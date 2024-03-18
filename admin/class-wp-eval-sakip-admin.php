@@ -23,7 +23,9 @@
 
 use Carbon_Fields\Container;
 use Carbon_Fields\Field;
-class Wp_Eval_Sakip_Admin {
+
+class Wp_Eval_Sakip_Admin
+{
 
 	/**
 	 * The ID of this plugin.
@@ -65,7 +67,8 @@ class Wp_Eval_Sakip_Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles() {
+	public function enqueue_styles()
+	{
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -79,8 +82,7 @@ class Wp_Eval_Sakip_Admin {
 		 * class.
 		 */
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/wp-eval-sakip-admin.css', array(), $this->version, 'all' );
-
+		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/wp-eval-sakip-admin.css', array(), $this->version, 'all');
 	}
 
 	/**
@@ -88,7 +90,8 @@ class Wp_Eval_Sakip_Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_scripts() {
+	public function enqueue_scripts()
+	{
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -102,8 +105,26 @@ class Wp_Eval_Sakip_Admin {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/wp-eval-sakip-admin.js', array( 'jquery' ), $this->version, false );
-
+		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/wp-eval-sakip-admin.js', array('jquery'), $this->version, false);
 	}
 
+
+	public function crb_attach_esakip_options()
+	{
+		global $wpdb;
+
+		$basic_options_container = Container::make('theme_options', __('ESAKIP Options'))
+			->set_page_menu_position(4)
+			->add_fields(array(
+				Field::make('html', 'crb_esakip_halaman_terkait')
+					->set_html('
+					<h5>HALAMAN TERKAIT</h5>
+	            	<ol>
+	            		<li></li>
+	            	</ol>'),
+				Field::make('text', 'crb_apikey_esakip', 'API KEY')
+					->set_default_value($this->functions->generateRandomString())
+					->set_help_text('Wajib diisi. API KEY digunakan untuk integrasi data.')
+			));
+	}
 }
