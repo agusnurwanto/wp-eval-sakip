@@ -1,32 +1,48 @@
-(function( $ ) {
-	'use strict';
+jQuery(document).ready(function () {
+  jQuery("#generate_user_sipd_merah").on("click", function () {
+    if (confirm("Apakah anda yakin akan menggenerate user SIPD!")) {
+      jQuery("#wrap-loading").show();
+      jQuery.ajax({
+        url: ajaxurl,
+        type: "post",
+        data: {
+          action: "generate_user_sipd_merah",
+          api_key: wpsipd.api_key,
+          pass: prompt("Masukan password default untuk User yang akan dibuat"),
+          update_pass: confirm(
+            "Apakah anda mau mereset password user existing juga?"
+          ),
+        },
+        dataType: "json",
+        success: function (data) {
+          jQuery("#wrap-loading").hide();
+          return alert(data.message);
+        },
+        error: function (e) {
+          console.log(e);
+          return alert(data.message);
+        },
+      });
+    }
+  });
+});
 
-	/**
-	 * All of the code for your admin-facing JavaScript source
-	 * should reside in this file.
-	 *
-	 * Note: It has been assumed you will write jQuery code here, so the
-	 * $ function reference has been prepared for usage within the scope
-	 * of this function.
-	 *
-	 * This enables you to define handlers, for when the DOM is ready:
-	 *
-	 * $(function() {
-	 *
-	 * });
-	 *
-	 * When the window is loaded:
-	 *
-	 * $( window ).load(function() {
-	 *
-	 * });
-	 *
-	 * ...and/or other possibilities.
-	 *
-	 * Ideally, it is not considered best practise to attach more than a
-	 * single DOM-ready or window-load handler for a particular page.
-	 * Although scripts in the WordPress core, Plugins and Themes may be
-	 * practising this, we should strive to set a better example in our own work.
-	 */
-
-})( jQuery );
+function sql_migrate_esakip() {
+  jQuery("#wrap-loading").show();
+  jQuery.ajax({
+    url: ajaxurl,
+    type: "POST",
+    data: {
+      action: "sql_migrate_esakip",
+    },
+    dataType: "json",
+    success: function (data) {
+      jQuery("#wrap-loading").hide();
+      return alert(data.message);
+    },
+    error: function (e) {
+      console.log(e);
+      return alert(data.message);
+    },
+  });
+}

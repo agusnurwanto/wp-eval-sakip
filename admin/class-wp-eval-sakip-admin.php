@@ -113,18 +113,63 @@ class Wp_Eval_Sakip_Admin
 	{
 		global $wpdb;
 
-		$basic_options_container = Container::make('theme_options', __('ESAKIP Options'))
+		$basic_options_container = Container::make('theme_options', __('E-SAKIP Options'))
 			->set_page_menu_position(4)
 			->add_fields(array(
 				Field::make('html', 'crb_esakip_halaman_terkait')
 					->set_html('
 					<h5>HALAMAN TERKAIT</h5>
 	            	<ol>
-	            		<li></li>
+						<li><span class="button button-primary" onclick="sql_migrate_esakip(); return false;">SQL Migrate</span> (Tombol untuk memperbaiki struktur database E-SAKIP)</li>
 	            	</ol>'),
 				Field::make('text', 'crb_apikey_esakip', 'API KEY')
 					->set_default_value($this->functions->generateRandomString())
 					->set_help_text('Wajib diisi. API KEY digunakan untuk integrasi data.')
 			));
+	}
+
+	function sql_migrate_esakip()
+	{
+		global $wpdb;
+		$ret = array(
+			'status'	=> 'success',
+			'message'	=> 'Berhasil menjalankan SQL migrate!'
+		);
+		$file = 'table.sql';
+		$ret['value'] = $file . ' (tgl: ' . date('Y-m-d H:i:s') . ')';
+		$path = ESAKIP_PLUGIN_PATH . '/' . $file;
+		if (file_exists($path)) {
+			$sql = file_get_contents($path);
+			$ret['sql'] = $sql;
+			if ($file == 'table.sql') {
+				require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+				$wpdb->hide_errors();
+				$rows_affected = dbDelta($sql);
+				if (empty($rows_affected)) {
+					$ret['status'] = 'error';
+					$ret['message'] = $wpdb->last_error;
+				} else {
+					$ret['message'] = implode(' | ', $rows_affected);
+				}
+			} else {
+				$wpdb->hide_errors();
+				$res = $wpdb->query($sql);
+				if (empty($res)) {
+					$ret['status'] = 'error';
+					$ret['message'] = $wpdb->last_error;
+				} else {
+					$ret['message'] = $res;
+				}
+			}
+			if ($ret['status'] == 'success') {
+				$ret['version'] = $this->version;
+				update_option('_last_update_sql_migrate_esakip', $ret['value']);
+				update_option('_wp_sipd_db_version_esakip', $this->version);
+			}
+		} else {
+			$ret['status'] = 'error';
+			$ret['message'] = 'File ' . $path . ' tidak ditemukan!';
+		}
+		die(json_encode($ret));
 	}
 }
