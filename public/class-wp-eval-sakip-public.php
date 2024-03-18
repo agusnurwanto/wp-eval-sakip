@@ -40,6 +40,8 @@ class Wp_Eval_Sakip_Public {
 	 */
 	private $version;
 
+	private $functions;
+
 	/**
 	 * Initialize the class and set its properties.
 	 *
@@ -47,11 +49,12 @@ class Wp_Eval_Sakip_Public {
 	 * @param      string    $plugin_name       The name of the plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct($plugin_name, $version, $functions)
+	{
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-
+		$this->functions = $functions;
 	}
 
 	/**

@@ -124,6 +124,13 @@ class Wp_Eval_Sakip {
 
 		$this->loader = new Wp_Eval_Sakip_Loader();
 
+		// Functions tambahan
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-wp-eval-sakip-functions.php';
+
+		$this->functions = new Esakip_Functions( $this->plugin_name, $this->version );
+
+		$this->loader->add_action('template_redirect', $this->functions, 'allow_access_private_post', 0);
+
 	}
 
 	/**
@@ -152,7 +159,7 @@ class Wp_Eval_Sakip {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Wp_Eval_Sakip_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new Wp_Eval_Sakip_Admin( $this->get_plugin_name(), $this->get_version(), $this->functions );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
@@ -168,7 +175,7 @@ class Wp_Eval_Sakip {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new Wp_Eval_Sakip_Public( $this->get_plugin_name(), $this->get_version() );
+		$plugin_public = new Wp_Eval_Sakip_Public( $this->get_plugin_name(), $this->get_version(), $this->functions );
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
