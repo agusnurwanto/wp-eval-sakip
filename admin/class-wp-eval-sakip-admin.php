@@ -108,6 +108,16 @@ class Wp_Eval_Sakip_Admin
 		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/wp-eval-sakip-admin.js', array('jquery'), $this->version, false);
 	}
 
+	public function get_ajax_field($options = array('type' => 'dokumen'))
+	{
+		$ret = array();
+		$hide_sidebar = Field::make('html', 'crb_hide_sidebar')
+			->set_html('
+        		<div id="load_ajax_carbon" data-type="' . $options['type'] . '"></div>
+        	');
+		$ret[] = $hide_sidebar;
+		return $ret;
+	}
 
 	public function crb_attach_esakip_options()
 	{
@@ -120,12 +130,87 @@ class Wp_Eval_Sakip_Admin
 					->set_html('
 					<h5>HALAMAN TERKAIT</h5>
 	            	<ol>
-						<li><span class="button button-primary" onclick="sql_migrate_esakip(); return false;">SQL Migrate</span> (Tombol untuk memperbaiki struktur database E-SAKIP)</li>
 	            	</ol>'),
-				Field::make('text', 'crb_apikey_esakip', 'API KEY')
+				Field::make('text', '_crb_apikey_esakip', 'API KEY')
 					->set_default_value($this->functions->generateRandomString())
-					->set_help_text('Wajib diisi. API KEY digunakan untuk integrasi data.')
+					->set_help_text('Wajib diisi. API KEY digunakan untuk integrasi data.'),
+				Field::make('html', 'crb_sql_migrate')
+					->set_html('<a onclick="sql_migrate_esakip(); return false;" href="#" class="button button-primary button-large">SQL Migrate</a>')
+					->set_help_text('Tombol untuk memperbaiki struktur database E-SAKIP.'),
+				Field::make('html', 'crb_generate_user_sipd_merah')
+					->set_html('<a id="generate_user_sipd_merah" onclick="return false;" href="#" class="button button-primary button-large">Generate User SIPD Merah By DB Lokal</a>')
+					->set_help_text('Data user active yang ada di table data_dewan akan digenerate menjadi user wordpress.'),
 			));
+			Container::make('theme_options', __('Admin Website'))
+				->set_page_parent($basic_options_container)
+				->add_fields(array(
+					$this->get_ajax_field(array('type' => 'admin_website'),
+
+				)
+			));
+
+		$dokumen_menu = Container::make('theme_options', __('Dokumen'))
+			->set_page_menu_position(4)
+			->add_fields($this->get_ajax_field(array('type' => 'dokumen')));
+
+			Container::make('theme_options', __('RENSTRA'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->get_ajax_field(array('type' => 'renstra')));
+			Container::make('theme_options', __('RENJA/RKT'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->get_ajax_field(array('type' => 'renja')));
+			Container::make('theme_options', __('Perjanjian Kinerja'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->get_ajax_field(array('type' => 'perjanjian_kinerja')));
+			Container::make('theme_options', __('Rencana Aksi'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->get_ajax_field(array('type' => 'rencana_aksi')));
+			Container::make('theme_options', __('IKU'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->get_ajax_field(array('type' => 'iku')));
+			Container::make('theme_options', __('SKP'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->get_ajax_field(array('type' => 'skp')));
+			Container::make('theme_options', __('Pengukuran Kinerja'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->get_ajax_field(array('type' => 'pengukuran_kinerja')));
+			Container::make('theme_options', __('Pengukuran Rencana Aksi'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->get_ajax_field(array('type' => 'pengukuran_rencana_aksi')));
+			Container::make('theme_options', __('Laporan Kinerja'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->get_ajax_field(array('type' => 'laporan_kinerja')));
+			Container::make('theme_options', __('Evaluasi Internal'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->get_ajax_field(array('type' => 'evaluasi_internal')));
+			Container::make('theme_options', __('Dokumen Lainnya'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->get_ajax_field(array('type' => 'dokumen_lainnya')));
+
+		$dokumen_kab_menu = Container::make('theme_options', __('Dokumen Kabupaten'))
+			->set_page_menu_position(4)
+			->add_fields($this->get_ajax_field(array('type' => 'dokumen_kabupaten')));
+
+			Container::make('theme_options', __('RPJMD'))
+				->set_page_parent($dokumen_kab_menu)
+				->add_fields($this->get_ajax_field(array('type' => 'rpjmd')));
+			Container::make('theme_options', __('RKPD'))
+				->set_page_parent($dokumen_kab_menu)
+				->add_fields($this->get_ajax_field(array('type' => 'rkpd')));
+			Container::make('theme_options', __('LKJIP/LPPD'))
+				->set_page_parent($dokumen_kab_menu)
+				->add_fields($this->get_ajax_field(array('type' => 'lkjip')));
+			Container::make('theme_options', __('Dokumen Lainnya'))
+				->set_page_parent($dokumen_kab_menu)
+				->add_fields($this->get_ajax_field(array('type' => 'dokumen_kab_lainnya')));
+
+		$laporan_hasil_evaluasi_menu = Container::make('theme_options', __('Laporan Hasil Evaluasi'))
+			->set_page_menu_position(4)
+			->add_fields($this->get_ajax_field(array('type' => 'laporan_hasil_evaluasi')));
+
+		$konsultasi_menu = Container::make('theme_options', __('Konsultasi'))
+			->set_page_menu_position(4)
+			->add_fields($this->get_ajax_field(array('type' => 'konsultasi')));
 	}
 
 	function sql_migrate_esakip()
@@ -169,6 +254,55 @@ class Wp_Eval_Sakip_Admin
 		} else {
 			$ret['status'] = 'error';
 			$ret['message'] = 'File ' . $path . ' tidak ditemukan!';
+		}
+		die(json_encode($ret));
+	}
+
+	function generate_user_sipd_merah()
+	{
+		global $wpdb;
+		$ret = array();
+		$ret['status'] = 'success';
+		$ret['message'] = 'Berhasil Generate User Wordpress dari DB Lokal SIPD Merah';
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				$users_pa = $wpdb->get_results(
+					$wpdb->prepare("
+						SELECT 
+						* 
+						FROM data_unit 
+						WHERE active=1
+						"),
+					ARRAY_A
+				);
+				$update_pass = false;
+				if (
+					!empty($_POST['update_pass'])
+					&& $_POST['update_pass'] == 'true'
+				) {
+					$update_pass = true;
+				}
+				if (!empty($users_pa)) {
+					foreach ($users_pa as $k => $user) {
+						$user['pass'] = $_POST['pass'];
+						$user['loginname'] = $user['nipkepala'];
+						$user['jabatan'] = $user['statuskepala'];
+						$user['nama'] = $user['namakepala'];
+						$user['id_sub_skpd'] = $user['id_skpd'];
+						$user['nip'] = $user['nipkepala'];
+						$this->gen_user_sipd_merah($user, $update_pass);
+					}
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Data user PA/KPA kosong. Harap lakukan singkronisasi data SKPD dulu!';
+				}
+			} else {
+				$ret['status'] = 'error';
+				$ret['message'] = 'APIKEY tidak sesuai!';
+			}
+		} else {
+			$ret['status'] = 'error';
+			$ret['message'] = 'Format Salah!';
 		}
 		die(json_encode($ret));
 	}
