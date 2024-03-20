@@ -122,12 +122,30 @@ class Wp_Eval_Sakip_Admin
 		return $ret;
 	}
 
+	public function load_ajax_carbon()
+	{
+		global $wpdb;
+		$ret = array(
+			'status'	=> 'success',
+			'message'	=> ''
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_api_key_extension')) {
+				if ($_POST['type'] == 'keu_pemdes'){
+					$url_add_new_ssh = $this->generatePage('Data Usulan Standar Satuan Harga (SSH) | ' . $v['tahun_anggaran'], $v['tahun_anggaran'], '[data_ssh_usulan tahun_anggaran="' . $v['tahun_anggaran'] . '"]');
+					$body_all .= '<div style="padding:.75rem 0 0 .75rem;"><a style="font-weight: bold;" target="_blank" href="' . $url_add_new_ssh . '">Halaman Data Usulan SSH ' . $v['tahun_anggaran'] . '</a></div>';
+				}
+			}
+			die(json_encode($ret));
+		}
+	}
+
 	public function crb_attach_esakip_options()
 	{
 		global $wpdb;
 
 		$basic_options_container = Container::make('theme_options', __('E-SAKIP Options'))
-			->set_page_menu_position(4)
+			->set_page_menu_position(3)
 			->add_fields(array(
 				Field::make('html', 'crb_esakip_halaman_terkait')
 					->set_html('
@@ -155,17 +173,19 @@ class Wp_Eval_Sakip_Admin
 			->add_fields($this->get_ajax_field(array('type' => 'admin_website')));
 
 		$pengisian_lke_menu = Container::make('theme_options', __('Pengisian LKE SAKIP'))
-			->set_page_menu_position(4);
+			->set_page_menu_position(3.1)
+			->set_icon( 'dashicons-edit-page' );
 
 		Container::make('theme_options', __('SAKIP Perangkat Daerah'))
 			->set_page_parent($pengisian_lke_menu)
 			->add_fields($this->get_ajax_field(array('type' => 'sakip_perangkat_daerah')));
-		Container::make('theme_options', __('SAKIP Kabupaten'))
+		Container::make('theme_options', __('SAKIP Pemda'))
 			->set_page_parent($pengisian_lke_menu)
-			->add_fields($this->get_ajax_field(array('type' => 'sakip_kabupaten')));
+			->add_fields($this->get_ajax_field(array('type' => 'sakip_pemda')));
 
 		$dokumen_menu = Container::make('theme_options', __('Dokumen'))
-			->set_page_menu_position(4);
+			->set_page_menu_position(3.2)
+			->set_icon( 'dashicons-media-default' );
 
 		Container::make('theme_options', __('RENSTRA'))
 			->set_page_parent($dokumen_menu)
@@ -201,8 +221,9 @@ class Wp_Eval_Sakip_Admin
 			->set_page_parent($dokumen_menu)
 			->add_fields($this->get_ajax_field(array('type' => 'dokumen_lainnya')));
 
-		$dokumen_kab_menu = Container::make('theme_options', __('Dokumen Kabupaten'))
-			->set_page_menu_position(4);
+		$dokumen_kab_menu = Container::make('theme_options', __('Dokumen Pemda'))
+			->set_page_menu_position(3.3)
+			->set_icon( 'dashicons-bank' );
 
 		Container::make('theme_options', __('RPJMD'))
 			->set_page_parent($dokumen_kab_menu)
@@ -218,7 +239,8 @@ class Wp_Eval_Sakip_Admin
 			->add_fields($this->get_ajax_field(array('type' => 'dokumen_kab_lainnya')));
 
 		$konsultasi_menu = Container::make('theme_options', __('Konsultasi'))
-			->set_page_menu_position(4)
+			->set_page_menu_position(3.4)
+			->set_icon( 'dashicons-testimonial' )
 			->add_fields($this->get_ajax_field(array('type' => 'konsultasi')));
 	}
 
