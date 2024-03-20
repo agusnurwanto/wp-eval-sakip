@@ -7,7 +7,7 @@ jQuery(document).ready(function () {
         type: "POST",
         data: {
           action: "generate_user_sipd_merah",
-          api_key: api_key,
+          api_key: esakip.api_key,
           pass: prompt("Masukan password default untuk User yang akan dibuat"),
           update_pass: confirm(
             "Apakah anda mau mereset password user existing juga?"

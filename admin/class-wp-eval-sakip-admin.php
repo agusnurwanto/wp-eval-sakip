@@ -106,6 +106,9 @@ class Wp_Eval_Sakip_Admin
 		 */
 
 		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/wp-eval-sakip-admin.js', array('jquery'), $this->version, false);
+		wp_localize_script($this->plugin_name, 'esakip', array(
+			'api_key' => get_option(ESAKIP_APIKEY)
+		));
 	}
 
 	public function get_ajax_field($options = array('type' => 'dokumen'))
@@ -141,72 +144,78 @@ class Wp_Eval_Sakip_Admin
 					->set_html('<a id="generate_user_sipd_merah" onclick="return false;" href="#" class="button button-primary button-large">Generate User SIPD Merah By DB Lokal</a>')
 					->set_help_text('Data user active yang ada di table data_dewan akan digenerate menjadi user wordpress.'),
 			));
-			Container::make('theme_options', __('Admin Website'))
-				->set_page_parent($basic_options_container)
-				->add_fields(array(
-					$this->get_ajax_field(array('type' => 'admin_website'),
+		Container::make('theme_options', __('Desain LKE SAKIP'))
+			->set_page_parent($basic_options_container)
+			->add_fields($this->get_ajax_field(array('type' => 'desain_lke_sakip')));
+		Container::make('theme_options', __('Jadwal Evaluasi'))
+			->set_page_parent($basic_options_container)
+			->add_fields($this->get_ajax_field(array('type' => 'jadwal_evaluasi')));
+		Container::make('theme_options', __('Admin Website'))
+			->set_page_parent($basic_options_container)
+			->add_fields($this->get_ajax_field(array('type' => 'admin_website')));
 
-				)
-			));
+		$pengisian_lke_menu = Container::make('theme_options', __('Pengisian LKE SAKIP'))
+			->set_page_menu_position(4);
+
+		Container::make('theme_options', __('SAKIP Perangkat Daerah'))
+			->set_page_parent($pengisian_lke_menu)
+			->add_fields($this->get_ajax_field(array('type' => 'sakip_perangkat_daerah')));
+		Container::make('theme_options', __('SAKIP Kabupaten'))
+			->set_page_parent($pengisian_lke_menu)
+			->add_fields($this->get_ajax_field(array('type' => 'sakip_kabupaten')));
 
 		$dokumen_menu = Container::make('theme_options', __('Dokumen'))
-			->set_page_menu_position(4)
-			->add_fields($this->get_ajax_field(array('type' => 'dokumen')));
+			->set_page_menu_position(4);
 
-			Container::make('theme_options', __('RENSTRA'))
-				->set_page_parent($dokumen_menu)
-				->add_fields($this->get_ajax_field(array('type' => 'renstra')));
-			Container::make('theme_options', __('RENJA/RKT'))
-				->set_page_parent($dokumen_menu)
-				->add_fields($this->get_ajax_field(array('type' => 'renja')));
-			Container::make('theme_options', __('Perjanjian Kinerja'))
-				->set_page_parent($dokumen_menu)
-				->add_fields($this->get_ajax_field(array('type' => 'perjanjian_kinerja')));
-			Container::make('theme_options', __('Rencana Aksi'))
-				->set_page_parent($dokumen_menu)
-				->add_fields($this->get_ajax_field(array('type' => 'rencana_aksi')));
-			Container::make('theme_options', __('IKU'))
-				->set_page_parent($dokumen_menu)
-				->add_fields($this->get_ajax_field(array('type' => 'iku')));
-			Container::make('theme_options', __('SKP'))
-				->set_page_parent($dokumen_menu)
-				->add_fields($this->get_ajax_field(array('type' => 'skp')));
-			Container::make('theme_options', __('Pengukuran Kinerja'))
-				->set_page_parent($dokumen_menu)
-				->add_fields($this->get_ajax_field(array('type' => 'pengukuran_kinerja')));
-			Container::make('theme_options', __('Pengukuran Rencana Aksi'))
-				->set_page_parent($dokumen_menu)
-				->add_fields($this->get_ajax_field(array('type' => 'pengukuran_rencana_aksi')));
-			Container::make('theme_options', __('Laporan Kinerja'))
-				->set_page_parent($dokumen_menu)
-				->add_fields($this->get_ajax_field(array('type' => 'laporan_kinerja')));
-			Container::make('theme_options', __('Evaluasi Internal'))
-				->set_page_parent($dokumen_menu)
-				->add_fields($this->get_ajax_field(array('type' => 'evaluasi_internal')));
-			Container::make('theme_options', __('Dokumen Lainnya'))
-				->set_page_parent($dokumen_menu)
-				->add_fields($this->get_ajax_field(array('type' => 'dokumen_lainnya')));
+		Container::make('theme_options', __('RENSTRA'))
+			->set_page_parent($dokumen_menu)
+			->add_fields($this->get_ajax_field(array('type' => 'renstra')));
+		Container::make('theme_options', __('RENJA/RKT'))
+			->set_page_parent($dokumen_menu)
+			->add_fields($this->get_ajax_field(array('type' => 'renja')));
+		Container::make('theme_options', __('Perjanjian Kinerja'))
+			->set_page_parent($dokumen_menu)
+			->add_fields($this->get_ajax_field(array('type' => 'perjanjian_kinerja')));
+		Container::make('theme_options', __('Rencana Aksi'))
+			->set_page_parent($dokumen_menu)
+			->add_fields($this->get_ajax_field(array('type' => 'rencana_aksi')));
+		Container::make('theme_options', __('IKU'))
+			->set_page_parent($dokumen_menu)
+			->add_fields($this->get_ajax_field(array('type' => 'iku')));
+		Container::make('theme_options', __('SKP'))
+			->set_page_parent($dokumen_menu)
+			->add_fields($this->get_ajax_field(array('type' => 'skp')));
+		Container::make('theme_options', __('Pengukuran Kinerja'))
+			->set_page_parent($dokumen_menu)
+			->add_fields($this->get_ajax_field(array('type' => 'pengukuran_kinerja')));
+		Container::make('theme_options', __('Pengukuran Rencana Aksi'))
+			->set_page_parent($dokumen_menu)
+			->add_fields($this->get_ajax_field(array('type' => 'pengukuran_rencana_aksi')));
+		Container::make('theme_options', __('Laporan Kinerja'))
+			->set_page_parent($dokumen_menu)
+			->add_fields($this->get_ajax_field(array('type' => 'laporan_kinerja')));
+		Container::make('theme_options', __('Evaluasi Internal'))
+			->set_page_parent($dokumen_menu)
+			->add_fields($this->get_ajax_field(array('type' => 'evaluasi_internal')));
+		Container::make('theme_options', __('Dokumen Lainnya'))
+			->set_page_parent($dokumen_menu)
+			->add_fields($this->get_ajax_field(array('type' => 'dokumen_lainnya')));
 
 		$dokumen_kab_menu = Container::make('theme_options', __('Dokumen Kabupaten'))
-			->set_page_menu_position(4)
-			->add_fields($this->get_ajax_field(array('type' => 'dokumen_kabupaten')));
+			->set_page_menu_position(4);
 
-			Container::make('theme_options', __('RPJMD'))
-				->set_page_parent($dokumen_kab_menu)
-				->add_fields($this->get_ajax_field(array('type' => 'rpjmd')));
-			Container::make('theme_options', __('RKPD'))
-				->set_page_parent($dokumen_kab_menu)
-				->add_fields($this->get_ajax_field(array('type' => 'rkpd')));
-			Container::make('theme_options', __('LKJIP/LPPD'))
-				->set_page_parent($dokumen_kab_menu)
-				->add_fields($this->get_ajax_field(array('type' => 'lkjip')));
-			Container::make('theme_options', __('Dokumen Lainnya'))
-				->set_page_parent($dokumen_kab_menu)
-				->add_fields($this->get_ajax_field(array('type' => 'dokumen_kab_lainnya')));
-
-		$laporan_hasil_evaluasi_menu = Container::make('theme_options', __('Laporan Hasil Evaluasi'))
-			->set_page_menu_position(4)
-			->add_fields($this->get_ajax_field(array('type' => 'laporan_hasil_evaluasi')));
+		Container::make('theme_options', __('RPJMD'))
+			->set_page_parent($dokumen_kab_menu)
+			->add_fields($this->get_ajax_field(array('type' => 'rpjmd')));
+		Container::make('theme_options', __('RKPD'))
+			->set_page_parent($dokumen_kab_menu)
+			->add_fields($this->get_ajax_field(array('type' => 'rkpd')));
+		Container::make('theme_options', __('LKJIP/LPPD'))
+			->set_page_parent($dokumen_kab_menu)
+			->add_fields($this->get_ajax_field(array('type' => 'lkjip')));
+		Container::make('theme_options', __('Dokumen Lainnya'))
+			->set_page_parent($dokumen_kab_menu)
+			->add_fields($this->get_ajax_field(array('type' => 'dokumen_kab_lainnya')));
 
 		$konsultasi_menu = Container::make('theme_options', __('Konsultasi'))
 			->set_page_menu_position(4)
@@ -256,6 +265,70 @@ class Wp_Eval_Sakip_Admin
 			$ret['message'] = 'File ' . $path . ' tidak ditemukan!';
 		}
 		die(json_encode($ret));
+	}
+
+	function gen_user_sipd_merah($user = array(), $update_pass = false)
+	{
+		global $wpdb;
+		if (!empty($user)) {
+			$username = $user['loginname'];
+			if (!empty($user['emailteks'])) {
+				$email = $user['emailteks'];
+			} else {
+				$email = $username . '@sipdlocal.com';
+			}
+			$role = get_role($user['jabatan']);
+			if (empty($role)) {
+				add_role($user['jabatan'], $user['jabatan'], array(
+					'read' => true,
+					'edit_posts' => false,
+					'delete_posts' => false
+				));
+			}
+			$insert_user = username_exists($username);
+			if (!$insert_user) {
+				$option = array(
+					'user_login' => $username,
+					'user_pass' => $user['pass'],
+					'user_email' => $email,
+					'first_name' => $user['nama'],
+					'display_name' => $user['nama'],
+					'role' => $user['jabatan']
+				);
+				$insert_user = wp_insert_user($option);
+
+				if (is_wp_error($insert_user)) {
+					//print_r($option);die();
+					return $insert_user;
+				}
+			}
+
+			if (!empty($update_pass)) {
+				wp_set_password($user['pass'], $insert_user);
+			}
+
+			$meta = array(
+				'_nip' => $user['nip'],
+				'description' => 'User dibuat dari data SIPD Merah'
+			);
+			if (!empty($user['id_sub_skpd'])) {
+				$skpd = $wpdb->get_var(
+					$wpdb->prepare("
+						SELECT nama_skpd 
+						FROM data_unit 
+						WHERE id_skpd=" . $user['id_sub_skpd'] . " 
+						  AND active=1")
+				);
+				$meta['_crb_nama_skpd'] = $skpd;
+				$meta['_id_sub_skpd'] = $user['id_sub_skpd'];
+			}
+			if (!empty($user['iduser'])) {
+				$meta['id_user_sipd'] = $user['iduser'];
+			}
+			foreach ($meta as $key => $val) {
+				update_user_meta($insert_user, $key, $val);
+			}
+		}
 	}
 
 	function generate_user_sipd_merah()

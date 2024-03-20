@@ -166,6 +166,7 @@ class Wp_Eval_Sakip {
 
 		$this->loader->add_action('wp_ajax_sql_migrate_esakip', $plugin_admin, 'sql_migrate_esakip');
 		$this->loader->add_action('wp_ajax_generate_user_sipd_merah', $plugin_admin, 'generate_user_sipd_merah');
+		$this->loader->add_action('wp_ajax_gen_user_sipd_merah', $plugin_admin, 'gen_user_sipd_merah');
 
 		$this->loader->add_action('carbon_fields_register_fields', $plugin_admin, 'crb_attach_esakip_options');
 	}
