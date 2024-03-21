@@ -185,6 +185,25 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
+		add_shortcode('desain_lke_sakip', array($plugin_public, 'desain_lke_sakip'));
+		add_shortcode('jadwal_evaluasi', array($plugin_public, 'jadwal_evaluasi'));
+		add_shortcode('renstra', array($plugin_public, 'renstra'));
+		add_shortcode('renja_rkt', array($plugin_public, 'renja_rkt'));
+		add_shortcode('perjanjian_kinerja', array($plugin_public, 'perjanjian_kinerja'));
+		add_shortcode('rencana_aksi', array($plugin_public, 'rencana_aksi'));
+		add_shortcode('iku', array($plugin_public, 'iku'));
+		add_shortcode('skp', array($plugin_public, 'skp'));
+		add_shortcode('pengukuran_kinerja', array($plugin_public, 'pengukuran_kinerja'));
+		add_shortcode('pengukuran_rencana_aksi', array($plugin_public, 'pengukuran_rencana_aksi'));
+		add_shortcode('laporan_kinerja', array($plugin_public, 'laporan_kinerja'));
+		add_shortcode('evaluasi_internal', array($plugin_public, 'evaluasi_internal'));
+		add_shortcode('dokumen_lainnya', array($plugin_public, 'dokumen_lainnya'));
+		add_shortcode('rpjmd', array($plugin_public, 'rpjmd'));
+		add_shortcode('rkpd', array($plugin_public, 'rkpd'));
+		add_shortcode('lkjip_lppd', array($plugin_public, 'lkjip_lppd'));
+		add_shortcode('dokumen_pemda_lainnya', array($plugin_public, 'dokumen_pemda_lainnya'));
+		add_shortcode('konsultasi', array($plugin_public, 'konsultasi'));
+
 	}
 
 	/**

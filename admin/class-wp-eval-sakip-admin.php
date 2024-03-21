@@ -131,7 +131,7 @@ class Wp_Eval_Sakip_Admin
 		);
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_api_key_extension')) {
-				if ($_POST['type'] == 'keu_pemdes'){
+				if ($_POST['type'] == 'keu_pemdes') {
 					$url_add_new_ssh = $this->generatePage('Data Usulan Standar Satuan Harga (SSH) | ' . $v['tahun_anggaran'], $v['tahun_anggaran'], '[data_ssh_usulan tahun_anggaran="' . $v['tahun_anggaran'] . '"]');
 					$body_all .= '<div style="padding:.75rem 0 0 .75rem;"><a style="font-weight: bold;" target="_blank" href="' . $url_add_new_ssh . '">Halaman Data Usulan SSH ' . $v['tahun_anggaran'] . '</a></div>';
 				}
@@ -143,6 +143,152 @@ class Wp_Eval_Sakip_Admin
 	public function crb_attach_esakip_options()
 	{
 		global $wpdb;
+
+		$desain_lke_sakip = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman Desain LKE SAKIP',
+			'content' => '[desain_lke_sakip]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+
+		$jadwal_evaluasi = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman Jadwal Evaluasi',
+			'content' => '[jadwal_evaluasi]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+
+		$pengisian_lke_sakip = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman Pengisian LKE',
+			'content' => '[pengisian_lke_sakip]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+
+		$renstra = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman RENSTRA',
+			'content' => '[renstra]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+
+		$renja_rkt = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman RENJA/RKT',
+			'content' => '[renja_rkt]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+
+		$perjanjian_kinerja = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman Perjanjian Kinerja',
+			'content' => '[perjanjian_kinerja]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+
+		$rencana_aksi = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman Rencana Aksi',
+			'content' => '[rencana_aksi]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+
+		$iku = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman IKU',
+			'content' => '[iku]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+
+		$skp = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman SKP',
+			'content' => '[skp]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+
+		$pengukuran_kinerja = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman Pengukuran Kinerja',
+			'content' => '[pengukuran_kinerja]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+
+		$pengukuran_rencana_aksi = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman Pengukuran Rencana Aksi',
+			'content' => '[pengukuran_rencana_aksi]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+
+		$laporan_kinerja = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman Laporan Kinerja',
+			'content' => '[laporan_kinerja]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+
+		$evaluasi_internal = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman Evaluasi Internal',
+			'content' => '[evaluasi_internal]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+
+		$dokumen_lainnya = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman Dokumen Lainnya',
+			'content' => '[dokumen_lainnya]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+
+		$rpjmd = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman RPJMD',
+			'content' => '[rpjmd]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+
+		$rkpd = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman RKPD',
+			'content' => '[rkpd]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+
+		$lkjip_lppd = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman LKJIP/LPPD',
+			'content' => '[lkjip_lppd]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+
+		$dokumen_pemda_lainnya = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman Dokumen Lainnya',
+			'content' => '[dokumen_pemda_lainnya]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+
+
 
 		$basic_options_container = Container::make('theme_options', __('E-SAKIP Options'))
 			->set_page_menu_position(3)
@@ -162,86 +308,366 @@ class Wp_Eval_Sakip_Admin
 					->set_html('<a id="generate_user_sipd_merah" onclick="return false;" href="#" class="button button-primary button-large">Generate User SIPD Merah By DB Lokal</a>')
 					->set_help_text('Data user active yang ada di table data_dewan akan digenerate menjadi user wordpress.'),
 			));
+		Container::make('theme_options', __('Pengaturan Perangkat Daerah'))
+			->set_page_parent($basic_options_container)
+			->add_fields(array(
+				Field::make('html', 'crb_pengisian_lke_hide_sidebar')
+					->set_html('
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	'),
+				Field::make('html', 'crb_siks_halaman_terkait_pengisian_lke')
+					->set_html('
+					<h5>HALAMAN TERKAIT</h5>
+	            	<ol>
+	            	</ol>
+		        	')
+			));
 		Container::make('theme_options', __('Desain LKE SAKIP'))
 			->set_page_parent($basic_options_container)
-			->add_fields($this->get_ajax_field(array('type' => 'desain_lke_sakip')));
+			->add_fields(array(
+				Field::make('html', 'crb_desain_lke_hide_sidebar')
+					->set_html('
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	'),
+				Field::make('html', 'crb_siks_halaman_terkait_desain_lke')
+					->set_html('
+					<h5>HALAMAN TERKAIT</h5>
+	            	<ol>
+	            		<li><a target="_blank" href="' . $desain_lke_sakip['url'] . '">' . $desain_lke_sakip['title'] . '</a></li>
+	            	</ol>
+		        	')
+			));
 		Container::make('theme_options', __('Jadwal Evaluasi'))
 			->set_page_parent($basic_options_container)
-			->add_fields($this->get_ajax_field(array('type' => 'jadwal_evaluasi')));
-		Container::make('theme_options', __('Admin Website'))
-			->set_page_parent($basic_options_container)
-			->add_fields($this->get_ajax_field(array('type' => 'admin_website')));
+			->add_fields(array(
+				Field::make('html', 'crb_jadwal_evaluasi_hide_sidebar')
+					->set_html('
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	'),
+				Field::make('html', 'crb_siks_halaman_terkait_jadwal_evaluasi')
+					->set_html('
+					<h5>HALAMAN TERKAIT</h5>
+	            	<ol>
+	            		<li><a target="_blank" href="' . $jadwal_evaluasi['url'] . '">' . $jadwal_evaluasi['title'] . '</a></li>
+	            	</ol>
+		        	')
+			));
 
 		$pengisian_lke_menu = Container::make('theme_options', __('Pengisian LKE SAKIP'))
 			->set_page_menu_position(3.1)
-			->set_icon( 'dashicons-edit-page' );
-
-		Container::make('theme_options', __('SAKIP Perangkat Daerah'))
-			->set_page_parent($pengisian_lke_menu)
-			->add_fields($this->get_ajax_field(array('type' => 'sakip_perangkat_daerah')));
-		Container::make('theme_options', __('SAKIP Pemda'))
-			->set_page_parent($pengisian_lke_menu)
-			->add_fields($this->get_ajax_field(array('type' => 'sakip_pemda')));
+			->set_icon('dashicons-edit-page')
+			->add_fields(array(
+				Field::make('html', 'crb_pengisian_lke_hide_sidebar')
+					->set_html('
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	'),
+				Field::make('html', 'crb_siks_halaman_terkait_pengisian_lke')
+					->set_html('
+					<h5>HALAMAN TERKAIT</h5>
+	            	<ol>
+	            		<li><a target="_blank" href="' . $pengisian_lke_sakip['url'] . '">' . $pengisian_lke_sakip['title'] . '</a></li>
+	            	</ol>
+		        	'),
+				Field::make('select', 'crb_jadwal_pengisian_lke', 'Jadwal Pengisian LKE')
+					->add_options(array(
+						'option1' => 'Option 1',
+						'option2' => 'Option 2',
+						'option3' => 'Option 3',
+					))
+					->set_width(50)
+			));
 
 		$dokumen_menu = Container::make('theme_options', __('Dokumen'))
 			->set_page_menu_position(3.2)
-			->set_icon( 'dashicons-media-default' );
+			->set_icon('dashicons-media-default');
 
 		Container::make('theme_options', __('RENSTRA'))
 			->set_page_parent($dokumen_menu)
-			->add_fields($this->get_ajax_field(array('type' => 'renstra')));
+			->add_fields(array(
+				Field::make('html', 'crb_renstra_hide_sidebar')
+					->set_html('
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	'),
+				Field::make('html', 'crb_siks_halaman_terkait_renstra')
+					->set_html('
+					<h5>HALAMAN TERKAIT</h5>
+	            	<ol>
+	            		<li><a target="_blank" href="' . $renstra['url'] . '">' . $renstra['title'] . '</a></li>
+	            	</ol>
+		        	')
+			));
 		Container::make('theme_options', __('RENJA/RKT'))
 			->set_page_parent($dokumen_menu)
-			->add_fields($this->get_ajax_field(array('type' => 'renja')));
+			->add_fields(array(
+				Field::make('html', 'crb_renja_rkt_hide_sidebar')
+					->set_html('
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	'),
+				Field::make('html', 'crb_siks_halaman_terkait_renja_rkt')
+					->set_html('
+					<h5>HALAMAN TERKAIT</h5>
+	            	<ol>
+	            		<li><a target="_blank" href="' . $renja_rkt['url'] . '">' . $renja_rkt['title'] . '</a></li>
+	            	</ol>
+		        	')
+			));
 		Container::make('theme_options', __('Perjanjian Kinerja'))
 			->set_page_parent($dokumen_menu)
-			->add_fields($this->get_ajax_field(array('type' => 'perjanjian_kinerja')));
+			->add_fields(array(
+				Field::make('html', 'crb_perjanjian_kinerja_hide_sidebar')
+					->set_html('
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	'),
+				Field::make('html', 'crb_siks_halaman_terkait_perjanjian_kinerja')
+					->set_html('
+					<h5>HALAMAN TERKAIT</h5>
+	            	<ol>
+	            		<li><a target="_blank" href="' . $perjanjian_kinerja['url'] . '">' . $perjanjian_kinerja['title'] . '</a></li>
+	            	</ol>
+		        	')
+			));
 		Container::make('theme_options', __('Rencana Aksi'))
 			->set_page_parent($dokumen_menu)
-			->add_fields($this->get_ajax_field(array('type' => 'rencana_aksi')));
+			->add_fields(array(
+				Field::make('html', 'crb_rencana_aksi_hide_sidebar')
+					->set_html('
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	'),
+				Field::make('html', 'crb_siks_halaman_terkait_rencana_aksi')
+					->set_html('
+					<h5>HALAMAN TERKAIT</h5>
+	            	<ol>
+	            		<li><a target="_blank" href="' . $rencana_aksi['url'] . '">' . $rencana_aksi['title'] . '</a></li>
+	            	</ol>
+		        	')
+			));
 		Container::make('theme_options', __('IKU'))
 			->set_page_parent($dokumen_menu)
-			->add_fields($this->get_ajax_field(array('type' => 'iku')));
+			->add_fields(array(
+				Field::make('html', 'crb_iku_hide_sidebar')
+					->set_html('
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	'),
+				Field::make('html', 'crb_siks_halaman_terkait_iku')
+					->set_html('
+					<h5>HALAMAN TERKAIT</h5>
+	            	<ol>
+	            		<li><a target="_blank" href="' . $iku['url'] . '">' . $iku['title'] . '</a></li>
+	            	</ol>
+		        	')
+			));
 		Container::make('theme_options', __('SKP'))
 			->set_page_parent($dokumen_menu)
-			->add_fields($this->get_ajax_field(array('type' => 'skp')));
+			->add_fields(array(
+				Field::make('html', 'crb_skp_hide_sidebar')
+					->set_html('
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	'),
+				Field::make('html', 'crb_siks_halaman_terkait_skp')
+					->set_html('
+					<h5>HALAMAN TERKAIT</h5>
+	            	<ol>
+	            		<li><a target="_blank" href="' . $skp['url'] . '">' . $skp['title'] . '</a></li>
+	            	</ol>
+		        	')
+			));
 		Container::make('theme_options', __('Pengukuran Kinerja'))
 			->set_page_parent($dokumen_menu)
-			->add_fields($this->get_ajax_field(array('type' => 'pengukuran_kinerja')));
+			->add_fields(array(
+				Field::make('html', 'crb_pengukuran_kinerja_hide_sidebar')
+					->set_html('
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	'),
+				Field::make('html', 'crb_siks_halaman_terkait_pengukuran_kinerja')
+					->set_html('
+					<h5>HALAMAN TERKAIT</h5>
+	            	<ol>
+	            		<li><a target="_blank" href="' . $pengukuran_kinerja['url'] . '">' . $pengukuran_kinerja['title'] . '</a></li>
+	            	</ol>
+		        	')
+			));
 		Container::make('theme_options', __('Pengukuran Rencana Aksi'))
 			->set_page_parent($dokumen_menu)
-			->add_fields($this->get_ajax_field(array('type' => 'pengukuran_rencana_aksi')));
+			->add_fields(array(
+				Field::make('html', 'crb_pengukuran_rencana_aksi_hide_sidebar')
+					->set_html('
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	'),
+				Field::make('html', 'crb_siks_halaman_terkait_pengukuran_rencana_aksi')
+					->set_html('
+					<h5>HALAMAN TERKAIT</h5>
+	            	<ol>
+	            		<li><a target="_blank" href="' . $pengukuran_rencana_aksi['url'] . '">' . $pengukuran_rencana_aksi['title'] . '</a></li>
+	            	</ol>
+		        	')
+			));
 		Container::make('theme_options', __('Laporan Kinerja'))
 			->set_page_parent($dokumen_menu)
-			->add_fields($this->get_ajax_field(array('type' => 'laporan_kinerja')));
+			->add_fields(array(
+				Field::make('html', 'crb_laporan_kinerja_hide_sidebar')
+					->set_html('
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	'),
+				Field::make('html', 'crb_siks_halaman_terkait_laporan_kinerja')
+					->set_html('
+					<h5>HALAMAN TERKAIT</h5>
+	            	<ol>
+	            		<li><a target="_blank" href="' . $laporan_kinerja['url'] . '">' . $laporan_kinerja['title'] . '</a></li>
+	            	</ol>
+		        	')
+			));
 		Container::make('theme_options', __('Evaluasi Internal'))
 			->set_page_parent($dokumen_menu)
-			->add_fields($this->get_ajax_field(array('type' => 'evaluasi_internal')));
+			->add_fields(array(
+				Field::make('html', 'crb_evaluasi_internal_hide_sidebar')
+					->set_html('
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	'),
+				Field::make('html', 'crb_siks_halaman_terkait_evaluasi_internal')
+					->set_html('
+					<h5>HALAMAN TERKAIT</h5>
+	            	<ol>
+	            		<li><a target="_blank" href="' . $evaluasi_internal['url'] . '">' . $evaluasi_internal['title'] . '</a></li>
+	            	</ol>
+		        	')
+			));
 		Container::make('theme_options', __('Dokumen Lainnya'))
 			->set_page_parent($dokumen_menu)
-			->add_fields($this->get_ajax_field(array('type' => 'dokumen_lainnya')));
+			->add_fields(array(
+				Field::make('html', 'crb_dokumen_lainnya_hide_sidebar')
+					->set_html('
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	'),
+				Field::make('html', 'crb_siks_halaman_terkait_dokumen_lainnya')
+					->set_html('
+					<h5>HALAMAN TERKAIT</h5>
+	            	<ol>
+	            		<li><a target="_blank" href="' . $dokumen_lainnya['url'] . '">' . $dokumen_lainnya['title'] . '</a></li>
+	            	</ol>
+		        	')
+			));
 
-		$dokumen_kab_menu = Container::make('theme_options', __('Dokumen Pemda'))
+		$dokumen_pemda_menu = Container::make('theme_options', __('Dokumen Pemda'))
 			->set_page_menu_position(3.3)
-			->set_icon( 'dashicons-bank' );
+			->set_icon('dashicons-bank');
 
 		Container::make('theme_options', __('RPJMD'))
-			->set_page_parent($dokumen_kab_menu)
-			->add_fields($this->get_ajax_field(array('type' => 'rpjmd')));
+			->set_page_parent($dokumen_pemda_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_rpjmd_hide_sidebar')
+					->set_html('
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	'),
+				Field::make('html', 'crb_siks_halaman_terkait_rpjmd')
+					->set_html('
+					<h5>HALAMAN TERKAIT</h5>
+	            	<ol>
+	            		<li><a target="_blank" href="' . $rpjmd['url'] . '">' . $rpjmd['title'] . '</a></li>
+	            	</ol>
+		        	')
+			));
 		Container::make('theme_options', __('RKPD'))
-			->set_page_parent($dokumen_kab_menu)
-			->add_fields($this->get_ajax_field(array('type' => 'rkpd')));
+			->set_page_parent($dokumen_pemda_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_rkpd_hide_sidebar')
+					->set_html('
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	'),
+				Field::make('html', 'crb_siks_halaman_terkait_rkpd')
+					->set_html('
+					<h5>HALAMAN TERKAIT</h5>
+	            	<ol>
+	            		<li><a target="_blank" href="' . $rkpd['url'] . '">' . $rkpd['title'] . '</a></li>
+	            	</ol>
+		        	')
+			));
 		Container::make('theme_options', __('LKJIP/LPPD'))
-			->set_page_parent($dokumen_kab_menu)
-			->add_fields($this->get_ajax_field(array('type' => 'lkjip')));
+			->set_page_parent($dokumen_pemda_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_lkjip_lppd_hide_sidebar')
+					->set_html('
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	'),
+				Field::make('html', 'crb_siks_halaman_terkait_lkjip_lppd')
+					->set_html('
+					<h5>HALAMAN TERKAIT</h5>
+	            	<ol>
+	            		<li><a target="_blank" href="' . $lkjip_lppd['url'] . '">' . $lkjip_lppd['title'] . '</a></li>
+	            	</ol>
+		        	')
+			));
 		Container::make('theme_options', __('Dokumen Lainnya'))
-			->set_page_parent($dokumen_kab_menu)
-			->add_fields($this->get_ajax_field(array('type' => 'dokumen_kab_lainnya')));
-
-		$konsultasi_menu = Container::make('theme_options', __('Konsultasi'))
-			->set_page_menu_position(3.4)
-			->set_icon( 'dashicons-testimonial' )
-			->add_fields($this->get_ajax_field(array('type' => 'konsultasi')));
+			->set_page_parent($dokumen_pemda_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_dokumen_pemda_lainnya_hide_sidebar')
+					->set_html('
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	'),
+				Field::make('html', 'crb_siks_halaman_terkait_dokumen_pemda_lainnya')
+					->set_html('
+					<h5>HALAMAN TERKAIT</h5>
+	            	<ol>
+	            		<li><a target="_blank" href="' . $dokumen_pemda_lainnya['url'] . '">' . $dokumen_pemda_lainnya['title'] . '</a></li>
+	            	</ol>
+		        	')
+			));
 	}
 
 	function sql_migrate_esakip()
