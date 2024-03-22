@@ -167,7 +167,9 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_sql_migrate_esakip', $plugin_admin, 'sql_migrate_esakip');
 		$this->loader->add_action('wp_ajax_generate_user_sipd_merah', $plugin_admin, 'generate_user_sipd_merah');
 		$this->loader->add_action('wp_ajax_gen_user_sipd_merah', $plugin_admin, 'gen_user_sipd_merah');
-
+		$this->loader->add_action('wp_ajax_load_ajax_carbon', $plugin_admin, 'load_ajax_carbon');
+		
+		
 		$this->loader->add_action('carbon_fields_register_fields', $plugin_admin, 'crb_attach_esakip_options');
 	}
 
@@ -202,7 +204,6 @@ class Wp_Eval_Sakip {
 		add_shortcode('rkpd', array($plugin_public, 'rkpd'));
 		add_shortcode('lkjip_lppd', array($plugin_public, 'lkjip_lppd'));
 		add_shortcode('dokumen_pemda_lainnya', array($plugin_public, 'dokumen_pemda_lainnya'));
-		add_shortcode('konsultasi', array($plugin_public, 'konsultasi'));
 
 	}
 

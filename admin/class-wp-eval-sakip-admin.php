@@ -83,6 +83,8 @@ class Wp_Eval_Sakip_Admin
 		 */
 
 		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/wp-eval-sakip-admin.css', array(), $this->version, 'all');
+		wp_enqueue_style($this->plugin_name . 'bootstrap', plugin_dir_url(__FILE__) . 'public/css/bootstrap.min.css', array(), $this->version, 'all');
+
 	}
 
 	/**
@@ -106,19 +108,20 @@ class Wp_Eval_Sakip_Admin
 		 */
 
 		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/wp-eval-sakip-admin.js', array('jquery'), $this->version, false);
+		wp_enqueue_script($this->plugin_name . 'bootstrap', plugin_dir_url(__FILE__) . 'js/bootstrap.bundle.min.js', array('jquery'), $this->version, false);
 		wp_localize_script($this->plugin_name, 'esakip', array(
 			'api_key' => get_option(ESAKIP_APIKEY)
 		));
 	}
 
-	public function get_ajax_field($options = array('type' => 'dokumen'))
+	public function get_ajax_field($options = array('type' => null))
 	{
 		$ret = array();
-		$hide_sidebar = Field::make('html', 'crb_hide_sidebar')
+		$load_ajax_field = Field::make('html', 'crb_load_ajax_field')
 			->set_html('
         		<div id="load_ajax_carbon" data-type="' . $options['type'] . '"></div>
         	');
-		$ret[] = $hide_sidebar;
+		$ret[] = $load_ajax_field;
 		return $ret;
 	}
 
@@ -126,19 +129,46 @@ class Wp_Eval_Sakip_Admin
 	{
 		global $wpdb;
 		$ret = array(
-			'status'	=> 'success',
-			'message'	=> ''
+			'status'    => 'success',
+			'message'   => ''
 		);
+
 		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_api_key_extension')) {
-				if ($_POST['type'] == 'keu_pemdes') {
-					$url_add_new_ssh = $this->generatePage('Data Usulan Standar Satuan Harga (SSH) | ' . $v['tahun_anggaran'], $v['tahun_anggaran'], '[data_ssh_usulan tahun_anggaran="' . $v['tahun_anggaran'] . '"]');
-					$body_all .= '<div style="padding:.75rem 0 0 .75rem;"><a style="font-weight: bold;" target="_blank" href="' . $url_add_new_ssh . '">Halaman Data Usulan SSH ' . $v['tahun_anggaran'] . '</a></div>';
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				$tahun = $wpdb->get_results(
+					$wpdb->prepare("
+                    SELECT 
+                        tahun_anggaran 
+                    FROM esakip_data_unit 
+                    GROUP BY tahun_anggaran
+                "),
+					ARRAY_A
+				);
+				foreach ($tahun as $tahun_item) {
+					if (!empty($_POST['type']) && $_POST['type'] == 'renja_rkt') {
+						$renja_rkt = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Dokumen RENJA/RKT Tahun '. $tahun_item['tahun_anggaran'],
+							'content' => '[renja_rkt tahun='.$tahun_item["tahun_anggaran"].']',
+							'show_header' => 1,
+							'no_key' => 1,
+							'post_status' => 'private'
+						));
+						$body_pemda = '<div class="accordion">';
+						$body_pemda .= '<h3 class="header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>';
+						$body_pemda .= '<div class="body-tahun">';
+						$body_pemda .= '<ul style="margin-left: 20px;">';
+						$body_pemda .= '<li><a target="_blank" href="' . $renja_rkt['url'] . '">' .$renja_rkt['title'].'</a></li>';
+						$body_pemda .= '</ul>';
+						$body_pemda .= '</div>';
+						$body_pemda .= '</div>';
+						$ret['message'] .= $body_pemda;
+					}
 				}
 			}
-			die(json_encode($ret));
 		}
+		die(json_encode($ret));
 	}
+
 
 	public function crb_attach_esakip_options()
 	{
@@ -177,7 +207,7 @@ class Wp_Eval_Sakip_Admin
 		));
 
 		$renja_rkt = $this->functions->generatePage(array(
-			'nama_page' => 'Halaman RENJA/RKT',
+			'nama_page' => 'Halaman RENJA RKT',
 			'content' => '[renja_rkt]',
 			'show_header' => 1,
 			'no_key' => 1,
@@ -288,8 +318,6 @@ class Wp_Eval_Sakip_Admin
 			'post_status' => 'private'
 		));
 
-
-
 		$basic_options_container = Container::make('theme_options', __('E-SAKIP Options'))
 			->set_page_menu_position(3)
 			->add_fields(array(
@@ -304,9 +332,9 @@ class Wp_Eval_Sakip_Admin
 				Field::make('html', 'crb_sql_migrate')
 					->set_html('<a onclick="sql_migrate_esakip(); return false;" href="#" class="button button-primary button-large">SQL Migrate</a>')
 					->set_help_text('Tombol untuk memperbaiki struktur database E-SAKIP.'),
-				Field::make('html', 'crb_generate_user_sipd_merah')
-					->set_html('<a id="generate_user_sipd_merah" onclick="return false;" href="#" class="button button-primary button-large">Generate User SIPD Merah By DB Lokal</a>')
-					->set_help_text('Data user active yang ada di table data_dewan akan digenerate menjadi user wordpress.'),
+				Field::make('html', 'crb_generate_user')
+					->set_html('<a id="generate_user" onclick="return false;" href="#" class="button button-primary button-large">Generate User By DB Lokal</a>')
+					->set_help_text('Data user active yang ada di table data unit akan digenerate menjadi user wordpress.'),
 			));
 		Container::make('theme_options', __('Pengaturan Perangkat Daerah'))
 			->set_page_parent($basic_options_container)
@@ -414,21 +442,15 @@ class Wp_Eval_Sakip_Admin
 		Container::make('theme_options', __('RENJA/RKT'))
 			->set_page_parent($dokumen_menu)
 			->add_fields(array(
-				Field::make('html', 'crb_renja_rkt_hide_sidebar')
+				Field::make('html', 'crb_renja_hide_sidebar')
 					->set_html('
-		        		<style>
-		        			.postbox-container { display: none; }
-		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
-		        		</style>
-		        	'),
-				Field::make('html', 'crb_siks_halaman_terkait_renja_rkt')
-					->set_html('
-					<h5>HALAMAN TERKAIT</h5>
-	            	<ol>
-	            		<li><a target="_blank" href="' . $renja_rkt['url'] . '">' . $renja_rkt['title'] . '</a></li>
-	            	</ol>
-		        	')
-			));
+						<style>
+							.postbox-container { display: none; }
+							#poststuff #post-body.columns-2 { margin: 0 !important; }
+						</style>
+					')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'renja_rkt')));
 		Container::make('theme_options', __('Perjanjian Kinerja'))
 			->set_page_parent($dokumen_menu)
 			->add_fields(array(
@@ -763,7 +785,7 @@ class Wp_Eval_Sakip_Admin
 				$skpd = $wpdb->get_var(
 					$wpdb->prepare("
 						SELECT nama_skpd 
-						FROM data_unit 
+						FROM esakip_data_unit 
 						WHERE id_skpd=" . $user['id_sub_skpd'] . " 
 						  AND active=1")
 				);
