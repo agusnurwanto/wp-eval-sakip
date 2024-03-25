@@ -326,32 +326,32 @@ class Wp_Eval_Sakip_Admin
 					<h5>HALAMAN TERKAIT</h5>
 	            	<ol>
 	            	</ol>'),
-				Field::make('text', '_crb_apikey_esakip', 'API KEY')
+                Field::make('text', '_crb_apikey_esakip', 'API KEY')
 					->set_default_value($this->functions->generateRandomString())
 					->set_help_text('Wajib diisi. API KEY digunakan untuk integrasi data.'),
 				Field::make('html', 'crb_sql_migrate')
 					->set_html('<a onclick="sql_migrate_esakip(); return false;" href="#" class="button button-primary button-large">SQL Migrate</a>')
 					->set_help_text('Tombol untuk memperbaiki struktur database E-SAKIP.'),
-				Field::make('html', 'crb_generate_user')
-					->set_html('<a id="generate_user" onclick="return false;" href="#" class="button button-primary button-large">Generate User By DB Lokal</a>')
-					->set_help_text('Data user active yang ada di table data unit akan digenerate menjadi user wordpress.'),
 			));
+
 		Container::make('theme_options', __('Pengaturan Perangkat Daerah'))
 			->set_page_parent($basic_options_container)
 			->add_fields(array(
-				Field::make('html', 'crb_pengisian_lke_hide_sidebar')
-					->set_html('
-		        		<style>
-		        			.postbox-container { display: none; }
-		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
-		        		</style>
-		        	'),
-				Field::make('html', 'crb_siks_halaman_terkait_pengisian_lke')
-					->set_html('
-					<h5>HALAMAN TERKAIT</h5>
-	            	<ol>
-	            	</ol>
-		        	')
+				Field::make('text', 'crb_url_server_sakip', 'URL Server WP-SIPD')
+					->set_default_value(admin_url('admin-ajax.php'))
+					->set_required(true),
+				Field::make('text', 'crb_apikey_wpsipd', 'API KEY WP-SIPD')
+					->set_default_value($this->functions->generateRandomString())
+					->set_help_text('Wajib diisi. API KEY digunakan untuk integrasi data.'),
+				Field::make('text', 'crb_tahun_wpsipd', 'Tahun Anggaran WP-SIPD')
+					->set_default_value(date('Y'))
+					->set_help_text('Wajib diisi.'),
+				Field::make('html', 'crb_html_data_unit')
+					->set_html('<a href="#" class="button button-primary" onclick="get_data_unit_wpsipd(); return false;">Tarik Data Unit dari WP SIPD</a>')
+					->set_help_text('Tombol untuk menarik data Unit dari WP SIPD.'),
+				Field::make('html', 'crb_generate_user')
+					->set_html('<a id="generate_user" onclick="return false;" href="#" class="button button-primary button-large">Generate User By DB Lokal</a>')
+					->set_help_text('Data user active yang ada di table data unit akan digenerate menjadi user wordpress.'),
 			));
 		Container::make('theme_options', __('Desain LKE SAKIP'))
 			->set_page_parent($basic_options_container)
@@ -848,5 +848,105 @@ class Wp_Eval_Sakip_Admin
 			$ret['message'] = 'Format Salah!';
 		}
 		die(json_encode($ret));
+	}
+
+	function get_data_unit_wpsipd()
+	{
+		global $wpdb;
+
+		if (empty($_POST['server'])) {
+			$data = array(
+				'status' => 'error',
+				'message' => 'URL Server Tidak Boleh Kosong'
+			);
+			$response = json_encode($data);
+			die($response);
+		}else if (empty($_POST['tahun_anggaran'])) {
+			$data = array(
+				'status' => 'error',
+				'message' => 'Tahun Tidak Boleh Kosong'
+			);
+			$response = json_encode($data);
+			die($response);
+		}else if (empty($_POST['api_key'])) {
+			$data = array(
+				'status' => 'error',
+				'message' => 'API Key Tidak Boleh Kosong'
+			);
+			$response = json_encode($data);
+			die($response);
+		}
+
+		// data to send in our API request
+		$api_params = array(
+			'action' => 'get_skpd',
+			'api_key'	=> $_POST['api_key'],
+			'tahun_anggaran' => $_POST['tahun_anggaran']
+		);
+
+		$response = wp_remote_post($_POST['server'], array('timeout' => 10, 'sslverify' => false, 'body' => $api_params));
+
+		$response = wp_remote_retrieve_body($response);
+
+		$data = json_decode($response);
+
+		$esakip_data_unit = $data->data;
+
+		if ($data->status == 'success' && !empty($esakip_data_unit)) {
+			$wpdb->update('esakip_data_unit', array('active' => 0), array('tahun_anggaran' => $api_params['tahun_anggaran']));
+			foreach ($esakip_data_unit as $vdata) {
+				$cek = $wpdb->get_var($wpdb->prepare(
+					'
+					select 
+						id 
+					from esakip_data_unit 
+					where id_skpd = %d
+						and tahun_anggaran = %d',
+					$vdata->id_skpd,
+					$vdata->tahun_anggaran
+				));
+				$opsi = array(
+					'id_setup_unit' => $vdata->id_setup_unit,
+					'id_unit' => $vdata->id_unit,
+					'is_skpd' => $vdata->is_skpd,
+					'kode_skpd' => $vdata->kode_skpd,
+					'kunci_skpd' => $vdata->kunci_skpd,
+					'nama_skpd' => $vdata->nama_skpd,
+					'posisi' => $vdata->posisi,
+					'status' => $vdata->status,
+					'id_skpd' => $vdata->id_skpd,
+					'bidur_1' => $vdata->bidur_1,
+					'bidur_2' => $vdata->bidur_2,
+					'bidur_3' => $vdata->bidur_3,
+					'idinduk' => $vdata->idinduk,
+					'ispendapatan' => $vdata->ispendapatan,
+					'isskpd' => $vdata->isskpd,
+					'kode_skpd_1' => $vdata->kode_skpd_1,
+					'kode_skpd_2' => $vdata->kode_skpd_2,
+					'kodeunit' => $vdata->kodeunit,
+					'komisi' => $vdata->komisi,
+					'namabendahara' => $vdata->namabendahara,
+					'namakepala' => $vdata->namakepala,
+					'namaunit' => $vdata->namaunit,
+					'nipbendahara' => $vdata->nipbendahara,
+					'nipkepala' => $vdata->nipkepala,
+					'pangkatkepala' => $vdata->pangkatkepala,
+					'setupunit' => $vdata->setupunit,
+					'statuskepala' => $vdata->statuskepala,
+					'update_at' => $vdata->update_at,
+					'tahun_anggaran' => $vdata->tahun_anggaran,
+					'active' => $vdata->active
+				);
+				if (empty($cek)) {
+					$wpdb->insert('esakip_data_unit', $opsi);
+				} else {
+					$wpdb->update('esakip_data_unit', $opsi, array('id' => $cek));
+				}
+			}
+		}
+
+		$response = json_encode($data);
+
+		die($response);
 	}
 }
