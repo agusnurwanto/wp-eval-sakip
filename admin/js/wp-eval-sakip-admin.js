@@ -1,19 +1,27 @@
 jQuery(document).ready(function () {
-  if (jQuery("#load_ajax_carbon").length >= 1) {
+  var loading = ''
+    +'<div id="wrap-loading">'
+          +'<div class="lds-hourglass"></div>'
+          +'<div id="persen-loading"></div>'
+      +'</div>';
+  if(jQuery('#wrap-loading').length == 0){
+    jQuery('body').prepend(loading);
+  }
+  if (jQuery("#esakip_load_ajax_carbon").length >= 1) {
     jQuery("#wrap-loading").show();
     jQuery.ajax({
       url: ajaxurl,
       type: "post",
       data: {
-        action: "load_ajax_carbon",
+        action: "esakip_load_ajax_carbon",
         api_key: esakip.api_key,
-        type: jQuery("#load_ajax_carbon").attr("data-type"),
+        type: jQuery("#esakip_load_ajax_carbon").attr("data-type"),
       },
       dataType: "json",
       success: function (data) {
         jQuery("#wrap-loading").hide();
         if (data.status == "success") {
-          jQuery("#load_ajax_carbon").html(data.message);
+          jQuery("#esakip_load_ajax_carbon").html(data.message);
         } else {
           return alert(data.message);
         }
@@ -50,27 +58,16 @@ jQuery(document).ready(function () {
       });
     }
   });
-  jQuery(".accordion").each(function () {
-    var $accordion = jQuery(this);
-    var $header = $accordion.find(".header-tahun");
-    var $body = $accordion.find(".body-tahun");
 
-    // Ketika header di-klik
-    $header.on("click", function () {
-      // Toggle kelas 'active' pada header dan body
-      $header.toggleClass("active");
-      $body.toggleClass("active");
-
-      // Tutup semua body accordion kecuali yang saat ini di-klik
-      jQuery(".accordion")
-        .not($accordion)
-        .find(".header-tahun")
-        .removeClass("active");
-      jQuery(".accordion")
-        .not($accordion)
-        .find(".body-tahun")
-        .removeClass("active");
-    });
+  jQuery('body').on('click', '.esakip-header-tahun', function(){
+    var tahun = jQuery(this).attr('tahun');
+    if(jQuery(this).hasClass('active')){
+      jQuery(this).removeClass('active');
+      jQuery('.esakip-body-tahun[tahun="'+tahun+'"]').removeClass('active');
+    }else{
+      jQuery(this).addClass('active');
+      jQuery('.esakip-body-tahun[tahun="'+tahun+'"]').addClass('active');
+    }
   });
 });
 

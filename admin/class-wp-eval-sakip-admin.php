@@ -119,13 +119,13 @@ class Wp_Eval_Sakip_Admin
 		$ret = array();
 		$load_ajax_field = Field::make('html', 'crb_load_ajax_field')
 			->set_html('
-        		<div id="load_ajax_carbon" data-type="' . $options['type'] . '"></div>
+        		<div id="esakip_load_ajax_carbon" data-type="' . $options['type'] . '"></div>
         	');
 		$ret[] = $load_ajax_field;
 		return $ret;
 	}
 
-	public function load_ajax_carbon()
+	public function esakip_load_ajax_carbon()
 	{
 		global $wpdb;
 		$ret = array(
@@ -153,14 +153,15 @@ class Wp_Eval_Sakip_Admin
 							'no_key' => 1,
 							'post_status' => 'private'
 						));
-						$body_pemda = '<div class="accordion">';
-						$body_pemda .= '<h3 class="header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>';
-						$body_pemda .= '<div class="body-tahun">';
-						$body_pemda .= '<ul style="margin-left: 20px;">';
-						$body_pemda .= '<li><a target="_blank" href="' . $renja_rkt['url'] . '">' .$renja_rkt['title'].'</a></li>';
-						$body_pemda .= '</ul>';
-						$body_pemda .= '</div>';
-						$body_pemda .= '</div>';
+						$body_pemda = '
+						<div class="accordion">
+							<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+							<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+								<ul style="margin-left: 20px;">
+									<li><a target="_blank" href="' . $renja_rkt['url'] . '">' .$renja_rkt['title'].'</a></li>
+								</ul>
+							</div>
+						</div>';
 						$ret['message'] .= $body_pemda;
 					}
 				}
@@ -326,7 +327,7 @@ class Wp_Eval_Sakip_Admin
 					<h5>HALAMAN TERKAIT</h5>
 	            	<ol>
 	            	</ol>'),
-                Field::make('text', '_crb_apikey_esakip', 'API KEY')
+				Field::make('text', 'crb_apikey_esakip', 'API KEY')
 					->set_default_value($this->functions->generateRandomString())
 					->set_help_text('Wajib diisi. API KEY digunakan untuk integrasi data.'),
 				Field::make('html', 'crb_sql_migrate')
