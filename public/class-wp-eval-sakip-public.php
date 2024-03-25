@@ -75,7 +75,8 @@ class Wp_Eval_Sakip_Public {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-
+		
+		wp_enqueue_style('dashicons');
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/wp-eval-sakip-public.css', array(), $this->version, 'all' );
 		wp_enqueue_style($this->plugin_name . 'bootstrap', plugin_dir_url(__FILE__) . 'css/bootstrap.min.css', array(), $this->version, 'all');
 		wp_enqueue_style($this->plugin_name . 'datatables', plugin_dir_url(__FILE__) . 'css/jquery.dataTables.min.css', array(), $this->version, 'all');
@@ -141,7 +142,7 @@ class Wp_Eval_Sakip_Public {
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-renja-rkt.php';
 	}
 
-	public function perjanjian_kinerja()
+	public function perjanjian_kinerja($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
 		if (!empty($_GET) && !empty($_GET['POST'])) {
@@ -150,7 +151,7 @@ class Wp_Eval_Sakip_Public {
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-perjanjian-kinerja.php';
 	}
 
-	public function rencana_aksi()
+	public function rencana_aksi($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
 		if (!empty($_GET) && !empty($_GET['POST'])) {
@@ -159,7 +160,7 @@ class Wp_Eval_Sakip_Public {
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-rencana-aksi.php';
 	}
 
-	public function iku()
+	public function iku($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
 		if (!empty($_GET) && !empty($_GET['POST'])) {
@@ -168,7 +169,7 @@ class Wp_Eval_Sakip_Public {
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-iku.php';
 	}
 
-	public function skp()
+	public function skp($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
 		if (!empty($_GET) && !empty($_GET['POST'])) {
@@ -177,7 +178,7 @@ class Wp_Eval_Sakip_Public {
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-skp.php';
 	}
 
-	public function pengukuran_kinerja()
+	public function pengukuran_kinerja($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
 		if (!empty($_GET) && !empty($_GET['POST'])) {
@@ -186,7 +187,7 @@ class Wp_Eval_Sakip_Public {
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-pengukuran-kinerja.php';
 	}
 
-	public function pengukuran_rencana_aksi()
+	public function pengukuran_rencana_aksi($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
 		if (!empty($_GET) && !empty($_GET['POST'])) {
@@ -195,7 +196,7 @@ class Wp_Eval_Sakip_Public {
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-pengukuran-rencana-aksi.php';
 	}
 
-	public function laporan_kinerja()
+	public function laporan_kinerja($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
 		if (!empty($_GET) && !empty($_GET['POST'])) {
@@ -204,7 +205,7 @@ class Wp_Eval_Sakip_Public {
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-laporan-kinerja.php';
 	}
 
-	public function evaluasi_internal()
+	public function evaluasi_internal($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
 		if (!empty($_GET) && !empty($_GET['POST'])) {
@@ -213,7 +214,7 @@ class Wp_Eval_Sakip_Public {
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-evaluasi-internal.php';
 	}
 
-	public function dokumen_lainnya()
+	public function dokumen_lainnya($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
 		if (!empty($_GET) && !empty($_GET['POST'])) {

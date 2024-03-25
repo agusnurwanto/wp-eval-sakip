@@ -84,7 +84,6 @@ class Wp_Eval_Sakip_Admin
 
 		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/wp-eval-sakip-admin.css', array(), $this->version, 'all');
 		wp_enqueue_style($this->plugin_name . 'bootstrap', plugin_dir_url(__FILE__) . 'public/css/bootstrap.min.css', array(), $this->version, 'all');
-
 	}
 
 	/**
@@ -147,8 +146,8 @@ class Wp_Eval_Sakip_Admin
 				foreach ($tahun as $tahun_item) {
 					if (!empty($_POST['type']) && $_POST['type'] == 'renja_rkt') {
 						$renja_rkt = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Dokumen RENJA/RKT Tahun '. $tahun_item['tahun_anggaran'],
-							'content' => '[renja_rkt tahun='.$tahun_item["tahun_anggaran"].']',
+							'nama_page' => 'Halaman Dokumen RENJA/RKT Tahun ' . $tahun_item['tahun_anggaran'],
+							'content' => '[renja_rkt tahun=' . $tahun_item["tahun_anggaran"] . ']',
 							'show_header' => 1,
 							'no_key' => 1,
 							'post_status' => 'private'
@@ -158,12 +157,165 @@ class Wp_Eval_Sakip_Admin
 							<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
 							<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
 								<ul style="margin-left: 20px;">
-									<li><a target="_blank" href="' . $renja_rkt['url'] . '">' .$renja_rkt['title'].'</a></li>
+									<li><a target="_blank" href="' . $renja_rkt['url'] . '">' . $renja_rkt['title'] . '</a></li>
 								</ul>
 							</div>
 						</div>';
-						$ret['message'] .= $body_pemda;
+					} else if (!empty($_POST['type']) && $_POST['type'] == 'skp') {
+						$skp = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Dokumen SKP Tahun ' . $tahun_item['tahun_anggaran'],
+							'content' => '[skp_tahun=' . $tahun_item["tahun_anggaran"] . ']',
+							'show_header' => 1,
+							'no_key' => 1,
+							'post_status' => 'private'
+						));
+						$body_pemda = '
+						<div class="accordion">
+							<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+							<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+								<ul style="margin-left: 20px;">
+									<li><a target="_blank" href="' . $skp['url'] . '">' . $skp['title'] . '</a></li>
+								</ul>
+							</div>
+						</div>';
+					} else if (!empty($_POST['type']) && $_POST['type'] == 'rencana_aksi') {
+						$rencana_aksi = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Dokumen Rencana Aksi Tahun ' . $tahun_item['tahun_anggaran'],
+							'content' => '[rencana_aksi_tahun=' . $tahun_item["tahun_anggaran"] . ']',
+							'show_header' => 1,
+							'no_key' => 1,
+							'post_status' => 'private'
+						));
+						$body_pemda = '
+						<div class="accordion">
+							<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+							<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+								<ul style="margin-left: 20px;">
+									<li><a target="_blank" href="' . $rencana_aksi['url'] . '">' . $rencana_aksi['title'] . '</a></li>
+								</ul>
+							</div>
+						</div>';
+					} else if (!empty($_POST['type']) && $_POST['type'] == 'iku') {
+						$iku = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Dokumen IKU Tahun ' . $tahun_item['tahun_anggaran'],
+							'content' => '[iku_tahun=' . $tahun_item["tahun_anggaran"] . ']',
+							'show_header' => 1,
+							'no_key' => 1,
+							'post_status' => 'private'
+						));
+						$body_pemda = '
+						<div class="accordion">
+							<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+							<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+								<ul style="margin-left: 20px;">
+									<li><a target="_blank" href="' . $iku['url'] . '">' . $iku['title'] . '</a></li>
+								</ul>
+							</div>
+						</div>';
+					} else if (!empty($_POST['type']) && $_POST['type'] == 'pengukuran_kinerja') {
+						$pengukuran_kinerja = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Dokumen Pengukuran Kinerja Tahun ' . $tahun_item['tahun_anggaran'],
+							'content' => '[pengukuran_kinerja_tahun=' . $tahun_item["tahun_anggaran"] . ']',
+							'show_header' => 1,
+							'no_key' => 1,
+							'post_status' => 'private'
+						));
+						$body_pemda = '
+						<div class="accordion">
+							<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+							<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+								<ul style="margin-left: 20px;">
+									<li><a target="_blank" href="' . $pengukuran_kinerja['url'] . '">' . $pengukuran_kinerja['title'] . '</a></li>
+								</ul>
+							</div>
+						</div>';
+					} else if (!empty($_POST['type']) && $_POST['type'] == 'pengukuran_rencana_aksi') {
+						$pengukuran_rencana_aksi = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Dokumen Pengukuran Rencana Aksi Tahun ' . $tahun_item['tahun_anggaran'],
+							'content' => '[pengukuran_rencana_aksi_tahun=' . $tahun_item["tahun_anggaran"] . ']',
+							'show_header' => 1,
+							'no_key' => 1,
+							'post_status' => 'private'
+						));
+						$body_pemda = '
+						<div class="accordion">
+							<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+							<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+								<ul style="margin-left: 20px;">
+									<li><a target="_blank" href="' . $pengukuran_rencana_aksi['url'] . '">' . $pengukuran_rencana_aksi['title'] . '</a></li>
+								</ul>
+							</div>
+						</div>';
+					} else if (!empty($_POST['type']) && $_POST['type'] == 'laporan_kinerja') {
+						$laporan_kinerja = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Dokumen Laporan Kinerja Tahun ' . $tahun_item['tahun_anggaran'],
+							'content' => '[laporan_kinerja_tahun=' . $tahun_item["tahun_anggaran"] . ']',
+							'show_header' => 1,
+							'no_key' => 1,
+							'post_status' => 'private'
+						));
+						$body_pemda = '
+						<div class="accordion">
+							<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+							<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+								<ul style="margin-left: 20px;">
+									<li><a target="_blank" href="' . $laporan_kinerja['url'] . '">' . $laporan_kinerja['title'] . '</a></li>
+								</ul>
+							</div>
+						</div>';
+					} else if (!empty($_POST['type']) && $_POST['type'] == 'evaluasi_internal') {
+						$evaluasi_internal = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Dokumen Evaluasi Internal Tahun ' . $tahun_item['tahun_anggaran'],
+							'content' => '[evaluasi_internal_tahun=' . $tahun_item["tahun_anggaran"] . ']',
+							'show_header' => 1,
+							'no_key' => 1,
+							'post_status' => 'private'
+						));
+						$body_pemda = '
+						<div class="accordion">
+							<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+							<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+								<ul style="margin-left: 20px;">
+									<li><a target="_blank" href="' . $evaluasi_internal['url'] . '">' . $evaluasi_internal['title'] . '</a></li>
+								</ul>
+							</div>
+						</div>';
+					} else if (!empty($_POST['type']) && $_POST['type'] == 'dokumen_lainnya') {
+						$dokumen_lainnya = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Dokumen Lain Tahun ' . $tahun_item['tahun_anggaran'],
+							'content' => '[dokumen_lainnya_tahun=' . $tahun_item["tahun_anggaran"] . ']',
+							'show_header' => 1,
+							'no_key' => 1,
+							'post_status' => 'private'
+						));
+						$body_pemda = '
+						<div class="accordion">
+							<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+							<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+								<ul style="margin-left: 20px;">
+									<li><a target="_blank" href="' . $dokumen_lainnya['url'] . '">' . $dokumen_lainnya['title'] . '</a></li>
+								</ul>
+							</div>
+						</div>';
+					} else if (!empty($_POST['type']) && $_POST['type'] == 'perjanjian_kinerja') {
+						$perjanjian_kinerja = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Dokumen Perjanjian Kinerja Tahun ' . $tahun_item['tahun_anggaran'],
+							'content' => '[dokumen_perjanjian_kinerja_tahun=' . $tahun_item["tahun_anggaran"] . ']',
+							'show_header' => 1,
+							'no_key' => 1,
+							'post_status' => 'private'
+						));
+						$body_pemda = '
+						<div class="accordion">
+							<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+							<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+								<ul style="margin-left: 20px;">
+									<li><a target="_blank" href="' . $perjanjian_kinerja['url'] . '">' . $perjanjian_kinerja['title'] . '</a></li>
+								</ul>
+							</div>
+						</div>';
 					}
+					$ret['message'] .= $body_pemda;
 				}
 			}
 		}
@@ -202,86 +354,6 @@ class Wp_Eval_Sakip_Admin
 		$renstra = $this->functions->generatePage(array(
 			'nama_page' => 'Halaman RENSTRA',
 			'content' => '[renstra]',
-			'show_header' => 1,
-			'no_key' => 1,
-			'post_status' => 'private'
-		));
-
-		$renja_rkt = $this->functions->generatePage(array(
-			'nama_page' => 'Halaman RENJA RKT',
-			'content' => '[renja_rkt]',
-			'show_header' => 1,
-			'no_key' => 1,
-			'post_status' => 'private'
-		));
-
-		$perjanjian_kinerja = $this->functions->generatePage(array(
-			'nama_page' => 'Halaman Perjanjian Kinerja',
-			'content' => '[perjanjian_kinerja]',
-			'show_header' => 1,
-			'no_key' => 1,
-			'post_status' => 'private'
-		));
-
-		$rencana_aksi = $this->functions->generatePage(array(
-			'nama_page' => 'Halaman Rencana Aksi',
-			'content' => '[rencana_aksi]',
-			'show_header' => 1,
-			'no_key' => 1,
-			'post_status' => 'private'
-		));
-
-		$iku = $this->functions->generatePage(array(
-			'nama_page' => 'Halaman IKU',
-			'content' => '[iku]',
-			'show_header' => 1,
-			'no_key' => 1,
-			'post_status' => 'private'
-		));
-
-		$skp = $this->functions->generatePage(array(
-			'nama_page' => 'Halaman SKP',
-			'content' => '[skp]',
-			'show_header' => 1,
-			'no_key' => 1,
-			'post_status' => 'private'
-		));
-
-		$pengukuran_kinerja = $this->functions->generatePage(array(
-			'nama_page' => 'Halaman Pengukuran Kinerja',
-			'content' => '[pengukuran_kinerja]',
-			'show_header' => 1,
-			'no_key' => 1,
-			'post_status' => 'private'
-		));
-
-		$pengukuran_rencana_aksi = $this->functions->generatePage(array(
-			'nama_page' => 'Halaman Pengukuran Rencana Aksi',
-			'content' => '[pengukuran_rencana_aksi]',
-			'show_header' => 1,
-			'no_key' => 1,
-			'post_status' => 'private'
-		));
-
-		$laporan_kinerja = $this->functions->generatePage(array(
-			'nama_page' => 'Halaman Laporan Kinerja',
-			'content' => '[laporan_kinerja]',
-			'show_header' => 1,
-			'no_key' => 1,
-			'post_status' => 'private'
-		));
-
-		$evaluasi_internal = $this->functions->generatePage(array(
-			'nama_page' => 'Halaman Evaluasi Internal',
-			'content' => '[evaluasi_internal]',
-			'show_header' => 1,
-			'no_key' => 1,
-			'post_status' => 'private'
-		));
-
-		$dokumen_lainnya = $this->functions->generatePage(array(
-			'nama_page' => 'Halaman Dokumen Lainnya',
-			'content' => '[dokumen_lainnya]',
 			'show_header' => 1,
 			'no_key' => 1,
 			'post_status' => 'private'
@@ -457,163 +529,109 @@ class Wp_Eval_Sakip_Admin
 			->add_fields(array(
 				Field::make('html', 'crb_perjanjian_kinerja_hide_sidebar')
 					->set_html('
-		        		<style>
-		        			.postbox-container { display: none; }
-		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
-		        		</style>
-		        	'),
-				Field::make('html', 'crb_siks_halaman_terkait_perjanjian_kinerja')
-					->set_html('
-					<h5>HALAMAN TERKAIT</h5>
-	            	<ol>
-	            		<li><a target="_blank" href="' . $perjanjian_kinerja['url'] . '">' . $perjanjian_kinerja['title'] . '</a></li>
-	            	</ol>
-		        	')
-			));
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'perjanjian_kinerja')));
 		Container::make('theme_options', __('Rencana Aksi'))
 			->set_page_parent($dokumen_menu)
 			->add_fields(array(
 				Field::make('html', 'crb_rencana_aksi_hide_sidebar')
 					->set_html('
-		        		<style>
-		        			.postbox-container { display: none; }
-		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
-		        		</style>
-		        	'),
-				Field::make('html', 'crb_siks_halaman_terkait_rencana_aksi')
-					->set_html('
-					<h5>HALAMAN TERKAIT</h5>
-	            	<ol>
-	            		<li><a target="_blank" href="' . $rencana_aksi['url'] . '">' . $rencana_aksi['title'] . '</a></li>
-	            	</ol>
-		        	')
-			));
+						<style>
+							.postbox-container { display: none; }
+							#poststuff #post-body.columns-2 { margin: 0 !important; }
+						</style>
+					')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'rencana_aksi')));
 		Container::make('theme_options', __('IKU'))
 			->set_page_parent($dokumen_menu)
 			->add_fields(array(
 				Field::make('html', 'crb_iku_hide_sidebar')
 					->set_html('
-		        		<style>
-		        			.postbox-container { display: none; }
-		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
-		        		</style>
-		        	'),
-				Field::make('html', 'crb_siks_halaman_terkait_iku')
-					->set_html('
-					<h5>HALAMAN TERKAIT</h5>
-	            	<ol>
-	            		<li><a target="_blank" href="' . $iku['url'] . '">' . $iku['title'] . '</a></li>
-	            	</ol>
-		        	')
-			));
+						<style>
+							.postbox-container { display: none; }
+							#poststuff #post-body.columns-2 { margin: 0 !important; }
+						</style>
+					')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'iku')));
 		Container::make('theme_options', __('SKP'))
 			->set_page_parent($dokumen_menu)
 			->add_fields(array(
 				Field::make('html', 'crb_skp_hide_sidebar')
 					->set_html('
-		        		<style>
-		        			.postbox-container { display: none; }
-		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
-		        		</style>
-		        	'),
-				Field::make('html', 'crb_siks_halaman_terkait_skp')
-					->set_html('
-					<h5>HALAMAN TERKAIT</h5>
-	            	<ol>
-	            		<li><a target="_blank" href="' . $skp['url'] . '">' . $skp['title'] . '</a></li>
-	            	</ol>
-		        	')
-			));
+						<style>
+							.postbox-container { display: none; }
+							#poststuff #post-body.columns-2 { margin: 0 !important; }
+						</style>
+					')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'skp')));
 		Container::make('theme_options', __('Pengukuran Kinerja'))
 			->set_page_parent($dokumen_menu)
 			->add_fields(array(
 				Field::make('html', 'crb_pengukuran_kinerja_hide_sidebar')
 					->set_html('
-		        		<style>
-		        			.postbox-container { display: none; }
-		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
-		        		</style>
-		        	'),
-				Field::make('html', 'crb_siks_halaman_terkait_pengukuran_kinerja')
-					->set_html('
-					<h5>HALAMAN TERKAIT</h5>
-	            	<ol>
-	            		<li><a target="_blank" href="' . $pengukuran_kinerja['url'] . '">' . $pengukuran_kinerja['title'] . '</a></li>
-	            	</ol>
-		        	')
-			));
+						<style>
+							.postbox-container { display: none; }
+							#poststuff #post-body.columns-2 { margin: 0 !important; }
+						</style>
+					')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'pengukuran_kinerja')));
 		Container::make('theme_options', __('Pengukuran Rencana Aksi'))
 			->set_page_parent($dokumen_menu)
 			->add_fields(array(
 				Field::make('html', 'crb_pengukuran_rencana_aksi_hide_sidebar')
 					->set_html('
-		        		<style>
-		        			.postbox-container { display: none; }
-		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
-		        		</style>
-		        	'),
-				Field::make('html', 'crb_siks_halaman_terkait_pengukuran_rencana_aksi')
-					->set_html('
-					<h5>HALAMAN TERKAIT</h5>
-	            	<ol>
-	            		<li><a target="_blank" href="' . $pengukuran_rencana_aksi['url'] . '">' . $pengukuran_rencana_aksi['title'] . '</a></li>
-	            	</ol>
-		        	')
-			));
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'pengukuran_rencana_aksi')));
 		Container::make('theme_options', __('Laporan Kinerja'))
 			->set_page_parent($dokumen_menu)
 			->add_fields(array(
 				Field::make('html', 'crb_laporan_kinerja_hide_sidebar')
 					->set_html('
-		        		<style>
-		        			.postbox-container { display: none; }
-		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
-		        		</style>
-		        	'),
-				Field::make('html', 'crb_siks_halaman_terkait_laporan_kinerja')
-					->set_html('
-					<h5>HALAMAN TERKAIT</h5>
-	            	<ol>
-	            		<li><a target="_blank" href="' . $laporan_kinerja['url'] . '">' . $laporan_kinerja['title'] . '</a></li>
-	            	</ol>
-		        	')
-			));
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'laporan_kinerja')));
 		Container::make('theme_options', __('Evaluasi Internal'))
 			->set_page_parent($dokumen_menu)
 			->add_fields(array(
 				Field::make('html', 'crb_evaluasi_internal_hide_sidebar')
 					->set_html('
-		        		<style>
-		        			.postbox-container { display: none; }
-		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
-		        		</style>
-		        	'),
-				Field::make('html', 'crb_siks_halaman_terkait_evaluasi_internal')
-					->set_html('
-					<h5>HALAMAN TERKAIT</h5>
-	            	<ol>
-	            		<li><a target="_blank" href="' . $evaluasi_internal['url'] . '">' . $evaluasi_internal['title'] . '</a></li>
-	            	</ol>
-		        	')
-			));
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'evaluasi_internal')));
 		Container::make('theme_options', __('Dokumen Lainnya'))
 			->set_page_parent($dokumen_menu)
 			->add_fields(array(
 				Field::make('html', 'crb_dokumen_lainnya_hide_sidebar')
 					->set_html('
-		        		<style>
-		        			.postbox-container { display: none; }
-		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
-		        		</style>
-		        	'),
-				Field::make('html', 'crb_siks_halaman_terkait_dokumen_lainnya')
-					->set_html('
-					<h5>HALAMAN TERKAIT</h5>
-	            	<ol>
-	            		<li><a target="_blank" href="' . $dokumen_lainnya['url'] . '">' . $dokumen_lainnya['title'] . '</a></li>
-	            	</ol>
-		        	')
-			));
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'dokumen_lainnya')));
 
 		$dokumen_pemda_menu = Container::make('theme_options', __('Dokumen Pemda'))
 			->set_page_menu_position(3.3)
