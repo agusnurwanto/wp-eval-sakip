@@ -164,7 +164,7 @@ class Wp_Eval_Sakip_Admin
 					} else if (!empty($_POST['type']) && $_POST['type'] == 'skp') {
 						$skp = $this->functions->generatePage(array(
 							'nama_page' => 'Halaman Dokumen SKP Tahun ' . $tahun_item['tahun_anggaran'],
-							'content' => '[skp_tahun=' . $tahun_item["tahun_anggaran"] . ']',
+							'content' => '[skp tahun=' . $tahun_item["tahun_anggaran"] . ']',
 							'show_header' => 1,
 							'no_key' => 1,
 							'post_status' => 'private'
@@ -181,7 +181,7 @@ class Wp_Eval_Sakip_Admin
 					} else if (!empty($_POST['type']) && $_POST['type'] == 'rencana_aksi') {
 						$rencana_aksi = $this->functions->generatePage(array(
 							'nama_page' => 'Halaman Dokumen Rencana Aksi Tahun ' . $tahun_item['tahun_anggaran'],
-							'content' => '[rencana_aksi_tahun=' . $tahun_item["tahun_anggaran"] . ']',
+							'content' => '[rencana_aksi tahun=' . $tahun_item["tahun_anggaran"] . ']',
 							'show_header' => 1,
 							'no_key' => 1,
 							'post_status' => 'private'
@@ -198,7 +198,7 @@ class Wp_Eval_Sakip_Admin
 					} else if (!empty($_POST['type']) && $_POST['type'] == 'iku') {
 						$iku = $this->functions->generatePage(array(
 							'nama_page' => 'Halaman Dokumen IKU Tahun ' . $tahun_item['tahun_anggaran'],
-							'content' => '[iku_tahun=' . $tahun_item["tahun_anggaran"] . ']',
+							'content' => '[iku tahun=' . $tahun_item["tahun_anggaran"] . ']',
 							'show_header' => 1,
 							'no_key' => 1,
 							'post_status' => 'private'
@@ -215,7 +215,7 @@ class Wp_Eval_Sakip_Admin
 					} else if (!empty($_POST['type']) && $_POST['type'] == 'pengukuran_kinerja') {
 						$pengukuran_kinerja = $this->functions->generatePage(array(
 							'nama_page' => 'Halaman Dokumen Pengukuran Kinerja Tahun ' . $tahun_item['tahun_anggaran'],
-							'content' => '[pengukuran_kinerja_tahun=' . $tahun_item["tahun_anggaran"] . ']',
+							'content' => '[pengukuran_kinerja tahun=' . $tahun_item["tahun_anggaran"] . ']',
 							'show_header' => 1,
 							'no_key' => 1,
 							'post_status' => 'private'
@@ -232,7 +232,7 @@ class Wp_Eval_Sakip_Admin
 					} else if (!empty($_POST['type']) && $_POST['type'] == 'pengukuran_rencana_aksi') {
 						$pengukuran_rencana_aksi = $this->functions->generatePage(array(
 							'nama_page' => 'Halaman Dokumen Pengukuran Rencana Aksi Tahun ' . $tahun_item['tahun_anggaran'],
-							'content' => '[pengukuran_rencana_aksi_tahun=' . $tahun_item["tahun_anggaran"] . ']',
+							'content' => '[pengukuran_rencana_aksi tahun=' . $tahun_item["tahun_anggaran"] . ']',
 							'show_header' => 1,
 							'no_key' => 1,
 							'post_status' => 'private'
@@ -249,7 +249,7 @@ class Wp_Eval_Sakip_Admin
 					} else if (!empty($_POST['type']) && $_POST['type'] == 'laporan_kinerja') {
 						$laporan_kinerja = $this->functions->generatePage(array(
 							'nama_page' => 'Halaman Dokumen Laporan Kinerja Tahun ' . $tahun_item['tahun_anggaran'],
-							'content' => '[laporan_kinerja_tahun=' . $tahun_item["tahun_anggaran"] . ']',
+							'content' => '[laporan_kinerja tahun=' . $tahun_item["tahun_anggaran"] . ']',
 							'show_header' => 1,
 							'no_key' => 1,
 							'post_status' => 'private'
@@ -266,7 +266,7 @@ class Wp_Eval_Sakip_Admin
 					} else if (!empty($_POST['type']) && $_POST['type'] == 'evaluasi_internal') {
 						$evaluasi_internal = $this->functions->generatePage(array(
 							'nama_page' => 'Halaman Dokumen Evaluasi Internal Tahun ' . $tahun_item['tahun_anggaran'],
-							'content' => '[evaluasi_internal_tahun=' . $tahun_item["tahun_anggaran"] . ']',
+							'content' => '[evaluasi_internal tahun=' . $tahun_item["tahun_anggaran"] . ']',
 							'show_header' => 1,
 							'no_key' => 1,
 							'post_status' => 'private'
@@ -283,7 +283,7 @@ class Wp_Eval_Sakip_Admin
 					} else if (!empty($_POST['type']) && $_POST['type'] == 'dokumen_lainnya') {
 						$dokumen_lainnya = $this->functions->generatePage(array(
 							'nama_page' => 'Halaman Dokumen Lain Tahun ' . $tahun_item['tahun_anggaran'],
-							'content' => '[dokumen_lainnya_tahun=' . $tahun_item["tahun_anggaran"] . ']',
+							'content' => '[dokumen_lainnya tahun=' . $tahun_item["tahun_anggaran"] . ']',
 							'show_header' => 1,
 							'no_key' => 1,
 							'post_status' => 'private'
@@ -300,7 +300,7 @@ class Wp_Eval_Sakip_Admin
 					} else if (!empty($_POST['type']) && $_POST['type'] == 'perjanjian_kinerja') {
 						$perjanjian_kinerja = $this->functions->generatePage(array(
 							'nama_page' => 'Halaman Dokumen Perjanjian Kinerja Tahun ' . $tahun_item['tahun_anggaran'],
-							'content' => '[dokumen_perjanjian_kinerja_tahun=' . $tahun_item["tahun_anggaran"] . ']',
+							'content' => '[dokumen_perjanjian_kinerja tahun=' . $tahun_item["tahun_anggaran"] . ']',
 							'show_header' => 1,
 							'no_key' => 1,
 							'post_status' => 'private'
