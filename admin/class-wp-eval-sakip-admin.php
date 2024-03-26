@@ -319,12 +319,20 @@ class Wp_Eval_Sakip_Admin
 			'post_status' => 'private'
 		));
 
+		$halaman_mapping_skpd = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman Mapping SKPD',
+			'content' => '[halaman_mapping_skpd]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+
 		$basic_options_container = Container::make('theme_options', __('E-SAKIP Options'))
 			->set_page_menu_position(3)
 			->add_fields(array(
 				Field::make('html', 'crb_esakip_halaman_terkait')
 					->set_html('
-					<h5>HALAMAN TERKAIT</h5>
+					<h4>HALAMAN TERKAIT</h4>
 	            	<ol>
 	            	</ol>'),
 				Field::make('text', 'crb_apikey_esakip', 'API KEY')
@@ -338,6 +346,12 @@ class Wp_Eval_Sakip_Admin
 		Container::make('theme_options', __('Pengaturan Perangkat Daerah'))
 			->set_page_parent($basic_options_container)
 			->add_fields(array(
+				Field::make('html', 'crb_esakip_halaman_terkait')
+					->set_html('
+					<h4>HALAMAN TERKAIT</h4>
+	            	<ol>
+	            		<li><a href="'.$halaman_mapping_skpd['url'].'">'.$halaman_mapping_skpd['title'].'</a></li>
+	            	</ol>'),
 				Field::make('text', 'crb_url_server_sakip', 'URL Server WP-SIPD')
 					->set_default_value(admin_url('admin-ajax.php'))
 					->set_required(true),

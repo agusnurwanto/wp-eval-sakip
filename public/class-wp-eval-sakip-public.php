@@ -257,4 +257,95 @@ class Wp_Eval_Sakip_Public {
 		}
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-dokumen-pemda-lainnya.php';
 	}
+
+	public function halaman_mapping_skpd()
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-mapping-skpd.php';
+	}
+
+
+    public function mapping_skpd()
+    {
+        global $wpdb;
+        $ret = array(
+            'status' => 'success',
+            'message' => 'Berhasil memproses data!'
+        );
+        if (!empty($_POST)) {
+            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+                if (empty($_POST['nama_skpd_sakip'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Nama SKPD SAKIP tidak boleh kosong!';
+                } else {
+                    $nama_skpd_sakip = $_POST['nama_skpd_sakip'];
+                    $skpd = $wpdb->get_row($wpdb->prepare('
+                        SELECT
+                        	*
+                        FROM esakip_data_unit
+                        WHERE id_skpd=%s
+                        	AND active=1
+                        order by tahun_anggaran DESC
+                    ', $_POST['id_skpd']), ARRAY_A);
+                    if (empty($skpd)) {
+	                    $ret['status'] = 'error';
+	                    $ret['message'] = 'ID SKPD tidak ditemukans!';
+                    } else {
+                    	update_option('_nama_skpd_sakip_'.$skpd['id_skpd'], $nama_skpd_sakip);
+                    	$data = array(
+                    		'opd' => $skpd['nama_skpd'],
+                    		'id_skpd' => $skpd['id_skpd']
+                    	);
+                        $wpdb->update('esakip_renja_rkt', $data, array(
+                            'opd' => $nama_skpd_sakip
+                        ));
+                        $wpdb->update('esakip_dokumen_lainnya', $data, array(
+                            'opd' => $nama_skpd_sakip
+                        ));
+                        $wpdb->update('esakip_evaluasi_internal', $data, array(
+                            'opd' => $nama_skpd_sakip
+                        ));
+                        $wpdb->update('esakip_iku', $data, array(
+                            'opd' => $nama_skpd_sakip
+                        ));
+                        $wpdb->update('esakip_laporan_kinerja', $data, array(
+                            'opd' => $nama_skpd_sakip
+                        ));
+                        $wpdb->update('esakip_lhe_opd', $data, array(
+                            'opd' => $nama_skpd_sakip
+                        ));
+                        $wpdb->update('esakip_pengukuran_kinerja', $data, array(
+                            'opd' => $nama_skpd_sakip
+                        ));
+                        $wpdb->update('esakip_pengukuran_rencana_aksi', $data, array(
+                            'opd' => $nama_skpd_sakip
+                        ));
+                        $wpdb->update('esakip_perjanjian_kinerja', $data, array(
+                            'opd' => $nama_skpd_sakip
+                        ));
+                        $wpdb->update('esakip_rencana_aksi', $data, array(
+                            'opd' => $nama_skpd_sakip
+                        ));
+                        $wpdb->update('esakip_renstra', $data, array(
+                            'opd' => $nama_skpd_sakip
+                        ));
+                        $wpdb->update('esakip_skp', $data, array(
+                            'opd' => $nama_skpd_sakip
+                        ));
+                    }
+                }
+            } else {
+                $ret['status']  = 'error';
+                $ret['message'] = 'Api key tidak ditemukan!';
+            }
+        } else {
+            $ret['status']  = 'error';
+            $ret['message'] = 'Format Salah!';
+        }
+
+        die(json_encode($ret));
+    }
 }
