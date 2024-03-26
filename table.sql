@@ -71,6 +71,7 @@ CREATE TABLE `esakip_lhe_opd` (
 
 CREATE TABLE `esakip_lkjip_lppd` (
   `id` int(11) NOT NULL auto_increment,
+  `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` varchar(255) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
@@ -80,6 +81,7 @@ CREATE TABLE `esakip_lkjip_lppd` (
 
 CREATE TABLE `esakip_other_file` (
   `id` int(11) NOT NULL auto_increment,
+  `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` varchar(255) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
@@ -150,6 +152,7 @@ CREATE TABLE `esakip_renja_rkt` (
 CREATE TABLE `esakip_renstra` (
   `id` int(11) NOT NULL auto_increment,
   `opd` varchar(255) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` longtext DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
@@ -159,6 +162,7 @@ CREATE TABLE `esakip_renstra` (
 
 CREATE TABLE `esakip_rkpd` (
   `id` int(11) NOT NULL auto_increment,
+  `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` varchar(255) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
@@ -168,6 +172,7 @@ CREATE TABLE `esakip_rkpd` (
 
 CREATE TABLE `esakip_rpjmd` (
   `id` int(11) NOT NULL auto_increment,
+  `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` varchar(255) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,

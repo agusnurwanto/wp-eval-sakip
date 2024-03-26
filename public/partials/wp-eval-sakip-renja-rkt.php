@@ -1,12 +1,29 @@
 <?php
+global $wpdb;
+
 if (!defined('WPINC')) {
 	die;
 }
+
 $input = shortcode_atts(array(
 	'tahun' => '2022'
 ), $atts);
 
-global $wpdb;
+$idtahun = $wpdb->get_results("
+		SELECT DISTINCT 
+			tahun_anggaran 
+		FROM esakip_data_unit",
+	ARRAY_A
+);
+$tahun = "<option value='-1'>Pilih Tahun</option>";
+
+foreach ($idtahun as $val) {
+	$selected = '';
+	if (!empty($input['tahun_anggaran']) && $val['tahun_anggaran'] == $input['tahun_anggaran']) {
+		$selected = 'selected';
+	}
+	$tahun .= "<option value='$val[tahun_anggaran]' $selected>$val[tahun_anggaran]</option>";
+}
 
 $unit = $wpdb->get_results($wpdb->prepare("
 	SELECT 
@@ -14,11 +31,11 @@ $unit = $wpdb->get_results($wpdb->prepare("
 		id_skpd, 
 		kode_skpd, 
 		nipkepala 
-	from data_unit 
-	where active=1 
-		and tahun_anggaran=%d
-		and is_skpd=1 
-	order by kode_skpd ASC
+	FROM esakip_data_unit 
+	WHERE active=1 
+	  AND tahun_anggaran=%d
+	  AND is_skpd=1 
+	ORDER BY kode_skpd ASC
 ", $input['tahun']), ARRAY_A);
 
 $dokumen_unset = $wpdb->get_results("
@@ -47,7 +64,7 @@ foreach ($unit as $kk => $vv) {
 	$tbody .= "<tr>";
 	$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
 	$tbody .= "<td>" . $vv['kode_skpd'] . "</td>";
-	$tbody .= "<td>" . $vv['nama_skpd'] . "</td>";
+	$tbody .= "<td style='text-transform: uppercase;'><a target='_blank' href='" . $detail_renja['url'] . '&id_skpd=' . $vv['id_skpd'] . "'>" . $vv['nama_skpd'] . "</a></td>";
 
 	$jumlah_dokumen = $wpdb->get_var(
 		$wpdb->prepare(
@@ -64,9 +81,7 @@ foreach ($unit as $kk => $vv) {
 		)
 	);
 
-	$aksi = "<a class='custom-button' target='_blank' href='" . $detail_renja['url'] . '&id_skpd=' . $vv['id_skpd'] . "'><span class='dashicons dashicons-arrow-right-alt2'></span></a>";
 	$tbody .= "<td>" . $jumlah_dokumen . "</td>";
-	$tbody .= "<td class='text-center'>" . $aksi . "</td>";
 	$tbody .= "</tr>";
 }
 
@@ -83,54 +98,55 @@ foreach ($dokumen_unset as $kk => $vv) {
 	$tbodyUnset .= "</tr>";
 }
 ?>
-
 <style type="text/css">
-	a.custom-button {
-		color: inherit;
-		text-decoration: none;
-		background-color: transparent;
-		cursor: pointer;
+	.wrap-table {
+		overflow: auto;
+		max-height: 100vh;
+		width: 100%;
 	}
 </style>
 <div class="container-md">
-	<div class="table-responsive">
-		<div class="table-container p-5 rounded shadow">
-			<h1 class="text-center">Dokumen RENJA / RKT Tahun <?php echo $input['tahun']; ?></h1>
-			<table class="table table-bordered">
-				<thead>
-					<tr>
-						<th class="text-center">No</th>
-						<th class="text-center">Kode SKPD</th>
-						<th class="text-center">Nama SKPD</th>
-						<th class="text-center">Jumlah Dokumen</th>
-						<th class="text-center">Aksi</th>
-					</tr>
-				</thead>
-				<tbody>
-					<?php echo $tbody; ?>
-				</tbody>
-			</table>
+	<div class="cetak">
+		<div style="padding: 10px;margin:0 0 3rem 0;">
+			<h1 class="text-center table-title">Dokumen RENJA / RKT Tahun <?php echo $input['tahun']; ?></h1>
+			<div class="wrap-table">
+				<table cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+					<thead>
+						<tr>
+							<th class="text-center">No</th>
+							<th class="text-center">Kode SKPD</th>
+							<th class="text-center">Nama SKPD</th>
+							<th class="text-center">Jumlah Dokumen</th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php echo $tbody; ?>
+					</tbody>
+				</table>
+			</div>
 		</div>
 	</div>
 </div>
 <div class="container-md">
-	<div class="table-responsive">
-		<div class="table-container p-5 rounded shadow">
+	<div class="cetak">
+		<div style="padding: 10px;margin:0 0 3rem 0;">
 			<h3 class="text-center">Dokumen yang belum disetting Tahun Anggaran</h3>
-			<table class="table table-bordered">
-				<thead>
-					<tr>
-						<th class="text-center">No</th>
-						<th class="text-center">Perangkat Daerah</th>
-						<th class="text-center">Nama Dokumen</th>
-						<th class="text-center">Keterangan</th>
-						<th class="text-center">Aksi</th>
-					</tr>
-				</thead>
-				<tbody>
-					<?php echo $tbodyUnset; ?>
-				</tbody>
-			</table>
+			<div class="wrap-table">
+				<table cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+					<thead>
+						<tr>
+							<th class="text-center">No</th>
+							<th class="text-center">Perangkat Daerah</th>
+							<th class="text-center">Nama Dokumen</th>
+							<th class="text-center">Keterangan</th>
+							<th class="text-center">Aksi</th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php echo $tbodyUnset; ?>
+					</tbody>
+				</table>
+			</div>
 		</div>
 	</div>
 </div>
@@ -147,14 +163,13 @@ foreach ($dokumen_unset as $kk => $vv) {
 			<div class="modal-body">
 				<form id="tahunForm">
 					<div class="form-group">
-						<label for="tahunAnggaran">Pilih Tahun Anggaran:</label>
+						<label for="tahunAnggaran">Tahun Anggaran:</label>
 						<select class="form-control" id="tahunAnggaran" name="tahunAnggaran">
-							<option value="2022">2022</option>
-							<option value="2023">2023</option>
-							<option value="2024">2024</option>
+							<?php echo $tahun; ?>
 						</select>
+						<input type="hidden" id="idDokumen" value=""> 
 					</div>
-					<button type="submit" class="btn btn-primary">Simpan</button>
+					<button type="submit" class="btn btn-primary" onclick="submit_tahun_renja_rkt(); return false">Simpan</button>
 				</form>
 			</div>
 		</div>
@@ -162,9 +177,50 @@ foreach ($dokumen_unset as $kk => $vv) {
 </div>
 
 <script>
-	function set_tahun_dokumen() {
+	function set_tahun_dokumen(id) {
 		jQuery('#tahunModal').modal('show');
+		jQuery('#idDokumen').val(id);
 	}
+
+	function submit_tahun_renja_rkt() {
+		let id = jQuery("#idDokumen").val();
+		if (id == '') {
+			return alert('id tidak boleh kosong');
+		}
+
+		let tahunAnggaran = jQuery("#tahunAnggaran").val();
+		if (tahunAnggaran == '') {
+			return alert('Tahun Anggaran tidak boleh kosong');
+		}
+
+		jQuery('#wrap-loading').show();
+		jQuery.ajax({
+			url: esakip.url,
+			type: 'POST',
+			data: {
+				action: 'submit_tahun_renja_rkt',
+				id: id,
+				tahunAnggaran: tahunAnggaran,
+				api_key: esakip.api_key
+			},
+			dataType: 'json',
+			success: function(response) {
+				console.log(response);
+				jQuery('#wrap-loading').hide();
+				if (response.status === 'success') {
+					alert(response.message);
+				} else {
+					alert(response.message);
+				}
+			},
+			error: function(xhr, status, error) {
+				jQuery('#wrap-loading').hide();
+				console.error(xhr.responseText);
+				alert('Terjadi kesalahan saat mengirim data!');
+			}
+		});
+	}
+
 
 	function detail_dokumen() {
 		jQuery('#uploadForm').modal('show');

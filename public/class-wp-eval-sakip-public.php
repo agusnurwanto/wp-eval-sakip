@@ -107,6 +107,10 @@ class Wp_Eval_Sakip_Public
 		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/wp-eval-sakip-public.js', array('jquery'), $this->version, false);
 		wp_enqueue_script($this->plugin_name . 'bootstrap', plugin_dir_url(__FILE__) . 'js/bootstrap.bundle.min.js', array('jquery'), $this->version, false);
 		wp_enqueue_script($this->plugin_name . 'datatables', plugin_dir_url(__FILE__) . 'js/jquery.dataTables.min.js', array('jquery'), $this->version, false);
+		wp_localize_script($this->plugin_name, 'esakip', array(
+			'api_key' => get_option(ESAKIP_APIKEY),
+			'url' => admin_url('admin-ajax.php')
+		));
 	}
 
 	public function desain_lke_sakip()
@@ -272,21 +276,21 @@ class Wp_Eval_Sakip_Public
 	}
 
 
-    public function mapping_skpd()
-    {
-        global $wpdb;
-        $ret = array(
-            'status' => 'success',
-            'message' => 'Berhasil memproses data!'
-        );
-        if (!empty($_POST)) {
-            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
-                if (empty($_POST['nama_skpd_sakip'])) {
-                    $ret['status'] = 'error';
-                    $ret['message'] = 'Nama SKPD SAKIP tidak boleh kosong!';
-                } else {
-                    $nama_skpd_sakip = $_POST['nama_skpd_sakip'];
-                    $skpd = $wpdb->get_row($wpdb->prepare('
+	public function mapping_skpd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil memproses data!'
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				if (empty($_POST['nama_skpd_sakip'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Nama SKPD SAKIP tidak boleh kosong!';
+				} else {
+					$nama_skpd_sakip = $_POST['nama_skpd_sakip'];
+					$skpd = $wpdb->get_row($wpdb->prepare('
                         SELECT
                         	*
                         FROM esakip_data_unit
@@ -294,65 +298,65 @@ class Wp_Eval_Sakip_Public
                         	AND active=1
                         order by tahun_anggaran DESC
                     ', $_POST['id_skpd']), ARRAY_A);
-                    if (empty($skpd)) {
-	                    $ret['status'] = 'error';
-	                    $ret['message'] = 'ID SKPD tidak ditemukans!';
-                    } else {
-                    	update_option('_nama_skpd_sakip_'.$skpd['id_skpd'], $nama_skpd_sakip);
-                    	$data = array(
-                    		'opd' => $skpd['nama_skpd'],
-                    		'id_skpd' => $skpd['id_skpd']
-                    	);
-                        $wpdb->update('esakip_renja_rkt', $data, array(
-                            'opd' => $nama_skpd_sakip
-                        ));
-                        $wpdb->update('esakip_dokumen_lainnya', $data, array(
-                            'opd' => $nama_skpd_sakip
-                        ));
-                        $wpdb->update('esakip_evaluasi_internal', $data, array(
-                            'opd' => $nama_skpd_sakip
-                        ));
-                        $wpdb->update('esakip_iku', $data, array(
-                            'opd' => $nama_skpd_sakip
-                        ));
-                        $wpdb->update('esakip_laporan_kinerja', $data, array(
-                            'opd' => $nama_skpd_sakip
-                        ));
-                        $wpdb->update('esakip_lhe_opd', $data, array(
-                            'opd' => $nama_skpd_sakip
-                        ));
-                        $wpdb->update('esakip_pengukuran_kinerja', $data, array(
-                            'opd' => $nama_skpd_sakip
-                        ));
-                        $wpdb->update('esakip_pengukuran_rencana_aksi', $data, array(
-                            'opd' => $nama_skpd_sakip
-                        ));
-                        $wpdb->update('esakip_perjanjian_kinerja', $data, array(
-                            'opd' => $nama_skpd_sakip
-                        ));
-                        $wpdb->update('esakip_rencana_aksi', $data, array(
-                            'opd' => $nama_skpd_sakip
-                        ));
-                        $wpdb->update('esakip_renstra', $data, array(
-                            'opd' => $nama_skpd_sakip
-                        ));
-                        $wpdb->update('esakip_skp', $data, array(
-                            'opd' => $nama_skpd_sakip
-                        ));
-                    }
-                }
-            } else {
-                $ret['status']  = 'error';
-                $ret['message'] = 'Api key tidak ditemukan!';
-            }
-        } else {
-            $ret['status']  = 'error';
-            $ret['message'] = 'Format Salah!';
-        }
+					if (empty($skpd)) {
+						$ret['status'] = 'error';
+						$ret['message'] = 'ID SKPD tidak ditemukans!';
+					} else {
+						update_option('_nama_skpd_sakip_' . $skpd['id_skpd'], $nama_skpd_sakip);
+						$data = array(
+							'opd' => $skpd['nama_skpd'],
+							'id_skpd' => $skpd['id_skpd']
+						);
+						$wpdb->update('esakip_renja_rkt', $data, array(
+							'opd' => $nama_skpd_sakip
+						));
+						$wpdb->update('esakip_dokumen_lainnya', $data, array(
+							'opd' => $nama_skpd_sakip
+						));
+						$wpdb->update('esakip_evaluasi_internal', $data, array(
+							'opd' => $nama_skpd_sakip
+						));
+						$wpdb->update('esakip_iku', $data, array(
+							'opd' => $nama_skpd_sakip
+						));
+						$wpdb->update('esakip_laporan_kinerja', $data, array(
+							'opd' => $nama_skpd_sakip
+						));
+						$wpdb->update('esakip_lhe_opd', $data, array(
+							'opd' => $nama_skpd_sakip
+						));
+						$wpdb->update('esakip_pengukuran_kinerja', $data, array(
+							'opd' => $nama_skpd_sakip
+						));
+						$wpdb->update('esakip_pengukuran_rencana_aksi', $data, array(
+							'opd' => $nama_skpd_sakip
+						));
+						$wpdb->update('esakip_perjanjian_kinerja', $data, array(
+							'opd' => $nama_skpd_sakip
+						));
+						$wpdb->update('esakip_rencana_aksi', $data, array(
+							'opd' => $nama_skpd_sakip
+						));
+						$wpdb->update('esakip_renstra', $data, array(
+							'opd' => $nama_skpd_sakip
+						));
+						$wpdb->update('esakip_skp', $data, array(
+							'opd' => $nama_skpd_sakip
+						));
+					}
+				}
+			} else {
+				$ret['status']  = 'error';
+				$ret['message'] = 'Api key tidak ditemukan!';
+			}
+		} else {
+			$ret['status']  = 'error';
+			$ret['message'] = 'Format Salah!';
+		}
 
-        die(json_encode($ret));
-    }
-	
+		die(json_encode($ret));
+	}
+
 	public function dokumen_detail_renja_rkt($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
@@ -411,11 +415,111 @@ class Wp_Eval_Sakip_Public
 		$ret = array(
 			'status' => 'success',
 			'message' => 'Berhasil tambah data!',
-			'data'  => array()
 		);
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				$id = $_POST['id'];
+				$tahun_anggaran = $_POST['tahunAnggaran'];
+
+				if (!empty($id) && !empty($tahun_anggaran)) {
+					$existing_data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT 
+								* 
+							FROM esakip_renja_rkt 
+							WHERE id = %d", $id)
+					);
+
+					if (!empty($existing_data)) {
+						$update_result = $wpdb->update(
+							'esakip_renja_rkt',
+							array(
+								'tahun_anggaran' => $tahun_anggaran,
+							),
+							array('id' => $id),
+							array('%d'),
+						);
+
+						if ($update_result === false) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal memperbarui data di dalam tabel!'
+							);
+						}
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message' => 'Data dengan ID yang diberikan tidak ditemukan!'
+						);
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message' => 'ID atau tahun anggaran tidak valid!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function tambah_dokumen_renja()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				$skpd = $_POST['skpd'];
+				$idSkpd = $_POST['idSkpd'];
+				$keterangan = $_POST['keterangan'];
+				$tahunAnggaran = $_POST['tahunAnggaran'];
+
+				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+				$upload = $this->functions->uploadFile($_POST['api_key'], $upload_dir, $_FILES['fileUpload'], array('pdf'), 1048576*10);
+				if($upload['status'] == false){
+					$ret = array(
+						'status' => 'error',
+						'message' => $upload['message']
+					);
+				}
+				if ($ret['status'] != 'error') {
+					$wpdb->insert(
+						'esakip_renja_rkt',
+						array(
+							'opd' => $skpd,
+							'id_skpd' => $idSkpd,
+							'dokumen' => $upload['filename'],
+							'keterangan' => $keterangan,
+							'tahun_anggaran' => $tahunAnggaran,
+							'created_at' => current_time('mysql'),
+						),
+						array('%s', '%s', '%s', '%d', '%s')
+					);
+
+					if ($wpdb->insert_id) {
+						$ret['message'] = 'Berhasil tambah data!';
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message' => 'Gagal menyimpan data ke database!'
+						);
+					}
+				}
 			} else {
 				$ret = array(
 					'status' => 'error',

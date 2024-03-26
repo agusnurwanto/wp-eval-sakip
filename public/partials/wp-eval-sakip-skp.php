@@ -10,6 +10,9 @@ $input = shortcode_atts(array(
 ), $atts);
 
 ?>
+<style type="text/css">
+	
+</style>
 <div class="container">
 	<div class="cetak">
 		<div style="padding: 10px;margin:0 0 3rem 0;">
