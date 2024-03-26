@@ -12,8 +12,10 @@ CREATE TABLE `esakip_achievement` (
 CREATE TABLE `esakip_dokumen_lainnya` (
   `id` int(11) NOT NULL auto_increment,
   `opd` varchar(255) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` longtext DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
@@ -22,8 +24,10 @@ CREATE TABLE `esakip_dokumen_lainnya` (
 CREATE TABLE `esakip_evaluasi_internal` (
   `id` int(11) NOT NULL auto_increment,
   `opd` varchar(255) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` longtext DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
@@ -32,8 +36,10 @@ CREATE TABLE `esakip_evaluasi_internal` (
 CREATE TABLE `esakip_iku` (
   `id` int(11) NOT NULL auto_increment,
   `opd` varchar(255) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` longtext DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
@@ -42,8 +48,10 @@ CREATE TABLE `esakip_iku` (
 CREATE TABLE `esakip_laporan_kinerja` (
   `id` int(11) NOT NULL auto_increment,
   `opd` varchar(255) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` longtext DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
@@ -52,8 +60,10 @@ CREATE TABLE `esakip_laporan_kinerja` (
 CREATE TABLE `esakip_lhe_opd` (
   `id` int(11) NOT NULL auto_increment,
   `opd` varchar(255) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` longtext DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
@@ -80,8 +90,10 @@ CREATE TABLE `esakip_other_file` (
 CREATE TABLE `esakip_pengukuran_kinerja` (
   `id` int(11) NOT NULL auto_increment,
   `opd` varchar(255) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` longtext DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
@@ -90,8 +102,10 @@ CREATE TABLE `esakip_pengukuran_kinerja` (
 CREATE TABLE `esakip_pengukuran_rencana_aksi` (
   `id` int(11) NOT NULL auto_increment,
   `opd` varchar(255) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` longtext DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
@@ -100,8 +114,10 @@ CREATE TABLE `esakip_pengukuran_rencana_aksi` (
 CREATE TABLE `esakip_perjanjian_kinerja` (
   `id` int(11) NOT NULL auto_increment,
   `opd` varchar(255) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` longtext DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
@@ -110,8 +126,10 @@ CREATE TABLE `esakip_perjanjian_kinerja` (
 CREATE TABLE `esakip_rencana_aksi` (
   `id` int(11) NOT NULL auto_increment,
   `opd` varchar(255) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` longtext DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
@@ -120,8 +138,10 @@ CREATE TABLE `esakip_rencana_aksi` (
 CREATE TABLE `esakip_renja_rkt` (
   `id` int(11) NOT NULL auto_increment,
   `opd` varchar(255) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` longtext DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
@@ -158,8 +178,10 @@ CREATE TABLE `esakip_rpjmd` (
 CREATE TABLE `esakip_skp` (
   `id` int(11) NOT NULL auto_increment,
   `opd` varchar(255) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` longtext DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
