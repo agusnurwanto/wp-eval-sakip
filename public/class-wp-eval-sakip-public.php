@@ -493,6 +493,8 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$id_dokumen = null;
+
 				if (!empty($_POST['id_dokumen'])) {
 					$id_dokumen = $_POST['id_dokumen'];
 				}
@@ -521,61 +523,65 @@ class Wp_Eval_Sakip_Public
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
 
-				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
-				$upload = $this->functions->uploadFile(
-					$_POST['api_key'],
-					$upload_dir,
-					$_FILES['fileUpload'],
-					array('pdf'),
-					1048576 * 10
-				);
-				if ($upload['status'] == false) {
-					$ret = array(
-						'status' => 'error',
-						'message' => $upload['message']
+				if ($ret['status'] == 'success') {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$upload = $this->functions->uploadFile(
+						$_POST['api_key'],
+						$upload_dir,
+						$_FILES['fileUpload'],
+						array('pdf'),
+						1048576 * 10
 					);
-				}
-				if ($ret['status'] != 'error' && empty($id_dokumen)) {
-					$wpdb->insert(
-						'esakip_renja_rkt',
-						array(
-							'opd' => $skpd,
-							'id_skpd' => $idSkpd,
-							'dokumen' => $upload['filename'],
-							'keterangan' => $keterangan,
-							'tahun_anggaran' => $tahunAnggaran,
-							'created_at' => current_time('mysql'),
-						),
-						array('%s', '%s', '%s', '%s', '%d')
-					);
-
-					if ($wpdb->insert_id) {
-						$ret['message'] = 'Berhasil tambah data!';
-					} else {
+					if ($upload['status'] == false) {
 						$ret = array(
 							'status' => 'error',
-							'message' => 'Gagal menyimpan data ke database!'
+							'message' => $upload['message']
 						);
 					}
-				} else {
-					$wpdb->update(
-						'esakip_renja_rkt',
-						array(
-							'opd' => $skpd,
-							'id_skpd' => $idSkpd,
-							'dokumen' => $upload['filename'],
-							'keterangan' => $keterangan,
-							'tahun_anggaran' => $tahunAnggaran,
-						),
-						array('id' => $id_dokumen),
-						array('%s', '%s', '%s', '%s', '%d')
-					);
+				}
 
-					if ($wpdb->rows_affected == 0) {
-						$ret = array(
-							'status' => 'error',
-							'message' => 'Gagal memperbarui data ke database!'
+				if ($ret['status'] == 'success') {
+					if (empty($id_dokumen)) {
+						$wpdb->insert(
+							'esakip_renja_rkt',
+							array(
+								'opd' => $skpd,
+								'id_skpd' => $idSkpd,
+								'dokumen' => $upload['filename'],
+								'keterangan' => $keterangan,
+								'tahun_anggaran' => $tahunAnggaran,
+								'created_at' => current_time('mysql'),
+							),
+							array('%s', '%s', '%s', '%s', '%d')
 						);
+
+						if (!$wpdb->insert_id) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal menyimpan data ke database!'
+							);
+						}
+					} else {
+						$wpdb->update(
+							'esakip_renja_rkt',
+							array(
+								'opd' => $skpd,
+								'id_skpd' => $idSkpd,
+								'dokumen' => $upload['filename'],
+								'keterangan' => $keterangan,
+								'tahun_anggaran' => $tahunAnggaran,
+							),
+							array('id' => $id_dokumen),
+							array('%s', '%s', '%s', '%s', '%d'),
+							array('%d')
+						);
+
+						if ($wpdb->rows_affected == 0) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal memperbarui data ke database!'
+							);
+						}
 					}
 				}
 			} else {
@@ -651,10 +657,7 @@ class Wp_Eval_Sakip_Public
 
 					$ret['data'] = $tbody;
 				} else {
-					$ret = array(
-						'status' => 'error',
-						'message'   => 'Data RENJA tidak ditemukan!'
-					);
+					$ret['data'] = "<tr><td colspan='6' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 			} else {
 				$ret = array(
