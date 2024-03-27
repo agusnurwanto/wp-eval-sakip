@@ -50,7 +50,7 @@ foreach ($renjas as $kk => $vv) {
     $tbody .= "<td>" . $vv['created_at'] . "</td>";
 
     $btn = '<button class="btn btn-sm btn-warning" onclick="detail_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Detail Data"><span class="dashicons dashicons-visibility"></span></button>';
-    $btn .= '<button class="btn btn-sm btn-danger" style="margin-left: 7px;" onclick="hapus_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Data"><span class="dashicons dashicons-trash"></span></button>';
+    $btn .= '<button class="btn btn-sm btn-danger" style="margin-left: 7px;" onclick="hapus_dokumen_renja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Data"><span class="dashicons dashicons-trash"></span></button>';
 
     $tbody .= "<td class='text-center'>" . $btn . "</td>";
     $tbody .= "</tr>";
@@ -73,7 +73,7 @@ foreach ($renjas as $kk => $vv) {
                 <button class="btn btn-primary" onclick="tambah_dokumen_renja();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
             </div>
             <div class="wrap-table">
-                <table id="management_data_table" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                <table id="table_dokumen_renja" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
@@ -85,7 +85,6 @@ foreach ($renjas as $kk => $vv) {
                         </tr>
                     </thead>
                     <tbody>
-                        <?php echo $tbody; ?>
                     </tbody>
                 </table>
             </div>
@@ -116,7 +115,7 @@ foreach ($renjas as $kk => $vv) {
                         <input type="file" class="form-control-file" id="fileUpload" name="fileUpload" required>
                     </div>
                     <div class="alert alert-warning mt-2" role="alert">
-                        Maksimal ukuran file: 10 MB. Format file yang diperbolehkan: PDF, JPG.
+                        Maksimal ukuran file: 10 MB. Format file yang diperbolehkan: PDF.
                     </div>
                     <div class="form-group">
                         <label for="keterangan">Keterangan</label>
@@ -129,6 +128,39 @@ foreach ($renjas as $kk => $vv) {
     </div>
 </div>
 <script>
+    jQuery(document).ready(function() {
+        getTableRenja();
+    });
+
+    function getTableRenja() {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_table_renja',
+                api_key: esakip.api_key,
+                id_skpd: <?php echo $id_skpd; ?>,
+                tahun_anggaran: '<?php echo $input['tahun'] ?>'
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                console.log(response);
+                if (response.status === 'success') {
+                    jQuery('#table_dokumen_renja tbody').html(response.data);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data RENJA/RKT!');
+            }
+        });
+    }
+
     function tambah_dokumen_renja() {
         jQuery("#uploadModal").modal('show');
     }
@@ -177,6 +209,7 @@ foreach ($renjas as $kk => $vv) {
                 if (response.status === 'success') {
                     jQuery('#uploadModal').modal('hide');
                     alert(response.message);
+                    getTableRenja();
                 } else {
                     alert(response.message);
                 }
@@ -189,12 +222,39 @@ foreach ($renjas as $kk => $vv) {
         });
     }
 
-
     function detail_dokumen() {
         alert("oke");
     }
 
-    function hapus_dokumen() {
-        alert("oke s");
+    function hapus_dokumen_renja(id) {
+        if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
+            return;
+        }
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'hapus_dokumen_renja',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    getTableRenja();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                jQuery('#wrap-loading').hide();
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
     }
 </script>

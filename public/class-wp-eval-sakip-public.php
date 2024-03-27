@@ -284,7 +284,7 @@ class Wp_Eval_Sakip_Public
 			'message' => 'Berhasil memproses data!'
 		);
 		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				if (empty($_POST['nama_skpd_sakip'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Nama SKPD SAKIP tidak boleh kosong!';
@@ -376,7 +376,7 @@ class Wp_Eval_Sakip_Public
 		);
 
 		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				if (!empty($_POST['nama_kec'])) {
 					$data = $wpdb->get_var(
 						$wpdb->prepare("
@@ -418,7 +418,7 @@ class Wp_Eval_Sakip_Public
 		);
 
 		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				$id = $_POST['id'];
 				$tahun_anggaran = $_POST['tahunAnggaran'];
 
@@ -483,15 +483,15 @@ class Wp_Eval_Sakip_Public
 		);
 
 		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				$skpd = $_POST['skpd'];
 				$idSkpd = $_POST['idSkpd'];
 				$keterangan = $_POST['keterangan'];
 				$tahunAnggaran = $_POST['tahunAnggaran'];
 
 				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
-				$upload = $this->functions->uploadFile($_POST['api_key'], $upload_dir, $_FILES['fileUpload'], array('pdf'), 1048576*10);
-				if($upload['status'] == false){
+				$upload = $this->functions->uploadFile($_POST['api_key'], $upload_dir, $_FILES['fileUpload'], array('pdf'), 1048576 * 10);
+				if ($upload['status'] == false) {
 					$ret = array(
 						'status' => 'error',
 						'message' => $upload['message']
@@ -519,6 +519,81 @@ class Wp_Eval_Sakip_Public
 							'message' => 'Gagal menyimpan data ke database!'
 						);
 					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_table_renja()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_skpd'])) {
+					$id_skpd = $_POST['id_skpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id SKPD kosong!';
+				}
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+				$renjas = $wpdb->get_results(
+					$wpdb->prepare("
+                    SELECT * 
+                    FROM esakip_renja_rkt 
+                    WHERE id_skpd = %d 
+                      AND tahun_anggaran = %d 
+                      AND active = 1
+                ", $id_skpd, $tahun_anggaran),
+					ARRAY_A
+				);
+
+				if (!empty($renjas)) {
+					$counter = 1;
+					$tbody = '';
+
+					foreach ($renjas as $kk => $vv) {
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+						$tbody .= "<td>" . $vv['opd'] . "</td>";
+						$tbody .= "<td>" . $vv['dokumen'] . "</td>";
+						$tbody .= "<td>" . $vv['keterangan'] . "</td>";
+						$tbody .= "<td>" . $vv['created_at'] . "</td>";
+
+						$btn = '<button class="btn btn-sm btn-warning" onclick="detail_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Detail Data"><span class="dashicons dashicons-visibility"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-danger" style="margin-left: 7px;" onclick="hapus_dokumen_renja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Data"><span class="dashicons dashicons-trash"></span></button>';
+
+						$tbody .= "<td class='text-center'>" . $btn . "</td>";
+						$tbody .= "</tr>";
+					}
+
+					$ret['data'] = $tbody;
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Data RENJA tidak ditemukan!'
+					);
 				}
 			} else {
 				$ret = array(

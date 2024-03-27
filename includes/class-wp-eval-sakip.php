@@ -193,6 +193,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_detail_renja_rkt', $plugin_public, 'get_detail_renja_rkt');
 		$this->loader->add_action('wp_ajax_tambah_dokumen_renja', $plugin_public, 'tambah_dokumen_renja');
 		$this->loader->add_action('wp_ajax_submit_tahun_renja_rkt', $plugin_public, 'submit_tahun_renja_rkt');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_renja', $plugin_public, 'hapus_dokumen_renja');
+		$this->loader->add_action('wp_ajax_get_table_renja', $plugin_public, 'get_table_renja');
 
 
 		add_shortcode('desain_lke_sakip', array($plugin_public, 'desain_lke_sakip'));
