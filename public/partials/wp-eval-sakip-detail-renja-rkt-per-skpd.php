@@ -25,42 +25,22 @@ $skpd = $wpdb->get_row(
 ", $id_skpd, $input['tahun']),
     ARRAY_A
 );
-
-$renjas = $wpdb->get_results(
-    $wpdb->prepare("
-    SELECT 
-        *
-    FROM esakip_renja_rkt
-    WHERE id_skpd=%d
-      AND tahun_anggaran=%d
-      AND active = 1
-", $id_skpd, $input['tahun']),
-    ARRAY_A
-);
-
-$counter = 1;
-$tbody = null;
-
-foreach ($renjas as $kk => $vv) {
-    $tbody .= "<tr>";
-    $tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-    $tbody .= "<td>" . $vv['opd'] . "</td>";
-    $tbody .= "<td>" . $vv['dokumen'] . "</td>";
-    $tbody .= "<td>" . $vv['keterangan'] . "</td>";
-    $tbody .= "<td>" . $vv['created_at'] . "</td>";
-
-    $btn = '<button class="btn btn-sm btn-warning" onclick="detail_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Detail Data"><span class="dashicons dashicons-visibility"></span></button>';
-    $btn .= '<button class="btn btn-sm btn-danger" style="margin-left: 7px;" onclick="hapus_dokumen_renja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Data"><span class="dashicons dashicons-trash"></span></button>';
-
-    $tbody .= "<td class='text-center'>" . $btn . "</td>";
-    $tbody .= "</tr>";
-}
 ?>
 <style type="text/css">
     .wrap-table {
         overflow: auto;
         max-height: 100vh;
         width: 100%;
+    }
+
+    .btn-action-group {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .btn-action-group .btn {
+        margin: 0 5px;
     }
 </style>
 
@@ -98,6 +78,7 @@ foreach ($renjas as $kk => $vv) {
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="uploadModalLabel">Tambah Dokumen</h5>
+                <h5 class="modal-title" id="editModalLabel">Edit Dokumen</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -106,13 +87,15 @@ foreach ($renjas as $kk => $vv) {
                 <form enctype="multipart/form-data">
                     <input type="hidden" value="<?php echo $id_skpd; ?>" id="idSkpd">
                     <input type="hidden" value="<?php echo $input['tahun']; ?>" id="tahunAnggaran">
+                    <input type="hidden" value="" id="idDokumen">
                     <div class="form-group">
                         <label for="perangkatDaerah">Perangkat Daerah</label>
                         <input type="text" class="form-control" id="perangkatDaerah" name="perangkatDaerah" style="text-transform: uppercase;" value="<?php echo $skpd['nama_skpd']; ?>" disabled>
                     </div>
                     <div class="form-group">
                         <label for="fileUpload">Pilih File</label>
-                        <input type="file" class="form-control-file" id="fileUpload" name="fileUpload" required>
+                        <input type="file" class="form-control-file" id="fileUpload" name="fileUpload" accept="application/pdf" required>
+                        <div style="padding-top: 10px; padding-bottom: 10px;"><a id="fileUploadExisting" target="_blank"></a></div>
                     </div>
                     <div class="alert alert-warning mt-2" role="alert">
                         Maksimal ukuran file: 10 MB. Format file yang diperbolehkan: PDF.
@@ -162,10 +145,55 @@ foreach ($renjas as $kk => $vv) {
     }
 
     function tambah_dokumen_renja() {
+        jQuery("#editModalLabel").hide();
+        jQuery("#uploadModalLabel").show();
+        jQuery("#idDokumen").val('');
+        jQuery("#fileUpload").val('');
+        jQuery("#keterangan").val('');
+        jQuery('#fileUploadExisting').removeAttr('href').empty();
         jQuery("#uploadModal").modal('show');
     }
 
+    function edit_dokumen_renja(id) {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_detail_renja_rkt_by_id',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                console.log(response);
+                if (response.status === 'success') {
+                    let data = response.data;
+                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + data.dokumen;
+                    jQuery("#idDokumen").val(data.id);
+                    jQuery("#fileUpload").val('');
+                    jQuery('#fileUploadExisting').attr('href', url).html(data.dokumen);
+                    jQuery("#keterangan").val(data.keterangan);
+                    jQuery("#uploadModalLabel").hide();
+                    jQuery("#editModalLabel").show();
+                    jQuery('#uploadModal').modal('show');
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data!');
+            }
+        });
+    }
+
+
     function submit_dokumen(that) {
+        let id_dokumen = jQuery("#idDokumen").val();
+
         let skpd = jQuery("#perangkatDaerah").val();
         if (skpd == '') {
             return alert('Perangkat Daerah tidak boleh kosong');
@@ -190,6 +218,7 @@ foreach ($renjas as $kk => $vv) {
         let form_data = new FormData();
         form_data.append('action', 'tambah_dokumen_renja');
         form_data.append('api_key', esakip.api_key);
+        form_data.append('id_dokumen', id_dokumen);
         form_data.append('skpd', skpd);
         form_data.append('idSkpd', idSkpd);
         form_data.append('keterangan', keterangan);
@@ -222,9 +251,11 @@ foreach ($renjas as $kk => $vv) {
         });
     }
 
-    function detail_dokumen() {
-        alert("oke");
+    function lihatDokumen(dokumen) {
+        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + dokumen;
+        window.open(url, '_blank');
     }
+
 
     function hapus_dokumen_renja(id) {
         if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
