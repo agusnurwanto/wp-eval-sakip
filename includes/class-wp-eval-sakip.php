@@ -195,7 +195,24 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_submit_tahun_renja_rkt', $plugin_public, 'submit_tahun_renja_rkt');
 		$this->loader->add_action('wp_ajax_hapus_dokumen_renja', $plugin_public, 'hapus_dokumen_renja');
 		$this->loader->add_action('wp_ajax_get_table_renja', $plugin_public, 'get_table_renja');
-
+		
+		$this->loader->add_action('wp_ajax_get_detail_skp_by_id', $plugin_public, 'get_detail_skp_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_skp', $plugin_public, 'tambah_dokumen_skp');
+		$this->loader->add_action('wp_ajax_submit_tahun_skp', $plugin_public, 'submit_tahun_skp');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_skp', $plugin_public, 'hapus_dokumen_skp');
+		$this->loader->add_action('wp_ajax_get_table_skp', $plugin_public, 'get_table_skp');
+		
+		$this->loader->add_action('wp_ajax_get_detail_perjanjian_kinerja_by_id', $plugin_public, 'get_detail_perjanjian_kinerja_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_perjanjian_kinerja', $plugin_public, 'tambah_dokumen_perjanjian_kinerja');
+		$this->loader->add_action('wp_ajax_submit_tahun_perjanjian_kinerja', $plugin_public, 'submit_tahun_perjanjian_kinerja');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_perjanjian_kinerja', $plugin_public, 'hapus_dokumen_perjanjian_kinerja');
+		$this->loader->add_action('wp_ajax_get_table_perjanjian_kinerja', $plugin_public, 'get_table_perjanjian_kinerja');
+		
+		$this->loader->add_action('wp_ajax_get_detail_rencana_aksi_by_id', $plugin_public, 'get_detail_rencana_aksi_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_rencana_aksi', $plugin_public, 'tambah_dokumen_rencana_aksi');
+		$this->loader->add_action('wp_ajax_submit_tahun_rencana_aksi', $plugin_public, 'submit_tahun_rencana_aksi');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_rencana_aksi', $plugin_public, 'hapus_dokumen_rencana_aksi');
+		$this->loader->add_action('wp_ajax_get_table_rencana_aksi', $plugin_public, 'get_table_rencana_aksi');
 
 		add_shortcode('desain_lke_sakip', array($plugin_public, 'desain_lke_sakip'));
 		add_shortcode('jadwal_evaluasi', array($plugin_public, 'jadwal_evaluasi'));
@@ -215,7 +232,13 @@ class Wp_Eval_Sakip {
 		add_shortcode('lkjip_lppd', array($plugin_public, 'lkjip_lppd'));
 		add_shortcode('dokumen_pemda_lainnya', array($plugin_public, 'dokumen_pemda_lainnya'));
 		add_shortcode('halaman_mapping_skpd', array($plugin_public, 'halaman_mapping_skpd'));
+
 		add_shortcode('dokumen_detail_renja_rkt', array($plugin_public, 'dokumen_detail_renja_rkt'));
+		add_shortcode('dokumen_detail_skp', array($plugin_public, 'dokumen_detail_skp'));
+		add_shortcode('dokumen_detail_perjanjian_kinerja', array($plugin_public, 'dokumen_detail_perjanjian_kinerja'));
+		add_shortcode('dokumen_detail_rencana_aksi', array($plugin_public, 'dokumen_detail_rencana_aksi'));
+		add_shortcode('dokumen_detail_pengukuran_kinerja', array($plugin_public, 'dokumen_detail_pengukuran_kinerja'));
+		add_shortcode('dokumen_detail_pengukuran_rencana_aksi', array($plugin_public, 'dokumen_detail_pengukuran_rencana_aksi'));
 	}
 
 	/**
