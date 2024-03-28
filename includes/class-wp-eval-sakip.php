@@ -213,6 +213,42 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_submit_tahun_rencana_aksi', $plugin_public, 'submit_tahun_rencana_aksi');
 		$this->loader->add_action('wp_ajax_hapus_dokumen_rencana_aksi', $plugin_public, 'hapus_dokumen_rencana_aksi');
 		$this->loader->add_action('wp_ajax_get_table_rencana_aksi', $plugin_public, 'get_table_rencana_aksi');
+		
+		$this->loader->add_action('wp_ajax_get_detail_pengukuran_kinerja_by_id', $plugin_public, 'get_detail_pengukuran_kinerja_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_pengukuran_kinerja', $plugin_public, 'tambah_dokumen_pengukuran_kinerja');
+		$this->loader->add_action('wp_ajax_submit_tahun_pengukuran_kinerja', $plugin_public, 'submit_tahun_pengukuran_kinerja');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_pengukuran_kinerja', $plugin_public, 'hapus_dokumen_pengukuran_kinerja');
+		$this->loader->add_action('wp_ajax_get_table_pengukuran_kinerja', $plugin_public, 'get_table_pengukuran_kinerja');
+
+		$this->loader->add_action('wp_ajax_get_detail_pengukuran_rencana_aksi_by_id', $plugin_public, 'get_detail_pengukuran_rencana_aksi_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_pengukuran_rencana_aksi', $plugin_public, 'tambah_dokumen_pengukuran_rencana_aksi');
+		$this->loader->add_action('wp_ajax_submit_tahun_pengukuran_rencana_aksi', $plugin_public, 'submit_tahun_pengukuran_rencana_aksi');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_pengukuran_rencana_aksi', $plugin_public, 'hapus_dokumen_pengukuran_rencana_aksi');
+		$this->loader->add_action('wp_ajax_get_table_pengukuran_rencana_aksi', $plugin_public, 'get_table_pengukuran_rencana_aksi');
+		
+		$this->loader->add_action('wp_ajax_get_detail_iku_by_id', $plugin_public, 'get_detail_iku_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_iku', $plugin_public, 'tambah_dokumen_iku');
+		$this->loader->add_action('wp_ajax_submit_tahun_iku', $plugin_public, 'submit_tahun_iku');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_iku', $plugin_public, 'hapus_dokumen_iku');
+		$this->loader->add_action('wp_ajax_get_table_iku', $plugin_public, 'get_table_iku');
+		
+		$this->loader->add_action('wp_ajax_get_detail_laporan_kinerja_by_id', $plugin_public, 'get_detail_laporan_kinerja_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_laporan_kinerja', $plugin_public, 'tambah_dokumen_laporan_kinerja');
+		$this->loader->add_action('wp_ajax_submit_tahun_laporan_kinerja', $plugin_public, 'submit_tahun_laporan_kinerja');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_laporan_kinerja', $plugin_public, 'hapus_dokumen_laporan_kinerja');
+		$this->loader->add_action('wp_ajax_get_table_laporan_kinerja', $plugin_public, 'get_table_laporan_kinerja');
+		
+		$this->loader->add_action('wp_ajax_get_detail_dokumen_lain_by_id', $plugin_public, 'get_detail_dokumen_lain_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_dokumen_lain', $plugin_public, 'tambah_dokumen_dokumen_lain');
+		$this->loader->add_action('wp_ajax_submit_tahun_dokumen_lain', $plugin_public, 'submit_tahun_dokumen_lain');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_dokumen_lain', $plugin_public, 'hapus_dokumen_dokumen_lain');
+		$this->loader->add_action('wp_ajax_get_table_dokumen_lain', $plugin_public, 'get_table_dokumen_lain');
+		
+		$this->loader->add_action('wp_ajax_get_detail_evaluasi_internal_by_id', $plugin_public, 'get_detail_evaluasi_internal_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_evaluasi_internal', $plugin_public, 'tambah_dokumen_evaluasi_internal');
+		$this->loader->add_action('wp_ajax_submit_tahun_evaluasi_internal', $plugin_public, 'submit_tahun_evaluasi_internal');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_evaluasi_internal', $plugin_public, 'hapus_dokumen_evaluasi_internal');
+		$this->loader->add_action('wp_ajax_get_table_evaluasi_internal', $plugin_public, 'get_table_evaluasi_internal');
 
 		add_shortcode('desain_lke_sakip', array($plugin_public, 'desain_lke_sakip'));
 		add_shortcode('jadwal_evaluasi', array($plugin_public, 'jadwal_evaluasi'));
@@ -239,6 +275,10 @@ class Wp_Eval_Sakip {
 		add_shortcode('dokumen_detail_rencana_aksi', array($plugin_public, 'dokumen_detail_rencana_aksi'));
 		add_shortcode('dokumen_detail_pengukuran_kinerja', array($plugin_public, 'dokumen_detail_pengukuran_kinerja'));
 		add_shortcode('dokumen_detail_pengukuran_rencana_aksi', array($plugin_public, 'dokumen_detail_pengukuran_rencana_aksi'));
+		add_shortcode('dokumen_detail_dokumen_lain', array($plugin_public, 'dokumen_detail_dokumen_lain'));
+		add_shortcode('dokumen_detail_evaluasi_internal', array($plugin_public, 'dokumen_detail_evaluasi_internal'));
+		add_shortcode('dokumen_detail_iku', array($plugin_public, 'dokumen_detail_iku'));
+		add_shortcode('dokumen_detail_laporan_kinerja', array($plugin_public, 'dokumen_detail_laporan_kinerja'));
 	}
 
 	/**
