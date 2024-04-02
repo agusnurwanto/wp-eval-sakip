@@ -314,6 +314,28 @@ class Wp_Eval_Sakip_Admin
 								</ul>
 							</div>
 						</div>';
+					} else if (!empty($_POST['type']) && $_POST['type'] == 'jadwal_rpjmd') {
+						$jadwal_rpjmd = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Jadwal RPJMD / RPD Tahun | ' . $tahun_item['tahun_anggaran'],
+							'content' => '[jadwal_rpjmd tahun=' . $tahun_item["tahun_anggaran"] . ']',
+							'show_header' => 1,
+							'no_key' => 1,
+							'post_status' => 'private'
+						));
+						$jadwal_evaluasi = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Jadwal',
+							'content' => '[jadwal_evaluasi]',
+							'show_header' => 1,
+							'no_key' => 1,
+							'post_status' => 'private'
+						));
+						$body_pemda = '
+						<div class="accordion">
+								<ol style="margin-left: 20px;">
+									<li><a target="_blank" href="' . $jadwal_evaluasi['url'] . '">' . $jadwal_evaluasi['title'] . '</a></li>
+									<li><a target="_blank" href="' . $jadwal_rpjmd['url'] . '">' . $jadwal_rpjmd['title'] . '</a></li>
+								</ol>
+						</div>';
 					}
 					$ret['message'] .= $body_pemda;
 				}
@@ -330,14 +352,6 @@ class Wp_Eval_Sakip_Admin
 		$desain_lke_sakip = $this->functions->generatePage(array(
 			'nama_page' => 'Halaman Desain LKE SAKIP',
 			'content' => '[desain_lke_sakip]',
-			'show_header' => 1,
-			'no_key' => 1,
-			'post_status' => 'private'
-		));
-
-		$jadwal_evaluasi = $this->functions->generatePage(array(
-			'nama_page' => 'Halaman Jadwal Evaluasi',
-			'content' => '[jadwal_evaluasi]',
 			'show_header' => 1,
 			'no_key' => 1,
 			'post_status' => 'private'
@@ -458,24 +472,18 @@ class Wp_Eval_Sakip_Admin
 	            	</ol>
 		        	')
 			));
-		Container::make('theme_options', __('Jadwal Evaluasi'))
+		Container::make('theme_options', __('Jadwal'))
 			->set_page_parent($basic_options_container)
 			->add_fields(array(
-				Field::make('html', 'crb_jadwal_evaluasi_hide_sidebar')
+				Field::make('html', 'crb_jadwal_hide_sidebar')
 					->set_html('
-		        		<style>
-		        			.postbox-container { display: none; }
-		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
-		        		</style>
-		        	'),
-				Field::make('html', 'crb_siks_halaman_terkait_jadwal_evaluasi')
-					->set_html('
-					<h5>HALAMAN TERKAIT</h5>
-	            	<ol>
-	            		<li><a target="_blank" href="' . $jadwal_evaluasi['url'] . '">' . $jadwal_evaluasi['title'] . '</a></li>
-	            	</ol>
-		        	')
-			));
+						<style>
+							.postbox-container { display: none; }
+							#poststuff #post-body.columns-2 { margin: 0 !important; }
+						</style>
+					')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'jadwal_rpjmd')));
 
 		$pengisian_lke_menu = Container::make('theme_options', __('Pengisian LKE SAKIP'))
 			->set_page_menu_position(3.1)

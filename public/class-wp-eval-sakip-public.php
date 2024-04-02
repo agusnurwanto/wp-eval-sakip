@@ -271,6 +271,15 @@ class Wp_Eval_Sakip_Public
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-mapping-skpd.php';
 	}
 
+	public function jadwal_rpjmd()
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-jadwal-rpjmd.php';
+	}
+
 
     public function mapping_skpd()
     {
@@ -429,5 +438,559 @@ class Wp_Eval_Sakip_Public
 			);
 		}
 		die(json_encode($ret));
+	}
+
+    public function get_data_jadwal_by_id()
+    {
+        global $wpdb;
+        $ret = array(
+            'status' => 'success',
+            'message' => 'Berhasil get data!',
+            'data' => array()
+        );
+        if (!empty($_POST)) {
+            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+                $ret['data'] = $wpdb->get_row($wpdb->prepare('
+                    SELECT 
+                        *
+                    FROM esakip_data_jadwal
+                    WHERE id=%d
+                ', $_POST['id']), ARRAY_A);
+            } else {
+                $ret['status']  = 'error';
+                $ret['message'] = 'Api key tidak ditemukan!';
+            }
+        } else {
+            $ret['status']  = 'error';
+            $ret['message'] = 'Format Salah!';
+        }
+
+        die(json_encode($ret));
+    }
+
+	/** Ambil data penjadwalan */
+	public function get_data_penjadwalan()
+	{
+		global $wpdb;
+		$return = array(
+			'status' => 'success',
+			'data'	=> array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+					$params = $columns = $totalRecords = $data = array();
+					$params = $_REQUEST;
+					$columns = array(
+						0 => 'nama_jadwal',
+						1 => 'status',
+						2 => 'started_at',
+						3 => 'end_at',
+						4 => 'tahun_anggaran',
+						5 => 'jenis_jadwal',
+						6 => 'id',
+					);
+					$where = $sqlTot = $sqlRec = "";
+
+					// check search value exist
+					if (!empty($params['search']['value'])) {
+						$where .= " AND ( nama_jadwal LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
+						$where .= " OR started_at LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
+						$where .= " OR end_at LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
+					}
+
+					if (!empty($_POST['tahun_anggaran'])) {
+						$where .= $wpdb->prepare(" AND tahun_anggaran = %d", $_POST['tahun_anggaran']);
+					}
+
+					// getting total number records without any search
+	                $sql_tot = "SELECT count(id) as jml FROM `esakip_data_jadwal`";
+	                $sqlRec = "SELECT " . implode(', ', $columns) . " FROM `esakip_data_jadwal`";
+					if (isset($where) && $where != '') {
+						$sqlTot .= $where;
+						$sqlRec .= $where;
+					}
+
+					$sqlRec .=  $wpdb->prepare(" ORDER BY " . $columns[$params['order'][0]['column']] . "   " . $params['order'][0]['dir'] . "  LIMIT %d ,%d ", $params['start'], $params['length']);
+
+					$queryTot = $wpdb->get_results($sqlTot, ARRAY_A);
+					$totalRecords = $queryTot[0]['jml'];
+					$queryRecords = $wpdb->get_results($sqlRec, ARRAY_A);
+
+					$checkOpenedSchedule = 0;
+					if (!empty($queryRecords)) {
+						foreach ($queryRecords as $recKey => $recVal) {
+							// $report = '<a class="btn btn-sm btn-primary mr-2" style="text-decoration: none;" onclick="report(\'' . $recVal['id'] . '\'); return false;" href="#" title="Cetak Laporan"><i class="dashicons dashicons-printer"></i></a>';
+							$edit	= '';
+							$delete	= '';
+							$lock	= '';
+							if ($recVal['status'] == 0) {
+							$checkOpenedSchedule++;
+							$lock	= '<a class="btn btn-sm btn-success mr-2" style="text-decoration: none;" onclick="lock_data_penjadwalan(\'' . $recVal['id'] . '\'); return false;" href="#" title="Kunci data penjadwalan"><i class="dashicons dashicons-unlock"></i></a>';
+							$edit	= '<a class="btn btn-sm btn-warning mr-2" style="text-decoration: none;" onclick="edit_data_penjadwalan(\'' . $recVal['id'] . '\'); return false;" href="#" title="Edit data penjadwalan"><i class="dashicons dashicons-edit"></i></a>';
+							$delete	= '<a class="btn btn-sm btn-danger" style="text-decoration: none;" onclick="hapus_data_penjadwalan(\'' . $recVal['id'] . '\'); return false;" href="#" title="Hapus data penjadwalan"><i class="dashicons dashicons-trash"></i></a>';
+							} else if ($recVal['status'] == 1) {
+								$lock	= '<a class="btn btn-sm btn-success disabled" style="text-decoration: none;" onclick="cannot_change_schedule(\'kunci\'); return false;" href="#" title="Kunci data penjadwalan" aria-disabled="true"><i class="dashicons dashicons-lock"></i></a>'; 
+						}
+
+							$status = array(
+								0 => 'terbuka',
+								1 => 'dikunci',
+								2 => 'selesai'
+							);
+
+							$queryRecords[$recKey]['started_at']	= date('d-m-Y H:i', strtotime($recVal['started_at']));
+							$queryRecords[$recKey]['end_at']	= date('d-m-Y H:i', strtotime($recVal['end_at']));
+							$queryRecords[$recKey]['aksi'] = $report . $lock . $edit . $delete;
+							$queryRecords[$recKey]['nama_jadwal'] = ucfirst($recVal['nama_jadwal']);
+							$queryRecords[$recKey]['status'] = $status[$recVal['status']];
+						}
+
+						$json_data = array(
+							"draw"            => intval($params['draw']),
+							"recordsTotal"    => intval($totalRecords),
+							"recordsFiltered" => intval($totalRecords),
+							"data"            => $queryRecords,
+							"checkOpenedSchedule" => $checkOpenedSchedule
+						);
+
+						die(json_encode($json_data));
+					} else {
+						$json_data = array(
+							"draw"            => intval($params['draw']),
+							"recordsTotal"    => 0,
+							"recordsFiltered" => 0,
+							"data"            => array(),
+							"checkOpenedSchedule" => $checkOpenedSchedule,
+							"message"			=> "Data tidak ditemukan!"
+						);
+
+						die(json_encode($json_data));
+					}
+			} else {
+				$return = array(
+					'status' => 'error',
+					'message'	=> 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$return = array(
+				'status' => 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($return));
+	}
+
+	/** Submit data penjadwalan */
+	public function submit_add_schedule()
+	{
+		global $wpdb;
+		$user_id = um_user('ID');
+		$user_meta = get_userdata($user_id);
+		$return = array(
+			'status' => 'success',
+			'data'	=> array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				
+				if (
+					!empty($_POST['nama_jadwal'])
+					&& !empty($_POST['jadwal_mulai'])
+					&& !empty($_POST['jadwal_selesai'])
+					&& !empty($_POST['tahun_anggaran'])
+				) {
+					$nama_jadwal		= trim(htmlspecialchars($_POST['nama_jadwal']));
+					$jadwal_mulai		= trim(htmlspecialchars($_POST['jadwal_mulai']));
+					$jadwal_mulai		= date('Y-m-d H:i:s', strtotime($jadwal_mulai));
+					$jadwal_selesai		= trim(htmlspecialchars($_POST['jadwal_selesai']));
+					$jadwal_selesai		= date('Y-m-d H:i:s', strtotime($jadwal_selesai));
+					$tahun_anggaran		= trim(htmlspecialchars($_POST['tahun_anggaran']));
+					$jenis_jadwal		= trim(htmlspecialchars($_POST['jenis_jadwal']));
+                    $id = $_POST['id'];
+
+					$arr_jadwal = ['usulan', 'penetapan'];
+					$jenis_jadwal = in_array($jenis_jadwal, $arr_jadwal) ? $jenis_jadwal : 'usulan';
+
+					$get_jadwal = $wpdb->get_results($wpdb->prepare("
+						SELECT 
+							* 
+						FROM `esakip_data_jadwal` 
+						WHERE id=%d
+					", $id), ARRAY_A);
+					foreach ($get_jadwal as $jadwal) {
+						if ($jadwal['status'] != 1) {
+							$return = array(
+								'status' => 'error',
+								'message'	=> 'Masih ada penjadwalan yang terbuka!'
+							);
+							die(json_encode($return));
+						}
+						if ($jadwal_mulai > $jadwal['started_at'] && $jadwal_mulai < $jadwal['end_at'] || $jadwal_selesai > $jadwal['started_at'] && $jadwal_selesai < $jadwal['end_at']) {
+							$return = array(
+								'status' => 'error',
+								'message'	=> 'Waktu sudah dipakai jadwal lain!'
+							);
+							die(json_encode($return));
+						}
+					}
+
+					//insert data penjadwalan
+					$data_jadwal = array(
+						'nama_jadwal' 		=> $nama_jadwal,
+						'started_at'		=> $jadwal_mulai,
+						'end_at'		=> $jadwal_selesai,
+						'tahun_anggaran'	=> $tahun_anggaran,
+						'status'			=> 0,
+						'tahun_anggaran'	=> $tahun_anggaran,
+						'jenis_jadwal'		=> $jenis_jadwal,
+					);
+
+					$wpdb->insert('esakip_data_jadwal', $data_jadwal);
+
+					$return = array(
+						'status'		=> 'success',
+						'message'		=> 'Berhasil!',
+						'data_jadwal'	=> $data_jadwal,
+					);
+					
+				} else {
+					$return = array(
+						'status' => 'error',
+						'message'	=> 'Harap diisi semua,tidak boleh ada yang kosong!'
+					);
+				}
+			} else {
+				$return = array(
+					'status' => 'error',
+					'message'	=> 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$return = array(
+				'status' => 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($return));
+	}
+
+	/** Submit data penjadwalan */
+	public function submit_edit_schedule()
+	{
+		global $wpdb;
+		$user_id = um_user('ID');
+		$user_meta = get_userdata($user_id);
+		$return = array(
+			'status' => 'success',
+			'data'	=> array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				if (!empty($_POST['id']) && !empty($_POST['nama_jadwal']) && !empty($_POST['jadwal_mulai']) && !empty($_POST['jadwal_selesai']) && !empty($_POST['tahun_anggaran']) && !empty($lama_pelaksanaan)) {
+					$id = trim(htmlspecialchars($_POST['id']));
+					$nama_jadwal		= trim(htmlspecialchars($_POST['nama_jadwal']));
+					$jadwal_mulai	= trim(htmlspecialchars($_POST['jadwal_mulai']));
+					$jadwal_mulai	= date('Y-m-d H:i:s', strtotime($jadwal_mulai));
+					$jadwal_selesai	= trim(htmlspecialchars($_POST['jadwal_selesai']));
+					$jadwal_selesai	= date('Y-m-d H:i:s', strtotime($jadwal_selesai));
+					$tahun_anggaran	= trim(htmlspecialchars($_POST['tahun_anggaran']));
+
+					$arr_jadwal = ['usulan', 'penetapan'];
+					$jenis_jadwal = in_array($jenis_jadwal, $arr_jadwal) ? $jenis_jadwal : 'usulan';
+
+					$data_this_id = $wpdb->get_row($wpdb->prepare('SELECT * FROM esakip_data_jadwal WHERE id = %d', $id), ARRAY_A);
+
+					if (!empty($data_this_id)) {
+						$status_check = array(0, NULL, 2);
+						if (in_array($data_this_id['status'], $status_check)) {
+							//update data penjadwalan
+							$data_jadwal = array(
+								'nama_jadwal' 			=> $nama_jadwal,
+								'started_at'			=> $jadwal_mulai,
+								'end_at'			=> $jadwal_selesai,
+								'tahun_anggaran'		=> $tahun_anggaran,
+								'jenis_jadwal'			=> $jenis_jadwal
+							);
+
+							$wpdb->update('esakip_data_jadwal', $data_jadwal, array(
+								'id'	=> $id
+							));
+
+							$return = array(
+								'status'		=> 'success',
+								'message'		=> 'Berhasil!',
+								'data_jadwal'	=> $data_jadwal
+							);
+						} else {
+							$return = array(
+								'status' => 'error',
+								'message'	=> "User tidak diijinkan!\nData sudah dikunci!",
+							);
+						}
+					} else {
+						$return = array(
+							'status' => 'error',
+							'message'	=> "Data tidak ditemukan!",
+						);
+					}
+				} else {
+					$return = array(
+						'status' => 'error',
+						'message'	=> 'Harap diisi semua,tidak boleh ada yang kosong!'
+					);
+				}
+				
+			} else {
+				$return = array(
+					'status' => 'error',
+					'message'	=> 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$return = array(
+				'status' => 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($return));
+	}
+
+	/** Submit delete data jadwal */
+	public function submit_delete_schedule()
+	{
+		global $wpdb;
+		$return = array(
+			'status' => 'success',
+			'data'	=> array()
+		);
+
+		$user_id = um_user('ID');
+		$user_meta = get_userdata($user_id);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				if (!empty($_POST['id'])) {
+					$id = trim(htmlspecialchars($_POST['id']));
+
+					$data_this_id = $wpdb->get_row($wpdb->prepare('
+						SELECT 
+							* 
+						FROM esakip_data_jadwal 
+						WHERE id = %d
+					', $id), ARRAY_A);
+
+					if (!empty($data_this_id)) {
+						$status_check = array(0, NULL, 2);
+						if (in_array($data_this_id['status'], $status_check)) {
+							$wpdb->delete('esakip_data_jadwal', array(
+								'id' => $id
+							), array('%d'));
+
+							$return = array(
+								'status' => 'success',
+								'message'	=> 'Berhasil!',
+							);
+						} else {
+							$return = array(
+								'status' => 'error',
+								'message'	=> "User tidak diijinkan!\nData sudah dikunci!",
+							);
+						}
+					} else {
+						$return = array(
+							'status' => 'error',
+							'message'	=> "Data tidak ditemukan!",
+						);
+					}
+				} else {
+					$return = array(
+						'status' => 'error',
+						'message'	=> 'Harap diisi semua,tidak boleh ada yang kosong!'
+					);
+				}
+			} else {
+				$return = array(
+					'status' => 'error',
+					'message'	=> 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$return = array(
+				'status' => 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($return));
+	}
+
+	/** Submit lock data jadwal RPJM */
+	public function submit_lock_schedule()
+	{
+		global $wpdb;
+		$return = array(
+			'status' => 'success',
+			'data'	=> array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				if (!empty($_POST['id'])) {
+					$id = trim(htmlspecialchars($_POST['id']));
+
+					$data_this_id 	= $wpdb->get_row($wpdb->prepare('
+						SELECT 
+							* 
+						FROM esakip_data_jadwal 
+						WHERE id = %d
+					', $id), ARRAY_A);
+
+					$timezone = get_option('timezone_string');
+					if (preg_match("/Asia/i", $timezone)) {
+						date_default_timezone_set($timezone);
+					} else {
+						$return = array(
+							'status' => 'error',
+							'message'	=> "Pengaturan timezone salah. Pilih salah satu kota di zona waktu yang sama dengan anda, antara lain:  \'Jakarta\',\'Makasar\',\'Jayapura\'",
+						);
+						die(json_encode($return));
+					}
+
+					$dateTime = new DateTime();
+					$time_now = $dateTime->format('Y-m-d H:i:s');
+					if ($time_now > $data_this_id['started_at']) {
+						$status_check = array(0, NULL, 2);
+						if (in_array($data_this_id['status'], $status_check)) {
+
+							//lock data penjadwalan
+							$wpdb->update('esakip_data_jadwal', array('end_at' => $time_now, 'status' => 1), array(
+								'id'	=> $id
+							));
+
+							$return = array(
+								'status' => 'success',
+								'message'	=> 'Berhasil!',
+								'data_input' => $queryRecords1
+							);
+						} else {
+							$return = array(
+								'status' => 'error',
+								'message'	=> "User tidak diijinkan!\nData sudah dikunci!",
+							);
+						}
+					} else {
+						$return = array(
+							'status' => 'error',
+							'message'	=> "Penjadwalan belum dimulai!",
+						);
+					}
+				
+				} else {
+					$return = array(
+						'status' => 'error',
+						'message'	=> 'Harap diisi semua,tidak boleh ada yang kosong!'
+					);
+				}
+			} else {
+				$return = array(
+					'status' => 'error',
+					'message'	=> 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$return = array(
+				'status' => 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($return));
+	}
+
+	/** Submit lock data jadwal RPJM */
+	public function submit_lock_schedule_rpjmd()
+	{
+		global $wpdb;
+		$return = array(
+			'status' => 'success',
+			'data'	=> array()
+		);
+
+		$user_id = um_user('ID');
+		$user_meta = get_userdata($user_id);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				if (!empty($_POST['id'])) {
+					$id = trim(htmlspecialchars($_POST['id']));
+
+					$data_this_id 	= $wpdb->get_row($wpdb->prepare('
+						SELECT 
+							* 
+						FROM esakip_data_jadwal 
+						WHERE id = %d
+					', $id), ARRAY_A);
+
+					$timezone = get_option('timezone_string');
+					if (preg_match("/Asia/i", $timezone)) {
+						date_default_timezone_set($timezone);
+					} else {
+						$return = array(
+							'status' => 'error',
+							'message'	=> "Pengaturan timezone salah. Pilih salah satu kota di zona waktu yang sama dengan anda, antara lain:  \'Jakarta\',\'Makasar\',\'Jayapura\'",
+						);
+						die(json_encode($return));
+					}
+
+					$dateTime = new DateTime();
+					$time_now = $dateTime->format('Y-m-d H:i:s');
+					if ($time_now > $data_this_id['started_at']) {
+						$status_check = array(0, NULL, 2);
+						if (in_array($data_this_id['status'], $status_check)) {
+
+							//lock data penjadwalan
+							$wpdb->update('esakip_data_jadwal', array('end_at' => $time_now, 'status' => 1), array(
+								'id'	=> $id
+							));
+
+							$return = array(
+								'status' => 'success',
+								'message'	=> 'Berhasil!',
+								'data_input' => $queryRecords1
+							);
+						} else {
+							$return = array(
+								'status' => 'error',
+								'message'	=> "User tidak diijinkan!\nData sudah dikunci!",
+							);
+						}
+					} else {
+						$return = array(
+							'status' => 'error',
+							'message'	=> "Penjadwalan belum dimulai!",
+						);
+					}
+				
+				} else {
+					$return = array(
+						'status' => 'error',
+						'message'	=> 'Harap diisi semua,tidak boleh ada yang kosong!'
+					);
+				}
+			} else {
+				$return = array(
+					'status' => 'error',
+					'message'	=> 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$return = array(
+				'status' => 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($return));
 	}
 }
