@@ -9,6 +9,22 @@ $input = shortcode_atts(array(
     'tahun' => '2022',
 ), $atts);
 
+if (!empty($_GET) && !empty($_GET['id_skpd'])) {
+    $id_skpd = $_GET['id_skpd'];
+}
+
+$skpd = $wpdb->get_row(
+    $wpdb->prepare("
+    SELECT 
+        kode_skpd,
+        nama_skpd
+    FROM esakip_data_unit
+    WHERE id_skpd=%d
+      AND tahun_anggaran=%d
+      AND active = 1
+", $id_skpd, $input['tahun']),
+    ARRAY_A
+);
 ?>
 <style type="text/css">
     .wrap-table {
@@ -32,12 +48,12 @@ $input = shortcode_atts(array(
 <div class="container-md">
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Dokumen Lainnya<br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
+            <h1 class="text-center" style="margin:3rem;">Dokumen Laporan Kinerja <br><?php echo $skpd['kode_skpd'] . ' ' . $skpd['nama_skpd'] ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
             <div style="margin-bottom: 25px;">
-                <button class="btn btn-primary" onclick="tambah_dokumen_dokumen_pemda_lain();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
+                <button class="btn btn-primary" onclick="tambah_dokumen_laporan_kinerja();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
             </div>
             <div class="wrap-table">
-                <table id="table_dokumen_dokumen_pemda_lain" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                <table id="table_dokumen_laporan_kinerja" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
@@ -96,16 +112,16 @@ $input = shortcode_atts(array(
 </div>
 <script>
     jQuery(document).ready(function() {
-        getTableDokLainPemda();
+        getTableLaporanKinerja();
     });
 
-    function getTableDokLainPemda() {
+    function getTableLaporanKinerja() {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'get_table_dokumen_pemda_lain',
+                action: 'get_table_laporan_kinerja',
                 api_key: esakip.api_key,
                 id_skpd: <?php echo $id_skpd; ?>,
                 tahun_anggaran: '<?php echo $input['tahun'] ?>'
@@ -115,7 +131,7 @@ $input = shortcode_atts(array(
                 jQuery('#wrap-loading').hide();
                 console.log(response);
                 if (response.status === 'success') {
-                    jQuery('#table_dokumen_dokumen_pemda_lain tbody').html(response.data);
+                    jQuery('#table_dokumen_laporan_kinerja tbody').html(response.data);
                 } else {
                     alert(response.message);
                 }
@@ -128,7 +144,7 @@ $input = shortcode_atts(array(
         });
     }
 
-    function tambah_dokumen_dokumen_pemda_lain() {
+    function tambah_dokumen_laporan_kinerja() {
         jQuery("#editModalLabel").hide();
         jQuery("#uploadModalLabel").show();
         jQuery("#idDokumen").val('');
@@ -138,13 +154,13 @@ $input = shortcode_atts(array(
         jQuery("#uploadModal").modal('show');
     }
 
-    function edit_dokumen_dokumen_pemda_lain(id) {
+    function edit_dokumen_laporan_kinerja(id) {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'get_detail_dokumen_pemda_lain_by_id',
+                action: 'get_detail_laporan_kinerja_by_id',
                 api_key: esakip.api_key,
                 id: id
             },
@@ -200,7 +216,7 @@ $input = shortcode_atts(array(
         }
 
         let form_data = new FormData();
-        form_data.append('action', 'tambah_dokumen_dokumen_pemda_lain');
+        form_data.append('action', 'tambah_dokumen_laporan_kinerja');
         form_data.append('api_key', esakip.api_key);
         form_data.append('id_dokumen', id_dokumen);
         form_data.append('skpd', skpd);
@@ -222,7 +238,7 @@ $input = shortcode_atts(array(
                 if (response.status === 'success') {
                     jQuery('#uploadModal').modal('hide');
                     alert(response.message);
-                    getTableDokLainPemda();
+                    getTableLaporanKinerja();
                 } else {
                     alert(response.message);
                 }
@@ -241,7 +257,7 @@ $input = shortcode_atts(array(
     }
 
 
-    function hapus_dokumen_dokumen_pemda_lain(id) {
+    function hapus_dokumen_laporan_kinerja(id) {
         if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
             return;
         }
@@ -250,7 +266,7 @@ $input = shortcode_atts(array(
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'hapus_dokumen_dokumen_pemda_lain',
+                action: 'hapus_dokumen_laporan_kinerja',
                 api_key: esakip.api_key,
                 id: id
             },
@@ -260,7 +276,7 @@ $input = shortcode_atts(array(
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
                     alert(response.message);
-                    getTableDokLainPemda();
+                    getTableLaporanKinerja();
                 } else {
                     alert(response.message);
                 }

@@ -300,7 +300,7 @@ class Wp_Eval_Sakip_Admin
 					} else if (!empty($_POST['type']) && $_POST['type'] == 'perjanjian_kinerja') {
 						$perjanjian_kinerja = $this->functions->generatePage(array(
 							'nama_page' => 'Halaman Dokumen Perjanjian Kinerja Tahun ' . $tahun_item['tahun_anggaran'],
-							'content' => '[dokumen_perjanjian_kinerja tahun=' . $tahun_item["tahun_anggaran"] . ']',
+							'content' => '[perjanjian_kinerja tahun=' . $tahun_item["tahun_anggaran"] . ']',
 							'show_header' => 1,
 							'no_key' => 1,
 							'post_status' => 'private'

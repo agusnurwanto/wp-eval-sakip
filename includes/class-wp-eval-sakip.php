@@ -197,11 +197,95 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_submit_lock_schedule_rpjmd',  $plugin_public, 'submit_lock_schedule_rpjmd');
 		$this->loader->add_action('wp_ajax_get_data_jadwal_by_id',  $plugin_public, 'get_data_jadwal_by_id');
 
-		$this->loader->add_action('wp_ajax_get_detail_renja_rkt', $plugin_public, 'get_detail_renja_rkt');
+		$this->loader->add_action('wp_ajax_get_detail_renja_rkt_by_id', $plugin_public, 'get_detail_renja_rkt_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_renja', $plugin_public, 'tambah_dokumen_renja');
+		$this->loader->add_action('wp_ajax_submit_tahun_renja_rkt', $plugin_public, 'submit_tahun_renja_rkt');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_renja', $plugin_public, 'hapus_dokumen_renja');
+		$this->loader->add_action('wp_ajax_get_table_renja', $plugin_public, 'get_table_renja');
+		
+		$this->loader->add_action('wp_ajax_get_detail_skp_by_id', $plugin_public, 'get_detail_skp_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_skp', $plugin_public, 'tambah_dokumen_skp');
+		$this->loader->add_action('wp_ajax_submit_tahun_skp', $plugin_public, 'submit_tahun_skp');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_skp', $plugin_public, 'hapus_dokumen_skp');
+		$this->loader->add_action('wp_ajax_get_table_skp', $plugin_public, 'get_table_skp');
+		
+		$this->loader->add_action('wp_ajax_get_detail_perjanjian_kinerja_by_id', $plugin_public, 'get_detail_perjanjian_kinerja_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_perjanjian_kinerja', $plugin_public, 'tambah_dokumen_perjanjian_kinerja');
+		$this->loader->add_action('wp_ajax_submit_tahun_perjanjian_kinerja', $plugin_public, 'submit_tahun_perjanjian_kinerja');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_perjanjian_kinerja', $plugin_public, 'hapus_dokumen_perjanjian_kinerja');
+		$this->loader->add_action('wp_ajax_get_table_perjanjian_kinerja', $plugin_public, 'get_table_perjanjian_kinerja');
+		
+		$this->loader->add_action('wp_ajax_get_detail_rencana_aksi_by_id', $plugin_public, 'get_detail_rencana_aksi_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_rencana_aksi', $plugin_public, 'tambah_dokumen_rencana_aksi');
+		$this->loader->add_action('wp_ajax_submit_tahun_rencana_aksi', $plugin_public, 'submit_tahun_rencana_aksi');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_rencana_aksi', $plugin_public, 'hapus_dokumen_rencana_aksi');
+		$this->loader->add_action('wp_ajax_get_table_rencana_aksi', $plugin_public, 'get_table_rencana_aksi');
+		
+		$this->loader->add_action('wp_ajax_get_detail_pengukuran_kinerja_by_id', $plugin_public, 'get_detail_pengukuran_kinerja_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_pengukuran_kinerja', $plugin_public, 'tambah_dokumen_pengukuran_kinerja');
+		$this->loader->add_action('wp_ajax_submit_tahun_pengukuran_kinerja', $plugin_public, 'submit_tahun_pengukuran_kinerja');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_pengukuran_kinerja', $plugin_public, 'hapus_dokumen_pengukuran_kinerja');
+		$this->loader->add_action('wp_ajax_get_table_pengukuran_kinerja', $plugin_public, 'get_table_pengukuran_kinerja');
 
-
+		$this->loader->add_action('wp_ajax_get_detail_pengukuran_rencana_aksi_by_id', $plugin_public, 'get_detail_pengukuran_rencana_aksi_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_pengukuran_rencana_aksi', $plugin_public, 'tambah_dokumen_pengukuran_rencana_aksi');
+		$this->loader->add_action('wp_ajax_submit_tahun_pengukuran_rencana_aksi', $plugin_public, 'submit_tahun_pengukuran_rencana_aksi');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_pengukuran_rencana_aksi', $plugin_public, 'hapus_dokumen_pengukuran_rencana_aksi');
+		$this->loader->add_action('wp_ajax_get_table_pengukuran_rencana_aksi', $plugin_public, 'get_table_pengukuran_rencana_aksi');
+		
+		$this->loader->add_action('wp_ajax_get_detail_iku_by_id', $plugin_public, 'get_detail_iku_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_iku', $plugin_public, 'tambah_dokumen_iku');
+		$this->loader->add_action('wp_ajax_submit_tahun_iku', $plugin_public, 'submit_tahun_iku');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_iku', $plugin_public, 'hapus_dokumen_iku');
+		$this->loader->add_action('wp_ajax_get_table_iku', $plugin_public, 'get_table_iku');
+		
+		$this->loader->add_action('wp_ajax_get_detail_laporan_kinerja_by_id', $plugin_public, 'get_detail_laporan_kinerja_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_laporan_kinerja', $plugin_public, 'tambah_dokumen_laporan_kinerja');
+		$this->loader->add_action('wp_ajax_submit_tahun_laporan_kinerja', $plugin_public, 'submit_tahun_laporan_kinerja');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_laporan_kinerja', $plugin_public, 'hapus_dokumen_laporan_kinerja');
+		$this->loader->add_action('wp_ajax_get_table_laporan_kinerja', $plugin_public, 'get_table_laporan_kinerja');
+		
+		$this->loader->add_action('wp_ajax_get_detail_dokumen_lain_by_id', $plugin_public, 'get_detail_dokumen_lain_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_dokumen_lain', $plugin_public, 'tambah_dokumen_dokumen_lain');
+		$this->loader->add_action('wp_ajax_submit_tahun_dokumen_lain', $plugin_public, 'submit_tahun_dokumen_lain');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_dokumen_lain', $plugin_public, 'hapus_dokumen_dokumen_lain');
+		$this->loader->add_action('wp_ajax_get_table_dokumen_lain', $plugin_public, 'get_table_dokumen_lain');
+		
+		$this->loader->add_action('wp_ajax_get_detail_evaluasi_internal_by_id', $plugin_public, 'get_detail_evaluasi_internal_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_evaluasi_internal', $plugin_public, 'tambah_dokumen_evaluasi_internal');
+		$this->loader->add_action('wp_ajax_submit_tahun_evaluasi_internal', $plugin_public, 'submit_tahun_evaluasi_internal');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_evaluasi_internal', $plugin_public, 'hapus_dokumen_evaluasi_internal');
+		$this->loader->add_action('wp_ajax_get_table_evaluasi_internal', $plugin_public, 'get_table_evaluasi_internal');
+		
+		$this->loader->add_action('wp_ajax_get_detail_renstra_by_id', $plugin_public, 'get_detail_renstra_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_renstra', $plugin_public, 'tambah_dokumen_renstra');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_renstra', $plugin_public, 'hapus_dokumen_renstra');
+		$this->loader->add_action('wp_ajax_get_table_renstra', $plugin_public, 'get_table_renstra');
+ 
+		$this->loader->add_action('wp_ajax_get_detail_rkpd_by_id', $plugin_public, 'get_detail_rkpd_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_rkpd', $plugin_public, 'tambah_dokumen_rkpd');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_rkpd', $plugin_public, 'hapus_dokumen_rkpd');
+		$this->loader->add_action('wp_ajax_get_table_rkpd', $plugin_public, 'get_table_rkpd');
+ 
+		$this->loader->add_action('wp_ajax_get_detail_rpjmd_by_id', $plugin_public, 'get_detail_rpjmd_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_rpjmd', $plugin_public, 'tambah_dokumen_rpjmd');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_rpjmd', $plugin_public, 'hapus_dokumen_rpjmd');
+		$this->loader->add_action('wp_ajax_get_table_rpjmd', $plugin_public, 'get_table_rpjmd');
+ 
+		$this->loader->add_action('wp_ajax_get_detail_lkjip_lppd_by_id', $plugin_public, 'get_detail_lkjip_lppd_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_lkjip_lppd', $plugin_public, 'tambah_dokumen_lkjip_lppd');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_lkjip_lppd', $plugin_public, 'hapus_dokumen_lkjip_lppd');
+		$this->loader->add_action('wp_ajax_get_table_lkjip_lppd', $plugin_public, 'get_table_lkjip_lppd');
+ 
+		$this->loader->add_action('wp_ajax_get_detail_dokumen_pemda_lain_by_id', $plugin_public, 'get_detail_dokumen_pemda_lain_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_dokumen_pemda_lain', $plugin_public, 'tambah_dokumen_dokumen_pemda_lain');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_dokumen_pemda_lain', $plugin_public, 'hapus_dokumen_dokumen_pemda_lain');
+		$this->loader->add_action('wp_ajax_get_table_dokumen_pemda_lain', $plugin_public, 'get_table_dokumen_pemda_lain');
+ 
 		add_shortcode('desain_lke_sakip', array($plugin_public, 'desain_lke_sakip'));
 		add_shortcode('jadwal_evaluasi', array($plugin_public, 'jadwal_evaluasi'));
+		add_shortcode('halaman_mapping_skpd', array($plugin_public, 'halaman_mapping_skpd'));
+		
 		add_shortcode('renstra', array($plugin_public, 'renstra'));
 		add_shortcode('renja_rkt', array($plugin_public, 'renja_rkt'));
 		add_shortcode('perjanjian_kinerja', array($plugin_public, 'perjanjian_kinerja'));
@@ -213,13 +297,25 @@ class Wp_Eval_Sakip {
 		add_shortcode('laporan_kinerja', array($plugin_public, 'laporan_kinerja'));
 		add_shortcode('evaluasi_internal', array($plugin_public, 'evaluasi_internal'));
 		add_shortcode('dokumen_lainnya', array($plugin_public, 'dokumen_lainnya'));
+
 		add_shortcode('rpjmd', array($plugin_public, 'rpjmd'));
 		add_shortcode('rkpd', array($plugin_public, 'rkpd'));
 		add_shortcode('lkjip_lppd', array($plugin_public, 'lkjip_lppd'));
 		add_shortcode('dokumen_pemda_lainnya', array($plugin_public, 'dokumen_pemda_lainnya'));
-		add_shortcode('halaman_mapping_skpd', array($plugin_public, 'halaman_mapping_skpd'));
+
 		add_shortcode('dokumen_detail_renja_rkt', array($plugin_public, 'dokumen_detail_renja_rkt'));
+
 		add_shortcode('jadwal_rpjmd', array($plugin_public, 'jadwal_rpjmd'));
+		add_shortcode('dokumen_detail_skp', array($plugin_public, 'dokumen_detail_skp'));
+		add_shortcode('dokumen_detail_perjanjian_kinerja', array($plugin_public, 'dokumen_detail_perjanjian_kinerja'));
+		add_shortcode('dokumen_detail_rencana_aksi', array($plugin_public, 'dokumen_detail_rencana_aksi'));
+		add_shortcode('dokumen_detail_pengukuran_kinerja', array($plugin_public, 'dokumen_detail_pengukuran_kinerja'));
+		add_shortcode('dokumen_detail_pengukuran_rencana_aksi', array($plugin_public, 'dokumen_detail_pengukuran_rencana_aksi'));
+		add_shortcode('dokumen_detail_dokumen_lain', array($plugin_public, 'dokumen_detail_dokumen_lain'));
+		add_shortcode('dokumen_detail_evaluasi_internal', array($plugin_public, 'dokumen_detail_evaluasi_internal'));
+		add_shortcode('dokumen_detail_iku', array($plugin_public, 'dokumen_detail_iku'));
+		add_shortcode('dokumen_detail_laporan_kinerja', array($plugin_public, 'dokumen_detail_laporan_kinerja'));
+
 	}
 
 	/**
