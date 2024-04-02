@@ -26,7 +26,7 @@ $body = '';
 		<table id="data_penjadwalan_table" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
 			<thead id="data_header">
 				<tr>
-					<th class="text-center">Nama Tahapan</th>
+					<th class="text-center">Nama Jadwal</th>
 					<th class="text-center">Status</th>
 					<th class="text-center">Jadwal Mulai</th>
 					<th class="text-center">Jadwal Selesai</th>
@@ -160,7 +160,7 @@ $body = '';
 				type: 'post',
 				dataType: 'json',
 				data:{
-					'action'			: 'submit_add_schedule',
+					'action'			: 'submit_jadwal',
 					'api_key'			: jQuery("#api_key").val(),
 					'nama_jadwal'		: nama_jadwal,
 					'jadwal_mulai'		: jadwalMulai,
@@ -230,7 +230,7 @@ $body = '';
 				type: 'post',
 				dataType: 'json',
 				data:{
-					'action'			: 'submit_edit_schedule',
+					'action'			: 'submit_edit_jadwal',
 					'api_key'			: jQuery("#api_key").val(),
 					'nama_jadwal'		: nama_jadwal,
 					'jadwal_mulai'		: jadwalMulai,
@@ -264,7 +264,7 @@ $body = '';
 				url: thisAjaxUrl,
 				type:'post',
 				data:{
-					'action' 	: 'submit_delete_schedule',
+					'action' 	: 'delete_jadwal',
 					'api_key'	: jQuery("#api_key").val(),
 					'id'		: id
 				},
@@ -291,7 +291,7 @@ $body = '';
 				url: thisAjaxUrl,
 				type:'post',
 				data:{
-					'action' 				: 'submit_lock_schedule',
+					'action' 				: 'lock_jadwal',
 					'api_key'				: jQuery("#api_key").val(),
 					'id'		: id
 				},

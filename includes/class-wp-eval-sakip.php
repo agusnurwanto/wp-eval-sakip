@@ -191,11 +191,10 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action( 'wp_ajax_mapping_skpd', $plugin_public, 'mapping_skpd' );
 
 		$this->loader->add_action('wp_ajax_get_data_penjadwalan', $plugin_public, 'get_data_penjadwalan');
-		$this->loader->add_action('wp_ajax_submit_add_schedule',  $plugin_public, 'submit_add_schedule');
-		$this->loader->add_action('wp_ajax_submit_edit_schedule',  $plugin_public, 'submit_edit_schedule');
-		$this->loader->add_action('wp_ajax_submit_delete_schedule',  $plugin_public, 'submit_delete_schedule');
-		$this->loader->add_action('wp_ajax_submit_lock_schedule',  $plugin_public, 'submit_lock_schedule');
-		$this->loader->add_action('wp_ajax_submit_lock_schedule_rpjmd',  $plugin_public, 'submit_lock_schedule_rpjmd');
+		$this->loader->add_action('wp_ajax_submit_jadwal',  $plugin_public, 'submit_jadwal');
+		$this->loader->add_action('wp_ajax_submit_edit_jadwal',  $plugin_public, 'submit_edit_jadwal');
+		$this->loader->add_action('wp_ajax_delete_jadwal',  $plugin_public, 'delete_jadwal');
+		$this->loader->add_action('wp_ajax_lock_jadwal',  $plugin_public, 'lock_jadwal');
 		$this->loader->add_action('wp_ajax_get_data_jadwal_by_id',  $plugin_public, 'get_data_jadwal_by_id');
 
 		$this->loader->add_action('wp_ajax_get_data_penjadwalan_rpjmd', $plugin_public, 'get_data_penjadwalan_rpjmd');

@@ -5755,6 +5755,7 @@ class Wp_Eval_Sakip_Public
 						5 => 'id',
 					);
 					$where = $sqlTot = $sqlRec = "";
+					$where = " WHERE tipe IS NULL ";
 
 					// check search value exist
 					if (!empty($params['search']['value'])) {
@@ -5847,7 +5848,7 @@ class Wp_Eval_Sakip_Public
 	}
 
 	/** Submit data penjadwalan */
-	public function submit_add_schedule()
+	public function submit_jadwal()
 	{
 		global $wpdb;
 		$user_id = um_user('ID');
@@ -5939,7 +5940,7 @@ class Wp_Eval_Sakip_Public
 	}
 
 	/** Submit data penjadwalan */
-	public function submit_edit_schedule()
+	public function submit_edit_jadwal()
 	{
 		global $wpdb;
 		$user_id = um_user('ID');
@@ -6018,7 +6019,7 @@ class Wp_Eval_Sakip_Public
 	}
 
 	/** Submit delete data jadwal */
-	public function submit_delete_schedule()
+	public function delete_jadwal()
 	{
 		global $wpdb;
 		$return = array(
@@ -6086,98 +6087,13 @@ class Wp_Eval_Sakip_Public
 	}
 
 	/** Submit lock data jadwal RPJM */
-	public function submit_lock_schedule()
+	public function lock_jadwal()
 	{
 		global $wpdb;
 		$return = array(
 			'status' => 'success',
 			'data'	=> array()
 		);
-
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
-				if (!empty($_POST['id'])) {
-					$id = trim(htmlspecialchars($_POST['id']));
-
-					$data_this_id 	= $wpdb->get_row($wpdb->prepare('
-						SELECT 
-							* 
-						FROM esakip_data_jadwal 
-						WHERE id = %d
-					', $id), ARRAY_A);
-
-					$timezone = get_option('timezone_string');
-					if (preg_match("/Asia/i", $timezone)) {
-						date_default_timezone_set($timezone);
-					} else {
-						$return = array(
-							'status' => 'error',
-							'message'	=> "Pengaturan timezone salah. Pilih salah satu kota di zona waktu yang sama dengan anda, antara lain:  \'Jakarta\',\'Makasar\',\'Jayapura\'",
-						);
-						die(json_encode($return));
-					}
-
-					$dateTime = new DateTime();
-					$time_now = $dateTime->format('Y-m-d H:i:s');
-					if ($time_now > $data_this_id['started_at']) {
-						$status_check = array(0, NULL, 2);
-						if (in_array($data_this_id['status'], $status_check)) {
-
-							//lock data penjadwalan
-							$wpdb->update('esakip_data_jadwal', array('end_at' => $time_now, 'status' => 1), array(
-								'id'	=> $id
-							));
-
-							$return = array(
-								'status' => 'success',
-								'message'	=> 'Berhasil!',
-								'data_input' => $queryRecords1
-							);
-						} else {
-							$return = array(
-								'status' => 'error',
-								'message'	=> "User tidak diijinkan!\nData sudah dikunci!",
-							);
-						}
-					} else {
-						$return = array(
-							'status' => 'error',
-							'message'	=> "Penjadwalan belum dimulai!",
-						);
-					}
-				
-				} else {
-					$return = array(
-						'status' => 'error',
-						'message'	=> 'Harap diisi semua,tidak boleh ada yang kosong!'
-					);
-				}
-			} else {
-				$return = array(
-					'status' => 'error',
-					'message'	=> 'Api Key tidak sesuai!'
-				);
-			}
-		} else {
-			$return = array(
-				'status' => 'error',
-				'message'	=> 'Format tidak sesuai!'
-			);
-		}
-		die(json_encode($return));
-	}
-
-	/** Submit lock data jadwal RPJM */
-	public function submit_lock_schedule_rpjmd()
-	{
-		global $wpdb;
-		$return = array(
-			'status' => 'success',
-			'data'	=> array()
-		);
-
-		$user_id = um_user('ID');
-		$user_meta = get_userdata($user_id);
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
@@ -6275,6 +6191,7 @@ class Wp_Eval_Sakip_Public
 						5 => 'id',
 					);
 					$where = $sqlTot = $sqlRec = "";
+					$where = " WHERE tipe='RPJMD' ";
 
 					// check search value exist
 					if (!empty($params['search']['value'])) {
@@ -6325,7 +6242,7 @@ class Wp_Eval_Sakip_Public
 
 							$tahun_anggaran_selesai = $recVal['tahun_anggaran'] + $recVal['lama_pelaksanaan'];
 
-							$queryRecords[$recKey]['aksi'] = $report . $lock . $edit . $delete;
+							$queryRecords[$recKey]['aksi'] = $edit . $delete;
 							$queryRecords[$recKey]['nama_jadwal'] = ucfirst($recVal['nama_jadwal']);
 							$queryRecords[$recKey]['tahun_anggaran_selesai'] = $tahun_anggaran_selesai;
 
