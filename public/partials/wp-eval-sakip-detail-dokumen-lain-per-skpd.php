@@ -232,6 +232,7 @@ $skpd = $wpdb->get_row(
             data: form_data,
             contentType: false,
             processData: false,
+            dataType: 'json',
             success: function(response) {
                 console.log(response);
                 jQuery('#wrap-loading').hide();
