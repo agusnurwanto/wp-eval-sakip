@@ -6199,21 +6199,6 @@ class Wp_Eval_Sakip_Public
 					}
 
 					/** Search id tipe */
-					$tipe = $_POST['tipe'];
-					$get_tipe = $wpdb->get_results($wpdb->prepare("
-						SELECT 
-							* 
-						FROM `esakip_data_jadwal` 
-						WHERE tipe=%s
-					", $tipe), ARRAY_A);
-
-					if (empty($get_tipe)) {
-						$return = array(
-							'status' => 'error',
-							'message'	=> 'Data tidak ditemukan!'
-						);
-						die(json_encode($return));
-					}
 
 					if (!empty($_POST['tahun_anggaran'])) {
 						$where .= $wpdb->prepare(" AND tahun_anggaran = %d", $_POST['tahun_anggaran']);
