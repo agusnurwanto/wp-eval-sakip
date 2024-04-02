@@ -1850,6 +1850,7 @@ class Wp_Eval_Sakip_Public
 
 				if (!empty($_POST['id_dokumen'])) {
 					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
 				}
 				if (!empty($_POST['skpd'])) {
 					$skpd = $_POST['skpd'];
@@ -1875,8 +1876,11 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
-
-				if ($ret['status'] == 'success') {
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
@@ -1915,17 +1919,26 @@ class Wp_Eval_Sakip_Public
 							);
 						}
 					} else {
+						$opsi = array(
+							'keterangan' => $keterangan
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_renja_rkt
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
 						$wpdb->update(
 							'esakip_renja_rkt',
-							array(
-								'opd' => $skpd,
-								'id_skpd' => $idSkpd,
-								'dokumen' => $upload['filename'],
-								'keterangan' => $keterangan,
-								'tahun_anggaran' => $tahunAnggaran,
-							),
+							$opsi,
 							array('id' => $id_dokumen),
-							array('%s', '%s', '%s', '%s', '%d'),
+							array('%s', '%s'),
 							array('%d')
 						);
 
@@ -1966,6 +1979,7 @@ class Wp_Eval_Sakip_Public
 
 				if (!empty($_POST['id_dokumen'])) {
 					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
 				}
 				if (!empty($_POST['skpd'])) {
 					$skpd = $_POST['skpd'];
@@ -1991,8 +2005,11 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
-
-				if ($ret['status'] == 'success') {
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
@@ -2031,17 +2048,26 @@ class Wp_Eval_Sakip_Public
 							);
 						}
 					} else {
+						$opsi = array(
+							'keterangan' => $keterangan
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_perjanjian_kinerja
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
 						$wpdb->update(
 							'esakip_perjanjian_kinerja',
-							array(
-								'opd' => $skpd,
-								'id_skpd' => $idSkpd,
-								'dokumen' => $upload['filename'],
-								'keterangan' => $keterangan,
-								'tahun_anggaran' => $tahunAnggaran,
-							),
+							$opsi,
 							array('id' => $id_dokumen),
-							array('%s', '%s', '%s', '%s', '%d'),
+							array('%s', '%s'),
 							array('%d')
 						);
 
@@ -2082,6 +2108,7 @@ class Wp_Eval_Sakip_Public
 
 				if (!empty($_POST['id_dokumen'])) {
 					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
 				}
 				if (!empty($_POST['skpd'])) {
 					$skpd = $_POST['skpd'];
@@ -2107,8 +2134,11 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
-
-				if ($ret['status'] == 'success') {
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
@@ -2147,17 +2177,26 @@ class Wp_Eval_Sakip_Public
 							);
 						}
 					} else {
+						$opsi = array(
+							'keterangan' => $keterangan
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_evaluasi_internal
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
 						$wpdb->update(
 							'esakip_evaluasi_internal',
-							array(
-								'opd' => $skpd,
-								'id_skpd' => $idSkpd,
-								'dokumen' => $upload['filename'],
-								'keterangan' => $keterangan,
-								'tahun_anggaran' => $tahunAnggaran,
-							),
+							$opsi,
 							array('id' => $id_dokumen),
-							array('%s', '%s', '%s', '%s', '%d'),
+							array('%s', '%s'),
 							array('%d')
 						);
 
@@ -2198,6 +2237,7 @@ class Wp_Eval_Sakip_Public
 
 				if (!empty($_POST['id_dokumen'])) {
 					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
 				}
 				if (!empty($_POST['skpd'])) {
 					$skpd = $_POST['skpd'];
@@ -2223,8 +2263,11 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
-
-				if ($ret['status'] == 'success') {
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
@@ -2263,17 +2306,26 @@ class Wp_Eval_Sakip_Public
 							);
 						}
 					} else {
+						$opsi = array(
+							'keterangan' => $keterangan
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_laporan_kinerja
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
 						$wpdb->update(
 							'esakip_laporan_kinerja',
-							array(
-								'opd' => $skpd,
-								'id_skpd' => $idSkpd,
-								'dokumen' => $upload['filename'],
-								'keterangan' => $keterangan,
-								'tahun_anggaran' => $tahunAnggaran,
-							),
+							$opsi,
 							array('id' => $id_dokumen),
-							array('%s', '%s', '%s', '%s', '%d'),
+							array('%s', '%s'),
 							array('%d')
 						);
 
@@ -2314,6 +2366,7 @@ class Wp_Eval_Sakip_Public
 
 				if (!empty($_POST['id_dokumen'])) {
 					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
 				}
 				if (!empty($_POST['skpd'])) {
 					$skpd = $_POST['skpd'];
@@ -2339,8 +2392,11 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
-
-				if ($ret['status'] == 'success') {
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
@@ -2379,17 +2435,26 @@ class Wp_Eval_Sakip_Public
 							);
 						}
 					} else {
+						$opsi = array(
+							'keterangan' => $keterangan
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_iku
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
 						$wpdb->update(
 							'esakip_iku',
-							array(
-								'opd' => $skpd,
-								'id_skpd' => $idSkpd,
-								'dokumen' => $upload['filename'],
-								'keterangan' => $keterangan,
-								'tahun_anggaran' => $tahunAnggaran,
-							),
+							$opsi,
 							array('id' => $id_dokumen),
-							array('%s', '%s', '%s', '%s', '%d'),
+							array('%s', '%s'),
 							array('%d')
 						);
 
@@ -2430,6 +2495,7 @@ class Wp_Eval_Sakip_Public
 
 				if (!empty($_POST['id_dokumen'])) {
 					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
 				}
 				if (!empty($_POST['skpd'])) {
 					$skpd = $_POST['skpd'];
@@ -2455,8 +2521,11 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
-
-				if ($ret['status'] == 'success') {
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
@@ -2495,17 +2564,26 @@ class Wp_Eval_Sakip_Public
 							);
 						}
 					} else {
+						$opsi = array(
+							'keterangan' => $keterangan
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_dokumen_lainnya
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
 						$wpdb->update(
 							'esakip_dokumen_lainnya',
-							array(
-								'opd' => $skpd,
-								'id_skpd' => $idSkpd,
-								'dokumen' => $upload['filename'],
-								'keterangan' => $keterangan,
-								'tahun_anggaran' => $tahunAnggaran,
-							),
+							$opsi,
 							array('id' => $id_dokumen),
-							array('%s', '%s', '%s', '%s', '%d'),
+							array('%s', '%s'),
 							array('%d')
 						);
 
@@ -2546,6 +2624,7 @@ class Wp_Eval_Sakip_Public
 
 				if (!empty($_POST['id_dokumen'])) {
 					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
 				}
 				if (!empty($_POST['skpd'])) {
 					$skpd = $_POST['skpd'];
@@ -2571,8 +2650,11 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
-
-				if ($ret['status'] == 'success') {
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
@@ -2611,17 +2693,26 @@ class Wp_Eval_Sakip_Public
 							);
 						}
 					} else {
+						$opsi = array(
+							'keterangan' => $keterangan
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_rencana_aksi
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
 						$wpdb->update(
 							'esakip_rencana_aksi',
-							array(
-								'opd' => $skpd,
-								'id_skpd' => $idSkpd,
-								'dokumen' => $upload['filename'],
-								'keterangan' => $keterangan,
-								'tahun_anggaran' => $tahunAnggaran,
-							),
+							$opsi,
 							array('id' => $id_dokumen),
-							array('%s', '%s', '%s', '%s', '%d'),
+							array('%s', '%s'),
 							array('%d')
 						);
 
@@ -2662,6 +2753,7 @@ class Wp_Eval_Sakip_Public
 
 				if (!empty($_POST['id_dokumen'])) {
 					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
 				}
 				if (!empty($_POST['skpd'])) {
 					$skpd = $_POST['skpd'];
@@ -2687,8 +2779,11 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
-
-				if ($ret['status'] == 'success') {
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
@@ -2727,17 +2822,26 @@ class Wp_Eval_Sakip_Public
 							);
 						}
 					} else {
+						$opsi = array(
+							'keterangan' => $keterangan
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_pengukuran_kinerja
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
 						$wpdb->update(
 							'esakip_pengukuran_kinerja',
-							array(
-								'opd' => $skpd,
-								'id_skpd' => $idSkpd,
-								'dokumen' => $upload['filename'],
-								'keterangan' => $keterangan,
-								'tahun_anggaran' => $tahunAnggaran,
-							),
+							$opsi,
 							array('id' => $id_dokumen),
-							array('%s', '%s', '%s', '%s', '%d'),
+							array('%s', '%s'),
 							array('%d')
 						);
 
@@ -2778,6 +2882,7 @@ class Wp_Eval_Sakip_Public
 
 				if (!empty($_POST['id_dokumen'])) {
 					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
 				}
 				if (!empty($_POST['skpd'])) {
 					$skpd = $_POST['skpd'];
@@ -2803,8 +2908,11 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
-
-				if ($ret['status'] == 'success') {
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
@@ -2843,17 +2951,26 @@ class Wp_Eval_Sakip_Public
 							);
 						}
 					} else {
+						$opsi = array(
+							'keterangan' => $keterangan
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_pengukuran_rencana_aksi
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
 						$wpdb->update(
 							'esakip_pengukuran_rencana_aksi',
-							array(
-								'opd' => $skpd,
-								'id_skpd' => $idSkpd,
-								'dokumen' => $upload['filename'],
-								'keterangan' => $keterangan,
-								'tahun_anggaran' => $tahunAnggaran,
-							),
+							$opsi,
 							array('id' => $id_dokumen),
-							array('%s', '%s', '%s', '%s', '%d'),
+							array('%s', '%s'),
 							array('%d')
 						);
 
@@ -2894,6 +3011,7 @@ class Wp_Eval_Sakip_Public
 
 				if (!empty($_POST['id_dokumen'])) {
 					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
 				}
 				if (!empty($_POST['skpd'])) {
 					$skpd = $_POST['skpd'];
@@ -2919,8 +3037,11 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
-
-				if ($ret['status'] == 'success') {
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
@@ -2959,17 +3080,26 @@ class Wp_Eval_Sakip_Public
 							);
 						}
 					} else {
+						$opsi = array(
+							'keterangan' => $keterangan
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_other_file
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
 						$wpdb->update(
 							'esakip_other_file',
-							array(
-								'opd' => $skpd,
-								'id_skpd' => $idSkpd,
-								'dokumen' => $upload['filename'],
-								'keterangan' => $keterangan,
-								'tahun_anggaran' => $tahunAnggaran,
-							),
+							$opsi,
 							array('id' => $id_dokumen),
-							array('%s', '%s', '%s', '%s', '%d'),
+							array('%s', '%s'),
 							array('%d')
 						);
 
@@ -3010,6 +3140,7 @@ class Wp_Eval_Sakip_Public
 
 				if (!empty($_POST['id_dokumen'])) {
 					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
 				}
 				if (!empty($_POST['skpd'])) {
 					$skpd = $_POST['skpd'];
@@ -3035,8 +3166,11 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
-
-				if ($ret['status'] == 'success') {
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
@@ -3075,17 +3209,26 @@ class Wp_Eval_Sakip_Public
 							);
 						}
 					} else {
+						$opsi = array(
+							'keterangan' => $keterangan
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_rkpd
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
 						$wpdb->update(
 							'esakip_rkpd',
-							array(
-								'opd' => $skpd,
-								'id_skpd' => $idSkpd,
-								'dokumen' => $upload['filename'],
-								'keterangan' => $keterangan,
-								'tahun_anggaran' => $tahunAnggaran,
-							),
+							$opsi,
 							array('id' => $id_dokumen),
-							array('%s', '%s', '%s', '%s', '%d'),
+							array('%s', '%s'),
 							array('%d')
 						);
 
@@ -3126,6 +3269,7 @@ class Wp_Eval_Sakip_Public
 
 				if (!empty($_POST['id_dokumen'])) {
 					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
 				}
 				if (!empty($_POST['skpd'])) {
 					$skpd = $_POST['skpd'];
@@ -3151,8 +3295,11 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
-
-				if ($ret['status'] == 'success') {
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
@@ -3191,17 +3338,26 @@ class Wp_Eval_Sakip_Public
 							);
 						}
 					} else {
+						$opsi = array(
+							'keterangan' => $keterangan
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_rpjmd
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
 						$wpdb->update(
 							'esakip_rpjmd',
-							array(
-								'opd' => $skpd,
-								'id_skpd' => $idSkpd,
-								'dokumen' => $upload['filename'],
-								'keterangan' => $keterangan,
-								'tahun_anggaran' => $tahunAnggaran,
-							),
+							$opsi,
 							array('id' => $id_dokumen),
-							array('%s', '%s', '%s', '%s', '%d'),
+							array('%s', '%s'),
 							array('%d')
 						);
 
@@ -3242,6 +3398,7 @@ class Wp_Eval_Sakip_Public
 
 				if (!empty($_POST['id_dokumen'])) {
 					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
 				}
 				if (!empty($_POST['skpd'])) {
 					$skpd = $_POST['skpd'];
@@ -3267,8 +3424,11 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
-
-				if ($ret['status'] == 'success') {
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
@@ -3307,17 +3467,26 @@ class Wp_Eval_Sakip_Public
 							);
 						}
 					} else {
+						$opsi = array(
+							'keterangan' => $keterangan
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_lkjip_lppd
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
 						$wpdb->update(
 							'esakip_lkjip_lppd',
-							array(
-								'opd' => $skpd,
-								'id_skpd' => $idSkpd,
-								'dokumen' => $upload['filename'],
-								'keterangan' => $keterangan,
-								'tahun_anggaran' => $tahunAnggaran,
-							),
+							$opsi,
 							array('id' => $id_dokumen),
-							array('%s', '%s', '%s', '%s', '%d'),
+							array('%s', '%s'),
 							array('%d')
 						);
 
@@ -3358,6 +3527,7 @@ class Wp_Eval_Sakip_Public
 
 				if (!empty($_POST['id_dokumen'])) {
 					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
 				}
 				if (!empty($_POST['skpd'])) {
 					$skpd = $_POST['skpd'];
@@ -3383,8 +3553,11 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
-
-				if ($ret['status'] == 'success') {
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
@@ -3423,17 +3596,26 @@ class Wp_Eval_Sakip_Public
 							);
 						}
 					} else {
+						$opsi = array(
+							'keterangan' => $keterangan
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_renstra
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
 						$wpdb->update(
 							'esakip_renstra',
-							array(
-								'opd' => $skpd,
-								'id_skpd' => $idSkpd,
-								'dokumen' => $upload['filename'],
-								'keterangan' => $keterangan,
-								'tahun_anggaran' => $tahunAnggaran,
-							),
+							$opsi,
 							array('id' => $id_dokumen),
-							array('%s', '%s', '%s', '%s', '%d'),
+							array('%s', '%s'),
 							array('%d')
 						);
 
@@ -3474,6 +3656,7 @@ class Wp_Eval_Sakip_Public
 
 				if (!empty($_POST['id_dokumen'])) {
 					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
 				}
 				if (!empty($_POST['skpd'])) {
 					$skpd = $_POST['skpd'];
@@ -3499,8 +3682,11 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
-
-				if ($ret['status'] == 'success') {
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
@@ -3539,17 +3725,26 @@ class Wp_Eval_Sakip_Public
 							);
 						}
 					} else {
+						$opsi = array(
+							'keterangan' => $keterangan
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_skp
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
 						$wpdb->update(
 							'esakip_skp',
-							array(
-								'opd' => $skpd,
-								'id_skpd' => $idSkpd,
-								'dokumen' => $upload['filename'],
-								'keterangan' => $keterangan,
-								'tahun_anggaran' => $tahunAnggaran,
-							),
+							$opsi,
 							array('id' => $id_dokumen),
-							array('%s', '%s', '%s', '%s', '%d'),
+							array('%s', '%s'),
 							array('%d')
 						);
 
@@ -4711,11 +4906,34 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$ret['data'] = $wpdb->update(
-					'esakip_renja_rkt',
-					array('active' => 0),
-					array('id' => $_POST['id'])
-				);
+				if (!empty($_POST['id'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$dokumen_lama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								dokumen
+							FROM esakip_renja_rkt
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					$ret['data'] = $wpdb->update(
+						'esakip_renja_rkt',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+
+					if ($wpdb->rows_affected > 0) {
+						if (is_file($upload_dir . $dokumen_lama)) {
+							unlink($upload_dir . $dokumen_lama);
+						}
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
 			} else {
 				$ret = array(
 					'status' => 'error',
@@ -4742,11 +4960,34 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$ret['data'] = $wpdb->update(
-					'esakip_perjanjian_kinerja',
-					array('active' => 0),
-					array('id' => $_POST['id'])
-				);
+				if (!empty($_POST['id'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$dokumen_lama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								dokumen
+							FROM esakip_perjanjian_kinerja
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					$ret['data'] = $wpdb->update(
+						'esakip_perjanjian_kinerja',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+
+					if ($wpdb->rows_affected > 0) {
+						if (is_file($upload_dir . $dokumen_lama)) {
+							unlink($upload_dir . $dokumen_lama);
+						}
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
 			} else {
 				$ret = array(
 					'status' => 'error',
@@ -4773,11 +5014,34 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$ret['data'] = $wpdb->update(
-					'esakip_rencana_aksi',
-					array('active' => 0),
-					array('id' => $_POST['id'])
-				);
+				if (!empty($_POST['id'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$dokumen_lama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								dokumen
+							FROM esakip_rencana_aksi
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					$ret['data'] = $wpdb->update(
+						'esakip_rencana_aksi',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+
+					if ($wpdb->rows_affected > 0) {
+						if (is_file($upload_dir . $dokumen_lama)) {
+							unlink($upload_dir . $dokumen_lama);
+						}
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
 			} else {
 				$ret = array(
 					'status' => 'error',
@@ -4804,11 +5068,34 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$ret['data'] = $wpdb->update(
-					'esakip_iku',
-					array('active' => 0),
-					array('id' => $_POST['id'])
-				);
+				if (!empty($_POST['id'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$dokumen_lama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								dokumen
+							FROM esakip_iku
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					$ret['data'] = $wpdb->update(
+						'esakip_iku',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+
+					if ($wpdb->rows_affected > 0) {
+						if (is_file($upload_dir . $dokumen_lama)) {
+							unlink($upload_dir . $dokumen_lama);
+						}
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
 			} else {
 				$ret = array(
 					'status' => 'error',
@@ -4835,11 +5122,34 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$ret['data'] = $wpdb->update(
-					'esakip_skp',
-					array('active' => 0),
-					array('id' => $_POST['id'])
-				);
+				if (!empty($_POST['id'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$dokumen_lama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								dokumen
+							FROM esakip_skp
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					$ret['data'] = $wpdb->update(
+						'esakip_skp',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+
+					if ($wpdb->rows_affected > 0) {
+						if (is_file($upload_dir . $dokumen_lama)) {
+							unlink($upload_dir . $dokumen_lama);
+						}
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
 			} else {
 				$ret = array(
 					'status' => 'error',
@@ -4866,11 +5176,34 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$ret['data'] = $wpdb->update(
-					'esakip_pengukuran_kinerja',
-					array('active' => 0),
-					array('id' => $_POST['id'])
-				);
+				if (!empty($_POST['id'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$dokumen_lama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								dokumen
+							FROM esakip_pengukuran_kinerja
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					$ret['data'] = $wpdb->update(
+						'esakip_pengukuran_kinerja',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+
+					if ($wpdb->rows_affected > 0) {
+						if (is_file($upload_dir . $dokumen_lama)) {
+							unlink($upload_dir . $dokumen_lama);
+						}
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
 			} else {
 				$ret = array(
 					'status' => 'error',
@@ -4897,11 +5230,34 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$ret['data'] = $wpdb->update(
-					'esakip_pengukuran_rencana_aksi',
-					array('active' => 0),
-					array('id' => $_POST['id'])
-				);
+				if (!empty($_POST['id'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$dokumen_lama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								dokumen
+							FROM esakip_pengukuran_rencana_aksi
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					$ret['data'] = $wpdb->update(
+						'esakip_pengukuran_rencana_aksi',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+
+					if ($wpdb->rows_affected > 0) {
+						if (is_file($upload_dir . $dokumen_lama)) {
+							unlink($upload_dir . $dokumen_lama);
+						}
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
 			} else {
 				$ret = array(
 					'status' => 'error',
@@ -4928,11 +5284,34 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$ret['data'] = $wpdb->update(
-					'esakip_laporan_kinerja',
-					array('active' => 0),
-					array('id' => $_POST['id'])
-				);
+				if (!empty($_POST['id'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$dokumen_lama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								dokumen
+							FROM esakip_laporan_kinerja
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					$ret['data'] = $wpdb->update(
+						'esakip_laporan_kinerja',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+
+					if ($wpdb->rows_affected > 0) {
+						if (is_file($upload_dir . $dokumen_lama)) {
+							unlink($upload_dir . $dokumen_lama);
+						}
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
 			} else {
 				$ret = array(
 					'status' => 'error',
@@ -4959,11 +5338,34 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$ret['data'] = $wpdb->update(
-					'esakip_evaluasi_internal',
-					array('active' => 0),
-					array('id' => $_POST['id'])
-				);
+				if (!empty($_POST['id'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$dokumen_lama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								dokumen
+							FROM esakip_evaluasi_internal
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					$ret['data'] = $wpdb->update(
+						'esakip_evaluasi_internal',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+
+					if ($wpdb->rows_affected > 0) {
+						if (is_file($upload_dir . $dokumen_lama)) {
+							unlink($upload_dir . $dokumen_lama);
+						}
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
 			} else {
 				$ret = array(
 					'status' => 'error',
@@ -4990,11 +5392,34 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$ret['data'] = $wpdb->update(
-					'esakip_dokumen_lainnya',
-					array('active' => 0),
-					array('id' => $_POST['id'])
-				);
+				if (!empty($_POST['id'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$dokumen_lama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								dokumen
+							FROM esakip_dokumen_lainnya
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					$ret['data'] = $wpdb->update(
+						'esakip_dokumen_lainnya',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+
+					if ($wpdb->rows_affected > 0) {
+						if (is_file($upload_dir . $dokumen_lama)) {
+							unlink($upload_dir . $dokumen_lama);
+						}
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
 			} else {
 				$ret = array(
 					'status' => 'error',
@@ -5021,11 +5446,34 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$ret['data'] = $wpdb->update(
-					'esakip_renstra',
-					array('active' => 0),
-					array('id' => $_POST['id'])
-				);
+				if (!empty($_POST['id'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$dokumen_lama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								dokumen
+							FROM esakip_renstra
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					$ret['data'] = $wpdb->update(
+						'esakip_renstra',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+
+					if ($wpdb->rows_affected > 0) {
+						if (is_file($upload_dir . $dokumen_lama)) {
+							unlink($upload_dir . $dokumen_lama);
+						}
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
 			} else {
 				$ret = array(
 					'status' => 'error',
@@ -5052,11 +5500,34 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$ret['data'] = $wpdb->update(
-					'esakip_rpjmd',
-					array('active' => 0),
-					array('id' => $_POST['id'])
-				);
+				if (!empty($_POST['id'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$dokumen_lama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								dokumen
+							FROM esakip_rpjmd
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					$ret['data'] = $wpdb->update(
+						'esakip_rpjmd',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+
+					if ($wpdb->rows_affected > 0) {
+						if (is_file($upload_dir . $dokumen_lama)) {
+							unlink($upload_dir . $dokumen_lama);
+						}
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
 			} else {
 				$ret = array(
 					'status' => 'error',
@@ -5083,11 +5554,34 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$ret['data'] = $wpdb->update(
-					'esakip_rkpd',
-					array('active' => 0),
-					array('id' => $_POST['id'])
-				);
+				if (!empty($_POST['id'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$dokumen_lama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								dokumen
+							FROM esakip_rkpd
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					$ret['data'] = $wpdb->update(
+						'esakip_rkpd',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+
+					if ($wpdb->rows_affected > 0) {
+						if (is_file($upload_dir . $dokumen_lama)) {
+							unlink($upload_dir . $dokumen_lama);
+						}
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
 			} else {
 				$ret = array(
 					'status' => 'error',
@@ -5114,11 +5608,34 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$ret['data'] = $wpdb->update(
-					'esakip_lkjip_lppd',
-					array('active' => 0),
-					array('id' => $_POST['id'])
-				);
+				if (!empty($_POST['id'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$dokumen_lama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								dokumen
+							FROM esakip_lkjip_lppd
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					$ret['data'] = $wpdb->update(
+						'esakip_lkjip_lppd',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+
+					if ($wpdb->rows_affected > 0) {
+						if (is_file($upload_dir . $dokumen_lama)) {
+							unlink($upload_dir . $dokumen_lama);
+						}
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
 			} else {
 				$ret = array(
 					'status' => 'error',
@@ -5145,11 +5662,34 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$ret['data'] = $wpdb->update(
-					'esakip_other_file',
-					array('active' => 0),
-					array('id' => $_POST['id'])
-				);
+				if (!empty($_POST['id'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$dokumen_lama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								dokumen
+							FROM esakip_other_file
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					$ret['data'] = $wpdb->update(
+						'esakip_other_file',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+
+					if ($wpdb->rows_affected > 0) {
+						if (is_file($upload_dir . $dokumen_lama)) {
+							unlink($upload_dir . $dokumen_lama);
+						}
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
 			} else {
 				$ret = array(
 					'status' => 'error',
