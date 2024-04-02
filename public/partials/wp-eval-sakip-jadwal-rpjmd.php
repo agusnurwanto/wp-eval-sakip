@@ -58,8 +58,8 @@ $body = '';
 					<input type="number" id='tahun_anggaran' name="tahun_anggaran" style='display:block;width:100%;' placeholder="Tahun Mulai Anggaran"/>
 				</div>
 				<div>
-					<label for='lama_pelaksanaan' style='display:inline-block'>Lama Pelaksanaan</label>
-					<input type="number" id='lama_pelaksanaan' name="lama_pelaksanaan" value="5" style='display:block;width:50%;' placeholder="5"/> Tahun
+					<label for='lama_pelaksanaan' style='display:block'>Lama Pelaksanaan</label>
+					<input type="number" id='lama_pelaksanaan' name="lama_pelaksanaan" value="5" style='display:inline-block;width:50%;' placeholder="5"/> Tahun
 				</div>
 				<div>
 					<label for='keterangan' style='display:inline-block'>Keterangan</label>
