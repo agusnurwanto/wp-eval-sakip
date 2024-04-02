@@ -189,6 +189,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 		$this->loader->add_action( 'wp_ajax_mapping_skpd', $plugin_public, 'mapping_skpd' );
+
 		$this->loader->add_action('wp_ajax_get_data_penjadwalan', $plugin_public, 'get_data_penjadwalan');
 		$this->loader->add_action('wp_ajax_submit_add_schedule',  $plugin_public, 'submit_add_schedule');
 		$this->loader->add_action('wp_ajax_submit_edit_schedule',  $plugin_public, 'submit_edit_schedule');
@@ -196,6 +197,12 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_submit_lock_schedule',  $plugin_public, 'submit_lock_schedule');
 		$this->loader->add_action('wp_ajax_submit_lock_schedule_rpjmd',  $plugin_public, 'submit_lock_schedule_rpjmd');
 		$this->loader->add_action('wp_ajax_get_data_jadwal_by_id',  $plugin_public, 'get_data_jadwal_by_id');
+
+		$this->loader->add_action('wp_ajax_get_data_penjadwalan_rpjmd', $plugin_public, 'get_data_penjadwalan_rpjmd');
+		$this->loader->add_action('wp_ajax_get_lama_pelaksanaan_rpjmd', $plugin_public, 'get_lama_pelaksanaan_rpjmd');
+		$this->loader->add_action('wp_ajax_submit_jadwal_rpjmd',  $plugin_public, 'submit_jadwal_rpjmd');
+		$this->loader->add_action('wp_ajax_delete_jadwal_rpjmd',  $plugin_public, 'delete_jadwal_rpjmd');
+		$this->loader->add_action('wp_ajax_submit_edit_jadwal_rpjmd',  $plugin_public, 'submit_edit_jadwal_rpjmd');
 
 		$this->loader->add_action('wp_ajax_get_detail_renja_rkt_by_id', $plugin_public, 'get_detail_renja_rkt_by_id');
 		$this->loader->add_action('wp_ajax_tambah_dokumen_renja', $plugin_public, 'tambah_dokumen_renja');

@@ -21,16 +21,15 @@ $body = '';
 		<input type="hidden" value="<?php echo get_option( '_crb_apikey_esakip' ); ?>" id="api_key">
 	<h1 class="text-center" style="margin:3rem;">Halaman Jadwal RPJMD / RPD</h1>
 		<div style="margin-bottom: 25px;">
-			<button class="btn btn-primary" onclick="tambah_jadwal();">Tambah Jadwal</button>
+			<button class="btn btn-primary" onclick="tambah_jadwal_rpmd();">Tambah Jadwal</button>
 		</div>
 		<table id="data_penjadwalan_table" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
 			<thead id="data_header">
 				<tr>
 					<th class="text-center">Nama Jadwal</th>
-					<th class="text-center">Status</th>
-					<th class="text-center">Jadwal Mulai</th>
-					<th class="text-center">Jadwal Selesai</th>
-					<th class="text-center">Tahun Anggaran</th>
+					<th class="text-center">Keterangan</th>
+					<th class="text-center">Tahun Mulai</th>
+					<th class="text-center">Tahun Akhir</th>
 					<th class="text-center" style="width: 150px;">Aksi</th>
 				</tr>
 			</thead>
@@ -51,16 +50,20 @@ $body = '';
 			</div>
 			<div class="modal-body">
 				<div>
-					<label for='nama' style='display:inline-block'>Nama Jadwal</label>
-					<input type='text' id='nama' style='display:block;width:100%;' placeholder='Nama Jadwal'>
+					<label for='nama_jadwal' style='display:inline-block'>Nama Jadwal</label>
+					<input type='text' id='nama_jadwal' style='display:block;width:100%;' placeholder='Input Nama Jadwal'>
 				</div>
 				<div>
-					<label for='tahun_anggaran' style='display:inline-block'>Tahun Anggaran</label>
+					<label for='tahun_anggaran' style='display:inline-block'>Tahun Mulai Anggaran</label>
 					<input type="number" id='tahun_anggaran' name="tahun_anggaran" style='display:block;width:100%;' placeholder="Tahun Mulai Anggaran"/>
 				</div>
 				<div>
-					<label for='jadwal_tanggal' style='display:inline-block'>Jadwal Pelaksanaan</label>
-					<input type="text" id='jadwal_tanggal' name="datetimes" style='display:block;width:100%;'/>
+					<label for='lama_pelaksanaan' style='display:inline-block'>Lama Pelaksanaan</label>
+					<input type="number" id='lama_pelaksanaan' name="lama_pelaksanaan" value="5" style='display:block;width:50%;' placeholder="5"/> Tahun
+				</div>
+				<div>
+					<label for='keterangan' style='display:inline-block'>Keterangan</label>
+					<input type='text' id='keterangan' style='display:block;width:100%;' placeholder='Input Keterangan'>
 				</div>
 			</div> 
 			<div class="modal-footer">
@@ -78,12 +81,13 @@ $body = '';
 
 		globalThis.thisAjaxUrl = "<?php echo admin_url('admin-ajax.php'); ?>"
 
-		get_data_penjadwalan();
+		globalThis.tipe = 'RPJMD'
+		get_data_penjadwalan_rpjmd();
 
 	});
 
 	/** get data penjadwalan */
-	function get_data_penjadwalan(){
+	function get_data_penjadwalan_rpjmd(){
 		jQuery("#wrap-loading").show();
 		globalThis.penjadwalanTable = jQuery('#data_penjadwalan_table').DataTable({
 			"processing": true,
@@ -92,8 +96,9 @@ $body = '';
 				url: thisAjaxUrl,
 				type:"post",
 				data:{
-					'action' 		: "get_data_penjadwalan",
-					'api_key' 		: jQuery("#api_key").val()
+					'action' 		: "get_data_penjadwalan_rpjmd",
+					'api_key' 		: jQuery("#api_key").val(),
+					'tipe' 			: tipe
 				}
 			},
 			"initComplete":function( settings, json){
@@ -105,19 +110,15 @@ $body = '';
 					className: "text-center"
 				},
 				{ 
-					"data": "status",
-					className: "text-center"
-				},
-				{ 
-					"data": "started_at",
-					className: "text-center"
-				},
-				{ 
-					"data": "end_at",
+					"data": "keterangan",
 					className: "text-center"
 				},
 				{ 
 					"data": "tahun_anggaran",
+					className: "text-center"
+				},
+				{ 
+					"data": "tahun_anggaran_selesai",
 					className: "text-center"
 				},
 				{ 
@@ -129,23 +130,37 @@ $body = '';
 	}
 
 	/** show modal tambah jadwal */
-	function tambah_jadwal(){
+	function tambah_jadwal_rpmd(){
 		jQuery("#modalTambahJadwal .modal-title").html("Tambah Penjadwalan");
+		jQuery('#lama_pelaksanaan').val(jQuery('#lama_pelaksanaan'));
 		jQuery("#modalTambahJadwal .submitBtn")
 			.attr("onclick", 'submitTambahJadwalForm()')
 			.attr("disabled", false)
 			.text("Simpan");
 		jQuery('#modalTambahJadwal').modal('show');
+		jQuery.ajax({
+			url: thisAjaxUrl,
+			type:"post",
+			data:{
+				'action' 			: "get_lama_pelaksanaan_rpjmd",
+				'api_key' 			: jQuery("#api_key").val(),
+				'tipe' 				: tipe
+			},
+			dataType: "json",
+			success:function(response){
+				jQuery("#lama_pelaksanaan").val(response.data.lama_pelaksanaan);
+			}
+		})
 	}
 
 	/** Submit tambah jadwal */
 	function submitTambahJadwalForm(){
 		jQuery("#wrap-loading").show()
-		let nama_jadwal = jQuery('#nama').val()
-		let jadwalMulai = jQuery("#jadwal_tanggal").data('daterangepicker').startDate.format('YYYY-MM-DD HH:mm:ss')
-		let jadwalSelesai = jQuery("#jadwal_tanggal").data('daterangepicker').endDate.format('YYYY-MM-DD HH:mm:ss')
+		let nama_jadwal = jQuery('#nama_jadwal').val()
+		let keterangan = jQuery("#keterangan").val()
 		let tahun_anggaran = jQuery("#tahun_anggaran").val()
-		if(nama_jadwal.trim() == '' || jadwalMulai == '' || jadwalSelesai == '' || tahun_anggaran == ''){
+		let lama_pelaksanaan = jQuery("#lama_pelaksanaan").val()
+		if(nama_jadwal.trim() == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == ''){
 			jQuery("#wrap-loading").hide()
 			alert("Ada yang kosong, Harap diisi semua")
 			return false
@@ -155,12 +170,13 @@ $body = '';
 				type: 'post',
 				dataType: 'json',
 				data:{
-					'action'			: 'submit_add_schedule',
+					'action'			: 'submit_jadwal_rpjmd',
 					'api_key'			: jQuery("#api_key").val(),
 					'nama_jadwal'		: nama_jadwal,
-					'jadwal_mulai'		: jadwalMulai,
-					'jadwal_selesai'	: jadwalSelesai,
-					'tahun_anggaran'	: tahun_anggaran
+					'tahun_anggaran'	: tahun_anggaran,
+					'keterangan'		: keterangan,
+					'tipe'				: tipe,
+					'lama_pelaksanaan'	: lama_pelaksanaan
 				},
 				beforeSend: function() {
 					jQuery('.submitBtn').attr('disabled','disabled')
@@ -202,21 +218,21 @@ $body = '';
 			dataType: "json",
 			success:function(response){
 				jQuery("#wrap-loading").hide()
-				jQuery("#nama").val(response.data.nama_jadwal);
+				jQuery("#nama_jadwal").val(response.data.nama_jadwal);
+				jQuery("#keterangan").val(response.data.keterangan);
 				jQuery("#tahun_anggaran").val(response.data.tahun_anggaran);
-				jQuery('#jadwal_tanggal').data('daterangepicker').setStartDate(moment(response.data.started_at).format('DD-MM-YYYY HH:mm'));
-				jQuery('#jadwal_tanggal').data('daterangepicker').setEndDate(moment(response.data.end_at).format('DD-MM-YYYY HH:mm'));
+				jQuery("#lama_pelaksanaan").val(response.data.lama_pelaksanaan);
 			}
 		})
 	}
 
 	function submitEditJadwalForm(id){
 		jQuery("#wrap-loading").show()
-		let nama_jadwal = jQuery('#nama').val()
-		let jadwalMulai = jQuery("#jadwal_tanggal").data('daterangepicker').startDate.format('YYYY-MM-DD HH:mm:ss')
-		let jadwalSelesai = jQuery("#jadwal_tanggal").data('daterangepicker').endDate.format('YYYY-MM-DD HH:mm:ss')
+		let nama_jadwal = jQuery('#nama_jadwal').val()
+		let keterangan = jQuery("#keterangan").val()
 		let tahun_anggaran = jQuery("#tahun_anggaran").val()
-		if(nama_jadwal.trim() == '' || jadwalMulai == '' || jadwalSelesai == '' || tahun_anggaran == ''){
+		let lama_pelaksanaan = jQuery("#lama_pelaksanaan").val()
+		if(nama_jadwal.trim() == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == ''){
 			jQuery("#wrap-loading").hide()
 			alert("Ada yang kosong, Harap diisi semua")
 			return false
@@ -226,13 +242,14 @@ $body = '';
 				type: 'post',
 				dataType: 'json',
 				data:{
-					'action'			: 'submit_edit_schedule',
+					'action'			: 'submit_edit_jadwal_rpjmd',
 					'api_key'			: jQuery("#api_key").val(),
 					'nama_jadwal'		: nama_jadwal,
-					'jadwal_mulai'		: jadwalMulai,
-					'jadwal_selesai'	: jadwalSelesai,
 					'id'				: id,
-					'tahun_anggaran'	: tahun_anggaran
+					'keterangan'		: keterangan,
+					'tahun_anggaran'	: tahun_anggaran,
+					'tipe'				: tipe,
+					'lama_pelaksanaan'	: lama_pelaksanaan
 				},
 				beforeSend: function() {
 					jQuery('.submitBtn').attr('disabled','disabled')
@@ -261,7 +278,7 @@ $body = '';
 				url: thisAjaxUrl,
 				type:'post',
 				data:{
-					'action' 	: 'submit_delete_schedule',
+					'action' 	: 'delete_jadwal_rpjmd',
 					'api_key'	: jQuery("#api_key").val(),
 					'id'		: id
 				},
@@ -279,58 +296,12 @@ $body = '';
 		}
 	}
 
-	function lock_data_penjadwalan(id){
-		let confirmLocked = confirm("Apakah anda yakin akan mengunci penjadwalan?");
-		if(confirmLocked){
-			jQuery('#wrap-loading').show();
-			jQuery.ajax({
-				url: thisAjaxUrl,
-				type:'post',
-				data:{
-					'action' 				: 'submit_lock_schedule_rpjmd',
-					'api_key'				: jQuery("#api_key").val(),
-					'id'		: id
-				},
-				dataType: 'json',
-				success:function(response){
-					jQuery('#wrap-loading').hide();
-					if(response.status == 'success'){
-						alert('Jadwal berhasil dikunci!.');
-						penjadwalanTable.ajax.reload();
-					}else{
-						alert(`GAGAL! \n${response.message}`);
-					}
-				}
-			});
-		}
-	}
-
-	jQuery(function() {
-		jQuery('#jadwal_tanggal').daterangepicker({
-			timePicker: true,
-			timePicker24Hour: true,
-			startDate: moment().startOf('hour'),
-			endDate: moment().startOf('hour').add(32, 'hour'),
-			locale: {
-				format: 'DD-MM-YYYY HH:mm'
-			}
-		});
-	});
-
-	function cannot_change_schedule(jenis){
-		if(jenis == 'kunci'){
-			alert('Tidak bisa kunci karena penjadwalan sudah dikunci');
-		}else if(jenis == 'edit'){
-			alert('Tidak bisa edit karena penjadwalan sudah dikunci');
-		}else if(jenis == 'hapus'){
-			alert('Tidak bisa hapus karena penjadwalan sudah dikunci');
-		}
-	}
-
 	function afterSubmitForm(){
-		jQuery("#nama").val("")
+		jQuery("#nama_jadwal").val("")
+		jQuery("#keterangan").val("")
 		jQuery("#tahun_anggaran").val("")
-		jQuery("#jadwal_tanggal").val("")
+		jQuery("#tipe").val("")
+		jQuery("#lama_pelaksanaan").val("")
 	}
 
 </script> 

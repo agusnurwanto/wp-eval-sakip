@@ -59,8 +59,8 @@ $body = '';
 					<input type="text" id='jadwal_tanggal' name="datetimes" style='display:block;width:100%;'/>
 				</div>
 				<div>
-					<label for='tahun_mulai_anggaran' style='display:inline-block'>Tahun Anggaran</label>
-					<input type="number" id='tahun_mulai_anggaran' name="tahun_mulai_anggaran" style='display:block;width:100%;' placeholder="Tahun Mulai Anggaran"/>
+					<label for='tahun_anggaran' style='display:inline-block'>Tahun Anggaran</label>
+					<input type="number" id='tahun_anggaran' name="tahun_anggaran" style='display:block;width:100%;' placeholder="Tahun Mulai Anggaran"/>
 				</div>
 			</div> 
 			<div class="modal-footer">
@@ -149,8 +149,8 @@ $body = '';
 		let nama_jadwal = jQuery('#nama').val()
 		let jadwalMulai = jQuery("#jadwal_tanggal").data('daterangepicker').startDate.format('YYYY-MM-DD HH:mm:ss')
 		let jadwalSelesai = jQuery("#jadwal_tanggal").data('daterangepicker').endDate.format('YYYY-MM-DD HH:mm:ss')
-		let this_tahun_anggaran = jQuery("#tahun_mulai_anggaran").val()
-		if(nama_jadwal.trim() == '' || jadwalMulai == '' || jadwalSelesai == '' || this_tahun_anggaran == ''){
+		let tahun_anggaran = jQuery("#tahun_anggaran").val()
+		if(nama_jadwal.trim() == '' || jadwalMulai == '' || jadwalSelesai == '' || tahun_anggaran == ''){
 			jQuery("#wrap-loading").hide()
 			alert("Ada yang kosong, Harap diisi semua")
 			return false
@@ -165,7 +165,7 @@ $body = '';
 					'nama_jadwal'		: nama_jadwal,
 					'jadwal_mulai'		: jadwalMulai,
 					'jadwal_selesai'	: jadwalSelesai,
-					'tahun_anggaran'	: this_tahun_anggaran
+					'tahun_anggaran'	: tahun_anggaran
 				},
 				beforeSend: function() {
 					jQuery('.submitBtn').attr('disabled','disabled')
@@ -195,6 +195,23 @@ $body = '';
 			.attr("disabled", false)
 			.text("Simpan");
 		jQuery("#wrap-loading").show()
+		jQuery.ajax({
+			url: thisAjaxUrl,
+			type:"post",
+			data:{
+				'action' 			: "get_data_jadwal_by_id",
+				'api_key' 			: jQuery("#api_key").val(),
+				'id' 	: id
+			},
+			dataType: "json",
+			success:function(response){
+				jQuery("#wrap-loading").hide()
+				jQuery("#nama").val(response.data.nama_jadwal);
+				jQuery("#tahun_anggaran").val(response.data.tahun_anggaran);
+				jQuery('#jadwal_tanggal').data('daterangepicker').setStartDate(moment(response.data.started_at).format('DD-MM-YYYY HH:mm'));
+				jQuery('#jadwal_tanggal').data('daterangepicker').setEndDate(moment(response.data.end_at).format('DD-MM-YYYY HH:mm'));
+			}
+		})
 	}
 
 	function submitEditJadwalForm(id){
@@ -202,8 +219,8 @@ $body = '';
 		let nama_jadwal = jQuery('#nama').val()
 		let jadwalMulai = jQuery("#jadwal_tanggal").data('daterangepicker').startDate.format('YYYY-MM-DD HH:mm:ss')
 		let jadwalSelesai = jQuery("#jadwal_tanggal").data('daterangepicker').endDate.format('YYYY-MM-DD HH:mm:ss')
-		let this_tahun_anggaran = jQuery("#tahun_mulai_anggaran").val()
-		if(nama_jadwal.trim() == '' || jadwalMulai == '' || jadwalSelesai == '' || this_tahun_anggaran == ''){
+		let tahun_anggaran = jQuery("#tahun_anggaran").val()
+		if(nama_jadwal.trim() == '' || jadwalMulai == '' || jadwalSelesai == '' || tahun_anggaran == ''){
 			jQuery("#wrap-loading").hide()
 			alert("Ada yang kosong, Harap diisi semua")
 			return false
@@ -219,7 +236,7 @@ $body = '';
 					'jadwal_mulai'		: jadwalMulai,
 					'jadwal_selesai'	: jadwalSelesai,
 					'id'				: id,
-					'tahun_anggaran'	: this_tahun_anggaran
+					'tahun_anggaran'	: tahun_anggaran
 				},
 				beforeSend: function() {
 					jQuery('.submitBtn').attr('disabled','disabled')
@@ -317,7 +334,7 @@ $body = '';
 
 	function afterSubmitForm(){
 		jQuery("#nama").val("")
-		jQuery("#tahun_mulai_anggaran").val("")
+		jQuery("#tahun_anggaran").val("")
 		jQuery("#jadwal_tanggal").val("")
 	}
 

@@ -239,10 +239,10 @@ CREATE TABLE `esakip_data_jadwal` (
   `keterangan` varchar(255) DEFAULT NULL,
   `started_at` datetime DEFAULT NULL,
   `end_at` datetime DEFAULT NULL,
-  `end_at_evaluasi` datetime DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT '0',
-  `id_desain_lke` int(11) DEFAULT NULL,
   `jenis_jadwal` varchar(30) DEFAULT NULL,
+  `tipe` varchar(30) DEFAULT NULL COMMENT 'RPJMD, LKE',
+  `lama_pelaksanaan` int(11) DEFAULT NULL,
   `tahun_anggaran` year(4) NOT NULL DEFAULT '2022',
   PRIMARY KEY  (id)
 );

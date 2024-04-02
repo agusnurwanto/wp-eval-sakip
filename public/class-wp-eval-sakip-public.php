@@ -5212,8 +5212,7 @@ class Wp_Eval_Sakip_Public
 						2 => 'started_at',
 						3 => 'end_at',
 						4 => 'tahun_anggaran',
-						5 => 'jenis_jadwal',
-						6 => 'id',
+						5 => 'id',
 					);
 					$where = $sqlTot = $sqlRec = "";
 
@@ -5333,11 +5332,9 @@ class Wp_Eval_Sakip_Public
 					$jadwal_selesai		= trim(htmlspecialchars($_POST['jadwal_selesai']));
 					$jadwal_selesai		= date('Y-m-d H:i:s', strtotime($jadwal_selesai));
 					$tahun_anggaran		= trim(htmlspecialchars($_POST['tahun_anggaran']));
-					$jenis_jadwal		= trim(htmlspecialchars($_POST['jenis_jadwal']));
                     $id = $_POST['id'];
 
 					$arr_jadwal = ['usulan', 'penetapan'];
-					$jenis_jadwal = in_array($jenis_jadwal, $arr_jadwal) ? $jenis_jadwal : 'usulan';
 
 					$get_jadwal = $wpdb->get_results($wpdb->prepare("
 						SELECT 
@@ -5370,7 +5367,6 @@ class Wp_Eval_Sakip_Public
 						'tahun_anggaran'	=> $tahun_anggaran,
 						'status'			=> 0,
 						'tahun_anggaran'	=> $tahun_anggaran,
-						'jenis_jadwal'		=> $jenis_jadwal,
 					);
 
 					$wpdb->insert('esakip_data_jadwal', $data_jadwal);
@@ -5415,17 +5411,15 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
-				if (!empty($_POST['id']) && !empty($_POST['nama_jadwal']) && !empty($_POST['jadwal_mulai']) && !empty($_POST['jadwal_selesai']) && !empty($_POST['tahun_anggaran']) && !empty($lama_pelaksanaan)) {
+				if (!empty($_POST['id']) && !empty($_POST['nama_jadwal']) && !empty($_POST['jadwal_mulai']) && !empty($_POST['jadwal_selesai']) && !empty($_POST['tahun_anggaran'])) {
 					$id = trim(htmlspecialchars($_POST['id']));
-					$nama_jadwal		= trim(htmlspecialchars($_POST['nama_jadwal']));
+					$nama_jadwal	= trim(htmlspecialchars($_POST['nama_jadwal']));
 					$jadwal_mulai	= trim(htmlspecialchars($_POST['jadwal_mulai']));
 					$jadwal_mulai	= date('Y-m-d H:i:s', strtotime($jadwal_mulai));
 					$jadwal_selesai	= trim(htmlspecialchars($_POST['jadwal_selesai']));
 					$jadwal_selesai	= date('Y-m-d H:i:s', strtotime($jadwal_selesai));
 					$tahun_anggaran	= trim(htmlspecialchars($_POST['tahun_anggaran']));
 
-					$arr_jadwal = ['usulan', 'penetapan'];
-					$jenis_jadwal = in_array($jenis_jadwal, $arr_jadwal) ? $jenis_jadwal : 'usulan';
 
 					$data_this_id = $wpdb->get_row($wpdb->prepare('SELECT * FROM esakip_data_jadwal WHERE id = %d', $id), ARRAY_A);
 
@@ -5436,9 +5430,8 @@ class Wp_Eval_Sakip_Public
 							$data_jadwal = array(
 								'nama_jadwal' 			=> $nama_jadwal,
 								'started_at'			=> $jadwal_mulai,
-								'end_at'			=> $jadwal_selesai,
-								'tahun_anggaran'		=> $tahun_anggaran,
-								'jenis_jadwal'			=> $jenis_jadwal
+								'end_at'				=> $jadwal_selesai,
+								'tahun_anggaran'		=> $tahun_anggaran
 							);
 
 							$wpdb->update('esakip_data_jadwal', $data_jadwal, array(
@@ -5698,6 +5691,337 @@ class Wp_Eval_Sakip_Public
 						);
 					}
 				
+				} else {
+					$return = array(
+						'status' => 'error',
+						'message'	=> 'Harap diisi semua,tidak boleh ada yang kosong!'
+					);
+				}
+			} else {
+				$return = array(
+					'status' => 'error',
+					'message'	=> 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$return = array(
+				'status' => 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($return));
+	}
+
+	/** Ambil data penjadwalan RPJMD */
+	public function get_data_penjadwalan_rpjmd()
+	{
+		global $wpdb;
+		$return = array(
+			'status' => 'success',
+			'data'	=> array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				if (!empty($_POST['tipe'])) {
+					$params = $columns = $totalRecords = $data = array();
+					$params = $_REQUEST;
+					$columns = array(
+						0 => 'nama_jadwal',
+						1 => 'keterangan',
+						2 => 'tahun_anggaran',
+						3 => 'lama_pelaksanaan',
+						4 => 'tipe',
+						5 => 'id',
+					);
+					$where = $sqlTot = $sqlRec = "";
+
+					// check search value exist
+					if (!empty($params['search']['value'])) {
+						$where .= " AND ( nama LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
+					}
+
+					/** Search id tipe */
+					$tipe = $_POST['tipe'];
+					$get_tipe = $wpdb->get_results($wpdb->prepare("
+						SELECT 
+							* 
+						FROM `esakip_data_jadwal` 
+						WHERE tipe=%s
+					", $tipe), ARRAY_A);
+
+					if (empty($get_tipe)) {
+						$return = array(
+							'status' => 'error',
+							'message'	=> 'Data tidak ditemukan!'
+						);
+						die(json_encode($return));
+					}
+
+					if (!empty($_POST['tahun_anggaran'])) {
+						$where .= $wpdb->prepare(" AND tahun_anggaran = %d", $_POST['tahun_anggaran']);
+					}
+
+					// getting total number records without any search
+					$sqlTot = "SELECT count(*) as jml FROM `esakip_data_jadwal`";
+					$sqlRec = "SELECT " . implode(', ', $columns) . " FROM `esakip_data_jadwal`";
+					if (isset($where) && $where != '') {
+						$sqlTot .= $where;
+						$sqlRec .= $where;
+					}
+
+					$sqlRec .=  $wpdb->prepare(" ORDER BY " . $columns[$params['order'][0]['column']] . "   " . $params['order'][0]['dir'] . "  LIMIT %d ,%d ", $params['start'], $params['length']);
+
+					$queryTot = $wpdb->get_results($sqlTot, ARRAY_A);
+					$totalRecords = $queryTot[0]['jml'];
+					$queryRecords = $wpdb->get_results($sqlRec, ARRAY_A);
+
+					if (!empty($queryRecords)) {
+						foreach ($queryRecords as $recKey => $recVal) {
+							$edit	= '';
+							$delete	= '';
+							$edit	= '<a class="btn btn-sm btn-warning mr-2" style="text-decoration: none;" onclick="edit_data_penjadwalan(\'' . $recVal['id'] . '\'); return false;" href="#" title="Edit data penjadwalan"><i class="dashicons dashicons-edit"></i></a>';
+							$delete	= '<a class="btn btn-sm btn-danger" style="text-decoration: none;" onclick="hapus_data_penjadwalan(\'' . $recVal['id'] . '\'); return false;" href="#" title="Hapus data penjadwalan"><i class="dashicons dashicons-trash"></i></a>';
+
+							$tahun_anggaran_selesai = $recVal['tahun_anggaran'] + $recVal['lama_pelaksanaan'];
+
+							$queryRecords[$recKey]['aksi'] = $report . $lock . $edit . $delete;
+							$queryRecords[$recKey]['nama_jadwal'] = ucfirst($recVal['nama_jadwal']);
+							$queryRecords[$recKey]['tahun_anggaran_selesai'] = $tahun_anggaran_selesai;
+
+						}
+
+						$json_data = array(
+							"draw"            => intval($params['draw']),
+							"recordsTotal"    => intval($totalRecords),
+							"recordsFiltered" => intval($totalRecords),
+							"data"            => $queryRecords,
+						);
+
+						die(json_encode($json_data));
+					} else {
+						$json_data = array(
+							"draw"            => intval($params['draw']),
+							"recordsTotal"    => 0,
+							"recordsFiltered" => 0,
+							"data"            => array(),
+							"message"			=> "Data tidak ditemukan!"
+						);
+
+						die(json_encode($json_data));
+					}
+				} else {
+					$return = array(
+						'status' => 'error',
+						'message'	=> 'Harap diisi semua,tidak boleh ada yang kosong!'
+					);
+				}
+			} else {
+				$return = array(
+					'status' => 'error',
+					'message'	=> 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$return = array(
+				'status' => 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($return));
+	}
+
+	/** Submit data penjadwalan */
+	public function submit_jadwal_rpjmd()
+	{
+		global $wpdb;
+		$return = array(
+			'status' => 'success',
+			'data'	=> array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				if (!empty($_POST['nama_jadwal']) && !empty($_POST['lama_pelaksanaan']) && !empty($_POST['keterangan']) && !empty($_POST['tahun_anggaran'])) {
+					$nama_jadwal	= trim(htmlspecialchars($_POST['nama_jadwal']));
+					$tahun_anggaran	= trim(htmlspecialchars($_POST['tahun_anggaran']));
+					$keterangan		= trim(htmlspecialchars($_POST['keterangan']));
+					$lama_pelaksanaan 	= trim(htmlspecialchars($_POST['lama_pelaksanaan']));
+					$tipe 	= trim(htmlspecialchars($_POST['tipe']));
+
+
+					$data_this_id = $wpdb->get_row($wpdb->prepare('SELECT * FROM esakip_data_jadwal WHERE id = %d', $id), ARRAY_A);
+
+					//update data penjadwalan
+					$data_jadwal = array(
+						'nama_jadwal' 			=> $nama_jadwal,
+						'tahun_anggaran'		=> $tahun_anggaran,
+						'keterangan'			=> $keterangan,
+						'tipe'					=> 'RPJMD',
+						'lama_pelaksanaan'		=> $lama_pelaksanaan
+					);
+
+					$wpdb->insert('esakip_data_jadwal', $data_jadwal);
+
+					$return = array(
+						'status'		=> 'success',
+						'message'		=> 'Berhasil!',
+						'data_jadwal'	=> $data_jadwal
+					);
+				} else {
+					$return = array(
+						'status' => 'error',
+						'message'	=> 'Harap diisi semua,tidak boleh ada yang kosong!'
+					);
+				}
+				
+			} else {
+				$return = array(
+					'status' => 'error',
+					'message'	=> 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$return = array(
+				'status' => 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($return));
+	}
+
+	/** get data default lama pelaksanaan by id */
+	public function get_lama_pelaksanaan_rpjmd()
+	{
+		global $wpdb;
+		$return = array(
+			'status' => 'success',
+			'data'	=> array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				$tipe = $_POST['tipe'];
+
+				$lama_pelaksanaan = $wpdb->get_results($wpdb->prepare('SELECT * FROM esakip_data_jadwal WHERE tipe = %s', $tipe), ARRAY_A);
+
+				$return = array(
+					'status' 						=> 'success',
+					'data' 							=> $lama_pelaksanaan[0]
+				);
+			} else {
+				$return = array(
+					'status'	=> 'error',
+					'message'	=> 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$return = array(
+				'status'	=> 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($return));
+	}
+
+	/** Submit data penjadwalan */
+	public function submit_edit_jadwal_rpjmd()
+	{
+		global $wpdb;
+		$return = array(
+			'status' => 'success',
+			'data'	=> array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				if (!empty($_POST['id']) && !empty($_POST['nama_jadwal']) && !empty($_POST['lama_pelaksanaan']) && !empty($_POST['keterangan']) && !empty($_POST['tahun_anggaran'])) {
+					$id = trim(htmlspecialchars($_POST['id']));
+					$nama_jadwal	= trim(htmlspecialchars($_POST['nama_jadwal']));
+					$tahun_anggaran	= trim(htmlspecialchars($_POST['tahun_anggaran']));
+					$keterangan		= trim(htmlspecialchars($_POST['keterangan']));
+					$lama_pelaksanaan 	= trim(htmlspecialchars($_POST['lama_pelaksanaan']));
+					$tipe 	= trim(htmlspecialchars($_POST['tipe']));
+
+
+					$data_this_id = $wpdb->get_row($wpdb->prepare('SELECT * FROM esakip_data_jadwal WHERE id = %d', $id), ARRAY_A);
+
+					//update data penjadwalan
+					$data_jadwal = array(
+						'nama_jadwal' 			=> $nama_jadwal,
+						'tahun_anggaran'		=> $tahun_anggaran,
+						'keterangan'			=> $keterangan,
+						'tipe'					=> 'RPJMD',
+						'lama_pelaksanaan'		=> $lama_pelaksanaan
+					);
+
+					$wpdb->update('esakip_data_jadwal', $data_jadwal, array(
+						'id'	=> $id
+					));
+
+					$return = array(
+						'status'		=> 'success',
+						'message'		=> 'Berhasil!',
+						'data_jadwal'	=> $data_jadwal
+					);
+				} else {
+					$return = array(
+						'status' => 'error',
+						'message'	=> 'Harap diisi semua,tidak boleh ada yang kosong!'
+					);
+				}
+				
+			} else {
+				$return = array(
+					'status' => 'error',
+					'message'	=> 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$return = array(
+				'status' => 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($return));
+	}
+
+	/** Submit delete data jadwal */
+	public function delete_jadwal_rpjmd()
+	{
+		global $wpdb;
+		$return = array(
+			'status' => 'success',
+			'data'	=> array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				if (!empty($_POST['id'])) {
+					$id = trim(htmlspecialchars($_POST['id']));
+
+					$data_this_id = $wpdb->get_row($wpdb->prepare('
+						SELECT 
+							* 
+						FROM esakip_data_jadwal 
+						WHERE id = %d
+					', $id), ARRAY_A);
+
+					if (!empty($data_this_id)) {
+							$wpdb->delete('esakip_data_jadwal', array(
+								'id' => $id
+							), array('%d'));
+
+							$return = array(
+								'status' => 'success',
+								'message'	=> 'Berhasil!',
+							);
+					} else {
+						$return = array(
+							'status' => 'error',
+							'message'	=> "Data tidak ditemukan!",
+						);
+					}
 				} else {
 					$return = array(
 						'status' => 'error',
