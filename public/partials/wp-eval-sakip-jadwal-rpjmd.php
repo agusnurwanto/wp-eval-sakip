@@ -133,6 +133,9 @@ $body = '';
 	function tambah_jadwal_rpmd(){
 		jQuery("#modalTambahJadwal .modal-title").html("Tambah Penjadwalan");
 		jQuery('#lama_pelaksanaan').val(jQuery('#lama_pelaksanaan'));
+        jQuery('#nama_jadwal').val('').prop('disabled', false);
+        jQuery('#keterangan').val('').prop('disabled', false);
+        jQuery('#tahun_anggaran').val('').prop('disabled', false);
 		jQuery("#modalTambahJadwal .submitBtn")
 			.attr("onclick", 'submitTambahJadwalForm()')
 			.attr("disabled", false)
