@@ -788,6 +788,7 @@ class Wp_Eval_Sakip_Admin
 			} else {
 				$email = $username . '@sipdlocal.com';
 			}
+			$user['jabatan'] = strtolower($user['jabatan']);
 			$role = get_role($user['jabatan']);
 			if (empty($role)) {
 				add_role($user['jabatan'], $user['jabatan'], array(
@@ -809,7 +810,6 @@ class Wp_Eval_Sakip_Admin
 				$insert_user = wp_insert_user($option);
 
 				if (is_wp_error($insert_user)) {
-					//print_r($option);die();
 					return $insert_user;
 				}
 			}
@@ -820,7 +820,7 @@ class Wp_Eval_Sakip_Admin
 
 			$meta = array(
 				'_nip' => $user['nip'],
-				'description' => 'User dibuat dari data SIPD Merah'
+				'description' => 'User dibuat dari data WP-SIPD'
 			);
 			if (!empty($user['id_sub_skpd'])) {
 				$skpd = $wpdb->get_var(
@@ -847,7 +847,7 @@ class Wp_Eval_Sakip_Admin
 		global $wpdb;
 		$ret = array();
 		$ret['status'] = 'success';
-		$ret['message'] = 'Berhasil Generate User Wordpress dari DB Lokal SIPD Merah';
+		$ret['message'] = 'Berhasil Generate User Wordpress dari DB Lokal';
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
 				$users_pa = $wpdb->get_results(
