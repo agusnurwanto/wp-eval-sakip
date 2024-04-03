@@ -153,6 +153,7 @@ CREATE TABLE `esakip_renstra` (
   `id` int(11) NOT NULL auto_increment,
   `opd` varchar(255) DEFAULT NULL,
   `id_skpd` int(11) DEFAULT NULL,
+  `id_jadwal` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` longtext DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
@@ -173,6 +174,7 @@ CREATE TABLE `esakip_rkpd` (
 CREATE TABLE `esakip_rpjmd` (
   `id` int(11) NOT NULL auto_increment,
   `id_skpd` int(11) DEFAULT NULL,
+  `id_jadwal` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` varchar(255) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,

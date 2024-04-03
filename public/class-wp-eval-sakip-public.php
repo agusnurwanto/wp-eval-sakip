@@ -5756,7 +5756,7 @@ class Wp_Eval_Sakip_Public
 						6 => 'id',
 					);
 					$where = $sqlTot = $sqlRec = "";
-					$where = " WHERE tipe = 'LKE' ";
+					$where = " WHERE tipe = 'LKE' AND status != 0";
 
 					// check search value exist
 					if (!empty($params['search']['value'])) {
@@ -5790,19 +5790,19 @@ class Wp_Eval_Sakip_Public
 							$edit	= '';
 							$delete	= '';
 							$lock	= '';
-							if ($recVal['status'] == 0) {
+							if ($recVal['status'] == 1) {
 							$checkOpenedSchedule++;
 							$lock	= '<a class="btn btn-sm btn-success mr-2" style="text-decoration: none;" onclick="lock_data_penjadwalan(\'' . $recVal['id'] . '\'); return false;" href="#" title="Kunci data penjadwalan"><i class="dashicons dashicons-unlock"></i></a>';
 							$edit	= '<a class="btn btn-sm btn-warning mr-2" style="text-decoration: none;" onclick="edit_data_penjadwalan(\'' . $recVal['id'] . '\'); return false;" href="#" title="Edit data penjadwalan"><i class="dashicons dashicons-edit"></i></a>';
 							$delete	= '<a class="btn btn-sm btn-danger" style="text-decoration: none;" onclick="hapus_data_penjadwalan(\'' . $recVal['id'] . '\'); return false;" href="#" title="Hapus data penjadwalan"><i class="dashicons dashicons-trash"></i></a>';
-							} else if ($recVal['status'] == 1) {
+							} else if ($recVal['status'] == 2) {
 								$lock	= '<a class="btn btn-sm btn-success disabled" style="text-decoration: none;" onclick="cannot_change_schedule(\'kunci\'); return false;" href="#" title="Kunci data penjadwalan" aria-disabled="true"><i class="dashicons dashicons-lock"></i></a>'; 
 						}
 
 							$status = array(
-								0 => 'terbuka',
-								1 => 'dikunci',
-								2 => 'selesai'
+								0 => 'hapus',
+								1 => 'active',
+								2 => 'dikunci'
 							);
 
 							$queryRecords[$recKey]['started_at']	= date('d-m-Y H:i', strtotime($recVal['started_at']));
@@ -5861,14 +5861,7 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
-				
-				if (
-					!empty($_POST['nama_jadwal'])
-					&& !empty($_POST['jadwal_mulai'])
-					&& !empty($_POST['jadwal_selesai'])
-					&& !empty($_POST['tahun_anggaran'])
-					&& !empty($_POST['tipe_perencanaan'])
-				) {
+				if (!empty($_POST['nama_jadwal']) && !empty($_POST['jenis_jadwal']) && !empty($_POST['tahun_anggaran'])) {
 					$nama_jadwal		= trim(htmlspecialchars($_POST['nama_jadwal']));
 					$jadwal_mulai		= trim(htmlspecialchars($_POST['jadwal_mulai']));
 					$jadwal_mulai		= date('Y-m-d H:i:s', strtotime($jadwal_mulai));
@@ -5888,7 +5881,7 @@ class Wp_Eval_Sakip_Public
 						WHERE id=%d
 					", $id), ARRAY_A);
 					foreach ($get_jadwal as $jadwal) {
-						if ($jadwal['status'] != 1) {
+						if ($jadwal['status'] != 2) {
 							$return = array(
 								'status' => 'error',
 								'message'	=> 'Masih ada penjadwalan yang terbuka!'
@@ -5912,6 +5905,8 @@ class Wp_Eval_Sakip_Public
 						'tahun_anggaran'	=> $tahun_anggaran,
 						'status'			=> 1,
 						'tahun_anggaran'	=> $tahun_anggaran,
+						'jenis_jadwal'	=> $jenis_jadwal,
+						'tipe'	=> 'LKE',
 					);
 
 					$wpdb->insert('esakip_data_jadwal', $data_jadwal);
@@ -5920,8 +5915,7 @@ class Wp_Eval_Sakip_Public
 						'status'		=> 'success',
 						'message'		=> 'Berhasil!',
 						'data_jadwal'	=> $data_jadwal,
-					);
-					
+					);					
 				} else {
 					$return = array(
 						'status' => 'error',
@@ -5956,7 +5950,7 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
-				if (!empty($_POST['id']) && !empty($_POST['nama_jadwal']) && !empty($_POST['jadwal_mulai']) && !empty($_POST['jadwal_selesai']) && !empty($_POST['tahun_anggaran'])) {
+				if (!empty($_POST['id']) && !empty($_POST['nama_jadwal']) && !empty($_POST['jadwal_mulai']) && !empty($_POST['jadwal_selesai']) && !empty($_POST['jenis_jadwal'])) {
 					$id = trim(htmlspecialchars($_POST['id']));
 					$nama_jadwal	= trim(htmlspecialchars($_POST['nama_jadwal']));
 					$jadwal_mulai	= trim(htmlspecialchars($_POST['jadwal_mulai']));
@@ -5964,18 +5958,21 @@ class Wp_Eval_Sakip_Public
 					$jadwal_selesai	= trim(htmlspecialchars($_POST['jadwal_selesai']));
 					$jadwal_selesai	= date('Y-m-d H:i:s', strtotime($jadwal_selesai));
 					$tahun_anggaran	= trim(htmlspecialchars($_POST['tahun_anggaran']));
+					$tipe 	= trim(htmlspecialchars($_POST['tipe']));
+					$jenis_jadwal 	= trim(htmlspecialchars($_POST['jenis_jadwal']));
 
 
 					$data_this_id = $wpdb->get_row($wpdb->prepare('SELECT * FROM esakip_data_jadwal WHERE id = %d', $id), ARRAY_A);
 
 					if (!empty($data_this_id)) {
-						$status_check = array(0, NULL, 2);
+						$status_check = array(1, NULL);
 						if (in_array($data_this_id['status'], $status_check)) {
 							//update data penjadwalan
 							$data_jadwal = array(
 								'nama_jadwal' 			=> $nama_jadwal,
 								'started_at'			=> $jadwal_mulai,
 								'end_at'				=> $jadwal_selesai,
+								'jenis_jadwal'			=> $jenis_jadwal,
 								'tahun_anggaran'		=> $tahun_anggaran
 							);
 
@@ -6031,9 +6028,6 @@ class Wp_Eval_Sakip_Public
 			'data'	=> array()
 		);
 
-		$user_id = um_user('ID');
-		$user_meta = get_userdata($user_id);
-
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
 				if (!empty($_POST['id'])) {
@@ -6047,9 +6041,9 @@ class Wp_Eval_Sakip_Public
 					', $id), ARRAY_A);
 
 					if (!empty($data_this_id)) {
-						$status_check = array(0, NULL, 2);
+						$status_check = array(1, NULL, 2);
 						if (in_array($data_this_id['status'], $status_check)) {
-							$wpdb->delete('esakip_data_jadwal', array(
+							$wpdb->update('esakip_data_jadwal', array('status' => 0), array(
 								'id' => $id
 							), array('%d'));
 
@@ -6072,7 +6066,7 @@ class Wp_Eval_Sakip_Public
 				} else {
 					$return = array(
 						'status' => 'error',
-						'message'	=> 'Harap diisi semua,tidak boleh ada yang kosong!'
+						'message'	=> 'ID tidak ditemukan!'
 					);
 				}
 			} else {
@@ -6125,11 +6119,11 @@ class Wp_Eval_Sakip_Public
 					$dateTime = new DateTime();
 					$time_now = $dateTime->format('Y-m-d H:i:s');
 					if ($time_now > $data_this_id['started_at']) {
-						$status_check = array(0, NULL, 2);
+						$status_check = array(1, NULL, 2);
 						if (in_array($data_this_id['status'], $status_check)) {
 
 							//lock data penjadwalan
-							$wpdb->update('esakip_data_jadwal', array('end_at' => $time_now, 'status' => 1), array(
+							$wpdb->update('esakip_data_jadwal', array('end_at' => $time_now, 'status' => 2), array(
 								'id'	=> $id
 							));
 
@@ -6449,14 +6443,14 @@ class Wp_Eval_Sakip_Public
 					', $id), ARRAY_A);
 
 					if (!empty($data_this_id)) {
-							$wpdb->delete('esakip_data_jadwal', array(
+							$wpdb->update('esakip_data_jadwal', array('status' => 0), array(
 								'id' => $id
 							), array('%d'));
 
 							$return = array(
 								'status' => 'success',
 								'message'	=> 'Berhasil!',
-							);
+						);
 					} else {
 						$return = array(
 							'status' => 'error',

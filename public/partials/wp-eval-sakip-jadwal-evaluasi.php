@@ -173,6 +173,7 @@ $body = '';
 	/** show modal tambah jadwal */
 	function tambah_jadwal(){
 		jQuery("#modalTambahJadwal .modal-title").html("Tambah Penjadwalan");
+        jQuery('#nama_jadwal').val('').prop('disabled', false);
 		jQuery("#modalTambahJadwal .submitBtn")
 			.attr("onclick", 'submitTambahJadwalForm()')
 			.attr("disabled", false)
@@ -219,6 +220,7 @@ $body = '';
 					'jadwal_mulai'		: jadwalMulai,
 					'jadwal_selesai'	: jadwalSelesai,
 					'jenis_jadwal'		: jenis_jadwal,
+					'tipe'				: tipe,
 					'tahun_anggaran'	: this_tahun_anggaran
 				},
 				beforeSend: function() {
@@ -291,6 +293,7 @@ $body = '';
 					'jadwal_mulai'		: jadwalMulai,
 					'jadwal_selesai'	: jadwalSelesai,
 					'jenis_jadwal'		: jenis_jadwal,
+					'id'		: id,
 					'tipe'				: tipe,
 					'tahun_anggaran'	: this_tahun_anggaran
 				},
