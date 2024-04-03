@@ -289,7 +289,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_table_dokumen_pemda_lain', $plugin_public, 'get_table_dokumen_pemda_lain');
  
 		add_shortcode('desain_lke_sakip', array($plugin_public, 'desain_lke_sakip'));
-		add_shortcode('jadwal_evaluasi', array($plugin_public, 'jadwal_evaluasi'));
+		add_shortcode('jadwal_evaluasi_sakip', array($plugin_public, 'jadwal_evaluasi_sakip'));
 		add_shortcode('halaman_mapping_skpd', array($plugin_public, 'halaman_mapping_skpd'));
 		
 		add_shortcode('renstra', array($plugin_public, 'renstra'));

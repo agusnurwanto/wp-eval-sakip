@@ -781,15 +781,6 @@ class Wp_Eval_Sakip_Admin
 		$get_tahun = $wpdb->get_results('select tahun_anggaran from esakip_data_unit group by tahun_anggaran', ARRAY_A);
 		$list_data = '';
 
-		$jadwal_evaluasi = $this->functions->generatePage(array(
-			'nama_page' => 'Halaman Jadwal',
-			'content' => '[jadwal_evaluasi]',
-			'show_header' => 1,
-			'no_key' => 1,
-			'post_status' => 'private'
-		));
-		$list_data .= '<li><a target="_blank" href="' . $jadwal_evaluasi['url'] . '">' . $jadwal_evaluasi['title'] . '</a></li>';
-
 		$jadwal_rpjmd = $this->functions->generatePage(array(
 				'nama_page' => 'Halaman Jadwal RPJMD / RPD ',
 				'content' => '[jadwal_rpjmd]',
@@ -799,17 +790,17 @@ class Wp_Eval_Sakip_Admin
 			));
 			$list_data .= '<li><a target="_blank" href="' . $jadwal_rpjmd['url'] . '">' . $jadwal_rpjmd['title'] . '</a></li>';
 
-		// $no = 0;
-		// foreach ($get_tahun as $k => $v) {
-		// 	$jadwal_rpjmd = $this->functions->generatePage(array(
-		// 		'nama_page' => 'Halaman Jadwal RPJMD / RPD Tahun | ' . $v['tahun_anggaran'],
-		// 		'content' => '[jadwal_rpjmd tahun=' . $v["tahun_anggaran"] . ']',
-		// 		'show_header' => 1,
-		// 		'no_key' => 1,
-		// 		'post_status' => 'private'
-		// 	));
-		// 	$list_data .= '<li><a target="_blank" href="' . $jadwal_rpjmd['url'] . '">' . $jadwal_rpjmd['title'] . '</a></li>';
-		// }
+		$no = 0;
+		foreach ($get_tahun as $k => $v) {
+			$jadwal_evaluasi = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Jadwal LKE Tahun Anggaran| ' . $v['tahun_anggaran'],
+				'content' => '[jadwal_evaluasi_sakip tahun_anggaran="' . $v["tahun_anggaran"] . '"]',
+				'show_header' => 1,
+				'no_key' => 1,
+				'post_status' => 'private'
+			));
+			$list_data .= '<li><a target="_blank" href="' . $jadwal_evaluasi['url'] . '">' . $jadwal_evaluasi['title'] . '</a></li>';
+		}
 		$label = array(
 			Field::make('html', 'crb_jadwal')
 				->set_html('

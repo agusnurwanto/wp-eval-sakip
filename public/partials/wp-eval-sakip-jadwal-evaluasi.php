@@ -5,6 +5,12 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 global $wpdb;
+$input = shortcode_atts(array(
+    'tahun_anggaran' => ''
+), $atts);
+if (!empty($_GET) && !empty($_GET['tahun_anggaran'])) {
+    $input['tahun_anggaran'] = $wpdb->prepare('%d', $_GET['tahun_anggaran']);
+}
 
 $body = '';
 ?>
@@ -19,7 +25,7 @@ $body = '';
 <div class="cetak">
 	<div style="padding: 10px;margin:0 0 3rem 0;">
 		<input type="hidden" value="<?php echo get_option( '_crb_apikey_esakip' ); ?>" id="api_key">
-	<h1 class="text-center" style="margin:3rem;">Halaman Penjadwalan</h1>
+	<h1 class="text-center" style="margin:3rem;">Halaman Penjadwalan Tahun <?php echo $input['tahun_anggaran']; ?></h1>
 		<div style="margin-bottom: 25px;">
 			<button class="btn btn-primary tambah_jadwal" onclick="tambah_jadwal();">Tambah Jadwal</button>
 		</div>
@@ -30,6 +36,7 @@ $body = '';
 					<th class="text-center">Status</th>
 					<th class="text-center">Jadwal Mulai</th>
 					<th class="text-center">Jadwal Selesai</th>
+					<th class="text-center">Jenis Jadwal</th>
 					<th class="text-center">Tahun Anggaran</th>
 					<th class="text-center" style="width: 150px;">Aksi</th>
 				</tr>
@@ -51,17 +58,24 @@ $body = '';
 			</div>
 			<div class="modal-body">
 				<div>
-					<label for='nama' style='display:inline-block'>Nama Jadwal</label>
-					<input type='text' id='nama' style='display:block;width:100%;' placeholder='Nama Jadwal'>
+					<label for='nama_jadwal' style='display:inline-block'>Nama Jadwal</label>
+					<input type='text' id='nama_jadwal' style='display:block;width:100%;' placeholder='Nama Jadwal'>
 				</div>
 				<div>
 					<label for='jadwal_tanggal' style='display:inline-block'>Jadwal Pelaksanaan</label>
 					<input type="text" id='jadwal_tanggal' name="datetimes" style='display:block;width:100%;'/>
 				</div>
 				<div>
-					<label for='tahun_anggaran' style='display:inline-block'>Tahun Anggaran</label>
-					<input type="number" id='tahun_anggaran' name="tahun_anggaran" style='display:block;width:100%;' placeholder="Tahun Mulai Anggaran"/>
+					<label for="jenis_jadwal" style='display:inline-block'>Pilih Jenis Jadwal</label>
+					<select id="jenis_jadwal" style='display:block;width: 100%;'>
+						<option value="usulan" selected>Usulan</option>
+						<option value="penetapan">Penetapan</option>
+					</select>
 				</div>
+				<!-- <div>
+					<label for='lama_pelaksanaan' style='display:block'>Lama Pelaksanaan</label>
+					<input type="number" id='lama_pelaksanaan' name="lama_pelaksanaan" value="1" style='display:inline-block;width:50%;' placeholder="1"/> Tahun
+				</div> -->
 			</div> 
 			<div class="modal-footer">
 				<button class="btn btn-primary submitBtn" onclick="submitTambahJadwalForm()">Simpan</button>
@@ -77,8 +91,25 @@ $body = '';
 	jQuery(document).ready(function(){
 
 		globalThis.thisAjaxUrl = "<?php echo admin_url('admin-ajax.php'); ?>"
-
+		globalThis.tahun_anggaran = "<?php echo $input['tahun_anggaran']; ?>"
+		globalThis.tipe = 'LKE'
 		get_data_penjadwalan();
+		jQuery('#selectYears').on('change', function(e) {
+			let selectedVal = jQuery(this).find('option:selected').val();
+			if (selectedVal != '') {
+				window.location = selectedVal;
+			}
+		});
+
+		jQuery('#jadwal_tanggal').daterangepicker({
+			timePicker: true,
+			timePicker24Hour: true,
+			startDate: moment().startOf('hour'),
+			endDate: moment().startOf('hour').add(32, 'hour'),
+			locale: {
+				format: 'DD-MM-YYYY HH:mm'
+			}
+		});
 
 	});
 
@@ -93,7 +124,9 @@ $body = '';
 				type:"post",
 				data:{
 					'action' 		: "get_data_penjadwalan",
-					'api_key' 		: jQuery("#api_key").val()
+					'api_key' 		: jQuery("#api_key").val(),
+					'tipe'			: tipe,
+                    'tahun_anggaran': '<?php echo $input['tahun_anggaran']; ?>'
 				}
 			},
 			"initComplete":function( settings, json){
@@ -122,6 +155,10 @@ $body = '';
 					className: "text-center"
 				},
 				{ 
+					"data": "jenis_jadwal",
+					className: "text-center"
+				},
+				{ 
 					"data": "tahun_anggaran",
 					className: "text-center"
 				},
@@ -141,16 +178,32 @@ $body = '';
 			.attr("disabled", false)
 			.text("Simpan");
 		jQuery('#modalTambahJadwal').modal('show');
+		// jQuery.ajax({
+		// 	url: thisAjaxUrl,
+		// 	type:"post",
+		// 	data:{
+		// 		'action' 			: "get_lama_pelaksanaan",
+		// 		'api_key' 			: jQuery("#api_key").val(),
+		// 		'tipe' 				: tipe
+		// 		'tahun_anggaran'	: <? echo $input['tahun_anggaran']; ?>
+		// 	},
+		// 	dataType: "json",
+		// 	success:function(response){
+		// 		jQuery("#lama_pelaksanaan").val(response.data.lama_pelaksanaan);
+		// 	}
+		// })
 	}
 
 	/** Submit tambah jadwal */
 	function submitTambahJadwalForm(){
 		jQuery("#wrap-loading").show()
-		let nama_jadwal = jQuery('#nama').val()
+		let this_tahun_anggaran = tahun_anggaran;
+		let nama_jadwal = jQuery('#nama_jadwal').val()
 		let jadwalMulai = jQuery("#jadwal_tanggal").data('daterangepicker').startDate.format('YYYY-MM-DD HH:mm:ss')
 		let jadwalSelesai = jQuery("#jadwal_tanggal").data('daterangepicker').endDate.format('YYYY-MM-DD HH:mm:ss')
-		let tahun_anggaran = jQuery("#tahun_anggaran").val()
-		if(nama_jadwal.trim() == '' || jadwalMulai == '' || jadwalSelesai == '' || tahun_anggaran == ''){
+		let jenis_jadwal = 1;
+		jenis_jadwal = jQuery("#jenis_jadwal").val();
+		if(nama_jadwal.trim() == '' || jadwalMulai == '' || jadwalSelesai == '' || jenis_jadwal == ''){
 			jQuery("#wrap-loading").hide()
 			alert("Ada yang kosong, Harap diisi semua")
 			return false
@@ -165,7 +218,8 @@ $body = '';
 					'nama_jadwal'		: nama_jadwal,
 					'jadwal_mulai'		: jadwalMulai,
 					'jadwal_selesai'	: jadwalSelesai,
-					'tahun_anggaran'	: tahun_anggaran
+					'jenis_jadwal'		: jenis_jadwal,
+					'tahun_anggaran'	: this_tahun_anggaran
 				},
 				beforeSend: function() {
 					jQuery('.submitBtn').attr('disabled','disabled')
@@ -206,8 +260,8 @@ $body = '';
 			dataType: "json",
 			success:function(response){
 				jQuery("#wrap-loading").hide()
-				jQuery("#nama").val(response.data.nama_jadwal);
-				jQuery("#tahun_anggaran").val(response.data.tahun_anggaran);
+				jQuery("#nama_jadwal").val(response.data.nama_jadwal);
+					jQuery("#jenis_jadwal").val(response.data.jenis_jadwal).change();
 				jQuery('#jadwal_tanggal').data('daterangepicker').setStartDate(moment(response.data.started_at).format('DD-MM-YYYY HH:mm'));
 				jQuery('#jadwal_tanggal').data('daterangepicker').setEndDate(moment(response.data.end_at).format('DD-MM-YYYY HH:mm'));
 			}
@@ -216,11 +270,12 @@ $body = '';
 
 	function submitEditJadwalForm(id){
 		jQuery("#wrap-loading").show()
-		let nama_jadwal = jQuery('#nama').val()
+		let this_tahun_anggaran = tahun_anggaran;
+		let nama_jadwal = jQuery('#nama_jadwal').val()
 		let jadwalMulai = jQuery("#jadwal_tanggal").data('daterangepicker').startDate.format('YYYY-MM-DD HH:mm:ss')
 		let jadwalSelesai = jQuery("#jadwal_tanggal").data('daterangepicker').endDate.format('YYYY-MM-DD HH:mm:ss')
-		let tahun_anggaran = jQuery("#tahun_anggaran").val()
-		if(nama_jadwal.trim() == '' || jadwalMulai == '' || jadwalSelesai == '' || tahun_anggaran == ''){
+		let jenis_jadwal = jQuery("#jenis_jadwal").val();
+		if(nama_jadwal.trim() == '' || jadwalMulai == '' || jadwalSelesai == '' || jenis_jadwal == ''){
 			jQuery("#wrap-loading").hide()
 			alert("Ada yang kosong, Harap diisi semua")
 			return false
@@ -235,8 +290,9 @@ $body = '';
 					'nama_jadwal'		: nama_jadwal,
 					'jadwal_mulai'		: jadwalMulai,
 					'jadwal_selesai'	: jadwalSelesai,
-					'id'				: id,
-					'tahun_anggaran'	: tahun_anggaran
+					'jenis_jadwal'		: jenis_jadwal,
+					'tipe'				: tipe,
+					'tahun_anggaran'	: this_tahun_anggaran
 				},
 				beforeSend: function() {
 					jQuery('.submitBtn').attr('disabled','disabled')
@@ -309,18 +365,6 @@ $body = '';
 			});
 		}
 	}
-
-	jQuery(function() {
-		jQuery('#jadwal_tanggal').daterangepicker({
-			timePicker: true,
-			timePicker24Hour: true,
-			startDate: moment().startOf('hour'),
-			endDate: moment().startOf('hour').add(32, 'hour'),
-			locale: {
-				format: 'DD-MM-YYYY HH:mm'
-			}
-		});
-	});
 
 	function cannot_change_schedule(jenis){
 		if(jenis == 'kunci'){

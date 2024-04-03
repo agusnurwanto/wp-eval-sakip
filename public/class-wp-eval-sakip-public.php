@@ -122,7 +122,7 @@ class Wp_Eval_Sakip_Public
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-desain-lke-sakip.php';
 	}
 
-	public function jadwal_evaluasi()
+	public function jadwal_evaluasi_sakip($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
 		if (!empty($_GET) && !empty($_GET['POST'])) {
@@ -5751,17 +5751,18 @@ class Wp_Eval_Sakip_Public
 						1 => 'status',
 						2 => 'started_at',
 						3 => 'end_at',
-						4 => 'tahun_anggaran',
-						5 => 'id',
+						4 => 'jenis_jadwal',
+						5 => 'tahun_anggaran',
+						6 => 'id',
 					);
 					$where = $sqlTot = $sqlRec = "";
-					$where = " WHERE tipe IS NULL ";
+					$where = " WHERE tipe = 'LKE' ";
 
 					// check search value exist
 					if (!empty($params['search']['value'])) {
 						$where .= " AND ( nama_jadwal LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
 						$where .= " OR started_at LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
-						$where .= " OR end_at LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
+						$where .= " OR jenis_jadwal LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
 					}
 
 					if (!empty($_POST['tahun_anggaran'])) {
@@ -5806,7 +5807,7 @@ class Wp_Eval_Sakip_Public
 
 							$queryRecords[$recKey]['started_at']	= date('d-m-Y H:i', strtotime($recVal['started_at']));
 							$queryRecords[$recKey]['end_at']	= date('d-m-Y H:i', strtotime($recVal['end_at']));
-							$queryRecords[$recKey]['aksi'] = $report . $lock . $edit . $delete;
+							$queryRecords[$recKey]['aksi'] = $lock . $edit . $delete;
 							$queryRecords[$recKey]['nama_jadwal'] = ucfirst($recVal['nama_jadwal']);
 							$queryRecords[$recKey]['status'] = $status[$recVal['status']];
 						}
@@ -5866,6 +5867,7 @@ class Wp_Eval_Sakip_Public
 					&& !empty($_POST['jadwal_mulai'])
 					&& !empty($_POST['jadwal_selesai'])
 					&& !empty($_POST['tahun_anggaran'])
+					&& !empty($_POST['tipe_perencanaan'])
 				) {
 					$nama_jadwal		= trim(htmlspecialchars($_POST['nama_jadwal']));
 					$jadwal_mulai		= trim(htmlspecialchars($_POST['jadwal_mulai']));
@@ -5873,9 +5875,11 @@ class Wp_Eval_Sakip_Public
 					$jadwal_selesai		= trim(htmlspecialchars($_POST['jadwal_selesai']));
 					$jadwal_selesai		= date('Y-m-d H:i:s', strtotime($jadwal_selesai));
 					$tahun_anggaran		= trim(htmlspecialchars($_POST['tahun_anggaran']));
-                    $id = $_POST['id'];
+					$tipe 	= trim(htmlspecialchars($_POST['tipe']));
+					$jenis_jadwal		= trim(htmlspecialchars($_POST['jenis_jadwal']));
 
 					$arr_jadwal = ['usulan', 'penetapan'];
+					$jenis_jadwal = in_array($jenis_jadwal, $arr_jadwal) ? $jenis_jadwal : 'usulan';
 
 					$get_jadwal = $wpdb->get_results($wpdb->prepare("
 						SELECT 
@@ -5904,9 +5908,9 @@ class Wp_Eval_Sakip_Public
 					$data_jadwal = array(
 						'nama_jadwal' 		=> $nama_jadwal,
 						'started_at'		=> $jadwal_mulai,
-						'end_at'		=> $jadwal_selesai,
+						'end_at'			=> $jadwal_selesai,
 						'tahun_anggaran'	=> $tahun_anggaran,
-						'status'			=> 0,
+						'status'			=> 1,
 						'tahun_anggaran'	=> $tahun_anggaran,
 					);
 
