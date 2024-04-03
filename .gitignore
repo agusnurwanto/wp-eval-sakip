@@ -1,1 +1,4 @@
 public/media/dokumen/*.pdf
+public/media/dokumen/*.PDF
+public/media/dokumen/dokumen_kabupaten/*.pdf
+public/media/dokumen/dokumen_kabupaten/*.PDF
