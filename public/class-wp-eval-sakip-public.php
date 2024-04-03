@@ -6298,6 +6298,7 @@ class Wp_Eval_Sakip_Public
 						'tahun_anggaran'		=> $tahun_anggaran,
 						'keterangan'			=> $keterangan,
 						'tipe'					=> 'RPJMD',
+						'status'					=> '1',
 						'lama_pelaksanaan'		=> $lama_pelaksanaan
 					);
 
