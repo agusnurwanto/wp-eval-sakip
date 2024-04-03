@@ -9,7 +9,8 @@ $input = shortcode_atts(array(
 	'tahun' => '2022'
 ), $atts);
 
-$idtahun = $wpdb->get_results("
+$idtahun = $wpdb->get_results(
+	"
 		SELECT DISTINCT 
 			tahun_anggaran 
 		FROM esakip_data_unit",
@@ -109,6 +110,9 @@ foreach ($dokumen_unset as $kk => $vv) {
 	<div class="cetak">
 		<div style="padding: 10px;margin:0 0 3rem 0;">
 			<h1 class="text-center table-title">Dokumen RENJA / RKT Tahun <?php echo $input['tahun']; ?></h1>
+			<div style="margin-bottom: 25px;">
+				<button class="btn btn-primary" onclick="refreshPage();"><i class="dashicons dashicons-plus"></i> Refresh Page</button>
+			</div>
 			<div class="wrap-table">
 				<table cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
 					<thead>
@@ -167,7 +171,7 @@ foreach ($dokumen_unset as $kk => $vv) {
 						<select class="form-control" id="tahunAnggaran" name="tahunAnggaran">
 							<?php echo $tahun; ?>
 						</select>
-						<input type="hidden" id="idDokumen" value=""> 
+						<input type="hidden" id="idDokumen" value="">
 					</div>
 					<button type="submit" class="btn btn-primary" onclick="submit_tahun_renja_rkt(); return false">Simpan</button>
 				</form>
@@ -177,6 +181,10 @@ foreach ($dokumen_unset as $kk => $vv) {
 </div>
 
 <script>
+	function refreshPage() {
+		location.reload();
+	}
+
 	function set_tahun_dokumen(id) {
 		jQuery('#tahunModal').modal('show');
 		jQuery('#idDokumen').val(id);

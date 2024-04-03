@@ -292,7 +292,9 @@ class Wp_Eval_Sakip {
 		add_shortcode('jadwal_evaluasi_sakip', array($plugin_public, 'jadwal_evaluasi_sakip'));
 		add_shortcode('halaman_mapping_skpd', array($plugin_public, 'halaman_mapping_skpd'));
 		
-		add_shortcode('renstra', array($plugin_public, 'renstra'));
+		add_shortcode('upload_dokumen_renstra', array($plugin_public, 'upload_dokumen_renstra'));
+		add_shortcode('upload_dokumen_rpjmd', array($plugin_public, 'upload_dokumen_rpjmd'));
+
 		add_shortcode('renja_rkt', array($plugin_public, 'renja_rkt'));
 		add_shortcode('perjanjian_kinerja', array($plugin_public, 'perjanjian_kinerja'));
 		add_shortcode('rencana_aksi', array($plugin_public, 'rencana_aksi'));

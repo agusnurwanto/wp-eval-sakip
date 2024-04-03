@@ -6,9 +6,19 @@ if (!defined('WPINC')) {
 }
 
 $input = shortcode_atts(array(
-    'tahun' => '2022',
+    'periode' => '',
 ), $atts);
 
+$data_jadwal = $wpdb->get_row(
+    $wpdb->prepare("
+        SELECT *
+        FROM esakip_data_jadwal
+        WHERE id = %d
+    ", $input['periode']),
+    ARRAY_A
+);
+
+$tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan'];
 ?>
 <style type="text/css">
     .wrap-table {
@@ -32,7 +42,7 @@ $input = shortcode_atts(array(
 <div class="container-md">
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Dokumen RPJMD<br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
+            <h1 class="text-center" style="margin:3rem;">Dokumen RPJMD<br><?php echo $data_jadwal['nama_jadwal'] . ' (' . $data_jadwal['tahun_anggaran'] . ' - ' . $tahun_periode . ')';?></h1>
             <div style="margin-bottom: 25px;">
                 <button class="btn btn-primary" onclick="tambah_dokumen_rpjmd();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
             </div>
@@ -41,7 +51,6 @@ $input = shortcode_atts(array(
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
-                            <th class="text-center">Perangkat Daerah</th>
                             <th class="text-center">Nama Dokumen</th>
                             <th class="text-center">Keterangan</th>
                             <th class="text-center">Waktu Upload</th>
@@ -69,13 +78,8 @@ $input = shortcode_atts(array(
             </div>
             <div class="modal-body">
                 <form enctype="multipart/form-data">
-                    <input type="hidden" value="<?php echo $id_skpd; ?>" id="idSkpd">
-                    <input type="hidden" value="<?php echo $input['tahun']; ?>" id="tahunAnggaran">
+                    <input type="hidden" value="<?php echo $data_jadwal['tahun_anggaran']; ?>" id="tahunAnggaran">
                     <input type="hidden" value="" id="idDokumen">
-                    <div class="form-group">
-                        <label for="perangkatDaerah">Perangkat Daerah</label>
-                        <input type="text" class="form-control" id="perangkatDaerah" name="perangkatDaerah" style="text-transform: uppercase;" value="<?php echo $skpd['nama_skpd']; ?>" disabled>
-                    </div>
                     <div class="form-group">
                         <label for="fileUpload">Pilih File</label>
                         <input type="file" class="form-control-file" id="fileUpload" name="fileUpload" accept="application/pdf" required>
@@ -107,8 +111,7 @@ $input = shortcode_atts(array(
             data: {
                 action: 'get_table_rpjmd',
                 api_key: esakip.api_key,
-                id_skpd: <?php echo $id_skpd; ?>,
-                tahun_anggaran: '<?php echo $input['tahun'] ?>'
+                tahun_anggaran: '<?php echo $data_jadwal['tahun_anggaran'] ?>'
             },
             dataType: 'json',
             success: function(response) {
@@ -154,7 +157,7 @@ $input = shortcode_atts(array(
                 console.log(response);
                 if (response.status === 'success') {
                     let data = response.data;
-                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + data.dokumen;
+                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/'; ?>' + data.dokumen;
                     jQuery("#idDokumen").val(data.id);
                     jQuery("#fileUpload").val('');
                     jQuery('#fileUploadExisting').attr('href', url).html(data.dokumen);
@@ -178,14 +181,6 @@ $input = shortcode_atts(array(
     function submit_dokumen(that) {
         let id_dokumen = jQuery("#idDokumen").val();
 
-        let skpd = jQuery("#perangkatDaerah").val();
-        if (skpd == '') {
-            return alert('Perangkat Daerah tidak boleh kosong');
-        }
-        let idSkpd = jQuery("#idSkpd").val();
-        if (idSkpd == '') {
-            return alert('Id Skpd tidak boleh kosong');
-        }
         let keterangan = jQuery("#keterangan").val();
         if (keterangan == '') {
             return alert('Keterangan tidak boleh kosong');
@@ -203,8 +198,6 @@ $input = shortcode_atts(array(
         form_data.append('action', 'tambah_dokumen_rpjmd');
         form_data.append('api_key', esakip.api_key);
         form_data.append('id_dokumen', id_dokumen);
-        form_data.append('skpd', skpd);
-        form_data.append('idSkpd', idSkpd);
         form_data.append('keterangan', keterangan);
         form_data.append('tahunAnggaran', tahunAnggaran);
         form_data.append('fileUpload', fileDokumen);
@@ -237,7 +230,7 @@ $input = shortcode_atts(array(
     }
 
     function lihatDokumen(dokumen) {
-        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + dokumen;
+        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/'; ?>' + dokumen;
         window.open(url, '_blank');
     }
 

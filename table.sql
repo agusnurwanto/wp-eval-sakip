@@ -74,6 +74,7 @@ CREATE TABLE `esakip_lkjip_lppd` (
   `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` varchar(255) DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
@@ -84,6 +85,7 @@ CREATE TABLE `esakip_other_file` (
   `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` varchar(255) DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
@@ -166,6 +168,7 @@ CREATE TABLE `esakip_rkpd` (
   `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` varchar(255) DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
@@ -177,6 +180,7 @@ CREATE TABLE `esakip_rpjmd` (
   `id_jadwal` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` varchar(255) DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)

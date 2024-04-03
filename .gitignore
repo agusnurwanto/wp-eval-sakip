@@ -1,4 +1,8 @@
 public/media/dokumen/*.pdf
+<<<<<<< HEAD
 public/media/dokumen/*.PDF
 public/media/dokumen/dokumen_kabupaten/*.pdf
 public/media/dokumen/dokumen_kabupaten/*.PDF
+=======
+public/media/dokumen/dokumen_pemda/*.pdf
+>>>>>>> a3c2ed5 (fix upload dokumen dengan periode)
