@@ -314,28 +314,6 @@ class Wp_Eval_Sakip_Admin
 								</ul>
 							</div>
 						</div>';
-					} else if (!empty($_POST['type']) && $_POST['type'] == 'jadwal_rpjmd') {
-						$jadwal_rpjmd = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Jadwal RPJMD / RPD Tahun | ' . $tahun_item['tahun_anggaran'],
-							'content' => '[jadwal_rpjmd tahun=' . $tahun_item["tahun_anggaran"] . ']',
-							'show_header' => 1,
-							'no_key' => 1,
-							'post_status' => 'private'
-						));
-						$jadwal_evaluasi = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Jadwal',
-							'content' => '[jadwal_evaluasi]',
-							'show_header' => 1,
-							'no_key' => 1,
-							'post_status' => 'private'
-						));
-						$body_pemda = '
-						<div class="accordion">
-								<ol style="margin-left: 20px;">
-									<li><a target="_blank" href="' . $jadwal_evaluasi['url'] . '">' . $jadwal_evaluasi['title'] . '</a></li>
-									<li><a target="_blank" href="' . $jadwal_rpjmd['url'] . '">' . $jadwal_rpjmd['title'] . '</a></li>
-								</ol>
-						</div>';
 					}
 					$ret['message'] .= $body_pemda;
 				}
@@ -483,7 +461,7 @@ class Wp_Eval_Sakip_Admin
 						</style>
 					')
 			))
-			->add_fields($this->get_ajax_field(array('type' => 'jadwal_rpjmd')));
+			->add_fields($this->generate_jadwal());
 
 		$pengisian_lke_menu = Container::make('theme_options', __('Pengisian LKE SAKIP'))
 			->set_page_menu_position(3.1)
@@ -731,6 +709,50 @@ class Wp_Eval_Sakip_Admin
 	            	</ol>
 		        	')
 			));
+	}
+
+	public function generate_jadwal()
+	{
+		global $wpdb;
+		$get_tahun = $wpdb->get_results('select tahun_anggaran from esakip_data_unit group by tahun_anggaran', ARRAY_A);
+		$list_data = '';
+
+		$jadwal_evaluasi = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman Jadwal',
+			'content' => '[jadwal_evaluasi]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+		$list_data .= '<li><a target="_blank" href="' . $jadwal_evaluasi['url'] . '">' . $jadwal_evaluasi['title'] . '</a></li>';
+
+		$jadwal_rpjmd = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Jadwal RPJMD / RPD ',
+				'content' => '[jadwal_rpjmd]',
+				'show_header' => 1,
+				'no_key' => 1,
+				'post_status' => 'private'
+			));
+			$list_data .= '<li><a target="_blank" href="' . $jadwal_rpjmd['url'] . '">' . $jadwal_rpjmd['title'] . '</a></li>';
+
+		// $no = 0;
+		// foreach ($get_tahun as $k => $v) {
+		// 	$jadwal_rpjmd = $this->functions->generatePage(array(
+		// 		'nama_page' => 'Halaman Jadwal RPJMD / RPD Tahun | ' . $v['tahun_anggaran'],
+		// 		'content' => '[jadwal_rpjmd tahun=' . $v["tahun_anggaran"] . ']',
+		// 		'show_header' => 1,
+		// 		'no_key' => 1,
+		// 		'post_status' => 'private'
+		// 	));
+		// 	$list_data .= '<li><a target="_blank" href="' . $jadwal_rpjmd['url'] . '">' . $jadwal_rpjmd['title'] . '</a></li>';
+		// }
+		$label = array(
+			Field::make('html', 'crb_jadwal')
+				->set_html('
+            		<ol>' . $list_data . '</ol>
+            	')
+		);
+		return $label;
 	}
 
 	function sql_migrate_esakip()

@@ -6198,12 +6198,6 @@ class Wp_Eval_Sakip_Public
 						$where .= " AND ( nama LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
 					}
 
-					/** Search id tipe */
-
-					if (!empty($_POST['tahun_anggaran'])) {
-						$where .= $wpdb->prepare(" AND tahun_anggaran = %d", $_POST['tahun_anggaran']);
-					}
-
 					// getting total number records without any search
 					$sqlTot = "SELECT count(*) as jml FROM `esakip_data_jadwal`";
 					$sqlRec = "SELECT " . implode(', ', $columns) . " FROM `esakip_data_jadwal`";
