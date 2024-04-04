@@ -171,7 +171,6 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_data_unit_wpsipd', $plugin_admin, 'get_data_unit_wpsipd');
 		$this->loader->add_action('wp_ajax_esakip_load_ajax_carbon', $plugin_admin, 'esakip_load_ajax_carbon');
 		
-		
 		$this->loader->add_action('carbon_fields_register_fields', $plugin_admin, 'crb_attach_esakip_options');
 	}
 
@@ -326,6 +325,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('dokumen_detail_evaluasi_internal', array($plugin_public, 'dokumen_detail_evaluasi_internal'));
 		add_shortcode('dokumen_detail_iku', array($plugin_public, 'dokumen_detail_iku'));
 		add_shortcode('dokumen_detail_laporan_kinerja', array($plugin_public, 'dokumen_detail_laporan_kinerja'));
+		add_shortcode('menu_eval_sakip', array($plugin_public, 'menu_eval_sakip'));
 		
 	}
 

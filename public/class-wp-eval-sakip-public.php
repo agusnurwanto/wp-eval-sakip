@@ -6566,4 +6566,254 @@ class Wp_Eval_Sakip_Public
 		}
 		die(json_encode($ret));
 	}
+
+	function menu_eval_sakip(){
+		global $wpdb;
+		$user_id = um_user('ID');
+		$user_meta = get_userdata($user_id);
+		if (!empty($_GET) && !empty($_GET['tahun'])) {
+			echo '<h1 class="text-center">TAHUN ANGGARAN TERPILIH<br>' . $_GET['tahun'] . '</h1>';
+		}
+		if (empty($user_meta->roles)) {
+			return 'User ini tidak dapat akses sama sekali :)';
+		}
+
+		$this->pilih_tahun_anggaran();
+		if (empty($_GET) || empty($_GET['tahun'])) {
+			return;
+		}
+
+		$url_upload_dokumen_rpjm = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman upload dokumen RPJMD dan RENSTRA per Periode',
+			'content' => '[upload_dokumen_rpjm_admin]',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		if (
+			in_array("administrator", $user_meta->roles)
+			|| in_array("admin_bappeda", $user_meta->roles)
+			|| in_array("admin_ortala", $user_meta->roles)
+		){
+			$renja_rkt = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Dokumen RENJA/RKT Tahun ' . $_GET['tahun'],
+				'content' => '[renja_rkt tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$skp = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Dokumen SKP Tahun ' . $_GET['tahun'],
+				'content' => '[skp tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$rencana_aksi = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Dokumen Rencana Aksi Tahun ' . $_GET['tahun'],
+				'content' => '[rencana_aksi tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$iku = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Dokumen IKU Tahun ' . $_GET['tahun'],
+				'content' => '[iku tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$pengukuran_kinerja = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Dokumen Pengukuran Kinerja Tahun ' . $_GET['tahun'],
+				'content' => '[pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$pengukuran_rencana_aksi = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Dokumen Pengukuran Rencana Aksi Tahun ' . $_GET['tahun'],
+				'content' => '[pengukuran_rencana_aksi tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$laporan_kinerja = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Dokumen Laporan Kinerja Tahun ' . $_GET['tahun'],
+				'content' => '[laporan_kinerja tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$evaluasi_internal = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Dokumen Evaluasi Internal Tahun ' . $_GET['tahun'],
+				'content' => '[evaluasi_internal tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$dokumen_lainnya = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Dokumen Lain Tahun ' . $_GET['tahun'],
+				'content' => '[dokumen_lainnya tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$perjanjian_kinerja = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Dokumen Perjanjian Kinerja Tahun ' . $_GET['tahun'],
+				'content' => '[perjanjian_kinerja tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$rkpd = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman RKPD Tahun ' . $_GET['tahun'],
+				'content' => '[rkpd tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$dokumen_pemda_lainnya = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Dokumen Lainnya Tahun ' . $_GET['tahun'],
+				'content' => '[dokumen_pemda_lainnya tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$lkjip_lppd = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman LKJIP/LPPD  ' . $_GET['tahun'],
+				'content' => '[lkjip_lppd tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			echo '
+				<ul class="daftar-tahun text_tengah">
+					<li><a href="' . $url_upload_dokumen_rpjm['url'] . '" target="_blank" class="btn btn-warning">' . $url_upload_dokumen_rpjm['title'] . '</a></li>
+					<li><a href="' . $renja_rkt['url'] . '" target="_blank">' . $renja_rkt['title'] . '</a></li>
+					<li><a href="' . $skp['url'] . '" target="_blank">' . $skp['title'] . '</a></li>
+					<li><a href="' . $rencana_aksi['url'] . '" target="_blank">' . $rencana_aksi['title'] . '</a></li>
+					<li><a href="' . $iku['url'] . '" target="_blank">' . $iku['title'] . '</a></li>
+					<li><a href="' . $pengukuran_kinerja['url'] . '" target="_blank">' . $pengukuran_kinerja['title'] . '</a></li>
+					<li><a href="' . $pengukuran_rencana_aksi['url'] . '" target="_blank">' . $pengukuran_rencana_aksi['title'] . '</a></li>
+					<li><a href="' . $laporan_kinerja['url'] . '" target="_blank">' . $laporan_kinerja['title'] . '</a></li>
+					<li><a href="' . $evaluasi_internal['url'] . '" target="_blank">' . $evaluasi_internal['title'] . '</a></li>
+					<li><a href="' . $dokumen_lainnya['url'] . '" target="_blank">' . $dokumen_lainnya['title'] . '</a></li>
+					<li><a href="' . $perjanjian_kinerja['url'] . '" target="_blank">' . $perjanjian_kinerja['title'] . '</a></li>
+					<li><a href="' . $rkpd['url'] . '" target="_blank">' . $rkpd['title'] . '</a></li>
+					<li><a href="' . $dokumen_pemda_lainnya['url'] . '" target="_blank">' . $dokumen_pemda_lainnya['title'] . '</a></li>
+					<li><a href="' . $lkjip_lppd['url'] . '" target="_blank">' . $lkjip_lppd['title'] . '</a></li>
+				</ul>';
+		} else if (
+			in_array("pa", $user_meta->roles)
+			|| in_array("kpa", $user_meta->roles)
+			|| in_array("plt", $user_meta->roles)
+		) {
+			$nipkepala = get_user_meta($user_id, '_nip');
+			$skpd_db = $wpdb->get_row($wpdb->prepare("
+				SELECT 
+					nama_skpd, 
+					id_skpd, 
+					kode_skpd,
+					is_skpd
+				from esakip_data_unit 
+				where nipkepala=%s 
+					and tahun_anggaran=%d
+				group by id_skpd", $nipkepala[0], $_GET['tahun']), ARRAY_A);
+			$detail_renja = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Detail Dokumen RENJA/RKT ' . $_GET['tahun'],
+				'content' => '[dokumen_detail_renja_rkt tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$detail_renja['url'] .= '?id_skpd='.$skpd_db['id_skpd'];
+			$detail_skp = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Detail Dokumen SKP ' . $_GET['tahun'],
+				'content' => '[dokumen_detail_skp tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$detail_skp['url'] .= '?id_skpd='.$skpd_db['id_skpd'];
+			$detail_rencana_aksi = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Detail Dokumen Rencana Aksi ' . $_GET['tahun'],
+				'content' => '[dokumen_detail_rencana_aksi tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$detail_rencana_aksi['url'] .= '?id_skpd='.$skpd_db['id_skpd'];
+			$detail_iku = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Detail Dokumen IKU ' . $_GET['tahun'],
+				'content' => '[dokumen_detail_iku tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$detail_iku['url'] .= '?id_skpd='.$skpd_db['id_skpd'];
+			$detail_pengukuran_kinerja = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Detail Dokumen Pengukuran Kinerja ' . $_GET['tahun'],
+				'content' => '[dokumen_detail_pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$detail_pengukuran_kinerja['url'] .= '?id_skpd='.$skpd_db['id_skpd'];
+			$detail_laporan_kinerja = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Detail Dokumen Laporan Kinerja ' . $_GET['tahun'],
+				'content' => '[dokumen_detail_laporan_kinerja tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$detail_laporan_kinerja['url'] .= '?id_skpd='.$skpd_db['id_skpd'];
+			$detail_evaluasi_internal = $this->functions->generatePage(array(
+			    'nama_page' => 'Halaman Detail Dokumen Evaluasi Internal ' . $_GET['tahun'],
+			    'content' => '[dokumen_detail_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
+			    'show_header' => 1,
+			    'post_status' => 'private'
+			));
+			$detail_evaluasi_internal['url'] .= '?id_skpd='.$skpd_db['id_skpd'];
+			$detail_dokumen_lain = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Detail Dokumen Lain ' . $_GET['tahun'],
+				'content' => '[dokumen_detail_dokumen_lain tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$detail_pengukuran_kinerja['url'] .= '?id_skpd='.$skpd_db['id_skpd'];
+			$detail_perjanjian_kinerja = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Detail Dokumen Perjanjian Kinerja ' . $_GET['tahun'],
+				'content' => '[dokumen_detail_perjanjian_kinerja tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$detail_perjanjian_kinerja['url'] .= '?id_skpd='.$skpd_db['id_skpd'];
+			echo '
+				<ul class="daftar-tahun text_tengah">
+					<li><a href="' . $url_upload_dokumen_rpjm['url'] . '" target="_blank" class="btn btn-warning">' . $url_upload_dokumen_rpjm['title'] . '</a></li>
+					<li><a href="' . $detail_renja['url'] . '" target="_blank">' . $detail_renja['title'] . '</a></li>
+					<li><a href="' . $detail_skp['url'] . '" target="_blank">' . $detail_skp['title'] . '</a></li>
+					<li><a href="' . $detail_rencana_aksi['url'] . '" target="_blank">' . $detail_rencana_aksi['title'] . '</a></li>
+					<li><a href="' . $detail_iku['url'] . '" target="_blank">' . $detail_iku['title'] . '</a></li>
+					<li><a href="' . $detail_pengukuran_kinerja['url'] . '" target="_blank">' . $detail_pengukuran_kinerja['title'] . '</a></li>
+					<li><a href="' . $detail_laporan_kinerja['url'] . '" target="_blank">' . $detail_laporan_kinerja['title'] . '</a></li>
+					<li><a href="' . $detail_evaluasi_internal['url'] . '" target="_blank">' . $detail_evaluasi_internal['title'] . '</a></li>
+					<li><a href="' . $detail_dokumen_lain['url'] . '" target="_blank">' . $detail_dokumen_lain['title'] . '</a></li>
+					<li><a href="' . $detail_perjanjian_kinerja['url'] . '" target="_blank">' . $detail_perjanjian_kinerja['title'] . '</a></li>
+				</ul>';
+		}
+	}
+
+	public function menu_monev_skpd($options)
+	{
+		global $wpdb;
+		$id_skpd = $options['id_skpd'];
+		$nama_skpd = $options['kode_skpd'] . ' ' . $options['nama_skpd'];
+		$api_key = get_option('_crb_api_key_extension');
+		$alamat = get_option('_crb_skpd_alamat_' . $id_skpd);
+		$ajax_url = admin_url('admin-ajax.php');
+	}
+
+	public function pilih_tahun_anggaran()
+	{
+		global $wpdb;
+		$tahun_aktif = false;
+		$class_hide = '';
+		if (!empty($_GET) && !empty($_GET['tahun'])) {
+			$tahun_aktif = $_GET['tahun'];
+			$class_hide = 'display: none;';
+		}
+		$tahun = $wpdb->get_results('select tahun_anggaran from esakip_data_unit group by tahun_anggaran', ARRAY_A);
+		echo "
+		<h5 class='text_tengah' style='" . $class_hide . "'>PILIH TAHUN ANGGARAN</h5>
+		<ul class='daftar-tahun text_tengah'>";
+		foreach ($tahun as $k => $v) {
+			$class = 'btn-primary';
+			if ($tahun_aktif == $v['tahun_anggaran']) {
+				$class = 'btn-success';
+			}
+			echo "<li><a href='?tahun=" . $v['tahun_anggaran'] . "' class='btn " . $class . "'>" . $v['tahun_anggaran'] . "</a></li>";
+		}
+		echo "</ul>";
+	}
 }

@@ -520,7 +520,7 @@ class Wp_Eval_Sakip_Admin
 					->set_html('
 					<h4>HALAMAN TERKAIT</h4>
 	            	<ol>
-	            		<li><a href="' . $halaman_mapping_skpd['url'] . '">' . $halaman_mapping_skpd['title'] . '</a></li>
+	            		<li><a href="' . $halaman_mapping_skpd['url'] . '" target="_blank">' . $halaman_mapping_skpd['title'] . '</a></li>
 	            	</ol>'),
 				Field::make('text', 'crb_url_server_sakip', 'URL Server WP-SIPD')
 					->set_default_value(admin_url('admin-ajax.php'))
@@ -1006,7 +1006,7 @@ class Wp_Eval_Sakip_Admin
 			'tahun_anggaran' => $_POST['tahun_anggaran']
 		);
 
-		$response = wp_remote_post($_POST['server'], array('timeout' => 10, 'sslverify' => false, 'body' => $api_params));
+		$response = wp_remote_post($_POST['server'], array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
 
 		$response = wp_remote_retrieve_body($response);
 
