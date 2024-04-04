@@ -146,11 +146,13 @@ class Wp_Eval_Sakip_Admin
 						$wpdb->prepare(
 							"
 							SELECT 
+								id,
 								nama_jadwal,
 								tahun_anggaran,
 								lama_pelaksanaan
 							FROM esakip_data_jadwal
 							WHERE tipe = 'RPJMD'
+							  AND status = 1
 							GROUP BY tahun_anggaran"
 						),
 						ARRAY_A
@@ -160,11 +162,13 @@ class Wp_Eval_Sakip_Admin
 						$wpdb->prepare(
 							"
 							SELECT 
+								id,
 								nama_jadwal,
 								tahun_anggaran,
 								lama_pelaksanaan
 							FROM esakip_data_jadwal
-							WHERE tipe = 'EVALUASI'
+							WHERE tipe = 'LKE'
+							  AND status = 1
 							GROUP BY tahun_anggaran"
 						),
 						ARRAY_A
@@ -173,8 +177,8 @@ class Wp_Eval_Sakip_Admin
 						$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
 						if (!empty($_POST['type']) && $_POST['type'] == 'renstra') {
 							$renstra = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman RENSTRA Jadwal ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-								'content' => '[renstra periode=' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ']',
+								'nama_page' => 'Halaman Upload Dokumen RENSTRA ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+								'content' => '[upload_dokumen_renstra periode=' . $jadwal_periode_item['id'] . ']',
 								'show_header' => 1,
 								'no_key' => 1,
 								'post_status' => 'private'
@@ -191,8 +195,8 @@ class Wp_Eval_Sakip_Admin
 						} else if (!empty($_POST['type']) && $_POST['type'] == 'rpjmd') {
 							$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
 							$rpjmd = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman RPJMD Jadwal ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-								'content' => '[rpjmd periode=' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ']',
+								'nama_page' => 'Halaman Upload Dokumen RPJMD ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+								'content' => '[upload_dokumen_rpjmd periode=' . $jadwal_periode_item['id'] . ']',
 								'show_header' => 1,
 								'no_key' => 1,
 								'post_status' => 'private'
@@ -516,7 +520,7 @@ class Wp_Eval_Sakip_Admin
 					->set_html('
 					<h4>HALAMAN TERKAIT</h4>
 	            	<ol>
-	            		<li><a href="' . $halaman_mapping_skpd['url'] . '">' . $halaman_mapping_skpd['title'] . '</a></li>
+	            		<li><a href="' . $halaman_mapping_skpd['url'] . '" target="_blank">' . $halaman_mapping_skpd['title'] . '</a></li>
 	            	</ol>'),
 				Field::make('text', 'crb_url_server_sakip', 'URL Server WP-SIPD')
 					->set_default_value(admin_url('admin-ajax.php'))
@@ -1002,7 +1006,7 @@ class Wp_Eval_Sakip_Admin
 			'tahun_anggaran' => $_POST['tahun_anggaran']
 		);
 
-		$response = wp_remote_post($_POST['server'], array('timeout' => 10, 'sslverify' => false, 'body' => $api_params));
+		$response = wp_remote_post($_POST['server'], array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
 
 		$response = wp_remote_retrieve_body($response);
 

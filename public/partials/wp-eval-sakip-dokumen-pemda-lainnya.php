@@ -41,7 +41,6 @@ $input = shortcode_atts(array(
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
-                            <th class="text-center">Perangkat Daerah</th>
                             <th class="text-center">Nama Dokumen</th>
                             <th class="text-center">Keterangan</th>
                             <th class="text-center">Waktu Upload</th>
@@ -69,13 +68,8 @@ $input = shortcode_atts(array(
             </div>
             <div class="modal-body">
                 <form enctype="multipart/form-data">
-                    <input type="hidden" value="<?php echo $id_skpd; ?>" id="idSkpd">
                     <input type="hidden" value="<?php echo $input['tahun']; ?>" id="tahunAnggaran">
                     <input type="hidden" value="" id="idDokumen">
-                    <div class="form-group">
-                        <label for="perangkatDaerah">Perangkat Daerah</label>
-                        <input type="text" class="form-control" id="perangkatDaerah" name="perangkatDaerah" style="text-transform: uppercase;" value="<?php echo $skpd['nama_skpd']; ?>" disabled>
-                    </div>
                     <div class="form-group">
                         <label for="fileUpload">Pilih File</label>
                         <input type="file" class="form-control-file" id="fileUpload" name="fileUpload" accept="application/pdf" required>
@@ -107,7 +101,6 @@ $input = shortcode_atts(array(
             data: {
                 action: 'get_table_dokumen_pemda_lain',
                 api_key: esakip.api_key,
-                id_skpd: <?php echo $id_skpd; ?>,
                 tahun_anggaran: '<?php echo $input['tahun'] ?>'
             },
             dataType: 'json',
@@ -154,7 +147,7 @@ $input = shortcode_atts(array(
                 console.log(response);
                 if (response.status === 'success') {
                     let data = response.data;
-                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + data.dokumen;
+                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/'; ?>' + data.dokumen;
                     jQuery("#idDokumen").val(data.id);
                     jQuery("#fileUpload").val('');
                     jQuery('#fileUploadExisting').attr('href', url).html(data.dokumen);
@@ -178,14 +171,6 @@ $input = shortcode_atts(array(
     function submit_dokumen(that) {
         let id_dokumen = jQuery("#idDokumen").val();
 
-        let skpd = jQuery("#perangkatDaerah").val();
-        if (skpd == '') {
-            return alert('Perangkat Daerah tidak boleh kosong');
-        }
-        let idSkpd = jQuery("#idSkpd").val();
-        if (idSkpd == '') {
-            return alert('Id Skpd tidak boleh kosong');
-        }
         let keterangan = jQuery("#keterangan").val();
         if (keterangan == '') {
             return alert('Keterangan tidak boleh kosong');
@@ -203,8 +188,6 @@ $input = shortcode_atts(array(
         form_data.append('action', 'tambah_dokumen_dokumen_pemda_lain');
         form_data.append('api_key', esakip.api_key);
         form_data.append('id_dokumen', id_dokumen);
-        form_data.append('skpd', skpd);
-        form_data.append('idSkpd', idSkpd);
         form_data.append('keterangan', keterangan);
         form_data.append('tahunAnggaran', tahunAnggaran);
         form_data.append('fileUpload', fileDokumen);
@@ -237,7 +220,7 @@ $input = shortcode_atts(array(
     }
 
     function lihatDokumen(dokumen) {
-        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + dokumen;
+        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/'; ?>' + dokumen;
         window.open(url, '_blank');
     }
 

@@ -10,6 +10,7 @@ $unit = $wpdb->get_results("
 		nama_skpd, 
 		id_skpd, 
 		kode_skpd, 
+		namakepala , 
 		nipkepala 
 	from esakip_data_unit 
 	where active=1
@@ -24,6 +25,7 @@ foreach ($unit as $kk => $vv) {
 		<tr>
 			<td>'.$vv['kode_skpd'].'</td>
 			<td>'.$vv['nama_skpd'].'</td>
+			<td class="text-center">'.$vv['namakepala'].'<br>'.$vv['nipkepala'].'</td>
 			<td><input type="text" value="'.$nama_skpd_sakip.'" id="_nama_skpd_sakip_'.$vv['id_skpd'].'" class="form-control"></td>
 			<td class="text-center"><button class="btn btn-primary" onclick="proses_mapping_skpd(\''.$vv['id_skpd'].'\');">Proses</button></td>
 		</tr>
@@ -37,6 +39,7 @@ foreach ($unit as $kk => $vv) {
 			<tr>
 				<th class="text-center">Kode SKPD SIPD</th>
 				<th class="text-center" style="width: 500px;">Nama SKPD SIPD</th>
+				<th class="text-center" style="width: 500px;">Nama dan NIP</th>
 				<th class="text-center" style="width: 500px;">Nama SKPD SAKIP</th>
 				<th class="text-center">Aksi</th>
 			</tr>

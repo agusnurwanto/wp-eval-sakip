@@ -74,6 +74,7 @@ CREATE TABLE `esakip_lkjip_lppd` (
   `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` varchar(255) DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
@@ -84,6 +85,7 @@ CREATE TABLE `esakip_other_file` (
   `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` varchar(255) DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
@@ -166,6 +168,7 @@ CREATE TABLE `esakip_rkpd` (
   `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` varchar(255) DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
@@ -241,7 +244,7 @@ CREATE TABLE `esakip_data_jadwal` (
   `keterangan` varchar(255) DEFAULT NULL,
   `started_at` datetime DEFAULT NULL,
   `end_at` datetime DEFAULT NULL,
-  `status` int(11) NOT NULL DEFAULT '1' COMMENT '0 = HAPUS 1 = ACTIVE, 2 = DIKUNCI',
+  `status` int(11) NOT NULL DEFAULT '1' COMMENT '0 = HAPUS, 1 = ACTIVE, 2 = DIKUNCI',
   `jenis_jadwal` varchar(30) DEFAULT NULL,
   `tipe` varchar(30) DEFAULT NULL COMMENT 'RPJMD, LKE',
   `lama_pelaksanaan` int(11) DEFAULT NULL,

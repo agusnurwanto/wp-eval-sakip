@@ -6,9 +6,19 @@ if (!defined('WPINC')) {
 }
 
 $input = shortcode_atts(array(
-    'tahun' => '2022',
+    'periode' => '',
 ), $atts);
 
+$data_jadwal = $wpdb->get_row(
+    $wpdb->prepare("
+        SELECT *
+        FROM esakip_data_jadwal
+        WHERE id = %d
+    ", $input['periode']),
+    ARRAY_A
+);
+
+$tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan'];
 ?>
 <style type="text/css">
     .wrap-table {
@@ -32,7 +42,7 @@ $input = shortcode_atts(array(
 <div class="container-md">
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Dokumen RENSTRA<br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
+            <h1 class="text-center" style="margin:3rem;">Dokumen RENSTRA<br><?php echo $data_jadwal['nama_jadwal'] . ' (' . $data_jadwal['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1>
             <div style="margin-bottom: 25px;">
                 <button class="btn btn-primary" onclick="tambah_dokumen_renstra();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
             </div>
@@ -70,7 +80,7 @@ $input = shortcode_atts(array(
             <div class="modal-body">
                 <form enctype="multipart/form-data">
                     <input type="hidden" value="<?php echo $id_skpd; ?>" id="idSkpd">
-                    <input type="hidden" value="<?php echo $input['tahun']; ?>" id="tahunAnggaran">
+                    <input type="hidden" value="<?php echo $input['periode']; ?>" id="id_jadwal">
                     <input type="hidden" value="" id="idDokumen">
                     <div class="form-group">
                         <label for="perangkatDaerah">Perangkat Daerah</label>
@@ -108,7 +118,7 @@ $input = shortcode_atts(array(
                 action: 'get_table_renstra',
                 api_key: esakip.api_key,
                 id_skpd: <?php echo $id_skpd; ?>,
-                tahun_anggaran: '<?php echo $input['tahun'] ?>'
+                id_jadwal: '<?php echo $input['periode']; ?>'
             },
             dataType: 'json',
             success: function(response) {
@@ -123,7 +133,7 @@ $input = shortcode_atts(array(
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data Laporan Kinerja!');
+                alert('Terjadi kesalahan saat memuat data RENSTRA!');
             }
         });
     }
@@ -190,9 +200,9 @@ $input = shortcode_atts(array(
         if (keterangan == '') {
             return alert('Keterangan tidak boleh kosong');
         }
-        let tahunAnggaran = jQuery("#tahunAnggaran").val();
-        if (tahunAnggaran == '') {
-            return alert('Tahun Anggaran tidak boleh kosong');
+        let idJadwal = jQuery("#id_jadwal").val();
+        if (id_Jadwal == '') {
+            return alert('Id Jadwal tidak boleh kosong');
         }
         let fileDokumen = jQuery("#fileUpload").prop('files')[0];
         if (fileDokumen == '') {
@@ -206,7 +216,7 @@ $input = shortcode_atts(array(
         form_data.append('skpd', skpd);
         form_data.append('idSkpd', idSkpd);
         form_data.append('keterangan', keterangan);
-        form_data.append('tahunAnggaran', tahunAnggaran);
+        form_data.append('id_jadwal', idJadwal);
         form_data.append('fileUpload', fileDokumen);
 
         jQuery('#wrap-loading').show();
