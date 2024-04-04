@@ -3491,11 +3491,11 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Keterangan kosong!';
 				}
-				if (!empty($_POST['tahunAnggaran'])) {
-					$tahunAnggaran = $_POST['tahunAnggaran'];
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun Anggaran kosong!';
+					$ret['message'] = 'Id Jadwal kosong!';
 				}
 				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
 					$ret['status'] = 'error';
@@ -3527,7 +3527,7 @@ class Wp_Eval_Sakip_Public
 								'id_skpd' => $idSkpd,
 								'dokumen' => $upload['filename'],
 								'keterangan' => $keterangan,
-								'tahun_anggaran' => $tahunAnggaran,
+								'id_jadwal' => $id_jadwal,
 								'created_at' => current_time('mysql'),
 							),
 							array('%s', '%s', '%s', '%s', '%d')
@@ -4534,19 +4534,19 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if (!empty($_POST['tahun_anggaran'])) {
-					$tahun_anggaran = $_POST['tahun_anggaran'];
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun Anggaran kosong!';
+					$ret['message'] = 'Id Jadwal kosong!';
 				}
 				$rpjmds = $wpdb->get_results(
 					$wpdb->prepare("
 						SELECT * 
 						FROM esakip_rpjmd
-						WHERE tahun_anggaran = %d 
+						WHERE id_jadwal = %d 
 						  AND active = 1
-					", $tahun_anggaran),
+					", $id_jadwal),
 					ARRAY_A
 				);
 
@@ -4674,8 +4674,8 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id SKPD kosong!';
 				}
-				if (!empty($_POST['tahun_anggaran'])) {
-					$tahun_anggaran = $_POST['tahun_anggaran'];
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
 				} else {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
@@ -4685,9 +4685,9 @@ class Wp_Eval_Sakip_Public
                     SELECT * 
                     FROM esakip_renstra
                     WHERE id_skpd = %d 
-                      AND tahun_anggaran = %d 
+                      AND id_jadwal = %d 
                       AND active = 1
-                ", $id_skpd, $tahun_anggaran),
+                ", $id_skpd, $id_jadwal),
 					ARRAY_A
 				);
 

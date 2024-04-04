@@ -152,7 +152,7 @@ class Wp_Eval_Sakip_Admin
 								lama_pelaksanaan
 							FROM esakip_data_jadwal
 							WHERE tipe = 'RPJMD'
-							  AND status = 0
+							  AND status = 1
 							GROUP BY tahun_anggaran"
 						),
 						ARRAY_A
@@ -168,7 +168,7 @@ class Wp_Eval_Sakip_Admin
 								lama_pelaksanaan
 							FROM esakip_data_jadwal
 							WHERE tipe = 'LKE'
-							  AND status = 0
+							  AND status = 1
 							GROUP BY tahun_anggaran"
 						),
 						ARRAY_A

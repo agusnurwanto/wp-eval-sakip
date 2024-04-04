@@ -126,7 +126,7 @@ $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data Laporan Kinerja!');
+                alert('Terjadi kesalahan saat memuat data RPJMD!');
             }
         });
     }

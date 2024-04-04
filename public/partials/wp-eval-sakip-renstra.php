@@ -80,7 +80,7 @@ $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan
             <div class="modal-body">
                 <form enctype="multipart/form-data">
                     <input type="hidden" value="<?php echo $id_skpd; ?>" id="idSkpd">
-                    <input type="hidden" value="<?php echo $data_jadwal['tahun_anggaran']; ?>" id="tahunAnggaran">
+                    <input type="hidden" value="<?php echo $input['periode']; ?>" id="id_jadwal">
                     <input type="hidden" value="" id="idDokumen">
                     <div class="form-group">
                         <label for="perangkatDaerah">Perangkat Daerah</label>
@@ -118,7 +118,7 @@ $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan
                 action: 'get_table_renstra',
                 api_key: esakip.api_key,
                 id_skpd: <?php echo $id_skpd; ?>,
-                tahun_anggaran: '<?php echo $data_jadwal['tahun_anggaran'] ?>'
+                id_jadwal: '<?php echo $input['periode']; ?>'
             },
             dataType: 'json',
             success: function(response) {
@@ -133,7 +133,7 @@ $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data Laporan Kinerja!');
+                alert('Terjadi kesalahan saat memuat data RENSTRA!');
             }
         });
     }
@@ -200,9 +200,9 @@ $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan
         if (keterangan == '') {
             return alert('Keterangan tidak boleh kosong');
         }
-        let tahunAnggaran = jQuery("#tahunAnggaran").val();
-        if (tahunAnggaran == '') {
-            return alert('Tahun Anggaran tidak boleh kosong');
+        let idJadwal = jQuery("#id_jadwal").val();
+        if (id_Jadwal == '') {
+            return alert('Id Jadwal tidak boleh kosong');
         }
         let fileDokumen = jQuery("#fileUpload").prop('files')[0];
         if (fileDokumen == '') {
@@ -216,7 +216,7 @@ $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan
         form_data.append('skpd', skpd);
         form_data.append('idSkpd', idSkpd);
         form_data.append('keterangan', keterangan);
-        form_data.append('tahunAnggaran', tahunAnggaran);
+        form_data.append('id_jadwal', idJadwal);
         form_data.append('fileUpload', fileDokumen);
 
         jQuery('#wrap-loading').show();
