@@ -131,7 +131,7 @@ class Wp_Eval_Sakip_Public
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-jadwal-evaluasi.php';
 	}
 
-	public function renstra()
+	public function renstra($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
 		if (!empty($_GET) && !empty($_GET['POST'])) {
@@ -5907,6 +5907,7 @@ class Wp_Eval_Sakip_Public
 						'tahun_anggaran'	=> $tahun_anggaran,
 						'jenis_jadwal'	=> $jenis_jadwal,
 						'tipe'	=> 'LKE',
+						'lama_pelaksanaan'	=> 1,
 					);
 
 					$wpdb->insert('esakip_data_jadwal', $data_jadwal);
@@ -6189,7 +6190,7 @@ class Wp_Eval_Sakip_Public
 						5 => 'id',
 					);
 					$where = $sqlTot = $sqlRec = "";
-					$where = " WHERE tipe='RPJMD' ";
+					$where = " WHERE tipe = 'RPJMD' AND status != 0";
 
 					// check search value exist
 					if (!empty($params['search']['value'])) {
@@ -6421,60 +6422,48 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($return));
 	}
 
-	/** Submit delete data jadwal */
-	public function delete_jadwal_rpjmd()
-	{
-		global $wpdb;
-		$return = array(
-			'status' => 'success',
-			'data'	=> array()
-		);
+    public function delete_jadwal_rpjmd()
+    {
+        global $wpdb;
+        $ret = array(
+            'status' => 'success',
+            'message' => 'Berhasil hapus data!',
+            'data' => array()
+        );
 
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
-				if (!empty($_POST['id'])) {
+        if (!empty($_POST)) {
+            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
 					$id = trim(htmlspecialchars($_POST['id']));
 
-					$data_this_id = $wpdb->get_row($wpdb->prepare('
-						SELECT 
-							* 
-						FROM esakip_data_jadwal 
-						WHERE id = %d
-					', $id), ARRAY_A);
-
-					if (!empty($data_this_id)) {
-							$wpdb->update('esakip_data_jadwal', array('status' => 0), array(
-								'id' => $id
-							), array('%d'));
-
-							$return = array(
-								'status' => 'success',
-								'message'	=> 'Berhasil!',
-						);
-					} else {
-						$return = array(
-							'status' => 'error',
-							'message'	=> "Data tidak ditemukan!",
-						);
-					}
-				} else {
-					$return = array(
-						'status' => 'error',
-						'message'	=> 'Harap diisi semua,tidak boleh ada yang kosong!'
-					);
-				}
-			} else {
-				$return = array(
-					'status' => 'error',
-					'message'	=> 'Api Key tidak sesuai!'
-				);
-			}
-		} else {
-			$return = array(
-				'status' => 'error',
-				'message'	=> 'Format tidak sesuai!'
-			);
-		}
-		die(json_encode($return));
-	}
+                // Periksa apakah data dengan ID yang akan dihapus ada di tabel esakip_renstra
+                $cek_id_jadwal = $wpdb->get_var($wpdb->prepare('
+                    SELECT id_jadwal
+                    FROM esakip_renstra
+                    WHERE id_jadwal=%d
+                ', $id));
+                $cek_id_jadwal = $wpdb->get_var($wpdb->prepare('
+                    SELECT id_jadwal
+                    FROM esakip_rpjmd
+                    WHERE id_jadwal=%d
+                ', $id));
+                if ($cek_id_jadwal) {
+                    // Jika data dengan ID yang sama ditemukan di tabel lain, tampilkan pesan
+                    $ret['status'] = 'confirm';
+                    $ret['message'] = 'ID sudah terpakai.';
+                } else {
+                    // Jika tidak ada data dengan ID yang sama di tabel lain, lanjutkan penghapusan seperti biasa
+                    $ret['data'] = $wpdb->update('esakip_data_jadwal', array('status' => 0), array(
+                        'id' => $id
+                    ));
+                }
+            } else {
+                $ret['status']  = 'error';
+                $ret['message'] = 'Api key tidak ditemukan!';
+            }
+        } else {
+            $ret['status']  = 'error';
+            $ret['message'] = 'Format Salah!';
+        }
+        die(json_encode($ret));
+    }
 }
