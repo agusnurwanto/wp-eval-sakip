@@ -289,14 +289,19 @@ class Wp_Eval_Sakip {
 		
 		$this->loader->add_action('wp_ajax_get_table_tahun_renja', $plugin_public, 'get_table_tahun_renja');
 		$this->loader->add_action('wp_ajax_get_table_skpd_renja', $plugin_public, 'get_table_skpd_renja');
-
+		$this->loader->add_action('wp_ajax_get_table_tahun_renstra', $plugin_public, 'get_table_tahun_renstra');
+		$this->loader->add_action('wp_ajax_get_table_skpd_renstra', $plugin_public, 'get_table_skpd_renstra');
+		$this->loader->add_action('wp_ajax_get_table_tahun_dokumen_lainnya', $plugin_public, 'get_table_tahun_dokumen_lainnya');
+		$this->loader->add_action('wp_ajax_get_table_skpd_dokumen_lainnya', $plugin_public, 'get_table_skpd_dokumen_lainnya');
+		
 		add_shortcode('desain_lke_sakip', array($plugin_public, 'desain_lke_sakip'));
 		add_shortcode('jadwal_evaluasi_sakip', array($plugin_public, 'jadwal_evaluasi_sakip'));
 		add_shortcode('halaman_mapping_skpd', array($plugin_public, 'halaman_mapping_skpd'));
 		
 		add_shortcode('upload_dokumen_renstra', array($plugin_public, 'upload_dokumen_renstra'));
 		add_shortcode('upload_dokumen_rpjmd', array($plugin_public, 'upload_dokumen_rpjmd'));
-
+		
+		add_shortcode('renstra', array($plugin_public, 'renstra'));
 		add_shortcode('renja_rkt', array($plugin_public, 'renja_rkt'));
 		add_shortcode('perjanjian_kinerja', array($plugin_public, 'perjanjian_kinerja'));
 		add_shortcode('rencana_aksi', array($plugin_public, 'rencana_aksi'));
@@ -321,7 +326,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('dokumen_detail_rencana_aksi', array($plugin_public, 'dokumen_detail_rencana_aksi'));
 		add_shortcode('dokumen_detail_pengukuran_kinerja', array($plugin_public, 'dokumen_detail_pengukuran_kinerja'));
 		add_shortcode('dokumen_detail_pengukuran_rencana_aksi', array($plugin_public, 'dokumen_detail_pengukuran_rencana_aksi'));
-		add_shortcode('dokumen_detail_dokumen_lain', array($plugin_public, 'dokumen_detail_dokumen_lain'));
+		add_shortcode('dokumen_detail_dokumen_lainnya', array($plugin_public, 'dokumen_detail_dokumen_lainnya'));
 		add_shortcode('dokumen_detail_evaluasi_internal', array($plugin_public, 'dokumen_detail_evaluasi_internal'));
 		add_shortcode('dokumen_detail_iku', array($plugin_public, 'dokumen_detail_iku'));
 		add_shortcode('dokumen_detail_laporan_kinerja', array($plugin_public, 'dokumen_detail_laporan_kinerja'));
