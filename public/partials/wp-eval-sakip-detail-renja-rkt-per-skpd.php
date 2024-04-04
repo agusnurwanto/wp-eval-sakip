@@ -25,6 +25,23 @@ $skpd = $wpdb->get_row(
 ", $id_skpd, $input['tahun']),
     ARRAY_A
 );
+
+$idtahun = $wpdb->get_results(
+    "
+		SELECT DISTINCT 
+			tahun_anggaran 
+		FROM esakip_data_unit",
+    ARRAY_A
+);
+$tahun = "<option value='-1'>Pilih Tahun</option>";
+
+foreach ($idtahun as $val) {
+    $selected = '';
+    if (!empty($input['tahun_anggaran']) && $val['tahun_anggaran'] == $input['tahun_anggaran']) {
+        $selected = 'selected';
+    }
+    $tahun .= "<option value='$val[tahun_anggaran]' $selected>$val[tahun_anggaran]</option>";
+}
 ?>
 <style type="text/css">
     .wrap-table {
@@ -110,9 +127,40 @@ $skpd = $wpdb->get_row(
         </div>
     </div>
 </div>
+
+<!-- Modal Tahun -->
+<div class="modal fade" id="tahunModal" tabindex="-1" role="dialog" aria-labelledby="tahunModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tahunModalLabel">Pilih Tahun Anggaran</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="tahunForm">
+                    <div class="form-group">
+                        <label for="tahunAnggaran">Tahun Anggaran:</label>
+                        <select class="form-control" id="tahunAnggaran" name="tahunAnggaran">
+                            <?php echo $tahun; ?>
+                        </select>
+                        <input type="hidden" id="idDokumen" value="">
+                    </div>
+                    <button type="submit" class="btn btn-primary" onclick="submit_tahun_renja_rkt(); return false">Simpan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tahun Tabel -->
+<div id="tahunContainer" class="container-md">
+</div>
 <script>
     jQuery(document).ready(function() {
         getTableRenja();
+        getTableTahun();
     });
 
     function getTableRenja() {
@@ -142,6 +190,44 @@ $skpd = $wpdb->get_row(
                 alert('Terjadi kesalahan saat memuat data RENJA/RKT!');
             }
         });
+    }
+
+    function getTableTahun() {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_table_tahun_renja',
+                api_key: esakip.api_key,
+                id_skpd: <?php echo $id_skpd; ?>,
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                console.log(response);
+                if (response.status === 'success') {
+                    jQuery('#tahunContainer').html(response.data);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat tabel!');
+            }
+        });
+    }
+
+    function lihatDokumen(dokumen) {
+        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + dokumen;
+        window.open(url, '_blank');
+    }
+
+    function set_tahun_dokumen(id) {
+        jQuery('#tahunModal').modal('show');
+        jQuery('#idDokumen').val(id);
     }
 
     function tambah_dokumen_renja() {
@@ -248,6 +334,48 @@ $skpd = $wpdb->get_row(
                 console.error(xhr.responseText);
                 alert('Terjadi kesalahan saat mengirim data!');
                 jQuery('#wrap-loading').hide();
+            }
+        });
+    }
+
+    function submit_tahun_renja_rkt() {
+        let id = jQuery("#idDokumen").val();
+        if (id == '') {
+            return alert('id tidak boleh kosong');
+        }
+
+        let tahunAnggaran = jQuery("#tahunAnggaran").val();
+        if (tahunAnggaran == '') {
+            return alert('Tahun Anggaran tidak boleh kosong');
+        }
+
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'submit_tahun_renja_rkt',
+                id: id,
+                tahunAnggaran: tahunAnggaran,
+                api_key: esakip.api_key
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    jQuery('#tahunModal').modal('hide');
+                    getTableTahun();
+                    getTableRenja();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
             }
         });
     }

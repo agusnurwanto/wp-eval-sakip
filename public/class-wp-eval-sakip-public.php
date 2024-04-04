@@ -3243,17 +3243,17 @@ class Wp_Eval_Sakip_Public
 					$id_dokumen = $_POST['id_dokumen'];
 					$ret['message'] = 'Berhasil edit data!';
 				}
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
+				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
 				} else {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Keterangan kosong!';
-				}
-				if (!empty($_POST['tahunAnggaran'])) {
-					$tahunAnggaran = $_POST['tahunAnggaran'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
 				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
 					$ret['status'] = 'error';
@@ -3283,7 +3283,7 @@ class Wp_Eval_Sakip_Public
 							array(
 								'dokumen' => $upload['filename'],
 								'keterangan' => $keterangan,
-								'tahun_anggaran' => $tahunAnggaran,
+								'id_jadwal' => $id_jadwal,
 								'created_at' => current_time('mysql'),
 							),
 							array('%s', '%s', '%s', '%s', '%d')
@@ -5656,28 +5656,6 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
-<<<<<<< HEAD
-					$params = $columns = $totalRecords = $data = array();
-					$params = $_REQUEST;
-					$columns = array(
-						0 => 'nama_jadwal',
-						1 => 'status',
-						2 => 'started_at',
-						3 => 'end_at',
-						4 => 'jenis_jadwal',
-						5 => 'tahun_anggaran',
-						6 => 'id',
-					);
-					$where = $sqlTot = $sqlRec = "";
-					$where = " WHERE tipe = 'LKE' AND status != 0";
-
-					// check search value exist
-					if (!empty($params['search']['value'])) {
-						$where .= " AND ( nama_jadwal LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
-						$where .= " OR started_at LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
-						$where .= " OR jenis_jadwal LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
-					}
-=======
 				$params = $columns = $totalRecords = $data = array();
 				$params = $_REQUEST;
 				$columns = array(
@@ -5685,19 +5663,19 @@ class Wp_Eval_Sakip_Public
 					1 => 'status',
 					2 => 'started_at',
 					3 => 'end_at',
-					4 => 'tahun_anggaran',
-					5 => 'id',
+					4 => 'jenis_jadwal',
+					5 => 'tahun_anggaran',
+					6 => 'id',
 				);
 				$where = $sqlTot = $sqlRec = "";
-				$where = " WHERE tipe IS NULL ";
+				$where = " WHERE tipe = 'LKE' AND status != 0";
 
 				// check search value exist
 				if (!empty($params['search']['value'])) {
 					$where .= " AND ( nama_jadwal LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
 					$where .= " OR started_at LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
-					$where .= " OR end_at LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
+					$where .= " OR jenis_jadwal LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
 				}
->>>>>>> a3c2ed5 (fix upload dokumen dengan periode)
 
 				if (!empty($_POST['tahun_anggaran'])) {
 					$where .= $wpdb->prepare(" AND tahun_anggaran = %d", $_POST['tahun_anggaran']);
@@ -5717,16 +5695,6 @@ class Wp_Eval_Sakip_Public
 				$totalRecords = $queryTot[0]['jml'];
 				$queryRecords = $wpdb->get_results($sqlRec, ARRAY_A);
 
-<<<<<<< HEAD
-					$checkOpenedSchedule = 0;
-					if (!empty($queryRecords)) {
-						foreach ($queryRecords as $recKey => $recVal) {
-							// $report = '<a class="btn btn-sm btn-primary mr-2" style="text-decoration: none;" onclick="report(\'' . $recVal['id'] . '\'); return false;" href="#" title="Cetak Laporan"><i class="dashicons dashicons-printer"></i></a>';
-							$edit	= '';
-							$delete	= '';
-							$lock	= '';
-							if ($recVal['status'] == 1) {
-=======
 				$checkOpenedSchedule = 0;
 				if (!empty($queryRecords)) {
 					foreach ($queryRecords as $recKey => $recVal) {
@@ -5734,51 +5702,24 @@ class Wp_Eval_Sakip_Public
 						$edit	= '';
 						$delete	= '';
 						$lock	= '';
-						if ($recVal['status'] == 0) {
->>>>>>> a3c2ed5 (fix upload dokumen dengan periode)
+						if ($recVal['status'] == 1) {
 							$checkOpenedSchedule++;
 							$lock	= '<a class="btn btn-sm btn-success mr-2" style="text-decoration: none;" onclick="lock_data_penjadwalan(\'' . $recVal['id'] . '\'); return false;" href="#" title="Kunci data penjadwalan"><i class="dashicons dashicons-unlock"></i></a>';
 							$edit	= '<a class="btn btn-sm btn-warning mr-2" style="text-decoration: none;" onclick="edit_data_penjadwalan(\'' . $recVal['id'] . '\'); return false;" href="#" title="Edit data penjadwalan"><i class="dashicons dashicons-edit"></i></a>';
 							$delete	= '<a class="btn btn-sm btn-danger" style="text-decoration: none;" onclick="hapus_data_penjadwalan(\'' . $recVal['id'] . '\'); return false;" href="#" title="Hapus data penjadwalan"><i class="dashicons dashicons-trash"></i></a>';
-<<<<<<< HEAD
-							} else if ($recVal['status'] == 2) {
-								$lock	= '<a class="btn btn-sm btn-success disabled" style="text-decoration: none;" onclick="cannot_change_schedule(\'kunci\'); return false;" href="#" title="Kunci data penjadwalan" aria-disabled="true"><i class="dashicons dashicons-lock"></i></a>'; 
-						}
-
-							$status = array(
-								0 => 'hapus',
-								1 => 'active',
-								2 => 'dikunci'
-							);
-
-							$queryRecords[$recKey]['started_at']	= date('d-m-Y H:i', strtotime($recVal['started_at']));
-							$queryRecords[$recKey]['end_at']	= date('d-m-Y H:i', strtotime($recVal['end_at']));
-							$queryRecords[$recKey]['aksi'] = $lock . $edit . $delete;
-							$queryRecords[$recKey]['nama_jadwal'] = ucfirst($recVal['nama_jadwal']);
-							$queryRecords[$recKey]['status'] = $status[$recVal['status']];
-						}
-
-						$json_data = array(
-							"draw"            => intval($params['draw']),
-							"recordsTotal"    => intval($totalRecords),
-							"recordsFiltered" => intval($totalRecords),
-							"data"            => $queryRecords,
-							"checkOpenedSchedule" => $checkOpenedSchedule
-=======
-						} else if ($recVal['status'] == 1) {
+						} else if ($recVal['status'] == 2) {
 							$lock	= '<a class="btn btn-sm btn-success disabled" style="text-decoration: none;" onclick="cannot_change_schedule(\'kunci\'); return false;" href="#" title="Kunci data penjadwalan" aria-disabled="true"><i class="dashicons dashicons-lock"></i></a>';
 						}
 
 						$status = array(
-							0 => 'terbuka',
-							1 => 'dikunci',
-							2 => 'selesai'
->>>>>>> a3c2ed5 (fix upload dokumen dengan periode)
+							0 => 'hapus',
+							1 => 'active',
+							2 => 'dikunci'
 						);
 
 						$queryRecords[$recKey]['started_at']	= date('d-m-Y H:i', strtotime($recVal['started_at']));
 						$queryRecords[$recKey]['end_at']	= date('d-m-Y H:i', strtotime($recVal['end_at']));
-						$queryRecords[$recKey]['aksi'] = $report . $lock . $edit . $delete;
+						$queryRecords[$recKey]['aksi'] = $lock . $edit . $delete;
 						$queryRecords[$recKey]['nama_jadwal'] = ucfirst($recVal['nama_jadwal']);
 						$queryRecords[$recKey]['status'] = $status[$recVal['status']];
 					}
@@ -5832,29 +5773,15 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
-<<<<<<< HEAD
 				if (!empty($_POST['nama_jadwal']) && !empty($_POST['jenis_jadwal']) && !empty($_POST['tahun_anggaran'])) {
-=======
-
-				if (
-					!empty($_POST['nama_jadwal'])
-					&& !empty($_POST['jadwal_mulai'])
-					&& !empty($_POST['jadwal_selesai'])
-					&& !empty($_POST['tahun_anggaran'])
-				) {
->>>>>>> a3c2ed5 (fix upload dokumen dengan periode)
 					$nama_jadwal		= trim(htmlspecialchars($_POST['nama_jadwal']));
 					$jadwal_mulai		= trim(htmlspecialchars($_POST['jadwal_mulai']));
 					$jadwal_mulai		= date('Y-m-d H:i:s', strtotime($jadwal_mulai));
 					$jadwal_selesai		= trim(htmlspecialchars($_POST['jadwal_selesai']));
 					$jadwal_selesai		= date('Y-m-d H:i:s', strtotime($jadwal_selesai));
 					$tahun_anggaran		= trim(htmlspecialchars($_POST['tahun_anggaran']));
-<<<<<<< HEAD
 					$tipe 	= trim(htmlspecialchars($_POST['tipe']));
 					$jenis_jadwal		= trim(htmlspecialchars($_POST['jenis_jadwal']));
-=======
-					$id = $_POST['id'];
->>>>>>> a3c2ed5 (fix upload dokumen dengan periode)
 
 					$arr_jadwal = ['usulan', 'penetapan'];
 					$jenis_jadwal = in_array($jenis_jadwal, $arr_jadwal) ? $jenis_jadwal : 'usulan';
@@ -5900,11 +5827,7 @@ class Wp_Eval_Sakip_Public
 						'status'		=> 'success',
 						'message'		=> 'Berhasil!',
 						'data_jadwal'	=> $data_jadwal,
-<<<<<<< HEAD
-					);					
-=======
 					);
->>>>>>> a3c2ed5 (fix upload dokumen dengan periode)
 				} else {
 					$return = array(
 						'status' => 'error',
@@ -6427,23 +6350,13 @@ class Wp_Eval_Sakip_Public
 					', $id), ARRAY_A);
 
 					if (!empty($data_this_id)) {
-<<<<<<< HEAD
-							$wpdb->update('esakip_data_jadwal', array('status' => 0), array(
-								'id' => $id
-							), array('%d'));
-
-							$return = array(
-								'status' => 'success',
-								'message'	=> 'Berhasil!',
-=======
-						$wpdb->delete('esakip_data_jadwal', array(
+						$wpdb->update('esakip_data_jadwal', array('status' => 0), array(
 							'id' => $id
 						), array('%d'));
 
 						$return = array(
 							'status' => 'success',
 							'message'	=> 'Berhasil!',
->>>>>>> a3c2ed5 (fix upload dokumen dengan periode)
 						);
 					} else {
 						$return = array(
@@ -6470,5 +6383,187 @@ class Wp_Eval_Sakip_Public
 			);
 		}
 		die(json_encode($return));
+	}
+
+	public function get_table_skpd_renja()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+
+				$unit = $wpdb->get_results(
+					$wpdb->prepare("
+					SELECT 
+						nama_skpd, 
+						id_skpd, 
+						kode_skpd, 
+						nipkepala 
+					FROM esakip_data_unit 
+					WHERE active=1 
+					  AND tahun_anggaran=%d
+					  AND is_skpd=1 
+					ORDER BY kode_skpd ASC
+					", $tahun_anggaran),
+					ARRAY_A
+				);
+
+				if (!empty($unit)) {
+					$tbody = '';
+					$counter = 1;
+					foreach ($unit as $kk => $vv) {
+						$detail_renja = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Detail Dokumen RENJA/RKT ' . $tahun_anggaran,
+							'content' => '[dokumen_detail_renja_rkt tahun=' . $tahun_anggaran . ']',
+							'show_header' => 1,
+							'no_key' => 1,
+							'post_status' => 'private'
+						));
+						$detail_renja['url'] .= '?1=1';
+
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+						$tbody .= "<td>" . $vv['kode_skpd'] . "</td>";
+						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
+
+						$jumlah_dokumen = $wpdb->get_var(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(id)
+								FROM esakip_renja_rkt 
+								WHERE id_skpd = %d
+								AND tahun_anggaran = %d
+								AND active = 1
+								",
+								$vv['id_skpd'],
+								$tahun_anggaran
+							)
+						);
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_renja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+						$btn .= '</div>';
+
+						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
+						$tbody .= "<td>" . $btn . "</td>";
+
+						$tbody .= "</tr>";
+					}
+					$ret['data'] = $tbody;
+				} else {
+					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_table_tahun_renja()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$where = 'tahun_anggaran IS NULL';
+
+				if (!empty($_POST['id_skpd'])) {
+					$id_skpd = $_POST['id_skpd'];
+					$where .= " AND id_skpd = $id_skpd";
+				}
+
+				$dokumen_unset = $wpdb->get_results("
+					SELECT 
+						*
+					FROM esakip_renja_rkt 
+					WHERE $where
+					  AND active = 1
+					",
+					ARRAY_A
+				);
+
+
+				$counterUnset = 1;
+				$tbodyUnset = '';
+				if (!empty($dokumen_unset)) {
+					$tbodyUnset .= '
+						<div class="cetak">
+							<div style="padding: 10px;margin:0 0 3rem 0;">
+								<h3 class="text-center">Dokumen yang belum disetting Tahun Anggaran</h3>
+								<div class="wrap-table">
+									<table id="table_dokumen_tahun" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+										<thead>
+											<tr>
+												<th class="text-center">No</th>
+												<th class="text-center">Perangkat Daerah</th>
+												<th class="text-center">Nama Dokumen</th>
+												<th class="text-center">Keterangan</th>
+												<th class="text-center">Aksi</th>
+											</tr>
+										</thead>
+										<tbody>';
+					foreach ($dokumen_unset as $kk => $vv) {
+						$tbodyUnset .= "<tr>";
+						$tbodyUnset .= "<td class='text-center'>" . $counterUnset++ . "</td>";
+						$tbodyUnset .= "<td>" . $vv['opd'] . "</td>";
+						$tbodyUnset .= "<td>" . $vv['dokumen'] . "</td>";
+						$tbodyUnset .= "<td>" . $vv['keterangan'] . "</td>";
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
+						$btn .= '</div>';
+
+						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
+
+						$tbodyUnset .= "</tr>";
+					}
+					$tbodyUnset .= '</tbody>
+								</table>
+							</div>
+						</div>
+					';
+
+					$ret['data'] = $tbodyUnset;
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
 	}
 }

@@ -78,7 +78,7 @@ $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan
             </div>
             <div class="modal-body">
                 <form enctype="multipart/form-data">
-                    <input type="hidden" value="<?php echo $data_jadwal['tahun_anggaran']; ?>" id="tahunAnggaran">
+                    <input type="hidden" value="<?php echo $input['periode']; ?>" id="id_jadwal">
                     <input type="hidden" value="" id="idDokumen">
                     <div class="form-group">
                         <label for="fileUpload">Pilih File</label>
@@ -111,7 +111,7 @@ $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan
             data: {
                 action: 'get_table_rpjmd',
                 api_key: esakip.api_key,
-                tahun_anggaran: '<?php echo $data_jadwal['tahun_anggaran'] ?>'
+                id_jadwal: '<?php echo $input['periode'] ?>'
             },
             dataType: 'json',
             success: function(response) {
@@ -181,6 +181,10 @@ $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan
     function submit_dokumen(that) {
         let id_dokumen = jQuery("#idDokumen").val();
 
+        let idJadwal = jQuery("#id_jadwal").val();
+        if (idJadwal == '') {
+            return alert('id_jadwal tidak boleh kosong');
+        }
         let keterangan = jQuery("#keterangan").val();
         if (keterangan == '') {
             return alert('Keterangan tidak boleh kosong');
@@ -199,7 +203,7 @@ $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan
         form_data.append('api_key', esakip.api_key);
         form_data.append('id_dokumen', id_dokumen);
         form_data.append('keterangan', keterangan);
-        form_data.append('tahunAnggaran', tahunAnggaran);
+        form_data.append('id_jadwal', idJadwal);
         form_data.append('fileUpload', fileDokumen);
 
         jQuery('#wrap-loading').show();
