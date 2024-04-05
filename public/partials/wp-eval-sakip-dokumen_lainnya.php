@@ -25,79 +25,6 @@ foreach ($idtahun as $val) {
 	}
 	$tahun .= "<option value='$val[tahun_anggaran]' $selected>$val[tahun_anggaran]</option>";
 }
-
-$detail_dokumen_lain = $this->functions->generatePage(array(
-	'nama_page' => 'Halaman Detail Dokumen Lain ' . $input['tahun'],
-	'content' => '[dokumen_detail_dokumen_lain tahun=' . $input["tahun"] . ']',
-	'show_header' => 1,
-	'no_key' => 1,
-	'post_status' => 'private'
-));
-$detail_dokumen_lain['url'] .= '?1=1';
-
-$unit = $wpdb->get_results($wpdb->prepare("
-	SELECT 
-		nama_skpd, 
-		id_skpd, 
-		kode_skpd, 
-		nipkepala 
-	FROM esakip_data_unit 
-	WHERE active=1 
-	  AND tahun_anggaran=%d
-	  AND is_skpd=1 
-	ORDER BY kode_skpd ASC
-", $input['tahun']), ARRAY_A);
-
-$dokumen_unset = $wpdb->get_results("
-	SELECT 
-		*
-	FROM esakip_dokumen_lainnya 
-	WHERE tahun_anggaran IS NULL
-	  AND active = 1
-", ARRAY_A);
-
-$tbody = '';
-$tbodyUnset = '';
-$counter = 1;
-$counterUnset = 1;
-
-foreach ($unit as $kk => $vv) {
-	$tbody .= "<tr>";
-	$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-	$tbody .= "<td>" . $vv['kode_skpd'] . "</td>";
-	$tbody .= "<td style='text-transform: uppercase;'><a target='_blank' href='" . $detail_dokumen_lain['url'] . '&id_skpd=' . $vv['id_skpd'] . "'>" . $vv['nama_skpd'] . "</a></td>";
-
-	$jumlah_dokumen = $wpdb->get_var(
-		$wpdb->prepare(
-			"
-			SELECT 
-				COUNT(id)
-			FROM esakip_dokumen_lainnya 
-			WHERE id_skpd = %d
-			  AND tahun_anggaran = %d
-			  AND active = 1
-			",
-			$vv['id_skpd'],
-			$input['tahun']
-		)
-	);
-
-	$tbody .= "<td>" . $jumlah_dokumen . "</td>";
-	$tbody .= "</tr>";
-}
-
-foreach ($dokumen_unset as $kk => $vv) {
-	$tbodyUnset .= "<tr>";
-	$tbodyUnset .= "<td class='text-center'>" . $counterUnset++ . "</td>";
-	$tbodyUnset .= "<td>" . $vv['opd'] . "</td>";
-	$tbodyUnset .= "<td>" . $vv['dokumen'] . "</td>";
-	$tbodyUnset .= "<td>" . $vv['keterangan'] . "</td>";
-
-	$aksiUnset = "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . ")'><span class='dashicons dashicons-insert'></span></button>";
-	$tbodyUnset .= "<td class='text-center'>" . $aksiUnset . "</td>";
-
-	$tbodyUnset .= "</tr>";
-}
 ?>
 <style type="text/css">
 	.wrap-table {
@@ -105,46 +32,33 @@ foreach ($dokumen_unset as $kk => $vv) {
 		max-height: 100vh;
 		width: 100%;
 	}
+
+	.btn-action-group {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.btn-action-group .btn {
+		margin: 0 5px;
+	}
 </style>
 <div class="container-md">
 	<div class="cetak">
 		<div style="padding: 10px;margin:0 0 3rem 0;">
 			<h1 class="text-center table-title">Dokumen Lain Tahun <?php echo $input['tahun']; ?></h1>
 			<div class="wrap-table">
-				<table cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+				<table id="table_dokumen_skpd" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
 					<thead>
 						<tr>
 							<th class="text-center">No</th>
 							<th class="text-center">Kode SKPD</th>
 							<th class="text-center">Nama SKPD</th>
 							<th class="text-center">Jumlah Dokumen</th>
-						</tr>
-					</thead>
-					<tbody>
-						<?php echo $tbody; ?>
-					</tbody>
-				</table>
-			</div>
-		</div>
-	</div>
-</div>
-<div class="container-md">
-	<div class="cetak">
-		<div style="padding: 10px;margin:0 0 3rem 0;">
-			<h3 class="text-center">Dokumen yang belum disetting Tahun Anggaran</h3>
-			<div class="wrap-table">
-				<table cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
-					<thead>
-						<tr>
-							<th class="text-center">No</th>
-							<th class="text-center">Perangkat Daerah</th>
-							<th class="text-center">Nama Dokumen</th>
-							<th class="text-center">Keterangan</th>
 							<th class="text-center">Aksi</th>
 						</tr>
 					</thead>
 					<tbody>
-						<?php echo $tbodyUnset; ?>
 					</tbody>
 				</table>
 			</div>
@@ -177,7 +91,71 @@ foreach ($dokumen_unset as $kk => $vv) {
 	</div>
 </div>
 
+<div id="tahunContainer" class="container-md">
+</div>
+
 <script>
+	jQuery(document).ready(function() {
+		getTableTahun();
+		getTableSkpd();
+	});
+
+	function getTableTahun() {
+		jQuery('#wrap-loading').show();
+		jQuery.ajax({
+			url: esakip.url,
+			type: 'POST',
+			data: {
+				action: 'get_table_tahun_dokumen_lainnya',
+				api_key: esakip.api_key,
+			},
+			dataType: 'json',
+			success: function(response) {
+				jQuery('#wrap-loading').hide();
+				console.log(response);
+				if (response.status === 'success') {
+					jQuery('#tahunContainer').html(response.data);
+				} else {
+					alert(response.message);
+				}
+			},
+			error: function(xhr, status, error) {
+				jQuery('#wrap-loading').hide();
+				console.error(xhr.responseText);
+				alert('Terjadi kesalahan saat memuat tabel!');
+			}
+		});
+	}
+
+	function getTableSkpd() {
+		jQuery('#wrap-loading').show();
+		jQuery.ajax({
+			url: esakip.url,
+			type: 'POST',
+			data: {
+				action: 'get_table_skpd_dokumen_lainnya',
+				api_key: esakip.api_key,
+				tahun_anggaran: <?php echo $input['tahun']; ?>,
+			},
+			dataType: 'json',
+			success: function(response) {
+				jQuery('#wrap-loading').hide();
+				console.log(response);
+				if (response.status === 'success') {
+					jQuery('#table_dokumen_skpd tbody').html(response.data);
+					jQuery('#table_dokumen_skpd tbody');
+				} else {
+					alert(response.message);
+				}
+			},
+			error: function(xhr, status, error) {
+				jQuery('#wrap-loading').hide();
+				console.error(xhr.responseText);
+				alert('Terjadi kesalahan saat memuat tabel!');
+			}
+		});
+	}
+
 	function set_tahun_dokumen(id) {
 		jQuery('#tahunModal').modal('show');
 		jQuery('#idDokumen').val(id);
@@ -220,5 +198,14 @@ foreach ($dokumen_unset as $kk => $vv) {
 				alert('Terjadi kesalahan saat mengirim data!');
 			}
 		});
+	}
+
+	function lihatDokumen(dokumen) {
+		let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + dokumen;
+		window.open(url, '_blank');
+	}
+
+	function toDetailUrl(url) {
+		window.open(url, '_blank');
 	}
 </script>

@@ -25,7 +25,7 @@ $body = '';
 <div class="cetak">
 	<div style="padding: 10px;margin:0 0 3rem 0;">
 		<input type="hidden" value="<?php echo get_option( '_crb_apikey_esakip' ); ?>" id="api_key">
-	<h1 class="text-center" style="margin:3rem;">Halaman Penjadwalan Tahun <?php echo $input['tahun_anggaran']; ?></h1>
+	<h1 class="text-center" style="margin:3rem;">Halaman Penjadwalan Lembar Kerja Evaluasi SAKIP <br>Tahun <?php echo $input['tahun_anggaran']; ?></h1>
 		<div style="margin-bottom: 25px;">
 			<button class="btn btn-primary tambah_jadwal" onclick="tambah_jadwal();">Tambah Jadwal</button>
 		</div>
