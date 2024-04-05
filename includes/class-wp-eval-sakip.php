@@ -166,12 +166,13 @@ class Wp_Eval_Sakip {
 
 		$this->loader->add_action('wp_ajax_sql_migrate_esakip', $plugin_admin, 'sql_migrate_esakip');
 		$this->loader->add_action('wp_ajax_generate_user_sipd_merah', $plugin_admin, 'generate_user_sipd_merah');
-		$this->loader->add_action('wp_ajax_gen_user_sipd_merah', $plugin_admin, 'gen_user_sipd_merah');
+		$this->loader->add_action('wp_ajax_generate_user_esakip', $plugin_admin, 'generate_user_esakip');
 		$this->loader->add_action('wp_ajax_get_data_unit', $plugin_admin, 'get_data_unit');
 		$this->loader->add_action('wp_ajax_get_data_unit_wpsipd', $plugin_admin, 'get_data_unit_wpsipd');
 		$this->loader->add_action('wp_ajax_esakip_load_ajax_carbon', $plugin_admin, 'esakip_load_ajax_carbon');
 		
 		$this->loader->add_action('carbon_fields_register_fields', $plugin_admin, 'crb_attach_esakip_options');
+		$this->loader->add_action('template_redirect', $plugin_admin, 'allow_access_private_post', 0);
 	}
 
 	/**

@@ -32,14 +32,14 @@ jQuery(document).ready(function () {
       },
     });
   }
-  jQuery("#generate_user").on("click", function () {
+  jQuery("#generate_user_esakip").on("click", function () {
     if (confirm("Apakah anda yakin akan menggenerate user SIPD!")) {
       jQuery("#wrap-loading").show();
       jQuery.ajax({
         url: ajaxurl,
         type: "POST",
         data: {
-          action: "generate_user_sipd_merah",
+          action: "generate_user_esakip",
           api_key: esakip.api_key,
           pass: prompt("Masukan password default untuk User yang akan dibuat"),
           update_pass: confirm(

@@ -535,8 +535,8 @@ class Wp_Eval_Sakip_Admin
 					->set_html('<a href="#" class="button button-primary" onclick="get_data_unit_wpsipd(); return false;">Tarik Data Unit dari WP SIPD</a>')
 					->set_help_text('Tombol untuk menarik data Unit dari WP SIPD.'),
 				Field::make('html', 'crb_generate_user')
-					->set_html('<a id="generate_user" onclick="return false;" href="#" class="button button-primary button-large">Generate User By DB Lokal</a>')
-					->set_help_text('Data user active yang ada di table data unit akan digenerate menjadi user wordpress.'),
+					->set_html('<a id="generate_user_esakip" onclick="return false;" href="#" class="button button-primary button-large">Generate User By DB Lokal</a>')
+					->set_help_text('Data user active yang ada di table esakip_data_unit akan digenerate menjadi user wordpress.'),
 			));
 		Container::make('theme_options', __('Desain LKE SAKIP'))
 			->set_page_parent($basic_options_container)
@@ -859,7 +859,7 @@ class Wp_Eval_Sakip_Admin
 		die(json_encode($ret));
 	}
 
-	function gen_user_sipd_merah($user = array(), $update_pass = false)
+	function gen_user_esakip($user = array(), $update_pass = false)
 	{
 		global $wpdb;
 		if (!empty($user)) {
@@ -893,6 +893,11 @@ class Wp_Eval_Sakip_Admin
 				if (is_wp_error($insert_user)) {
 					return $insert_user;
 				}
+			}else{
+				$user_meta = get_userdata( $insert_user );
+				if(!in_array($user['jabatan'], $user_meta->roles)){
+					$user_meta->add_role( $user['jabatan'] );
+				}
 			}
 
 			if (!empty($update_pass)) {
@@ -923,7 +928,7 @@ class Wp_Eval_Sakip_Admin
 		}
 	}
 
-	function generate_user_sipd_merah()
+	function generate_user_esakip()
 	{
 		global $wpdb;
 		$ret = array();
@@ -935,7 +940,7 @@ class Wp_Eval_Sakip_Admin
 					$wpdb->prepare("
 						SELECT 
 						* 
-						FROM data_unit 
+						FROM esakip_data_unit 
 						WHERE active=1
 						"),
 					ARRAY_A
@@ -955,7 +960,7 @@ class Wp_Eval_Sakip_Admin
 						$user['nama'] = $user['namakepala'];
 						$user['id_sub_skpd'] = $user['id_skpd'];
 						$user['nip'] = $user['nipkepala'];
-						$this->gen_user_sipd_merah($user, $update_pass);
+						$this->gen_user_esakip($user, $update_pass);
 					}
 				} else {
 					$ret['status'] = 'error';
@@ -1070,5 +1075,76 @@ class Wp_Eval_Sakip_Admin
 		$response = json_encode($data);
 
 		die($response);
+	}
+
+	function allow_access_private_post()
+	{
+		if (
+			!empty($_GET)
+			&& !empty($_GET['key'])
+		) {
+			$key = base64_decode($_GET['key']);
+			$key_db = md5(get_option(ESAKIP_APIKEY));
+			$key = explode($key_db, $key);
+			$valid = 0;
+			if (
+				!empty($key[1])
+				&& $key[0] == $key[1]
+				&& is_numeric($key[1])
+			) {
+				$tgl1 = new DateTime();
+				$date = substr($key[1], 0, strlen($key[1]) - 3);
+				$tgl2 = new DateTime(date('Y-m-d', $date));
+				$valid = $tgl2->diff($tgl1)->days + 1;
+			}
+			if ($valid == 1) {
+				global $wp_query;
+				// print_r($wp_query);
+				// print_r($wp_query->queried_object); die('tes');
+				if (!empty($wp_query->queried_object)) {
+					if ($wp_query->queried_object->post_status == 'private') {
+						wp_update_post(array(
+							'ID'    =>  $wp_query->queried_object->ID,
+							'post_status'   =>  'publish'
+						));
+						if (!empty($_GET['private'])) {
+							die('<script>window.location =  window.location.href;</script>');
+						} else {
+							die('<script>window.location =  window.location.href+"&private=1";</script>');
+						}
+					} else if (!empty($_GET['private'])) {
+						wp_update_post(array(
+							'ID'    =>  $wp_query->queried_object->ID,
+							'post_status'   =>  'private'
+						));
+					}
+				} else if ($wp_query->found_posts >= 1) {
+					global $wpdb;
+					$sql = $wp_query->request;
+					$post = $wpdb->get_results($sql, ARRAY_A);
+					if (!empty($post)) {
+						if (empty($post[0]['post_status'])) {
+							return;
+						}
+						if ($post[0]['post_status'] == 'private') {
+							wp_update_post(array(
+								'ID'    =>  $post[0]['ID'],
+								'post_status'   =>  'publish'
+							));
+							if (!empty($_GET['private'])) {
+								die('<script>window.location =  window.location.href;</script>');
+							} else {
+								die('<script>window.location =  window.location.href+"&private=1";</script>');
+							}
+						} else if (!empty($_GET['private'])) {
+							wp_update_post(array(
+								'ID'    =>  $post[0]['ID'],
+								'post_status'   =>  'private'
+							));
+						}
+					}
+				}
+			}
+		}
 	}
 }
