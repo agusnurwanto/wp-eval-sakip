@@ -6,42 +6,19 @@ if (!defined('WPINC')) {
 }
 
 $input = shortcode_atts(array(
-    'tahun' => '2022',
+    'periode' => '',
 ), $atts);
 
-if (!empty($_GET) && !empty($_GET['id_skpd'])) {
-    $id_skpd = $_GET['id_skpd'];
-}
-
-$skpd = $wpdb->get_row(
+$data_jadwal = $wpdb->get_row(
     $wpdb->prepare("
-    SELECT 
-        kode_skpd,
-        nama_skpd
-    FROM esakip_data_unit
-    WHERE id_skpd=%d
-      AND tahun_anggaran=%d
-      AND active = 1
-", $id_skpd, $input['tahun']),
+        SELECT *
+        FROM esakip_data_jadwal
+        WHERE id = %d
+    ", $input['periode']),
     ARRAY_A
 );
 
-$idtahun = $wpdb->get_results(
-    "
-		SELECT DISTINCT 
-			tahun_anggaran 
-		FROM esakip_data_unit",
-    ARRAY_A
-);
-$tahun = "<option value='-1'>Pilih Tahun</option>";
-
-foreach ($idtahun as $val) {
-    $selected = '';
-    if (!empty($input['tahun_anggaran']) && $val['tahun_anggaran'] == $input['tahun_anggaran']) {
-        $selected = 'selected';
-    }
-    $tahun .= "<option value='$val[tahun_anggaran]' $selected>$val[tahun_anggaran]</option>";
-}
+$tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan'];
 ?>
 <style type="text/css">
     .wrap-table {
@@ -65,12 +42,12 @@ foreach ($idtahun as $val) {
 <div class="container-md">
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Dokumen Lain <br><?php echo $skpd['kode_skpd'] . ' ' . $skpd['nama_skpd'] ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
+            <h1 class="text-center" style="margin:3rem;">Dokumen RENSTRA<br><?php echo $data_jadwal['nama_jadwal'] . ' (' . $data_jadwal['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1>
             <div style="margin-bottom: 25px;">
-                <button class="btn btn-primary" onclick="tambah_dokumen_lain();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
+                <button class="btn btn-primary" onclick="tambah_dokumen_renstra();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
             </div>
             <div class="wrap-table">
-                <table id="table_dokumen_lain" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                <table id="table_dokumen_renstra" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
@@ -103,7 +80,7 @@ foreach ($idtahun as $val) {
             <div class="modal-body">
                 <form enctype="multipart/form-data">
                     <input type="hidden" value="<?php echo $id_skpd; ?>" id="idSkpd">
-                    <input type="hidden" value="<?php echo $input['tahun']; ?>" id="tahunAnggaran">
+                    <input type="hidden" value="<?php echo $input['periode']; ?>" id="id_jadwal">
                     <input type="hidden" value="" id="idDokumen">
                     <div class="form-group">
                         <label for="perangkatDaerah">Perangkat Daerah</label>
@@ -127,60 +104,28 @@ foreach ($idtahun as $val) {
         </div>
     </div>
 </div>
-
-<!-- Modal Tahun -->
-<div class="modal fade" id="tahunModal" tabindex="-1" role="dialog" aria-labelledby="tahunModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="tahunModalLabel">Pilih Tahun Anggaran</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="tahunForm">
-                    <div class="form-group">
-                        <label for="tahunAnggaran">Tahun Anggaran:</label>
-                        <select class="form-control" id="tahunAnggaran" name="tahunAnggaran">
-                            <?php echo $tahun; ?>
-                        </select>
-                        <input type="hidden" id="idDokumen" value="">
-                    </div>
-                    <button type="submit" class="btn btn-primary" onclick="submit_tahun_dokumen_lainnya(); return false">Simpan</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Tahun Tabel -->
-<div id="tahunContainer" class="container-md">
-</div>
-
 <script>
     jQuery(document).ready(function() {
-        getTableDokumenLain();
-        getTableTahun();
+        getTableRenstra();
     });
 
-    function getTableDokumenLain() {
+    function getTableRenstra() {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'get_table_dokumen_lain',
+                action: 'get_table_renstra',
                 api_key: esakip.api_key,
                 id_skpd: <?php echo $id_skpd; ?>,
-                tahun_anggaran: '<?php echo $input['tahun'] ?>'
+                id_jadwal: '<?php echo $input['periode']; ?>'
             },
             dataType: 'json',
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 console.log(response);
                 if (response.status === 'success') {
-                    jQuery('#table_dokumen_lain tbody').html(response.data);
+                    jQuery('#table_dokumen_renstra tbody').html(response.data);
                 } else {
                     alert(response.message);
                 }
@@ -188,40 +133,12 @@ foreach ($idtahun as $val) {
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data Lain!');
+                alert('Terjadi kesalahan saat memuat data RENSTRA!');
             }
         });
     }
 
-    function getTableTahun() {
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: 'POST',
-            data: {
-                action: 'get_table_tahun_dokumen_lainnya',
-                api_key: esakip.api_key,
-                id_skpd: <?php echo $id_skpd; ?>,
-            },
-            dataType: 'json',
-            success: function(response) {
-                jQuery('#wrap-loading').hide();
-                console.log(response);
-                if (response.status === 'success') {
-                    jQuery('#tahunContainer').html(response.data);
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                jQuery('#wrap-loading').hide();
-                console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat tabel!');
-            }
-        });
-    }
-
-    function tambah_dokumen_lain() {
+    function tambah_dokumen_renstra() {
         jQuery("#editModalLabel").hide();
         jQuery("#uploadModalLabel").show();
         jQuery("#idDokumen").val('');
@@ -231,13 +148,13 @@ foreach ($idtahun as $val) {
         jQuery("#uploadModal").modal('show');
     }
 
-    function edit_dokumen_lain(id) {
+    function edit_dokumen_renstra(id) {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'get_detail_lain_by_id',
+                action: 'get_detail_renstra_by_id',
                 api_key: esakip.api_key,
                 id: id
             },
@@ -267,47 +184,6 @@ foreach ($idtahun as $val) {
         });
     }
 
-    function submit_tahun_dokumen_lainnya() {
-        let id = jQuery("#idDokumen").val();
-        if (id == '') {
-            return alert('id tidak boleh kosong');
-        }
-
-        let tahunAnggaran = jQuery("#tahunAnggaran").val();
-        if (tahunAnggaran == '') {
-            return alert('Tahun Anggaran tidak boleh kosong');
-        }
-
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: 'POST',
-            data: {
-                action: 'submit_tahun_dokumen_lainnya',
-                id: id,
-                tahunAnggaran: tahunAnggaran,
-                api_key: esakip.api_key
-            },
-            dataType: 'json',
-            success: function(response) {
-                console.log(response);
-                jQuery('#wrap-loading').hide();
-                if (response.status === 'success') {
-                    alert(response.message);
-                    jQuery('#tahunModal').modal('hide');
-                    getTableTahun();
-                    getTableDokumenLain();
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                jQuery('#wrap-loading').hide();
-                console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat mengirim data!');
-            }
-        });
-    }
 
     function submit_dokumen(that) {
         let id_dokumen = jQuery("#idDokumen").val();
@@ -324,9 +200,9 @@ foreach ($idtahun as $val) {
         if (keterangan == '') {
             return alert('Keterangan tidak boleh kosong');
         }
-        let tahunAnggaran = jQuery("#tahunAnggaran").val();
-        if (tahunAnggaran == '') {
-            return alert('Tahun Anggaran tidak boleh kosong');
+        let idJadwal = jQuery("#id_jadwal").val();
+        if (id_Jadwal == '') {
+            return alert('Id Jadwal tidak boleh kosong');
         }
         let fileDokumen = jQuery("#fileUpload").prop('files')[0];
         if (fileDokumen == '') {
@@ -334,13 +210,13 @@ foreach ($idtahun as $val) {
         }
 
         let form_data = new FormData();
-        form_data.append('action', 'tambah_dokumen_lain');
+        form_data.append('action', 'tambah_dokumen_renstra');
         form_data.append('api_key', esakip.api_key);
         form_data.append('id_dokumen', id_dokumen);
         form_data.append('skpd', skpd);
         form_data.append('idSkpd', idSkpd);
         form_data.append('keterangan', keterangan);
-        form_data.append('tahunAnggaran', tahunAnggaran);
+        form_data.append('id_jadwal', idJadwal);
         form_data.append('fileUpload', fileDokumen);
 
         jQuery('#wrap-loading').show();
@@ -357,7 +233,7 @@ foreach ($idtahun as $val) {
                 if (response.status === 'success') {
                     jQuery('#uploadModal').modal('hide');
                     alert(response.message);
-                    getTableDokumenLain();
+                    getTableRenstra();
                 } else {
                     alert(response.message);
                 }
@@ -375,12 +251,8 @@ foreach ($idtahun as $val) {
         window.open(url, '_blank');
     }
 
-    function set_tahun_dokumen(id) {
-        jQuery('#tahunModal').modal('show');
-        jQuery('#idDokumen').val(id);
-    }
 
-    function hapus_dokumen_lain(id) {
+    function hapus_dokumen_renstra(id) {
         if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
             return;
         }
@@ -389,7 +261,7 @@ foreach ($idtahun as $val) {
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'hapus_dokumen_lain',
+                action: 'hapus_dokumen_renstra',
                 api_key: esakip.api_key,
                 id: id
             },
@@ -399,7 +271,7 @@ foreach ($idtahun as $val) {
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
                     alert(response.message);
-                    getTableDokumenLain();
+                    getTableRenstra();
                 } else {
                     alert(response.message);
                 }

@@ -290,10 +290,34 @@ class Wp_Eval_Sakip {
 		
 		$this->loader->add_action('wp_ajax_get_table_tahun_renja', $plugin_public, 'get_table_tahun_renja');
 		$this->loader->add_action('wp_ajax_get_table_skpd_renja', $plugin_public, 'get_table_skpd_renja');
-		$this->loader->add_action('wp_ajax_get_table_tahun_renstra', $plugin_public, 'get_table_tahun_renstra');
-		$this->loader->add_action('wp_ajax_get_table_skpd_renstra', $plugin_public, 'get_table_skpd_renstra');
 		$this->loader->add_action('wp_ajax_get_table_tahun_dokumen_lainnya', $plugin_public, 'get_table_tahun_dokumen_lainnya');
 		$this->loader->add_action('wp_ajax_get_table_skpd_dokumen_lainnya', $plugin_public, 'get_table_skpd_dokumen_lainnya');
+		$this->loader->add_action('wp_ajax_get_table_tahun_skp', $plugin_public, 'get_table_tahun_skp');
+		$this->loader->add_action('wp_ajax_get_table_skpd_skp', $plugin_public, 'get_table_skpd_skp');
+		$this->loader->add_action('wp_ajax_get_table_tahun_perjanjian_kinerja', $plugin_public, 'get_table_tahun_perjanjian_kinerja');
+		$this->loader->add_action('wp_ajax_get_table_skpd_perjanjian_kinerja', $plugin_public, 'get_table_skpd_perjanjian_kinerja');
+		$this->loader->add_action('wp_ajax_get_table_tahun_rencana_aksi', $plugin_public, 'get_table_tahun_rencana_aksi');
+		$this->loader->add_action('wp_ajax_get_table_skpd_rencana_aksi', $plugin_public, 'get_table_skpd_rencana_aksi');
+		$this->loader->add_action('wp_ajax_get_table_tahun_pengukuran_kinerja', $plugin_public, 'get_table_tahun_pengukuran_kinerja');
+		$this->loader->add_action('wp_ajax_get_table_skpd_pengukuran_kinerja', $plugin_public, 'get_table_skpd_pengukuran_kinerja');
+		$this->loader->add_action('wp_ajax_get_table_tahun_pengukuran_rencana_aksi', $plugin_public, 'get_table_tahun_pengukuran_rencana_aksi');
+		$this->loader->add_action('wp_ajax_get_table_skpd_pengukuran_rencana_aksi', $plugin_public, 'get_table_skpd_pengukuran_rencana_aksi');
+		$this->loader->add_action('wp_ajax_get_table_tahun_iku', $plugin_public, 'get_table_tahun_iku');
+		$this->loader->add_action('wp_ajax_get_table_skpd_iku', $plugin_public, 'get_table_skpd_iku');
+		$this->loader->add_action('wp_ajax_get_table_tahun_evaluasi_internal', $plugin_public, 'get_table_tahun_evaluasi_internal');
+		$this->loader->add_action('wp_ajax_get_table_skpd_evaluasi_internal', $plugin_public, 'get_table_skpd_evaluasi_internal');
+		$this->loader->add_action('wp_ajax_get_table_tahun_laporan_kinerja', $plugin_public, 'get_table_tahun_laporan_kinerja');
+		$this->loader->add_action('wp_ajax_get_table_skpd_laporan_kinerja', $plugin_public, 'get_table_skpd_laporan_kinerja');
+		$this->loader->add_action('wp_ajax_get_table_tahun_rkpd', $plugin_public, 'get_table_tahun_rkpd');
+		$this->loader->add_action('wp_ajax_get_table_skpd_rkpd', $plugin_public, 'get_table_skpd_rkpd');
+		$this->loader->add_action('wp_ajax_get_table_tahun_lkjip', $plugin_public, 'get_table_tahun_lkjip');
+		$this->loader->add_action('wp_ajax_get_table_skpd_lkjip', $plugin_public, 'get_table_skpd_lkjip');
+
+		$this->loader->add_action('wp_ajax_get_table_tahun_renstra', $plugin_public, 'get_table_tahun_renstra');
+		$this->loader->add_action('wp_ajax_get_table_skpd_renstra', $plugin_public, 'get_table_skpd_renstra');
+		$this->loader->add_action('wp_ajax_get_table_tahun_rpjmd', $plugin_public, 'get_table_tahun_rpjmd');
+		$this->loader->add_action('wp_ajax_get_table_skpd_rpjmd', $plugin_public, 'get_table_skpd_rpjmd');
+
 		
 		add_shortcode('desain_lke_sakip', array($plugin_public, 'desain_lke_sakip'));
 		add_shortcode('jadwal_evaluasi_sakip', array($plugin_public, 'jadwal_evaluasi_sakip'));

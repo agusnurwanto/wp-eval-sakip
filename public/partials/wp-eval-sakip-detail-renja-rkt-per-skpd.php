@@ -157,6 +157,7 @@ foreach ($idtahun as $val) {
 <!-- Tahun Tabel -->
 <div id="tahunContainer" class="container-md">
 </div>
+
 <script>
     jQuery(document).ready(function() {
         getTableRenja();
@@ -275,7 +276,6 @@ foreach ($idtahun as $val) {
             }
         });
     }
-
 
     function submit_dokumen(that) {
         let id_dokumen = jQuery("#idDokumen").val();
@@ -406,6 +406,7 @@ foreach ($idtahun as $val) {
                 if (response.status === 'success') {
                     alert(response.message);
                     getTableRenja();
+                    getTableTahun();
                 } else {
                     alert(response.message);
                 }

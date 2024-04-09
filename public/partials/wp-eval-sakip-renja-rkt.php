@@ -65,6 +65,7 @@ foreach ($idtahun as $val) {
 		</div>
 	</div>
 </div>
+
 <div id="tahunContainer" class="container-md">
 </div>
 
@@ -208,11 +209,5 @@ foreach ($idtahun as $val) {
 				alert('Terjadi kesalahan saat mengirim data!');
 			}
 		});
-	}
-
-
-	function detail_dokumen() {
-		jQuery('#uploadForm').modal('show');
-
 	}
 </script>
