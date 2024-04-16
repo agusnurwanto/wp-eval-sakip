@@ -14,11 +14,32 @@ $data_jadwal = $wpdb->get_row(
         SELECT *
         FROM esakip_data_jadwal
         WHERE id = %d
+          AND status = 1
     ", $input['periode']),
     ARRAY_A
 );
 
+
 $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan'];
+
+$idtahun = $wpdb->get_results(
+    "
+		SELECT 
+			*
+		FROM esakip_data_jadwal",
+    ARRAY_A
+);
+
+$tahun = "<option value='-1'>Pilih Tahun Periode</option>";
+
+foreach ($idtahun as $val) {
+    $tahun_anggaran_selesai = $val['tahun_anggaran'] + $val['lama_pelaksanaan'];
+    $selected = '';
+    if (!empty($input['id']) && $val['id'] == $input['periode']) {
+        $selected = 'selected';
+    }
+    $tahun .= "<option value='$val[id]' $selected>$val[nama_jadwal] Periode $val[tahun_anggaran] -  $tahun_anggaran_selesai</option>";
+} 
 ?>
 <style type="text/css">
     .wrap-table {
@@ -42,7 +63,7 @@ $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan
 <div class="container-md">
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Dokumen RPJMD<br><?php echo $data_jadwal['nama_jadwal'] . ' (' . $data_jadwal['tahun_anggaran'] . ' - ' . $tahun_periode . ')';?></h1>
+            <h1 class="text-center" style="margin:3rem;">Dokumen RPJMD<br><?php echo $data_jadwal['nama_jadwal'] . ' (' . $data_jadwal['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1>
             <div style="margin-bottom: 25px;">
                 <button class="btn btn-primary" onclick="tambah_dokumen_rpjmd();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
             </div>
@@ -98,9 +119,41 @@ $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan
         </div>
     </div>
 </div>
+
+<!-- Modal Tahun -->
+<div class="modal fade" id="tahunModal" tabindex="-1" role="dialog" aria-labelledby="tahunModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tahunModalLabel">Pilih Tahun Anggaran</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="tahunForm">
+                    <div class="form-group">
+                        <label for="tahunAnggaran">Tahun Anggaran:</label>
+                        <select class="form-control" id="tahunAnggaran" name="tahunAnggaran">
+                            <?php echo $tahun; ?>
+                        </select>
+                        <input type="hidden" id="idDokumen" value="">
+                    </div>
+                    <button type="submit" class="btn btn-primary" onclick="submit_tahun_rpjmd(); return false">Simpan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tahun Tabel -->
+<div id="tahunContainer" class="container-md">
+</div>
+
 <script>
     jQuery(document).ready(function() {
         getTableRpjmd();
+        getTableTahun();
     });
 
     function getTableRpjmd() {
@@ -111,7 +164,7 @@ $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan
             data: {
                 action: 'get_table_rpjmd',
                 api_key: esakip.api_key,
-                id_jadwal: '<?php echo $input['periode'] ?>'
+                id_periode: <?php echo $input['periode']; ?>,
             },
             dataType: 'json',
             success: function(response) {
@@ -126,9 +179,46 @@ $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data RPJMD!');
+                alert('Terjadi kesalahan saat memuat data rpjmd!');
             }
         });
+    }
+
+    function getTableTahun() {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_table_tahun_rpjmd',
+                api_key: esakip.api_key,
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                console.log(response);
+                if (response.status === 'success') {
+                    jQuery('#tahunContainer').html(response.data);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat tabel!');
+            }
+        });
+    }
+
+    function lihatDokumen(dokumen) {
+        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + dokumen;
+        window.open(url, '_blank');
+    }
+
+    function set_tahun_dokumen(id) {
+        jQuery('#tahunModal').modal('show');
+        jQuery('#idDokumen').val(id);
     }
 
     function tambah_dokumen_rpjmd() {
@@ -157,7 +247,7 @@ $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan
                 console.log(response);
                 if (response.status === 'success') {
                     let data = response.data;
-                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/'; ?>' + data.dokumen;
+                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + data.dokumen;
                     jQuery("#idDokumen").val(data.id);
                     jQuery("#fileUpload").val('');
                     jQuery('#fileUploadExisting').attr('href', url).html(data.dokumen);
@@ -177,13 +267,16 @@ $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan
         });
     }
 
-
     function submit_dokumen(that) {
         let id_dokumen = jQuery("#idDokumen").val();
 
-        let idJadwal = jQuery("#id_jadwal").val();
-        if (idJadwal == '') {
-            return alert('id_jadwal tidak boleh kosong');
+        let skpd = jQuery("#perangkatDaerah").val();
+        if (skpd == '') {
+            return alert('Perangkat Daerah tidak boleh kosong');
+        }
+        let idSkpd = jQuery("#idSkpd").val();
+        if (idSkpd == '') {
+            return alert('Id Skpd tidak boleh kosong');
         }
         let keterangan = jQuery("#keterangan").val();
         if (keterangan == '') {
@@ -202,8 +295,10 @@ $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan
         form_data.append('action', 'tambah_dokumen_rpjmd');
         form_data.append('api_key', esakip.api_key);
         form_data.append('id_dokumen', id_dokumen);
+        form_data.append('skpd', skpd);
+        form_data.append('idSkpd', idSkpd);
         form_data.append('keterangan', keterangan);
-        form_data.append('id_jadwal', idJadwal);
+        form_data.append('tahunAnggaran', tahunAnggaran);
         form_data.append('fileUpload', fileDokumen);
 
         jQuery('#wrap-loading').show();
@@ -222,7 +317,7 @@ $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan
                     alert(response.message);
                     getTableRpjmd();
                 } else {
-                    alert(response.message);
+                    alert('Error: ' + response.message);
                 }
             },
             error: function(xhr, status, error) {
@@ -233,8 +328,50 @@ $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan
         });
     }
 
+    function submit_tahun_rpjmd() {
+        let id = jQuery("#idDokumen").val();
+        if (id == '') {
+            return alert('id tidak boleh kosong');
+        }
+
+        let tahunAnggaran = jQuery("#tahunAnggaran").val();
+        if (tahunAnggaran == '') {
+            return alert('Tahun Anggaran tidak boleh kosong');
+        }
+
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'submit_tahun_rpjmd',
+                id: id,
+                tahunAnggaran: tahunAnggaran,
+                api_key: esakip.api_key
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    jQuery('#tahunModal').modal('hide');
+                    getTableTahun();
+                    getTableRpjmd();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }
+
     function lihatDokumen(dokumen) {
-        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/'; ?>' + dokumen;
+        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + dokumen;
         window.open(url, '_blank');
     }
 
@@ -259,6 +396,7 @@ $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan
                 if (response.status === 'success') {
                     alert(response.message);
                     getTableRpjmd();
+                    getTableTahun();
                 } else {
                     alert(response.message);
                 }

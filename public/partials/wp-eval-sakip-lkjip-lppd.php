@@ -9,6 +9,22 @@ $input = shortcode_atts(array(
     'tahun' => '2022',
 ), $atts);
 
+$idtahun = $wpdb->get_results(
+    "
+		SELECT DISTINCT 
+			tahun_anggaran 
+		FROM esakip_data_unit",
+    ARRAY_A
+);
+$tahun = "<option value='-1'>Pilih Tahun</option>";
+
+foreach ($idtahun as $val) {
+    $selected = '';
+    if (!empty($input['tahun_anggaran']) && $val['tahun_anggaran'] == $input['tahun_anggaran']) {
+        $selected = 'selected';
+    }
+    $tahun .= "<option value='$val[tahun_anggaran]' $selected>$val[tahun_anggaran]</option>";
+}
 ?>
 <style type="text/css">
     .wrap-table {
@@ -32,12 +48,12 @@ $input = shortcode_atts(array(
 <div class="container-md">
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Dokumen LKJIP / LPPD<br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
+            <h1 class="text-center" style="margin:3rem;">Dokumen LKJIP / LPPD <br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
             <div style="margin-bottom: 25px;">
-                <button class="btn btn-primary" onclick="tambah_dokumen_lkjip_lppd();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
+                <button class="btn btn-primary" onclick="tambah_dokumen_lkjip();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
             </div>
             <div class="wrap-table">
-                <table id="table_dokumen_lkjip_lppd" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                <table id="table_dokumen_lkjip" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
@@ -53,6 +69,10 @@ $input = shortcode_atts(array(
             </div>
         </div>
     </div>
+</div>
+
+<!-- Tahun Tabel -->
+<div id="tahunContainer" class="container-md">
 </div>
 
 <!-- Modal Upload -->
@@ -88,12 +108,108 @@ $input = shortcode_atts(array(
         </div>
     </div>
 </div>
+
+<!-- Modal Tahun -->
+<div class="modal fade" id="tahunModal" tabindex="-1" role="dialog" aria-labelledby="tahunModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tahunModalLabel">Pilih Tahun Anggaran</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="tahunForm">
+                    <div class="form-group">
+                        <label for="tahunAnggaran">Tahun Anggaran:</label>
+                        <select class="form-control" id="tahunAnggaran" name="tahunAnggaran">
+                            <?php echo $tahun; ?>
+                        </select>
+                        <input type="hidden" id="idDokumen" value="">
+                    </div>
+                    <button type="submit" class="btn btn-primary" onclick="submit_tahun_lkjip(); return false">Simpan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     jQuery(document).ready(function() {
-        getTableLkjipLppd();
+        getTableLkjip();
+        getTableTahun();
     });
 
-    function getTableLkjipLppd() {
+    function getTableTahun() {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_table_tahun_lkjip',
+                api_key: esakip.api_key,
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                console.log(response);
+                if (response.status === 'success') {
+                    jQuery('#tahunContainer').html(response.data);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat tabel!');
+            }
+        });
+    }
+
+    function submit_tahun_lkjip() {
+        let id = jQuery("#idDokumen").val();
+        if (id == '') {
+            return alert('id tidak boleh kosong');
+        }
+
+        let tahunAnggaran = jQuery("#tahunAnggaran").val();
+        if (tahunAnggaran == '') {
+            return alert('Tahun Anggaran tidak boleh kosong');
+        }
+
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'submit_tahun_lkjip_lppd',
+                id: id,
+                tahunAnggaran: tahunAnggaran,
+                api_key: esakip.api_key
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    jQuery('#tahunModal').modal('hide');
+                    getTableTahun();
+                    getTableLkjip();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }
+
+    function getTableLkjip() {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -108,7 +224,7 @@ $input = shortcode_atts(array(
                 jQuery('#wrap-loading').hide();
                 console.log(response);
                 if (response.status === 'success') {
-                    jQuery('#table_dokumen_lkjip_lppd tbody').html(response.data);
+                    jQuery('#table_dokumen_lkjip tbody').html(response.data);
                 } else {
                     alert(response.message);
                 }
@@ -116,12 +232,12 @@ $input = shortcode_atts(array(
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data Laporan Kinerja!');
+                alert('Terjadi kesalahan saat memuat data LKJIP!');
             }
         });
     }
 
-    function tambah_dokumen_lkjip_lppd() {
+    function tambah_dokumen_lkjip() {
         jQuery("#editModalLabel").hide();
         jQuery("#uploadModalLabel").show();
         jQuery("#idDokumen").val('');
@@ -131,7 +247,7 @@ $input = shortcode_atts(array(
         jQuery("#uploadModal").modal('show');
     }
 
-    function edit_dokumen_lkjip_lppd(id) {
+    function edit_dokumen_lkjip(id) {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -147,7 +263,7 @@ $input = shortcode_atts(array(
                 console.log(response);
                 if (response.status === 'success') {
                     let data = response.data;
-                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/'; ?>' + data.dokumen;
+                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + data.dokumen;
                     jQuery("#idDokumen").val(data.id);
                     jQuery("#fileUpload").val('');
                     jQuery('#fileUploadExisting').attr('href', url).html(data.dokumen);
@@ -167,7 +283,6 @@ $input = shortcode_atts(array(
         });
     }
 
-
     function submit_dokumen(that) {
         let id_dokumen = jQuery("#idDokumen").val();
 
@@ -185,7 +300,7 @@ $input = shortcode_atts(array(
         }
 
         let form_data = new FormData();
-        form_data.append('action', 'tambah_dokumen_lkjip_lppd');
+        form_data.append('action', 'tambah_dokumen_lkjip');
         form_data.append('api_key', esakip.api_key);
         form_data.append('id_dokumen', id_dokumen);
         form_data.append('keterangan', keterangan);
@@ -206,7 +321,7 @@ $input = shortcode_atts(array(
                 if (response.status === 'success') {
                     jQuery('#uploadModal').modal('hide');
                     alert(response.message);
-                    getTableLkjipLppd();
+                    getTableLkjip();
                 } else {
                     alert(response.message);
                 }
@@ -220,12 +335,16 @@ $input = shortcode_atts(array(
     }
 
     function lihatDokumen(dokumen) {
-        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/'; ?>' + dokumen;
+        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + dokumen;
         window.open(url, '_blank');
     }
 
+    function set_tahun_dokumen(id) {
+        jQuery('#tahunModal').modal('show');
+        jQuery('#idDokumen').val(id);
+    }
 
-    function hapus_dokumen_lkjip_lppd(id) {
+    function hapus_dokumen_lkjip(id) {
         if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
             return;
         }
@@ -244,7 +363,7 @@ $input = shortcode_atts(array(
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
                     alert(response.message);
-                    getTableLkjipLppd();
+                    getTableLkjip();
                 } else {
                     alert(response.message);
                 }

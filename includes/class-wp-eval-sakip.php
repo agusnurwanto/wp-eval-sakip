@@ -266,12 +266,15 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_detail_renstra_by_id', $plugin_public, 'get_detail_renstra_by_id');
 		$this->loader->add_action('wp_ajax_tambah_dokumen_renstra', $plugin_public, 'tambah_dokumen_renstra');
 		$this->loader->add_action('wp_ajax_hapus_dokumen_renstra', $plugin_public, 'hapus_dokumen_renstra');
+		$this->loader->add_action('wp_ajax_submit_tahun_renstra', $plugin_public, 'submit_tahun_renstra');
 		$this->loader->add_action('wp_ajax_get_table_renstra', $plugin_public, 'get_table_renstra');
  
 		$this->loader->add_action('wp_ajax_get_detail_rkpd_by_id', $plugin_public, 'get_detail_rkpd_by_id');
 		$this->loader->add_action('wp_ajax_tambah_dokumen_rkpd', $plugin_public, 'tambah_dokumen_rkpd');
 		$this->loader->add_action('wp_ajax_hapus_dokumen_rkpd', $plugin_public, 'hapus_dokumen_rkpd');
 		$this->loader->add_action('wp_ajax_get_table_rkpd', $plugin_public, 'get_table_rkpd');
+		$this->loader->add_action('wp_ajax_get_table_tahun_dokumen_pemda_lain', $plugin_public, 'get_table_tahun_dokumen_pemda_lain');
+		$this->loader->add_action('wp_ajax_submit_tahun_dokumen_pemda_lain', $plugin_public, 'submit_tahun_dokumen_pemda_lain');
  
 		$this->loader->add_action('wp_ajax_get_detail_rpjmd_by_id', $plugin_public, 'get_detail_rpjmd_by_id');
 		$this->loader->add_action('wp_ajax_tambah_dokumen_rpjmd', $plugin_public, 'tambah_dokumen_rpjmd');
@@ -282,11 +285,15 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_tambah_dokumen_lkjip_lppd', $plugin_public, 'tambah_dokumen_lkjip_lppd');
 		$this->loader->add_action('wp_ajax_hapus_dokumen_lkjip_lppd', $plugin_public, 'hapus_dokumen_lkjip_lppd');
 		$this->loader->add_action('wp_ajax_get_table_lkjip_lppd', $plugin_public, 'get_table_lkjip_lppd');
+		$this->loader->add_action('wp_ajax_get_table_tahun_lkjip_lppd', $plugin_public, 'get_table_tahun_lkjip_lppd');
+		$this->loader->add_action('wp_ajax_submit_tahun_lkjip_lppd', $plugin_public, 'submit_tahun_lkjip_lppd');
  
 		$this->loader->add_action('wp_ajax_get_detail_dokumen_pemda_lain_by_id', $plugin_public, 'get_detail_dokumen_pemda_lain_by_id');
 		$this->loader->add_action('wp_ajax_tambah_dokumen_dokumen_pemda_lain', $plugin_public, 'tambah_dokumen_dokumen_pemda_lain');
 		$this->loader->add_action('wp_ajax_hapus_dokumen_dokumen_pemda_lain', $plugin_public, 'hapus_dokumen_dokumen_pemda_lain');
 		$this->loader->add_action('wp_ajax_get_table_dokumen_pemda_lain', $plugin_public, 'get_table_dokumen_pemda_lain');
+		$this->loader->add_action('wp_ajax_get_table_tahun_dokumen_pemda_lain', $plugin_public, 'get_table_tahun_dokumen_pemda_lain');
+		$this->loader->add_action('wp_ajax_submit_tahun_dokumen_pemda_lain', $plugin_public, 'submit_tahun_dokumen_pemda_lain');
 		
 		$this->loader->add_action('wp_ajax_get_table_tahun_renja', $plugin_public, 'get_table_tahun_renja');
 		$this->loader->add_action('wp_ajax_get_table_skpd_renja', $plugin_public, 'get_table_skpd_renja');
@@ -316,8 +323,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_table_tahun_renstra', $plugin_public, 'get_table_tahun_renstra');
 		$this->loader->add_action('wp_ajax_get_table_skpd_renstra', $plugin_public, 'get_table_skpd_renstra');
 		$this->loader->add_action('wp_ajax_get_table_tahun_rpjmd', $plugin_public, 'get_table_tahun_rpjmd');
-		$this->loader->add_action('wp_ajax_get_table_skpd_rpjmd', $plugin_public, 'get_table_skpd_rpjmd');
-
+		$this->loader->add_action('wp_ajax_submit_tahun_rpjmd', $plugin_public, 'submit_tahun_rpjmd');
 		
 		add_shortcode('desain_lke_sakip', array($plugin_public, 'desain_lke_sakip'));
 		add_shortcode('jadwal_evaluasi_sakip', array($plugin_public, 'jadwal_evaluasi_sakip'));

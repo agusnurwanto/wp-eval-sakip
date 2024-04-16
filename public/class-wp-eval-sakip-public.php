@@ -1171,6 +1171,156 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($ret));
 	}
 
+	public function submit_tahun_renstra()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$id = $_POST['id'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id kosong!';
+				}
+				if (!empty($_POST['tahunAnggaran'])) {
+					$tahun_anggaran = $_POST['tahunAnggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+
+				if (!empty($id) && !empty($tahun_anggaran)) {
+					$existing_data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT 
+								* 
+							FROM esakip_renstra 
+							WHERE id = %d", $id)
+					);
+
+					if (!empty($existing_data)) {
+						$update_result = $wpdb->update(
+							'esakip_renstra',
+							array(
+								'tahun_anggaran' => $tahun_anggaran,
+							),
+							array('id' => $id),
+							array('%d'),
+						);
+
+						if ($update_result === false) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal memperbarui data di dalam tabel!'
+							);
+						}
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message' => 'Data dengan ID yang diberikan tidak ditemukan!'
+						);
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message' => 'ID atau tahun anggaran tidak valid!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function submit_tahun_rpjmd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$id = $_POST['id'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id kosong!';
+				}
+				if (!empty($_POST['tahunAnggaran'])) {
+					$tahun_anggaran = $_POST['tahunAnggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+
+				if (!empty($id) && !empty($tahun_anggaran)) {
+					$existing_data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT 
+								* 
+							FROM esakip_rpjmd 
+							WHERE id = %d", $id)
+					);
+
+					if (!empty($existing_data)) {
+						$update_result = $wpdb->update(
+							'esakip_rpjmd',
+							array(
+								'tahun_anggaran' => $tahun_anggaran,
+							),
+							array('id' => $id),
+							array('%d'),
+						);
+
+						if ($update_result === false) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal memperbarui data di dalam tabel!'
+							);
+						}
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message' => 'Data dengan ID yang diberikan tidak ditemukan!'
+						);
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message' => 'ID atau tahun anggaran tidak valid!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
 	public function submit_tahun_rencana_aksi()
 	{
 		global $wpdb;
@@ -1506,6 +1656,231 @@ class Wp_Eval_Sakip_Public
 					if (!empty($existing_data)) {
 						$update_result = $wpdb->update(
 							'esakip_dokumen_lainnya',
+							array(
+								'tahun_anggaran' => $tahun_anggaran,
+							),
+							array('id' => $id),
+							array('%d'),
+						);
+
+						if ($update_result === false) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal memperbarui data di dalam tabel!'
+							);
+						}
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message' => 'Data dengan ID yang diberikan tidak ditemukan!'
+						);
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message' => 'ID atau tahun anggaran tidak valid!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function submit_tahun_lkjip_lppd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$id = $_POST['id'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id kosong!';
+				}
+				if (!empty($_POST['tahunAnggaran'])) {
+					$tahun_anggaran = $_POST['tahunAnggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+
+				if (!empty($id) && !empty($tahun_anggaran)) {
+					$existing_data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT 
+								* 
+							FROM esakip_lkjip_lppd
+							WHERE id = %d", $id)
+					);
+
+					if (!empty($existing_data)) {
+						$update_result = $wpdb->update(
+							'esakip_lkjip_lppd',
+							array(
+								'tahun_anggaran' => $tahun_anggaran,
+							),
+							array('id' => $id),
+							array('%d'),
+						);
+
+						if ($update_result === false) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal memperbarui data di dalam tabel!'
+							);
+						}
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message' => 'Data dengan ID yang diberikan tidak ditemukan!'
+						);
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message' => 'ID atau tahun anggaran tidak valid!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function submit_tahun_rkpd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$id = $_POST['id'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id kosong!';
+				}
+				if (!empty($_POST['tahunAnggaran'])) {
+					$tahun_anggaran = $_POST['tahunAnggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+
+				if (!empty($id) && !empty($tahun_anggaran)) {
+					$existing_data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT 
+								* 
+							FROM esakip_rkpd
+							WHERE id = %d", $id)
+					);
+
+					if (!empty($existing_data)) {
+						$update_result = $wpdb->update(
+							'esakip_rkpd',
+							array(
+								'tahun_anggaran' => $tahun_anggaran,
+							),
+							array('id' => $id),
+							array('%d'),
+						);
+
+						if ($update_result === false) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal memperbarui data di dalam tabel!'
+							);
+						}
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message' => 'Data dengan ID yang diberikan tidak ditemukan!'
+						);
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message' => 'ID atau tahun anggaran tidak valid!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function submit_tahun_dokumen_pemda_lain()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$id = $_POST['id'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id kosong!';
+				}
+				if (!empty($_POST['tahunAnggaran'])) {
+					$tahun_anggaran = $_POST['tahunAnggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+
+				if (!empty($id) && !empty($tahun_anggaran)) {
+					$existing_data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT 
+								* 
+							FROM esakip_other_file
+							WHERE id = %d", $id)
+					);
+
+					if (!empty($existing_data)) {
+						$update_result = $wpdb->update(
+							'esakip_other_file',
 							array(
 								'tahun_anggaran' => $tahun_anggaran,
 							),
@@ -4439,8 +4814,8 @@ class Wp_Eval_Sakip_Public
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_lkjip_lppd(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
-						$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_lkjip_lppd(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_lkjip(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_lkjip(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						$btn .= '</div>';
 
 						$tbody .= "<td class='text-center'>" . $btn . "</td>";
@@ -4506,8 +4881,8 @@ class Wp_Eval_Sakip_Public
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_dokumen_pemda_lain(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
-						$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_dokumen_pemda_lain(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_pemda_lain(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_pemda_lain(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						$btn .= '</div>';
 
 						$tbody .= "<td class='text-center'>" . $btn . "</td>";
@@ -4544,8 +4919,8 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if (!empty($_POST['id_jadwal'])) {
-					$id_jadwal = $_POST['id_jadwal'];
+				if (!empty($_POST['id_periode'])) {
+					$id_jadwal = $_POST['id_periode'];
 				} else {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Jadwal kosong!';
@@ -4684,8 +5059,8 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id SKPD kosong!';
 				}
-				if (!empty($_POST['id_jadwal'])) {
-					$id_jadwal = $_POST['id_jadwal'];
+				if (!empty($_POST['id_periode'])) {
+					$id_jadwal = $_POST['id_periode'];
 				} else {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Jadwal kosong!';
@@ -6565,6 +6940,258 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($ret));
 	}
 
+	public function get_table_tahun_dokumen_pemda_lain()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$where = 'tahun_anggaran IS NULL';
+
+				if (!empty($_POST['id_skpd'])) {
+					$id_skpd = $_POST['id_skpd'];
+					$where .= " AND id_skpd = $id_skpd";
+				}
+
+				$dokumen_unset = $wpdb->get_results(
+					"
+					SELECT 
+						*
+					FROM esakip_other_file
+					WHERE $where
+					  AND active = 1
+					",
+					ARRAY_A
+				);
+
+				$counterUnset = 1;
+				$tbodyUnset = '';
+				if (!empty($dokumen_unset)) {
+					$tbodyUnset .= '
+						<div class="cetak">
+							<div style="padding: 10px;margin:0 0 3rem 0;">
+								<h3 class="text-center">Dokumen yang belum disetting Tahun Anggaran</h3>
+								<div class="wrap-table">
+									<table id="table_dokumen_tahun" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+										<thead>
+											<tr>
+												<th class="text-center">No</th>
+												<th class="text-center">Nama Dokumen</th>
+												<th class="text-center">Keterangan</th>
+												<th class="text-center">Aksi</th>
+											</tr>
+										</thead>
+										<tbody>';
+					foreach ($dokumen_unset as $kk => $vv) {
+						$tbodyUnset .= "<tr>";
+						$tbodyUnset .= "<td class='text-center'>" . $counterUnset++ . "</td>";
+						$tbodyUnset .= "<td>" . $vv['dokumen'] . "</td>";
+						$tbodyUnset .= "<td>" . $vv['keterangan'] . "</td>";
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
+						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+						$btn .= '</div>';
+
+						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
+
+						$tbodyUnset .= "</tr>";
+					}
+					$tbodyUnset .= '</tbody>
+								</table>
+							</div>
+						</div>
+					';
+
+					$ret['data'] = $tbodyUnset;
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_table_tahun_rpjmd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$where = 'id_jadwal IS NULL';
+
+				$dokumen_unset = $wpdb->get_results(
+					"
+					SELECT 
+						*
+					FROM esakip_rpjmd 
+					WHERE $where
+					  AND active = 1
+					",
+					ARRAY_A
+				);
+
+				$counterUnset = 1;
+				$tbodyUnset = '';
+				if (!empty($dokumen_unset)) {
+					$tbodyUnset .= '
+						<div class="cetak">
+							<div style="padding: 10px;margin:0 0 3rem 0;">
+								<h3 class="text-center">Dokumen yang belum disetting Tahun Periode</h3>
+								<div class="wrap-table">
+									<table id="table_dokumen_tahun" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+										<thead>
+											<tr>
+												<th class="text-center">No</th>
+												<th class="text-center">Nama Dokumen</th>
+												<th class="text-center">Keterangan</th>
+												<th class="text-center">Aksi</th>
+											</tr>
+										</thead>
+										<tbody>';
+					foreach ($dokumen_unset as $kk => $vv) {
+						$tbodyUnset .= "<tr>";
+						$tbodyUnset .= "<td class='text-center'>" . $counterUnset++ . "</td>";
+						$tbodyUnset .= "<td>" . $vv['dokumen'] . "</td>";
+						$tbodyUnset .= "<td>" . $vv['keterangan'] . "</td>";
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
+						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+						$btn .= '</div>';
+
+						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
+
+						$tbodyUnset .= "</tr>";
+					}
+					$tbodyUnset .= '</tbody>
+								</table>
+							</div>
+						</div>
+					';
+
+					$ret['data'] = $tbodyUnset;
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_table_tahun_renstra()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$where = 'id_jadwal IS NULL';
+
+				if (!empty($_POST['id_skpd'])) {
+					$id_skpd = $_POST['id_skpd'];
+					$where .= " AND id_skpd = $id_skpd";
+				}
+
+				$dokumen_unset = $wpdb->get_results(
+					"
+					SELECT 
+						*
+					FROM esakip_renstra 
+					WHERE $where
+					  AND active = 1
+					",
+					ARRAY_A
+				);
+
+				$counterUnset = 1;
+				$tbodyUnset = '';
+				if (!empty($dokumen_unset)) {
+					$tbodyUnset .= '
+						<div class="cetak">
+							<div style="padding: 10px;margin:0 0 3rem 0;">
+								<h3 class="text-center">Dokumen yang belum disetting Tahun Periode</h3>
+								<div class="wrap-table">
+									<table id="table_dokumen_tahun" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+										<thead>
+											<tr>
+												<th class="text-center">No</th>
+												<th class="text-center">Perangkat Daerah</th>
+												<th class="text-center">Nama Dokumen</th>
+												<th class="text-center">Keterangan</th>
+												<th class="text-center">Aksi</th>
+											</tr>
+										</thead>
+										<tbody>';
+					foreach ($dokumen_unset as $kk => $vv) {
+						$tbodyUnset .= "<tr>";
+						$tbodyUnset .= "<td class='text-center'>" . $counterUnset++ . "</td>";
+						$tbodyUnset .= "<td>" . $vv['opd'] . "</td>";
+						$tbodyUnset .= "<td>" . $vv['dokumen'] . "</td>";
+						$tbodyUnset .= "<td>" . $vv['keterangan'] . "</td>";
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
+						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+						$btn .= '</div>';
+
+						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
+
+						$tbodyUnset .= "</tr>";
+					}
+					$tbodyUnset .= '</tbody>
+								</table>
+							</div>
+						</div>
+					';
+
+					$ret['data'] = $tbodyUnset;
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
 	public function get_table_skpd_perjanjian_kinerja()
 	{
 		global $wpdb;
@@ -7935,7 +8562,7 @@ class Wp_Eval_Sakip_Public
 					"
 					SELECT 
 						*
-					FROM esakip_lkjip 
+					FROM esakip_lkjip_lppd
 					WHERE $where
 					  AND active = 1
 					",
@@ -8373,11 +9000,17 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if (!empty($_POST['id_jadwal'])) {
-					$id_jadwal = $_POST['id_jadwal'];
+				if (!empty($_POST['id_periode'])) {
+					$id_jadwal = $_POST['id_periode'];
 				} else {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Jadwal kosong!';
+				}
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
 
 				$unit = $wpdb->get_results(
@@ -8388,11 +9021,11 @@ class Wp_Eval_Sakip_Public
 						kode_skpd, 
 						nipkepala 
 					FROM esakip_data_unit 
-					WHERE active=1 
-					  AND id_jadwal=%d
+					WHERE tahun_anggaran=%d
+					  AND active=1 
 					  AND is_skpd=1 
 					ORDER BY kode_skpd ASC
-					", $id_jadwal),
+					", $tahun_anggaran),
 					ARRAY_A
 				);
 
@@ -8419,10 +9052,10 @@ class Wp_Eval_Sakip_Public
 								"
 								SELECT 
 									COUNT(id)
-								FROM esakip_rensra
+								FROM esakip_renstra
 								WHERE id_skpd = %d
-								AND id_jadwal = %d
-								AND active = 1
+								  AND id_jadwal = %d
+								  AND active = 1
 								",
 								$vv['id_skpd'],
 								$id_jadwal
@@ -8492,7 +9125,7 @@ class Wp_Eval_Sakip_Public
 					$tbodyUnset .= '
 						<div class="cetak">
 							<div style="padding: 10px;margin:0 0 3rem 0;">
-								<h3 class="text-center">Dokumen yang belum disetting Periode</h3>
+								<h3 class="text-center">Dokumen yang belum disetting Tahun Periode</h3>
 								<div class="wrap-table">
 									<table id="table_dokumen_periode" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
 										<thead>

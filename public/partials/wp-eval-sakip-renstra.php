@@ -6,24 +6,39 @@ if (!defined('WPINC')) {
 }
 
 $input = shortcode_atts(array(
-	'tahun' => '2022'
+	'periode' => ''
 ), $atts);
+
+$periode = $wpdb->get_row(
+    $wpdb->prepare("
+    SELECT 
+		*
+    FROM esakip_data_jadwal
+    WHERE id=%d
+      AND status = 1
+", $input['periode']),
+    ARRAY_A
+);
+
+$tahun_periode = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
 
 $idtahun = $wpdb->get_results(
 	"
-		SELECT DISTINCT 
-			tahun_anggaran 
-		FROM esakip_data_unit",
+		SELECT 
+			*
+		FROM esakip_data_jadwal",
 	ARRAY_A
 );
-$tahun = "<option value='-1'>Pilih Tahun</option>";
+
+$tahun = "<option value='-1'>Pilih Tahun Periode</option>";
 
 foreach ($idtahun as $val) {
+	$tahun_anggaran_selesai = $val['tahun_anggaran'] + $val['lama_pelaksanaan'];
 	$selected = '';
-	if (!empty($input['tahun_anggaran']) && $val['tahun_anggaran'] == $input['tahun_anggaran']) {
+	if (!empty($input['id']) && $val['id'] == $input['periode']) {
 		$selected = 'selected';
 	}
-	$tahun .= "<option value='$val[tahun_anggaran]' $selected>$val[tahun_anggaran]</option>";
+	$tahun .= "<option value='$val[id]' $selected>$val[nama_jadwal] Periode $val[tahun_anggaran] -  $tahun_anggaran_selesai</option>";
 }
 ?>
 <style type="text/css">
@@ -46,7 +61,7 @@ foreach ($idtahun as $val) {
 <div class="container-md">
 	<div class="cetak">
 		<div style="padding: 10px;margin:0 0 3rem 0;">
-			<h1 class="text-center table-title">Dokumen RENJA / RKT Tahun <?php echo $input['tahun']; ?></h1>
+			<h1 class="text-center table-title">Dokumen RENSTRA <br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1>
 			<div class="wrap-table">
 				<table id="table_dokumen_skpd" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
 					<thead>
@@ -80,13 +95,13 @@ foreach ($idtahun as $val) {
 			<div class="modal-body">
 				<form id="tahunForm">
 					<div class="form-group">
-						<label for="tahunAnggaran">Tahun Anggaran:</label>
+						<label for="tahunAnggaran">Tahun Periode:</label>
 						<select class="form-control" id="tahunAnggaran" name="tahunAnggaran">
 							<?php echo $tahun; ?>
 						</select>
 						<input type="hidden" id="idDokumen" value="">
 					</div>
-					<button type="submit" class="btn btn-primary" onclick="submit_tahun_renja_rkt(); return false">Simpan</button>
+					<button type="submit" class="btn btn-primary" onclick="submit_tahun_renstra(); return false">Simpan</button>
 				</form>
 			</div>
 		</div>
@@ -105,7 +120,7 @@ foreach ($idtahun as $val) {
 			url: esakip.url,
 			type: 'POST',
 			data: {
-				action: 'get_table_tahun_renja',
+				action: 'get_table_tahun_renstra',
 				api_key: esakip.api_key,
 			},
 			dataType: 'json',
@@ -132,9 +147,10 @@ foreach ($idtahun as $val) {
 			url: esakip.url,
 			type: 'POST',
 			data: {
-				action: 'get_table_skpd_renja',
+				action: 'get_table_skpd_renstra',
 				api_key: esakip.api_key,
-				tahun_anggaran: <?php echo $input['tahun']; ?>,
+				id_periode: <?php echo $input['periode']; ?>,
+				tahun_anggaran: <?php echo $periode['tahun_anggaran']; ?>,
 			},
 			dataType: 'json',
 			success: function(response) {
@@ -168,7 +184,7 @@ foreach ($idtahun as $val) {
 		window.open(url, '_blank');
 	}
 
-	function submit_tahun_renja_rkt() {
+	function submit_tahun_renstra() {
 		let id = jQuery("#idDokumen").val();
 		if (id == '') {
 			return alert('id tidak boleh kosong');
@@ -184,7 +200,7 @@ foreach ($idtahun as $val) {
 			url: esakip.url,
 			type: 'POST',
 			data: {
-				action: 'submit_tahun_renja_rkt',
+				action: 'submit_tahun_renstra',
 				id: id,
 				tahunAnggaran: tahunAnggaran,
 				api_key: esakip.api_key

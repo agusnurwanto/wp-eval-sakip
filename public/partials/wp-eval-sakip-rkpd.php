@@ -9,6 +9,22 @@ $input = shortcode_atts(array(
     'tahun' => '2022',
 ), $atts);
 
+$idtahun = $wpdb->get_results(
+    "
+		SELECT DISTINCT 
+			tahun_anggaran 
+		FROM esakip_data_unit",
+    ARRAY_A
+);
+$tahun = "<option value='-1'>Pilih Tahun</option>";
+
+foreach ($idtahun as $val) {
+    $selected = '';
+    if (!empty($input['tahun_anggaran']) && $val['tahun_anggaran'] == $input['tahun_anggaran']) {
+        $selected = 'selected';
+    }
+    $tahun .= "<option value='$val[tahun_anggaran]' $selected>$val[tahun_anggaran]</option>";
+}
 ?>
 <style type="text/css">
     .wrap-table {
@@ -32,7 +48,7 @@ $input = shortcode_atts(array(
 <div class="container-md">
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Dokumen RKPD<br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
+            <h1 class="text-center" style="margin:3rem;">Dokumen RKPD <br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
             <div style="margin-bottom: 25px;">
                 <button class="btn btn-primary" onclick="tambah_dokumen_rkpd();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
             </div>
@@ -53,6 +69,10 @@ $input = shortcode_atts(array(
             </div>
         </div>
     </div>
+</div>
+
+<!-- Tahun Tabel -->
+<div id="tahunContainer" class="container-md">
 </div>
 
 <!-- Modal Upload -->
@@ -88,10 +108,106 @@ $input = shortcode_atts(array(
         </div>
     </div>
 </div>
+
+<!-- Modal Tahun -->
+<div class="modal fade" id="tahunModal" tabindex="-1" role="dialog" aria-labelledby="tahunModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tahunModalLabel">Pilih Tahun Anggaran</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="tahunForm">
+                    <div class="form-group">
+                        <label for="tahunAnggaran">Tahun Anggaran:</label>
+                        <select class="form-control" id="tahunAnggaran" name="tahunAnggaran">
+                            <?php echo $tahun; ?>
+                        </select>
+                        <input type="hidden" id="idDokumen" value="">
+                    </div>
+                    <button type="submit" class="btn btn-primary" onclick="submit_tahun_rkpd(); return false">Simpan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     jQuery(document).ready(function() {
         getTableRkpd();
+        getTableTahun();
     });
+
+    function getTableTahun() {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_table_tahun_rkpd',
+                api_key: esakip.api_key,
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                console.log(response);
+                if (response.status === 'success') {
+                    jQuery('#tahunContainer').html(response.data);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat tabel!');
+            }
+        });
+    }
+
+    function submit_tahun_rkpd() {
+        let id = jQuery("#idDokumen").val();
+        if (id == '') {
+            return alert('id tidak boleh kosong');
+        }
+
+        let tahunAnggaran = jQuery("#tahunAnggaran").val();
+        if (tahunAnggaran == '') {
+            return alert('Tahun Anggaran tidak boleh kosong');
+        }
+
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'submit_tahun_dokumen_rkpd',
+                id: id,
+                tahunAnggaran: tahunAnggaran,
+                api_key: esakip.api_key
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    jQuery('#tahunModal').modal('hide');
+                    getTableTahun();
+                    getTableRkpd();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }
 
     function getTableRkpd() {
         jQuery('#wrap-loading').show();
@@ -116,7 +232,7 @@ $input = shortcode_atts(array(
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data Laporan Kinerja!');
+                alert('Terjadi kesalahan saat memuat data rkpd!');
             }
         });
     }
@@ -147,7 +263,7 @@ $input = shortcode_atts(array(
                 console.log(response);
                 if (response.status === 'success') {
                     let data = response.data;
-                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/'; ?>' + data.dokumen;
+                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + data.dokumen;
                     jQuery("#idDokumen").val(data.id);
                     jQuery("#fileUpload").val('');
                     jQuery('#fileUploadExisting').attr('href', url).html(data.dokumen);
@@ -166,7 +282,6 @@ $input = shortcode_atts(array(
             }
         });
     }
-
 
     function submit_dokumen(that) {
         let id_dokumen = jQuery("#idDokumen").val();
@@ -220,10 +335,14 @@ $input = shortcode_atts(array(
     }
 
     function lihatDokumen(dokumen) {
-        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/'; ?>' + dokumen;
+        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + dokumen;
         window.open(url, '_blank');
     }
 
+    function set_tahun_dokumen(id) {
+        jQuery('#tahunModal').modal('show');
+        jQuery('#idDokumen').val(id);
+    }
 
     function hapus_dokumen_rkpd(id) {
         if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
