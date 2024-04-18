@@ -6062,10 +6062,6 @@ class Wp_Eval_Sakip_Public
 					$where .= " OR jenis_jadwal LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
 				}
 
-				if (!empty($_POST['tahun_anggaran'])) {
-					$where .= $wpdb->prepare(" AND tahun_anggaran = %d", $_POST['tahun_anggaran']);
-				}
-
 				// getting total number records without any search
 				$sql_tot = "SELECT count(id) as jml FROM `esakip_data_jadwal`";
 				$sqlRec = "SELECT " . implode(', ', $columns) . " FROM `esakip_data_jadwal`";
@@ -6097,9 +6093,9 @@ class Wp_Eval_Sakip_Public
 						}
 
 						$status = array(
-							0 => 'hapus',
-							1 => 'active',
-							2 => 'dikunci'
+							0 => 'Dihapus',
+							1 => 'Active',
+							2 => 'Dikunci'
 						);
 
 						$queryRecords[$recKey]['started_at']	= date('d-m-Y H:i', strtotime($recVal['started_at']));
