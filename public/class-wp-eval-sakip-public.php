@@ -1187,14 +1187,14 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id kosong!';
 				}
-				if (!empty($_POST['tahunAnggaran'])) {
-					$tahun_anggaran = $_POST['tahunAnggaran'];
+				if (!empty($_POST['tahunPeriode'])) {
+					$tahun_periode = $_POST['tahunPeriode'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun Anggaran kosong!';
+					$ret['message'] = 'Tahun Periode kosong!';
 				}
 
-				if (!empty($id) && !empty($tahun_anggaran)) {
+				if (!empty($id) && !empty($tahun_periode)) {
 					$existing_data = $wpdb->get_row(
 						$wpdb->prepare("
 							SELECT 
@@ -1207,7 +1207,7 @@ class Wp_Eval_Sakip_Public
 						$update_result = $wpdb->update(
 							'esakip_renstra',
 							array(
-								'tahun_anggaran' => $tahun_anggaran,
+								'id_jadwal' => $tahun_periode,
 							),
 							array('id' => $id),
 							array('%d'),
@@ -1262,14 +1262,14 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id kosong!';
 				}
-				if (!empty($_POST['tahunAnggaran'])) {
-					$tahun_anggaran = $_POST['tahunAnggaran'];
+				if (!empty($_POST['tahunPeriode'])) {
+					$tahun_periode = $_POST['tahunPeriode'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun Anggaran kosong!';
+					$ret['message'] = 'Tahun Periode kosong!';
 				}
 
-				if (!empty($id) && !empty($tahun_anggaran)) {
+				if (!empty($id) && !empty($tahun_periode)) {
 					$existing_data = $wpdb->get_row(
 						$wpdb->prepare("
 							SELECT 
@@ -1282,7 +1282,7 @@ class Wp_Eval_Sakip_Public
 						$update_result = $wpdb->update(
 							'esakip_rpjmd',
 							array(
-								'tahun_anggaran' => $tahun_anggaran,
+								'id_jadwal' => $tahun_periode,
 							),
 							array('id' => $id),
 							array('%d'),

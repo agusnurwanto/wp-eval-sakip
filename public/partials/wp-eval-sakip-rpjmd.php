@@ -33,12 +33,12 @@ $idtahun = $wpdb->get_results(
 $tahun = "<option value='-1'>Pilih Tahun Periode</option>";
 
 foreach ($idtahun as $val) {
-    $tahun_anggaran_selesai = $val['tahun_anggaran'] + $val['lama_pelaksanaan'];
+    $tahun_Periode_selesai = $val['tahun_anggaran'] + $val['lama_pelaksanaan'];
     $selected = '';
     if (!empty($input['id']) && $val['id'] == $input['periode']) {
         $selected = 'selected';
     }
-    $tahun .= "<option value='$val[id]' $selected>$val[nama_jadwal] Periode $val[tahun_anggaran] -  $tahun_anggaran_selesai</option>";
+    $tahun .= "<option value='$val[id]' $selected>$val[nama_jadwal] Periode $val[tahun_anggaran] -  $tahun_Periode_selesai</option>";
 } 
 ?>
 <style type="text/css">
@@ -125,7 +125,7 @@ foreach ($idtahun as $val) {
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="tahunModalLabel">Pilih Tahun Anggaran</h5>
+                <h5 class="modal-title" id="tahunModalLabel">Pilih Tahun Periode</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -133,8 +133,8 @@ foreach ($idtahun as $val) {
             <div class="modal-body">
                 <form id="tahunForm">
                     <div class="form-group">
-                        <label for="tahunAnggaran">Tahun Anggaran:</label>
-                        <select class="form-control" id="tahunAnggaran" name="tahunAnggaran">
+                        <label for="tahunPeriode">Tahun Periode:</label>
+                        <select class="form-control" id="tahunPeriode" name="tahunPeriode">
                             <?php echo $tahun; ?>
                         </select>
                         <input type="hidden" id="idDokumen" value="">
@@ -179,7 +179,7 @@ foreach ($idtahun as $val) {
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data rpjmd!');
+                alert('Terjadi kesalahan saat memuat data RPJMD!');
             }
         });
     }
@@ -212,7 +212,7 @@ foreach ($idtahun as $val) {
     }
 
     function lihatDokumen(dokumen) {
-        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + dokumen;
+        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/'; ?>' + dokumen;
         window.open(url, '_blank');
     }
 
@@ -247,7 +247,7 @@ foreach ($idtahun as $val) {
                 console.log(response);
                 if (response.status === 'success') {
                     let data = response.data;
-                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + data.dokumen;
+                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/'; ?>' + data.dokumen;
                     jQuery("#idDokumen").val(data.id);
                     jQuery("#fileUpload").val('');
                     jQuery('#fileUploadExisting').attr('href', url).html(data.dokumen);
@@ -274,17 +274,13 @@ foreach ($idtahun as $val) {
         if (skpd == '') {
             return alert('Perangkat Daerah tidak boleh kosong');
         }
-        let idSkpd = jQuery("#idSkpd").val();
-        if (idSkpd == '') {
-            return alert('Id Skpd tidak boleh kosong');
-        }
         let keterangan = jQuery("#keterangan").val();
         if (keterangan == '') {
             return alert('Keterangan tidak boleh kosong');
         }
-        let tahunAnggaran = jQuery("#tahunAnggaran").val();
-        if (tahunAnggaran == '') {
-            return alert('Tahun Anggaran tidak boleh kosong');
+        let tahunPeriode = jQuery("#tahunPeriode").val();
+        if (tahunPeriode == '') {
+            return alert('Tahun Periode tidak boleh kosong');
         }
         let fileDokumen = jQuery("#fileUpload").prop('files')[0];
         if (fileDokumen == '') {
@@ -296,9 +292,8 @@ foreach ($idtahun as $val) {
         form_data.append('api_key', esakip.api_key);
         form_data.append('id_dokumen', id_dokumen);
         form_data.append('skpd', skpd);
-        form_data.append('idSkpd', idSkpd);
         form_data.append('keterangan', keterangan);
-        form_data.append('tahunAnggaran', tahunAnggaran);
+        form_data.append('tahunPeriode', tahunPeriode);
         form_data.append('fileUpload', fileDokumen);
 
         jQuery('#wrap-loading').show();
@@ -334,9 +329,9 @@ foreach ($idtahun as $val) {
             return alert('id tidak boleh kosong');
         }
 
-        let tahunAnggaran = jQuery("#tahunAnggaran").val();
-        if (tahunAnggaran == '') {
-            return alert('Tahun Anggaran tidak boleh kosong');
+        let tahunPeriode = jQuery("#tahunPeriode").val();
+        if (tahunPeriode == '') {
+            return alert('Tahun Periode tidak boleh kosong');
         }
 
         jQuery('#wrap-loading').show();
@@ -346,7 +341,7 @@ foreach ($idtahun as $val) {
             data: {
                 action: 'submit_tahun_rpjmd',
                 id: id,
-                tahunAnggaran: tahunAnggaran,
+                tahunPeriode: tahunPeriode,
                 api_key: esakip.api_key
             },
             dataType: 'json',

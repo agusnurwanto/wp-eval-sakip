@@ -87,7 +87,7 @@ foreach ($idtahun as $val) {
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="tahunModalLabel">Pilih Tahun Anggaran</h5>
+				<h5 class="modal-title" id="tahunModalLabel">Pilih Tahun Periode</h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
@@ -95,8 +95,8 @@ foreach ($idtahun as $val) {
 			<div class="modal-body">
 				<form id="tahunForm">
 					<div class="form-group">
-						<label for="tahunAnggaran">Tahun Periode:</label>
-						<select class="form-control" id="tahunAnggaran" name="tahunAnggaran">
+						<label for="tahunPeriode">Tahun Periode:</label>
+						<select class="form-control" id="tahunPeriode" name="tahunPeriode">
 							<?php echo $tahun; ?>
 						</select>
 						<input type="hidden" id="idDokumen" value="">
@@ -190,9 +190,9 @@ foreach ($idtahun as $val) {
 			return alert('id tidak boleh kosong');
 		}
 
-		let tahunAnggaran = jQuery("#tahunAnggaran").val();
-		if (tahunAnggaran == '') {
-			return alert('Tahun Anggaran tidak boleh kosong');
+		let tahunPeriode = jQuery("#tahunPeriode").val();
+		if (tahunPeriode == '') {
+			return alert('Tahun Periode tidak boleh kosong');
 		}
 
 		jQuery('#wrap-loading').show();
@@ -202,7 +202,7 @@ foreach ($idtahun as $val) {
 			data: {
 				action: 'submit_tahun_renstra',
 				id: id,
-				tahunAnggaran: tahunAnggaran,
+				tahunPeriode: tahunPeriode,
 				api_key: esakip.api_key
 			},
 			dataType: 'json',
