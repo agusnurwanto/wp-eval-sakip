@@ -151,12 +151,14 @@ class Wp_Eval_Sakip_Admin
 								tahun_anggaran,
 								lama_pelaksanaan
 							FROM esakip_data_jadwal
-							WHERE tipe = 'RPJMD'
+							WHERE tipe = %s
 							  AND status = 1
-							GROUP BY tahun_anggaran"
+							GROUP BY tahun_anggaran",
+							'RPJMD'
 						),
 						ARRAY_A
 					);
+
 
 					$jadwal_evaluasi = $wpdb->get_results(
 						$wpdb->prepare(
@@ -167,9 +169,10 @@ class Wp_Eval_Sakip_Admin
 								tahun_anggaran,
 								lama_pelaksanaan
 							FROM esakip_data_jadwal
-							WHERE tipe = 'LKE'
+							WHERE tipe = %s
 							  AND status = 1
-							GROUP BY tahun_anggaran"
+							GROUP BY tahun_anggaran",
+							'LKE'
 						),
 						ARRAY_A
 					);
@@ -776,7 +779,6 @@ class Wp_Eval_Sakip_Admin
 		        	')
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'dokumen_pemda_lainnya')));
-
 	}
 
 	public function generate_jadwal()
@@ -786,13 +788,13 @@ class Wp_Eval_Sakip_Admin
 		$list_data = '';
 
 		$jadwal_rpjmd = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Jadwal RPJMD / RPD ',
-				'content' => '[jadwal_rpjmd]',
-				'show_header' => 1,
-				'no_key' => 1,
-				'post_status' => 'private'
-			));
-			$list_data .= '<li><a target="_blank" href="' . $jadwal_rpjmd['url'] . '">' . $jadwal_rpjmd['title'] . '</a></li>';
+			'nama_page' => 'Halaman Jadwal RPJMD / RPD ',
+			'content' => '[jadwal_rpjmd]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+		$list_data .= '<li><a target="_blank" href="' . $jadwal_rpjmd['url'] . '">' . $jadwal_rpjmd['title'] . '</a></li>';
 
 		$no = 0;
 		foreach ($get_tahun as $k => $v) {
@@ -893,10 +895,10 @@ class Wp_Eval_Sakip_Admin
 				if (is_wp_error($insert_user)) {
 					return $insert_user;
 				}
-			}else{
-				$user_meta = get_userdata( $insert_user );
-				if(!in_array($user['jabatan'], $user_meta->roles)){
-					$user_meta->add_role( $user['jabatan'] );
+			} else {
+				$user_meta = get_userdata($insert_user);
+				if (!in_array($user['jabatan'], $user_meta->roles)) {
+					$user_meta->add_role($user['jabatan']);
 				}
 			}
 

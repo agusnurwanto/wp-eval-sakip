@@ -1187,8 +1187,8 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id kosong!';
 				}
-				if (!empty($_POST['tahunPeriode'])) {
-					$tahun_periode = $_POST['tahunPeriode'];
+				if (!empty($_POST['id_jadwal'])) {
+					$tahun_periode = $_POST['id_jadwal'];
 				} else {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Periode kosong!';
