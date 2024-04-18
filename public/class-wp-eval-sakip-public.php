@@ -6723,21 +6723,29 @@ class Wp_Eval_Sakip_Public
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
 				$id = trim(htmlspecialchars($_POST['id']));
 				// Periksa apakah data dengan ID yang akan dihapus ada di tabel esakip_renstra
-				$cek_id_jadwal = $wpdb->get_var($wpdb->prepare('
+				$cek_id_jadwal_renstra = $wpdb->get_var($wpdb->prepare('
                     SELECT id_jadwal
                     FROM esakip_renstra
                     WHERE id_jadwal=%d
+                    	AND active=1
                 ', $id));
-				$cek_id_jadwal = $wpdb->get_var($wpdb->prepare('
+                if ($cek_id_jadwal_renstra) {
+					// Jika data dengan ID yang sama ditemukan di tabel lain, tampilkan pesan
+					$ret['status'] = 'confirm';
+					$ret['message'] = 'Jadwal tidak bisa dihapus karena sudah terpakai di dokumen RENSTRA.';
+				}
+				$cek_id_jadwal_rpjmd = $wpdb->get_var($wpdb->prepare('
                     SELECT id_jadwal
                     FROM esakip_rpjmd
                     WHERE id_jadwal=%d
+                    	AND active=1
                 ', $id));
-				if ($cek_id_jadwal) {
+				if ($cek_id_jadwal_rpjmd) {
 					// Jika data dengan ID yang sama ditemukan di tabel lain, tampilkan pesan
 					$ret['status'] = 'confirm';
-					$ret['message'] = 'ID sudah terpakai.';
-				} else {
+					$ret['message'] = 'Jadwal tidak bisa dihapus karena sudah terpakai di dokumen RPJMD / RPD.';
+				}
+				if($ret['status'] != 'confirm'){
 					// Jika tidak ada data dengan ID yang sama di tabel lain, lanjutkan penghapusan seperti biasa
 					$ret['data'] = $wpdb->update('esakip_data_jadwal', array('status' => 0), array(
 						'id' => $id
