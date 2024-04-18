@@ -732,10 +732,6 @@ foreach ($idtahun as $val) {
         if (keterangan == '') {
             return alert('Keterangan tidak boleh kosong');
         }
-        let tahunPeriode = jQuery("#tahunPeriode").val();
-        if (tahunPeriode == '') {
-            return alert('Tahun Periode tidak boleh kosong');
-        }
         let id_jadwal = jQuery("#id_jadwal").prop('files')[0];
         if (id_jadwal == '') {
             return alert('ID Jadwal tidak boleh kosong');
@@ -753,7 +749,6 @@ foreach ($idtahun as $val) {
         form_data.append('idSkpd', idSkpd);
         form_data.append('id_jadwal', id_jadwal);
         form_data.append('keterangan', keterangan);
-        form_data.append('tahunPeriode', tahunPeriode);
         form_data.append('fileUpload', fileDokumen);
 
         jQuery('#wrap-loading').show();
