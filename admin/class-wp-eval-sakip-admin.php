@@ -157,22 +157,6 @@ class Wp_Eval_Sakip_Admin
 						),
 						ARRAY_A
 					);
-
-					$jadwal_evaluasi = $wpdb->get_results(
-						$wpdb->prepare(
-							"
-							SELECT 
-								id,
-								nama_jadwal,
-								tahun_anggaran,
-								lama_pelaksanaan
-							FROM esakip_data_jadwal
-							WHERE tipe = 'LKE'
-							  AND status = 1
-							GROUP BY tahun_anggaran"
-						),
-						ARRAY_A
-					);
 					foreach ($jadwal_periode as $jadwal_periode_item) {
 						$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
 						if (!empty($_POST['type']) && $_POST['type'] == 'renstra') {
@@ -213,26 +197,40 @@ class Wp_Eval_Sakip_Admin
 						}
 						$ret['message'] .= $body_pemda;
 					}
+				}else if (!empty($_POST['type']) && $_POST['type'] == 'pengisian_lke') {
+					$jadwal_evaluasi = $wpdb->get_results(
+						$wpdb->prepare(
+							"
+							SELECT 
+								id,
+								nama_jadwal,
+								tahun_anggaran,
+								lama_pelaksanaan
+							FROM esakip_data_jadwal
+							WHERE tipe = 'LKE'
+							  AND status = 1
+							GROUP BY tahun_anggaran"
+						),
+						ARRAY_A
+					);
 					foreach ($jadwal_evaluasi as $jadwal_evaluasi_item) {
 						$tahun_anggaran_selesai = $jadwal_evaluasi_item['tahun_anggaran'] + $jadwal_evaluasi_item['lama_pelaksanaan'];
-						if (!empty($_POST['type']) && $_POST['type'] == 'pengisian_lke') {
-							$pengisian_lke_sakip = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Pengisian LKE ' . $jadwal_evaluasi_item['nama_jadwal'] . ' ' . 'Jadwal ' . $jadwal_evaluasi_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-								'content' => '[pengisian_lke_sakip]',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-							<h3 style="text-transform:uppercase;" class="esakip-header-tahun" tahun="' . $jadwal_evaluasi_item['tahun_anggaran'] . '">' . $jadwal_evaluasi_item['nama_jadwal'] . ' ' . $jadwal_evaluasi_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $jadwal_evaluasi_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $pengisian_lke_sakip['url'] . '">' . $pengisian_lke_sakip['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						}
+						$pengisian_lke_sakip = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Pengisian LKE ' . $jadwal_evaluasi_item['nama_jadwal'] . ' ' . 'Jadwal ' . $jadwal_evaluasi_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+							'content' => '[pengisian_lke_sakip]',
+							'show_header' => 1,
+							'no_key' => 1,
+							'post_status' => 'private'
+						));
+						$body_pemda = '
+						<div class="accordion">
+						<h3 style="text-transform:uppercase;" class="esakip-header-tahun" tahun="' . $jadwal_evaluasi_item['tahun_anggaran'] . '">' . $jadwal_evaluasi_item['nama_jadwal'] . ' ' . $jadwal_evaluasi_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . '</h3>
+							<div class="esakip-body-tahun" tahun="' . $jadwal_evaluasi_item['tahun_anggaran'] . '">
+								<ul style="margin-left: 20px;">
+									<li><a target="_blank" href="' . $pengisian_lke_sakip['url'] . '">' . $pengisian_lke_sakip['title'] . '</a></li>
+								</ul>
+							</div>
+						</div>';
 						$ret['message'] .= $body_pemda;
 					}
 				} else {

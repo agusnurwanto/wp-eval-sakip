@@ -9199,12 +9199,64 @@ class Wp_Eval_Sakip_Public
 			return;
 		}
 
-		$url_upload_dokumen_rpjm = $this->functions->generatePage(array(
-			'nama_page' => 'Halaman upload dokumen RPJMD dan RENSTRA per Periode',
-			'content' => '[upload_dokumen_rpjm_admin]',
-			'show_header' => 1,
-			'post_status' => 'private'
-		));
+		$jadwal_periode = $wpdb->get_results("
+			SELECT 
+				id,
+				nama_jadwal,
+				tahun_anggaran,
+				lama_pelaksanaan
+			FROM esakip_data_jadwal
+			WHERE tipe = 'RPJMD'
+			  AND status = 1",
+			ARRAY_A
+		);
+		$periode_rpjmd = '';
+		$periode_renstra = '';
+		foreach ($jadwal_periode as $jadwal_periode_item) {
+			$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
+
+			$rpjmd = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Upload Dokumen RPJMD ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[upload_dokumen_rpjmd periode=' . $jadwal_periode_item['id'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$periode_rpjmd .= '<li><a target="_blank" href="' . $rpjmd['url'] . '" class="btn btn-primary">' . $rpjmd['title'] . '</a></li>';
+
+			$renstra = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Dokumen RENSTRA ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[renstra periode=' . $jadwal_periode_item['id'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$periode_renstra .= '<li><a target="_blank" href="' . $renstra['url'] . '" class="btn btn-primary">' . $renstra['title'] . '</a></li>';
+		}
+
+		if(empty($periode_rpjmd)){
+			$periode_rpjmd = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
+		}
+
+		if(empty($periode_renstra)){
+			$periode_renstra = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
+		}
+		$halaman_rpjmd = '
+			<div class="accordion">
+				<h5 class="esakip-header-tahun" data-id="rpjmd" style="margin: 0;">Periode Upload Dokumen RPJMD</h5>
+				<div class="esakip-body-tahun" data-id="rpjmd">
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+						'.$periode_rpjmd.'
+					</ul>
+				</div>
+			</div>';
+		$halaman_renstra = '
+			<div class="accordion">
+				<h5 class="esakip-header-tahun" data-id="renstra" style="margin: 0;">Periode Upload Dokumen RENSTRA</h5>
+				<div class="esakip-body-tahun" data-id="renstra">
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+						'.$periode_renstra.'
+					</ul>
+				</div>
+			</div>';
 		if (
 			in_array("administrator", $user_meta->roles)
 			|| in_array("admin_bappeda", $user_meta->roles)
@@ -9290,7 +9342,8 @@ class Wp_Eval_Sakip_Public
 			));
 			echo '
 				<ul class="daftar-tahun text_tengah">
-					<li><a href="' . $url_upload_dokumen_rpjm['url'] . '" target="_blank" class="btn btn-warning">' . $url_upload_dokumen_rpjm['title'] . '</a></li>
+					<li>'.$halaman_rpjmd.'</li>
+					<li>'.$halaman_renstra.'</li>
 					<li><a href="' . $renja_rkt['url'] . '" target="_blank" class="btn btn-primary">' . $renja_rkt['title'] . '</a></li>
 					<li><a href="' . $skp['url'] . '" target="_blank" class="btn btn-primary">' . $skp['title'] . '</a></li>
 					<li><a href="' . $rencana_aksi['url'] . '" target="_blank" class="btn btn-primary">' . $rencana_aksi['title'] . '</a></li>
@@ -9386,7 +9439,7 @@ class Wp_Eval_Sakip_Public
 			$detail_perjanjian_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 			echo '
 				<ul class="daftar-menu-sakip">
-					<li><a href="' . $url_upload_dokumen_rpjm['url'] . '" target="_blank" class="btn btn-warning">' . $url_upload_dokumen_rpjm['title'] . '</a></li>
+					<li>'.$halaman_renstra.'</li>
 					<li><a href="' . $detail_renja['url'] . '" target="_blank" class="btn btn-primary">' . $detail_renja['title'] . '</a></li>
 					<li><a href="' . $detail_skp['url'] . '" target="_blank" class="btn btn-primary">' . $detail_skp['title'] . '</a></li>
 					<li><a href="' . $detail_rencana_aksi['url'] . '" target="_blank" class="btn btn-primary">' . $detail_rencana_aksi['title'] . '</a></li>
