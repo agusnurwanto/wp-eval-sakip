@@ -6057,18 +6057,18 @@ class Wp_Eval_Sakip_Public
 
 				// check search value exist
 				if (!empty($params['search']['value'])) {
-					$where .= " AND ( nama_jadwal LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
-					$where .= " OR started_at LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
-					$where .= " OR jenis_jadwal LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
+					$where .= " AND ( 
+						nama_jadwal LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%")." 
+						OR started_at LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%")."
+						OR jenis_jadwal LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%").'
+					)';
 				}
 
 				// getting total number records without any search
-				$sql_tot = "SELECT count(id) as jml FROM `esakip_data_jadwal`";
+				$sqlTot = "SELECT count(id) as jml FROM `esakip_data_jadwal`";
 				$sqlRec = "SELECT " . implode(', ', $columns) . " FROM `esakip_data_jadwal`";
-				if (isset($where) && $where != '') {
-					$sqlTot .= $where;
-					$sqlRec .= $where;
-				}
+				$sqlTot .= $where;
+				$sqlRec .= $where;
 
 				$sqlRec .=  $wpdb->prepare(" ORDER BY " . $columns[$params['order'][0]['column']] . "   " . $params['order'][0]['dir'] . "  LIMIT %d ,%d ", $params['start'], $params['length']);
 
@@ -9178,6 +9178,7 @@ class Wp_Eval_Sakip_Public
 		global $wpdb;
 		$user_id = um_user('ID');
 		$user_meta = get_userdata($user_id);
+		$html = '';
 		if (!empty($_GET) && !empty($_GET['tahun'])) {
 			echo '<h1 class="text-center">TAHUN ANGGARAN TERPILIH<br>' . $_GET['tahun'] . '</h1>';
 		}
@@ -9318,63 +9319,63 @@ class Wp_Eval_Sakip_Public
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$detail_renja['url'] .= '?id_skpd=' . $skpd_db['id_skpd'];
+			$detail_renja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 			$detail_skp = $this->functions->generatePage(array(
 				'nama_page' => 'Halaman Detail Dokumen SKP ' . $_GET['tahun'],
 				'content' => '[dokumen_detail_skp tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$detail_skp['url'] .= '?id_skpd=' . $skpd_db['id_skpd'];
+			$detail_skp['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 			$detail_rencana_aksi = $this->functions->generatePage(array(
 				'nama_page' => 'Halaman Detail Dokumen Rencana Aksi ' . $_GET['tahun'],
 				'content' => '[dokumen_detail_rencana_aksi tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$detail_rencana_aksi['url'] .= '?id_skpd=' . $skpd_db['id_skpd'];
+			$detail_rencana_aksi['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 			$detail_iku = $this->functions->generatePage(array(
 				'nama_page' => 'Halaman Detail Dokumen IKU ' . $_GET['tahun'],
 				'content' => '[dokumen_detail_iku tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$detail_iku['url'] .= '?id_skpd=' . $skpd_db['id_skpd'];
+			$detail_iku['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 			$detail_pengukuran_kinerja = $this->functions->generatePage(array(
 				'nama_page' => 'Halaman Detail Dokumen Pengukuran Kinerja ' . $_GET['tahun'],
 				'content' => '[dokumen_detail_pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$detail_pengukuran_kinerja['url'] .= '?id_skpd=' . $skpd_db['id_skpd'];
+			$detail_pengukuran_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 			$detail_laporan_kinerja = $this->functions->generatePage(array(
 				'nama_page' => 'Halaman Detail Dokumen Laporan Kinerja ' . $_GET['tahun'],
 				'content' => '[dokumen_detail_laporan_kinerja tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$detail_laporan_kinerja['url'] .= '?id_skpd=' . $skpd_db['id_skpd'];
+			$detail_laporan_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 			$detail_evaluasi_internal = $this->functions->generatePage(array(
 				'nama_page' => 'Halaman Detail Dokumen Evaluasi Internal ' . $_GET['tahun'],
 				'content' => '[dokumen_detail_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$detail_evaluasi_internal['url'] .= '?id_skpd=' . $skpd_db['id_skpd'];
+			$detail_evaluasi_internal['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 			$detail_dokumen_lain = $this->functions->generatePage(array(
 				'nama_page' => 'Halaman Detail Dokumen Lain ' . $_GET['tahun'],
 				'content' => '[dokumen_detail_dokumen_lain tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$detail_pengukuran_kinerja['url'] .= '?id_skpd=' . $skpd_db['id_skpd'];
+			$detail_pengukuran_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 			$detail_perjanjian_kinerja = $this->functions->generatePage(array(
 				'nama_page' => 'Halaman Detail Dokumen Perjanjian Kinerja ' . $_GET['tahun'],
 				'content' => '[dokumen_detail_perjanjian_kinerja tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$detail_perjanjian_kinerja['url'] .= '?id_skpd=' . $skpd_db['id_skpd'];
+			$detail_perjanjian_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 			echo '
 				<ul class="daftar-menu-sakip">
 					<li><a href="' . $url_upload_dokumen_rpjm['url'] . '" target="_blank" class="btn btn-warning">' . $url_upload_dokumen_rpjm['title'] . '</a></li>
@@ -9402,8 +9403,8 @@ class Wp_Eval_Sakip_Public
 		}
 		$tahun = $wpdb->get_results('select tahun_anggaran from esakip_data_unit group by tahun_anggaran', ARRAY_A);
 		echo "
-		<h5 class='text_tengah' style='" . $class_hide . "'>PILIH TAHUN ANGGARAN</h5>
-		<ul class='daftar-tahun text_tengah'>";
+		<h5 class='text-center' style='" . $class_hide . "'>PILIH TAHUN ANGGARAN</h5>
+		<ul class='daftar-tahun-sakip text-center'>";
 		foreach ($tahun as $k => $v) {
 			$class = 'btn-primary';
 			if ($tahun_aktif == $v['tahun_anggaran']) {
