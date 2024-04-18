@@ -252,9 +252,9 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_table_laporan_kinerja', $plugin_public, 'get_table_laporan_kinerja');
 		
 		$this->loader->add_action('wp_ajax_get_detail_dokumen_lain_by_id', $plugin_public, 'get_detail_dokumen_lain_by_id');
-		$this->loader->add_action('wp_ajax_tambah_dokumen_dokumen_lain', $plugin_public, 'tambah_dokumen_dokumen_lain');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_lain', $plugin_public, 'tambah_dokumen_lain');
 		$this->loader->add_action('wp_ajax_submit_tahun_dokumen_lain', $plugin_public, 'submit_tahun_dokumen_lain');
-		$this->loader->add_action('wp_ajax_hapus_dokumen_dokumen_lain', $plugin_public, 'hapus_dokumen_dokumen_lain');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_lain', $plugin_public, 'hapus_dokumen_lain');
 		$this->loader->add_action('wp_ajax_get_table_dokumen_lain', $plugin_public, 'get_table_dokumen_lain');
 		
 		$this->loader->add_action('wp_ajax_get_detail_evaluasi_internal_by_id', $plugin_public, 'get_detail_evaluasi_internal_by_id');
@@ -289,8 +289,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_submit_tahun_lkjip_lppd', $plugin_public, 'submit_tahun_lkjip_lppd');
  
 		$this->loader->add_action('wp_ajax_get_detail_dokumen_pemda_lain_by_id', $plugin_public, 'get_detail_dokumen_pemda_lain_by_id');
-		$this->loader->add_action('wp_ajax_tambah_dokumen_dokumen_pemda_lain', $plugin_public, 'tambah_dokumen_dokumen_pemda_lain');
-		$this->loader->add_action('wp_ajax_hapus_dokumen_dokumen_pemda_lain', $plugin_public, 'hapus_dokumen_dokumen_pemda_lain');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_pemda_lain', $plugin_public, 'tambah_dokumen_pemda_lain');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_pemda_lain', $plugin_public, 'hapus_dokumen_pemda_lain');
 		$this->loader->add_action('wp_ajax_get_table_dokumen_pemda_lain', $plugin_public, 'get_table_dokumen_pemda_lain');
 		$this->loader->add_action('wp_ajax_get_table_tahun_dokumen_pemda_lain', $plugin_public, 'get_table_tahun_dokumen_pemda_lain');
 		$this->loader->add_action('wp_ajax_submit_tahun_dokumen_pemda_lain', $plugin_public, 'submit_tahun_dokumen_pemda_lain');

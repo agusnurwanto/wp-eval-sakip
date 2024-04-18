@@ -19,14 +19,17 @@ $data_jadwal = $wpdb->get_row(
     ARRAY_A
 );
 
-
 $tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan'];
 
 $idtahun = $wpdb->get_results(
-    "
-		SELECT 
-			*
-		FROM esakip_data_jadwal",
+    $wpdb->prepare(
+        "
+        SELECT 
+            *
+        FROM esakip_data_jadwal
+        WHERE tipe = %s",
+        'RPJMD'
+    ),
     ARRAY_A
 );
 
@@ -39,7 +42,7 @@ foreach ($idtahun as $val) {
         $selected = 'selected';
     }
     $tahun .= "<option value='$val[id]' $selected>$val[nama_jadwal] Periode $val[tahun_anggaran] -  $tahun_Periode_selesai</option>";
-} 
+}
 ?>
 <style type="text/css">
     .wrap-table {
@@ -133,8 +136,8 @@ foreach ($idtahun as $val) {
             <div class="modal-body">
                 <form id="tahunForm">
                     <div class="form-group">
-                        <label for="tahunPeriode">Tahun Periode:</label>
-                        <select class="form-control" id="tahunPeriode" name="tahunPeriode">
+                        <label for="id_jadwal">Tahun Periode:</label>
+                        <select class="form-control" id="id_jadwal" name="id_jadwal">
                             <?php echo $tahun; ?>
                         </select>
                         <input type="hidden" id="idDokumen" value="">
@@ -278,8 +281,8 @@ foreach ($idtahun as $val) {
         if (keterangan == '') {
             return alert('Keterangan tidak boleh kosong');
         }
-        let tahunPeriode = jQuery("#tahunPeriode").val();
-        if (tahunPeriode == '') {
+        let id_jadwal = jQuery("#id_jadwal").val();
+        if (id_jadwal == '') {
             return alert('Tahun Periode tidak boleh kosong');
         }
         let fileDokumen = jQuery("#fileUpload").prop('files')[0];
@@ -293,7 +296,7 @@ foreach ($idtahun as $val) {
         form_data.append('id_dokumen', id_dokumen);
         form_data.append('skpd', skpd);
         form_data.append('keterangan', keterangan);
-        form_data.append('tahunPeriode', tahunPeriode);
+        form_data.append('id_jadwal', id_jadwal);
         form_data.append('fileUpload', fileDokumen);
 
         jQuery('#wrap-loading').show();
@@ -329,8 +332,8 @@ foreach ($idtahun as $val) {
             return alert('id tidak boleh kosong');
         }
 
-        let tahunPeriode = jQuery("#tahunPeriode").val();
-        if (tahunPeriode == '') {
+        let id_jadwal = jQuery("#id_jadwal").val();
+        if (id_jadwal == '') {
             return alert('Tahun Periode tidak boleh kosong');
         }
 
@@ -341,7 +344,7 @@ foreach ($idtahun as $val) {
             data: {
                 action: 'submit_tahun_rpjmd',
                 id: id,
-                tahunPeriode: tahunPeriode,
+                id_jadwal: id_jadwal,
                 api_key: esakip.api_key
             },
             dataType: 'json',
@@ -364,12 +367,6 @@ foreach ($idtahun as $val) {
             }
         });
     }
-
-    function lihatDokumen(dokumen) {
-        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + dokumen;
-        window.open(url, '_blank');
-    }
-
 
     function hapus_dokumen_rpjmd(id) {
         if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {

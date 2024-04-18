@@ -237,7 +237,7 @@ foreach ($idtahun as $val) {
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'get_detail_lain_by_id',
+                action: 'get_detail_dokumen_lain_by_id',
                 api_key: esakip.api_key,
                 id: id
             },
@@ -283,7 +283,7 @@ foreach ($idtahun as $val) {
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'submit_tahun_dokumen_lainnya',
+                action: 'submit_tahun_dokumen_lain',
                 id: id,
                 tahunAnggaran: tahunAnggaran,
                 api_key: esakip.api_key

@@ -886,7 +886,7 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($ret));
 	}
 
-	public function get_detail_dokumen_lainnya_by_id()
+	public function get_detail_dokumen_lain_by_id()
 	{
 		global $wpdb;
 		$ret = array(
@@ -1187,8 +1187,8 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id kosong!';
 				}
-				if (!empty($_POST['tahunPeriode'])) {
-					$tahun_periode = $_POST['tahunPeriode'];
+				if (!empty($_POST['id_jadwal'])) {
+					$tahun_periode = $_POST['id_jadwal'];
 				} else {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Periode kosong!';
@@ -1621,7 +1621,7 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($ret));
 	}
 
-	public function submit_tahun_dokumen_lainnya()
+	public function submit_tahun_dokumen_lain()
 	{
 		global $wpdb;
 		$ret = array(
@@ -2866,7 +2866,7 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($ret));
 	}
 
-	public function tambah_dokumen_dokumen_lainnya()
+	public function tambah_dokumen_lain()
 	{
 		global $wpdb;
 		$ret = array(
@@ -3382,7 +3382,7 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($ret));
 	}
 
-	public function tambah_dokumen_dokumen_pemda_lain()
+	public function tambah_dokumen_pemda_lain()
 	{
 		global $wpdb;
 		$ret = array(
@@ -4523,8 +4523,8 @@ class Wp_Eval_Sakip_Public
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_dokumen_lain(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
-						$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_dokumen_lain(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_lain(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_lain(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						$btn .= '</div>';
 
 						$tbody .= "<td class='text-center'>" . $btn . "</td>";
@@ -5678,7 +5678,7 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($ret));
 	}
 
-	public function hapus_dokumen_dokumen_lainnya()
+	public function hapus_dokumen_lain()
 	{
 		global $wpdb;
 		$ret = array(
