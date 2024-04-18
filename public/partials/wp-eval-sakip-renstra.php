@@ -23,11 +23,15 @@ $periode = $wpdb->get_row(
 $tahun_periode = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
 
 $idtahun = $wpdb->get_results(
-	"
-		SELECT 
-			*
-		FROM esakip_data_jadwal",
-	ARRAY_A
+    $wpdb->prepare(
+        "
+        SELECT 
+            *
+        FROM esakip_data_jadwal
+        WHERE tipe = %s",
+        'RPJMD'
+    ),
+    ARRAY_A
 );
 
 $tahun = "<option value='-1'>Pilih Tahun Periode</option>";

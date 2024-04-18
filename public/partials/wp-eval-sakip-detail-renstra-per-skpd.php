@@ -40,10 +40,14 @@ $skpd = $wpdb->get_row(
 $tahun_periode = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
 
 $idtahun = $wpdb->get_results(
-    "
-		SELECT 
-			*
-		FROM esakip_data_jadwal",
+    $wpdb->prepare(
+        "
+        SELECT 
+            *
+        FROM esakip_data_jadwal
+        WHERE tipe = %s",
+        'RPJMD'
+    ),
     ARRAY_A
 );
 
