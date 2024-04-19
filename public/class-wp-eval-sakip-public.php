@@ -113,15 +113,6 @@ class Wp_Eval_Sakip_Public
 		));
 	}
 
-	public function desain_lke_sakip()
-	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-desain-lke-sakip.php';
-	}
-
 	public function jadwal_evaluasi_sakip($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
@@ -464,6 +455,15 @@ class Wp_Eval_Sakip_Public
 			return '';
 		}
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-dokumen-lain-per-skpd.php';
+	}
+	
+	public function pengisian_lke_sakip($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-pengisian-lke-sakip.php';
 	}
 
 	public function get_detail_renja_rkt_by_id()
@@ -6058,9 +6058,9 @@ class Wp_Eval_Sakip_Public
 				// check search value exist
 				if (!empty($params['search']['value'])) {
 					$where .= " AND ( 
-						nama_jadwal LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%")." 
-						OR started_at LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%")."
-						OR jenis_jadwal LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%").'
+						nama_jadwal LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%") . " 
+						OR started_at LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%") . "
+						OR jenis_jadwal LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%") . '
 					)';
 				}
 
@@ -6083,13 +6083,28 @@ class Wp_Eval_Sakip_Public
 						$edit	= '';
 						$delete	= '';
 						$lock	= '';
+						$lke	= '';
 						if ($recVal['status'] == 1) {
 							$checkOpenedSchedule++;
-							$lock	= '<a class="btn btn-sm btn-success mr-2" style="text-decoration: none;" onclick="lock_data_penjadwalan(\'' . $recVal['id'] . '\'); return false;" href="#" title="Kunci data penjadwalan"><i class="dashicons dashicons-unlock"></i></a>';
-							$edit	= '<a class="btn btn-sm btn-warning mr-2" style="text-decoration: none;" onclick="edit_data_penjadwalan(\'' . $recVal['id'] . '\'); return false;" href="#" title="Edit data penjadwalan"><i class="dashicons dashicons-edit"></i></a>';
-							$delete	= '<a class="btn btn-sm btn-danger" style="text-decoration: none;" onclick="hapus_data_penjadwalan(\'' . $recVal['id'] . '\'); return false;" href="#" title="Hapus data penjadwalan"><i class="dashicons dashicons-trash"></i></a>';
+							$lke = '<div class="btn-group mr-2" role="group">';
+							$lke .= '<a class="btn btn-sm btn-info" style="text-decoration: none;" onclick="set_desain_lke(\'' . $recVal['id'] . '\'); return false;" href="#" title="Set Desain LKE"><i class="dashicons dashicons-editor-table"></i></a>';
+							$lke .= '</div>';
+
+							$lock = '<div class="btn-group mr-2" role="group">';
+							$lock .= '<a class="btn btn-sm btn-success" style="text-decoration: none;" onclick="lock_data_penjadwalan(\'' . $recVal['id'] . '\'); return false;" href="#" title="Kunci data penjadwalan"><i class="dashicons dashicons-unlock"></i></a>';
+							$lock .= '</div>';
+
+							$edit = '<div class="btn-group mr-2" role="group">';
+							$edit .= '<a class="btn btn-sm btn-warning" style="text-decoration: none;" onclick="edit_data_penjadwalan(\'' . $recVal['id'] . '\'); return false;" href="#" title="Edit data penjadwalan"><i class="dashicons dashicons-edit"></i></a>';
+							$edit .= '</div>';
+
+							$delete = '<div class="btn-group" role="group">';
+							$delete .= '<a class="btn btn-sm btn-danger" style="text-decoration: none;" onclick="hapus_data_penjadwalan(\'' . $recVal['id'] . '\'); return false;" href="#" title="Hapus data penjadwalan"><i class="dashicons dashicons-trash"></i></a>';
+							$delete .= '</div>';
 						} else if ($recVal['status'] == 2) {
-							$lock	= '<a class="btn btn-sm btn-success disabled" style="text-decoration: none;" onclick="cannot_change_schedule(\'kunci\'); return false;" href="#" title="Kunci data penjadwalan" aria-disabled="true"><i class="dashicons dashicons-lock"></i></a>';
+							$lock = '<div class="btn-group" role="group">';
+							$lock .= '<a class="btn btn-sm btn-success disabled" style="text-decoration: none;" onclick="cannot_change_schedule(\'kunci\'); return false;" href="#" title="Kunci data penjadwalan" aria-disabled="true"><i class="dashicons dashicons-lock"></i></a>';
+							$lock .= '</div>';
 						}
 
 						$status = array(
@@ -6100,7 +6115,7 @@ class Wp_Eval_Sakip_Public
 
 						$queryRecords[$recKey]['started_at']	= date('d-m-Y H:i', strtotime($recVal['started_at']));
 						$queryRecords[$recKey]['end_at']	= date('d-m-Y H:i', strtotime($recVal['end_at']));
-						$queryRecords[$recKey]['aksi'] = $lock . $edit . $delete;
+						$queryRecords[$recKey]['aksi'] = $lke . $lock . $edit . $delete;
 						$queryRecords[$recKey]['nama_jadwal'] = ucfirst($recVal['nama_jadwal']);
 						$queryRecords[$recKey]['status'] = $status[$recVal['status']];
 					}
@@ -6729,7 +6744,7 @@ class Wp_Eval_Sakip_Public
                     WHERE id_jadwal=%d
                     	AND active=1
                 ', $id));
-                if ($cek_id_jadwal_renstra) {
+				if ($cek_id_jadwal_renstra) {
 					// Jika data dengan ID yang sama ditemukan di tabel lain, tampilkan pesan
 					$ret['status'] = 'confirm';
 					$ret['message'] = 'Jadwal tidak bisa dihapus karena sudah terpakai di dokumen RENSTRA.';
@@ -6745,7 +6760,7 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'confirm';
 					$ret['message'] = 'Jadwal tidak bisa dihapus karena sudah terpakai di dokumen RPJMD / RPD.';
 				}
-				if($ret['status'] != 'confirm'){
+				if ($ret['status'] != 'confirm') {
 					// Jika tidak ada data dengan ID yang sama di tabel lain, lanjutkan penghapusan seperti biasa
 					$ret['data'] = $wpdb->update('esakip_data_jadwal', array('status' => 0), array(
 						'id' => $id
@@ -9199,7 +9214,8 @@ class Wp_Eval_Sakip_Public
 			return;
 		}
 
-		$jadwal_periode = $wpdb->get_results("
+		$jadwal_periode = $wpdb->get_results(
+			"
 			SELECT 
 				id,
 				nama_jadwal,
@@ -9232,11 +9248,11 @@ class Wp_Eval_Sakip_Public
 			$periode_renstra .= '<li><a target="_blank" href="' . $renstra['url'] . '" class="btn btn-primary">' . $renstra['title'] . '</a></li>';
 		}
 
-		if(empty($periode_rpjmd)){
+		if (empty($periode_rpjmd)) {
 			$periode_rpjmd = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
 		}
 
-		if(empty($periode_renstra)){
+		if (empty($periode_renstra)) {
 			$periode_renstra = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
 		}
 		$halaman_rpjmd = '
@@ -9244,7 +9260,7 @@ class Wp_Eval_Sakip_Public
 				<h5 class="esakip-header-tahun" data-id="rpjmd" style="margin: 0;">Periode Upload Dokumen RPJMD</h5>
 				<div class="esakip-body-tahun" data-id="rpjmd">
 					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-						'.$periode_rpjmd.'
+						' . $periode_rpjmd . '
 					</ul>
 				</div>
 			</div>';
@@ -9253,7 +9269,7 @@ class Wp_Eval_Sakip_Public
 				<h5 class="esakip-header-tahun" data-id="renstra" style="margin: 0;">Periode Upload Dokumen RENSTRA</h5>
 				<div class="esakip-body-tahun" data-id="renstra">
 					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-						'.$periode_renstra.'
+						' . $periode_renstra . '
 					</ul>
 				</div>
 			</div>';
@@ -9342,8 +9358,8 @@ class Wp_Eval_Sakip_Public
 			));
 			echo '
 				<ul class="daftar-tahun text_tengah">
-					<li>'.$halaman_rpjmd.'</li>
-					<li>'.$halaman_renstra.'</li>
+					<li>' . $halaman_rpjmd . '</li>
+					<li>' . $halaman_renstra . '</li>
 					<li><a href="' . $renja_rkt['url'] . '" target="_blank" class="btn btn-primary">' . $renja_rkt['title'] . '</a></li>
 					<li><a href="' . $skp['url'] . '" target="_blank" class="btn btn-primary">' . $skp['title'] . '</a></li>
 					<li><a href="' . $rencana_aksi['url'] . '" target="_blank" class="btn btn-primary">' . $rencana_aksi['title'] . '</a></li>
@@ -9439,7 +9455,7 @@ class Wp_Eval_Sakip_Public
 			$detail_perjanjian_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 			echo '
 				<ul class="daftar-menu-sakip">
-					<li>'.$halaman_renstra.'</li>
+					<li>' . $halaman_renstra . '</li>
 					<li><a href="' . $detail_renja['url'] . '" target="_blank" class="btn btn-primary">' . $detail_renja['title'] . '</a></li>
 					<li><a href="' . $detail_skp['url'] . '" target="_blank" class="btn btn-primary">' . $detail_skp['title'] . '</a></li>
 					<li><a href="' . $detail_rencana_aksi['url'] . '" target="_blank" class="btn btn-primary">' . $detail_rencana_aksi['title'] . '</a></li>

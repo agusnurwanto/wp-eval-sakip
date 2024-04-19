@@ -20,6 +20,12 @@ $body = '';
 	border-color: #eaeaea;
 	vertical-align: middle;
 }
+.btn-group {
+	display: inline-block;
+	margin-bottom: 5px;
+    margin-right: 5px; 
+}
+
 </style>
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 <div class="cetak">
@@ -38,7 +44,7 @@ $body = '';
 					<th class="text-center">Jadwal Selesai</th>
 					<th class="text-center">Jenis Jadwal</th>
 					<th class="text-center">Tahun Anggaran</th>
-					<th class="text-center" style="width: 150px;">Aksi</th>
+					<th class="text-center">Aksi</th>
 				</tr>
 			</thead>
 			<tbody id="data_body">
@@ -385,4 +391,7 @@ $body = '';
 		jQuery("#jadwal_tanggal").val("")
 	}
 
+	function set_desain_lke(id){
+		alert('berhasil id=' + id)
+	}
 </script> 

@@ -207,11 +207,10 @@ class Wp_Eval_Sakip_Admin
 
 					$body_pemda = '<ol>';
 					foreach ($jadwal_evaluasi as $jadwal_evaluasi_item) {
-						$tahun_anggaran_selesai = $jadwal_evaluasi_item['tahun_anggaran'] + $jadwal_evaluasi_item['lama_pelaksanaan'];
 						if (!empty($_POST['type']) && $_POST['type'] == 'pengisian_lke') {
 							$pengisian_lke_sakip = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Pengisian LKE ' . $jadwal_evaluasi_item['nama_jadwal'] . ' ' . 'Jadwal ' . $jadwal_evaluasi_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-								'content' => '[pengisian_lke_sakip]',
+								'nama_page' => 'Halaman Pengisian LKE ' . $jadwal_evaluasi_item['nama_jadwal'] . ' ' . ' | ' . $jadwal_evaluasi_item['tahun_anggaran'],
+								'content' => '[pengisian_lke_sakip id_jadwal=' . $jadwal_evaluasi_item['id'] . ']',
 								'show_header' => 1,
 								'no_key' => 1,
 								'post_status' => 'private'
@@ -468,14 +467,6 @@ class Wp_Eval_Sakip_Admin
 	{
 		global $wpdb;
 
-		$desain_lke_sakip = $this->functions->generatePage(array(
-			'nama_page' => 'Halaman Desain LKE SAKIP',
-			'content' => '[desain_lke_sakip]',
-			'show_header' => 1,
-			'no_key' => 1,
-			'post_status' => 'private'
-		));
-
 		$halaman_mapping_skpd = $this->functions->generatePage(array(
 			'nama_page' => 'Halaman Mapping SKPD',
 			'content' => '[halaman_mapping_skpd]',
@@ -525,24 +516,7 @@ class Wp_Eval_Sakip_Admin
 					->set_html('<a id="generate_user_esakip" onclick="return false;" href="#" class="button button-primary button-large">Generate User By DB Lokal</a>')
 					->set_help_text('Data user active yang ada di table esakip_data_unit akan digenerate menjadi user wordpress.'),
 			));
-		Container::make('theme_options', __('Desain LKE SAKIP'))
-			->set_page_parent($basic_options_container)
-			->add_fields(array(
-				Field::make('html', 'crb_desain_lke_hide_sidebar')
-					->set_html('
-		        		<style>
-		        			.postbox-container { display: none; }
-		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
-		        		</style>
-		        	'),
-				Field::make('html', 'crb_halaman_terkait_desain_lke')
-					->set_html('
-					<h5>HALAMAN TERKAIT</h5>
-	            	<ol>
-	            		<li><a target="_blank" href="' . $desain_lke_sakip['url'] . '">' . $desain_lke_sakip['title'] . '</a></li>
-	            	</ol>
-		        	')
-			));
+		
 		Container::make('theme_options', __('Jadwal'))
 			->set_page_parent($basic_options_container)
 			->add_fields(array(

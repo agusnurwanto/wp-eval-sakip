@@ -251,3 +251,40 @@ CREATE TABLE `esakip_data_jadwal` (
   `tahun_anggaran` year(4) NOT NULL DEFAULT '2022',
   PRIMARY KEY  (id)
 );
+
+CREATE TABLE esakip_komponen_utama (
+  `id` int(11) NOT NULL auto_increment,
+  `id_jadwal` int(11) NOT NULL,
+  `nama` varchar(255) DEFAULT NULL,
+  `bobot` float DEFAULT NULL,
+  `active` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY  (`id`)
+);
+
+CREATE TABLE esakip_subkomponen (
+  `id` int(11) NOT NULL auto_increment,
+  `id_komponen` int(11) NOT NULL,
+  `nama` varchar(255) DEFAULT NULL,
+  `bobot` float DEFAULT NULL,
+  `active` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY  (`id`)
+);
+
+CREATE TABLE esakip_komponen_penilaian (
+  `id` int(11) NOT NULL auto_increment,
+  `id_subkomponen` int(11),
+  `nama` varchar(255) DEFAULT NULL,
+  `tipe` varchar(30) DEFAULT NULL,
+  `keterangan` varchar(255) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY  (`id`)
+);
+
+CREATE TABLE esakip_lke_history (
+  `id` int(11) NOT NULL auto_increment,
+  `id_user` int(11) DEFAULT NULL,
+  `id_jadwal` int(11) NOT NULL,
+  `create_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY  (`id`)
+);
