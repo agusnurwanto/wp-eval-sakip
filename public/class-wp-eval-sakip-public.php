@@ -9429,7 +9429,7 @@ class Wp_Eval_Sakip_Public
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$detail_pengukuran_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+			$detail_dokumen_lain['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 			$detail_perjanjian_kinerja = $this->functions->generatePage(array(
 				'nama_page' => 'Halaman Detail Dokumen Perjanjian Kinerja ' . $_GET['tahun'],
 				'content' => '[dokumen_detail_perjanjian_kinerja tahun=' . $_GET['tahun'] . ']',

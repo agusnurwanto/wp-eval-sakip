@@ -39,10 +39,10 @@ class Esakip_Functions
     {
         if (
             !empty($_GET)
-            && !empty($_GET['key'])
+            && !empty($_GET['key_sakip'])
         ) {
-            $key = base64_decode($_GET['key']);
-            $decode = $this->decode_key($_GET['key']);
+            $key = base64_decode($_GET['key_sakip']);
+            $decode = $this->decode_key($_GET['key_sakip']);
             if (!empty($decode['skip'])) {
                 return;
             }
@@ -140,9 +140,9 @@ class Esakip_Functions
             $options['custom_url'] = $custom_post->custom_url;
         }
         if (strpos($link, '?') === false) {
-            $link .= '?key=' . $this->gen_key(false, $options);
+            $link .= '?key_sakip=' . $this->gen_key(false, $options);
         } else {
-            $link .= '&key=' . $this->gen_key(false, $options);
+            $link .= '&key_sakip=' . $this->gen_key(false, $options);
         }
         return $link;
     }
