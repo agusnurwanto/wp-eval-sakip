@@ -457,6 +457,15 @@ class Wp_Eval_Sakip_Public
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-dokumen-lain-per-skpd.php';
 	}
 	
+	public function desain_lke_sakip($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-desain-lke-sakip.php';
+	}
+
 	public function pengisian_lke_sakip($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
@@ -464,6 +473,15 @@ class Wp_Eval_Sakip_Public
 			return '';
 		}
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-pengisian-lke-sakip.php';
+	}
+
+	public function pengisian_lke_sakip_per_skpd($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-pengisian-lke-sakip-per-skpd.php';
 	}
 
 	public function get_detail_renja_rkt_by_id()
@@ -6080,6 +6098,14 @@ class Wp_Eval_Sakip_Public
 				if (!empty($queryRecords)) {
 					foreach ($queryRecords as $recKey => $recVal) {
 						// $report = '<a class="btn btn-sm btn-primary mr-2" style="text-decoration: none;" onclick="report(\'' . $recVal['id'] . '\'); return false;" href="#" title="Cetak Laporan"><i class="dashicons dashicons-printer"></i></a>';
+						$desain_lke_page = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Desain LKE SAKIP ' . $recVal['nama_jadwal'],
+							'content' => '[desain_lke_sakip id_jadwal=' . $recVal['id'] . ']',
+							'show_header' => 1,
+							'no_key' => 1,
+							'post_status' => 'private'
+						));
+
 						$edit	= '';
 						$delete	= '';
 						$lock	= '';
@@ -6087,7 +6113,7 @@ class Wp_Eval_Sakip_Public
 						if ($recVal['status'] == 1) {
 							$checkOpenedSchedule++;
 							$lke = '<div class="btn-group mr-2" role="group">';
-							$lke .= '<a class="btn btn-sm btn-info" style="text-decoration: none;" onclick="set_desain_lke(\'' . $recVal['id'] . '\'); return false;" href="#" title="Set Desain LKE"><i class="dashicons dashicons-editor-table"></i></a>';
+							$lke .= '<a class="btn btn-sm btn-info" style="text-decoration: none;" onclick="set_desain_lke(\'' . $desain_lke_page['url'] . '\'); return false;" href="#" title="Set Desain LKE"><i class="dashicons dashicons-editor-table"></i></a>';
 							$lke .= '</div>';
 
 							$lock = '<div class="btn-group mr-2" role="group">';
@@ -6816,7 +6842,7 @@ class Wp_Eval_Sakip_Public
 					$counter = 1;
 					foreach ($unit as $kk => $vv) {
 						$detail_dokumen_lainnya = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Detail Dokumen dokumen_lainnya/RKT ' . $tahun_anggaran,
+							'nama_page' => 'Halaman Detail Dokumen dokumen_lainnya ' . $tahun_anggaran,
 							'content' => '[dokumen_detail_dokumen_lainnya tahun=' . $tahun_anggaran . ']',
 							'show_header' => 1,
 							'no_key' => 1,
@@ -9052,14 +9078,14 @@ class Wp_Eval_Sakip_Public
 					$tbody = '';
 					$counter = 1;
 					foreach ($unit as $kk => $vv) {
-						$detail_rensra = $this->functions->generatePage(array(
+						$detail_renstra = $this->functions->generatePage(array(
 							'nama_page' => 'Halaman Detail Dokumen RENSTRA ' . $id_jadwal,
 							'content' => '[upload_dokumen_renstra periode=' . $id_jadwal . ']',
 							'show_header' => 1,
 							'no_key' => 1,
 							'post_status' => 'private'
 						));
-						$detail_rensra['url'] .= '?1=1';
+						$detail_renstra['url'] .= '?1=1';
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
@@ -9082,7 +9108,7 @@ class Wp_Eval_Sakip_Public
 						);
 
 						$btn = '<div class="btn-action-group">';
-						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_rensra['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_renstra['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 						$btn .= '</div>';
 
 						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
@@ -9093,6 +9119,244 @@ class Wp_Eval_Sakip_Public
 					$ret['data'] = $tbody;
 				} else {
 					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_table_skpd_pengisian_lke()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
+				}
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+
+				$unit = $wpdb->get_results(
+					$wpdb->prepare("
+					SELECT 
+						nama_skpd, 
+						id_skpd, 
+						kode_skpd
+					FROM esakip_data_unit 
+					WHERE tahun_anggaran=%d
+					  AND active=1 
+					  AND is_skpd=1 
+					ORDER BY kode_skpd ASC
+					", $tahun_anggaran),
+					ARRAY_A
+				);
+
+				if (!empty($unit)) {
+					$tbody = '';
+					$counter = 1;
+					foreach ($unit as $kk => $vv) {
+						$detail_pengisian_lke = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Pengisian LKE ' . $vv['nama_skpd'],
+							'content' => '[pengisian_lke_sakip_per_skpd id_jadwal=' . $id_jadwal . ']',
+							'show_header' => 1,
+							'no_key' => 1,
+							'post_status' => 'private'
+						));
+						$detail_pengisian_lke['url'] .= '?1=1';
+
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+						$tbody .= "<td>" . $vv['kode_skpd'] . "</td>";
+						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
+
+						$nilai_skpd = $wpdb->get_var(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(nilai)
+								FROM esakip_pengisian_lke
+								WHERE id_skpd = %d
+								  AND id_jadwal = %d
+								  AND active = 1
+								",
+								$vv['id_skpd'],
+								$id_jadwal
+							)
+						);
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_pengisian_lke['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+						$btn .= '</div>';
+
+						$tbody .= "<td class='text-center'>" . $nilai_skpd . "</td>";
+						$tbody .= "<td>" . $btn . "</td>";
+
+						$tbody .= "</tr>";
+					}
+					$ret['data'] = $tbody;
+				} else {
+					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_table_pengisian_lke()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_skpd'])) {
+					$id_skpd = $_POST['id_skpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id SKPD kosong!';
+				}
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
+				}
+				$data_komponen = $wpdb->get_results(
+					$wpdb->prepare("
+                    SELECT * 
+                    FROM esakip_komponen
+                    WHERE id_jadwal = %d 
+                      AND active = 1
+                ", $id_jadwal),
+					ARRAY_A
+				);
+				if(!empty($data_komponen)){
+					$data_subkomponen = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT * 
+						FROM esakip_subkomponen
+						WHERE id_jadwal = %d 
+						  AND active = 1
+					", $id_jadwal),
+						ARRAY_A
+					);
+					if(!empty($data_subkomponen)){
+						$data_komponen_penilaian = $wpdb->get_results(
+							$wpdb->prepare("
+							SELECT * 
+							FROM esakip_komponen_penilaian
+							WHERE id_jadwal = %d 
+							  AND active = 1
+						", $id_jadwal),
+							ARRAY_A
+						);
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_table_desain_lke()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_skpd'])) {
+					$id_skpd = $_POST['id_skpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id SKPD kosong!';
+				}
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
+				}
+				$data_komponen = $wpdb->get_results(
+					$wpdb->prepare("
+                    SELECT * 
+                    FROM esakip_komponen
+                    WHERE id_jadwal = %d 
+                      AND active = 1
+                ", $id_jadwal),
+					ARRAY_A
+				);
+				if(!empty($data_komponen)){
+					$data_subkomponen = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT * 
+						FROM esakip_subkomponen
+						WHERE id_jadwal = %d 
+						  AND active = 1
+					", $id_jadwal),
+						ARRAY_A
+					);
+					if(!empty($data_subkomponen)){
+						$data_komponen_penilaian = $wpdb->get_results(
+							$wpdb->prepare("
+							SELECT * 
+							FROM esakip_komponen_penilaian
+							WHERE id_jadwal = %d 
+							  AND active = 1
+						", $id_jadwal),
+							ARRAY_A
+						);
+					}
 				}
 			} else {
 				$ret = array(

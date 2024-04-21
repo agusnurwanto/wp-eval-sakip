@@ -391,7 +391,7 @@ $body = '';
 		jQuery("#jadwal_tanggal").val("")
 	}
 
-	function set_desain_lke(id){
-		alert('berhasil id=' + id)
+	function set_desain_lke(url) {
+		window.open(url, '_blank');
 	}
 </script> 

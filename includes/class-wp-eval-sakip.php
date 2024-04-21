@@ -325,6 +325,10 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_table_tahun_rpjmd', $plugin_public, 'get_table_tahun_rpjmd');
 		$this->loader->add_action('wp_ajax_submit_tahun_rpjmd', $plugin_public, 'submit_tahun_rpjmd');
 		
+		$this->loader->add_action('wp_ajax_get_table_desain_lke', $plugin_public, 'get_table_desain_lke');
+		$this->loader->add_action('wp_ajax_get_table_skpd_pengisian_lke', $plugin_public, 'get_table_skpd_pengisian_lke');
+		$this->loader->add_action('wp_ajax_get_table_pengisian_lke', $plugin_public, 'get_table_pengisian_lke');
+		
 		add_shortcode('jadwal_evaluasi_sakip', array($plugin_public, 'jadwal_evaluasi_sakip'));
 		add_shortcode('halaman_mapping_skpd', array($plugin_public, 'halaman_mapping_skpd'));
 		
@@ -362,7 +366,9 @@ class Wp_Eval_Sakip {
 		add_shortcode('dokumen_detail_laporan_kinerja', array($plugin_public, 'dokumen_detail_laporan_kinerja'));
 		add_shortcode('dokumen_detail_laporan_kinerja', array($plugin_public, 'dokumen_detail_laporan_kinerja'));
 		
+		add_shortcode('desain_lke_sakip', array($plugin_public, 'desain_lke_sakip'));
 		add_shortcode('pengisian_lke_sakip', array($plugin_public, 'pengisian_lke_sakip'));
+		add_shortcode('pengisian_lke_sakip_per_skpd', array($plugin_public, 'pengisian_lke_sakip_per_skpd'));
 
 		add_shortcode('menu_eval_sakip', array($plugin_public, 'menu_eval_sakip'));
 		

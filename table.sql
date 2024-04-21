@@ -252,7 +252,7 @@ CREATE TABLE `esakip_data_jadwal` (
   PRIMARY KEY  (id)
 );
 
-CREATE TABLE esakip_komponen_utama (
+CREATE TABLE esakip_komponen (
   `id` int(11) NOT NULL auto_increment,
   `id_jadwal` int(11) NOT NULL,
   `nama` varchar(255) DEFAULT NULL,
@@ -280,10 +280,32 @@ CREATE TABLE esakip_komponen_penilaian (
   PRIMARY KEY  (`id`)
 );
 
-CREATE TABLE esakip_lke_history (
+CREATE TABLE esakip_pengisian_lke (
   `id` int(11) NOT NULL auto_increment,
   `id_user` int(11) DEFAULT NULL,
+  `id_skpd` int(11) NOT NULL,
+  `id_evaluator` int(11) NOT NULL,
   `id_jadwal` int(11) NOT NULL,
+  `id_komponen` int(11) NOT NULL,
+  `id_subkomponen` int(11) NOT NULL,
+  `id_komponen_penilaian` int(11) NOT NULL,
+  `nilai` varchar(30) DEFAULT NULL,
+  `create_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  `active` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY  (`id`)
+);
+
+CREATE TABLE esakip_pengisian_lke_history (
+  `id` int(11) NOT NULL auto_increment,
+  `id_user` int(11) DEFAULT NULL,
+  `id_skpd` int(11) NOT NULL,
+  `id_evaluator` int(11) NOT NULL,
+  `id_jadwal` int(11) NOT NULL,
+  `id_komponen` int(11) NOT NULL,
+  `id_subkomponen` int(11) NOT NULL,
+  `id_komponen_penilaian` int(11) NOT NULL,
+  `nilai` varchar(30) DEFAULT NULL,
   `create_at` datetime DEFAULT current_timestamp(),
   `update_at` datetime DEFAULT current_timestamp(),
   PRIMARY KEY  (`id`)
