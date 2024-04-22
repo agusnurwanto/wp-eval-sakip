@@ -25,7 +25,17 @@ if (empty($jadwal)) {
 }
 ?>
 <style>
+.transparent-button {
+    background-color: transparent;
+    border: none;
+    color: #000; /* Warna teks */
+    cursor: pointer;
+    transition: color 0.3s; /* Animasi perubahan warna teks */
+}
 
+.transparent-button:hover {
+    color: #fff; /* Warna teks saat hover */
+}
 </style>
 <div class="container-md">
     <div style="padding: 10px;margin:0 0 3rem 0;">
@@ -34,7 +44,7 @@ if (empty($jadwal)) {
             <table id="table_desain_sakip" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                 <thead>
                     <tr>
-                        <th class="text-center">Komponen/Sub Komponen</th>
+                        <th class="text-center" colspan="4">Komponen/Sub Komponen</th>
                         <th class="text-center">Bobot</th>
                         <th class="text-center">Format Penilaian</th>
                         <th class="text-center">Aksi</th>
@@ -47,8 +57,8 @@ if (empty($jadwal)) {
     </div>
 </div>
 <script>
-    document.ready(function(){
-        // get_table_desain_sakip();
+    jQuery(document).ready(function() {
+        get_table_desain_sakip();
     })
 
     function get_table_desain_sakip() {
@@ -60,7 +70,6 @@ if (empty($jadwal)) {
                 action: 'get_table_desain_lke',
                 api_key: esakip.api_key,
                 id_jadwal: <?php echo $input['id_jadwal']; ?>,
-                id_skpd: <?php echo $input['id_skpd']; ?>,
             },
             dataType: 'json',
             success: function(response) {

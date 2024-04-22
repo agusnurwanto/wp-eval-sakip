@@ -456,7 +456,7 @@ class Wp_Eval_Sakip_Public
 		}
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-dokumen-lain-per-skpd.php';
 	}
-	
+
 	public function desain_lke_sakip($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
@@ -9246,12 +9246,6 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if (!empty($_POST['id_skpd'])) {
-					$id_skpd = $_POST['id_skpd'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
-				}
 				if (!empty($_POST['id_jadwal'])) {
 					$id_jadwal = $_POST['id_jadwal'];
 				} else {
@@ -9260,35 +9254,85 @@ class Wp_Eval_Sakip_Public
 				}
 				$data_komponen = $wpdb->get_results(
 					$wpdb->prepare("
-                    SELECT * 
-                    FROM esakip_komponen
-                    WHERE id_jadwal = %d 
-                      AND active = 1
-                ", $id_jadwal),
+						SELECT * 
+						FROM esakip_komponen
+						WHERE id_jadwal = %d
+						  AND active = 1
+						", $id_jadwal),
 					ARRAY_A
 				);
-				if(!empty($data_komponen)){
-					$data_subkomponen = $wpdb->get_results(
-						$wpdb->prepare("
-						SELECT * 
-						FROM esakip_subkomponen
-						WHERE id_jadwal = %d 
-						  AND active = 1
-					", $id_jadwal),
-						ARRAY_A
-					);
-					if(!empty($data_subkomponen)){
-						$data_komponen_penilaian = $wpdb->get_results(
+
+				$tbody = '';
+				if (!empty($data_komponen)) {
+					$counter = 'A';
+					foreach ($data_komponen as $komponen) {
+						$counter_isi = 1;
+						$counter_sub = 'a';
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-left'>" . $counter++ . "</td>";
+						$tbody .= "<td class='text-left' colspan='3'>" . $komponen['nama'] . "</td>";
+						$tbody .= "<td class='text-center'>" . $komponen['bobot'] . "</td>";
+						$tbody .= "<td class='text-left'></td>";
+						$tbody .= "<td class='text-center'>0.00</td>";
+						$tbody .= "<td class='text-center'>0.00%</td>";
+						$tbody .= "<td class='text-center'></td>";
+						$tbody .= "</tr>";
+
+						$data_subkomponen = $wpdb->get_results(
 							$wpdb->prepare("
-							SELECT * 
-							FROM esakip_komponen_penilaian
-							WHERE id_jadwal = %d 
-							  AND active = 1
-						", $id_jadwal),
+								SELECT * 
+								FROM esakip_subkomponen
+								WHERE id_komponen = %d
+								AND active = 1
+								", $komponen['id']),
 							ARRAY_A
 						);
+
+						if (!empty($data_subkomponen)) {
+							foreach ($data_subkomponen as $subkomponen) {
+								$tbody .= "<tr>";
+								$tbody .= "<td class='text-left'></td>";
+								$tbody .= "<td class='text-left'>" . $counter_sub++ . "</td>";
+								$tbody .= "<td class='text-left' colspan='2'>" . $subkomponen['nama'] . "</td>";
+								$tbody .= "<td class='text-center'>" . $subkomponen['bobot'] . "</td>";
+								$tbody .= "<td class='text-left'></td>";
+								$tbody .= "<td class='text-center'>0.00</td>";
+								$tbody .= "<td class='text-center'>0.00%</td>";
+								$tbody .= "</tr>";
+
+								$data_komponen_penilaian = $wpdb->get_results(
+									$wpdb->prepare("
+										SELECT * 
+										FROM esakip_komponen_penilaian
+										WHERE id_subkomponen = %d 
+										AND active = 1
+									", $subkomponen['id']),
+									ARRAY_A
+								);
+
+								if (!empty($data_komponen_penilaian)) {
+									foreach ($data_komponen_penilaian as $penilaian) {
+										$tbody .= "<tr>";
+										$tbody .= "<td class='text-left'></td>";
+										$tbody .= "<td class='text-left'></td>";
+										$tbody .= "<td class='text-left'>" . $counter_isi++ . "</td>";
+										$tbody .= "<td class='text-left'>" . $penilaian['nama'] . "</td>";
+										$tbody .= "<td class='text-center'>-</td>";
+										$tbody .= "<td class='text-center'>pilih jawaban</td>";
+										$tbody .= "<td class='text-center'>0.00</td>";
+										$tbody .= "<td class='text-center'></td>";
+										$tbody .= "<td class='text-center'>Belum Ada</td>";
+										$tbody .= "</tr>";
+									}
+								}
+							}
+						}
 					}
+				} else {
+					$tbody = "<tr><td colspan='8' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
+
+				$ret['data'] = $tbody;
 			} else {
 				$ret = array(
 					'status' => 'error',
@@ -9315,12 +9359,6 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if (!empty($_POST['id_skpd'])) {
-					$id_skpd = $_POST['id_skpd'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
-				}
 				if (!empty($_POST['id_jadwal'])) {
 					$id_jadwal = $_POST['id_jadwal'];
 				} else {
@@ -9329,35 +9367,86 @@ class Wp_Eval_Sakip_Public
 				}
 				$data_komponen = $wpdb->get_results(
 					$wpdb->prepare("
-                    SELECT * 
-                    FROM esakip_komponen
-                    WHERE id_jadwal = %d 
-                      AND active = 1
-                ", $id_jadwal),
+						SELECT * 
+						FROM esakip_komponen
+						WHERE id_jadwal = %d
+						  AND active = 1
+						", $id_jadwal),
 					ARRAY_A
 				);
-				if(!empty($data_komponen)){
-					$data_subkomponen = $wpdb->get_results(
-						$wpdb->prepare("
-						SELECT * 
-						FROM esakip_subkomponen
-						WHERE id_jadwal = %d 
-						  AND active = 1
-					", $id_jadwal),
-						ARRAY_A
-					);
-					if(!empty($data_subkomponen)){
-						$data_komponen_penilaian = $wpdb->get_results(
+
+				$tbody = '';
+				if (!empty($data_komponen)) {
+					$counter = 'A';
+					foreach ($data_komponen as $komponen) {
+						$counter_isi = 1;
+						$counter_sub = 'a';
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-left'>" . $counter++ . "</td>";
+						$tbody .= "<td class='text-left' colspan='3'>" . $komponen['nama'] . "</td>";
+						$tbody .= "<td class='text-center'>" . $komponen['bobot'] . "</td>";
+						$tbody .= "<td class='text-left'></td>";
+						$tbody .= "<td class='text-center'>-</td>";
+						$tbody .= "</tr>";
+
+						$data_subkomponen = $wpdb->get_results(
 							$wpdb->prepare("
-							SELECT * 
-							FROM esakip_komponen_penilaian
-							WHERE id_jadwal = %d 
-							  AND active = 1
-						", $id_jadwal),
+								SELECT * 
+								FROM esakip_subkomponen
+								WHERE id_komponen = %d
+								AND active = 1
+								", $komponen['id']),
 							ARRAY_A
 						);
+
+						if (!empty($data_subkomponen)) {
+							foreach ($data_subkomponen as $subkomponen) {
+								$tbody .= "<tr>";
+								$tbody .= "<td class='text-left'></td>";
+								$tbody .= "<td class='text-left'>" . $counter_sub++ . "</td>";
+								$tbody .= "<td class='text-left' colspan='2'>" . $subkomponen['nama'] . "</td>";
+								$tbody .= "<td class='text-center'>" . $subkomponen['bobot'] . "</td>";
+								$tbody .= "<td class='text-left'></td>";
+								$tbody .= "<td class='text-center'>-</td>";
+								$tbody .= "</tr>";
+
+								$data_komponen_penilaian = $wpdb->get_results(
+									$wpdb->prepare("
+										SELECT * 
+										FROM esakip_komponen_penilaian
+										WHERE id_subkomponen = %d 
+										AND active = 1
+									", $subkomponen['id']),
+									ARRAY_A
+								);
+
+								if (!empty($data_komponen_penilaian)) {
+									foreach ($data_komponen_penilaian as $penilaian) {
+										$tbody .= "<tr>";
+										$tbody .= "<td class='text-left'></td>";
+										$tbody .= "<td class='text-left'></td>";
+										$tbody .= "<td class='text-left'>" . $counter_isi++ . "</td>";
+										$tbody .= "<td class='text-left'>" . $penilaian['nama'] . "</td>";
+										$tbody .= "<td class='text-center'>" . $penilaian['bobot'] . "</td>";
+										$tbody .= "<td class='text-center'>" . $penilaian['tipe'] . "</td>";
+										$tbody .= "<td class='text-center'>-</td>";
+										$tbody .= "</tr>";
+									}
+								}
+							}
+						}
 					}
+				} else {
+					$tbody = "<tr><td colspan='6' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
+
+				$tbody .= "<tr>";
+				$tbody .= "<td colspan='7' class='text-center'>";
+				$tbody .= "<button class='transparent-button' onclick='tambah_komponen_utama()'><span class='dashicons dashicons-table-row-after'></span> Tambah Komponen Utama Lain</button>";
+				$tbody .= "</td>";
+				$tbody .= "</tr>";
+
+				$ret['data'] = $tbody;
 			} else {
 				$ret = array(
 					'status' => 'error',
