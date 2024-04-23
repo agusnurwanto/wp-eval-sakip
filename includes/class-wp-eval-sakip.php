@@ -326,6 +326,10 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_submit_tahun_rpjmd', $plugin_public, 'submit_tahun_rpjmd');
 		
 		$this->loader->add_action('wp_ajax_get_table_desain_lke', $plugin_public, 'get_table_desain_lke');
+		$this->loader->add_action('wp_ajax_tambah_komponen_lke', $plugin_public, 'tambah_komponen_lke');
+		$this->loader->add_action('wp_ajax_tambah_subkomponen_lke', $plugin_public, 'tambah_subkomponen_lke');
+		$this->loader->add_action('wp_ajax_tambah_komponen_penilaian_lke', $plugin_public, 'tambah_komponen_penilaian_lke');
+
 		$this->loader->add_action('wp_ajax_get_table_skpd_pengisian_lke', $plugin_public, 'get_table_skpd_pengisian_lke');
 		$this->loader->add_action('wp_ajax_get_table_pengisian_lke', $plugin_public, 'get_table_pengisian_lke');
 		

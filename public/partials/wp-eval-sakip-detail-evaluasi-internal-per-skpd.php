@@ -221,7 +221,6 @@ foreach ($idtahun as $val) {
                     alert(response.message);
                     jQuery('#tahunModal').modal('hide');
                     getTableTahun();
-                    getTableTahun();
                 } else {
                     alert(response.message);
                 }
