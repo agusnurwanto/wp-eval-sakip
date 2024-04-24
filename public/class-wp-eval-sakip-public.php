@@ -9483,7 +9483,7 @@ class Wp_Eval_Sakip_Public
 
 				$tbody .= "<tr>";
 				$tbody .= "<td colspan='7' class='text-center'>";
-				$tbody .= "<button class='transparent-button' onclick='tambah_komponen_utama()'><span class='dashicons dashicons-table-row-after'></span> Tambah Komponen Utama Lain</button>";
+				$tbody .= "<button class='transparent-button' onclick='tambah_komponen_utama()'><span class='dashicons dashicons-table-row-after'></span> Tambah Komponen Utama</button>";
 				$tbody .= "</td>";
 				$tbody .= "</tr>";
 
@@ -9897,8 +9897,8 @@ class Wp_Eval_Sakip_Public
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				$id_komponen = null;
 
-				if (!empty($_POST['id_komponen'])) {
-					$id_komponen = $_POST['id_komponen'];
+				if (!empty($_POST['id'])) {
+					$id_komponen = $_POST['id'];
 					$ret['message'] = 'Berhasil edit data!';
 				}
 
@@ -9969,10 +9969,10 @@ class Wp_Eval_Sakip_Public
 		);
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$id_komponen = null;
+				$id_subkomponen = null;
 
-				if (!empty($_POST['id_subkomponen'])) {
-					$id_subkomponen = $_POST['id_subkomponen'];
+				if (!empty($_POST['id'])) {
+					$id_subkomponen = $_POST['id'];
 					$ret['message'] = 'Berhasil edit data!';
 				}
 
@@ -9992,7 +9992,7 @@ class Wp_Eval_Sakip_Public
 					$bobot_subkomponen = $_POST['bobot_subkomponen'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Bobot Komponen kosong!';
+					$ret['message'] = 'Bobot Sub Komponen kosong!';
 				}
 
 				if ($ret['status'] === 'success') {
@@ -10046,8 +10046,8 @@ class Wp_Eval_Sakip_Public
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				$id_komponen_penilaian = null;
 
-				if (!empty($_POST['id_komponen_penilaian'])) {
-					$id_komponen_penilaian = $_POST['id_komponen_penilaian'];
+				if (!empty($_POST['id'])) {
+					$id_komponen_penilaian = $_POST['id'];
 					$ret['message'] = 'Berhasil edit data!';
 				}
 
@@ -10106,6 +10106,270 @@ class Wp_Eval_Sakip_Public
 			$ret = array(
 				'status' => 'error',
 				'message' => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_komponen_lke_by_id()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT *
+							FROM esakip_komponen
+							WHERE id = %d
+						", $_POST['id']),
+						ARRAY_A
+					);
+					$ret['data'] = $data;
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+	public function get_subkomponen_lke_by_id()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT *
+							FROM esakip_subkomponen
+							WHERE id = %d
+						", $_POST['id']),
+						ARRAY_A
+					);
+					$ret['data'] = $data;
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+	public function get_komponen_penilaian_lke_by_id()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT *
+							FROM esakip_komponen_penilaian
+							WHERE id = %d
+						", $_POST['id']),
+						ARRAY_A
+					);
+					$ret['data'] = $data;
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_komponen_lke()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$cek_id = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT id_komponen
+							FROM esakip_subkomponen
+							WHERE id_komponen=%d
+						", $_POST['id'])
+					);
+					if (empty($cek_id)) {
+						$ret['data'] = $wpdb->update(
+							'esakip_komponen',
+							array('active' => 0),
+							array('id' => $_POST['id'])
+						);
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message'   => 'Data dengan ID = ' . $cek_id . ' memiliki Subkomponen Aktif!'
+						);
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+	public function hapus_komponen_penilaian_lke()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$ret['data'] = $wpdb->update(
+						'esakip_komponen_penilaian',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+	public function hapus_subkomponen_lke()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$cek_id = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT id_subkomponen
+							FROM esakip_komponen_penilaian
+							WHERE id_subkomponen=%d
+						", $_POST['id'])
+					);
+					if (empty($cek_id)) {
+						$ret['data'] = $wpdb->update(
+							'esakip_subkomponen',
+							array('active' => 0),
+							array('id' => $_POST['id'])
+						);
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message'   => 'Data dengan ID = ' . $cek_id . ' memiliki Komponen Penilaian Aktif!'
+						);
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
 			);
 		}
 		die(json_encode($ret));
