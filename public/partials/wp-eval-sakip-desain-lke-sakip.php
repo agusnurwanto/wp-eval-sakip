@@ -25,7 +25,34 @@ if (empty($jadwal)) {
 }
 ?>
 <style>
+    .transparent-button {
+        background-color: transparent;
+        border: none;
+        color: #000;
+        cursor: pointer;
+        transition: color 0.3s;
+        width: 100%;
+        outline: none;
+    }
 
+    .transparent-button:hover,
+    .transparent-button:focus,
+    .transparent-button:focus-visible {
+        color: #000;
+        background-color: #E5E1DA;
+        border-color: transparent;
+        outline: none;
+    }
+
+    .btn-action-group {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .btn-action-group .btn {
+        margin: 0 5px;
+    }
 </style>
 <div class="container-md">
     <div style="padding: 10px;margin:0 0 3rem 0;">
@@ -34,10 +61,10 @@ if (empty($jadwal)) {
             <table id="table_desain_sakip" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                 <thead>
                     <tr>
-                        <th class="text-center">Komponen/Sub Komponen</th>
-                        <th class="text-center">Bobot</th>
+                        <th class="text-center" colspan="4" style="vertical-align: middle;">Komponen/Sub Komponen</th>
+                        <th class="text-center" style="vertical-align: middle;">Bobot</th>
                         <th class="text-center">Format Penilaian</th>
-                        <th class="text-center">Aksi</th>
+                        <th class="text-center" style="vertical-align: middle;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -46,9 +73,110 @@ if (empty($jadwal)) {
         </div>
     </div>
 </div>
+
+<!-- Modal tambah komponen -->
+<div class="modal fade" id="tambahKomponenModal" tabindex="-1" role="dialog" aria-labelledby="tambahKomponenModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tambahKomponenModalLabel">Tambah Komponen Utama</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formTambahKomponen">
+                    <input type="hidden" value="" id="idKomponen">
+                    <input type="hidden" value="<?php echo $input['id_jadwal'] ?>" id="idJadwal">
+                    <div class="form-group">
+                        <label for="namaKomponen">Nama Komponen</label>
+                        <input type="text" class="form-control" id="namaKomponen" name="namaKomponen" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bobotKomponen">Bobot Komponen</label>
+                        <input type="number" class="form-control" id="bobotKomponen" name="bobotKomponen" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" onclick="submit_komponen(); return false">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal untuk menambah subkomponen -->
+<div class="modal fade" id="tambahSubkomponenModal" tabindex="-1" role="dialog" aria-labelledby="tambahSubkomponenModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tambahSubkomponenModalLabel">Tambah Subkomponen</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formTambahSubkomponen">
+                    <input type="hidden" value="" id="idSubKomponen">
+                    <input type="hidden" value="" id="idKomponen_sub">
+                    <div class="form-group">
+                        <label for="namaSubKomponen">Nama Subkomponen</label>
+                        <input type="text" class="form-control" id="namaSubKomponen" name="namaSubKomponen" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bobotSubKomponen">Bobot Subkomponen</label>
+                        <input type="number" class="form-control" id="bobotSubKomponen" name="bobotSubKomponen" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" onclick="submit_subkomponen(); return false">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal untuk menambah komponen penilaian -->
+<div class="modal fade" id="tambahPenilaianModal" tabindex="-1" role="dialog" aria-labelledby="tambahPenilaianModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tambahPenilaianModalLabel">Tambah Komponen Penilaian</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formTambahPenilaian">
+                    <input type="hidden" value="" id="idKomponenPenilaian">
+                    <input type="hidden" value="" id="idSubKomponen_penilaian">
+                    <div class="form-group">
+                        <label for="namaPenilaian">Nama Komponen Penilaian</label>
+                        <input type="text" class="form-control" id="namaPenilaian" name="namaPenilaian" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tipeJawaban">Tipe Jawaban</label>
+                        <select class="form-control" id="tipeJawaban" name="tipeJawaban" required>
+                            <option value="">Pilih Tipe Jawaban</option>
+                            <option value="1">Y/T</option>
+                            <option value="2">A/B/C/D/E</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" onclick="submit_komponen_penilaian(); return false">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-    document.ready(function(){
-        // get_table_desain_sakip();
+    jQuery(document).ready(function() {
+        get_table_desain_sakip();
     })
 
     function get_table_desain_sakip() {
@@ -60,7 +188,6 @@ if (empty($jadwal)) {
                 action: 'get_table_desain_lke',
                 api_key: esakip.api_key,
                 id_jadwal: <?php echo $input['id_jadwal']; ?>,
-                id_skpd: <?php echo $input['id_skpd']; ?>,
             },
             dataType: 'json',
             success: function(response) {
@@ -76,6 +203,370 @@ if (empty($jadwal)) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
                 alert('Terjadi kesalahan saat memuat tabel!');
+            }
+        });
+    }
+
+    function tambah_komponen_utama() {
+        jQuery('#idKomponen').val('');
+        jQuery('#namaKomponen').val('');
+        jQuery('#bobotKomponen').val('');
+        jQuery('#tambahKomponenModal').modal('show');
+    }
+
+    function tambah_subkomponen(id) {
+        jQuery('#idKomponen_sub').val(id);
+        jQuery('#idSubKomponen').val('');
+        jQuery('#namaSubKomponen').val('');
+        jQuery('#bobotSubKomponen').val('');
+        jQuery('#tambahSubkomponenModal').modal('show');
+    }
+
+    function tambah_komponen_penilaian(id) {
+        jQuery('#idSubKomponen_penilaian').val(id);
+        jQuery('#idKomponenPenilaian').val('');
+        jQuery('#namaPenilaian').val('');
+        jQuery('#tipeJawaban').val('');
+        jQuery('#tambahPenilaianModal').modal('show');
+    }
+
+    function edit_data_komponen(id) {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_komponen_lke_by_id',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                console.log(response);
+                if (response.status === 'success') {
+                    let data = response.data;
+                    jQuery("#idKomponen").val(data.id);
+                    jQuery("#namaKomponen").val(data.nama);
+                    jQuery("#bobotKomponen").val(data.bobot);
+                    jQuery('#tambahKomponenModal').modal('show');
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data!');
+            }
+        });
+    }
+
+    function edit_data_subkomponen(id) {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_subkomponen_lke_by_id',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                console.log(response);
+                if (response.status === 'success') {
+                    let data = response.data;
+                    jQuery("#idSubKomponen").val(data.id);
+                    jQuery("#idKomponen_sub").val(data.id_komponen);
+                    jQuery("#namaSubKomponen").val(data.nama);
+                    jQuery("#bobotSubKomponen").val(data.bobot);
+                    jQuery('#tambahSubkomponenModal').modal('show');
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data!');
+            }
+        });
+    }
+
+    function edit_data_komponen_penilaian(id) {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_komponen_penilaian_lke_by_id',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                console.log(response);
+                if (response.status === 'success') {
+                    let data = response.data;
+                    jQuery("#idKomponenPenilaian").val(data.id);
+                    jQuery("#idSubKomponen_penilaian").val(data.id_subkomponen);
+                    jQuery("#namaPenilaian").val(data.nama);
+                    jQuery("#tipeJawaban").val(data.tipe);
+                    jQuery('#tambahPenilaianModal').modal('show');
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data!');
+            }
+        });
+    }
+
+    function hapus_data_komponen(id) {
+        if (!confirm('Apakah Anda yakin ingin menghapus Komponen ini?')) {
+            return;
+        }
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'hapus_komponen_lke',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    get_table_desain_sakip();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                jQuery('#wrap-loading').hide();
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }
+
+    function hapus_data_subkomponen(id) {
+        if (!confirm('Apakah Anda yakin ingin menghapus Sub Komponen ini?')) {
+            return;
+        }
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'hapus_subkomponen_lke',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    get_table_desain_sakip();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                jQuery('#wrap-loading').hide();
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }
+
+    function hapus_data_komponen_penilaian(id) {
+        if (!confirm('Apakah Anda yakin ingin menghapus Komponen Penilaian ini?')) {
+            return;
+        }
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'hapus_komponen_penilaian_lke',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    get_table_desain_sakip();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                jQuery('#wrap-loading').hide();
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }
+
+    function submit_komponen() {
+        let id_komponen = jQuery("#idKomponen").val();
+
+        let idJadwal = jQuery("#idJadwal").val();
+        if (idJadwal == '') {
+            return alert('Id Jadwal tidak boleh kosong');
+        }
+
+        let namaKomponen = jQuery("#namaKomponen").val();
+        if (namaKomponen == '') {
+            return alert('Nama Komponen tidak boleh kosong');
+        }
+
+        let bobotKomponen = jQuery("#bobotKomponen").val();
+        if (bobotKomponen == '') {
+            return alert('Bobot Komponen tidak boleh kosong');
+        }
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'tambah_komponen_lke',
+                id: id_komponen,
+                id_jadwal: idJadwal,
+                nama_komponen: namaKomponen,
+                bobot_komponen: bobotKomponen,
+                api_key: esakip.api_key
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    jQuery('#tambahKomponenModal').modal('hide');
+                    get_table_desain_sakip();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }
+
+    function submit_subkomponen() {
+        let id_subkomponen = jQuery("#idSubKomponen").val();
+
+        let idKomponen_sub = jQuery("#idKomponen_sub").val();
+        if (idKomponen_sub == '') {
+            return alert('Id Komponen tidak boleh kosong');
+        }
+
+        let namaSubKomponen = jQuery("#namaSubKomponen").val();
+        if (namaSubKomponen == '') {
+            return alert('Nama Sub Komponen tidak boleh kosong');
+        }
+
+        let bobotSubKomponen = jQuery("#bobotSubKomponen").val();
+        if (bobotSubKomponen == '') {
+            return alert('Bobot Sub Komponen tidak boleh kosong');
+        }
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'tambah_subkomponen_lke',
+                id: id_subkomponen,
+                id_komponen: idKomponen_sub,
+                nama_subkomponen: namaSubKomponen,
+                bobot_subkomponen: bobotSubKomponen,
+                api_key: esakip.api_key
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    jQuery('#tambahSubkomponenModal').modal('hide');
+                    get_table_desain_sakip();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }
+
+    function submit_komponen_penilaian() {
+        let id_komponen_penilaian = jQuery("#idKomponenPenilaian").val();
+
+        let idSubKomponen_penilaian = jQuery("#idSubKomponen_penilaian").val();
+        if (idSubKomponen_penilaian == '') {
+            return alert('Id Sub Komponen tidak boleh kosong');
+        }
+
+        let namaPenilaian = jQuery("#namaPenilaian").val();
+        if (namaPenilaian == '') {
+            return alert('Nama Penilaian tidak boleh kosong');
+        }
+
+        let tipeJawaban = jQuery("#tipeJawaban").val();
+        if (tipeJawaban == '') {
+            return alert('Tipe Penilaian tidak boleh kosong');
+        }
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'tambah_komponen_penilaian_lke',
+                id: id_komponen_penilaian,
+                id_subkomponen: idSubKomponen_penilaian,
+                nama_komponen_penilaian: namaPenilaian,
+                tipe_komponen_penilaian: tipeJawaban,
+                api_key: esakip.api_key
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    jQuery('#tambahPenilaianModal').modal('hide');
+                    get_table_desain_sakip();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
             }
         });
     }
