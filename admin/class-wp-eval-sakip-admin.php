@@ -544,9 +544,19 @@ class Wp_Eval_Sakip_Admin
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'pengisian_lke')));
 
-		$dokumen_menu = Container::make('theme_options', __('Dokumen'))
+		$dokumen_menu = Container::make('theme_options', __('Dokumen SKPD'))
 			->set_page_menu_position(3.2)
-			->set_icon('dashicons-media-default');
+			->set_icon('dashicons-media-default')
+			->add_fields(array(
+				Field::make('html', 'crb_renstra_hide_sidebar')
+					->set_html('
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'renstra')));
 
 		Container::make('theme_options', __('RENSTRA'))
 			->set_page_parent($dokumen_menu)
