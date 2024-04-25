@@ -53,15 +53,15 @@ $skpd = $wpdb->get_row(
             <table id="table_pengisian_sakip" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                 <thead>
                     <tr>
-                        <th class="text-center" rowspan="2" style="vertical-align: middle;" >Komponen/Sub Komponen</th>
-                        <th class="text-center" rowspan="2" style="vertical-align: middle;" >Bukti Dukung</th>
+                        <th class="text-center" rowspan="2" colspan="4" style="vertical-align: middle;" >Komponen/Sub Komponen</th>
                         <th class="text-center" rowspan="2" style="vertical-align: middle;" >Bobot</th>
-                        <th class="text-center" colspan="2">Penilaian PD/Perangkat Daerah</th>
-                        <th class="text-center" rowspan="2" style="vertical-align: middle;" >Kontrol Kerangka Logis</th>
+                        <th class="text-center" colspan="3">Penilaian PD/Perangkat Daerah</th>
+                        <th class="text-center" rowspan="2" style="vertical-align: middle;" >Bukti Dukung</th>
                     </tr>
                     <tr>
                         <th class="text-center">Jawaban</th>
                         <th class="text-center">Nilai</th>
+                        <th class="text-center">%</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -71,8 +71,8 @@ $skpd = $wpdb->get_row(
     </div>
 </div>
 <script>
-    document.ready(function(){
-        // get_table_pengisian_sakip();
+    jQuery(document).ready(function(){
+        get_table_pengisian_sakip();
     })
 
     function get_table_pengisian_sakip() {
@@ -84,7 +84,7 @@ $skpd = $wpdb->get_row(
                 action: 'get_table_pengisian_lke',
                 api_key: esakip.api_key,
                 id_jadwal: <?php echo $input['id_jadwal']; ?>,
-                id_skpd: <?php echo $input['id_skpd']; ?>,
+                id_skpd: <?php echo $id_skpd; ?>,
             },
             dataType: 'json',
             success: function(response) {
