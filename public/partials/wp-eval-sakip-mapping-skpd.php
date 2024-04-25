@@ -3,6 +3,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 global $wpdb;
+$tahun_anggaran= get_option('_crb_tahun_wpsipd');
 $api_key = get_option('_crb_apikey_esakip');
 
 $unit = $wpdb->get_results("
@@ -15,6 +16,7 @@ $unit = $wpdb->get_results("
 	from esakip_data_unit 
 	where active=1
 		and is_skpd=1 
+		and tahun_anggaran=$tahun_anggaran
 	group by id_skpd
 	order by kode_skpd ASC
 ", ARRAY_A);
@@ -33,7 +35,7 @@ foreach ($unit as $kk => $vv) {
 }
 ?>
 <div id="wrap-table">
-	<h1 class="text-center">Mapping SKPD</h1>
+	<h1 class="text-center">Mapping SKPD Tahun <?php echo $tahun_anggaran; ?></h1>
 	<table>
 		<thead>
 			<tr>
