@@ -33,6 +33,7 @@ if ( ! defined( 'WPINC' ) ) {
 define( 'ESAKIP_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'ESAKIP_PLUGIN_PATH', plugin_dir_path(__FILE__) );
 define( 'ESAKIP_APIKEY', '_crb_apikey_esakip' );
+define( 'ESAKIP_TAHUN_ANGGARAN', '_crb_tahun_wpsipd' );
 
 // ============== https://carbonfields.net/ ================
 if(!defined('Carbon_Fields_Plugin\PLUGIN_FILE')){

@@ -270,6 +270,8 @@ CREATE TABLE `esakip_data_jadwal` (
 CREATE TABLE esakip_komponen (
   `id` int(11) NOT NULL auto_increment,
   `id_jadwal` int(11) NOT NULL,
+  `nomor_urut` DECIMAL(10,2) NOT NULL,
+  `id_user_penilai` int(11) DEFAULT NULL,
   `nama` varchar(255) DEFAULT NULL,
   `bobot` float DEFAULT NULL,
   `active` tinyint(4) NOT NULL DEFAULT '1',
@@ -279,6 +281,8 @@ CREATE TABLE esakip_komponen (
 CREATE TABLE esakip_subkomponen (
   `id` int(11) NOT NULL auto_increment,
   `id_komponen` int(11) NOT NULL,
+  `nomor_urut` DECIMAL(10,2) NOT NULL,
+  `id_user_penilai` int(11) DEFAULT NULL,
   `nama` varchar(255) DEFAULT NULL,
   `bobot` float DEFAULT NULL,
   `active` tinyint(4) NOT NULL DEFAULT '1',
@@ -287,9 +291,10 @@ CREATE TABLE esakip_subkomponen (
 
 CREATE TABLE esakip_komponen_penilaian (
   `id` int(11) NOT NULL auto_increment,
-  `id_subkomponen` int(11),
+  `id_subkomponen` int(11) NOT NULL,
+  `nomor_urut` DECIMAL(10,2) NOT NULL,
   `nama` varchar(255) DEFAULT NULL,
-  `tipe` varchar(30) DEFAULT NULL,
+  `tipe` varchar(30) DEFAULT NULL COMMENT '1 = Ya/Tidak, 2 = A/B/C/D',
   `keterangan` varchar(255) DEFAULT NULL,
   `active` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY  (`id`)
@@ -299,7 +304,7 @@ CREATE TABLE esakip_pengisian_lke (
   `id` int(11) NOT NULL auto_increment,
   `id_user` int(11) DEFAULT NULL,
   `id_skpd` int(11) NOT NULL,
-  `id_evaluator` int(11) NOT NULL,
+  `id_user_penilai` int(11) DEFAULT NULL,
   `id_jadwal` int(11) NOT NULL,
   `id_komponen` int(11) NOT NULL,
   `id_subkomponen` int(11) NOT NULL,
@@ -315,7 +320,7 @@ CREATE TABLE esakip_pengisian_lke_history (
   `id` int(11) NOT NULL auto_increment,
   `id_user` int(11) DEFAULT NULL,
   `id_skpd` int(11) NOT NULL,
-  `id_evaluator` int(11) NOT NULL,
+  `id_user_penilai` int(11) DEFAULT NULL,
   `id_jadwal` int(11) NOT NULL,
   `id_komponen` int(11) NOT NULL,
   `id_subkomponen` int(11) NOT NULL,

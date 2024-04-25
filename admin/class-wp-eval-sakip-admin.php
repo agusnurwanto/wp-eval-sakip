@@ -489,6 +489,9 @@ class Wp_Eval_Sakip_Admin
 				Field::make('html', 'crb_sql_migrate')
 					->set_html('<a onclick="sql_migrate_esakip(); return false;" href="#" class="button button-primary button-large">SQL Migrate</a>')
 					->set_help_text('Tombol untuk memperbaiki struktur database E-SAKIP.'),
+				Field::make('text', 'crb_tahun_wpsipd', 'Tahun Anggaran E-SAKIP')
+					->set_default_value(date('Y'))
+					->set_help_text('Wajib diisi.'),
 			));
 
 		Container::make('theme_options', __('Pengaturan Perangkat Daerah'))
@@ -506,9 +509,6 @@ class Wp_Eval_Sakip_Admin
 				Field::make('text', 'crb_apikey_wpsipd', 'API KEY WP-SIPD')
 					->set_default_value($this->functions->generateRandomString())
 					->set_help_text('Wajib diisi. API KEY digunakan untuk integrasi data.'),
-				Field::make('text', 'crb_tahun_wpsipd', 'Tahun Anggaran WP-SIPD')
-					->set_default_value(date('Y'))
-					->set_help_text('Wajib diisi.'),
 				Field::make('html', 'crb_html_data_unit')
 					->set_html('<a href="#" class="button button-primary" onclick="get_data_unit_wpsipd(); return false;">Tarik Data Unit dari WP SIPD</a>')
 					->set_help_text('Tombol untuk menarik data Unit dari WP SIPD.'),

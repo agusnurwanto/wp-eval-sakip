@@ -57,6 +57,7 @@ $skpd = $wpdb->get_row(
                         <th class="text-center" rowspan="2" style="vertical-align: middle;" >Bobot</th>
                         <th class="text-center" colspan="3">Penilaian PD/Perangkat Daerah</th>
                         <th class="text-center" rowspan="2" style="vertical-align: middle;" >Bukti Dukung</th>
+                        <th class="text-center" rowspan="2" style="vertical-align: middle;" >Keterangan</th>
                     </tr>
                     <tr>
                         <th class="text-center">Jawaban</th>

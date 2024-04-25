@@ -6821,6 +6821,8 @@ class Wp_Eval_Sakip_Public
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
 
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
 				$unit = $wpdb->get_results(
 					$wpdb->prepare("
 					SELECT 
@@ -6833,7 +6835,7 @@ class Wp_Eval_Sakip_Public
 					  AND tahun_anggaran=%d
 					  AND is_skpd=1 
 					ORDER BY kode_skpd ASC
-					", $tahun_anggaran),
+					", $tahun_anggaran_sakip),
 					ARRAY_A
 				);
 
@@ -7255,6 +7257,8 @@ class Wp_Eval_Sakip_Public
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
 
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
 				$unit = $wpdb->get_results(
 					$wpdb->prepare("
 					SELECT 
@@ -7267,7 +7271,7 @@ class Wp_Eval_Sakip_Public
 					  AND tahun_anggaran=%d
 					  AND is_skpd=1 
 					ORDER BY kode_skpd ASC
-					", $tahun_anggaran),
+					", $tahun_anggaran_sakip),
 					ARRAY_A
 				);
 
@@ -7437,6 +7441,8 @@ class Wp_Eval_Sakip_Public
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
 
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
 				$unit = $wpdb->get_results(
 					$wpdb->prepare("
 					SELECT 
@@ -7449,7 +7455,7 @@ class Wp_Eval_Sakip_Public
 					  AND tahun_anggaran=%d
 					  AND is_skpd=1 
 					ORDER BY kode_skpd ASC
-					", $tahun_anggaran),
+					", $tahun_anggaran_sakip),
 					ARRAY_A
 				);
 
@@ -7618,6 +7624,8 @@ class Wp_Eval_Sakip_Public
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
 
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
 				$unit = $wpdb->get_results(
 					$wpdb->prepare("
 					SELECT 
@@ -7630,7 +7638,7 @@ class Wp_Eval_Sakip_Public
 					  AND tahun_anggaran=%d
 					  AND is_skpd=1 
 					ORDER BY kode_skpd ASC
-					", $tahun_anggaran),
+					", $tahun_anggaran_sakip),
 					ARRAY_A
 				);
 
@@ -7800,6 +7808,8 @@ class Wp_Eval_Sakip_Public
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
 
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
 				$unit = $wpdb->get_results(
 					$wpdb->prepare("
 					SELECT 
@@ -7812,7 +7822,7 @@ class Wp_Eval_Sakip_Public
 					  AND tahun_anggaran=%d
 					  AND is_skpd=1 
 					ORDER BY kode_skpd ASC
-					", $tahun_anggaran),
+					", $tahun_anggaran_sakip),
 					ARRAY_A
 				);
 
@@ -7981,6 +7991,7 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
 				$unit = $wpdb->get_results(
 					$wpdb->prepare("
@@ -7994,7 +8005,7 @@ class Wp_Eval_Sakip_Public
 					  AND tahun_anggaran=%d
 					  AND is_skpd=1 
 					ORDER BY kode_skpd ASC
-					", $tahun_anggaran),
+					", $tahun_anggaran_sakip),
 					ARRAY_A
 				);
 
@@ -8163,6 +8174,7 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
 				$unit = $wpdb->get_results(
 					$wpdb->prepare("
@@ -8176,7 +8188,7 @@ class Wp_Eval_Sakip_Public
 					  AND tahun_anggaran=%d
 					  AND is_skpd=1 
 					ORDER BY kode_skpd ASC
-					", $tahun_anggaran),
+					", $tahun_anggaran_sakip),
 					ARRAY_A
 				);
 
@@ -8345,6 +8357,7 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
 				$unit = $wpdb->get_results(
 					$wpdb->prepare("
@@ -8358,7 +8371,7 @@ class Wp_Eval_Sakip_Public
 					  AND tahun_anggaran=%d
 					  AND is_skpd=1 
 					ORDER BY kode_skpd ASC
-					", $tahun_anggaran),
+					", $tahun_anggaran_sakip),
 					ARRAY_A
 				);
 
@@ -8688,6 +8701,8 @@ class Wp_Eval_Sakip_Public
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
 
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
 				$unit = $wpdb->get_results(
 					$wpdb->prepare("
 					SELECT 
@@ -8700,7 +8715,7 @@ class Wp_Eval_Sakip_Public
 					  AND tahun_anggaran=%d
 					  AND is_skpd=1 
 					ORDER BY kode_skpd ASC
-					", $tahun_anggaran),
+					", $tahun_anggaran_sakip),
 					ARRAY_A
 				);
 
@@ -8783,6 +8798,8 @@ class Wp_Eval_Sakip_Public
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
 
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
 				$unit = $wpdb->get_results(
 					$wpdb->prepare("
 					SELECT 
@@ -8795,7 +8812,7 @@ class Wp_Eval_Sakip_Public
 					  AND tahun_anggaran=%d
 					  AND is_skpd=1 
 					ORDER BY kode_skpd ASC
-					", $tahun_anggaran),
+					", $tahun_anggaran_sakip),
 					ARRAY_A
 				);
 
@@ -9058,6 +9075,8 @@ class Wp_Eval_Sakip_Public
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
 
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
 				$unit = $wpdb->get_results(
 					$wpdb->prepare("
 					SELECT 
@@ -9070,7 +9089,7 @@ class Wp_Eval_Sakip_Public
 					  AND active=1 
 					  AND is_skpd=1 
 					ORDER BY kode_skpd ASC
-					", $tahun_anggaran),
+					", $tahun_anggaran_sakip),
 					ARRAY_A
 				);
 
@@ -9159,6 +9178,8 @@ class Wp_Eval_Sakip_Public
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
 
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
 				$unit = $wpdb->get_results(
 					$wpdb->prepare("
 					SELECT 
@@ -9170,7 +9191,7 @@ class Wp_Eval_Sakip_Public
 					  AND active=1 
 					  AND is_skpd=1 
 					ORDER BY kode_skpd ASC
-					", $tahun_anggaran),
+					", $tahun_anggaran_sakip),
 					ARRAY_A
 				);
 
@@ -9384,6 +9405,7 @@ class Wp_Eval_Sakip_Public
 						FROM esakip_komponen
 						WHERE id_jadwal = %d
 						  AND active = 1
+						ORDER BY nomor_urut ASC
 						", $id_jadwal),
 					ARRAY_A
 				);
@@ -9407,6 +9429,7 @@ class Wp_Eval_Sakip_Public
 						$tbody .= "<td class='text-left' colspan='3'><b>" . $komponen['nama'] . "</b></td>";
 						$tbody .= "<td class='text-center'>" . $komponen['bobot'] . "</td>";
 						$tbody .= "<td class='text-left'></td>";
+						$tbody .= "<td class='text-left'></td>";
 						$tbody .= "<td class='text-center'>" . $btn . "</td>";
 						$tbody .= "</tr>";
 
@@ -9415,7 +9438,8 @@ class Wp_Eval_Sakip_Public
 								SELECT * 
 								FROM esakip_subkomponen
 								WHERE id_komponen = %d
-								AND active = 1
+								  AND active = 1
+								ORDER BY nomor_urut ASC
 								", $komponen['id']),
 							ARRAY_A
 						);
@@ -9437,6 +9461,7 @@ class Wp_Eval_Sakip_Public
 								$tbody .= "<td class='text-left' colspan='2'><b>" . $subkomponen['nama'] . "</b></td>";
 								$tbody .= "<td class='text-center'>" . $subkomponen['bobot'] . "</td>";
 								$tbody .= "<td class='text-left'></td>";
+								$tbody .= "<td class='text-left'></td>";
 								$tbody .= "<td class='text-center'>" . $btn . "</td>";
 								$tbody .= "</tr>";
 
@@ -9445,7 +9470,8 @@ class Wp_Eval_Sakip_Public
 										SELECT * 
 										FROM esakip_komponen_penilaian
 										WHERE id_subkomponen = %d 
-										AND active = 1
+										  AND active = 1
+										ORDER BY nomor_urut ASC
 									", $subkomponen['id']),
 									ARRAY_A
 								);
@@ -9470,6 +9496,7 @@ class Wp_Eval_Sakip_Public
 										} else if ($penilaian['tipe'] == 2) {
 											$tbody .= "<td class='text-center'>A/B/C/D/E</td>";
 										}
+										$tbody .= "<td class='text-left'>" . $penilaian['keterangan'] . "</td>";
 										$tbody .= "<td class='text-center'>" . $btn . "</td>";
 										$tbody .= "</tr>";
 									}
@@ -9478,12 +9505,12 @@ class Wp_Eval_Sakip_Public
 						}
 					}
 				} else {
-					$tbody = "<tr><td colspan='6' class='text-center'>Tidak ada data tersedia</td></tr>";
+					$tbody = "<tr><td colspan='8' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 
 				$tbody .= "<tr>";
-				$tbody .= "<td colspan='7' class='text-center'>";
-				$tbody .= "<button class='transparent-button' onclick='tambah_komponen_utama()'><span class='dashicons dashicons-table-row-after'></span> Tambah Komponen Utama</button>";
+				$tbody .= "<td colspan='8' class='text-center'>";
+				$tbody .= "<button class='btn btn-primary btn-lg btn-block' onclick='tambah_komponen_utama(\"" . $id_jadwal . "\")'><span class='dashicons dashicons-table-row-after'></span> Tambah Komponen Utama</button>";
 				$tbody .= "</td>";
 				$tbody .= "</tr>";
 
@@ -9920,30 +9947,55 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Bobot Komponen kosong!';
 				}
+				if (!empty($_POST['nomor_urut'])) {
+					$nomor_urut = $_POST['nomor_urut'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Nomor Urut kosong!';
+				}
 
 				if ($ret['status'] === 'success') {
-					if (!empty($id_komponen)) {
-						$wpdb->update(
-							'esakip_komponen',
-							array(
-								'nama' => $nama_komponen,
-								'bobot' => $bobot_komponen,
-							),
-							array('id' => $id_komponen),
-							array('%s', '%f'),
-							array('%d')
+					$total_bobot = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT SUM(bobot) 
+							FROM esakip_komponen 
+							WHERE id_jadwal = %d 
+							  AND active = 1
+						", $id_jadwal)
+					);
+
+					$total_bobot_baru = $total_bobot + $bobot_komponen;
+					if ($total_bobot_baru > 100) {
+						$ret = array(
+							'status' => 'error',
+							'message' => 'Total bobot komponen melebihi 100!'
 						);
 					} else {
-						$wpdb->insert(
-							'esakip_komponen',
-							array(
-								'id_jadwal' => $id_jadwal,
-								'nama' => $nama_komponen,
-								'bobot' => $bobot_komponen,
-								'active' => 1,
-							),
-							array('%d', '%s', '%f', '%d')
-						);
+						if (!empty($id_komponen)) {
+							$wpdb->update(
+								'esakip_komponen',
+								array(
+									'nama' => $nama_komponen,
+									'bobot' => $bobot_komponen,
+									'nomor_urut' => $nomor_urut,
+								),
+								array('id' => $id_komponen),
+								array('%s', '%f', '%f'),
+								array('%d')
+							);
+						} else {
+							$wpdb->insert(
+								'esakip_komponen',
+								array(
+									'id_jadwal' => $id_jadwal,
+									'nama' => $nama_komponen,
+									'bobot' => $bobot_komponen,
+									'nomor_urut' => $nomor_urut,
+									'active' => 1,
+								),
+								array('%d', '%s', '%f', '%f', '%d')
+							);
+						}
 					}
 				}
 			} else {
@@ -9994,30 +10046,62 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Bobot Sub Komponen kosong!';
 				}
+				if (!empty($_POST['nomor_urut'])) {
+					$nomor_urut = $_POST['nomor_urut'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Nomor Urut kosong!';
+				}
 
 				if ($ret['status'] === 'success') {
-					if (!empty($id_subkomponen)) {
-						$wpdb->update(
-							'esakip_subkomponen',
-							array(
-								'nama' => $nama_subkomponen,
-								'bobot' => $bobot_subkomponen,
-							),
-							array('id' => $id_subkomponen),
-							array('%s', '%f'),
-							array('%d')
+					$bobot_komponen_utama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT bobot
+							FROM esakip_komponen
+							WHERE id = %d
+						", $id_komponen)
+					);
+
+					$total_bobot_subkomponen = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT SUM(bobot) 
+							FROM esakip_subkomponen 
+							WHERE id_komponen = %d 
+							  AND active = 1
+						", $id_komponen)
+					);
+
+					if (($total_bobot_subkomponen + $bobot_subkomponen) > $bobot_komponen_utama) {
+						$ret = array(
+							'status' => 'error',
+							'message' => 'Total bobot Sub Komponen melebihi Komponen Induknya!'
 						);
 					} else {
-						$wpdb->insert(
-							'esakip_subkomponen',
-							array(
-								'id_komponen' => $id_komponen,
-								'nama' => $nama_subkomponen,
-								'bobot' => $bobot_subkomponen,
-								'active' => 1,
-							),
-							array('%d', '%s', '%f', '%d')
-						);
+						if (!empty($id_subkomponen)) {
+							$wpdb->update(
+								'esakip_subkomponen',
+								array(
+									'nama' => $nama_subkomponen,
+									'bobot' => $bobot_subkomponen,
+									'nomor_urut' => $nomor_urut,
+								),
+								array('id' => $id_subkomponen),
+								array('%s', '%f', '%f'),
+								array('%d')
+							);
+						} else {
+							$wpdb->insert(
+								'esakip_subkomponen',
+								array(
+									'id_komponen' => $id_komponen,
+									'nama' => $nama_subkomponen,
+									'bobot' => $bobot_subkomponen,
+									'nomor_urut' => $nomor_urut,
+									'active' => 1,
+								),
+								array('%d', '%s', '%f', '%f', '%d')
+							);
+						}
 					}
 				}
 			} else {
@@ -10069,6 +10153,15 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tipe Komponen Penilaian kosong!';
 				}
+				if (!empty($_POST['keterangan'])) {
+					$keterangan = $_POST['keterangan'];
+				}
+				if (!empty($_POST['nomor_urut'])) {
+					$nomor_urut = $_POST['nomor_urut'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Nomor Urut kosong!';
+				}
 
 				if ($ret['status'] === 'success') {
 					if (!empty($id_komponen_penilaian)) {
@@ -10078,9 +10171,11 @@ class Wp_Eval_Sakip_Public
 								'id_subkomponen' => $id_subkomponen,
 								'nama' => $nama_komponen_penilaian,
 								'tipe' => $tipe_komponen_penilaian,
+								'nomor_urut' => $nomor_urut,
+								'keterangan' => $keterangan,
 							),
 							array('id' => $id_komponen_penilaian),
-							array('%d', '%s', '%s'),
+							array('%d', '%s', '%s', '%f', '%s'),
 							array('%d')
 						);
 					} else {
@@ -10090,9 +10185,11 @@ class Wp_Eval_Sakip_Public
 								'id_subkomponen' => $id_subkomponen,
 								'nama' => $nama_komponen_penilaian,
 								'tipe' => $tipe_komponen_penilaian,
+								'nomor_urut' => $nomor_urut,
+								'keterangan' => $keterangan,
 								'active' => 1,
 							),
-							array('%d', '%s', '%s', '%d')
+							array('%d', '%s', '%s', '%f', '%s', '%d')
 						);
 					}
 				}
@@ -10370,6 +10467,142 @@ class Wp_Eval_Sakip_Public
 			$ret = array(
 				'status' => 'error',
 				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+	public function get_urutan_lke()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_jadwal'])) {
+					$input_type = 'id_jadwal';
+					$input_value = $_POST['id_jadwal'];
+				} elseif (!empty($_POST['id_komponen'])) {
+					$input_type = 'id_komponen';
+					$input_value = $_POST['id_komponen'];
+				} elseif (!empty($_POST['id_subkomponen'])) {
+					$input_type = 'id_subkomponen';
+					$input_value = $_POST['id_subkomponen'];
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message' => 'Parameter tidak valid!'
+					);
+					die(json_encode($ret));
+				}
+
+				switch ($input_type) {
+					case 'id_jadwal':
+						// Komponen
+						$id_urutan_komponen = $wpdb->get_results(
+							$wpdb->prepare("
+                            SELECT 
+                                nomor_urut 
+                            FROM esakip_komponen
+                            WHERE id_jadwal=%d
+                            AND active = 1
+                        ", $input_value),
+							ARRAY_A
+						);
+
+						$max_nomor_urut = 0;
+						foreach ($id_urutan_komponen as $val) {
+							if ($val['nomor_urut'] > $max_nomor_urut) {
+								$max_nomor_urut = $val['nomor_urut'];
+							}
+						}
+						$next_nomor_urut = $max_nomor_urut + 1;
+
+						$urutan_komponen = "<option value='$next_nomor_urut'>Urutan Selanjutnya</option>";
+
+						$counter_text_urutan = 1;
+						foreach ($id_urutan_komponen as $val) {
+							$urutan_komponen .= "<option value='$val[nomor_urut]'>" . $counter_text_urutan++ . "</option>";
+						}
+
+						$ret['data'] = $urutan_komponen;
+						break;
+
+					case 'id_komponen':
+						// Subkomponen
+						$id_urutan_subkomponen = $wpdb->get_results(
+							$wpdb->prepare("
+                            SELECT 
+                                nomor_urut 
+                            FROM esakip_subkomponen
+                            WHERE id_komponen=%d
+                            AND active = 1
+                        ", $input_value),
+							ARRAY_A
+						);
+
+						$max_nomor_urut_subkomponen = 0;
+						foreach ($id_urutan_subkomponen as $val) {
+							if ($val['nomor_urut'] > $max_nomor_urut_subkomponen) {
+								$max_nomor_urut_subkomponen = $val['nomor_urut'];
+							}
+						}
+						$next_nomor_urut_subkomponen = $max_nomor_urut_subkomponen + 1;
+
+						$urutan_subkomponen = "<option value='$next_nomor_urut_subkomponen'>Urutan Selanjutnya</option>";
+
+						$counter_text_urutan_subkomponen = 1;
+						foreach ($id_urutan_subkomponen as $val) {
+							$urutan_subkomponen .= "<option value='$val[nomor_urut]'>" . $counter_text_urutan_subkomponen++ . "</option>";
+						}
+
+						$ret['data'] = $urutan_subkomponen;
+						break;
+
+					case 'id_subkomponen':
+						// Komponen Penilaian
+						$id_urutan_komponen_penilaian = $wpdb->get_results(
+							$wpdb->prepare("
+                            SELECT 
+                                nomor_urut 
+                            FROM esakip_komponen_penilaian
+                            WHERE id_subkomponen=%d
+                            AND active = 1
+                        ", $input_value),
+							ARRAY_A
+						);
+
+						$max_nomor_urut_penilaian = 0;
+						foreach ($id_urutan_komponen_penilaian as $val) {
+							if ($val['nomor_urut'] > $max_nomor_urut_penilaian) {
+								$max_nomor_urut_penilaian = $val['nomor_urut'];
+							}
+						}
+						$next_nomor_urut_penilaian = $max_nomor_urut_penilaian + 1;
+
+						$urutan_komponen_penilaian = "<option value='$next_nomor_urut_penilaian'>Urutan Selanjutnya</option>";
+
+						$counter_text_urutan_penilaian = 1;
+						foreach ($id_urutan_komponen_penilaian as $val) {
+							$urutan_komponen_penilaian .= "<option value='$val[nomor_urut]'>" . $counter_text_urutan_penilaian++ . "</option>";
+						}
+
+						$ret['data'] = $urutan_komponen_penilaian;
+						break;
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
 			);
 		}
 		die(json_encode($ret));

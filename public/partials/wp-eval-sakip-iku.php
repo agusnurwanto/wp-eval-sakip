@@ -10,11 +10,12 @@ $input = shortcode_atts(array(
 ), $atts);
 
 $idtahun = $wpdb->get_results(
-	"
+    "
 		SELECT DISTINCT 
 			tahun_anggaran 
-		FROM esakip_data_unit",
-	ARRAY_A
+		FROM esakip_data_unit        
+        ORDER BY tahun_anggaran DESC",
+    ARRAY_A
 );
 $tahun = "<option value='-1'>Pilih Tahun</option>";
 
