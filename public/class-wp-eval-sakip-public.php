@@ -9510,7 +9510,7 @@ class Wp_Eval_Sakip_Public
 
 				$tbody .= "<tr>";
 				$tbody .= "<td colspan='8' class='text-center'>";
-				$tbody .= "<button class='btn btn-primary btn-lg btn-block' onclick='tambah_komponen_utama(\"" . $id_jadwal . "\")'><span class='dashicons dashicons-table-row-after'></span> Tambah Komponen Utama</button>";
+				$tbody .= "<button class='btn btn-primary btn-lg btn-block' onclick='tambah_komponen_utama(\"" . $id_jadwal . "\")'><span class='dashicons dashicons-plus'></span> Tambah Komponen Utama</button>";
 				$tbody .= "</td>";
 				$tbody .= "</tr>";
 
@@ -9981,17 +9981,35 @@ class Wp_Eval_Sakip_Public
 				}
 
 				if ($ret['status'] === 'success') {
-					$total_bobot = $wpdb->get_var(
-						$wpdb->prepare("
-							SELECT SUM(bobot) 
-							FROM esakip_komponen 
-							WHERE id_jadwal = %d 
-							  AND active = 1
-						", $id_jadwal)
-					);
+					if (!empty($id_komponen)) {
+						$old_bobot = $wpdb->get_var(
+							$wpdb->prepare("
+								SELECT bobot 
+								FROM esakip_komponen 
+								WHERE id = %d 
+							", $id_komponen)
+						);
 
-					$total_bobot_baru = $total_bobot + $bobot_komponen;
-					if ($total_bobot_baru > 100) {
+						$total_bobot = $wpdb->get_var(
+							$wpdb->prepare("
+								SELECT SUM(bobot) 
+								FROM esakip_komponen 
+								WHERE id_jadwal = %d 
+								  AND active = 1
+							", $id_jadwal)
+						) - $old_bobot + $bobot_komponen;
+					} else {
+						$total_bobot = $wpdb->get_var(
+							$wpdb->prepare("
+								SELECT SUM(bobot) 
+								FROM esakip_komponen 
+								WHERE id_jadwal = %d 
+								  AND active = 1
+							", $id_jadwal)
+						) + $bobot_komponen;
+					}
+
+					if ($total_bobot > 100) {
 						$ret = array(
 							'status' => 'error',
 							'message' => 'Total bobot komponen melebihi 100!'
@@ -10080,27 +10098,45 @@ class Wp_Eval_Sakip_Public
 				}
 
 				if ($ret['status'] === 'success') {
-					$bobot_komponen_utama = $wpdb->get_var(
+					if (!empty($id_subkomponen)) {
+						$old_bobot = $wpdb->get_var(
+							$wpdb->prepare("
+								SELECT bobot 
+								FROM esakip_subkomponen
+								WHERE id = %d 
+							", $id_subkomponen)
+						);
+
+						$total_bobot = $wpdb->get_var(
+							$wpdb->prepare("
+								SELECT SUM(bobot) 
+								FROM esakip_subkomponen
+								WHERE id_komponen = %d 
+								  AND active = 1
+							", $id_komponen)
+						) - $old_bobot + $bobot_subkomponen;
+					} else {
+						$total_bobot = $wpdb->get_var(
+							$wpdb->prepare("
+								SELECT SUM(bobot) 
+								FROM esakip_subkomponen
+								WHERE id_komponen = %d 
+								  AND active = 1
+							", $id_komponen)
+						) + $bobot_subkomponen;
+					}
+					$bobot_komponen = $wpdb->get_var(
 						$wpdb->prepare("
 							SELECT bobot
 							FROM esakip_komponen
 							WHERE id = %d
+							AND active = 1
 						", $id_komponen)
 					);
-
-					$total_bobot_subkomponen = $wpdb->get_var(
-						$wpdb->prepare("
-							SELECT SUM(bobot) 
-							FROM esakip_subkomponen 
-							WHERE id_komponen = %d 
-							  AND active = 1
-						", $id_komponen)
-					);
-
-					if (($total_bobot_subkomponen + $bobot_subkomponen) > $bobot_komponen_utama) {
+					if ($total_bobot > $bobot_komponen) {
 						$ret = array(
 							'status' => 'error',
-							'message' => 'Total bobot Sub Komponen melebihi Komponen Induknya!'
+							'message' => 'Total bobot Sub Komponen Komponen Induknya!'
 						);
 					} else {
 						if (!empty($id_subkomponen)) {
@@ -10254,7 +10290,26 @@ class Wp_Eval_Sakip_Public
 						", $_POST['id']),
 						ARRAY_A
 					);
-					$ret['data'] = $data;
+					if ($data) {
+						$default_urutan = $wpdb->get_var(
+							$wpdb->prepare("
+							SELECT MAX(nomor_urut)
+							FROM esakip_komponen
+							WHERE id_jadwal = %d
+						", $_POST['id'])
+						);
+
+						if ($default_urutan === null) {
+							$default_urutan = 0;
+						}
+
+						$ret['data'] = $data + ['default_urutan' => $default_urutan];
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message'   => 'Data Tidak Ditemukan!'
+						);
+					}
 				} else {
 					$ret = array(
 						'status' => 'error',
@@ -10295,11 +10350,42 @@ class Wp_Eval_Sakip_Public
 						", $_POST['id']),
 						ARRAY_A
 					);
-					$ret['data'] = $data;
+
+					if ($data) {
+						$data_komponen = $wpdb->get_row(
+							$wpdb->prepare("
+								SELECT 
+									nama,
+									bobot
+								FROM esakip_komponen
+								WHERE id = %d
+							", $_POST['id']),
+							ARRAY_A
+						);
+
+						$default_urutan = $wpdb->get_var(
+							$wpdb->prepare("
+								SELECT MAX(nomor_urut)
+								FROM esakip_subkomponen
+								WHERE id_komponen = %d
+							", $data['id_komponen'])
+						);
+
+						if ($default_urutan === null) {
+							$default_urutan = 0;
+						}
+
+						$ret['data'] = $data + ['komponen' => $data_komponen] + ['default_urutan' => $default_urutan];
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message' => 'Data Komponen tidak ditemukan!'
+						);
+					}
 				} else {
 					$ret = array(
 						'status' => 'error',
-						'message'   => 'Id Kosong!'
+						'message' => 'Id Kosong!'
 					);
 				}
 			} else {
@@ -10336,7 +10422,37 @@ class Wp_Eval_Sakip_Public
 						", $_POST['id']),
 						ARRAY_A
 					);
-					$ret['data'] = $data;
+					if ($data) {
+						$data_subkomponen = $wpdb->get_row(
+							$wpdb->prepare("
+								SELECT 
+									nama,
+									bobot
+								FROM esakip_subkomponen
+								WHERE id = %d
+							", $_POST['id']),
+							ARRAY_A
+						);
+
+						$default_urutan = $wpdb->get_var(
+							$wpdb->prepare("
+								SELECT MAX(nomor_urut)
+								FROM esakip_komponen_penilaian
+								WHERE id_subkomponen = %d
+							", $_POST['id'])
+						);
+
+						if ($default_urutan === null) {
+							$default_urutan = 0;
+						}
+
+						$ret['data'] = $data + ['subkomponen' => $data_subkomponen] + ['default_urutan' => $default_urutan];
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message' => 'Data Sub Komponen tidak ditemukan!'
+						);
+					}
 				} else {
 					$ret = array(
 						'status' => 'error',
