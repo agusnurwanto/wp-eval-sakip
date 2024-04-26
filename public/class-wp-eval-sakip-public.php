@@ -9649,6 +9649,7 @@ class Wp_Eval_Sakip_Public
 		);
 		$periode_rpjmd = '';
 		$periode_renstra = '';
+		$periode_renstra_skpd = '';
 		foreach ($jadwal_periode as $jadwal_periode_item) {
 			$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
 
@@ -9667,6 +9668,16 @@ class Wp_Eval_Sakip_Public
 				'post_status' => 'private'
 			));
 			$periode_renstra .= '<li><a target="_blank" href="' . $renstra['url'] . '" class="btn btn-primary">' . $renstra['title'] . '</a></li>';
+
+			$renstra_skpd = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Detail Dokumen RENSTRA ' . $jadwal_periode_item['id'],
+				'content' => '[upload_dokumen_renstra periode=' . $jadwal_periode_item['id'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_renstra = 'Halaman Detail Dokumen RENSTRA ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+			$renstra_skpd['url'] .= '&id_skpd=ganti';
+			$periode_renstra_skpd .= '<li><a target="_blank" href="' . $renstra_skpd['url'] . '" class="btn btn-primary">' . $title_renstra . '</a></li>';
 		}
 
 		if (empty($periode_rpjmd)) {
@@ -9674,6 +9685,10 @@ class Wp_Eval_Sakip_Public
 		}
 
 		if (empty($periode_renstra)) {
+			$periode_renstra = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
+		}
+
+		if (empty($periode_renstra_skpd)) {
 			$periode_renstra = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
 		}
 		$halaman_rpjmd = '
@@ -9811,6 +9826,16 @@ class Wp_Eval_Sakip_Public
 				where nipkepala=%s 
 					and tahun_anggaran=%d
 				group by id_skpd", $nipkepala[0], $_GET['tahun']), ARRAY_A);
+
+			$halaman_renstra_skpd = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="renstra" style="margin: 0;">Periode Upload Dokumen RENSTRA</h5>
+					<div class="esakip-body-tahun" data-id="renstra">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+							' . str_replace('&id_skpd=ganti', '&id_skpd='.$skpd_db['id_skpd'], $periode_renstra_skpd) . '
+						</ul>
+					</div>
+				</div>';
 			$detail_renja = $this->functions->generatePage(array(
 				'nama_page' => 'Halaman Detail Dokumen RENJA/RKT ' . $_GET['tahun'],
 				'content' => '[dokumen_detail_renja_rkt tahun=' . $_GET['tahun'] . ']',
@@ -9875,8 +9900,9 @@ class Wp_Eval_Sakip_Public
 			));
 			$detail_perjanjian_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 			echo '
+				<h2 class="text-center">'.$skpd_db['nama_skpd'].'</h2>
 				<ul class="daftar-menu-sakip">
-					<li>' . $halaman_renstra . '</li>
+					<li>' . $halaman_renstra_skpd . '</li>
 					<li><a href="' . $detail_renja['url'] . '" target="_blank" class="btn btn-primary">' . $detail_renja['title'] . '</a></li>
 					<li><a href="' . $detail_skp['url'] . '" target="_blank" class="btn btn-primary">' . $detail_skp['title'] . '</a></li>
 					<li><a href="' . $detail_rencana_aksi['url'] . '" target="_blank" class="btn btn-primary">' . $detail_rencana_aksi['title'] . '</a></li>
