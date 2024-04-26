@@ -10270,6 +10270,209 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($ret));
 	}
 
+	public function get_detail_komponen_lke_by_id()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT *
+							FROM esakip_komponen
+							WHERE id = %d
+						", $_POST['id']),
+						ARRAY_A
+					);
+					if ($data) {
+						$default_urutan = $wpdb->get_var(
+							$wpdb->prepare("
+							SELECT MAX(nomor_urut)
+							FROM esakip_komponen
+							WHERE id_jadwal = %d
+						", $_POST['id'])
+						);
+
+						if ($default_urutan === null) {
+							$default_urutan = 0;
+						}
+
+						$ret['data'] = $data + ['default_urutan' => $default_urutan];
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message'   => 'Data Tidak Ditemukan!'
+						);
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+	public function get_detail_subkomponen_lke_by_id()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT *
+							FROM esakip_subkomponen
+							WHERE id = %d
+						", $_POST['id']),
+						ARRAY_A
+					);
+
+					if ($data) {
+						$data_komponen = $wpdb->get_row(
+							$wpdb->prepare("
+								SELECT 
+									nama,
+									bobot
+								FROM esakip_komponen
+								WHERE id = %d
+							", $_POST['id']),
+							ARRAY_A
+						);
+
+						$default_urutan = $wpdb->get_var(
+							$wpdb->prepare("
+								SELECT MAX(nomor_urut)
+								FROM esakip_subkomponen
+								WHERE id_komponen = %d
+							", $data['id_komponen'])
+						);
+
+						if ($default_urutan === null) {
+							$default_urutan = 0;
+						}
+
+						$ret['data'] = $data + ['komponen' => $data_komponen] + ['default_urutan' => $default_urutan];
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message' => 'Data Komponen tidak ditemukan!'
+						);
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message' => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+	public function get_detail_penilaian_lke_by_id()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT *
+							FROM esakip_komponen_penilaian
+							WHERE id = %d
+						", $_POST['id']),
+						ARRAY_A
+					);
+					if ($data) {
+						$data_subkomponen = $wpdb->get_row(
+							$wpdb->prepare("
+								SELECT 
+									nama,
+									bobot
+								FROM esakip_subkomponen
+								WHERE id = %d
+							", $_POST['id']),
+							ARRAY_A
+						);
+
+						$default_urutan = $wpdb->get_var(
+							$wpdb->prepare("
+								SELECT MAX(nomor_urut)
+								FROM esakip_komponen_penilaian
+								WHERE id_subkomponen = %d
+							", $_POST['id'])
+						);
+
+						if ($default_urutan === null) {
+							$default_urutan = 0;
+						}
+
+						$ret['data'] = $data + ['subkomponen' => $data_subkomponen] + ['default_urutan' => $default_urutan];
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message' => 'Data Sub Komponen tidak ditemukan!'
+						);
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
 	public function get_komponen_lke_by_id()
 	{
 		global $wpdb;
@@ -10359,7 +10562,7 @@ class Wp_Eval_Sakip_Public
 									bobot
 								FROM esakip_komponen
 								WHERE id = %d
-							", $_POST['id']),
+							", $data['id_komponen']),
 							ARRAY_A
 						);
 
@@ -10430,7 +10633,7 @@ class Wp_Eval_Sakip_Public
 									bobot
 								FROM esakip_subkomponen
 								WHERE id = %d
-							", $_POST['id']),
+							", $data['id_subkomponen']),
 							ARRAY_A
 						);
 

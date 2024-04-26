@@ -269,7 +269,7 @@ if (empty($jadwal)) {
             type: "POST",
             url: esakip.url,
             data: {
-                action: 'get_komponen_lke_by_id',
+                action: 'get_detail_komponen_lke_by_id',
                 api_key: esakip.api_key,
                 id: id
             },
@@ -305,7 +305,7 @@ if (empty($jadwal)) {
             type: "POST",
             url: esakip.url,
             data: {
-                action: 'get_subkomponen_lke_by_id',
+                action: 'get_detail_subkomponen_lke_by_id',
                 api_key: esakip.api_key,
                 id: id
             },
@@ -343,7 +343,7 @@ if (empty($jadwal)) {
             type: "POST",
             url: esakip.url,
             data: {
-                action: 'get_komponen_penilaian_lke_by_id',
+                action: 'get_detail_penilaian_lke_by_id',
                 api_key: esakip.api_key,
                 id: id
             },
