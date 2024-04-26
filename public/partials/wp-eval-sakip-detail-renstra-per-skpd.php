@@ -12,6 +12,7 @@ $input = shortcode_atts(array(
 if (!empty($_GET) && !empty($_GET['id_skpd'])) {
     $id_skpd = $_GET['id_skpd'];
 }
+$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
 $periode = $wpdb->get_row(
     $wpdb->prepare("
@@ -33,7 +34,7 @@ $skpd = $wpdb->get_row(
     WHERE id_skpd=%d
       AND tahun_anggaran=%d
       AND active = 1
-", $id_skpd, $periode['tahun_anggaran']),
+", $id_skpd, $tahun_anggaran_sakip),
     ARRAY_A
 );
 
@@ -61,6 +62,7 @@ foreach ($idtahun as $val) {
     }
     $tahun .= "<option value='$val[id]' $selected>$val[nama_jadwal] Periode $val[tahun_anggaran] -  $tahun_anggaran_selesai</option>";
 }
+
 ?>
 <style type="text/css">
     .wrap-table {

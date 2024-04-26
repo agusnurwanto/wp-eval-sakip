@@ -86,21 +86,20 @@ if (empty($jadwal)) {
                 <form id="formTambahKomponen">
                     <input type="hidden" value="" id="idKomponen">
                     <input type="hidden" value="<?php echo $input['id_jadwal'] ?>" id="idJadwal">
+                        <div class="form-group">
+                            <div class="alert alert-secondary" role="alert">
+                                Bobot Maksimal 100
+                            </div>
+                        </div>
                     <div class="form-row">
                         <div class="form-group col-md-6">
-                            <div class="alert alert-info" role="alert">
-                                Bobot Maksimal Adalah mmmm
-                            </div>
+                            <label for="namaKomponen">Nama Komponen</label>
+                            <input type="text" class="form-control" id="namaKomponen" name="namaKomponen" required>
                         </div>
                         <div class="form-group col-md-6">
-                            <div class="alert alert-info" role="alert">
-                                Urutan Komponen
-                            </div>
+                            <label for="userPenilai">User Penilai</label>
+                            <select class="form-control" id="userPenilai" name="userPenilai" required></select>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="namaKomponen">Nama Komponen</label>
-                        <input type="text" class="form-control" id="namaKomponen" name="namaKomponen" required>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-6">
@@ -108,9 +107,8 @@ if (empty($jadwal)) {
                             <input type="number" class="form-control" id="bobotKomponen" name="bobotKomponen" required>
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="nomorUrutKomponen">Urutan Komponen</label>
-                            <select class="form-control" id="nomorUrutKomponen" name="nomorUrutKomponen">
-                            </select>
+                            <label for="nomorUrutKomponen">Nomor Urut</label>
+                            <input type="number" class="form-control" id="nomorUrutKomponen" name="nomorUrutKomponen">
                         </div>
                     </div>
                 </form>
@@ -139,24 +137,25 @@ if (empty($jadwal)) {
                     <input type="hidden" value="" id="idKomponen_sub">
                     <div class="form-row">
                         <div class="form-group col-md-6">
-                            <div class="alert alert-info" role="alert">
-                                Sub Komponen dari 
+                            <div class="alert alert-secondary" role="alert" id="alertSub">
+                                Sub Komponen dari Komponen
                             </div>
                         </div>
-                        <div class="form-group col-md-3">
-                            <div class="alert alert-info" role="alert">
-                                Bobot Maksimal Adalah mmmm
-                            </div>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <div class="alert alert-info" role="alert">
-                                Urutan Subkomponen
+                        <div class="form-group col-md-6">
+                            <div class="alert alert-secondary" role="alert" id="alertBobotSub">
+                                Bobot Maksimal Komponen
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="namaSubKomponen">Nama Subkomponen</label>
-                        <input type="text" class="form-control" id="namaSubKomponen" name="namaSubKomponen" required>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="namaSubKomponen">Nama Subkomponen</label>
+                            <input type="text" class="form-control" id="namaSubKomponen" name="namaSubKomponen" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="userPenilai_sub">User Penilai</label>
+                            <select class="form-control" id="userPenilai_sub" name="userPenilai_sub" required></select>
+                        </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-6">
@@ -164,9 +163,8 @@ if (empty($jadwal)) {
                             <input type="number" class="form-control" id="bobotSubKomponen" name="bobotSubKomponen" required>
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="nomorUrutSubkomponen">Urutan Sub Komponen</label>
-                            <select class="form-control" id="nomorUrutSubkomponen" name="nomorUrutSubkomponen">
-                            </select>
+                            <label for="nomorUrutSubkomponen">Nomor Urut</label>
+                            <input type="number" class="form-control" id="nomorUrutSubkomponen" name="nomorUrutSubkomponen">
                         </div>
                     </div>
                 </form>
@@ -193,18 +191,9 @@ if (empty($jadwal)) {
                 <form id="formTambahPenilaian">
                     <input type="hidden" value="" id="idKomponenPenilaian">
                     <input type="hidden" value="" id="idSubKomponen_penilaian">
-                    <div class="form-row">
-                        <div class="form-group col-md-7">
-                            <div class="alert alert-info" role="alert">
-                                Komponen Penilaian dari 
-                            </div>
+                        <div class="form-group col-md-6">
+                            <div class="alert alert-secondary" role="alert" id="alertPenilaian"></div>
                         </div>
-                        <div class="form-group col-md-5">
-                            <div class="alert alert-info" role="alert">
-                                Urutan Penilaian
-                            </div>
-                        </div>
-                    </div>
                     <div class="form-group">
                         <label for="namaPenilaian">Nama Komponen Penilaian</label>
                         <input type="text" class="form-control" id="namaPenilaian" name="namaPenilaian" required>
@@ -217,15 +206,14 @@ if (empty($jadwal)) {
                         <div class="form-group col-md-6">
                             <label for="tipeJawaban">Tipe Jawaban</label>
                             <select class="form-control" id="tipeJawaban" name="tipeJawaban" required>
-                                <option value="">Pilih Tipe Jawaban</option>
+                                <option value="" selected disabled>Pilih Tipe Jawaban</option>
                                 <option value="1">Y/T</option>
                                 <option value="2">A/B/C/D/E</option>
                             </select>
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="nomorUrutPenilaian">Urutan Komponen</label>
-                            <select class="form-control" id="nomorUrutPenilaian" name="nomorUrutPenilaian">
-                            </select>
+                            <label for="nomorUrutPenilaian">Nomor Urut</label>
+                            <input type="number" class="form-control" id="nomorUrutPenilaian" name="nomorUrutPenilaian">
                         </div>
                     </div>
                 </form>
@@ -277,9 +265,9 @@ if (empty($jadwal)) {
             type: "POST",
             url: esakip.url,
             data: {
-                action: 'get_urutan_lke',
+                action: 'get_komponen_lke_by_id',
                 api_key: esakip.api_key,
-                id_jadwal: id
+                id: id
             },
             dataType: "json",
             success: function(response) {
@@ -287,9 +275,9 @@ if (empty($jadwal)) {
                 if (response.status === 'success') {
                     jQuery('#idKomponen').val('');
                     jQuery('#namaKomponen').val('');
+                    jQuery('#userPenilai').val('');
                     jQuery('#bobotKomponen').val('');
-                    jQuery('#nomorUrutKomponen').val('');
-                    jQuery('#nomorUrutKomponen').html(response.data);
+                    jQuery('#nomorUrutKomponen').val(data.bobot);
                 } else {
                     console.error('Error:', response.message);
                 }
@@ -308,7 +296,7 @@ if (empty($jadwal)) {
             type: "POST",
             url: esakip.url,
             data: {
-                action: 'get_urutan_lke',
+                action: 'get_subkomponen_lke_by_id',
                 api_key: esakip.api_key,
                 id_komponen: id
             },
@@ -318,10 +306,12 @@ if (empty($jadwal)) {
                 if (response.status === 'success') {
                     jQuery('#idKomponen_sub').val(id);
                     jQuery('#idSubKomponen').val('');
+                    jQuery('#alertSub').text('Subkomponen dari Komponen' + data.bobot);
+                    jQuery('#alertBobotSub').text('Bobot Maksimal Subkomponen adalah' + data.bobot);
                     jQuery('#namaSubKomponen').val('');
+                    jQuery('#userPenilai').val('');
                     jQuery('#bobotSubKomponen').val('');
                     jQuery('#nomorUrutSubkomponen').val('');
-                    jQuery('#nomorUrutSubkomponen').html(response.data);
                 } else {
                     console.error('Error:', response.message);
                 }
@@ -340,7 +330,7 @@ if (empty($jadwal)) {
             type: "POST",
             url: esakip.url,
             data: {
-                action: 'get_urutan_lke',
+                action: 'get_komponen_penilaian_lke_by_id',
                 api_key: esakip.api_key,
                 id_subkomponen: id
             },
@@ -350,11 +340,11 @@ if (empty($jadwal)) {
                 if (response.status === 'success') {
                     jQuery('#idSubKomponen_penilaian').val(id);
                     jQuery('#idKomponenPenilaian').val('');
+                    jQuery('#alertPenilaian').text('Komponen Penilaian dari Sub Komponen' + data.bobot);
                     jQuery('#namaPenilaian').val('');
                     jQuery('#tipeJawaban').val('');
                     jQuery("#keterangan").val('');
-                    jQuery('#nomorUrutPenilaian').val('');
-                    jQuery('#nomorUrutPenilaian').html(response.data);
+                    jQuery('#nomorUrutPenilaian').val(data.nomor_urut);
                 } else {
                     console.error('Error:', response.message);
                 }
@@ -386,7 +376,8 @@ if (empty($jadwal)) {
                     jQuery("#idKomponen").val(data.id);
                     jQuery("#namaKomponen").val(data.nama);
                     jQuery("#bobotKomponen").val(data.bobot);
-                    jQuery('#nomorUrutKomponen').html(data.nomor_urut);
+                    jQuery("#userPenilai").val(data.id_user_penilai);
+                    jQuery('#nomorUrutKomponen').val(data.nomor_urut);
                     jQuery('#tambahKomponenModal').modal('show');
                 } else {
                     alert(response.message);
@@ -420,7 +411,8 @@ if (empty($jadwal)) {
                     jQuery("#idKomponen_sub").val(data.id_komponen);
                     jQuery("#namaSubKomponen").val(data.nama);
                     jQuery("#bobotSubKomponen").val(data.bobot);
-                    jQuery('#nomorUrutSubkomponen').html(data.nomor_urut);
+                    jQuery("#userPenilai_sub").val(data.id_user_penilai);
+                    jQuery('#nomorUrutSubkomponen').val(data.nomor_urut);
                     jQuery('#tambahSubkomponenModal').modal('show');
                 } else {
                     alert(response.message);
@@ -455,7 +447,7 @@ if (empty($jadwal)) {
                     jQuery("#namaPenilaian").val(data.nama);
                     jQuery("#tipeJawaban").val(data.tipe);
                     jQuery("#keterangan").val(data.keterangan);
-                    jQuery('#nomorUrutPenilaian').html(data.nomor_urut);
+                    jQuery('#nomorUrutPenilaian').val(data.nomor_urut);
                     jQuery('#tambahPenilaianModal').modal('show');
                 } else {
                     alert(response.message);
