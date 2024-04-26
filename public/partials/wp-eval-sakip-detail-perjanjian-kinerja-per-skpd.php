@@ -12,6 +12,7 @@ $input = shortcode_atts(array(
 if (!empty($_GET) && !empty($_GET['id_skpd'])) {
     $id_skpd = $_GET['id_skpd'];
 }
+$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
 $skpd = $wpdb->get_row(
     $wpdb->prepare("
@@ -22,7 +23,7 @@ $skpd = $wpdb->get_row(
     WHERE id_skpd=%d
       AND tahun_anggaran=%d
       AND active = 1
-", $id_skpd, $input['tahun']),
+", $id_skpd, $tahun_anggaran_sakip),
     ARRAY_A
 );
 $idtahun = $wpdb->get_results(

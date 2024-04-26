@@ -29,6 +29,7 @@ $jadwal = $wpdb->get_row(
 if (empty($jadwal)) {
     die("jadwal tidak tersedia");
 }
+$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
 $skpd = $wpdb->get_row(
     $wpdb->prepare("
@@ -39,7 +40,7 @@ $skpd = $wpdb->get_row(
     WHERE id_skpd=%d
       AND tahun_anggaran=%d
       AND active = 1
-", $id_skpd, $jadwal['tahun_anggaran']),
+", $id_skpd, $tahun_anggaran_sakip),
     ARRAY_A
 );
 ?>
