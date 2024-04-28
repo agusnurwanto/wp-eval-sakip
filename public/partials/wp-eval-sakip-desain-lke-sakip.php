@@ -286,7 +286,7 @@ if (empty($jadwal)) {
                     jQuery('#defaultTextInfo').show();
                     jQuery('#userPenilai').val('');
                     jQuery('#bobotKomponen').val('');
-                    jQuery('#nomorUrutSubkomponen').val(parseFloat(data.default_urutan) + 1.00);
+                    jQuery('#nomorUrutKomponen').val(parseFloat(data.default_urutan) + 1.00);
                 } else {
                     console.error('Error:', response.message);
                 }
@@ -392,7 +392,7 @@ if (empty($jadwal)) {
                     let data = response.data;
                     jQuery('#tambahKomponenModalLabel').hide();
                     jQuery('#editKomponenModalLabel').show();
-                    jQuery('#defaultTextInfo').show();
+                    jQuery('#defaultTextInfo').hide();
                     jQuery("#idKomponen").val(data.id);
                     jQuery("#namaKomponen").val(data.nama);
                     jQuery("#bobotKomponen").val(data.bobot);
@@ -429,7 +429,7 @@ if (empty($jadwal)) {
                     let data = response.data;
                     jQuery('#tambahSubkomponenModalLabel').hide();
                     jQuery('#editSubkomponenModalLabel').show();
-                    jQuery('#defaultTextInfo').show();
+                    jQuery('#defaultTextInfo').hide();
                     jQuery('#alertSub').text('Nama Komponen = ' + data.komponen.nama);
                     jQuery('#alertBobotSub').text('Bobot Max Komponen = ' + data.komponen.bobot);
                     jQuery("#idSubKomponen").val(data.id);
@@ -469,7 +469,7 @@ if (empty($jadwal)) {
                     let data = response.data;
                     jQuery('#tambahPenilaianModalLabel').hide();
                     jQuery('#editPenilaianModalLabel').show();
-                    jQuery('#defaultTextInfo').show();
+                    jQuery('#defaultTextInfo').hide();
                     jQuery('#alertPenilaian').text('Nama Sub Komponen = ' + data.subkomponen.nama);
                     jQuery("#idKomponenPenilaian").val(data.id);
                     jQuery("#idSubKomponen_penilaian").val(data.id_subkomponen);
