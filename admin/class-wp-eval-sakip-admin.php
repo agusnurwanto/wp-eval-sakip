@@ -489,9 +489,6 @@ class Wp_Eval_Sakip_Admin
 				Field::make('html', 'crb_sql_migrate')
 					->set_html('<a onclick="sql_migrate_esakip(); return false;" href="#" class="button button-primary button-large">SQL Migrate</a>')
 					->set_help_text('Tombol untuk memperbaiki struktur database E-SAKIP.'),
-				Field::make('text', 'crb_tahun_wpsipd', 'Tahun Anggaran E-SAKIP')
-					->set_default_value(date('Y'))
-					->set_help_text('Wajib diisi.'),
 			));
 
 		Container::make('theme_options', __('Pengaturan Perangkat Daerah'))
@@ -501,7 +498,7 @@ class Wp_Eval_Sakip_Admin
 					->set_html('
 					<h4>HALAMAN TERKAIT</h4>
 	            	<ol>
-	            		<li><a href="' . $halaman_mapping_skpd['url'] . '" target="_blank">' . $halaman_mapping_skpd['title'] . '</a></li>
+	            		<li><a href="'.$halaman_mapping_skpd['url'].'">'.$halaman_mapping_skpd['title'].'</a></li>
 	            	</ol>'),
 				Field::make('text', 'crb_url_server_sakip', 'URL Server WP-SIPD')
 					->set_default_value(admin_url('admin-ajax.php'))
@@ -509,12 +506,15 @@ class Wp_Eval_Sakip_Admin
 				Field::make('text', 'crb_apikey_wpsipd', 'API KEY WP-SIPD')
 					->set_default_value($this->functions->generateRandomString())
 					->set_help_text('Wajib diisi. API KEY digunakan untuk integrasi data.'),
+				Field::make('text', 'crb_tahun_wpsipd', 'Tahun Anggaran WP-SIPD')
+					->set_default_value(date('Y'))
+					->set_help_text('Wajib diisi.'),
 				Field::make('html', 'crb_html_data_unit')
 					->set_html('<a href="#" class="button button-primary" onclick="get_data_unit_wpsipd(); return false;">Tarik Data Unit dari WP SIPD</a>')
 					->set_help_text('Tombol untuk menarik data Unit dari WP SIPD.'),
 				Field::make('html', 'crb_generate_user')
-					->set_html('<a id="generate_user_esakip" onclick="return false;" href="#" class="button button-primary button-large">Generate User By DB Lokal</a>')
-					->set_help_text('Data user active yang ada di table esakip_data_unit akan digenerate menjadi user wordpress.'),
+					->set_html('<a id="generate_user" onclick="return false;" href="#" class="button button-primary button-large">Generate User By DB Lokal</a>')
+					->set_help_text('Data user active yang ada di table data unit akan digenerate menjadi user wordpress.'),
 			));
 		
 		Container::make('theme_options', __('Jadwal'))
