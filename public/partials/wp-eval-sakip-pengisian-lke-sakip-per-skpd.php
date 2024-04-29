@@ -54,11 +54,11 @@ $skpd = $wpdb->get_row(
             <table id="table_pengisian_sakip" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                 <thead>
                     <tr>
-                        <th class="text-center" rowspan="2" colspan="4" style="vertical-align: middle;" >Komponen/Sub Komponen</th>
-                        <th class="text-center" rowspan="2" style="vertical-align: middle;" >Bobot</th>
+                        <th class="text-center" rowspan="2" colspan="4" style="vertical-align: middle;">Komponen/Sub Komponen</th>
+                        <th class="text-center" rowspan="2" style="vertical-align: middle;">Bobot</th>
                         <th class="text-center" colspan="3">Penilaian PD/Perangkat Daerah</th>
-                        <th class="text-center" rowspan="2" style="vertical-align: middle;" >Bukti Dukung</th>
-                        <th class="text-center" rowspan="2" style="vertical-align: middle;" >Keterangan</th>
+                        <th class="text-center" rowspan="2" style="vertical-align: middle;">Keterangan</th>
+                        <th class="text-center" rowspan="2" style="vertical-align: middle;">Bukti Dukung</th>
                     </tr>
                     <tr>
                         <th class="text-center">Jawaban</th>
@@ -73,9 +73,50 @@ $skpd = $wpdb->get_row(
     </div>
 </div>
 <script>
-    jQuery(document).ready(function(){
+    jQuery(document).ready(function() {
         get_table_pengisian_sakip();
     })
+
+    function submitNilai(id, that) {
+        let idUser = null;
+        let idSkpd = <?php echo $id_skpd; ?>
+        let idJadwal = <?php echo $input['id_jadwal']; ?>
+        let nilaiJawaban = that.value;
+        let idKomponenPenilaian = id;
+
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'tambah_nilai_lke',
+                id_user:idUser,
+                id_skpd:idSkpd,
+                id_user_penilai:idSkpd,
+                id_jadwal: idJadwal,
+                id_komponen_penilaian: idKomponenPenilaian,
+                nilai: nilaiJawaban,
+                api_key: esakip.api_key
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    alert("nilai adalah = " + nilai + " id adalah =" + id);
+                    get_table_pengisian_sakip();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }
 
     function get_table_pengisian_sakip() {
         jQuery('#wrap-loading').show();

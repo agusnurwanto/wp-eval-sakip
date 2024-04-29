@@ -9297,6 +9297,7 @@ class Wp_Eval_Sakip_Public
 						$tbody .= "<td class='text-center'>0.00</td>";
 						$tbody .= "<td class='text-center'>0.00%</td>";
 						$tbody .= "<td class='text-center'></td>";
+						$tbody .= "<td class='text-center'></td>";
 						$tbody .= "</tr>";
 
 						$data_subkomponen = $wpdb->get_results(
@@ -9319,6 +9320,8 @@ class Wp_Eval_Sakip_Public
 								$tbody .= "<td class='text-left'></td>";
 								$tbody .= "<td class='text-center'>0.00</td>";
 								$tbody .= "<td class='text-center'>0.00%</td>";
+								$tbody .= "<td class='text-left'></td>";
+								$tbody .= "<td class='text-left'></td>";
 								$tbody .= "</tr>";
 
 								$data_komponen_penilaian = $wpdb->get_results(
@@ -9333,16 +9336,16 @@ class Wp_Eval_Sakip_Public
 
 								if (!empty($data_komponen_penilaian)) {
 									foreach ($data_komponen_penilaian as $penilaian) {
-										$opsi = "<option value='0'>Pilih Jawaban</option>";
+										$opsi = "<option value=''>Pilih Jawaban</option>";
 										if ($penilaian['tipe'] == 1) {
 											$opsi .= "<option value='1' class='text-center'>Y</option>";
-											$opsi .= "<option value='1' class='text-center'>T</option>";
+											$opsi .= "<option value='0' class='text-center'>T</option>";
 										} else if ($penilaian['tipe'] == 2) {
 											$opsi .= "<option value='1' class='text-center'>A</option>";
-											$opsi .= "<option value='1' class='text-center'>B</option>";
-											$opsi .= "<option value='1' class='text-center'>C</option>";
-											$opsi .= "<option value='1' class='text-center'>D</option>";
-											$opsi .= "<option value='1' class='text-center'>E</option>";
+											$opsi .= "<option value='0.75' class='text-center'>B</option>";
+											$opsi .= "<option value='0.5' class='text-center'>C</option>";
+											$opsi .= "<option value='0.25' class='text-center'>D</option>";
+											$opsi .= "<option value='0' class='text-center'>E</option>";
 										}
 
 										$tbody .= "<tr>";
@@ -9351,9 +9354,11 @@ class Wp_Eval_Sakip_Public
 										$tbody .= "<td class='text-left'>" . $counter_isi++ . "</td>";
 										$tbody .= "<td class='text-left'>" . $penilaian['nama'] . "</td>";
 										$tbody .= "<td class='text-center'>-</td>";
-										$tbody .= "<td class='text-center'><select>" . $opsi . "</select></td>";
+										$tbody .= "<td class='text-center'><select id='optionJawab{'$counter_isi'}' onchange='submitNilai(" . $penilaian['id'] . ", this)'>" . $opsi . "</select></td>";
 										$tbody .= "<td class='text-center'>0.00</td>";
 										$tbody .= "<td class='text-center'></td>";
+										$tbody .= "<td class='text-center'>" . $penilaian['keterangan'] . "</span>
+										</td>";
 										$tbody .= "<td class='text-center'><span class='badge badge-warning'>Belum Ada</span>
 										</td>";
 										$tbody .= "</tr>";
@@ -10854,6 +10859,76 @@ class Wp_Eval_Sakip_Public
 				'message'   => 'Format tidak sesuai!'
 			);
 		}
+		die(json_encode($ret));
+	}
+
+	public function tambah_nilai_lke()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$id_user = !empty($_POST['id_user']) ? $_POST['id_user'] : null;
+				$id_skpd = !empty($_POST['id_skpd']) ? $_POST['id_skpd'] : null;
+				$id_user_penilai = !empty($_POST['id_user_penilai']) ? $_POST['id_user_penilai'] : null;
+				$id_jadwal = !empty($_POST['id_jadwal']) ? $_POST['id_jadwal'] : null;
+				$id_komponen = !empty($_POST['id_komponen']) ? $_POST['id_komponen'] : null;
+				$id_subkomponen = !empty($_POST['id_subkomponen']) ? $_POST['id_subkomponen'] : null;
+				$id_komponen_penilaian = !empty($_POST['id_komponen_penilaian']) ? $_POST['id_komponen_penilaian'] : null;
+				$nilai = !empty($_POST['nilai']) ? $_POST['nilai'] : null;
+
+				$existing_data = $wpdb->get_row(
+					$wpdb->prepare(
+						"SELECT id FROM esakip_pengisian_lke WHERE id_subkomponen = %d AND id_komponen_penilaian = %d",
+						$id_subkomponen,
+						$id_komponen_penilaian
+					)
+				);
+
+				if ($existing_data) {
+					$wpdb->update(
+						'esakip_pengisian_lke',
+						array(
+							'nilai' => $nilai,
+							'update_at' => current_time('mysql'),
+						),
+						array('id' => $existing_data->id),
+						array('%s', '%s'),
+						array('%d')
+					);
+				} else {
+					$wpdb->insert(
+						'esakip_pengisian_lke',
+						array(
+							'id_user' => $id_user,
+							'id_skpd' => $id_skpd,
+							'id_user_penilai' => $id_user_penilai,
+							'id_jadwal' => $id_jadwal,
+							'id_komponen' => $id_komponen,
+							'id_subkomponen' => $id_subkomponen,
+							'id_komponen_penilaian' => $id_komponen_penilaian,
+							'nilai' => $nilai,
+						),
+						array('%d', '%d', '%d', '%d', '%d', '%d', '%d', '%s')
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
+
 		die(json_encode($ret));
 	}
 }
