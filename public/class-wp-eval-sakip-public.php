@@ -9410,6 +9410,16 @@ class Wp_Eval_Sakip_Public
 					ARRAY_A
 				);
 
+				$total_bobot_komponen = $wpdb->get_var(
+					$wpdb->prepare("
+						SELECT SUM(bobot)
+						FROM esakip_komponen
+						WHERE id_jadwal = %d
+						AND active = 1
+					", $id_jadwal)
+				);
+
+
 				$tbody = '';
 				if (!empty($data_komponen)) {
 					$counter = 'A';
@@ -9417,10 +9427,21 @@ class Wp_Eval_Sakip_Public
 						$btn = '';
 						$counter_isi = 1;
 						$counter_sub = 'a';
+						$bobot_komponen = $komponen['bobot'];
+						$total_bobot_subkomponen = $wpdb->get_var(
+							$wpdb->prepare("
+								SELECT SUM(bobot)
+								FROM esakip_subkomponen
+								WHERE id_komponen = %d
+								AND active = 1
+							", $komponen['id'])
+						);
 
 						$btn .= '<div class="btn-action-group">';
 						$btn .= "<button class='btn btn-warning' onclick='edit_data_komponen(\"" . $komponen['id'] . "\");' title='Edit Data Komponen'><span class='dashicons dashicons-edit'></span></button>";
-						$btn .= "<button class='btn btn-primary' onclick='tambah_subkomponen(\"" . $komponen['id'] . "\");' title='Tambah Subkomponen'><span class='dashicons dashicons-plus'></span></button>";
+						if ($total_bobot_subkomponen < $bobot_komponen) {
+							$btn .= "<button class='btn btn-primary' onclick='tambah_subkomponen(\"" . $komponen['id'] . "\");' title='Tambah Subkomponen'><span class='dashicons dashicons-plus'></span></button>";
+						}
 						$btn .= "<button class='btn btn-danger' onclick='hapus_data_komponen(\"" . $komponen['id'] . "\");' title='Hapus Data Komponen'><span class='dashicons dashicons-trash'></span>";
 						$btn .= '</div>';
 
@@ -9508,11 +9529,13 @@ class Wp_Eval_Sakip_Public
 					$tbody = "<tr><td colspan='8' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 
-				$tbody .= "<tr>";
-				$tbody .= "<td colspan='8' class='text-center'>";
-				$tbody .= "<button class='btn btn-primary btn-lg btn-block' onclick='tambah_komponen_utama(\"" . $id_jadwal . "\")'><span class='dashicons dashicons-plus'></span> Tambah Komponen Utama</button>";
-				$tbody .= "</td>";
-				$tbody .= "</tr>";
+				if ($total_bobot_komponen != 100) {
+					$tbody .= "<tr>";
+					$tbody .= "<td colspan='8' class='text-center'>";
+					$tbody .= "<button class='btn btn-primary btn-lg btn-block' onclick='tambah_komponen_utama(\"" . $id_jadwal . "\")'><span class='dashicons dashicons-plus'></span> Tambah Komponen Utama</button>";
+					$tbody .= "</td>";
+					$tbody .= "</tr>";
+				}
 
 				$ret['data'] = $tbody;
 			} else {
@@ -9832,7 +9855,7 @@ class Wp_Eval_Sakip_Public
 					<h5 class="esakip-header-tahun" data-id="renstra" style="margin: 0;">Periode Upload Dokumen RENSTRA</h5>
 					<div class="esakip-body-tahun" data-id="renstra">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-							' . str_replace('&id_skpd=ganti', '&id_skpd='.$skpd_db['id_skpd'], $periode_renstra_skpd) . '
+							' . str_replace('&id_skpd=ganti', '&id_skpd=' . $skpd_db['id_skpd'], $periode_renstra_skpd) . '
 						</ul>
 					</div>
 				</div>';
@@ -9900,7 +9923,7 @@ class Wp_Eval_Sakip_Public
 			));
 			$detail_perjanjian_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 			echo '
-				<h2 class="text-center">'.$skpd_db['nama_skpd'].'</h2>
+				<h2 class="text-center">' . $skpd_db['nama_skpd'] . '</h2>
 				<ul class="daftar-menu-sakip">
 					<li>' . $halaman_renstra_skpd . '</li>
 					<li><a href="' . $detail_renja['url'] . '" target="_blank" class="btn btn-primary">' . $detail_renja['title'] . '</a></li>
@@ -9987,6 +10010,7 @@ class Wp_Eval_Sakip_Public
 								SELECT bobot 
 								FROM esakip_komponen 
 								WHERE id = %d 
+								  AND active = 1
 							", $id_komponen)
 						);
 
@@ -10008,11 +10032,24 @@ class Wp_Eval_Sakip_Public
 							", $id_jadwal)
 						) + $bobot_komponen;
 					}
+					$bobot_sub = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT SUM(bobot) 
+							FROM esakip_subkomponen 
+							WHERE id_komponen = %d 
+							  AND active = 1
+						", $id_komponen)
+					);
 
 					if ($total_bobot > 100) {
 						$ret = array(
 							'status' => 'error',
 							'message' => 'Total bobot komponen melebihi 100!'
+						);
+					} else if ($bobot_sub > $bobot_komponen) {
+						$ret = array(
+							'status' => 'error',
+							'message' => 'Bobot Sub Komponen melebihi bobot Komponen Induknya!'
 						);
 					} else {
 						if (!empty($id_komponen)) {
@@ -10414,23 +10451,26 @@ class Wp_Eval_Sakip_Public
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				if (!empty($_POST['id'])) {
-					$data = $wpdb->get_row(
+					$data_subkomponen = $wpdb->get_row(
 						$wpdb->prepare("
-							SELECT *
-							FROM esakip_komponen_penilaian
-							WHERE id = %d
-						", $_POST['id']),
-						ARRAY_A
-					);
-					if ($data) {
-						$data_subkomponen = $wpdb->get_row(
-							$wpdb->prepare("
 								SELECT 
 									nama,
+									id_komponen,
 									bobot
 								FROM esakip_subkomponen
 								WHERE id = %d
 							", $_POST['id']),
+						ARRAY_A
+					);
+					if (!empty($data_subkomponen)) {
+						$data_komponen = $wpdb->get_row(
+							$wpdb->prepare("
+								SELECT 
+									nama,
+									bobot
+								FROM esakip_komponen
+								WHERE id = %d
+							", $data_subkomponen['id_komponen']),
 							ARRAY_A
 						);
 
@@ -10446,7 +10486,7 @@ class Wp_Eval_Sakip_Public
 							$default_urutan = 0;
 						}
 
-						$ret['data'] = $data + ['subkomponen' => $data_subkomponen] + ['default_urutan' => $default_urutan];
+						$ret['data'] = ['subkomponen' => $data_subkomponen] + ['default_urutan' => $default_urutan] + ['komponen' => $data_komponen];
 					} else {
 						$ret = array(
 							'status' => 'error',
@@ -10630,6 +10670,7 @@ class Wp_Eval_Sakip_Public
 							$wpdb->prepare("
 								SELECT 
 									nama,
+									id_komponen,
 									bobot
 								FROM esakip_subkomponen
 								WHERE id = %d
@@ -10637,19 +10678,18 @@ class Wp_Eval_Sakip_Public
 							ARRAY_A
 						);
 
-						$default_urutan = $wpdb->get_var(
+						$data_komponen = $wpdb->get_row(
 							$wpdb->prepare("
-								SELECT MAX(nomor_urut)
-								FROM esakip_komponen_penilaian
-								WHERE id_subkomponen = %d
-							", $_POST['id'])
+								SELECT 
+									nama,
+									bobot
+								FROM esakip_komponen
+								WHERE id = %d
+							", $data_subkomponen['id_komponen']),
+							ARRAY_A
 						);
 
-						if ($default_urutan === null) {
-							$default_urutan = 0;
-						}
-
-						$ret['data'] = $data + ['subkomponen' => $data_subkomponen] + ['default_urutan' => $default_urutan];
+						$ret['data'] = $data + ['subkomponen' => $data_subkomponen] + ['komponen' => $data_komponen];
 					} else {
 						$ret = array(
 							'status' => 'error',

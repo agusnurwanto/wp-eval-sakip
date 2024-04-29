@@ -23,6 +23,17 @@ $jadwal = $wpdb->get_row(
 if (empty($jadwal)) {
     die("jadwal tidak tersedia");
 }
+$user_evaluator = $wpdb->get_results("
+        SELECT 
+            sipd_users.ID, 
+            sipd_users.user_nicename 
+        FROM sipd_users 
+        INNER JOIN wp_usermeta 
+        ON sipd_users.ID = wp_usermeta.user_id 
+        WHERE wp_usermeta.meta_key = 'wp_capabilities' 
+          AND wp_usermeta.meta_value LIKE '%subscriber%' 
+        ORDER BY sipd_users.user_nicename
+", ARRAY_A);
 ?>
 <style>
     .transparent-button {
@@ -110,7 +121,7 @@ if (empty($jadwal)) {
                         <div class="form-group col-md-6">
                             <label for="nomorUrutKomponen">Nomor Urut</label>
                             <input type="number" class="form-control" id="nomorUrutKomponen" name="nomorUrutKomponen">
-                            <small class="text-muted text-sm-left" id="defaultTextInfo"> Default Nomor Urut</small>
+                            <small class="text-muted text-sm-left" id="defaultTextInfoKomponen"> Default Nomor Urut</small>
                         </div>
                     </div>
                 </form>
@@ -139,11 +150,9 @@ if (empty($jadwal)) {
                     <input type="hidden" value="" id="idSubKomponen">
                     <input type="hidden" value="" id="idKomponen_sub">
                     <div class="form-row">
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-12">
                             <div class="alert alert-info text-sm-left" role="alert" id="alertSub">
                             </div>
-                        </div>
-                        <div class="form-group col-md-6">
                             <div class="alert alert-info text-sm-left" role="alert" id="alertBobotSub">
                             </div>
                         </div>
@@ -166,7 +175,7 @@ if (empty($jadwal)) {
                         <div class="form-group col-md-6">
                             <label for="nomorUrutSubkomponen">Nomor Urut</label>
                             <input type="number" class="form-control" id="nomorUrutSubkomponen" name="nomorUrutSubkomponen" required>
-                            <small class="text-muted text-sm-left" id="defaultTextInfo"> Default Nomor Urut</small>
+                            <small class="text-muted text-sm-left" id="defaultTextInfoSub"> Default Nomor Urut</small>
                         </div>
                     </div>
                 </form>
@@ -195,7 +204,8 @@ if (empty($jadwal)) {
                     <input type="hidden" value="" id="idKomponenPenilaian">
                     <input type="hidden" value="" id="idSubKomponen_penilaian">
                     <div class="form-group">
-                        <div class="alert alert-info text-sm-left" role="alert" id="alertPenilaian"></div>
+                        <div class="alert alert-info text-sm-left" role="alert" id="alertKomponen_penilaian"></div>
+                        <div class="alert alert-info text-sm-left" role="alert" id="alertSub_penilaian"></div>
                     </div>
                     <div class="form-group">
                         <label for="namaPenilaian">Nama Komponen Penilaian</label>
@@ -217,7 +227,7 @@ if (empty($jadwal)) {
                         <div class="form-group col-md-6">
                             <label for="nomorUrutPenilaian">Nomor Urut</label>
                             <input type="number" class="form-control" id="nomorUrutPenilaian" name="nomorUrutPenilaian">
-                            <small class="text-muted text-sm-left" id="defaultTextInfo"> Default Nomor Urut</small>
+                            <small class="text-muted text-sm-left" id="defaultTextInfoPenilaian"> Default Nomor Urut</small>
                         </div>
                     </div>
                 </form>
@@ -283,7 +293,7 @@ if (empty($jadwal)) {
                     jQuery('#namaKomponen').val('');
                     jQuery('#tambahKomponenModalLabel').show();
                     jQuery('#editKomponenModalLabel').hide();
-                    jQuery('#defaultTextInfo').show();
+                    jQuery('#defaultTextInfoKomponen').show();
                     jQuery('#userPenilai').val('');
                     jQuery('#bobotKomponen').val('');
                     jQuery('#nomorUrutKomponen').val(parseFloat(data.default_urutan) + 1.00);
@@ -318,7 +328,7 @@ if (empty($jadwal)) {
                     jQuery('#idSubKomponen').val('');
                     jQuery('#tambahSubkomponenModalLabel').show();
                     jQuery('#editSubkomponenModalLabel').hide();
-                    jQuery('#defaultTextInfo').show();
+                    jQuery('#defaultTextInfoSub').show();
                     jQuery('#alertSub').text('Nama Komponen = ' + data.komponen.nama);
                     jQuery('#alertBobotSub').text('Bobot Max Komponen = ' + data.komponen.bobot);
                     jQuery('#namaSubKomponen').val('');
@@ -356,8 +366,9 @@ if (empty($jadwal)) {
                     jQuery('#idKomponenPenilaian').val('');
                     jQuery('#tambahPenilaianModalLabel').show();
                     jQuery('#editPenilaianModalLabel').hide();
-                    jQuery('#defaultTextInfo').show();
-                    jQuery('#alertPenilaian').text('Nama Sub Komponen = ' + data.subkomponen.nama);
+                    jQuery('#defaultTextInfoPenilaian').show();
+                    jQuery('#alertKomponen_penilaian').text('Nama Komponen = ' + data.komponen.nama);
+                    jQuery('#alertSub_penilaian').text('Nama Sub Komponen = ' + data.subkomponen.nama);
                     jQuery('#namaPenilaian').val('');
                     jQuery('#tipeJawaban').val('');
                     jQuery("#keterangan").val('');
@@ -392,7 +403,7 @@ if (empty($jadwal)) {
                     let data = response.data;
                     jQuery('#tambahKomponenModalLabel').hide();
                     jQuery('#editKomponenModalLabel').show();
-                    jQuery('#defaultTextInfo').hide();
+                    jQuery('#defaultTextInfoKomponen').hide();
                     jQuery("#idKomponen").val(data.id);
                     jQuery("#namaKomponen").val(data.nama);
                     jQuery("#bobotKomponen").val(data.bobot);
@@ -429,7 +440,7 @@ if (empty($jadwal)) {
                     let data = response.data;
                     jQuery('#tambahSubkomponenModalLabel').hide();
                     jQuery('#editSubkomponenModalLabel').show();
-                    jQuery('#defaultTextInfo').hide();
+                    jQuery('#defaultTextInfoSub').hide();
                     jQuery('#alertSub').text('Nama Komponen = ' + data.komponen.nama);
                     jQuery('#alertBobotSub').text('Bobot Max Komponen = ' + data.komponen.bobot);
                     jQuery("#idSubKomponen").val(data.id);
@@ -469,8 +480,9 @@ if (empty($jadwal)) {
                     let data = response.data;
                     jQuery('#tambahPenilaianModalLabel').hide();
                     jQuery('#editPenilaianModalLabel').show();
-                    jQuery('#defaultTextInfo').hide();
-                    jQuery('#alertPenilaian').text('Nama Sub Komponen = ' + data.subkomponen.nama);
+                    jQuery('#defaultTextInfoPenilaian').hide();
+                    jQuery('#alertKomponen_penilaian').text('Nama Komponen = ' + data.komponen.nama);
+                    jQuery('#alertSub_penilaian').text('Nama Sub Komponen = ' + data.subkomponen.nama);
                     jQuery("#idKomponenPenilaian").val(data.id);
                     jQuery("#idSubKomponen_penilaian").val(data.id_subkomponen);
                     jQuery("#namaPenilaian").val(data.nama);
