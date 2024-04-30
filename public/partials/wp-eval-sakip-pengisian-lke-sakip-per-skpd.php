@@ -78,9 +78,7 @@ $skpd = $wpdb->get_row(
     })
 
     function submitNilai(id, that) {
-        let idUser = null;
-        let idSkpd = <?php echo $id_skpd; ?>
-        let idJadwal = <?php echo $input['id_jadwal']; ?>
+        let idSkpd = <?php echo $id_skpd; ?>;
         let nilaiJawaban = that.value;
         let idKomponenPenilaian = id;
 
@@ -90,10 +88,7 @@ $skpd = $wpdb->get_row(
             type: 'POST',
             data: {
                 action: 'tambah_nilai_lke',
-                id_user:idUser,
                 id_skpd:idSkpd,
-                id_user_penilai:idSkpd,
-                id_jadwal: idJadwal,
                 id_komponen_penilaian: idKomponenPenilaian,
                 nilai: nilaiJawaban,
                 api_key: esakip.api_key

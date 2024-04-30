@@ -11007,23 +11007,37 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$id_user = !empty($_POST['id_user']) ? $_POST['id_user'] : null;
-				$id_skpd = !empty($_POST['id_skpd']) ? $_POST['id_skpd'] : null;
-				$id_user_penilai = !empty($_POST['id_user_penilai']) ? $_POST['id_user_penilai'] : null;
-				$id_jadwal = !empty($_POST['id_jadwal']) ? $_POST['id_jadwal'] : null;
-				$id_komponen = !empty($_POST['id_komponen']) ? $_POST['id_komponen'] : null;
-				$id_subkomponen = !empty($_POST['id_subkomponen']) ? $_POST['id_subkomponen'] : null;
-				$id_komponen_penilaian = !empty($_POST['id_komponen_penilaian']) ? $_POST['id_komponen_penilaian'] : null;
-				$nilai = !empty($_POST['nilai']) ? $_POST['nilai'] : null;
-
-				$existing_data = $wpdb->get_row(
-					$wpdb->prepare(
-						"SELECT id FROM esakip_pengisian_lke WHERE id_subkomponen = %d AND id_komponen_penilaian = %d",
-						$id_subkomponen,
-						$id_komponen_penilaian
-					)
+				$user_id = um_user('ID');
+				$user_meta = get_userdata($user_id);
+				if (!empty($_POST['id_skpd'])) {
+					$id_skpd = $_POST['id_skpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id SKPD kosong!';
+				}
+				if (!empty($_POST['id_komponen_penilaian'])) {
+					$id_komponen_penilaian = $_POST['id_komponen_penilaian'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Komponen Penilaian kosong!';
+				}
+				if (!empty($_POST['nilai'])) {
+					$nilai = $_POST['nilai'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Nilai kosong!';
+				}
+				$current_user = wp_get_current_user();
+				$allowed_roles = array();
+				$existing_data = $wpdb->get_var(
+					$wpdb->prepare("
+						SELECT 
+							id
+						FROM esakip_pengisian_lke
+						WHERE id = %d 
+						  AND active = 1
+					",)
 				);
-
 				if ($existing_data) {
 					$wpdb->update(
 						'esakip_pengisian_lke',
