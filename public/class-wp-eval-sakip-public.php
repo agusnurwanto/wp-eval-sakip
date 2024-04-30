@@ -6208,23 +6208,25 @@ class Wp_Eval_Sakip_Public
 					$arr_jadwal = ['usulan', 'penetapan'];
 					$jenis_jadwal = in_array($jenis_jadwal, $arr_jadwal) ? $jenis_jadwal : 'usulan';
 
-					$id_jadwal_sebelumnya = $wpdb->get_var("
+					$id_jadwal_sebelumnya = $wpdb->get_var($wpdb->prepare("
 						SELECT MAX(id)
 						FROM esakip_data_jadwal
 						WHERE tipe='LKE'
-					");
+							tahun_anggaran=%d
+					", $tahun_anggaran));
 
 					$get_jadwal = $wpdb->get_results($wpdb->prepare("
 						SELECT 
 							* 
 						FROM `esakip_data_jadwal` 
-						WHERE id=%d
-					", $id), ARRAY_A);
+						WHERE tahun_anggaran=%d
+							AND status != 0
+					", $tahun_anggaran), ARRAY_A);
 					foreach ($get_jadwal as $jadwal) {
 						if ($jadwal['status'] != 2) {
 							$return = array(
 								'status' => 'error',
-								'message'	=> 'Masih ada penjadwalan yang terbuka!'
+								'message'	=> 'Masih ada jadwal yang terbuka!'
 							);
 							die(json_encode($return));
 						}
@@ -6313,6 +6315,67 @@ class Wp_Eval_Sakip_Public
 										);
 										$wpdb->insert('esakip_komponen_penilaian', $data_komponen_penilaian_baru);
 									}
+								}
+							}
+						}
+					}else{
+						// buat script dalam bentuk array nilai default design LKE
+						$design = array(
+							array(
+								'nama_komponen' => 'PERENCANAAN KINERJA',
+								'bobot' => 30,
+								'data' => array(
+									array(
+										'nama_subkomponen' => 'PEMENUHAN',
+										'bobot' => 6,
+										'data' => array(
+											array(
+												'nama_komponen_penilaian' => 'Renstra telah disusun',
+												'format' => '',
+												'keterangan' => ''
+											),
+											array(
+												'nama_komponen_penilaian' => 'Dokumen perencanaan kinerja tahunan (Renja) telah disusun',
+												'format' => '',
+												'keterangan' => ''
+											)
+										)
+									),
+									array(
+										'nama_subkomponen' => 'KUALITAS RENSTRA',
+										'bobot' => 9,
+										'data' => array(
+											array(
+												'nama_komponen_penilaian' => 'Dokumen Perencanaan Kinerja telah diformalkan.',
+												'format' => '',
+												'keterangan' => ''
+											)
+										)
+									),
+								)
+							),
+							array(
+								'nama_komponen' => 'PENGUKURAN KINERJA',
+								'bobot' => 30,
+								'data' => array(
+									array(
+										'nama_subkomponen' => 'PELAKSANAAN PENGUKURAN KINERJA',
+										'bobot' => 6,
+										'data' => array(
+											array(
+												'nama_komponen_penilaian' => 'Telah terdapat indikator kinerja utama (IKU) sebagai ukuran kinerja secara formal	',
+												'format' => '',
+												'keterangan' => ''
+											)
+										)
+									)
+								)
+							),
+						);
+						foreach($design as $komponen){
+							foreach($komponen['data'] as $sub_komponen){
+								foreach($sub_komponen['data'] as $komponen_penilaian){
+
 								}
 							}
 						}
