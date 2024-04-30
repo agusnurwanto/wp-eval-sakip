@@ -513,7 +513,7 @@ class Wp_Eval_Sakip_Admin
 					->set_html('<a href="#" class="button button-primary" onclick="get_data_unit_wpsipd(); return false;">Tarik Data Unit dari WP SIPD</a>')
 					->set_help_text('Tombol untuk menarik data Unit dari WP SIPD.'),
 				Field::make('html', 'crb_generate_user')
-					->set_html('<a id="generate_user" onclick="return false;" href="#" class="button button-primary button-large">Generate User By DB Lokal</a>')
+					->set_html('<a id="generate_user_esakip" onclick="return false;" href="#" class="button button-primary button-large">Generate User By DB Lokal</a>')
 					->set_help_text('Data user active yang ada di table data unit akan digenerate menjadi user wordpress.'),
 			));
 		
