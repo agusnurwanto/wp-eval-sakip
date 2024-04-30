@@ -16,6 +16,7 @@ $jadwal = $wpdb->get_row(
         FROM esakip_data_jadwal
         WHERE id=%d
           AND status=1
+          AND tipe='LKE'
     ", $input['id_jadwal']),
     ARRAY_A
 );

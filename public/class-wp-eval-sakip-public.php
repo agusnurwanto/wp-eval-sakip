@@ -6208,6 +6208,12 @@ class Wp_Eval_Sakip_Public
 					$arr_jadwal = ['usulan', 'penetapan'];
 					$jenis_jadwal = in_array($jenis_jadwal, $arr_jadwal) ? $jenis_jadwal : 'usulan';
 
+					$id_jadwal_sebelumnya = $wpdb->get_var("
+						SELECT MAX(id)
+						FROM esakip_data_jadwal
+						WHERE tipe='LKE'
+					");
+
 					$get_jadwal = $wpdb->get_results($wpdb->prepare("
 						SELECT 
 							* 
@@ -6245,6 +6251,72 @@ class Wp_Eval_Sakip_Public
 					);
 
 					$wpdb->insert('esakip_data_jadwal', $data_jadwal);
+					$id_jadwal_baru = $wpdb->insert_id;
+
+					// Tambahkan data komponen jika ada ID jadwal sebelumnya
+					if (!empty($id_jadwal_sebelumnya)) {
+						$data_komponen = $wpdb->get_results(
+							$wpdb->prepare("
+                        		SELECT * 
+								FROM esakip_komponen 
+								WHERE id_jadwal = %d
+                    		", $id_jadwal_sebelumnya),
+							ARRAY_A
+						);
+
+						if (!empty($data_komponen)) {
+							foreach ($data_komponen as $komponen) {
+								$data_komponen_baru = array(
+									'id_jadwal' => $id_jadwal_baru,
+									'nomor_urut' => $komponen['nomor_urut'],
+									'id_user_penilai' => $komponen['id_user_penilai'],
+									'nama' => $komponen['nama'],
+									'bobot' => $komponen['bobot'],
+								);
+								$wpdb->insert('esakip_komponen', $data_komponen_baru);
+								$id_komponen_baru = $wpdb->insert_id;
+
+								$data_subkomponen = $wpdb->get_results(
+									$wpdb->prepare("
+										SELECT * 
+										FROM esakip_subkomponen 
+										WHERE id_komponen = %d
+									", $komponen['id']),
+									ARRAY_A
+								);
+								foreach ($data_subkomponen as $subkomponen) {
+									$data_subkomponen_baru = array(
+										'id_komponen' => $id_komponen_baru,
+										'nomor_urut' => $subkomponen['nomor_urut'],
+										'id_user_penilai' => $subkomponen['id_user_penilai'],
+										'nama' => $subkomponen['nama'],
+										'bobot' => $subkomponen['bobot'],
+									);
+									$wpdb->insert('esakip_subkomponen', $data_subkomponen_baru);
+									$id_subkomponen_baru = $wpdb->insert_id;
+
+									$data_komponen_penilaian = $wpdb->get_results(
+										$wpdb->prepare("
+											SELECT * 
+											FROM esakip_komponen_penilaian 
+											WHERE id_subkomponen = %d
+										", $subkomponen['id']),
+										ARRAY_A
+									);
+									foreach ($data_komponen_penilaian as $penilaian) {
+										$data_komponen_penilaian_baru = array(
+											'id_subkomponen' => $id_subkomponen_baru,
+											'nomor_urut' => $penilaian['nomor_urut'],
+											'nama' => $penilaian['nama'],
+											'tipe' => $penilaian['tipe'],
+											'keterangan' => $penilaian['keterangan'],
+										);
+										$wpdb->insert('esakip_komponen_penilaian', $data_komponen_penilaian_baru);
+									}
+								}
+							}
+						}
+					}
 
 					$return = array(
 						'status'		=> 'success',
