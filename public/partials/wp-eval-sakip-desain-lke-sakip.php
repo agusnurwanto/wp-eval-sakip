@@ -24,17 +24,6 @@ $jadwal = $wpdb->get_row(
 if (empty($jadwal)) {
     die("jadwal tidak tersedia");
 }
-$user_evaluator = $wpdb->get_results("
-        SELECT 
-            sipd_users.ID, 
-            sipd_users.user_nicename 
-        FROM sipd_users 
-        INNER JOIN wp_usermeta 
-        ON sipd_users.ID = wp_usermeta.user_id 
-        WHERE wp_usermeta.meta_key = 'wp_capabilities' 
-          AND wp_usermeta.meta_value LIKE '%subscriber%' 
-        ORDER BY sipd_users.user_nicename
-", ARRAY_A);
 ?>
 <style>
     .transparent-button {
@@ -289,7 +278,6 @@ $user_evaluator = $wpdb->get_results("
                 let data = response.data;
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
-                    let data = response.data;
                     jQuery('#idKomponen').val('');
                     jQuery('#namaKomponen').val('');
                     jQuery('#tambahKomponenModalLabel').show();
@@ -322,9 +310,9 @@ $user_evaluator = $wpdb->get_results("
             },
             dataType: "json",
             success: function(response) {
+                let data = response.data;
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
-                    let data = response.data;
                     jQuery('#idKomponen_sub').val(id);
                     jQuery('#idSubKomponen').val('');
                     jQuery('#tambahSubkomponenModalLabel').show();
@@ -360,9 +348,9 @@ $user_evaluator = $wpdb->get_results("
             },
             dataType: "json",
             success: function(response) {
+                let data = response.data;
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
-                    let data = response.data;
                     jQuery('#idSubKomponen_penilaian').val(id);
                     jQuery('#idKomponenPenilaian').val('');
                     jQuery('#tambahPenilaianModalLabel').show();
@@ -398,10 +386,10 @@ $user_evaluator = $wpdb->get_results("
             },
             dataType: 'json',
             success: function(response) {
+                let data = response.data;
                 jQuery('#wrap-loading').hide();
                 console.log(response);
                 if (response.status === 'success') {
-                    let data = response.data;
                     jQuery('#tambahKomponenModalLabel').hide();
                     jQuery('#editKomponenModalLabel').show();
                     jQuery('#defaultTextInfoKomponen').hide();
@@ -435,10 +423,10 @@ $user_evaluator = $wpdb->get_results("
             },
             dataType: 'json',
             success: function(response) {
+                let data = response.data;
                 jQuery('#wrap-loading').hide();
                 console.log(response);
                 if (response.status === 'success') {
-                    let data = response.data;
                     jQuery('#tambahSubkomponenModalLabel').hide();
                     jQuery('#editSubkomponenModalLabel').show();
                     jQuery('#defaultTextInfoSub').hide();

@@ -6048,7 +6048,6 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($ret));
 	}
 
-	/** Ambil data penjadwalan */
 	public function get_data_penjadwalan()
 	{
 		global $wpdb;
@@ -6059,7 +6058,7 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
-				$params = $columns = $totalRecords = $data = array();
+				$params = $columns = $totalRecords = array();
 				$params = $_REQUEST;
 				$columns = array(
 					0 => 'nama_jadwal',
@@ -6097,7 +6096,6 @@ class Wp_Eval_Sakip_Public
 				$checkOpenedSchedule = 0;
 				if (!empty($queryRecords)) {
 					foreach ($queryRecords as $recKey => $recVal) {
-						// $report = '<a class="btn btn-sm btn-primary mr-2" style="text-decoration: none;" onclick="report(\'' . $recVal['id'] . '\'); return false;" href="#" title="Cetak Laporan"><i class="dashicons dashicons-printer"></i></a>';
 						$desain_lke_page = $this->functions->generatePage(array(
 							'nama_page' => 'Halaman Desain LKE SAKIP ' . $recVal['nama_jadwal'],
 							'content' => '[desain_lke_sakip id_jadwal=' . $recVal['id'] . ']',
@@ -6134,9 +6132,9 @@ class Wp_Eval_Sakip_Public
 						}
 
 						$status = array(
-							0 => 'Dihapus',
-							1 => 'Active',
-							2 => 'Dikunci'
+							0 => '<span class="badge badge-dark"> Dihapus </span>',
+							1 => '<span class="badge badge-success">Aktif</span>',
+							2 => '<span class="badge badge-secondary">Dikunci</span>'
 						);
 
 						$queryRecords[$recKey]['started_at']	= date('d-m-Y H:i', strtotime($recVal['started_at']));
@@ -6182,7 +6180,6 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($return));
 	}
 
-	/** Submit data penjadwalan */
 	public function submit_jadwal()
 	{
 		global $wpdb;
@@ -6202,26 +6199,30 @@ class Wp_Eval_Sakip_Public
 					$jadwal_selesai		= trim(htmlspecialchars($_POST['jadwal_selesai']));
 					$jadwal_selesai		= date('Y-m-d H:i:s', strtotime($jadwal_selesai));
 					$tahun_anggaran		= trim(htmlspecialchars($_POST['tahun_anggaran']));
-					$tipe 	= trim(htmlspecialchars($_POST['tipe']));
 					$jenis_jadwal		= trim(htmlspecialchars($_POST['jenis_jadwal']));
-
 					$arr_jadwal = ['usulan', 'penetapan'];
 					$jenis_jadwal = in_array($jenis_jadwal, $arr_jadwal) ? $jenis_jadwal : 'usulan';
 
-					$id_jadwal_sebelumnya = $wpdb->get_var($wpdb->prepare("
-						SELECT MAX(id)
-						FROM esakip_data_jadwal
-						WHERE tipe='LKE'
-							tahun_anggaran=%d
-					", $tahun_anggaran));
+					$id_jadwal_sebelumnya = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT MAX(id)
+							FROM esakip_data_jadwal
+							WHERE tipe='LKE'
+							AND tahun_anggaran=%d
+						", $tahun_anggaran)
+					);
 
-					$get_jadwal = $wpdb->get_results($wpdb->prepare("
-						SELECT 
-							* 
-						FROM `esakip_data_jadwal` 
-						WHERE tahun_anggaran=%d
+					$get_jadwal = $wpdb->get_results(
+						$wpdb->prepare("
+							SELECT 
+								* 
+							FROM esakip_data_jadwal
+							WHERE tahun_anggaran=%d
 							AND status != 0
-					", $tahun_anggaran), ARRAY_A);
+						", $tahun_anggaran),
+						ARRAY_A
+					);
+
 					foreach ($get_jadwal as $jadwal) {
 						if ($jadwal['status'] != 2) {
 							$return = array(
@@ -6241,15 +6242,15 @@ class Wp_Eval_Sakip_Public
 
 					//insert data penjadwalan
 					$data_jadwal = array(
-						'nama_jadwal' 		=> $nama_jadwal,
-						'started_at'		=> $jadwal_mulai,
-						'end_at'			=> $jadwal_selesai,
-						'tahun_anggaran'	=> $tahun_anggaran,
-						'status'			=> 1,
-						'tahun_anggaran'	=> $tahun_anggaran,
-						'jenis_jadwal'	=> $jenis_jadwal,
-						'tipe'	=> 'LKE',
-						'lama_pelaksanaan'	=> 1,
+						'nama_jadwal' => $nama_jadwal,
+						'started_at' => $jadwal_mulai,
+						'end_at' => $jadwal_selesai,
+						'tahun_anggaran' => $tahun_anggaran,
+						'status' => 1,
+						'tahun_anggaran' => $tahun_anggaran,
+						'jenis_jadwal' => $jenis_jadwal,
+						'tipe' => 'LKE',
+						'lama_pelaksanaan' => 1,
 					);
 
 					$wpdb->insert('esakip_data_jadwal', $data_jadwal);
@@ -6318,7 +6319,7 @@ class Wp_Eval_Sakip_Public
 								}
 							}
 						}
-					}else{
+					} else {
 						// buat script dalam bentuk array nilai default design LKE
 						$design = array(
 							array(
@@ -6372,10 +6373,9 @@ class Wp_Eval_Sakip_Public
 								)
 							),
 						);
-						foreach($design as $komponen){
-							foreach($komponen['data'] as $sub_komponen){
-								foreach($sub_komponen['data'] as $komponen_penilaian){
-
+						foreach ($design as $komponen) {
+							foreach ($komponen['data'] as $sub_komponen) {
+								foreach ($sub_komponen['data'] as $komponen_penilaian) {
 								}
 							}
 						}
