@@ -837,7 +837,7 @@ class Wp_Eval_Sakip_Admin
 			if (!empty($user['emailteks'])) {
 				$email = $user['emailteks'];
 			} else {
-				$email = $username . '@sipdlocal.com';
+				$email = $username . '@sakiplocal.com';
 			}
 			$user['jabatan'] = strtolower($user['jabatan']);
 			$role = get_role($user['jabatan']);
@@ -875,9 +875,11 @@ class Wp_Eval_Sakip_Admin
 			}
 
 			$meta = array(
-				'_nip' => $user['nip'],
-				'description' => 'User dibuat dari data WP-SIPD'
+				'description' => 'User dibuat dari generate sistem aplikasi WP-Eval-SAKIP'
 			);
+			if(!empty($user['nip'])){
+				$meta['nip'] = $user['nip'];
+			}
 			if (!empty($user['id_sub_skpd'])) {
 				$skpd = $wpdb->get_var(
 					$wpdb->prepare("
@@ -932,6 +934,51 @@ class Wp_Eval_Sakip_Admin
 						$user['nip'] = $user['nipkepala'];
 						$this->gen_user_esakip($user, $update_pass);
 					}
+
+					// admin bappeda
+					$args = array(
+					    'role'    => 'admin_bappeda',
+					    'orderby' => 'user_nicename',
+					    'order'   => 'ASC'
+					);
+					$users_bappeda = get_users( $args );
+					$user_data = array();
+					$user_data['pass'] = $_POST['pass'];
+					$user_data['jabatan'] = 'admin_bappeda';
+					if(empty($user_exist)){
+						$user_data['loginname'] = 'admin_perencanaan';
+						$user_data['nama'] = 'Admin Perencanaan';
+						$this->gen_user_esakip($user_data, $update_pass);
+					}else{
+						foreach ( $users_bappeda as $user_exist ) {
+							$user_data['loginname'] = $user_exist->user_login;
+							$user_data['nama'] = $user_exist->display_name;
+						}
+						$this->gen_user_esakip($user_data, $update_pass);
+					}
+
+					// admin ortala
+					$args = array(
+					    'role'    => 'admin_ortala',
+					    'orderby' => 'user_nicename',
+					    'order'   => 'ASC'
+					);
+					$users_ortala = get_users( $args );
+					$user_data = array();
+					$user_data['pass'] = $_POST['pass'];
+					$user_data['jabatan'] = 'admin_ortala';
+					if(empty($user_exist)){
+						$user_data['loginname'] = 'admin_organisasi';
+						$user_data['nama'] = 'Admin Organisasi';
+						$this->gen_user_esakip($user_data, $update_pass);
+					}else{
+						foreach ( $users_ortala as $user_exist ) {
+							$user_data['loginname'] = $user_exist->user_login;
+							$user_data['nama'] = $user_exist->display_name;
+						}
+						$this->gen_user_esakip($user_data, $update_pass);
+					}
+
 				} else {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Data user PA/KPA kosong. Harap lakukan singkronisasi data SKPD dulu!';
