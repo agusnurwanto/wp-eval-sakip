@@ -119,7 +119,7 @@ $tahun_anggaran = $input['tahun_anggaran'];
 					'action': "get_data_penjadwalan",
 					'api_key': esakip.api_key,
 					'tipe': tipe,
-					'tahun_anggaran': '<?php echo $tahun_anggaran; ?>'
+					'tahun_anggaran': tahun_anggaran
 				}
 			},
 			"initComplete": function(settings, json) {
