@@ -6208,7 +6208,7 @@ class Wp_Eval_Sakip_Public
 							SELECT MAX(id)
 							FROM esakip_data_jadwal
 							WHERE tipe='LKE'
-							AND tahun_anggaran=%d
+							  AND tahun_anggaran=%d
 						", $tahun_anggaran)
 					);
 
@@ -6217,8 +6217,9 @@ class Wp_Eval_Sakip_Public
 							SELECT 
 								* 
 							FROM esakip_data_jadwal
-							WHERE tahun_anggaran=%d
-							AND status != 0
+							WHERE tipe='LKE'
+							  AND tahun_anggaran=%d
+							  AND status != 0
 						", $tahun_anggaran),
 						ARRAY_A
 					);
@@ -6321,63 +6322,120 @@ class Wp_Eval_Sakip_Public
 						}
 					} else {
 						// buat script dalam bentuk array nilai default design LKE
-						$design = array(
-							array(
-								'nama_komponen' => 'PERENCANAAN KINERJA',
-								'bobot' => 30,
-								'data' => array(
-									array(
-										'nama_subkomponen' => 'PEMENUHAN',
-										'bobot' => 6,
-										'data' => array(
-											array(
-												'nama_komponen_penilaian' => 'Renstra telah disusun',
-												'format' => '',
-												'keterangan' => ''
-											),
-											array(
-												'nama_komponen_penilaian' => 'Dokumen perencanaan kinerja tahunan (Renja) telah disusun',
-												'format' => '',
-												'keterangan' => ''
-											)
-										)
-									),
-									array(
-										'nama_subkomponen' => 'KUALITAS RENSTRA',
-										'bobot' => 9,
-										'data' => array(
-											array(
-												'nama_komponen_penilaian' => 'Dokumen Perencanaan Kinerja telah diformalkan.',
-												'format' => '',
-												'keterangan' => ''
-											)
-										)
-									),
-								)
-							),
-							array(
-								'nama_komponen' => 'PENGUKURAN KINERJA',
-								'bobot' => 30,
-								'data' => array(
-									array(
-										'nama_subkomponen' => 'PELAKSANAAN PENGUKURAN KINERJA',
-										'bobot' => 6,
-										'data' => array(
-											array(
-												'nama_komponen_penilaian' => 'Telah terdapat indikator kinerja utama (IKU) sebagai ukuran kinerja secara formal	',
-												'format' => '',
-												'keterangan' => ''
-											)
-										)
-									)
-								)
-							),
+						$esakip_komponen = array(
+							array('id_jadwal' => $id_jadwal_baru, 'nama' => 'PERENCANAAN KINERJA', 'bobot' => '30', 'active' => '1', 'nomor_urut' => '1.00', 'id_user_penilai' => NULL),
+							array('id_jadwal' => $id_jadwal_baru, 'nama' => 'PENGUKURAN KINERJA', 'bobot' => '30', 'active' => '1', 'nomor_urut' => '2.00', 'id_user_penilai' => NULL),
+							array('id_jadwal' => $id_jadwal_baru, 'nama' => 'PELAPORAN KINERJA', 'bobot' => '15', 'active' => '1', 'nomor_urut' => '3.00', 'id_user_penilai' => NULL),
+							array('id_jadwal' => $id_jadwal_baru, 'nama' => 'EVALUASI AKUNTABILITAS KINERJA INTERNAL', 'bobot' => '25', 'active' => '1', 'nomor_urut' => '4.00', 'id_user_penilai' => NULL)
 						);
-						foreach ($design as $komponen) {
-							foreach ($komponen['data'] as $sub_komponen) {
-								foreach ($sub_komponen['data'] as $komponen_penilaian) {
-								}
-							}
+
+						$esakip_subkomponen = array(
+							array('id_komponen' => '1', 'nama' => 'PEMENUHAN', 'bobot' => '6', 'active' => '1', 'nomor_urut' => '1.00', 'id_user_penilai' => NULL),
+							array('id_komponen' => '1', 'nama' => 'KUALITAS RENSTRA', 'bobot' => '9', 'active' => '1', 'nomor_urut' => '2.00', 'id_user_penilai' => NULL),
+							array('id_komponen' => '1', 'nama' => 'IMPLEMENTASI', 'bobot' => '15', 'active' => '1', 'nomor_urut' => '3.00', 'id_user_penilai' => NULL),
+							array('id_komponen' => '2', 'nama' => 'PELAKSANAAN PENGUKURAN KINERJA', 'bobot' => '6', 'active' => '1', 'nomor_urut' => '1.00', 'id_user_penilai' => NULL),
+							array('id_komponen' => '2', 'nama' => 'KUALITAS PENGUKURAN', 'bobot' => '9', 'active' => '1', 'nomor_urut' => '2.00', 'id_user_penilai' => NULL),
+							array('id_komponen' => '2', 'nama' => 'IMPLEMENTASI PENGUKURAN', 'bobot' => '15', 'active' => '1', 'nomor_urut' => '3.00', 'id_user_penilai' => NULL),
+							array('id_komponen' => '3', 'nama' => 'PEMENUHAN PELAPORAN', 'bobot' => '3', 'active' => '1', 'nomor_urut' => '1.00', 'id_user_penilai' => NULL),
+							array('id_komponen' => '3', 'nama' => 'PENYAJIAN INFORMASI KINERJA', 'bobot' => '4.5', 'active' => '1', 'nomor_urut' => '2.00', 'id_user_penilai' => NULL),
+							array('id_komponen' => '3', 'nama' => 'PEMANFAATAN INFORMASI KINERJA', 'bobot' => '7.5', 'active' => '1', 'nomor_urut' => '3.00', 'id_user_penilai' => NULL),
+							array('id_komponen' => '4', 'nama' => 'PELAKSANAAN EVALUASI AKUNTABILITAS KINERJA', 'bobot' => '5', 'active' => '1', 'nomor_urut' => '1.00', 'id_user_penilai' => NULL),
+							array('id_komponen' => '4', 'nama' => 'KUALITAS EVALUASI', 'bobot' => '7.5', 'active' => '1', 'nomor_urut' => '2.00', 'id_user_penilai' => NULL),
+							array('id_komponen' => '4', 'nama' => 'PEMANFAATAN EVALUASI', 'bobot' => '12.5', 'active' => '1', 'nomor_urut' => '3.00', 'id_user_penilai' => NULL)
+						);
+
+						$esakip_komponen_penilaian = array(
+							array('id_subkomponen' => '1', 'nama' => 'Renstra telah disusun', 'tipe' => '1', 'keterangan' => 'Renstra OPD (2024-2026)', 'active' => '1', 'nomor_urut' => '1.00'),
+							array('id_subkomponen' => '1', 'nama' => 'Dokumen perencanaan kinerja tahunan (Renja) telah disusun
+						  ', 'tipe' => '1', 'keterangan' => 'Renja 2023 dan 2024', 'active' => '1', 'nomor_urut' => '2.00'),
+							array('id_subkomponen' => '1', 'nama' => 'Terdapat dokumen perencanaan anggaran yang mendukung kinerja', 'tipe' => '1', 'keterangan' => '- Renja 2023 dan 2024, - DPA 2024 dan DPPA 2023 (di dokumen lainnya)', 'active' => '1', 'nomor_urut' => '3.00'),
+							array('id_subkomponen' => '1', 'nama' => 'Perjanjian Kinerja (PK) telah disusun', 'tipe' => '1', 'keterangan' => 'PK 2023 dan 2024', 'active' => '1', 'nomor_urut' => '4.00'),
+							array('id_subkomponen' => '1', 'nama' => 'PK telah menyajikan Indikator Tujuan/ Sasaran', 'tipe' => '2', 'keterangan' => 'PK 2023 dan 2024', 'active' => '1', 'nomor_urut' => '5.00'),
+							array('id_subkomponen' => '1', 'nama' => 'Terdapat dokumen Rencana Aksi', 'tipe' => '1', 'keterangan' => 'Rencana Aksi 2023 dan 2024', 'active' => '1', 'nomor_urut' => '6.00'),
+							array('id_subkomponen' => '2', 'nama' => 'Dokumen Perencanaan Kinerja telah diformalkan.', 'tipe' => '1', 'keterangan' => 'Renstra dan Renja', 'active' => '1', 'nomor_urut' => '1.00'),
+							array('id_subkomponen' => '2', 'nama' => 'Renstra telah dipublikasikan tepat waktu', 'tipe' => '1', 'keterangan' => 'Screenshoot Renstra 2024-2026 di website OPD, esr dan aplikasi SAKIP', 'active' => '1', 'nomor_urut' => '2.00'),
+							array('id_subkomponen' => '2', 'nama' => 'Renja telah dipublikasikan tepat waktu', 'tipe' => '1', 'keterangan' => 'Screenshoot Renja 2023 dan 2024 di website OPD, esr dan aplikasi SAKIP', 'active' => '1', 'nomor_urut' => '3.00'),
+							array('id_subkomponen' => '2', 'nama' => 'Perjanjian Kinerja telah dipublikasikan tepat waktu', 'tipe' => '1', 'keterangan' => 'Screenshoot PK 2023 dan 2024 di website OPD, esr dan aplikasi SAKIP', 'active' => '1', 'nomor_urut' => '4.00'),
+							array('id_subkomponen' => '2', 'nama' => 'Tujuan telah berorientasi hasil', 'tipe' => '2', 'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024', 'active' => '1', 'nomor_urut' => '5.00'),
+							array('id_subkomponen' => '2', 'nama' => 'Ukuran Keberhasilan (Indikator Kinerja) Tujuan telah memenuhi kriteria SMART.', 'tipe' => '2', 'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024', 'active' => '1', 'nomor_urut' => '6.00'),
+							array('id_subkomponen' => '2', 'nama' => 'Sasaran telah jelas berorientasi hasil', 'tipe' => '2', 'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024', 'active' => '1', 'nomor_urut' => '7.00'),
+							array('id_subkomponen' => '2', 'nama' => 'Ukuran Keberhasilan (Indikator Kinerja) Sasaran telah memenuhi kriteria SMART.', 'tipe' => '2', 'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024', 'active' => '1', 'nomor_urut' => '8.00'),
+							array('id_subkomponen' => '2', 'nama' => 'Indikator Kinerja Tujuan telah menggambarkan kondisi Tujuan yang harus dicapai, tertuang secara berkelanjutan (sustainable - tidak sering diganti dalam 1 periode Perencanaan Strategis).', 'tipe' => '2', 'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024', 'active' => '1', 'nomor_urut' => '9.00'),
+							array('id_subkomponen' => '2', 'nama' => 'Indikator Kinerja Sasaran telah menggambarkan kondisi Sasaran yang harus dicapai, tertuang secara berkelanjutan (sustainable - tidak sering diganti dalam 1 periode Perencanaan Strategis).', 'tipe' => '2', 'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024', 'active' => '1', 'nomor_urut' => '10.00'),
+							array('id_subkomponen' => '2', 'nama' => 'Target yang ditetapkan dalam Perencanaan Kinerja dapat dicapai (achievable) dan realistis.', 'tipe' => '2', 'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024', 'active' => '1', 'nomor_urut' => '11.00'),
+							array('id_subkomponen' => '2', 'nama' => 'Setiap Dokumen Perencanaan Kinerja (Renstra, Renja, PK) telah menggambarkan hubungan yang berkesinambungan, serta selaras antara Kondisi/Hasil yang akan dicapai di setiap level jabatan (Cascading Kinerja).', 'tipe' => '2', 'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024,  cascading dan pohon kinerja (di dokumen lainnya)', 'active' => '1', 'nomor_urut' => '12.00'),
+							array('id_subkomponen' => '3', 'nama' => 'Dokumen Renstra digunakan sebagai acuan penyusunan Dokumen Rencana Kerja dan Anggaran', 'tipe' => '2', 'keterangan' => '- Renstra OPD (2024-2026), Renja 2023 dan 2024, Rencana Aksi 2023 dan 2024 - DPA 2024 dan DPPA 2023 (di dokumen lainnya)', 'active' => '1', 'nomor_urut' => '1.00'),
+							array('id_subkomponen' => '3', 'nama' => 'Target jangka menengah dalam Renstra telah dimonitor pencapaiannya sampai dengan tahun berjalan', 'tipe' => '2', 'keterangan' => 'Renstra OPD (2024-2026), Laporan Kinerja 2023', 'active' => '1', 'nomor_urut' => '2.00'),
+							array('id_subkomponen' => '3', 'nama' => 'Anggaran yang ditetapkan telah mengacu pada Kinerja yang ingin dicapai', 'tipe' => '2', 'keterangan' => '- Renstra OPD (2024-2026), Renja 2023 dan 2024, Rencana Aksi 2023 dan 2024 - DPA 2024 dan DPPA 2023 (di dokumen lainnya)', 'active' => '1', 'nomor_urut' => '3.00'),
+							array('id_subkomponen' => '3', 'nama' => 'Aktivitas yang dilaksanakan telah mendukung Kinerja', 'tipe' => '2', 'keterangan' => 'Rencana aksi 2023 dan 2024', 'active' => '1', 'nomor_urut' => '4.00'),
+							array('id_subkomponen' => '3', 'nama' => 'Target kinerja yang diperjanjikan pada Perjanjian Kinerja telah digunakan untuk mengukur keberhasilan', 'tipe' => '2', 'keterangan' => '- Perjanjian Kinerja 2023 dan 2024, SKP 2023 dan 2024 - SK dan bukti pemberian reward punishment (dokumen lainnya)', 'active' => '1', 'nomor_urut' => '5.00'),
+							array('id_subkomponen' => '3', 'nama' => 'Setiap pegawai memahami dan peduli serta berkomitmen dalam mencapai kinerja yang telah direncanakan dalam Sasaran Kinerja Pegawai (SKP)', 'tipe' => '2', 'keterangan' => 'SKP 2023 dan 2024, PK 2023 dan 2024', 'active' => '1', 'nomor_urut' => '6.00'),
+							array('id_subkomponen' => '3', 'nama' => 'Dokumen Renstra telah direviu secara berkala', 'tipe' => '2', 'keterangan' => 'Screenshoot aplikasi e-monev E-80 dan E-81 (dokumen lainnya)', 'active' => '1', 'nomor_urut' => '7.00'),
+							array('id_subkomponen' => '4', 'nama' => 'Telah terdapat indikator kinerja utama (IKU) sebagai ukuran kinerja secara formal', 'tipe' => '1', 'keterangan' => 'Dokumen IKU 2024-2026', 'active' => '1', 'nomor_urut' => '1.00'),
+							array('id_subkomponen' => '4', 'nama' => 'Terdapat Definisi Operasional yang jelas atas kinerja dan cara mengukur indikator kinerja.', 'tipe' => '2', 'keterangan' => 'Dokumen IKU 2024-2026', 'active' => '1', 'nomor_urut' => '2.00'),
+							array('id_subkomponen' => '4', 'nama' => 'Terdapat mekanisme yang jelas terhadap pengumpulan data kinerja yang dapat diandalkan.', 'tipe' => '2', 'keterangan' => 'SOP pengumpulan data kinerja (di dokumen lainnya)', 'active' => '1', 'nomor_urut' => '3.00'),
+							array('id_subkomponen' => '5', 'nama' => 'Pimpinan selalu terlibat sebagai pengambil keputusan (Decision Maker) dalam mengukur capaian kinerja.', 'tipe' => '2', 'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024', 'active' => '1', 'nomor_urut' => '1.00'),
+							array('id_subkomponen' => '5', 'nama' => 'Data kinerja yang dikumpulkan telah relevan untuk mengukur capaian kinerja yang diharapkan.', 'tipe' => '2', 'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024,  Laporan Kinerja 2023', 'active' => '1', 'nomor_urut' => '2.00'),
+							array('id_subkomponen' => '5', 'nama' => 'Data kinerja yang dikumpulkan telah mendukung capaian kinerja yang diharapkan.', 'tipe' => '2', 'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024,  Laporan Kinerja 2023', 'active' => '1', 'nomor_urut' => '3.00'),
+							array('id_subkomponen' => '5', 'nama' => 'Pengumpulan data kinerja atas Rencana Aksi dilakukan secara berkala (bulanan/triwulanan/semester)', 'tipe' => '1', 'keterangan' => 'Pengukuran rencana aksi Tahun 2023 dan 2024', 'active' => '1', 'nomor_urut' => '4.00'),
+							array('id_subkomponen' => '5', 'nama' => 'Pengukuran kinerja sudah dilakukan secara berjenjang', 'tipe' => '2', 'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024', 'active' => '1', 'nomor_urut' => '5.00'),
+							array('id_subkomponen' => '5', 'nama' => 'Pengumpulan data kinerja telah memanfaatkan Teknologi Informasi (Aplikasi).', 'tipe' => '1', 'keterangan' => 'Screenshoot aplikasi EP3, E-monev (dokumen lainnya)', 'active' => '1', 'nomor_urut' => '6.00'),
+							array('id_subkomponen' => '5', 'nama' => 'Pengukuran capaian kinerja telah memanfaatkan Teknologi Informasi (Aplikasi).', 'tipe' => '1', 'keterangan' => 'Screenshoot aplikasi EP3, E-monev (dokumen lainnya)', 'active' => '1', 'nomor_urut' => '7.00'),
+							array('id_subkomponen' => '6', 'nama' => 'Pengukuran Kinerja telah menjadi dasar dalam penyesuaian (pemberian/pengurangan) tunjangan kinerja/penghasilan.', 'tipe' => '2', 'keterangan' => '- Pengukuran Kinerja 2023 dan 2024,  - Screenshoot EP3 (dokumen lainnya)', 'active' => '1', 'nomor_urut' => '1.00'),
+							array('id_subkomponen' => '6', 'nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian (Refocusing) Organisasi.', 'tipe' => '2', 'keterangan' => '- Pengukuran Kinerja 2023 dan 2024 - Screenshoot EP3 (dokumen lainnya)', 'active' => '1', 'nomor_urut' => '2.00'),
+							array('id_subkomponen' => '6', 'nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian Strategi dalam mencapai kinerja.', 'tipe' => '2', 'keterangan' => 'Dokumen Pengukuran Kinerja 2023 dan 2024;  Evaluasi Internal 2023 dan 2024; Rencana Aksi 2024', 'active' => '1', 'nomor_urut' => '3.00'),
+							array('id_subkomponen' => '6', 'nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian Kebijakan dalam mencapai kinerja.', 'tipe' => '2', 'keterangan' => 'Dokumen Pengukuran Kinerja 2023 dan 2024;  Evaluasi Internal 2023 dan 2024; Rencana Aksi 2024', 'active' => '1', 'nomor_urut' => '4.00'),
+							array('id_subkomponen' => '6', 'nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian Aktivitas dalam mencapai kinerja.', 'tipe' => '2', 'keterangan' => 'Dokumen Pengukuran Kinerja 2023 dan 2024;  Evaluasi Internal 2023 dan 2024; Rencana Aksi 2024', 'active' => '1', 'nomor_urut' => '5.00'),
+							array('id_subkomponen' => '6', 'nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian Anggaran dalam mencapai kinerja.', 'tipe' => '2', 'keterangan' => 'Dokumen Pengukuran Kinerja 2023 dan 2024;  Evaluasi Internal 2023 dan 2024; DPA 2024 dan DPPA 2023', 'active' => '1', 'nomor_urut' => '6.00'),
+							array('id_subkomponen' => '6', 'nama' => 'Terdapat efisiensi atas penggunaan anggaran dalam mencapai kinerja.', 'tipe' => '2', 'keterangan' => '- Laporan Kinerja 2023;  - DPPA 2023 (di dokumen lainnya)', 'active' => '1', 'nomor_urut' => '7.00'),
+							array('id_subkomponen' => '6', 'nama' => 'Setiap unit/satuan kerja memahami dan peduli atas hasil pengukuran kinerja.', 'tipe' => '2', 'keterangan' => NULL, 'active' => '1', 'nomor_urut' => '8.00'),
+							array('id_subkomponen' => '6', 'nama' => 'Setiap pegawai memahami dan peduli atas hasil pengukuran kinerja.', 'tipe' => '2', 'keterangan' => NULL, 'active' => '1', 'nomor_urut' => '9.00'),
+							array('id_subkomponen' => '7', 'nama' => 'Dokumen Laporan Kinerja telah disusun.', 'tipe' => '1', 'keterangan' => 'Laporan Kinerja 2023', 'active' => '1', 'nomor_urut' => '1.00'),
+							array('id_subkomponen' => '7', 'nama' => 'Dokumen Laporan Kinerja telah disusun secara berkala.', 'tipe' => '1', 'keterangan' => 'Laporan Kinerja 2023', 'active' => '1', 'nomor_urut' => '2.00'),
+							array('id_subkomponen' => '7', 'nama' => 'Dokumen Laporan Kinerja telah diformalkan.', 'tipe' => '1', 'keterangan' => 'Laporan Kinerja 2023', 'active' => '1', 'nomor_urut' => '3.00'),
+							array('id_subkomponen' => '7', 'nama' => 'Dokumen Laporan Kinerja telah direviu.', 'tipe' => '1', 'keterangan' => 'Laporan Kinerja 2023', 'active' => '1', 'nomor_urut' => '4.00'),
+							array('id_subkomponen' => '7', 'nama' => 'Dokumen Laporan Kinerja telah dipublikasikan.', 'tipe' => '1', 'keterangan' => 'Screenshoot Laporan Kinerja 2023 pada website, esr, aplikasi sakip kab madiun (dokumen lainnya)', 'active' => '1', 'nomor_urut' => '5.00'),
+							array('id_subkomponen' => '7', 'nama' => 'Dokumen Laporan Kinerja telah disampaikan tepat waktu.', 'tipe' => '1', 'keterangan' => 'Laporan Kinerja 2023', 'active' => '1', 'nomor_urut' => '6.00'),
+							array('id_subkomponen' => '8', 'nama' => 'Dokumen Laporan Kinerja disusun secara berkualitas sesuai dengan standar.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'active' => '1', 'nomor_urut' => '1.00'),
+							array('id_subkomponen' => '8', 'nama' => 'Dokumen Laporan Kinerja telah mengungkap seluruh informasi tentang pencapaian kinerja.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'active' => '1', 'nomor_urut' => '2.00'),
+							array('id_subkomponen' => '8', 'nama' => 'Dokumen Laporan Kinerja telah menginfokan perbandingan realisasi kinerja dengan target tahunan.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'active' => '1', 'nomor_urut' => '3.00'),
+							array('id_subkomponen' => '8', 'nama' => 'Dokumen Laporan Kinerja telah menginfokan perbandingan realisasi kinerja dengan target jangka menengah.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'active' => '1', 'nomor_urut' => '4.00'),
+							array('id_subkomponen' => '8', 'nama' => 'Dokumen Laporan Kinerja telah menginfokan perbandingan realisasi kinerja dengan realisasi kinerja tahun-tahun sebelumnya.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'active' => '1', 'nomor_urut' => '5.00'),
+							array('id_subkomponen' => '8', 'nama' => 'Dokumen Laporan Kinerja telah menyajikan informasi keuangan yang terkait dengan pencapaian sasaran kinerja instansi.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'active' => '1', 'nomor_urut' => '6.00'),
+							array('id_subkomponen' => '8', 'nama' => 'Dokumen Laporan Kinerja telah menginfokan kualitas atas capaian kinerja beserta upaya nyata dan/atau hambatannya.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'active' => '1', 'nomor_urut' => '7.00'),
+							array('id_subkomponen' => '8', 'nama' => 'Dokumen Laporan Kinerja telah menginfokan efisiensi atas penggunaan sumber daya dalam mencapai kinerja.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'active' => '1', 'nomor_urut' => '8.00'),
+							array('id_subkomponen' => '8', 'nama' => 'Dokumen Laporan Kinerja telah menginfokan upaya perbaikan dan penyempurnaan kinerja ke depan (Rekomendasi perbaikan kinerja).', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'active' => '1', 'nomor_urut' => '9.00'),
+							array('id_subkomponen' => '9', 'nama' => 'Informasi dalam laporan kinerja selalu menjadi perhatian utama pimpinan (Bertanggung Jawab).', 'tipe' => '1', 'keterangan' => 'Laporan Kinerja 2023', 'active' => '1', 'nomor_urut' => '1.00'),
+							array('id_subkomponen' => '9', 'nama' => 'Penyajian informasi dalam laporan kinerja menjadi kepedulian seluruh pegawai.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'active' => '1', 'nomor_urut' => '2.00'),
+							array('id_subkomponen' => '9', 'nama' => 'Informasi dalam laporan kinerja berkala telah digunakan dalam penyesuaian aktivitas untuk mencapai kinerja.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'active' => '1', 'nomor_urut' => '3.00'),
+							array('id_subkomponen' => '9', 'nama' => 'Informasi dalam laporan kinerja berkala telah digunakan dalam penyesuaian penggunaan anggaran untuk mencapai kinerja.', 'tipe' => '2', 'keterangan' => '- Laporan Kinerja 2023,  - DPA 2024 (dokumen lainnya)', 'active' => '1', 'nomor_urut' => '4.00'),
+							array('id_subkomponen' => '9', 'nama' => 'Informasi dalam laporan kinerja telah digunakan dalam evaluasi pencapaian keberhasilan kinerja.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023, Evaluasi Internal 2023', 'active' => '1', 'nomor_urut' => '5.00'),
+							array('id_subkomponen' => '9', 'nama' => 'Informasi dalam laporan kinerja telah digunakan dalam penyesuaian perencanaan kinerja yang akan dihadapi berikutnya.', 'tipe' => '2', 'keterangan' => '- Laporan Kinerja 2023, rencana aksi 2024,  - DPA 2024 (dokumen lainnya)', 'active' => '1', 'nomor_urut' => '6.00'),
+							array('id_subkomponen' => '9', 'nama' => 'Informasi dalam laporan kinerja selalu mempengaruhi perubahan budaya kinerja organisasi.', 'tipe' => '2', 'keterangan' => '- Laporan Kinerja 2023, rencana aksi 2024, evaluasi internal 2024 dan 2023 - DPA 2024 (dokumen lainnya)', 'active' => '1', 'nomor_urut' => '7.00'),
+							array('id_subkomponen' => '10', 'nama' => 'Telah dilaksanakan Evaluasi Akuntabilitas Kinerja secara berkala.', 'tipe' => '1', 'keterangan' => 'Evaluasi Internal 2023 dan 2024', 'active' => '1', 'nomor_urut' => '1.00'),
+							array('id_subkomponen' => '11', 'nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan secara berjenjang.', 'tipe' => '2', 'keterangan' => 'Evaluasi Internal 2023 dan 2024', 'active' => '1', 'nomor_urut' => '1.00'),
+							array('id_subkomponen' => '11', 'nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan dengan pendalaman yang memadai.', 'tipe' => '2', 'keterangan' => 'Evaluasi Internal 2023 dan 2024', 'active' => '1', 'nomor_urut' => '2.00'),
+							array('id_subkomponen' => '11', 'nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan pada seluruh bidang di OPD.', 'tipe' => '2', 'keterangan' => 'Evaluasi Internal 2023 dan 2024', 'active' => '1', 'nomor_urut' => '3.00'),
+							array('id_subkomponen' => '11', 'nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan menggunakan Teknologi Informasi (Aplikasi).', 'tipe' => '2', 'keterangan' => 'Evaluasi Internal 2023 dan 2024', 'active' => '1', 'nomor_urut' => '4.00'),
+							array('id_subkomponen' => '12', 'nama' => 'Seluruh rekomendasi atas hasil evaluasi akuntabilitas kinerja (internal dan LHE SAKIP OPD) telah ditindaklanjuti.', 'tipe' => '2', 'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023', 'active' => '1', 'nomor_urut' => '1.00'),
+							array('id_subkomponen' => '12', 'nama' => 'Telah terjadi peningkatan implementasi SAKIP  (internal dan LHE SAKIP OPD) dengan melaksanakan tindak lanjut atas rekomendasi hasil evaluasi akuntabilitas kinerja.', 'tipe' => '2', 'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024', 'active' => '1', 'nomor_urut' => '2.00'),
+							array('id_subkomponen' => '12', 'nama' => 'Hasil Evaluasi Akuntabilitas Kinerja  (internal dan LHE SAKIP OPD) telah dimanfaatkan untuk perbaikan dan peningkatan akuntabilitas kinerja.', 'tipe' => '2', 'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024', 'active' => '1', 'nomor_urut' => '3.00'),
+							array('id_subkomponen' => '12', 'nama' => 'Hasil dari Evaluasi Akuntabilitas Kinerja  (internal dan LHE SAKIP OPD)telah dimanfaatkan dalam mendukung efektivitas dan efisiensi kinerja.', 'tipe' => '2', 'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024, DPA 2024', 'active' => '1', 'nomor_urut' => '4.00'),
+							array('id_subkomponen' => '12', 'nama' => 'Telah terjadi perbaikan dan peningkatan kinerja dengan memanfaatkan hasil evaluasi akuntabilitas kinerja  (internal dan LHE SAKIP OPD).', 'tipe' => '2', 'keterangan' => '- Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024, DPA 2024 - Dokumen lainnya (Inovasi, Prestasi)', 'active' => '1', 'nomor_urut' => '5.00')
+						);
+
+						$table_komponen = 'esakip_komponen';
+						$table_subkomponen = 'esakip_subkomponen';
+						$table_penilaian = 'esakip_komponen_penilaian';
+
+						foreach ($esakip_komponen as $komponen) {
+							$wpdb->insert($table_komponen, $komponen);
+						}
+						foreach ($esakip_subkomponen as $subkomponen) {
+							$wpdb->insert($table_subkomponen, $subkomponen);
+						}
+						foreach ($esakip_komponen_penilaian as $penilaian) {
+							$wpdb->insert($table_penilaian, $penilaian);
 						}
 					}
 
@@ -9330,12 +9388,23 @@ class Wp_Eval_Sakip_Public
 					ARRAY_A
 				);
 
+				$jadwal = $wpdb->get_results(
+					$wpdb->prepare("
+					SELECT 
+						*
+					FROM esakip_data_jadwal
+					WHERE id=%d
+					  AND status != 0
+					", $id_jadwal),
+					ARRAY_A
+				);
+
 				if (!empty($unit)) {
 					$tbody = '';
 					$counter = 1;
 					foreach ($unit as $kk => $vv) {
 						$detail_pengisian_lke = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Pengisian LKE ' . $vv['nama_skpd'],
+							'nama_page' => 'Halaman Pengisian LKE ' . $vv['nama_skpd'] . ' ' . $jadwal['nama_jadwal'],
 							'content' => '[pengisian_lke_sakip_per_skpd id_jadwal=' . $id_jadwal . ']',
 							'show_header' => 1,
 							'no_key' => 1,

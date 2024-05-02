@@ -6,7 +6,7 @@ if (!defined('WPINC')) {
 }
 
 $input = shortcode_atts(array(
-    'id_jadwal' => '',
+    'id_jadwal' => null,
 ), $atts);
 
 if (!empty($_GET) && !empty($_GET['id_skpd'])) {
@@ -21,13 +21,13 @@ $jadwal = $wpdb->get_row(
             *
         FROM esakip_data_jadwal
         WHERE id=%d
-          AND status=1
+          AND status!=0
     ", $input['id_jadwal']),
     ARRAY_A
 );
 
 if (empty($jadwal)) {
-    die("jadwal tidak tersedia");
+    die(print_r($wpdb->last_query . '[id_jadwal= ' . $input['id_jadwal']));
 }
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
