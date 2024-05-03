@@ -2311,6 +2311,7 @@ class Wp_Eval_Sakip_Public
 								'keterangan' => $keterangan,
 								'tahun_anggaran' => $tahunAnggaran,
 								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
 							),
 							array('%s', '%s', '%s', '%s', '%d')
 						);
@@ -2323,7 +2324,9 @@ class Wp_Eval_Sakip_Public
 						}
 					} else {
 						$opsi = array(
-							'keterangan' => $keterangan
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
 						);
 						if (!empty($_FILES['fileUpload'])) {
 							$opsi['dokumen'] = $upload['filename'];
@@ -2440,6 +2443,7 @@ class Wp_Eval_Sakip_Public
 								'keterangan' => $keterangan,
 								'tahun_anggaran' => $tahunAnggaran,
 								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
 							),
 							array('%s', '%s', '%s', '%s', '%d')
 						);
@@ -2452,7 +2456,9 @@ class Wp_Eval_Sakip_Public
 						}
 					} else {
 						$opsi = array(
-							'keterangan' => $keterangan
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
 						);
 						if (!empty($_FILES['fileUpload'])) {
 							$opsi['dokumen'] = $upload['filename'];
@@ -2569,6 +2575,7 @@ class Wp_Eval_Sakip_Public
 								'keterangan' => $keterangan,
 								'tahun_anggaran' => $tahunAnggaran,
 								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
 							),
 							array('%s', '%s', '%s', '%s', '%d')
 						);
@@ -2581,7 +2588,9 @@ class Wp_Eval_Sakip_Public
 						}
 					} else {
 						$opsi = array(
-							'keterangan' => $keterangan
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
 						);
 						if (!empty($_FILES['fileUpload'])) {
 							$opsi['dokumen'] = $upload['filename'];
@@ -2698,6 +2707,7 @@ class Wp_Eval_Sakip_Public
 								'keterangan' => $keterangan,
 								'tahun_anggaran' => $tahunAnggaran,
 								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
 							),
 							array('%s', '%s', '%s', '%s', '%d')
 						);
@@ -2710,7 +2720,9 @@ class Wp_Eval_Sakip_Public
 						}
 					} else {
 						$opsi = array(
-							'keterangan' => $keterangan
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
 						);
 						if (!empty($_FILES['fileUpload'])) {
 							$opsi['dokumen'] = $upload['filename'];
@@ -2827,6 +2839,7 @@ class Wp_Eval_Sakip_Public
 								'keterangan' => $keterangan,
 								'tahun_anggaran' => $tahunAnggaran,
 								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
 							),
 							array('%s', '%s', '%s', '%s', '%d')
 						);
@@ -2839,7 +2852,9 @@ class Wp_Eval_Sakip_Public
 						}
 					} else {
 						$opsi = array(
-							'keterangan' => $keterangan
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
 						);
 						if (!empty($_FILES['fileUpload'])) {
 							$opsi['dokumen'] = $upload['filename'];
@@ -2956,6 +2971,7 @@ class Wp_Eval_Sakip_Public
 								'keterangan' => $keterangan,
 								'tahun_anggaran' => $tahunAnggaran,
 								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
 							),
 							array('%s', '%s', '%s', '%s', '%d')
 						);
@@ -2968,7 +2984,9 @@ class Wp_Eval_Sakip_Public
 						}
 					} else {
 						$opsi = array(
-							'keterangan' => $keterangan
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
 						);
 						if (!empty($_FILES['fileUpload'])) {
 							$opsi['dokumen'] = $upload['filename'];
@@ -3085,6 +3103,7 @@ class Wp_Eval_Sakip_Public
 								'keterangan' => $keterangan,
 								'tahun_anggaran' => $tahunAnggaran,
 								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
 							),
 							array('%s', '%s', '%s', '%s', '%d')
 						);
@@ -3097,7 +3116,9 @@ class Wp_Eval_Sakip_Public
 						}
 					} else {
 						$opsi = array(
-							'keterangan' => $keterangan
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
 						);
 						if (!empty($_FILES['fileUpload'])) {
 							$opsi['dokumen'] = $upload['filename'];
@@ -3214,6 +3235,7 @@ class Wp_Eval_Sakip_Public
 								'keterangan' => $keterangan,
 								'tahun_anggaran' => $tahunAnggaran,
 								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
 							),
 							array('%s', '%s', '%s', '%s', '%d')
 						);
@@ -3226,7 +3248,9 @@ class Wp_Eval_Sakip_Public
 						}
 					} else {
 						$opsi = array(
-							'keterangan' => $keterangan
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
 						);
 						if (!empty($_FILES['fileUpload'])) {
 							$opsi['dokumen'] = $upload['filename'];
@@ -3343,6 +3367,7 @@ class Wp_Eval_Sakip_Public
 								'keterangan' => $keterangan,
 								'tahun_anggaran' => $tahunAnggaran,
 								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
 							),
 							array('%s', '%s', '%s', '%s', '%d')
 						);
@@ -3355,7 +3380,9 @@ class Wp_Eval_Sakip_Public
 						}
 					} else {
 						$opsi = array(
-							'keterangan' => $keterangan
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
 						);
 						if (!empty($_FILES['fileUpload'])) {
 							$opsi['dokumen'] = $upload['filename'];
@@ -3458,6 +3485,7 @@ class Wp_Eval_Sakip_Public
 								'keterangan' => $keterangan,
 								'tahun_anggaran' => $tahunAnggaran,
 								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
 							),
 							array('%s', '%s', '%s', '%s', '%d')
 						);
@@ -3470,7 +3498,9 @@ class Wp_Eval_Sakip_Public
 						}
 					} else {
 						$opsi = array(
-							'keterangan' => $keterangan
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
 						);
 						if (!empty($_FILES['fileUpload'])) {
 							$opsi['dokumen'] = $upload['filename'];
@@ -3573,6 +3603,7 @@ class Wp_Eval_Sakip_Public
 								'keterangan' => $keterangan,
 								'tahun_anggaran' => $tahunAnggaran,
 								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
 							),
 							array('%s', '%s', '%s', '%s', '%d')
 						);
@@ -3585,7 +3616,9 @@ class Wp_Eval_Sakip_Public
 						}
 					} else {
 						$opsi = array(
-							'keterangan' => $keterangan
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
 						);
 						if (!empty($_FILES['fileUpload'])) {
 							$opsi['dokumen'] = $upload['filename'];
@@ -3688,6 +3721,7 @@ class Wp_Eval_Sakip_Public
 								'keterangan' => $keterangan,
 								'id_jadwal' => $id_jadwal,
 								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
 							),
 							array('%s', '%s', '%s', '%s', '%d')
 						);
@@ -3700,7 +3734,9 @@ class Wp_Eval_Sakip_Public
 						}
 					} else {
 						$opsi = array(
-							'keterangan' => $keterangan
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
 						);
 						if (!empty($_FILES['fileUpload'])) {
 							$opsi['dokumen'] = $upload['filename'];
@@ -3803,6 +3839,7 @@ class Wp_Eval_Sakip_Public
 								'keterangan' => $keterangan,
 								'tahun_anggaran' => $tahunAnggaran,
 								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
 							),
 							array('%s', '%s', '%s', '%s', '%d')
 						);
@@ -3815,7 +3852,9 @@ class Wp_Eval_Sakip_Public
 						}
 					} else {
 						$opsi = array(
-							'keterangan' => $keterangan
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
 						);
 						if (!empty($_FILES['fileUpload'])) {
 							$opsi['dokumen'] = $upload['filename'];
@@ -3932,6 +3971,7 @@ class Wp_Eval_Sakip_Public
 								'keterangan' => $keterangan,
 								'id_jadwal' => $id_jadwal,
 								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
 							),
 							array('%s', '%s', '%s', '%s', '%d')
 						);
@@ -3944,7 +3984,9 @@ class Wp_Eval_Sakip_Public
 						}
 					} else {
 						$opsi = array(
-							'keterangan' => $keterangan
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
 						);
 						if (!empty($_FILES['fileUpload'])) {
 							$opsi['dokumen'] = $upload['filename'];
@@ -4061,6 +4103,7 @@ class Wp_Eval_Sakip_Public
 								'keterangan' => $keterangan,
 								'tahun_anggaran' => $tahunAnggaran,
 								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
 							),
 							array('%s', '%s', '%s', '%s', '%d')
 						);
@@ -4073,7 +4116,9 @@ class Wp_Eval_Sakip_Public
 						}
 					} else {
 						$opsi = array(
-							'keterangan' => $keterangan
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
 						);
 						if (!empty($_FILES['fileUpload'])) {
 							$opsi['dokumen'] = $upload['filename'];
@@ -6427,6 +6472,7 @@ class Wp_Eval_Sakip_Public
 											array('nama' => 'Setiap pegawai memahami dan peduli atas hasil pengukuran kinerja.', 'tipe' => '2', 'keterangan' => NULL, 'nomor_urut' => '9.00'),
 										)
 									)
+								)
 							),
 							array(
 								'id_jadwal' => $id_jadwal_baru,
@@ -6521,25 +6567,41 @@ class Wp_Eval_Sakip_Public
 									)
 								)
 							)
-						)
-					);
+						);
 
-					foreach ($design as $komponen) {
-						$wpdb->insert('esakip_komponen', $komponen);
-						$id_komponen_baru = $wpdb->insert_id;
+						foreach ($design as $komponen) {
+							$komponen_baru = array(
+								'id_jadwal' => $id_jadwal_baru,
+								'nomor_urut' => $komponen['nomor_urut'],
+								'nama' => $komponen['nama'],
+								'bobot' => $komponen['bobot'],
+							);
+							$wpdb->insert('esakip_komponen', $komponen_baru);
+							$id_komponen_baru = $wpdb->insert_id;
 
-						foreach ($komponen['data'] as $subkomponen) {
-							$subkomponen['id'] = $id_komponen_baru;
-							$wpdb->insert('esakip_subkomponen', $subkomponen);
-							$id_subkomponen_baru = $wpdb->insert_id;
+							foreach ($komponen['data'] as $subkomponen) {
+								$subkomponen_baru = array(
+									'id_komponen' => $id_komponen_baru,
+									'nomor_urut' => $subkomponen['nomor_urut'],
+									'nama' => $subkomponen['nama'],
+									'bobot' => $subkomponen['bobot'],
+								);
+								$wpdb->insert('esakip_subkomponen', $subkomponen_baru);
+								$id_subkomponen_baru = $wpdb->insert_id;
 
-							foreach ($subkomponen['data'] as $penilaian) {
-								$penilaian['id'] = $id_subkomponen_baru;
-								$wpdb->insert('esakip_komponen_penilaian', $penilaian);
+								foreach ($subkomponen['data'] as $penilaian) {
+									$komponen_penilaian_baru = array(
+										'id_subkomponen' => $id_subkomponen_baru,
+										'nomor_urut' => $penilaian['nomor_urut'],
+										'nama' => $penilaian['nama'],
+										'tipe' => $penilaian['tipe'],
+										'keterangan' => $penilaian['keterangan'],
+									);
+									$wpdb->insert('esakip_komponen_penilaian', $komponen_penilaian_baru);
+								}
 							}
 						}
 					}
-				}
 
 					$return = array(
 						'status'		=> 'success',
@@ -7238,6 +7300,7 @@ class Wp_Eval_Sakip_Public
 												<th class="text-center">Perangkat Daerah</th>
 												<th class="text-center">Nama Dokumen</th>
 												<th class="text-center">Keterangan</th>
+												<th class="text-center">Waktu Upload</th>
 												<th class="text-center">Aksi</th>
 											</tr>
 										</thead>
@@ -7254,6 +7317,7 @@ class Wp_Eval_Sakip_Public
 						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 						$btn .= '</div>';
 
+						$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
 						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
 
 						$tbodyUnset .= "</tr>";
@@ -7324,6 +7388,7 @@ class Wp_Eval_Sakip_Public
 												<th class="text-center">No</th>
 												<th class="text-center">Nama Dokumen</th>
 												<th class="text-center">Keterangan</th>
+												<th class="text-center">Waktu Upload</th>
 												<th class="text-center">Aksi</th>
 											</tr>
 										</thead>
@@ -7339,6 +7404,7 @@ class Wp_Eval_Sakip_Public
 						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 						$btn .= '</div>';
 
+						$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
 						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
 
 						$tbodyUnset .= "</tr>";
@@ -7404,6 +7470,7 @@ class Wp_Eval_Sakip_Public
 												<th class="text-center">No</th>
 												<th class="text-center">Nama Dokumen</th>
 												<th class="text-center">Keterangan</th>
+												<th class="text-center">Waktu Upload</th>
 												<th class="text-center">Aksi</th>
 											</tr>
 										</thead>
@@ -7419,6 +7486,7 @@ class Wp_Eval_Sakip_Public
 						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 						$btn .= '</div>';
 
+						$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
 						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
 
 						$tbodyUnset .= "</tr>";
@@ -7490,6 +7558,7 @@ class Wp_Eval_Sakip_Public
 												<th class="text-center">Perangkat Daerah</th>
 												<th class="text-center">Nama Dokumen</th>
 												<th class="text-center">Keterangan</th>
+												<th class="text-center">Waktu Upload</th>
 												<th class="text-center">Aksi</th>
 											</tr>
 										</thead>
@@ -7506,6 +7575,7 @@ class Wp_Eval_Sakip_Public
 						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 						$btn .= '</div>';
 
+						$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
 						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
 
 						$tbodyUnset .= "</tr>";
@@ -7674,6 +7744,7 @@ class Wp_Eval_Sakip_Public
 												<th class="text-center">Perangkat Daerah</th>
 												<th class="text-center">Nama Dokumen</th>
 												<th class="text-center">Keterangan</th>
+												<th class="text-center">Waktu Upload</th>
 												<th class="text-center">Aksi</th>
 											</tr>
 										</thead>
@@ -7690,6 +7761,7 @@ class Wp_Eval_Sakip_Public
 						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 						$btn .= '</div>';
 
+						$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
 						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
 
 						$tbodyUnset .= "</tr>";
@@ -7858,6 +7930,7 @@ class Wp_Eval_Sakip_Public
 												<th class="text-center">Perangkat Daerah</th>
 												<th class="text-center">Nama Dokumen</th>
 												<th class="text-center">Keterangan</th>
+												<th class="text-center">Waktu Upload</th>
 												<th class="text-center">Aksi</th>
 											</tr>
 										</thead>
@@ -7874,6 +7947,7 @@ class Wp_Eval_Sakip_Public
 						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 						$btn .= '</div>';
 
+						$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
 						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
 
 						$tbodyUnset .= "</tr>";
@@ -8041,6 +8115,7 @@ class Wp_Eval_Sakip_Public
 												<th class="text-center">Perangkat Daerah</th>
 												<th class="text-center">Nama Dokumen</th>
 												<th class="text-center">Keterangan</th>
+												<th class="text-center">Waktu Upload</th>
 												<th class="text-center">Aksi</th>
 											</tr>
 										</thead>
@@ -8057,6 +8132,7 @@ class Wp_Eval_Sakip_Public
 						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 						$btn .= '</div>';
 
+						$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
 						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
 
 						$tbodyUnset .= "</tr>";
@@ -8225,6 +8301,7 @@ class Wp_Eval_Sakip_Public
 												<th class="text-center">Perangkat Daerah</th>
 												<th class="text-center">Nama Dokumen</th>
 												<th class="text-center">Keterangan</th>
+												<th class="text-center">Waktu Upload</th>
 												<th class="text-center">Aksi</th>
 											</tr>
 										</thead>
@@ -8241,6 +8318,7 @@ class Wp_Eval_Sakip_Public
 						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 						$btn .= '</div>';
 
+						$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
 						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
 
 						$tbodyUnset .= "</tr>";
@@ -8408,6 +8486,7 @@ class Wp_Eval_Sakip_Public
 												<th class="text-center">Perangkat Daerah</th>
 												<th class="text-center">Nama Dokumen</th>
 												<th class="text-center">Keterangan</th>
+												<th class="text-center">Waktu Upload</th>
 												<th class="text-center">Aksi</th>
 											</tr>
 										</thead>
@@ -8424,6 +8503,7 @@ class Wp_Eval_Sakip_Public
 						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 						$btn .= '</div>';
 
+						$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
 						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
 
 						$tbodyUnset .= "</tr>";
@@ -8591,6 +8671,7 @@ class Wp_Eval_Sakip_Public
 												<th class="text-center">Perangkat Daerah</th>
 												<th class="text-center">Nama Dokumen</th>
 												<th class="text-center">Keterangan</th>
+												<th class="text-center">Waktu Upload</th>
 												<th class="text-center">Aksi</th>
 											</tr>
 										</thead>
@@ -8607,6 +8688,7 @@ class Wp_Eval_Sakip_Public
 						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 						$btn .= '</div>';
 
+						$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
 						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
 
 						$tbodyUnset .= "</tr>";
@@ -8774,6 +8856,7 @@ class Wp_Eval_Sakip_Public
 												<th class="text-center">Perangkat Daerah</th>
 												<th class="text-center">Nama Dokumen</th>
 												<th class="text-center">Keterangan</th>
+												<th class="text-center">Waktu Upload</th>
 												<th class="text-center">Aksi</th>
 											</tr>
 										</thead>
@@ -8790,6 +8873,7 @@ class Wp_Eval_Sakip_Public
 						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 						$btn .= '</div>';
 
+						$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
 						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
 
 						$tbodyUnset .= "</tr>";
@@ -8855,6 +8939,7 @@ class Wp_Eval_Sakip_Public
 												<th class="text-center">No</th>
 												<th class="text-center">Nama Dokumen</th>
 												<th class="text-center">Keterangan</th>
+												<th class="text-center">Waktu Upload</th>
 												<th class="text-center">Aksi</th>
 											</tr>
 										</thead>
@@ -8870,6 +8955,7 @@ class Wp_Eval_Sakip_Public
 						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 						$btn .= '</div>';
 
+						$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
 						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
 
 						$tbodyUnset .= "</tr>";
@@ -8935,6 +9021,7 @@ class Wp_Eval_Sakip_Public
 												<th class="text-center">No</th>
 												<th class="text-center">Nama Dokumen</th>
 												<th class="text-center">Keterangan</th>
+												<th class="text-center">Waktu Upload</th>
 												<th class="text-center">Aksi</th>
 											</tr>
 										</thead>
@@ -8950,6 +9037,7 @@ class Wp_Eval_Sakip_Public
 						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 						$btn .= '</div>';
 
+						$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
 						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
 
 						$tbodyUnset .= "</tr>";
@@ -9215,6 +9303,7 @@ class Wp_Eval_Sakip_Public
 												<th class="text-center">Perangkat Daerah</th>
 												<th class="text-center">Nama Dokumen</th>
 												<th class="text-center">Keterangan</th>
+												<th class="text-center">Waktu Upload</th>
 												<th class="text-center">Aksi</th>
 											</tr>
 										</thead>
@@ -9231,6 +9320,7 @@ class Wp_Eval_Sakip_Public
 						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 						$btn .= '</div>';
 
+						$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
 						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
 
 						$tbodyUnset .= "</tr>";
@@ -9302,6 +9392,7 @@ class Wp_Eval_Sakip_Public
 												<th class="text-center">Perangkat Daerah</th>
 												<th class="text-center">Nama Dokumen</th>
 												<th class="text-center">Keterangan</th>
+												<th class="text-center">Waktu Upload</th>
 												<th class="text-center">Aksi</th>
 											</tr>
 										</thead>
@@ -9318,6 +9409,7 @@ class Wp_Eval_Sakip_Public
 						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 						$btn .= '</div>';
 
+						$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
 						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
 
 						$tbodyUnset .= "</tr>";
@@ -9373,16 +9465,16 @@ class Wp_Eval_Sakip_Public
 
 				$unit = $wpdb->get_results(
 					$wpdb->prepare("
-					SELECT 
-						nama_skpd, 
-						id_skpd, 
-						kode_skpd, 
-						nipkepala 
-					FROM esakip_data_unit 
-					WHERE tahun_anggaran=%d
-					  AND active=1 
-					  AND is_skpd=1 
-					ORDER BY kode_skpd ASC
+						SELECT 
+							nama_skpd, 
+							id_skpd, 
+							kode_skpd, 
+							nipkepala 
+						FROM esakip_data_unit 
+						WHERE tahun_anggaran=%d
+						AND active=1 
+						AND is_skpd=1 
+						ORDER BY kode_skpd ASC
 					", $tahun_anggaran_sakip),
 					ARRAY_A
 				);
@@ -9907,6 +9999,7 @@ class Wp_Eval_Sakip_Public
 												<th class="text-center">Perangkat Daerah</th>
 												<th class="text-center">Nama Dokumen</th>
 												<th class="text-center">Keterangan</th>
+												<th class="text-center">Waktu Upload</th>
 												<th class="text-center">Aksi</th>
 											</tr>
 										</thead>
@@ -9923,6 +10016,7 @@ class Wp_Eval_Sakip_Public
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						$btn .= '</div>';
 
+						$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
 						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
 
 						$tbodyUnset .= "</tr>";
