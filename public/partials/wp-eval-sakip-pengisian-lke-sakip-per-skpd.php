@@ -72,6 +72,35 @@ $skpd = $wpdb->get_row(
         </div>
     </div>
 </div>
+
+
+<!-- Modal tambah komponen -->
+<div class="modal fade" id="tambahBuktiDukungModal" tabindex="-1" role="dialog" aria-labelledby="tambahBuktiDukungModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tambahBuktiDukungModalLabel">Tambah Bukti Dukung</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formTambahBuktiDukung">
+                    <input type="hidden" value="" id="idPenilaian" name="idPenilaian">
+                        <div class="form-group">
+                            <label for="linkBuktiDukung">Link Bukti Dukung</label>
+                            <input type="text" class="form-control" id="linkBuktiDukung" name="linkBuktiDukung">
+                        </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" onclick="submitBuktiDukung(); return false">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     jQuery(document).ready(function() {
         get_table_pengisian_sakip();
@@ -79,8 +108,13 @@ $skpd = $wpdb->get_row(
 
     function submitNilai(id, that) {
         let idSkpd = <?php echo $id_skpd; ?>;
-        let nilaiJawaban = that.value;
+        let nilaiJawaban = parseFloat(that.value);
         let idKomponenPenilaian = id;
+
+        if (![0, 0.25, 0.5, 0.75, 1].includes(nilaiJawaban)) {
+            alert("Nilai yang dimasukkan tidak valid!");
+            return;
+        }
 
         jQuery('#wrap-loading').show();
         jQuery.ajax({
@@ -88,7 +122,7 @@ $skpd = $wpdb->get_row(
             type: 'POST',
             data: {
                 action: 'tambah_nilai_lke',
-                id_skpd:idSkpd,
+                id_skpd: idSkpd,
                 id_komponen_penilaian: idKomponenPenilaian,
                 nilai: nilaiJawaban,
                 api_key: esakip.api_key
@@ -99,7 +133,85 @@ $skpd = $wpdb->get_row(
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
                     alert(response.message);
-                    alert("nilai adalah = " + nilai + " id adalah =" + id);
+                    get_table_pengisian_sakip();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }
+
+    function tambahBuktiDukung(id) {
+        jQuery('#wrap-loading').show();
+        jQuery('#idPenilaian').val(id);
+        jQuery('#linkBuktiDukung').val('');
+        jQuery('#tambahBuktiDukungModal').modal('show');
+        jQuery('#wrap-loading').hide();
+    }
+
+    // function editBuktiDukung(id, that) {
+    //     jQuery('#wrap-loading').show();
+    //     jQuery.ajax({
+    //         type: "POST",
+    //         url: esakip.url,
+    //         data: {
+    //             action: '',
+    //             api_key: esakip.api_key,
+    //             id: id
+    //         },
+    //         dataType: "json",
+    //         success: function(response) {
+    //             let data = response.data;
+    //             jQuery('#wrap-loading').hide();
+    //             if (response.status === 'success') {
+    //                 jQuery('#idKomponen').val('');
+    //             } else {
+    //                 console.error('Error:', response.message);
+    //             }
+    //         },
+    //         error: function(xhr, status, error) {
+    //             jQuery('#wrap-loading').hide();
+    //             console.error('AJAX Error:', status, error);
+    //         }
+    //     });
+    //     jQuery('#tambahBuktiDukungModal').modal('show');
+    // }
+
+    function submitBuktiDukung() {
+        let idSkpd = <?php echo $id_skpd; ?>;
+        let idKomponenPenilaian = jQuery('#idPenilaian').val();
+        if (idKomponenPenilaian == '') {
+            return alert('Komponen Penilaian tidak boleh kosong');
+        }
+
+        let buktiDukung = jQuery('#linkBuktiDukung').val();
+        if (buktiDukung == '') {
+            return alert('Link Bukti Dukung tidak boleh kosong');
+        }
+
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'tambah_bukti_dukung',
+                id_skpd: idSkpd,
+                id_komponen_penilaian: idKomponenPenilaian,
+                bukti_dukung: buktiDukung,
+                api_key: esakip.api_key
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    jQuery('#tambahBuktiDukungModal').modal('hide');
                     get_table_pengisian_sakip();
                 } else {
                     alert(response.message);
