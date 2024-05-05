@@ -7040,10 +7040,8 @@ class Wp_Eval_Sakip_Public
 							'nama_page' => 'Halaman Detail Dokumen dokumen_lainnya ' . $tahun_anggaran,
 							'content' => '[dokumen_detail_dokumen_lainnya tahun=' . $tahun_anggaran . ']',
 							'show_header' => 1,
-							'no_key' => 1,
 							'post_status' => 'private'
 						));
-						$detail_dokumen_lainnya['url'] .= '?1=1';
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
@@ -7476,10 +7474,8 @@ class Wp_Eval_Sakip_Public
 							'nama_page' => 'Halaman Detail Dokumen Perjanjian Kinerja ' . $tahun_anggaran,
 							'content' => '[dokumen_detail_perjanjian_kinerja tahun=' . $tahun_anggaran . ']',
 							'show_header' => 1,
-							'no_key' => 1,
 							'post_status' => 'private'
 						));
-						$detail_perjanjian_kinerja['url'] .= '?1=1';
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
@@ -7660,10 +7656,8 @@ class Wp_Eval_Sakip_Public
 							'nama_page' => 'Halaman Detail Dokumen Rencana Aksi ' . $tahun_anggaran,
 							'content' => '[dokumen_detail_rencana_aksi tahun=' . $tahun_anggaran . ']',
 							'show_header' => 1,
-							'no_key' => 1,
 							'post_status' => 'private'
 						));
-						$detail_rencana_aksi['url'] .= '?1=1';
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
@@ -7843,10 +7837,8 @@ class Wp_Eval_Sakip_Public
 							'nama_page' => 'Halaman Detail Dokumen Rencana Aksi ' . $tahun_anggaran,
 							'content' => '[dokumen_detail_iku tahun=' . $tahun_anggaran . ']',
 							'show_header' => 1,
-							'no_key' => 1,
 							'post_status' => 'private'
 						));
-						$detail_iku['url'] .= '?1=1';
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
@@ -8027,10 +8019,8 @@ class Wp_Eval_Sakip_Public
 							'nama_page' => 'Halaman Detail Dokumen Evaluasi Internal ' . $tahun_anggaran,
 							'content' => '[dokumen_detail_evaluasi_internal tahun=' . $tahun_anggaran . ']',
 							'show_header' => 1,
-							'no_key' => 1,
 							'post_status' => 'private'
 						));
-						$detail_evaluasi_internal['url'] .= '?1=1';
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
@@ -8210,10 +8200,8 @@ class Wp_Eval_Sakip_Public
 							'nama_page' => 'Halaman Detail Dokumen Pengukuran Kinerja ' . $tahun_anggaran,
 							'content' => '[dokumen_detail_pengukuran_kinerja tahun=' . $tahun_anggaran . ']',
 							'show_header' => 1,
-							'no_key' => 1,
 							'post_status' => 'private'
 						));
-						$detail_pengukuran_kinerja['url'] .= '?1=1';
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
@@ -8393,10 +8381,8 @@ class Wp_Eval_Sakip_Public
 							'nama_page' => 'Halaman Detail Dokumen Rencana Aksi ' . $tahun_anggaran,
 							'content' => '[dokumen_detail_pengukuran_rencana_aksi tahun=' . $tahun_anggaran . ']',
 							'show_header' => 1,
-							'no_key' => 1,
 							'post_status' => 'private'
 						));
-						$detail_pengukuran_rencana_aksi['url'] .= '?1=1';
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
@@ -8576,10 +8562,8 @@ class Wp_Eval_Sakip_Public
 							'nama_page' => 'Halaman Detail Dokumen Laporan Kinerja ' . $tahun_anggaran,
 							'content' => '[dokumen_detail_laporan_kinerja tahun=' . $tahun_anggaran . ']',
 							'show_header' => 1,
-							'no_key' => 1,
 							'post_status' => 'private'
 						));
-						$detail_laporan_kinerja['url'] .= '?1=1';
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
@@ -8920,10 +8904,8 @@ class Wp_Eval_Sakip_Public
 							'nama_page' => 'Halaman Detail Dokumen RENJA/RKT ' . $tahun_anggaran,
 							'content' => '[dokumen_detail_renja_rkt tahun=' . $tahun_anggaran . ']',
 							'show_header' => 1,
-							'no_key' => 1,
 							'post_status' => 'private'
 						));
-						$detail_renja['url'] .= '?1=1';
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
@@ -9017,10 +8999,8 @@ class Wp_Eval_Sakip_Public
 							'nama_page' => 'Halaman Detail Dokumen SKP ' . $tahun_anggaran,
 							'content' => '[dokumen_detail_skp tahun=' . $tahun_anggaran . ']',
 							'show_header' => 1,
-							'no_key' => 1,
 							'post_status' => 'private'
 						));
-						$detail_skp['url'] .= '?1=1';
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
@@ -9294,10 +9274,8 @@ class Wp_Eval_Sakip_Public
 							'nama_page' => 'Halaman Detail Dokumen RENSTRA ' . $id_jadwal,
 							'content' => '[upload_dokumen_renstra periode=' . $id_jadwal . ']',
 							'show_header' => 1,
-							'no_key' => 1,
 							'post_status' => 'private'
 						));
-						$detail_renstra['url'] .= '?1=1';
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
@@ -9407,10 +9385,8 @@ class Wp_Eval_Sakip_Public
 							'nama_page' => 'Halaman Pengisian LKE ' . $vv['nama_skpd'] . ' ' . $jadwal['nama_jadwal'],
 							'content' => '[pengisian_lke_sakip_per_skpd id_jadwal=' . $id_jadwal . ']',
 							'show_header' => 1,
-							'no_key' => 1,
 							'post_status' => 'private'
 						));
-						$detail_pengisian_lke['url'] .= '?1=1';
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
@@ -10025,7 +10001,7 @@ class Wp_Eval_Sakip_Public
 				'post_status' => 'private'
 			));
 			echo '
-				<ul class="daftar-tahun text_tengah">
+				<ul class="daftar-menu-sakip">
 					<li>' . $halaman_rpjmd . '</li>
 					<li>' . $halaman_renstra . '</li>
 					<li><a href="' . $renja_rkt['url'] . '" target="_blank" class="btn btn-primary">' . $renja_rkt['title'] . '</a></li>

@@ -46,6 +46,7 @@ class Esakip_Functions
             if (!empty($decode['skip'])) {
                 return;
             }
+            unset($_GET['key_sakip']);
 
             $key_db = md5(get_option(ESAKIP_APIKEY));
             $key = explode($key_db, $key);
@@ -62,14 +63,23 @@ class Esakip_Functions
             }
             if ($valid == 1) {
                 global $wp_query;
+                // print_r($wp_query);
+                // print_r($wp_query->queried_object); die('tes');
                 if (!empty($wp_query->queried_object)) {
                     if ($wp_query->queried_object->post_status == 'private') {
                         wp_update_post(array(
                             'ID'    =>  $wp_query->queried_object->ID,
                             'post_status'   =>  'publish'
                         ));
-                        die('<script>window.location =  window.location.href;</script>');
-                    } else {
+                        $custom_post = get_page($wp_query->queried_object->ID);
+                        $custom_post->custom_url = $_GET;
+                        $link = $this->get_link_post($custom_post);
+                        if (!empty($_GET['private'])) {
+                            die('<script>window.location =  "'.$link.'";</script>');
+                        } else {
+                            die('<script>window.location =  "'.$link.'"+"&private=1";</script>');
+                        }
+                    } else if (!empty($_GET['private'])) {
                         wp_update_post(array(
                             'ID'    =>  $wp_query->queried_object->ID,
                             'post_status'   =>  'private'
@@ -80,13 +90,23 @@ class Esakip_Functions
                     $sql = $wp_query->request;
                     $post = $wpdb->get_results($sql, ARRAY_A);
                     if (!empty($post)) {
+                        if (empty($post[0]['post_status'])) {
+                            return;
+                        }
                         if ($post[0]['post_status'] == 'private') {
                             wp_update_post(array(
                                 'ID'    =>  $post[0]['ID'],
                                 'post_status'   =>  'publish'
                             ));
-                            die('<script>window.location =  window.location.href;</script>');
-                        } else {
+                            $custom_post = get_page($post[0]['ID']);
+                            $custom_post->custom_url = $_GET;
+                            $link = $this->get_link_post($custom_post);
+                            if (!empty($_GET['private'])) {
+                                die('<script>window.location =  "'.$link.'";</script>');
+                            } else {
+                                die('<script>window.location =  "'.$link.'"+"&private=1";</script>');
+                            }
+                        } else if (!empty($_GET['private'])) {
                             wp_update_post(array(
                                 'ID'    =>  $post[0]['ID'],
                                 'post_status'   =>  'private'

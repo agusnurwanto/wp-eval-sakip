@@ -48,6 +48,11 @@
   width: 100%;
 }
 
+.daftar-menu-sakip {
+  max-width: 600px;
+  margin: auto;
+}
+
 .daftar-menu-sakip li {
   display: block;
   list-style: none;
