@@ -43,6 +43,16 @@ $skpd = $wpdb->get_row(
 ", $id_skpd, $tahun_anggaran_sakip),
     ARRAY_A
 );
+$user_id = um_user('ID');
+$user_meta = get_userdata($user_id);
+$can_verify = false;
+if (
+    in_array("admin_ortala", $user_meta->roles) ||
+    in_array("admin_bappeda", $user_meta->roles) ||
+    in_array("administrator", $user_meta->roles)
+) {
+    $can_verify = true;
+}
 ?>
 <style>
     .wrap-table {
@@ -62,20 +72,28 @@ $skpd = $wpdb->get_row(
                         <tr>
                             <th class="text-center" rowspan="2" colspan="4" style="vertical-align: middle;">Komponen/Sub Komponen</th>
                             <th class="text-center" rowspan="2" style="vertical-align: middle;">Bobot</th>
-                            <th class="text-center" colspan="3">Penilaian PD/Perangkat Daerah</th>
-                            <th class="text-center" rowspan="2" style="vertical-align: middle;">Bukti Dukung</th>
-                            <th class="text-center" rowspan="2" style="vertical-align: middle;">Keterangan OPD</th>
-                            <th class="text-center" colspan="3">Penilaian Evaluator</th>
-                            <th class="text-center" rowspan="2" style="vertical-align: middle;">Keterangan Penilai</th>
-                            <th class="text-center" rowspan="2" style="vertical-align: middle;">Aksi</th>
+                            <?php if (!$can_verify) : ?>
+                                <th class="text-center" colspan="3">Penilaian PD/Perangkat Daerah</th>
+                                <th class="text-center" rowspan="2" style="vertical-align: middle;">Bukti Dukung</th>
+                                <th class="text-center" rowspan="2" style="vertical-align: middle;">Keterangan OPD</th>
+                            <?php endif; ?>
+                            <?php if ($can_verify) : ?>
+                                <th class="text-center" colspan="3">Penilaian Evaluator</th>
+                                <th class="text-center" rowspan="2" style="vertical-align: middle;">Keterangan Penilai</th>
+                                <th class="text-center" rowspan="2" style="vertical-align: middle;">Aksi</th>
+                            <?php endif; ?>
                         </tr>
                         <tr>
-                            <th class="text-center">Jawaban</th>
-                            <th class="text-center">Nilai</th>
-                            <th class="text-center">%</th>
-                            <th class="text-center">Jawaban</th>
-                            <th class="text-center">Nilai</th>
-                            <th class="text-center">%</th>
+                            <?php if (!$can_verify) : ?>
+                                <th class="text-center">Jawaban</th>
+                                <th class="text-center">Nilai</th>
+                                <th class="text-center">%</th>
+                            <?php endif; ?>
+                            <?php if ($can_verify) : ?>
+                                <th class="text-center">Jawaban</th>
+                                <th class="text-center">Nilai</th>
+                                <th class="text-center">%</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>

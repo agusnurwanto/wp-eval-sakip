@@ -9696,6 +9696,9 @@ class Wp_Eval_Sakip_Public
 	public function get_table_pengisian_lke()
 	{
 		global $wpdb;
+		$user_id = um_user('ID');
+		$user_meta = get_userdata($user_id);
+
 		$ret = array(
 			'status' => 'success',
 			'message' => 'Berhasil get data!',
@@ -9720,8 +9723,17 @@ class Wp_Eval_Sakip_Public
 					ARRAY_A
 				);
 
+
 				$tbody = '';
 				if (!empty($data_komponen)) {
+					$can_verify = false;
+					if (
+						in_array("admin_ortala", $user_meta->roles) ||
+						in_array("admin_bappeda", $user_meta->roles) ||
+						in_array("administrator", $user_meta->roles)
+					) {
+						$can_verify = true;
+					}
 					$counter = 'A';
 					foreach ($data_komponen as $komponen) {
 						$counter_isi = 1;
@@ -9730,15 +9742,21 @@ class Wp_Eval_Sakip_Public
 						$tbody .= "<td class='text-left'>" . $counter++ . "</td>";
 						$tbody .= "<td class='text-left' colspan='3'><b>" . $komponen['nama'] . "</b></td>";
 						$tbody .= "<td class='text-center'>" . $komponen['bobot'] . "</td>";
-						$tbody .= "<td class='text-left'></td>";
-						$tbody .= "<td class='text-center'>0.00</td>";
-						$tbody .= "<td class='text-center'>0.00%</td>";
-						$tbody .= "<td class='text-center'></td>";
-						$tbody .= "<td class='text-center'></td>";
-						$tbody .= "<td class='text-center'></td>";
-						$tbody .= "<td class='text-center'>0.00</td>";
-						$tbody .= "<td class='text-center'>0.00%</td>";
-						$tbody .= "<td class='text-center'></td>";
+						switch ($can_verify) {
+							case false:
+								$tbody .= "<td class='text-left'></td>";
+								$tbody .= "<td class='text-center'>0.00</td>";
+								$tbody .= "<td class='text-center'>0.00%</td>";
+								$tbody .= "<td class='text-center'></td>";
+								$tbody .= "<td class='text-center'></td>";
+								break;
+							case true:
+								$tbody .= "<td class='text-center'></td>";
+								$tbody .= "<td class='text-center'>0.00</td>";
+								$tbody .= "<td class='text-center'>0.00%</td>";
+								$tbody .= "<td class='text-center'></td>";
+								break;
+						}
 						$tbody .= "<td class='text-center'></td>";
 						$tbody .= "</tr>";
 
@@ -9759,15 +9777,21 @@ class Wp_Eval_Sakip_Public
 								$tbody .= "<td class='text-left'>" . $counter_sub++ . "</td>";
 								$tbody .= "<td class='text-left' colspan='2'><b>" . $subkomponen['nama'] . "</b></td>";
 								$tbody .= "<td class='text-center'>" . $subkomponen['bobot'] . "</td>";
-								$tbody .= "<td class='text-left'></td>";
-								$tbody .= "<td class='text-center'>0.00</td>";
-								$tbody .= "<td class='text-center'>0.00%</td>";
-								$tbody .= "<td class='text-center'></td>";
-								$tbody .= "<td class='text-center'></td>";
-								$tbody .= "<td class='text-center'></td>";
-								$tbody .= "<td class='text-center'>0.00</td>";
-								$tbody .= "<td class='text-center'>0.00%</td>";
-								$tbody .= "<td class='text-center'></td>";
+								switch ($can_verify) {
+									case false:
+										$tbody .= "<td class='text-left'></td>";
+										$tbody .= "<td class='text-center'>0.00</td>";
+										$tbody .= "<td class='text-center'>0.00%</td>";
+										$tbody .= "<td class='text-center'></td>";
+										$tbody .= "<td class='text-center'></td>";
+										break;
+									case true:
+										$tbody .= "<td class='text-center'></td>";
+										$tbody .= "<td class='text-center'>0.00</td>";
+										$tbody .= "<td class='text-center'>0.00%</td>";
+										$tbody .= "<td class='text-center'></td>";
+										break;
+								}
 								$tbody .= "<td class='text-center'></td>";
 								$tbody .= "</tr>";
 
@@ -9806,10 +9830,8 @@ class Wp_Eval_Sakip_Public
 								);
 
 								if (!empty($data_komponen_penilaian)) {
-									$counter_data = 0;
 									foreach ($data_komponen_penilaian as $penilaian) {
 										//opsi jawaban usulan
-										$counter_data++;
 										$opsi = "<option value=''>Pilih Jawaban</option>";
 										if (isset($penilaian['pl_nilai_usulan'])) {
 											if ($penilaian['kp_tipe'] == 1) {
@@ -9876,8 +9898,11 @@ class Wp_Eval_Sakip_Public
 										} else {
 											$nilai_penetapan = "0.00";
 										}
-										$btn_save = "<button class='btn btn-primary' onclick='simpanPerubahan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan'><span class='dashicons dashicons-saved' ></span></button>";
-										$btn_save_penetapan = "<button class='btn btn-info' onclick='simpanPerubahanPenetapan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan Penetapan'><span class='dashicons dashicons-saved' ></span></button>";
+										if ($can_verify == true) {
+											$btn_save_penetapan = "<button class='btn btn-info' onclick='simpanPerubahanPenetapan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan Penetapan'><span class='dashicons dashicons-saved' ></span></button>";
+										} else {
+											$btn_save = "<button class='btn btn-primary' onclick='simpanPerubahan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan'><span class='dashicons dashicons-saved' ></span></button>";
+										}
 
 										$tbody .= "<tr>";
 										$tbody .= "<td class='text-left'></td>";
@@ -9885,15 +9910,21 @@ class Wp_Eval_Sakip_Public
 										$tbody .= "<td class='text-left'>" . $counter_isi++ . "</td>";
 										$tbody .= "<td class='text-left'>" . $penilaian['kp_nama'] . "<br><small class='text-muted'>" . $penilaian['kp_keterangan'] . "</small></td>";
 										$tbody .= "<td class='text-center'>-</td>";
-										$tbody .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "'>" . $opsi . "</select></td>";
-										$tbody .= "<td class='text-center'>" . $nilai_usulan . "</td>";
-										$tbody .= "<td class='text-center'></td>";
-										$tbody .= "<td class='text-center'><input type='text' id='buktiDukung" . $penilaian['kp_id'] . "' value='" . $penilaian['pl_bukti_dukung'] . "'></input></td>";
-										$tbody .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "'>" . $penilaian['pl_keterangan'] . "</textarea></td>";
-										$tbody .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "'>" . $opsi_penetapan . "</select></td>";
-										$tbody .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
-										$tbody .= "<td class='text-center'></td>";
-										$tbody .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'>" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
+										switch ($can_verify) {
+											case false:
+												$tbody .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "'>" . $opsi . "</select></td>";
+												$tbody .= "<td class='text-center'>" . $nilai_usulan . "</td>";
+												$tbody .= "<td class='text-center'></td>";
+												$tbody .= "<td class='text-center'><input type='text' id='buktiDukung" . $penilaian['kp_id'] . "' value='" . $penilaian['pl_bukti_dukung'] . "'></input></td>";
+												$tbody .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "'>" . $penilaian['pl_keterangan'] . "</textarea></td>";
+												break;
+											case true:
+												$tbody .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "'>" . $opsi_penetapan . "</select></td>";
+												$tbody .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
+												$tbody .= "<td class='text-center'></td>";
+												$tbody .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'>" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
+												break;
+										}
 										$tbody .= "<td class='text-center'>" . $btn_save . $btn_save_penetapan . "</td>";
 										$tbody .= "</tr>";
 									}
@@ -9999,7 +10030,7 @@ class Wp_Eval_Sakip_Public
 						$tbody .= "<td class='text-left' colspan='3'><b>" . $komponen['nama'] . "</b></td>";
 						$tbody .= "<td class='text-center'>" . $komponen['bobot'] . "</td>";
 						$tbody .= "<td class='text-left'></td>";
-						$tbody .= "<td class='text-left'>User Penilai: <b>".$user_penilai[$komponen['id_user_penilai']]."</b></td>";
+						$tbody .= "<td class='text-left'>User Penilai: <b>" . $user_penilai[$komponen['id_user_penilai']] . "</b></td>";
 						$tbody .= "<td class='text-center'>" . $btn . "</td>";
 						$tbody .= "</tr>";
 
@@ -10031,7 +10062,7 @@ class Wp_Eval_Sakip_Public
 								$tbody .= "<td class='text-left' colspan='2'><b>" . $subkomponen['nama'] . "</b></td>";
 								$tbody .= "<td class='text-center'>" . $subkomponen['bobot'] . "</td>";
 								$tbody .= "<td class='text-left'></td>";
-								$tbody .= "<td class='text-left'>User Penilai: <b>".$user_penilai[$subkomponen['id_user_penilai']]."</b></td>";
+								$tbody .= "<td class='text-left'>User Penilai: <b>" . $user_penilai[$subkomponen['id_user_penilai']] . "</b></td>";
 								$tbody .= "<td class='text-center'>" . $btn . "</td>";
 								$tbody .= "</tr>";
 

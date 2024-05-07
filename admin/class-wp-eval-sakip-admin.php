@@ -199,7 +199,7 @@ class Wp_Eval_Sakip_Admin
 								lama_pelaksanaan
 							FROM esakip_data_jadwal
 							WHERE tipe = %s
-							  AND status !=0",
+							  AND status =1",
 							'LKE'
 						),
 						ARRAY_A
