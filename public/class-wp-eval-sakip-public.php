@@ -6774,6 +6774,27 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($return));
 	}
 
+	public function delete_data_lokal_history($nama_tabel = 'esakip_pengisian_lke', $id_jadwal = 1)
+	{
+		global $wpdb;
+		$return = array(
+			'status' => 'error',
+			'message'	=> 'Format tidak sesuai!'
+		);
+
+		$nama_tabel_history = $nama_tabel . "_history";
+
+		$delete = $wpdb->delete($nama_tabel_history, array('id_jadwal' => $id_jadwal));
+		if ($delete == false) {
+			$return = array(
+				'status' 	=> 'error',
+				'message'	=> 'Delete error, harap hubungi admin!'
+			);
+		}
+
+		return $return;
+	}
+
 	/** Submit lock data jadwal RPJM */
 	public function lock_jadwal()
 	{
@@ -6817,10 +6838,37 @@ class Wp_Eval_Sakip_Public
 								'id'	=> $id
 							));
 
+							$delete_lokal_history = $this->delete_data_lokal_history('esakip_pengisian_lke', $data_this_id['id']);
+
+							$columns_1 = array(
+								'id_user',
+								'id_skpd',
+								'id_user_penilai',
+								'id_komponen',
+								'id_subkomponen',
+								'id_komponen_penilaian',
+								'nilai_usulan',
+								'nilai_penetapan',
+								'keterangan',
+								'keterangan_penilai',
+								'bukti_dukung',
+								'create_at',
+								'update_at'
+							);
+
+
+							$sql_backup_esakip_pengisian_lke =  "
+								INSERT INTO esakip_pengisian_lke" . $prefix . "_history (" . implode(', ', $columns_1) . ",id_asli,id_jadwal)
+								SELECT " . implode(', ', $columns_1) . ", " .$data_this_id['id'].",". $id . "
+											FROM esakip_pengisian_lke";
+
+							$queryRecords1 = $wpdb->query($sql_backup_esakip_pengisian_lke);
+
 							$return = array(
 								'status' => 'success',
 								'message'	=> 'Berhasil!',
-								'data_input' => $queryRecords1
+								'data_input' => $queryRecords1,
+								'sql' => $wpdb->last_query
 							);
 						} else {
 							$return = array(
