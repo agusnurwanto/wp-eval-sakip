@@ -25,9 +25,11 @@ if (empty($jadwal)) {
     die("jadwal tidak tersedia");
 }
 
-$user_penilai = '
-    
-';
+$user_penilai = $this->get_user_penilai();
+$user_penilai_html = '<option value="">Pilih user</option>';
+foreach($user_penilai as $key => $val){
+    $user_penilai_html .= '<option value="'.$key.'">'.$val.'</option>';
+}
 ?>
 <style>
     .transparent-button {
@@ -105,10 +107,7 @@ $user_penilai = '
                         <div class="form-group col-md-6">
                             <label for="userPenilai">User Penilai</label>
                             <select class="form-control" id="userPenilai" name="userPenilai" required>
-                                <option value="">Pilih user</option>
-                                <option value="1">Admin Inspektorat</option>
-                                <option value="2">Admin Perencanaan</option>
-                                <option value="3">Admin Organisasi</option>
+                                <?php echo $user_penilai_html; ?>
                             </select>
                         </div>
                     </div>
@@ -164,10 +163,7 @@ $user_penilai = '
                         <div class="form-group col-md-6">
                             <label for="userPenilai_sub">User Penilai</label>
                             <select class="form-control" id="userPenilai_sub" name="userPenilai_sub" required>
-                                <option value="">Pilih user</option>
-                                <option value="1">Admin Inspektorat</option>
-                                <option value="2">Admin Perencanaan</option>
-                                <option value="3">Admin Organisasi</option>
+                                <?php echo $user_penilai_html; ?>
                             </select>
                         </div>
                     </div>
@@ -687,7 +683,7 @@ $user_penilai = '
 
         let userPenilai_sub = jQuery("#userPenilai_sub").val();
         if (userPenilai_sub == '') {
-            return alert('Nomor Urut Sub Komponen tidak boleh kosong');
+            return alert('User Penilai Sub Komponen tidak boleh kosong');
         }
         jQuery('#wrap-loading').show();
         jQuery.ajax({

@@ -9920,6 +9920,15 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($ret));
 	}
 
+	public function get_user_penilai()
+	{
+		return array(
+			'1' => 'Admin Inspektorat',
+			'2' => 'Admin Perencanaan',
+			'3' => 'Admin Ortala'
+		);
+	}
+
 	public function get_table_desain_lke()
 	{
 		global $wpdb;
@@ -9957,7 +9966,8 @@ class Wp_Eval_Sakip_Public
 					", $id_jadwal)
 				);
 
-
+				$user_penilai = $this->get_user_penilai();
+				$user_penilai[''] = '-';
 				$tbody = '';
 				if (!empty($data_komponen)) {
 					$counter = 'A';
@@ -9988,7 +9998,7 @@ class Wp_Eval_Sakip_Public
 						$tbody .= "<td class='text-left' colspan='3'><b>" . $komponen['nama'] . "</b></td>";
 						$tbody .= "<td class='text-center'>" . $komponen['bobot'] . "</td>";
 						$tbody .= "<td class='text-left'></td>";
-						$tbody .= "<td class='text-left'></td>";
+						$tbody .= "<td class='text-left'>User Penilai: <b>".$user_penilai[$komponen['id_user_penilai']]."</b></td>";
 						$tbody .= "<td class='text-center'>" . $btn . "</td>";
 						$tbody .= "</tr>";
 
@@ -10020,7 +10030,7 @@ class Wp_Eval_Sakip_Public
 								$tbody .= "<td class='text-left' colspan='2'><b>" . $subkomponen['nama'] . "</b></td>";
 								$tbody .= "<td class='text-center'>" . $subkomponen['bobot'] . "</td>";
 								$tbody .= "<td class='text-left'></td>";
-								$tbody .= "<td class='text-left'></td>";
+								$tbody .= "<td class='text-left'>User Penilai: <b>".$user_penilai[$subkomponen['id_user_penilai']]."</b></td>";
 								$tbody .= "<td class='text-center'>" . $btn . "</td>";
 								$tbody .= "</tr>";
 
