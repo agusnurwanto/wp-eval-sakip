@@ -6377,11 +6377,13 @@ class Wp_Eval_Sakip_Public
 								'nama' => 'PERENCANAAN KINERJA DEFAULT',
 								'bobot' => '30',
 								'nomor_urut' => '1.00',
+								'id_user_penilai' => '1',
 								'data' => array(
 									array(
 										'nama' => 'PEMENUHAN',
 										'bobot' => '6',
 										'nomor_urut' => '1.00',
+										'id_user_penilai' => '1',
 										'data' => array(
 											array('nama' => 'Renstra telah disusun', 'tipe' => '1', 'keterangan' => 'Renstra OPD (2024-2026)', 'nomor_urut' => '1.00'),
 											array('nama' => 'Dokumen perencanaan kinerja tahunan (Renja) telah disusun', 'tipe' => '1', 'keterangan' => 'Renja 2023 dan 2024', 'nomor_urut' => '2.00'),
@@ -6395,6 +6397,7 @@ class Wp_Eval_Sakip_Public
 										'nama' => 'KUALITAS RENSTRA',
 										'bobot' => '9',
 										'nomor_urut' => '2.00',
+										'id_user_penilai' => '1',
 										'data' => array(
 											array('nama' => 'Dokumen Perencanaan Kinerja telah diformalkan.', 'tipe' => '1', 'keterangan' => 'Renstra dan Renja', 'nomor_urut' => '1.00'),
 											array('nama' => 'Renstra telah dipublikasikan tepat waktu', 'tipe' => '1', 'keterangan' => 'Screenshoot Renstra 2024-2026 di website OPD, esr dan aplikasi SAKIP', 'nomor_urut' => '2.00'),
@@ -6414,6 +6417,7 @@ class Wp_Eval_Sakip_Public
 										'nama' => 'IMPLEMENTASI',
 										'bobot' => '15',
 										'nomor_urut' => '3.00',
+										'id_user_penilai' => '1',
 										'data' => array(
 											array('nama' => 'Dokumen Renstra digunakan sebagai acuan penyusunan Dokumen Rencana Kerja dan Anggaran', 'tipe' => '2', 'keterangan' => '- Renstra OPD (2024-2026), Renja 2023 dan 2024, Rencana Aksi 2023 dan 2024 - DPA 2024 dan DPPA 2023 (di dokumen lainnya)', 'nomor_urut' => '1.00'),
 											array('nama' => 'Target jangka menengah dalam Renstra telah dimonitor pencapaiannya sampai dengan tahun berjalan', 'tipe' => '2', 'keterangan' => 'Renstra OPD (2024-2026), Laporan Kinerja 2023', 'nomor_urut' => '2.00'),
@@ -6431,11 +6435,13 @@ class Wp_Eval_Sakip_Public
 								'nama' => 'PENGUKURAN KINERJA',
 								'bobot' => '30',
 								'nomor_urut' => '2.00',
+								'id_user_penilai' => '2',
 								'data' => array(
 									array(
 										'nama' => 'PELAKSANAAN PENGUKURAN KINERJA',
 										'bobot' => '6',
 										'nomor_urut' => '1.00',
+										'id_user_penilai' => '2',
 										'data' => array(
 											array('nama' => 'Telah terdapat indikator kinerja utama (IKU) sebagai ukuran kinerja secara formal', 'tipe' => '1', 'keterangan' => 'Dokumen IKU 2024-2026', 'nomor_urut' => '1.00'),
 											array('nama' => 'Terdapat Definisi Operasional yang jelas atas kinerja dan cara mengukur indikator kinerja.', 'tipe' => '2', 'keterangan' => 'Dokumen IKU 2024-2026', 'nomor_urut' => '2.00'),
@@ -6446,6 +6452,7 @@ class Wp_Eval_Sakip_Public
 										'nama' => 'KUALITAS PENGUKURAN',
 										'bobot' => '9',
 										'nomor_urut' => '2.00',
+										'id_user_penilai' => '2',
 										'data' => array(
 											array('nama' => 'Pimpinan selalu terlibat sebagai pengambil keputusan (Decision Maker) dalam mengukur capaian kinerja.', 'tipe' => '2', 'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024', 'nomor_urut' => '1.00'),
 											array('nama' => 'Data kinerja yang dikumpulkan telah relevan untuk mengukur capaian kinerja yang diharapkan.', 'tipe' => '2', 'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024,  Laporan Kinerja 2023', 'nomor_urut' => '2.00'),
@@ -6460,6 +6467,7 @@ class Wp_Eval_Sakip_Public
 										'nama' => 'IMPLEMENTASI PENGUKURAN',
 										'bobot' => '15',
 										'nomor_urut' => '3.00',
+										'id_user_penilai' => '2',
 										'data' => array(
 											array('nama' => 'Pengukuran Kinerja telah menjadi dasar dalam penyesuaian (pemberian/pengurangan) tunjangan kinerja/penghasilan.', 'tipe' => '2', 'keterangan' => '- Pengukuran Kinerja 2023 dan 2024,  - Screenshoot EP3 (dokumen lainnya)', 'nomor_urut' => '1.00'),
 											array('nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian (Refocusing) Organisasi.', 'tipe' => '2', 'keterangan' => '- Pengukuran Kinerja 2023 dan 2024 - Screenshoot EP3 (dokumen lainnya)', 'nomor_urut' => '2.00'),
@@ -6479,11 +6487,13 @@ class Wp_Eval_Sakip_Public
 								'nama' => 'PELAPORAN KINERJA',
 								'bobot' => '15',
 								'nomor_urut' => '3.00',
+								'id_user_penilai' => '3',
 								'data' => array(
 									array(
 										'nama' => 'PEMENUHAN PELAPORAN',
 										'bobot' => '3',
 										'nomor_urut' => '1.00',
+										'id_user_penilai' => '3',
 										'data' => array(
 											array('nama' => 'Dokumen Laporan Kinerja telah disusun.', 'tipe' => '1', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '1.00'),
 											array('nama' => 'Dokumen Laporan Kinerja telah disusun secara berkala.', 'tipe' => '1', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '2.00'),
@@ -6498,6 +6508,7 @@ class Wp_Eval_Sakip_Public
 										'nama' => 'PENYAJIAN INFORMASI KINERJA',
 										'bobot' => '4.5',
 										'nomor_urut' => '2.00',
+										'id_user_penilai' => '3',
 										'data' => array(
 											array('nama' => 'Dokumen Laporan Kinerja disusun secara berkualitas sesuai dengan standar.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '1.00'),
 											array('nama' => 'Dokumen Laporan Kinerja telah mengungkap seluruh informasi tentang pencapaian kinerja.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '2.00'),
@@ -6515,6 +6526,7 @@ class Wp_Eval_Sakip_Public
 										'nama' => 'PEMANFAATAN INFORMASI KINERJA',
 										'bobot' => '7.5',
 										'nomor_urut' => '3.00',
+										'id_user_penilai' => '3',
 										'data' => array(
 											array('nama' => 'Informasi dalam laporan kinerja selalu menjadi perhatian utama pimpinan (Bertanggung Jawab).', 'tipe' => '1', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '1.00'),
 											array('nama' => 'Penyajian informasi dalam laporan kinerja menjadi kepedulian seluruh pegawai.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '2.00'),
@@ -6533,11 +6545,13 @@ class Wp_Eval_Sakip_Public
 								'nama' => 'EVALUASI AKUNTABILITAS KINERJA INTERNAL',
 								'bobot' => '25',
 								'nomor_urut' => '4.00',
+								'id_user_penilai' => '1',
 								'data' => array(
 									array(
 										'nama' => 'PELAKSANAAN EVALUASI AKUNTABILITAS KINERJA',
 										'bobot' => '5',
 										'nomor_urut' => '1.00',
+										'id_user_penilai' => '1',
 										'data' => array(
 											array('nama' => 'Telah dilaksanakan Evaluasi Akuntabilitas Kinerja secara berkala.', 'tipe' => '1', 'keterangan' => 'Evaluasi Internal 2023 dan 2024', 'nomor_urut' => '1.00'),
 										)
@@ -6546,6 +6560,7 @@ class Wp_Eval_Sakip_Public
 										'nama' => 'KUALITAS EVALUASI',
 										'bobot' => '7.5',
 										'nomor_urut' => '2.00',
+										'id_user_penilai' => '1',
 										'data' => array(
 											array('nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan secara berjenjang.', 'tipe' => '2', 'keterangan' => 'Evaluasi Internal 2023 dan 2024', 'nomor_urut' => '1.00'),
 											array('nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan dengan pendalaman yang memadai.', 'tipe' => '2', 'keterangan' => 'Evaluasi Internal 2023 dan 2024', 'nomor_urut' => '2.00'),
@@ -6557,6 +6572,7 @@ class Wp_Eval_Sakip_Public
 										'nama' => 'PEMANFAATAN EVALUASI',
 										'bobot' => '12.5',
 										'nomor_urut' => '3.00',
+										'id_user_penilai' => '1',
 										'data' => array(
 											array('nama' => 'Seluruh rekomendasi atas hasil evaluasi akuntabilitas kinerja (internal dan LHE SAKIP OPD) telah ditindaklanjuti.', 'tipe' => '2', 'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023', 'nomor_urut' => '1.00'),
 											array('nama' => 'Telah terjadi peningkatan implementasi SAKIP  (internal dan LHE SAKIP OPD) dengan melaksanakan tindak lanjut atas rekomendasi hasil evaluasi akuntabilitas kinerja.', 'tipe' => '2', 'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024', 'nomor_urut' => '2.00'),
@@ -6573,6 +6589,7 @@ class Wp_Eval_Sakip_Public
 							$komponen_baru = array(
 								'id_jadwal' => $id_jadwal_baru,
 								'nomor_urut' => $komponen['nomor_urut'],
+								'id_user_penilai' => $komponen['id_user_penilai'],
 								'nama' => $komponen['nama'],
 								'bobot' => $komponen['bobot'],
 							);
@@ -6583,6 +6600,7 @@ class Wp_Eval_Sakip_Public
 								$subkomponen_baru = array(
 									'id_komponen' => $id_komponen_baru,
 									'nomor_urut' => $subkomponen['nomor_urut'],
+									'id_user_penilai' => $subkomponen['id_user_penilai'],
 									'nama' => $subkomponen['nama'],
 									'bobot' => $subkomponen['bobot'],
 								);
@@ -10476,6 +10494,12 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Nomor Urut kosong!';
 				}
+				if (!empty($_POST['user_penilai'])) {
+					$user_penilai = $_POST['user_penilai'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'User Penilai kosong!';
+				}
 
 				if ($ret['status'] === 'success') {
 					if (!empty($id_komponen)) {
@@ -10533,6 +10557,7 @@ class Wp_Eval_Sakip_Public
 									'nama' => $nama_komponen,
 									'bobot' => $bobot_komponen,
 									'nomor_urut' => $nomor_urut,
+									'id_user_penilai' => $user_penilai,
 								),
 								array('id' => $id_komponen),
 								array('%s', '%f', '%f'),
@@ -10546,6 +10571,7 @@ class Wp_Eval_Sakip_Public
 									'nama' => $nama_komponen,
 									'bobot' => $bobot_komponen,
 									'nomor_urut' => $nomor_urut,
+									'id_user_penilai' => $user_penilai,
 									'active' => 1,
 								),
 								array('%d', '%s', '%f', '%f', '%d')
@@ -10607,6 +10633,12 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Nomor Urut kosong!';
 				}
+				if (!empty($_POST['user_penilai'])) {
+					$user_penilai = $_POST['user_penilai'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'User Penilai kosong!';
+				}
 
 				if ($ret['status'] === 'success') {
 					if (!empty($id_subkomponen)) {
@@ -10657,6 +10689,7 @@ class Wp_Eval_Sakip_Public
 									'nama' => $nama_subkomponen,
 									'bobot' => $bobot_subkomponen,
 									'nomor_urut' => $nomor_urut,
+									'id_user_penilai' => $user_penilai,
 								),
 								array('id' => $id_subkomponen),
 								array('%s', '%f', '%f'),
@@ -10670,6 +10703,7 @@ class Wp_Eval_Sakip_Public
 									'nama' => $nama_subkomponen,
 									'bobot' => $bobot_subkomponen,
 									'nomor_urut' => $nomor_urut,
+									'id_user_penilai' => $user_penilai,
 									'active' => 1,
 								),
 								array('%d', '%s', '%f', '%f', '%d')

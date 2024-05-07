@@ -24,6 +24,10 @@ $jadwal = $wpdb->get_row(
 if (empty($jadwal)) {
     die("jadwal tidak tersedia");
 }
+
+$user_penilai = '
+    
+';
 ?>
 <style>
     .transparent-button {
@@ -100,7 +104,12 @@ if (empty($jadwal)) {
                         </div>
                         <div class="form-group col-md-6">
                             <label for="userPenilai">User Penilai</label>
-                            <select class="form-control" id="userPenilai" name="userPenilai" required></select>
+                            <select class="form-control" id="userPenilai" name="userPenilai" required>
+                                <option value="">Pilih user</option>
+                                <option value="1">Admin Inspektorat</option>
+                                <option value="2">Admin Perencanaan</option>
+                                <option value="3">Admin Organisasi</option>
+                            </select>
                         </div>
                     </div>
                     <div class="form-row">
@@ -154,7 +163,12 @@ if (empty($jadwal)) {
                         </div>
                         <div class="form-group col-md-6">
                             <label for="userPenilai_sub">User Penilai</label>
-                            <select class="form-control" id="userPenilai_sub" name="userPenilai_sub" required></select>
+                            <select class="form-control" id="userPenilai_sub" name="userPenilai_sub" required>
+                                <option value="">Pilih user</option>
+                                <option value="1">Admin Inspektorat</option>
+                                <option value="2">Admin Perencanaan</option>
+                                <option value="3">Admin Organisasi</option>
+                            </select>
                         </div>
                     </div>
                     <div class="form-row">
@@ -609,6 +623,11 @@ if (empty($jadwal)) {
         if (nomorUrutKomponen == '') {
             return alert('Nomor Urut Komponen tidak boleh kosong');
         }
+
+        let userPenilai = jQuery("#userPenilai").val();
+        if (userPenilai == '') {
+            return alert('User Penilai tidak boleh kosong');
+        }
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -620,6 +639,7 @@ if (empty($jadwal)) {
                 nama_komponen: namaKomponen,
                 bobot_komponen: bobotKomponen,
                 nomor_urut: nomorUrutKomponen,
+                user_penilai: userPenilai,
                 api_key: esakip.api_key
             },
             dataType: 'json',
@@ -664,6 +684,11 @@ if (empty($jadwal)) {
         if (nomorUrutSubkomponen == '') {
             return alert('Nomor Urut Sub Komponen tidak boleh kosong');
         }
+
+        let userPenilai_sub = jQuery("#userPenilai_sub").val();
+        if (userPenilai_sub == '') {
+            return alert('Nomor Urut Sub Komponen tidak boleh kosong');
+        }
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -675,6 +700,7 @@ if (empty($jadwal)) {
                 nama_subkomponen: namaSubKomponen,
                 bobot_subkomponen: bobotSubKomponen,
                 nomor_urut: nomorUrutSubkomponen,
+                user_penilai: userPenilai_sub,
                 api_key: esakip.api_key
             },
             dataType: 'json',
