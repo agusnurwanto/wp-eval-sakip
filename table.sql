@@ -325,6 +325,7 @@ CREATE TABLE esakip_pengisian_lke_history (
   `id_skpd` int(11) NOT NULL,
   `id_user_penilai` int(11) DEFAULT NULL,
   `id_jadwal` int(11) NOT NULL,
+  `id_asli` int(11) NOT NULL,
   `id_komponen` int(11) NOT NULL,
   `id_subkomponen` int(11) NOT NULL,
   `id_komponen_penilaian` int(11) NOT NULL,
