@@ -340,6 +340,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_hapus_subkomponen_lke', $plugin_public, 'hapus_subkomponen_lke');
 		
 		$this->loader->add_action('wp_ajax_tambah_nilai_lke', $plugin_public, 'tambah_nilai_lke');
+		$this->loader->add_action('wp_ajax_tambah_nilai_penetapan_lke', $plugin_public, 'tambah_nilai_penetapan_lke');
 		$this->loader->add_action('wp_ajax_tambah_bukti_dukung', $plugin_public, 'tambah_bukti_dukung');
 
 		$this->loader->add_action('wp_ajax_get_table_skpd_pengisian_lke', $plugin_public, 'get_table_skpd_pengisian_lke');
