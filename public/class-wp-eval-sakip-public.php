@@ -6877,7 +6877,7 @@ class Wp_Eval_Sakip_Public
 
 							$sql_backup_esakip_pengisian_lke =  "
 								INSERT INTO esakip_pengisian_lke" . $prefix . "_history (" . implode(', ', $columns_1) . ",id_asli,id_jadwal)
-								SELECT " . implode(', ', $columns_1) . ", " .$data_this_id['id'].",". $id . "
+								SELECT " . implode(', ', $columns_1) . ", " . $data_this_id['id'] . "," . $id . "
 											FROM esakip_pengisian_lke";
 
 							$queryRecords1 = $wpdb->query($sql_backup_esakip_pengisian_lke);
@@ -9876,7 +9876,8 @@ class Wp_Eval_Sakip_Public
 										} else {
 											$nilai_penetapan = "0.00";
 										}
-										$btn_save = "<button class='btn btn-primary' onclick='simpanPerubahan(" . $penilaian['kp_id'] . ", this)' title='Simpan Perubahan'><span class='dashicons dashicons-saved' ></span></button>";
+										$btn_save = "<button class='btn btn-primary' onclick='simpanPerubahan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan'><span class='dashicons dashicons-saved' ></span></button>";
+										$btn_save_penetapan = "<button class='btn btn-info' onclick='simpanPerubahanPenetapan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan Penetapan'><span class='dashicons dashicons-saved' ></span></button>";
 
 										$tbody .= "<tr>";
 										$tbody .= "<td class='text-left'></td>";
@@ -9884,16 +9885,16 @@ class Wp_Eval_Sakip_Public
 										$tbody .= "<td class='text-left'>" . $counter_isi++ . "</td>";
 										$tbody .= "<td class='text-left'>" . $penilaian['kp_nama'] . "<br><small class='text-muted'>" . $penilaian['kp_keterangan'] . "</small></td>";
 										$tbody .= "<td class='text-center'>-</td>";
-										$tbody .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] ."'>" . $opsi . "</select></td>";
+										$tbody .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "'>" . $opsi . "</select></td>";
 										$tbody .= "<td class='text-center'>" . $nilai_usulan . "</td>";
 										$tbody .= "<td class='text-center'></td>";
-										$tbody .= "<td class='text-center'><input type='text'></input></td>";
-										$tbody .= "<td class='text-center'><textarea></textarea></td>";
-										$tbody .= "<td class='text-center'><select onchange='submitNilaiPenetapan(" . $penilaian['kp_id'] . ", this)'>" . $opsi_penetapan . "</select></td>";
+										$tbody .= "<td class='text-center'><input type='text' id='buktiDukung" . $penilaian['kp_id'] . "' value='" . $penilaian['pl_bukti_dukung'] . "'></input></td>";
+										$tbody .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "'>" . $penilaian['pl_keterangan'] . "</textarea></td>";
+										$tbody .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "'>" . $opsi_penetapan . "</select></td>";
 										$tbody .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
 										$tbody .= "<td class='text-center'></td>";
-										$tbody .= "<td class='text-center'><textarea></textarea></td>";
-										$tbody .= "<td class='text-center'>" . $btn_save . "</td>";
+										$tbody .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'>" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
+										$tbody .= "<td class='text-center'>" . $btn_save . $btn_save_penetapan . "</td>";
 										$tbody .= "</tr>";
 									}
 								}
@@ -11449,49 +11450,53 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Komponen Penilaian kosong!';
 				}
-				if (isset($_POST['nilai'])) {
-					$nilai = $_POST['nilai'];
+				if (isset($_POST['nilai_penetapan'])) {
+					$nilai_penetapan = $_POST['nilai_penetapan'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Nilai Penetapan kosong!';
 				}
+				if (isset($_POST['ket_penetapan'])) {
+					$ket_penetapan = $_POST['ket_penetapan'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Keterangan Penetapan kosong!';
+				}
+
+
 				$allowed_roles = array();
 				$existing_data = $wpdb->get_var(
 					$wpdb->prepare("
 						SELECT 
 							id
 						FROM esakip_pengisian_lke
-						WHERE id_user = %d 
-						  AND id_skpd = %d
+						WHERE id_skpd = %d
 						  AND id_komponen_penilaian = %d
-					", $id_user, $id_skpd, $id_komponen_penilaian)
+					", $id_skpd, $id_komponen_penilaian)
 				);
 				if ($existing_data) {
 					$updated = $wpdb->update(
 						'esakip_pengisian_lke',
 						array(
-							'nilai_penetapan' => $nilai,
+							'id_user_penilai' => $id_user,
+							'nilai_penetapan' => $nilai_penetapan,
+							'keterangan_penilai' => $ket_penetapan,
 							'update_at' => current_time('mysql')
 						),
 						array('id' => $existing_data),
-						array('%f', '%s'),
-						array('%d')
+						array('%d', '%f', '%s', '%s'),
 					);
 
 					if ($updated !== false) {
-						$ret['message'] = "Berhasil update nilai!";
+						$ret['message'] = "Berhasil tambah nilai penetapan!";
 					} else {
 						$ret['status'] = 'error';
-						$ret['message'] = "Gagal melakukan update nilai: " . $wpdb->last_error;
+						$ret['message'] = "Gagal melakukan update nilai penetapan: " . $wpdb->last_error;
 					}
 				} else {
-					$wpdb->insert(
-						'esakip_pengisian_lke',
-						array(
-							'id_user' => $id_user,
-							'id_skpd' => $id_skpd,
-							'id_komponen_penilaian' => $id_komponen_penilaian,
-							'nilai_penetapan' => $nilai,
-							'create_at' => current_time('mysql')
-						),
-						array('%d', '%d', '%d', '%f', '%s'),
+					$ret = array(
+						'status' => 'error',
+						'message' => 'Id Penilaian Tidak Ditemukan!'
 					);
 				}
 			} else {
@@ -11536,37 +11541,78 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Komponen Penilaian kosong!';
 				}
-				if (isset($_POST['nilai'])) {
-					$nilai = $_POST['nilai'];
+				if (isset($_POST['nilai_usulan'])) {
+					$nilai_usulan = $_POST['nilai_usulan'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Nilai Usulan kosong!';
 				}
+				if (!empty($_POST['ket_usulan'])) {
+					$ket_usulan = $_POST['ket_usulan'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Keterangan Usulan kosong!';
+				}
+				if (!empty($_POST['bukti_usulan'])) {
+					$bukti_usulan = $_POST['bukti_usulan'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Bukti Usulan kosong!';
+				}
+				$id_subkomponen = $wpdb->get_var(
+					$wpdb->prepare("
+						SELECT 
+							id_subkomponen
+						FROM esakip_komponen_penilaian
+						WHERE id = %d
+					", $id_komponen_penilaian)
+				);
+				if (!empty($id_subkomponen)) {
+					$id_komponen = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT 
+								id_komponen
+							FROM esakip_subkomponen
+							WHERE id = %d
+						", $id_subkomponen)
+					);
+					if (empty($id_subkomponen)) {
+						$ret['status'] = 'error';
+						$ret['message'] = 'ID Komponen kosong!';
+					}
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID Subomponen kosong!';
+				}
+
 				$allowed_roles = array();
 				$existing_data = $wpdb->get_var(
 					$wpdb->prepare("
 						SELECT 
 							id
 						FROM esakip_pengisian_lke
-						WHERE id_user = %d 
-						  AND id_skpd = %d
+						WHERE id_skpd = %d
 						  AND id_komponen_penilaian = %d
-					", $id_user, $id_skpd, $id_komponen_penilaian)
+					", $id_skpd, $id_komponen_penilaian)
 				);
 				if ($existing_data) {
 					$updated = $wpdb->update(
 						'esakip_pengisian_lke',
 						array(
-							'nilai_usulan' => $nilai,
+							'nilai_usulan' => $nilai_usulan,
+							'keterangan' => $ket_usulan,
+							'bukti_dukung' => $bukti_usulan,
 							'update_at' => current_time('mysql')
 						),
 						array('id' => $existing_data),
-						array('%f', '%s'),
-						array('%d')
+						array('%f', '%s', '%s', '%s'),
 					);
 
 					if ($updated !== false) {
-						$ret['message'] = "Berhasil update nilai!";
+						$ret['message'] = "Berhasil update nilai usulan!";
 					} else {
 						$ret['status'] = 'error';
-						$ret['message'] = "Gagal melakukan update nilai: " . $wpdb->last_error;
+						$ret['message'] = "Gagal melakukan update nilai usulan: " . $wpdb->last_error;
 					}
 				} else {
 					$wpdb->insert(
@@ -11574,101 +11620,15 @@ class Wp_Eval_Sakip_Public
 						array(
 							'id_user' => $id_user,
 							'id_skpd' => $id_skpd,
+							'id_komponen' => $id_komponen,
+							'id_subkomponen' => $id_subkomponen,
 							'id_komponen_penilaian' => $id_komponen_penilaian,
-							'nilai_usulan' => $nilai,
+							'keterangan' => $ket_usulan,
+							'nilai_usulan' => $nilai_usulan,
+							'bukti_dukung' => $bukti_usulan,
 							'create_at' => current_time('mysql')
 						),
-						array('%d', '%d', '%d', '%f', '%s'),
-					);
-				}
-			} else {
-				$ret = array(
-					'status' => 'error',
-					'message' => 'Api Key tidak sesuai!'
-				);
-			}
-		} else {
-			$ret = array(
-				'status' => 'error',
-				'message' => 'Format tidak sesuai!'
-			);
-		}
-
-		die(json_encode($ret));
-	}
-
-	public function tambah_bukti_dukung()
-	{
-		global $wpdb;
-		$ret = array(
-			'status' => 'success',
-			'message' => 'Berhasil tambah nilai!',
-		);
-
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$id_user = um_user('ID');
-				$user_meta = get_userdata($id_user);
-				$current_user = wp_get_current_user();
-
-				if (!empty($_POST['id_skpd'])) {
-					$id_skpd = $_POST['id_skpd'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
-				}
-				if (!empty($_POST['id_komponen_penilaian'])) {
-					$id_komponen_penilaian = $_POST['id_komponen_penilaian'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Id Komponen Penilaian kosong!';
-				}
-				if (!empty($_POST['bukti_dukung'])) {
-					$bukti_dukung = $_POST['bukti_dukung'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Bukti Dukung kosong!';
-				}
-				$allowed_roles = array();
-				$existing_data = $wpdb->get_var(
-					$wpdb->prepare("
-						SELECT 
-							id
-						FROM esakip_pengisian_lke
-						WHERE id_user = %d 
-						  AND id_skpd = %d
-						  AND id_komponen_penilaian = %d
-					", $id_user, $id_skpd, $id_komponen_penilaian)
-				);
-				if ($existing_data) {
-					$updated = $wpdb->update(
-						'esakip_pengisian_lke',
-						array(
-							'bukti_dukung' => $bukti_dukung,
-							'update_at' => current_time('mysql'),
-						),
-						array('id' => $existing_data),
-						array('%s', '%s'),
-						array('%d')
-					);
-
-					if ($updated !== false) {
-						$ret['message'] = "Berhasil update nilai!";
-					} else {
-						$ret['status'] = 'error';
-						$ret['message'] = "Gagal melakukan update nilai: " . $wpdb->last_error;
-					}
-				} else {
-					$wpdb->insert(
-						'esakip_pengisian_lke',
-						array(
-							'id_user' => $id_user,
-							'id_skpd' => $id_skpd,
-							'id_komponen_penilaian' => $id_komponen_penilaian,
-							'bukti_dukung' => $bukti_dukung,
-							'create_at' => current_time('mysql'),
-						),
-						array('%d', '%d', '%d', '%s', '%s'),
+						array('%d', '%d', '%d', '%s', '%f', '%s', '%s', '%s', '%s'),
 					);
 				}
 			} else {
