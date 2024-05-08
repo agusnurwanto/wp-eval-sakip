@@ -43,9 +43,18 @@ $skpd = $wpdb->get_row(
 ", $id_skpd, $tahun_anggaran_sakip),
     ARRAY_A
 );
+$current_user = wp_get_current_user();
+$can_verify = false;
+if (
+    in_array("admin_ortala", $current_user->roles) ||
+    in_array("admin_bappeda", $current_user->roles) ||
+    in_array("administrator", $current_user->roles)
+) {
+    $can_verify = true;
+}
 ?>
 <style>
-.wrap-table {
+    .wrap-table {
         overflow: auto;
         max-height: 100vh;
         width: 100%;
@@ -62,20 +71,28 @@ $skpd = $wpdb->get_row(
                         <tr>
                             <th class="text-center" rowspan="2" colspan="4" style="vertical-align: middle;">Komponen/Sub Komponen</th>
                             <th class="text-center" rowspan="2" style="vertical-align: middle;">Bobot</th>
-                            <th class="text-center" colspan="3">Penilaian PD/Perangkat Daerah</th>
-                            <th class="text-center" rowspan="2" style="vertical-align: middle;">Bukti Dukung</th> 
-                            <th class="text-center" rowspan="2" style="vertical-align: middle;">Keterangan OPD</th>
-                            <th class="text-center" colspan="3">Penilaian Evaluator</th>
-                            <th class="text-center" rowspan="2" style="vertical-align: middle;">Keterangan Penilai</th>
-                            <th class="text-center" rowspan="2" style="vertical-align: middle;">Aksi</th>
+                            <?php if (!$can_verify) : ?>
+                                <th class="text-center" colspan="3">Penilaian PD/Perangkat Daerah</th>
+                                <th class="text-center" rowspan="2" style="vertical-align: middle;">Bukti Dukung</th>
+                                <th class="text-center" rowspan="2" style="vertical-align: middle;">Keterangan OPD</th>
+                            <?php endif; ?>
+                            <?php if ($can_verify) : ?>
+                                <th class="text-center" colspan="3">Penilaian Evaluator</th>
+                                <th class="text-center" rowspan="2" style="vertical-align: middle;">Keterangan Evaluator</th>
+                                <th class="text-center" rowspan="2" style="vertical-align: middle;">Aksi</th>
+                            <?php endif; ?>
                         </tr>
                         <tr>
-                            <th class="text-center">Jawaban</th>
-                            <th class="text-center">Nilai</th>
-                            <th class="text-center">%</th>
-                            <th class="text-center">Jawaban</th>
-                            <th class="text-center">Nilai</th>
-                            <th class="text-center">%</th>
+                            <?php if (!$can_verify) : ?>
+                                <th class="text-center">Jawaban</th>
+                                <th class="text-center">Nilai</th>
+                                <th class="text-center">%</th>
+                            <?php endif; ?>
+                            <?php if ($can_verify) : ?>
+                                <th class="text-center">Jawaban</th>
+                                <th class="text-center">Nilai</th>
+                                <th class="text-center">%</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>
@@ -89,134 +106,6 @@ $skpd = $wpdb->get_row(
         jQuery(document).ready(function() {
             get_table_pengisian_sakip();
         })
-
-        function simpanPerubahan(id, that) {
-            // let answers = jQuery(that).closest('tr').attr('data-id');
-            alert(jQuery('#opsiUsulan' + id).val());
-        }
-
-        function submitNilai(id, that) {
-            let idSkpd = <?php echo $id_skpd; ?>;
-            let nilaiJawaban = parseFloat(that.value);
-            let idKomponenPenilaian = id;
-
-            if (![0, 0.25, 0.5, 0.75, 1].includes(nilaiJawaban)) {
-                alert("Nilai yang dimasukkan tidak valid!");
-                return;
-            }
-
-            jQuery('#wrap-loading').show();
-            jQuery.ajax({
-                url: esakip.url,
-                type: 'POST',
-                data: {
-                    action: 'tambah_nilai_lke',
-                    id_skpd: idSkpd,
-                    id_komponen_penilaian: idKomponenPenilaian,
-                    nilai: nilaiJawaban,
-                    api_key: esakip.api_key
-                },
-                dataType: 'json',
-                success: function(response) {
-                    console.log(response);
-                    jQuery('#wrap-loading').hide();
-                    if (response.status === 'success') {
-                        alert(response.message);
-                        get_table_pengisian_sakip();
-                    } else {
-                        alert(response.message);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    jQuery('#wrap-loading').hide();
-                    console.error(xhr.responseText);
-                    alert('Terjadi kesalahan saat mengirim data!');
-                }
-            });
-        }
-
-        function submitNilaiPenetapan(id, that) {
-            let idSkpd = <?php echo $id_skpd; ?>;
-            let nilaiJawaban = parseFloat(that.value);
-            let idKomponenPenilaian = id;
-
-            if (![0, 0.25, 0.5, 0.75, 1].includes(nilaiJawaban)) {
-                alert("Nilai yang dimasukkan tidak valid!");
-                return;
-            }
-
-            jQuery('#wrap-loading').show();
-            jQuery.ajax({
-                url: esakip.url,
-                type: 'POST',
-                data: {
-                    action: 'tambah_nilai_penetapan_lke',
-                    id_skpd: idSkpd,
-                    id_komponen_penilaian: idKomponenPenilaian,
-                    nilai: nilaiJawaban,
-                    api_key: esakip.api_key
-                },
-                dataType: 'json',
-                success: function(response) {
-                    console.log(response);
-                    jQuery('#wrap-loading').hide();
-                    if (response.status === 'success') {
-                        alert(response.message);
-                        get_table_pengisian_sakip();
-                    } else {
-                        alert(response.message);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    jQuery('#wrap-loading').hide();
-                    console.error(xhr.responseText);
-                    alert('Terjadi kesalahan saat mengirim data!');
-                }
-            });
-        }
-
-        function submitBuktiDukung() {
-            let idSkpd = <?php echo $id_skpd; ?>;
-            let idKomponenPenilaian = jQuery('#idPenilaian').val();
-            if (idKomponenPenilaian == '') {
-                return alert('Komponen Penilaian tidak boleh kosong');
-            }
-
-            let buktiDukung = jQuery('#linkBuktiDukung').val();
-            if (buktiDukung == '') {
-                return alert('Link Bukti Dukung tidak boleh kosong');
-            }
-
-            jQuery('#wrap-loading').show();
-            jQuery.ajax({
-                url: esakip.url,
-                type: 'POST',
-                data: {
-                    action: 'tambah_bukti_dukung',
-                    id_skpd: idSkpd,
-                    id_komponen_penilaian: idKomponenPenilaian,
-                    bukti_dukung: buktiDukung,
-                    api_key: esakip.api_key
-                },
-                dataType: 'json',
-                success: function(response) {
-                    console.log(response);
-                    jQuery('#wrap-loading').hide();
-                    if (response.status === 'success') {
-                        alert(response.message);
-                        jQuery('#tambahBuktiDukungModal').modal('hide');
-                        get_table_pengisian_sakip();
-                    } else {
-                        alert(response.message);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    jQuery('#wrap-loading').hide();
-                    console.error(xhr.responseText);
-                    alert('Terjadi kesalahan saat mengirim data!');
-                }
-            });
-        }
 
         function get_table_pengisian_sakip() {
             jQuery('#wrap-loading').show();
@@ -243,6 +132,119 @@ $skpd = $wpdb->get_row(
                     jQuery('#wrap-loading').hide();
                     console.error(xhr.responseText);
                     alert('Terjadi kesalahan saat memuat tabel!');
+                }
+            });
+        }
+
+        function simpanPerubahan(id) {
+            let nilaiUsulan = parseFloat(jQuery('#opsiUsulan' + id).val());
+            if (nilaiUsulan === '') {
+                return alert("Nilai Usulan Tidak Boleh Kosong!");
+            }
+            let ketUsulan = jQuery('#keteranganUsulan' + id).val();
+            if (ketUsulan == '') {
+                return alert("Keterangan Usulan Tidak Boleh Kosong!");
+            }
+            let buktiUsulan = jQuery('#buktiDukung' + id).val();
+            if (buktiUsulan == '') {
+                return alert("Bukti Usulan Tidak Boleh Kosong!");
+            }
+            let idSkpd = <?php echo $id_skpd; ?>;
+            if (idSkpd == '') {
+                return alert("ID SKPD Usulan Tidak Boleh Kosong!");
+            }
+            let idKomponenPenilaian = id;
+            if (idKomponenPenilaian == '') {
+                return alert("ID Komponen Penilaian Tidak Boleh Kosong!");
+            }
+
+            if (![0, 0.25, 0.5, 0.75, 1].includes(nilaiUsulan)) {
+                alert("Nilai yang dimasukkan tidak valid!");
+                return;
+            }
+
+            jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                url: esakip.url,
+                type: 'POST',
+                data: {
+                    action: 'tambah_nilai_lke',
+                    id_skpd: idSkpd,
+                    id_komponen_penilaian: idKomponenPenilaian,
+                    nilai_usulan: nilaiUsulan,
+                    ket_usulan: ketUsulan,
+                    bukti_usulan: buktiUsulan,
+                    api_key: esakip.api_key
+                },
+                dataType: 'json',
+                success: function(response) {
+                    console.log(response);
+                    jQuery('#wrap-loading').hide();
+                    if (response.status === 'success') {
+                        alert(response.message);
+                        get_table_pengisian_sakip();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    jQuery('#wrap-loading').hide();
+                    console.error(xhr.responseText);
+                    alert('Terjadi kesalahan saat mengirim data!');
+                }
+            });
+        }
+
+        function simpanPerubahanPenetapan(id) {
+            let nilaiPenetapan = parseFloat(jQuery('#opsiPenetapan' + id).val());
+            if (nilaiPenetapan === '') {
+                return alert("Nilai Penetapan Tidak Boleh Kosong!");
+            }
+            let ketPenetapan = jQuery('#keteranganPenetapan' + id).val();
+            if (ketPenetapan == '') {
+                return alert("Keterangan Penetapan Tidak Boleh Kosong!");
+            }
+            let idSkpd = <?php echo $id_skpd; ?>;
+            if (idSkpd == '') {
+                return alert("ID SKPD Penetapan Tidak Boleh Kosong!");
+            }
+            let idKomponenPenilaian = id;
+            if (idKomponenPenilaian == '') {
+                return alert("ID Komponen Penilaian Penetapan Tidak Boleh Kosong!");
+            }
+
+            if (![0, 0.25, 0.5, 0.75, 1].includes(nilaiPenetapan)) {
+                alert("Nilai yang dimasukkan tidak valid!");
+                return;
+            }
+
+            jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                url: esakip.url,
+                type: 'POST',
+                data: {
+                    action: 'tambah_nilai_penetapan_lke',
+                    id_skpd: idSkpd,
+                    id_komponen_penilaian: idKomponenPenilaian,
+                    nilai_penetapan: nilaiPenetapan,
+                    ket_penetapan: ketPenetapan,
+                    api_key: esakip.api_key
+                },
+                dataType: 'json',
+                success: function(response) {
+                    console.log(response);
+                    jQuery('#wrap-loading').hide();
+                    if (response.status === 'success') {
+                        alert(response.message);
+                        get_table_pengisian_sakip();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    jQuery('#wrap-loading').hide();
+                    console.error(xhr.responseText);
+                    alert('Terjadi kesalahan saat mengirim data!');
                 }
             });
         }

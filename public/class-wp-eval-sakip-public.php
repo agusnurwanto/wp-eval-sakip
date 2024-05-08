@@ -6380,11 +6380,13 @@ class Wp_Eval_Sakip_Public
 								'nama' => 'PERENCANAAN KINERJA DEFAULT',
 								'bobot' => '30',
 								'nomor_urut' => '1.00',
+								'id_user_penilai' => '1',
 								'data' => array(
 									array(
 										'nama' => 'PEMENUHAN',
 										'bobot' => '6',
 										'nomor_urut' => '1.00',
+										'id_user_penilai' => '1',
 										'data' => array(
 											array('nama' => 'Renstra telah disusun', 'tipe' => '1', 'keterangan' => 'Renstra OPD (2024-2026)', 'nomor_urut' => '1.00'),
 											array('nama' => 'Dokumen perencanaan kinerja tahunan (Renja) telah disusun', 'tipe' => '1', 'keterangan' => 'Renja 2023 dan 2024', 'nomor_urut' => '2.00'),
@@ -6398,6 +6400,7 @@ class Wp_Eval_Sakip_Public
 										'nama' => 'KUALITAS RENSTRA',
 										'bobot' => '9',
 										'nomor_urut' => '2.00',
+										'id_user_penilai' => '1',
 										'data' => array(
 											array('nama' => 'Dokumen Perencanaan Kinerja telah diformalkan.', 'tipe' => '1', 'keterangan' => 'Renstra dan Renja', 'nomor_urut' => '1.00'),
 											array('nama' => 'Renstra telah dipublikasikan tepat waktu', 'tipe' => '1', 'keterangan' => 'Screenshoot Renstra 2024-2026 di website OPD, esr dan aplikasi SAKIP', 'nomor_urut' => '2.00'),
@@ -6417,6 +6420,7 @@ class Wp_Eval_Sakip_Public
 										'nama' => 'IMPLEMENTASI',
 										'bobot' => '15',
 										'nomor_urut' => '3.00',
+										'id_user_penilai' => '1',
 										'data' => array(
 											array('nama' => 'Dokumen Renstra digunakan sebagai acuan penyusunan Dokumen Rencana Kerja dan Anggaran', 'tipe' => '2', 'keterangan' => '- Renstra OPD (2024-2026), Renja 2023 dan 2024, Rencana Aksi 2023 dan 2024 - DPA 2024 dan DPPA 2023 (di dokumen lainnya)', 'nomor_urut' => '1.00'),
 											array('nama' => 'Target jangka menengah dalam Renstra telah dimonitor pencapaiannya sampai dengan tahun berjalan', 'tipe' => '2', 'keterangan' => 'Renstra OPD (2024-2026), Laporan Kinerja 2023', 'nomor_urut' => '2.00'),
@@ -6434,11 +6438,13 @@ class Wp_Eval_Sakip_Public
 								'nama' => 'PENGUKURAN KINERJA',
 								'bobot' => '30',
 								'nomor_urut' => '2.00',
+								'id_user_penilai' => '2',
 								'data' => array(
 									array(
 										'nama' => 'PELAKSANAAN PENGUKURAN KINERJA',
 										'bobot' => '6',
 										'nomor_urut' => '1.00',
+										'id_user_penilai' => '2',
 										'data' => array(
 											array('nama' => 'Telah terdapat indikator kinerja utama (IKU) sebagai ukuran kinerja secara formal', 'tipe' => '1', 'keterangan' => 'Dokumen IKU 2024-2026', 'nomor_urut' => '1.00'),
 											array('nama' => 'Terdapat Definisi Operasional yang jelas atas kinerja dan cara mengukur indikator kinerja.', 'tipe' => '2', 'keterangan' => 'Dokumen IKU 2024-2026', 'nomor_urut' => '2.00'),
@@ -6449,6 +6455,7 @@ class Wp_Eval_Sakip_Public
 										'nama' => 'KUALITAS PENGUKURAN',
 										'bobot' => '9',
 										'nomor_urut' => '2.00',
+										'id_user_penilai' => '2',
 										'data' => array(
 											array('nama' => 'Pimpinan selalu terlibat sebagai pengambil keputusan (Decision Maker) dalam mengukur capaian kinerja.', 'tipe' => '2', 'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024', 'nomor_urut' => '1.00'),
 											array('nama' => 'Data kinerja yang dikumpulkan telah relevan untuk mengukur capaian kinerja yang diharapkan.', 'tipe' => '2', 'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024,  Laporan Kinerja 2023', 'nomor_urut' => '2.00'),
@@ -6463,6 +6470,7 @@ class Wp_Eval_Sakip_Public
 										'nama' => 'IMPLEMENTASI PENGUKURAN',
 										'bobot' => '15',
 										'nomor_urut' => '3.00',
+										'id_user_penilai' => '2',
 										'data' => array(
 											array('nama' => 'Pengukuran Kinerja telah menjadi dasar dalam penyesuaian (pemberian/pengurangan) tunjangan kinerja/penghasilan.', 'tipe' => '2', 'keterangan' => '- Pengukuran Kinerja 2023 dan 2024,  - Screenshoot EP3 (dokumen lainnya)', 'nomor_urut' => '1.00'),
 											array('nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian (Refocusing) Organisasi.', 'tipe' => '2', 'keterangan' => '- Pengukuran Kinerja 2023 dan 2024 - Screenshoot EP3 (dokumen lainnya)', 'nomor_urut' => '2.00'),
@@ -6482,11 +6490,13 @@ class Wp_Eval_Sakip_Public
 								'nama' => 'PELAPORAN KINERJA',
 								'bobot' => '15',
 								'nomor_urut' => '3.00',
+								'id_user_penilai' => '3',
 								'data' => array(
 									array(
 										'nama' => 'PEMENUHAN PELAPORAN',
 										'bobot' => '3',
 										'nomor_urut' => '1.00',
+										'id_user_penilai' => '3',
 										'data' => array(
 											array('nama' => 'Dokumen Laporan Kinerja telah disusun.', 'tipe' => '1', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '1.00'),
 											array('nama' => 'Dokumen Laporan Kinerja telah disusun secara berkala.', 'tipe' => '1', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '2.00'),
@@ -6501,6 +6511,7 @@ class Wp_Eval_Sakip_Public
 										'nama' => 'PENYAJIAN INFORMASI KINERJA',
 										'bobot' => '4.5',
 										'nomor_urut' => '2.00',
+										'id_user_penilai' => '3',
 										'data' => array(
 											array('nama' => 'Dokumen Laporan Kinerja disusun secara berkualitas sesuai dengan standar.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '1.00'),
 											array('nama' => 'Dokumen Laporan Kinerja telah mengungkap seluruh informasi tentang pencapaian kinerja.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '2.00'),
@@ -6518,6 +6529,7 @@ class Wp_Eval_Sakip_Public
 										'nama' => 'PEMANFAATAN INFORMASI KINERJA',
 										'bobot' => '7.5',
 										'nomor_urut' => '3.00',
+										'id_user_penilai' => '3',
 										'data' => array(
 											array('nama' => 'Informasi dalam laporan kinerja selalu menjadi perhatian utama pimpinan (Bertanggung Jawab).', 'tipe' => '1', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '1.00'),
 											array('nama' => 'Penyajian informasi dalam laporan kinerja menjadi kepedulian seluruh pegawai.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '2.00'),
@@ -6536,11 +6548,13 @@ class Wp_Eval_Sakip_Public
 								'nama' => 'EVALUASI AKUNTABILITAS KINERJA INTERNAL',
 								'bobot' => '25',
 								'nomor_urut' => '4.00',
+								'id_user_penilai' => '1',
 								'data' => array(
 									array(
 										'nama' => 'PELAKSANAAN EVALUASI AKUNTABILITAS KINERJA',
 										'bobot' => '5',
 										'nomor_urut' => '1.00',
+										'id_user_penilai' => '1',
 										'data' => array(
 											array('nama' => 'Telah dilaksanakan Evaluasi Akuntabilitas Kinerja secara berkala.', 'tipe' => '1', 'keterangan' => 'Evaluasi Internal 2023 dan 2024', 'nomor_urut' => '1.00'),
 										)
@@ -6549,6 +6563,7 @@ class Wp_Eval_Sakip_Public
 										'nama' => 'KUALITAS EVALUASI',
 										'bobot' => '7.5',
 										'nomor_urut' => '2.00',
+										'id_user_penilai' => '1',
 										'data' => array(
 											array('nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan secara berjenjang.', 'tipe' => '2', 'keterangan' => 'Evaluasi Internal 2023 dan 2024', 'nomor_urut' => '1.00'),
 											array('nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan dengan pendalaman yang memadai.', 'tipe' => '2', 'keterangan' => 'Evaluasi Internal 2023 dan 2024', 'nomor_urut' => '2.00'),
@@ -6560,6 +6575,7 @@ class Wp_Eval_Sakip_Public
 										'nama' => 'PEMANFAATAN EVALUASI',
 										'bobot' => '12.5',
 										'nomor_urut' => '3.00',
+										'id_user_penilai' => '1',
 										'data' => array(
 											array('nama' => 'Seluruh rekomendasi atas hasil evaluasi akuntabilitas kinerja (internal dan LHE SAKIP OPD) telah ditindaklanjuti.', 'tipe' => '2', 'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023', 'nomor_urut' => '1.00'),
 											array('nama' => 'Telah terjadi peningkatan implementasi SAKIP  (internal dan LHE SAKIP OPD) dengan melaksanakan tindak lanjut atas rekomendasi hasil evaluasi akuntabilitas kinerja.', 'tipe' => '2', 'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024', 'nomor_urut' => '2.00'),
@@ -6576,6 +6592,7 @@ class Wp_Eval_Sakip_Public
 							$komponen_baru = array(
 								'id_jadwal' => $id_jadwal_baru,
 								'nomor_urut' => $komponen['nomor_urut'],
+								'id_user_penilai' => $komponen['id_user_penilai'],
 								'nama' => $komponen['nama'],
 								'bobot' => $komponen['bobot'],
 							);
@@ -6586,6 +6603,7 @@ class Wp_Eval_Sakip_Public
 								$subkomponen_baru = array(
 									'id_komponen' => $id_komponen_baru,
 									'nomor_urut' => $subkomponen['nomor_urut'],
+									'id_user_penilai' => $subkomponen['id_user_penilai'],
 									'nama' => $subkomponen['nama'],
 									'bobot' => $subkomponen['bobot'],
 								);
@@ -6862,7 +6880,7 @@ class Wp_Eval_Sakip_Public
 
 							$sql_backup_esakip_pengisian_lke =  "
 								INSERT INTO esakip_pengisian_lke" . $prefix . "_history (" . implode(', ', $columns_1) . ",id_asli,id_jadwal)
-								SELECT " . implode(', ', $columns_1) . ", " .$data_this_id['id'].",". $id . "
+								SELECT " . implode(', ', $columns_1) . ", " . $data_this_id['id'] . "," . $id . "
 											FROM esakip_pengisian_lke";
 
 							$queryRecords1 = $wpdb->query($sql_backup_esakip_pengisian_lke);
@@ -9695,35 +9713,72 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Jadwal kosong!';
 				}
+				if (!empty($_POST['id_skpd'])) {
+					$id_skpd = $_POST['id_skpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id SKPD kosong!';
+				}
 				$data_komponen = $wpdb->get_results(
 					$wpdb->prepare("
 						SELECT * 
 						FROM esakip_komponen
 						WHERE id_jadwal = %d
 						  AND active = 1
+						ORDER BY nomor_urut ASC
 						", $id_jadwal),
 					ARRAY_A
 				);
+				$current_user = wp_get_current_user();
 
 				$tbody = '';
 				if (!empty($data_komponen)) {
+					$can_verify = false;
+					if (
+						in_array("admin_ortala", $current_user->roles) ||
+						in_array("admin_bappeda", $current_user->roles) ||
+						in_array("administrator", $current_user->roles)
+					) {
+						$can_verify = true;
+					}
+
 					$counter = 'A';
 					foreach ($data_komponen as $komponen) {
+						$sum_nilai_sub = 0;
+						if ($sum_nilai_sub == 0) {
+							$persentase_kom = 0;
+						} else {
+							$persentase_kom = $sum_nilai_sub / $komponen['bobot'];
+						}
+
+						$sum_nilai_sub_penetapan = 0;
+						if ($sum_nilai_sub_penetapan == 0) {
+							$persentase_kom_penetapan = 0;
+						} else {
+							$persentase_kom_penetapan = $sum_nilai_sub_penetapan / $komponen['bobot'];
+						}
+
 						$counter_isi = 1;
 						$counter_sub = 'a';
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-left'>" . $counter++ . "</td>";
 						$tbody .= "<td class='text-left' colspan='3'><b>" . $komponen['nama'] . "</b></td>";
 						$tbody .= "<td class='text-center'>" . $komponen['bobot'] . "</td>";
-						$tbody .= "<td class='text-left'></td>";
-						$tbody .= "<td class='text-center'>0.00</td>";
-						$tbody .= "<td class='text-center'>0.00%</td>";
-						$tbody .= "<td class='text-center'></td>";
-						$tbody .= "<td class='text-center'></td>";
-						$tbody .= "<td class='text-center'></td>";
-						$tbody .= "<td class='text-center'>0.00</td>";
-						$tbody .= "<td class='text-center'>0.00%</td>";
-						$tbody .= "<td class='text-center'></td>";
+						switch ($can_verify) {
+							case false:
+								$tbody .= "<td class='text-left'></td>";
+								$tbody .= "<td class='text-center'>" . $sum_nilai_sub . "</td>";
+								$tbody .= "<td class='text-center'>" . $persentase_kom . "%" . "</td>";
+								$tbody .= "<td class='text-center'></td>";
+								$tbody .= "<td class='text-center'></td>";
+								break;
+							case true:
+								$tbody .= "<td class='text-center'></td>";
+								$tbody .= "<td class='text-center'>" . $sum_nilai_sub_penetapan . "</td>";
+								$tbody .= "<td class='text-center'>" . $persentase_kom_penetapan . "%" . "</td>";
+								$tbody .= "<td class='text-center'></td>";
+								break;
+						}
 						$tbody .= "<td class='text-center'></td>";
 						$tbody .= "</tr>";
 
@@ -9733,32 +9788,94 @@ class Wp_Eval_Sakip_Public
 								FROM esakip_subkomponen
 								WHERE id_komponen = %d
 								  AND active = 1
+								ORDER BY nomor_urut ASC
 								", $komponen['id']),
 							ARRAY_A
 						);
 
 						if (!empty($data_subkomponen)) {
 							foreach ($data_subkomponen as $subkomponen) {
+								$sum_nilai_usulan = $wpdb->get_var(
+									$wpdb->prepare("
+										SELECT SUM(nilai_usulan)
+										FROM esakip_pengisian_lke
+										WHERE id_subkomponen = %d
+										  AND id_skpd = %d
+									", $subkomponen['id'], $id_skpd));
+								$count_nilai_usulan = $wpdb->get_var(
+									$wpdb->prepare("
+										SELECT COUNT(id)
+										FROM esakip_pengisian_lke
+										WHERE id_subkomponen = %d
+										  AND id_skpd = %d
+									", $subkomponen['id'], $id_skpd));
+
+								if ($count_nilai_usulan == 0) {
+									$persentase = 0;
+								} else {
+									$persentase = $sum_nilai_usulan / $count_nilai_usulan;
+								}
+
+								$total_nilai_sub = $persentase * $subkomponen['bobot'];
+								$sum_nilai_sub + $total_nilai_sub;
+
+								$sum_nilai_penetapan = $wpdb->get_var(
+									$wpdb->prepare("
+										SELECT SUM(nilai_penetapan)
+										FROM esakip_pengisian_lke
+										WHERE id_subkomponen = %d
+										  AND id_skpd = %d
+									", $subkomponen['id'], $id_skpd));
+								$count_nilai_penetapan = $wpdb->get_var(
+									$wpdb->prepare("
+										SELECT COUNT(id)
+										FROM esakip_pengisian_lke
+										WHERE id_subkomponen = %d
+										  AND id_skpd = %d
+									", $subkomponen['id'], $id_skpd));
+
+								if ($count_nilai_penetapan == 0) {
+									$persentase_penetapan = 0;
+								} else {
+									$persentase_penetapan = $sum_nilai_penetapan / $count_nilai_penetapan;
+								}
+
+								$total_nilai_sub_penetapan = $persentase_penetapan * $subkomponen['bobot'];
+								$sum_nilai_sub_penetapan + $total_nilai_sub_penetapan;
+
 								$tbody .= "<tr>";
 								$tbody .= "<td class='text-left'></td>";
 								$tbody .= "<td class='text-left'>" . $counter_sub++ . "</td>";
 								$tbody .= "<td class='text-left' colspan='2'><b>" . $subkomponen['nama'] . "</b></td>";
 								$tbody .= "<td class='text-center'>" . $subkomponen['bobot'] . "</td>";
-								$tbody .= "<td class='text-left'></td>";
-								$tbody .= "<td class='text-center'>0.00</td>";
-								$tbody .= "<td class='text-center'>0.00%</td>";
-								$tbody .= "<td class='text-center'></td>";
-								$tbody .= "<td class='text-center'></td>";
-								$tbody .= "<td class='text-center'></td>";
-								$tbody .= "<td class='text-center'>0.00</td>";
-								$tbody .= "<td class='text-center'>0.00%</td>";
-								$tbody .= "<td class='text-center'></td>";
+								switch ($can_verify) {
+									case false:
+										$tbody .= "<td class='text-left'></td>";
+										$tbody .= "<td class='text-center'>" . $total_nilai_sub . "</td>";
+										$tbody .= "<td class='text-center'>" . $persentase . "%" . "</td>";
+										$tbody .= "<td class='text-center'></td>";
+										$tbody .= "<td class='text-center'></td>";
+										break;
+									case true:
+										$tbody .= "<td class='text-center'></td>";
+										$tbody .= "<td class='text-center'>0.00</td>";
+										$tbody .= "<td class='text-center'>0.00%</td>";
+										$tbody .= "<td class='text-center'></td>";
+										break;
+								}
 								$tbody .= "<td class='text-center'></td>";
 								$tbody .= "</tr>";
 
 								$data_komponen_penilaian = $wpdb->get_results(
 									$wpdb->prepare("
 										SELECT 
+											kp.id AS kp_id,
+											kp.id_subkomponen AS kp_id_subkomponen,
+											kp.nomor_urut AS kp_nomor_urut,
+											kp.nama AS kp_nama,
+											kp.tipe AS kp_tipe,
+											kp.keterangan AS kp_keterangan,
+											kp.active AS kp_active,
 											pl.id AS pl_id,
 											pl.id_user AS pl_id_user,
 											pl.id_skpd AS pl_id_skpd,
@@ -9773,112 +9890,116 @@ class Wp_Eval_Sakip_Public
 											pl.bukti_dukung AS pl_bukti_dukung,
 											pl.create_at AS pl_create_at,
 											pl.update_at AS pl_update_at,
-											pl.active AS pl_active,
-											kp.id AS kp_id,
-											kp.id_subkomponen AS kp_id_subkomponen,
-											kp.nomor_urut AS kp_nomor_urut,
-											kp.nama AS kp_nama,
-											kp.tipe AS kp_tipe,
-											kp.keterangan AS kp_keterangan,
-											kp.active AS kp_active
+											pl.active AS pl_active
 										FROM esakip_komponen_penilaian AS kp
 										LEFT JOIN esakip_pengisian_lke AS pl 
-											ON kp.id = pl.id_komponen_penilaian
+											ON kp.id = pl.id_komponen_penilaian AND pl.id_skpd = %d
 										WHERE kp.id_subkomponen = %d
-										AND kp.active = 1
-									", $subkomponen['id']),
+										  AND kp.active = 1
+										ORDER BY kp.nomor_urut ASC
+									",  $id_skpd, $subkomponen['id']),
 									ARRAY_A
 								);
 
 								if (!empty($data_komponen_penilaian)) {
-									$counter_data = 0;
 									foreach ($data_komponen_penilaian as $penilaian) {
-										//opsi jawaban usulan
-										$counter_data++;
-										$opsi = "<option value=''>Pilih Jawaban</option>";
-										if (isset($penilaian['pl_nilai_usulan'])) {
-											if ($penilaian['kp_tipe'] == 1) {
-												$opsi .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 1 ? " selected" : "") . ">Y</option>";
-												$opsi .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0 ? " selected" : "") . ">T</option>";
-											} else if ($penilaian['kp_tipe'] == 2) {
-												$opsi .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 1 ? " selected" : "") . ">A</option>";
-												$opsi .= "<option value='0.75' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0.75 ? " selected" : "") . ">B</option>";
-												$opsi .= "<option value='0.5' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0.5 ? " selected" : "") . ">C</option>";
-												$opsi .= "<option value='0.25' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0.25 ? " selected" : "") . ">D</option>";
-												$opsi .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0 ? " selected" : "") . ">E</option>";
-											}
-										} else {
-											$opsi = "<option value=''>Pilih Jawaban</option>";
-											if ($penilaian['kp_tipe'] == 1) {
-												$opsi .= "<option value='1' class='text-center'>Y</option>";
-												$opsi .= "<option value='0' class='text-center'>T</option>";
-											} else if ($penilaian['kp_tipe'] == 2) {
-												$opsi .= "<option value='1' class='text-center'>A</option>";
-												$opsi .= "<option value='0.75' class='text-center'>B</option>";
-												$opsi .= "<option value='0.5' class='text-center'>C</option>";
-												$opsi .= "<option value='0.25' class='text-center'>D</option>";
-												$opsi .= "<option value='0' class='text-center'>E</option>";
-											}
+										switch ($can_verify) {
+											case false:
+												//opsi jawaban usulan
+												$opsi = "<option value=''>Pilih Jawaban</option>";
+												if (isset($penilaian['pl_nilai_usulan'])) {
+													if ($penilaian['kp_tipe'] == 1) {
+														$opsi .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 1 ? " selected" : "") . ">Y</option>";
+														$opsi .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0 ? " selected" : "") . ">T</option>";
+													} else if ($penilaian['kp_tipe'] == 2) {
+														$opsi .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 1 ? " selected" : "") . ">A</option>";
+														$opsi .= "<option value='0.75' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0.75 ? " selected" : "") . ">B</option>";
+														$opsi .= "<option value='0.5' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0.5 ? " selected" : "") . ">C</option>";
+														$opsi .= "<option value='0.25' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0.25 ? " selected" : "") . ">D</option>";
+														$opsi .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0 ? " selected" : "") . ">E</option>";
+													}
+												} else {
+													$opsi = "<option value=''>Pilih Jawaban</option>";
+													if ($penilaian['kp_tipe'] == 1) {
+														$opsi .= "<option value='1' class='text-center'>Y</option>";
+														$opsi .= "<option value='0' class='text-center'>T</option>";
+													} else if ($penilaian['kp_tipe'] == 2) {
+														$opsi .= "<option value='1' class='text-center'>A</option>";
+														$opsi .= "<option value='0.75' class='text-center'>B</option>";
+														$opsi .= "<option value='0.5' class='text-center'>C</option>";
+														$opsi .= "<option value='0.25' class='text-center'>D</option>";
+														$opsi .= "<option value='0' class='text-center'>E</option>";
+													}
+												}
+												//nilai usulan
+												if (isset($penilaian['pl_nilai_usulan'])) {
+													$nilai_usulan = $penilaian['pl_nilai_usulan'];
+												} else {
+													$nilai_usulan = "0.00";
+												}
+												$btn_save = "<button class='btn btn-primary' onclick='simpanPerubahan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan'><span class='dashicons dashicons-saved' ></span></button>";
+												break;
+											case true:
+												//opsi jawaban penetapan
+												$opsi_penetapan = "<option value=''>Pilih Jawaban</option>";
+												if (isset($penilaian['pl_nilai_penetapan'])) {
+													if ($penilaian['kp_tipe'] == 1) {
+														$opsi_penetapan .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 1 ? " selected" : "") . ">Y</option>";
+														$opsi_penetapan .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0 ? " selected" : "") . ">T</option>";
+													} else if ($penilaian['kp_tipe'] == 2) {
+														$opsi_penetapan .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 1 ? " selected" : "") . ">A</option>";
+														$opsi_penetapan .= "<option value='0.75' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.75 ? " selected" : "") . ">B</option>";
+														$opsi_penetapan .= "<option value='0.5' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.5 ? " selected" : "") . ">C</option>";
+														$opsi_penetapan .= "<option value='0.25' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.25 ? " selected" : "") . ">D</option>";
+														$opsi_penetapan .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0 ? " selected" : "") . ">E</option>";
+													}
+												} else {
+													$opsi_penetapan = "<option value=''>Pilih Jawaban</option>";
+													if ($penilaian['kp_tipe'] == 1) {
+														$opsi_penetapan .= "<option value='1' class='text-center'>Y</option>";
+														$opsi_penetapan .= "<option value='0' class='text-center'>T</option>";
+													} else if ($penilaian['kp_tipe'] == 2) {
+														$opsi_penetapan .= "<option value='1' class='text-center'>A</option>";
+														$opsi_penetapan .= "<option value='0.75' class='text-center'>B</option>";
+														$opsi_penetapan .= "<option value='0.5' class='text-center'>C</option>";
+														$opsi_penetapan .= "<option value='0.25' class='text-center'>D</option>";
+														$opsi_penetapan .= "<option value='0' class='text-center'>E</option>";
+													}
+												}
+
+												//nilai penetapan
+												if (isset($penilaian['pl_nilai_penetapan'])) {
+													$nilai_penetapan = $penilaian['pl_nilai_penetapan'];
+												} else {
+													$nilai_penetapan = "0.00";
+												}
+												$btn_save_penetapan = "<button class='btn btn-info' onclick='simpanPerubahanPenetapan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan Penetapan'><span class='dashicons dashicons-saved' ></span></button>";
+												break;
 										}
 
-										//opsi jawaban penetapan
-										$opsi_penetapan = "<option value=''>Pilih Jawaban</option>";
-										if (isset($penilaian['pl_nilai_penetapan'])) {
-											if ($penilaian['kp_tipe'] == 1) {
-												$opsi_penetapan .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 1 ? " selected" : "") . ">Y</option>";
-												$opsi_penetapan .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0 ? " selected" : "") . ">T</option>";
-											} else if ($penilaian['kp_tipe'] == 2) {
-												$opsi_penetapan .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 1 ? " selected" : "") . ">A</option>";
-												$opsi_penetapan .= "<option value='0.75' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.75 ? " selected" : "") . ">B</option>";
-												$opsi_penetapan .= "<option value='0.5' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.5 ? " selected" : "") . ">C</option>";
-												$opsi_penetapan .= "<option value='0.25' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.25 ? " selected" : "") . ">D</option>";
-												$opsi_penetapan .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0 ? " selected" : "") . ">E</option>";
-											}
-										} else {
-											$opsi_penetapan = "<option value=''>Pilih Jawaban</option>";
-											if ($penilaian['kp_tipe'] == 1) {
-												$opsi_penetapan .= "<option value='1' class='text-center'>Y</option>";
-												$opsi_penetapan .= "<option value='0' class='text-center'>T</option>";
-											} else if ($penilaian['kp_tipe'] == 2) {
-												$opsi_penetapan .= "<option value='1' class='text-center'>A</option>";
-												$opsi_penetapan .= "<option value='0.75' class='text-center'>B</option>";
-												$opsi_penetapan .= "<option value='0.5' class='text-center'>C</option>";
-												$opsi_penetapan .= "<option value='0.25' class='text-center'>D</option>";
-												$opsi_penetapan .= "<option value='0' class='text-center'>E</option>";
-											}
-										}
-
-										//nilai usulan
-										if (isset($penilaian['pl_nilai_usulan'])) {
-											$nilai_usulan = $penilaian['pl_nilai_usulan'];
-										} else {
-											$nilai_usulan = "0.00";
-										}
-
-										//nilai penetapan
-										if (isset($penilaian['pl_nilai_penetapan'])) {
-											$nilai_penetapan = $penilaian['pl_nilai_penetapan'];
-										} else {
-											$nilai_penetapan = "0.00";
-										}
-										$btn_save = "<button class='btn btn-primary' onclick='simpanPerubahan(" . $penilaian['kp_id'] . ", this)' title='Simpan Perubahan'><span class='dashicons dashicons-saved' ></span></button>";
-
+										//table isi
 										$tbody .= "<tr>";
 										$tbody .= "<td class='text-left'></td>";
 										$tbody .= "<td class='text-left'></td>";
 										$tbody .= "<td class='text-left'>" . $counter_isi++ . "</td>";
 										$tbody .= "<td class='text-left'>" . $penilaian['kp_nama'] . "<br><small class='text-muted'>" . $penilaian['kp_keterangan'] . "</small></td>";
 										$tbody .= "<td class='text-center'>-</td>";
-										$tbody .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] ."'>" . $opsi . "</select></td>";
-										$tbody .= "<td class='text-center'>" . $nilai_usulan . "</td>";
-										$tbody .= "<td class='text-center'></td>";
-										$tbody .= "<td class='text-center'><input type='text'></input></td>";
-										$tbody .= "<td class='text-center'><textarea></textarea></td>";
-										$tbody .= "<td class='text-center'><select onchange='submitNilaiPenetapan(" . $penilaian['kp_id'] . ", this)'>" . $opsi_penetapan . "</select></td>";
-										$tbody .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
-										$tbody .= "<td class='text-center'></td>";
-										$tbody .= "<td class='text-center'><textarea></textarea></td>";
-										$tbody .= "<td class='text-center'>" . $btn_save . "</td>";
+										switch ($can_verify) {
+											case false:
+												$tbody .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "'>" . $opsi . "</select></td>";
+												$tbody .= "<td class='text-center'>" . $nilai_usulan . "</td>";
+												$tbody .= "<td class='text-center'></td>";
+												$tbody .= "<td class='text-center'><input type='text' id='buktiDukung" . $penilaian['kp_id'] . "' value='" . $penilaian['pl_bukti_dukung'] . "'></input></td>";
+												$tbody .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "'>" . $penilaian['pl_keterangan'] . "</textarea></td>";
+												break;
+											case true:
+												$tbody .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "'>" . $opsi_penetapan . "</select></td>";
+												$tbody .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
+												$tbody .= "<td class='text-center'></td>";
+												$tbody .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'>" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
+												break;
+										}
+										$tbody .= "<td class='text-center'>" . $btn_save . $btn_save_penetapan . "</td>";
 										$tbody .= "</tr>";
 									}
 								}
@@ -9886,7 +10007,7 @@ class Wp_Eval_Sakip_Public
 						}
 					}
 				} else {
-					$tbody = "<tr><td colspan='8' class='text-center'>Tidak ada data tersedia</td></tr>";
+					$tbody = "<tr><td colspan='4' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 
 				$ret['data'] = $tbody;
@@ -9903,6 +10024,15 @@ class Wp_Eval_Sakip_Public
 			);
 		}
 		die(json_encode($ret));
+	}
+
+	public function get_user_penilai()
+	{
+		return array(
+			'1' => 'Admin Inspektorat',
+			'2' => 'Admin Perencanaan',
+			'3' => 'Admin Ortala'
+		);
 	}
 
 	public function get_table_desain_lke()
@@ -9942,7 +10072,8 @@ class Wp_Eval_Sakip_Public
 					", $id_jadwal)
 				);
 
-
+				$user_penilai = $this->get_user_penilai();
+				$user_penilai[''] = '-';
 				$tbody = '';
 				if (!empty($data_komponen)) {
 					$counter = 'A';
@@ -9973,7 +10104,7 @@ class Wp_Eval_Sakip_Public
 						$tbody .= "<td class='text-left' colspan='3'><b>" . $komponen['nama'] . "</b></td>";
 						$tbody .= "<td class='text-center'>" . $komponen['bobot'] . "</td>";
 						$tbody .= "<td class='text-left'></td>";
-						$tbody .= "<td class='text-left'></td>";
+						$tbody .= "<td class='text-left'>User Penilai: <b>" . $user_penilai[$komponen['id_user_penilai']] . "</b></td>";
 						$tbody .= "<td class='text-center'>" . $btn . "</td>";
 						$tbody .= "</tr>";
 
@@ -10005,7 +10136,7 @@ class Wp_Eval_Sakip_Public
 								$tbody .= "<td class='text-left' colspan='2'><b>" . $subkomponen['nama'] . "</b></td>";
 								$tbody .= "<td class='text-center'>" . $subkomponen['bobot'] . "</td>";
 								$tbody .= "<td class='text-left'></td>";
-								$tbody .= "<td class='text-left'></td>";
+								$tbody .= "<td class='text-left'>User Penilai: <b>" . $user_penilai[$subkomponen['id_user_penilai']] . "</b></td>";
 								$tbody .= "<td class='text-center'>" . $btn . "</td>";
 								$tbody .= "</tr>";
 
@@ -10527,6 +10658,12 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Nomor Urut kosong!';
 				}
+				if (!empty($_POST['user_penilai'])) {
+					$user_penilai = $_POST['user_penilai'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'User Penilai kosong!';
+				}
 
 				if ($ret['status'] === 'success') {
 					if (!empty($id_komponen)) {
@@ -10584,6 +10721,7 @@ class Wp_Eval_Sakip_Public
 									'nama' => $nama_komponen,
 									'bobot' => $bobot_komponen,
 									'nomor_urut' => $nomor_urut,
+									'id_user_penilai' => $user_penilai,
 								),
 								array('id' => $id_komponen),
 								array('%s', '%f', '%f'),
@@ -10597,6 +10735,7 @@ class Wp_Eval_Sakip_Public
 									'nama' => $nama_komponen,
 									'bobot' => $bobot_komponen,
 									'nomor_urut' => $nomor_urut,
+									'id_user_penilai' => $user_penilai,
 									'active' => 1,
 								),
 								array('%d', '%s', '%f', '%f', '%d')
@@ -10658,6 +10797,12 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Nomor Urut kosong!';
 				}
+				if (!empty($_POST['user_penilai'])) {
+					$user_penilai = $_POST['user_penilai'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'User Penilai kosong!';
+				}
 
 				if ($ret['status'] === 'success') {
 					if (!empty($id_subkomponen)) {
@@ -10708,6 +10853,7 @@ class Wp_Eval_Sakip_Public
 									'nama' => $nama_subkomponen,
 									'bobot' => $bobot_subkomponen,
 									'nomor_urut' => $nomor_urut,
+									'id_user_penilai' => $user_penilai,
 								),
 								array('id' => $id_subkomponen),
 								array('%s', '%f', '%f'),
@@ -10721,6 +10867,7 @@ class Wp_Eval_Sakip_Public
 									'nama' => $nama_subkomponen,
 									'bobot' => $bobot_subkomponen,
 									'nomor_urut' => $nomor_urut,
+									'id_user_penilai' => $user_penilai,
 									'active' => 1,
 								),
 								array('%d', '%s', '%f', '%f', '%d')
@@ -11392,10 +11539,6 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$id_user = um_user('ID');
-				$user_meta = get_userdata($id_user);
-				$current_user = wp_get_current_user();
-
 				if (!empty($_POST['id_skpd'])) {
 					$id_skpd = $_POST['id_skpd'];
 				} else {
@@ -11408,49 +11551,58 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Komponen Penilaian kosong!';
 				}
-				if (isset($_POST['nilai'])) {
-					$nilai = $_POST['nilai'];
+				if (isset($_POST['nilai_penetapan'])) {
+					$nilai_penetapan = $_POST['nilai_penetapan'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Nilai Penetapan kosong!';
 				}
-				$allowed_roles = array();
+				if (isset($_POST['ket_penetapan'])) {
+					$ket_penetapan = $_POST['ket_penetapan'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Keterangan Penetapan kosong!';
+				}
+
+				$current_user = wp_get_current_user();
+				$allowed_roles = array('admin_ortala', 'admin_perencanaan', 'administrator');
+				if (empty(array_intersect($allowed_roles, $current_user->roles))) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Akses ditolak - hanya pengguna dengan peran tertentu yang dapat mengakses fitur ini!';
+					die(json_encode($ret));
+				}
 				$existing_data = $wpdb->get_var(
 					$wpdb->prepare("
 						SELECT 
 							id
 						FROM esakip_pengisian_lke
-						WHERE id_user = %d 
-						  AND id_skpd = %d
+						WHERE id_skpd = %d
 						  AND id_komponen_penilaian = %d
-					", $id_user, $id_skpd, $id_komponen_penilaian)
+					", $id_skpd, $id_komponen_penilaian)
 				);
 				if ($existing_data) {
 					$updated = $wpdb->update(
 						'esakip_pengisian_lke',
 						array(
-							'nilai_penetapan' => $nilai,
+							'id_user_penilai' => $current_user->ID,
+							'nilai_penetapan' => $nilai_penetapan,
+							'keterangan_penilai' => $ket_penetapan,
 							'update_at' => current_time('mysql')
 						),
 						array('id' => $existing_data),
-						array('%f', '%s'),
-						array('%d')
+						array('%d', '%f', '%s', '%s'),
 					);
 
 					if ($updated !== false) {
-						$ret['message'] = "Berhasil update nilai!";
+						$ret['message'] = "Berhasil tambah nilai penetapan!";
 					} else {
 						$ret['status'] = 'error';
-						$ret['message'] = "Gagal melakukan update nilai: " . $wpdb->last_error;
+						$ret['message'] = "Gagal melakukan update nilai penetapan: " . $wpdb->last_error;
 					}
 				} else {
-					$wpdb->insert(
-						'esakip_pengisian_lke',
-						array(
-							'id_user' => $id_user,
-							'id_skpd' => $id_skpd,
-							'id_komponen_penilaian' => $id_komponen_penilaian,
-							'nilai_penetapan' => $nilai,
-							'create_at' => current_time('mysql')
-						),
-						array('%d', '%d', '%d', '%f', '%s'),
+					$ret = array(
+						'status' => 'error',
+						'message' => 'Id Penilaian Tidak Ditemukan!'
 					);
 				}
 			} else {
@@ -11479,10 +11631,6 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$id_user = um_user('ID');
-				$user_meta = get_userdata($id_user);
-				$current_user = wp_get_current_user();
-
 				if (!empty($_POST['id_skpd'])) {
 					$id_skpd = $_POST['id_skpd'];
 				} else {
@@ -11495,139 +11643,101 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Komponen Penilaian kosong!';
 				}
-				if (isset($_POST['nilai'])) {
-					$nilai = $_POST['nilai'];
+				if (isset($_POST['nilai_usulan'])) {
+					$nilai_usulan = $_POST['nilai_usulan'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Nilai Usulan kosong!';
 				}
+				if (!empty($_POST['ket_usulan'])) {
+					$ket_usulan = $_POST['ket_usulan'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Keterangan Usulan kosong!';
+				}
+				if (!empty($_POST['bukti_usulan'])) {
+					$bukti_usulan = $_POST['bukti_usulan'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Bukti Usulan kosong!';
+				}
+				$current_user = wp_get_current_user();
+				$allowed_roles = array('admin_ortala', 'admin_perencanaan', 'administrator');
+				if (!empty(array_intersect($allowed_roles, $current_user->roles))) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Akses ditolak - hanya pengguna dengan peran tertentu yang dapat mengakses fitur ini!';
+					die(json_encode($ret));
+				}
+				$id_subkomponen = $wpdb->get_var(
+					$wpdb->prepare("
+						SELECT 
+							id_subkomponen
+						FROM esakip_komponen_penilaian
+						WHERE id = %d
+					", $id_komponen_penilaian)
+				);
+				if (!empty($id_subkomponen)) {
+					$id_komponen = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT 
+								id_komponen
+							FROM esakip_subkomponen
+							WHERE id = %d
+						", $id_subkomponen)
+					);
+					if (empty($id_subkomponen)) {
+						$ret['status'] = 'error';
+						$ret['message'] = 'ID Komponen kosong!';
+					}
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID Subomponen kosong!';
+				}
+
 				$allowed_roles = array();
 				$existing_data = $wpdb->get_var(
 					$wpdb->prepare("
 						SELECT 
 							id
 						FROM esakip_pengisian_lke
-						WHERE id_user = %d 
-						  AND id_skpd = %d
+						WHERE id_skpd = %d
 						  AND id_komponen_penilaian = %d
-					", $id_user, $id_skpd, $id_komponen_penilaian)
+					", $id_skpd, $id_komponen_penilaian)
 				);
 				if ($existing_data) {
 					$updated = $wpdb->update(
 						'esakip_pengisian_lke',
 						array(
-							'nilai_usulan' => $nilai,
+							'nilai_usulan' => $nilai_usulan,
+							'keterangan' => $ket_usulan,
+							'bukti_dukung' => $bukti_usulan,
 							'update_at' => current_time('mysql')
 						),
 						array('id' => $existing_data),
-						array('%f', '%s'),
-						array('%d')
+						array('%f', '%s', '%s', '%s'),
 					);
 
 					if ($updated !== false) {
-						$ret['message'] = "Berhasil update nilai!";
+						$ret['message'] = "Berhasil update nilai usulan!";
 					} else {
 						$ret['status'] = 'error';
-						$ret['message'] = "Gagal melakukan update nilai: " . $wpdb->last_error;
+						$ret['message'] = "Gagal melakukan update nilai usulan: " . $wpdb->last_error;
 					}
 				} else {
 					$wpdb->insert(
 						'esakip_pengisian_lke',
 						array(
-							'id_user' => $id_user,
+							'id_user' => $current_user->ID,
 							'id_skpd' => $id_skpd,
+							'id_komponen' => $id_komponen,
+							'id_subkomponen' => $id_subkomponen,
 							'id_komponen_penilaian' => $id_komponen_penilaian,
-							'nilai_usulan' => $nilai,
+							'keterangan' => $ket_usulan,
+							'nilai_usulan' => $nilai_usulan,
+							'bukti_dukung' => $bukti_usulan,
 							'create_at' => current_time('mysql')
 						),
-						array('%d', '%d', '%d', '%f', '%s'),
-					);
-				}
-			} else {
-				$ret = array(
-					'status' => 'error',
-					'message' => 'Api Key tidak sesuai!'
-				);
-			}
-		} else {
-			$ret = array(
-				'status' => 'error',
-				'message' => 'Format tidak sesuai!'
-			);
-		}
-
-		die(json_encode($ret));
-	}
-
-	public function tambah_bukti_dukung()
-	{
-		global $wpdb;
-		$ret = array(
-			'status' => 'success',
-			'message' => 'Berhasil tambah nilai!',
-		);
-
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$id_user = um_user('ID');
-				$user_meta = get_userdata($id_user);
-				$current_user = wp_get_current_user();
-
-				if (!empty($_POST['id_skpd'])) {
-					$id_skpd = $_POST['id_skpd'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
-				}
-				if (!empty($_POST['id_komponen_penilaian'])) {
-					$id_komponen_penilaian = $_POST['id_komponen_penilaian'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Id Komponen Penilaian kosong!';
-				}
-				if (!empty($_POST['bukti_dukung'])) {
-					$bukti_dukung = $_POST['bukti_dukung'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Bukti Dukung kosong!';
-				}
-				$allowed_roles = array();
-				$existing_data = $wpdb->get_var(
-					$wpdb->prepare("
-						SELECT 
-							id
-						FROM esakip_pengisian_lke
-						WHERE id_user = %d 
-						  AND id_skpd = %d
-						  AND id_komponen_penilaian = %d
-					", $id_user, $id_skpd, $id_komponen_penilaian)
-				);
-				if ($existing_data) {
-					$updated = $wpdb->update(
-						'esakip_pengisian_lke',
-						array(
-							'bukti_dukung' => $bukti_dukung,
-							'update_at' => current_time('mysql'),
-						),
-						array('id' => $existing_data),
-						array('%s', '%s'),
-						array('%d')
-					);
-
-					if ($updated !== false) {
-						$ret['message'] = "Berhasil update nilai!";
-					} else {
-						$ret['status'] = 'error';
-						$ret['message'] = "Gagal melakukan update nilai: " . $wpdb->last_error;
-					}
-				} else {
-					$wpdb->insert(
-						'esakip_pengisian_lke',
-						array(
-							'id_user' => $id_user,
-							'id_skpd' => $id_skpd,
-							'id_komponen_penilaian' => $id_komponen_penilaian,
-							'bukti_dukung' => $bukti_dukung,
-							'create_at' => current_time('mysql'),
-						),
-						array('%d', '%d', '%d', '%s', '%s'),
+						array('%d', '%d', '%d', '%s', '%f', '%s', '%s', '%s', '%s'),
 					);
 				}
 			} else {
