@@ -6153,12 +6153,15 @@ class Wp_Eval_Sakip_Public
 							'post_status' => 'private'
 						));
 
+						$report = '<a class="btn btn-sm btn-primary mr-2" style="text-decoration: none;" onclick="report(\'' . $recVal['id'] . '\'); return false;" href="#" title="Cetak Laporan"><i class="dashicons dashicons-printer"></i></a>';
+
 						$edit	= '';
 						$delete	= '';
 						$lock	= '';
 						$lke	= '';
 						if ($recVal['status'] == 1) {
 							$checkOpenedSchedule++;
+
 							$lke = '<div class="btn-group mr-2" role="group">';
 							$lke .= '<a class="btn btn-sm btn-info" style="text-decoration: none;" onclick="set_desain_lke(\'' . $desain_lke_page['url'] . '\'); return false;" href="#" title="Set Desain LKE"><i class="dashicons dashicons-editor-table"></i></a>';
 							$lke .= '</div>';
@@ -6188,7 +6191,7 @@ class Wp_Eval_Sakip_Public
 
 						$queryRecords[$recKey]['started_at']	= date('d-m-Y H:i', strtotime($recVal['started_at']));
 						$queryRecords[$recKey]['end_at']	= date('d-m-Y H:i', strtotime($recVal['end_at']));
-						$queryRecords[$recKey]['aksi'] = $lke . $lock . $edit . $delete;
+						$queryRecords[$recKey]['aksi'] = $report . $lke . $lock . $edit . $delete;
 						$queryRecords[$recKey]['nama_jadwal'] = ucfirst($recVal['nama_jadwal']);
 						$queryRecords[$recKey]['status'] = $status[$recVal['status']];
 					}
@@ -11642,4 +11645,97 @@ class Wp_Eval_Sakip_Public
 
 		die(json_encode($ret));
 	}
+
+    public function list_perangkat_daerah(){
+    	global $wpdb;
+
+    	try {
+    		if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+					$all_skpd = array();
+					$user_id = um_user('ID');
+					$user_meta = get_userdata($user_id);
+					$list_skpd_options = '<option value="">Pilih Unit Kerja</option><option value="all">Semua Unit Kerja</option>';
+					$nama_skpd = "";
+					if(
+						in_array("pa", $user_meta->roles)
+						|| in_array("kpa", $user_meta->roles)
+						|| in_array("plt", $user_meta->roles)
+					){
+						$nipkepala = get_user_meta($user_id, '_nip');
+						$skpd_db = $wpdb->get_results($wpdb->prepare("
+							SELECT 
+								nama_skpd, 
+								id_skpd, 
+								kode_skpd,
+								is_skpd
+							from esakip_data_unit 
+							where nipkepala=%s 
+								and tahun_anggaran=%d
+							group by id_skpd", $nipkepala[0], $_POST['tahun_anggaran']), ARRAY_A);
+						foreach ($skpd_db as $skpd) {
+							$nama_skpd = '<br>'.$skpd['kode_skpd'].' '.$skpd['nama_skpd'];
+							$all_skpd[] = $skpd;
+							$list_skpd_options .= '<option value="'.$skpd['id_skpd'].'">'.$skpd['kode_skpd'].' '.$skpd['nama_skpd'].'</option>';
+							if($skpd['is_skpd'] == 1){
+								$sub_skpd_db = $wpdb->get_results($wpdb->prepare("
+									SELECT 
+										nama_skpd, 
+										id_skpd, 
+										kode_skpd,
+										is_skpd
+									from esakip_data_unit 
+									where id_unit=%d 
+										and tahun_anggaran=%d
+										and is_skpd=0
+									group by id_skpd", $skpd['id_skpd'], $_POST['tahun_anggaran']), ARRAY_A);
+								foreach ($sub_skpd_db as $sub_skpd) {
+									$all_skpd[] = $sub_skpd;
+									$list_skpd_options .= '<option value="'.$sub_skpd['id_skpd'].'">-- '.$sub_skpd['kode_skpd'].' '.$sub_skpd['nama_skpd'].'</option>';
+								}
+							}
+						}
+					}else if(
+						in_array("administrator", $user_meta->roles)
+						|| in_array("admin_bappeda", $user_meta->roles)
+						|| in_array("admin_ortala", $user_meta->roles)
+					){
+						$skpd_mitra = $wpdb->get_results($wpdb->prepare("
+							SELECT 
+								nama_skpd, 
+								id_skpd, 
+								kode_skpd,
+								is_skpd 
+							from esakip_data_unit 
+							where active=1 
+								and tahun_anggaran=%d
+							group by id_skpd
+							order by id_unit ASC, kode_skpd ASC", $_POST['tahun_anggaran']), ARRAY_A);
+						foreach ($skpd_mitra as $k => $v) {
+							$all_skpd[] = $v;
+							if($v['is_skpd'] == 1){
+								$list_skpd_options .= '<option value="'.$v['id_skpd'].'">'.$v['kode_skpd'].' '.$v['nama_skpd'].'</option>';
+							}else{
+								$list_skpd_options .= '<option value="'.$v['id_skpd'].'">-- '.$v['kode_skpd'].' '.$v['nama_skpd'].'</option>';
+							}
+						}
+					}
+					echo json_encode([
+						'status' => true,
+						'list_skpd_options' => $list_skpd_options
+					]);exit();
+				}else{
+					throw new Exception("Api key tidak sesuai", 1);
+				}
+			}else{
+				throw new Exception("Format tidak sesuai", 1);	
+			}
+    	} catch (Exception $e) {
+    		echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);exit();
+    	}
+    }
 }

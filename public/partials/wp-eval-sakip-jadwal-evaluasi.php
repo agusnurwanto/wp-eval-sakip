@@ -86,7 +86,7 @@ $tahun_anggaran = $input['tahun_anggaran'];
 		</div>
 	</div>
 </div>
-
+<div class="report"></div>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <script>
@@ -160,6 +160,26 @@ $tahun_anggaran = $input['tahun_anggaran'];
 				}
 			]
 		});
+	}
+
+	function get_jadwal_by_id(id) {
+		return new Promise(function(resolve, reject) {
+			jQuery("#wrap-loading").show()
+			jQuery.ajax({
+				url: esakip.url,
+				type: "post",
+				data: {
+					'action': "get_data_jadwal_by_id",
+					'api_key': esakip.api_key,
+					'id': id
+				},
+				dataType: "json",
+				success: function(response) {
+					jQuery("#wrap-loading").hide()
+					return resolve(response);
+				}
+			})
+		})
 	}
 
 	function tambah_jadwal() {
@@ -362,5 +382,88 @@ $tahun_anggaran = $input['tahun_anggaran'];
 
 	function set_desain_lke(url) {
 		window.open(url, '_blank');
+	}
+
+
+	function report(id) {
+		let modal = `
+			<div class="modal fade" id="modal-report" tab-index="-1" role="dialog" aria-hidden="true">
+			  <div class="modal-dialog modal-lg" role="document" style="min-width:1450px">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <h5 class="modal-title">Laporan</h5>
+			        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			          <span aria-hidden="true">&times;</span>
+			        </button>
+			      </div>
+			      
+			      <div class="modal-body">
+				    <div class="container-fluid">
+					    <div class="row">
+						    <div class="col-md-2">Unit Kerja</div>
+						    <div class="col-md-6">
+						    	<select class="form-control list_perangkat_daerah" id="list_perangkat_daerah"></select>
+						    </div>
+					    </div></br>
+					    <div class="row">
+					    	<div class="col-md-2"></div>
+					    	<div class="col-md-6 action-footer">
+					      		<button type="button" class="btn btn-success btn-preview" onclick="cek('${id}')">Proses</button>
+					    	</div>
+					    </div></br>
+					</div>
+			      </div>
+			      <div class="modal-cek" style="padding:10px"></div>
+			    </div>
+			  </div>
+			</div>`;
+
+		jQuery("body .report").html(modal);
+		get_jadwal_by_id(id)
+			list_perangkat_daerah()
+				.then(function() {
+					jQuery("#modal-report").modal('show');
+					jQuery('.jenis').select2({
+						width: '100%'
+				});
+			})
+	}
+
+	function list_perangkat_daerah() {
+		return new Promise(function(resolve, reject) {
+			if (typeof list_perangkat_daerah_global == 'undefined') {
+				jQuery('#wrap-loading').show();
+				jQuery.ajax({
+					url: esakip.url,
+					type: 'post',
+					dataType: 'json',
+					data: {
+						action: 'list_perangkat_daerah',
+						tahun_anggaran: tahun_anggaran,
+						'api_key': esakip.api_key,
+					},
+					success: function(response) {
+						jQuery('#wrap-loading').hide();
+						if (response.status) {
+							list_perangkat_daerah_global = response.list_skpd_options;
+							jQuery("#list_perangkat_daerah").html(list_perangkat_daerah_global);
+							jQuery('#list_perangkat_daerah').select2({
+								width: '100%'
+							});
+							return resolve();
+						}
+
+						alert('Oops ada kesalahan load data Unit kerja');
+						return resolve();
+					}
+				});
+			} else {
+				jQuery("#list_perangkat_daerah").html(list_perangkat_daerah_global);
+				jQuery('#list_perangkat_daerah').select2({
+					width: '100%'
+				});
+				return resolve();
+			}
+		})
 	}
 </script>
