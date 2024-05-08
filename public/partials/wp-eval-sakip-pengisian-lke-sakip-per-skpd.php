@@ -43,13 +43,12 @@ $skpd = $wpdb->get_row(
 ", $id_skpd, $tahun_anggaran_sakip),
     ARRAY_A
 );
-$user_id = um_user('ID');
-$user_meta = get_userdata($user_id);
+$current_user = wp_get_current_user();
 $can_verify = false;
 if (
-    in_array("admin_ortala", $user_meta->roles) ||
-    in_array("admin_bappeda", $user_meta->roles) ||
-    in_array("administrator", $user_meta->roles)
+    in_array("admin_ortala", $current_user->roles) ||
+    in_array("admin_bappeda", $current_user->roles) ||
+    in_array("administrator", $current_user->roles)
 ) {
     $can_verify = true;
 }
@@ -79,7 +78,7 @@ if (
                             <?php endif; ?>
                             <?php if ($can_verify) : ?>
                                 <th class="text-center" colspan="3">Penilaian Evaluator</th>
-                                <th class="text-center" rowspan="2" style="vertical-align: middle;">Keterangan Penilai</th>
+                                <th class="text-center" rowspan="2" style="vertical-align: middle;">Keterangan Evaluator</th>
                                 <th class="text-center" rowspan="2" style="vertical-align: middle;">Aksi</th>
                             <?php endif; ?>
                         </tr>

@@ -9696,9 +9696,6 @@ class Wp_Eval_Sakip_Public
 	public function get_table_pengisian_lke()
 	{
 		global $wpdb;
-		$user_id = um_user('ID');
-		$user_meta = get_userdata($user_id);
-
 		$ret = array(
 			'status' => 'success',
 			'message' => 'Berhasil get data!',
@@ -9713,29 +9710,51 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Jadwal kosong!';
 				}
+				if (!empty($_POST['id_skpd'])) {
+					$id_skpd = $_POST['id_skpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id SKPD kosong!';
+				}
 				$data_komponen = $wpdb->get_results(
 					$wpdb->prepare("
 						SELECT * 
 						FROM esakip_komponen
 						WHERE id_jadwal = %d
 						  AND active = 1
+						ORDER BY nomor_urut ASC
 						", $id_jadwal),
 					ARRAY_A
 				);
-
+				$current_user = wp_get_current_user();
 
 				$tbody = '';
 				if (!empty($data_komponen)) {
 					$can_verify = false;
 					if (
-						in_array("admin_ortala", $user_meta->roles) ||
-						in_array("admin_bappeda", $user_meta->roles) ||
-						in_array("administrator", $user_meta->roles)
+						in_array("admin_ortala", $current_user->roles) ||
+						in_array("admin_bappeda", $current_user->roles) ||
+						in_array("administrator", $current_user->roles)
 					) {
 						$can_verify = true;
 					}
+
 					$counter = 'A';
 					foreach ($data_komponen as $komponen) {
+						$sum_nilai_sub = 0;
+						if ($sum_nilai_sub == 0) {
+							$persentase_kom = 0;
+						} else {
+							$persentase_kom = $sum_nilai_sub / $komponen['bobot'];
+						}
+
+						$sum_nilai_sub_penetapan = 0;
+						if ($sum_nilai_sub_penetapan == 0) {
+							$persentase_kom_penetapan = 0;
+						} else {
+							$persentase_kom_penetapan = $sum_nilai_sub_penetapan / $komponen['bobot'];
+						}
+
 						$counter_isi = 1;
 						$counter_sub = 'a';
 						$tbody .= "<tr>";
@@ -9745,15 +9764,15 @@ class Wp_Eval_Sakip_Public
 						switch ($can_verify) {
 							case false:
 								$tbody .= "<td class='text-left'></td>";
-								$tbody .= "<td class='text-center'>0.00</td>";
-								$tbody .= "<td class='text-center'>0.00%</td>";
+								$tbody .= "<td class='text-center'>" . $sum_nilai_sub . "</td>";
+								$tbody .= "<td class='text-center'>" . $persentase_kom . "%" . "</td>";
 								$tbody .= "<td class='text-center'></td>";
 								$tbody .= "<td class='text-center'></td>";
 								break;
 							case true:
 								$tbody .= "<td class='text-center'></td>";
-								$tbody .= "<td class='text-center'>0.00</td>";
-								$tbody .= "<td class='text-center'>0.00%</td>";
+								$tbody .= "<td class='text-center'>" . $sum_nilai_sub_penetapan . "</td>";
+								$tbody .= "<td class='text-center'>" . $persentase_kom_penetapan . "%" . "</td>";
 								$tbody .= "<td class='text-center'></td>";
 								break;
 						}
@@ -9766,12 +9785,61 @@ class Wp_Eval_Sakip_Public
 								FROM esakip_subkomponen
 								WHERE id_komponen = %d
 								  AND active = 1
+								ORDER BY nomor_urut ASC
 								", $komponen['id']),
 							ARRAY_A
 						);
 
 						if (!empty($data_subkomponen)) {
 							foreach ($data_subkomponen as $subkomponen) {
+								$sum_nilai_usulan = $wpdb->get_var(
+									$wpdb->prepare("
+										SELECT SUM(nilai_usulan)
+										FROM esakip_pengisian_lke
+										WHERE id_subkomponen = %d
+										  AND id_skpd = %d
+									", $subkomponen['id'], $id_skpd));
+								$count_nilai_usulan = $wpdb->get_var(
+									$wpdb->prepare("
+										SELECT COUNT(id)
+										FROM esakip_pengisian_lke
+										WHERE id_subkomponen = %d
+										  AND id_skpd = %d
+									", $subkomponen['id'], $id_skpd));
+
+								if ($count_nilai_usulan == 0) {
+									$persentase = 0;
+								} else {
+									$persentase = $sum_nilai_usulan / $count_nilai_usulan;
+								}
+
+								$total_nilai_sub = $persentase * $subkomponen['bobot'];
+								$sum_nilai_sub + $total_nilai_sub;
+
+								$sum_nilai_penetapan = $wpdb->get_var(
+									$wpdb->prepare("
+										SELECT SUM(nilai_penetapan)
+										FROM esakip_pengisian_lke
+										WHERE id_subkomponen = %d
+										  AND id_skpd = %d
+									", $subkomponen['id'], $id_skpd));
+								$count_nilai_penetapan = $wpdb->get_var(
+									$wpdb->prepare("
+										SELECT COUNT(id)
+										FROM esakip_pengisian_lke
+										WHERE id_subkomponen = %d
+										  AND id_skpd = %d
+									", $subkomponen['id'], $id_skpd));
+
+								if ($count_nilai_penetapan == 0) {
+									$persentase_penetapan = 0;
+								} else {
+									$persentase_penetapan = $sum_nilai_penetapan / $count_nilai_penetapan;
+								}
+
+								$total_nilai_sub_penetapan = $persentase_penetapan * $subkomponen['bobot'];
+								$sum_nilai_sub_penetapan + $total_nilai_sub_penetapan;
+
 								$tbody .= "<tr>";
 								$tbody .= "<td class='text-left'></td>";
 								$tbody .= "<td class='text-left'>" . $counter_sub++ . "</td>";
@@ -9780,8 +9848,8 @@ class Wp_Eval_Sakip_Public
 								switch ($can_verify) {
 									case false:
 										$tbody .= "<td class='text-left'></td>";
-										$tbody .= "<td class='text-center'>0.00</td>";
-										$tbody .= "<td class='text-center'>0.00%</td>";
+										$tbody .= "<td class='text-center'>" . $total_nilai_sub . "</td>";
+										$tbody .= "<td class='text-center'>" . $persentase . "%" . "</td>";
 										$tbody .= "<td class='text-center'></td>";
 										$tbody .= "<td class='text-center'></td>";
 										break;
@@ -9798,6 +9866,13 @@ class Wp_Eval_Sakip_Public
 								$data_komponen_penilaian = $wpdb->get_results(
 									$wpdb->prepare("
 										SELECT 
+											kp.id AS kp_id,
+											kp.id_subkomponen AS kp_id_subkomponen,
+											kp.nomor_urut AS kp_nomor_urut,
+											kp.nama AS kp_nama,
+											kp.tipe AS kp_tipe,
+											kp.keterangan AS kp_keterangan,
+											kp.active AS kp_active,
 											pl.id AS pl_id,
 											pl.id_user AS pl_id_user,
 											pl.id_skpd AS pl_id_skpd,
@@ -9812,98 +9887,94 @@ class Wp_Eval_Sakip_Public
 											pl.bukti_dukung AS pl_bukti_dukung,
 											pl.create_at AS pl_create_at,
 											pl.update_at AS pl_update_at,
-											pl.active AS pl_active,
-											kp.id AS kp_id,
-											kp.id_subkomponen AS kp_id_subkomponen,
-											kp.nomor_urut AS kp_nomor_urut,
-											kp.nama AS kp_nama,
-											kp.tipe AS kp_tipe,
-											kp.keterangan AS kp_keterangan,
-											kp.active AS kp_active
+											pl.active AS pl_active
 										FROM esakip_komponen_penilaian AS kp
 										LEFT JOIN esakip_pengisian_lke AS pl 
-											ON kp.id = pl.id_komponen_penilaian
+											ON kp.id = pl.id_komponen_penilaian AND pl.id_skpd = %d
 										WHERE kp.id_subkomponen = %d
-										AND kp.active = 1
-									", $subkomponen['id']),
+										  AND kp.active = 1
+										ORDER BY kp.nomor_urut ASC
+									",  $id_skpd, $subkomponen['id']),
 									ARRAY_A
 								);
 
 								if (!empty($data_komponen_penilaian)) {
 									foreach ($data_komponen_penilaian as $penilaian) {
-										//opsi jawaban usulan
-										$opsi = "<option value=''>Pilih Jawaban</option>";
-										if (isset($penilaian['pl_nilai_usulan'])) {
-											if ($penilaian['kp_tipe'] == 1) {
-												$opsi .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 1 ? " selected" : "") . ">Y</option>";
-												$opsi .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0 ? " selected" : "") . ">T</option>";
-											} else if ($penilaian['kp_tipe'] == 2) {
-												$opsi .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 1 ? " selected" : "") . ">A</option>";
-												$opsi .= "<option value='0.75' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0.75 ? " selected" : "") . ">B</option>";
-												$opsi .= "<option value='0.5' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0.5 ? " selected" : "") . ">C</option>";
-												$opsi .= "<option value='0.25' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0.25 ? " selected" : "") . ">D</option>";
-												$opsi .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0 ? " selected" : "") . ">E</option>";
-											}
-										} else {
-											$opsi = "<option value=''>Pilih Jawaban</option>";
-											if ($penilaian['kp_tipe'] == 1) {
-												$opsi .= "<option value='1' class='text-center'>Y</option>";
-												$opsi .= "<option value='0' class='text-center'>T</option>";
-											} else if ($penilaian['kp_tipe'] == 2) {
-												$opsi .= "<option value='1' class='text-center'>A</option>";
-												$opsi .= "<option value='0.75' class='text-center'>B</option>";
-												$opsi .= "<option value='0.5' class='text-center'>C</option>";
-												$opsi .= "<option value='0.25' class='text-center'>D</option>";
-												$opsi .= "<option value='0' class='text-center'>E</option>";
-											}
+										switch ($can_verify) {
+											case false:
+												//opsi jawaban usulan
+												$opsi = "<option value=''>Pilih Jawaban</option>";
+												if (isset($penilaian['pl_nilai_usulan'])) {
+													if ($penilaian['kp_tipe'] == 1) {
+														$opsi .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 1 ? " selected" : "") . ">Y</option>";
+														$opsi .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0 ? " selected" : "") . ">T</option>";
+													} else if ($penilaian['kp_tipe'] == 2) {
+														$opsi .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 1 ? " selected" : "") . ">A</option>";
+														$opsi .= "<option value='0.75' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0.75 ? " selected" : "") . ">B</option>";
+														$opsi .= "<option value='0.5' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0.5 ? " selected" : "") . ">C</option>";
+														$opsi .= "<option value='0.25' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0.25 ? " selected" : "") . ">D</option>";
+														$opsi .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0 ? " selected" : "") . ">E</option>";
+													}
+												} else {
+													$opsi = "<option value=''>Pilih Jawaban</option>";
+													if ($penilaian['kp_tipe'] == 1) {
+														$opsi .= "<option value='1' class='text-center'>Y</option>";
+														$opsi .= "<option value='0' class='text-center'>T</option>";
+													} else if ($penilaian['kp_tipe'] == 2) {
+														$opsi .= "<option value='1' class='text-center'>A</option>";
+														$opsi .= "<option value='0.75' class='text-center'>B</option>";
+														$opsi .= "<option value='0.5' class='text-center'>C</option>";
+														$opsi .= "<option value='0.25' class='text-center'>D</option>";
+														$opsi .= "<option value='0' class='text-center'>E</option>";
+													}
+												}
+												//nilai usulan
+												if (isset($penilaian['pl_nilai_usulan'])) {
+													$nilai_usulan = $penilaian['pl_nilai_usulan'];
+												} else {
+													$nilai_usulan = "0.00";
+												}
+												$btn_save = "<button class='btn btn-primary' onclick='simpanPerubahan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan'><span class='dashicons dashicons-saved' ></span></button>";
+												break;
+											case true:
+												//opsi jawaban penetapan
+												$opsi_penetapan = "<option value=''>Pilih Jawaban</option>";
+												if (isset($penilaian['pl_nilai_penetapan'])) {
+													if ($penilaian['kp_tipe'] == 1) {
+														$opsi_penetapan .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 1 ? " selected" : "") . ">Y</option>";
+														$opsi_penetapan .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0 ? " selected" : "") . ">T</option>";
+													} else if ($penilaian['kp_tipe'] == 2) {
+														$opsi_penetapan .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 1 ? " selected" : "") . ">A</option>";
+														$opsi_penetapan .= "<option value='0.75' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.75 ? " selected" : "") . ">B</option>";
+														$opsi_penetapan .= "<option value='0.5' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.5 ? " selected" : "") . ">C</option>";
+														$opsi_penetapan .= "<option value='0.25' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.25 ? " selected" : "") . ">D</option>";
+														$opsi_penetapan .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0 ? " selected" : "") . ">E</option>";
+													}
+												} else {
+													$opsi_penetapan = "<option value=''>Pilih Jawaban</option>";
+													if ($penilaian['kp_tipe'] == 1) {
+														$opsi_penetapan .= "<option value='1' class='text-center'>Y</option>";
+														$opsi_penetapan .= "<option value='0' class='text-center'>T</option>";
+													} else if ($penilaian['kp_tipe'] == 2) {
+														$opsi_penetapan .= "<option value='1' class='text-center'>A</option>";
+														$opsi_penetapan .= "<option value='0.75' class='text-center'>B</option>";
+														$opsi_penetapan .= "<option value='0.5' class='text-center'>C</option>";
+														$opsi_penetapan .= "<option value='0.25' class='text-center'>D</option>";
+														$opsi_penetapan .= "<option value='0' class='text-center'>E</option>";
+													}
+												}
+
+												//nilai penetapan
+												if (isset($penilaian['pl_nilai_penetapan'])) {
+													$nilai_penetapan = $penilaian['pl_nilai_penetapan'];
+												} else {
+													$nilai_penetapan = "0.00";
+												}
+												$btn_save_penetapan = "<button class='btn btn-info' onclick='simpanPerubahanPenetapan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan Penetapan'><span class='dashicons dashicons-saved' ></span></button>";
+												break;
 										}
 
-										//opsi jawaban penetapan
-										$opsi_penetapan = "<option value=''>Pilih Jawaban</option>";
-										if (isset($penilaian['pl_nilai_penetapan'])) {
-											if ($penilaian['kp_tipe'] == 1) {
-												$opsi_penetapan .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 1 ? " selected" : "") . ">Y</option>";
-												$opsi_penetapan .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0 ? " selected" : "") . ">T</option>";
-											} else if ($penilaian['kp_tipe'] == 2) {
-												$opsi_penetapan .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 1 ? " selected" : "") . ">A</option>";
-												$opsi_penetapan .= "<option value='0.75' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.75 ? " selected" : "") . ">B</option>";
-												$opsi_penetapan .= "<option value='0.5' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.5 ? " selected" : "") . ">C</option>";
-												$opsi_penetapan .= "<option value='0.25' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.25 ? " selected" : "") . ">D</option>";
-												$opsi_penetapan .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0 ? " selected" : "") . ">E</option>";
-											}
-										} else {
-											$opsi_penetapan = "<option value=''>Pilih Jawaban</option>";
-											if ($penilaian['kp_tipe'] == 1) {
-												$opsi_penetapan .= "<option value='1' class='text-center'>Y</option>";
-												$opsi_penetapan .= "<option value='0' class='text-center'>T</option>";
-											} else if ($penilaian['kp_tipe'] == 2) {
-												$opsi_penetapan .= "<option value='1' class='text-center'>A</option>";
-												$opsi_penetapan .= "<option value='0.75' class='text-center'>B</option>";
-												$opsi_penetapan .= "<option value='0.5' class='text-center'>C</option>";
-												$opsi_penetapan .= "<option value='0.25' class='text-center'>D</option>";
-												$opsi_penetapan .= "<option value='0' class='text-center'>E</option>";
-											}
-										}
-
-										//nilai usulan
-										if (isset($penilaian['pl_nilai_usulan'])) {
-											$nilai_usulan = $penilaian['pl_nilai_usulan'];
-										} else {
-											$nilai_usulan = "0.00";
-										}
-
-										//nilai penetapan
-										if (isset($penilaian['pl_nilai_penetapan'])) {
-											$nilai_penetapan = $penilaian['pl_nilai_penetapan'];
-										} else {
-											$nilai_penetapan = "0.00";
-										}
-										if ($can_verify == true) {
-											$btn_save_penetapan = "<button class='btn btn-info' onclick='simpanPerubahanPenetapan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan Penetapan'><span class='dashicons dashicons-saved' ></span></button>";
-										} else {
-											$btn_save = "<button class='btn btn-primary' onclick='simpanPerubahan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan'><span class='dashicons dashicons-saved' ></span></button>";
-										}
-
+										//table isi
 										$tbody .= "<tr>";
 										$tbody .= "<td class='text-left'></td>";
 										$tbody .= "<td class='text-left'></td>";
@@ -9933,7 +10004,7 @@ class Wp_Eval_Sakip_Public
 						}
 					}
 				} else {
-					$tbody = "<tr><td colspan='8' class='text-center'>Tidak ada data tersedia</td></tr>";
+					$tbody = "<tr><td colspan='4' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 
 				$ret['data'] = $tbody;
@@ -11465,10 +11536,6 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$id_user = um_user('ID');
-				$user_meta = get_userdata($id_user);
-				$current_user = wp_get_current_user();
-
 				if (!empty($_POST['id_skpd'])) {
 					$id_skpd = $_POST['id_skpd'];
 				} else {
@@ -11494,8 +11561,13 @@ class Wp_Eval_Sakip_Public
 					$ret['message'] = 'Keterangan Penetapan kosong!';
 				}
 
-
-				$allowed_roles = array();
+				$current_user = wp_get_current_user();
+				$allowed_roles = array('admin_ortala', 'admin_perencanaan', 'administrator');
+				if (empty(array_intersect($allowed_roles, $current_user->roles))) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Akses ditolak - hanya pengguna dengan peran tertentu yang dapat mengakses fitur ini!';
+					die(json_encode($ret));
+				}
 				$existing_data = $wpdb->get_var(
 					$wpdb->prepare("
 						SELECT 
@@ -11509,7 +11581,7 @@ class Wp_Eval_Sakip_Public
 					$updated = $wpdb->update(
 						'esakip_pengisian_lke',
 						array(
-							'id_user_penilai' => $id_user,
+							'id_user_penilai' => $current_user->ID,
 							'nilai_penetapan' => $nilai_penetapan,
 							'keterangan_penilai' => $ket_penetapan,
 							'update_at' => current_time('mysql')
@@ -11556,10 +11628,6 @@ class Wp_Eval_Sakip_Public
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$id_user = um_user('ID');
-				$user_meta = get_userdata($id_user);
-				$current_user = wp_get_current_user();
-
 				if (!empty($_POST['id_skpd'])) {
 					$id_skpd = $_POST['id_skpd'];
 				} else {
@@ -11589,6 +11657,13 @@ class Wp_Eval_Sakip_Public
 				} else {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Bukti Usulan kosong!';
+				}
+				$current_user = wp_get_current_user();
+				$allowed_roles = array('admin_ortala', 'admin_perencanaan', 'administrator');
+				if (!empty(array_intersect($allowed_roles, $current_user->roles))) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Akses ditolak - hanya pengguna dengan peran tertentu yang dapat mengakses fitur ini!';
+					die(json_encode($ret));
 				}
 				$id_subkomponen = $wpdb->get_var(
 					$wpdb->prepare("
@@ -11649,7 +11724,7 @@ class Wp_Eval_Sakip_Public
 					$wpdb->insert(
 						'esakip_pengisian_lke',
 						array(
-							'id_user' => $id_user,
+							'id_user' => $current_user->ID,
 							'id_skpd' => $id_skpd,
 							'id_komponen' => $id_komponen,
 							'id_subkomponen' => $id_subkomponen,
