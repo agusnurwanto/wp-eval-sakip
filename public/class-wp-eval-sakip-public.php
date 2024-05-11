@@ -9655,11 +9655,23 @@ class Wp_Eval_Sakip_Public
 						$tbody .= "<td>" . $vv['kode_skpd'] . "</td>";
 						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
-						$nilai_skpd = $wpdb->get_var(
+						$nilai_usulan = $wpdb->get_var(
 							$wpdb->prepare(
 								"
 								SELECT 
 									COUNT(nilai_usulan)
+								FROM esakip_pengisian_lke
+								WHERE id_skpd = %d
+								  AND active = 1
+								",
+								$vv['id_skpd']
+							)
+						);
+						$nilai_penetapan = $wpdb->get_var(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(nilai_penetapan)
 								FROM esakip_pengisian_lke
 								WHERE id_skpd = %d
 								  AND active = 1
@@ -9672,7 +9684,8 @@ class Wp_Eval_Sakip_Public
 						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_pengisian_lke['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 						$btn .= '</div>';
 
-						$tbody .= "<td class='text-center'>" . $nilai_skpd . "</td>";
+						$tbody .= "<td class='text-center'>" . $nilai_usulan . "</td>";
+						$tbody .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
 						$tbody .= "<td>" . $btn . "</td>";
 
 						$tbody .= "</tr>";

@@ -53,7 +53,8 @@ if (empty($jadwal)) {
                             <th class="text-center">No</th>
                             <th class="text-center">Kode SKPD</th>
                             <th class="text-center">Nama SKPD</th>
-                            <th class="text-center">Nilai</th>
+                            <th class="text-center">Nilai Usulan</th>
+                            <th class="text-center">Nilai Penetapan</th>
                             <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
