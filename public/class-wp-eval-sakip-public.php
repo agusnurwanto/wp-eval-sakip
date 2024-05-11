@@ -10372,6 +10372,35 @@ class Wp_Eval_Sakip_Public
 			$periode_renstra_skpd .= '<li><a target="_blank" href="' . $renstra_skpd['url'] . '" class="btn btn-primary">' . $title_renstra . '</a></li>';
 		}
 
+
+		$get_jadwal_lke = $wpdb->get_results(
+			"
+			SELECT 
+				id,
+				nama_jadwal,
+				tahun_anggaran,
+				lama_pelaksanaan
+			FROM esakip_data_jadwal
+			WHERE tipe = 'LKE'
+			  AND status = 1",
+			ARRAY_A
+		);
+		$pengisian_lke = '';
+		foreach ($get_jadwal_lke as $get_jadwal_lke_sakip) {
+			$tahun_anggaran_selesai = $get_jadwal_lke_sakip['tahun_anggaran'] + $get_jadwal_lke_sakip['lama_pelaksanaan'];
+
+			$lke = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Pengisian LKE ' . $get_jadwal_lke_sakip['nama_jadwal'],
+				'content' => '[pengisian_lke_sakip id_jadwal=' . $get_jadwal_lke_sakip['id'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$pengisian_lke .= '<li><a target="_blank" href="' . $lke['url'] . '" class="btn btn-primary">' . $lke['title'] . '</a></li>';
+		}
+
+		if (empty($pengisian_lke)) {
+			$pengisian_lke = '<li><a return="false" href="#" class="btn btn-secondary">Pengisian LKE kosong atau belum dibuat</a></li>';
+		}
 		if (empty($periode_rpjmd)) {
 			$periode_rpjmd = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
 		}
@@ -10383,6 +10412,15 @@ class Wp_Eval_Sakip_Public
 		if (empty($periode_renstra_skpd)) {
 			$periode_renstra = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
 		}
+		$halaman_lke = '
+			<div class="accordion">
+				<h5 class="esakip-header-tahun" data-id="lke" style="margin: 0;">Halaman Pengisian LKE</h5>
+				<div class="esakip-body-tahun" data-id="lke">
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+						' . $pengisian_lke . '
+					</ul>
+				</div>
+			</div>';
 		$halaman_rpjmd = '
 			<div class="accordion">
 				<h5 class="esakip-header-tahun" data-id="rpjmd" style="margin: 0;">Periode Upload Dokumen RPJMD</h5>
@@ -10486,6 +10524,7 @@ class Wp_Eval_Sakip_Public
 			));
 			echo '
 				<ul class="daftar-menu-sakip">
+					<li>' . $halaman_lke . '</li>
 					<li>' . $halaman_rpjmd . '</li>
 					<li>' . $halaman_renstra . '</li>
 					<li><a href="' . $renja_rkt['url'] . '" target="_blank" class="btn btn-primary">' . $renja_rkt['title'] . '</a></li>
