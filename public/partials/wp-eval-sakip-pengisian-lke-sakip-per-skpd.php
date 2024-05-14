@@ -17,11 +17,12 @@ if (!empty($_GET) && !empty($_GET['id_skpd'])) {
 
 $jadwal = $wpdb->get_row(
     $wpdb->prepare("
-        SELECT
-            *
-        FROM esakip_data_jadwal
-        WHERE id=%d
-          AND status!=0
+    SELECT
+        *
+    FROM esakip_data_jadwal
+    WHERE id=%d
+      AND tipe='lke'
+      AND status!=0
     ", $input['id_jadwal']),
     ARRAY_A
 );

@@ -9758,19 +9758,15 @@ class Wp_Eval_Sakip_Public
 					$counter = 'A';
 					foreach ($data_komponen as $komponen) {
 						$sum_nilai_sub = 0;
-						if ($sum_nilai_sub == 0) {
-							$persentase_kom = 0;
-						} else {
+						$sum_nilai_sub_penetapan = 0;
+						if ($sum_nilai_sub > 0) {
 							$persentase_kom = $sum_nilai_sub / $komponen['bobot'];
 						}
-
-						$sum_nilai_sub_penetapan = 0;
-						if ($sum_nilai_sub_penetapan == 0) {
-							$persentase_kom_penetapan = 0;
-						} else {
+						if ($sum_nilai_sub_penetapan > 0) {
 							$persentase_kom_penetapan = $sum_nilai_sub_penetapan / $komponen['bobot'];
 						}
 
+						//tbody komponen
 						$counter_isi = 1;
 						$counter_sub = 'a';
 						$tbody .= "<tr>";
@@ -9778,13 +9774,13 @@ class Wp_Eval_Sakip_Public
 						$tbody .= "<td class='text-left' colspan='3'><b>" . $komponen['nama'] . "</b></td>";
 						$tbody .= "<td class='text-center'>" . $komponen['bobot'] . "</td>";
 						$tbody .= "<td class='text-left'></td>";
-						$tbody .= "<td class='text-center'>" . $sum_nilai_sub . "</td>";
-						$tbody .= "<td class='text-center'>" . $persentase_kom . "%" . "</td>";
+						$tbody .= "<td class='text-center'>" . number_format($sum_nilai_sub, 2) . "</td>";
+						$tbody .= "<td class='text-center'>" . number_format($persentase_kom * 100, 2) . "%" . "</td>";
 						$tbody .= "<td class='text-center'></td>";
 						$tbody .= "<td class='text-center'></td>";
 						$tbody .= "<td class='text-center'></td>";
-						$tbody .= "<td class='text-center'>" . $sum_nilai_sub_penetapan . "</td>";
-						$tbody .= "<td class='text-center'>" . $persentase_kom_penetapan . "%" . "</td>";
+						$tbody .= "<td class='text-center'>" . number_format($sum_nilai_sub_penetapan, 2) .  "</td>";
+						$tbody .= "<td class='text-center'>" . number_format($persentase_kom_penetapan * 100, 2) . "%" . "</td>";
 						$tbody .= "<td class='text-center'></td>";
 						$tbody .= "<td class='text-center'></td>";
 						$tbody .= "</tr>";
@@ -9799,7 +9795,6 @@ class Wp_Eval_Sakip_Public
 								", $komponen['id']),
 							ARRAY_A
 						);
-
 						if (!empty($data_subkomponen)) {
 							foreach ($data_subkomponen as $subkomponen) {
 								$sum_nilai_usulan = $wpdb->get_var(
@@ -9818,16 +9813,6 @@ class Wp_Eval_Sakip_Public
 										  AND id_skpd = %d
 									", $subkomponen['id'], $id_skpd)
 								);
-
-								if ($count_nilai_usulan == 0) {
-									$persentase = 0;
-								} else {
-									$persentase = $sum_nilai_usulan / $count_nilai_usulan;
-								}
-
-								$total_nilai_sub = $persentase * $subkomponen['bobot'];
-								$sum_nilai_sub + $total_nilai_sub;
-
 								$sum_nilai_penetapan = $wpdb->get_var(
 									$wpdb->prepare("
 										SELECT SUM(nilai_penetapan)
@@ -9845,31 +9830,36 @@ class Wp_Eval_Sakip_Public
 									", $subkomponen['id'], $id_skpd)
 								);
 
-								if ($count_nilai_penetapan == 0) {
-									$persentase_penetapan = 0;
-								} else {
-									$persentase_penetapan = $sum_nilai_penetapan / $count_nilai_penetapan;
+								if ($count_nilai_usulan > 0) {
+									$persentase = $sum_nilai_usulan / $count_nilai_usulan;
+									$total_nilai_sub = $persentase * $subkomponen['bobot'];
+									$sum_nilai_sub += $total_nilai_sub;
 								}
 
-								$total_nilai_sub_penetapan = $persentase_penetapan * $subkomponen['bobot'];
-								$sum_nilai_sub_penetapan + $total_nilai_sub_penetapan;
+								if ($count_nilai_penetapan > 0) {
+									$persentase_penetapan = $sum_nilai_penetapan / $count_nilai_penetapan;
+									$total_nilai_sub_penetapan = $persentase_penetapan * $subkomponen['bobot'];
+									$sum_nilai_sub_penetapan += $total_nilai_sub_penetapan;
+								}
 
+								//tbody subkomponen
 								$tbody .= "<tr>";
 								$tbody .= "<td class='text-left'></td>";
 								$tbody .= "<td class='text-left'>" . $counter_sub++ . "</td>";
 								$tbody .= "<td class='text-left' colspan='2'><b>" . $subkomponen['nama'] . "</b></td>";
 								$tbody .= "<td class='text-center'>" . $subkomponen['bobot'] . "</td>";
 								$tbody .= "<td class='text-left'></td>";
-								$tbody .= "<td class='text-center'>" . $total_nilai_sub . "</td>";
-								$tbody .= "<td class='text-center'>" . $persentase . "%" . "</td>";
+								$tbody .= "<td class='text-center'>" . number_format($total_nilai_sub, 2) . "</td>";
+								$tbody .= "<td class='text-center'>" . number_format($persentase * 100, 2) . "%" . "</td>";
 								$tbody .= "<td class='text-center'></td>";
 								$tbody .= "<td class='text-center'></td>";
 								$tbody .= "<td class='text-center'></td>";
-								$tbody .= "<td class='text-center'>0.00</td>";
-								$tbody .= "<td class='text-center'>0.00%</td>";
+								$tbody .= "<td class='text-center'>" . number_format($total_nilai_sub_penetapan, 2) . "</td>";
+								$tbody .= "<td class='text-center'>" . number_format($persentase_penetapan * 100, 2) . "%" . "</td>";
 								$tbody .= "<td class='text-center'></td>";
 								$tbody .= "<td class='text-center'></td>";
 								$tbody .= "</tr>";
+
 
 								$data_komponen_penilaian = $wpdb->get_results(
 									$wpdb->prepare("
@@ -9908,7 +9898,6 @@ class Wp_Eval_Sakip_Public
 
 								if (!empty($data_komponen_penilaian)) {
 									foreach ($data_komponen_penilaian as $penilaian) {
-
 										//opsi jawaban usulan
 										$opsi = "<option value=''>Pilih Jawaban</option>";
 										if (isset($penilaian['pl_nilai_usulan'])) {
@@ -9976,7 +9965,7 @@ class Wp_Eval_Sakip_Public
 											$nilai_penetapan = "0.00";
 										}
 
-										//table isi
+										//tbody isi
 										$tbody .= "<tr>";
 										$tbody .= "<td class='text-left'></td>";
 										$tbody .= "<td class='text-left'></td>";
