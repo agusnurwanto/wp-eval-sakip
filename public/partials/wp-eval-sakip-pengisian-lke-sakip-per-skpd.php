@@ -74,7 +74,7 @@ if (
                             <th class="text-center" rowspan="2" style="vertical-align: middle;">Bukti Dukung</th>
                             <th class="text-center" rowspan="2" style="vertical-align: middle;">Keterangan OPD</th>
                             <th class="text-center" colspan="3">Penilaian Evaluator</th>
-                            <th class="text-center" rowspan="2" style="vertical-align: middle;">Keterangan Evaluator</th>
+                            <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Keterangan Evaluator</th>
                             <th class="text-center" rowspan="2" style="vertical-align: middle;">Aksi</th>
                         </tr>
                         <tr>
