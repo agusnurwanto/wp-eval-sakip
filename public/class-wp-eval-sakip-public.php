@@ -9816,13 +9816,6 @@ class Wp_Eval_Sakip_Public
 						);
 						if (!empty($data_subkomponen)) {
 							foreach ($data_subkomponen as $subkomponen) {
-								$disabled = 'disabled';
-								if (
-									array_key_exists($subkomponen['id_user_penilai'], $intersected_roles) ||
-									empty($subkomponen['id_user_penilai'])
-								) {
-									$disabled = '';
-								}
 								$sum_nilai_usulan = $wpdb->get_var(
 									$wpdb->prepare("
 										SELECT SUM(nilai_usulan)
