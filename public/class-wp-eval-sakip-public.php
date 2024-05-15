@@ -9684,7 +9684,7 @@ class Wp_Eval_Sakip_Public
 						);
 
 						$btn = '<div class="btn-action-group">';
-						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_pengisian_lke['url'] . '&id_skpd=' . $vv['id_skpd']. '&id_jadwal=' . $id_jadwal . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_pengisian_lke['url'] . '&id_skpd=' . $vv['id_skpd'] . '&id_jadwal=' . $id_jadwal . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 						$btn .= '</div>';
 
 						$tbody .= "<td class='text-center'>" . $nilai_usulan . "</td>";
@@ -9737,7 +9737,7 @@ class Wp_Eval_Sakip_Public
 				}
 
 				// $prefix_history = '';
-                // $where_history = '';
+				// $where_history = '';
 				// if($data_jadwal_terpilih['status'] == 0){
 				// 	$cek_jadwal = $this->validasi_jadwal_perencanaan('verifikasi_rka'.$where_rka,$tahun_anggaran);
 				// 	$jadwal_lokal = $cek_jadwal['data'];
@@ -9770,8 +9770,8 @@ class Wp_Eval_Sakip_Public
 				);
 				if (!empty($data_komponen)) {
 					$tbody = '';
-					$can_verify = false;
 					//jika user adalah admin atau skpd
+					$can_verify = false;
 					if (
 						in_array("admin_ortala", $current_user->roles) ||
 						in_array("admin_bappeda", $current_user->roles) ||
@@ -9782,13 +9782,15 @@ class Wp_Eval_Sakip_Public
 
 					$counter = 'A';
 					foreach ($data_komponen as $komponen) {
+						$tbody2 = "";
 						$counter_isi = 1;
 						$counter_sub = 'a';
 
 						$sum_nilai_sub = 0;
 						$sum_nilai_sub_penetapan = 0;
+						$persentase_kom = 0;
+						$persentase_kom_penetapan = 0;
 
-						$tbody2 = "";
 						$data_subkomponen = $wpdb->get_results(
 							$wpdb->prepare("
 								SELECT * 
@@ -9801,10 +9803,12 @@ class Wp_Eval_Sakip_Public
 						);
 						if (!empty($data_subkomponen)) {
 							foreach ($data_subkomponen as $subkomponen) {
+								//jika bukan user penilai disabled input
 								$disabled = 'disabled';
 								if (array_key_exists($subkomponen['id_user_penilai'], $intersected_roles)) {
 									$disabled = '';
 								}
+
 								$sum_nilai_usulan = $wpdb->get_var(
 									$wpdb->prepare("
 										SELECT SUM(nilai_usulan)
@@ -9816,10 +9820,9 @@ class Wp_Eval_Sakip_Public
 								$count_nilai_usulan = $wpdb->get_var(
 									$wpdb->prepare("
 										SELECT COUNT(id)
-										FROM esakip_pengisian_lke
+										FROM esakip_komponen_penilaian
 										WHERE id_subkomponen = %d
-										  AND id_skpd = %d
-									", $subkomponen['id'], $id_skpd)
+									", $subkomponen['id'])
 								);
 								$sum_nilai_penetapan = $wpdb->get_var(
 									$wpdb->prepare("
@@ -9832,22 +9835,25 @@ class Wp_Eval_Sakip_Public
 								$count_nilai_penetapan = $wpdb->get_var(
 									$wpdb->prepare("
 										SELECT COUNT(id)
-										FROM esakip_pengisian_lke
+										FROM esakip_komponen_penilaian
 										WHERE id_subkomponen = %d
-										  AND id_skpd = %d
-									", $subkomponen['id'], $id_skpd)
+									", $subkomponen['id'])
 								);
 
 								//jumlah nilai sub
+								$total_nilai_sub = 0;
+								$total_nilai_sub_penetapan = 0;
+								$persentase_sub = 0;
+								$persentase_sub_penetapan = 0;
 								if ($count_nilai_usulan > 0) {
-									$persentase = $sum_nilai_usulan / $count_nilai_usulan;
-									$total_nilai_sub = $persentase * $subkomponen['bobot'];
+									$persentase_sub = $sum_nilai_usulan / $count_nilai_usulan;
+									$total_nilai_sub = $persentase_sub * $subkomponen['bobot'];
 									$sum_nilai_sub += $total_nilai_sub;
 								}
 
 								if ($count_nilai_penetapan > 0) {
-									$persentase_penetapan = $sum_nilai_penetapan / $count_nilai_penetapan;
-									$total_nilai_sub_penetapan = $persentase_penetapan * $subkomponen['bobot'];
+									$persentase_sub_penetapan = $sum_nilai_penetapan / $count_nilai_penetapan;
+									$total_nilai_sub_penetapan = $persentase_sub_penetapan * $subkomponen['bobot'];
 									$sum_nilai_sub_penetapan += $total_nilai_sub_penetapan;
 								}
 
@@ -9859,12 +9865,12 @@ class Wp_Eval_Sakip_Public
 								$tbody2 .= "<td class='text-center'>" . $subkomponen['bobot'] . "</td>";
 								$tbody2 .= "<td class='text-left'></td>";
 								$tbody2 .= "<td class='text-center'>" . number_format($total_nilai_sub, 2) . "</td>";
-								$tbody2 .= "<td class='text-center'>" . number_format($persentase * 100, 2) . "%" . "</td>";
+								$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub * 100, 2) . "%" . "</td>";
 								$tbody2 .= "<td class='text-center'></td>";
 								$tbody2 .= "<td class='text-center'></td>";
 								$tbody2 .= "<td class='text-center'></td>";
 								$tbody2 .= "<td class='text-center'>" . number_format($total_nilai_sub_penetapan, 2) . "</td>";
-								$tbody2 .= "<td class='text-center'>" . number_format($persentase_penetapan * 100, 2) . "%" . "</td>";
+								$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub_penetapan * 100, 2) . "%" . "</td>";
 								$tbody2 .= "<td class='text-left' colspan='2'>User Penilai: <b>" . $user_penilai[$subkomponen['id_user_penilai']] . "</b></td>";
 								$tbody2 .= "</tr>";
 
@@ -10019,6 +10025,7 @@ class Wp_Eval_Sakip_Public
 								}
 							}
 						}
+
 						//jumlah nilai kom
 						if ($sum_nilai_sub > 0) {
 							$persentase_kom = $sum_nilai_sub / $komponen['bobot'];
@@ -10417,7 +10424,7 @@ class Wp_Eval_Sakip_Public
 			$tahun_anggaran_selesai = $get_jadwal_lke_sakip['tahun_anggaran'] + $get_jadwal_lke_sakip['lama_pelaksanaan'];
 
 			$lke = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Pengisian LKE ' . $get_jadwal_lke_sakip['nama_jadwal'].' '.$get_jadwal_lke_sakip['tahun_anggaran'],
+				'nama_page' => 'Halaman Pengisian LKE ' . $get_jadwal_lke_sakip['nama_jadwal'] . ' ' . $get_jadwal_lke_sakip['tahun_anggaran'],
 				'content' => '[pengisian_lke_sakip id_jadwal=' . $get_jadwal_lke_sakip['id'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
@@ -10588,7 +10595,7 @@ class Wp_Eval_Sakip_Public
 
 			foreach ($get_jadwal_lke as $get_jadwal_lke_sakip) {
 				$pengisian_lke_per_skpd = $this->functions->generatePage(array(
-					'nama_page' => 'Halaman Pengisian LKE ' . $get_jadwal_lke_sakip['nama_jadwal'].' '.$get_jadwal_lke_sakip['tahun_anggaran'],
+					'nama_page' => 'Halaman Pengisian LKE ' . $get_jadwal_lke_sakip['nama_jadwal'] . ' ' . $get_jadwal_lke_sakip['tahun_anggaran'],
 					'content' => '[pengisian_lke_sakip_per_skpd id_jadwal=' . $get_jadwal_lke_sakip['id'] . ']',
 					'show_header' => 1,
 					'post_status' => 'private'
@@ -11543,6 +11550,7 @@ class Wp_Eval_Sakip_Public
 		}
 		die(json_encode($ret));
 	}
+
 	public function hapus_komponen_penilaian_lke()
 	{
 		global $wpdb;
@@ -11580,6 +11588,7 @@ class Wp_Eval_Sakip_Public
 		}
 		die(json_encode($ret));
 	}
+
 	public function hapus_subkomponen_lke()
 	{
 		global $wpdb;
@@ -11674,6 +11683,7 @@ class Wp_Eval_Sakip_Public
 					$ret['message'] = 'Akses ditolak - hanya pengguna dengan peran tertentu yang dapat mengakses fitur ini!';
 					die(json_encode($ret));
 				}
+
 				$existing_data = $wpdb->get_var(
 					$wpdb->prepare("
 						SELECT 
@@ -11703,21 +11713,48 @@ class Wp_Eval_Sakip_Public
 						$ret['message'] = "Gagal melakukan update nilai penetapan: " . $wpdb->last_error;
 					}
 				} else {
-					$insert = $wpdb->insert(
-						'esakip_pengisian_lke',
-						array(
-							'id_skpd' => $id_skpd,
-							'id_user_penilai' => $current_user->ID,
-							'nilai_penetapan' => $nilai_penetapan,
-							'id_komponen_penilaian' => $id_komponen_penilaian,
-							'keterangan_penilai' => $ket_penetapan,
-							'create_at' => current_time('mysql')
-						),
-						array('%d', '%d', '%f', '%d', '%s', '%s'),
+					//cari id kom dan subkom ketika insert baru
+					$id_subkomponen = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT 
+								id_subkomponen
+							FROM esakip_komponen_penilaian
+							WHERE id = %d
+						", $id_komponen_penilaian)
 					);
-					if ($insert == false) {
+					if (!empty($id_subkomponen)) {
+						$id_komponen = $wpdb->get_var(
+							$wpdb->prepare("
+								SELECT 
+									id_komponen
+								FROM esakip_subkomponen
+								WHERE id = %d
+							", $id_subkomponen)
+						);
+						if (empty($id_subkomponen)) {
+							$ret['status'] = 'error';
+							$ret['message'] = 'ID Komponen kosong!';
+						}
+					} else {
 						$ret['status'] = 'error';
-						$ret['message'] = "Gagal melakukan simpan nilai penetapan: " . $wpdb->last_error;
+						$ret['message'] = 'ID Subomponen kosong!';
+					}
+					//jika sukses insert
+					if ($ret['status'] = 'success') {
+						$wpdb->insert(
+							'esakip_pengisian_lke',
+							array(
+								'id_skpd' => $id_skpd,
+								'id_user_penilai' => $current_user->ID,
+								'nilai_penetapan' => $nilai_penetapan,
+								'id_komponen' => $id_komponen,
+								'id_subkomponen' => $id_subkomponen,
+								'id_komponen_penilaian' => $id_komponen_penilaian,
+								'keterangan_penilai' => $ket_penetapan,
+								'create_at' => current_time('mysql')
+							),
+							array('%d', '%d', '%f', '%d', '%d', '%d', '%s', '%s'),
+						);
 					}
 				}
 			} else {
@@ -11776,37 +11813,13 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Bukti Usulan kosong!';
 				}
+
 				$current_user = wp_get_current_user();
 				$allowed_roles = array('admin_ortala', 'admin_perencanaan', 'administrator');
 				if (!empty(array_intersect($allowed_roles, $current_user->roles))) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Akses ditolak - hanya pengguna dengan peran tertentu yang dapat mengakses fitur ini!';
 					die(json_encode($ret));
-				}
-				$id_subkomponen = $wpdb->get_var(
-					$wpdb->prepare("
-						SELECT 
-							id_subkomponen
-						FROM esakip_komponen_penilaian
-						WHERE id = %d
-					", $id_komponen_penilaian)
-				);
-				if (!empty($id_subkomponen)) {
-					$id_komponen = $wpdb->get_var(
-						$wpdb->prepare("
-							SELECT 
-								id_komponen
-							FROM esakip_subkomponen
-							WHERE id = %d
-						", $id_subkomponen)
-					);
-					if (empty($id_subkomponen)) {
-						$ret['status'] = 'error';
-						$ret['message'] = 'ID Komponen kosong!';
-					}
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'ID Subomponen kosong!';
 				}
 
 				$allowed_roles = array();
@@ -11839,21 +11852,51 @@ class Wp_Eval_Sakip_Public
 						$ret['message'] = "Gagal melakukan update nilai usulan: " . $wpdb->last_error;
 					}
 				} else {
-					$wpdb->insert(
-						'esakip_pengisian_lke',
-						array(
-							'id_user' => $current_user->ID,
-							'id_skpd' => $id_skpd,
-							'id_komponen' => $id_komponen,
-							'id_subkomponen' => $id_subkomponen,
-							'id_komponen_penilaian' => $id_komponen_penilaian,
-							'keterangan' => $ket_usulan,
-							'nilai_usulan' => $nilai_usulan,
-							'bukti_dukung' => $bukti_usulan,
-							'create_at' => current_time('mysql')
-						),
-						array('%d', '%d', '%d', '%s', '%f', '%s', '%s', '%s', '%s'),
+					//cari id kom dan subkom ketika insert baru
+					$id_subkomponen = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT 
+								id_subkomponen
+							FROM esakip_komponen_penilaian
+							WHERE id = %d
+						", $id_komponen_penilaian)
 					);
+					if (!empty($id_subkomponen)) {
+						$id_komponen = $wpdb->get_var(
+							$wpdb->prepare("
+								SELECT 
+									id_komponen
+								FROM esakip_subkomponen
+								WHERE id = %d
+							", $id_subkomponen)
+						);
+						if (empty($id_subkomponen)) {
+							$ret['status'] = 'error';
+							$ret['message'] = 'ID Komponen kosong!';
+						}
+					} else {
+						$ret['status'] = 'error';
+						$ret['message'] = 'ID Subomponen kosong!';
+					}
+
+					//jika sukses insert
+					if ($ret['status'] = 'success') {
+						$wpdb->insert(
+							'esakip_pengisian_lke',
+							array(
+								'id_user' => $current_user->ID,
+								'id_skpd' => $id_skpd,
+								'id_komponen' => $id_komponen,
+								'id_subkomponen' => $id_subkomponen,
+								'id_komponen_penilaian' => $id_komponen_penilaian,
+								'keterangan' => $ket_usulan,
+								'nilai_usulan' => $nilai_usulan,
+								'bukti_dukung' => $bukti_usulan,
+								'create_at' => current_time('mysql')
+							),
+							array('%d', '%d', '%d', '%s', '%f', '%s', '%s', '%s', '%s'),
+						);
+					}
 				}
 			} else {
 				$ret = array(
@@ -11941,8 +11984,8 @@ class Wp_Eval_Sakip_Public
 						foreach ($skpd_mitra as $k => $v) {
 							$all_skpd[] = $v;
 
-							if($v['is_skpd'] == 1){
-								$list_skpd_options .= '<option value="'.$v['id_skpd'].'">'.$v['kode_skpd'].' '.$v['nama_skpd'].'</option>';
+							if ($v['is_skpd'] == 1) {
+								$list_skpd_options .= '<option value="' . $v['id_skpd'] . '">' . $v['kode_skpd'] . ' ' . $v['nama_skpd'] . '</option>';
 							}
 						}
 					}
