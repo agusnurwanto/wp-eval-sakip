@@ -41,28 +41,35 @@ $skpd = $wpdb->get_row(
 ", $id_skpd, $tahun_anggaran_sakip),
     ARRAY_A
 );
-$current_user = wp_get_current_user();
-$can_verify = false;
-if (
-    in_array("admin_ortala", $current_user->roles) ||
-    in_array("admin_bappeda", $current_user->roles) ||
-    in_array("administrator", $current_user->roles)
-) {
-    $can_verify = true;
-}
 
-$get_jadwal = $wpdb->get_results("SELECT * from esakip_data_jadwal where id = (select max(id) from esakip_data_jadwal where tipe='LKE')", ARRAY_A);
-if(!empty($get_jadwal)){
+
+// date_default_timezone_set("Asia/Bangkok");
+// $dateTime = new DateTime();
+// $time_now = $dateTime->format('Y-m-d H:i:s');
+$get_jadwal = $wpdb->get_results(
+    $wpdb->prepare("
+        SELECT * 
+        FROM esakip_data_jadwal 
+        WHERE id = (
+            SELECT MAX(id) 
+            FROM esakip_data_jadwal 
+            WHERE tipe = %s
+        )", 'LKE'),
+    ARRAY_A
+);
+
+
+if (!empty($get_jadwal)) {
     $tahun_anggaran = $get_jadwal[0]['tahun_anggaran'];
-    $namaJadwal = $get_jadwal[0]['nama_jadwal'];
-    $mulaiJadwal = $get_jadwal[0]['started_at'];
-    $selesaiJadwal = $get_jadwal[0]['end_at'];
+    $nama_jadwal = $get_jadwal[0]['nama_jadwal'];
+    $mulai_jadwal = $get_jadwal[0]['started_at'];
+    $selesai_jadwal = $get_jadwal[0]['end_at'];
     $lama_pelaksanaan = $get_jadwal[0]['lama_pelaksanaan'];
-}else{
+} else {
     $tahun_anggaran = '2024';
-    $namaJadwal = '-';
-    $mulaiJadwal = '-';
-    $selesaiJadwal = '-';
+    $nama_jadwal = '-';
+    $mulai_jadwal = '-';
+    $selesai_jadwal = '-';
     $lama_pelaksanaan = 1;
 }
 $timezone = get_option('timezone_string');
@@ -73,6 +80,12 @@ $timezone = get_option('timezone_string');
         overflow: auto;
         max-height: 100vh;
         width: 100%;
+    }
+
+    input:disabled,
+    select:disabled,
+    textarea:disabled {
+        background: #8080804f;
     }
 </style>
 
@@ -88,8 +101,8 @@ $timezone = get_option('timezone_string');
                             <th class="text-center" rowspan="2" colspan="4" style="vertical-align: middle;">Komponen/Sub Komponen</th>
                             <th class="text-center" rowspan="2" style="vertical-align: middle;">Bobot</th>
                             <th class="text-center" colspan="3">Penilaian PD/Perangkat Daerah</th>
-                            <th class="text-center" rowspan="2" style="vertical-align: middle;">Bukti Dukung</th>
-                            <th class="text-center" rowspan="2" style="vertical-align: middle;">Keterangan OPD</th>
+                            <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Bukti Dukung</th>
+                            <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Keterangan OPD</th>
                             <th class="text-center" colspan="3">Penilaian Evaluator</th>
                             <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Keterangan Evaluator</th>
                             <th class="text-center" rowspan="2" style="vertical-align: middle;">Aksi</th>
@@ -114,15 +127,16 @@ $timezone = get_option('timezone_string');
         jQuery(document).ready(function() {
             get_table_pengisian_sakip();
             run_download_excel_sakip();
-        })
-        var dataHitungMundur = {
-            'namaJadwal' : '<?php echo ucwords($namaJadwal)  ?>',
-            'mulaiJadwal' : '<?php echo $mulaiJadwal  ?>',
-            'selesaiJadwal' : '<?php echo $selesaiJadwal  ?>',
-            'thisTimeZone' : '<?php echo $timezone ?>'
-        }
 
-        penjadwalanHitungMundur(dataHitungMundur);
+            let dataHitungMundur = {
+                'namaJadwal': '<?php echo ucwords($nama_jadwal)  ?>',
+                'mulaiJadwal': '<?php echo $mulai_jadwal  ?>',
+                'selesaiJadwal': '<?php echo $selesai_jadwal  ?>',
+                'thisTimeZone': '<?php echo $timezone ?>'
+            }
+            penjadwalanHitungMundur(dataHitungMundur);
+        })
+
 
         function get_table_pengisian_sakip() {
             jQuery('#wrap-loading').show();
