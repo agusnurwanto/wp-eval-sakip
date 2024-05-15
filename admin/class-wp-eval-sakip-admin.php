@@ -209,12 +209,12 @@ class Wp_Eval_Sakip_Admin
 					foreach ($jadwal_evaluasi as $jadwal_evaluasi_item) {
 						if (!empty($_POST['type']) && $_POST['type'] == 'pengisian_lke') {
 							$pengisian_lke_sakip = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Pengisian LKE ' . $jadwal_evaluasi_item['nama_jadwal'] . ' ' . ' | ' . $jadwal_evaluasi_item['tahun_anggaran'],
+								'nama_page' => 'Halaman Pengisian LKE | ' . $jadwal_evaluasi_item['tahun_anggaran'],
 								'content' => '[pengisian_lke_sakip id_jadwal=' . $jadwal_evaluasi_item['id'] . ']',
 								'show_header' => 1,
-								'no_key' => 1,
 								'post_status' => 'private'
 							));
+							$pengisian_lke_sakip['url'] .= '&id_jadwal=' . $jadwal_evaluasi_item['id'];
 							$body_pemda .= '
 								<li><a target="_blank" href="' . $pengisian_lke_sakip['url'] . '">' . $pengisian_lke_sakip['title'] . '</a></li>';
 						}
