@@ -20,9 +20,27 @@ $jadwal = $wpdb->get_row(
     ARRAY_A
 );
 
-if (empty($jadwal)) {
+if (empty($jadwal)) {+
     die("jadwal tidak tersedia");
 }
+
+$get_jadwal = $wpdb->get_results("SELECT * from esakip_data_jadwal where id = (select max(id) from esakip_data_jadwal where tipe='LKE')", ARRAY_A);
+if(!empty($get_jadwal)){
+    $tahun_anggaran = $get_jadwal[0]['tahun_anggaran'];
+    $namaJadwal = $get_jadwal[0]['nama_jadwal'];
+    $mulaiJadwal = $get_jadwal[0]['started_at'];
+    $selesaiJadwal = $get_jadwal[0]['end_at'];
+    $lama_pelaksanaan = $get_jadwal[0]['lama_pelaksanaan'];
+}else{
+    $tahun_anggaran = '2024';
+    $namaJadwal = '-';
+    $mulaiJadwal = '-';
+    $selesaiJadwal = '-';
+    $lama_pelaksanaan = 1;
+}
+
+$timezone = get_option('timezone_string');
+
 
 ?>
 <style type="text/css">
@@ -72,6 +90,15 @@ if (empty($jadwal)) {
     jQuery(document).ready(function() {
         getTableSkpd();
     });
+
+    var dataHitungMundur = {
+        'namaJadwal' : '<?php echo ucwords($namaJadwal)  ?>',
+        'mulaiJadwal' : '<?php echo $mulaiJadwal  ?>',
+        'selesaiJadwal' : '<?php echo $selesaiJadwal  ?>',
+        'thisTimeZone' : '<?php echo $timezone ?>'
+    }
+
+    penjadwalanHitungMundur(dataHitungMundur);
 
     function getTableSkpd() {
         jQuery('#wrap-loading').show();

@@ -9681,7 +9681,7 @@ class Wp_Eval_Sakip_Public
 						);
 
 						$btn = '<div class="btn-action-group">';
-						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_pengisian_lke['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_pengisian_lke['url'] . '&id_skpd=' . $vv['id_skpd']. '&id_jadwal=' . $id_jadwal . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 						$btn .= '</div>';
 
 						$tbody .= "<td class='text-center'>" . $nilai_usulan . "</td>";
@@ -10382,7 +10382,8 @@ class Wp_Eval_Sakip_Public
 				lama_pelaksanaan
 			FROM esakip_data_jadwal
 			WHERE tipe = 'LKE'
-			  AND status = 1",
+			  AND status = 1
+			ORDER BY started_at DESC LIMIT 1",
 			ARRAY_A
 		);
 		$pengisian_lke = '';
@@ -10395,6 +10396,7 @@ class Wp_Eval_Sakip_Public
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
+			$lke['url'] .= '&id_jadwal=' . $get_jadwal_lke_sakip['id'];
 			$pengisian_lke .= '<li><a target="_blank" href="' . $lke['url'] . '" class="btn btn-primary">' . $lke['title'] . '</a></li>';
 		}
 
@@ -10511,7 +10513,7 @@ class Wp_Eval_Sakip_Public
 				'post_status' => 'private'
 			));
 			$dokumen_pemda_lainnya = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen Lainnya Tahun ' . $_GET['tahun'],
+				'nama_page' => 'Halaman Dokumen Pemda Lainnya Tahun ' . $_GET['tahun'],
 				'content' => '[dokumen_pemda_lainnya tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
@@ -11878,9 +11880,7 @@ class Wp_Eval_Sakip_Public
 							$all_skpd[] = $v;
 							if($v['is_skpd'] == 1){
 								$list_skpd_options .= '<option value="'.$v['id_skpd'].'">'.$v['kode_skpd'].' '.$v['nama_skpd'].'</option>';
-							}else{
-								$list_skpd_options .= '<option value="'.$v['id_skpd'].'">-- '.$v['kode_skpd'].' '.$v['nama_skpd'].'</option>';
-							}
+							}						
 						}
 					}
 					echo json_encode([
