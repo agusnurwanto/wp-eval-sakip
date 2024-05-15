@@ -17,18 +17,16 @@ if (!empty($_GET) && !empty($_GET['id_skpd'])) {
 
 $jadwal = $wpdb->get_row(
     $wpdb->prepare("
-        SELECT
-            *
-        FROM esakip_data_jadwal
-        WHERE id=%d
-          AND status!=0
+    SELECT
+        *
+    FROM esakip_data_jadwal
+    WHERE id=%d
+      AND tipe='lke'
+      AND status!=0
     ", $input['id_jadwal']),
     ARRAY_A
 );
 
-if (empty($jadwal)) {
-    die(print_r($wpdb->last_query . '[id_jadwal= ' . $input['id_jadwal']));
-}
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
 $skpd = $wpdb->get_row(
@@ -89,28 +87,20 @@ $timezone = get_option('timezone_string');
                         <tr>
                             <th class="text-center" rowspan="2" colspan="4" style="vertical-align: middle;">Komponen/Sub Komponen</th>
                             <th class="text-center" rowspan="2" style="vertical-align: middle;">Bobot</th>
-                            <?php if (!$can_verify) : ?>
-                                <th class="text-center" colspan="3">Penilaian PD/Perangkat Daerah</th>
-                                <th class="text-center" rowspan="2" style="vertical-align: middle;">Bukti Dukung</th>
-                                <th class="text-center" rowspan="2" style="vertical-align: middle;">Keterangan OPD</th>
-                            <?php endif; ?>
-                            <?php if ($can_verify) : ?>
-                                <th class="text-center" colspan="3">Penilaian Evaluator</th>
-                                <th class="text-center" rowspan="2" style="vertical-align: middle;">Keterangan Evaluator</th>
-                                <th class="text-center" rowspan="2" style="vertical-align: middle;">Aksi</th>
-                            <?php endif; ?>
+                            <th class="text-center" colspan="3">Penilaian PD/Perangkat Daerah</th>
+                            <th class="text-center" rowspan="2" style="vertical-align: middle;">Bukti Dukung</th>
+                            <th class="text-center" rowspan="2" style="vertical-align: middle;">Keterangan OPD</th>
+                            <th class="text-center" colspan="3">Penilaian Evaluator</th>
+                            <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Keterangan Evaluator</th>
+                            <th class="text-center" rowspan="2" style="vertical-align: middle;">Aksi</th>
                         </tr>
                         <tr>
-                            <?php if (!$can_verify) : ?>
-                                <th class="text-center">Jawaban</th>
-                                <th class="text-center">Nilai</th>
-                                <th class="text-center">%</th>
-                            <?php endif; ?>
-                            <?php if ($can_verify) : ?>
-                                <th class="text-center">Jawaban</th>
-                                <th class="text-center">Nilai</th>
-                                <th class="text-center">%</th>
-                            <?php endif; ?>
+                            <th class="text-center">Jawaban</th>
+                            <th class="text-center">Nilai</th>
+                            <th class="text-center">%</th>
+                            <th class="text-center">Jawaban</th>
+                            <th class="text-center">Nilai</th>
+                            <th class="text-center">%</th>
                         </tr>
                     </thead>
                     <tbody>
