@@ -9750,7 +9750,7 @@ class Wp_Eval_Sakip_Public
 				);
 
 				$intersected_roles = array_intersect($admin_roles, $current_user->roles);
-	
+
 				$user_penilai = $this->get_user_penilai();
 				$user_penilai[''] = '-';
 
@@ -9768,14 +9768,14 @@ class Wp_Eval_Sakip_Public
 
 					$counter = 'A';
 					foreach ($data_komponen as $komponen) {
-						//jika user penilai komponen sudah diset
-						$disabled = 'disabled';
-						if (
-							array_key_exists($komponen['id_user_penilai'], $intersected_roles) ||
-							empty($komponen['id_user_penilai'])
-						) {
-							$disabled = '';
-						}
+						// //jika user penilai komponen sudah diset
+						// $disabled = 'disabled';
+						// if (
+						// 	array_key_exists($komponen['id_user_penilai'], $intersected_roles) ||
+						// 	empty($komponen['id_user_penilai'])
+						// ) {
+						// 	$disabled = '';
+						// }
 
 						$sum_nilai_sub = 0;
 						$sum_nilai_sub_penetapan = 0;
@@ -9801,7 +9801,7 @@ class Wp_Eval_Sakip_Public
 						$tbody .= "<td class='text-center'></td>";
 						$tbody .= "<td class='text-center'>" . number_format($sum_nilai_sub_penetapan, 2) .  "</td>";
 						$tbody .= "<td class='text-center'>" . number_format($persentase_kom_penetapan * 100, 2) . "%" . "</td>";
-						$tbody .= "<td class='text-left' colspan='2'>User Penilai: <b>" . $user_penilai[$komponen['id_user_penilai']] . "</b></td>";
+						$tbody .= "<td class='text-left' colspan='2'></td>";
 						$tbody .= "</tr>";
 
 						$data_subkomponen = $wpdb->get_results(
@@ -9816,6 +9816,13 @@ class Wp_Eval_Sakip_Public
 						);
 						if (!empty($data_subkomponen)) {
 							foreach ($data_subkomponen as $subkomponen) {
+								$disabled = 'disabled';
+								if (
+									array_key_exists($subkomponen['id_user_penilai'], $intersected_roles) ||
+									empty($subkomponen['id_user_penilai'])
+								) {
+									$disabled = '';
+								}
 								$sum_nilai_usulan = $wpdb->get_var(
 									$wpdb->prepare("
 										SELECT SUM(nilai_usulan)
@@ -10013,10 +10020,10 @@ class Wp_Eval_Sakip_Public
 												$tbody .= "<td class='text-center'></td>";
 												$tbody .= "<td class='text-center'><input type='text' id='buktiDukung" . $penilaian['kp_id'] . "' value='" . $penilaian['pl_bukti_dukung'] . "' disabled></input></td>";
 												$tbody .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan'] . "</textarea></td>";
-												$tbody .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' ". $disabled .">" . $opsi_penetapan . "</select></td>";
+												$tbody .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' " . $disabled . ">" . $opsi_penetapan . "</select></td>";
 												$tbody .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
 												$tbody .= "<td class='text-center'></td>";
-												$tbody .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'". $disabled .">" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
+												$tbody .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'" . $disabled . ">" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
 												if (!$disabled) {
 													$tbody .= "<td class='text-center'>" . $btn_save_penetapan . "</td>";
 												} else {
@@ -10095,7 +10102,7 @@ class Wp_Eval_Sakip_Public
 						AND active = 1
 					", $id_jadwal)
 				);
- 
+
 				$user_penilai = $this->get_user_penilai();
 				$user_penilai[''] = '-';
 				$tbody = '';
