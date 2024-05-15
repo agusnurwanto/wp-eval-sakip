@@ -10138,7 +10138,8 @@ class Wp_Eval_Sakip_Public
 						$tbody .= "<td class='text-left' colspan='3'><b>" . $komponen['nama'] . "</b></td>";
 						$tbody .= "<td class='text-center'>" . $komponen['bobot'] . "</td>";
 						$tbody .= "<td class='text-left'></td>";
-						$tbody .= "<td class='text-left'>User Penilai: <b>" . $user_penilai[$komponen['id_user_penilai']] . "</b></td>";
+						$tbody .= "<td class='text-left'></td>";
+						$tbody .= "<td class='text-left' style='display: none'>User Penilai: <b>" . $user_penilai[$komponen['id_user_penilai']] . "</b></td>";
 						$tbody .= "<td class='text-center'>" . $btn . "</td>";
 						$tbody .= "</tr>";
 

@@ -104,7 +104,7 @@ foreach($user_penilai as $key => $val){
                             <label for="namaKomponen">Nama Komponen</label>
                             <input type="text" class="form-control" id="namaKomponen" name="namaKomponen" required>
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-6" style="display: none;">
                             <label for="userPenilai">User Penilai</label>
                             <select class="form-control" id="userPenilai" name="userPenilai" required>
                                 <?php echo $user_penilai_html; ?>
