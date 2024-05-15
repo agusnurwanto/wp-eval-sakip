@@ -6143,6 +6143,7 @@ class Wp_Eval_Sakip_Public
 				$queryRecords = $wpdb->get_results($sqlRec, ARRAY_A);
 
 				$checkOpenedSchedule = 0;
+				$report = '';
 				if (!empty($queryRecords)) {
 					foreach ($queryRecords as $recKey => $recVal) {
 						$desain_lke_page = $this->functions->generatePage(array(
@@ -6153,7 +6154,9 @@ class Wp_Eval_Sakip_Public
 							'post_status' => 'private'
 						));
 
-						$report = '<a class="btn btn-sm btn-primary mr-2" style="text-decoration: none;" onclick="report(\'' . $recVal['id'] . '\'); return false;" href="#" title="Cetak Laporan"><i class="dashicons dashicons-printer"></i></a>';
+						$report = '<div class="btn-group mr-2" role="group">';
+						$report .= '<a class="btn btn-sm btn-primary" style="text-decoration: none;" onclick="report(\'' . $recVal['id'] . '\'); return false;" href="#" title="Cetak Laporan"><i class="dashicons dashicons-printer"></i></a>';
+						$report .= '</div>';
 
 						$edit	= '';
 						$delete	= '';
