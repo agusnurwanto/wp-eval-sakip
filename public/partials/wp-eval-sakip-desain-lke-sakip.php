@@ -620,10 +620,10 @@ foreach($user_penilai as $key => $val){
             return alert('Nomor Urut Komponen tidak boleh kosong');
         }
 
-        let userPenilai = jQuery("#userPenilai").val();
-        if (userPenilai == '') {
-            return alert('User Penilai tidak boleh kosong');
-        }
+        // let userPenilai = jQuery("#userPenilai").val();
+        // if (userPenilai == '') {
+        //     return alert('User Penilai tidak boleh kosong');
+        // }
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -635,7 +635,7 @@ foreach($user_penilai as $key => $val){
                 nama_komponen: namaKomponen,
                 bobot_komponen: bobotKomponen,
                 nomor_urut: nomorUrutKomponen,
-                user_penilai: userPenilai,
+                // user_penilai: userPenilai,
                 api_key: esakip.api_key
             },
             dataType: 'json',

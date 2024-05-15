@@ -10758,12 +10758,12 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Nomor Urut kosong!';
 				}
-				if (!empty($_POST['user_penilai'])) {
-					$user_penilai = $_POST['user_penilai'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'User Penilai kosong!';
-				}
+				// if (!empty($_POST['user_penilai'])) {
+				// 	$user_penilai = $_POST['user_penilai'];
+				// } else {
+				// 	$ret['status'] = 'error';
+				// 	$ret['message'] = 'User Penilai kosong!';
+				// }
 
 				if ($ret['status'] === 'success') {
 					if (!empty($id_komponen)) {
@@ -10821,7 +10821,7 @@ class Wp_Eval_Sakip_Public
 									'nama' => $nama_komponen,
 									'bobot' => $bobot_komponen,
 									'nomor_urut' => $nomor_urut,
-									'id_user_penilai' => $user_penilai,
+									// 'id_user_penilai' => $user_penilai,
 								),
 								array('id' => $id_komponen),
 								array('%s', '%f', '%f'),
@@ -10835,7 +10835,7 @@ class Wp_Eval_Sakip_Public
 									'nama' => $nama_komponen,
 									'bobot' => $bobot_komponen,
 									'nomor_urut' => $nomor_urut,
-									'id_user_penilai' => $user_penilai,
+									// 'id_user_penilai' => $user_penilai,
 									'active' => 1,
 								),
 								array('%d', '%s', '%f', '%f', '%d')
