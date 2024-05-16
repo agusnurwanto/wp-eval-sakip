@@ -9741,19 +9741,6 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Jadwal kosong!';
 				}
-
-				$dateTime = new DateTime();
-				$time_now = $dateTime->format('Y-m-d H:i:s');
-
-				$data_jadwal = $wpdb->get_results(
-					$wpdb->prepare("
-						SELECT *
-						FROM esakip_data_jadwal
-						WHERE id=%d
-					", $id_jadwal),
-					ARRAY_A
-				);
-				die(print_r($data_jadwal));
 				
 				//user authorize
 				$current_user = wp_get_current_user();
@@ -9766,7 +9753,7 @@ class Wp_Eval_Sakip_Public
 				$user_penilai = $this->get_user_penilai();
 				$user_penilai[''] = '-';
 
-				$data_komponen = $wpdb->get_row(
+				$data_komponen = $wpdb->get_results(
 					$wpdb->prepare("
 						SELECT * 
 						FROM esakip_komponen
@@ -9815,9 +9802,6 @@ class Wp_Eval_Sakip_Public
 								$disabled = 'disabled';
 								if (array_key_exists($subkomponen['id_user_penilai'], $intersected_roles)) {
 									$disabled = '';
-								}
-								if ($time_now > $data_jadwal['started_at'] && $time_now < $data_jadwal['end_at']) {
-									$disabled = 'disabled';
 								}
 
 								$sum_nilai_usulan = $wpdb->get_var(
