@@ -10414,7 +10414,7 @@ class Wp_Eval_Sakip_Public
 			$tahun_anggaran_selesai = $get_jadwal_lke_sakip['tahun_anggaran'] + $get_jadwal_lke_sakip['lama_pelaksanaan'];
 
 			$lke = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Pengisian LKE ' . $get_jadwal_lke_sakip['nama_jadwal'].' '.$get_jadwal_lke_sakip['tahun_anggaran'],
+				'nama_page' => 'Halaman Pengisian LKE ' . $get_jadwal_lke_sakip['nama_jadwal'],
 				'content' => '[pengisian_lke_sakip id_jadwal=' . $get_jadwal_lke_sakip['id'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
@@ -10585,7 +10585,7 @@ class Wp_Eval_Sakip_Public
 
 			foreach ($get_jadwal_lke as $get_jadwal_lke_sakip) {
 				$pengisian_lke_per_skpd = $this->functions->generatePage(array(
-					'nama_page' => 'Halaman Pengisian LKE ' . $get_jadwal_lke_sakip['nama_jadwal'].' '.$get_jadwal_lke_sakip['tahun_anggaran'],
+					'nama_page' => 'Halaman Pengisian LKE ' . $skpd_db['nama_skpd'] . ' ' . $get_jadwal_lke_sakip['nama_jadwal'],
 					'content' => '[pengisian_lke_sakip_per_skpd id_jadwal=' . $get_jadwal_lke_sakip['id'] . ']',
 					'show_header' => 1,
 					'post_status' => 'private'
