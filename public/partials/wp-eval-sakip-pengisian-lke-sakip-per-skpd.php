@@ -42,19 +42,15 @@ $skpd = $wpdb->get_row(
     ARRAY_A
 );
 
-
-// date_default_timezone_set("Asia/Bangkok");
-// $dateTime = new DateTime();
-// $time_now = $dateTime->format('Y-m-d H:i:s');
 $get_jadwal = $wpdb->get_results(
-    $wpdb->prepare("
+    $wpdb->prepare(
+        "
         SELECT * 
         FROM esakip_data_jadwal 
-        WHERE id = (
-            SELECT MAX(id) 
-            FROM esakip_data_jadwal 
-            WHERE tipe = %s
-        )", 'LKE'),
+        WHERE id = %d
+        ",
+        $input['id_jadwal']
+    ),
     ARRAY_A
 );
 
@@ -187,11 +183,11 @@ $timezone = get_option('timezone_string');
             run_download_excel_sakip();
 
             let dataHitungMundur = {
-                'namaJadwal': '<?php echo ucwords($nama_jadwal)  ?>',
-                'mulaiJadwal': '<?php echo $mulai_jadwal  ?>',
-                'selesaiJadwal': '<?php echo $selesai_jadwal  ?>',
-                'thisTimeZone': '<?php echo $timezone ?>'
-            }
+                'namaJadwal': <?php echo json_encode(ucwords($nama_jadwal)); ?>,
+                'mulaiJadwal': <?php echo json_encode($mulai_jadwal); ?>,
+                'selesaiJadwal': <?php echo json_encode($selesai_jadwal); ?>,
+                'thisTimeZone': <?php echo json_encode($timezone); ?>
+            };
             penjadwalanHitungMundur(dataHitungMundur);
         })
 

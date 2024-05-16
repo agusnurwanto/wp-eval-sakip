@@ -9735,18 +9735,26 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id SKPD kosong!';
 				}
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
+				}
 
-				// $prefix_history = '';
-				// $where_history = '';
-				// if($data_jadwal_terpilih['status'] == 0){
-				// 	$cek_jadwal = $this->validasi_jadwal_perencanaan('verifikasi_rka'.$where_rka,$tahun_anggaran);
-				// 	$jadwal_lokal = $cek_jadwal['data'];
-				// }else{
-				// 	$jadwal_lokal = $data_jadwal_terpilih;
-				// 	$prefix_history = '_history';
-				// 	$where_history = ' AND id_jadwal='.$data_jadwal_terpilih['id_jadwal_lokal'];
-				// }
+				$dateTime = new DateTime();
+				$time_now = $dateTime->format('Y-m-d H:i:s');
 
+				$data_jadwal = $wpdb->get_results(
+					$wpdb->prepare("
+						SELECT *
+						FROM esakip_data_jadwal
+						WHERE id=%d
+					", $id_jadwal),
+					ARRAY_A
+				);
+				die(print_r($data_jadwal));
+				
 				//user authorize
 				$current_user = wp_get_current_user();
 				$admin_roles = array(
@@ -9758,7 +9766,7 @@ class Wp_Eval_Sakip_Public
 				$user_penilai = $this->get_user_penilai();
 				$user_penilai[''] = '-';
 
-				$data_komponen = $wpdb->get_results(
+				$data_komponen = $wpdb->get_row(
 					$wpdb->prepare("
 						SELECT * 
 						FROM esakip_komponen
@@ -9807,6 +9815,9 @@ class Wp_Eval_Sakip_Public
 								$disabled = 'disabled';
 								if (array_key_exists($subkomponen['id_user_penilai'], $intersected_roles)) {
 									$disabled = '';
+								}
+								if ($time_now > $data_jadwal['started_at'] && $time_now < $data_jadwal['end_at']) {
+									$disabled = 'disabled';
 								}
 
 								$sum_nilai_usulan = $wpdb->get_var(
@@ -10068,6 +10079,39 @@ class Wp_Eval_Sakip_Public
 			);
 		}
 		die(json_encode($ret));
+	}
+
+	public function validasi_jadwal_aktif()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		date_default_timezone_set("Asia/Bangkok");
+		$dateTime = new DateTime();
+		$time_now = $dateTime->format('Y-m-d H:i:s');
+
+		$sql_jadwal_lokal = $wpdb->get_results("
+			SELECT 
+				* 
+			FROM `data_jadwal_lokal` 
+			WHERE status = 0 
+				AND (
+					waktu_awal < '" . $time_now . "' 
+					AND waktu_akhir > '" . $time_now . "'
+				) AND id_tipe='" . $sql_tipe[0]['id'] . "'" . $where_renja, ARRAY_A);
+
+		if (!empty($sql_jadwal_lokal)) {
+			$ret['data'] = $sql_jadwal_lokal;
+		} else {
+			$ret = array(
+				'message'	=> "Data terbuka tidak ditemukan.",
+				'data'		=> $sql_jadwal_lokal
+			);
+		}
 	}
 
 	public function get_user_penilai()

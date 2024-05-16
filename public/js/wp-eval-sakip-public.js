@@ -99,35 +99,24 @@ function tableHtmlToExcel(tableID, filename = "") {
 }
 
 function penjadwalanHitungMundur(dataHitungMundur = {}) {
-    nama =
-        dataHitungMundur["namaJadwal"] == ""
-            ? "Penjadwalan"
-            : dataHitungMundur["namaJadwal"];
-    mulaiJadwal =
-        dataHitungMundur["mulaiJadwal"] == ""
-            ? "2022-08-12 16:00:00"
-            : dataHitungMundur["mulaiJadwal"];
-    selesaiJadwal =
-        dataHitungMundur["selesaiJadwal"] == ""
-            ? "2022-09-12 16:00:00"
-            : dataHitungMundur["selesaiJadwal"];
-    thisTimeZone =
-        dataHitungMundur["thisTimeZone"] == ""
-            ? "Asia/Jakarta"
-            : dataHitungMundur["thisTimeZone"];
+    let nama = dataHitungMundur["namaJadwal"] || "Penjadwalan";
+    let mulaiJadwal = dataHitungMundur["mulaiJadwal"] || "2022-08-12 16:00:00";
+    let selesaiJadwal = dataHitungMundur["selesaiJadwal"] || "2022-09-12 16:00:00";
+    let thisTimeZone = dataHitungMundur["thisTimeZone"] || "Asia/Jakarta";
 
-    cekTimeZone = thisTimeZone.includes("Asia/");
-
-    if (cekTimeZone == false) {
+    if (!thisTimeZone.includes("Asia/")) {
         console.log("Pengaturan timezone salah");
         console.log(
-            "Pilih salah satu kota di zona waktu yang sama dengan anda, antara lain:  'Jakarta','Makasar','Jayapura'"
+            "Pilih salah satu kota di zona waktu yang sama dengan anda, antara lain: 'Jakarta','Makasar','Jayapura'"
         );
+        return;
     }
 
     var jadwal =
         '<div id="penjadwalanHitungMundur">' +
-        '<label id="titles"><span class="dashicons dashicons-clock"></span>&nbsp;' + nama +"</label>" +
+        '<label id="titles"><span class="dashicons dashicons-clock"></span>&nbsp;' +
+        nama +
+        "</label>" +
         '<div id="days" style="margin-left:10px">0 <span>Hari</span></div>' +
         '<div id="hours">00 <span>Jam</span></div>' +
         '<div id="minutes">00 <span>Menit</span></div>' +
@@ -137,31 +126,27 @@ function penjadwalanHitungMundur(dataHitungMundur = {}) {
     jQuery("body").prepend(jadwal);
 
     function makeTimer() {
-        var endTime = new Date(selesaiJadwal);
+        let endTime = new Date(selesaiJadwal);
         endTime = Date.parse(endTime) / 1000;
 
-        var now = new Date();
-        now = new Date(now.toLocaleString("en-US", { timeZone: thisTimeZone }));
-        now = Date.parse(now) / 1000;
+        let now = new Date();
+        now =
+            Date.parse(
+                new Date(
+                    now.toLocaleString("en-US", { timeZone: thisTimeZone })
+                )
+            ) / 1000;
 
-        var timeLeft = endTime - now;
+        let timeLeft = endTime - now;
 
-        var days = Math.floor(timeLeft / 86400);
-        var hours = Math.floor((timeLeft - days * 86400) / 3600);
-        var minutes = Math.floor((timeLeft - days * 86400 - hours * 3600) / 60);
-        var seconds = Math.floor(
-            timeLeft - days * 86400 - hours * 3600 - minutes * 60
-        );
+        let days = Math.floor(timeLeft / 86400);
+        let hours = Math.floor((timeLeft % 86400) / 3600);
+        let minutes = Math.floor((timeLeft % 3600) / 60);
+        let seconds = Math.floor(timeLeft % 60);
 
-        if (hours < "10") {
-            hours = "0" + hours;
-        }
-        if (minutes < "10") {
-            minutes = "0" + minutes;
-        }
-        if (seconds < "10") {
-            seconds = "0" + seconds;
-        }
+        if (hours < 10) hours = "0" + hours;
+        if (minutes < 10) minutes = "0" + minutes;
+        if (seconds < 10) seconds = "0" + seconds;
 
         jQuery("#days").html(days + "<span>Hari</span>");
         jQuery("#hours").html(hours + "<span>Jam</span>");
@@ -177,16 +162,12 @@ function penjadwalanHitungMundur(dataHitungMundur = {}) {
         }
     }
 
-    var mulaiJadwal = new Date(mulaiJadwal);
-    mulaiJadwal = Date.parse(mulaiJadwal);
+    let mulaiJadwalTime = new Date(mulaiJadwal).getTime();
+    let now = new Date().toLocaleString("en-US", { timeZone: thisTimeZone });
+    now = new Date(now).getTime();
 
-    var now = new Date();
-    now = new Date(now.toLocaleString("en-US", { timeZone: thisTimeZone }));
-    now = Date.parse(now);
-    if (now > mulaiJadwal) {
-        var wpsipdTimer = setInterval(function () {
-            makeTimer();
-        }, 1000);
+    if (now > mulaiJadwalTime) {
+        var wpsipdTimer = setInterval(makeTimer, 1000);
     } else {
         jQuery("#days").html("0 <span>Hari</span>");
         jQuery("#hours").html("00 <span>Jam</span>");
