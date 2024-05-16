@@ -58,7 +58,6 @@ $get_jadwal = $wpdb->get_results(
     ARRAY_A
 );
 
-
 if (!empty($get_jadwal)) {
     $tahun_anggaran = $get_jadwal[0]['tahun_anggaran'];
     $nama_jadwal = $get_jadwal[0]['nama_jadwal'];
@@ -87,40 +86,99 @@ $timezone = get_option('timezone_string');
     textarea:disabled {
         background: #8080804f;
     }
+
+    .action-section {
+        display: flex;
+        margin: 2rem 0;
+        margin-left: 10px;
+    }
+
+    .container {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .info-section {
+        display: flex;
+        justify-content: space-between;
+        max-width: 400px;
+        width: 100%;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        border-left: 5px solid #007BFF;
+    }
+
+    .info-section .label {
+        font-weight: bold;
+        color: #555;
+    }
+
+    .info-section .value {
+        color: #007BFF;
+        font-weight: bold;
+    }
+
+    @media (max-width: 480px) {
+        .container {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .info-section {
+            max-width: 100%;
+            margin-bottom: 20px;
+        }
+    }
 </style>
 
 <body>
     <div class="container-md" id="cetak" title="Pengisian LKE SAKIP (<?php echo $jadwal['tahun_anggaran']; ?>)">
         <div style="padding: 10px;margin:0 0 3rem 0;">
             <h1 class="text-center" style="margin:3rem;">Pengisian LKE SAKIP<br><?php echo $skpd['kode_skpd'] . ' ' . $skpd['nama_skpd'] ?><br><?php echo $jadwal['nama_jadwal']; ?> (<?php echo $jadwal['tahun_anggaran']; ?>)</h1>
-            <div class="action-section" style="display:flex;margin:2rem 0 2rem 0;"></div>
-            <div class="wrap-table">
-                <table id="table_pengisian_sakip" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th class="text-center" rowspan="2" colspan="4" style="vertical-align: middle;">Komponen/Sub Komponen</th>
-                            <th class="text-center" rowspan="2" style="vertical-align: middle;">Bobot</th>
-                            <th class="text-center" colspan="3">Penilaian PD/Perangkat Daerah</th>
-                            <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Bukti Dukung</th>
-                            <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Keterangan OPD</th>
-                            <th class="text-center" colspan="3">Penilaian Evaluator</th>
-                            <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Keterangan Evaluator</th>
-                            <th class="text-center" rowspan="2" style="vertical-align: middle;">Aksi</th>
-                        </tr>
-                        <tr>
-                            <th class="text-center">Jawaban</th>
-                            <th class="text-center">Nilai</th>
-                            <th class="text-center">%</th>
-                            <th class="text-center">Jawaban</th>
-                            <th class="text-center">Nilai</th>
-                            <th class="text-center">%</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
+        </div>
+        <div class="action-section">
+        </div>
+        <div class="container">
+            <div class="info-section">
+                <span class="label">Total Nilai Usulan:</span>
+                <span class="value">99</span>
+            </div>
+            <div class="info-section">
+                <span class="label">Total Nilai Penetapan:</span>
+                <span class="value">99</span>
             </div>
         </div>
+        <div class="wrap-table">
+            <table id="table_pengisian_sakip" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th class="text-center" rowspan="2" colspan="4" style="vertical-align: middle;">Komponen/Sub Komponen</th>
+                        <th class="text-center" rowspan="2" style="vertical-align: middle;">Bobot</th>
+                        <th class="text-center" colspan="3">Penilaian PD/Perangkat Daerah</th>
+                        <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Bukti Dukung</th>
+                        <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Keterangan OPD</th>
+                        <th class="text-center" colspan="3">Penilaian Evaluator</th>
+                        <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Keterangan Evaluator</th>
+                        <th class="text-center" rowspan="2" style="vertical-align: middle;">Aksi</th>
+                    </tr>
+                    <tr>
+                        <th class="text-center">Jawaban</th>
+                        <th class="text-center">Nilai</th>
+                        <th class="text-center">%</th>
+                        <th class="text-center">Jawaban</th>
+                        <th class="text-center">Nilai</th>
+                        <th class="text-center">%</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
     </div>
 
     <script>
