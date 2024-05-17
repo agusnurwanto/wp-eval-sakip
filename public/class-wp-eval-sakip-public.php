@@ -9741,7 +9741,27 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Jadwal kosong!';
 				}
-				
+
+				date_default_timezone_set('Asia/Jakarta'); // Adjust this if your server is set to a different timezone
+				$dateTime = new DateTime();
+				$data_jadwal = $wpdb->get_row(
+					$wpdb->prepare("
+						SELECT *
+						FROM esakip_data_jadwal
+						WHERE id=%d
+					", $id_jadwal),
+					ARRAY_A
+				);
+				if ($data_jadwal) {
+					$started_at = trim($data_jadwal['started_at']);
+					$end_at = trim($data_jadwal['end_at']);
+
+					$started_at_dt = new DateTime($started_at);
+					$end_at_dt = new DateTime($end_at);
+				} else {
+					error_log('Data jadwal tidak ditemukan.');
+				}
+
 				//user authorize
 				$current_user = wp_get_current_user();
 				$admin_roles = array(
@@ -9798,12 +9818,19 @@ class Wp_Eval_Sakip_Public
 						);
 						if (!empty($data_subkomponen)) {
 							foreach ($data_subkomponen as $subkomponen) {
-								//jika bukan user penilai disabled input
 								$disabled = 'disabled';
-								if (array_key_exists($subkomponen['id_user_penilai'], $intersected_roles)) {
+								//jika jadwal masih buka, jika merupakan user penilai
+								if ($dateTime > $started_at_dt && $dateTime < $end_at_dt) {
 									$disabled = '';
+									if (array_key_exists($subkomponen['id_user_penilai'], $intersected_roles)) {
+										$disabled = '';
+									} else {
+										$disabled = 'disabled';
+									}
+								} else {
+									$disabled = 'disabled';
 								}
-
+								
 								$sum_nilai_usulan = $wpdb->get_var(
 									$wpdb->prepare("
 										SELECT SUM(nilai_usulan)
