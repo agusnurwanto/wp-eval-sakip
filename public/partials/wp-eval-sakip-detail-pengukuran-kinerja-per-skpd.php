@@ -17,7 +17,6 @@ $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 $skpd = $wpdb->get_row(
     $wpdb->prepare("
     SELECT 
-        kode_skpd,
         nama_skpd
     FROM esakip_data_unit
     WHERE id_skpd=%d
@@ -67,7 +66,7 @@ foreach ($idtahun as $val) {
 <div class="container-md">
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Dokumen Pengukuran Kinerja <br><?php echo $skpd['kode_skpd'] . ' ' . $skpd['nama_skpd'] ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
+            <h1 class="text-center" style="margin:3rem;">Dokumen Pengukuran Kinerja <br><?php echo $skpd['nama_skpd'] ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
             <div style="margin-bottom: 25px;">
                 <button class="btn btn-primary" onclick="tambah_dokumen_pengukuran_kinerja();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
             </div>

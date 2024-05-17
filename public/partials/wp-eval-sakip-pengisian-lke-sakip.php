@@ -20,22 +20,21 @@ $jadwal = $wpdb->get_row(
     ARRAY_A
 );
 
-if (empty($jadwal)) {+
+if (empty($jadwal)) {
     die("jadwal tidak tersedia");
 }
 
-$get_jadwal = $wpdb->get_results("SELECT * from esakip_data_jadwal where id = (select max(id) from esakip_data_jadwal where tipe='LKE')", ARRAY_A);
-if(!empty($get_jadwal)){
-    $tahun_anggaran = $get_jadwal[0]['tahun_anggaran'];
-    $namaJadwal = $get_jadwal[0]['nama_jadwal'];
-    $mulaiJadwal = $get_jadwal[0]['started_at'];
-    $selesaiJadwal = $get_jadwal[0]['end_at'];
-    $lama_pelaksanaan = $get_jadwal[0]['lama_pelaksanaan'];
-}else{
+if (!empty($jadwal)) {
+    $tahun_anggaran = $jadwal['tahun_anggaran'];
+    $nama_jadwal = $jadwal['nama_jadwal'];
+    $mulai_jadwal = $jadwal['started_at'];
+    $selesai_jadwal = $jadwal['end_at'];
+    $lama_pelaksanaan = $jadwal['lama_pelaksanaan'];
+} else {
     $tahun_anggaran = '2024';
-    $namaJadwal = '-';
-    $mulaiJadwal = '-';
-    $selesaiJadwal = '-';
+    $nama_jadwal = '-';
+    $mulai_jadwal = '-';
+    $selesai_jadwal = '-';
     $lama_pelaksanaan = 1;
 }
 
@@ -69,7 +68,6 @@ $timezone = get_option('timezone_string');
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
-                            <th class="text-center">Kode SKPD</th>
                             <th class="text-center">Nama SKPD</th>
                             <th class="text-center">Nilai Usulan</th>
                             <th class="text-center">Nilai Penetapan</th>
@@ -89,16 +87,14 @@ $timezone = get_option('timezone_string');
 <script>
     jQuery(document).ready(function() {
         getTableSkpd();
+        let dataHitungMundur = {
+            'namaJadwal': <?php echo json_encode(ucwords($nama_jadwal)); ?>,
+            'mulaiJadwal': <?php echo json_encode($mulai_jadwal); ?>,
+            'selesaiJadwal': <?php echo json_encode($selesai_jadwal); ?>,
+            'thisTimeZone': <?php echo json_encode($timezone); ?>
+        };
+        penjadwalanHitungMundur(dataHitungMundur);
     });
-
-    var dataHitungMundur = {
-        'namaJadwal' : '<?php echo ucwords($namaJadwal)  ?>',
-        'mulaiJadwal' : '<?php echo $mulaiJadwal  ?>',
-        'selesaiJadwal' : '<?php echo $selesaiJadwal  ?>',
-        'thisTimeZone' : '<?php echo $timezone ?>'
-    }
-
-    penjadwalanHitungMundur(dataHitungMundur);
 
     function getTableSkpd() {
         jQuery('#wrap-loading').show();

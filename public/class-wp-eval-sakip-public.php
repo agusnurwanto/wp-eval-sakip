@@ -7280,7 +7280,6 @@ class Wp_Eval_Sakip_Public
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td>" . $vv['kode_skpd'] . "</td>";
 						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
 						$jumlah_dokumen = $wpdb->get_var(
@@ -7722,7 +7721,6 @@ class Wp_Eval_Sakip_Public
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td>" . $vv['kode_skpd'] . "</td>";
 						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
 						$jumlah_dokumen = $wpdb->get_var(
@@ -7906,7 +7904,6 @@ class Wp_Eval_Sakip_Public
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td>" . $vv['kode_skpd'] . "</td>";
 						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
 						$jumlah_dokumen = $wpdb->get_var(
@@ -8089,7 +8086,6 @@ class Wp_Eval_Sakip_Public
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td>" . $vv['kode_skpd'] . "</td>";
 						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
 						$jumlah_dokumen = $wpdb->get_var(
@@ -8273,7 +8269,6 @@ class Wp_Eval_Sakip_Public
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td>" . $vv['kode_skpd'] . "</td>";
 						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
 						$jumlah_dokumen = $wpdb->get_var(
@@ -8456,7 +8451,6 @@ class Wp_Eval_Sakip_Public
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td>" . $vv['kode_skpd'] . "</td>";
 						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
 						$jumlah_dokumen = $wpdb->get_var(
@@ -8639,7 +8633,6 @@ class Wp_Eval_Sakip_Public
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td>" . $vv['kode_skpd'] . "</td>";
 						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
 						$jumlah_dokumen = $wpdb->get_var(
@@ -8822,7 +8815,6 @@ class Wp_Eval_Sakip_Public
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td>" . $vv['kode_skpd'] . "</td>";
 						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
 						$jumlah_dokumen = $wpdb->get_var(
@@ -9170,7 +9162,6 @@ class Wp_Eval_Sakip_Public
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td>" . $vv['kode_skpd'] . "</td>";
 						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
 						$jumlah_dokumen = $wpdb->get_var(
@@ -9265,7 +9256,6 @@ class Wp_Eval_Sakip_Public
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td>" . $vv['kode_skpd'] . "</td>";
 						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
 						$jumlah_dokumen = $wpdb->get_var(
@@ -9544,7 +9534,6 @@ class Wp_Eval_Sakip_Public
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td>" . $vv['kode_skpd'] . "</td>";
 						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
 						$jumlah_dokumen = $wpdb->get_var(
@@ -9655,7 +9644,6 @@ class Wp_Eval_Sakip_Public
 
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td>" . $vv['kode_skpd'] . "</td>";
 						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
 						$nilai_usulan = $wpdb->get_var(
@@ -9830,7 +9818,7 @@ class Wp_Eval_Sakip_Public
 								} else {
 									$disabled = 'disabled';
 								}
-								
+
 								$sum_nilai_usulan = $wpdb->get_var(
 									$wpdb->prepare("
 										SELECT SUM(nilai_usulan)
@@ -10922,6 +10910,7 @@ class Wp_Eval_Sakip_Public
 		}
 		die(json_encode($ret));
 	}
+	
 	public function tambah_subkomponen_lke()
 	{
 		global $wpdb;
@@ -11204,6 +11193,7 @@ class Wp_Eval_Sakip_Public
 		}
 		die(json_encode($ret));
 	}
+
 	public function get_detail_subkomponen_lke_by_id()
 	{
 		global $wpdb;
@@ -11276,6 +11266,7 @@ class Wp_Eval_Sakip_Public
 		}
 		die(json_encode($ret));
 	}
+
 	public function get_detail_penilaian_lke_by_id()
 	{
 		global $wpdb;
@@ -11350,6 +11341,7 @@ class Wp_Eval_Sakip_Public
 		}
 		die(json_encode($ret));
 	}
+
 	public function get_komponen_lke_by_id()
 	{
 		global $wpdb;
@@ -11410,6 +11402,7 @@ class Wp_Eval_Sakip_Public
 		}
 		die(json_encode($ret));
 	}
+
 	public function get_subkomponen_lke_by_id()
 	{
 		global $wpdb;

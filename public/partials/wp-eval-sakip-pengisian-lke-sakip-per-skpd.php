@@ -32,7 +32,6 @@ $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 $skpd = $wpdb->get_row(
     $wpdb->prepare("
     SELECT 
-        kode_skpd,
         nama_skpd
     FROM esakip_data_unit
     WHERE id_skpd=%d
@@ -42,24 +41,12 @@ $skpd = $wpdb->get_row(
     ARRAY_A
 );
 
-$get_jadwal = $wpdb->get_results(
-    $wpdb->prepare(
-        "
-        SELECT * 
-        FROM esakip_data_jadwal 
-        WHERE id = %d
-        ",
-        $input['id_jadwal']
-    ),
-    ARRAY_A
-);
-
-if (!empty($get_jadwal)) {
-    $tahun_anggaran = $get_jadwal[0]['tahun_anggaran'];
-    $nama_jadwal = $get_jadwal[0]['nama_jadwal'];
-    $mulai_jadwal = $get_jadwal[0]['started_at'];
-    $selesai_jadwal = $get_jadwal[0]['end_at'];
-    $lama_pelaksanaan = $get_jadwal[0]['lama_pelaksanaan'];
+if (!empty($jadwal)) {
+    $tahun_anggaran = $jadwal['tahun_anggaran'];
+    $nama_jadwal = $jadwal['nama_jadwal'];
+    $mulai_jadwal = $jadwal['started_at'];
+    $selesai_jadwal = $jadwal['end_at'];
+    $lama_pelaksanaan = $jadwal['lama_pelaksanaan'];
 } else {
     $tahun_anggaran = '2024';
     $nama_jadwal = '-';
@@ -134,7 +121,7 @@ $timezone = get_option('timezone_string');
 <body>
     <div class="container-md" id="cetak" title="Pengisian LKE SAKIP (<?php echo $jadwal['tahun_anggaran']; ?>)">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Pengisian LKE SAKIP<br><?php echo $skpd['kode_skpd'] . ' ' . $skpd['nama_skpd'] ?><br><?php echo $jadwal['nama_jadwal']; ?> (<?php echo $jadwal['tahun_anggaran']; ?>)</h1>
+            <h1 class="text-center" style="margin:3rem;">Pengisian LKE SAKIP<br><?php echo $skpd['nama_skpd'] ?><br><?php echo $jadwal['nama_jadwal']; ?> (<?php echo $jadwal['tahun_anggaran']; ?>)</h1>
         </div>
         <div class="action-section">
         </div>

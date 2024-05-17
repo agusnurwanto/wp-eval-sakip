@@ -53,7 +53,6 @@ foreach ($idtahun as $val) {
 					<thead>
 						<tr>
 							<th class="text-center">No</th>
-							<th class="text-center">Kode SKPD</th>
 							<th class="text-center">Nama SKPD</th>
 							<th class="text-center">Jumlah Dokumen</th>
 							<th class="text-center">Aksi</th>
