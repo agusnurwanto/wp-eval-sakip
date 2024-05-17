@@ -128,11 +128,11 @@ $timezone = get_option('timezone_string');
         <div class="container">
             <div class="info-section">
                 <span class="label">Total Nilai Usulan:</span>
-                <span class="value">99</span>
+                <span class="value" id="nilaiUsulanTotal"></span>
             </div>
             <div class="info-section">
                 <span class="label">Total Nilai Penetapan:</span>
-                <span class="value">99</span>
+                <span class="value" id="nilaiPenetapanTotal"></span>
             </div>
         </div>
         <div class="wrap-table">
@@ -195,7 +195,9 @@ $timezone = get_option('timezone_string');
                     jQuery('#wrap-loading').hide();
                     console.log(response);
                     if (response.status === 'success') {
-                        jQuery('#table_pengisian_sakip tbody').html(response.data);
+                        jQuery('#table_pengisian_sakip tbody').html(response.data.tbody);
+                        jQuery('#nilaiUsulanTotal').html(response.data.total_nilai);
+                        jQuery('#nilaiPenetapanTotal').html(response.data.total_nilai_penetapan);
                     } else {
                         alert(response.message);
                     }

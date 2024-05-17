@@ -9537,18 +9537,14 @@ class Wp_Eval_Sakip_Public
 						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
 						$jumlah_dokumen = $wpdb->get_var(
-							$wpdb->prepare(
-								"
+							$wpdb->prepare("
 								SELECT 
 									COUNT(id)
 								FROM esakip_renstra
 								WHERE id_skpd = %d
 								  AND id_jadwal = %d
 								  AND active = 1
-								",
-								$vv['id_skpd'],
-								$id_jadwal
-							)
+							", $vv['id_skpd'], $id_jadwal)
 						);
 
 						$btn = '<div class="btn-action-group">';
@@ -9607,26 +9603,26 @@ class Wp_Eval_Sakip_Public
 
 				$unit = $wpdb->get_results(
 					$wpdb->prepare("
-					SELECT 
-						nama_skpd, 
-						id_skpd, 
-						kode_skpd
-					FROM esakip_data_unit 
-					WHERE tahun_anggaran=%d
-					  AND active=1 
-					  AND is_skpd=1 
-					ORDER BY kode_skpd ASC
+						SELECT 
+							nama_skpd, 
+							id_skpd, 
+							kode_skpd
+						FROM esakip_data_unit 
+						WHERE tahun_anggaran=%d
+						AND active=1 
+						AND is_skpd=1 
+						ORDER BY kode_skpd ASC
 					", $tahun_anggaran_sakip),
 					ARRAY_A
 				);
 
 				$jadwal = $wpdb->get_results(
 					$wpdb->prepare("
-					SELECT 
-						*
-					FROM esakip_data_jadwal
-					WHERE id=%d
-					  AND status != 0
+						SELECT 
+							*
+						FROM esakip_data_jadwal
+						WHERE id=%d
+							AND status != 0
 					", $id_jadwal),
 					ARRAY_A
 				);
@@ -9647,28 +9643,22 @@ class Wp_Eval_Sakip_Public
 						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
 						$nilai_usulan = $wpdb->get_var(
-							$wpdb->prepare(
-								"
+							$wpdb->prepare("
 								SELECT 
 									COUNT(nilai_usulan)
 								FROM esakip_pengisian_lke
 								WHERE id_skpd = %d
 								  AND active = 1
-								",
-								$vv['id_skpd']
-							)
+								", $vv['id_skpd'])
 						);
 						$nilai_penetapan = $wpdb->get_var(
-							$wpdb->prepare(
-								"
+							$wpdb->prepare("
 								SELECT 
 									COUNT(nilai_penetapan)
 								FROM esakip_pengisian_lke
 								WHERE id_skpd = %d
 								  AND active = 1
-								",
-								$vv['id_skpd']
-							)
+							", $vv['id_skpd'])
 						);
 
 						$btn = '<div class="btn-action-group">';
@@ -9730,6 +9720,7 @@ class Wp_Eval_Sakip_Public
 					$ret['message'] = 'Id Jadwal kosong!';
 				}
 
+				//get jadwal
 				date_default_timezone_set('Asia/Jakarta'); // Adjust this if your server is set to a different timezone
 				$dateTime = new DateTime();
 				$data_jadwal = $wpdb->get_row(
@@ -9782,7 +9773,8 @@ class Wp_Eval_Sakip_Public
 					) {
 						$can_verify = true;
 					}
-
+					$total_nilai = 0;
+					$total_nilai_penetapan = 0;
 					$counter = 'A';
 					foreach ($data_komponen as $komponen) {
 						$tbody2 = "";
@@ -9859,12 +9851,14 @@ class Wp_Eval_Sakip_Public
 									$persentase_sub = $sum_nilai_usulan / $count_nilai_usulan;
 									$total_nilai_sub = $persentase_sub * $subkomponen['bobot'];
 									$sum_nilai_sub += $total_nilai_sub;
+									$total_nilai += $sum_nilai_sub;
 								}
 
 								if ($count_nilai_penetapan > 0) {
 									$persentase_sub_penetapan = $sum_nilai_penetapan / $count_nilai_penetapan;
 									$total_nilai_sub_penetapan = $persentase_sub_penetapan * $subkomponen['bobot'];
 									$sum_nilai_sub_penetapan += $total_nilai_sub_penetapan;
+									$total_nilai_penetapan += $sum_nilai_penetapan;
 								}
 
 								//tbody subkomponen
@@ -10059,12 +10053,16 @@ class Wp_Eval_Sakip_Public
 						$tbody .= "<td class='text-left' colspan='2'></td>";
 						$tbody .= "</tr>";
 						$tbody .= $tbody2;
+
+						$merged_data['tbody'] = $tbody;
+						$merged_data['total_nilai'] = $total_nilai;
+						$merged_data['total_nilai_penetapan'] = $total_nilai_penetapan;
 					}
 				} else {
 					$tbody = "<tr><td colspan='4' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 
-				$ret['data'] = $tbody;
+				$ret['data'] = $merged_data;
 			} else {
 				$ret = array(
 					'status' => 'error',
@@ -10910,7 +10908,7 @@ class Wp_Eval_Sakip_Public
 		}
 		die(json_encode($ret));
 	}
-	
+
 	public function tambah_subkomponen_lke()
 	{
 		global $wpdb;
