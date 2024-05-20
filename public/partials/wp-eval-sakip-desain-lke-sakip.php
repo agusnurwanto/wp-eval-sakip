@@ -27,8 +27,8 @@ if (empty($jadwal)) {
 
 $user_penilai = $this->get_user_penilai();
 $user_penilai_html = '<option value="">Pilih user</option>';
-foreach($user_penilai as $key => $val){
-    $user_penilai_html .= '<option value="'.$key.'">'.$val.'</option>';
+foreach ($user_penilai as $key => $val) {
+    $user_penilai_html .= '<option value="' . $key . '">' . $val . '</option>';
 }
 ?>
 <style>
@@ -230,6 +230,127 @@ foreach($user_penilai as $key => $val){
                             <small class="text-muted text-sm-left" id="defaultTextInfoPenilaian"> Default Nomor Urut</small>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label>Pilih Jenis Bukti Dukung <small>(minimal 1 dan bisa lebih dari 1)</small></label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="renstra">
+                                    <label class="form-check-label" for="renstra">
+                                        RENSTRA
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="renja-rkt">
+                                    <label class="form-check-label" for="renja-rkt">
+                                        RENJA/RKT
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="perjanjian-kinerja">
+                                    <label class="form-check-label" for="perjanjian-kinerja">
+                                        Perjanjian Kinerja
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="rencana-aksi">
+                                    <label class="form-check-label" for="rencana-aksi">
+                                        Rencana Aksi
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="dokumen-lainnya">
+                                    <label class="form-check-label" for="dokumen-lainnya">
+                                        Dokumen Lainnya
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="iku">
+                                    <label class="form-check-label" for="iku">
+                                        IKU
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="skp">
+                                    <label class="form-check-label" for="skp">
+                                        SKP
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="pengukuran-kinerja">
+                                    <label class="form-check-label" for="pengukuran-kinerja">
+                                        Pengukuran Kinerja
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="pengukuran-rencana-aksi">
+                                    <label class="form-check-label" for="pengukuran-rencana-aksi">
+                                        Pengukuran Rencana Aksi
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="laporan-kinerja">
+                                    <label class="form-check-label" for="laporan-kinerja">
+                                        Laporan Kinerja
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="evaluasi-internal">
+                                    <label class="form-check-label" for="evaluasi-internal">
+                                        Evaluasi Internal
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" onclick="submit_komponen_penilaian(); return false">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal untuk menambah kerangka logis komponen penilaian -->
+<div class="modal fade" id="tambahKerangkaLogisModal" tabindex="-1" role="dialog" aria-labelledby="tambahKerangkaLogisModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tambahKerangkaLogisModalLabel">Tambah Kerangka Logis</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formTambahKerangkaLogis">
+                    <input type="hidden" value="" id="idKomponenPenilaian">
+                    <input type="hidden" value="" id="idSubKomponen_penilaian">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="jenisKerangkaLogis">Jenis Kerangka Logis</label>
+                            <select class="form-control" id="jenisKerangkaLogis" name="jenisKerangkaLogis" required>
+                                <option value="" selected disabled>Pilih Jenis Kerangka Logis</option>
+                                <option value="1">Rata-Rata</option>
+                                <option value="2">Nilai</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6" id="subkomponenPembandingContainer" style="display:none;">
+                            <label for="subkomponenPembanding">Pilih Subkomponen Pembanding</label>
+                            <input type="text" class="form-control" id="subkomponenPembanding" name="subkomponenPembanding">
+                        </div>
+                        <div class="form-group col-md-6" id="komponenPenilaianPembandingContainer" style="display:none;">
+                            <label for="komponenPenilaianPembanding">Pilih Komponen Penilaian Pembanding</label>
+                            <input type="text" class="form-control" id="komponenPenilaianPembanding" name="komponenPenilaianPembanding">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="pesanKerangkaLogis">Pesan Kesalahan</label>
+                        <textarea class="form-control" id="pesanKerangkaLogis" name="pesanKerangkaLogis" required></textarea>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -243,6 +364,23 @@ foreach($user_penilai as $key => $val){
 <script>
     jQuery(document).ready(function() {
         get_table_desain_sakip();
+        jQuery('#subkomponenPembandingContainer').hide();
+        jQuery('#komponenPenilaianPembandingContainer').hide();
+
+        // Handle change event on the dropdown
+        jQuery('#jenisKerangkaLogis').on('change', function() {
+            var jenisKerangkaLogis = jQuery(this).val();
+            if (jenisKerangkaLogis == '1') {
+                jQuery('#subkomponenPembandingContainer').show();
+                jQuery('#komponenPenilaianPembandingContainer').hide();
+            } else if (jenisKerangkaLogis == '2') {
+                jQuery('#komponenPenilaianPembandingContainer').show();
+                jQuery('#subkomponenPembandingContainer').hide();
+            } else {
+                jQuery('#subkomponenPembandingContainer').hide();
+                jQuery('#komponenPenilaianPembandingContainer').hide();
+            }
+        });
     })
 
     function get_table_desain_sakip() {
@@ -382,6 +520,16 @@ foreach($user_penilai as $key => $val){
             }
         });
         jQuery('#tambahPenilaianModal').modal('show');
+    }
+
+    function tambah_kerangka_logis(id) {
+        jQuery('#idSubKomponen_penilaian').val(id);
+        jQuery('#idKomponenPenilaian').val('');
+        jQuery('#jenisKerangkaLogis').val('');
+        jQuery('#subkomponenPembanding').val('');
+        jQuery('#pesanKerangkaLogis').val('');
+        jQuery('#komponenPenilaianPembanding').val('');
+        jQuery('#tambahKerangkaLogisModal').modal('show');
     }
 
     function edit_data_komponen(id) {
