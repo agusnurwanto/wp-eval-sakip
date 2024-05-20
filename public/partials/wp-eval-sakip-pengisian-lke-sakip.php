@@ -26,12 +26,14 @@ if (empty($jadwal)) {
 
 if (!empty($jadwal)) {
     $tahun_anggaran = $jadwal['tahun_anggaran'];
+    $jenis_jadwal = $jadwal['jenis_jadwal'];
     $nama_jadwal = $jadwal['nama_jadwal'];
     $mulai_jadwal = $jadwal['started_at'];
     $selesai_jadwal = $jadwal['end_at'];
     $lama_pelaksanaan = $jadwal['lama_pelaksanaan'];
 } else {
     $tahun_anggaran = '2024';
+    $jenis_jadwal = '-';
     $nama_jadwal = '-';
     $mulai_jadwal = '-';
     $selesai_jadwal = '-';
@@ -88,6 +90,7 @@ $timezone = get_option('timezone_string');
     jQuery(document).ready(function() {
         getTableSkpd();
         let dataHitungMundur = {
+            'jenisJadwal': <?php echo json_encode(ucwords($jenis_jadwal)); ?>,
             'namaJadwal': <?php echo json_encode(ucwords($nama_jadwal)); ?>,
             'mulaiJadwal': <?php echo json_encode($mulai_jadwal); ?>,
             'selesaiJadwal': <?php echo json_encode($selesai_jadwal); ?>,
