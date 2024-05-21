@@ -167,6 +167,44 @@ $timezone = get_option('timezone_string');
     </div>
 
     <!-- Modal tambah bukti dukung -->
+    <div class="modal fade bd-example-modal-lg" id="tambahBuktiDukungModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tambahBuktiDukungModalLabel">Tambah Kerangka Logis</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table id="tableKerangkaLogis" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center">No</th>
+                                <th class="text-center">Jenis Bukti Dukung</th>
+                                <th class="text-center">Nama Dokumen</th>
+                                <th class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <form id="formtambahBuktiDukung">
+                        <input type="hidden" value="" id="idPenilaian" name="idPenilaian">
+                        <div class="form-group">
+                            <label for="linkBuktiDukung">Pilih Bukti Dukung</label>
+                            <input type="text" class="form-control" id="linkBuktiDukung" name="linkBuktiDukung">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-primary" onclick="submit_komponen_penilaian(); return false">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="tambahBuktiDukungModal" tabindex="-1" role="dialog" aria-labelledby="tambahBuktiDukungModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

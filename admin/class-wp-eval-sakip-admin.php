@@ -748,6 +748,111 @@ class Wp_Eval_Sakip_Admin
 				')
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'evaluasi_internal')));
+		
+		Container::make('theme_options', __('Pohon Kinerja dan Cascading'))
+			->set_page_parent($dokumen_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_pohon_kinerja_dan_cascading_hide_sidebar')
+					->set_html('
+						<style>
+							.postbox-container { display: none; }
+							#poststuff #post-body.columns-2 { margin: 0 !important; }
+						</style>
+					')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'pohon_kinerja_dan_cascading')));
+		
+		Container::make('theme_options', __('LHE AKIP Internal'))
+			->set_page_parent($dokumen_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_lhe_akip_internal_hide_sidebar')
+					->set_html('
+						<style>
+							.postbox-container { display: none; }
+							#poststuff #post-body.columns-2 { margin: 0 !important; }
+						</style>
+					')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'lhe_akip_internal')));
+
+		Container::make('theme_options', __('TL LHE AKIP Internal'))
+			->set_page_parent($dokumen_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_tl_lhe_akip_internal_hide_sidebar')
+					->set_html('
+						<style>
+							.postbox-container { display: none; }
+							#poststuff #post-body.columns-2 { margin: 0 !important; }
+						</style>
+					')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'tl_lhe_akip_internal')));
+			
+		Container::make('theme_options', __('TL LHE AKIP Kemenpan'))
+		->set_page_parent($dokumen_menu)
+		->add_fields(array(
+			Field::make('html', 'crb_tl_lhe_akip_kemenpan_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+		))
+		->add_fields($this->get_ajax_field(array('type' => 'tl_lhe_akip_kemenpan')));
+			
+		Container::make('theme_options', __('Laporan Monev Renaksi'))
+		->set_page_parent($dokumen_menu)
+		->add_fields(array(
+			Field::make('html', 'crb_laporan_monev_renaksi_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+		))
+		->add_fields($this->get_ajax_field(array('type' => 'laporan_monev_renaksi')));
+		
+		Container::make('theme_options', __('Pedoman Teknis Perencanaan'))
+		->set_page_parent($dokumen_menu)
+		->add_fields(array(
+			Field::make('html', 'crb_pedoman_teknis_perencanaan_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+		))
+		->add_fields($this->get_ajax_field(array('type' => 'pedoman_teknis_perencanaan')));
+		
+		Container::make('theme_options', __('Pedoman Teknis Pengukuran dan Pengumpulan Data Kinerja'))
+		->set_page_parent($dokumen_menu)
+		->add_fields(array(
+			Field::make('html', 'crb_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+		))
+		->add_fields($this->get_ajax_field(array('type' => 'pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja')));
+		
+		Container::make('theme_options', __('Pedoman Teknis Evaluasi Internal'))
+		->set_page_parent($dokumen_menu)
+		->add_fields(array(
+			Field::make('html', 'crb_pedoman_teknis_evaluasi_internal_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+		))
+		->add_fields($this->get_ajax_field(array('type' => 'pedoman_teknis_evaluasi_internal')));
+
 		Container::make('theme_options', __('Dokumen Lainnya'))
 			->set_page_parent($dokumen_menu)
 			->add_fields(array(

@@ -235,69 +235,75 @@ foreach ($user_penilai as $key => $val) {
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="renstra">
+                                    <input class="form-check-input" type="checkbox" value="RENSTRA" id="renstra">
                                     <label class="form-check-label" for="renstra">
                                         RENSTRA
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="renja-rkt">
+                                    <input class="form-check-input" type="checkbox" value="RENJA/RKT" id="renja-rkt">
                                     <label class="form-check-label" for="renja-rkt">
                                         RENJA/RKT
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="perjanjian-kinerja">
+                                    <input class="form-check-input" type="checkbox" value="Perjanjian Kinerja" id="perjanjian-kinerja">
                                     <label class="form-check-label" for="perjanjian-kinerja">
                                         Perjanjian Kinerja
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="rencana-aksi">
+                                    <input class="form-check-input" type="checkbox" value="Rencana Aksi" id="rencana-aksi">
                                     <label class="form-check-label" for="rencana-aksi">
                                         Rencana Aksi
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="dokumen-lainnya">
+                                    <input class="form-check-input" type="checkbox" value="Dokumen Lainnya" id="dokumen-lainnya">
                                     <label class="form-check-label" for="dokumen-lainnya">
                                         Dokumen Lainnya
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="DPA" id="dpa">
+                                    <label class="form-check-label" for="dpa">
+                                        DPA
                                     </label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="iku">
+                                    <input class="form-check-input" type="checkbox" value="IKU" id="iku">
                                     <label class="form-check-label" for="iku">
                                         IKU
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="skp">
+                                    <input class="form-check-input" type="checkbox" value="SKP" id="skp">
                                     <label class="form-check-label" for="skp">
                                         SKP
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="pengukuran-kinerja">
+                                    <input class="form-check-input" type="checkbox" value="Pengukuran Kinerja" id="pengukuran-kinerja">
                                     <label class="form-check-label" for="pengukuran-kinerja">
                                         Pengukuran Kinerja
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="pengukuran-rencana-aksi">
+                                    <input class="form-check-input" type="checkbox" value="Pengukuran Rencana Aksi" id="pengukuran-rencana-aksi">
                                     <label class="form-check-label" for="pengukuran-rencana-aksi">
                                         Pengukuran Rencana Aksi
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="laporan-kinerja">
+                                    <input class="form-check-input" type="checkbox" value="Laporan Kinerja" id="laporan-kinerja">
                                     <label class="form-check-label" for="laporan-kinerja">
                                         Laporan Kinerja
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="evaluasi-internal">
+                                    <input class="form-check-input" type="checkbox" value="Evaluasi Internal" id="evaluasi-internal">
                                     <label class="form-check-label" for="evaluasi-internal">
                                         Evaluasi Internal
                                     </label>
@@ -316,8 +322,8 @@ foreach ($user_penilai as $key => $val) {
 </div>
 
 <!-- Modal untuk menambah kerangka logis komponen penilaian -->
-<div class="modal fade" id="tambahKerangkaLogisModal" tabindex="-1" role="dialog" aria-labelledby="tambahKerangkaLogisModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade bd-example-modal-lg" id="tambahKerangkaLogisModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="tambahKerangkaLogisModalLabel">Tambah Kerangka Logis</h5>
@@ -326,9 +332,21 @@ foreach ($user_penilai as $key => $val) {
                 </button>
             </div>
             <div class="modal-body">
+                <table id="tableKerangkaLogis" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">No</th>
+                            <th class="text-center">Jenis Kerangka Logis</th>
+                            <th class="text-center">Sub Komponen/Komponen Penilaian Pembanding</th>
+                            <th class="text-center">Pesan Kesalahan</th>
+                            <th class="text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
                 <form id="formTambahKerangkaLogis">
                     <input type="hidden" value="" id="idKomponenPenilaian">
-                    <input type="hidden" value="" id="idSubKomponen_penilaian">
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="jenisKerangkaLogis">Jenis Kerangka Logis</label>
@@ -340,11 +358,13 @@ foreach ($user_penilai as $key => $val) {
                         </div>
                         <div class="form-group col-md-6" id="subkomponenPembandingContainer" style="display:none;">
                             <label for="subkomponenPembanding">Pilih Subkomponen Pembanding</label>
-                            <input type="text" class="form-control" id="subkomponenPembanding" name="subkomponenPembanding">
+                            <select class="form-control" id="subkomponenPembanding" name="subkomponenPembanding">
+                            </select>
                         </div>
                         <div class="form-group col-md-6" id="komponenPenilaianPembandingContainer" style="display:none;">
                             <label for="komponenPenilaianPembanding">Pilih Komponen Penilaian Pembanding</label>
-                            <input type="text" class="form-control" id="komponenPenilaianPembanding" name="komponenPenilaianPembanding">
+                            <select class="form-control" id="komponenPenilaianPembanding" name="komponenPenilaianPembanding">
+                            </select>
                         </div>
                     </div>
                     <div class="form-group">
@@ -355,7 +375,7 @@ foreach ($user_penilai as $key => $val) {
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-info" data-dismiss="modal">Tutup</button>
-                <button type="button" class="btn btn-primary" onclick="submit_komponen_penilaian(); return false">Simpan</button>
+                <button type="button" class="btn btn-primary" onclick="submit_kerangka_logis(); return false">Simpan</button>
             </div>
         </div>
     </div>
@@ -364,12 +384,15 @@ foreach ($user_penilai as $key => $val) {
 <script>
     jQuery(document).ready(function() {
         get_table_desain_sakip();
+        get_option_sub_pembanding();
+        get_option_penilaian_pembanding();
+
         jQuery('#subkomponenPembandingContainer').hide();
         jQuery('#komponenPenilaianPembandingContainer').hide();
 
-        // Handle change event on the dropdown
+        // Handle change event kerangka logis
         jQuery('#jenisKerangkaLogis').on('change', function() {
-            var jenisKerangkaLogis = jQuery(this).val();
+            let jenisKerangkaLogis = jQuery(this).val();
             if (jenisKerangkaLogis == '1') {
                 jQuery('#subkomponenPembandingContainer').show();
                 jQuery('#komponenPenilaianPembandingContainer').hide();
@@ -508,6 +531,7 @@ foreach ($user_penilai as $key => $val) {
                     jQuery('#alertSub_penilaian').text('Nama Sub Komponen = ' + data.subkomponen.nama);
                     jQuery('#namaPenilaian').val('');
                     jQuery('#tipeJawaban').val('');
+                    jQuery('input[type=checkbox]').prop('checked', false);
                     jQuery("#keterangan").val('');
                     jQuery('#nomorUrutPenilaian').val(parseFloat(data.default_urutan) + 1.00);
                 } else {
@@ -523,12 +547,14 @@ foreach ($user_penilai as $key => $val) {
     }
 
     function tambah_kerangka_logis(id) {
-        jQuery('#idSubKomponen_penilaian').val(id);
-        jQuery('#idKomponenPenilaian').val('');
+        jQuery('#idKomponenPenilaian').val(id);
         jQuery('#jenisKerangkaLogis').val('');
         jQuery('#subkomponenPembanding').val('');
         jQuery('#pesanKerangkaLogis').val('');
         jQuery('#komponenPenilaianPembanding').val('');
+
+        jQuery('#subkomponenPembandingContainer').hide();
+        jQuery('#komponenPenilaianPembandingContainer').hide();
         jQuery('#tambahKerangkaLogisModal').modal('show');
     }
 
@@ -609,6 +635,17 @@ foreach ($user_penilai as $key => $val) {
         });
     }
 
+    function setCheckBoxes(selectedBuktiDukung) {
+        jQuery('input[type=checkbox]').prop('checked', false);
+
+        // Iterate over the selectedBuktiDukung array and check the corresponding checkboxes
+        if (selectedBuktiDukung && selectedBuktiDukung.length > 0) {
+            selectedBuktiDukung.forEach(function(bukti) {
+                jQuery('input[value="' + bukti + '"]').prop('checked', true);
+            });
+        }
+    }
+
     function edit_data_komponen_penilaian(id) {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
@@ -628,14 +665,15 @@ foreach ($user_penilai as $key => $val) {
                     jQuery('#tambahPenilaianModalLabel').hide();
                     jQuery('#editPenilaianModalLabel').show();
                     jQuery('#defaultTextInfoPenilaian').hide();
-                    jQuery('#alertKomponen_penilaian').text('Nama Komponen = ' + data.komponen.nama);
-                    jQuery('#alertSub_penilaian').text('Nama Sub Komponen = ' + data.subkomponen.nama);
-                    jQuery("#idKomponenPenilaian").val(data.id);
-                    jQuery("#idSubKomponen_penilaian").val(data.id_subkomponen);
-                    jQuery("#namaPenilaian").val(data.nama);
-                    jQuery("#tipeJawaban").val(data.tipe);
-                    jQuery("#keterangan").val(data.keterangan);
-                    jQuery('#nomorUrutPenilaian').val(data.nomor_urut);
+                    jQuery('#alertKomponen_penilaian').text('Nama Komponen = ' + data.komponen.nama + ' (' + data.komponen.bobot + ')');
+                    jQuery('#alertSub_penilaian').text('Nama Sub Komponen = ' + data.subkomponen.nama + ' (' + data.subkomponen.bobot + ')');
+                    jQuery("#idKomponenPenilaian").val(data.data.id);
+                    jQuery("#idSubKomponen_penilaian").val(data.data.id_subkomponen);
+                    jQuery("#namaPenilaian").val(data.data.nama);
+                    jQuery("#tipeJawaban").val(data.data.tipe);
+                    jQuery("#keterangan").val(data.data.keterangan);
+                    jQuery('#nomorUrutPenilaian').val(data.data.nomor_urut);
+                    setCheckBoxes(data.data.jenis_bukti_dukung);
                     jQuery('#tambahPenilaianModal').modal('show');
                 } else {
                     alert(response.message);
@@ -891,6 +929,16 @@ foreach ($user_penilai as $key => $val) {
         if (nomorUrutPenilaian == '') {
             return alert('Nomor Urut Penilaian tidak boleh kosong');
         }
+
+        let selectedBuktiDukung = [];
+        jQuery('input[type=checkbox]:checked').each(function() {
+            selectedBuktiDukung.push(jQuery(this).val());
+        });
+
+        if (selectedBuktiDukung.length === 0) {
+            return alert('Minimal satu bukti dukung harus dipilih');
+        }
+
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -902,6 +950,7 @@ foreach ($user_penilai as $key => $val) {
                 nama_komponen_penilaian: namaPenilaian,
                 tipe_komponen_penilaian: tipeJawaban,
                 keterangan: keterangan,
+                bukti_dukung: JSON.stringify(selectedBuktiDukung),
                 nomor_urut: nomorUrutPenilaian,
                 api_key: esakip.api_key
             },
@@ -923,5 +972,120 @@ foreach ($user_penilai as $key => $val) {
                 alert('Terjadi kesalahan saat mengirim data!');
             }
         });
+    }
+
+    function submit_kerangka_logis() {
+        let idKomponenPenilaian = jQuery("#idKomponenPenilaian").val();
+        if (idKomponenPenilaian == '') {
+            return alert('Id Komponen Penilaian tidak boleh kosong');
+        }
+        let jenisKerangkaLogis = jQuery("#jenisKerangkaLogis").val();
+        if (jenisKerangkaLogis == '') {
+            return alert('Jenis Kerangka Logis tidak boleh kosong');
+        }
+        let pesanKerangkaLogis = jQuery("#pesanKerangkaLogis").val();
+        if (pesanKerangkaLogis == '') {
+            return alert('Pesan Kesalahan tidak boleh kosong');
+        }
+
+        let komponenPembanding = '';
+        if (jenisKerangkaLogis == 1) {
+            komponenPembanding = jQuery("#subkomponenPembanding").val();
+            if (komponenPembanding == '') {
+                return alert('Sub Komponen Pembanding tidak boleh kosong');
+            }
+        } else if (jenisKerangkaLogis == 2) {
+            komponenPembanding = jQuery("#komponenPenilaianPembanding").val();
+            if (komponenPembanding == '') {
+                return alert('Komponen Pembanding tidak boleh kosong');
+            }
+        }
+
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'tambah_kerangka_logis_penilaian_lke',
+                id: idKomponenPenilaian,
+                jenis_kerangka_logis: jenisKerangkaLogis,
+                komponen_pembanding: komponenPembanding,
+                pesan_kesalahan: pesanKerangkaLogis,
+                api_key: esakip.api_key
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    jQuery('#tambahPenilaianModal').modal('hide');
+                    get_table_desain_sakip();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }
+
+    function get_option_sub_pembanding() {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: "POST",
+            data: {
+                'action': "get_subkomponen_pembanding",
+                'api_key': esakip.api_key,
+                'id_jadwal': <?php echo $input['id_jadwal']; ?>,
+            },
+            dataType: "json",
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    jQuery('#subkomponenPembanding').html(response.data)
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        })
+    }
+
+    function get_option_penilaian_pembanding() {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: "POST",
+            data: {
+                'action': "get_komponen_penilaian_pembanding",
+                'api_key': esakip.api_key,
+                'id_jadwal': <?php echo $input['id_jadwal']; ?>,
+            },
+            dataType: "json",
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    jQuery('#komponenPenilaianPembanding').html(response.data)
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        })
     }
 </script>

@@ -35,14 +35,14 @@ foreach ($unit as $kk => $vv) {
 }
 ?>
 <div id="wrap-table">
-	<h1 class="text-center">Mapping SKPD Tahun <?php echo $tahun_anggaran; ?></h1>
+	<h1 class="text-center">Mapping OPD Tahun <?php echo $tahun_anggaran; ?></h1>
 	<table>
 		<thead>
 			<tr>
-				<th class="text-center">Kode SKPD SIPD</th>
-				<th class="text-center" style="width: 500px;">Nama SKPD SIPD</th>
+				<th class="text-center">Kode OPD SIPD</th>
+				<th class="text-center" style="width: 500px;">Nama OPD SIPD</th>
 				<th class="text-center" style="width: 500px;">Nama dan NIP</th>
-				<th class="text-center" style="width: 500px;">Nama SKPD SAKIP</th>
+				<th class="text-center" style="width: 500px;">Nama OPD SAKIP</th>
 				<th class="text-center">Aksi</th>
 			</tr>
 		</thead>
