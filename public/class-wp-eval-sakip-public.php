@@ -11692,6 +11692,7 @@ class Wp_Eval_Sakip_Public
 		}
 		die(json_encode($ret));
 	}
+
 	public function tambah_komponen_penilaian_lke()
 	{
 		global $wpdb;
@@ -11700,7 +11701,6 @@ class Wp_Eval_Sakip_Public
 			'message' => 'Berhasil tambah data!',
 		);
 		if (!empty($_POST)) {
-
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				$id_komponen_penilaian = null;
 
@@ -11736,6 +11736,13 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Nomor Urut kosong!';
 				}
+				if (!empty($_POST['bukti_dukung'])) {
+					$bukti_dukung = $_POST['bukti_dukung'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Jenis Bukti Dukung kosong!';
+				}
+				
 
 				if ($ret['status'] === 'success') {
 					if (!empty($id_komponen_penilaian)) {
@@ -11747,9 +11754,10 @@ class Wp_Eval_Sakip_Public
 								'tipe' => $tipe_komponen_penilaian,
 								'nomor_urut' => $nomor_urut,
 								'keterangan' => $keterangan,
+								'jenis_bukti_dukung' => $bukti_dukung,
 							),
 							array('id' => $id_komponen_penilaian),
-							array('%d', '%s', '%s', '%f', '%s'),
+							array('%d', '%s', '%s', '%f', '%s', '%s'),
 							array('%d')
 						);
 					} else {
@@ -11761,12 +11769,73 @@ class Wp_Eval_Sakip_Public
 								'tipe' => $tipe_komponen_penilaian,
 								'nomor_urut' => $nomor_urut,
 								'keterangan' => $keterangan,
+								'jenis_bukti_dukung' => $bukti_dukung,
 								'active' => 1,
 							),
-							array('%d', '%s', '%s', '%f', '%s', '%d')
+							array('%d', '%s', '%s', '%f', '%s', '%d', '%s')
 						);
 					}
 				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function tambah_kerangka_logis_penilaian_lke()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah kerangka logis!',
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$id_komponen_penilaian = $_POST['id'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Komponen Penilaian kosong!';
+				}
+				if (!empty($_POST['jenis_kerangka_logis'])) {
+					$jenis_kerangka_logis = $_POST['jenis_kerangka_logis'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Jenis Kerangka Logis kosong!';
+				}
+				if (!empty($_POST['pesan_kesalahan'])) {
+					$pesan_kesalahan = $_POST['pesan_kesalahan'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Pesan Kesalahan kosong!';
+				}
+				if (!empty($_POST['komponen_pembanding'])) {
+					$komponen_pembanding = $_POST['komponen_pembanding'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Komponen Pembanding kosong!';
+				}
+				if ($ret['status'] === 'success') {
+					$wpdb->insert(
+						'esakip_kontrol_kerangka_logis',
+						array(
+							'id_komponen_penilaian' => $id_komponen_penilaian,
+							'jenis_kerangka_logis' => $jenis_kerangka_logis,
+							'pesan_kesalahan' => $pesan_kesalahan,
+							'id_komponen_pembanding' => $komponen_pembanding,
+						),
+						array('%d', '%d', '%s', '%d'),
+					);
+				} 
 			} else {
 				$ret = array(
 					'status' => 'error',
@@ -12124,6 +12193,7 @@ class Wp_Eval_Sakip_Public
 		}
 		die(json_encode($ret));
 	}
+
 	public function get_komponen_penilaian_lke_by_id()
 	{
 		global $wpdb;
@@ -12167,8 +12237,20 @@ class Wp_Eval_Sakip_Public
 							", $data_subkomponen['id_komponen']),
 							ARRAY_A
 						);
+						$jenis_bukti_dukung = $data['jenis_bukti_dukung'];
+						if (!empty($jenis_bukti_dukung) && is_string($jenis_bukti_dukung)) {
+							$data['jenis_bukti_dukung'] = json_decode(stripslashes($jenis_bukti_dukung), true);
+							if (json_last_error() !== JSON_ERROR_NONE) {
+								$data['jenis_bukti_dukung'] = array(); // Fallback to empty array if JSON decoding fails
+							}
+						} else {
+							$data['jenis_bukti_dukung'] = array();
+						}				
+						$merged_data['data'] = $data;
+						$merged_data['subkomponen'] = $data_subkomponen;
+						$merged_data['komponen'] = $data_komponen;
 
-						$ret['data'] = $data + ['subkomponen' => $data_subkomponen] + ['komponen' => $data_komponen];
+						$ret['data'] = $merged_data;
 					} else {
 						$ret = array(
 							'status' => 'error',
@@ -12337,38 +12419,63 @@ class Wp_Eval_Sakip_Public
 		}
 		die(json_encode($ret));
 	}
-
+	
 	function get_subkomponen_pembanding()
 	{
 		global $wpdb;
 		$ret = array(
 			'status' => 'success',
-			'message' => 'Berhasil hapus data!',
+			'message' => 'Berhasil get data!',
 			'data' => array()
 		);
 
 		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('ESAKIP_APIKEY')) {
-				if (isset($_POST['search'])) {
-					$search_term = '%' . $wpdb->esc_like($_POST['search']) . '%';
-
-					$subkomponens = $wpdb->get_results(
-						$wpdb->prepare("
-							SELECT id, nama
-							FROM esakip_subkomponen
-							WHERE active = 1 AND nama LIKE %s
-							LIMIT 10
-						", $search_term),
-						ARRAY_A
-					);
-
-					foreach ($subkomponens as $subkomponen) {
-						$ret['data'] = array(
-							'label' => $subkomponen['nama'],
-							'value' => $subkomponen['id']
-						);
-					}
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
 				}
+				$options = '<option value="">Pilih Subkomponen</option>';
+
+				$komponens = $wpdb->get_results(
+					$wpdb->prepare("
+						SELECT id
+						FROM esakip_komponen
+						WHERE active = 1 
+						  AND id_jadwal = %s
+					", $id_jadwal),
+					ARRAY_A
+				);
+				if (!empty($komponens)) {
+					foreach($komponens as $komponen) {
+						$subkomponens = $wpdb->get_results(
+							$wpdb->prepare("
+								SELECT 
+									id,
+									nama
+								FROM esakip_subkomponen
+								WHERE active = 1 
+								  AND id_komponen = %s
+							", $komponen['id']),
+							ARRAY_A
+						);
+						if (!empty($subkomponens)) {
+							foreach($subkomponens as $subkomponen) {
+								$options .= '<option value="' . $subkomponen['id'] . '">' . $subkomponen['nama'] . '</option>';
+							}
+						} else {
+							$ret['status'] = 'error';
+							$ret['message'] = 'Subkomponen tidak ditemukan';
+						}
+					}
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Komponen tidak ditemukan';
+				}
+
+				$ret['data'] = $options;
 			} else {
 				$ret = array(
 					'status' => 'error',
@@ -12390,31 +12497,75 @@ class Wp_Eval_Sakip_Public
 		global $wpdb;
 		$ret = array(
 			'status' => 'success',
-			'message' => 'Berhasil hapus data!',
+			'message' => 'Berhasil get data!',
 			'data' => array()
 		);
+
 		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('ESAKIP_APIKEY')) {
-				if (!empty($_POST['search'])) {
-					$search_term = '%' . $wpdb->esc_like($_POST['search']) . '%';
-
-					$komponens = $wpdb->get_results(
-						$wpdb->prepare("
-							SELECT id, nama
-							FROM esakip_komponen_penilaian
-							WHERE active = 1 AND nama LIKE %s
-							LIMIT 10
-						", $search_term),
-						ARRAY_A
-					);
-
-					foreach ($komponens as $komponen) {
-						$ret['data'] = array(
-							'label' => $komponen['nama'],
-							'value' => $komponen['id']
-						);
-					}
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
 				}
+				$options = '<option value="">Pilih Subkomponen</option>';
+
+				$komponens = $wpdb->get_results(
+					$wpdb->prepare("
+						SELECT id
+						FROM esakip_komponen
+						WHERE active = 1 
+						  AND id_jadwal = %s
+					", $id_jadwal),
+					ARRAY_A
+				);
+				if (!empty($komponens)) {
+					foreach($komponens as $komponen) {
+						$subkomponens = $wpdb->get_results(
+							$wpdb->prepare("
+								SELECT 
+									id,
+									nama
+								FROM esakip_subkomponen
+								WHERE active = 1 
+								  AND id_komponen = %s
+							", $komponen['id']),
+							ARRAY_A
+						);
+						if (!empty($subkomponens)) {
+							foreach($subkomponens as $subkomponen) {
+								$penilaians = $wpdb->get_results(
+									$wpdb->prepare("
+										SELECT 
+											id,
+											nama
+										FROM esakip_komponen_penilaian
+										WHERE active = 1 
+										  AND id_subkomponen = %s
+									", $subkomponen['id']),
+									ARRAY_A
+								);
+								if (!empty($penilaians)) {
+									foreach($penilaians as $penilaians) {
+										$options .= '<option value="' . $penilaians['id'] . '">' . $penilaians['nama'] . '</option>';
+									}
+								} else {
+									$ret['status'] = 'error';
+									$ret['message'] = 'Komponen Penilaian tidak ditemukan';
+								}
+							}
+						} else {
+							$ret['status'] = 'error';
+							$ret['message'] = 'Subkomponen tidak ditemukan';
+						}
+					}
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Komponen tidak ditemukan';
+				}
+
+				$ret['data'] = $options;
 			} else {
 				$ret = array(
 					'status' => 'error',

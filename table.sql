@@ -308,6 +308,7 @@ CREATE TABLE esakip_komponen_penilaian (
   `nama` varchar(255) DEFAULT NULL,
   `tipe` varchar(30) DEFAULT NULL COMMENT '1 = Ya/Tidak, 2 = A/B/C/D',
   `keterangan` varchar(255) DEFAULT NULL,
+  `jenis_bukti_dukung` text DEFAULT NULL,
   `active` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY  (`id`)
 );
