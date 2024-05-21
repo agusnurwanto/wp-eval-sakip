@@ -350,3 +350,12 @@ CREATE TABLE esakip_pengisian_lke_history (
   `update_at` datetime DEFAULT current_timestamp(),
   PRIMARY KEY  (`id`)
 );
+
+CREATE TABLE esakip_kontrol_kerangka_logis (
+ `id` int(11) NOT NULL auto_increment,
+ `id_komponen_penilaian` int(11) NOT NULL,
+ `jenis_kerangka_logis` int(11) DEFAULT NULL COMMENT '1 = Rata-Rata, 2 = Nilai',
+ `id_komponen_pembanding` int(11) DEFAULT NULL,
+ `pesan_kesalahan` varchar(255) DEFAULT NULL,
+ PRIMARY KEY  (`id`)
+);
