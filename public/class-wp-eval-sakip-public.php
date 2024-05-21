@@ -11013,6 +11013,31 @@ class Wp_Eval_Sakip_Public
 			return;
 		}
 
+		$jadwal_periode_rpjpd = $wpdb->get_results(
+			"
+			SELECT 
+				id,
+				nama_jadwal,
+				tahun_anggaran,
+				lama_pelaksanaan
+			FROM esakip_data_jadwal
+			WHERE tipe = 'RPJPD'
+			  AND status = 1",
+			ARRAY_A
+		);
+		$periode_rpjpd = '';
+		foreach ($jadwal_periode_rpjpd as $jadwal_periode_item_rpjpd) {
+			$tahun_anggaran_selesai = $jadwal_periode_item_rpjpd['tahun_anggaran'] + $jadwal_periode_item_rpjpd['lama_pelaksanaan'];
+
+			$rpjpd = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Upload Dokumen RPJPD ' . $jadwal_periode_item_rpjpd['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item_rpjpd['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[upload_dokumen_rpjpd periode=' . $jadwal_periode_item_rpjpd['id'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$periode_rpjpd .= '<li><a target="_blank" href="' . $rpjpd['url'] . '" class="btn btn-primary">' . $rpjpd['title'] . '</a></li>';
+		}
+
 		$jadwal_periode = $wpdb->get_results(
 			"
 			SELECT 
@@ -11090,6 +11115,9 @@ class Wp_Eval_Sakip_Public
 		if (empty($pengisian_lke)) {
 			$pengisian_lke = '<li><a return="false" href="#" class="btn btn-secondary">Pengisian LKE kosong atau belum dibuat</a></li>';
 		}
+		if (empty($periode_rpjpd)) {
+			$periode_rpjpd = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJPD kosong atau belum dibuat</a></li>';
+		}
 		if (empty($periode_rpjmd)) {
 			$periode_rpjmd = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
 		}
@@ -11107,6 +11135,15 @@ class Wp_Eval_Sakip_Public
 				<div class="esakip-body-tahun" data-id="lke">
 					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 						' . $pengisian_lke . '
+					</ul>
+				</div>
+			</div>';
+		$halaman_rpjpd = '
+			<div class="accordion">
+				<h5 class="esakip-header-tahun" data-id="rpjpd" style="margin: 0;">Periode Upload Dokumen RPJPD</h5>
+				<div class="esakip-body-tahun" data-id="rpjpd">
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+						' . $periode_rpjpd . '
 					</ul>
 				</div>
 			</div>';
@@ -11214,6 +11251,7 @@ class Wp_Eval_Sakip_Public
 			echo '
 				<ul class="daftar-menu-sakip">
 					<li>' . $halaman_lke . '</li>
+					<li>' . $halaman_rpjpd . '</li>
 					<li>' . $halaman_rpjmd . '</li>
 					<li>' . $halaman_renstra . '</li>
 					<li><a href="' . $renja_rkt['url'] . '" target="_blank" class="btn btn-primary">' . $renja_rkt['title'] . '</a></li>
@@ -11235,7 +11273,7 @@ class Wp_Eval_Sakip_Public
 			|| in_array("kpa", $user_meta->roles)
 			|| in_array("plt", $user_meta->roles)
 		) {
-			$nipkepala = get_user_meta($user_id, '_nip');
+			$nipkepala = get_user_meta($user_id, '_nip') ?: get_user_meta($user_id, 'nip');
 			$skpd_db = $wpdb->get_row($wpdb->prepare("
 				SELECT 
 					nama_skpd, 
@@ -12766,7 +12804,7 @@ class Wp_Eval_Sakip_Public
 						|| in_array("kpa", $user_meta->roles)
 						|| in_array("plt", $user_meta->roles)
 					) {
-						$nipkepala = get_user_meta($user_id, '_nip');
+						$nipkepala = get_user_meta($user_id, '_nip') ?: get_user_meta($user_id, 'nip');
 						$skpd_db = $wpdb->get_results($wpdb->prepare("
 							SELECT 
 								nama_skpd, 
