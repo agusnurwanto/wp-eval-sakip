@@ -9928,118 +9928,191 @@ class Wp_Eval_Sakip_Public
 
 	public function get_table_skpd_pengisian_lke()
 	{
-		global $wpdb;
-		$ret = array(
-			'status' => 'success',
-			'message' => 'Berhasil get data!',
-			'data' => array()
-		);
+    global $wpdb;
+    $ret = array(
+        'status' => 'success',
+        'message' => 'Berhasil get data!',
+        'data' => array()
+    );
 
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if (!empty($_POST['id_jadwal'])) {
-					$id_jadwal = $_POST['id_jadwal'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Id Jadwal kosong!';
-				}
-				if (!empty($_POST['tahun_anggaran'])) {
-					$tahun_anggaran = $_POST['tahun_anggaran'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun Anggaran kosong!';
-				}
+    if (!empty($_POST)) {
+        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+            if (!empty($_POST['id_jadwal'])) {
+                $id_jadwal = $_POST['id_jadwal'];
+            } else {
+                $ret['status'] = 'error';
+                $ret['message'] = 'Id Jadwal kosong!';
+                die(json_encode($ret));
+            }
 
-				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+            if (!empty($_POST['tahun_anggaran'])) {
+                $tahun_anggaran = $_POST['tahun_anggaran'];
+            } else {
+                $ret['status'] = 'error';
+                $ret['message'] = 'Tahun Anggaran kosong!';
+                die(json_encode($ret));
+            }
 
-				$unit = $wpdb->get_results(
-					$wpdb->prepare("
-						SELECT 
-							nama_skpd, 
-							id_skpd, 
-							kode_skpd
-						FROM esakip_data_unit 
-						WHERE tahun_anggaran=%d
-						AND active=1 
-						AND is_skpd=1 
-						ORDER BY kode_skpd ASC
-					", $tahun_anggaran_sakip),
-					ARRAY_A
-				);
+            $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-				$jadwal = $wpdb->get_results(
-					$wpdb->prepare("
-						SELECT 
-							*
-						FROM esakip_data_jadwal
-						WHERE id=%d
-							AND status != 0
-					", $id_jadwal),
-					ARRAY_A
-				);
+            $unit = $wpdb->get_results(
+                $wpdb->prepare("
+                    SELECT 
+                        nama_skpd, 
+                        id_skpd, 
+                        kode_skpd
+                    FROM esakip_data_unit 
+                    WHERE tahun_anggaran=%d
+                    AND active=1 
+                    AND is_skpd=1 
+                    ORDER BY kode_skpd ASC
+                ", $tahun_anggaran_sakip),
+                ARRAY_A
+            );
 
-				if (!empty($unit)) {
-					$tbody = '';
-					$counter = 1;
-					foreach ($unit as $kk => $vv) {
-						$detail_pengisian_lke = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Pengisian LKE ' . $vv['nama_skpd'] . ' ' . $jadwal['nama_jadwal'],
-							'content' => '[pengisian_lke_sakip_per_skpd id_jadwal=' . $id_jadwal . ']',
-							'show_header' => 1,
-							'post_status' => 'private'
-						));
+            $jadwal = $wpdb->get_row(
+                $wpdb->prepare("
+                    SELECT 
+                        *
+                    FROM esakip_data_jadwal
+                    WHERE id=%d
+                        AND status != 0
+                ", $id_jadwal),
+                ARRAY_A
+            );
 
-						$tbody .= "<tr>";
-						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
+            if (!empty($unit) && !empty($jadwal)) {
+                $tbody = '';
+                $counter = 1;
+                $total_nilai_usulan = 0;
+                $total_nilai_penetapan = 0;
 
-						$nilai_usulan = $wpdb->get_var(
-							$wpdb->prepare("
-								SELECT 
-									COUNT(nilai_usulan)
-								FROM esakip_pengisian_lke
-								WHERE id_skpd = %d
-								  AND active = 1
-								", $vv['id_skpd'])
-						);
-						$nilai_penetapan = $wpdb->get_var(
-							$wpdb->prepare("
-								SELECT 
-									COUNT(nilai_penetapan)
-								FROM esakip_pengisian_lke
-								WHERE id_skpd = %d
-								  AND active = 1
-							", $vv['id_skpd'])
-						);
+                foreach ($unit as $kk => $vv) {
+                    $nilai_usulan = 0;
+                    $nilai_penetapan = 0;
 
-						$btn = '<div class="btn-action-group">';
-						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_pengisian_lke['url'] . '&id_skpd=' . $vv['id_skpd'] . '&id_jadwal=' . $id_jadwal . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
-						$btn .= '</div>';
+                    $get_komponen = $wpdb->get_results(
+                        $wpdb->prepare("
+                            SELECT * 
+                            FROM esakip_komponen
+                            WHERE id_jadwal = %d
+                              AND active = 1
+                            ORDER BY nomor_urut ASC
+                        ", $id_jadwal),
+                        ARRAY_A
+                    );
 
-						$tbody .= "<td class='text-center'>" . $nilai_usulan . "</td>";
-						$tbody .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
-						$tbody .= "<td>" . $btn . "</td>";
+                    foreach ($get_komponen as $komponen) {
+                        $get_subkomponen = $wpdb->get_results(
+                            $wpdb->prepare("
+                                SELECT * 
+                                FROM esakip_subkomponen
+                                WHERE id_komponen = %d
+                                  AND active = 1
+                                ORDER BY nomor_urut ASC
+                            ", $komponen['id']),
+                            ARRAY_A
+                        );
 
-						$tbody .= "</tr>";
-					}
-					$ret['data'] = $tbody;
-				} else {
-					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
-				}
-			} else {
-				$ret = array(
-					'status' => 'error',
-					'message'   => 'Api Key tidak sesuai!'
-				);
-			}
-		} else {
-			$ret = array(
-				'status' => 'error',
-				'message'   => 'Format tidak sesuai!'
-			);
-		}
-		die(json_encode($ret));
-	}
+                        foreach ($get_subkomponen as $subkomponen) {
+                            $sum_nilai_usulan = $wpdb->get_var(
+                                $wpdb->prepare("
+                                    SELECT SUM(nilai_usulan)
+                                    FROM esakip_pengisian_lke
+                                    WHERE id_subkomponen = %d
+                                      AND id_skpd = %d
+                                ", $subkomponen['id'], $vv['id_skpd'])
+                            );
+
+                            $count_nilai_usulan = $wpdb->get_var(
+                                $wpdb->prepare("
+                                    SELECT COUNT(id)
+                                    FROM esakip_komponen_penilaian
+                                    WHERE id_subkomponen = %d
+                                ", $subkomponen['id'])
+                            );
+
+                            $sum_nilai_penetapan = $wpdb->get_var(
+                                $wpdb->prepare("
+                                    SELECT SUM(nilai_penetapan)
+                                    FROM esakip_pengisian_lke
+                                    WHERE id_subkomponen = %d
+                                      AND id_skpd = %d
+                                ", $subkomponen['id'], $vv['id_skpd'])
+                            );
+
+                            $count_nilai_penetapan = $wpdb->get_var(
+                                $wpdb->prepare("
+                                    SELECT COUNT(id)
+                                    FROM esakip_komponen_penilaian
+                                    WHERE id_subkomponen = %d
+                                ", $subkomponen['id'])
+                            );
+
+                            $total_nilai_sub = 0;
+                            $total_nilai_sub_penetapan = 0;
+
+                            if ($count_nilai_usulan > 0) {
+                                $persentase_sub = $sum_nilai_usulan / $count_nilai_usulan;
+                                $total_nilai_sub = $persentase_sub * $subkomponen['bobot'];
+                                $nilai_usulan += $total_nilai_sub;
+                            }
+
+                            if ($count_nilai_penetapan > 0) {
+                                $persentase_sub_penetapan = $sum_nilai_penetapan / $count_nilai_penetapan;
+                                $total_nilai_sub_penetapan = $persentase_sub_penetapan * $subkomponen['bobot'];
+                                $nilai_penetapan += $total_nilai_sub_penetapan;
+                            }
+                        }
+                    }
+
+                    $total_nilai_usulan += $nilai_usulan;
+                    $total_nilai_penetapan += $nilai_penetapan;
+
+                    $detail_pengisian_lke = $this->functions->generatePage(array(
+                        'nama_page' => 'Halaman Pengisian LKE ' . $vv['nama_skpd'] . ' ' . $jadwal['nama_jadwal'],
+                        'content' => '[pengisian_lke_sakip_per_skpd id_jadwal=' . $id_jadwal . ']',
+                        'show_header' => 1,
+                        'post_status' => 'private'
+                    ));
+
+                    $btn = '<div class="btn-action-group">';
+                    $btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_pengisian_lke['url'] . '&id_skpd=' . $vv['id_skpd'] . '&id_jadwal=' . $id_jadwal . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+                    $btn .= '</div>';
+
+                    $tbody .= "<tr>";
+                    $tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+                    $tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</td>";
+                    $tbody .= "<td class='text-center'>" . number_format($nilai_usulan, 2) . "</td>";
+                    $tbody .= "<td class='text-center'>" . number_format($nilai_penetapan, 2) . "</td>";
+                    $tbody .= "<td class='text-center'></td>";
+                    $tbody .= "<td class='text-center'></td>";
+                    $tbody .= "<td class='text-center'></td>";
+                    $tbody .= "<td class='text-center'></td>";
+                    $tbody .= "<td>" . $btn . "</td>";
+                    $tbody .= "</tr>";
+                }
+
+                $ret['data'] = $tbody;
+                $ret['nilai_usulan'] = $nilai_usulan;
+                $ret['nilai_penetapan'] = $nilai_penetapan;
+            } else {
+                $ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+            }
+        } else {
+            $ret = array(
+                'status' => 'error',
+                'message' => 'Api Key tidak sesuai!'
+            );
+        }
+    } else {
+        $ret = array(
+            'status' => 'error',
+            'message' => 'Format tidak sesuai!'
+        );
+    }
+    die(json_encode($ret));
+}
 
 	public function get_table_pengisian_lke()
 	{
@@ -10113,6 +10186,9 @@ class Wp_Eval_Sakip_Public
 						", $id_jadwal),
 					ARRAY_A
 				);
+
+				$merged_data = array('debug' => array());
+
 				if (!empty($data_komponen)) {
 					$tbody = '';
 					//jika user adalah admin atau skpd
@@ -10200,15 +10276,13 @@ class Wp_Eval_Sakip_Public
 								if ($count_nilai_usulan > 0) {
 									$persentase_sub = $sum_nilai_usulan / $count_nilai_usulan;
 									$total_nilai_sub = $persentase_sub * $subkomponen['bobot'];
-									$sum_nilai_sub += $total_nilai_sub;
-									$total_nilai += $sum_nilai_sub;
+									$sum_nilai_sub += $total_nilai_sub;;
 								}
 
 								if ($count_nilai_penetapan > 0) {
 									$persentase_sub_penetapan = $sum_nilai_penetapan / $count_nilai_penetapan;
 									$total_nilai_sub_penetapan = $persentase_sub_penetapan * $subkomponen['bobot'];
 									$sum_nilai_sub_penetapan += $total_nilai_sub_penetapan;
-									$total_nilai_penetapan += $sum_nilai_penetapan;
 								}
 
 								//tbody subkomponen
@@ -10405,6 +10479,10 @@ class Wp_Eval_Sakip_Public
 						if ($sum_nilai_sub_penetapan > 0) {
 							$persentase_kom_penetapan = $sum_nilai_sub_penetapan / $komponen['bobot'];
 						}
+
+						$total_nilai += $sum_nilai_sub;
+						$total_nilai_penetapan += $sum_nilai_penetapan;
+
 						//tbody komponen
 						$tbody .= "<tr class='table-active'>";
 						$tbody .= "<td class='text-left'>" . $counter++ . "</td>";

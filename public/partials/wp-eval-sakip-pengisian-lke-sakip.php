@@ -74,6 +74,10 @@ $timezone = get_option('timezone_string');
                         <th class="text-center">Nama SKPD</th>
                         <th class="text-center">Nilai Usulan</th>
                         <th class="text-center">Nilai Penetapan</th>
+                        <th class="text-center">Nilai Komponen <br>A</th>
+                        <th class="text-center">Nilai Komponen <br>B</th>
+                        <th class="text-center">Nilai Komponen <br>C</th>
+                        <th class="text-center">Nilai Komponen <br>D</th>
                         <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
