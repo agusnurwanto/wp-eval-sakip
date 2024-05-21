@@ -29,8 +29,15 @@ function run_download_excel_sakip(type) {
     var body =
         '<a id="excel" onclick="return false;" href="#" class="btn btn-success"><span class="dashicons dashicons-media-spreadsheet"></span>Download Excel</a>';
     var download_excel =
-        '<div id="action-sipd" class="hide-print">' + body + "</div>";
+        '<div id="action-sakip" class="hide-print">' + body + "</div>";
     jQuery(".action-section").append(download_excel);
+    
+    jQuery(".action-section").css({
+        "display": "flex",
+        "justify-content": "center",
+        "align-items": "center",
+        "margin-bottom": "20px" 
+    });
 
     jQuery(".cetak").css({
         "font-family":
@@ -157,7 +164,7 @@ function penjadwalanHitungMundur(dataHitungMundur = {}) {
         jQuery("#seconds").html(seconds + "<span>Detik</span>");
 
         if (timeLeft < 0) {
-            clearInterval(wpsipdTimer);
+            clearInterval(wpsakipTimer);
             jQuery("#days").html("0 <span>Hari</span>");
             jQuery("#hours").html("00 <span>Jam</span>");
             jQuery("#minutes").html("00 <span>Menit</span>");
@@ -170,7 +177,7 @@ function penjadwalanHitungMundur(dataHitungMundur = {}) {
     now = new Date(now).getTime();
 
     if (now > mulaiJadwalTime) {
-        var wpsipdTimer = setInterval(makeTimer, 1000);
+        var wpsakipTimer = setInterval(makeTimer, 1000);
     } else {
         jQuery("#days").html("0 <span>Hari</span>");
         jQuery("#hours").html("00 <span>Jam</span>");

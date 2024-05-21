@@ -10264,10 +10264,18 @@ class Wp_Eval_Sakip_Public
                 $counter = 1;
                 $total_nilai_usulan = 0;
                 $total_nilai_penetapan = 0;
+                $total_nilai_komponen_a = 0;
+                $total_nilai_komponen_b = 0;
+                $total_nilai_komponen_c = 0;
+                $total_nilai_komponen_d = 0;
 
                 foreach ($unit as $kk => $vv) {
                     $nilai_usulan = 0;
                     $nilai_penetapan = 0;
+                    $nilai_komponen_a = 0;
+                    $nilai_komponen_b = 0;
+                    $nilai_komponen_c = 0;
+                    $nilai_komponen_d = 0;
 
                     $get_komponen = $wpdb->get_results(
                         $wpdb->prepare("
@@ -10327,8 +10335,84 @@ class Wp_Eval_Sakip_Public
                                 ", $subkomponen['id'])
                             );
 
+                            $sum_nilai_komponen_a = $wpdb->get_var(
+                                $wpdb->prepare("
+                                    SELECT SUM(nilai_penetapan)
+                                    FROM esakip_pengisian_lke
+                                    WHERE id_subkomponen = %d
+                                      AND id_komponen = 1
+                                      AND id_skpd = %d
+                                ", $subkomponen['id'], $vv['id_skpd'])
+                            );
+
+                            $count_nilai_komponen_a = $wpdb->get_var(
+                                $wpdb->prepare("
+                                    SELECT COUNT(id)
+                                    FROM esakip_komponen_penilaian
+                                    WHERE id_subkomponen = %d
+                                ", $subkomponen['id'])
+                            );
+
+                            $sum_nilai_komponen_b = $wpdb->get_var(
+                                $wpdb->prepare("
+                                    SELECT SUM(nilai_penetapan)
+                                    FROM esakip_pengisian_lke
+                                    WHERE id_subkomponen = %d
+                                      AND id_komponen = 2
+                                      AND id_skpd = %d
+                                ", $subkomponen['id'], $vv['id_skpd'])
+                            );
+
+                            $count_nilai_komponen_b = $wpdb->get_var(
+                                $wpdb->prepare("
+                                    SELECT COUNT(id)
+                                    FROM esakip_komponen_penilaian
+                                    WHERE id_subkomponen = %d
+                                ", $subkomponen['id'])
+                            );
+
+                            $sum_nilai_komponen_c = $wpdb->get_var(
+                                $wpdb->prepare("
+                                    SELECT SUM(nilai_penetapan)
+                                    FROM esakip_pengisian_lke
+                                    WHERE id_subkomponen = %d
+                                      AND id_komponen = 3
+                                      AND id_skpd = %d
+                                ", $subkomponen['id'], $vv['id_skpd'])
+                            );
+
+                            $count_nilai_komponen_c = $wpdb->get_var(
+                                $wpdb->prepare("
+                                    SELECT COUNT(id)
+                                    FROM esakip_komponen_penilaian
+                                    WHERE id_subkomponen = %d
+                                ", $subkomponen['id'])
+                            );
+
+                            $sum_nilai_komponen_d = $wpdb->get_var(
+                                $wpdb->prepare("
+                                    SELECT SUM(nilai_penetapan)
+                                    FROM esakip_pengisian_lke
+                                    WHERE id_subkomponen = %d
+                                      AND id_komponen = 2
+                                      AND id_skpd = %d
+                                ", $subkomponen['id'], $vv['id_skpd'])
+                            );
+
+                            $count_nilai_komponen_d = $wpdb->get_var(
+                                $wpdb->prepare("
+                                    SELECT COUNT(id)
+                                    FROM esakip_komponen_penilaian
+                                    WHERE id_subkomponen = %d
+                                ", $subkomponen['id'])
+                            );
+
                             $total_nilai_sub = 0;
                             $total_nilai_sub_penetapan = 0;
+                            $total_nilai_sub_komponen_a = 0;
+                            $total_nilai_sub_komponen_b = 0;
+                            $total_nilai_sub_komponen_c = 0;
+                            $total_nilai_sub_komponen_d = 0;
 
                             if ($count_nilai_usulan > 0) {
                                 $persentase_sub = $sum_nilai_usulan / $count_nilai_usulan;
@@ -10341,11 +10425,39 @@ class Wp_Eval_Sakip_Public
                                 $total_nilai_sub_penetapan = $persentase_sub_penetapan * $subkomponen['bobot'];
                                 $nilai_penetapan += $total_nilai_sub_penetapan;
                             }
+
+                            if ($count_nilai_komponen_a > 0) {
+                                $persentase_sub_komponen_a = $sum_nilai_komponen_a / $count_nilai_komponen_a;
+                                $total_nilai_sub_komponen_a = $persentase_sub_komponen_a * $subkomponen['bobot'];
+                                $nilai_komponen_a += $total_nilai_sub_komponen_a;
+                            }
+
+                            if ($count_nilai_komponen_b > 0) {
+                                $persentase_sub_komponen_b = $sum_nilai_komponen_b / $count_nilai_komponen_b;
+                                $total_nilai_sub_komponen_b = $persentase_sub_komponen_b * $subkomponen['bobot'];
+                                $nilai_komponen_b += $total_nilai_sub_komponen_b;
+                            }
+
+                            if ($count_nilai_komponen_c > 0) {
+                                $persentase_sub_komponen_c = $sum_nilai_komponen_c / $count_nilai_komponen_c;
+                                $total_nilai_sub_komponen_c = $persentase_sub_komponen_c * $subkomponen['bobot'];
+                                $nilai_komponen_c += $total_nilai_sub_komponen_c;
+                            }
+
+                            if ($count_nilai_komponen_d > 0) {
+                                $persentase_sub_komponen_d = $sum_nilai_komponen_d / $count_nilai_komponen_d;
+                                $total_nilai_sub_komponen_d = $persentase_sub_komponen_d * $subkomponen['bobot'];
+                                $nilai_komponen_d += $total_nilai_sub_komponen_d;
+                            }
                         }
                     }
 
                     $total_nilai_usulan += $nilai_usulan;
                     $total_nilai_penetapan += $nilai_penetapan;
+                    $total_nilai_komponen_a += $nilai_komponen_a;
+                    $total_nilai_komponen_b += $nilai_komponen_b;
+                    $total_nilai_komponen_c += $nilai_komponen_c;
+                    $total_nilai_komponen_d += $nilai_komponen_d;
 
                     $detail_pengisian_lke = $this->functions->generatePage(array(
                         'nama_page' => 'Halaman Pengisian LKE ' . $vv['nama_skpd'] . ' ' . $jadwal['nama_jadwal'],
@@ -10362,11 +10474,11 @@ class Wp_Eval_Sakip_Public
                     $tbody .= "<td class='text-center'>" . $counter++ . "</td>";
                     $tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</td>";
                     $tbody .= "<td class='text-center'>" . number_format($nilai_usulan, 2) . "</td>";
+                    $tbody .= "<td class='text-center'>" . number_format($nilai_komponen_a, 2) . "</td>";
+                    $tbody .= "<td class='text-center'>" . number_format($nilai_komponen_b, 2) . "</td>";
+                    $tbody .= "<td class='text-center'>" . number_format($nilai_komponen_c, 2) . "</td>";
+                    $tbody .= "<td class='text-center'>" . number_format($nilai_komponen_d, 2) . "</td>";
                     $tbody .= "<td class='text-center'>" . number_format($nilai_penetapan, 2) . "</td>";
-                    $tbody .= "<td class='text-center'></td>";
-                    $tbody .= "<td class='text-center'></td>";
-                    $tbody .= "<td class='text-center'></td>";
-                    $tbody .= "<td class='text-center'></td>";
                     $tbody .= "<td>" . $btn . "</td>";
                     $tbody .= "</tr>";
                 }
@@ -10374,6 +10486,10 @@ class Wp_Eval_Sakip_Public
                 $ret['data'] = $tbody;
                 $ret['nilai_usulan'] = $nilai_usulan;
                 $ret['nilai_penetapan'] = $nilai_penetapan;
+                $ret['nilai_komponen_a'] = $nilai_komponen_a;
+                $ret['nilai_komponen_b'] = $nilai_komponen_b;
+                $ret['nilai_komponen_c'] = $nilai_komponen_c;
+                $ret['nilai_komponen_d'] = $nilai_komponen_d;
             } else {
                 $ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
             }
