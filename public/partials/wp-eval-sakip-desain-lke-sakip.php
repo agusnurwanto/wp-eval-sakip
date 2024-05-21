@@ -434,6 +434,39 @@ foreach ($user_penilai as $key => $val) {
         });
     }
 
+    function get_table_kerangka_logis(id) {
+        return new Promise((resolve, reject) => {
+            jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                url: esakip.url,
+                type: 'POST',
+                data: {
+                    action: 'get_table_kerangka_logis',
+                    api_key: esakip.api_key,
+                    id_komponen_penilaian: id,
+                },
+                dataType: 'json',
+                success: function(response) {
+                    jQuery('#wrap-loading').hide();
+                    console.log(response);
+                    if (response.status === 'success') {
+                        jQuery('#tableKerangkaLogis tbody').html(response.data);
+                        resolve()
+                    } else {
+                        alert(response.message);
+                        reject(response.message)
+                    }
+                },
+                error: function(xhr, status, error) {
+                    jQuery('#wrap-loading').hide();
+                    console.error(xhr.responseText);
+                    alert('Terjadi kesalahan saat memuat tabel!');
+                    reject(xhr.responseText);
+                }
+            });
+        });
+    }
+
     function tambah_komponen_utama(id) {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
@@ -547,15 +580,19 @@ foreach ($user_penilai as $key => $val) {
     }
 
     function tambah_kerangka_logis(id) {
-        jQuery('#idKomponenPenilaian').val(id);
-        jQuery('#jenisKerangkaLogis').val('');
-        jQuery('#subkomponenPembanding').val('');
-        jQuery('#pesanKerangkaLogis').val('');
-        jQuery('#komponenPenilaianPembanding').val('');
+        get_table_kerangka_logis(id).then(() => {
+            jQuery('#idKomponenPenilaian').val(id);
+            jQuery('#jenisKerangkaLogis').val('');
+            jQuery('#subkomponenPembanding').val('');
+            jQuery('#pesanKerangkaLogis').val('');
+            jQuery('#komponenPenilaianPembanding').val('');
 
-        jQuery('#subkomponenPembandingContainer').hide();
-        jQuery('#komponenPenilaianPembandingContainer').hide();
-        jQuery('#tambahKerangkaLogisModal').modal('show');
+            jQuery('#subkomponenPembandingContainer').hide();
+            jQuery('#komponenPenilaianPembandingContainer').hide();
+            jQuery('#tambahKerangkaLogisModal').modal('show');
+        }).catch((error) => {
+            console.error('Error loading table:', error);
+        });
     }
 
     function edit_data_komponen(id) {
@@ -1087,5 +1124,9 @@ foreach ($user_penilai as $key => $val) {
                 alert('Terjadi kesalahan saat mengirim data!');
             }
         })
+    }
+
+    function hapus_kerangka_logis(id) {
+        alert('berhasil id kl adalah : ' + id);
     }
 </script>
