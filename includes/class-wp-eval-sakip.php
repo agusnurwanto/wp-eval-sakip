@@ -203,6 +203,13 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_delete_jadwal_rpjmd',  $plugin_public, 'delete_jadwal_rpjmd');
 		$this->loader->add_action('wp_ajax_submit_edit_jadwal_rpjmd',  $plugin_public, 'submit_edit_jadwal_rpjmd');
 
+		$this->loader->add_action('wp_ajax_get_detail_dpa_by_id', $plugin_public, 'get_detail_dpa_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_dpa', $plugin_public, 'tambah_dokumen_dpa');
+		$this->loader->add_action('wp_ajax_submit_tahun_dpa', $plugin_public, 'submit_tahun_dpa');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_dpa', $plugin_public, 'hapus_dokumen_dpa');
+		$this->loader->add_action('wp_ajax_get_table_dpa', $plugin_public, 'get_table_dpa');
+
+
 		$this->loader->add_action('wp_ajax_get_detail_renja_rkt_by_id', $plugin_public, 'get_detail_renja_rkt_by_id');
 		$this->loader->add_action('wp_ajax_tambah_dokumen_renja', $plugin_public, 'tambah_dokumen_renja');
 		$this->loader->add_action('wp_ajax_submit_tahun_renja_rkt', $plugin_public, 'submit_tahun_renja_rkt');
@@ -295,6 +302,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_table_tahun_dokumen_pemda_lain', $plugin_public, 'get_table_tahun_dokumen_pemda_lain');
 		$this->loader->add_action('wp_ajax_submit_tahun_dokumen_pemda_lain', $plugin_public, 'submit_tahun_dokumen_pemda_lain');
 		
+		$this->loader->add_action('wp_ajax_get_table_tahun_dpa', $plugin_public, 'get_table_tahun_dpa');
+		$this->loader->add_action('wp_ajax_get_table_skpd_dpa', $plugin_public, 'get_table_skpd_dpa');		
 		$this->loader->add_action('wp_ajax_get_table_tahun_renja', $plugin_public, 'get_table_tahun_renja');
 		$this->loader->add_action('wp_ajax_get_table_skpd_renja', $plugin_public, 'get_table_skpd_renja');
 		$this->loader->add_action('wp_ajax_get_table_tahun_dokumen_lainnya', $plugin_public, 'get_table_tahun_dokumen_lainnya');
@@ -353,6 +362,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('upload_dokumen_rpjmd', array($plugin_public, 'upload_dokumen_rpjmd'));
 		
 		add_shortcode('renstra', array($plugin_public, 'renstra'));
+		add_shortcode('dpa', array($plugin_public, 'dpa'));
 		add_shortcode('renja_rkt', array($plugin_public, 'renja_rkt'));
 		add_shortcode('perjanjian_kinerja', array($plugin_public, 'perjanjian_kinerja'));
 		add_shortcode('rencana_aksi', array($plugin_public, 'rencana_aksi'));
@@ -371,6 +381,7 @@ class Wp_Eval_Sakip {
 
 		add_shortcode('jadwal_rpjmd', array($plugin_public, 'jadwal_rpjmd'));
 
+		add_shortcode('dokumen_detail_dpa', array($plugin_public, 'dokumen_detail_dpa'));
 		add_shortcode('dokumen_detail_renja_rkt', array($plugin_public, 'dokumen_detail_renja_rkt'));
 		add_shortcode('dokumen_detail_skp', array($plugin_public, 'dokumen_detail_skp'));
 		add_shortcode('dokumen_detail_perjanjian_kinerja', array($plugin_public, 'dokumen_detail_perjanjian_kinerja'));

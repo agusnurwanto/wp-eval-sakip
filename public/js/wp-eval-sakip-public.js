@@ -96,7 +96,9 @@ function tableHtmlToExcel(tableID, filename = "") {
 
         downloadLink.click();
     }
-}function penjadwalanHitungMundur(dataHitungMundur = {}) {
+}
+
+function penjadwalanHitungMundur(dataHitungMundur = {}) {
     let jenis = dataHitungMundur["jenisJadwal"] || "Jenis Jadwal";
     let nama = dataHitungMundur["namaJadwal"] || "Penjadwalan";
     let mulaiJadwal = dataHitungMundur["mulaiJadwal"] || "2022-08-12 16:00:00";
