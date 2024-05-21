@@ -71,7 +71,7 @@ $timezone = get_option('timezone_string');
                 <thead>
                     <tr>
                         <th class="text-center">No</th>
-                        <th class="text-center">Nama SKPD</th>
+                        <th class="text-center">Nama OPD</th>
                         <th class="text-center">Nilai Usulan</th>
                         <th class="text-center">Nilai Penetapan</th>
                         <th class="text-center">Aksi</th>
