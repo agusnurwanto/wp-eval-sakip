@@ -221,6 +221,44 @@ class Wp_Eval_Sakip_Admin
 					}
 					$body_pemda .= '</ol>';
 					$ret['message'] .= $body_pemda;
+				}else if (
+					!empty($_POST['type'])
+					&& (
+						$_POST['type'] == 'rpjpd'
+					)
+				) {
+					$jadwal_periode = $wpdb->get_results(
+						$wpdb->prepare(
+							"
+							SELECT 
+								id,
+								nama_jadwal,
+								tahun_anggaran,
+								lama_pelaksanaan
+							FROM esakip_data_jadwal
+							WHERE tipe = %s
+							  AND status = 1",
+							'RPJPD'
+						),
+						ARRAY_A
+					);
+
+					$body_pemda = '<ol>';
+					foreach ($jadwal_periode as $jadwal_periode_item) {
+						$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
+						
+						$rpjpd = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Upload Dokumen RPJPD ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+							'content' => '[upload_dokumen_rpjpd periode=' . $jadwal_periode_item['id'] . ']',
+							'show_header' => 1,
+							'no_key' => 1,
+							'post_status' => 'private'
+						));
+						$body_pemda .= '
+						<li><a target="_blank" href="' . $rpjpd['url'] . '">' . $rpjpd['title'] . '</a></li>';
+					}
+					$body_pemda .= '</ol>';
+					$ret['message'] .= $body_pemda;
 				} else {
 					$tahun = $wpdb->get_results(
 						$wpdb->prepare("
@@ -727,6 +765,19 @@ class Wp_Eval_Sakip_Admin
 			->set_page_menu_position(3.3)
 			->set_icon('dashicons-bank');
 
+		Container::make('theme_options', __('RPJPD'))
+			->set_page_parent($dokumen_pemda_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_rpjpd_hide_sidebar')
+					->set_html('
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'rpjpd')));
+
 		Container::make('theme_options', __('RPJMD'))
 			->set_page_parent($dokumen_pemda_menu)
 			->add_fields(array(
@@ -806,6 +857,17 @@ class Wp_Eval_Sakip_Admin
 			));
 			$list_data .= '<li><a target="_blank" href="' . $jadwal_evaluasi['url'] . '">' . $jadwal_evaluasi['title'] . '</a></li>';
 		}
+		
+		// jadwal rpjpd
+		$jadwal_rpjpd = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman Jadwal RPJPD',
+			'content' => '[jadwal_rpjpd]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+		$list_data .= '<li><a target="_blank" href="' . $jadwal_rpjpd['url'] . '">' . $jadwal_rpjpd['title'] . '</a></li>';
+
 		$label = array(
 			Field::make('html', 'crb_jadwal')
 				->set_html('
