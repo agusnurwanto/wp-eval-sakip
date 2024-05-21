@@ -389,7 +389,24 @@ class Wp_Eval_Sakip_Admin
 									</ul>
 								</div>
 							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'evaluasi_internal') {
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'dpa') {
+							$dpa = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Dokumen DPA Tahun ' . $tahun_item['tahun_anggaran'],
+								'content' => '[dpa tahun=' . $tahun_item["tahun_anggaran"] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+							<div class="accordion">
+								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+									<ul style="margin-left: 20px;">
+										<li><a target="_blank" href="' . $dpa['url'] . '">' . $dpa['title'] . '</a></li>
+									</ul>
+								</div>
+							</div>';
+						}else if (!empty($_POST['type']) && $_POST['type'] == 'evaluasi_internal') {
 							$evaluasi_internal = $this->functions->generatePage(array(
 								'nama_page' => 'Halaman Dokumen Evaluasi Internal Tahun ' . $tahun_item['tahun_anggaran'],
 								'content' => '[evaluasi_internal tahun=' . $tahun_item["tahun_anggaran"] . ']',
@@ -705,6 +722,20 @@ class Wp_Eval_Sakip_Admin
 				')
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'laporan_kinerja')));
+
+		Container::make('theme_options', __('DPA'))
+			->set_page_parent($dokumen_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_renja_hide_sidebar')
+					->set_html('
+						<style>
+							.postbox-container { display: none; }
+							#poststuff #post-body.columns-2 { margin: 0 !important; }
+						</style>
+					')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'dpa')));
+			
 		Container::make('theme_options', __('Evaluasi Internal'))
 			->set_page_parent($dokumen_menu)
 			->add_fields(array(

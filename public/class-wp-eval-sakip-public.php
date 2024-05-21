@@ -141,6 +141,15 @@ class Wp_Eval_Sakip_Public
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-renstra.php';
 	}
 
+	public function dpa($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-dpa.php';
+	}
+
 	public function renja_rkt($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
@@ -382,6 +391,15 @@ class Wp_Eval_Sakip_Public
 		}
 
 		die(json_encode($ret));
+	}
+
+	public function dokumen_detail_dpa($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-dpa-per-skpd.php';
 	}
 
 	public function dokumen_detail_renja_rkt($atts)
@@ -2216,6 +2234,81 @@ class Wp_Eval_Sakip_Public
 					if (!empty($existing_data)) {
 						$update_result = $wpdb->update(
 							'esakip_skp',
+							array(
+								'tahun_anggaran' => $tahun_anggaran,
+							),
+							array('id' => $id),
+							array('%d'),
+						);
+
+						if ($update_result === false) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal memperbarui data di dalam tabel!'
+							);
+						}
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message' => 'Data dengan ID yang diberikan tidak ditemukan!'
+						);
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message' => 'ID atau tahun anggaran tidak valid!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function submit_tahun_dpa()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$id = $_POST['id'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id kosong!';
+				}
+				if (!empty($_POST['tahunAnggaran'])) {
+					$tahun_anggaran = $_POST['tahunAnggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+
+				if (!empty($id) && !empty($tahun_anggaran)) {
+					$existing_data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT 
+								* 
+							FROM esakip_dpa 
+							WHERE id = %d", $id)
+					);
+
+					if (!empty($existing_data)) {
+						$update_result = $wpdb->update(
+							'esakip_dpa',
 							array(
 								'tahun_anggaran' => $tahun_anggaran,
 							),
@@ -4164,6 +4257,81 @@ class Wp_Eval_Sakip_Public
 							);
 						}
 					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_table_dpa()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_skpd'])) {
+					$id_skpd = $_POST['id_skpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id SKPD kosong!';
+				}
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+				$get_dpa = $wpdb->get_results(
+					$wpdb->prepare("
+                    SELECT * 
+                    FROM esakip_dpa 
+                    WHERE id_skpd = %d 
+                      AND tahun_anggaran = %d 
+                      AND active = 1
+                ", $id_skpd, $tahun_anggaran),
+					ARRAY_A
+				);
+
+				if (!empty($get_dpa)) {
+					$counter = 1;
+					$tbody = '';
+
+					foreach ($get_dpa as $kk => $vv) {
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+						$tbody .= "<td>" . $vv['opd'] . "</td>";
+						$tbody .= "<td>" . $vv['dokumen'] . "</td>";
+						$tbody .= "<td>" . $vv['keterangan'] . "</td>";
+						$tbody .= "<td>" . $vv['created_at'] . "</td>";
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_dpa(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_dpa(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+						$btn .= '</div>';
+
+						$tbody .= "<td class='text-center'>" . $btn . "</td>";
+						$tbody .= "</tr>";
+					}
+
+					$ret['data'] = $tbody;
+				} else {
+					$ret['data'] = "<tr><td colspan='6' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 			} else {
 				$ret = array(
@@ -9579,6 +9747,189 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($ret));
 	}
 
+	public function get_table_tahun_dpa()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$where = 'tahun_anggaran IS NULL';
+
+				if (!empty($_POST['id_skpd'])) {
+					$id_skpd = $_POST['id_skpd'];
+					$where .= " AND id_skpd = $id_skpd";
+				}
+
+				$dokumen_unset = $wpdb->get_results(
+					"
+					SELECT 
+						*
+					FROM esakip_dpa
+					WHERE $where
+					  AND active = 1
+					",
+					ARRAY_A
+				);
+
+				$counterUnset = 1;
+				$tbodyUnset = '';
+				if (!empty($dokumen_unset)) {
+					$tbodyUnset .= '
+						<div class="cetak">
+							<div style="padding: 10px;margin:0 0 3rem 0;">
+								<h3 class="text-center">Dokumen yang belum disetting Tahun Anggaran</h3>
+								<div class="wrap-table">
+									<table id="table_dokumen_tahun" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+										<thead>
+											<tr>
+												<th class="text-center">No</th>
+												<th class="text-center">Perangkat Daerah</th>
+												<th class="text-center">Nama Dokumen</th>
+												<th class="text-center">Keterangan</th>
+												<th class="text-center">Waktu Upload</th>
+												<th class="text-center">Aksi</th>
+											</tr>
+										</thead>
+										<tbody>';
+					foreach ($dokumen_unset as $kk => $vv) {
+						$tbodyUnset .= "<tr>";
+						$tbodyUnset .= "<td class='text-center'>" . $counterUnset++ . "</td>";
+						$tbodyUnset .= "<td>" . $vv['opd'] . "</td>";
+						$tbodyUnset .= "<td>" . $vv['dokumen'] . "</td>";
+						$tbodyUnset .= "<td>" . $vv['keterangan'] . "</td>";
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
+						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+						$btn .= '</div>';
+
+						$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
+						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
+
+						$tbodyUnset .= "</tr>";
+					}
+					$tbodyUnset .= '</tbody>
+								</table>
+							</div>
+						</div>
+					';
+
+					$ret['data'] = $tbodyUnset;
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_table_skpd_dpa()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
+				$unit = $wpdb->get_results(
+					$wpdb->prepare("
+					SELECT 
+						nama_skpd, 
+						id_skpd, 
+						kode_skpd, 
+						nipkepala 
+					FROM esakip_data_unit 
+					WHERE active=1 
+					  AND tahun_anggaran=%d
+					  AND is_skpd=1 
+					ORDER BY kode_skpd ASC
+					", $tahun_anggaran_sakip),
+					ARRAY_A
+				);
+
+				if (!empty($unit)) {
+					$tbody = '';
+					$counter = 1;
+					foreach ($unit as $kk => $vv) {
+						$detail_dpa = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Detail Dokumen DPA ' . $tahun_anggaran,
+							'content' => '[dokumen_detail_dpa tahun=' . $tahun_anggaran . ']',
+							'show_header' => 1,
+							'post_status' => 'private'
+						));
+
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
+
+						$jumlah_dokumen = $wpdb->get_var(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(id)
+								FROM esakip_dpa 
+								WHERE id_skpd = %d
+								AND tahun_anggaran = %d
+								AND active = 1
+								",
+								$vv['id_skpd'],
+								$tahun_anggaran
+							)
+						);
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_dpa['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+						$btn .= '</div>';
+
+						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
+						$tbody .= "<td>" . $btn . "</td>";
+
+						$tbody .= "</tr>";
+					}
+					$ret['data'] = $tbody;
+				} else {
+					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
 	public function get_table_tahun_renja()
 	{
 		global $wpdb;
@@ -10079,7 +10430,6 @@ class Wp_Eval_Sakip_Public
 								$disabled = 'disabled';
 								//jika jadwal masih buka, jika merupakan user penilai
 								if ($dateTime > $started_at_dt && $dateTime < $end_at_dt) {
-									$disabled = '';
 									if (array_key_exists($subkomponen['id_user_penilai'], $intersected_roles)) {
 										$disabled = '';
 									} else {
@@ -10140,7 +10490,7 @@ class Wp_Eval_Sakip_Public
 								}
 
 								//tbody subkomponen
-								$tbody2 .= "<tr>";
+								$tbody2 .= "<tr class='table-active'>";
 								$tbody2 .= "<td class='text-left'></td>";
 								$tbody2 .= "<td class='text-left'>" . $counter_sub++ . "</td>";
 								$tbody2 .= "<td class='text-left' colspan='2'><b>" . $subkomponen['nama'] . "</b></td>";
@@ -10148,12 +10498,11 @@ class Wp_Eval_Sakip_Public
 								$tbody2 .= "<td class='text-left'></td>";
 								$tbody2 .= "<td class='text-center'>" . number_format($total_nilai_sub, 2) . "</td>";
 								$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub * 100, 2) . "%" . "</td>";
-								$tbody2 .= "<td class='text-center'></td>";
-								$tbody2 .= "<td class='text-center'></td>";
+								$tbody2 .= "<td class='text-center' colspan='3'></td>";
 								$tbody2 .= "<td class='text-center'></td>";
 								$tbody2 .= "<td class='text-center'>" . number_format($total_nilai_sub_penetapan, 2) . "</td>";
 								$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub_penetapan * 100, 2) . "%" . "</td>";
-								$tbody2 .= "<td class='text-left' colspan='2'>User Penilai: <b>" . $user_penilai[$subkomponen['id_user_penilai']] . "</b></td>";
+								$tbody2 .= "<td class='text-left' colspan='3'>User Penilai: <b>" . $user_penilai[$subkomponen['id_user_penilai']] . "</b></td>";
 								$tbody2 .= "</tr>";
 
 
@@ -10261,6 +10610,21 @@ class Wp_Eval_Sakip_Public
 											$nilai_penetapan = "0.00";
 										}
 
+										//kerangka logis usulan
+										if (isset($penilaian['pl_nilai_usulan'])) {
+											$kerangka_logis = "<td class='text-center table-success'>OK</td>";
+										} else {
+											$kerangka_logis = "<td class='text-center table-danger'>Belum Diisi</td>";
+										}
+
+										//kerangka logis penetapan
+										if (isset($penilaian['pl_nilai_penetapan'])) {
+											$kerangka_logis_penetapan = "<td class='text-center table-success'>OK</td>";
+										} else {
+											$kerangka_logis_penetapan = "<td class='text-center table-danger'>Belum Diisi</td>";
+										}
+
+
 										//tbody isi
 										$tbody2 .= "<tr>";
 										$tbody2 .= "<td class='text-left'></td>";
@@ -10275,12 +10639,14 @@ class Wp_Eval_Sakip_Public
 												$tbody2 .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "'>" . $opsi . "</select></td>";
 												$tbody2 .= "<td class='text-center'>" . $nilai_usulan . "</td>";
 												$tbody2 .= "<td class='text-center'></td>";
-												$tbody2 .= "<td class='text-center'><input type='text' id='buktiDukung" . $penilaian['kp_id'] . "' value='" . $penilaian['pl_bukti_dukung'] . "'></input></td>";
+												$tbody2 .= "<td class='text-center'><button type='button' class='btn btn-primary' onclick='tambahBuktiDukung(" . $penilaian['kp_id'] . ")' id='buktiDukung" . $penilaian['kp_id'] . "'>Tambah/Lihat Bukti Dukung</button></td>";
 												$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "'>" . $penilaian['pl_keterangan'] . "</textarea></td>";
+												$tbody2 .= $kerangka_logis;
 												$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' disabled>" . $opsi_penetapan . "</select></td>";
 												$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
 												$tbody2 .= "<td class='text-center'></td>";
 												$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
+												$tbody2 .= $kerangka_logis_penetapan;
 												$tbody2 .= "<td class='text-center'>" . $btn_save . "</td>";
 												break;
 											case true:
@@ -10289,12 +10655,14 @@ class Wp_Eval_Sakip_Public
 												$tbody2 .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "' disabled>" . $opsi . "</select></td>";
 												$tbody2 .= "<td class='text-center'>" . $nilai_usulan . "</td>";
 												$tbody2 .= "<td class='text-center'></td>";
-												$tbody2 .= "<td class='text-center'><input type='text' id='buktiDukung" . $penilaian['kp_id'] . "' value='" . $penilaian['pl_bukti_dukung'] . "' disabled></input></td>";
+												$tbody2 .= "<td class='text-center'><button  type='button' class='btn btn-primary' onclick='tambahBuktiDukung(" . $penilaian['kp_id'] . ")' id='buktiDukung" . $penilaian['kp_id'] . "'>Tambah/Lihat Bukti Dukung</button></td>";
 												$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan'] . "</textarea></td>";
+												$tbody2 .= $kerangka_logis;
 												$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' " . $disabled . ">" . $opsi_penetapan . "</select></td>";
 												$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
 												$tbody2 .= "<td class='text-center'></td>";
 												$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'" . $disabled . ">" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
+												$tbody2 .= $kerangka_logis_penetapan;
 												if (!$disabled) {
 													$tbody2 .= "<td class='text-center'>" . $btn_save_penetapan . "</td>";
 												} else {
@@ -10316,19 +10684,18 @@ class Wp_Eval_Sakip_Public
 							$persentase_kom_penetapan = $sum_nilai_sub_penetapan / $komponen['bobot'];
 						}
 						//tbody komponen
-						$tbody .= "<tr>";
+						$tbody .= "<tr class='table-active'>";
 						$tbody .= "<td class='text-left'>" . $counter++ . "</td>";
 						$tbody .= "<td class='text-left' colspan='3'><b>" . $komponen['nama'] . "</b></td>";
 						$tbody .= "<td class='text-center'>" . $komponen['bobot'] . "</td>";
 						$tbody .= "<td class='text-left'></td>";
 						$tbody .= "<td class='text-center'>" . number_format($sum_nilai_sub, 2) . "</td>";
 						$tbody .= "<td class='text-center'>" . number_format($persentase_kom * 100, 2) . "%" . "</td>";
-						$tbody .= "<td class='text-center'></td>";
-						$tbody .= "<td class='text-center'></td>";
+						$tbody .= "<td class='text-center' colspan='3'></td>";
 						$tbody .= "<td class='text-center'></td>";
 						$tbody .= "<td class='text-center'>" . number_format($sum_nilai_sub_penetapan, 2) .  "</td>";
 						$tbody .= "<td class='text-center'>" . number_format($persentase_kom_penetapan * 100, 2) . "%" . "</td>";
-						$tbody .= "<td class='text-left' colspan='2'></td>";
+						$tbody .= "<td class='text-left' colspan='3'></td>";
 						$tbody .= "</tr>";
 						$tbody .= $tbody2;
 
@@ -10354,39 +10721,6 @@ class Wp_Eval_Sakip_Public
 			);
 		}
 		die(json_encode($ret));
-	}
-
-	public function validasi_jadwal_aktif()
-	{
-		global $wpdb;
-		$ret = array(
-			'status' => 'success',
-			'message' => 'Berhasil get data!',
-			'data' => array()
-		);
-
-		date_default_timezone_set("Asia/Bangkok");
-		$dateTime = new DateTime();
-		$time_now = $dateTime->format('Y-m-d H:i:s');
-
-		$sql_jadwal_lokal = $wpdb->get_results("
-			SELECT 
-				* 
-			FROM `data_jadwal_lokal` 
-			WHERE status = 0 
-				AND (
-					waktu_awal < '" . $time_now . "' 
-					AND waktu_akhir > '" . $time_now . "'
-				) AND id_tipe='" . $sql_tipe[0]['id'] . "'" . $where_renja, ARRAY_A);
-
-		if (!empty($sql_jadwal_lokal)) {
-			$ret['data'] = $sql_jadwal_lokal;
-		} else {
-			$ret = array(
-				'message'	=> "Data terbuka tidak ditemukan.",
-				'data'		=> $sql_jadwal_lokal
-			);
-		}
 	}
 
 	public function get_user_penilai()
@@ -10520,6 +10854,7 @@ class Wp_Eval_Sakip_Public
 										$btn = '';
 
 										$btn .= '<div class="btn-action-group">';
+										$btn .= "<button class='btn btn-info' onclick='tambah_kerangka_logis(\"" . $penilaian['id'] . "\");' title='Tambah Kerangka Logis'><span class='dashicons dashicons-admin-generic'></span></button>";
 										$btn .= "<button class='btn btn-warning' onclick='edit_data_komponen_penilaian(\"" . $penilaian['id'] . "\");' title='Edit Data'><span class='dashicons dashicons-edit'></span></button>";
 										$btn .= "<button class='btn btn-danger' onclick='hapus_data_komponen_penilaian(\"" . $penilaian['id'] . "\");' title='Hapus Data'><span class='dashicons dashicons-trash'></span>";
 										$btn .= '</div>';
@@ -11965,6 +12300,99 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($ret));
 	}
 
+	function get_subkomponen_pembanding()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('ESAKIP_APIKEY')) {
+				if (isset($_POST['search'])) {
+					$search_term = '%' . $wpdb->esc_like($_POST['search']) . '%';
+
+					$subkomponens = $wpdb->get_results(
+						$wpdb->prepare("
+							SELECT id, nama
+							FROM esakip_subkomponen
+							WHERE active = 1 AND nama LIKE %s
+							LIMIT 10
+						", $search_term),
+						ARRAY_A
+					);
+
+					foreach ($subkomponens as $subkomponen) {
+						$ret['data'] = array(
+							'label' => $subkomponen['nama'],
+							'value' => $subkomponen['id']
+						);
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
+
+		die(json_encode($ret));
+	}
+
+	function get_komponen_penilaian_pembanding()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('ESAKIP_APIKEY')) {
+				if (!empty($_POST['search'])) {
+					$search_term = '%' . $wpdb->esc_like($_POST['search']) . '%';
+
+					$komponens = $wpdb->get_results(
+						$wpdb->prepare("
+							SELECT id, nama
+							FROM esakip_komponen_penilaian
+							WHERE active = 1 AND nama LIKE %s
+							LIMIT 10
+						", $search_term),
+						ARRAY_A
+					);
+
+					foreach ($komponens as $komponen) {
+						$ret['data'] = array(
+							'label' => $komponen['nama'],
+							'value' => $komponen['id']
+						);
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
+
+		die(json_encode($ret));
+	}
+
 	public function tambah_nilai_penetapan_lke()
 	{
 		global $wpdb;
@@ -11987,6 +12415,12 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Komponen Penilaian kosong!';
 				}
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Jadwal Penetapan kosong!';
+				}
 				if (isset($_POST['nilai_penetapan'])) {
 					$nilai_penetapan = $_POST['nilai_penetapan'];
 				} else {
@@ -12000,6 +12434,41 @@ class Wp_Eval_Sakip_Public
 					$ret['message'] = 'Keterangan Penetapan kosong!';
 				}
 
+				//validasi jadwal
+				date_default_timezone_set('Asia/Jakarta'); // Adjust this if your server is set to a different timezone
+				$dateTime = new DateTime();
+				$data_jadwal = $wpdb->get_row(
+					$wpdb->prepare("
+						SELECT *
+						FROM esakip_data_jadwal
+						WHERE id=%d
+					", $id_jadwal),
+					ARRAY_A
+				);
+				if ($data_jadwal) {
+					$started_at = trim($data_jadwal['started_at']);
+					$end_at = trim($data_jadwal['end_at']);
+
+					$started_at_dt = new DateTime($started_at);
+					$end_at_dt = new DateTime($end_at);
+				} else {
+					error_log('Data jadwal tidak ditemukan.');
+				}
+				if ($dateTime > $started_at_dt && $dateTime > $end_at_dt) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Jadwal Sudah Selesai!';
+					die(json_encode($ret));
+				}
+
+				//validasi nilai
+				$valid_values = [0, 0.25, 0.5, 0.75, 1];
+				if (!in_array($nilai_penetapan, $valid_values)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Aksi ditolak - nilai yang dimasukkan tidak valid!';
+					die(json_encode($ret));
+				}
+
+				//validasi user
 				$current_user = wp_get_current_user();
 				$allowed_roles = array('admin_ortala', 'admin_perencanaan', 'administrator');
 				if (empty(array_intersect($allowed_roles, $current_user->roles))) {
@@ -12119,6 +12588,12 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Komponen Penilaian kosong!';
 				}
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Jadwal Usulan kosong!';
+				}
 				if (isset($_POST['nilai_usulan'])) {
 					$nilai_usulan = $_POST['nilai_usulan'];
 				} else {
@@ -12138,6 +12613,41 @@ class Wp_Eval_Sakip_Public
 					$ret['message'] = 'Bukti Usulan kosong!';
 				}
 
+				//validasi jadwal
+				date_default_timezone_set('Asia/Jakarta'); // Adjust this if your server is set to a different timezone
+				$dateTime = new DateTime();
+				$data_jadwal = $wpdb->get_row(
+					$wpdb->prepare("
+						SELECT *
+						FROM esakip_data_jadwal
+						WHERE id=%d
+					", $id_jadwal),
+					ARRAY_A
+				);
+				if ($data_jadwal) {
+					$started_at = trim($data_jadwal['started_at']);
+					$end_at = trim($data_jadwal['end_at']);
+
+					$started_at_dt = new DateTime($started_at);
+					$end_at_dt = new DateTime($end_at);
+				} else {
+					error_log('Data jadwal tidak ditemukan.');
+				}
+				if ($dateTime > $started_at_dt && $dateTime > $end_at_dt) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Jadwal Sudah Selesai!';
+					die(json_encode($ret));
+				}
+
+				//validasi nilai
+				$valid_values = [0, 0.25, 0.5, 0.75, 1];
+				if (!in_array($nilai_usulan, $valid_values)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Aksi ditolak - nilai yang dimasukkan tidak valid!';
+					die(json_encode($ret));
+				}
+
+				//validasi user
 				$current_user = wp_get_current_user();
 				$allowed_roles = array('admin_ortala', 'admin_perencanaan', 'administrator');
 				if (!empty(array_intersect($allowed_roles, $current_user->roles))) {

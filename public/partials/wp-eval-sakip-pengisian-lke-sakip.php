@@ -26,12 +26,14 @@ if (empty($jadwal)) {
 
 if (!empty($jadwal)) {
     $tahun_anggaran = $jadwal['tahun_anggaran'];
+    $jenis_jadwal = $jadwal['jenis_jadwal'];
     $nama_jadwal = $jadwal['nama_jadwal'];
     $mulai_jadwal = $jadwal['started_at'];
     $selesai_jadwal = $jadwal['end_at'];
     $lama_pelaksanaan = $jadwal['lama_pelaksanaan'];
 } else {
     $tahun_anggaran = '2024';
+    $jenis_jadwal = '-';
     $nama_jadwal = '-';
     $mulai_jadwal = '-';
     $selesai_jadwal = '-';
@@ -58,26 +60,26 @@ $timezone = get_option('timezone_string');
     .btn-action-group .btn {
         margin: 0 5px;
     }
-</style>
-<div class="container-md">
-    <div class="cetak">
+</style>    
+    <div class="container-md" id="cetak" title="Pengisian LKE SAKIP (<?php echo $jadwal['tahun_anggaran']; ?>)">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center table-title">Pengisian LKE SAKIP<br><?php echo $jadwal['nama_jadwal']; ?> (<?php echo $jadwal['tahun_anggaran']; ?>)</h1>
-            <div class="wrap-table">
-                <table id="table_dokumen_skpd" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th class="text-center">No</th>
-                            <th class="text-center">Nama SKPD</th>
-                            <th class="text-center">Nilai Usulan</th>
-                            <th class="text-center">Nilai Penetapan</th>
-                            <th class="text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
+        <h1 class="text-center table-title">Pengisian LKE SAKIP<br><?php echo $jadwal['nama_jadwal']; ?> (<?php echo $jadwal['tahun_anggaran']; ?>)</h1>
+        <div class="action-section">
+        </div>
+        <div class="wrap-table">
+            <table id="table_dokumen_skpd" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th class="text-center">No</th>
+                        <th class="text-center">Nama SKPD</th>
+                        <th class="text-center">Nilai Usulan</th>
+                        <th class="text-center">Nilai Penetapan</th>
+                        <th class="text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -87,7 +89,9 @@ $timezone = get_option('timezone_string');
 <script>
     jQuery(document).ready(function() {
         getTableSkpd();
+        run_download_excel_sakip();
         let dataHitungMundur = {
+            'jenisJadwal': <?php echo json_encode(ucwords($jenis_jadwal)); ?>,
             'namaJadwal': <?php echo json_encode(ucwords($nama_jadwal)); ?>,
             'mulaiJadwal': <?php echo json_encode($mulai_jadwal); ?>,
             'selesaiJadwal': <?php echo json_encode($selesai_jadwal); ?>,

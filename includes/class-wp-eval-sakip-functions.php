@@ -75,9 +75,9 @@ class Esakip_Functions
                         $custom_post->custom_url = $_GET;
                         $link = $this->get_link_post($custom_post);
                         if (!empty($_GET['private'])) {
-                            die('<script>window.location =  "'.$link.'";</script>');
+                            die('<script>window.location =  "' . $link . '";</script>');
                         } else {
-                            die('<script>window.location =  "'.$link.'"+"&private=1";</script>');
+                            die('<script>window.location =  "' . $link . '"+"&private=1";</script>');
                         }
                     } else if (!empty($_GET['private'])) {
                         wp_update_post(array(
@@ -102,9 +102,9 @@ class Esakip_Functions
                             $custom_post->custom_url = $_GET;
                             $link = $this->get_link_post($custom_post);
                             if (!empty($_GET['private'])) {
-                                die('<script>window.location =  "'.$link.'";</script>');
+                                die('<script>window.location =  "' . $link . '";</script>');
                             } else {
-                                die('<script>window.location =  "'.$link.'"+"&private=1";</script>');
+                                die('<script>window.location =  "' . $link . '"+"&private=1";</script>');
                             }
                         } else if (!empty($_GET['private'])) {
                             wp_update_post(array(

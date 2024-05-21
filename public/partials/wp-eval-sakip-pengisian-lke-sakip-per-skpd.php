@@ -43,19 +43,20 @@ $skpd = $wpdb->get_row(
 
 if (!empty($jadwal)) {
     $tahun_anggaran = $jadwal['tahun_anggaran'];
+    $jenis_jadwal = $jadwal['jenis_jadwal'];
     $nama_jadwal = $jadwal['nama_jadwal'];
     $mulai_jadwal = $jadwal['started_at'];
     $selesai_jadwal = $jadwal['end_at'];
     $lama_pelaksanaan = $jadwal['lama_pelaksanaan'];
 } else {
     $tahun_anggaran = '2024';
+    $jenis_jadwal = '-';
     $nama_jadwal = '-';
     $mulai_jadwal = '-';
     $selesai_jadwal = '-';
     $lama_pelaksanaan = 1;
 }
 $timezone = get_option('timezone_string');
-
 ?>
 <style>
     .wrap-table {
@@ -144,8 +145,10 @@ $timezone = get_option('timezone_string');
                         <th class="text-center" colspan="3">Penilaian PD/Perangkat Daerah</th>
                         <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Bukti Dukung</th>
                         <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Keterangan OPD</th>
+                        <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Kerangka Logis OPD</th>
                         <th class="text-center" colspan="3">Penilaian Evaluator</th>
                         <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Keterangan Evaluator</th>
+                        <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Kerangka Logis Evaluator</th>
                         <th class="text-center" rowspan="2" style="vertical-align: middle;">Aksi</th>
                     </tr>
                     <tr>
@@ -162,6 +165,32 @@ $timezone = get_option('timezone_string');
             </table>
         </div>
     </div>
+
+    <!-- Modal tambah bukti dukung -->
+    <div class="modal fade" id="tambahBuktiDukungModal" tabindex="-1" role="dialog" aria-labelledby="tambahBuktiDukungModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tambahBuktiDukungModalLabel">Tambah Bukti Dukung</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formTambahBuktiDukung">
+                        <input type="hidden" value="" id="idPenilaian" name="idPenilaian">
+                        <div class="form-group">
+                            <label for="linkBuktiDukung">Link Bukti Dukung</label>
+                            <input type="text" class="form-control" id="linkBuktiDukung" name="linkBuktiDukung">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-primary" onclick="submitBuktiDukung(); return false">Simpan</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -170,6 +199,7 @@ $timezone = get_option('timezone_string');
             run_download_excel_sakip();
 
             let dataHitungMundur = {
+                'jenisJadwal': <?php echo json_encode(ucwords($jenis_jadwal)); ?>,
                 'namaJadwal': <?php echo json_encode(ucwords($nama_jadwal)); ?>,
                 'mulaiJadwal': <?php echo json_encode($mulai_jadwal); ?>,
                 'selesaiJadwal': <?php echo json_encode($selesai_jadwal); ?>,
@@ -215,6 +245,10 @@ $timezone = get_option('timezone_string');
             if (nilaiUsulan === '') {
                 return alert("Nilai Usulan Tidak Boleh Kosong!");
             }
+            let idJadwal = <?php echo $input['id_jadwal']; ?>;
+            if (idJadwal == '') {
+                return alert("Id Jadwal Tidak Boleh Kosong!");
+            }
             let ketUsulan = jQuery('#keteranganUsulan' + id).val();
             if (ketUsulan == '') {
                 return alert("Keterangan Usulan Tidak Boleh Kosong!");
@@ -245,6 +279,7 @@ $timezone = get_option('timezone_string');
                     action: 'tambah_nilai_lke',
                     id_skpd: idSkpd,
                     id_komponen_penilaian: idKomponenPenilaian,
+                    id_jadwal: idJadwal,
                     nilai_usulan: nilaiUsulan,
                     ket_usulan: ketUsulan,
                     bukti_usulan: buktiUsulan,
@@ -274,6 +309,10 @@ $timezone = get_option('timezone_string');
             if (nilaiPenetapan === '') {
                 return alert("Nilai Penetapan Tidak Boleh Kosong!");
             }
+            let idJadwal = <?php echo $input['id_jadwal']; ?>;
+            if (idJadwal == '') {
+                return alert("Id Jadwal Tidak Boleh Kosong!");
+            }
             let ketPenetapan = jQuery('#keteranganPenetapan' + id).val();
             if (ketPenetapan == '') {
                 return alert("Keterangan Penetapan Tidak Boleh Kosong!");
@@ -300,6 +339,7 @@ $timezone = get_option('timezone_string');
                     action: 'tambah_nilai_penetapan_lke',
                     id_skpd: idSkpd,
                     id_komponen_penilaian: idKomponenPenilaian,
+                    id_jadwal: idJadwal,
                     nilai_penetapan: nilaiPenetapan,
                     ket_penetapan: ketPenetapan,
                     api_key: esakip.api_key
@@ -321,6 +361,14 @@ $timezone = get_option('timezone_string');
                     alert('Terjadi kesalahan saat mengirim data!');
                 }
             });
+        }
+
+        function tambahBuktiDukung(id) {
+            jQuery('#wrap-loading').show();
+            jQuery('#idPenilaian').val(id);
+            jQuery('#linkBuktiDukung').val('');
+            jQuery('#tambahBuktiDukungModal').modal('show');
+            jQuery('#wrap-loading').hide();
         }
     </script>
 </body>
