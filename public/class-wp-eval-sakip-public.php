@@ -240,6 +240,15 @@ class Wp_Eval_Sakip_Public
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-rpjmd.php';
 	}
 
+	public function upload_dokumen_rpjpd($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-rpjpd.php';
+	}
+
 	public function rkpd($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
@@ -285,6 +294,14 @@ class Wp_Eval_Sakip_Public
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-jadwal-rpjmd.php';
 	}
 
+	public function jadwal_rpjpd()
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-jadwal-rpjpd.php';
+	}
 
 	public function mapping_skpd()
 	{
@@ -7025,6 +7042,104 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($return));
 	}
 
+	/** Ambil data penjadwalan RPJPD */
+	public function get_data_penjadwalan_rpjpd()
+	{
+		global $wpdb;
+		$return = array(
+			'status' => 'success',
+			'data'	=> array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				if (!empty($_POST['tipe'])) {
+					$params = $columns = $totalRecords = $data = array();
+					$params = $_REQUEST;
+					$columns = array(
+						0 => 'nama_jadwal',
+						1 => 'keterangan',
+						2 => 'tahun_anggaran',
+						3 => 'lama_pelaksanaan',
+						4 => 'tipe',
+						5 => 'id',
+					);
+					$where = $sqlTot = $sqlRec = "";
+					$where = " WHERE tipe = 'RPJPD' AND status != 0";
+
+					// check search value exist
+					if (!empty($params['search']['value'])) {
+						$where .= " AND ( nama LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
+					}
+
+					// getting total number records without any search
+					$sqlTot = "SELECT count(*) as jml FROM `esakip_data_jadwal`";
+					$sqlRec = "SELECT " . implode(', ', $columns) . " FROM `esakip_data_jadwal`";
+					if (isset($where) && $where != '') {
+						$sqlTot .= $where;
+						$sqlRec .= $where;
+					}
+
+					$sqlRec .=  $wpdb->prepare(" ORDER BY " . $columns[$params['order'][0]['column']] . "   " . $params['order'][0]['dir'] . "  LIMIT %d ,%d ", $params['start'], $params['length']);
+
+					$queryTot = $wpdb->get_results($sqlTot, ARRAY_A);
+					$totalRecords = $queryTot[0]['jml'];
+					$queryRecords = $wpdb->get_results($sqlRec, ARRAY_A);
+
+					if (!empty($queryRecords)) {
+						foreach ($queryRecords as $recKey => $recVal) {
+							$edit	= '';
+							$delete	= '';
+							$edit	= '<a class="btn btn-sm btn-warning mr-2" style="text-decoration: none;" onclick="edit_data_penjadwalan(\'' . $recVal['id'] . '\'); return false;" href="#" title="Edit data penjadwalan"><i class="dashicons dashicons-edit"></i></a>';
+							$delete	= '<a class="btn btn-sm btn-danger" style="text-decoration: none;" onclick="hapus_data_penjadwalan(\'' . $recVal['id'] . '\'); return false;" href="#" title="Hapus data penjadwalan"><i class="dashicons dashicons-trash"></i></a>';
+
+							$tahun_anggaran_selesai = $recVal['tahun_anggaran'] + $recVal['lama_pelaksanaan'];
+
+							$queryRecords[$recKey]['aksi'] = $edit . $delete;
+							$queryRecords[$recKey]['nama_jadwal'] = ucfirst($recVal['nama_jadwal']);
+							$queryRecords[$recKey]['tahun_anggaran_selesai'] = $tahun_anggaran_selesai;
+						}
+
+						$json_data = array(
+							"draw"            => intval($params['draw']),
+							"recordsTotal"    => intval($totalRecords),
+							"recordsFiltered" => intval($totalRecords),
+							"data"            => $queryRecords,
+						);
+
+						die(json_encode($json_data));
+					} else {
+						$json_data = array(
+							"draw"            => intval($params['draw']),
+							"recordsTotal"    => 0,
+							"recordsFiltered" => 0,
+							"data"            => array(),
+							"message"			=> "Data tidak ditemukan!"
+						);
+
+						die(json_encode($json_data));
+					}
+				} else {
+					$return = array(
+						'status' => 'error',
+						'message'	=> 'Harap diisi semua,tidak boleh ada yang kosong!'
+					);
+				}
+			} else {
+				$return = array(
+					'status' => 'error',
+					'message'	=> 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$return = array(
+				'status' => 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($return));
+	}
+
 	/** Submit data penjadwalan */
 	public function submit_jadwal_rpjmd()
 	{
@@ -7213,6 +7328,169 @@ class Wp_Eval_Sakip_Public
 					// Jika data dengan ID yang sama ditemukan di tabel lain, tampilkan pesan
 					$ret['status'] = 'confirm';
 					$ret['message'] = 'Jadwal tidak bisa dihapus karena sudah terpakai di dokumen RPJMD / RPD.';
+				}
+				if ($ret['status'] != 'confirm') {
+					// Jika tidak ada data dengan ID yang sama di tabel lain, lanjutkan penghapusan seperti biasa
+					$ret['data'] = $wpdb->update('esakip_data_jadwal', array('status' => 0), array(
+						'id' => $id
+					));
+				}
+			} else {
+				$ret['status']  = 'error';
+				$ret['message'] = 'Api key tidak ditemukan!';
+			}
+		} else {
+			$ret['status']  = 'error';
+			$ret['message'] = 'Format Salah!';
+		}
+		die(json_encode($ret));
+	}
+
+	/** Submit data penjadwalan RPJPD */
+	public function submit_jadwal_rpjpd()
+	{
+		global $wpdb;
+		$return = array(
+			'status' => 'success',
+			'data'	=> array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				if (!empty($_POST['nama_jadwal']) && !empty($_POST['lama_pelaksanaan']) && !empty($_POST['keterangan']) && !empty($_POST['tahun_anggaran'])) {
+					$nama_jadwal	= trim(htmlspecialchars($_POST['nama_jadwal']));
+					$tahun_anggaran	= trim(htmlspecialchars($_POST['tahun_anggaran']));
+					$keterangan		= trim(htmlspecialchars($_POST['keterangan']));
+					$lama_pelaksanaan 	= trim(htmlspecialchars($_POST['lama_pelaksanaan']));
+					$tipe 	= trim(htmlspecialchars($_POST['tipe']));
+
+
+					$data_this_id = $wpdb->get_row($wpdb->prepare('SELECT * FROM esakip_data_jadwal WHERE id = %d', $id), ARRAY_A);
+
+					//update data penjadwalan
+					$data_jadwal = array(
+						'nama_jadwal' 			=> $nama_jadwal,
+						'tahun_anggaran'		=> $tahun_anggaran,
+						'keterangan'			=> $keterangan,
+						'tipe'					=> 'RPJPD',
+						'status'					=> '1',
+						'lama_pelaksanaan'		=> $lama_pelaksanaan
+					);
+
+					$wpdb->insert('esakip_data_jadwal', $data_jadwal);
+
+					$return = array(
+						'status'		=> 'success',
+						'message'		=> 'Berhasil!',
+						'data_jadwal'	=> $data_jadwal
+					);
+				} else {
+					$return = array(
+						'status' => 'error',
+						'message'	=> 'Harap diisi semua,tidak boleh ada yang kosong!'
+					);
+				}
+			} else {
+				$return = array(
+					'status' => 'error',
+					'message'	=> 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$return = array(
+				'status' => 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($return));
+	}
+
+
+	/** Submit edit data penjadwalan RPJPD*/
+	public function submit_edit_jadwal_rpjpd()
+	{
+		global $wpdb;
+		$return = array(
+			'status' => 'success',
+			'data'	=> array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				if (!empty($_POST['id']) && !empty($_POST['nama_jadwal']) && !empty($_POST['lama_pelaksanaan']) && !empty($_POST['keterangan']) && !empty($_POST['tahun_anggaran'])) {
+					$id = trim(htmlspecialchars($_POST['id']));
+					$nama_jadwal	= trim(htmlspecialchars($_POST['nama_jadwal']));
+					$tahun_anggaran	= trim(htmlspecialchars($_POST['tahun_anggaran']));
+					$keterangan		= trim(htmlspecialchars($_POST['keterangan']));
+					$lama_pelaksanaan 	= trim(htmlspecialchars($_POST['lama_pelaksanaan']));
+					$tipe 	= trim(htmlspecialchars($_POST['tipe']));
+
+
+					$data_this_id = $wpdb->get_row($wpdb->prepare('SELECT * FROM esakip_data_jadwal WHERE id = %d', $id), ARRAY_A);
+
+					//update data penjadwalan
+					$data_jadwal = array(
+						'nama_jadwal' 			=> $nama_jadwal,
+						'tahun_anggaran'		=> $tahun_anggaran,
+						'keterangan'			=> $keterangan,
+						'tipe'					=> 'RPJPD',
+						'lama_pelaksanaan'		=> $lama_pelaksanaan
+					);
+
+					$wpdb->update('esakip_data_jadwal', $data_jadwal, array(
+						'id'	=> $id
+					));
+
+					$return = array(
+						'status'		=> 'success',
+						'message'		=> 'Berhasil!',
+						'data_jadwal'	=> $data_jadwal
+					);
+				} else {
+					$return = array(
+						'status' => 'error',
+						'message'	=> 'Harap diisi semua,tidak boleh ada yang kosong!'
+					);
+				}
+			} else {
+				$return = array(
+					'status' => 'error',
+					'message'	=> 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$return = array(
+				'status' => 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($return));
+	}
+
+
+	public function delete_jadwal_rpjpd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				$id = trim(htmlspecialchars($_POST['id']));
+				// Periksa apakah data dengan ID yang akan dihapus ada di tabel esakip_rpjpd
+				$cek_id_jadwal_rpjpd = $wpdb->get_var($wpdb->prepare('
+                    SELECT id_jadwal
+                    FROM esakip_rpjpd
+                    WHERE id_jadwal=%d
+                    	AND active=1
+                ', $id));
+				if ($cek_id_jadwal_rpjpd) {
+					// Jika data dengan ID yang sama ditemukan di tabel esakip_rpjpd, tampilkan pesan
+					$ret['status'] = 'confirm';
+					$ret['message'] = 'Jadwal tidak bisa dihapus karena sudah terpakai di dokumen RPJPD.';
 				}
 				if ($ret['status'] != 'confirm') {
 					// Jika tidak ada data dengan ID yang sama di tabel lain, lanjutkan penghapusan seperti biasa
@@ -12053,5 +12331,448 @@ class Wp_Eval_Sakip_Public
 			]);
 			exit();
 		}
+	}
+
+	public function get_table_rpjpd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_periode'])) {
+					$id_jadwal = $_POST['id_periode'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
+				}
+				$rpjpds = $wpdb->get_results(
+					$wpdb->prepare("
+						SELECT * 
+						FROM esakip_rpjpd
+						WHERE id_jadwal = %d 
+						  AND active = 1
+					", $id_jadwal),
+					ARRAY_A
+				);
+
+				if (!empty($rpjpds)) {
+					$counter = 1;
+					$tbody = '';
+
+					foreach ($rpjpds as $kk => $vv) {
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+						$tbody .= "<td>" . $vv['dokumen'] . "</td>";
+						$tbody .= "<td>" . $vv['keterangan'] . "</td>";
+						$tbody .= "<td>" . $vv['created_at'] . "</td>";
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_rpjpd(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_rpjpd(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+						$btn .= '</div>';
+
+						$tbody .= "<td class='text-center'>" . $btn . "</td>";
+						$tbody .= "</tr>";
+					}
+
+					$ret['data'] = $tbody;
+				} else {
+					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	
+	public function get_table_tahun_rpjpd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$where = 'id_jadwal IS NULL';
+
+				$dokumen_unset = $wpdb->get_results(
+					"
+					SELECT 
+						*
+					FROM esakip_rpjpd 
+					WHERE $where
+					  AND active = 1
+					",
+					ARRAY_A
+				);
+
+				$counterUnset = 1;
+				$tbodyUnset = '';
+				if (!empty($dokumen_unset)) {
+					$tbodyUnset .= '
+						<div class="cetak">
+							<div style="padding: 10px;margin:0 0 3rem 0;">
+								<h3 class="text-center">Dokumen yang belum disetting Tahun Periode</h3>
+								<div class="wrap-table">
+									<table id="table_dokumen_tahun" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+										<thead>
+											<tr>
+												<th class="text-center">No</th>
+												<th class="text-center">Nama Dokumen</th>
+												<th class="text-center">Keterangan</th>
+												<th class="text-center">Waktu Upload</th>
+												<th class="text-center">Aksi</th>
+											</tr>
+										</thead>
+										<tbody>';
+					foreach ($dokumen_unset as $kk => $vv) {
+						$tbodyUnset .= "<tr>";
+						$tbodyUnset .= "<td class='text-center'>" . $counterUnset++ . "</td>";
+						$tbodyUnset .= "<td>" . $vv['dokumen'] . "</td>";
+						$tbodyUnset .= "<td>" . $vv['keterangan'] . "</td>";
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
+						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+						$btn .= '</div>';
+
+						$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
+						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
+
+						$tbodyUnset .= "</tr>";
+					}
+					$tbodyUnset .= '</tbody>
+								</table>
+							</div>
+						</div>
+					';
+
+					$ret['data'] = $tbodyUnset;
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	
+	public function tambah_dokumen_rpjpd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$id_dokumen = null;
+
+				if (!empty($_POST['id_dokumen'])) {
+					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
+				}
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
+				}
+				if (!empty($_POST['keterangan'])) {
+					$keterangan = $_POST['keterangan'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Keterangan kosong!';
+				}
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
+					$upload = $this->functions->uploadFile(
+						$_POST['api_key'],
+						$upload_dir,
+						$_FILES['fileUpload'],
+						array('pdf'),
+						1048576 * 10
+					);
+					if ($upload['status'] == false) {
+						$ret = array(
+							'status' => 'error',
+							'message' => $upload['message']
+						);
+					}
+				}
+
+				if ($ret['status'] == 'success') {
+					if (empty($id_dokumen)) {
+						$wpdb->insert(
+							'esakip_rpjpd',
+							array(
+								'dokumen' => $upload['filename'],
+								'keterangan' => $keterangan,
+								'id_jadwal' => $id_jadwal,
+								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
+							),
+							array('%s', '%s', '%s', '%s', '%s')
+						);
+
+						if (!$wpdb->insert_id) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal menyimpan data ke database!'
+							);
+						}
+					} else {
+						$opsi = array(
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_rpjpd
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
+						$wpdb->update(
+							'esakip_rpjpd',
+							$opsi,
+							array('id' => $id_dokumen),
+							array('%s', '%s'),
+							array('%d')
+						);
+
+						if ($wpdb->rows_affected == 0) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal memperbarui data ke database!'
+							);
+						}
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	
+	public function get_detail_rpjpd_by_id()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT *
+							FROM esakip_rpjpd
+							WHERE id = %d
+						", $_POST['id']),
+						ARRAY_A
+					);
+					$ret['data'] = $data;
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	
+	public function submit_tahun_rpjpd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$id = $_POST['id'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id kosong!';
+				}
+				if (!empty($_POST['id_jadwal'])) {
+					$tahun_periode = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Periode kosong!';
+				}
+
+				if (!empty($id) && !empty($tahun_periode)) {
+					$existing_data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT 
+								* 
+							FROM esakip_rpjpd 
+							WHERE id = %d", $id)
+					);
+
+					if (!empty($existing_data)) {
+						$update_result = $wpdb->update(
+							'esakip_rpjpd',
+							array(
+								'id_jadwal' => $tahun_periode,
+							),
+							array('id' => $id),
+							array('%d'),
+						);
+
+						if ($update_result === false) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal memperbarui data di dalam tabel!'
+							);
+						}
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message' => 'Data dengan ID yang diberikan tidak ditemukan!'
+						);
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message' => 'ID atau tahun anggaran tidak valid!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	
+	public function hapus_dokumen_rpjpd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
+					$dokumen_lama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								dokumen
+							FROM esakip_rpjpd
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					$ret['data'] = $wpdb->update(
+						'esakip_rpjpd',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+
+					if ($wpdb->rows_affected > 0) {
+						if (is_file($upload_dir . $dokumen_lama)) {
+							unlink($upload_dir . $dokumen_lama);
+						}
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
 	}
 }

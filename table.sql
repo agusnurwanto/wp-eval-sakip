@@ -338,3 +338,15 @@ CREATE TABLE esakip_pengisian_lke_history (
   `update_at` datetime DEFAULT current_timestamp(),
   PRIMARY KEY  (`id`)
 );
+
+CREATE TABLE `esakip_rpjpd` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_skpd` int(11) DEFAULT NULL,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `dokumen` varchar(255) DEFAULT NULL,
+  `keterangan` varchar(255) DEFAULT NULL,
+  `tanggal_upload` varchar(50) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp,
+  `active` tinyint(4) DEFAULT 1,
+ PRIMARY KEY(id)
+);
