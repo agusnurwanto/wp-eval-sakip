@@ -256,6 +256,11 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_submit_tahun_iku', $plugin_public, 'submit_tahun_iku');
 		$this->loader->add_action('wp_ajax_hapus_dokumen_iku', $plugin_public, 'hapus_dokumen_iku');
 		$this->loader->add_action('wp_ajax_get_table_iku', $plugin_public, 'get_table_iku');
+
+		$this->loader->add_action('wp_ajax_get_detail_dokumen_by_id', $plugin_public, 'get_detail_dokumen_by_id');
+		$this->loader->add_action('wp_ajax_submit_tambah_dokumen', $plugin_public, 'submit_tambah_dokumen');
+		$this->loader->add_action('wp_ajax_hapus_dokumen', $plugin_public, 'hapus_dokumen');
+		$this->loader->add_action('wp_ajax_get_table_dokumen', $plugin_public, 'get_table_dokumen');
 		
 		$this->loader->add_action('wp_ajax_get_detail_laporan_kinerja_by_id', $plugin_public, 'get_detail_laporan_kinerja_by_id');
 		$this->loader->add_action('wp_ajax_tambah_dokumen_laporan_kinerja', $plugin_public, 'tambah_dokumen_laporan_kinerja');
@@ -415,6 +420,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('jadwal_rpjmd', array($plugin_public, 'jadwal_rpjmd'));
 		add_shortcode('jadwal_rpjpd', array($plugin_public, 'jadwal_rpjpd'));
 
+		add_shortcode('dokumen_detail_pohon_kinerja_dan_cascading', array($plugin_public, 'dokumen_detail_pohon_kinerja_dan_cascading'));
 		add_shortcode('dokumen_detail_dpa', array($plugin_public, 'dokumen_detail_dpa'));
 		add_shortcode('dokumen_detail_renja_rkt', array($plugin_public, 'dokumen_detail_renja_rkt'));
 		add_shortcode('dokumen_detail_skp', array($plugin_public, 'dokumen_detail_skp'));
