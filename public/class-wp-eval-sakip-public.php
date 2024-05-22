@@ -519,6 +519,42 @@ class Wp_Eval_Sakip_Public
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-pengisian-lke-sakip-per-skpd.php';
 	}
 
+	public function pohon_kinerja_dan_cascading($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-pohon-kinerja-dan-cascading.php';
+	}
+	
+	public function lhe_akip_internal($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-lhe-akip-internal.php';
+	}
+	
+	public function tl_lhe_akip_internal($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-tl-lhe-akip-internal.php';
+	}
+	
+	public function tl_lhe_akip_kemenpan($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-tl-lhe-akip-kemenpan.php';
+	}
+
 	public function get_detail_renja_rkt_by_id()
 	{
 		global $wpdb;
@@ -10912,6 +10948,309 @@ class Wp_Eval_Sakip_Public
 			$ret = array(
 				'status' => 'error',
 				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_table_skpd_dokumen()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+				if (!empty($_POST['tipe_dokumen'])) {
+					$tipe_dokumen = $_POST['tipe_dokumen'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tipe Dokumen kosong!';
+				}
+
+				if($ret['status'] == 'success'){
+					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+	
+					$unit = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT 
+							nama_skpd, 
+							id_skpd, 
+							kode_skpd, 
+							nipkepala 
+						FROM esakip_data_unit 
+						WHERE active=1 
+						  AND tahun_anggaran=%d
+						  AND is_skpd=1 
+						ORDER BY kode_skpd ASC
+						", $tahun_anggaran_sakip),
+						ARRAY_A
+					);
+	
+					// untuk mengatur judul halaman sesuai tipe dokumen
+					$nama_page = array(
+						"pohon_kinerja_dan_cascading" => "Pohon Kinerja dan Cascading"
+					);
+
+					// untuk mengatur tabel sesuai tipe dokumen
+					$nama_tabel = array(
+						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading"
+					);
+	
+					if (!empty($unit)) {
+						$tbody = '';
+						$counter = 1;
+						foreach ($unit as $kk => $vv) {
+							$detail_dokumen = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Detail Dokumen '. $nama_page[$tipe_dokumen] .' ' . $tahun_anggaran,
+								'content' => '[dokumen_detail_'. $tipe_dokumen .' tahun=' . $tahun_anggaran . ']',
+								'show_header' => 1,
+								'post_status' => 'private'
+							));
+	
+							$tbody .= "<tr>";
+							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+							$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
+	
+							$jumlah_dokumen = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(id)
+									FROM $nama_tabel[$tipe_dokumen]
+									WHERE id_skpd = %d
+									AND tahun_anggaran = %d
+									AND active = 1
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran
+								)
+							);
+	
+							$btn = '<div class="btn-action-group">';
+							$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_dokumen['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+							$btn .= '</div>';
+	
+							$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
+							$tbody .= "<td>" . $btn . "</td>";
+	
+							$tbody .= "</tr>";
+						}
+						$ret['data'] = $tbody;
+					} else {
+						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_table_tahun_dokumen()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['tipe_dokumen'])) {
+					$tipe_dokumen = $_POST['tipe_dokumen'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tipe Dokumen kosong!';
+				}
+
+				if($ret['status'] == 'success'){
+					// untuk mengatur tabel sesuai tipe dokumen
+					$nama_tabel = array(
+						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading"
+					);
+
+					$where = 'tahun_anggaran IS NULL';
+	
+					if (!empty($_POST['id_skpd'])) {
+						$id_skpd = $_POST['id_skpd'];
+						$where .= " AND id_skpd = $id_skpd";
+					}
+	
+					$dokumen_unset = $wpdb->get_results(
+						"
+						SELECT 
+							*
+						FROM $nama_tabel[$tipe_dokumen] 
+						WHERE $where
+						  AND active = 1
+						",
+						ARRAY_A
+					);
+	
+					$counterUnset = 1;
+					$tbodyUnset = '';
+					if (!empty($dokumen_unset)) {
+						$tbodyUnset .= '
+							<div class="cetak">
+								<div style="padding: 10px;margin:0 0 3rem 0;">
+									<h3 class="text-center">Dokumen yang belum disetting Tahun Anggaran</h3>
+									<div class="wrap-table">
+										<table id="table_dokumen_tahun" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+											<thead>
+												<tr>
+													<th class="text-center">No</th>
+													<th class="text-center">Perangkat Daerah</th>
+													<th class="text-center">Nama Dokumen</th>
+													<th class="text-center">Keterangan</th>
+													<th class="text-center">Waktu Upload</th>
+													<th class="text-center">Aksi</th>
+												</tr>
+											</thead>
+											<tbody>';
+						foreach ($dokumen_unset as $kk => $vv) {
+							$tbodyUnset .= "<tr>";
+							$tbodyUnset .= "<td class='text-center'>" . $counterUnset++ . "</td>";
+							$tbodyUnset .= "<td>" . $vv['opd'] . "</td>";
+							$tbodyUnset .= "<td>" . $vv['dokumen'] . "</td>";
+							$tbodyUnset .= "<td>" . $vv['keterangan'] . "</td>";
+	
+							$btn = '<div class="btn-action-group">';
+							$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
+							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+							$btn .= '</div>';
+	
+							$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
+							$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
+	
+							$tbodyUnset .= "</tr>";
+						}
+						$tbodyUnset .= '</tbody>
+									</table>
+								</div>
+							</div>
+						';
+	
+						$ret['data'] = $tbodyUnset;
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function submit_tahun_dokumen()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$id = $_POST['id'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id kosong!';
+				}
+				if (!empty($_POST['tahunAnggaran'])) {
+					$tahun_anggaran = $_POST['tahunAnggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+				if (!empty($_POST['tipe_dokumen'])) {
+					$tipe_dokumen = $_POST['tipe_dokumen'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tipe Dokumen kosong!';
+				}
+
+				if($ret['status'] == 'success'){
+					if (!empty($id) && !empty($tahun_anggaran)) {
+						// untuk mengatur tabel sesuai tipe dokumen
+						$nama_tabel = array(
+							"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading"
+						);
+
+						$existing_data = $wpdb->get_row(
+							$wpdb->prepare("
+								SELECT 
+									* 
+								FROM $nama_tabel[$tipe_dokumen]
+								WHERE id = %d", $id)
+						);
+	
+						if (!empty($existing_data)) {
+							$update_result = $wpdb->update(
+								$nama_tabel[$tipe_dokumen],
+								array(
+									'tahun_anggaran' => $tahun_anggaran,
+								),
+								array('id' => $id),
+								array('%d'),
+							);
+	
+							if ($update_result === false) {
+								$ret = array(
+									'status' => 'error',
+									'message' => 'Gagal memperbarui data di dalam tabel!'
+								);
+							}
+						} else {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Data dengan ID yang diberikan tidak ditemukan!'
+							);
+						}
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message' => 'ID atau tahun anggaran tidak valid!'
+						);
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
 			);
 		}
 		die(json_encode($ret));

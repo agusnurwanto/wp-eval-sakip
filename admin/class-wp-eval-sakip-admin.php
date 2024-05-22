@@ -508,6 +508,74 @@ class Wp_Eval_Sakip_Admin
 									</ul>
 								</div>
 							</div>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'pohon_kinerja_dan_cascading') {
+							$pohon_kinerja_cascading = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Dokumen Pohon Kinerja dan Cascading Tahun ' . $tahun_item['tahun_anggaran'],
+								'content' => '[pohon_kinerja_dan_cascading tahun=' . $tahun_item["tahun_anggaran"] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+							<div class="accordion">
+								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+									<ul style="margin-left: 20px;">
+										<li><a target="_blank" href="' . $pohon_kinerja_cascading['url'] . '">' . $pohon_kinerja_cascading['title'] . '</a></li>
+									</ul>
+								</div>
+							</div>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'lhe_akip_internal') {
+							$lhe_akip_internal = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Dokumen LHE AKIP Internal Tahun ' . $tahun_item['tahun_anggaran'],
+								'content' => '[lhe_akip_internal tahun=' . $tahun_item["tahun_anggaran"] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+							<div class="accordion">
+								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+									<ul style="margin-left: 20px;">
+										<li><a target="_blank" href="' . $lhe_akip_internal['url'] . '">' . $lhe_akip_internal['title'] . '</a></li>
+									</ul>
+								</div>
+							</div>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'tl_lhe_akip_internal') {
+							$tl_lhe_akip_internal = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Dokumen TL LHE AKIP Internal Tahun ' . $tahun_item['tahun_anggaran'],
+								'content' => '[tl_lhe_akip_internal tahun=' . $tahun_item["tahun_anggaran"] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+							<div class="accordion">
+								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+									<ul style="margin-left: 20px;">
+										<li><a target="_blank" href="' . $tl_lhe_akip_internal['url'] . '">' . $tl_lhe_akip_internal['title'] . '</a></li>
+									</ul>
+								</div>
+							</div>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'tl_lhe_akip_kemenpan') {
+							$tl_lhe_akip_kemenpan = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Dokumen TL LHE AKIP Kemenpan Tahun ' . $tahun_item['tahun_anggaran'],
+								'content' => '[tl_lhe_akip_kemenpan tahun=' . $tahun_item["tahun_anggaran"] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+							<div class="accordion">
+								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+									<ul style="margin-left: 20px;">
+										<li><a target="_blank" href="' . $tl_lhe_akip_kemenpan['url'] . '">' . $tl_lhe_akip_kemenpan['title'] . '</a></li>
+									</ul>
+								</div>
+							</div>';
 						}
 						$ret['message'] .= $body_pemda;
 					}
