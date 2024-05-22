@@ -10394,7 +10394,7 @@ class Wp_Eval_Sakip_Public
                                     SELECT SUM(nilai_penetapan)
                                     FROM esakip_pengisian_lke
                                     WHERE id_subkomponen = %d
-                                      AND id_komponen = 2
+                                      AND id_komponen = 4
                                       AND id_skpd = %d
                                 ", $subkomponen['id'], $vv['id_skpd'])
                             );
