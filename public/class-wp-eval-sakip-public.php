@@ -9090,6 +9090,612 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($ret));
 	}
 
+	public function get_table_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_skpd'])) {
+					$id_skpd = $_POST['id_skpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id SKPD kosong!';
+				}
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+				$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerjas = $wpdb->get_results(
+					$wpdb->prepare("
+                    SELECT * 
+                    FROM esakip_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja
+                    WHERE id_skpd = %d 
+                      AND tahun_anggaran = %d 
+                      AND active = 1
+                ", $id_skpd, $tahun_anggaran),
+					ARRAY_A
+				);
+
+				if (!empty($pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerjas)) {
+					$counter = 1;
+					$tbody = '';
+
+					foreach ($pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerjas as $kk => $vv) {
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+						$tbody .= "<td>" . $vv['opd'] . "</td>";
+						$tbody .= "<td>" . $vv['dokumen'] . "</td>";
+						$tbody .= "<td>" . $vv['keterangan'] . "</td>";
+						$tbody .= "<td>" . $vv['created_at'] . "</td>";
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+						$btn .= '</div>';
+
+						$tbody .= "<td class='text-center'>" . $btn . "</td>";
+						$tbody .= "</tr>";
+					}
+
+					$ret['data'] = $tbody;
+				} else {
+					$ret['data'] = "<tr><td colspan='6' class='text-center'>Tidak ada data tersedia</td></tr>";
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_by_id()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT *
+							FROM esakip_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja
+							WHERE id = %d
+						", $_POST['id']),
+						ARRAY_A
+					);
+					$ret['data'] = $data;
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function tambah_dokumen_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$id_dokumen = null;
+
+				if (!empty($_POST['id_dokumen'])) {
+					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
+				}
+				if (!empty($_POST['skpd'])) {
+					$skpd = $_POST['skpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Perangkat Daerah kosong!';
+				}
+				if (!empty($_POST['idSkpd'])) {
+					$idSkpd = $_POST['idSkpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id SKPD kosong!';
+				}
+				if (!empty($_POST['keterangan'])) {
+					$keterangan = $_POST['keterangan'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Keterangan kosong!';
+				}
+				if (!empty($_POST['tahunAnggaran'])) {
+					$tahunAnggaran = $_POST['tahunAnggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$upload = $this->functions->uploadFile(
+						$_POST['api_key'],
+						$upload_dir,
+						$_FILES['fileUpload'],
+						array('pdf'),
+						1048576 * 10
+					);
+					if ($upload['status'] == false) {
+						$ret = array(
+							'status' => 'error',
+							'message' => $upload['message']
+						);
+					}
+				}
+
+				if ($ret['status'] == 'success') {
+					if (empty($id_dokumen)) {
+						$wpdb->insert(
+							'esakip_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja',
+							array(
+								'opd' => $skpd,
+								'id_skpd' => $idSkpd,
+								'dokumen' => $upload['filename'],
+								'keterangan' => $keterangan,
+								'tahun_anggaran' => $tahunAnggaran,
+								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
+							),
+							array('%s', '%s', '%s', '%s', '%d')
+						);
+
+						if (!$wpdb->insert_id) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal menyimpan data ke database!'
+							);
+						}
+					} else {
+						$opsi = array(
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
+						$wpdb->update(
+							'esakip_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja',
+							$opsi,
+							array('id' => $id_dokumen),
+							array('%s', '%s'),
+							array('%d')
+						);
+
+						if ($wpdb->rows_affected == 0) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal memperbarui data ke database!'
+							);
+						}
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_dokumen_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$dokumen_lama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								dokumen
+							FROM esakip_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					$ret['data'] = $wpdb->update(
+						'esakip_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+
+					if ($wpdb->rows_affected > 0) {
+						if (is_file($upload_dir . $dokumen_lama)) {
+							unlink($upload_dir . $dokumen_lama);
+						}
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_table_pedoman_teknis_evaluasi_internal()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_skpd'])) {
+					$id_skpd = $_POST['id_skpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id SKPD kosong!';
+				}
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+				$pedoman_teknis_evaluasi_internals = $wpdb->get_results(
+					$wpdb->prepare("
+                    SELECT * 
+                    FROM esakip_pedoman_teknis_evaluasi_internal
+                    WHERE id_skpd = %d 
+                      AND tahun_anggaran = %d 
+                      AND active = 1
+                ", $id_skpd, $tahun_anggaran),
+					ARRAY_A
+				);
+
+				if (!empty($pedoman_teknis_evaluasi_internals)) {
+					$counter = 1;
+					$tbody = '';
+
+					foreach ($pedoman_teknis_evaluasi_internals as $kk => $vv) {
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+						$tbody .= "<td>" . $vv['opd'] . "</td>";
+						$tbody .= "<td>" . $vv['dokumen'] . "</td>";
+						$tbody .= "<td>" . $vv['keterangan'] . "</td>";
+						$tbody .= "<td>" . $vv['created_at'] . "</td>";
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_pedoman_teknis_evaluasi_internal(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_pedoman_teknis_evaluasi_internal(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+						$btn .= '</div>';
+
+						$tbody .= "<td class='text-center'>" . $btn . "</td>";
+						$tbody .= "</tr>";
+					}
+
+					$ret['data'] = $tbody;
+				} else {
+					$ret['data'] = "<tr><td colspan='6' class='text-center'>Tidak ada data tersedia</td></tr>";
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_detail_pedoman_teknis_evaluasi_internal_by_id()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT *
+							FROM esakip_pedoman_teknis_evaluasi_internal
+							WHERE id = %d
+						", $_POST['id']),
+						ARRAY_A
+					);
+					$ret['data'] = $data;
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function tambah_dokumen_pedoman_teknis_evaluasi_internal()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$id_dokumen = null;
+
+				if (!empty($_POST['id_dokumen'])) {
+					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
+				}
+				if (!empty($_POST['skpd'])) {
+					$skpd = $_POST['skpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Perangkat Daerah kosong!';
+				}
+				if (!empty($_POST['idSkpd'])) {
+					$idSkpd = $_POST['idSkpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id SKPD kosong!';
+				}
+				if (!empty($_POST['keterangan'])) {
+					$keterangan = $_POST['keterangan'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Keterangan kosong!';
+				}
+				if (!empty($_POST['tahunAnggaran'])) {
+					$tahunAnggaran = $_POST['tahunAnggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$upload = $this->functions->uploadFile(
+						$_POST['api_key'],
+						$upload_dir,
+						$_FILES['fileUpload'],
+						array('pdf'),
+						1048576 * 10
+					);
+					if ($upload['status'] == false) {
+						$ret = array(
+							'status' => 'error',
+							'message' => $upload['message']
+						);
+					}
+				}
+
+				if ($ret['status'] == 'success') {
+					if (empty($id_dokumen)) {
+						$wpdb->insert(
+							'esakip_pedoman_teknis_evaluasi_internal',
+							array(
+								'opd' => $skpd,
+								'id_skpd' => $idSkpd,
+								'dokumen' => $upload['filename'],
+								'keterangan' => $keterangan,
+								'tahun_anggaran' => $tahunAnggaran,
+								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
+							),
+							array('%s', '%s', '%s', '%s', '%d')
+						);
+
+						if (!$wpdb->insert_id) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal menyimpan data ke database!'
+							);
+						}
+					} else {
+						$opsi = array(
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_pedoman_teknis_evaluasi_internal
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
+						$wpdb->update(
+							'esakip_pedoman_teknis_evaluasi_internal',
+							$opsi,
+							array('id' => $id_dokumen),
+							array('%s', '%s'),
+							array('%d')
+						);
+
+						if ($wpdb->rows_affected == 0) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal memperbarui data ke database!'
+							);
+						}
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_dokumen_pedoman_teknis_evaluasi_internal()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$dokumen_lama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								dokumen
+							FROM esakip_pedoman_teknis_evaluasi_internal
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					$ret['data'] = $wpdb->update(
+						'esakip_pedoman_teknis_evaluasi_internal',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+
+					if ($wpdb->rows_affected > 0) {
+						if (is_file($upload_dir . $dokumen_lama)) {
+							unlink($upload_dir . $dokumen_lama);
+						}
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
 	public function get_table_skpd_perjanjian_kinerja()
 	{
 		global $wpdb;
@@ -11176,8 +11782,7 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($ret));
 	}
 
-	public function get_table_skpd_pengisian_lke()
-	{
+public function get_table_skpd_pengisian_lke() {
     global $wpdb;
     $ret = array(
         'status' => 'success',
@@ -11236,18 +11841,16 @@ class Wp_Eval_Sakip_Public
                 $counter = 1;
                 $total_nilai_usulan = 0;
                 $total_nilai_penetapan = 0;
-                $total_nilai_komponen_a = 0;
-                $total_nilai_komponen_b = 0;
-                $total_nilai_komponen_c = 0;
-                $total_nilai_komponen_d = 0;
+
+                // Initialize total values for all components dynamically
+                $total_nilai_komponen = array();
 
                 foreach ($unit as $kk => $vv) {
                     $nilai_usulan = 0;
                     $nilai_penetapan = 0;
-                    $nilai_komponen_a = 0;
-                    $nilai_komponen_b = 0;
-                    $nilai_komponen_c = 0;
-                    $nilai_komponen_d = 0;
+
+                    // Initialize individual component values for current unit
+                    $nilai_komponen = array();
 
                     $get_komponen = $wpdb->get_results(
                         $wpdb->prepare("
@@ -11261,6 +11864,9 @@ class Wp_Eval_Sakip_Public
                     );
 
                     foreach ($get_komponen as $komponen) {
+                        $komponen_id = $komponen['id'];
+                        $nilai_komponen[$komponen_id] = 0;
+
                         $get_subkomponen = $wpdb->get_results(
                             $wpdb->prepare("
                                 SELECT * 
@@ -11268,18 +11874,20 @@ class Wp_Eval_Sakip_Public
                                 WHERE id_komponen = %d
                                   AND active = 1
                                 ORDER BY nomor_urut ASC
-                            ", $komponen['id']),
+                            ", $komponen_id),
                             ARRAY_A
                         );
 
                         foreach ($get_subkomponen as $subkomponen) {
+                            $subkomponen_id = $subkomponen['id'];
+
                             $sum_nilai_usulan = $wpdb->get_var(
                                 $wpdb->prepare("
                                     SELECT SUM(nilai_usulan)
                                     FROM esakip_pengisian_lke
                                     WHERE id_subkomponen = %d
                                       AND id_skpd = %d
-                                ", $subkomponen['id'], $vv['id_skpd'])
+                                ", $subkomponen_id, $vv['id_skpd'])
                             );
 
                             $count_nilai_usulan = $wpdb->get_var(
@@ -11287,7 +11895,7 @@ class Wp_Eval_Sakip_Public
                                     SELECT COUNT(id)
                                     FROM esakip_komponen_penilaian
                                     WHERE id_subkomponen = %d
-                                ", $subkomponen['id'])
+                                ", $subkomponen_id)
                             );
 
                             $sum_nilai_penetapan = $wpdb->get_var(
@@ -11296,7 +11904,7 @@ class Wp_Eval_Sakip_Public
                                     FROM esakip_pengisian_lke
                                     WHERE id_subkomponen = %d
                                       AND id_skpd = %d
-                                ", $subkomponen['id'], $vv['id_skpd'])
+                                ", $subkomponen_id, $vv['id_skpd'])
                             );
 
                             $count_nilai_penetapan = $wpdb->get_var(
@@ -11304,87 +11912,11 @@ class Wp_Eval_Sakip_Public
                                     SELECT COUNT(id)
                                     FROM esakip_komponen_penilaian
                                     WHERE id_subkomponen = %d
-                                ", $subkomponen['id'])
-                            );
-
-                            $sum_nilai_komponen_a = $wpdb->get_var(
-                                $wpdb->prepare("
-                                    SELECT SUM(nilai_penetapan)
-                                    FROM esakip_pengisian_lke
-                                    WHERE id_subkomponen = %d
-                                      AND id_komponen = 1
-                                      AND id_skpd = %d
-                                ", $subkomponen['id'], $vv['id_skpd'])
-                            );
-
-                            $count_nilai_komponen_a = $wpdb->get_var(
-                                $wpdb->prepare("
-                                    SELECT COUNT(id)
-                                    FROM esakip_komponen_penilaian
-                                    WHERE id_subkomponen = %d
-                                ", $subkomponen['id'])
-                            );
-
-                            $sum_nilai_komponen_b = $wpdb->get_var(
-                                $wpdb->prepare("
-                                    SELECT SUM(nilai_penetapan)
-                                    FROM esakip_pengisian_lke
-                                    WHERE id_subkomponen = %d
-                                      AND id_komponen = 2
-                                      AND id_skpd = %d
-                                ", $subkomponen['id'], $vv['id_skpd'])
-                            );
-
-                            $count_nilai_komponen_b = $wpdb->get_var(
-                                $wpdb->prepare("
-                                    SELECT COUNT(id)
-                                    FROM esakip_komponen_penilaian
-                                    WHERE id_subkomponen = %d
-                                ", $subkomponen['id'])
-                            );
-
-                            $sum_nilai_komponen_c = $wpdb->get_var(
-                                $wpdb->prepare("
-                                    SELECT SUM(nilai_penetapan)
-                                    FROM esakip_pengisian_lke
-                                    WHERE id_subkomponen = %d
-                                      AND id_komponen = 3
-                                      AND id_skpd = %d
-                                ", $subkomponen['id'], $vv['id_skpd'])
-                            );
-
-                            $count_nilai_komponen_c = $wpdb->get_var(
-                                $wpdb->prepare("
-                                    SELECT COUNT(id)
-                                    FROM esakip_komponen_penilaian
-                                    WHERE id_subkomponen = %d
-                                ", $subkomponen['id'])
-                            );
-
-                            $sum_nilai_komponen_d = $wpdb->get_var(
-                                $wpdb->prepare("
-                                    SELECT SUM(nilai_penetapan)
-                                    FROM esakip_pengisian_lke
-                                    WHERE id_subkomponen = %d
-                                      AND id_komponen = 4
-                                      AND id_skpd = %d
-                                ", $subkomponen['id'], $vv['id_skpd'])
-                            );
-
-                            $count_nilai_komponen_d = $wpdb->get_var(
-                                $wpdb->prepare("
-                                    SELECT COUNT(id)
-                                    FROM esakip_komponen_penilaian
-                                    WHERE id_subkomponen = %d
-                                ", $subkomponen['id'])
+                                ", $subkomponen_id)
                             );
 
                             $total_nilai_sub = 0;
                             $total_nilai_sub_penetapan = 0;
-                            $total_nilai_sub_komponen_a = 0;
-                            $total_nilai_sub_komponen_b = 0;
-                            $total_nilai_sub_komponen_c = 0;
-                            $total_nilai_sub_komponen_d = 0;
 
                             if ($count_nilai_usulan > 0) {
                                 $persentase_sub = $sum_nilai_usulan / $count_nilai_usulan;
@@ -11396,40 +11928,22 @@ class Wp_Eval_Sakip_Public
                                 $persentase_sub_penetapan = $sum_nilai_penetapan / $count_nilai_penetapan;
                                 $total_nilai_sub_penetapan = $persentase_sub_penetapan * $subkomponen['bobot'];
                                 $nilai_penetapan += $total_nilai_sub_penetapan;
-                            }
-
-                            if ($count_nilai_komponen_a > 0) {
-                                $persentase_sub_komponen_a = $sum_nilai_komponen_a / $count_nilai_komponen_a;
-                                $total_nilai_sub_komponen_a = $persentase_sub_komponen_a * $subkomponen['bobot'];
-                                $nilai_komponen_a += $total_nilai_sub_komponen_a;
-                            }
-
-                            if ($count_nilai_komponen_b > 0) {
-                                $persentase_sub_komponen_b = $sum_nilai_komponen_b / $count_nilai_komponen_b;
-                                $total_nilai_sub_komponen_b = $persentase_sub_komponen_b * $subkomponen['bobot'];
-                                $nilai_komponen_b += $total_nilai_sub_komponen_b;
-                            }
-
-                            if ($count_nilai_komponen_c > 0) {
-                                $persentase_sub_komponen_c = $sum_nilai_komponen_c / $count_nilai_komponen_c;
-                                $total_nilai_sub_komponen_c = $persentase_sub_komponen_c * $subkomponen['bobot'];
-                                $nilai_komponen_c += $total_nilai_sub_komponen_c;
-                            }
-
-                            if ($count_nilai_komponen_d > 0) {
-                                $persentase_sub_komponen_d = $sum_nilai_komponen_d / $count_nilai_komponen_d;
-                                $total_nilai_sub_komponen_d = $persentase_sub_komponen_d * $subkomponen['bobot'];
-                                $nilai_komponen_d += $total_nilai_sub_komponen_d;
+                                $persentase_sub_komponen = $sum_nilai_penetapan / $count_nilai_penetapan;
+                                $total_nilai_sub_komponen = $persentase_sub_komponen * $subkomponen['bobot'];
+                                $nilai_komponen[$komponen_id] += $total_nilai_sub_komponen;
                             }
                         }
                     }
 
                     $total_nilai_usulan += $nilai_usulan;
                     $total_nilai_penetapan += $nilai_penetapan;
-                    $total_nilai_komponen_a += $nilai_komponen_a;
-                    $total_nilai_komponen_b += $nilai_komponen_b;
-                    $total_nilai_komponen_c += $nilai_komponen_c;
-                    $total_nilai_komponen_d += $nilai_komponen_d;
+
+                    foreach ($nilai_komponen as $komponen_id => $nilai) {
+                        if (!isset($total_nilai_komponen[$komponen_id])) {
+                            $total_nilai_komponen[$komponen_id] = 0;
+                        }
+                        $total_nilai_komponen[$komponen_id] += $nilai;
+                    }
 
                     $detail_pengisian_lke = $this->functions->generatePage(array(
                         'nama_page' => 'Halaman Pengisian LKE ' . $vv['nama_skpd'] . ' ' . $jadwal['nama_jadwal'],
@@ -11446,22 +11960,20 @@ class Wp_Eval_Sakip_Public
                     $tbody .= "<td class='text-center'>" . $counter++ . "</td>";
                     $tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</td>";
                     $tbody .= "<td class='text-center'>" . number_format($nilai_usulan, 2) . "</td>";
-                    $tbody .= "<td class='text-center'>" . number_format($nilai_komponen_a, 2) . "</td>";
-                    $tbody .= "<td class='text-center'>" . number_format($nilai_komponen_b, 2) . "</td>";
-                    $tbody .= "<td class='text-center'>" . number_format($nilai_komponen_c, 2) . "</td>";
-                    $tbody .= "<td class='text-center'>" . number_format($nilai_komponen_d, 2) . "</td>";
+
+                    foreach ($nilai_komponen as $komponen_id => $nilai) {
+                        $tbody .= "<td class='text-center'>" . number_format($nilai, 2) . "</td>";
+                    }
+
                     $tbody .= "<td class='text-center'>" . number_format($nilai_penetapan, 2) . "</td>";
                     $tbody .= "<td>" . $btn . "</td>";
                     $tbody .= "</tr>";
                 }
 
                 $ret['data'] = $tbody;
-                $ret['nilai_usulan'] = $nilai_usulan;
-                $ret['nilai_penetapan'] = $nilai_penetapan;
-                $ret['nilai_komponen_a'] = $nilai_komponen_a;
-                $ret['nilai_komponen_b'] = $nilai_komponen_b;
-                $ret['nilai_komponen_c'] = $nilai_komponen_c;
-                $ret['nilai_komponen_d'] = $nilai_komponen_d;
+                $ret['nilai_usulan'] = $total_nilai_usulan;
+                $ret['nilai_penetapan'] = $total_nilai_penetapan;
+                $ret['nilai_komponen'] = $total_nilai_komponen;
             } else {
                 $ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
             }
@@ -11479,6 +11991,7 @@ class Wp_Eval_Sakip_Public
     }
     die(json_encode($ret));
 }
+
 
 	public function get_table_pengisian_lke()
 	{
@@ -11935,13 +12448,17 @@ class Wp_Eval_Sakip_Public
 					// untuk mengatur judul halaman sesuai tipe dokumen
 					$nama_page = array(
 						"pohon_kinerja_dan_cascading" => "Pohon Kinerja dan Cascading",
-						"pedoman_teknis_perencanaan" => "Pedoman Teknis Perencanaan"
+						"pedoman_teknis_perencanaan" => "Pedoman Teknis Perencanaan",
+						"pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja" => "Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja",
+						"pedoman_teknis_evaluasi_internal" => "Pedoman Teknis Evaluasi Internal"
 					);
 
 					// untuk mengatur tabel sesuai tipe dokumen
 					$nama_tabel = array(
 						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading",
-						"pedoman_teknis_perencanaan" => "esakip_pedoman_teknis_perencanaan"
+						"pedoman_teknis_perencanaan" => "esakip_pedoman_teknis_perencanaan",
+						"pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja" => "esakip_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja",
+						"pedoman_teknis_evaluasi_internal" => "esakip_pedoman_teknis_evaluasi_internal"
 					);
 	
 					if (!empty($unit)) {
@@ -12025,7 +12542,9 @@ class Wp_Eval_Sakip_Public
 					// untuk mengatur tabel sesuai tipe dokumen
 					$nama_tabel = array(
 						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading",
-						"pedoman_teknis_perencanaan" => "esakip_pedoman_teknis_perencanaan"
+						"pedoman_teknis_perencanaan" => "esakip_pedoman_teknis_perencanaan",
+						"pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja" => "esakip_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja",
+						"pedoman_teknis_evaluasi_internal" => "esakip_pedoman_teknis_evaluasi_internal"
 					);
 
 					$where = 'tahun_anggaran IS NULL';
@@ -12141,7 +12660,9 @@ class Wp_Eval_Sakip_Public
 						// untuk mengatur tabel sesuai tipe dokumen
 						$nama_tabel = array(
 							"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading",
-							"pedoman_teknis_perencanaan" => "esakip_pedoman_teknis_perencanaan"
+							"pedoman_teknis_perencanaan" => "esakip_pedoman_teknis_perencanaan",
+						"pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja" => "esakip_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja",
+						"pedoman_teknis_evaluasi_internal" => "esakip_pedoman_teknis_evaluasi_internal"
 						);
 
 						$existing_data = $wpdb->get_row(
