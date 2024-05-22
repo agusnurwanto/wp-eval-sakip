@@ -69,6 +69,7 @@ foreach ($user_penilai as $key => $val) {
                         <th class="text-center" style="vertical-align: middle;">Bobot</th>
                         <th class="text-center">Format Penilaian</th>
                         <th class="text-center">Keterangan</th>
+                        <th class="text-center">Kerangka Logis</th>
                         <th class="text-center" style="vertical-align: middle;">Aksi</th>
                     </tr>
                 </thead>
@@ -231,7 +232,7 @@ foreach ($user_penilai as $key => $val) {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Pilih Jenis Bukti Dukung <small>(minimal 1 dan bisa lebih dari 1)</small></label>
+                        <label>Pilih Jenis Bukti Dukung <small class="text-secondary">( minimal 1 atau bisa lebih dari 1 )</small></label>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-check">
@@ -1056,7 +1057,7 @@ foreach ($user_penilai as $key => $val) {
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
                     alert(response.message);
-                    jQuery('#tambahPenilaianModal').modal('hide');
+                    jQuery('#tambahKerangkaLogisModal').modal('hide');
                     get_table_desain_sakip();
                 } else {
                     alert(response.message);
@@ -1127,6 +1128,34 @@ foreach ($user_penilai as $key => $val) {
     }
 
     function hapus_kerangka_logis(id) {
-        alert('berhasil id kl adalah : ' + id);
+        if (!confirm('Apakah Anda yakin ingin menghapus Kerangka Logis ini?')) {
+            return;
+        }
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'hapus_kerangka_logis',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    jQuery('#tambahKerangkaLogisModal').modal('hide');
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                jQuery('#wrap-loading').hide();
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
     }
 </script>
