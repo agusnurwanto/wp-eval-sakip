@@ -361,7 +361,8 @@ CREATE TABLE `esakip_rpjpd` (
   `tanggal_upload` varchar(50) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
- PRIMARY KEY(id)
+ PRIMARY KEY(`id`)
+);
  
 CREATE TABLE esakip_kontrol_kerangka_logis (
  `id` int(11) NOT NULL auto_increment,
@@ -369,5 +370,6 @@ CREATE TABLE esakip_kontrol_kerangka_logis (
  `jenis_kerangka_logis` int(11) DEFAULT NULL COMMENT '1 = Rata-Rata, 2 = Nilai',
  `id_komponen_pembanding` int(11) DEFAULT NULL,
  `pesan_kesalahan` varchar(255) DEFAULT NULL,
+ `active` tinyint(4) NOT NULL DEFAULT 1,
  PRIMARY KEY  (`id`)
 );

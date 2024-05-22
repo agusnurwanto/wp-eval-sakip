@@ -10926,6 +10926,88 @@ class Wp_Eval_Sakip_Public
 		);
 	}
 
+	public function get_table_kerangka_logis()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_komponen_penilaian'])) {
+					$id_komponen_penilaian = $_POST['id_komponen_penilaian'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Komponen Penilaian kosong!';
+				}
+				$kerangka_logises = $wpdb->get_results(
+					$wpdb->prepare("
+						SELECT * 
+						FROM esakip_kontrol_kerangka_logis
+						WHERE id_komponen_penilaian = %d
+						  AND active = 1
+						", $id_komponen_penilaian),
+					ARRAY_A
+				);
+				$tbody = '';
+				$counter = 1;
+				if (!empty($kerangka_logises)) {
+					foreach ($kerangka_logises as $kerangka_logis) {
+						$btn = '<div class="btn-action-group">';
+						$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_kerangka_logis(\'' . $kerangka_logis['id'] . '\'); return false;" href="#" title="Hapus Kerangka Logis"><span class="dashicons dashicons-no-alt"></span></button>';
+						$btn .= '</div>';
+						
+						$tbody .= '<tr>';
+						$tbody .= '<td class="text-left">' . $counter++ . '</td>';
+						if ($kerangka_logis['jenis_kerangka_logis'] == 1) {
+							$subkomponen = $wpdb->get_var(
+								$wpdb->prepare("
+									SELECT nama
+									FROM esakip_subkomponen
+									WHERE id=%d
+									AND active = 1
+								", $kerangka_logis['id_komponen_pembanding'])
+							);
+							$tbody .= '<td class="text-left">' . $subkomponen . '</td>';
+							$tbody .= '<td class="text-left">Rata Rata</td>';
+						} else if ($kerangka_logis['jenis_kerangka_logis'] == 2) {
+							$penilaian = $wpdb->get_var(
+								$wpdb->prepare("
+									SELECT nama	
+									FROM esakip_komponen_penilaian
+									WHERE id=%d
+									  AND active = 1
+								", $kerangka_logis['id_komponen_pembanding'])
+							);
+							$tbody .= '<td class="text-left">Nilai</td>';
+							$tbody .= '<td class="text-left">' . $penilaian . '</td>';
+						}
+						$tbody .= '<td class="text-left">' . $kerangka_logis['pesan_kesalahan'] . '</td>';
+						$tbody .= '<td class="text-left">' . $btn . '</td>';
+						$tbody .= '</tr>';
+					} 
+				} else {
+					$tbody .= "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+				}
+				$ret['data'] = $tbody;
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
 	public function get_table_desain_lke()
 	{
 		global $wpdb;
@@ -11936,7 +12018,7 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Jenis Bukti Dukung kosong!';
 				}
-				
+
 
 				if ($ret['status'] === 'success') {
 					if (!empty($id_komponen_penilaian)) {
@@ -12029,7 +12111,7 @@ class Wp_Eval_Sakip_Public
 						),
 						array('%d', '%d', '%s', '%d'),
 					);
-				} 
+				}
 			} else {
 				$ret = array(
 					'status' => 'error',
@@ -12439,7 +12521,7 @@ class Wp_Eval_Sakip_Public
 							}
 						} else {
 							$data['jenis_bukti_dukung'] = array();
-						}				
+						}
 						$merged_data['data'] = $data;
 						$merged_data['subkomponen'] = $data_subkomponen;
 						$merged_data['komponen'] = $data_komponen;
@@ -12613,7 +12695,7 @@ class Wp_Eval_Sakip_Public
 		}
 		die(json_encode($ret));
 	}
-	
+
 	function get_subkomponen_pembanding()
 	{
 		global $wpdb;
@@ -12643,7 +12725,7 @@ class Wp_Eval_Sakip_Public
 					ARRAY_A
 				);
 				if (!empty($komponens)) {
-					foreach($komponens as $komponen) {
+					foreach ($komponens as $komponen) {
 						$subkomponens = $wpdb->get_results(
 							$wpdb->prepare("
 								SELECT 
@@ -12656,7 +12738,7 @@ class Wp_Eval_Sakip_Public
 							ARRAY_A
 						);
 						if (!empty($subkomponens)) {
-							foreach($subkomponens as $subkomponen) {
+							foreach ($subkomponens as $subkomponen) {
 								$options .= '<option value="' . $subkomponen['id'] . '">' . $subkomponen['nama'] . '</option>';
 							}
 						} else {
@@ -12715,7 +12797,7 @@ class Wp_Eval_Sakip_Public
 					ARRAY_A
 				);
 				if (!empty($komponens)) {
-					foreach($komponens as $komponen) {
+					foreach ($komponens as $komponen) {
 						$subkomponens = $wpdb->get_results(
 							$wpdb->prepare("
 								SELECT 
@@ -12728,7 +12810,7 @@ class Wp_Eval_Sakip_Public
 							ARRAY_A
 						);
 						if (!empty($subkomponens)) {
-							foreach($subkomponens as $subkomponen) {
+							foreach ($subkomponens as $subkomponen) {
 								$penilaians = $wpdb->get_results(
 									$wpdb->prepare("
 										SELECT 
@@ -12741,7 +12823,7 @@ class Wp_Eval_Sakip_Public
 									ARRAY_A
 								);
 								if (!empty($penilaians)) {
-									foreach($penilaians as $penilaians) {
+									foreach ($penilaians as $penilaians) {
 										$options .= '<option value="' . $penilaians['id'] . '">' . $penilaians['nama'] . '</option>';
 									}
 								} else {
@@ -13293,7 +13375,7 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($ret));
 	}
 
-	
+
 	public function get_table_tahun_rpjpd()
 	{
 		global $wpdb;
@@ -13376,7 +13458,7 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($ret));
 	}
 
-	
+
 	public function tambah_dokumen_rpjpd()
 	{
 		global $wpdb;
@@ -13495,7 +13577,7 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($ret));
 	}
 
-	
+
 	public function get_detail_rpjpd_by_id()
 	{
 		global $wpdb;
@@ -13538,7 +13620,7 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($ret));
 	}
 
-	
+
 	public function submit_tahun_rpjpd()
 	{
 		global $wpdb;
@@ -13614,7 +13696,7 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($ret));
 	}
 
-	
+
 	public function hapus_dokumen_rpjpd()
 	{
 		global $wpdb;
