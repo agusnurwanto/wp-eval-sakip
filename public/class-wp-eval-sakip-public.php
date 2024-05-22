@@ -11421,35 +11421,35 @@ class Wp_Eval_Sakip_Public
 
 	public function get_table_skpd_pengisian_lke()
 	{
-    global $wpdb;
-    $ret = array(
-        'status' => 'success',
-        'message' => 'Berhasil get data!',
-        'data' => array()
-    );
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
 
-    if (!empty($_POST)) {
-        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-            if (!empty($_POST['id_jadwal'])) {
-                $id_jadwal = $_POST['id_jadwal'];
-            } else {
-                $ret['status'] = 'error';
-                $ret['message'] = 'Id Jadwal kosong!';
-                die(json_encode($ret));
-            }
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
+					die(json_encode($ret));
+				}
 
-            if (!empty($_POST['tahun_anggaran'])) {
-                $tahun_anggaran = $_POST['tahun_anggaran'];
-            } else {
-                $ret['status'] = 'error';
-                $ret['message'] = 'Tahun Anggaran kosong!';
-                die(json_encode($ret));
-            }
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+					die(json_encode($ret));
+				}
 
-            $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-            $unit = $wpdb->get_results(
-                $wpdb->prepare("
+				$unit = $wpdb->get_results(
+					$wpdb->prepare("
                     SELECT 
                         nama_skpd, 
                         id_skpd, 
@@ -11460,268 +11460,268 @@ class Wp_Eval_Sakip_Public
                     AND is_skpd=1 
                     ORDER BY kode_skpd ASC
                 ", $tahun_anggaran_sakip),
-                ARRAY_A
-            );
+					ARRAY_A
+				);
 
-            $jadwal = $wpdb->get_row(
-                $wpdb->prepare("
+				$jadwal = $wpdb->get_row(
+					$wpdb->prepare("
                     SELECT 
                         *
                     FROM esakip_data_jadwal
                     WHERE id=%d
                         AND status != 0
                 ", $id_jadwal),
-                ARRAY_A
-            );
+					ARRAY_A
+				);
 
-            if (!empty($unit) && !empty($jadwal)) {
-                $tbody = '';
-                $counter = 1;
-                $total_nilai_usulan = 0;
-                $total_nilai_penetapan = 0;
-                $total_nilai_komponen_a = 0;
-                $total_nilai_komponen_b = 0;
-                $total_nilai_komponen_c = 0;
-                $total_nilai_komponen_d = 0;
+				if (!empty($unit) && !empty($jadwal)) {
+					$tbody = '';
+					$counter = 1;
+					$total_nilai_usulan = 0;
+					$total_nilai_penetapan = 0;
+					$total_nilai_komponen_a = 0;
+					$total_nilai_komponen_b = 0;
+					$total_nilai_komponen_c = 0;
+					$total_nilai_komponen_d = 0;
 
-                foreach ($unit as $kk => $vv) {
-                    $nilai_usulan = 0;
-                    $nilai_penetapan = 0;
-                    $nilai_komponen_a = 0;
-                    $nilai_komponen_b = 0;
-                    $nilai_komponen_c = 0;
-                    $nilai_komponen_d = 0;
+					foreach ($unit as $kk => $vv) {
+						$nilai_usulan = 0;
+						$nilai_penetapan = 0;
+						$nilai_komponen_a = 0;
+						$nilai_komponen_b = 0;
+						$nilai_komponen_c = 0;
+						$nilai_komponen_d = 0;
 
-                    $get_komponen = $wpdb->get_results(
-                        $wpdb->prepare("
+						$get_komponen = $wpdb->get_results(
+							$wpdb->prepare("
                             SELECT * 
                             FROM esakip_komponen
                             WHERE id_jadwal = %d
                               AND active = 1
                             ORDER BY nomor_urut ASC
                         ", $id_jadwal),
-                        ARRAY_A
-                    );
+							ARRAY_A
+						);
 
-                    foreach ($get_komponen as $komponen) {
-                        $get_subkomponen = $wpdb->get_results(
-                            $wpdb->prepare("
+						foreach ($get_komponen as $komponen) {
+							$get_subkomponen = $wpdb->get_results(
+								$wpdb->prepare("
                                 SELECT * 
                                 FROM esakip_subkomponen
                                 WHERE id_komponen = %d
                                   AND active = 1
                                 ORDER BY nomor_urut ASC
                             ", $komponen['id']),
-                            ARRAY_A
-                        );
+								ARRAY_A
+							);
 
-                        foreach ($get_subkomponen as $subkomponen) {
-                            $sum_nilai_usulan = $wpdb->get_var(
-                                $wpdb->prepare("
+							foreach ($get_subkomponen as $subkomponen) {
+								$sum_nilai_usulan = $wpdb->get_var(
+									$wpdb->prepare("
                                     SELECT SUM(nilai_usulan)
                                     FROM esakip_pengisian_lke
                                     WHERE id_subkomponen = %d
                                       AND id_skpd = %d
                                 ", $subkomponen['id'], $vv['id_skpd'])
-                            );
+								);
 
-                            $count_nilai_usulan = $wpdb->get_var(
-                                $wpdb->prepare("
+								$count_nilai_usulan = $wpdb->get_var(
+									$wpdb->prepare("
                                     SELECT COUNT(id)
                                     FROM esakip_komponen_penilaian
                                     WHERE id_subkomponen = %d
                                 ", $subkomponen['id'])
-                            );
+								);
 
-                            $sum_nilai_penetapan = $wpdb->get_var(
-                                $wpdb->prepare("
+								$sum_nilai_penetapan = $wpdb->get_var(
+									$wpdb->prepare("
                                     SELECT SUM(nilai_penetapan)
                                     FROM esakip_pengisian_lke
                                     WHERE id_subkomponen = %d
                                       AND id_skpd = %d
                                 ", $subkomponen['id'], $vv['id_skpd'])
-                            );
+								);
 
-                            $count_nilai_penetapan = $wpdb->get_var(
-                                $wpdb->prepare("
+								$count_nilai_penetapan = $wpdb->get_var(
+									$wpdb->prepare("
                                     SELECT COUNT(id)
                                     FROM esakip_komponen_penilaian
                                     WHERE id_subkomponen = %d
                                 ", $subkomponen['id'])
-                            );
+								);
 
-                            $sum_nilai_komponen_a = $wpdb->get_var(
-                                $wpdb->prepare("
+								$sum_nilai_komponen_a = $wpdb->get_var(
+									$wpdb->prepare("
                                     SELECT SUM(nilai_penetapan)
                                     FROM esakip_pengisian_lke
                                     WHERE id_subkomponen = %d
                                       AND id_komponen = 1
                                       AND id_skpd = %d
                                 ", $subkomponen['id'], $vv['id_skpd'])
-                            );
+								);
 
-                            $count_nilai_komponen_a = $wpdb->get_var(
-                                $wpdb->prepare("
+								$count_nilai_komponen_a = $wpdb->get_var(
+									$wpdb->prepare("
                                     SELECT COUNT(id)
                                     FROM esakip_komponen_penilaian
                                     WHERE id_subkomponen = %d
                                 ", $subkomponen['id'])
-                            );
+								);
 
-                            $sum_nilai_komponen_b = $wpdb->get_var(
-                                $wpdb->prepare("
+								$sum_nilai_komponen_b = $wpdb->get_var(
+									$wpdb->prepare("
                                     SELECT SUM(nilai_penetapan)
                                     FROM esakip_pengisian_lke
                                     WHERE id_subkomponen = %d
                                       AND id_komponen = 2
                                       AND id_skpd = %d
                                 ", $subkomponen['id'], $vv['id_skpd'])
-                            );
+								);
 
-                            $count_nilai_komponen_b = $wpdb->get_var(
-                                $wpdb->prepare("
+								$count_nilai_komponen_b = $wpdb->get_var(
+									$wpdb->prepare("
                                     SELECT COUNT(id)
                                     FROM esakip_komponen_penilaian
                                     WHERE id_subkomponen = %d
                                 ", $subkomponen['id'])
-                            );
+								);
 
-                            $sum_nilai_komponen_c = $wpdb->get_var(
-                                $wpdb->prepare("
+								$sum_nilai_komponen_c = $wpdb->get_var(
+									$wpdb->prepare("
                                     SELECT SUM(nilai_penetapan)
                                     FROM esakip_pengisian_lke
                                     WHERE id_subkomponen = %d
                                       AND id_komponen = 3
                                       AND id_skpd = %d
                                 ", $subkomponen['id'], $vv['id_skpd'])
-                            );
+								);
 
-                            $count_nilai_komponen_c = $wpdb->get_var(
-                                $wpdb->prepare("
+								$count_nilai_komponen_c = $wpdb->get_var(
+									$wpdb->prepare("
                                     SELECT COUNT(id)
                                     FROM esakip_komponen_penilaian
                                     WHERE id_subkomponen = %d
                                 ", $subkomponen['id'])
-                            );
+								);
 
-                            $sum_nilai_komponen_d = $wpdb->get_var(
-                                $wpdb->prepare("
+								$sum_nilai_komponen_d = $wpdb->get_var(
+									$wpdb->prepare("
                                     SELECT SUM(nilai_penetapan)
                                     FROM esakip_pengisian_lke
                                     WHERE id_subkomponen = %d
                                       AND id_komponen = 4
                                       AND id_skpd = %d
                                 ", $subkomponen['id'], $vv['id_skpd'])
-                            );
+								);
 
-                            $count_nilai_komponen_d = $wpdb->get_var(
-                                $wpdb->prepare("
+								$count_nilai_komponen_d = $wpdb->get_var(
+									$wpdb->prepare("
                                     SELECT COUNT(id)
                                     FROM esakip_komponen_penilaian
                                     WHERE id_subkomponen = %d
                                 ", $subkomponen['id'])
-                            );
+								);
 
-                            $total_nilai_sub = 0;
-                            $total_nilai_sub_penetapan = 0;
-                            $total_nilai_sub_komponen_a = 0;
-                            $total_nilai_sub_komponen_b = 0;
-                            $total_nilai_sub_komponen_c = 0;
-                            $total_nilai_sub_komponen_d = 0;
+								$total_nilai_sub = 0;
+								$total_nilai_sub_penetapan = 0;
+								$total_nilai_sub_komponen_a = 0;
+								$total_nilai_sub_komponen_b = 0;
+								$total_nilai_sub_komponen_c = 0;
+								$total_nilai_sub_komponen_d = 0;
 
-                            if ($count_nilai_usulan > 0) {
-                                $persentase_sub = $sum_nilai_usulan / $count_nilai_usulan;
-                                $total_nilai_sub = $persentase_sub * $subkomponen['bobot'];
-                                $nilai_usulan += $total_nilai_sub;
-                            }
+								if ($count_nilai_usulan > 0) {
+									$persentase_sub = $sum_nilai_usulan / $count_nilai_usulan;
+									$total_nilai_sub = $persentase_sub * $subkomponen['bobot'];
+									$nilai_usulan += $total_nilai_sub;
+								}
 
-                            if ($count_nilai_penetapan > 0) {
-                                $persentase_sub_penetapan = $sum_nilai_penetapan / $count_nilai_penetapan;
-                                $total_nilai_sub_penetapan = $persentase_sub_penetapan * $subkomponen['bobot'];
-                                $nilai_penetapan += $total_nilai_sub_penetapan;
-                            }
+								if ($count_nilai_penetapan > 0) {
+									$persentase_sub_penetapan = $sum_nilai_penetapan / $count_nilai_penetapan;
+									$total_nilai_sub_penetapan = $persentase_sub_penetapan * $subkomponen['bobot'];
+									$nilai_penetapan += $total_nilai_sub_penetapan;
+								}
 
-                            if ($count_nilai_komponen_a > 0) {
-                                $persentase_sub_komponen_a = $sum_nilai_komponen_a / $count_nilai_komponen_a;
-                                $total_nilai_sub_komponen_a = $persentase_sub_komponen_a * $subkomponen['bobot'];
-                                $nilai_komponen_a += $total_nilai_sub_komponen_a;
-                            }
+								if ($count_nilai_komponen_a > 0) {
+									$persentase_sub_komponen_a = $sum_nilai_komponen_a / $count_nilai_komponen_a;
+									$total_nilai_sub_komponen_a = $persentase_sub_komponen_a * $subkomponen['bobot'];
+									$nilai_komponen_a += $total_nilai_sub_komponen_a;
+								}
 
-                            if ($count_nilai_komponen_b > 0) {
-                                $persentase_sub_komponen_b = $sum_nilai_komponen_b / $count_nilai_komponen_b;
-                                $total_nilai_sub_komponen_b = $persentase_sub_komponen_b * $subkomponen['bobot'];
-                                $nilai_komponen_b += $total_nilai_sub_komponen_b;
-                            }
+								if ($count_nilai_komponen_b > 0) {
+									$persentase_sub_komponen_b = $sum_nilai_komponen_b / $count_nilai_komponen_b;
+									$total_nilai_sub_komponen_b = $persentase_sub_komponen_b * $subkomponen['bobot'];
+									$nilai_komponen_b += $total_nilai_sub_komponen_b;
+								}
 
-                            if ($count_nilai_komponen_c > 0) {
-                                $persentase_sub_komponen_c = $sum_nilai_komponen_c / $count_nilai_komponen_c;
-                                $total_nilai_sub_komponen_c = $persentase_sub_komponen_c * $subkomponen['bobot'];
-                                $nilai_komponen_c += $total_nilai_sub_komponen_c;
-                            }
+								if ($count_nilai_komponen_c > 0) {
+									$persentase_sub_komponen_c = $sum_nilai_komponen_c / $count_nilai_komponen_c;
+									$total_nilai_sub_komponen_c = $persentase_sub_komponen_c * $subkomponen['bobot'];
+									$nilai_komponen_c += $total_nilai_sub_komponen_c;
+								}
 
-                            if ($count_nilai_komponen_d > 0) {
-                                $persentase_sub_komponen_d = $sum_nilai_komponen_d / $count_nilai_komponen_d;
-                                $total_nilai_sub_komponen_d = $persentase_sub_komponen_d * $subkomponen['bobot'];
-                                $nilai_komponen_d += $total_nilai_sub_komponen_d;
-                            }
-                        }
-                    }
+								if ($count_nilai_komponen_d > 0) {
+									$persentase_sub_komponen_d = $sum_nilai_komponen_d / $count_nilai_komponen_d;
+									$total_nilai_sub_komponen_d = $persentase_sub_komponen_d * $subkomponen['bobot'];
+									$nilai_komponen_d += $total_nilai_sub_komponen_d;
+								}
+							}
+						}
 
-                    $total_nilai_usulan += $nilai_usulan;
-                    $total_nilai_penetapan += $nilai_penetapan;
-                    $total_nilai_komponen_a += $nilai_komponen_a;
-                    $total_nilai_komponen_b += $nilai_komponen_b;
-                    $total_nilai_komponen_c += $nilai_komponen_c;
-                    $total_nilai_komponen_d += $nilai_komponen_d;
+						$total_nilai_usulan += $nilai_usulan;
+						$total_nilai_penetapan += $nilai_penetapan;
+						$total_nilai_komponen_a += $nilai_komponen_a;
+						$total_nilai_komponen_b += $nilai_komponen_b;
+						$total_nilai_komponen_c += $nilai_komponen_c;
+						$total_nilai_komponen_d += $nilai_komponen_d;
 
-                    $detail_pengisian_lke = $this->functions->generatePage(array(
-                        'nama_page' => 'Halaman Pengisian LKE ' . $vv['nama_skpd'] . ' ' . $jadwal['nama_jadwal'],
-                        'content' => '[pengisian_lke_sakip_per_skpd id_jadwal=' . $id_jadwal . ']',
-                        'show_header' => 1,
-                        'post_status' => 'private'
-                    ));
+						$detail_pengisian_lke = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Pengisian LKE ' . $vv['nama_skpd'] . ' ' . $jadwal['nama_jadwal'],
+							'content' => '[pengisian_lke_sakip_per_skpd id_jadwal=' . $id_jadwal . ']',
+							'show_header' => 1,
+							'post_status' => 'private'
+						));
 
-                    $btn = '<div class="btn-action-group">';
-                    $btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_pengisian_lke['url'] . '&id_skpd=' . $vv['id_skpd'] . '&id_jadwal=' . $id_jadwal . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
-                    $btn .= '</div>';
+						$btn = '<div class="btn-action-group">';
+						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_pengisian_lke['url'] . '&id_skpd=' . $vv['id_skpd'] . '&id_jadwal=' . $id_jadwal . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+						$btn .= '</div>';
 
-                    $tbody .= "<tr>";
-                    $tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-                    $tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</td>";
-                    $tbody .= "<td class='text-center'>" . number_format($nilai_usulan, 2) . "</td>";
-                    $tbody .= "<td class='text-center'>" . number_format($nilai_komponen_a, 2) . "</td>";
-                    $tbody .= "<td class='text-center'>" . number_format($nilai_komponen_b, 2) . "</td>";
-                    $tbody .= "<td class='text-center'>" . number_format($nilai_komponen_c, 2) . "</td>";
-                    $tbody .= "<td class='text-center'>" . number_format($nilai_komponen_d, 2) . "</td>";
-                    $tbody .= "<td class='text-center'>" . number_format($nilai_penetapan, 2) . "</td>";
-                    $tbody .= "<td>" . $btn . "</td>";
-                    $tbody .= "</tr>";
-                }
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</td>";
+						$tbody .= "<td class='text-center'>" . number_format($nilai_usulan, 2) . "</td>";
+						$tbody .= "<td class='text-center'>" . number_format($nilai_komponen_a, 2) . "</td>";
+						$tbody .= "<td class='text-center'>" . number_format($nilai_komponen_b, 2) . "</td>";
+						$tbody .= "<td class='text-center'>" . number_format($nilai_komponen_c, 2) . "</td>";
+						$tbody .= "<td class='text-center'>" . number_format($nilai_komponen_d, 2) . "</td>";
+						$tbody .= "<td class='text-center'>" . number_format($nilai_penetapan, 2) . "</td>";
+						$tbody .= "<td>" . $btn . "</td>";
+						$tbody .= "</tr>";
+					}
 
-                $ret['data'] = $tbody;
-                $ret['nilai_usulan'] = $nilai_usulan;
-                $ret['nilai_penetapan'] = $nilai_penetapan;
-                $ret['nilai_komponen_a'] = $nilai_komponen_a;
-                $ret['nilai_komponen_b'] = $nilai_komponen_b;
-                $ret['nilai_komponen_c'] = $nilai_komponen_c;
-                $ret['nilai_komponen_d'] = $nilai_komponen_d;
-            } else {
-                $ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
-            }
-        } else {
-            $ret = array(
-                'status' => 'error',
-                'message' => 'Api Key tidak sesuai!'
-            );
-        }
-    } else {
-        $ret = array(
-            'status' => 'error',
-            'message' => 'Format tidak sesuai!'
-        );
-    }
-    die(json_encode($ret));
-}
+					$ret['data'] = $tbody;
+					$ret['nilai_usulan'] = $nilai_usulan;
+					$ret['nilai_penetapan'] = $nilai_penetapan;
+					$ret['nilai_komponen_a'] = $nilai_komponen_a;
+					$ret['nilai_komponen_b'] = $nilai_komponen_b;
+					$ret['nilai_komponen_c'] = $nilai_komponen_c;
+					$ret['nilai_komponen_d'] = $nilai_komponen_d;
+				} else {
+					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
 
 	public function get_table_pengisian_lke()
 	{
@@ -11974,12 +11974,6 @@ class Wp_Eval_Sakip_Public
 												$opsi .= "<option value='0' class='text-center'>E</option>";
 											}
 										}
-										//nilai usulan
-										if (isset($penilaian['pl_nilai_usulan'])) {
-											$nilai_usulan = $penilaian['pl_nilai_usulan'];
-										} else {
-											$nilai_usulan = "0.00";
-										}
 
 										//opsi jawaban penetapan
 										$opsi_penetapan = "<option value=''>Pilih Jawaban</option>";
@@ -12008,6 +12002,13 @@ class Wp_Eval_Sakip_Public
 											}
 										}
 
+										//nilai usulan
+										if (isset($penilaian['pl_nilai_usulan'])) {
+											$nilai_usulan = $penilaian['pl_nilai_usulan'];
+										} else {
+											$nilai_usulan = "0.00";
+										}
+
 										//nilai penetapan
 										if (isset($penilaian['pl_nilai_penetapan'])) {
 											$nilai_penetapan = $penilaian['pl_nilai_penetapan'];
@@ -12015,20 +12016,107 @@ class Wp_Eval_Sakip_Public
 											$nilai_penetapan = "0.00";
 										}
 
-										//kerangka logis usulan
+										// Ambil data kerangka logis yang aktif berdasarkan id_komponen_penilaian
+										$data_kerangka_logis = $wpdb->get_results(
+											$wpdb->prepare("
+												SELECT *
+												FROM esakip_kontrol_kerangka_logis
+												WHERE id_komponen_penilaian = %d
+												  AND active = 1
+											", $penilaian['pl_id_komponen_penilaian']),
+											ARRAY_A
+										);
+
+										// Default pesan kerangka logis
+										$kerangka_logis = "<td class='text-center table-warning'>Belum Diisi</td>";
+										$kerangka_logis_penetapan = "<td class='text-center table-warning'>Belum Diisi</td>";
+
+										//kerangka logis nilai usulan
 										if (isset($penilaian['pl_nilai_usulan'])) {
-											$kerangka_logis = "<td class='text-center table-success'>OK</td>";
-										} else {
-											$kerangka_logis = "<td class='text-center table-danger'>Belum Diisi</td>";
+											$pesan_kesalahan = [];
+
+											foreach ($data_kerangka_logis as $kl) {
+												if ($kl['jenis_kerangka_logis'] == 1) {
+													// Rata-rata
+													$avg_nilai_sub = $wpdb->get_var(
+														$wpdb->prepare("
+															SELECT AVG(nilai_usulan)
+															FROM esakip_pengisian_lke
+															WHERE id_subkomponen = %d
+															AND id_skpd = %d
+														", $kl['id_komponen_pembanding'], $id_skpd)
+													);
+
+													if ($avg_nilai_sub < $penilaian['pl_nilai_usulan']) {
+														$pesan_kesalahan[] = $kl['pesan_kesalahan'];
+													}
+												} else if ($kl['jenis_kerangka_logis'] == 2) {
+													// Nilai
+													$nilai_komponen_penilaian = $wpdb->get_var(
+														$wpdb->prepare("
+															SELECT nilai_usulan
+															FROM esakip_pengisian_lke
+															WHERE id_komponen_penilaian = %d
+															AND id_skpd = %d
+														", $kl['id_komponen_pembanding'], $id_skpd)
+													);
+
+													if ($penilaian['pl_nilai_usulan'] > $nilai_komponen_penilaian) {
+														$pesan_kesalahan[] = $kl['pesan_kesalahan'];
+													}
+												}
+											}
+
+											if (!empty($pesan_kesalahan)) {
+												$kerangka_logis = "<td class='text-center table-danger'><ul><li>" . implode("</li><li>", $pesan_kesalahan) . "</li></ul></td>";
+											} else {
+												$kerangka_logis = "<td class='text-center table-success'>OK</td>";
+											}
 										}
 
-										//kerangka logis penetapan
+
+										//kerangka logis nilai penetapan
 										if (isset($penilaian['pl_nilai_penetapan'])) {
-											$kerangka_logis_penetapan = "<td class='text-center table-success'>OK</td>";
-										} else {
-											$kerangka_logis_penetapan = "<td class='text-center table-danger'>Belum Diisi</td>";
-										}
+											$pesan_kesalahan_penetapan = [];
 
+											foreach ($data_kerangka_logis as $kl) {
+												if ($kl['jenis_kerangka_logis'] == 1) {
+													// Rata-rata
+													$avg_nilai_sub = $wpdb->get_var(
+														$wpdb->prepare("
+															SELECT AVG(nilai_penetapan)
+															FROM esakip_pengisian_lke
+															WHERE id_subkomponen = %d
+															AND id_skpd = %d
+														", $kl['id_komponen_pembanding'], $id_skpd)
+													);
+
+													if ($avg_nilai_sub < $penilaian['pl_nilai_penetapan']) {
+														$pesan_kesalahan_penetapan[] = $kl['pesan_kesalahan'];
+													}
+												} else if ($kl['jenis_kerangka_logis'] == 2) {
+													// Nilai
+													$nilai_komponen_penilaian = $wpdb->get_var(
+														$wpdb->prepare("
+															SELECT nilai_penetapan
+															FROM esakip_pengisian_lke
+															WHERE id_komponen_penilaian = %d
+															AND id_skpd = %d
+														", $kl['id_komponen_pembanding'], $id_skpd)
+													);
+
+													if ($penilaian['pl_nilai_penetapan'] > $nilai_komponen_penilaian) {
+														$pesan_kesalahan_penetapan[] = $kl['pesan_kesalahan'];
+													}
+												}
+											}
+
+											if (!empty($pesan_kesalahan_penetapan)) {
+												$kerangka_logis_penetapan = "<td class='text-center table-danger'><ul><li>" . implode("</li><li>", $pesan_kesalahan_penetapan) . "</li></ul></td>";
+											} else {
+												$kerangka_logis_penetapan = "<td class='text-center table-success'>OK</td>";
+											}
+										}
 
 										//tbody isi
 										$tbody2 .= "<tr>";
@@ -12109,8 +12197,8 @@ class Wp_Eval_Sakip_Public
 						$tbody .= $tbody2;
 
 						$merged_data['tbody'] = $tbody;
-						$merged_data['total_nilai'] = $total_nilai;
-						$merged_data['total_nilai_penetapan'] = $total_nilai_penetapan;
+						$merged_data['total_nilai'] = number_format($total_nilai, 2);
+						$merged_data['total_nilai_penetapan'] = number_format($total_nilai_penetapan, 2);
 					}
 				} else {
 					$tbody = "<tr><td colspan='4' class='text-center'>Tidak ada data tersedia</td></tr>";
@@ -12493,7 +12581,7 @@ class Wp_Eval_Sakip_Public
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_kerangka_logis(\'' . $kerangka_logis['id'] . '\'); return false;" href="#" title="Hapus Kerangka Logis"><span class="dashicons dashicons-no-alt"></span></button>';
 						$btn .= '</div>';
-						
+
 						$tbody .= '<tr>';
 						$tbody .= '<td class="text-left">' . $counter++ . '</td>';
 						if ($kerangka_logis['jenis_kerangka_logis'] == 1) {
@@ -12522,7 +12610,7 @@ class Wp_Eval_Sakip_Public
 						$tbody .= '<td class="text-left">' . $kerangka_logis['pesan_kesalahan'] . '</td>';
 						$tbody .= '<td class="text-left">' . $btn . '</td>';
 						$tbody .= '</tr>';
-					} 
+					}
 				} else {
 					$tbody .= "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
@@ -12611,8 +12699,7 @@ class Wp_Eval_Sakip_Public
 						$tbody .= "<td class='text-left' colspan='3'><b>" . $komponen['nama'] . "</b></td>";
 						$tbody .= "<td class='text-center'>" . $komponen['bobot'] . "</td>";
 						$tbody .= "<td class='text-left'></td>";
-						$tbody .= "<td class='text-left'></td>";
-						$tbody .= "<td class='text-left' style='display: none'>User Penilai: <b>" . $user_penilai[$komponen['id_user_penilai']] . "</b></td>";
+						$tbody .= "<td class='text-left'colspan='2'></td>";
 						$tbody .= "<td class='text-center'>" . $btn . "</td>";
 						$tbody .= "</tr>";
 
@@ -12644,43 +12731,97 @@ class Wp_Eval_Sakip_Public
 								$tbody .= "<td class='text-left' colspan='2'><b>" . $subkomponen['nama'] . "</b></td>";
 								$tbody .= "<td class='text-center'>" . $subkomponen['bobot'] . "</td>";
 								$tbody .= "<td class='text-left'></td>";
-								$tbody .= "<td class='text-left'>User Penilai: <b>" . $user_penilai[$subkomponen['id_user_penilai']] . "</b></td>";
+								$tbody .= "<td class='text-left' colspan='2'>User Penilai: <b>" . $user_penilai[$subkomponen['id_user_penilai']] . "</b></td>";
 								$tbody .= "<td class='text-center'>" . $btn . "</td>";
 								$tbody .= "</tr>";
 
 								$data_komponen_penilaian = $wpdb->get_results(
 									$wpdb->prepare("
-										SELECT * 
-										FROM esakip_komponen_penilaian
-										WHERE id_subkomponen = %d 
-										  AND active = 1
-										ORDER BY nomor_urut ASC
+										SELECT 
+											kp.id AS kp_id,
+											kp.id_subkomponen,
+											kp.nomor_urut,
+											kp.nama AS kp_nama,
+											kp.tipe,
+											kp.keterangan AS kp_keterangan,
+											kp.jenis_bukti_dukung,
+											kp.active AS kp_active,
+											kl.id AS kl_id,
+											kl.id_komponen_penilaian,
+											kl.jenis_kerangka_logis,
+											kl.id_komponen_pembanding,
+											kl.pesan_kesalahan,
+											kl.active AS kl_active
+										FROM esakip_komponen_penilaian AS kp
+										LEFT JOIN esakip_kontrol_kerangka_logis AS kl
+										   ON kp.id = kl.id_komponen_penilaian
+										  AND kl.active = 1
+										WHERE kp.id_subkomponen = %d 
+										  AND kp.active = 1
+										ORDER BY kp.nomor_urut ASC
 									", $subkomponen['id']),
 									ARRAY_A
 								);
 
-								if (!empty($data_komponen_penilaian)) {
-									foreach ($data_komponen_penilaian as $penilaian) {
+								// Group kerangka logis data by kp_id
+								$grouped_data = array();
+								foreach ($data_komponen_penilaian as $row) {
+									$kp_id = $row['kp_id'];
+									if (!isset($grouped_data[$kp_id])) {
+										$grouped_data[$kp_id] = [
+											'kp_id' => $row['kp_id'],
+											'kp_nama' => $row['kp_nama'],
+											'kp_tipe' => $row['tipe'],
+											'kp_keterangan' => $row['kp_keterangan'],
+											'kerangka_logis' => []
+										];
+									}
+									if (!is_null($row['kl_id'])) {
+										$grouped_data[$kp_id]['kerangka_logis'][] = [
+											'jenis_kerangka_logis' => $row['jenis_kerangka_logis'],
+											'pesan_kesalahan' => $row['pesan_kesalahan']
+										];
+									}
+								}
+
+								// Render the data
+								if (!empty($grouped_data)) {
+									foreach ($grouped_data as $penilaian) {
 										$btn = '';
 
 										$btn .= '<div class="btn-action-group">';
-										$btn .= "<button class='btn btn-info' onclick='tambah_kerangka_logis(\"" . $penilaian['id'] . "\");' title='Tambah Kerangka Logis'><span class='dashicons dashicons-admin-generic'></span></button>";
-										$btn .= "<button class='btn btn-warning' onclick='edit_data_komponen_penilaian(\"" . $penilaian['id'] . "\");' title='Edit Data'><span class='dashicons dashicons-edit'></span></button>";
-										$btn .= "<button class='btn btn-danger' onclick='hapus_data_komponen_penilaian(\"" . $penilaian['id'] . "\");' title='Hapus Data'><span class='dashicons dashicons-trash'></span>";
+										$btn .= "<button class='btn btn-info' onclick='tambah_kerangka_logis(\"" . $penilaian['kp_id'] . "\");' title='Tambah Kerangka Logis'><span class='dashicons dashicons-admin-generic'></span></button>";
+										$btn .= "<button class='btn btn-warning' onclick='edit_data_komponen_penilaian(\"" . $penilaian['kp_id'] . "\");' title='Edit Data'><span class='dashicons dashicons-edit'></span></button>";
+										$btn .= "<button class='btn btn-danger' onclick='hapus_data_komponen_penilaian(\"" . $penilaian['kp_id'] . "\");' title='Hapus Data'><span class='dashicons dashicons-trash'></span>";
 										$btn .= '</div>';
 
 										$tbody .= "<tr>";
 										$tbody .= "<td class='text-left'></td>";
 										$tbody .= "<td class='text-left'></td>";
 										$tbody .= "<td class='text-left'>" . $counter_isi++ . "</td>";
-										$tbody .= "<td class='text-left'>" . $penilaian['nama'] . "</td>";
+										$tbody .= "<td class='text-left'>" . $penilaian['kp_nama'] . "</td>";
 										$tbody .= "<td class='text-center'></td>";
-										if ($penilaian['tipe'] == 1) {
+
+										if ($penilaian['kp_tipe'] == 1) {
 											$tbody .= "<td class='text-center'>Y/T</td>";
-										} else if ($penilaian['tipe'] == 2) {
+										} else if ($penilaian['kp_tipe'] == 2) {
 											$tbody .= "<td class='text-center'>A/B/C/D/E</td>";
 										}
-										$tbody .= "<td class='text-left'>" . $penilaian['keterangan'] . "</td>";
+
+										$tbody .= "<td class='text-left'>" . $penilaian['kp_keterangan'] . "</td>";
+
+										// Render kerangka logis as ul and li, if any
+										$tbody .= "<td class='text-left'><ul>";
+										if (!empty($penilaian['kerangka_logis'])) {
+											foreach ($penilaian['kerangka_logis'] as $kl) {
+												$kerangka_logis_text = $kl['jenis_kerangka_logis'] == 1 ? 'Rata-Rata' : 'Nilai';
+												$tbody .= "<li>" . $kerangka_logis_text . ": " . $kl['pesan_kesalahan'] . "</li>";
+											}
+										} else {
+											$tbody .= "<li>Tidak ada kerangka logis</li>";
+										}
+										$tbody .= "</ul></td>";
+
 										$tbody .= "<td class='text-center'>" . $btn . "</td>";
 										$tbody .= "</tr>";
 									}
@@ -13634,6 +13775,13 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Komponen Pembanding kosong!';
 				}
+				if($jenis_kerangka_logis == 2) {
+					if ($id_komponen_penilaian == $komponen_pembanding){
+						$ret['status'] = 'error';
+						$ret['message'] = 'Tidak dapat dibandingkan dengan nilai penilaian itu sendiri!';
+						die(json_encode($ret));
+					}
+				}
 				if ($ret['status'] === 'success') {
 					$wpdb->insert(
 						'esakip_kontrol_kerangka_logis',
@@ -14247,7 +14395,7 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Jadwal kosong!';
 				}
-				$options = '<option value="">Pilih Subkomponen</option>';
+				$options = '<option value="" selected disabled>Pilih Subkomponen</option>';
 
 				$komponens = $wpdb->get_results(
 					$wpdb->prepare("
@@ -14277,12 +14425,12 @@ class Wp_Eval_Sakip_Public
 							}
 						} else {
 							$ret['status'] = 'error';
-							$ret['message'] = 'Subkomponen tidak ditemukan';
+							$ret['message'] = 'Subkomponen aktif tidak ditemukan';
 						}
 					}
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Komponen tidak ditemukan';
+					$ret['message'] = 'Komponen aktif tidak ditemukan';
 				}
 
 				$ret['data'] = $options;
@@ -14298,7 +14446,6 @@ class Wp_Eval_Sakip_Public
 				'message' => 'Format tidak sesuai!'
 			);
 		}
-
 		die(json_encode($ret));
 	}
 
@@ -14319,7 +14466,7 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Jadwal kosong!';
 				}
-				$options = '<option value="">Pilih Subkomponen</option>';
+				$options = '<option value="" selected disabled>Pilih Komponen Penilaian</option>';
 
 				$komponens = $wpdb->get_results(
 					$wpdb->prepare("
@@ -14362,12 +14509,12 @@ class Wp_Eval_Sakip_Public
 									}
 								} else {
 									$ret['status'] = 'error';
-									$ret['message'] = 'Komponen Penilaian tidak ditemukan';
+									$ret['message'] = 'Komponen Penilaian aktif tidak ditemukan';
 								}
 							}
 						} else {
 							$ret['status'] = 'error';
-							$ret['message'] = 'Subkomponen tidak ditemukan';
+							$ret['message'] = 'Subkomponen aktif tidak ditemukan';
 						}
 					}
 				} else {
@@ -14388,7 +14535,44 @@ class Wp_Eval_Sakip_Public
 				'message' => 'Format tidak sesuai!'
 			);
 		}
+		die(json_encode($ret));
+	}
 
+	public function hapus_kerangka_logis()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$ret['data'] = $wpdb->update(
+						'esakip_kontrol_kerangka_logis',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
 		die(json_encode($ret));
 	}
 
@@ -14605,12 +14789,12 @@ class Wp_Eval_Sakip_Public
 					$ret['status'] = 'error';
 					$ret['message'] = 'Keterangan Usulan kosong!';
 				}
-				if (!empty($_POST['bukti_usulan'])) {
-					$bukti_usulan = $_POST['bukti_usulan'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Bukti Usulan kosong!';
-				}
+				// if (!empty($_POST['bukti_usulan'])) {
+				// 	$bukti_usulan = $_POST['bukti_usulan'];
+				// } else {
+				// 	$ret['status'] = 'error';
+				// 	$ret['message'] = 'Bukti Usulan kosong!';
+				// }
 
 				//validasi jadwal
 				date_default_timezone_set('Asia/Jakarta'); // Adjust this if your server is set to a different timezone

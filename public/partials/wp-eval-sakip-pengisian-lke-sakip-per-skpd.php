@@ -258,10 +258,10 @@ $timezone = get_option('timezone_string');
             if (ketUsulan == '') {
                 return alert("Keterangan Usulan Tidak Boleh Kosong!");
             }
-            let buktiUsulan = jQuery('#buktiDukung' + id).val();
-            if (buktiUsulan == '') {
-                return alert("Bukti Usulan Tidak Boleh Kosong!");
-            }
+            // let buktiUsulan = jQuery('#buktiDukung' + id).val();
+            // if (buktiUsulan == '') {
+            //     return alert("Bukti Usulan Tidak Boleh Kosong!");
+            // }
             let idSkpd = <?php echo $id_skpd; ?>;
             if (idSkpd == '') {
                 return alert("ID SKPD Usulan Tidak Boleh Kosong!");
@@ -287,7 +287,7 @@ $timezone = get_option('timezone_string');
                     id_jadwal: idJadwal,
                     nilai_usulan: nilaiUsulan,
                     ket_usulan: ketUsulan,
-                    bukti_usulan: buktiUsulan,
+                    // bukti_usulan: buktiUsulan,
                     api_key: esakip.api_key
                 },
                 dataType: 'json',
