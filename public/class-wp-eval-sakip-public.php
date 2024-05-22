@@ -15171,7 +15171,7 @@ public function get_table_skpd_pengisian_lke() {
 
 				//validasi user
 				$current_user = wp_get_current_user();
-				$allowed_roles = array('admin_ortala', 'admin_perencanaan', 'administrator');
+				$allowed_roles = array('admin_ortala', 'admin_bappeda', 'administrator');
 				if (empty(array_intersect($allowed_roles, $current_user->roles))) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Akses ditolak - hanya pengguna dengan peran tertentu yang dapat mengakses fitur ini!';
@@ -15350,7 +15350,7 @@ public function get_table_skpd_pengisian_lke() {
 
 				//validasi user
 				$current_user = wp_get_current_user();
-				$allowed_roles = array('admin_ortala', 'admin_perencanaan', 'administrator');
+				$allowed_roles = array('admin_ortala', 'admin_bappeda', 'administrator');
 				if (!empty(array_intersect($allowed_roles, $current_user->roles))) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Akses ditolak - hanya pengguna dengan peran tertentu yang dapat mengakses fitur ini!';
