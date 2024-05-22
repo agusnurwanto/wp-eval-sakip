@@ -576,7 +576,7 @@ class Wp_Eval_Sakip_Admin
 									</ul>
 								</div>
 							</div>';
-						}else if (!empty($_POST['type']) && $_POST['type'] == 'laporan_monev_renaksi') {
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'laporan_monev_renaksi') {
 							$laporan_monev_renaksi = $this->functions->generatePage(array(
 								'nama_page' => 'Halaman Monev Renaksi Tahun ' . $tahun_item['tahun_anggaran'],
 								'content' => '[laporan_monev_renaksi tahun=' . $tahun_item["tahun_anggaran"] . ']',
@@ -590,6 +590,57 @@ class Wp_Eval_Sakip_Admin
 								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
 									<ul style="margin-left: 20px;">
 										<li><a target="_blank" href="' . $laporan_monev_renaksi['url'] . '">' . $laporan_monev_renaksi['title'] . '</a></li>
+									</ul>
+								</div>
+							</div>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'pedoman_teknis_perencanaan') {
+							$pedoman_teknis_perencanaan = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Pedoman Teknis Perencanaan Tahun ' . $tahun_item['tahun_anggaran'],
+								'content' => '[pedoman_teknis_perencanaan tahun=' . $tahun_item["tahun_anggaran"] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+							<div class="accordion">
+								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+									<ul style="margin-left: 20px;">
+										<li><a target="_blank" href="' . $pedoman_teknis_perencanaan['url'] . '">' . $pedoman_teknis_perencanaan['title'] . '</a></li>
+									</ul>
+								</div>
+							</div>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja') {
+							$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja Tahun ' . $tahun_item['tahun_anggaran'],
+								'content' => '[pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja tahun=' . $tahun_item["tahun_anggaran"] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+							<div class="accordion">
+								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+									<ul style="margin-left: 20px;">
+										<li><a target="_blank" href="' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['url'] . '">' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['title'] . '</a></li>
+									</ul>
+								</div>
+							</div>';
+						}else if (!empty($_POST['type']) && $_POST['type'] == 'pedoman_teknis_evaluasi_internal') {
+							$pedoman_teknis_evaluasi_internal = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Pedoman Teknis Evaluasi Internal Tahun ' . $tahun_item['tahun_anggaran'],
+								'content' => '[pedoman_teknis_evaluasi_internal tahun=' . $tahun_item["tahun_anggaran"] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+							<div class="accordion">
+								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+									<ul style="margin-left: 20px;">
+										<li><a target="_blank" href="' . $pedoman_teknis_evaluasi_internal['url'] . '">' . $pedoman_teknis_evaluasi_internal['title'] . '</a></li>
 									</ul>
 								</div>
 							</div>';
