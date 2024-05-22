@@ -373,6 +373,14 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_table_skpd_pengisian_lke', $plugin_public, 'get_table_skpd_pengisian_lke');
 		$this->loader->add_action('wp_ajax_get_table_pengisian_lke', $plugin_public, 'get_table_pengisian_lke');
 		$this->loader->add_action('wp_ajax_list_perangkat_daerah',  $plugin_public, 'list_perangkat_daerah');
+ 
+		$this->loader->add_action('wp_ajax_get_detail_laporan_monev_renaksi_by_id', $plugin_public, 'get_detail_laporan_monev_renaksi_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_laporan_monev_renaksi', $plugin_public, 'tambah_dokumen_laporan_monev_renaksi');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_laporan_monev_renaksi', $plugin_public, 'hapus_dokumen_laporan_monev_renaksi');
+		$this->loader->add_action('wp_ajax_get_table_laporan_monev_renaksi', $plugin_public, 'get_table_laporan_monev_renaksi');
+		$this->loader->add_action('wp_ajax_get_table_skpd_laporan_monev_renaksi', $plugin_public, 'get_table_skpd_laporan_monev_renaksi');
+		$this->loader->add_action('wp_ajax_get_table_tahun_laporan_monev_renaksi', $plugin_public, 'get_table_tahun_laporan_monev_renaksi');
+		$this->loader->add_action('wp_ajax_submit_tahun_laporan_monev_renaksi', $plugin_public, 'submit_tahun_laporan_monev_renaksi');
 		
 		add_shortcode('jadwal_evaluasi_sakip', array($plugin_public, 'jadwal_evaluasi_sakip'));
 		add_shortcode('halaman_mapping_skpd', array($plugin_public, 'halaman_mapping_skpd'));
@@ -402,6 +410,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('lhe_akip_internal', array($plugin_public, 'lhe_akip_internal'));
 		add_shortcode('tl_lhe_akip_internal', array($plugin_public, 'tl_lhe_akip_internal'));
 		add_shortcode('tl_lhe_akip_kemenpan', array($plugin_public, 'tl_lhe_akip_kemenpan'));
+		add_shortcode('laporan_monev_renaksi', array($plugin_public, 'laporan_monev_renaksi'));
 
 		add_shortcode('jadwal_rpjmd', array($plugin_public, 'jadwal_rpjmd'));
 		add_shortcode('jadwal_rpjpd', array($plugin_public, 'jadwal_rpjpd'));
@@ -417,7 +426,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('dokumen_detail_evaluasi_internal', array($plugin_public, 'dokumen_detail_evaluasi_internal'));
 		add_shortcode('dokumen_detail_iku', array($plugin_public, 'dokumen_detail_iku'));
 		add_shortcode('dokumen_detail_laporan_kinerja', array($plugin_public, 'dokumen_detail_laporan_kinerja'));
-		add_shortcode('dokumen_detail_laporan_kinerja', array($plugin_public, 'dokumen_detail_laporan_kinerja'));
+		add_shortcode('dokumen_detail_laporan_monev_renaksi', array($plugin_public, 'dokumen_detail_laporan_monev_renaksi'));
 		
 		add_shortcode('desain_lke_sakip', array($plugin_public, 'desain_lke_sakip'));
 		add_shortcode('pengisian_lke_sakip', array($plugin_public, 'pengisian_lke_sakip'));

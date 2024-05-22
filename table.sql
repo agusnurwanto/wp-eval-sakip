@@ -386,3 +386,16 @@ CREATE TABLE `esakip_pohon_kinerja_dan_cascading` (
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
 );
+
+CREATE TABLE `esakip_laporan_monev_renaksi` (
+  `id` int(11) NOT NULL auto_increment,
+  `opd` varchar(255) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `dokumen` varchar(255) DEFAULT NULL,
+  `keterangan` longtext DEFAULT NULL,
+  `tanggal_upload` varchar(50) DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp,
+  `active` tinyint(4) DEFAULT 1,
+ PRIMARY KEY(id)
+);

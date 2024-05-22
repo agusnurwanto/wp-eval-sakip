@@ -285,6 +285,15 @@ class Wp_Eval_Sakip_Public
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-dokumen-pemda-lainnya.php';
 	}
 
+	public function laporan_monev_renaksi($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-laporan-monev-renaksi.php';
+	}
+
 	public function halaman_mapping_skpd()
 	{
 		// untuk disable render shortcode di halaman edit page/post
@@ -526,6 +535,15 @@ class Wp_Eval_Sakip_Public
 			return '';
 		}
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-pohon-kinerja-dan-cascading.php';
+	}
+
+	public function dokumen_detail_laporan_monev_renaksi($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-laporan-monev-renaksi-per-skpd.php';
 	}
 	
 	public function lhe_akip_internal($atts)
@@ -8138,6 +8156,567 @@ class Wp_Eval_Sakip_Public
 					';
 
 					$ret['data'] = $tbodyUnset;
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_table_tahun_laporan_monev_renaksi()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$where = 'tahun_anggaran IS NULL';
+
+				if (!empty($_POST['id_skpd'])) {
+					$id_skpd = $_POST['id_skpd'];
+					$where .= " AND id_skpd = $id_skpd";
+				}
+
+				$dokumen_unset = $wpdb->get_results(
+					"
+					SELECT 
+						*
+					FROM esakip_laporan_monev_renaksi 
+					WHERE $where
+					  AND active = 1
+					",
+					ARRAY_A
+				);
+
+				$counterUnset = 1;
+				$tbodyUnset = '';
+				if (!empty($dokumen_unset)) {
+					$tbodyUnset .= '
+						<div class="cetak">
+							<div style="padding: 10px;margin:0 0 3rem 0;">
+								<h3 class="text-center">Dokumen yang belum disetting Tahun Anggaran</h3>
+								<div class="wrap-table">
+									<table id="table_dokumen_tahun" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+										<thead>
+											<tr>
+												<th class="text-center">No</th>
+												<th class="text-center">Perangkat Daerah</th>
+												<th class="text-center">Nama Dokumen</th>
+												<th class="text-center">Keterangan</th>
+												<th class="text-center">Waktu Upload</th>
+												<th class="text-center">Aksi</th>
+											</tr>
+										</thead>
+										<tbody>';
+					foreach ($dokumen_unset as $kk => $vv) {
+						$tbodyUnset .= "<tr>";
+						$tbodyUnset .= "<td class='text-center'>" . $counterUnset++ . "</td>";
+						$tbodyUnset .= "<td>" . $vv['opd'] . "</td>";
+						$tbodyUnset .= "<td>" . $vv['dokumen'] . "</td>";
+						$tbodyUnset .= "<td>" . $vv['keterangan'] . "</td>";
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
+						$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+						$btn .= '</div>';
+
+						$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
+						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
+
+						$tbodyUnset .= "</tr>";
+					}
+					$tbodyUnset .= '</tbody>
+								</table>
+							</div>
+						</div>
+					';
+
+					$ret['data'] = $tbodyUnset;
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_table_skpd_laporan_monev_renaksi()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
+				$unit = $wpdb->get_results(
+					$wpdb->prepare("
+					SELECT 
+						nama_skpd, 
+						id_skpd, 
+						kode_skpd, 
+						nipkepala 
+					FROM esakip_data_unit 
+					WHERE active=1 
+					  AND tahun_anggaran=%d
+					  AND is_skpd=1 
+					ORDER BY kode_skpd ASC
+					", $tahun_anggaran_sakip),
+					ARRAY_A
+				);
+
+				if (!empty($unit)) {
+					$tbody = '';
+					$counter = 1;
+					foreach ($unit as $kk => $vv) {
+						$detail_laporan_monev_renaksi = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Detail Dokumen Laporan Monev Renaksi ' . $tahun_anggaran,
+							'content' => '[dokumen_detail_laporan_monev_renaksi tahun=' . $tahun_anggaran . ']',
+							'show_header' => 1,
+							'post_status' => 'private'
+						));
+
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
+
+						$jumlah_dokumen = $wpdb->get_var(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(id)
+								FROM esakip_laporan_monev_renaksi 
+								WHERE id_skpd = %d
+								AND tahun_anggaran = %d
+								AND active = 1
+								",
+								$vv['id_skpd'],
+								$tahun_anggaran
+							)
+						);
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_laporan_monev_renaksi['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+						$btn .= '</div>';
+
+						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
+						$tbody .= "<td>" . $btn . "</td>";
+
+						$tbody .= "</tr>";
+					}
+					$ret['data'] = $tbody;
+				} else {
+					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function submit_tahun_laporan_monev_renaksi()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$id = $_POST['id'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id kosong!';
+				}
+				if (!empty($_POST['tahunAnggaran'])) {
+					$tahun_anggaran = $_POST['tahunAnggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+
+				if (!empty($id) && !empty($tahun_anggaran)) {
+					$existing_data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT 
+								* 
+							FROM esakip_laporan_monev_renaksi 
+							WHERE id = %d", $id)
+					);
+
+					if (!empty($existing_data)) {
+						$update_result = $wpdb->update(
+							'esakip_laporan_monev_renaksi',
+							array(
+								'tahun_anggaran' => $tahun_anggaran,
+							),
+							array('id' => $id),
+							array('%d'),
+						);
+
+						if ($update_result === false) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal memperbarui data di dalam tabel!'
+							);
+						}
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message' => 'Data dengan ID yang diberikan tidak ditemukan!'
+						);
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message' => 'ID atau tahun anggaran tidak valid!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_table_laporan_monev_renaksi()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_skpd'])) {
+					$id_skpd = $_POST['id_skpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id SKPD kosong!';
+				}
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+				$laporan_monev_renaksis = $wpdb->get_results(
+					$wpdb->prepare("
+                    SELECT * 
+                    FROM esakip_laporan_monev_renaksi
+                    WHERE id_skpd = %d 
+                      AND tahun_anggaran = %d 
+                      AND active = 1
+                ", $id_skpd, $tahun_anggaran),
+					ARRAY_A
+				);
+
+				if (!empty($laporan_monev_renaksis)) {
+					$counter = 1;
+					$tbody = '';
+
+					foreach ($laporan_monev_renaksis as $kk => $vv) {
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+						$tbody .= "<td>" . $vv['opd'] . "</td>";
+						$tbody .= "<td>" . $vv['dokumen'] . "</td>";
+						$tbody .= "<td>" . $vv['keterangan'] . "</td>";
+						$tbody .= "<td>" . $vv['created_at'] . "</td>";
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_laporan_monev_renaksi(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_laporan_monev_renaksi(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+						$btn .= '</div>';
+
+						$tbody .= "<td class='text-center'>" . $btn . "</td>";
+						$tbody .= "</tr>";
+					}
+
+					$ret['data'] = $tbody;
+				} else {
+					$ret['data'] = "<tr><td colspan='6' class='text-center'>Tidak ada data tersedia</td></tr>";
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_detail_laporan_monev_renaksi_by_id()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT *
+							FROM esakip_laporan_monev_renaksi
+							WHERE id = %d
+						", $_POST['id']),
+						ARRAY_A
+					);
+					$ret['data'] = $data;
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function tambah_dokumen_laporan_monev_renaksi()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$id_dokumen = null;
+
+				if (!empty($_POST['id_dokumen'])) {
+					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
+				}
+				if (!empty($_POST['skpd'])) {
+					$skpd = $_POST['skpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Perangkat Daerah kosong!';
+				}
+				if (!empty($_POST['idSkpd'])) {
+					$idSkpd = $_POST['idSkpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id SKPD kosong!';
+				}
+				if (!empty($_POST['keterangan'])) {
+					$keterangan = $_POST['keterangan'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Keterangan kosong!';
+				}
+				if (!empty($_POST['tahunAnggaran'])) {
+					$tahunAnggaran = $_POST['tahunAnggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$upload = $this->functions->uploadFile(
+						$_POST['api_key'],
+						$upload_dir,
+						$_FILES['fileUpload'],
+						array('pdf'),
+						1048576 * 10
+					);
+					if ($upload['status'] == false) {
+						$ret = array(
+							'status' => 'error',
+							'message' => $upload['message']
+						);
+					}
+				}
+
+				if ($ret['status'] == 'success') {
+					if (empty($id_dokumen)) {
+						$wpdb->insert(
+							'esakip_laporan_monev_renaksi',
+							array(
+								'opd' => $skpd,
+								'id_skpd' => $idSkpd,
+								'dokumen' => $upload['filename'],
+								'keterangan' => $keterangan,
+								'tahun_anggaran' => $tahunAnggaran,
+								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
+							),
+							array('%s', '%s', '%s', '%s', '%d')
+						);
+
+						if (!$wpdb->insert_id) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal menyimpan data ke database!'
+							);
+						}
+					} else {
+						$opsi = array(
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_laporan_monev_renaksi
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
+						$wpdb->update(
+							'esakip_laporan_monev_renaksi',
+							$opsi,
+							array('id' => $id_dokumen),
+							array('%s', '%s'),
+							array('%d')
+						);
+
+						if ($wpdb->rows_affected == 0) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal memperbarui data ke database!'
+							);
+						}
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_dokumen_laporan_monev_renaksi()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$dokumen_lama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								dokumen
+							FROM esakip_laporan_monev_renaksi
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					$ret['data'] = $wpdb->update(
+						'esakip_laporan_monev_renaksi',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+
+					if ($wpdb->rows_affected > 0) {
+						if (is_file($upload_dir . $dokumen_lama)) {
+							unlink($upload_dir . $dokumen_lama);
+						}
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
 				}
 			} else {
 				$ret = array(
