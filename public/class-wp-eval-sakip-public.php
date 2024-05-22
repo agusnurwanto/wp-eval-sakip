@@ -536,6 +536,33 @@ class Wp_Eval_Sakip_Public
 		}
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-pohon-kinerja-dan-cascading-per-skpd.php';
 	}
+	
+	public function dokumen_detail_lhe_akip_internal($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-lhe-akip-internal-per-skpd.php';
+	}
+	
+	public function dokumen_detail_tl_lhe_akip_internal($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-tl-lhe-akip-internal-per-skpd.php';
+	}
+	
+	public function dokumen_detail_tl_lhe_akip_kemenpan($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-tl-lhe-akip-kemenpan-per-skpd.php';
+	}
 
 	public function desain_lke_sakip($atts)
 	{
@@ -1240,7 +1267,10 @@ class Wp_Eval_Sakip_Public
 					$tipe_dokumen = $_POST['tipe_dokumen'];
 					// untuk mengatur tabel sesuai tipe dokumen
 					$nama_tabel = array(
-						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading"
+						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading",
+						"lhe_akip_internal" => "esakip_lhe_akip_internal",
+						"tl_lhe_akip_internal" => "esakip_tl_lhe_akip_internal",
+						"tl_lhe_akip_kemenpan" => "esakip_tl_lhe_akip_kemenpan"
 					);
 
 					$data = $wpdb->get_row(
@@ -5639,7 +5669,10 @@ class Wp_Eval_Sakip_Public
 				if($ret['status'] == 'success'){
 					// untuk mengatur tabel sesuai tipe dokumen
 					$nama_tabel = array(
-						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading"
+						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading",
+						"lhe_akip_internal" => "esakip_lhe_akip_internal",
+						"tl_lhe_akip_internal" => "esakip_tl_lhe_akip_internal",
+						"tl_lhe_akip_kemenpan" => "esakip_tl_lhe_akip_kemenpan"
 					);
 
 					$datas = $wpdb->get_results(
@@ -6466,7 +6499,10 @@ class Wp_Eval_Sakip_Public
 					$tipe_dokumen = $_POST['tipe_dokumen'];
 					// untuk mengatur tabel sesuai tipe dokumen
 					$nama_tabel = array(
-						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading"
+						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading",
+						"lhe_akip_internal" => "esakip_lhe_akip_internal",
+						"tl_lhe_akip_internal" => "esakip_tl_lhe_akip_internal",
+						"tl_lhe_akip_kemenpan" => "esakip_tl_lhe_akip_kemenpan"
 					);
 
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
@@ -12142,13 +12178,19 @@ class Wp_Eval_Sakip_Public
 					// untuk mengatur judul halaman sesuai tipe dokumen
 					$nama_page = array(
 						"pohon_kinerja_dan_cascading" => "Pohon Kinerja dan Cascading",
-						"pedoman_teknis_perencanaan" => "Pedoman Teknis Perencanaan"
+						"pedoman_teknis_perencanaan" => "Pedoman Teknis Perencanaan",
+						"lhe_akip_internal" => "LHE AKIP Internal",
+						"tl_lhe_akip_internal" => "TL LHE AKIP Internal",
+						"tl_lhe_akip_kemenpan" => "TL LHE AKIP Kemenpan"
 					);
 
 					// untuk mengatur tabel sesuai tipe dokumen
 					$nama_tabel = array(
 						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading",
-						"pedoman_teknis_perencanaan" => "esakip_pedoman_teknis_perencanaan"
+						"pedoman_teknis_perencanaan" => "esakip_pedoman_teknis_perencanaan",
+						"lhe_akip_internal" => "esakip_lhe_akip_internal",
+						"tl_lhe_akip_internal" => "esakip_tl_lhe_akip_internal",
+						"tl_lhe_akip_kemenpan" => "esakip_tl_lhe_akip_kemenpan"
 					);
 	
 					if (!empty($unit)) {
@@ -12232,7 +12274,10 @@ class Wp_Eval_Sakip_Public
 					// untuk mengatur tabel sesuai tipe dokumen
 					$nama_tabel = array(
 						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading",
-						"pedoman_teknis_perencanaan" => "esakip_pedoman_teknis_perencanaan"
+						"pedoman_teknis_perencanaan" => "esakip_pedoman_teknis_perencanaan",
+						"lhe_akip_internal" => "esakip_lhe_akip_internal",
+						"tl_lhe_akip_internal" => "esakip_tl_lhe_akip_internal",
+						"tl_lhe_akip_kemenpan" => "esakip_tl_lhe_akip_kemenpan"
 					);
 
 					$where = 'tahun_anggaran IS NULL';
@@ -12348,7 +12393,10 @@ class Wp_Eval_Sakip_Public
 						// untuk mengatur tabel sesuai tipe dokumen
 						$nama_tabel = array(
 							"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading",
-							"pedoman_teknis_perencanaan" => "esakip_pedoman_teknis_perencanaan"
+							"pedoman_teknis_perencanaan" => "esakip_pedoman_teknis_perencanaan",
+							"lhe_akip_internal" => "esakip_lhe_akip_internal",
+							"tl_lhe_akip_internal" => "esakip_tl_lhe_akip_internal",
+							"tl_lhe_akip_kemenpan" => "esakip_tl_lhe_akip_kemenpan"
 						);
 
 						$existing_data = $wpdb->get_row(
@@ -15014,7 +15062,10 @@ class Wp_Eval_Sakip_Public
 				if ($ret['status'] == 'success') {
 					// untuk mengatur tabel sesuai tipe dokumen
 					$nama_tabel = array(
-						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading"
+						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading",
+						"lhe_akip_internal" => "esakip_lhe_akip_internal",
+						"tl_lhe_akip_internal" => "esakip_tl_lhe_akip_internal",
+						"tl_lhe_akip_kemenpan" => "esakip_tl_lhe_akip_kemenpan"
 					);
 
 					if (empty($id_dokumen)) {
