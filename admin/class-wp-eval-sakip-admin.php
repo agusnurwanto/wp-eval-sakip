@@ -508,6 +508,23 @@ class Wp_Eval_Sakip_Admin
 									</ul>
 								</div>
 							</div>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'laporan_monev_renaksi') {
+							$laporan_monev_renaksi = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Monev Renaksi Tahun ' . $tahun_item['tahun_anggaran'],
+								'content' => '[laporan_monev_renaksi tahun=' . $tahun_item["tahun_anggaran"] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+							<div class="accordion">
+								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+									<ul style="margin-left: 20px;">
+										<li><a target="_blank" href="' . $laporan_monev_renaksi['url'] . '">' . $laporan_monev_renaksi['title'] . '</a></li>
+									</ul>
+								</div>
+							</div>';
 						}
 						$ret['message'] .= $body_pemda;
 					}
