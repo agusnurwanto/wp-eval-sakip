@@ -340,6 +340,9 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_table_skpd_rkpd', $plugin_public, 'get_table_skpd_rkpd');
 		$this->loader->add_action('wp_ajax_get_table_tahun_lkjip', $plugin_public, 'get_table_tahun_lkjip');
 		$this->loader->add_action('wp_ajax_get_table_skpd_lkjip', $plugin_public, 'get_table_skpd_lkjip');
+		$this->loader->add_action('wp_ajax_get_table_tahun_dokumen', $plugin_public, 'get_table_tahun_dokumen');
+		$this->loader->add_action('wp_ajax_get_table_skpd_dokumen', $plugin_public, 'get_table_skpd_dokumen');
+		$this->loader->add_action('wp_ajax_submit_tahun_dokumen', $plugin_public, 'submit_tahun_dokumen');
 
 		$this->loader->add_action('wp_ajax_get_table_tahun_renstra', $plugin_public, 'get_table_tahun_renstra');
 		$this->loader->add_action('wp_ajax_get_table_skpd_renstra', $plugin_public, 'get_table_skpd_renstra');
@@ -371,6 +374,14 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_table_pengisian_lke', $plugin_public, 'get_table_pengisian_lke');
 		$this->loader->add_action('wp_ajax_list_perangkat_daerah',  $plugin_public, 'list_perangkat_daerah');
 		$this->loader->add_action('wp_ajax_get_dokumen_bukti_dukung',  $plugin_public, 'get_dokumen_bukti_dukung');
+ 
+		$this->loader->add_action('wp_ajax_get_detail_laporan_monev_renaksi_by_id', $plugin_public, 'get_detail_laporan_monev_renaksi_by_id');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_laporan_monev_renaksi', $plugin_public, 'tambah_dokumen_laporan_monev_renaksi');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_laporan_monev_renaksi', $plugin_public, 'hapus_dokumen_laporan_monev_renaksi');
+		$this->loader->add_action('wp_ajax_get_table_laporan_monev_renaksi', $plugin_public, 'get_table_laporan_monev_renaksi');
+		$this->loader->add_action('wp_ajax_get_table_skpd_laporan_monev_renaksi', $plugin_public, 'get_table_skpd_laporan_monev_renaksi');
+		$this->loader->add_action('wp_ajax_get_table_tahun_laporan_monev_renaksi', $plugin_public, 'get_table_tahun_laporan_monev_renaksi');
+		$this->loader->add_action('wp_ajax_submit_tahun_laporan_monev_renaksi', $plugin_public, 'submit_tahun_laporan_monev_renaksi');
 		
 		add_shortcode('jadwal_evaluasi_sakip', array($plugin_public, 'jadwal_evaluasi_sakip'));
 		add_shortcode('halaman_mapping_skpd', array($plugin_public, 'halaman_mapping_skpd'));
@@ -396,6 +407,11 @@ class Wp_Eval_Sakip {
 		add_shortcode('rkpd', array($plugin_public, 'rkpd'));
 		add_shortcode('lkjip_lppd', array($plugin_public, 'lkjip_lppd'));
 		add_shortcode('dokumen_pemda_lainnya', array($plugin_public, 'dokumen_pemda_lainnya'));
+		add_shortcode('pohon_kinerja_dan_cascading', array($plugin_public, 'pohon_kinerja_dan_cascading'));
+		add_shortcode('lhe_akip_internal', array($plugin_public, 'lhe_akip_internal'));
+		add_shortcode('tl_lhe_akip_internal', array($plugin_public, 'tl_lhe_akip_internal'));
+		add_shortcode('tl_lhe_akip_kemenpan', array($plugin_public, 'tl_lhe_akip_kemenpan'));
+		add_shortcode('laporan_monev_renaksi', array($plugin_public, 'laporan_monev_renaksi'));
 
 		add_shortcode('jadwal_rpjmd', array($plugin_public, 'jadwal_rpjmd'));
 		add_shortcode('jadwal_rpjpd', array($plugin_public, 'jadwal_rpjpd'));
@@ -411,7 +427,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('dokumen_detail_evaluasi_internal', array($plugin_public, 'dokumen_detail_evaluasi_internal'));
 		add_shortcode('dokumen_detail_iku', array($plugin_public, 'dokumen_detail_iku'));
 		add_shortcode('dokumen_detail_laporan_kinerja', array($plugin_public, 'dokumen_detail_laporan_kinerja'));
-		add_shortcode('dokumen_detail_laporan_kinerja', array($plugin_public, 'dokumen_detail_laporan_kinerja'));
+		add_shortcode('dokumen_detail_laporan_monev_renaksi', array($plugin_public, 'dokumen_detail_laporan_monev_renaksi'));
 		
 		add_shortcode('desain_lke_sakip', array($plugin_public, 'desain_lke_sakip'));
 		add_shortcode('pengisian_lke_sakip', array($plugin_public, 'pengisian_lke_sakip'));
