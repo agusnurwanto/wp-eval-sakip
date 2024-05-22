@@ -235,37 +235,37 @@ foreach ($user_penilai as $key => $val) {
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="RENSTRA" id="renstra">
+                                    <input class="form-check-input" type="checkbox" value="esakip_renstra" id="renstra">
                                     <label class="form-check-label" for="renstra">
                                         RENSTRA
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="RENJA/RKT" id="renja-rkt">
+                                    <input class="form-check-input" type="checkbox" value="esakip_renja_rkt" id="renja-rkt">
                                     <label class="form-check-label" for="renja-rkt">
                                         RENJA/RKT
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="Perjanjian Kinerja" id="perjanjian-kinerja">
+                                    <input class="form-check-input" type="checkbox" value="esakip_perjanjian_kinerja" id="perjanjian-kinerja">
                                     <label class="form-check-label" for="perjanjian-kinerja">
                                         Perjanjian Kinerja
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="Rencana Aksi" id="rencana-aksi">
+                                    <input class="form-check-input" type="checkbox" value="esakip_rencana_aksi" id="rencana-aksi">
                                     <label class="form-check-label" for="rencana-aksi">
                                         Rencana Aksi
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="Dokumen Lainnya" id="dokumen-lainnya">
+                                    <input class="form-check-input" type="checkbox" value="esakip_dokumen_lainnya" id="dokumen-lainnya">
                                     <label class="form-check-label" for="dokumen-lainnya">
                                         Dokumen Lainnya
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="DPA" id="dpa">
+                                    <input class="form-check-input" type="checkbox" value="esakip_dpa" id="dpa">
                                     <label class="form-check-label" for="dpa">
                                         DPA
                                     </label>
@@ -273,37 +273,37 @@ foreach ($user_penilai as $key => $val) {
                             </div>
                             <div class="col-md-6">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="IKU" id="iku">
+                                    <input class="form-check-input" type="checkbox" value="esakip_iku" id="iku">
                                     <label class="form-check-label" for="iku">
                                         IKU
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="SKP" id="skp">
+                                    <input class="form-check-input" type="checkbox" value="esakip_skp" id="skp">
                                     <label class="form-check-label" for="skp">
                                         SKP
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="Pengukuran Kinerja" id="pengukuran-kinerja">
+                                    <input class="form-check-input" type="checkbox" value="esakip_pengukuran_kinerja" id="pengukuran-kinerja">
                                     <label class="form-check-label" for="pengukuran-kinerja">
                                         Pengukuran Kinerja
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="Pengukuran Rencana Aksi" id="pengukuran-rencana-aksi">
+                                    <input class="form-check-input" type="checkbox" value="esakip_pengukuran_rencana_aksi" id="pengukuran-rencana-aksi">
                                     <label class="form-check-label" for="pengukuran-rencana-aksi">
                                         Pengukuran Rencana Aksi
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="Laporan Kinerja" id="laporan-kinerja">
+                                    <input class="form-check-input" type="checkbox" value="esakip_laporan_kinerja" id="laporan-kinerja">
                                     <label class="form-check-label" for="laporan-kinerja">
                                         Laporan Kinerja
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="Evaluasi Internal" id="evaluasi-internal">
+                                    <input class="form-check-input" type="checkbox" value="esakip_evaluasi_internal" id="evaluasi-internal">
                                     <label class="form-check-label" for="evaluasi-internal">
                                         Evaluasi Internal
                                     </label>

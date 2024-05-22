@@ -171,61 +171,28 @@ $timezone = get_option('timezone_string');
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="tambahBuktiDukungModalLabel">Tambah Kerangka Logis</h5>
+                    <h5 class="modal-title" id="tambahBuktiDukungModalLabel">Pilih Bukti Dukung</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <table id="tableKerangkaLogis" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                    <table id="tableBuktiDukung" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                         <thead>
                             <tr>
-                                <th class="text-center">No</th>
-                                <th class="text-center">Jenis Bukti Dukung</th>
+                                <th class="text-center" colspan="2">Jenis Bukti Dukung</th>
                                 <th class="text-center">Nama Dokumen</th>
-                                <th class="text-center">Aksi</th>
+                                <th class="text-center">Keterangan</th>
+                                <th class="text-center">Tanggal Upload</th>
                             </tr>
                         </thead>
                         <tbody>
                         </tbody>
                     </table>
-                    <form id="formtambahBuktiDukung">
-                        <input type="hidden" value="" id="idPenilaian" name="idPenilaian">
-                        <div class="form-group">
-                            <label for="linkBuktiDukung">Pilih Bukti Dukung</label>
-                            <input type="text" class="form-control" id="linkBuktiDukung" name="linkBuktiDukung">
-                        </div>
-                    </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-info" data-dismiss="modal">Tutup</button>
                     <button type="button" class="btn btn-primary" onclick="submit_komponen_penilaian(); return false">Simpan</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="tambahBuktiDukungModal" tabindex="-1" role="dialog" aria-labelledby="tambahBuktiDukungModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="tambahBuktiDukungModalLabel">Tambah Bukti Dukung</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="formTambahBuktiDukung">
-                        <input type="hidden" value="" id="idPenilaian" name="idPenilaian">
-                        <div class="form-group">
-                            <label for="linkBuktiDukung">Link Bukti Dukung</label>
-                            <input type="text" class="form-control" id="linkBuktiDukung" name="linkBuktiDukung">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-info" data-dismiss="modal">Tutup</button>
-                    <button type="button" class="btn btn-primary" onclick="submitBuktiDukung(); return false">Simpan</button>
                 </div>
             </div>
         </div>
@@ -401,12 +368,50 @@ $timezone = get_option('timezone_string');
             });
         }
 
-        function tambahBuktiDukung(id) {
+        function tambahBuktiDukung(idSkpd, id) {
             jQuery('#wrap-loading').show();
             jQuery('#idPenilaian').val(id);
-            jQuery('#linkBuktiDukung').val('');
-            jQuery('#tambahBuktiDukungModal').modal('show');
-            jQuery('#wrap-loading').hide();
+            jQuery.ajax({
+                url: esakip.url,
+                type: 'POST',
+                data: {
+                    action: 'get_dokumen_bukti_dukung',
+                    id_skpd: idSkpd,
+                    kp_id: id,
+                    tahun_anggaran: <?php echo $tahun_anggaran; ?>,
+                    api_key: esakip.api_key
+                },
+                dataType: 'json',
+                success: function(response) {
+                    console.log(response);
+                    jQuery('#wrap-loading').hide();
+                    if(response.status == 'success'){
+                        var html = '';
+                        var url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>'
+                        for(var i in response.data){
+                            response.data[i].map(function(data, ii){
+                                html += ''
+                                +'<tr>'
+                                    +'<td class="text-center"><input type="checkbox"/></td>'
+                                    +'<td>'+i+'</td>'
+                                    +'<td><a href="'+url+data.dokumen+'" target="_blank">'+data.dokumen+'</a></td>'
+                                    +'<td>'+data.keterangan+'</td>'
+                                    +'<td class="text-center">'+data.created_at+'</td>'
+                                +'<tr>';
+                            });
+                        };
+                        jQuery('#tableBuktiDukung tbody').html(html);
+                        jQuery('#tambahBuktiDukungModal').modal('show');
+                    }else{
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    jQuery('#wrap-loading').hide();
+                    console.error(xhr.responseText);
+                    alert('Terjadi kesalahan saat mengambil data!');
+                }
+            });
         }
     </script>
 </body>

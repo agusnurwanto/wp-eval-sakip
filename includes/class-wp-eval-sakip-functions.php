@@ -128,7 +128,16 @@ class Esakip_Functions
         if (!empty($options['custom_url'])) {
             $custom_url = array();
             foreach ($options['custom_url'] as $k => $v) {
-                $custom_url[] = $v['key'] . '=' . $v['value'];
+                if(
+                    !empty($v['key']) 
+                    && !empty($v['value'])
+                ){
+                    $custom_url[] = $v['key'] . '=' . $v['value'];
+                }else{
+                    foreach($v as $key => $val){
+                        $custom_url[] = $key . '=' . $val;
+                    }
+                }
             }
             $tambahan_url = $key_db . implode('&', $custom_url);
         }
