@@ -10829,7 +10829,7 @@ class Wp_Eval_Sakip_Public
 												$tbody2 .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "'>" . $opsi . "</select></td>";
 												$tbody2 .= "<td class='text-center'>" . $nilai_usulan . "</td>";
 												$tbody2 .= "<td class='text-center'></td>";
-												$tbody2 .= "<td class='text-center'><button type='button' class='btn btn-primary' onclick='tambahBuktiDukung(" . $penilaian['kp_id'] . ")' id='buktiDukung" . $penilaian['kp_id'] . "'>Tambah/Lihat Bukti Dukung</button></td>";
+												$tbody2 .= "<td class='text-center'><button type='button' class='btn btn-primary btn-sm' title='Tambah bukti dukung' onclick='tambahBuktiDukung(".$id_skpd.",". $penilaian['kp_id'] . ")' id='buktiDukung" . $penilaian['kp_id'] . "'><i class='dashicons dashicons-plus'></i></button></td>";
 												$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "'>" . $penilaian['pl_keterangan'] . "</textarea></td>";
 												$tbody2 .= $kerangka_logis;
 												$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' disabled>" . $opsi_penetapan . "</select></td>";
@@ -10845,7 +10845,7 @@ class Wp_Eval_Sakip_Public
 												$tbody2 .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "' disabled>" . $opsi . "</select></td>";
 												$tbody2 .= "<td class='text-center'>" . $nilai_usulan . "</td>";
 												$tbody2 .= "<td class='text-center'></td>";
-												$tbody2 .= "<td class='text-center'><button  type='button' class='btn btn-primary' onclick='tambahBuktiDukung(" . $penilaian['kp_id'] . ")' id='buktiDukung" . $penilaian['kp_id'] . "'>Tambah/Lihat Bukti Dukung</button></td>";
+												$tbody2 .= "<td class='text-center'><button  type='button' class='btn btn-primary btn-sm' title='Tambah bukti dukung' onclick='tambahBuktiDukung(".$id_skpd.",". $penilaian['kp_id'] . ")' id='buktiDukung" . $penilaian['kp_id'] . "'><i class='dashicons dashicons-plus'></i></button></td>";
 												$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan'] . "</textarea></td>";
 												$tbody2 .= $kerangka_logis;
 												$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' " . $disabled . ">" . $opsi_penetapan . "</select></td>";
@@ -13735,6 +13735,77 @@ class Wp_Eval_Sakip_Public
 						'status' => 'error',
 						'message'   => 'Id Kosong!'
 					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	function get_dokumen_bukti_dukung()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil ambil data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if ($ret['status']!='error' && empty($_POST['id_skpd'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID OPD tidak boleh kosong!';
+				}else if ($ret['status']!='error' && empty($_POST['kp_id'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID Komponen penilai tidak boleh kosong!';
+				}else if ($ret['status']!='error' && empty($_POST['tahun_anggaran'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
+				}
+				if ($ret['status']!='error') {
+					$jenis_bukti_dukung_db = $wpdb->get_var($wpdb->prepare("
+						SELECT
+							jenis_bukti_dukung
+						FROM esakip_komponen_penilaian
+						WHERE id=%d
+					", $_POST['kp_id']));
+					$all_dokumen = array();
+					$jenis_bukti_dukung = json_decode(stripslashes($jenis_bukti_dukung_db), true);
+					if (json_last_error() !== JSON_ERROR_NONE) {
+						$jenis_bukti_dukung = array();
+					}
+					foreach($jenis_bukti_dukung as $v){
+						$sql = $wpdb->prepare("
+							SELECT
+								*
+							FROM {$v}
+							WHERE id_skpd=%d
+								AND active=1
+						", $_POST['id_skpd']);
+
+						// dikecualikan karena dokumen ini tidak berdasarkan tahun anggaran, tapi per periode
+						if(
+							$v != 'esakip_renstra'
+							&& $v != 'esakip_rpjmd'
+							&& $v != 'esakip_rpjpd'
+						){
+							$sql .= $wpdb->prepare(' AND tahun_anggaran=%d', $_POST['tahun_anggaran']);
+						}
+						$all_dokumen[$v] = $wpdb->get_results($sql);
+					}
+
+					$ret['data'] = $all_dokumen;
+					$ret['sql'] = $wpdb->last_query;
 				}
 			} else {
 				$ret = array(
