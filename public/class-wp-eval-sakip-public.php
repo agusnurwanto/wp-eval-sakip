@@ -12688,7 +12688,7 @@ public function get_table_skpd_pengisian_lke() {
 						}
 
 						$total_nilai += $sum_nilai_sub;
-						$total_nilai_penetapan += $sum_nilai_penetapan;
+						$total_nilai_penetapan += $sum_nilai_sub_penetapan;
 
 						//tbody komponen
 						$tbody .= "<tr class='table-active'>";
