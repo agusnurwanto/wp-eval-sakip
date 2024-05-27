@@ -1291,6 +1291,28 @@ class Wp_Eval_Sakip_Admin
 						$this->gen_user_esakip($user_data, $update_pass);
 					}
 
+					// admin review
+					$args = array(
+					    'role'    => 'admin_panrb',
+					    'orderby' => 'user_nicename',
+					    'order'   => 'ASC'
+					);
+					$users_fanrb = get_users( $args );
+					$user_data = array();
+					$user_data['pass'] = $_POST['pass'];
+					$user_data['jabatan'] = 'admin_panrb';
+					if(empty($user_exist)){
+						$user_data['loginname'] = 'admin_panrb';
+						$user_data['nama'] = 'Admin Review';
+						$this->gen_user_esakip($user_data, $update_pass);
+					}else{
+						foreach ( $users_fanrb as $user_exist ) {
+							$user_data['loginname'] = $user_exist->user_login;
+							$user_data['nama'] = $user_exist->display_name;
+						}
+						$this->gen_user_esakip($user_data, $update_pass);
+					}
+
 					// admin ortala
 					$args = array(
 					    'role'    => 'admin_ortala',
