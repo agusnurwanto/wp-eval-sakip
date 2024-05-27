@@ -27,7 +27,7 @@ foreach ($idtahun as $val) {
 	$tahun .= "<option value='$val[tahun_anggaran]' $selected>$val[tahun_anggaran]</option>";
 }
 
-$tipe_dokumen = "pohon_kinerja_dan_cascading";
+$tipe_dokumen = "pedoman_teknis_evaluasi_internal";
 ?>
 <style type="text/css">
 	.wrap-table {
@@ -49,7 +49,7 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
 <div class="container-md">
 	<div class="cetak">
 		<div style="padding: 10px;margin:0 0 3rem 0;">
-			<h1 class="text-center table-title">Dokumen Pohon Kinerja dan Cascading Tahun <?php echo $input['tahun']; ?></h1>
+			<h1 class="text-center table-title">Dokumen Pedoman Teknis Evaluasi Internal Tahun <?php echo $input['tahun']; ?></h1>
 			<div class="wrap-table">
 				<table id="table_dokumen_skpd" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
 					<thead>
@@ -57,6 +57,28 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
 							<th class="text-center">No</th>
 							<th class="text-center">Nama OPD</th>
 							<th class="text-center">Jumlah Dokumen</th>
+							<th class="text-center">Aksi</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="container-md">
+	<div class="cetak">
+		<div style="padding: 10px;margin:0 0 3rem 0;">
+			<h3 class="text-center">Dokumen yang belum disetting Tahun Anggaran</h3>
+			<div class="wrap-table">
+				<table cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+					<thead>
+						<tr>
+							<th class="text-center">No</th>
+							<th class="text-center">Perangkat Daerah</th>
+							<th class="text-center">Nama Dokumen</th>
+							<th class="text-center">Keterangan</th>
 							<th class="text-center">Aksi</th>
 						</tr>
 					</thead>

@@ -44,6 +44,10 @@ foreach ($idtahun as $val) {
     }
     $tahun .= "<option value='$val[tahun_anggaran]' $selected>$val[tahun_anggaran]</option>";
 }
+
+$current_user = wp_get_current_user();
+$user_roles = $current_user->roles;
+$is_admin_panrb = in_array('admin_panrb', $user_roles);
 ?>
 <style type="text/css">
     .wrap-table {
@@ -68,9 +72,11 @@ foreach ($idtahun as $val) {
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
             <h1 class="text-center" style="margin:3rem;">Dokumen Evaluasi Internal <br><?php echo $skpd['nama_skpd'] ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
+            <?php if (!$is_admin_panrb): ?>
             <div style="margin-bottom: 25px;">
-                <button class="btn btn-primary" onclick="tambah_dokumen_evaluasi_internal();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
+                <button class="btn btn-primary" onclick="tambah_dokumen_pedoman_teknis_evaluasi_internal();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
             </div>
+            <?php endif; ?>
             <div class="wrap-table">
                 <table id="table_dokumen_evaluasi_internal" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
@@ -269,7 +275,7 @@ foreach ($idtahun as $val) {
         });
     }
 
-    function tambah_dokumen_evaluasi_internal() {
+    function tambah_dokumen_pedoman_teknis_evaluasi_internal() {
         jQuery("#editModalLabel").hide();
         jQuery("#uploadModalLabel").show();
         jQuery("#idDokumen").val('');
@@ -341,7 +347,7 @@ foreach ($idtahun as $val) {
         }
 
         let form_data = new FormData();
-        form_data.append('action', 'tambah_dokumen_evaluasi_internal');
+        form_data.append('action', 'tambah_dokumen_pedoman_teknis_evaluasi_internal');
         form_data.append('api_key', esakip.api_key);
         form_data.append('id_dokumen', id_dokumen);
         form_data.append('skpd', skpd);

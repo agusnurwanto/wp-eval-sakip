@@ -576,7 +576,7 @@ class Wp_Eval_Sakip_Admin
 									</ul>
 								</div>
 							</div>';
-						}else if (!empty($_POST['type']) && $_POST['type'] == 'laporan_monev_renaksi') {
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'laporan_monev_renaksi') {
 							$laporan_monev_renaksi = $this->functions->generatePage(array(
 								'nama_page' => 'Halaman Monev Renaksi Tahun ' . $tahun_item['tahun_anggaran'],
 								'content' => '[laporan_monev_renaksi tahun=' . $tahun_item["tahun_anggaran"] . ']',
@@ -590,6 +590,57 @@ class Wp_Eval_Sakip_Admin
 								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
 									<ul style="margin-left: 20px;">
 										<li><a target="_blank" href="' . $laporan_monev_renaksi['url'] . '">' . $laporan_monev_renaksi['title'] . '</a></li>
+									</ul>
+								</div>
+							</div>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'pedoman_teknis_perencanaan') {
+							$pedoman_teknis_perencanaan = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Pedoman Teknis Perencanaan Tahun ' . $tahun_item['tahun_anggaran'],
+								'content' => '[pedoman_teknis_perencanaan tahun=' . $tahun_item["tahun_anggaran"] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+							<div class="accordion">
+								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+									<ul style="margin-left: 20px;">
+										<li><a target="_blank" href="' . $pedoman_teknis_perencanaan['url'] . '">' . $pedoman_teknis_perencanaan['title'] . '</a></li>
+									</ul>
+								</div>
+							</div>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja') {
+							$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja Tahun ' . $tahun_item['tahun_anggaran'],
+								'content' => '[pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja tahun=' . $tahun_item["tahun_anggaran"] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+							<div class="accordion">
+								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+									<ul style="margin-left: 20px;">
+										<li><a target="_blank" href="' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['url'] . '">' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['title'] . '</a></li>
+									</ul>
+								</div>
+							</div>';
+						}else if (!empty($_POST['type']) && $_POST['type'] == 'pedoman_teknis_evaluasi_internal') {
+							$pedoman_teknis_evaluasi_internal = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Pedoman Teknis Evaluasi Internal Tahun ' . $tahun_item['tahun_anggaran'],
+								'content' => '[pedoman_teknis_evaluasi_internal tahun=' . $tahun_item["tahun_anggaran"] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+							<div class="accordion">
+								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+									<ul style="margin-left: 20px;">
+										<li><a target="_blank" href="' . $pedoman_teknis_evaluasi_internal['url'] . '">' . $pedoman_teknis_evaluasi_internal['title'] . '</a></li>
 									</ul>
 								</div>
 							</div>';
@@ -1027,6 +1078,16 @@ class Wp_Eval_Sakip_Admin
 		$get_tahun = $wpdb->get_results('select tahun_anggaran from esakip_data_unit group by tahun_anggaran', ARRAY_A);
 		$list_data = '';
 
+		// jadwal rpjpd
+		$jadwal_rpjpd = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman Jadwal RPJPD',
+			'content' => '[jadwal_rpjpd]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+		$list_data .= '<li><a target="_blank" href="' . $jadwal_rpjpd['url'] . '">' . $jadwal_rpjpd['title'] . '</a></li>';
+
 		$jadwal_rpjmd = $this->functions->generatePage(array(
 			'nama_page' => 'Halaman Jadwal RPJMD / RPD ',
 			'content' => '[jadwal_rpjmd]',
@@ -1047,16 +1108,6 @@ class Wp_Eval_Sakip_Admin
 			));
 			$list_data .= '<li><a target="_blank" href="' . $jadwal_evaluasi['url'] . '">' . $jadwal_evaluasi['title'] . '</a></li>';
 		}
-		
-		// jadwal rpjpd
-		$jadwal_rpjpd = $this->functions->generatePage(array(
-			'nama_page' => 'Halaman Jadwal RPJPD',
-			'content' => '[jadwal_rpjpd]',
-			'show_header' => 1,
-			'no_key' => 1,
-			'post_status' => 'private'
-		));
-		$list_data .= '<li><a target="_blank" href="' . $jadwal_rpjpd['url'] . '">' . $jadwal_rpjpd['title'] . '</a></li>';
 
 		$label = array(
 			Field::make('html', 'crb_jadwal')
@@ -1234,6 +1285,28 @@ class Wp_Eval_Sakip_Admin
 						$this->gen_user_esakip($user_data, $update_pass);
 					}else{
 						foreach ( $users_bappeda as $user_exist ) {
+							$user_data['loginname'] = $user_exist->user_login;
+							$user_data['nama'] = $user_exist->display_name;
+						}
+						$this->gen_user_esakip($user_data, $update_pass);
+					}
+
+					// admin review
+					$args = array(
+					    'role'    => 'admin_panrb',
+					    'orderby' => 'user_nicename',
+					    'order'   => 'ASC'
+					);
+					$users_fanrb = get_users( $args );
+					$user_data = array();
+					$user_data['pass'] = $_POST['pass'];
+					$user_data['jabatan'] = 'admin_panrb';
+					if(empty($user_exist)){
+						$user_data['loginname'] = 'admin_panrb';
+						$user_data['nama'] = 'Admin Review';
+						$this->gen_user_esakip($user_data, $update_pass);
+					}else{
+						foreach ( $users_fanrb as $user_exist ) {
 							$user_data['loginname'] = $user_exist->user_login;
 							$user_data['nama'] = $user_exist->display_name;
 						}

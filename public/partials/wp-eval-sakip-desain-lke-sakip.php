@@ -69,6 +69,7 @@ foreach ($user_penilai as $key => $val) {
                         <th class="text-center" style="vertical-align: middle;">Bobot</th>
                         <th class="text-center">Format Penilaian</th>
                         <th class="text-center">Keterangan</th>
+                        <th class="text-center">Kerangka Logis</th>
                         <th class="text-center" style="vertical-align: middle;">Aksi</th>
                     </tr>
                 </thead>
@@ -231,7 +232,7 @@ foreach ($user_penilai as $key => $val) {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Pilih Jenis Bukti Dukung <small>(minimal 1 dan bisa lebih dari 1)</small></label>
+                        <label>Pilih Jenis Bukti Dukung <small class="text-secondary">( minimal 1 atau bisa lebih dari 1 )</small></label>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-check">
@@ -270,6 +271,30 @@ foreach ($user_penilai as $key => $val) {
                                         DPA
                                     </label>
                                 </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_tl_lhe_akip_kemenpan" id="tl-lhe-akip-kemenpan">
+                                    <label class="form-check-label" for="tl-lhe-akip-kemenpan">
+                                        TL LHE AKIP Kemenpan
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_pohon_kinerja_dan_cascading" id="pohon-kinerja-dan-cascading">
+                                    <label class="form-check-label" for="pohon-kinerja-dan-cascading">
+                                        Pohon Kinerja dan Cascading
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_lhe_akip_internal" id="lhe-akip-internal">
+                                    <label class="form-check-label" for="lhe-akip-internal">
+                                        LHE AKIP Internal
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja" id="pedoman-teknis-pengukuran-dan-pengumpulan-data-kinerja">
+                                    <label class="form-check-label" for="pedoman-teknis-pengukuran-dan-pengumpulan-data-kinerja">
+                                        Pedoman Teknis Pengukuran dan Pengumpulan Data Kinerja
+                                    </label>
+                                </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-check">
@@ -306,6 +331,30 @@ foreach ($user_penilai as $key => $val) {
                                     <input class="form-check-input" type="checkbox" value="esakip_evaluasi_internal" id="evaluasi-internal">
                                     <label class="form-check-label" for="evaluasi-internal">
                                         Evaluasi Internal
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_pedoman_teknis_evaluasi_internal" id="pedoman-teknis-evaluasi-internal">
+                                    <label class="form-check-label" for="pedoman-teknis-evaluasi-internal">
+                                        Pedoman Teknis Evaluasi Internal
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_laporan_monev_renaksi" id="laporan-monev-renaksi">
+                                    <label class="form-check-label" for="laporan-monev-renaksi">
+                                        Laporan Monev Renaksi
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_pedoman_teknis_perencanaan" id="pedoman-teknis-perencanaan">
+                                    <label class="form-check-label" for="pedoman-teknis-perencanaan">
+                                        Pedoman Teknis Perencanaan
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_tl_lhe_akip_internal" id="tl-lhe-akip-internal">
+                                    <label class="form-check-label" for="tl-lhe-akip-internal">
+                                        TL LHE AKIP Internal
                                     </label>
                                 </div>
                             </div>
@@ -1056,7 +1105,7 @@ foreach ($user_penilai as $key => $val) {
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
                     alert(response.message);
-                    jQuery('#tambahPenilaianModal').modal('hide');
+                    jQuery('#tambahKerangkaLogisModal').modal('hide');
                     get_table_desain_sakip();
                 } else {
                     alert(response.message);
@@ -1127,6 +1176,34 @@ foreach ($user_penilai as $key => $val) {
     }
 
     function hapus_kerangka_logis(id) {
-        alert('berhasil id kl adalah : ' + id);
+        if (!confirm('Apakah Anda yakin ingin menghapus Kerangka Logis ini?')) {
+            return;
+        }
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'hapus_kerangka_logis',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    jQuery('#tambahKerangkaLogisModal').modal('hide');
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                jQuery('#wrap-loading').hide();
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
     }
 </script>
