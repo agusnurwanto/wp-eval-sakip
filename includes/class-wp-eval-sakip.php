@@ -382,6 +382,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_table_skpd_laporan_monev_renaksi', $plugin_public, 'get_table_skpd_laporan_monev_renaksi');
 		$this->loader->add_action('wp_ajax_get_table_tahun_laporan_monev_renaksi', $plugin_public, 'get_table_tahun_laporan_monev_renaksi');
 		$this->loader->add_action('wp_ajax_submit_tahun_laporan_monev_renaksi', $plugin_public, 'submit_tahun_laporan_monev_renaksi');
+		$this->loader->add_action('wp_ajax_submit_bukti_dukung', $plugin_public, 'submit_bukti_dukung');
 		
 		add_shortcode('jadwal_evaluasi_sakip', array($plugin_public, 'jadwal_evaluasi_sakip'));
 		add_shortcode('halaman_mapping_skpd', array($plugin_public, 'halaman_mapping_skpd'));

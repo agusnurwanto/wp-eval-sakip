@@ -328,6 +328,7 @@ CREATE TABLE esakip_pengisian_lke (
   `bukti_dukung` text DEFAULT NULL,
   `create_at` datetime DEFAULT current_timestamp(),
   `update_at` datetime DEFAULT current_timestamp(),
+  `tahun_anggaran` year(4) DEFAULT null,
   `active` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY  (`id`)
 );
