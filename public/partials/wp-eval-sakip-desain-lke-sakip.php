@@ -271,6 +271,30 @@ foreach ($user_penilai as $key => $val) {
                                         DPA
                                     </label>
                                 </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_tl_lhe_akip_kemenpan" id="tl-lhe-akip-kemenpan">
+                                    <label class="form-check-label" for="tl-lhe-akip-kemenpan">
+                                        TL LHE AKIP Kemenpan
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_pohon_kinerja_dan_cascading" id="pohon-kinerja-dan-cascading">
+                                    <label class="form-check-label" for="pohon-kinerja-dan-cascading">
+                                        Pohon Kinerja dan Cascading
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_lhe_akip_internal" id="lhe-akip-internal">
+                                    <label class="form-check-label" for="lhe-akip-internal">
+                                        LHE AKIP Internal
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja" id="pedoman-teknis-pengukuran-dan-pengumpulan-data-kinerja">
+                                    <label class="form-check-label" for="pedoman-teknis-pengukuran-dan-pengumpulan-data-kinerja">
+                                        Pedoman Teknis Pengukuran dan Pengumpulan Data Kinerja
+                                    </label>
+                                </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-check">
@@ -307,6 +331,30 @@ foreach ($user_penilai as $key => $val) {
                                     <input class="form-check-input" type="checkbox" value="esakip_evaluasi_internal" id="evaluasi-internal">
                                     <label class="form-check-label" for="evaluasi-internal">
                                         Evaluasi Internal
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_pedoman_teknis_evaluasi_internal" id="pedoman-teknis-evaluasi-internal">
+                                    <label class="form-check-label" for="pedoman-teknis-evaluasi-internal">
+                                        Pedoman Teknis Evaluasi Internal
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_laporan_monev_renaksi" id="laporan-monev-renaksi">
+                                    <label class="form-check-label" for="laporan-monev-renaksi">
+                                        Laporan Monev Renaksi
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_pedoman_teknis_perencanaan" id="pedoman-teknis-perencanaan">
+                                    <label class="form-check-label" for="pedoman-teknis-perencanaan">
+                                        Pedoman Teknis Perencanaan
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_tl_lhe_akip_internal" id="tl-lhe-akip-internal">
+                                    <label class="form-check-label" for="tl-lhe-akip-internal">
+                                        TL LHE AKIP Internal
                                     </label>
                                 </div>
                             </div>
