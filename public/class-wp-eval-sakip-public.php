@@ -13712,8 +13712,62 @@ public function get_table_skpd_pengisian_lke() {
 				'post_status' => 'private'
 			));
 			$lkjip_lppd = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman LKJIP/LPPD  ' . $_GET['tahun'],
+				'nama_page' => 'Halaman LKJIP/LPPD Tahun ' . $_GET['tahun'],
 				'content' => '[lkjip_lppd tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$dpa = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman DPA Tahun ' . $_GET['tahun'],
+				'content' => '[dpa tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$pohon_kinerja_dan_cascading = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Pohon Kinerja dan Cascading Tahun ' . $_GET['tahun'],
+				'content' => '[pohon_kinerja_dan_cascading tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$lhe_akip_internal = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman LHE AKIP Internal Tahun ' . $_GET['tahun'],
+				'content' => '[lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$tl_lhe_akip_internal = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman TL LHE AKIP Internal Tahun ' . $_GET['tahun'],
+				'content' => '[tl_lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$tl_lhe_akip_kemenpan = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman AKIP Kemenpan Tahun ' . $_GET['tahun'],
+				'content' => '[tl_lhe_akip_kemenpan tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$laporan_monev_renaksi = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Monev Renaksi Tahun ' . $_GET['tahun'],
+				'content' => '[laporan_monev_renaksi tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));	
+			$pedoman_teknis_perencanaan = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Pedoman Teknis Perencanaan Tahun ' . $_GET['tahun'],
+				'content' => '[pedoman_teknis_perencanaan tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));			
+			$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja Tahun ' . $_GET['tahun'],
+				'content' => '[pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$pedoman_teknis_evaluasi_internal = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Pedoman Teknis Evaluasi Internal Tahun ' . $_GET['tahun'],
+				'content' => '[pedoman_teknis_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
@@ -13736,6 +13790,15 @@ public function get_table_skpd_pengisian_lke() {
 					<li><a href="' . $rkpd['url'] . '" target="_blank" class="btn btn-primary">' . $rkpd['title'] . '</a></li>
 					<li><a href="' . $dokumen_pemda_lainnya['url'] . '" target="_blank" class="btn btn-primary">' . $dokumen_pemda_lainnya['title'] . '</a></li>
 					<li><a href="' . $lkjip_lppd['url'] . '" target="_blank" class="btn btn-primary">' . $lkjip_lppd['title'] . '</a></li>
+					<li><a href="' . $dpa['url'] . '" target="_blank" class="btn btn-primary">' . $dpa['title'] . '</a></li>
+					<li><a href="' . $pohon_kinerja_dan_cascading['url'] . '" target="_blank" class="btn btn-primary">' . $pohon_kinerja_dan_cascading['title'] . '</a></li>
+					<li><a href="' . $lhe_akip_internal['url'] . '" target="_blank" class="btn btn-primary">' . $lhe_akip_internal['title'] . '</a></li>
+					<li><a href="' . $tl_lhe_akip_internal['url'] . '" target="_blank" class="btn btn-primary">' . $tl_lhe_akip_internal['title'] . '</a></li>
+					<li><a href="' . $tl_lhe_akip_kemenpan['url'] . '" target="_blank" class="btn btn-primary">' . $tl_lhe_akip_kemenpan['title'] . '</a></li>
+					<li><a href="' . $laporan_monev_renaksi['url'] . '" target="_blank" class="btn btn-primary">' . $laporan_monev_renaksi['title'] . '</a></li>
+					<li><a href="' . $pedoman_teknis_perencanaan['url'] . '" target="_blank" class="btn btn-primary">' . $pedoman_teknis_perencanaan['title'] . '</a></li>
+					<li><a href="' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['url'] . '" target="_blank" class="btn btn-primary">' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['title'] . '</a></li>
+					<li><a href="' . $pedoman_teknis_evaluasi_internal['url'] . '" target="_blank" class="btn btn-primary">' . $pedoman_teknis_evaluasi_internal['title'] . '</a></li>
 				</ul>';
 		} else if (
 			in_array("pa", $user_meta->roles)
@@ -13848,6 +13911,69 @@ public function get_table_skpd_pengisian_lke() {
 				'post_status' => 'private'
 			));
 			$detail_perjanjian_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+			$detail_dpa = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Detail Dokumen DPA ' . $_GET['tahun'],
+				'content' => '[dokumen_dpa tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$detail_dpa['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+			$detail_pohon_kinerja_dan_cascading = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Detail Dokumen Pohon Kinerja dan Cascading  ' . $_GET['tahun'],
+				'content' => '[dokumen_detail_pohon_kinerja_dan_cascading tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$detail_pohon_kinerja_dan_cascading['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+			$detail_lhe_akip_internal = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Detail Dokumen LHE AKIP Internal  ' . $_GET['tahun'],
+				'content' => '[dokumen_detail_lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$detail_lhe_akip_internal['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+			$detail_tl_lhe_akip_internal = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Detail Dokumen TL LHE AKIP Internal  ' . $_GET['tahun'],
+				'content' => '[dokumen_detail_tl_lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$detail_tl_lhe_akip_internal['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+			$detail_tl_lhe_akip_kemenpan = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Detail Dokumen AKIP Kemenpan  ' . $_GET['tahun'],
+				'content' => '[dokumen_detail_tl_lhe_akip_kemenpan tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$detail_tl_lhe_akip_kemenpan['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+			$detail_laporan_monev_renaksi = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Detail Dokumen Laporan Monev Renaksi  ' . $_GET['tahun'],
+				'content' => '[dokumen_detail_laporan_monev_renaksi tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$detail_laporan_monev_renaksi['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];	
+			$detail_pedoman_teknis_perencanaan = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Detail Dokumen Pedoman Teknis Perencanaan  ' . $_GET['tahun'],
+				'content' => '[dokumen_detail_pedoman_teknis_perencanaan tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$detail_pedoman_teknis_perencanaan['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];			
+			$detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Detail Dokumen Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja  ' . $_GET['tahun'],
+				'content' => '[dokumen_detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+			$detail_pedoman_teknis_evaluasi_internal = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Detail Dokumen Pedoman Teknis Evaluasi Internal  ' . $_GET['tahun'],
+				'content' => '[dokumen_detail_pedoman_teknis_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$detail_pedoman_teknis_evaluasi_internal['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 			echo '
 				<h2 class="text-center">' . $skpd_db['nama_skpd'] . '</h2>
 				<ul class="daftar-menu-sakip">
@@ -13862,6 +13988,15 @@ public function get_table_skpd_pengisian_lke() {
 					<li><a href="' . $detail_evaluasi_internal['url'] . '" target="_blank" class="btn btn-primary">' . $detail_evaluasi_internal['title'] . '</a></li>
 					<li><a href="' . $detail_dokumen_lain['url'] . '" target="_blank" class="btn btn-primary">' . $detail_dokumen_lain['title'] . '</a></li>
 					<li><a href="' . $detail_perjanjian_kinerja['url'] . '" target="_blank" class="btn btn-primary">' . $detail_perjanjian_kinerja['title'] . '</a></li>
+					<li><a href="' . $detail_dpa['url'] . '" target="_blank" class="btn btn-primary">' . $detail_dpa['title'] . '</a></li>
+					<li><a href="' . $detail_pohon_kinerja_dan_cascading['url'] . '" target="_blank" class="btn btn-primary">' . $detail_pohon_kinerja_dan_cascading['title'] . '</a></li>
+					<li><a href="' . $detail_lhe_akip_internal['url'] . '" target="_blank" class="btn btn-primary">' . $detail_lhe_akip_internal['title'] . '</a></li>
+					<li><a href="' . $detail_tl_lhe_akip_internal['url'] . '" target="_blank" class="btn btn-primary">' . $detail_tl_lhe_akip_internal['title'] . '</a></li>
+					<li><a href="' . $detail_tl_lhe_akip_kemenpan['url'] . '" target="_blank" class="btn btn-primary">' . $detail_tl_lhe_akip_kemenpan['title'] . '</a></li>
+					<li><a href="' . $detail_laporan_monev_renaksi['url'] . '" target="_blank" class="btn btn-primary">' . $detail_laporan_monev_renaksi['title'] . '</a></li>
+					<li><a href="' . $detail_pedoman_teknis_perencanaan['url'] . '" target="_blank" class="btn btn-primary">' . $detail_pedoman_teknis_perencanaan['title'] . '</a></li>
+					<li><a href="' . $detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['url'] . '" target="_blank" class="btn btn-primary">' . $detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['title'] . '</a></li>
+					<li><a href="' . $detail_pedoman_teknis_evaluasi_internal['url'] . '" target="_blank" class="btn btn-primary">' . $detail_pedoman_teknis_evaluasi_internal['title'] . '</a></li>
 				</ul>';
 		}
 	}
