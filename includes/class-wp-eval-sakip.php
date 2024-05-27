@@ -267,6 +267,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_submit_tahun_laporan_kinerja', $plugin_public, 'submit_tahun_laporan_kinerja');
 		$this->loader->add_action('wp_ajax_hapus_dokumen_laporan_kinerja', $plugin_public, 'hapus_dokumen_laporan_kinerja');
 		$this->loader->add_action('wp_ajax_get_table_laporan_kinerja', $plugin_public, 'get_table_laporan_kinerja');
+		$this->loader->add_action('wp_ajax_get_verifikasi_dokumen_by_id', $plugin_public, 'get_verifikasi_dokumen_by_id');
+		$this->loader->add_action('wp_ajax_submit_verifikasi_dokumen', $plugin_public, 'submit_verifikasi_dokumen');
 		
 		$this->loader->add_action('wp_ajax_get_detail_dokumen_lain_by_id', $plugin_public, 'get_detail_dokumen_lain_by_id');
 		$this->loader->add_action('wp_ajax_tambah_dokumen_lain', $plugin_public, 'tambah_dokumen_lain');

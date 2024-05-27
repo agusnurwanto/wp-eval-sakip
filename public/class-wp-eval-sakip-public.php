@@ -4807,15 +4807,49 @@ class Wp_Eval_Sakip_Public
 					$counter = 1;
 					$tbody = '';
 
+					// user authorize
+					$current_user = wp_get_current_user();
+					//jika user adalah admin atau skpd
+					$can_verify = false;
+					if (
+						in_array("admin_ortala", $current_user->roles) ||
+						in_array("admin_bappeda", $current_user->roles) ||
+						in_array("administrator", $current_user->roles)
+					) {
+						$can_verify = true;
+					}
+
 					foreach ($laporan_kinerjas as $kk => $vv) {
+						$data_verifikasi = $wpdb->get_row($wpdb->prepare('
+											SELECT 
+												*
+											FROM esakip_keterangan_verifikator
+											WHERE id_dokumen=%d
+												AND active=1
+										', $vv['id']), ARRAY_A);
+
+						$color_badge_verify = 'secondary';
+						$text_badge = 'Menunggu';
+						if($data_verifikasi['status_verifikasi'] == 1){
+							$color_badge_verify = 'success';
+							$text_badge = 'Diterima';
+						}else if($data_verifikasi['status_verifikasi'] == 2){
+							$color_badge_verify = 'danger';
+							$text_badge = 'Ditolak';
+						}
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
 						$tbody .= "<td>" . $vv['opd'] . "</td>";
 						$tbody .= "<td>" . $vv['dokumen'] . "</td>";
 						$tbody .= "<td>" . $vv['keterangan'] . "</td>";
 						$tbody .= "<td>" . $vv['created_at'] . "</td>";
+						$tbody .= "<td class='text-center'><span class='badge badge-" . $color_badge_verify . "' style='padding: .5em 1.4em;'>" . $text_badge . "</span></td>";
+						$tbody .= "<td>" . $data_verifikasi['keterangan_verifikasi'] . "</td>";
 
 						$btn = '<div class="btn-action-group">';
+						if($can_verify){
+							$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
+						}
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_laporan_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 						$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_laporan_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
@@ -16187,6 +16221,223 @@ public function get_table_skpd_pengisian_lke() {
 
 					$ret['data'] = $all_dokumen;
 					$ret['sql'] = $wpdb->last_query;
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function submit_verifikasi_dokumen()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil Verifikasi Dokumen!',
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_dokumen'])) {
+					$id_dokumen = $_POST['id_dokumen'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Dokumen kosong!';
+				}
+				if (!empty($_POST['idSkpd'])) {
+					$idSkpd = $_POST['idSkpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id SKPD kosong!';
+				}
+				if (!empty($_POST['keterangan'])) {
+					$keterangan = $_POST['keterangan'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Keterangan kosong!';
+				}
+				if (!empty($_POST['tahunAnggaran'])) {
+					$tahunAnggaran = $_POST['tahunAnggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+				if (!empty($_POST['tipe_dokumen'])) {
+					$tipe_dokumen = $_POST['tipe_dokumen'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tipe Dokumen kosong!';
+				}
+				if (!empty($_POST['verifikasi_dokumen'])) {
+					$verifikasi_dokumen = $_POST['verifikasi_dokumen'];
+					$input_verifikasi = 0;
+					if($verifikasi_dokumen == 'terima'){
+						$input_verifikasi = 1;
+					}else if($verifikasi_dokumen == 'tolak'){
+						$input_verifikasi = 2;
+					}
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Verifikasi Dokumen kosong!';
+				}
+
+				$current_user = wp_get_current_user();
+
+				if ($ret['status'] == 'success' && $input_verifikasi > 0) {
+					// untuk mengatur tabel sesuai tipe dokumen
+					$nama_tabel = array(
+						"laporan_kinerja" => "esakip_laporan_kinerja"
+					);
+
+					// Cek data verifikasi yg sudah ada
+					$data_terverifikasi = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT *
+							FROM esakip_keterangan_verifikator
+							WHERE id_dokumen = %d
+								AND nama_tabel_dokumen = %s
+								AND active=1
+								AND tahun_anggaran=%d
+						", $id_dokumen, $nama_tabel[$tipe_dokumen],$tahunAnggaran),
+						ARRAY_A
+					);
+					if (empty($data_terverifikasi)) {
+						$wpdb->insert(
+							'esakip_keterangan_verifikator',
+							array(
+								'id_dokumen' => $id_dokumen,
+								'status_verifikasi' => $input_verifikasi,
+								'keterangan_verifikasi' => $keterangan,
+								'active' => 1,
+								'user_id' => $current_user->ID,
+								'id_skpd' => $idSkpd,
+								'tahun_anggaran' => $tahunAnggaran,
+								'created_at' => current_time('mysql'),
+								'nama_tabel_dokumen' => $nama_tabel[$tipe_dokumen]
+							),
+							array('%d', '%d', '%s', '%d', '%d', '%d', '%d', '%s', '%s')
+						);
+
+						if (!$wpdb->insert_id) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal menyimpan data ke database!'
+							);
+						}
+					} else {
+						$opsi = array(
+							'status_verifikasi' => $input_verifikasi,
+							'keterangan_verifikasi' => $keterangan,
+							'user_id' => $current_user->ID
+						);
+
+						$wpdb->update(
+							'esakip_keterangan_verifikator',
+							$opsi,
+							array('id' => $data_terverifikasi['id']),
+							array('%d', '%s', '%d'),
+							array('%d')
+						);
+
+						if ($wpdb->rows_affected == 0) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal memperbarui data ke database!'
+							);
+						}
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	
+	public function get_verifikasi_dokumen_by_id()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					if(!empty($_POST['tipe_dokumen'])){
+						$tipe_dokumen = $_POST['tipe_dokumen'];
+						// untuk mengatur tabel sesuai tipe dokumen
+						$nama_tabel = array(
+							"laporan_kinerja" => "esakip_laporan_kinerja"
+						);
+
+						$data = $wpdb->get_row(
+							$wpdb->prepare("
+								SELECT *
+								FROM $nama_tabel[$tipe_dokumen]
+								WHERE id = %d
+									AND active=1
+							", $_POST['id']),
+							ARRAY_A
+						);
+						if(!empty($data)){
+							$data_verifikasi = $wpdb->get_row(
+								$wpdb->prepare("
+									SELECT *
+									FROM esakip_keterangan_verifikator
+									WHERE id_dokumen = %d
+										AND nama_tabel_dokumen = %s
+										AND active=1
+								", $data['id'], $nama_tabel[$tipe_dokumen]),
+								ARRAY_A
+							);
+
+							$ret['data'] = $data_verifikasi;
+							if(empty($data_verifikasi)){
+								$ret = array(
+									'cek' => $wpdb->last_query,
+									'data' => array(),
+									'status' => 'success',
+									'message'   => 'Data Belum Diverifikasi!'
+								);		
+							}
+						}else{
+							$ret = array(
+								'status' => 'error',
+								'message'   => 'Data Tidak Ditemukan!'
+							);		
+						}
+					}else{
+						$ret = array(
+							'status' => 'error',
+							'message'   => 'Tipe Dokumen Kosong!'
+						);	
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
 				}
 			} else {
 				$ret = array(

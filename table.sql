@@ -465,6 +465,20 @@ CREATE TABLE `esakip_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja` (
  PRIMARY KEY(id)
 );
 
+CREATE TABLE `esakip_keterangan_verifikator` (
+  `id` int NOT NULL auto_increment,
+  `id_dokumen` int DEFAULT NULL,
+  `status_verifikasi` tinyint DEFAULT NULL COMMENT '0=menunggu,1=disetujui,2=ditolak',
+  `keterangan_verifikasi` text,
+  `nama_tabel_dokumen` varchar(64) DEFAULT NULL,
+  `active` tinyint DEFAULT NULL,
+  `user_id` int DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `id_skpd` int DEFAULT NULL,
+  `tahun_anggaran` year DEFAULT NULL,
+ PRIMARY KEY(id)
+);
+
 CREATE TABLE `esakip_pedoman_teknis_evaluasi_internal` (
   `id` int(11) NOT NULL auto_increment,
   `opd` varchar(255) DEFAULT NULL,
