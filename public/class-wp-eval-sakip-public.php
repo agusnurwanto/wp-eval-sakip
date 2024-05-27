@@ -12396,6 +12396,7 @@ public function get_table_skpd_pengisian_lke() {
 					if (
 						in_array("admin_ortala", $current_user->roles) ||
 						in_array("admin_bappeda", $current_user->roles) ||
+						in_array("admin_panrb", $current_user->roles) ||
 						in_array("administrator", $current_user->roles)
 					) {
 						$can_verify = true;
@@ -12734,12 +12735,18 @@ public function get_table_skpd_pengisian_lke() {
 												$tbody2 .= "<td class='text-center'>" . $btn_save . "</td>";
 												break;
 											case true:
+                    						if (!$this->is_admin_panrb()) {
 												$btn_save_penetapan = "<button class='btn btn-info' onclick='simpanPerubahanPenetapan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan Penetapan'><span class='dashicons dashicons-saved' ></span></button>";
+											}
 
 												$tbody2 .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "' disabled>" . $opsi . "</select></td>";
 												$tbody2 .= "<td class='text-center'>" . $nilai_usulan . "</td>";
 												$tbody2 .= "<td class='text-center'></td>";
-												$tbody2 .= "<td class='text-center'><button  type='button' class='btn btn-primary btn-sm' title='Tambah bukti dukung' onclick='tambahBuktiDukung(".$id_skpd.",". $penilaian['kp_id'] . ")' id='buktiDukung" . $penilaian['kp_id'] . "'><i class='dashicons dashicons-plus'></i></button></td>";
+												if (!$this->is_admin_panrb()) {
+												    $tbody2 .= "<td class='text-center'><button type='button' class='btn btn-primary btn-sm' title='Tambah bukti dukung' onclick='tambahBuktiDukung(" . $id_skpd . "," . $penilaian['kp_id'] . ")' id='buktiDukung" . $penilaian['kp_id'] . "'><i class='dashicons dashicons-plus'></i></button></td>";
+												} else {
+												    $tbody2 .= "<td class='text-center'></td>";
+												}
 												$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan'] . "</textarea></td>";
 												$tbody2 .= $kerangka_logis;
 												$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' " . $disabled . ">" . $opsi_penetapan . "</select></td>";
