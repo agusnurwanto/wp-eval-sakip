@@ -13638,6 +13638,7 @@ public function get_table_skpd_pengisian_lke() {
 			in_array("administrator", $user_meta->roles)
 			|| in_array("admin_bappeda", $user_meta->roles)
 			|| in_array("admin_ortala", $user_meta->roles)
+			|| in_array("admin_panrb", $user_meta->roles)
 		) {
 			$renja_rkt = $this->functions->generatePage(array(
 				'nama_page' => 'Halaman Dokumen RENJA/RKT Tahun ' . $_GET['tahun'],
@@ -13712,61 +13713,61 @@ public function get_table_skpd_pengisian_lke() {
 				'post_status' => 'private'
 			));
 			$lkjip_lppd = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman LKJIP/LPPD Tahun ' . $_GET['tahun'],
+				'nama_page' => 'Halaman Dokumen LKJIP/LPPD Tahun ' . $_GET['tahun'],
 				'content' => '[lkjip_lppd tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$dpa = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman DPA Tahun ' . $_GET['tahun'],
+				'nama_page' => 'Halaman Dokumen DPA Tahun ' . $_GET['tahun'],
 				'content' => '[dpa tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$pohon_kinerja_dan_cascading = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Pohon Kinerja dan Cascading Tahun ' . $_GET['tahun'],
+				'nama_page' => 'Halaman Dokumen Pohon Kinerja dan Cascading Tahun ' . $_GET['tahun'],
 				'content' => '[pohon_kinerja_dan_cascading tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$lhe_akip_internal = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman LHE AKIP Internal Tahun ' . $_GET['tahun'],
+				'nama_page' => 'Halaman Dokumen LHE AKIP Internal Tahun ' . $_GET['tahun'],
 				'content' => '[lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$tl_lhe_akip_internal = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman TL LHE AKIP Internal Tahun ' . $_GET['tahun'],
+				'nama_page' => 'Halaman Dokumen TL LHE AKIP Internal Tahun ' . $_GET['tahun'],
 				'content' => '[tl_lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$tl_lhe_akip_kemenpan = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman AKIP Kemenpan Tahun ' . $_GET['tahun'],
+				'nama_page' => 'Halaman Dokumen AKIP Kemenpan Tahun ' . $_GET['tahun'],
 				'content' => '[tl_lhe_akip_kemenpan tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$laporan_monev_renaksi = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Monev Renaksi Tahun ' . $_GET['tahun'],
+				'nama_page' => 'Halaman Dokumen Monev Renaksi Tahun ' . $_GET['tahun'],
 				'content' => '[laporan_monev_renaksi tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));	
 			$pedoman_teknis_perencanaan = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Pedoman Teknis Perencanaan Tahun ' . $_GET['tahun'],
+				'nama_page' => 'Halaman Dokumen Pedoman Teknis Perencanaan Tahun ' . $_GET['tahun'],
 				'content' => '[pedoman_teknis_perencanaan tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));			
 			$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja Tahun ' . $_GET['tahun'],
+				'nama_page' => 'Halaman Dokumen Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja Tahun ' . $_GET['tahun'],
 				'content' => '[pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$pedoman_teknis_evaluasi_internal = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Pedoman Teknis Evaluasi Internal Tahun ' . $_GET['tahun'],
+				'nama_page' => 'Halaman Dokumen Pedoman Teknis Evaluasi Internal Tahun ' . $_GET['tahun'],
 				'content' => '[pedoman_teknis_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
