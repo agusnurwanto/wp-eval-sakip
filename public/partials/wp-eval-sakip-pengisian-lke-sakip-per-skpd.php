@@ -444,7 +444,12 @@ $timezone = get_option('timezone_string');
                 dataType: 'json',
                 success: function(response) {
                     jQuery('#wrap-loading').hide();
-                    jQuery('#tambahBuktiDukungModal').modal('hide');
+                    if(response.status == 'error'){
+                        alert(response.message);
+                    }else{
+                        jQuery();
+                        jQuery('#tambahBuktiDukungModal').modal('hide');
+                    }
                 }
             });
         }
