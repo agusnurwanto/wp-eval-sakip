@@ -224,7 +224,8 @@ $timezone = get_option('timezone_string');
                 action: 'get_table_pengisian_lke',
                 api_key: esakip.api_key,
                 id_jadwal: <?php echo $input['id_jadwal']; ?>,
-                id_skpd: <?php echo $id_skpd; ?>,
+                tahun_anggaran: <?php echo $tahun_anggaran; ?>,
+                id_skpd: <?php echo $id_skpd; ?>
             },
             dataType: 'json',
             success: function(response) {
