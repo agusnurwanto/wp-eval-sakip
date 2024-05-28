@@ -43,7 +43,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	 */
 	private $version;
 
-	private $functions;
+	public $functions;
 
 	/**
 	 * Initialize the class and set its properties.
