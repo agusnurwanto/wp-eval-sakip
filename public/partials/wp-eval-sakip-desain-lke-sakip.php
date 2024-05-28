@@ -68,8 +68,8 @@ foreach ($user_penilai as $key => $val) {
                         <th class="text-center" colspan="4" style="vertical-align: middle;">Komponen/Sub Komponen</th>
                         <th class="text-center" style="vertical-align: middle;">Bobot</th>
                         <th class="text-center">Format Penilaian</th>
-                        <th class="text-center">Keterangan</th>
-                        <th class="text-center">Kerangka Logis</th>
+                        <th class="text-center" style="vertical-align: middle;">Keterangan</th>
+                        <th class="text-center" style="vertical-align: middle;">Kerangka Logis</th>
                         <th class="text-center" style="vertical-align: middle;">Aksi</th>
                     </tr>
                 </thead>
