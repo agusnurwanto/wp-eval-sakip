@@ -14550,7 +14550,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					'show_header' => 1,
 					'post_status' => 'private'
 				));
-				$pengisian_lke_per_skpd_page .= '<li><a target="_blank" href="' . $pengisian_lke_per_skpd['url'] . '&id_skpd=' . $skpd_db['id_skpd'] . '" class="btn btn-primary">' . $pengisian_lke_per_skpd['title'] . '</a></li>';
+				$pengisian_lke_per_skpd_page .= '<li><a target="_blank" href="' . $pengisian_lke_per_skpd['url'] . '&id_skpd=' . $skpd_db['id_skpd'] . '&id_jadwal='. $get_jadwal_lke_sakip['id'] . '" class="btn btn-primary">' . $pengisian_lke_per_skpd['title'] . '</a></li>';
 			}
 			if (empty($pengisian_lke_per_skpd_page)) {
 				$pengisian_lke_per_skpd_page = '<li><a return="false" href="#" class="btn btn-secondary">Pengisian LKE kosong atau belum dibuat</a></li>';

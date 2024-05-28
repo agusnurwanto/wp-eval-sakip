@@ -9,6 +9,12 @@ $input = shortcode_atts(array(
     'id_jadwal' => '',
 ), $atts);
 
+if(!empty($_GET['id_jadwal'])){
+    $id_jadwal = $_GET['id_jadwal'];
+} else {
+    die('JADWAL KOSONG !');
+}
+
 $jadwal = $wpdb->get_row(
     $wpdb->prepare("
         SELECT
@@ -16,7 +22,7 @@ $jadwal = $wpdb->get_row(
         FROM esakip_data_jadwal
         WHERE id=%d
           AND status!=0
-    ", $input['id_jadwal']),
+    ", $id_jadwal),
     ARRAY_A
 );
 
@@ -121,7 +127,7 @@ $get_nama_komponen = $wpdb->get_results(
             data: {
                 action: 'get_table_skpd_pengisian_lke',
                 api_key: esakip.api_key,
-                id_jadwal: <?php echo $input['id_jadwal']; ?>,
+                id_jadwal: <?php echo $id_jadwal; ?>,
                 tahun_anggaran: <?php echo $jadwal['tahun_anggaran']; ?>,
             },
             dataType: 'json',

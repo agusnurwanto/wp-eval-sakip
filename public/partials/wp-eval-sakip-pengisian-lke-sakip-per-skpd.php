@@ -15,6 +15,12 @@ if (!empty($_GET) && !empty($_GET['id_skpd'])) {
     die("skpd kosong");
 }
 
+if(!empty($_GET['id_jadwal'])){
+    $id_jadwal = $_GET['id_jadwal'];
+} else {
+    die('JADWAL KOSONG !');
+}
+
 $jadwal = $wpdb->get_row(
     $wpdb->prepare("
     SELECT
@@ -23,7 +29,7 @@ $jadwal = $wpdb->get_row(
     WHERE id=%d
       AND tipe='lke'
       AND status!=0
-    ", $input['id_jadwal']),
+    ", $id_jadwal),
     ARRAY_A
 );
 
@@ -225,7 +231,7 @@ $timezone = get_option('timezone_string');
             data: {
                 action: 'get_table_pengisian_lke',
                 api_key: esakip.api_key,
-                id_jadwal: <?php echo $input['id_jadwal']; ?>,
+                id_jadwal: <?php echo $id_jadwal; ?>,
                 tahun_anggaran: <?php echo $tahun_anggaran; ?>,
                 id_skpd: <?php echo $id_skpd; ?>
             },
@@ -254,7 +260,7 @@ $timezone = get_option('timezone_string');
         if (nilaiUsulan === '') {
             return alert("Nilai Usulan Tidak Boleh Kosong!");
         }
-        let idJadwal = <?php echo $input['id_jadwal']; ?>;
+        let idJadwal = <?php echo $id_jadwal; ?>;
         if (idJadwal == '') {
             return alert("Id Jadwal Tidak Boleh Kosong!");
         }
@@ -318,7 +324,7 @@ $timezone = get_option('timezone_string');
         if (nilaiPenetapan === '') {
             return alert("Nilai Penetapan Tidak Boleh Kosong!");
         }
-        let idJadwal = <?php echo $input['id_jadwal']; ?>;
+        let idJadwal = <?php echo $id_jadwal; ?>;
         if (idJadwal == '') {
             return alert("Id Jadwal Tidak Boleh Kosong!");
         }

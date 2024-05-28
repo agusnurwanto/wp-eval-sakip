@@ -333,9 +333,9 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				if ($data_jadwal) {
 					$started_at = trim($data_jadwal['started_at']);
 					$end_at = trim($data_jadwal['end_at']);
-
 					$started_at_dt = new DateTime($started_at);
 					$end_at_dt = new DateTime($end_at);
+					$jenis_jadwal = $data_jadwal['jenis_jadwal'];
 				} else {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Data jadwal tidak ditemukan!';
@@ -381,6 +381,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					$total_nilai = 0;
 					$total_nilai_penetapan = 0;
 					$counter = 'A';
+
 					foreach ($data_komponen as $komponen) {
 						$tbody2 = "";
 						$counter_isi = 1;
@@ -403,15 +404,30 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						);
 						if (!empty($data_subkomponen)) {
 							foreach ($data_subkomponen as $subkomponen) {
-								$disabled = 'disabled';
-								//jika jadwal masih buka, jika merupakan user penilai
+								// Jika jadwal masih buka
 								if ($dateTime > $started_at_dt && $dateTime < $end_at_dt) {
-									if (array_key_exists($subkomponen['id_user_penilai'], $intersected_roles)) {
-										$disabled = '';
-									} else {
-										$disabled = 'disabled';
+									if ($jenis_jadwal == 'penetapan') {
+										// Jika jadwal penetapan dan user adalah evaluator
+										if ($can_verify === true) {
+											// Hanya jika user penilai sesuai dengan subkomponen
+											if (array_key_exists($subkomponen['id_user_penilai'], $intersected_roles)) {
+												$disabled = '';
+											} else {
+												$disabled = 'disabled';
+											}
+										} else {
+											$disabled = 'disabled';
+										}
+									} else if ($jenis_jadwal == 'usulan') {
+										// Jika jadwal usulan dan user bukan evaluator
+										if ($can_verify === false) {
+											$disabled = '';
+										} else {
+											$disabled = 'disabled';
+										}
 									}
 								} else {
+									// Jika jadwal sudah tutup
 									$disabled = 'disabled';
 								}
 
@@ -701,6 +717,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 										$tbody2 .= "<td class='text-left'>" . $counter_isi++ . "</td>";
 										$tbody2 .= "<td class='text-left'>" . $penilaian['kp_nama'] . "<br><small class='text-muted'>" . $penilaian['kp_keterangan'] . "</small></td>";
 										$tbody2 .= "<td class='text-center'>-</td>";
+
 										$bukti_dukung = json_decode(stripslashes($penilaian['pl_bukti_dukung']), true);
 										if (!empty($bukti_dukung)) {
 											foreach ($bukti_dukung as $k => $bukti) {
@@ -709,7 +726,9 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 											$bukti_dukung = implode(', ', $bukti_dukung);
 										}
 										$tombol_bukti = "";
-										$tombol_bukti = "<button type='button' class='btn btn-primary btn-sm' title='Tambah bukti dukung' onclick='tambahBuktiDukung(" . $id_skpd . "," . $penilaian['kp_id'] . ")' id='buktiDukung" . $penilaian['kp_id'] . "'><i class='dashicons dashicons-plus'></i></button>";
+										if ($disabled == '') {
+											$tombol_bukti = "<button type='button' class='btn btn-primary btn-sm' title='Tambah bukti dukung' onclick='tambahBuktiDukung(" . $id_skpd . "," . $penilaian['kp_id'] . ")' id='buktiDukung" . $penilaian['kp_id'] . "'><i class='dashicons dashicons-plus'></i></button>";
+										}
 										switch ($can_verify) {
 											case false:
 												$btn_save = "<button class='btn btn-primary' onclick='simpanPerubahan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan'><span class='dashicons dashicons-saved' ></span></button>";
