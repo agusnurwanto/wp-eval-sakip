@@ -166,8 +166,8 @@ $timezone = get_option('timezone_string');
 </div>
 
 <!-- Modal tambah bukti dukung -->
-<div class="modal fade bd-example-modal-lg" id="tambahBuktiDukungModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+<div class="modal fade bd-example-modal-xl" id="tambahBuktiDukungModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="tambahBuktiDukungModalLabel">Pilih Bukti Dukung</h5>
@@ -176,6 +176,8 @@ $timezone = get_option('timezone_string');
                 </button>
             </div>
             <div class="modal-body">
+                <h5 class="text-center">Upload Bukti Dukung</h5>
+                <div id="uploadBuktiDukung" class="text-center"></div>
                 <table id="tableBuktiDukung" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
                         <tr>
@@ -192,8 +194,8 @@ $timezone = get_option('timezone_string');
                 <input type="hidden" id="idSkpd_komponen" name="">
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-info" data-dismiss="modal">Tutup</button>
                 <button type="button" class="btn btn-primary" onclick="submit_bukti_dukung(); return false">Simpan</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
@@ -391,12 +393,20 @@ $timezone = get_option('timezone_string');
                 jQuery('#wrap-loading').hide();
                 if(response.status == 'success'){
                     var html = '';
-                    var url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>'
+                    var url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>';
+                    var bukti_dukung_existing = {};
+                    response.data_existing.map(function(b, i){
+                        bukti_dukung_existing[b] = b;
+                    });
                     for(var i in response.data){
                         response.data[i].map(function(data, ii){
+                            var checked = '';
+                            if(bukti_dukung_existing[data.dokumen]){
+                                checked = 'checked';
+                            }
                             html += ''
                             +'<tr>'
-                                +'<td class="text-center"><input type="checkbox" class="list-dokumen" value="'+data.dokumen+'"/></td>'
+                                +'<td class="text-center"><input type="checkbox" '+checked+' class="list-dokumen" value="'+data.dokumen+'"/></td>'
                                 +'<td>'+i+'</td>'
                                 +'<td><a href="'+url+data.dokumen+'" target="_blank">'+data.dokumen+'</a></td>'
                                 +'<td>'+data.keterangan+'</td>'
@@ -447,7 +457,12 @@ $timezone = get_option('timezone_string');
                     if(response.status == 'error'){
                         alert(response.message);
                     }else{
-                        jQuery();
+                        var url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>';
+                        var html = '';
+                        response.data.map(function(b, i){
+                            html += '<a href="'+url+b+'" target="_blank">'+b+'</a>';
+                        });
+                        jQuery('.bukti-dukung-view[kp-id="'+id_komponen+'"]').html(html);
                         jQuery('#tambahBuktiDukungModal').modal('hide');
                     }
                 }
