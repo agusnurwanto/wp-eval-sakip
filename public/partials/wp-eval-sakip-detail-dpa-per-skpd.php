@@ -28,9 +28,9 @@ $skpd = $wpdb->get_row(
 
 $idtahun = $wpdb->get_results(
     "
-		SELECT DISTINCT 
-			tahun_anggaran 
-		FROM esakip_data_unit        
+        SELECT DISTINCT 
+            tahun_anggaran 
+        FROM esakip_data_unit        
         ORDER BY tahun_anggaran DESC",
     ARRAY_A
 );
@@ -43,6 +43,7 @@ foreach ($idtahun as $val) {
     }
     $tahun .= "<option value='$val[tahun_anggaran]' $selected>$val[tahun_anggaran]</option>";
 }
+$tipe_dokumen = "dpa";
 
 $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
@@ -342,7 +343,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data dpa!');
+                alert('Terjadi kesalahan saat memuat data Laporan Monev Renaksi!');
             }
         });
     }
@@ -353,9 +354,10 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'get_table_tahun_dpa',
+                action: 'get_table_tahun_dokumen',
                 api_key: esakip.api_key,
                 id_skpd: <?php echo $id_skpd; ?>,
+                tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
             },
             dataType: 'json',
             success: function(response) {
@@ -375,16 +377,6 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         });
     }
 
-    function lihatDokumen(dokumen) {
-        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + dokumen;
-        window.open(url, '_blank');
-    }
-
-    function set_tahun_dokumen(id) {
-        jQuery('#tahunModal').modal('show');
-        jQuery('#idDokumen').val(id);
-    }
-
     function tambah_dokumen_dpa() {
         jQuery("#editModalLabel").hide();
         jQuery("#uploadModalLabel").show();
@@ -393,6 +385,54 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         jQuery("#keterangan").val('');
         jQuery('#fileUploadExisting').removeAttr('href').empty();
         jQuery("#uploadModal").modal('show');
+    }
+
+    function set_tahun_dokumen(id) {
+        jQuery('#tahunModal').modal('show');
+        jQuery('#idDokumen').val(id);
+    }
+
+    function submit_tahun_dpa() {
+        let id = jQuery("#idDokumen").val();
+        if (id == '') {
+            return alert('id tidak boleh kosong');
+        }
+
+        let tahunAnggaran = jQuery("#tahunAnggaran").val();
+        if (tahunAnggaran == '') {
+            return alert('Tahun Anggaran tidak boleh kosong');
+        }
+
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'submit_tahun_dpa',
+                id: id,
+                api_key: esakip.api_key,
+                tahunAnggaran: tahunAnggaran,
+                tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    jQuery('#tahunModal').modal('hide');
+                    getTableTahun();
+                    getTableRenja();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
     }
 
     function edit_dokumen_dpa(id) {
@@ -430,6 +470,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             }
         });
     }
+
 
     function submit_dokumen(that) {
         let id_dokumen = jQuery("#idDokumen").val();
@@ -481,55 +522,13 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                     alert(response.message);
                     getTabledpa();
                 } else {
-                    alert('Error: ' + response.message);
+                    alert(response.message);
                 }
             },
             error: function(xhr, status, error) {
                 console.error(xhr.responseText);
                 alert('Terjadi kesalahan saat mengirim data!');
                 jQuery('#wrap-loading').hide();
-            }
-        });
-    }
-
-    function submit_tahun_dpa() {
-        let id = jQuery("#idDokumen").val();
-        if (id == '') {
-            return alert('id tidak boleh kosong');
-        }
-
-        let tahunAnggaran = jQuery("#tahunAnggaran").val();
-        if (tahunAnggaran == '') {
-            return alert('Tahun Anggaran tidak boleh kosong');
-        }
-
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: 'POST',
-            data: {
-                action: 'submit_tahun_dpa',
-                id: id,
-                tahunAnggaran: tahunAnggaran,
-                api_key: esakip.api_key
-            },
-            dataType: 'json',
-            success: function(response) {
-                console.log(response);
-                jQuery('#wrap-loading').hide();
-                if (response.status === 'success') {
-                    alert(response.message);
-                    jQuery('#tahunModal').modal('hide');
-                    getTableTahun();
-                    getTabledpa();
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                jQuery('#wrap-loading').hide();
-                console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat mengirim data!');
             }
         });
     }
@@ -560,7 +559,6 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 if (response.status === 'success') {
                     alert(response.message);
                     getTabledpa();
-                    getTableTahun();
                 } else {
                     alert(response.message);
                 }
