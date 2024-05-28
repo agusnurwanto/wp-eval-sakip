@@ -14639,7 +14639,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$detail_perjanjian_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 			$detail_dpa = $this->functions->generatePage(array(
 				'nama_page' => 'Halaman Detail Dokumen DPA ' . $_GET['tahun'],
-				'content' => '[dokumen_dpa tahun=' . $_GET['tahun'] . ']',
+				'content' => '[dokumen_detail_dpa tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
