@@ -694,12 +694,17 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 										}
 
 										//tbody isi
-										$tbody2 .= "<tr>";
+										$tbody2 .= "<tr kp-id='".$penilaian['kp_id']."'>";
 										$tbody2 .= "<td class='text-left'></td>";
 										$tbody2 .= "<td class='text-left'></td>";
 										$tbody2 .= "<td class='text-left'>" . $counter_isi++ . "</td>";
 										$tbody2 .= "<td class='text-left'>" . $penilaian['kp_nama'] . "<br><small class='text-muted'>" . $penilaian['kp_keterangan'] . "</small></td>";
 										$tbody2 .= "<td class='text-center'>-</td>";
+										$bukti_dukung = json_decode(stripslashes($penilaian['pl_bukti_dukung']), true);
+										foreach($bukti_dukung as $k => $bukti){
+											$bukti_dukung[$k] = '<a href="'.ESAKIP_PLUGIN_URL . 'public/media/dokumen/'.$bukti.'" target="_blank">'.$bukti.'</a>';
+										}
+										$bukti_dukung = implode(', ', $bukti_dukung);
 										switch ($can_verify) {
 											case false:
 												$btn_save = "<button class='btn btn-primary' onclick='simpanPerubahan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan'><span class='dashicons dashicons-saved' ></span></button>";
@@ -707,7 +712,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												$tbody2 .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "'>" . $opsi . "</select></td>";
 												$tbody2 .= "<td class='text-center'>" . $nilai_usulan . "</td>";
 												$tbody2 .= "<td class='text-center'></td>";
-												$tbody2 .= "<td class='text-center'><button type='button' class='btn btn-primary btn-sm' title='Tambah bukti dukung' onclick='tambahBuktiDukung(".$id_skpd.",". $penilaian['kp_id'] . ")' id='buktiDukung" . $penilaian['kp_id'] . "'><i class='dashicons dashicons-plus'></i></button></td>";
+												$tbody2 .= "<td class='text-center'><div class='bukti-dukung-view' kp-id='".$penilaian['kp_id']."'>".$bukti_dukung."</div><button type='button' class='btn btn-primary btn-sm' title='Tambah bukti dukung' onclick='tambahBuktiDukung(".$id_skpd.",". $penilaian['kp_id'] . ")' id='buktiDukung" . $penilaian['kp_id'] . "'><i class='dashicons dashicons-plus'></i></button></td>";
 												$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "'>" . $penilaian['pl_keterangan'] . "</textarea></td>";
 												$tbody2 .= $kerangka_logis;
 												$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' disabled>" . $opsi_penetapan . "</select></td>";
@@ -726,9 +731,9 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												$tbody2 .= "<td class='text-center'>" . $nilai_usulan . "</td>";
 												$tbody2 .= "<td class='text-center'></td>";
 												if (!$this->is_admin_panrb()) {
-												    $tbody2 .= "<td class='text-center'><button type='button' class='btn btn-primary btn-sm' title='Tambah bukti dukung' onclick='tambahBuktiDukung(" . $id_skpd . "," . $penilaian['kp_id'] . ")' id='buktiDukung" . $penilaian['kp_id'] . "'><i class='dashicons dashicons-plus'></i></button></td>";
+												    $tbody2 .= "<td class='text-center'><div class='bukti-dukung-view' kp-id='".$penilaian['kp_id']."'>".$bukti_dukung."</div><button type='button' class='btn btn-primary btn-sm' title='Tambah bukti dukung' onclick='tambahBuktiDukung(" . $id_skpd . "," . $penilaian['kp_id'] . ")' id='buktiDukung" . $penilaian['kp_id'] . "'><i class='dashicons dashicons-plus'></i></button></td>";
 												} else {
-												    $tbody2 .= "<td class='text-center'></td>";
+												    $tbody2 .= "<td class='text-center'><div class='bukti-dukung-view' kp-id='".$penilaian['kp_id']."'>".$bukti_dukung."</div></td>";
 												}
 												$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan'] . "</textarea></td>";
 												$tbody2 .= $kerangka_logis;
