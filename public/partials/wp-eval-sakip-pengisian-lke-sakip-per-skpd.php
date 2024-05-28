@@ -176,6 +176,8 @@ $timezone = get_option('timezone_string');
                 </button>
             </div>
             <div class="modal-body">
+                <h5 class="text-center">Upload Bukti Dukung</h5>
+                <div id="uploadBuktiDukung" class="text-center"></div>
                 <table id="tableBuktiDukung" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
                         <tr>
