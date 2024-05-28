@@ -13158,7 +13158,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$tl_lhe_akip_kemenpan = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen AKIP Kemenpan Tahun ' . $_GET['tahun'],
+				'nama_page' => 'Halaman Dokumen TL LHE AKIP Kemenpan Tahun ' . $_GET['tahun'],
 				'content' => '[tl_lhe_akip_kemenpan tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
@@ -13356,7 +13356,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			));
 			$detail_tl_lhe_akip_internal['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 			$detail_tl_lhe_akip_kemenpan = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen AKIP Kemenpan  ' . $_GET['tahun'],
+				'nama_page' => 'Halaman Detail Dokumen TL LHE AKIP Kemenpan  ' . $_GET['tahun'],
 				'content' => '[dokumen_detail_tl_lhe_akip_kemenpan tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
