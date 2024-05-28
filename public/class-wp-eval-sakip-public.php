@@ -20,7 +20,9 @@
  * @subpackage Wp_Eval_Sakip/public
  * @author     Agus Nurwanto <agusnurwantomuslim@gmail.com>
  */
-class Wp_Eval_Sakip_Public
+
+require_once ESAKIP_PLUGIN_PATH . "/public/class-wp-eval-sakip-public-veirify-dokumen.php";
+class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 {
 
 	/**
@@ -663,7 +665,7 @@ class Wp_Eval_Sakip_Public
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-tl-lhe-akip-kemenpan.php';
 	}
 
-	private function is_admin_panrb() {
+	public function is_admin_panrb() {
 	    $current_user = wp_get_current_user();
 	    return in_array('admin_panrb', $current_user->roles);
 	}
@@ -6835,80 +6837,469 @@ class Wp_Eval_Sakip_Public
 					} else {
 						// buat script dalam bentuk array nilai default design LKE
 						$design = array(
-							array(
+							array( //0
 								'id_jadwal' => $id_jadwal_baru,
 								'nama' => 'PERENCANAAN KINERJA DEFAULT',
 								'bobot' => '30',
 								'nomor_urut' => '1.00',
 								'id_user_penilai' => '1',
 								'data' => array(
-									array(
+									array(//0
 										'nama' => 'PEMENUHAN',
 										'bobot' => '6',
 										'nomor_urut' => '1.00',
 										'id_user_penilai' => '1',
 										'data' => array(
-											array('nama' => 'Renstra telah disusun', 'tipe' => '1', 'keterangan' => 'Renstra OPD (2024-2026)', 'nomor_urut' => '1.00'),
-											array('nama' => 'Dokumen perencanaan kinerja tahunan (Renja) telah disusun', 'tipe' => '1', 'keterangan' => 'Renja 2023 dan 2024', 'nomor_urut' => '2.00'),
-											array('nama' => 'Terdapat dokumen perencanaan anggaran yang mendukung kinerja', 'tipe' => '1', 'keterangan' => '- Renja 2023 dan 2024, - DPA 2024 dan DPPA 2023 (di dokumen lainnya)', 'nomor_urut' => '3.00'),
-											array('nama' => 'Perjanjian Kinerja (PK) telah disusun', 'tipe' => '1', 'keterangan' => 'PK 2023 dan 2024', 'nomor_urut' => '4.00'),
-											array('nama' => 'PK telah menyajikan Indikator Tujuan/ Sasaran', 'tipe' => '2', 'keterangan' => 'PK 2023 dan 2024', 'nomor_urut' => '5.00'),
-											array('nama' => 'Terdapat dokumen Rencana Aksi', 'tipe' => '1', 'keterangan' => 'Rencana Aksi 2023 dan 2024', 'nomor_urut' => '6.00')
+											array(//0
+												'nama' => 'Renstra telah disusun', 
+												'tipe' => '1', 
+												'keterangan' => 'Renstra OPD (2024-2026)', 
+												'nomor_urut' => '1.00'
+											),
+											array(//1
+												'nama' => 'Dokumen perencanaan kinerja tahunan (Renja) telah disusun', 
+												'tipe' => '1', 
+												'keterangan' => 'Renja 2023 dan 2024', 
+												'nomor_urut' => '2.00', 
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'pesan_kesalahan' => 'SALAH dokumen RENSTRA tidak ada',
+														'id_komponen_pembanding' => '0-0-0'
+													)
+												)
+											),
+											array(//2
+												'nama' => 'Terdapat dokumen perencanaan anggaran yang mendukung kinerja', 
+												'tipe' => '1', 
+												'keterangan' => '- Renja 2023 dan 2024, - DPA 2024 dan DPPA 2023 (di dokumen lainnya)', 
+												'nomor_urut' => '3.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-0-1',
+														'pesan_kesalahan' => 'SALAH, Perencanaan kinerja tahunan tidak ada.'
+													),
+												)
+											),
+											array(//3
+												'nama' => 'Perjanjian Kinerja (PK) telah disusun', 
+												'tipe' => '1', 
+												'keterangan' => 'PK 2023 dan 2024', 
+												'nomor_urut' => '4.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-0-1',
+														'pesan_kesalahan' => 'SALAH, Perencanaan kinerja tahunan tidak ada.'
+													)
+												)
+											),
+											array(//4
+												'nama' => 'PK telah menyajikan Indikator Tujuan/ Sasaran', 
+												'tipe' => '2', 
+												'keterangan' => 'PK 2023 dan 2024', 
+												'nomor_urut' => '5.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-0-3',
+														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
+													),
+												)
+											),
+											array(//5
+												'nama' => 'Terdapat dokumen Rencana Aksi', 
+												'tipe' => '1', 
+												'keterangan' => 'Rencana Aksi 2023 dan 2024', 
+												'nomor_urut' => '6.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-0-3',
+														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
+													),
+												)
+											)
 										)
 									),
-									array(
+									array(//1
 										'nama' => 'KUALITAS RENSTRA',
 										'bobot' => '9',
 										'nomor_urut' => '2.00',
 										'id_user_penilai' => '1',
 										'data' => array(
-											array('nama' => 'Dokumen Perencanaan Kinerja telah diformalkan.', 'tipe' => '1', 'keterangan' => 'Renstra dan Renja', 'nomor_urut' => '1.00'),
-											array('nama' => 'Renstra telah dipublikasikan tepat waktu', 'tipe' => '1', 'keterangan' => 'Screenshoot Renstra 2024-2026 di website OPD, esr dan aplikasi SAKIP', 'nomor_urut' => '2.00'),
-											array('nama' => 'Renja telah dipublikasikan tepat waktu', 'tipe' => '1', 'keterangan' => 'Screenshoot Renja 2023 dan 2024 di website OPD, esr dan aplikasi SAKIP', 'nomor_urut' => '3.00'),
-											array('nama' => 'Perjanjian Kinerja telah dipublikasikan tepat waktu', 'tipe' => '1', 'keterangan' => 'Screenshoot PK 2023 dan 2024 di website OPD, esr dan aplikasi SAKIP', 'nomor_urut' => '4.00'),
-											array('nama' => 'Tujuan telah berorientasi hasil', 'tipe' => '2', 'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024', 'nomor_urut' => '5.00'),
-											array('nama' => 'Ukuran Keberhasilan (Indikator Kinerja) Tujuan telah memenuhi kriteria SMART.', 'tipe' => '2', 'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024', 'nomor_urut' => '6.00'),
-											array('nama' => 'Sasaran telah jelas berorientasi hasil', 'tipe' => '2', 'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024', 'nomor_urut' => '7.00'),
-											array('nama' => 'Ukuran Keberhasilan (Indikator Kinerja) Sasaran telah memenuhi kriteria SMART.', 'tipe' => '2', 'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024', 'nomor_urut' => '8.00'),
-											array('nama' => 'Indikator Kinerja Tujuan telah menggambarkan kondisi Tujuan yang harus dicapai, tertuang secara berkelanjutan (sustainable - tidak sering diganti dalam 1 periode Perencanaan Strategis).', 'tipe' => '2', 'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024', 'nomor_urut' => '9.00'),
-											array('nama' => 'Indikator Kinerja Sasaran telah menggambarkan kondisi Sasaran yang harus dicapai, tertuang secara berkelanjutan (sustainable - tidak sering diganti dalam 1 periode Perencanaan Strategis).', 'tipe' => '2', 'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024', 'nomor_urut' => '10.00'),
-											array('nama' => 'Target yang ditetapkan dalam Perencanaan Kinerja dapat dicapai (achievable) dan realistis.', 'tipe' => '2', 'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024', 'nomor_urut' => '11.00'),
-											array('nama' => 'Setiap Dokumen Perencanaan Kinerja (Renstra, Renja, PK) telah menggambarkan hubungan yang berkesinambungan, serta selaras antara Kondisi/Hasil yang akan dicapai di setiap level jabatan (Cascading Kinerja).', 'tipe' => '2', 'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024,  cascading dan pohon kinerja (di dokumen lainnya)', 'nomor_urut' => '12.00')
+											array(//0
+												'nama' => 'Dokumen Perencanaan Kinerja telah diformalkan.', 
+												'tipe' => '1', 
+												'keterangan' => 'Renstra dan Renja', 
+												'nomor_urut' => '1.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-0-1',
+														'pesan_kesalahan' => 'SALAH, Perencanaan kinerja tahunan tidak ada.'
+													)
+												)
+											),
+											array(//1
+												'nama' => 'Renstra telah dipublikasikan tepat waktu', 
+												'tipe' => '1', 
+												'keterangan' => 'Screenshoot Renstra 2024-2026 di website OPD, esr dan aplikasi SAKIP', 
+												'nomor_urut' => '2.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-0-3',
+														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
+													)
+												)
+											),
+											array(//2
+												'nama' => 'Renja telah dipublikasikan tepat waktu', 
+												'tipe' => '1', 
+												'keterangan' => 'Screenshoot Renja 2023 dan 2024 di website OPD, esr dan aplikasi SAKIP', 
+												'nomor_urut' => '3.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-0-3',
+														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
+													)
+												)
+											),
+											array(//3
+												'nama' => 'Perjanjian Kinerja telah dipublikasikan tepat waktu', 
+												'tipe' => '1', 
+												'keterangan' => 'Screenshoot PK 2023 dan 2024 di website OPD, esr dan aplikasi SAKIP', 
+												'nomor_urut' => '4.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-0-3',
+														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
+													)
+												)
+											),
+											array(//4
+												'nama' => 'Tujuan telah berorientasi hasil', 
+												'tipe' => '2', 
+												'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024', 
+												'nomor_urut' => '5.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'pesan_kesalahan' => 'SALAH dokumen RENSTRA tidak ada',
+														'id_komponen_pembanding' => '0-0-0'
+													)
+												)
+											),
+											array(//5
+												'nama' => 'Ukuran Keberhasilan (Indikator Kinerja) Tujuan telah memenuhi kriteria SMART.', 
+												'tipe' => '2', 
+												'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024', 
+												'nomor_urut' => '6.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-1-1',
+														'pesan_kesalahan' => 'SALAH, Dokumen Perencanaan belum diformalkan.'
+													),
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-1-4', 
+														'pesan_kesalahan' => 'SALAH, Tujuan tidak ada.'
+													)
+												)
+											),
+											array(//6
+												'nama' => 'Sasaran telah jelas berorientasi hasil', 
+												'tipe' => '2', 
+												'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024', 
+												'nomor_urut' => '7.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-1-1',
+														'pesan_kesalahan' => 'SALAH, Dokumen Perencanaan belum diformalkan.'
+													),
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-1-4', 'pesan_kesalahan' => 'SALAH, Tujuan tidak ada.'
+													)
+												)
+											),
+											array(//7
+												'nama' => 'Ukuran Keberhasilan (Indikator Kinerja) Sasaran telah memenuhi kriteria SMART.', 
+												'tipe' => '2', 
+												'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024', 
+												'nomor_urut' => '8.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-1-1',
+														'pesan_kesalahan' => 'SALAH, Dokumen Perencanaan belum diformalkan.'
+													),
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-1-4', 'pesan_kesalahan' => 'SALAH, Tujuan tidak ada.'
+													)
+												)
+											),
+											array(//8
+												'nama' => 'Indikator Kinerja Tujuan telah menggambarkan kondisi Tujuan yang harus dicapai, tertuang secara berkelanjutan (sustainable - tidak sering diganti dalam 1 periode Perencanaan Strategis).', 
+												'tipe' => '2', 
+												'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024', 
+												'nomor_urut' => '9.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-1-1',
+														'pesan_kesalahan' => 'SALAH, Dokumen Perencanaan belum diformalkan.'
+													),
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-1-7', 'pesan_kesalahan' => 'SALAH, Indikator Tujuan belum SMART.'
+													)
+												)
+											),
+											array(//9
+												'nama' => 'Indikator Kinerja Sasaran telah menggambarkan kondisi Sasaran yang harus dicapai, tertuang secara berkelanjutan (sustainable - tidak sering diganti dalam 1 periode Perencanaan Strategis).', 
+												'tipe' => '2', 
+												'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024', 
+												'nomor_urut' => '10.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-1-7', 'pesan_kesalahan' => 'SALAH, Indikator Tujuan belum SMART.'
+													),
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-1-1',
+														'pesan_kesalahan' => ' SALAH, Dokumen Perencanaan belum diformalkan.'
+													)
+												)
+											),
+											array(//10
+												'nama' => 'Target yang ditetapkan dalam Perencanaan Kinerja dapat dicapai (achievable) dan realistis.', 
+												'tipe' => '2', 
+												'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024', 
+												'nomor_urut' => '11.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-1-7', 
+														'pesan_kesalahan' => 'SALAH, Indikator Tujuan belum tepat'
+													)
+												)
+											),
+											array(//11
+												'nama' => 'Setiap Dokumen Perencanaan Kinerja (Renstra, Renja, PK) telah menggambarkan hubungan yang berkesinambungan, serta selaras antara Kondisi/Hasil yang akan dicapai di setiap level jabatan (Cascading Kinerja).', 
+												'tipe' => '2', 
+												'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024,  cascading dan pohon kinerja (di dokumen lainnya)', 
+												'nomor_urut' => '12.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'pesan_kesalahan' => 'SALAH dokumen RENSTRA tidak ada',
+														'id_komponen_pembanding' => '0-0-0'
+													),
+													array(
+														'jenis_kerangka_logis' => '1',
+														'id_komponen_pembanding' => '0-1',
+														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata2 kualitas tujuan/sasaran, indikator, dan target.'
+													)
+												)
+											)
 										)
 									),
-									array(
+									array(//2
 										'nama' => 'IMPLEMENTASI',
 										'bobot' => '15',
 										'nomor_urut' => '3.00',
 										'id_user_penilai' => '1',
 										'data' => array(
-											array('nama' => 'Dokumen Renstra digunakan sebagai acuan penyusunan Dokumen Rencana Kerja dan Anggaran', 'tipe' => '2', 'keterangan' => '- Renstra OPD (2024-2026), Renja 2023 dan 2024, Rencana Aksi 2023 dan 2024 - DPA 2024 dan DPPA 2023 (di dokumen lainnya)', 'nomor_urut' => '1.00'),
-											array('nama' => 'Target jangka menengah dalam Renstra telah dimonitor pencapaiannya sampai dengan tahun berjalan', 'tipe' => '2', 'keterangan' => 'Renstra OPD (2024-2026), Laporan Kinerja 2023', 'nomor_urut' => '2.00'),
-											array('nama' => 'Anggaran yang ditetapkan telah mengacu pada Kinerja yang ingin dicapai', 'tipe' => '2', 'keterangan' => '- Renstra OPD (2024-2026), Renja 2023 dan 2024, Rencana Aksi 2023 dan 2024 - DPA 2024 dan DPPA 2023 (di dokumen lainnya)', 'nomor_urut' => '3.00'),
-											array('nama' => 'Aktivitas yang dilaksanakan telah mendukung Kinerja', 'tipe' => '2', 'keterangan' => 'Rencana aksi 2023 dan 2024', 'nomor_urut' => '4.00'),
-											array('nama' => 'Target kinerja yang diperjanjikan pada Perjanjian Kinerja telah digunakan untuk mengukur keberhasilan', 'tipe' => '2', 'keterangan' => '- Perjanjian Kinerja 2023 dan 2024, SKP 2023 dan 2024 - SK dan bukti pemberian reward punishment (dokumen lainnya)', 'nomor_urut' => '5.00'),
-											array('nama' => 'Setiap pegawai memahami dan peduli serta berkomitmen dalam mencapai kinerja yang telah direncanakan dalam Sasaran Kinerja Pegawai (SKP)', 'tipe' => '2', 'keterangan' => 'SKP 2023 dan 2024, PK 2023 dan 2024', 'nomor_urut' => '6.00'),
-											array('nama' => 'Dokumen Renstra telah direviu secara berkala', 'tipe' => '2', 'keterangan' => 'Screenshoot aplikasi e-monev E-80 dan E-81 (dokumen lainnya)', 'nomor_urut' => '7.00')
+											array(//0
+												'nama' => 'Dokumen Renstra digunakan sebagai acuan penyusunan Dokumen Rencana Kerja dan Anggaran', 
+												'tipe' => '2', 
+												'keterangan' => '- Renstra OPD (2024-2026), Renja 2023 dan 2024, Rencana Aksi 2023 dan 2024 - DPA 2024 dan DPPA 2023 (di dokumen lainnya)', 
+												'nomor_urut' => '1.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-0-3',
+														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
+													),
+													array(
+														'jenis_kerangka_logis' => '1',
+														'id_komponen_pembanding' => '0-1',
+														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas RENSTRA.'
+													)
+												)
+											),
+											array(//1
+												'nama' => 'Target jangka menengah dalam Renstra telah dimonitor pencapaiannya sampai dengan tahun berjalan', 
+												'tipe' => '2', 
+												'keterangan' => 'Renstra OPD (2024-2026), Laporan Kinerja 2023', 
+												'nomor_urut' => '2.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-0-3',
+														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
+													),
+													array(
+														'jenis_kerangka_logis' => '1',
+														'id_komponen_pembanding' => '0-1',
+														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas RENSTRA.'
+													)
+												)
+											),
+											array(//2
+												'nama' => 'Anggaran yang ditetapkan telah mengacu pada Kinerja yang ingin dicapai', 
+												'tipe' => '2', 
+												'keterangan' => '- Renstra OPD (2024-2026), Renja 2023 dan 2024, Rencana Aksi 2023 dan 2024 - DPA 2024 dan DPPA 2023 (di dokumen lainnya)', 
+												'nomor_urut' => '3.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-0-3',
+														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
+													),
+													array(
+														'jenis_kerangka_logis' => '1',
+														'id_komponen_pembanding' => '0-1',
+														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas RENSTRA.'
+													)
+												)
+											),
+											array(//3
+												'nama' => 'Aktivitas yang dilaksanakan telah mendukung Kinerja', 
+												'tipe' => '2', 
+												'keterangan' => 'Rencana aksi 2023 dan 2024', 
+												'nomor_urut' => '4.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-0-3',
+														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
+													),
+													array(
+														'jenis_kerangka_logis' => '1',
+														'id_komponen_pembanding' => '0-1',
+														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas RENSTRA.'
+													)
+												)
+											),
+											array(//4
+												'nama' => 'Target kinerja yang diperjanjikan pada Perjanjian Kinerja telah digunakan untuk mengukur keberhasilan', 
+												'tipe' => '2', 
+												'keterangan' => '- Perjanjian Kinerja 2023 dan 2024, SKP 2023 dan 2024 - SK dan bukti pemberian reward punishment (dokumen lainnya)', 
+												'nomor_urut' => '5.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-0-3',
+														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
+													),
+													array(
+														'jenis_kerangka_logis' => '1',
+														'id_komponen_pembanding' => '0-1',
+														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas RENSTRA.'
+													)
+												)
+											),
+											array(//5
+												'nama' => 'Setiap pegawai memahami dan peduli serta berkomitmen dalam mencapai kinerja yang telah direncanakan dalam Sasaran Kinerja Pegawai (SKP)', 
+												'tipe' => '2', 
+												'keterangan' => 'SKP 2023 dan 2024, PK 2023 dan 2024', 
+												'nomor_urut' => '6.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-0-3',
+														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
+													),
+													array(
+														'jenis_kerangka_logis' => '1',
+														'id_komponen_pembanding' => '0-1',
+														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas RENSTRA.'
+													)
+												)
+											),
+											array(//6
+												'nama' => 'Dokumen Renstra telah direviu secara berkala', 
+												'tipe' => '2', 
+												'keterangan' => 'Screenshoot aplikasi e-monev E-80 dan E-81 (dokumen lainnya)', 
+												'nomor_urut' => '7.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '0-0-3',
+														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
+													),
+													array(
+														'jenis_kerangka_logis' => '1',
+														'id_komponen_pembanding' => '0-1',
+														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas RENSTRA.'
+													)
+												)
+											)
 										)
 									)
 								),
 							),
-							array(
+							array(//3
 								'id_jadwal' => $id_jadwal_baru,
+								
 								'nama' => 'PENGUKURAN KINERJA',
 								'bobot' => '30',
 								'nomor_urut' => '2.00',
 								'id_user_penilai' => '2',
 								'data' => array(
-									array(
+									array(//0
 										'nama' => 'PELAKSANAAN PENGUKURAN KINERJA',
 										'bobot' => '6',
 										'nomor_urut' => '1.00',
 										'id_user_penilai' => '2',
 										'data' => array(
-											array('nama' => 'Telah terdapat indikator kinerja utama (IKU) sebagai ukuran kinerja secara formal', 'tipe' => '1', 'keterangan' => 'Dokumen IKU 2024-2026', 'nomor_urut' => '1.00'),
-											array('nama' => 'Terdapat Definisi Operasional yang jelas atas kinerja dan cara mengukur indikator kinerja.', 'tipe' => '2', 'keterangan' => 'Dokumen IKU 2024-2026', 'nomor_urut' => '2.00'),
-											array('nama' => 'Terdapat mekanisme yang jelas terhadap pengumpulan data kinerja yang dapat diandalkan.', 'tipe' => '2', 'keterangan' => 'SOP pengumpulan data kinerja (di dokumen lainnya)', 'nomor_urut' => '3.00'),
+											array(//0
+												'nama' => 'Telah terdapat indikator kinerja utama (IKU) sebagai ukuran kinerja secara formal', 
+												'tipe' => '1', 
+												'keterangan' => 'Dokumen IKU 2024-2026', 
+												'nomor_urut' => '1.00'
+											),
+											array(//1
+												'nama' => 'Terdapat Definisi Operasional yang jelas atas kinerja dan cara mengukur indikator kinerja.', 
+												'tipe' => '2', 
+												'keterangan' => 'Dokumen IKU 2024-2026', 
+												'nomor_urut' => '2.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '3-0-0', 
+														'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
+													)
+												)
+											),
+											array(//2
+												'nama' => 'Terdapat mekanisme yang jelas terhadap pengumpulan data kinerja yang dapat diandalkan.', 
+												'tipe' => '2',
+												'keterangan' => 'SOP pengumpulan data kinerja (di dokumen lainnya)', 
+												'nomor_urut' => '3.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '3-0-0', 
+														'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
+													),
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '3-0-1', 
+														'pesan_kesalahan' => 'SALAH, Nilai lebih tinggi dari nilai Definisi Operasional yang jelas atas kinerja.'
+													)
+												)
+											),
 										)
 									),
 									array(
@@ -6917,13 +7308,106 @@ class Wp_Eval_Sakip_Public
 										'nomor_urut' => '2.00',
 										'id_user_penilai' => '2',
 										'data' => array(
-											array('nama' => 'Pimpinan selalu terlibat sebagai pengambil keputusan (Decision Maker) dalam mengukur capaian kinerja.', 'tipe' => '2', 'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024', 'nomor_urut' => '1.00'),
-											array('nama' => 'Data kinerja yang dikumpulkan telah relevan untuk mengukur capaian kinerja yang diharapkan.', 'tipe' => '2', 'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024,  Laporan Kinerja 2023', 'nomor_urut' => '2.00'),
-											array('nama' => 'Data kinerja yang dikumpulkan telah mendukung capaian kinerja yang diharapkan.', 'tipe' => '2', 'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024,  Laporan Kinerja 2023', 'nomor_urut' => '3.00'),
-											array('nama' => 'Pengumpulan data kinerja atas Rencana Aksi dilakukan secara berkala (bulanan/triwulanan/semester)', 'tipe' => '1', 'keterangan' => 'Pengukuran rencana aksi Tahun 2023 dan 2024', 'nomor_urut' => '4.00'),
-											array('nama' => 'Pengukuran kinerja sudah dilakukan secara berjenjang', 'tipe' => '2', 'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024', 'nomor_urut' => '5.00'),
-											array('nama' => 'Pengumpulan data kinerja telah memanfaatkan Teknologi Informasi (Aplikasi).', 'tipe' => '1', 'keterangan' => 'Screenshoot aplikasi EP3, E-monev (dokumen lainnya)', 'nomor_urut' => '6.00'),
-											array('nama' => 'Pengukuran capaian kinerja telah memanfaatkan Teknologi Informasi (Aplikasi).', 'tipe' => '1', 'keterangan' => 'Screenshoot aplikasi EP3, E-monev (dokumen lainnya)', 'nomor_urut' => '7.00'),
+											array(
+												'nama' => 'Pimpinan selalu terlibat sebagai pengambil keputusan (Decision Maker) dalam mengukur capaian kinerja.', 
+												'tipe' => '2', 
+												'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024', 
+												'nomor_urut' => '1.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '3-0-0', 
+														'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
+													)
+													
+												)
+											),
+											array(
+												'nama' => 'Data kinerja yang dikumpulkan telah relevan untuk mengukur capaian kinerja yang diharapkan.', 
+												'tipe' => '2', 
+												'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024,  Laporan Kinerja 2023', 
+												'nomor_urut' => '2.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '3-0-0', 
+														'pesan_kesalahan' => 'SALAH, nilai lebih tinggi dari IKU sebagai ukuran kinerja.'
+													)
+												)
+											),
+											array(
+												'nama' => 'Data kinerja yang dikumpulkan telah mendukung capaian kinerja yang diharapkan.', 
+												'tipe' => '2', 
+												'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024,  Laporan Kinerja 2023', 
+												'nomor_urut' => '3.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '3-0-0', 
+														'pesan_kesalahan' => 'SALAH, nilai lebih tinggi dari IKU sebagai ukuran kinerja.'
+													)
+												)
+											),
+											array(
+												'nama' => 'Pengumpulan data kinerja atas Rencana Aksi dilakukan secara berkala (bulanan/triwulanan/semester)', 
+												'tipe' => '1', 
+												'keterangan' => 'Pengukuran rencana aksi Tahun 2023 dan 2024', 
+												'nomor_urut' => '4.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '3-0-0', 
+														'pesan_kesalahan' => 'SALAH, nilai lebih tinggi dari IKU sebagai ukuran kinerja.'
+													)
+												)
+											),
+											array(
+												'nama' => 'Pengukuran kinerja sudah dilakukan secara berjenjang', 
+												'tipe' => '2', 
+												'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024', 
+												'nomor_urut' => '5.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '3-0-0', 
+														'pesan_kesalahan' => 'SALAH, nilai lebih tinggi dari IKU sebagai ukuran kinerja.'
+													)
+												)
+											),
+											array(
+												'nama' => 'Pengumpulan data kinerja telah memanfaatkan Teknologi Informasi (Aplikasi).', 
+												'tipe' => '1', 
+												'keterangan' => 'Screenshoot aplikasi EP3, E-monev (dokumen lainnya)', 
+												'nomor_urut' => '6.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '1',
+														'id_komponen_pembanding' => '3-0',
+														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Pelaksanaan Pengukuran Kinerja'
+													),
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '3-0-0', 'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
+													)
+												)
+											),
+											array(
+												'nama' => 'Pengukuran capaian kinerja telah memanfaatkan Teknologi Informasi (Aplikasi).', 
+												'tipe' => '1', 
+												'keterangan' => 'Screenshoot aplikasi EP3, E-monev (dokumen lainnya)', 
+												'nomor_urut' => '7.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '1',
+														'id_komponen_pembanding' => '3-0',
+														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Pelaksanaan Pengukuran Kinerja'
+													),
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '3-0-0', 'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
+													),
+												)
+											),
 										)
 									),
 									array(
@@ -6932,21 +7416,166 @@ class Wp_Eval_Sakip_Public
 										'nomor_urut' => '3.00',
 										'id_user_penilai' => '2',
 										'data' => array(
-											array('nama' => 'Pengukuran Kinerja telah menjadi dasar dalam penyesuaian (pemberian/pengurangan) tunjangan kinerja/penghasilan.', 'tipe' => '2', 'keterangan' => '- Pengukuran Kinerja 2023 dan 2024,  - Screenshoot EP3 (dokumen lainnya)', 'nomor_urut' => '1.00'),
-											array('nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian (Refocusing) Organisasi.', 'tipe' => '2', 'keterangan' => '- Pengukuran Kinerja 2023 dan 2024 - Screenshoot EP3 (dokumen lainnya)', 'nomor_urut' => '2.00'),
-											array('nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian Strategi dalam mencapai kinerja.', 'tipe' => '2', 'keterangan' => 'Dokumen Pengukuran Kinerja 2023 dan 2024;  Evaluasi Internal 2023 dan 2024; Rencana Aksi 2024', 'nomor_urut' => '3.00'),
-											array('nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian Kebijakan dalam mencapai kinerja.', 'tipe' => '2', 'keterangan' => 'Dokumen Pengukuran Kinerja 2023 dan 2024;  Evaluasi Internal 2023 dan 2024; Rencana Aksi 2024', 'nomor_urut' => '4.00'),
-											array('nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian Aktivitas dalam mencapai kinerja.', 'tipe' => '2', 'keterangan' => 'Dokumen Pengukuran Kinerja 2023 dan 2024;  Evaluasi Internal 2023 dan 2024; Rencana Aksi 2024', 'nomor_urut' => '5.00'),
-											array('nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian Anggaran dalam mencapai kinerja.', 'tipe' => '2', 'keterangan' => 'Dokumen Pengukuran Kinerja 2023 dan 2024;  Evaluasi Internal 2023 dan 2024; DPA 2024 dan DPPA 2023', 'nomor_urut' => '6.00'),
-											array('nama' => 'Terdapat efisiensi atas penggunaan anggaran dalam mencapai kinerja.', 'tipe' => '2', 'keterangan' => '- Laporan Kinerja 2023;  - DPPA 2023 (di dokumen lainnya)', 'nomor_urut' => '7.00'),
-											array('nama' => 'Setiap unit/satuan kerja memahami dan peduli atas hasil pengukuran kinerja.', 'tipe' => '2', 'keterangan' => NULL, 'nomor_urut' => '8.00'),
-											array('nama' => 'Setiap pegawai memahami dan peduli atas hasil pengukuran kinerja.', 'tipe' => '2', 'keterangan' => NULL, 'nomor_urut' => '9.00'),
+											array(
+												'nama' => 'Pengukuran Kinerja telah menjadi dasar dalam penyesuaian (pemberian/pengurangan) tunjangan kinerja/penghasilan.', 
+												'tipe' => '2', 
+												'keterangan' => '- Pengukuran Kinerja 2023 dan 2024,  - Screenshoot EP3 (dokumen lainnya)', 
+												'nomor_urut' => '1.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '3-0-0', 'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
+													),
+													array(
+														'jenis_kerangka_logis' => '1',
+														'id_komponen_pembanding' => '3-4',
+														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
+													)
+												)
+											),
+											array(
+												'nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian (Refocusing) Organisasi.', 
+												'tipe' => '2', 
+												'keterangan' => '- Pengukuran Kinerja 2023 dan 2024 - Screenshoot EP3 (dokumen lainnya)', 
+												'nomor_urut' => '2.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '3-0-0', 'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
+													),
+													array(
+														'jenis_kerangka_logis' => '1',
+														'id_komponen_pembanding' => '3-4',
+														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
+													)
+												)
+											),
+											array(
+												'nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian Strategi dalam mencapai kinerja.', 
+												'tipe' => '2', 
+												'keterangan' => 'Dokumen Pengukuran Kinerja 2023 dan 2024;  Evaluasi Internal 2023 dan 2024; Rencana Aksi 2024', 
+												'nomor_urut' => '3.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '3-0-0', 'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
+													),
+													array(
+														'jenis_kerangka_logis' => '1',
+														'id_komponen_pembanding' => '3-4',
+														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
+													)
+												)
+											),
+											array(
+												'nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian Kebijakan dalam mencapai kinerja.', 
+												'tipe' => '2', 
+												'keterangan' => 'Dokumen Pengukuran Kinerja 2023 dan 2024;  Evaluasi Internal 2023 dan 2024; Rencana Aksi 2024', 
+												'nomor_urut' => '4.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '3-0-0', 'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
+													),
+													array(
+														'jenis_kerangka_logis' => '1',
+														'id_komponen_pembanding' => '3-4',
+														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
+													)
+												)
+											),
+											array(
+												'nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian Aktivitas dalam mencapai kinerja.', 
+												'tipe' => '2', 
+												'keterangan' => 'Dokumen Pengukuran Kinerja 2023 dan 2024;  Evaluasi Internal 2023 dan 2024; Rencana Aksi 2024', 
+												'nomor_urut' => '5.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '3-0-0', 'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
+													),
+													array(
+														'jenis_kerangka_logis' => '1',
+														'id_komponen_pembanding' => '3-4',
+														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
+													)
+												)
+											),
+											array(
+												'nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian Anggaran dalam mencapai kinerja.', 
+												'tipe' => '2', 
+												'keterangan' => 'Dokumen Pengukuran Kinerja 2023 dan 2024;  Evaluasi Internal 2023 dan 2024; DPA 2024 dan DPPA 2023', 
+												'nomor_urut' => '6.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '3-0-0', 'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
+													),
+													array(
+														'jenis_kerangka_logis' => '1',
+														'id_komponen_pembanding' => '3-4',
+														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
+													)
+												)
+											),
+											array(
+												'nama' => 'Terdapat efisiensi atas penggunaan anggaran dalam mencapai kinerja.', 
+												'tipe' => '2', 
+												'keterangan' => '- Laporan Kinerja 2023;  - DPPA 2023 (di dokumen lainnya)', 
+												'nomor_urut' => '7.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '3-0-0', 'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
+													),
+													array(
+														'jenis_kerangka_logis' => '1',
+														'id_komponen_pembanding' => '3-4',
+														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
+													)
+												)
+											),
+											array(
+												'nama' => 'Setiap unit/satuan kerja memahami dan peduli atas hasil pengukuran kinerja.', 
+												'tipe' => '2', 
+												'keterangan' => NULL, 
+												'nomor_urut' => '8.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '3-0-0', 'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
+													),
+													array(
+														'jenis_kerangka_logis' => '1',
+														'id_komponen_pembanding' => '3-4',
+														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
+													)
+												)
+											),
+											array(
+												'nama' => 'Setiap pegawai memahami dan peduli atas hasil pengukuran kinerja.', 
+												'tipe' => '2', 
+												'keterangan' => NULL, 
+												'nomor_urut' => '9.00',
+												'data' => array(
+													array(
+														'jenis_kerangka_logis' => '2',
+														'id_komponen_pembanding' => '3-0-0', 'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
+													),
+													array(
+														'jenis_kerangka_logis' => '1',
+														'id_komponen_pembanding' => '3-4',
+														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
+													)
+												)
+											),
 										)
 									)
 								)
 							),
 							array(
 								'id_jadwal' => $id_jadwal_baru,
+								
 								'nama' => 'PELAPORAN KINERJA',
 								'bobot' => '15',
 								'nomor_urut' => '3.00',
@@ -6958,12 +7587,42 @@ class Wp_Eval_Sakip_Public
 										'nomor_urut' => '1.00',
 										'id_user_penilai' => '3',
 										'data' => array(
-											array('nama' => 'Dokumen Laporan Kinerja telah disusun.', 'tipe' => '1', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '1.00'),
-											array('nama' => 'Dokumen Laporan Kinerja telah disusun secara berkala.', 'tipe' => '1', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '2.00'),
-											array('nama' => 'Dokumen Laporan Kinerja telah diformalkan.', 'tipe' => '1', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '3.00'),
-											array('nama' => 'Dokumen Laporan Kinerja telah direviu.', 'tipe' => '1', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '4.00'),
-											array('nama' => 'Dokumen Laporan Kinerja telah dipublikasikan.', 'tipe' => '1', 'keterangan' => 'Screenshoot Laporan Kinerja 2023 pada website, esr, aplikasi sakip kab madiun (dokumen lainnya)', 'nomor_urut' => '5.00'),
-											array('nama' => 'Dokumen Laporan Kinerja telah disampaikan tepat waktu.', 'tipe' => '1', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '6.00'),
+											array(
+												'nama' => 'Dokumen Laporan Kinerja telah disusun.', 
+												'tipe' => '1', 
+												'keterangan' => 'Laporan Kinerja 2023', 
+												'nomor_urut' => '1.00'
+											),
+											array(
+												'nama' => 'Dokumen Laporan Kinerja telah disusun secara berkala.', 
+												'tipe' => '1', 
+												'keterangan' => 'Laporan Kinerja 2023', 
+												'nomor_urut' => '2.00'
+											),
+											array(
+												'nama' => 'Dokumen Laporan Kinerja telah diformalkan.', 
+												'tipe' => '1', 
+												'keterangan' => 'Laporan Kinerja 2023', 
+												'nomor_urut' => '3.00'
+											),
+											array(
+												'nama' => 'Dokumen Laporan Kinerja telah direviu.', 
+												'tipe' => '1', 
+												'keterangan' => 'Laporan Kinerja 2023', 
+												'nomor_urut' => '4.00'
+											),
+											array(
+												'nama' => 'Dokumen Laporan Kinerja telah dipublikasikan.', 
+												'tipe' => '1', 
+												'keterangan' => 'Screenshoot Laporan Kinerja 2023 pada website, esr, aplikasi sakip kab madiun (dokumen lainnya)', 
+												'nomor_urut' => '5.00'
+											),
+											array(
+												'nama' => 'Dokumen Laporan Kinerja telah disampaikan tepat waktu.', 
+												'tipe' => '1', 
+												'keterangan' => 'Laporan Kinerja 2023', 
+												'nomor_urut' => '6.00'
+											),
 										)
 
 									),
@@ -6973,15 +7632,60 @@ class Wp_Eval_Sakip_Public
 										'nomor_urut' => '2.00',
 										'id_user_penilai' => '3',
 										'data' => array(
-											array('nama' => 'Dokumen Laporan Kinerja disusun secara berkualitas sesuai dengan standar.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '1.00'),
-											array('nama' => 'Dokumen Laporan Kinerja telah mengungkap seluruh informasi tentang pencapaian kinerja.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '2.00'),
-											array('nama' => 'Dokumen Laporan Kinerja telah menginfokan perbandingan realisasi kinerja dengan target tahunan.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '3.00'),
-											array('nama' => 'Dokumen Laporan Kinerja telah menginfokan perbandingan realisasi kinerja dengan target jangka menengah.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '4.00'),
-											array('nama' => 'Dokumen Laporan Kinerja telah menginfokan perbandingan realisasi kinerja dengan realisasi kinerja tahun-tahun sebelumnya.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '5.00'),
-											array('nama' => 'Dokumen Laporan Kinerja telah menyajikan informasi keuangan yang terkait dengan pencapaian sasaran kinerja instansi.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '6.00'),
-											array('nama' => 'Dokumen Laporan Kinerja telah menginfokan kualitas atas capaian kinerja beserta upaya nyata dan/atau hambatannya.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '7.00'),
-											array('nama' => 'Dokumen Laporan Kinerja telah menginfokan efisiensi atas penggunaan sumber daya dalam mencapai kinerja.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '8.00'),
-											array('nama' => 'Dokumen Laporan Kinerja telah menginfokan upaya perbaikan dan penyempurnaan kinerja ke depan (Rekomendasi perbaikan kinerja).', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '9.00'),
+											array(
+												'nama' => 'Dokumen Laporan Kinerja disusun secara berkualitas sesuai dengan standar.', 
+												'tipe' => '2', 
+												'keterangan' => 'Laporan Kinerja 2023', 
+												'nomor_urut' => '1.00'
+											),
+											array(
+												'nama' => 'Dokumen Laporan Kinerja telah mengungkap seluruh informasi tentang pencapaian kinerja.', 
+												'tipe' => '2', 
+												'keterangan' => 'Laporan Kinerja 2023', 
+												'nomor_urut' => '2.00'
+											),
+											array(
+												'nama' => 'Dokumen Laporan Kinerja telah menginfokan perbandingan realisasi kinerja dengan target tahunan.', 
+												'tipe' => '2', 
+												'keterangan' => 'Laporan Kinerja 2023', 
+												'nomor_urut' => '3.00'
+											),
+											array(
+												'nama' => 'Dokumen Laporan Kinerja telah menginfokan perbandingan realisasi kinerja dengan target jangka menengah.', 
+												'tipe' => '2', 
+												'keterangan' => 'Laporan Kinerja 2023', 
+												'nomor_urut' => '4.00'
+											),
+											array(
+												'nama' => 'Dokumen Laporan Kinerja telah menginfokan perbandingan realisasi kinerja dengan realisasi kinerja tahun-tahun sebelumnya.', 
+												'tipe' => '2', 
+												'keterangan' => 'Laporan Kinerja 2023', 
+												'nomor_urut' => '5.00'
+											),
+											array(
+												'nama' => 'Dokumen Laporan Kinerja telah menyajikan informasi keuangan yang terkait dengan pencapaian sasaran kinerja instansi.', 
+												'tipe' => '2', 
+												'keterangan' => 'Laporan Kinerja 2023', 
+												'nomor_urut' => '6.00'
+											),
+											array(
+												'nama' => 'Dokumen Laporan Kinerja telah menginfokan kualitas atas capaian kinerja beserta upaya nyata dan/atau hambatannya.', 
+												'tipe' => '2', 
+												'keterangan' => 'Laporan Kinerja 2023', 
+												'nomor_urut' => '7.00'
+											),
+											array(
+												'nama' => 'Dokumen Laporan Kinerja telah menginfokan efisiensi atas penggunaan sumber daya dalam mencapai kinerja.', 
+												'tipe' => '2', 
+												'keterangan' => 'Laporan Kinerja 2023', 
+												'nomor_urut' => '8.00'
+											),
+											array(
+												'nama' => 'Dokumen Laporan Kinerja telah menginfokan upaya perbaikan dan penyempurnaan kinerja ke depan (Rekomendasi perbaikan kinerja).', 
+												'tipe' => '2', 
+												'keterangan' => 'Laporan Kinerja 2023', 
+												'nomor_urut' => '9.00'
+											),
 										)
 
 									),
@@ -6991,13 +7695,48 @@ class Wp_Eval_Sakip_Public
 										'nomor_urut' => '3.00',
 										'id_user_penilai' => '3',
 										'data' => array(
-											array('nama' => 'Informasi dalam laporan kinerja selalu menjadi perhatian utama pimpinan (Bertanggung Jawab).', 'tipe' => '1', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '1.00'),
-											array('nama' => 'Penyajian informasi dalam laporan kinerja menjadi kepedulian seluruh pegawai.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '2.00'),
-											array('nama' => 'Informasi dalam laporan kinerja berkala telah digunakan dalam penyesuaian aktivitas untuk mencapai kinerja.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023', 'nomor_urut' => '3.00'),
-											array('nama' => 'Informasi dalam laporan kinerja berkala telah digunakan dalam penyesuaian penggunaan anggaran untuk mencapai kinerja.', 'tipe' => '2', 'keterangan' => '- Laporan Kinerja 2023,  - DPA 2024 (dokumen lainnya)', 'nomor_urut' => '4.00'),
-											array('nama' => 'Informasi dalam laporan kinerja telah digunakan dalam evaluasi pencapaian keberhasilan kinerja.', 'tipe' => '2', 'keterangan' => 'Laporan Kinerja 2023, Evaluasi Internal 2023', 'nomor_urut' => '5.00'),
-											array('nama' => 'Informasi dalam laporan kinerja telah digunakan dalam penyesuaian perencanaan kinerja yang akan dihadapi berikutnya.', 'tipe' => '2', 'keterangan' => '- Laporan Kinerja 2023, rencana aksi 2024,  - DPA 2024 (dokumen lainnya)', 'nomor_urut' => '6.00'),
-											array('nama' => 'Informasi dalam laporan kinerja selalu mempengaruhi perubahan budaya kinerja organisasi.', 'tipe' => '2', 'keterangan' => '- Laporan Kinerja 2023, rencana aksi 2024, evaluasi internal 2024 dan 2023 - DPA 2024 (dokumen lainnya)', 'nomor_urut' => '7.00'),
+											array(
+												'nama' => 'Informasi dalam laporan kinerja selalu menjadi perhatian utama pimpinan (Bertanggung Jawab).', 
+												'tipe' => '1', 
+												'keterangan' => 'Laporan Kinerja 2023', 
+												'nomor_urut' => '1.00'
+											),
+											array(
+												'nama' => 'Penyajian informasi dalam laporan kinerja menjadi kepedulian seluruh pegawai.', 
+												'tipe' => '2', 
+												'keterangan' => 'Laporan Kinerja 2023', 
+												'nomor_urut' => '2.00'
+											),
+											array(
+												'nama' => 'Informasi dalam laporan kinerja berkala telah digunakan dalam penyesuaian aktivitas untuk mencapai kinerja.', 
+												'tipe' => '2', 
+												'keterangan' => 'Laporan Kinerja 2023', 
+												'nomor_urut' => '3.00'
+											),
+											array(
+												'nama' => 'Informasi dalam laporan kinerja berkala telah digunakan dalam penyesuaian penggunaan anggaran untuk mencapai kinerja.', 
+												'tipe' => '2', 
+												'keterangan' => '- Laporan Kinerja 2023,  - DPA 2024 (dokumen lainnya)', 
+												'nomor_urut' => '4.00'
+											),
+											array(
+												'nama' => 'Informasi dalam laporan kinerja telah digunakan dalam evaluasi pencapaian keberhasilan kinerja.', 
+												'tipe' => '2', 
+												'keterangan' => 'Laporan Kinerja 2023, Evaluasi Internal 2023', 
+												'nomor_urut' => '5.00'
+											),
+											array(
+												'nama' => 'Informasi dalam laporan kinerja telah digunakan dalam penyesuaian perencanaan kinerja yang akan dihadapi berikutnya.', 
+												'tipe' => '2', 
+												'keterangan' => '- Laporan Kinerja 2023, rencana aksi 2024,  - DPA 2024 (dokumen lainnya)', 
+												'nomor_urut' => '6.00'
+											),
+											array(
+												'nama' => 'Informasi dalam laporan kinerja selalu mempengaruhi perubahan budaya kinerja organisasi.', 
+												'tipe' => '2', 
+												'keterangan' => '- Laporan Kinerja 2023, rencana aksi 2024, evaluasi internal 2024 dan 2023 - DPA 2024 (dokumen lainnya)', 
+												'nomor_urut' => '7.00'
+											),
 										)
 
 									),
@@ -7005,6 +7744,7 @@ class Wp_Eval_Sakip_Public
 							),
 							array(
 								'id_jadwal' => $id_jadwal_baru,
+								
 								'nama' => 'EVALUASI AKUNTABILITAS KINERJA INTERNAL',
 								'bobot' => '25',
 								'nomor_urut' => '4.00',
@@ -7016,7 +7756,12 @@ class Wp_Eval_Sakip_Public
 										'nomor_urut' => '1.00',
 										'id_user_penilai' => '1',
 										'data' => array(
-											array('nama' => 'Telah dilaksanakan Evaluasi Akuntabilitas Kinerja secara berkala.', 'tipe' => '1', 'keterangan' => 'Evaluasi Internal 2023 dan 2024', 'nomor_urut' => '1.00'),
+											array(
+												'nama' => 'Telah dilaksanakan Evaluasi Akuntabilitas Kinerja secara berkala.', 
+												'tipe' => '1', 
+												'keterangan' => 'Evaluasi Internal 2023 dan 2024', 
+												'nomor_urut' => '1.00'
+											),
 										)
 									),
 									array(
@@ -7025,10 +7770,30 @@ class Wp_Eval_Sakip_Public
 										'nomor_urut' => '2.00',
 										'id_user_penilai' => '1',
 										'data' => array(
-											array('nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan secara berjenjang.', 'tipe' => '2', 'keterangan' => 'Evaluasi Internal 2023 dan 2024', 'nomor_urut' => '1.00'),
-											array('nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan dengan pendalaman yang memadai.', 'tipe' => '2', 'keterangan' => 'Evaluasi Internal 2023 dan 2024', 'nomor_urut' => '2.00'),
-											array('nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan pada seluruh bidang di OPD.', 'tipe' => '2', 'keterangan' => 'Evaluasi Internal 2023 dan 2024', 'nomor_urut' => '3.00'),
-											array('nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan menggunakan Teknologi Informasi (Aplikasi).', 'tipe' => '2', 'keterangan' => 'Evaluasi Internal 2023 dan 2024', 'nomor_urut' => '4.00'),
+											array(
+												'nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan secara berjenjang.', 
+												'tipe' => '2', 
+												'keterangan' => 'Evaluasi Internal 2023 dan 2024', 
+												'nomor_urut' => '1.00'
+											),
+											array(
+												'nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan dengan pendalaman yang memadai.', 
+												'tipe' => '2', 
+												'keterangan' => 'Evaluasi Internal 2023 dan 2024', 
+												'nomor_urut' => '2.00'
+											),
+											array(
+												'nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan pada seluruh bidang di OPD.', 
+												'tipe' => '2', 
+												'keterangan' => 'Evaluasi Internal 2023 dan 2024', 
+												'nomor_urut' => '3.00'
+											),
+											array(
+												'nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan menggunakan Teknologi Informasi (Aplikasi).', 
+												'tipe' => '2', 
+												'keterangan' => 'Evaluasi Internal 2023 dan 2024', 
+												'nomor_urut' => '4.00'
+											),
 										)
 									),
 									array(
@@ -7037,18 +7802,43 @@ class Wp_Eval_Sakip_Public
 										'nomor_urut' => '3.00',
 										'id_user_penilai' => '1',
 										'data' => array(
-											array('nama' => 'Seluruh rekomendasi atas hasil evaluasi akuntabilitas kinerja (internal dan LHE SAKIP OPD) telah ditindaklanjuti.', 'tipe' => '2', 'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023', 'nomor_urut' => '1.00'),
-											array('nama' => 'Telah terjadi peningkatan implementasi SAKIP  (internal dan LHE SAKIP OPD) dengan melaksanakan tindak lanjut atas rekomendasi hasil evaluasi akuntabilitas kinerja.', 'tipe' => '2', 'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024', 'nomor_urut' => '2.00'),
-											array('nama' => 'Hasil Evaluasi Akuntabilitas Kinerja  (internal dan LHE SAKIP OPD) telah dimanfaatkan untuk perbaikan dan peningkatan akuntabilitas kinerja.', 'tipe' => '2', 'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024', 'nomor_urut' => '3.00'),
-											array('nama' => 'Hasil dari Evaluasi Akuntabilitas Kinerja  (internal dan LHE SAKIP OPD)telah dimanfaatkan dalam mendukung efektivitas dan efisiensi kinerja.', 'tipe' => '2', 'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024, DPA 2024', 'nomor_urut' => '4.00'),
-											array('nama' => 'Telah terjadi perbaikan dan peningkatan kinerja dengan memanfaatkan hasil evaluasi akuntabilitas kinerja  (internal dan LHE SAKIP OPD).', 'tipe' => '2', 'keterangan' => '- Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024, DPA 2024 - Dokumen lainnya (Inovasi, Prestasi)', 'nomor_urut' => '5.00')
+											array(
+												'nama' => 'Seluruh rekomendasi atas hasil evaluasi akuntabilitas kinerja (internal dan LHE SAKIP OPD) telah ditindaklanjuti.', 
+												'tipe' => '2', 
+												'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023', 
+												'nomor_urut' => '1.00'
+											),
+											array(
+												'nama' => 'Telah terjadi peningkatan implementasi SAKIP  (internal dan LHE SAKIP OPD) dengan melaksanakan tindak lanjut atas rekomendasi hasil evaluasi akuntabilitas kinerja.', 
+												'tipe' => '2', 
+												'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024', 
+												'nomor_urut' => '2.00'
+											),
+											array(
+												'nama' => 'Hasil Evaluasi Akuntabilitas Kinerja  (internal dan LHE SAKIP OPD) telah dimanfaatkan untuk perbaikan dan peningkatan akuntabilitas kinerja.', 
+												'tipe' => '2', 
+												'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024', 
+												'nomor_urut' => '3.00'
+											),
+											array(
+												'nama' => 'Hasil dari Evaluasi Akuntabilitas Kinerja  (internal dan LHE SAKIP OPD)telah dimanfaatkan dalam mendukung efektivitas dan efisiensi kinerja.', 
+												'tipe' => '2', 
+												'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024, DPA 2024', 
+												'nomor_urut' => '4.00'
+											),
+											array(
+												'nama' => 'Telah terjadi perbaikan dan peningkatan kinerja dengan memanfaatkan hasil evaluasi akuntabilitas kinerja  (internal dan LHE SAKIP OPD).', 
+												'tipe' => '2', 
+												'keterangan' => '- Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024, DPA 2024 - Dokumen lainnya (Inovasi, Prestasi)', 
+												'nomor_urut' => '5.00'
+												)
 										)
 									)
 								)
 							)
 						);
 
-						foreach ($design as $komponen) {
+						foreach ($design as $k => $komponen) {
 							$komponen_baru = array(
 								'id_jadwal' => $id_jadwal_baru,
 								'nomor_urut' => $komponen['nomor_urut'],
@@ -7056,10 +7846,10 @@ class Wp_Eval_Sakip_Public
 								'nama' => $komponen['nama'],
 								'bobot' => $komponen['bobot'],
 							);
-							$wpdb->insert('esakip_komponen', $komponen_baru);
+							$design[$k]['id'] = $wpdb->insert('esakip_komponen', $komponen_baru);
 							$id_komponen_baru = $wpdb->insert_id;
 
-							foreach ($komponen['data'] as $subkomponen) {
+							foreach ($komponen['data'] as $kk => $subkomponen) {
 								$subkomponen_baru = array(
 									'id_komponen' => $id_komponen_baru,
 									'nomor_urut' => $subkomponen['nomor_urut'],
@@ -7067,10 +7857,10 @@ class Wp_Eval_Sakip_Public
 									'nama' => $subkomponen['nama'],
 									'bobot' => $subkomponen['bobot'],
 								);
-								$wpdb->insert('esakip_subkomponen', $subkomponen_baru);
+								$design[$k]['data'][$kk]['id'] = $wpdb->insert('esakip_subkomponen', $subkomponen_baru);
 								$id_subkomponen_baru = $wpdb->insert_id;
 
-								foreach ($subkomponen['data'] as $penilaian) {
+								foreach ($subkomponen['data'] as $kkk => $penilaian) {
 									$komponen_penilaian_baru = array(
 										'id_subkomponen' => $id_subkomponen_baru,
 										'nomor_urut' => $penilaian['nomor_urut'],
@@ -7078,7 +7868,21 @@ class Wp_Eval_Sakip_Public
 										'tipe' => $penilaian['tipe'],
 										'keterangan' => $penilaian['keterangan'],
 									);
-									$wpdb->insert('esakip_komponen_penilaian', $komponen_penilaian_baru);
+									$design[$k]['data'][$kk]['data'][$kkk]['id'] = $wpdb->insert('esakip_komponen_penilaian', $komponen_penilaian_baru);
+
+									// simpan kerangka logis
+									foreach ($penilaian['data'] as $kerangka_logis){
+										$id_pembanding = explode('-', $kerangka_logis['id_komponen_pembanding']);
+										if($kerangka_logis['jenis_kerangka_logis'] == 1){
+											$id_pembanding = $design[$id_pembanding[0]]['data'][$id_pembanding[1]]['id'];
+										}
+										$kerangka_logis_baru = array(
+											'id_komponen_penilaian' => $design[$k]['data'][$kk]['data'][$kkk]['id'],
+											'jenis_kerangka_logis' => $kerangka_logis['jenis_kerangka_logis'],
+											'pesan_kesalahan' => $kerangka_logis['pesan_kesalahan'],
+											'id_komponen_pembanding' => $id_pembanding
+										);
+									}
 								}
 							}
 						}
@@ -11804,799 +12608,6 @@ class Wp_Eval_Sakip_Public
 		die(json_encode($ret));
 	}
 
-public function get_table_skpd_pengisian_lke() {
-    global $wpdb;
-    $ret = array(
-        'status' => 'success',
-        'message' => 'Berhasil get data!',
-        'data' => array()
-    );
-
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if (!empty($_POST['id_jadwal'])) {
-					$id_jadwal = $_POST['id_jadwal'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Id Jadwal kosong!';
-					die(json_encode($ret));
-				}
-
-				if (!empty($_POST['tahun_anggaran'])) {
-					$tahun_anggaran = $_POST['tahun_anggaran'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun Anggaran kosong!';
-					die(json_encode($ret));
-				}
-
-				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
-
-				$unit = $wpdb->get_results(
-					$wpdb->prepare("
-                    SELECT 
-                        nama_skpd, 
-                        id_skpd, 
-                        kode_skpd
-                    FROM esakip_data_unit 
-                    WHERE tahun_anggaran=%d
-                    AND active=1 
-                    AND is_skpd=1 
-                    ORDER BY kode_skpd ASC
-                ", $tahun_anggaran_sakip),
-					ARRAY_A
-				);
-
-				$jadwal = $wpdb->get_row(
-					$wpdb->prepare("
-                    SELECT 
-                        *
-                    FROM esakip_data_jadwal
-                    WHERE id=%d
-                        AND status != 0
-                ", $id_jadwal),
-					ARRAY_A
-				);
-            if (!empty($unit) && !empty($jadwal)) {
-                $tbody = '';
-                $counter = 1;
-                $total_nilai_usulan = 0;
-                $total_nilai_penetapan = 0;
-
-                // Initialize total values for all components dynamically
-                $total_nilai_komponen = array();
-
-                foreach ($unit as $kk => $vv) {
-                    $nilai_usulan = 0;
-                    $nilai_penetapan = 0;
-
-                    // Initialize individual component values for current unit
-                    $nilai_komponen = array();
-
-						$get_komponen = $wpdb->get_results(
-							$wpdb->prepare("
-                            SELECT * 
-                            FROM esakip_komponen
-                            WHERE id_jadwal = %d
-                              AND active = 1
-                            ORDER BY nomor_urut ASC
-                        ", $id_jadwal),
-							ARRAY_A
-						);
-
-                    foreach ($get_komponen as $komponen) {
-                        $komponen_id = $komponen['id'];
-                        $nilai_komponen[$komponen_id] = 0;
-
-                        $get_subkomponen = $wpdb->get_results(
-                            $wpdb->prepare("
-                                SELECT * 
-                                FROM esakip_subkomponen
-                                WHERE id_komponen = %d
-                                  AND active = 1
-                                ORDER BY nomor_urut ASC
-                            ", $komponen_id),
-                            ARRAY_A
-                        );
-
-                        foreach ($get_subkomponen as $subkomponen) {
-                            $subkomponen_id = $subkomponen['id'];
-
-                            $sum_nilai_usulan = $wpdb->get_var(
-                                $wpdb->prepare("
-                                    SELECT SUM(nilai_usulan)
-                                    FROM esakip_pengisian_lke
-                                    WHERE id_subkomponen = %d
-                                      AND id_skpd = %d
-                                      AND tahun_anggaran = %d
-                                ", $subkomponen['id'], $vv['id_skpd'], $tahun_anggaran)
-                            );
-
-								$count_nilai_usulan = $wpdb->get_var(
-									$wpdb->prepare("
-                                    SELECT COUNT(id)
-                                    FROM esakip_komponen_penilaian
-                                    WHERE id_subkomponen = %d
-                                ", $subkomponen_id)
-                            );
-
-								$sum_nilai_penetapan = $wpdb->get_var(
-									$wpdb->prepare("
-                                    SELECT SUM(nilai_penetapan)
-                                    FROM esakip_pengisian_lke
-                                    WHERE id_subkomponen = %d
-                                      AND id_skpd = %d
-                                      AND tahun_anggaran = %d
-                                ", $subkomponen['id'], $vv['id_skpd'], $tahun_anggaran)
-                            );
-
-								$count_nilai_penetapan = $wpdb->get_var(
-									$wpdb->prepare("
-                                    SELECT COUNT(id)
-                                    FROM esakip_komponen_penilaian
-                                    WHERE id_subkomponen = %d
-                                ", $subkomponen['id'])
-                            );
-
-                            $sum_nilai_komponen_a = $wpdb->get_var(
-                                $wpdb->prepare("
-                                    SELECT SUM(nilai_penetapan)
-                                    FROM esakip_pengisian_lke
-                                    WHERE id_subkomponen = %d
-                                      AND id_komponen = 1
-                                      AND id_skpd = %d
-                                      AND tahun_anggaran = %d
-                                ", $subkomponen['id'], $vv['id_skpd'], $tahun_anggaran)
-                            );
-
-                            $count_nilai_komponen_a = $wpdb->get_var(
-                                $wpdb->prepare("
-                                    SELECT COUNT(id)
-                                    FROM esakip_komponen_penilaian
-                                    WHERE id_subkomponen = %d
-                                ", $subkomponen['id'])
-                            );
-
-                            $sum_nilai_komponen_b = $wpdb->get_var(
-                                $wpdb->prepare("
-                                    SELECT SUM(nilai_penetapan)
-                                    FROM esakip_pengisian_lke
-                                    WHERE id_subkomponen = %d
-                                      AND id_komponen = 2
-                                      AND id_skpd = %d
-                                      AND tahun_anggaran = %d
-                                ", $subkomponen['id'], $vv['id_skpd'], $tahun_anggaran)
-                            );
-
-                            $count_nilai_komponen_b = $wpdb->get_var(
-                                $wpdb->prepare("
-                                    SELECT COUNT(id)
-                                    FROM esakip_komponen_penilaian
-                                    WHERE id_subkomponen = %d
-                                ", $subkomponen['id'])
-                            );
-
-                            $sum_nilai_komponen_c = $wpdb->get_var(
-                                $wpdb->prepare("
-                                    SELECT SUM(nilai_penetapan)
-                                    FROM esakip_pengisian_lke
-                                    WHERE id_subkomponen = %d
-                                      AND id_komponen = 3
-                                      AND id_skpd = %d
-                                      AND tahun_anggaran = %d
-                                ", $subkomponen['id'], $vv['id_skpd'], $tahun_anggaran)
-                            );
-
-                            $count_nilai_komponen_c = $wpdb->get_var(
-                                $wpdb->prepare("
-                                    SELECT COUNT(id)
-                                    FROM esakip_komponen_penilaian
-                                    WHERE id_subkomponen = %d
-                                ", $subkomponen['id'])
-                            );
-
-                            $sum_nilai_komponen_d = $wpdb->get_var(
-                                $wpdb->prepare("
-                                    SELECT SUM(nilai_penetapan)
-                                    FROM esakip_pengisian_lke
-                                    WHERE id_subkomponen = %d
-                                      AND id_komponen = 4
-                                      AND id_skpd = %d
-                                      AND tahun_anggaran = %d
-                                ", $subkomponen['id'], $vv['id_skpd'], $tahun_anggaran)
-                            );
-
-                            $count_nilai_komponen_d = $wpdb->get_var(
-                                $wpdb->prepare("
-                                    SELECT COUNT(id)
-                                    FROM esakip_komponen_penilaian
-                                    WHERE id_subkomponen = %d
-                                ", $subkomponen['id'])
-                            );
-
-                            $total_nilai_sub = 0;
-                            $total_nilai_sub_penetapan = 0;
-
-								if ($count_nilai_usulan > 0) {
-									$persentase_sub = $sum_nilai_usulan / $count_nilai_usulan;
-									$total_nilai_sub = $persentase_sub * $subkomponen['bobot'];
-									$nilai_usulan += $total_nilai_sub;
-								}
-                            if ($count_nilai_penetapan > 0) {
-                                $persentase_sub_penetapan = $sum_nilai_penetapan / $count_nilai_penetapan;
-                                $total_nilai_sub_penetapan = $persentase_sub_penetapan * $subkomponen['bobot'];
-                                $nilai_penetapan += $total_nilai_sub_penetapan;
-                                $persentase_sub_komponen = $sum_nilai_penetapan / $count_nilai_penetapan;
-                                $total_nilai_sub_komponen = $persentase_sub_komponen * $subkomponen['bobot'];
-                                $nilai_komponen[$komponen_id] += $total_nilai_sub_komponen;
-                            }
-                        }
-                    }
-
-                    $total_nilai_usulan += $nilai_usulan;
-                    $total_nilai_penetapan += $nilai_penetapan;
-
-                    foreach ($nilai_komponen as $komponen_id => $nilai) {
-                        if (!isset($total_nilai_komponen[$komponen_id])) {
-                            $total_nilai_komponen[$komponen_id] = 0;
-                        }
-                        $total_nilai_komponen[$komponen_id] += $nilai;
-                    }
-
-						$detail_pengisian_lke = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Pengisian LKE ' . $vv['nama_skpd'] . ' ' . $jadwal['nama_jadwal'],
-							'content' => '[pengisian_lke_sakip_per_skpd id_jadwal=' . $id_jadwal . ']',
-							'show_header' => 1,
-							'post_status' => 'private'
-						));
-
-						$btn = '<div class="btn-action-group">';
-						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_pengisian_lke['url'] . '&id_skpd=' . $vv['id_skpd'] . '&id_jadwal=' . $id_jadwal . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
-						$btn .= '</div>';
-                    $tbody .= "<tr>";
-                    $tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-                    $tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</td>";
-                    $tbody .= "<td class='text-center'>" . number_format($nilai_usulan, 2) . "</td>";
-
-                    foreach ($nilai_komponen as $komponen_id => $nilai) {
-                        $tbody .= "<td class='text-center'>" . number_format($nilai, 2) . "</td>";
-                    }
-
-                    $tbody .= "<td class='text-center'>" . number_format($nilai_penetapan, 2) . "</td>";
-                    $tbody .= "<td>" . $btn . "</td>";
-                    $tbody .= "</tr>";
-                }
-
-                $ret['data'] = $tbody;
-                $ret['nilai_usulan'] = $total_nilai_usulan;
-                $ret['nilai_penetapan'] = $total_nilai_penetapan;
-                $ret['nilai_komponen'] = $total_nilai_komponen;
-            } else {
-                $ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
-            }
-        } else {
-            $ret = array(
-                'status' => 'error',
-                'message' => 'Api Key tidak sesuai!'
-            );
-        }
-    } else {
-        $ret = array(
-            'status' => 'error',
-            'message' => 'Format tidak sesuai!'
-        );
-    }
-    die(json_encode($ret));
-}
-
-
-	public function get_table_pengisian_lke()
-	{
-		global $wpdb;
-		$ret = array(
-			'status' => 'success',
-			'message' => 'Berhasil get data!',
-			'data' => array()
-		);
-
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if (!empty($_POST['id_jadwal'])) {
-					$id_jadwal = $_POST['id_jadwal'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Id Jadwal kosong!';
-				}
-				if (!empty($_POST['id_skpd'])) {
-					$id_skpd = $_POST['id_skpd'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
-				}
-				if (!empty($_POST['id_jadwal'])) {
-					$id_jadwal = $_POST['id_jadwal'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Id Jadwal kosong!';
-				}
-
-				//get jadwal
-				date_default_timezone_set('Asia/Jakarta'); // Adjust this if your server is set to a different timezone
-				$dateTime = new DateTime();
-				$data_jadwal = $wpdb->get_row(
-					$wpdb->prepare("
-						SELECT *
-						FROM esakip_data_jadwal
-						WHERE id=%d
-					", $id_jadwal),
-					ARRAY_A
-				);
-				if ($data_jadwal) {
-					$started_at = trim($data_jadwal['started_at']);
-					$end_at = trim($data_jadwal['end_at']);
-
-					$started_at_dt = new DateTime($started_at);
-					$end_at_dt = new DateTime($end_at);
-				} else {
-					error_log('Data jadwal tidak ditemukan.');
-				}
-
-				//user authorize
-				$current_user = wp_get_current_user();
-				$admin_roles = array(
-					'1' => 'administrator',
-					'2' => 'admin_bappeda',
-					'3' => 'admin_ortala'
-				);
-				$intersected_roles = array_intersect($admin_roles, $current_user->roles);
-				$user_penilai = $this->get_user_penilai();
-				$user_penilai[''] = '-';
-
-				$data_komponen = $wpdb->get_results(
-					$wpdb->prepare("
-						SELECT * 
-						FROM esakip_komponen
-						WHERE id_jadwal = %d
-						  AND active = 1
-						ORDER BY nomor_urut ASC
-						", $id_jadwal),
-					ARRAY_A
-				);
-
-				$merged_data = array('debug' => array());
-
-				if (!empty($data_komponen)) {
-					$tbody = '';
-					//jika user adalah admin atau skpd
-					$can_verify = false;
-					if (
-						in_array("admin_ortala", $current_user->roles) ||
-						in_array("admin_bappeda", $current_user->roles) ||
-						in_array("admin_panrb", $current_user->roles) ||
-						in_array("administrator", $current_user->roles)
-					) {
-						$can_verify = true;
-					}
-					$total_nilai = 0;
-					$total_nilai_penetapan = 0;
-					$counter = 'A';
-					foreach ($data_komponen as $komponen) {
-						$tbody2 = "";
-						$counter_isi = 1;
-						$counter_sub = 'a';
-
-						$sum_nilai_sub = 0;
-						$sum_nilai_sub_penetapan = 0;
-						$persentase_kom = 0;
-						$persentase_kom_penetapan = 0;
-
-						$data_subkomponen = $wpdb->get_results(
-							$wpdb->prepare("
-								SELECT * 
-								FROM esakip_subkomponen
-								WHERE id_komponen = %d
-								  AND active = 1
-								ORDER BY nomor_urut ASC
-								", $komponen['id']),
-							ARRAY_A
-						);
-						if (!empty($data_subkomponen)) {
-							foreach ($data_subkomponen as $subkomponen) {
-								$disabled = 'disabled';
-								//jika jadwal masih buka, jika merupakan user penilai
-								if ($dateTime > $started_at_dt && $dateTime < $end_at_dt) {
-									if (array_key_exists($subkomponen['id_user_penilai'], $intersected_roles)) {
-										$disabled = '';
-									} else {
-										$disabled = 'disabled';
-									}
-								} else {
-									$disabled = 'disabled';
-								}
-
-								$sum_nilai_usulan = $wpdb->get_var(
-									$wpdb->prepare("
-										SELECT SUM(nilai_usulan)
-										FROM esakip_pengisian_lke
-										WHERE id_subkomponen = %d
-										  	AND id_skpd = %d
-                                      		AND tahun_anggaran = %d
-									", $subkomponen['id'], $id_skpd, $tahun_anggaran)
-								);
-								$count_nilai_usulan = $wpdb->get_var(
-									$wpdb->prepare("
-										SELECT COUNT(id)
-										FROM esakip_komponen_penilaian
-										WHERE id_subkomponen = %d
-									", $subkomponen['id'])
-								);
-								$sum_nilai_penetapan = $wpdb->get_var(
-									$wpdb->prepare("
-										SELECT SUM(nilai_penetapan)
-										FROM esakip_pengisian_lke
-										WHERE id_subkomponen = %d
-										  	AND id_skpd = %d
-                                      		AND tahun_anggaran = %d
-									", $subkomponen['id'], $id_skpd, $tahun_anggaran)
-								);
-								$count_nilai_penetapan = $wpdb->get_var(
-									$wpdb->prepare("
-										SELECT COUNT(id)
-										FROM esakip_komponen_penilaian
-										WHERE id_subkomponen = %d
-									", $subkomponen['id'])
-								);
-
-								//jumlah nilai sub
-								$total_nilai_sub = 0;
-								$total_nilai_sub_penetapan = 0;
-								$persentase_sub = 0;
-								$persentase_sub_penetapan = 0;
-								if ($count_nilai_usulan > 0) {
-									$persentase_sub = $sum_nilai_usulan / $count_nilai_usulan;
-									$total_nilai_sub = $persentase_sub * $subkomponen['bobot'];
-									$sum_nilai_sub += $total_nilai_sub;;
-								}
-
-								if ($count_nilai_penetapan > 0) {
-									$persentase_sub_penetapan = $sum_nilai_penetapan / $count_nilai_penetapan;
-									$total_nilai_sub_penetapan = $persentase_sub_penetapan * $subkomponen['bobot'];
-									$sum_nilai_sub_penetapan += $total_nilai_sub_penetapan;
-								}
-
-								//tbody subkomponen
-								$tbody2 .= "<tr class='table-active'>";
-								$tbody2 .= "<td class='text-left'></td>";
-								$tbody2 .= "<td class='text-left'>" . $counter_sub++ . "</td>";
-								$tbody2 .= "<td class='text-left' colspan='2'><b>" . $subkomponen['nama'] . "</b></td>";
-								$tbody2 .= "<td class='text-center'>" . $subkomponen['bobot'] . "</td>";
-								$tbody2 .= "<td class='text-left'></td>";
-								$tbody2 .= "<td class='text-center'>" . number_format($total_nilai_sub, 2) . "</td>";
-								$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub * 100, 2) . "%" . "</td>";
-								$tbody2 .= "<td class='text-center' colspan='3'></td>";
-								$tbody2 .= "<td class='text-center'></td>";
-								$tbody2 .= "<td class='text-center'>" . number_format($total_nilai_sub_penetapan, 2) . "</td>";
-								$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub_penetapan * 100, 2) . "%" . "</td>";
-								$tbody2 .= "<td class='text-left' colspan='3'>User Penilai: <b>" . $user_penilai[$subkomponen['id_user_penilai']] . "</b></td>";
-								$tbody2 .= "</tr>";
-
-
-								$data_komponen_penilaian = $wpdb->get_results(
-									$wpdb->prepare("
-										SELECT 
-											kp.id AS kp_id,
-											kp.id_subkomponen AS kp_id_subkomponen,
-											kp.nomor_urut AS kp_nomor_urut,
-											kp.nama AS kp_nama,
-											kp.tipe AS kp_tipe,
-											kp.keterangan AS kp_keterangan,
-											kp.active AS kp_active,
-											pl.id AS pl_id,
-											pl.id_user AS pl_id_user,
-											pl.id_skpd AS pl_id_skpd,
-											pl.id_user_penilai AS pl_id_user_penilai,
-											pl.id_komponen AS pl_id_komponen,
-											pl.id_subkomponen AS pl_id_subkomponen,
-											pl.id_komponen_penilaian AS pl_id_komponen_penilaian,
-											pl.nilai_usulan AS pl_nilai_usulan,
-											pl.nilai_penetapan AS pl_nilai_penetapan,
-											pl.keterangan AS pl_keterangan,
-											pl.keterangan_penilai AS pl_keterangan_penilai,
-											pl.bukti_dukung AS pl_bukti_dukung,
-											pl.create_at AS pl_create_at,
-											pl.update_at AS pl_update_at,
-											pl.active AS pl_active
-										FROM esakip_komponen_penilaian AS kp
-										LEFT JOIN esakip_pengisian_lke AS pl 
-											ON kp.id = pl.id_komponen_penilaian AND pl.id_skpd = %d
-											AND pl.tahun_anggaran=%d
-										WHERE kp.id_subkomponen = %d
-										  AND kp.active = 1
-										ORDER BY kp.nomor_urut ASC
-									",  $id_skpd, $tahun_anggaran, $subkomponen['id']),
-									ARRAY_A
-								);
-
-								if (!empty($data_komponen_penilaian)) {
-									foreach ($data_komponen_penilaian as $penilaian) {
-										//opsi jawaban usulan
-										$opsi = "<option value=''>Pilih Jawaban</option>";
-										if (isset($penilaian['pl_nilai_usulan'])) {
-											if ($penilaian['kp_tipe'] == 1) {
-												$opsi .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 1 ? " selected" : "") . ">Y</option>";
-												$opsi .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0 ? " selected" : "") . ">T</option>";
-											} else if ($penilaian['kp_tipe'] == 2) {
-												$opsi .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 1 ? " selected" : "") . ">A</option>";
-												$opsi .= "<option value='0.75' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0.75 ? " selected" : "") . ">B</option>";
-												$opsi .= "<option value='0.5' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0.5 ? " selected" : "") . ">C</option>";
-												$opsi .= "<option value='0.25' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0.25 ? " selected" : "") . ">D</option>";
-												$opsi .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0 ? " selected" : "") . ">E</option>";
-											}
-										} else {
-											$opsi = "<option value=''>Pilih Jawaban</option>";
-											if ($penilaian['kp_tipe'] == 1) {
-												$opsi .= "<option value='1' class='text-center'>Y</option>";
-												$opsi .= "<option value='0' class='text-center'>T</option>";
-											} else if ($penilaian['kp_tipe'] == 2) {
-												$opsi .= "<option value='1' class='text-center'>A</option>";
-												$opsi .= "<option value='0.75' class='text-center'>B</option>";
-												$opsi .= "<option value='0.5' class='text-center'>C</option>";
-												$opsi .= "<option value='0.25' class='text-center'>D</option>";
-												$opsi .= "<option value='0' class='text-center'>E</option>";
-											}
-										}
-
-										//opsi jawaban penetapan
-										$opsi_penetapan = "<option value=''>Pilih Jawaban</option>";
-										if (isset($penilaian['pl_nilai_penetapan'])) {
-											if ($penilaian['kp_tipe'] == 1) {
-												$opsi_penetapan .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 1 ? " selected" : "") . ">Y</option>";
-												$opsi_penetapan .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0 ? " selected" : "") . ">T</option>";
-											} else if ($penilaian['kp_tipe'] == 2) {
-												$opsi_penetapan .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 1 ? " selected" : "") . ">A</option>";
-												$opsi_penetapan .= "<option value='0.75' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.75 ? " selected" : "") . ">B</option>";
-												$opsi_penetapan .= "<option value='0.5' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.5 ? " selected" : "") . ">C</option>";
-												$opsi_penetapan .= "<option value='0.25' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.25 ? " selected" : "") . ">D</option>";
-												$opsi_penetapan .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0 ? " selected" : "") . ">E</option>";
-											}
-										} else {
-											$opsi_penetapan = "<option value=''>Pilih Jawaban</option>";
-											if ($penilaian['kp_tipe'] == 1) {
-												$opsi_penetapan .= "<option value='1' class='text-center'>Y</option>";
-												$opsi_penetapan .= "<option value='0' class='text-center'>T</option>";
-											} else if ($penilaian['kp_tipe'] == 2) {
-												$opsi_penetapan .= "<option value='1' class='text-center'>A</option>";
-												$opsi_penetapan .= "<option value='0.75' class='text-center'>B</option>";
-												$opsi_penetapan .= "<option value='0.5' class='text-center'>C</option>";
-												$opsi_penetapan .= "<option value='0.25' class='text-center'>D</option>";
-												$opsi_penetapan .= "<option value='0' class='text-center'>E</option>";
-											}
-										}
-
-										//nilai usulan
-										if (isset($penilaian['pl_nilai_usulan'])) {
-											$nilai_usulan = $penilaian['pl_nilai_usulan'];
-										} else {
-											$nilai_usulan = "0.00";
-										}
-
-										//nilai penetapan
-										if (isset($penilaian['pl_nilai_penetapan'])) {
-											$nilai_penetapan = $penilaian['pl_nilai_penetapan'];
-										} else {
-											$nilai_penetapan = "0.00";
-										}
-
-										// Ambil data kerangka logis yang aktif berdasarkan id_komponen_penilaian
-										$data_kerangka_logis = $wpdb->get_results(
-											$wpdb->prepare("
-												SELECT *
-												FROM esakip_kontrol_kerangka_logis
-												WHERE id_komponen_penilaian = %d
-												  AND active = 1
-											", $penilaian['pl_id_komponen_penilaian']),
-											ARRAY_A
-										);
-
-										// Default pesan kerangka logis
-										$kerangka_logis = "<td class='text-center table-warning'>Belum Diisi</td>";
-										$kerangka_logis_penetapan = "<td class='text-center table-warning'>Belum Diisi</td>";
-
-										//kerangka logis nilai usulan
-										if (isset($penilaian['pl_nilai_usulan'])) {
-											$pesan_kesalahan = [];
-
-											foreach ($data_kerangka_logis as $kl) {
-												if ($kl['jenis_kerangka_logis'] == 1) {
-													// Rata-rata
-													$avg_nilai_sub = $wpdb->get_var(
-														$wpdb->prepare("
-															SELECT AVG(nilai_usulan)
-															FROM esakip_pengisian_lke
-															WHERE id_subkomponen = %d
-															AND id_skpd = %d
-														", $kl['id_komponen_pembanding'], $id_skpd)
-													);
-
-													if ($avg_nilai_sub < $penilaian['pl_nilai_usulan']) {
-														$pesan_kesalahan[] = $kl['pesan_kesalahan'];
-													}
-												} else if ($kl['jenis_kerangka_logis'] == 2) {
-													// Nilai
-													$nilai_komponen_penilaian = $wpdb->get_var(
-														$wpdb->prepare("
-															SELECT nilai_usulan
-															FROM esakip_pengisian_lke
-															WHERE id_komponen_penilaian = %d
-															AND id_skpd = %d
-														", $kl['id_komponen_pembanding'], $id_skpd)
-													);
-
-													if ($penilaian['pl_nilai_usulan'] > $nilai_komponen_penilaian) {
-														$pesan_kesalahan[] = $kl['pesan_kesalahan'];
-													}
-												}
-											}
-
-											if (!empty($pesan_kesalahan)) {
-												$kerangka_logis = "<td class='text-center table-danger'><ul><li>" . implode("</li><li>", $pesan_kesalahan) . "</li></ul></td>";
-											} else {
-												$kerangka_logis = "<td class='text-center table-success'>OK</td>";
-											}
-										}
-
-
-										//kerangka logis nilai penetapan
-										if (isset($penilaian['pl_nilai_penetapan'])) {
-											$pesan_kesalahan_penetapan = [];
-
-											foreach ($data_kerangka_logis as $kl) {
-												if ($kl['jenis_kerangka_logis'] == 1) {
-													// Rata-rata
-													$avg_nilai_sub = $wpdb->get_var(
-														$wpdb->prepare("
-															SELECT AVG(nilai_penetapan)
-															FROM esakip_pengisian_lke
-															WHERE id_subkomponen = %d
-															AND id_skpd = %d
-														", $kl['id_komponen_pembanding'], $id_skpd)
-													);
-
-													if ($avg_nilai_sub < $penilaian['pl_nilai_penetapan']) {
-														$pesan_kesalahan_penetapan[] = $kl['pesan_kesalahan'];
-													}
-												} else if ($kl['jenis_kerangka_logis'] == 2) {
-													// Nilai
-													$nilai_komponen_penilaian = $wpdb->get_var(
-														$wpdb->prepare("
-															SELECT nilai_penetapan
-															FROM esakip_pengisian_lke
-															WHERE id_komponen_penilaian = %d
-															AND id_skpd = %d
-														", $kl['id_komponen_pembanding'], $id_skpd)
-													);
-
-													if ($penilaian['pl_nilai_penetapan'] > $nilai_komponen_penilaian) {
-														$pesan_kesalahan_penetapan[] = $kl['pesan_kesalahan'];
-													}
-												}
-											}
-
-											if (!empty($pesan_kesalahan_penetapan)) {
-												$kerangka_logis_penetapan = "<td class='text-center table-danger'><ul><li>" . implode("</li><li>", $pesan_kesalahan_penetapan) . "</li></ul></td>";
-											} else {
-												$kerangka_logis_penetapan = "<td class='text-center table-success'>OK</td>";
-											}
-										}
-
-										//tbody isi
-										$tbody2 .= "<tr>";
-										$tbody2 .= "<td class='text-left'></td>";
-										$tbody2 .= "<td class='text-left'></td>";
-										$tbody2 .= "<td class='text-left'>" . $counter_isi++ . "</td>";
-										$tbody2 .= "<td class='text-left'>" . $penilaian['kp_nama'] . "<br><small class='text-muted'>" . $penilaian['kp_keterangan'] . "</small></td>";
-										$tbody2 .= "<td class='text-center'>-</td>";
-										switch ($can_verify) {
-											case false:
-												$btn_save = "<button class='btn btn-primary' onclick='simpanPerubahan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan'><span class='dashicons dashicons-saved' ></span></button>";
-
-												$tbody2 .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "'>" . $opsi . "</select></td>";
-												$tbody2 .= "<td class='text-center'>" . $nilai_usulan . "</td>";
-												$tbody2 .= "<td class='text-center'></td>";
-												$tbody2 .= "<td class='text-center'><button type='button' class='btn btn-primary btn-sm' title='Tambah bukti dukung' onclick='tambahBuktiDukung(".$id_skpd.",". $penilaian['kp_id'] . ")' id='buktiDukung" . $penilaian['kp_id'] . "'><i class='dashicons dashicons-plus'></i></button></td>";
-												$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "'>" . $penilaian['pl_keterangan'] . "</textarea></td>";
-												$tbody2 .= $kerangka_logis;
-												$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' disabled>" . $opsi_penetapan . "</select></td>";
-												$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
-												$tbody2 .= "<td class='text-center'></td>";
-												$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
-												$tbody2 .= $kerangka_logis_penetapan;
-												$tbody2 .= "<td class='text-center'>" . $btn_save . "</td>";
-												break;
-											case true:
-                    						if (!$this->is_admin_panrb()) {
-												$btn_save_penetapan = "<button class='btn btn-info' onclick='simpanPerubahanPenetapan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan Penetapan'><span class='dashicons dashicons-saved' ></span></button>";
-											}
-
-												$tbody2 .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "' disabled>" . $opsi . "</select></td>";
-												$tbody2 .= "<td class='text-center'>" . $nilai_usulan . "</td>";
-												$tbody2 .= "<td class='text-center'></td>";
-												if (!$this->is_admin_panrb()) {
-												    $tbody2 .= "<td class='text-center'><button type='button' class='btn btn-primary btn-sm' title='Tambah bukti dukung' onclick='tambahBuktiDukung(" . $id_skpd . "," . $penilaian['kp_id'] . ")' id='buktiDukung" . $penilaian['kp_id'] . "'><i class='dashicons dashicons-plus'></i></button></td>";
-												} else {
-												    $tbody2 .= "<td class='text-center'></td>";
-												}
-												$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan'] . "</textarea></td>";
-												$tbody2 .= $kerangka_logis;
-												$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' " . $disabled . ">" . $opsi_penetapan . "</select></td>";
-												$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
-												$tbody2 .= "<td class='text-center'></td>";
-												$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'" . $disabled . ">" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
-												$tbody2 .= $kerangka_logis_penetapan;
-												if (!$disabled) {
-													$tbody2 .= "<td class='text-center'>" . $btn_save_penetapan . "</td>";
-												} else {
-													$tbody2 .= "<td class='text-center'></td>";
-												}
-												break;
-										}
-										$tbody2 .= "</tr>";
-									}
-								}
-							}
-						}
-
-						//jumlah nilai kom
-						if ($sum_nilai_sub > 0) {
-							$persentase_kom = $sum_nilai_sub / $komponen['bobot'];
-						}
-						if ($sum_nilai_sub_penetapan > 0) {
-							$persentase_kom_penetapan = $sum_nilai_sub_penetapan / $komponen['bobot'];
-						}
-
-						$total_nilai += $sum_nilai_sub;
-						$total_nilai_penetapan += $sum_nilai_sub_penetapan;
-
-						//tbody komponen
-						$tbody .= "<tr class='table-active'>";
-						$tbody .= "<td class='text-left'>" . $counter++ . "</td>";
-						$tbody .= "<td class='text-left' colspan='3'><b>" . $komponen['nama'] . "</b></td>";
-						$tbody .= "<td class='text-center'>" . $komponen['bobot'] . "</td>";
-						$tbody .= "<td class='text-left'></td>";
-						$tbody .= "<td class='text-center'>" . number_format($sum_nilai_sub, 2) . "</td>";
-						$tbody .= "<td class='text-center'>" . number_format($persentase_kom * 100, 2) . "%" . "</td>";
-						$tbody .= "<td class='text-center' colspan='3'></td>";
-						$tbody .= "<td class='text-center'></td>";
-						$tbody .= "<td class='text-center'>" . number_format($sum_nilai_sub_penetapan, 2) .  "</td>";
-						$tbody .= "<td class='text-center'>" . number_format($persentase_kom_penetapan * 100, 2) . "%" . "</td>";
-						$tbody .= "<td class='text-left' colspan='3'></td>";
-						$tbody .= "</tr>";
-						$tbody .= $tbody2;
-
-						$merged_data['tbody'] = $tbody;
-						$merged_data['total_nilai'] = number_format($total_nilai, 2);
-						$merged_data['total_nilai_penetapan'] = number_format($total_nilai_penetapan, 2);
-					}
-				} else {
-					$tbody = "<tr><td colspan='4' class='text-center'>Tidak ada data tersedia</td></tr>";
-				}
-
-				$ret['data'] = $merged_data;
-			} else {
-				$ret = array(
-					'status' => 'error',
-					'message'   => 'Api Key tidak sesuai!'
-				);
-			}
-		} else {
-			$ret = array(
-				'status' => 'error',
-				'message'   => 'Format tidak sesuai!'
-			);
-		}
-		die(json_encode($ret));
-	}
-
 	public function get_table_skpd_dokumen()
 	{
 		global $wpdb;
@@ -15103,360 +15114,6 @@ public function get_table_skpd_pengisian_lke() {
 		die(json_encode($ret));
 	}
 
-	public function tambah_nilai_penetapan_lke()
-	{
-		global $wpdb;
-		$ret = array(
-			'status' => 'success',
-			'message' => 'Berhasil tambah nilai penetapan!',
-		);
-
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if($ret['status'] != 'error' && empty($_POST['id_skpd'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
-				}else if($ret['status'] != 'error' && empty($_POST['id_komponen_penilaian'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Id Komponen Penilaian kosong!';
-				}else if($ret['status'] != 'error' && empty($_POST['id_jadwal'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Jadwal Penetapan kosong!';
-				}else if($ret['status'] != 'error' && empty($_POST['nilai_penetapan'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Nilai Penetapan kosong!';
-				}else if($ret['status'] != 'error' && empty($_POST['ket_penetapan'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Keterangan Penetapan kosong!';
-				}else if($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])){
-					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun anggaran kosong!';
-				}
-
-				if($ret['status'] == 'error'){
-					die(json_encode($ret));
-				}
-				$id_skpd = $_POST['id_skpd'];
-				$id_komponen_penilaian = $_POST['id_komponen_penilaian'];
-				$id_jadwal = $_POST['id_jadwal'];
-				$nilai_penetapan = $_POST['nilai_penetapan'];
-				$ket_penetapan = $_POST['ket_penetapan'];
-				$tahun_anggaran = $_POST['tahun_anggaran'];
-
-				//validasi jadwal
-				date_default_timezone_set('Asia/Jakarta'); // Adjust this if your server is set to a different timezone
-				$dateTime = new DateTime();
-				$data_jadwal = $wpdb->get_row(
-					$wpdb->prepare("
-						SELECT *
-						FROM esakip_data_jadwal
-						WHERE id=%d
-					", $id_jadwal),
-					ARRAY_A
-				);
-				if ($data_jadwal) {
-					$started_at = trim($data_jadwal['started_at']);
-					$end_at = trim($data_jadwal['end_at']);
-
-					$started_at_dt = new DateTime($started_at);
-					$end_at_dt = new DateTime($end_at);
-				} else {
-					error_log('Data jadwal tidak ditemukan.');
-				}
-				if ($dateTime > $started_at_dt && $dateTime > $end_at_dt) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Jadwal Sudah Selesai!';
-					die(json_encode($ret));
-				}
-
-				//validasi nilai
-				$valid_values = [0, 0.25, 0.5, 0.75, 1];
-				if (!in_array($nilai_penetapan, $valid_values)) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Aksi ditolak - nilai yang dimasukkan tidak valid!';
-					die(json_encode($ret));
-				}
-
-				//validasi user
-				$current_user = wp_get_current_user();
-				$allowed_roles = array('admin_ortala', 'admin_bappeda', 'administrator');
-				if (empty(array_intersect($allowed_roles, $current_user->roles))) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Akses ditolak - hanya pengguna dengan peran tertentu yang dapat mengakses fitur ini!';
-					die(json_encode($ret));
-				}
-
-				$existing_data = $wpdb->get_var(
-					$wpdb->prepare("
-						SELECT 
-							id
-						FROM esakip_pengisian_lke
-						WHERE id_skpd = %d
-						  AND id_komponen_penilaian = %d
-						  AND tahun_anggaran=%d
-					", $id_skpd, $id_komponen_penilaian, $tahun_anggaran)
-				);
-				if ($existing_data) {
-					$updated = $wpdb->update(
-						'esakip_pengisian_lke',
-						array(
-							'id_user_penilai' => $current_user->ID,
-							'nilai_penetapan' => $nilai_penetapan,
-							'keterangan_penilai' => $ket_penetapan,
-							'update_at' => current_time('mysql')
-						),
-						array('id' => $existing_data),
-						array('%d', '%f', '%s', '%s'),
-					);
-
-					if ($updated !== false) {
-						$ret['message'] = "Berhasil edit nilai penetapan!";
-					} else {
-						$ret['status'] = 'error';
-						$ret['message'] = "Gagal melakukan update nilai penetapan: " . $wpdb->last_error;
-					}
-				} else {
-					//cari id kom dan subkom ketika insert baru
-					$id_subkomponen = $wpdb->get_var(
-						$wpdb->prepare("
-							SELECT 
-								id_subkomponen
-							FROM esakip_komponen_penilaian
-							WHERE id = %d
-						", $id_komponen_penilaian)
-					);
-					if (!empty($id_subkomponen)) {
-						$id_komponen = $wpdb->get_var(
-							$wpdb->prepare("
-								SELECT 
-									id_komponen
-								FROM esakip_subkomponen
-								WHERE id = %d
-							", $id_subkomponen)
-						);
-						if (empty($id_subkomponen)) {
-							$ret['status'] = 'error';
-							$ret['message'] = 'ID Komponen kosong!';
-						}
-					} else {
-						$ret['status'] = 'error';
-						$ret['message'] = 'ID Subomponen kosong!';
-					}
-					//jika sukses insert
-					if ($ret['status'] = 'success') {
-						$wpdb->insert(
-							'esakip_pengisian_lke',
-							array(
-								'id_skpd' => $id_skpd,
-								'id_user_penilai' => $current_user->ID,
-								'nilai_penetapan' => $nilai_penetapan,
-								'id_komponen' => $id_komponen,
-								'id_subkomponen' => $id_subkomponen,
-								'id_komponen_penilaian' => $id_komponen_penilaian,
-								'keterangan_penilai' => $ket_penetapan,
-								'tahun_anggaran' => $tahun_anggaran,
-								'create_at' => current_time('mysql')
-							),
-							array('%d', '%d', '%f', '%d', '%d', '%d', '%s', '%d', '%s'),
-						);
-					}
-				}
-			} else {
-				$ret = array(
-					'status' => 'error',
-					'message' => 'Api Key tidak sesuai!'
-				);
-			}
-		} else {
-			$ret = array(
-				'status' => 'error',
-				'message' => 'Format tidak sesuai!'
-			);
-		}
-
-		die(json_encode($ret));
-	}
-
-	public function tambah_nilai_lke()
-	{
-		global $wpdb;
-		$ret = array(
-			'status' => 'success',
-			'message' => 'Berhasil tambah nilai!',
-		);
-
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if ($ret['status'] != 'error' && empty($_POST['id_skpd'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
-				}else if ($ret['status'] != 'error' && empty($_POST['id_komponen_penilaian'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Id Komponen Penilaian kosong!';
-				}else if ($ret['status'] != 'error' && empty($_POST['id_jadwal'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Jadwal Usulan kosong!';
-				}else if ($ret['status'] != 'error' && empty($_POST['nilai_usulan'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Nilai Usulan kosong!';
-				}else if ($ret['status'] != 'error' && empty($_POST['ket_usulan'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Keterangan Usulan kosong!';
-				}else if ($ret['status'] != 'error' && empty($_POST['bukti_usulan'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Bukti Usulan kosong!';
-				}else if($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])){
-					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun anggaran kosong!';
-				}
-				if($ret['status'] == 'error'){
-					die(json_encode($ret));
-				}
-				$tahun_anggaran = $_POST['tahun_anggaran'];
-				$id_skpd = $_POST['id_skpd'];
-				$id_komponen_penilaian = $_POST['id_komponen_penilaian'];
-				$id_jadwal = $_POST['id_jadwal'];
-				$nilai_usulan = $_POST['nilai_usulan'];
-				$ket_usulan = $_POST['ket_usulan'];
-				$bukti_usulan = $_POST['bukti_usulan'];
-
-				//validasi jadwal
-				date_default_timezone_set('Asia/Jakarta'); // Adjust this if your server is set to a different timezone
-				$dateTime = new DateTime();
-				$data_jadwal = $wpdb->get_row(
-					$wpdb->prepare("
-						SELECT *
-						FROM esakip_data_jadwal
-						WHERE id=%d
-					", $id_jadwal),
-					ARRAY_A
-				);
-				if ($data_jadwal) {
-					$started_at = trim($data_jadwal['started_at']);
-					$end_at = trim($data_jadwal['end_at']);
-
-					$started_at_dt = new DateTime($started_at);
-					$end_at_dt = new DateTime($end_at);
-				} else {
-					error_log('Data jadwal tidak ditemukan.');
-				}
-				if ($dateTime > $started_at_dt && $dateTime > $end_at_dt) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Jadwal Sudah Selesai!';
-					die(json_encode($ret));
-				}
-
-				//validasi nilai
-				$valid_values = [0, 0.25, 0.5, 0.75, 1];
-				if (!in_array($nilai_usulan, $valid_values)) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Aksi ditolak - nilai yang dimasukkan tidak valid!';
-					die(json_encode($ret));
-				}
-
-				//validasi user
-				$current_user = wp_get_current_user();
-				$allowed_roles = array('admin_ortala', 'admin_bappeda', 'administrator');
-				if (!empty(array_intersect($allowed_roles, $current_user->roles))) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Akses ditolak - hanya pengguna dengan peran tertentu yang dapat mengakses fitur ini!';
-					die(json_encode($ret));
-				}
-
-				$allowed_roles = array();
-				$existing_data = $wpdb->get_var(
-					$wpdb->prepare("
-						SELECT 
-							id
-						FROM esakip_pengisian_lke
-						WHERE id_skpd = %d
-						  AND id_komponen_penilaian = %d
-						  AND tahun_anggaran = %d
-					", $id_skpd, $id_komponen_penilaian, $tahun_anggaran)
-				);
-				if ($existing_data) {
-					$updated = $wpdb->update(
-						'esakip_pengisian_lke',
-						array(
-							'nilai_usulan' => $nilai_usulan,
-							'keterangan' => $ket_usulan,
-							'bukti_dukung' => $bukti_usulan,
-							'update_at' => current_time('mysql')
-						),
-						array('id' => $existing_data),
-						array('%f', '%s', '%s', '%s'),
-					);
-
-					if ($updated !== false) {
-						$ret['message'] = "Berhasil update nilai usulan!";
-					} else {
-						$ret['status'] = 'error';
-						$ret['message'] = "Gagal melakukan update nilai usulan: " . $wpdb->last_error;
-					}
-				} else {
-					//cari id kom dan subkom ketika insert baru
-					$id_subkomponen = $wpdb->get_var(
-						$wpdb->prepare("
-							SELECT 
-								id_subkomponen
-							FROM esakip_komponen_penilaian
-							WHERE id = %d
-						", $id_komponen_penilaian)
-					);
-					if (!empty($id_subkomponen)) {
-						$id_komponen = $wpdb->get_var(
-							$wpdb->prepare("
-								SELECT 
-									id_komponen
-								FROM esakip_subkomponen
-								WHERE id = %d
-							", $id_subkomponen)
-						);
-						if (empty($id_subkomponen)) {
-							$ret['status'] = 'error';
-							$ret['message'] = 'ID Komponen kosong!';
-						}
-					} else {
-						$ret['status'] = 'error';
-						$ret['message'] = 'ID Subomponen kosong!';
-					}
-
-					//jika sukses insert
-					if ($ret['status'] = 'success') {
-						$wpdb->insert(
-							'esakip_pengisian_lke',
-							array(
-								'id_user' => $current_user->ID,
-								'id_skpd' => $id_skpd,
-								'id_komponen' => $id_komponen,
-								'id_subkomponen' => $id_subkomponen,
-								'id_komponen_penilaian' => $id_komponen_penilaian,
-								'keterangan' => $ket_usulan,
-								'nilai_usulan' => $nilai_usulan,
-								'bukti_dukung' => $bukti_usulan,
-								'tahun_anggaran' => $tahun_anggaran,
-								'create_at' => current_time('mysql')
-							),
-							array('%d', '%d', '%d', '%s', '%f', '%s', '%s', '%s', '%d', '%s'),
-						);
-					}
-				}
-			} else {
-				$ret = array(
-					'status' => 'error',
-					'message' => 'Api Key tidak sesuai!'
-				);
-			}
-		} else {
-			$ret = array(
-				'status' => 'error',
-				'message' => 'Format tidak sesuai!'
-			);
-		}
-
-		die(json_encode($ret));
-	}
-
 	public function list_perangkat_daerah()
 	{
 		global $wpdb;
@@ -16128,138 +15785,6 @@ public function get_table_skpd_pengisian_lke() {
 						'status' => 'error',
 						'message'   => 'Id Kosong!'
 					);
-				}
-			} else {
-				$ret = array(
-					'status' => 'error',
-					'message'   => 'Api Key tidak sesuai!'
-				);
-			}
-		} else {
-			$ret = array(
-				'status' => 'error',
-				'message'   => 'Format tidak sesuai!'
-			);
-		}
-		die(json_encode($ret));
-	}
-
-	function get_dokumen_bukti_dukung()
-	{
-		global $wpdb;
-		$ret = array(
-			'status' => 'success',
-			'message' => 'Berhasil ambil data!',
-			'data' => array()
-		);
-
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if ($ret['status']!='error' && empty($_POST['id_skpd'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'ID OPD tidak boleh kosong!';
-				}else if ($ret['status']!='error' && empty($_POST['kp_id'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'ID Komponen penilai tidak boleh kosong!';
-				}else if ($ret['status']!='error' && empty($_POST['tahun_anggaran'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
-				}
-				if ($ret['status']!='error') {
-					$jenis_bukti_dukung_db = $wpdb->get_var($wpdb->prepare("
-						SELECT
-							jenis_bukti_dukung
-						FROM esakip_komponen_penilaian
-						WHERE id=%d
-					", $_POST['kp_id']));
-					$all_dokumen = array();
-					$jenis_bukti_dukung = json_decode(stripslashes($jenis_bukti_dukung_db), true);
-					if (json_last_error() !== JSON_ERROR_NONE) {
-						$jenis_bukti_dukung = array();
-					}
-					foreach($jenis_bukti_dukung as $v){
-						$sql = $wpdb->prepare("
-							SELECT
-								*
-							FROM {$v}
-							WHERE id_skpd=%d
-								AND active=1
-						", $_POST['id_skpd']);
-
-						// dikecualikan karena dokumen ini tidak berdasarkan tahun anggaran, tapi per periode
-						if(
-							$v != 'esakip_renstra'
-							&& $v != 'esakip_rpjmd'
-							&& $v != 'esakip_rpjpd'
-						){
-							$sql .= $wpdb->prepare(' AND tahun_anggaran=%d', $_POST['tahun_anggaran']);
-						}
-						$all_dokumen[$v] = $wpdb->get_results($sql, ARRAY_A);
-						if(
-							$v == 'esakip_rpjmd'
-							|| $v == 'esakip_rpjpd'
-							|| $v == 'esakip_rkpd'
-							|| $v == 'esakip_lkjip_lppd'
-							|| $v == 'esakip_other_file'
-						){
-							foreach($all_dokumen[$v] as $key => $dok){
-								$all_dokumen[$v][$key]['dokumen'] = 'dokumen_pemda/'.$dok['dokumen'];
-							}
-						}
-					}
-
-					$ret['data'] = $all_dokumen;
-					$ret['sql'] = $wpdb->last_query;
-				}
-			} else {
-				$ret = array(
-					'status' => 'error',
-					'message'   => 'Api Key tidak sesuai!'
-				);
-			}
-		} else {
-			$ret = array(
-				'status' => 'error',
-				'message'   => 'Format tidak sesuai!'
-			);
-		}
-		die(json_encode($ret));
-	}
-
-	function submit_bukti_dukung()
-	{
-		global $wpdb;
-		$ret = array(
-			'status' => 'success',
-			'message' => 'Berhasil simpan data!',
-			'data' => array()
-		);
-
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if ($ret['status']!='error' && empty($_POST['id_skpd'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'ID OPD tidak boleh kosong!';
-				}else if ($ret['status']!='error' && empty($_POST['kp_id'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'ID Komponen penilai tidak boleh kosong!';
-				}else if ($ret['status']!='error' && empty($_POST['tahun_anggaran'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
-				}else if ($ret['status']!='error' && empty($_POST['bukti_dukung'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Bukti dukung tidak boleh kosong!';
-				}
-				if ($ret['status']!='error') {
-					$sql = $wpdb->prepare("
-						SELECT
-							*
-						FROM esakip_pengisian_lke
-						WHERE id_subkomponen = %d
-						  AND id_skpd = %d
-						  AND tahun_anggaran = %d
-					", $_POST['kp_id'], $_POST['id_skpd'], $_POST['tahun_anggaran']);
-					$ret['sql'] = $wpdb->last_query;
 				}
 			} else {
 				$ret = array(
