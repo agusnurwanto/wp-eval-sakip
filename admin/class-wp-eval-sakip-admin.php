@@ -680,6 +680,9 @@ class Wp_Eval_Sakip_Admin
 				Field::make('html', 'crb_sql_migrate')
 					->set_html('<a onclick="sql_migrate_esakip(); return false;" href="#" class="button button-primary button-large">SQL Migrate</a>')
 					->set_help_text('Tombol untuk memperbaiki struktur database E-SAKIP.'),
+				Field::make('text', 'crb_maksimal_upload_dokumen_esakip', 'Maksimal Upload Dokumen')
+					->set_default_value(10)
+					->set_help_text('Wajib diisi. Setting batas ukuran maksimal untuk upload dokumen. Ukuran dalam MB'),
 			));
 
 		Container::make('theme_options', __('Pengaturan Perangkat Daerah'))
