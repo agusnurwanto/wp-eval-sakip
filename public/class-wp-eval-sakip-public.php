@@ -2523,12 +2523,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -2655,12 +2656,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -2787,12 +2789,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -2919,12 +2922,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -3051,12 +3055,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -3183,12 +3188,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -3315,12 +3321,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -3447,12 +3454,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -3579,12 +3587,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -3699,12 +3708,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -3817,12 +3827,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -3935,12 +3946,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -4053,12 +4065,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -4183,12 +4196,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -4315,12 +4329,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -9628,12 +9643,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -9933,12 +9949,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -10238,12 +10255,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -10543,12 +10561,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -15415,12 +15434,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -15543,12 +15563,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -16224,12 +16245,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * 10
+						1048576 * $maksimal_upload
 					);
 					if ($upload['status'] == false) {
 						$ret = array(

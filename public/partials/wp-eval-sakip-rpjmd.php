@@ -116,7 +116,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                         <div style="padding-top: 10px; padding-bottom: 10px;"><a id="fileUploadExisting" target="_blank"></a></div>
                     </div>
                     <div class="alert alert-warning mt-2" role="alert">
-                        Maksimal ukuran file: 10 MB. Format file yang diperbolehkan: PDF.
+                        Maksimal ukuran file: <?php echo get_option('_crb_maksimal_upload_dokumen_esakip'); ?> MB. Format file yang diperbolehkan: PDF.
                     </div>
                     <div class="form-group">
                         <label for="keterangan">Keterangan</label>
