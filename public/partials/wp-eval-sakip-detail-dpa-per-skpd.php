@@ -28,9 +28,9 @@ $skpd = $wpdb->get_row(
 
 $idtahun = $wpdb->get_results(
     "
-		SELECT DISTINCT 
-			tahun_anggaran 
-		FROM esakip_data_unit        
+        SELECT DISTINCT 
+            tahun_anggaran 
+        FROM esakip_data_unit        
         ORDER BY tahun_anggaran DESC",
     ARRAY_A
 );
@@ -43,6 +43,7 @@ foreach ($idtahun as $val) {
     }
     $tahun .= "<option value='$val[tahun_anggaran]' $selected>$val[tahun_anggaran]</option>";
 }
+$tipe_dokumen = "dpa";
 
 $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
@@ -64,6 +65,10 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     .btn-action-group .btn {
         margin: 0 5px;
     }
+
+    #table_dokumen_dpa th {
+        vertical-align: middle;
+    }
 </style>
 
 <!-- Table -->
@@ -80,12 +85,17 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 <table id="table_dokumen_dpa" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
                         <tr>
-                            <th class="text-center">No</th>
-                            <th class="text-center">Perangkat Daerah</th>
-                            <th class="text-center">Nama Dokumen</th>
+                            <th class="text-center" rowspan="2">No</th>
+                            <th class="text-center" rowspan="2">Perangkat Daerah</th>
+                            <th class="text-center" rowspan="2">Nama Dokumen</th>
+                            <th class="text-center" rowspan="2">Keterangan</th>
+                            <th class="text-center" rowspan="2">Waktu Upload</th>
+                            <th class="text-center" colspan="2">Verfikasi</th>
+                            <th class="text-center" rowspan="2" style="width: 150px;">Aksi</th>
+                        </tr>
+                        <tr>
+                            <th class="text-center">Status</th>
                             <th class="text-center">Keterangan</th>
-                            <th class="text-center">Waktu Upload</th>
-                            <th class="text-center" style="width: 150px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -161,6 +171,46 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     </div>
 </div>
 
+<!-- Modal Verifikasi -->
+<div class="modal fade" id="verifikasiModal" tabindex="-1" role="dialog" aria-labelledby="verifikasiModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="verifikasiModalLabel">Verifikasi Dokumen</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" value="<?php echo $id_skpd; ?>" id="idSkpd">
+                    <input type="hidden" value="<?php echo $input['tahun']; ?>" id="tahunAnggaran">
+                    <input type="hidden" value="" id="idDokumen">
+                    <tr>
+                        <td>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="verifikasi_dokumen" id="verifikasi_dokumen_terima" value="terima">
+                                <label class="form-check-label" for="verifikasi_dokumen_terima">Terima</label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="verifikasi_dokumen" id="verifikasi_dokumen_tolak" value="tolak">
+                                <label class="form-check-label" for="verifikasi_dokumen_tolak">Tolak</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <div class="form-group">
+                        <label for="keterangan_verifikasi">Keterangan</label>
+                        <textarea class="form-control" id="keterangan_verifikasi" name="keterangan_verifikasi" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" onclick="submit_verifikasi_dokumen(this); return false">Simpan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Tahun Tabel -->
 <div id="tahunContainer" class="container-md">
 </div>
@@ -169,7 +219,105 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     jQuery(document).ready(function() {
         getTabledpa();
         getTableTahun();
+        window.tipe_dokumen = "dpa";
     });
+
+    function verifikasi_dokumen(id){
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_verifikasi_dokumen_by_id',
+                api_key: esakip.api_key,
+                id: id,
+                tipe_dokumen: tipe_dokumen,
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                console.log(response);
+                if (response.status === 'success') {
+                    let data = response.data;
+                    if(data.length !== 0 || data.status_verifikasi != null){
+                        let verifikasi = (data.status_verifikasi == 1) ? "terima" : "tolak";
+                        jQuery("input[name=verifikasi_dokumen][value='"+verifikasi+"']").prop("checked",true);
+                        jQuery("#keterangan_verifikasi").val(data.keterangan_verifikasi);
+                    }
+                    jQuery("#idDokumen").val(id);
+                    jQuery("#verifikasiModal").modal('show');
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data!');
+            }
+        });
+    }
+
+    function submit_verifikasi_dokumen(that){
+        let id_dokumen = jQuery("#idDokumen").val();
+        if (id_dokumen == '') {
+            return alert('Id Dokumen tidak boleh kosong');
+        }
+
+        let idSkpd = jQuery("#idSkpd").val();
+        if (idSkpd == '') {
+            return alert('Id Skpd tidak boleh kosong');
+        }
+        let keterangan = jQuery("#keterangan_verifikasi").val();
+        if (keterangan == '') {
+            return alert('Keterangan tidak boleh kosong');
+        }
+        let tahunAnggaran = jQuery("#tahunAnggaran").val();
+        if (tahunAnggaran == '') {
+            return alert('Tahun Anggaran tidak boleh kosong');
+        }
+        let verifikasi_dokumen = jQuery("input[name='verifikasi_dokumen']:checked").val();
+
+        if (verifikasi_dokumen == '' || verifikasi_dokumen == undefined) {
+            return alert('Verifikasi tidak boleh kosong');
+        }
+
+        let form_data = new FormData();
+        form_data.append('action', 'submit_verifikasi_dokumen');
+        form_data.append('api_key', esakip.api_key);
+        form_data.append('id_dokumen', id_dokumen);
+        form_data.append('idSkpd', idSkpd);
+        form_data.append('keterangan', keterangan);
+        form_data.append('tahunAnggaran', tahunAnggaran);
+        form_data.append('verifikasi_dokumen', verifikasi_dokumen);
+        form_data.append('tipe_dokumen', tipe_dokumen);
+
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            contentType: false,
+            processData: false,
+            data: form_data,
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    jQuery('#verifikasiModal').modal('hide');
+                    alert(response.message);
+                    getTabledpa();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
+                jQuery('#wrap-loading').hide();
+            }
+        });
+    }
 
     function getTabledpa() {
         jQuery('#wrap-loading').show();
@@ -195,7 +343,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data dpa!');
+                alert('Terjadi kesalahan saat memuat data Laporan Monev Renaksi!');
             }
         });
     }
@@ -206,9 +354,10 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'get_table_tahun_dpa',
+                action: 'get_table_tahun_dokumen',
                 api_key: esakip.api_key,
                 id_skpd: <?php echo $id_skpd; ?>,
+                tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
             },
             dataType: 'json',
             success: function(response) {
@@ -228,16 +377,6 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         });
     }
 
-    function lihatDokumen(dokumen) {
-        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + dokumen;
-        window.open(url, '_blank');
-    }
-
-    function set_tahun_dokumen(id) {
-        jQuery('#tahunModal').modal('show');
-        jQuery('#idDokumen').val(id);
-    }
-
     function tambah_dokumen_dpa() {
         jQuery("#editModalLabel").hide();
         jQuery("#uploadModalLabel").show();
@@ -246,6 +385,54 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         jQuery("#keterangan").val('');
         jQuery('#fileUploadExisting').removeAttr('href').empty();
         jQuery("#uploadModal").modal('show');
+    }
+
+    function set_tahun_dokumen(id) {
+        jQuery('#tahunModal').modal('show');
+        jQuery('#idDokumen').val(id);
+    }
+
+    function submit_tahun_dpa() {
+        let id = jQuery("#idDokumen").val();
+        if (id == '') {
+            return alert('id tidak boleh kosong');
+        }
+
+        let tahunAnggaran = jQuery("#tahunAnggaran").val();
+        if (tahunAnggaran == '') {
+            return alert('Tahun Anggaran tidak boleh kosong');
+        }
+
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'submit_tahun_dpa',
+                id: id,
+                api_key: esakip.api_key,
+                tahunAnggaran: tahunAnggaran,
+                tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    jQuery('#tahunModal').modal('hide');
+                    getTableTahun();
+                    getTableRenja();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
     }
 
     function edit_dokumen_dpa(id) {
@@ -283,6 +470,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             }
         });
     }
+
 
     function submit_dokumen(that) {
         let id_dokumen = jQuery("#idDokumen").val();
@@ -334,55 +522,13 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                     alert(response.message);
                     getTabledpa();
                 } else {
-                    alert('Error: ' + response.message);
+                    alert(response.message);
                 }
             },
             error: function(xhr, status, error) {
                 console.error(xhr.responseText);
                 alert('Terjadi kesalahan saat mengirim data!');
                 jQuery('#wrap-loading').hide();
-            }
-        });
-    }
-
-    function submit_tahun_dpa() {
-        let id = jQuery("#idDokumen").val();
-        if (id == '') {
-            return alert('id tidak boleh kosong');
-        }
-
-        let tahunAnggaran = jQuery("#tahunAnggaran").val();
-        if (tahunAnggaran == '') {
-            return alert('Tahun Anggaran tidak boleh kosong');
-        }
-
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: 'POST',
-            data: {
-                action: 'submit_tahun_dpa',
-                id: id,
-                tahunAnggaran: tahunAnggaran,
-                api_key: esakip.api_key
-            },
-            dataType: 'json',
-            success: function(response) {
-                console.log(response);
-                jQuery('#wrap-loading').hide();
-                if (response.status === 'success') {
-                    alert(response.message);
-                    jQuery('#tahunModal').modal('hide');
-                    getTableTahun();
-                    getTabledpa();
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                jQuery('#wrap-loading').hide();
-                console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat mengirim data!');
             }
         });
     }
@@ -413,7 +559,6 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 if (response.status === 'success') {
                     alert(response.message);
                     getTabledpa();
-                    getTableTahun();
                 } else {
                     alert(response.message);
                 }
