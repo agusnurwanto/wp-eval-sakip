@@ -416,6 +416,16 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_table_tahun_pedoman_teknis_evaluasi_internal', $plugin_public, 'get_table_tahun_pedoman_teknis_evaluasi_internal');
 		$this->loader->add_action('wp_ajax_submit_tahun_pedoman_teknis_evaluasi_internal', $plugin_public, 'submit_tahun_pedoman_teknis_evaluasi_internal');
 		
+		$this->loader->add_action('wp_ajax_get_pokin_level1',  $plugin_public, 'get_pokin_level1');
+		$this->loader->add_action('wp_ajax_create_pokin_level1',  $plugin_public, 'create_pokin_level1');
+		$this->loader->add_action('wp_ajax_edit_pokin_level1',  $plugin_public, 'edit_pokin_level1');
+		$this->loader->add_action('wp_ajax_update_pokin_level1',  $plugin_public, 'update_pokin_level1');
+		$this->loader->add_action('wp_ajax_delete_pokin_level1',  $plugin_public, 'delete_pokin_level1');
+		$this->loader->add_action('wp_ajax_create_indikator_pokin_level1',  $plugin_public, 'create_indikator_pokin_level1');
+		$this->loader->add_action('wp_ajax_edit_indikator_pokin_level1',  $plugin_public, 'edit_indikator_pokin_level1');
+		$this->loader->add_action('wp_ajax_update_indikator_pokin_level1',  $plugin_public, 'update_indikator_pokin_level1');
+		$this->loader->add_action('wp_ajax_delete_indikator_pokin_level1',  $plugin_public, 'delete_indikator_pokin_level1');
+		
 		add_shortcode('jadwal_evaluasi_sakip', array($plugin_public, 'jadwal_evaluasi_sakip'));
 		add_shortcode('halaman_mapping_skpd', array($plugin_public, 'halaman_mapping_skpd'));
 		
@@ -477,6 +487,8 @@ class Wp_Eval_Sakip {
 		add_shortcode('pengisian_lke_sakip_per_skpd', array($plugin_public, 'pengisian_lke_sakip_per_skpd'));
 
 		add_shortcode('menu_eval_sakip', array($plugin_public, 'menu_eval_sakip'));
+		add_shortcode('penyusunan_pohon_kinerja',array($plugin_public,'penyusunan_pohon_kinerja'));
+		add_shortcode('view_pohon_kinerja',array($plugin_public,'view_pohon_kinerja'));
 		
 	}
 
