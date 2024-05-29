@@ -1103,7 +1103,7 @@ class Wp_Eval_Sakip_Admin
 		$no = 0;
 		foreach ($get_tahun as $k => $v) {
 			$jadwal_evaluasi = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Jadwal LKE Tahun Anggaran| ' . $v['tahun_anggaran'],
+				'nama_page' => 'Halaman Jadwal LKE Tahun Anggaran | ' . $v['tahun_anggaran'],
 				'content' => '[jadwal_evaluasi_sakip tahun_anggaran="' . $v["tahun_anggaran"] . '"]',
 				'show_header' => 1,
 				'no_key' => 1,

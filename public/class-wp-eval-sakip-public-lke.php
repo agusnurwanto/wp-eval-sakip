@@ -759,7 +759,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
 												$tbody2 .= "<td class='text-center'></td>";
 												$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
-												$tbody2 .= $kerangka_logis;
+												$tbody2 .= $kerangka_logis_penetapan;
 												if ($disabled == '') {
 													if (!$this->is_admin_panrb()) {
 														$tbody2 .= "<td class='text-center'>" . $btn_save . "</td>";
