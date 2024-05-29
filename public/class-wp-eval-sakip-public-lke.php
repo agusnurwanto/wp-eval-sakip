@@ -574,10 +574,11 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 											LEFT JOIN esakip_pengisian_lke_history AS pl 
 												ON kp.id = pl.id_komponen_penilaian AND pl.id_skpd = %d
 												AND pl.tahun_anggaran=%d
+												AND pl.id_jadwal=%d
 											WHERE kp.id_subkomponen = %d
 											AND kp.active = 1
 											ORDER BY kp.nomor_urut ASC
-										",  $id_skpd, $tahun_anggaran, $subkomponen['id']),
+										",  $id_skpd, $tahun_anggaran, $id_jadwal, $subkomponen['id']),
 										ARRAY_A
 									);
 								}
