@@ -55,7 +55,7 @@ if (!empty($jadwal)) {
     $selesai_jadwal = $jadwal['end_at'];
     $lama_pelaksanaan = $jadwal['lama_pelaksanaan'];
 } else {
-    $tahun_anggaran = '2024';
+    $tahun_anggaran = $tahun_anggaran_sakip;
     $jenis_jadwal = '-';
     $nama_jadwal = '-';
     $mulai_jadwal = '-';
