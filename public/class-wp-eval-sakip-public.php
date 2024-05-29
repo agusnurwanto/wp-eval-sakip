@@ -6936,6 +6936,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						ARRAY_A
 					);
 
+					// cek jadwal lama
 					foreach ($get_jadwal as $jadwal) {
 						if ($jadwal['status'] != 2) {
 							$return = array(
@@ -8695,10 +8696,66 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$wpdb->update('esakip_data_jadwal', array('end_at' => $time_now, 'status' => 2), array(
 								'id'	=> $id
 							));
-
-							$delete_lokal_history = $this->delete_data_lokal_history('esakip_pengisian_lke', $data_this_id['id']);
+							
+							//backup komponen 
+							$delete_lokal_history = $this->delete_data_lokal_history('esakip_komponen', $data_this_id['id']);
 
 							$columns_1 = array(
+								'id_jadwal',
+								'nomor_urut',
+								'id_user_penilai',
+								'nama',
+								'bobot'
+							);
+
+							$sql_backup_esakip_komponen =  "
+								INSERT INTO esakip_komponen_history (" . implode(', ', $columns_1) . ",id_asli)
+								SELECT " . implode(', ', $columns_1) . ", id as id_asli
+											FROM esakip_komponen";
+
+							$queryRecords1 = $wpdb->query($sql_backup_esakip_komponen);
+
+							//backup subkomponen 
+							$delete_lokal_history = $this->delete_data_lokal_history('esakip_subkomponen', $data_this_id['id']);
+
+							$columns_2 = array(
+								'id_komponen',
+								'nomor_urut',
+								'id_user_penilai',
+								'nama',
+								'bobot'
+							);
+
+							$sql_backup_esakip_subkomponen =  "
+								INSERT INTO esakip_subkomponen_history (" . implode(', ', $columns_2) . ",id_asli,id_jadwal)
+								SELECT " . implode(', ', $columns_2) . ", id as id_asli, " . $data_this_id['id'] . "
+											FROM esakip_subkomponen";
+
+							$queryRecords2 = $wpdb->query($sql_backup_esakip_subkomponen);
+							
+							//backup komponen penilaian
+							$delete_lokal_history = $this->delete_data_lokal_history('esakip_komponen_penilaian', $data_this_id['id']);
+
+							$columns_3 = array(
+								'id_subkomponen',
+								'nomor_urut',
+								'nama',
+								'tipe',
+								'keterangan',
+								'jenis_bukti_dukung'
+							);
+
+							$sql_backup_esakip_komponen_penilaian =  "
+								INSERT INTO esakip_komponen_penilaian_history (" . implode(', ', $columns_3) . ",id_asli,id_jadwal)
+								SELECT " . implode(', ', $columns_3) . ", id as id_asli, " . $data_this_id['id'] . "
+											FROM esakip_komponen_penilaian";
+
+							$queryRecords1 = $wpdb->query($sql_backup_esakip_komponen_penilaian);
+
+							//backup pengisian lke
+							$delete_lokal_history = $this->delete_data_lokal_history('esakip_pengisian_lke', $data_this_id['id']);
+
+							$columns_4 = array(
 								'id_user',
 								'id_skpd',
 								'id_user_penilai',
@@ -8716,8 +8773,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							);
 
 							$sql_backup_esakip_pengisian_lke =  "
-								INSERT INTO esakip_pengisian_lke_history (" . implode(', ', $columns_1) . ",id_asli,id_jadwal)
-								SELECT " . implode(', ', $columns_1) . ", id as id_asli, " . $data_this_id['id'] . "
+								INSERT INTO esakip_pengisian_lke_history (" . implode(', ', $columns_4) . ",id_asli,id_jadwal)
+								SELECT " . implode(', ', $columns_4) . ", id as id_asli, " . $data_this_id['id'] . "
 											FROM esakip_pengisian_lke";
 
 							$queryRecords1 = $wpdb->query($sql_backup_esakip_pengisian_lke);

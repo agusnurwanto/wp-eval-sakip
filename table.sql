@@ -321,6 +321,45 @@ CREATE TABLE esakip_pengisian_lke (
   PRIMARY KEY  (`id`)
 );
 
+CREATE TABLE esakip_komponen_history (
+  `id` int(11) NOT NULL auto_increment,
+  `id_jadwal` int(11) NOT NULL,
+  `nomor_urut` DECIMAL(10,2) NOT NULL,
+  `id_user_penilai` int(11) DEFAULT NULL,
+  `nama` varchar(255) DEFAULT NULL,
+  `bobot` float DEFAULT NULL,
+  `active` tinyint(4) NOT NULL DEFAULT '1',
+  `id_asli` int(11) DEFAULT NULL,
+  PRIMARY KEY  (`id`)
+);
+
+CREATE TABLE esakip_subkomponen_history (
+  `id` int(11) NOT NULL auto_increment,
+  `id_komponen` int(11) NOT NULL,
+  `nomor_urut` DECIMAL(10,2) NOT NULL,
+  `id_user_penilai` int(11) DEFAULT NULL,
+  `nama` varchar(255) DEFAULT NULL,
+  `bobot` float DEFAULT NULL,
+  `active` tinyint(4) NOT NULL DEFAULT '1',
+  `id_asli` int(11) DEFAULT NULL,
+  `id_jadwal` int(11) NOT NULL,
+  PRIMARY KEY  (`id`)
+);
+
+CREATE TABLE esakip_komponen_penilaian_history (
+  `id` int(11) NOT NULL auto_increment,
+  `id_subkomponen` int(11) NOT NULL,
+  `nomor_urut` DECIMAL(10,2) NOT NULL,
+  `nama` varchar(255) DEFAULT NULL,
+  `tipe` varchar(30) DEFAULT NULL COMMENT '1 = Ya/Tidak, 2 = A/B/C/D',
+  `keterangan` varchar(255) DEFAULT NULL,
+  `jenis_bukti_dukung` text DEFAULT NULL,
+  `active` tinyint(4) NOT NULL DEFAULT '1',
+  `id_asli` int(11) DEFAULT NULL,
+  `id_jadwal` int(11) NOT NULL,
+  PRIMARY KEY  (`id`)
+);
+
 CREATE TABLE esakip_pengisian_lke_history (
   `id` int(11) NOT NULL auto_increment,
   `id_user` int(11) DEFAULT NULL,
