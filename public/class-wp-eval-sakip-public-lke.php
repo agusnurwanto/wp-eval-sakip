@@ -568,8 +568,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												pl.keterangan_penilai AS pl_keterangan_penilai,
 												pl.bukti_dukung AS pl_bukti_dukung,
 												pl.create_at AS pl_create_at,
-												pl.update_at AS pl_update_at,
-												pl.active AS pl_active
+												pl.update_at AS pl_update_at
 											FROM esakip_komponen_penilaian AS kp
 											LEFT JOIN esakip_pengisian_lke_history AS pl 
 												ON kp.id = pl.id_komponen_penilaian AND pl.id_skpd = %d
