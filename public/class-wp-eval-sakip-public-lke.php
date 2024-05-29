@@ -323,6 +323,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				//get jadwal
 				date_default_timezone_set('Asia/Jakarta'); // Adjust this if your server is set to a different timezone
 				$dateTime = new DateTime();
+
 				$data_jadwal = $wpdb->get_row(
 					$wpdb->prepare("
 						SELECT *
@@ -338,6 +339,11 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					$started_at_dt = new DateTime($started_at);
 					$end_at_dt = new DateTime($end_at);
 					$jenis_jadwal = $data_jadwal['jenis_jadwal'];
+					if($data_jadwal['status'] == 2) {
+						$prefix_history = '_history';
+					} else {
+						$prefix_history = null;
+					}
 				} else {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Data jadwal tidak ditemukan!';
@@ -502,42 +508,80 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								$tbody2 .= "<td class='text-left' colspan='3'>User Penilai: <b>" . $user_penilai[$subkomponen['id_user_penilai']] . "</b></td>";
 								$tbody2 .= "</tr>";
 
-
-								$data_komponen_penilaian = $wpdb->get_results(
-									$wpdb->prepare("
-										SELECT 
-											kp.id AS kp_id,
-											kp.id_subkomponen AS kp_id_subkomponen,
-											kp.nomor_urut AS kp_nomor_urut,
-											kp.nama AS kp_nama,
-											kp.tipe AS kp_tipe,
-											kp.keterangan AS kp_keterangan,
-											kp.active AS kp_active,
-											pl.id AS pl_id,
-											pl.id_user AS pl_id_user,
-											pl.id_skpd AS pl_id_skpd,
-											pl.id_user_penilai AS pl_id_user_penilai,
-											pl.id_komponen AS pl_id_komponen,
-											pl.id_subkomponen AS pl_id_subkomponen,
-											pl.id_komponen_penilaian AS pl_id_komponen_penilaian,
-											pl.nilai_usulan AS pl_nilai_usulan,
-											pl.nilai_penetapan AS pl_nilai_penetapan,
-											pl.keterangan AS pl_keterangan,
-											pl.keterangan_penilai AS pl_keterangan_penilai,
-											pl.bukti_dukung AS pl_bukti_dukung,
-											pl.create_at AS pl_create_at,
-											pl.update_at AS pl_update_at,
-											pl.active AS pl_active
-										FROM esakip_komponen_penilaian AS kp
-										LEFT JOIN esakip_pengisian_lke AS pl 
-											ON kp.id = pl.id_komponen_penilaian AND pl.id_skpd = %d
-											AND pl.tahun_anggaran=%d
-										WHERE kp.id_subkomponen = %d
-										  AND kp.active = 1
-										ORDER BY kp.nomor_urut ASC
-									",  $id_skpd, $tahun_anggaran, $subkomponen['id']),
-									ARRAY_A
-								);
+								if (empty($prefix_history)) {
+									$data_komponen_penilaian = $wpdb->get_results(
+										$wpdb->prepare("
+											SELECT 
+												kp.id AS kp_id,
+												kp.id_subkomponen AS kp_id_subkomponen,
+												kp.nomor_urut AS kp_nomor_urut,
+												kp.nama AS kp_nama,
+												kp.tipe AS kp_tipe,
+												kp.keterangan AS kp_keterangan,
+												kp.active AS kp_active,
+												pl.id AS pl_id,
+												pl.id_user AS pl_id_user,
+												pl.id_skpd AS pl_id_skpd,
+												pl.id_user_penilai AS pl_id_user_penilai,
+												pl.id_komponen AS pl_id_komponen,
+												pl.id_subkomponen AS pl_id_subkomponen,
+												pl.id_komponen_penilaian AS pl_id_komponen_penilaian,
+												pl.nilai_usulan AS pl_nilai_usulan,
+												pl.nilai_penetapan AS pl_nilai_penetapan,
+												pl.keterangan AS pl_keterangan,
+												pl.keterangan_penilai AS pl_keterangan_penilai,
+												pl.bukti_dukung AS pl_bukti_dukung,
+												pl.create_at AS pl_create_at,
+												pl.update_at AS pl_update_at,
+												pl.active AS pl_active
+											FROM esakip_komponen_penilaian AS kp
+											LEFT JOIN esakip_pengisian_lke AS pl 
+												ON kp.id = pl.id_komponen_penilaian AND pl.id_skpd = %d
+												AND pl.tahun_anggaran=%d
+											WHERE kp.id_subkomponen = %d
+											AND kp.active = 1
+											ORDER BY kp.nomor_urut ASC
+										",  $id_skpd, $tahun_anggaran, $subkomponen['id']),
+										ARRAY_A
+									);
+								} else if (!empty($prefix_history)) {
+									$data_komponen_penilaian = $wpdb->get_results(
+										$wpdb->prepare("
+											SELECT 
+												kp.id AS kp_id,
+												kp.id_subkomponen AS kp_id_subkomponen,
+												kp.nomor_urut AS kp_nomor_urut,
+												kp.nama AS kp_nama,
+												kp.tipe AS kp_tipe,
+												kp.keterangan AS kp_keterangan,
+												kp.active AS kp_active,
+												pl.id AS pl_id,
+												pl.id_user AS pl_id_user,
+												pl.id_skpd AS pl_id_skpd,
+												pl.id_user_penilai AS pl_id_user_penilai,
+												pl.id_komponen AS pl_id_komponen,
+												pl.id_subkomponen AS pl_id_subkomponen,
+												pl.id_komponen_penilaian AS pl_id_komponen_penilaian,
+												pl.nilai_usulan AS pl_nilai_usulan,
+												pl.nilai_penetapan AS pl_nilai_penetapan,
+												pl.keterangan AS pl_keterangan,
+												pl.keterangan_penilai AS pl_keterangan_penilai,
+												pl.bukti_dukung AS pl_bukti_dukung,
+												pl.create_at AS pl_create_at,
+												pl.update_at AS pl_update_at,
+												pl.active AS pl_active
+											FROM esakip_komponen_penilaian AS kp
+											LEFT JOIN esakip_pengisian_lke_history AS pl 
+												ON kp.id = pl.id_komponen_penilaian AND pl.id_skpd = %d
+												AND pl.tahun_anggaran=%d
+												AND pl.id_jadwal=%d
+											WHERE kp.id_subkomponen = %d
+											AND kp.active = 1
+											ORDER BY kp.nomor_urut ASC
+										",  $id_skpd, $tahun_anggaran, $id_jadwal, $subkomponen['id']),
+										ARRAY_A
+									);
+								}
 
 								if (!empty($data_komponen_penilaian)) {
 									foreach ($data_komponen_penilaian as $penilaian) {
@@ -759,7 +803,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
 												$tbody2 .= "<td class='text-center'></td>";
 												$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
-												$tbody2 .= $kerangka_logis;
+												$tbody2 .= $kerangka_logis_penetapan;
 												if ($disabled == '') {
 													if (!$this->is_admin_panrb()) {
 														$tbody2 .= "<td class='text-center'>" . $btn_save . "</td>";
@@ -1309,8 +1353,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							|| $v == 'esakip_renstra'
 						) {
 							$jadwal_periode = $wpdb->get_results(
-								$wpdb->prepare(
-									"
+								$wpdb->prepare("
 									SELECT 
 										id,
 										nama_jadwal,
@@ -1318,9 +1361,8 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 										lama_pelaksanaan
 									FROM esakip_data_jadwal
 									WHERE tipe = %s
-									  AND status = 1",
-									'RPJMD'
-								),
+									  AND status = 1
+								", 'RPJMD'),
 								ARRAY_A
 							);
 							foreach ($jadwal_periode as $jadwal_periode_item) {
@@ -1562,11 +1604,20 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				} else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
-				} else if ($ret['status'] != 'error' && empty($_POST['bukti_dukung'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Bukti dukung tidak boleh kosong!';
 				}
+				// else if ($ret['status'] != 'error' && !isset($_POST['bukti_dukung'])) {
+				// 	$ret['status'] = 'error';
+				// 	$ret['message'] = 'Bukti dukung tidak boleh kosong!';
+				// }
 				if ($ret['status'] != 'error') {
+
+					$current_user = wp_get_current_user();
+					$allowed_roles = array('admin_ortala', 'admin_bappeda', 'administrator', 'admin_panrb');
+					if (!empty(array_intersect($allowed_roles, $current_user->roles))) {
+						$ret['status'] = 'error';
+						$ret['message'] = 'Akses ditolak - hanya pengguna dengan peran tertentu yang dapat mengakses fitur ini!';
+						die(json_encode($ret));
+					}
 					$id_skpd = $_POST['id_skpd'];
 					$id_komponen_penilaian = $_POST['kp_id'];
 					$tahun_anggaran = $_POST['tahun_anggaran'];
@@ -1593,7 +1644,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						);
 
 						if ($updated !== false) {
-							$ret['message'] = "Berhasil update nilai usulan!";
+							$ret['message'] = "Berhasil update bukti dukung usulan!";
 						} else {
 							$ret['status'] = 'error';
 							$ret['message'] = "Gagal melakukan update nilai usulan: " . $wpdb->last_error;
