@@ -7033,14 +7033,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										$wpdb->insert('esakip_komponen_penilaian', $data_komponen_penilaian_baru);
 										$id_komponen_penilaian_baru = $wpdb->insert_id;
 
-										$data_pengisian_lke = array(
-											'id_komponen' => $id_komponen_baru,
-											'id_subkomponen' => $id_subkomponen_baru,
-											'id_komponen_penilaian' => $id_komponen_penilaian_baru
-										);
+										// die($penilaian['id']." dan ".$id_komponen_penilaian_baru);
 
-										$wpdb->update('esakip_pengisian_lke',
-											$data_pengisian_lke, 
+										$update_penilaian_ske = $wpdb->update('esakip_pengisian_lke',
+											array(
+												'id_komponen' => $id_komponen_baru,
+												'id_subkomponen' => $id_subkomponen_baru,
+												'id_komponen_penilaian' => $id_komponen_penilaian_baru
+											), 
 											array(
 												'id_komponen'=>$komponen['id'], 
 												'id_subkomponen' => $subkomponen['id'], 
@@ -7048,6 +7048,42 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'tahun_anggaran'=>$tahun_anggaran,
 												'active'=>1
 											));
+
+										// cek apakah berhasil update data, jika tidak maka ambil data dari history
+										if(!$update_penilaian_ske){
+											$data_penilaian_ske_terbaru_history = $wpdb->get_row(
+												$wpdb->prepare("
+													SELECT *
+													FROM esakip_pengisian_lke_history
+													WHERE id_komponen=%d
+														AND id_subkomponen=%d 
+														AND id_komponen_penilaian=%d
+														AND tahun_anggaran=%d
+														AND id_jadwal=%d
+												", $komponen['id'], $subkomponen['id'], $penilaian['id'], $tahun_anggaran, $id_jadwal_sebelumnya),
+												ARRAY_A
+											);
+
+											if(!empty($data_penilaian_ske_terbaru_history)){
+												$wpdb->insert('esakip_pengisian_lke', array(
+													'id_user' => $data_penilaian_ske_terbaru_history['id_user'],
+													'id_skpd' => $data_penilaian_ske_terbaru_history['id_skpd'],
+													'id_user_penilai' => $data_penilaian_ske_terbaru_history['id_user_penilai'],
+													'id_komponen' => $id_komponen_baru,
+													'id_subkomponen' => $id_subkomponen_baru,
+													'id_komponen_penilaian' => $id_komponen_penilaian_baru,
+													'nilai_usulan' => $data_penilaian_ske_terbaru_history['nilai_usulan'],
+													'nilai_penetapan' => $data_penilaian_ske_terbaru_history['nilai_penetapan'],
+													'keterangan' => $data_penilaian_ske_terbaru_history['keterangan'],
+													'keterangan_penilai' => $data_penilaian_ske_terbaru_history['keterangan_penilai'],
+													'bukti_dukung' => $data_penilaian_ske_terbaru_history['bukti_dukung'],
+													'create_at' => $data_penilaian_ske_terbaru_history['create_at'],
+													'update_at' => $data_penilaian_ske_terbaru_history['update_at'],
+													'tahun_anggaran' => $data_penilaian_ske_terbaru_history['tahun_anggaran'],
+													'active' => 1
+												));
+											}
+										}
 
 										$data_kerangka_logis = $wpdb->get_results(
 											$wpdb->prepare("
