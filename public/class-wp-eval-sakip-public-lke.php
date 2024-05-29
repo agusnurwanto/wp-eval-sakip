@@ -321,6 +321,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				$tahun_anggaran = $_POST['tahun_anggaran'];
 
 				//get jadwal
+				date_default_timezone_set('Asia/Jakarta'); // Adjust this if your server is set to a different timezone
 				$dateTime = new DateTime();
 				$data_jadwal = $wpdb->get_row(
 					$wpdb->prepare("
@@ -894,6 +895,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				$tahun_anggaran = $_POST['tahun_anggaran'];
 
 				//validasi jadwal
+				date_default_timezone_set('Asia/Jakarta'); // Adjust this if your server is set to a different timezone
 				$dateTime = new DateTime();
 				$data_jadwal = $wpdb->get_row(
 					$wpdb->prepare("
@@ -1066,6 +1068,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				$ket_usulan = $_POST['ket_usulan'];
 
 				//validasi jadwal
+				date_default_timezone_set('Asia/Jakarta'); // Adjust this if your server is set to a different timezone
 				$dateTime = new DateTime();
 				$data_jadwal = $wpdb->get_row(
 					$wpdb->prepare("
