@@ -330,9 +330,10 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					", $id_jadwal),
 					ARRAY_A
 				);
-				if ($data_jadwal) {
+				if (!empty($data_jadwal)) {
 					$started_at = trim($data_jadwal['started_at']);
 					$end_at = trim($data_jadwal['end_at']);
+
 					$started_at_dt = new DateTime($started_at);
 					$end_at_dt = new DateTime($end_at);
 					$jenis_jadwal = $data_jadwal['jenis_jadwal'];
@@ -404,11 +405,13 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						);
 						if (!empty($data_subkomponen)) {
 							foreach ($data_subkomponen as $subkomponen) {
+								$disabled = 'disabled';
 								// Jika jadwal masih buka
 								if ($dateTime > $started_at_dt && $dateTime < $end_at_dt) {
+									// Jika jadwal penetapan
 									if ($jenis_jadwal == 'penetapan') {
-										// Jika jadwal penetapan dan user adalah evaluator
-										if ($can_verify === true) {
+										// dan user adalah evaluator
+										if ($can_verify == true) {
 											// Hanya jika user penilai sesuai dengan subkomponen
 											if (array_key_exists($subkomponen['id_user_penilai'], $intersected_roles)) {
 												$disabled = '';
@@ -416,17 +419,20 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												$disabled = 'disabled';
 											}
 										} else {
+											// Jika bukan evaluator, tidak bisa input saat penetapan
 											$disabled = 'disabled';
 										}
+										// Jika jadwal usulan
 									} else if ($jenis_jadwal == 'usulan') {
-										// Jika jadwal usulan dan user bukan evaluator
-										if ($can_verify === false) {
+										// dan user bukan evaluator
+										if ($can_verify == false) {
 											$disabled = '';
 										} else {
 											$disabled = 'disabled';
 										}
 									}
 								} else {
+									die('ppp');
 									// Jika jadwal sudah tutup
 									$disabled = 'disabled';
 								}
@@ -672,7 +678,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 											foreach ($data_kerangka_logis as $kl) {
 												if ($kl['jenis_kerangka_logis'] == 1) {
 													// Rata-rata
-													$avg_nilai_sub = $wpdb->get_var(
+													$avg_nilai_sub_penetapan = $wpdb->get_var(
 														$wpdb->prepare("
 															SELECT AVG(nilai_penetapan)
 															FROM esakip_pengisian_lke
@@ -682,12 +688,12 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 														", $kl['id_komponen_pembanding'], $id_skpd, $tahun_anggaran)
 													);
 
-													if ($avg_nilai_sub < $penilaian['pl_nilai_penetapan']) {
+													if ($avg_nilai_sub_penetapan < $penilaian['pl_nilai_penetapan']) {
 														$pesan_kesalahan_penetapan[] = $kl['pesan_kesalahan'];
 													}
 												} else if ($kl['jenis_kerangka_logis'] == 2) {
 													// Nilai
-													$nilai_komponen_penilaian = $wpdb->get_var(
+													$nilai_komponen_penilaian_penetapan = $wpdb->get_var(
 														$wpdb->prepare("
 															SELECT nilai_penetapan
 															FROM esakip_pengisian_lke
@@ -696,8 +702,9 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 																AND tahun_anggaran=%d
 														", $kl['id_komponen_pembanding'], $id_skpd, $tahun_anggaran)
 													);
+													// die(print_r($wpdb->last_query));
 
-													if ($penilaian['pl_nilai_penetapan'] > $nilai_komponen_penilaian) {
+													if ($penilaian['pl_nilai_penetapan'] > $nilai_komponen_penilaian_penetapan) {
 														$pesan_kesalahan_penetapan[] = $kl['pesan_kesalahan'];
 													}
 												}
@@ -710,14 +717,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 											}
 										}
 
-										//tbody isi
-										$tbody2 .= "<tr kp-id='" . $penilaian['kp_id'] . "'>";
-										$tbody2 .= "<td class='text-left'></td>";
-										$tbody2 .= "<td class='text-left'></td>";
-										$tbody2 .= "<td class='text-left'>" . $counter_isi++ . "</td>";
-										$tbody2 .= "<td class='text-left'>" . $penilaian['kp_nama'] . "<br><small class='text-muted'>" . $penilaian['kp_keterangan'] . "</small></td>";
-										$tbody2 .= "<td class='text-center'>-</td>";
-
+										
 										$bukti_dukung = json_decode(stripslashes($penilaian['pl_bukti_dukung']), true);
 										if (!empty($bukti_dukung)) {
 											foreach ($bukti_dukung as $k => $bukti) {
@@ -729,22 +729,33 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 										if ($disabled == '') {
 											$tombol_bukti = "<button type='button' class='btn btn-primary btn-sm' title='Tambah bukti dukung' onclick='tambahBuktiDukung(" . $id_skpd . "," . $penilaian['kp_id'] . ")' id='buktiDukung" . $penilaian['kp_id'] . "'><i class='dashicons dashicons-plus'></i></button>";
 										}
+										//tbody isi
+										$tbody2 .= "<tr kp-id='" . $penilaian['kp_id'] . "'>";
+										$tbody2 .= "<td class='text-left'></td>";
+										$tbody2 .= "<td class='text-left'></td>";
+										$tbody2 .= "<td class='text-left'>" . $counter_isi++ . "</td>";
+										$tbody2 .= "<td class='text-left'>" . $penilaian['kp_nama'] . "<br><small class='text-muted'>" . $penilaian['kp_keterangan'] . "</small></td>";
+										$tbody2 .= "<td class='text-center'>-</td>";
 										switch ($can_verify) {
 											case false:
 												$btn_save = "<button class='btn btn-primary' onclick='simpanPerubahan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan'><span class='dashicons dashicons-saved' ></span></button>";
 
-												$tbody2 .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "'>" . $opsi . "</select></td>";
+												$tbody2 .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "' $disabled>" . $opsi . "</select></td>";
 												$tbody2 .= "<td class='text-center'>" . $nilai_usulan . "</td>";
 												$tbody2 .= "<td class='text-center'></td>";
 												$tbody2 .= "<td class='text-center'><div class='bukti-dukung-view' kp-id='" . $penilaian['kp_id'] . "'>" . $bukti_dukung . "</div>" . $tombol_bukti . "</td>";
-												$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "'>" . $penilaian['pl_keterangan'] . "</textarea></td>";
+												$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "' $disabled>" . $penilaian['pl_keterangan'] . "</textarea></td>";
 												$tbody2 .= $kerangka_logis;
 												$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' disabled>" . $opsi_penetapan . "</select></td>";
 												$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
 												$tbody2 .= "<td class='text-center'></td>";
 												$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
-												$tbody2 .= $kerangka_logis_penetapan;
-												$tbody2 .= "<td class='text-center'>" . $btn_save . "</td>";
+												$tbody2 .= $kerangka_logis;
+												if ($disabled == ''){
+													$tbody2 .= "<td class='text-center'>" . $btn_save . "</td>";
+												} else {
+													$tbody2 .= "<td class='text-center'></td>";	
+												}
 												break;
 											case true:
 												if (!$this->is_admin_panrb()) {
@@ -766,7 +777,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												$tbody2 .= "<td class='text-center'></td>";
 												$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'" . $disabled . ">" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
 												$tbody2 .= $kerangka_logis_penetapan;
-												if (!$disabled) {
+												if ($disabled == '') {
 													$tbody2 .= "<td class='text-center'>" . $btn_save_penetapan . "</td>";
 												} else {
 													$tbody2 .= "<td class='text-center'></td>";
@@ -849,7 +860,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				} else if ($ret['status'] != 'error' && empty($_POST['id_jadwal'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Jadwal Penetapan kosong!';
-				} else if ($ret['status'] != 'error' && empty($_POST['nilai_penetapan'])) {
+				} else if ($ret['status'] != 'error' && !isset($_POST['nilai_penetapan']) || $_POST['nilai_penetapan'] === '') {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Nilai Penetapan kosong!';
 				} else if ($ret['status'] != 'error' && empty($_POST['ket_penetapan'])) {
@@ -1022,7 +1033,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				} else if ($ret['status'] != 'error' && empty($_POST['id_jadwal'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Jadwal Usulan kosong!';
-				} else if ($ret['status'] != 'error' && empty($_POST['nilai_usulan'])) {
+				} else if ($ret['status'] != 'error' && !isset($_POST['nilai_usulan']) || $_POST['nilai_usulan'] === '') {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Nilai Usulan kosong!';
 				} else if ($ret['status'] != 'error' && empty($_POST['ket_usulan'])) {
