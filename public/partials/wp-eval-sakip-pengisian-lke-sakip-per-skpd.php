@@ -298,7 +298,8 @@ $timezone = get_option('timezone_string');
                 nilai_usulan: nilaiUsulan,
                 ket_usulan: ketUsulan,
                 // bukti_usulan: buktiUsulan,
-                api_key: esakip.api_key
+                api_key: esakip.api_key,
+                tahun_anggaran: <?php echo $tahun_anggaran; ?>
             },
             dataType: 'json',
             success: function(response) {

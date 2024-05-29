@@ -336,8 +336,10 @@ CREATE TABLE esakip_pengisian_lke_history (
   `keterangan` text DEFAULT NULL,
   `keterangan_penilai` text DEFAULT NULL,
   `bukti_dukung` text DEFAULT NULL,
+  `id_asli` int(11) DEFAULT NULL,
   `create_at` datetime DEFAULT current_timestamp(),
   `update_at` datetime DEFAULT current_timestamp(),
+  `tahun_anggaran` year(4) DEFAULT null,
   PRIMARY KEY  (`id`)
 );
 

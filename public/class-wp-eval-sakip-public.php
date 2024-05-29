@@ -6996,6 +6996,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							FROM esakip_data_jadwal
 							WHERE tipe='LKE'
 							  AND tahun_anggaran=%d
+							  AND status !=0
 						", $tahun_anggaran)
 					);
 
@@ -7106,6 +7107,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										);
 										$wpdb->insert('esakip_komponen_penilaian', $data_komponen_penilaian_baru);
 										$id_komponen_penilaian_baru = $wpdb->insert_id;
+
+										$data_pengisian_lke = array(
+											'id_komponen' => $id_komponen_baru,
+											'id_subkomponen' => $id_subkomponen_baru,
+											'id_komponen_penilaian' => $id_komponen_penilaian_baru
+										);
+
+										$wpdb->update('esakip_pengisian_lke',
+											$data_pengisian_lke, 
+											array(
+												'id_komponen'=>$komponen['id'], 
+												'id_subkomponen' => $subkomponen['id'], 
+												'id_komponen_penilaian'=> $penilaian['id'],
+												'tahun_anggaran'=>$tahun_anggaran,
+												'active'=>1
+											));
 
 										$data_kerangka_logis = $wpdb->get_results(
 											$wpdb->prepare("
@@ -8774,10 +8791,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'update_at'
 							);
 
-
 							$sql_backup_esakip_pengisian_lke =  "
-								INSERT INTO esakip_pengisian_lke" . $prefix . "_history (" . implode(', ', $columns_1) . ",id_asli,id_jadwal)
-								SELECT " . implode(', ', $columns_1) . ", " . $data_this_id['id'] . "," . $id . "
+								INSERT INTO esakip_pengisian_lke_history (" . implode(', ', $columns_1) . ",id_asli,id_jadwal)
+								SELECT " . implode(', ', $columns_1) . ", id as id_asli, " . $data_this_id['id'] . "
 											FROM esakip_pengisian_lke";
 
 							$queryRecords1 = $wpdb->query($sql_backup_esakip_pengisian_lke);
