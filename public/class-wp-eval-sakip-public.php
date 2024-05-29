@@ -2526,7 +2526,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -2664,7 +2664,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -2802,7 +2802,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -2940,7 +2940,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -3078,7 +3078,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -3216,7 +3216,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -3354,7 +3354,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -3492,7 +3492,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -3630,7 +3630,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -3756,7 +3756,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -3880,7 +3880,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -4004,7 +4004,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -4128,7 +4128,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -4264,7 +4264,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -4402,7 +4402,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -4517,12 +4517,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	// 			}
 	// 			$get_dpa = $wpdb->get_results(
 	// 				$wpdb->prepare("
-    //                 SELECT * 
-    //                 FROM esakip_dpa 
-    //                 WHERE id_skpd = %d 
-    //                   AND tahun_anggaran = %d 
-    //                   AND active = 1
-    //             ", $id_skpd, $tahun_anggaran),
+	//                 SELECT * 
+	//                 FROM esakip_dpa 
+	//                 WHERE id_skpd = %d 
+	//                   AND tahun_anggaran = %d 
+	//                   AND active = 1
+	//             ", $id_skpd, $tahun_anggaran),
 	// 				ARRAY_A
 	// 			);
 
@@ -4630,10 +4630,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
-						if($data_verifikasi['status_verifikasi'] == 1){
+						if ($data_verifikasi['status_verifikasi'] == 1) {
 							$color_badge_verify = 'success';
 							$text_badge = 'Diterima';
-						}else if($data_verifikasi['status_verifikasi'] == 2){
+						} else if ($data_verifikasi['status_verifikasi'] == 2) {
 							$color_badge_verify = 'danger';
 							$text_badge = 'Ditolak';
 						}
@@ -4649,7 +4649,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if($can_verify){
+						if ($can_verify) {
 							$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
 						}
 						if (!$this->is_admin_panrb()) {
@@ -4819,10 +4819,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
-						if($data_verifikasi['status_verifikasi'] == 1){
+						if ($data_verifikasi['status_verifikasi'] == 1) {
 							$color_badge_verify = 'success';
 							$text_badge = 'Diterima';
-						}else if($data_verifikasi['status_verifikasi'] == 2){
+						} else if ($data_verifikasi['status_verifikasi'] == 2) {
 							$color_badge_verify = 'danger';
 							$text_badge = 'Ditolak';
 						}
@@ -4838,7 +4838,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if($can_verify){
+						if ($can_verify) {
 							$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
 						}
 						if (!$this->is_admin_panrb()) {
@@ -5702,10 +5702,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
-						if($data_verifikasi['status_verifikasi'] == 1){
+						if ($data_verifikasi['status_verifikasi'] == 1) {
 							$color_badge_verify = 'success';
 							$text_badge = 'Diterima';
-						}else if($data_verifikasi['status_verifikasi'] == 2){
+						} else if ($data_verifikasi['status_verifikasi'] == 2) {
 							$color_badge_verify = 'danger';
 							$text_badge = 'Ditolak';
 						}
@@ -10262,7 +10262,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -10573,7 +10573,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -10884,7 +10884,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -11195,7 +11195,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -14233,15 +14233,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 
 		$jadwal_periode = $wpdb->get_results(
-			"
-			SELECT 
-				id,
-				nama_jadwal,
-				tahun_anggaran,
-				lama_pelaksanaan
-			FROM esakip_data_jadwal
-			WHERE tipe = 'RPJMD'
-			  AND status = 1",
+			$wpdb->prepare("
+				SELECT 
+					id,
+					nama_jadwal,
+					tahun_anggaran,
+					lama_pelaksanaan
+				FROM esakip_data_jadwal
+				WHERE tipe = 'RPJMD'
+				  AND tahun_anggaran = %d
+				  AND status = 1
+			", $_GET['tahun']),
 			ARRAY_A
 		);
 		$periode_rpjmd = '';
@@ -14279,16 +14281,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 
 		$get_jadwal_lke = $wpdb->get_results(
-			"
-			SELECT 
-				id,
-				nama_jadwal,
-				tahun_anggaran,
-				lama_pelaksanaan
-			FROM esakip_data_jadwal
-			WHERE tipe = 'LKE'
-			  AND status = 1
-			ORDER BY started_at DESC LIMIT 1",
+			$wpdb->prepare("
+				SELECT 
+					id,
+					nama_jadwal,
+					tahun_anggaran,
+					lama_pelaksanaan
+				FROM esakip_data_jadwal
+				WHERE tipe = 'LKE'
+				  AND tahun_anggaran = %d
+				  AND status = 1
+				ORDER BY started_at DESC LIMIT 1
+			", $_GET['tahun']),
 			ARRAY_A
 		);
 		$pengisian_lke = '';
@@ -14543,29 +14547,31 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					and tahun_anggaran=%d
 				group by id_skpd", $nipkepala[0], $_GET['tahun']), ARRAY_A);
 
-			foreach ($get_jadwal_lke as $get_jadwal_lke_sakip) {
-				$pengisian_lke_per_skpd = $this->functions->generatePage(array(
-					'nama_page' => 'Halaman Pengisian LKE ' . $skpd_db['nama_skpd'] . ' ' . $get_jadwal_lke_sakip['nama_jadwal'],
-					'content' => '[pengisian_lke_sakip_per_skpd id_jadwal=' . $get_jadwal_lke_sakip['id'] . ']',
-					'show_header' => 1,
-					'post_status' => 'private'
-				));
-				$pengisian_lke_per_skpd_page .= '<li><a target="_blank" href="' . $pengisian_lke_per_skpd['url'] . '&id_skpd=' . $skpd_db['id_skpd'] . '&id_jadwal='. $get_jadwal_lke_sakip['id'] . '" class="btn btn-primary">' . $pengisian_lke_per_skpd['title'] . '</a></li>';
-			}
-			if (empty($pengisian_lke_per_skpd_page)) {
-				$pengisian_lke_per_skpd_page = '<li><a return="false" href="#" class="btn btn-secondary">Pengisian LKE kosong atau belum dibuat</a></li>';
-			}
-			$halaman_lke_per_skpd = '
-			<div class="accordion">
-				<h5 class="esakip-header-tahun" data-id="lke" style="margin: 0;">Halaman Pengisian LKE</h5>
-				<div class="esakip-body-tahun" data-id="lke">
-					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-						' . $pengisian_lke_per_skpd_page . '
-					</ul>
-				</div>
-			</div>';
+			if (!empty($skpd_db)) {
+				foreach ($get_jadwal_lke as $get_jadwal_lke_sakip) {
+					$pengisian_lke_per_skpd = $this->functions->generatePage(array(
+						'nama_page' => 'Halaman Pengisian LKE ' . $skpd_db['nama_skpd'] . ' ' . $get_jadwal_lke_sakip['nama_jadwal'],
+						'content' => '[pengisian_lke_sakip_per_skpd id_jadwal=' . $get_jadwal_lke_sakip['id'] . ']',
+						'show_header' => 1,
+						'post_status' => 'private'
+					));
+					$pengisian_lke_per_skpd_page .= '<li><a target="_blank" href="' . $pengisian_lke_per_skpd['url'] . '&id_skpd=' . $skpd_db['id_skpd'] . '&id_jadwal=' . $get_jadwal_lke_sakip['id'] . '" class="btn btn-primary">' . $pengisian_lke_per_skpd['title'] . '</a></li>';
+				}
 
-			$halaman_renstra_skpd = '
+				if (empty($pengisian_lke_per_skpd_page)) {
+					$pengisian_lke_per_skpd_page = '<li><a return="false" href="#" class="btn btn-secondary">Pengisian LKE kosong atau belum dibuat</a></li>';
+				}
+				$halaman_lke_per_skpd = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="lke" style="margin: 0;">Halaman Pengisian LKE</h5>
+					<div class="esakip-body-tahun" data-id="lke">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+							' . $pengisian_lke_per_skpd_page . '
+						</ul>
+					</div>
+				</div>';
+
+				$halaman_renstra_skpd = '
 				<div class="accordion">
 					<h5 class="esakip-header-tahun" data-id="renstra" style="margin: 0;">Periode Upload Dokumen RENSTRA</h5>
 					<div class="esakip-body-tahun" data-id="renstra">
@@ -14574,133 +14580,133 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						</ul>
 					</div>
 				</div>';
-			$detail_renja = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen RENJA/RKT ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_renja_rkt tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_renja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_skp = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen SKP ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_skp tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_skp['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_rencana_aksi = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Rencana Aksi ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_rencana_aksi tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_rencana_aksi['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_iku = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen IKU ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_iku tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_iku['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_pengukuran_kinerja = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Pengukuran Kinerja ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_pengukuran_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_laporan_kinerja = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Laporan Kinerja ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_laporan_kinerja tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_laporan_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_evaluasi_internal = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Evaluasi Internal ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_evaluasi_internal['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_dokumen_lain = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Lain ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_dokumen_lainnya tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_dokumen_lain['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_perjanjian_kinerja = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Perjanjian Kinerja ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_perjanjian_kinerja tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_perjanjian_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_dpa = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen DPA ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_dpa tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_dpa['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_pohon_kinerja_dan_cascading = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Pohon Kinerja dan Cascading  ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_pohon_kinerja_dan_cascading tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_pohon_kinerja_dan_cascading['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_lhe_akip_internal = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen LHE AKIP Internal  ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_lhe_akip_internal['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_tl_lhe_akip_internal = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen TL LHE AKIP Internal  ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_tl_lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_tl_lhe_akip_internal['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_tl_lhe_akip_kemenpan = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen TL LHE AKIP Kemenpan  ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_tl_lhe_akip_kemenpan tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_tl_lhe_akip_kemenpan['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_laporan_monev_renaksi = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Laporan Monev Renaksi  ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_laporan_monev_renaksi tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_laporan_monev_renaksi['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_pedoman_teknis_perencanaan = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Pedoman Teknis Perencanaan  ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_pedoman_teknis_perencanaan tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_pedoman_teknis_perencanaan['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja  ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_pedoman_teknis_evaluasi_internal = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Pedoman Teknis Evaluasi Internal  ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_pedoman_teknis_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_pedoman_teknis_evaluasi_internal['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			echo '
+				$detail_renja = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Detail Dokumen RENJA/RKT ' . $_GET['tahun'],
+					'content' => '[dokumen_detail_renja_rkt tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$detail_renja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$detail_skp = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Detail Dokumen SKP ' . $_GET['tahun'],
+					'content' => '[dokumen_detail_skp tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$detail_skp['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$detail_rencana_aksi = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Detail Dokumen Rencana Aksi ' . $_GET['tahun'],
+					'content' => '[dokumen_detail_rencana_aksi tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$detail_rencana_aksi['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$detail_iku = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Detail Dokumen IKU ' . $_GET['tahun'],
+					'content' => '[dokumen_detail_iku tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$detail_iku['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$detail_pengukuran_kinerja = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Detail Dokumen Pengukuran Kinerja ' . $_GET['tahun'],
+					'content' => '[dokumen_detail_pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$detail_pengukuran_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$detail_laporan_kinerja = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Detail Dokumen Laporan Kinerja ' . $_GET['tahun'],
+					'content' => '[dokumen_detail_laporan_kinerja tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$detail_laporan_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$detail_evaluasi_internal = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Detail Dokumen Evaluasi Internal ' . $_GET['tahun'],
+					'content' => '[dokumen_detail_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$detail_evaluasi_internal['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$detail_dokumen_lain = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Detail Dokumen Lain ' . $_GET['tahun'],
+					'content' => '[dokumen_detail_dokumen_lainnya tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$detail_dokumen_lain['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$detail_perjanjian_kinerja = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Detail Dokumen Perjanjian Kinerja ' . $_GET['tahun'],
+					'content' => '[dokumen_detail_perjanjian_kinerja tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$detail_perjanjian_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$detail_dpa = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Detail Dokumen DPA ' . $_GET['tahun'],
+					'content' => '[dokumen_detail_dpa tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$detail_dpa['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$detail_pohon_kinerja_dan_cascading = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Detail Dokumen Pohon Kinerja dan Cascading  ' . $_GET['tahun'],
+					'content' => '[dokumen_detail_pohon_kinerja_dan_cascading tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$detail_pohon_kinerja_dan_cascading['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$detail_lhe_akip_internal = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Detail Dokumen LHE AKIP Internal  ' . $_GET['tahun'],
+					'content' => '[dokumen_detail_lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$detail_lhe_akip_internal['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$detail_tl_lhe_akip_internal = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Detail Dokumen TL LHE AKIP Internal  ' . $_GET['tahun'],
+					'content' => '[dokumen_detail_tl_lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$detail_tl_lhe_akip_internal['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$detail_tl_lhe_akip_kemenpan = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Detail Dokumen TL LHE AKIP Kemenpan  ' . $_GET['tahun'],
+					'content' => '[dokumen_detail_tl_lhe_akip_kemenpan tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$detail_tl_lhe_akip_kemenpan['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$detail_laporan_monev_renaksi = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Detail Dokumen Laporan Monev Renaksi  ' . $_GET['tahun'],
+					'content' => '[dokumen_detail_laporan_monev_renaksi tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$detail_laporan_monev_renaksi['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$detail_pedoman_teknis_perencanaan = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Detail Dokumen Pedoman Teknis Perencanaan  ' . $_GET['tahun'],
+					'content' => '[dokumen_detail_pedoman_teknis_perencanaan tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$detail_pedoman_teknis_perencanaan['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Detail Dokumen Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja  ' . $_GET['tahun'],
+					'content' => '[dokumen_detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$detail_pedoman_teknis_evaluasi_internal = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Detail Dokumen Pedoman Teknis Evaluasi Internal  ' . $_GET['tahun'],
+					'content' => '[dokumen_detail_pedoman_teknis_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$detail_pedoman_teknis_evaluasi_internal['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				echo '
 				<h2 class="text-center">' . $skpd_db['nama_skpd'] . '</h2>
 				<ul class="daftar-menu-sakip">
 				<li>' . $halaman_renstra_skpd . '</li>
@@ -14724,6 +14730,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					<li><a href="' . $detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['url'] . '" target="_blank" class="btn btn-primary">' . $detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['title'] . '</a></li>
 					<li><a href="' . $detail_pedoman_teknis_evaluasi_internal['url'] . '" target="_blank" class="btn btn-primary">' . $detail_pedoman_teknis_evaluasi_internal['title'] . '</a></li>
 				</ul>';
+			} else {
+				return 'maaf, data skpd kosong';
+				error_log("Warning: \$get_jadwal_lke, \$skpd_db are empty");
+			}
 		}
 	}
 
@@ -16258,7 +16268,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -16392,7 +16402,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -16682,7 +16692,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Keterangan kosong!';
 				}
-				if($_POST['tipe_dokumen'] != 'renstra'){
+				if ($_POST['tipe_dokumen'] != 'renstra') {
 					if (!empty($_POST['tahunAnggaran'])) {
 						$tahunAnggaran = $_POST['tahunAnggaran'];
 					} else {
@@ -16942,10 +16952,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
-						if($data_verifikasi['status_verifikasi'] == 1){
+						if ($data_verifikasi['status_verifikasi'] == 1) {
 							$color_badge_verify = 'success';
 							$text_badge = 'Diterima';
-						}else if($data_verifikasi['status_verifikasi'] == 2){
+						} else if ($data_verifikasi['status_verifikasi'] == 2) {
 							$color_badge_verify = 'danger';
 							$text_badge = 'Ditolak';
 						}
@@ -16961,10 +16971,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if($can_verify){
+						if ($can_verify) {
 							$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
 						}
-                    	if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb()) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_dpa(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_dpa(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
@@ -17083,7 +17093,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
