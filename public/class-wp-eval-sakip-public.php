@@ -9427,7 +9427,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$counter = 1;
 					foreach ($unit as $kk => $vv) {
 						$detail_dokumen_lainnya = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Detail Dokumen dokumen_lainnya ' . $tahun_anggaran,
+							'nama_page' => 'Halaman Detail Dokumen Lain ' . $tahun_anggaran,
 							'content' => '[dokumen_detail_dokumen_lainnya tahun=' . $tahun_anggaran . ']',
 							'show_header' => 1,
 							'post_status' => 'private'
