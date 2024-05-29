@@ -4492,83 +4492,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
-	// public function get_table_dpa()
-	// {
-	// 	global $wpdb;
-	// 	$ret = array(
-	// 		'status' => 'success',
-	// 		'message' => 'Berhasil get data!',
-	// 		'data' => array()
-	// 	);
-
-	// 	if (!empty($_POST)) {
-	// 		if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-	// 			if (!empty($_POST['id_skpd'])) {
-	// 				$id_skpd = $_POST['id_skpd'];
-	// 			} else {
-	// 				$ret['status'] = 'error';
-	// 				$ret['message'] = 'Id SKPD kosong!';
-	// 			}
-	// 			if (!empty($_POST['tahun_anggaran'])) {
-	// 				$tahun_anggaran = $_POST['tahun_anggaran'];
-	// 			} else {
-	// 				$ret['status'] = 'error';
-	// 				$ret['message'] = 'Tahun Anggaran kosong!';
-	// 			}
-	// 			$get_dpa = $wpdb->get_results(
-	// 				$wpdb->prepare("
-	//                 SELECT * 
-	//                 FROM esakip_dpa 
-	//                 WHERE id_skpd = %d 
-	//                   AND tahun_anggaran = %d 
-	//                   AND active = 1
-	//             ", $id_skpd, $tahun_anggaran),
-	// 				ARRAY_A
-	// 			);
-
-	// 			if (!empty($get_dpa)) {
-	// 				$counter = 1;
-	// 				$tbody = '';
-
-	// 				foreach ($get_dpa as $kk => $vv) {
-	// 					$tbody .= "<tr>";
-	// 					$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-	// 					$tbody .= "<td>" . $vv['opd'] . "</td>";
-	// 					$tbody .= "<td>" . $vv['dokumen'] . "</td>";
-	// 					$tbody .= "<td>" . $vv['keterangan'] . "</td>";
-	// 					$tbody .= "<td>" . $vv['created_at'] . "</td>";
-
-	// 					$btn = '<div class="btn-action-group">';
-	// 					$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-	// 					if (!$this->is_admin_panrb()) {
-	// 						$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_dpa(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
-	// 						$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_dpa(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
-	// 					}
-	// 					$btn .= '</div>';
-
-	// 					$tbody .= "<td class='text-center'>" . $btn . "</td>";
-	// 					$tbody .= "</tr>";
-	// 				}
-
-	// 				$ret['data'] = $tbody;
-	// 			} else {
-	// 				$ret['data'] = "<tr><td colspan='6' class='text-center'>Tidak ada data tersedia</td></tr>";
-	// 			}
-	// 		} else {
-	// 			$ret = array(
-	// 				'status' => 'error',
-	// 				'message'   => 'Api Key tidak sesuai!'
-	// 			);
-	// 		}
-	// 	} else {
-	// 		$ret = array(
-	// 			'status' => 'error',
-	// 			'message'   => 'Format tidak sesuai!'
-	// 		);
-	// 	}
-	// 	die(json_encode($ret));
-	// }
-
 	public function get_table_renja()
 	{
 		global $wpdb;
@@ -5211,6 +5134,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 		die(json_encode($ret));
 	}
+	
 	public function get_table_pengukuran_kinerja()
 	{
 		global $wpdb;

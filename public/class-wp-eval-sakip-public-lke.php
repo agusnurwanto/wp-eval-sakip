@@ -374,7 +374,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					if (
 						in_array("admin_ortala", $current_user->roles) ||
 						in_array("admin_bappeda", $current_user->roles) ||
-						in_array("admin_panrb", $current_user->roles) ||
 						in_array("administrator", $current_user->roles)
 					) {
 						$can_verify = true;
@@ -432,7 +431,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 										}
 									}
 								} else {
-									die('ppp');
 									// Jika jadwal sudah tutup
 									$disabled = 'disabled';
 								}
@@ -717,7 +715,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 											}
 										}
 
-										
+
 										$bukti_dukung = json_decode(stripslashes($penilaian['pl_bukti_dukung']), true);
 										if (!empty($bukti_dukung)) {
 											foreach ($bukti_dukung as $k => $bukti) {
@@ -738,23 +736,37 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 										$tbody2 .= "<td class='text-center'>-</td>";
 										switch ($can_verify) {
 											case false:
-												$btn_save = "<button class='btn btn-primary' onclick='simpanPerubahan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan'><span class='dashicons dashicons-saved' ></span></button>";
-
-												$tbody2 .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "' $disabled>" . $opsi . "</select></td>";
+												if (!$this->is_admin_panrb()) {
+													$btn_save = "<button class='btn btn-primary' onclick='simpanPerubahan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan'><span class='dashicons dashicons-saved' ></span></button>";
+												}
+												if (!$this->is_admin_panrb()) {
+													$tbody2 .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "' $disabled>" . $opsi . "</select></td>";
+												} else {
+													$tbody2 .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "' disabled>" . $opsi . "</select></td>";
+												}
 												$tbody2 .= "<td class='text-center'>" . $nilai_usulan . "</td>";
 												$tbody2 .= "<td class='text-center'></td>";
-												$tbody2 .= "<td class='text-center'><div class='bukti-dukung-view' kp-id='" . $penilaian['kp_id'] . "'>" . $bukti_dukung . "</div>" . $tombol_bukti . "</td>";
-												$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "' $disabled>" . $penilaian['pl_keterangan'] . "</textarea></td>";
+												if (!$this->is_admin_panrb()) {
+													$tbody2 .= "<td class='text-center'><div class='bukti-dukung-view' kp-id='" . $penilaian['kp_id'] . "'>" . $bukti_dukung . "</div>" . $tombol_bukti . "</td>";
+													$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "' $disabled>" . $penilaian['pl_keterangan'] . "</textarea></td>";
+												} else {
+													$tbody2 .= "<td class='text-center'><div class='bukti-dukung-view' kp-id='" . $penilaian['kp_id'] . "'>" . $bukti_dukung . "</div></td>";
+													$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan'] . "</textarea></td>";
+												}
 												$tbody2 .= $kerangka_logis;
 												$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' disabled>" . $opsi_penetapan . "</select></td>";
 												$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
 												$tbody2 .= "<td class='text-center'></td>";
 												$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
 												$tbody2 .= $kerangka_logis;
-												if ($disabled == ''){
-													$tbody2 .= "<td class='text-center'>" . $btn_save . "</td>";
+												if ($disabled == '') {
+													if (!$this->is_admin_panrb()) {
+														$tbody2 .= "<td class='text-center'>" . $btn_save . "</td>";
+													} else {
+														$tbody2 .= "<td class='text-center'></td>";
+													}
 												} else {
-													$tbody2 .= "<td class='text-center'></td>";	
+													$tbody2 .= "<td class='text-center'></td>";
 												}
 												break;
 											case true:
@@ -765,11 +777,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												$tbody2 .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "' disabled>" . $opsi . "</select></td>";
 												$tbody2 .= "<td class='text-center'>" . $nilai_usulan . "</td>";
 												$tbody2 .= "<td class='text-center'></td>";
-												if (!$this->is_admin_panrb()) {
-													$tbody2 .= "<td class='text-center'><div class='bukti-dukung-view' kp-id='" . $penilaian['kp_id'] . "'>" . $bukti_dukung . "</div>" . $tombol_bukti . "</td>";
-												} else {
-													$tbody2 .= "<td class='text-center'><div class='bukti-dukung-view' kp-id='" . $penilaian['kp_id'] . "'>" . $bukti_dukung . "</div></td>";
-												}
+												$tbody2 .= "<td class='text-center'><div class='bukti-dukung-view' kp-id='" . $penilaian['kp_id'] . "'>" . $bukti_dukung . "</div></td>";
 												$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan'] . "</textarea></td>";
 												$tbody2 .= $kerangka_logis;
 												$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' " . $disabled . ">" . $opsi_penetapan . "</select></td>";
@@ -778,7 +786,11 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'" . $disabled . ">" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
 												$tbody2 .= $kerangka_logis_penetapan;
 												if ($disabled == '') {
-													$tbody2 .= "<td class='text-center'>" . $btn_save_penetapan . "</td>";
+													if (!$this->is_admin_panrb()) {
+														$tbody2 .= "<td class='text-center'>" . $btn_save_penetapan . "</td>";
+													} else {
+														$tbody2 .= "<td class='text-center'></td>";
+													}
 												} else {
 													$tbody2 .= "<td class='text-center'></td>";
 												}
