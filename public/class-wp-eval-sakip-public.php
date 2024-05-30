@@ -9460,7 +9460,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$counter = 1;
 					foreach ($unit as $kk => $vv) {
 						$detail_dokumen_lainnya = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Detail Dokumen Lain ' . $tahun_anggaran,
+							'nama_page' => 'Halaman Detail Dokumen Lainnya ' . $tahun_anggaran,
 							'content' => '[dokumen_detail_dokumen_lainnya tahun=' . $tahun_anggaran . ']',
 							'show_header' => 1,
 							'post_status' => 'private'
@@ -11782,7 +11782,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$counter = 1;
 					foreach ($unit as $kk => $vv) {
 						$detail_iku = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Detail Dokumen Rencana Aksi ' . $tahun_anggaran,
+							'nama_page' => 'Halaman Detail Dokumen IKU ' . $tahun_anggaran,
 							'content' => '[dokumen_detail_iku tahun=' . $tahun_anggaran . ']',
 							'show_header' => 1,
 							'post_status' => 'private'
@@ -15053,7 +15053,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$evaluasi_internal_skpd_detail .= '<li><a href="' . $evaluasi_internal_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $title_evaluasi_internal_skpd . '</a></li>'; 
 
 			$dokumen_lain_skpd = $this->functions->generatePage(array(
-				'nama_page' => 'Dokumen Lainnya ' . $_GET['tahun'],
+				'nama_page' => 'Lainnya ' . $_GET['tahun'],
 				'content' => '[dokumen_detail_dokumen_lainnya tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
