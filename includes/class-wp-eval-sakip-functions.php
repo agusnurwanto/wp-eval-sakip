@@ -125,6 +125,7 @@ class Esakip_Functions
             $key_db = md5(get_option(ESAKIP_APIKEY));
         }
         $tambahan_url = '';
+        $cek_param_get = [];
         if (!empty($options['custom_url'])) {
             $custom_url = array();
             foreach ($options['custom_url'] as $k => $v) {
@@ -134,14 +135,15 @@ class Esakip_Functions
                 ){
                     $custom_url[] = $v['key'] . '=' . $v['value'];
                 }else{
-                    foreach($v as $key => $val){
-                        $custom_url[] = $key . '=' . $val;
-                    }
+                    $cek_param_get[] = $k . '=' . $v;
                 }
             }
             $tambahan_url = $key_db . implode('&', $custom_url);
         }
         $key = base64_encode($now . $key_db . $now . $tambahan_url);
+        if(!empty($cek_param_get)){
+            $key .= '&'.implode('&', $cek_param_get);
+        }
         return $key;
     }
 
