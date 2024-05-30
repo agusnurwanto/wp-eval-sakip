@@ -14224,7 +14224,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$tahun_anggaran_selesai = $jadwal_periode_item_rpjpd['tahun_anggaran'] + $jadwal_periode_item_rpjpd['lama_pelaksanaan'];
 
 			$rpjpd = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Upload Dokumen RPJPD ' . $jadwal_periode_item_rpjpd['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item_rpjpd['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'nama_page' => 'RPJPD | ' . $jadwal_periode_item_rpjpd['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item_rpjpd['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
 				'content' => '[upload_dokumen_rpjpd periode=' . $jadwal_periode_item_rpjpd['id'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
@@ -14244,14 +14244,81 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			  AND status = 1",
 			ARRAY_A
 		);
+		// SAKIP PEMDA
+		$renja_detail_pemda = '';
+		$iku_detail_pemda = '';
+		$skp_detail_pemda = '';
+		$rencana_aksi_detail_pemda = '';
+		$pengukuran_kinerja_detail_pemda = '';
+		$pengukuran_rencana_aksi_detail_pemda = '';
+		$laporan_kinerja_detail_pemda = '';
+		$evaluasi_internal_detail_pemda = '';
+		$dokumen_lainnya_detail_pemda = '';
+		$perjanjian_kinerja_detail_pemda = '';
+		$rkpd_detail_pemda = '';
+		$dokumen_pemda_lainnya_detail_pemda = '';
+		$lkjip_lppd_detail_pemda = '';
+		$dpa_detail_pemda = '';
+		$pohon_kinerja_dan_cascading_detail_pemda = '';
+		$lhe_akip_internal_detail_pemda = '';
+		$tl_lhe_akip_internal_detail_pemda = '';
+		$tl_lhe_akip_kemenpan_detail_pemda = '';
+		$laporan_monev_renaksi_detail_pemda = '';
+		$pedoman_teknis_perencanaan_detail_pemda = '';
+		$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_detail_pemda = '';
+		$pedoman_teknis_evaluasi_internal_detail_pemda = '';
+		
+		// SAKIP OPD
 		$periode_rpjmd = '';
 		$periode_renstra = '';
 		$periode_renstra_skpd = '';
+		$renja_rkt_detail = '';
+		$iku_detail = '';
+		$skp_detail = '';
+		$rencana_aksi_detail = '';
+		$pengukuran_kinerja_detail = '';
+		$pengukuran_rencana_aksi_detail = '';
+		$laporan_kinerja_detail = '';
+		$evaluasi_internal_detail = '';
+		$dokumen_lainnya_detail = '';
+		$perjanjian_kinerja_detail = '';
+		$rkpd_detail = '';
+		$dokumen_pemda_lainnya_detail = '';
+		$lkjip_lppd_detail = '';
+		$dpa_detail = '';
+		$pohon_kinerja_dan_cascading_detail = '';
+		$lhe_akip_internal_detail = '';
+		$tl_lhe_akip_internal_detail = '';
+		$tl_lhe_akip_kemenpan_detail = '';
+		$laporan_monev_renaksi_detail = '';
+		$pedoman_teknis_perencanaan_detail = '';
+		$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_detail = '';
+		$pedoman_teknis_evaluasi_internal_detail = '';
+
+		//OPD
+		$renja_skpd_detail = '';
+		$iku_skpd_detail = '';	
+		$skp_skpd_detail = '';
+		$rencana_aksi_skpd_detail = '';
+		$pengukuran_kinerja_skpd_detail = '';
+		$laporan_kinerja_skpd_detail = '';
+		$evaluasi_internal_skpd_detail = '';
+		$dokumen_lain_skpd_detail = '';
+		$perjanjian_kinerja_skpd_detail = '';
+		$dpa_skpd_detail = '';
+		$pohon_kinerja_dan_cascading_skpd_detail = '';
+		$lhe_akip_internal_skpd_detail = '';
+		$tl_lhe_akip_internal_skpd_detail = '';
+		$tl_lhe_akip_kemenpan_skpd_detail = '';
+		$laporan_monev_renaksi_skpd_detail = '';
+		$pedoman_teknis_perencanaan_skpd_detail = '';
+		$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_skpd_detail = '';
+		$pedoman_teknis_evaluasi_internal_skpd_detail = '';	
 		foreach ($jadwal_periode as $jadwal_periode_item) {
 			$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
 
 			$rpjmd = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Upload Dokumen RPJMD ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'nama_page' => 'RPJMD | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
 				'content' => '[upload_dokumen_rpjmd periode=' . $jadwal_periode_item['id'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
@@ -14259,7 +14326,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$periode_rpjmd .= '<li><a target="_blank" href="' . $rpjmd['url'] . '" class="btn btn-primary">' . $rpjmd['title'] . '</a></li>';
 
 			$renstra = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen RENSTRA ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'nama_page' => 'RENSTRA | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
 				'content' => '[renstra periode=' . $jadwal_periode_item['id'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
@@ -14267,16 +14334,417 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$periode_renstra .= '<li><a target="_blank" href="' . $renstra['url'] . '" class="btn btn-primary">' . $renstra['title'] . '</a></li>';
 
 			$renstra_skpd = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen RENSTRA ' . $jadwal_periode_item['id'],
+				'nama_page' => 'RENSTRA | ' . $jadwal_periode_item['id'],
 				'content' => '[upload_dokumen_renstra periode=' . $jadwal_periode_item['id'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$title_renstra = 'Halaman Detail Dokumen RENSTRA ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+			$title_renstra = 'Dokumen RENSTRA | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
 			$renstra_skpd['url'] .= '&id_skpd=ganti';
 			$periode_renstra_skpd .= '<li><a target="_blank" href="' . $renstra_skpd['url'] . '" class="btn btn-primary">' . $title_renstra . '</a></li>';
-		}
 
+			// PEMDA
+
+			$renja_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'RENJA / RKT',
+				'content' => '[renja/rkt tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_renja = 'RENJA / RKT';
+			$renja_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_renja . '</a></li>';
+
+			$iku_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'IKU',
+				'content' => '[iku tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_skp = 'IKU';
+			$iku_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_skp . '</a></li>';
+
+			$skp_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'SKP',
+				'content' => '[skp tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_skp = 'SKP';
+			$skp_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_skp . '</a></li>';
+
+			$rencana_aksi_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'Rencana Aksi',
+				'content' => '[rencana_aksi tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_rencana_aksi = 'Rencana Aksi';
+			$rencana_aksi_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_rencana_aksi . '</a></li>';
+
+			$pengukuran_kinerja_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'Pengukuran Kinerja',
+				'content' => '[pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_pengukuran_kinerja = 'Pengukuran Kinerja';
+			$pengukuran_kinerja_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_pengukuran_kinerja . '</a></li>';
+
+			$pengukuran_rencana_aksi_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'Pengukuran Rencana Aksi',
+				'content' => '[pengukuran_rencana_aksi tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_pengukuran_rencana_aksi = 'Pengukuran Rencana Aksi';
+			$pengukuran_rencana_aksi_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_pengukuran_rencana_aksi . '</a></li>';
+
+			$laporan_kinerja_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'Laporan Kinerja',
+				'content' => '[laporan_kinerja tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_laporan_kinerja = 'Laporan Kinerja';
+			$laporan_kinerja_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_laporan_kinerja . '</a></li>';
+
+			$evaluasi_internal_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'Evaluasi Internal',
+				'content' => '[evaluasi_internal tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_evaluasi_internal = 'Evaluasi Internal';
+			$evaluasi_internal_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_evaluasi_internal . '</a></li>';
+
+			$dokumen_lainnya_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'Lainnya',
+				'content' => '[dokumen_lainnya tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_dokumen_lainnya = 'Lainnya';
+			$dokumen_lainnya_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_dokumen_lainnya . '</a></li>';
+
+			$perjanjian_kinerja_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'Perjanjian Kinerja',
+				'content' => '[perjanjian_kinerja tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_perjanjian_kinerja = 'Perjanjian Kinerja';
+			$perjanjian_kinerja_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_perjanjian_kinerja . '</a></li>';
+
+			$rkpd_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'RKPD',
+				'content' => '[rkpd tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_rkpd = 'RKPD';
+			$rkpd_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_rkpd . '</a></li>';
+
+			$dokumen_pemda_lainnya_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'Pemda Lainnya',
+				'content' => '[dokumen_pemda_lainnya tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_dokumen_pemda_lainnya = 'Pemda Lainnya';
+			$dokumen_pemda_lainnya_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_dokumen_pemda_lainnya . '</a></li>';
+
+			$lkjip_lppd_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'LKJIP / LPPD',
+				'content' => '[lkjip_lppd tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_lkjip_lppd = 'LKJIP / LPPD';
+			$lkjip_lppd_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_lkjip_lppd . '</a></li>';
+
+			$dpa_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'DPA',
+				'content' => '[dpa tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_dpa = 'DPA';
+			$dpa_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_dpa . '</a></li>';
+
+			$pohon_kinerja_dan_cascading_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'Pohon Kinerja dan Cascading',
+				'content' => '[pohon_kinerja_dan_cascading tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_pohon_kinerja_dan_cascading = 'Pohon Kinerja dan Cascading';
+			$pohon_kinerja_dan_cascading_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_pohon_kinerja_dan_cascading . '</a></li>';
+
+			$lhe_akip_internal_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'LHE AKIP Internal',
+				'content' => '[lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_lhe_akip_internal = 'LHE AKIP Internal';
+			$lhe_akip_internal_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_lhe_akip_internal . '</a></li>';
+
+			$tl_lhe_akip_internal_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'TL LHE AKIP Internal',
+				'content' => '[tl_lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_tl_lhe_akip_internal = 'TL LHE AKIP Internal';
+			$tl_lhe_akip_internal_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_tl_lhe_akip_internal . '</a></li>';
+
+			$tl_lhe_akip_kemenpan_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'TL LHE AKIP Kemenpan',
+				'content' => '[tl_lhe_akip_kemenpan tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_tl_lhe_akip_kemenpan = 'TL LHE AKIP Kemenpan';
+			$tl_lhe_akip_kemenpan_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_tl_lhe_akip_kemenpan . '</a></li>';
+
+			$laporan_monev_renaksi_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'Laporan Monev Renaksi',
+				'content' => '[laporan_monev_renaksi tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_laporan_monev_renaksi = 'Laporan Monev Renaksi';
+			$laporan_monev_renaksi_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_laporan_monev_renaksi . '</a></li>';
+
+			$pedoman_teknis_perencanaan_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'Pedoman Teknis Perencanaan',
+				'content' => '[pedoman_teknis_perencanaan tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_pedoman_teknis_perencanaan = 'Pedoman Teknis Perencanaan';
+			$pedoman_teknis_perencanaan_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_pedoman_teknis_perencanaan . '</a></li>';
+
+			$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja',
+				'content' => '[pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja';
+			$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja . '</a></li>';
+
+			$pedoman_teknis_evaluasi_internal_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'Pedoman Teknis Evaluasi Internal',
+				'content' => '[pedoman_teknis_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_pedoman_teknis_evaluasi_internal = 'Pedoman Teknis Evaluasi Internal';
+			$pedoman_teknis_evaluasi_internal_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-primary">' .  $title_pedoman_teknis_evaluasi_internal . '</a></li>';
+
+			//DOKUMEN OPD
+
+			$renja_rkt = $this->functions->generatePage(array(
+				'nama_page' => 'RENJA / RKT',
+				'content' => '[renja_rkt tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$renja_rkt_detail .= '<li><a target="_blank" href="' . $renja_rkt['url'] . '" class="btn btn-primary">' .  $renja_rkt['title'] . '</a></li>';
+
+			$iku = $this->functions->generatePage(array(
+				'nama_page' => 'IKU -',
+				'content' => '[iku tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_iku = 'IKU ';
+			$iku_detail .= '<li><a target="_blank" href="' . $iku['url'] . '" class="btn btn-primary">' .  $title_iku . '</a></li>';
+
+			$perjanjian_kinerja = $this->functions->generatePage(array(
+				'nama_page' => 'Perjanjian Kinerja -',
+				'content' => '[perjanjian_kinerja tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_perjanjian_kinerja = 'Perjanjian Kinerja';
+			$perjanjian_kinerja_detail .= '<li><a target="_blank" href="' . $perjanjian_kinerja['url'] . '" class="btn btn-primary">' .  $title_perjanjian_kinerja . '</a></li>';
+
+			$laporan_kinerja = $this->functions->generatePage(array(
+				'nama_page' => 'Laporan Kinerja -',
+				'content' => '[laporan_kinerja tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_laporan_kinerja = 'Laporan Kinerja'; 
+			$laporan_kinerja_detail .= '<li><a target="_blank" href="' . $laporan_kinerja['url'] . '" class="btn btn-primary">' .  $title_laporan_kinerja . '</a></li>';
+
+			$dpa = $this->functions->generatePage(array(
+				'nama_page' => 'DPA -',
+				'content' => '[dpa tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_dpa = 'DPA';
+			$dpa_detail .= '<li><a target="_blank" href="' . $dpa['url'] . '" class="btn btn-primary">' .  $title_dpa . '</a></li>';
+
+			$pohon_kinerja_dan_cascading = $this->functions->generatePage(array(
+				'nama_page' => 'Pohon Kinerja dan Cascading -',
+				'content' => '[pohon_kinerja_dan_cascading tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_pohon_kinerja_dan_cascading = 'Pohon Kinerja dan Cascading';
+			$pohon_kinerja_dan_cascading_detail .= '<li><a target="_blank" href="' . $pohon_kinerja_dan_cascading['url'] . '" class="btn btn-primary">' .  $title_pohon_kinerja_dan_cascading . '</a></li>';
+
+			$lhe_akip_internal = $this->functions->generatePage(array(
+				'nama_page' => 'LHE AKIP Internal -',
+				'content' => '[lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_lhe_akip_internal = 'LHE AKIP Internal';
+			$lhe_akip_internal_detail .= '<li><a target="_blank" href="' . $lhe_akip_internal['url'] . '" class="btn btn-primary">' .  $title_lhe_akip_internal . '</a></li>';
+
+			$tl_lhe_akip_internal = $this->functions->generatePage(array(
+				'nama_page' => 'TL LHE AKIP Internal-',
+				'content' => '[tl_lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_tl_lhe_akip_internal = 'TL LHE AKIP Internal';
+			$tl_lhe_akip_internal_detail .= '<li><a target="_blank" href="' . $tl_lhe_akip_internal['url'] . '" class="btn btn-primary">' .  $title_tl_lhe_akip_internal . '</a></li>';
+
+			$laporan_monev_renaksi = $this->functions->generatePage(array(
+				'nama_page' => 'Laporan Monev Renaksi -',
+				'content' => '[laporan_monev_renaksi tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_laporan_monev_renaksi = 'Laporan Monev Renaksi';
+			$laporan_monev_renaksi_detail .= '<li><a target="_blank" href="' . $laporan_monev_renaksi['url'] . '" class="btn btn-primary">' .  $title_laporan_monev_renaksi . '</a></li>';
+
+			$dokumen_lainnya = $this->functions->generatePage(array(
+				'nama_page' => 'Lainnya -',
+				'content' => '[dokumen_lainnya tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_dokumen_lainnya = 'Lainnya';
+			$dokumen_lainnya_detail .= '<li><a target="_blank" href="' . $dokumen_lainnya['url'] . '" class="btn btn-primary">' .  $title_dokumen_lainnya . '</a></li>';
+
+			//DOKUMEN OPD JIKA DIPAKAI
+
+			// $skp = $this->functions->generatePage(array(
+			// 	'nama_page' => 'SKP',
+			// 	'content' => '[skp tahun=' . $_GET['tahun'] . ']',
+			// 	'show_header' => 1,
+			// 	'post_status' => 'private'
+			// ));
+			// $title_skp = '$skp';
+			// $skp_detail .= '<li><a target="_blank" href="' . $skp['url'] . '" class="btn btn-primary">' .  $title_skp . '</a></li>';
+
+			// $rencana_aksi = $this->functions->generatePage(array(
+			// 	'nama_page' => 'Rencana Aksi',
+			// 	'content' => '[rencana_aksi tahun=' . $_GET['tahun'] . ']',
+			// 	'show_header' => 1,
+			// 	'post_status' => 'private'
+			// ));
+			// $title_rencana_aksi = 'Rencana Aksi';
+			// $rencana_aksi_detail .= '<li><a target="_blank" href="' . $rencana_aksi['url'] . '" class="btn btn-primary">' .  $title_rencana_aksi . '</a></li>';
+
+			// $pengukuran_kinerja = $this->functions->generatePage(array(
+			// 	'nama_page' => 'Pengukuran Kinerja',
+			// 	'content' => '[pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
+			// 	'show_header' => 1,
+			// 	'post_status' => 'private'
+			// ));
+			// $title_pengukuran_kinerja = 'Pengukuran Kinerja';
+			// $pengukuran_kinerja_detail .= '<li><a target="_blank" href="' . $pengukuran_kinerja['url'] . '" class="btn btn-primary">' .  $title_pengukuran_kinerja . '</a></li>';
+
+			// $pengukuran_rencana_aksi = $this->functions->generatePage(array(
+			// 	'nama_page' => 'Pengukuran Rencana Aksi',
+			// 	'content' => '[pengukuran_rencana_aksi tahun=' . $_GET['tahun'] . ']',
+			// 	'show_header' => 1,
+			// 	'post_status' => 'private'
+			// ));
+			// $title_pengukuran_rencana_aksi = 'Pengukuran Rencana Aksi';
+			// $pengukuran_rencana_aksi_detail .= '<li><a target="_blank" href="' . $pengukuran_rencana_aksi['url'] . '" class="btn btn-primary">' .  $title_pengukuran_rencana_aksi . '</a></li>';
+
+			// $evaluasi_internal = $this->functions->generatePage(array(
+			// 	'nama_page' => 'Evaluasi Internal',
+			// 	'content' => '[evaluasi_internal tahun=' . $_GET['tahun'] . ']',
+			// 	'show_header' => 1,
+			// 	'post_status' => 'private'
+			// ));
+			// $title_evaluasi_internal = 'Evaluasi Internal';
+			// $evaluasi_internal_detail .= '<li><a target="_blank" href="' . $evaluasi_internal['url'] . '" class="btn btn-primary">' .  $title_evaluasi_internal . '</a></li>';
+
+			// $dokumen_lainnya = $this->functions->generatePage(array(
+			// 	'nama_page' => 'Lainnya',
+			// 	'content' => '[dokumen_lainnya tahun=' . $_GET['tahun'] . ']',
+			// 	'show_header' => 1,
+			// 	'post_status' => 'private'
+			// ));
+			// $title_dokumen_lainnya = 'Lainnya';
+			// $dokumen_lainnya_detail .= '<li><a target="_blank" href="' . $dokumen_lainnya['url'] . '" class="btn btn-primary">' .  $title_dokumen_lainnya . '</a></li>';
+
+			// $rkpd = $this->functions->generatePage(array(
+			// 	'nama_page' => 'RKPD',
+			// 	'content' => '[rkpd tahun=' . $_GET['tahun'] . ']',
+			// 	'show_header' => 1,
+			// 	'post_status' => 'private'
+			// ));
+			// $title_rkpd = 'RKPD';
+			// $rkpd_detail .= '<li><a target="_blank" href="' . $rkpd['url'] . '" class="btn btn-primary">' .  $title_rkpd . '</a></li>';
+
+			// $lkjip_lppd = $this->functions->generatePage(array(
+			// 	'nama_page' => 'LKJIP / LPPD',
+			// 	'content' => '[lkjip_lppd tahun=' . $_GET['tahun'] . ']',
+			// 	'show_header' => 1,
+			// 	'post_status' => 'private'
+			// ));
+			// $title_lkjip_lppd = 'LKJIP / LPPD';
+			// $lkjip_lppd_detail .= '<li><a target="_blank" href="' . $lkjip_lppd['url'] . '" class="btn btn-primary">' .  $title_lkjip_lppd . '</a></li>';
+
+			// $tl_lhe_akip_kemenpan = $this->functions->generatePage(array(
+			// 	'nama_page' => 'TL LHE AKIP Kemenpan',
+			// 	'content' => '[tl_lhe_akip_kemenpan tahun=' . $_GET['tahun'] . ']',
+			// 	'show_header' => 1,
+			// 	'post_status' => 'private'
+			// ));
+			// $title_tl_lhe_akip_kemenpan = 'TL LHE AKIP Kemenpan';
+			// $tl_lhe_akip_kemenpan_detail .= '<li><a target="_blank" href="' . $tl_lhe_akip_kemenpan['url'] . '" class="btn btn-primary">' .  $title_tl_lhe_akip_kemenpan . '</a></li>';
+
+			// $pedoman_teknis_perencanaan = $this->functions->generatePage(array(
+			// 	'nama_page' => 'Pedoman Teknis Perencanaan',
+			// 	'content' => '[pedoman_teknis_perencanaan tahun=' . $_GET['tahun'] . ']',
+			// 	'show_header' => 1,
+			// 	'post_status' => 'private'
+			// ));
+			// $title_pedoman_teknis_perencanaan = 'Pedoman Teknis Perencanaan';
+			// $pedoman_teknis_perencanaan_detail .= '<li><a target="_blank" href="' . $pedoman_teknis_perencanaan['url'] . '" class="btn btn-primary">' .  $title_pedoman_teknis_perencanaan . '</a></li>';
+
+			// $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = $this->functions->generatePage(array(
+			// 	'nama_page' => 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja',
+			// 	'content' => '[pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja tahun=' . $_GET['tahun'] . ']',
+			// 	'show_header' => 1,
+			// 	'post_status' => 'private'
+			// ));
+			// $title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja';
+			// $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_detail .= '<li><a target="_blank" href="' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['url'] . '" class="btn btn-primary">' .  $title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja . '</a></li>';
+
+			// $pedoman_teknis_evaluasi_internal = $this->functions->generatePage(array(
+			// 	'nama_page' => 'Pedoman Teknis Evaluasi Internal',
+			// 	'content' => '[pedoman_teknis_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
+			// 	'show_header' => 1,
+			// 	'post_status' => 'private'
+			// ));
+			// $title_pedoman_teknis_evaluasi_internal = 'Pedoman Teknis Evaluasi Internal';
+			// $pedoman_teknis_evaluasi_internal_detail .= '<li><a target="_blank" href="' . $pedoman_teknis_evaluasi_internal['url'] . '" class="btn btn-primary">' .  $title_pedoman_teknis_evaluasi_internal . '</a></li>';
+
+		}
 
 		$get_jadwal_lke = $wpdb->get_results(
 			"
@@ -14292,12 +14760,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			ARRAY_A
 		);
 		$pengisian_lke = '';
-		$pengisian_lke_per_skpd_page = '';
+		$pengisian_lke_per_skpd_page = '';	
 		foreach ($get_jadwal_lke as $get_jadwal_lke_sakip) {
 			$tahun_anggaran_selesai = $get_jadwal_lke_sakip['tahun_anggaran'] + $get_jadwal_lke_sakip['lama_pelaksanaan'];
 
 			$lke = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Pengisian LKE ' . $get_jadwal_lke_sakip['nama_jadwal'],
+				'nama_page' => 'Pengisian LKE | ' . $get_jadwal_lke_sakip['nama_jadwal'],
 				'content' => '[pengisian_lke_sakip id_jadwal=' . $get_jadwal_lke_sakip['id'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
@@ -14325,7 +14793,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 		$halaman_lke = '
 			<div class="accordion">
-				<h5 class="esakip-header-tahun" data-id="lke" style="margin: 0;">Halaman Pengisian LKE</h5>
+				<h5 class="esakip-header-tahun" data-id="lke" style="margin: 0;">Pengisian LKE</h5>
 				<div class="esakip-body-tahun" data-id="lke">
 					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 						' . $pengisian_lke . '
@@ -14359,172 +14827,88 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					</ul>
 				</div>
 			</div>';
+		$halaman_renstra_opd = '
+			<div class="accordion">
+				<h5 class="esakip-header-tahun" data-id="renstra-opd" style="margin: 0;">Periode Upload Dokumen RENSTRA</h5>
+				<div class="esakip-body-tahun" data-id="renstra-opd">
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+						' . $periode_renstra . '
+					</ul>
+				</div>
+			</div>';
+
+		$halaman_renstra_skpd = '
+			<div class="accordion">
+				<h5 class="esakip-header-tahun" data-id="renstra-skpd" style="margin: 0;">Periode Upload Dokumen RENSTRA</h5>
+				<div class="esakip-body-tahun" data-id="renstra-skpd">
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+						'. $periode_renstra_skpd . '
+					</ul>
+				</div>
+			</div>';
+		$halaman_sakip = '
+			<div class="accordion">
+				<h5 class="esakip-header-tahun" data-id="halaman-sakip" style="margin: 0;">Dokumen SAKIP</h5>
+				<div class="esakip-body-tahun" data-id="halaman-sakip">
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+						' . $halaman_rpjpd . '
+						' . $halaman_rpjmd . '
+						' . $halaman_renstra . '
+						' . $iku_detail_pemda . '
+						' . $renja_detail_pemda . '
+						' . $rkpd_detail_pemda . '
+						' . $perjanjian_kinerja_detail_pemda . '
+						' . $rencana_aksi_detail_pemda . '
+						' . $laporan_kinerja_detail_pemda . '
+						' . $dpa_detail_pemda . '
+						' . $pohon_kinerja_dan_cascading_detail_pemda . '
+						' . $lhe_akip_internal_detail_pemda . '
+						' . $tl_lhe_akip_internal_detail_pemda . '
+						' . $tl_lhe_akip_kemenpan_detail_pemda . '
+						' . $laporan_monev_renaksi_detail_pemda . '
+						' . $pedoman_teknis_perencanaan_detail_pemda . '
+						' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_detail_pemda . '
+						' . $pedoman_teknis_evaluasi_internal_detail_pemda . '
+						' . $skp_detail_pemda . '
+						' . $pengukuran_kinerja_detail_pemda . '
+						' . $pengukuran_rencana_aksi_detail_pemda . '
+						' . $evaluasi_internal_detail_pemda . '
+						' . $dokumen_pemda_lainnya_detail_pemda . '
+						' . $lkjip_lppd_detail_pemda . '
+						' . $dokumen_lainnya_detail_pemda . '
+					</ul>
+				</div>
+			</div>';
+		$halaman_sakip_opd = '
+			<div class="accordion">
+				<h5 class="esakip-header-tahun" data-id="halaman-sakip-opd" style="margin: 0;">Dokumen SAKIP OPD</h5>
+				<div class="esakip-body-tahun" data-id="halaman-sakip-opd">
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+					' . $halaman_renstra_opd . '
+					' . $iku_detail . '
+					' . $renja_rkt_detail . '
+					' . $perjanjian_kinerja_detail . '
+					' . $laporan_kinerja_detail . '
+					' . $dpa_detail . '
+					' . $pohon_kinerja_dan_cascading_detail . '
+					' . $lhe_akip_internal_detail . '
+					' . $tl_lhe_akip_internal_detail . '
+					' . $laporan_monev_renaksi_detail . '
+					' . $dokumen_lainnya_detail . '
+					</ul>
+				</div>
+			</div>';
 		if (
 			in_array("administrator", $user_meta->roles)
 			|| in_array("admin_bappeda", $user_meta->roles)
 			|| in_array("admin_ortala", $user_meta->roles)
 			|| in_array("admin_panrb", $user_meta->roles)
 		) {
-			$renja_rkt = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen RENJA/RKT Tahun ' . $_GET['tahun'],
-				'content' => '[renja_rkt tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$skp = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen SKP Tahun ' . $_GET['tahun'],
-				'content' => '[skp tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$rencana_aksi = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen Rencana Aksi Tahun ' . $_GET['tahun'],
-				'content' => '[rencana_aksi tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$iku = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen IKU Tahun ' . $_GET['tahun'],
-				'content' => '[iku tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$pengukuran_kinerja = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen Pengukuran Kinerja Tahun ' . $_GET['tahun'],
-				'content' => '[pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$pengukuran_rencana_aksi = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen Pengukuran Rencana Aksi Tahun ' . $_GET['tahun'],
-				'content' => '[pengukuran_rencana_aksi tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$laporan_kinerja = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen Laporan Kinerja Tahun ' . $_GET['tahun'],
-				'content' => '[laporan_kinerja tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$evaluasi_internal = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen Evaluasi Internal Tahun ' . $_GET['tahun'],
-				'content' => '[evaluasi_internal tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$dokumen_lainnya = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen Lain Tahun ' . $_GET['tahun'],
-				'content' => '[dokumen_lainnya tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$perjanjian_kinerja = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen Perjanjian Kinerja Tahun ' . $_GET['tahun'],
-				'content' => '[perjanjian_kinerja tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$rkpd = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman RKPD Tahun ' . $_GET['tahun'],
-				'content' => '[rkpd tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$dokumen_pemda_lainnya = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen Pemda Lainnya Tahun ' . $_GET['tahun'],
-				'content' => '[dokumen_pemda_lainnya tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$lkjip_lppd = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen LKJIP/LPPD Tahun ' . $_GET['tahun'],
-				'content' => '[lkjip_lppd tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$dpa = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen DPA Tahun ' . $_GET['tahun'],
-				'content' => '[dpa tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$pohon_kinerja_dan_cascading = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen Pohon Kinerja dan Cascading Tahun ' . $_GET['tahun'],
-				'content' => '[pohon_kinerja_dan_cascading tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$lhe_akip_internal = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen LHE AKIP Internal Tahun ' . $_GET['tahun'],
-				'content' => '[lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$tl_lhe_akip_internal = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen TL LHE AKIP Internal Tahun ' . $_GET['tahun'],
-				'content' => '[tl_lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$tl_lhe_akip_kemenpan = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen TL LHE AKIP Kemenpan Tahun ' . $_GET['tahun'],
-				'content' => '[tl_lhe_akip_kemenpan tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$laporan_monev_renaksi = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen Monev Renaksi Tahun ' . $_GET['tahun'],
-				'content' => '[laporan_monev_renaksi tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$pedoman_teknis_perencanaan = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen Pedoman Teknis Perencanaan Tahun ' . $_GET['tahun'],
-				'content' => '[pedoman_teknis_perencanaan tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja Tahun ' . $_GET['tahun'],
-				'content' => '[pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$pedoman_teknis_evaluasi_internal = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Dokumen Pedoman Teknis Evaluasi Internal Tahun ' . $_GET['tahun'],
-				'content' => '[pedoman_teknis_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
 			echo '
 				<ul class="daftar-menu-sakip">
+					<li>' . $halaman_sakip . '</li>
+					<li>' . $halaman_sakip_opd . '</li>
 					<li>' . $halaman_lke . '</li>
-					<li>' . $halaman_rpjpd . '</li>
-					<li>' . $halaman_rpjmd . '</li>
-					<li>' . $halaman_renstra . '</li>
-					<li><a href="' . $renja_rkt['url'] . '" target="_blank" class="btn btn-primary">' . $renja_rkt['title'] . '</a></li>
-					<li><a href="' . $skp['url'] . '" target="_blank" class="btn btn-primary">' . $skp['title'] . '</a></li>
-					<li><a href="' . $rencana_aksi['url'] . '" target="_blank" class="btn btn-primary">' . $rencana_aksi['title'] . '</a></li>
-					<li><a href="' . $iku['url'] . '" target="_blank" class="btn btn-primary">' . $iku['title'] . '</a></li>
-					<li><a href="' . $pengukuran_kinerja['url'] . '" target="_blank" class="btn btn-primary">' . $pengukuran_kinerja['title'] . '</a></li>
-					<li><a href="' . $pengukuran_rencana_aksi['url'] . '" target="_blank" class="btn btn-primary">' . $pengukuran_rencana_aksi['title'] . '</a></li>
-					<li><a href="' . $laporan_kinerja['url'] . '" target="_blank" class="btn btn-primary">' . $laporan_kinerja['title'] . '</a></li>
-					<li><a href="' . $evaluasi_internal['url'] . '" target="_blank" class="btn btn-primary">' . $evaluasi_internal['title'] . '</a></li>
-					<li><a href="' . $dokumen_lainnya['url'] . '" target="_blank" class="btn btn-primary">' . $dokumen_lainnya['title'] . '</a></li>
-					<li><a href="' . $perjanjian_kinerja['url'] . '" target="_blank" class="btn btn-primary">' . $perjanjian_kinerja['title'] . '</a></li>
-					<li><a href="' . $rkpd['url'] . '" target="_blank" class="btn btn-primary">' . $rkpd['title'] . '</a></li>
-					<li><a href="' . $dokumen_pemda_lainnya['url'] . '" target="_blank" class="btn btn-primary">' . $dokumen_pemda_lainnya['title'] . '</a></li>
-					<li><a href="' . $lkjip_lppd['url'] . '" target="_blank" class="btn btn-primary">' . $lkjip_lppd['title'] . '</a></li>
-					<li><a href="' . $dpa['url'] . '" target="_blank" class="btn btn-primary">' . $dpa['title'] . '</a></li>
-					<li><a href="' . $pohon_kinerja_dan_cascading['url'] . '" target="_blank" class="btn btn-primary">' . $pohon_kinerja_dan_cascading['title'] . '</a></li>
-					<li><a href="' . $lhe_akip_internal['url'] . '" target="_blank" class="btn btn-primary">' . $lhe_akip_internal['title'] . '</a></li>
-					<li><a href="' . $tl_lhe_akip_internal['url'] . '" target="_blank" class="btn btn-primary">' . $tl_lhe_akip_internal['title'] . '</a></li>
-					<li><a href="' . $tl_lhe_akip_kemenpan['url'] . '" target="_blank" class="btn btn-primary">' . $tl_lhe_akip_kemenpan['title'] . '</a></li>
-					<li><a href="' . $laporan_monev_renaksi['url'] . '" target="_blank" class="btn btn-primary">' . $laporan_monev_renaksi['title'] . '</a></li>
-					<li><a href="' . $pedoman_teknis_perencanaan['url'] . '" target="_blank" class="btn btn-primary">' . $pedoman_teknis_perencanaan['title'] . '</a></li>
-					<li><a href="' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['url'] . '" target="_blank" class="btn btn-primary">' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['title'] . '</a></li>
-					<li><a href="' . $pedoman_teknis_evaluasi_internal['url'] . '" target="_blank" class="btn btn-primary">' . $pedoman_teknis_evaluasi_internal['title'] . '</a></li>
 				</ul>';
 		} else if (
 			in_array("pa", $user_meta->roles)
@@ -14545,19 +14929,193 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 			foreach ($get_jadwal_lke as $get_jadwal_lke_sakip) {
 				$pengisian_lke_per_skpd = $this->functions->generatePage(array(
-					'nama_page' => 'Halaman Pengisian LKE ' . $skpd_db['nama_skpd'] . ' ' . $get_jadwal_lke_sakip['nama_jadwal'],
+					'nama_page' => 'Pengisian LKE | ' . $skpd_db['nama_skpd'] . ' ' . $get_jadwal_lke_sakip['nama_jadwal'],
 					'content' => '[pengisian_lke_sakip_per_skpd id_jadwal=' . $get_jadwal_lke_sakip['id'] . ']',
 					'show_header' => 1,
 					'post_status' => 'private'
 				));
 				$pengisian_lke_per_skpd_page .= '<li><a target="_blank" href="' . $pengisian_lke_per_skpd['url'] . '&id_skpd=' . $skpd_db['id_skpd'] . '&id_jadwal='. $get_jadwal_lke_sakip['id'] . '" class="btn btn-primary">' . $pengisian_lke_per_skpd['title'] . '</a></li>';
+
+				$renja_skpd = $this->functions->generatePage(array(
+					'nama_page' => 'RENJA / RKT-',
+					'content' => '[dokumen_detail_renja_rkt tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+
+				$title_renja = 'RENJA / RKT ';
+				$renja_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$renja_skpd_detail .= '<li><a target="_blank" href="' . $renja_skpd['url'] . '" class="btn btn-primary">' . $title_renja . '</a></li>';
+				
+				$iku_skpd = $this->functions->generatePage(array(
+					'nama_page' => 'IKU ',
+					'content' => '[dokumen_detail_iku tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+
+				$iku_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$iku_skpd_detail .= '<li><a target="_blank" href="' . $iku_skpd['url'] . '" class="btn btn-primary">' . $iku_skpd['title'] . '</a></li>';
+
+				$skp_skpd = $this->functions->generatePage(array(
+					'nama_page' => 'SKP ',
+					'content' => '[dokumen_detail_skp tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$skp_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$skp_skpd_detail .= '<li><a href="' . $skp_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $skp_skpd['title'] . '</a></li>'; 
+
+				$rencana_aksi_skpd = $this->functions->generatePage(array(
+					'nama_page' => 'Rencana Aksi ',
+					'content' => '[dokumen_detail_rencana_aksi tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$rencana_aksi_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$rencana_aksi_skpd_detail .= '<li><a href="' . $rencana_aksi_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $rencana_aksi_skpd['title'] . '</a></li>'; 
+
+				$pengukuran_kinerja_skpd = $this->functions->generatePage(array(
+					'nama_page' => 'Pengukuran Kinerja ',
+					'content' => '[dokumen_detail_pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$pengukuran_kinerja_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$pengukuran_kinerja_skpd_detail .= '<li><a href="' . $pengukuran_kinerja_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $pengukuran_kinerja_skpd['title'] . '</a></li>'; 
+
+				$pengukuran_kinerja_skpd = $this->functions->generatePage(array(
+				'nama_page' => 'Pengukuran Kinerja ',
+				'content' => '[dokumen_detail_pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+				$pengukuran_kinerja_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$pengukuran_kinerja_skpd_detail .= '<li><a href="' . $pengukuran_kinerja_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $pengukuran_kinerja_skpd['title'] . '</a></li>'; 
+
+				$laporan_kinerja_skpd = $this->functions->generatePage(array(
+					'nama_page' => 'Laporan Kinerja ',
+					'content' => '[dokumen_detail_laporan_kinerja tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$laporan_kinerja_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$laporan_kinerja_skpd_detail .= '<li><a href="' . $laporan_kinerja_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $laporan_kinerja_skpd['title'] . '</a></li>'; 
+
+				$evaluasi_internal_skpd = $this->functions->generatePage(array(
+					'nama_page' => 'Evaluasi Internal ',
+					'content' => '[dokumen_detail_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$evaluasi_internal_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$evaluasi_internal_skpd_detail .= '<li><a href="' . $evaluasi_internal_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $evaluasi_internal_skpd['title'] . '</a></li>'; 
+
+				$dokumen_lain_skpd = $this->functions->generatePage(array(
+					'nama_page' => 'Dokumen Lainnya ',
+					'content' => '[dokumen_detail_dokumen_lainnya tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$dokumen_lain_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$dokumen_lain_skpd_detail .= '<li><a href="' . $dokumen_lain_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $dokumen_lain_skpd['title'] . '</a></li>'; 
+
+				$perjanjian_kinerja_skpd = $this->functions->generatePage(array(
+					'nama_page' => 'Perjanjian Kinerja ',
+					'content' => '[dokumen_detail_perjanjian_kinerja tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$perjanjian_kinerja_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$perjanjian_kinerja_skpd_detail .= '<li><a href="' . $perjanjian_kinerja_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $perjanjian_kinerja_skpd['title'] . '</a></li>'; 
+
+				$dpa_skpd = $this->functions->generatePage(array(
+					'nama_page' => 'DPA ',
+					'content' => '[dokumen_detail_dpa tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$dpa_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$dpa_skpd_detail .= '<li><a href="' . $dpa_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $dpa_skpd['title'] . '</a></li>'; 
+
+				$pohon_kinerja_dan_cascading_skpd = $this->functions->generatePage(array(
+					'nama_page' => 'Pohon Kinerja dan Cascading  ',
+					'content' => '[dokumen_detail_pohon_kinerja_dan_cascading tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$pohon_kinerja_dan_cascading_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$pohon_kinerja_dan_cascading_skpd_detail .= '<li><a href="' . $pohon_kinerja_dan_cascading_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $pohon_kinerja_dan_cascading_skpd['title'] . '</a></li>'; 
+
+				$lhe_akip_internal_skpd = $this->functions->generatePage(array(
+					'nama_page' => 'LHE AKIP Internal  ',
+					'content' => '[dokumen_detail_lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$lhe_akip_internal_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$lhe_akip_internal_skpd_detail .= '<li><a href="' . $lhe_akip_internal_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $lhe_akip_internal_skpd['title'] . '</a></li>'; 
+
+				$tl_lhe_akip_internal_skpd = $this->functions->generatePage(array(
+					'nama_page' => 'TL LHE AKIP Internal  ',
+					'content' => '[dokumen_detail_tl_lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$tl_lhe_akip_internal_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$tl_lhe_akip_internal_skpd_detail .= '<li><a href="' . $tl_lhe_akip_internal_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $tl_lhe_akip_internal_skpd['title'] . '</a></li>'; 
+
+				$tl_lhe_akip_kemenpan_skpd = $this->functions->generatePage(array(
+					'nama_page' => 'TL LHE AKIP Kemenpan  ',
+					'content' => '[dokumen_detail_tl_lhe_akip_kemenpan tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$tl_lhe_akip_kemenpan_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$tl_lhe_akip_kemenpan_skpd_detail .= '<li><a href="' . $tl_lhe_akip_kemenpan_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $tl_lhe_akip_kemenpan_skpd['title'] . '</a></li>'; 
+
+				$laporan_monev_renaksi_skpd = $this->functions->generatePage(array(
+					'nama_page' => 'Laporan Monev Renaksi  ',
+					'content' => '[dokumen_detail_laporan_monev_renaksi tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$laporan_monev_renaksi_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$laporan_monev_renaksi_skpd_detail .= '<li><a href="' . $laporan_monev_renaksi_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $laporan_monev_renaksi_skpd['title'] . '</a></li>'; 
+
+				$pedoman_teknis_perencanaan_skpd = $this->functions->generatePage(array(
+					'nama_page' => 'Pedoman Teknis Perencanaan  ',
+					'content' => '[dokumen_detail_pedoman_teknis_perencanaan tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$pedoman_teknis_perencanaan_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$pedoman_teknis_perencanaan_skpd_detail .= '<li><a href="' . $pedoman_teknis_perencanaan_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $pedoman_teknis_perencanaan_skpd['title'] . '</a></li>'; 
+
+				$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_skpd = $this->functions->generatePage(array(
+					'nama_page' => 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja  ',
+					'content' => '[dokumen_detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_skpd_detail .= '<li><a href="' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_skpd['title'] . '</a></li>'; 
+
+				$pedoman_teknis_evaluasi_internal_skpd = $this->functions->generatePage(array(
+					'nama_page' => 'Pedoman Teknis Evaluasi Internal  ',
+					'content' => '[dokumen_detail_pedoman_teknis_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$pedoman_teknis_evaluasi_internal_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$pedoman_teknis_evaluasi_internal_skpd_detail .= '<li><a href="' . $pedoman_teknis_evaluasi_internal_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $pedoman_teknis_evaluasi_internal_skpd['title'] . '</a></li>'; 
 			}
 			if (empty($pengisian_lke_per_skpd_page)) {
 				$pengisian_lke_per_skpd_page = '<li><a return="false" href="#" class="btn btn-secondary">Pengisian LKE kosong atau belum dibuat</a></li>';
 			}
 			$halaman_lke_per_skpd = '
 			<div class="accordion">
-				<h5 class="esakip-header-tahun" data-id="lke" style="margin: 0;">Halaman Pengisian LKE</h5>
+				<h5 class="esakip-header-tahun" data-id="lke" style="margin: 0;">Pengisian LKE</h5>
 				<div class="esakip-body-tahun" data-id="lke">
 					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 						' . $pengisian_lke_per_skpd_page . '
@@ -14565,164 +15123,31 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				</div>
 			</div>';
 
-			$halaman_renstra_skpd = '
+			$halaman_sakip_skpd = '
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="renstra" style="margin: 0;">Periode Upload Dokumen RENSTRA</h5>
-					<div class="esakip-body-tahun" data-id="renstra">
+					<h5 class="esakip-header-tahun" data-id="halaman-sakip-skpd" style="margin: 0;">Dokumen SAKIP</h5>
+					<div class="esakip-body-tahun" data-id="halaman-sakip-skpd">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-							' . str_replace('&id_skpd=ganti', '&id_skpd=' . $skpd_db['id_skpd'], $periode_renstra_skpd) . '
+							' . $halaman_renstra_skpd . '
+							' . $iku_skpd_detail . '
+							' . $renja_skpd_detail . '
+							' . $perjanjian_kinerja_skpd_detail . '
+							' . $rencana_aksi_skpd_detail . '
+							' . $laporan_kinerja_skpd_detail . '
+							' . $dpa_skpd_detail . '
+							' . $pohon_kinerja_dan_cascading_skpd_detail . '
+							' . $lhe_akip_internal_skpd_detail . '
+							' . $tl_lhe_akip_internal_skpd_detail . '
+							' . $dokumen_lain_skpd_detail . '
 						</ul>
 					</div>
 				</div>';
-			$detail_renja = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen RENJA/RKT ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_renja_rkt tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_renja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_skp = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen SKP ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_skp tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_skp['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_rencana_aksi = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Rencana Aksi ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_rencana_aksi tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_rencana_aksi['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_iku = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen IKU ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_iku tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_iku['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_pengukuran_kinerja = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Pengukuran Kinerja ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_pengukuran_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_laporan_kinerja = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Laporan Kinerja ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_laporan_kinerja tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_laporan_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_evaluasi_internal = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Evaluasi Internal ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_evaluasi_internal['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_dokumen_lain = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Lain ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_dokumen_lainnya tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_dokumen_lain['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_perjanjian_kinerja = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Perjanjian Kinerja ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_perjanjian_kinerja tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_perjanjian_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_dpa = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen DPA ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_dpa tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_dpa['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_pohon_kinerja_dan_cascading = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Pohon Kinerja dan Cascading  ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_pohon_kinerja_dan_cascading tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_pohon_kinerja_dan_cascading['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_lhe_akip_internal = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen LHE AKIP Internal  ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_lhe_akip_internal['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_tl_lhe_akip_internal = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen TL LHE AKIP Internal  ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_tl_lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_tl_lhe_akip_internal['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_tl_lhe_akip_kemenpan = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen TL LHE AKIP Kemenpan  ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_tl_lhe_akip_kemenpan tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_tl_lhe_akip_kemenpan['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_laporan_monev_renaksi = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Laporan Monev Renaksi  ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_laporan_monev_renaksi tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_laporan_monev_renaksi['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_pedoman_teknis_perencanaan = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Pedoman Teknis Perencanaan  ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_pedoman_teknis_perencanaan tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_pedoman_teknis_perencanaan['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja  ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$detail_pedoman_teknis_evaluasi_internal = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Detail Dokumen Pedoman Teknis Evaluasi Internal  ' . $_GET['tahun'],
-				'content' => '[dokumen_detail_pedoman_teknis_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$detail_pedoman_teknis_evaluasi_internal['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+
 			echo '
 				<h2 class="text-center">' . $skpd_db['nama_skpd'] . '</h2>
 				<ul class="daftar-menu-sakip">
-				<li>' . $halaman_renstra_skpd . '</li>
-				<li>' . $halaman_lke_per_skpd . '</li>
-					<li><a href="' . $detail_renja['url'] . '" target="_blank" class="btn btn-primary">' . $detail_renja['title'] . '</a></li>
-					<li><a href="' . $detail_skp['url'] . '" target="_blank" class="btn btn-primary">' . $detail_skp['title'] . '</a></li>
-					<li><a href="' . $detail_rencana_aksi['url'] . '" target="_blank" class="btn btn-primary">' . $detail_rencana_aksi['title'] . '</a></li>
-					<li><a href="' . $detail_iku['url'] . '" target="_blank" class="btn btn-primary">' . $detail_iku['title'] . '</a></li>
-					<li><a href="' . $detail_pengukuran_kinerja['url'] . '" target="_blank" class="btn btn-primary">' . $detail_pengukuran_kinerja['title'] . '</a></li>
-					<li><a href="' . $detail_laporan_kinerja['url'] . '" target="_blank" class="btn btn-primary">' . $detail_laporan_kinerja['title'] . '</a></li>
-					<li><a href="' . $detail_evaluasi_internal['url'] . '" target="_blank" class="btn btn-primary">' . $detail_evaluasi_internal['title'] . '</a></li>
-					<li><a href="' . $detail_dokumen_lain['url'] . '" target="_blank" class="btn btn-primary">' . $detail_dokumen_lain['title'] . '</a></li>
-					<li><a href="' . $detail_perjanjian_kinerja['url'] . '" target="_blank" class="btn btn-primary">' . $detail_perjanjian_kinerja['title'] . '</a></li>
-					<li><a href="' . $detail_dpa['url'] . '" target="_blank" class="btn btn-primary">' . $detail_dpa['title'] . '</a></li>
-					<li><a href="' . $detail_pohon_kinerja_dan_cascading['url'] . '" target="_blank" class="btn btn-primary">' . $detail_pohon_kinerja_dan_cascading['title'] . '</a></li>
-					<li><a href="' . $detail_lhe_akip_internal['url'] . '" target="_blank" class="btn btn-primary">' . $detail_lhe_akip_internal['title'] . '</a></li>
-					<li><a href="' . $detail_tl_lhe_akip_internal['url'] . '" target="_blank" class="btn btn-primary">' . $detail_tl_lhe_akip_internal['title'] . '</a></li>
-					<li><a href="' . $detail_tl_lhe_akip_kemenpan['url'] . '" target="_blank" class="btn btn-primary">' . $detail_tl_lhe_akip_kemenpan['title'] . '</a></li>
-					<li><a href="' . $detail_laporan_monev_renaksi['url'] . '" target="_blank" class="btn btn-primary">' . $detail_laporan_monev_renaksi['title'] . '</a></li>
-					<li><a href="' . $detail_pedoman_teknis_perencanaan['url'] . '" target="_blank" class="btn btn-primary">' . $detail_pedoman_teknis_perencanaan['title'] . '</a></li>
-					<li><a href="' . $detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['url'] . '" target="_blank" class="btn btn-primary">' . $detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['title'] . '</a></li>
-					<li><a href="' . $detail_pedoman_teknis_evaluasi_internal['url'] . '" target="_blank" class="btn btn-primary">' . $detail_pedoman_teknis_evaluasi_internal['title'] . '</a></li>
+					<li>' . $halaman_sakip_skpd . '</li>
+					<li>' . $halaman_lke_per_skpd . '</li>
 				</ul>';
 		}
 	}
