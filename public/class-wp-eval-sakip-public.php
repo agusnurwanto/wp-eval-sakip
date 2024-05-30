@@ -14670,7 +14670,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			//DOKUMEN OPD JIKA DIPAKAI
 
 			$skp = $this->functions->generatePage(array(
-				'nama_page' => 'SKP',
+				'nama_page' => 'SKP -',
 				'content' => '[skp tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
@@ -14706,7 +14706,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			// $pengukuran_rencana_aksi_detail .= '<li><a target="_blank" href="' . $pengukuran_rencana_aksi['url'] . '" class="btn btn-primary">' .  $title_pengukuran_rencana_aksi . '</a></li>';
 
 			$evaluasi_internal = $this->functions->generatePage(array(
-				'nama_page' => 'Evaluasi Internal',
+				'nama_page' => 'Evaluasi Internal -',
 				'content' => '[evaluasi_internal tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
@@ -14901,10 +14901,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_detail_pemda . '
 						' . $pedoman_teknis_evaluasi_internal_detail_pemda . '
 						' . $skp_detail_pemda . '
-						' . $pengukuran_kinerja_detail_pemda . '
-						' . $pengukuran_rencana_aksi_detail_pemda . '
 						' . $evaluasi_internal_detail_pemda . '
-						' . $dokumen_pemda_lainnya_detail_pemda . '
 						' . $lkjip_lppd_detail_pemda . '
 						' . $dokumen_lainnya_detail_pemda . '
 					</ul>
@@ -14920,12 +14917,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					' . $renja_rkt_detail . '
 					' . $perjanjian_kinerja_detail . '
 					' . $laporan_kinerja_detail . '
+					' . $rencana_aksi_detail . '
 					' . $dpa_detail . '
 					' . $pohon_kinerja_dan_cascading_detail . '
 					' . $lhe_akip_internal_detail . '
 					' . $tl_lhe_akip_internal_detail . '
 					' . $laporan_monev_renaksi_detail . '
-					' . $rencana_aksi_detail . '
 					' . $skp_detail . '
 					' . $evaluasi_internal_detail . '
 					' . $dokumen_lainnya_detail . '
@@ -15189,6 +15186,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							' . $pohon_kinerja_dan_cascading_skpd_detail . '
 							' . $lhe_akip_internal_skpd_detail . '
 							' . $tl_lhe_akip_internal_skpd_detail . '
+							' . $laporan_monev_renaksi_skpd_detail . '
+							' . $skp_skpd_detail . '
+							' . $evaluasi_internal_skpd_detail . '
 							' . $dokumen_lain_skpd_detail . '
 						</ul>
 					</div>
