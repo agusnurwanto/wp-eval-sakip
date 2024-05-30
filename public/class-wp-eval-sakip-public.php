@@ -14963,12 +14963,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 			foreach ($get_jadwal_lke as $get_jadwal_lke_sakip) {
 				$pengisian_lke_per_skpd = $this->functions->generatePage(array(
-					'nama_page' => 'Pengisian LKE | ' . $get_jadwal_lke_sakip['nama_jadwal'],
+					'nama_page' => 'Pengisian LKE | ' . $skpd_db['nama_skpd'] . ' ' . $get_jadwal_lke_sakip['nama_jadwal'],
 					'content' => '[pengisian_lke_sakip_per_skpd id_jadwal=' . $get_jadwal_lke_sakip['id'] . ']',
 					'show_header' => 1,
 					'post_status' => 'private'
 				));
-				$pengisian_lke_per_skpd_page .= '<li><a target="_blank" href="' . $pengisian_lke_per_skpd['url'] . '&id_skpd=' . $skpd_db['id_skpd'] . '&id_jadwal='. $get_jadwal_lke_sakip['id'] . '" class="btn btn-primary">' . $pengisian_lke_per_skpd['title'] . '</a></li>';
+				$pengisian_lke_per_skpd_page .= '<li><a target="_blank" href="' . $pengisian_lke_per_skpd['url'] . '&id_skpd=' . $skpd_db['id_skpd'] . '&id_jadwal='. $get_jadwal_lke_sakip['id'] . '" class="btn btn-primary">Pengisian LKE | '.$get_jadwal_lke_sakip['nama_jadwal'].'</a></li>';
 			}
 			$renja_skpd = $this->functions->generatePage(array(
 				'nama_page' => 'RENJA / RKT-' . $_GET['tahun'],
