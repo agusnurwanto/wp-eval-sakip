@@ -2526,7 +2526,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -2664,7 +2664,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -2802,7 +2802,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -2940,7 +2940,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -3078,7 +3078,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -3216,7 +3216,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -3354,7 +3354,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -3492,7 +3492,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -3630,7 +3630,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -3756,7 +3756,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -3880,7 +3880,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -4004,7 +4004,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -4128,7 +4128,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -4264,7 +4264,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -4402,7 +4402,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -4492,83 +4492,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
-	// public function get_table_dpa()
-	// {
-	// 	global $wpdb;
-	// 	$ret = array(
-	// 		'status' => 'success',
-	// 		'message' => 'Berhasil get data!',
-	// 		'data' => array()
-	// 	);
-
-	// 	if (!empty($_POST)) {
-	// 		if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-	// 			if (!empty($_POST['id_skpd'])) {
-	// 				$id_skpd = $_POST['id_skpd'];
-	// 			} else {
-	// 				$ret['status'] = 'error';
-	// 				$ret['message'] = 'Id SKPD kosong!';
-	// 			}
-	// 			if (!empty($_POST['tahun_anggaran'])) {
-	// 				$tahun_anggaran = $_POST['tahun_anggaran'];
-	// 			} else {
-	// 				$ret['status'] = 'error';
-	// 				$ret['message'] = 'Tahun Anggaran kosong!';
-	// 			}
-	// 			$get_dpa = $wpdb->get_results(
-	// 				$wpdb->prepare("
-    //                 SELECT * 
-    //                 FROM esakip_dpa 
-    //                 WHERE id_skpd = %d 
-    //                   AND tahun_anggaran = %d 
-    //                   AND active = 1
-    //             ", $id_skpd, $tahun_anggaran),
-	// 				ARRAY_A
-	// 			);
-
-	// 			if (!empty($get_dpa)) {
-	// 				$counter = 1;
-	// 				$tbody = '';
-
-	// 				foreach ($get_dpa as $kk => $vv) {
-	// 					$tbody .= "<tr>";
-	// 					$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-	// 					$tbody .= "<td>" . $vv['opd'] . "</td>";
-	// 					$tbody .= "<td>" . $vv['dokumen'] . "</td>";
-	// 					$tbody .= "<td>" . $vv['keterangan'] . "</td>";
-	// 					$tbody .= "<td>" . $vv['created_at'] . "</td>";
-
-	// 					$btn = '<div class="btn-action-group">';
-	// 					$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-	// 					if (!$this->is_admin_panrb()) {
-	// 						$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_dpa(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
-	// 						$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_dpa(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
-	// 					}
-	// 					$btn .= '</div>';
-
-	// 					$tbody .= "<td class='text-center'>" . $btn . "</td>";
-	// 					$tbody .= "</tr>";
-	// 				}
-
-	// 				$ret['data'] = $tbody;
-	// 			} else {
-	// 				$ret['data'] = "<tr><td colspan='6' class='text-center'>Tidak ada data tersedia</td></tr>";
-	// 			}
-	// 		} else {
-	// 			$ret = array(
-	// 				'status' => 'error',
-	// 				'message'   => 'Api Key tidak sesuai!'
-	// 			);
-	// 		}
-	// 	} else {
-	// 		$ret = array(
-	// 			'status' => 'error',
-	// 			'message'   => 'Format tidak sesuai!'
-	// 		);
-	// 	}
-	// 	die(json_encode($ret));
-	// }
-
 	public function get_table_renja()
 	{
 		global $wpdb;
@@ -4630,10 +4553,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
-						if($data_verifikasi['status_verifikasi'] == 1){
+						if ($data_verifikasi['status_verifikasi'] == 1) {
 							$color_badge_verify = 'success';
 							$text_badge = 'Diterima';
-						}else if($data_verifikasi['status_verifikasi'] == 2){
+						} else if ($data_verifikasi['status_verifikasi'] == 2) {
 							$color_badge_verify = 'danger';
 							$text_badge = 'Ditolak';
 						}
@@ -4649,7 +4572,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if($can_verify){
+						if ($can_verify) {
 							$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
 						}
 						if (!$this->is_admin_panrb()) {
@@ -4819,10 +4742,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
-						if($data_verifikasi['status_verifikasi'] == 1){
+						if ($data_verifikasi['status_verifikasi'] == 1) {
 							$color_badge_verify = 'success';
 							$text_badge = 'Diterima';
-						}else if($data_verifikasi['status_verifikasi'] == 2){
+						} else if ($data_verifikasi['status_verifikasi'] == 2) {
 							$color_badge_verify = 'danger';
 							$text_badge = 'Ditolak';
 						}
@@ -4838,7 +4761,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if($can_verify){
+						if ($can_verify) {
 							$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
 						}
 						if (!$this->is_admin_panrb()) {
@@ -5211,6 +5134,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 		die(json_encode($ret));
 	}
+	
 	public function get_table_pengukuran_kinerja()
 	{
 		global $wpdb;
@@ -5702,10 +5626,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
-						if($data_verifikasi['status_verifikasi'] == 1){
+						if ($data_verifikasi['status_verifikasi'] == 1) {
 							$color_badge_verify = 'success';
 							$text_badge = 'Diterima';
-						}else if($data_verifikasi['status_verifikasi'] == 2){
+						} else if ($data_verifikasi['status_verifikasi'] == 2) {
 							$color_badge_verify = 'danger';
 							$text_badge = 'Ditolak';
 						}
@@ -6996,6 +6920,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							FROM esakip_data_jadwal
 							WHERE tipe='LKE'
 							  AND tahun_anggaran=%d
+							  AND status !=0
 						", $tahun_anggaran)
 					);
 
@@ -7011,6 +6936,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						ARRAY_A
 					);
 
+					// cek jadwal lama
 					foreach ($get_jadwal as $jadwal) {
 						if ($jadwal['status'] != 2) {
 							$return = array(
@@ -7106,6 +7032,58 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										);
 										$wpdb->insert('esakip_komponen_penilaian', $data_komponen_penilaian_baru);
 										$id_komponen_penilaian_baru = $wpdb->insert_id;
+
+										// die($penilaian['id']." dan ".$id_komponen_penilaian_baru);
+
+										$update_penilaian_ske = $wpdb->update('esakip_pengisian_lke',
+											array(
+												'id_komponen' => $id_komponen_baru,
+												'id_subkomponen' => $id_subkomponen_baru,
+												'id_komponen_penilaian' => $id_komponen_penilaian_baru
+											), 
+											array(
+												'id_komponen'=>$komponen['id'], 
+												'id_subkomponen' => $subkomponen['id'], 
+												'id_komponen_penilaian'=> $penilaian['id'],
+												'tahun_anggaran'=>$tahun_anggaran,
+												'active'=>1
+											));
+
+										// cek apakah berhasil update data, jika tidak maka ambil data dari history
+										if(!$update_penilaian_ske){
+											$data_penilaian_ske_terbaru_history = $wpdb->get_row(
+												$wpdb->prepare("
+													SELECT *
+													FROM esakip_pengisian_lke_history
+													WHERE id_komponen=%d
+														AND id_subkomponen=%d 
+														AND id_komponen_penilaian=%d
+														AND tahun_anggaran=%d
+														AND id_jadwal=%d
+												", $komponen['id'], $subkomponen['id'], $penilaian['id'], $tahun_anggaran, $id_jadwal_sebelumnya),
+												ARRAY_A
+											);
+
+											if(!empty($data_penilaian_ske_terbaru_history)){
+												$wpdb->insert('esakip_pengisian_lke', array(
+													'id_user' => $data_penilaian_ske_terbaru_history['id_user'],
+													'id_skpd' => $data_penilaian_ske_terbaru_history['id_skpd'],
+													'id_user_penilai' => $data_penilaian_ske_terbaru_history['id_user_penilai'],
+													'id_komponen' => $id_komponen_baru,
+													'id_subkomponen' => $id_subkomponen_baru,
+													'id_komponen_penilaian' => $id_komponen_penilaian_baru,
+													'nilai_usulan' => $data_penilaian_ske_terbaru_history['nilai_usulan'],
+													'nilai_penetapan' => $data_penilaian_ske_terbaru_history['nilai_penetapan'],
+													'keterangan' => $data_penilaian_ske_terbaru_history['keterangan'],
+													'keterangan_penilai' => $data_penilaian_ske_terbaru_history['keterangan_penilai'],
+													'bukti_dukung' => $data_penilaian_ske_terbaru_history['bukti_dukung'],
+													'create_at' => $data_penilaian_ske_terbaru_history['create_at'],
+													'update_at' => $data_penilaian_ske_terbaru_history['update_at'],
+													'tahun_anggaran' => $data_penilaian_ske_terbaru_history['tahun_anggaran'],
+													'active' => 1
+												));
+											}
+										}
 
 										$data_kerangka_logis = $wpdb->get_results(
 											$wpdb->prepare("
@@ -8754,10 +8732,66 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$wpdb->update('esakip_data_jadwal', array('end_at' => $time_now, 'status' => 2), array(
 								'id'	=> $id
 							));
-
-							$delete_lokal_history = $this->delete_data_lokal_history('esakip_pengisian_lke', $data_this_id['id']);
+							
+							//backup komponen 
+							$delete_lokal_history = $this->delete_data_lokal_history('esakip_komponen', $data_this_id['id']);
 
 							$columns_1 = array(
+								'id_jadwal',
+								'nomor_urut',
+								'id_user_penilai',
+								'nama',
+								'bobot'
+							);
+
+							$sql_backup_esakip_komponen =  "
+								INSERT INTO esakip_komponen_history (" . implode(', ', $columns_1) . ",id_asli)
+								SELECT " . implode(', ', $columns_1) . ", id as id_asli
+											FROM esakip_komponen";
+
+							$queryRecords1 = $wpdb->query($sql_backup_esakip_komponen);
+
+							//backup subkomponen 
+							$delete_lokal_history = $this->delete_data_lokal_history('esakip_subkomponen', $data_this_id['id']);
+
+							$columns_2 = array(
+								'id_komponen',
+								'nomor_urut',
+								'id_user_penilai',
+								'nama',
+								'bobot'
+							);
+
+							$sql_backup_esakip_subkomponen =  "
+								INSERT INTO esakip_subkomponen_history (" . implode(', ', $columns_2) . ",id_asli,id_jadwal)
+								SELECT " . implode(', ', $columns_2) . ", id as id_asli, " . $data_this_id['id'] . "
+											FROM esakip_subkomponen";
+
+							$queryRecords2 = $wpdb->query($sql_backup_esakip_subkomponen);
+							
+							//backup komponen penilaian
+							$delete_lokal_history = $this->delete_data_lokal_history('esakip_komponen_penilaian', $data_this_id['id']);
+
+							$columns_3 = array(
+								'id_subkomponen',
+								'nomor_urut',
+								'nama',
+								'tipe',
+								'keterangan',
+								'jenis_bukti_dukung'
+							);
+
+							$sql_backup_esakip_komponen_penilaian =  "
+								INSERT INTO esakip_komponen_penilaian_history (" . implode(', ', $columns_3) . ",id_asli,id_jadwal)
+								SELECT " . implode(', ', $columns_3) . ", id as id_asli, " . $data_this_id['id'] . "
+											FROM esakip_komponen_penilaian";
+
+							$queryRecords1 = $wpdb->query($sql_backup_esakip_komponen_penilaian);
+
+							//backup pengisian lke
+							$delete_lokal_history = $this->delete_data_lokal_history('esakip_pengisian_lke', $data_this_id['id']);
+
+							$columns_4 = array(
 								'id_user',
 								'id_skpd',
 								'id_user_penilai',
@@ -8774,10 +8808,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'update_at'
 							);
 
-
 							$sql_backup_esakip_pengisian_lke =  "
-								INSERT INTO esakip_pengisian_lke" . $prefix . "_history (" . implode(', ', $columns_1) . ",id_asli,id_jadwal)
-								SELECT " . implode(', ', $columns_1) . ", " . $data_this_id['id'] . "," . $id . "
+								INSERT INTO esakip_pengisian_lke_history (" . implode(', ', $columns_4) . ",id_asli,id_jadwal)
+								SELECT " . implode(', ', $columns_4) . ", id as id_asli, " . $data_this_id['id'] . "
 											FROM esakip_pengisian_lke";
 
 							$queryRecords1 = $wpdb->query($sql_backup_esakip_pengisian_lke);
@@ -10262,7 +10295,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -10573,7 +10606,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -10884,7 +10917,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -11195,7 +11228,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -14233,15 +14266,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 
 		$jadwal_periode = $wpdb->get_results(
-			"
-			SELECT 
-				id,
-				nama_jadwal,
-				tahun_anggaran,
-				lama_pelaksanaan
-			FROM esakip_data_jadwal
-			WHERE tipe = 'RPJMD'
-			  AND status = 1",
+			$wpdb->prepare("
+				SELECT 
+					id,
+					nama_jadwal,
+					tahun_anggaran,
+					lama_pelaksanaan
+				FROM esakip_data_jadwal
+				WHERE tipe = 'RPJMD'
+				  AND tahun_anggaran = %d
+				  AND status = 1
+			", $_GET['tahun']),
 			ARRAY_A
 		);
 		// SAKIP PEMDA
@@ -14747,16 +14782,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 
 		$get_jadwal_lke = $wpdb->get_results(
-			"
-			SELECT 
-				id,
-				nama_jadwal,
-				tahun_anggaran,
-				lama_pelaksanaan
-			FROM esakip_data_jadwal
-			WHERE tipe = 'LKE'
-			  AND status = 1
-			ORDER BY started_at DESC LIMIT 1",
+			$wpdb->prepare("
+				SELECT 
+					id,
+					nama_jadwal,
+					tahun_anggaran,
+					lama_pelaksanaan
+				FROM esakip_data_jadwal
+				WHERE tipe = 'LKE'
+				  AND tahun_anggaran = %d
+				  AND status = 1
+				ORDER BY started_at DESC LIMIT 1
+			", $_GET['tahun']),
 			ARRAY_A
 		);
 		$pengisian_lke = '';
@@ -15144,11 +15181,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				</div>';
 
 			echo '
+
 				<h2 class="text-center">' . $skpd_db['nama_skpd'] . '</h2>
 				<ul class="daftar-menu-sakip">
 					<li>' . $halaman_sakip_skpd . '</li>
 					<li>' . $halaman_lke_per_skpd . '</li>
 				</ul>';
+			} else {
+				return 'maaf, data skpd kosong';
+				error_log("Warning: \$get_jadwal_lke, \$skpd_db are empty");
+			}
 		}
 	}
 
@@ -16683,7 +16725,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -16817,7 +16859,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -17107,7 +17149,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Keterangan kosong!';
 				}
-				if($_POST['tipe_dokumen'] != 'renstra'){
+				if ($_POST['tipe_dokumen'] != 'renstra') {
 					if (!empty($_POST['tahunAnggaran'])) {
 						$tahunAnggaran = $_POST['tahunAnggaran'];
 					} else {
@@ -17367,10 +17409,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
-						if($data_verifikasi['status_verifikasi'] == 1){
+						if ($data_verifikasi['status_verifikasi'] == 1) {
 							$color_badge_verify = 'success';
 							$text_badge = 'Diterima';
-						}else if($data_verifikasi['status_verifikasi'] == 2){
+						} else if ($data_verifikasi['status_verifikasi'] == 2) {
 							$color_badge_verify = 'danger';
 							$text_badge = 'Ditolak';
 						}
@@ -17386,10 +17428,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if($can_verify){
+						if ($can_verify) {
 							$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
 						}
-                    	if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb()) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_dpa(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_dpa(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
@@ -17508,7 +17550,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
-				
+
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');

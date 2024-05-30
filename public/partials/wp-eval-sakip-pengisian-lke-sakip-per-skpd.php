@@ -15,7 +15,7 @@ if (!empty($_GET) && !empty($_GET['id_skpd'])) {
     die("skpd kosong");
 }
 
-if(!empty($_GET['id_jadwal'])){
+if (!empty($_GET['id_jadwal'])) {
     $id_jadwal = $_GET['id_jadwal'];
 } else {
     die('JADWAL KOSONG !');
@@ -55,7 +55,7 @@ if (!empty($jadwal)) {
     $selesai_jadwal = $jadwal['end_at'];
     $lama_pelaksanaan = $jadwal['lama_pelaksanaan'];
 } else {
-    $tahun_anggaran = '2024';
+    $tahun_anggaran = $tahun_anggaran_sakip;
     $jenis_jadwal = '-';
     $nama_jadwal = '-';
     $mulai_jadwal = '-';
@@ -89,7 +89,6 @@ $timezone = get_option('timezone_string');
         gap: 20px;
         margin-bottom: 30px;
     }
-
     .info-section {
         display: flex;
         justify-content: space-between;
@@ -183,7 +182,7 @@ $timezone = get_option('timezone_string');
             </div>
             <div class="modal-body">
                 <h5 class="text-center">Upload Bukti Dukung</h5>
-                <div id="uploadBuktiDukung" class="text-center"></div>
+                <div id="uploadBuktiDukung" class="text-center" style="margin-bottom: 20px;"></div>
                 <table id="tableBuktiDukung" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
                         <tr>
@@ -268,10 +267,10 @@ $timezone = get_option('timezone_string');
         if (ketUsulan == '') {
             return alert("Keterangan Usulan Tidak Boleh Kosong!");
         }
-        let buktiUsulan = jQuery('#buktiDukung' + id).val();
-        if (buktiUsulan == '') {
-            return alert("Bukti Usulan Tidak Boleh Kosong!");
-        }
+        // let buktiUsulan = jQuery('#buktiDukung' + id).text();
+        // if (buktiUsulan == '') {
+        //     return alert("Bukti Usulan Tidak Boleh Kosong!");
+        // }
         let idSkpd = <?php echo $id_skpd; ?>;
         if (idSkpd == '') {
             return alert("ID SKPD Usulan Tidak Boleh Kosong!");
@@ -298,7 +297,8 @@ $timezone = get_option('timezone_string');
                 nilai_usulan: nilaiUsulan,
                 ket_usulan: ketUsulan,
                 // bukti_usulan: buktiUsulan,
-                api_key: esakip.api_key
+                api_key: esakip.api_key,
+                tahun_anggaran: <?php echo $tahun_anggaran; ?>
             },
             dataType: 'json',
             success: function(response) {
@@ -397,32 +397,33 @@ $timezone = get_option('timezone_string');
             success: function(response) {
                 console.log(response);
                 jQuery('#wrap-loading').hide();
-                if(response.status == 'success'){
+                if (response.status == 'success') {
                     var html = '';
                     var url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>';
                     var bukti_dukung_existing = {};
-                    response.data_existing.map(function(b, i){
+                    response.data_existing.map(function(b, i) {
                         bukti_dukung_existing[b] = b;
                     });
-                    for(var i in response.data){
-                        response.data[i].map(function(data, ii){
+                    for (var i in response.data) {
+                        response.data[i].map(function(data, ii) {
                             var checked = '';
-                            if(bukti_dukung_existing[data.dokumen]){
+                            if (bukti_dukung_existing[data.dokumen]) {
                                 checked = 'checked';
                             }
-                            html += ''
-                            +'<tr>'
-                                +'<td class="text-center"><input type="checkbox" '+checked+' class="list-dokumen" value="'+data.dokumen+'"/></td>'
-                                +'<td>'+i+'</td>'
-                                +'<td><a href="'+url+data.dokumen+'" target="_blank">'+data.dokumen+'</a></td>'
-                                +'<td>'+data.keterangan+'</td>'
-                                +'<td class="text-center">'+data.created_at+'</td>'
-                            +'<tr>';
+                            html += '' +
+                                '<tr>' +
+                                '<td class="text-center"><input type="checkbox" ' + checked + ' class="list-dokumen" value="' + data.dokumen + '"/></td>' +
+                                '<td>' + i + '</td>' +
+                                '<td><a href="' + url + data.dokumen + '" target="_blank">' + data.dokumen + '</a></td>' +
+                                '<td>' + data.keterangan + '</td>' +
+                                '<td class="text-center">' + data.created_at + '</td>' +
+                                '<tr>';
                         });
                     };
                     jQuery('#tableBuktiDukung tbody').html(html);
+                    jQuery('#uploadBuktiDukung').html(response.upload_bukti_dukung);
                     jQuery('#tambahBuktiDukungModal').modal('show');
-                }else{
+                } else {
                     alert(response.message);
                 }
             },
@@ -433,46 +434,54 @@ $timezone = get_option('timezone_string');
             }
         });
     }
-    function submit_bukti_dukung(){
+
+    function submit_bukti_dukung() {
         var id_komponen = jQuery('#id_komponen').val();
         var idSkpd = jQuery('#idSkpd_komponen').val();
         var bukti_dukung = [];
-        jQuery('#tableBuktiDukung tbody .list-dokumen').map(function(i, b){
-            if(jQuery(b).is(':checked')){
+
+        jQuery('#tableBuktiDukung tbody .list-dokumen').map(function(i, b) {
+            if (jQuery(b).is(':checked')) {
                 bukti_dukung.push(jQuery(b).val());
             }
         });
-        if(bukti_dukung.length == 0){
-            return alert('Pilih bukti dukung dulu!');
-        }else{
-            jQuery('#wrap-loading').show();
-            jQuery.ajax({
-                url: esakip.url,
-                type: 'POST',
-                data: {
-                    action: 'submit_bukti_dukung',
-                    id_skpd: idSkpd,
-                    bukti_dukung: bukti_dukung,
-                    kp_id: id_komponen,
-                    tahun_anggaran: <?php echo $tahun_anggaran; ?>,
-                    api_key: esakip.api_key
-                },
-                dataType: 'json',
-                success: function(response) {
-                    jQuery('#wrap-loading').hide();
-                    if(response.status == 'error'){
-                        alert(response.message);
-                    }else{
-                        var url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>';
-                        var html = '';
-                        response.data.map(function(b, i){
-                            html += '<a href="'+url+b+'" target="_blank">'+b+'</a>';
+
+        jQuery('#wrap-loading').show();
+
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'submit_bukti_dukung',
+                id_skpd: idSkpd,
+                bukti_dukung: bukti_dukung,
+                kp_id: id_komponen,
+                tahun_anggaran: <?php echo $tahun_anggaran; ?>,
+                api_key: esakip.api_key
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                if (response.status == 'error') {
+                    alert(response.message);
+                } else {
+                    var url = esakip.plugin_url + 'public/media/dokumen/'; 
+                    var html = '';
+                    if (Array.isArray(response.data)) {
+                        response.data.map(function(b, i) {
+                            html += '<a href="' + url + b + '" target="_blank">' + b + '</a>';
                         });
-                        jQuery('.bukti-dukung-view[kp-id="'+id_komponen+'"]').html(html);
-                        jQuery('#tambahBuktiDukungModal').modal('hide');
                     }
+                    jQuery('.bukti-dukung-view[kp-id="' + id_komponen + '"]').html(html);
+                    alert(response.message);
+                    get_table_pengisian_sakip();
+                    jQuery('#tambahBuktiDukungModal').modal('hide');
                 }
-            });
-        }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                alert("An error occurred: " + xhr.status + " " + xhr.statusText);
+            }
+        });
     }
 </script>
