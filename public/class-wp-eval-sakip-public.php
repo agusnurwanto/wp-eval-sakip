@@ -14266,17 +14266,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 
 		$jadwal_periode = $wpdb->get_results(
-			$wpdb->prepare("
-				SELECT 
-					id,
-					nama_jadwal,
-					tahun_anggaran,
-					lama_pelaksanaan
-				FROM esakip_data_jadwal
-				WHERE tipe = 'RPJMD'
-				  AND tahun_anggaran = %d
-				  AND status = 1
-			", $_GET['tahun']),
+			"
+			SELECT 
+				id,
+				nama_jadwal,
+				tahun_anggaran,
+				lama_pelaksanaan
+			FROM esakip_data_jadwal
+			WHERE tipe = 'RPJMD'
+			  AND status = 1",
 			ARRAY_A
 		);
 		// SAKIP PEMDA
@@ -14782,18 +14780,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 
 		$get_jadwal_lke = $wpdb->get_results(
-			$wpdb->prepare("
-				SELECT 
-					id,
-					nama_jadwal,
-					tahun_anggaran,
-					lama_pelaksanaan
-				FROM esakip_data_jadwal
-				WHERE tipe = 'LKE'
-				  AND tahun_anggaran = %d
-				  AND status = 1
-				ORDER BY started_at DESC LIMIT 1
-			", $_GET['tahun']),
+			"
+			SELECT 
+				id,
+				nama_jadwal,
+				tahun_anggaran,
+				lama_pelaksanaan
+			FROM esakip_data_jadwal
+			WHERE tipe = 'LKE'
+			  AND status = 1
+			ORDER BY started_at DESC LIMIT 1",
 			ARRAY_A
 		);
 		$pengisian_lke = '';
@@ -15181,16 +15177,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				</div>';
 
 			echo '
-
 				<h2 class="text-center">' . $skpd_db['nama_skpd'] . '</h2>
 				<ul class="daftar-menu-sakip">
 					<li>' . $halaman_sakip_skpd . '</li>
 					<li>' . $halaman_lke_per_skpd . '</li>
 				</ul>';
-			} else {
-				return 'maaf, data skpd kosong';
-				error_log("Warning: \$get_jadwal_lke, \$skpd_db are empty");
-			}
 		}
 	}
 
