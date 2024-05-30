@@ -1519,11 +1519,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id kosong!';
 				}
-				if (!empty($_POST['tahunPeriode'])) {
-					$tahun_periode = $_POST['tahunPeriode'];
+				if (!empty($_POST['id_jadwal'])) {
+					$tahun_periode = $_POST['id_jadwal'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun Periode kosong!';
+					$ret['message'] = 'Jadwal Periode kosong!';
 				}
 
 				if (!empty($id) && !empty($tahun_periode)) {
