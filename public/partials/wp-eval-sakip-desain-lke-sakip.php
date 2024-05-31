@@ -70,6 +70,8 @@ foreach ($user_penilai as $key => $val) {
                         <th class="text-center">Format Penilaian</th>
                         <th class="text-center" style="vertical-align: middle;">Keterangan</th>
                         <th class="text-center" style="vertical-align: middle;">Kerangka Logis</th>
+                        <th class="text-center" style="vertical-align: middle;">Penjelasan</th>
+                        <th class="text-center" style="vertical-align: middle;">Langkah Kerja</th>
                         <th class="text-center" style="vertical-align: middle;">Aksi</th>
                     </tr>
                 </thead>
@@ -215,6 +217,14 @@ foreach ($user_penilai as $key => $val) {
                     <div class="form-group">
                         <label for="keterangan">Keterangan</label>
                         <textarea class="form-control" id="keterangan" name="keterangan" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="penjelasan">Penjelasan</label>
+                        <textarea class="form-control" id="penjelasan" name="penjelasan" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="langkahKerja">Langkah Kerja</label>
+                        <textarea class="form-control" id="langkahKerja" name="langkahKerja" required></textarea>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-6">
@@ -758,6 +768,8 @@ foreach ($user_penilai as $key => $val) {
                     jQuery("#namaPenilaian").val(data.data.nama);
                     jQuery("#tipeJawaban").val(data.data.tipe);
                     jQuery("#keterangan").val(data.data.keterangan);
+                    jQuery("#penjelasan").val(data.data.penjelasan);
+                    jQuery("#langkahKerja").val(data.data.langkah_kerja);
                     jQuery('#nomorUrutPenilaian').val(data.data.nomor_urut);
                     setCheckBoxes(data.data.jenis_bukti_dukung);
                     jQuery('#tambahPenilaianModal').modal('show');
@@ -1016,6 +1028,16 @@ foreach ($user_penilai as $key => $val) {
             return alert('Nomor Urut Penilaian tidak boleh kosong');
         }
 
+        let penjelasan = jQuery("#penjelasan").val();
+        if (penjelasan == '') {
+            return alert('Penjelasan tidak boleh kosong');
+        }
+
+        let langkahKerja = jQuery("#langkahKerja").val();
+        if (langkahKerja == '') {
+            return alert('Langkah Kerja tidak boleh kosong');
+        }
+
         let selectedBuktiDukung = [];
         jQuery('input[type=checkbox]:checked').each(function() {
             selectedBuktiDukung.push(jQuery(this).val());
@@ -1036,6 +1058,8 @@ foreach ($user_penilai as $key => $val) {
                 nama_komponen_penilaian: namaPenilaian,
                 tipe_komponen_penilaian: tipeJawaban,
                 keterangan: keterangan,
+                penjelasan: penjelasan,
+                langkah_kerja: langkahKerja,
                 bukti_dukung: JSON.stringify(selectedBuktiDukung),
                 nomor_urut: nomorUrutPenilaian,
                 api_key: esakip.api_key

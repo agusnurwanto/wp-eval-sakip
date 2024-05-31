@@ -391,6 +391,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_table_tahun_laporan_monev_renaksi', $plugin_public, 'get_table_tahun_laporan_monev_renaksi');
 		$this->loader->add_action('wp_ajax_submit_tahun_laporan_monev_renaksi', $plugin_public, 'submit_tahun_laporan_monev_renaksi');
 		$this->loader->add_action('wp_ajax_submit_bukti_dukung', $plugin_public, 'submit_bukti_dukung');
+		$this->loader->add_action('wp_ajax_get_penjelasan_lke', $plugin_public, 'get_penjelasan_lke');
  
 		$this->loader->add_action('wp_ajax_get_detail_pedoman_teknis_perencanaan_by_id', $plugin_public, 'get_detail_pedoman_teknis_perencanaan_by_id');
 		$this->loader->add_action('wp_ajax_tambah_dokumen_pedoman_teknis_perencanaan', $plugin_public, 'tambah_dokumen_pedoman_teknis_perencanaan');
