@@ -32,6 +32,12 @@ foreach ($user_penilai as $key => $val) {
 }
 ?>
 <style>
+    .wrap-table {
+        overflow: auto;
+        max-height: 100vh;
+        width: 100%;
+    }
+
     .transparent-button {
         width: 100%;
     }
