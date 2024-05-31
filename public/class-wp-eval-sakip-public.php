@@ -13820,7 +13820,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		return array(
 			'1' => 'Admin Inspektorat',
 			'2' => 'Admin Perencanaan',
-			'3' => 'Admin Ortala'
+			'3' => 'Admin Organisasi'
 		);
 	}
 
