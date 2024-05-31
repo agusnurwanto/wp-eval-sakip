@@ -89,6 +89,7 @@ $timezone = get_option('timezone_string');
         gap: 20px;
         margin-bottom: 30px;
     }
+
     .info-section {
         display: flex;
         justify-content: space-between;
@@ -197,6 +198,36 @@ $timezone = get_option('timezone_string');
                 </table>
                 <input type="hidden" id="id_komponen" name="">
                 <input type="hidden" id="idSkpd_komponen" name="">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="submit_bukti_dukung(); return false">Simpan</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal info penjelasan -->
+<div class="modal fade bd-example-modal-lg" id="infoPenjelasanModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="infoPenjelasanModalLabel">Penjelasan dan Langkah Kerja</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table id="infoPenjelasanTable" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Penjelasan</th>
+                            <th class="text-center">Langkah Kerja</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" onclick="submit_bukti_dukung(); return false">Simpan</button>
@@ -465,7 +496,7 @@ $timezone = get_option('timezone_string');
                 if (response.status == 'error') {
                     alert(response.message);
                 } else {
-                    var url = esakip.plugin_url + 'public/media/dokumen/'; 
+                    var url = esakip.plugin_url + 'public/media/dokumen/';
                     var html = '';
                     if (Array.isArray(response.data)) {
                         response.data.map(function(b, i) {
@@ -483,5 +514,34 @@ $timezone = get_option('timezone_string');
                 alert("An error occurred: " + xhr.status + " " + xhr.statusText);
             }
         });
+    }
+
+    function infoPenjelasan(id) {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: "POST",
+            data: {
+                'action': "get_penjelasan_lke",
+                'api_key': esakip.api_key,
+                'id': id,
+            },
+            dataType: "json",
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    jQuery('#infoPenjelasanTable tbody').html(response.data)
+                    jQuery('#infoPenjelasanModal').modal('show')
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        })
     }
 </script>

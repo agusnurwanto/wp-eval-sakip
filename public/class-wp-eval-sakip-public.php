@@ -13976,6 +13976,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$tbody .= "<td class='text-center'>" . $komponen['bobot'] . "</td>";
 						$tbody .= "<td class='text-left'></td>";
 						$tbody .= "<td class='text-left'colspan='2'></td>";
+						$tbody .= "<td class='text-center'></td>";
+						$tbody .= "<td class='text-center'></td>";
 						$tbody .= "<td class='text-center'>" . $btn . "</td>";
 						$tbody .= "</tr>";
 
@@ -14008,6 +14010,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								$tbody .= "<td class='text-center'>" . $subkomponen['bobot'] . "</td>";
 								$tbody .= "<td class='text-left'></td>";
 								$tbody .= "<td class='text-left' colspan='2'>User Penilai: <b>" . $user_penilai[$subkomponen['id_user_penilai']] . "</b></td>";
+								$tbody .= "<td class='text-center'></td>";
+								$tbody .= "<td class='text-center'></td>";
 								$tbody .= "<td class='text-center'>" . $btn . "</td>";
 								$tbody .= "</tr>";
 
@@ -14021,6 +14025,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											kp.tipe,
 											kp.keterangan AS kp_keterangan,
 											kp.jenis_bukti_dukung,
+											kp.penjelasan,
+											kp.langkah_kerja,
 											kp.active AS kp_active,
 											kl.id AS kl_id,
 											kl.id_komponen_penilaian,
@@ -14048,6 +14054,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											'kp_id' => $row['kp_id'],
 											'kp_nama' => $row['kp_nama'],
 											'kp_tipe' => $row['tipe'],
+											'kp.penjelasan' => $row['penjelasan'],
+											'kp.langkah_kerja' => $row['langkah_kerja'],
 											'kp_keterangan' => $row['kp_keterangan'],
 											'kerangka_logis' => []
 										];
@@ -14098,6 +14106,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										}
 										$tbody .= "</ul></td>";
 
+										$tbody .= "<td class='text-center'>" . $penilaian['kp.penjelasan'] . "</td>";
+										$tbody .= "<td class='text-center'>" . $penilaian['kp.langkah_kerja'] . "</td>";
 										$tbody .= "<td class='text-center'>" . $btn . "</td>";
 										$tbody .= "</tr>";
 									}
@@ -15548,6 +15558,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Jenis Bukti Dukung kosong!';
 				}
+				if (!empty($_POST['penjelasan'])) {
+					$penjelasan = $_POST['penjelasan'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Penjelasan kosong!';
+				}
+				if (!empty($_POST['langkah_kerja'])) {
+					$langkah_kerja = $_POST['langkah_kerja'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Langkah Kerja kosong!';
+				}
 
 
 				if ($ret['status'] === 'success') {
@@ -15560,10 +15582,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'tipe' => $tipe_komponen_penilaian,
 								'nomor_urut' => $nomor_urut,
 								'keterangan' => $keterangan,
+								'penjelasan' => $penjelasan,
+								'langkah_kerja' => $langkah_kerja,
 								'jenis_bukti_dukung' => $bukti_dukung,
 							),
 							array('id' => $id_komponen_penilaian),
-							array('%d', '%s', '%s', '%f', '%s', '%s'),
+							array('%d', '%s', '%s', '%f', '%s', '%s', '%s', '%s'),
 							array('%d')
 						);
 					} else {
@@ -15575,10 +15599,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'tipe' => $tipe_komponen_penilaian,
 								'nomor_urut' => $nomor_urut,
 								'keterangan' => $keterangan,
+								'penjelasan' => $penjelasan,
+								'langkah_kerja' => $langkah_kerja,
 								'jenis_bukti_dukung' => $bukti_dukung,
 								'active' => 1,
 							),
-							array('%d', '%s', '%s', '%f', '%s', '%d', '%s')
+							array('%d', '%s', '%s', '%f', '%s', '%d', '%s', '%s', '%s')
 						);
 					}
 				}
