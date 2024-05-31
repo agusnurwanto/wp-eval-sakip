@@ -7126,7 +7126,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											array( //0
 												'nama' => 'Renstra telah disusun',
 												'tipe' => '1',
-												'keterangan' => 'Renstra OPD (2024-2026)',
+												'keterangan' => 'Renstra Perangkat Daerah (2024-2026)',
 												'nomor_urut' => '1.00'
 											),
 											array( //1
@@ -7218,7 +7218,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											array( //1
 												'nama' => 'Renstra telah dipublikasikan tepat waktu',
 												'tipe' => '1',
-												'keterangan' => 'Screenshoot Renstra 2024-2026 di website OPD, esr dan aplikasi SAKIP',
+												'keterangan' => 'Screenshoot Renstra 2024-2026 di website Perangkat Daerah, esr dan aplikasi SAKIP',
 												'nomor_urut' => '2.00',
 												'data' => array(
 													array(
@@ -7231,7 +7231,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											array( //2
 												'nama' => 'Renja telah dipublikasikan tepat waktu',
 												'tipe' => '1',
-												'keterangan' => 'Screenshoot Renja 2023 dan 2024 di website OPD, esr dan aplikasi SAKIP',
+												'keterangan' => 'Screenshoot Renja 2023 dan 2024 di website Perangkat Daerah, esr dan aplikasi SAKIP',
 												'nomor_urut' => '3.00',
 												'data' => array(
 													array(
@@ -7244,7 +7244,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											array( //3
 												'nama' => 'Perjanjian Kinerja telah dipublikasikan tepat waktu',
 												'tipe' => '1',
-												'keterangan' => 'Screenshoot PK 2023 dan 2024 di website OPD, esr dan aplikasi SAKIP',
+												'keterangan' => 'Screenshoot PK 2023 dan 2024 di website Perangkat Daerah, esr dan aplikasi SAKIP',
 												'nomor_urut' => '4.00',
 												'data' => array(
 													array(
@@ -7257,7 +7257,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											array( //4
 												'nama' => 'Tujuan telah berorientasi hasil',
 												'tipe' => '2',
-												'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024',
+												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024',
 												'nomor_urut' => '5.00',
 												'data' => array(
 													array(
@@ -7270,7 +7270,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											array( //5
 												'nama' => 'Ukuran Keberhasilan (Indikator Kinerja) Tujuan telah memenuhi kriteria SMART.',
 												'tipe' => '2',
-												'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024',
+												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024',
 												'nomor_urut' => '6.00',
 												'data' => array(
 													array(
@@ -7288,7 +7288,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											array( //6
 												'nama' => 'Sasaran telah jelas berorientasi hasil',
 												'tipe' => '2',
-												'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024',
+												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024',
 												'nomor_urut' => '7.00',
 												'data' => array(
 													array(
@@ -7305,7 +7305,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											array( //7
 												'nama' => 'Ukuran Keberhasilan (Indikator Kinerja) Sasaran telah memenuhi kriteria SMART.',
 												'tipe' => '2',
-												'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024',
+												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024',
 												'nomor_urut' => '8.00',
 												'data' => array(
 													array(
@@ -7322,7 +7322,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											array( //8
 												'nama' => 'Indikator Kinerja Tujuan telah menggambarkan kondisi Tujuan yang harus dicapai, tertuang secara berkelanjutan (sustainable - tidak sering diganti dalam 1 periode Perencanaan Strategis).',
 												'tipe' => '2',
-												'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024',
+												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024',
 												'nomor_urut' => '9.00',
 												'data' => array(
 													array(
@@ -7339,7 +7339,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											array( //9
 												'nama' => 'Indikator Kinerja Sasaran telah menggambarkan kondisi Sasaran yang harus dicapai, tertuang secara berkelanjutan (sustainable - tidak sering diganti dalam 1 periode Perencanaan Strategis).',
 												'tipe' => '2',
-												'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024',
+												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024',
 												'nomor_urut' => '10.00',
 												'data' => array(
 													array(
@@ -7356,7 +7356,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											array( //10
 												'nama' => 'Target yang ditetapkan dalam Perencanaan Kinerja dapat dicapai (achievable) dan realistis.',
 												'tipe' => '2',
-												'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024',
+												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024',
 												'nomor_urut' => '11.00',
 												'data' => array(
 													array(
@@ -7369,7 +7369,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											array( //11
 												'nama' => 'Setiap Dokumen Perencanaan Kinerja (Renstra, Renja, PK) telah menggambarkan hubungan yang berkesinambungan, serta selaras antara Kondisi/Hasil yang akan dicapai di setiap level jabatan (Cascading Kinerja).',
 												'tipe' => '2',
-												'keterangan' => 'Renstra OPD (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024,  cascading dan pohon kinerja (di dokumen lainnya)',
+												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024,  cascading dan pohon kinerja (di dokumen lainnya)',
 												'nomor_urut' => '12.00',
 												'data' => array(
 													array(
@@ -7395,7 +7395,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											array( //0
 												'nama' => 'Dokumen Renstra digunakan sebagai acuan penyusunan Dokumen Rencana Kerja dan Anggaran',
 												'tipe' => '2',
-												'keterangan' => '- Renstra OPD (2024-2026), Renja 2023 dan 2024, Rencana Aksi 2023 dan 2024 - DPA 2024 dan DPPA 2023 (di dokumen lainnya)',
+												'keterangan' => '- Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, Rencana Aksi 2023 dan 2024 - DPA 2024 dan DPPA 2023 (di dokumen lainnya)',
 												'nomor_urut' => '1.00',
 												'data' => array(
 													array(
@@ -7413,7 +7413,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											array( //1
 												'nama' => 'Target jangka menengah dalam Renstra telah dimonitor pencapaiannya sampai dengan tahun berjalan',
 												'tipe' => '2',
-												'keterangan' => 'Renstra OPD (2024-2026), Laporan Kinerja 2023',
+												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Laporan Kinerja 2023',
 												'nomor_urut' => '2.00',
 												'data' => array(
 													array(
@@ -7431,7 +7431,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											array( //2
 												'nama' => 'Anggaran yang ditetapkan telah mengacu pada Kinerja yang ingin dicapai',
 												'tipe' => '2',
-												'keterangan' => '- Renstra OPD (2024-2026), Renja 2023 dan 2024, Rencana Aksi 2023 dan 2024 - DPA 2024 dan DPPA 2023 (di dokumen lainnya)',
+												'keterangan' => '- Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, Rencana Aksi 2023 dan 2024 - DPA 2024 dan DPPA 2023 (di dokumen lainnya)',
 												'nomor_urut' => '3.00',
 												'data' => array(
 													array(
@@ -8295,7 +8295,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												)
 											),
 											array(
-												'nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan pada seluruh bidang di OPD.',
+												'nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan pada seluruh bidang di Perangkat Daerah.',
 												'tipe' => '2',
 												'keterangan' => 'Evaluasi Internal 2023 dan 2024',
 												'nomor_urut' => '3.00',
@@ -8329,7 +8329,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										'id_user_penilai' => '1',
 										'data' => array(
 											array(
-												'nama' => 'Seluruh rekomendasi atas hasil evaluasi akuntabilitas kinerja (internal dan LHE SAKIP OPD) telah ditindaklanjuti.',
+												'nama' => 'Seluruh rekomendasi atas hasil evaluasi akuntabilitas kinerja (internal dan LHE SAKIP Perangkat Daerah) telah ditindaklanjuti.',
 												'tipe' => '2',
 												'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023',
 												'nomor_urut' => '1.00',
@@ -8347,7 +8347,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												)
 											),
 											array(
-												'nama' => 'Telah terjadi peningkatan implementasi SAKIP  (internal dan LHE SAKIP OPD) dengan melaksanakan tindak lanjut atas rekomendasi hasil evaluasi akuntabilitas kinerja.',
+												'nama' => 'Telah terjadi peningkatan implementasi SAKIP  (internal dan LHE SAKIP Perangkat Daerah) dengan melaksanakan tindak lanjut atas rekomendasi hasil evaluasi akuntabilitas kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024',
 												'nomor_urut' => '2.00',
@@ -8365,7 +8365,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												)
 											),
 											array(
-												'nama' => 'Hasil Evaluasi Akuntabilitas Kinerja  (internal dan LHE SAKIP OPD) telah dimanfaatkan untuk perbaikan dan peningkatan akuntabilitas kinerja.',
+												'nama' => 'Hasil Evaluasi Akuntabilitas Kinerja  (internal dan LHE SAKIP Perangkat Daerah) telah dimanfaatkan untuk perbaikan dan peningkatan akuntabilitas kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024',
 												'nomor_urut' => '3.00',
@@ -8383,7 +8383,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												)
 											),
 											array(
-												'nama' => 'Hasil dari Evaluasi Akuntabilitas Kinerja  (internal dan LHE SAKIP OPD)telah dimanfaatkan dalam mendukung efektivitas dan efisiensi kinerja.',
+												'nama' => 'Hasil dari Evaluasi Akuntabilitas Kinerja  (internal dan LHE SAKIP Perangkat Daerah)telah dimanfaatkan dalam mendukung efektivitas dan efisiensi kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024, DPA 2024',
 												'nomor_urut' => '4.00',
@@ -8401,7 +8401,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												)
 											),
 											array(
-												'nama' => 'Telah terjadi perbaikan dan peningkatan kinerja dengan memanfaatkan hasil evaluasi akuntabilitas kinerja  (internal dan LHE SAKIP OPD).',
+												'nama' => 'Telah terjadi perbaikan dan peningkatan kinerja dengan memanfaatkan hasil evaluasi akuntabilitas kinerja  (internal dan LHE SAKIP Perangkat Daerah).',
 												'tipe' => '2',
 												'keterangan' => '- Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024, DPA 2024 - Dokumen lainnya (Inovasi, Prestasi)',
 												'nomor_urut' => '5.00',
@@ -14301,7 +14301,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_detail_pemda = '';
 		$pedoman_teknis_evaluasi_internal_detail_pemda = '';
 		
-		// SAKIP OPD
+		// SAKIP Perangkat Daerah
 		$periode_rpjmd = '';
 		$periode_renstra = '';
 		$periode_renstra_skpd = '';
@@ -14328,7 +14328,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_detail = '';
 		$pedoman_teknis_evaluasi_internal_detail = '';
 
-		//OPD
+		//Perangkat Daerah
 		$renja_skpd_detail = '';
 		$iku_skpd_detail = '';	
 		$skp_skpd_detail = '';
@@ -14576,7 +14576,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$title_pedoman_teknis_evaluasi_internal = 'Pedoman Teknis Evaluasi Internal';
 			$pedoman_teknis_evaluasi_internal_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_pedoman_teknis_evaluasi_internal . '</a></li>';
 
-			//DOKUMEN OPD
+			//DOKUMEN Perangkat Daerah
 
 			$renja_rkt = $this->functions->generatePage(array(
 				'nama_page' => 'RENJA / RKT ' . $_GET['tahun'],
@@ -14667,7 +14667,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$title_dokumen_lainnya = 'Lainnya';
 			$dokumen_lainnya_detail .= '<li><a target="_blank" href="' . $dokumen_lainnya['url'] . '" class="btn btn-primary">' .  $title_dokumen_lainnya . '</a></li>';
 
-			//DOKUMEN OPD JIKA DIPAKAI
+			//DOKUMEN Perangkat Daerah JIKA DIPAKAI
 
 			$skp = $this->functions->generatePage(array(
 				'nama_page' => 'SKP -',
@@ -14909,7 +14909,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			</div>';
 		$halaman_sakip_opd = '
 			<div class="accordion">
-				<h5 class="esakip-header-tahun" data-id="halaman-sakip-opd" style="margin: 0;">Dokumen SAKIP OPD</h5>
+				<h5 class="esakip-header-tahun" data-id="halaman-sakip-opd" style="margin: 0;">Dokumen SAKIP Perangkat Daerah</h5>
 				<div class="esakip-body-tahun" data-id="halaman-sakip-opd">
 					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 					' . $halaman_renstra_opd . '

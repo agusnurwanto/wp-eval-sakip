@@ -148,8 +148,8 @@ $timezone = get_option('timezone_string');
                     <th class="text-center" rowspan="2" style="vertical-align: middle;">Bobot</th>
                     <th class="text-center" colspan="3">Penilaian PD/Perangkat Daerah</th>
                     <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Bukti Dukung</th>
-                    <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Keterangan OPD</th>
-                    <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Kerangka Logis OPD</th>
+                    <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Keterangan Perangkat Daerah</th>
+                    <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Kerangka Logis Perangkat Daerah</th>
                     <th class="text-center" colspan="3">Penilaian Evaluator</th>
                     <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Keterangan Evaluator</th>
                     <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Kerangka Logis Evaluator</th>

@@ -55,7 +55,7 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
 					<thead>
 						<tr>
 							<th class="text-center">No</th>
-							<th class="text-center">Nama OPD</th>
+							<th class="text-center">Nama Perangkat Daerah</th>
 							<th class="text-center">Jumlah Dokumen</th>
 							<th class="text-center">Aksi</th>
 						</tr>

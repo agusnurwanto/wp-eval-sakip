@@ -676,7 +676,7 @@ class Wp_Eval_Sakip_Admin
 		global $wpdb;
 
 		$halaman_mapping_skpd = $this->functions->generatePage(array(
-			'nama_page' => 'Halaman Mapping OPD',
+			'nama_page' => 'Halaman Mapping Perangkat Daerah',
 			'content' => '[halaman_mapping_skpd]',
 			'show_header' => 1,
 			'no_key' => 1,
@@ -810,7 +810,7 @@ class Wp_Eval_Sakip_Admin
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'dokumen_pemda_lainnya')));
 
-		$dokumen_menu = Container::make('theme_options', __('Dokumen OPD'))
+		$dokumen_menu = Container::make('theme_options', __('Dokumen Perangkat Daerah'))
 			->set_page_menu_position(3.2)
 			->set_icon('dashicons-media-default')
 			->add_fields(array(
@@ -1402,7 +1402,7 @@ class Wp_Eval_Sakip_Admin
 
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Data user PA/KPA kosong. Harap lakukan singkronisasi data OPD dulu!';
+					$ret['message'] = 'Data user PA/KPA kosong. Harap lakukan singkronisasi data Perangkat Daerah dulu!';
 				}
 			} else {
 				$ret['status'] = 'error';
