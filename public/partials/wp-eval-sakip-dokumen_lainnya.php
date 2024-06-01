@@ -209,4 +209,71 @@ foreach ($idtahun as $val) {
 	function toDetailUrl(url) {
 		window.open(url, '_blank');
 	}
+
+    function hapus_tahun_dokumen_lainnya(id) {
+        if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
+            return;
+        }
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'hapus_tahun_dokumen_lainnya',
+                api_key: esakip.api_key,
+				tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    getTableSkpd();
+                    getTableTahun();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                jQuery('#wrap-loading').hide();
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }
+
+    function hapus_tahun_dokumen_lainnya(id) {
+        if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
+            return;
+        }
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'hapus_tahun_dokumen_lainnya',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    getTableSkpd();
+                    getTableTahun();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                jQuery('#wrap-loading').hide();
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }
 </script>

@@ -214,7 +214,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'submit_tahun_rencana_aksi',
+                action: 'c',
                 id: id,
                 tahunAnggaran: tahunAnggaran,
                 api_key: esakip.api_key
@@ -406,6 +406,39 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 if (response.status === 'success') {
                     alert(response.message);
                     getTableRencanaAksi();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                jQuery('#wrap-loading').hide();
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }
+
+    function hapus_tahun_dokumen_rencana_aksi(id) {
+        if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
+            return;
+        }
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'hapus_tahun_dokumen_rencana_aksi',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    getTableRencanaAksi();
+                    getTableTahun();
                 } else {
                     alert(response.message);
                 }

@@ -9573,6 +9573,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if (!$this->is_admin_panrb()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+
+							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_lainnya(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
 						$btn .= '</div>';
 
@@ -9662,6 +9664,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if (!$this->is_admin_panrb()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+
+							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_other_file(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
 						$btn .= '</div>';
 
@@ -9746,6 +9750,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if (!$this->is_admin_panrb()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+
+							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_rpjmd(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
 						$btn .= '</div>';
 
@@ -9837,6 +9843,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if (!$this->is_admin_panrb()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+
+							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_renstra(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
 						$btn .= '</div>';
 
@@ -9928,6 +9936,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if (!$this->is_admin_panrb()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+
+							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_laporan_monev_renaksi(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
 						$btn .= '</div>';
 
@@ -11526,6 +11536,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if (!$this->is_admin_panrb()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+
+							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_perjanjian_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
 						$btn .= '</div>';
 
@@ -11711,6 +11723,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if (!$this->is_admin_panrb()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+
+							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_rencana_aksi(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
 						$btn .= '</div>';
 
@@ -11895,6 +11909,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if (!$this->is_admin_panrb()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+
+							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_iku(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
 						$btn .= '</div>';
 
@@ -12080,6 +12096,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if (!$this->is_admin_panrb()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+
+							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_evaluasi_internal(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
 						$btn .= '</div>';
 
@@ -12264,6 +12282,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if (!$this->is_admin_panrb()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+
+							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_pengukuran_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
 						$btn .= '</div>';
 
@@ -12448,6 +12468,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if (!$this->is_admin_panrb()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+
+							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_pengukuran_rencana_aksi(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
 						$btn .= '</div>';
 
@@ -12632,6 +12654,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if (!$this->is_admin_panrb()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+
+							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_laporan_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
 						$btn .= '</div>';
 
@@ -12716,6 +12740,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if (!$this->is_admin_panrb()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+
+							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_rkpd(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
 						$btn .= '</div>';
 
@@ -12800,6 +12826,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if (!$this->is_admin_panrb()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+
+							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_lkjip_lppd(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
 						$btn .= '</div>';
 
@@ -13079,6 +13107,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if (!$this->is_admin_panrb()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+
+							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_dpa(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
 						$btn .= '</div>';
 
@@ -13264,6 +13294,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if (!$this->is_admin_panrb()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+
+							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_renja_rkt(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
 						$btn .= '</div>';
 
@@ -13355,6 +13387,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if (!$this->is_admin_panrb()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+
+							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_skp(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
 						$btn .= '</div>';
 
@@ -13688,6 +13722,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 							if (!$this->is_admin_panrb()) {
 								$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+
+							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_tipe(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 							}
 							$btn .= '</div>';
 
@@ -14202,6 +14238,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn = '<div class="btn-action-group">';
 						$btn .= "<button class='btn btn-success' onclick='set_periode_dokumen(" . $vv['id'] . "); return false;' title='Set Periode Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
+
+						$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_renstra(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						$btn .= '</div>';
 
 						$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
@@ -16675,6 +16713,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if (!$this->is_admin_panrb()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+
+							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_rpjpd(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
 						$btn .= '</div>';
 
@@ -17727,5 +17767,929 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			);
 		}
 		die(json_encode($ret));
+	}	
+
+	public function hapus_tahun_dokumen_rpjmd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$get_data = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_rpjmd
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					if ($get_data) {
+	                    $ret['data'] = $wpdb->delete('esakip_rpjmd', array(
+	                        'id' => $_POST['id']
+	                    ));
+	                }
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+		public function hapus_tahun_dokumen_lainnya()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$get_data = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_lainnya
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					if ($get_data) {
+	                    $ret['data'] = $wpdb->delete('esakip_lainnya', array(
+	                        'id' => $_POST['id']
+	                    ));
+	                }
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_tahun_dokumen_other_file()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$get_data = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_other_file
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					if ($get_data) {
+	                    $ret['data'] = $wpdb->delete('esakip_other_file', array(
+	                        'id' => $_POST['id']
+	                    ));
+	                }
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_tahun_dokumen_renstra()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$get_data = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_renstra
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					if ($get_data) {
+	                    $ret['data'] = $wpdb->delete('esakip_renstra', array(
+	                        'id' => $_POST['id']
+	                    ));
+	                }
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_tahun_dokumen_laporan_monev_renaksi()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$get_data = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_laporan_monev_renaksi
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					if ($get_data) {
+	                    $ret['data'] = $wpdb->delete('esakip_laporan_monev_renaksi', array(
+	                        'id' => $_POST['id']
+	                    ));
+	                }
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_tahun_dokumen_perjanjian_kinerja()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$get_data = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_perjanjian_kinerja
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					if ($get_data) {
+	                    $ret['data'] = $wpdb->delete('esakip_perjanjian_kinerja', array(
+	                        'id' => $_POST['id']
+	                    ));
+	                }
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_tahun_dokumen_rencana_aksi()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$get_data = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_rencana_aksi
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					if ($get_data) {
+	                    $ret['data'] = $wpdb->delete('esakip_rencana_aksi', array(
+	                        'id' => $_POST['id']
+	                    ));
+	                }
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_tahun_dokumen_iku()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$get_data = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_iku
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					if ($get_data) {
+	                    $ret['data'] = $wpdb->delete('esakip_iku', array(
+	                        'id' => $_POST['id']
+	                    ));
+	                }
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_tahun_dokumen_evaluasi_internal()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$get_data = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_evaluasi_internal
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					if ($get_data) {
+	                    $ret['data'] = $wpdb->delete('esakip_evaluasi_internal', array(
+	                        'id' => $_POST['id']
+	                    ));
+	                }
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_tahun_dokumen_pengukuran_kinerja()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$get_data = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_pengukuran_kinerja
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					if ($get_data) {
+	                    $ret['data'] = $wpdb->delete('esakip_pengukuran_kinerja', array(
+	                        'id' => $_POST['id']
+	                    ));
+	                }
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_tahun_dokumen_pengukuran_rencana_aksi()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$get_data = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_pengukuran_rencana_aksi
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					if ($get_data) {
+	                    $ret['data'] = $wpdb->delete('esakip_pengukuran_rencana_aksi', array(
+	                        'id' => $_POST['id']
+	                    ));
+	                }
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_tahun_dokumen_laporan_kinerja()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$get_data = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_laporan_kinerja
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					if ($get_data) {
+	                    $ret['data'] = $wpdb->delete('esakip_laporan_kinerja', array(
+	                        'id' => $_POST['id']
+	                    ));
+	                }
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_tahun_dokumen_rkpd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$get_data = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_rkpd
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					if ($get_data) {
+	                    $ret['data'] = $wpdb->delete('esakip_rkpd', array(
+	                        'id' => $_POST['id']
+	                    ));
+	                }
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_tahun_dokumen_lkjip_lppd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$get_data = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_lkjip_lppd
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					if ($get_data) {
+	                    $ret['data'] = $wpdb->delete('esakip_lkjip_lppd', array(
+	                        'id' => $_POST['id']
+	                    ));
+	                }
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_tahun_dokumen_dpa()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$get_data = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_dpa
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					if ($get_data) {
+	                    $ret['data'] = $wpdb->delete('esakip_dpa', array(
+	                        'id' => $_POST['id']
+	                    ));
+	                }
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_tahun_dokumen_renja_rkt()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$get_data = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_renja_rkt
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					if ($get_data) {
+	                    $ret['data'] = $wpdb->delete('esakip_renja_rkt', array(
+	                        'id' => $_POST['id']
+	                    ));
+	                }
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_tahun_dokumen_skp()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$get_data = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_skp
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					if ($get_data) {
+	                    $ret['data'] = $wpdb->delete('esakip_skp', array(
+	                        'id' => $_POST['id']
+	                    ));
+	                }
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_tahun_dokumen_rpjpd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$get_data = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_rpjpd
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					if ($get_data) {
+	                    $ret['data'] = $wpdb->delete('esakip_rpjpd', array(
+	                        'id' => $_POST['id']
+	                    ));
+	                }
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+	public function hapus_tahun_dokumen_tipe()
+	{
+	    global $wpdb;
+	    $ret = array(
+	        'status' => 'success',
+	        'message' => 'Berhasil hapus data!',
+	        'data' => array()
+	    );
+
+	    if (!empty($_POST)) {
+	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+	            if (!empty($_POST['id']) && !empty($_POST['tipe_dokumen'])) {
+	                $tipe_dokumen = sanitize_text_field($_POST['tipe_dokumen']);
+	                $id = intval($_POST['id']);
+
+	                $nama_tabel = array(
+						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading",
+						"pedoman_teknis_perencanaan" => "esakip_pedoman_teknis_perencanaan",
+						"pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja" => "esakip_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja",
+						"pedoman_teknis_evaluasi_internal" => "esakip_pedoman_teknis_evaluasi_internal",
+						"lhe_akip_internal" => "esakip_lhe_akip_internal",
+						"tl_lhe_akip_internal" => "esakip_tl_lhe_akip_internal",
+						"tl_lhe_akip_kemenpan" => "esakip_tl_lhe_akip_kemenpan",
+						"dpa" => "esakip_dpa"
+	                );
+
+	                if (array_key_exists($tipe_dokumen, $nama_tabel)) {
+	                    $table_name = $nama_tabel[$tipe_dokumen];
+	                    $get_data = $wpdb->get_var(
+	                        $wpdb->prepare("
+	                            SELECT COUNT(*) 
+	                            FROM $table_name 
+	                            WHERE id = %d
+	                        ", $id)
+	                    );
+
+	                    if ($get_data) {
+	                        $deleted = $wpdb->delete($table_name, array('id' => $id));
+	                        if ($deleted !== false) {
+	                            $ret['data'] = $deleted;
+	                        } else {
+	                            $ret = array(
+	                                'status' => 'error',
+	                                'message' => 'Gagal menghapus data!'
+	                            );
+	                        }
+	                    } else {
+	                        $ret = array(
+	                            'status' => 'error',
+	                            'message' => 'Data tidak ditemukan!'
+	                        );
+	                    }
+	                } else {
+	                    $ret = array(
+	                        'status' => 'error',
+	                        'message' => 'Tipe dokumen tidak valid!'
+	                    );
+	                }
+	            } else {
+	                $ret = array(
+	                    'status' => 'error',
+	                    'message' => 'Id atau tipe dokumen kosong!'
+	                );
+	            }
+	        } else {
+	            $ret = array(
+	                'status' => 'error',
+	                'message' => 'Api Key tidak sesuai!'
+	            );
+	        }
+	    } else {
+	        $ret = array(
+	            'status' => 'error',
+	            'message' => 'Format tidak sesuai!'
+	        );
+	    }
+	    die(json_encode($ret));
 	}
 }
+
