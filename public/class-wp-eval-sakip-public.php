@@ -6911,6 +6911,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$jadwal_selesai		= date('Y-m-d H:i:s', strtotime($jadwal_selesai));
 					$tahun_anggaran		= trim(htmlspecialchars($_POST['tahun_anggaran']));
 					$jenis_jadwal		= trim(htmlspecialchars($_POST['jenis_jadwal']));
+					$tampil_nilai_penetapan	= $_POST['tampil_nilai_penetapan'];
 					$arr_jadwal = ['usulan', 'penetapan'];
 					$jenis_jadwal = in_array($jenis_jadwal, $arr_jadwal) ? $jenis_jadwal : 'usulan';
 
@@ -6964,6 +6965,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						'tahun_anggaran' => $tahun_anggaran,
 						'jenis_jadwal' => $jenis_jadwal,
 						'tipe' => 'LKE',
+						'tampil_nilai_penetapan' => $tampil_nilai_penetapan,
 						'lama_pelaksanaan' => 1,
 					);
 
@@ -8699,8 +8701,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$jadwal_selesai	= date('Y-m-d H:i:s', strtotime($jadwal_selesai));
 					$tahun_anggaran	= trim(htmlspecialchars($_POST['tahun_anggaran']));
 					$tipe 	= trim(htmlspecialchars($_POST['tipe']));
-					$jenis_jadwal 	= trim(htmlspecialchars($_POST['jenis_jadwal']));
-
+					$tampil_nilai_penetapan	= $_POST['tampil_nilai_penetapan'];
+					$jenis_jadwal 	= trim(htmlspecialchars($_POST['jenis_jadwal'])); 
 
 					$data_this_id = $wpdb->get_row($wpdb->prepare('SELECT * FROM esakip_data_jadwal WHERE id = %d', $id), ARRAY_A);
 
@@ -8713,7 +8715,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'started_at'			=> $jadwal_mulai,
 								'end_at'				=> $jadwal_selesai,
 								'jenis_jadwal'			=> $jenis_jadwal,
-								'tahun_anggaran'		=> $tahun_anggaran
+								'tahun_anggaran'		=> $tahun_anggaran,
+								'tampil_nilai_penetapan'=> $tampil_nilai_penetapan
 							);
 
 							$wpdb->update('esakip_data_jadwal', $data_jadwal, array(

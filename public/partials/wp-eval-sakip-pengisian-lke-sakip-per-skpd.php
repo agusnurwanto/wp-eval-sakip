@@ -229,10 +229,6 @@ $timezone = get_option('timezone_string');
                     </tbody>
                 </table>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" onclick="submit_bukti_dukung(); return false">Simpan</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
-            </div>
         </div>
     </div>
 </div>
@@ -251,7 +247,6 @@ $timezone = get_option('timezone_string');
         };
         penjadwalanHitungMundur(dataHitungMundur);
     })
-
 
     function get_table_pengisian_sakip() {
         jQuery('#wrap-loading').show();
@@ -531,8 +526,8 @@ $timezone = get_option('timezone_string');
                 console.log(response);
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
-                    jQuery('#infoPenjelasanTable tbody').html(response.data)
-                    jQuery('#infoPenjelasanModal').modal('show')
+                    jQuery('#infoPenjelasanTable tbody').html(response.data);
+                    jQuery('#infoPenjelasanModal').modal('show');
                 } else {
                     alert(response.message);
                 }
@@ -542,6 +537,6 @@ $timezone = get_option('timezone_string');
                 console.error(xhr.responseText);
                 alert('Terjadi kesalahan saat mengirim data!');
             }
-        })
+        });
     }
 </script>
