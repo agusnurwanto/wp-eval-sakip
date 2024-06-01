@@ -6911,6 +6911,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$jadwal_selesai		= date('Y-m-d H:i:s', strtotime($jadwal_selesai));
 					$tahun_anggaran		= trim(htmlspecialchars($_POST['tahun_anggaran']));
 					$jenis_jadwal		= trim(htmlspecialchars($_POST['jenis_jadwal']));
+					$tampil_nilai_penetapan	= $_POST['tampil_nilai_penetapan'];
 					$arr_jadwal = ['usulan', 'penetapan'];
 					$jenis_jadwal = in_array($jenis_jadwal, $arr_jadwal) ? $jenis_jadwal : 'usulan';
 
@@ -6964,6 +6965,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						'tahun_anggaran' => $tahun_anggaran,
 						'jenis_jadwal' => $jenis_jadwal,
 						'tipe' => 'LKE',
+						'tampil_nilai_penetapan' => $tampil_nilai_penetapan,
 						'lama_pelaksanaan' => 1,
 					);
 
@@ -7029,6 +7031,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											'nama' => $penilaian['nama'],
 											'tipe' => $penilaian['tipe'],
 											'keterangan' => $penilaian['keterangan'],
+											'penjelasan' => $penilaian['penjelasan'],
+											'langkah_kerja' => $penilaian['langkah_kerja'],
 										);
 										$wpdb->insert('esakip_komponen_penilaian', $data_komponen_penilaian_baru);
 										$id_komponen_penilaian_baru = $wpdb->insert_id;
@@ -7127,13 +7131,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Renstra telah disusun',
 												'tipe' => '1',
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026)',
-												'nomor_urut' => '1.00'
+												'nomor_urut' => '1.00',
+												'penjelasan' => 'cukup jelas',
+												'langkah_kerja' => 'Dapatkan dokumen berupa hard copy maupun soft copy'
 											),
 											array( //1
 												'nama' => 'Dokumen perencanaan kinerja tahunan (Renja) telah disusun',
 												'tipe' => '1',
 												'keterangan' => 'Renja 2023 dan 2024',
 												'nomor_urut' => '2.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -7147,6 +7155,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'tipe' => '1',
 												'keterangan' => '- Renja 2023 dan 2024, - DPA 2024 dan DPPA 2023 (di dokumen lainnya)',
 												'nomor_urut' => '3.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -7160,6 +7170,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'tipe' => '1',
 												'keterangan' => 'PK 2023 dan 2024',
 												'nomor_urut' => '4.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -7173,6 +7185,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'tipe' => '2',
 												'keterangan' => 'PK 2023 dan 2024',
 												'nomor_urut' => '5.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -7185,6 +7199,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Terdapat dokumen Rencana Aksi',
 												'tipe' => '1',
 												'keterangan' => 'Rencana Aksi 2023 dan 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '6.00',
 												'data' => array(
 													array(
@@ -7206,6 +7222,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Perencanaan Kinerja telah diformalkan.',
 												'tipe' => '1',
 												'keterangan' => 'Renstra dan Renja',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '1.00',
 												'data' => array(
 													array(
@@ -7219,6 +7237,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Renstra telah dipublikasikan tepat waktu',
 												'tipe' => '1',
 												'keterangan' => 'Screenshoot Renstra 2024-2026 di website Perangkat Daerah, esr dan aplikasi SAKIP',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '2.00',
 												'data' => array(
 													array(
@@ -7231,6 +7251,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											array( //2
 												'nama' => 'Renja telah dipublikasikan tepat waktu',
 												'tipe' => '1',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'keterangan' => 'Screenshoot Renja 2023 dan 2024 di website Perangkat Daerah, esr dan aplikasi SAKIP',
 												'nomor_urut' => '3.00',
 												'data' => array(
@@ -7246,6 +7268,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'tipe' => '1',
 												'keterangan' => 'Screenshoot PK 2023 dan 2024 di website Perangkat Daerah, esr dan aplikasi SAKIP',
 												'nomor_urut' => '4.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -7259,6 +7283,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'tipe' => '2',
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024',
 												'nomor_urut' => '5.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -7272,6 +7298,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'tipe' => '2',
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024',
 												'nomor_urut' => '6.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -7290,6 +7318,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'tipe' => '2',
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024',
 												'nomor_urut' => '7.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -7307,6 +7337,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'tipe' => '2',
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024',
 												'nomor_urut' => '8.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -7323,6 +7355,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Indikator Kinerja Tujuan telah menggambarkan kondisi Tujuan yang harus dicapai, tertuang secara berkelanjutan (sustainable - tidak sering diganti dalam 1 periode Perencanaan Strategis).',
 												'tipe' => '2',
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '9.00',
 												'data' => array(
 													array(
@@ -7340,6 +7374,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Indikator Kinerja Sasaran telah menggambarkan kondisi Sasaran yang harus dicapai, tertuang secara berkelanjutan (sustainable - tidak sering diganti dalam 1 periode Perencanaan Strategis).',
 												'tipe' => '2',
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '10.00',
 												'data' => array(
 													array(
@@ -7357,6 +7393,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Target yang ditetapkan dalam Perencanaan Kinerja dapat dicapai (achievable) dan realistis.',
 												'tipe' => '2',
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '11.00',
 												'data' => array(
 													array(
@@ -7370,6 +7408,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Setiap Dokumen Perencanaan Kinerja (Renstra, Renja, PK) telah menggambarkan hubungan yang berkesinambungan, serta selaras antara Kondisi/Hasil yang akan dicapai di setiap level jabatan (Cascading Kinerja).',
 												'tipe' => '2',
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024,  cascading dan pohon kinerja (di dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '12.00',
 												'data' => array(
 													array(
@@ -7396,6 +7436,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Renstra digunakan sebagai acuan penyusunan Dokumen Rencana Kerja dan Anggaran',
 												'tipe' => '2',
 												'keterangan' => '- Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, Rencana Aksi 2023 dan 2024 - DPA 2024 dan DPPA 2023 (di dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '1.00',
 												'data' => array(
 													array(
@@ -7414,6 +7456,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Target jangka menengah dalam Renstra telah dimonitor pencapaiannya sampai dengan tahun berjalan',
 												'tipe' => '2',
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '2.00',
 												'data' => array(
 													array(
@@ -7432,6 +7476,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Anggaran yang ditetapkan telah mengacu pada Kinerja yang ingin dicapai',
 												'tipe' => '2',
 												'keterangan' => '- Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, Rencana Aksi 2023 dan 2024 - DPA 2024 dan DPPA 2023 (di dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '3.00',
 												'data' => array(
 													array(
@@ -7451,6 +7497,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'tipe' => '2',
 												'keterangan' => 'Rencana aksi 2023 dan 2024',
 												'nomor_urut' => '4.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -7468,6 +7516,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Target kinerja yang diperjanjikan pada Perjanjian Kinerja telah digunakan untuk mengukur keberhasilan',
 												'tipe' => '2',
 												'keterangan' => '- Perjanjian Kinerja 2023 dan 2024, SKP 2023 dan 2024 - SK dan bukti pemberian reward punishment (dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '5.00',
 												'data' => array(
 													array(
@@ -7486,6 +7536,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Setiap pegawai memahami dan peduli serta berkomitmen dalam mencapai kinerja yang telah direncanakan dalam Sasaran Kinerja Pegawai (SKP)',
 												'tipe' => '2',
 												'keterangan' => 'SKP 2023 dan 2024, PK 2023 dan 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '6.00',
 												'data' => array(
 													array(
@@ -7504,6 +7556,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Renstra telah direviu secara berkala',
 												'tipe' => '2',
 												'keterangan' => 'Screenshoot aplikasi e-monev E-80 dan E-81 (dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '7.00',
 												'data' => array(
 													array(
@@ -7540,12 +7594,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Telah terdapat indikator kinerja utama (IKU) sebagai ukuran kinerja secara formal',
 												'tipe' => '1',
 												'keterangan' => 'Dokumen IKU 2024-2026',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '1.00'
 											),
 											array( //1
 												'nama' => 'Terdapat Definisi Operasional yang jelas atas kinerja dan cara mengukur indikator kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Dokumen IKU 2024-2026',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '2.00',
 												'data' => array(
 													array(
@@ -7559,6 +7617,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Terdapat mekanisme yang jelas terhadap pengumpulan data kinerja yang dapat diandalkan.',
 												'tipe' => '2',
 												'keterangan' => 'SOP pengumpulan data kinerja (di dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '3.00',
 												'data' => array(
 													array(
@@ -7585,6 +7645,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pimpinan selalu terlibat sebagai pengambil keputusan (Decision Maker) dalam mengukur capaian kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '1.00',
 												'data' => array(
 													array(
@@ -7599,6 +7661,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Data kinerja yang dikumpulkan telah relevan untuk mengukur capaian kinerja yang diharapkan.',
 												'tipe' => '2',
 												'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024,  Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '2.00',
 												'data' => array(
 													array(
@@ -7612,6 +7676,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Data kinerja yang dikumpulkan telah mendukung capaian kinerja yang diharapkan.',
 												'tipe' => '2',
 												'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024,  Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '3.00',
 												'data' => array(
 													array(
@@ -7625,6 +7691,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pengumpulan data kinerja atas Rencana Aksi dilakukan secara berkala (bulanan/triwulanan/semester)',
 												'tipe' => '1',
 												'keterangan' => 'Pengukuran rencana aksi Tahun 2023 dan 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '4.00',
 												'data' => array(
 													array(
@@ -7638,6 +7706,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pengukuran kinerja sudah dilakukan secara berjenjang',
 												'tipe' => '2',
 												'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '5.00',
 												'data' => array(
 													array(
@@ -7651,6 +7721,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pengumpulan data kinerja telah memanfaatkan Teknologi Informasi (Aplikasi).',
 												'tipe' => '1',
 												'keterangan' => 'Screenshoot aplikasi EP3, E-monev (dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '6.00',
 												'data' => array(
 													array(
@@ -7668,6 +7740,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pengukuran capaian kinerja telah memanfaatkan Teknologi Informasi (Aplikasi).',
 												'tipe' => '1',
 												'keterangan' => 'Screenshoot aplikasi EP3, E-monev (dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '7.00',
 												'data' => array(
 													array(
@@ -7693,6 +7767,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pengukuran Kinerja telah menjadi dasar dalam penyesuaian (pemberian/pengurangan) tunjangan kinerja/penghasilan.',
 												'tipe' => '2',
 												'keterangan' => '- Pengukuran Kinerja 2023 dan 2024,  - Screenshoot EP3 (dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '1.00',
 												'data' => array(
 													array(
@@ -7710,6 +7786,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian (Refocusing) Organisasi.',
 												'tipe' => '2',
 												'keterangan' => '- Pengukuran Kinerja 2023 dan 2024 - Screenshoot EP3 (dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '2.00',
 												'data' => array(
 													array(
@@ -7727,6 +7805,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian Strategi dalam mencapai kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Dokumen Pengukuran Kinerja 2023 dan 2024;  Evaluasi Internal 2023 dan 2024; Rencana Aksi 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '3.00',
 												'data' => array(
 													array(
@@ -7744,6 +7824,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian Kebijakan dalam mencapai kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Dokumen Pengukuran Kinerja 2023 dan 2024;  Evaluasi Internal 2023 dan 2024; Rencana Aksi 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '4.00',
 												'data' => array(
 													array(
@@ -7761,6 +7843,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian Aktivitas dalam mencapai kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Dokumen Pengukuran Kinerja 2023 dan 2024;  Evaluasi Internal 2023 dan 2024; Rencana Aksi 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '5.00',
 												'data' => array(
 													array(
@@ -7778,6 +7862,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian Anggaran dalam mencapai kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Dokumen Pengukuran Kinerja 2023 dan 2024;  Evaluasi Internal 2023 dan 2024; DPA 2024 dan DPPA 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '6.00',
 												'data' => array(
 													array(
@@ -7795,6 +7881,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Terdapat efisiensi atas penggunaan anggaran dalam mencapai kinerja.',
 												'tipe' => '2',
 												'keterangan' => '- Laporan Kinerja 2023;  - DPPA 2023 (di dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '7.00',
 												'data' => array(
 													array(
@@ -7812,6 +7900,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Setiap unit/satuan kerja memahami dan peduli atas hasil pengukuran kinerja.',
 												'tipe' => '2',
 												'keterangan' => NULL,
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '8.00',
 												'data' => array(
 													array(
@@ -7829,6 +7919,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Setiap pegawai memahami dan peduli atas hasil pengukuran kinerja.',
 												'tipe' => '2',
 												'keterangan' => NULL,
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '9.00',
 												'data' => array(
 													array(
@@ -7864,12 +7956,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah disusun.',
 												'tipe' => '1',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '1.00'
 											),
 											array( //1
 												'nama' => 'Dokumen Laporan Kinerja telah disusun secara berkala.',
 												'tipe' => '1',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '2.00',
 												'data' => array(
 													array(
@@ -7883,6 +7979,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah diformalkan.',
 												'tipe' => '1',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '3.00',
 												'data' => array(
 													array(
@@ -7896,6 +7994,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah direviu.',
 												'tipe' => '1',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '4.00',
 												'data' => array(
 													array(
@@ -7909,6 +8009,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah dipublikasikan.',
 												'tipe' => '1',
 												'keterangan' => 'Screenshoot Laporan Kinerja 2023 pada website, esr, aplikasi sakip kab madiun (dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '5.00',
 												'data' => array(
 													array(
@@ -7922,6 +8024,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah disampaikan tepat waktu.',
 												'tipe' => '1',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '6.00',
 												'data' => array(
 													array(
@@ -7945,6 +8049,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja disusun secara berkualitas sesuai dengan standar.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '1.00',
 												'data' => array(
 													array(
@@ -7958,6 +8064,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah mengungkap seluruh informasi tentang pencapaian kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '2.00',
 												'data' => array(
 													array(
@@ -7976,6 +8084,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah menginfokan perbandingan realisasi kinerja dengan target tahunan.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '3.00',
 												'data' => array(
 													array(
@@ -7994,6 +8104,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah menginfokan perbandingan realisasi kinerja dengan target jangka menengah.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '4.00',
 												'data' => array(
 													array(
@@ -8012,6 +8124,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah menginfokan perbandingan realisasi kinerja dengan realisasi kinerja tahun-tahun sebelumnya.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '5.00',
 												'data' => array(
 													array(
@@ -8030,6 +8144,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah menyajikan informasi keuangan yang terkait dengan pencapaian sasaran kinerja instansi.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '6.00',
 												'data' => array(
 													array(
@@ -8048,6 +8164,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah menginfokan kualitas atas capaian kinerja beserta upaya nyata dan/atau hambatannya.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '7.00',
 												'data' => array(
 													array(
@@ -8066,6 +8184,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah menginfokan efisiensi atas penggunaan sumber daya dalam mencapai kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '8.00',
 												'data' => array(
 													array(
@@ -8084,6 +8204,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah menginfokan upaya perbaikan dan penyempurnaan kinerja ke depan (Rekomendasi perbaikan kinerja).',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '9.00',
 												'data' => array(
 													array(
@@ -8112,6 +8234,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Informasi dalam laporan kinerja selalu menjadi perhatian utama pimpinan (Bertanggung Jawab).',
 												'tipe' => '1',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '1.00',
 												'data' => array(
 													array(
@@ -8131,6 +8255,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'Penyajian informasi dalam laporan kinerja menjadi kepedulian seluruh pegawai.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '2.00',
 												'data' => array(
 													array(
@@ -8149,6 +8275,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Informasi dalam laporan kinerja berkala telah digunakan dalam penyesuaian aktivitas untuk mencapai kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '3.00',
 												'data' => array(
 													array(
@@ -8167,6 +8295,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Informasi dalam laporan kinerja berkala telah digunakan dalam penyesuaian penggunaan anggaran untuk mencapai kinerja.',
 												'tipe' => '2',
 												'keterangan' => '- Laporan Kinerja 2023,  - DPA 2024 (dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '4.00',
 												'data' => array(
 													array(
@@ -8185,6 +8315,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Informasi dalam laporan kinerja telah digunakan dalam evaluasi pencapaian keberhasilan kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023, Evaluasi Internal 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '5.00',
 												'data' => array(
 													array(
@@ -8203,6 +8335,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Informasi dalam laporan kinerja telah digunakan dalam penyesuaian perencanaan kinerja yang akan dihadapi berikutnya.',
 												'tipe' => '2',
 												'keterangan' => '- Laporan Kinerja 2023, rencana aksi 2024,  - DPA 2024 (dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '6.00',
 												'data' => array(
 													array(
@@ -8221,6 +8355,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Informasi dalam laporan kinerja selalu mempengaruhi perubahan budaya kinerja organisasi.',
 												'tipe' => '2',
 												'keterangan' => '- Laporan Kinerja 2023, rencana aksi 2024, evaluasi internal 2024 dan 2023 - DPA 2024 (dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '7.00',
 												'data' => array(
 													array(
@@ -8258,6 +8394,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Telah dilaksanakan Evaluasi Akuntabilitas Kinerja secara berkala.',
 												'tipe' => '1',
 												'keterangan' => 'Evaluasi Internal 2023 dan 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '1.00'
 											),
 										)
@@ -8272,6 +8410,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan secara berjenjang.',
 												'tipe' => '2',
 												'keterangan' => 'Evaluasi Internal 2023 dan 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '1.00',
 												'data' => array(
 													array(
@@ -8298,6 +8438,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan pada seluruh bidang di Perangkat Daerah.',
 												'tipe' => '2',
 												'keterangan' => 'Evaluasi Internal 2023 dan 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '3.00',
 												'data' => array(
 													array(
@@ -8311,6 +8453,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan menggunakan Teknologi Informasi (Aplikasi).',
 												'tipe' => '2',
 												'keterangan' => 'Evaluasi Internal 2023 dan 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '4.00',
 												'data' => array(
 													array(
@@ -8333,6 +8477,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'tipe' => '2',
 												'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023',
 												'nomor_urut' => '1.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -8350,6 +8496,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Telah terjadi peningkatan implementasi SAKIP  (internal dan LHE SAKIP Perangkat Daerah) dengan melaksanakan tindak lanjut atas rekomendasi hasil evaluasi akuntabilitas kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '2.00',
 												'data' => array(
 													array(
@@ -8368,6 +8516,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Hasil Evaluasi Akuntabilitas Kinerja  (internal dan LHE SAKIP Perangkat Daerah) telah dimanfaatkan untuk perbaikan dan peningkatan akuntabilitas kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '3.00',
 												'data' => array(
 													array(
@@ -8386,6 +8536,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Hasil dari Evaluasi Akuntabilitas Kinerja  (internal dan LHE SAKIP Perangkat Daerah)telah dimanfaatkan dalam mendukung efektivitas dan efisiensi kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024, DPA 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '4.00',
 												'data' => array(
 													array(
@@ -8404,6 +8556,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Telah terjadi perbaikan dan peningkatan kinerja dengan memanfaatkan hasil evaluasi akuntabilitas kinerja  (internal dan LHE SAKIP Perangkat Daerah).',
 												'tipe' => '2',
 												'keterangan' => '- Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024, DPA 2024 - Dokumen lainnya (Inovasi, Prestasi)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '5.00',
 												'data' => array(
 													array(
@@ -8461,6 +8615,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										'nama' => $penilaian['nama'],
 										'tipe' => $penilaian['tipe'],
 										'keterangan' => $penilaian['keterangan'],
+										'penjelasan' => $penilaian['penjelasan'],
+										'langkah_kerja' => $penilaian['langkah_kerja'],
 									);
 									if ($wpdb->insert('esakip_komponen_penilaian', $komponen_penilaian_baru) === false) {
 										error_log("Error inserting into esakip_komponen_penilaian: " . $wpdb->last_error);
@@ -8545,8 +8701,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$jadwal_selesai	= date('Y-m-d H:i:s', strtotime($jadwal_selesai));
 					$tahun_anggaran	= trim(htmlspecialchars($_POST['tahun_anggaran']));
 					$tipe 	= trim(htmlspecialchars($_POST['tipe']));
-					$jenis_jadwal 	= trim(htmlspecialchars($_POST['jenis_jadwal']));
-
+					$tampil_nilai_penetapan	= $_POST['tampil_nilai_penetapan'];
+					$jenis_jadwal 	= trim(htmlspecialchars($_POST['jenis_jadwal'])); 
 
 					$data_this_id = $wpdb->get_row($wpdb->prepare('SELECT * FROM esakip_data_jadwal WHERE id = %d', $id), ARRAY_A);
 
@@ -8559,7 +8715,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'started_at'			=> $jadwal_mulai,
 								'end_at'				=> $jadwal_selesai,
 								'jenis_jadwal'			=> $jenis_jadwal,
-								'tahun_anggaran'		=> $tahun_anggaran
+								'tahun_anggaran'		=> $tahun_anggaran,
+								'tampil_nilai_penetapan'=> $tampil_nilai_penetapan
 							);
 
 							$wpdb->update('esakip_data_jadwal', $data_jadwal, array(
@@ -14424,406 +14581,406 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$renstra_skpd['url'] .= '&id_skpd=ganti';
 			$periode_renstra_skpd .= '<li><a target="_blank" href="' . $renstra_skpd['url'] . '" class="btn btn-primary">' . $title_renstra . '</a></li>';
 		}
-			// PEMDA
+		// PEMDA
 
-			$renja_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'RENJA / RKT' . $_GET['tahun'],
-				'content' => '[renja/rkt tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_renja = 'RENJA / RKT';
-			$renja_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_renja . '</a></li>';
+		$renja_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'RENJA / RKT' . $_GET['tahun'],
+			'content' => '[renja/rkt tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_renja = 'RENJA / RKT';
+		$renja_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_renja . '</a></li>';
 
-			$iku_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'IKU' . $_GET['tahun'],
-				'content' => '[iku tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_skp = 'IKU';
-			$iku_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_skp . '</a></li>';
+		$iku_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'IKU' . $_GET['tahun'],
+			'content' => '[iku tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_skp = 'IKU';
+		$iku_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_skp . '</a></li>';
 
-			$skp_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'SKP' . $_GET['tahun'],
-				'content' => '[skp tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_skp = 'SKP';
-			$skp_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_skp . '</a></li>';
+		$skp_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'SKP' . $_GET['tahun'],
+			'content' => '[skp tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_skp = 'SKP';
+		$skp_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_skp . '</a></li>';
 
-			$rencana_aksi_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Rencana Aksi' . $_GET['tahun'],
-				'content' => '[rencana_aksi tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_rencana_aksi = 'Rencana Aksi';
-			$rencana_aksi_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_rencana_aksi . '</a></li>';
+		$rencana_aksi_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'Rencana Aksi' . $_GET['tahun'],
+			'content' => '[rencana_aksi tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_rencana_aksi = 'Rencana Aksi';
+		$rencana_aksi_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_rencana_aksi . '</a></li>';
 
-			$pengukuran_kinerja_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Pengukuran Kinerja' . $_GET['tahun'],
-				'content' => '[pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_pengukuran_kinerja = 'Pengukuran Kinerja';
-			$pengukuran_kinerja_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_pengukuran_kinerja . '</a></li>';
+		$pengukuran_kinerja_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'Pengukuran Kinerja' . $_GET['tahun'],
+			'content' => '[pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_pengukuran_kinerja = 'Pengukuran Kinerja';
+		$pengukuran_kinerja_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_pengukuran_kinerja . '</a></li>';
 
-			$pengukuran_rencana_aksi_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Pengukuran Rencana Aksi' . $_GET['tahun'],
-				'content' => '[pengukuran_rencana_aksi tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_pengukuran_rencana_aksi = 'Pengukuran Rencana Aksi';
-			$pengukuran_rencana_aksi_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_pengukuran_rencana_aksi . '</a></li>';
+		$pengukuran_rencana_aksi_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'Pengukuran Rencana Aksi' . $_GET['tahun'],
+			'content' => '[pengukuran_rencana_aksi tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_pengukuran_rencana_aksi = 'Pengukuran Rencana Aksi';
+		$pengukuran_rencana_aksi_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_pengukuran_rencana_aksi . '</a></li>';
 
-			$laporan_kinerja_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Laporan Kinerja' . $_GET['tahun'],
-				'content' => '[laporan_kinerja tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_laporan_kinerja = 'Laporan Kinerja';
-			$laporan_kinerja_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_laporan_kinerja . '</a></li>';
+		$laporan_kinerja_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'Laporan Kinerja' . $_GET['tahun'],
+			'content' => '[laporan_kinerja tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_laporan_kinerja = 'Laporan Kinerja';
+		$laporan_kinerja_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_laporan_kinerja . '</a></li>';
 
-			$evaluasi_internal_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Evaluasi Internal' . $_GET['tahun'],
-				'content' => '[evaluasi_internal tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_evaluasi_internal = 'Evaluasi Internal';
-			$evaluasi_internal_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_evaluasi_internal . '</a></li>';
+		$evaluasi_internal_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'Evaluasi Internal' . $_GET['tahun'],
+			'content' => '[evaluasi_internal tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_evaluasi_internal = 'Evaluasi Internal';
+		$evaluasi_internal_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_evaluasi_internal . '</a></li>';
 
-			$dokumen_lainnya_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Lainnya' . $_GET['tahun'],
-				'content' => '[dokumen_lainnya tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_dokumen_lainnya = 'Lainnya';
-			$dokumen_lainnya_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_dokumen_lainnya . '</a></li>';
+		$dokumen_lainnya_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'Lainnya' . $_GET['tahun'],
+			'content' => '[dokumen_lainnya tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_dokumen_lainnya = 'Lainnya';
+		$dokumen_lainnya_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_dokumen_lainnya . '</a></li>';
 
-			$perjanjian_kinerja_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Perjanjian Kinerja' . $_GET['tahun'],
-				'content' => '[perjanjian_kinerja tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_perjanjian_kinerja = 'Perjanjian Kinerja';
-			$perjanjian_kinerja_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_perjanjian_kinerja . '</a></li>';
+		$perjanjian_kinerja_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'Perjanjian Kinerja' . $_GET['tahun'],
+			'content' => '[perjanjian_kinerja tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_perjanjian_kinerja = 'Perjanjian Kinerja';
+		$perjanjian_kinerja_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_perjanjian_kinerja . '</a></li>';
 
-			$rkpd_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'RKPD' . $_GET['tahun'],
-				'content' => '[rkpd tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_rkpd = 'RKPD';
-			$rkpd_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_rkpd . '</a></li>';
+		$rkpd_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'RKPD' . $_GET['tahun'],
+			'content' => '[rkpd tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_rkpd = 'RKPD';
+		$rkpd_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_rkpd . '</a></li>';
 
-			$dokumen_pemda_lainnya_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Pemda Lainnya' . $_GET['tahun'],
-				'content' => '[dokumen_pemda_lainnya tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_dokumen_pemda_lainnya = 'Pemda Lainnya';
-			$dokumen_pemda_lainnya_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_dokumen_pemda_lainnya . '</a></li>';
+		$dokumen_pemda_lainnya_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'Pemda Lainnya' . $_GET['tahun'],
+			'content' => '[dokumen_pemda_lainnya tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_dokumen_pemda_lainnya = 'Pemda Lainnya';
+		$dokumen_pemda_lainnya_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_dokumen_pemda_lainnya . '</a></li>';
 
-			$lkjip_lppd_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'LKJIP / LPPD' . $_GET['tahun'],
-				'content' => '[lkjip_lppd tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_lkjip_lppd = 'LKJIP / LPPD';
-			$lkjip_lppd_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_lkjip_lppd . '</a></li>';
+		$lkjip_lppd_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'LKJIP / LPPD' . $_GET['tahun'],
+			'content' => '[lkjip_lppd tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_lkjip_lppd = 'LKJIP / LPPD';
+		$lkjip_lppd_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_lkjip_lppd . '</a></li>';
 
-			$dpa_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'DPA' . $_GET['tahun'],
-				'content' => '[dpa tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_dpa = 'DPA';
-			$dpa_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_dpa . '</a></li>';
+		$dpa_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'DPA' . $_GET['tahun'],
+			'content' => '[dpa tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_dpa = 'DPA';
+		$dpa_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_dpa . '</a></li>';
 
-			$pohon_kinerja_dan_cascading_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Pohon Kinerja dan Cascading' . $_GET['tahun'],
-				'content' => '[pohon_kinerja_dan_cascading tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_pohon_kinerja_dan_cascading = 'Pohon Kinerja dan Cascading';
-			$pohon_kinerja_dan_cascading_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_pohon_kinerja_dan_cascading . '</a></li>';
+		$pohon_kinerja_dan_cascading_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'Pohon Kinerja dan Cascading' . $_GET['tahun'],
+			'content' => '[pohon_kinerja_dan_cascading tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_pohon_kinerja_dan_cascading = 'Pohon Kinerja dan Cascading';
+		$pohon_kinerja_dan_cascading_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_pohon_kinerja_dan_cascading . '</a></li>';
 
-			$lhe_akip_internal_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'LHE AKIP Internal' . $_GET['tahun'],
-				'content' => '[lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_lhe_akip_internal = 'LHE AKIP Internal';
-			$lhe_akip_internal_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_lhe_akip_internal . '</a></li>';
+		$lhe_akip_internal_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'LHE AKIP Internal' . $_GET['tahun'],
+			'content' => '[lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_lhe_akip_internal = 'LHE AKIP Internal';
+		$lhe_akip_internal_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_lhe_akip_internal . '</a></li>';
 
-			$tl_lhe_akip_internal_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'TL LHE AKIP Internal' . $_GET['tahun'],
-				'content' => '[tl_lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_tl_lhe_akip_internal = 'TL LHE AKIP Internal';
-			$tl_lhe_akip_internal_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_tl_lhe_akip_internal . '</a></li>';
+		$tl_lhe_akip_internal_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'TL LHE AKIP Internal' . $_GET['tahun'],
+			'content' => '[tl_lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_tl_lhe_akip_internal = 'TL LHE AKIP Internal';
+		$tl_lhe_akip_internal_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_tl_lhe_akip_internal . '</a></li>';
 
-			$tl_lhe_akip_kemenpan_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'TL LHE AKIP Kemenpan' . $_GET['tahun'],
-				'content' => '[tl_lhe_akip_kemenpan tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_tl_lhe_akip_kemenpan = 'TL LHE AKIP Kemenpan';
-			$tl_lhe_akip_kemenpan_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_tl_lhe_akip_kemenpan . '</a></li>';
+		$tl_lhe_akip_kemenpan_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'TL LHE AKIP Kemenpan' . $_GET['tahun'],
+			'content' => '[tl_lhe_akip_kemenpan tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_tl_lhe_akip_kemenpan = 'TL LHE AKIP Kemenpan';
+		$tl_lhe_akip_kemenpan_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_tl_lhe_akip_kemenpan . '</a></li>';
 
-			$laporan_monev_renaksi_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Laporan Monev Renaksi' . $_GET['tahun'],
-				'content' => '[laporan_monev_renaksi tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_laporan_monev_renaksi = 'Laporan Monev Renaksi';
-			$laporan_monev_renaksi_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_laporan_monev_renaksi . '</a></li>';
+		$laporan_monev_renaksi_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'Laporan Monev Renaksi' . $_GET['tahun'],
+			'content' => '[laporan_monev_renaksi tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_laporan_monev_renaksi = 'Laporan Monev Renaksi';
+		$laporan_monev_renaksi_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_laporan_monev_renaksi . '</a></li>';
 
-			$pedoman_teknis_perencanaan_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Pedoman Teknis Perencanaan' . $_GET['tahun'],
-				'content' => '[pedoman_teknis_perencanaan tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_pedoman_teknis_perencanaan = 'Pedoman Teknis Perencanaan';
-			$pedoman_teknis_perencanaan_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_pedoman_teknis_perencanaan . '</a></li>';
+		$pedoman_teknis_perencanaan_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'Pedoman Teknis Perencanaan' . $_GET['tahun'],
+			'content' => '[pedoman_teknis_perencanaan tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_pedoman_teknis_perencanaan = 'Pedoman Teknis Perencanaan';
+		$pedoman_teknis_perencanaan_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_pedoman_teknis_perencanaan . '</a></li>';
 
-			$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja' . $_GET['tahun'],
-				'content' => '[pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja';
-			$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja . '</a></li>';
+		$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja' . $_GET['tahun'],
+			'content' => '[pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja';
+		$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja . '</a></li>';
 
-			$pedoman_teknis_evaluasi_internal_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Pedoman Teknis Evaluasi Internal' . $_GET['tahun'],
-				'content' => '[pedoman_teknis_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_pedoman_teknis_evaluasi_internal = 'Pedoman Teknis Evaluasi Internal';
-			$pedoman_teknis_evaluasi_internal_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_pedoman_teknis_evaluasi_internal . '</a></li>';
+		$pedoman_teknis_evaluasi_internal_pemda = $this->functions->generatePage(array(
+			'nama_page' => 'Pedoman Teknis Evaluasi Internal' . $_GET['tahun'],
+			'content' => '[pedoman_teknis_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_pedoman_teknis_evaluasi_internal = 'Pedoman Teknis Evaluasi Internal';
+		$pedoman_teknis_evaluasi_internal_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_pedoman_teknis_evaluasi_internal . '</a></li>';
 
-			//DOKUMEN Perangkat Daerah
+		//DOKUMEN Perangkat Daerah
 
-			$renja_rkt = $this->functions->generatePage(array(
-				'nama_page' => 'RENJA / RKT ' . $_GET['tahun'],
-				'content' => '[renja_rkt tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$renja_rkt_detail .= '<li><a target="_blank" href="' . $renja_rkt['url'] . '" class="btn btn-primary"> RENJA / RKT </a></li>';
+		$renja_rkt = $this->functions->generatePage(array(
+			'nama_page' => 'RENJA / RKT ' . $_GET['tahun'],
+			'content' => '[renja_rkt tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$renja_rkt_detail .= '<li><a target="_blank" href="' . $renja_rkt['url'] . '" class="btn btn-primary"> RENJA / RKT </a></li>';
 
-			$iku = $this->functions->generatePage(array(
-				'nama_page' => 'IKU -' . $_GET['tahun'],
-				'content' => '[iku tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_iku = 'IKU ';
-			$iku_detail .= '<li><a target="_blank" href="' . $iku['url'] . '" class="btn btn-primary">' .  $title_iku . '</a></li>';
+		$iku = $this->functions->generatePage(array(
+			'nama_page' => 'IKU -' . $_GET['tahun'],
+			'content' => '[iku tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_iku = 'IKU ';
+		$iku_detail .= '<li><a target="_blank" href="' . $iku['url'] . '" class="btn btn-primary">' .  $title_iku . '</a></li>';
 
-			$perjanjian_kinerja = $this->functions->generatePage(array(
-				'nama_page' => 'Perjanjian Kinerja -' . $_GET['tahun'],
-				'content' => '[perjanjian_kinerja tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_perjanjian_kinerja = 'Perjanjian Kinerja';
-			$perjanjian_kinerja_detail .= '<li><a target="_blank" href="' . $perjanjian_kinerja['url'] . '" class="btn btn-primary">' .  $title_perjanjian_kinerja . '</a></li>';
+		$perjanjian_kinerja = $this->functions->generatePage(array(
+			'nama_page' => 'Perjanjian Kinerja -' . $_GET['tahun'],
+			'content' => '[perjanjian_kinerja tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_perjanjian_kinerja = 'Perjanjian Kinerja';
+		$perjanjian_kinerja_detail .= '<li><a target="_blank" href="' . $perjanjian_kinerja['url'] . '" class="btn btn-primary">' .  $title_perjanjian_kinerja . '</a></li>';
 
-			$laporan_kinerja = $this->functions->generatePage(array(
-				'nama_page' => 'Laporan Kinerja -' . $_GET['tahun'],
-				'content' => '[laporan_kinerja tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_laporan_kinerja = 'Laporan Kinerja'; 
-			$laporan_kinerja_detail .= '<li><a target="_blank" href="' . $laporan_kinerja['url'] . '" class="btn btn-primary">' .  $title_laporan_kinerja . '</a></li>';
+		$laporan_kinerja = $this->functions->generatePage(array(
+			'nama_page' => 'Laporan Kinerja -' . $_GET['tahun'],
+			'content' => '[laporan_kinerja tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_laporan_kinerja = 'Laporan Kinerja'; 
+		$laporan_kinerja_detail .= '<li><a target="_blank" href="' . $laporan_kinerja['url'] . '" class="btn btn-primary">' .  $title_laporan_kinerja . '</a></li>';
 
-			$dpa = $this->functions->generatePage(array(
-				'nama_page' => 'DPA -' . $_GET['tahun'],
-				'content' => '[dpa tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_dpa = 'DPA';
-			$dpa_detail .= '<li><a target="_blank" href="' . $dpa['url'] . '" class="btn btn-primary">' .  $title_dpa . '</a></li>';
+		$dpa = $this->functions->generatePage(array(
+			'nama_page' => 'DPA -' . $_GET['tahun'],
+			'content' => '[dpa tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_dpa = 'DPA';
+		$dpa_detail .= '<li><a target="_blank" href="' . $dpa['url'] . '" class="btn btn-primary">' .  $title_dpa . '</a></li>';
 
-			$pohon_kinerja_dan_cascading = $this->functions->generatePage(array(
-				'nama_page' => 'Pohon Kinerja dan Cascading -' . $_GET['tahun'],
-				'content' => '[pohon_kinerja_dan_cascading tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_pohon_kinerja_dan_cascading = 'Pohon Kinerja dan Cascading';
-			$pohon_kinerja_dan_cascading_detail .= '<li><a target="_blank" href="' . $pohon_kinerja_dan_cascading['url'] . '" class="btn btn-primary">' .  $title_pohon_kinerja_dan_cascading . '</a></li>';
+		$pohon_kinerja_dan_cascading = $this->functions->generatePage(array(
+			'nama_page' => 'Pohon Kinerja dan Cascading -' . $_GET['tahun'],
+			'content' => '[pohon_kinerja_dan_cascading tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_pohon_kinerja_dan_cascading = 'Pohon Kinerja dan Cascading';
+		$pohon_kinerja_dan_cascading_detail .= '<li><a target="_blank" href="' . $pohon_kinerja_dan_cascading['url'] . '" class="btn btn-primary">' .  $title_pohon_kinerja_dan_cascading . '</a></li>';
 
-			$lhe_akip_internal = $this->functions->generatePage(array(
-				'nama_page' => 'LHE AKIP Internal -' . $_GET['tahun'],
-				'content' => '[lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_lhe_akip_internal = 'LHE AKIP Internal';
-			$lhe_akip_internal_detail .= '<li><a target="_blank" href="' . $lhe_akip_internal['url'] . '" class="btn btn-primary">' .  $title_lhe_akip_internal . '</a></li>';
+		$lhe_akip_internal = $this->functions->generatePage(array(
+			'nama_page' => 'LHE AKIP Internal -' . $_GET['tahun'],
+			'content' => '[lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_lhe_akip_internal = 'LHE AKIP Internal';
+		$lhe_akip_internal_detail .= '<li><a target="_blank" href="' . $lhe_akip_internal['url'] . '" class="btn btn-primary">' .  $title_lhe_akip_internal . '</a></li>';
 
-			$tl_lhe_akip_internal = $this->functions->generatePage(array(
-				'nama_page' => 'TL LHE AKIP Internal -' . $_GET['tahun'],
-				'content' => '[tl_lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_tl_lhe_akip_internal = 'TL LHE AKIP Internal';
-			$tl_lhe_akip_internal_detail .= '<li><a target="_blank" href="' . $tl_lhe_akip_internal['url'] . '" class="btn btn-primary">' .  $title_tl_lhe_akip_internal . '</a></li>';
+		$tl_lhe_akip_internal = $this->functions->generatePage(array(
+			'nama_page' => 'TL LHE AKIP Internal -' . $_GET['tahun'],
+			'content' => '[tl_lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_tl_lhe_akip_internal = 'TL LHE AKIP Internal';
+		$tl_lhe_akip_internal_detail .= '<li><a target="_blank" href="' . $tl_lhe_akip_internal['url'] . '" class="btn btn-primary">' .  $title_tl_lhe_akip_internal . '</a></li>';
 
-			$laporan_monev_renaksi = $this->functions->generatePage(array(
-				'nama_page' => 'Laporan Monev Renaksi -' . $_GET['tahun'],
-				'content' => '[laporan_monev_renaksi tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_laporan_monev_renaksi = 'Laporan Monev Renaksi';
-			$laporan_monev_renaksi_detail .= '<li><a target="_blank" href="' . $laporan_monev_renaksi['url'] . '" class="btn btn-primary">' .  $title_laporan_monev_renaksi . '</a></li>';
+		$laporan_monev_renaksi = $this->functions->generatePage(array(
+			'nama_page' => 'Laporan Monev Renaksi -' . $_GET['tahun'],
+			'content' => '[laporan_monev_renaksi tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_laporan_monev_renaksi = 'Laporan Monev Renaksi';
+		$laporan_monev_renaksi_detail .= '<li><a target="_blank" href="' . $laporan_monev_renaksi['url'] . '" class="btn btn-primary">' .  $title_laporan_monev_renaksi . '</a></li>';
 
-			$dokumen_lainnya = $this->functions->generatePage(array(
-				'nama_page' => 'Lainnya -' . $_GET['tahun'],
-				'content' => '[dokumen_lainnya tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_dokumen_lainnya = 'Lainnya';
-			$dokumen_lainnya_detail .= '<li><a target="_blank" href="' . $dokumen_lainnya['url'] . '" class="btn btn-primary">' .  $title_dokumen_lainnya . '</a></li>';
+		$dokumen_lainnya = $this->functions->generatePage(array(
+			'nama_page' => 'Lainnya -' . $_GET['tahun'],
+			'content' => '[dokumen_lainnya tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_dokumen_lainnya = 'Lainnya';
+		$dokumen_lainnya_detail .= '<li><a target="_blank" href="' . $dokumen_lainnya['url'] . '" class="btn btn-primary">' .  $title_dokumen_lainnya . '</a></li>';
 
-			//DOKUMEN Perangkat Daerah JIKA DIPAKAI
+		//DOKUMEN Perangkat Daerah JIKA DIPAKAI
 
-			$skp = $this->functions->generatePage(array(
-				'nama_page' => 'SKP -',
-				'content' => '[skp tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_skp = 'SKP';
-			$skp_detail .= '<li><a target="_blank" href="' . $skp['url'] . '" class="btn btn-primary">' .  $title_skp . '</a></li>';
+		$skp = $this->functions->generatePage(array(
+			'nama_page' => 'SKP -',
+			'content' => '[skp tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_skp = 'SKP';
+		$skp_detail .= '<li><a target="_blank" href="' . $skp['url'] . '" class="btn btn-primary">' .  $title_skp . '</a></li>';
 
-			$rencana_aksi = $this->functions->generatePage(array(
-				'nama_page' => 'Rencana Aksi',
-				'content' => '[rencana_aksi tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_rencana_aksi = 'Rencana Aksi';
-			$rencana_aksi_detail .= '<li><a target="_blank" href="' . $rencana_aksi['url'] . '" class="btn btn-primary">' .  $title_rencana_aksi . '</a></li>';
+		$rencana_aksi = $this->functions->generatePage(array(
+			'nama_page' => 'Rencana Aksi',
+			'content' => '[rencana_aksi tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_rencana_aksi = 'Rencana Aksi';
+		$rencana_aksi_detail .= '<li><a target="_blank" href="' . $rencana_aksi['url'] . '" class="btn btn-primary">' .  $title_rencana_aksi . '</a></li>';
 
-			// $pengukuran_kinerja = $this->functions->generatePage(array(
-			// 	'nama_page' => 'Pengukuran Kinerja',
-			// 	'content' => '[pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
-			// 	'show_header' => 1,
-			// 	'post_status' => 'private'
-			// ));
-			// $title_pengukuran_kinerja = 'Pengukuran Kinerja';
-			// $pengukuran_kinerja_detail .= '<li><a target="_blank" href="' . $pengukuran_kinerja['url'] . '" class="btn btn-primary">' .  $title_pengukuran_kinerja . '</a></li>';
+		// $pengukuran_kinerja = $this->functions->generatePage(array(
+		// 	'nama_page' => 'Pengukuran Kinerja',
+		// 	'content' => '[pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
+		// 	'show_header' => 1,
+		// 	'post_status' => 'private'
+		// ));
+		// $title_pengukuran_kinerja = 'Pengukuran Kinerja';
+		// $pengukuran_kinerja_detail .= '<li><a target="_blank" href="' . $pengukuran_kinerja['url'] . '" class="btn btn-primary">' .  $title_pengukuran_kinerja . '</a></li>';
 
-			// $pengukuran_rencana_aksi = $this->functions->generatePage(array(
-			// 	'nama_page' => 'Pengukuran Rencana Aksi',
-			// 	'content' => '[pengukuran_rencana_aksi tahun=' . $_GET['tahun'] . ']',
-			// 	'show_header' => 1,
-			// 	'post_status' => 'private'
-			// ));
-			// $title_pengukuran_rencana_aksi = 'Pengukuran Rencana Aksi';
-			// $pengukuran_rencana_aksi_detail .= '<li><a target="_blank" href="' . $pengukuran_rencana_aksi['url'] . '" class="btn btn-primary">' .  $title_pengukuran_rencana_aksi . '</a></li>';
+		// $pengukuran_rencana_aksi = $this->functions->generatePage(array(
+		// 	'nama_page' => 'Pengukuran Rencana Aksi',
+		// 	'content' => '[pengukuran_rencana_aksi tahun=' . $_GET['tahun'] . ']',
+		// 	'show_header' => 1,
+		// 	'post_status' => 'private'
+		// ));
+		// $title_pengukuran_rencana_aksi = 'Pengukuran Rencana Aksi';
+		// $pengukuran_rencana_aksi_detail .= '<li><a target="_blank" href="' . $pengukuran_rencana_aksi['url'] . '" class="btn btn-primary">' .  $title_pengukuran_rencana_aksi . '</a></li>';
 
-			$evaluasi_internal = $this->functions->generatePage(array(
-				'nama_page' => 'Evaluasi Internal -',
-				'content' => '[evaluasi_internal tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_evaluasi_internal = 'Evaluasi Internal';
-			$evaluasi_internal_detail .= '<li><a target="_blank" href="' . $evaluasi_internal['url'] . '" class="btn btn-primary">' .  $title_evaluasi_internal . '</a></li>';
+		$evaluasi_internal = $this->functions->generatePage(array(
+			'nama_page' => 'Evaluasi Internal -',
+			'content' => '[evaluasi_internal tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_evaluasi_internal = 'Evaluasi Internal';
+		$evaluasi_internal_detail .= '<li><a target="_blank" href="' . $evaluasi_internal['url'] . '" class="btn btn-primary">' .  $title_evaluasi_internal . '</a></li>';
 
-			// $dokumen_lainnya = $this->functions->generatePage(array(
-			// 	'nama_page' => 'Lainnya',
-			// 	'content' => '[dokumen_lainnya tahun=' . $_GET['tahun'] . ']',
-			// 	'show_header' => 1,
-			// 	'post_status' => 'private'
-			// ));
-			// $title_dokumen_lainnya = 'Lainnya';
-			// $dokumen_lainnya_detail .= '<li><a target="_blank" href="' . $dokumen_lainnya['url'] . '" class="btn btn-primary">' .  $title_dokumen_lainnya . '</a></li>';
+		// $dokumen_lainnya = $this->functions->generatePage(array(
+		// 	'nama_page' => 'Lainnya',
+		// 	'content' => '[dokumen_lainnya tahun=' . $_GET['tahun'] . ']',
+		// 	'show_header' => 1,
+		// 	'post_status' => 'private'
+		// ));
+		// $title_dokumen_lainnya = 'Lainnya';
+		// $dokumen_lainnya_detail .= '<li><a target="_blank" href="' . $dokumen_lainnya['url'] . '" class="btn btn-primary">' .  $title_dokumen_lainnya . '</a></li>';
 
-			// $rkpd = $this->functions->generatePage(array(
-			// 	'nama_page' => 'RKPD',
-			// 	'content' => '[rkpd tahun=' . $_GET['tahun'] . ']',
-			// 	'show_header' => 1,
-			// 	'post_status' => 'private'
-			// ));
-			// $title_rkpd = 'RKPD';
-			// $rkpd_detail .= '<li><a target="_blank" href="' . $rkpd['url'] . '" class="btn btn-primary">' .  $title_rkpd . '</a></li>';
+		// $rkpd = $this->functions->generatePage(array(
+		// 	'nama_page' => 'RKPD',
+		// 	'content' => '[rkpd tahun=' . $_GET['tahun'] . ']',
+		// 	'show_header' => 1,
+		// 	'post_status' => 'private'
+		// ));
+		// $title_rkpd = 'RKPD';
+		// $rkpd_detail .= '<li><a target="_blank" href="' . $rkpd['url'] . '" class="btn btn-primary">' .  $title_rkpd . '</a></li>';
 
-			// $lkjip_lppd = $this->functions->generatePage(array(
-			// 	'nama_page' => 'LKJIP / LPPD',
-			// 	'content' => '[lkjip_lppd tahun=' . $_GET['tahun'] . ']',
-			// 	'show_header' => 1,
-			// 	'post_status' => 'private'
-			// ));
-			// $title_lkjip_lppd = 'LKJIP / LPPD';
-			// $lkjip_lppd_detail .= '<li><a target="_blank" href="' . $lkjip_lppd['url'] . '" class="btn btn-primary">' .  $title_lkjip_lppd . '</a></li>';
+		// $lkjip_lppd = $this->functions->generatePage(array(
+		// 	'nama_page' => 'LKJIP / LPPD',
+		// 	'content' => '[lkjip_lppd tahun=' . $_GET['tahun'] . ']',
+		// 	'show_header' => 1,
+		// 	'post_status' => 'private'
+		// ));
+		// $title_lkjip_lppd = 'LKJIP / LPPD';
+		// $lkjip_lppd_detail .= '<li><a target="_blank" href="' . $lkjip_lppd['url'] . '" class="btn btn-primary">' .  $title_lkjip_lppd . '</a></li>';
 
-			// $tl_lhe_akip_kemenpan = $this->functions->generatePage(array(
-			// 	'nama_page' => 'TL LHE AKIP Kemenpan',
-			// 	'content' => '[tl_lhe_akip_kemenpan tahun=' . $_GET['tahun'] . ']',
-			// 	'show_header' => 1,
-			// 	'post_status' => 'private'
-			// ));
-			// $title_tl_lhe_akip_kemenpan = 'TL LHE AKIP Kemenpan';
-			// $tl_lhe_akip_kemenpan_detail .= '<li><a target="_blank" href="' . $tl_lhe_akip_kemenpan['url'] . '" class="btn btn-primary">' .  $title_tl_lhe_akip_kemenpan . '</a></li>';
+		// $tl_lhe_akip_kemenpan = $this->functions->generatePage(array(
+		// 	'nama_page' => 'TL LHE AKIP Kemenpan',
+		// 	'content' => '[tl_lhe_akip_kemenpan tahun=' . $_GET['tahun'] . ']',
+		// 	'show_header' => 1,
+		// 	'post_status' => 'private'
+		// ));
+		// $title_tl_lhe_akip_kemenpan = 'TL LHE AKIP Kemenpan';
+		// $tl_lhe_akip_kemenpan_detail .= '<li><a target="_blank" href="' . $tl_lhe_akip_kemenpan['url'] . '" class="btn btn-primary">' .  $title_tl_lhe_akip_kemenpan . '</a></li>';
 
-			// $pedoman_teknis_perencanaan = $this->functions->generatePage(array(
-			// 	'nama_page' => 'Pedoman Teknis Perencanaan',
-			// 	'content' => '[pedoman_teknis_perencanaan tahun=' . $_GET['tahun'] . ']',
-			// 	'show_header' => 1,
-			// 	'post_status' => 'private'
-			// ));
-			// $title_pedoman_teknis_perencanaan = 'Pedoman Teknis Perencanaan';
-			// $pedoman_teknis_perencanaan_detail .= '<li><a target="_blank" href="' . $pedoman_teknis_perencanaan['url'] . '" class="btn btn-primary">' .  $title_pedoman_teknis_perencanaan . '</a></li>';
+		// $pedoman_teknis_perencanaan = $this->functions->generatePage(array(
+		// 	'nama_page' => 'Pedoman Teknis Perencanaan',
+		// 	'content' => '[pedoman_teknis_perencanaan tahun=' . $_GET['tahun'] . ']',
+		// 	'show_header' => 1,
+		// 	'post_status' => 'private'
+		// ));
+		// $title_pedoman_teknis_perencanaan = 'Pedoman Teknis Perencanaan';
+		// $pedoman_teknis_perencanaan_detail .= '<li><a target="_blank" href="' . $pedoman_teknis_perencanaan['url'] . '" class="btn btn-primary">' .  $title_pedoman_teknis_perencanaan . '</a></li>';
 
-			// $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = $this->functions->generatePage(array(
-			// 	'nama_page' => 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja',
-			// 	'content' => '[pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja tahun=' . $_GET['tahun'] . ']',
-			// 	'show_header' => 1,
-			// 	'post_status' => 'private'
-			// ));
-			// $title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja';
-			// $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_detail .= '<li><a target="_blank" href="' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['url'] . '" class="btn btn-primary">' .  $title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja . '</a></li>';
+		// $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = $this->functions->generatePage(array(
+		// 	'nama_page' => 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja',
+		// 	'content' => '[pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja tahun=' . $_GET['tahun'] . ']',
+		// 	'show_header' => 1,
+		// 	'post_status' => 'private'
+		// ));
+		// $title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja';
+		// $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_detail .= '<li><a target="_blank" href="' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['url'] . '" class="btn btn-primary">' .  $title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja . '</a></li>';
 
-			// $pedoman_teknis_evaluasi_internal = $this->functions->generatePage(array(
-			// 	'nama_page' => 'Pedoman Teknis Evaluasi Internal',
-			// 	'content' => '[pedoman_teknis_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
-			// 	'show_header' => 1,
-			// 	'post_status' => 'private'
-			// ));
-			// $title_pedoman_teknis_evaluasi_internal = 'Pedoman Teknis Evaluasi Internal';
-			// $pedoman_teknis_evaluasi_internal_detail .= '<li><a target="_blank" href="' . $pedoman_teknis_evaluasi_internal['url'] . '" class="btn btn-primary">' .  $title_pedoman_teknis_evaluasi_internal . '</a></li>';
+		// $pedoman_teknis_evaluasi_internal = $this->functions->generatePage(array(
+		// 	'nama_page' => 'Pedoman Teknis Evaluasi Internal',
+		// 	'content' => '[pedoman_teknis_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
+		// 	'show_header' => 1,
+		// 	'post_status' => 'private'
+		// ));
+		// $title_pedoman_teknis_evaluasi_internal = 'Pedoman Teknis Evaluasi Internal';
+		// $pedoman_teknis_evaluasi_internal_detail .= '<li><a target="_blank" href="' . $pedoman_teknis_evaluasi_internal['url'] . '" class="btn btn-primary">' .  $title_pedoman_teknis_evaluasi_internal . '</a></li>';
 
 		$get_jadwal_lke = $wpdb->get_results(
 			"
@@ -14995,6 +15152,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			|| in_array("plt", $user_meta->roles)
 		) {
 			$nipkepala = get_user_meta($user_id, '_nip') ?: get_user_meta($user_id, 'nip');
+			$tahun_skpd = get_option('_crb_tahun_wpsipd');
 			$skpd_db = $wpdb->get_row($wpdb->prepare("
 				SELECT 
 					nama_skpd, 
@@ -15004,7 +15162,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				from esakip_data_unit 
 				where nipkepala=%s 
 					and tahun_anggaran=%d
-				group by id_skpd", $nipkepala[0], $_GET['tahun']), ARRAY_A);
+				group by id_skpd", $nipkepala[0], $tahun_skpd), ARRAY_A);
 
 			foreach ($get_jadwal_lke as $get_jadwal_lke_sakip) {
 				$pengisian_lke_per_skpd = $this->functions->generatePage(array(
