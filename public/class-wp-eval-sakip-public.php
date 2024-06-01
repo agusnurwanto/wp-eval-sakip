@@ -7029,6 +7029,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											'nama' => $penilaian['nama'],
 											'tipe' => $penilaian['tipe'],
 											'keterangan' => $penilaian['keterangan'],
+											'penjelasan' => $penilaian['penjelasan'],
+											'langkah_kerja' => $penilaian['langkah_kerja'],
 										);
 										$wpdb->insert('esakip_komponen_penilaian', $data_komponen_penilaian_baru);
 										$id_komponen_penilaian_baru = $wpdb->insert_id;
@@ -7127,13 +7129,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Renstra telah disusun',
 												'tipe' => '1',
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026)',
-												'nomor_urut' => '1.00'
+												'nomor_urut' => '1.00',
+												'penjelasan' => 'cukup jelas',
+												'langkah_kerja' => 'Dapatkan dokumen berupa hard copy maupun soft copy'
 											),
 											array( //1
 												'nama' => 'Dokumen perencanaan kinerja tahunan (Renja) telah disusun',
 												'tipe' => '1',
 												'keterangan' => 'Renja 2023 dan 2024',
 												'nomor_urut' => '2.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -7147,6 +7153,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'tipe' => '1',
 												'keterangan' => '- Renja 2023 dan 2024, - DPA 2024 dan DPPA 2023 (di dokumen lainnya)',
 												'nomor_urut' => '3.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -7160,6 +7168,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'tipe' => '1',
 												'keterangan' => 'PK 2023 dan 2024',
 												'nomor_urut' => '4.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -7173,6 +7183,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'tipe' => '2',
 												'keterangan' => 'PK 2023 dan 2024',
 												'nomor_urut' => '5.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -7185,6 +7197,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Terdapat dokumen Rencana Aksi',
 												'tipe' => '1',
 												'keterangan' => 'Rencana Aksi 2023 dan 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '6.00',
 												'data' => array(
 													array(
@@ -7206,6 +7220,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Perencanaan Kinerja telah diformalkan.',
 												'tipe' => '1',
 												'keterangan' => 'Renstra dan Renja',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '1.00',
 												'data' => array(
 													array(
@@ -7219,6 +7235,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Renstra telah dipublikasikan tepat waktu',
 												'tipe' => '1',
 												'keterangan' => 'Screenshoot Renstra 2024-2026 di website Perangkat Daerah, esr dan aplikasi SAKIP',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '2.00',
 												'data' => array(
 													array(
@@ -7231,6 +7249,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											array( //2
 												'nama' => 'Renja telah dipublikasikan tepat waktu',
 												'tipe' => '1',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'keterangan' => 'Screenshoot Renja 2023 dan 2024 di website Perangkat Daerah, esr dan aplikasi SAKIP',
 												'nomor_urut' => '3.00',
 												'data' => array(
@@ -7246,6 +7266,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'tipe' => '1',
 												'keterangan' => 'Screenshoot PK 2023 dan 2024 di website Perangkat Daerah, esr dan aplikasi SAKIP',
 												'nomor_urut' => '4.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -7259,6 +7281,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'tipe' => '2',
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024',
 												'nomor_urut' => '5.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -7272,6 +7296,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'tipe' => '2',
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024',
 												'nomor_urut' => '6.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -7290,6 +7316,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'tipe' => '2',
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024',
 												'nomor_urut' => '7.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -7307,6 +7335,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'tipe' => '2',
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024',
 												'nomor_urut' => '8.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -7323,6 +7353,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Indikator Kinerja Tujuan telah menggambarkan kondisi Tujuan yang harus dicapai, tertuang secara berkelanjutan (sustainable - tidak sering diganti dalam 1 periode Perencanaan Strategis).',
 												'tipe' => '2',
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '9.00',
 												'data' => array(
 													array(
@@ -7340,6 +7372,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Indikator Kinerja Sasaran telah menggambarkan kondisi Sasaran yang harus dicapai, tertuang secara berkelanjutan (sustainable - tidak sering diganti dalam 1 periode Perencanaan Strategis).',
 												'tipe' => '2',
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024, IKU 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '10.00',
 												'data' => array(
 													array(
@@ -7357,6 +7391,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Target yang ditetapkan dalam Perencanaan Kinerja dapat dicapai (achievable) dan realistis.',
 												'tipe' => '2',
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '11.00',
 												'data' => array(
 													array(
@@ -7370,6 +7406,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Setiap Dokumen Perencanaan Kinerja (Renstra, Renja, PK) telah menggambarkan hubungan yang berkesinambungan, serta selaras antara Kondisi/Hasil yang akan dicapai di setiap level jabatan (Cascading Kinerja).',
 												'tipe' => '2',
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, PK 2023 dan 2024,  cascading dan pohon kinerja (di dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '12.00',
 												'data' => array(
 													array(
@@ -7396,6 +7434,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Renstra digunakan sebagai acuan penyusunan Dokumen Rencana Kerja dan Anggaran',
 												'tipe' => '2',
 												'keterangan' => '- Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, Rencana Aksi 2023 dan 2024 - DPA 2024 dan DPPA 2023 (di dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '1.00',
 												'data' => array(
 													array(
@@ -7414,6 +7454,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Target jangka menengah dalam Renstra telah dimonitor pencapaiannya sampai dengan tahun berjalan',
 												'tipe' => '2',
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026), Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '2.00',
 												'data' => array(
 													array(
@@ -7432,6 +7474,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Anggaran yang ditetapkan telah mengacu pada Kinerja yang ingin dicapai',
 												'tipe' => '2',
 												'keterangan' => '- Renstra Perangkat Daerah (2024-2026), Renja 2023 dan 2024, Rencana Aksi 2023 dan 2024 - DPA 2024 dan DPPA 2023 (di dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '3.00',
 												'data' => array(
 													array(
@@ -7451,6 +7495,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'tipe' => '2',
 												'keterangan' => 'Rencana aksi 2023 dan 2024',
 												'nomor_urut' => '4.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -7468,6 +7514,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Target kinerja yang diperjanjikan pada Perjanjian Kinerja telah digunakan untuk mengukur keberhasilan',
 												'tipe' => '2',
 												'keterangan' => '- Perjanjian Kinerja 2023 dan 2024, SKP 2023 dan 2024 - SK dan bukti pemberian reward punishment (dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '5.00',
 												'data' => array(
 													array(
@@ -7486,6 +7534,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Setiap pegawai memahami dan peduli serta berkomitmen dalam mencapai kinerja yang telah direncanakan dalam Sasaran Kinerja Pegawai (SKP)',
 												'tipe' => '2',
 												'keterangan' => 'SKP 2023 dan 2024, PK 2023 dan 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '6.00',
 												'data' => array(
 													array(
@@ -7504,6 +7554,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Renstra telah direviu secara berkala',
 												'tipe' => '2',
 												'keterangan' => 'Screenshoot aplikasi e-monev E-80 dan E-81 (dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '7.00',
 												'data' => array(
 													array(
@@ -7540,12 +7592,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Telah terdapat indikator kinerja utama (IKU) sebagai ukuran kinerja secara formal',
 												'tipe' => '1',
 												'keterangan' => 'Dokumen IKU 2024-2026',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '1.00'
 											),
 											array( //1
 												'nama' => 'Terdapat Definisi Operasional yang jelas atas kinerja dan cara mengukur indikator kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Dokumen IKU 2024-2026',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '2.00',
 												'data' => array(
 													array(
@@ -7559,6 +7615,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Terdapat mekanisme yang jelas terhadap pengumpulan data kinerja yang dapat diandalkan.',
 												'tipe' => '2',
 												'keterangan' => 'SOP pengumpulan data kinerja (di dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '3.00',
 												'data' => array(
 													array(
@@ -7585,6 +7643,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pimpinan selalu terlibat sebagai pengambil keputusan (Decision Maker) dalam mengukur capaian kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '1.00',
 												'data' => array(
 													array(
@@ -7599,6 +7659,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Data kinerja yang dikumpulkan telah relevan untuk mengukur capaian kinerja yang diharapkan.',
 												'tipe' => '2',
 												'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024,  Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '2.00',
 												'data' => array(
 													array(
@@ -7612,6 +7674,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Data kinerja yang dikumpulkan telah mendukung capaian kinerja yang diharapkan.',
 												'tipe' => '2',
 												'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024,  Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '3.00',
 												'data' => array(
 													array(
@@ -7625,6 +7689,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pengumpulan data kinerja atas Rencana Aksi dilakukan secara berkala (bulanan/triwulanan/semester)',
 												'tipe' => '1',
 												'keterangan' => 'Pengukuran rencana aksi Tahun 2023 dan 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '4.00',
 												'data' => array(
 													array(
@@ -7638,6 +7704,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pengukuran kinerja sudah dilakukan secara berjenjang',
 												'tipe' => '2',
 												'keterangan' => 'Dokumen pengukuran kinerja Tahun 2023 dan 2024, SKP 2023 dan 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '5.00',
 												'data' => array(
 													array(
@@ -7651,6 +7719,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pengumpulan data kinerja telah memanfaatkan Teknologi Informasi (Aplikasi).',
 												'tipe' => '1',
 												'keterangan' => 'Screenshoot aplikasi EP3, E-monev (dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '6.00',
 												'data' => array(
 													array(
@@ -7668,6 +7738,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pengukuran capaian kinerja telah memanfaatkan Teknologi Informasi (Aplikasi).',
 												'tipe' => '1',
 												'keterangan' => 'Screenshoot aplikasi EP3, E-monev (dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '7.00',
 												'data' => array(
 													array(
@@ -7693,6 +7765,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pengukuran Kinerja telah menjadi dasar dalam penyesuaian (pemberian/pengurangan) tunjangan kinerja/penghasilan.',
 												'tipe' => '2',
 												'keterangan' => '- Pengukuran Kinerja 2023 dan 2024,  - Screenshoot EP3 (dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '1.00',
 												'data' => array(
 													array(
@@ -7710,6 +7784,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian (Refocusing) Organisasi.',
 												'tipe' => '2',
 												'keterangan' => '- Pengukuran Kinerja 2023 dan 2024 - Screenshoot EP3 (dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '2.00',
 												'data' => array(
 													array(
@@ -7727,6 +7803,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian Strategi dalam mencapai kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Dokumen Pengukuran Kinerja 2023 dan 2024;  Evaluasi Internal 2023 dan 2024; Rencana Aksi 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '3.00',
 												'data' => array(
 													array(
@@ -7744,6 +7822,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian Kebijakan dalam mencapai kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Dokumen Pengukuran Kinerja 2023 dan 2024;  Evaluasi Internal 2023 dan 2024; Rencana Aksi 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '4.00',
 												'data' => array(
 													array(
@@ -7761,6 +7841,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian Aktivitas dalam mencapai kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Dokumen Pengukuran Kinerja 2023 dan 2024;  Evaluasi Internal 2023 dan 2024; Rencana Aksi 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '5.00',
 												'data' => array(
 													array(
@@ -7778,6 +7860,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Pengukuran kinerja telah mempengaruhi penyesuaian Anggaran dalam mencapai kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Dokumen Pengukuran Kinerja 2023 dan 2024;  Evaluasi Internal 2023 dan 2024; DPA 2024 dan DPPA 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '6.00',
 												'data' => array(
 													array(
@@ -7795,6 +7879,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Terdapat efisiensi atas penggunaan anggaran dalam mencapai kinerja.',
 												'tipe' => '2',
 												'keterangan' => '- Laporan Kinerja 2023;  - DPPA 2023 (di dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '7.00',
 												'data' => array(
 													array(
@@ -7812,6 +7898,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Setiap unit/satuan kerja memahami dan peduli atas hasil pengukuran kinerja.',
 												'tipe' => '2',
 												'keterangan' => NULL,
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '8.00',
 												'data' => array(
 													array(
@@ -7829,6 +7917,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Setiap pegawai memahami dan peduli atas hasil pengukuran kinerja.',
 												'tipe' => '2',
 												'keterangan' => NULL,
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '9.00',
 												'data' => array(
 													array(
@@ -7864,12 +7954,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah disusun.',
 												'tipe' => '1',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '1.00'
 											),
 											array( //1
 												'nama' => 'Dokumen Laporan Kinerja telah disusun secara berkala.',
 												'tipe' => '1',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '2.00',
 												'data' => array(
 													array(
@@ -7883,6 +7977,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah diformalkan.',
 												'tipe' => '1',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '3.00',
 												'data' => array(
 													array(
@@ -7896,6 +7992,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah direviu.',
 												'tipe' => '1',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '4.00',
 												'data' => array(
 													array(
@@ -7909,6 +8007,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah dipublikasikan.',
 												'tipe' => '1',
 												'keterangan' => 'Screenshoot Laporan Kinerja 2023 pada website, esr, aplikasi sakip kab madiun (dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '5.00',
 												'data' => array(
 													array(
@@ -7922,6 +8022,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah disampaikan tepat waktu.',
 												'tipe' => '1',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '6.00',
 												'data' => array(
 													array(
@@ -7945,6 +8047,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja disusun secara berkualitas sesuai dengan standar.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '1.00',
 												'data' => array(
 													array(
@@ -7958,6 +8062,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah mengungkap seluruh informasi tentang pencapaian kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '2.00',
 												'data' => array(
 													array(
@@ -7976,6 +8082,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah menginfokan perbandingan realisasi kinerja dengan target tahunan.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '3.00',
 												'data' => array(
 													array(
@@ -7994,6 +8102,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah menginfokan perbandingan realisasi kinerja dengan target jangka menengah.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '4.00',
 												'data' => array(
 													array(
@@ -8012,6 +8122,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah menginfokan perbandingan realisasi kinerja dengan realisasi kinerja tahun-tahun sebelumnya.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '5.00',
 												'data' => array(
 													array(
@@ -8030,6 +8142,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah menyajikan informasi keuangan yang terkait dengan pencapaian sasaran kinerja instansi.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '6.00',
 												'data' => array(
 													array(
@@ -8048,6 +8162,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah menginfokan kualitas atas capaian kinerja beserta upaya nyata dan/atau hambatannya.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '7.00',
 												'data' => array(
 													array(
@@ -8066,6 +8182,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah menginfokan efisiensi atas penggunaan sumber daya dalam mencapai kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '8.00',
 												'data' => array(
 													array(
@@ -8084,6 +8202,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Dokumen Laporan Kinerja telah menginfokan upaya perbaikan dan penyempurnaan kinerja ke depan (Rekomendasi perbaikan kinerja).',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '9.00',
 												'data' => array(
 													array(
@@ -8112,6 +8232,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Informasi dalam laporan kinerja selalu menjadi perhatian utama pimpinan (Bertanggung Jawab).',
 												'tipe' => '1',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '1.00',
 												'data' => array(
 													array(
@@ -8131,6 +8253,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'Penyajian informasi dalam laporan kinerja menjadi kepedulian seluruh pegawai.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '2.00',
 												'data' => array(
 													array(
@@ -8149,6 +8273,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Informasi dalam laporan kinerja berkala telah digunakan dalam penyesuaian aktivitas untuk mencapai kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '3.00',
 												'data' => array(
 													array(
@@ -8167,6 +8293,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Informasi dalam laporan kinerja berkala telah digunakan dalam penyesuaian penggunaan anggaran untuk mencapai kinerja.',
 												'tipe' => '2',
 												'keterangan' => '- Laporan Kinerja 2023,  - DPA 2024 (dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '4.00',
 												'data' => array(
 													array(
@@ -8185,6 +8313,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Informasi dalam laporan kinerja telah digunakan dalam evaluasi pencapaian keberhasilan kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Laporan Kinerja 2023, Evaluasi Internal 2023',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '5.00',
 												'data' => array(
 													array(
@@ -8203,6 +8333,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Informasi dalam laporan kinerja telah digunakan dalam penyesuaian perencanaan kinerja yang akan dihadapi berikutnya.',
 												'tipe' => '2',
 												'keterangan' => '- Laporan Kinerja 2023, rencana aksi 2024,  - DPA 2024 (dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '6.00',
 												'data' => array(
 													array(
@@ -8221,6 +8353,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Informasi dalam laporan kinerja selalu mempengaruhi perubahan budaya kinerja organisasi.',
 												'tipe' => '2',
 												'keterangan' => '- Laporan Kinerja 2023, rencana aksi 2024, evaluasi internal 2024 dan 2023 - DPA 2024 (dokumen lainnya)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '7.00',
 												'data' => array(
 													array(
@@ -8258,6 +8392,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Telah dilaksanakan Evaluasi Akuntabilitas Kinerja secara berkala.',
 												'tipe' => '1',
 												'keterangan' => 'Evaluasi Internal 2023 dan 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '1.00'
 											),
 										)
@@ -8272,6 +8408,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan secara berjenjang.',
 												'tipe' => '2',
 												'keterangan' => 'Evaluasi Internal 2023 dan 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '1.00',
 												'data' => array(
 													array(
@@ -8298,6 +8436,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan pada seluruh bidang di Perangkat Daerah.',
 												'tipe' => '2',
 												'keterangan' => 'Evaluasi Internal 2023 dan 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '3.00',
 												'data' => array(
 													array(
@@ -8311,6 +8451,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Evaluasi Akuntabilitas Kinerja telah dilaksanakan menggunakan Teknologi Informasi (Aplikasi).',
 												'tipe' => '2',
 												'keterangan' => 'Evaluasi Internal 2023 dan 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '4.00',
 												'data' => array(
 													array(
@@ -8333,6 +8475,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'tipe' => '2',
 												'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023',
 												'nomor_urut' => '1.00',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'data' => array(
 													array(
 														'jenis_kerangka_logis' => '2',
@@ -8350,6 +8494,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Telah terjadi peningkatan implementasi SAKIP  (internal dan LHE SAKIP Perangkat Daerah) dengan melaksanakan tindak lanjut atas rekomendasi hasil evaluasi akuntabilitas kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '2.00',
 												'data' => array(
 													array(
@@ -8368,6 +8514,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Hasil Evaluasi Akuntabilitas Kinerja  (internal dan LHE SAKIP Perangkat Daerah) telah dimanfaatkan untuk perbaikan dan peningkatan akuntabilitas kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '3.00',
 												'data' => array(
 													array(
@@ -8386,6 +8534,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Hasil dari Evaluasi Akuntabilitas Kinerja  (internal dan LHE SAKIP Perangkat Daerah)telah dimanfaatkan dalam mendukung efektivitas dan efisiensi kinerja.',
 												'tipe' => '2',
 												'keterangan' => 'Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024, DPA 2024',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '4.00',
 												'data' => array(
 													array(
@@ -8404,6 +8554,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'nama' => 'Telah terjadi perbaikan dan peningkatan kinerja dengan memanfaatkan hasil evaluasi akuntabilitas kinerja  (internal dan LHE SAKIP Perangkat Daerah).',
 												'tipe' => '2',
 												'keterangan' => '- Tindak Lanjut LHE SAKIP 2023, Laporan Kinerja 2023, Rencana Aksi 2024, Evaluasi Internal 2024, DPA 2024 - Dokumen lainnya (Inovasi, Prestasi)',
+												'penjelasan' => '',
+												'langkah_kerja' => '',
 												'nomor_urut' => '5.00',
 												'data' => array(
 													array(
@@ -8461,6 +8613,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										'nama' => $penilaian['nama'],
 										'tipe' => $penilaian['tipe'],
 										'keterangan' => $penilaian['keterangan'],
+										'penjelasan' => $penilaian['penjelasan'],
+										'langkah_kerja' => $penilaian['langkah_kerja'],
 									);
 									if ($wpdb->insert('esakip_komponen_penilaian', $komponen_penilaian_baru) === false) {
 										error_log("Error inserting into esakip_komponen_penilaian: " . $wpdb->last_error);
