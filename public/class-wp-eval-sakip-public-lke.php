@@ -339,6 +339,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					$started_at_dt = new DateTime($started_at);
 					$end_at_dt = new DateTime($end_at);
 					$jenis_jadwal = $data_jadwal['jenis_jadwal'];
+					$tampil_nilai_penetapan = $data_jadwal['tampil_nilai_penetapan'];
 					if ($data_jadwal['status'] == 2) {
 						$prefix_history = '_history';
 					} else {
@@ -879,7 +880,11 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 						$merged_data['tbody'] = $tbody;
 						$merged_data['total_nilai'] = number_format($total_nilai, 2);
-						$merged_data['total_nilai_penetapan'] = number_format($total_nilai_penetapan, 2);
+						if ($tampil_nilai_penetapan == 1) {
+							$merged_data['total_nilai_penetapan'] = number_format($total_nilai_penetapan, 2);
+						} else {
+							$merged_data['total_nilai_penetapan'] = '-';
+						}
 					}
 				} else {
 					$tbody = "<tr><td colspan='4' class='text-center'>Tidak ada data tersedia</td></tr>";
