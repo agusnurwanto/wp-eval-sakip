@@ -307,7 +307,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					$ret['message'] = 'Id Jadwal kosong!';
 				} else if ($ret['status'] != 'error' && empty($_POST['id_skpd'])) {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				} else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun anggaran kosong!';
@@ -913,7 +913,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				if ($ret['status'] != 'error' && empty($_POST['id_skpd'])) {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				} else if ($ret['status'] != 'error' && empty($_POST['id_komponen_penilaian'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Komponen Penilaian kosong!';
@@ -1087,7 +1087,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				if ($ret['status'] != 'error' && empty($_POST['id_skpd'])) {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				} else if ($ret['status'] != 'error' && empty($_POST['id_komponen_penilaian'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Komponen Penilaian kosong!';

@@ -304,7 +304,7 @@ $timezone = get_option('timezone_string');
         // }
         let idSkpd = <?php echo $id_skpd; ?>;
         if (idSkpd == '') {
-            return alert("ID SKPD Usulan Tidak Boleh Kosong!");
+            return alert("ID Perangkat Daerah Usulan Tidak Boleh Kosong!");
         }
         let idKomponenPenilaian = id;
         if (idKomponenPenilaian == '') {
@@ -365,7 +365,7 @@ $timezone = get_option('timezone_string');
         }
         let idSkpd = <?php echo $id_skpd; ?>;
         if (idSkpd == '') {
-            return alert("ID SKPD Penetapan Tidak Boleh Kosong!");
+            return alert("ID Perangkat Daerah Penetapan Tidak Boleh Kosong!");
         }
         let idKomponenPenilaian = id;
         if (idKomponenPenilaian == '') {

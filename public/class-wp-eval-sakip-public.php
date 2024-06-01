@@ -361,7 +361,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
 				if (empty($_POST['nama_skpd_sakip'])) {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Nama SKPD SAKIP tidak boleh kosong!';
+					$ret['message'] = 'Nama Perangkat Daerah SAKIP tidak boleh kosong!';
 				} else {
 					$nama_skpd_sakip = $_POST['nama_skpd_sakip'];
 					$skpd = $wpdb->get_row($wpdb->prepare('
@@ -374,7 +374,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                     ', $_POST['id_skpd']), ARRAY_A);
 					if (empty($skpd)) {
 						$ret['status'] = 'error';
-						$ret['message'] = 'ID SKPD tidak ditemukans!';
+						$ret['message'] = 'ID Perangkat Daerah tidak ditemukans!';
 					} else {
 						update_option('_nama_skpd_sakip_' . $skpd['id_skpd'], $nama_skpd_sakip);
 						$data = array(
@@ -2504,7 +2504,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$idSkpd = $_POST['idSkpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
@@ -2642,7 +2642,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$idSkpd = $_POST['idSkpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
@@ -2780,7 +2780,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$idSkpd = $_POST['idSkpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
@@ -2918,7 +2918,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$idSkpd = $_POST['idSkpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
@@ -3056,7 +3056,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$idSkpd = $_POST['idSkpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
@@ -3194,7 +3194,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$idSkpd = $_POST['idSkpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
@@ -3332,7 +3332,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$idSkpd = $_POST['idSkpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
@@ -3470,7 +3470,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$idSkpd = $_POST['idSkpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
@@ -3608,7 +3608,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$idSkpd = $_POST['idSkpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
@@ -4242,7 +4242,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$idSkpd = $_POST['idSkpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
@@ -4380,7 +4380,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$idSkpd = $_POST['idSkpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
@@ -4507,7 +4507,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_skpd = $_POST['id_skpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['tahun_anggaran'])) {
 					$tahun_anggaran = $_POST['tahun_anggaran'];
@@ -4619,7 +4619,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_skpd = $_POST['id_skpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['tahun_anggaran'])) {
 					$tahun_anggaran = $_POST['tahun_anggaran'];
@@ -4696,7 +4696,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_skpd = $_POST['id_skpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['tahun_anggaran'])) {
 					$tahun_anggaran = $_POST['tahun_anggaran'];
@@ -4808,7 +4808,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_skpd = $_POST['id_skpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['tahun_anggaran'])) {
 					$tahun_anggaran = $_POST['tahun_anggaran'];
@@ -4919,7 +4919,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_skpd = $_POST['id_skpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['tahun_anggaran'])) {
 					$tahun_anggaran = $_POST['tahun_anggaran'];
@@ -4996,7 +4996,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_skpd = $_POST['id_skpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['tahun_anggaran'])) {
 					$tahun_anggaran = $_POST['tahun_anggaran'];
@@ -5073,7 +5073,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_skpd = $_POST['id_skpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['tahun_anggaran'])) {
 					$tahun_anggaran = $_POST['tahun_anggaran'];
@@ -5150,7 +5150,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_skpd = $_POST['id_skpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['tahun_anggaran'])) {
 					$tahun_anggaran = $_POST['tahun_anggaran'];
@@ -5227,7 +5227,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_skpd = $_POST['id_skpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['tahun_anggaran'])) {
 					$tahun_anggaran = $_POST['tahun_anggaran'];
@@ -5580,7 +5580,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_skpd = $_POST['id_skpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['id_periode'])) {
 					$id_jadwal = $_POST['id_periode'];
@@ -5692,7 +5692,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_skpd = $_POST['id_skpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['tahun_anggaran'])) {
 					$tahun_anggaran = $_POST['tahun_anggaran'];
@@ -5769,7 +5769,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_skpd = $_POST['id_skpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['tahun_anggaran'])) {
 					$tahun_anggaran = $_POST['tahun_anggaran'];
@@ -10153,7 +10153,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_skpd = $_POST['id_skpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['tahun_anggaran'])) {
 					$tahun_anggaran = $_POST['tahun_anggaran'];
@@ -10283,7 +10283,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$idSkpd = $_POST['idSkpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
@@ -10464,7 +10464,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_skpd = $_POST['id_skpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['tahun_anggaran'])) {
 					$tahun_anggaran = $_POST['tahun_anggaran'];
@@ -10594,7 +10594,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$idSkpd = $_POST['idSkpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
@@ -10775,7 +10775,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_skpd = $_POST['id_skpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['tahun_anggaran'])) {
 					$tahun_anggaran = $_POST['tahun_anggaran'];
@@ -10905,7 +10905,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$idSkpd = $_POST['idSkpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
@@ -11086,7 +11086,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_skpd = $_POST['id_skpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['tahun_anggaran'])) {
 					$tahun_anggaran = $_POST['tahun_anggaran'];
@@ -11216,7 +11216,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$idSkpd = $_POST['idSkpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
@@ -16772,7 +16772,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$idSkpd = $_POST['idSkpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
@@ -17216,7 +17216,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$idSkpd = $_POST['idSkpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
@@ -17438,7 +17438,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_skpd = $_POST['id_skpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['tahun_anggaran'])) {
 					$tahun_anggaran = $_POST['tahun_anggaran'];
@@ -17603,7 +17603,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$idSkpd = $_POST['idSkpd'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
