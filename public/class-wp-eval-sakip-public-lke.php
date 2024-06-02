@@ -499,7 +499,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								$tbody2 .= "<td class='text-left'>" . $counter_sub++ . "</td>";
 								$tbody2 .= "<td class='text-left' colspan='2'><b>" . $subkomponen['nama'] . "</b></td>";
 								if(
-									$_POST['excel'] == 'false' 
+									empty($_POST['excel'])
 									|| $_POST['excel'] == 'usulan' 
 									|| $_POST['excel'] == 'usulan_penetapan'
 								){
@@ -515,7 +515,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 									$tbody2 .= "<td class='text-center'></td>";
 								}
 								if(
-									$_POST['excel'] == 'false' 
+									empty($_POST['excel'])
 									|| $_POST['excel'] == 'penetapan' 
 									|| $_POST['excel'] == 'usulan_penetapan'
 								){
@@ -799,7 +799,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 										$tbody2 .= "<td class='text-left'></td>";
 										$tbody2 .= "<td class='text-left'>" . $counter_isi++ . "</td>";
 										$tbody2 .= "<td class='text-left'>" . $penilaian['kp_nama'] . "<br><small class='text-muted'> Keterangan : " . $penilaian['kp_keterangan'] . "</small></td>";
-										if($_POST['excel'] == 'false'){
+										if(empty($_POST['excel'])){
 											$tbody2 .= "<td class='text-center'><button class='btn btn-secondary' onclick='infoPenjelasan(" . $penilaian['kp_id'] . ")' title='Info Nilai'><span class='dashicons dashicons-info'></span></button></td>";
 										}else{
 											$tbody2 .= "<td class='text-center'></td>";
@@ -815,7 +815,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 													$tbody2 .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "' disabled>" . $opsi . "</select></td>";
 												}
 												if(
-													$_POST['excel'] == 'false' 
+													empty($_POST['excel'])
 													|| $_POST['excel'] == 'usulan' 
 													|| $_POST['excel'] == 'usulan_penetapan'
 												){
@@ -825,7 +825,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												if (!$this->is_admin_panrb()) {
 													$tbody2 .= "<td class='text-center'><div class='bukti-dukung-view' kp-id='" . $penilaian['kp_id'] . "'>" . $bukti_dukung . "</div>" . $tombol_bukti . "</td>";
 													if(
-														$_POST['excel'] == 'false' 
+														empty($_POST['excel'])
 														|| $_POST['excel'] == 'usulan' 
 														|| $_POST['excel'] == 'usulan_penetapan'
 													){
@@ -834,7 +834,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												} else {
 													$tbody2 .= "<td class='text-center'><div class='bukti-dukung-view' kp-id='" . $penilaian['kp_id'] . "'>" . $bukti_dukung . "</div></td>";
 													if(
-														$_POST['excel'] == 'false' 
+														empty($_POST['excel'])
 														|| $_POST['excel'] == 'usulan' 
 														|| $_POST['excel'] == 'usulan_penetapan'
 													){
@@ -842,14 +842,14 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 													}
 												}
 												if(
-													$_POST['excel'] == 'false' 
+													empty($_POST['excel'])
 													|| $_POST['excel'] == 'usulan' 
 													|| $_POST['excel'] == 'usulan_penetapan'
 												){
 													$tbody2 .= $kerangka_logis;
 												}
 												if(
-													$_POST['excel'] == 'false' 
+													empty($_POST['excel'])
 													|| $_POST['excel'] == 'penetapan' 
 													|| $_POST['excel'] == 'usulan_penetapan'
 												){
@@ -859,7 +859,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 													$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
 													$tbody2 .= $kerangka_logis_penetapan;
 												}
-												if($_POST['excel'] == 'false'){
+												if(empty($_POST['excel'])){
 													if ($disabled == '') {
 														if (!$this->is_admin_panrb()) {
 															$tbody2 .= "<td class='text-center'>" . $btn_save . "</td>";
@@ -877,7 +877,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												}
 
 												if(
-													$_POST['excel'] == 'false' 
+													empty($_POST['excel'])
 													|| $_POST['excel'] == 'usulan' 
 													|| $_POST['excel'] == 'usulan_penetapan'
 												){
@@ -887,7 +887,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												}
 												$tbody2 .= "<td class='text-center'><div class='bukti-dukung-view' kp-id='" . $penilaian['kp_id'] . "'>" . $bukti_dukung . "</div></td>";
 												if(
-													$_POST['excel'] == 'false' 
+													empty($_POST['excel'])
 													|| $_POST['excel'] == 'usulan' 
 													|| $_POST['excel'] == 'usulan_penetapan'
 												){
@@ -895,7 +895,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 													$tbody2 .= $kerangka_logis;
 												}
 												if(
-													$_POST['excel'] == 'false' 
+													empty($_POST['excel'])
 													|| $_POST['excel'] == 'penetapan' 
 													|| $_POST['excel'] == 'usulan_penetapan'
 												){
@@ -905,7 +905,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 													$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'" . $disabled . ">" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
 													$tbody2 .= $kerangka_logis_penetapan;
 												}
-												if($_POST['excel'] == 'false'){
+												if(empty($_POST['excel'])){
 													if ($disabled == '') {
 														if (!$this->is_admin_panrb()) {
 															$tbody2 .= "<td class='text-center'>" . $btn_save_penetapan . "</td>";
@@ -941,7 +941,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						$tbody .= "<td class='text-left' colspan='3'><b>" . $komponen['nama'] . "</b></td>";
 						$tbody .= "<td class='text-center'>" . $komponen['bobot'] . "</td>";
 						if(
-							$_POST['excel'] == 'false' 
+							empty($_POST['excel'])
 							|| $_POST['excel'] == 'usulan' 
 							|| $_POST['excel'] == 'usulan_penetapan'
 						){
@@ -956,7 +956,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							$tbody2 .= "<td class='text-center'></td>";
 						}
 						if(
-							$_POST['excel'] == 'false' 
+							empty($_POST['excel'])
 							|| $_POST['excel'] == 'penetapan' 
 							|| $_POST['excel'] == 'usulan_penetapan'
 						){
@@ -965,7 +965,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							$tbody .= "<td class='text-center'>" . number_format($persentase_kom_penetapan * 100, 2) . "%" . "</td>";
 						}
 						if(
-							$_POST['excel'] == 'false' 
+							empty($_POST['excel'])
 							|| $_POST['excel'] == 'penetapan' 
 							|| $_POST['excel'] == 'usulan_penetapan'
 						){

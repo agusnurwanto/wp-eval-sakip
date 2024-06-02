@@ -135,14 +135,14 @@ if(!empty($_GET['excel'])){
 </style>
 
 <div class="container-md" id="cetak" title="Pengisian LKE SAKIP (<?php echo $jadwal['tahun_anggaran']; ?>)">
-    <div style="padding: 10px;margin:0 0 3rem 0;">
-        <h1 class="text-center" style="margin:3rem;">Pengisian LKE SAKIP<br><?php echo $skpd['nama_skpd'] ?><br><?php echo $jadwal['nama_jadwal']; ?> (<?php echo $jadwal['tahun_anggaran']; ?>)</h1>
+    <div style="padding: 10px;">
+        <h1 class="text-center">Pengisian LKE SAKIP<br><?php echo $skpd['nama_skpd'] ?><br><?php echo $jadwal['nama_jadwal']; ?> (<?php echo $jadwal['tahun_anggaran']; ?>)</h1>
     </div>
     <div class="action-section" style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
     <?php if(empty($excel)): ?>
         <div id="action-sakip" class="hide-print">
             <a href="<?php echo $excel_usulan; ?>" target="_blank" class="btn btn-success">Laporan Data Usulan</a>
-            <a href="<?php echo $excel_penetapan; ?>" target="_blank" class="btn btn-success">Laporan Excel Data Penetapan</a>
+            <a href="<?php echo $excel_penetapan; ?>" target="_blank" class="btn btn-success">Laporan Data Penetapan</a>
             <a href="<?php echo $excel_usulan_penetapan; ?>" target="_blank" class="btn btn-success">Laporan Data Usulan dan Penetapan</a>
         </div>
     <?php endif; ?>
