@@ -141,8 +141,11 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                         <label for="keterangan">Keterangan</label>
                         <textarea class="form-control" id="keterangan" name="keterangan" rows="3" required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary" onclick="submit_dokumen(this); return false">Unggah</button>
                 </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" onclick="submit_dokumen(this); return false">Simpan</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
@@ -167,8 +170,11 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                         </select>
                         <input type="hidden" id="idDokumen" value="">
                     </div>
-                    <button type="submit" class="btn btn-primary" onclick="submit_tahun_renja_rkt(); return false">Simpan</button>
                 </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" onclick="submit_tahun_renja_rkt(); return false">Simpan</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
@@ -207,8 +213,11 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                         <label for="keterangan_verifikasi">Keterangan</label>
                         <textarea class="form-control" id="keterangan_verifikasi" name="keterangan_verifikasi" rows="3" required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary" onclick="submit_verifikasi_dokumen(this); return false">Simpan</button>
                 </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" onclick="submit_verifikasi_dokumen(this); return false">Simpan</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
@@ -223,6 +232,13 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         getTableRenja();
         getTableTahun();
         window.tipe_dokumen = "renja_rkt";
+        jQuery("#fileUpload").on('change', function(){
+            var id_dokumen = jQuery('#idDokumen').val();
+            if(id_dokumen == ''){
+                var name = jQuery("#fileUpload").prop('files')[0].name;
+                jQuery('#nama_file').val(name);
+            }
+        });
     });
 
     function verifikasi_dokumen(id){
