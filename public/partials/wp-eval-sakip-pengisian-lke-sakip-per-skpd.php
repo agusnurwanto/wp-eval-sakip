@@ -63,6 +63,15 @@ if (!empty($jadwal)) {
     $lama_pelaksanaan = 1;
 }
 $timezone = get_option('timezone_string');
+
+$excel_usulan = $this->functions->modifyGetParameter(false, 'excel', 'usulan');
+$excel_penetapan = $this->functions->modifyGetParameter(false, 'excel', 'penetapan');
+$excel_usulan_penetapan = $this->functions->modifyGetParameter(false, 'excel', 'usulan_penetapan');
+
+$excel = false;
+if(!empty($_GET['excel'])){
+    $excel = $_GET['excel'];
+}
 ?>
 <style>
     .wrap-table {
@@ -123,23 +132,45 @@ $timezone = get_option('timezone_string');
             margin-bottom: 20px;
         }
     }
+/* 
+    .textPenjelasan {
+        background: transparent;
+        resize: none;
+        overflow: hidden;
+        min-height: 20px;
+        width: 100%;
+        box-sizing: border-box;
+        border: none;
+        padding: 0;
+    } */
 </style>
 
 <div class="container-md" id="cetak" title="Pengisian LKE SAKIP (<?php echo $jadwal['tahun_anggaran']; ?>)">
-    <div style="padding: 10px;margin:0 0 3rem 0;">
-        <h1 class="text-center" style="margin:3rem;">Pengisian LKE SAKIP<br><?php echo $skpd['nama_skpd'] ?><br><?php echo $jadwal['nama_jadwal']; ?> (<?php echo $jadwal['tahun_anggaran']; ?>)</h1>
+    <div style="padding: 10px;">
+        <h1 class="text-center">Pengisian LKE SAKIP<br><?php echo $skpd['nama_skpd'] ?><br><?php echo $jadwal['nama_jadwal']; ?> (<?php echo $jadwal['tahun_anggaran']; ?>)</h1>
     </div>
-    <div class="action-section">
+    <div class="action-section" style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
+    <?php if(empty($excel)): ?>
+        <div id="action-sakip" class="hide-print">
+            <a href="<?php echo $excel_usulan; ?>" target="_blank" class="btn btn-success">Laporan Data Usulan</a>
+            <a href="<?php echo $excel_penetapan; ?>" target="_blank" class="btn btn-success">Laporan Data Penetapan</a>
+            <a href="<?php echo $excel_usulan_penetapan; ?>" target="_blank" class="btn btn-success">Laporan Data Usulan dan Penetapan</a>
+        </div>
+    <?php endif; ?>
     </div>
     <div class="container">
+    <?php if(empty($excel) || $excel == 'usulan' || $excel == 'usulan_penetapan'): ?>
         <div class="info-section">
             <span class="label">Total Nilai Usulan:</span>
             <span class="value" id="nilaiUsulanTotal"></span>
         </div>
+    <?php endif; ?>
+    <?php if(empty($excel) || $excel == 'penetapan' || $excel == 'usulan_penetapan'): ?>
         <div class="info-section">
             <span class="label">Total Nilai Penetapan:</span>
             <span class="value" id="nilaiPenetapanTotal"></span>
         </div>
+    <?php endif; ?>
     </div>
     <div class="wrap-table">
         <table id="table_pengisian_sakip" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
@@ -147,22 +178,34 @@ $timezone = get_option('timezone_string');
                 <tr>
                     <th class="text-center" rowspan="2" colspan="4" style="vertical-align: middle;">Komponen/Sub Komponen</th>
                     <th class="text-center" rowspan="2" style="vertical-align: middle;">Bobot</th>
-                    <th class="text-center" colspan="3">Penilaian PD/Perangkat Daerah</th>
+                <?php if(empty($excel) || $excel == 'usulan' || $excel == 'usulan_penetapan'): ?>
+                    <th class="text-center" colspan="3">Penilaian Perangkat Daerah</th>
+                <?php endif; ?>
                     <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Bukti Dukung</th>
+                <?php if(empty($excel) || $excel == 'usulan' || $excel == 'usulan_penetapan'): ?>
                     <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Keterangan Perangkat Daerah</th>
                     <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Kerangka Logis Perangkat Daerah</th>
+                <?php endif; ?>
+                <?php if(empty($excel) || $excel == 'penetapan' || $excel == 'usulan_penetapan'): ?>
                     <th class="text-center" colspan="3">Penilaian Evaluator</th>
                     <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Keterangan Evaluator</th>
                     <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Kerangka Logis Evaluator</th>
+                <?php endif; ?>
+                <?php if(empty($excel)): ?>
                     <th class="text-center" rowspan="2" style="vertical-align: middle;">Aksi</th>
+                <?php endif; ?>
                 </tr>
                 <tr>
+                <?php if(empty($excel) || $excel == 'usulan' || $excel == 'usulan_penetapan'): ?>
                     <th class="text-center">Jawaban</th>
                     <th class="text-center">Nilai</th>
                     <th class="text-center">%</th>
+                <?php endif; ?>
+                <?php if(empty($excel) || $excel == 'penetapan' || $excel == 'usulan_penetapan'): ?>
                     <th class="text-center">Jawaban</th>
                     <th class="text-center">Nilai</th>
                     <th class="text-center">%</th>
+                <?php endif; ?>
                 </tr>
             </thead>
             <tbody>
@@ -171,6 +214,7 @@ $timezone = get_option('timezone_string');
     </div>
 </div>
 
+<?php if(empty($excel)): ?>
 <!-- Modal tambah bukti dukung -->
 <div class="modal fade bd-example-modal-xl" id="tambahBuktiDukungModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
@@ -221,8 +265,8 @@ $timezone = get_option('timezone_string');
                 <table id="infoPenjelasanTable" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
                         <tr>
-                            <th class="text-center">Penjelasan</th>
-                            <th class="text-center">Langkah Kerja</th>
+                            <th class="text-center" style="width: 50%;">Penjelasan</th>
+                            <th class="text-center" style="width: 50%;">Langkah Kerja</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -232,12 +276,11 @@ $timezone = get_option('timezone_string');
         </div>
     </div>
 </div>
-
+<?php endif; ?>
 <script>
     jQuery(document).ready(function() {
         get_table_pengisian_sakip();
-        run_download_excel_sakip();
-
+    <?php if(empty($excel)): ?>
         let dataHitungMundur = {
             'jenisJadwal': <?php echo json_encode(ucwords($jenis_jadwal)); ?>,
             'namaJadwal': <?php echo json_encode(ucwords($nama_jadwal)); ?>,
@@ -246,6 +289,9 @@ $timezone = get_option('timezone_string');
             'thisTimeZone': <?php echo json_encode($timezone); ?>
         };
         penjadwalanHitungMundur(dataHitungMundur);
+    <?php else: ?>
+        run_download_excel_sakip();
+    <?php endif; ?>
     })
 
     function get_table_pengisian_sakip() {
@@ -258,7 +304,8 @@ $timezone = get_option('timezone_string');
                 api_key: esakip.api_key,
                 id_jadwal: <?php echo $id_jadwal; ?>,
                 tahun_anggaran: <?php echo $tahun_anggaran; ?>,
-                id_skpd: <?php echo $id_skpd; ?>
+                id_skpd: <?php echo $id_skpd; ?>,
+                excel: "<?php echo $excel; ?>"
             },
             dataType: 'json',
             success: function(response) {

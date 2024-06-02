@@ -456,4 +456,32 @@ class Esakip_Functions
             );
         }
     }
+
+    function getFullUrl() {
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+        $fullUrl = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        return $fullUrl;
+    }
+
+    function modifyGetParameter($url=false, $paramName, $paramValue) {
+        if(empty($url)){
+            $url = $this->getFullUrl();
+        }
+        $parsedUrl = parse_url($url);
+        parse_str($parsedUrl['query'], $queryParams);
+        $queryParams[$paramName] = $paramValue;
+        $newQuery = http_build_query($queryParams);
+        
+        $newUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'];
+        if (isset($parsedUrl['port'])) {
+            $newUrl .= ':' . $parsedUrl['port'];
+        }
+        $newUrl .= $parsedUrl['path'] . '?' . $newQuery;
+        
+        if (isset($parsedUrl['fragment'])) {
+            $newUrl .= '#' . $parsedUrl['fragment'];
+        }
+        
+        return $newUrl;
+    }
 }

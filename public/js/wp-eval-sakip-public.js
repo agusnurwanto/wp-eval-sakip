@@ -185,3 +185,23 @@ function penjadwalanHitungMundur(dataHitungMundur = {}) {
         jQuery("#seconds").html("00 <span>Detik</span>");
     }
 }
+
+function changeUrl(option){
+    var key = option.key;
+    var value = option.value;
+    var _url = option.url;
+    var url_object = new URL(_url);
+    var value_asli = url_object.searchParams.get(key);
+    var _and = '&';
+    if(_url.indexOf('?') == -1){
+        _url += '?';
+        _and = '';
+    }
+
+    if(_url.indexOf(key) != -1){
+        _url = _url.replace(_and+key+'='+value_asli, _and+key+'='+value);
+    }else{
+        _url += _and+key+'='+value
+    }
+    return _url;
+}
