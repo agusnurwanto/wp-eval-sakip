@@ -75,15 +75,15 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
             <h1 class="text-center" style="margin:3rem;">Dokumen RENJA/RKT <br><?php echo $skpd['nama_skpd'] ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
-            <?php if (!$is_admin_panrb): ?>
-            <div style="margin-bottom: 25px;">
-                <button class="btn btn-primary" onclick="tambah_dokumen_renja();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
-            </div>
+            <?php if (!$is_admin_panrb) : ?>
+                <div style="margin-bottom: 25px;">
+                    <button class="btn btn-primary" onclick="tambah_dokumen_renja();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
+                </div>
             <?php endif; ?>
             <div class="wrap-table">
                 <table id="table_dokumen_renja" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
-                    <tr>
+                        <tr>
                             <th class="text-center" rowspan="2">No</th>
                             <th class="text-center" rowspan="2">Perangkat Daerah</th>
                             <th class="text-center" rowspan="2">Nama Dokumen</th>
@@ -129,9 +129,9 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                         <label for="fileUpload">Pilih File</label>
                         <input type="file" class="form-control-file" id="fileUpload" name="fileUpload" accept="application/pdf" required>
                         <div style="padding-top: 10px; padding-bottom: 10px;"><a id="fileUploadExisting" target="_blank"></a></div>
-                        <div class="alert alert-warning mt-2" role="alert">
-                            Maksimal ukuran file: <?php echo get_option('_crb_maksimal_upload_dokumen_esakip'); ?> MB. Format file yang diperbolehkan: PDF.
-                        </div>
+                    </div>
+                    <div class="alert alert-warning mt-2" role="alert">
+                        Maksimal ukuran file: <?php echo get_option('_crb_maksimal_upload_dokumen_esakip'); ?> MB. Format file yang diperbolehkan: PDF.
                     </div>
                     <div class="form-group">
                         <label for="nama_file">Nama Dokumen</label>
@@ -232,16 +232,16 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         getTableRenja();
         getTableTahun();
         window.tipe_dokumen = "renja_rkt";
-        jQuery("#fileUpload").on('change', function(){
+        jQuery("#fileUpload").on('change', function() {
             var id_dokumen = jQuery('#idDokumen').val();
-            if(id_dokumen == ''){
+            if (id_dokumen == '') {
                 var name = jQuery("#fileUpload").prop('files')[0].name;
                 jQuery('#nama_file').val(name);
             }
         });
     });
 
-    function verifikasi_dokumen(id){
+    function verifikasi_dokumen(id) {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -258,9 +258,9 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 console.log(response);
                 if (response.status === 'success') {
                     let data = response.data;
-                    if(data.length !== 0 || data.status_verifikasi != null){
+                    if (data.length !== 0 || data.status_verifikasi != null) {
                         let verifikasi = (data.status_verifikasi == 1) ? "terima" : "tolak";
-                        jQuery("input[name=verifikasi_dokumen][value='"+verifikasi+"']").prop("checked",true);
+                        jQuery("input[name=verifikasi_dokumen][value='" + verifikasi + "']").prop("checked", true);
                         jQuery("#keterangan_verifikasi").val(data.keterangan_verifikasi);
                     }
                     jQuery("#idDokumen").val(id);
@@ -277,7 +277,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         });
     }
 
-    function submit_verifikasi_dokumen(that){
+    function submit_verifikasi_dokumen(that) {
         let id_dokumen = jQuery("#idDokumen").val();
         if (id_dokumen == '') {
             return alert('Id Dokumen tidak boleh kosong');

@@ -126,6 +126,10 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                         Maksimal ukuran file: <?php echo get_option('_crb_maksimal_upload_dokumen_esakip'); ?> MB. Format file yang diperbolehkan: PDF.
                     </div>
                     <div class="form-group">
+                        <label for="nama_file">Nama Dokumen</label>
+                        <input type="text" class="form-control" id="nama_file" name="nama_file" rows="3" required>
+                    </div>
+                    <div class="form-group">
                         <label for="keterangan">Keterangan</label>
                         <textarea class="form-control" id="keterangan" name="keterangan" rows="3" required></textarea>
                     </div>
@@ -170,6 +174,13 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     jQuery(document).ready(function() {
         getTablepedoman_teknis_evaluasi_internal();
         getTableTahun();
+        jQuery("#fileUpload").on('change', function() {
+            var id_dokumen = jQuery('#idDokumen').val();
+            if (id_dokumen == '') {
+                var name = jQuery("#fileUpload").prop('files')[0].name;
+                jQuery('#nama_file').val(name);
+            }
+        });
     });
 
     function getTablepedoman_teknis_evaluasi_internal() {
@@ -236,6 +247,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         jQuery("#idDokumen").val('');
         jQuery("#fileUpload").val('');
         jQuery("#keterangan").val('');
+        jQuery("#nama_file").val('');
         jQuery('#fileUploadExisting').removeAttr('href').empty();
         jQuery("#uploadModal").modal('show');
     }
@@ -309,6 +321,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                     jQuery("#fileUpload").val('');
                     jQuery('#fileUploadExisting').attr('href', url).html(data.dokumen);
                     jQuery("#keterangan").val(data.keterangan);
+                    jQuery("#nama_file").val(data.dokumen);
                     jQuery("#uploadModalLabel").hide();
                     jQuery("#editModalLabel").show();
                     jQuery('#uploadModal').modal('show');
@@ -348,6 +361,10 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         if (fileDokumen == '') {
             return alert('File Upload tidak boleh kosong');
         }
+        let namaDokumen = jQuery("#nama_file").val();
+        if (namaDokumen == '') {
+            return alert('Nama Dokumen tidak boleh kosong');
+        }
 
         let form_data = new FormData();
         form_data.append('action', 'tambah_dokumen_pedoman_teknis_evaluasi_internal');
@@ -358,6 +375,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         form_data.append('keterangan', keterangan);
         form_data.append('tahunAnggaran', tahunAnggaran);
         form_data.append('fileUpload', fileDokumen);
+        form_data.append('namaDokumen', namaDokumen);
 
         jQuery('#wrap-loading').show();
         jQuery.ajax({
