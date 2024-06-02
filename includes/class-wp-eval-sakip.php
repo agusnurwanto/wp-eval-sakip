@@ -516,6 +516,25 @@ class Wp_Eval_Sakip {
 		add_shortcode('menu_eval_sakip', array($plugin_public, 'menu_eval_sakip'));
 		add_shortcode('penyusunan_pohon_kinerja',array($plugin_public,'penyusunan_pohon_kinerja'));
 		add_shortcode('view_pohon_kinerja',array($plugin_public,'view_pohon_kinerja'));
+
+		add_shortcode('dokumen_detail_dpa_pemda', array($plugin_public, 'dokumen_detail_dpa_pemda'));
+		add_shortcode('dokumen_detail_skp_pemda', array($plugin_public, 'dokumen_detail_skp_pemda'));
+		add_shortcode('dokumen_detail_rencana_aksi_pemda', array($plugin_public, 'dokumen_detail_rencana_aksi_pemda'));
+		add_shortcode('dokumen_detail_perjanjian_kinerja_pemda', array($plugin_public, 'dokumen_detail_perjanjian_kinerja_pemda'));
+		add_shortcode('dokumen_detail_evaluasi_internal_pemda', array($plugin_public, 'dokumen_detail_evaluasi_internal_pemda'));
+		add_shortcode('dokumen_detail_iku_pemda', array($plugin_public, 'dokumen_detail_iku_pemda'));
+		add_shortcode('dokumen_detail_laporan_kinerja_pemda', array($plugin_public, 'dokumen_detail_laporan_kinerja_pemda'));
+		add_shortcode('dokumen_detail_dokumen_lainnya_pemda', array($plugin_public, 'dokumen_detail_dokumen_lainnya_pemda'));
+		add_shortcode('dokumen_detail_pohon_kinerja_dan_cascading_pemda', array($plugin_public, 'dokumen_detail_pohon_kinerja_dan_cascading_pemda'));
+		add_shortcode('dokumen_detail_lhe_akip_internal_pemda', array($plugin_public, 'dokumen_detail_lhe_akip_internal_pemda'));
+		add_shortcode('dokumen_detail_tl_lhe_akip_internal_pemda', array($plugin_public, 'dokumen_detail_tl_lhe_akip_internal_pemda'));
+		add_shortcode('dokumen_detail_tl_lhe_akip_kemenpan_pemda', array($plugin_public, 'dokumen_detail_tl_lhe_akip_kemenpan_pemda'));
+		add_shortcode('dokumen_detail_laporan_monev_renaksi_pemda', array($plugin_public, 'dokumen_detail_laporan_monev_renaksi_pemda'));
+		add_shortcode('dokumen_detail_pedoman_teknis_perencanaan_pemda', array($plugin_public, 'dokumen_detail_pedoman_teknis_perencanaan_pemda'));
+		add_shortcode('dokumen_detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda', array($plugin_public, 'dokumen_detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda'));
+		add_shortcode('dokumen_detail_pedoman_teknis_evaluasi_internal_pemda', array($plugin_public, 'dokumen_detail_pedoman_teknis_evaluasi_internal_pemda'));
+		add_shortcode('dokumen_detail_lkjip_pemda', array($plugin_public, 'dokumen_detail_lkjip_pemda'));
+		add_shortcode('dokumen_detail_rkpd_pemda', array($plugin_public, 'dokumen_detail_rkpd_pemda'));
 		
 	}
 
