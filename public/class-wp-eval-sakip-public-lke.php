@@ -1839,10 +1839,17 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				);
 
 				if ($penjelasans) {
-					$tbody = "<tr class='text-left'><td>" . $penjelasans['penjelasan'] . "</td><td>" . $penjelasans['langkah_kerja'] . "</td></tr>";
+					$tbody = "
+					<tr class='text-left'>
+						<td>
+							<textarea class='textPenjelasan' disabled style='background: transparent; overflow: hidden; min-height: 20px; min-width: 100%; box-sizing: border-box;'>" . htmlspecialchars($penjelasans['penjelasan']) . "</textarea>
+						</td>
+						<td>
+							<textarea class='textPenjelasan' disabled style='background: transparent; overflow: hidden; min-height: 20px; min-width: 100%; box-sizing: border-box;'>" . htmlspecialchars($penjelasans['langkah_kerja']) . "</textarea>
+						</td>
+					</tr>";
 				} else {
 					$tbody = "<tr class='text-left' colspan='2'>tidak ada data tersedia</tr>";
-
 				}
 				$ret['data'] = $tbody;
 			} else {
