@@ -2499,52 +2499,42 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				$id_dokumen = null;
 
-				if (!empty($_POST['id_dokumen'])) {
-					$id_dokumen = $_POST['id_dokumen'];
+				if ($ret['status'] != 'error' && !empty($_POST['id_dokumen'])) {
 					$ret['message'] = 'Berhasil edit data!';
-				}
-				if (!empty($_POST['skpd'])) {
-					$skpd = $_POST['skpd'];
-				} else {
+					$id_dokumen = $_POST['id_dokumen'];
+				}else if ($ret['status'] != 'error' && empty($_POST['skpd'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Perangkat Daerah kosong!';
-				}
-				if (!empty($_POST['idSkpd'])) {
-					$idSkpd = $_POST['idSkpd'];
-				} else {
+				}else if ($ret['status'] != 'error' && empty($_POST['idSkpd'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Perangkat Daerah kosong!';
-				}
-				if (!empty($_POST['keterangan'])) {
-					$keterangan = $_POST['keterangan'];
-				} else {
+				}else if ($ret['status'] != 'error' && empty($_POST['keterangan'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Keterangan kosong!';
-				}
-				if (!empty($_POST['tahunAnggaran'])) {
-					$tahunAnggaran = $_POST['tahunAnggaran'];
-				} else {
+				}else if ($ret['status'] != 'error' && empty($_POST['tahunAnggaran'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
-				}
-				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+				}else if ($ret['status'] != 'error' && empty($_FILES['fileUpload']) && empty($id_dokumen)) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'File Dokumen kosong!';
-				}
-				if (empty(get_option('_crb_maksimal_upload_dokumen_esakip'))) {
+				}else if (empty($_POST['namaDokumen']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}else if (empty(get_option('_crb_maksimal_upload_dokumen_esakip'))) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
 
-				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
-					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+				if ($ret['status'] != 'error' && !empty($_FILES['fileUpload'])) {
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * $maksimal_upload
+						1048576 * $maksimal_upload,
+						$_POST['namaDokumen']
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -2552,9 +2542,32 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'message' => $upload['message']
 						);
 					}
+				}else if($ret['status'] != 'error' && !empty($_POST['namaDokumen'])){
+					$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+						SELECT
+							dokumen
+						FROM esakip_renja_rkt
+						WHERE id=%d
+					", $id_dokumen));
+					if($dokumen_lama != $_POST['namaDokumen']){
+						$ret_rename = $this->functions->renameFile($upload_dir . $dokumen_lama, $upload_dir . $_POST['namaDokumen']);
+						if($ret_rename['status'] != 'error'){
+							$wpdb->update(
+								'esakip_renja_rkt',
+								array('dokumen' => $_POST['namaDokumen']),
+								array('id' => $id_dokumen),
+							);
+						}else{
+							$ret = $ret_rename;
+						}
+					}
 				}
 
-				if ($ret['status'] == 'success') {
+				if ($ret['status'] != 'error') {
+					$skpd = $_POST['skpd'];
+					$idSkpd = $_POST['idSkpd'];
+					$keterangan = $_POST['keterangan'];
+					$tahunAnggaran = $_POST['tahunAnggaran'];
 					if (empty($id_dokumen)) {
 						$wpdb->insert(
 							'esakip_renja_rkt',

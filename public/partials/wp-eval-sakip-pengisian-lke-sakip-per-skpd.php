@@ -132,17 +132,6 @@ if(!empty($_GET['excel'])){
             margin-bottom: 20px;
         }
     }
-/* 
-    .textPenjelasan {
-        background: transparent;
-        resize: none;
-        overflow: hidden;
-        min-height: 20px;
-        width: 100%;
-        box-sizing: border-box;
-        border: none;
-        padding: 0;
-    } */
 </style>
 
 <div class="container-md" id="cetak" title="Pengisian LKE SAKIP (<?php echo $jadwal['tahun_anggaran']; ?>)">

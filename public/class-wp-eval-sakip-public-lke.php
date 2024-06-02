@@ -1842,10 +1842,10 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					$tbody = "
 					<tr class='text-left'>
 						<td>
-							<textarea class='textPenjelasan' disabled style='background: transparent; overflow: hidden; min-height: 20px; min-width: 100%; box-sizing: border-box;'>" . htmlspecialchars($penjelasans['penjelasan']) . "</textarea>
+							<textarea class='textPenjelasan form-control' disabled style='background: transparent; min-height: 100px; border: 0;'>" . htmlspecialchars($penjelasans['penjelasan']) . "</textarea>
 						</td>
 						<td>
-							<textarea class='textPenjelasan' disabled style='background: transparent; overflow: hidden; min-height: 20px; min-width: 100%; box-sizing: border-box;'>" . htmlspecialchars($penjelasans['langkah_kerja']) . "</textarea>
+							<textarea class='textPenjelasan form-control' disabled style='background: transparent; min-height: 100px; border: 0;'>" . htmlspecialchars($penjelasans['langkah_kerja']) . "</textarea>
 						</td>
 					</tr>";
 				} else {
