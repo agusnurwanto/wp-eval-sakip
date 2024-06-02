@@ -89,6 +89,7 @@ $timezone = get_option('timezone_string');
         gap: 20px;
         margin-bottom: 30px;
     }
+
     .info-section {
         display: flex;
         justify-content: space-between;
@@ -148,8 +149,8 @@ $timezone = get_option('timezone_string');
                     <th class="text-center" rowspan="2" style="vertical-align: middle;">Bobot</th>
                     <th class="text-center" colspan="3">Penilaian PD/Perangkat Daerah</th>
                     <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Bukti Dukung</th>
-                    <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Keterangan OPD</th>
-                    <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Kerangka Logis OPD</th>
+                    <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Keterangan Perangkat Daerah</th>
+                    <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Kerangka Logis Perangkat Daerah</th>
                     <th class="text-center" colspan="3">Penilaian Evaluator</th>
                     <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Keterangan Evaluator</th>
                     <th class="text-center" rowspan="2" style="vertical-align: middle; width: 240px;">Kerangka Logis Evaluator</th>
@@ -206,6 +207,32 @@ $timezone = get_option('timezone_string');
     </div>
 </div>
 
+<!-- Modal info penjelasan -->
+<div class="modal fade bd-example-modal-lg" id="infoPenjelasanModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="infoPenjelasanModalLabel">Penjelasan dan Langkah Kerja</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table id="infoPenjelasanTable" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Penjelasan</th>
+                            <th class="text-center">Langkah Kerja</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     jQuery(document).ready(function() {
         get_table_pengisian_sakip();
@@ -220,7 +247,6 @@ $timezone = get_option('timezone_string');
         };
         penjadwalanHitungMundur(dataHitungMundur);
     })
-
 
     function get_table_pengisian_sakip() {
         jQuery('#wrap-loading').show();
@@ -273,7 +299,7 @@ $timezone = get_option('timezone_string');
         // }
         let idSkpd = <?php echo $id_skpd; ?>;
         if (idSkpd == '') {
-            return alert("ID SKPD Usulan Tidak Boleh Kosong!");
+            return alert("ID Perangkat Daerah Usulan Tidak Boleh Kosong!");
         }
         let idKomponenPenilaian = id;
         if (idKomponenPenilaian == '') {
@@ -334,7 +360,7 @@ $timezone = get_option('timezone_string');
         }
         let idSkpd = <?php echo $id_skpd; ?>;
         if (idSkpd == '') {
-            return alert("ID SKPD Penetapan Tidak Boleh Kosong!");
+            return alert("ID Perangkat Daerah Penetapan Tidak Boleh Kosong!");
         }
         let idKomponenPenilaian = id;
         if (idKomponenPenilaian == '') {
@@ -465,7 +491,7 @@ $timezone = get_option('timezone_string');
                 if (response.status == 'error') {
                     alert(response.message);
                 } else {
-                    var url = esakip.plugin_url + 'public/media/dokumen/'; 
+                    var url = esakip.plugin_url + 'public/media/dokumen/';
                     var html = '';
                     if (Array.isArray(response.data)) {
                         response.data.map(function(b, i) {
@@ -481,6 +507,35 @@ $timezone = get_option('timezone_string');
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 alert("An error occurred: " + xhr.status + " " + xhr.statusText);
+            }
+        });
+    }
+
+    function infoPenjelasan(id) {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: "POST",
+            data: {
+                'action': "get_penjelasan_lke",
+                'api_key': esakip.api_key,
+                'id': id,
+            },
+            dataType: "json",
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    jQuery('#infoPenjelasanTable tbody').html(response.data);
+                    jQuery('#infoPenjelasanModal').modal('show');
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
             }
         });
     }

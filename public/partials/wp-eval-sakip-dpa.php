@@ -55,7 +55,7 @@ $tipe_dokumen = "dpa";
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
-                            <th class="text-center">Nama OPD</th>
+                            <th class="text-center">Nama Perangkat Daerah</th>
                             <th class="text-center">Jumlah Dokumen</th>
                             <th class="text-center">Aksi</th>
                         </tr>
@@ -209,6 +209,40 @@ $tipe_dokumen = "dpa";
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }
+
+    function hapus_tahun_dokumen_tipe(id) {
+        if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
+            return;
+        }
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'hapus_tahun_dokumen_tipe',
+                api_key: esakip.api_key,
+				tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    getTableSkpd();
+                    getTableTahun();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                jQuery('#wrap-loading').hide();
                 alert('Terjadi kesalahan saat mengirim data!');
             }
         });

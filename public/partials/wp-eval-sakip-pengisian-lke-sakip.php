@@ -88,7 +88,7 @@ $get_nama_komponen = $wpdb->get_results(
         <thead>
             <tr>
                 <th class="text-center">N0</th>
-                <th class="text-center">NAMA SKPD</th>
+                <th class="text-center">NAMA PERANGKAT DAERAH</th>
                 <th class="text-center">NILAI USULAN</th>
                 <?php
                     if (!empty($get_nama_komponen)) {

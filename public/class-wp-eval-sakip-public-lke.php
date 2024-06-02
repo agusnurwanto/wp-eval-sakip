@@ -307,7 +307,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					$ret['message'] = 'Id Jadwal kosong!';
 				} else if ($ret['status'] != 'error' && empty($_POST['id_skpd'])) {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				} else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun anggaran kosong!';
@@ -339,7 +339,8 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					$started_at_dt = new DateTime($started_at);
 					$end_at_dt = new DateTime($end_at);
 					$jenis_jadwal = $data_jadwal['jenis_jadwal'];
-					if($data_jadwal['status'] == 2) {
+					$tampil_nilai_penetapan = $data_jadwal['tampil_nilai_penetapan'];
+					if ($data_jadwal['status'] == 2) {
 						$prefix_history = '_history';
 					} else {
 						$prefix_history = null;
@@ -518,6 +519,8 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												kp.nama AS kp_nama,
 												kp.tipe AS kp_tipe,
 												kp.keterangan AS kp_keterangan,
+												kp.penjelasan AS kp_penjelasan,
+												kp.langkah_kerja AS kp_langkah_kerja,
 												kp.active AS kp_active,
 												pl.id AS pl_id,
 												pl.id_user AS pl_id_user,
@@ -554,6 +557,8 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												kp.nama AS kp_nama,
 												kp.tipe AS kp_tipe,
 												kp.keterangan AS kp_keterangan,
+												kp.penjelasan AS kp_penjelasan,
+												kp.langkah_kerja AS kp_langkah_kerja,
 												kp.active AS kp_active,
 												pl.id AS pl_id,
 												pl.id_user AS pl_id_user,
@@ -769,15 +774,15 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 										}
 										$tombol_bukti = "";
 										if ($disabled == '') {
-											$tombol_bukti = "<button type='button' class='btn btn-primary btn-sm' title='Tambah bukti dukung' onclick='tambahBuktiDukung(" . $id_skpd . "," . $penilaian['kp_id'] . ")' id='buktiDukung" . $penilaian['kp_id'] . "'><i class='dashicons dashicons-plus'></i></button>";
+											$tombol_bukti = "<button type='button' class='btn btn-primary btn-sm' title='Tambah bukti dukung' onclick='tambahBuktiDukung(" . $id_skpd . "," . $penilaian['kp_id'] . ")' id='buktiDukung" . $penilaian['kp_id'] . "' title='Tambah Bukti Dukung'><i class='dashicons dashicons-plus'></i></button>";
 										}
 										//tbody isi
 										$tbody2 .= "<tr kp-id='" . $penilaian['kp_id'] . "'>";
 										$tbody2 .= "<td class='text-left'></td>";
 										$tbody2 .= "<td class='text-left'></td>";
 										$tbody2 .= "<td class='text-left'>" . $counter_isi++ . "</td>";
-										$tbody2 .= "<td class='text-left'>" . $penilaian['kp_nama'] . "<br><small class='text-muted'>" . $penilaian['kp_keterangan'] . "</small></td>";
-										$tbody2 .= "<td class='text-center'>-</td>";
+										$tbody2 .= "<td class='text-left'>" . $penilaian['kp_nama'] . "<br><small class='text-muted'> Keterangan : " . $penilaian['kp_keterangan'] . "</small></td>";
+										$tbody2 .= "<td class='text-center'><button class='btn btn-secondary' onclick='infoPenjelasan(" . $penilaian['kp_id'] . ")' title='Info Nilai'><span class='dashicons dashicons-info'></span></button></td>";
 										switch ($can_verify) {
 											case false:
 												if (!$this->is_admin_panrb()) {
@@ -875,7 +880,11 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 						$merged_data['tbody'] = $tbody;
 						$merged_data['total_nilai'] = number_format($total_nilai, 2);
-						$merged_data['total_nilai_penetapan'] = number_format($total_nilai_penetapan, 2);
+						if ($tampil_nilai_penetapan == 1) {
+							$merged_data['total_nilai_penetapan'] = number_format($total_nilai_penetapan, 2);
+						} else {
+							$merged_data['total_nilai_penetapan'] = '-';
+						}
 					}
 				} else {
 					$tbody = "<tr><td colspan='4' class='text-center'>Tidak ada data tersedia</td></tr>";
@@ -909,7 +918,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				if ($ret['status'] != 'error' && empty($_POST['id_skpd'])) {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				} else if ($ret['status'] != 'error' && empty($_POST['id_komponen_penilaian'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Komponen Penilaian kosong!';
@@ -1083,7 +1092,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				if ($ret['status'] != 'error' && empty($_POST['id_skpd'])) {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Id SKPD kosong!';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				} else if ($ret['status'] != 'error' && empty($_POST['id_komponen_penilaian'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Komponen Penilaian kosong!';
@@ -1696,6 +1705,50 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					}
 					$ret['data'] = json_decode($bukti_dukung, true);
 				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	function get_penjelasan_lke()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$penjelasans = $wpdb->get_row(
+					$wpdb->prepare("
+						SELECT 
+							penjelasan,
+							langkah_kerja
+						FROM esakip_komponen_penilaian
+						WHERE id =%d
+					", $_POST['id']),
+					ARRAY_A
+				);
+
+				if ($penjelasans) {
+					$tbody = "<tr class='text-left'><td>" . $penjelasans['penjelasan'] . "</td><td>" . $penjelasans['langkah_kerja'] . "</td></tr>";
+				} else {
+					$tbody = "<tr class='text-left' colspan='2'>tidak ada data tersedia</tr>";
+
+				}
+				$ret['data'] = $tbody;
 			} else {
 				$ret = array(
 					'status' => 'error',

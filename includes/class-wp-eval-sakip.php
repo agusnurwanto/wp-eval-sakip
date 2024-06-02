@@ -299,6 +299,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_tambah_dokumen_rpjmd', $plugin_public, 'tambah_dokumen_rpjmd');
 		$this->loader->add_action('wp_ajax_hapus_dokumen_rpjmd', $plugin_public, 'hapus_dokumen_rpjmd');
 		$this->loader->add_action('wp_ajax_get_table_rpjmd', $plugin_public, 'get_table_rpjmd');
+		$this->loader->add_action('wp_ajax_hapus_tahun_dokumen_rpjmd', $plugin_public, 'hapus_tahun_dokumen_rpjmd');
 
 		$this->loader->add_action('wp_ajax_get_detail_rpjpd_by_id', $plugin_public, 'get_detail_rpjpd_by_id');
 		$this->loader->add_action('wp_ajax_tambah_dokumen_rpjpd', $plugin_public, 'tambah_dokumen_rpjpd');
@@ -351,6 +352,25 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_table_skpd_dokumen', $plugin_public, 'get_table_skpd_dokumen');
 		$this->loader->add_action('wp_ajax_submit_tahun_dokumen', $plugin_public, 'submit_tahun_dokumen');
 
+		$this->loader->add_action('wp_ajax_hapus_tahun_dokumen_lainnya', $plugin_public, 'hapus_tahun_dokumen_lainnya');
+		$this->loader->add_action('wp_ajax_hapus_tahun_dokumen_other_file', $plugin_public, 'hapus_tahun_dokumen_other_file');
+		$this->loader->add_action('wp_ajax_hapus_tahun_dokumen_rpjmd', $plugin_public, 'hapus_tahun_dokumen_rpjmd');
+		$this->loader->add_action('wp_ajax_hapus_tahun_dokumen_renstra', $plugin_public, 'hapus_tahun_dokumen_renstra');
+		$this->loader->add_action('wp_ajax_hapus_tahun_dokumen_laporan_monev_renaksi', $plugin_public, 'hapus_tahun_dokumen_laporan_monev_renaksi');
+		$this->loader->add_action('wp_ajax_hapus_tahun_dokumen_perjanjian_kinerja', $plugin_public, 'hapus_tahun_dokumen_perjanjian_kinerja');
+		$this->loader->add_action('wp_ajax_hapus_tahun_dokumen_rencana_aksi', $plugin_public, 'hapus_tahun_dokumen_rencana_aksi');
+		$this->loader->add_action('wp_ajax_hapus_tahun_dokumen_iku', $plugin_public, 'hapus_tahun_dokumen_iku');
+		$this->loader->add_action('wp_ajax_hapus_tahun_dokumen_evaluasi_internal', $plugin_public, 'hapus_tahun_dokumen_evaluasi_internal');
+		$this->loader->add_action('wp_ajax_hapus_tahun_dokumen_pengukuran_kinerja', $plugin_public, 'hapus_tahun_dokumen_pengukuran_kinerja');
+		$this->loader->add_action('wp_ajax_hapus_tahun_dokumen_pengukuran_rencana_aksi', $plugin_public, 'hapus_tahun_dokumen_pengukuran_rencana_aksi');
+		$this->loader->add_action('wp_ajax_hapus_tahun_dokumen_laporan_kinerja', $plugin_public, 'hapus_tahun_dokumen_laporan_kinerja');
+		$this->loader->add_action('wp_ajax_hapus_tahun_dokumen_rkpd', $plugin_public, 'hapus_tahun_dokumen_rkpd');
+		$this->loader->add_action('wp_ajax_hapus_tahun_dokumen_lkjip_lppd', $plugin_public, 'hapus_tahun_dokumen_lkjip_lppd');
+		$this->loader->add_action('wp_ajax_hapus_tahun_dokumen_dpa', $plugin_public, 'hapus_tahun_dokumen_dpa');
+		$this->loader->add_action('wp_ajax_hapus_tahun_dokumen_renja_rkt', $plugin_public, 'hapus_tahun_dokumen_renja_rkt');
+		$this->loader->add_action('wp_ajax_hapus_tahun_dokumen_skp', $plugin_public, 'hapus_tahun_dokumen_skp');
+		$this->loader->add_action('wp_ajax_hapus_tahun_dokumen_tipe', $plugin_public, 'hapus_tahun_dokumen_tipe');
+
 		$this->loader->add_action('wp_ajax_get_table_tahun_renstra', $plugin_public, 'get_table_tahun_renstra');
 		$this->loader->add_action('wp_ajax_get_table_skpd_renstra', $plugin_public, 'get_table_skpd_renstra');
 		$this->loader->add_action('wp_ajax_get_table_tahun_rpjmd', $plugin_public, 'get_table_tahun_rpjmd');
@@ -391,6 +411,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_table_tahun_laporan_monev_renaksi', $plugin_public, 'get_table_tahun_laporan_monev_renaksi');
 		$this->loader->add_action('wp_ajax_submit_tahun_laporan_monev_renaksi', $plugin_public, 'submit_tahun_laporan_monev_renaksi');
 		$this->loader->add_action('wp_ajax_submit_bukti_dukung', $plugin_public, 'submit_bukti_dukung');
+		$this->loader->add_action('wp_ajax_get_penjelasan_lke', $plugin_public, 'get_penjelasan_lke');
  
 		$this->loader->add_action('wp_ajax_get_detail_pedoman_teknis_perencanaan_by_id', $plugin_public, 'get_detail_pedoman_teknis_perencanaan_by_id');
 		$this->loader->add_action('wp_ajax_tambah_dokumen_pedoman_teknis_perencanaan', $plugin_public, 'tambah_dokumen_pedoman_teknis_perencanaan');

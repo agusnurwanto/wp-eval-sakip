@@ -263,6 +263,7 @@ CREATE TABLE `esakip_data_jadwal` (
   `jenis_jadwal` varchar(30) DEFAULT NULL,
   `tipe` varchar(30) DEFAULT NULL COMMENT 'RPJMD, LKE',
   `lama_pelaksanaan` int(11) DEFAULT NULL,
+  `tampil_nilai_penetapan` NOT NULL DEFAULT '1' COMMENT '1 Tampil, 0 Tidak Tampil',
   `tahun_anggaran` year(4) NOT NULL DEFAULT '2022',
   PRIMARY KEY  (id)
 );
@@ -297,6 +298,8 @@ CREATE TABLE esakip_komponen_penilaian (
   `tipe` varchar(30) DEFAULT NULL COMMENT '1 = Ya/Tidak, 2 = A/B/C/D',
   `keterangan` varchar(255) DEFAULT NULL,
   `jenis_bukti_dukung` text DEFAULT NULL,
+  `penjelasan` text DEFAULT NULL,
+  `langkah_kerja` text DEFAULT NULL,
   `active` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY  (`id`)
 );

@@ -78,6 +78,12 @@ $tahun_anggaran = $input['tahun_anggaran'];
 						<option value="penetapan">Penetapan</option>
 					</select>
 				</div>
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value="1" id="tampilNilaiPenetapan">
+					<label class="form-check-label" for="tampilNilaiPenetapan">
+						Tampilkan Nilai Penetapan
+					</label>
+				</div>
 			</div>
 			<div class="modal-footer">
 				<button class="btn btn-primary submitBtn" onclick="submitTambahJadwalForm()">Simpan</button>
@@ -196,6 +202,10 @@ $tahun_anggaran = $input['tahun_anggaran'];
 		jQuery("#wrap-loading").show()
 		let this_tahun_anggaran = tahun_anggaran;
 		let nama_jadwal = jQuery('#nama_jadwal').val()
+		let tampilNilaiPenetapan = jQuery('input[id="tampilNilaiPenetapan"]:checked').val();
+		if (tampilNilaiPenetapan != 1){
+			tampilNilaiPenetapan = 0
+		}
 		let jadwalMulai = jQuery("#jadwal_tanggal").data('daterangepicker').startDate.format('YYYY-MM-DD HH:mm:ss')
 		let jadwalSelesai = jQuery("#jadwal_tanggal").data('daterangepicker').endDate.format('YYYY-MM-DD HH:mm:ss')
 		let jenis_jadwal = 1;
@@ -217,6 +227,7 @@ $tahun_anggaran = $input['tahun_anggaran'];
 					'jadwal_selesai': jadwalSelesai,
 					'jenis_jadwal': jenis_jadwal,
 					'tipe': tipe,
+					'tampil_nilai_penetapan': tampilNilaiPenetapan,
 					'tahun_anggaran': this_tahun_anggaran
 				},
 				beforeSend: function() {
@@ -256,8 +267,15 @@ $tahun_anggaran = $input['tahun_anggaran'];
 			},
 			dataType: "json",
 			success: function(response) {
+				jQuery('input[type=checkbox]').prop('checked', false);
 				jQuery("#wrap-loading").hide()
 				jQuery("#nama_jadwal").val(response.data.nama_jadwal);
+				if (response.data.tampil_nilai_penetapan == 1){
+					jQuery('#tampilNilaiPenetapan').prop('checked', true)
+				} else {
+					jQuery('#tampilNilaiPenetapan').prop('checked', false)
+
+				}
 				jQuery("#jenis_jadwal").val(response.data.jenis_jadwal).change();
 				jQuery('#jadwal_tanggal').data('daterangepicker').setStartDate(moment(response.data.started_at).format('DD-MM-YYYY HH:mm'));
 				jQuery('#jadwal_tanggal').data('daterangepicker').setEndDate(moment(response.data.end_at).format('DD-MM-YYYY HH:mm'));
@@ -271,6 +289,10 @@ $tahun_anggaran = $input['tahun_anggaran'];
 		let nama_jadwal = jQuery('#nama_jadwal').val()
 		let jadwalMulai = jQuery("#jadwal_tanggal").data('daterangepicker').startDate.format('YYYY-MM-DD HH:mm:ss')
 		let jadwalSelesai = jQuery("#jadwal_tanggal").data('daterangepicker').endDate.format('YYYY-MM-DD HH:mm:ss')
+		let tampilNilaiPenetapan = jQuery('input[id="tampilNilaiPenetapan"]:checked').val();
+		if (tampilNilaiPenetapan != 1){
+			tampilNilaiPenetapan = 0
+		}
 		let jenis_jadwal = jQuery("#jenis_jadwal").val();
 		if (nama_jadwal.trim() == '' || jadwalMulai == '' || jadwalSelesai == '' || jenis_jadwal == '') {
 			jQuery("#wrap-loading").hide()
@@ -288,6 +310,7 @@ $tahun_anggaran = $input['tahun_anggaran'];
 					'jadwal_mulai': jadwalMulai,
 					'jadwal_selesai': jadwalSelesai,
 					'jenis_jadwal': jenis_jadwal,
+					'tampil_nilai_penetapan': tampilNilaiPenetapan,
 					'id': id,
 					'tipe': tipe,
 					'tahun_anggaran': this_tahun_anggaran
@@ -420,11 +443,11 @@ $tahun_anggaran = $input['tahun_anggaran'];
 
 		jQuery("body .report").html(modal);
 		get_jadwal_by_id(id)
-			list_perangkat_daerah()
-				.then(function() {
-					jQuery("#modal-report").modal('show');
-					jQuery('.jenis').select2({
-						width: '100%'
+		list_perangkat_daerah()
+			.then(function() {
+				jQuery("#modal-report").modal('show');
+				jQuery('.jenis').select2({
+					width: '100%'
 				});
 			})
 	}
