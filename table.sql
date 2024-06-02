@@ -547,3 +547,18 @@ CREATE TABLE `esakip_pohon_kinerja` (
   `update_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id)
 );
+
+
+CREATE TABLE `esakip_menu_dokumen` (
+  `id` int(11) NOT NULL auto_increment,
+  `nama_tabel` varchar(255) NOT NULL,
+  `nama_dokumen` varchar(255) NOT NULL,
+  `user_role` varchar(255) NOT NULL,
+  `jenis_role` int(11) DEFAULT NULL,
+  `keterangan` varchar(255) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `tahun_anggaran` year NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp,
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp,
+  PRIMARY key (id)
+);

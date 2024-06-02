@@ -425,6 +425,10 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_edit_indikator_pokin_level1',  $plugin_public, 'edit_indikator_pokin_level1');
 		$this->loader->add_action('wp_ajax_update_indikator_pokin_level1',  $plugin_public, 'update_indikator_pokin_level1');
 		$this->loader->add_action('wp_ajax_delete_indikator_pokin_level1',  $plugin_public, 'delete_indikator_pokin_level1');
+
+		$this->loader->add_action('wp_ajax_get_data_pengaturan_menu',  $plugin_public, 'get_data_pengaturan_menu');
+		$this->loader->add_action('wp_ajax_get_pengaturan_menu_by_id',  $plugin_public, 'get_pengaturan_menu_by_id');
+		$this->loader->add_action('wp_ajax_submit_edit_pengaturan_menu_dokumen',  $plugin_public, 'submit_edit_pengaturan_menu_dokumen');
 		
 		add_shortcode('jadwal_evaluasi_sakip', array($plugin_public, 'jadwal_evaluasi_sakip'));
 		add_shortcode('halaman_mapping_skpd', array($plugin_public, 'halaman_mapping_skpd'));
@@ -461,6 +465,8 @@ class Wp_Eval_Sakip {
 
 		add_shortcode('jadwal_rpjmd', array($plugin_public, 'jadwal_rpjmd'));
 		add_shortcode('jadwal_rpjpd', array($plugin_public, 'jadwal_rpjpd'));
+
+		add_shortcode('pengaturan_menu', array($plugin_public, 'pengaturan_menu'));
 
 		add_shortcode('dokumen_detail_pohon_kinerja_dan_cascading', array($plugin_public, 'dokumen_detail_pohon_kinerja_dan_cascading'));
 		add_shortcode('dokumen_detail_lhe_akip_internal', array($plugin_public, 'dokumen_detail_lhe_akip_internal'));
