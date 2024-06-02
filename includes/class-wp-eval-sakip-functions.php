@@ -457,6 +457,44 @@ class Esakip_Functions
         }
     }
 
+    function renameFile($oldName, $newName, $ext=array('pdf')) {
+        if (empty($newName)) {
+            return array(
+                'status' => 'error',
+                'message' => "Nama file tidak boleh kosong!"
+            );
+        }
+        $fileInfo = pathinfo($newName);
+        $ext_file = strtolower($fileInfo['extension']);
+        if (isset($fileInfo['extension']) && !in_array($ext_file, $ext)) {
+            return array(
+                'status' => 'error',
+                'message' => "Nama file harus berextension ".implode(', ', $ext)
+            );
+        }else if(!file_exists($oldName)) {
+            return array(
+                'status' => 'error',
+                'message' => "File tidak ditemukan: $oldName"
+            );
+        }else if(file_exists($newName)) {
+            return array(
+                'status' => 'error',
+                'message' => "File dengan nama $newName sudah ada!"
+            );
+        }
+        if(rename($oldName, $newName)) {
+            return array(
+                'status' => 'success',
+                'message' => "File berhasil di-rename dari $oldName ke $newName"
+            );
+        } else {
+            return array(
+                'status' => 'error',
+                'message' => "Gagal merename file $oldName ke $newName"
+            );
+        }
+    }
+
     function getFullUrl() {
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
         $fullUrl = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
