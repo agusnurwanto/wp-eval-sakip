@@ -498,15 +498,32 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								$tbody2 .= "<td class='text-left'></td>";
 								$tbody2 .= "<td class='text-left'>" . $counter_sub++ . "</td>";
 								$tbody2 .= "<td class='text-left' colspan='2'><b>" . $subkomponen['nama'] . "</b></td>";
-								$tbody2 .= "<td class='text-center'>" . $subkomponen['bobot'] . "</td>";
-								$tbody2 .= "<td class='text-left'></td>";
-								$tbody2 .= "<td class='text-center'>" . number_format($total_nilai_sub, 2) . "</td>";
-								$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub * 100, 2) . "%" . "</td>";
-								$tbody2 .= "<td class='text-center' colspan='3'></td>";
-								$tbody2 .= "<td class='text-center'></td>";
-								$tbody2 .= "<td class='text-center'>" . number_format($total_nilai_sub_penetapan, 2) . "</td>";
-								$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub_penetapan * 100, 2) . "%" . "</td>";
-								$tbody2 .= "<td class='text-left' colspan='3'>User Penilai: <b>" . $user_penilai[$subkomponen['id_user_penilai']] . "</b></td>";
+								if(
+									$_POST['excel'] == 'false' 
+									|| $_POST['excel'] == 'usulan' 
+									|| $_POST['excel'] == 'usulan_penetapan'
+								){
+									$tbody2 .= "<td class='text-center'>" . $subkomponen['bobot'] . "</td>";
+									$tbody2 .= "<td class='text-left'></td>";
+									$tbody2 .= "<td class='text-center'>" . number_format($total_nilai_sub, 2) . "</td>";
+									$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub * 100, 2) . "%" . "</td>";
+									$tbody2 .= "<td class='text-center' colspan='3'></td>";
+								}
+
+								// kolom bukti dukung di laporan penetapan
+								if($_POST['excel'] == 'penetapan'){
+									$tbody2 .= "<td class='text-center'></td>";
+								}
+								if(
+									$_POST['excel'] == 'false' 
+									|| $_POST['excel'] == 'penetapan' 
+									|| $_POST['excel'] == 'usulan_penetapan'
+								){
+									$tbody2 .= "<td class='text-center'></td>";
+									$tbody2 .= "<td class='text-center'>" . number_format($total_nilai_sub_penetapan, 2) . "</td>";
+									$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub_penetapan * 100, 2) . "%" . "</td>";
+									$tbody2 .= "<td class='text-left' colspan='3'>User Penilai: <b>" . $user_penilai[$subkomponen['id_user_penilai']] . "</b></td>";
+								}
 								$tbody2 .= "</tr>";
 
 								if (empty($prefix_history)) {
@@ -782,7 +799,11 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 										$tbody2 .= "<td class='text-left'></td>";
 										$tbody2 .= "<td class='text-left'>" . $counter_isi++ . "</td>";
 										$tbody2 .= "<td class='text-left'>" . $penilaian['kp_nama'] . "<br><small class='text-muted'> Keterangan : " . $penilaian['kp_keterangan'] . "</small></td>";
-										$tbody2 .= "<td class='text-center'><button class='btn btn-secondary' onclick='infoPenjelasan(" . $penilaian['kp_id'] . ")' title='Info Nilai'><span class='dashicons dashicons-info'></span></button></td>";
+										if($_POST['excel'] == 'false'){
+											$tbody2 .= "<td class='text-center'><button class='btn btn-secondary' onclick='infoPenjelasan(" . $penilaian['kp_id'] . ")' title='Info Nilai'><span class='dashicons dashicons-info'></span></button></td>";
+										}else{
+											$tbody2 .= "<td class='text-center'></td>";
+										}
 										switch ($can_verify) {
 											case false:
 												if (!$this->is_admin_panrb()) {
@@ -793,29 +814,61 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												} else {
 													$tbody2 .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "' disabled>" . $opsi . "</select></td>";
 												}
-												$tbody2 .= "<td class='text-center'>" . $nilai_usulan . "</td>";
-												$tbody2 .= "<td class='text-center'></td>";
+												if(
+													$_POST['excel'] == 'false' 
+													|| $_POST['excel'] == 'usulan' 
+													|| $_POST['excel'] == 'usulan_penetapan'
+												){
+													$tbody2 .= "<td class='text-center'>" . $nilai_usulan . "</td>";
+													$tbody2 .= "<td class='text-center'></td>";
+												}
 												if (!$this->is_admin_panrb()) {
 													$tbody2 .= "<td class='text-center'><div class='bukti-dukung-view' kp-id='" . $penilaian['kp_id'] . "'>" . $bukti_dukung . "</div>" . $tombol_bukti . "</td>";
-													$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "' $disabled>" . $penilaian['pl_keterangan'] . "</textarea></td>";
+													if(
+														$_POST['excel'] == 'false' 
+														|| $_POST['excel'] == 'usulan' 
+														|| $_POST['excel'] == 'usulan_penetapan'
+													){
+														$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "' $disabled>" . $penilaian['pl_keterangan'] . "</textarea></td>";
+													}
 												} else {
 													$tbody2 .= "<td class='text-center'><div class='bukti-dukung-view' kp-id='" . $penilaian['kp_id'] . "'>" . $bukti_dukung . "</div></td>";
-													$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan'] . "</textarea></td>";
+													if(
+														$_POST['excel'] == 'false' 
+														|| $_POST['excel'] == 'usulan' 
+														|| $_POST['excel'] == 'usulan_penetapan'
+													){
+														$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan'] . "</textarea></td>";
+													}
 												}
-												$tbody2 .= $kerangka_logis;
-												$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' disabled>" . $opsi_penetapan . "</select></td>";
-												$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
-												$tbody2 .= "<td class='text-center'></td>";
-												$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
-												$tbody2 .= $kerangka_logis_penetapan;
-												if ($disabled == '') {
-													if (!$this->is_admin_panrb()) {
-														$tbody2 .= "<td class='text-center'>" . $btn_save . "</td>";
+												if(
+													$_POST['excel'] == 'false' 
+													|| $_POST['excel'] == 'usulan' 
+													|| $_POST['excel'] == 'usulan_penetapan'
+												){
+													$tbody2 .= $kerangka_logis;
+												}
+												if(
+													$_POST['excel'] == 'false' 
+													|| $_POST['excel'] == 'penetapan' 
+													|| $_POST['excel'] == 'usulan_penetapan'
+												){
+													$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' disabled>" . $opsi_penetapan . "</select></td>";
+													$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
+													$tbody2 .= "<td class='text-center'></td>";
+													$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
+													$tbody2 .= $kerangka_logis_penetapan;
+												}
+												if($_POST['excel'] == 'false'){
+													if ($disabled == '') {
+														if (!$this->is_admin_panrb()) {
+															$tbody2 .= "<td class='text-center'>" . $btn_save . "</td>";
+														} else {
+															$tbody2 .= "<td class='text-center'></td>";
+														}
 													} else {
 														$tbody2 .= "<td class='text-center'></td>";
 													}
-												} else {
-													$tbody2 .= "<td class='text-center'></td>";
 												}
 												break;
 											case true:
@@ -823,25 +876,45 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 													$btn_save_penetapan = "<button class='btn btn-info' onclick='simpanPerubahanPenetapan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan Penetapan'><span class='dashicons dashicons-saved' ></span></button>";
 												}
 
-												$tbody2 .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "' disabled>" . $opsi . "</select></td>";
-												$tbody2 .= "<td class='text-center'>" . $nilai_usulan . "</td>";
-												$tbody2 .= "<td class='text-center'></td>";
+												if(
+													$_POST['excel'] == 'false' 
+													|| $_POST['excel'] == 'usulan' 
+													|| $_POST['excel'] == 'usulan_penetapan'
+												){
+													$tbody2 .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "' disabled>" . $opsi . "</select></td>";
+													$tbody2 .= "<td class='text-center'>" . $nilai_usulan . "</td>";
+													$tbody2 .= "<td class='text-center'></td>";
+												}
 												$tbody2 .= "<td class='text-center'><div class='bukti-dukung-view' kp-id='" . $penilaian['kp_id'] . "'>" . $bukti_dukung . "</div></td>";
-												$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan'] . "</textarea></td>";
-												$tbody2 .= $kerangka_logis;
-												$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' " . $disabled . ">" . $opsi_penetapan . "</select></td>";
-												$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
-												$tbody2 .= "<td class='text-center'></td>";
-												$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'" . $disabled . ">" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
-												$tbody2 .= $kerangka_logis_penetapan;
-												if ($disabled == '') {
-													if (!$this->is_admin_panrb()) {
-														$tbody2 .= "<td class='text-center'>" . $btn_save_penetapan . "</td>";
+												if(
+													$_POST['excel'] == 'false' 
+													|| $_POST['excel'] == 'usulan' 
+													|| $_POST['excel'] == 'usulan_penetapan'
+												){
+													$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan'] . "</textarea></td>";
+													$tbody2 .= $kerangka_logis;
+												}
+												if(
+													$_POST['excel'] == 'false' 
+													|| $_POST['excel'] == 'penetapan' 
+													|| $_POST['excel'] == 'usulan_penetapan'
+												){
+													$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' " . $disabled . ">" . $opsi_penetapan . "</select></td>";
+													$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
+													$tbody2 .= "<td class='text-center'></td>";
+													$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'" . $disabled . ">" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
+													$tbody2 .= $kerangka_logis_penetapan;
+												}
+												if($_POST['excel'] == 'false'){
+													if ($disabled == '') {
+														if (!$this->is_admin_panrb()) {
+															$tbody2 .= "<td class='text-center'>" . $btn_save_penetapan . "</td>";
+														} else {
+															$tbody2 .= "<td class='text-center'></td>";
+														}
 													} else {
 														$tbody2 .= "<td class='text-center'></td>";
 													}
-												} else {
-													$tbody2 .= "<td class='text-center'></td>";
 												}
 												break;
 										}
@@ -867,18 +940,40 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						$tbody .= "<td class='text-left'>" . $counter++ . "</td>";
 						$tbody .= "<td class='text-left' colspan='3'><b>" . $komponen['nama'] . "</b></td>";
 						$tbody .= "<td class='text-center'>" . $komponen['bobot'] . "</td>";
-						$tbody .= "<td class='text-left'></td>";
-						$tbody .= "<td class='text-center'>" . number_format($sum_nilai_sub, 2) . "</td>";
-						$tbody .= "<td class='text-center'>" . number_format($persentase_kom * 100, 2) . "%" . "</td>";
-						$tbody .= "<td class='text-center' colspan='3'></td>";
-						$tbody .= "<td class='text-center'></td>";
-						$tbody .= "<td class='text-center'>" . number_format($sum_nilai_sub_penetapan, 2) .  "</td>";
-						$tbody .= "<td class='text-center'>" . number_format($persentase_kom_penetapan * 100, 2) . "%" . "</td>";
-						$tbody .= "<td class='text-left' colspan='3'></td>";
+						if(
+							$_POST['excel'] == 'false' 
+							|| $_POST['excel'] == 'usulan' 
+							|| $_POST['excel'] == 'usulan_penetapan'
+						){
+							$tbody .= "<td class='text-left'></td>";
+							$tbody .= "<td class='text-center'>" . number_format($sum_nilai_sub, 2) . "</td>";
+							$tbody .= "<td class='text-center'>" . number_format($persentase_kom * 100, 2) . "%" . "</td>";
+							$tbody .= "<td class='text-center' colspan='3'></td>";
+						}
+
+						// kolom bukti dukung di laporan penetapan
+						if($_POST['excel'] == 'penetapan'){
+							$tbody2 .= "<td class='text-center'></td>";
+						}
+						if(
+							$_POST['excel'] == 'false' 
+							|| $_POST['excel'] == 'penetapan' 
+							|| $_POST['excel'] == 'usulan_penetapan'
+						){
+							$tbody .= "<td class='text-center'></td>";
+							$tbody .= "<td class='text-center'>" . number_format($sum_nilai_sub_penetapan, 2) .  "</td>";
+							$tbody .= "<td class='text-center'>" . number_format($persentase_kom_penetapan * 100, 2) . "%" . "</td>";
+						}
+						if(
+							$_POST['excel'] == 'false' 
+							|| $_POST['excel'] == 'penetapan' 
+							|| $_POST['excel'] == 'usulan_penetapan'
+						){
+							$tbody .= "<td class='text-center' colspan='3'></td>";
+						}
 						$tbody .= "</tr>";
 						$tbody .= $tbody2;
 
-						$merged_data['tbody'] = $tbody;
 						$merged_data['total_nilai'] = number_format($total_nilai, 2);
 						if ($tampil_nilai_penetapan == 1) {
 							$merged_data['total_nilai_penetapan'] = number_format($total_nilai_penetapan, 2);
@@ -890,6 +985,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					$tbody = "<tr><td colspan='4' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 
+				$merged_data['tbody'] = $tbody;
 				$ret['data'] = $merged_data;
 			} else {
 				$ret = array(
