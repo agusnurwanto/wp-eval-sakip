@@ -821,8 +821,7 @@ class Wp_Eval_Sakip_Admin
 		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
 		        		</style>
 		        	')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'renstra')));
+			));
 
 		Container::make('theme_options', __('RENSTRA'))
 			->set_page_parent($dokumen_menu)
@@ -954,31 +953,31 @@ class Wp_Eval_Sakip_Admin
 
 
 
-		// Container::make('theme_options', __('Rencana Aksi'))
-		// 	->set_page_parent($dokumen_menu)
-		// 	->add_fields(array(
-		// 		Field::make('html', 'crb_rencana_aksi_hide_sidebar')
-		// 			->set_html('
-		// 				<style>
-		// 					.postbox-container { display: none; }
-		// 					#poststuff #post-body.columns-2 { margin: 0 !important; }
-		// 				</style>
-		// 			')
-		// 	))
-		// 	->add_fields($this->get_ajax_field(array('type' => 'rencana_aksi')));
+		Container::make('theme_options', __('Rencana Aksi'))
+			->set_page_parent($dokumen_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_rencana_aksi_hide_sidebar')
+					->set_html('
+						<style>
+							.postbox-container { display: none; }
+							#poststuff #post-body.columns-2 { margin: 0 !important; }
+						</style>
+					')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'rencana_aksi')));
 		
-		// Container::make('theme_options', __('SKP'))
-		// 	->set_page_parent($dokumen_menu)
-		// 	->add_fields(array(
-		// 		Field::make('html', 'crb_skp_hide_sidebar')
-		// 			->set_html('
-		// 				<style>
-		// 					.postbox-container { display: none; }
-		// 					#poststuff #post-body.columns-2 { margin: 0 !important; }
-		// 				</style>
-		// 			')
-		// 	))
-		// 	->add_fields($this->get_ajax_field(array('type' => 'skp')));
+		Container::make('theme_options', __('SKP'))
+			->set_page_parent($dokumen_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_skp_hide_sidebar')
+					->set_html('
+						<style>
+							.postbox-container { display: none; }
+							#poststuff #post-body.columns-2 { margin: 0 !important; }
+						</style>
+					')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'skp')));
 		// Container::make('theme_options', __('Pengukuran Kinerja'))
 		// 	->set_page_parent($dokumen_menu)
 		// 	->add_fields(array(
@@ -1004,18 +1003,18 @@ class Wp_Eval_Sakip_Admin
 		// 	))
 		// 	->add_fields($this->get_ajax_field(array('type' => 'pengukuran_rencana_aksi')));
 			
-		// Container::make('theme_options', __('Evaluasi Internal'))
-		// 	->set_page_parent($dokumen_menu)
-		// 	->add_fields(array(
-		// 		Field::make('html', 'crb_evaluasi_internal_hide_sidebar')
-		// 			->set_html('
-		// 			<style>
-		// 				.postbox-container { display: none; }
-		// 				#poststuff #post-body.columns-2 { margin: 0 !important; }
-		// 			</style>
-		// 		')
-		// 	))
-		// 	->add_fields($this->get_ajax_field(array('type' => 'evaluasi_internal')));
+		Container::make('theme_options', __('Evaluasi Internal'))
+			->set_page_parent($dokumen_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_evaluasi_internal_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'evaluasi_internal')));
 			
 		// Container::make('theme_options', __('TL LHE AKIP Kemenpan'))
 		// ->set_page_parent($dokumen_menu)
