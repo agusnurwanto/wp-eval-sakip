@@ -680,6 +680,168 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		return in_array('admin_panrb', $current_user->roles);
 	}
 
+	public function dokumen_detail_dpa_pemda($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-dpa-pemda.php';
+	}
+
+	public function dokumen_detail_skp_pemda($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-skp-pemda.php';
+	}
+
+	public function dokumen_detail_rencana_aksi_pemda($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-rencana-aksi-pemda.php';
+	}
+
+	public function dokumen_detail_perjanjian_kinerja_pemda($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-perjanjian-kinerja-pemda.php';
+	}
+
+	public function dokumen_detail_evaluasi_internal_pemda($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-evaluasi-internal-pemda.php';
+	}
+
+	public function dokumen_detail_iku_pemda($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-iku-pemda.php';
+	}
+
+	public function dokumen_detail_laporan_kinerja_pemda($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-laporan-kinerja-pemda.php';
+	}
+
+	public function dokumen_detail_dokumen_lainnya_pemda($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-dokumen-lain-pemda.php';
+	}
+
+	public function dokumen_detail_pohon_kinerja_dan_cascading_pemda($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-pohon-kinerja-dan-cascading-pemda.php';
+	}
+
+	public function dokumen_detail_lhe_akip_internal_pemda($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-lhe-akip-internal-pemda.php';
+	}
+
+	public function dokumen_detail_tl_lhe_akip_internal_pemda($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-tl-lhe-akip-internal-pemda.php';
+	}
+
+	public function dokumen_detail_tl_lhe_akip_kemenpan_pemda($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-tl-lhe-akip-kemenpan-pemda.php';
+	}
+
+	public function dokumen_detail_laporan_monev_renaksi_pemda($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-laporan-monev-renaksi-pemda.php';
+	}
+
+	public function dokumen_detail_pedoman_teknis_perencanaan_pemda($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-pedoman-teknis-perencanaan-pemda.php';
+	}
+
+	public function dokumen_detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-pedoman-teknis-pengukuran-dan-pengumpulan-data-kinerja-pemda.php';
+	}
+
+	public function dokumen_detail_pedoman_teknis_evaluasi_internal_pemda($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-pedoman-teknis-evaluasi-internal-pemda.php';
+	}
+
+	public function dokumen_detail_lkjip_lppd_pemda($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-lkjip-pemda.php';
+	}
+
+	public function dokumen_detail_rkpd_pemda($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-rkpd-pemda.php';
+	}
+
 	public function get_detail_renja_rkt_by_id()
 	{
 		global $wpdb;
@@ -14627,246 +14789,236 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$periode_renstra_skpd .= '<li><a target="_blank" href="' . $renstra_skpd['url'] . '" class="btn btn-primary">' . $title_renstra . '</a></li>';
 		}
 		// PEMDA
-		if(!empty($cek_data['pemerintah_daerah']['RENJA/RKT']) && $cek_data['pemerintah_daerah']['RENJA/RKT']['active'] == 1){
-			$renja_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'RENJA / RKT' . $_GET['tahun'],
-				'content' => '[renja/rkt tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_renja = 'RENJA / RKT';
-			$renja_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_renja . '</a></li>';
-		}
 
 		if(!empty($cek_data['pemerintah_daerah']['IKU']) && $cek_data['pemerintah_daerah']['IKU']['active'] == 1){
 			$iku_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'IKU' . $_GET['tahun'],
-				'content' => '[iku tahun=' . $_GET['tahun'] . ']',
+				'nama_page' => 'IKU Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_iku_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$title_skp = 'IKU';
-			$iku_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_skp . '</a></li>';
+			$title_iku = 'IKU';
+			$iku_detail_pemda .= '<li><a return="false"; href="' . $iku_pemda['url'] . '"   class="btn btn-info">' .  $title_iku . '</a></li>';
 		}
 
 		if(!empty($cek_data['pemerintah_daerah']['SKP']) && $cek_data['pemerintah_daerah']['SKP']['active'] == 1){
 			$skp_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'SKP' . $_GET['tahun'],
-				'content' => '[skp tahun=' . $_GET['tahun'] . ']',
+				'nama_page' => 'SKP Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_skp_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title_skp = 'SKP';
-			$skp_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_skp . '</a></li>';
+			$skp_detail_pemda .= '<li><a return="false"; href="'.$skp_pemda['url'].'"  class="btn btn-info">' .  $title_skp . '</a></li>';
 		}
 
 		if(!empty($cek_data['pemerintah_daerah']['Rencana Aksi']) && $cek_data['pemerintah_daerah']['Rencana Aksi']['active'] == 1){
 			$rencana_aksi_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Rencana Aksi' . $_GET['tahun'],
-				'content' => '[rencana_aksi tahun=' . $_GET['tahun'] . ']',
+				'nama_page' => 'Rencana Aksi Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_rencana_aksi_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title_rencana_aksi = 'Rencana Aksi';
-			$rencana_aksi_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_rencana_aksi . '</a></li>';
+			$rencana_aksi_detail_pemda .= '<li><a return="false"; href="'.$rencana_aksi_pemda['url'].'"  class="btn btn-info">' .  $title_rencana_aksi . '</a></li>';
 		}
 
 		if(!empty($cek_data['pemerintah_daerah']['Pengukuran Kinerja']) && $cek_data['pemerintah_daerah']['Pengukuran Kinerja']['active'] == 1){
 			$pengukuran_kinerja_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Pengukuran Kinerja' . $_GET['tahun'],
-				'content' => '[pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
+				'nama_page' => 'Pengukuran Kinerja Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_pengukuran_kinerja_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title_pengukuran_kinerja = 'Pengukuran Kinerja';
-			$pengukuran_kinerja_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_pengukuran_kinerja . '</a></li>';
+			$pengukuran_kinerja_detail_pemda .= '<li><a return="false"; href="'.$pengukuran_kinerja_pemda['url'].'"  class="btn btn-info">' .  $title_pengukuran_kinerja . '</a></li>';
 		}
 
 		if(!empty($cek_data['pemerintah_daerah']['Pengukuran Rencana Aksi']) && $cek_data['pemerintah_daerah']['Pengukuran Rencana Aksi']['active'] == 1){
 			$pengukuran_rencana_aksi_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Pengukuran Rencana Aksi' . $_GET['tahun'],
-				'content' => '[pengukuran_rencana_aksi tahun=' . $_GET['tahun'] . ']',
+				'nama_page' => 'Pengukuran Rencana Aksi Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_pengukuran_rencana_aksi_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title_pengukuran_rencana_aksi = 'Pengukuran Rencana Aksi';
-			$pengukuran_rencana_aksi_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_pengukuran_rencana_aksi . '</a></li>';
+			$pengukuran_rencana_aksi_detail_pemda .= '<li><a return="false"; href="'.$pengukuran_rencana_aksi_pemda['url'].'"  class="btn btn-info">' .  $title_pengukuran_rencana_aksi . '</a></li>';
 		}
 
 		if(!empty($cek_data['pemerintah_daerah']['Laporan Kinerja']) && $cek_data['pemerintah_daerah']['Laporan Kinerja']['active'] == 1){
 			$laporan_kinerja_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Laporan Kinerja' . $_GET['tahun'],
-				'content' => '[laporan_kinerja tahun=' . $_GET['tahun'] . ']',
+				'nama_page' => 'Laporan Kinerja Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_laporan_kinerja_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title_laporan_kinerja = 'Laporan Kinerja';
-			$laporan_kinerja_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_laporan_kinerja . '</a></li>';
+			$laporan_kinerja_detail_pemda .= '<li><a return="false"; href="'.$laporan_kinerja_pemda['url'].'"  class="btn btn-info">' .  $title_laporan_kinerja . '</a></li>';
 		}
 
 		if(!empty($cek_data['pemerintah_daerah']['Evaluasi Internal']) && $cek_data['pemerintah_daerah']['Evaluasi Internal']['active'] == 1){
 			$evaluasi_internal_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Evaluasi Internal' . $_GET['tahun'],
-				'content' => '[evaluasi_internal tahun=' . $_GET['tahun'] . ']',
+				'nama_page' => 'Evaluasi Internal Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_evaluasi_internal_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title_evaluasi_internal = 'Evaluasi Internal';
-			$evaluasi_internal_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_evaluasi_internal . '</a></li>';
+			$evaluasi_internal_detail_pemda .= '<li><a return="false"; href="'.$evaluasi_internal_pemda['url'].'"  class="btn btn-info">' .  $title_evaluasi_internal . '</a></li>';
 		}
 
 		if(!empty($cek_data['pemerintah_daerah']['Dokumen Lainnya']) && $cek_data['pemerintah_daerah']['Dokumen Lainnya']['active'] == 1){
 			$dokumen_lainnya_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Lainnya' . $_GET['tahun'],
-				'content' => '[dokumen_lainnya tahun=' . $_GET['tahun'] . ']',
+				'nama_page' => 'Lainnya Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_dokumen_lainnya_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title_dokumen_lainnya = 'Lainnya';
-			$dokumen_lainnya_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_dokumen_lainnya . '</a></li>';
+			$dokumen_lainnya_detail_pemda .= '<li><a return="false"; href="'.$dokumen_lainnya_pemda['url'].'"  class="btn btn-info">' .  $title_dokumen_lainnya . '</a></li>';
 		}
 
 		if(!empty($cek_data['pemerintah_daerah']['Perjanjian Kinerja']) && $cek_data['pemerintah_daerah']['Perjanjian Kinerja']['active'] == 1){
 			$perjanjian_kinerja_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Perjanjian Kinerja' . $_GET['tahun'],
-				'content' => '[perjanjian_kinerja tahun=' . $_GET['tahun'] . ']',
+				'nama_page' => 'Perjanjian Kinerja Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_perjanjian_kinerja_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title_perjanjian_kinerja = 'Perjanjian Kinerja';
-			$perjanjian_kinerja_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_perjanjian_kinerja . '</a></li>';
+			$perjanjian_kinerja_detail_pemda .= '<li><a return="false"; href="'.$perjanjian_kinerja_pemda['url'].'"  class="btn btn-info">' .  $title_perjanjian_kinerja . '</a></li>';
 		}
 
 		if(!empty($cek_data['pemerintah_daerah']['RKPD']) && $cek_data['pemerintah_daerah']['RKPD']['active'] == 1){
 			$rkpd_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'RKPD' . $_GET['tahun'],
-				'content' => '[rkpd tahun=' . $_GET['tahun'] . ']',
+				'nama_page' => 'RKPD Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_rkpd_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title_rkpd = 'RKPD';
-			$rkpd_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_rkpd . '</a></li>';
+			$rkpd_detail_pemda .= '<li><a return="false"; href="'.$rkpd_pemda['url'].'"  class="btn btn-info">' .  $title_rkpd . '</a></li>';
 		}
 
 		if(!empty($cek_data['pemerintah_daerah']['Dokumen Lainnya']) && $cek_data['pemerintah_daerah']['Dokumen Lainnya']['active'] == 1){
 			$dokumen_pemda_lainnya_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Pemda Lainnya' . $_GET['tahun'],
-				'content' => '[dokumen_pemda_lainnya tahun=' . $_GET['tahun'] . ']',
+				'nama_page' => 'Pemda Lainnya Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_dokumen_pemda_lainnya_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title_dokumen_pemda_lainnya = 'Pemda Lainnya';
-			$dokumen_pemda_lainnya_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_dokumen_pemda_lainnya . '</a></li>';
+			$dokumen_pemda_lainnya_detail_pemda .= '<li><a return="false"; href="'.$dokumen_pemda_lainnya_pemda['url'].'"  class="btn btn-info">' .  $title_dokumen_pemda_lainnya . '</a></li>';
 		}
 
 		if(!empty($cek_data['pemerintah_daerah']['LKJIP/LPPD']) && $cek_data['pemerintah_daerah']['LKJIP/LPPD']['active'] == 1){
 			$lkjip_lppd_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'LKJIP / LPPD' . $_GET['tahun'],
-				'content' => '[lkjip_lppd tahun=' . $_GET['tahun'] . ']',
+				'nama_page' => 'LKJIP / LPPD Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_lkjip_lppd_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title_lkjip_lppd = 'LKJIP / LPPD';
-			$lkjip_lppd_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_lkjip_lppd . '</a></li>';
+			$lkjip_lppd_detail_pemda .= '<li><a return="false"; href="'.$lkjip_lppd_pemda['url'].'"  class="btn btn-info">' .  $title_lkjip_lppd . '</a></li>';
 		}
 
 		if(!empty($cek_data['pemerintah_daerah']['DPA']) && $cek_data['pemerintah_daerah']['DPA']['active'] == 1){
 			$dpa_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'DPA' . $_GET['tahun'],
-				'content' => '[dpa tahun=' . $_GET['tahun'] . ']',
+				'nama_page' => 'DPA Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_dpa_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title_dpa = 'DPA';
-			$dpa_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_dpa . '</a></li>';
+			$dpa_detail_pemda .= '<li><a return="false"; href="'.$dpa_pemda['url'].'"  class="btn btn-info">' .  $title_dpa . '</a></li>';
 		}
 
 		if(!empty($cek_data['pemerintah_daerah']['Pohon Kinerja dan Cascading']) && $cek_data['pemerintah_daerah']['Pohon Kinerja dan Cascading']['active'] == 1){
 			$pohon_kinerja_dan_cascading_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Pohon Kinerja dan Cascading' . $_GET['tahun'],
-				'content' => '[pohon_kinerja_dan_cascading tahun=' . $_GET['tahun'] . ']',
+				'nama_page' => 'Pohon Kinerja dan Cascading Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_pohon_kinerja_dan_cascading_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title_pohon_kinerja_dan_cascading = 'Pohon Kinerja dan Cascading';
-			$pohon_kinerja_dan_cascading_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_pohon_kinerja_dan_cascading . '</a></li>';
+			$pohon_kinerja_dan_cascading_detail_pemda .= '<li><a return="false"; href="'.$pohon_kinerja_dan_cascading_pemda['url'].'"  class="btn btn-info">' .  $title_pohon_kinerja_dan_cascading . '</a></li>';
 		}
 
 		if(!empty($cek_data['pemerintah_daerah']['LHE AKIP Internal']) && $cek_data['pemerintah_daerah']['LHE AKIP Internal']['active'] == 1){
 			$lhe_akip_internal_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'LHE AKIP Internal' . $_GET['tahun'],
-				'content' => '[lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
+				'nama_page' => 'LHE AKIP Internal Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_lhe_akip_internal_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title_lhe_akip_internal = 'LHE AKIP Internal';
-			$lhe_akip_internal_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_lhe_akip_internal . '</a></li>';
+			$lhe_akip_internal_detail_pemda .= '<li><a return="false"; href="'.$lhe_akip_internal_pemda['url'].'"  class="btn btn-info">' .  $title_lhe_akip_internal . '</a></li>';
 		}
 
 		if(!empty($cek_data['pemerintah_daerah']['TL LHE AKIP Internal']) && $cek_data['pemerintah_daerah']['TL LHE AKIP Internal']['active'] == 1){
 			$tl_lhe_akip_internal_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'TL LHE AKIP Internal' . $_GET['tahun'],
-				'content' => '[tl_lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
+				'nama_page' => 'TL LHE AKIP Internal Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_tl_lhe_akip_internal_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title_tl_lhe_akip_internal = 'TL LHE AKIP Internal';
-			$tl_lhe_akip_internal_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_tl_lhe_akip_internal . '</a></li>';
+			$tl_lhe_akip_internal_detail_pemda .= '<li><a return="false"; href="'.$tl_lhe_akip_internal_pemda['url'].'"  class="btn btn-info">' .  $title_tl_lhe_akip_internal . '</a></li>';
 		}
 
 		if(!empty($cek_data['pemerintah_daerah']['TL LHE AKIP Kemenpan']) && $cek_data['pemerintah_daerah']['TL LHE AKIP Kemenpan']['active'] == 1){
 			$tl_lhe_akip_kemenpan_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'TL LHE AKIP Kemenpan' . $_GET['tahun'],
-				'content' => '[tl_lhe_akip_kemenpan tahun=' . $_GET['tahun'] . ']',
+				'nama_page' => 'TL LHE AKIP Kemenpan Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_tl_lhe_akip_kemenpan_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title_tl_lhe_akip_kemenpan = 'TL LHE AKIP Kemenpan';
-			$tl_lhe_akip_kemenpan_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_tl_lhe_akip_kemenpan . '</a></li>';
+			$tl_lhe_akip_kemenpan_detail_pemda .= '<li><a return="false"; href="'.$tl_lhe_akip_kemenpan_pemda['url'].'"  class="btn btn-info">' .  $title_tl_lhe_akip_kemenpan . '</a></li>';
 		}
 
 		if(!empty($cek_data['pemerintah_daerah']['Laporan Monev Renaksi']) && $cek_data['pemerintah_daerah']['Laporan Monev Renaksi']['active'] == 1){
 			$laporan_monev_renaksi_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Laporan Monev Renaksi' . $_GET['tahun'],
-				'content' => '[laporan_monev_renaksi tahun=' . $_GET['tahun'] . ']',
+				'nama_page' => 'Laporan Monev Renaksi Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_laporan_monev_renaksi_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title_laporan_monev_renaksi = 'Laporan Monev Renaksi';
-			$laporan_monev_renaksi_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_laporan_monev_renaksi . '</a></li>';
+			$laporan_monev_renaksi_detail_pemda .= '<li><a return="false"; href="'.$laporan_monev_renaksi_pemda['url'].'"  class="btn btn-info">' .  $title_laporan_monev_renaksi . '</a></li>';
 		}
 
 		if(!empty($cek_data['pemerintah_daerah']['Pedoman Teknis Perencanaan']) && $cek_data['pemerintah_daerah']['Pedoman Teknis Perencanaan']['active'] == 1){
 			$pedoman_teknis_perencanaan_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Pedoman Teknis Perencanaan' . $_GET['tahun'],
-				'content' => '[pedoman_teknis_perencanaan tahun=' . $_GET['tahun'] . ']',
+				'nama_page' => 'Pedoman Teknis Perencanaan Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_pedoman_teknis_perencanaan_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title_pedoman_teknis_perencanaan = 'Pedoman Teknis Perencanaan';
-			$pedoman_teknis_perencanaan_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_pedoman_teknis_perencanaan . '</a></li>';
+			$pedoman_teknis_perencanaan_detail_pemda .= '<li><a return="false"; href="'.$pedoman_teknis_perencanaan_pemda['url'].'"  class="btn btn-info">' .  $title_pedoman_teknis_perencanaan . '</a></li>';
 		}
 
 		if(!empty($cek_data['pemerintah_daerah']['Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja']) && $cek_data['pemerintah_daerah']['Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja']['active'] == 1){
 			$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja' . $_GET['tahun'],
-				'content' => '[pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja tahun=' . $_GET['tahun'] . ']',
+				'nama_page' => 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja';
-			$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja . '</a></li>';
+			$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_detail_pemda .= '<li><a return="false"; href="'.$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda['url'].'"  class="btn btn-info">' .  $title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja . '</a></li>';
 		}
 
 		if(!empty($cek_data['pemerintah_daerah']['Pedoman Teknis Evaluasi Internal']) && $cek_data['pemerintah_daerah']['Pedoman Teknis Evaluasi Internal']['active'] == 1){
 			$pedoman_teknis_evaluasi_internal_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Pedoman Teknis Evaluasi Internal' . $_GET['tahun'],
-				'content' => '[pedoman_teknis_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
+				'nama_page' => 'Pedoman Teknis Evaluasi Internal Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_pedoman_teknis_evaluasi_internal_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title_pedoman_teknis_evaluasi_internal = 'Pedoman Teknis Evaluasi Internal';
-			$pedoman_teknis_evaluasi_internal_detail_pemda .= '<li><a return="false"; href="#"  class="btn btn-info">' .  $title_pedoman_teknis_evaluasi_internal . '</a></li>';
+			$pedoman_teknis_evaluasi_internal_detail_pemda .= '<li><a return="false"; href="'.$pedoman_teknis_evaluasi_internal_pemda['url'].'"  class="btn btn-info">' .  $title_pedoman_teknis_evaluasi_internal . '</a></li>';
 		}
 
 		//DOKUMEN Perangkat Daerah

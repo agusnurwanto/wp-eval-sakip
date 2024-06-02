@@ -533,7 +533,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('dokumen_detail_pedoman_teknis_perencanaan_pemda', array($plugin_public, 'dokumen_detail_pedoman_teknis_perencanaan_pemda'));
 		add_shortcode('dokumen_detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda', array($plugin_public, 'dokumen_detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda'));
 		add_shortcode('dokumen_detail_pedoman_teknis_evaluasi_internal_pemda', array($plugin_public, 'dokumen_detail_pedoman_teknis_evaluasi_internal_pemda'));
-		add_shortcode('dokumen_detail_lkjip_pemda', array($plugin_public, 'dokumen_detail_lkjip_pemda'));
+		add_shortcode('dokumen_detail_lkjip_lppd_pemda', array($plugin_public, 'dokumen_detail_lkjip_lppd_pemda'));
 		add_shortcode('dokumen_detail_rkpd_pemda', array($plugin_public, 'dokumen_detail_rkpd_pemda'));
 		
 	}
