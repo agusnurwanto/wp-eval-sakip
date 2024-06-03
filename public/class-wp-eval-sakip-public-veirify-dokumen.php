@@ -71,7 +71,9 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             $tbody .= "<td class='text-left'>" . $menu['nama_tabel'] . "</td>";
                             $tbody .= "<td class='text-left'>" . $menu['nama_dokumen'] . "</td>";
                             $tbody .= "<td class='text-left'>" . $akses_user . "</td>";
-                            $tbody .= "<td class='text-center'><span class='dashicons " . $badge_verifikasi_upload . "'></span> " . $text_badge_verifikasi_upload . "</td>";
+                            if($tipe == 'perangkat_daerah'){
+                                $tbody .= "<td class='text-center'><span class='dashicons " . $badge_verifikasi_upload . "'></span> " . $text_badge_verifikasi_upload . "</td>";
+                            }
                             $tbody .= "<td class='text-center'><span class='badge badge-" . $color_badge_verify . "' style='padding: .5em 1.4em;'>" . $text_badge . "</span></td>";
                             $tbody .= "<td class='text-center'>" . $menu['keterangan'] . "</td>";
     
@@ -213,6 +215,18 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             'jenis_role'    => 1
                         ),
                         array(
+                            'nama_dokumen' => 'SKP',
+                            'nama_tabel' => 'esakip_skp_pemda',
+                            'user_role' => 'pemerintah_daerah',
+                            'jenis_role'    => 1
+                        ),
+                        array(
+                            'nama_dokumen' => 'Evaluasi Internal',
+                            'nama_tabel' => 'esakip_evaluasi_internal_pemda',
+                            'user_role' => 'pemerintah_daerah',
+                            'jenis_role'    => 1
+                        ),
+                        array(
                             'nama_dokumen' => 'Pedoman Teknis Evaluasi Internal',
                             'nama_tabel' => 'esakip_pedoman_teknis_evaluasi_internal_pemda',
                             'user_role' => 'pemerintah_daerah',
@@ -228,7 +242,8 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             'nama_dokumen' => 'RENSTRA',
                             'nama_tabel' => 'esakip_renstra',
                             'user_role' => 'perangkat_daerah',
-                            'jenis_role'    => 2
+                            'jenis_role'    => 2,
+                            'verifikasi_upload_dokumen' => 1
                         ),
                         array(
                             'nama_dokumen' => 'IKU',
@@ -240,13 +255,15 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             'nama_dokumen' => 'RENJA/RKT',
                             'nama_tabel' => 'esakip_renja_rkt',
                             'user_role' => 'perangkat_daerah',
-                            'jenis_role'    => 2
+                            'jenis_role'    => 2,
+                            'verifikasi_upload_dokumen' => 1
                         ),
                         array(
                             'nama_dokumen' => 'Perjanjian Kinerja',
                             'nama_tabel' => 'esakip_perjanjian_kinerja',
                             'user_role' => 'perangkat_daerah',
-                            'jenis_role'    => 2
+                            'jenis_role'    => 2,
+                            'verifikasi_upload_dokumen' => 1
                         ),
                         array(
                             'nama_dokumen' => 'Rencana Aksi',
@@ -258,13 +275,15 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             'nama_dokumen' => 'Laporan Kinerja',
                             'nama_tabel' => 'esakip_laporan_kinerja',
                             'user_role' => 'perangkat_daerah',
-                            'jenis_role'    => 2
+                            'jenis_role'    => 2,
+                            'verifikasi_upload_dokumen' => 1
                         ),
                         array(
                             'nama_dokumen' => 'DPA',
                             'nama_tabel' => 'esakip_dpa',
                             'user_role' => 'perangkat_daerah',
-                            'jenis_role'    => 2
+                            'jenis_role'    => 2,
+                            'verifikasi_upload_dokumen' => 1
                         ),
                         array(
                             'nama_dokumen' => 'Pohon Kinerja dan Cascading',
@@ -295,6 +314,18 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             'nama_tabel' => 'esakip_dokumen_lainnya',
                             'user_role' => 'perangkat_daerah',
                             'jenis_role'    => 2
+                        ),
+                        array(
+                            'nama_dokumen' => 'SKP',
+                            'nama_tabel' => 'esakip_skp',
+                            'user_role' => 'perangkat_daerah',
+                            'jenis_role'    => 2
+                        ),
+                        array(
+                            'nama_dokumen' => 'Evaluasi Internal',
+                            'nama_tabel' => 'esakip_evaluasi_internal',
+                            'user_role' => 'perangkat_daerah',
+                            'jenis_role'    => 2
                         )
                     );
 
@@ -314,12 +345,19 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                         }else if($menu['user_role'] == 'perangkat_daerah'){
                             $jenis_role = 2;
                         }
+
+                        if(!empty($menu['verifikasi_upload_dokumen'])){
+                            $verifikasi_upload = 1;
+                        }else{
+                            $verifikasi_upload = 0;
+                        }
+
                         $default_menu = array(
                             'nama_tabel' => $menu['nama_tabel'],
                             'nama_dokumen' => $menu['nama_dokumen'],
                             'user_role' => $menu['user_role'],
                             'jenis_role'    => $jenis_role,
-                            'verifikasi_upload_dokumen' => $menu['verifikasi_upload_dokumen'],
+                            'verifikasi_upload_dokumen' => $verifikasi_upload,
                             'active' => 1,
                             'tahun_anggaran' => $tahun_anggaran
                         );
@@ -332,7 +370,8 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             $update_menu = $wpdb->update(
                                 'esakip_menu_dokumen', 
                                 array(
-                                    'nama_tabel' => $menu['nama_tabel']
+                                    'nama_tabel' => $menu['nama_tabel'],
+                                    'verifikasi_upload_dokumen' => $verifikasi_upload
                                 ),
                                 array(
                                     'nama_dokumen' => $menu['nama_dokumen'],
@@ -366,24 +405,9 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             'user_role' => 'pemerintah_daerah'
                         ),
                         array(
-                            'nama_dokumen' => 'SKP',
-                            'nama_tabel' => 'esakip_skp',
-                            'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
                             'nama_dokumen' => 'RENSTRA',
                             'nama_tabel' => 'esakip_renstra',
                             'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'SKP',
-                            'nama_tabel' => 'esakip_skp',
-                            'user_role' => 'perangkat_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'Evaluasi Internal',
-                            'nama_tabel' => 'esakip_evaluasi_internal',
-                            'user_role' => 'perangkat_daerah'
                         ),
                         array(
                             'nama_dokumen' => 'Pengukuran Kinerja',
@@ -545,19 +569,6 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
 					$ret['message'] = 'Pengaturan Menu Dokumen kosong!';
 				}
 
-                if (!empty($_POST['verifikasi_dokumen'])) {
-					$pengaturan_verifikasi_upload_dokumen = $_POST['verifikasi_dokumen'];
-					$input_verifikasi = 0;
-					if ($pengaturan_verifikasi_upload_dokumen == 'verifikasi') {
-						$input_verifikasi = 1;
-					} else if ($pengaturan_verifikasi_upload_dokumen == 'tidak') {
-						$input_verifikasi = 0;
-					}
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Pengaturan Verifikasi Upload Dokumen kosong!';
-				}
-
                 if (!empty($_POST['akses_user'])) {
 					$pengaturan_akses_user = $_POST['akses_user'];
 					$input_akses_user = 0;
@@ -590,7 +601,6 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
 							'active' => $input_pengaturan_menu,
 							'keterangan' => $keterangan,
                             'updated_at' => current_time('mysql'),
-                            'verifikasi_upload_dokumen' => $input_verifikasi,
                             'jenis_role' => $input_akses_user
 						);
 

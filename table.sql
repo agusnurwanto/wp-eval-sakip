@@ -559,6 +559,7 @@ CREATE TABLE `esakip_menu_dokumen` (
   `user_role` varchar(255) NOT NULL,
   `jenis_role` int(11) DEFAULT NULL,
   `keterangan` varchar(255) DEFAULT NULL,
+  `verifikasi_upload_dokumen` tinyint DEFAULT NULL,
   `active` tinyint(4) NOT NULL,
   `tahun_anggaran` year NOT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp,
