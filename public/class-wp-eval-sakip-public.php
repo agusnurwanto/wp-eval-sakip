@@ -6534,7 +6534,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						"pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja" => "esakip_pedoman_teknis_pengukuran_dan_p_d_k_pemda",
 						"pedoman_teknis_evaluasi_internal" => "esakip_pedoman_teknis_evaluasi_internal_pemda",
 						"lkjip" => "esakip_lkjip_lppd_pemda",
-						"rkpd" => "esakip_rkpd"
+						"rkpd" => "esakip_rkpd_pemda"
 					);
 				
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
@@ -15747,14 +15747,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['RKPD']) && $cek_data['pemerintah_daerah']['RKPD']['active'] == 1) {
-			 $rkpd = $this->functions->generatePage(array(
-				'nama_page' => 'RKPD',
-				'content' => '[rkpd tahun=' . $_GET['tahun'] . ']',
+			$rkpd_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'RKPD Pemda' . $_GET['tahun'],
+				'content' => '[dokumen_detail_rkpd_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title_rkpd = 'RKPD';
-			$rkpd_detail .= '<li><a target="_blank" href="' . $rkpd['url'] . '" class="btn btn-primary">' .  $title_rkpd . '</a></li>';
+			$rkpd_detail_pemda .= '<li><a target="_blank" href="' . $rkpd_pemda['url'] . '"  class="btn btn-info">' .  $title_rkpd . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['Dokumen Lainnya']) && $cek_data['pemerintah_daerah']['Dokumen Lainnya']['active'] == 1) {
