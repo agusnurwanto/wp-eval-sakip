@@ -98,7 +98,7 @@ $body = '';
 						</tr>
 						<small class="d-block">Setting Menu Upload Dokumen Yang Tampil Di Dashboard User</small>
 					</div>
-					<div class="form-group" style="margin: 2em 0 0;">
+					<div class="form-group" style="margin: 1.5em 0 0;">
 						<label class="d-block">Pengaturan Akses User Upload Dokumen</label>
 						<tr>
 							<td>
@@ -122,11 +122,15 @@ $body = '';
 						</tr>
 						<small class="d-block">Setting User Yang Bisa Mengakses Upload Dokumen</small>
 					</div>
-                    <div class="form-group" style="margin: 2em 0 0;">
+                    <div class="form-group" style="margin: 1.5em 0 0;">
+                        <label for="no_urut">No Urut</label>
+                        <input type="text" name="no_urut_menu" id="no_urut">
+                    </div>
+					<div class="form-group" style="margin: 1.5em 0 0;">
                         <label for="keterangan">Keterangan</label>
                         <textarea class="form-control" id="keterangan" name="keterangan" rows="3"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="margin: 2em 0 0;" onclick="submit_pengaturan_menu(this); return false">Simpan</button>
+                    <button type="submit" class="btn btn-primary" style="margin: 1.5em 0 0;" onclick="submit_pengaturan_menu(this); return false">Simpan</button>
                 </form>
             </div>
         </div>
@@ -236,7 +240,8 @@ $body = '';
 							akses_user = 'semua';
 						}
                         jQuery("input[name=akses_user_upload_dokumen][value='"+akses_user+"']").prop("checked",true);
-                    }
+						jQuery("#no_urut").val(data.default_urutan);
+					}
                     jQuery("#idDokumen").val(id);
 					jQuery("#tipeDokumen").val(tipe);
                     jQuery("#editPengaturanMenu").modal('show');
@@ -280,6 +285,11 @@ $body = '';
         if (akses_user == '' || akses_user == undefined) {
             return alert('Pengaturan akses user tidak boleh kosong!');
         }
+		
+		let nomor_urutan = jQuery("#no_urut").val();;
+        if (nomor_urutan == '') {
+            return alert('Nomor Urut tidak boleh kosong!');
+        }
 
         let form_data = new FormData();
         form_data.append('action', 'submit_edit_pengaturan_menu_dokumen');
@@ -290,6 +300,7 @@ $body = '';
         form_data.append('menu_dokumen', menu_dokumen);
         form_data.append('tipe_dokumen', tipe_dokumen);
 		form_data.append('akses_user', akses_user);
+		form_data.append('nomor_urutan', nomor_urutan);
 
         jQuery('#wrap-loading').show();
         jQuery.ajax({
