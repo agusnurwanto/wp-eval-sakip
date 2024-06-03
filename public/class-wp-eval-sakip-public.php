@@ -689,15 +689,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-dpa-pemda.php';
 	}
 
-	public function dokumen_detail_skp_pemda($atts)
-	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-skp-pemda.php';
-	}
-
 	public function dokumen_detail_rencana_aksi_pemda($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
@@ -714,15 +705,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			return '';
 		}
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-perjanjian-kinerja-pemda.php';
-	}
-
-	public function dokumen_detail_evaluasi_internal_pemda($atts)
-	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-evaluasi-internal-pemda.php';
 	}
 
 	public function dokumen_detail_iku_pemda($atts)
@@ -6401,10 +6383,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading_pemda",
 						"iku" => "esakip_iku_pemda",
 						"dpa" => "esakip_dpa_pemda",
-						"skp" => "esakip_skp_pemda",
 						"rencana_aksi" => "esakip_rencana_aksi_pemda",
 						"perjanjian_kinerja" => "esakip_perjanjian_kinerja_pemda",
-						"evaluasi_internal" => "esakip_evaluasi_internal_pemda",
 						"laporan_kinerja" => "esakip_laporan_kinerja_pemda",
 						"dokumen_lainnya" => "esakip_dokumen_lainnya_pemda",
 						"lhe_akip_internal" => "esakip_lhe_akip_internal_pemda",
@@ -6513,10 +6493,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading_pemda",
 						"iku" => "esakip_iku_pemda",
 						"dpa" => "esakip_dpa_pemda",
-						"skp" => "esakip_skp_pemda",
 						"rencana_aksi" => "esakip_rencana_aksi_pemda",
 						"perjanjian_kinerja" => "esakip_perjanjian_kinerja_pemda",
-						"evaluasi_internal" => "esakip_evaluasi_internal_pemda",
 						"laporan_kinerja" => "esakip_laporan_kinerja_pemda",
 						"dokumen_lainnya" => "esakip_dokumen_lainnya_pemda",
 						"lhe_akip_internal" => "esakip_lhe_akip_internal_pemda",
@@ -6659,10 +6637,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading_pemda",
 						"iku" => "esakip_iku_pemda",
 						"dpa" => "esakip_dpa_pemda",
-						"skp" => "esakip_skp_pemda",
 						"rencana_aksi" => "esakip_rencana_aksi_pemda",
 						"perjanjian_kinerja" => "esakip_perjanjian_kinerja_pemda",
-						"evaluasi_internal" => "esakip_evaluasi_internal_pemda",
 						"laporan_kinerja" => "esakip_laporan_kinerja_pemda",
 						"dokumen_lainnya" => "esakip_dokumen_lainnya_pemda",
 						"lhe_akip_internal" => "esakip_lhe_akip_internal_pemda",
@@ -6725,10 +6701,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading_pemda",
 						"iku" => "esakip_iku_pemda",
 						"dpa" => "esakip_dpa_pemda",
-						"skp" => "esakip_skp_pemda",
 						"rencana_aksi" => "esakip_rencana_aksi_pemda",
 						"perjanjian_kinerja" => "esakip_perjanjian_kinerja_pemda",
-						"evaluasi_internal" => "esakip_evaluasi_internal_pemda",
 						"laporan_kinerja" => "esakip_laporan_kinerja_pemda",
 						"dokumen_lainnya" => "esakip_dokumen_lainnya_pemda",
 						"lhe_akip_internal" => "esakip_lhe_akip_internal_pemda",
@@ -16213,7 +16187,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		$halaman_sakip = '
 			<div class="accordion">
-				<h5 class="esakip-header-tahun" data-id="halaman-sakip" style="margin: 0;">Dokumen SAKIP</h5>
+				<h5 class="esakip-header-tahun" data-id="halaman-sakip" style="margin: 0;">Dokumen SAKIP Pemerintah Daerah</h5>
 				<div class="esakip-body-tahun" data-id="halaman-sakip">
 					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 						' . $halaman_rpjpd . '
