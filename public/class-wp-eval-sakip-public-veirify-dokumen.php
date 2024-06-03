@@ -48,10 +48,30 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                                 $text_badge = 'Tidak Aktif';
                             }
 
+                            $badge_verifikasi_upload = 'dashicons-dismiss';
+                            $text_badge_verifikasi_upload = 'Tidak';
+                            if ($menu['verifikasi_upload_dokumen'] == 1) {
+                                $badge_verifikasi_upload = 'dashicons-yes-alt';
+                                $text_badge_verifikasi_upload = 'Iya';
+                            }
+
+                            $akses_user = "<ul>";
+                            if($menu['jenis_role'] == 1){
+                                $akses_user .= "<li>Pemerintah Daerah</li>";
+                            }else if($menu['jenis_role'] == 2){
+                                $akses_user .= "<li>Perangkat Daerah</li>";
+                            }else if($menu['jenis_role'] == 3){
+                                $akses_user .= "<li>Pemerintah Daerah</li>
+                                                <li>Perangkat Daerah</li>";
+                            }
+                            $akses_user .="</ul>";
+
                             $tbody .= "<tr>";
                             $tbody .= "<td class='text-center'>" . $counter++ . "</td>";
                             $tbody .= "<td class='text-left'>" . $menu['nama_tabel'] . "</td>";
                             $tbody .= "<td class='text-left'>" . $menu['nama_dokumen'] . "</td>";
+                            $tbody .= "<td class='text-left'>" . $akses_user . "</td>";
+                            $tbody .= "<td class='text-center'><span class='dashicons " . $badge_verifikasi_upload . "'></span> " . $text_badge_verifikasi_upload . "</td>";
                             $tbody .= "<td class='text-center'><span class='badge badge-" . $color_badge_verify . "' style='padding: .5em 1.4em;'>" . $text_badge . "</span></td>";
                             $tbody .= "<td class='text-center'>" . $menu['keterangan'] . "</td>";
     
@@ -103,98 +123,241 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
 
                     $design_menu = array(
                         array(
-                            'nama_dokumen' => 'RPJPD',
-                            'nama_tabel' => 'esakip_rpjpd',
-                            'user_role' => 'pemerintah_daerah'
+                            'nama_dokumen'  => 'RPJPD',
+                            'nama_tabel'    => 'esakip_rpjpd',
+                            'user_role'     => 'pemerintah_daerah',
+                            'jenis_role'    => 1
                         ),
                         array(
                             'nama_dokumen' => 'RPJMD',
                             'nama_tabel' => 'esakip_rpjmd',
-                            'user_role' => 'pemerintah_daerah'
+                            'user_role' => 'pemerintah_daerah',
+                            'jenis_role'    => 1
+                        ),
+                        array(
+                            'nama_dokumen' => 'IKU',
+                            'nama_tabel' => 'esakip_iku_pemda',
+                            'user_role' => 'pemerintah_daerah',
+                            'jenis_role'    => 1
                         ),
                         array(
                             'nama_dokumen' => 'RKPD',
                             'nama_tabel' => 'esakip_rkpd',
-                            'user_role' => 'pemerintah_daerah'
+                            'user_role' => 'pemerintah_daerah',
+                            'jenis_role'    => 1
                         ),
+                        array(
+                            'nama_dokumen' => 'Perjanjian Kinerja',
+                            'nama_tabel' => 'esakip_perjanjian_kinerja_pemda',
+                            'user_role' => 'pemerintah_daerah',
+                            'jenis_role'    => 1
+                        ),
+                        array(
+                            'nama_dokumen' => 'Rencana Aksi',
+                            'nama_tabel' => 'esakip_rencana_aksi_pemda',
+                            'user_role' => 'pemerintah_daerah',
+                            'jenis_role'    => 1
+                        ),
+                        array(
+                            'nama_dokumen' => 'Laporan Kinerja',
+                            'nama_tabel' => 'esakip_laporan_kinerja_pemda',
+                            'user_role' => 'pemerintah_daerah',
+                            'jenis_role'    => 1
+                        ),
+                        array(
+                            'nama_dokumen' => 'DPA',
+                            'nama_tabel' => 'esakip_dpa_pemda',
+                            'user_role' => 'pemerintah_daerah',
+                            'jenis_role'    => 1
+                        ),
+                        array(
+                            'nama_dokumen' => 'Pohon Kinerja dan Cascading',
+                            'nama_tabel' => 'esakip_pohon_kinerja_dan_cascading_pemda',
+                            'user_role' => 'pemerintah_daerah',
+                            'jenis_role'    => 1
+                        ),
+                        array(
+                            'nama_dokumen' => 'TL LHE AKIP Kemenpan',
+                            'nama_tabel' => 'esakip_tl_lhe_akip_kemenpan',
+                            'user_role' => 'pemerintah_daerah',
+                            'jenis_role'    => 1
+                        ),
+                        array(
+                            'nama_dokumen' => 'LHE AKIP Internal',
+                            'nama_tabel' => 'esakip_lhe_akip_internal_pemda',
+                            'user_role' => 'pemerintah_daerah',
+                            'jenis_role'    => 1
+                        ),
+                        array(
+                            'nama_dokumen' => 'TL LHE AKIP Internal',
+                            'nama_tabel' => 'esakip_tl_lhe_akip_internal_pemda',
+                            'user_role' => 'pemerintah_daerah',
+                            'jenis_role'    => 1
+                        ),
+                        array(
+                            'nama_dokumen' => 'Laporan Monev Renaksi',
+                            'nama_tabel' => 'esakip_laporan_monev_renaksi_pemda',
+                            'user_role' => 'pemerintah_daerah',
+                            'jenis_role'    => 1
+                        ),
+                        array(
+                            'nama_dokumen' => 'Pedoman Teknis Perencanaan',
+                            'nama_tabel' => 'esakip_pedoman_teknis_perencanaan_pemda',
+                            'user_role' => 'pemerintah_daerah',
+                            'jenis_role'    => 1
+                        ),
+                        array(
+                            'nama_dokumen' => 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja',
+                            'nama_tabel' => 'esakip_pedoman_teknis_pengukuran_dan_p_d_k_pemda',
+                            'user_role' => 'pemerintah_daerah',
+                            'jenis_role'    => 1
+                        ),
+                        array(
+                            'nama_dokumen' => 'Pedoman Teknis Evaluasi Internal',
+                            'nama_tabel' => 'esakip_pedoman_teknis_evaluasi_internal_pemda',
+                            'user_role' => 'pemerintah_daerah',
+                            'jenis_role'    => 1
+                        ),
+                        array(
+                            'nama_dokumen' => 'Dokumen Lainnya',
+                            'nama_tabel' => 'esakip_other_file',
+                            'user_role' => 'pemerintah_daerah',
+                            'jenis_role'    => 1
+                        ),
+                        array(
+                            'nama_dokumen' => 'RENSTRA',
+                            'nama_tabel' => 'esakip_renstra',
+                            'user_role' => 'perangkat_daerah',
+                            'jenis_role'    => 2
+                        ),
+                        array(
+                            'nama_dokumen' => 'IKU',
+                            'nama_tabel' => 'esakip_iku',
+                            'user_role' => 'perangkat_daerah',
+                            'jenis_role'    => 2
+                        ),
+                        array(
+                            'nama_dokumen' => 'RENJA/RKT',
+                            'nama_tabel' => 'esakip_renja_rkt',
+                            'user_role' => 'perangkat_daerah',
+                            'jenis_role'    => 2
+                        ),
+                        array(
+                            'nama_dokumen' => 'Perjanjian Kinerja',
+                            'nama_tabel' => 'esakip_perjanjian_kinerja',
+                            'user_role' => 'perangkat_daerah',
+                            'jenis_role'    => 2
+                        ),
+                        array(
+                            'nama_dokumen' => 'Rencana Aksi',
+                            'nama_tabel' => 'esakip_rencana_aksi',
+                            'user_role' => 'perangkat_daerah',
+                            'jenis_role'    => 2
+                        ),
+                        array(
+                            'nama_dokumen' => 'Laporan Kinerja',
+                            'nama_tabel' => 'esakip_laporan_kinerja',
+                            'user_role' => 'perangkat_daerah',
+                            'jenis_role'    => 2
+                        ),
+                        array(
+                            'nama_dokumen' => 'DPA',
+                            'nama_tabel' => 'esakip_dpa',
+                            'user_role' => 'perangkat_daerah',
+                            'jenis_role'    => 2
+                        ),
+                        array(
+                            'nama_dokumen' => 'Pohon Kinerja dan Cascading',
+                            'nama_tabel' => 'esakip_pohon_kinerja_dan_cascading',
+                            'user_role' => 'perangkat_daerah',
+                            'jenis_role'    => 2
+                        ),
+                        array(
+                            'nama_dokumen' => 'LHE AKIP Internal',
+                            'nama_tabel' => 'esakip_lhe_akip_internal',
+                            'user_role' => 'perangkat_daerah',
+                            'jenis_role'    => 2
+                        ),
+                        array(
+                            'nama_dokumen' => 'TL LHE AKIP Internal',
+                            'nama_tabel' => 'esakip_tl_lhe_akip_internal',
+                            'user_role' => 'perangkat_daerah',
+                            'jenis_role'    => 2
+                        ),
+                        array(
+                            'nama_dokumen' => 'Laporan Monev Renaksi',
+                            'nama_tabel' => 'esakip_laporan_monev_renaksi',
+                            'user_role' => 'perangkat_daerah',
+                            'jenis_role'    => 2
+                        ),
+                        array(
+                            'nama_dokumen' => 'Dokumen Lainnya',
+                            'nama_tabel' => 'esakip_dokumen_lainnya',
+                            'user_role' => 'perangkat_daerah',
+                            'jenis_role'    => 2
+                        )
+                    );
+
+                    foreach ($design_menu as $menu) {
+                        $cek_menu = $wpdb->get_results(
+                            "
+                            SELECT 
+                                *
+                            FROM esakip_menu_dokumen 
+                            WHERE tahun_anggaran =".$tahun_anggaran."
+                                AND nama_dokumen='".$menu['nama_dokumen']."'
+                                AND user_role='".$menu['user_role']."'",
+                            ARRAY_A
+                        );
+                        if($menu['user_role'] == 'pemerintah_daerah'){
+                            $jenis_role = 1;
+                        }else if($menu['user_role'] == 'perangkat_daerah'){
+                            $jenis_role = 2;
+                        }
+                        $default_menu = array(
+                            'nama_tabel' => $menu['nama_tabel'],
+                            'nama_dokumen' => $menu['nama_dokumen'],
+                            'user_role' => $menu['user_role'],
+                            'jenis_role'    => $jenis_role,
+                            'verifikasi_upload_dokumen' => $menu['verifikasi_upload_dokumen'],
+                            'active' => 1,
+                            'tahun_anggaran' => $tahun_anggaran
+                        );
+                        if(empty($cek_menu)){
+                            if ($wpdb->insert('esakip_menu_dokumen', $default_menu) === false) {
+                                error_log("Error inserting into esakip_menu_dokumen: " . $wpdb->last_error);
+                                continue;
+                            }
+                        }else{
+                            $update_menu = $wpdb->update(
+                                'esakip_menu_dokumen', 
+                                array(
+                                    'nama_tabel' => $menu['nama_tabel']
+                                ),
+                                array(
+                                    'nama_dokumen' => $menu['nama_dokumen'],
+                                    'tahun_anggaran' => $tahun_anggaran,
+                                    'user_role' => $menu['user_role']
+                                ),
+							    array('%s')
+                            );
+                            if ($update_menu === false) {
+                                error_log("Error updating into esakip_menu_dokumen: " . $wpdb->last_error);
+                                continue;
+                            }
+                        }
+                        
+                    }
+
+                    $data_hapus = array(
                         array(
                             'nama_dokumen' => 'LKJIP/LPPD',
                             'nama_tabel' => 'esakip_lkjip_lppd',
                             'user_role' => 'pemerintah_daerah'
                         ),
                         array(
-                            'nama_dokumen' => 'Dokumen Lainnya',
-                            'nama_tabel' => 'esakip_dokumen_lainnya',
-                            'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
                             'nama_dokumen' => 'RENJA/RKT',
                             'nama_tabel' => 'esakip_renja_rkt',
-                            'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'Pedoman Teknis Evaluasi Internal',
-                            'nama_tabel' => 'esakip_pedoman_teknis_evaluasi_internal',
-                            'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja',
-                            'nama_tabel' => 'esakip_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja',
-                            'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'Pedoman Teknis Perencanaan',
-                            'nama_tabel' => 'esakip_pedoman_teknis_perencanaan',
-                            'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'Laporan Monev Renaksi',
-                            'nama_tabel' => 'esakip_laporan_monev_renaksi',
-                            'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'TL LHE AKIP Kemenpan',
-                            'nama_tabel' => 'esakip_tl_lhe_akip_kemenpan',
-                            'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'TL LHE AKIP Internal',
-                            'nama_tabel' => 'esakip_tl_lhe_akip_internal',
-                            'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'LHE AKIP Internal',
-                            'nama_tabel' => 'esakip_lhe_akip_internal',
-                            'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'Pohon Kinerja dan Cascading',
-                            'nama_tabel' => 'esakip_pohon_kinerja_dan_cascading',
-                            'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'DPA',
-                            'nama_tabel' => 'esakip_dpa',
-                            'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'Perjanjian Kinerja',
-                            'nama_tabel' => 'esakip_perjanjian_kinerja',
-                            'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'Evaluasi Internal',
-                            'nama_tabel' => 'esakip_evaluasi_internal',
-                            'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'Laporan Kinerja',
-                            'nama_tabel' => 'esakip_laporan_kinerja',
-                            'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'Pengukuran Rencana Aksi',
-                            'nama_tabel' => 'esakip_pengukuran_rencana_aksi',
                             'user_role' => 'pemerintah_daerah'
                         ),
                         array(
@@ -203,84 +366,14 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             'user_role' => 'pemerintah_daerah'
                         ),
                         array(
-                            'nama_dokumen' => 'Rencana Aksi',
-                            'nama_tabel' => 'esakip_rencana_aksi',
-                            'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
                             'nama_dokumen' => 'SKP',
                             'nama_tabel' => 'esakip_skp',
                             'user_role' => 'pemerintah_daerah'
                         ),
                         array(
-                            'nama_dokumen' => 'IKU',
-                            'nama_tabel' => 'esakip_iku',
-                            'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
                             'nama_dokumen' => 'RENSTRA',
                             'nama_tabel' => 'esakip_renstra',
                             'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'RENSTRA',
-                            'nama_tabel' => 'esakip_renstra',
-                            'user_role' => 'perangkat_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'IKU',
-                            'nama_tabel' => 'esakip_iku',
-                            'user_role' => 'perangkat_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'RENJA/RKT',
-                            'nama_tabel' => 'esakip_renja_rkt',
-                            'user_role' => 'perangkat_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'Perjanjian Kinerja',
-                            'nama_tabel' => 'esakip_perjanjian_kinerja',
-                            'user_role' => 'perangkat_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'Laporan Kinerja',
-                            'nama_tabel' => 'esakip_laporan_kinerja',
-                            'user_role' => 'perangkat_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'DPA',
-                            'nama_tabel' => 'esakip_dpa',
-                            'user_role' => 'perangkat_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'Pohon Kinerja dan Cascading',
-                            'nama_tabel' => 'esakip_pohon_kinerja_dan_cascading',
-                            'user_role' => 'perangkat_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'LHE AKIP Internal',
-                            'nama_tabel' => 'esakip_lhe_akip_internal',
-                            'user_role' => 'perangkat_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'TL LHE AKIP Internal',
-                            'nama_tabel' => 'esakip_tl_lhe_akip_internal',
-                            'user_role' => 'perangkat_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'Laporan Monev Renaksi',
-                            'nama_tabel' => 'esakip_laporan_monev_renaksi',
-                            'user_role' => 'perangkat_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'Dokumen Lainnya',
-                            'nama_tabel' => 'esakip_dokumen_lainnya',
-                            'user_role' => 'perangkat_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'Rencana Aksi',
-                            'nama_tabel' => 'esakip_rencana_aksi',
-                            'user_role' => 'perangkat_daerah'
                         ),
                         array(
                             'nama_dokumen' => 'SKP',
@@ -319,42 +412,14 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                         )
                     );
 
-                    foreach ($design_menu as $menu) {
-                        $cek_menu = $wpdb->get_results(
-                            "
-                            SELECT 
-                                *
-                            FROM esakip_menu_dokumen 
-                            WHERE tahun_anggaran =".$tahun_anggaran."
-                                AND nama_tabel='".$menu['nama_tabel']."'
-                                AND user_role='".$menu['user_role']."'",
-                            ARRAY_A
-                        );
-                        $default_menu = array(
-                            'nama_tabel' => $menu['nama_tabel'],
-                            'nama_dokumen' => $menu['nama_dokumen'],
-                            'user_role' => $menu['user_role'],
-                            'active' => 1,
-                            'tahun_anggaran' => $tahun_anggaran
-                        );
-                        if(empty($cek_menu)){
-                            if ($wpdb->insert('esakip_menu_dokumen', $default_menu) === false) {
-                                error_log("Error inserting into esakip_menu_dokumen: " . $wpdb->last_error);
-                                continue;
-                            }
-                        }else{
-                            $update_menu = $wpdb->update(
-                                'esakip_menu_dokumen', 
-                                array('nama_dokumen' => $menu['nama_dokumen']),
-                                array('nama_tabel' => $menu['nama_tabel'],'tahun_anggaran' => $tahun_anggaran),
-							    array('%s')
-                            );
-                            if ($update_menu === false) {
-                                error_log("Error updating into esakip_menu_dokumen: " . $wpdb->last_error);
-                                continue;
-                            }
-                        }
-                        
+                    foreach ($data_hapus as $hapus) {
+                        $ret['data'] = $wpdb->delete(
+                            'esakip_menu_dokumen', 
+                            array(
+                                'tahun_anggaran' => $tahun_anggaran,
+                                'nama_dokumen' => $hapus['nama_dokumen'],
+                                'user_role' => $hapus['user_role']
+	                    ));                    
                     }
                 } else {
                     $return = array(
@@ -480,6 +545,34 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
 					$ret['message'] = 'Pengaturan Menu Dokumen kosong!';
 				}
 
+                if (!empty($_POST['verifikasi_dokumen'])) {
+					$pengaturan_verifikasi_upload_dokumen = $_POST['verifikasi_dokumen'];
+					$input_verifikasi = 0;
+					if ($pengaturan_verifikasi_upload_dokumen == 'verifikasi') {
+						$input_verifikasi = 1;
+					} else if ($pengaturan_verifikasi_upload_dokumen == 'tidak') {
+						$input_verifikasi = 0;
+					}
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Pengaturan Verifikasi Upload Dokumen kosong!';
+				}
+
+                if (!empty($_POST['akses_user'])) {
+					$pengaturan_akses_user = $_POST['akses_user'];
+					$input_akses_user = 0;
+					if ($pengaturan_akses_user == 'pemda') {
+						$input_akses_user = 1;
+					} else if ($pengaturan_akses_user == 'pd') {
+						$input_akses_user = 2;
+					} else if ($pengaturan_akses_user == 'semua') {
+						$input_akses_user = 3;
+					}
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Pengaturan Akses User Upload Dokumen kosong!';
+				}
+
 				if ($ret['status'] == 'success') {
 					// Cek data verifikasi yg sudah ada
 					$data_menu = $wpdb->get_row(
@@ -496,17 +589,21 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
 						$opsi = array(
 							'active' => $input_pengaturan_menu,
 							'keterangan' => $keterangan,
-                            'updated_at' => current_time('mysql')
+                            'updated_at' => current_time('mysql'),
+                            'verifikasi_upload_dokumen' => $input_verifikasi,
+                            'jenis_role' => $input_akses_user
 						);
 
 						$wpdb->update(
 							'esakip_menu_dokumen',
 							$opsi,
 							array('id' => $id_dokumen),
-							array('%d', '%s', '%s'),
+							array('%d', '%s', '%s', '%d', '%d'),
 							array('%d')
 						);
 
+                        $ret['check'] = $wpdb->rows_affected;
+                        $ret['opsi'] = $opsi;
 						if ($wpdb->rows_affected == 0) {
 							$ret = array(
 								'status' => 'error',

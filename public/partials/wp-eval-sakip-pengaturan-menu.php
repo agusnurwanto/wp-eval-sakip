@@ -35,6 +35,8 @@ $body = '';
 					<th class="text-center">No</th>
 					<th class="text-center">Nama Tabel Database</th>
 					<th class="text-center">Nama Dokumen</th>
+					<th class="text-center">Akses User</th>
+					<th class="text-center">Verifikasi Upload Dokumen</th>
 					<th class="text-center">Status</th>
 					<th class="text-center">Keterangan</th>
 					<th class="text-center" style="width: 150px;">Aksi</th>
@@ -51,6 +53,8 @@ $body = '';
 					<th class="text-center">No</th>
 					<th class="text-center">Nama Tabel Database</th>
 					<th class="text-center">Nama Dokumen</th>
+					<th class="text-center">Akses User</th>
+					<th class="text-center">Verifikasi Upload Dokumen</th>
 					<th class="text-center">Status</th>
 					<th class="text-center">Keterangan</th>
 					<th class="text-center" style="width: 150px;">Aksi</th>
@@ -64,7 +68,7 @@ $body = '';
 
 <!-- Modal Edit Pengaturan Menu -->
 <div class="modal fade" id="editPengaturanMenu" tabindex="-1" role="dialog" aria-labelledby="editPengaturanMenuLabel" aria-hidden="true">
-    <div class="modal-dialog modal-m modal-dialog-centered" role="document">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editPengaturanMenuLabel">Edit Pengaturan Menu Dokumen</h5>
@@ -77,25 +81,70 @@ $body = '';
                     <input type="hidden" value="<?php echo $input['tahun_anggaran']; ?>" id="tahunAnggaran">
                     <input type="hidden" value="" id="idDokumen">
 					<input type="hidden" value="" id="tipeDokumen">
-                    <tr>
-                        <td>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="menu_dokumen" id="menu_dokumen_tampil" value="tampil">
-                                <label class="form-check-label" for="menu_dokumen_tampil">Tampilkan</label>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="menu_dokumen" id="menu_dokumen_sembunyi" value="sembunyi">
-                                <label class="form-check-label" for="menu_dokumen_sembunyi">Sembunyikan</label>
-                            </div>
-                        </td>
-                    </tr>
-                    <div class="form-group">
+					<div class="form-group">
+						<label class="d-block">Pengaturan Menu Upload Dokumen</label>
+						<tr>
+							<td>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" name="menu_dokumen" id="menu_dokumen_tampil" value="tampil">
+									<label class="form-check-label" for="menu_dokumen_tampil">Tampilkan</label>
+								</div>
+							</td>
+							<td>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" name="menu_dokumen" id="menu_dokumen_sembunyi" value="sembunyi">
+									<label class="form-check-label" for="menu_dokumen_sembunyi">Sembunyikan</label>
+								</div>
+							</td>
+						</tr>
+						<small class="d-block">Setting Menu Upload Dokumen Yang Tampil Di Dashboard User</small>
+					</div>
+					<div class="form-group" style="margin: 2em 0 0;">
+						<label class="d-block">Pengaturan Verifikasi Upload Dokumen</label>
+						<tr>
+							<td>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" name="verifikasi_upload_dokumen" id="verifikasi_upload_dokumen_verifikasi" value="verifikasi">
+									<label class="form-check-label" for="verifikasi_upload_dokumen_verifikasi">Verifikasi</label>
+								</div>
+							</td>
+							<td>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" name="verifikasi_upload_dokumen" id="verifikasi_upload_dokumen_tidak" value="tidak">
+									<label class="form-check-label" for="verifikasi_upload_dokumen_tidak">Tidak Verifikasi</label>
+								</div>
+							</td>
+						</tr>
+					</div>
+					<div class="form-group" style="margin: 2em 0 0;">
+						<label class="d-block">Pengaturan Akses User Upload Dokumen</label>
+						<tr>
+							<td>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" name="akses_user_upload_dokumen" id="akses_user_upload_dokumen_pemda" value="pemda">
+									<label class="form-check-label" for="akses_user_upload_dokumen_pemda">Pemerintah Daerah</label>
+								</div>
+							</td>
+							<td>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" name="akses_user_upload_dokumen" id="akses_user_upload_dokumen_pd" value="pd">
+									<label class="form-check-label" for="akses_user_upload_dokumen_pd">Peragkat Daerah</label>
+								</div>
+							</td>
+							<td>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" name="akses_user_upload_dokumen" id="verifikasi_upload_dokumen_semua" value="semua">
+									<label class="form-check-label" for="verifikasi_upload_dokumen_semua">Pemerintah Daerah dan Perangkat Daerah</label>
+								</div>
+							</td>
+						</tr>
+						<small class="d-block">Setting User Yang Bisa Mengakses Upload Dokumen</small>
+					</div>
+                    <div class="form-group" style="margin: 2em 0 0;">
                         <label for="keterangan">Keterangan</label>
                         <textarea class="form-control" id="keterangan" name="keterangan" rows="3"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary" onclick="submit_pengaturan_menu(this); return false">Simpan</button>
+                    <button type="submit" class="btn btn-primary" style="margin: 2em 0 0;" onclick="submit_pengaturan_menu(this); return false">Simpan</button>
                 </form>
             </div>
         </div>
@@ -196,6 +245,17 @@ $body = '';
                         let pengaturan_menu = (data.active == 1) ? "tampil" : "sembunyi";
                         jQuery("input[name=menu_dokumen][value='"+pengaturan_menu+"']").prop("checked",true);
                         jQuery("#keterangan").val(data.keterangan);
+						let verifikasi_upload = (data.verifikasi_upload_dokumen == 1) ? "verifikasi" : "tidak";
+                        jQuery("input[name=verifikasi_upload_dokumen][value='"+verifikasi_upload+"']").prop("checked",true);
+						let akses_user = '';
+						if(data.jenis_role == 1){
+							akses_user = 'pemda';
+						}else if(data.jenis_role == 2){
+							akses_user = 'pd';
+						}else if(data.jenis_role == 3){
+							akses_user = 'semua';
+						}
+                        jQuery("input[name=akses_user_upload_dokumen][value='"+akses_user+"']").prop("checked",true);
                     }
                     jQuery("#idDokumen").val(id);
 					jQuery("#tipeDokumen").val(tipe);
@@ -235,6 +295,18 @@ $body = '';
             return alert('Pengaturan menu tidak boleh kosong!');
         }
 
+		let verifikasi_dokumen = jQuery("input[name='verifikasi_upload_dokumen']:checked").val();
+
+        if (verifikasi_dokumen == '' || verifikasi_dokumen == undefined) {
+            return alert('Pengaturan Verifikasi Upload Dokumen tidak boleh kosong!');
+        }
+
+		let akses_user = jQuery("input[name='akses_user_upload_dokumen']:checked").val();
+
+        if (akses_user == '' || akses_user == undefined) {
+            return alert('Pengaturan akses user tidak boleh kosong!');
+        }
+
         let form_data = new FormData();
         form_data.append('action', 'submit_edit_pengaturan_menu_dokumen');
         form_data.append('api_key', esakip.api_key);
@@ -243,6 +315,8 @@ $body = '';
         form_data.append('tahun_anggaran', tahun_anggaran);
         form_data.append('menu_dokumen', menu_dokumen);
         form_data.append('tipe_dokumen', tipe_dokumen);
+		form_data.append('verifikasi_dokumen', verifikasi_dokumen);
+		form_data.append('akses_user', akses_user);
 
         jQuery('#wrap-loading').show();
         jQuery.ajax({

@@ -653,6 +653,7 @@ CREATE TABLE `esakip_rencana_aksi_pemda` (
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
+);
 
 CREATE TABLE `esakip_rkpd_pemda` (
   `id` int(11) NOT NULL auto_increment,
@@ -744,7 +745,7 @@ CREATE TABLE `esakip_pedoman_teknis_perencanaan_pemda` (
  PRIMARY KEY(id)
 );
 
-CREATE TABLE `esakip_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda` (
+CREATE TABLE `esakip_pedoman_teknis_pengukuran_dan_p_d_k_pemda` (
   `id` int(11) NOT NULL auto_increment,
   `opd` varchar(255) DEFAULT NULL,
   `id_skpd` int(11) DEFAULT NULL,
@@ -771,6 +772,19 @@ CREATE TABLE `esakip_pedoman_teknis_evaluasi_internal_pemda` (
 );
 
 CREATE TABLE `esakip_dpa_pemda` (
+  `id` int(11) NOT NULL auto_increment,
+  `opd` varchar(255) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `dokumen` varchar(255) DEFAULT NULL,
+  `keterangan` longtext DEFAULT NULL,
+  `tanggal_upload` varchar(50) DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp,
+  `active` tinyint(4) DEFAULT 1,
+ PRIMARY KEY(id)
+);
+
+CREATE TABLE `esakip_pohon_kinerja_dan_cascading_pemda` (
   `id` int(11) NOT NULL auto_increment,
   `opd` varchar(255) DEFAULT NULL,
   `id_skpd` int(11) DEFAULT NULL,
