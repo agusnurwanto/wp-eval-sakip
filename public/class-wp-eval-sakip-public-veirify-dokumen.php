@@ -149,6 +149,12 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             'jenis_role'    => 1
                         ),
                         array(
+                            'nama_dokumen' => 'LKJIP/LPPD',
+                            'nama_tabel' => 'esakip_lkjip_lppd',
+                            'user_role' => 'pemerintah_daerah',
+                            'jenis_role'    => 1
+                        ),
+                        array(
                             'nama_dokumen' => 'Perjanjian Kinerja',
                             'nama_tabel' => 'esakip_perjanjian_kinerja_pemda',
                             'user_role' => 'pemerintah_daerah',
@@ -326,6 +332,12 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             'nama_tabel' => 'esakip_evaluasi_internal',
                             'user_role' => 'perangkat_daerah',
                             'jenis_role'    => 2
+                        ),
+                        array(
+                            'nama_dokumen' => 'Pengukuran Kinerja',
+                            'nama_tabel' => 'esakip_pengukuran_kinerja',
+                            'user_role' => 'perangkat_daerah',
+                            'jenis_role'    => 2
                         )
                     );
 
@@ -385,65 +397,6 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                                 continue;
                             }
                         }
-                        
-                    }
-
-                    $data_hapus = array(
-                        array(
-                            'nama_dokumen' => 'LKJIP/LPPD',
-                            'nama_tabel' => 'esakip_lkjip_lppd',
-                            'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'RENJA/RKT',
-                            'nama_tabel' => 'esakip_renja_rkt',
-                            'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'Pengukuran Kinerja',
-                            'nama_tabel' => 'esakip_pengukuran_kinerja',
-                            'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'RENSTRA',
-                            'nama_tabel' => 'esakip_renstra',
-                            'user_role' => 'pemerintah_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'Pengukuran Kinerja',
-                            'nama_tabel' => 'esakip_pengukuran_kinerja',
-                            'user_role' => 'perangkat_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'Pedoman Teknis Evaluasi Internal',
-                            'nama_tabel' => 'esakip_pedoman_teknis_evaluasi_internal',
-                            'user_role' => 'perangkat_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja',
-                            'nama_tabel' => 'esakip_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja',
-                            'user_role' => 'perangkat_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'Pedoman Teknis Perencanaan',
-                            'nama_tabel' => 'esakip_pedoman_teknis_perencanaan',
-                            'user_role' => 'perangkat_daerah'
-                        ),
-                        array(
-                            'nama_dokumen' => 'TL LHE AKIP Kemenpan',
-                            'nama_tabel' => 'esakip_tl_lhe_akip_kemenpan',
-                            'user_role' => 'perangkat_daerah'
-                        )
-                    );
-
-                    foreach ($data_hapus as $hapus) {
-                        $ret['data'] = $wpdb->delete(
-                            'esakip_menu_dokumen', 
-                            array(
-                                'tahun_anggaran' => $tahun_anggaran,
-                                'nama_dokumen' => $hapus['nama_dokumen'],
-                                'user_role' => $hapus['user_role']
-	                    ));                    
                     }
                 } else {
                     $return = array(
