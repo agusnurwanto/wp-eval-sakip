@@ -6369,6 +6369,352 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
+	
+	public function get_table_dokumen_pemerintah_daerah()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+
+				if (!empty($_POST['tipe_dokumen'])) {
+					$tipe_dokumen = $_POST['tipe_dokumen'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tipe Dokumen kosong!';
+				}
+
+				if ($ret['status'] == 'success') {
+					// untuk mengatur tabel sesuai tipe dokumen
+					$nama_tabel_admin = array(
+						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading_pemda",
+						"iku" => "esakip_iku_pemda"
+					);
+
+					$datas = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT * 
+						FROM $nama_tabel_admin[$tipe_dokumen]
+						WHERE tahun_anggaran = %d 
+						  AND active = 1
+					", $tahun_anggaran),
+						ARRAY_A
+					);
+
+					if (!empty($datas)) {
+						$counter = 1;
+						$tbody = '';
+
+						foreach ($datas as $kk => $vv) {
+							$tbody .= "<tr>";
+							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+							$tbody .= "<td>" . $vv['opd'] . "</td>";
+							$tbody .= "<td>" . $vv['dokumen'] . "</td>";
+							$tbody .= "<td>" . $vv['keterangan'] . "</td>";
+							$tbody .= "<td>" . $vv['created_at'] . "</td>";
+
+							$btn = '<div class="btn-action-group">';
+							$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
+							if (!$this->is_admin_panrb()) {
+								$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
+								$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+							}
+							$btn .= '</div>';
+
+							$tbody .= "<td class='text-center'>" . $btn . "</td>";
+							$tbody .= "</tr>";
+						}
+
+						$ret['data'] = $tbody;
+					} else {
+						$ret['data'] = "<tr><td colspan='6' class='text-center'>Tidak ada data tersedia</td></tr>";
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function submit_tambah_dokumen_pemerintah_daerah()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$id_dokumen = null;
+
+				if (!empty($_POST['id_dokumen'])) {
+					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
+				}
+				if (!empty($_POST['skpd'])) {
+					$skpd = ucwords($_POST['skpd']);
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Perangkat Daerah kosong!';
+				}
+				if (!empty($_POST['keterangan'])) {
+					$keterangan = $_POST['keterangan'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Keterangan kosong!';
+				}
+				if (!empty($_POST['tahunAnggaran'])) {
+					$tahunAnggaran = $_POST['tahunAnggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if (!empty($_POST['tipe_dokumen'])) {
+					$tipe_dokumen = $_POST['tipe_dokumen'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tipe Dokumen kosong!';
+				}
+				if (empty(get_option('_crb_maksimal_upload_dokumen_esakip'))) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
+				}
+
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
+					$upload = $this->functions->uploadFile(
+						$_POST['api_key'],
+						$upload_dir,
+						$_FILES['fileUpload'],
+						array('pdf'),
+						1048576 * $maksimal_upload
+					);
+					if ($upload['status'] == false) {
+						$ret = array(
+							'status' => 'error',
+							'message' => $upload['message']
+						);
+					}
+				}
+
+				if ($ret['status'] == 'success') {
+					// untuk mengatur tabel sesuai tipe dokumen
+					$nama_tabel = array(
+						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading_pemda",
+						"iku" => "esakip_iku_pemda"
+					);
+
+					// pastikan tambah kolom id user
+					$user_id = um_user('ID');
+
+					if (empty($id_dokumen)) {
+						$wpdb->insert(
+							$nama_tabel[$tipe_dokumen],
+							array(
+								'opd' => $skpd,
+								'id_user' => $user_id,
+								'dokumen' => $upload['filename'],
+								'keterangan' => $keterangan,
+								'tahun_anggaran' => $tahunAnggaran,
+								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
+							),
+							array('%s', '%s', '%s', '%s', '%d')
+						);
+
+						if (!$wpdb->insert_id) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal menyimpan data ke database!'
+							);
+						}
+					} else {
+						$opsi = array(
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM $nama_tabel[$tipe_dokumen]
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
+						$wpdb->update(
+							$nama_tabel[$tipe_dokumen],
+							$opsi,
+							array('id' => $id_dokumen),
+							array('%s', '%s'),
+							array('%d')
+						);
+
+						if ($wpdb->rows_affected == 0) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal memperbarui data ke database!'
+							);
+						}
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_detail_dokumen_by_id_pemerintah_daerah()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+				if (!empty($_POST['id']) && !empty($_POST['tipe_dokumen'])) {
+					$tipe_dokumen = $_POST['tipe_dokumen'];
+					// untuk mengatur tabel sesuai tipe dokumen
+					$nama_tabel = array(
+						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading_pemda",
+						"iku" => "esakip_iku_pemda",
+					);
+
+					$data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT *
+							FROM $nama_tabel[$tipe_dokumen]
+							WHERE id = %d
+						", $_POST['id']),
+						ARRAY_A
+					);
+					$ret['data'] = $data;
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Ada Data Yang Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	
+	public function hapus_dokumen_pemerintah_daerah()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id']) && !empty($_POST['tipe_dokumen'])) {
+					$tipe_dokumen = $_POST['tipe_dokumen'];
+					// untuk mengatur tabel sesuai tipe dokumen
+					$nama_tabel = array(
+						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading_pemda",
+						"iku" => "esakip_iku_pemda"
+					);
+
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$dokumen_lama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								dokumen
+							FROM $nama_tabel[$tipe_dokumen]
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					$ret['data'] = $wpdb->update(
+						$nama_tabel[$tipe_dokumen],
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+
+					if ($wpdb->rows_affected > 0) {
+						if (is_file($upload_dir . $dokumen_lama)) {
+							unlink($upload_dir . $dokumen_lama);
+						}
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Ada Data Yang Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
 	public function hapus_dokumen_renja()
 	{
 		global $wpdb;

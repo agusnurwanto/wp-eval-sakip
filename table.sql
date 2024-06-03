@@ -787,7 +787,7 @@ CREATE TABLE `esakip_dpa_pemda` (
 CREATE TABLE `esakip_pohon_kinerja_dan_cascading_pemda` (
   `id` int(11) NOT NULL auto_increment,
   `opd` varchar(255) DEFAULT NULL,
-  `id_skpd` int(11) DEFAULT NULL,
+  `id_user` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` longtext DEFAULT NULL,
   `tanggal_upload` varchar(50) DEFAULT NULL,

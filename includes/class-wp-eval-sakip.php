@@ -261,7 +261,12 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_submit_tambah_dokumen', $plugin_public, 'submit_tambah_dokumen');
 		$this->loader->add_action('wp_ajax_hapus_dokumen', $plugin_public, 'hapus_dokumen');
 		$this->loader->add_action('wp_ajax_get_table_dokumen', $plugin_public, 'get_table_dokumen');
-		
+
+		$this->loader->add_action('wp_ajax_get_detail_dokumen_by_id_pemerintah_daerah', $plugin_public, 'get_detail_dokumen_by_id_pemerintah_daerah');
+		$this->loader->add_action('wp_ajax_get_table_dokumen_pemerintah_daerah', $plugin_public, 'get_table_dokumen_pemerintah_daerah');
+		$this->loader->add_action('wp_ajax_submit_tambah_dokumen_pemerintah_daerah', $plugin_public, 'submit_tambah_dokumen_pemerintah_daerah');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_pemerintah_daerah', $plugin_public, 'hapus_dokumen_pemerintah_daerah');
+
 		$this->loader->add_action('wp_ajax_get_detail_laporan_kinerja_by_id', $plugin_public, 'get_detail_laporan_kinerja_by_id');
 		$this->loader->add_action('wp_ajax_tambah_dokumen_laporan_kinerja', $plugin_public, 'tambah_dokumen_laporan_kinerja');
 		$this->loader->add_action('wp_ajax_submit_tahun_laporan_kinerja', $plugin_public, 'submit_tahun_laporan_kinerja');
