@@ -1272,32 +1272,6 @@ class Wp_Eval_Sakip_Admin
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'rencana_aksi_pemda')));
 		
-		Container::make('theme_options', __('SKP'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_skp_hide_sidebar')
-					->set_html('
-						<style>
-							.postbox-container { display: none; }
-							#poststuff #post-body.columns-2 { margin: 0 !important; }
-						</style>
-					')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'skp_pemda')));
-			
-		Container::make('theme_options', __('Evaluasi Internal'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_evaluasi_internal_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'evaluasi_internal_pemda')));
-		
 		Container::make('theme_options', __('LKJIP/LPPD'))
 			->set_page_parent($dokumen_pemda_menu)
 			->add_fields(array(
