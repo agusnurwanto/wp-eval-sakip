@@ -56,7 +56,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 <div class="container-md">
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Dokumen Pohon Kinerja dan Cascading <br>Pemerintah Daerah<br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
+            <h1 class="text-center" style="margin:3rem;">Dokumen IKU <br>Pemerintah Daerah<br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
             <?php if (!$is_admin_panrb): ?>
             <div style="margin-bottom: 25px;">
                 <button class="btn btn-primary" onclick="tambah_dokumen();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
@@ -67,7 +67,6 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
-                            <th class="text-center">Unit Kerja</th>
                             <th class="text-center">Nama Dokumen</th>
                             <th class="text-center">Keterangan</th>
                             <th class="text-center">Waktu Upload</th>
@@ -97,10 +96,6 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 <form enctype="multipart/form-data">
                     <input type="hidden" value="<?php echo $input['tahun']; ?>" id="tahunAnggaran">
                     <input type="hidden" value="" id="idDokumen">
-                    <div class="form-group">
-                        <label for="perangkatDaerah">Perangkat Daerah</label>
-                        <input type="text" class="form-control" id="perangkatDaerah" name="perangkatDaerah" style="text-transform: uppercase;" value="pemerintah daerah" disabled>
-                    </div>
                     <div class="form-group">
                         <label for="fileUpload">Pilih File</label>
                         <input type="file" class="form-control-file" id="fileUpload" name="fileUpload" accept="application/pdf" required>
@@ -325,10 +320,6 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     function submit_dokumen(that) {
         let id_dokumen = jQuery("#idDokumen").val();
 
-        let skpd = jQuery("#perangkatDaerah").val();
-        if (skpd == '') {
-            return alert('Perangkat Daerah tidak boleh kosong');
-        }
         let keterangan = jQuery("#keterangan").val();
         if (keterangan == '') {
             return alert('Keterangan tidak boleh kosong');
@@ -351,7 +342,6 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         form_data.append('action', 'submit_tambah_dokumen_pemerintah_daerah');
         form_data.append('api_key', esakip.api_key);
         form_data.append('id_dokumen', id_dokumen);
-        form_data.append('skpd', skpd);
         form_data.append('keterangan', keterangan);
         form_data.append('tahunAnggaran', tahunAnggaran);
         form_data.append('fileUpload', fileDokumen);

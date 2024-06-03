@@ -6399,7 +6399,23 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					// untuk mengatur tabel sesuai tipe dokumen
 					$nama_tabel_admin = array(
 						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading_pemda",
-						"iku" => "esakip_iku_pemda"
+						"iku" => "esakip_iku_pemda",
+						"dpa" => "esakip_dpa_pemda",
+						"skp" => "esakip_skp_pemda",
+						"rencana_aksi" => "esakip_rencana_aksi_pemda",
+						"perjanjian_kinerja" => "esakip_perjanjian_kinerja_pemda",
+						"evaluasi_internal" => "esakip_evaluasi_internal_pemda",
+						"laporan_kinerja" => "esakip_laporan_kinerja_pemda",
+						"dokumen_lainnya" => "esakip_dokumen_lainnya_pemda",
+						"lhe_akip_internal" => "esakip_lhe_akip_internal_pemda",
+						"tl_lhe_akip_internal" => "esakip_tl_lhe_akip_internal_pemda",
+						"tl_lhe_akip_kemenpan" => "esakip_tl_lhe_akip_kemenpan_pemda",
+						"laporan_monev_renaksi" => "esakip_laporan_monev_renaksi_pemda",
+						"pedoman_teknis_perencanaan" => "esakip_pedoman_teknis_perencanaan_pemda",
+						"pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja" => "esakip_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda",
+						"pedoman_teknis_evaluasi_internal" => "esakip_pedoman_teknis_evaluasi_internal_pemda",
+						"lkjip" => "esakip_lkjip_pemda",
+						"rkpd" => "esakip_rkpd_pemda"
 					);
 
 					$datas = $wpdb->get_results(
@@ -6419,7 +6435,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						foreach ($datas as $kk => $vv) {
 							$tbody .= "<tr>";
 							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-							$tbody .= "<td>" . $vv['opd'] . "</td>";
 							$tbody .= "<td>" . $vv['dokumen'] . "</td>";
 							$tbody .= "<td>" . $vv['keterangan'] . "</td>";
 							$tbody .= "<td>" . $vv['created_at'] . "</td>";
@@ -6472,12 +6487,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_dokumen = $_POST['id_dokumen'];
 					$ret['message'] = 'Berhasil edit data!';
 				}
-				if (!empty($_POST['skpd'])) {
-					$skpd = ucwords($_POST['skpd']);
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Perangkat Daerah kosong!';
-				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
 				} else {
@@ -6503,32 +6512,69 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				if (empty(get_option('_crb_maksimal_upload_dokumen_esakip'))) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
-				}
-
-				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
-					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
-					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
-					$upload = $this->functions->uploadFile(
-						$_POST['api_key'],
-						$upload_dir,
-						$_FILES['fileUpload'],
-						array('pdf'),
-						1048576 * $maksimal_upload
-					);
-					if ($upload['status'] == false) {
-						$ret = array(
-							'status' => 'error',
-							'message' => $upload['message']
-						);
-					}
-				}
+				}				
 
 				if ($ret['status'] == 'success') {
 					// untuk mengatur tabel sesuai tipe dokumen
 					$nama_tabel = array(
 						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading_pemda",
-						"iku" => "esakip_iku_pemda"
+						"iku" => "esakip_iku_pemda",
+						"dpa" => "esakip_dpa_pemda",
+						"skp" => "esakip_skp_pemda",
+						"rencana_aksi" => "esakip_rencana_aksi_pemda",
+						"perjanjian_kinerja" => "esakip_perjanjian_kinerja_pemda",
+						"evaluasi_internal" => "esakip_evaluasi_internal_pemda",
+						"laporan_kinerja" => "esakip_laporan_kinerja_pemda",
+						"dokumen_lainnya" => "esakip_dokumen_lainnya_pemda",
+						"lhe_akip_internal" => "esakip_lhe_akip_internal_pemda",
+						"tl_lhe_akip_internal" => "esakip_tl_lhe_akip_internal_pemda",
+						"tl_lhe_akip_kemenpan" => "esakip_tl_lhe_akip_kemenpan_pemda",
+						"laporan_monev_renaksi" => "esakip_laporan_monev_renaksi_pemda",
+						"pedoman_teknis_perencanaan" => "esakip_pedoman_teknis_perencanaan_pemda",
+						"pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja" => "esakip_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda",
+						"pedoman_teknis_evaluasi_internal" => "esakip_pedoman_teknis_evaluasi_internal_pemda",
+						"lkjip" => "esakip_lkjip_pemda",
+						"rkpd" => "esakip_rkpd_pemda"
 					);
+				
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+				
+					if ($ret['status'] != 'error' && !empty($_FILES['fileUpload'])) {
+						$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
+						$upload = $this->functions->uploadFile(
+							$_POST['api_key'],
+							$upload_dir,
+							$_FILES['fileUpload'],
+							array('pdf'),
+							1048576 * $maksimal_upload,
+							$_POST['namaDokumen']
+						);
+						if ($upload['status'] == false) {
+							$ret = array(
+								'status' => 'error',
+								'message' => $upload['message']
+							);
+						}
+					} else if ($ret['status'] != 'error' && !empty($_POST['namaDokumen'])) {
+						$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+							SELECT
+								dokumen
+							FROM $nama_tabel[$tipe_dokumen]
+							WHERE id=%d
+						", $id_dokumen));
+						if ($dokumen_lama != $_POST['namaDokumen']) {
+							$ret_rename = $this->functions->renameFile($upload_dir . $dokumen_lama, $upload_dir . $_POST['namaDokumen']);
+							if ($ret_rename['status'] != 'error') {
+								$wpdb->update(
+									$nama_tabel[$tipe_dokumen],
+									array('dokumen' => $_POST['namaDokumen']),
+									array('id' => $id_dokumen),
+								);
+							} else {
+								$ret = $ret_rename;
+							}
+						}
+					}
 
 					// pastikan tambah kolom id user
 					$user_id = um_user('ID');
@@ -6538,7 +6584,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$nama_tabel[$tipe_dokumen],
 							array(
 								'opd' => $skpd,
-								'id_user' => $user_id,
 								'dokumen' => $upload['filename'],
 								'keterangan' => $keterangan,
 								'tahun_anggaran' => $tahunAnggaran,
@@ -6621,6 +6666,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$nama_tabel = array(
 						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading_pemda",
 						"iku" => "esakip_iku_pemda",
+						"dpa" => "esakip_dpa_pemda",
+						"skp" => "esakip_skp_pemda",
+						"rencana_aksi" => "esakip_rencana_aksi_pemda",
+						"perjanjian_kinerja" => "esakip_perjanjian_kinerja_pemda",
+						"evaluasi_internal" => "esakip_evaluasi_internal_pemda",
+						"laporan_kinerja" => "esakip_laporan_kinerja_pemda",
+						"dokumen_lainnya" => "esakip_dokumen_lainnya_pemda",
+						"lhe_akip_internal" => "esakip_lhe_akip_internal_pemda",
+						"tl_lhe_akip_internal" => "esakip_tl_lhe_akip_internal_pemda",
+						"tl_lhe_akip_kemenpan" => "esakip_tl_lhe_akip_kemenpan_pemda",
+						"laporan_monev_renaksi" => "esakip_laporan_monev_renaksi_pemda",
+						"pedoman_teknis_perencanaan" => "esakip_pedoman_teknis_perencanaan_pemda",
+						"pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja" => "esakip_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda",
+						"pedoman_teknis_evaluasi_internal" => "esakip_pedoman_teknis_evaluasi_internal_pemda",
+						"lkjip" => "esakip_lkjip_pemda",
+						"rkpd" => "esakip_rkpd_pemda",
 					);
 
 					$data = $wpdb->get_row(
@@ -6670,7 +6731,23 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					// untuk mengatur tabel sesuai tipe dokumen
 					$nama_tabel = array(
 						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading_pemda",
-						"iku" => "esakip_iku_pemda"
+						"iku" => "esakip_iku_pemda",
+						"dpa" => "esakip_dpa_pemda",
+						"skp" => "esakip_skp_pemda",
+						"rencana_aksi" => "esakip_rencana_aksi_pemda",
+						"perjanjian_kinerja" => "esakip_perjanjian_kinerja_pemda",
+						"evaluasi_internal" => "esakip_evaluasi_internal_pemda",
+						"laporan_kinerja" => "esakip_laporan_kinerja_pemda",
+						"dokumen_lainnya" => "esakip_dokumen_lainnya_pemda",
+						"lhe_akip_internal" => "esakip_lhe_akip_internal_pemda",
+						"tl_lhe_akip_internal" => "esakip_tl_lhe_akip_internal_pemda",
+						"tl_lhe_akip_kemenpan" => "esakip_tl_lhe_akip_kemenpan_pemda",
+						"laporan_monev_renaksi" => "esakip_laporan_monev_renaksi_pemda",
+						"pedoman_teknis_perencanaan" => "esakip_pedoman_teknis_perencanaan_pemda",
+						"pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja" => "esakip_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda",
+						"pedoman_teknis_evaluasi_internal" => "esakip_pedoman_teknis_evaluasi_internal_pemda",
+						"lkjip" => "esakip_lkjip_pemda",
+						"rkpd" => "esakip_rkpd_pemda"
 					);
 
 					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
