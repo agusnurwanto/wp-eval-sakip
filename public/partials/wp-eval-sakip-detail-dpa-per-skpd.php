@@ -76,10 +76,10 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
             <h1 class="text-center" style="margin:3rem;">Dokumen DPA <br><?php echo $skpd['nama_skpd'] ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
-            <?php if (!$is_admin_panrb): ?>
-            <div style="margin-bottom: 25px;">
-                <button class="btn btn-primary" onclick="tambah_dokumen_dpa();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
-            </div>
+            <?php if (!$is_admin_panrb) : ?>
+                <div style="margin-bottom: 25px;">
+                    <button class="btn btn-primary" onclick="tambah_dokumen_dpa();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
+                </div>
             <?php endif; ?>
             <div class="wrap-table">
                 <table id="table_dokumen_dpa" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
@@ -133,6 +133,10 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                     </div>
                     <div class="alert alert-warning mt-2" role="alert">
                         Maksimal ukuran file: <?php echo get_option('_crb_maksimal_upload_dokumen_esakip'); ?> MB. Format file yang diperbolehkan: PDF.
+                    </div>
+                    <div class="form-group">
+                        <label for="nama_file">Nama Dokumen</label>
+                        <input type="text" class="form-control" id="nama_file" name="nama_file" rows="3" required>
                     </div>
                     <div class="form-group">
                         <label for="keterangan">Keterangan</label>
@@ -219,10 +223,17 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     jQuery(document).ready(function() {
         getTabledpa();
         getTableTahun();
+        jQuery("#fileUpload").on('change', function() {
+            var id_dokumen = jQuery('#idDokumen').val();
+            if (id_dokumen == '') {
+                var name = jQuery("#fileUpload").prop('files')[0].name;
+                jQuery('#nama_file').val(name);
+            }
+        });
         window.tipe_dokumen = "dpa";
     });
 
-    function verifikasi_dokumen(id){
+    function verifikasi_dokumen(id) {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -239,9 +250,9 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 console.log(response);
                 if (response.status === 'success') {
                     let data = response.data;
-                    if(data.length !== 0 || data.status_verifikasi != null){
+                    if (data.length !== 0 || data.status_verifikasi != null) {
                         let verifikasi = (data.status_verifikasi == 1) ? "terima" : "tolak";
-                        jQuery("input[name=verifikasi_dokumen][value='"+verifikasi+"']").prop("checked",true);
+                        jQuery("input[name=verifikasi_dokumen][value='" + verifikasi + "']").prop("checked", true);
                         jQuery("#keterangan_verifikasi").val(data.keterangan_verifikasi);
                     }
                     jQuery("#idDokumen").val(id);
@@ -258,7 +269,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         });
     }
 
-    function submit_verifikasi_dokumen(that){
+    function submit_verifikasi_dokumen(that) {
         let id_dokumen = jQuery("#idDokumen").val();
         if (id_dokumen == '') {
             return alert('Id Dokumen tidak boleh kosong');
@@ -383,6 +394,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         jQuery("#idDokumen").val('');
         jQuery("#fileUpload").val('');
         jQuery("#keterangan").val('');
+        jQuery("#nama_file").val('');
         jQuery('#fileUploadExisting').removeAttr('href').empty();
         jQuery("#uploadModal").modal('show');
     }
@@ -457,6 +469,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                     jQuery('#fileUploadExisting').attr('href', url).html(data.dokumen);
                     jQuery("#keterangan").val(data.keterangan);
                     jQuery("#uploadModalLabel").hide();
+                    jQuery("#nama_file").val(data.dokumen);
                     jQuery("#editModalLabel").show();
                     jQuery('#uploadModal').modal('show');
                 } else {
@@ -495,6 +508,10 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         if (fileDokumen == '') {
             return alert('File Upload tidak boleh kosong');
         }
+        let namaDokumen = jQuery("#nama_file").val();
+        if (namaDokumen == '') {
+            return alert('Nama Dokumen tidak boleh kosong');
+        }
 
         let form_data = new FormData();
         form_data.append('action', 'tambah_dokumen_dpa');
@@ -505,6 +522,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         form_data.append('keterangan', keterangan);
         form_data.append('tahunAnggaran', tahunAnggaran);
         form_data.append('fileUpload', fileDokumen);
+        form_data.append('namaDokumen', namaDokumen);
 
         jQuery('#wrap-loading').show();
         jQuery.ajax({
