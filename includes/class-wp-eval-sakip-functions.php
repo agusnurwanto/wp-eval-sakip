@@ -411,7 +411,6 @@ class Esakip_Functions
         try {
             if (!empty($api_key) && $api_key == get_option(ESAKIP_APIKEY)) {
                 if (!empty($file)) {
-
                     if (empty($ext)) {
                         throw new Exception('Extensi file belum ditentukan ' . json_encode($file));
                     }
@@ -419,7 +418,7 @@ class Esakip_Functions
                     if (empty($path)) {
                         throw new Exception('Lokasi folder belum ditentukan ' . json_encode($file));
                     }
-
+                    
                     $imageFileType = strtolower(pathinfo($path . basename($file["name"]), PATHINFO_EXTENSION));
                     if (!in_array($imageFileType, $ext)) {
                         throw new Exception('Lampiran wajib ber-type ' . implode(", ", $ext) . ' ' . json_encode($file));
@@ -436,6 +435,11 @@ class Esakip_Functions
                         $file['name'] = $nama_file . '-' . $file['name'];
                     }
                     $target = $path .  $file['name'];
+
+                    if(file_exists($target)) {
+                        throw new Exception("File dengan nama $target sudah ada!");
+                    }
+
                     $moved = move_uploaded_file($file['tmp_name'], $target);
                     if ($moved) {
                         return [

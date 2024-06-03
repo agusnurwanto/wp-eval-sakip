@@ -131,7 +131,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			return '';
 		}
 
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-renstra-per-skpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-renstra-per-skpd.php';
 	}
 
 	public function renstra($atts)
@@ -446,7 +446,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-dpa-per-skpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-dpa-per-skpd.php';
 	}
 
 	public function dokumen_detail_renja_rkt($atts)
@@ -455,7 +455,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-renja-rkt-per-skpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-renja-rkt-per-skpd.php';
 	}
 
 	public function dokumen_detail_skp($atts)
@@ -464,7 +464,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-skp-per-skpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-skp-per-skpd.php';
 	}
 
 	public function dokumen_detail_rencana_aksi($atts)
@@ -473,7 +473,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-rencana-aksi-per-skpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-rencana-aksi-per-skpd.php';
 	}
 
 	public function dokumen_detail_perjanjian_kinerja($atts)
@@ -482,7 +482,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-perjanjian-kinerja-per-skpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-perjanjian-kinerja-per-skpd.php';
 	}
 
 	public function dokumen_detail_pengukuran_kinerja($atts)
@@ -491,7 +491,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-pengukuran-kinerja-per-skpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-pengukuran-kinerja-per-skpd.php';
 	}
 
 	public function dokumen_detail_pengukuran_rencana_aksi($atts)
@@ -500,7 +500,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-pengukuran-rencana-aksi-per-skpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-pengukuran-rencana-aksi-per-skpd.php';
 	}
 
 	public function dokumen_detail_evaluasi_internal($atts)
@@ -509,7 +509,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-evaluasi-internal-per-skpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-evaluasi-internal-per-skpd.php';
 	}
 
 	public function dokumen_detail_iku($atts)
@@ -518,7 +518,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-iku-per-skpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-iku-per-skpd.php';
 	}
 
 	public function dokumen_detail_laporan_kinerja($atts)
@@ -527,7 +527,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-laporan-kinerja-per-skpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-laporan-kinerja-per-skpd.php';
 	}
 
 	public function dokumen_detail_dokumen_lainnya($atts)
@@ -536,7 +536,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-dokumen-lain-per-skpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-dokumen-lain-per-skpd.php';
 	}
 
 	public function dokumen_detail_pohon_kinerja_dan_cascading($atts)
@@ -545,7 +545,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-pohon-kinerja-dan-cascading-per-skpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-pohon-kinerja-dan-cascading-per-skpd.php';
 	}
 
 	public function dokumen_detail_lhe_akip_internal($atts)
@@ -554,7 +554,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-lhe-akip-internal-per-skpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-lhe-akip-internal-per-skpd.php';
 	}
 
 	public function dokumen_detail_tl_lhe_akip_internal($atts)
@@ -563,7 +563,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-tl-lhe-akip-internal-per-skpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-tl-lhe-akip-internal-per-skpd.php';
 	}
 
 	public function dokumen_detail_tl_lhe_akip_kemenpan($atts)
@@ -572,7 +572,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-tl-lhe-akip-kemenpan-per-skpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-tl-lhe-akip-kemenpan-per-skpd.php';
 	}
 
 	public function desain_lke_sakip($atts)
@@ -617,7 +617,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-laporan-monev-renaksi-per-skpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-laporan-monev-renaksi-per-skpd.php';
 	}
 
 	public function dokumen_detail_pedoman_teknis_perencanaan($atts)
@@ -626,7 +626,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-pedoman-teknis-perencanaan-per-skpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-pedoman-teknis-perencanaan-per-skpd.php';
 	}
 
 	public function dokumen_detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja($atts)
@@ -635,7 +635,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-pedoman-teknis-pengukuran-dan-pengumpulan-data-kinerja-per-skpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-pedoman-teknis-pengukuran-dan-pengumpulan-data-kinerja-per-skpd.php';
 	}
 
 	public function dokumen_detail_pedoman_teknis_evaluasi_internal($atts)
@@ -644,7 +644,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-pedoman-teknis-evaluasi-internal-per-skpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-pedoman-teknis-evaluasi-internal-per-skpd.php';
 	}
 
 	public function lhe_akip_internal($atts)
@@ -686,7 +686,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-dpa-pemda.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-dpa-pemda.php';
 	}
 
 	public function dokumen_detail_skp_pemda($atts)
@@ -695,7 +695,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-skp-pemda.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-skp-pemda.php';
 	}
 
 	public function dokumen_detail_rencana_aksi_pemda($atts)
@@ -704,7 +704,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-rencana-aksi-pemda.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-rencana-aksi-pemda.php';
 	}
 
 	public function dokumen_detail_perjanjian_kinerja_pemda($atts)
@@ -713,7 +713,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-perjanjian-kinerja-pemda.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-perjanjian-kinerja-pemda.php';
 	}
 
 	public function dokumen_detail_evaluasi_internal_pemda($atts)
@@ -722,7 +722,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-evaluasi-internal-pemda.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-evaluasi-internal-pemda.php';
 	}
 
 	public function dokumen_detail_iku_pemda($atts)
@@ -731,7 +731,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-iku-pemda.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-iku-pemda.php';
 	}
 
 	public function dokumen_detail_laporan_kinerja_pemda($atts)
@@ -740,7 +740,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-laporan-kinerja-pemda.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-laporan-kinerja-pemda.php';
 	}
 
 	public function dokumen_detail_dokumen_lainnya_pemda($atts)
@@ -749,7 +749,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-dokumen-lain-pemda.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-dokumen-lain-pemda.php';
 	}
 
 	public function dokumen_detail_pohon_kinerja_dan_cascading_pemda($atts)
@@ -758,7 +758,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-pohon-kinerja-dan-cascading-pemda.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-pohon-kinerja-dan-cascading-pemda.php';
 	}
 
 	public function dokumen_detail_lhe_akip_internal_pemda($atts)
@@ -767,7 +767,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-lhe-akip-internal-pemda.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-lhe-akip-internal-pemda.php';
 	}
 
 	public function dokumen_detail_tl_lhe_akip_internal_pemda($atts)
@@ -776,7 +776,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-tl-lhe-akip-internal-pemda.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-tl-lhe-akip-internal-pemda.php';
 	}
 
 	public function dokumen_detail_tl_lhe_akip_kemenpan_pemda($atts)
@@ -785,7 +785,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-tl-lhe-akip-kemenpan-pemda.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-tl-lhe-akip-kemenpan-pemda.php';
 	}
 
 	public function dokumen_detail_laporan_monev_renaksi_pemda($atts)
@@ -794,7 +794,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-laporan-monev-renaksi-pemda.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-laporan-monev-renaksi-pemda.php';
 	}
 
 	public function dokumen_detail_pedoman_teknis_perencanaan_pemda($atts)
@@ -803,7 +803,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-pedoman-teknis-perencanaan-pemda.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-pedoman-teknis-perencanaan-pemda.php';
 	}
 
 	public function dokumen_detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda($atts)
@@ -812,7 +812,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-pedoman-teknis-pengukuran-dan-pengumpulan-data-kinerja-pemda.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-pedoman-teknis-pengukuran-dan-pengumpulan-data-kinerja-pemda.php';
 	}
 
 	public function dokumen_detail_pedoman_teknis_evaluasi_internal_pemda($atts)
@@ -821,7 +821,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-pedoman-teknis-evaluasi-internal-pemda.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-pedoman-teknis-evaluasi-internal-pemda.php';
 	}
 
 	public function dokumen_detail_lkjip_lppd_pemda($atts)
@@ -830,7 +830,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-lkjip-pemda.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-lkjip-pemda.php';
 	}
 
 	public function dokumen_detail_rkpd_pemda($atts)
@@ -839,7 +839,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-detail-rkpd-pemda.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-rkpd-pemda.php';
 	}
 
 	public function get_detail_renja_rkt_by_id()
@@ -6487,34 +6487,27 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_dokumen = $_POST['id_dokumen'];
 					$ret['message'] = 'Berhasil edit data!';
 				}
-				if (!empty($_POST['keterangan'])) {
-					$keterangan = $_POST['keterangan'];
-				} else {
+				if ($ret['status'] != 'error' && empty($_POST['keterangan'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Keterangan kosong!';
-				}
-				if (!empty($_POST['tahunAnggaran'])) {
-					$tahunAnggaran = $_POST['tahunAnggaran'];
-				} else {
+				}else if ($ret['status'] != 'error' && empty($_POST['tahunAnggaran'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
-				}
-				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+				}else if ($ret['status'] != 'error' && empty($_FILES['fileUpload']) && empty($id_dokumen)) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'File Dokumen kosong!';
-				}
-				if (!empty($_POST['tipe_dokumen'])) {
-					$tipe_dokumen = $_POST['tipe_dokumen'];
-				} else {
+				}else if ($ret['status'] != 'error' && empty($_POST['tipe_dokumen'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tipe Dokumen kosong!';
-				}
-				if (empty(get_option('_crb_maksimal_upload_dokumen_esakip'))) {
+				}else if ($ret['status'] != 'error'&& empty(get_option('_crb_maksimal_upload_dokumen_esakip'))) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}				
 
-				if ($ret['status'] == 'success') {
+				if ($ret['status'] != 'error') {
+					$keterangan = $_POST['keterangan'];
+					$tahunAnggaran = $_POST['tahunAnggaran'];
+					$tipe_dokumen = $_POST['tipe_dokumen'];
 					// untuk mengatur tabel sesuai tipe dokumen
 					$nama_tabel = array(
 						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading_pemda",
@@ -6576,60 +6569,59 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						}
 					}
 
-					// pastikan tambah kolom id user
-					$user_id = um_user('ID');
+					if($ret['status'] != "error"){
+						// pastikan tambah kolom id user
+						$user_id = um_user('ID');
 
-					if (empty($id_dokumen)) {
-						$wpdb->insert(
-							$nama_tabel[$tipe_dokumen],
-							array(
-								'opd' => $skpd,
-								'dokumen' => $upload['filename'],
+						if (empty($id_dokumen)) {
+							$wpdb->insert(
+								$nama_tabel[$tipe_dokumen],
+								array(
+									'dokumen' => $upload['filename'],
+									'keterangan' => $keterangan,
+									'tahun_anggaran' => $tahunAnggaran,
+									'created_at' => current_time('mysql'),
+									'tanggal_upload' => current_time('mysql')
+								)
+							);
+
+							if (!$wpdb->insert_id) {
+								$ret = array(
+									'status' => 'error',
+									'message' => 'Gagal menyimpan data ke database!',
+									'sql' => $wpdb->last_query
+								);
+							}
+						} else {
+							$opsi = array(
 								'keterangan' => $keterangan,
-								'tahun_anggaran' => $tahunAnggaran,
 								'created_at' => current_time('mysql'),
 								'tanggal_upload' => current_time('mysql')
-							),
-							array('%s', '%s', '%s', '%s', '%d')
-						);
-
-						if (!$wpdb->insert_id) {
-							$ret = array(
-								'status' => 'error',
-								'message' => 'Gagal menyimpan data ke database!'
 							);
-						}
-					} else {
-						$opsi = array(
-							'keterangan' => $keterangan,
-							'created_at' => current_time('mysql'),
-							'tanggal_upload' => current_time('mysql')
-						);
-						if (!empty($_FILES['fileUpload'])) {
-							$opsi['dokumen'] = $upload['filename'];
-							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
-								SELECT
-									dokumen
-								FROM $nama_tabel[$tipe_dokumen]
-								WHERE id=%d
-							", $id_dokumen));
-							if (is_file($upload_dir . $dokumen_lama)) {
-								unlink($upload_dir . $dokumen_lama);
+							if (!empty($_FILES['fileUpload'])) {
+								$opsi['dokumen'] = $upload['filename'];
+								$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+									SELECT
+										dokumen
+									FROM $nama_tabel[$tipe_dokumen]
+									WHERE id=%d
+								", $id_dokumen));
+								if (is_file($upload_dir . $dokumen_lama)) {
+									unlink($upload_dir . $dokumen_lama);
+								}
 							}
-						}
-						$wpdb->update(
-							$nama_tabel[$tipe_dokumen],
-							$opsi,
-							array('id' => $id_dokumen),
-							array('%s', '%s'),
-							array('%d')
-						);
-
-						if ($wpdb->rows_affected == 0) {
-							$ret = array(
-								'status' => 'error',
-								'message' => 'Gagal memperbarui data ke database!'
+							$wpdb->update(
+								$nama_tabel[$tipe_dokumen],
+								$opsi,
+								array('id' => $id_dokumen)
 							);
+
+							if ($wpdb->rows_affected == 0) {
+								$ret = array(
+									'status' => 'error',
+									'message' => 'Gagal memperbarui data ke database!'
+								);
+							}
 						}
 					}
 				}

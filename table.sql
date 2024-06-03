@@ -624,6 +624,7 @@ CREATE TABLE `esakip_lkjip_lppd_pemda` (
   `id_skpd` int(11) DEFAULT NULL,
   `dokumen` varchar(255) DEFAULT NULL,
   `keterangan` varchar(255) DEFAULT NULL,
+  `tanggal_upload` varchar(50) DEFAULT NULL,
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
