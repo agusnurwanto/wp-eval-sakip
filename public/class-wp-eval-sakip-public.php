@@ -16104,9 +16104,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$periode_renstra = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
 		}
 
-		if (empty($periode_renstra_skpd)) {
-			$periode_renstra = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
-		}
 		$halaman_lke = '
 			<div class="accordion">
 				<h5 class="esakip-header-tahun" data-id="lke" style="margin: 0;">Pengisian LKE</h5>
@@ -16245,17 +16242,35 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$pengisian_lke_per_skpd_page .= '<li><a target="_blank" href="' . $pengisian_lke_per_skpd['url'] . '&id_skpd=' . $skpd_db['id_skpd'] . '&id_jadwal=' . $get_jadwal_lke_sakip['id'] . '" class="btn btn-primary">Pengisian LKE | ' . $get_jadwal_lke_sakip['nama_jadwal'] . '</a></li>';
 			}
 
-			
-			$renstra_skpd = $this->functions->generatePage(array(
-				'nama_page' => 'RENSTRA | ' . $jadwal_periode_item['id'],
-				'content' => '[upload_dokumen_renstra periode=' . $jadwal_periode_item['id'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_renstra = 'Dokumen RENSTRA | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
-			$renstra_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-			$periode_renstra_skpd .= '<li><a target="_blank" href="' . $renstra_skpd['url'] . '" class="btn btn-primary">' . $title_renstra . '</a></li>';
-			
+			$jadwal_periode_rpjmd_renstra = $wpdb->get_results(
+				"
+				SELECT 
+					id,
+					nama_jadwal,
+					tahun_anggaran,
+					lama_pelaksanaan
+				FROM esakip_data_jadwal
+				WHERE tipe = 'RPJMD'
+				  AND status = 1",
+				ARRAY_A
+			);
+
+			foreach ($jadwal_periode_rpjmd_renstra as $jadwal_periode_item) {
+				$renstra_skpd = $this->functions->generatePage(array(
+					'nama_page' => 'RENSTRA | ' . $jadwal_periode_item['id'],
+					'content' => '[upload_dokumen_renstra periode=' . $jadwal_periode_item['id'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$title_renstra = 'Dokumen RENSTRA | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+				$renstra_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$periode_renstra_skpd .= '<li><a target="_blank" href="' . $renstra_skpd['url'] . '" class="btn btn-primary">' . $title_renstra . '</a></li>';
+			}
+				
+			if (empty($periode_renstra_skpd)) {
+				$periode_renstra_skpd = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
+			}
+
 			if (!empty($cek_data['perangkat_daerah']['RENSTRA']) && $cek_data['perangkat_daerah']['RENSTRA']['active'] == 1) {
 				$halaman_renstra_skpd = '
 					<div class="accordion">
