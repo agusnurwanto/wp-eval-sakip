@@ -15949,7 +15949,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		//DOKUMEN Perangkat Daerah JIKA DIPAKAI
 		if (!empty($cek_data['perangkat_daerah']['SKP']) && $cek_data['perangkat_daerah']['SKP']['active'] == 1) {
 			$skp = $this->functions->generatePage(array(
-				'nama_page' => 'SKP -',
+				'nama_page' => 'SKP -' . $_GET['tahun'],
 				'content' => '[skp tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
@@ -15960,7 +15960,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		if (!empty($cek_data['perangkat_daerah']['Rencana Aksi']) && $cek_data['perangkat_daerah']['Rencana Aksi']['active'] == 1) {
 			$rencana_aksi = $this->functions->generatePage(array(
-				'nama_page' => 'Rencana Aksi',
+				'nama_page' => 'Rencana Aksi -' . $_GET['tahun'],
 				'content' => '[rencana_aksi tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
@@ -15971,7 +15971,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		if (!empty($cek_data['perangkat_daerah']['Pengukuran Kinerja']) && $cek_data['perangkat_daerah']['Pengukuran Kinerja']['active'] == 1) {
 			$pengukuran_kinerja = $this->functions->generatePage(array(
-				'nama_page' => 'Pengukuran Kinerja',
+				'nama_page' => 'Pengukuran Kinerja -' . $_GET['tahun'],
 				'content' => '[pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
@@ -15990,7 +15990,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		if (!empty($cek_data['perangkat_daerah']['Evaluasi Internal']) && $cek_data['perangkat_daerah']['Evaluasi Internal']['active'] == 1) {
 			$evaluasi_internal = $this->functions->generatePage(array(
-				'nama_page' => 'Evaluasi Internal -',
+				'nama_page' => 'Evaluasi Internal -' . $_GET['tahun'],
 				'content' => '[evaluasi_internal tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
