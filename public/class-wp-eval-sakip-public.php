@@ -15636,15 +15636,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			));
 			$periode_renstra .= '<li><a target="_blank" href="' . $renstra['url'] . '" class="btn btn-primary">' . $renstra['title'] . '</a></li>';
 
-			$renstra_skpd = $this->functions->generatePage(array(
-				'nama_page' => 'RENSTRA | ' . $jadwal_periode_item['id'],
-				'content' => '[upload_dokumen_renstra periode=' . $jadwal_periode_item['id'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_renstra = 'Dokumen RENSTRA | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
-			$renstra_skpd['url'] .= '&id_skpd=ganti';
-			$periode_renstra_skpd .= '<li><a target="_blank" href="' . $renstra_skpd['url'] . '" class="btn btn-primary">' . $title_renstra . '</a></li>';
 		}
 		// PEMDA
 
@@ -15656,7 +15647,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_iku = 'IKU';
-			$iku_detail_pemda .= '<li><a target="_blank" href="' . $iku_pemda['url'] . '"   class="btn btn-info">' .  $title_iku . '</a></li>';
+			$cek_data['pemerintah_daerah']['IKU']['link'] = '<li><a target="_blank" href="' . $iku_pemda['url'] . '"   class="btn btn-info">' .  $title_iku . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['SKP']) && $cek_data['pemerintah_daerah']['SKP']['active'] == 1) {
@@ -15667,7 +15658,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_skp = 'SKP';
-			$skp_detail_pemda .= '<li><a target="_blank" href="' . $skp_pemda['url'] . '"  class="btn btn-info">' .  $title_skp . '</a></li>';
+			$cek_data['pemerintah_daerah']['SKP']['link'] = '<li><a target="_blank" href="' . $skp_pemda['url'] . '"  class="btn btn-info">' .  $title_skp . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['Rencana Aksi']) && $cek_data['pemerintah_daerah']['Rencana Aksi']['active'] == 1) {
@@ -15678,7 +15669,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_rencana_aksi = 'Rencana Aksi';
-			$rencana_aksi_detail_pemda .= '<li><a target="_blank" href="' . $rencana_aksi_pemda['url'] . '"  class="btn btn-info">' .  $title_rencana_aksi . '</a></li>';
+			$cek_data['pemerintah_daerah']['Rencana Aksi']['link'] = '<li><a target="_blank" href="' . $rencana_aksi_pemda['url'] . '"  class="btn btn-info">' .  $title_rencana_aksi . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['Pengukuran Kinerja']) && $cek_data['pemerintah_daerah']['Pengukuran Kinerja']['active'] == 1) {
@@ -15689,7 +15680,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_pengukuran_kinerja = 'Pengukuran Kinerja';
-			$pengukuran_kinerja_detail_pemda .= '<li><a target="_blank" href="' . $pengukuran_kinerja_pemda['url'] . '"  class="btn btn-info">' .  $title_pengukuran_kinerja . '</a></li>';
+			$cek_data['pemerintah_daerah']['Pengukuran Kinerja']['link'] = '<li><a target="_blank" href="' . $pengukuran_kinerja_pemda['url'] . '"  class="btn btn-info">' .  $title_pengukuran_kinerja . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['Pengukuran Rencana Aksi']) && $cek_data['pemerintah_daerah']['Pengukuran Rencana Aksi']['active'] == 1) {
@@ -15700,7 +15691,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_pengukuran_rencana_aksi = 'Pengukuran Rencana Aksi';
-			$pengukuran_rencana_aksi_detail_pemda .= '<li><a target="_blank" href="' . $pengukuran_rencana_aksi_pemda['url'] . '"  class="btn btn-info">' .  $title_pengukuran_rencana_aksi . '</a></li>';
+			$cek_data['pemerintah_daerah']['Pengukuran Rencana Aksi']['link'] = '<li><a target="_blank" href="' . $pengukuran_rencana_aksi_pemda['url'] . '"  class="btn btn-info">' .  $title_pengukuran_rencana_aksi . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['Laporan Kinerja']) && $cek_data['pemerintah_daerah']['Laporan Kinerja']['active'] == 1) {
@@ -15711,7 +15702,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_laporan_kinerja = 'Laporan Kinerja';
-			$laporan_kinerja_detail_pemda .= '<li><a target="_blank" href="' . $laporan_kinerja_pemda['url'] . '"  class="btn btn-info">' .  $title_laporan_kinerja . '</a></li>';
+			$cek_data['pemerintah_daerah']['Laporan Kinerja']['link'] = '<li><a target="_blank" href="' . $laporan_kinerja_pemda['url'] . '"  class="btn btn-info">' .  $title_laporan_kinerja . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['Evaluasi Internal']) && $cek_data['pemerintah_daerah']['Evaluasi Internal']['active'] == 1) {
@@ -15722,7 +15713,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_evaluasi_internal = 'Evaluasi Internal';
-			$evaluasi_internal_detail_pemda .= '<li><a target="_blank" href="' . $evaluasi_internal_pemda['url'] . '"  class="btn btn-info">' .  $title_evaluasi_internal . '</a></li>';
+			$cek_data['pemerintah_daerah']['Evaluasi Internal']['link'] = '<li><a target="_blank" href="' . $evaluasi_internal_pemda['url'] . '"  class="btn btn-info">' .  $title_evaluasi_internal . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['Dokumen Lainnya']) && $cek_data['pemerintah_daerah']['Dokumen Lainnya']['active'] == 1) {
@@ -15733,7 +15724,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_dokumen_lainnya = 'Lainnya';
-			$dokumen_lainnya_detail_pemda .= '<li><a target="_blank" href="' . $dokumen_lainnya_pemda['url'] . '"  class="btn btn-info">' .  $title_dokumen_lainnya . '</a></li>';
+			$cek_data['pemerintah_daerah']['Dokumen Lainnya']['link'] = '<li><a target="_blank" href="' . $dokumen_lainnya_pemda['url'] . '"  class="btn btn-info">' .  $title_dokumen_lainnya . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['Perjanjian Kinerja']) && $cek_data['pemerintah_daerah']['Perjanjian Kinerja']['active'] == 1) {
@@ -15744,7 +15735,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_perjanjian_kinerja = 'Perjanjian Kinerja';
-			$perjanjian_kinerja_detail_pemda .= '<li><a target="_blank" href="' . $perjanjian_kinerja_pemda['url'] . '"  class="btn btn-info">' .  $title_perjanjian_kinerja . '</a></li>';
+			$cek_data['pemerintah_daerah']['Perjanjian Kinerja']['link'] = '<li><a target="_blank" href="' . $perjanjian_kinerja_pemda['url'] . '"  class="btn btn-info">' .  $title_perjanjian_kinerja . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['RKPD']) && $cek_data['pemerintah_daerah']['RKPD']['active'] == 1) {
@@ -15755,7 +15746,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_rkpd = 'RKPD';
-			$rkpd_detail_pemda .= '<li><a target="_blank" href="' . $rkpd_pemda['url'] . '"  class="btn btn-info">' .  $title_rkpd . '</a></li>';
+			$cek_data['pemerintah_daerah']['RKPD']['link'] = '<li><a target="_blank" href="' . $rkpd_pemda['url'] . '"  class="btn btn-info">' .  $title_rkpd . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['Dokumen Lainnya']) && $cek_data['pemerintah_daerah']['Dokumen Lainnya']['active'] == 1) {
@@ -15766,7 +15757,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_dokumen_pemda_lainnya = 'Pemda Lainnya';
-			$dokumen_pemda_lainnya_detail_pemda .= '<li><a target="_blank" href="' . $dokumen_pemda_lainnya_pemda['url'] . '"  class="btn btn-info">' .  $title_dokumen_pemda_lainnya . '</a></li>';
+			$cek_data['pemerintah_daerah']['Dokumen Lainnya']['link'] = '<li><a target="_blank" href="' . $dokumen_pemda_lainnya_pemda['url'] . '"  class="btn btn-info">' .  $title_dokumen_pemda_lainnya . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['LKJIP/LPPD']) && $cek_data['pemerintah_daerah']['LKJIP/LPPD']['active'] == 1) {
@@ -15777,7 +15768,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_lkjip_lppd = 'LKJIP / LPPD';
-			$lkjip_lppd_detail_pemda .= '<li><a target="_blank" href="' . $lkjip_lppd_pemda['url'] . '"  class="btn btn-info">' .  $title_lkjip_lppd . '</a></li>';
+			$cek_data['pemerintah_daerah']['LKJIP/LPPD']['link'] = '<li><a target="_blank" href="' . $lkjip_lppd_pemda['url'] . '"  class="btn btn-info">' .  $title_lkjip_lppd . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['DPA']) && $cek_data['pemerintah_daerah']['DPA']['active'] == 1) {
@@ -15788,7 +15779,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_dpa = 'DPA';
-			$dpa_detail_pemda .= '<li><a target="_blank" href="' . $dpa_pemda['url'] . '"  class="btn btn-info">' .  $title_dpa . '</a></li>';
+			$cek_data['pemerintah_daerah']['DPA']['link'] = '<li><a target="_blank" href="' . $dpa_pemda['url'] . '"  class="btn btn-info">' .  $title_dpa . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['Pohon Kinerja dan Cascading']) && $cek_data['pemerintah_daerah']['Pohon Kinerja dan Cascading']['active'] == 1) {
@@ -15799,7 +15790,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_pohon_kinerja_dan_cascading = 'Pohon Kinerja dan Cascading';
-			$pohon_kinerja_dan_cascading_detail_pemda .= '<li><a target="_blank" href="' . $pohon_kinerja_dan_cascading_pemda['url'] . '"  class="btn btn-info">' .  $title_pohon_kinerja_dan_cascading . '</a></li>';
+			$cek_data['pemerintah_daerah']['Pohon Kinerja dan Cascading']['link'] = '<li><a target="_blank" href="' . $pohon_kinerja_dan_cascading_pemda['url'] . '"  class="btn btn-info">' .  $title_pohon_kinerja_dan_cascading . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['LHE AKIP Internal']) && $cek_data['pemerintah_daerah']['LHE AKIP Internal']['active'] == 1) {
@@ -15810,7 +15801,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_lhe_akip_internal = 'LHE AKIP Internal';
-			$lhe_akip_internal_detail_pemda .= '<li><a target="_blank" href="' . $lhe_akip_internal_pemda['url'] . '"  class="btn btn-info">' .  $title_lhe_akip_internal . '</a></li>';
+			$cek_data['pemerintah_daerah']['LHE AKIP Internal']['link'] = '<li><a target="_blank" href="' . $lhe_akip_internal_pemda['url'] . '"  class="btn btn-info">' .  $title_lhe_akip_internal . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['TL LHE AKIP Internal']) && $cek_data['pemerintah_daerah']['TL LHE AKIP Internal']['active'] == 1) {
@@ -15821,7 +15812,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_tl_lhe_akip_internal = 'TL LHE AKIP Internal';
-			$tl_lhe_akip_internal_detail_pemda .= '<li><a target="_blank" href="' . $tl_lhe_akip_internal_pemda['url'] . '"  class="btn btn-info">' .  $title_tl_lhe_akip_internal . '</a></li>';
+			$cek_data['pemerintah_daerah']['TL LHE AKIP Internal']['link'] = '<li><a target="_blank" href="' . $tl_lhe_akip_internal_pemda['url'] . '"  class="btn btn-info">' .  $title_tl_lhe_akip_internal . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['TL LHE AKIP Kemenpan']) && $cek_data['pemerintah_daerah']['TL LHE AKIP Kemenpan']['active'] == 1) {
@@ -15832,7 +15823,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_tl_lhe_akip_kemenpan = 'TL LHE AKIP Kemenpan';
-			$tl_lhe_akip_kemenpan_detail_pemda .= '<li><a target="_blank" href="' . $tl_lhe_akip_kemenpan_pemda['url'] . '"  class="btn btn-info">' .  $title_tl_lhe_akip_kemenpan . '</a></li>';
+			$cek_data['pemerintah_daerah']['TL LHE AKIP Kemenpan']['link'] = '<li><a target="_blank" href="' . $tl_lhe_akip_kemenpan_pemda['url'] . '"  class="btn btn-info">' .  $title_tl_lhe_akip_kemenpan . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['Laporan Monev Renaksi']) && $cek_data['pemerintah_daerah']['Laporan Monev Renaksi']['active'] == 1) {
@@ -15843,7 +15834,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_laporan_monev_renaksi = 'Laporan Monev Renaksi';
-			$laporan_monev_renaksi_detail_pemda .= '<li><a target="_blank" href="' . $laporan_monev_renaksi_pemda['url'] . '"  class="btn btn-info">' .  $title_laporan_monev_renaksi . '</a></li>';
+			$cek_data['pemerintah_daerah']['Laporan Monev Renaksi']['link'] = '<li><a target="_blank" href="' . $laporan_monev_renaksi_pemda['url'] . '"  class="btn btn-info">' .  $title_laporan_monev_renaksi . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['Pedoman Teknis Perencanaan']) && $cek_data['pemerintah_daerah']['Pedoman Teknis Perencanaan']['active'] == 1) {
@@ -15854,7 +15845,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_pedoman_teknis_perencanaan = 'Pedoman Teknis Perencanaan';
-			$pedoman_teknis_perencanaan_detail_pemda .= '<li><a target="_blank" href="' . $pedoman_teknis_perencanaan_pemda['url'] . '"  class="btn btn-info">' .  $title_pedoman_teknis_perencanaan . '</a></li>';
+			$cek_data['pemerintah_daerah']['Pedoman Teknis Perencanaan']['link'] = '<li><a target="_blank" href="' . $pedoman_teknis_perencanaan_pemda['url'] . '"  class="btn btn-info">' .  $title_pedoman_teknis_perencanaan . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja']) && $cek_data['pemerintah_daerah']['Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja']['active'] == 1) {
@@ -15865,7 +15856,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja';
-			$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_detail_pemda .= '<li><a target="_blank" href="' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda['url'] . '"  class="btn btn-info">' .  $title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja . '</a></li>';
+			$cek_data['pemerintah_daerah']['Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja']['link'] = '<li><a target="_blank" href="' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda['url'] . '"  class="btn btn-info">' .  $title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['Pedoman Teknis Evaluasi Internal']) && $cek_data['pemerintah_daerah']['Pedoman Teknis Evaluasi Internal']['active'] == 1) {
@@ -15876,7 +15867,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_pedoman_teknis_evaluasi_internal = 'Pedoman Teknis Evaluasi Internal';
-			$pedoman_teknis_evaluasi_internal_detail_pemda .= '<li><a target="_blank" href="' . $pedoman_teknis_evaluasi_internal_pemda['url'] . '"  class="btn btn-info">' .  $title_pedoman_teknis_evaluasi_internal . '</a></li>';
+			$cek_data['pemerintah_daerah']['Pedoman Teknis Evaluasi Internal']['link'] = '<li><a target="_blank" href="' . $pedoman_teknis_evaluasi_internal_pemda['url'] . '"  class="btn btn-info">' .  $title_pedoman_teknis_evaluasi_internal . '</a></li>';
 		}
 
 		//DOKUMEN Perangkat Daerah
@@ -15887,7 +15878,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$renja_rkt_detail .= '<li><a target="_blank" href="' . $renja_rkt['url'] . '" class="btn btn-primary"> RENJA / RKT </a></li>';
+			$cek_data['perangkat_daerah']['RENJA/RKT']['link'] = '<li><a target="_blank" href="' . $renja_rkt['url'] . '" class="btn btn-primary"> RENJA / RKT </a></li>';
 		}
 
 		if (!empty($cek_data['perangkat_daerah']['IKU']) && $cek_data['perangkat_daerah']['IKU']['active'] == 1) {
@@ -15898,7 +15889,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_iku = 'IKU ';
-			$iku_detail .= '<li><a target="_blank" href="' . $iku['url'] . '" class="btn btn-primary">' .  $title_iku . '</a></li>';
+			$cek_data['perangkat_daerah']['IKU']['link'] = '<li><a target="_blank" href="' . $iku['url'] . '" class="btn btn-primary">' .  $title_iku . '</a></li>';
 		}
 
 		if (!empty($cek_data['perangkat_daerah']['Perjanjian Kinerja']) && $cek_data['perangkat_daerah']['Perjanjian Kinerja']['active'] == 1) {
@@ -15909,7 +15900,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_perjanjian_kinerja = 'Perjanjian Kinerja';
-			$perjanjian_kinerja_detail .= '<li><a target="_blank" href="' . $perjanjian_kinerja['url'] . '" class="btn btn-primary">' .  $title_perjanjian_kinerja . '</a></li>';
+			$cek_data['perangkat_daerah']['Perjanjian Kinerja']['link'] = '<li><a target="_blank" href="' . $perjanjian_kinerja['url'] . '" class="btn btn-primary">' .  $title_perjanjian_kinerja . '</a></li>';
 		}
 
 		if (!empty($cek_data['perangkat_daerah']['Laporan Kinerja']) && $cek_data['perangkat_daerah']['Laporan Kinerja']['active'] == 1) {
@@ -15920,7 +15911,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_laporan_kinerja = 'Laporan Kinerja';
-			$laporan_kinerja_detail .= '<li><a target="_blank" href="' . $laporan_kinerja['url'] . '" class="btn btn-primary">' .  $title_laporan_kinerja . '</a></li>';
+			$cek_data['perangkat_daerah']['Laporan Kinerja']['link'] = '<li><a target="_blank" href="' . $laporan_kinerja['url'] . '" class="btn btn-primary">' .  $title_laporan_kinerja . '</a></li>';
 		}
 
 		if (!empty($cek_data['perangkat_daerah']['DPA']) && $cek_data['perangkat_daerah']['DPA']['active'] == 1) {
@@ -15931,7 +15922,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_dpa = 'DPA';
-			$dpa_detail .= '<li><a target="_blank" href="' . $dpa['url'] . '" class="btn btn-primary">' .  $title_dpa . '</a></li>';
+			$cek_data['perangkat_daerah']['DPA']['link'] = '<li><a target="_blank" href="' . $dpa['url'] . '" class="btn btn-primary">' .  $title_dpa . '</a></li>';
 		}
 
 		if (!empty($cek_data['perangkat_daerah']['Pohon Kinerja dan Cascading']) && $cek_data['perangkat_daerah']['Pohon Kinerja dan Cascading']['active'] == 1) {
@@ -15942,7 +15933,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_pohon_kinerja_dan_cascading = 'Pohon Kinerja dan Cascading';
-			$pohon_kinerja_dan_cascading_detail .= '<li><a target="_blank" href="' . $pohon_kinerja_dan_cascading['url'] . '" class="btn btn-primary">' .  $title_pohon_kinerja_dan_cascading . '</a></li>';
+			$cek_data['perangkat_daerah']['Pohon Kinerja dan Cascading']['link'] = '<li><a target="_blank" href="' . $pohon_kinerja_dan_cascading['url'] . '" class="btn btn-primary">' .  $title_pohon_kinerja_dan_cascading . '</a></li>';
 		}
 
 		if (!empty($cek_data['perangkat_daerah']['LHE AKIP Internal']) && $cek_data['perangkat_daerah']['LHE AKIP Internal']['active'] == 1) {
@@ -15953,7 +15944,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_lhe_akip_internal = 'LHE AKIP Internal';
-			$lhe_akip_internal_detail .= '<li><a target="_blank" href="' . $lhe_akip_internal['url'] . '" class="btn btn-primary">' .  $title_lhe_akip_internal . '</a></li>';
+			$cek_data['perangkat_daerah']['LHE AKIP Internal']['link'] = '<li><a target="_blank" href="' . $lhe_akip_internal['url'] . '" class="btn btn-primary">' .  $title_lhe_akip_internal . '</a></li>';
 		}
 
 		if (!empty($cek_data['perangkat_daerah']['TL LHE AKIP Internal']) && $cek_data['perangkat_daerah']['TL LHE AKIP Internal']['active'] == 1) {
@@ -15964,7 +15955,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_tl_lhe_akip_internal = 'TL LHE AKIP Internal';
-			$tl_lhe_akip_internal_detail .= '<li><a target="_blank" href="' . $tl_lhe_akip_internal['url'] . '" class="btn btn-primary">' .  $title_tl_lhe_akip_internal . '</a></li>';
+			$cek_data['perangkat_daerah']['TL LHE AKIP Internal']['link'] = '<li><a target="_blank" href="' . $tl_lhe_akip_internal['url'] . '" class="btn btn-primary">' .  $title_tl_lhe_akip_internal . '</a></li>';
 		}
 
 		if (!empty($cek_data['perangkat_daerah']['Laporan Monev Renaksi']) && $cek_data['perangkat_daerah']['Laporan Monev Renaksi']['active'] == 1) {
@@ -15975,7 +15966,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_laporan_monev_renaksi = 'Laporan Monev Renaksi';
-			$laporan_monev_renaksi_detail .= '<li><a target="_blank" href="' . $laporan_monev_renaksi['url'] . '" class="btn btn-primary">' .  $title_laporan_monev_renaksi . '</a></li>';
+			$cek_data['perangkat_daerah']['Laporan Monev Renaksi']['link'] = '<li><a target="_blank" href="' . $laporan_monev_renaksi['url'] . '" class="btn btn-primary">' .  $title_laporan_monev_renaksi . '</a></li>';
 		}
 
 		if (!empty($cek_data['perangkat_daerah']['Dokumen Lainnya']) && $cek_data['perangkat_daerah']['Dokumen Lainnya']['active'] == 1) {
@@ -15986,7 +15977,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_dokumen_lainnya = 'Lainnya';
-			$dokumen_lainnya_detail .= '<li><a target="_blank" href="' . $dokumen_lainnya['url'] . '" class="btn btn-primary">' .  $title_dokumen_lainnya . '</a></li>';
+			$cek_data['perangkat_daerah']['Dokumen Lainnya']['link'] = '<li><a target="_blank" href="' . $dokumen_lainnya['url'] . '" class="btn btn-primary">' .  $title_dokumen_lainnya . '</a></li>';
 		}
 
 		//DOKUMEN Perangkat Daerah JIKA DIPAKAI
@@ -15998,7 +15989,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_skp = 'SKP';
-			$skp_detail .= '<li><a target="_blank" href="' . $skp['url'] . '" class="btn btn-primary">' .  $title_skp . '</a></li>';
+			$cek_data['perangkat_daerah']['SKP']['link'] = '<li><a target="_blank" href="' . $skp['url'] . '" class="btn btn-primary">' .  $title_skp . '</a></li>';
 		}
 
 		if (!empty($cek_data['perangkat_daerah']['Rencana Aksi']) && $cek_data['perangkat_daerah']['Rencana Aksi']['active'] == 1) {
@@ -16009,18 +16000,19 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_rencana_aksi = 'Rencana Aksi';
-			$rencana_aksi_detail .= '<li><a target="_blank" href="' . $rencana_aksi['url'] . '" class="btn btn-primary">' .  $title_rencana_aksi . '</a></li>';
+			$cek_data['perangkat_daerah']['Rencana Aksi']['link'] = '<li><a target="_blank" href="' . $rencana_aksi['url'] . '" class="btn btn-primary">' .  $title_rencana_aksi . '</a></li>';
 		}
 
-		// $pengukuran_kinerja = $this->functions->generatePage(array(
-		// 	'nama_page' => 'Pengukuran Kinerja',
-		// 	'content' => '[pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
-		// 	'show_header' => 1,
-		// 	'post_status' => 'private'
-		// ));
-		// $title_pengukuran_kinerja = 'Pengukuran Kinerja';
-		// $pengukuran_kinerja_detail .= '<li><a target="_blank" href="' . $pengukuran_kinerja['url'] . '" class="btn btn-primary">' .  $title_pengukuran_kinerja . '</a></li>';
-
+		if (!empty($cek_data['perangkat_daerah']['Pengukuran Kinerja']) && $cek_data['perangkat_daerah']['Pengukuran Kinerja']['active'] == 1) {
+			$pengukuran_kinerja = $this->functions->generatePage(array(
+				'nama_page' => 'Pengukuran Kinerja',
+				'content' => '[pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_pengukuran_kinerja = 'Pengukuran Kinerja';
+			$cek_data['perangkat_daerah']['Pengukuran Kinerja']['link'] = '<li><a target="_blank" href="' . $pengukuran_kinerja['url'] . '" class="btn btn-primary">' .  $title_pengukuran_kinerja . '</a></li>';
+		}
 		// $pengukuran_rencana_aksi = $this->functions->generatePage(array(
 		// 	'nama_page' => 'Pengukuran Rencana Aksi',
 		// 	'content' => '[pengukuran_rencana_aksi tahun=' . $_GET['tahun'] . ']',
@@ -16038,7 +16030,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_evaluasi_internal = 'Evaluasi Internal';
-			$evaluasi_internal_detail .= '<li><a target="_blank" href="' . $evaluasi_internal['url'] . '" class="btn btn-primary">' .  $title_evaluasi_internal . '</a></li>';
+			$cek_data['perangkat_daerah']['Evaluasi Internal']['link'] = '<li><a target="_blank" href="' . $evaluasi_internal['url'] . '" class="btn btn-primary">' .  $title_evaluasi_internal . '</a></li>';
 		}
 
 		// $dokumen_lainnya = $this->functions->generatePage(array(
@@ -16168,6 +16160,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						</ul>
 					</div>
 				</div>';
+				$cek_data['pemerintah_daerah']['RPJPD']['link'] = $halaman_rpjpd;
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['RPJMD']) && $cek_data['pemerintah_daerah']['RPJMD']['active'] == 1) {
@@ -16180,18 +16173,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						</ul>
 					</div>
 				</div>';
-		}
-
-		if (!empty($cek_data['pemerintah_daerah']['RENSTRA']) && $cek_data['pemerintah_daerah']['RENSTRA']['active'] == 1) {
-			$halaman_renstra = '
-				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="renstra" style="margin: 0;">Periode Upload Dokumen RENSTRA</h5>
-					<div class="esakip-body-tahun" data-id="renstra">
-						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-							' . $periode_renstra . '
-						</ul>
-					</div>
-				</div>';
+				$cek_data['pemerintah_daerah']['RPJMD']['link'] = $halaman_rpjmd;
 		}
 
 		if (!empty($cek_data['perangkat_daerah']['RENSTRA']) && $cek_data['perangkat_daerah']['RENSTRA']['active'] == 1) {
@@ -16204,48 +16186,42 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						</ul>
 					</div>
 				</div>';
-		}
-
-		if (!empty($cek_data['perangkat_daerah']['RENSTRA']) && $cek_data['perangkat_daerah']['RENSTRA']['active'] == 1) {
-			$halaman_renstra_skpd = '
-				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="renstra-skpd" style="margin: 0;">Periode Upload Dokumen RENSTRA</h5>
-					<div class="esakip-body-tahun" data-id="renstra-skpd">
-						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-							' . $periode_renstra_skpd . '
-						</ul>
-					</div>
-				</div>';
-			$cek_data['perangkat_daerah']['RENSTRA']['link'] = $halaman_renstra_skpd;
+				$cek_data['perangkat_daerah']['RENSTRA']['link'] = $halaman_renstra_opd;
 		}
 
 		$halaman_sakip = '
 			<div class="accordion">
 				<h5 class="esakip-header-tahun" data-id="halaman-sakip" style="margin: 0;">Dokumen SAKIP</h5>
 				<div class="esakip-body-tahun" data-id="halaman-sakip">
-					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-						' . $halaman_rpjpd . '
-						' . $halaman_rpjmd . '
-						' . $halaman_renstra . '
-						' . $iku_detail_pemda . '
-						' . $renja_detail_pemda . '
-						' . $rkpd_detail_pemda . '
-						' . $perjanjian_kinerja_detail_pemda . '
-						' . $rencana_aksi_detail_pemda . '
-						' . $laporan_kinerja_detail_pemda . '
-						' . $dpa_detail_pemda . '
-						' . $pohon_kinerja_dan_cascading_detail_pemda . '
-						' . $lhe_akip_internal_detail_pemda . '
-						' . $tl_lhe_akip_internal_detail_pemda . '
-						' . $tl_lhe_akip_kemenpan_detail_pemda . '
-						' . $laporan_monev_renaksi_detail_pemda . '
-						' . $pedoman_teknis_perencanaan_detail_pemda . '
-						' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_detail_pemda . '
-						' . $pedoman_teknis_evaluasi_internal_detail_pemda . '
-						' . $skp_detail_pemda . '
-						' . $evaluasi_internal_detail_pemda . '
-						' . $lkjip_lppd_detail_pemda . '
-						' . $dokumen_lainnya_detail_pemda . '
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+						foreach ($cek_data['pemerintah_daerah'] as $data) {
+							if(!empty($data['link'])){
+								$halaman_sakip .= $data['link'];
+							}
+						}
+						// ' . $halaman_rpjpd . '
+						// ' . $halaman_rpjmd . '
+						// ' . $halaman_renstra . '
+						// ' . $iku_detail_pemda . '
+						// ' . $renja_detail_pemda . '
+						// ' . $rkpd_detail_pemda . '
+						// ' . $perjanjian_kinerja_detail_pemda . '
+						// ' . $rencana_aksi_detail_pemda . '
+						// ' . $laporan_kinerja_detail_pemda . '
+						// ' . $dpa_detail_pemda . '
+						// ' . $pohon_kinerja_dan_cascading_detail_pemda . '
+						// ' . $lhe_akip_internal_detail_pemda . '
+						// ' . $tl_lhe_akip_internal_detail_pemda . '
+						// ' . $tl_lhe_akip_kemenpan_detail_pemda . '
+						// ' . $laporan_monev_renaksi_detail_pemda . '
+						// ' . $pedoman_teknis_perencanaan_detail_pemda . '
+						// ' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_detail_pemda . '
+						// ' . $pedoman_teknis_evaluasi_internal_detail_pemda . '
+						// ' . $skp_detail_pemda . '
+						// ' . $evaluasi_internal_detail_pemda . '
+						// ' . $lkjip_lppd_detail_pemda . '
+						// ' . $dokumen_lainnya_detail_pemda . '
+			$halaman_sakip .= '
 					</ul>
 				</div>
 			</div>';
@@ -16253,21 +16229,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			<div class="accordion">
 				<h5 class="esakip-header-tahun" data-id="halaman-sakip-opd" style="margin: 0;">Dokumen SAKIP Perangkat Daerah</h5>
 				<div class="esakip-body-tahun" data-id="halaman-sakip-opd">
-					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-					' . $halaman_renstra_opd . '
-					' . $iku_detail . '
-					' . $renja_rkt_detail . '
-					' . $perjanjian_kinerja_detail . '
-					' . $laporan_kinerja_detail . '
-					' . $rencana_aksi_detail . '
-					' . $dpa_detail . '
-					' . $pohon_kinerja_dan_cascading_detail . '
-					' . $lhe_akip_internal_detail . '
-					' . $tl_lhe_akip_internal_detail . '
-					' . $laporan_monev_renaksi_detail . '
-					' . $skp_detail . '
-					' . $evaluasi_internal_detail . '
-					' . $dokumen_lainnya_detail . '
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+					foreach ($cek_data['perangkat_daerah'] as $data) {
+						if(!empty($data['link'])){
+							$halaman_sakip_opd .= $data['link'];
+						}
+					}
+		$halaman_sakip_opd .= '
 					</ul>
 				</div>
 			</div>';
@@ -16309,6 +16277,30 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					'post_status' => 'private'
 				));
 				$pengisian_lke_per_skpd_page .= '<li><a target="_blank" href="' . $pengisian_lke_per_skpd['url'] . '&id_skpd=' . $skpd_db['id_skpd'] . '&id_jadwal=' . $get_jadwal_lke_sakip['id'] . '" class="btn btn-primary">Pengisian LKE | ' . $get_jadwal_lke_sakip['nama_jadwal'] . '</a></li>';
+			}
+
+			
+			$renstra_skpd = $this->functions->generatePage(array(
+				'nama_page' => 'RENSTRA | ' . $jadwal_periode_item['id'],
+				'content' => '[upload_dokumen_renstra periode=' . $jadwal_periode_item['id'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_renstra = 'Dokumen RENSTRA | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+			$renstra_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+			$periode_renstra_skpd .= '<li><a target="_blank" href="' . $renstra_skpd['url'] . '" class="btn btn-primary">' . $title_renstra . '</a></li>';
+			
+			if (!empty($cek_data['perangkat_daerah']['RENSTRA']) && $cek_data['perangkat_daerah']['RENSTRA']['active'] == 1) {
+				$halaman_renstra_skpd = '
+					<div class="accordion">
+						<h5 class="esakip-header-tahun" data-id="renstra-skpd" style="margin: 0;">Periode Upload Dokumen RENSTRA</h5>
+						<div class="esakip-body-tahun" data-id="renstra-skpd">
+							<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+								' . $periode_renstra_skpd . '
+							</ul>
+						</div>
+					</div>';
+				$cek_data['perangkat_daerah']['RENSTRA']['link'] = $halaman_renstra_skpd;
 			}
 
 			if (!empty($cek_data['perangkat_daerah']['RENJA/RKT']) && $cek_data['perangkat_daerah']['RENJA/RKT']['active'] == 1) {
