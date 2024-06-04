@@ -287,6 +287,23 @@ class Wp_Eval_Sakip_Admin
 									</ul>
 								</div>
 							</div>';
+						}else if (!empty($_POST['type']) && $_POST['type'] == 'input_pohon_kinerja_opd') {
+							$input_pokin = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Input Pohon Kinerja Perangkat Daerah Tahun ' . $tahun_item['tahun_anggaran'],
+								'content' => '[penyusunan_pohon_kinerja_pd tahun=' . $tahun_item["tahun_anggaran"] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+							<div class="accordion">
+								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+									<ul style="margin-left: 20px;">
+										<li><a target="_blank" href="' . $input_pokin['url'] . '">' . $input_pokin['title'] . '</a></li>
+									</ul>
+								</div>
+							</div>';
 						}else if (!empty($_POST['type']) && $_POST['type'] == 'renja_rkt') {
 							$renja_rkt = $this->functions->generatePage(array(
 								'nama_page' => 'Halaman Dokumen RENJA/RKT Tahun ' . $tahun_item['tahun_anggaran'],
@@ -491,10 +508,10 @@ class Wp_Eval_Sakip_Admin
 									</ul>
 								</div>
 							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'dokumen_pemda_lainnya') {
-							$dokumen_pemda_lainnya = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Lainnya Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dokumen_pemda_lainnya tahun=' . $tahun_item["tahun_anggaran"] . ']',
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'dokumen_lainnya_pemda') {
+							$dokumen_lainnya_pemda = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Dokumen Lainnya Pemda Tahun ' . $tahun_item['tahun_anggaran'],
+								'content' => '[dokumen_detail_dokumen_lainnya_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
 								'show_header' => 1,
 								'no_key' => 1,
 								'post_status' => 'private'
@@ -504,7 +521,7 @@ class Wp_Eval_Sakip_Admin
 								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
 								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
 									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $dokumen_pemda_lainnya['url'] . '">' . $dokumen_pemda_lainnya['title'] . '</a></li>
+										<li><a target="_blank" href="' . $dokumen_lainnya_pemda['url'] . '">' . $dokumen_lainnya_pemda['title'] . '</a></li>
 									</ul>
 								</div>
 							</div>';
@@ -1114,7 +1131,7 @@ class Wp_Eval_Sakip_Admin
 						</style>
 					')
 			))
-			->add_fields($this->get_ajax_field(array('type' => 'rkpd_pemda_pemda')));
+			->add_fields($this->get_ajax_field(array('type' => 'rkpd_pemda')));
 
 		Container::make('theme_options', __('Perjanjian Kinerja'))
 			->set_page_parent($dokumen_pemda_menu)
@@ -1272,32 +1289,6 @@ class Wp_Eval_Sakip_Admin
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'rencana_aksi_pemda')));
 		
-		Container::make('theme_options', __('SKP'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_skp_hide_sidebar')
-					->set_html('
-						<style>
-							.postbox-container { display: none; }
-							#poststuff #post-body.columns-2 { margin: 0 !important; }
-						</style>
-					')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'skp_pemda')));
-			
-		Container::make('theme_options', __('Evaluasi Internal'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_evaluasi_internal_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'evaluasi_internal_pemda')));
-		
 		Container::make('theme_options', __('LKJIP/LPPD'))
 			->set_page_parent($dokumen_pemda_menu)
 			->add_fields(array(
@@ -1314,7 +1305,7 @@ class Wp_Eval_Sakip_Admin
 		Container::make('theme_options', __('Dokumen Lainnya'))
 			->set_page_parent($dokumen_pemda_menu)
 			->add_fields(array(
-				Field::make('html', 'crb_dokumen_pemda_lainnya_hide_sidebar')
+				Field::make('html', 'crb_dokumen_lainnya_pemda_hide_sidebar')
 					->set_html('
 						<style>
 							.postbox-container { display: none; }
@@ -1322,7 +1313,7 @@ class Wp_Eval_Sakip_Admin
 						</style>
 					')
 			))
-			->add_fields($this->get_ajax_field(array('type' => 'dokumen_pemda_lainnya')));
+			->add_fields($this->get_ajax_field(array('type' => 'dokumen_lainnya_pemda')));
 
 		$dokumen_menu = Container::make('theme_options', __('Dokumen Perangkat Daerah'))
 			->set_page_menu_position(3.2)
@@ -1635,6 +1626,19 @@ class Wp_Eval_Sakip_Admin
 		        	')
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'input_pohon_kinerja')));
+
+		Container::make('theme_options', __('Pohon Kinerja Perangkat Daerah'))
+		->set_page_parent($pengisian_pokin_menu)
+		->add_fields(array(
+			Field::make('html', 'crb_pengisian_pokin_pd_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+		))
+		->add_fields($this->get_ajax_field(array('type' => 'input_pohon_kinerja_opd')));
 
 		$monev_pokin_menu = Container::make('theme_options', __('MONEV Kinerja'))
 			->set_page_menu_position(3.5)

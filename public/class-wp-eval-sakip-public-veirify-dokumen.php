@@ -17,7 +17,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				if (!empty($_POST['tahun_anggaran']) && !empty($_POST['tipe'])) {
                     $tahun_anggaran = $_POST['tahun_anggaran'];
-                    $this->generate_menu($tahun_anggaran,$_POST['tipe']);
+                    $cek = $this->generate_menu($tahun_anggaran,$_POST['tipe']);
 
                     $where_jenis_user = '';
                     if(!empty($_POST['tipe'])){
@@ -121,7 +121,6 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
                 if (!empty($tahun_anggaran) && !empty($tipe)) {
-                    $tahun_anggaran = $_POST['tahun_anggaran'];
                     if($tipe == 'pemerintah_daerah'){
                         $design_menu = array(
                             array(
@@ -233,7 +232,6 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                                 'jenis_role'    => 1
                             )
                         );
-    
                         $nomor_urut = 1.00;
                         foreach ($design_menu as $menu) {
                             $cek_menu = $wpdb->get_results($wpdb->prepare("

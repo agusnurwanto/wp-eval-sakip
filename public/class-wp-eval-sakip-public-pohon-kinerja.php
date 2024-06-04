@@ -3,26 +3,33 @@
 require_once ESAKIP_PLUGIN_PATH . "/public/class-wp-eval-sakip-public-monev-kinerja.php";
 class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 {
-    public function penyusunan_pohon_kinerja(){
+    public function penyusunan_pohon_kinerja($atts){
     	if(!empty($_GET) && !empty($_GET['post'])){
 			return '';
 		}
 
-		require_once WPSIPD_PLUGIN_PATH . 'public/partials/pohon-kinerja/wp-eval-sakip-penyusunan-pohon-kinerja.php';
+		require_once ESAKIP_PLUGIN_PATH . 'public/partials/pohon-kinerja/wp-eval-sakip-penyusunan-pohon-kinerja.php';
     }
-    public function view_pohon_kinerja(){
+    public function penyusunan_pohon_kinerja_pd($atts){
     	if(!empty($_GET) && !empty($_GET['post'])){
 			return '';
 		}
 
-		require_once WPSIPD_PLUGIN_PATH . 'public/partials/pohon-kinerja/wp-eval-sakip-view-pohon-kinerja.php';
+		require_once ESAKIP_PLUGIN_PATH . 'public/partials/pohon-kinerja/wp-eval-sakip-penyusunan-pohon-kinerja-opd.php';
+    }
+    public function view_pohon_kinerja($atts){
+    	if(!empty($_GET) && !empty($_GET['post'])){
+			return '';
+		}
+
+		require_once ESAKIP_PLUGIN_PATH . 'public/partials/pohon-kinerja/wp-eval-sakip-view-pohon-kinerja.php';
     }
 
     public function get_pokin_level1(){
     	global $wpdb;
     	try {
     		if (!empty($_POST)) {
-				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( '_crb_api_key_extension' )) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( ESAKIP_APIKEY )) {
 					
 					$dataPokin = $wpdb->get_results($wpdb->prepare("
 						SELECT 
@@ -79,7 +86,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
     	global $wpdb;
     	try {
     		if (!empty($_POST)) {
-				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( '_crb_api_key_extension' )) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( ESAKIP_APIKEY )) {
 
 					$input = json_decode(stripslashes($_POST['data']), true);
 
@@ -118,7 +125,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
     	global $wpdb;
     	try {
     		if (!empty($_POST)) {
-				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( '_crb_api_key_extension' )) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( ESAKIP_APIKEY )) {
 
 					$data = $wpdb->get_row($wpdb->prepare("SELECT id, label FROM esakip_pohon_kinerja WHERE id=%d AND active=%d", $_POST['id'], 1),  ARRAY_A);
 
@@ -148,7 +155,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
     	global $wpdb;
     	try {
     		if (!empty($_POST)) {
-				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( '_crb_api_key_extension' )) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( ESAKIP_APIKEY )) {
 
 					$input = json_decode(stripslashes($_POST['data']), true);
 
@@ -186,7 +193,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
     	global $wpdb;
     	try {
     		if (!empty($_POST)) {
-				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( '_crb_api_key_extension' )) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( ESAKIP_APIKEY )) {
 
 					$indikator = $wpdb->get_row($wpdb->prepare("SELECT id FROM esakip_pohon_kinerja WHERE parent=%d AND label_indikator_kinerja IS NOT NULL AND level=%d AND active=%d", $_POST['id'], 1, 1),  ARRAY_A);
 
@@ -227,7 +234,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
     	global $wpdb;
     	try {
     		if (!empty($_POST)) {
-				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( '_crb_api_key_extension' )) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( ESAKIP_APIKEY )) {
 
 					$input = json_decode(stripslashes($_POST['data']), true);
 
@@ -267,7 +274,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
     	global $wpdb;
     	try {
     		if (!empty($_POST)) {
-				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( '_crb_api_key_extension' )) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( ESAKIP_APIKEY )) {
 
 					$data = $wpdb->get_row($wpdb->prepare("SELECT id, label, parent, label_indikator_kinerja FROM esakip_pohon_kinerja WHERE id=%d AND active=%d", $_POST['id'], 1),  ARRAY_A);
 
@@ -297,7 +304,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
     	global $wpdb;
     	try {
     		if (!empty($_POST)) {
-				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( '_crb_api_key_extension' )) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( ESAKIP_APIKEY )) {
 
 					$input = json_decode(stripslashes($_POST['data']), true);
 
@@ -336,7 +343,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
     	global $wpdb;
     	try {
     		if (!empty($_POST)) {
-				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( '_crb_api_key_extension' )) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( ESAKIP_APIKEY )) {
 
 					$data = $wpdb->delete('esakip_pohon_kinerja', [
 						'id' => $_POST['id']

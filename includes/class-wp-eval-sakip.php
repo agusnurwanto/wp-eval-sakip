@@ -523,10 +523,8 @@ class Wp_Eval_Sakip {
 		add_shortcode('view_pohon_kinerja',array($plugin_public,'view_pohon_kinerja'));
 
 		add_shortcode('dokumen_detail_dpa_pemda', array($plugin_public, 'dokumen_detail_dpa_pemda'));
-		add_shortcode('dokumen_detail_skp_pemda', array($plugin_public, 'dokumen_detail_skp_pemda'));
 		add_shortcode('dokumen_detail_rencana_aksi_pemda', array($plugin_public, 'dokumen_detail_rencana_aksi_pemda'));
 		add_shortcode('dokumen_detail_perjanjian_kinerja_pemda', array($plugin_public, 'dokumen_detail_perjanjian_kinerja_pemda'));
-		add_shortcode('dokumen_detail_evaluasi_internal_pemda', array($plugin_public, 'dokumen_detail_evaluasi_internal_pemda'));
 		add_shortcode('dokumen_detail_iku_pemda', array($plugin_public, 'dokumen_detail_iku_pemda'));
 		add_shortcode('dokumen_detail_laporan_kinerja_pemda', array($plugin_public, 'dokumen_detail_laporan_kinerja_pemda'));
 		add_shortcode('dokumen_detail_dokumen_lainnya_pemda', array($plugin_public, 'dokumen_detail_dokumen_lainnya_pemda'));
@@ -540,6 +538,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('dokumen_detail_pedoman_teknis_evaluasi_internal_pemda', array($plugin_public, 'dokumen_detail_pedoman_teknis_evaluasi_internal_pemda'));
 		add_shortcode('dokumen_detail_lkjip_lppd_pemda', array($plugin_public, 'dokumen_detail_lkjip_lppd_pemda'));
 		add_shortcode('dokumen_detail_rkpd_pemda', array($plugin_public, 'dokumen_detail_rkpd_pemda'));
+		add_shortcode('penyusunan_pohon_kinerja_pd', array($plugin_public, 'penyusunan_pohon_kinerja_pd'));
 		
 	}
 
