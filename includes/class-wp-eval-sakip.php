@@ -190,12 +190,12 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 		$this->loader->add_action( 'wp_ajax_mapping_skpd', $plugin_public, 'mapping_skpd' );
 
-		$this->loader->add_action('wp_ajax_get_data_penjadwalan', $plugin_public, 'get_data_penjadwalan');
-		$this->loader->add_action('wp_ajax_submit_jadwal',  $plugin_public, 'submit_jadwal');
-		$this->loader->add_action('wp_ajax_submit_edit_jadwal',  $plugin_public, 'submit_edit_jadwal');
-		$this->loader->add_action('wp_ajax_delete_jadwal',  $plugin_public, 'delete_jadwal');
-		$this->loader->add_action('wp_ajax_lock_jadwal',  $plugin_public, 'lock_jadwal');
-		$this->loader->add_action('wp_ajax_get_data_jadwal_by_id',  $plugin_public, 'get_data_jadwal_by_id');
+		$this->loader->add_action('wp_ajax_get_data_penjadwalan_lke', $plugin_public, 'get_data_penjadwalan_lke');
+		$this->loader->add_action('wp_ajax_submit_jadwal_lke',  $plugin_public, 'submit_jadwal_lke');
+		$this->loader->add_action('wp_ajax_submit_edit_jadwal_lke',  $plugin_public, 'submit_edit_jadwal_lke');
+		$this->loader->add_action('wp_ajax_delete_jadwal_lke',  $plugin_public, 'delete_jadwal_lke');
+		$this->loader->add_action('wp_ajax_lock_jadwal_lke',  $plugin_public, 'lock_jadwal_lke');
+		$this->loader->add_action('wp_ajax_get_data_jadwal_lke',  $plugin_public, 'get_data_jadwal_lke');
 
 		$this->loader->add_action('wp_ajax_get_data_penjadwalan_rpjmd', $plugin_public, 'get_data_penjadwalan_rpjmd');
 		$this->loader->add_action('wp_ajax_get_lama_pelaksanaan_rpjmd', $plugin_public, 'get_lama_pelaksanaan_rpjmd');
@@ -405,7 +405,7 @@ class Wp_Eval_Sakip {
 
 		$this->loader->add_action('wp_ajax_get_table_skpd_pengisian_lke', $plugin_public, 'get_table_skpd_pengisian_lke');
 		$this->loader->add_action('wp_ajax_get_table_pengisian_lke', $plugin_public, 'get_table_pengisian_lke');
-		$this->loader->add_action('wp_ajax_list_perangkat_daerah',  $plugin_public, 'list_perangkat_daerah');
+		$this->loader->add_action('wp_ajax_list_perangkat_daerah_lke',  $plugin_public, 'list_perangkat_daerah_lke');
 		$this->loader->add_action('wp_ajax_get_dokumen_bukti_dukung',  $plugin_public, 'get_dokumen_bukti_dukung');
  
 		$this->loader->add_action('wp_ajax_get_detail_laporan_monev_renaksi_by_id', $plugin_public, 'get_detail_laporan_monev_renaksi_by_id');
