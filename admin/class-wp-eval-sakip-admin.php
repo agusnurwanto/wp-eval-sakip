@@ -139,7 +139,7 @@ class Wp_Eval_Sakip_Admin
 					&& (
 						$_POST['type'] == 'renstra'
 						|| $_POST['type'] == 'rpjmd'
-
+						|| $_POST['type'] == 'input_perencanaan_rpjmd'
 					)
 				) {
 					$jadwal_periode = $wpdb->get_results(
@@ -181,6 +181,16 @@ class Wp_Eval_Sakip_Admin
 							));
 							$body_pemda .= '
 							<li><a target="_blank" href="' . $rpjmd['url'] . '">' . $rpjmd['title'] . '</a></li>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'input_perencanaan_rpjmd') {
+							$perencanaan_rpjmd = $this->functions->generatePage(array(
+								'nama_page' => 'Input RPJMD ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+								'content' => '[input_rpjmd periode=' . $jadwal_periode_item['id'] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda .= '
+							<li><a target="_blank" href="' . $perencanaan_rpjmd['url'] . '">' . $perencanaan_rpjmd['title'] . '</a></li>';
 						}
 					}
 					$body_pemda .= '</ol>';
@@ -221,10 +231,11 @@ class Wp_Eval_Sakip_Admin
 					}
 					$body_pemda .= '</ol>';
 					$ret['message'] .= $body_pemda;
-				}else if (
+				} else if (
 					!empty($_POST['type'])
 					&& (
 						$_POST['type'] == 'rpjpd'
+						|| $_POST['type'] == 'input_perencanaan_rpjpd'
 					)
 				) {
 					$jadwal_periode = $wpdb->get_results(
@@ -246,16 +257,27 @@ class Wp_Eval_Sakip_Admin
 					$body_pemda = '<ol>';
 					foreach ($jadwal_periode as $jadwal_periode_item) {
 						$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
-						
-						$rpjpd = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Upload Dokumen RPJPD ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-							'content' => '[upload_dokumen_rpjpd periode=' . $jadwal_periode_item['id'] . ']',
-							'show_header' => 1,
-							'no_key' => 1,
-							'post_status' => 'private'
-						));
-						$body_pemda .= '
-						<li><a target="_blank" href="' . $rpjpd['url'] . '">' . $rpjpd['title'] . '</a></li>';
+						if (!empty($_POST['type']) && $_POST['type'] == 'rpjpd') {
+							$rpjpd = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Upload Dokumen RPJPD ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+								'content' => '[upload_dokumen_rpjpd periode=' . $jadwal_periode_item['id'] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda .= '
+							<li><a target="_blank" href="' . $rpjpd['url'] . '">' . $rpjpd['title'] . '</a></li>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'input_perencanaan_rpjpd') {
+							$perencanaan_rpjpd = $this->functions->generatePage(array(
+								'nama_page' => 'Input RPJPD ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+								'content' => '[input_rpjpd periode=' . $jadwal_periode_item['id'] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda .= '
+							<li><a target="_blank" href="' . $perencanaan_rpjpd['url'] . '">' . $perencanaan_rpjpd['title'] . '</a></li>';
+						}
 					}
 					$body_pemda .= '</ol>';
 					$ret['message'] .= $body_pemda;
@@ -287,7 +309,7 @@ class Wp_Eval_Sakip_Admin
 									</ul>
 								</div>
 							</div>';
-						}else if (!empty($_POST['type']) && $_POST['type'] == 'input_pohon_kinerja_opd') {
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'input_pohon_kinerja_opd') {
 							$input_pokin = $this->functions->generatePage(array(
 								'nama_page' => 'Halaman Input Pohon Kinerja Perangkat Daerah Tahun ' . $tahun_item['tahun_anggaran'],
 								'content' => '[penyusunan_pohon_kinerja_pd tahun=' . $tahun_item["tahun_anggaran"] . ']',
@@ -304,7 +326,7 @@ class Wp_Eval_Sakip_Admin
 									</ul>
 								</div>
 							</div>';
-						}else if (!empty($_POST['type']) && $_POST['type'] == 'renja_rkt') {
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'renja_rkt') {
 							$renja_rkt = $this->functions->generatePage(array(
 								'nama_page' => 'Halaman Dokumen RENJA/RKT Tahun ' . $tahun_item['tahun_anggaran'],
 								'content' => '[renja_rkt tahun=' . $tahun_item["tahun_anggaran"] . ']',
@@ -440,7 +462,7 @@ class Wp_Eval_Sakip_Admin
 									</ul>
 								</div>
 							</div>';
-						}else if (!empty($_POST['type']) && $_POST['type'] == 'evaluasi_internal') {
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'evaluasi_internal') {
 							$evaluasi_internal = $this->functions->generatePage(array(
 								'nama_page' => 'Halaman Dokumen Evaluasi Internal Tahun ' . $tahun_item['tahun_anggaran'],
 								'content' => '[evaluasi_internal tahun=' . $tahun_item["tahun_anggaran"] . ']',
@@ -661,7 +683,7 @@ class Wp_Eval_Sakip_Admin
 									</ul>
 								</div>
 							</div>';
-						}else if (!empty($_POST['type']) && $_POST['type'] == 'pedoman_teknis_evaluasi_internal') {
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'pedoman_teknis_evaluasi_internal') {
 							$pedoman_teknis_evaluasi_internal = $this->functions->generatePage(array(
 								'nama_page' => 'Halaman Pedoman Teknis Evaluasi Internal Tahun ' . $tahun_item['tahun_anggaran'],
 								'content' => '[pedoman_teknis_evaluasi_internal tahun=' . $tahun_item["tahun_anggaran"] . ']',
@@ -678,7 +700,7 @@ class Wp_Eval_Sakip_Admin
 									</ul>
 								</div>
 							</div>';
-						}						else if (!empty($_POST['type']) && $_POST['type'] == 'skp_pemda') {
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'skp_pemda') {
 							$skp_pemda = $this->functions->generatePage(array(
 								'nama_page' => 'Halaman Dokumen Pemda SKP Tahun ' . $tahun_item['tahun_anggaran'],
 								'content' => '[dokumen_detail_skp_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
@@ -763,7 +785,7 @@ class Wp_Eval_Sakip_Admin
 									</ul>
 								</div>
 							</div>';
-						}else if (!empty($_POST['type']) && $_POST['type'] == 'evaluasi_internal_pemda') {
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'evaluasi_internal_pemda') {
 							$evaluasi_internal_pemda = $this->functions->generatePage(array(
 								'nama_page' => 'Halaman Dokumen Pemda Evaluasi Internal Tahun ' . $tahun_item['tahun_anggaran'],
 								'content' => '[dokumen_detail_evaluasi_internal_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
@@ -1032,7 +1054,7 @@ class Wp_Eval_Sakip_Admin
 					->set_html('
 					<h4>HALAMAN TERKAIT</h4>
 	            	<ol>
-	            		<li><a href="'.$halaman_mapping_skpd['url'].'">'.$halaman_mapping_skpd['title'].'</a></li>
+	            		<li><a href="' . $halaman_mapping_skpd['url'] . '">' . $halaman_mapping_skpd['title'] . '</a></li>
 	            	</ol>'),
 				Field::make('text', 'crb_url_server_sakip', 'URL Server WP-SIPD')
 					->set_default_value(admin_url('admin-ajax.php'))
@@ -1050,7 +1072,7 @@ class Wp_Eval_Sakip_Admin
 					->set_html('<a id="generate_user_esakip" onclick="return false;" href="#" class="button button-primary button-large">Generate User By DB Lokal</a>')
 					->set_help_text('Data user active yang ada di table data unit akan digenerate menjadi user wordpress.'),
 			));
-		
+
 		Container::make('theme_options', __('Jadwal'))
 			->set_page_parent($basic_options_container)
 			->add_fields(array(
@@ -1064,10 +1086,10 @@ class Wp_Eval_Sakip_Admin
 			))
 			->add_fields($this->generate_jadwal());
 
-			Container::make('theme_options', __('Menu Setting'))
+		Container::make('theme_options', __('Menu Setting'))
 			->set_page_parent($basic_options_container)
 			->add_fields($this->generate_menu());
-			
+
 		$dokumen_pemda_menu = Container::make('theme_options', __('Dokumen Pemda'))
 			->set_page_menu_position(3.1)
 			->set_icon('dashicons-bank')
@@ -1093,7 +1115,7 @@ class Wp_Eval_Sakip_Admin
 					')
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'rpjpd')));
-		
+
 		Container::make('theme_options', __('RPJMD'))
 			->set_page_parent($dokumen_pemda_menu)
 			->add_fields(array(
@@ -1119,7 +1141,7 @@ class Wp_Eval_Sakip_Admin
 					')
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'iku_pemda')));
-		
+
 		Container::make('theme_options', __('RKPD'))
 			->set_page_parent($dokumen_pemda_menu)
 			->add_fields(array(
@@ -1173,17 +1195,17 @@ class Wp_Eval_Sakip_Admin
 			->add_fields($this->get_ajax_field(array('type' => 'dpa_pemda')));
 
 		Container::make('theme_options', __('Pohon Kinerja dan Cascading'))
-		->set_page_parent($dokumen_pemda_menu)
-		->add_fields(array(
-			Field::make('html', 'crb_pohon_kinerja_dan_cascading_hide_sidebar')
-				->set_html('
+			->set_page_parent($dokumen_pemda_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_pohon_kinerja_dan_cascading_hide_sidebar')
+					->set_html('
 					<style>
 						.postbox-container { display: none; }
 						#poststuff #post-body.columns-2 { margin: 0 !important; }
 					</style>
 				')
-		))
-		->add_fields($this->get_ajax_field(array('type' => 'pohon_kinerja_dan_cascading_pemda')));
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'pohon_kinerja_dan_cascading_pemda')));
 
 		Container::make('theme_options', __('LHE AKIP Internal'))
 			->set_page_parent($dokumen_pemda_menu)
@@ -1210,71 +1232,71 @@ class Wp_Eval_Sakip_Admin
 					')
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'tl_lhe_akip_internal_pemda')));
-			
+
 		Container::make('theme_options', __('TL LHE AKIP Kemenpan'))
-		->set_page_parent($dokumen_pemda_menu)
-		->add_fields(array(
-			Field::make('html', 'crb_tl_lhe_akip_kemenpan_hide_sidebar')
-				->set_html('
+			->set_page_parent($dokumen_pemda_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_tl_lhe_akip_kemenpan_hide_sidebar')
+					->set_html('
 					<style>
 						.postbox-container { display: none; }
 						#poststuff #post-body.columns-2 { margin: 0 !important; }
 					</style>
 				')
-		))
-		->add_fields($this->get_ajax_field(array('type' => 'tl_lhe_akip_kemenpan_pemda')));
-			
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'tl_lhe_akip_kemenpan_pemda')));
+
 		Container::make('theme_options', __('Laporan Monev Renaksi'))
-		->set_page_parent($dokumen_pemda_menu)
-		->add_fields(array(
-			Field::make('html', 'crb_laporan_monev_renaksi_hide_sidebar')
-				->set_html('
+			->set_page_parent($dokumen_pemda_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_laporan_monev_renaksi_hide_sidebar')
+					->set_html('
 					<style>
 						.postbox-container { display: none; }
 						#poststuff #post-body.columns-2 { margin: 0 !important; }
 					</style>
 				')
-		))
-		->add_fields($this->get_ajax_field(array('type' => 'laporan_monev_renaksi_pemda')));
-		
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'laporan_monev_renaksi_pemda')));
+
 		Container::make('theme_options', __('Pedoman Teknis Perencanaan'))
-		->set_page_parent($dokumen_pemda_menu)
-		->add_fields(array(
-			Field::make('html', 'crb_pedoman_teknis_perencanaan_hide_sidebar')
-				->set_html('
+			->set_page_parent($dokumen_pemda_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_pedoman_teknis_perencanaan_hide_sidebar')
+					->set_html('
 					<style>
 						.postbox-container { display: none; }
 						#poststuff #post-body.columns-2 { margin: 0 !important; }
 					</style>
 				')
-		))
-		->add_fields($this->get_ajax_field(array('type' => 'pedoman_teknis_perencanaan_pemda')));
-		
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'pedoman_teknis_perencanaan_pemda')));
+
 		Container::make('theme_options', __('Pedoman Teknis Pengukuran dan Pengumpulan Data Kinerja'))
-		->set_page_parent($dokumen_pemda_menu)
-		->add_fields(array(
-			Field::make('html', 'crb_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_hide_sidebar')
-				->set_html('
+			->set_page_parent($dokumen_pemda_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_hide_sidebar')
+					->set_html('
 					<style>
 						.postbox-container { display: none; }
 						#poststuff #post-body.columns-2 { margin: 0 !important; }
 					</style>
 				')
-		))
-		->add_fields($this->get_ajax_field(array('type' => 'pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda')));
-		
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda')));
+
 		Container::make('theme_options', __('Pedoman Teknis Evaluasi Internal'))
-		->set_page_parent($dokumen_pemda_menu)
-		->add_fields(array(
-			Field::make('html', 'crb_pedoman_teknis_evaluasi_internal_hide_sidebar')
-				->set_html('
+			->set_page_parent($dokumen_pemda_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_pedoman_teknis_evaluasi_internal_hide_sidebar')
+					->set_html('
 					<style>
 						.postbox-container { display: none; }
 						#poststuff #post-body.columns-2 { margin: 0 !important; }
 					</style>
 				')
-		))
-		->add_fields($this->get_ajax_field(array('type' => 'pedoman_teknis_evaluasi_internal_pemda')));
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'pedoman_teknis_evaluasi_internal_pemda')));
 
 		Container::make('theme_options', __('Rencana Aksi'))
 			->set_page_parent($dokumen_pemda_menu)
@@ -1288,7 +1310,7 @@ class Wp_Eval_Sakip_Admin
 					')
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'rencana_aksi_pemda')));
-		
+
 		Container::make('theme_options', __('LKJIP/LPPD'))
 			->set_page_parent($dokumen_pemda_menu)
 			->add_fields(array(
@@ -1407,17 +1429,17 @@ class Wp_Eval_Sakip_Admin
 			->add_fields($this->get_ajax_field(array('type' => 'dpa')));
 
 		Container::make('theme_options', __('Pohon Kinerja dan Cascading'))
-		->set_page_parent($dokumen_menu)
-		->add_fields(array(
-			Field::make('html', 'crb_pohon_kinerja_dan_cascading_hide_sidebar')
-				->set_html('
+			->set_page_parent($dokumen_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_pohon_kinerja_dan_cascading_hide_sidebar')
+					->set_html('
 					<style>
 						.postbox-container { display: none; }
 						#poststuff #post-body.columns-2 { margin: 0 !important; }
 					</style>
 				')
-		))
-		->add_fields($this->get_ajax_field(array('type' => 'pohon_kinerja_dan_cascading')));
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'pohon_kinerja_dan_cascading')));
 
 		Container::make('theme_options', __('LHE AKIP Internal'))
 			->set_page_parent($dokumen_menu)
@@ -1446,17 +1468,17 @@ class Wp_Eval_Sakip_Admin
 			->add_fields($this->get_ajax_field(array('type' => 'tl_lhe_akip_internal')));
 
 		Container::make('theme_options', __('Laporan Monev Renaksi'))
-		->set_page_parent($dokumen_menu)
-		->add_fields(array(
-			Field::make('html', 'crb_laporan_monev_renaksi_hide_sidebar')
-				->set_html('
+			->set_page_parent($dokumen_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_laporan_monev_renaksi_hide_sidebar')
+					->set_html('
 					<style>
 						.postbox-container { display: none; }
 						#poststuff #post-body.columns-2 { margin: 0 !important; }
 					</style>
 				')
-		))
-		->add_fields($this->get_ajax_field(array('type' => 'laporan_monev_renaksi')));
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'laporan_monev_renaksi')));
 
 		Container::make('theme_options', __('Rencana Aksi'))
 			->set_page_parent($dokumen_menu)
@@ -1470,7 +1492,7 @@ class Wp_Eval_Sakip_Admin
 					')
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'rencana_aksi')));
-		
+
 		Container::make('theme_options', __('SKP'))
 			->set_page_parent($dokumen_menu)
 			->add_fields(array(
@@ -1507,7 +1529,7 @@ class Wp_Eval_Sakip_Admin
 		// 		')
 		// 	))
 		// 	->add_fields($this->get_ajax_field(array('type' => 'pengukuran_rencana_aksi')));
-			
+
 		Container::make('theme_options', __('Evaluasi Internal'))
 			->set_page_parent($dokumen_menu)
 			->add_fields(array(
@@ -1520,7 +1542,7 @@ class Wp_Eval_Sakip_Admin
 				')
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'evaluasi_internal')));
-			
+
 		// Container::make('theme_options', __('TL LHE AKIP Kemenpan'))
 		// ->set_page_parent($dokumen_menu)
 		// ->add_fields(array(
@@ -1533,7 +1555,7 @@ class Wp_Eval_Sakip_Admin
 		// 		')
 		// ))
 		// ->add_fields($this->get_ajax_field(array('type' => 'tl_lhe_akip_kemenpan')));
-			
+
 		// Container::make('theme_options', __('Laporan Monev Renaksi'))
 		// ->set_page_parent($dokumen_menu)
 		// ->add_fields(array(
@@ -1546,7 +1568,7 @@ class Wp_Eval_Sakip_Admin
 		// 		')
 		// ))
 		// ->add_fields($this->get_ajax_field(array('type' => 'laporan_monev_renaksi')));
-		
+
 		// Container::make('theme_options', __('Pedoman Teknis Perencanaan'))
 		// ->set_page_parent($dokumen_menu)
 		// ->add_fields(array(
@@ -1559,7 +1581,7 @@ class Wp_Eval_Sakip_Admin
 		// 		')
 		// ))
 		// ->add_fields($this->get_ajax_field(array('type' => 'pedoman_teknis_perencanaan')));
-		
+
 		// Container::make('theme_options', __('Pedoman Teknis Pengukuran dan Pengumpulan Data Kinerja'))
 		// ->set_page_parent($dokumen_menu)
 		// ->add_fields(array(
@@ -1572,7 +1594,7 @@ class Wp_Eval_Sakip_Admin
 		// 		')
 		// ))
 		// ->add_fields($this->get_ajax_field(array('type' => 'pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja')));
-		
+
 		// Container::make('theme_options', __('Pedoman Teknis Evaluasi Internal'))
 		// ->set_page_parent($dokumen_menu)
 		// ->add_fields(array(
@@ -1628,17 +1650,17 @@ class Wp_Eval_Sakip_Admin
 			->add_fields($this->get_ajax_field(array('type' => 'input_pohon_kinerja')));
 
 		Container::make('theme_options', __('Pohon Kinerja Perangkat Daerah'))
-		->set_page_parent($pengisian_pokin_menu)
-		->add_fields(array(
-			Field::make('html', 'crb_pengisian_pokin_pd_hide_sidebar')
-				->set_html('
+			->set_page_parent($pengisian_pokin_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_pengisian_pokin_pd_hide_sidebar')
+					->set_html('
 					<style>
 						.postbox-container { display: none; }
 						#poststuff #post-body.columns-2 { margin: 0 !important; }
 					</style>
 				')
-		))
-		->add_fields($this->get_ajax_field(array('type' => 'input_pohon_kinerja_opd')));
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'input_pohon_kinerja_opd')));
 
 		$monev_pokin_menu = Container::make('theme_options', __('MONEV Kinerja'))
 			->set_page_menu_position(3.5)
@@ -1653,6 +1675,45 @@ class Wp_Eval_Sakip_Admin
 		        	')
 			));
 
+		$input_perencanaan_menu = Container::make('theme_options', __('Input Perencanaan'))
+			->set_page_menu_position(3.5)
+			->set_icon('dashicons-edit-page')
+			->add_fields(array(
+				Field::make('html', 'crb_input_perencanaan_hide_sidebar')
+					->set_html('
+							<style>
+								.postbox-container { display: none; }
+								#poststuff #post-body.columns-2 { margin: 0 !important; }
+							</style>
+						')
+			));
+
+		Container::make('theme_options', __('Input RPJPD'))
+			->set_page_parent($input_perencanaan_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_perencanaan_rpjpd_hide_sidebar')
+					->set_html('
+						<style>
+							.postbox-container { display: none; }
+							#poststuff #post-body.columns-2 { margin: 0 !important; }
+						</style>
+					')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'input_perencanaan_rpjpd')));
+
+		Container::make('theme_options', __('Input RPJMD'))
+			->set_page_parent($input_perencanaan_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_perencanaan_rpjmd_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'input_perencanaan_rpjmd')));
+
 		// Container::make('theme_options', __('RKPD'))
 		// 	->set_page_parent($dokumen_pemda_menu)
 		// 	->add_fields(array(
@@ -1665,7 +1726,7 @@ class Wp_Eval_Sakip_Admin
 		// 			')
 		// 	))
 		// 	->add_fields($this->get_ajax_field(array('type' => 'rkpd')));
-		
+
 		// Container::make('theme_options', __('LKJIP/LPPD'))
 		// 	->set_page_parent($dokumen_pemda_menu)
 		// 	->add_fields(array(
@@ -1680,7 +1741,8 @@ class Wp_Eval_Sakip_Admin
 		// 	->add_fields($this->get_ajax_field(array('type' => 'lkjip')));
 	}
 
-	public function generate_menu(){
+	public function generate_menu()
+	{
 		global $wpdb;
 		$get_tahun = $wpdb->get_results('select tahun_anggaran from esakip_data_unit group by tahun_anggaran order by tahun_anggaran ASC', ARRAY_A);
 		$list_data = '';
@@ -1844,7 +1906,7 @@ class Wp_Eval_Sakip_Admin
 			$meta = array(
 				'description' => 'User dibuat dari generate sistem aplikasi WP-Eval-SAKIP'
 			);
-			if(!empty($user['nip'])){
+			if (!empty($user['nip'])) {
 				$meta['nip'] = $user['nip'];
 			}
 			if (!empty($user['id_sub_skpd'])) {
@@ -1904,20 +1966,20 @@ class Wp_Eval_Sakip_Admin
 
 					// admin bappeda
 					$args = array(
-					    'role'    => 'admin_bappeda',
-					    'orderby' => 'user_nicename',
-					    'order'   => 'ASC'
+						'role'    => 'admin_bappeda',
+						'orderby' => 'user_nicename',
+						'order'   => 'ASC'
 					);
-					$users_bappeda = get_users( $args );
+					$users_bappeda = get_users($args);
 					$user_data = array();
 					$user_data['pass'] = $_POST['pass'];
 					$user_data['jabatan'] = 'admin_bappeda';
-					if(empty($user_exist)){
+					if (empty($user_exist)) {
 						$user_data['loginname'] = 'admin_perencanaan';
 						$user_data['nama'] = 'Admin Perencanaan';
 						$this->gen_user_esakip($user_data, $update_pass);
-					}else{
-						foreach ( $users_bappeda as $user_exist ) {
+					} else {
+						foreach ($users_bappeda as $user_exist) {
 							$user_data['loginname'] = $user_exist->user_login;
 							$user_data['nama'] = $user_exist->display_name;
 						}
@@ -1926,20 +1988,20 @@ class Wp_Eval_Sakip_Admin
 
 					// admin review
 					$args = array(
-					    'role'    => 'admin_panrb',
-					    'orderby' => 'user_nicename',
-					    'order'   => 'ASC'
+						'role'    => 'admin_panrb',
+						'orderby' => 'user_nicename',
+						'order'   => 'ASC'
 					);
-					$users_fanrb = get_users( $args );
+					$users_fanrb = get_users($args);
 					$user_data = array();
 					$user_data['pass'] = $_POST['pass'];
 					$user_data['jabatan'] = 'admin_panrb';
-					if(empty($user_exist)){
+					if (empty($user_exist)) {
 						$user_data['loginname'] = 'admin_panrb';
 						$user_data['nama'] = 'Admin Review';
 						$this->gen_user_esakip($user_data, $update_pass);
-					}else{
-						foreach ( $users_fanrb as $user_exist ) {
+					} else {
+						foreach ($users_fanrb as $user_exist) {
 							$user_data['loginname'] = $user_exist->user_login;
 							$user_data['nama'] = $user_exist->display_name;
 						}
@@ -1948,26 +2010,25 @@ class Wp_Eval_Sakip_Admin
 
 					// admin ortala
 					$args = array(
-					    'role'    => 'admin_ortala',
-					    'orderby' => 'user_nicename',
-					    'order'   => 'ASC'
+						'role'    => 'admin_ortala',
+						'orderby' => 'user_nicename',
+						'order'   => 'ASC'
 					);
-					$users_ortala = get_users( $args );
+					$users_ortala = get_users($args);
 					$user_data = array();
 					$user_data['pass'] = $_POST['pass'];
 					$user_data['jabatan'] = 'admin_ortala';
-					if(empty($user_exist)){
+					if (empty($user_exist)) {
 						$user_data['loginname'] = 'admin_organisasi';
 						$user_data['nama'] = 'Admin Organisasi';
 						$this->gen_user_esakip($user_data, $update_pass);
-					}else{
-						foreach ( $users_ortala as $user_exist ) {
+					} else {
+						foreach ($users_ortala as $user_exist) {
 							$user_data['loginname'] = $user_exist->user_login;
 							$user_data['nama'] = $user_exist->display_name;
 						}
 						$this->gen_user_esakip($user_data, $update_pass);
 					}
-
 				} else {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Data user PA/KPA kosong. Harap lakukan singkronisasi data Perangkat Daerah dulu!';
