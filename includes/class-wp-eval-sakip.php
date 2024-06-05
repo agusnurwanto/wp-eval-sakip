@@ -215,6 +215,13 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_lock_jadwal_verifikasi_upload_dokumen',  $plugin_public, 'lock_jadwal_verifikasi_upload_dokumen');
 		$this->loader->add_action('wp_ajax_get_data_jadwal_by_id_verifikasi_upload_dokumen',  $plugin_public, 'get_data_jadwal_by_id_verifikasi_upload_dokumen');
 
+		$this->loader->add_action('wp_ajax_get_data_penjadwalan_verifikasi_upload_dokumen_renstra', $plugin_public, 'get_data_penjadwalan_verifikasi_upload_dokumen_renstra');
+		$this->loader->add_action('wp_ajax_submit_jadwal_verifikasi_upload_dokumen_renstra',  $plugin_public, 'submit_jadwal_verifikasi_upload_dokumen_renstra');
+		$this->loader->add_action('wp_ajax_submit_edit_jadwal_verifikasi_upload_dokumen_renstra',  $plugin_public, 'submit_edit_jadwal_verifikasi_upload_dokumen_renstra');
+		$this->loader->add_action('wp_ajax_delete_jadwal_verifikasi_upload_dokumen_renstra',  $plugin_public, 'delete_jadwal_verifikasi_upload_dokumen_renstra');
+		$this->loader->add_action('wp_ajax_lock_jadwal_verifikasi_upload_dokumen_renstra',  $plugin_public, 'lock_jadwal_verifikasi_upload_dokumen_renstra');
+		$this->loader->add_action('wp_ajax_get_data_jadwal_by_id_verifikasi_upload_dokumen_renstra',  $plugin_public, 'get_data_jadwal_by_id_verifikasi_upload_dokumen_renstra');
+
 		$this->loader->add_action('wp_ajax_get_detail_dpa_by_id', $plugin_public, 'get_detail_dpa_by_id');
 		$this->loader->add_action('wp_ajax_tambah_dokumen_dpa', $plugin_public, 'tambah_dokumen_dpa');
 		$this->loader->add_action('wp_ajax_submit_tahun_dpa', $plugin_public, 'submit_tahun_dpa');
@@ -463,7 +470,13 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_pengaturan_menu_by_id',  $plugin_public, 'get_pengaturan_menu_by_id');
 		$this->loader->add_action('wp_ajax_submit_edit_pengaturan_menu_dokumen',  $plugin_public, 'submit_edit_pengaturan_menu_dokumen');
 		
+		$this->loader->add_action('wp_ajax_esakip_simpan_rpjpd',  $plugin_public, 'esakip_simpan_rpjpd');
+		$this->loader->add_action('wp_ajax_esakip_get_rpjpd',  $plugin_public, 'esakip_get_rpjpd');
+		$this->loader->add_action('wp_ajax_esakip_simpan_rpjpd',  $plugin_public, 'esakip_simpan_rpjpd');
+		$this->loader->add_action('wp_ajax_esakip_hapus_rpjpd',  $plugin_public, 'esakip_hapus_rpjpd');
+
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
+		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_evaluasi_sakip', array($plugin_public, 'jadwal_evaluasi_sakip'));
 		add_shortcode('halaman_mapping_skpd', array($plugin_public, 'halaman_mapping_skpd'));
 		

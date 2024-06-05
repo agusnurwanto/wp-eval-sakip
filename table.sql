@@ -510,6 +510,7 @@ CREATE TABLE `esakip_keterangan_verifikator` (
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `id_skpd` int DEFAULT NULL,
   `tahun_anggaran` year DEFAULT NULL,
+  `id_jadwal` int(11) DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -773,4 +774,48 @@ CREATE TABLE `esakip_pohon_kinerja_dan_cascading_pemda` (
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
+);
+
+CREATE TABLE `esakip_rpjpd_visi` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `visi_teks` text DEFAULT NULL,
+  `update_at` datetime NOT NULL,
+  PRIMARY KEY  (id)
+);
+
+CREATE TABLE `esakip_rpjpd_misi` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_visi` int(11) DEFAULT NULL,
+  `misi_teks` text DEFAULT NULL,
+  `urut_misi` tinyint(4) DEFAULT NULL,
+  `update_at` datetime NOT NULL,
+  PRIMARY KEY  (id)
+);
+
+CREATE TABLE `esakip_rpjpd_sasaran` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_misi` int(11) DEFAULT NULL,
+  `saspok_teks` text DEFAULT NULL,
+  `urut_saspok` tinyint(4) DEFAULT NULL,
+  `update_at` datetime NOT NULL,
+  PRIMARY KEY  (id)
+);
+
+CREATE TABLE `esakip_rpjpd_kebijakan` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_saspok` int(11) DEFAULT NULL,
+  `kebijakan_teks` text DEFAULT NULL,
+  `urut_kebijakan` tinyint(4) DEFAULT NULL,
+  `update_at` datetime NOT NULL,
+  PRIMARY KEY  (id)
+);
+
+CREATE TABLE `esakip_rpjpd_isu` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_kebijakan` int(11) DEFAULT NULL,
+  `isu_teks` text DEFAULT NULL,
+  `urut_isu` tinyint(4) DEFAULT NULL,
+  `update_at` datetime NOT NULL,
+  PRIMARY KEY  (id)
 );

@@ -189,6 +189,7 @@ class Wp_Eval_Sakip_Admin
 								'no_key' => 1,
 								'post_status' => 'private'
 							));
+							// $perencanaan_rpjmd['url'] .= '&id_periode_rpjmd=' . $jadwal_periode_item['id'];
 							$body_pemda .= '
 							<li><a target="_blank" href="' . $perencanaan_rpjmd['url'] . '">' . $perencanaan_rpjmd['title'] . '</a></li>';
 						}
@@ -275,6 +276,7 @@ class Wp_Eval_Sakip_Admin
 								'no_key' => 1,
 								'post_status' => 'private'
 							));
+							// $perencanaan_rpjpd['url'] .= '&id_periode_rpjpd=' . $jadwal_periode_item['id'];
 							$body_pemda .= '
 							<li><a target="_blank" href="' . $perencanaan_rpjpd['url'] . '">' . $perencanaan_rpjpd['title'] . '</a></li>';
 						}
@@ -1045,6 +1047,8 @@ class Wp_Eval_Sakip_Admin
 				Field::make('text', 'crb_maksimal_upload_dokumen_esakip', 'Maksimal Upload Dokumen')
 					->set_default_value(10)
 					->set_help_text('Wajib diisi. Setting batas ukuran maksimal untuk upload dokumen. Ukuran dalam MB'),
+				Field::make('text', 'crb_nama_pemda', 'Nama Pemerintah Daerah')
+					->set_help_text('Wajib diisi.'),
 			));
 
 		Container::make('theme_options', __('Pengaturan Perangkat Daerah'))
@@ -1816,6 +1820,16 @@ class Wp_Eval_Sakip_Admin
 			));
 			$list_data .= '<li><a target="_blank" href="' . $jadwal_verifikasi['url'] . '">' . $jadwal_verifikasi['title'] . '</a></li>';
 		}
+
+		//sementara dipending dahulu 
+		// $jadwal_verifikasi_renstra = $this->functions->generatePage(array(
+		// 	'nama_page' => 'Halaman Jadwal Verifikasi Upload Dokumen | RENSTRA',
+		// 	'content' => '[jadwal_verifikasi_upload_dokumen_renstra]',
+		// 	'show_header' => 1,
+		// 	'no_key' => 1,
+		// 	'post_status' => 'private'
+		// ));
+		// $list_data .= '<li><a target="_blank" href="' . $jadwal_verifikasi_renstra['url'] . '">' . $jadwal_verifikasi_renstra['title'] . '</a></li>';
 
 		$label = array(
 			Field::make('html', 'crb_jadwal')

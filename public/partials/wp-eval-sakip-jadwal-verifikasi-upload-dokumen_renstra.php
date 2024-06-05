@@ -6,15 +6,6 @@ if ( ! defined( 'WPINC' ) ) {
 
 global $wpdb;
 
-$input = shortcode_atts(array(
-	'tahun_anggaran' => ''
-), $atts);
-
-if (!empty($_GET) && !empty($_GET['tahun_anggaran'])) {
-	$input['tahun_anggaran'] = $wpdb->prepare('%d', $_GET['tahun_anggaran']);
-}
-$tahun_anggaran = $input['tahun_anggaran'];
-
 $body = '';
 ?>
 <style>
@@ -28,7 +19,7 @@ $body = '';
 <div class="cetak">
 	<div style="padding: 10px;margin:0 0 3rem 0;">
 	<input type="hidden" value="<?php echo get_option( '_crb_apikey_esakip' ); ?>" id="api_key">
-	<h1 class="text-center" style="margin:3rem;">Halaman Penjadwalan Verifikasi Upload Dokumen <br>Tahun <?php echo $input['tahun_anggaran']; ?></h1>
+	<h1 class="text-center" style="margin:3rem;">Halaman Penjadwalan Verifikasi Upload Dokumen RENSTRA</h1>
 	<!-- <div style="margin-bottom: 25px;">
 		<button class="btn btn-primary tambah_jadwal" onclick="tambah_jadwal();">Tambah Jadwal</button>
 	</div> -->
@@ -39,7 +30,6 @@ $body = '';
 				<th class="text-center">Status</th>
 				<th class="text-center">Jadwal Mulai</th>
 				<th class="text-center">Jadwal Selesai</th>
-				<th class="text-center">Tahun Anggaran</th>
 				<th class="text-center">Langsung Verifikasi</th>
 				<th class="text-center">Keterangan</th>
 				<th class="text-center">Aksi</th>
@@ -109,7 +99,6 @@ $body = '';
 	jQuery(document).ready(function(){
 
 		window.thisAjaxUrl = "<?php echo admin_url('admin-ajax.php'); ?>"
-		window.tahun_anggaran = "<?php echo $tahun_anggaran; ?>"
 
 		get_data_jadwal();
 		
@@ -132,9 +121,8 @@ $body = '';
 			url: esakip.url,
 			type: 'POST',
 			data:{
-				'action' 		: "get_data_penjadwalan_verifikasi_upload_dokumen",
-				'api_key' 		: esakip.api_key,
-				'tahun_anggaran': tahun_anggaran
+				'action' 		: "get_data_penjadwalan_verifikasi_upload_dokumen_renstra",
+				'api_key' 		: esakip.api_key
 			},
 			dataType: 'json',
 			success: function(response) {
@@ -185,12 +173,11 @@ $body = '';
 				type: 'post',
 				dataType: 'json',
 				data: {
-					'action': 'submit_jadwal_verifikasi_upload_dokumen',
+					'action': 'submit_jadwal_verifikasi_upload_dokumen_renstra',
 					'api_key': esakip.api_key,
 					'nama_jadwal': nama_jadwal,
 					'jadwal_mulai': jadwal_mulai,
 					'jadwal_selesai': jadwal_selesai,
-					'tahun_anggaran': tahun_anggaran,
 					'langsung_verifikasi':langsung_verifikasi
 				},
 				beforeSend: function() {
@@ -224,7 +211,7 @@ $body = '';
 			url: esakip.url,
 			type: "post",
 			data: {
-				'action': "get_data_jadwal_by_id_verifikasi_upload_dokumen",
+				'action': "get_data_jadwal_by_id_verifikasi_upload_dokumen_renstra",
 				'api_key': esakip.api_key,
 				'id': id
 			},
@@ -259,13 +246,12 @@ $body = '';
 				type: 'post',
 				dataType: 'json',
 				data: {
-					'action': 'submit_edit_jadwal_verifikasi_upload_dokumen',
+					'action': 'submit_edit_jadwal_verifikasi_upload_dokumen_renstra',
 					'api_key': esakip.api_key,
 					'nama_jadwal': nama_jadwal,
 					'jadwal_mulai': jadwal_mulai,
 					'jadwal_selesai': jadwal_selesai,
 					'id': id,
-					'tahun_anggaran': tahun_anggaran,
 					'keterangan'	: keterangan,
 					'verifikasi_upload': verifikasi_upload
 				},
@@ -286,6 +272,60 @@ $body = '';
 		}
 		jQuery('#modalJadwal').modal('hide');
 	}
+
+	function hapus_data_penjadwalan(id) {
+		let confirmDelete = confirm("Apakah anda yakin akan menghapus penjadwalan?");
+		if (confirmDelete) {
+			jQuery('#wrap-loading').show();
+			jQuery.ajax({
+				url: esakip.url,
+				type: 'post',
+				data: {
+					'action': 'delete_jadwal_verifikasi_upload_dokumen_renstra',
+					'api_key': esakip.api_key,
+					'id': id
+				},
+				dataType: 'json',
+				success: function(response) {
+					jQuery('#wrap-loading').hide();
+					if (response.status == 'success') {
+						alert('Data berhasil dihapus!.');
+						get_data_jadwal()
+						jQuery(".tambah_jadwal").prop('hidden', false);
+					} else {
+						alert(`GAGAL! \n${response.message}`);
+					}
+				}
+			});
+		}
+	}
+
+	// function lock_data_penjadwalan(id) {
+	// 	let confirmLocked = confirm("Apakah anda yakin akan mengunci penjadwalan?");
+	// 	if (confirmLocked) {
+	// 		jQuery('#wrap-loading').show();
+	// 		jQuery.ajax({
+	// 			url: esakip.url,
+	// 			type: 'post',
+	// 			data: {
+	// 				'action': 'lock_jadwal',
+	// 				'api_key': esakip.api_key,
+	// 				'id': id
+	// 			},
+	// 			dataType: 'json',
+	// 			success: function(response) {
+	// 				jQuery('#wrap-loading').hide();
+	// 				if (response.status == 'success') {
+	// 					alert('Data berhasil dikunci!.');
+	// 					penjadwalanTable.ajax.reload();
+	// 					jQuery(".tambah_jadwal").prop('hidden', false);
+	// 				} else {
+	// 					alert(`GAGAL! \n${response.message}`);
+	// 				}
+	// 			}
+	// 		});
+	// 	}
+	// }
 
 	function afterSubmitForm(){
 		jQuery("#keterangan").val("")

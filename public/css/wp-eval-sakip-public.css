@@ -1,49 +1,48 @@
 #wrap-loading {
-  display: none;
-  width: 100%;
-  height: 100vh;
-  position: fixed;
-  z-index: 9999999;
-  background: #00000073;
-  top: 0;
+    display: none;
+    width: 100%;
+    height: 100vh;
+    position: fixed;
+    z-index: 9999999;
+    background: #00000073;
+    top: 0;
 }
 .lds-hourglass {
-  position: fixed;
-  width: 64px;
-  height: 64px;
-  top: 50vh;
-  left: 50%;
-  z-index: 99999;
-  margin-left: -32px;
+    position: fixed;
+    width: 64px;
+    height: 64px;
+    top: 50vh;
+    left: 50%;
+    z-index: 99999;
+    margin-left: -32px;
 }
 .lds-hourglass:after {
-  content: " ";
-  display: block;
-  border-radius: 50%;
-  width: 0;
-  height: 0;
-  margin: 6px;
-  box-sizing: border-box;
-  border: 26px solid #fff;
-  border-color: #fff transparent #fff transparent;
-  animation: lds-hourglass 1.2s infinite;
+    content: " ";
+    display: block;
+    border-radius: 50%;
+    width: 0;
+    height: 0;
+    margin: 6px;
+    box-sizing: border-box;
+    border: 26px solid #fff;
+    border-color: #fff transparent #fff transparent;
+    animation: lds-hourglass 1.2s infinite;
 }
 @keyframes lds-hourglass {
-  0% {
-    transform: rotate(0);
-    animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
-  }
-  50% {
-    transform: rotate(900deg);
-    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
-  }
-  100% {
-    transform: rotate(1800deg);
-  }
+    0% {
+        transform: rotate(0);
+        animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+    }
+    50% {
+        transform: rotate(900deg);
+        animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+    100% {
+        transform: rotate(1800deg);
+    }
 }
 
-
-#penjadwalanHitungMundur{
+#penjadwalanHitungMundur {
     text-align: center;
     padding-bottom: 80px;
     width: 250px !important;
@@ -57,16 +56,16 @@
     border-bottom-left-radius: 0.6em;
     border-bottom-right-radius: 0.6em;
 }
-#penjadwalanHitungMundur span{
+#penjadwalanHitungMundur span {
     display: block;
     font-size: 13px;
     color: white;
 }
-#penjadwalanHitungMundur #titles span{
+#penjadwalanHitungMundur #titles span {
     display: inline-block !important;
     font-size: 15px !important;
 }
-#penjadwalanHitungMundur div{
+#penjadwalanHitungMundur div {
     display: inline-block;
     line-height: 1;
     padding: 0;
@@ -74,7 +73,7 @@
     width: 20%;
     height: 40px;
 }
-#penjadwalanHitungMundur #titles{
+#penjadwalanHitungMundur #titles {
     display: block;
     font-size: 15px;
     color: white;
@@ -83,68 +82,156 @@
     text-align: center;
     line-height: 1;
 }
-#penjadwalanHitungMundur #days{
+#penjadwalanHitungMundur #days {
     font-size: 20px;
     color: #db4844;
     text-align: center;
 }
-#penjadwalanHitungMundur #hours{
+#penjadwalanHitungMundur #hours {
     font-size: 20px;
     color: #f07c22;
     text-align: center;
 }
-#penjadwalanHitungMundur #minutes{
+#penjadwalanHitungMundur #minutes {
     font-size: 20px;
     color: #f6da74;
     text-align: center;
 }
 
-#penjadwalanHitungMundur #seconds{
+#penjadwalanHitungMundur #seconds {
     font-size: 20px;
     color: #abcd58;
     text-align: center;
 }
 
 .table-responsive {
-  overflow: auto;
-  max-height: 100vh;
-  width: 100%;
+    overflow: auto;
+    max-height: 100vh;
+    width: 100%;
 }
 
 .daftar-menu-sakip {
-  max-width: 600px;
-  margin: auto;
+    max-width: 600px;
+    margin: auto;
 }
 
 .daftar-menu-sakip li {
-  display: block;
-  list-style: none;
-  margin: 5px;
+    display: block;
+    list-style: none;
+    margin: 5px;
 }
 
 .daftar-tahun-sakip li {
-  list-style: none;
-  margin: 5px;
-  display: inline-block;
+    list-style: none;
+    margin: 5px;
+    display: inline-block;
 }
 
 .esakip-body-tahun {
-  display: none;
+    display: none;
 }
 
 .esakip-body-tahun.active {
-  display: block;
+    display: block;
 }
 
 .esakip-header-tahun {
-  cursor: pointer;
-  padding: 10px;
+    cursor: pointer;
+    padding: 10px;
 }
 
 .esakip-header-tahun {
-  background: #9e9e9e4f;
+    background: #9e9e9e4f;
 }
 
 .esakip-header-tahun.active {
-  background: #ffc107 !important;
+    background: #ffc107 !important;
+}
+
+.esakip-cetak {
+    font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    padding: 0;
+    margin: 0;
+    font-size: 11pt;
+}
+.esakip-m-t-20 {
+    margin-top: 20px;
+}
+.esakip-bawah {
+    border-bottom: 1px solid #000;
+}
+.esakip-kiri {
+    border-left: 1px solid #000;
+}
+.esakip-kanan {
+    border-right: 1px solid #000;
+}
+.esakip-atas {
+    border-top: 1px solid #000;
+}
+.esakip-text_tengah {
+    text-align: center;
+}
+.esakip-text_kiri {
+    text-align: left;
+}
+.esakip-text_kanan {
+    text-align: right;
+}
+.esakip-text_blok {
+    font-weight: bold;
+}
+.esakip-text_12 {
+    font-size: 12px !important;
+}
+.esakip-text_15 {
+    font-size: 15px !important;
+}
+.esakip-text_20 {
+    font-size: 20px !important;
+}
+.esakip-logoprinter {
+    position: absolute;
+    top: 150px;
+    right: 600px;
+}
+thead {
+    display: table-header-group;
+}
+.esakip-setbreakafter {
+    page-break-after: always;
+}
+.esakip-setbreakbefore {
+    page-break-before: always;
+}
+#action-sakip {
+    padding: 20px 0;
+    text-align: center;
+}
+@media print {
+    .hide-print {
+        display: none;
+    }
+}
+.edit-mapping,
+.edit-monev,
+.edit-monev-file {
+    border: 2px solid;
+    padding: 2px;
+    border-radius: 50%;
+    color: #2196f3;
+    margin-left: 10px;
+    cursor: pointer;
+}
+.edit-monev {
+    padding: 1px 1px 7px;
+}
+#tambah-data {
+    text-decoration: none;
+}
+.edit-mapping:hover,
+.edit-monev:hover {
+    background: #00bcd4;
+    color: #fff;
 }
