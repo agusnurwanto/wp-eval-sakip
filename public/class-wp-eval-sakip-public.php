@@ -2750,6 +2750,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'status' => 'error',
 								'message' => 'Gagal menyimpan data ke database!'
 							);
+						}else{
+							$data = array(
+								'id_dokumen'	=> $wpdb->insert_id,
+								'id_skpd'		=> $idSkpd,
+								'tahun_anggaran'=> $tahunAnggaran,
+								'nama_tabel'	=> 'esakip_renja_rkt'
+							);
+
+							$setting_verifikasi = $this->setting_verifikasi_upload($data);
+							if($setting_verifikasi['status'] == 'success'){
+								$ret['setting_verifikasi'] = $setting_verifikasi;
+							}
 						}
 					} else {
 						$opsi = array(
@@ -2912,6 +2924,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'status' => 'error',
 								'message' => 'Gagal menyimpan data ke database!'
 							);
+						}else{
+							$data = array(
+								'id_dokumen'	=> $wpdb->insert_id,
+								'id_skpd'		=> $idSkpd,
+								'tahun_anggaran'=> $tahunAnggaran,
+								'nama_tabel'	=> 'esakip_perjanjian_kinerja'
+							);
+
+							$setting_verifikasi = $this->setting_verifikasi_upload($data);
+							if($setting_verifikasi['status'] == 'success'){
+								$ret['setting_verifikasi'] = $setting_verifikasi;
+							}
 						}
 					} else {
 						$opsi = array(
@@ -3236,6 +3260,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'status' => 'error',
 								'message' => 'Gagal menyimpan data ke database!'
 							);
+						}else{
+							$data = array(
+								'id_dokumen'	=> $wpdb->insert_id,
+								'id_skpd'		=> $idSkpd,
+								'tahun_anggaran'=> $tahunAnggaran,
+								'nama_tabel'	=> 'esakip_laporan_kinerja'
+							);
+
+							$setting_verifikasi = $this->setting_verifikasi_upload($data);
+							if($setting_verifikasi['status'] == 'success'){
+								$ret['setting_verifikasi'] = $setting_verifikasi;
+							}
 						}
 					} else {
 						$opsi = array(
@@ -5375,12 +5411,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
-						if ($data_verifikasi['status_verifikasi'] == 1) {
-							$color_badge_verify = 'success';
-							$text_badge = 'Diterima';
-						} else if ($data_verifikasi['status_verifikasi'] == 2) {
-							$color_badge_verify = 'danger';
-							$text_badge = 'Ditolak';
+						if(!empty($data_verifikasi)){
+							if ($data_verifikasi['status_verifikasi'] == 1) {
+								$color_badge_verify = 'success';
+								$text_badge = 'Diterima';
+							} else if ($data_verifikasi['status_verifikasi'] == 2) {
+								$color_badge_verify = 'danger';
+								$text_badge = 'Ditolak';
+							}
+							$keterangan = '';
+							if(!empty($data_verifikasi['keterangan_verifikasi'])){
+								$keterangan = $data_verifikasi['keterangan_verifikasi'];
+							}
 						}
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
@@ -5389,7 +5431,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$tbody .= "<td>" . $vv['keterangan'] . "</td>";
 						$tbody .= "<td>" . $vv['created_at'] . "</td>";
 						$tbody .= "<td class='text-center'><span class='badge badge-" . $color_badge_verify . "' style='padding: .5em 1.4em;'>" . $text_badge . "</span></td>";
-						$tbody .= "<td>" . $data_verifikasi['keterangan_verifikasi'] . "</td>";
+						$tbody .= "<td>" . $keterangan . "</td>";
 
 						$btn = '<div class="btn-action-group">';
 						if ($can_verify) {
@@ -19054,6 +19096,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'status' => 'error',
 								'message' => 'Gagal menyimpan data ke database!'
 							);
+						}else{
+							$data = array(
+								'id_dokumen'	=> $wpdb->insert_id,
+								'id_skpd'		=> $idSkpd,
+								'tahun_anggaran'=> $tahunAnggaran,
+								'nama_tabel'	=> 'esakip_dpa'
+							);
+
+							$setting_verifikasi = $this->setting_verifikasi_upload($data);
+							if($setting_verifikasi['status'] == 'success'){
+								$ret['setting_verifikasi'] = $setting_verifikasi;
+							}
 						}
 					} else {
 						$opsi = array(
