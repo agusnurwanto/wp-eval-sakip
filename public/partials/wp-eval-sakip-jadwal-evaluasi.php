@@ -99,7 +99,7 @@ $tahun_anggaran = $input['tahun_anggaran'];
 	jQuery(document).ready(function() {
 		globalThis.tahun_anggaran = "<?php echo $tahun_anggaran; ?>"
 		globalThis.tipe = 'LKE'
-		get_data_penjadwalan();
+		get_data_penjadwalan_lke();
 
 		jQuery('#jadwal_tanggal').daterangepicker({
 			timePicker: true,
@@ -113,7 +113,7 @@ $tahun_anggaran = $input['tahun_anggaran'];
 
 	});
 
-	function get_data_penjadwalan() {
+	function get_data_penjadwalan_lke() {
 		jQuery("#wrap-loading").show();
 		globalThis.penjadwalanTable = jQuery('#data_penjadwalan_table').DataTable({
 			"processing": true,
@@ -122,7 +122,7 @@ $tahun_anggaran = $input['tahun_anggaran'];
 				url: esakip.url,
 				type: "post",
 				data: {
-					'action': "get_data_penjadwalan",
+					'action': "get_data_penjadwalan_lke",
 					'api_key': esakip.api_key,
 					'tipe': tipe,
 					'tahun_anggaran': tahun_anggaran
@@ -168,14 +168,14 @@ $tahun_anggaran = $input['tahun_anggaran'];
 		});
 	}
 
-	function get_jadwal_by_id(id) {
+	function get_jadwal_lke(id) {
 		return new Promise(function(resolve, reject) {
 			jQuery("#wrap-loading").show()
 			jQuery.ajax({
 				url: esakip.url,
 				type: "post",
 				data: {
-					'action': "get_data_jadwal_by_id",
+					'action': "get_data_jadwal_lke",
 					'api_key': esakip.api_key,
 					'id': id
 				},
@@ -220,7 +220,7 @@ $tahun_anggaran = $input['tahun_anggaran'];
 				type: 'post',
 				dataType: 'json',
 				data: {
-					'action': 'submit_jadwal',
+					'action': 'submit_jadwal_lke',
 					'api_key': esakip.api_key,
 					'nama_jadwal': nama_jadwal,
 					'jadwal_mulai': jadwalMulai,
@@ -261,7 +261,7 @@ $tahun_anggaran = $input['tahun_anggaran'];
 			url: esakip.url,
 			type: "post",
 			data: {
-				'action': "get_data_jadwal_by_id",
+				'action': "get_data_jadwal_lke",
 				'api_key': esakip.api_key,
 				'id': id
 			},
@@ -304,7 +304,7 @@ $tahun_anggaran = $input['tahun_anggaran'];
 				type: 'post',
 				dataType: 'json',
 				data: {
-					'action': 'submit_edit_jadwal',
+					'action': 'submit_edit_jadwal_lke',
 					'api_key': esakip.api_key,
 					'nama_jadwal': nama_jadwal,
 					'jadwal_mulai': jadwalMulai,
@@ -341,7 +341,7 @@ $tahun_anggaran = $input['tahun_anggaran'];
 				url: esakip.url,
 				type: 'post',
 				data: {
-					'action': 'delete_jadwal',
+					'action': 'delete_jadwal_lke',
 					'api_key': esakip.api_key,
 					'id': id
 				},
@@ -368,7 +368,7 @@ $tahun_anggaran = $input['tahun_anggaran'];
 				url: esakip.url,
 				type: 'post',
 				data: {
-					'action': 'lock_jadwal',
+					'action': 'lock_jadwal_lke',
 					'api_key': esakip.api_key,
 					'id': id
 				},
@@ -442,7 +442,7 @@ $tahun_anggaran = $input['tahun_anggaran'];
 			</div>`;
 
 		jQuery("body .report").html(modal);
-		get_jadwal_by_id(id)
+		get_jadwal_lke(id)
 		list_perangkat_daerah()
 			.then(function() {
 				jQuery("#modal-report").modal('show');
@@ -461,7 +461,7 @@ $tahun_anggaran = $input['tahun_anggaran'];
 					type: 'post',
 					dataType: 'json',
 					data: {
-						action: 'list_perangkat_daerah',
+						action: 'list_perangkat_daerah_lke',
 						tahun_anggaran: tahun_anggaran,
 						'api_key': esakip.api_key,
 					},

@@ -359,6 +359,24 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-pengaturan-menu.php';
 	}
 
+	public function input_rpjmd($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-input_rpjmd.php';
+	}
+
+	public function input_rpjpd($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-input_rpjpd.php';
+	}
+
 	public function mapping_skpd()
 	{
 		global $wpdb;
@@ -7673,7 +7691,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
-	public function get_data_jadwal_by_id()
+	public function get_data_jadwal_lke()
 	{
 		global $wpdb;
 		$ret = array(
@@ -7701,7 +7719,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
-	public function get_data_penjadwalan()
+	public function get_data_penjadwalan_lke()
 	{
 		global $wpdb;
 		$return = array(
@@ -7843,7 +7861,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($return));
 	}
 
-	public function submit_jadwal()
+	public function submit_jadwal_lke()
 	{
 		global $wpdb;
 		$user_id = um_user('ID');
@@ -9635,7 +9653,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($return));
 	}
 
-	public function submit_edit_jadwal()
+	public function submit_edit_jadwal_lke()
 	{
 		global $wpdb;
 		$user_id = um_user('ID');
@@ -9717,7 +9735,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	}
 
 	/** Submit delete data jadwal */
-	public function delete_jadwal()
+	public function delete_jadwal_lke()
 	{
 		global $wpdb;
 		$return = array(
@@ -9803,7 +9821,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	}
 
 	/** Submit lock data jadwal RPJM */
-	public function lock_jadwal()
+	public function lock_jadwal_lke()
 	{
 		global $wpdb;
 		$return = array(
@@ -17860,7 +17878,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
-	public function list_perangkat_daerah()
+	public function list_perangkat_daerah_lke()
 	{
 		global $wpdb;
 

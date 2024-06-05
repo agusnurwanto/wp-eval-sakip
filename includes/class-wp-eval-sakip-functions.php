@@ -429,6 +429,14 @@ class Esakip_Functions
                     }
 
                     if (!empty($nama_file)) {
+                        // hapus extension file
+                        $nama_file = explode('.', $nama_file);
+                        $cek_jml = count($nama_file);
+                        if($cek_jml >= 2){
+                            unset($nama_file[$cek_jml-1]);
+                        }
+                        $nama_file = implode('.', $nama_file);
+
                         $file['name'] = $nama_file . '.' . $imageFileType;
                     } else {
                         $nama_file = date('Y-m-d-H-i-s');
@@ -470,12 +478,13 @@ class Esakip_Functions
         }
         $fileInfo = pathinfo($newName);
         $ext_file = strtolower($fileInfo['extension']);
-        if (isset($fileInfo['extension']) && !in_array($ext_file, $ext)) {
+        if (!in_array($ext_file, $ext)) {
             return array(
                 'status' => 'error',
                 'message' => "Nama file harus berextension ".implode(', ', $ext)
             );
-        }else if(!file_exists($oldName)) {
+        }
+        if(!file_exists($oldName)) {
             return array(
                 'status' => 'error',
                 'message' => "File tidak ditemukan: $oldName"
