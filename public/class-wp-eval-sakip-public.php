@@ -12424,14 +12424,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$dokumen_lama = $wpdb->get_var($wpdb->prepare("
 						SELECT
 							dokumen
-						FROM esakip_perjanjian_kinerja
+						FROM esakip_pedoman_teknis_evaluasi_internal
 						WHERE id=%d
 					", $id_dokumen));
 					if ($dokumen_lama != $_POST['namaDokumen']) {
 						$ret_rename = $this->functions->renameFile($upload_dir . $dokumen_lama, $upload_dir . $_POST['namaDokumen']);
 						if ($ret_rename['status'] != 'error') {
 							$wpdb->update(
-								'esakip_perjanjian_kinerja',
+								'esakip_pedoman_teknis_evaluasi_internal',
 								array('dokumen' => $_POST['namaDokumen']),
 								array('id' => $id_dokumen),
 							);
