@@ -25,12 +25,11 @@ $skpd = $wpdb->get_row(
 ", $id_skpd, $tahun_anggaran_sakip),
     ARRAY_A
 );
-
 $idtahun = $wpdb->get_results(
     "
-		SELECT DISTINCT 
-			tahun_anggaran 
-		FROM esakip_data_unit        
+        SELECT DISTINCT 
+            tahun_anggaran 
+        FROM esakip_data_unit        
         ORDER BY tahun_anggaran DESC",
     ARRAY_A
 );
@@ -64,6 +63,9 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     .btn-action-group .btn {
         margin: 0 5px;
     }
+    #table_dokumen_pengukuran_kinerja th {
+        vertical-align: middle;
+    }
 </style>
 
 <!-- Table -->
@@ -80,12 +82,12 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 <table id="table_dokumen_pengukuran_kinerja" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
                         <tr>
-                            <th class="text-center">No</th>
-                            <th class="text-center">Perangkat Daerah</th>
-                            <th class="text-center">Nama Dokumen</th>
-                            <th class="text-center">Keterangan</th>
-                            <th class="text-center">Waktu Upload</th>
-                            <th class="text-center" style="width: 150px;">Aksi</th>
+                            <th class="text-center" rowspan="2">No</th>
+                            <th class="text-center" rowspan="2">Perangkat Daerah</th>
+                            <th class="text-center" rowspan="2">Nama Dokumen</th>
+                            <th class="text-center" rowspan="2">Keterangan</th>
+                            <th class="text-center" rowspan="2">Waktu Upload</th>
+                            <th class="text-center" rowspan="2" style="width: 150px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -125,6 +127,10 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                         Maksimal ukuran file: <?php echo get_option('_crb_maksimal_upload_dokumen_esakip'); ?> MB. Format file yang diperbolehkan: PDF.
                     </div>
                     <div class="form-group">
+                        <label for="nama_file">Nama Dokumen</label>
+                        <input type="text" class="form-control" id="nama_file" name="nama_file" rows="3" required>
+                    </div>
+                    <div class="form-group">
                         <label for="keterangan">Keterangan</label>
                         <textarea class="form-control" id="keterangan" name="keterangan" rows="3" required></textarea>
                     </div>
@@ -134,7 +140,6 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         </div>
     </div>
 </div>
-
 
 <!-- Modal Tahun -->
 <div class="modal fade" id="tahunModal" tabindex="-1" role="dialog" aria-labelledby="tahunModalLabel" aria-hidden="true">
@@ -170,6 +175,14 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     jQuery(document).ready(function() {
         getTablePengukuranKinerja();
         getTableTahun();
+        jQuery("#fileUpload").on('change', function() {
+            var id_dokumen = jQuery('#idDokumen').val();
+            if (id_dokumen == '') {
+                var name = jQuery("#fileUpload").prop('files')[0].name;
+                jQuery('#nama_file').val(name);
+            }
+        });
+        window.tipe_dokumen = "pengukuran_kinerja";
     });
 
     function getTablePengukuranKinerja() {
@@ -233,6 +246,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         jQuery("#editModalLabel").hide();
         jQuery("#uploadModalLabel").show();
         jQuery("#idDokumen").val('');
+        jQuery("#nama_file").val('');
         jQuery("#fileUpload").val('');
         jQuery("#keterangan").val('');
         jQuery('#fileUploadExisting').removeAttr('href').empty();
@@ -258,6 +272,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                     let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + data.dokumen;
                     jQuery("#idDokumen").val(data.id);
                     jQuery("#fileUpload").val('');
+                    jQuery("#nama_file").val(data.dokumen);
                     jQuery('#fileUploadExisting').attr('href', url).html(data.dokumen);
                     jQuery("#keterangan").val(data.keterangan);
                     jQuery("#uploadModalLabel").hide();
@@ -273,6 +288,11 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 alert('Terjadi kesalahan saat memuat data!');
             }
         });
+    }
+
+    function set_tahun_dokumen(id) {
+        jQuery('#tahunModal').modal('show');
+        jQuery('#idDokumen').val(id);
     }
 
     function set_tahun_dokumen(id) {
@@ -303,6 +323,10 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         if (fileDokumen == '') {
             return alert('File Upload tidak boleh kosong');
         }
+        let namaDokumen = jQuery("#nama_file").val();
+        if (namaDokumen == '') {
+            return alert('Nama Dokumen tidak boleh kosong');
+        }
 
         let form_data = new FormData();
         form_data.append('action', 'tambah_dokumen_pengukuran_kinerja');
@@ -313,6 +337,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         form_data.append('keterangan', keterangan);
         form_data.append('tahunAnggaran', tahunAnggaran);
         form_data.append('fileUpload', fileDokumen);
+        form_data.append('namaDokumen', namaDokumen);
 
         jQuery('#wrap-loading').show();
         jQuery.ajax({
@@ -337,6 +362,48 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 console.error(xhr.responseText);
                 alert('Terjadi kesalahan saat mengirim data!');
                 jQuery('#wrap-loading').hide();
+            }
+        });
+    }
+
+    function submit_tahun_pengukuran_kinerja() {
+        let id = jQuery("#idDokumen").val();
+        if (id == '') {
+            return alert('id tidak boleh kosong');
+        }
+
+        let tahunAnggaran = jQuery("#tahunAnggaran").val();
+        if (tahunAnggaran == '') {
+            return alert('Tahun Anggaran tidak boleh kosong');
+        }
+
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'submit_tahun_pengukuran_kinerja',
+                id: id,
+                tahunAnggaran: tahunAnggaran,
+                api_key: esakip.api_key
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    jQuery('#tahunModal').modal('hide');
+                    getTableTahun();
+                    getTablePengukuranKinerja();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
             }
         });
     }
@@ -379,26 +446,18 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         });
     }
 
-    function submit_tahun_pengukuran_kinerja() {
-        let id = jQuery("#idDokumen").val();
-        if (id == '') {
-            return alert('id tidak boleh kosong');
+    function hapus_tahun_dokumen_pengukuran_kinerja(id) {
+        if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
+            return;
         }
-
-        let tahunAnggaran = jQuery("#tahunAnggaran").val();
-        if (tahunAnggaran == '') {
-            return alert('Tahun Anggaran tidak boleh kosong');
-        }
-
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'submit_tahun_pengukuran_kinerja',
-                id: id,
-                tahunAnggaran: tahunAnggaran,
-                api_key: esakip.api_key
+                action: 'hapus_tahun_dokumen_pengukuran_kinerja',
+                api_key: esakip.api_key,
+                id: id
             },
             dataType: 'json',
             success: function(response) {
@@ -406,16 +465,15 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
                     alert(response.message);
-                    jQuery('#tahunModal').modal('hide');
-                    getTableTahun();
                     getTablePengukuranKinerja();
+                    getTableTahun();
                 } else {
                     alert(response.message);
                 }
             },
             error: function(xhr, status, error) {
-                jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
+                jQuery('#wrap-loading').hide();
                 alert('Terjadi kesalahan saat mengirim data!');
             }
         });
