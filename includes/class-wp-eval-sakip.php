@@ -470,6 +470,12 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_pengaturan_menu_by_id',  $plugin_public, 'get_pengaturan_menu_by_id');
 		$this->loader->add_action('wp_ajax_submit_edit_pengaturan_menu_dokumen',  $plugin_public, 'submit_edit_pengaturan_menu_dokumen');
 		
+		$this->loader->add_action('wp_ajax_esakip_simpan_rpjpd',  $plugin_public, 'esakip_simpan_rpjpd');
+		$this->loader->add_action('wp_ajax_esakip_get_rpjpd',  $plugin_public, 'esakip_get_rpjpd');
+		$this->loader->add_action('wp_ajax_esakip_singkron_rpjpd_sipd_lokal',  $plugin_public, 'esakip_singkron_rpjpd_sipd_lokal');
+		$this->loader->add_action('wp_ajax_esakip_simpan_rpjpd',  $plugin_public, 'esakip_simpan_rpjpd');
+		$this->loader->add_action('wp_ajax_esakip_hapus_rpjpd',  $plugin_public, 'esakip_hapus_rpjpd');
+
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_evaluasi_sakip', array($plugin_public, 'jadwal_evaluasi_sakip'));
