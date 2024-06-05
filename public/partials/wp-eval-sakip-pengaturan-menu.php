@@ -84,43 +84,43 @@ $body = '';
 						<label class="d-block">Pengaturan Menu Upload Dokumen</label>
 						<tr>
 							<td>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio" name="menu_dokumen" id="menu_dokumen_tampil" value="tampil">
-									<label class="form-check-label" for="menu_dokumen_tampil">Tampilkan</label>
+								<div class="custom-control custom-radio custom-control-inline">
+									<input class="custom-control-input" type="radio" name="menu_dokumen" id="menu_dokumen_tampil" value="tampil">
+									<label class="custom-control-label" for="menu_dokumen_tampil">Tampilkan</label>
 								</div>
 							</td>
 							<td>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio" name="menu_dokumen" id="menu_dokumen_sembunyi" value="sembunyi">
-									<label class="form-check-label" for="menu_dokumen_sembunyi">Sembunyikan</label>
+								<div class="custom-control custom-radio custom-control-inline">
+									<input class="custom-control-input" type="radio" name="menu_dokumen" id="menu_dokumen_sembunyi" value="sembunyi">
+									<label class="custom-control-label" for="menu_dokumen_sembunyi">Sembunyikan</label>
 								</div>
 							</td>
 						</tr>
-						<small class="d-block">Setting Menu Upload Dokumen Yang Tampil Di Dashboard User</small>
+						<small class="d-block form-text text-muted">Setting Menu Upload Dokumen Yang Tampil Di Dashboard User</small>
 					</div>
 					<div class="form-group" style="margin: 1.5em 0 0;">
 						<label class="d-block">Pengaturan Akses User Upload Dokumen</label>
 						<tr>
 							<td>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio" name="akses_user_upload_dokumen" id="akses_user_upload_dokumen_pemda" value="pemda">
-									<label class="form-check-label" for="akses_user_upload_dokumen_pemda">Pemerintah Daerah</label>
+								<div class="custom-control custom-radio custom-control-inline">
+									<input class="custom-control-input" type="radio" name="akses_user_upload_dokumen" id="akses_user_upload_dokumen_pemda" value="pemda">
+									<label class="custom-control-label" for="akses_user_upload_dokumen_pemda">Pemerintah Daerah</label>
 								</div>
 							</td>
 							<td>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio" name="akses_user_upload_dokumen" id="akses_user_upload_dokumen_pd" value="pd">
-									<label class="form-check-label" for="akses_user_upload_dokumen_pd">Peragkat Daerah</label>
+								<div class="custom-control custom-radio custom-control-inline">
+									<input class="custom-control-input" type="radio" name="akses_user_upload_dokumen" id="akses_user_upload_dokumen_pd" value="pd">
+									<label class="custom-control-label" for="akses_user_upload_dokumen_pd">Peragkat Daerah</label>
 								</div>
 							</td>
 							<td>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio" name="akses_user_upload_dokumen" id="verifikasi_upload_dokumen_semua" value="semua">
-									<label class="form-check-label" for="verifikasi_upload_dokumen_semua">Pemerintah Daerah dan Perangkat Daerah</label>
+								<div class="custom-control custom-radio custom-control-inline">
+									<input class="custom-control-input" type="radio" name="akses_user_upload_dokumen" id="verifikasi_upload_dokumen_semua" value="semua">
+									<label class="custom-control-label" for="verifikasi_upload_dokumen_semua">Pemerintah Daerah dan Perangkat Daerah</label>
 								</div>
 							</td>
 						</tr>
-						<small class="d-block">Setting User Yang Bisa Mengakses Upload Dokumen</small>
+						<small class="d-block form-text text-muted">Setting User Yang Bisa Mengakses Upload Dokumen</small>
 					</div>
                     <div class="form-group" style="margin: 1.5em 0 0;">
                         <label for="no_urut">No Urut</label>
