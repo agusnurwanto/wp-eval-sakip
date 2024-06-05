@@ -472,7 +472,6 @@ class Wp_Eval_Sakip {
 		
 		$this->loader->add_action('wp_ajax_esakip_simpan_rpjpd',  $plugin_public, 'esakip_simpan_rpjpd');
 		$this->loader->add_action('wp_ajax_esakip_get_rpjpd',  $plugin_public, 'esakip_get_rpjpd');
-		$this->loader->add_action('wp_ajax_esakip_singkron_rpjpd_sipd_lokal',  $plugin_public, 'esakip_singkron_rpjpd_sipd_lokal');
 		$this->loader->add_action('wp_ajax_esakip_simpan_rpjpd',  $plugin_public, 'esakip_simpan_rpjpd');
 		$this->loader->add_action('wp_ajax_esakip_hapus_rpjpd',  $plugin_public, 'esakip_hapus_rpjpd');
 
