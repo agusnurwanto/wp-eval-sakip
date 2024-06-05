@@ -42,7 +42,8 @@ foreach($unit as $opd){
 			FROM $dok[nama_tabel]
 			WHERE id_skpd=%d
 				AND active=1
-		", $opd['id_skpd']));
+				AND tahun_anggaran=%d
+		", $opd['id_skpd'], $input['tahun_anggaran']));
 		$warning = "bg-success";
 		if($jml_dokumen == 0){
 			$warning="bg-danger";
