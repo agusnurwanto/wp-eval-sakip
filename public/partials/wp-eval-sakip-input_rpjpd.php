@@ -33,7 +33,6 @@ if (empty($jadwal)) {
 }
 $tahun_awal = $jadwal['tahun_anggaran'];
 $tahun_akhir = $tahun_awal + $jadwal['lama_pelaksanaan'];
-$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 $nama_pemda = get_option(ESAKIP_NAMA_PEMDA);
 $api_key = get_option(ESAKIP_APIKEY);
 
