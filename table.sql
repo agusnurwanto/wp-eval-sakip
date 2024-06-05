@@ -265,6 +265,7 @@ CREATE TABLE `esakip_data_jadwal` (
   `lama_pelaksanaan` int(11) DEFAULT NULL,
   `tampil_nilai_penetapan` int(11) NOT NULL DEFAULT '1' COMMENT '1 Tampil, 0 Tidak Tampil',
   `tahun_anggaran` year(4) NOT NULL DEFAULT '2022',
+  `default_verifikasi_upload` tinyint(4) DEFAULT NULL,
   PRIMARY KEY  (id)
 );
 

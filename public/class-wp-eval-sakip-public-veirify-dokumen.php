@@ -2,7 +2,15 @@
 
 require_once ESAKIP_PLUGIN_PATH . "/public/class-wp-eval-sakip-public-lke.php";
 class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
-{
+{   
+	public function jadwal_verifikasi_upload_dokumen($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-jadwal-verifikasi-upload-dokumen.php';
+	}
 
 	public function get_data_pengaturan_menu()
 	{
@@ -631,4 +639,408 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
 		}
 		die(json_encode($ret));
 	}
+
+    // Setting langsung Verifikasi Upload Dokumen
+    public function get_data_penjadwalan_verifikasi_upload_dokumen()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array(),
+            'cekJadwalTerbuka' => 0
+		);
+
+        if (!empty($_POST)) {
+            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+                if (!empty($_POST['tahun_anggaran'])) {
+                    $tahun_anggaran = $_POST['tahun_anggaran'];
+
+                    // auto tambah data jika tidak ada data
+                    
+                    $cek_jadwal_verifikasi = $wpdb->get_results($wpdb->prepare("
+                        SELECT 
+                            *
+                        FROM esakip_data_jadwal 
+                        WHERE tipe = 'verifikasi_upload_dokumen'
+                            AND status !=0
+                            AND tahun_anggaran=%d
+                    ", $tahun_anggaran), ARRAY_A);
+
+                    $started_date = current_time('mysql');
+                    $time = strtotime($started_date);
+                    $ended_date = date("Y-m-d H:i:s", strtotime("+1 month", $time));
+
+                    if(empty($cek_jadwal_verifikasi)){
+                        $default_menu = array(
+                            'nama_jadwal'   => 'langsung verifikasi',
+                            'started_at'    => $started_date,
+                            'end_at'        => $ended_date,
+                            'status'        => 1,
+                            'tipe'          => 'verifikasi_upload_dokumen',
+                            'lama_pelaksanaan' => 1,
+                            'tahun_anggaran'    => $tahun_anggaran,
+                            'default_verifikasi_upload' => 0
+                        );
+                        if ($wpdb->insert('esakip_data_jadwal', $default_menu) === false) {
+                            error_log("Error inserting into esakip_menu_dokumen: " . $wpdb->last_error);
+                        }
+                    }
+
+                    $data_jadwal_verifikasi = $wpdb->get_results($wpdb->prepare("
+                        SELECT 
+                            *
+                        FROM esakip_data_jadwal 
+                        WHERE tipe = 'verifikasi_upload_dokumen'
+                            AND status !=0
+                            AND tahun_anggaran=%d
+                    ", $tahun_anggaran), ARRAY_A);
+
+                    if (!empty($data_jadwal_verifikasi)) {
+                        $tbody = '';
+                        $status = '';
+                        $cekJadwalTerbuka = 0;
+                        foreach ($data_jadwal_verifikasi as $menu) {
+                            if($menu['status'] == 0){
+                                $status = '<span class="badge badge-dark"> Dihapus </span>';
+                            }else if($menu['status'] == 1){
+                                $status = '<span class="badge badge-success"> Aktif </span>';
+                            }else if($menu['status'] == 2){
+                                $status = '<span class="badge badge-secondary"> Dikunci </span>';
+                            }
+
+                            if($menu['default_verifikasi_upload'] == 1){
+                                $badge_verifikasi_upload = 'dashicons-yes-alt';
+                                $langsung_verifikasi = "Iya";
+                            }else{
+                                $badge_verifikasi_upload = 'dashicons-dismiss';
+                                $langsung_verifikasi = "Tidak";
+                            }
+                            $tbody .= "<tr>";
+                            $tbody .= "<td class='text-center'>" . $menu['nama_jadwal'] . "</td>";
+                            $tbody .= "<td class='text-center'>" . $status . "</td>";
+                            $tbody .= "<td class='text-center'>" . date('d-m-Y H:i', strtotime($menu['started_at'])) . "</td>";
+                            $tbody .= "<td class='text-center'>" . date('d-m-Y H:i', strtotime($menu['end_at'])) . "</td>";
+                            $tbody .= "<td class='text-center'>" . $tahun_anggaran . "</td>";
+                            $tbody .= "<td class='text-center'><span class='dashicons " . $badge_verifikasi_upload . "'></span> " . $langsung_verifikasi . "</td>";
+                            $tbody .= "<td class='text-center'>" . $menu['keterangan'] . "</td>";
+                            
+                            if ($menu['status'] == 1) {
+                                $cekJadwalTerbuka++;
+
+                                $edit = '<div class="btn-group mr-2" role="group">
+                                            <a class="btn btn-sm btn-warning" style="text-decoration: none;" onclick="edit_data_penjadwalan(\'' . $menu['id'] . '\'); return false;" href="#" title="Edit data penjadwalan"><i class="dashicons dashicons-edit"></i></a>
+                                        </div>';
+                            }
+
+                            $aksi = $edit;
+                            $tbody .= "<td class='text-center'>" . $aksi . "</td>";
+
+                            $tbody .= "</tr>";
+                        }
+                        $ret['data'] = $tbody;
+                        $ret['cekJadwalTerbuka'] = $cekJadwalTerbuka;
+                    } else {
+                        $ret['data'] = "<tr><td colspan='7' class='text-center'>Tidak ada data tersedia</td></tr>";
+                    }
+                } else {
+                    $ret = array(
+                        'status' => 'error',
+                        'message'   => 'Ada data yang kosong!'
+                    );
+                }
+            } else {
+                $ret = array(
+                    'status' => 'error',
+                    'message'   => 'Api Key tidak sesuai!'
+                );
+            }
+        } else {
+            $ret = array(
+                'status' => 'error',
+                'message'   => 'Format tidak sesuai!'
+            );
+        }
+        die(json_encode($ret));
+	}
+    
+	/** Submit data penjadwalan verifikasi */
+	public function submit_jadwal_verifikasi_upload_dokumen()
+	{
+		global $wpdb;
+		$return = array(
+			'status' => 'success',
+			'data'	=> array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				if (!empty($_POST['nama_jadwal']) && !empty($_POST['jadwal_mulai']) && !empty($_POST['jadwal_selesai']) && !empty($_POST['tahun_anggaran']) && !empty($_POST['langsung_verifikasi'])) {
+					$nama_jadwal		= trim(htmlspecialchars($_POST['nama_jadwal']));
+					$jadwal_mulai		= trim(htmlspecialchars($_POST['jadwal_mulai']));
+					$jadwal_mulai		= date('Y-m-d H:i:s', strtotime($jadwal_mulai));
+					$jadwal_selesai		= trim(htmlspecialchars($_POST['jadwal_selesai']));
+					$jadwal_selesai		= date('Y-m-d H:i:s', strtotime($jadwal_selesai));
+					$tahun_anggaran		= trim(htmlspecialchars($_POST['tahun_anggaran']));
+                    $langsung_verifikasi= trim(htmlspecialchars($_POST['langsung_verifikasi']));
+
+					$get_jadwal = $wpdb->get_results(
+						$wpdb->prepare("
+							SELECT 
+								* 
+							FROM esakip_data_jadwal
+							WHERE tipe='verifikasi_upload_dokumen'
+							  AND tahun_anggaran=%d
+							  AND status != 0
+						", $tahun_anggaran),
+						ARRAY_A
+					);
+
+					// cek jadwal lama
+					foreach ($get_jadwal as $jadwal) {
+						if ($jadwal['status'] != 2) {
+							$return = array(
+								'status' => 'error',
+								'message'	=> 'Masih ada jadwal yang terbuka!'
+							);
+							die(json_encode($return));
+						}
+						if ($jadwal_mulai > $jadwal['started_at'] && $jadwal_mulai < $jadwal['end_at'] || $jadwal_selesai > $jadwal['started_at'] && $jadwal_selesai < $jadwal['end_at']) {
+							$return = array(
+								'status' => 'error',
+								'message'	=> 'Waktu sudah dipakai jadwal lain!'
+							);
+							die(json_encode($return));
+						}
+					}
+
+                    $setting_langsung_verifikasi = 0;
+                    if($langsung_verifikasi == "iya"){
+                        $setting_langsung_verifikasi=1;
+                    }
+
+					//insert data jadwal
+					$data_jadwal = array(
+						'nama_jadwal' => $nama_jadwal,
+						'started_at' => $jadwal_mulai,
+						'end_at' => $jadwal_selesai,
+						'status' => 1,
+						'tahun_anggaran' => $tahun_anggaran,
+						'tipe' => 'verifikasi_upload_dokumen',
+						'lama_pelaksanaan' => 1,
+                        'default_verifikasi_upload'=>$setting_langsung_verifikasi
+					);
+
+					$insert_data = $wpdb->insert(
+                        'esakip_data_jadwal', 
+                        $data_jadwal,
+                        array('%s', '%s', '%s', '%d', '%s', '%s', '%d')
+                    );
+
+                    $return = array(
+                        'status'		=> 'success',
+                        'message'		=> 'Berhasil!',
+                        'data_jadwal'	=> $data_jadwal
+                    );
+				} else {
+					$return = array(
+						'status' => 'error',
+						'message'	=> 'Harap diisi semua,tidak boleh ada yang kosong!'
+					);
+				}
+			} else {
+				$return = array(
+					'status' => 'error',
+					'message'	=> 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$return = array(
+				'status' => 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($return));
+	}
+    
+	public function get_data_jadwal_by_id_verifikasi_upload_dokumen()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				$ret['data'] = $wpdb->get_row($wpdb->prepare('
+                    SELECT 
+                        *
+                    FROM esakip_data_jadwal
+                    WHERE id=%d
+                ', $_POST['id']), ARRAY_A);
+			} else {
+				$ret['status']  = 'error';
+				$ret['message'] = 'Api key tidak ditemukan!';
+			}
+		} else {
+			$ret['status']  = 'error';
+			$ret['message'] = 'Format Salah!';
+		}
+
+		die(json_encode($ret));
+	}
+
+    
+	public function submit_edit_jadwal_verifikasi_upload_dokumen()
+	{
+		global $wpdb;
+		$user_id = um_user('ID');
+		$user_meta = get_userdata($user_id);
+		$return = array(
+			'status' => 'success',
+			'data'	=> array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				if (!empty($_POST['id']) && !empty($_POST['nama_jadwal']) && !empty($_POST['jadwal_mulai']) && !empty($_POST['jadwal_selesai']) && !empty($_POST['verifikasi_upload'])) {
+					$id = trim(htmlspecialchars($_POST['id']));
+					$nama_jadwal	= trim(htmlspecialchars($_POST['nama_jadwal']));
+					$jadwal_mulai	= trim(htmlspecialchars($_POST['jadwal_mulai']));
+					$jadwal_mulai	= date('Y-m-d H:i:s', strtotime($jadwal_mulai));
+					$jadwal_selesai	= trim(htmlspecialchars($_POST['jadwal_selesai']));
+					$jadwal_selesai	= date('Y-m-d H:i:s', strtotime($jadwal_selesai));
+					$tahun_anggaran	= trim(htmlspecialchars($_POST['tahun_anggaran']));
+                    $keterangan = trim(htmlspecialchars($_POST['keterangan']));
+                    $verifikasi_upload = trim(htmlspecialchars($_POST['verifikasi_upload']));
+
+                    $verifikasi_upload = ($verifikasi_upload == 'iya') ? 1 : 0;
+
+					$data_this_id = $wpdb->get_row($wpdb->prepare('SELECT * FROM esakip_data_jadwal WHERE id = %d', $id), ARRAY_A);
+
+					if (!empty($data_this_id)) {
+						$status_check = array(1, NULL);
+						if (in_array($data_this_id['status'], $status_check)) {
+							//update data penjadwalan
+							$data_jadwal = array(
+								'nama_jadwal' 			=> $nama_jadwal,
+								'started_at'			=> $jadwal_mulai,
+								'end_at'				=> $jadwal_selesai,
+								'tahun_anggaran'		=> $tahun_anggaran,
+								'keterangan'            => $keterangan,
+                                'default_verifikasi_upload'     => $verifikasi_upload
+							);
+
+							$wpdb->update(
+                                'esakip_data_jadwal', 
+                                $data_jadwal, 
+                                array(
+								    'id'	=> $id
+                                ),
+                                array('%s', '%s', '%s', '%d', '%s'),
+                                array('%d')
+                            );
+
+							$return = array(
+								'status'		=> 'success',
+								'message'		=> 'Berhasil!',
+								'data_jadwal'	=> $data_jadwal
+							);
+						} else {
+							$return = array(
+								'status' => 'error',
+								'message'	=> "User tidak diijinkan!\nData sudah dikunci!",
+							);
+						}
+					} else {
+						$return = array(
+							'status' => 'error',
+							'message'	=> "Data tidak ditemukan!",
+						);
+					}
+				} else {
+					$return = array(
+						'status' => 'error',
+						'message'	=> 'Harap diisi semua,tidak boleh ada yang kosong!'
+					);
+				}
+			} else {
+				$return = array(
+					'status' => 'error',
+					'message'	=> 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$return = array(
+				'status' => 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($return));
+	}
+
+    function setting_verifikasi_upload($data)
+    {
+		global $wpdb;
+		$return = array(
+			'status' => 'success',
+			'data'	=> array()
+		);
+
+		if (!empty($data)) {
+			if (!empty($data['id_dokumen']) && !empty($data['id_skpd']) && !empty($data['tahun_anggaran']) && !empty($data['nama_tabel'])) {
+                //setting untuk verifikasi upload dokumen
+                $current_user = wp_get_current_user();
+                
+                $cek_langsung_verifikasi = $wpdb->get_var($wpdb->prepare('
+                    SELECT 
+                        default_verifikasi_upload
+                    FROM esakip_data_jadwal
+                    WHERE tipe="verifikasi_upload_dokumen"
+                        AND tahun_anggaran=%d
+                        AND status != 0
+                ', $data['tahun_anggaran']));
+
+                $return['cek'] = $cek_langsung_verifikasi;
+                if(!empty($cek_langsung_verifikasi)){
+                    if($cek_langsung_verifikasi == 1){
+                        $wpdb->insert(
+                            'esakip_keterangan_verifikator',
+                            array(
+                                'id_dokumen' => $data['id_dokumen'],
+                                'status_verifikasi' => 1,
+                                'active' => 1,
+                                'user_id' => $current_user->ID,
+                                'id_skpd' => $data['id_skpd'],
+                                'tahun_anggaran' => $data['tahun_anggaran'],
+                                'created_at' => current_time('mysql'),
+                                'nama_tabel_dokumen' => $data['nama_tabel']
+                            ),
+                            array('%d', '%d', '%d', '%d', '%d', '%d', '%s', '%s')
+                        );
+        
+                        if (!$wpdb->insert_id) {
+                            error_log("Error inserting into esakip_keterangan_verifikator: " . $wpdb->last_error);
+                            $return = array(
+                                'status' => 'error',
+                                'message' => 'Gagal menyimpan data ke database!'
+                            );
+                        }
+                    }
+                }
+            }else {
+                $return = array(
+                    'status' => 'error',
+                    'message'	=> 'Ada Data Yang Kosong!'
+                );
+            }
+        } else {
+            $return = array(
+                'status' => 'error',
+                'message'	=> 'Data Tidak Ada!'
+            );
+        }
+        return $return;
+    }
 }

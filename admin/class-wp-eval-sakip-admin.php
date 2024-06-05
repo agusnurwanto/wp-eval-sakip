@@ -1770,7 +1770,7 @@ class Wp_Eval_Sakip_Admin
 	public function generate_jadwal()
 	{
 		global $wpdb;
-		$get_tahun = $wpdb->get_results('select tahun_anggaran from esakip_data_unit group by tahun_anggaran', ARRAY_A);
+		$get_tahun = $wpdb->get_results('select tahun_anggaran from esakip_data_unit group by tahun_anggaran order by tahun_anggaran ASC', ARRAY_A);
 		$list_data = '';
 
 		// jadwal rpjpd
@@ -1802,6 +1802,19 @@ class Wp_Eval_Sakip_Admin
 				'post_status' => 'private'
 			));
 			$list_data .= '<li><a target="_blank" href="' . $jadwal_evaluasi['url'] . '">' . $jadwal_evaluasi['title'] . '</a></li>';
+		}
+
+		// jadwal verifikasi upload dokumen
+		$no = 0;
+		foreach ($get_tahun as $k => $v) {
+			$jadwal_verifikasi = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Jadwal Verifikasi Upload Dokumen Tahun Anggaran | ' . $v['tahun_anggaran'],
+				'content' => '[jadwal_verifikasi_upload_dokumen tahun_anggaran="' . $v["tahun_anggaran"] . '"]',
+				'show_header' => 1,
+				'no_key' => 1,
+				'post_status' => 'private'
+			));
+			$list_data .= '<li><a target="_blank" href="' . $jadwal_verifikasi['url'] . '">' . $jadwal_verifikasi['title'] . '</a></li>';
 		}
 
 		$label = array(
