@@ -100,6 +100,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						'label' => trim($input['level_1']),
 						'parent' => 0,
 						'level' => 1,
+						'tahun_anggaran' => $input['tahun_anggaran'],
 						'active' => 1
 					]);
 
@@ -249,6 +250,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						'label_indikator_kinerja' => trim($input['ind_level_1']),
 						'parent' => $input['parent'],
 						'level' => 1,
+						'tahun_anggaran' => $input['tahun_anggaran'],
 						'active' => 1
 					]);
 

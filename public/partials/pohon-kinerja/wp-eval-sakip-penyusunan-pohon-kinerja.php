@@ -522,6 +522,7 @@ jQuery(document).ready(function(){
 		let action = jQuery(this).data('action');
 		let view = jQuery(this).data('view');
 		let form = getFormData(jQuery("#form-pokin"));
+		form['tahun_anggaran'] = '<?php echo $input['tahun_anggaran']; ?>';
 		
 		jQuery.ajax({
 			method:'POST',
