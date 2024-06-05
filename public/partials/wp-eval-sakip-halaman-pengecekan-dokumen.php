@@ -28,6 +28,7 @@ $unit = $wpdb->get_results($wpdb->prepare("
 	FROM esakip_data_unit
 	WHERE tahun_anggaran=%d
 		AND active=1
+		AND is_skpd=1
 ", $input['tahun_anggaran']), ARRAY_A);
 $unit_html = "";
 $no = 0;
