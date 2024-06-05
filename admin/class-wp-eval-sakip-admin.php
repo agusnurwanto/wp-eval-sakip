@@ -189,6 +189,7 @@ class Wp_Eval_Sakip_Admin
 								'no_key' => 1,
 								'post_status' => 'private'
 							));
+							// $perencanaan_rpjmd['url'] .= '&id_periode_rpjmd=' . $jadwal_periode_item['id'];
 							$body_pemda .= '
 							<li><a target="_blank" href="' . $perencanaan_rpjmd['url'] . '">' . $perencanaan_rpjmd['title'] . '</a></li>';
 						}
@@ -275,6 +276,7 @@ class Wp_Eval_Sakip_Admin
 								'no_key' => 1,
 								'post_status' => 'private'
 							));
+							// $perencanaan_rpjpd['url'] .= '&id_periode_rpjpd=' . $jadwal_periode_item['id'];
 							$body_pemda .= '
 							<li><a target="_blank" href="' . $perencanaan_rpjpd['url'] . '">' . $perencanaan_rpjpd['title'] . '</a></li>';
 						}
@@ -1045,6 +1047,8 @@ class Wp_Eval_Sakip_Admin
 				Field::make('text', 'crb_maksimal_upload_dokumen_esakip', 'Maksimal Upload Dokumen')
 					->set_default_value(10)
 					->set_help_text('Wajib diisi. Setting batas ukuran maksimal untuk upload dokumen. Ukuran dalam MB'),
+				Field::make('text', 'crb_nama_pemda', 'Nama Pemerintah Daerah')
+					->set_help_text('Wajib diisi.'),
 			));
 
 		Container::make('theme_options', __('Pengaturan Perangkat Daerah'))
