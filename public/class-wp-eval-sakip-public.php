@@ -4837,6 +4837,30 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'status' => 'error',
 								'message' => 'Gagal menyimpan data ke database!'
 							);
+						}else{
+							$current_user = wp_get_current_user();
+							$wpdb->insert(
+								'esakip_keterangan_verifikator',
+								array(
+									'id_dokumen' => $wpdb->insert_id,
+									'status_verifikasi' => 1,
+									'active' => 1,
+									'user_id' => $current_user->ID,
+									'id_skpd' => $idSkpd,
+									'id_jadwal' => $id_jadwal,
+									'created_at' => current_time('mysql'),
+									'nama_tabel_dokumen' => 'esakip_renstra'
+								),
+								array('%d', '%d', '%d', '%d', '%d', '%d', '%s', '%s')
+							);
+			
+							if (!$wpdb->insert_id) {
+								error_log("Error inserting into esakip_keterangan_verifikator: " . $wpdb->last_error);
+								$return = array(
+									'status' => 'error',
+									'message' => 'Gagal menyimpan data ke database!'
+								);
+							}
 						}
 					} else {
 						$opsi = array(

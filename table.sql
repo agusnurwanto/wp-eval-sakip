@@ -510,6 +510,7 @@ CREATE TABLE `esakip_keterangan_verifikator` (
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `id_skpd` int DEFAULT NULL,
   `tahun_anggaran` year DEFAULT NULL,
+  `id_jadwal` int(11) DEFAULT NULL,
  PRIMARY KEY(id)
 );
 

@@ -1817,6 +1817,16 @@ class Wp_Eval_Sakip_Admin
 			$list_data .= '<li><a target="_blank" href="' . $jadwal_verifikasi['url'] . '">' . $jadwal_verifikasi['title'] . '</a></li>';
 		}
 
+		//sementara dipending dahulu 
+		// $jadwal_verifikasi_renstra = $this->functions->generatePage(array(
+		// 	'nama_page' => 'Halaman Jadwal Verifikasi Upload Dokumen | RENSTRA',
+		// 	'content' => '[jadwal_verifikasi_upload_dokumen_renstra]',
+		// 	'show_header' => 1,
+		// 	'no_key' => 1,
+		// 	'post_status' => 'private'
+		// ));
+		// $list_data .= '<li><a target="_blank" href="' . $jadwal_verifikasi_renstra['url'] . '">' . $jadwal_verifikasi_renstra['title'] . '</a></li>';
+
 		$label = array(
 			Field::make('html', 'crb_jadwal')
 				->set_html('
