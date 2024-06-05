@@ -364,7 +364,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         }
 
         let form_data = new FormData();
-        form_data.append('action', 'tambah_dokumen_pedoman_teknis_evaluasi_internal');
+        form_data.append('action', 'tambah_dokumen_evaluasi_internal');
         form_data.append('api_key', esakip.api_key);
         form_data.append('id_dokumen', id_dokumen);
         form_data.append('skpd', skpd);
