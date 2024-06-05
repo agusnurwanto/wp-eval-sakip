@@ -842,6 +842,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-rkpd-pemda.php';
 	}
 
+	public function halaman_cek_dokumen($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-halaman-pengecekan-dokumen.php';
+	}
+
 	public function get_detail_renja_rkt_by_id()
 	{
 		global $wpdb;

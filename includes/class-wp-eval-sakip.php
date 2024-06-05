@@ -550,6 +550,7 @@ class Wp_Eval_Sakip {
 		
 		add_shortcode('input_rpjpd', array($plugin_public, 'input_rpjpd'));
 		add_shortcode('input_rpjmd', array($plugin_public, 'input_rpjmd'));
+		add_shortcode('halaman_cek_dokumen', array($plugin_public, 'halaman_cek_dokumen'));
 	}
 
 	/**
