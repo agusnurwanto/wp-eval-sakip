@@ -4846,7 +4846,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'status' => 'error',
 								'message' => 'Gagal menyimpan data ke database!'
 							);
-						}else{
+						} else {
 							$current_user = wp_get_current_user();
 							$wpdb->insert(
 								'esakip_keterangan_verifikator',
@@ -4862,7 +4862,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								),
 								array('%d', '%d', '%d', '%d', '%d', '%d', '%s', '%s')
 							);
-			
+
 							if (!$wpdb->insert_id) {
 								error_log("Error inserting into esakip_keterangan_verifikator: " . $wpdb->last_error);
 								$return = array(
@@ -8036,6 +8036,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											'keterangan' => $penilaian['keterangan'],
 											'penjelasan' => $penilaian['penjelasan'],
 											'langkah_kerja' => $penilaian['langkah_kerja'],
+											'jenis_bukti_dukung' => $penilaian['jenis_bukti_dukung']
 										);
 										$wpdb->insert('esakip_komponen_penilaian', $data_komponen_penilaian_baru);
 										$id_komponen_penilaian_baru = $wpdb->insert_id;
@@ -8138,7 +8139,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026)',
 												'nomor_urut' => '1.00',
 												'penjelasan' => 'cukup jelas',
-												'langkah_kerja' => 'Dapatkan dokumen berupa hard copy maupun soft copy'
+												'langkah_kerja' => 'Dapatkan dokumen berupa hard copy maupun soft copy',
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra'
+												)
 											),
 											array( //1
 												'nama' => 'Dokumen perencanaan kinerja tahunan (Renja) telah disusun',
@@ -8153,6 +8157,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'pesan_kesalahan' => 'SALAH dokumen RENSTRA tidak ada',
 														'id_komponen_pembanding' => '0-0-0'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renja_rkt'
 												)
 											),
 											array( //2
@@ -8168,6 +8175,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-0-1',
 														'pesan_kesalahan' => 'SALAH, Perencanaan kinerja tahunan tidak ada.'
 													),
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renja_rkt',
+													'esakip_dokumen_lainnya',
+													'esakip_dpa'
 												)
 											),
 											array( //3
@@ -8183,6 +8195,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-0-1',
 														'pesan_kesalahan' => 'SALAH, Perencanaan kinerja tahunan tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_perjanjian_kinerja'
 												)
 											),
 											array( //4
@@ -8198,6 +8213,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-0-3',
 														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
 													),
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_perjanjian_kinerja'
 												)
 											),
 											array( //5
@@ -8213,6 +8231,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-0-3',
 														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
 													),
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_rencana_aksi'
 												)
 											)
 										)
@@ -8236,6 +8257,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-0-1',
 														'pesan_kesalahan' => 'SALAH, Perencanaan kinerja tahunan tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renja_rkt',
+													'esakip_renstra'
 												)
 											),
 											array( //1
@@ -8251,6 +8276,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-0-3',
 														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_dokumen_lainnya',
+													'esakip_renstra'
 												)
 											),
 											array( //2
@@ -8266,6 +8295,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-0-3',
 														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_dokumen_lainnya',
+													'esakip_renja_rkt'
 												)
 											),
 											array( //3
@@ -8281,6 +8314,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-0-3',
 														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_dokumen_lainnya',
+													'esakip_perjanjian_kinerja'
 												)
 											),
 											array( //4
@@ -8296,6 +8333,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'pesan_kesalahan' => 'SALAH dokumen RENSTRA tidak ada',
 														'id_komponen_pembanding' => '0-0-0'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_renja_rkt',
+													'esakip_perjanjian_kinerja'
 												)
 											),
 											array( //5
@@ -8316,6 +8358,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1-4',
 														'pesan_kesalahan' => 'SALAH, Tujuan tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_renja_rkt',
+													'esakip_perjanjian_kinerja'
 												)
 											),
 											array( //6
@@ -8335,6 +8382,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'jenis_kerangka_logis' => '2',
 														'id_komponen_pembanding' => '0-1-4', 'pesan_kesalahan' => 'SALAH, Tujuan tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_renja_rkt',
+													'esakip_perjanjian_kinerja'
 												)
 											),
 											array( //7
@@ -8354,6 +8406,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'jenis_kerangka_logis' => '2',
 														'id_komponen_pembanding' => '0-1-4', 'pesan_kesalahan' => 'SALAH, Tujuan tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_renja_rkt',
+													'esakip_perjanjian_kinerja',
+													'esakip_iku'
 												)
 											),
 											array( //8
@@ -8373,6 +8431,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'jenis_kerangka_logis' => '2',
 														'id_komponen_pembanding' => '0-1-7', 'pesan_kesalahan' => 'SALAH, Indikator Tujuan belum SMART.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_renja_rkt',
+													'esakip_perjanjian_kinerja',
+													'esakip_iku'
 												)
 											),
 											array( //9
@@ -8392,6 +8456,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1-1',
 														'pesan_kesalahan' => ' SALAH, Dokumen Perencanaan belum diformalkan.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_renja_rkt',
+													'esakip_perjanjian_kinerja',
+													'esakip_iku'
 												)
 											),
 											array( //10
@@ -8407,6 +8477,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1-7',
 														'pesan_kesalahan' => 'SALAH, Indikator Tujuan belum tepat'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_renja_rkt',
+													'esakip_perjanjian_kinerja'
 												)
 											),
 											array( //11
@@ -8427,6 +8502,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata2 kualitas tujuan/sasaran, indikator, dan target.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_renja_rkt',
+													'esakip_perjanjian_kinerja',
+													'esakip_dokumen_lainnya',
+													'esakip_pohon_kinerja_dan_cascading'
 												)
 											)
 										)
@@ -8455,6 +8537,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas RENSTRA.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_renja_rkt',
+													'esakip_rencana_aksi',
+													'esakip_dokumen_lainnya',
+													'esakip_dpa'
 												)
 											),
 											array( //1
@@ -8475,6 +8564,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas RENSTRA.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_laporan_kinerja'
 												)
 											),
 											array( //2
@@ -8495,6 +8588,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas RENSTRA.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_renja_rkt',
+													'esakip_rencana_aksi',
+													'esakip_dokumen_lainnya',
+													'esakip_dpa'
 												)
 											),
 											array( //3
@@ -8515,6 +8615,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas RENSTRA.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_rencana_aksi'
 												)
 											),
 											array( //4
@@ -8535,6 +8638,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas RENSTRA.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_perjanjian_kinerja',
+													'esakip_dokumen_lainnya',
+													'esakip_skp'
 												)
 											),
 											array( //5
@@ -8555,6 +8663,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas RENSTRA.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_skp',
+													'esakip_perjanjian_kinerja'
 												)
 											),
 											array( //6
@@ -8575,6 +8687,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas RENSTRA.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_dokumen_lainnya'
 												)
 											)
 										)
@@ -8601,7 +8716,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'keterangan' => 'Dokumen IKU 2024-2026',
 												'penjelasan' => 'cukup jelas',
 												'langkah_kerja' => 'Cek apakah terdapat aturan/pedoman/SOP terkait pengumpulan data kinerja pada satuan kerja.',
-												'nomor_urut' => '1.00'
+												'nomor_urut' => '1.00',
+												'jenis_bukti_dukung' => array(
+													'esakip_iku'
+												)
 											),
 											array( //1
 												'nama' => 'Terdapat Definisi Operasional yang jelas atas kinerja dan cara mengukur indikator kinerja.',
@@ -8616,6 +8734,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-0-0',
 														'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_iku'
 												)
 											),
 											array( //2
@@ -8636,6 +8757,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-0-1',
 														'pesan_kesalahan' => 'SALAH, Nilai lebih tinggi dari nilai Definisi Operasional yang jelas atas kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_dokumen_lainnya'
 												)
 											),
 										)
@@ -8660,6 +8784,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
 													)
 
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_pengukuran_kinerja',
+													'esakip_skp'
 												)
 											),
 											array(
@@ -8675,6 +8803,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-0-0',
 														'pesan_kesalahan' => 'SALAH, nilai lebih tinggi dari IKU sebagai ukuran kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_pengukuran_kinerja',
+													'esakip_skp',
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -8690,6 +8823,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-0-0',
 														'pesan_kesalahan' => 'SALAH, nilai lebih tinggi dari IKU sebagai ukuran kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_pengukuran_kinerja',
+													'esakip_skp',
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -8705,6 +8843,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-0-0',
 														'pesan_kesalahan' => 'SALAH, nilai lebih tinggi dari IKU sebagai ukuran kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
 												)
 											),
 											array(
@@ -8720,6 +8860,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-0-0',
 														'pesan_kesalahan' => 'SALAH, nilai lebih tinggi dari IKU sebagai ukuran kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_pengukuran_kinerja',
+													'esakip_skp'
 												)
 											),
 											array(
@@ -8739,6 +8883,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'jenis_kerangka_logis' => '2',
 														'id_komponen_pembanding' => '1-0-0', 'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_dokumen_lainnya'
 												)
 											),
 											array(
@@ -8758,6 +8905,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'jenis_kerangka_logis' => '2',
 														'id_komponen_pembanding' => '1-0-0', 'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
 													),
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_dokumen_lainnya'
 												)
 											),
 										)
@@ -8785,6 +8935,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_dokumen_lainnya',
+													'esakip_pengukuran_kinerja'
 												)
 											),
 											array(
@@ -8804,6 +8958,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_dokumen_lainnya',
+													'esakip_pengukuran_kinerja'
 												)
 											),
 											array(
@@ -8823,6 +8981,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_pengukuran_kinerja',
+													'esakip_rencana_aksi',
+													'esakip_evaluasi_internal'
 												)
 											),
 											array(
@@ -8842,6 +9005,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_pengukuran_kinerja',
+													'esakip_rencana_aksi',
+													'esakip_evaluasi_internal'
 												)
 											),
 											array(
@@ -8861,6 +9029,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_pengukuran_kinerja',
+													'esakip_rencana_aksi',
+													'esakip_evaluasi_internal'
 												)
 											),
 											array(
@@ -8880,6 +9053,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_pengukuran_kinerja',
+													'esakip_dokumen_lainnya',
+													'esakip_evaluasi_internal',
+													'esakip_dpa'
 												)
 											),
 											array(
@@ -8899,6 +9078,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja',
+													'esakip_dokumen_lainnya',
+													'esakip_dpa'
 												)
 											),
 											array(
@@ -8918,6 +9102,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_evaluasi_internal',
+													'esakip_dokumen_lainnya'
 												)
 											),
 											array(
@@ -8937,6 +9125,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_evaluasi_internal',
+													'esakip_dokumen_lainnya'
 												)
 											),
 										)
@@ -8963,7 +9155,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'keterangan' => 'Laporan Kinerja 2023',
 												'penjelasan' => 'Cukup jelas',
 												'langkah_kerja' => '-',
-												'nomor_urut' => '1.00'
+												'nomor_urut' => '1.00',
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
+												)
 											),
 											array( //1
 												'nama' => 'Dokumen Laporan Kinerja telah disusun secara berkala.',
@@ -8978,6 +9173,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-0',
 														'pesan_kesalahan' => 'SALAH, Laporan Kinerja tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array( //2
@@ -8993,6 +9191,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-0',
 														'pesan_kesalahan' => 'SALAH, Laporan Kinerja tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9008,6 +9209,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-0',
 														'pesan_kesalahan' => 'SALAH, Laporan Kinerja tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9023,6 +9227,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-0',
 														'pesan_kesalahan' => 'SALAH, Laporan Kinerja tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9038,6 +9245,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-0',
 														'pesan_kesalahan' => 'SALAH, Laporan Kinerja tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 										)
@@ -9063,6 +9273,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-0',
 														'pesan_kesalahan' => 'SALAH, Laporan Kinerja tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9083,6 +9296,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-2',
 														'pesan_kesalahan' => 'SALAH, Laporan kinerja belum diformalkan.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9103,6 +9319,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-2',
 														'pesan_kesalahan' => 'SALAH, Laporan kinerja tidak disusun secara berkala.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9123,6 +9342,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-2',
 														'pesan_kesalahan' => 'SALAH, Laporan kinerja tidak disusun secara berkala.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9143,6 +9365,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-3',
 														'pesan_kesalahan' => 'SALAH, Laporan kinerja belum direviu.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9163,6 +9388,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-3',
 														'pesan_kesalahan' => 'SALAH, Laporan kinerja belum direviu.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9183,6 +9411,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-3',
 														'pesan_kesalahan' => 'SALAH, Laporan kinerja belum direviu.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9203,6 +9434,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-3',
 														'pesan_kesalahan' => 'SALAH, Laporan kinerja belum direviu.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9223,6 +9457,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-3',
 														'pesan_kesalahan' => 'SALAH, Laporan kinerja belum direviu.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 										)
@@ -9253,6 +9490,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Penyajian Informasi Kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9274,6 +9514,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Penyajian Informasi Kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9294,6 +9537,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Penyajian Informasi Kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9314,6 +9560,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Penyajian Informasi Kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja',
+													'esakip_dokumen_lainnya',
+													'esakip_dpa'
 												)
 											),
 											array(
@@ -9334,6 +9585,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Penyajian Informasi Kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja',
+													'esakip_evaluasi_internal'
 												)
 											),
 											array(
@@ -9353,6 +9608,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Penyajian Informasi Kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja',
+													'esakip_dpa'
 												)
 											),
 											array(
@@ -9373,6 +9632,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Penyajian Informasi Kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja',
+													'esakip_dpa',
+													'esakip_rencana_aksi',
+													'esakip_dokumen_lainnya',
+													'esakip_evaluasi_internal'
 												)
 											),
 										)
@@ -9400,7 +9666,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'keterangan' => 'Evaluasi Internal 2023 dan 2024',
 												'penjelasan' => 'cukup jelas',
 												'langkah_kerja' => '-',
-												'nomor_urut' => '1.00'
+												'nomor_urut' => '1.00',
+												'jenis_bukti_dukung' => array(
+													'esakip_evaluasi_internal'
+												)
 											),
 										)
 									),
@@ -9423,6 +9692,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '3-0-0',
 														'pesan_kesalahan' => 'SALAH, Evaluasi belum dilaksanakan.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_evaluasi_internal'
 												)
 											),
 											array(
@@ -9438,6 +9710,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '3-0-0',
 														'pesan_kesalahan' => 'SALAH, Evaluasi belum dilaksanakan.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_evaluasi_internal'
 												)
 											),
 											array(
@@ -9453,6 +9728,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '3-0-0',
 														'pesan_kesalahan' => 'SALAH, Evaluasi belum dilaksanakan.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_evaluasi_internal'
 												)
 											),
 											array(
@@ -9468,6 +9746,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '3-0-0',
 														'pesan_kesalahan' => 'SALAH, Evaluasi belum dilaksanakan.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_evaluasi_internal'
 												)
 											),
 										)
@@ -9496,6 +9777,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '3-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Evaluasi'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja',
+													'esakip_tl_lhe_akip_internal'
 												)
 											),
 											array(
@@ -9516,6 +9801,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '3-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Evaluasi'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja',
+													'esakip_tl_lhe_akip_internal',
+													'esakip_evaluasi_internal',
+													'esakip_rencana_aksi'
 												)
 											),
 											array(
@@ -9536,6 +9827,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '3-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Evaluasi'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja',
+													'esakip_tl_lhe_akip_internal',
+													'esakip_evaluasi_internal',
+													'esakip_rencana_aksi'
 												)
 											),
 											array(
@@ -9556,6 +9853,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '3-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Evaluasi'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja',
+													'esakip_tl_lhe_akip_internal',
+													'esakip_evaluasi_internal',
+													'esakip_rencana_aksi',
+													'esakip_dpa'
 												)
 											),
 											array(
@@ -9576,6 +9880,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '3-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Evaluasi'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja',
+													'esakip_tl_lhe_akip_internal',
+													'esakip_evaluasi_internal',
+													'esakip_rencana_aksi',
+													'esakip_dokumen_lainnya'
 												)
 											)
 										)
@@ -9623,6 +9934,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										'keterangan' => $penilaian['keterangan'],
 										'penjelasan' => $penilaian['penjelasan'],
 										'langkah_kerja' => $penilaian['langkah_kerja'],
+										'jenis_bukti_dukung' => '[\"'.implode('\",\"',$penilaian['jenis_bukti_dukung']).'\"]'
 									);
 									if ($wpdb->insert('esakip_komponen_penilaian', $komponen_penilaian_baru) === false) {
 										error_log("Error inserting into esakip_komponen_penilaian: " . $wpdb->last_error);
@@ -16144,16 +16456,20 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		// $pedoman_teknis_evaluasi_internal_detail .= '<li><a target="_blank" href="' . $pedoman_teknis_evaluasi_internal['url'] . '" class="btn btn-primary">' .  $title_pedoman_teknis_evaluasi_internal . '</a></li>';
 
 		$get_jadwal_lke = $wpdb->get_results(
-			"
-			SELECT 
-				id,
-				nama_jadwal,
-				tahun_anggaran,
-				lama_pelaksanaan
-			FROM esakip_data_jadwal
-			WHERE tipe = 'LKE'
-			  AND status = 1
-			ORDER BY started_at DESC LIMIT 1",
+			$wpdb->prepare(
+				"
+				SELECT 
+					id,
+					nama_jadwal,
+					tahun_anggaran,
+					lama_pelaksanaan
+				FROM esakip_data_jadwal
+				WHERE tipe = 'LKE'
+				  AND status = 1
+				  AND tahun_anggaran=%d
+				ORDER BY started_at DESC LIMIT 1",
+				$_GET['tahun']
+			),
 			ARRAY_A
 		);
 		$pengisian_lke = '';
@@ -20161,191 +20477,118 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		global $wpdb;
 		$ret = array(
 			'status'    => 'success',
-			'message'   => 'Berhasil mengambil data RPJPD dari data SIPD lokal!'
+			'message'   => 'Berhasil mengambil data RPJPD!'
 		);
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$table = '';
-				$where = 'where 1=1 ';
 
-				if ($_POST['table'] == 'all') {
-					$sql = "
-                        select 
-                            v.id as id_visi,
-                            v.visi_teks,
-                            m.id as id_misi,
-                            m.misi_teks,
-                            m.urut_misi,
-                            s.id as id_sasaran,
-                            s.saspok_teks,
-                            s.urut_saspok,
-                            k.id as id_kebijakan,
-                            k.kebijakan_teks,
-                            k.urut_kebijakan,
-                            i.id as id_isu,
-                            i.isu_teks,
-                            i.urut_isu
-                        from esakip_rpjpd_visi v
-                        left join esakip_rpjpd_misi m on v.id=m.id_visi
-                        left join esakip_rpjpd_sasaran s on m.id=s.id_misi
-                        left join esakip_rpjpd_kebijakan k on s.id=k.id_saspok
-                        left join esakip_rpjpd_isu i on k.id=i.id_kebijakan
-                    ";
-					$ret['data'] = $wpdb->get_results($sql, ARRAY_A);
-				} else {
-					if (!empty($id_jadwal_history)) {
-						if ($_POST['table'] == 'esakip_rpjpd_visi') {
-							$table = 'esakip_rpjpd_visi_history';
-							$where .= "and id_jadwal=" . $id_jadwal_history . " ";
-						} else if ($_POST['table'] == 'esakip_rpjpd_misi') {
-							$table = 'esakip_rpjpd_misi_history';
-							$where .= "and id_jadwal=" . $id_jadwal_history . " ";
-							if (!empty($_POST['id_misi'])) {
-								$id_visi = $wpdb->get_var($wpdb->prepare(
-									"
-                                    select id_visi
-                                    from $table
-                                    where id_asli=%d
-                                        and id_jadwal=%d",
-									$_POST['id_misi'],
-									$id_jadwal_history
-								));
-								$where .= $wpdb->prepare('and id_visi=%d', $id_visi);
-							} else {
-								$where .= $wpdb->prepare('and id_visi=%d', $_POST['id']);
-							}
-						} else if ($_POST['table'] == 'esakip_rpjpd_sasaran') {
-							$table = 'esakip_rpjpd_sasaran_history';
-							$where .= "and id_jadwal=" . $id_jadwal_history . " ";
-							if (!empty($_POST['id_saspok'])) {
-								$id_misi = $wpdb->get_var($wpdb->prepare(
-									"
-                                    select id_misi
-                                    from $table
-                                    where id_asli=%d
-                                        and id_jadwal=%d",
-									$_POST['id_saspok'],
-									$id_jadwal_history
-								));
-								$where .= $wpdb->prepare('and id_misi=%d', $id_misi);
-							} else {
-								$where .= $wpdb->prepare('and id_misi=%d', $_POST['id']);
-							}
-						} else if ($_POST['table'] == 'esakip_rpjpd_kebijakan') {
-							$table = 'esakip_rpjpd_kebijakan_history';
-							$where .= "and id_jadwal=" . $id_jadwal_history . " ";
-							if (!empty($_POST['id_kebijakan'])) {
-								$id_saspok = $wpdb->get_var($wpdb->prepare(
-									"
-                                    select id_saspok
-                                    from $table
-                                    where id_asli=%d
-                                        and id_jadwal=%d",
-									$_POST['id_kebijakan'],
-									$id_jadwal_history
-								));
-								$where .= $wpdb->prepare('and id_saspok=%d', $id_saspok);
-							} else {
-								$where .= $wpdb->prepare('and id_saspok=%d', $_POST['id']);
-							}
-						} else if ($_POST['table'] == 'esakip_rpjpd_isu') {
-							$table = 'esakip_rpjpd_isu_history';
-							$where .= "and id_jadwal=" . $id_jadwal_history . " ";
-							if (!empty($_POST['id_isu'])) {
-								$id_kebijakan = $wpdb->get_var($wpdb->prepare(
-									"
-                                    select id_kebijakan
-                                    from $table
-                                    where id_asli=%d
-                                        and id_jadwal=%d",
-									$_POST['id_isu'],
-									$id_jadwal_history
-								));
-								$where .= $wpdb->prepare('and id_kebijakan=%d', $id_kebijakan);
-							} else {
-								$where .= $wpdb->prepare('and id_kebijakan=%d', $_POST['id']);
-							}
+		if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+			if ($_POST['table'] == 'all') {
+				$sql = "
+                SELECT 
+                    v.id AS id_visi,
+                    v.visi_teks,
+                    m.id AS id_misi,
+                    m.misi_teks,
+                    m.urut_misi,
+                    s.id AS id_sasaran,
+                    s.saspok_teks,
+                    s.urut_saspok,
+                    k.id AS id_kebijakan,
+                    k.kebijakan_teks,
+                    k.urut_kebijakan,
+                    i.id AS id_isu,
+                    i.isu_teks,
+                    i.urut_isu
+                FROM 
+                    esakip_rpjpd_visi v
+                LEFT JOIN 
+                    esakip_rpjpd_misi m ON v.id = m.id_visi
+                LEFT JOIN 
+                    esakip_rpjpd_sasaran s ON m.id = s.id_misi
+                LEFT JOIN 
+                    esakip_rpjpd_kebijakan k ON s.id = k.id_saspok
+                LEFT JOIN 
+                    esakip_rpjpd_isu i ON k.id = i.id_kebijakan
+            ";
+				$ret['data'] = $wpdb->get_results($sql, ARRAY_A);
+			} else {
+				$table = '';
+				$where = ' WHERE 1=1 ';
+
+				if (!empty($id_jadwal_history)) {
+					$where .= " AND id_jadwal = $id_jadwal_history ";
+				}
+
+				switch ($_POST['table']) {
+					case 'esakip_rpjpd_visi':
+						$table = ($id_jadwal_history) ? 'esakip_rpjpd_visi_history' : 'esakip_rpjpd_visi';
+						break;
+					case 'esakip_rpjpd_misi':
+						$table = ($id_jadwal_history) ? 'esakip_rpjpd_misi_history' : 'esakip_rpjpd_misi';
+						if (!empty($_POST['id_misi'])) {
+							$where .= $wpdb->prepare(" AND id = %d", $_POST['id_misi']);
+						} else {
+							$where .= $wpdb->prepare(" AND id_visi = %d", $_POST['id']);
 						}
-					} else {
-						if ($_POST['table'] == 'esakip_rpjpd_visi') {
-							$table = 'esakip_rpjpd_visi';
-						} else if ($_POST['table'] == 'esakip_rpjpd_misi') {
-							$table = 'esakip_rpjpd_misi';
-							if (!empty($_POST['id_misi'])) {
-								$id_visi = $wpdb->get_var($wpdb->prepare("
-                                    select id_visi
-                                    from $table
-                                    where id=%d", $_POST['id_misi']));
-								$where .= $wpdb->prepare('and id_visi=%d', $id_visi);
-							} else {
-								$where .= $wpdb->prepare('and id_visi=%d', $_POST['id']);
-							}
-						} else if ($_POST['table'] == 'esakip_rpjpd_sasaran') {
-							$table = 'esakip_rpjpd_sasaran';
-							if (!empty($_POST['id_saspok'])) {
-								$id_misi = $wpdb->get_var($wpdb->prepare("
-                                    select id_misi
-                                    from $table
-                                    where id=%d", $_POST['id_saspok']));
-								$where .= $wpdb->prepare('and id_misi=%d', $id_misi);
-							} else {
-								$where .= $wpdb->prepare('and id_misi=%d', $_POST['id']);
-							}
-						} else if ($_POST['table'] == 'esakip_rpjpd_kebijakan') {
-							$table = 'esakip_rpjpd_kebijakan';
-							if (!empty($_POST['id_kebijakan'])) {
-								$id_saspok = $wpdb->get_var($wpdb->prepare("
-                                    select id_saspok
-                                    from $table
-                                    where id=%d", $_POST['id_kebijakan']));
-								$where .= $wpdb->prepare('and id_saspok=%d', $id_saspok);
-							} else {
-								$where .= $wpdb->prepare('and id_saspok=%d', $_POST['id']);
-							}
-						} else if ($_POST['table'] == 'esakip_rpjpd_isu') {
-							$table = 'esakip_rpjpd_isu';
-							if (!empty($_POST['id_isu'])) {
-								$id_kebijakan = $wpdb->get_var($wpdb->prepare("
-                                    select id_kebijakan
-                                    from $table
-                                    where id=%d", $_POST['id_isu']));
-								$where .= $wpdb->prepare('and id_kebijakan=%d', $id_kebijakan);
-							} else {
-								$where .= $wpdb->prepare('and id_kebijakan=%d', $_POST['id']);
-							}
+						break;
+					case 'esakip_rpjpd_sasaran':
+						$table = ($id_jadwal_history) ? 'esakip_rpjpd_sasaran_history' : 'esakip_rpjpd_sasaran';
+						if (!empty($_POST['id_saspok'])) {
+							$where .= $wpdb->prepare(" AND id = %d", $_POST['id_saspok']);
+						} else {
+							$where .= $wpdb->prepare(" AND id_misi = %d", $_POST['id']);
 						}
-					}
-					$sql = "
-                        select 
-                            * 
-                        from $table
-                        $where
-                    ";
-					$ret['data'] = $wpdb->get_results($sql, ARRAY_A);
-					if (!empty($id_jadwal_history)) {
-						foreach ($ret['data'] as $k => $data) {
-							$ret['data'][$k]['id'] = $data['id_asli'];
+						break;
+					case 'esakip_rpjpd_kebijakan':
+						$table = ($id_jadwal_history) ? 'esakip_rpjpd_kebijakan_history' : 'esakip_rpjpd_kebijakan';
+						if (!empty($_POST['id_kebijakan'])) {
+							$where .= $wpdb->prepare(" AND id = %d", $_POST['id_kebijakan']);
+						} else {
+							$where .= $wpdb->prepare(" AND id_saspok = %d", $_POST['id']);
 						}
+						break;
+					case 'esakip_rpjpd_isu':
+						$table = ($id_jadwal_history) ? 'esakip_rpjpd_isu_history' : 'esakip_rpjpd_isu';
+						if (!empty($_POST['id_isu'])) {
+							$where .= $wpdb->prepare(" AND id = %d", $_POST['id_isu']);
+						} else {
+							$where .= $wpdb->prepare(" AND id_kebijakan = %d", $_POST['id']);
+						}
+						break;
+					default:
+						$ret = array(
+							'status' => 'error',
+							'message'   => 'Tabel tidak valid!'
+						);
+						if (!$res) {
+							die(json_encode($ret));
+						} else {
+							return $ret;
+						}
+				}
+
+				$sql = "SELECT * FROM $table $where";
+				$ret['data'] = $wpdb->get_results($sql, ARRAY_A);
+
+				if ($id_jadwal_history) {
+					foreach ($ret['data'] as $k => $data) {
+						$ret['data'][$k]['id'] = $data['id_asli'];
 					}
 				}
-			} else {
-				$ret = array(
-					'status' => 'error',
-					'message'   => 'Api Key tidak sesuai!'
-				);
 			}
 		} else {
 			$ret = array(
 				'status' => 'error',
-				'message'   => 'Format tidak sesuai!'
+				'message'   => 'Api Key tidak sesuai!'
 			);
 		}
-		if (!empty($res)) {
-			return $ret;
-		} else {
+
+		if (!$res) {
 			die(json_encode($ret));
+		} else {
+			return $ret;
 		}
 	}
+
 
 	public function esakip_simpan_rpjpd()
 	{
@@ -20590,6 +20833,544 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				} else if ($_POST['table'] == 'esakip_rpjpd_isu') {
 					$table = $_POST['table'];
 					$wpdb->delete($table, array('id' => $_POST['id']));
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	function _number_format($number = 0, $mata_uang = '')
+	{
+		if (!is_numeric($number)) {
+			$number = 0;
+		}
+		$uang = number_format($number, 0, ",", ".");
+		if (!empty($mata_uang)) {
+			$uang = $mata_uang . ' ' . $uang;
+		}
+		return $uang;
+	}
+
+	public function esakip_get_rpd($cb = false)
+	{
+		global $wpdb;
+		$ret = array(
+			'status'  => 'success',
+			'message' => 'Berhasil get data RPD!'
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$id_jadwal_rpjpd = "";
+				if (!empty($_POST['id_unik_tujuan'])) {
+					$jadwal_rpd = $wpdb->get_results("SELECT * FROM esakip_data_jadwal WHERE tipe='RPJMD' AND status!=0", ARRAY_A);
+					if (!empty($jadwal_rpd)) {
+						$id_jadwal_rpjpd = $jadwal_rpd[0]['relasi_perencanaan'];
+					}
+				}
+
+				$table = '';
+				$where = 'WHERE 1=1 AND active=1';
+				$type = $_POST['type'];
+
+				if ($type != 1) {
+					$where .= ' AND active=1';
+				}
+
+				switch ($_POST['table']) {
+					case 'esakip_rpd_tujuan':
+						$table = $_POST['table'];
+						if (!empty($_POST['id_unik_tujuan'])) {
+							$where .= $wpdb->prepare(' AND id_unik=%s', $_POST['id_unik_tujuan']);
+						} elseif (!empty($_POST['id_unik_tujuan_indikator'])) {
+							$where .= $wpdb->prepare(' AND id_unik_indikator=%s', $_POST['id_unik_tujuan_indikator']);
+						}
+						$where .= ' ORDER BY no_urut ASC, id ASC';
+						break;
+
+					case 'esakip_rpd_sasaran':
+						$table = $_POST['table'];
+						if (!empty($_POST['id_unik_tujuan'])) {
+							$where .= $wpdb->prepare(' AND kode_tujuan=%s', $_POST['id_unik_tujuan']);
+						} elseif (!empty($_POST['id_unik_sasaran'])) {
+							$where .= $wpdb->prepare(' AND id_unik=%s', $_POST['id_unik_sasaran']);
+						} elseif (!empty($_POST['id_unik_sasaran_indikator'])) {
+							$where .= $wpdb->prepare(' AND id_unik_indikator=%s', $_POST['id_unik_sasaran_indikator']);
+						}
+						$where .= ' ORDER BY sasaran_no_urut ASC, id ASC';
+						break;
+
+					case 'esakip_rpd_program':
+						$table = $_POST['table'];
+						if (!empty($_POST['id_unik_sasaran'])) {
+							$where .= $wpdb->prepare(' AND kode_sasaran=%s', $_POST['id_unik_sasaran']);
+						} elseif (!empty($_POST['id_unik_program'])) {
+							$where .= $wpdb->prepare(' AND id_unik=%s', $_POST['id_unik_program']);
+						} elseif (!empty($_POST['id_unik_program_indikator'])) {
+							$where .= $wpdb->prepare(' AND id_unik_indikator=%s', $_POST['id_unik_program_indikator']);
+						}
+						break;
+
+					default:
+						$ret = array(
+							'status'  => 'error',
+							'message' => 'Tabel tidak boleh kosong atau tidak valid!'
+						);
+						die(json_encode($ret));
+				}
+
+				if (!empty($table)) {
+					$sql = "SELECT * FROM $table $where";
+					$ret['data'] = $wpdb->get_results($sql, ARRAY_A);
+					$data_all = array();
+
+					if ($_POST['table'] == 'esakip_rpd_tujuan') {
+						foreach ($ret['data'] as $tujuan) {
+							if (empty($data_all[$tujuan['id_unik']])) {
+								if (!empty($_POST['id_unik_tujuan_indikator'])) {
+									$_POST['id_unik_tujuan'] = $tujuan['id_unik'];
+								}
+								$sasaran = $wpdb->get_results($wpdb->prepare("SELECT id_unik FROM esakip_rpd_sasaran WHERE id_unik_indikator IS NULL AND active=1 AND kode_tujuan=%s", $tujuan['id_unik']), ARRAY_A);
+								$kd_all_sasaran = implode(',', array_map(function ($sas) {
+									return "'" . $sas['id_unik'] . "'";
+								}, $sasaran));
+
+								if (empty($kd_all_sasaran)) {
+									$kd_all_sasaran = '0';
+								}
+
+								$program = $wpdb->get_results($wpdb->prepare("SELECT id_unik FROM esakip_rpd_program WHERE id_unik_indikator IS NULL AND active=1 AND kode_sasaran IN ($kd_all_sasaran)"), ARRAY_A);
+								$kd_all_prog = implode(',', array_map(function ($prog) {
+									return "'" . $prog['id_unik'] . "'";
+								}, $program));
+
+								if (empty($kd_all_prog)) {
+									$kd_all_prog = '0';
+								}
+
+								$pagu = $wpdb->get_row("SELECT sum(pagu_1) as pagu_akumulasi_1, sum(pagu_2) as pagu_akumulasi_2, sum(pagu_3) as pagu_akumulasi_3, sum(pagu_4) as pagu_akumulasi_4, sum(pagu_5) as pagu_akumulasi_5 FROM esakip_rpd_program WHERE id_unik_indikator IS NOT NULL AND active=1 AND id_unik IN ($kd_all_prog)", ARRAY_A);
+
+								$data_all[$tujuan['id_unik']] = array(
+									'id' => $tujuan['id'],
+									'id_unik' => $tujuan['id_unik'],
+									'nama' => $tujuan['tujuan_teks'],
+									'id_jadwal_rpjpd' => $id_jadwal_rpjpd,
+									'pagu_akumulasi_1' => $pagu['pagu_akumulasi_1'],
+									'pagu_akumulasi_2' => $pagu['pagu_akumulasi_2'],
+									'pagu_akumulasi_3' => $pagu['pagu_akumulasi_3'],
+									'pagu_akumulasi_4' => $pagu['pagu_akumulasi_4'],
+									'pagu_akumulasi_5' => $pagu['pagu_akumulasi_5'],
+									'rpjpd' => array(),
+									'detail' => array(),
+									'no_urut' => $tujuan['no_urut'],
+									'catatan_teks_tujuan' => $tujuan['catatan_teks_tujuan'],
+									'indikator_catatan_teks' => $tujuan['indikator_catatan_teks']
+								);
+
+								if (!empty($_POST['id_unik_tujuan'])) {
+									$_POST['table'] = 'data_rpjpd_isu';
+									$_POST['id_isu'] = $tujuan['id_isu'];
+									$data_all[$tujuan['id_unik']]['rpjpd']['isu'] = array(
+										'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
+										'id' => $tujuan['id_isu']
+									);
+
+									$_POST['table'] = 'data_rpjpd_kebijakan';
+									$_POST['id_kebijakan'] = $data_all[$tujuan['id_unik']]['rpjpd']['isu']['data']['data'][0]['id_kebijakan'];
+									$data_all[$tujuan['id_unik']]['rpjpd']['kebijakan'] = array(
+										'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
+										'id' => $_POST['id_kebijakan']
+									);
+
+									$_POST['table'] = 'data_rpjpd_sasaran';
+									$_POST['id_saspok'] = $data_all[$tujuan['id_unik']]['rpjpd']['kebijakan']['data']['data'][0]['id_saspok'];
+									$data_all[$tujuan['id_unik']]['rpjpd']['sasaran'] = array(
+										'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
+										'id' => $_POST['id_saspok']
+									);
+
+									$_POST['table'] = 'data_rpjpd_misi';
+									$_POST['id_misi'] = $data_all[$tujuan['id_unik']]['rpjpd']['sasaran']['data']['data'][0]['id_misi'];
+									$data_all[$tujuan['id_unik']]['rpjpd']['misi'] = array(
+										'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
+										'id' => $_POST['id_misi']
+									);
+
+									$_POST['table'] = 'data_rpjpd_visi';
+									$_POST['id_visi'] = $data_all[$tujuan['id_unik']]['rpjpd']['misi']['data']['data'][0]['id_visi'];
+									$data_all[$tujuan['id_unik']]['rpjpd']['visi'] = array(
+										'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
+										'id' => $_POST['id_visi']
+									);
+								}
+							}
+						}
+					}
+
+					$ret['data'] = $data_all;
+				} else {
+					$ret = array(
+						'status'  => 'error',
+						'message' => 'Tabel Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status'  => 'error',
+					'message' => 'API key tidak valid!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status'  => 'error',
+				'message' => 'POST data tidak boleh kosong!'
+			);
+		}
+
+		die(json_encode($ret));
+	}
+
+
+	public function esakip_simpan_rpd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status'    => 'success',
+			'message'   => 'Berhasil simpan data RPD!'
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$table = '';
+				if ($_POST['table'] == 'esakip_rpd_tujuan') {
+					$table = $_POST['table'];
+					// simpan atau edit indikator tujuan
+					if (!empty($_POST['id_tujuan'])) {
+						$tujuan = $wpdb->get_results($wpdb->prepare("
+                                select
+                                    id_isu,
+                                    tujuan_teks,
+                                    id_unik,
+                                    no_urut
+                                from $table
+                                where id_unik=%s
+                            ", $_POST['id_tujuan']), ARRAY_A);
+						for ($i = 1; $i <= 5; $i++) {
+							if (empty($_POST['vol_' . $i]) && empty($_POST['satuan_' . $i])) {
+								$_POST['vol_' . $i] = '';
+								$_POST['satuan_' . $i] = '';
+							}
+						}
+						$data = array(
+							'id_isu' => $tujuan[0]['id_isu'],
+							'tujuan_teks' => $tujuan[0]['tujuan_teks'],
+							'id_unik' => $tujuan[0]['id_unik'],
+							'indikator_teks' => $_POST['data'],
+							'target_awal' => $_POST['vol_awal'],
+							'target_1' => $_POST['vol_1'],
+							'target_2' => $_POST['vol_2'],
+							'target_3' => $_POST['vol_3'],
+							'target_4' => $_POST['vol_4'],
+							'target_5' => $_POST['vol_5'],
+							'target_akhir' => $_POST['vol_akhir'],
+							'update_at' => date('Y-m-d H:i:s'),
+							'no_urut' => $tujuan[0]['no_urut'],
+							'indikator_catatan_teks' => $_POST['indikator_catatan_teks'],
+							'satuan' => $_POST['satuan'],
+							'active' => 1
+						);
+						if (!empty($_POST['id'])) {
+							$data['id_unik_indikator'] = $_POST['id'];
+							$wpdb->update($table, $data, array("id_unik_indikator" => $_POST['id']));
+							$ret['message'] = 'Berhasil update data RPD!';
+						} else {
+							$data['id_unik_indikator'] = $this->generateRandomString(5);
+							$cek_id = $wpdb->get_var($wpdb->prepare("
+                                    select 
+                                        id 
+                                    from $table
+                                    where indikator_teks=%s
+                                        and id_unik=%s
+                                ", $_POST['data'], $_POST['id_tujuan']));
+							if (!empty($cek_id)) {
+								$ret['status'] = 'error';
+								$ret['message'] = 'Indikator tujuan teks sudah ada!';
+							} else {
+								$wpdb->insert($table, $data);
+							}
+						}
+						// simpan atau edit tujuan
+					} else {
+						$data = array(
+							'id_isu' => $_POST['id_isu'],
+							'tujuan_teks' => $_POST['data'],
+							'update_at' => date('Y-m-d H:i:s'),
+							'no_urut'   => $_POST['no_urut'],
+							'catatan_teks_tujuan'   => $_POST['catatan_teks_tujuan'],
+							'active' => 1
+						);
+						if (!empty($_POST['id'])) {
+							$data['id_unik'] = $_POST['id'];
+							$wpdb->update($table, $data, array("id_unik" => $_POST['id']));
+							$ret['message'] = 'Berhasil update data RPD!';
+						} else {
+							$data['id_unik'] = $this->generateRandomString(5);
+							$cek_id = $wpdb->get_var($wpdb->prepare("
+                                    select 
+                                        id 
+                                    from $table
+                                    where tujuan_teks=%s
+                                ", $_POST['data']));
+							if (!empty($cek_id)) {
+								$ret['status'] = 'error';
+								$ret['message'] = 'Tujuan teks sudah ada!';
+							} else {
+								$wpdb->insert($table, $data);
+							}
+						}
+					}
+				} else if ($_POST['table'] == 'esakip_rpd_sasaran') {
+					$table = $_POST['table'];
+					// simpan atau edit indikator sasaran
+					if (!empty($_POST['id_sasaran'])) {
+						$sasaran = $wpdb->get_results($wpdb->prepare("
+                                select
+                                    kode_tujuan,
+                                    sasaran_teks,
+                                    id_unik,
+                                    sasaran_no_urut
+                                from $table
+                                where id_unik=%s
+                            ", $_POST['id_sasaran']), ARRAY_A);
+						for ($i = 1; $i <= 5; $i++) {
+							if (empty($_POST['vol_' . $i]) && empty($_POST['satuan_' . $i])) {
+								$_POST['vol_' . $i] = '';
+								$_POST['satuan_' . $i] = '';
+							}
+						}
+						$data = array(
+							'kode_tujuan' => $sasaran[0]['kode_tujuan'],
+							'sasaran_teks' => $sasaran[0]['sasaran_teks'],
+							'id_unik' => $sasaran[0]['id_unik'],
+							'indikator_teks' => $_POST['data'],
+							'target_awal' => $_POST['vol_awal'],
+							'target_1' => $_POST['vol_1'],
+							'target_2' => $_POST['vol_2'],
+							'target_3' => $_POST['vol_3'],
+							'target_4' => $_POST['vol_4'],
+							'target_5' => $_POST['vol_5'],
+							'target_akhir' => $_POST['vol_akhir'],
+							'update_at' => date('Y-m-d H:i:s'),
+							'sasaran_no_urut' => $sasaran[0]['sasaran_no_urut'],
+							'indikator_catatan_teks' => $_POST['indikator_catatan_teks'],
+							'satuan' => $_POST['satuan'],
+							'active' => 1
+						);
+						if (!empty($_POST['id'])) {
+							$data['id_unik_indikator'] = $_POST['id'];
+							$wpdb->update($table, $data, array("id_unik_indikator" => $_POST['id']));
+							$ret['message'] = 'Berhasil update data RPD!';
+						} else {
+							$data['id_unik_indikator'] = $this->generateRandomString(5);
+							$cek_id = $wpdb->get_var($wpdb->prepare("
+                                    select 
+                                        id 
+                                    from $table
+                                    where indikator_teks=%s
+                                        and id_unik=%s
+                                ", $_POST['data'], $_POST['id_sasaran']));
+							if (!empty($cek_id)) {
+								$ret['status'] = 'error';
+								$ret['message'] = 'Indikator sasaran teks sudah ada!';
+							} else {
+								$wpdb->insert($table, $data);
+							}
+						}
+						// simpan atau edit sasaran
+					} else {
+						$data = array(
+							'kode_tujuan' => $_POST['id_tujuan'],
+							'sasaran_teks' => $_POST['data'],
+							'update_at' => date('Y-m-d H:i:s'),
+							'sasaran_no_urut' => $_POST['sasaran_no_urut'],
+							'sasaran_catatan' => $_POST['sasaran_catatan'],
+							'active' => 1
+						);
+						if (!empty($_POST['id'])) {
+							$data['id_unik'] = $_POST['id'];
+							$wpdb->update($table, $data, array("id_unik" => $_POST['id']));
+							$ret['message'] = 'Berhasil update data RPD!';
+						} else {
+							$data['id_unik'] = $this->generateRandomString(5);
+							$cek_id = $wpdb->get_var($wpdb->prepare("
+                                    select 
+                                        id 
+                                    from $table
+                                    where sasaran_teks=%s
+                                ", $_POST['data']));
+							if (!empty($cek_id)) {
+								$ret['status'] = 'error';
+								$ret['message'] = 'Sasaran teks sudah ada!';
+							} else {
+								$wpdb->insert($table, $data);
+							}
+						}
+					}
+				} else if ($_POST['table'] == 'esakip_rpd_program') {
+					$table = $_POST['table'];
+					// simpan atau edit indikator program
+					if (!empty($_POST['id_program'])) {
+						$program = $wpdb->get_results($wpdb->prepare("
+                                select
+                                    kode_sasaran,
+                                    nama_program,
+                                    id_program,
+                                    id_unik
+                                from $table
+                                where id_unik=%s
+                            ", $_POST['id_program']), ARRAY_A);
+						for ($i = 1; $i <= 5; $i++) {
+							if (empty($_POST['vol_' . $i]) && empty($_POST['satuan_' . $i])) {
+								$_POST['vol_' . $i] = '';
+								$_POST['satuan_' . $i] = '';
+								$_POST['pagu_' . $i] = '';
+							}
+						}
+						$data = array(
+							'kode_sasaran' => $program[0]['kode_sasaran'],
+							'nama_program' => $program[0]['nama_program'],
+							'id_program' => $program[0]['id_program'],
+							'id_unik' => $program[0]['id_unik'],
+							'id_unit' => $_POST['id_skpd'],
+							'kode_skpd' => $_POST['kode_skpd'],
+							'nama_skpd' => $_POST['nama_skpd'],
+							'indikator' => $_POST['data'],
+							'target_awal' => $_POST['vol_awal'],
+							'target_1' => $_POST['vol_1'],
+							'pagu_1' => $_POST['pagu_1'],
+							'target_2' => $_POST['vol_2'],
+							'pagu_2' => $_POST['pagu_2'],
+							'target_3' => $_POST['vol_3'],
+							'pagu_3' => $_POST['pagu_3'],
+							'target_4' => $_POST['vol_4'],
+							'pagu_4' => $_POST['pagu_4'],
+							'target_5' => $_POST['vol_5'],
+							'pagu_5' => $_POST['pagu_5'],
+							'target_akhir' => $_POST['vol_akhir'],
+							'catatan' => $_POST['catatan'],
+							'satuan' => $_POST['satuan'],
+							'update_at' => date('Y-m-d H:i:s'),
+							'active' => 1
+						);
+						if (!empty($_POST['id'])) {
+							$data['id_unik_indikator'] = $_POST['id'];
+							$wpdb->update($table, $data, array("id_unik_indikator" => $_POST['id']));
+							$ret['message'] = 'Berhasil update data RPD!';
+						} else {
+							$data['id_unik_indikator'] = $this->generateRandomString(5);
+							$cek_id = $wpdb->get_var($wpdb->prepare("
+                                    select 
+                                        id 
+                                    from $table
+                                    where indikator=%s
+                                        and id_unik=%s
+                                ", $_POST['data'], $_POST['id_program']));
+							if (!empty($cek_id)) {
+								$ret['status'] = 'error';
+								$ret['message'] = 'Indikator program sudah ada!';
+							} else {
+								$wpdb->insert($table, $data);
+							}
+						}
+						// simpan atau edit program
+					} else {
+						$data = array(
+							'kode_sasaran' => $_POST['id_sasaran'],
+							'nama_program' => $_POST['nama_program'],
+							'catatan' => $_POST['catatan'],
+							'id_program' => $_POST['data'],
+							'update_at' => date('Y-m-d H:i:s'),
+							'active' => 1
+						);
+						if (!empty($_POST['id'])) {
+							$data['id_unik'] = $_POST['id'];
+							$wpdb->update($table, $data, array("id_unik" => $_POST['id']));
+							$ret['message'] = 'Berhasil update data RPD!';
+						} else {
+							$data['id_unik'] = $this->generateRandomString(5);
+							$cek_id = $wpdb->get_var($wpdb->prepare("
+                                    select 
+                                        id 
+                                    from $table
+                                    where nama_program=%s
+                                ", $_POST['nama_program']));
+							if (!empty($cek_id)) {
+								$ret['status'] = 'error';
+								$ret['message'] = 'Program teks sudah ada!';
+							} else {
+								$wpdb->insert($table, $data);
+							}
+						}
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function esakip_hapus_rpd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status'    => 'success',
+			'message'   => 'Berhasil hapus data RPD!'
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$table = '';
+				if ($_POST['table'] == 'esakip_rpd_tujuan') {
+					$table = $_POST['table'];
+					if (!empty($_POST['id_unik_tujuan_indikator'])) {
+						$wpdb->delete($table, array('id_unik_indikator' => $_POST['id_unik_tujuan_indikator']));
+					} else {
+						$wpdb->delete($table, array('id_unik' => $_POST['id']));
+					}
+				} else if ($_POST['table'] == 'esakip_rpd_sasaran') {
+					$table = $_POST['table'];
+					if (!empty($_POST['id_unik_sasaran_indikator'])) {
+						$wpdb->delete($table, array('id_unik_indikator' => $_POST['id_unik_sasaran_indikator']));
+					} else {
+						$wpdb->delete($table, array('id_unik' => $_POST['id']));
+					}
+				} else if ($_POST['table'] == 'esakip_rpd_program') {
+					$table = $_POST['table'];
+					if (!empty($_POST['id_unik_program_indikator'])) {
+						$wpdb->delete($table, array('id_unik_indikator' => $_POST['id_unik_program_indikator']));
+					} else {
+						$wpdb->delete($table, array('id_unik' => $_POST['id']));
+					}
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Param table tidak tidak boleh kosong!';
 				}
 			} else {
 				$ret = array(
