@@ -216,7 +216,7 @@ if(!empty($pohon_kinerja_level_1)){
 	}
 }
 
-// echo '<pre>'; print_r($data_all['data']); echo '</pre>';die();
+// echo '<pre>'; print_r(array_values($data_all['data'])); echo '</pre>';die();
 
 $view_kinerja = $this->functions->generatePage(array(
 	'nama_page' => 'View Pohon Kinerja',
@@ -226,14 +226,13 @@ $view_kinerja = $this->functions->generatePage(array(
 ));
 $html = '';
 foreach ($data_all['data'] as $key1 => $level_1) {
-
 	$html.='<tr><td><a href="'.$view_kinerja['url'].'&id='.$level_1['id'].'" target="_blank">'.$level_1['label'].'</a></td>';
 	$indikator=[];
 	foreach ($level_1['indikator'] as $indikatorlevel1) {
 		$indikator[]=$indikatorlevel1['label_indikator_kinerja'];
 	}
 	$html.='<td>'.implode("</br>", $indikator).'</td>';
-	foreach ($level_1['data'] as $key2 => $level_2) {
+	foreach (array_values($level_1['data']) as $key2 => $level_2) {
 		if($key2==0){
 			$html.='<td>'.$level_2['label'].'</td>';
 		}else{
@@ -244,7 +243,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 			$indikator[]=$indikatorlevel2['label_indikator_kinerja'];
 		}
 		$html.='<td>'.implode("</br>", $indikator).'</td>';
-		foreach ($level_2['data'] as $key3 => $level_3) {
+		foreach (array_values($level_2['data']) as $key3 => $level_3) {
 			if($key3==0){
 				$html.='<td>'.$level_3['label'].'</td>';
 			}else{
@@ -255,7 +254,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 				$indikator[]=$indikatorlevel3['label_indikator_kinerja'];
 			}
 			$html.='<td>'.implode("</br>", $indikator).'</td>';
-			foreach ($level_3['data'] as $key4 => $level_4) {
+			foreach (array_values($level_3['data']) as $key4 => $level_4) {
 				if($key4==0){
 					$html.='<td>'.$level_4['label'].'</td>';
 				}else{
@@ -295,6 +294,13 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 			<?php echo $html; ?>
 		</tbody>
 	</table>
+	
+	<div class="hide-print" id="catatan_dokumentasi" style="max-width: 1200px; margin: auto;">
+		<h4 style="margin: 30px 0 10px; font-weight: bold;">Catatan Dokumentasi:</h4>
+		<ul>
+			<li>Pohon kinerja bisa dilihat ketika data terisi minimal sampai dengan level ke-2.</li>
+		</ul>
+	</div>
 </div>
 
 <div class="modal fade" id="modal-pokin" role="dialog" data-backdrop="static" aria-hidden="true">'

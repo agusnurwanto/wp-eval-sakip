@@ -183,11 +183,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						'id' => $input['id']
 					]);
 
-					$child = $wpdb->update('esakip_pohon_kinerja', [
-						'label' => trim($input['label'])
-					], [
-						'parent' => $input['id']
-					]);
+					// $child = $wpdb->update('esakip_pohon_kinerja', [
+					// 	'label' => trim($input['label'])
+					// ], [
+					// 	'parent' => $input['id'],
+					// 	'label_indikator_kinerja' => 'IS NOT NULL'
+					// ]);
 
 					echo json_encode([
 		    			'status' => true,
@@ -262,7 +263,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					}
 
 					$data = $wpdb->insert('esakip_pohon_kinerja', [
-						'label' => trim($input['label']),
+						// 'label' => trim($input['label']),
 						'label_indikator_kinerja' => trim($input['indikator_label']),
 						'parent' => $input['parent'],
 						'level' => $input['level'],
