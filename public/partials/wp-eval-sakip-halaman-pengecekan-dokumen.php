@@ -192,17 +192,33 @@ $unit_html_rpjpd_rpjmd .= "
 <div class="container-md">
 	<div class="cetak">
 		<div style="padding: 10px;margin:0 0 3rem 0;">
-			<h1 class="text-center table-title">Monitor Upload Dokumen Perangkat Daerah Tahun <?php echo $input['tahun_anggaran']; ?></h1>
+			<h1 class="text-center table-title">Monitor Upload Dokumen RPJPD dan RPJMD</h1>
 			<table>
 				<thead>
 					<tr>
-						<th>No</th>
-						<th>Perangkat Daerah</th>
-						<?php echo $dok_html; ?>
+						<?php echo $get_dok_html_rpjpd_rpjmd; ?>
 					</tr>
 				</thead>
 				<tbody>
-					<?php echo $unit_html; ?>
+					<?php echo $unit_html_rpjpd_rpjmd; ?>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="container-md">
+	<div class="cetak">
+		<div style="padding: 10px;margin:0 0 3rem 0;">
+			<h1 class="text-center table-title">Monitor Upload Dokumen Pemerintah Daerah Tahun <?php echo $input['tahun_anggaran']; ?></h1>
+			<table>
+				<thead>
+					<tr>
+						<?php echo $get_dok_html_pemda; ?>
+					</tr>
+				</thead>
+				<tbody>
+					<?php echo $unit_html_pemda; ?>
 				</tbody>
 			</table>
 		</div>
@@ -232,33 +248,17 @@ $unit_html_rpjpd_rpjmd .= "
 <div class="container-md">
 	<div class="cetak">
 		<div style="padding: 10px;margin:0 0 3rem 0;">
-			<h1 class="text-center table-title">Monitor Upload Dokumen Pemerintah Daerah Tahun <?php echo $input['tahun_anggaran']; ?></h1>
+			<h1 class="text-center table-title">Monitor Upload Dokumen Perangkat Daerah Tahun <?php echo $input['tahun_anggaran']; ?></h1>
 			<table>
 				<thead>
 					<tr>
-						<?php echo $get_dok_html_pemda; ?>
+						<th>No</th>
+						<th>Perangkat Daerah</th>
+						<?php echo $dok_html; ?>
 					</tr>
 				</thead>
 				<tbody>
-					<?php echo $unit_html_pemda; ?>
-				</tbody>
-			</table>
-		</div>
-	</div>
-</div>
-
-<div class="container-md">
-	<div class="cetak">
-		<div style="padding: 10px;margin:0 0 3rem 0;">
-			<h1 class="text-center table-title">Monitor Upload Dokumen RPJPD dan RPJMD</h1>
-			<table>
-				<thead>
-					<tr>
-						<?php echo $get_dok_html_rpjpd_rpjmd; ?>
-					</tr>
-				</thead>
-				<tbody>
-					<?php echo $unit_html_rpjpd_rpjmd; ?>
+					<?php echo $unit_html; ?>
 				</tbody>
 			</table>
 		</div>
