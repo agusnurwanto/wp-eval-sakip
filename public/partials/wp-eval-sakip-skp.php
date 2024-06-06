@@ -55,6 +55,7 @@ foreach ($idtahun as $val) {
 							<th class="text-center">No</th>
 							<th class="text-center">Nama Perangkat Daerah</th>
 							<th class="text-center">Jumlah Dokumen</th>
+							<th class="text-center">Aksi</th>
 						</tr>
 					</thead>
 					<tbody>

@@ -15807,17 +15807,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$cek_data['pemerintah_daerah']['RKPD']['link'] = '<li><a target="_blank" href="' . $rkpd_pemda['url'] . '"  class="btn btn-info">' .  $title_rkpd . '</a></li>';
 		}
 
-		if (!empty($cek_data['pemerintah_daerah']['Dokumen Lainnya']) && $cek_data['pemerintah_daerah']['Dokumen Lainnya']['active'] == 1) {
-			$dokumen_pemda_lainnya_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Pemda Lainnya Pemda' . $_GET['tahun'],
-				'content' => '[dokumen_detail_dokumen_pemda_lainnya_pemda tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_dokumen_pemda_lainnya = 'Pemda Lainnya';
-			$cek_data['pemerintah_daerah']['Dokumen Lainnya']['link'] = '<li><a target="_blank" href="' . $dokumen_pemda_lainnya_pemda['url'] . '"  class="btn btn-info">' .  $title_dokumen_pemda_lainnya . '</a></li>';
-		}
-
 		if (!empty($cek_data['pemerintah_daerah']['LKJIP/LPPD']) && $cek_data['pemerintah_daerah']['LKJIP/LPPD']['active'] == 1) {
 			$lkjip_lppd_pemda = $this->functions->generatePage(array(
 				'nama_page' => 'LKJIP / LPPD Pemda' . $_GET['tahun'],
