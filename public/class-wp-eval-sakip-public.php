@@ -8027,6 +8027,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											'keterangan' => $penilaian['keterangan'],
 											'penjelasan' => $penilaian['penjelasan'],
 											'langkah_kerja' => $penilaian['langkah_kerja'],
+											'jenis_bukti_dukung' => $penilaian['jenis_bukti_dukung']
 										);
 										$wpdb->insert('esakip_komponen_penilaian', $data_komponen_penilaian_baru);
 										$id_komponen_penilaian_baru = $wpdb->insert_id;
@@ -8129,7 +8130,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'keterangan' => 'Renstra Perangkat Daerah (2024-2026)',
 												'nomor_urut' => '1.00',
 												'penjelasan' => 'cukup jelas',
-												'langkah_kerja' => 'Dapatkan dokumen berupa hard copy maupun soft copy'
+												'langkah_kerja' => 'Dapatkan dokumen berupa hard copy maupun soft copy',
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra'
+												)
 											),
 											array( //1
 												'nama' => 'Dokumen perencanaan kinerja tahunan (Renja) telah disusun',
@@ -8144,6 +8148,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'pesan_kesalahan' => 'SALAH dokumen RENSTRA tidak ada',
 														'id_komponen_pembanding' => '0-0-0'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renja_rkt'
 												)
 											),
 											array( //2
@@ -8159,6 +8166,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-0-1',
 														'pesan_kesalahan' => 'SALAH, Perencanaan kinerja tahunan tidak ada.'
 													),
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renja_rkt',
+													'esakip_dokumen_lainnya',
+													'esakip_dpa'
 												)
 											),
 											array( //3
@@ -8174,6 +8186,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-0-1',
 														'pesan_kesalahan' => 'SALAH, Perencanaan kinerja tahunan tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_perjanjian_kinerja'
 												)
 											),
 											array( //4
@@ -8189,6 +8204,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-0-3',
 														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
 													),
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_perjanjian_kinerja'
 												)
 											),
 											array( //5
@@ -8204,6 +8222,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-0-3',
 														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
 													),
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_rencana_aksi'
 												)
 											)
 										)
@@ -8227,6 +8248,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-0-1',
 														'pesan_kesalahan' => 'SALAH, Perencanaan kinerja tahunan tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renja_rkt',
+													'esakip_renstra'
 												)
 											),
 											array( //1
@@ -8242,6 +8267,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-0-3',
 														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_dokumen_lainnya',
+													'esakip_renstra'
 												)
 											),
 											array( //2
@@ -8257,6 +8286,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-0-3',
 														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_dokumen_lainnya',
+													'esakip_renja_rkt'
 												)
 											),
 											array( //3
@@ -8272,6 +8305,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-0-3',
 														'pesan_kesalahan' => 'SALAH, PK tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_dokumen_lainnya',
+													'esakip_perjanjian_kinerja'
 												)
 											),
 											array( //4
@@ -8287,6 +8324,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'pesan_kesalahan' => 'SALAH dokumen RENSTRA tidak ada',
 														'id_komponen_pembanding' => '0-0-0'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_renja_rkt',
+													'esakip_perjanjian_kinerja'
 												)
 											),
 											array( //5
@@ -8307,6 +8349,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1-4',
 														'pesan_kesalahan' => 'SALAH, Tujuan tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_renja_rkt',
+													'esakip_perjanjian_kinerja'
 												)
 											),
 											array( //6
@@ -8326,6 +8373,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'jenis_kerangka_logis' => '2',
 														'id_komponen_pembanding' => '0-1-4', 'pesan_kesalahan' => 'SALAH, Tujuan tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_renja_rkt',
+													'esakip_perjanjian_kinerja'
 												)
 											),
 											array( //7
@@ -8345,6 +8397,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'jenis_kerangka_logis' => '2',
 														'id_komponen_pembanding' => '0-1-4', 'pesan_kesalahan' => 'SALAH, Tujuan tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_renja_rkt',
+													'esakip_perjanjian_kinerja',
+													'esakip_iku'
 												)
 											),
 											array( //8
@@ -8364,6 +8422,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'jenis_kerangka_logis' => '2',
 														'id_komponen_pembanding' => '0-1-7', 'pesan_kesalahan' => 'SALAH, Indikator Tujuan belum SMART.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_renja_rkt',
+													'esakip_perjanjian_kinerja',
+													'esakip_iku'
 												)
 											),
 											array( //9
@@ -8383,6 +8447,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1-1',
 														'pesan_kesalahan' => ' SALAH, Dokumen Perencanaan belum diformalkan.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_renja_rkt',
+													'esakip_perjanjian_kinerja',
+													'esakip_iku'
 												)
 											),
 											array( //10
@@ -8398,6 +8468,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1-7',
 														'pesan_kesalahan' => 'SALAH, Indikator Tujuan belum tepat'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_renja_rkt',
+													'esakip_perjanjian_kinerja'
 												)
 											),
 											array( //11
@@ -8418,6 +8493,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata2 kualitas tujuan/sasaran, indikator, dan target.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_renja_rkt',
+													'esakip_perjanjian_kinerja',
+													'esakip_dokumen_lainnya',
+													'esakip_pohon_kinerja_dan_cascading'
 												)
 											)
 										)
@@ -8446,6 +8528,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas RENSTRA.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_renja_rkt',
+													'esakip_rencana_aksi',
+													'esakip_dokumen_lainnya',
+													'esakip_dpa'
 												)
 											),
 											array( //1
@@ -8466,6 +8555,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas RENSTRA.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_laporan_kinerja'
 												)
 											),
 											array( //2
@@ -8486,6 +8579,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas RENSTRA.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_renstra',
+													'esakip_renja_rkt',
+													'esakip_rencana_aksi',
+													'esakip_dokumen_lainnya',
+													'esakip_dpa'
 												)
 											),
 											array( //3
@@ -8506,6 +8606,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas RENSTRA.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_rencana_aksi'
 												)
 											),
 											array( //4
@@ -8526,6 +8629,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas RENSTRA.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_perjanjian_kinerja',
+													'esakip_dokumen_lainnya',
+													'esakip_skp'
 												)
 											),
 											array( //5
@@ -8546,6 +8654,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas RENSTRA.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_skp',
+													'esakip_perjanjian_kinerja'
 												)
 											),
 											array( //6
@@ -8566,6 +8678,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '0-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas RENSTRA.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_dokumen_lainnya'
 												)
 											)
 										)
@@ -8592,7 +8707,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'keterangan' => 'Dokumen IKU 2024-2026',
 												'penjelasan' => 'cukup jelas',
 												'langkah_kerja' => 'Cek apakah terdapat aturan/pedoman/SOP terkait pengumpulan data kinerja pada satuan kerja.',
-												'nomor_urut' => '1.00'
+												'nomor_urut' => '1.00',
+												'jenis_bukti_dukung' => array(
+													'esakip_iku'
+												)
 											),
 											array( //1
 												'nama' => 'Terdapat Definisi Operasional yang jelas atas kinerja dan cara mengukur indikator kinerja.',
@@ -8607,6 +8725,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-0-0',
 														'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_iku'
 												)
 											),
 											array( //2
@@ -8627,6 +8748,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-0-1',
 														'pesan_kesalahan' => 'SALAH, Nilai lebih tinggi dari nilai Definisi Operasional yang jelas atas kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_dokumen_lainnya'
 												)
 											),
 										)
@@ -8651,6 +8775,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
 													)
 
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_pengukuran_kinerja',
+													'esakip_skp'
 												)
 											),
 											array(
@@ -8666,6 +8794,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-0-0',
 														'pesan_kesalahan' => 'SALAH, nilai lebih tinggi dari IKU sebagai ukuran kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_pengukuran_kinerja',
+													'esakip_skp',
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -8681,6 +8814,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-0-0',
 														'pesan_kesalahan' => 'SALAH, nilai lebih tinggi dari IKU sebagai ukuran kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_pengukuran_kinerja',
+													'esakip_skp',
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -8696,6 +8834,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-0-0',
 														'pesan_kesalahan' => 'SALAH, nilai lebih tinggi dari IKU sebagai ukuran kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
 												)
 											),
 											array(
@@ -8711,6 +8851,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-0-0',
 														'pesan_kesalahan' => 'SALAH, nilai lebih tinggi dari IKU sebagai ukuran kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_pengukuran_kinerja',
+													'esakip_skp'
 												)
 											),
 											array(
@@ -8730,6 +8874,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'jenis_kerangka_logis' => '2',
 														'id_komponen_pembanding' => '1-0-0', 'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_dokumen_lainnya'
 												)
 											),
 											array(
@@ -8749,6 +8896,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'jenis_kerangka_logis' => '2',
 														'id_komponen_pembanding' => '1-0-0', 'pesan_kesalahan' => 'SALAH, IKU tidak ada.'
 													),
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_dokumen_lainnya'
 												)
 											),
 										)
@@ -8776,6 +8926,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_dokumen_lainnya',
+													'esakip_pengukuran_kinerja'
 												)
 											),
 											array(
@@ -8795,6 +8949,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_dokumen_lainnya',
+													'esakip_pengukuran_kinerja'
 												)
 											),
 											array(
@@ -8814,6 +8972,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_pengukuran_kinerja',
+													'esakip_rencana_aksi',
+													'esakip_evaluasi_internal'
 												)
 											),
 											array(
@@ -8833,6 +8996,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_pengukuran_kinerja',
+													'esakip_rencana_aksi',
+													'esakip_evaluasi_internal'
 												)
 											),
 											array(
@@ -8852,6 +9020,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_pengukuran_kinerja',
+													'esakip_rencana_aksi',
+													'esakip_evaluasi_internal'
 												)
 											),
 											array(
@@ -8871,6 +9044,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_pengukuran_kinerja',
+													'esakip_dokumen_lainnya',
+													'esakip_evaluasi_internal',
+													'esakip_dpa'
 												)
 											),
 											array(
@@ -8890,6 +9069,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja',
+													'esakip_dokumen_lainnya',
+													'esakip_dpa'
 												)
 											),
 											array(
@@ -8909,6 +9093,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_evaluasi_internal',
+													'esakip_dokumen_lainnya'
 												)
 											),
 											array(
@@ -8928,6 +9116,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '1-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Pengukuran.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_evaluasi_internal',
+													'esakip_dokumen_lainnya'
 												)
 											),
 										)
@@ -8954,7 +9146,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'keterangan' => 'Laporan Kinerja 2023',
 												'penjelasan' => 'Cukup jelas',
 												'langkah_kerja' => '-',
-												'nomor_urut' => '1.00'
+												'nomor_urut' => '1.00',
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
+												)
 											),
 											array( //1
 												'nama' => 'Dokumen Laporan Kinerja telah disusun secara berkala.',
@@ -8969,6 +9164,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-0',
 														'pesan_kesalahan' => 'SALAH, Laporan Kinerja tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array( //2
@@ -8984,6 +9182,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-0',
 														'pesan_kesalahan' => 'SALAH, Laporan Kinerja tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -8999,6 +9200,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-0',
 														'pesan_kesalahan' => 'SALAH, Laporan Kinerja tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9014,6 +9218,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-0',
 														'pesan_kesalahan' => 'SALAH, Laporan Kinerja tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9029,6 +9236,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-0',
 														'pesan_kesalahan' => 'SALAH, Laporan Kinerja tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 										)
@@ -9054,6 +9264,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-0',
 														'pesan_kesalahan' => 'SALAH, Laporan Kinerja tidak ada.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9074,6 +9287,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-2',
 														'pesan_kesalahan' => 'SALAH, Laporan kinerja belum diformalkan.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9094,6 +9310,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-2',
 														'pesan_kesalahan' => 'SALAH, Laporan kinerja tidak disusun secara berkala.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9114,6 +9333,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-2',
 														'pesan_kesalahan' => 'SALAH, Laporan kinerja tidak disusun secara berkala.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9134,6 +9356,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-3',
 														'pesan_kesalahan' => 'SALAH, Laporan kinerja belum direviu.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9154,6 +9379,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-3',
 														'pesan_kesalahan' => 'SALAH, Laporan kinerja belum direviu.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9174,6 +9402,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-3',
 														'pesan_kesalahan' => 'SALAH, Laporan kinerja belum direviu.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9194,6 +9425,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-3',
 														'pesan_kesalahan' => 'SALAH, Laporan kinerja belum direviu.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9214,6 +9448,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-0-3',
 														'pesan_kesalahan' => 'SALAH, Laporan kinerja belum direviu.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 										)
@@ -9244,6 +9481,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Penyajian Informasi Kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9265,6 +9505,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Penyajian Informasi Kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9285,6 +9528,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Penyajian Informasi Kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja'
 												)
 											),
 											array(
@@ -9305,6 +9551,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Penyajian Informasi Kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja',
+													'esakip_dokumen_lainnya',
+													'esakip_dpa'
 												)
 											),
 											array(
@@ -9325,6 +9576,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Penyajian Informasi Kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja',
+													'esakip_evaluasi_internal'
 												)
 											),
 											array(
@@ -9344,6 +9599,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Penyajian Informasi Kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja',
+													'esakip_dpa'
 												)
 											),
 											array(
@@ -9364,6 +9623,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '2-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Penyajian Informasi Kinerja.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja',
+													'esakip_dpa',
+													'esakip_rencana_aksi',
+													'esakip_dokumen_lainnya',
+													'esakip_evaluasi_internal'
 												)
 											),
 										)
@@ -9391,7 +9657,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												'keterangan' => 'Evaluasi Internal 2023 dan 2024',
 												'penjelasan' => 'cukup jelas',
 												'langkah_kerja' => '-',
-												'nomor_urut' => '1.00'
+												'nomor_urut' => '1.00',
+												'jenis_bukti_dukung' => array(
+													'esakip_evaluasi_internal'
+												)
 											),
 										)
 									),
@@ -9414,6 +9683,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '3-0-0',
 														'pesan_kesalahan' => 'SALAH, Evaluasi belum dilaksanakan.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_evaluasi_internal'
 												)
 											),
 											array(
@@ -9429,6 +9701,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '3-0-0',
 														'pesan_kesalahan' => 'SALAH, Evaluasi belum dilaksanakan.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_evaluasi_internal'
 												)
 											),
 											array(
@@ -9444,6 +9719,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '3-0-0',
 														'pesan_kesalahan' => 'SALAH, Evaluasi belum dilaksanakan.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_evaluasi_internal'
 												)
 											),
 											array(
@@ -9459,6 +9737,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '3-0-0',
 														'pesan_kesalahan' => 'SALAH, Evaluasi belum dilaksanakan.'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_evaluasi_internal'
 												)
 											),
 										)
@@ -9487,6 +9768,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '3-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Evaluasi'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja',
+													'esakip_tl_lhe_akip_internal'
 												)
 											),
 											array(
@@ -9507,6 +9792,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '3-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Evaluasi'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja',
+													'esakip_tl_lhe_akip_internal',
+													'esakip_evaluasi_internal',
+													'esakip_rencana_aksi'
 												)
 											),
 											array(
@@ -9527,6 +9818,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '3-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Evaluasi'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja',
+													'esakip_tl_lhe_akip_internal',
+													'esakip_evaluasi_internal',
+													'esakip_rencana_aksi'
 												)
 											),
 											array(
@@ -9547,6 +9844,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '3-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Evaluasi'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja',
+													'esakip_tl_lhe_akip_internal',
+													'esakip_evaluasi_internal',
+													'esakip_rencana_aksi',
+													'esakip_dpa'
 												)
 											),
 											array(
@@ -9567,6 +9871,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'id_komponen_pembanding' => '3-1',
 														'pesan_kesalahan' => 'SALAH, Lebih tinggi dari nilai rata-rata Kualitas Evaluasi'
 													)
+												),
+												'jenis_bukti_dukung' => array(
+													'esakip_laporan_kinerja',
+													'esakip_tl_lhe_akip_internal',
+													'esakip_evaluasi_internal',
+													'esakip_rencana_aksi',
+													'esakip_dokumen_lainnya'
 												)
 											)
 										)
@@ -9614,6 +9925,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										'keterangan' => $penilaian['keterangan'],
 										'penjelasan' => $penilaian['penjelasan'],
 										'langkah_kerja' => $penilaian['langkah_kerja'],
+										'jenis_bukti_dukung' => '[\"'.implode('\",\"',$penilaian['jenis_bukti_dukung']).'\"]'
 									);
 									if ($wpdb->insert('esakip_komponen_penilaian', $komponen_penilaian_baru) === false) {
 										error_log("Error inserting into esakip_komponen_penilaian: " . $wpdb->last_error);
@@ -16147,16 +16459,20 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		// $pedoman_teknis_evaluasi_internal_detail .= '<li><a target="_blank" href="' . $pedoman_teknis_evaluasi_internal['url'] . '" class="btn btn-primary">' .  $title_pedoman_teknis_evaluasi_internal . '</a></li>';
 
 		$get_jadwal_lke = $wpdb->get_results(
-			"
-			SELECT 
-				id,
-				nama_jadwal,
-				tahun_anggaran,
-				lama_pelaksanaan
-			FROM esakip_data_jadwal
-			WHERE tipe = 'LKE'
-			  AND status = 1
-			ORDER BY started_at DESC LIMIT 1",
+			$wpdb->prepare(
+				"
+				SELECT 
+					id,
+					nama_jadwal,
+					tahun_anggaran,
+					lama_pelaksanaan
+				FROM esakip_data_jadwal
+				WHERE tipe = 'LKE'
+				  AND status = 1
+				  AND tahun_anggaran=%d
+				ORDER BY started_at DESC LIMIT 1",
+				$_GET['tahun']
+			),
 			ARRAY_A
 		);
 		$pengisian_lke = '';
