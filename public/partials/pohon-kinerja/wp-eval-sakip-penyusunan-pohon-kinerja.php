@@ -382,7 +382,7 @@ jQuery(document).ready(function(){
 		jQuery("#wrap-loading").show();
 		jQuery.ajax({
 			method:'POST',
-			url:ajax.url,
+			url:esakip.url,
 			data:{
 		  		"action": "edit_pokin",
 		  		"api_key": esakip.api_key,
@@ -420,7 +420,7 @@ jQuery(document).ready(function(){
 			jQuery("#wrap-loading").show();
 			jQuery.ajax({
 				method:'POST',
-				url:ajax.url,
+				url:esakip.url,
 				data:{
 					'action': 'delete_pokin',
 		      		'api_key': esakip.api_key,
@@ -469,7 +469,7 @@ jQuery(document).ready(function(){
 		jQuery("#wrap-loading").show();
 		jQuery.ajax({
 			method:'POST',
-			url:ajax.url,
+			url:esakip.url,
 			data:{
 	  			"action": "edit_indikator_pokin",
 	  			"api_key": esakip.api_key,
@@ -508,7 +508,7 @@ jQuery(document).ready(function(){
 			jQuery("#wrap-loading").show();
 			jQuery.ajax({
 				method:'POST',
-				url:ajax.url,
+				url:esakip.url,
 				data:{
 					'action': 'delete_indikator_pokin',
 		      		'api_key': esakip.api_key,
@@ -563,7 +563,7 @@ jQuery(document).ready(function(){
 		jQuery("#wrap-loading").show();
 		jQuery.ajax({
 			method:'POST',
-			url:ajax.url,
+			url:esakip.url,
 			data:{
 		  		"action": "edit_pokin",
 		  		"api_key": esakip.api_key,
@@ -602,7 +602,7 @@ jQuery(document).ready(function(){
 			jQuery("#wrap-loading").show();
 			jQuery.ajax({
 				method:'POST',
-				url:ajax.url,
+				url:esakip.url,
 				data:{
 					'action': 'delete_pokin',
 		      		'api_key': esakip.api_key,
@@ -654,7 +654,7 @@ jQuery(document).ready(function(){
 		jQuery("#wrap-loading").show();
 		jQuery.ajax({
 			method:'POST',
-			url:ajax.url,
+			url:esakip.url,
 			data:{
 	  			"action": "edit_indikator_pokin",
 	  			"api_key": esakip.api_key,
@@ -695,7 +695,7 @@ jQuery(document).ready(function(){
 			jQuery("#wrap-loading").show();
 			jQuery.ajax({
 				method:'POST',
-				url:ajax.url,
+				url:esakip.url,
 				data:{
 					'action': 'delete_indikator_pokin',
 		      		'api_key': esakip.api_key,
@@ -753,7 +753,7 @@ jQuery(document).ready(function(){
 		jQuery("#wrap-loading").show();
 		jQuery.ajax({
 			method:'POST',
-			url:ajax.url,
+			url:esakip.url,
 			data:{
 		  		"action": "edit_pokin",
 		  		"api_key": esakip.api_key,
@@ -792,7 +792,7 @@ jQuery(document).ready(function(){
 			jQuery("#wrap-loading").show();
 			jQuery.ajax({
 				method:'POST',
-				url:ajax.url,
+				url:esakip.url,
 				data:{
 					'action': 'delete_pokin',
 		      		'api_key': esakip.api_key,
@@ -844,7 +844,7 @@ jQuery(document).ready(function(){
 		jQuery("#wrap-loading").show();
 		jQuery.ajax({
 			method:'POST',
-			url:ajax.url,
+			url:esakip.url,
 			data:{
 	  			"action": "edit_indikator_pokin",
 	  			"api_key": esakip.api_key,
@@ -885,7 +885,7 @@ jQuery(document).ready(function(){
 			jQuery("#wrap-loading").show();
 			jQuery.ajax({
 				method:'POST',
-				url:ajax.url,
+				url:esakip.url,
 				data:{
 					'action': 'delete_indikator_pokin',
 		      		'api_key': esakip.api_key,
@@ -944,7 +944,7 @@ jQuery(document).ready(function(){
 		jQuery("#wrap-loading").show();
 		jQuery.ajax({
 			method:'POST',
-			url:ajax.url,
+			url:esakip.url,
 			data:{
 		  		"action": "edit_pokin",
 		  		"api_key": esakip.api_key,
@@ -983,7 +983,7 @@ jQuery(document).ready(function(){
 			jQuery("#wrap-loading").show();
 			jQuery.ajax({
 				method:'POST',
-				url:ajax.url,
+				url:esakip.url,
 				data:{
 					'action': 'delete_pokin',
 		      		'api_key': esakip.api_key,
@@ -1035,7 +1035,7 @@ jQuery(document).ready(function(){
 		jQuery("#wrap-loading").show();
 		jQuery.ajax({
 			method:'POST',
-			url:ajax.url,
+			url:esakip.url,
 			data:{
 	  			"action": "edit_indikator_pokin",
 	  			"api_key": esakip.api_key,
@@ -1076,7 +1076,7 @@ jQuery(document).ready(function(){
 			jQuery("#wrap-loading").show();
 			jQuery.ajax({
 				method:'POST',
-				url:ajax.url,
+				url:esakip.url,
 				data:{
 					'action': 'delete_indikator_pokin',
 		      		'api_key': esakip.api_key,
@@ -1108,7 +1108,7 @@ jQuery(document).ready(function(){
 		
 		jQuery.ajax({
 			method:'POST',
-			url:ajax.url,
+			url:esakip.url,
 			dataType:'json',
 			data:{
 				'action': action,
@@ -1131,7 +1131,7 @@ function pokinLevel1(){
 	jQuery("#wrap-loading").show();
 	return new Promise(function(resolve, reject){
 		jQuery.ajax({
-			url: ajax.url,
+			url: esakip.url,
 	      	type: "post",
 	      	data: {
 	      		"action": "get_data_pokin",
@@ -1200,7 +1200,7 @@ function pokinLevel2(params){
 	jQuery("#wrap-loading").show();
 	return new Promise(function(resolve, reject){
 		jQuery.ajax({
-			url: ajax.url,
+			url: esakip.url,
 	      	type: "post",
 	      	data: {
 	      		"action": "get_data_pokin",
@@ -1277,7 +1277,7 @@ function pokinLevel3(params){
 	jQuery("#wrap-loading").show();
 	return new Promise(function(resolve, reject){
 		jQuery.ajax({
-			url: ajax.url,
+			url: esakip.url,
 	      	type: "post",
 	      	data: {
 	      		"action": "get_data_pokin",
@@ -1358,7 +1358,7 @@ function pokinLevel4(params){
 	jQuery("#wrap-loading").show();
 	return new Promise(function(resolve, reject){
 		jQuery.ajax({
-			url: ajax.url,
+			url: esakip.url,
 	      	type: "post",
 	      	data: {
 	      		"action": "get_data_pokin",
