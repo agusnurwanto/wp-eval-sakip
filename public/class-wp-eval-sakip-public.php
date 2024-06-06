@@ -8876,8 +8876,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 														'pesan_kesalahan' => 'SALAH, nilai lebih tinggi dari IKU sebagai ukuran kinerja.'
 													)
 												),
-												'jenis_bukti_dukung' => array(
-												)
+												'jenis_bukti_dukung' => array()
 											),
 											array(
 												'nama' => 'Pengukuran kinerja sudah dilakukan secara berjenjang',
@@ -9966,7 +9965,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										'keterangan' => $penilaian['keterangan'],
 										'penjelasan' => $penilaian['penjelasan'],
 										'langkah_kerja' => $penilaian['langkah_kerja'],
-										'jenis_bukti_dukung' => '[\"'.implode('\",\"',$penilaian['jenis_bukti_dukung']).'\"]'
+										'jenis_bukti_dukung' => '[\"' . implode('\",\"', $penilaian['jenis_bukti_dukung']) . '\"]'
 									);
 									if ($wpdb->insert('esakip_komponen_penilaian', $komponen_penilaian_baru) === false) {
 										error_log("Error inserting into esakip_komponen_penilaian: " . $wpdb->last_error);
@@ -20540,7 +20539,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                     esakip_rpjpd_kebijakan k ON s.id = k.id_saspok
                 LEFT JOIN 
                     esakip_rpjpd_isu i ON k.id = i.id_kebijakan
-            ";
+            	";
 				$ret['data'] = $wpdb->get_results($sql, ARRAY_A);
 			} else {
 				$table = '';
@@ -21373,41 +21372,46 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	{
 		global $wpdb;
 		$ret = array(
-			'status'    => 'success',
-			'message'   => 'Berhasil hapus data RPD!'
+			'status' => 'success',
+			'message' => 'Berhasil hapus data RPD!',
 		);
 		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] === get_option(ESAKIP_APIKEY)) {
 				$table = '';
-				if ($_POST['table'] == 'esakip_rpd_tujuan') {
-					$table = $_POST['table'];
-					if (!empty($_POST['id_unik_tujuan_indikator'])) {
-						$wpdb->delete($table, array('id_unik_indikator' => $_POST['id_unik_tujuan_indikator']));
-					} else {
-						$wpdb->delete($table, array('id_unik' => $_POST['id']));
-					}
-				} else if ($_POST['table'] == 'esakip_rpd_sasaran') {
-					$table = $_POST['table'];
-					if (!empty($_POST['id_unik_sasaran_indikator'])) {
-						$wpdb->delete($table, array('id_unik_indikator' => $_POST['id_unik_sasaran_indikator']));
-					} else {
-						$wpdb->delete($table, array('id_unik' => $_POST['id']));
-					}
-				} else if ($_POST['table'] == 'esakip_rpd_program') {
-					$table = $_POST['table'];
-					if (!empty($_POST['id_unik_program_indikator'])) {
-						$wpdb->delete($table, array('id_unik_indikator' => $_POST['id_unik_program_indikator']));
-					} else {
-						$wpdb->delete($table, array('id_unik' => $_POST['id']));
-					}
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Param table tidak tidak boleh kosong!';
+				switch ($_POST['table']) {
+					case 'esakip_rpd_tujuan':
+						$table = $_POST['table'];
+						if (!empty($_POST['id_unik_tujuan_indikator'])) {
+							$wpdb->delete($table, ['id_unik_indikator' => $_POST['id_unik_tujuan_indikator']]);
+						} else {
+							$wpdb->delete($table, ['id_unik' => $_POST['id']]);
+						}
+						break;
+					case 'esakip_rpd_sasaran':
+						$table = $_POST['table'];
+						if (!empty($_POST['id_unik_sasaran_indikator'])) {
+							$wpdb->delete($table, ['id_unik_indikator' => $_POST['id_unik_sasaran_indikator']]);
+						} else {
+							$wpdb->delete($table, ['id_unik' => $_POST['id']]);
+						}
+						break;
+					case 'esakip_rpd_program':
+						$table = $_POST['table'];
+						if (!empty($_POST['id_unik_program_indikator'])) {
+							$wpdb->delete($table, ['id_unik_indikator' => $_POST['id_unik_program_indikator']]);
+						} else {
+							$wpdb->delete($table, ['id_unik' => $_POST['id']]);
+						}
+						break;
+					default:
+						$ret['status'] = 'error';
+						$ret['message'] = 'Param table tidak tidak boleh kosong!';
+						break;
 				}
 			} else {
 				$ret = array(
 					'status' => 'error',
-					'message'   => 'Api Key tidak sesuai!'
+					'message' => 'Api Key tidak sesuai!',
 				);
 			}
 		} else {
@@ -21417,5 +21421,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			);
 		}
 		die(json_encode($ret));
+	}
+
+
+	public function generateRandomString($length = 10)
+	{
+		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		$charactersLength = strlen($characters);
+		$randomString = '';
+		for ($i = 0; $i < $length; $i++) {
+			$randomString .= $characters[rand(0, $charactersLength - 1)];
+		}
+		$randomString = time() . '-' . $randomString;
+		return $randomString;
 	}
 }
