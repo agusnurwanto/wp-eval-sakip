@@ -25,7 +25,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		require_once ESAKIP_PLUGIN_PATH . 'public/partials/pohon-kinerja/wp-eval-sakip-view-pohon-kinerja.php';
     }
 
-    public function get_pokin_level1(){
+    public function get_data_pokin(){
     	global $wpdb;
     	try {
     		if (!empty($_POST)) {
@@ -40,8 +40,19 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							b.id AS id_indikator,
 							b.label_indikator_kinerja
 						FROM esakip_pohon_kinerja a
-							LEFT JOIN esakip_pohon_kinerja b ON a.id=b.parent AND a.level=b.level 
-						WHERE a.parent=%d AND a.level=%d AND a.active=%d ORDER BY a.id", 0, 1, 1), ARRAY_A);
+							LEFT JOIN esakip_pohon_kinerja b 
+								ON a.id=b.parent AND a.level=b.level 
+						WHERE 
+							a.tahun_anggaran=%d AND 
+							a.parent=%d AND 
+							a.level=%d AND 
+							a.active=%d 
+						ORDER BY a.id", 
+						$_POST['tahun_anggaran'], 
+						$_POST['parent'], 
+						$_POST['level'], 
+						1
+					), ARRAY_A);
 
 					$data = [];
 					foreach ($dataPokin as $key => $pokin) {
@@ -82,7 +93,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
     	}
     }
 
-    public function create_pokin_level1(){
+    public function create_pokin(){
     	global $wpdb;
     	try {
     		if (!empty($_POST)) {
@@ -90,16 +101,16 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					$input = json_decode(stripslashes($_POST['data']), true);
 
-					$id = $wpdb->get_var($wpdb->prepare("SELECT id FROM esakip_pohon_kinerja WHERE label=%s AND parent=%d AND level=%d AND active=%d ORDER BY id", trim($input['level_1']), 0, 1, 1),  ARRAY_A);
+					$id = $wpdb->get_var($wpdb->prepare("SELECT id FROM esakip_pohon_kinerja WHERE label=%s AND parent=%d AND level=%d AND active=%d ORDER BY id", trim($input['label']), $input['parent'], $input['level'], 1),  ARRAY_A);
 
 					if(!empty($id)){
 						throw new Exception("Data sudah ada!", 1);
 					}
 
 					$data = $wpdb->insert('esakip_pohon_kinerja', [
-						'label' => trim($input['level_1']),
-						'parent' => 0,
-						'level' => 1,
+						'label' => trim($input['label']),
+						'parent' => $input['parent'],
+						'level' => $input['level'],
 						'tahun_anggaran' => $input['tahun_anggaran'],
 						'active' => 1
 					]);
@@ -122,13 +133,13 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
     	}
     }
 
-    public function edit_pokin_level1(){
+    public function edit_pokin(){
     	global $wpdb;
     	try {
     		if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( ESAKIP_APIKEY )) {
 
-					$data = $wpdb->get_row($wpdb->prepare("SELECT id, label FROM esakip_pohon_kinerja WHERE id=%d AND active=%d", $_POST['id'], 1),  ARRAY_A);
+					$data = $wpdb->get_row($wpdb->prepare("SELECT id, parent, level, label FROM esakip_pohon_kinerja WHERE id=%d AND active=%d", $_POST['id'], 1),  ARRAY_A);
 
 					if(empty($data)){
 						throw new Exception("Data tidak ditemukan!", 1);
@@ -152,7 +163,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
     	}	
     }
 
-    public function update_pokin_level1(){
+    public function update_pokin(){
     	global $wpdb;
     	try {
     		if (!empty($_POST)) {
@@ -160,16 +171,22 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					$input = json_decode(stripslashes($_POST['data']), true);
 
-					$id = $wpdb->get_var($wpdb->prepare("SELECT id FROM esakip_pohon_kinerja WHERE label=%s AND id!=%d AND parent=%d AND level=%d AND active=%d", trim($input['level_1']), $input['id'], 0, 1, 1),  ARRAY_A);
+					$id = $wpdb->get_var($wpdb->prepare("SELECT id FROM esakip_pohon_kinerja WHERE label=%s AND id!=%d AND parent=%d AND level=%d AND active=%d", trim($input['label']), $input['id'], $input['parent'], $input['level'], 1),  ARRAY_A);
 
 					if(!empty($id)){
 						throw new Exception("Data sudah ada!", 1);
 					}
 
 					$data = $wpdb->update('esakip_pohon_kinerja', [
-						'label' => trim($input['level_1'])
+						'label' => trim($input['label'])
 					], [
 						'id' => $input['id']
+					]);
+
+					$child = $wpdb->update('esakip_pohon_kinerja', [
+						'label' => trim($input['label'])
+					], [
+						'parent' => $input['id']
 					]);
 
 					echo json_encode([
@@ -190,23 +207,23 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
     	}
     }
 
-    public function delete_pokin_level1(){
+    public function delete_pokin(){
     	global $wpdb;
     	try {
     		if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( ESAKIP_APIKEY )) {
 
-					$indikator = $wpdb->get_row($wpdb->prepare("SELECT id FROM esakip_pohon_kinerja WHERE parent=%d AND label_indikator_kinerja IS NOT NULL AND level=%d AND active=%d", $_POST['id'], 1, 1),  ARRAY_A);
+					$indikator = $wpdb->get_row($wpdb->prepare("SELECT id FROM esakip_pohon_kinerja WHERE parent=%d AND label_indikator_kinerja IS NOT NULL AND level=%d AND active=%d", $_POST['id'], $_POST['level'], 1),  ARRAY_A);
 
 					if(!empty($indikator)){
 						throw new Exception("Indikator harus dihapus dulu!", 1);
 					}
 
-					$child = $wpdb->get_row($wpdb->prepare("SELECT id FROM esakip_pohon_kinerja WHERE parent=%d AND level=%d AND active=%d", $_POST['id'], 2, 1),  ARRAY_A);
+					$child = $wpdb->get_row($wpdb->prepare("SELECT id FROM esakip_pohon_kinerja WHERE parent=%d AND level=%d AND active=%d", $_POST['id'], (intval($_POST['level'])+1), 1),  ARRAY_A);
 
 
 					if(!empty($child)){
-						throw new Exception("Child harus dihapus dulu!", 1);
+						throw new Exception("Pohon kinerja level ".(intval($_POST['level'])+1)." harus dihapus dulu!", 1);
 					}
 
 					$data = $wpdb->delete('esakip_pohon_kinerja', [
@@ -231,7 +248,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
     	}
     }
 
-    public function create_indikator_pokin_level1(){
+    public function create_indikator_pokin(){
     	global $wpdb;
     	try {
     		if (!empty($_POST)) {
@@ -239,7 +256,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					$input = json_decode(stripslashes($_POST['data']), true);
 
-					$id = $wpdb->get_var($wpdb->prepare("SELECT id FROM esakip_pohon_kinerja WHERE label_indikator_kinerja=%s AND parent=%d AND level=%d AND active=%d", trim($input['ind_level_1']), $input['parent'], 1, 1),  ARRAY_A);
+					$id = $wpdb->get_var($wpdb->prepare("SELECT id FROM esakip_pohon_kinerja WHERE label_indikator_kinerja=%s AND parent=%d AND level=%d AND active=%d", trim($input['indikator_label']), $input['parent'], $input['level'], 1),  ARRAY_A);
 
 					if(!empty($id)){
 						throw new Exception("Data sudah ada!", 1);
@@ -247,9 +264,9 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					$data = $wpdb->insert('esakip_pohon_kinerja', [
 						'label' => trim($input['label']),
-						'label_indikator_kinerja' => trim($input['ind_level_1']),
+						'label_indikator_kinerja' => trim($input['indikator_label']),
 						'parent' => $input['parent'],
-						'level' => 1,
+						'level' => $input['level'],
 						'tahun_anggaran' => $input['tahun_anggaran'],
 						'active' => 1
 					]);
@@ -272,13 +289,13 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
     	}	
     }
 
-    public function edit_indikator_pokin_level1(){
+    public function edit_indikator_pokin(){
     	global $wpdb;
     	try {
     		if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( ESAKIP_APIKEY )) {
 
-					$data = $wpdb->get_row($wpdb->prepare("SELECT id, label, parent, label_indikator_kinerja FROM esakip_pohon_kinerja WHERE id=%d AND active=%d", $_POST['id'], 1),  ARRAY_A);
+					$data = $wpdb->get_row($wpdb->prepare("SELECT id, label, parent, label_indikator_kinerja, level FROM esakip_pohon_kinerja WHERE id=%d AND active=%d", $_POST['id'], 1),  ARRAY_A);
 
 					if(empty($data)){
 						throw new Exception("Data tidak ditemukan!", 1);
@@ -302,7 +319,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
     	}
     }
 
-    public function update_indikator_pokin_level1(){
+    public function update_indikator_pokin(){
     	global $wpdb;
     	try {
     		if (!empty($_POST)) {
@@ -310,17 +327,18 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					$input = json_decode(stripslashes($_POST['data']), true);
 
-					$id = $wpdb->get_var($wpdb->prepare("SELECT id FROM esakip_pohon_kinerja WHERE id!=%d AND parent=%d AND level=%d AND active=%d", $input['id'], $input['parent'], 1, 1),  ARRAY_A);
+					$id = $wpdb->get_var($wpdb->prepare("SELECT id FROM esakip_pohon_kinerja WHERE id!=%d AND parent=%d AND level=%d AND active=%d", $input['id'], $input['parent'], $input['level'], 1),  ARRAY_A);
 
 					if(!empty($id)){
 						throw new Exception("Data sudah ada!", 1);
 					}
 
 					$data = $wpdb->update('esakip_pohon_kinerja', [
-						'label_indikator_kinerja' => trim($input['ind_level_1']),
+						'label_indikator_kinerja' => trim($input['indikator_label']),
 					], [
 						'id' => $input['id'],
 						'parent' => $input['parent'],
+						'level' => $input['level'],
 					]);
 
 					echo json_encode([
@@ -341,7 +359,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
     	}
     }
 
-    public function delete_indikator_pokin_level1(){
+    public function delete_indikator_pokin(){
     	global $wpdb;
     	try {
     		if (!empty($_POST)) {
