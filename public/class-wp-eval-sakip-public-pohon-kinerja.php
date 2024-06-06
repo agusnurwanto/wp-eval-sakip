@@ -35,8 +35,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						SELECT 
 							a.id,
 							a.label,
-							b.parent,
-							b.active,
+							a.parent,
+							a.active,
 							b.id AS id_indikator,
 							b.label_indikator_kinerja
 						FROM esakip_pohon_kinerja a
@@ -117,7 +117,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					echo json_encode([
 		    			'status' => true,
-		    			'message' => 'Sukses simpan data!'
+		    			'message' => 'Sukses simpan pohon kinerja!'
 		    		]);exit();
 				}else{
 					throw new Exception("API tidak ditemukan!", 1);
@@ -191,7 +191,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					echo json_encode([
 		    			'status' => true,
-		    			'message' => 'Sukses ubah data!'
+		    			'message' => 'Sukses ubah pohon kinerja!'
 		    		]);exit();
 				}else{
 					throw new Exception("API tidak ditemukan!", 1);
@@ -221,7 +221,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					$child = $wpdb->get_row($wpdb->prepare("SELECT id FROM esakip_pohon_kinerja WHERE parent=%d AND level=%d AND active=%d", $_POST['id'], (intval($_POST['level'])+1), 1),  ARRAY_A);
 
-
 					if(!empty($child)){
 						throw new Exception("Pohon kinerja level ".(intval($_POST['level'])+1)." harus dihapus dulu!", 1);
 					}
@@ -232,7 +231,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					echo json_encode([
 		    			'status' => true,
-		    			'message' => 'Sukses hapus data!'
+		    			'message' => 'Sukses hapus pohon kinerja!'
 		    		]);exit();
 				}else{
 					throw new Exception("API tidak ditemukan!", 1);
@@ -273,7 +272,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					echo json_encode([
 		    			'status' => true,
-		    			'message' => 'Sukses simpan data!'
+		    			'message' => 'Sukses simpan indikator!'
 		    		]);exit();
 				}else{
 					throw new Exception("API tidak ditemukan!", 1);
@@ -295,7 +294,23 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
     		if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( ESAKIP_APIKEY )) {
 
-					$data = $wpdb->get_row($wpdb->prepare("SELECT id, label, parent, label_indikator_kinerja, level FROM esakip_pohon_kinerja WHERE id=%d AND active=%d", $_POST['id'], 1),  ARRAY_A);
+					$data = $wpdb->get_row($wpdb->prepare("
+						SELECT 
+							a.id, 
+							a.label, 
+							a.parent, 
+							a.label_indikator_kinerja, 
+							a.level,
+							b.parent AS parent_all 
+						FROM 
+							esakip_pohon_kinerja a
+						LEFT JOIN esakip_pohon_kinerja b ON b.id=a.parent 
+						WHERE 
+							a.id=%d AND 
+							a.active=%d", 
+						$_POST['id'], 
+						1
+					),  ARRAY_A);
 
 					if(empty($data)){
 						throw new Exception("Data tidak ditemukan!", 1);
@@ -343,7 +358,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					echo json_encode([
 		    			'status' => true,
-		    			'message' => 'Sukses ubah data!'
+		    			'message' => 'Sukses ubah indikator!'
 		    		]);exit();
 				}else{
 					throw new Exception("API tidak ditemukan!", 1);
@@ -371,7 +386,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					echo json_encode([
 		    			'status' => true,
-		    			'message' => 'Sukses hapus data!'
+		    			'message' => 'Sukses hapus indikator!'
 		    		]);exit();
 				}else{
 					throw new Exception("API tidak ditemukan!", 1);
