@@ -31,12 +31,12 @@ function run_download_excel_sakip(type) {
     var download_excel =
         '<div id="action-sakip" class="hide-print">' + body + "</div>";
     jQuery(".action-section").append(download_excel);
-    
+
     jQuery(".action-section").css({
-        "display": "flex",
+        display: "flex",
         "justify-content": "center",
         "align-items": "center",
-        "margin-bottom": "20px" 
+        "margin-bottom": "20px",
     });
 
     jQuery(".cetak").css({
@@ -109,7 +109,8 @@ function penjadwalanHitungMundur(dataHitungMundur = {}) {
     let jenis = dataHitungMundur["jenisJadwal"] || "Jenis Jadwal";
     let nama = dataHitungMundur["namaJadwal"] || "Penjadwalan";
     let mulaiJadwal = dataHitungMundur["mulaiJadwal"] || "2022-08-12 16:00:00";
-    let selesaiJadwal = dataHitungMundur["selesaiJadwal"] || "2022-09-12 16:00:00";
+    let selesaiJadwal =
+        dataHitungMundur["selesaiJadwal"] || "2022-09-12 16:00:00";
     let thisTimeZone = dataHitungMundur["thisTimeZone"] || "Asia/Jakarta";
 
     if (!thisTimeZone.includes("Asia/")) {
@@ -124,7 +125,7 @@ function penjadwalanHitungMundur(dataHitungMundur = {}) {
         '<div id="penjadwalanHitungMundur">' +
         '<label id="titles"><span class="dashicons dashicons-clock"></span>&nbsp;' +
         jenis +
-        '</span> | ' +
+        "</span> | " +
         nama +
         "</label>" +
         '<div id="days" style="margin-left:10px">0 <span>Hari</span></div>' +
@@ -186,22 +187,66 @@ function penjadwalanHitungMundur(dataHitungMundur = {}) {
     }
 }
 
-function changeUrl(option){
+function changeUrl(option) {
     var key = option.key;
     var value = option.value;
     var _url = option.url;
     var url_object = new URL(_url);
     var value_asli = url_object.searchParams.get(key);
-    var _and = '&';
-    if(_url.indexOf('?') == -1){
-        _url += '?';
-        _and = '';
+    var _and = "&";
+    if (_url.indexOf("?") == -1) {
+        _url += "?";
+        _and = "";
     }
 
-    if(_url.indexOf(key) != -1){
-        _url = _url.replace(_and+key+'='+value_asli, _and+key+'='+value);
-    }else{
-        _url += _and+key+'='+value
+    if (_url.indexOf(key) != -1) {
+        _url = _url.replace(
+            _and + key + "=" + value_asli,
+            _and + key + "=" + value
+        );
+    } else {
+        _url += _and + key + "=" + value;
     }
     return _url;
+}
+
+function formatRupiah(angka, prefix) {
+    var cek_minus = false;
+    if (!angka || angka == "" || angka == 0) {
+        angka = "0";
+    } else if (angka < 0) {
+        angka = angka * -1;
+        cek_minus = true;
+    }
+    try {
+        if (typeof angka == "number") {
+            angka = Math.round(angka * 100) / 100;
+            angka += "";
+            angka = angka.replace(/\./g, ",").toString();
+        }
+        angka += "";
+        number_string = angka;
+    } catch (e) {
+        console.log("angka", e, angka);
+        var number_string = "0";
+    }
+    var split = number_string.split(","),
+        sisa = split[0].length % 3,
+        rupiah = split[0].substr(0, sisa),
+        ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+    // tambahkan titik jika yang di input sudah menjadi angka ribuan
+    if (ribuan) {
+        separator = sisa ? "." : "";
+        rupiah += separator + ribuan.join(".");
+    }
+
+    rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
+    if (cek_minus) {
+        return (
+            "-" + (prefix == undefined ? rupiah : rupiah ? "Rp. " + rupiah : "")
+        );
+    } else {
+        return prefix == undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
+    }
 }

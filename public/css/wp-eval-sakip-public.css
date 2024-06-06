@@ -209,6 +209,9 @@ thead {
     padding: 20px 0;
     text-align: center;
 }
+#action-sakip a {
+    text-decoration: none;
+}
 @media print {
     .hide-print {
         display: none;
@@ -227,9 +230,7 @@ thead {
 .edit-monev {
     padding: 1px 1px 7px;
 }
-#tambah-data {
-    text-decoration: none;
-}
+
 .edit-mapping:hover,
 .edit-monev:hover {
     background: #00bcd4;
