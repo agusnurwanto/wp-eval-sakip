@@ -342,7 +342,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					$input = json_decode(stripslashes($_POST['data']), true);
 
-					$id = $wpdb->get_var($wpdb->prepare("SELECT id FROM esakip_pohon_kinerja WHERE id!=%d AND parent=%d AND level=%d AND active=%d", $input['id'], $input['parent'], $input['level'], 1),  ARRAY_A);
+					$id = $wpdb->get_var($wpdb->prepare("SELECT id FROM esakip_pohon_kinerja WHERE id!=%d AND parent=%d AND level=%d AND active=%d AND label_indikator_kinerja=%s", $input['id'], $input['parent'], $input['level'], 1, trim($input['indikator_label'])),  ARRAY_A);
 
 					if(!empty($id)){
 						throw new Exception("Data sudah ada!", 1);

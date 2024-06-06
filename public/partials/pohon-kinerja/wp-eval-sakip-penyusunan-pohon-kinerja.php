@@ -994,6 +994,98 @@ jQuery(document).ready(function(){
 		}
 	});
 
+	jQuery(document).on('click', '.tambah-indikator-pokin-level4', function(){
+		jQuery("#modal-crud").find('.modal-title').html('Tambah Indikator');
+		jQuery("#modal-crud").find('.modal-body').html(``
+			+`<form id="form-pokin">`
+				+`<input type="hidden" name="parent_all" value="${jQuery(this).data('parent')}">`
+				+`<input type="hidden" name="parent" value="${jQuery(this).data('id')}">`
+				+`<input type="hidden" name="label" value="${jQuery(this).parent().parent().find('.label-level4').text()}">`
+				+`<input type="hidden" name="level" value="4">`
+				+`<div class="form-group">`
+					+`<label for="indikator-label">${jQuery(this).parent().parent().find('.label-level4').text()}</label>`
+					+`<textarea class="form-control" name="indikator_label" placeholder="Tuliskan indikator..."></textarea>`
+				+`</div>`
+			+`</form>`);
+		jQuery("#modal-crud").find('.modal-footer').html(``
+			+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
+				+`Tutup`
+			+`</button>`
+			+`<button type="button" class="btn btn-success" id="simpan-data-pokin" data-action="create_indikator_pokin" data-view="pokinLevel4">`
+				+`Simpan`
+			+`</button>`);
+		jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
+		jQuery("#modal-crud").find('.modal-dialog').css('width','');
+		jQuery("#modal-crud").modal('show');
+	});
+
+	jQuery(document).on('click', '.edit-indikator-pokin-level4', function(){
+		jQuery("#wrap-loading").show();
+		jQuery.ajax({
+			method:'POST',
+			url:ajax.url,
+			data:{
+	  			"action": "edit_indikator_pokin",
+	  			"api_key": esakip.api_key,
+	  			'id':jQuery(this).data('id')
+			},
+			dataType:'json',
+			success:function(response){
+				jQuery("#wrap-loading").hide();
+				jQuery("#modal-crud").find('.modal-title').html('Edit Indikator');
+				jQuery("#modal-crud").find('.modal-body').html(``
+					+`<form id="form-pokin">`
+						+`<input type="hidden" name="id" value="${response.data.id}">`
+						+`<input type="hidden" name="parent_all" value="${response.data.parent_all}">`
+						+`<input type="hidden" name="parent" value="${response.data.parent}">`
+						+`<input type="hidden" name="level" value="${response.data.level}">`
+						+`<div class="form-group">`
+							+`<label for="indikator-label">${response.data.label}</label>`
+							+`<textarea class="form-control" name="indikator_label">${response.data.label_indikator_kinerja}</textarea>`
+						+`</div>`
+					+`</form>`);
+				jQuery("#modal-crud").find(`.modal-footer`).html(``
+					+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
+						+`Tutup`
+					+`</button>`
+					+`<button type="button" class="btn btn-success" id="simpan-data-pokin" data-action="update_indikator_pokin" data-view="pokinLevel4">`
+						+`Update`
+					+`</button>`);
+				jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
+				jQuery("#modal-crud").find('.modal-dialog').css('width','');
+				jQuery("#modal-crud").modal('show');
+			}
+		});
+	})
+
+	jQuery(document).on('click', '.hapus-indikator-pokin-level4', function(){
+		let parent = jQuery(this).data('parent');
+		if(confirm(`Data akan dihapus?`)){
+			jQuery("#wrap-loading").show();
+			jQuery.ajax({
+				method:'POST',
+				url:ajax.url,
+				data:{
+					'action': 'delete_indikator_pokin',
+		      		'api_key': esakip.api_key,
+					'id':jQuery(this).data('id')
+				},
+				dataType:'json',
+				success:function(response){
+					jQuery("#wrap-loading").hide();
+					alert(response.message);
+					if(response.status){
+						pokinLevel4({
+							'parent':parent
+						}).then(function(){
+							jQuery("#pokinLevel4").DataTable();
+						});
+					}
+				}
+			})
+		}
+	});
+
 	jQuery(document).on('click', '#simpan-data-pokin', function(){
 		jQuery('#wrap-loading').show();
 		let modal = jQuery("#modal-crud");
