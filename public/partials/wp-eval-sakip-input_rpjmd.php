@@ -776,6 +776,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
     }
 </style>
 <h4 style="text-align: center; margin: 0; font-weight: bold;">Monitoring dan Evaluasi RPD (Rencana Pembangunan Daerah) <br><?php echo $nama_pemda; ?><br><?php echo $tahun_awal . ' - ' . $tahun_akhir; ?></h4>
+<div id="action-sakip"></div>
 <div id="cetak" title="Laporan MONEV RENJA" style="padding: 5px; overflow: auto; height: 80vh;">
     <table cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; font-size: 70%; border: 0; table-layout: fixed;" contenteditable="false">
         <thead>
@@ -1214,12 +1215,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
 <script type="text/javascript">
     jQuery(document).ready(function() {
         let data_all = <?php echo json_encode($data_all); ?>;
-    
-        var mySpace = '<div style="padding:3rem;"></div>';
-        window.edit_val = false;
-    
-        jQuery('body').prepend(mySpace);
-    
+
         var aksi = '' +
             '<?php echo $add_rpd; ?>' +
             '<a style="margin-left: 10px;" id="generate-data-program-renstra" onclick="return false;" href="#" class="btn btn-warning">Generate Data Program Dari RENSTRA</a>' +
@@ -1241,7 +1237,131 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
             '</select>' +
             '</label>';
         jQuery('#action-sakip').append(aksi);
-        
+
+        jQuery('#generate-data-program-renstra').on('click', function() {
+            if (confirm("Apakah anda yakin?\nGenerate data program dari RENSTRA akan menghapus data program di RPD.")) {
+                generate_data_program_renstra();
+            }
+
+            jQuery('#tambah-data').on('click', function() {
+                tampil_detail_popup();
+            });
+
+
+            jQuery('#visi-teks').on('change', function() {
+                var id_visi = jQuery(this).val();
+                if (id_visi) {
+                    get_rpjpd('esakip_rpjpd_misi', id_visi)
+                        .then(function(data) {
+                            var html = '<option value="">Pilih misi RPJPD</option>';
+                            data.map(function(b, i) {
+                                html += '<option value="' + b.id + '">' + b.misi_teks + '</option>';
+                            });
+                            jQuery('#misi-teks').html(html);
+                            jQuery('#saspok-teks').html('');
+                            jQuery('#kebijakan-teks').html('');
+                            jQuery('#isu-teks').html('');
+                        });
+                } else {
+                    jQuery('#saspok-teks').html('');
+                    jQuery('#kebijakan-teks').html('');
+                    jQuery('#isu-teks').html('');
+                }
+            });
+
+            jQuery('#misi-teks').on('change', function() {
+                var id_misi = jQuery(this).val();
+                if (id_misi) {
+                    get_rpjpd('esakip_rpjpd_sasaran', id_misi)
+                        .then(function(data) {
+                            var html = '<option value="">Pilih sasaran pokok RPJPD</option>';
+                            data.map(function(b, i) {
+                                html += '<option value="' + b.id + '">' + b.saspok_teks + '</option>';
+                            });
+                            jQuery('#saspok-teks').html(html);
+                            jQuery('#kebijakan-teks').html('');
+                            jQuery('#isu-teks').html('');
+                        });
+                } else {
+                    jQuery('#kebijakan-teks').html('');
+                    jQuery('#isu-teks').html('');
+                }
+            });
+
+            jQuery('#saspok-teks').on('change', function() {
+                var id_saspok = jQuery(this).val();
+                if (id_saspok) {
+                    get_rpjpd('esakip_rpjpd_kebijakan', id_saspok)
+                        .then(function(data) {
+                            var html = '<option value="">Pilih kebijakan RPJPD</option>';
+                            data.map(function(b, i) {
+                                html += '<option value="' + b.id + '">' + b.kebijakan_teks + '</option>';
+                            });
+                            jQuery('#kebijakan-teks').html(html);
+                            jQuery('#isu-teks').html('');
+                        });
+                } else {
+                    jQuery('#isu-teks').html('');
+                }
+            });
+
+            jQuery('#kebijakan-teks').on('change', function() {
+                var id_kebijakan = jQuery(this).val();
+                if (id_kebijakan) {
+                    get_rpjpd('esakip_rpjpd_isu', id_kebijakan)
+                        .then(function(data) {
+                            var html = '<option value="">Pilih isu RPJPD</option>';
+                            data.map(function(b, i) {
+                                html += '<option value="' + b.id + '">' + b.isu_teks + '</option>';
+                            });
+                            jQuery('#isu-teks').html(html);
+                        });
+                }
+            });
+
+            jQuery('#modal-monev').on('hidden.bs.modal', function() {
+                refresh_page();
+            });
+        });
+
+        jQuery('.edit-monev').on('click', function() {
+            var data_id = jQuery(this).attr('data-id').split('||');
+            if (data_id[2]) {
+                tampil_detail_popup(function() {
+                    detail_tujuan(data_id[0], function() {
+                        detail_sasaran(data_id[1], function() {
+                            var program = data_id[2].split('|');
+                            if (program[1]) {
+                                edit_program_indikator(program[1]);
+                            } else {
+                                edit_program(program[0]);
+                            }
+                        });
+                    });
+                });
+            } else if (data_id[1]) {
+                tampil_detail_popup(function() {
+                    detail_tujuan(data_id[0], function() {
+                        var sasaran = data_id[1].split('|');
+                        if (sasaran[1]) {
+                            edit_sasaran_indikator(sasaran[1]);
+                        } else {
+                            edit_sasaran(sasaran[0]);
+                        }
+                    });
+                });
+            } else if (data_id[0]) {
+                tampil_detail_popup(function() {
+                    var tujuan = data_id[0].split('|');
+                    if (tujuan[1]) {
+                        edit_tujuan_indikator(tujuan[1]);
+                    } else {
+                        edit_tujuan(tujuan[0]);
+                    }
+                });
+            }
+        });
+
     })
 
     function filter_skpd(that) {
@@ -1292,65 +1412,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
             jQuery('.edit-monev').hide();
         }
     }
-    jQuery('.edit-monev').on('click', function() {
-        var data_id = jQuery(this).attr('data-id').split('||');
-        if (data_id[2]) {
-            tampil_detail_popup(function() {
-                detail_tujuan(data_id[0], function() {
-                    detail_sasaran(data_id[1], function() {
-                        var program = data_id[2].split('|');
-                        if (program[1]) {
-                            edit_program_indikator(program[1]);
-                        } else {
-                            edit_program(program[0]);
-                        }
-                    });
-                });
-            });
-        } else if (data_id[1]) {
-            tampil_detail_popup(function() {
-                detail_tujuan(data_id[0], function() {
-                    var sasaran = data_id[1].split('|');
-                    if (sasaran[1]) {
-                        edit_sasaran_indikator(sasaran[1]);
-                    } else {
-                        edit_sasaran(sasaran[0]);
-                    }
-                });
-            });
-        } else if (data_id[0]) {
-            tampil_detail_popup(function() {
-                var tujuan = data_id[0].split('|');
-                if (tujuan[1]) {
-                    edit_tujuan_indikator(tujuan[1]);
-                } else {
-                    edit_tujuan(tujuan[0]);
-                }
-            });
-        }
-    });
-    jQuery('#singkron-sipd').on('click', function() {
-        if (confirm('Apakah anda yakin untuk mengambil data dari SIPD lokal? data lama akan diupdate!')) {
-            jQuery('#wrap-loading').show();
-            jQuery.ajax({
-                url: esakip.url,
-                type: "post",
-                data: {
-                    "action": "singkron_rpd_sipd",
-                    "api_key": "<?php echo $api_key; ?>",
-                    "user": "<?php echo $current_user->display_name; ?>"
-                },
-                dataType: "json",
-                success: function(res) {
-                    jQuery('#wrap-loading').hide();
-                    alert(res.message);
-                }
-            });
-        }
-    });
-    jQuery('#tambah-data').on('click', function() {
-        tampil_detail_popup();
-    });
+
 
     function tampil_detail_popup(cb) {
         jQuery('#wrap-loading').show();
@@ -2922,11 +2984,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
         });
     }
 
-    jQuery('#generate-data-program-renstra').on('click', function() {
-        if (confirm("Apakah anda yakin?\nGenerate data program dari RENSTRA akan menghapus data program di RPD.")) {
-            generate_data_program_renstra();
-        }
-    });
+
 
     function generate_data_program_renstra() {
         jQuery('#wrap-loading').show();
@@ -2947,81 +3005,6 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
             }
         });
     }
-
-    jQuery('#visi-teks').on('change', function() {
-        var id_visi = jQuery(this).val();
-        if (id_visi) {
-            get_rpjpd('esakip_rpjpd_misi', id_visi)
-                .then(function(data) {
-                    var html = '<option value="">Pilih misi RPJPD</option>';
-                    data.map(function(b, i) {
-                        html += '<option value="' + b.id + '">' + b.misi_teks + '</option>';
-                    });
-                    jQuery('#misi-teks').html(html);
-                    jQuery('#saspok-teks').html('');
-                    jQuery('#kebijakan-teks').html('');
-                    jQuery('#isu-teks').html('');
-                });
-        } else {
-            jQuery('#saspok-teks').html('');
-            jQuery('#kebijakan-teks').html('');
-            jQuery('#isu-teks').html('');
-        }
-    });
-
-    jQuery('#misi-teks').on('change', function() {
-        var id_misi = jQuery(this).val();
-        if (id_misi) {
-            get_rpjpd('esakip_rpjpd_sasaran', id_misi)
-                .then(function(data) {
-                    var html = '<option value="">Pilih sasaran pokok RPJPD</option>';
-                    data.map(function(b, i) {
-                        html += '<option value="' + b.id + '">' + b.saspok_teks + '</option>';
-                    });
-                    jQuery('#saspok-teks').html(html);
-                    jQuery('#kebijakan-teks').html('');
-                    jQuery('#isu-teks').html('');
-                });
-        } else {
-            jQuery('#kebijakan-teks').html('');
-            jQuery('#isu-teks').html('');
-        }
-    });
-
-    jQuery('#saspok-teks').on('change', function() {
-        var id_saspok = jQuery(this).val();
-        if (id_saspok) {
-            get_rpjpd('esakip_rpjpd_kebijakan', id_saspok)
-                .then(function(data) {
-                    var html = '<option value="">Pilih kebijakan RPJPD</option>';
-                    data.map(function(b, i) {
-                        html += '<option value="' + b.id + '">' + b.kebijakan_teks + '</option>';
-                    });
-                    jQuery('#kebijakan-teks').html(html);
-                    jQuery('#isu-teks').html('');
-                });
-        } else {
-            jQuery('#isu-teks').html('');
-        }
-    });
-
-    jQuery('#kebijakan-teks').on('change', function() {
-        var id_kebijakan = jQuery(this).val();
-        if (id_kebijakan) {
-            get_rpjpd('esakip_rpjpd_isu', id_kebijakan)
-                .then(function(data) {
-                    var html = '<option value="">Pilih isu RPJPD</option>';
-                    data.map(function(b, i) {
-                        html += '<option value="' + b.id + '">' + b.isu_teks + '</option>';
-                    });
-                    jQuery('#isu-teks').html(html);
-                });
-        }
-    });
-
-    jQuery('#modal-monev').on('hidden.bs.modal', function() {
-        refresh_page();
-    });
 
     function refresh_page() {
         if (edit_val) {
