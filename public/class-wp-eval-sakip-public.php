@@ -698,6 +698,36 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		return in_array('admin_panrb', $current_user->roles);
 	}
 
+	public function hak_akses_upload_dokumen($nama_dokumen,$tahun_anggaran)
+	 	{    
+		    global $wpdb;
+		    $current_user = wp_get_current_user();
+		    $user_roles = $current_user->roles;
+		    $is_administrator = in_array('administrator', $user_roles);
+
+		    $admin_role_pemda = array(
+		      'admin_bappeda',
+		      'admin_ortala'
+		    );
+
+		      $this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2 ;
+
+		    $cek_settingan_menu = $wpdb->get_var(
+		      $wpdb->prepare(
+		      "SELECT 
+		        jenis_role
+		      FROM esakip_menu_dokumen 
+		      WHERE nama_dokumen=%s
+		      AND user_role='perangkat_daerah' 
+		      AND active = 1
+		      AND tahun_anggaran=%d
+		    ", $nama_dokumen, $tahun_anggaran)
+		    );
+
+		    $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
+		    return $hak_akses_user;
+	  	}
+
 	public function dokumen_detail_dpa_pemda($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
@@ -5548,9 +5578,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
+						if ($this->hak_akses_upload_dokumen('IKU', $tahun_anggaran)){	
 						if (!$this->is_admin_panrb()) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_iku(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_iku(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+						}
 						}
 						$btn .= '</div>';
 
