@@ -501,7 +501,7 @@ foreach ($data_all['data'] as $visi) {
         margin: 3px;
     }
 </style>
-<h4 style="text-align: center; margin: 0; font-weight: bold;">Monitoring dan Evaluasi RPJPD (Rencana Pembangunan Jangka Panjang Daerah) <br><?php echo $nama_pemda; ?><br>Tahun <?php echo $tahun_awal; ?> - <?php echo $tahun_akhir; ?></h4>
+<h4 style="text-align: center; margin: 0; font-weight: bold;">Input RPJPD <?php echo $jadwal['nama_jadwal']; ?> <br><?php echo $nama_pemda; ?><br>Tahun <?php echo $tahun_awal; ?> - <?php echo $tahun_akhir; ?></h4>
 <div id="action-sakip"></div>
 <div id="action-section"></div>
 <div id="cetak" title="Laporan RPJPD" style="padding: 5px; overflow: auto; height: 80vh;">
