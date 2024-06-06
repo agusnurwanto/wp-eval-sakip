@@ -28,7 +28,6 @@ foreach ($idtahun as $val) {
     }
     $tahun .= "<option value='$val[tahun_anggaran]' $selected>$val[tahun_anggaran]</option>";
 }
-$tipe_dokumen = "dokumen_lainnya";
 
 $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
@@ -171,7 +170,6 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 action: 'get_table_dokumen_pemerintah_daerah',
                 api_key: esakip.api_key,
                 tahun_anggaran: '<?php echo $input['tahun'] ?>',
-                tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
             },
             dataType: 'json',
             success: function(response) {
@@ -287,7 +285,6 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 action: 'get_detail_dokumen_by_id_pemerintah_daerah',
                 api_key: esakip.api_key,
                 id: id,
-				tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
             },
             dataType: 'json',
             success: function(response) {
