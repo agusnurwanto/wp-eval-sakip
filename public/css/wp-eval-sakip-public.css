@@ -209,8 +209,29 @@ thead {
     padding: 20px 0;
     text-align: center;
 }
-@media  print {
+@media print {
     .hide-print {
         display: none;
     }
+}
+.edit-mapping,
+.edit-monev,
+.edit-monev-file {
+    border: 2px solid;
+    padding: 2px;
+    border-radius: 50%;
+    color: #2196f3;
+    margin-left: 10px;
+    cursor: pointer;
+}
+.edit-monev {
+    padding: 1px 1px 7px;
+}
+#tambah-data {
+    text-decoration: none;
+}
+.edit-mapping:hover,
+.edit-monev:hover {
+    background: #00bcd4;
+    color: #fff;
 }

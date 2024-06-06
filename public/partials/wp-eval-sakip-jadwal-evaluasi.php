@@ -14,6 +14,15 @@ if (!empty($_GET) && !empty($_GET['tahun_anggaran'])) {
 }
 $tahun_anggaran = $input['tahun_anggaran'];
 
+$url_cek_dokumen = '';
+$cek_dokumen = $this->functions->generatePage(array(
+	'nama_page' => 'Halaman Cek Dokumen | '. $tahun_anggaran,
+	'content' => '[halaman_cek_dokumen tahun_anggaran="' . $tahun_anggaran . '"]',
+	'show_header' => 1,
+	'no_key' => 1,
+	'post_status' => 'private'
+));
+$url_cek_dokumen .= $cek_dokumen['url'];
 ?>
 <style>
 	.bulk-action {
@@ -427,29 +436,41 @@ $tahun_anggaran = $input['tahun_anggaran'];
 						    <div class="col-md-6">
 						    	<select class="form-control list_perangkat_daerah" id="list_perangkat_daerah"></select>
 						    </div>
-					    </div></br>
+					    </div>
+					    <br/>
+					    <div class="row">
+					    	<div class="col-md-2">Jenis Laporan</div>
+					    	<div class="col-md-6">
+					      		<select class="form-control jenis" id="jenis">
+					      			<option value="-">Pilih Jenis</option>
+									<option value="halaman_cek_dokumen">Monitor Upload Dokumen</option>
+				      			</select>
+					    	</div>
+					    </div>
+					    <br/>
 					    <div class="row">
 					    	<div class="col-md-2"></div>
 					    	<div class="col-md-6 action-footer">
 					      		<button type="button" class="btn btn-success btn-preview" onclick="cek('${id}')">Proses</button>
 					    	</div>
-					    </div></br>
+					    </div>
 					</div>
 			      </div>
 			      <div class="modal-cek" style="padding:10px"></div>
 			    </div>
 			  </div>
 			</div>`;
-
 		jQuery("body .report").html(modal);
 		get_jadwal_lke(id)
-		list_perangkat_daerah()
-			.then(function() {
-				jQuery("#modal-report").modal('show');
-				jQuery('.jenis').select2({
-					width: '100%'
-				});
-			})
+			.then(function(response) {
+				list_perangkat_daerah()
+					.then(function() {
+						jQuery("#modal-report").modal('show');
+						jQuery('.jenis').select2({
+							width: '100%'
+						});
+					})
+			});
 	}
 
 	function list_perangkat_daerah() {
@@ -488,5 +509,24 @@ $tahun_anggaran = $input['tahun_anggaran'];
 				return resolve();
 			}
 		})
+	}
+
+	function cek(id) {
+		let jenis = jQuery("#jenis").val();
+		let id_unit = jQuery("#list_perangkat_daerah").val();
+
+		if (id_unit == '' || id_unit == 'undefined') {
+			alert('Unit kerja belum dipilih');
+			return;
+		}
+		switch (jenis) {
+			case 'halaman_cek_dokumen':
+				window.open('<?php echo $url_cek_dokumen; ?>','_blank');
+				break;
+
+			case '-':
+				alert('Jenis laporan belum dipilih');
+				break;
+		}
 	}
 </script>
