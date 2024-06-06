@@ -524,7 +524,8 @@ jQuery(document).ready(function(){
 
 	jQuery(document).on('click', '.view-pokin-level2', function(){
 		pokinLevel2({
-			'parent':jQuery(this).data('id')
+			'parent':jQuery(this).data('id'),
+			'label_parent_1':jQuery(this).parent().parent().find('.label-level1').text()
 		}).then(function(){
 			jQuery("#pokinLevel2").DataTable();
 		});
@@ -712,7 +713,9 @@ jQuery(document).ready(function(){
 
 	jQuery(document).on('click', '.view-pokin-level3', function(){
 		pokinLevel3({
-			'parent':jQuery(this).data('id')
+			'parent':jQuery(this).data('id'),
+			'label_parent_1':jQuery("#table_parent_1").find('.label_parent_1').text(),
+			'label_parent_2':jQuery(this).parent().parent().find('.label-level2').text()
 		}).then(function(){
 			jQuery("#pokinLevel3").DataTable();
 		});
@@ -900,7 +903,10 @@ jQuery(document).ready(function(){
 
 	jQuery(document).on('click', '.view-pokin-level4', function(){
 		pokinLevel4({
-			'parent':jQuery(this).data('id')
+			'parent':jQuery(this).data('id'),
+			'label_parent_1':jQuery("#table_parent_1").find('.label_parent_1').text(),
+			'label_parent_2':jQuery("#table_parent_2").find('.label_parent_2').text(),
+			'label_parent_3':jQuery(this).parent().parent().find('.label-level3').text()
 		}).then(function(){
 			jQuery("#pokinLevel4").DataTable();
 		});
@@ -1204,11 +1210,11 @@ function pokinLevel2(params){
 	          		+`<div style="margin-top:10px">`
           				+`<button type="button" data-parent="${params.parent}" class="btn btn-success mb-2" id="tambah-pokin-level2"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
 	          		+`</div>`
-	          		+`<table class="table">`
+	          		+`<table class="table" id="table_parent_1">`
       					+`<thead>`
 	          				+`<tr>`
 	          					+`<th class="text-center" style="width: 160px;">Level 1</th>`
-	          					+`<th>`+jQuery(`#nav-level-1 tr[id=pokinLevel1_${params.parent}]`).find('td').eq(1).text()+`</th>`
+	          					+`<th class="label_parent_1">${params.label_parent_1}</th>`
 	          				+`</tr>`
       					+`</thead>`
       				+`</table>`
@@ -1281,15 +1287,15 @@ function pokinLevel3(params){
 	          		+`<div style="margin-top:10px">`
           				+`<button type="button" data-parent="${params.parent}" class="btn btn-success mb-2" id="tambah-pokin-level3"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
 	          		+`</div>`
-	          		+`<table class="table">`
+	          		+`<table class="table" id="table_parent_2">`
       					+`<thead>`
 	          				+`<tr>`
 	          					+`<th class="text-center" style="width: 160px;">Level 1</th>`
-	          					+`<th>`+jQuery(`#nav-level-1 tr[id=pokinLevel1_${params.parent}]`).find('td').eq(1).text()+`</th>`
+	          					+`<th class="label_parent_1">${params.label_parent_1}</th>`
 	          				+`</tr>`
 	          				+`<tr>`
 	          					+`<th class="text-center" style="width: 160px;">Level 2</th>`
-	          					+`<th>`+jQuery(`#nav-level-2 tr[id=pokinLevel2_${params.parent}]`).find('td').eq(1).text()+`</th>`
+	          					+`<th class="label_parent_2">${params.label_parent_2}</th>`
 	          				+`</tr>`
       					+`</thead>`
       				+`</table>`
@@ -1362,19 +1368,19 @@ function pokinLevel4(params){
 	          		+`<div style="margin-top:10px">`
           				+`<button type="button" data-parent="${params.parent}" class="btn btn-success mb-2" id="tambah-pokin-level4"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
 	          		+`</div>`
-	          		+`<table class="table">`
+	          		+`<table class="table" id="table_parent_3">`
       					+`<thead>`
 	          				+`<tr>`
 	          					+`<th class="text-center" style="width: 160px;">Level 1</th>`
-	          					+`<th>`+jQuery(`#nav-level-1 tr[id=pokinLevel1_${params.parent}]`).find('td').eq(1).text()+`</th>`
+	          					+`<th class="label_parent_1">${params.label_parent_1}</th>`
 	          				+`</tr>`
 	          				+`<tr>`
 	          					+`<th class="text-center" style="width: 160px;">Level 2</th>`
-	          					+`<th>`+jQuery(`#nav-level-2 tr[id=pokinLevel2_${params.parent}]`).find('td').eq(1).text()+`</th>`
+	          					+`<th class="label_parent_2">${params.label_parent_2}</th>`
 	          				+`</tr>`
 	          				+`<tr>`
 	          					+`<th class="text-center" style="width: 160px;">Level 3</th>`
-	          					+`<th>`+jQuery(`#nav-level-3 tr[id=pokinLevel3_${params.parent}]`).find('td').eq(1).text()+`</th>`
+	          					+`<th class="label_parent_3">${params.label_parent_3}</th>`
 	          				+`</tr>`
       					+`</thead>`
       				+`</table>`
