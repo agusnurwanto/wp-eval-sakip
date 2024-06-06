@@ -49,6 +49,28 @@ $tipe_dokumen = "tl_lhe_akip_internal";
 $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
 $is_admin_panrb = in_array('admin_panrb', $user_roles);
+$is_administrator = in_array('administrator', $user_roles);
+
+    $admin_role_pemda = array(
+        'admin_bappeda',
+        'admin_ortala'
+    );
+
+    $this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2 ;
+
+    $cek_settingan_menu = $wpdb->get_var(
+        $wpdb->prepare(
+        "SELECT 
+            jenis_role
+        FROM esakip_menu_dokumen 
+        WHERE nama_dokumen='TL LHE AKIP Internal'
+          AND user_role='perangkat_daerah' 
+          AND active = 1
+          AND tahun_anggaran=%d
+    ", $input['tahun'])
+    );
+
+    $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
 ?>
 <style type="text/css">
     .wrap-table {
@@ -73,7 +95,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
             <h1 class="text-center" style="margin:3rem;">Dokumen TL LHE AKIP Internal <br><?php echo $skpd['nama_skpd'] ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
-            <?php if (!$is_admin_panrb): ?>
+            <?php if (!$is_admin_panrb && $hak_akses_user): ?>
             <div style="margin-bottom: 25px;">
                 <button class="btn btn-primary" onclick="tambah_dokumen();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
             </div>
