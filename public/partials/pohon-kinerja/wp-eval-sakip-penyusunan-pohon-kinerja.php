@@ -898,6 +898,102 @@ jQuery(document).ready(function(){
 		}
 	});
 
+	jQuery(document).on('click', '.view-pokin-level4', function(){
+		pokinLevel4({
+			'parent':jQuery(this).data('id')
+		}).then(function(){
+			jQuery("#pokinLevel4").DataTable();
+		});
+	})
+
+	jQuery(document).on('click', '#tambah-pokin-level4', function(){
+		jQuery("#modal-crud").find('.modal-title').html('Tambah Pohon Kinerja');
+		jQuery("#modal-crud").find('.modal-body').html(``
+			+`<form id="form-pokin">`				
+				+`<input type="hidden" name="parent" value="${jQuery(this).data('parent')}">`
+				+`<input type="hidden" name="level" value="4">`
+				+`<div class="form-group">`
+						+`<textarea class="form-control" name="label" placeholder="Tuliskan pohon kinerja level 4..."></textarea>`
+				+`</div>`
+			+`</form>`);
+		jQuery("#modal-crud").find('.modal-footer').html(''
+			+'<button type="button" class="btn btn-danger" data-dismiss="modal">'
+				+'Tutup'
+			+'</button>'
+			+'<button type="button" class="btn btn-success" id="simpan-data-pokin" data-action="create_pokin" data-view="pokinLevel4">'
+				+'Simpan'
+			+'</button>');
+		jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
+		jQuery("#modal-crud").find('.modal-dialog').css('width','');
+		jQuery("#modal-crud").modal('show');
+	})
+
+	jQuery(document).on('click', '.edit-pokin-level4', function(){
+		jQuery("#wrap-loading").show();
+		jQuery.ajax({
+			method:'POST',
+			url:ajax.url,
+			data:{
+		  		"action": "edit_pokin",
+		  		"api_key": esakip.api_key,
+		  		'id':jQuery(this).data('id')
+			},
+			dataType:'json',
+			success:function(response){
+				jQuery("#wrap-loading").hide();
+				jQuery("#modal-crud").find('.modal-title').html('Edit Pohon Kinerja');
+				jQuery("#modal-crud").find('.modal-body').html(``
+					+`<form id="form-pokin">`
+						+`<input type="hidden" name="id" value="${response.data.id}">`
+						+`<input type="hidden" name="parent" value="${response.data.parent}">`
+						+`<input type="hidden" name="level" value="${response.data.level}">`
+						+`<div class="form-group">`
+							+`<textarea class="form-control" name="label">${response.data.label}</textarea>`
+						+`</div>`
+					+`</form>`);
+				jQuery("#modal-crud").find(`.modal-footer`).html(``
+					+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
+						+`Tutup`
+					+`</button>`
+					+`<button type="button" class="btn btn-success" id="simpan-data-pokin" data-action="update_pokin" data-view="pokinLevel4">`
+						+`Update`
+					+`</button>`);
+				jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
+				jQuery("#modal-crud").find('.modal-dialog').css('width','');
+				jQuery("#modal-crud").modal('show');
+			}
+		});
+	})
+
+	jQuery(document).on('click', '.hapus-pokin-level4', function(){
+		let parent = jQuery(this).data('parent');
+		if(confirm(`Data akan dihapus?`)){
+			jQuery("#wrap-loading").show();
+			jQuery.ajax({
+				method:'POST',
+				url:ajax.url,
+				data:{
+					'action': 'delete_pokin',
+		      		'api_key': esakip.api_key,
+					'id':jQuery(this).data('id'),
+					'level':4,
+				},
+				dataType:'json',
+				success:function(response){
+					jQuery("#wrap-loading").hide();
+					alert(response.message);
+					if(response.status){
+						pokinLevel4({
+							'parent':parent
+						}).then(function(){
+							jQuery("#pokinLevel4").DataTable();
+						});
+					}
+				}
+			})
+		}
+	});
+
 	jQuery(document).on('click', '#simpan-data-pokin', function(){
 		jQuery('#wrap-loading').show();
 		let modal = jQuery("#modal-crud");
@@ -1147,6 +1243,90 @@ function pokinLevel3(params){
 
 				jQuery("#nav-level-3").html(level3);
 				jQuery('.nav-tabs a[href="#nav-level-3"]').tab('show');
+				jQuery('#modal-pokin').modal('show');
+				resolve();
+    		}
+		});
+	});
+}
+
+function pokinLevel4(params){
+	jQuery("#wrap-loading").show();
+	return new Promise(function(resolve, reject){
+		jQuery.ajax({
+			url: ajax.url,
+	      	type: "post",
+	      	data: {
+	      		"action": "get_data_pokin",
+	      		"level": 4,
+	      		"parent": params.parent_all ?? params.parent,
+	      		"tahun_anggaran": '<?php echo $input['tahun_anggaran']; ?>',
+	      		"api_key": esakip.api_key
+	      	},
+	      	dataType: "json",
+	      	success: function(res){
+          		jQuery('#wrap-loading').hide();
+          		let level4 = ``
+	          		+`<div style="margin-top:10px">`
+          				+`<button type="button" data-parent="${params.parent}" class="btn btn-success mb-2" id="tambah-pokin-level4"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
+	          		+`</div>`
+	          		+`<table class="table">`
+      					+`<thead>`
+	          				+`<tr>`
+	          					+`<th class="text-center" style="width: 160px;">Level 1</th>`
+	          					+`<th>`+jQuery(`#nav-level-1 tr[id=pokinLevel1_${params.parent}]`).find('td').eq(1).text()+`</th>`
+	          				+`</tr>`
+	          				+`<tr>`
+	          					+`<th class="text-center" style="width: 160px;">Level 2</th>`
+	          					+`<th>`+jQuery(`#nav-level-2 tr[id=pokinLevel2_${params.parent}]`).find('td').eq(1).text()+`</th>`
+	          				+`</tr>`
+	          				+`<tr>`
+	          					+`<th class="text-center" style="width: 160px;">Level 3</th>`
+	          					+`<th>`+jQuery(`#nav-level-3 tr[id=pokinLevel3_${params.parent}]`).find('td').eq(1).text()+`</th>`
+	          				+`</tr>`
+      					+`</thead>`
+      				+`</table>`
+	          		+`<table class="table" id="pokinLevel4">`
+	          			+`<thead>`
+	          				+`<tr>`
+	          					+`<th class="text-center" style="width:20%">No</th>`
+	          					+`<th class="text-center" style="width:60%">Label Pohon Kinerja</th>`
+	          					+`<th class="text-center" style="width:20%">Aksi</th>`
+	          				+`</tr>`
+	          			+`</thead>`
+	          			+`<tbody>`;
+			          		res.data.map(function(value, index){
+			          			level4 += ``
+				          			+`<tr>`
+					          			+`<td class="text-center">${index+1}.</td>`
+					          			+`<td class="label-level4">${value.label}</td>`
+					          			+`<td class="text-center">`
+					          				+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-success tambah-indikator-pokin-level4" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
+					          				+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-primary edit-pokin-level4" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`
+				          					+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-danger hapus-pokin-level4" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
+					          			+`</td>`
+					          		+`</tr>`;
+
+					          	let indikator = Object.values(value.indikator);
+					          	if(indikator.length > 0){
+									indikator.map(function(indikator_value, indikator_index){
+										level4 += ``
+								     	+`<tr>`
+								      		+`<td><span style="display:none">${index+1}</span></td>`
+								      		+`<td>${index+1}.${indikator_index+1} ${indikator_value.label}</td>`
+								      		+`<td class="text-center">`
+							      				+`<a href="javascript:void(0)" data-id="${indikator_value.id}" class="btn btn-sm btn-primary edit-indikator-pokin-level4" title="Edit"><i class="dashicons dashicons-edit"></i></a> `
+							      				+`<a href="javascript:void(0)" data-id="${indikator_value.id}" data-parent="${value.parent}" class="btn btn-sm btn-danger hapus-indikator-pokin-level4" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
+								      		+`</td>`
+								      	+`</tr>`;
+									});
+					          	}
+			          		});
+          					level4+=`<tbody>`
+          			+`</table>`;
+
+				jQuery("#nav-level-4").html(level4);
+				jQuery('.nav-tabs a[href="#nav-level-4"]').tab('show');
 				jQuery('#modal-pokin').modal('show');
 				resolve();
     		}
