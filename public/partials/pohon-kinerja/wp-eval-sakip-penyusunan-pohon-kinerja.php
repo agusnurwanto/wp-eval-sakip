@@ -236,7 +236,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 		if($key2==0){
 			$html.='<td>'.$level_2['label'].'</td>';
 		}else{
-			$html.='<tr><td colspan="2"></td><td>'.$level_2['label'].'</td>';
+			$html.='<tr><td></td><td></td><td>'.$level_2['label'].'</td>';
 		}
 		$indikator=[];
 		foreach ($level_2['indikator'] as $indikatorlevel2) {
@@ -247,7 +247,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 			if($key3==0){
 				$html.='<td>'.$level_3['label'].'</td>';
 			}else{
-				$html.='<tr><td colspan="4"></td><td>'.$level_3['label'].'</td>';
+				$html.='<tr><td></td><td></td><td></td><td></td><td>'.$level_3['label'].'</td>';
 			}
 			$indikator=[];
 			foreach ($level_3['indikator'] as $indikatorlevel3) {
@@ -258,7 +258,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 				if($key4==0){
 					$html.='<td>'.$level_4['label'].'</td>';
 				}else{
-					$html.='<tr><td colspan="6"></td><td>'.$level_4['label'].'</td>';
+					$html.='<tr><td></td><td></td><td></td><td></td><td></td><td></td><td>'.$level_4['label'].'</td>';
 				}
 				$indikator=[];
 				foreach ($level_4['indikator'] as $indikatorlevel4) {
@@ -1198,6 +1198,7 @@ function pokinLevel1(){
 
 function pokinLevel2(params){
 	jQuery("#wrap-loading").show();
+	let parent = params.parent_all ?? params.parent;
 	return new Promise(function(resolve, reject){
 		jQuery.ajax({
 			url: esakip.url,
@@ -1205,7 +1206,7 @@ function pokinLevel2(params){
 	      	data: {
 	      		"action": "get_data_pokin",
 	      		"level": 2,
-	      		"parent": params.parent_all ?? params.parent,
+	      		"parent": parent,
 	      		"tahun_anggaran": '<?php echo $input['tahun_anggaran']; ?>',
 	      		"api_key": esakip.api_key
 	      	},
@@ -1214,7 +1215,7 @@ function pokinLevel2(params){
           		jQuery('#wrap-loading').hide();
           		let level2 = ``
 	          		+`<div style="margin-top:10px">`
-          				+`<button type="button" data-parent="${params.parent}" class="btn btn-success mb-2" id="tambah-pokin-level2"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
+          				+`<button type="button" data-parent="${parent}" class="btn btn-success mb-2" id="tambah-pokin-level2"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
 	          		+`</div>`
 	          		+`<table class="table" id="table_parent_1">`
       					+`<thead>`
@@ -1275,6 +1276,7 @@ function pokinLevel2(params){
 
 function pokinLevel3(params){
 	jQuery("#wrap-loading").show();
+	let parent = params.parent_all ?? params.parent;
 	return new Promise(function(resolve, reject){
 		jQuery.ajax({
 			url: esakip.url,
@@ -1282,7 +1284,7 @@ function pokinLevel3(params){
 	      	data: {
 	      		"action": "get_data_pokin",
 	      		"level": 3,
-	      		"parent": params.parent_all ?? params.parent,
+	      		"parent": parent,
 	      		"tahun_anggaran": '<?php echo $input['tahun_anggaran']; ?>',
 	      		"api_key": esakip.api_key
 	      	},
@@ -1291,7 +1293,7 @@ function pokinLevel3(params){
           		jQuery('#wrap-loading').hide();
           		let level3 = ``
 	          		+`<div style="margin-top:10px">`
-          				+`<button type="button" data-parent="${params.parent}" class="btn btn-success mb-2" id="tambah-pokin-level3"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
+          				+`<button type="button" data-parent="${parent}" class="btn btn-success mb-2" id="tambah-pokin-level3"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
 	          		+`</div>`
 	          		+`<table class="table" id="table_parent_2">`
       					+`<thead>`
@@ -1356,6 +1358,7 @@ function pokinLevel3(params){
 
 function pokinLevel4(params){
 	jQuery("#wrap-loading").show();
+	let parent = params.parent_all ?? params.parent;
 	return new Promise(function(resolve, reject){
 		jQuery.ajax({
 			url: esakip.url,
@@ -1363,7 +1366,7 @@ function pokinLevel4(params){
 	      	data: {
 	      		"action": "get_data_pokin",
 	      		"level": 4,
-	      		"parent": params.parent_all ?? params.parent,
+	      		"parent": parent,
 	      		"tahun_anggaran": '<?php echo $input['tahun_anggaran']; ?>',
 	      		"api_key": esakip.api_key
 	      	},
@@ -1372,7 +1375,7 @@ function pokinLevel4(params){
           		jQuery('#wrap-loading').hide();
           		let level4 = ``
 	          		+`<div style="margin-top:10px">`
-          				+`<button type="button" data-parent="${params.parent}" class="btn btn-success mb-2" id="tambah-pokin-level4"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
+          				+`<button type="button" data-parent="${parent}" class="btn btn-success mb-2" id="tambah-pokin-level4"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
 	          		+`</div>`
 	          		+`<table class="table" id="table_parent_3">`
       					+`<thead>`
