@@ -10600,6 +10600,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$tahun_anggaran	= trim(htmlspecialchars($_POST['tahun_anggaran']));
 					$keterangan		= trim(htmlspecialchars($_POST['keterangan']));
 					$lama_pelaksanaan 	= trim(htmlspecialchars($_POST['lama_pelaksanaan']));
+					$relasi_rpjpd 	= $_POST['relasi_rpjpd'];
 					$tipe 	= trim(htmlspecialchars($_POST['tipe']));
 
 
@@ -10609,9 +10610,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$data_jadwal = array(
 						'nama_jadwal' 			=> $nama_jadwal,
 						'tahun_anggaran'		=> $tahun_anggaran,
+						'relasi_perencanaan'	=> $relasi_rpjpd,
 						'keterangan'			=> $keterangan,
 						'tipe'					=> 'RPJMD',
-						'status'					=> '1',
+						'status'				=> '1',
 						'lama_pelaksanaan'		=> $lama_pelaksanaan
 					);
 

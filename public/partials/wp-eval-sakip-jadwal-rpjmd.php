@@ -1,25 +1,44 @@
 <?php
+global $wpdb;
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
+if (!defined('WPINC')) {
 	die;
 }
 
-global $wpdb;
+$select_rpjpd = '';
+$data_rpjpd = $wpdb->get_results(
+	"
+		SELECT
+			id,
+			nama_jadwal
+		FROM
+			esakip_data_jadwal
+		WHERE
+			tipe='RPJPD'
+			and status!=0",
+	ARRAY_A
+);
+
+if (!empty($data_rpjpd)) {
+	foreach ($data_rpjpd as $val_rpjpd) {
+		$select_rpjpd .= '<option value="' . $val_rpjpd['id'] . '">' . $val_rpjpd['nama_jadwal'] . '</option>';
+	}
+}
 
 $body = '';
 ?>
 <style>
-.bulk-action {
-	padding: .45rem;
-	border-color: #eaeaea;
-	vertical-align: middle;
-}
+	.bulk-action {
+		padding: .45rem;
+		border-color: #eaeaea;
+		vertical-align: middle;
+	}
 </style>
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 <div class="cetak">
 	<div style="padding: 10px;margin:0 0 3rem 0;">
-		<input type="hidden" value="<?php echo get_option( '_crb_apikey_esakip' ); ?>" id="api_key">
-	<h1 class="text-center" style="margin:3rem;">Halaman Jadwal RPJMD / RPD</h1>
+		<input type="hidden" value="<?php echo get_option('_crb_apikey_esakip'); ?>" id="api_key">
+		<h1 class="text-center" style="margin:3rem;">Halaman Jadwal RPJMD / RPD</h1>
 		<div style="margin-bottom: 25px;">
 			<button class="btn btn-primary" onclick="tambah_jadwal_rpmd();">Tambah Jadwal</button>
 		</div>
@@ -45,7 +64,7 @@ $body = '';
 			<div class="modal-header">
 				<h5 class="modal-title" id="modalTambahJadwalLabel">Tambah Penjadwalan</h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-				<span aria-hidden="true">&times;</span>
+					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
 			<div class="modal-body">
@@ -55,17 +74,24 @@ $body = '';
 				</div>
 				<div>
 					<label for='tahun_anggaran' style='display:inline-block'>Tahun Mulai Anggaran</label>
-					<input type="number" id='tahun_anggaran' name="tahun_anggaran" style='display:block;width:100%;' placeholder="Tahun Mulai Anggaran"/>
+					<input type="number" id='tahun_anggaran' name="tahun_anggaran" style='display:block;width:100%;' placeholder="Tahun Mulai Anggaran" />
 				</div>
 				<div>
 					<label for='lama_pelaksanaan' style='display:block'>Lama Pelaksanaan</label>
-					<input type="number" id='lama_pelaksanaan' name="lama_pelaksanaan" value="5" style='display:inline-block;width:50%;' placeholder="5"/> Tahun
+					<input type="number" id='lama_pelaksanaan' name="lama_pelaksanaan" value="5" style='display:inline-block;width:50%;' placeholder="5" /> Tahun
 				</div>
 				<div>
 					<label for='keterangan' style='display:inline-block'>Keterangan</label>
 					<input type='text' id='keterangan' style='display:block;width:100%;' placeholder='Input Keterangan'>
 				</div>
-			</div> 
+				<div>
+					<label for="relasi_rpjpd" style='display:inline-block'>Pilih Jadwal RPJPD</label>
+					<select id="relasi_rpjpd" style='display:block;width: 100%;'>
+						<option value="">Pilih RPJPD</option>
+						<?php echo $select_rpjpd; ?>
+					</select>
+				</div>
+			</div>
 			<div class="modal-footer">
 				<button class="btn btn-primary submitBtn" onclick="submitTambahJadwalForm()">Simpan</button>
 				<button type="submit" class="components-button btn btn-secondary" data-dismiss="modal">Tutup</button>
@@ -77,7 +103,7 @@ $body = '';
 <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <script>
-	jQuery(document).ready(function(){
+	jQuery(document).ready(function() {
 
 		globalThis.thisAjaxUrl = "<?php echo admin_url('admin-ajax.php'); ?>"
 
@@ -87,41 +113,40 @@ $body = '';
 	});
 
 	/** get data penjadwalan */
-	function get_data_penjadwalan_rpjmd(){
+	function get_data_penjadwalan_rpjmd() {
 		jQuery("#wrap-loading").show();
 		globalThis.penjadwalanTable = jQuery('#data_penjadwalan_table').DataTable({
 			"processing": true,
 			"serverSide": true,
 			"ajax": {
 				url: thisAjaxUrl,
-				type:"post",
-				data:{
-					'action' 		: "get_data_penjadwalan_rpjmd",
-					'api_key' 		: jQuery("#api_key").val(),
-					'tipe' 			: tipe
+				type: "post",
+				data: {
+					'action': "get_data_penjadwalan_rpjmd",
+					'api_key': jQuery("#api_key").val(),
+					'tipe': tipe
 				}
 			},
-			"initComplete":function( settings, json){
+			"initComplete": function(settings, json) {
 				jQuery("#wrap-loading").hide();
 			},
-			"columns": [
-				{ 
+			"columns": [{
 					"data": "nama_jadwal",
 					className: "text-center"
 				},
-				{ 
+				{
 					"data": "keterangan",
 					className: "text-center"
 				},
-				{ 
+				{
 					"data": "tahun_anggaran",
 					className: "text-center"
 				},
-				{ 
+				{
 					"data": "tahun_anggaran_selesai",
 					className: "text-center"
 				},
-				{ 
+				{
 					"data": "aksi",
 					className: "text-center"
 				}
@@ -130,12 +155,13 @@ $body = '';
 	}
 
 	/** show modal tambah jadwal */
-	function tambah_jadwal_rpmd(){
+	function tambah_jadwal_rpmd() {
 		jQuery("#modalTambahJadwal .modal-title").html("Tambah Penjadwalan");
 		jQuery('#lama_pelaksanaan').val(jQuery('#lama_pelaksanaan'));
-        jQuery('#nama_jadwal').val('').prop('disabled', false);
-        jQuery('#keterangan').val('').prop('disabled', false);
-        jQuery('#tahun_anggaran').val('').prop('disabled', false);
+		jQuery('#relasi_rpjpd').val('');
+		jQuery('#nama_jadwal').val('').prop('disabled', false);
+		jQuery('#keterangan').val('').prop('disabled', false);
+		jQuery('#tahun_anggaran').val('').prop('disabled', false);
 		jQuery("#modalTambahJadwal .submitBtn")
 			.attr("onclick", 'submitTambahJadwalForm()')
 			.attr("disabled", false)
@@ -143,55 +169,57 @@ $body = '';
 		jQuery('#modalTambahJadwal').modal('show');
 		jQuery.ajax({
 			url: thisAjaxUrl,
-			type:"post",
-			data:{
-				'action' 			: "get_lama_pelaksanaan_rpjmd",
-				'api_key' 			: jQuery("#api_key").val(),
-				'tipe' 				: tipe
+			type: "post",
+			data: {
+				'action': "get_lama_pelaksanaan_rpjmd",
+				'api_key': jQuery("#api_key").val(),
+				'tipe': tipe
 			},
 			dataType: "json",
-			success:function(response){
+			success: function(response) {
 				jQuery("#lama_pelaksanaan").val(response.data.lama_pelaksanaan);
 			}
 		})
 	}
 
 	/** Submit tambah jadwal */
-	function submitTambahJadwalForm(){
+	function submitTambahJadwalForm() {
 		jQuery("#wrap-loading").show()
 		let nama_jadwal = jQuery('#nama_jadwal').val()
 		let keterangan = jQuery("#keterangan").val()
+		let relasi_rpjpd = jQuery("#relasi_rpjpd").val()
 		let tahun_anggaran = jQuery("#tahun_anggaran").val()
 		let lama_pelaksanaan = jQuery("#lama_pelaksanaan").val()
-		if(nama_jadwal.trim() == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == ''){
+		if (nama_jadwal.trim() == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '') {
 			jQuery("#wrap-loading").hide()
 			alert("Ada yang kosong, Harap diisi semua")
 			return false
-		}else{
+		} else {
 			jQuery.ajax({
 				url: thisAjaxUrl,
 				type: 'post',
 				dataType: 'json',
-				data:{
-					'action'			: 'submit_jadwal_rpjmd',
-					'api_key'			: jQuery("#api_key").val(),
-					'nama_jadwal'		: nama_jadwal,
-					'tahun_anggaran'	: tahun_anggaran,
-					'keterangan'		: keterangan,
-					'tipe'				: tipe,
-					'lama_pelaksanaan'	: lama_pelaksanaan
+				data: {
+					'action': 'submit_jadwal_rpjmd',
+					'api_key': jQuery("#api_key").val(),
+					'nama_jadwal': nama_jadwal,
+					'tahun_anggaran': tahun_anggaran,
+					'relasi_rpjpd': relasi_rpjpd,
+					'keterangan': keterangan,
+					'tipe': tipe,
+					'lama_pelaksanaan': lama_pelaksanaan
 				},
 				beforeSend: function() {
-					jQuery('.submitBtn').attr('disabled','disabled')
+					jQuery('.submitBtn').attr('disabled', 'disabled')
 				},
-				success: function(response){
+				success: function(response) {
 					jQuery('#modalTambahJadwal').modal('hide')
 					jQuery('#wrap-loading').hide()
-					if(response.status == 'success'){
+					if (response.status == 'success') {
 						alert('Jadwal berhasil ditambahkan')
 						penjadwalanTable.ajax.reload()
 						afterSubmitForm()
-					}else{
+					} else {
 						alert(response.message)
 					}
 				}
@@ -201,26 +229,27 @@ $body = '';
 	}
 
 	/** edit akun ssh usulan */
-	function edit_data_penjadwalan(id){
+	function edit_data_penjadwalan(id) {
 		jQuery('#modalTambahJadwal').modal('show');
 		jQuery("#modalTambahJadwal .modal-title").html("Edit Penjadwalan");
 		jQuery("#modalTambahJadwal .submitBtn")
-			.attr("onclick", 'submitEditJadwalForm('+id+')')
+			.attr("onclick", 'submitEditJadwalForm(' + id + ')')
 			.attr("disabled", false)
 			.text("Simpan");
 		jQuery("#wrap-loading").show()
 		jQuery("#wrap-loading").show()
 		jQuery.ajax({
 			url: thisAjaxUrl,
-			type:"post",
-			data:{
-				'action' 			: "get_data_jadwal_by_id_rpjmd",
-				'api_key' 			: jQuery("#api_key").val(),
-				'id' 	: id
+			type: "post",
+			data: {
+				'action': "get_data_jadwal_by_id_rpjmd",
+				'api_key': jQuery("#api_key").val(),
+				'id': id
 			},
 			dataType: "json",
-			success:function(response){
+			success: function(response) {
 				jQuery("#wrap-loading").hide()
+				jQuery("#relasi_rpjpd").val(response.data.relasi_perencanaan).change();
 				jQuery("#nama_jadwal").val(response.data.nama_jadwal);
 				jQuery("#keterangan").val(response.data.keterangan);
 				jQuery("#tahun_anggaran").val(response.data.tahun_anggaran);
@@ -229,42 +258,42 @@ $body = '';
 		})
 	}
 
-	function submitEditJadwalForm(id){
+	function submitEditJadwalForm(id) {
 		jQuery("#wrap-loading").show()
 		let nama_jadwal = jQuery('#nama_jadwal').val()
 		let keterangan = jQuery("#keterangan").val()
 		let tahun_anggaran = jQuery("#tahun_anggaran").val()
 		let lama_pelaksanaan = jQuery("#lama_pelaksanaan").val()
-		if(nama_jadwal.trim() == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == ''){
+		if (nama_jadwal.trim() == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '') {
 			jQuery("#wrap-loading").hide()
 			alert("Ada yang kosong, Harap diisi semua")
 			return false
-		}else{
+		} else {
 			jQuery.ajax({
 				url: thisAjaxUrl,
 				type: 'post',
 				dataType: 'json',
-				data:{
-					'action'			: 'submit_edit_jadwal_rpjmd',
-					'api_key'			: jQuery("#api_key").val(),
-					'nama_jadwal'		: nama_jadwal,
-					'id'				: id,
-					'keterangan'		: keterangan,
-					'tahun_anggaran'	: tahun_anggaran,
-					'tipe'				: tipe,
-					'lama_pelaksanaan'	: lama_pelaksanaan
+				data: {
+					'action': 'submit_edit_jadwal_rpjmd',
+					'api_key': jQuery("#api_key").val(),
+					'nama_jadwal': nama_jadwal,
+					'id': id,
+					'keterangan': keterangan,
+					'tahun_anggaran': tahun_anggaran,
+					'tipe': tipe,
+					'lama_pelaksanaan': lama_pelaksanaan
 				},
 				beforeSend: function() {
-					jQuery('.submitBtn').attr('disabled','disabled')
+					jQuery('.submitBtn').attr('disabled', 'disabled')
 				},
-				success: function(response){
+				success: function(response) {
 					jQuery('#modalTambahJadwal').modal('hide')
 					jQuery('#wrap-loading').hide()
-					if(response.status == 'success'){
+					if (response.status == 'success') {
 						alert('Jadwal berhasil diperbarui')
 						penjadwalanTable.ajax.reload()
 						afterSubmitForm()
-					}else{
+					} else {
 						alert(`GAGAL! \n${response.message}`)
 					}
 				}
@@ -273,25 +302,25 @@ $body = '';
 		jQuery('#modalTambahJadwal').modal('hide');
 	}
 
-	function hapus_data_penjadwalan(id){
+	function hapus_data_penjadwalan(id) {
 		let confirmDelete = confirm("Apakah anda yakin akan menghapus penjadwalan?");
-		if(confirmDelete){
+		if (confirmDelete) {
 			jQuery('#wrap-loading').show();
 			jQuery.ajax({
 				url: thisAjaxUrl,
-				type:'post',
-				data:{
-					'action' 	: 'delete_jadwal_rpjmd',
-					'api_key'	: jQuery("#api_key").val(),
-					'id'		: id
+				type: 'post',
+				data: {
+					'action': 'delete_jadwal_rpjmd',
+					'api_key': jQuery("#api_key").val(),
+					'id': id
 				},
 				dataType: 'json',
-				success:function(response){
+				success: function(response) {
 					jQuery('#wrap-loading').hide();
-					if(response.status == 'success'){
+					if (response.status == 'success') {
 						alert('Jadwal berhasil dihapus!.');
-						penjadwalanTable.ajax.reload();	
-					}else{
+						penjadwalanTable.ajax.reload();
+					} else {
 						alert(`GAGAL! \n${response.message}`);
 					}
 				}
@@ -299,12 +328,11 @@ $body = '';
 		}
 	}
 
-	function afterSubmitForm(){
+	function afterSubmitForm() {
 		jQuery("#nama_jadwal").val("")
 		jQuery("#keterangan").val("")
 		jQuery("#tahun_anggaran").val("")
 		jQuery("#tipe").val("")
 		jQuery("#lama_pelaksanaan").val("")
 	}
-
-</script> 
+</script>
