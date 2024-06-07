@@ -116,10 +116,12 @@ $is_administrator = in_array('administrator', $user_roles);
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
             <h1 class="text-center" style="margin:3rem;">Dokumen RENSTRA <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1>
-            <?php if (!$is_admin_panrb && $hak_akses_user): ?>
-            <div style="margin-bottom: 25px;">
-                <button class="btn btn-primary" onclick="tambah_dokumen_renstra();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
-            </div>
+            <?php if ($hak_akses_user): ?>
+                <?php if (!$is_admin_panrb): ?>
+                    <div style="margin-bottom: 25px;">
+                        <button class="btn btn-primary" onclick="tambah_dokumen_renstra();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
+                    </div>
+                <?php endif; ?>
             <?php endif; ?>
             <div class="wrap-table">
                 <table id="table_dokumen_renstra" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
