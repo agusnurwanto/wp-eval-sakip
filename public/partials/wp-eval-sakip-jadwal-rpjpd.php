@@ -214,7 +214,7 @@ $body = '';
 			url: thisAjaxUrl,
 			type:"post",
 			data:{
-				'action' 			: "get_data_jadwal_by_id",
+				'action' 			: "get_data_jadwal_by_id_rpjpd",
 				'api_key' 			: jQuery("#api_key").val(),
 				'id' 	: id
 			},
