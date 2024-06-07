@@ -61,7 +61,6 @@ $data_all = array(
     'pemutakhiran_program' => 0
 );
 
-$add_rpd = '';
 $body_monev = '';
 $tujuan_ids = array();
 $sasaran_ids = array();
@@ -712,11 +711,10 @@ foreach ($data_all['data'] as $tujuan) {
             }
 
             $isMutakhir = '';
-            if (!empty($add_rpd)) {
-                if ($program['statusMutakhirProgram']) {
-                    $isMutakhir = '<button class="btn-sm btn-warning" onclick="tampilProgram(\'' . $program['id_unik'] . '\')" style="margin: 1px;"><i class="dashicons dashicons-update" title="Mutakhirkan"></i></button>';
-                }
+            if ($program['statusMutakhirProgram']) {
+                $isMutakhir = '<button class="btn-sm btn-warning" onclick="tampilProgram(\'' . $program['id_unik'] . '\')" style="margin: 1px;"><i class="dashicons dashicons-update" title="Mutakhirkan"></i></button>';
             }
+
 
             $body .= '
 				<tr class="tr-program" data-kode-skpd="' . $program['kode_skpd'] . '" ' . $warning . '>
@@ -1221,7 +1219,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
         let data_all = <?php echo json_encode($data_all); ?>;
 
         var aksi = '' +
-            '<?php echo $add_rpd; ?>' +
+            '<a style="margin-left: 10px;" id="tambah-data" onclick="return false;" href="#" class="btn btn-success">Tambah Data RPD</a><br><br>' +
             '<h3 style="margin-top: 20px;">SETTING</h3>' +
             '<label><input type="checkbox" onclick="tampilkan_edit(this);"> Edit Data RPJMD</label>' +
             '<label style="margin-left: 20px;"><input type="checkbox" onclick="show_debug(this);"> Debug Cascading RPJMD</label>' +
@@ -2496,7 +2494,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 url: esakip.url,
                 type: "post",
                 data: {
-                    "action": "simpan_rpd",
+                    "action": "esakip_simpan_rpd",
                     "api_key": "<?php echo $api_key; ?>",
                     "table": 'esakip_rpd_tujuan',
                     "data": tujuan_teks,
@@ -2544,7 +2542,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 url: esakip.url,
                 type: "post",
                 data: {
-                    "action": "simpan_rpd",
+                    "action": "esakip_simpan_rpd",
                     "api_key": "<?php echo $api_key; ?>",
                     "table": 'esakip_rpd_sasaran',
                     "data": sasaran_teks,
@@ -2587,7 +2585,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 url: esakip.url,
                 type: "post",
                 data: {
-                    "action": "simpan_rpd",
+                    "action": "esakip_simpan_rpd",
                     "api_key": "<?php echo $api_key; ?>",
                     "table": 'esakip_rpd_program',
                     "data": id_program_master,
@@ -2931,7 +2929,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 url: esakip.url,
                 type: "post",
                 data: {
-                    "action": "simpan_rpd",
+                    "action": "esakip_simpan_rpd",
                     "api_key": "<?php echo $api_key; ?>",
                     "table": 'esakip_rpd_program',
                     "data": program_teks_indikator,
@@ -2968,7 +2966,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 url: esakip.url,
                 type: "post",
                 data: {
-                    "action": "get_rpjpd",
+                    "action": "esakip_get_rpjpd",
                     "api_key": "<?php echo $api_key; ?>",
                     "table": table,
                     "id": id
