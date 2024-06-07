@@ -1217,6 +1217,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
 <script type="text/javascript">
     jQuery(document).ready(function() {
         let data_all = <?php echo json_encode($data_all); ?>;
+        window.edit_val = false;
 
         var aksi = '' +
             '<a style="margin-left: 10px;" id="tambah-data" onclick="return false;" href="#" class="btn btn-success">Tambah Data RPD</a><br><br>' +
