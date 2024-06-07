@@ -30,6 +30,30 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
     	try {
     		if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( ESAKIP_APIKEY )) {
+
+					switch ($_POST['level']) {
+						case '2':
+							$label_parent = ',
+							(SELECT label FROM esakip_pohon_kinerja WHERE id=a.parent) label_parent_1';
+							break;
+
+						case '3':
+							$label_parent = ',
+							(SELECT label FROM esakip_pohon_kinerja WHERE id=(SELECT parent FROM esakip_pohon_kinerja WHERE id=a.parent)) label_parent_1,
+								(SELECT label FROM esakip_pohon_kinerja WHERE id=a.parent) label_parent_2';
+							break;
+
+						case '4':
+							$label_parent = ',
+							(SELECT label FROM esakip_pohon_kinerja WHERE id=(SELECT parent FROM esakip_pohon_kinerja WHERE id=(SELECT parent FROM esakip_pohon_kinerja WHERE id=a.parent))) label_parent_1,
+							(SELECT label FROM esakip_pohon_kinerja WHERE id=(SELECT parent FROM esakip_pohon_kinerja WHERE id=a.parent)) label_parent_2,
+							(SELECT label FROM esakip_pohon_kinerja WHERE id=a.parent) label_parent_3';
+							break;
+						
+						default:
+							$label_parent = '';
+							break;
+					}
 					
 					$dataPokin = $wpdb->get_results($wpdb->prepare("
 						SELECT 
@@ -39,6 +63,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							a.active,
 							b.id AS id_indikator,
 							b.label_indikator_kinerja
+							".$label_parent."
 						FROM esakip_pohon_kinerja a
 							LEFT JOIN esakip_pohon_kinerja b 
 								ON a.id=b.parent AND a.level=b.level 
@@ -54,20 +79,37 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						1
 					), ARRAY_A);
 
-					$data = [];
+					$data = [
+						'data' => [],
+						'parent' => []
+					];
 					foreach ($dataPokin as $key => $pokin) {
-						if(empty($data[$pokin['id']])){
-							$data[$pokin['id']] = [
+
+						if(empty($data['parent'][$pokin['label_parent_1']])){
+							$data['parent'][$pokin['label_parent_1']] = $pokin['label_parent_1'];
+						}
+
+						if(empty($data['parent'][$pokin['label_parent_2']])){
+							$data['parent'][$pokin['label_parent_2']] = $pokin['label_parent_2'];
+						}
+
+						if(empty($data['parent'][$pokin['label_parent_3']])){
+							$data['parent'][$pokin['label_parent_3']] = $pokin['label_parent_3'];
+						}
+
+						if(empty($data['data'][$pokin['id']])){
+							$data['data'][$pokin['id']] = [
 								'id' => $pokin['id'],
 								'label' => $pokin['label'],
 								'parent' => $pokin['parent'],
+								'label_parent_1' => $pokin['label_parent_1'],
 								'indikator' => []
 							];
 						}
 
 						if(!empty($pokin['id_indikator'])){
-							if(empty($data[$pokin['id']]['indikator'][$pokin['id_indikator']])){
-								$data[$pokin['id']]['indikator'][$pokin['id_indikator']] = [
+							if(empty($data['data'][$pokin['id']]['indikator'][$pokin['id_indikator']])){
+								$data['data'][$pokin['id']]['indikator'][$pokin['id_indikator']] = [
 									'id' => $pokin['id_indikator'],
 									'label' => $pokin['label_indikator_kinerja']
 								];
@@ -77,7 +119,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					echo json_encode([
 		    			'status' => true,
-		    			'data' => array_values($data)
+		    			'data' => array_values($data['data']),
+		    			'parent' => array_values($data['parent'])
 		    		]);exit();
 				}else{
 					throw new Exception("API tidak ditemukan!", 1);
@@ -183,12 +226,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						'id' => $input['id']
 					]);
 
-					// $child = $wpdb->update('esakip_pohon_kinerja', [
-					// 	'label' => trim($input['label'])
-					// ], [
-					// 	'parent' => $input['id'],
-					// 	'label_indikator_kinerja' => 'IS NOT NULL'
-					// ]);
+					$child = $wpdb->query($wpdb->prepare("UPDATE esakip_pohon_kinerja SET label=%s WHERE parent=%d AND label_indikator_kinerja IS NOT NULL", trim($input['label']), $input['id']));
 
 					echo json_encode([
 		    			'status' => true,
