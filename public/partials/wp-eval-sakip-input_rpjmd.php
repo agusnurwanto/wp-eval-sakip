@@ -1841,36 +1841,38 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 jQuery('#indikator-teks-tujuan-catatan').val('');
                 jQuery('#modal-tujuan-indikator').modal('show');
                 for (var b in res.data_all) {
-                    res.data_all[b].rpjpd.visi.data.data.map(function(bb, ii) {
-                        if (bb.id == res.data_all[b].rpjpd.visi.id) {
-                            jQuery('#visi-teks-indikator').html(bb.visi_teks);
-                        }
-                    });
+                    if(res.data_all[b].rpjpd){
+                        res.data_all[b].rpjpd.visi.data.data.map(function(bb, ii) {
+                            if (bb.id == res.data_all[b].rpjpd.visi.id) {
+                                jQuery('#visi-teks-indikator').html(bb.visi_teks);
+                            }
+                        });
 
-                    res.data_all[b].rpjpd.misi.data.data.map(function(bb, ii) {
-                        if (bb.id == res.data_all[b].rpjpd.misi.id) {
-                            jQuery('#misi-teks-indikator').html(bb.misi_teks);
-                        }
-                    });
+                        res.data_all[b].rpjpd.misi.data.data.map(function(bb, ii) {
+                            if (bb.id == res.data_all[b].rpjpd.misi.id) {
+                                jQuery('#misi-teks-indikator').html(bb.misi_teks);
+                            }
+                        });
 
-                    res.data_all[b].rpjpd.sasaran.data.data.map(function(bb, ii) {
-                        if (bb.id == res.data_all[b].rpjpd.sasaran.id) {
-                            jQuery('#saspok-teks-indikator').html(bb.saspok_teks);
-                        }
-                    });
+                        res.data_all[b].rpjpd.sasaran.data.data.map(function(bb, ii) {
+                            if (bb.id == res.data_all[b].rpjpd.sasaran.id) {
+                                jQuery('#saspok-teks-indikator').html(bb.saspok_teks);
+                            }
+                        });
 
-                    res.data_all[b].rpjpd.kebijakan.data.data.map(function(bb, ii) {
-                        var selected = '';
-                        if (bb.id == res.data_all[b].rpjpd.kebijakan.id) {
-                            jQuery('#kebijakan-teks-indikator').html(bb.kebijakan_teks);
-                        }
-                    });
+                        res.data_all[b].rpjpd.kebijakan.data.data.map(function(bb, ii) {
+                            var selected = '';
+                            if (bb.id == res.data_all[b].rpjpd.kebijakan.id) {
+                                jQuery('#kebijakan-teks-indikator').html(bb.kebijakan_teks);
+                            }
+                        });
 
-                    res.data_all[b].rpjpd.isu.data.data.map(function(bb, ii) {
-                        if (bb.id == res.data_all[b].rpjpd.isu.id) {
-                            jQuery('#isu-teks-indikator').html(bb.isu_teks);
-                        }
-                    });
+                        res.data_all[b].rpjpd.isu.data.data.map(function(bb, ii) {
+                            if (bb.id == res.data_all[b].rpjpd.isu.id) {
+                                jQuery('#isu-teks-indikator').html(bb.isu_teks);
+                            }
+                        });
+                    }
 
                     jQuery('#tujuan-teks-indikator').html(res.data_all[b].nama);
                     jQuery('#modal-tujuan-indikator').attr('id-tujuan', res.data_all[b].id_unik);
@@ -2128,55 +2130,65 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
             success: function(res) {
                 jQuery('#wrap-loading').hide();
                 for (var b in res.data_all) {
-                    var visi_html = '<option value="">Pilih visi RPJPD</option>';
-                    res.data_all[b].rpjpd.visi.data.data.map(function(bb, ii) {
-                        var selected = '';
-                        if (bb.id == res.data_all[b].rpjpd.visi.id) {
-                            selected = 'selected';
-                        }
-                        visi_html += '<option ' + selected + ' value="' + bb.id + '">' + bb.visi_teks + '</option>';
-                    });
-                    jQuery('#visi-teks').html(visi_html);
+                    if(res.data_all[b].rpjpd.visi.data.data){
+                        var visi_html = '<option value="">Pilih Visi RPJPD</option>';
+                        res.data_all[b].rpjpd.visi.data.data.map(function(bb, ii) {
+                            var selected = '';
+                            if (bb.id == res.data_all[b].rpjpd.visi.id) {
+                                selected = 'selected';
+                            }
+                            visi_html += '<option ' + selected + ' value="' + bb.id + '">' + bb.visi_teks + '</option>';
+                        });
+                        jQuery('#visi-teks').html(visi_html);
+                    }
 
-                    var misi_html = '<option value="">Pilih misi RPJPD</option>';
-                    res.data_all[b].rpjpd.misi.data.data.map(function(bb, ii) {
-                        var selected = '';
-                        if (bb.id == res.data_all[b].rpjpd.misi.id) {
-                            selected = 'selected';
-                        }
-                        misi_html += '<option ' + selected + ' value="' + bb.id + '">' + bb.misi_teks + '</option>';
-                    });
-                    jQuery('#misi-teks').html(misi_html);
+                    if(res.data_all[b].rpjpd.misi.data.data){
+                        var misi_html = '<option value="">Pilih misi RPJPD</option>';
+                        res.data_all[b].rpjpd.misi.data.data.map(function(bb, ii) {
+                            var selected = '';
+                            if (bb.id == res.data_all[b].rpjpd.misi.id) {
+                                selected = 'selected';
+                            }
+                            misi_html += '<option ' + selected + ' value="' + bb.id + '">' + bb.misi_teks + '</option>';
+                        });
+                        jQuery('#misi-teks').html(misi_html);
+                    }
 
-                    var saspok_html = '<option value="">Pilih sasaran RPJPD</option>';
-                    res.data_all[b].rpjpd.sasaran.data.data.map(function(bb, ii) {
-                        var selected = '';
-                        if (bb.id == res.data_all[b].rpjpd.sasaran.id) {
-                            selected = 'selected';
-                        }
-                        saspok_html += '<option ' + selected + ' value="' + bb.id + '">' + bb.saspok_teks + '</option>';
-                    });
-                    jQuery('#saspok-teks').html(saspok_html);
+                    if(res.data_all[b].rpjpd.sasaran.data.data){
+                        var saspok_html = '<option value="">Pilih sasaran RPJPD</option>';
+                        res.data_all[b].rpjpd.sasaran.data.data.map(function(bb, ii) {
+                            var selected = '';
+                            if (bb.id == res.data_all[b].rpjpd.sasaran.id) {
+                                selected = 'selected';
+                            }
+                            saspok_html += '<option ' + selected + ' value="' + bb.id + '">' + bb.saspok_teks + '</option>';
+                        });
+                        jQuery('#saspok-teks').html(saspok_html);
+                    }
 
-                    var kebijakan_html = '<option value="">Pilih kebijakan RPJPD</option>';
-                    res.data_all[b].rpjpd.kebijakan.data.data.map(function(bb, ii) {
-                        var selected = '';
-                        if (bb.id == res.data_all[b].rpjpd.kebijakan.id) {
-                            selected = 'selected';
-                        }
-                        kebijakan_html += '<option ' + selected + ' value="' + bb.id + '">' + bb.kebijakan_teks + '</option>';
-                    });
-                    jQuery('#kebijakan-teks').html(kebijakan_html);
+                    if(res.data_all[b].rpjpd.kebijakan.data.data){
+                        var kebijakan_html = '<option value="">Pilih kebijakan RPJPD</option>';
+                        res.data_all[b].rpjpd.kebijakan.data.data.map(function(bb, ii) {
+                            var selected = '';
+                            if (bb.id == res.data_all[b].rpjpd.kebijakan.id) {
+                                selected = 'selected';
+                            }
+                            kebijakan_html += '<option ' + selected + ' value="' + bb.id + '">' + bb.kebijakan_teks + '</option>';
+                        });
+                        jQuery('#kebijakan-teks').html(kebijakan_html);
+                    }
 
-                    var isu_html = '<option value="">Pilih isu RPJPD</option>';
-                    res.data_all[b].rpjpd.isu.data.data.map(function(bb, ii) {
-                        var selected = '';
-                        if (bb.id == res.data_all[b].rpjpd.isu.id) {
-                            selected = 'selected';
-                        }
-                        isu_html += '<option ' + selected + ' value="' + bb.id + '">' + bb.isu_teks + '</option>';
-                    });
-                    jQuery('#isu-teks').html(isu_html);
+                    if(res.data_all[b].rpjpd.isu.data.data){
+                        var isu_html = '<option value="">Pilih isu RPJPD</option>';
+                        res.data_all[b].rpjpd.isu.data.data.map(function(bb, ii) {
+                            var selected = '';
+                            if (bb.id == res.data_all[b].rpjpd.isu.id) {
+                                selected = 'selected';
+                            }
+                            isu_html += '<option ' + selected + ' value="' + bb.id + '">' + bb.isu_teks + '</option>';
+                        });
+                        jQuery('#isu-teks').html(isu_html);
+                    }
 
                     jQuery('#tujuan-teks').val(res.data_all[b].nama);
                     jQuery('#no-urut-teks-tujuan').val(res.data_all[b].no_urut);

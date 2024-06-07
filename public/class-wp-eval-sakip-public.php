@@ -21105,7 +21105,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						}
 					}
 
-					$ret['data'] = $data_all;
+					$ret['data_all'] = $data_all;
 				} else {
 					$ret = array(
 						'status'  => 'error',
