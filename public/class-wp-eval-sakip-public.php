@@ -4490,17 +4490,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_dokumen = $_POST['id_dokumen'];
 					$ret['message'] = 'Berhasil edit data!';
 				}
-				if (!empty($_POST['id_jadwal'])) {
-					$id_jadwal = $_POST['id_jadwal'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Id Jadwal kosong!';
-				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
 				} else {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Keterangan kosong!';
+				}
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
 				}
 				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
 					$ret['status'] = 'error';
@@ -4515,7 +4515,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
 
-				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
+				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
@@ -4572,7 +4572,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'status' => 'error',
 								'message' => 'Gagal menyimpan data ke database!'
 							);
-						}
+						} 
 					} else {
 						$opsi = array(
 							'keterangan' => $keterangan,
@@ -18726,17 +18726,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_dokumen = $_POST['id_dokumen'];
 					$ret['message'] = 'Berhasil edit data!';
 				}
-				if (!empty($_POST['id_jadwal'])) {
-					$id_jadwal = $_POST['id_jadwal'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Id Jadwal kosong!';
-				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
 				} else {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Keterangan kosong!';
+				}
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
 				}
 				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
 					$ret['status'] = 'error';
@@ -18751,7 +18751,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
 
-				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
+				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
@@ -18800,7 +18800,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'created_at' => current_time('mysql'),
 								'tanggal_upload' => current_time('mysql')
 							),
-							array('%s', '%s', '%s', '%s', '%s')
+							array('%s', '%s', '%s', '%s', '%d')
 						);
 
 						if (!$wpdb->insert_id) {
@@ -18808,7 +18808,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'status' => 'error',
 								'message' => 'Gagal menyimpan data ke database!'
 							);
-						}
+						} 
 					} else {
 						$opsi = array(
 							'keterangan' => $keterangan,
