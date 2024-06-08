@@ -461,7 +461,7 @@ $is_administrator = in_array('administrator', $user_roles);
         });
     }
 
-    function hapus_tahun_dokumen_tipe(id) {
+    function hapus_tahun_dokumen_laporan_monev_kinerja(id) {
         if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
             return;
         }
@@ -470,9 +470,8 @@ $is_administrator = in_array('administrator', $user_roles);
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'hapus_tahun_dokumen_tipe',
+                action: 'hapus_tahun_dokumen_laporan_monev_kinerja',
                 api_key: esakip.api_key,
-                tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
                 id: id
             },
             dataType: 'json',
@@ -482,7 +481,7 @@ $is_administrator = in_array('administrator', $user_roles);
                 if (response.status === 'success') {
                     alert(response.message);
                     getTableSkpd();
-                    getTableTahun();
+                    getTableLaporanMonevRenaksi();
                 } else {
                     alert(response.message);
                 }
