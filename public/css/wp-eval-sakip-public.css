@@ -236,3 +236,7 @@ thead {
     background: #00bcd4;
     color: #fff;
 }
+
+.modal a {
+    text-decoration: none !important;
+}
