@@ -697,6 +697,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$current_user = wp_get_current_user();
 		return in_array('admin_panrb', $current_user->roles);
 	}
+	public function is_admin_user()
+	{
+	    $current_user = wp_get_current_user();
+	    $cek = array('admin_ortala', 'administrator', 'admin_bappeda');
+	    return array_intersect($cek, $current_user->roles);
+	}
 
 	public function hak_akses_upload_dokumen($nama_dokumen,$tahun_anggaran)
 	 	{    
@@ -4484,17 +4490,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_dokumen = $_POST['id_dokumen'];
 					$ret['message'] = 'Berhasil edit data!';
 				}
-				if (!empty($_POST['id_jadwal'])) {
-					$id_jadwal = $_POST['id_jadwal'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Id Jadwal kosong!';
-				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
 				} else {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Keterangan kosong!';
+				}
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
 				}
 				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
 					$ret['status'] = 'error';
@@ -4509,7 +4515,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
 
-				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
+				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
@@ -4566,7 +4572,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'status' => 'error',
 								'message' => 'Gagal menyimpan data ke database!'
 							);
-						}
+						} 
 					} else {
 						$opsi = array(
 							'keterangan' => $keterangan,
@@ -5195,7 +5201,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						if ($can_verify) {
 							$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
 						}
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('RENJA/RKT', $tahun_anggaran)) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_renja(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_renja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
@@ -5272,7 +5278,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Rencana Aksi', $tahun_anggaran)) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_rencana_aksi(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_rencana_aksi(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
@@ -5384,7 +5390,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						if ($can_verify) {
 							$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
 						}
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Perjanjian Kinerja', $tahun_anggaran)) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_perjanjian_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_perjanjian_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
@@ -5501,7 +5507,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
 						}
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Laporan Kinerja', $tahun_anggaran)) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_laporan_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_laporan_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
@@ -5578,11 +5584,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if ($this->hak_akses_upload_dokumen('IKU', $tahun_anggaran)){	
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('IKU', $tahun_anggaran)) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_iku(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_iku(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
-						}
 						}
 						$btn .= '</div>';
 
@@ -5657,7 +5661,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Dokumen Lainnya', $tahun_anggaran)) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_lain(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_lain(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
@@ -5734,7 +5738,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Evaluasi Internal', $tahun_anggaran)) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_evaluasi_internal(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_evaluasi_internal(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
@@ -5811,7 +5815,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Pengukuran Kinerja', $tahun_anggaran)) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_pengukuran_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_pengukuran_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
@@ -5888,7 +5892,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Pengukuran Rencana Aksi', $tahun_anggaran)) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_pengukuran_rencana_aksi(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_pengukuran_rencana_aksi(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
@@ -5957,7 +5961,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('LKJIP/LPPD', $tahun_anggaran)) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_lkjip(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_lkjip(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
@@ -6026,7 +6030,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Dokumen Lainnya', $tahun_anggaran)) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_pemda_lain(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_pemda_lain(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
@@ -6164,7 +6168,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('RKPD', $tahun_anggaran)) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_rkpd(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_rkpd(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
@@ -6276,7 +6280,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						// if($can_verify){
 						// 	$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
 						// }
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && !$this->is_admin_user()) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_renstra(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_renstra(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
@@ -6353,7 +6357,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('SKP', $tahun_anggaran)) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_skp(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_skp(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
@@ -6413,6 +6417,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 
 				if ($ret['status'] == 'success') {
+
+				// untuk mengatur judul halaman sesuai tipe dokumen
+					$nama_page = array(
+						"pohon_kinerja_dan_cascading" => "Pohon Kinerja dan Cascading",
+						"lhe_akip_internal" => "LHE AKIP Internal",
+						"tl_lhe_akip_internal" => "TL LHE AKIP Internal",
+						"tl_lhe_akip_kemenpan" => "TL LHE AKIP Kemenpan"
+					);
 					// untuk mengatur tabel sesuai tipe dokumen
 					$nama_tabel = array(
 						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading",
@@ -6446,7 +6458,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 							$btn = '<div class="btn-action-group">';
 							$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-							if (!$this->is_admin_panrb()) {
+							if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen($nama_page[$tipe_dokumen], $tahun_anggaran)) {
 								$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 								$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 							}
@@ -10458,6 +10470,34 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($return));
 	}
 
+	public function get_data_jadwal_by_id_rpjmd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				$ret['data'] = $wpdb->get_row($wpdb->prepare('
+                    SELECT 
+                        *
+                    FROM esakip_data_jadwal
+                    WHERE id=%d
+                ', $_POST['id']), ARRAY_A);
+			} else {
+				$ret['status']  = 'error';
+				$ret['message'] = 'Api key tidak ditemukan!';
+			}
+		} else {
+			$ret['status']  = 'error';
+			$ret['message'] = 'Format Salah!';
+		}
+
+		die(json_encode($ret));
+	}
+
 	/** Ambil data penjadwalan RPJPD */
 	public function get_data_penjadwalan_rpjpd()
 	{
@@ -10572,6 +10612,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$tahun_anggaran	= trim(htmlspecialchars($_POST['tahun_anggaran']));
 					$keterangan		= trim(htmlspecialchars($_POST['keterangan']));
 					$lama_pelaksanaan 	= trim(htmlspecialchars($_POST['lama_pelaksanaan']));
+					$relasi_rpjpd 	= $_POST['relasi_rpjpd'];
 					$tipe 	= trim(htmlspecialchars($_POST['tipe']));
 
 
@@ -10581,9 +10622,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$data_jadwal = array(
 						'nama_jadwal' 			=> $nama_jadwal,
 						'tahun_anggaran'		=> $tahun_anggaran,
+						'relasi_perencanaan'	=> $relasi_rpjpd,
 						'keterangan'			=> $keterangan,
 						'tipe'					=> 'RPJMD',
-						'status'					=> '1',
+						'status'				=> '1',
 						'lama_pelaksanaan'		=> $lama_pelaksanaan
 					);
 
@@ -10821,6 +10863,33 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($return));
 	}
 
+	public function get_data_jadwal_by_id_rpjpd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				$ret['data'] = $wpdb->get_row($wpdb->prepare('
+                    SELECT 
+                        *
+                    FROM esakip_data_jadwal
+                    WHERE id=%d
+                ', $_POST['id']), ARRAY_A);
+			} else {
+				$ret['status']  = 'error';
+				$ret['message'] = 'Api key tidak ditemukan!';
+			}
+		} else {
+			$ret['status']  = 'error';
+			$ret['message'] = 'Format Salah!';
+		}
+
+		die(json_encode($ret));
+	}
 
 	/** Submit edit data penjadwalan RPJPD*/
 	public function submit_edit_jadwal_rpjpd()
@@ -11077,7 +11146,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && !$this->is_admin_user()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 
 							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_lainnya(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
@@ -11168,7 +11237,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && !$this->is_admin_user()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 
 							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_other_file(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
@@ -11347,7 +11416,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && !$this->is_admin_user()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 
 							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_renstra(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
@@ -11440,7 +11509,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && !$this->is_admin_user()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 
 							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_laporan_monev_renaksi(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
@@ -11692,7 +11761,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Laporan Monev Renaksi', $tahun_anggaran)) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_laporan_monev_renaksi(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_laporan_monev_renaksi(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
@@ -12027,7 +12096,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Pedoman Teknis Perencanaan', $tahun_anggaran)) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_pedoman_teknis_perencanaan(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_pedoman_teknis_perencanaan(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
@@ -12362,7 +12431,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja', $tahun_anggaran)) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
@@ -12697,7 +12766,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Pedoman Teknis Evaluasi Internal', $tahun_anggaran)) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_pedoman_teknis_evaluasi_internal(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_pedoman_teknis_evaluasi_internal(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
@@ -13136,7 +13205,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && !$this->is_admin_user()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 
 							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_perjanjian_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
@@ -13323,7 +13392,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && !$this->is_admin_user()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 
 							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_rencana_aksi(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
@@ -13509,7 +13578,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && !$this->is_admin_user()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 
 							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_iku(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
@@ -13696,7 +13765,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && !$this->is_admin_user()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 
 							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_evaluasi_internal(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
@@ -13882,7 +13951,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && !$this->is_admin_user()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 
 							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_pengukuran_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
@@ -14068,7 +14137,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && !$this->is_admin_user()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 
 							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_pengukuran_rencana_aksi(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
@@ -14254,7 +14323,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && !$this->is_admin_user()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 
 							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_laporan_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
@@ -14340,7 +14409,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && !$this->is_admin_user()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 
 							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_rkpd(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
@@ -14426,7 +14495,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && !$this->is_admin_user()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 
 							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_lkjip_lppd(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
@@ -14707,7 +14776,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && !$this->is_admin_user()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 
 							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_dpa(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
@@ -14894,7 +14963,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && !$this->is_admin_user()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 
 							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_renja_rkt(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
@@ -14987,7 +15056,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && !$this->is_admin_user()) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 
 							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_skp(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
@@ -15322,7 +15391,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 							$btn = '<div class="btn-action-group">';
 							$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-							if (!$this->is_admin_panrb()) {
+							if (!$this->is_admin_panrb() && !$this->is_admin_user()) {
 								$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 
 								$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_tipe(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
@@ -15920,6 +15989,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			ARRAY_A
 		);
 		$periode_rpjpd = '';
+		$periode_input_rpjpd = '';
 		foreach ($jadwal_periode_rpjpd as $jadwal_periode_item_rpjpd) {
 			$tahun_anggaran_selesai = $jadwal_periode_item_rpjpd['tahun_anggaran'] + $jadwal_periode_item_rpjpd['lama_pelaksanaan'];
 
@@ -15930,6 +16000,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$periode_rpjpd .= '<li><a target="_blank" href="' . $rpjpd['url'] . '" class="btn btn-primary">' . $rpjpd['title'] . '</a></li>';
+
+			$input_rpjpd = $this->functions->generatePage(array(
+				'nama_page' => 'Input RPJPD | ' . $jadwal_periode_item_rpjpd['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item_rpjpd['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[input_rpjpd periode=' . $jadwal_periode_item_rpjpd['id'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$periode_input_rpjpd .= '<li><a target="_blank" href="' . $input_rpjpd['url'] . '" class="btn btn-primary">' . $input_rpjpd['title'] . '</a></li>';
 		}
 
 		$jadwal_periode = $wpdb->get_results(
@@ -15945,6 +16023,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			ARRAY_A
 		);
 		// SAKIP PEMDA
+		$halaman_monitor_upload_dokumen = '';
 		$renja_detail_pemda = '';
 		$iku_detail_pemda = '';
 		$skp_detail_pemda = '';
@@ -15972,9 +16051,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$halaman_renstra = '';
 		$halaman_renstra_opd = '';
 		$halaman_renstra_skpd = '';
+		$periode_rpjmd = '';
+		$periode_input_rpjmd = '';
+		$periode_input_pohon_kinerja_pemda = '';
 
 		// SAKIP Perangkat Daerah
-		$periode_rpjmd = '';
 		$periode_renstra = '';
 		$periode_renstra_skpd = '';
 		$renja_rkt_detail = '';
@@ -16030,6 +16111,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			));
 			$periode_rpjmd .= '<li><a target="_blank" href="' . $rpjmd['url'] . '" class="btn btn-primary">' . $rpjmd['title'] . '</a></li>';
 
+			$input_rpjmd = $this->functions->generatePage(array(
+				'nama_page' => 'Input RPJMD | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[input_rpjmd periode=' . $jadwal_periode_item['id'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$periode_input_rpjmd .= '<li><a target="_blank" href="' . $input_rpjmd['url'] . '" class="btn btn-primary">' . $input_rpjmd['title'] . '</a></li>';
+
+			$input_pohon_kinerja_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'Input Pohon Kinerja | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[penyusunan_pohon_kinerja periode=' . $jadwal_periode_item['id'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$periode_input_pohon_kinerja_pemda .= '<li><a target="_blank" href="#" class="btn btn-primary">' . $input_pohon_kinerja_pemda['title'] . '</a></li>';
+
 			$renstra = $this->functions->generatePage(array(
 				'nama_page' => 'RENSTRA | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
 				'content' => '[renstra periode=' . $jadwal_periode_item['id'] . ']',
@@ -16039,6 +16136,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$periode_renstra .= '<li><a target="_blank" href="' . $renstra['url'] . '" class="btn btn-primary">' . $renstra['title'] . '</a></li>';
 		}
 		// PEMDA
+
+		$monitor_upload_dokumen = $this->functions->generatePage(array(
+			'nama_page' => 'Laporan Upload Dokumen'.$_GET['tahun'],
+			'content' => '[halaman_cek_dokumen tahun=' .$_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$halaman_monitor_upload_dokumen .= '<li><a target="_blank" href="' . $monitor_upload_dokumen['url'] . '" class="btn btn-primary"> Laporan Monitor Upload Dokumen </a></li>';
 
 		if (!empty($cek_data['pemerintah_daerah']['IKU']) && $cek_data['pemerintah_daerah']['IKU']['active'] == 1) {
 			$iku_pemda = $this->functions->generatePage(array(
@@ -16531,6 +16636,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (empty($periode_renstra)) {
 			$periode_renstra = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
 		}
+		if (empty($periode_input_rpjpd)) {
+			$periode_input_rpjpd = '<li><a return="false" href="#" class="btn btn-secondary">Periode Input RPJPD kosong atau belum dibuat</a></li>';
+		}
+		if (empty($periode_input_rpjmd)) {
+			$periode_input_rpjmd = '<li><a return="false" href="#" class="btn btn-secondary">Periode Input RPJMD kosong atau belum dibuat</a></li>';
+		}
+		if (empty($periode_input_pohon_kinerja_pemda)) {
+			$periode_input_pohon_kinerja_pemda = '<li><a return="false" href="#" class="btn btn-secondary">Periode Input Pohon Kinerja kosong atau belum dibuat</a></li>';
+		}
 
 		$halaman_lke = '
 			<div class="accordion">
@@ -16579,6 +16693,35 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				</div>';
 			$cek_data['perangkat_daerah']['RENSTRA']['link'] = $halaman_renstra_opd;
 		}
+		$halaman_input_rpjpd = '
+			<div class="accordion">
+				<h5 class="esakip-header-tahun" data-id="input_rpjpd" style="margin: 0;">Periode Input RPJPD</h5>
+				<div class="esakip-body-tahun" data-id="input_rpjpd">
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+						' . $periode_input_rpjpd . '
+					</ul>
+				</div>
+			</div>';
+
+		$halaman_input_rpjmd = '
+			<div class="accordion">
+				<h5 class="esakip-header-tahun" data-id="input_rpjmd" style="margin: 0;">Periode Input RPJMD</h5>
+				<div class="esakip-body-tahun" data-id="input_rpjmd">
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+						' . $periode_input_rpjmd . '
+					</ul>
+				</div>
+			</div>';
+
+		$halaman_input_pohon_kinerja_pemda = '
+			<div class="accordion">
+				<h5 class="esakip-header-tahun" data-id="input_pohon_kinerja" style="margin: 0;">Periode Input Pohon Kinerja</h5>
+				<div class="esakip-body-tahun" data-id="input_pohon_kinerja">
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+						' . $periode_input_pohon_kinerja_pemda . '
+					</ul>
+				</div>
+			</div>';
 
 		$halaman_sakip = '
 			<div class="accordion">
@@ -16626,6 +16769,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$halaman_sakip_opd .= $data['link'];
 			}
 		}
+
+		$halaman_input_rpjpd_rpjmd = '
+			<div class="accordion">
+				<h5 class="esakip-header-tahun" data-id="halaman-input-rpjpd-rpjmd" style="margin: 0;">Periode Input</h5>
+				<div class="esakip-body-tahun" data-id="halaman-input-rpjpd-rpjmd">
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+						' . $halaman_input_rpjpd . '
+						' . $halaman_input_rpjmd . '
+						' . $halaman_input_pohon_kinerja_pemda . '
+					</ul>
+				</div>
+			</div>';
 		$halaman_sakip_opd .= '
 					</ul>
 				</div>
@@ -16637,11 +16792,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			|| in_array("admin_panrb", $user_meta->roles)
 		) {
 			echo '
-				<ul class="daftar-menu-sakip">
-					<li>' . $halaman_sakip . '</li>
-					<li>' . $halaman_sakip_opd . '</li>
-					<li>' . $halaman_lke . '</li>
-				</ul>';
+        		<ul class="daftar-menu-sakip">
+					<li>' . $halaman_monitor_upload_dokumen . '</li>
+            		<li>' . $halaman_sakip . '</li>
+           			<li>' . $halaman_sakip_opd . '</li>
+            		<li>' . $halaman_lke . '</li>';
+    			if (in_array("admin_panrb", $user_meta->roles) || in_array("admin_bappeda", $user_meta->roles)) {
+       				echo '<li>' . $halaman_input_rpjpd_rpjmd . '</li>';
+   				}
+    		echo '</ul>';
 		} else if (
 			in_array("pa", $user_meta->roles)
 			|| in_array("kpa", $user_meta->roles)
@@ -18665,17 +18824,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id_dokumen = $_POST['id_dokumen'];
 					$ret['message'] = 'Berhasil edit data!';
 				}
-				if (!empty($_POST['id_jadwal'])) {
-					$id_jadwal = $_POST['id_jadwal'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Id Jadwal kosong!';
-				}
 				if (!empty($_POST['keterangan'])) {
 					$keterangan = $_POST['keterangan'];
 				} else {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Keterangan kosong!';
+				}
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
 				}
 				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
 					$ret['status'] = 'error';
@@ -18690,7 +18849,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
 
-				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
+				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
@@ -18739,7 +18898,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'created_at' => current_time('mysql'),
 								'tanggal_upload' => current_time('mysql')
 							),
-							array('%s', '%s', '%s', '%s', '%s')
+							array('%s', '%s', '%s', '%s', '%d')
 						);
 
 						if (!$wpdb->insert_id) {
@@ -18747,7 +18906,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'status' => 'error',
 								'message' => 'Gagal menyimpan data ke database!'
 							);
-						}
+						} 
 					} else {
 						$opsi = array(
 							'keterangan' => $keterangan,
@@ -19281,7 +19440,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						if ($can_verify) {
 							$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
 						}
-						if (!$this->is_admin_panrb()) {
+						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('DPA', $tahun_anggaran)) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_dpa(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_dpa(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						}
@@ -20503,7 +20662,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
-	public function esakip_get_rpjpd($res = false, $id_jadwal_history = false)
+	public function esakip_get_rpjpd($res = false, $id_jadwal_rpjpd = false)
 	{
 		global $wpdb;
 		$ret = array(
@@ -20545,16 +20704,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$table = '';
 				$where = ' WHERE 1=1 ';
 
-				if (!empty($id_jadwal_history)) {
-					$where .= " AND id_jadwal = $id_jadwal_history ";
+				if (!empty($id_jadwal_rpjpd)) {
+					$where .= " AND id_jadwal = $id_jadwal_rpjpd ";
 				}
 
 				switch ($_POST['table']) {
 					case 'esakip_rpjpd_visi':
-						$table = ($id_jadwal_history) ? 'esakip_rpjpd_visi_history' : 'esakip_rpjpd_visi';
+						$table = 'esakip_rpjpd_visi';
 						break;
 					case 'esakip_rpjpd_misi':
-						$table = ($id_jadwal_history) ? 'esakip_rpjpd_misi_history' : 'esakip_rpjpd_misi';
+						$table = 'esakip_rpjpd_misi';
 						if (!empty($_POST['id_misi'])) {
 							$where .= $wpdb->prepare(" AND id = %d", $_POST['id_misi']);
 						} else {
@@ -20562,7 +20721,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						}
 						break;
 					case 'esakip_rpjpd_sasaran':
-						$table = ($id_jadwal_history) ? 'esakip_rpjpd_sasaran_history' : 'esakip_rpjpd_sasaran';
+						$table = 'esakip_rpjpd_sasaran';
 						if (!empty($_POST['id_saspok'])) {
 							$where .= $wpdb->prepare(" AND id = %d", $_POST['id_saspok']);
 						} else {
@@ -20570,7 +20729,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						}
 						break;
 					case 'esakip_rpjpd_kebijakan':
-						$table = ($id_jadwal_history) ? 'esakip_rpjpd_kebijakan_history' : 'esakip_rpjpd_kebijakan';
+						$table = 'esakip_rpjpd_kebijakan';
 						if (!empty($_POST['id_kebijakan'])) {
 							$where .= $wpdb->prepare(" AND id = %d", $_POST['id_kebijakan']);
 						} else {
@@ -20578,7 +20737,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						}
 						break;
 					case 'esakip_rpjpd_isu':
-						$table = ($id_jadwal_history) ? 'esakip_rpjpd_isu_history' : 'esakip_rpjpd_isu';
+						$table = 'esakip_rpjpd_isu';
 						if (!empty($_POST['id_isu'])) {
 							$where .= $wpdb->prepare(" AND id = %d", $_POST['id_isu']);
 						} else {
@@ -20600,7 +20759,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$sql = "SELECT * FROM $table $where";
 				$ret['data'] = $wpdb->get_results($sql, ARRAY_A);
 
-				if ($id_jadwal_history) {
+				if ($id_jadwal_rpjpd) {
 					foreach ($ret['data'] as $k => $data) {
 						$ret['data'][$k]['id'] = $data['id_asli'];
 					}
@@ -20903,152 +21062,252 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				$id_jadwal_rpjpd = "";
-				if (!empty($_POST['id_unik_tujuan'])) {
-					$jadwal_rpd = $wpdb->get_results("SELECT * FROM esakip_data_jadwal WHERE tipe='RPJMD' AND status!=0", ARRAY_A);
-					if (!empty($jadwal_rpd)) {
-						$id_jadwal_rpjpd = $jadwal_rpd[0]['relasi_perencanaan'];
-					}
-				}
+                if(!empty($_POST['id_unik_tujuan'])){
+                    $jadwal_rpd = $wpdb->get_results("select * from esakip_data_jadwal where tipe='RPJMD' and status!=0", ARRAY_A);
+                    if(!empty($jadwal_rpd)){
+                        $id_jadwal_rpjpd = $jadwal_rpd[0]['relasi_perencanaan'];
+                    }
+                }
+                $table = '';
+                $where = 'where 1=1 and active=1';
+                $type = $_POST['type'];
+                if($type != 1){
+                    $where .= 'and active=1';
+                }
+                if($_POST['table'] == 'esakip_rpd_tujuan'){
+                    $table = $_POST['table'];
+                    if(!empty($_POST['id_unik_tujuan'])){
+                        $where .= $wpdb->prepare(' and id_unik=%s', $_POST['id_unik_tujuan']);
+                    }else if(!empty($_POST['id_unik_tujuan_indikator'])){
+                        $where .= $wpdb->prepare(' and id_unik_indikator=%s', $_POST['id_unik_tujuan_indikator']);
+                    }
+                    $where .= ' ORDER BY no_urut ASC, id ASC';
+                }else if($_POST['table'] == 'esakip_rpd_sasaran'){
+                    $table = $_POST['table'];
+                    if(!empty($_POST['id_unik_tujuan'])){
+                        $where .= $wpdb->prepare(' and kode_tujuan=%s', $_POST['id_unik_tujuan']);
+                    }else if(!empty($_POST['id_unik_sasaran'])){
+                        $where .= $wpdb->prepare(' and id_unik=%s', $_POST['id_unik_sasaran']);
+                    }else if(!empty($_POST['id_unik_sasaran_indikator'])){
+                        $where .= $wpdb->prepare(' and id_unik_indikator=%s', $_POST['id_unik_sasaran_indikator']);
+                    }
+                    $where .= ' ORDER BY sasaran_no_urut ASC, id ASC';
+                }else if($_POST['table'] == 'esakip_rpd_program'){
+                    $table = $_POST['table'];
+                    if(!empty($_POST['id_unik_sasaran'])){
+                        $where .= $wpdb->prepare(' and kode_sasaran=%s', $_POST['id_unik_sasaran']);
+                    }else if(!empty($_POST['id_unik_program'])){
+                        $where .= $wpdb->prepare(' and id_unik=%s', $_POST['id_unik_program']);
+                    }else if(!empty($_POST['id_unik_program_indikator'])){
+                        $where .= $wpdb->prepare(' and id_unik_indikator=%s', $_POST['id_unik_program_indikator']);
+                    }
+                }else if($_POST['table'] == 'data_rpd_tujuan'){
+                    $table = $_POST['table'];
+                }
+                if(!empty($table)){
+                    $sql = $wpdb->prepare("
+                        select 
+                            * 
+                        from $table
+                        $where
+                    ");
+                    // die($sql);
+                    $ret['data'] = $wpdb->get_results($sql, ARRAY_A);
+                    $data_all = array();
+                    if($_POST['table'] == 'esakip_rpd_tujuan'){
+                        foreach ($ret['data'] as $tujuan) {
+                            if(empty($data_all[$tujuan['id_unik']])){
+                                if(!empty($_POST['id_unik_tujuan_indikator'])){
+                                    $_POST['id_unik_tujuan'] = $tujuan['id_unik'];
+                                }
+                                $sasaran = $wpdb->get_results($wpdb->prepare("
+                                    SELECT 
+                                        id_unik
+                                    from esakip_rpd_sasaran 
+                                    where id_unik_indikator IS NULL
+                                        AND active=1
+                                        AND kode_tujuan=%s
+                                ", $tujuan['id_unik']), ARRAY_A);
+                                $kd_all_sasaran = array();
+                                foreach($sasaran as $sas){
+                                    $kd_all_sasaran[] = "'".$sas['id_unik']."'";
+                                }
+                                $kd_all_sasaran =  implode(',', $kd_all_sasaran);
+                                if(empty($kd_all_sasaran)){
+                                    $kd_all_sasaran = 0;
+                                }
 
-				$table = '';
-				$where = 'WHERE 1=1 AND active=1';
-				$type = $_POST['type'];
+                                $program = $wpdb->get_results($wpdb->prepare("
+                                    SELECT 
+                                        id_unik
+                                    from esakip_rpd_program 
+                                    where id_unik_indikator IS NULL
+                                        AND active=1
+                                        AND kode_sasaran in ($kd_all_sasaran)
+                                ", $sasaran['id_unik']), ARRAY_A);
+                                $kd_all_prog = array();
+                                foreach($program as $prog){
+                                    $kd_all_prog[] = "'".$prog['id_unik']."'";
+                                }
+                                $kd_all_prog =  implode(',', $kd_all_prog);
+                                if(empty($kd_all_prog)){
+                                    $kd_all_prog = 0;
+                                }
 
-				if ($type != 1) {
-					$where .= ' AND active=1';
-				}
+                                $pagu = $wpdb->get_row($wpdb->prepare("
+                                    SELECT 
+                                        sum(pagu_1) as pagu_akumulasi_1,
+                                        sum(pagu_2) as pagu_akumulasi_2,
+                                        sum(pagu_3) as pagu_akumulasi_3,
+                                        sum(pagu_4) as pagu_akumulasi_4,
+                                        sum(pagu_5) as pagu_akumulasi_5
+                                    from esakip_rpd_program 
+                                    where id_unik_indikator IS NOT NULL
+                                        AND active=1
+                                        AND id_unik in ($kd_all_prog)
+                                "), ARRAY_A);
+                                $data_all[$tujuan['id_unik']] = array(
+                                    'id' => $tujuan['id'],
+                                    'id_unik' => $tujuan['id_unik'],
+                                    'nama' => $tujuan['tujuan_teks'],
+                                    'id_jadwal_rpjpd' => $id_jadwal_rpjpd,
+                                    'pagu_akumulasi_1' => $pagu['pagu_akumulasi_1'],
+                                    'pagu_akumulasi_2' => $pagu['pagu_akumulasi_2'],
+                                    'pagu_akumulasi_3' => $pagu['pagu_akumulasi_3'],
+                                    'pagu_akumulasi_4' => $pagu['pagu_akumulasi_4'],
+                                    'pagu_akumulasi_5' => $pagu['pagu_akumulasi_5'],
+                                    'rpjpd' => array(),
+                                    'detail' => array(),
+                                    'no_urut' => $tujuan['no_urut'],
+                                    'catatan_teks_tujuan' => $tujuan['catatan_teks_tujuan'],
+                                    'indikator_catatan_teks' => $tujuan['indikator_catatan_teks']
+                                );
+                                if(!empty($_POST['id_unik_tujuan'])){
+                                    $_POST['table'] = 'data_rpjpd_isu';
+                                    $_POST['id_isu'] = $tujuan['id_isu'];
+                                    $data_all[$tujuan['id_unik']]['rpjpd']['isu'] = array(
+                                        'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
+                                        'id' => $tujuan['id_isu']
+                                    );
 
-				switch ($_POST['table']) {
-					case 'esakip_rpd_tujuan':
-						$table = $_POST['table'];
-						if (!empty($_POST['id_unik_tujuan'])) {
-							$where .= $wpdb->prepare(' AND id_unik=%s', $_POST['id_unik_tujuan']);
-						} elseif (!empty($_POST['id_unik_tujuan_indikator'])) {
-							$where .= $wpdb->prepare(' AND id_unik_indikator=%s', $_POST['id_unik_tujuan_indikator']);
-						}
-						$where .= ' ORDER BY no_urut ASC, id ASC';
-						break;
+                                    $_POST['table'] = 'data_rpjpd_kebijakan';
+                                    $_POST['id_kebijakan'] = $data_all[$tujuan['id_unik']]['rpjpd']['isu']['data']['data'][0]['id_kebijakan'];
+                                    $data_all[$tujuan['id_unik']]['rpjpd']['kebijakan'] = array(
+                                        'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
+                                        'id' => $_POST['id_kebijakan']
+                                    );
 
-					case 'esakip_rpd_sasaran':
-						$table = $_POST['table'];
-						if (!empty($_POST['id_unik_tujuan'])) {
-							$where .= $wpdb->prepare(' AND kode_tujuan=%s', $_POST['id_unik_tujuan']);
-						} elseif (!empty($_POST['id_unik_sasaran'])) {
-							$where .= $wpdb->prepare(' AND id_unik=%s', $_POST['id_unik_sasaran']);
-						} elseif (!empty($_POST['id_unik_sasaran_indikator'])) {
-							$where .= $wpdb->prepare(' AND id_unik_indikator=%s', $_POST['id_unik_sasaran_indikator']);
-						}
-						$where .= ' ORDER BY sasaran_no_urut ASC, id ASC';
-						break;
+                                    $_POST['table'] = 'data_rpjpd_sasaran';
+                                    $_POST['id_saspok'] = $data_all[$tujuan['id_unik']]['rpjpd']['kebijakan']['data']['data'][0]['id_saspok'];
+                                    $data_all[$tujuan['id_unik']]['rpjpd']['sasaran'] = array(
+                                        'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
+                                        'id' => $_POST['id_saspok']
+                                    );
 
-					case 'esakip_rpd_program':
-						$table = $_POST['table'];
-						if (!empty($_POST['id_unik_sasaran'])) {
-							$where .= $wpdb->prepare(' AND kode_sasaran=%s', $_POST['id_unik_sasaran']);
-						} elseif (!empty($_POST['id_unik_program'])) {
-							$where .= $wpdb->prepare(' AND id_unik=%s', $_POST['id_unik_program']);
-						} elseif (!empty($_POST['id_unik_program_indikator'])) {
-							$where .= $wpdb->prepare(' AND id_unik_indikator=%s', $_POST['id_unik_program_indikator']);
-						}
-						break;
+                                    $_POST['table'] = 'data_rpjpd_misi';
+                                    $_POST['id_misi'] = $data_all[$tujuan['id_unik']]['rpjpd']['sasaran']['data']['data'][0]['id_misi'];
+                                    $data_all[$tujuan['id_unik']]['rpjpd']['misi'] = array(
+                                        'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
+                                        'id' => $_POST['id_misi']
+                                    );
 
-					default:
-						$ret = array(
-							'status'  => 'error',
-							'message' => 'Tabel tidak boleh kosong atau tidak valid!'
-						);
-						die(json_encode($ret));
-				}
-
-				if (!empty($table)) {
-					$sql = "SELECT * FROM $table $where";
-					$ret['data'] = $wpdb->get_results($sql, ARRAY_A);
-					$data_all = array();
-
-					if ($_POST['table'] == 'esakip_rpd_tujuan') {
-						foreach ($ret['data'] as $tujuan) {
-							if (empty($data_all[$tujuan['id_unik']])) {
-								if (!empty($_POST['id_unik_tujuan_indikator'])) {
-									$_POST['id_unik_tujuan'] = $tujuan['id_unik'];
-								}
-								$sasaran = $wpdb->get_results($wpdb->prepare("SELECT id_unik FROM esakip_rpd_sasaran WHERE id_unik_indikator IS NULL AND active=1 AND kode_tujuan=%s", $tujuan['id_unik']), ARRAY_A);
-								$kd_all_sasaran = implode(',', array_map(function ($sas) {
-									return "'" . $sas['id_unik'] . "'";
-								}, $sasaran));
-
-								if (empty($kd_all_sasaran)) {
-									$kd_all_sasaran = '0';
-								}
-
-								$program = $wpdb->get_results($wpdb->prepare("SELECT id_unik FROM esakip_rpd_program WHERE id_unik_indikator IS NULL AND active=1 AND kode_sasaran IN ($kd_all_sasaran)"), ARRAY_A);
-								$kd_all_prog = implode(',', array_map(function ($prog) {
-									return "'" . $prog['id_unik'] . "'";
-								}, $program));
-
-								if (empty($kd_all_prog)) {
-									$kd_all_prog = '0';
-								}
-
-								$pagu = $wpdb->get_row("SELECT sum(pagu_1) as pagu_akumulasi_1, sum(pagu_2) as pagu_akumulasi_2, sum(pagu_3) as pagu_akumulasi_3, sum(pagu_4) as pagu_akumulasi_4, sum(pagu_5) as pagu_akumulasi_5 FROM esakip_rpd_program WHERE id_unik_indikator IS NOT NULL AND active=1 AND id_unik IN ($kd_all_prog)", ARRAY_A);
-
-								$data_all[$tujuan['id_unik']] = array(
-									'id' => $tujuan['id'],
-									'id_unik' => $tujuan['id_unik'],
-									'nama' => $tujuan['tujuan_teks'],
-									'id_jadwal_rpjpd' => $id_jadwal_rpjpd,
-									'pagu_akumulasi_1' => $pagu['pagu_akumulasi_1'],
-									'pagu_akumulasi_2' => $pagu['pagu_akumulasi_2'],
-									'pagu_akumulasi_3' => $pagu['pagu_akumulasi_3'],
-									'pagu_akumulasi_4' => $pagu['pagu_akumulasi_4'],
-									'pagu_akumulasi_5' => $pagu['pagu_akumulasi_5'],
-									'rpjpd' => array(),
-									'detail' => array(),
-									'no_urut' => $tujuan['no_urut'],
-									'catatan_teks_tujuan' => $tujuan['catatan_teks_tujuan'],
-									'indikator_catatan_teks' => $tujuan['indikator_catatan_teks']
-								);
-
-								if (!empty($_POST['id_unik_tujuan'])) {
-									$_POST['table'] = 'data_rpjpd_isu';
-									$_POST['id_isu'] = $tujuan['id_isu'];
-									$data_all[$tujuan['id_unik']]['rpjpd']['isu'] = array(
-										'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
-										'id' => $tujuan['id_isu']
-									);
-
-									$_POST['table'] = 'data_rpjpd_kebijakan';
-									$_POST['id_kebijakan'] = $data_all[$tujuan['id_unik']]['rpjpd']['isu']['data']['data'][0]['id_kebijakan'];
-									$data_all[$tujuan['id_unik']]['rpjpd']['kebijakan'] = array(
-										'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
-										'id' => $_POST['id_kebijakan']
-									);
-
-									$_POST['table'] = 'data_rpjpd_sasaran';
-									$_POST['id_saspok'] = $data_all[$tujuan['id_unik']]['rpjpd']['kebijakan']['data']['data'][0]['id_saspok'];
-									$data_all[$tujuan['id_unik']]['rpjpd']['sasaran'] = array(
-										'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
-										'id' => $_POST['id_saspok']
-									);
-
-									$_POST['table'] = 'data_rpjpd_misi';
-									$_POST['id_misi'] = $data_all[$tujuan['id_unik']]['rpjpd']['sasaran']['data']['data'][0]['id_misi'];
-									$data_all[$tujuan['id_unik']]['rpjpd']['misi'] = array(
-										'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
-										'id' => $_POST['id_misi']
-									);
-
-									$_POST['table'] = 'data_rpjpd_visi';
-									$_POST['id_visi'] = $data_all[$tujuan['id_unik']]['rpjpd']['misi']['data']['data'][0]['id_visi'];
-									$data_all[$tujuan['id_unik']]['rpjpd']['visi'] = array(
-										'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
-										'id' => $_POST['id_visi']
-									);
-								}
-							}
-						}
-					}
-
-					$ret['data'] = $data_all;
+                                    $_POST['table'] = 'data_rpjpd_visi';
+                                    $_POST['id_visi'] = $data_all[$tujuan['id_unik']]['rpjpd']['misi']['data']['data'][0]['id_visi'];
+                                    $data_all[$tujuan['id_unik']]['rpjpd']['visi'] = array(
+                                        'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
+                                        'id' => $_POST['id_visi']
+                                    );
+                                }
+                            }
+                            if(!empty($tujuan['id_unik_indikator'])){
+                                $data_all[$tujuan['id_unik']]['detail'][] = $tujuan;
+                            }
+                        }
+                    }else if($_POST['table'] == 'esakip_rpd_sasaran'){
+                        foreach ($ret['data'] as $sasaran) {
+                            if(empty($data_all[$sasaran['id_unik']])){
+                                $program = $wpdb->get_results($wpdb->prepare("
+                                    SELECT 
+                                        id_unik
+                                    from esakip_rpd_program 
+                                    where id_unik_indikator IS NULL
+                                        AND active=1
+                                        AND kode_sasaran=%s
+                                ", $sasaran['id_unik']), ARRAY_A);
+                                $kd_all_prog = array();
+                                foreach($program as $prog){
+                                    $kd_all_prog[] = "'".$prog['id_unik']."'";
+                                }
+                                $kd_all_prog =  implode(',', $kd_all_prog);
+                                if(empty($kd_all_prog)){
+                                    $kd_all_prog = 0;
+                                }
+                                $pagu = $wpdb->get_row($wpdb->prepare("
+                                    SELECT 
+                                        sum(pagu_1) as pagu_akumulasi_1,
+                                        sum(pagu_2) as pagu_akumulasi_2,
+                                        sum(pagu_3) as pagu_akumulasi_3,
+                                        sum(pagu_4) as pagu_akumulasi_4,
+                                        sum(pagu_5) as pagu_akumulasi_5
+                                    from esakip_rpd_program 
+                                    where id_unik_indikator IS NOT NULL
+                                        AND active=1
+                                        AND id_unik in ($kd_all_prog)
+                                "), ARRAY_A);
+                                $data_all[$sasaran['id_unik']] = array(
+                                    'id' => $sasaran['id'],
+                                    'id_unik' => $sasaran['id_unik'],
+                                    'nama' => $sasaran['sasaran_teks'],
+                                    'pagu_akumulasi_1' => $pagu['pagu_akumulasi_1'],
+                                    'pagu_akumulasi_2' => $pagu['pagu_akumulasi_2'],
+                                    'pagu_akumulasi_3' => $pagu['pagu_akumulasi_3'],
+                                    'pagu_akumulasi_4' => $pagu['pagu_akumulasi_4'],
+                                    'pagu_akumulasi_5' => $pagu['pagu_akumulasi_5'],
+                                    'sasaran_no_urut' => $sasaran['sasaran_no_urut'],
+                                    'sasaran_catatan' => $sasaran['sasaran_catatan'],
+                                    'indikator_catatan_teks'=> $sasaran['indikator_catatan_teks'],
+                                    'detail' => array()
+                                );
+                            }
+                            if(!empty($sasaran['id_unik_indikator'])){
+                                $data_all[$sasaran['id_unik']]['detail'][] = $sasaran;
+                            }
+                        }
+                    }else if($_POST['table'] == 'esakip_rpd_program'){
+                        foreach ($ret['data'] as $program) {
+                            if(empty($data_all[$program['id_unik']])){
+                                $pagu = $wpdb->get_row($wpdb->prepare("
+                                    SELECT 
+                                        sum(pagu_1) as pagu_akumulasi_1,
+                                        sum(pagu_2) as pagu_akumulasi_2,
+                                        sum(pagu_3) as pagu_akumulasi_3,
+                                        sum(pagu_4) as pagu_akumulasi_4,
+                                        sum(pagu_5) as pagu_akumulasi_5
+                                    from esakip_rpd_program 
+                                    where id_unik_indikator IS NOT NULL
+                                        AND active=1
+                                        AND id_unik=%s
+                                ", $program['id_unik']), ARRAY_A);
+                                $data_all[$program['id_unik']] = array(
+                                    'id' => $program['id'],
+                                    'id_unik' => $program['id_unik'],
+                                    'id_program' => $program['id_program'],
+                                    'catatan' => $program['catatan'],
+                                    'nama' => $program['nama_program'],
+                                    'pagu_akumulasi_1' => $pagu['pagu_akumulasi_1'],
+                                    'pagu_akumulasi_2' => $pagu['pagu_akumulasi_2'],
+                                    'pagu_akumulasi_3' => $pagu['pagu_akumulasi_3'],
+                                    'pagu_akumulasi_4' => $pagu['pagu_akumulasi_4'],
+                                    'pagu_akumulasi_5' => $pagu['pagu_akumulasi_5'],
+                                    'detail' => array()
+                                );
+                            }
+                            if(!empty($program['id_unik_indikator'])){
+                                $data_all[$program['id_unik']]['detail'][] = $program;
+                            }
+                        }
+                    }
+                    $ret['data_all'] = $data_all;
 				} else {
 					$ret = array(
 						'status'  => 'error',
@@ -21384,7 +21643,20 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						if (!empty($_POST['id_unik_tujuan_indikator'])) {
 							$wpdb->delete($table, ['id_unik_indikator' => $_POST['id_unik_tujuan_indikator']]);
 						} else {
-							$wpdb->delete($table, ['id_unik' => $_POST['id']]);
+							$cek_id = $wpdb->get_var(
+								$wpdb->prepare("
+									SELECT kode_tujuan
+									FROM esakip_rpd_sasaran
+									WHERE kode_tujuan = %d
+								", $_POST['id'])
+							);
+							if (empty($cek_id)) {
+								$wpdb->delete($table, ['id_unik' => $_POST['id']]);							
+							} else {
+								$ret['status'] = 'error';
+								$ret['message'] = 'Tujuan memiliki Sasaran aktif! Mohon hapus Sasaran turunannya terlebih dahulu!';
+								die(json_encode($ret));
+							}							
 						}
 						break;
 					case 'esakip_rpd_sasaran':
@@ -21392,7 +21664,20 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						if (!empty($_POST['id_unik_sasaran_indikator'])) {
 							$wpdb->delete($table, ['id_unik_indikator' => $_POST['id_unik_sasaran_indikator']]);
 						} else {
-							$wpdb->delete($table, ['id_unik' => $_POST['id']]);
+							$cek_id = $wpdb->get_var(
+								$wpdb->prepare("
+									SELECT kode_sasaran
+									FROM esakip_rpd_program
+									WHERE kode_sasaran = %d
+								", $_POST['id'])
+							);
+							if (empty($cek_id)) {
+								$wpdb->delete($table, ['id_unik' => $_POST['id']]);							
+							} else {
+								$ret['status'] = 'error';
+								$ret['message'] = 'Sasaran memiliki Program aktif! Mohon hapus Program turunannya terlebih dahulu!';
+								die(json_encode($ret));
+							}		
 						}
 						break;
 					case 'esakip_rpd_program':
@@ -21405,9 +21690,59 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						break;
 					default:
 						$ret['status'] = 'error';
-						$ret['message'] = 'Param table tidak tidak boleh kosong!';
+						$ret['message'] = 'Param table tidak boleh kosong!';
 						break;
 				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!',
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function esakip_get_bidang_urusan()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data bidang urusan dari WP-SIPD!',
+			'data' => array(),
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] === get_option(ESAKIP_APIKEY)) {
+				if(!empty(get_option(ESAKIP_URL_WPSIPD))) {
+					$url = get_option(ESAKIP_URL_WPSIPD);
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'URL WP-SIPD Kosong!';
+					die(json_encode($ret));
+				}
+				if(!empty(get_option(ESAKIP_APIKEY_WPSIPD))) {
+					$api_key = get_option(ESAKIP_APIKEY_WPSIPD);
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'API-Key WP-SIPD Kosong!';
+					die(json_encode($ret));
+				}
+				$api_params = array(
+					'action' => 'get_bidang_urusan',
+					'api_key' => $api_key,
+					'type' => $_POST['type']
+				);
+		
+				$response = wp_remote_post($url, array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
+				$response = wp_remote_retrieve_body($response);
+				$data = json_decode($response);
+
+				$ret['data'] = $data;
 			} else {
 				$ret = array(
 					'status' => 'error',

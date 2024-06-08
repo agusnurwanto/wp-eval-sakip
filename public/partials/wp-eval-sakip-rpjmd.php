@@ -7,19 +7,20 @@ if (!defined('WPINC')) {
 
 $input = shortcode_atts(array(
     'periode' => '',
-), $atts);
+), $atts);$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-$data_jadwal = $wpdb->get_row(
+$periode = $wpdb->get_row(
     $wpdb->prepare("
-        SELECT *
-        FROM esakip_data_jadwal
-        WHERE id = %d
-          AND status = 1
-    ", $input['periode']),
+    SELECT 
+        *
+    FROM esakip_data_jadwal
+    WHERE id=%d
+      AND status = 1
+", $input['periode']),
     ARRAY_A
 );
 
-$tahun_periode = $data_jadwal['tahun_anggaran'] + $data_jadwal['lama_pelaksanaan'];
+$tahun_periode = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
 
 $idtahun = $wpdb->get_results(
     $wpdb->prepare(
@@ -36,17 +37,18 @@ $idtahun = $wpdb->get_results(
 $tahun = "<option value='-1'>Pilih Tahun Periode</option>";
 
 foreach ($idtahun as $val) {
-    $tahun_Periode_selesai = $val['tahun_anggaran'] + $val['lama_pelaksanaan'];
+    $tahun_anggaran_selesai = $val['tahun_anggaran'] + $val['lama_pelaksanaan'];
     $selected = '';
     if (!empty($input['id']) && $val['id'] == $input['periode']) {
         $selected = 'selected';
     }
-    $tahun .= "<option value='$val[id]' $selected>$val[nama_jadwal] Periode $val[tahun_anggaran] -  $tahun_Periode_selesai</option>";
+    $tahun .= "<option value='$val[id]' $selected>$val[nama_jadwal] Periode $val[tahun_anggaran] -  $tahun_anggaran_selesai</option>";
 }
 
 $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
 $is_admin_panrb = in_array('admin_panrb', $user_roles);
+
 ?>
 <style type="text/css">
     .wrap-table {
@@ -64,27 +66,31 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     .btn-action-group .btn {
         margin: 0 5px;
     }
+
+    #table_dokumen_rpjmd th {
+        vertical-align: middle;
+    }
 </style>
 
 <!-- Table -->
 <div class="container-md">
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Dokumen RPJMD<br><?php echo $data_jadwal['nama_jadwal'] . ' (' . $data_jadwal['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1>
+            <h1 class="text-center" style="margin:3rem;">Dokumen RPJMD <br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1>
             <?php if (!$is_admin_panrb): ?>
-            <div style="margin-bottom: 25px;">
-                <button class="btn btn-primary" onclick="tambah_dokumen_rpjmd();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
-            </div>
+                <div style="margin-bottom: 25px;">
+                    <button class="btn btn-primary" onclick="tambah_dokumen_rpjmd();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
+                </div>
             <?php endif; ?>
             <div class="wrap-table">
                 <table id="table_dokumen_rpjmd" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
-                        <tr>
-                            <th class="text-center">No</th>
-                            <th class="text-center">Nama Dokumen</th>
-                            <th class="text-center">Keterangan</th>
-                            <th class="text-center">Waktu Upload</th>
-                            <th class="text-center" style="width: 150px;">Aksi</th>
+                    <tr>
+                            <th class="text-center" rowspan="2">No</th>
+                            <th class="text-center" rowspan="2">Nama Dokumen</th>
+                            <th class="text-center" rowspan="2">Keterangan</th>
+                            <th class="text-center" rowspan="2">Waktu Upload</th>
+                            <th class="text-center" rowspan="2" style="width: 150px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -119,6 +125,10 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                         Maksimal ukuran file: <?php echo get_option('_crb_maksimal_upload_dokumen_esakip'); ?> MB. Format file yang diperbolehkan: PDF.
                     </div>
                     <div class="form-group">
+                        <label for="nama_file">Nama Dokumen</label>
+                        <input type="text" class="form-control" id="nama_file" name="nama_file" rows="3" required>
+                    </div>
+                    <div class="form-group">
                         <label for="keterangan">Keterangan</label>
                         <textarea class="form-control" id="keterangan" name="keterangan" rows="3" required></textarea>
                     </div>
@@ -134,7 +144,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="tahunModalLabel">Pilih Tahun Periode</h5>
+                <h5 class="modal-title" id="tahunModalLabel">Pilih ID Jadwal</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -142,7 +152,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             <div class="modal-body">
                 <form id="tahunForm">
                     <div class="form-group">
-                        <label for="id_jadwal">Tahun Periode:</label>
+                        <label for="id_jadwal">ID Jadwal:</label>
                         <select class="form-control" id="id_jadwal" name="id_jadwal">
                             <?php echo $tahun; ?>
                         </select>
@@ -163,6 +173,13 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     jQuery(document).ready(function() {
         getTableRpjmd();
         getTableTahun();
+        jQuery("#fileUpload").on('change', function() {
+            var id_dokumen = jQuery('#idDokumen').val();
+            if (id_dokumen == '') {
+                var name = jQuery("#fileUpload").prop('files')[0].name;
+                jQuery('#nama_file').val(name);
+            }
+        });
     });
 
     function getTableRpjmd() {
@@ -188,7 +205,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data RPJMD!');
+                alert('Terjadi kesalahan saat memuat data Rpjmd!');
             }
         });
     }
@@ -221,7 +238,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     }
 
     function lihatDokumen(dokumen) {
-        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/'; ?>' + dokumen;
+        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + dokumen;
         window.open(url, '_blank');
     }
 
@@ -233,6 +250,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     function tambah_dokumen_rpjmd() {
         jQuery("#editModalLabel").hide();
         jQuery("#uploadModalLabel").show();
+        jQuery('#nama_file').val('');
         jQuery("#idDokumen").val('');
         jQuery("#fileUpload").val('');
         jQuery("#keterangan").val('');
@@ -256,9 +274,10 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 console.log(response);
                 if (response.status === 'success') {
                     let data = response.data;
-                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/'; ?>' + data.dokumen;
+                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + data.dokumen;
                     jQuery("#idDokumen").val(data.id);
                     jQuery("#fileUpload").val('');
+                    jQuery('#nama_file').val(data.dokumen);
                     jQuery('#fileUploadExisting').attr('href', url).html(data.dokumen);
                     jQuery("#keterangan").val(data.keterangan);
                     jQuery("#uploadModalLabel").hide();
@@ -279,31 +298,31 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     function submit_dokumen(that) {
         let id_dokumen = jQuery("#idDokumen").val();
 
-        let skpd = jQuery("#perangkatDaerah").val();
-        if (skpd == '') {
-            return alert('Perangkat Daerah tidak boleh kosong');
-        }
         let keterangan = jQuery("#keterangan").val();
         if (keterangan == '') {
             return alert('Keterangan tidak boleh kosong');
         }
         let id_jadwal = jQuery("#id_jadwal").val();
         if (id_jadwal == '') {
-            return alert('Tahun Periode tidak boleh kosong');
+            return alert('ID Jadwal tidak boleh kosong');
         }
         let fileDokumen = jQuery("#fileUpload").prop('files')[0];
         if (fileDokumen == '') {
             return alert('File Upload tidak boleh kosong');
+        }
+        let namaDokumen = jQuery("#nama_file").val();
+        if (namaDokumen == '') {
+            return alert('Nama Dokumen tidak boleh kosong');
         }
 
         let form_data = new FormData();
         form_data.append('action', 'tambah_dokumen_rpjmd');
         form_data.append('api_key', esakip.api_key);
         form_data.append('id_dokumen', id_dokumen);
-        form_data.append('skpd', skpd);
         form_data.append('keterangan', keterangan);
         form_data.append('id_jadwal', id_jadwal);
         form_data.append('fileUpload', fileDokumen);
+        form_data.append('namaDokumen', namaDokumen);
 
         jQuery('#wrap-loading').show();
         jQuery.ajax({
@@ -340,7 +359,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 
         let id_jadwal = jQuery("#id_jadwal").val();
         if (id_jadwal == '') {
-            return alert('Tahun Periode tidak boleh kosong');
+            return alert('ID Jadwal tidak boleh kosong');
         }
 
         jQuery('#wrap-loading').show();
@@ -373,6 +392,12 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             }
         });
     }
+
+    function lihatDokumen(dokumen) {
+        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + dokumen;
+        window.open(url, '_blank');
+    }
+
 
     function hapus_dokumen_rpjmd(id) {
         if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {

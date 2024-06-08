@@ -140,6 +140,12 @@ class Wp_Eval_Sakip_Admin
 						$_POST['type'] == 'renstra'
 						|| $_POST['type'] == 'rpjmd'
 						|| $_POST['type'] == 'input_perencanaan_rpjmd'
+						|| $_POST['type'] == 'input_pohon_kinerja_pemda'
+						|| $_POST['type'] == 'input_pohon_kinerja_opd'
+						|| $_POST['type'] == 'cascading_pemda'
+						|| $_POST['type'] == 'cascading_pd'
+						|| $_POST['type'] == 'croscutting_pemda'
+						|| $_POST['type'] == 'croscutting_pd'
 					)
 				) {
 					$jadwal_periode = $wpdb->get_results(
@@ -161,7 +167,68 @@ class Wp_Eval_Sakip_Admin
 					$body_pemda = '<ol>';
 					foreach ($jadwal_periode as $jadwal_periode_item) {
 						$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
-						if (!empty($_POST['type']) && $_POST['type'] == 'renstra') {
+						if (!empty($_POST['type']) && $_POST['type'] == 'input_pohon_kinerja_pemda') {
+							$input_pokin = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Input Pohon Kinerja ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+								'content' => '[penyusunan_pohon_kinerja periode=' . $jadwal_periode_item['id'] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+								<li><a target="_blank" href="' . $input_pokin['url'] . '">' . $input_pokin['title'] . '</a></li>
+									</ul>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'input_pohon_kinerja_opd') {
+							$input_pokin = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Input Pohon Kinerja Perangkat Daerah ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+								'content' => '[penyusunan_pohon_kinerja_pd periode=' . $jadwal_periode_item['id'] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+								<li><a target="_blank" href="' . $input_pokin['url'] . '">' . $input_pokin['title'] . '</a></li>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'cascading_pemda') {
+							$cascading = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Input Cascading Pemerintah Daerah ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+								'content' => '[cascading_pemda periode=' . $jadwal_periode_item['id'] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+								<li><a target="_blank" href="' . $cascading['url'] . '">' . $cascading['title'] . '</a></li>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'cascading_pd') {
+							$cascading = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Input Cascading Perangkat Daerah ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+								'content' => '[cascading_pd periode=' . $jadwal_periode_item['id'] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+								<li><a target="_blank" href="' . $cascading['url'] . '">' . $cascading['title'] . '</a></li>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'croscutting_pemda') {
+							$croscutting = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Input Croscutting Pemerintah Daerah ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+								'content' => '[croscutting_pemda periode=' . $jadwal_periode_item['id'] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+								<li><a target="_blank" href="' . $croscutting['url'] . '">' . $croscutting['title'] . '</a></li>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'croscutting_pd') {
+							$croscutting = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Input Croscutting Perangkat Daerah ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+								'content' => '[croscutting_pd periode=' . $jadwal_periode_item['id'] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+								<li><a target="_blank" href="' . $croscutting['url'] . '">' . $croscutting['title'] . '</a></li>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'renstra') {
 							$renstra = $this->functions->generatePage(array(
 								'nama_page' => 'Halaman Dokumen RENSTRA ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
 								'content' => '[renstra periode=' . $jadwal_periode_item['id'] . ']',
@@ -294,41 +361,7 @@ class Wp_Eval_Sakip_Admin
 						ARRAY_A
 					);
 					foreach ($tahun as $tahun_item) {
-						if (!empty($_POST['type']) && $_POST['type'] == 'input_pohon_kinerja') {
-							$input_pokin = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Input Pohon Kinerja Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[penyusunan_pohon_kinerja tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $input_pokin['url'] . '">' . $input_pokin['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'input_pohon_kinerja_opd') {
-							$input_pokin = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Input Pohon Kinerja Perangkat Daerah Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[penyusunan_pohon_kinerja_pd tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $input_pokin['url'] . '">' . $input_pokin['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'renja_rkt') {
+						if (!empty($_POST['type']) && $_POST['type'] == 'renja_rkt') {
 							$renja_rkt = $this->functions->generatePage(array(
 								'nama_page' => 'Halaman Dokumen RENJA/RKT Tahun ' . $tahun_item['tahun_anggaran'],
 								'content' => '[renja_rkt tahun=' . $tahun_item["tahun_anggaran"] . ']',
@@ -1651,7 +1684,46 @@ class Wp_Eval_Sakip_Admin
 		        		</style>
 		        	')
 			))
-			->add_fields($this->get_ajax_field(array('type' => 'input_pohon_kinerja')));
+			->add_fields($this->get_ajax_field(array('type' => 'input_pohon_kinerja_pemda')));
+
+		Container::make('theme_options', __('Pohon Kinerja Pemerintah Daerah'))
+			->set_page_parent($pengisian_pokin_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_pengisian_pokin_pemda_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'input_pohon_kinerja_pemda')));
+
+		Container::make('theme_options', __('Cascading Pemerintah Daerah'))
+			->set_page_parent($pengisian_pokin_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_pengisian_cascading_pemda_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'cascading_pemda')));
+
+		Container::make('theme_options', __('Croscutting Pemerintah Daerah'))
+			->set_page_parent($pengisian_pokin_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_pengisian_croscutting_pemda_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'croscutting_pemda')));
 
 		Container::make('theme_options', __('Pohon Kinerja Perangkat Daerah'))
 			->set_page_parent($pengisian_pokin_menu)
@@ -1666,7 +1738,33 @@ class Wp_Eval_Sakip_Admin
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'input_pohon_kinerja_opd')));
 
-		$monev_pokin_menu = Container::make('theme_options', __('MONEV Kinerja'))
+		Container::make('theme_options', __('Cascading Perangkat Daerah'))
+			->set_page_parent($pengisian_pokin_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_pengisian_cascading_pd_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'cascading_pd')));
+
+		Container::make('theme_options', __('Croscutting Perangkat Daerah'))
+			->set_page_parent($pengisian_pokin_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_pengisian_croscutting_pd_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'croscutting_pd')));
+
+		$monev_ren_aksi_menu = Container::make('theme_options', __('MONEV Rencana Aksi'))
 			->set_page_menu_position(3.5)
 			->set_icon('dashicons-edit-page')
 			->add_fields(array(
@@ -1679,21 +1777,34 @@ class Wp_Eval_Sakip_Admin
 		        	')
 			));
 
-		$input_perencanaan_menu = Container::make('theme_options', __('Input Perencanaan'))
-			->set_page_menu_position(3.5)
-			->set_icon('dashicons-edit-page')
+		Container::make('theme_options', __('MONEV Rencana Aksi Pemerintah Daerah'))
+			->set_page_parent($monev_ren_aksi_menu)
 			->add_fields(array(
-				Field::make('html', 'crb_input_perencanaan_hide_sidebar')
+				Field::make('html', 'crb_pengisian_monev_pemda_hide_sidebar')
 					->set_html('
-							<style>
-								.postbox-container { display: none; }
-								#poststuff #post-body.columns-2 { margin: 0 !important; }
-							</style>
-						')
-			));
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'monev_rencana_aksi_pemda')));
+
+		Container::make('theme_options', __('MONEV Rencana Aksi Perangkat Daerah'))
+			->set_page_parent($monev_ren_aksi_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_pengisian_monev_pd_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'monev_rencana_aksi_opd')));
 
 		Container::make('theme_options', __('Input RPJPD'))
-			->set_page_parent($input_perencanaan_menu)
+			->set_page_menu_position(3.6)
 			->add_fields(array(
 				Field::make('html', 'crb_perencanaan_rpjpd_hide_sidebar')
 					->set_html('
@@ -1706,7 +1817,7 @@ class Wp_Eval_Sakip_Admin
 			->add_fields($this->get_ajax_field(array('type' => 'input_perencanaan_rpjpd')));
 
 		Container::make('theme_options', __('Input RPJMD'))
-			->set_page_parent($input_perencanaan_menu)
+			->set_page_menu_position(3.7)
 			->add_fields(array(
 				Field::make('html', 'crb_perencanaan_rpjmd_hide_sidebar')
 					->set_html('

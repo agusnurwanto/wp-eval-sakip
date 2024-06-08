@@ -211,7 +211,7 @@ foreach ($idtahun as $val) {
 		});
 	}
 
-    function hapus_tahun_dokumen_tipe(id) {
+    function hapus_tahun_dokumen_laporan_monev_renaksi(id) {
         if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
             return;
         }
@@ -222,7 +222,6 @@ foreach ($idtahun as $val) {
             data: {
                 action: 'hapus_tahun_dokumen_tipe',
                 api_key: esakip.api_key,
-				tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
                 id: id
             },
             dataType: 'json',

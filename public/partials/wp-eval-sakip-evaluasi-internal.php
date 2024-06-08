@@ -221,7 +221,6 @@ foreach ($idtahun as $val) {
             data: {
                 action: 'hapus_tahun_dokumen_evaluasi_internal',
                 api_key: esakip.api_key,
-                tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
                 id: id
             },
             dataType: 'json',

@@ -61,7 +61,6 @@ $data_all = array(
     'pemutakhiran_program' => 0
 );
 
-$add_rpd = '';
 $body_monev = '';
 $tujuan_ids = array();
 $sasaran_ids = array();
@@ -712,11 +711,10 @@ foreach ($data_all['data'] as $tujuan) {
             }
 
             $isMutakhir = '';
-            if (!empty($add_rpd)) {
-                if ($program['statusMutakhirProgram']) {
-                    $isMutakhir = '<button class="btn-sm btn-warning" onclick="tampilProgram(\'' . $program['id_unik'] . '\')" style="margin: 1px;"><i class="dashicons dashicons-update" title="Mutakhirkan"></i></button>';
-                }
+            if ($program['statusMutakhirProgram']) {
+                $isMutakhir = '<button class="btn-sm btn-warning" onclick="tampilProgram(\'' . $program['id_unik'] . '\')" style="margin: 1px;"><i class="dashicons dashicons-update" title="Mutakhirkan"></i></button>';
             }
+
 
             $body .= '
 				<tr class="tr-program" data-kode-skpd="' . $program['kode_skpd'] . '" ' . $warning . '>
@@ -1219,9 +1217,10 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
 <script type="text/javascript">
     jQuery(document).ready(function() {
         let data_all = <?php echo json_encode($data_all); ?>;
+        window.edit_val = false;
 
         var aksi = '' +
-            '<?php echo $add_rpd; ?>' +
+            '<a style="margin-left: 10px;" id="tambah-data" onclick="return false;" href="#" class="btn btn-success">Tambah Data RPD</a><br><br>' +
             '<h3 style="margin-top: 20px;">SETTING</h3>' +
             '<label><input type="checkbox" onclick="tampilkan_edit(this);"> Edit Data RPJMD</label>' +
             '<label style="margin-left: 20px;"><input type="checkbox" onclick="show_debug(this);"> Debug Cascading RPJMD</label>' +
@@ -1841,37 +1840,50 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 jQuery('#indikator-teks-tujuan-vol-akhir').val('');
                 jQuery('#indikator-teks-tujuan-catatan').val('');
                 jQuery('#modal-tujuan-indikator').modal('show');
+
                 for (var b in res.data_all) {
-                    res.data_all[b].rpjpd.visi.data.data.map(function(bb, ii) {
-                        if (bb.id == res.data_all[b].rpjpd.visi.id) {
-                            jQuery('#visi-teks-indikator').html(bb.visi_teks);
+                    if (res.data_all[b].rpjpd) {
+                        if (res.data_all[b].rpjpd.visi && res.data_all[b].rpjpd.visi.data && Array.isArray(res.data_all[b].rpjpd.visi.data.data)) {
+                            res.data_all[b].rpjpd.visi.data.data.map(function(bb, ii) {
+                                if (bb.id == res.data_all[b].rpjpd.visi.id) {
+                                    jQuery('#visi-teks-indikator').html(bb.visi_teks);
+                                }
+                            });
                         }
-                    });
 
-                    res.data_all[b].rpjpd.misi.data.data.map(function(bb, ii) {
-                        if (bb.id == res.data_all[b].rpjpd.misi.id) {
-                            jQuery('#misi-teks-indikator').html(bb.misi_teks);
+                        if (res.data_all[b].rpjpd.misi && res.data_all[b].rpjpd.misi.data && Array.isArray(res.data_all[b].rpjpd.misi.data.data)) {
+                            res.data_all[b].rpjpd.misi.data.data.map(function(bb, ii) {
+                                if (bb.id == res.data_all[b].rpjpd.misi.id) {
+                                    jQuery('#misi-teks-indikator').html(bb.misi_teks);
+                                }
+                            });
                         }
-                    });
 
-                    res.data_all[b].rpjpd.sasaran.data.data.map(function(bb, ii) {
-                        if (bb.id == res.data_all[b].rpjpd.sasaran.id) {
-                            jQuery('#saspok-teks-indikator').html(bb.saspok_teks);
+                        if (res.data_all[b].rpjpd.sasaran && res.data_all[b].rpjpd.sasaran.data && Array.isArray(res.data_all[b].rpjpd.sasaran.data.data)) {
+                            res.data_all[b].rpjpd.sasaran.data.data.map(function(bb, ii) {
+                                if (bb.id == res.data_all[b].rpjpd.sasaran.id) {
+                                    jQuery('#saspok-teks-indikator').html(bb.saspok_teks);
+                                }
+                            });
                         }
-                    });
 
-                    res.data_all[b].rpjpd.kebijakan.data.data.map(function(bb, ii) {
-                        var selected = '';
-                        if (bb.id == res.data_all[b].rpjpd.kebijakan.id) {
-                            jQuery('#kebijakan-teks-indikator').html(bb.kebijakan_teks);
+                        if (res.data_all[b].rpjpd.kebijakan && res.data_all[b].rpjpd.kebijakan.data && Array.isArray(res.data_all[b].rpjpd.kebijakan.data.data)) {
+                            res.data_all[b].rpjpd.kebijakan.data.data.map(function(bb, ii) {
+                                var selected = '';
+                                if (bb.id == res.data_all[b].rpjpd.kebijakan.id) {
+                                    jQuery('#kebijakan-teks-indikator').html(bb.kebijakan_teks);
+                                }
+                            });
                         }
-                    });
 
-                    res.data_all[b].rpjpd.isu.data.data.map(function(bb, ii) {
-                        if (bb.id == res.data_all[b].rpjpd.isu.id) {
-                            jQuery('#isu-teks-indikator').html(bb.isu_teks);
+                        if (res.data_all[b].rpjpd.isu && res.data_all[b].rpjpd.isu.data && Array.isArray(res.data_all[b].rpjpd.isu.data.data)) {
+                            res.data_all[b].rpjpd.isu.data.data.map(function(bb, ii) {
+                                if (bb.id == res.data_all[b].rpjpd.isu.id) {
+                                    jQuery('#isu-teks-indikator').html(bb.isu_teks);
+                                }
+                            });
                         }
-                    });
+                    }
 
                     jQuery('#tujuan-teks-indikator').html(res.data_all[b].nama);
                     jQuery('#modal-tujuan-indikator').attr('id-tujuan', res.data_all[b].id_unik);
@@ -2129,55 +2141,65 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
             success: function(res) {
                 jQuery('#wrap-loading').hide();
                 for (var b in res.data_all) {
-                    var visi_html = '<option value="">Pilih visi RPJPD</option>';
-                    res.data_all[b].rpjpd.visi.data.data.map(function(bb, ii) {
-                        var selected = '';
-                        if (bb.id == res.data_all[b].rpjpd.visi.id) {
-                            selected = 'selected';
-                        }
-                        visi_html += '<option ' + selected + ' value="' + bb.id + '">' + bb.visi_teks + '</option>';
-                    });
-                    jQuery('#visi-teks').html(visi_html);
+                    if (res.data_all[b].rpjpd.visi.data.data) {
+                        var visi_html = '<option value="">Pilih Visi RPJPD</option>';
+                        res.data_all[b].rpjpd.visi.data.data.map(function(bb, ii) {
+                            var selected = '';
+                            if (bb.id == res.data_all[b].rpjpd.visi.id) {
+                                selected = 'selected';
+                            }
+                            visi_html += '<option ' + selected + ' value="' + bb.id + '">' + bb.visi_teks + '</option>';
+                        });
+                        jQuery('#visi-teks').html(visi_html);
+                    }
 
-                    var misi_html = '<option value="">Pilih misi RPJPD</option>';
-                    res.data_all[b].rpjpd.misi.data.data.map(function(bb, ii) {
-                        var selected = '';
-                        if (bb.id == res.data_all[b].rpjpd.misi.id) {
-                            selected = 'selected';
-                        }
-                        misi_html += '<option ' + selected + ' value="' + bb.id + '">' + bb.misi_teks + '</option>';
-                    });
-                    jQuery('#misi-teks').html(misi_html);
+                    if (res.data_all[b].rpjpd.misi.data.data) {
+                        var misi_html = '<option value="">Pilih misi RPJPD</option>';
+                        res.data_all[b].rpjpd.misi.data.data.map(function(bb, ii) {
+                            var selected = '';
+                            if (bb.id == res.data_all[b].rpjpd.misi.id) {
+                                selected = 'selected';
+                            }
+                            misi_html += '<option ' + selected + ' value="' + bb.id + '">' + bb.misi_teks + '</option>';
+                        });
+                        jQuery('#misi-teks').html(misi_html);
+                    }
 
-                    var saspok_html = '<option value="">Pilih sasaran RPJPD</option>';
-                    res.data_all[b].rpjpd.sasaran.data.data.map(function(bb, ii) {
-                        var selected = '';
-                        if (bb.id == res.data_all[b].rpjpd.sasaran.id) {
-                            selected = 'selected';
-                        }
-                        saspok_html += '<option ' + selected + ' value="' + bb.id + '">' + bb.saspok_teks + '</option>';
-                    });
-                    jQuery('#saspok-teks').html(saspok_html);
+                    if (res.data_all[b].rpjpd.sasaran.data.data) {
+                        var saspok_html = '<option value="">Pilih sasaran RPJPD</option>';
+                        res.data_all[b].rpjpd.sasaran.data.data.map(function(bb, ii) {
+                            var selected = '';
+                            if (bb.id == res.data_all[b].rpjpd.sasaran.id) {
+                                selected = 'selected';
+                            }
+                            saspok_html += '<option ' + selected + ' value="' + bb.id + '">' + bb.saspok_teks + '</option>';
+                        });
+                        jQuery('#saspok-teks').html(saspok_html);
+                    }
 
-                    var kebijakan_html = '<option value="">Pilih kebijakan RPJPD</option>';
-                    res.data_all[b].rpjpd.kebijakan.data.data.map(function(bb, ii) {
-                        var selected = '';
-                        if (bb.id == res.data_all[b].rpjpd.kebijakan.id) {
-                            selected = 'selected';
-                        }
-                        kebijakan_html += '<option ' + selected + ' value="' + bb.id + '">' + bb.kebijakan_teks + '</option>';
-                    });
-                    jQuery('#kebijakan-teks').html(kebijakan_html);
+                    if (res.data_all[b].rpjpd.kebijakan.data.data) {
+                        var kebijakan_html = '<option value="">Pilih kebijakan RPJPD</option>';
+                        res.data_all[b].rpjpd.kebijakan.data.data.map(function(bb, ii) {
+                            var selected = '';
+                            if (bb.id == res.data_all[b].rpjpd.kebijakan.id) {
+                                selected = 'selected';
+                            }
+                            kebijakan_html += '<option ' + selected + ' value="' + bb.id + '">' + bb.kebijakan_teks + '</option>';
+                        });
+                        jQuery('#kebijakan-teks').html(kebijakan_html);
+                    }
 
-                    var isu_html = '<option value="">Pilih isu RPJPD</option>';
-                    res.data_all[b].rpjpd.isu.data.data.map(function(bb, ii) {
-                        var selected = '';
-                        if (bb.id == res.data_all[b].rpjpd.isu.id) {
-                            selected = 'selected';
-                        }
-                        isu_html += '<option ' + selected + ' value="' + bb.id + '">' + bb.isu_teks + '</option>';
-                    });
-                    jQuery('#isu-teks').html(isu_html);
+                    if (res.data_all[b].rpjpd.isu.data.data) {
+                        var isu_html = '<option value="">Pilih isu RPJPD</option>';
+                        res.data_all[b].rpjpd.isu.data.data.map(function(bb, ii) {
+                            var selected = '';
+                            if (bb.id == res.data_all[b].rpjpd.isu.id) {
+                                selected = 'selected';
+                            }
+                            isu_html += '<option ' + selected + ' value="' + bb.id + '">' + bb.isu_teks + '</option>';
+                        });
+                        jQuery('#isu-teks').html(isu_html);
+                    }
 
                     jQuery('#tujuan-teks').val(res.data_all[b].nama);
                     jQuery('#no-urut-teks-tujuan').val(res.data_all[b].no_urut);
@@ -2204,14 +2226,19 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
             dataType: "json",
             success: function(res) {
                 jQuery('#wrap-loading').hide();
-                jQuery('#tujuan-sasaran-teks').html(jQuery('tr[id-tujuan="' + res.data[0].kode_tujuan + '"] td').eq(1).html());
-                for (var b in res.data_all) {
-                    jQuery('#sasaran-teks').val(res.data_all[b].nama);
+                if (res.data && res.data[0] && res.data[0].kode_tujuan) {
+                    jQuery('#tujuan-sasaran-teks').html(jQuery('tr[id-tujuan="' + res.data[0].kode_tujuan + '"] td').eq(1).html());
                 }
-                // console.log(res.data_all[b]);
-                jQuery('#sasaran-no-urut').val(res.data_all[b].sasaran_no_urut);
-                jQuery('#sasaran-catatan-teks').val(res.data_all[b].sasaran_catatan);
-                jQuery('#modal-sasaran').attr('id-tujuan', res.data[0].kode_tujuan);
+                for (var b in res.data_all) {
+                    if (res.data_all[b]) {
+                        jQuery('#sasaran-teks').val(res.data_all[b].nama);
+                        jQuery('#sasaran-no-urut').val(res.data_all[b].sasaran_no_urut);
+                        jQuery('#sasaran-catatan-teks').val(res.data_all[b].sasaran_catatan);
+                    }
+                }
+                if (res.data && res.data[0]) {
+                    jQuery('#modal-sasaran').attr('id-tujuan', res.data[0].kode_tujuan);
+                }
                 jQuery('#modal-sasaran').attr('data-id', id_unik_sasaran);
                 jQuery('#modal-sasaran').modal('show');
             }
@@ -2226,28 +2253,37 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                         url: esakip.url,
                         type: "post",
                         data: {
-                            "action": "get_bidang_urusan",
+                            "action": "esakip_get_bidang_urusan",
                             "api_key": "<?php echo $api_key; ?>",
                             "type": 1
                         },
                         dataType: "json",
                         success: function(res) {
-                            window.all_program = {};
-                            res.data.map(function(b, i) {
-                                b.nama_urusan = b.nama_urusan.trim();
-                                b.nama_bidang_urusan = b.nama_bidang_urusan.trim();
-                                b.nama_program = b.nama_program.trim();
-                                if (!all_program[b.nama_urusan]) {
-                                    all_program[b.nama_urusan] = {};
-                                }
-                                if (!all_program[b.nama_urusan][b.nama_bidang_urusan]) {
-                                    all_program[b.nama_urusan][b.nama_bidang_urusan] = {};
-                                }
-                                if (!all_program[b.nama_urusan][b.nama_bidang_urusan][b.nama_program]) {
-                                    all_program[b.nama_urusan][b.nama_bidang_urusan][b.nama_program] = b;
-                                }
-                            });
-                            resolve();
+                            if (res && res.data && Array.isArray(res.data.data)) {
+                                window.all_program = {};
+                                res.data.data.map(function(b, i) {
+                                    b.nama_urusan = b.nama_urusan.trim();
+                                    b.nama_bidang_urusan = b.nama_bidang_urusan.trim();
+                                    b.nama_program = b.nama_program.trim();
+                                    if (!all_program[b.nama_urusan]) {
+                                        all_program[b.nama_urusan] = {};
+                                    }
+                                    if (!all_program[b.nama_urusan][b.nama_bidang_urusan]) {
+                                        all_program[b.nama_urusan][b.nama_bidang_urusan] = {};
+                                    }
+                                    if (!all_program[b.nama_urusan][b.nama_bidang_urusan][b.nama_program]) {
+                                        all_program[b.nama_urusan][b.nama_bidang_urusan][b.nama_program] = b;
+                                    }
+                                });
+                                resolve();
+                            } else {
+                                console.error("Unexpected response structure: ", res);
+                                reject("Unexpected response structure");
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("AJAX error: ", status, error);
+                            reject(error);
                         }
                     });
                 } else {
@@ -2259,26 +2295,35 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                         url: esakip.url,
                         type: "post",
                         data: {
-                            "action": "get_bidang_urusan",
+                            "action": "esakip_get_bidang_urusan",
                             "api_key": "<?php echo $api_key; ?>",
                             "type": 0
                         },
                         dataType: "json",
                         success: function(res) {
-                            window.all_skpd_program = {};
-                            res.data.map(function(b, i) {
-                                if (!all_skpd_program[b.id_program]) {
-                                    all_skpd_program[b.id_program] = [];
-                                }
-                                all_skpd_program[b.id_program].push(b);
-                            });
-                            window.all_skpd = {};
-                            res.data.map(function(b, i) {
-                                if (!all_skpd[b.id_skpd]) {
-                                    all_skpd[b.id_skpd] = b;
-                                }
-                            });
-                            resolve();
+                            if (res && res.data && Array.isArray(res.data.data)) {
+                                window.all_skpd_program = {};
+                                res.data.data.map(function(b, i) {
+                                    if (!all_skpd_program[b.id_program]) {
+                                        all_skpd_program[b.id_program] = [];
+                                    }
+                                    all_skpd_program[b.id_program].push(b);
+                                });
+                                window.all_skpd = {};
+                                res.data.data.map(function(b, i) {
+                                    if (!all_skpd[b.id_skpd]) {
+                                        all_skpd[b.id_skpd] = b;
+                                    }
+                                });
+                                resolve();
+                            } else {
+                                console.error("Unexpected response structure: ", res);
+                                reject("Unexpected response structure");
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("AJAX error: ", status, error);
+                            reject(error);
                         }
                     });
                 } else {
@@ -2339,48 +2384,59 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 jQuery('#kebijakan-teks-indikator').html('');
                 jQuery('#isu-teks-indikator').html('');
                 for (var b in res.data_all) {
-                    res.data_all[b].rpjpd.visi.data.data.map(function(bb, ii) {
-                        if (bb.id == res.data_all[b].rpjpd.visi.id) {
-                            jQuery('#visi-teks-indikator').html(bb.visi_teks);
-                        }
-                    });
+                    if (res.data_all[b].rpjpd.visi.data && Array.isArray(res.data_all[b].rpjpd.visi.data.data)) {
+                        res.data_all[b].rpjpd.visi.data.data.map(function(bb, ii) {
+                            if (bb.id == res.data_all[b].rpjpd.visi.id) {
+                                jQuery('#visi-teks-indikator').html(bb.visi_teks);
+                            }
+                        });
+                    }
 
-                    res.data_all[b].rpjpd.misi.data.data.map(function(bb, ii) {
-                        if (bb.id == res.data_all[b].rpjpd.misi.id) {
-                            jQuery('#misi-teks-indikator').html(bb.misi_teks);
-                        }
-                    });
+                    if (res.data_all[b].rpjpd.misi.data && Array.isArray(res.data_all[b].rpjpd.misi.data.data)) {
+                        res.data_all[b].rpjpd.misi.data.data.map(function(bb, ii) {
+                            if (bb.id == res.data_all[b].rpjpd.misi.id) {
+                                jQuery('#misi-teks-indikator').html(bb.misi_teks);
+                            }
+                        });
+                    }
 
-                    res.data_all[b].rpjpd.sasaran.data.data.map(function(bb, ii) {
-                        if (bb.id == res.data_all[b].rpjpd.sasaran.id) {
-                            jQuery('#saspok-teks-indikator').html(bb.saspok_teks);
-                        }
-                    });
+                    if (res.data_all[b].rpjpd.sasaran.data && Array.isArray(res.data_all[b].rpjpd.sasaran.data.data)) {
+                        res.data_all[b].rpjpd.sasaran.data.data.map(function(bb, ii) {
+                            if (bb.id == res.data_all[b].rpjpd.sasaran.id) {
+                                jQuery('#saspok-teks-indikator').html(bb.saspok_teks);
+                            }
+                        });
+                    }
 
-                    res.data_all[b].rpjpd.kebijakan.data.data.map(function(bb, ii) {
-                        var selected = '';
-                        if (bb.id == res.data_all[b].rpjpd.kebijakan.id) {
-                            jQuery('#kebijakan-teks-indikator').html(bb.kebijakan_teks);
-                        }
-                    });
+                    if (res.data_all[b].rpjpd.kebijakan.data && Array.isArray(res.data_all[b].rpjpd.kebijakan.data.data)) {
+                        res.data_all[b].rpjpd.kebijakan.data.data.map(function(bb, ii) {
+                            var selected = '';
+                            if (bb.id == res.data_all[b].rpjpd.kebijakan.id) {
+                                jQuery('#kebijakan-teks-indikator').html(bb.kebijakan_teks);
+                            }
+                        });
+                    }
 
-                    res.data_all[b].rpjpd.isu.data.data.map(function(bb, ii) {
-                        if (bb.id == res.data_all[b].rpjpd.isu.id) {
-                            jQuery('#isu-teks-indikator').html(bb.isu_teks);
-                        }
-                    });
+                    if (res.data_all[b].rpjpd.isu.data && Array.isArray(res.data_all[b].rpjpd.isu.data.data)) {
+                        res.data_all[b].rpjpd.isu.data.data.map(function(bb, ii) {
+                            if (bb.id == res.data_all[b].rpjpd.isu.id) {
+                                jQuery('#isu-teks-indikator').html(bb.isu_teks);
+                            }
+                        });
+                    }
 
                     jQuery('#tujuan-teks-indikator').html(res.data_all[b].nama);
                     jQuery('#modal-tujuan-indikator').attr('id-tujuan', res.data_all[b].id_unik);
-
-                    jQuery('#indikator-teks-tujuan').val(res.data_all[b].detail[0].indikator_teks);
-                    jQuery('#indikator-teks-tujuan-vol-awal').val(get_vol(res.data_all[b].detail[0].target_awal));
-                    jQuery('#indikator-teks-tujuan-satuan').val(res.data_all[b].detail[0].satuan);
-                    <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
-                        jQuery('#indikator-teks-tujuan-vol-<?php echo $i; ?>').val(get_vol(res.data_all[b].detail[0].target_<?php echo $i; ?>));
-                    <?php }; ?>
-                    jQuery('#indikator-teks-tujuan-vol-akhir').val(get_vol(res.data_all[b].detail[0].target_akhir));
-                    jQuery('#indikator-teks-tujuan-catatan').val(res.data_all[b].indikator_catatan_teks);
+                    if (res.data_all[b].detail && res.data_all[b].detail[0]) {
+                        jQuery('#indikator-teks-tujuan').val(res.data_all[b].detail[0].indikator_teks);
+                        jQuery('#indikator-teks-tujuan-vol-awal').val(get_vol(res.data_all[b].detail[0].target_awal));
+                        jQuery('#indikator-teks-tujuan-satuan').val(res.data_all[b].detail[0].satuan);
+                        <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
+                            jQuery('#indikator-teks-tujuan-vol-<?php echo $i; ?>').val(get_vol(res.data_all[b].detail[0].target_<?php echo $i; ?>));
+                        <?php }; ?>
+                        jQuery('#indikator-teks-tujuan-vol-akhir').val(get_vol(res.data_all[b].detail[0].target_akhir));
+                        jQuery('#indikator-teks-tujuan-catatan').val(res.data_all[b].indikator_catatan_teks);
+                    }
                 }
                 jQuery('#wrap-loading').hide();
                 jQuery('#modal-tujuan-indikator').attr('data-id', id_unik_tujuan_indikator);
@@ -2407,14 +2463,17 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     jQuery('#tujuan-sasaran-teks-indikator').html(jQuery('tr[id-tujuan="' + jQuery('#tambah-data-sasaran').attr('id-tujuan') + '"] td').eq(1).html());
                     jQuery('#sasaran-teks-indikator').html(res.data_all[b].nama);
                     jQuery('#modal-sasaran-indikator').attr('id-sasaran', res.data_all[b].id_unik);
-                    jQuery('#indikator-teks-sasaran').val(res.data_all[b].detail[0].indikator_teks);
-                    jQuery('#indikator-teks-sasaran-satuan').val(res.data_all[b].detail[0].satuan);
-                    jQuery('#indikator-teks-sasaran-vol-awal').val(get_vol(res.data_all[b].detail[0].target_awal));
-                    <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
-                        jQuery('#indikator-teks-sasaran-vol-<?php echo $i; ?>').val(get_vol(res.data_all[b].detail[0].target_<?php echo $i; ?>));
-                    <?php }; ?>
-                    jQuery('#indikator-teks-sasaran-vol-akhir').val(get_vol(res.data_all[b].detail[0].target_akhir));
-                    jQuery('#indikator-catatan-teks-sasaran').val(res.data_all[b].indikator_catatan_teks);
+
+                    if (res.data_all[b].detail && res.data_all[b].detail[0]) {
+                        jQuery('#indikator-teks-sasaran').val(res.data_all[b].detail[0].indikator_teks);
+                        jQuery('#indikator-teks-sasaran-satuan').val(res.data_all[b].detail[0].satuan);
+                        jQuery('#indikator-teks-sasaran-vol-awal').val(get_vol(res.data_all[b].detail[0].target_awal));
+                        <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
+                            jQuery('#indikator-teks-sasaran-vol-<?php echo $i; ?>').val(get_vol(res.data_all[b].detail[0].target_<?php echo $i; ?>));
+                        <?php }; ?>
+                        jQuery('#indikator-teks-sasaran-vol-akhir').val(get_vol(res.data_all[b].detail[0].target_akhir));
+                        jQuery('#indikator-catatan-teks-sasaran').val(res.data_all[b].indikator_catatan_teks);
+                    }
                 }
                 jQuery('#wrap-loading').hide();
                 jQuery('#modal-sasaran-indikator').attr('data-id', id_unik_sasaran_indikator);
@@ -2440,20 +2499,24 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 jQuery('#program-tujuan-teks-indikator').html(jQuery('tr[id-tujuan="' + jQuery('#tambah-data-sasaran').attr('id-tujuan') + '"] td').eq(1).html());
                 jQuery('#program-sasaran-teks-indikator').html(jQuery('tr[id-sasaran="' + jQuery('#tambah-data-program').attr('id-sasaran') + '"] td').eq(1).html());
                 jQuery('#program-teks-indikator').html(res.data[0].nama_program);
+
                 get_bidang_urusan(true).then(function() {
                     for (var b in res.data_all) {
                         get_skpd(res.data_all[b].detail[0].id_program, res.data_all[b].detail[0].id_unit);
                         jQuery('#program-teks-indikator').html(res.data_all[b].nama);
                         jQuery('#modal-program-indikator').attr('id-program', res.data_all[b].id_unik);
-                        jQuery('#indikator-teks-program').val(res.data_all[b].detail[0].indikator);
-                        jQuery('#indikator-teks-program-vol-awal').val(get_vol(res.data_all[b].detail[0].target_awal));
-                        jQuery('#indikator-teks-program-satuan').val(res.data_all[b].detail[0].satuan);
-                        <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
-                            jQuery('#indikator-teks-program-vol-<?php echo $i; ?>').val(get_vol(res.data_all[b].detail[0].target_<?php echo $i; ?>));
-                            jQuery('#indikator-teks-program-pagu-<?php echo $i; ?>').val(res.data_all[b].detail[0].pagu_<?php echo $i; ?>);
-                        <?php }; ?>
-                        jQuery('#indikator-teks-program-vol-akhir').val(get_vol(res.data_all[b].detail[0].target_akhir));
-                        jQuery('#indikator-catatan-teks-program').val(res.data_all[b].detail[0].catatan);
+
+                        if (res.data_all[b].detail && res.data_all[b].detail[0]) {
+                            jQuery('#indikator-teks-program').val(res.data_all[b].detail[0].indikator);
+                            jQuery('#indikator-teks-program-vol-awal').val(get_vol(res.data_all[b].detail[0].target_awal));
+                            jQuery('#indikator-teks-program-satuan').val(res.data_all[b].detail[0].satuan);
+                            <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
+                                jQuery('#indikator-teks-program-vol-<?php echo $i; ?>').val(get_vol(res.data_all[b].detail[0].target_<?php echo $i; ?>));
+                                jQuery('#indikator-teks-program-pagu-<?php echo $i; ?>').val(res.data_all[b].detail[0].pagu_<?php echo $i; ?>);
+                            <?php }; ?>
+                            jQuery('#indikator-teks-program-vol-akhir').val(get_vol(res.data_all[b].detail[0].target_akhir));
+                            jQuery('#indikator-catatan-teks-program').val(res.data_all[b].detail[0].catatan);
+                        }
                     }
                     jQuery('#wrap-loading').hide();
                     jQuery('#modal-program-indikator').attr('data-id', id_unik_program_indikator);
@@ -2496,7 +2559,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 url: esakip.url,
                 type: "post",
                 data: {
-                    "action": "simpan_rpd",
+                    "action": "esakip_simpan_rpd",
                     "api_key": "<?php echo $api_key; ?>",
                     "table": 'esakip_rpd_tujuan',
                     "data": tujuan_teks,
@@ -2544,7 +2607,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 url: esakip.url,
                 type: "post",
                 data: {
-                    "action": "simpan_rpd",
+                    "action": "esakip_simpan_rpd",
                     "api_key": "<?php echo $api_key; ?>",
                     "table": 'esakip_rpd_sasaran',
                     "data": sasaran_teks,
@@ -2587,7 +2650,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 url: esakip.url,
                 type: "post",
                 data: {
-                    "action": "simpan_rpd",
+                    "action": "esakip_simpan_rpd",
                     "api_key": "<?php echo $api_key; ?>",
                     "table": 'esakip_rpd_program',
                     "data": id_program_master,
@@ -2931,7 +2994,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 url: esakip.url,
                 type: "post",
                 data: {
-                    "action": "simpan_rpd",
+                    "action": "esakip_simpan_rpd",
                     "api_key": "<?php echo $api_key; ?>",
                     "table": 'esakip_rpd_program',
                     "data": program_teks_indikator,
@@ -2968,7 +3031,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 url: esakip.url,
                 type: "post",
                 data: {
-                    "action": "get_rpjpd",
+                    "action": "esakip_get_rpjpd",
                     "api_key": "<?php echo $api_key; ?>",
                     "table": table,
                     "id": id

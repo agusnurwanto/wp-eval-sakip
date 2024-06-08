@@ -202,11 +202,13 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_submit_jadwal_rpjmd',  $plugin_public, 'submit_jadwal_rpjmd');
 		$this->loader->add_action('wp_ajax_delete_jadwal_rpjmd',  $plugin_public, 'delete_jadwal_rpjmd');
 		$this->loader->add_action('wp_ajax_submit_edit_jadwal_rpjmd',  $plugin_public, 'submit_edit_jadwal_rpjmd');
+		$this->loader->add_action('wp_ajax_get_data_jadwal_by_id_rpjmd', $plugin_public, 'get_data_jadwal_by_id_rpjmd');
 
 		$this->loader->add_action('wp_ajax_get_data_penjadwalan_rpjpd', $plugin_public, 'get_data_penjadwalan_rpjpd');
 		$this->loader->add_action('wp_ajax_submit_jadwal_rpjpd',  $plugin_public, 'submit_jadwal_rpjpd');
 		$this->loader->add_action('wp_ajax_delete_jadwal_rpjpd',  $plugin_public, 'delete_jadwal_rpjpd');
 		$this->loader->add_action('wp_ajax_submit_edit_jadwal_rpjpd',  $plugin_public, 'submit_edit_jadwal_rpjpd');
+		$this->loader->add_action('wp_ajax_get_data_jadwal_by_id_rpjpd', $plugin_public, 'get_data_jadwal_by_id_rpjpd');
 		
 		$this->loader->add_action('wp_ajax_get_data_penjadwalan_verifikasi_upload_dokumen', $plugin_public, 'get_data_penjadwalan_verifikasi_upload_dokumen');
 		$this->loader->add_action('wp_ajax_submit_jadwal_verifikasi_upload_dokumen',  $plugin_public, 'submit_jadwal_verifikasi_upload_dokumen');
@@ -478,6 +480,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_esakip_hapus_rpd',  $plugin_public, 'esakip_hapus_rpd');
 		$this->loader->add_action('wp_ajax_esakip_simpan_rpd',  $plugin_public, 'esakip_simpan_rpd');
 		$this->loader->add_action('wp_ajax_esakip_get_rpd',  $plugin_public, 'esakip_get_rpd');
+		$this->loader->add_action('wp_ajax_esakip_get_bidang_urusan',  $plugin_public, 'esakip_get_bidang_urusan');
 
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));

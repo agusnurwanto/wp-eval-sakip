@@ -6,7 +6,7 @@ if (!defined('WPINC')) {
 }
 
 $input = shortcode_atts(array(
-	'tahun_anggaran' => '2022'
+	'tahun' => '2022'
 ), $atts);
 
 // Perangkat Daerah
@@ -18,7 +18,7 @@ $dokumen = $wpdb->get_results($wpdb->prepare("
 		AND active=1
 		AND user_role= 'perangkat_daerah'
 		AND nama_dokumen NOT LIKE 'RENSTRA'
-", $input['tahun_anggaran']), ARRAY_A);
+", $input['tahun']), ARRAY_A);
 $dok_html = "";
 foreach($dokumen as $dok){
 	$dok_html .= "<th class='text-center'>".$dok['nama_dokumen']."</th>";
@@ -31,7 +31,7 @@ $unit = $wpdb->get_results($wpdb->prepare("
 	WHERE tahun_anggaran=%d
 		AND active=1
 		AND is_skpd=1
-", $input['tahun_anggaran']), ARRAY_A);
+", $input['tahun']), ARRAY_A);
 $unit_html = "";
 $no = 0;
 foreach($unit as $opd){
@@ -45,7 +45,7 @@ foreach($unit as $opd){
 			WHERE id_skpd=%d
 				AND active=1
 				AND tahun_anggaran=%d
-		", $opd['id_skpd'], $input['tahun_anggaran']));
+		", $opd['id_skpd'], $input['tahun']));
 	$warning = "bg-success";
 	if($jml_dokumen == 0){
 		$warning="bg-danger";
@@ -115,7 +115,7 @@ $dokumen_pemda = $wpdb->get_results($wpdb->prepare("
 		AND active=1
 		AND user_role='pemerintah_daerah'
 		AND nama_dokumen NOT IN ('RPJPD', 'RPJMD')
-", $input['tahun_anggaran']), ARRAY_A);
+", $input['tahun']), ARRAY_A);
 $get_dok_html_pemda = "";
 foreach($dokumen_pemda as $dok_pemda){
 	$get_dok_html_pemda .= "<th class='text-center'>".$dok_pemda['nama_dokumen']."</th>";
@@ -130,7 +130,7 @@ foreach($dokumen_pemda as $dok_pemda){
 		FROM $dok_pemda[nama_tabel]
 		WHERE active=1
 			AND tahun_anggaran=%d
-	", $input['tahun_anggaran']));
+	", $input['tahun']));
 	$warning = "bg-success";
 	if($jml_dokumen_pemda == 0){
 		$warning="bg-danger";
@@ -153,6 +153,7 @@ $dokumen_rpjpd_rpjmd = $wpdb->get_results($wpdb->prepare("
 		lama_pelaksanaan
 	FROM esakip_data_jadwal
 	WHERE tipe IN ('RPJPD','RPJMD')
+		AND status = 1
 	ORDER BY tipe DESC, id ASC
 ",), ARRAY_A);
 
@@ -210,24 +211,6 @@ $unit_html_rpjpd_rpjmd .= "
 <div class="container-md">
 	<div class="cetak">
 		<div style="padding: 10px;margin:0 0 3rem 0;">
-			<h1 class="text-center table-title">Monitor Upload Dokumen Pemerintah Daerah Tahun <?php echo $input['tahun_anggaran']; ?></h1>
-			<table>
-				<thead>
-					<tr>
-						<?php echo $get_dok_html_pemda; ?>
-					</tr>
-				</thead>
-				<tbody>
-					<?php echo $unit_html_pemda; ?>
-				</tbody>
-			</table>
-		</div>
-	</div>
-</div>
-
-<div class="container-md">
-	<div class="cetak">
-		<div style="padding: 10px;margin:0 0 3rem 0;">
 			<h1 class="text-center table-title">Monitor Upload Dokumen RENSTRA</h1>
 			<table>
 				<thead>
@@ -248,7 +231,25 @@ $unit_html_rpjpd_rpjmd .= "
 <div class="container-md">
 	<div class="cetak">
 		<div style="padding: 10px;margin:0 0 3rem 0;">
-			<h1 class="text-center table-title">Monitor Upload Dokumen Perangkat Daerah Tahun <?php echo $input['tahun_anggaran']; ?></h1>
+			<h1 class="text-center table-title">Monitor Upload Dokumen Pemerintah Daerah Tahun <?php echo $input['tahun']; ?></h1>
+			<table>
+				<thead>
+					<tr>
+						<?php echo $get_dok_html_pemda; ?>
+					</tr>
+				</thead>
+				<tbody>
+					<?php echo $unit_html_pemda; ?>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="container-md">
+	<div class="cetak">
+		<div style="padding: 10px;margin:0 0 3rem 0;">
+			<h1 class="text-center table-title">Monitor Upload Dokumen Perangkat Daerah Tahun <?php echo $input['tahun']; ?></h1>
 			<table>
 				<thead>
 					<tr>
