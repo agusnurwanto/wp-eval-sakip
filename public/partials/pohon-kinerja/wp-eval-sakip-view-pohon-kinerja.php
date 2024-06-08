@@ -142,13 +142,11 @@ if(!empty($pohon_kinerja_level_1)){
 	}
 }
 
-// echo '<pre>'; print_r($data_all['data']); echo '</pre>';die();
-
-$style0 = 'style=\"color:#252020;font-size:13px; font-weight:600; padding:20px\"';
-$style1 = 'style=\"color: #0d0909; font-size:12px; font-weight:600;font-style:italic; border-radius: 5px; background: #efd655; padding:10px\"';
-$style2 = 'style=\"color:#454810; font-size:12px; font-weight:600; font-style:italic; background: #4df8ef; padding:10px\"';
-$style3 = 'style=\"color: #0d0909; font-size:12px; font-weight:600;font-style:italic; border-radius: 5px; background: #f84d4d; padding:10px\"';
-$style4 = 'style=\"color: #0d0909; font-size:12px; font-weight:600;font-style:italic; border-radius: 5px; background: #5995e9; padding:10px\"';
+$style0 = 'style=\"color:#0d0909;font-size:13px; font-weight:600; padding:15px; min-height:60px\"';
+$style1 = 'style=\"color: #0d0909; font-size:12px; font-weight:600;font-style:italic; border-radius: 5px; background: #efd655; padding:10px; min-height:60px\"';
+$style2 = 'style=\"color:#0d0909; font-size:12px; font-weight:600; font-style:italic; background: #fe7373; padding:10px; min-height:60px\"';
+$style3 = 'style=\"color: #0d0909; font-size:12px; font-weight:600;font-style:italic; border-radius: 5px; background: #57b2ec; padding:10px; min-height:60px\"';
+$style4 = 'style=\"color: #0d0909; font-size:12px; font-weight:600;font-style:italic; border-radius: 5px; background: #c979e3; padding:10px; min-height:60px;\"';
 
 $data_temp= [];
 if(!empty($data_all['data'])){
@@ -175,7 +173,7 @@ if(!empty($data_all['data'])){
 
 		        if(!empty($level_2['indikator'])){
 			        foreach ($level_2['indikator'] as $keyindikatorlevel2 => $indikator) {
-			            $data_temp[$keylevel2][0]->f.="<div ".$style3.">".$indikator['label_indikator_kinerja']."</div>";
+			            $data_temp[$keylevel2][0]->f.="<div ".$style2.">".$indikator['label_indikator_kinerja']."</div>";
 			        }
 		        }
 
@@ -189,7 +187,7 @@ if(!empty($data_all['data'])){
 
 			            if(!empty($level_3['indikator'])){
 				            foreach ($level_3['indikator'] as $keyindikatorlevel3 => $indikator) {
-				                $data_temp[$keylevel3][0]->f.="<div ".$style4.">".$indikator['label_indikator_kinerja']."</div>";
+				                $data_temp[$keylevel3][0]->f.="<div ".$style3.">".$indikator['label_indikator_kinerja']."</div>";
 				            }
 			            }
 
@@ -233,10 +231,12 @@ if(!empty($data_all['data'])){
 
 <style type="text/css">
   	.google-visualization-orgchart-node{
-    	background: #53cb82;
+    	background: #4dec9d;
+    	border-radius: 10px;
+    	border:0;
   	}
   	#chart_div .google-visualization-orgchart-connrow-medium{
-    	height: 34px;
+    	height: 20px;
   	}
   	#chart_div .google-visualization-orgchart-linebottom {
     	border-bottom: 4px solid #f84d4d;
@@ -276,7 +276,7 @@ if(!empty($data_all['data'])){
         data.addColumn('string', 'Level2');
         data.addColumn('string', 'ToolTip');
         data.addRows(data_all);
-        data.setRowProperty(2, 'selectedStyle', 'background-color:#00FF00');
+        data.setRowProperty(2, 'selectedStyle');
        
         // Create the chart.
         var chart = new google.visualization.OrgChart(document.getElementById('chart_div'));
