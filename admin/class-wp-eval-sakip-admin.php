@@ -1653,6 +1653,45 @@ class Wp_Eval_Sakip_Admin
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'input_pohon_kinerja')));
 
+		Container::make('theme_options', __('Pohon Kinerja Pemerintah Daerah'))
+			->set_page_parent($pengisian_pokin_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_pengisian_pokin_pemda_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'input_pohon_kinerja_pemda')));
+
+		Container::make('theme_options', __('Cascading Pemerintah Daerah'))
+			->set_page_parent($pengisian_pokin_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_pengisian_cascading_pemda_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'cascading_pemda')));
+
+		Container::make('theme_options', __('Croscutting Pemerintah Daerah'))
+			->set_page_parent($pengisian_pokin_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_pengisian_croscutting_pemda_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'croscutting_pemda')));
+
 		Container::make('theme_options', __('Pohon Kinerja Perangkat Daerah'))
 			->set_page_parent($pengisian_pokin_menu)
 			->add_fields(array(
@@ -1666,7 +1705,33 @@ class Wp_Eval_Sakip_Admin
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'input_pohon_kinerja_opd')));
 
-		$monev_pokin_menu = Container::make('theme_options', __('MONEV Kinerja'))
+		Container::make('theme_options', __('Cascading Perangkat Daerah'))
+			->set_page_parent($pengisian_pokin_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_pengisian_cascading_pd_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'cascading_pd')));
+
+		Container::make('theme_options', __('Croscutting Perangkat Daerah'))
+			->set_page_parent($pengisian_pokin_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_pengisian_croscutting_pd_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'croscutting_pd')));
+
+		$monev_ren_aksi_menu = Container::make('theme_options', __('MONEV Rencana Aksi'))
 			->set_page_menu_position(3.5)
 			->set_icon('dashicons-edit-page')
 			->add_fields(array(
@@ -1679,21 +1744,34 @@ class Wp_Eval_Sakip_Admin
 		        	')
 			));
 
-		$input_perencanaan_menu = Container::make('theme_options', __('Input Perencanaan'))
-			->set_page_menu_position(3.5)
-			->set_icon('dashicons-edit-page')
+		Container::make('theme_options', __('MONEV Rencana Aksi Pemerintah Daerah'))
+			->set_page_parent($monev_ren_aksi_menu)
 			->add_fields(array(
-				Field::make('html', 'crb_input_perencanaan_hide_sidebar')
+				Field::make('html', 'crb_pengisian_monev_pemda_hide_sidebar')
 					->set_html('
-							<style>
-								.postbox-container { display: none; }
-								#poststuff #post-body.columns-2 { margin: 0 !important; }
-							</style>
-						')
-			));
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'monev_rencana_aksi_pemda')));
+
+		Container::make('theme_options', __('MONEV Rencana Aksi Perangkat Daerah'))
+			->set_page_parent($monev_ren_aksi_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_pengisian_monev_pd_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'monev_rencana_aksi_opd')));
 
 		Container::make('theme_options', __('Input RPJPD'))
-			->set_page_parent($input_perencanaan_menu)
+			->set_page_menu_position(3.6)
 			->add_fields(array(
 				Field::make('html', 'crb_perencanaan_rpjpd_hide_sidebar')
 					->set_html('
@@ -1706,7 +1784,7 @@ class Wp_Eval_Sakip_Admin
 			->add_fields($this->get_ajax_field(array('type' => 'input_perencanaan_rpjpd')));
 
 		Container::make('theme_options', __('Input RPJMD'))
-			->set_page_parent($input_perencanaan_menu)
+			->set_page_menu_position(3.7)
 			->add_fields(array(
 				Field::make('html', 'crb_perencanaan_rpjmd_hide_sidebar')
 					->set_html('
