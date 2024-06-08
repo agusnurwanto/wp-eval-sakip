@@ -6417,6 +6417,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 
 				if ($ret['status'] == 'success') {
+
+				// untuk mengatur judul halaman sesuai tipe dokumen
+					$nama_page = array(
+						"pohon_kinerja_dan_cascading" => "Pohon Kinerja dan Cascading",
+						"lhe_akip_internal" => "LHE AKIP Internal",
+						"tl_lhe_akip_internal" => "TL LHE AKIP Internal",
+						"tl_lhe_akip_kemenpan" => "TL LHE AKIP Kemenpan"
+					);
 					// untuk mengatur tabel sesuai tipe dokumen
 					$nama_tabel = array(
 						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading",
@@ -6450,7 +6458,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 							$btn = '<div class="btn-action-group">';
 							$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-							if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen($nama_tabel[$tipe_dokumen], $tahun_anggaran)) {
+							if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen($nama_page[$tipe_dokumen], $tahun_anggaran)) {
 								$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 								$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 							}
