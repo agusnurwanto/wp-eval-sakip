@@ -15981,6 +15981,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			ARRAY_A
 		);
 		$periode_rpjpd = '';
+		$periode_input_rpjpd = '';
 		foreach ($jadwal_periode_rpjpd as $jadwal_periode_item_rpjpd) {
 			$tahun_anggaran_selesai = $jadwal_periode_item_rpjpd['tahun_anggaran'] + $jadwal_periode_item_rpjpd['lama_pelaksanaan'];
 
@@ -15991,6 +15992,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$periode_rpjpd .= '<li><a target="_blank" href="' . $rpjpd['url'] . '" class="btn btn-primary">' . $rpjpd['title'] . '</a></li>';
+
+			$input_rpjpd = $this->functions->generatePage(array(
+				'nama_page' => 'Input RPJPD | ' . $jadwal_periode_item_rpjpd['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item_rpjpd['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[input_rpjpd periode=' . $jadwal_periode_item_rpjpd['id'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$periode_input_rpjpd .= '<li><a target="_blank" href="' . $input_rpjpd['url'] . '" class="btn btn-primary">' . $input_rpjpd['title'] . '</a></li>';
 		}
 
 		$jadwal_periode = $wpdb->get_results(
@@ -16006,6 +16015,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			ARRAY_A
 		);
 		// SAKIP PEMDA
+		$halaman_monitor_upload_dokumen = '';
 		$renja_detail_pemda = '';
 		$iku_detail_pemda = '';
 		$skp_detail_pemda = '';
@@ -16033,9 +16043,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$halaman_renstra = '';
 		$halaman_renstra_opd = '';
 		$halaman_renstra_skpd = '';
+		$periode_rpjmd = '';
+		$periode_input_rpjmd = '';
+		$periode_input_pohon_kinerja_pemda = '';
 
 		// SAKIP Perangkat Daerah
-		$periode_rpjmd = '';
 		$periode_renstra = '';
 		$periode_renstra_skpd = '';
 		$renja_rkt_detail = '';
@@ -16091,6 +16103,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			));
 			$periode_rpjmd .= '<li><a target="_blank" href="' . $rpjmd['url'] . '" class="btn btn-primary">' . $rpjmd['title'] . '</a></li>';
 
+			$input_rpjmd = $this->functions->generatePage(array(
+				'nama_page' => 'Input RPJMD | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[input_rpjmd periode=' . $jadwal_periode_item['id'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$periode_input_rpjmd .= '<li><a target="_blank" href="' . $input_rpjmd['url'] . '" class="btn btn-primary">' . $input_rpjmd['title'] . '</a></li>';
+
+			$input_pohon_kinerja_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'Input Pohon Kinerja | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[penyusunan_pohon_kinerja periode=' . $jadwal_periode_item['id'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$periode_input_pohon_kinerja_pemda .= '<li><a target="_blank" href="#" class="btn btn-primary">' . $input_pohon_kinerja_pemda['title'] . '</a></li>';
+
 			$renstra = $this->functions->generatePage(array(
 				'nama_page' => 'RENSTRA | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
 				'content' => '[renstra periode=' . $jadwal_periode_item['id'] . ']',
@@ -16100,6 +16128,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$periode_renstra .= '<li><a target="_blank" href="' . $renstra['url'] . '" class="btn btn-primary">' . $renstra['title'] . '</a></li>';
 		}
 		// PEMDA
+
+		$monitor_upload_dokumen = $this->functions->generatePage(array(
+			'nama_page' => 'Laporan Monitor Upload Dokumen'.$_GET['tahun'],
+			'content' => '[halaman_cek_dokumen periode=' .$_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$halaman_monitor_upload_dokumen .= '<li><a target="_blank" href="' . $monitor_upload_dokumen['url'] . '" class="btn btn-primary"> Laporan Monitor Upload Dokumen </a></li>';
 
 		if (!empty($cek_data['pemerintah_daerah']['IKU']) && $cek_data['pemerintah_daerah']['IKU']['active'] == 1) {
 			$iku_pemda = $this->functions->generatePage(array(
@@ -16592,6 +16628,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (empty($periode_renstra)) {
 			$periode_renstra = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
 		}
+		if (empty($periode_input_rpjpd)) {
+			$periode_input_rpjpd = '<li><a return="false" href="#" class="btn btn-secondary">Periode Input RPJPD kosong atau belum dibuat</a></li>';
+		}
+		if (empty($periode_input_rpjmd)) {
+			$periode_input_rpjmd = '<li><a return="false" href="#" class="btn btn-secondary">Periode Input RPJMD kosong atau belum dibuat</a></li>';
+		}
+		if (empty($periode_input_pohon_kinerja_pemda)) {
+			$periode_input_pohon_kinerja_pemda = '<li><a return="false" href="#" class="btn btn-secondary">Periode Input Pohon Kinerja kosong atau belum dibuat</a></li>';
+		}
 
 		$halaman_lke = '
 			<div class="accordion">
@@ -16640,6 +16685,35 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				</div>';
 			$cek_data['perangkat_daerah']['RENSTRA']['link'] = $halaman_renstra_opd;
 		}
+		$halaman_input_rpjpd = '
+			<div class="accordion">
+				<h5 class="esakip-header-tahun" data-id="input_rpjpd" style="margin: 0;">Periode Input RPJPD</h5>
+				<div class="esakip-body-tahun" data-id="input_rpjpd">
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+						' . $periode_input_rpjpd . '
+					</ul>
+				</div>
+			</div>';
+
+		$halaman_input_rpjmd = '
+			<div class="accordion">
+				<h5 class="esakip-header-tahun" data-id="input_rpjmd" style="margin: 0;">Periode Input RPJMD</h5>
+				<div class="esakip-body-tahun" data-id="input_rpjmd">
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+						' . $periode_input_rpjmd . '
+					</ul>
+				</div>
+			</div>';
+
+		$halaman_input_pohon_kinerja_pemda = '
+			<div class="accordion">
+				<h5 class="esakip-header-tahun" data-id="input_pohon_kinerja" style="margin: 0;">Periode Input Pohon Kinerja</h5>
+				<div class="esakip-body-tahun" data-id="input_pohon_kinerja">
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+						' . $periode_input_pohon_kinerja_pemda . '
+					</ul>
+				</div>
+			</div>';
 
 		$halaman_sakip = '
 			<div class="accordion">
@@ -16687,6 +16761,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$halaman_sakip_opd .= $data['link'];
 			}
 		}
+
+		$halaman_input_rpjpd_rpjmd = '
+			<div class="accordion">
+				<h5 class="esakip-header-tahun" data-id="halaman-input-rpjpd-rpjmd" style="margin: 0;">Periode Input</h5>
+				<div class="esakip-body-tahun" data-id="halaman-input-rpjpd-rpjmd">
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+						' . $halaman_input_rpjpd . '
+						' . $halaman_input_rpjmd . '
+						' . $halaman_input_pohon_kinerja_pemda . '
+					</ul>
+				</div>
+			</div>';
 		$halaman_sakip_opd .= '
 					</ul>
 				</div>
@@ -16698,11 +16784,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			|| in_array("admin_panrb", $user_meta->roles)
 		) {
 			echo '
-				<ul class="daftar-menu-sakip">
-					<li>' . $halaman_sakip . '</li>
-					<li>' . $halaman_sakip_opd . '</li>
-					<li>' . $halaman_lke . '</li>
-				</ul>';
+        		<ul class="daftar-menu-sakip">
+					<li>' . $halaman_monitor_upload_dokumen . '</li>
+            		<li>' . $halaman_sakip . '</li>
+           			<li>' . $halaman_sakip_opd . '</li>
+            		<li>' . $halaman_lke . '</li>';
+    			if (in_array("admin_panrb", $user_meta->roles) || in_array("admin_bappeda", $user_meta->roles)) {
+       				echo '<li>' . $halaman_input_rpjpd_rpjmd . '</li>';
+   				}
+    		echo '</ul>';
 		} else if (
 			in_array("pa", $user_meta->roles)
 			|| in_array("kpa", $user_meta->roles)
