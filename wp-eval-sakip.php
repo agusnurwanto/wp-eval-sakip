@@ -35,6 +35,8 @@ define( 'ESAKIP_PLUGIN_PATH', plugin_dir_path(__FILE__) );
 define( 'ESAKIP_APIKEY', '_crb_apikey_esakip' );
 define( 'ESAKIP_NAMA_PEMDA', '_crb_nama_pemda' );
 define( 'ESAKIP_TAHUN_ANGGARAN', '_crb_tahun_wpsipd' );
+define( 'ESAKIP_URL_WPSIPD', '_crb_url_server_sakip' );
+define( 'ESAKIP_APIKEY_WPSIPD', '_crb_apikey_wpsipd' );
 
 // ============== https://carbonfields.net/ ================
 if(!defined('Carbon_Fields_Plugin\PLUGIN_FILE')){
