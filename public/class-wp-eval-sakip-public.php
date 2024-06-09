@@ -16106,6 +16106,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$periode_rpjmd = '';
 		$periode_input_rpjmd = '';
 		$periode_input_pohon_kinerja_pemda = '';
+		$periode_input_cascading_pemda = '';
+		$periode_input_croscutting_pemda = '';
 
 		// SAKIP Perangkat Daerah
 		$periode_renstra = '';
@@ -16132,6 +16134,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$pedoman_teknis_perencanaan_detail = '';
 		$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_detail = '';
 		$pedoman_teknis_evaluasi_internal_detail = '';
+		$periode_input_cascading = '';
+		$periode_input_croscutting = '';
 
 		//Perangkat Daerah
 		$renja_skpd_detail = '';
@@ -16177,11 +16181,27 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 			$input_pohon_kinerja_pemda = $this->functions->generatePage(array(
 				'nama_page' => 'Input Pohon Kinerja | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-				'content' => '[penyusunan_pohon_kinerja periode=' . $jadwal_periode_item['id'] . ']',
+				'content' => '[input_pohon_kinerja_pemda periode=' . $jadwal_periode_item['id'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$periode_input_pohon_kinerja_pemda .= '<li><a target="_blank" href="#" class="btn btn-primary">' . $input_pohon_kinerja_pemda['title'] . '</a></li>';
+			$periode_input_pohon_kinerja_pemda .= '<li><a target="_blank" href="' . $input_pohon_kinerja_pemda['url'] . '" class="btn btn-primary">' . $input_pohon_kinerja_pemda['title'] . '</a></li>';
+
+			$input_cascading_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'Input Cascading Pemda | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[cascading_pemda periode=' . $jadwal_periode_item['id'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$periode_input_cascading_pemda .= '<li><a target="_blank" href="' . $input_cascading_pemda['url'] . '" class="btn btn-primary"> Input Cascading | ' . $jadwal_periode_item['nama_jadwal'] . ' Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai.'</a></li>';
+
+			$input_croscutting_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'Input Croscutting Pemda | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[croscutting_pemda periode=' . $jadwal_periode_item['id'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$periode_input_croscutting_pemda .= '<li><a target="_blank" href="' . $input_croscutting_pemda['url'] . '" class="btn btn-primary"> Input Croscutting | ' . $jadwal_periode_item['nama_jadwal'] . '</a></li>';
 
 			$renstra = $this->functions->generatePage(array(
 				'nama_page' => 'RENSTRA | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
@@ -16701,6 +16721,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (empty($periode_input_pohon_kinerja_pemda)) {
 			$periode_input_pohon_kinerja_pemda = '<li><a return="false" href="#" class="btn btn-secondary">Periode Input Pohon Kinerja kosong atau belum dibuat</a></li>';
 		}
+		if (empty($periode_input_cascading_pemda)) {
+			$periode_input_cascading_pemda = '<li><a return="false" href="#" class="btn btn-secondary">Periode Input Cascading kosong atau belum dibuat</a></li>';
+		}
+		if (empty($periode_input_croscutting_pemda)) {
+			$periode_input_croscutting_pemda = '<li><a return="false" href="#" class="btn btn-secondary">Periode Input Croscutting kosong atau belum dibuat</a></li>';
+		}
 
 		$halaman_lke = '
 			<div class="accordion">
@@ -16779,6 +16805,26 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				</div>
 			</div>';
 
+		$halaman_input_cascading_pemda = '
+			<div class="accordion">
+				<h5 class="esakip-header-tahun" data-id="input_cascading_pemda" style="margin: 0;">Periode Input Cascading</h5>
+				<div class="esakip-body-tahun" data-id="input_cascading_pemda">
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+						' . $periode_input_cascading_pemda . '
+					</ul>
+				</div>
+			</div>';
+
+		$halaman_input_croscutting_pemda = '
+			<div class="accordion">
+				<h5 class="esakip-header-tahun" data-id="input_croscutting" style="margin: 0;">Periode Input Croscutting</h5>
+				<div class="esakip-body-tahun" data-id="input_croscutting">
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+						' . $periode_input_croscutting_pemda . '
+					</ul>
+				</div>
+			</div>';
+
 		$halaman_sakip = '
 			<div class="accordion">
 				<h5 class="esakip-header-tahun" data-id="halaman-sakip" style="margin: 0;">Dokumen SAKIP Pemerintah Daerah</h5>
@@ -16834,6 +16880,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						' . $halaman_input_rpjpd . '
 						' . $halaman_input_rpjmd . '
 						' . $halaman_input_pohon_kinerja_pemda . '
+						' . $halaman_input_cascading_pemda . '
+						' . $halaman_input_croscutting_pemda . '
 					</ul>
 				</div>
 			</div>';
