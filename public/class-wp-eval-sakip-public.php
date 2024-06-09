@@ -11467,7 +11467,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen_renstra('RENSTRA')) {							
+						if (!$this->is_admin_panrb() 
+							// && $this->hak_akses_upload_dokumen_renstra('RENSTRA')
+						) {							
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 
 							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_renstra(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
@@ -16773,31 +16775,37 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				</div>';
 			$cek_data['perangkat_daerah']['RENSTRA']['link'] = $halaman_renstra_opd;
 		}
+
+		//halaman cascading dan croscutting
+			// <li>
+			// 	<div class="accordion">
+			// 		<h5 class="esakip-header-tahun" data-id="halaman-input-pokin" style="margin: 0;">Input Cascading</h5>
+			// 		<div class="esakip-body-tahun" data-id="halaman-input-pokin">
+			// 			<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+			// 				' . $halaman_input_cascading_pemda . '
+			// 			</ul>
+			// 		</div>
+			// 	</div>
+			// </li>
+			// <li>
+			// 	<div class="accordion">
+			// 		<h5 class="esakip-header-tahun" data-id="halaman-input-pokin" style="margin: 0;">Input Crosscutting</h5>
+			// 		<div class="esakip-body-tahun" data-id="halaman-input-pokin">
+			// 			<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+			// 				' . $halaman_input_croscutting_pemda . '
+			// 			</ul>
+			// 		</div>
+			// 	</div>
+			// </li>
 		$halaman_input_rpjpd = $periode_input_rpjpd;
 
 		$halaman_input_rpjmd = $periode_input_rpjmd;
 
 		$halaman_input_pohon_kinerja_pemda = $periode_input_pohon_kinerja_pemda;
 
-		$halaman_input_cascading_pemda = '
-			<div class="accordion">
-				<h5 class="esakip-header-tahun" data-id="input_cascading_pemda" style="margin: 0;">Periode Input Cascading</h5>
-				<div class="esakip-body-tahun" data-id="input_cascading_pemda">
-					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-						' . $periode_input_cascading_pemda . '
-					</ul>
-				</div>
-			</div>';
-
-		$halaman_input_croscutting_pemda = '
-			<div class="accordion">
-				<h5 class="esakip-header-tahun" data-id="input_croscutting" style="margin: 0;">Periode Input Croscutting</h5>
-				<div class="esakip-body-tahun" data-id="input_croscutting">
-					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-						' . $periode_input_croscutting_pemda . '
-					</ul>
-				</div>
-			</div>';
+		$halaman_input_cascading_pemda = $periode_input_cascading_pemda;
+		
+		$halaman_input_croscutting_pemda = $periode_input_croscutting_pemda;
 
 		$halaman_sakip = '
 			<div class="accordion">
@@ -16825,16 +16833,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 
 		$halaman_input_rpjpd_rpjmd = '
-			<div class="accordion">
-				<h5 class="esakip-header-tahun" data-id="halaman-input-rpjpd-rpjmd" style="margin: 0;">Periode Input</h5>
-				<div class="esakip-body-tahun" data-id="halaman-input-rpjpd-rpjmd">
-					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-						' . $halaman_input_rpjpd . '
-						' . $halaman_input_rpjmd . '
-						' . $halaman_input_pohon_kinerja_pemda . '
-						' . $halaman_input_cascading_pemda . '
-						' . $halaman_input_croscutting_pemda . '
-					</ul>
+			<li>
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="halaman-input-rpjpd" style="margin: 0;">Input RPJPD</h5>
+					<div class="esakip-body-tahun" data-id="halaman-input-rpjpd">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+							' . $halaman_input_rpjpd . '
+						</ul>
+					</div>
 				</div>
 			</li>
 			<li>
@@ -16856,7 +16862,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						</ul>
 					</div>
 				</div>
-			</li>';
+			</li>
+			';
 		$halaman_sakip_opd .= '
 					</ul>
 				</div>
