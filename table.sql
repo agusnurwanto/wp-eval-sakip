@@ -267,6 +267,8 @@ CREATE TABLE `esakip_data_jadwal` (
   `tahun_anggaran` year(4) NOT NULL DEFAULT '2022',
   `default_verifikasi_upload` tinyint(4) DEFAULT NULL,
   `relasi_perencanaan` int(11) DEFAULT NULL,
+  `tahun_selesai_anggaran` year(4) DEFAULT NULL,
+  `jenis_jadwal_khusus` varchar(30) DEFAULT NULL COMMENT 'RPJMD, RPD',
   PRIMARY KEY  (id)
 );
 

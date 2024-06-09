@@ -37,7 +37,12 @@ $skpd = $wpdb->get_row(
     ARRAY_A
 );
 
-$tahun_periode = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
+if(!empty($periode['tahun_selesai_anggaran'])){
+    $tahun_periode = $periode['tahun_selesai_anggaran'];
+}else{
+    $tahun_periode = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
+}
+
 
 $idtahun = $wpdb->get_results(
     $wpdb->prepare(

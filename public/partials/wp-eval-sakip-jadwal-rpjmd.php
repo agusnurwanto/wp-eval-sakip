@@ -49,6 +49,7 @@ $body = '';
 					<th class="text-center">Keterangan</th>
 					<th class="text-center">Tahun Mulai</th>
 					<th class="text-center">Tahun Akhir</th>
+					<th class="text-center">Jenis Jadwal</th>
 					<th class="text-center" style="width: 150px;">Aksi</th>
 				</tr>
 			</thead>
@@ -68,21 +69,43 @@ $body = '';
 				</button>
 			</div>
 			<div class="modal-body">
-				<div>
+				<div class="form-group">
 					<label for='nama_jadwal' style='display:inline-block'>Nama Jadwal</label>
 					<input type='text' id='nama_jadwal' style='display:block;width:100%;' placeholder='Input Nama Jadwal'>
 				</div>
-				<div>
+				<div class="form-group">
 					<label for='tahun_anggaran' style='display:inline-block'>Tahun Mulai Anggaran</label>
 					<input type="number" id='tahun_anggaran' name="tahun_anggaran" style='display:block;width:100%;' placeholder="Tahun Mulai Anggaran" />
 				</div>
-				<div>
+				<div class="form-group">
+					<label for='tahun_selesai_anggaran' style='display:inline-block'>Tahun Selesai Anggaran</label>
+					<input type="number" id='tahun_selesai_anggaran' name="tahun_selesai_anggaran" style='display:block;width:100%;' placeholder="Tahun Selesai Anggaran" />
+				</div>
+				<div class="form-group">
 					<label for='lama_pelaksanaan' style='display:block'>Lama Pelaksanaan</label>
 					<input type="number" id='lama_pelaksanaan' name="lama_pelaksanaan" value="5" style='display:inline-block;width:50%;' placeholder="5" /> Tahun
 				</div>
-				<div>
+				<div class="form-group">
 					<label for='keterangan' style='display:inline-block'>Keterangan</label>
 					<input type='text' id='keterangan' style='display:block;width:100%;' placeholder='Input Keterangan'>
+				</div>
+				<div class="form-group">
+					<label class="d-block">Jenis Jadwal</label>
+					<tr>
+						<td>
+							<div class="custom-control custom-radio custom-control-inline">
+								<input class="custom-control-input" type="radio" name="jenis_khusus_rpjmd" id="jenis_khusus_rpjmd_rpjmd" value="rpjmd">
+								<label class="custom-control-label" for="jenis_khusus_rpjmd_rpjmd">RPJMD</label>
+							</div>
+						</td>
+						<td>
+							<div class="custom-control custom-radio custom-control-inline">
+								<input class="custom-control-input" type="radio" name="jenis_khusus_rpjmd" id="jenis_khusus_rpjmd_rpd" value="rpd">
+								<label class="custom-control-label" for="jenis_khusus_rpjmd_rpd">RPD</label>
+							</div>
+						</td>
+					</tr>
+					<small class="d-block form-text text-muted">Catatan: Jenis RPD tidak ada kolom visi dan misi. Jenis RPJMD ada kolom visi dan misi.</small>
 				</div>
 				<div>
 					<label for="relasi_rpjpd" style='display:inline-block'>Pilih Jadwal RPJPD</label>
@@ -147,6 +170,10 @@ $body = '';
 					className: "text-center"
 				},
 				{
+					"data": "jenis_jadwal_khusus",
+					className: "text-center"
+				},
+				{
 					"data": "aksi",
 					className: "text-center"
 				}
@@ -190,7 +217,9 @@ $body = '';
 		let relasi_rpjpd = jQuery("#relasi_rpjpd").val()
 		let tahun_anggaran = jQuery("#tahun_anggaran").val()
 		let lama_pelaksanaan = jQuery("#lama_pelaksanaan").val()
-		if (nama_jadwal.trim() == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '') {
+		let tahun_selesai_anggaran = jQuery("#tahun_selesai_anggaran").val()
+		let jenis_khusus_rpjmd = jQuery("input[name='jenis_khusus_rpjmd']:checked").val()
+		if (nama_jadwal.trim() == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '' || jenis_khusus_rpjmd == '') {
 			jQuery("#wrap-loading").hide()
 			alert("Ada yang kosong, Harap diisi semua")
 			return false
@@ -207,7 +236,9 @@ $body = '';
 					'relasi_rpjpd': relasi_rpjpd,
 					'keterangan': keterangan,
 					'tipe': tipe,
-					'lama_pelaksanaan': lama_pelaksanaan
+					'lama_pelaksanaan': lama_pelaksanaan,
+					'jenis_khusus_rpjmd': jenis_khusus_rpjmd,
+					'tahun_selesai_anggaran': tahun_selesai_anggaran
 				},
 				beforeSend: function() {
 					jQuery('.submitBtn').attr('disabled', 'disabled')
@@ -253,6 +284,9 @@ $body = '';
 				jQuery("#nama_jadwal").val(response.data.nama_jadwal);
 				jQuery("#keterangan").val(response.data.keterangan);
 				jQuery("#tahun_anggaran").val(response.data.tahun_anggaran);
+				jQuery("#tahun_selesai_anggaran").val(response.data.tahun_selesai_anggaran);
+				let jenis_khusus_rpjmd = (response.data.jenis_jadwal_khusus == 'rpd') ? "rpd" : "rpjmd";
+				jQuery("input[name=jenis_khusus_rpjmd][value='"+jenis_khusus_rpjmd+"']").prop("checked",true);
 				jQuery("#lama_pelaksanaan").val(response.data.lama_pelaksanaan);
 			}
 		})
@@ -264,7 +298,9 @@ $body = '';
 		let keterangan = jQuery("#keterangan").val()
 		let tahun_anggaran = jQuery("#tahun_anggaran").val()
 		let lama_pelaksanaan = jQuery("#lama_pelaksanaan").val()
-		if (nama_jadwal.trim() == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '') {
+		let tahun_selesai_anggaran = jQuery("#tahun_selesai_anggaran").val()
+		let jenis_khusus_rpjmd = jQuery("input[name='jenis_khusus_rpjmd']:checked").val()
+		if (nama_jadwal.trim() == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '' || jenis_khusus_rpjmd == '') {
 			jQuery("#wrap-loading").hide()
 			alert("Ada yang kosong, Harap diisi semua")
 			return false
@@ -281,7 +317,9 @@ $body = '';
 					'keterangan': keterangan,
 					'tahun_anggaran': tahun_anggaran,
 					'tipe': tipe,
-					'lama_pelaksanaan': lama_pelaksanaan
+					'lama_pelaksanaan': lama_pelaksanaan,
+					'jenis_khusus_rpjmd': jenis_khusus_rpjmd,
+					'tahun_selesai_anggaran': tahun_selesai_anggaran
 				},
 				beforeSend: function() {
 					jQuery('.submitBtn').attr('disabled', 'disabled')
