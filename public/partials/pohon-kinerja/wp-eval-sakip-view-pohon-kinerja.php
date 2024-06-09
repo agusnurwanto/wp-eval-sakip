@@ -142,24 +142,24 @@ if(!empty($pohon_kinerja_level_1)){
 	}
 }
 
-$style0 = 'style=\"color:#0d0909;font-size:13px; font-weight:600; padding:15px; min-height:60px\"';
-$style1 = 'style=\"color: #0d0909; font-size:12px; font-weight:600;font-style:italic; border-radius: 5px; background: #efd655; padding:10px; min-height:60px\"';
-$style2 = 'style=\"color:#0d0909; font-size:12px; font-weight:600; font-style:italic; background: #fe7373; padding:10px; min-height:60px\"';
-$style3 = 'style=\"color: #0d0909; font-size:12px; font-weight:600;font-style:italic; border-radius: 5px; background: #57b2ec; padding:10px; min-height:60px\"';
-$style4 = 'style=\"color: #0d0909; font-size:12px; font-weight:600;font-style:italic; border-radius: 5px; background: #c979e3; padding:10px; min-height:60px;\"';
+$style0 = 'level0';
+$style1 = 'class=\"level1\"';
+$style2 = 'class=\"level2\"';
+$style3 = 'class=\"level3\"';
+$style4 = 'class=\"level4\"';
 
 $data_temp= [];
 if(!empty($data_all['data'])){
 
 	foreach ($data_all['data'] as $keylevel1 => $level_1) {
 		$data_temp[$keylevel1][0] = (object)[
-	      'v' => "<div ".$style0.">".trim($level_1['label'])."</div>",
-	      'f' => "<div ".$style0.">".trim($level_1['label'])."</div>",
+	      'v' => "<div class=\\\"".$style0." label1\\\">".trim($level_1['label'])."</div>",
+	      'f' => "<div class=\\\"".$style0." label1\\\">".trim($level_1['label'])."</div>",
 	    ];
 
 	    if(!empty($level_1['indikator'])){
 		    foreach ($level_1['indikator'] as $keyindikatorlevel1 => $indikator) {
-		        $data_temp[$keylevel1][0]->f.="<div ".$style1.">".$indikator['label_indikator_kinerja']."</div>";
+		        $data_temp[$keylevel1][0]->f.="<div ".$style1.">IK: ".$indikator['label_indikator_kinerja']."</div>";
 		    }
 	    }
 
@@ -167,13 +167,13 @@ if(!empty($data_all['data'])){
 
 		    foreach ($level_1['data'] as $keylevel2 => $level_2) {
 		        $data_temp[$keylevel2][0] = (object)[
-		          	'v' => "<div ".$style0.">".trim($level_2['label'])."</div>",
-		          	'f' => "<div ".$style0.">".trim($level_2['label'])."</div>",
+		          	'v' => "<div class=\\\"".$style0." label2\\\">".trim($level_2['label'])."</div>",
+		          	'f' => "<div class=\\\"".$style0." label2\\\">".trim($level_2['label'])."</div>",
 		        ];
 
 		        if(!empty($level_2['indikator'])){
 			        foreach ($level_2['indikator'] as $keyindikatorlevel2 => $indikator) {
-			            $data_temp[$keylevel2][0]->f.="<div ".$style2.">".$indikator['label_indikator_kinerja']."</div>";
+			            $data_temp[$keylevel2][0]->f.="<div ".$style2.">IK: ".$indikator['label_indikator_kinerja']."</div>";
 			        }
 		        }
 
@@ -181,41 +181,41 @@ if(!empty($data_all['data'])){
 
 			        foreach ($level_2['data'] as $keylevel3 => $level_3) {
 			            $data_temp[$keylevel3][0] = (object)[
-			              'v' => "<div ".$style0.">".trim($level_3['label'])."</div>",
-			              'f' => "<div ".$style0.">".trim($level_3['label'])."</div>",
+			              'v' => "<div class=\\\"".$style0." label3\\\">".trim($level_3['label'])."</div>",
+			              'f' => "<div class=\\\"".$style0." label3\\\">".trim($level_3['label'])."</div>",
 			            ];
 
 			            if(!empty($level_3['indikator'])){
 				            foreach ($level_3['indikator'] as $keyindikatorlevel3 => $indikator) {
-				                $data_temp[$keylevel3][0]->f.="<div ".$style3.">".$indikator['label_indikator_kinerja']."</div>";
+				                $data_temp[$keylevel3][0]->f.="<div ".$style3.">IK: ".$indikator['label_indikator_kinerja']."</div>";
 				            }
 			            }
 
-			            $data_temp[$keylevel3][1] = "<div ".$style0.">".trim($level_2['label'])."</div>";
+			            $data_temp[$keylevel3][1] = "<div class=\\\"".$style0." label2\\\">".trim($level_2['label'])."</div>";
 			            $data_temp[$keylevel3][2] = '';
 
 			            if(!empty($level_3['data'])){
 
 		            		foreach ($level_3['data'] as $keylevel4 => $level_4) {
 			            		$data_temp[$keylevel4][0] = (object)[
-					              'v' => "<div ".$style0.">".trim($level_4['label'])."</div>",
-					              'f' => "<div ".$style0.">".trim($level_4['label'])."</div>",
+					              'v' => "<div class=\\\"".$style0." label4\\\">".trim($level_4['label'])."</div>",
+					              'f' => "<div class=\\\"".$style0." label4\\\">".trim($level_4['label'])."</div>",
 					            ];
 
 					            if(!empty($level_4['indikator'])){
 				            		foreach ($level_4['indikator'] as $keyindikatorlevel4 => $indikator) {
-						                $data_temp[$keylevel4][0]->f.="<div ".$style4.">".$indikator['label_indikator_kinerja']."</div>";
+						                $data_temp[$keylevel4][0]->f.="<div ".$style4.">IK: ".$indikator['label_indikator_kinerja']."</div>";
 						            }
 					            }
 
-					            $data_temp[$keylevel4][1] = "<div ".$style0.">".trim($level_3['label'])."</div>";
+					            $data_temp[$keylevel4][1] = "<div class=\\\"".$style0." label3\\\">".trim($level_3['label'])."</div>";
 					            $data_temp[$keylevel4][2] = '';
 					        }
 			            }
 			        }
 		        }
 
-			    $data_temp[$keylevel2][1] = "<div ".$style0.">".trim($level_1['label'])."</div>";
+			    $data_temp[$keylevel2][1] = "<div class=\\\"".$style0." label1\\\">".trim($level_1['label'])."</div>";
 			    $data_temp[$keylevel2][2] = '';
 			}
 		}
@@ -231,9 +231,9 @@ if(!empty($data_all['data'])){
 
 <style type="text/css">
   	.google-visualization-orgchart-node{
-    	background: #4dec9d;
-    	border-radius: 10px;
+    	border-radius: 5px;
     	border:0;
+    	padding: 0;
   	}
   	#chart_div .google-visualization-orgchart-connrow-medium{
     	height: 20px;
@@ -252,6 +252,62 @@ if(!empty($data_all['data'])){
 
   	#chart_div .google-visualization-orgchart-linetop {
     	border-top: 4px solid #f84d4d;
+  	}
+  	.level0 {
+  		color:#0d0909;
+  		font-size:13px;
+  		font-weight:600;
+  		padding:10px;
+  		min-height:80px;
+  		min-width: 200px;
+  	}
+  	.label1 {
+  		background: #efd655; 
+  		border-radius: 5px 5px 0 0;
+  	}
+  	.level1 {
+  		color: #0d0909; 
+  		font-size:11px; 
+  		font-weight:600;
+  		font-style:italic; 
+  		padding:10px; 
+  		min-height:70px;
+  	}
+  	.label2 {
+  		background: #fe7373; 
+  		border-radius: 5px 5px 0 0;
+  	}
+  	.level2 {
+  		color:#0d0909; 
+  		font-size:11px; 
+  		font-weight:600; 
+  		font-style:italic;
+  		padding:10px; 
+  		min-height:70px;
+  	}
+  	.label3 {
+  		background: #57b2ec; 
+  		border-radius: 5px 5px 0 0;
+  	}
+  	.level3 {
+  		color: #0d0909; 
+  		font-size:11px; 
+  		font-weight:600;
+  		font-style:italic; 
+  		padding:10px; 
+  		min-height:70px;
+  	}
+  	.label4 {
+  		background: #c979e3; 
+  		border-radius: 5px 5px 0 0;
+  	}
+  	.level4 {
+  		color: #0d0909; 
+  		font-size:11px; 
+  		font-weight:600;
+  		font-style:italic; 
+  		padding:10px; 
+  		min-height:70px;
   	}
 </style>
 
