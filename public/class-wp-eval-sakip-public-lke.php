@@ -1452,7 +1452,8 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 										'post_status' => 'private'
 									));
 									$dokumen['url'] .= '&id_skpd=' . $_POST['id_skpd'];
-									$ret['upload_bukti_dukung'] .= '<a style="margin-left: 5px;" class="btn btn-warning" target="_blank" href="' . $dokumen['url'] . '">' . $dokumen['title'] . '</a>';
+									$title_renstra = 'Dokumen RENSTRA | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+									$ret['upload_bukti_dukung'] .= '<a style="margin-left: 5px;" class="btn btn-warning" target="_blank" href="' . $dokumen['url'] . '">' . $title_renstra . '</a>';
 								}
 							}
 							continue;
