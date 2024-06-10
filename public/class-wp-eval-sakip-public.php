@@ -712,23 +712,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	    $is_administrator = in_array('administrator', $user_roles);
 
 	    $admin_role_pemda = array(
-	      'admin_bappeda',
-	      'admin_ortala'
+	      	'admin_bappeda',
+	      	'admin_ortala'
 	    );
 
 	      $this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2 ;
 
-	    $cek_settingan_menu = $wpdb->get_var(
-	      $wpdb->prepare(
-	      "SELECT 
-	        jenis_role
-	      FROM esakip_menu_dokumen 
-	      WHERE nama_dokumen=%s
-	      AND user_role='perangkat_daerah' 
-	      AND active = 1
-	      AND tahun_anggaran=%d
-	    ", $nama_dokumen, $tahun_anggaran)
-	    );
+	    $cek_settingan_menu = $wpdb->get_var($wpdb->prepare("
+      		SELECT 
+		        jenis_role
+	      	FROM esakip_menu_dokumen 
+	      	WHERE nama_dokumen=%s
+		      	AND user_role='perangkat_daerah' 
+		      	AND active = 1
+		      	AND tahun_anggaran=%d
+	    ", $nama_dokumen, $tahun_anggaran));
 
 	    $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
 	    return $hak_akses_user;
@@ -742,22 +740,20 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	    $is_administrator = in_array('administrator', $user_roles);
 
 	    $admin_role_pemda = array(
-	      'admin_bappeda',
-	      'admin_ortala'
+	      	'admin_bappeda',
+	      	'admin_ortala'
 	    );
 
-	      $this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2 ;
+      	$this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2 ;
 
-	    $cek_settingan_menu = $wpdb->get_var(
-	      $wpdb->prepare(
-	      "SELECT 
-	        jenis_role
-	      FROM esakip_menu_dokumen 
-	      WHERE nama_dokumen=%s
-	      AND user_role='perangkat_daerah' 
-	      AND active = 1
-	    ", $nama_dokumen)
-	    );
+	    $cek_settingan_menu = $wpdb->get_var($wpdb->prepare("
+	    	SELECT 
+	        	jenis_role
+	      	FROM esakip_menu_dokumen 
+	      	WHERE nama_dokumen=%s
+	      		AND user_role='perangkat_daerah' 
+	      		AND active = 1
+	    ", $nama_dokumen));
 
 	    $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
 	    return $hak_akses_user;
@@ -16613,69 +16609,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$cek_data['perangkat_daerah']['Evaluasi Internal']['link'] = '<li><a target="_blank" href="' . $evaluasi_internal['url'] . '" class="btn btn-primary">' .  $title_evaluasi_internal . '</a></li>';
 		}
 
-		// $dokumen_lainnya = $this->functions->generatePage(array(
-		// 	'nama_page' => 'Lainnya',
-		// 	'content' => '[dokumen_lainnya tahun=' . $_GET['tahun'] . ']',
-		// 	'show_header' => 1,
-		// 	'post_status' => 'private'
-		// ));
-		// $title_dokumen_lainnya = 'Lainnya';
-		// $dokumen_lainnya_detail .= '<li><a target="_blank" href="' . $dokumen_lainnya['url'] . '" class="btn btn-primary">' .  $title_dokumen_lainnya . '</a></li>';
-
-		// $rkpd = $this->functions->generatePage(array(
-		// 	'nama_page' => 'RKPD',
-		// 	'content' => '[rkpd tahun=' . $_GET['tahun'] . ']',
-		// 	'show_header' => 1,
-		// 	'post_status' => 'private'
-		// ));
-		// $title_rkpd = 'RKPD';
-		// $rkpd_detail .= '<li><a target="_blank" href="' . $rkpd['url'] . '" class="btn btn-primary">' .  $title_rkpd . '</a></li>';
-
-		// $lkjip_lppd = $this->functions->generatePage(array(
-		// 	'nama_page' => 'LKJIP / LPPD',
-		// 	'content' => '[lkjip_lppd tahun=' . $_GET['tahun'] . ']',
-		// 	'show_header' => 1,
-		// 	'post_status' => 'private'
-		// ));
-		// $title_lkjip_lppd = 'LKJIP / LPPD';
-		// $lkjip_lppd_detail .= '<li><a target="_blank" href="' . $lkjip_lppd['url'] . '" class="btn btn-primary">' .  $title_lkjip_lppd . '</a></li>';
-
-		// $tl_lhe_akip_kemenpan = $this->functions->generatePage(array(
-		// 	'nama_page' => 'TL LHE AKIP Kemenpan',
-		// 	'content' => '[tl_lhe_akip_kemenpan tahun=' . $_GET['tahun'] . ']',
-		// 	'show_header' => 1,
-		// 	'post_status' => 'private'
-		// ));
-		// $title_tl_lhe_akip_kemenpan = 'TL LHE AKIP Kemenpan';
-		// $tl_lhe_akip_kemenpan_detail .= '<li><a target="_blank" href="' . $tl_lhe_akip_kemenpan['url'] . '" class="btn btn-primary">' .  $title_tl_lhe_akip_kemenpan . '</a></li>';
-
-		// $pedoman_teknis_perencanaan = $this->functions->generatePage(array(
-		// 	'nama_page' => 'Pedoman Teknis Perencanaan',
-		// 	'content' => '[pedoman_teknis_perencanaan tahun=' . $_GET['tahun'] . ']',
-		// 	'show_header' => 1,
-		// 	'post_status' => 'private'
-		// ));
-		// $title_pedoman_teknis_perencanaan = 'Pedoman Teknis Perencanaan';
-		// $pedoman_teknis_perencanaan_detail .= '<li><a target="_blank" href="' . $pedoman_teknis_perencanaan['url'] . '" class="btn btn-primary">' .  $title_pedoman_teknis_perencanaan . '</a></li>';
-
-		// $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = $this->functions->generatePage(array(
-		// 	'nama_page' => 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja',
-		// 	'content' => '[pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja tahun=' . $_GET['tahun'] . ']',
-		// 	'show_header' => 1,
-		// 	'post_status' => 'private'
-		// ));
-		// $title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja';
-		// $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_detail .= '<li><a target="_blank" href="' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['url'] . '" class="btn btn-primary">' .  $title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja . '</a></li>';
-
-		// $pedoman_teknis_evaluasi_internal = $this->functions->generatePage(array(
-		// 	'nama_page' => 'Pedoman Teknis Evaluasi Internal',
-		// 	'content' => '[pedoman_teknis_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
-		// 	'show_header' => 1,
-		// 	'post_status' => 'private'
-		// ));
-		// $title_pedoman_teknis_evaluasi_internal = 'Pedoman Teknis Evaluasi Internal';
-		// $pedoman_teknis_evaluasi_internal_detail .= '<li><a target="_blank" href="' . $pedoman_teknis_evaluasi_internal['url'] . '" class="btn btn-primary">' .  $title_pedoman_teknis_evaluasi_internal . '</a></li>';
-
 		$get_jadwal_lke = $wpdb->get_results(
 			$wpdb->prepare(
 				"
@@ -17038,16 +16971,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$title_pengukuran_kinerja_skpd = 'Pengukuran Kinerja';
 				$pengukuran_kinerja_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 				$pengukuran_kinerja_skpd_detail .= '<li><a href="' . $pengukuran_kinerja_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $title_pengukuran_kinerja_skpd . '</a></li>';
-
-				// $pengukuran_kinerja_skpd = $this->functions->generatePage(array(
-				// 	'nama_page' => 'Pengukuran Kinerja ' . $_GET['tahun'],
-				// 	'content' => '[dokumen_detail_pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
-				// 	'show_header' => 1,
-				// 	'post_status' => 'private'
-				// ));
-				// $pengukuran_kinerja = 'Pengukuran Kinerja';
-				// $pengukuran_kinerja_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-				// $pengukuran_kinerja_skpd_detail .= '<li><a href="' . $pengukuran_kinerja_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $title_pengukuran_kinerja_skpd . '</a></li>';
 				$cek_data['perangkat_daerah']['Pengukuran Kinerja']['link'] = $pengukuran_kinerja_skpd_detail;
 			}
 
