@@ -482,6 +482,10 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_esakip_get_rpd',  $plugin_public, 'esakip_get_rpd');
 		$this->loader->add_action('wp_ajax_esakip_get_bidang_urusan',  $plugin_public, 'esakip_get_bidang_urusan');
 
+		$this->loader->add_action('wp_ajax_get_table_cascading',  $plugin_public, 'get_table_cascading');
+		$this->loader->add_action('wp_ajax_edit_cascading_pemda',  $plugin_public, 'edit_cascading_pemda');
+		$this->loader->add_action('wp_ajax_submit_edit_cascading',  $plugin_public, 'submit_edit_cascading');
+
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_evaluasi_sakip', array($plugin_public, 'jadwal_evaluasi_sakip'));
@@ -571,6 +575,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('input_rpjpd', array($plugin_public, 'input_rpjpd'));
 		add_shortcode('input_rpjmd', array($plugin_public, 'input_rpjmd'));
 		add_shortcode('halaman_cek_dokumen', array($plugin_public, 'halaman_cek_dokumen'));
+		add_shortcode('cascading_pemda', array($plugin_public, 'cascading_pemda'));
 	}
 
 	/**

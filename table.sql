@@ -854,8 +854,9 @@ CREATE TABLE `esakip_rpd_tujuan` (
   `visi_teks` text DEFAULT NULL,
   `id_isu` int(11) DEFAULT NULL,
   `no_urut` int(11) NOT NULL,
-  `catatan_teks_tujuan` text NOT NULL,
-  `indikator_catatan_teks` text NOT NULL,
+  `catatan_teks_tujuan` text DEFAULT NULL,
+  `indikator_catatan_teks` text DEFAULT NULL,
+  `nama_cascading` text DEFAULT NULL,
   `update_at` datetime NOT NULL,
   `active` tinyint(4) NOT NULL,
   PRIMARY KEY  (id)
