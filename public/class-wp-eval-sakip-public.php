@@ -21836,85 +21836,71 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
-	public function submit_edit_cascading()
-	{
-		global $wpdb;
-		$ret = array(
-			'status' => 'success',
-			'message' => 'Berhasil Simpan data!',
-			'data'  => array()
-		);
+	public function submit_edit_cascading(){
+	    global $wpdb;
+	    $ret = array(
+	        'status' => 'success',
+	        'message' => 'Berhasil simpan data!',
+	        'data' => array()
+	    );
+	    if(!empty($_POST)){
+	        if(!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+                $id = null;
 
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-                if (empty($_POST['id'])) {
-                    $ret['status'] = 'error';
-                    $ret['message'] = 'Data ID tidak boleh kosong!';
-                }else if (empty($_POST['nama_cascading'])) {
+				if (!empty($_POST['id'])) {
+					$id = $_POST['id'];
+					$ret['message'] = 'Berhasil edit data!';
+				} else if (empty($_POST['nama_cascading'])) {
                     $ret['status'] = 'error';
                     $ret['message'] = 'Data Nama Cascading tidak boleh kosong!';
                 } else if (empty($_POST['tujuan_teks'])) {
                     $ret['status'] = 'error';
                     $ret['message'] = 'Data Judul Cascading tidak boleh kosong!';
                 } else {
-                    $id = $_POST['id'];
                     $nama_cascading = $_POST['nama_cascading'];
                     $tujuan_teks = $_POST['tujuan_teks'];
-                    $data = array(
-                        'nama_cascading' => $nama_cascading,
-                        'tujuan_teks' => $tujuan_teks,
-                        'active' => 1,
-                        'update_at' => current_time('mysql')
-                    );
-                    if (!empty($_POST['id'])) {
-                        $cek_id = $wpdb->get_row(
-						$wpdb->prepare("
-							SELECT 
+	                $data = array(
+	                    'nama_cascading' => $nama_cascading,
+	                    'tujuan_teks' => $tujuan_teks,
+	                    'active' => 1,
+	                    'update_at' => current_time('mysql')
+	                );
+	                if(!empty($_POST['id'])){
+	                    $wpdb->update('esakip_rpd_tujuan', $data, array(
+	                        'id' => $_POST['id']
+	                    ));
+	                    $ret['message'] = 'Berhasil update data!';
+	                }else{
+	                    $cek_id = $wpdb->get_row($wpdb->prepare('
+	                        SELECT
 								*
-							FROM esakip_rpd_tujuan
-							WHERE id = %d
-						", $_POST['id']),
-						ARRAY_A);
-                        if ($cek_id['active'] == 0) {
-                            $wpdb->update('esakip_rpd_tujuan', $data, array(
-                                'id' => $_POST['id']
-                            ));
-                            $ret['message'] = 'Berhasil update data!';
-                        } else {
-                            $ret['status'] = 'error';
-                            $ret['message'] = 'Gagal disimpan. Data RPD dengan id="' . $id . 'sudah ada!';
-                        }
-                    } else {
-                        $cek_id = $wpdb->get_row("
-                        SELECT 
-                        	*
-                        from esakip_rpd_tujuan 
-                        where id=%d 
-                        ", ARRAY_A);
-                        if (empty($cek_id)) {
-                            $wpdb->insert('esakip_rpd_tujuan', $data);
-                        } else {
-                            if ($cek_id['active'] == 0) {
-                                $wpdb->update('esakip_rpd_tujuan', $data, array(
-                                    'id' => $cek_id['id']
-                                ));
-                            } else {
-                                $ret['status'] = 'error';
-                           		$ret['message'] = 'Gagal disimpan. Data RPD dengan id="' . $id . 'sudah ada!';
-                            }
-                        }
-                    }
-                }
-            } else {
-                $ret['status']  = 'error';
-                $ret['message'] = 'Api key tidak ditemukan!';
-            }
-        } else {
-            $ret['status']  = 'error';
-            $ret['message'] = 'Format Salah!';
-        }
+	                        FROM esakip_rpd_tujuan
+	                        WHERE id=%s
+	                    ', $id), ARRAY_A);
+	                    print_r($cek_id); die($wpdb->last_query);
+	                    if(empty($cek_id)){
+	                        $wpdb->insert('esakip_rpd_tujuan', $data);
+	                    }else{
+	                        if($cek_id['active'] == 0){
+	                            $wpdb->update('esakip_rpd_tujuan', $data, array(
+	                                'id' => $cek_id['id']
+	                            ));
+	                        }else{
+	                            $ret['status'] = 'error';
+	                            $ret['message'] = 'Gagal disimpan. Data RPD dengan id="'.$id.'" sudah ada!';
+	                        }
+	                    }
+	                }
+	            }
+	        }else{
+	            $ret['status']  = 'error';
+	            $ret['message'] = 'Api key tidak ditemukan!';
+	        }
+	    }else{
+	        $ret['status']  = 'error';
+	        $ret['message'] = 'Format Salah!';
+	    }
 
-        die(json_encode($ret));
-    }
-
+	    die(json_encode($ret));
+	}
 }

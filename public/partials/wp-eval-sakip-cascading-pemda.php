@@ -113,7 +113,7 @@ foreach ($idtahun as $val) {
             </div>
             <div class="modal-body">
                 <input type="hidden" value="<?php echo $input['periode']; ?>" id="id_jadwal">
-                <input type="hidden" value="id" id="id">
+                    <input type="hidden" value="" id="id">
                 <div class="form-group">
                     <label for="tujuan_teks">Judul Cascading</label>
                     <input type="text" class="form-control" id="tujuan_teks" name="tujuan_teks" disabled>
@@ -124,7 +124,7 @@ foreach ($idtahun as $val) {
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary submitBtn" onclick="submit_edit_cascading(this); return false">Simpan</button>
+                <button class="btn btn-primary submitBtn" onclick="submit_edit_cascading('id')">Simpan</button>
                 <button type="submit" class="components-button btn btn-secondary" data-dismiss="modal">Tutup</button>
             </div>
         </div>
@@ -133,6 +133,7 @@ foreach ($idtahun as $val) {
 <script>
     jQuery(document).ready(function() {
         getTableCascading();
+        var id = jQuery('#id').val();
     });
 
     function getTableCascading() {
@@ -196,37 +197,53 @@ foreach ($idtahun as $val) {
         });
     }
 
-function submit_edit_cascading(that){
-    var id = jQuery('#id').val();
-    var nama_cascading = jQuery('#nama_cascading').val();
-    if(nama_cascading == ''){
-        return alert('Data Nama Cascading tidak boleh kosong!');
-    }
-    var tujuan_teks = jQuery('#tujuan_teks').val();
-    if(tujuan_teks == ''){
-        return alert('Data Judul Cascading tidak boleh kosong!');
-    }
+    function submit_edit_cascading(that) {
+        let id = jQuery("#id").val();
+        if (id == '') {
+            return alert('Id tidak boleh kosong');
+        }
+        var tujuan_teks = jQuery('#tujuan_teks').val();
+        if(tujuan_teks == ''){
+            return alert('Data tujuan_teks tidak boleh kosong!');
+        }
+        var nama_cascading = jQuery('#nama_cascading').val();
+        if(nama_cascading == ''){
+            return alert('Data nama_cascading tidak boleh kosong!');
+        }
 
-    jQuery('#wrap-loading').show();
-    jQuery.ajax({
-        method: 'post',
-        url: esakip.url,
-        dataType: 'json',
-        data:{
-            action: 'submit_edit_cascading',
-                api_key: esakip.api_key,
-                id_jadwal: <?php echo $input['periode']; ?>,
-                id_jadwal: <?php echo $input['periode']; ?>,
-        },
-        success: function(res){
-            alert(res.message);
-            jQuery('#modalEditCascading').modal('hide');
-            if(res.status == 'success'){
-                getTableCascading();
-            }else{
+        let form_data = new FormData();
+        form_data.append('action', 'submit_edit_cascading');
+        form_data.append('api_key', esakip.api_key);
+        form_data.append('id', id);
+        form_data.append('nama_cascading', nama_cascading);
+        form_data.append('tujuan_teks', tujuan_teks);
+
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            contentType: false,
+            processData: false,
+            data: form_data,
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    jQuery('#modalEditCascading').modal('hide');
+                    alert(response.message);
+                    getTableCascading();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
                 jQuery('#wrap-loading').hide();
             }
-        }
-    });
-}
+        });
+    }
+
+
 </script>
