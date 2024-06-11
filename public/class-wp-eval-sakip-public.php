@@ -16219,8 +16219,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		// PEMDA
 
 		$monitor_upload_dokumen = $this->functions->generatePage(array(
-			'nama_page' => 'Laporan Upload Dokumen'.$_GET['tahun'],
-			'content' => '[halaman_cek_dokumen tahun=' .$_GET['tahun'] . ']',
+			'nama_page' => 'Halaman Cek Dokumen | '.$_GET['tahun'],
+			'content' => '[halaman_cek_dokumen tahun_anggaran=' .$_GET['tahun'] . ']',
 			'show_header' => 1,
 			'post_status' => 'private'
 		));
