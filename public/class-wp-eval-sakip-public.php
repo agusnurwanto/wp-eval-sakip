@@ -699,26 +699,26 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	}
 	public function is_admin_user()
 	{
-	    $current_user = wp_get_current_user();
-	    $cek = array('admin_ortala', 'administrator', 'admin_bappeda');
-	    return array_intersect($cek, $current_user->roles);
+		$current_user = wp_get_current_user();
+		$cek = array('admin_ortala', 'administrator', 'admin_bappeda');
+		return array_intersect($cek, $current_user->roles);
 	}
 
-	public function hak_akses_upload_dokumen($nama_dokumen,$tahun_anggaran)
- 	{    
-	    global $wpdb;
-	    $current_user = wp_get_current_user();
-	    $user_roles = $current_user->roles;
-	    $is_administrator = in_array('administrator', $user_roles);
+	public function hak_akses_upload_dokumen($nama_dokumen, $tahun_anggaran)
+	{
+		global $wpdb;
+		$current_user = wp_get_current_user();
+		$user_roles = $current_user->roles;
+		$is_administrator = in_array('administrator', $user_roles);
 
-	    $admin_role_pemda = array(
-	      	'admin_bappeda',
-	      	'admin_ortala'
-	    );
+		$admin_role_pemda = array(
+			'admin_bappeda',
+			'admin_ortala'
+		);
 
-	      $this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2 ;
+		$this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2;
 
-	    $cek_settingan_menu = $wpdb->get_var($wpdb->prepare("
+		$cek_settingan_menu = $wpdb->get_var($wpdb->prepare("
       		SELECT 
 		        jenis_role
 	      	FROM esakip_menu_dokumen 
@@ -728,25 +728,25 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		      	AND tahun_anggaran=%d
 	    ", $nama_dokumen, $tahun_anggaran));
 
-	    $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
-	    return $hak_akses_user;
-  	}
+		$hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
+		return $hak_akses_user;
+	}
 
-  	public function hak_akses_upload_dokumen_renstra($nama_dokumen)
- 	{    
-	    global $wpdb;
-	    $current_user = wp_get_current_user();
-	    $user_roles = $current_user->roles;
-	    $is_administrator = in_array('administrator', $user_roles);
+	public function hak_akses_upload_dokumen_renstra($nama_dokumen)
+	{
+		global $wpdb;
+		$current_user = wp_get_current_user();
+		$user_roles = $current_user->roles;
+		$is_administrator = in_array('administrator', $user_roles);
 
-	    $admin_role_pemda = array(
-	      	'admin_bappeda',
-	      	'admin_ortala'
-	    );
+		$admin_role_pemda = array(
+			'admin_bappeda',
+			'admin_ortala'
+		);
 
-      	$this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2 ;
+		$this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2;
 
-	    $cek_settingan_menu = $wpdb->get_var($wpdb->prepare("
+		$cek_settingan_menu = $wpdb->get_var($wpdb->prepare("
 	    	SELECT 
 	        	jenis_role
 	      	FROM esakip_menu_dokumen 
@@ -755,9 +755,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	      		AND active = 1
 	    ", $nama_dokumen));
 
-	    $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
-	    return $hak_akses_user;
-  	}
+		$hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
+		return $hak_akses_user;
+	}
 
 	public function dokumen_detail_dpa_pemda($atts)
 	{
@@ -4606,7 +4606,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'status' => 'error',
 								'message' => 'Gagal menyimpan data ke database!'
 							);
-						} 
+						}
 					} else {
 						$opsi = array(
 							'keterangan' => $keterangan,
@@ -6453,7 +6453,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				if ($ret['status'] == 'success') {
 
-				// untuk mengatur judul halaman sesuai tipe dokumen
+					// untuk mengatur judul halaman sesuai tipe dokumen
 					$nama_page = array(
 						"pohon_kinerja_dan_cascading" => "Pohon Kinerja dan Cascading",
 						"lhe_akip_internal" => "LHE AKIP Internal",
@@ -10460,15 +10460,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$edit	= '<a class="btn btn-sm btn-warning mr-2" style="text-decoration: none;" onclick="edit_data_penjadwalan(\'' . $recVal['id'] . '\'); return false;" href="#" title="Edit data penjadwalan"><i class="dashicons dashicons-edit"></i></a>';
 							$delete	= '<a class="btn btn-sm btn-danger" style="text-decoration: none;" onclick="hapus_data_penjadwalan(\'' . $recVal['id'] . '\'); return false;" href="#" title="Hapus data penjadwalan"><i class="dashicons dashicons-trash"></i></a>';
 
-							if(!empty($recVal['tahun_selesai_anggaran'])){
+							if (!empty($recVal['tahun_selesai_anggaran'])) {
 								$tahun_anggaran_selesai = $recVal['tahun_selesai_anggaran'];
-							}else{
+							} else {
 								$tahun_anggaran_selesai = $recVal['tahun_anggaran'] + $recVal['lama_pelaksanaan'];
 							}
 
-							if(!empty($recVal['jenis_jadwal_khusus'])){
+							if (!empty($recVal['jenis_jadwal_khusus'])) {
 								$jenis_jadwal_khusus = strtoupper($recVal['jenis_jadwal_khusus']);
-							}else{
+							} else {
 								$jenis_jadwal_khusus = 'RPJMD';
 							}
 
@@ -10677,7 +10677,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						'tipe'					=> 'RPJMD',
 						'status'				=> '1',
 						'lama_pelaksanaan'		=> $lama_pelaksanaan,
-						'tahun_selesai_anggaran'=> $tahun_selesai_anggaran,
+						'tahun_selesai_anggaran' => $tahun_selesai_anggaran,
 						'jenis_jadwal_khusus'	=> $jenis_jadwal_khusus
 					);
 
@@ -10774,7 +10774,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						'keterangan'			=> $keterangan,
 						'tipe'					=> 'RPJMD',
 						'lama_pelaksanaan'		=> $lama_pelaksanaan,
-						'tahun_selesai_anggaran'=> $tahun_selesai_anggaran,
+						'tahun_selesai_anggaran' => $tahun_selesai_anggaran,
 						'jenis_jadwal_khusus'	=> $jenis_khusus_rpjmd
 					);
 
@@ -11472,9 +11472,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb() 
+						if (!$this->is_admin_panrb()
 							// && $this->hak_akses_upload_dokumen_renstra('RENSTRA')
-						) {							
+						) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
 
 							$btn .= '<button class="btn btn-danger" onclick="hapus_tahun_dokumen_renstra(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
@@ -16162,9 +16162,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_skpd_detail = '';
 		$pedoman_teknis_evaluasi_internal_skpd_detail = '';
 		foreach ($jadwal_periode as $jadwal_periode_item) {
-			if(!empty($jadwal_periode_item['tahun_selesai_anggaran'])){
+			if (!empty($jadwal_periode_item['tahun_selesai_anggaran'])) {
 				$tahun_anggaran_selesai = $jadwal_periode_item['tahun_selesai_anggaran'];
-			}else{
+			} else {
 				$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
 			}
 
@@ -16222,8 +16222,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		// PEMDA
 
 		$monitor_upload_dokumen = $this->functions->generatePage(array(
-			'nama_page' => 'Halaman Cek Dokumen | '.$_GET['tahun'],
-			'content' => '[halaman_cek_dokumen tahun_anggaran=' .$_GET['tahun'] . ']',
+			'nama_page' => 'Laporan Upload Dokumen' . $_GET['tahun'],
+			'content' => '[halaman_cek_dokumen tahun=' . $_GET['tahun'] . ']',
 			'show_header' => 1,
 			'post_status' => 'private'
 		));
@@ -16721,37 +16721,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$cek_data['perangkat_daerah']['RENSTRA']['link'] = $halaman_renstra_opd;
 		}
 
-		//halaman cascading dan croscutting
-			// <li>
-			// 	<div class="accordion">
-			// 		<h5 class="esakip-header-tahun" data-id="halaman-input-pokin" style="margin: 0;">Input Cascading</h5>
-			// 		<div class="esakip-body-tahun" data-id="halaman-input-pokin">
-			// 			<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-			// 				' . $halaman_input_cascading_pemda . '
-			// 			</ul>
-			// 		</div>
-			// 	</div>
-			// </li>
-			// <li>
-			// 	<div class="accordion">
-			// 		<h5 class="esakip-header-tahun" data-id="halaman-input-pokin" style="margin: 0;">Input Crosscutting</h5>
-			// 		<div class="esakip-body-tahun" data-id="halaman-input-pokin">
-			// 			<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-			// 				' . $halaman_input_croscutting_pemda . '
-			// 			</ul>
-			// 		</div>
-			// 	</div>
-			// </li>
 		$halaman_input_rpjpd = $periode_input_rpjpd;
-
 		$halaman_input_rpjmd = $periode_input_rpjmd;
-
 		$halaman_input_pohon_kinerja_pemda = $periode_input_pohon_kinerja_pemda;
-
 		$halaman_input_cascading_pemda = $periode_input_cascading_pemda;
-		
 		$halaman_input_croscutting_pemda = $periode_input_croscutting_pemda;
-
 		$halaman_sakip = '
 			<div class="accordion">
 				<h5 class="esakip-header-tahun" data-id="halaman-sakip" style="margin: 0;">Dokumen SAKIP Pemerintah Daerah</h5>
@@ -16808,6 +16782,26 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					</div>
 				</div>
 			</li>
+			<li>
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="halaman-input-cascading" style="margin: 0;">Input Cascading</h5>
+					<div class="esakip-body-tahun" data-id="halaman-input-cascading">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+							' . $halaman_input_cascading_pemda . '
+						</ul>
+					</div>
+				</div>
+			</li>
+			<li>
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="halaman-input-croscutting" style="margin: 0;">Input Croscutting</h5>
+					<div class="esakip-body-tahun" data-id="halaman-input-croscutting">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+							' . $halaman_input_croscutting_pemda . '
+						</ul>
+					</div>
+				</div>
+			</li>
 			';
 		$halaman_sakip_opd .= '
 					</ul>
@@ -16825,14 +16819,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
             		<li>' . $halaman_sakip . '</li>
            			<li>' . $halaman_sakip_opd . '</li>
             		<li>' . $halaman_lke . '</li>';
-    			if (
-    				in_array("admin_panrb", $user_meta->roles) 
-    				|| in_array("admin_bappeda", $user_meta->roles)
-    				|| in_array("administrator", $user_meta->roles)
-    			) {
-       				echo $halaman_input_rpjpd_rpjmd;
-   				}
-    		echo '</ul>';
+			if (
+				in_array("admin_panrb", $user_meta->roles)
+				|| in_array("admin_bappeda", $user_meta->roles)
+				|| in_array("administrator", $user_meta->roles)
+			) {
+				echo $halaman_input_rpjpd_rpjmd;
+			}
+			echo '</ul>';
 		} else if (
 			in_array("pa", $user_meta->roles)
 			|| in_array("kpa", $user_meta->roles)
@@ -16876,9 +16870,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			);
 
 			foreach ($jadwal_periode_rpjmd_renstra as $jadwal_periode_item) {
-				if(!empty($jadwal_periode_item['tahun_selesai_anggaran'])){
+				if (!empty($jadwal_periode_item['tahun_selesai_anggaran'])) {
 					$tahun_anggaran_selesai = $jadwal_periode_item['tahun_selesai_anggaran'];
-				}else{
+				} else {
 					$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
 				}
 
@@ -18873,7 +18867,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'status' => 'error',
 								'message' => 'Gagal menyimpan data ke database!'
 							);
-						} 
+						}
 					} else {
 						$opsi = array(
 							'keterangan' => $keterangan,
@@ -21029,65 +21023,65 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				$id_jadwal_rpjpd = "";
-                if(!empty($_POST['id_unik_tujuan'])){
-                    $jadwal_rpd = $wpdb->get_results("select * from esakip_data_jadwal where tipe='RPJMD' and status!=0", ARRAY_A);
-                    if(!empty($jadwal_rpd)){
-                        $id_jadwal_rpjpd = $jadwal_rpd[0]['relasi_perencanaan'];
-                    }
-                }
-                $table = '';
-                $where = 'where 1=1 and active=1';
-                $type = $_POST['type'];
-                if($type != 1){
-                    $where .= 'and active=1';
-                }
-                if($_POST['table'] == 'esakip_rpd_tujuan'){
-                    $table = $_POST['table'];
-                    if(!empty($_POST['id_unik_tujuan'])){
-                        $where .= $wpdb->prepare(' and id_unik=%s', $_POST['id_unik_tujuan']);
-                    }else if(!empty($_POST['id_unik_tujuan_indikator'])){
-                        $where .= $wpdb->prepare(' and id_unik_indikator=%s', $_POST['id_unik_tujuan_indikator']);
-                    }
-                    $where .= ' ORDER BY no_urut ASC, id ASC';
-                }else if($_POST['table'] == 'esakip_rpd_sasaran'){
-                    $table = $_POST['table'];
-                    if(!empty($_POST['id_unik_tujuan'])){
-                        $where .= $wpdb->prepare(' and kode_tujuan=%s', $_POST['id_unik_tujuan']);
-                    }else if(!empty($_POST['id_unik_sasaran'])){
-                        $where .= $wpdb->prepare(' and id_unik=%s', $_POST['id_unik_sasaran']);
-                    }else if(!empty($_POST['id_unik_sasaran_indikator'])){
-                        $where .= $wpdb->prepare(' and id_unik_indikator=%s', $_POST['id_unik_sasaran_indikator']);
-                    }
-                    $where .= ' ORDER BY sasaran_no_urut ASC, id ASC';
-                }else if($_POST['table'] == 'esakip_rpd_program'){
-                    $table = $_POST['table'];
-                    if(!empty($_POST['id_unik_sasaran'])){
-                        $where .= $wpdb->prepare(' and kode_sasaran=%s', $_POST['id_unik_sasaran']);
-                    }else if(!empty($_POST['id_unik_program'])){
-                        $where .= $wpdb->prepare(' and id_unik=%s', $_POST['id_unik_program']);
-                    }else if(!empty($_POST['id_unik_program_indikator'])){
-                        $where .= $wpdb->prepare(' and id_unik_indikator=%s', $_POST['id_unik_program_indikator']);
-                    }
-                }else if($_POST['table'] == 'data_rpd_tujuan'){
-                    $table = $_POST['table'];
-                }
-                if(!empty($table)){
-                    $sql = $wpdb->prepare("
+				if (!empty($_POST['id_unik_tujuan'])) {
+					$jadwal_rpd = $wpdb->get_results("select * from esakip_data_jadwal where tipe='RPJMD' and status!=0", ARRAY_A);
+					if (!empty($jadwal_rpd)) {
+						$id_jadwal_rpjpd = $jadwal_rpd[0]['relasi_perencanaan'];
+					}
+				}
+				$table = '';
+				$where = 'where 1=1 and active=1';
+				$type = $_POST['type'];
+				if ($type != 1) {
+					$where .= 'and active=1';
+				}
+				if ($_POST['table'] == 'esakip_rpd_tujuan') {
+					$table = $_POST['table'];
+					if (!empty($_POST['id_unik_tujuan'])) {
+						$where .= $wpdb->prepare(' and id_unik=%s', $_POST['id_unik_tujuan']);
+					} else if (!empty($_POST['id_unik_tujuan_indikator'])) {
+						$where .= $wpdb->prepare(' and id_unik_indikator=%s', $_POST['id_unik_tujuan_indikator']);
+					}
+					$where .= ' ORDER BY no_urut ASC, id ASC';
+				} else if ($_POST['table'] == 'esakip_rpd_sasaran') {
+					$table = $_POST['table'];
+					if (!empty($_POST['id_unik_tujuan'])) {
+						$where .= $wpdb->prepare(' and kode_tujuan=%s', $_POST['id_unik_tujuan']);
+					} else if (!empty($_POST['id_unik_sasaran'])) {
+						$where .= $wpdb->prepare(' and id_unik=%s', $_POST['id_unik_sasaran']);
+					} else if (!empty($_POST['id_unik_sasaran_indikator'])) {
+						$where .= $wpdb->prepare(' and id_unik_indikator=%s', $_POST['id_unik_sasaran_indikator']);
+					}
+					$where .= ' ORDER BY sasaran_no_urut ASC, id ASC';
+				} else if ($_POST['table'] == 'esakip_rpd_program') {
+					$table = $_POST['table'];
+					if (!empty($_POST['id_unik_sasaran'])) {
+						$where .= $wpdb->prepare(' and kode_sasaran=%s', $_POST['id_unik_sasaran']);
+					} else if (!empty($_POST['id_unik_program'])) {
+						$where .= $wpdb->prepare(' and id_unik=%s', $_POST['id_unik_program']);
+					} else if (!empty($_POST['id_unik_program_indikator'])) {
+						$where .= $wpdb->prepare(' and id_unik_indikator=%s', $_POST['id_unik_program_indikator']);
+					}
+				} else if ($_POST['table'] == 'data_rpd_tujuan') {
+					$table = $_POST['table'];
+				}
+				if (!empty($table)) {
+					$sql = $wpdb->prepare("
                         select 
                             * 
                         from $table
                         $where
                     ");
-                    // die($sql);
-                    $ret['data'] = $wpdb->get_results($sql, ARRAY_A);
-                    $data_all = array();
-                    if($_POST['table'] == 'esakip_rpd_tujuan'){
-                        foreach ($ret['data'] as $tujuan) {
-                            if(empty($data_all[$tujuan['id_unik']])){
-                                if(!empty($_POST['id_unik_tujuan_indikator'])){
-                                    $_POST['id_unik_tujuan'] = $tujuan['id_unik'];
-                                }
-                                $sasaran = $wpdb->get_results($wpdb->prepare("
+					// die($sql);
+					$ret['data'] = $wpdb->get_results($sql, ARRAY_A);
+					$data_all = array();
+					if ($_POST['table'] == 'esakip_rpd_tujuan') {
+						foreach ($ret['data'] as $tujuan) {
+							if (empty($data_all[$tujuan['id_unik']])) {
+								if (!empty($_POST['id_unik_tujuan_indikator'])) {
+									$_POST['id_unik_tujuan'] = $tujuan['id_unik'];
+								}
+								$sasaran = $wpdb->get_results($wpdb->prepare("
                                     SELECT 
                                         id_unik
                                     from esakip_rpd_sasaran 
@@ -21095,16 +21089,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                         AND active=1
                                         AND kode_tujuan=%s
                                 ", $tujuan['id_unik']), ARRAY_A);
-                                $kd_all_sasaran = array();
-                                foreach($sasaran as $sas){
-                                    $kd_all_sasaran[] = "'".$sas['id_unik']."'";
-                                }
-                                $kd_all_sasaran =  implode(',', $kd_all_sasaran);
-                                if(empty($kd_all_sasaran)){
-                                    $kd_all_sasaran = 0;
-                                }
+								$kd_all_sasaran = array();
+								foreach ($sasaran as $sas) {
+									$kd_all_sasaran[] = "'" . $sas['id_unik'] . "'";
+								}
+								$kd_all_sasaran =  implode(',', $kd_all_sasaran);
+								if (empty($kd_all_sasaran)) {
+									$kd_all_sasaran = 0;
+								}
 
-                                $program = $wpdb->get_results($wpdb->prepare("
+								$program = $wpdb->get_results($wpdb->prepare("
                                     SELECT 
                                         id_unik
                                     from esakip_rpd_program 
@@ -21112,16 +21106,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                         AND active=1
                                         AND kode_sasaran in ($kd_all_sasaran)
                                 ", $sasaran['id_unik']), ARRAY_A);
-                                $kd_all_prog = array();
-                                foreach($program as $prog){
-                                    $kd_all_prog[] = "'".$prog['id_unik']."'";
-                                }
-                                $kd_all_prog =  implode(',', $kd_all_prog);
-                                if(empty($kd_all_prog)){
-                                    $kd_all_prog = 0;
-                                }
+								$kd_all_prog = array();
+								foreach ($program as $prog) {
+									$kd_all_prog[] = "'" . $prog['id_unik'] . "'";
+								}
+								$kd_all_prog =  implode(',', $kd_all_prog);
+								if (empty($kd_all_prog)) {
+									$kd_all_prog = 0;
+								}
 
-                                $pagu = $wpdb->get_row($wpdb->prepare("
+								$pagu = $wpdb->get_row($wpdb->prepare("
                                     SELECT 
                                         sum(pagu_1) as pagu_akumulasi_1,
                                         sum(pagu_2) as pagu_akumulasi_2,
@@ -21133,67 +21127,67 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                         AND active=1
                                         AND id_unik in ($kd_all_prog)
                                 "), ARRAY_A);
-                                $data_all[$tujuan['id_unik']] = array(
-                                    'id' => $tujuan['id'],
-                                    'id_unik' => $tujuan['id_unik'],
-                                    'nama' => $tujuan['tujuan_teks'],
-                                    'id_jadwal_rpjpd' => $id_jadwal_rpjpd,
-                                    'pagu_akumulasi_1' => $pagu['pagu_akumulasi_1'],
-                                    'pagu_akumulasi_2' => $pagu['pagu_akumulasi_2'],
-                                    'pagu_akumulasi_3' => $pagu['pagu_akumulasi_3'],
-                                    'pagu_akumulasi_4' => $pagu['pagu_akumulasi_4'],
-                                    'pagu_akumulasi_5' => $pagu['pagu_akumulasi_5'],
-                                    'rpjpd' => array(),
-                                    'detail' => array(),
-                                    'no_urut' => $tujuan['no_urut'],
-                                    'catatan_teks_tujuan' => $tujuan['catatan_teks_tujuan'],
-                                    'indikator_catatan_teks' => $tujuan['indikator_catatan_teks']
-                                );
-                                if(!empty($_POST['id_unik_tujuan'])){
-                                    $_POST['table'] = 'data_rpjpd_isu';
-                                    $_POST['id_isu'] = $tujuan['id_isu'];
-                                    $data_all[$tujuan['id_unik']]['rpjpd']['isu'] = array(
-                                        'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
-                                        'id' => $tujuan['id_isu']
-                                    );
+								$data_all[$tujuan['id_unik']] = array(
+									'id' => $tujuan['id'],
+									'id_unik' => $tujuan['id_unik'],
+									'nama' => $tujuan['tujuan_teks'],
+									'id_jadwal_rpjpd' => $id_jadwal_rpjpd,
+									'pagu_akumulasi_1' => $pagu['pagu_akumulasi_1'],
+									'pagu_akumulasi_2' => $pagu['pagu_akumulasi_2'],
+									'pagu_akumulasi_3' => $pagu['pagu_akumulasi_3'],
+									'pagu_akumulasi_4' => $pagu['pagu_akumulasi_4'],
+									'pagu_akumulasi_5' => $pagu['pagu_akumulasi_5'],
+									'rpjpd' => array(),
+									'detail' => array(),
+									'no_urut' => $tujuan['no_urut'],
+									'catatan_teks_tujuan' => $tujuan['catatan_teks_tujuan'],
+									'indikator_catatan_teks' => $tujuan['indikator_catatan_teks']
+								);
+								if (!empty($_POST['id_unik_tujuan'])) {
+									$_POST['table'] = 'data_rpjpd_isu';
+									$_POST['id_isu'] = $tujuan['id_isu'];
+									$data_all[$tujuan['id_unik']]['rpjpd']['isu'] = array(
+										'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
+										'id' => $tujuan['id_isu']
+									);
 
-                                    $_POST['table'] = 'data_rpjpd_kebijakan';
-                                    $_POST['id_kebijakan'] = $data_all[$tujuan['id_unik']]['rpjpd']['isu']['data']['data'][0]['id_kebijakan'];
-                                    $data_all[$tujuan['id_unik']]['rpjpd']['kebijakan'] = array(
-                                        'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
-                                        'id' => $_POST['id_kebijakan']
-                                    );
+									$_POST['table'] = 'data_rpjpd_kebijakan';
+									$_POST['id_kebijakan'] = $data_all[$tujuan['id_unik']]['rpjpd']['isu']['data']['data'][0]['id_kebijakan'];
+									$data_all[$tujuan['id_unik']]['rpjpd']['kebijakan'] = array(
+										'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
+										'id' => $_POST['id_kebijakan']
+									);
 
-                                    $_POST['table'] = 'data_rpjpd_sasaran';
-                                    $_POST['id_saspok'] = $data_all[$tujuan['id_unik']]['rpjpd']['kebijakan']['data']['data'][0]['id_saspok'];
-                                    $data_all[$tujuan['id_unik']]['rpjpd']['sasaran'] = array(
-                                        'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
-                                        'id' => $_POST['id_saspok']
-                                    );
+									$_POST['table'] = 'data_rpjpd_sasaran';
+									$_POST['id_saspok'] = $data_all[$tujuan['id_unik']]['rpjpd']['kebijakan']['data']['data'][0]['id_saspok'];
+									$data_all[$tujuan['id_unik']]['rpjpd']['sasaran'] = array(
+										'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
+										'id' => $_POST['id_saspok']
+									);
 
-                                    $_POST['table'] = 'data_rpjpd_misi';
-                                    $_POST['id_misi'] = $data_all[$tujuan['id_unik']]['rpjpd']['sasaran']['data']['data'][0]['id_misi'];
-                                    $data_all[$tujuan['id_unik']]['rpjpd']['misi'] = array(
-                                        'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
-                                        'id' => $_POST['id_misi']
-                                    );
+									$_POST['table'] = 'data_rpjpd_misi';
+									$_POST['id_misi'] = $data_all[$tujuan['id_unik']]['rpjpd']['sasaran']['data']['data'][0]['id_misi'];
+									$data_all[$tujuan['id_unik']]['rpjpd']['misi'] = array(
+										'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
+										'id' => $_POST['id_misi']
+									);
 
-                                    $_POST['table'] = 'data_rpjpd_visi';
-                                    $_POST['id_visi'] = $data_all[$tujuan['id_unik']]['rpjpd']['misi']['data']['data'][0]['id_visi'];
-                                    $data_all[$tujuan['id_unik']]['rpjpd']['visi'] = array(
-                                        'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
-                                        'id' => $_POST['id_visi']
-                                    );
-                                }
-                            }
-                            if(!empty($tujuan['id_unik_indikator'])){
-                                $data_all[$tujuan['id_unik']]['detail'][] = $tujuan;
-                            }
-                        }
-                    }else if($_POST['table'] == 'esakip_rpd_sasaran'){
-                        foreach ($ret['data'] as $sasaran) {
-                            if(empty($data_all[$sasaran['id_unik']])){
-                                $program = $wpdb->get_results($wpdb->prepare("
+									$_POST['table'] = 'data_rpjpd_visi';
+									$_POST['id_visi'] = $data_all[$tujuan['id_unik']]['rpjpd']['misi']['data']['data'][0]['id_visi'];
+									$data_all[$tujuan['id_unik']]['rpjpd']['visi'] = array(
+										'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
+										'id' => $_POST['id_visi']
+									);
+								}
+							}
+							if (!empty($tujuan['id_unik_indikator'])) {
+								$data_all[$tujuan['id_unik']]['detail'][] = $tujuan;
+							}
+						}
+					} else if ($_POST['table'] == 'esakip_rpd_sasaran') {
+						foreach ($ret['data'] as $sasaran) {
+							if (empty($data_all[$sasaran['id_unik']])) {
+								$program = $wpdb->get_results($wpdb->prepare("
                                     SELECT 
                                         id_unik
                                     from esakip_rpd_program 
@@ -21201,15 +21195,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                         AND active=1
                                         AND kode_sasaran=%s
                                 ", $sasaran['id_unik']), ARRAY_A);
-                                $kd_all_prog = array();
-                                foreach($program as $prog){
-                                    $kd_all_prog[] = "'".$prog['id_unik']."'";
-                                }
-                                $kd_all_prog =  implode(',', $kd_all_prog);
-                                if(empty($kd_all_prog)){
-                                    $kd_all_prog = 0;
-                                }
-                                $pagu = $wpdb->get_row($wpdb->prepare("
+								$kd_all_prog = array();
+								foreach ($program as $prog) {
+									$kd_all_prog[] = "'" . $prog['id_unik'] . "'";
+								}
+								$kd_all_prog =  implode(',', $kd_all_prog);
+								if (empty($kd_all_prog)) {
+									$kd_all_prog = 0;
+								}
+								$pagu = $wpdb->get_row($wpdb->prepare("
                                     SELECT 
                                         sum(pagu_1) as pagu_akumulasi_1,
                                         sum(pagu_2) as pagu_akumulasi_2,
@@ -21221,29 +21215,29 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                         AND active=1
                                         AND id_unik in ($kd_all_prog)
                                 "), ARRAY_A);
-                                $data_all[$sasaran['id_unik']] = array(
-                                    'id' => $sasaran['id'],
-                                    'id_unik' => $sasaran['id_unik'],
-                                    'nama' => $sasaran['sasaran_teks'],
-                                    'pagu_akumulasi_1' => $pagu['pagu_akumulasi_1'],
-                                    'pagu_akumulasi_2' => $pagu['pagu_akumulasi_2'],
-                                    'pagu_akumulasi_3' => $pagu['pagu_akumulasi_3'],
-                                    'pagu_akumulasi_4' => $pagu['pagu_akumulasi_4'],
-                                    'pagu_akumulasi_5' => $pagu['pagu_akumulasi_5'],
-                                    'sasaran_no_urut' => $sasaran['sasaran_no_urut'],
-                                    'sasaran_catatan' => $sasaran['sasaran_catatan'],
-                                    'indikator_catatan_teks'=> $sasaran['indikator_catatan_teks'],
-                                    'detail' => array()
-                                );
-                            }
-                            if(!empty($sasaran['id_unik_indikator'])){
-                                $data_all[$sasaran['id_unik']]['detail'][] = $sasaran;
-                            }
-                        }
-                    }else if($_POST['table'] == 'esakip_rpd_program'){
-                        foreach ($ret['data'] as $program) {
-                            if(empty($data_all[$program['id_unik']])){
-                                $pagu = $wpdb->get_row($wpdb->prepare("
+								$data_all[$sasaran['id_unik']] = array(
+									'id' => $sasaran['id'],
+									'id_unik' => $sasaran['id_unik'],
+									'nama' => $sasaran['sasaran_teks'],
+									'pagu_akumulasi_1' => $pagu['pagu_akumulasi_1'],
+									'pagu_akumulasi_2' => $pagu['pagu_akumulasi_2'],
+									'pagu_akumulasi_3' => $pagu['pagu_akumulasi_3'],
+									'pagu_akumulasi_4' => $pagu['pagu_akumulasi_4'],
+									'pagu_akumulasi_5' => $pagu['pagu_akumulasi_5'],
+									'sasaran_no_urut' => $sasaran['sasaran_no_urut'],
+									'sasaran_catatan' => $sasaran['sasaran_catatan'],
+									'indikator_catatan_teks' => $sasaran['indikator_catatan_teks'],
+									'detail' => array()
+								);
+							}
+							if (!empty($sasaran['id_unik_indikator'])) {
+								$data_all[$sasaran['id_unik']]['detail'][] = $sasaran;
+							}
+						}
+					} else if ($_POST['table'] == 'esakip_rpd_program') {
+						foreach ($ret['data'] as $program) {
+							if (empty($data_all[$program['id_unik']])) {
+								$pagu = $wpdb->get_row($wpdb->prepare("
                                     SELECT 
                                         sum(pagu_1) as pagu_akumulasi_1,
                                         sum(pagu_2) as pagu_akumulasi_2,
@@ -21255,26 +21249,26 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                         AND active=1
                                         AND id_unik=%s
                                 ", $program['id_unik']), ARRAY_A);
-                                $data_all[$program['id_unik']] = array(
-                                    'id' => $program['id'],
-                                    'id_unik' => $program['id_unik'],
-                                    'id_program' => $program['id_program'],
-                                    'catatan' => $program['catatan'],
-                                    'nama' => $program['nama_program'],
-                                    'pagu_akumulasi_1' => $pagu['pagu_akumulasi_1'],
-                                    'pagu_akumulasi_2' => $pagu['pagu_akumulasi_2'],
-                                    'pagu_akumulasi_3' => $pagu['pagu_akumulasi_3'],
-                                    'pagu_akumulasi_4' => $pagu['pagu_akumulasi_4'],
-                                    'pagu_akumulasi_5' => $pagu['pagu_akumulasi_5'],
-                                    'detail' => array()
-                                );
-                            }
-                            if(!empty($program['id_unik_indikator'])){
-                                $data_all[$program['id_unik']]['detail'][] = $program;
-                            }
-                        }
-                    }
-                    $ret['data_all'] = $data_all;
+								$data_all[$program['id_unik']] = array(
+									'id' => $program['id'],
+									'id_unik' => $program['id_unik'],
+									'id_program' => $program['id_program'],
+									'catatan' => $program['catatan'],
+									'nama' => $program['nama_program'],
+									'pagu_akumulasi_1' => $pagu['pagu_akumulasi_1'],
+									'pagu_akumulasi_2' => $pagu['pagu_akumulasi_2'],
+									'pagu_akumulasi_3' => $pagu['pagu_akumulasi_3'],
+									'pagu_akumulasi_4' => $pagu['pagu_akumulasi_4'],
+									'pagu_akumulasi_5' => $pagu['pagu_akumulasi_5'],
+									'detail' => array()
+								);
+							}
+							if (!empty($program['id_unik_indikator'])) {
+								$data_all[$program['id_unik']]['detail'][] = $program;
+							}
+						}
+					}
+					$ret['data_all'] = $data_all;
 				} else {
 					$ret = array(
 						'status'  => 'error',
@@ -21618,12 +21612,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								", $_POST['id'])
 							);
 							if (empty($cek_id)) {
-								$wpdb->delete($table, ['id_unik' => $_POST['id']]);							
+								$wpdb->delete($table, ['id_unik' => $_POST['id']]);
 							} else {
 								$ret['status'] = 'error';
 								$ret['message'] = 'Tujuan memiliki Sasaran aktif! Mohon hapus Sasaran turunannya terlebih dahulu!';
 								die(json_encode($ret));
-							}							
+							}
 						}
 						break;
 					case 'esakip_rpd_sasaran':
@@ -21639,12 +21633,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								", $_POST['id'])
 							);
 							if (empty($cek_id)) {
-								$wpdb->delete($table, ['id_unik' => $_POST['id']]);							
+								$wpdb->delete($table, ['id_unik' => $_POST['id']]);
 							} else {
 								$ret['status'] = 'error';
 								$ret['message'] = 'Sasaran memiliki Program aktif! Mohon hapus Program turunannya terlebih dahulu!';
 								die(json_encode($ret));
-							}		
+							}
 						}
 						break;
 					case 'esakip_rpd_program':
@@ -21685,14 +21679,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		);
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] === get_option(ESAKIP_APIKEY)) {
-				if(!empty(get_option(ESAKIP_URL_WPSIPD))) {
+				if (!empty(get_option(ESAKIP_URL_WPSIPD))) {
 					$url = get_option(ESAKIP_URL_WPSIPD);
 				} else {
 					$ret['status'] = 'error';
 					$ret['message'] = 'URL WP-SIPD Kosong!';
 					die(json_encode($ret));
 				}
-				if(!empty(get_option(ESAKIP_APIKEY_WPSIPD))) {
+				if (!empty(get_option(ESAKIP_APIKEY_WPSIPD))) {
 					$api_key = get_option(ESAKIP_APIKEY_WPSIPD);
 				} else {
 					$ret['status'] = 'error';
@@ -21704,7 +21698,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					'api_key' => $api_key,
 					'type' => $_POST['type']
 				);
-		
+
 				$response = wp_remote_post($url, array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
 				$response = wp_remote_retrieve_body($response);
 				$data = json_decode($response);
@@ -21757,7 +21751,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                     WHERE id_unik_indikator IS NULL
                      	AND active = 1
                 ", ARRAY_A);
-				// print_r($get_tujuan); die($wpdb->last_query);
 
 				if (!empty($get_tujuan)) {
 					$counter = 1;
@@ -21770,7 +21763,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$tbody .= "<td>" . $vv['tujuan_teks'] . "</td>";
 
 						$btn = '<div class="btn-action-group">';
-						$btn .= '<button class="btn btn-sm btn-info" onclick="view_tujuan return false;" href="#" title="View"><span class="dashicons dashicons-visibility"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-info" onclick="view_tujuan(\'' . $vv['id'] . '\') return false;" href="#" title="View"><span class="dashicons dashicons-visibility"></span></button>';
 						$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_cascading_pemda(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit"><span class="dashicons dashicons-edit"></span></button>';
 						$btn .= '</div>';
 
@@ -21816,7 +21809,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							FROM esakip_rpd_tujuan
 							WHERE id = %d
 						", $_POST['id']),
-						ARRAY_A);
+						ARRAY_A
+					);
 					$ret['data'] = $data;
 				} else {
 					$ret = array(
@@ -21839,71 +21833,81 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
-	public function submit_edit_cascading(){
-	    global $wpdb;
-	    $ret = array(
-	        'status' => 'success',
-	        'message' => 'Berhasil simpan data!',
-	        'data' => array()
-	    );
-	    if(!empty($_POST)){
-	        if(!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-                $id = null;
-
-				if (!empty($_POST['id'])) {
-					$id = $_POST['id'];
-					$ret['message'] = 'Berhasil edit data!';
+	public function submit_edit_cascading()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil edit data!',
+			'data' => array()
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (empty($_POST['id'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id kosong!';
+					die(json_encode($ret));
 				} else if (empty($_POST['nama_cascading'])) {
-                    $ret['status'] = 'error';
-                    $ret['message'] = 'Data Nama Cascading tidak boleh kosong!';
-                } else if (empty($_POST['tujuan_teks'])) {
-                    $ret['status'] = 'error';
-                    $ret['message'] = 'Data Judul Cascading tidak boleh kosong!';
-                } else {
-                    $nama_cascading = $_POST['nama_cascading'];
-                    $tujuan_teks = $_POST['tujuan_teks'];
-	                $data = array(
-	                    'nama_cascading' => $nama_cascading,
-	                    'tujuan_teks' => $tujuan_teks,
-	                    'active' => 1,
-	                    'update_at' => current_time('mysql')
-	                );
-	                if(!empty($_POST['id'])){
-	                    $wpdb->update('esakip_rpd_tujuan', $data, array(
-	                        'id' => $_POST['id']
-	                    ));
-	                    $ret['message'] = 'Berhasil update data!';
-	                }else{
-	                    $cek_id = $wpdb->get_row($wpdb->prepare('
-	                        SELECT
-								*
-	                        FROM esakip_rpd_tujuan
-	                        WHERE id=%s
-	                    ', $id), ARRAY_A);
-	                    print_r($cek_id); die($wpdb->last_query);
-	                    if(empty($cek_id)){
-	                        $wpdb->insert('esakip_rpd_tujuan', $data);
-	                    }else{
-	                        if($cek_id['active'] == 0){
-	                            $wpdb->update('esakip_rpd_tujuan', $data, array(
-	                                'id' => $cek_id['id']
-	                            ));
-	                        }else{
-	                            $ret['status'] = 'error';
-	                            $ret['message'] = 'Gagal disimpan. Data RPD dengan id="'.$id.'" sudah ada!';
-	                        }
-	                    }
-	                }
-	            }
-	        }else{
-	            $ret['status']  = 'error';
-	            $ret['message'] = 'Api key tidak ditemukan!';
-	        }
-	    }else{
-	        $ret['status']  = 'error';
-	        $ret['message'] = 'Format Salah!';
-	    }
+					$ret['status'] = 'error';
+					$ret['message'] = 'Nama Cascading kosong!';
+					die(json_encode($ret));
+				} else {
+					$nama_cascading = $_POST['nama_cascading'];
+					$data = array(
+						'nama_cascading' => $nama_cascading,
+						'update_at' => current_time('mysql')
+					);
+					$wpdb->update('esakip_rpd_tujuan', $data, array('id' => $_POST['id']));					
+				}
+			} else {
+				$ret['status']  = 'error';
+				$ret['message'] = 'Api key tidak ditemukan!';
+			}
+		} else {
+			$ret['status']  = 'error';
+			$ret['message'] = 'Format Salah!';
+		}
 
-	    die(json_encode($ret));
+		die(json_encode($ret));
+	}
+
+	public function get_chart_cascading()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'id Jadwal kosong!';
+					die(json_encode($ret));
+				}
+
+				// $id_tujuan = $wpdb->get_var(
+				// 	$wpdb->prepare("
+				// 		SELECT relasi_perencanaan
+				// 		FROM esakip_data_jadwal
+				// 		WHERE id_jadwal = %d
+				// 	", $id_jadwal)
+				// );
+				
+
+			} else {
+				$ret['status']  = 'error';
+				$ret['message'] = 'Api key tidak ditemukan!';
+			}
+		} else {
+			$ret['status']  = 'error';
+			$ret['sql']  = $wpdb->last_query;
+			$ret['message'] = 'Format Salah!';
+		}
+
+		die(json_encode($ret));
 	}
 }
