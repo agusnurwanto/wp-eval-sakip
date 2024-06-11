@@ -16185,28 +16185,31 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$periode_input_rpjmd .= '<li><a target="_blank" href="' . $input_rpjmd['url'] . '" class="btn btn-primary">' . $input_rpjmd['title'] . '</a></li>';
 
 			$input_pohon_kinerja_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Input Pohon Kinerja | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-				'content' => '[input_pohon_kinerja_pemda periode=' . $jadwal_periode_item['id'] . ']',
+				'nama_page' => 'Halaman Input Pohon Kinerja ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[penyusunan_pohon_kinerja periode=' . $jadwal_periode_item['id'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$periode_input_pohon_kinerja_pemda .= '<li><a target="_blank" href="' . $input_pohon_kinerja_pemda['url'] . '" class="btn btn-primary">' . $input_pohon_kinerja_pemda['title'] . '</a></li>';
+			$title = 'Input Pohon Kinerja | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+			$periode_input_pohon_kinerja_pemda .= '<li><a target="_blank" href="' . $input_pohon_kinerja_pemda['url'] . '" class="btn btn-primary">'.$title.'</a></li>';
 
 			$input_cascading_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Input Cascading Pemda | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'nama_page' => 'Halaman Input Cascading Pemerintah Daerah ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
 				'content' => '[cascading_pemda periode=' . $jadwal_periode_item['id'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$periode_input_cascading_pemda .= '<li><a target="_blank" href="' . $input_cascading_pemda['url'] . '" class="btn btn-primary"> Input Cascading | ' . $jadwal_periode_item['nama_jadwal'] . ' Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai.'</a></li>';
+			$title = 'Input Cascading Pemda | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+			$periode_input_cascading_pemda .= '<li><a target="_blank" href="' . $input_cascading_pemda['url'] . '" class="btn btn-primary">'.$title.'</a></li>';
 
 			$input_croscutting_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Input Croscutting Pemda | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'nama_page' => 'Halaman Input Croscutting Pemerintah Daerah ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
 				'content' => '[croscutting_pemda periode=' . $jadwal_periode_item['id'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$periode_input_croscutting_pemda .= '<li><a target="_blank" href="' . $input_croscutting_pemda['url'] . '" class="btn btn-primary"> Input Croscutting | ' . $jadwal_periode_item['nama_jadwal'] . '</a></li>';
+			$title = 'Input Croscutting Pemda | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+			$periode_input_croscutting_pemda .= '<li><a target="_blank" href="' . $input_croscutting_pemda['url'] . '" class="btn btn-primary">'.$title. '</a></li>';
 
 			$renstra = $this->functions->generatePage(array(
 				'nama_page' => 'RENSTRA | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,

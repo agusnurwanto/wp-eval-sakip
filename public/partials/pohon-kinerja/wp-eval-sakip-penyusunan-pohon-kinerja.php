@@ -11,7 +11,7 @@ $input = shortcode_atts(array(
 
 global $wpdb;
 $data_all = [
-	'data' => []
+	'data' => array()
 ];
 
 $periode = $wpdb->get_row(
@@ -24,6 +24,9 @@ $periode = $wpdb->get_row(
 ", $input['periode']),
     ARRAY_A
 );
+if(empty($periode)){
+	die('<h1 class="text-center">Jadwal periode RPJMD/RPD tidak ditemukan!</h1>');
+}
 
 if(!empty($periode['tahun_selesai_anggaran'])){
     $tahun_periode = $periode['tahun_selesai_anggaran'];
@@ -39,9 +42,9 @@ $pohon_kinerja_level_1 = $wpdb->get_results($wpdb->prepare("
 	WHERE parent=0 
 		AND level=1 
 		AND active=1 
-		AND tahun_anggaran=%d 
+		AND id_jadwal=%d 
 	ORDER BY id
-", $input['tahun_anggaran']), ARRAY_A);
+", $input['periode']), ARRAY_A);
 if(!empty($pohon_kinerja_level_1)){
 	foreach ($pohon_kinerja_level_1 as $level_1) {
 		if(empty($data_all['data'][trim($level_1['label'])])){
@@ -49,8 +52,8 @@ if(!empty($pohon_kinerja_level_1)){
 				'id' => $level_1['id'],
 				'label' => $level_1['label'],
 				'level' => $level_1['level'],
-				'indikator' => [],
-				'data' => []
+				'indikator' => array(),
+				'data' => array()
 			];
 		}
 
@@ -62,9 +65,9 @@ if(!empty($pohon_kinerja_level_1)){
 			WHERE parent=%d 
 				AND level=1 
 				AND active=1 
-				AND tahun_anggaran=%d 
+				AND id_jadwal=%d 
 			ORDER BY id
-		", $level_1['id'], $input['tahun_anggaran']), ARRAY_A);
+		", $level_1['id'], $input['periode']), ARRAY_A);
 		if(!empty($indikator_pohon_kinerja_level_1)){
 			foreach ($indikator_pohon_kinerja_level_1 as $indikator_level_1) {
 				if(!empty($indikator_level_1['label_indikator_kinerja'])){
@@ -88,9 +91,9 @@ if(!empty($pohon_kinerja_level_1)){
 			WHERE parent=%d 
 				AND level=2
 				AND active=1 
-				AND tahun_anggaran=%d 
+				AND id_jadwal=%d 
 			ORDER by id
-		", $level_1['id'], $input['tahun_anggaran']), ARRAY_A);
+		", $level_1['id'], $input['periode']), ARRAY_A);
 		if(!empty($pohon_kinerja_level_2)){
 			foreach ($pohon_kinerja_level_2 as $level_2) {
 				if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])])){
@@ -98,8 +101,8 @@ if(!empty($pohon_kinerja_level_1)){
 						'id' => $level_2['id'],
 						'label' => $level_2['label'],
 						'level' => $level_2['level'],
-						'indikator' => [],
-						'data' => []
+						'indikator' => array(),
+						'data' => array()
 					];
 				}
 
@@ -111,9 +114,9 @@ if(!empty($pohon_kinerja_level_1)){
 					WHERE parent=%d 
 						AND level=2 
 						AND active=1 
-						AND tahun_anggaran=%d 
+						AND id_jadwal=%d 
 					ORDER BY id
-				", $level_2['id'], $input['tahun_anggaran']), ARRAY_A);
+				", $level_2['id'], $input['periode']), ARRAY_A);
 				if(!empty($indikator_pohon_kinerja_level_2)){
 					foreach ($indikator_pohon_kinerja_level_2 as $indikator_level_2) {
 						if(!empty($indikator_level_2['label_indikator_kinerja'])){
@@ -137,9 +140,9 @@ if(!empty($pohon_kinerja_level_1)){
 					WHERE parent=%d 
 						AND level=3 
 						AND active=1 
-						AND tahun_anggaran=%d 
+						AND id_jadwal=%d 
 					ORDER by id
-				", $level_2['id'], $input['tahun_anggaran']), ARRAY_A);
+				", $level_2['id'], $input['periode']), ARRAY_A);
 				if(!empty($pohon_kinerja_level_3)){
 					foreach ($pohon_kinerja_level_3 as $level_3) {
 						if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])])){
@@ -147,8 +150,8 @@ if(!empty($pohon_kinerja_level_1)){
 								'id' => $level_3['id'],
 								'label' => $level_3['label'],
 								'level' => $level_3['level'],
-								'indikator' => [],
-								'data' => []
+								'indikator' => array(),
+								'data' => array()
 							];
 						}
 
@@ -160,9 +163,9 @@ if(!empty($pohon_kinerja_level_1)){
 							WHERE parent=%d 
 								AND level=3 
 								AND active=1 
-								AND tahun_anggaran=%d
+								AND id_jadwal=%d
 							ORDER BY id
-						", $level_3['id'], $input['tahun_anggaran']), ARRAY_A);
+						", $level_3['id'], $input['periode']), ARRAY_A);
 						if(!empty($indikator_pohon_kinerja_level_3)){
 							foreach ($indikator_pohon_kinerja_level_3 as $indikator_level_3) {
 								if(!empty($indikator_level_3['label_indikator_kinerja'])){
@@ -186,9 +189,9 @@ if(!empty($pohon_kinerja_level_1)){
 							WHERE parent=%d 
 								AND level=4
 								AND active=1 
-								AND tahun_anggaran=%d
+								AND id_jadwal=%d
 							ORDER by id
-						", $level_3['id'], $input['tahun_anggaran']), ARRAY_A);
+						", $level_3['id'], $input['periode']), ARRAY_A);
 						if(!empty($pohon_kinerja_level_4)){
 							foreach ($pohon_kinerja_level_4 as $level_4) {
 								if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])])){
@@ -196,7 +199,7 @@ if(!empty($pohon_kinerja_level_1)){
 										'id' => $level_4['id'],
 										'label' => $level_4['label'],
 										'level' => $level_4['level'],
-										'indikator' => []
+										'indikator' => array()
 									];
 								}
 
@@ -208,9 +211,9 @@ if(!empty($pohon_kinerja_level_1)){
 									WHERE parent=%d 
 										AND level=4 
 										AND active=1 
-										AND tahun_anggaran=%d
+										AND id_jadwal=%d
 									ORDER BY id
-								", $level_4['id'], $input['tahun_anggaran']), ARRAY_A);
+								", $level_4['id'], $input['periode']), ARRAY_A);
 								if(!empty($indikator_pohon_kinerja_level_4)){
 									foreach ($indikator_pohon_kinerja_level_4 as $indikator_level_4) {
 										if(!empty($indikator_level_4['label_indikator_kinerja'])){
@@ -244,52 +247,93 @@ $view_kinerja = $this->functions->generatePage(array(
 ));
 $html = '';
 foreach ($data_all['data'] as $key1 => $level_1) {
-	$html.='<tr><td><a href="'.$view_kinerja['url'].'&id='.$level_1['id'].'" target="_blank">'.$level_1['label'].'</a></td>';
-	$indikator=[];
+	$indikator=array();
 	foreach ($level_1['indikator'] as $indikatorlevel1) {
 		$indikator[]=$indikatorlevel1['label_indikator_kinerja'];
 	}
-	$html.='<td>'.implode("</br>", $indikator).'</td>';
+	$html.='
+	<tr>
+		<td class="level1"><a href="'.$view_kinerja['url'].'&id='.$level_1['id'].'" target="_blank">'.$level_1['label'].'</a></td>
+		<td class="indikator">'.implode("</br>", $indikator).'</td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>';
 	foreach (array_values($level_1['data']) as $key2 => $level_2) {
-		if($key2==0){
-			$html.='<td>'.$level_2['label'].'</td>';
-		}else{
-			$html.='<tr><td></td><td></td><td>'.$level_2['label'].'</td>';
-		}
-		$indikator=[];
+		$indikator=array();
 		foreach ($level_2['indikator'] as $indikatorlevel2) {
 			$indikator[]=$indikatorlevel2['label_indikator_kinerja'];
 		}
-		$html.='<td>'.implode("</br>", $indikator).'</td>';
+		$html.='
+		<tr>
+			<td></td>
+			<td></td>
+			<td class="level2">'.$level_2['label'].'</td>
+			<td class="indikator">'.implode("</br>", $indikator).'</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>';
 		foreach (array_values($level_2['data']) as $key3 => $level_3) {
-			if($key3==0){
-				$html.='<td>'.$level_3['label'].'</td>';
-			}else{
-				$html.='<tr><td></td><td></td><td></td><td></td><td>'.$level_3['label'].'</td>';
-			}
-			$indikator=[];
+			$indikator=array();
 			foreach ($level_3['indikator'] as $indikatorlevel3) {
 				$indikator[]=$indikatorlevel3['label_indikator_kinerja'];
 			}
-			$html.='<td>'.implode("</br>", $indikator).'</td>';
+			$html.='
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td class="level3">'.$level_3['label'].'</td>
+				<td class="indikator">'.implode("</br>", $indikator).'</td>
+				<td></td>
+				<td></td>
+			</tr>';
 			foreach (array_values($level_3['data']) as $key4 => $level_4) {
-				if($key4==0){
-					$html.='<td>'.$level_4['label'].'</td>';
-				}else{
-					$html.='<tr><td></td><td></td><td></td><td></td><td></td><td></td><td>'.$level_4['label'].'</td>';
-				}
-				$indikator=[];
+				$indikator=array();
 				foreach ($level_4['indikator'] as $indikatorlevel4) {
 					$indikator[]=$indikatorlevel4['label_indikator_kinerja'];
 				}
-				$html.='<td>'.implode("</br>", $indikator).'</td></tr>';
+				$html.='
+				<tr>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td class="level4">'.$level_4['label'].'</td>
+					<td class="indikator">'.implode("</br>", $indikator).'</td>
+				</tr>';
 			}
 		}
 	}
 }
 ?>
 
-<style type="text/css"></style>
+<style type="text/css">
+	.level1 {
+		background: #efd655;
+		text-decoration: underline;
+	}
+	.level2 {
+		background: #fe7373;
+	}
+	.level3 {
+		background: #57b2ec;
+	}
+	.level4 {
+		background: #c979e3;
+	}
+	.indikator {
+		background: #b5d9ea;
+	}
+</style>
 <h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Pohon Kinerja<br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h3><br>
 <div id="action" style="text-align: center; margin-top:30px; margin-bottom: 30px;">
 		<a style="margin-left: 10px;" id="tambah-pohon-kinerja" onclick="return false;" href="#" class="btn btn-success">Tambah Data</a>
@@ -1116,7 +1160,7 @@ jQuery(document).ready(function(){
 		let action = jQuery(this).data('action');
 		let view = jQuery(this).data('view');
 		let form = getFormData(jQuery("#form-pokin"));
-		form['tahun_anggaran'] = '<?php echo $input['tahun_anggaran']; ?>';
+		form['id_jadwal'] = '<?php echo $input['periode']; ?>';
 		
 		jQuery.ajax({
 			method:'POST',
@@ -1149,7 +1193,7 @@ function pokinLevel1(){
 	      		"action": "get_data_pokin",
 	      		"level": 1,
 	      		"parent": 0,
-	      		"tahun_anggaran": '<?php echo $input['tahun_anggaran']; ?>',
+	      		"id_jadwal": '<?php echo $input['periode']; ?>',
 	      		"api_key": esakip.api_key
 	      	},
 	      	dataType: "json",
@@ -1219,7 +1263,7 @@ function pokinLevel2(params){
 	      		"action": "get_data_pokin",
 	      		"level": 2,
 	      		"parent": parent,
-	      		"tahun_anggaran": '<?php echo $input['tahun_anggaran']; ?>',
+	      		"id_jadwal": '<?php echo $input['periode']; ?>',
 	      		"api_key": esakip.api_key
 	      	},
 	      	dataType: "json",
@@ -1302,7 +1346,7 @@ function pokinLevel3(params){
 	      		"action": "get_data_pokin",
 	      		"level": 3,
 	      		"parent": parent,
-	      		"tahun_anggaran": '<?php echo $input['tahun_anggaran']; ?>',
+	      		"id_jadwal": '<?php echo $input['periode']; ?>',
 	      		"api_key": esakip.api_key
 	      	},
 	      	dataType: "json",
@@ -1385,7 +1429,7 @@ function pokinLevel4(params){
 	      		"action": "get_data_pokin",
 	      		"level": 4,
 	      		"parent": parent,
-	      		"tahun_anggaran": '<?php echo $input['tahun_anggaran']; ?>',
+	      		"id_jadwal": '<?php echo $input['periode']; ?>',
 	      		"api_key": esakip.api_key
 	      	},
 	      	dataType: "json",
