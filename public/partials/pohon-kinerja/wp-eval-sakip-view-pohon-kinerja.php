@@ -8,6 +8,9 @@ if ( ! defined( 'WPINC' ) ) {
 $input = shortcode_atts(array(
 	'periode' => '',
 ), $atts);
+if(!empty($_GET) && !empty($_GET['id_jadwal'])){
+	$input['periode'] = $_GET['id_jadwal'];
+}
 
 global $wpdb;
 
@@ -21,7 +24,6 @@ $periode = $wpdb->get_row(
 		*
     FROM esakip_data_jadwal
     WHERE id=%d
-      AND status = 1
 ", $input['periode']),
     ARRAY_A
 );
@@ -33,7 +35,17 @@ if(!empty($periode['tahun_selesai_anggaran'])){
 }
 
 // pokin level 1
-$pohon_kinerja_level_1 = $wpdb->get_results($wpdb->prepare("SELECT * FROM esakip_pohon_kinerja WHERE id=%d AND parent=%d AND level=%d AND active=%d ORDER BY id", $_GET['id'], 0, 1, 1), ARRAY_A);
+$pohon_kinerja_level_1 = $wpdb->get_results($wpdb->prepare("
+	SELECT 
+		* 
+	FROM esakip_pohon_kinerja 
+	WHERE id=%d 
+		AND parent=0 
+		AND level=1 
+		AND active=1 
+		AND id_jadwal=%d 
+	ORDER BY id
+", $_GET['id'], $input['periode']), ARRAY_A);
 if(!empty($pohon_kinerja_level_1)){
 	foreach ($pohon_kinerja_level_1 as $level_1) {
 		if(empty($data_all['data'][trim($level_1['label'])])){
@@ -47,7 +59,16 @@ if(!empty($pohon_kinerja_level_1)){
 		}
 
 		// indikator pokin level 1
-		$indikator_pohon_kinerja_level_1 = $wpdb->get_results($wpdb->prepare("SELECT * FROM esakip_pohon_kinerja WHERE parent=%d AND level=%d AND active=%d ORDER BY id", $level_1['id'], 1, 1), ARRAY_A);
+		$indikator_pohon_kinerja_level_1 = $wpdb->get_results($wpdb->prepare("
+			SELECT 
+				* 
+			FROM esakip_pohon_kinerja 
+			WHERE parent=%d 
+				AND level=1 
+				AND active=1 
+				AND id_jadwal=%d 
+			ORDER BY id
+		", $level_1['id'], $input['periode']), ARRAY_A);
 		if(!empty($indikator_pohon_kinerja_level_1)){
 			foreach ($indikator_pohon_kinerja_level_1 as $indikator_level_1) {
 				if(!empty($indikator_level_1['label_indikator_kinerja'])){
@@ -64,7 +85,16 @@ if(!empty($pohon_kinerja_level_1)){
 		}
 
 		// pokin level 2 
-		$pohon_kinerja_level_2 = $wpdb->get_results($wpdb->prepare("SELECT * FROM esakip_pohon_kinerja WHERE parent=%d AND level=%d AND active=%d ORDER by id", $level_1['id'], 2, 1), ARRAY_A);
+		$pohon_kinerja_level_2 = $wpdb->get_results($wpdb->prepare("
+			SELECT 
+				* 
+			FROM esakip_pohon_kinerja 
+			WHERE parent=%d 
+				AND level=2 
+				AND active=1 
+				AND id_jadwal=%d 
+			ORDER by id
+		", $level_1['id'], $input['periode']), ARRAY_A);
 		if(!empty($pohon_kinerja_level_2)){
 			foreach ($pohon_kinerja_level_2 as $level_2) {
 				if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])])){
@@ -78,7 +108,16 @@ if(!empty($pohon_kinerja_level_1)){
 				}
 
 				// indikator pokin level 2
-				$indikator_pohon_kinerja_level_2 = $wpdb->get_results($wpdb->prepare("SELECT * FROM esakip_pohon_kinerja WHERE parent=%d AND level=%d AND active=%d ORDER BY id", $level_2['id'], 2, 1), ARRAY_A);
+				$indikator_pohon_kinerja_level_2 = $wpdb->get_results($wpdb->prepare("
+					SELECT 
+						* 
+					FROM esakip_pohon_kinerja 
+					WHERE parent=%d 
+						AND level=2 
+						AND active=1 
+						AND id_jadwal=%d 
+					ORDER BY id
+				", $level_2['id'], $input['periode']), ARRAY_A);
 				if(!empty($indikator_pohon_kinerja_level_2)){
 					foreach ($indikator_pohon_kinerja_level_2 as $indikator_level_2) {
 						if(!empty($indikator_level_2['label_indikator_kinerja'])){
@@ -95,7 +134,16 @@ if(!empty($pohon_kinerja_level_1)){
 				}
 
 				// pokin level 3
-				$pohon_kinerja_level_3 = $wpdb->get_results($wpdb->prepare("SELECT * FROM esakip_pohon_kinerja WHERE parent=%d AND level=%d AND active=%d ORDER by id", $level_2['id'], 3, 1), ARRAY_A);
+				$pohon_kinerja_level_3 = $wpdb->get_results($wpdb->prepare("
+					SELECT 
+						* 
+					FROM esakip_pohon_kinerja 
+					WHERE parent=%d 
+						AND level=3 
+						AND active=1 
+						AND id_jadwal=%d 
+					ORDER by id
+				", $level_2['id'], $input['periode']), ARRAY_A);
 				if(!empty($pohon_kinerja_level_3)){
 					foreach ($pohon_kinerja_level_3 as $level_3) {
 						if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])])){
@@ -109,7 +157,16 @@ if(!empty($pohon_kinerja_level_1)){
 						}
 
 						// indikator pokin level 3
-						$indikator_pohon_kinerja_level_3 = $wpdb->get_results($wpdb->prepare("SELECT * FROM esakip_pohon_kinerja WHERE parent=%d AND level=%d AND active=%d ORDER BY id", $level_3['id'], 3, 1), ARRAY_A);
+						$indikator_pohon_kinerja_level_3 = $wpdb->get_results($wpdb->prepare("
+							SELECT 
+								* 
+							FROM esakip_pohon_kinerja 
+							WHERE parent=%d 
+								AND level=3 
+								AND active=1 
+								AND id_jadwal=%d 
+							ORDER BY id
+						", $level_3['id'], $input['periode']), ARRAY_A);
 						if(!empty($indikator_pohon_kinerja_level_3)){
 							foreach ($indikator_pohon_kinerja_level_3 as $indikator_level_3) {
 								if(!empty($indikator_level_3['label_indikator_kinerja'])){
@@ -126,7 +183,16 @@ if(!empty($pohon_kinerja_level_1)){
 						}
 
 						// pokin level 4
-						$pohon_kinerja_level_4 = $wpdb->get_results($wpdb->prepare("SELECT * FROM esakip_pohon_kinerja WHERE parent=%d AND level=%d AND active=%d ORDER by id", $level_3['id'], 4, 1), ARRAY_A);
+						$pohon_kinerja_level_4 = $wpdb->get_results($wpdb->prepare("
+							SELECT 
+								* 
+							FROM esakip_pohon_kinerja 
+							WHERE parent=%d 
+								AND level=4 
+								AND active=1
+								AND id_jadwal=%d 
+							ORDER by id
+						", $level_3['id'], $input['periode']), ARRAY_A);
 						if(!empty($pohon_kinerja_level_4)){
 							foreach ($pohon_kinerja_level_4 as $level_4) {
 								if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])])){
@@ -139,7 +205,16 @@ if(!empty($pohon_kinerja_level_1)){
 								}
 
 								// indikator pokin level 4
-								$indikator_pohon_kinerja_level_4 = $wpdb->get_results($wpdb->prepare("SELECT * FROM esakip_pohon_kinerja WHERE parent=%d AND level=%d AND active=%d ORDER BY id", $level_4['id'], 4, 1), ARRAY_A);
+								$indikator_pohon_kinerja_level_4 = $wpdb->get_results($wpdb->prepare("
+									SELECT 
+										* 
+									FROM esakip_pohon_kinerja 
+									WHERE parent=%d 
+										AND level=4 
+										AND active=1 
+										AND id_jadwal=%d 
+									ORDER BY id
+								", $level_4['id'], $input['periode']), ARRAY_A);
 								if(!empty($indikator_pohon_kinerja_level_4)){
 									foreach ($indikator_pohon_kinerja_level_4 as $indikator_level_4) {
 										if(!empty($indikator_level_4['label_indikator_kinerja'])){

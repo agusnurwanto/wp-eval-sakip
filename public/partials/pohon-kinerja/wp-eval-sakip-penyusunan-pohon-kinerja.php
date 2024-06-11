@@ -241,7 +241,7 @@ if(!empty($pohon_kinerja_level_1)){
 
 $view_kinerja = $this->functions->generatePage(array(
 	'nama_page' => 'View Pohon Kinerja',
-	'content' => '[view_pohon_kinerja periode=' . $periode['id'] . ']',
+	'content' => '[view_pohon_kinerja]',
 	'show_header' => 1,
 	'post_status' => 'private'
 ));
@@ -253,7 +253,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 	}
 	$html.='
 	<tr>
-		<td class="level1"><a href="'.$view_kinerja['url'].'&id='.$level_1['id'].'" target="_blank">'.$level_1['label'].'</a></td>
+		<td class="level1"><a href="'.$view_kinerja['url'].'&id='.$level_1['id'].'&id_jadwal='.$input['periode'].'" target="_blank">'.$level_1['label'].'</a></td>
 		<td class="indikator">'.implode("</br>", $indikator).'</td>
 		<td></td>
 		<td></td>
