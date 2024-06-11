@@ -58,7 +58,7 @@ $current_user = wp_get_current_user();
 
 $data_all = array(
     'data' => array(),
-    'pemutakhiran_program' => 0
+    // 'pemutakhiran_program' => 0
 );
 
 $body_monev = '';
@@ -145,18 +145,18 @@ foreach ($tujuan_all as $tujuan) {
                         $kode_program = explode(" ", $program['nama_program']);
                         $checkProgram = $wpdb->get_row($wpdb->prepare("SELECT kode_program FROM data_prog_keg WHERE kode_program=%s AND tahun_anggaran=%d AND active=%d", $kode_program[0], $tahun_anggaran, 1), ARRAY_A);
 
-                        $statusMutakhirProgram = 0;
-                        if (empty($checkProgram['kode_program'])) {
-                            $statusMutakhirProgram = 1;
-                            $data_all['pemutakhiran_program']++;
-                        }
+                        // $statusMutakhirProgram = 0;
+                        // if (empty($checkProgram['kode_program'])) {
+                        //     $statusMutakhirProgram = 1;
+                        //     // $data_all['pemutakhiran_program']++;
+                        // }
 
                         $data_all['data'][$tujuan['id_unik']]['data'][$sasaran['id_unik']]['data'][$program['id_unik']] = array(
                             'id_unik' => $program['id_unik'],
                             'nama' => $program['nama_program'],
                             'kode_skpd' => $program['kode_skpd'],
                             'nama_skpd' => $program['nama_skpd'],
-                            'statusMutakhirProgram' => $statusMutakhirProgram,
+                            // 'statusMutakhirProgram' => $statusMutakhirProgram,
                             'total_akumulasi_1' => 0,
                             'total_akumulasi_2' => 0,
                             'total_akumulasi_3' => 0,
@@ -710,19 +710,19 @@ foreach ($data_all['data'] as $tujuan) {
                 $catatan_program = $program['detail'][0]['catatan'];
             }
 
-            $isMutakhir = '';
-            if ($program['statusMutakhirProgram']) {
-                $isMutakhir = '<button class="btn-sm btn-warning" onclick="tampilProgram(\'' . $program['id_unik'] . '\')" style="margin: 1px;"><i class="dashicons dashicons-update" title="Mutakhirkan"></i></button>';
-            }
+            // $isMutakhir = '';
+            // if ($program['statusMutakhirProgram']) {
+            //     $isMutakhir = '<button class="btn-sm btn-warning" onclick="tampilProgram(\'' . $program['id_unik'] . '\')" style="margin: 1px;"><i class="dashicons dashicons-update" title="Mutakhirkan"></i></button>';
+            // }
 
-
+            
+            // <td class="esakip-atas esakip-kanan esakip-bawah">' . parsing_nama_kode($program['nama']) . button_edit_monev($tujuan['detail'][0]['id_unik'] . '||' . $sasaran['detail'][0]['id_unik'] . '||' . $program['detail'][0]['id_unik']) . " " . $isMutakhir . '</td>
             $body .= '
 				<tr class="tr-program" data-kode-skpd="' . $program['kode_skpd'] . '" ' . $warning . '>
 					<td class="esakip-kiri esakip-atas esakip-kanan esakip-bawah">' . $no_tujuan . '.' . $no_sasaran . '.' . $no_program . '</td>
 					<td class="esakip-atas esakip-kanan esakip-bawah"><span class="debug-tujuan">' . $tujuan['detail'][0]['isu_teks'] . '</span></td>
 					<td class="esakip-atas esakip-kanan esakip-bawah"><span class="debug-tujuan">' . $tujuan['nama'] . '</span></td>
 					<td class="esakip-atas esakip-kanan esakip-bawah"><span class="debug-sasaran">' . $sasaran['nama'] . '</span></td>
-					<td class="esakip-atas esakip-kanan esakip-bawah">' . parsing_nama_kode($program['nama']) . button_edit_monev($tujuan['detail'][0]['id_unik'] . '||' . $sasaran['detail'][0]['id_unik'] . '||' . $program['detail'][0]['id_unik']) . " " . $isMutakhir . '</td>
 					<td class="esakip-atas esakip-kanan esakip-bawah">' . $text_indikator . '</td>
 					<td class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah">' . $target_awal . '</td>
 					' . $target_html . '
@@ -3127,42 +3127,42 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     '<button type="button" class="btn btn-success" onclick=\'mutakhirkanProgram("' + id_unik + '", "' + res.data[0].id + '")\'>Mutakhirkan</button>');
                 jQuery("#modal-raw").modal('show');
 
-                get_bidang_urusan().then(function() {
-                    get_urusan('urusan-teks-mutakhir')
-                    get_bidang(false, 'bidang-teks-mutakhir');
-                    get_program(false, '', 'program-teks-mutakhir', 'urusan-teks-mutakhir');
-                    jQuery('#wrap-loading').hide();
-                });
+                // get_bidang_urusan().then(function() {
+                //     get_urusan('urusan-teks-mutakhir')
+                //     get_bidang(false, 'bidang-teks-mutakhir');
+                //     get_program(false, '', 'program-teks-mutakhir', 'urusan-teks-mutakhir');
+                //     jQuery('#wrap-loading').hide();
+                // });
             }
         });
     }
 
-    function mutakhirkanProgram(id_unik, id) {
-        let id_program = jQuery("#program-teks-mutakhir").val();
-        if (id_program == null || id_program == "" || id_program == "undefined") {
-            alert('Wajib memilih program!');
-        } else {
-            jQuery('#wrap-loading').show();
-            jQuery.ajax({
-                url: esakip.url,
-                type: "post",
-                data: {
-                    "action": "esakip_mutakhirkan_program_rpd",
-                    "api_key": "<?php echo $api_key; ?>",
-                    'id': id,
-                    'id_program': id_program,
-                    'id_unik': id_unik,
-                    'tahun_anggaran': '<?php echo $tahun_anggaran; ?>'
-                },
-                dataType: "json",
-                success: function(response) {
-                    jQuery('#wrap-loading').hide();
-                    alert(response.message);
-                    if (response.status) {
-                        location.reload();
-                    }
-                }
-            });
-        }
-    }
+    // function mutakhirkanProgram(id_unik, id) {
+    //     let id_program = jQuery("#program-teks-mutakhir").val();
+    //     if (id_program == null || id_program == "" || id_program == "undefined") {
+    //         alert('Wajib memilih program!');
+    //     } else {
+    //         jQuery('#wrap-loading').show();
+    //         jQuery.ajax({
+    //             url: esakip.url,
+    //             type: "post",
+    //             data: {
+    //                 "action": "esakip_mutakhirkan_program_rpd",
+    //                 "api_key": "<?php //echo $api_key; ?>",
+    //                 'id': id,
+    //                 'id_program': id_program,
+    //                 'id_unik': id_unik,
+    //                 'tahun_anggaran': '<?php //echo $tahun_anggaran; ?>'
+    //             },
+    //             dataType: "json",
+    //             success: function(response) {
+    //                 jQuery('#wrap-loading').hide();
+    //                 alert(response.message);
+    //                 if (response.status) {
+    //                     location.reload();
+    //                 }
+    //             }
+    //         });
+    //     }
+    // }
 </script>
