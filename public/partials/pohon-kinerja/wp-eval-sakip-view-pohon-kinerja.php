@@ -5,11 +5,32 @@ if ( ! defined( 'WPINC' ) ) {
   die;
 }
 
+$input = shortcode_atts(array(
+	'periode' => '',
+), $atts);
+
 global $wpdb;
 
 $data_all = [
 	'data' => []
 ];
+
+$periode = $wpdb->get_row(
+    $wpdb->prepare("
+    SELECT 
+		*
+    FROM esakip_data_jadwal
+    WHERE id=%d
+      AND status = 1
+", $input['periode']),
+    ARRAY_A
+);
+
+if(!empty($periode['tahun_selesai_anggaran'])){
+    $tahun_periode = $periode['tahun_selesai_anggaran'];
+}else{
+    $tahun_periode = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
+}
 
 // pokin level 1
 $pohon_kinerja_level_1 = $wpdb->get_results($wpdb->prepare("SELECT * FROM esakip_pohon_kinerja WHERE id=%d AND parent=%d AND level=%d AND active=%d ORDER BY id", $_GET['id'], 0, 1, 1), ARRAY_A);
@@ -311,7 +332,7 @@ if(!empty($data_all['data'])){
   	}
 </style>
 
-<h4 style="text-align: center; margin: 0; font-weight: bold;">Pohon Kinerja</h4><br>
+<h4 style="text-align: center; margin: 0; font-weight: bold;">Pohon Kinerja<br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h4><br>
 <div id="cetak" title="Laporan Pohon Kinerja" style="padding: 5px; overflow: auto; height: 100vh;">
     <div id="chart_div" ></div>
 </div>

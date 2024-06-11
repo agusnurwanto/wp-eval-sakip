@@ -152,10 +152,7 @@ class Wp_Eval_Sakip_Admin
 						$wpdb->prepare(
 							"
 							SELECT 
-								id,
-								nama_jadwal,
-								tahun_anggaran,
-								lama_pelaksanaan
+								*
 							FROM esakip_data_jadwal
 							WHERE tipe = %s
 							  AND status = 1",
@@ -166,7 +163,13 @@ class Wp_Eval_Sakip_Admin
 
 					$body_pemda = '<ol>';
 					foreach ($jadwal_periode as $jadwal_periode_item) {
-						$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
+						// Cek setting tahun anggaran selesai
+						if(!empty($jadwal_periode_item['tahun_selesai_anggaran'])){
+							$tahun_anggaran_selesai = $jadwal_periode_item['tahun_selesai_anggaran'];
+						}else{
+							$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
+						}
+
 						if (!empty($_POST['type']) && $_POST['type'] == 'input_pohon_kinerja_pemda') {
 							$input_pokin = $this->functions->generatePage(array(
 								'nama_page' => 'Halaman Input Pohon Kinerja ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
@@ -175,7 +178,7 @@ class Wp_Eval_Sakip_Admin
 								'no_key' => 1,
 								'post_status' => 'private'
 							));
-							$body_pemda = '
+							$body_pemda .= '
 								<li><a target="_blank" href="' . $input_pokin['url'] . '">' . $input_pokin['title'] . '</a></li>
 									</ul>';
 						} else if (!empty($_POST['type']) && $_POST['type'] == 'input_pohon_kinerja_opd') {
@@ -186,7 +189,7 @@ class Wp_Eval_Sakip_Admin
 								'no_key' => 1,
 								'post_status' => 'private'
 							));
-							$body_pemda = '
+							$body_pemda .= '
 								<li><a target="_blank" href="' . $input_pokin['url'] . '">' . $input_pokin['title'] . '</a></li>';
 						} else if (!empty($_POST['type']) && $_POST['type'] == 'cascading_pemda') {
 							$cascading = $this->functions->generatePage(array(
@@ -196,7 +199,7 @@ class Wp_Eval_Sakip_Admin
 								'no_key' => 1,
 								'post_status' => 'private'
 							));
-							$body_pemda = '
+							$body_pemda .= '
 								<li><a target="_blank" href="' . $cascading['url'] . '">' . $cascading['title'] . '</a></li>';
 						} else if (!empty($_POST['type']) && $_POST['type'] == 'cascading_pd') {
 							$cascading = $this->functions->generatePage(array(
@@ -206,7 +209,7 @@ class Wp_Eval_Sakip_Admin
 								'no_key' => 1,
 								'post_status' => 'private'
 							));
-							$body_pemda = '
+							$body_pemda .= '
 								<li><a target="_blank" href="' . $cascading['url'] . '">' . $cascading['title'] . '</a></li>';
 						} else if (!empty($_POST['type']) && $_POST['type'] == 'croscutting_pemda') {
 							$croscutting = $this->functions->generatePage(array(
@@ -216,7 +219,7 @@ class Wp_Eval_Sakip_Admin
 								'no_key' => 1,
 								'post_status' => 'private'
 							));
-							$body_pemda = '
+							$body_pemda .= '
 								<li><a target="_blank" href="' . $croscutting['url'] . '">' . $croscutting['title'] . '</a></li>';
 						} else if (!empty($_POST['type']) && $_POST['type'] == 'croscutting_pd') {
 							$croscutting = $this->functions->generatePage(array(
@@ -226,7 +229,7 @@ class Wp_Eval_Sakip_Admin
 								'no_key' => 1,
 								'post_status' => 'private'
 							));
-							$body_pemda = '
+							$body_pemda .= '
 								<li><a target="_blank" href="' . $croscutting['url'] . '">' . $croscutting['title'] . '</a></li>';
 						} else if (!empty($_POST['type']) && $_POST['type'] == 'renstra') {
 							$renstra = $this->functions->generatePage(array(

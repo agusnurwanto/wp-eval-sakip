@@ -6,12 +6,30 @@ if ( ! defined( 'WPINC' ) ) {
 
 $input = shortcode_atts(array(
     'tahun_anggaran' => '2024',
+	'periode' => '',
 ), $atts);
 
 global $wpdb;
 $data_all = [
 	'data' => []
 ];
+
+$periode = $wpdb->get_row(
+    $wpdb->prepare("
+    SELECT 
+		*
+    FROM esakip_data_jadwal
+    WHERE id=%d
+      AND status = 1
+", $input['periode']),
+    ARRAY_A
+);
+
+if(!empty($periode['tahun_selesai_anggaran'])){
+    $tahun_periode = $periode['tahun_selesai_anggaran'];
+}else{
+    $tahun_periode = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
+}
 
 // pokin level 1
 $pohon_kinerja_level_1 = $wpdb->get_results($wpdb->prepare("
@@ -220,7 +238,7 @@ if(!empty($pohon_kinerja_level_1)){
 
 $view_kinerja = $this->functions->generatePage(array(
 	'nama_page' => 'View Pohon Kinerja',
-	'content' => '[view_pohon_kinerja]',
+	'content' => '[view_pohon_kinerja periode=' . $periode['id'] . ']',
 	'show_header' => 1,
 	'post_status' => 'private'
 ));
@@ -272,7 +290,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 ?>
 
 <style type="text/css"></style>
-<h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Pohon Kinerja</h3><br>
+<h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Pohon Kinerja<br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h3><br>
 <div id="action" style="text-align: center; margin-top:30px; margin-bottom: 30px;">
 		<a style="margin-left: 10px;" id="tambah-pohon-kinerja" onclick="return false;" href="#" class="btn btn-success">Tambah Data</a>
 </div>
