@@ -587,7 +587,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
 					}
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Pengaturan Akses User Upload Dokumen kosong!';
+					$ret['message'] = 'Ada yang error! Harap ulangi edit pengaturan menu';
 				}
 
 				if ($ret['status'] == 'success') {

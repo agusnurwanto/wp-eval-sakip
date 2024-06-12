@@ -37,7 +37,7 @@ $skpd = $wpdb->get_row(
     ARRAY_A
 );
 
-if(!empty($periode['tahun_selesai_anggaran'])){
+if(!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggaran'] > 1){
     $tahun_periode = $periode['tahun_selesai_anggaran'];
 }else{
     $tahun_periode = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
@@ -79,19 +79,22 @@ $is_administrator = in_array('administrator', $user_roles);
 
     $this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2 ;
 
-    // $cek_settingan_menu = $wpdb->get_var(
-    //     $wpdb->prepare(
-    //     "SELECT 
-    //         jenis_role
-    //     FROM esakip_menu_dokumen 
-    //     WHERE nama_dokumen='RENSTRA'
-    //       AND user_role='perangkat_daerah' 
-    //       AND active = 1
-    // ",)
-    // );
+    $cek_settingan_menu = $wpdb->get_var(
+        $wpdb->prepare(
+        "SELECT 
+            jenis_role
+        FROM esakip_menu_dokumen 
+        WHERE nama_dokumen='RENSTRA'
+          AND user_role='perangkat_daerah' 
+          AND active = 1
+          AND id_jadwal=%d
+    ",$input['periode'])
+    );
 
-    // $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
-    $hak_akses_user = true;
+    print_r($cek_settingan_menu);
+
+    $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
+    // $hak_akses_user = true;
 
 ?>
 <style type="text/css">
@@ -122,7 +125,7 @@ $is_administrator = in_array('administrator', $user_roles);
         <div style="padding: 10px;margin:0 0 3rem 0;">
             <h1 class="text-center" style="margin:3rem;">Dokumen RENSTRA <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1>
             <?php if (!$is_admin_panrb 
-                // && $hak_akses_user
+                && $hak_akses_user
             ): ?>
                 <div style="margin-bottom: 25px;">
                     <button class="btn btn-primary" onclick="tambah_dokumen_renstra();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>

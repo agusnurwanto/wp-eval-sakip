@@ -28,7 +28,7 @@ if(empty($periode)){
 	die('<h1 class="text-center">Jadwal periode RPJMD/RPD tidak ditemukan!</h1>');
 }
 
-if(!empty($periode['tahun_selesai_anggaran'])){
+if(!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggaran'] > 1){
     $tahun_periode = $periode['tahun_selesai_anggaran'];
 }else{
     $tahun_periode = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
