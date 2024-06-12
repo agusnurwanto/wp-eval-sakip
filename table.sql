@@ -299,12 +299,21 @@ CREATE TABLE esakip_komponen_penilaian (
   `id_subkomponen` int(11) NOT NULL,
   `nomor_urut` DECIMAL(10,2) NOT NULL,
   `nama` varchar(255) DEFAULT NULL,
-  `tipe` varchar(30) DEFAULT NULL COMMENT '1 = Ya/Tidak, 2 = A/B/C/D',
+  `tipe` varchar(30) DEFAULT NULL COMMENT '1 = Ya/Tidak, 2 = A/B/C/D, 3 =Custom',
   `keterangan` varchar(255) DEFAULT NULL,
   `jenis_bukti_dukung` text DEFAULT NULL,
   `penjelasan` text DEFAULT NULL,
   `langkah_kerja` text DEFAULT NULL,
   `active` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY  (`id`)
+);
+
+CREATE TABLE esakip_penilaian_custom (
+  `id` int(11) NOT NULL auto_increment,
+  `id_komponen_penilaian` int(11) NOT NULL,
+  `nama` varchar(255) NOT NULL,
+  `keterangan` varchar(255) DEFAULT NULL,
+  `nilai` int(11) NOT NULL,
   PRIMARY KEY  (`id`)
 );
 
