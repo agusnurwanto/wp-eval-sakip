@@ -570,6 +570,7 @@ CREATE TABLE `esakip_menu_dokumen` (
   `tahun_anggaran` year NOT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp,
   `updated_at` datetime NOT NULL DEFAULT current_timestamp,
+  `id_jadwal` int(11) DEFAULT NULL,
   PRIMARY key (id)
 );
 

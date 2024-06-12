@@ -164,7 +164,7 @@ class Wp_Eval_Sakip_Admin
 					$body_pemda = '<ol>';
 					foreach ($jadwal_periode as $jadwal_periode_item) {
 						// Cek setting tahun anggaran selesai
-						if(!empty($jadwal_periode_item['tahun_selesai_anggaran'])){
+						if(!empty($jadwal_periode_item['tahun_selesai_anggaran']) && $jadwal_periode_item['tahun_selesai_anggaran'] > 1){
 							$tahun_anggaran_selesai = $jadwal_periode_item['tahun_selesai_anggaran'];
 						}else{
 							$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];

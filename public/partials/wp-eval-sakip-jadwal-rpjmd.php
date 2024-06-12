@@ -107,12 +107,60 @@ $body = '';
 					</tr>
 					<small class="d-block form-text text-muted">Catatan: Jenis RPD tidak ada kolom visi dan misi. Jenis RPJMD ada kolom visi dan misi.</small>
 				</div>
-				<div>
+				<div class="form-group">
 					<label for="relasi_rpjpd" style='display:inline-block'>Pilih Jadwal RPJPD</label>
 					<select id="relasi_rpjpd" style='display:block;width: 100%;'>
 						<option value="">Pilih RPJPD</option>
 						<?php echo $select_rpjpd; ?>
 					</select>
+				</div>
+				<div class="form-group">
+					<label class="d-block">Pengaturan Akses User Upload Dokumen RENSTRA</label>
+					<tr>
+						<td>
+							<div class="custom-control custom-radio custom-control-inline">
+								<input class="custom-control-input" type="radio" name="akses_user_upload_dokumen" id="akses_user_upload_dokumen_pemda" value="pemda">
+								<label class="custom-control-label" for="akses_user_upload_dokumen_pemda">Pemerintah Daerah</label>
+							</div>
+						</td>
+						<td>
+							<div class="custom-control custom-radio custom-control-inline">
+								<input class="custom-control-input" type="radio" name="akses_user_upload_dokumen" id="akses_user_upload_dokumen_pd" value="pd" checked>
+								<label class="custom-control-label" for="akses_user_upload_dokumen_pd">Perangkat Daerah</label>
+							</div>
+						</td>
+						<td>
+							<div class="custom-control custom-radio custom-control-inline">
+								<input class="custom-control-input" type="radio" name="akses_user_upload_dokumen" id="verifikasi_upload_dokumen_semua" value="semua">
+								<label class="custom-control-label" for="verifikasi_upload_dokumen_semua">Pemerintah Daerah dan Perangkat Daerah</label>
+							</div>
+						</td>
+					</tr>
+					<small class="d-block form-text text-muted">Setting User Yang Bisa Mengakses Upload Dokumen RENSTRA</small>
+				</div>
+				<div class="form-group">
+					<label class="d-block">Pengaturan Akses User Upload Dokumen Pohon Kinerja</label>
+					<tr>
+						<td>
+							<div class="custom-control custom-radio custom-control-inline">
+								<input class="custom-control-input" type="radio" name="akses_user_upload_dokumen_pohon_kinerja" id="akses_user_upload_dokumen_pemda_pohon_kinerja" value="pemda">
+								<label class="custom-control-label" for="akses_user_upload_dokumen_pemda_pohon_kinerja">Pemerintah Daerah</label>
+							</div>
+						</td>
+						<td>
+							<div class="custom-control custom-radio custom-control-inline">
+								<input class="custom-control-input" type="radio" name="akses_user_upload_dokumen_pohon_kinerja" id="akses_user_upload_dokumen_pd_pohon_kinerja" value="pd" checked>
+								<label class="custom-control-label" for="akses_user_upload_dokumen_pd_pohon_kinerja">Perangkat Daerah</label>
+							</div>
+						</td>
+						<td>
+							<div class="custom-control custom-radio custom-control-inline">
+								<input class="custom-control-input" type="radio" name="akses_user_upload_dokumen_pohon_kinerja" id="verifikasi_upload_dokumen_semua_pohon_kinerja" value="semua">
+								<label class="custom-control-label" for="verifikasi_upload_dokumen_semua_pohon_kinerja">Pemerintah Daerah dan Perangkat Daerah</label>
+							</div>
+						</td>
+					</tr>
+					<small class="d-block form-text text-muted">Setting User Yang Bisa Mengakses Upload Dokumen Pohon Kinerja</small>
 				</div>
 			</div>
 			<div class="modal-footer">
@@ -219,7 +267,10 @@ $body = '';
 		let lama_pelaksanaan = jQuery("#lama_pelaksanaan").val()
 		let tahun_selesai_anggaran = jQuery("#tahun_selesai_anggaran").val()
 		let jenis_khusus_rpjmd = jQuery("input[name='jenis_khusus_rpjmd']:checked").val()
-		if (nama_jadwal.trim() == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '' || jenis_khusus_rpjmd == '') {
+		let akses_user = jQuery("input[name='akses_user_upload_dokumen']:checked").val();
+		let akses_user_pohon_kinerja = jQuery("input[name='akses_user_upload_dokumen_pohon_kinerja']:checked").val();
+
+		if (nama_jadwal.trim() == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '' || jenis_khusus_rpjmd == '' || akses_user == '' || akses_user_pohon_kinerja == '') {
 			jQuery("#wrap-loading").hide()
 			alert("Ada yang kosong, Harap diisi semua")
 			return false
@@ -238,7 +289,9 @@ $body = '';
 					'tipe': tipe,
 					'lama_pelaksanaan': lama_pelaksanaan,
 					'jenis_khusus_rpjmd': jenis_khusus_rpjmd,
-					'tahun_selesai_anggaran': tahun_selesai_anggaran
+					'tahun_selesai_anggaran': tahun_selesai_anggaran,
+					'akses_user': akses_user,
+					'akses_user_pohon_kinerja': akses_user_pohon_kinerja
 				},
 				beforeSend: function() {
 					jQuery('.submitBtn').attr('disabled', 'disabled')
@@ -288,6 +341,27 @@ $body = '';
 				let jenis_khusus_rpjmd = (response.data.jenis_jadwal_khusus == 'rpd') ? "rpd" : "rpjmd";
 				jQuery("input[name=jenis_khusus_rpjmd][value='"+jenis_khusus_rpjmd+"']").prop("checked",true);
 				jQuery("#lama_pelaksanaan").val(response.data.lama_pelaksanaan);
+				// setting renstra
+				let akses_user = '';
+				if(response.data.jenis_role == 1){
+					akses_user = 'pemda';
+				}else if(response.data.jenis_role == 2){
+					akses_user = 'pd';
+				}else if(response.data.jenis_role == 3){
+					akses_user = 'semua';
+				}
+				jQuery("input[name=akses_user_upload_dokumen][value='"+akses_user+"']").prop("checked",true);
+
+				// setting pohon kinerja
+				let akses_user_pohon_kinerja = '';
+				if(response.data.jenis_role_pohon_kinerja == 1){
+					akses_user_pohon_kinerja = 'pemda';
+				}else if(response.data.jenis_role_pohon_kinerja == 2){
+					akses_user_pohon_kinerja = 'pd';
+				}else if(response.data.jenis_role_pohon_kinerja == 3){
+					akses_user_pohon_kinerja = 'semua';
+				}
+				jQuery("input[name=akses_user_upload_dokumen_pohon_kinerja][value='"+akses_user_pohon_kinerja+"']").prop("checked",true);
 			}
 		})
 	}
@@ -300,7 +374,10 @@ $body = '';
 		let lama_pelaksanaan = jQuery("#lama_pelaksanaan").val()
 		let tahun_selesai_anggaran = jQuery("#tahun_selesai_anggaran").val()
 		let jenis_khusus_rpjmd = jQuery("input[name='jenis_khusus_rpjmd']:checked").val()
-		if (nama_jadwal.trim() == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '' || jenis_khusus_rpjmd == '') {
+		let akses_user = jQuery("input[name='akses_user_upload_dokumen']:checked").val();
+		let akses_user_pohon_kinerja = jQuery("input[name='akses_user_upload_dokumen_pohon_kinerja']:checked").val();
+
+		if (nama_jadwal.trim() == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '' || jenis_khusus_rpjmd == '' || akses_user == '' || akses_user_pohon_kinerja == '') {
 			jQuery("#wrap-loading").hide()
 			alert("Ada yang kosong, Harap diisi semua")
 			return false
@@ -319,7 +396,9 @@ $body = '';
 					'tipe': tipe,
 					'lama_pelaksanaan': lama_pelaksanaan,
 					'jenis_khusus_rpjmd': jenis_khusus_rpjmd,
-					'tahun_selesai_anggaran': tahun_selesai_anggaran
+					'tahun_selesai_anggaran': tahun_selesai_anggaran,
+					'akses_user' : akses_user,
+					'akses_user_pohon_kinerja' : akses_user_pohon_kinerja
 				},
 				beforeSend: function() {
 					jQuery('.submitBtn').attr('disabled', 'disabled')

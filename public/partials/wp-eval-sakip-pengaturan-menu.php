@@ -98,7 +98,7 @@ $body = '';
 						</tr>
 						<small class="d-block form-text text-muted">Setting Menu Upload Dokumen Yang Tampil Di Dashboard User</small>
 					</div>
-					<div class="form-group" style="margin: 1.5em 0 0;">
+					<div class="form-group" id="setting_hak_akses_user" style="margin: 1.5em 0 0;">
 						<label class="d-block">Pengaturan Akses User Upload Dokumen</label>
 						<tr>
 							<td>
@@ -241,6 +241,12 @@ $body = '';
 						}
                         jQuery("input[name=akses_user_upload_dokumen][value='"+akses_user+"']").prop("checked",true);
 						jQuery("#no_urut").val(data.default_urutan);
+						if(data.nama_tabel == 'esakip_renstra'){
+							console.log(data.nama_tabel)
+							jQuery('#setting_hak_akses_user').hide();
+						}else{
+							jQuery('#setting_hak_akses_user').show();
+						}
 					}
                     jQuery("#idDokumen").val(id);
 					jQuery("#tipeDokumen").val(tipe);
@@ -282,9 +288,9 @@ $body = '';
 
 		let akses_user = jQuery("input[name='akses_user_upload_dokumen']:checked").val();
 
-        if (akses_user == '' || akses_user == undefined) {
-            return alert('Pengaturan akses user tidak boleh kosong!');
-        }
+        // if (akses_user == '' || akses_user == undefined) {
+        //     return alert('Pengaturan akses user tidak boleh kosong!');
+        // }
 		
 		let nomor_urutan = jQuery("#no_urut").val();;
         if (nomor_urutan == '') {

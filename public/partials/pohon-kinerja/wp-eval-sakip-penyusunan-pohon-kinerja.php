@@ -25,7 +25,7 @@ $periode = $wpdb->get_row(
     ARRAY_A
 );
 
-if(!empty($periode['tahun_selesai_anggaran'])){
+if(!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggaran'] > 1){
     $tahun_periode = $periode['tahun_selesai_anggaran'];
 }else{
     $tahun_periode = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
