@@ -17770,7 +17770,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'jenis_bukti_dukung' => $bukti_dukung,
 								'active' => 1,
 							),
-							array('%d', '%s', '%s', '%f', '%s', '%d', '%s', '%s', '%s')
+							array('%d', '%s', '%s', '%f', '%s', '%s', '%s', '%s'),
 						);
 					}
 				}

@@ -598,6 +598,8 @@ foreach ($user_penilai as $key => $val) {
                     jQuery('#alertKomponen_penilaian').text('Nama Komponen = ' + data.komponen.nama);
                     jQuery('#alertSub_penilaian').text('Nama Sub Komponen = ' + data.subkomponen.nama);
                     jQuery('#namaPenilaian').val('');
+                    jQuery('#penjelasan').val('');
+                    jQuery('#langkahKerja').val('');
                     jQuery('#tipeJawaban').val('');
                     jQuery('input[type=checkbox]').prop('checked', false);
                     jQuery("#keterangan").val('');
