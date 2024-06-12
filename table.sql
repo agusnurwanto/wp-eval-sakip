@@ -419,6 +419,7 @@ CREATE TABLE `esakip_pohon_kinerja_dan_cascading` (
   `keterangan` longtext DEFAULT NULL,
   `tanggal_upload` varchar(50) DEFAULT NULL,
   `tahun_anggaran` year(4) DEFAULT NULL,
+  `id_jadwal` int(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
@@ -550,6 +551,7 @@ CREATE TABLE `esakip_pohon_kinerja` (
   `label_indikator_kinerja` varchar(255) DEFAULT null,
   `level` int(11) NOT null,
   `tahun_anggaran` year(4) DEFAULT NULL,
+  `id_jadwal` int(11) DEFAULT NULL,
   `active` tinyint(4) NOT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `update_at` datetime DEFAULT current_timestamp(),

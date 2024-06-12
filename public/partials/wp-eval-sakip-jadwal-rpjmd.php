@@ -110,7 +110,7 @@ $body = '';
 				<div class="form-group">
 					<label for="relasi_rpjpd" style='display:inline-block'>Pilih Jadwal RPJPD</label>
 					<select id="relasi_rpjpd" style='display:block;width: 100%;'>
-						<option value="">Pilih RPJPD</option>
+						<option value="0">Pilih RPJPD</option>
 						<?php echo $select_rpjpd; ?>
 					</select>
 				</div>
