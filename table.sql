@@ -312,8 +312,9 @@ CREATE TABLE esakip_penilaian_custom (
   `id` int(11) NOT NULL auto_increment,
   `id_komponen_penilaian` int(11) NOT NULL,
   `nama` varchar(255) NOT NULL,
-  `keterangan` varchar(255) DEFAULT NULL,
   `nilai` int(11) NOT NULL,
+  `nomor_urut` DECIMAL(10,2) NOT NULL,
+  `active` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY  (`id`)
 );
 
