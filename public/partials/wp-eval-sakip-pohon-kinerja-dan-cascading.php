@@ -6,25 +6,52 @@ if (!defined('WPINC')) {
 }
 
 $input = shortcode_atts(array(
-	'tahun' => '2022'
+	'tahun' => '2022',
+    'periode'   => ''
 ), $atts);
 
-$idtahun = $wpdb->get_results(
-    "
-		SELECT DISTINCT 
-			tahun_anggaran 
-		FROM esakip_data_unit        
-        ORDER BY tahun_anggaran DESC",
+$periode = $wpdb->get_row(
+    $wpdb->prepare("
+    SELECT 
+		*
+    FROM esakip_data_jadwal
+    WHERE id=%d
+      AND status = 1
+", $input['periode']),
     ARRAY_A
 );
-$tahun = "<option value='-1'>Pilih Tahun</option>";
+
+if(!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggaran'] > 1){
+    $tahun_periode = $periode['tahun_selesai_anggaran'];
+}else{
+    $tahun_periode = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
+}
+
+$idtahun = $wpdb->get_results(
+    $wpdb->prepare(
+        "
+        SELECT 
+            *
+        FROM esakip_data_jadwal
+        WHERE tipe = %s",
+        'RPJMD'
+    ),
+    ARRAY_A
+);
+
+$tahun = "<option value='-1'>Pilih Tahun Periode</option>";
 
 foreach ($idtahun as $val) {
-	$selected = '';
-	if (!empty($input['tahun_anggaran']) && $val['tahun_anggaran'] == $input['tahun_anggaran']) {
-		$selected = 'selected';
-	}
-	$tahun .= "<option value='$val[tahun_anggaran]' $selected>$val[tahun_anggaran]</option>";
+    if(!empty($val['tahun_selesai_anggaran']) && $val['tahun_selesai_anggaran'] > 1){
+        $tahun_anggaran_selesai = $val['tahun_selesai_anggaran'];
+    }else{
+        $tahun_anggaran_selesai = $val['tahun_anggaran'] + $val['lama_pelaksanaan'];
+    }
+    $selected = '';
+    if (!empty($input['id']) && $val['id'] == $input['periode']) {
+        $selected = 'selected';
+    }
+    $tahun .= "<option value='$val[id]' $selected>$val[nama_jadwal] Periode $val[tahun_anggaran] -  $tahun_anggaran_selesai</option>";
 }
 
 $tipe_dokumen = "pohon_kinerja_dan_cascading";
@@ -49,7 +76,7 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
 <div class="container-md">
 	<div class="cetak">
 		<div style="padding: 10px;margin:0 0 3rem 0;">
-			<h1 class="text-center table-title">Dokumen Pohon Kinerja dan Cascading Tahun <?php echo $input['tahun']; ?></h1>
+			<h1 class="text-center table-title">Dokumen Pohon Kinerja dan Cascading <br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1>
 			<div class="wrap-table">
 				<table id="table_dokumen_skpd" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
 					<thead>
@@ -76,7 +103,7 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="tahunModalLabel">Pilih Tahun Anggaran</h5>
+				<h5 class="modal-title" id="tahunModalLabel">Pilih ID Jadwal</h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
@@ -84,8 +111,8 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
 			<div class="modal-body">
 				<form id="tahunForm">
 					<div class="form-group">
-						<label for="tahunAnggaran">Tahun Anggaran:</label>
-						<select class="form-control" id="tahunAnggaran" name="tahunAnggaran">
+						<label for="id_jadwal">ID Jadwal:</label>
+						<select class="form-control" id="id_jadwal" name="id_jadwal">
 							<?php echo $tahun; ?>
 						</select>
 						<input type="hidden" id="idDokumen" value="">
@@ -114,9 +141,10 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
 			url: esakip.url,
 			type: 'POST',
 			data: {
-				action: 'get_table_tahun_dokumen',
+				action: 'get_table_tahun_pohon_kinerja',
 				api_key: esakip.api_key,
 				tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
+				id_periode: <?php echo $input['periode']; ?>,
 			},
 			dataType: 'json',
 			success: function(response) {
@@ -142,9 +170,10 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
 			url: esakip.url,
 			type: 'POST',
 			data: {
-				action: 'get_table_skpd_dokumen',
+				action: 'get_table_skpd_pohon_kinerja',
 				api_key: esakip.api_key,
 				tahun_anggaran: <?php echo $input['tahun']; ?>,
+				id_periode: <?php echo $input['periode']; ?>,
 				tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
 			},
 			dataType: 'json',
@@ -180,9 +209,9 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
 			return alert('id tidak boleh kosong');
 		}
 
-		let tahunAnggaran = jQuery("#tahunAnggaran").val();
-		if (tahunAnggaran == '') {
-			return alert('Tahun Anggaran tidak boleh kosong');
+		let id_jadwal = jQuery("#id_jadwal").val();
+		if (id_jadwal == '') {
+			return alert('ID Jadwal tidak boleh kosong');
 		}
 
 		jQuery('#wrap-loading').show();
@@ -190,9 +219,9 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
 			url: esakip.url,
 			type: 'POST',
 			data: {
-				action: 'submit_tahun_dokumen',
+				action: 'submit_tahun_pohon_kinerja',
 				id: id,
-				tahunAnggaran: tahunAnggaran,
+                id_jadwal: id_jadwal,
 				api_key: esakip.api_key,
 				tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
 			},
@@ -202,6 +231,9 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
 				jQuery('#wrap-loading').hide();
 				if (response.status === 'success') {
 					alert(response.message);
+					jQuery('#tahunModal').modal('hide');
+                    getTableTahun();
+                    getTableSkpd();
 				} else {
 					alert(response.message);
 				}
@@ -214,7 +246,7 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
 		});
 	}
 
-    function hapus_tahun_dokumen_tipe(id) {
+    function hapus_dokumen_pohon_kinerja(id) {
         if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
             return;
         }
@@ -223,7 +255,7 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'hapus_tahun_dokumen_tipe',
+                action: 'hapus_dokumen',
                 api_key: esakip.api_key,
 				tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
                 id: id

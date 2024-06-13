@@ -6,7 +6,8 @@ if (!defined('WPINC')) {
 }
 
 $input = shortcode_atts(array(
-    'tahun' => '2022',
+    'tahun'     => '2022',
+    'periode'   => ''
 ), $atts);
 
 if (!empty($_GET) && !empty($_GET['id_skpd'])) {
@@ -14,6 +15,17 @@ if (!empty($_GET) && !empty($_GET['id_skpd'])) {
 }
 
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
+$periode = $wpdb->get_row(
+    $wpdb->prepare("
+    SELECT 
+		*
+    FROM esakip_data_jadwal
+    WHERE id=%d
+      AND status = 1
+", $input['periode']),
+    ARRAY_A
+);
 
 $skpd = $wpdb->get_row(
     $wpdb->prepare("
@@ -27,22 +39,37 @@ $skpd = $wpdb->get_row(
     ARRAY_A
 );
 
+if(!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggaran'] > 1){
+    $tahun_periode = $periode['tahun_selesai_anggaran'];
+}else{
+    $tahun_periode = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
+}
+
 $idtahun = $wpdb->get_results(
-    "
-		SELECT DISTINCT 
-			tahun_anggaran 
-		FROM esakip_data_unit        
-        ORDER BY tahun_anggaran DESC",
+    $wpdb->prepare(
+        "
+        SELECT 
+            *
+        FROM esakip_data_jadwal
+        WHERE tipe = %s",
+        'RPJMD'
+    ),
     ARRAY_A
 );
-$tahun = "<option value='-1'>Pilih Tahun</option>";
+
+$tahun = "<option value='-1'>Pilih Tahun Periode</option>";
 
 foreach ($idtahun as $val) {
+    if(!empty($val['tahun_selesai_anggaran']) && $val['tahun_selesai_anggaran'] > 1){
+        $tahun_anggaran_selesai = $val['tahun_selesai_anggaran'];
+    }else{
+        $tahun_anggaran_selesai = $val['tahun_anggaran'] + $val['lama_pelaksanaan'];
+    }
     $selected = '';
-    if (!empty($input['tahun_anggaran']) && $val['tahun_anggaran'] == $input['tahun_anggaran']) {
+    if (!empty($input['id']) && $val['id'] == $input['periode']) {
         $selected = 'selected';
     }
-    $tahun .= "<option value='$val[tahun_anggaran]' $selected>$val[tahun_anggaran]</option>";
+    $tahun .= "<option value='$val[id]' $selected>$val[nama_jadwal] Periode $val[tahun_anggaran] -  $tahun_anggaran_selesai</option>";
 }
 
 $tipe_dokumen = "pohon_kinerja_dan_cascading";
@@ -67,8 +94,8 @@ $is_administrator = in_array('administrator', $user_roles);
         WHERE nama_dokumen='Pohon Kinerja dan Cascading'
           AND user_role='perangkat_daerah' 
           AND active = 1
-          AND tahun_anggaran=%d
-    ", $input['tahun'])
+          AND id_jadwal=%d
+    ", $input['periode'])
     );
 
     $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
@@ -95,7 +122,7 @@ $is_administrator = in_array('administrator', $user_roles);
 <div class="container-md">
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Dokumen Pohon Kinerja dan Cascading <br><?php echo $skpd['nama_skpd'] ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
+            <h1 class="text-center" style="margin:3rem;">Dokumen Pohon Kinerja dan Cascading <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1>
             <?php if (!$is_admin_panrb && $hak_akses_user): ?>
             <div style="margin-bottom: 25px;">
                 <button class="btn btn-primary" onclick="tambah_dokumen();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
@@ -135,7 +162,6 @@ $is_administrator = in_array('administrator', $user_roles);
             <div class="modal-body">
                 <form enctype="multipart/form-data">
                     <input type="hidden" value="<?php echo $id_skpd; ?>" id="idSkpd">
-                    <input type="hidden" value="<?php echo $input['tahun']; ?>" id="tahunAnggaran">
                     <input type="hidden" value="" id="idDokumen">
                     <div class="form-group">
                         <label for="perangkatDaerah">Perangkat Daerah</label>
@@ -157,8 +183,11 @@ $is_administrator = in_array('administrator', $user_roles);
                         <label for="keterangan">Keterangan</label>
                         <textarea class="form-control" id="keterangan" name="keterangan" rows="3" required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary" onclick="submit_dokumen(this); return false;">Unggah</button>
                 </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" onclick="submit_dokumen(this); return false;">Unggah</button>
+                <button type="submit" class="components-button btn btn-secondary" data-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
@@ -169,7 +198,7 @@ $is_administrator = in_array('administrator', $user_roles);
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="tahunModalLabel">Pilih Tahun Anggaran</h5>
+                <h5 class="modal-title" id="tahunModalLabel">Pilih ID Jadwal</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -177,8 +206,8 @@ $is_administrator = in_array('administrator', $user_roles);
             <div class="modal-body">
                 <form id="tahunForm">
                     <div class="form-group">
-                        <label for="tahunAnggaran">Tahun Anggaran:</label>
-                        <select class="form-control" id="tahunAnggaran" name="tahunAnggaran">
+                        <label for="id_jadwal">ID Jadwal:</label>
+                        <select class="form-control" id="id_jadwal" name="id_jadwal">
                             <?php echo $tahun; ?>
                         </select>
                         <input type="hidden" id="idDokumen" value="">
@@ -213,10 +242,10 @@ $is_administrator = in_array('administrator', $user_roles);
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'get_table_dokumen',
+                action: 'get_table_pohon_kinerja',
                 api_key: esakip.api_key,
                 id_skpd: <?php echo $id_skpd; ?>,
-                tahun_anggaran: '<?php echo $input['tahun'] ?>',
+				id_periode: <?php echo $input['periode']; ?>,
                 tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
             },
             dataType: 'json',
@@ -243,10 +272,11 @@ $is_administrator = in_array('administrator', $user_roles);
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'get_table_tahun_dokumen',
+                action: 'get_table_tahun_pohon_kinerja',
                 api_key: esakip.api_key,
                 id_skpd: <?php echo $id_skpd; ?>,
                 tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
+                id_periode: <?php echo $input['periode']; ?>,
             },
             dataType: 'json',
             success: function(response) {
@@ -288,9 +318,9 @@ $is_administrator = in_array('administrator', $user_roles);
             return alert('id tidak boleh kosong');
         }
 
-        let tahunAnggaran = jQuery("#tahunAnggaran").val();
-        if (tahunAnggaran == '') {
-            return alert('Tahun Anggaran tidak boleh kosong');
+        let id_jadwal = jQuery("#id_jadwal").val();
+        if (id_jadwal == '') {
+            return alert('ID Jadwal tidak boleh kosong');
         }
 
         jQuery('#wrap-loading').show();
@@ -298,9 +328,9 @@ $is_administrator = in_array('administrator', $user_roles);
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'submit_tahun_dokumen',
+                action: 'submit_tahun_pohon_kinerja',
                 id: id,
-                tahunAnggaran: tahunAnggaran,
+                id_jadwal: id_jadwal,
                 api_key: esakip.api_key,
 				tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
             },
@@ -325,13 +355,13 @@ $is_administrator = in_array('administrator', $user_roles);
         });
     }
 
-    function edit_dokumen(id) {
+    function edit_dokumen_pohon_kinerja(id) {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'get_detail_dokumen_by_id',
+                action: 'get_detail_pohon_kinerja_by_id',
                 api_key: esakip.api_key,
                 id: id,
 				tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
@@ -379,10 +409,10 @@ $is_administrator = in_array('administrator', $user_roles);
         if (keterangan == '') {
             return alert('Keterangan tidak boleh kosong');
         }
-        let tahunAnggaran = jQuery("#tahunAnggaran").val();
-        if (tahunAnggaran == '') {
-            return alert('Tahun Anggaran tidak boleh kosong');
-        }
+        // let tahunAnggaran = jQuery("#tahunAnggaran").val();
+        // if (tahunAnggaran == '') {
+        //     return alert('Tahun Anggaran tidak boleh kosong');
+        // }
         let fileDokumen = jQuery("#fileUpload").prop('files')[0];
         if (fileDokumen == '') {
             return alert('File Upload tidak boleh kosong');
@@ -394,13 +424,13 @@ $is_administrator = in_array('administrator', $user_roles);
         let tipe_dokumen = '<?php echo $tipe_dokumen; ?>';
 
         let form_data = new FormData();
-        form_data.append('action', 'submit_tambah_dokumen');
+        form_data.append('action', 'tambah_dokumen_pohon_kinerja');
         form_data.append('api_key', esakip.api_key);
         form_data.append('id_dokumen', id_dokumen);
         form_data.append('skpd', skpd);
         form_data.append('idSkpd', idSkpd);
         form_data.append('keterangan', keterangan);
-        form_data.append('tahunAnggaran', tahunAnggaran);
+        form_data.append('id_periode', <?php echo $input['periode']; ?>);
         form_data.append('fileUpload', fileDokumen);
         form_data.append('tipe_dokumen', tipe_dokumen);
         form_data.append('namaDokumen', namaDokumen);
@@ -438,7 +468,7 @@ $is_administrator = in_array('administrator', $user_roles);
     }
 
 
-    function hapus_dokumen(id) {
+    function hapus_dokumen_pohon_kinerja(id) {
         if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
             return;
         }
@@ -460,39 +490,6 @@ $is_administrator = in_array('administrator', $user_roles);
                 if (response.status === 'success') {
                     alert(response.message);
                     getTableSkpd();
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText);
-                jQuery('#wrap-loading').hide();
-                alert('Terjadi kesalahan saat mengirim data!');
-            }
-        });
-    }
-
-    function hapus_tahun_dokumen_tipe(id) {
-        if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
-            return;
-        }
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: 'POST',
-            data: {
-                action: 'hapus_tahun_dokumen_tipe',
-                api_key: esakip.api_key,
-                tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
-                id: id
-            },
-            dataType: 'json',
-            success: function(response) {
-                console.log(response);
-                jQuery('#wrap-loading').hide();
-                if (response.status === 'success') {
-                    alert(response.message);
-                    getTableSkpd();
                     getTableTahun();
                 } else {
                     alert(response.message);
@@ -505,4 +502,38 @@ $is_administrator = in_array('administrator', $user_roles);
             }
         });
     }
+
+    // function hapus_tahun_dokumen(id) {
+    //     if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
+    //         return;
+    //     }
+    //     jQuery('#wrap-loading').show();
+    //     jQuery.ajax({
+    //         url: esakip.url,
+    //         type: 'POST',
+    //         data: {
+    //             action: 'hapus_tahun_dokumen_tipe',
+    //             api_key: esakip.api_key,
+    //             tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
+    //             id: id
+    //         },
+    //         dataType: 'json',
+    //         success: function(response) {
+    //             console.log(response);
+    //             jQuery('#wrap-loading').hide();
+    //             if (response.status === 'success') {
+    //                 alert(response.message);
+    //                 getTableSkpd();
+    //                 getTableTahun();
+    //             } else {
+    //                 alert(response.message);
+    //             }
+    //         },
+    //         error: function(xhr, status, error) {
+    //             console.error(xhr.responseText);
+    //             jQuery('#wrap-loading').hide();
+    //             alert('Terjadi kesalahan saat mengirim data!');
+    //         }
+    //     });
+    // }
 </script>
