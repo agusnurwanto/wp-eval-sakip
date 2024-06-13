@@ -50,97 +50,6 @@ $data_temp = [''];
     #table_dokumen_cascading th {
         vertical-align: middle;
     }
-
-    .google-visualization-orgchart-node {
-        border-radius: 5px;
-        border: 0;
-        padding: 0;
-    }
-
-    #chart_div .google-visualization-orgchart-connrow-medium {
-        height: 20px;
-    }
-
-    #chart_div .google-visualization-orgchart-linebottom {
-        border-bottom: 4px solid #f84d4d;
-    }
-
-    #chart_div .google-visualization-orgchart-lineleft {
-        border-left: 4px solid #f84d4d;
-    }
-
-    #chart_div .google-visualization-orgchart-lineright {
-        border-right: 4px solid #f84d4d;
-    }
-
-    #chart_div .google-visualization-orgchart-linetop {
-        border-top: 4px solid #f84d4d;
-    }
-
-    .level0 {
-        color: #0d0909;
-        font-size: 13px;
-        font-weight: 600;
-        padding: 10px;
-        min-height: 80px;
-        min-width: 200px;
-    }
-
-    .label1 {
-        background: #efd655;
-        border-radius: 5px 5px 0 0;
-    }
-
-    .level1 {
-        color: #0d0909;
-        font-size: 11px;
-        font-weight: 600;
-        font-style: italic;
-        padding: 10px;
-        min-height: 70px;
-    }
-
-    .label2 {
-        background: #fe7373;
-        border-radius: 5px 5px 0 0;
-    }
-
-    .level2 {
-        color: #0d0909;
-        font-size: 11px;
-        font-weight: 600;
-        font-style: italic;
-        padding: 10px;
-        min-height: 70px;
-    }
-
-    .label3 {
-        background: #57b2ec;
-        border-radius: 5px 5px 0 0;
-    }
-
-    .level3 {
-        color: #0d0909;
-        font-size: 11px;
-        font-weight: 600;
-        font-style: italic;
-        padding: 10px;
-        min-height: 70px;
-    }
-
-    .label4 {
-        background: #c979e3;
-        border-radius: 5px 5px 0 0;
-    }
-
-    .level4 {
-        color: #0d0909;
-        font-size: 11px;
-        font-weight: 600;
-        font-style: italic;
-        padding: 10px;
-        min-height: 70px;
-    }
 </style>
 
 <!-- Table -->
@@ -167,7 +76,6 @@ $data_temp = [''];
 </div>
 
 <div id="view_cascading">
-    <h4 style="text-align: center; margin: 0; font-weight: bold;">Cascading</h4><br>
     <div id="cetak" title="Laporan Pohon Kinerja" style="padding: 5px; overflow: auto; height: 100vh;">
         <div id="chart_div"></div>
     </div>
@@ -346,6 +254,35 @@ $data_temp = [''];
                 console.error(xhr.responseText);
                 alert('Terjadi kesalahan saat mengirim data!');
                 jQuery('#wrap-loading').hide();
+            }
+        });
+    }
+
+    function view_cascading(id_tujuan){
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'view_cascading_pemda',
+                api_key: esakip.api_key,
+                id_jadwal: <?php echo $input['periode']; ?>,
+                id: id_tujuan,
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                console.log(response);
+                if (response.status === 'success') {
+                    jQuery('#chart_div').html(response.html);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data!');
             }
         });
     }
