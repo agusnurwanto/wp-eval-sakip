@@ -423,6 +423,10 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_tambah_kerangka_logis_penilaian_lke', $plugin_public, 'tambah_kerangka_logis_penilaian_lke');
 		$this->loader->add_action('wp_ajax_get_table_kerangka_logis', $plugin_public, 'get_table_kerangka_logis');
 		$this->loader->add_action('wp_ajax_hapus_kerangka_logis', $plugin_public, 'hapus_kerangka_logis');
+		$this->loader->add_action('wp_ajax_get_table_opsi_custom', $plugin_public, 'get_table_opsi_custom');
+		$this->loader->add_action('wp_ajax_hapus_opsi_custom', $plugin_public, 'hapus_opsi_custom');
+		$this->loader->add_action('wp_ajax_tambah_opsi_custom', $plugin_public, 'tambah_opsi_custom');
+		$this->loader->add_action('wp_ajax_get_option_custom_by_id', $plugin_public, 'get_option_custom_by_id');
 		
 		$this->loader->add_action('wp_ajax_tambah_nilai_lke', $plugin_public, 'tambah_nilai_lke');
 		$this->loader->add_action('wp_ajax_tambah_nilai_penetapan_lke', $plugin_public, 'tambah_nilai_penetapan_lke');
