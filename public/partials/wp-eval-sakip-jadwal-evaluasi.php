@@ -16,7 +16,7 @@ $tahun_anggaran = $input['tahun_anggaran'];
 
 $url_cek_dokumen = '';
 $cek_dokumen = $this->functions->generatePage(array(
-	'nama_page' => 'Halaman Cek Dokumen | '. $tahun_anggaran,
+	'nama_page' => 'Laporan Monitor Upload Dokumen | '. $tahun_anggaran,
 	'content' => '[halaman_cek_dokumen tahun_anggaran="' . $tahun_anggaran . '"]',
 	'show_header' => 1,
 	'no_key' => 1,

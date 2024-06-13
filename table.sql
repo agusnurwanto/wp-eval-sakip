@@ -286,10 +286,11 @@ CREATE TABLE esakip_komponen (
 CREATE TABLE esakip_subkomponen (
   `id` int(11) NOT NULL auto_increment,
   `id_komponen` int(11) NOT NULL,
-  `nomor_urut` DECIMAL(10,2) NOT NULL,
   `id_user_penilai` int(11) DEFAULT NULL,
-  `nama` varchar(255) DEFAULT NULL,
-  `bobot` float DEFAULT NULL,
+  `metode_penilaian` int(11) NOT NULL DEFAULT '1' COMMENT '1 = Rata-Rata, 0 = Nilai Dinamis',
+  `nama` varchar(255) NOT NULL,
+  `bobot` float NOT NULL,
+  `nomor_urut` DECIMAL(10,2) NOT NULL,
   `active` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY  (`id`)
 );
@@ -299,6 +300,7 @@ CREATE TABLE esakip_komponen_penilaian (
   `id_subkomponen` int(11) NOT NULL,
   `nomor_urut` DECIMAL(10,2) NOT NULL,
   `nama` varchar(255) DEFAULT NULL,
+  `bobot` float DEFAULT NULL,
   `tipe` varchar(30) DEFAULT NULL COMMENT '1 = Ya/Tidak, 2 = A/B/C/D, 3 =Custom',
   `keterangan` varchar(255) DEFAULT NULL,
   `jenis_bukti_dukung` text DEFAULT NULL,
@@ -312,7 +314,7 @@ CREATE TABLE esakip_penilaian_custom (
   `id` int(11) NOT NULL auto_increment,
   `id_komponen_penilaian` int(11) NOT NULL,
   `nama` varchar(255) NOT NULL,
-  `nilai` int(11) NOT NULL,
+  `nilai` decimal(5, 2) DEFAULT NULL,
   `nomor_urut` DECIMAL(10,2) NOT NULL,
   `active` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY  (`id`)

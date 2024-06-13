@@ -59,7 +59,11 @@ $idtahun = $wpdb->get_results(
 $tahun = "<option value='-1'>Pilih Tahun Periode</option>";
 
 foreach ($idtahun as $val) {
-    $tahun_anggaran_selesai = $val['tahun_anggaran'] + $val['lama_pelaksanaan'];
+    if(!empty($val['tahun_selesai_anggaran']) && $val['tahun_selesai_anggaran'] > 1){
+        $tahun_anggaran_selesai = $val['tahun_selesai_anggaran'];
+    }else{
+        $tahun_anggaran_selesai = $val['tahun_anggaran'] + $val['lama_pelaksanaan'];
+    }
     $selected = '';
     if (!empty($input['id']) && $val['id'] == $input['periode']) {
         $selected = 'selected';
@@ -90,8 +94,6 @@ $is_administrator = in_array('administrator', $user_roles);
           AND id_jadwal=%d
     ",$input['periode'])
     );
-
-    print_r($cek_settingan_menu);
 
     $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
     // $hak_akses_user = true;
