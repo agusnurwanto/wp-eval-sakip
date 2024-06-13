@@ -50,6 +50,21 @@ $data_temp = [''];
     #table_dokumen_cascading th {
         vertical-align: middle;
     }
+
+    #tabel-cascading, #tabel-cascading td, #tabel-cascading table {
+        padding: 0;
+        border: 0;
+        margin: 0;
+    }
+    #tabel-cascading > tbody > tr > td:last-child{
+        padding-left: 10px;
+    }
+
+    #tabel-cascading button.btn.btn-lg.btn-info,
+    #tabel-cascading button.btn.btn-lg.btn-warning {
+        width: 100%;
+        min-height: 75px;
+    }
 </style>
 
 <!-- Table -->

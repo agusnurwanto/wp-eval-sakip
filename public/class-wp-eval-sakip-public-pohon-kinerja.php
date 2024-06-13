@@ -713,22 +713,143 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		);
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if (!empty($_POST['id_jadwal'])) {
-					$id_jadwal = $_POST['id_jadwal'];
-				} else {
+				if (empty($_POST['id_jadwal'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'id Jadwal kosong!';
-					die(json_encode($ret));
+				} else if(empty($_POST['id'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'id kosong!';
 				}
 
-				// $id_tujuan = $wpdb->get_var(
-				// 	$wpdb->prepare("
-				// 		SELECT relasi_perencanaan
-				// 		FROM esakip_data_jadwal
-				// 		WHERE id_jadwal = %d
-				// 	", $id_jadwal)
-				// );
-				$ret['html'] = 'On progress!';
+				if($ret['status'] != 'error'){
+					$id_jadwal = $_POST['id_jadwal'];
+					$tujuan = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT 
+								*
+							FROM esakip_rpd_tujuan
+							WHERE id = %d
+								AND active=1
+						", $_POST['id']),
+						ARRAY_A
+					);
+					$indikator_tujuan = $wpdb->get_results(
+						$wpdb->prepare("
+							SELECT 
+								*
+							FROM esakip_rpd_tujuan
+							WHERE id_unik = %s
+								AND active=1
+								AND id_unik_indikator IS NOT NULL
+						", $tujuan['id_unik']),
+						ARRAY_A
+					);
+					$indikator_tujuan_html = '
+					<table>
+						<tbody>
+							<tr>
+					';
+					$data = '';
+					foreach($indikator_tujuan as $ind){
+						$data .= '<td class="text-center"><button class="btn btn-lg btn-warning">'.$ind['indikator_teks'].'</button></td>';
+					}
+					if(empty($data)){
+						$data = '<td class="text-center"><button class="btn btn-lg btn-warning"></button></td>';
+					}
+					$indikator_tujuan_html .= $data.'
+							</tr>
+						</tbody>
+					</table>
+					';
+					$sasaran = $wpdb->get_results(
+						$wpdb->prepare("
+							SELECT 
+								*
+							FROM esakip_rpd_sasaran
+							WHERE kode_tujuan = %s
+								AND active=1
+								AND id_unik_indikator IS NULL
+						", $tujuan['kode_tujuan']),
+						ARRAY_A
+					);
+					$sasaran_html = '
+					<table>
+						<tbody>
+							<tr>
+					';
+					$data = '';
+					foreach($sasaran as $sas){
+						$data .= '<td class="text-center"><button class="btn btn-lg btn-warning">'.$sas['sasaran_teks'].'</button></td>';
+					}
+					if(empty($data)){
+						$data = '<td class="text-center"><button class="btn btn-lg btn-warning"></button></td>';
+					}
+					$sasaran_html .= $data.'
+							</tr>
+						</tbody>
+					</table>
+					';
+					$indikator_sasaran = $wpdb->get_results(
+						$wpdb->prepare("
+							SELECT 
+								*
+							FROM esakip_rpd_sasaran
+							WHERE id_unik = %s
+								AND active=1
+								AND id_unik_indikator IS NOT NULL
+						", $sasaran['id_unik']),
+						ARRAY_A
+					);
+					$indikator_sasaran_html = '
+					<table>
+						<tbody>
+							<tr>
+					';
+					$data = '';
+					foreach($indikator_sasaran as $ind){
+						$data .= '<td class="text-center"><button class="btn btn-lg btn-warning">'.$ind['indikator_teks'].'</button></td>';
+					}
+					if(empty($data)){
+						$data = '<td class="text-center"><button class="btn btn-lg btn-warning"></button></td>';
+					}
+					$indikator_sasaran_html .= $data.'
+							</tr>
+						</tbody>
+					</table>
+					';
+					$html = '
+					<h1 class="text-center">'.$tujuan['nama_cascading'].'</h1>
+					<table id="tabel-cascading">
+						<tbody>
+							<tr>
+								<td class="text-center" style="width: 200px;"><button class="btn btn-lg btn-info">MISI RPJPD</button></td>
+								<td class="text-center"><button class="btn btn-lg btn-warning"></button></td>
+							</tr>
+							<tr>
+								<td class="text-center"><button class="btn btn-lg btn-info">TUJUAN RPD</button></td>
+								<td class="text-center"><button class="btn btn-lg btn-warning">'.$tujuan['tujuan_teks'].'</button></td>
+							</tr>
+							<tr>
+								<td class="text-center"><button class="btn btn-lg btn-info">INDIKATOR TUJUAN RPD</button></td>
+								<td class="text-center">'.$indikator_tujuan_html.'</td>
+							</tr>
+							<tr>
+								<td class="text-center"><button class="btn btn-lg btn-info">SASARAN RPD</button></td>
+								<td class="text-center">'.$sasaran_html.'</td>
+							</tr>
+							<tr>
+								<td class="text-center"><button class="btn btn-lg btn-info">INDIKATOR SASARAN RPD</button></td>
+								<td class="text-center">'.$indikator_sasaran_html.'</td>
+							</tr>
+							<tr>
+								<td class="text-center"><button class="btn btn-lg btn-info">URUSAN PENGAMPU</button></td>
+								<td class="text-center"><button class="btn btn-lg btn-warning"></button></td>
+							</tr>
+						</tbody>
+					</table>
+					';
+					$ret['html'] = $html;
+				}
 
 			} else {
 				$ret['status']  = 'error';
