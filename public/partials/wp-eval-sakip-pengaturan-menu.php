@@ -241,8 +241,7 @@ $body = '';
 						}
                         jQuery("input[name=akses_user_upload_dokumen][value='"+akses_user+"']").prop("checked",true);
 						jQuery("#no_urut").val(data.default_urutan);
-						if(data.nama_tabel == 'esakip_renstra'){
-							console.log(data.nama_tabel)
+						if(data.nama_tabel == 'esakip_renstra' || data.nama_tabel == 'esakip_pohon_kinerja_dan_cascading'){
 							jQuery('#setting_hak_akses_user').hide();
 						}else{
 							jQuery('#setting_hak_akses_user').show();

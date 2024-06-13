@@ -718,7 +718,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		$this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2;
 
-		if ($nama_dokumen == 'RENSTRA' || $nama_dokumen == 'Pohon Kinerja') {
+		if($nama_dokumen == 'RENSTRA' || $nama_dokumen == 'Pohon Kinerja dan Cascading'){
 			// Khusus di Settingan RENSTRA dan pohon kinerja tahun anggaran diganti dengan id jadwal periode renstra
 			$cek_settingan_menu = $wpdb->get_var($wpdb->prepare("
 				SELECT 
@@ -10563,7 +10563,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					foreach ($data_hak_akses as $v_hak_akses) {
 						if ($v_hak_akses['nama_tabel'] == 'esakip_renstra') {
 							$ret['data']['jenis_role'] = !empty($v_hak_akses['jenis_role']) ? $v_hak_akses['jenis_role'] : 2;
-						} else if ($v_hak_akses['nama_tabel'] == 'esakip_pohon_kinerja') {
+						}else if($v_hak_akses['nama_tabel'] == 'esakip_pohon_kinerja_dan_cascading'){
 							$ret['data']['jenis_role_pohon_kinerja'] = !empty($v_hak_akses['jenis_role']) ? $v_hak_akses['jenis_role'] : 2;
 						}
 					}
@@ -10934,9 +10934,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					}
 
 					// update hak akses user pohon kinerja
-					$get_akses_user_this_periode_pohon_kinerja = $wpdb->get_row($wpdb->prepare('SELECT * FROM esakip_menu_dokumen WHERE nama_tabel=%s AND id_jadwal=%d AND active=1', 'esakip_pohon_kinerja', $id), ARRAY_A);
-					$opsi['nama_tabel']		= 'esakip_pohon_kinerja';
-					$opsi['nama_dokumen']	= 'Pohon Kinerja';
+					$get_akses_user_this_periode_pohon_kinerja = $wpdb->get_row($wpdb->prepare('SELECT * FROM esakip_menu_dokumen WHERE nama_tabel=%s AND id_jadwal=%d AND active=1','esakip_pohon_kinerja_dan_cascading', $id), ARRAY_A);
+					$opsi['nama_tabel']		= 'esakip_pohon_kinerja_dan_cascading';
+					$opsi['nama_dokumen']	= 'Pohon Kinerja dan Cascading';
 					$opsi['jenis_role']		= $input_akses_user_pohon_kinerja;
 
 					if (!empty($get_akses_user_this_periode_pohon_kinerja)) {
@@ -16473,8 +16473,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$periode_renstra .= '<li><a target="_blank" href="' . $renstra['url'] . '" class="btn btn-primary">' . $renstra['title'] . '</a></li>';
 
 			$pohon_kinerja = $this->functions->generatePage(array(
-				'nama_page' => 'Pohon Kinerja | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-				'content' => '[pohon_kinerja periode=' . $jadwal_periode_item['id'] . ']',
+				'nama_page' => 'Pohon Kinerja dan Cascading | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[pohon_kinerja_dan_cascading periode=' . $jadwal_periode_item['id'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
@@ -16988,7 +16988,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($cek_data['perangkat_daerah']['Pohon Kinerja dan Cascading']) && $cek_data['perangkat_daerah']['Pohon Kinerja dan Cascading']['active'] == 1) {
 			$halaman_pohon_kinerja_opd = '
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="pohon-kinerja-opd" style="margin: 0;">Periode Upload Dokumen Pohon Kinerja</h5>
+					<h5 class="esakip-header-tahun" data-id="pohon-kinerja-opd" style="margin: 0;">Periode Upload Dokumen Pohon Kinerja Dan Cascading</h5>
 					<div class="esakip-body-tahun" data-id="pohon-kinerja-opd">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $periode_pohon_kinerja . '
@@ -17186,12 +17186,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$periode_renstra_skpd .= '<li><a target="_blank" href="' . $renstra_skpd['url'] . '" class="btn btn-primary">' . $title_renstra . '</a></li>';
 
 				$pohon_kinerja_skpd = $this->functions->generatePage(array(
-					'nama_page' => 'Pohon Kinerja | ' . $jadwal_periode_item['id'],
-					'content' => '[upload_dokumen_pohon_kinerja periode=' . $jadwal_periode_item['id'] . ']',
+					'nama_page' => 'Pohon Kinerja dan Cascading | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai  . ' Perangkat Daerah',
+					'content' => '[dokumen_detail_pohon_kinerja_dan_cascading periode=' . $jadwal_periode_item['id'] . ']',
 					'show_header' => 1,
 					'post_status' => 'private'
 				));
-				$title_pohon_kinerja = 'Dokumen Pohon Kinerja | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+				$title_pohon_kinerja = 'Pohon Kinerja dan Cascading | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
 				$pohon_kinerja_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 				$periode_pohon_kinerja_skpd .= '<li><a target="_blank" href="' . $pohon_kinerja_skpd['url'] . '" class="btn btn-primary">' . $title_pohon_kinerja . '</a></li>';
 			}
@@ -17220,7 +17220,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			if (!empty($cek_data['perangkat_daerah']['Pohon Kinerja dan Cascading']) && $cek_data['perangkat_daerah']['Pohon Kinerja dan Cascading']['active'] == 1) {
 				$halaman_pohon_kinerja_skpd = '
 					<div class="accordion">
-						<h5 class="esakip-header-tahun" data-id="pohon-kinerja-skpd" style="margin: 0;">Periode Upload Dokumen Pohon Kinerja</h5>
+						<h5 class="esakip-header-tahun" data-id="pohon-kinerja-skpd" style="margin: 0;">Periode Upload Dokumen Pohon Kinerja dan Cascading</h5>
 						<div class="esakip-body-tahun" data-id="pohon-kinerja-skpd">
 							<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 								' . $periode_pohon_kinerja_skpd . '
@@ -22419,6 +22419,644 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$ret['message'] = 'Format Salah!';
 		}
 
+		die(json_encode($ret));
+	}
+
+	
+    public function get_table_pohon_kinerja()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_skpd'])) {
+					$id_skpd = $_POST['id_skpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
+				}
+				if (!empty($_POST['id_periode'])) {
+					$id_jadwal = $_POST['id_periode'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
+				}
+				$data_pohon_kinerja = $wpdb->get_results(
+					$wpdb->prepare("
+                    SELECT * 
+                    FROM esakip_pohon_kinerja_dan_cascading
+                    WHERE id_skpd = %d 
+                      AND id_jadwal = %d 
+                      AND active = 1
+                ", $id_skpd, $id_jadwal),
+					ARRAY_A
+				);
+
+				if (!empty($data_pohon_kinerja)) {
+					$counter = 1;
+					$tbody = '';
+
+					// user authorize
+					$current_user = wp_get_current_user();
+					//jika user adalah admin atau skpd
+					$can_verify = false;
+					if (
+						in_array("admin_ortala", $current_user->roles) ||
+						in_array("admin_bappeda", $current_user->roles) ||
+						in_array("administrator", $current_user->roles)
+					) {
+						$can_verify = true;
+					}
+
+					foreach ($data_pohon_kinerja as $kk => $vv) {
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+						$tbody .= "<td>" . $vv['opd'] . "</td>";
+						$tbody .= "<td>" . $vv['dokumen'] . "</td>";
+						$tbody .= "<td>" . $vv['keterangan'] . "</td>";
+						$tbody .= "<td>" . $vv['created_at'] . "</td>";
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
+						// if($can_verify){
+						// 	$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
+						// }
+						//  //if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen_renstra('RENSTRA')) {
+						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Pohon Kinerja dan Cascading', $id_jadwal)) {
+							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_pohon_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
+							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_pohon_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+						}
+						$btn .= '</div>';
+
+						$tbody .= "<td class='text-center'>" . $btn . "</td>";
+						$tbody .= "</tr>";
+					}
+
+					$ret['data'] = $tbody;
+				} else {
+					$ret['data'] = "<tr><td colspan='8' class='text-center'>Tidak ada data tersedia</td></tr>";
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+    public function get_table_tahun_pohon_kinerja()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$where = 'id_jadwal IS NULL';
+
+				if (!empty($_POST['id_skpd'])) {
+					$id_skpd = $_POST['id_skpd'];
+					$where .= " AND id_skpd = $id_skpd";
+				}
+				if (!empty($_POST['id_periode'])) {
+					$id_jadwal = $_POST['id_periode'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
+				}
+
+				$dokumen_unset = $wpdb->get_results(
+					"
+					SELECT 
+						*
+					FROM esakip_pohon_kinerja_dan_cascading 
+					WHERE $where
+					  AND active = 1
+					",
+					ARRAY_A
+				);
+
+				$counterUnset = 1;
+				$tbodyUnset = '';
+				if (!empty($dokumen_unset)) {
+					$tbodyUnset .= '
+						<div class="cetak">
+							<div style="padding: 10px;margin:0 0 3rem 0;">
+								<h3 class="text-center">Dokumen yang belum disetting Tahun Periode</h3>
+								<div class="wrap-table">
+									<table id="table_dokumen_tahun" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+										<thead>
+											<tr>
+												<th class="text-center">No</th>
+												<th class="text-center">Perangkat Daerah</th>
+												<th class="text-center">Nama Dokumen</th>
+												<th class="text-center">Keterangan</th>
+												<th class="text-center">Waktu Upload</th>
+												<th class="text-center">Aksi</th>
+											</tr>
+										</thead>
+										<tbody>';
+					foreach ($dokumen_unset as $kk => $vv) {
+						$tbodyUnset .= "<tr>";
+						$tbodyUnset .= "<td class='text-center'>" . $counterUnset++ . "</td>";
+						$tbodyUnset .= "<td>" . $vv['opd'] . "</td>";
+						$tbodyUnset .= "<td>" . $vv['dokumen'] . "</td>";
+						$tbodyUnset .= "<td>" . $vv['keterangan'] . "</td>";
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
+						if (
+							!$this->is_admin_panrb() 
+							&& $this->hak_akses_upload_dokumen('Pohon Kinerja dan Cascading', $id_jadwal)
+						) {
+							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
+
+							$btn .= '<button class="btn btn-danger" onclick="hapus_dokumen_pohon_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+						}
+						$btn .= '</div>';
+
+						$tbodyUnset .= "<td class='text-center'>" . $vv['tanggal_upload'] . "</td>";
+						$tbodyUnset .= "<td class='text-center'>" . $btn . "</td>";
+
+						$tbodyUnset .= "</tr>";
+					}
+					$tbodyUnset .= '</tbody>
+								</table>
+							</div>
+						</div>
+					';
+
+					$ret['data'] = $tbodyUnset;
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+    
+	public function tambah_dokumen_pohon_kinerja()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$id_dokumen = null;
+
+				if (!empty($_POST['id_dokumen'])) {
+					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
+				}
+				if (!empty($_POST['skpd'])) {
+					$skpd = $_POST['skpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Perangkat Daerah kosong!';
+				}
+				if (!empty($_POST['idSkpd'])) {
+					$idSkpd = $_POST['idSkpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
+				}
+				if (!empty($_POST['keterangan'])) {
+					$keterangan = $_POST['keterangan'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Keterangan kosong!';
+				}
+				if (!empty($_POST['id_periode'])) {
+					$id_jadwal = $_POST['id_periode'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
+				}
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if (empty($_POST['namaDokumen']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if (empty(get_option('_crb_maksimal_upload_dokumen_esakip'))) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
+				}
+
+				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
+					$upload = $this->functions->uploadFile(
+						$_POST['api_key'],
+						$upload_dir,
+						$_FILES['fileUpload'],
+						array('pdf'),
+						1048576 * $maksimal_upload,
+						$_POST['namaDokumen']
+					);
+					if ($upload['status'] == false) {
+						$ret = array(
+							'status' => 'error',
+							'message' => $upload['message']
+						);
+					}
+				} else if ($ret['status'] != 'error' && !empty($_POST['namaDokumen'])) {
+					$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+						SELECT
+							dokumen
+						FROM esakip_pohon_kinerja_dan_cascading
+						WHERE id=%d
+					", $id_dokumen));
+					if ($dokumen_lama != $_POST['namaDokumen']) {
+						$ret_rename = $this->functions->renameFile($upload_dir . $dokumen_lama, $upload_dir . $_POST['namaDokumen']);
+						if ($ret_rename['status'] != 'error') {
+							$wpdb->update(
+								'esakip_pohon_kinerja_dan_cascading',
+								array('dokumen' => $_POST['namaDokumen']),
+								array('id' => $id_dokumen),
+							);
+						} else {
+							$ret = $ret_rename;
+						}
+					}
+				}
+
+				if ($ret['status'] == 'success') {
+					if (empty($id_dokumen)) {
+						$wpdb->insert(
+							'esakip_pohon_kinerja_dan_cascading',
+							array(
+								'opd' => $skpd,
+								'id_skpd' => $idSkpd,
+								'dokumen' => $upload['filename'],
+								'keterangan' => $keterangan,
+								'id_jadwal' => $id_jadwal,
+								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
+							),
+							array('%s', '%s', '%s', '%s', '%d')
+						);
+					} else {
+						$opsi = array(
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_pohon_kinerja_dan_cascading
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
+						$wpdb->update(
+							'esakip_pohon_kinerja_dan_cascading',
+							$opsi,
+							array('id' => $id_dokumen),
+							array('%s', '%s'),
+							array('%d')
+						);
+
+						if ($wpdb->rows_affected == 0) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal memperbarui data ke database!'
+							);
+						}
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	
+	public function get_detail_pohon_kinerja_by_id()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT *
+							FROM esakip_pohon_kinerja_dan_cascading
+							WHERE id = %d
+						", $_POST['id']),
+						ARRAY_A
+					);
+					$ret['data'] = $data;
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_dokumen_pohon_kinerja()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$dokumen_lama = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								dokumen
+							FROM esakip_pohon_kinerja_dan_cascading
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					$ret['data'] = $wpdb->update(
+						'esakip_pohon_kinerja_dan_cascading',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
+
+					if ($wpdb->rows_affected > 0) {
+						if (is_file($upload_dir . $dokumen_lama)) {
+							unlink($upload_dir . $dokumen_lama);
+						}
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	
+	public function get_table_skpd_pohon_kinerja()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_periode'])) {
+					$id_jadwal = $_POST['id_periode'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
+				}
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
+				$unit = $wpdb->get_results(
+					$wpdb->prepare("
+						SELECT 
+							nama_skpd, 
+							id_skpd, 
+							kode_skpd, 
+							nipkepala 
+						FROM esakip_data_unit 
+						WHERE tahun_anggaran=%d
+						AND active=1 
+						AND is_skpd=1 
+						ORDER BY kode_skpd ASC
+					", $tahun_anggaran_sakip),
+					ARRAY_A
+				);
+
+				$periode = $wpdb->get_row(
+					$wpdb->prepare("
+					SELECT 
+						*
+					FROM esakip_data_jadwal
+					WHERE id=%d
+					  AND status = 1
+				", $id_jadwal),
+					ARRAY_A
+				);
+				
+				if(!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggaran'] > 1){
+					$tahun_periode_selesai = $periode['tahun_selesai_anggaran'];
+				}else{
+					$tahun_periode_selesai = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
+				}
+
+				if (!empty($unit)) {
+					$tbody = '';
+					$counter = 1;
+					foreach ($unit as $kk => $vv) {
+						$detail_pohon_kinerja = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Detail Dokumen Pohon Kinerja dan Cascading | ' . $periode['nama_jadwal'] . ' ' . 'Periode ' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode_selesai  . ' Perangkat Daerah',
+							'content' => '[dokumen_detail_pohon_kinerja_dan_cascading periode=' . $id_jadwal . ']',
+							'show_header' => 1,
+							'post_status' => 'private'
+						));
+
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
+
+						$jumlah_dokumen = $wpdb->get_var(
+							$wpdb->prepare("
+								SELECT 
+									COUNT(id)
+								FROM esakip_pohon_kinerja_dan_cascading
+								WHERE id_skpd = %d
+								  AND id_jadwal = %d
+								  AND active = 1
+							", $vv['id_skpd'], $id_jadwal)
+						);
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_pohon_kinerja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+						$btn .= '</div>';
+
+						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
+						$tbody .= "<td>" . $btn . "</td>";
+
+						$tbody .= "</tr>";
+					}
+					$ret['data'] = $tbody;
+				} else {
+					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	
+	public function submit_tahun_pohon_kinerja()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$id = $_POST['id'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id kosong!';
+				}
+				if (!empty($_POST['id_jadwal'])) {
+					$tahun_periode = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Periode kosong!';
+				}
+
+				if (!empty($id) && !empty($tahun_periode)) {
+					$existing_data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT 
+								* 
+							FROM esakip_pohon_kinerja_dan_cascading 
+							WHERE id = %d", $id)
+					);
+
+					if (!empty($existing_data)) {
+						$update_result = $wpdb->update(
+							'esakip_pohon_kinerja_dan_cascading',
+							array(
+								'id_jadwal' => $tahun_periode,
+							),
+							array('id' => $id),
+							array('%d'),
+						);
+
+						if ($update_result === false) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal memperbarui data di dalam tabel!'
+							);
+						}
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message' => 'Data dengan ID yang diberikan tidak ditemukan!'
+						);
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message' => 'ID atau tahun anggaran tidak valid!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
 		die(json_encode($ret));
 	}
 }
