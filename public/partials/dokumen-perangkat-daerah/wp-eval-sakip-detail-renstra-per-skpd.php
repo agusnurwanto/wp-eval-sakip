@@ -94,7 +94,7 @@ $is_administrator = in_array('administrator', $user_roles);
     print_r($cek_settingan_menu);
 
     $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
-    $hak_akses_user = true;
+    // $hak_akses_user = true;
 
 ?>
 <style type="text/css">
