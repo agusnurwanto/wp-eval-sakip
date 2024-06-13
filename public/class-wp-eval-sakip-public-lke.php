@@ -498,11 +498,11 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								$tbody2 .= "<td class='text-left'></td>";
 								$tbody2 .= "<td class='text-left'>" . $counter_sub++ . "</td>";
 								$tbody2 .= "<td class='text-left' colspan='2'><b>" . $subkomponen['nama'] . "</b></td>";
-								if(
+								if (
 									empty($_POST['excel'])
-									|| $_POST['excel'] == 'usulan' 
+									|| $_POST['excel'] == 'usulan'
 									|| $_POST['excel'] == 'usulan_penetapan'
-								){
+								) {
 									$tbody2 .= "<td class='text-center'>" . $subkomponen['bobot'] . "</td>";
 									$tbody2 .= "<td class='text-left'></td>";
 									$tbody2 .= "<td class='text-center'>" . number_format($total_nilai_sub, 2) . "</td>";
@@ -511,14 +511,14 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								}
 
 								// kolom bukti dukung di laporan penetapan
-								if($_POST['excel'] == 'penetapan'){
+								if ($_POST['excel'] == 'penetapan') {
 									$tbody2 .= "<td class='text-center'></td>";
 								}
-								if(
+								if (
 									empty($_POST['excel'])
-									|| $_POST['excel'] == 'penetapan' 
+									|| $_POST['excel'] == 'penetapan'
 									|| $_POST['excel'] == 'usulan_penetapan'
-								){
+								) {
 									$tbody2 .= "<td class='text-center'></td>";
 									$tbody2 .= "<td class='text-center'>" . number_format($total_nilai_sub_penetapan, 2) . "</td>";
 									$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub_penetapan * 100, 2) . "%" . "</td>";
@@ -606,6 +606,16 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 								if (!empty($data_komponen_penilaian)) {
 									foreach ($data_komponen_penilaian as $penilaian) {
+										$opsi_custom = $wpdb->get_results(
+											$wpdb->prepare("
+												SELECT *
+												FROM esakip_penilaian_custom
+												WHERE id_komponen_penilaian =%d	
+												  AND active = 1
+											", $penilaian['kp_id']),
+											ARRAY_A
+										);
+
 										//opsi jawaban usulan
 										$opsi = "<option value=''>Pilih Jawaban</option>";
 										if (isset($penilaian['pl_nilai_usulan'])) {
@@ -618,6 +628,12 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												$opsi .= "<option value='0.5' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0.5 ? " selected" : "") . ">C</option>";
 												$opsi .= "<option value='0.25' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0.25 ? " selected" : "") . ">D</option>";
 												$opsi .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_usulan'] == 0 ? " selected" : "") . ">E</option>";
+											} else if ($penilaian['kp_tipe'] == 3) {
+												if (!empty($opsi_custom)) {
+													foreach ($opsi_custom as $custom) {
+														$opsi .= "<option value='" . $custom['nilai'] . "' class='text-center'" . ($penilaian['pl_nilai_usulan'] == $custom['nilai'] ? " selected" : "") . ">" . $custom['nama'] . "</option>";
+													}
+												}
 											}
 										} else {
 											$opsi = "<option value=''>Pilih Jawaban</option>";
@@ -630,6 +646,12 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												$opsi .= "<option value='0.5' class='text-center'>C</option>";
 												$opsi .= "<option value='0.25' class='text-center'>D</option>";
 												$opsi .= "<option value='0' class='text-center'>E</option>";
+											} else if ($penilaian['kp_tipe'] == 3) {
+												if (!empty($opsi_custom)) {
+													foreach ($opsi_custom as $custom) {
+														$opsi .= "<option value='" . $custom['nilai'] . "' class='text-center')>" . $custom['nama'] . "</option>";
+													}
+												}
 											}
 										}
 
@@ -645,6 +667,12 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												$opsi_penetapan .= "<option value='0.5' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.5 ? " selected" : "") . ">C</option>";
 												$opsi_penetapan .= "<option value='0.25' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.25 ? " selected" : "") . ">D</option>";
 												$opsi_penetapan .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0 ? " selected" : "") . ">E</option>";
+											} else if ($penilaian['kp_tipe'] == 3) {
+												if (!empty($opsi_custom)) {
+													foreach ($opsi_custom as $custom) {
+														$opsi_penetapan .= "<option value='" . $custom['nilai'] . "' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == $custom['nilai'] ? " selected" : "") . ">" . $custom['nama'] . "</option>";
+													}
+												}
 											}
 										} else {
 											$opsi_penetapan = "<option value=''>Pilih Jawaban</option>";
@@ -657,6 +685,12 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												$opsi_penetapan .= "<option value='0.5' class='text-center'>C</option>";
 												$opsi_penetapan .= "<option value='0.25' class='text-center'>D</option>";
 												$opsi_penetapan .= "<option value='0' class='text-center'>E</option>";
+											} else if ($penilaian['kp_tipe'] == 3) {
+												if (!empty($opsi_custom)) {
+													foreach ($opsi_custom as $custom) {
+														$opsi_penetapan .= "<option value='" . $custom['nilai'] . "' class='text-center')>" . $custom['nama'] . "</option>";
+													}
+												}
 											}
 										}
 
@@ -766,8 +800,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 																AND tahun_anggaran=%d
 														", $kl['id_komponen_pembanding'], $id_skpd, $tahun_anggaran)
 													);
-													// die(print_r($wpdb->last_query));
-
 													if ($penilaian['pl_nilai_penetapan'] > $nilai_komponen_penilaian_penetapan) {
 														$pesan_kesalahan_penetapan[] = $kl['pesan_kesalahan'];
 													}
@@ -799,9 +831,9 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 										$tbody2 .= "<td class='text-left'></td>";
 										$tbody2 .= "<td class='text-left'>" . $counter_isi++ . "</td>";
 										$tbody2 .= "<td class='text-left'>" . $penilaian['kp_nama'] . "<br><small class='text-muted'> Keterangan : " . $penilaian['kp_keterangan'] . "</small></td>";
-										if(empty($_POST['excel'])){
+										if (empty($_POST['excel'])) {
 											$tbody2 .= "<td class='text-center'><button class='btn btn-secondary' onclick='infoPenjelasan(" . $penilaian['kp_id'] . ")' title='Info Nilai'><span class='dashicons dashicons-info'></span></button></td>";
-										}else{
+										} else {
 											$tbody2 .= "<td class='text-center'></td>";
 										}
 										switch ($can_verify) {
@@ -814,52 +846,52 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												} else {
 													$tbody2 .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "' disabled>" . $opsi . "</select></td>";
 												}
-												if(
+												if (
 													empty($_POST['excel'])
-													|| $_POST['excel'] == 'usulan' 
+													|| $_POST['excel'] == 'usulan'
 													|| $_POST['excel'] == 'usulan_penetapan'
-												){
+												) {
 													$tbody2 .= "<td class='text-center'>" . $nilai_usulan . "</td>";
 													$tbody2 .= "<td class='text-center'></td>";
 												}
 												if (!$this->is_admin_panrb()) {
 													$tbody2 .= "<td class='text-center'><div class='bukti-dukung-view' kp-id='" . $penilaian['kp_id'] . "'>" . $bukti_dukung . "</div>" . $tombol_bukti . "</td>";
-													if(
+													if (
 														empty($_POST['excel'])
-														|| $_POST['excel'] == 'usulan' 
+														|| $_POST['excel'] == 'usulan'
 														|| $_POST['excel'] == 'usulan_penetapan'
-													){
+													) {
 														$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "' $disabled>" . $penilaian['pl_keterangan'] . "</textarea></td>";
 													}
 												} else {
 													$tbody2 .= "<td class='text-center'><div class='bukti-dukung-view' kp-id='" . $penilaian['kp_id'] . "'>" . $bukti_dukung . "</div></td>";
-													if(
+													if (
 														empty($_POST['excel'])
-														|| $_POST['excel'] == 'usulan' 
+														|| $_POST['excel'] == 'usulan'
 														|| $_POST['excel'] == 'usulan_penetapan'
-													){
+													) {
 														$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan'] . "</textarea></td>";
 													}
 												}
-												if(
+												if (
 													empty($_POST['excel'])
-													|| $_POST['excel'] == 'usulan' 
+													|| $_POST['excel'] == 'usulan'
 													|| $_POST['excel'] == 'usulan_penetapan'
-												){
+												) {
 													$tbody2 .= $kerangka_logis;
 												}
-												if(
+												if (
 													empty($_POST['excel'])
-													|| $_POST['excel'] == 'penetapan' 
+													|| $_POST['excel'] == 'penetapan'
 													|| $_POST['excel'] == 'usulan_penetapan'
-												){
+												) {
 													$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' disabled>" . $opsi_penetapan . "</select></td>";
 													$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
 													$tbody2 .= "<td class='text-center'></td>";
 													$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
 													$tbody2 .= $kerangka_logis_penetapan;
 												}
-												if(empty($_POST['excel'])){
+												if (empty($_POST['excel'])) {
 													if ($disabled == '') {
 														if (!$this->is_admin_panrb()) {
 															$tbody2 .= "<td class='text-center'>" . $btn_save . "</td>";
@@ -876,36 +908,36 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 													$btn_save_penetapan = "<button class='btn btn-info' onclick='simpanPerubahanPenetapan(" . $penilaian['kp_id'] . ")' title='Simpan Perubahan Penetapan'><span class='dashicons dashicons-saved' ></span></button>";
 												}
 
-												if(
+												if (
 													empty($_POST['excel'])
-													|| $_POST['excel'] == 'usulan' 
+													|| $_POST['excel'] == 'usulan'
 													|| $_POST['excel'] == 'usulan_penetapan'
-												){
+												) {
 													$tbody2 .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "' disabled>" . $opsi . "</select></td>";
 													$tbody2 .= "<td class='text-center'>" . $nilai_usulan . "</td>";
 													$tbody2 .= "<td class='text-center'></td>";
 												}
 												$tbody2 .= "<td class='text-center'><div class='bukti-dukung-view' kp-id='" . $penilaian['kp_id'] . "'>" . $bukti_dukung . "</div></td>";
-												if(
+												if (
 													empty($_POST['excel'])
-													|| $_POST['excel'] == 'usulan' 
+													|| $_POST['excel'] == 'usulan'
 													|| $_POST['excel'] == 'usulan_penetapan'
-												){
+												) {
 													$tbody2 .= "<td class='text-center'><textarea id='keteranganUsulan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan'] . "</textarea></td>";
 													$tbody2 .= $kerangka_logis;
 												}
-												if(
+												if (
 													empty($_POST['excel'])
-													|| $_POST['excel'] == 'penetapan' 
+													|| $_POST['excel'] == 'penetapan'
 													|| $_POST['excel'] == 'usulan_penetapan'
-												){
+												) {
 													$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' " . $disabled . ">" . $opsi_penetapan . "</select></td>";
 													$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
 													$tbody2 .= "<td class='text-center'></td>";
 													$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'" . $disabled . ">" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
 													$tbody2 .= $kerangka_logis_penetapan;
 												}
-												if(empty($_POST['excel'])){
+												if (empty($_POST['excel'])) {
 													if ($disabled == '') {
 														if (!$this->is_admin_panrb()) {
 															$tbody2 .= "<td class='text-center'>" . $btn_save_penetapan . "</td>";
@@ -940,11 +972,11 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						$tbody .= "<td class='text-left'>" . $counter++ . "</td>";
 						$tbody .= "<td class='text-left' colspan='3'><b>" . $komponen['nama'] . "</b></td>";
 						$tbody .= "<td class='text-center'>" . $komponen['bobot'] . "</td>";
-						if(
+						if (
 							empty($_POST['excel'])
-							|| $_POST['excel'] == 'usulan' 
+							|| $_POST['excel'] == 'usulan'
 							|| $_POST['excel'] == 'usulan_penetapan'
-						){
+						) {
 							$tbody .= "<td class='text-left'></td>";
 							$tbody .= "<td class='text-center'>" . number_format($sum_nilai_sub, 2) . "</td>";
 							$tbody .= "<td class='text-center'>" . number_format($persentase_kom * 100, 2) . "%" . "</td>";
@@ -952,23 +984,23 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						}
 
 						// kolom bukti dukung di laporan penetapan
-						if($_POST['excel'] == 'penetapan'){
+						if ($_POST['excel'] == 'penetapan') {
 							$tbody2 .= "<td class='text-center'></td>";
 						}
-						if(
+						if (
 							empty($_POST['excel'])
-							|| $_POST['excel'] == 'penetapan' 
+							|| $_POST['excel'] == 'penetapan'
 							|| $_POST['excel'] == 'usulan_penetapan'
-						){
+						) {
 							$tbody .= "<td class='text-center'></td>";
 							$tbody .= "<td class='text-center'>" . number_format($sum_nilai_sub_penetapan, 2) .  "</td>";
 							$tbody .= "<td class='text-center'>" . number_format($persentase_kom_penetapan * 100, 2) . "%" . "</td>";
 						}
-						if(
+						if (
 							empty($_POST['excel'])
-							|| $_POST['excel'] == 'penetapan' 
+							|| $_POST['excel'] == 'penetapan'
 							|| $_POST['excel'] == 'usulan_penetapan'
-						){
+						) {
 							$tbody .= "<td class='text-center' colspan='3'></td>";
 						}
 						$tbody .= "</tr>";
@@ -1069,12 +1101,12 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				}
 
 				//validasi nilai
-				$valid_values = [0, 0.25, 0.5, 0.75, 1];
-				if (!in_array($nilai_penetapan, $valid_values)) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Aksi ditolak - nilai yang dimasukkan tidak valid!';
-					die(json_encode($ret));
-				}
+				// $valid_values = [0, 0.25, 0.5, 0.75, 1];
+				// if (!in_array($nilai_penetapan, $valid_values)) {
+				// 	$ret['status'] = 'error';
+				// 	$ret['message'] = 'Aksi ditolak - nilai yang dimasukkan tidak valid!';
+				// 	die(json_encode($ret));
+				// }
 
 				//validasi user
 				$current_user = wp_get_current_user();
@@ -1242,12 +1274,12 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				}
 
 				//validasi nilai
-				$valid_values = [0, 0.25, 0.5, 0.75, 1];
-				if (!in_array($nilai_usulan, $valid_values)) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Aksi ditolak - nilai yang dimasukkan tidak valid!';
-					die(json_encode($ret));
-				}
+				// $valid_values = [0, 0.25, 0.5, 0.75, 1];
+				// if (!in_array($nilai_usulan, $valid_values)) {
+				// 	$ret['status'] = 'error';
+				// 	$ret['message'] = 'Aksi ditolak - nilai yang dimasukkan tidak valid!';
+				// 	die(json_encode($ret));
+				// }
 
 				//validasi user
 				$current_user = wp_get_current_user();
@@ -1426,7 +1458,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								$all_dokumen[$v][$key]['dokumen'] = 'dokumen_pemda/' . $dok['dokumen'];
 							}
 						}
-						
+
 						if ($v == 'esakip_renstra') {
 							$jadwal_periode = $wpdb->get_results(
 								$wpdb->prepare("
@@ -1558,7 +1590,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								'post_status' => 'private'
 							));
 						}
-						if(!empty($dokumen)){
+						if (!empty($dokumen)) {
 							$dokumen['url'] .= '&id_skpd=' . $_POST['id_skpd'];
 							$ret['upload_bukti_dukung'] .= '<a style="margin-left: 5px;" class="btn btn-warning" target="_blank" href="' . $dokumen['url'] . '">' . $dokumen['title'] . '</a>';
 						}
