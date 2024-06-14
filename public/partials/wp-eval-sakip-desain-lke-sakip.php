@@ -252,29 +252,16 @@ foreach ($user_penilai as $key => $val) {
                                 <option value="3">Custom</option>
                             </select>
                         </div>
+                        <div class="form-group col-md-4" id="bobotPenilaian">
+                            <label for="bobotPenilaian">Bobot</label>
+                            <input type="number" class="form-control" id="bobotPenilaian" name="bobotPenilaian" required>
+                        </div>
                         <div class="form-group col-md-4">
                             <label for="nomorUrutPenilaian">Nomor Urut</label>
                             <input type="number" class="form-control" id="nomorUrutPenilaian" name="nomorUrutPenilaian">
                             <small class="text-muted text-sm-left" id="defaultTextInfoCustom"> Default Nomor Urut</small>
                         </div>
-                        <div class="form-group col-md-4">
-                            <label for="bobotPenilaian">Bobot</label>
-                            <input type="number" class="form-control" id="bobotPenilaian" name="bobotPenilaian" required>
-                        </div>
                     </div>
-                    <table id="tablePenilaianCustom" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
-                        <div id="buttonOpsiCustom"></div>
-                        <thead>
-                            <tr>
-                                <th class="text-center" style="width: 10%;">No</th>
-                                <th class="text-center" style="width: 60%;">Nama</th>
-                                <th class="text-center" style="width: 10%;">Nilai</th>
-                                <th class="text-center" style="width: 20%;">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
                     <div class="form-group">
                         <label>Pilih Jenis Bukti Dukung <small class="text-secondary">( minimal 1 atau bisa lebih dari 1 )</small></label>
                         <div class="row">
@@ -444,13 +431,45 @@ foreach ($user_penilai as $key => $val) {
     </div>
 </div>
 
+<div class="modal fade bd-example-modal-xl" id="OpsiCustomModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="OpsiCustomModalLabel">Tambah Opsi Custom</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table id="tablePenilaianCustom" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                    <div id="buttonOpsiCustom"></div>
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 10%;">No</th>
+                            <th class="text-center" style="width: 60%;">Nama</th>
+                            <th class="text-center" style="width: 10%;">Nilai</th>
+                            <th class="text-center" style="width: 20%;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" onclick="submit_opsi_custom(); return false">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal untuk menambah Opsi Kustom komponen penilaian -->
 <div class="modal fade bd-example-modal-lg" id="tambahOpsiCustomModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="tambahOpsiCustomModalLabel">Tambah Opsi Custom</h5>
                 <h5 class="modal-title" id="editOpsiCustomModalLabel">Edit Opsi Custom</h5>
+                <h5 class="modal-title" id="tambahOpsiCustomModalLabel">Tambah Opsi Custom</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -484,6 +503,7 @@ foreach ($user_penilai as $key => $val) {
     </div>
 </div>
 
+
 <script>
     jQuery(document).ready(function() {
         get_table_desain_sakip();
@@ -492,8 +512,8 @@ foreach ($user_penilai as $key => $val) {
 
         jQuery('#subkomponenPembandingContainer').hide();
         jQuery('#komponenPenilaianPembandingContainer').hide();
-        jQuery('#tablePenilaianCustom').hide();
-        jQuery('#buttonOpsiCustom').hide();
+        jQuery('#bobotPenilaian').hide();
+        // jQuery('#buttonOpsiCustom').hide();
 
         // Handle change event kerangka logis
         jQuery('#jenisKerangkaLogis').on('change', function() {
@@ -514,17 +534,13 @@ foreach ($user_penilai as $key => $val) {
         jQuery('#tipeJawaban').on('change', function() {
             let tipeJawaban = jQuery(this).val();
             if (tipeJawaban == '1') {
-                jQuery('#tablePenilaianCustom').hide();
-                jQuery('#buttonOpsiCustom').hide();
+                jQuery('#bobotPenilaian').hide();
             } else if (tipeJawaban == '2') {
-                jQuery('#tablePenilaianCustom').hide();
-                jQuery('#buttonOpsiCustom').hide();
+                jQuery('#bobotPenilaian').hide();
             } else if (tipeJawaban == '3') {
-                jQuery('#tablePenilaianCustom').show();
-                jQuery('#buttonOpsiCustom').show();
+                jQuery('#bobotPenilaian').show();
             } else {
-                jQuery('#tablePenilaianCustom').hide();
-                jQuery('#buttonOpsiCustom').hide();
+                jQuery('#bobotPenilaian').hide();
             }
         });
     })
@@ -563,7 +579,16 @@ foreach ($user_penilai as $key => $val) {
         jQuery('#namaOpsiCustom').val('');
         jQuery('#nilaiOpsi').val('');
         jQuery('#nomorUrutOpsi').val('');
+        jQuery('#editOpsiCustomModalLabel').hide();
+        jQuery('#tambahOpsiCustomModalLabel').show();
         jQuery('#tambahOpsiCustomModal').modal('show');
+    }
+
+    function tambah_opsi_modal(id) {
+        getTableOpsiCustom(id).then(() => {
+            jQuery('#idKomponenPenilaian').val(id);
+            jQuery('#OpsiCustomModal').modal('show');
+        })
     }
 
     function get_table_kerangka_logis(id) {
@@ -641,7 +666,7 @@ foreach ($user_penilai as $key => $val) {
             data: {
                 action: 'get_option_custom_by_id',
                 api_key: esakip.api_key,
-                id: id 
+                id: id
             },
             dataType: "json",
             success: function(response) {
@@ -655,6 +680,7 @@ foreach ($user_penilai as $key => $val) {
                     jQuery('#nomorUrutOpsi').val(response.data.nomor_urut);
                     jQuery('#tambahOpsiCustomModalLabel').hide();
                     jQuery('#editOpsiCustomModalLabel').show();
+                    jQuery('#tambahOpsiCustomModal').modal('show');
                 } else {
                     console.error('Error:', response.message);
                 }
@@ -664,7 +690,6 @@ foreach ($user_penilai as $key => $val) {
                 console.error('AJAX Error:', status, error);
             }
         });
-        jQuery('#tambahOpsiCustomModal').modal('show');
     }
 
     function tambah_komponen_utama(id) {
@@ -767,6 +792,7 @@ foreach ($user_penilai as $key => $val) {
                     jQuery('#penjelasan').val('');
                     jQuery('#bobotPenilaian').val('');
                     jQuery('#langkahKerja').val('');
+                    jQuery('#bobotPenilaian').hide();
                     jQuery('#tipeJawaban').val('');
                     jQuery('input[type=checkbox]').prop('checked', false);
                     jQuery("#keterangan").val('');
@@ -889,49 +915,50 @@ foreach ($user_penilai as $key => $val) {
     }
 
     function edit_data_komponen_penilaian(id) {
-        getTableOpsiCustom(id).then(() => {
-            jQuery('#wrap-loading').show();
-            jQuery.ajax({
-                url: esakip.url,
-                type: 'POST',
-                data: {
-                    action: 'get_komponen_penilaian_lke_by_id',
-                    api_key: esakip.api_key,
-                    id: id
-                },
-                dataType: 'json',
-                success: function(response) {
-                    jQuery('#wrap-loading').hide();
-                    console.log(response);
-                    if (response.status === 'success') {
-                        let data = response.data;
-                        jQuery('#tambahPenilaianModalLabel').hide();
-                        jQuery('#editPenilaianModalLabel').show();
-                        jQuery('#defaultTextInfoPenilaian').hide();
-                        jQuery('#alertKomponen_penilaian').text('Nama Komponen = ' + data.komponen.nama + ' (' + data.komponen.bobot + ')');
-                        jQuery('#alertSub_penilaian').text('Nama Sub Komponen = ' + data.subkomponen.nama + ' (' + data.subkomponen.bobot + ')');
-                        jQuery("#idKomponenPenilaian").val(data.data.id);
-                        jQuery("#idSubKomponen_penilaian").val(data.data.id_subkomponen);
-                        jQuery("#namaPenilaian").val(data.data.nama);
-                        jQuery("#tipeJawaban").val(data.data.tipe);
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_komponen_penilaian_lke_by_id',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                console.log(response);
+                if (response.status === 'success') {
+                    let data = response.data;
+                    jQuery('#tambahPenilaianModalLabel').hide();
+                    jQuery('#editPenilaianModalLabel').show();
+                    jQuery('#defaultTextInfoPenilaian').hide();
+                    jQuery('#alertKomponen_penilaian').text('Nama Komponen = ' + data.komponen.nama + ' (' + data.komponen.bobot + ')');
+                    jQuery('#alertSub_penilaian').text('Nama Sub Komponen = ' + data.subkomponen.nama + ' (' + data.subkomponen.bobot + ')');
+                    jQuery("#idKomponenPenilaian").val(data.data.id);
+                    jQuery("#idSubKomponen_penilaian").val(data.data.id_subkomponen);
+                    jQuery("#namaPenilaian").val(data.data.nama);
+                    jQuery("#tipeJawaban").val(data.data.tipe);
+                    if (data.data.tipe == 3) {
+                        jQuery('#bobotPenilaian').show();
                         jQuery("#bobotPenilaian").val(data.data.bobot);
-                        jQuery("#keterangan").val(data.data.keterangan);
-                        jQuery("#penjelasan").val(data.data.penjelasan);
-                        jQuery("#langkahKerja").val(data.data.langkah_kerja);
-                        jQuery('#nomorUrutPenilaian').val(data.data.nomor_urut);
-                        setCheckBoxes(data.data.jenis_bukti_dukung);
-                        jQuery('#tambahPenilaianModal').modal('show');
-                    } else {
-                        alert(response.message);
                     }
-                },
-                error: function(xhr, status, error) {
-                    jQuery('#wrap-loading').hide();
-                    console.error(xhr.responseText);
-                    alert('Terjadi kesalahan saat memuat data!');
+                    jQuery("#keterangan").val(data.data.keterangan);
+                    jQuery("#penjelasan").val(data.data.penjelasan);
+                    jQuery("#langkahKerja").val(data.data.langkah_kerja);
+                    jQuery('#nomorUrutPenilaian').val(data.data.nomor_urut);
+                    setCheckBoxes(data.data.jenis_bukti_dukung);
+                    jQuery('#tambahPenilaianModal').modal('show');
+                } else {
+                    alert(response.message);
                 }
-            });
-        })
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data!');
+            }
+        });
     }
 
     function hapus_data_komponen(id) {
@@ -1192,10 +1219,11 @@ foreach ($user_penilai as $key => $val) {
         if (langkahKerja == '') {
             return alert('Langkah Kerja tidak boleh kosong');
         }
-
-        let bobotPenilaian = jQuery("#bobotPenilaian").val();
-        if (bobotPenilaian == '') {
-            return alert('Bobot Penilaian tidak boleh kosong');
+        if (tipeJawaban == 3) {
+            let bobotPenilaian = jQuery("#bobotPenilaian").val();
+            if (bobotPenilaian == '') {
+                return alert('Bobot Penilaian tidak boleh kosong');
+            }
         }
 
         let selectedBuktiDukung = [];
@@ -1343,7 +1371,7 @@ foreach ($user_penilai as $key => $val) {
                 if (response.status === 'success') {
                     alert(response.message);
                     jQuery('#tambahOpsiCustomModal').modal('hide');
-                    edit_data_komponen_penilaian(idKomponenPenilaian)
+                    tambah_opsi_modal(idKomponenPenilaian)
                 } else {
                     alert(response.message);
                 }
@@ -1463,7 +1491,7 @@ foreach ($user_penilai as $key => $val) {
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
                     alert(response.message);
-                    edit_data_komponen_penilaian(id_penilaian)
+                    tambah_opsi_modal(id_penilaian)
                 } else {
                     alert(response.message);
                 }

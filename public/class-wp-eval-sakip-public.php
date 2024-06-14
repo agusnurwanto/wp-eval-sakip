@@ -718,7 +718,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		$this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2;
 
-		if($nama_dokumen == 'RENSTRA' || $nama_dokumen == 'Pohon Kinerja dan Cascading'){
+		if ($nama_dokumen == 'RENSTRA' || $nama_dokumen == 'Pohon Kinerja dan Cascading') {
 			// Khusus di Settingan RENSTRA dan pohon kinerja tahun anggaran diganti dengan id jadwal periode renstra
 			$cek_settingan_menu = $wpdb->get_var($wpdb->prepare("
 				SELECT 
@@ -10554,7 +10554,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					foreach ($data_hak_akses as $v_hak_akses) {
 						if ($v_hak_akses['nama_tabel'] == 'esakip_renstra') {
 							$ret['data']['jenis_role'] = !empty($v_hak_akses['jenis_role']) ? $v_hak_akses['jenis_role'] : 2;
-						}else if($v_hak_akses['nama_tabel'] == 'esakip_pohon_kinerja_dan_cascading'){
+						} else if ($v_hak_akses['nama_tabel'] == 'esakip_pohon_kinerja_dan_cascading') {
 							$ret['data']['jenis_role_pohon_kinerja'] = !empty($v_hak_akses['jenis_role']) ? $v_hak_akses['jenis_role'] : 2;
 						}
 					}
@@ -10925,7 +10925,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					}
 
 					// update hak akses user pohon kinerja
-					$get_akses_user_this_periode_pohon_kinerja = $wpdb->get_row($wpdb->prepare('SELECT * FROM esakip_menu_dokumen WHERE nama_tabel=%s AND id_jadwal=%d AND active=1','esakip_pohon_kinerja_dan_cascading', $id), ARRAY_A);
+					$get_akses_user_this_periode_pohon_kinerja = $wpdb->get_row($wpdb->prepare('SELECT * FROM esakip_menu_dokumen WHERE nama_tabel=%s AND id_jadwal=%d AND active=1', 'esakip_pohon_kinerja_dan_cascading', $id), ARRAY_A);
 					$opsi['nama_tabel']		= 'esakip_pohon_kinerja_dan_cascading';
 					$opsi['nama_dokumen']	= 'Pohon Kinerja dan Cascading';
 					$opsi['jenis_role']		= $input_akses_user_pohon_kinerja;
@@ -15882,8 +15882,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				if (!empty($opsi_custom_datas)) {
 					foreach ($opsi_custom_datas as $datas) {
 						$btn = '<div class="btn-action-group">';
-						$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_opsi_custom(\'' . $datas['id'] . '\', \'' . $id_komponen_penilaian . '\'); return false;" href="#" title="Hapus Kerangka Logis"><span class="dashicons dashicons-no-alt"></span></button>';
-						$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_opsi_custom(\'' . $datas['id'] . '\', \'' . $id_komponen_penilaian . '\'); return false;" href="#" title="Hapus Kerangka Logis"><span class="dashicons dashicons-edit"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_opsi_custom(\'' . $datas['id'] . '\', \'' . $id_komponen_penilaian . '\'); return false;" href="#" title="Hapus Opsi Custom"><span class="dashicons dashicons-no-alt"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_opsi_custom(\'' . $datas['id'] . '\', \'' . $id_komponen_penilaian . '\'); return false;" href="#" title="Edit Opsi Custom"><span class="dashicons dashicons-edit"></span></button>';
 						$btn .= '</div>';
 
 						$tbody .= '<tr>';
@@ -16083,6 +16083,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									foreach ($grouped_data as $penilaian) {
 										$btn = '';
 										$btn .= '<div class="btn-action-group">';
+										$btn .= "<button class='btn btn-secondary' onclick='tambah_opsi_modal(\"" . $penilaian['kp_id'] . "\");' title='Tambah Opsi Penilaian Custom'><span class='dashicons dashicons-insert'></span></button>";
 										$btn .= "<button class='btn btn-info' onclick='tambah_kerangka_logis(\"" . $penilaian['kp_id'] . "\");' title='Tambah Kerangka Logis'><span class='dashicons dashicons-admin-generic'></span></button>";
 										$btn .= "<button class='btn btn-warning' onclick='edit_data_komponen_penilaian(\"" . $penilaian['kp_id'] . "\");' title='Edit Data'><span class='dashicons dashicons-edit'></span></button>";
 										$btn .= "<button class='btn btn-danger' onclick='hapus_data_komponen_penilaian(\"" . $penilaian['kp_id'] . "\");' title='Hapus Data'><span class='dashicons dashicons-trash'></span>";
@@ -17717,7 +17718,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'message' => 'Total bobot Sub Komponen Komponen Induknya!'
 						);
 						die(json_encode($ret));
-					} else if ($total_bobot < $bobot_penilaian) {
+					} else if ($bobot_subkomponen < $bobot_penilaian) {
 						$ret = array(
 							'status' => 'error',
 							'message' => 'Total bobot Komponen Penilaian Melebihi Subkomponen Induknya!'
@@ -17832,11 +17833,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Langkah Kerja kosong!';
 				}
-				if (!empty($_POST['bobot_penilaian'])) {
-					$bobot_penilaian = $_POST['bobot_penilaian'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Bobot Penilaian kosong!';
+				if ($tipe_komponen_penilaian == 3) {
+					if (!empty($_POST['bobot_penilaian'])) {
+						$bobot_penilaian = $_POST['bobot_penilaian'];
+					} else {
+						$ret['status'] = 'error';
+						$ret['message'] = 'Bobot Penilaian kosong!';
+					}
 				}
 				if ($ret['status'] === 'success') {
 					if (!empty($id_komponen_penilaian)) {
@@ -18060,7 +18063,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$ret['message'] = 'Melebihi maksimal bobot penilaian!';
 						die(json_encode($ret));
 					}
-					
+
 					if (!empty($id_opsi)) {
 						$wpdb->update(
 							'esakip_penilaian_custom',
@@ -22335,8 +22338,188 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$randomString = time() . '-' . $randomString;
 		return $randomString;
 	}
-	
-    public function get_table_pohon_kinerja()
+
+	public function get_table_cascading()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+				$get_tujuan = $wpdb->get_results("
+                    SELECT 
+                    	* 
+                    FROM esakip_rpd_tujuan
+                    WHERE id_unik_indikator IS NULL
+                     	AND active = 1
+                ", ARRAY_A);
+
+				if (!empty($get_tujuan)) {
+					$counter = 1;
+					$tbody = '';
+
+					foreach ($get_tujuan as $kk => $vv) {
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+						$tbody .= "<td>" . $vv['nama_cascading'] . "</td>";
+						$tbody .= "<td>" . $vv['tujuan_teks'] . "</td>";
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= '<button class="btn btn-sm btn-info" onclick="view_tujuan(\'' . $vv['id'] . '\') return false;" href="#" title="View"><span class="dashicons dashicons-visibility"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_cascading_pemda(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit"><span class="dashicons dashicons-edit"></span></button>';
+						$btn .= '</div>';
+
+						$tbody .= "<td class='text-center'>" . $btn . "</td>";
+						$tbody .= "</tr>";
+					}
+
+					$ret['data'] = $tbody;
+				} else {
+					$ret['data'] = "<tr><td colspan='8' class='text-center'>Tidak ada data tersedia</td></tr>";
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function edit_cascading_pemda()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT 
+								*
+							FROM esakip_rpd_tujuan
+							WHERE id = %d
+						", $_POST['id']),
+						ARRAY_A
+					);
+					$ret['data'] = $data;
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function submit_edit_cascading()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil edit data!',
+			'data' => array()
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (empty($_POST['id'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id kosong!';
+					die(json_encode($ret));
+				} else if (empty($_POST['nama_cascading'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Nama Cascading kosong!';
+					die(json_encode($ret));
+				} else {
+					$nama_cascading = $_POST['nama_cascading'];
+					$data = array(
+						'nama_cascading' => $nama_cascading,
+						'update_at' => current_time('mysql')
+					);
+					$wpdb->update('esakip_rpd_tujuan', $data, array('id' => $_POST['id']));
+				}
+			} else {
+				$ret['status']  = 'error';
+				$ret['message'] = 'Api key tidak ditemukan!';
+			}
+		} else {
+			$ret['status']  = 'error';
+			$ret['message'] = 'Format Salah!';
+		}
+
+		die(json_encode($ret));
+	}
+
+	public function get_chart_cascading()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'id Jadwal kosong!';
+					die(json_encode($ret));
+				}
+
+				// $id_tujuan = $wpdb->get_var(
+				// 	$wpdb->prepare("
+				// 		SELECT relasi_perencanaan
+				// 		FROM esakip_data_jadwal
+				// 		WHERE id_jadwal = %d
+				// 	", $id_jadwal)
+				// );
+
+
+			} else {
+				$ret['status']  = 'error';
+				$ret['message'] = 'Api key tidak ditemukan!';
+			}
+		} else {
+			$ret['status']  = 'error';
+			$ret['sql']  = $wpdb->last_query;
+			$ret['message'] = 'Format Salah!';
+		}
+
+		die(json_encode($ret));
+	}
+
+
+	public function get_table_pohon_kinerja()
 	{
 		global $wpdb;
 		$ret = array(
@@ -22429,7 +22612,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
-    public function get_table_tahun_pohon_kinerja()
+	public function get_table_tahun_pohon_kinerja()
 	{
 		global $wpdb;
 		$ret = array(
@@ -22494,7 +22677,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if (
-							!$this->is_admin_panrb() 
+							!$this->is_admin_panrb()
 							&& $this->hak_akses_upload_dokumen('Pohon Kinerja dan Cascading', $id_jadwal)
 						) {
 							$btn .= "<button class='btn btn-success' onclick='set_tahun_dokumen(" . $vv['id'] . "); return false;' title='Set Tahun Dokumen'><span class='dashicons dashicons-insert'></span></button>";
@@ -22530,7 +22713,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 		die(json_encode($ret));
 	}
-    
+
 	public function tambah_dokumen_pohon_kinerja()
 	{
 		global $wpdb;
@@ -22686,7 +22869,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
-	
+
 	public function get_detail_pohon_kinerja_by_id()
 	{
 		global $wpdb;
@@ -22783,7 +22966,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
-	
+
 	public function get_table_skpd_pohon_kinerja()
 	{
 		global $wpdb;
@@ -22836,10 +23019,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				", $id_jadwal),
 					ARRAY_A
 				);
-				
-				if(!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggaran'] > 1){
+
+				if (!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggaran'] > 1) {
 					$tahun_periode_selesai = $periode['tahun_selesai_anggaran'];
-				}else{
+				} else {
 					$tahun_periode_selesai = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
 				}
 
@@ -22897,7 +23080,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
-	
+
 	public function submit_tahun_pohon_kinerja()
 	{
 		global $wpdb;
