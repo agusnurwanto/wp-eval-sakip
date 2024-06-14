@@ -497,6 +497,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_table_cascading',  $plugin_public, 'get_table_cascading');
 		$this->loader->add_action('wp_ajax_edit_cascading_pemda',  $plugin_public, 'edit_cascading_pemda');
 		$this->loader->add_action('wp_ajax_submit_edit_cascading',  $plugin_public, 'submit_edit_cascading');
+		$this->loader->add_action('wp_ajax_view_cascading_pemda',  $plugin_public, 'view_cascading_pemda');
 
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
