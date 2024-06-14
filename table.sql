@@ -287,7 +287,7 @@ CREATE TABLE esakip_subkomponen (
   `id` int(11) NOT NULL auto_increment,
   `id_komponen` int(11) NOT NULL,
   `id_user_penilai` int(11) DEFAULT NULL,
-  `metode_penilaian` int(11) NOT NULL DEFAULT '1' COMMENT '1 = Rata-Rata, 0 = Nilai Dinamis',
+  `metode_penilaian` int(11) NOT NULL DEFAULT '1' COMMENT '1 = Rata-Rata, 2 = Nilai Dinamis',
   `nama` varchar(255) NOT NULL,
   `bobot` float NOT NULL,
   `nomor_urut` DECIMAL(10,2) NOT NULL,

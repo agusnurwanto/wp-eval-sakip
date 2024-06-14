@@ -18013,7 +18013,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									'bobot' => $bobot_penilaian,
 								),
 								array('id' => $id_komponen_penilaian),
-								array('%d', '%s', '%s', '%f', '%s', '%s', '%s', '%s', '%d'),
+								array('%d', '%s', '%s', '%f', '%s', '%s', '%s', '%s', '%f'),
 								array('%d')
 							);
 						} else {
@@ -18030,7 +18030,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									'jenis_bukti_dukung' => $bukti_dukung,
 									'bobot' => $bobot_penilaian,
 								),
-								array('%d', '%s', '%s', '%f', '%s', '%s', '%s', '%s', '%d'),
+								array('%d', '%s', '%s', '%f', '%s', '%s', '%s', '%s', '%f'),
 							);
 						}
 					}
