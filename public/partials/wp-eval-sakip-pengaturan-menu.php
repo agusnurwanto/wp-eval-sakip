@@ -130,6 +130,9 @@ $body = '';
                         <label for="keterangan">Keterangan</label>
                         <textarea class="form-control" id="keterangan" name="keterangan" rows="3"></textarea>
                     </div>
+					<div class="form-group" style="margin: 1.5rem 0 0;" id="keterangan_hak_akses_user">
+						<small class="d-block form-text text-muted">Setting Hak Akses Upload Dokumen "RENSTRA" dan "Pohon Kinerja dan Cascading" berada di setting penjadwalan RPJMD.</small>
+					</div>
                     <button type="submit" class="btn btn-primary" style="margin: 1.5em 0 0;" onclick="submit_pengaturan_menu(this); return false">Simpan</button>
                 </form>
             </div>
@@ -147,7 +150,7 @@ $body = '';
 
 		get_data_pengaturan_menu_pemda();
 		get_data_pengaturan_menu_perangkat_daerah();
-
+		jQuery('#keterangan_hak_akses_user').hide();
 	});
 
 	/** get data pengaturan menu pemda*/
@@ -243,8 +246,10 @@ $body = '';
 						jQuery("#no_urut").val(data.default_urutan);
 						if(data.nama_tabel == 'esakip_renstra' || data.nama_tabel == 'esakip_pohon_kinerja_dan_cascading'){
 							jQuery('#setting_hak_akses_user').hide();
+							jQuery('#keterangan_hak_akses_user').show();
 						}else{
 							jQuery('#setting_hak_akses_user').show();
+							jQuery('#keterangan_hak_akses_user').hide();
 						}
 					}
                     jQuery("#idDokumen").val(id);

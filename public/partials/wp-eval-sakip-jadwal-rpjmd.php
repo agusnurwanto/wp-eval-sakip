@@ -114,7 +114,25 @@ $body = '';
 						<?php echo $select_rpjpd; ?>
 					</select>
 				</div>
-				<div class="form-group">
+				<div class="form-group" style="margin: 1.5rem 0;">
+					<label class="d-block">Pengaturan Menu Upload Dokumen RENSTRA</label>
+					<tr>
+						<td>
+							<div class="custom-control custom-radio custom-control-inline">
+								<input class="custom-control-input" type="radio" name="menu_dokumen" id="menu_dokumen_tampil" value="tampil" checked>
+								<label class="custom-control-label" for="menu_dokumen_tampil">Tampilkan</label>
+							</div>
+						</td>
+						<td>
+							<div class="custom-control custom-radio custom-control-inline">
+								<input class="custom-control-input" type="radio" name="menu_dokumen" id="menu_dokumen_sembunyi" value="sembunyi">
+								<label class="custom-control-label" for="menu_dokumen_sembunyi">Sembunyikan</label>
+							</div>
+						</td>
+					</tr>
+					<small class="d-block form-text text-muted">Setting Menu Upload Dokumen Yang Tampil Di Dashboard User Per Periode</small>
+				</div>
+				<div class="form-group" style="margin: 1.5rem 0;">
 					<label class="d-block">Pengaturan Akses User Upload Dokumen RENSTRA</label>
 					<tr>
 						<td>
@@ -138,7 +156,25 @@ $body = '';
 					</tr>
 					<small class="d-block form-text text-muted">Setting User Yang Bisa Mengakses Upload Dokumen RENSTRA</small>
 				</div>
-				<div class="form-group">
+				<div class="form-group" style="margin: 1.5rem 0;">
+					<label class="d-block">Pengaturan Menu Upload Dokumen Pohon Kinerja dan Cascading</label>
+					<tr>
+						<td>
+							<div class="custom-control custom-radio custom-control-inline">
+								<input class="custom-control-input" type="radio" name="menu_dokumen_pohon_kinerja" id="menu_dokumen_tampil_pohon_kinerja" value="tampil" checked>
+								<label class="custom-control-label" for="menu_dokumen_tampil_pohon_kinerja">Tampilkan</label>
+							</div>
+						</td>
+						<td>
+							<div class="custom-control custom-radio custom-control-inline">
+								<input class="custom-control-input" type="radio" name="menu_dokumen_pohon_kinerja" id="menu_dokumen_sembunyi_pohon_kinerja" value="sembunyi">
+								<label class="custom-control-label" for="menu_dokumen_sembunyi_pohon_kinerja">Sembunyikan</label>
+							</div>
+						</td>
+					</tr>
+					<small class="d-block form-text text-muted">Setting Menu Upload Dokumen Yang Tampil Di Dashboard User Per Periode</small>
+				</div>
+				<div class="form-group" style="margin: 1.5rem 0;">
 					<label class="d-block">Pengaturan Akses User Upload Dokumen Pohon Kinerja</label>
 					<tr>
 						<td>
@@ -269,8 +305,10 @@ $body = '';
 		let jenis_khusus_rpjmd = jQuery("input[name='jenis_khusus_rpjmd']:checked").val()
 		let akses_user = jQuery("input[name='akses_user_upload_dokumen']:checked").val();
 		let akses_user_pohon_kinerja = jQuery("input[name='akses_user_upload_dokumen_pohon_kinerja']:checked").val();
+		let menu_dokumen = jQuery("input[name='menu_dokumen']:checked").val();
+		let menu_dokumen_pohon_kinerja = jQuery("input[name='menu_dokumen_pohon_kinerja']:checked").val();
 
-		if (nama_jadwal.trim() == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '' || jenis_khusus_rpjmd == '' || akses_user == '' || akses_user_pohon_kinerja == '') {
+		if (nama_jadwal.trim() == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '' || jenis_khusus_rpjmd == '' || akses_user == '' || akses_user_pohon_kinerja == '' || menu_dokumen == '' || menu_dokumen_pohon_kinerja == '') {
 			jQuery("#wrap-loading").hide()
 			alert("Ada yang kosong, Harap diisi semua")
 			return false
@@ -291,7 +329,9 @@ $body = '';
 					'jenis_khusus_rpjmd': jenis_khusus_rpjmd,
 					'tahun_selesai_anggaran': tahun_selesai_anggaran,
 					'akses_user': akses_user,
-					'akses_user_pohon_kinerja': akses_user_pohon_kinerja
+					'akses_user_pohon_kinerja': akses_user_pohon_kinerja,
+					'menu_dokumen': menu_dokumen,
+					'menu_dokumen_pohon_kinerja': menu_dokumen_pohon_kinerja
 				},
 				beforeSend: function() {
 					jQuery('.submitBtn').attr('disabled', 'disabled')
@@ -352,6 +392,8 @@ $body = '';
 				}
 				jQuery("input[name=akses_user_upload_dokumen][value='"+akses_user+"']").prop("checked",true);
 
+				jQuery("input[name=menu_dokumen][value='"+response.data.hak_akses_renstra+"']").prop("checked",true);
+
 				// setting pohon kinerja
 				let akses_user_pohon_kinerja = '';
 				if(response.data.jenis_role_pohon_kinerja == 1){
@@ -362,6 +404,8 @@ $body = '';
 					akses_user_pohon_kinerja = 'semua';
 				}
 				jQuery("input[name=akses_user_upload_dokumen_pohon_kinerja][value='"+akses_user_pohon_kinerja+"']").prop("checked",true);
+
+				jQuery("input[name=menu_dokumen_pohon_kinerja][value='"+response.data.hak_akses_pohon_kinerja+"']").prop("checked",true);
 			}
 		})
 	}
@@ -376,8 +420,10 @@ $body = '';
 		let jenis_khusus_rpjmd = jQuery("input[name='jenis_khusus_rpjmd']:checked").val()
 		let akses_user = jQuery("input[name='akses_user_upload_dokumen']:checked").val();
 		let akses_user_pohon_kinerja = jQuery("input[name='akses_user_upload_dokumen_pohon_kinerja']:checked").val();
+		let menu_dokumen = jQuery("input[name='menu_dokumen']:checked").val();
+		let menu_dokumen_pohon_kinerja = jQuery("input[name='menu_dokumen_pohon_kinerja']:checked").val();
 
-		if (nama_jadwal.trim() == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '' || jenis_khusus_rpjmd == '' || akses_user == '' || akses_user_pohon_kinerja == '') {
+		if (nama_jadwal.trim() == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '' || jenis_khusus_rpjmd == '' || akses_user == '' || akses_user_pohon_kinerja == '' || menu_dokumen == '' || menu_dokumen_pohon_kinerja == '') {
 			jQuery("#wrap-loading").hide()
 			alert("Ada yang kosong, Harap diisi semua")
 			return false
@@ -398,7 +444,9 @@ $body = '';
 					'jenis_khusus_rpjmd': jenis_khusus_rpjmd,
 					'tahun_selesai_anggaran': tahun_selesai_anggaran,
 					'akses_user' : akses_user,
-					'akses_user_pohon_kinerja' : akses_user_pohon_kinerja
+					'akses_user_pohon_kinerja' : akses_user_pohon_kinerja,
+					'menu_dokumen' : menu_dokumen,
+					'menu_dokumen_pohon_kinerja' : menu_dokumen_pohon_kinerja
 				},
 				beforeSend: function() {
 					jQuery('.submitBtn').attr('disabled', 'disabled')
