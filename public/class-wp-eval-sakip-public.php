@@ -16107,7 +16107,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									foreach ($grouped_data as $penilaian) {
 										$btn = '';
 										$btn .= '<div class="btn-action-group">';
-										$btn .= "<button class='btn btn-secondary' onclick='tambah_opsi_modal(\"" . $penilaian['kp_id'] . "\");' title='Tambah Opsi Penilaian Custom'><span class='dashicons dashicons-insert'></span></button>";
+										if ($subkomponen['metode_penilaian'] == 2) {
+											$btn .= "<button class='btn btn-secondary' onclick='tambah_opsi_modal(\"" . $penilaian['kp_id'] . "\");' title='Tambah Opsi Penilaian Custom'><span class='dashicons dashicons-insert'></span></button>";
+										}
 										$btn .= "<button class='btn btn-info' onclick='tambah_kerangka_logis(\"" . $penilaian['kp_id'] . "\");' title='Tambah Kerangka Logis'><span class='dashicons dashicons-admin-generic'></span></button>";
 										$btn .= "<button class='btn btn-warning' onclick='edit_data_komponen_penilaian(\"" . $penilaian['kp_id'] . "\");' title='Edit Data'><span class='dashicons dashicons-edit'></span></button>";
 										$btn .= "<button class='btn btn-danger' onclick='hapus_data_komponen_penilaian(\"" . $penilaian['kp_id'] . "\");' title='Hapus Data'><span class='dashicons dashicons-trash'></span>";
@@ -17736,6 +17738,49 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 
 				if ($ret['status'] === 'success') {
+					$cek_status = '';
+					if ($metode_penilaian == 1) {
+						$cek_status = $wpdb->get_var(
+							$wpdb->prepare("
+							SELECT tipe
+							FROM esakip_komponen_penilaian
+							WHERE id_subkomponen = %d 
+							  AND tipe = 3 
+							  AND active = 1;
+							", $id_subkomponen)
+						);
+						if (!empty($cek_status)) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Metode Rata - Rata Tidak Dapat Mempunyai Tipe Penilaian Custom!'
+							);
+							die(json_encode($ret));
+						}
+					} else if ($metode_penilaian == 2) {
+						$cek_status = $wpdb->get_var(
+							$wpdb->prepare("
+							SELECT tipe
+							FROM esakip_komponen_penilaian
+							WHERE id_subkomponen = %d 
+							  AND (tipe = 1 OR tipe = 2) 
+							  AND active = 1;
+							", $id_subkomponen)
+						);
+						if (!empty($cek_status)) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Metode Dinamis Hanya Dapat Mempunyai Tipe Penilaian Custom!'
+							);
+							die(json_encode($ret));
+						}
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message' => 'Metode Penilaian Tidak Valid!'
+						);
+						die(json_encode($ret));
+					}
+
 					if (!empty($id_subkomponen)) {
 						$old_bobot = $wpdb->get_var(
 							$wpdb->prepare("
@@ -18387,7 +18432,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								SELECT 
 									nama,
 									id_komponen,
-									bobot
+									bobot,
+									metode_penilaian
 								FROM esakip_subkomponen
 								WHERE id = %d
 							", $_POST['id']),
@@ -18413,11 +18459,26 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							", $_POST['id'])
 						);
 
+						//option dinamis
+						$opsi_tipe = '<option val="" selected disabled>Pilih Tipe Jawaban</option>';
+						//rata rata
+						if ($data_subkomponen['metode_penilaian'] == 1) {
+							$opsi_tipe .= '
+								<option value="1">Y/T</option>
+								<option value="2">A/B/C/D/E</option>
+							';
+						//nilai dinamis
+						} else if ($data_subkomponen['metode_penilaian'] == 2) {
+							$opsi_tipe .= '
+								<option value="3">Custom</option>
+							';
+						}
+
 						if ($default_urutan === null) {
 							$default_urutan = 0;
 						}
 
-						$ret['data'] = ['subkomponen' => $data_subkomponen] + ['default_urutan' => $default_urutan] + ['komponen' => $data_komponen];
+						$ret['data'] = ['subkomponen' => $data_subkomponen] + ['default_urutan' => $default_urutan] + ['komponen' => $data_komponen] + ['opsi_tipe' => $opsi_tipe];
 					} else {
 						$ret = array(
 							'status' => 'error',
@@ -18605,7 +18666,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								SELECT 
 									nama,
 									id_komponen,
-									bobot
+									bobot,
+									metode_penilaian
 								FROM esakip_subkomponen
 								WHERE id = %d
 							", $data['id_subkomponen']),
@@ -18622,6 +18684,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							", $data_subkomponen['id_komponen']),
 							ARRAY_A
 						);
+						//option dinamis
+						$opsi_tipe = '<option val="" selected disabled>Pilih Tipe Jawaban</option>';
+						//rata rata
+						if ($data_subkomponen['metode_penilaian'] == 1) {
+							$opsi_tipe .= '
+								<option value="1">Y/T</option>
+								<option value="2">A/B/C/D/E</option>
+							';
+						//nilai dinamis
+						} else if ($data_subkomponen['metode_penilaian'] == 2) {
+							$opsi_tipe .= '
+								<option value="3">Custom</option>
+							';
+						}
+
 						$jenis_bukti_dukung = $data['jenis_bukti_dukung'];
 						if (!empty($jenis_bukti_dukung) && is_string($jenis_bukti_dukung)) {
 							$data['jenis_bukti_dukung'] = json_decode(stripslashes($jenis_bukti_dukung), true);
@@ -18634,6 +18711,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$merged_data['data'] = $data;
 						$merged_data['subkomponen'] = $data_subkomponen;
 						$merged_data['komponen'] = $data_komponen;
+						$merged_data['opsi_tipe'] = $opsi_tipe;
 
 						$ret['data'] = $merged_data;
 					} else {

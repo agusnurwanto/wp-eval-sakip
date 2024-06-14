@@ -30,6 +30,7 @@ $user_penilai_html = '<option value="">Pilih user</option>';
 foreach ($user_penilai as $key => $val) {
     $user_penilai_html .= '<option value="' . $key . '">' . $val . '</option>';
 }
+
 ?>
 <style>
     .wrap-table {
@@ -246,13 +247,10 @@ foreach ($user_penilai as $key => $val) {
                         <div class="form-group col-md-4">
                             <label for="tipeJawaban">Tipe Jawaban</label>
                             <select class="form-control" id="tipeJawaban" name="tipeJawaban" required>
-                                <option value="" selected disabled>Pilih Tipe Jawaban</option>
-                                <option value="1">Y/T</option>
-                                <option value="2">A/B/C/D/E</option>
-                                <option value="3">Custom</option>
+                               
                             </select>
                         </div>
-                        <div class="form-group col-md-4" id="bobotPenilaian">
+                        <div class="form-group col-md-4" id="bobotPenilaianLabel">
                             <label for="bobotPenilaian">Bobot</label>
                             <input type="number" class="form-control" id="bobotPenilaian" name="bobotPenilaian" required>
                         </div>
@@ -431,6 +429,7 @@ foreach ($user_penilai as $key => $val) {
     </div>
 </div>
 
+<!-- Modal untuk menambah Opsi Kustom komponen penilaian -->
 <div class="modal fade bd-example-modal-xl" id="OpsiCustomModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -457,7 +456,6 @@ foreach ($user_penilai as $key => $val) {
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-info" data-dismiss="modal">Tutup</button>
-                <button type="button" class="btn btn-primary" onclick="submit_opsi_custom(); return false">Simpan</button>
             </div>
         </div>
     </div>
@@ -513,10 +511,12 @@ foreach ($user_penilai as $key => $val) {
         jQuery('#subkomponenPembandingContainer').hide();
         jQuery('#komponenPenilaianPembandingContainer').hide();
         jQuery('#bobotPenilaian').hide();
-        // jQuery('#buttonOpsiCustom').hide();
+        jQuery('#bobotPenilaianLabel').hide();
 
         // Handle change event kerangka logis
         jQuery('#jenisKerangkaLogis').on('change', function() {
+            console.log('tipeJawaban changed to:', jQuery(this).val());
+
             let jenisKerangkaLogis = jQuery(this).val();
             if (jenisKerangkaLogis == '1') {
                 jQuery('#subkomponenPembandingContainer').show();
@@ -535,12 +535,16 @@ foreach ($user_penilai as $key => $val) {
             let tipeJawaban = jQuery(this).val();
             if (tipeJawaban == '1') {
                 jQuery('#bobotPenilaian').hide();
+                jQuery('#bobotPenilaianLabel').hide();
             } else if (tipeJawaban == '2') {
                 jQuery('#bobotPenilaian').hide();
+                jQuery('#bobotPenilaianLabel').hide();
             } else if (tipeJawaban == '3') {
                 jQuery('#bobotPenilaian').show();
+                jQuery('#bobotPenilaianLabel').show();
             } else {
                 jQuery('#bobotPenilaian').hide();
+                jQuery('#bobotPenilaianLabel').hide();
             }
         });
     })
@@ -579,6 +583,7 @@ foreach ($user_penilai as $key => $val) {
         jQuery('#namaOpsiCustom').val('');
         jQuery('#nilaiOpsi').val('');
         jQuery('#nomorUrutOpsi').val('');
+        jQuery('#defaultTextInfoCustom').show();
         jQuery('#editOpsiCustomModalLabel').hide();
         jQuery('#tambahOpsiCustomModalLabel').show();
         jQuery('#tambahOpsiCustomModal').modal('show');
@@ -680,6 +685,7 @@ foreach ($user_penilai as $key => $val) {
                     jQuery('#nomorUrutOpsi').val(response.data.nomor_urut);
                     jQuery('#tambahOpsiCustomModalLabel').hide();
                     jQuery('#editOpsiCustomModalLabel').show();
+                    jQuery('#defaultTextInfoCustom').hide();
                     jQuery('#tambahOpsiCustomModal').modal('show');
                 } else {
                     console.error('Error:', response.message);
@@ -790,12 +796,14 @@ foreach ($user_penilai as $key => $val) {
                     jQuery('#alertSub_penilaian').text('Nama Sub Komponen = ' + data.subkomponen.nama);
                     jQuery('#namaPenilaian').val('');
                     jQuery('#penjelasan').val('');
+                    jQuery('#bobotPenilaianLabel').hide();
                     jQuery('#bobotPenilaian').val('');
-                    jQuery('#langkahKerja').val('');
                     jQuery('#bobotPenilaian').hide();
+                    jQuery('#langkahKerja').val('');
                     jQuery('#tipeJawaban').val('');
                     jQuery('input[type=checkbox]').prop('checked', false);
                     jQuery("#keterangan").val('');
+                    jQuery('#tipeJawaban').html(data.opsi_tipe);
                     jQuery('#nomorUrutPenilaian').val(parseFloat(data.default_urutan) + 1.00);
                 } else {
                     console.error('Error:', response.message);
@@ -938,10 +946,15 @@ foreach ($user_penilai as $key => $val) {
                     jQuery("#idKomponenPenilaian").val(data.data.id);
                     jQuery("#idSubKomponen_penilaian").val(data.data.id_subkomponen);
                     jQuery("#namaPenilaian").val(data.data.nama);
+                    jQuery('#tipeJawaban').html(data.opsi_tipe);
                     jQuery("#tipeJawaban").val(data.data.tipe);
                     if (data.data.tipe == 3) {
                         jQuery('#bobotPenilaian').show();
+                        jQuery('#bobotPenilaianLabel').show();
                         jQuery("#bobotPenilaian").val(data.data.bobot);
+                    } else {
+                        jQuery('#bobotPenilaian').hide();
+                        jQuery('#bobotPenilaianLabel').hide();
                     }
                     jQuery("#keterangan").val(data.data.keterangan);
                     jQuery("#penjelasan").val(data.data.penjelasan);
@@ -1219,8 +1232,8 @@ foreach ($user_penilai as $key => $val) {
         if (langkahKerja == '') {
             return alert('Langkah Kerja tidak boleh kosong');
         }
+        let bobotPenilaian = jQuery("#bobotPenilaian").val();
         if (tipeJawaban == 3) {
-            let bobotPenilaian = jQuery("#bobotPenilaian").val();
             if (bobotPenilaian == '') {
                 return alert('Bobot Penilaian tidak boleh kosong');
             }
