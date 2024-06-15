@@ -535,6 +535,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												kp.nomor_urut AS kp_nomor_urut,
 												kp.nama AS kp_nama,
 												kp.tipe AS kp_tipe,
+												kp.bobot AS kp_bobot,
 												kp.keterangan AS kp_keterangan,
 												kp.penjelasan AS kp_penjelasan,
 												kp.langkah_kerja AS kp_langkah_kerja,
@@ -573,6 +574,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												kp.nomor_urut AS kp_nomor_urut,
 												kp.nama AS kp_nama,
 												kp.tipe AS kp_tipe,
+												kp.bobot AS kp_bobot,
 												kp.keterangan AS kp_keterangan,
 												kp.penjelasan AS kp_penjelasan,
 												kp.langkah_kerja AS kp_langkah_kerja,
@@ -814,6 +816,12 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 											}
 										}
 
+										//jika metode penilaian nilai dinamis maka tampilkan bobot penilaian
+										if ($subkomponen['metode_penilaian'] == 2) {
+											$bobot_komponen_penilaian = $penilaian['kp_bobot'];
+										} else if ($subkomponen['metode_penilaian'] == 1) {
+											$bobot_komponen_penilaian = '-';
+										}
 
 										$bukti_dukung = json_decode(stripslashes($penilaian['pl_bukti_dukung']), true);
 										if (!empty($bukti_dukung)) {
@@ -832,11 +840,9 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 										$tbody2 .= "<td class='text-left'></td>";
 										$tbody2 .= "<td class='text-left'>" . $counter_isi++ . "</td>";
 										$tbody2 .= "<td class='text-left'>" . $penilaian['kp_nama'] . "<br><small class='text-muted'> Keterangan : " . $penilaian['kp_keterangan'] . "</small></td>";
-										if (empty($_POST['excel'])) {
-											$tbody2 .= "<td class='text-center'><button class='btn btn-secondary' onclick='infoPenjelasan(" . $penilaian['kp_id'] . ")' title='Info Nilai'><span class='dashicons dashicons-info'></span></button></td>";
-										} else {
-											$tbody2 .= "<td class='text-center'></td>";
-										}
+
+										$tbody2 .= "<td class='text-center'>" . $bobot_komponen_penilaian . "</td>";
+
 										switch ($can_verify) {
 											case false:
 												if (!$this->is_admin_panrb()) {
@@ -853,8 +859,13 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 													|| $_POST['excel'] == 'usulan_penetapan'
 												) {
 													$tbody2 .= "<td class='text-center'>" . $nilai_usulan . "</td>";
+												}
+												if (empty($_POST['excel'])) {
+													$tbody2 .= "<td class='text-center'><button class='btn btn-secondary' onclick='infoPenjelasan(" . $penilaian['kp_id'] . ")' title='Info Penjelasan'><span class='dashicons dashicons-info'></span></button></td>";
+												} else {
 													$tbody2 .= "<td class='text-center'></td>";
 												}
+
 												if (!$this->is_admin_panrb()) {
 													$tbody2 .= "<td class='text-center'><div class='bukti-dukung-view' kp-id='" . $penilaian['kp_id'] . "'>" . $bukti_dukung . "</div>" . $tombol_bukti . "</td>";
 													if (
@@ -916,6 +927,10 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												) {
 													$tbody2 .= "<td class='text-center'><select id='opsiUsulan" . $penilaian['kp_id'] . "' disabled>" . $opsi . "</select></td>";
 													$tbody2 .= "<td class='text-center'>" . $nilai_usulan . "</td>";
+												}
+												if (empty($_POST['excel'])) {
+													$tbody2 .= "<td class='text-center'><button class='btn btn-secondary' onclick='infoPenjelasan(" . $penilaian['kp_id'] . ")' title='Info Penjelasan'><span class='dashicons dashicons-info'></span></button></td>";
+												} else {
 													$tbody2 .= "<td class='text-center'></td>";
 												}
 												$tbody2 .= "<td class='text-center'><div class='bukti-dukung-view' kp-id='" . $penilaian['kp_id'] . "'>" . $bukti_dukung . "</div></td>";
