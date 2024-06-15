@@ -612,6 +612,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												FROM esakip_penilaian_custom
 												WHERE id_komponen_penilaian =%d	
 												  AND active = 1
+												ORDER BY nomor_urut ASC
 											", $penilaian['kp_id']),
 											ARRAY_A
 										);

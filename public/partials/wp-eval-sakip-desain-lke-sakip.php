@@ -1383,6 +1383,7 @@ foreach ($user_penilai as $key => $val) {
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
                     alert(response.message);
+                    get_table_desain_sakip();
                     jQuery('#tambahOpsiCustomModal').modal('hide');
                     tambah_opsi_modal(idKomponenPenilaian)
                 } else {
@@ -1504,6 +1505,7 @@ foreach ($user_penilai as $key => $val) {
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
                     alert(response.message);
+                    get_table_desain_sakip();
                     tambah_opsi_modal(id_penilaian)
                 } else {
                     alert(response.message);

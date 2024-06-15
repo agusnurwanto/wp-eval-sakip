@@ -16105,10 +16105,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								// Render the data
 								if (!empty($grouped_data)) {
 									foreach ($grouped_data as $penilaian) {
+										$cek_opsi_custom = $wpdb->get_var(
+											$wpdb->prepare("
+												SELECT id
+												FROM esakip_penilaian_custom
+												WHERE id_komponen_penilaian=%d
+											", $penilaian['kp_id'])
+										);
 										$btn = '';
 										$btn .= '<div class="btn-action-group">';
 										if ($subkomponen['metode_penilaian'] == 2) {
-											$btn .= "<button class='btn btn-secondary' onclick='tambah_opsi_modal(\"" . $penilaian['kp_id'] . "\");' title='Tambah Opsi Penilaian Custom'><span class='dashicons dashicons-insert'></span></button>";
+											$button_class = $cek_opsi_custom ? 'btn btn-success' : 'btn btn-secondary';
+											$btn .= "<button class='$button_class' onclick='tambah_opsi_modal(\"" . $penilaian['kp_id'] . "\");' title='Tambah Opsi Penilaian Custom'><span class='dashicons dashicons-insert'></span></button>";
 										}
 										$btn .= "<button class='btn btn-info' onclick='tambah_kerangka_logis(\"" . $penilaian['kp_id'] . "\");' title='Tambah Kerangka Logis'><span class='dashicons dashicons-admin-generic'></span></button>";
 										$btn .= "<button class='btn btn-warning' onclick='edit_data_komponen_penilaian(\"" . $penilaian['kp_id'] . "\");' title='Edit Data'><span class='dashicons dashicons-edit'></span></button>";
@@ -18978,7 +18986,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						SELECT id
 						FROM esakip_komponen
 						WHERE active = 1 
-						  AND id_jadwal = %s
+						  AND id_jadwal = %d
 					", $id_jadwal),
 					ARRAY_A
 				);
@@ -18991,7 +18999,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									nama
 								FROM esakip_subkomponen
 								WHERE active = 1 
-								  AND id_komponen = %s
+								  AND id_komponen = %d
 							", $komponen['id']),
 							ARRAY_A
 						);
@@ -19004,7 +19012,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											nama
 										FROM esakip_komponen_penilaian
 										WHERE active = 1 
-										  AND id_subkomponen = %s
+										  AND id_subkomponen = %d
 									", $subkomponen['id']),
 									ARRAY_A
 								);
@@ -19012,9 +19020,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									foreach ($penilaians as $penilaians) {
 										$options .= '<option value="' . $penilaians['id'] . '">' . $penilaians['nama'] . '</option>';
 									}
-								} else {
-									$ret['status'] = 'error';
-									$ret['message'] = 'Komponen Penilaian aktif tidak ditemukan';
 								}
 							}
 						} else {
