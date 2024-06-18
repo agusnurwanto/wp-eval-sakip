@@ -51,7 +51,8 @@ $idtahun = $wpdb->get_results(
         SELECT 
             *
         FROM esakip_data_jadwal
-        WHERE tipe = %s",
+        WHERE tipe = %s
+            AND status=1",
         'RPJMD'
     ),
     ARRAY_A

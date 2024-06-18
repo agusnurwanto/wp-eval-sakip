@@ -129,6 +129,7 @@ foreach ($idtahun as $val) {
 			data: {
 				action: 'get_table_tahun_renstra',
 				api_key: esakip.api_key,
+				id_periode: <?php echo $input['periode']; ?>,
 			},
 			dataType: 'json',
 			success: function(response) {

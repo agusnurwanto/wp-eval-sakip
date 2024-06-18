@@ -146,6 +146,8 @@ class Wp_Eval_Sakip_Admin
 						|| $_POST['type'] == 'cascading_pd'
 						|| $_POST['type'] == 'croscutting_pemda'
 						|| $_POST['type'] == 'croscutting_pd'
+						|| $_POST['type'] == 'pohon_kinerja_dan_cascading'
+						|| $_POST['type'] == 'pohon_kinerja_dan_cascading_pemda'
 					)
 				) {
 					$jadwal_periode = $wpdb->get_results(
@@ -262,6 +264,16 @@ class Wp_Eval_Sakip_Admin
 							// $perencanaan_rpjmd['url'] .= '&id_periode_rpjmd=' . $jadwal_periode_item['id'];
 							$body_pemda .= '
 							<li><a target="_blank" href="' . $perencanaan_rpjmd['url'] . '">' . $perencanaan_rpjmd['title'] . '</a></li>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'pohon_kinerja_dan_cascading') {
+							$pohon_kinerja_cascading = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Dokumen Pohon Kinerja dan Cascading Tahun ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+								'content' => '[pohon_kinerja_dan_cascading periode=' . $jadwal_periode_item['id'] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda .= '
+							<li><a target="_blank" href="' . $pohon_kinerja_cascading['url'] . '">' . $pohon_kinerja_cascading['title'] . '</a></li>';
 						}
 					}
 					$body_pemda .= '</ol>';
@@ -360,6 +372,7 @@ class Wp_Eval_Sakip_Admin
 								tahun_anggaran 
 							FROM esakip_data_unit 
 							GROUP BY tahun_anggaran
+							ORDER BY tahun_anggaran ASC
 						"),
 						ARRAY_A
 					);
@@ -599,23 +612,6 @@ class Wp_Eval_Sakip_Admin
 								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
 									<ul style="margin-left: 20px;">
 										<li><a target="_blank" href="' . $lkjip_lppd['url'] . '">' . $lkjip_lppd['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'pohon_kinerja_dan_cascading') {
-							$pohon_kinerja_cascading = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pohon Kinerja dan Cascading Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[pohon_kinerja_dan_cascading tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $pohon_kinerja_cascading['url'] . '">' . $pohon_kinerja_cascading['title'] . '</a></li>
 									</ul>
 								</div>
 							</div>';
@@ -905,23 +901,6 @@ class Wp_Eval_Sakip_Admin
 								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
 									<ul style="margin-left: 20px;">
 										<li><a target="_blank" href="' . $lkjip_lppd_pemda['url'] . '">' . $lkjip_lppd_pemda['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'pohon_kinerja_dan_cascading_pemda') {
-							$pohon_kinerja_cascading_pemda = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pemda Pohon Kinerja dan Cascading Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dokumen_detail_pohon_kinerja_dan_cascading_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $pohon_kinerja_cascading_pemda['url'] . '">' . $pohon_kinerja_cascading_pemda['title'] . '</a></li>
 									</ul>
 								</div>
 							</div>';

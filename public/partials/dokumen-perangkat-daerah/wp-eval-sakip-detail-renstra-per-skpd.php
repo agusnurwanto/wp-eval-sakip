@@ -50,7 +50,8 @@ $idtahun = $wpdb->get_results(
         SELECT 
             *
         FROM esakip_data_jadwal
-        WHERE tipe = %s",
+        WHERE tipe = %s
+            AND status=1",
         'RPJMD'
     ),
     ARRAY_A
@@ -414,6 +415,7 @@ $is_administrator = in_array('administrator', $user_roles);
 				action: 'get_table_tahun_renstra',
 				api_key: esakip.api_key,
                 id_skpd: <?php echo $id_skpd; ?>,
+                id_periode: <?php echo $input['periode']; ?>,
 			},
 			dataType: 'json',
 			success: function(response) {
