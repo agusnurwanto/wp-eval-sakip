@@ -396,10 +396,12 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								$sum_nilai_penetapan = $wpdb->get_var(
 									$wpdb->prepare("
 										SELECT SUM(nilai_penetapan)
-										FROM esakip_pengisian_lke
-										WHERE id_subkomponen = %d
-										  	AND id_skpd = %d
-                                      		AND tahun_anggaran = %d
+										FROM esakip_pengisian_lke p
+										INNER JOIN esakip_komponen_penilaian k on p.id_komponen_penilaian=k.id
+										WHERE p.id_subkomponen = %d
+										  	AND p.id_skpd = %d
+                                      		AND p.tahun_anggaran = %d
+											AND k.active=1
 									", $subkomponen['id'], $id_skpd, $tahun_anggaran)
 								);
 								$count_nilai_penetapan = $wpdb->get_var(
