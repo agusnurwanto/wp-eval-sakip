@@ -513,7 +513,8 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												ON kp.id = pl.id_komponen_penilaian AND pl.id_skpd = %d
 												AND pl.tahun_anggaran=%d
 											WHERE kp.id_subkomponen = %d
-											AND kp.active = 1
+											  AND kp.active = 1
+											  AND kp.active = 1
 											ORDER BY kp.nomor_urut ASC
 										",  $id_skpd, $tahun_anggaran, $subkomponen['id']),
 										ARRAY_A
