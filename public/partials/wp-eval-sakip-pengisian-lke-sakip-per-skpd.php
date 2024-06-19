@@ -342,10 +342,10 @@ if(!empty($_GET['excel'])){
             return alert("ID Komponen Penilaian Tidak Boleh Kosong!");
         }
 
-        if (![0, 0.25, 0.5, 0.75, 1].includes(nilaiUsulan)) {
-            alert("Nilai yang dimasukkan tidak valid!");
-            return;
-        }
+        // if (![0, 0.25, 0.5, 0.75, 1].includes(nilaiUsulan)) {
+        //     alert("Nilai yang dimasukkan tidak valid!");
+        //     return;
+        // }
 
         jQuery('#wrap-loading').show();
         jQuery.ajax({
