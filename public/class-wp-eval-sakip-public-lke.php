@@ -427,7 +427,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 									$persentase_sub_custom = $sum_nilai_usulan / $subkomponen['bobot'];
 									$persentase_sub = $sum_nilai_usulan / $count_nilai_usulan;
 									$total_nilai_sub = $persentase_sub * $subkomponen['bobot'];
-									$sum_nilai_sub += $total_nilai_sub;;
+									$sum_nilai_sub += $total_nilai_sub;
 								}
 
 								if ($count_nilai_penetapan > 0) {
@@ -928,16 +928,29 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							}
 						}
 
-						//jumlah nilai kom
-						if ($sum_nilai_sub > 0) {
-							$persentase_kom = $sum_nilai_sub / $komponen['bobot'];
+						//jumlah persentase komponen & total nilai
+						if ($subkomponen['metode_penilaian'] == 1) {
+							if ($sum_nilai_sub > 0) {
+								$persentase_kom = $sum_nilai_sub / $komponen['bobot'];
+							}
+							if ($sum_nilai_sub_penetapan > 0) {
+								$persentase_kom_penetapan = $sum_nilai_sub_penetapan / $komponen['bobot'];
+							}
+	
+							$total_nilai += $sum_nilai_sub;
+							$total_nilai_penetapan += $sum_nilai_sub_penetapan;
+						} else if ($subkomponen['metode_penilaian'] == 2) {
+							if ($total_nilai_sub > 0) {
+								$persentase_kom = $total_nilai_sub / $komponen['bobot'];
+							}
+							if ($total_nilai_sub_penetapan > 0) {
+								$persentase_kom_penetapan = $total_nilai_sub_penetapan / $komponen['bobot'];
+							}
+	
+							$total_nilai += $total_nilai_sub;
+							$total_nilai_penetapan += $total_nilai_sub_penetapan;
 						}
-						if ($sum_nilai_sub_penetapan > 0) {
-							$persentase_kom_penetapan = $sum_nilai_sub_penetapan / $komponen['bobot'];
-						}
-
-						$total_nilai += $sum_nilai_sub;
-						$total_nilai_penetapan += $sum_nilai_sub_penetapan;
+						
 
 						//tbody komponen
 						$tbody .= "<tr class='table-active'>";
@@ -978,7 +991,10 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						$tbody .= "</tr>";
 						$tbody .= $tbody2;
 
+						//nilai usulan selalu muncul
 						$merged_data['total_nilai'] = number_format($total_nilai, 2);
+
+						//nilai penetapan diset dimenu jadwal
 						if ($tampil_nilai_penetapan == 1) {
 							$merged_data['total_nilai_penetapan'] = number_format($total_nilai_penetapan, 2);
 						} else {
