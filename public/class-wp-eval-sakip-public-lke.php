@@ -424,12 +424,14 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								$persentase_sub = 0;
 								$persentase_sub_penetapan = 0;
 								if ($count_nilai_usulan > 0) {
+									$persentase_sub_custom = $sum_nilai_usulan / $subkomponen['bobot'];
 									$persentase_sub = $sum_nilai_usulan / $count_nilai_usulan;
 									$total_nilai_sub = $persentase_sub * $subkomponen['bobot'];
 									$sum_nilai_sub += $total_nilai_sub;;
 								}
 
 								if ($count_nilai_penetapan > 0) {
+									$persentase_sub_custom_penetapan = $sum_nilai_penetapan / $subkomponen['bobot'];
 									$persentase_sub_penetapan = $sum_nilai_penetapan / $count_nilai_penetapan;
 									$total_nilai_sub_penetapan = $persentase_sub_penetapan * $subkomponen['bobot'];
 									$sum_nilai_sub_penetapan += $total_nilai_sub_penetapan;
@@ -449,7 +451,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 									$tbody2 .= "<td class='text-left'></td>";
 									if ($subkomponen['metode_penilaian'] == 2) {
 										$tbody2 .= "<td class='text-center'>" . number_format($sum_nilai_usulan, 2) . "</td>";
-										$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub * 100, 2) . "%" . "</td>";
+										$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub_custom * 100, 2) . "%" . "</td>";
 									} else if ($subkomponen['metode_penilaian'] == 1) {
 										$tbody2 .= "<td class='text-center'>" . number_format($total_nilai_sub, 2) . "</td>";
 										$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub * 100, 2) . "%" . "</td>";
@@ -469,7 +471,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 									$tbody2 .= "<td class='text-center'></td>";
 									if ($subkomponen['metode_penilaian'] == 2) {
 										$tbody2 .= "<td class='text-center'>" . number_format($sum_nilai_penetapan, 2) . "</td>";
-										$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub_penetapan * 100, 2) . "%" . "</td>";
+										$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub_custom_penetapan * 100, 2) . "%" . "</td>";
 									} else if ($subkomponen['metode_penilaian'] == 1) {
 										$tbody2 .= "<td class='text-center'>" . number_format($total_nilai_sub_penetapan, 2) . "</td>";
 										$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub_penetapan * 100, 2) . "%" . "</td>";
