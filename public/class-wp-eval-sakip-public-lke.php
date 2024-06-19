@@ -929,7 +929,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						}
 
 						//jumlah persentase komponen & total nilai
-						if ($subkomponen['metode_penilaian'] == 1) {
+						if ($subkomponen['metode_penilaian'] == 2) {
 							if ($sum_nilai_sub > 0) {
 								$persentase_kom = $sum_nilai_sub / $komponen['bobot'];
 							}
@@ -939,7 +939,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	
 							$total_nilai += $sum_nilai_sub;
 							$total_nilai_penetapan += $sum_nilai_sub_penetapan;
-						} else if ($subkomponen['metode_penilaian'] == 2) {
+						} else if ($subkomponen['metode_penilaian'] == 1) {
 							if ($total_nilai_sub > 0) {
 								$persentase_kom = $total_nilai_sub / $komponen['bobot'];
 							}
