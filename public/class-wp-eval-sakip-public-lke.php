@@ -52,8 +52,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				// Retrieve jadwal data
 				$jadwal = $wpdb->get_row(
 					$wpdb->prepare("
-						SELECT 
-								*
+						SELECT *
 						FROM esakip_data_jadwal
 						WHERE id=%d
 						AND status != 0
@@ -70,12 +69,12 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					// Retrieve komponen data once
 					$komponen_list = $wpdb->get_results(
 						$wpdb->prepare("
-								SELECT * 
-								FROM esakip_komponen
-								WHERE id_jadwal = %d
-								  AND active = 1
-								ORDER BY nomor_urut ASC
-							", $id_jadwal),
+							SELECT * 
+							FROM esakip_komponen
+							WHERE id_jadwal = %d
+								AND active = 1
+							ORDER BY nomor_urut ASC
+						", $id_jadwal),
 						ARRAY_A
 					);
 
@@ -91,12 +90,12 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							// Retrieve subkomponen data
 							$subkomponen_list = $wpdb->get_results(
 								$wpdb->prepare("
-										SELECT * 
-										FROM esakip_subkomponen
-										WHERE id_komponen = %d
-										  AND active = 1
-										ORDER BY nomor_urut ASC
-									", $komponen_id),
+									SELECT * 
+									FROM esakip_subkomponen
+									WHERE id_komponen = %d
+										AND active = 1
+									ORDER BY nomor_urut ASC
+								", $komponen_id),
 								ARRAY_A
 							);
 
@@ -106,41 +105,45 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								// Calculate nilai usulan
 								$sum_nilai_usulan = $wpdb->get_var(
 									$wpdb->prepare("
-											SELECT SUM(nilai_usulan)
-											FROM esakip_pengisian_lke
-											WHERE id_subkomponen = %d
-											  AND id_skpd = %d
-											  AND tahun_anggaran = %d
-										", $subkomponen_id, $unit['id_skpd'], $tahun_anggaran)
+										SELECT SUM(nilai_usulan)
+										FROM esakip_pengisian_lke p
+										INNER JOIN esakip_komponen_penilaian k on p.id_komponen_penilaian = k.id
+										WHERE p.id_subkomponen = %d
+											AND p.id_skpd = %d
+											AND p.tahun_anggaran = %d
+											AND k.active=1
+									", $subkomponen_id, $unit['id_skpd'], $tahun_anggaran)
 								);
 
 								$count_nilai_usulan = $wpdb->get_var(
 									$wpdb->prepare("
-											SELECT COUNT(id)
-											FROM esakip_komponen_penilaian
-											WHERE id_subkomponen = %d
-											  AND active = 1
-										", $subkomponen_id)
+										SELECT COUNT(id)
+										FROM esakip_komponen_penilaian
+										WHERE id_subkomponen = %d
+											AND active = 1
+									", $subkomponen_id)
 								);
 
 								// Calculate nilai penetapan
 								$sum_nilai_penetapan = $wpdb->get_var(
 									$wpdb->prepare("
-											SELECT SUM(nilai_penetapan)
-											FROM esakip_pengisian_lke
-											WHERE id_subkomponen = %d
-											  AND id_skpd = %d
-											  AND tahun_anggaran = %d
-										", $subkomponen_id, $unit['id_skpd'], $tahun_anggaran)
+										SELECT SUM(nilai_penetapan)
+										FROM esakip_pengisian_lke p
+										INNER JOIN esakip_komponen_penilaian k on p.id_komponen_penilaian = k.id
+										WHERE p.id_subkomponen = %d
+											AND p.id_skpd = %d
+											AND p.tahun_anggaran = %d
+											AND k.active=1
+									", $subkomponen_id, $unit['id_skpd'], $tahun_anggaran)
 								);
 
 								$count_nilai_penetapan = $wpdb->get_var(
 									$wpdb->prepare("
-											SELECT COUNT(id)
-											FROM esakip_komponen_penilaian
-											WHERE id_subkomponen = %d
-											  AND active = 1
-										", $subkomponen_id)
+										SELECT COUNT(id)
+										FROM esakip_komponen_penilaian
+										WHERE id_subkomponen = %d
+											AND active = 1
+									", $subkomponen_id)
 								);
 
 								if ($subkomponen['metode_penilaian'] == 1) {
@@ -379,10 +382,12 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								$sum_nilai_usulan = $wpdb->get_var(
 									$wpdb->prepare("
 										SELECT SUM(nilai_usulan)
-										FROM esakip_pengisian_lke
-										WHERE id_subkomponen = %d
-										  	AND id_skpd = %d
-                                      		AND tahun_anggaran = %d
+										FROM esakip_pengisian_lke p
+										INNER JOIN esakip_komponen_penilaian k on p.id_komponen_penilaian=k.id
+										WHERE p.id_subkomponen = %d
+										  AND p.id_skpd = %d
+                                      	  AND p.tahun_anggaran = %d
+										  AND k.active=1
 									", $subkomponen['id'], $id_skpd, $tahun_anggaran)
 								);
 								$count_nilai_usulan = $wpdb->get_var(
@@ -399,9 +404,9 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 										FROM esakip_pengisian_lke p
 										INNER JOIN esakip_komponen_penilaian k on p.id_komponen_penilaian=k.id
 										WHERE p.id_subkomponen = %d
-										  	AND p.id_skpd = %d
-                                      		AND p.tahun_anggaran = %d
-											AND k.active=1
+										  AND p.id_skpd = %d
+                                      	  AND p.tahun_anggaran = %d
+										  AND k.active=1
 									", $subkomponen['id'], $id_skpd, $tahun_anggaran)
 								);
 								$count_nilai_penetapan = $wpdb->get_var(
