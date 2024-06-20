@@ -526,7 +526,6 @@ class Wp_Eval_Sakip {
 		add_shortcode('rpjmd', array($plugin_public, 'rpjmd'));
 		add_shortcode('rkpd', array($plugin_public, 'rkpd'));
 		add_shortcode('lkjip_lppd', array($plugin_public, 'lkjip_lppd'));
-		add_shortcode('dokumen_pemda_lainnya', array($plugin_public, 'dokumen_pemda_lainnya'));
 		add_shortcode('pohon_kinerja_dan_cascading', array($plugin_public, 'pohon_kinerja_dan_cascading'));
 		add_shortcode('lhe_akip_internal', array($plugin_public, 'lhe_akip_internal'));
 		add_shortcode('tl_lhe_akip_internal', array($plugin_public, 'tl_lhe_akip_internal'));
