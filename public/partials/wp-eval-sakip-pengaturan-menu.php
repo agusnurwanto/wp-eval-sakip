@@ -62,6 +62,20 @@ $body = '';
 			<tbody id="data_body">
 			</tbody>
 		</table>
+
+	<h1 class="text-center" style="margin:10rem 0 0;">Halaman Pengaturan Menu Khusus<br>Tahun <?php echo $input['tahun_anggaran']; ?></h1>
+		<table id="data_pengaturan_menu_khusus_table" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+			<thead id="data_header">
+				<tr>
+					<th class="text-center" style="width: 4rem;">No</th>
+					<th class="text-center" style="width: 30rem;">Penempatan Menu</th>
+					<th class="text-center">Set Html</th>
+					<th class="text-center" style="width: 150px;">Aksi</th>
+				</tr>
+			</thead>
+			<tbody id="data_body">
+			</tbody>
+		</table>
 	</div>
 </div>
 
@@ -150,6 +164,7 @@ $body = '';
 
 		get_data_pengaturan_menu_pemda();
 		get_data_pengaturan_menu_perangkat_daerah();
+		get_data_pengaturan_menu_khusus();
 		jQuery('#keterangan_hak_akses_user').hide();
 	});
 
@@ -212,6 +227,67 @@ $body = '';
 			}
 		});
 	}
+
+	/** get data pengaturan menu khusus */
+	function get_data_pengaturan_menu_khusus(){
+		jQuery("#wrap-loading").show();
+		jQuery.ajax({
+			url: esakip.url,
+			type: 'POST',
+			data:{
+				'action' 		: "get_data_pengaturan_menu_khusus",
+				'api_key' 		: esakip.api_key,
+				'tahun_anggaran': tahun_anggaran
+			},
+			dataType: 'json',
+			success: function(response) {
+				jQuery('#wrap-loading').hide();
+				console.log(response);
+				if (response.status === 'success') {
+					jQuery('#data_pengaturan_menu_khusus_table tbody').html(response.data);
+				} else {
+					alert(response.message);
+				}
+			},
+			error: function(xhr, status, error) {
+				jQuery('#wrap-loading').hide();
+				console.error(xhr.responseText);
+				alert('Terjadi kesalahan saat memuat tabel!');
+			}
+		});
+	}
+
+	function simpan_menu_khusus(tipe) {
+		let set_html = jQuery('#set_html_menu_khusus_'+tipe).val();
+
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                'action': 'simpan_perubahan_menu_khusus',
+                'api_key': esakip.api_key,
+                'tahun_anggaran': tahun_anggaran,
+				'set_html': set_html,
+				'tipe': tipe
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    get_data_pengaturan_menu_khusus();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }
 
     function edit_pengaturan_menu(id,tipe){
         jQuery('#wrap-loading').show();

@@ -127,6 +127,116 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
 		die(json_encode($ret));
 	}
 
+    public function get_data_pengaturan_menu_khusus()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['tahun_anggaran'])) {
+                    $tahun_anggaran = $_POST['tahun_anggaran'];
+
+                    $set_html_pemda = get_option('sakip_menu_khusus_set_html_pemda'.$tahun_anggaran);
+                    $set_html_opd = get_option('sakip_menu_khusus_set_html_opd'.$tahun_anggaran);
+
+                    $tbody = '';
+                    $tbody .= "<tr>";
+                    $tbody .= "<td class='text-center'>1</td>";
+                    $tbody .= "<td class='text-left'>
+                                    Pemerintah Daerah
+                            </td>";
+                    $tbody .= "<td class='text-left'>
+                                <textarea class='form-control' id='set_html_menu_khusus_pemda' rows='3'>". stripslashes(htmlspecialchars_decode($set_html_pemda)) ."</textarea>
+                                </td>";
+                    $tbody .= "<td class='text-center'>";
+                    $tbody .= "<button class='btn btn-primary' onclick='simpan_menu_khusus(\"pemda\"); return false;' href='#' title='Simpan Data'><span class='dashicons dashicons-saved'></span></button>";
+                    $tbody .= "</td>";    
+                    $tbody .= "</tr>";
+
+                    $tbody .= "<tr>";
+                    $tbody .= "<td class='text-center'>2</td>";
+                    $tbody .= "<td class='text-left'>
+                                    Perangkat Daerah
+                            </td>";
+                    $tbody .= "<td class='text-left'>
+                                <textarea class='form-control' id='set_html_menu_khusus_opd' rows='3'>". stripslashes(htmlspecialchars_decode($set_html_opd)) ."</textarea>
+                                </td>";
+                    $tbody .= "<td class='text-center'>";
+                    $tbody .= "<button class='btn btn-primary' onclick='simpan_menu_khusus(\"opd\"); return false;' href='#' title='Simpan Data'><span class='dashicons dashicons-saved'></span></button>";
+                    $tbody .= "</td>";    
+                    $tbody .= "</tr>";
+                    
+                    $ret['data'] = $tbody;
+                } else {
+                    $ret = array(
+                        'status' => 'error',
+                        'message'   => 'Ada data yang kosong!'
+                    );
+	    		}
+            } else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+    public function simpan_perubahan_menu_khusus()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil Simpan Pengaturan Menu Khusus!'
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				
+                $set_html = !empty($_POST['set_html']) ? $_POST['set_html'] : '';
+
+                if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+                if (!empty($_POST['tipe'])) {
+					$tipe = $_POST['tipe'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tipe kosong!';
+				}
+                
+				if ($ret['status'] == 'success') {
+                    update_option('sakip_menu_khusus_set_html_'. $tipe .''.$tahun_anggaran, trim(htmlspecialchars($set_html)));
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
     public function generate_menu($tahun_anggaran,$tipe)
 	{
 		global $wpdb;

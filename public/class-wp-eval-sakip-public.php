@@ -17131,6 +17131,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$halaman_sakip .= $data['link'];
 			}
 		}
+
+		$set_html_pemda = get_option('sakip_menu_khusus_set_html_pemda'.$_GET['tahun']);
+		if(!empty($set_html_pemda)){
+			$halaman_sakip .= "<li>". stripslashes(htmlspecialchars_decode($set_html_pemda)) ."<li>";
+		}
+
 		$halaman_sakip .= '
 					</ul>
 				</div>
@@ -17144,6 +17150,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			if (!empty($data['link'])) {
 				$halaman_sakip_opd .= $data['link'];
 			}
+		}
+
+		$set_html_opd = get_option('sakip_menu_khusus_set_html_opd'.$_GET['tahun']);
+		if(!empty($set_html_opd)){
+			$halaman_sakip_opd .= "<li>". stripslashes(htmlspecialchars_decode($set_html_opd)) ."<li>";
 		}
 
 		$halaman_input_rpjpd_rpjmd = '
@@ -17553,6 +17564,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$halaman_sakip_skpd .= $data['link'];
 				}
 			}
+
+			$set_html_opd = get_option('sakip_menu_khusus_set_html_opd'.$_GET['tahun']);
+			if(!empty($set_html_opd)){
+				$halaman_sakip_skpd .= "<li>". stripslashes(htmlspecialchars_decode($set_html_opd)) ."<li>";
+			}
+
 			$halaman_sakip_skpd .= '
 						</ul>
 					</div>
