@@ -4,6 +4,33 @@ require_once ESAKIP_PLUGIN_PATH . "/public/class-wp-eval-sakip-public-pohon-kine
 class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 {
 
+	public function desain_lke_sakip($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/wp-eval-sakip-desain-lke-sakip.php';
+	}
+
+	public function pengisian_lke_sakip($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/wp-eval-sakip-pengisian-lke-sakip.php';
+	}
+
+	public function pengisian_lke_sakip_per_skpd($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/wp-eval-sakip-pengisian-lke-sakip-per-skpd.php';
+	}
+
 	public function get_table_skpd_pengisian_lke()
 	{
 		global $wpdb;
@@ -105,7 +132,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								// Calculate nilai usulan
 								$sum_nilai_usulan = $wpdb->get_var(
 									$wpdb->prepare("
-										SELECT SUM(nilai_usulan)
+										SELECT SUM(p.nilai_usulan)
 										FROM esakip_pengisian_lke p
 										INNER JOIN esakip_komponen_penilaian k on p.id_komponen_penilaian = k.id
 										WHERE p.id_subkomponen = %d
@@ -117,17 +144,17 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 								$count_nilai_usulan = $wpdb->get_var(
 									$wpdb->prepare("
-										SELECT COUNT(id)
-										FROM esakip_komponen_penilaian
-										WHERE id_subkomponen = %d
-											AND active = 1
+										SELECT COUNT(k.id)
+										FROM esakip_komponen_penilaian k
+										WHERE k.id_subkomponen = %d
+											AND k.active = 1
 									", $subkomponen_id)
 								);
 
 								// Calculate nilai penetapan
 								$sum_nilai_penetapan = $wpdb->get_var(
 									$wpdb->prepare("
-										SELECT SUM(nilai_penetapan)
+										SELECT SUM(p.nilai_penetapan)
 										FROM esakip_pengisian_lke p
 										INNER JOIN esakip_komponen_penilaian k on p.id_komponen_penilaian = k.id
 										WHERE p.id_subkomponen = %d
@@ -139,29 +166,30 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 								$count_nilai_penetapan = $wpdb->get_var(
 									$wpdb->prepare("
-										SELECT COUNT(id)
-										FROM esakip_komponen_penilaian
-										WHERE id_subkomponen = %d
-											AND active = 1
+										SELECT COUNT(k.id)
+										FROM esakip_komponen_penilaian k
+										WHERE k.id_subkomponen = %d
+											AND k.active = 1
 									", $subkomponen_id)
 								);
 
+								// rata-rata
 								if ($subkomponen['metode_penilaian'] == 1) {
-									if ($count_nilai_usulan > 0) {
-										$nilai_usulan += $sum_nilai_usulan;
-									}
-
-									if ($count_nilai_penetapan > 0) {
-										$nilai_penetapan += $sum_nilai_penetapan;
-										$nilai_komponen[$komponen_id] += ($sum_nilai_penetapan / $count_nilai_penetapan) * $subkomponen['bobot'];
-									}
-								} else if ($subkomponen['metode_penilaian'] == 2) {
 									if ($count_nilai_usulan > 0) {
 										$nilai_usulan += ($sum_nilai_usulan / $count_nilai_usulan) * $subkomponen['bobot'];
 									}
 
 									if ($count_nilai_penetapan > 0) {
 										$nilai_komponen[$komponen_id] += ($sum_nilai_penetapan / $count_nilai_penetapan) * $subkomponen['bobot'];
+									}
+								// akumulasi
+								} else if ($subkomponen['metode_penilaian'] == 2) {
+									if ($count_nilai_usulan > 0) {
+										$nilai_usulan += $sum_nilai_usulan;
+									}
+
+									if ($count_nilai_penetapan > 0) {
+										$nilai_komponen[$komponen_id] += $sum_nilai_penetapan;
 									}
 								}
 							}
@@ -331,8 +359,8 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						$counter_isi = 1;
 						$counter_sub = 'a';
 
-						$sum_nilai_sub = 0;
-						$sum_nilai_sub_penetapan = 0;
+						$total_nilai_kom = 0;
+						$total_nilai_kom_penetapan = 0;
 						$persentase_kom = 0;
 						$persentase_kom_penetapan = 0;
 
@@ -424,18 +452,30 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								$persentase_sub = 0;
 								$persentase_sub_penetapan = 0;
 								if ($count_nilai_usulan > 0) {
-									$persentase_sub_custom = $sum_nilai_usulan / $subkomponen['bobot'];
-									$persentase_sub = $sum_nilai_usulan / $count_nilai_usulan;
-									$total_nilai_sub = $persentase_sub * $subkomponen['bobot'];
-									$sum_nilai_sub += $total_nilai_sub;
+									// nilai akumulasi sub
+									if ($subkomponen['metode_penilaian'] == 2) {
+										$persentase_sub = $sum_nilai_usulan / $subkomponen['bobot'];
+										$total_nilai_sub = $sum_nilai_usulan;
+									// nilai rata-rata sub
+									} else if ($subkomponen['metode_penilaian'] == 1) {
+										$persentase_sub = $sum_nilai_usulan / $count_nilai_usulan;
+										$total_nilai_sub = $persentase_sub * $subkomponen['bobot'];
+									}
 								}
+								$total_nilai_kom += $total_nilai_sub;
 
 								if ($count_nilai_penetapan > 0) {
-									$persentase_sub_custom_penetapan = $sum_nilai_penetapan / $subkomponen['bobot'];
-									$persentase_sub_penetapan = $sum_nilai_penetapan / $count_nilai_penetapan;
-									$total_nilai_sub_penetapan = $persentase_sub_penetapan * $subkomponen['bobot'];
-									$sum_nilai_sub_penetapan += $total_nilai_sub_penetapan;
+									// nilai akumulasi sub
+									if ($subkomponen['metode_penilaian'] == 2) {
+										$persentase_sub_penetapan = $sum_nilai_penetapan / $subkomponen['bobot'];
+										$total_nilai_sub_penetapan += $sum_nilai_penetapan;
+									// nilai rata-rata sub
+									} else if ($subkomponen['metode_penilaian'] == 1) {
+										$persentase_sub_penetapan = $sum_nilai_penetapan / $count_nilai_penetapan;
+										$total_nilai_sub_penetapan = $persentase_sub_penetapan * $subkomponen['bobot'];
+									}
 								}
+								$total_nilai_kom_penetapan += $total_nilai_sub_penetapan;
 
 								//tbody subkomponen
 								$tbody2 .= "<tr class='table-active'>";
@@ -449,13 +489,8 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								) {
 									$tbody2 .= "<td class='text-center'>" . $subkomponen['bobot'] . "</td>";
 									$tbody2 .= "<td class='text-left'></td>";
-									if ($subkomponen['metode_penilaian'] == 2) {
-										$tbody2 .= "<td class='text-center'>" . number_format($sum_nilai_usulan, 2) . "</td>";
-										$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub_custom * 100, 2) . "%" . "</td>";
-									} else if ($subkomponen['metode_penilaian'] == 1) {
-										$tbody2 .= "<td class='text-center'>" . number_format($total_nilai_sub, 2) . "</td>";
-										$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub * 100, 2) . "%" . "</td>";
-									}
+									$tbody2 .= "<td class='text-center'>" . number_format($total_nilai_sub, 2) . "</td>";
+									$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub * 100, 2) . "%" . "</td>";
 									$tbody2 .= "<td class='text-center' colspan='3'></td>";
 								}
 
@@ -469,14 +504,8 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 									|| $_POST['excel'] == 'usulan_penetapan'
 								) {
 									$tbody2 .= "<td class='text-center'></td>";
-									if ($subkomponen['metode_penilaian'] == 2) {
-										$tbody2 .= "<td class='text-center'>" . number_format($sum_nilai_penetapan, 2) . "</td>";
-										$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub_custom_penetapan * 100, 2) . "%" . "</td>";
-									} else if ($subkomponen['metode_penilaian'] == 1) {
-										$tbody2 .= "<td class='text-center'>" . number_format($total_nilai_sub_penetapan, 2) . "</td>";
-										$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub_penetapan * 100, 2) . "%" . "</td>";
-									}
-
+									$tbody2 .= "<td class='text-center'>" . number_format($total_nilai_sub_penetapan, 2) . "</td>";
+									$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub_penetapan * 100, 2) . "%" . "</td>";
 									$tbody2 .= "<td class='text-left' colspan='3'>User Penilai: <b>" . $user_penilai[$subkomponen['id_user_penilai']] . "</b></td>";
 								}
 								$tbody2 .= "</tr>";
@@ -928,28 +957,15 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							}
 						}
 
-						//jumlah persentase komponen & total nilai
-						if ($subkomponen['metode_penilaian'] == 2) {
-							if ($sum_nilai_sub > 0) {
-								$persentase_kom = $sum_nilai_sub / $komponen['bobot'];
-							}
-							if ($sum_nilai_sub_penetapan > 0) {
-								$persentase_kom_penetapan = $sum_nilai_sub_penetapan / $komponen['bobot'];
-							}
-	
-							$total_nilai += $sum_nilai_sub;
-							$total_nilai_penetapan += $sum_nilai_sub_penetapan;
-						} else if ($subkomponen['metode_penilaian'] == 1) {
-							if ($total_nilai_sub > 0) {
-								$persentase_kom = $total_nilai_sub / $komponen['bobot'];
-							}
-							if ($total_nilai_sub_penetapan > 0) {
-								$persentase_kom_penetapan = $total_nilai_sub_penetapan / $komponen['bobot'];
-							}
-	
-							$total_nilai += $total_nilai_sub;
-							$total_nilai_penetapan += $total_nilai_sub_penetapan;
+						if ($total_nilai_kom > 0) {
+							$persentase_kom = $total_nilai_kom / $komponen['bobot'];
 						}
+						if ($total_nilai_kom_penetapan > 0) {
+							$persentase_kom_penetapan = $total_nilai_kom_penetapan / $komponen['bobot'];
+						}
+
+						$total_nilai += $total_nilai_kom;
+						$total_nilai_penetapan += $total_nilai_kom_penetapan;
 						
 
 						//tbody komponen
@@ -963,7 +979,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							|| $_POST['excel'] == 'usulan_penetapan'
 						) {
 							$tbody .= "<td class='text-left'></td>";
-							$tbody .= "<td class='text-center'>" . number_format($sum_nilai_sub, 2) . "</td>";
+							$tbody .= "<td class='text-center'>" . number_format($total_nilai_kom, 2) . "</td>";
 							$tbody .= "<td class='text-center'>" . number_format($persentase_kom * 100, 2) . "%" . "</td>";
 							$tbody .= "<td class='text-center' colspan='3'></td>";
 						}
@@ -978,7 +994,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							|| $_POST['excel'] == 'usulan_penetapan'
 						) {
 							$tbody .= "<td class='text-center'></td>";
-							$tbody .= "<td class='text-center'>" . number_format($sum_nilai_sub_penetapan, 2) .  "</td>";
+							$tbody .= "<td class='text-center'>" . number_format($total_nilai_kom_penetapan, 2) .  "</td>";
 							$tbody .= "<td class='text-center'>" . number_format($persentase_kom_penetapan * 100, 2) . "%" . "</td>";
 						}
 						if (
