@@ -7,28 +7,57 @@ if (!defined('WPINC')) {
 
 $input = shortcode_atts(array(
     'tahun' => '2022',
+    'periode' => ''
 ), $atts);
 
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-$idtahun = $wpdb->get_results(
-    "
-		SELECT DISTINCT 
-			tahun_anggaran 
-		FROM esakip_data_unit        
-        ORDER BY tahun_anggaran DESC",
+$periode = $wpdb->get_row(
+    $wpdb->prepare("
+    SELECT 
+		*
+    FROM esakip_data_jadwal
+    WHERE id=%d
+      AND status = 1
+", $input['periode']),
     ARRAY_A
 );
-$tahun = "<option value='-1'>Pilih Tahun</option>";
+
+if(!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggaran'] > 1){
+    $tahun_periode = $periode['tahun_selesai_anggaran'];
+}else{
+    $tahun_periode = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
+}
+
+$idtahun = $wpdb->get_results(
+    $wpdb->prepare(
+        "
+        SELECT 
+            *
+        FROM esakip_data_jadwal
+        WHERE tipe = %s
+            AND status=1",
+        'RPJMD'
+    ),
+    ARRAY_A
+);
+
+$tahun = "<option value='-1'>Pilih Tahun Periode</option>";
 
 foreach ($idtahun as $val) {
+    if(!empty($val['tahun_selesai_anggaran']) && $val['tahun_selesai_anggaran'] > 1){
+        $tahun_anggaran_selesai = $val['tahun_selesai_anggaran'];
+    }else{
+        $tahun_anggaran_selesai = $val['tahun_anggaran'] + $val['lama_pelaksanaan'];
+    }
+
     $selected = '';
     if (!empty($input['tahun_anggaran']) && $val['tahun_anggaran'] == $input['tahun_anggaran']) {
         $selected = 'selected';
     }
     $tahun .= "<option value='$val[tahun_anggaran]' $selected>$val[tahun_anggaran]</option>";
 }
-$tipe_dokumen = "pohon_kinerja_dan_cascading";
+$tipe_dokumen = "pohon_kinerja_dan_cascading_pemda";
 
 $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
@@ -56,7 +85,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 <div class="container-md">
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Dokumen Pohon Kinerja dan Cascading <br>Pemerintah Daerah<br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
+            <h1 class="text-center" style="margin:3rem;">Dokumen Pohon Kinerja dan Cascading <br>Pemerintah Daerah<br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1>
             <?php if (!$is_admin_panrb): ?>
             <div style="margin-bottom: 25px;">
                 <button class="btn btn-primary" onclick="tambah_dokumen();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
@@ -168,10 +197,11 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'get_table_dokumen_pemerintah_daerah',
+                action: 'get_table_pohon_kinerja',
                 api_key: esakip.api_key,
                 tahun_anggaran: '<?php echo $input['tahun'] ?>',
                 tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
+                id_periode: <?php echo $input['periode']; ?>,
             },
             dataType: 'json',
             success: function(response) {
@@ -278,13 +308,13 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     //     });
     // }
 
-    function edit_dokumen(id) {
+    function edit_dokumen_pohon_kinerja(id) {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'get_detail_dokumen_by_id_pemerintah_daerah',
+                action: 'get_detail_pohon_kinerja_by_id',
                 api_key: esakip.api_key,
                 id: id,
 				tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
@@ -324,10 +354,6 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         if (keterangan == '') {
             return alert('Keterangan tidak boleh kosong');
         }
-        let tahunAnggaran = jQuery("#tahunAnggaran").val();
-        if (tahunAnggaran == '') {
-            return alert('Tahun Anggaran tidak boleh kosong');
-        }
         let fileDokumen = jQuery("#fileUpload").prop('files')[0];
         if (fileDokumen == '') {
             return alert('File Upload tidak boleh kosong');
@@ -339,7 +365,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         let tipe_dokumen = '<?php echo $tipe_dokumen; ?>';
 
         let form_data = new FormData();
-        form_data.append('action', 'submit_tambah_dokumen_pemerintah_daerah');
+        form_data.append('action', 'tambah_dokumen_pohon_kinerja');
         form_data.append('api_key', esakip.api_key);
         form_data.append('id_dokumen', id_dokumen);
         form_data.append('keterangan', keterangan);
@@ -347,6 +373,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         form_data.append('fileUpload', fileDokumen);
         form_data.append('tipe_dokumen', tipe_dokumen);
         form_data.append('namaDokumen', namaDokumen);
+        form_data.append('id_periode', <?php echo $input['periode']; ?>);
 
         jQuery('#wrap-loading').show();
         jQuery.ajax({
@@ -381,7 +408,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     }
 
 
-    function hapus_dokumen(id) {
+    function hapus_dokumen_pohon_kinerja(id) {
         if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
             return;
         }
@@ -390,7 +417,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'hapus_dokumen_pemerintah_daerah',
+                action: 'hapus_dokumen',
                 api_key: esakip.api_key,
                 id: id,
                 tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
