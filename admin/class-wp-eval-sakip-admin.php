@@ -266,8 +266,18 @@ class Wp_Eval_Sakip_Admin
 							<li><a target="_blank" href="' . $perencanaan_rpjmd['url'] . '">' . $perencanaan_rpjmd['title'] . '</a></li>';
 						} else if (!empty($_POST['type']) && $_POST['type'] == 'pohon_kinerja_dan_cascading') {
 							$pohon_kinerja_cascading = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pohon Kinerja dan Cascading Tahun ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+								'nama_page' => 'Halaman Dokumen Pohon Kinerja dan Cascading ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
 								'content' => '[pohon_kinerja_dan_cascading periode=' . $jadwal_periode_item['id'] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda .= '
+							<li><a target="_blank" href="' . $pohon_kinerja_cascading['url'] . '">' . $pohon_kinerja_cascading['title'] . '</a></li>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'pohon_kinerja_dan_cascading_pemda') {
+							$pohon_kinerja_cascading = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Dokumen Pohon Kinerja dan Cascading Pemda ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+								'content' => '[dokumen_detail_pohon_kinerja_dan_cascading_pemda periode=' . $jadwal_periode_item['id'] . ']',
 								'show_header' => 1,
 								'no_key' => 1,
 								'post_status' => 'private'

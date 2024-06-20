@@ -791,6 +791,7 @@ CREATE TABLE `esakip_pohon_kinerja_dan_cascading_pemda` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `id_jadwal` int(4) DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
