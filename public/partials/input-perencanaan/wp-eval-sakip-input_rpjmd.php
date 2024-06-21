@@ -773,7 +773,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
         background: #baffba;
     }
 </style>
-<h4 style="text-align: center; margin: 0; font-weight: bold; text-transform:uppercase;">Input <?php echo $jadwal['jenis_jadwal_khusus']; ?> <?php echo $jadwal['nama_jadwal']; ?><br><?php echo $nama_pemda; ?><br><?php echo $tahun_awal . ' - ' . $tahun_akhir; ?></h4>
+<h4 style="text-align: center; margin: 0; font-weight: bold; text-transform:uppercase;">Jadwal <?php echo $jadwal['jenis_jadwal_khusus']; ?> <?php echo $jadwal['nama_jadwal']; ?><br><?php echo $nama_pemda; ?><br><?php echo $tahun_awal . ' - ' . $jadwal['tahun_selesai_anggaran']; ?></h4>
 <div id="action-sakip"></div>
 <div id="cetak" title="Laporan MONEV RENJA" style="padding: 5px; overflow: auto; height: 80vh;">
     <table cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; font-size: 70%; border: 0; table-layout: fixed;" contenteditable="false">
