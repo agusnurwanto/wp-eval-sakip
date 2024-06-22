@@ -715,7 +715,7 @@ foreach ($data_all['data'] as $tujuan) {
             //     $isMutakhir = '<button class="btn-sm btn-warning" onclick="tampilProgram(\'' . $program['id_unik'] . '\')" style="margin: 1px;"><i class="dashicons dashicons-update" title="Mutakhirkan"></i></button>';
             // }
 
-            
+
             // <td class="esakip-atas esakip-kanan esakip-bawah">' . parsing_nama_kode($program['nama']) . button_edit_monev($tujuan['detail'][0]['id_unik'] . '||' . $sasaran['detail'][0]['id_unik'] . '||' . $program['detail'][0]['id_unik']) . " " . $isMutakhir . '</td>
             $body .= '
 				<tr class="tr-program" data-kode-skpd="' . $program['kode_skpd'] . '" ' . $warning . '>
@@ -773,7 +773,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
         background: #baffba;
     }
 </style>
-<h4 style="text-align: center; margin: 0; font-weight: bold;">Input RPJMD <?php echo $jadwal['nama_jadwal']; ?><br><?php echo $nama_pemda; ?><br><?php echo $tahun_awal . ' - ' . $tahun_akhir; ?></h4>
+<h4 style="text-align: center; margin: 0; font-weight: bold; text-transform:uppercase;">Jadwal <?php echo $jadwal['jenis_jadwal_khusus']; ?> <?php echo $jadwal['nama_jadwal']; ?><br><?php echo $nama_pemda; ?><br><?php echo $tahun_awal . ' - ' . $jadwal['tahun_selesai_anggaran']; ?></h4>
 <div id="action-sakip"></div>
 <div id="cetak" title="Laporan MONEV RENJA" style="padding: 5px; overflow: auto; height: 80vh;">
     <table cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; font-size: 70%; border: 0; table-layout: fixed;" contenteditable="false">
@@ -831,7 +831,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
     <div class="modal-dialog" style="max-width: 1500px;" role="document">
         <div class="modal-content">
             <div class="modal-header bgpanel-theme">
-                <h4 style="margin: 0;" class="modal-title" id="">Data RPJMD</h4>
+                <h4 style="margin: 0; text-transform:uppercase;" class="modal-title" id="">Data <?php echo $jadwal['jenis_jadwal_khusus']; ?></h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span><i class="dashicons dashicons-dismiss"></i></span></button>
             </div>
             <div class="modal-body">
@@ -858,7 +858,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header bgpanel-theme">
-                <h4 style="margin: 0;" class="modal-title" id="">Data RPJMD Tujuan</h4>
+                <h4 style="margin: 0;text-transform:uppercase;" class="modal-title" id="">Data <?php echo $jadwal['jenis_jadwal_khusus']; ?> Tujuan</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span><i class="dashicons dashicons-dismiss"></i></span></button>
             </div>
             <div class="modal-body">
@@ -886,7 +886,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     <div class="form-group">
                         <label>Tujuan Teks</label>
                         <textarea class="form-control" id="tujuan-teks"></textarea>
-                        <small class="form-text text-muted">Input teks tujuan RPJMD.</small>
+                        <small class="form-text text-muted" style="text-transform:uppercase;">Input teks tujuan <?php echo $jadwal['jenis_jadwal_khusus']; ?>.</small>
                     </div>
                     <div class="form-group">
                         <label>No Urut</label>
@@ -910,7 +910,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header bgpanel-theme">
-                <h4 style="margin: 0;" class="modal-title" id="">Data RPJMD Indikator Tujuan</h4>
+                <h4 style="margin: 0; text-transform:uppercase;" class="modal-title" id="">Data <?php echo $jadwal['jenis_jadwal_khusus']; ?> Indikator Tujuan</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span><i class="dashicons dashicons-dismiss"></i></span></button>
             </div>
             <div class="modal-body">
@@ -942,7 +942,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                             <td id="isu-teks-indikator"></td>
                         </tr>
                         <tr>
-                            <th>Tujuan RPJMD</th>
+                            <th style="text-transform:uppercase;">Tujuan <?php echo $jadwal['jenis_jadwal_khusus']; ?></th>
                             <td class="text-center">:</td>
                             <td id="tujuan-teks-indikator"></td>
                         </tr>
@@ -989,14 +989,14 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header bgpanel-theme">
-                <h4 style="margin: 0;" class="modal-title" id="">Data RPJMD Sasaran</h4>
+                <h4 style="margin: 0; text-transform:uppercase;" class="modal-title" id="">Data <?php echo $jadwal['jenis_jadwal_khusus']; ?> Sasaran</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span><i class="dashicons dashicons-dismiss"></i></span></button>
             </div>
             <div class="modal-body">
                 <table class="table table-bordered">
                     <tbody>
                         <tr>
-                            <th style="width: 175px;">Tujuan RPJMD</th>
+                            <th style="width: 175px; text-transform:uppercase;">Tujuan <?php echo $jadwal['jenis_jadwal_khusus']; ?></th>
                             <td id="tujuan-sasaran-teks"></td>
                         </tr>
                     </tbody>
@@ -1005,7 +1005,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     <div class="form-group">
                         <label>Sasaran Teks</label>
                         <textarea class="form-control" id="sasaran-teks"></textarea>
-                        <small class="form-text text-muted">Input teks sasaran RPJMD.</small>
+                        <small class="form-text text-muted" style="text-transform:uppercase;">Input teks sasaran <?php echo $jadwal['jenis_jadwal_khusus']; ?>.</small>
                     </div>
                     <div class="form-group">
                         <label>No Urut</label>
@@ -1028,19 +1028,19 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header bgpanel-theme">
-                <h4 style="margin: 0;" class="modal-title" id="">Data RPJMD Indikator Sasaran</h4>
+                <h4 style="margin: 0; text-transform:uppercase;" class="modal-title" id="">Data <?php echo $jadwal['jenis_jadwal_khusus']; ?> Indikator Sasaran</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span><i class="dashicons dashicons-dismiss"></i></span></button>
             </div>
             <div class="modal-body">
                 <table class="table table-bordered">
                     <tbody>
                         <tr>
-                            <th style="width: 175px;">Tujuan RPJMD</th>
+                            <th style="width: 175px; text-transform:uppercase;">Tujuan <?php echo $jadwal['jenis_jadwal_khusus']; ?></th>
                             <td class="text-center">:</td>
                             <td id="tujuan-sasaran-teks-indikator"></td>
                         </tr>
                         <tr>
-                            <th>Sasaran RPJMD</th>
+                            <th style="text-transform:uppercase;">Sasaran <?php echo $jadwal['jenis_jadwal_khusus']; ?></th>
                             <td class="text-center">:</td>
                             <td id="sasaran-teks-indikator"></td>
                         </tr>
@@ -1086,18 +1086,18 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header bgpanel-theme">
-                <h4 style="margin: 0;" class="modal-title" id="">Data RPJMD Program</h4>
+                <h4 style="margin: 0; text-transform:uppercase;" class="modal-title" id="">Data <?php echo $jadwal['jenis_jadwal_khusus']; ?> Program</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span><i class="dashicons dashicons-dismiss"></i></span></button>
             </div>
             <div class="modal-body">
                 <table class="table table-bordered">
                     <tbody>
                         <tr>
-                            <th style="width: 175px;">Tujuan RPJMD</th>
+                            <th style="width: 175px; text-transform:uppercase;">Tujuan <?php echo $jadwal['jenis_jadwal_khusus']; ?></th>
                             <td id="tujuan-program-teks"></td>
                         </tr>
                         <tr>
-                            <th>Sasaran RPJMD</th>
+                            <th style="text-transform:uppercase;">Sasaran <?php echo $jadwal['jenis_jadwal_khusus']; ?></th>
                             <td id="sasaran-program-teks"></td>
                         </tr>
                     </tbody>
@@ -1132,22 +1132,22 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header bgpanel-theme">
-                <h4 style="margin: 0;" class="modal-title" id="">Data RPJMD Indikator Program</h4>
+                <h4 style="margin: 0; text-transform:uppercase;" class="modal-title" id="">Data <?php echo $jadwal['jenis_jadwal_khusus']; ?> Indikator Program</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span><i class="dashicons dashicons-dismiss"></i></span></button>
             </div>
             <div class="modal-body">
                 <table class="table table-bordered">
                     <tbody>
                         <tr>
-                            <th style="width: 175px;">Tujuan RPJMD</th>
+                            <th style="width: 175px; text-transform:uppercase;">Tujuan <?php echo $jadwal['jenis_jadwal_khusus']; ?></th>
                             <td id="program-tujuan-teks-indikator"></td>
                         </tr>
                         <tr>
-                            <th>Sasaran RPJMD</th>
+                            <th style="text-transform:uppercase;">Sasaran <?php echo $jadwal['jenis_jadwal_khusus']; ?></th>
                             <td id="program-sasaran-teks-indikator"></td>
                         </tr>
                         <tr>
-                            <th>Program RPJMD</th>
+                            <th style="text-transform:uppercase;">Program <?php echo $jadwal['jenis_jadwal_khusus']; ?></th>
                             <td id="program-teks-indikator"></td>
                         </tr>
                     </tbody>
@@ -1156,6 +1156,10 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     <div class="form-group">
                         <label>Pilih SKPD</label>
                         <select class="form-control" id="skpd-teks"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Pilih Indikator Sasaran</label>
+                        <select class="form-control" id="indikator-teks-program-sasaran"></select>
                     </div>
                     <div class="form-group">
                         <label>Indikator Teks</label>
@@ -1222,8 +1226,8 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
         var aksi = '' +
             '<a style="margin-left: 10px;" id="tambah-data" onclick="return false;" href="#" class="btn btn-success">Tambah Data RPD</a><br><br>' +
             '<h3 style="margin-top: 20px;">SETTING</h3>' +
-            '<label><input type="checkbox" onclick="tampilkan_edit(this);"> Edit Data RPJMD</label>' +
-            '<label style="margin-left: 20px;"><input type="checkbox" onclick="show_debug(this);"> Debug Cascading RPJMD</label>' +
+            '<label style="text-transform:uppercase;"><input type="checkbox" onclick="tampilkan_edit(this);"> Edit Data <?php echo $jadwal['jenis_jadwal_khusus']; ?></label>' +
+            '<label style="margin-left: 20px; text-transform:uppercase;"><input type="checkbox" onclick="show_debug(this);"> Debug Cascading <?php echo $jadwal['jenis_jadwal_khusus']; ?></label>' +
             '<label style="margin-left: 20px;">' +
             'Sembunyikan Baris ' +
             '<select id="sembunyikan-baris" onchange="sembunyikan_baris(this);" style="padding: 5px 10px; min-width: 200px;">' +
@@ -1944,20 +1948,25 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 jQuery('#program-teks-indikator').html(res.data[0].nama_program);
                 get_bidang_urusan(true).then(function() {
                     get_skpd(res.data[0].id_program);
-                    jQuery('#indikator-teks-program').val('');
-                    jQuery('#indikator-teks-program-vol-awal').val('');
-                    jQuery('#indikator-teks-program-satuan').val('');
-                    jQuery('#indikator-teks-program-satuan-awal').val('');
-                    <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
-                        jQuery('#indikator-teks-program-vol-<?php echo $i; ?>').val('');
-                        jQuery('#indikator-teks-program-satuan-<?php echo $i; ?>').val('');
-                        jQuery('#indikator-teks-program-pagu-<?php echo $i; ?>').val('');
-                    <?php }; ?>
-                    jQuery('#indikator-teks-program-vol-akhir').val('');
-                    jQuery('#indikator-teks-program-satuan-akhir').val('');
-                    jQuery('#indikator-catatan-teks-program').val('');
-                    jQuery('#modal-program-indikator').attr('id-program', id_program);
-                    jQuery('#modal-program-indikator').attr('data-id', '');
+                    get_indikator_sasaran(jQuery('#tambah-data-program').attr('id-sasaran')).then((data) => {
+                        jQuery('#indikator-teks-program-sasaran').val('');
+                        jQuery('#indikator-teks-program').val('');
+                        jQuery('#indikator-teks-program-vol-awal').val('');
+                        jQuery('#indikator-teks-program-satuan').val('');
+                        jQuery('#indikator-teks-program-satuan-awal').val('');
+                        <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
+                            jQuery('#indikator-teks-program-vol-<?php echo $i; ?>').val('');
+                            jQuery('#indikator-teks-program-satuan-<?php echo $i; ?>').val('');
+                            jQuery('#indikator-teks-program-pagu-<?php echo $i; ?>').val('');
+                        <?php }; ?>
+                        jQuery('#indikator-teks-program-vol-akhir').val('');
+                        jQuery('#indikator-teks-program-satuan-akhir').val('');
+                        jQuery('#indikator-catatan-teks-program').val('');
+                        jQuery('#modal-program-indikator').attr('id-program', id_program);
+                        jQuery('#modal-program-indikator').attr('data-id', '');
+                    }).catch(function(error) {
+                        console.error("Error fetching indikator sasaran:", error);
+                    });
                     jQuery('#modal-program-indikator').modal('show');
                     jQuery('#wrap-loading').hide();
                 });
@@ -2503,28 +2512,41 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 get_bidang_urusan(true).then(function() {
                     for (var b in res.data_all) {
                         get_skpd(res.data_all[b].detail[0].id_program, res.data_all[b].detail[0].id_unit);
-                        jQuery('#program-teks-indikator').html(res.data_all[b].nama);
-                        jQuery('#modal-program-indikator').attr('id-program', res.data_all[b].id_unik);
+                        get_indikator_sasaran(jQuery('#tambah-data-program').attr('id-sasaran')).then((data) => {
+                            jQuery('#indikator-teks-program-sasaran').val(res.data[0].id_unik_indikator_sasaran)
+                            jQuery('#program-teks-indikator').html(res.data_all[b].nama);
+                            jQuery('#modal-program-indikator').attr('id-program', res.data_all[b].id_unik);
 
-                        if (res.data_all[b].detail && res.data_all[b].detail[0]) {
-                            jQuery('#indikator-teks-program').val(res.data_all[b].detail[0].indikator);
-                            jQuery('#indikator-teks-program-vol-awal').val(get_vol(res.data_all[b].detail[0].target_awal));
-                            jQuery('#indikator-teks-program-satuan').val(res.data_all[b].detail[0].satuan);
-                            <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
-                                jQuery('#indikator-teks-program-vol-<?php echo $i; ?>').val(get_vol(res.data_all[b].detail[0].target_<?php echo $i; ?>));
-                                jQuery('#indikator-teks-program-pagu-<?php echo $i; ?>').val(res.data_all[b].detail[0].pagu_<?php echo $i; ?>);
-                            <?php }; ?>
-                            jQuery('#indikator-teks-program-vol-akhir').val(get_vol(res.data_all[b].detail[0].target_akhir));
-                            jQuery('#indikator-catatan-teks-program').val(res.data_all[b].detail[0].catatan);
-                        }
+                            if (res.data_all[b].detail && res.data_all[b].detail[0]) {
+                                jQuery('#indikator-teks-program').val(res.data_all[b].detail[0].indikator);
+                                jQuery('#indikator-teks-program-vol-awal').val(get_vol(res.data_all[b].detail[0].target_awal));
+                                jQuery('#indikator-teks-program-satuan').val(res.data_all[b].detail[0].satuan);
+                                <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
+                                    jQuery('#indikator-teks-program-vol-<?php echo $i; ?>').val(get_vol(res.data_all[b].detail[0]['target_<?php echo $i; ?>']));
+                                    jQuery('#indikator-teks-program-pagu-<?php echo $i; ?>').val(res.data_all[b].detail[0]['pagu_<?php echo $i; ?>']);
+                                <?php }; ?>
+                                jQuery('#indikator-teks-program-vol-akhir').val(get_vol(res.data_all[b].detail[0].target_akhir));
+                                jQuery('#indikator-catatan-teks-program').val(res.data_all[b].detail[0].catatan);
+                            }
+                        }).catch(function(error) {
+                            console.error("Error fetching indikator sasaran:", error);
+                        });
                     }
                     jQuery('#wrap-loading').hide();
                     jQuery('#modal-program-indikator').attr('data-id', id_unik_program_indikator);
                     jQuery('#modal-program-indikator').modal('show');
-                })
+                }).catch(function(error) {
+                    console.error("Error fetching bidang urusan:", error);
+                    jQuery('#wrap-loading').hide();
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                jQuery('#wrap-loading').hide();
             }
         });
     }
+
 
     function get_vol(text) {
         return text.split(' ')[0];
@@ -2542,7 +2564,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
         var id_isu = jQuery('#isu-teks').val();
         <?php if (!empty($id_jadwal_rpjpd)) : ?>
             if (id_isu == '') {
-                return alert('Isu RPJPD tidak boleh kosong karena jadwal RPJMD sudah terelasi dengan jadwal RPJPD!');
+                return alert('Isu RPJPD tidak boleh kosong karena jadwal <?php echo $jadwal['jenis_jadwal_khusus']; ?> sudah terelasi dengan jadwal RPJPD!');
             }
         <?php endif; ?>
         var id_tujuan = jQuery('#modal-tujuan').attr('data-id');
@@ -2968,6 +2990,10 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
         if (program_teks_indikator == '') {
             return alert('Indikator program tidak boleh kosong!');
         }
+        var indikator_sasaran_program = jQuery('#indikator-teks-program-sasaran').val();
+        if (indikator_sasaran_program == '') {
+            return alert('Indikator Sasaran Program tidak boleh kosong!');
+        }
         var vol_awal = jQuery('#indikator-teks-program-vol-awal').val();
         if (vol_awal == '') {
             return alert('Volume awal indikator program tidak boleh kosong!');
@@ -3002,6 +3028,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     "id_skpd": id_skpd,
                     "kode_skpd": kode_skpd,
                     "nama_skpd": nama_skpd,
+                    "indikator_sasaran_program": indikator_sasaran_program,
                     "vol_awal": vol_awal,
                     "satuan": satuan,
                     <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?> "vol_<?php echo $i; ?>": vol_<?php echo $i; ?>,
@@ -3045,7 +3072,30 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
         });
     }
 
-
+    function get_indikator_sasaran(id_sasaran) {
+        return new Promise(function(resolve, reject) {
+            jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                url: esakip.url,
+                type: "POST",
+                data: {
+                    "action": "get_indikator_sasaran",
+                    "api_key": "<?php echo $api_key; ?>",
+                    "id_sasaran": id_sasaran
+                },
+                dataType: "json",
+                success: function(res) {
+                    jQuery('#wrap-loading').hide();
+                    jQuery('#indikator-teks-program-sasaran').html(res.data);
+                    resolve(res.data);
+                },
+                error: function(xhr, status, error) {
+                    jQuery('#wrap-loading').hide();
+                    reject(error);
+                }
+            });
+        });
+    }
 
     function generate_data_program_renstra() {
         jQuery('#wrap-loading').show();
@@ -3090,7 +3140,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
             dataType: "json",
             success: function(res) {
 
-                jQuery("#modal-raw .modal-title").html('Mutakhirkan Program RPJMD');
+                jQuery("#modal-raw .modal-title").html('Mutakhirkan Program <?php echo $jadwal['jenis_jadwal_khusus']; ?>');
                 jQuery("#modal-raw .modal-body").html(
                     '<h4 style="text-align:center"><span>EXISTING</span></h4>' +
                     '<table class="table">' +
@@ -3148,11 +3198,13 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
     //             type: "post",
     //             data: {
     //                 "action": "esakip_mutakhirkan_program_rpd",
-    //                 "api_key": "<?php //echo $api_key; ?>",
+    //                 "api_key": "<?php //echo $api_key; 
+                                    ?>",
     //                 'id': id,
     //                 'id_program': id_program,
     //                 'id_unik': id_unik,
-    //                 'tahun_anggaran': '<?php //echo $tahun_anggaran; ?>'
+    //                 'tahun_anggaran': '<?php //echo $tahun_anggaran; 
+                                            ?>'
     //             },
     //             dataType: "json",
     //             success: function(response) {

@@ -943,6 +943,7 @@ CREATE TABLE `esakip_rpd_program` (
   `id_unik` text DEFAULT NULL,
   `id_unik_indikator` text DEFAULT NULL,
   `id_unit` varchar(20) DEFAULT NULL,
+  `id_unik_indikator_sasaran` text DEFAULT NULL,
   `indikator` text DEFAULT NULL,
   `is_locked` tinyint(4) DEFAULT NULL,
   `is_locked_indikator` tinyint(4) DEFAULT NULL,

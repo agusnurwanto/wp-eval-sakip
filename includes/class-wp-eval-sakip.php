@@ -495,6 +495,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_esakip_simpan_rpd',  $plugin_public, 'esakip_simpan_rpd');
 		$this->loader->add_action('wp_ajax_esakip_get_rpd',  $plugin_public, 'esakip_get_rpd');
 		$this->loader->add_action('wp_ajax_esakip_get_bidang_urusan',  $plugin_public, 'esakip_get_bidang_urusan');
+		$this->loader->add_action('wp_ajax_get_indikator_sasaran',  $plugin_public, 'get_indikator_sasaran');
 
 		$this->loader->add_action('wp_ajax_get_table_cascading',  $plugin_public, 'get_table_cascading');
 		$this->loader->add_action('wp_ajax_edit_cascading_pemda',  $plugin_public, 'edit_cascading_pemda');
