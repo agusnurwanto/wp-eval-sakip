@@ -590,7 +590,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-pohon-kinerja-dan-cascading.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-pohon-kinerja-dan-cascading.php';
 	}
 
 	public function dokumen_detail_laporan_monev_renaksi($atts)
@@ -635,7 +635,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-lhe-akip-internal.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-lhe-akip-internal.php';
 	}
 
 	public function tl_lhe_akip_internal($atts)
@@ -644,7 +644,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-tl-lhe-akip-internal.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-tl-lhe-akip-internal.php';
 	}
 
 	public function tl_lhe_akip_kemenpan($atts)
@@ -653,7 +653,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-eval-sakip-tl-lhe-akip-kemenpan.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-tl-lhe-akip-kemenpan.php';
 	}
 
 	public function is_admin_panrb()
