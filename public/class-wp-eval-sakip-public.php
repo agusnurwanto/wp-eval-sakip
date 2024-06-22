@@ -16373,6 +16373,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$periode_input_pohon_kinerja_pemda = '';
 		$periode_input_cascading_pemda = '';
 		$periode_input_croscutting_pemda = '';
+		$periode_input_pohon_kinerja_opd = '';
 		$periode_dokumen_pohon_kinerja_pemda = '';
 
 		// SAKIP Perangkat Daerah
@@ -17288,6 +17289,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				if (!empty($cek_data_periode['esakip_pohon_kinerja_dan_cascading']) && $cek_data_periode['esakip_pohon_kinerja_dan_cascading']['active'] == 1) {
 					$periode_pohon_kinerja_skpd .= '<li><a target="_blank" href="' . $pohon_kinerja_skpd['url'] . '" class="btn btn-primary">' . $title_pohon_kinerja . '</a></li>';
 				}
+
+				$input_pohon_kinerja_opd = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Input Pohon Kinerja Perangkat Daerah ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+					'content' => '[penyusunan_pohon_kinerja_opd periode=' . $jadwal_periode_item['id'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$title = 'Input Pohon Kinerja | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+				$input_pohon_kinerja_opd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$periode_input_pohon_kinerja_opd .= '<li><a target="_blank" href="' . $input_pohon_kinerja_opd['url'] . '" class="btn btn-primary">' . $title . '</a></li>';
+	
+			}
+
+			if (empty($periode_input_pohon_kinerja_opd)) {
+				$periode_input_pohon_kinerja_opd = '<li><a return="false" href="#" class="btn btn-secondary">Periode Input Pohon Kinerja kosong atau belum dibuat</a></li>';
 			}
 
 			if (empty($periode_renstra_skpd)) {
@@ -17539,11 +17555,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					</div>
 				</div>';
 
+			$halaman_sakip_pokin_opd ='
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="halaman-input-pokin-opd" style="margin: 0;">Input Pohon Kinerja</h5>
+					<div class="esakip-body-tahun" data-id="halaman-input-pokin-opd">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+						'. $periode_input_pohon_kinerja_opd .'
+						</ul>
+					</div>
+				</div>';
+
 			echo '
 				<h2 class="text-center">' . $skpd_db['nama_skpd'] . '</h2>
 				<ul class="daftar-menu-sakip">
 					<li>' . $halaman_sakip_skpd . '</li>
 					<li>' . $halaman_lke_per_skpd . '</li>
+					<li>' . $halaman_sakip_pokin_opd . '</li>
 				</ul>';
 		}
 	}

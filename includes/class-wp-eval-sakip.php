@@ -584,7 +584,8 @@ class Wp_Eval_Sakip {
 		add_shortcode('dokumen_detail_pedoman_teknis_evaluasi_internal_pemda', array($plugin_public, 'dokumen_detail_pedoman_teknis_evaluasi_internal_pemda'));
 		add_shortcode('dokumen_detail_lkjip_lppd_pemda', array($plugin_public, 'dokumen_detail_lkjip_lppd_pemda'));
 		add_shortcode('dokumen_detail_rkpd_pemda', array($plugin_public, 'dokumen_detail_rkpd_pemda'));
-		add_shortcode('penyusunan_pohon_kinerja_pd', array($plugin_public, 'penyusunan_pohon_kinerja_pd'));
+		add_shortcode('penyusunan_pohon_kinerja_opd', array($plugin_public, 'penyusunan_pohon_kinerja_opd'));
+		add_shortcode('view_pohon_kinerja_opd',array($plugin_public,'view_pohon_kinerja_opd'));
 		
 		add_shortcode('input_rpjpd', array($plugin_public, 'input_rpjpd'));
 		add_shortcode('input_rpjmd', array($plugin_public, 'input_rpjmd'));

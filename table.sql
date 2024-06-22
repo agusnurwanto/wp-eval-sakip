@@ -570,6 +570,20 @@ CREATE TABLE `esakip_pohon_kinerja` (
   PRIMARY key (id)
 );
 
+CREATE TABLE `esakip_pohon_kinerja_opd` (
+  `id` int(11) NOT NULL auto_increment,
+  `label` varchar(255) NOT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `parent` int(11) DEFAULT 0,
+  `label_indikator_kinerja` varchar(255) DEFAULT null,
+  `level` int(11) NOT null,
+  `tahun_anggaran` year(4) DEFAULT NULL,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
+);
 
 CREATE TABLE `esakip_menu_dokumen` (
   `id` int(11) NOT NULL auto_increment,
