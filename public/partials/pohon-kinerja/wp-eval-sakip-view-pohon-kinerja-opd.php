@@ -509,7 +509,7 @@ if(!empty($data_all['data'])){
   		min-height:70px;
   	}
 	.label5 {
-  		background: #c979e3; 
+  		background: #28a745; 
   		border-radius: 5px 5px 0 0;
   	}
   	.level5 {
