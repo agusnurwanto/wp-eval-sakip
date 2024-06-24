@@ -131,34 +131,6 @@ $data_temp = [''];
        
     });
 
-    function getDataChart() {
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: 'POST',
-            data: {
-                action: 'get_chart_cascading',
-                api_key: esakip.api_key,
-                id_jadwal: <?php echo $input['periode']; ?>,
-            },
-            dataType: 'json',
-            success: function(response) {
-                jQuery('#wrap-loading').hide();
-                console.log(response);
-                if (response.status === 'success') {
-                    jQuery('#table_dokumen_cascading tbody').html(response.data);
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                jQuery('#wrap-loading').hide();
-                console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data!');
-            }
-        });
-    }
-
     function getTableCascading() {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
