@@ -321,11 +321,11 @@ if(!empty($pohon_kinerja_level_1)){
 }
 
 $style0 = 'level0';
-$style1 = 'class=\"level1\"';
-$style2 = 'class=\"level2\"';
-$style3 = 'class=\"level3\"';
-$style4 = 'class=\"level4\"';
-$style5 = 'class=\"level5\"';
+$style1 = 'class="level1"';
+$style2 = 'class="level2"';
+$style3 = 'class="level3"';
+$style4 = 'class="level4"';
+$style5 = 'class="level5"';
 
 $data_temp= [];
 if(!empty($data_all['data'])){
@@ -333,7 +333,7 @@ if(!empty($data_all['data'])){
 	foreach ($data_all['data'] as $keylevel1 => $level_1) {
 		$data_temp[$keylevel1][0] = (object)[
 	      'v' => $level_1['label'],
-	      'f' => "<div class=\\\"".$style0." label1\\\">".trim($level_1['label'])."</div>",
+	      'f' => "<div class=\"".$style0." label1\">".trim($level_1['label'])."</div>",
 	    ];
 
 	    if(!empty($level_1['indikator'])){
@@ -347,7 +347,7 @@ if(!empty($data_all['data'])){
 		    foreach ($level_1['data'] as $keylevel2 => $level_2) {
 		        $data_temp[$keylevel2][0] = (object)[
 		          	'v' => $level_2['label'],
-		          	'f' => "<div class=\\\"".$style0." label2\\\">".trim($level_2['label'])."</div>",
+		          	'f' => "<div class=\"".$style0." label2\">".trim($level_2['label'])."</div>",
 		        ];
 
 		        if(!empty($level_2['indikator'])){
@@ -361,7 +361,7 @@ if(!empty($data_all['data'])){
 			        foreach ($level_2['data'] as $keylevel3 => $level_3) {
 			            $data_temp[$keylevel3][0] = (object)[
 			              'v' => $level_3['label'],
-			              'f' => "<div class=\\\"".$style0." label3\\\">".trim($level_3['label'])."</div>",
+			              'f' => "<div class=\"".$style0." label3\">".trim($level_3['label'])."</div>",
 			            ];
 
 			            if(!empty($level_3['indikator'])){
@@ -371,14 +371,14 @@ if(!empty($data_all['data'])){
 			            }
 
 			            $data_temp[$keylevel3][1] = $level_2['label'];
-			            $data_temp[$keylevel3][2] = '';
+			            $data_temp[$keylevel3][2] = $level_3['label'];
 
 			            if(!empty($level_3['data'])){
 
 		            		foreach ($level_3['data'] as $keylevel4 => $level_4) {
 			            		$data_temp[$keylevel4][0] = (object)[
 					              'v' => $level_4['label'],
-					              'f' => "<div class=\\\"".$style0." label4\\\">".trim($level_4['label'])."</div>",
+					              'f' => "<div class=\"".$style0." label4\">".trim($level_4['label'])."</div>",
 					            ];
 
 					            if(!empty($level_4['indikator'])){
@@ -388,14 +388,14 @@ if(!empty($data_all['data'])){
 					            }
 
 					            $data_temp[$keylevel4][1] = $level_3['label'];
-					            $data_temp[$keylevel4][2] = '';
+					            $data_temp[$keylevel4][2] = $level_4['label'];
 
 								if(!empty($level_4['data'])){
 
 									foreach ($level_4['data'] as $keylevel5 => $level_5) {
 										$data_temp[$keylevel5][0] = (object)[
 										  'v' => $level_5['label'],
-										  'f' => "<div class=\\\"".$style0." label5\\\">".trim($level_5['label'])."</div>",
+										  'f' => "<div class=\"".$style0." label5\">".trim($level_5['label'])."</div>",
 										];
 		
 										if(!empty($level_5['indikator'])){
@@ -405,7 +405,7 @@ if(!empty($data_all['data'])){
 										}
 		
 										$data_temp[$keylevel5][1] = $level_4['label'];
-										$data_temp[$keylevel5][2] = '';
+										$data_temp[$keylevel5][2] = $level_5['label'];
 									}
 								}
 					        }
@@ -414,12 +414,12 @@ if(!empty($data_all['data'])){
 		        }
 
 			    $data_temp[$keylevel2][1] = $level_1['label'];
-			    $data_temp[$keylevel2][2] = '';
+			    $data_temp[$keylevel2][2] = $level_2['label'];
 			}
 		}
 
 		$data_temp[$keylevel1][1] = '';
-		$data_temp[$keylevel1][2] = '';
+		$data_temp[$keylevel1][2] = $level_1['label'];
 	}
 }
 
@@ -533,13 +533,12 @@ if(!empty($data_all['data'])){
     google.charts.setOnLoadCallback(drawChart);
 
     function drawChart() {
-      	var data_temp = '<?php echo json_encode(array_values($data_temp)); ?>';
-      	window.data_all = JSON.parse(data_temp);
+      	window.data_all = <?php echo json_encode(array_values($data_temp)); ?>;
       	console.log(data_all);
 
       	window.data = new google.visualization.DataTable();
-        data.addColumn('string', 'Level1');
-        data.addColumn('string', 'Level2');
+        data.addColumn('string', 'Name');
+        data.addColumn('string', 'Manager');
         data.addColumn('string', 'ToolTip');
         data.addRows(data_all);
         data.setRowProperty(2, 'selectedStyle');
