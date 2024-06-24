@@ -714,6 +714,26 @@ foreach ($data_all['data'] as $visi) {
         </div>
     </div>
 </div>
+<style>
+    #modal-monev .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .table-responsive {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 1rem;
+        background-color: transparent;
+    }
+</style>
 <script type="text/javascript">
     jQuery(document).ready(function() {
         run_download_excel_sakip();
