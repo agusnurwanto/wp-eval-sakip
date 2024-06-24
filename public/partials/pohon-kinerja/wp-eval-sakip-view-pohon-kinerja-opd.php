@@ -432,6 +432,7 @@ if(!empty($data_all['data'])){
     	border-radius: 5px;
     	border:0;
     	padding: 0;
+		vertical-align: top;
   	}
   	#chart_div .google-visualization-orgchart-connrow-medium{
     	height: 20px;
@@ -457,7 +458,7 @@ if(!empty($data_all['data'])){
   		font-weight:600;
   		padding:10px;
   		min-height:80px;
-  		min-width: 200px;
+  		min-width: 250px;
   	}
   	.label1 {
   		background: #efd655; 
