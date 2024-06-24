@@ -1224,7 +1224,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
         window.edit_val = false;
 
         var aksi = '' +
-            '<a style="margin-left: 10px;" id="tambah-data" onclick="return false;" href="#" class="btn btn-success">Tambah Data RPD</a><br><br>' +
+            '<a style="margin-left: 10px; text-transform:uppercase;" id="tambah-data" onclick="return false;" href="#" class="btn btn-success">Tambah Data <?php echo $jadwal['jenis_jadwal_khusus']; ?></a><br><br>' +
             '<h3 style="margin-top: 20px;">SETTING</h3>' +
             '<label style="text-transform:uppercase;"><input type="checkbox" onclick="tampilkan_edit(this);"> Edit Data <?php echo $jadwal['jenis_jadwal_khusus']; ?></label>' +
             '<label style="margin-left: 20px; text-transform:uppercase;"><input type="checkbox" onclick="show_debug(this);"> Debug Cascading <?php echo $jadwal['jenis_jadwal_khusus']; ?></label>' +
