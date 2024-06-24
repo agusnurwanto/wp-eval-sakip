@@ -114,90 +114,138 @@ $body = '';
 						<?php echo $select_rpjpd; ?>
 					</select>
 				</div>
-				<div class="form-group" style="margin: 1.5rem 0;">
-					<label class="d-block">Pengaturan Menu Upload Dokumen RENSTRA</label>
-					<tr>
-						<td>
-							<div class="custom-control custom-radio custom-control-inline">
-								<input class="custom-control-input" type="radio" name="menu_dokumen" id="menu_dokumen_tampil" value="tampil" checked>
-								<label class="custom-control-label" for="menu_dokumen_tampil">Tampilkan</label>
-							</div>
-						</td>
-						<td>
-							<div class="custom-control custom-radio custom-control-inline">
-								<input class="custom-control-input" type="radio" name="menu_dokumen" id="menu_dokumen_sembunyi" value="sembunyi">
-								<label class="custom-control-label" for="menu_dokumen_sembunyi">Sembunyikan</label>
-							</div>
-						</td>
-					</tr>
-					<small class="d-block form-text text-muted">Setting Menu Upload Dokumen Yang Tampil Di Dashboard User Per Periode</small>
+				<div class="card" style="margin: 1.5rem 0;">
+  					<div class="card-body">
+						<div class="form-group">
+							<label class="d-block">Pengaturan Menu Upload Dokumen RENSTRA</label>
+							<tr>
+								<td>
+									<div class="custom-control custom-radio custom-control-inline">
+										<input class="custom-control-input" type="radio" name="menu_dokumen" id="menu_dokumen_tampil" value="tampil" checked>
+										<label class="custom-control-label" for="menu_dokumen_tampil">Tampilkan</label>
+									</div>
+								</td>
+								<td>
+									<div class="custom-control custom-radio custom-control-inline">
+										<input class="custom-control-input" type="radio" name="menu_dokumen" id="menu_dokumen_sembunyi" value="sembunyi">
+										<label class="custom-control-label" for="menu_dokumen_sembunyi">Sembunyikan</label>
+									</div>
+								</td>
+							</tr>
+							<small class="d-block form-text text-muted">Setting Menu Upload Dokumen Yang Tampil Di Dashboard User Per Periode</small>
+						</div>
+						<div class="form-group" style="margin: 1.5rem 0 0 0;">
+							<label class="d-block">Pengaturan Akses User Upload Dokumen RENSTRA</label>
+							<tr>
+								<td>
+									<div class="custom-control custom-radio custom-control-inline">
+										<input class="custom-control-input" type="radio" name="akses_user_upload_dokumen" id="akses_user_upload_dokumen_pemda" value="pemda">
+										<label class="custom-control-label" for="akses_user_upload_dokumen_pemda">Pemerintah Daerah</label>
+									</div>
+								</td>
+								<td>
+									<div class="custom-control custom-radio custom-control-inline">
+										<input class="custom-control-input" type="radio" name="akses_user_upload_dokumen" id="akses_user_upload_dokumen_pd" value="pd" checked>
+										<label class="custom-control-label" for="akses_user_upload_dokumen_pd">Perangkat Daerah</label>
+									</div>
+								</td>
+								<td>
+									<div class="custom-control custom-radio custom-control-inline">
+										<input class="custom-control-input" type="radio" name="akses_user_upload_dokumen" id="verifikasi_upload_dokumen_semua" value="semua">
+										<label class="custom-control-label" for="verifikasi_upload_dokumen_semua">Pemerintah Daerah dan Perangkat Daerah</label>
+									</div>
+								</td>
+							</tr>
+							<small class="d-block form-text text-muted">Setting User Yang Bisa Mengakses Upload Dokumen RENSTRA</small>
+						</div>
+					</div>
 				</div>
-				<div class="form-group" style="margin: 1.5rem 0;">
-					<label class="d-block">Pengaturan Akses User Upload Dokumen RENSTRA</label>
-					<tr>
-						<td>
-							<div class="custom-control custom-radio custom-control-inline">
-								<input class="custom-control-input" type="radio" name="akses_user_upload_dokumen" id="akses_user_upload_dokumen_pemda" value="pemda">
-								<label class="custom-control-label" for="akses_user_upload_dokumen_pemda">Pemerintah Daerah</label>
-							</div>
-						</td>
-						<td>
-							<div class="custom-control custom-radio custom-control-inline">
-								<input class="custom-control-input" type="radio" name="akses_user_upload_dokumen" id="akses_user_upload_dokumen_pd" value="pd" checked>
-								<label class="custom-control-label" for="akses_user_upload_dokumen_pd">Perangkat Daerah</label>
-							</div>
-						</td>
-						<td>
-							<div class="custom-control custom-radio custom-control-inline">
-								<input class="custom-control-input" type="radio" name="akses_user_upload_dokumen" id="verifikasi_upload_dokumen_semua" value="semua">
-								<label class="custom-control-label" for="verifikasi_upload_dokumen_semua">Pemerintah Daerah dan Perangkat Daerah</label>
-							</div>
-						</td>
-					</tr>
-					<small class="d-block form-text text-muted">Setting User Yang Bisa Mengakses Upload Dokumen RENSTRA</small>
+				<div class="card" style="margin: 1.5rem 0;">
+  					<div class="card-body">
+						<div class="form-group">
+							<label class="d-block">Pengaturan Menu Upload Dokumen Pohon Kinerja dan Cascading</label>
+							<tr>
+								<td>
+									<div class="custom-control custom-radio custom-control-inline">
+										<input class="custom-control-input" type="radio" name="menu_dokumen_pohon_kinerja" id="menu_dokumen_tampil_pohon_kinerja" value="tampil" checked>
+										<label class="custom-control-label" for="menu_dokumen_tampil_pohon_kinerja">Tampilkan</label>
+									</div>
+								</td>
+								<td>
+									<div class="custom-control custom-radio custom-control-inline">
+										<input class="custom-control-input" type="radio" name="menu_dokumen_pohon_kinerja" id="menu_dokumen_sembunyi_pohon_kinerja" value="sembunyi">
+										<label class="custom-control-label" for="menu_dokumen_sembunyi_pohon_kinerja">Sembunyikan</label>
+									</div>
+								</td>
+							</tr>
+							<small class="d-block form-text text-muted">Setting Menu Upload Dokumen Yang Tampil Di Dashboard User Per Periode</small>
+						</div>
+						<div class="form-group" style="margin: 1.5rem 0 0 0;">
+							<label class="d-block">Pengaturan Akses User Upload Dokumen Pohon Kinerja</label>
+							<tr>
+								<td>
+									<div class="custom-control custom-radio custom-control-inline">
+										<input class="custom-control-input" type="radio" name="akses_user_upload_dokumen_pohon_kinerja" id="akses_user_upload_dokumen_pemda_pohon_kinerja" value="pemda">
+										<label class="custom-control-label" for="akses_user_upload_dokumen_pemda_pohon_kinerja">Pemerintah Daerah</label>
+									</div>
+								</td>
+								<td>
+									<div class="custom-control custom-radio custom-control-inline">
+										<input class="custom-control-input" type="radio" name="akses_user_upload_dokumen_pohon_kinerja" id="akses_user_upload_dokumen_pd_pohon_kinerja" value="pd" checked>
+										<label class="custom-control-label" for="akses_user_upload_dokumen_pd_pohon_kinerja">Perangkat Daerah</label>
+									</div>
+								</td>
+								<td>
+									<div class="custom-control custom-radio custom-control-inline">
+										<input class="custom-control-input" type="radio" name="akses_user_upload_dokumen_pohon_kinerja" id="verifikasi_upload_dokumen_semua_pohon_kinerja" value="semua">
+										<label class="custom-control-label" for="verifikasi_upload_dokumen_semua_pohon_kinerja">Pemerintah Daerah dan Perangkat Daerah</label>
+									</div>
+								</td>
+							</tr>
+							<small class="d-block form-text text-muted">Setting User Yang Bisa Mengakses Upload Dokumen Pohon Kinerja</small>
+						</div>
+					</div>
 				</div>
-				<div class="form-group" style="margin: 1.5rem 0;">
-					<label class="d-block">Pengaturan Menu Upload Dokumen Pohon Kinerja dan Cascading</label>
-					<tr>
-						<td>
-							<div class="custom-control custom-radio custom-control-inline">
-								<input class="custom-control-input" type="radio" name="menu_dokumen_pohon_kinerja" id="menu_dokumen_tampil_pohon_kinerja" value="tampil" checked>
-								<label class="custom-control-label" for="menu_dokumen_tampil_pohon_kinerja">Tampilkan</label>
-							</div>
-						</td>
-						<td>
-							<div class="custom-control custom-radio custom-control-inline">
-								<input class="custom-control-input" type="radio" name="menu_dokumen_pohon_kinerja" id="menu_dokumen_sembunyi_pohon_kinerja" value="sembunyi">
-								<label class="custom-control-label" for="menu_dokumen_sembunyi_pohon_kinerja">Sembunyikan</label>
-							</div>
-						</td>
-					</tr>
-					<small class="d-block form-text text-muted">Setting Menu Upload Dokumen Yang Tampil Di Dashboard User Per Periode</small>
-				</div>
-				<div class="form-group" style="margin: 1.5rem 0;">
-					<label class="d-block">Pengaturan Akses User Upload Dokumen Pohon Kinerja</label>
-					<tr>
-						<td>
-							<div class="custom-control custom-radio custom-control-inline">
-								<input class="custom-control-input" type="radio" name="akses_user_upload_dokumen_pohon_kinerja" id="akses_user_upload_dokumen_pemda_pohon_kinerja" value="pemda">
-								<label class="custom-control-label" for="akses_user_upload_dokumen_pemda_pohon_kinerja">Pemerintah Daerah</label>
-							</div>
-						</td>
-						<td>
-							<div class="custom-control custom-radio custom-control-inline">
-								<input class="custom-control-input" type="radio" name="akses_user_upload_dokumen_pohon_kinerja" id="akses_user_upload_dokumen_pd_pohon_kinerja" value="pd" checked>
-								<label class="custom-control-label" for="akses_user_upload_dokumen_pd_pohon_kinerja">Perangkat Daerah</label>
-							</div>
-						</td>
-						<td>
-							<div class="custom-control custom-radio custom-control-inline">
-								<input class="custom-control-input" type="radio" name="akses_user_upload_dokumen_pohon_kinerja" id="verifikasi_upload_dokumen_semua_pohon_kinerja" value="semua">
-								<label class="custom-control-label" for="verifikasi_upload_dokumen_semua_pohon_kinerja">Pemerintah Daerah dan Perangkat Daerah</label>
-							</div>
-						</td>
-					</tr>
-					<small class="d-block form-text text-muted">Setting User Yang Bisa Mengakses Upload Dokumen Pohon Kinerja</small>
-				</div>
+				<!--<div class="card" style="margin: 1.5rem 0;">
+  					<div class="card-body">
+						<div class="form-group">
+							<label class="d-block">Pengaturan Menu Penyusunan Pohon Kinerja</label>
+							<tr>
+								<td>
+									<div class="custom-control custom-radio custom-control-inline">
+										<input class="custom-control-input" type="radio" name="menu_penyusunan_pohon_kinerja_pemda" id="menu_penyusunan_pohon_kinerja_pemda_tampil" value="tampil" checked>
+										<label class="custom-control-label" for="menu_penyusunan_pohon_kinerja_pemda_tampil">Tampilkan</label>
+									</div>
+								</td>
+								<td>
+									<div class="custom-control custom-radio custom-control-inline">
+										<input class="custom-control-input" type="radio" name="menu_penyusunan_pohon_kinerja_pemda" id="menu_penyusunan_pohon_kinerja_pemda_sembunyi" value="sembunyi">
+										<label class="custom-control-label" for="menu_penyusunan_pohon_kinerja_pemda_sembunyi">Sembunyikan</label>
+									</div>
+								</td>
+							</tr>
+							<small class="d-block form-text text-muted">Setting Menu Penyusunan Pohon Kinerja Yang Tampil Di Dashboard User Per Periode</small>
+						</div>
+						 <div class="form-group">
+							<label class="d-block">Pengaturan Menu Penyusunan Pohon Kinerja Perangkat Daerah</label>
+							<tr>
+								<td>
+									<div class="custom-control custom-radio custom-control-inline">
+										<input class="custom-control-input" type="radio" name="menu_penyusunan_pohon_kinerja_opd" id="menu_penyusunan_pohon_kinerja_opd_tampil" value="tampil" checked>
+										<label class="custom-control-label" for="menu_penyusunan_pohon_kinerja_opd_tampil">Tampilkan</label>
+									</div>
+								</td>
+								<td>
+									<div class="custom-control custom-radio custom-control-inline">
+										<input class="custom-control-input" type="radio" name="menu_penyusunan_pohon_kinerja_opd" id="menu_penyusunan_pohon_kinerja_opd_sembunyi" value="sembunyi">
+										<label class="custom-control-label" for="menu_penyusunan_pohon_kinerja_opd_sembunyi">Sembunyikan</label>
+									</div>
+								</td>
+							</tr>
+							<small class="d-block form-text text-muted">Setting Menu Penyusunan Pohon Kinerja Yang Tampil Di Dashboard User Per Periode</small>
+						</div>
+					</div>
+				</div> -->
 			</div>
 			<div class="modal-footer">
 				<button class="btn btn-primary submitBtn" onclick="submitTambahJadwalForm()">Simpan</button>
@@ -422,6 +470,8 @@ $body = '';
 		let akses_user_pohon_kinerja = jQuery("input[name='akses_user_upload_dokumen_pohon_kinerja']:checked").val();
 		let menu_dokumen = jQuery("input[name='menu_dokumen']:checked").val();
 		let menu_dokumen_pohon_kinerja = jQuery("input[name='menu_dokumen_pohon_kinerja']:checked").val();
+		// let menu_penyusunan_pohon_kinerja_pemda = jQuery("input[name='menu_penyusunan_pohon_kinerja_pemda']:checked").val();
+		// let menu_penyusunan_pohon_kinerja_opd = jQuery("input[name='menu_penyusunan_pohon_kinerja_opd']:checked").val();
 
 		if (nama_jadwal.trim() == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '' || jenis_khusus_rpjmd == '' || akses_user == '' || akses_user_pohon_kinerja == '' || menu_dokumen == '' || menu_dokumen_pohon_kinerja == '') {
 			jQuery("#wrap-loading").hide()

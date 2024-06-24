@@ -17,6 +17,13 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 		require_once ESAKIP_PLUGIN_PATH . 'public/partials/pohon-kinerja/wp-eval-sakip-penyusunan-pohon-kinerja-opd.php';
     }
+	public function list_penyusunan_pohon_kinerja_opd($atts){
+    	if(!empty($_GET) && !empty($_GET['post'])){
+			return '';
+		}
+
+		require_once ESAKIP_PLUGIN_PATH . 'public/partials/dokumen-list-opd/wp-eval-sakip-list-penyusunan-pohon-kinerja-opd.php';
+    }
     public function view_pohon_kinerja($atts){
     	if(!empty($_GET) && !empty($_GET['post'])){
 			return '';

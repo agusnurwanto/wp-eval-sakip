@@ -320,7 +320,7 @@ $body = '';
 						}
                         jQuery("input[name=akses_user_upload_dokumen][value='"+akses_user+"']").prop("checked",true);
 						jQuery("#no_urut").val(data.default_urutan);
-						if(data.nama_tabel == 'esakip_renstra' || data.nama_tabel == 'esakip_pohon_kinerja_dan_cascading'){
+						if(data.nama_tabel == 'esakip_renstra' || data.nama_tabel == 'esakip_pohon_kinerja_dan_cascading' || data.nama_tabel == 'esakip_pohon_kinerja' || data.nama_tabel == 'esakip_pohon_kinerja_opd'){
 							jQuery('#setting_hak_akses_user').hide();
 							jQuery('#keterangan_hak_akses_user').show();
 						}else{

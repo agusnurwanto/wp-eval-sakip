@@ -34,7 +34,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				if (!empty($_POST['tahun_anggaran']) && !empty($_POST['tipe'])) {
                     $tahun_anggaran = $_POST['tahun_anggaran'];
-                    $cek = $this->generate_menu($tahun_anggaran,$_POST['tipe']);
+                    $cek = $this->generate_pengaturan_menu($tahun_anggaran,$_POST['tipe']);
 
                     $where_jenis_user = '';
                     if(!empty($_POST['tipe'])){
@@ -237,7 +237,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
 		die(json_encode($ret));
 	}
 
-    public function generate_menu($tahun_anggaran,$tipe)
+    public function generate_pengaturan_menu($tahun_anggaran,$tipe)
 	{
 		global $wpdb;
 		$return = array(
@@ -355,6 +355,12 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             array(
                                 'nama_dokumen' => 'Dokumen Lainnya',
                                 'nama_tabel' => 'esakip_other_file',
+                                'user_role' => 'pemerintah_daerah',
+                                'jenis_role'    => 1
+                            ),
+                            array(
+                                'nama_dokumen' => 'Penyusunan Pohon Kinerja',
+                                'nama_tabel' => 'esakip_pohon_kinerja',
                                 'user_role' => 'pemerintah_daerah',
                                 'jenis_role'    => 1
                             )
@@ -492,6 +498,12 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             array(
                                 'nama_dokumen' => 'Dokumen Lainnya',
                                 'nama_tabel' => 'esakip_dokumen_lainnya',
+                                'user_role' => 'perangkat_daerah',
+                                'jenis_role'    => 2
+                            ),
+                            array(
+                                'nama_dokumen' => 'Penyusunan Pohon Kinerja',
+                                'nama_tabel' => 'esakip_pohon_kinerja_opd',
                                 'user_role' => 'perangkat_daerah',
                                 'jenis_role'    => 2
                             )

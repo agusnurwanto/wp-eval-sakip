@@ -157,7 +157,8 @@ class Wp_Eval_Sakip_Admin
 								*
 							FROM esakip_data_jadwal
 							WHERE tipe = %s
-							  AND status = 1",
+							  AND status = 1
+							  ORDER BY tahun_anggaran DESC",
 							'RPJMD'
 						),
 						ARRAY_A
@@ -185,14 +186,15 @@ class Wp_Eval_Sakip_Admin
 									</ul>';
 						} else if (!empty($_POST['type']) && $_POST['type'] == 'input_pohon_kinerja_opd') {
 							$input_pokin = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Input Pohon Kinerja Perangkat Daerah ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-								'content' => '[penyusunan_pohon_kinerja_pd periode=' . $jadwal_periode_item['id'] . ']',
+								'nama_page' => 'List Halaman Input Pohon Kinerja Perangkat Daerah ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+								'content' => '[list_penyusunan_pohon_kinerja_opd periode=' . $jadwal_periode_item['id'] . ']',
 								'show_header' => 1,
 								'no_key' => 1,
 								'post_status' => 'private'
 							));
+							$title = 'Halaman Input Pohon Kinerja Perangkat Daerah ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
 							$body_pemda .= '
-								<li><a target="_blank" href="' . $input_pokin['url'] . '">' . $input_pokin['title'] . '</a></li>';
+								<li><a target="_blank" href="' . $input_pokin['url'] . '">' . $title . '</a></li>';
 						} else if (!empty($_POST['type']) && $_POST['type'] == 'cascading_pemda') {
 							$cascading = $this->functions->generatePage(array(
 								'nama_page' => 'Halaman Input Cascading Pemerintah Daerah ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
@@ -341,7 +343,8 @@ class Wp_Eval_Sakip_Admin
 								lama_pelaksanaan
 							FROM esakip_data_jadwal
 							WHERE tipe = %s
-							  AND status = 1",
+							  AND status = 1
+							  ORDER BY tahun_anggaran DESC",
 							'RPJPD'
 						),
 						ARRAY_A
