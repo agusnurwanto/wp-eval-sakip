@@ -185,7 +185,7 @@ class Wp_Eval_Sakip_Admin
 									</ul>';
 						} else if (!empty($_POST['type']) && $_POST['type'] == 'input_pohon_kinerja_opd') {
 							$input_pokin = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Input Pohon Kinerja Perangkat Daerah ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+								'nama_page' => 'Halaman Input Pohon Kinerja Perangkat Daerah ' . $jadwal_periode_item['nama_jadwal_renstra'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
 								'content' => '[penyusunan_pohon_kinerja_pd periode=' . $jadwal_periode_item['id'] . ']',
 								'show_header' => 1,
 								'no_key' => 1,
