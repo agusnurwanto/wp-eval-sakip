@@ -55,9 +55,10 @@ $data_temp = [''];
         padding: 0;
         border: 0;
         margin: 0;
+        vertical-align: top;
     }
-    #tabel-cascading > tbody > tr > td:last-child{
-        padding-left: 10px;
+    #tabel-cascading > tbody > tr > td{
+        padding: 10px;
     }
 
     #tabel-cascading button.btn.btn-lg.btn-info,

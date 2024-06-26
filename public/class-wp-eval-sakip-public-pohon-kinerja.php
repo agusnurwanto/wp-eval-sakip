@@ -1095,23 +1095,10 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					}
 
 					//misi rpjpd
-					$misi_rpjpd_html = '
-					<table>
-						<tbody>
-							<tr>
-					';
-						$data = '';
-						foreach ($misi_rpjpd as $misi) {
-							$data .= '<td class="text-center"><button class="btn btn-lg btn-warning">' . $misi['misi_teks'] . '</button></td>';
-						}
-						if (empty($data)) {
-							$data = '<td class="text-center"><button class="btn btn-lg btn-warning"></button></td>';
-						}
-						$misi_rpjpd_html .= $data . '
-							</tr>
-						</tbody>
-					</table>
-					';
+					$misi_rpjpd_html ='';
+					foreach ($misi_rpjpd as $misi) {
+						$misi_rpjpd_html .= $misi['misi_teks'];
+					}
 
 					//indikator tujuan rpd
 					$indikator_tujuan_html = '
@@ -1214,12 +1201,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							<tr>
 					';
 					$data = '';
-						foreach ($skpd_program as $skpd) {
-							$data .= '<td class="text-center"><button class="btn btn-lg btn-warning">' . $skpd['nama_skpd'] . '</button></td>';
-						}
-						if (empty($data)) {
-							$data = '<td class="text-center"><button class="btn btn-lg btn-warning"></button></td>';
-						}
+					foreach ($skpd_program as $skpd) {
+						$data .= '<td class="text-center"><button class="btn btn-lg btn-warning">' . $skpd['nama_skpd'] . '</button></td>';
+					}
+					if (empty($data)) {
+						$data = '<td class="text-center"><button class="btn btn-lg btn-warning"></button></td>';
+					}
 					$skpd_program_html .= $data . '
 							</tr>
 						</tbody>
@@ -1252,7 +1239,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							</tr>
 							<tr>
 								<td class="text-center"><button class="btn btn-lg btn-info">URUSAN PENGAMPU</button></td>
-								<td class="text-center"><button class="btn btn-lg btn-warning">' . $skpd_program_html . '</button></td>
+								<td class="text-center">' . $skpd_program_html . '</td>
 							</tr>
 						</tbody>
 					</table>
