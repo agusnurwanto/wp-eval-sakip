@@ -10392,20 +10392,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$params = $_REQUEST;
 					$columns = array(
 						0 => 'nama_jadwal',
-						1 => 'keterangan',
-						2 => 'tahun_anggaran',
-						3 => 'lama_pelaksanaan',
-						4 => 'tipe',
-						5 => 'id',
-						6 => 'tahun_selesai_anggaran',
-						7 => 'jenis_jadwal_khusus'
+						1 => 'nama_jadwal_renstra',
+						2 => 'keterangan',
+						3 => 'tahun_anggaran',
+						4 => 'lama_pelaksanaan',
+						5 => 'tipe',
+						6 => 'id',
+						7 => 'tahun_selesai_anggaran',
+						8 => 'jenis_jadwal_khusus'
 					);
 					$where = $sqlTot = $sqlRec = "";
 					$where = " WHERE tipe = 'RPJMD' AND status != 0";
 
 					// check search value exist
 					if (!empty($params['search']['value'])) {
-						$where .= " AND ( nama LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
+						$where .= " AND ( nama_jadwal LIKE " . $wpdb->prepare('%s', "%" . $params['search']['value'] . "%");
 					}
 
 					// getting total number records without any search
@@ -10648,8 +10649,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
-				if (!empty($_POST['nama_jadwal']) && !empty($_POST['lama_pelaksanaan']) && !empty($_POST['keterangan']) && !empty($_POST['tahun_anggaran']) && !empty($_POST['jenis_khusus_rpjmd']) && !empty($_POST['akses_user']) && !empty($_POST['akses_user_pohon_kinerja'])) {
+				if (!empty($_POST['nama_jadwal']) && !empty($_POST['nama_jadwal_renstra']) && !empty($_POST['lama_pelaksanaan']) && !empty($_POST['keterangan']) && !empty($_POST['tahun_anggaran']) && !empty($_POST['jenis_khusus_rpjmd']) && !empty($_POST['akses_user']) && !empty($_POST['akses_user_pohon_kinerja'])) {
 					$nama_jadwal	= trim(htmlspecialchars($_POST['nama_jadwal']));
+					$nama_jadwal_renstra	= trim(htmlspecialchars($_POST['nama_jadwal_renstra']));
 					$tahun_anggaran	= trim(htmlspecialchars($_POST['tahun_anggaran']));
 					$keterangan		= trim(htmlspecialchars($_POST['keterangan']));
 					$lama_pelaksanaan 	= trim(htmlspecialchars($_POST['lama_pelaksanaan']));
@@ -10678,6 +10680,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					//update data penjadwalan
 					$data_jadwal = array(
 						'nama_jadwal' 			=> $nama_jadwal,
+						'nama_jadwal_renstra' 	=> $nama_jadwal_renstra,
 						'tahun_anggaran'		=> $tahun_anggaran,
 						'relasi_perencanaan'	=> $relasi_rpjpd,
 						'keterangan'			=> $keterangan,
@@ -10827,9 +10830,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
-				if (!empty($_POST['id']) && !empty($_POST['nama_jadwal']) && !empty($_POST['lama_pelaksanaan']) && !empty($_POST['keterangan']) && !empty($_POST['tahun_anggaran']) && !empty($_POST['jenis_khusus_rpjmd']) && !empty($_POST['akses_user']) && !empty($_POST['akses_user_pohon_kinerja'])) {
+				if (!empty($_POST['id']) && !empty($_POST['nama_jadwal']) && !empty($_POST['nama_jadwal_renstra']) && !empty($_POST['lama_pelaksanaan']) && !empty($_POST['keterangan']) && !empty($_POST['tahun_anggaran']) && !empty($_POST['jenis_khusus_rpjmd']) && !empty($_POST['akses_user']) && !empty($_POST['akses_user_pohon_kinerja'])) {
 					$id = trim(htmlspecialchars($_POST['id']));
 					$nama_jadwal	= trim(htmlspecialchars($_POST['nama_jadwal']));
+					$nama_jadwal_renstra	= trim(htmlspecialchars($_POST['nama_jadwal_renstra']));
 					$tahun_anggaran	= trim(htmlspecialchars($_POST['tahun_anggaran']));
 					$keterangan		= trim(htmlspecialchars($_POST['keterangan']));
 					$lama_pelaksanaan 	= trim(htmlspecialchars($_POST['lama_pelaksanaan']));
@@ -10887,6 +10891,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					//update data penjadwalan
 					$data_jadwal = array(
 						'nama_jadwal' 			=> $nama_jadwal,
+						'nama_jadwal_renstra' 	=> $nama_jadwal_renstra,
 						'tahun_anggaran'		=> $tahun_anggaran,
 						'keterangan'			=> $keterangan,
 						'tipe'					=> 'RPJMD',
@@ -17300,6 +17305,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				SELECT 
 					id,
 					nama_jadwal,
+					nama_jadwal_renstra,
 					tahun_anggaran,
 					lama_pelaksanaan,
 					tahun_selesai_anggaran
@@ -17361,14 +17367,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 
 				$input_pohon_kinerja_opd = $this->functions->generatePage(array(
-					'nama_page' => 'Halaman Input Pohon Kinerja Perangkat Daerah ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+					'nama_page' => 'Halaman Input Pohon Kinerja Perangkat Daerah ' . $jadwal_periode_item['nama_jadwal_renstra'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
 					'content' => '[penyusunan_pohon_kinerja_opd periode=' . $jadwal_periode_item['id'] . ']',
 					'show_header' => 1,
 					'post_status' => 'private'
 				));
-				$title = 'Input Pohon Kinerja | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+				$title_pokin = 'Input Pohon Kinerja | ' . $jadwal_periode_item['nama_jadwal_renstra'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
 				$input_pohon_kinerja_opd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-				$periode_input_pohon_kinerja_opd .= '<li><a style="text-align: left;" target="_blank" href="' . $input_pohon_kinerja_opd['url'] . '" class="btn btn-primary">' . $title . '</a></li>';
+				$periode_input_pohon_kinerja_opd .= '<li><a style="text-align: left;" target="_blank" href="' . $input_pohon_kinerja_opd['url'] . '" class="btn btn-primary">' . $title_pokin . '</a></li>';
 	
 			}
 

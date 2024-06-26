@@ -317,7 +317,7 @@ if(!empty($pohon_kinerja_level_1)){
 }
 
 $view_kinerja = $this->functions->generatePage(array(
-	'nama_page' => 'View Pohon Kinerja '.$skpd['nama_skpd'],
+	'nama_page' => 'View Pohon Kinerja OPD'.$skpd['nama_skpd'],
 	'content' => '[view_pohon_kinerja_opd periode='. $input['periode'] .']',
 	'show_header' => 1,
 	'post_status' => 'private'
@@ -442,7 +442,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 		background: #b5d9ea;
 	}
 </style>
-<h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Pohon Kinerja <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h3><br>
+<h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Pohon Kinerja <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $periode['nama_jadwal_renstra'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h3><br>
 <div id="action" style="text-align: center; margin-top:30px; margin-bottom: 30px;">
 		<a style="margin-left: 10px;" id="tambah-pohon-kinerja" onclick="return false;" href="#" class="btn btn-success">Tambah Data</a>
 </div>

@@ -46,6 +46,7 @@ $body = '';
 			<thead id="data_header">
 				<tr>
 					<th class="text-center">Nama Jadwal</th>
+					<th class="text-center">Nama Jadwal RENSTRA</th>
 					<th class="text-center">Keterangan</th>
 					<th class="text-center">Tahun Mulai</th>
 					<th class="text-center">Tahun Akhir</th>
@@ -72,6 +73,10 @@ $body = '';
 				<div class="form-group">
 					<label for='nama_jadwal' style='display:inline-block'>Nama Jadwal</label>
 					<input type='text' id='nama_jadwal' style='display:block;width:100%;' placeholder='Input Nama Jadwal'>
+				</div>
+				<div class="form-group">
+					<label for='nama_jadwal_renstra' style='display:inline-block'>Nama Jadwal RENSTRA</label>
+					<input type='text' id='nama_jadwal_renstra' style='display:block;width:100%;' placeholder='Input Nama Jadwal RENSTRA'>
 				</div>
 				<div class="form-group">
 					<label for='tahun_anggaran' style='display:inline-block'>Tahun Mulai Anggaran</label>
@@ -290,6 +295,10 @@ $body = '';
 					className: "text-center"
 				},
 				{
+					"data": "nama_jadwal_renstra",
+					className: "text-center"
+				},
+				{
 					"data": "keterangan",
 					className: "text-center"
 				},
@@ -319,6 +328,7 @@ $body = '';
 		jQuery('#lama_pelaksanaan').val(jQuery('#lama_pelaksanaan'));
 		jQuery('#relasi_rpjpd').val('');
 		jQuery('#nama_jadwal').val('').prop('disabled', false);
+		jQuery('#nama_jadwal_renstra').val('').prop('disabled', false);
 		jQuery('#keterangan').val('').prop('disabled', false);
 		jQuery('#tahun_anggaran').val('').prop('disabled', false);
 		jQuery("#modalTambahJadwal .submitBtn")
@@ -345,6 +355,7 @@ $body = '';
 	function submitTambahJadwalForm() {
 		jQuery("#wrap-loading").show()
 		let nama_jadwal = jQuery('#nama_jadwal').val()
+		let nama_jadwal_renstra = jQuery('#nama_jadwal_renstra').val()
 		let keterangan = jQuery("#keterangan").val()
 		let relasi_rpjpd = jQuery("#relasi_rpjpd").val()
 		let tahun_anggaran = jQuery("#tahun_anggaran").val()
@@ -356,7 +367,7 @@ $body = '';
 		let menu_dokumen = jQuery("input[name='menu_dokumen']:checked").val();
 		let menu_dokumen_pohon_kinerja = jQuery("input[name='menu_dokumen_pohon_kinerja']:checked").val();
 
-		if (nama_jadwal.trim() == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '' || jenis_khusus_rpjmd == '' || akses_user == '' || akses_user_pohon_kinerja == '' || menu_dokumen == '' || menu_dokumen_pohon_kinerja == '') {
+		if (nama_jadwal.trim() == '' || nama_jadwal_renstra == ''|| keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '' || jenis_khusus_rpjmd == '' || akses_user == '' || akses_user_pohon_kinerja == '' || menu_dokumen == '' || menu_dokumen_pohon_kinerja == '') {
 			jQuery("#wrap-loading").hide()
 			alert("Ada yang kosong, Harap diisi semua")
 			return false
@@ -369,6 +380,7 @@ $body = '';
 					'action': 'submit_jadwal_rpjmd',
 					'api_key': jQuery("#api_key").val(),
 					'nama_jadwal': nama_jadwal,
+					'nama_jadwal_renstra': nama_jadwal_renstra,
 					'tahun_anggaran': tahun_anggaran,
 					'relasi_rpjpd': relasi_rpjpd,
 					'keterangan': keterangan,
@@ -423,6 +435,7 @@ $body = '';
 				jQuery("#wrap-loading").hide()
 				jQuery("#relasi_rpjpd").val(response.data.relasi_perencanaan).change();
 				jQuery("#nama_jadwal").val(response.data.nama_jadwal);
+				jQuery("#nama_jadwal_renstra").val(response.data.nama_jadwal_renstra);
 				jQuery("#keterangan").val(response.data.keterangan);
 				jQuery("#tahun_anggaran").val(response.data.tahun_anggaran);
 				jQuery("#tahun_selesai_anggaran").val(response.data.tahun_selesai_anggaran);
@@ -461,6 +474,7 @@ $body = '';
 	function submitEditJadwalForm(id) {
 		jQuery("#wrap-loading").show()
 		let nama_jadwal = jQuery('#nama_jadwal').val()
+		let nama_jadwal_renstra = jQuery('#nama_jadwal_renstra').val()
 		let keterangan = jQuery("#keterangan").val()
 		let tahun_anggaran = jQuery("#tahun_anggaran").val()
 		let lama_pelaksanaan = jQuery("#lama_pelaksanaan").val()
@@ -473,7 +487,7 @@ $body = '';
 		// let menu_penyusunan_pohon_kinerja_pemda = jQuery("input[name='menu_penyusunan_pohon_kinerja_pemda']:checked").val();
 		// let menu_penyusunan_pohon_kinerja_opd = jQuery("input[name='menu_penyusunan_pohon_kinerja_opd']:checked").val();
 
-		if (nama_jadwal.trim() == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '' || jenis_khusus_rpjmd == '' || akses_user == '' || akses_user_pohon_kinerja == '' || menu_dokumen == '' || menu_dokumen_pohon_kinerja == '') {
+		if (nama_jadwal.trim() == '' || nama_jadwal_renstra == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '' || jenis_khusus_rpjmd == '' || akses_user == '' || akses_user_pohon_kinerja == '' || menu_dokumen == '' || menu_dokumen_pohon_kinerja == '') {
 			jQuery("#wrap-loading").hide()
 			alert("Ada yang kosong, Harap diisi semua")
 			return false
@@ -486,6 +500,7 @@ $body = '';
 					'action': 'submit_edit_jadwal_rpjmd',
 					'api_key': jQuery("#api_key").val(),
 					'nama_jadwal': nama_jadwal,
+					'nama_jadwal_renstra': nama_jadwal_renstra,
 					'id': id,
 					'keterangan': keterangan,
 					'tahun_anggaran': tahun_anggaran,
