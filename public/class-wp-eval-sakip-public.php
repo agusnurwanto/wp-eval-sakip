@@ -16373,6 +16373,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			SELECT 
 				id,
 				nama_jadwal,
+				nama_jadwal_renstra,
 				tahun_anggaran,
 				lama_pelaksanaan,
 				tahun_selesai_anggaran
@@ -16539,12 +16540,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$periode_input_croscutting_pemda .= '<li><a target="_blank" href="' . $input_croscutting_pemda['url'] . '" class="btn btn-primary">' . $title . '</a></li>';
 
 			$list_input_pohon_kinerja_opd = $this->functions->generatePage(array(
-				'nama_page' => 'List Halaman Input Pohon Kinerja Perangkat Daerah ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'nama_page' => 'List Halaman Input Pohon Kinerja Perangkat Daerah ' . $jadwal_periode_item['nama_jadwal_renstra'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
 				'content' => '[list_penyusunan_pohon_kinerja_opd periode=' . $jadwal_periode_item['id'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$title = 'Input Pohon Kinerja | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+			$title = 'Input Pohon Kinerja | ' . $jadwal_periode_item['nama_jadwal_renstra'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
 			$list_periode_input_pohon_kinerja_opd .= '<li><a target="_blank" href="' . $list_input_pohon_kinerja_opd['url'] . '" class="btn btn-primary">' . $title . '</a></li>';
 			
 			$renstra = $this->functions->generatePage(array(
