@@ -1057,7 +1057,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						", $tujuan['id_unik']),
 						ARRAY_A
 					);
-					if($tujuan['id_isu'] != 0) {
+					if ($tujuan['id_isu'] != 0) {
 						//cari misi berdasarkan isu
 						$id_isu_rpjpd = $wpdb->get_var(
 							$wpdb->prepare("
@@ -1095,7 +1095,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					}
 
 					//misi rpjpd
-					$misi_rpjpd_html ='';
+					$misi_rpjpd_html = '';
 					foreach ($misi_rpjpd as $misi) {
 						$misi_rpjpd_html .= $misi['misi_teks'];
 					}
@@ -1106,12 +1106,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						<tbody>
 							<tr>
 					';
-						$data = '';
-						foreach ($indikator_tujuan as $ind) {
-							$data .= '<td class="text-center"><button class="btn btn-lg btn-warning">' . $ind['indikator_teks'] . '</button></td>';
-						}
-						if (empty($data)) {
-							$data = '<td class="text-center"><button class="btn btn-lg btn-warning"></button></td>';
+					$data = '';
+					foreach ($indikator_tujuan as $ind) {
+						$data .= '<td class="text-center"><button class="btn btn-lg btn-warning">' . $ind['indikator_teks'] . '</button></td>';
+					}
+					if (empty($data)) {
+						$data = '<td class="text-center"><button class="btn btn-lg btn-warning"></button></td>';
 					}
 					$indikator_tujuan_html .= $data . '
 							</tr>
@@ -1137,63 +1137,68 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						<tbody>
 							<tr>
 					';
-						$data = '';
-						foreach ($sasaran as $sas) {
-							$data .= '<td class="text-center"><button class="btn btn-lg btn-warning">' . $sas['sasaran_teks'] . '</button></td>';
-						}
-						if (empty($data)) {
-							$data = '<td class="text-center"><button class="btn btn-lg btn-warning"></button></td>';
-						}
+					$data = '';
+					$indikator_sasarans = array();
+					$skpd_programs = array();
+					foreach ($sasaran as $sas) {
+						$data .= '<td class="text-center"><button class="btn btn-lg btn-warning">' . $sas['sasaran_teks'] . '</button></td>';
+						//indikator sasaran sasaran rpd
+						$indikator_sasaran = $wpdb->get_results(
+							$wpdb->prepare("
+									SELECT 
+										*
+									FROM esakip_rpd_sasaran
+									WHERE id_unik = %s
+									AND id_unik_indikator IS NOT NULL
+									AND active=1
+								", $sas['id_unik']),
+							ARRAY_A
+						);
+						//indikator sasaran sasaran rpd
+						$skpd_program = $wpdb->get_results(
+							$wpdb->prepare("
+									SELECT 
+										*
+									FROM esakip_rpd_program
+									WHERE kode_sasaran = %s
+									AND id_unik_indikator IS NOT NULL
+									AND active=1
+								", $sas['id_unik']),
+							ARRAY_A
+						);
+						$indikator_sasarans = array_merge($indikator_sasarans, $indikator_sasaran);
+						$skpd_programs = array_merge($skpd_programs, $skpd_program);
+					}
+					if (empty($data)) {
+						$data = '<td class="text-center"><button class="btn btn-lg btn-warning"></button></td>';
+					}
 					$sasaran_html .= $data . '
 							</tr>
 						</tbody>
 					</table>
 					';
 
-					//indikator sasaran sasaran rpd
-					$indikator_sasaran = $wpdb->get_results(
-						$wpdb->prepare("
-							SELECT 
-								*
-							FROM esakip_rpd_sasaran
-							WHERE id_unik = %s
-							  AND id_unik_indikator IS NOT NULL
-							  AND active=1
-						", $sasaran[0]['id_unik']),
-						ARRAY_A
-					);
-					
+
+
 					$indikator_sasaran_html = '
 					<table>
 						<tbody>
 							<tr>
 					';
 					$data = '';
-						foreach ($indikator_sasaran as $ind) {
-							$data .= '<td class="text-center"><button class="btn btn-lg btn-warning">' . $ind['indikator_teks'] . '</button></td>';
-						}
-						if (empty($data)) {
-							$data = '<td class="text-center"><button class="btn btn-lg btn-warning"></button></td>';
-						}
+					foreach ($indikator_sasarans as $ind) {
+						$data .= '<td class="text-center"><button class="btn btn-lg btn-warning">' . $ind['indikator_teks'] . '</button></td>';
+					}
+					if (empty($data)) {
+						$data = '<td class="text-center"><button class="btn btn-lg btn-warning"></button></td>';
+					}
 					$indikator_sasaran_html .= $data . '
 							</tr>
 						</tbody>
 					</table>
 					';
-					
-					//indikator sasaran sasaran rpd
-					$skpd_program = $wpdb->get_results(
-						$wpdb->prepare("
-							SELECT 
-								*
-							FROM esakip_rpd_program
-							WHERE kode_sasaran = %s
-							  AND id_unik_indikator IS NOT NULL
-							  AND active=1
-						", $sasaran[0]['id_unik']),
-						ARRAY_A
-					);
-					// die($wpdb->last_query);
+
+
 
 					$skpd_program_html = '
 					<table>
@@ -1201,7 +1206,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							<tr>
 					';
 					$data = '';
-					foreach ($skpd_program as $skpd) {
+					foreach ($skpd_programs as $skpd) {
 						$data .= '<td class="text-center"><button class="btn btn-lg btn-warning">' . $skpd['nama_skpd'] . '</button></td>';
 					}
 					if (empty($data)) {
