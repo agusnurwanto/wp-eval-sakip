@@ -68,17 +68,17 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					switch ($_POST['level']) {
 						case '2':
-							$label_parent = ',
+							$label_parent = '
 							(
 								SELECT 
 									label 
 								FROM esakip_pohon_kinerja'. $_prefix_opd .' 
-								WHERE id=a.parent '. $_where_opd .'
+								WHERE id=a.id '. $_where_opd .'
 							) label_parent_1';
 							break;
 
 						case '3':
-							$label_parent = ',
+							$label_parent = '
 							(
 								SELECT 
 									label 
@@ -87,19 +87,19 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									SELECT 
 										parent 
 									FROM esakip_pohon_kinerja'. $_prefix_opd .' 
-									WHERE id=a.parent '. $_where_opd .'
+									WHERE id=a.id '. $_where_opd .'
 								) '. $_where_opd .'
 							) label_parent_1,
 							(
 								SELECT 
 									label 
 								FROM esakip_pohon_kinerja'. $_prefix_opd .' 
-								WHERE id=a.parent '. $_where_opd .'
+								WHERE id=a.id '. $_where_opd .'
 							) label_parent_2';
 							break;
 
 						case '4':
-							$label_parent = ',
+							$label_parent = '
 							(
 								SELECT 
 									label 
@@ -112,7 +112,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 										SELECT 
 											parent 
 										FROM esakip_pohon_kinerja'. $_prefix_opd .' 
-										WHERE id=a.parent '. $_where_opd .'
+										WHERE id=a.id '. $_where_opd .'
 									) '. $_where_opd .'
 								) '. $_where_opd .'
 							) label_parent_1,
@@ -124,19 +124,19 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									SELECT 
 										parent 
 									FROM esakip_pohon_kinerja'. $_prefix_opd .' 
-									WHERE id=a.parent '. $_where_opd .'
+									WHERE id=a.id '. $_where_opd .'
 								) '. $_where_opd .'
 							) label_parent_2,
 							(
 								SELECT 
 									label 
 								FROM esakip_pohon_kinerja'. $_prefix_opd .' 
-								WHERE id=a.parent '. $_where_opd .'
+								WHERE id=a.id '. $_where_opd .'
 							) label_parent_3';
 							break;
 
 						case '5':
-							$label_parent = ',
+							$label_parent = '
 							(
 								SELECT 
 									label 
@@ -153,7 +153,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 											SELECT 
 												parent 
 											FROM esakip_pohon_kinerja'. $_prefix_opd .' 
-											WHERE id=a.parent '. $_where_opd .'
+											WHERE id=a.id '. $_where_opd .'
 										) '. $_where_opd .'
 									) '. $_where_opd .'
 								) '. $_where_opd .'
@@ -170,7 +170,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 										SELECT 
 											parent 
 										FROM esakip_pohon_kinerja'. $_prefix_opd .' 
-										WHERE id=a.parent '. $_where_opd .'
+										WHERE id=a.id '. $_where_opd .'
 									) '. $_where_opd .'
 								) '. $_where_opd .'
 							) label_parent_2,
@@ -182,14 +182,14 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									SELECT 
 										parent 
 									FROM esakip_pohon_kinerja'. $_prefix_opd .' 
-									WHERE id=a.parent '. $_where_opd .'
+									WHERE id=a.id '. $_where_opd .'
 								) '. $_where_opd .'
 							) label_parent_3,
 							(
 								SELECT 
 									label 
 								FROM esakip_pohon_kinerja'. $_prefix_opd .' 
-								WHERE id=a.parent '. $_where_opd .'
+								WHERE id=a.id '. $_where_opd .'
 							) label_parent_4';
 							break;
 						
@@ -207,7 +207,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								a.active,
 								b.id AS id_indikator,
 								b.label_indikator_kinerja
-								".$label_parent."
 							FROM esakip_pohon_kinerja a
 								LEFT JOIN esakip_pohon_kinerja b 
 									ON a.id=b.parent AND a.level=b.level 
@@ -222,7 +221,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							$_POST['level'], 
 							1
 						), ARRAY_A);
-					}else{
+					}else if($_prefix_opd == '_opd'){
 						$dataPokin = $wpdb->get_results($wpdb->prepare("
 							SELECT 
 								a.id,
@@ -231,9 +230,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								a.active,
 								b.id AS id_indikator,
 								b.label_indikator_kinerja
-								".$label_parent."
-							FROM esakip_pohon_kinerja$_prefix_opd a
-								LEFT JOIN esakip_pohon_kinerja$_prefix_opd b 
+							FROM esakip_pohon_kinerja_opd a
+								LEFT JOIN esakip_pohon_kinerja_opd b 
 									ON a.id=b.parent AND a.level=b.level 
 							WHERE 
 								a.id_jadwal=%d AND 
@@ -250,28 +248,48 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						), ARRAY_A);
 					}
 
+					$dataParent = array();
+					if($_prefix_opd == ''){
+						if(!empty($label_parent)){
+							$dataParent = $wpdb->get_results($wpdb->prepare("
+									SELECT 
+										".$label_parent."
+									FROM esakip_pohon_kinerja a 
+									WHERE 
+										a.id_jadwal=%d AND 
+										a.id=%d AND
+										a.active=%d
+									ORDER BY a.id", 
+									$_POST['id_jadwal'], 
+									$_POST['parent'], 
+									1
+								), ARRAY_A);
+						}
+					}else if($_prefix_opd == '_opd'){
+						if(!empty($label_parent)){
+							$dataParent = $wpdb->get_results($wpdb->prepare("
+									SELECT 
+										".$label_parent."
+									FROM esakip_pohon_kinerja_opd a 
+									WHERE 
+										a.id_jadwal=%d AND 
+										a.id=%d AND
+										a.active=%d AND 
+										a.id_skpd=%d
+									ORDER BY a.id", 
+									$_POST['id_jadwal'], 
+									$_POST['parent'], 
+									1,
+									$id_skpd
+								), ARRAY_A);
+						}
+					}
+
 					$data = [
 						'data' => [],
 						'parent' => []
 					];
 					foreach ($dataPokin as $key => $pokin) {
-
-						if(empty($data['parent'][$pokin['label_parent_1']])){
-							$data['parent'][$pokin['label_parent_1']] = $pokin['label_parent_1'];
-						}
-
-						if(empty($data['parent'][$pokin['label_parent_2']])){
-							$data['parent'][$pokin['label_parent_2']] = $pokin['label_parent_2'];
-						}
-
-						if(empty($data['parent'][$pokin['label_parent_3']])){
-							$data['parent'][$pokin['label_parent_3']] = $pokin['label_parent_3'];
-						}
-
-						if(empty($data['parent'][$pokin['label_parent_4']])){
-							$data['parent'][$pokin['label_parent_4']] = $pokin['label_parent_4'];
-						}
-
 						if(empty($data['data'][$pokin['id']])){
 							$data['data'][$pokin['id']] = [
 								'id' => $pokin['id'],
@@ -289,6 +307,25 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									'label' => $pokin['label_indikator_kinerja']
 								];
 							}
+						}
+					}
+
+					foreach ($dataParent as $v_parent) {
+						
+						if(empty($data['parent'][$v_parent['label_parent_1']])){
+							$data['parent'][$v_parent['label_parent_1']] = $v_parent['label_parent_1'];
+						}
+
+						if(empty($data['parent'][$v_parent['label_parent_2']])){
+							$data['parent'][$v_parent['label_parent_2']] = $v_parent['label_parent_2'];
+						}
+
+						if(empty($data['parent'][$v_parent['label_parent_3']])){
+							$data['parent'][$v_parent['label_parent_3']] = $v_parent['label_parent_3'];
+						}
+
+						if(empty($data['parent'][$v_parent['label_parent_4']])){
+							$data['parent'][$v_parent['label_parent_4']] = $v_parent['label_parent_4'];
 						}
 					}
 
@@ -317,9 +354,20 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
     		if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( ESAKIP_APIKEY )) {
 
-					$_prefix_opd = $_where_opd = $id_skpd = '';
+					$_prefix_opd = $_where_opd = $id_skpd = $id_skpd_croscutting = $keterangan_croscutting = '';
+					$input = json_decode(stripslashes($_POST['data']), true);
+
 					if(!empty($_POST['tipe_pokin'])){
 						if(!empty($_POST['id_skpd'])){
+							if($input['settingCroscutting'] == 'true'){
+								if(!empty($input['skpdCroscutting']) && !empty($input['keteranganCroscutting'])){
+									$id_skpd_croscutting = $input['skpdCroscutting'];
+									$keterangan_croscutting = $input['keteranganCroscutting'];
+								}else{
+									throw new Exception("Input Croscutting wajib diisi!", 1);		
+								}
+							}
+
 							$id_skpd = $_POST['id_skpd'];
 							$_prefix_opd = $_POST['tipe_pokin'] == "opd" ? "_opd" : "";
 							$_where_opd = $_POST['tipe_pokin'] == "opd" ? ' AND id_skpd='.$id_skpd : '';
@@ -327,8 +375,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							throw new Exception("Id SKPD tidak ditemukan!", 1);
 						}
 					}
-
-					$input = json_decode(stripslashes($_POST['data']), true);
 
 					$id = $wpdb->get_var($wpdb->prepare("
 						SELECT 
@@ -346,6 +392,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					}
 
 					if($_prefix_opd == ""){
+						// untuk pokin pepmda //////////////////////////////////////////////////////////
 						$data = $wpdb->insert('esakip_pohon_kinerja', [
 							'label' => trim($input['label']),
 							'parent' => $input['parent'],
@@ -354,6 +401,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							'active' => 1
 						]);
 					}else{
+						// untuk pokin opd //////////////////////////////////////////////////////////
 						$data = $wpdb->insert('esakip_pohon_kinerja'.$_prefix_opd, [
 							'label' => trim($input['label']),
 							'parent' => $input['parent'],
@@ -362,11 +410,37 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							'active' => 1,
 							'id_skpd' => $id_skpd
 						]);
+
+						$parent_pokin_id = $wpdb->insert_id;
+
+						$data_cek_croscutting = $wpdb->get_row($wpdb->prepare("
+							SELECT *
+							FROM esakip_croscutting_opd
+							WHERE parent_pohon_kinerja=%d
+							AND id_skpd_croscutting=%d
+							AND keterangan=%s
+						", $parent_pokin_id, $id_skpd_croscutting, $keterangan_croscutting)
+						, ARRAY_A);
+
+						if(empty($data_cek_croscutting)){
+							$insert_crocutting = $wpdb->insert('esakip_croscutting_opd', [
+								'parent_pohon_kinerja' => $parent_pokin_id,
+								'keterangan' => trim($keterangan_croscutting),
+								'id_skpd_croscutting' => $id_skpd_croscutting,
+								'active' => 1,
+								'created_at' => current_time('mysql'),
+								'updated_at' => current_time('mysql')
+							]);
+						}else{
+							throw new Exception("Data Croscutting sudah ada!", 1);
+						}
 					}
 
 					echo json_encode([
 		    			'status' => true,
-		    			'message' => 'Sukses simpan pohon kinerja!'
+		    			'message' => 'Sukses simpan pohon kinerja!',
+						'cek_data' => $wpdb->last_query,
+						'cek_insert' => $insert_crocutting
 		    		]);exit();
 				}else{
 					throw new Exception("API tidak ditemukan!", 1);
@@ -410,13 +484,26 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							AND active=%d$_where_opd
 					", $_POST['id'], 1),  ARRAY_A);
 
+					$data_croscutting = array();
+					if(!empty($_prefix_opd) && $_prefix_opd == "_opd" && !empty($data)){
+						$data_croscutting = $wpdb->get_row($wpdb->prepare("
+								SELECT 
+									keterangan,
+									parent_pohon_kinerja
+								FROM esakip_croscutting_opd
+								WHERE parent_pohon_kinerja=%d 
+									AND active=%d
+							", $_POST['id'], 1),  ARRAY_A);
+					}
+
 					if(empty($data)){
 						throw new Exception("Data tidak ditemukan!", 1);
 					}
 
 					echo json_encode([
 		    			'status' => true,
-		    			'data' => $data
+		    			'data' => $data,
+						'data_croscutting' => $data_croscutting
 		    		]);exit();
 				}else{
 					throw new Exception("API tidak ditemukan!", 1);
@@ -437,10 +524,20 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
     	try {
     		if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( ESAKIP_APIKEY )) {
+					$input = json_decode(stripslashes($_POST['data']), true);
 
-					$_prefix_opd = $_where_opd = $id_skpd = '';
+					$_prefix_opd = $_where_opd = $id_skpd = $id_skpd_croscutting = $keterangan_croscutting = '';
 					if(!empty($_POST['tipe_pokin'])){
 						if(!empty($_POST['id_skpd'])){
+							if($input['settingCroscutting'] == 'true'){
+								if(!empty($input['skpdCroscutting']) && !empty($input['keteranganCroscutting'])){
+									$id_skpd_croscutting = $input['skpdCroscutting'];
+									$keterangan_croscutting = $input['keteranganCroscutting'];
+								}else{
+									throw new Exception("Data Croscutting tidak ditemukan!", 1);		
+								}
+							}
+
 							$id_skpd = $_POST['id_skpd'];
 							$_prefix_opd = $_POST['tipe_pokin'] == "opd" ? "_opd" : "";
 							$_where_opd = $_POST['tipe_pokin'] == "opd" ? ' AND id_skpd='.$id_skpd : '';
@@ -449,7 +546,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						}
 					}
 
-					$input = json_decode(stripslashes($_POST['data']), true);
 
 					$id = $wpdb->get_var($wpdb->prepare("
 						SELECT 
@@ -467,7 +563,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					}
 
 					if($_prefix_opd == ''){
-						// untuk pokin pemda
+						// untuk pokin pemda //////////////////////////////////////////////////////////////////////////////
 						$data = $wpdb->update('esakip_pohon_kinerja', [
 							'label' => trim($input['label'])
 						], [
@@ -481,7 +577,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								AND label_indikator_kinerja IS NOT NULL
 						", trim($input['label']), $input['id']));
 					}else{
-						// untuk pokin opd
+						// untuk pokin opd  //////////////////////////////////////////////////////////////////////////////
 						$data = $wpdb->update('esakip_pohon_kinerja'.$_prefix_opd, [
 							'label' => trim($input['label'])
 						], [
@@ -496,6 +592,40 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								AND label_indikator_kinerja IS NOT NULL
 								AND id_skpd=%d
 						", trim($input['label']), $input['id'], $id_skpd));
+
+						$data_cek_croscutting = $wpdb->get_row($wpdb->prepare("
+							SELECT *
+							FROM esakip_croscutting_opd
+							WHERE parent_pohon_kinerja=%d
+							AND id_skpd_croscutting=%d
+							AND keterangan=%s
+						", $input['id'], $id_skpd_croscutting, $keterangan_croscutting)
+						, ARRAY_A);
+
+						if(empty($data_cek_croscutting)){
+							$insert_crocutting = $wpdb->insert('esakip_croscutting_opd', [
+								'parent_pohon_kinerja' => $input['id'],
+								'keterangan' => trim($keterangan_croscutting),
+								'id_skpd_croscutting' => $id_skpd_croscutting,
+								'active' => 1,
+								'created_at' => current_time('mysql'),
+								'updated_at' => current_time('mysql')
+							]);
+						}else{
+							$update_crocutting = $wpdb->update('esakip_croscutting_opd', 
+								array(
+									'parent_pohon_kinerja' => $input['id'],
+									'keterangan' => trim($keterangan_croscutting),
+									'id_skpd_croscutting' => $id_skpd_croscutting,
+									'active' => 1,
+									'updated_at' => current_time('mysql')
+								),
+								array(
+									'id' => $data_cek_croscutting['id']
+								)
+							);
+						}
+
 					}
 
 					echo json_encode([
