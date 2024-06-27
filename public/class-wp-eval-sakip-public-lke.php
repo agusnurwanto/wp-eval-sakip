@@ -182,7 +182,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 									if ($count_nilai_penetapan > 0) {
 										$nilai_komponen[$komponen_id] += ($sum_nilai_penetapan / $count_nilai_penetapan) * $subkomponen['bobot'];
 									}
-								// akumulasi
+									// akumulasi
 								} else if ($subkomponen['metode_penilaian'] == 2) {
 									if ($count_nilai_usulan > 0) {
 										$nilai_usulan += $sum_nilai_usulan;
@@ -456,7 +456,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 									if ($subkomponen['metode_penilaian'] == 2) {
 										$persentase_sub = $sum_nilai_usulan / $subkomponen['bobot'];
 										$total_nilai_sub = $sum_nilai_usulan;
-									// nilai rata-rata sub
+										// nilai rata-rata sub
 									} else if ($subkomponen['metode_penilaian'] == 1) {
 										$persentase_sub = $sum_nilai_usulan / $count_nilai_usulan;
 										$total_nilai_sub = $persentase_sub * $subkomponen['bobot'];
@@ -469,7 +469,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 									if ($subkomponen['metode_penilaian'] == 2) {
 										$persentase_sub_penetapan = $sum_nilai_penetapan / $subkomponen['bobot'];
 										$total_nilai_sub_penetapan += $sum_nilai_penetapan;
-									// nilai rata-rata sub
+										// nilai rata-rata sub
 									} else if ($subkomponen['metode_penilaian'] == 1) {
 										$persentase_sub_penetapan = $sum_nilai_penetapan / $count_nilai_penetapan;
 										$total_nilai_sub_penetapan = $persentase_sub_penetapan * $subkomponen['bobot'];
@@ -504,8 +504,13 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 									|| $_POST['excel'] == 'usulan_penetapan'
 								) {
 									$tbody2 .= "<td class='text-center'></td>";
-									$tbody2 .= "<td class='text-center'>" . number_format($total_nilai_sub_penetapan, 2) . "</td>";
-									$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub_penetapan * 100, 2) . "%" . "</td>";
+									if ($tampil_nilai_penetapan == 1) {
+										$tbody2 .= "<td class='text-center'>" . number_format($total_nilai_sub_penetapan, 2) . "</td>";
+										$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub_penetapan * 100, 2) . "%" . "</td>";
+									} else {
+										$tbody2 .= "<td class='text-center'> - </td>";
+										$tbody2 .= "<td class='text-center'> - </td>";
+									}
 									$tbody2 .= "<td class='text-left' colspan='3'>User Penilai: <b>" . $user_penilai[$subkomponen['id_user_penilai']] . "</b></td>";
 								}
 								$tbody2 .= "</tr>";
@@ -645,38 +650,40 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 										//opsi jawaban penetapan
 										$opsi_penetapan = "<option value=''>Pilih Jawaban</option>";
-										if (isset($penilaian['pl_nilai_penetapan'])) {
-											if ($penilaian['kp_tipe'] == 1) {
-												$opsi_penetapan .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 1 ? " selected" : "") . ">Y</option>";
-												$opsi_penetapan .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0 ? " selected" : "") . ">T</option>";
-											} else if ($penilaian['kp_tipe'] == 2) {
-												$opsi_penetapan .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 1 ? " selected" : "") . ">A</option>";
-												$opsi_penetapan .= "<option value='0.75' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.75 ? " selected" : "") . ">B</option>";
-												$opsi_penetapan .= "<option value='0.5' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.5 ? " selected" : "") . ">C</option>";
-												$opsi_penetapan .= "<option value='0.25' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.25 ? " selected" : "") . ">D</option>";
-												$opsi_penetapan .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0 ? " selected" : "") . ">E</option>";
-											} else if ($penilaian['kp_tipe'] == 3) {
-												if (!empty($opsi_custom)) {
-													foreach ($opsi_custom as $custom) {
-														$opsi_penetapan .= "<option value='" . $custom['nilai'] . "' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == $custom['nilai'] ? " selected" : "") . ">" . $custom['nama'] . "</option>";
+										if ($tampil_nilai_penetapan == 1) {
+											if (isset($penilaian['pl_nilai_penetapan'])) {
+												if ($penilaian['kp_tipe'] == 1) {
+													$opsi_penetapan .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 1 ? " selected" : "") . ">Y</option>";
+													$opsi_penetapan .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0 ? " selected" : "") . ">T</option>";
+												} else if ($penilaian['kp_tipe'] == 2) {
+													$opsi_penetapan .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 1 ? " selected" : "") . ">A</option>";
+													$opsi_penetapan .= "<option value='0.75' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.75 ? " selected" : "") . ">B</option>";
+													$opsi_penetapan .= "<option value='0.5' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.5 ? " selected" : "") . ">C</option>";
+													$opsi_penetapan .= "<option value='0.25' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.25 ? " selected" : "") . ">D</option>";
+													$opsi_penetapan .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0 ? " selected" : "") . ">E</option>";
+												} else if ($penilaian['kp_tipe'] == 3) {
+													if (!empty($opsi_custom)) {
+														foreach ($opsi_custom as $custom) {
+															$opsi_penetapan .= "<option value='" . $custom['nilai'] . "' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == $custom['nilai'] ? " selected" : "") . ">" . $custom['nama'] . "</option>";
+														}
 													}
 												}
-											}
-										} else {
-											$opsi_penetapan = "<option value=''>Pilih Jawaban</option>";
-											if ($penilaian['kp_tipe'] == 1) {
-												$opsi_penetapan .= "<option value='1' class='text-center'>Y</option>";
-												$opsi_penetapan .= "<option value='0' class='text-center'>T</option>";
-											} else if ($penilaian['kp_tipe'] == 2) {
-												$opsi_penetapan .= "<option value='1' class='text-center'>A</option>";
-												$opsi_penetapan .= "<option value='0.75' class='text-center'>B</option>";
-												$opsi_penetapan .= "<option value='0.5' class='text-center'>C</option>";
-												$opsi_penetapan .= "<option value='0.25' class='text-center'>D</option>";
-												$opsi_penetapan .= "<option value='0' class='text-center'>E</option>";
-											} else if ($penilaian['kp_tipe'] == 3) {
-												if (!empty($opsi_custom)) {
-													foreach ($opsi_custom as $custom) {
-														$opsi_penetapan .= "<option value='" . $custom['nilai'] . "' class='text-center')>" . $custom['nama'] . "</option>";
+											} else {
+												$opsi_penetapan = "<option value=''>Pilih Jawaban</option>";
+												if ($penilaian['kp_tipe'] == 1) {
+													$opsi_penetapan .= "<option value='1' class='text-center'>Y</option>";
+													$opsi_penetapan .= "<option value='0' class='text-center'>T</option>";
+												} else if ($penilaian['kp_tipe'] == 2) {
+													$opsi_penetapan .= "<option value='1' class='text-center'>A</option>";
+													$opsi_penetapan .= "<option value='0.75' class='text-center'>B</option>";
+													$opsi_penetapan .= "<option value='0.5' class='text-center'>C</option>";
+													$opsi_penetapan .= "<option value='0.25' class='text-center'>D</option>";
+													$opsi_penetapan .= "<option value='0' class='text-center'>E</option>";
+												} else if ($penilaian['kp_tipe'] == 3) {
+													if (!empty($opsi_custom)) {
+														foreach ($opsi_custom as $custom) {
+															$opsi_penetapan .= "<option value='" . $custom['nilai'] . "' class='text-center')>" . $custom['nama'] . "</option>";
+														}
 													}
 												}
 											}
@@ -757,47 +764,50 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 										}
 
 
-										//kerangka logis nilai penetapan
-										if (isset($penilaian['pl_nilai_penetapan'])) {
-											$pesan_kesalahan_penetapan = [];
 
-											foreach ($data_kerangka_logis as $kl) {
-												if ($kl['jenis_kerangka_logis'] == 1) {
-													// Rata-rata
-													$avg_nilai_sub_penetapan = $wpdb->get_var(
-														$wpdb->prepare("
+										//kerangka logis nilai penetapan
+										if ($tampil_nilai_penetapan == 1) {
+											if (isset($penilaian['pl_nilai_penetapan'])) {
+												$pesan_kesalahan_penetapan = [];
+
+												foreach ($data_kerangka_logis as $kl) {
+													if ($kl['jenis_kerangka_logis'] == 1) {
+														// Rata-rata
+														$avg_nilai_sub_penetapan = $wpdb->get_var(
+															$wpdb->prepare("
 															SELECT AVG(nilai_penetapan)
 															FROM esakip_pengisian_lke
 															WHERE id_subkomponen = %d
 																AND id_skpd = %d
 																AND tahun_anggaran=%d
 														", $kl['id_komponen_pembanding'], $id_skpd, $tahun_anggaran)
-													);
+														);
 
-													if ($avg_nilai_sub_penetapan < $penilaian['pl_nilai_penetapan']) {
-														$pesan_kesalahan_penetapan[] = $kl['pesan_kesalahan'];
-													}
-												} else if ($kl['jenis_kerangka_logis'] == 2) {
-													// Nilai
-													$nilai_komponen_penilaian_penetapan = $wpdb->get_var(
-														$wpdb->prepare("
+														if ($avg_nilai_sub_penetapan < $penilaian['pl_nilai_penetapan']) {
+															$pesan_kesalahan_penetapan[] = $kl['pesan_kesalahan'];
+														}
+													} else if ($kl['jenis_kerangka_logis'] == 2) {
+														// Nilai
+														$nilai_komponen_penilaian_penetapan = $wpdb->get_var(
+															$wpdb->prepare("
 															SELECT nilai_penetapan
 															FROM esakip_pengisian_lke
 															WHERE id_komponen_penilaian = %d
 																AND id_skpd = %d
 																AND tahun_anggaran=%d
 														", $kl['id_komponen_pembanding'], $id_skpd, $tahun_anggaran)
-													);
-													if ($penilaian['pl_nilai_penetapan'] > $nilai_komponen_penilaian_penetapan) {
-														$pesan_kesalahan_penetapan[] = $kl['pesan_kesalahan'];
+														);
+														if ($penilaian['pl_nilai_penetapan'] > $nilai_komponen_penilaian_penetapan) {
+															$pesan_kesalahan_penetapan[] = $kl['pesan_kesalahan'];
+														}
 													}
 												}
-											}
 
-											if (!empty($pesan_kesalahan_penetapan)) {
-												$kerangka_logis_penetapan = "<td class='text-center table-danger'><ul><li>" . implode("</li><li>", $pesan_kesalahan_penetapan) . "</li></ul></td>";
-											} else {
-												$kerangka_logis_penetapan = "<td class='text-center table-success'>OK</td>";
+												if (!empty($pesan_kesalahan_penetapan)) {
+													$kerangka_logis_penetapan = "<td class='text-center table-danger'><ul><li>" . implode("</li><li>", $pesan_kesalahan_penetapan) . "</li></ul></td>";
+												} else {
+													$kerangka_logis_penetapan = "<td class='text-center table-success'>OK</td>";
+												}
 											}
 										}
 
@@ -883,9 +893,17 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 													|| $_POST['excel'] == 'usulan_penetapan'
 												) {
 													$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' disabled>" . $opsi_penetapan . "</select></td>";
-													$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
+													if ($tampil_nilai_penetapan == 1) {
+														$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
+													} else {
+														$tbody2 .= "<td class='text-center'> - </td>";
+													}
 													$tbody2 .= "<td class='text-center'></td>";
-													$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "' disabled>" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
+													if ($tampil_nilai_penetapan == 1) {
+														$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'" . $disabled . ">" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
+													} else {
+														$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'" . $disabled . "> - </textarea></td>";
+													}
 													$tbody2 .= $kerangka_logis_penetapan;
 												}
 												if (empty($_POST['excel'])) {
@@ -933,9 +951,17 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 													|| $_POST['excel'] == 'usulan_penetapan'
 												) {
 													$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' " . $disabled . ">" . $opsi_penetapan . "</select></td>";
-													$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
+													if ($tampil_nilai_penetapan == 1) {
+														$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
+													} else {
+														$tbody2 .= "<td class='text-center'> - </td>";
+													}
 													$tbody2 .= "<td class='text-center'></td>";
-													$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'" . $disabled . ">" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
+													if ($tampil_nilai_penetapan == 1) {
+														$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'" . $disabled . ">" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
+													} else {
+														$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'" . $disabled . "> - </textarea></td>";
+													}
 													$tbody2 .= $kerangka_logis_penetapan;
 												}
 												if (empty($_POST['excel'])) {
@@ -966,7 +992,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 						$total_nilai += $total_nilai_kom;
 						$total_nilai_penetapan += $total_nilai_kom_penetapan;
-						
+
 
 						//tbody komponen
 						$tbody .= "<tr class='table-active'>";
@@ -994,8 +1020,13 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							|| $_POST['excel'] == 'usulan_penetapan'
 						) {
 							$tbody .= "<td class='text-center'></td>";
-							$tbody .= "<td class='text-center'>" . number_format($total_nilai_kom_penetapan, 2) .  "</td>";
-							$tbody .= "<td class='text-center'>" . number_format($persentase_kom_penetapan * 100, 2) . "%" . "</td>";
+							if ($tampil_nilai_penetapan == 1) {
+								$tbody .= "<td class='text-center'>" . number_format($total_nilai_kom_penetapan, 2) .  "</td>";
+								$tbody .= "<td class='text-center'>" . number_format($persentase_kom_penetapan * 100, 2) . "%" . "</td>";
+							} else {
+								$tbody .= "<td class='text-center'> - </td>";
+								$tbody .= "<td class='text-center'> - </td>";
+							}
 						}
 						if (
 							empty($_POST['excel'])
@@ -1071,7 +1102,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				if ($ret['status'] == 'error') {
 					die(json_encode($ret));
 				}
-				
+
 				$id_skpd = $_POST['id_skpd'];
 				$id_komponen_penilaian = $_POST['id_komponen_penilaian'];
 				$id_jadwal = $_POST['id_jadwal'];
@@ -1104,7 +1135,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					$ret['message'] = 'Jadwal Sudah Selesai!';
 					die(json_encode($ret));
 				}
-				
+
 				//cari id kom dan subkom ketika insert baru
 				$id_subkomponen = $wpdb->get_var(
 					$wpdb->prepare("

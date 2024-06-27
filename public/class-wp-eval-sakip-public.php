@@ -10147,12 +10147,44 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						WHERE id = %d
 					', $id), ARRAY_A);
 
+					//validasi data pengisian
+					$data_desain = $wpdb->get_results(
+						$wpdb->prepare('
+							SELECT 
+								* 
+							FROM esakip_komponen
+							WHERE id_jadwal = %d
+						', $id),
+						ARRAY_A
+					);
+					if (!empty($data_desain)) {
+						foreach ($data_desain as $komponen) {
+							$data_pengisian = $wpdb->get_results(
+								$wpdb->prepare('
+									SELECT 
+										* 
+									FROM esakip_pengisian_lke
+									WHERE id_komponen = %d
+								', $komponen['id']),
+								ARRAY_A
+							);
+						}
+					}
+					if (!empty($data_pengisian)) {
+						$ret['status'] = 'error';
+						$ret['message'] = 'Jadwal tidak dapat dihapus karena memiliki data penilaian aktif!';
+						die(json_encode($ret));
+					}
+
 					if (!empty($data_this_id)) {
 						$status_check = array(1, NULL, 2);
 						if (in_array($data_this_id['status'], $status_check)) {
-							$wpdb->update('esakip_data_jadwal', array('status' => 0), array(
-								'id' => $id
-							), array('%d'));
+							$wpdb->update(
+								'esakip_data_jadwal',
+								array('status' => 0),
+								array('id' => $id),
+								array('%d')
+							);
 
 							$return = array(
 								'status' => 'success',
@@ -16547,7 +16579,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			));
 			$title = 'Input Pohon Kinerja | ' . $jadwal_periode_item['nama_jadwal_renstra'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
 			$list_periode_input_pohon_kinerja_opd .= '<li><a target="_blank" href="' . $list_input_pohon_kinerja_opd['url'] . '" class="btn btn-primary">' . $title . '</a></li>';
-			
+
 			$renstra = $this->functions->generatePage(array(
 				'nama_page' => 'RENSTRA | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
 				'content' => '[renstra periode=' . $jadwal_periode_item['id'] . ']',
@@ -17154,8 +17186,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			}
 		}
 
-		$set_html_pemda = get_option('sakip_menu_khusus_set_html_pemda'.$_GET['tahun']);
-		if(!empty($set_html_pemda)){
+		$set_html_pemda = get_option('sakip_menu_khusus_set_html_pemda' . $_GET['tahun']);
+		if (!empty($set_html_pemda)) {
 			$halaman_sakip .= stripslashes(htmlspecialchars_decode($set_html_pemda));
 		}
 
@@ -17174,8 +17206,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			}
 		}
 
-		$set_html_opd = get_option('sakip_menu_khusus_set_html_opd'.$_GET['tahun']);
-		if(!empty($set_html_opd)){
+		$set_html_opd = get_option('sakip_menu_khusus_set_html_opd' . $_GET['tahun']);
+		if (!empty($set_html_opd)) {
 			$halaman_sakip_opd .= stripslashes(htmlspecialchars_decode($set_html_opd));
 		}
 
@@ -17200,8 +17232,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					</div>
 				</div>
 			</li>';
-			if (!empty($cek_data['pemerintah_daerah']['Penyusunan Pohon Kinerja']) && $cek_data['pemerintah_daerah']['Penyusunan Pohon Kinerja']['active'] == 1) {
-				$halaman_input_rpjpd_rpjmd .= '
+		if (!empty($cek_data['pemerintah_daerah']['Penyusunan Pohon Kinerja']) && $cek_data['pemerintah_daerah']['Penyusunan Pohon Kinerja']['active'] == 1) {
+			$halaman_input_rpjpd_rpjmd .= '
 				<li>
 					<div class="accordion">
 						<h5 class="esakip-header-tahun" data-id="halaman-input-pokin" style="margin: 0;">Input Pohon Kinerja Pemerintah Daerah</h5>
@@ -17212,9 +17244,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						</div>
 					</div>
 				</li>';
-			}
-			if (!empty($cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']) && $cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']['active'] == 1) {
-				$halaman_input_rpjpd_rpjmd .= '
+		}
+		if (!empty($cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']) && $cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']['active'] == 1) {
+			$halaman_input_rpjpd_rpjmd .= '
 				<li>
 					<div class="accordion">
 						<h5 class="esakip-header-tahun" data-id="halaman-input-pokin-opd" style="margin: 0;">Input Pohon Kinerja Perangkat Daerah</h5>
@@ -17225,9 +17257,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						</div>
 					</div>
 				</li>';
-			}
+		}
 
-			$halaman_input_rpjpd_rpjmd .= '
+		$halaman_input_rpjpd_rpjmd .= '
 			<li>
 				<div class="accordion">
 					<h5 class="esakip-header-tahun" data-id="halaman-input-cascading" style="margin: 0;">Input Cascading</h5>
@@ -17376,7 +17408,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$title_pokin = 'Input Pohon Kinerja | ' . $jadwal_periode_item['nama_jadwal_renstra'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
 				$input_pohon_kinerja_opd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 				$periode_input_pohon_kinerja_opd .= '<li><a style="text-align: left;" target="_blank" href="' . $input_pohon_kinerja_opd['url'] . '" class="btn btn-primary">' . $title_pokin . '</a></li>';
-	
 			}
 
 			if (empty($periode_input_pohon_kinerja_opd)) {
@@ -17622,8 +17653,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 			}
 
-			$set_html_opd = get_option('sakip_menu_khusus_set_html_opd'.$_GET['tahun']);
-			if(!empty($set_html_opd)){
+			$set_html_opd = get_option('sakip_menu_khusus_set_html_opd' . $_GET['tahun']);
+			if (!empty($set_html_opd)) {
 				$halaman_sakip_skpd .= stripslashes(htmlspecialchars_decode($set_html_opd));
 			}
 
@@ -17632,17 +17663,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					</div>
 				</div>';
 
-				if (!empty($cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']) && $cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']['active'] == 1) {
-					$halaman_sakip_pokin_opd ='
+			if (!empty($cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']) && $cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']['active'] == 1) {
+				$halaman_sakip_pokin_opd = '
 						<div class="accordion">
 							<h5 class="esakip-header-tahun" data-id="halaman-input-pokin-opd" style="margin: 0;">Input Pohon Kinerja</h5>
 							<div class="esakip-body-tahun" data-id="halaman-input-pokin-opd">
 								<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-								'. $periode_input_pohon_kinerja_opd .'
+								' . $periode_input_pohon_kinerja_opd . '
 								</ul>
 							</div>
 						</div>';
-				}
+			}
 			echo '
 				<h2 class="text-center">' . $skpd_db['nama_skpd'] . '</h2>
 				<ul class="daftar-menu-sakip">
@@ -22680,12 +22711,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						WHERE id_unik =%d 
 						  AND id_unik_indikator IS NOT NULL 
 						  AND id_unik_indikator != '';
-					", $id_sasaran), ARRAY_A
+					", $id_sasaran),
+					ARRAY_A
 				);
 
 				$opsi = '<option value="">Pilih Indikator Sasaran</option>';
-				if(!empty($indikator_sasaran_all)){
-					foreach($indikator_sasaran_all as $indikator_sasaran) {
+				if (!empty($indikator_sasaran_all)) {
+					foreach ($indikator_sasaran_all as $indikator_sasaran) {
 						$opsi .= '<option value="' . $indikator_sasaran['id_unik_indikator'] . '">' . $indikator_sasaran['indikator_teks'] . '</option>';
 					}
 				}
