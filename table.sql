@@ -256,6 +256,7 @@ CREATE TABLE `esakip_data_unit` (
 CREATE TABLE `esakip_data_jadwal` (
   `id` int(11) NOT NULL auto_increment,
   `nama_jadwal` varchar(64) DEFAULT NULL,
+  `nama_jadwal_renstra` varchar(64) DEFAULT NULL,
   `keterangan` varchar(255) DEFAULT NULL,
   `started_at` datetime DEFAULT NULL,
   `end_at` datetime DEFAULT NULL,

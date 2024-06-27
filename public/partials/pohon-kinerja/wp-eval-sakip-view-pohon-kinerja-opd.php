@@ -509,7 +509,7 @@ if(!empty($data_all['data'])){
   		min-height:70px;
   	}
 	.label5 {
-  		background: #c979e3; 
+  		background: #28a745; 
   		border-radius: 5px 5px 0 0;
   	}
   	.level5 {
@@ -522,7 +522,7 @@ if(!empty($data_all['data'])){
   	}
 </style>
 
-<h4 style="text-align: center; margin: 0; font-weight: bold;">Pohon Kinerja <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h4><br>
+<h4 style="text-align: center; margin: 0; font-weight: bold;">Pohon Kinerja <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $periode['nama_jadwal_renstra'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h4><br>
 <div id="cetak" title="Laporan Pohon Kinerja" style="padding: 5px; overflow: auto; height: 100vh;">
     <div id="chart_div" ></div>
 </div>

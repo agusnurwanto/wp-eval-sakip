@@ -541,10 +541,10 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												pl.active AS pl_active
 											FROM esakip_komponen_penilaian AS kp
 											LEFT JOIN esakip_pengisian_lke AS pl 
-												ON kp.id = pl.id_komponen_penilaian AND pl.id_skpd = %d
+												ON kp.id = pl.id_komponen_penilaian 
+												AND pl.id_skpd = %d
 												AND pl.tahun_anggaran=%d
 											WHERE kp.id_subkomponen = %d
-											  AND kp.active = 1
 											  AND kp.active = 1
 											ORDER BY kp.nomor_urut ASC
 										",  $id_skpd, $tahun_anggaran, $subkomponen['id']),
@@ -1071,6 +1071,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				if ($ret['status'] == 'error') {
 					die(json_encode($ret));
 				}
+				
 				$id_skpd = $_POST['id_skpd'];
 				$id_komponen_penilaian = $_POST['id_komponen_penilaian'];
 				$id_jadwal = $_POST['id_jadwal'];
@@ -1103,13 +1104,51 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					$ret['message'] = 'Jadwal Sudah Selesai!';
 					die(json_encode($ret));
 				}
+				
+				//cari id kom dan subkom ketika insert baru
+				$id_subkomponen = $wpdb->get_var(
+					$wpdb->prepare("
+						SELECT 
+							id_subkomponen
+						FROM esakip_komponen_penilaian
+						WHERE id = %d
+					", $id_komponen_penilaian)
+				);
 
-				//validasi nilai
-				// $valid_values = [0, 0.25, 0.5, 0.75, 1];
-				// if (!in_array($nilai_penetapan, $valid_values)) {
-				// 	$ret['status'] = 'error';
-				// 	$ret['message'] = 'Aksi ditolak - nilai yang dimasukkan tidak valid!';
-				// 	die(json_encode($ret));
+				// //validasi nilai
+				// $metode_penilaian = $wpdb->get_var(
+				// 	$wpdb->prepare("
+				// 		SELECT 
+				// 			metode_penilaian
+				// 		FROM esakip_subkomponen
+				// 		WHERE id = %d
+				// 	", $id_subkomponen)
+				// );
+				// if ($metode_penilaian == 2) {
+				// 	//validasi nilai custom
+				// 	$valid_values_custom = $wpdb->get_results(
+				// 		$wpdb->prepare("
+				// 			SELECT nilai
+				// 			FROM esakip_penilaian_custom
+				// 			WHERE id=%d
+				// 		", $id_komponen_penilaian),
+				// 		ARRAY_A
+				// 	);
+				// 	$valid_values_custom_flat = array_column($valid_values_custom, 'nilai');
+
+				// 	if (!in_array($nilai_penetapan, $valid_values_custom_flat)) {
+				// 		$ret['status'] = 'error';
+				// 		$ret['message'] = 'Aksi ditolak - nilai yang dimasukkan tidak valid!';
+				// 		die(json_encode($ret));
+				// 	}
+				// } else {
+				// 	// validasi nilai rata rata
+				// 	$valid_values = [0, 0.25, 0.5, 0.75, 1];
+				// 	if (!in_array($nilai_penetapan, $valid_values)) {
+				// 		$ret['status'] = 'error';
+				// 		$ret['message'] = 'Aksi ditolak - nilai yang dimasukkan tidak valid!';
+				// 		die(json_encode($ret));
+				// 	}
 				// }
 
 				//validasi user
@@ -1151,15 +1190,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						$ret['message'] = "Gagal melakukan update nilai penetapan: " . $wpdb->last_error;
 					}
 				} else {
-					//cari id kom dan subkom ketika insert baru
-					$id_subkomponen = $wpdb->get_var(
-						$wpdb->prepare("
-							SELECT 
-								id_subkomponen
-							FROM esakip_komponen_penilaian
-							WHERE id = %d
-						", $id_komponen_penilaian)
-					);
 					if (!empty($id_subkomponen)) {
 						$id_komponen = $wpdb->get_var(
 							$wpdb->prepare("
@@ -1277,12 +1307,50 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					die(json_encode($ret));
 				}
 
-				//validasi nilai
-				// $valid_values = [0, 0.25, 0.5, 0.75, 1];
-				// if (!in_array($nilai_usulan, $valid_values)) {
-				// 	$ret['status'] = 'error';
-				// 	$ret['message'] = 'Aksi ditolak - nilai yang dimasukkan tidak valid!';
-				// 	die(json_encode($ret));
+				//cari id kom dan subkom ketika insert baru
+				$id_subkomponen = $wpdb->get_var(
+					$wpdb->prepare("
+						SELECT 
+							id_subkomponen
+						FROM esakip_komponen_penilaian
+						WHERE id = %d
+					", $id_komponen_penilaian)
+				);
+
+				// //validasi nilai
+				// $metode_penilaian = $wpdb->get_var(
+				// 	$wpdb->prepare("
+				// 		SELECT 
+				// 			metode_penilaian
+				// 		FROM esakip_subkomponen
+				// 		WHERE id = %d
+				// 	", $id_subkomponen)
+				// );
+				// if ($metode_penilaian == 2) {
+				// 	//validasi nilai custom
+				// 	$valid_values_custom = $wpdb->get_results(
+				// 		$wpdb->prepare("
+				// 			SELECT nilai
+				// 			FROM esakip_penilaian_custom
+				// 			WHERE id=%d
+				// 		", $id_komponen_penilaian),
+				// 		ARRAY_A
+				// 	);
+				// 	$valid_values_custom_flat = array_column($valid_values_custom, 'nilai');
+
+				// 	if (!in_array($nilai_usulan, $valid_values_custom_flat)) {
+				// 		$ret['status'] = 'error';
+				// 		$ret['message'] = 'Aksi ditolak - nilai yang dimasukkan tidak valid!';
+				// 		die(json_encode($ret));
+				// 	}
+				// } else {
+				// 	// validasi nilai rata rata
+				// 	$valid_values = [0, 0.25, 0.5, 0.75, 1];
+				// 	if (!in_array($nilai_usulan, $valid_values)) {
+				// 		$ret['status'] = 'error';
+				// 		$ret['message'] = 'Aksi ditolak - nilai yang dimasukkan tidak valid!';
+				// 		die(json_encode($ret));
+				// 	}
 				// }
 
 				//validasi user
@@ -1324,15 +1392,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						$ret['message'] = "Gagal melakukan update nilai usulan: " . $wpdb->last_error;
 					}
 				} else {
-					//cari id kom dan subkom ketika insert baru
-					$id_subkomponen = $wpdb->get_var(
-						$wpdb->prepare("
-							SELECT 
-								id_subkomponen
-							FROM esakip_komponen_penilaian
-							WHERE id = %d
-						", $id_komponen_penilaian)
-					);
 					if (!empty($id_subkomponen)) {
 						$id_komponen = $wpdb->get_var(
 							$wpdb->prepare("

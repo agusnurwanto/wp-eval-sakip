@@ -330,6 +330,7 @@ if(!empty($data_all['data'])){
     	border-radius: 5px;
     	border:0;
     	padding: 0;
+    	vertical-align: top;
   	}
   	#chart_div .google-visualization-orgchart-connrow-medium{
     	height: 20px;
@@ -405,10 +406,17 @@ if(!empty($data_all['data'])){
   		padding:10px; 
   		min-height:70px;
   	}
+  	@media print {
+  		#cetak {
+  			max-width: auto !important;
+  			height: auto !important;
+  		}
+  		@page {size: landscape;}
+  	}
 </style>
 
 <h4 style="text-align: center; margin: 0; font-weight: bold;">Pohon Kinerja<br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h4><br>
-<div id="cetak" title="Laporan Pohon Kinerja" style="padding: 5px; overflow: auto; height: 100vh;">
+<div id="cetak" title="Laporan Pohon Kinerja" style="padding: 5px; overflow: auto; max-width: 100vw;">
     <div id="chart_div" ></div>
 </div>
 

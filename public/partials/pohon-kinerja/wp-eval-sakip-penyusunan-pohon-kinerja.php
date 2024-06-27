@@ -414,6 +414,26 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     	</div>
   	</div>
 </div>
+<style>
+    #modal-pokin .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .table-responsive {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 1rem;
+        background-color: transparent;
+    }
+</style>
 
 <script type="text/javascript">
 jQuery(document).ready(function(){

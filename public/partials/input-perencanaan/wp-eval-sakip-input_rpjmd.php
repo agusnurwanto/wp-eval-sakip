@@ -1217,6 +1217,26 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
         </div>
     </div>
 </div>
+<style>
+    #modal-monev .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .table-responsive {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 1rem;
+        background-color: transparent;
+    }
+</style>
 
 <script type="text/javascript">
     jQuery(document).ready(function() {
@@ -1224,7 +1244,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
         window.edit_val = false;
 
         var aksi = '' +
-            '<a style="margin-left: 10px;" id="tambah-data" onclick="return false;" href="#" class="btn btn-success">Tambah Data RPD</a><br><br>' +
+            '<a style="margin-left: 10px; text-transform:uppercase;" id="tambah-data" onclick="return false;" href="#" class="btn btn-success">Tambah Data <?php echo $jadwal['jenis_jadwal_khusus']; ?></a><br><br>' +
             '<h3 style="margin-top: 20px;">SETTING</h3>' +
             '<label style="text-transform:uppercase;"><input type="checkbox" onclick="tampilkan_edit(this);"> Edit Data <?php echo $jadwal['jenis_jadwal_khusus']; ?></label>' +
             '<label style="margin-left: 20px; text-transform:uppercase;"><input type="checkbox" onclick="show_debug(this);"> Debug Cascading <?php echo $jadwal['jenis_jadwal_khusus']; ?></label>' +

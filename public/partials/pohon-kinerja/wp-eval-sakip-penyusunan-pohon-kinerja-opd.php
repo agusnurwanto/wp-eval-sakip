@@ -340,7 +340,7 @@ if(!empty($pohon_kinerja_level_1)){
 }
 
 $view_kinerja = $this->functions->generatePage(array(
-	'nama_page' => 'View Pohon Kinerja '.$skpd['nama_skpd'],
+	'nama_page' => 'View Pohon Kinerja OPD'.$skpd['nama_skpd'],
 	'content' => '[view_pohon_kinerja_opd periode='. $input['periode'] .']',
 	'show_header' => 1,
 	'post_status' => 'private'
@@ -469,7 +469,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 		background: #b5d9ea;
 	}
 </style>
-<h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Pohon Kinerja <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h3><br>
+<h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Pohon Kinerja <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $periode['nama_jadwal_renstra'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h3><br>
 <?php if (!$is_admin_panrb): ?>
 <div id="action" style="text-align: center; margin-top:30px; margin-bottom: 30px;">
 		<a style="margin-left: 10px;" id="tambah-pohon-kinerja" onclick="return false;" href="#" class="btn btn-success">Tambah Data</a>
@@ -549,6 +549,27 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     	</div>
   	</div>
 </div>
+
+<style>
+    #modal-pokin .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .table-responsive {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 1rem;
+        background-color: transparent;
+    }
+</style>
 <script type="text/javascript">
 jQuery(document).ready(function(){
 
