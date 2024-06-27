@@ -504,7 +504,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 									|| $_POST['excel'] == 'usulan_penetapan'
 								) {
 									$tbody2 .= "<td class='text-center'></td>";
-									if ($tampil_nilai_penetapan == 1) {
+									if ($tampil_nilai_penetapan == 1 || $can_verify == true) {
 										$tbody2 .= "<td class='text-center'>" . number_format($total_nilai_sub_penetapan, 2) . "</td>";
 										$tbody2 .= "<td class='text-center'>" . number_format($persentase_sub_penetapan * 100, 2) . "%" . "</td>";
 									} else {
@@ -650,44 +650,43 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 										//opsi jawaban penetapan
 										$opsi_penetapan = "<option value=''>Pilih Jawaban</option>";
-										if ($tampil_nilai_penetapan == 1) {
-											if (isset($penilaian['pl_nilai_penetapan'])) {
-												if ($penilaian['kp_tipe'] == 1) {
-													$opsi_penetapan .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 1 ? " selected" : "") . ">Y</option>";
-													$opsi_penetapan .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0 ? " selected" : "") . ">T</option>";
-												} else if ($penilaian['kp_tipe'] == 2) {
-													$opsi_penetapan .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 1 ? " selected" : "") . ">A</option>";
-													$opsi_penetapan .= "<option value='0.75' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.75 ? " selected" : "") . ">B</option>";
-													$opsi_penetapan .= "<option value='0.5' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.5 ? " selected" : "") . ">C</option>";
-													$opsi_penetapan .= "<option value='0.25' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.25 ? " selected" : "") . ">D</option>";
-													$opsi_penetapan .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0 ? " selected" : "") . ">E</option>";
-												} else if ($penilaian['kp_tipe'] == 3) {
-													if (!empty($opsi_custom)) {
-														foreach ($opsi_custom as $custom) {
-															$opsi_penetapan .= "<option value='" . $custom['nilai'] . "' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == $custom['nilai'] ? " selected" : "") . ">" . $custom['nama'] . "</option>";
-														}
+										if (isset($penilaian['pl_nilai_penetapan'])) {
+											if ($penilaian['kp_tipe'] == 1) {
+												$opsi_penetapan .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 1 ? " selected" : "") . ">Y</option>";
+												$opsi_penetapan .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0 ? " selected" : "") . ">T</option>";
+											} else if ($penilaian['kp_tipe'] == 2) {
+												$opsi_penetapan .= "<option value='1' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 1 ? " selected" : "") . ">A</option>";
+												$opsi_penetapan .= "<option value='0.75' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.75 ? " selected" : "") . ">B</option>";
+												$opsi_penetapan .= "<option value='0.5' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.5 ? " selected" : "") . ">C</option>";
+												$opsi_penetapan .= "<option value='0.25' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0.25 ? " selected" : "") . ">D</option>";
+												$opsi_penetapan .= "<option value='0' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == 0 ? " selected" : "") . ">E</option>";
+											} else if ($penilaian['kp_tipe'] == 3) {
+												if (!empty($opsi_custom)) {
+													foreach ($opsi_custom as $custom) {
+														$opsi_penetapan .= "<option value='" . $custom['nilai'] . "' class='text-center'" . ($penilaian['pl_nilai_penetapan'] == $custom['nilai'] ? " selected" : "") . ">" . $custom['nama'] . "</option>";
 													}
 												}
-											} else {
-												$opsi_penetapan = "<option value=''>Pilih Jawaban</option>";
-												if ($penilaian['kp_tipe'] == 1) {
-													$opsi_penetapan .= "<option value='1' class='text-center'>Y</option>";
-													$opsi_penetapan .= "<option value='0' class='text-center'>T</option>";
-												} else if ($penilaian['kp_tipe'] == 2) {
-													$opsi_penetapan .= "<option value='1' class='text-center'>A</option>";
-													$opsi_penetapan .= "<option value='0.75' class='text-center'>B</option>";
-													$opsi_penetapan .= "<option value='0.5' class='text-center'>C</option>";
-													$opsi_penetapan .= "<option value='0.25' class='text-center'>D</option>";
-													$opsi_penetapan .= "<option value='0' class='text-center'>E</option>";
-												} else if ($penilaian['kp_tipe'] == 3) {
-													if (!empty($opsi_custom)) {
-														foreach ($opsi_custom as $custom) {
-															$opsi_penetapan .= "<option value='" . $custom['nilai'] . "' class='text-center')>" . $custom['nama'] . "</option>";
-														}
+											}
+										} else {
+											$opsi_penetapan = "<option value=''>Pilih Jawaban</option>";
+											if ($penilaian['kp_tipe'] == 1) {
+												$opsi_penetapan .= "<option value='1' class='text-center'>Y</option>";
+												$opsi_penetapan .= "<option value='0' class='text-center'>T</option>";
+											} else if ($penilaian['kp_tipe'] == 2) {
+												$opsi_penetapan .= "<option value='1' class='text-center'>A</option>";
+												$opsi_penetapan .= "<option value='0.75' class='text-center'>B</option>";
+												$opsi_penetapan .= "<option value='0.5' class='text-center'>C</option>";
+												$opsi_penetapan .= "<option value='0.25' class='text-center'>D</option>";
+												$opsi_penetapan .= "<option value='0' class='text-center'>E</option>";
+											} else if ($penilaian['kp_tipe'] == 3) {
+												if (!empty($opsi_custom)) {
+													foreach ($opsi_custom as $custom) {
+														$opsi_penetapan .= "<option value='" . $custom['nilai'] . "' class='text-center')>" . $custom['nama'] . "</option>";
 													}
 												}
 											}
 										}
+
 
 										//nilai usulan
 										if (isset($penilaian['pl_nilai_usulan'])) {
@@ -766,7 +765,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 
 										//kerangka logis nilai penetapan
-										if ($tampil_nilai_penetapan == 1) {
+										if ($tampil_nilai_penetapan == 1 || $can_verify == true) {
 											if (isset($penilaian['pl_nilai_penetapan'])) {
 												$pesan_kesalahan_penetapan = [];
 
@@ -892,14 +891,15 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 													|| $_POST['excel'] == 'penetapan'
 													|| $_POST['excel'] == 'usulan_penetapan'
 												) {
-													$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' disabled>" . $opsi_penetapan . "</select></td>";
-													if ($tampil_nilai_penetapan == 1) {
+													if ($tampil_nilai_penetapan == 1 || $can_verify == true) {
+														$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' disabled>" . $opsi_penetapan . "</select></td>";
 														$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
 													} else {
+														$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' disabled><option selected> - </option></select></td>";
 														$tbody2 .= "<td class='text-center'> - </td>";
 													}
 													$tbody2 .= "<td class='text-center'></td>";
-													if ($tampil_nilai_penetapan == 1) {
+													if ($tampil_nilai_penetapan == 1 || $can_verify == true) {
 														$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'" . $disabled . ">" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
 													} else {
 														$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'" . $disabled . "> - </textarea></td>";
@@ -951,17 +951,9 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 													|| $_POST['excel'] == 'usulan_penetapan'
 												) {
 													$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' " . $disabled . ">" . $opsi_penetapan . "</select></td>";
-													if ($tampil_nilai_penetapan == 1) {
-														$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
-													} else {
-														$tbody2 .= "<td class='text-center'> - </td>";
-													}
+													$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
 													$tbody2 .= "<td class='text-center'></td>";
-													if ($tampil_nilai_penetapan == 1) {
-														$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'" . $disabled . ">" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
-													} else {
-														$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'" . $disabled . "> - </textarea></td>";
-													}
+													$tbody2 .= "<td class='text-center'><textarea id='keteranganPenetapan" . $penilaian['kp_id'] . "'" . $disabled . ">" . $penilaian['pl_keterangan_penilai'] . "</textarea></td>";
 													$tbody2 .= $kerangka_logis_penetapan;
 												}
 												if (empty($_POST['excel'])) {
@@ -1020,7 +1012,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							|| $_POST['excel'] == 'usulan_penetapan'
 						) {
 							$tbody .= "<td class='text-center'></td>";
-							if ($tampil_nilai_penetapan == 1) {
+							if ($tampil_nilai_penetapan == 1 || $can_verify == true) {
 								$tbody .= "<td class='text-center'>" . number_format($total_nilai_kom_penetapan, 2) .  "</td>";
 								$tbody .= "<td class='text-center'>" . number_format($persentase_kom_penetapan * 100, 2) . "%" . "</td>";
 							} else {
@@ -1042,10 +1034,14 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						$merged_data['total_nilai'] = number_format($total_nilai, 2);
 
 						//nilai penetapan diset dimenu jadwal
-						if ($tampil_nilai_penetapan == 1) {
+						if ($tampil_nilai_penetapan == 1 && $can_verify == true) {
 							$merged_data['total_nilai_penetapan'] = number_format($total_nilai_penetapan, 2);
-						} else {
+						} else if ($tampil_nilai_penetapan == 0 && $can_verify == false){
 							$merged_data['total_nilai_penetapan'] = '-';
+						} else if ($tampil_nilai_penetapan == 0 && $can_verify == true){
+							$merged_data['total_nilai_penetapan'] = number_format($total_nilai_penetapan, 2) . '<br><small class="text-muted">disembunyikan</>';
+						} else {
+							$merged_data['total_nilai_penetapan'] = number_format($total_nilai_penetapan, 2);
 						}
 					}
 				} else {
