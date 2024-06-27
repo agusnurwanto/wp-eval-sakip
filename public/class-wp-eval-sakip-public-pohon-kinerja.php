@@ -1220,117 +1220,113 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						);
 					}
 
-					//misi rpjpd
+					// misi rpjpd
 					$misi_rpjpd_html = '';
 					foreach ($misi_rpjpd as $misi) {
 						$misi_rpjpd_html .= $misi['misi_teks'];
 					}
 
-					//indikator tujuan rpd
-					$indikator_tujuan_html = '
-					<table>
-						<tbody>
-							<tr>
-					';
-					$data = '';
-					foreach ($indikator_tujuan as $ind) {
-						$data .= '<td class="text-center"><button class="btn btn-lg btn-warning">' . $ind['indikator_teks'] . '</button></td>';
-					}
-					if (empty($data)) {
-						$data = '<td class="text-center"><button class="btn btn-lg btn-warning"></button></td>';
-					}
-					$indikator_tujuan_html .= $data . '
-							</tr>
-						</tbody>
-					</table>
-					';
-
-					//sasaran rpd
+					// sasaran rpd
 					$sasaran = $wpdb->get_results(
 						$wpdb->prepare("
-							SELECT 
-								*
-							FROM esakip_rpd_sasaran
-							WHERE kode_tujuan = %s
-								AND active=1
-								AND id_unik_indikator IS NULL
+						SELECT 
+							*
+						FROM esakip_rpd_sasaran
+						WHERE kode_tujuan = %s
+							AND active=1
+							AND id_unik_indikator IS NULL
 						", $tujuan['id_unik']),
 						ARRAY_A
 					);
+					$jml_sasaran = count($sasaran);
+					if ($jml_sasaran != 0) {
+						$width_sasaran = 100 / $jml_sasaran;
+						$width_ind_sasaran = 100 / $jml_sasaran;
+						$colspan_sasaran = 100 / $jml_sasaran;
+					}
 
-					$sasaran_html = '
+					$indikator_sasaran_html = '
 					<table>
-						<tbody>
-							<tr>
-					';
-					$data = '';
+						<tbody>';
+					$data_sasaran = '';
 					$indikator_sasarans = array();
 					$skpd_programs = array();
 					foreach ($sasaran as $sas) {
-						$data .= '<td class="text-center"><button class="btn btn-lg btn-warning">' . $sas['sasaran_teks'] . '</button></td>';
-						//indikator sasaran sasaran rpd
+						// indikator sasaran sasaran rpd
 						$indikator_sasaran = $wpdb->get_results(
 							$wpdb->prepare("
-									SELECT 
-										*
-									FROM esakip_rpd_sasaran
-									WHERE id_unik = %s
-									AND id_unik_indikator IS NOT NULL
-									AND active=1
-								", $sas['id_unik']),
+								SELECT 
+									*
+								FROM esakip_rpd_sasaran
+								WHERE id_unik = %s
+								AND id_unik_indikator IS NOT NULL
+								AND active=1
+							", $sas['id_unik']),
 							ARRAY_A
 						);
-						//indikator sasaran sasaran rpd
-						$skpd_program = $wpdb->get_results(
-							$wpdb->prepare("
+						$width_ind_sasaran = $width_sasaran / count($indikator_sasaran);
+						foreach ($indikator_sasaran as $ind) {
+							$data_sasaran .= '<td class="text-center" width="' . $width_ind_sasaran . '%"><button class="btn btn-lg btn-warning">' . $ind['indikator_teks'] . '</button></td>';
+
+							// indikator sasaran sasaran rpd
+							$skpd_program = $wpdb->get_results(
+								$wpdb->prepare("
 									SELECT 
 										*
 									FROM esakip_rpd_program
 									WHERE kode_sasaran = %s
-									AND id_unik_indikator IS NOT NULL
-									AND active=1
+										AND 1=1
+										AND id_unik_indikator IS NOT NULL
+										AND active=1
 								", $sas['id_unik']),
-							ARRAY_A
-						);
+								ARRAY_A
+							);
+						}
+						if (empty($data_sasaran)) {
+							$data_sasaran = '<td class="text-center" width="' . $width_ind_sasaran . '%"><button class="btn btn-lg btn-warning"></button></td>';
+						}
 						$indikator_sasarans = array_merge($indikator_sasarans, $indikator_sasaran);
 						$skpd_programs = array_merge($skpd_programs, $skpd_program);
+					}
+					$indikator_sasaran_html .= $data_sasaran . '
+						</tbody>
+					</table>';
+
+					$jml_ind_sasaran = count($indikator_sasarans);
+
+					$colspan_tujuan = $jml_ind_sasaran;
+					if ($jml_ind_sasaran % 2 == 1) {
+						$colspan_sasaran;
+					}
+
+					// indikator tujuan rpd
+					$indikator_tujuan_html = '';
+					$data = '';
+					foreach ($indikator_tujuan as $ind) {
+						$data .= '<td class="text-center" colspan="' . $colspan_tujuan . '"><button class="btn btn-lg btn-warning">' . $ind['indikator_teks'] . '</button></td>';
+					}
+					if (empty($data)) {
+						$data = '<td class="text-center" colspan="' . $colspan_tujuan . '"><button class="btn btn-lg btn-warning"></button></td>';
+					}
+					$indikator_tujuan_html .= $data;
+
+					$sasaran_html = '
+					<table>
+						<tbody>';
+					$data = '';
+					foreach ($sasaran as $sas) {
+						$data .= '<td class="text-center" width="' . $width_sasaran . '%"><button class="btn btn-lg btn-warning">' . $sas['sasaran_teks'] . '</button></td>';
 					}
 					if (empty($data)) {
 						$data = '<td class="text-center"><button class="btn btn-lg btn-warning"></button></td>';
 					}
 					$sasaran_html .= $data . '
-							</tr>
 						</tbody>
-					</table>
-					';
-
-
-
-					$indikator_sasaran_html = '
-					<table>
-						<tbody>
-							<tr>
-					';
-					$data = '';
-					foreach ($indikator_sasarans as $ind) {
-						$data .= '<td class="text-center"><button class="btn btn-lg btn-warning">' . $ind['indikator_teks'] . '</button></td>';
-					}
-					if (empty($data)) {
-						$data = '<td class="text-center"><button class="btn btn-lg btn-warning"></button></td>';
-					}
-					$indikator_sasaran_html .= $data . '
-							</tr>
-						</tbody>
-					</table>
-					';
-
-
+					</table>';
 
 					$skpd_program_html = '
 					<table>
-						<tbody>
-							<tr>
-					';
+						<tbody>';
 					$data = '';
 					foreach ($skpd_programs as $skpd) {
 						$data .= '<td class="text-center"><button class="btn btn-lg btn-warning">' . $skpd['nama_skpd'] . '</button></td>';
@@ -1339,42 +1335,41 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						$data = '<td class="text-center"><button class="btn btn-lg btn-warning"></button></td>';
 					}
 					$skpd_program_html .= $data . '
-							</tr>
 						</tbody>
-					</table>
-					';
-					//render html
+					</table>';
+
+					// render html
 					$html = '
-					<h1 class="text-center">' . $tujuan['nama_cascading'] . '</h1>
-					<table id="tabel-cascading">
-						<tbody>
-							<tr>
-								<td class="text-center" style="width: 200px;"><button class="btn btn-lg btn-info">MISI RPJPD</button></td>
-								<td class="text-center"><button class="btn btn-lg btn-warning">' . $misi_rpjpd_html . '</button></td>
-							</tr>
-							<tr>
-								<td class="text-center"><button class="btn btn-lg btn-info">TUJUAN RPD</button></td>
-								<td class="text-center"><button class="btn btn-lg btn-warning">' . $tujuan['tujuan_teks'] . '</button></td>
-							</tr>
-							<tr>
-								<td class="text-center"><button class="btn btn-lg btn-info">INDIKATOR TUJUAN RPD</button></td>
-								<td class="text-center">' . $indikator_tujuan_html . '</td>
-							</tr>
-							<tr>
-								<td class="text-center"><button class="btn btn-lg btn-info">SASARAN RPD</button></td>
-								<td class="text-center">' . $sasaran_html . '</td>
-							</tr>
-							<tr>
-								<td class="text-center"><button class="btn btn-lg btn-info">INDIKATOR SASARAN RPD</button></td>
-								<td class="text-center">' . $indikator_sasaran_html . '</td>
-							</tr>
-							<tr>
-								<td class="text-center"><button class="btn btn-lg btn-info">URUSAN PENGAMPU</button></td>
-								<td class="text-center">' . $skpd_program_html . '</td>
-							</tr>
-						</tbody>
-					</table>
-					';
+						<h1 class="text-center">' . $tujuan['nama_cascading'] . '</h1>
+						<table id="tabel-cascading">
+							<tbody>
+								<tr>
+									<td class="text-center" style="width: 200px;"><button class="btn btn-lg btn-info">MISI RPJPD</button></td>
+									<td class="text-center" colspan="' . $colspan_tujuan . '"><button class="btn btn-lg btn-warning">' . $misi_rpjpd_html . '</button></td>
+								</tr>
+								<tr>
+									<td class="text-center"><button class="btn btn-lg btn-info">TUJUAN RPD</button></td>
+									<td class="text-center" colspan="' . $colspan_tujuan . '"><button class="btn btn-lg btn-warning">' . $tujuan['tujuan_teks'] . '</button></td>
+								</tr>
+								<tr>
+									<td class="text-center"><button class="btn btn-lg btn-info">INDIKATOR TUJUAN RPD</button></td>
+									' . $indikator_tujuan_html . '
+								</tr>
+								<tr>
+									<td class="text-center"><button class="btn btn-lg btn-info">SASARAN RPD</button></td>
+									<td class="text-center">' . $sasaran_html . '</td>
+								</tr>
+								<tr>
+									<td class="text-center"><button class="btn btn-lg btn-info">INDIKATOR SASARAN RPD</button></td>
+									<td class="text-center">' . $indikator_sasaran_html . '</td>
+								</tr>
+								<tr>
+									<td class="text-center"><button class="btn btn-lg btn-info">URUSAN PENGAMPU</button></td>
+									<td class="text-center">' . $skpd_program_html . '</td>
+								</tr>
+							</tbody>
+						</table>
+						';
 					$ret['html'] = $html;
 				}
 			} else {
