@@ -8153,11 +8153,64 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											}
 										}
 
+										$update_penilaian_lke = $wpdb->update(
+											'esakip_pengisian_lke',
+											array(
+												'id_komponen' => $id_komponen_baru,
+												'id_subkomponen' => $id_subkomponen_baru,
+												'id_komponen_penilaian' => $id_komponen_penilaian_baru
+											),
+											array(
+												'id_komponen' => $komponen['id'],
+												'id_subkomponen' => $subkomponen['id'],
+												'id_komponen_penilaian' => $penilaian['id'],
+												'tahun_anggaran' => $tahun_anggaran,
+												'active' => 1
+											)
+										);
+
+										// Check if update data failed, if not then get data from history
+										if (!$update_penilaian_lke) {
+											$data_penilaian_lke_terbaru_history = $wpdb->get_row(
+												$wpdb->prepare("
+                                                SELECT *
+                                                FROM esakip_pengisian_lke_history
+                                                WHERE id_komponen = %d
+                                                  AND id_subkomponen = %d 
+                                                  AND id_komponen_penilaian = %d
+                                                  AND tahun_anggaran = %d
+                                                  AND id_jadwal = %d
+                                            ", $komponen['id'], $subkomponen['id'], $penilaian['id'], $tahun_anggaran, $id_jadwal_sebelumnya),
+												ARRAY_A
+											);
+
+											if (!empty($data_penilaian_lke_terbaru_history)) {
+												$wpdb->insert('esakip_pengisian_lke', array(
+													'id_user' => $data_penilaian_lke_terbaru_history['id_user'],
+													'id_skpd' => $data_penilaian_lke_terbaru_history['id_skpd'],
+													'id_user_penilai' => $data_penilaian_lke_terbaru_history['id_user_penilai'],
+													'id_komponen' => $id_komponen_baru,
+													'id_subkomponen' => $id_subkomponen_baru,
+													'id_komponen_penilaian' => $id_komponen_penilaian_baru,
+													'nilai_usulan' => $data_penilaian_lke_terbaru_history['nilai_usulan'],
+													'nilai_penetapan' => $data_penilaian_lke_terbaru_history['nilai_penetapan'],
+													'keterangan' => $data_penilaian_lke_terbaru_history['keterangan'],
+													'keterangan_penilai' => $data_penilaian_lke_terbaru_history['keterangan_penilai'],
+													'bukti_dukung' => $data_penilaian_lke_terbaru_history['bukti_dukung'],
+													'create_at' => $data_penilaian_lke_terbaru_history['create_at'],
+													'update_at' => $data_penilaian_lke_terbaru_history['update_at'],
+													'tahun_anggaran' => $data_penilaian_lke_terbaru_history['tahun_anggaran'],
+													'active' => 1
+												));
+											}
+										}
+
 										$data_kerangka_logis = $wpdb->get_results(
 											$wpdb->prepare("
                                             SELECT * 
                                             FROM esakip_kontrol_kerangka_logis
                                             WHERE id_komponen_penilaian = %d
+											  AND active = 1
                                         ", $penilaian['id']),
 											ARRAY_A
 										);
@@ -8181,6 +8234,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                             SELECT * 
                                             FROM esakip_penilaian_custom
                                             WHERE id_komponen_penilaian = %d
+											  AND active = 1
                                         ", $penilaian['id']),
 											ARRAY_A
 										);
@@ -10346,7 +10400,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$sql_backup_esakip_komponen = "
 							INSERT INTO esakip_komponen_history (" . implode(', ', $columns_1) . ", id_asli)
 							SELECT " . implode(', ', $columns_1) . ", id as id_asli
-							FROM esakip_komponen";
+							FROM esakip_komponen
+							WHERE active=1";
 
 							$queryRecords1 = $wpdb->query($sql_backup_esakip_komponen);
 
@@ -10365,7 +10420,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$sql_backup_esakip_subkomponen = "
 							INSERT INTO esakip_subkomponen_history (" . implode(', ', $columns_2) . ", id_asli, id_jadwal)
 							SELECT " . implode(', ', $columns_2) . ", id as id_asli, " . $data_this_id['id'] . "
-							FROM esakip_subkomponen";
+							FROM esakip_subkomponen
+							WHERE active=1";
 
 							$queryRecords2 = $wpdb->query($sql_backup_esakip_subkomponen);
 
@@ -10385,7 +10441,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$sql_backup_esakip_komponen_penilaian = "
 							INSERT INTO esakip_komponen_penilaian_history (" . implode(', ', $columns_3) . ", id_asli, id_jadwal)
 							SELECT " . implode(', ', $columns_3) . ", id as id_asli, " . $data_this_id['id'] . "
-							FROM esakip_komponen_penilaian";
+							FROM esakip_komponen_penilaian
+							WHERE active=1";
 
 							$queryRecords3 = $wpdb->query($sql_backup_esakip_komponen_penilaian);
 
@@ -10402,7 +10459,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$sql_backup_esakip_kontrol_kerangka_logis = "
 							INSERT INTO esakip_kontrol_kerangka_logis_history (" . implode(', ', $columns_4) . ", id_asli, id_jadwal)
 							SELECT " . implode(', ', $columns_4) . ", id as id_asli, " . $data_this_id['id'] . "
-							FROM esakip_kontrol_kerangka_logis";
+							FROM esakip_kontrol_kerangka_logis
+							WHERE active=1";
 
 							$queryRecords4 = $wpdb->query($sql_backup_esakip_kontrol_kerangka_logis);
 
@@ -10419,7 +10477,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$sql_backup_esakip_penilaian_custom = "
 							INSERT INTO esakip_penilaian_custom_history (" . implode(', ', $columns_5) . ", id_asli, id_jadwal)
 							SELECT " . implode(', ', $columns_5) . ", id as id_asli, " . $data_this_id['id'] . "
-							FROM esakip_penilaian_custom";
+							FROM esakip_penilaian_custom
+							WHERE active=1";
 
 							$queryRecords5 = $wpdb->query($sql_backup_esakip_penilaian_custom);
 
