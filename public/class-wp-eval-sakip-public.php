@@ -17627,6 +17627,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$halaman_sakip_skpd .= "<li>". stripslashes(htmlspecialchars_decode($set_html_opd)) ."<li>";
 			}
 
+			$halaman_sakip_pokin_opd = '';
 			$halaman_sakip_skpd .= '
 						</ul>
 					</div>

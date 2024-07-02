@@ -35,6 +35,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 			return '';
 		}
 
+		$tipe = 'pemda';
 		require_once ESAKIP_PLUGIN_PATH . 'public/partials/pohon-kinerja/wp-eval-sakip-view-pohon-kinerja.php';
 	}
 
@@ -44,7 +45,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 			return '';
 		}
 
-		require_once ESAKIP_PLUGIN_PATH . 'public/partials/pohon-kinerja/wp-eval-sakip-view-pohon-kinerja-opd.php';
+		$tipe = 'opd';
+		require_once ESAKIP_PLUGIN_PATH . 'public/partials/pohon-kinerja/wp-eval-sakip-view-pohon-kinerja.php';
 	}
 
 	public function cascading_pemda($atts)
@@ -1491,5 +1493,96 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 			);
 		}
 		die(json_encode($ret));
+	}
+
+	function get_pokin($opsi){
+		global $wpdb;
+		$data_ret = array();
+		$table = 'esakip_pohon_kinerja';
+		$where_skpd = '';
+		if($opsi['tipe'] == 'opd'){
+			$table = 'esakip_pohon_kinerja_opd';
+			$where_skpd = $wpdb->prepare('AND id_skpd=%d', $opsi['id_skpd']);
+		}
+		if($opsi['level'] == 1){
+			$pohon_kinerja = $wpdb->get_results($wpdb->prepare("
+				SELECT 
+					* 
+				FROM $table 
+				WHERE id=%d
+					AND parent=0 
+					AND level=%d 
+					AND active=1 
+					AND id_jadwal=%d 
+					$where_skpd
+				ORDER BY id
+			", $opsi['id'], $opsi['level'], $opsi['periode']), ARRAY_A);
+		}else{
+			$pohon_kinerja = $wpdb->get_results($wpdb->prepare("
+				SELECT 
+					* 
+				FROM $table 
+				WHERE parent=%d
+					AND level=%d 
+					AND active=1 
+					AND id_jadwal=%d
+					$where_skpd
+				ORDER BY id
+			", $opsi['id'], $opsi['level'], $opsi['periode']), ARRAY_A);
+		}
+		if(!empty($pohon_kinerja)){
+			foreach ($pohon_kinerja as $level) {
+				if(empty($data_ret[trim($level['label'])])){
+					$data_ret[trim($level['label'])] = [
+						'id' => $level['id'],
+						'label' => $level['label'],
+						'level' => $level['level'],
+						'indikator' => [],
+						'data' => []
+					];
+				}
+
+				$indikator_pohon_kinerja_level = $wpdb->get_results($wpdb->prepare("
+					SELECT 
+						* 
+					FROM $table 
+					WHERE parent=%d 
+						AND level=%d 
+						AND active=1 
+						AND id_jadwal=%d
+						$where_skpd
+					ORDER BY id
+				", $level['id'], $level['level'], $opsi['periode']), ARRAY_A);
+				if(!empty($indikator_pohon_kinerja_level)){
+					foreach ($indikator_pohon_kinerja_level as $indikator_level) {
+						if(!empty($indikator_level['label_indikator_kinerja'])){
+							if(empty($data_ret[trim($level['label'])]['indikator'][(trim($indikator_level['label_indikator_kinerja']))])){
+								$data_ret[trim($level['label'])]['indikator'][(trim($indikator_level['label_indikator_kinerja']))] = [
+									'id' => $indikator_level['id'],
+									'parent' => $indikator_level['parent'],
+									'label_indikator_kinerja' => $indikator_level['label_indikator_kinerja'],
+									'level' => $indikator_level['level']
+								];
+							}
+						}
+					}
+				}
+				if(
+					(
+						$level['level'] <= 4 
+						&& $opsi['tipe'] == 'pemda'
+					)
+					|| (
+						$level['level'] <= 5 
+						&& $opsi['tipe'] == 'opd'
+					)
+				){
+					$opsi['id'] = $level['id'];
+					$opsi['level'] = $level['level']+1;
+					$data_ret[trim($level['label'])]['data'] = $this->get_pokin($opsi);
+				}
+			}
+		}
+		return $data_ret;
 	}
 }
