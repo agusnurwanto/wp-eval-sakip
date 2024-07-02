@@ -321,6 +321,17 @@ CREATE TABLE esakip_penilaian_custom (
   PRIMARY KEY  (`id`)
 );
 
+CREATE TABLE esakip_penilaian_custom_history (
+  `id` int(11) NOT NULL auto_increment,
+  `id_komponen_penilaian` int(11) NOT NULL,
+  `nama` varchar(255) NOT NULL,
+  `nilai` decimal(5, 2) DEFAULT NULL,
+  `nomor_urut` DECIMAL(10,2) NOT NULL,
+  `id_asli` int(11) DEFAULT NULL,
+  `id_jadwal` int(11) NOT NULL,
+  PRIMARY KEY  (`id`)
+);
+
 CREATE TABLE esakip_pengisian_lke (
   `id` int(11) NOT NULL auto_increment,
   `id_user` int(11) DEFAULT NULL,
@@ -361,6 +372,7 @@ CREATE TABLE esakip_subkomponen_history (
   `nama` varchar(255) DEFAULT NULL,
   `bobot` float DEFAULT NULL,
   `active` tinyint(4) NOT NULL DEFAULT '1',
+  `metode_penilaian` int(11) NOT NULL DEFAULT '1' COMMENT '1 = Rata-Rata, 2 = Nilai Dinamis',
   `id_asli` int(11) DEFAULT NULL,
   `id_jadwal` int(11) NOT NULL,
   PRIMARY KEY  (`id`)
@@ -375,6 +387,7 @@ CREATE TABLE esakip_komponen_penilaian_history (
   `keterangan` varchar(255) DEFAULT NULL,
   `jenis_bukti_dukung` text DEFAULT NULL,
   `active` tinyint(4) NOT NULL DEFAULT '1',
+  `bobot` float DEFAULT NULL,
   `id_asli` int(11) DEFAULT NULL,
   `id_jadwal` int(11) NOT NULL,
   PRIMARY KEY  (`id`)
@@ -421,6 +434,17 @@ CREATE TABLE esakip_kontrol_kerangka_logis (
  `id_komponen_pembanding` int(11) DEFAULT NULL,
  `pesan_kesalahan` varchar(255) DEFAULT NULL,
  `active` tinyint(4) NOT NULL DEFAULT 1,
+ PRIMARY KEY  (`id`)
+);
+
+CREATE TABLE esakip_kontrol_kerangka_logis_history (
+ `id` int(11) NOT NULL auto_increment,
+ `id_komponen_penilaian` int(11) NOT NULL,
+ `jenis_kerangka_logis` int(11) DEFAULT NULL COMMENT '1 = Rata-Rata, 2 = Nilai',
+ `id_komponen_pembanding` int(11) DEFAULT NULL,
+ `pesan_kesalahan` varchar(255) DEFAULT NULL,
+ `id_jadwal` int(11) DEFAULT NULL,
+ `id_asli` int(11) DEFAULT NULL,
  PRIMARY KEY  (`id`)
 );
 
@@ -593,7 +617,6 @@ CREATE TABLE `esakip_menu_dokumen` (
   `user_role` varchar(255) NOT NULL,
   `jenis_role` int(11) DEFAULT NULL,
   `keterangan` varchar(255) DEFAULT NULL,
-  `verifikasi_upload_dokumen` tinyint DEFAULT NULL,
   `nomor_urut` DECIMAL(10,2) NOT NULL,
   `active` tinyint(4) NOT NULL,
   `tahun_anggaran` year NOT NULL,
@@ -602,6 +625,7 @@ CREATE TABLE `esakip_menu_dokumen` (
   `id_jadwal` int(11) DEFAULT NULL,
   PRIMARY key (id)
 );
+  `verifikasi_upload_dokumen` tinyint DEFAULT NULL,
 
 CREATE TABLE `esakip_dokumen_lainnya_pemda` (
   `id` int(11) NOT NULL auto_increment,
@@ -1026,4 +1050,17 @@ CREATE TABLE `esakip_prog_keg` (
   `update_at` datetime DEFAULT NULL,
   `tahun_anggaran` year(4) NOT NULL DEFAULT '2021',
   PRIMARY KEY  (id)
+);
+
+CREATE TABLE `esakip_croscutting_opd` (
+  `id` int(11) NOT NULL auto_increment,
+  `parent_pohon_kinerja` int(11) NOT NULL,
+  `keterangan` varchar(255) DEFAULT null,
+  `label_croscutting` varchar(255) DEFAULT NULL,
+  `label_indikator_croscutting` varchar(255) DEFAULT null,
+  `id_skpd_croscutting` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
 );

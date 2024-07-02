@@ -53,7 +53,7 @@ $data_temp = [''];
 
     #tabel-cascading, #tabel-cascading td, #tabel-cascading table {
         padding: 0;
-        border: 0;
+        border: 4px solid white;
         margin: 0;
         vertical-align: top;
     }

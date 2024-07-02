@@ -314,6 +314,10 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 		}
 	}
 }
+
+$current_user = wp_get_current_user();
+$user_roles = $current_user->roles;
+$is_admin_panrb = in_array('admin_panrb', $user_roles);
 ?>
 
 <style type="text/css">
@@ -335,9 +339,11 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 	}
 </style>
 <h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Pohon Kinerja<br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h3><br>
+<?php if (!$is_admin_panrb): ?>
 <div id="action" style="text-align: center; margin-top:30px; margin-bottom: 30px;">
 		<a style="margin-left: 10px;" id="tambah-pohon-kinerja" onclick="return false;" href="#" class="btn btn-success">Tambah Data</a>
 </div>
+<?php endif; ?>
 <div id="cetak" title="Penyusunan Pohon Kinerja" style="padding: 5px; overflow: auto; height: 100vh;">
 	<table>
 		<thead>

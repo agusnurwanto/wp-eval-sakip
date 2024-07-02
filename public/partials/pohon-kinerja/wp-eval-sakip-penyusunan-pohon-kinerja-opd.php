@@ -52,6 +52,29 @@ $skpd = $wpdb->get_row(
     ARRAY_A
 );
 
+$unit = $wpdb->get_results(
+	$wpdb->prepare("
+		SELECT 
+			nama_skpd, 
+			id_skpd, 
+			kode_skpd, 
+			nipkepala 
+		FROM esakip_data_unit 
+		WHERE tahun_anggaran=%d
+		AND active=1 
+		AND is_skpd=1 
+		ORDER BY kode_skpd ASC
+	", $tahun_anggaran_sakip),
+	ARRAY_A
+);
+
+$option_skpd = "<option value='seluruh'>Pilih Seluruh Perangkat Daerah</option>";
+if(!empty($unit)){
+	foreach ($unit as $v_unit) {
+		$option_skpd .="<option value='" . $v_unit['id_skpd'] . "'>" . $v_unit['nama_skpd'] . "</option>";
+	}
+}
+
 // pokin level 1
 $pohon_kinerja_level_1 = $wpdb->get_results($wpdb->prepare("
 	SELECT 
@@ -419,6 +442,10 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 		}
 	}
 }
+
+$current_user = wp_get_current_user();
+$user_roles = $current_user->roles;
+$is_admin_panrb = in_array('admin_panrb', $user_roles);
 ?>
 
 <style type="text/css">
@@ -443,9 +470,11 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 	}
 </style>
 <h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Pohon Kinerja <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $periode['nama_jadwal_renstra'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h3><br>
+<?php if (!$is_admin_panrb): ?>
 <div id="action" style="text-align: center; margin-top:30px; margin-bottom: 30px;">
 		<a style="margin-left: 10px;" id="tambah-pohon-kinerja" onclick="return false;" href="#" class="btn btn-success">Tambah Data</a>
 </div>
+<?php endif; ?>
 <div id="cetak" title="Penyusunan Pohon Kinerja" style="padding: 5px; overflow: auto; height: 100vh;">
 	<table>
 		<thead>
@@ -1139,7 +1168,23 @@ jQuery(document).ready(function(){
 				+`<div class="form-group">`
 						+`<textarea class="form-control" name="label" placeholder="Tuliskan pohon kinerja level 4..."></textarea>`
 				+`</div>`
+				+`<div class="custom-control custom-checkbox">`
+					+`<input type="checkbox" class="custom-control-input" name="settingCroscutting" value="true" id="settingCroscutting4">`
+					+`<label class="custom-control-label" for="settingCroscutting4">Setting Croscutting</label>`
+				+`</div>`
+				+`<div class="form-group" id="showSkpdCroscutting4">`
+					+`<label for="skpdCroscutting4">Pilih Perangkat Daerah</label>`
+					+`<select class="form-control" name="skpdCroscutting" id="skpdCroscutting4">`
+					+`<?php echo $option_skpd; ?>`
+					+`</select>`
+				+`</div>`
+				+`<div class="form-group" id="showKeteranganCroscutting4">`
+					+`<label for="skpdCroscutting4">Keterangan Croscutting</label>`
+					+`<textarea class="form-control" id="keteranganCroscutting4" name="keteranganCroscutting"></textarea>`
+				+`</div>`
 			+`</form>`);
+			jQuery("#showSkpdCroscutting4").hide();
+			jQuery("#showKeteranganCroscutting4").hide();
 		jQuery("#modal-crud").find('.modal-footer').html(''
 			+'<button type="button" class="btn btn-danger" data-dismiss="modal">'
 				+'Tutup'
@@ -1150,6 +1195,9 @@ jQuery(document).ready(function(){
 		jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
 		jQuery("#modal-crud").find('.modal-dialog').css('width','');
 		jQuery("#modal-crud").modal('show');
+		jQuery('#skpdCroscutting4').select2({
+								width: '100%'
+							});
 	})
 
 	jQuery(document).on('click', '.edit-pokin-level4', function(){
@@ -1166,6 +1214,16 @@ jQuery(document).ready(function(){
 			},
 			dataType:'json',
 			success:function(response){
+				let keterangan = '';
+				let parent_pohon_kinerja = '';
+				if(response.data_croscutting != null || response.data_croscutting != undefined){
+					if(response.data_croscutting.keterangan != ''){
+						keterangan = response.data_croscutting.keterangan;
+					}
+					if(response.data_croscutting.parent_pohon_kinerja != ''){
+						parent_pohon_kinerja = response.data_croscutting.parent_pohon_kinerja;
+					}
+				}
 				jQuery("#wrap-loading").hide();
 				jQuery("#modal-crud").find('.modal-title').html('Edit Pohon Kinerja');
 				jQuery("#modal-crud").find('.modal-body').html(``
@@ -1176,7 +1234,22 @@ jQuery(document).ready(function(){
 						+`<div class="form-group">`
 							+`<textarea class="form-control" name="label">${response.data.label}</textarea>`
 						+`</div>`
+						+`<div class="custom-control custom-checkbox">`
+							+`<input type="checkbox" class="custom-control-input" name="settingCroscutting" value="true" id="settingCroscutting4">`
+							+`<label class="custom-control-label" for="settingCroscutting4">Setting Croscutting</label>`
+						+`</div>`
+						+`<div class="form-group" id="showSkpdCroscutting4">`
+							+`<label for="skpdCroscutting4">Pilih Perangkat Daerah</label>`
+							+`<select class="form-control" name="skpdCroscutting" id="skpdCroscutting4">`
+							+`<?php echo $option_skpd; ?>`
+							+`</select>`
+						+`</div>`
+						+`<div class="form-group" id="showKeteranganCroscutting4">`
+							+`<label for="skpdCroscutting4">Keterangan Croscutting</label>`
+							+`<textarea class="form-control" id="keteranganCroscutting" name="keteranganCroscutting">${keterangan}</textarea>`
+						+`</div>`
 					+`</form>`);
+				jQuery(`#skpdCroscutting4 option[value="${parent_pohon_kinerja}"]`).prop('selected', true);
 				jQuery("#modal-crud").find(`.modal-footer`).html(``
 					+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
 						+`Tutup`
@@ -1187,9 +1260,38 @@ jQuery(document).ready(function(){
 				jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
 				jQuery("#modal-crud").find('.modal-dialog').css('width','');
 				jQuery("#modal-crud").modal('show');
+				jQuery('#skpdCroscutting4').select2({
+								width: '100%'
+							});
+				
+				if(response.data_croscutting != null || response.data_croscutting != undefined){
+					jQuery('#settingCroscutting4').prop('checked', true);
+					jQuery("#showSkpdCroscutting4").show();
+					jQuery("#showKeteranganCroscutting4").show();
+					if(response.data_croscutting.keterangan != ''){
+						keterangan = response.data_croscutting.keterangan;
+					}
+					if(response.data_croscutting.parent_pohon_kinerja != ''){
+						parent_pohon_kinerja = response.data_croscutting.parent_pohon_kinerja;
+					}
+				}else{
+					jQuery('#settingCroscutting4').prop('checked', false);
+					jQuery("#showSkpdCroscutting4").hide();
+					jQuery("#showKeteranganCroscutting4").hide();
+				}
 			}
 		});
 	})
+
+	jQuery(document).on('change', '#settingCroscutting4', function(){
+        if(this.checked) {
+			jQuery("#showSkpdCroscutting4").show();
+			jQuery("#showKeteranganCroscutting4").show();
+        }else{
+			jQuery("#showSkpdCroscutting4").hide();
+			jQuery("#showKeteranganCroscutting4").hide();
+		}
+    });
 
 	jQuery(document).on('click', '.hapus-pokin-level4', function(){
 		let parent = jQuery(this).data('parent');
