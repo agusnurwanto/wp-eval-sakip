@@ -961,6 +961,8 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 											$bobot_komponen_penilaian = $penilaian['kp_bobot'];
 										} else if ($subkomponen['metode_penilaian'] == 1) {
 											$bobot_komponen_penilaian = '-';
+											$nilai_usulan = '-';
+											$nilai_penetapan = '-';
 										}
 
 										$bukti_dukung = json_decode(stripslashes($penilaian['pl_bukti_dukung']), true);

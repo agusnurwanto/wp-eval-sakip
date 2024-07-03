@@ -16046,7 +16046,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									SELECT nama
 									FROM esakip_subkomponen
 									WHERE id=%d
-									AND active = 1
+									  AND active = 1
 								", $kerangka_logis['id_komponen_pembanding'])
 							);
 							$tbody .= '<td class="text-left">Rata Rata</td>';
@@ -19145,7 +19145,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		global $wpdb;
 		$ret = array(
 			'status' => 'success',
-			'message' => 'Berhasil hapus data!',
+			'message' => "Berhasil hapus data!\n",
 			'data' => array()
 		);
 
@@ -19153,58 +19153,80 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				if (!empty($_POST['id'])) {
 					$id = intval($_POST['id']);
-					$wpdb->update(
+
+					// Hapus komponen penilaian
+					$update_result = $wpdb->update(
 						'esakip_komponen_penilaian',
 						array('active' => 0),
 						array('id' => $id)
 					);
 
-					// cek id berkaitan
-					$cek_penilaian = $wpdb->get_results(
-						$wpdb->prepare("
-							SELECT id
-							FROM esakip_pengisian_lke
-							WHERE id_komponen_penilaian = %d 
-							  AND active = 1
-						", $id)
-					);
-					$cek_kerangka_logis = $wpdb->get_results(
-						$wpdb->prepare("
-							SELECT id
-							FROM esakip_kontrol_kerangka_logis
-							WHERE id_komponen_penilaian = %d 
-							  AND active = 1
-						", $id)
-					);
-					$cek_opsi_custom = $wpdb->get_results(
-						$wpdb->prepare("
-							SELECT id
-							FROM esakip_penilaian_custom
-							WHERE id_komponen_penilaian = %d 
-							  AND active = 1
-						", $id)
-					);
+					if ($update_result !== false) {
+						$ret['message'] .= " Komponen penilaian berhasil dihapus.\n";
 
-					// update(delete) if exist
-					if (!empty($cek_penilaian)) {
-						$wpdb->update(
-							'esakip_pengisian_lke',
-							array('active' => 0),
-							array('id_komponen_penilaian' => $id)
-						);
-					}
-					if (!empty($cek_kerangka_logis)) {
-						$wpdb->update(
-							'esakip_kontrol_kerangka_logis',
-							array('active' => 0),
-							array('id_komponen_penilaian' => $id)
-						);
-					}
-					if (!empty($cek_opsi_custom)) {
-						$wpdb->update(
-							'esakip_penilaian_custom',
-							array('active' => 0),
-							array('id_komponen_penilaian' => $id)
+						// Cek dan hapus data berkaitan
+						$related_tables = [
+							'esakip_pengisian_lke' => 'id_komponen_penilaian',
+							'esakip_kontrol_kerangka_logis' => 'id_komponen_penilaian',
+							'esakip_penilaian_custom' => 'id_komponen_penilaian',
+						];
+
+						foreach ($related_tables as $table => $column) {
+							$cek_data = $wpdb->get_results(
+								$wpdb->prepare("
+                                SELECT id
+                                FROM $table
+                                WHERE $column = %d 
+                                  AND active = 1
+                            ", $id)
+							);
+
+							if (!empty($cek_data)) {
+								$delete_result = $wpdb->update(
+									$table,
+									array('active' => 0),
+									array($column => $id)
+								);
+
+								if ($delete_result !== false) {
+									$ret['message'] .= " Data di tabel $table berhasil dihapus.\n";
+								} else {
+									$ret['message'] .= " Gagal menghapus data di tabel $table.\n";
+									$ret['status'] = 'error';
+								}
+							}
+
+							// Jika tabel esakip_kontrol_kerangka_logis, update juga kolom id_pembanding
+							if ($table == 'esakip_kontrol_kerangka_logis') {
+								$cek_pembanding = $wpdb->get_results(
+									$wpdb->prepare("
+										SELECT id
+										FROM esakip_kontrol_kerangka_logis
+										WHERE id_komponen_pembanding = %d
+										  AND active = 1
+									", $id)
+								);
+	
+								if (!empty($cek_pembanding)) {
+									$update_pembanding_result = $wpdb->update(
+										'esakip_kontrol_kerangka_logis',
+										array('active' => 0),
+										array('id_komponen_pembanding' => $id)
+									);
+	
+									if ($update_pembanding_result !== false) {
+										$ret['message'] .= " Data di tabel esakip_kontrol_kerangka_logis (id_komponen_pembanding) berhasil dihapus.\n";
+									} else {
+										$ret['message'] .= " Gagal menghapus data di tabel esakip_kontrol_kerangka_logis (id_komponen_pembanding).\n";
+										$ret['status'] = 'error';
+									}
+								}
+							}	
+						}
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message'   => 'Gagal menghapus komponen penilaian.'
 						);
 					}
 				} else {
@@ -19228,12 +19250,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
+
 	public function hapus_subkomponen_lke()
 	{
 		global $wpdb;
 		$ret = array(
 			'status' => 'success',
-			'message' => 'Berhasil hapus data!',
+			'message' => "Berhasil hapus data!.\n",
 			'data' => array()
 		);
 
@@ -19247,6 +19270,27 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							WHERE id_subkomponen=%d
 						", $_POST['id'])
 					);
+					$cek_kl = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT id_komponen_pembanding
+							FROM esakip_kontrol_kerangka_logis
+							WHERE id_komponen_pembanding=%d
+						", $_POST['id'])
+					);
+
+					if (!empty($cek_kl)) {
+						$delete_kl = $wpdb->update(
+							'esakip_kontrol_kerangka_logis',
+							array('active' => 0),
+							array('id_komponen_pembanding' => $_POST['id'])
+						);
+						if ($delete_kl !== false) {
+							$ret['message'] .= " Data di tabel esakip_kontrol_kerangka_logis (id_komponen_pembanding) berhasil dihapus.\n";
+						} else {
+							$ret['message'] .= " Gagal menghapus data di tabel esakip_kontrol_kerangka_logis (id_komponen_pembanding).\n";
+							$ret['status'] = 'error';
+						}
+					} 
 					if (empty($cek_id)) {
 						$ret['data'] = $wpdb->update(
 							'esakip_subkomponen',
