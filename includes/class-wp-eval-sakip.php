@@ -479,6 +479,11 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_edit_indikator_pokin',  $plugin_public, 'edit_indikator_pokin');
 		$this->loader->add_action('wp_ajax_update_indikator_pokin',  $plugin_public, 'update_indikator_pokin');
 		$this->loader->add_action('wp_ajax_delete_indikator_pokin',  $plugin_public, 'delete_indikator_pokin');
+		
+		$this->loader->add_action('wp_ajax_create_croscutting',  $plugin_public, 'create_croscutting');
+		$this->loader->add_action('wp_ajax_edit_croscutting',  $plugin_public, 'edit_croscutting');
+		$this->loader->add_action('wp_ajax_update_croscutting',  $plugin_public, 'update_croscutting');
+		$this->loader->add_action('wp_ajax_delete_croscutting',  $plugin_public, 'delete_croscutting');
 
 		$this->loader->add_action('wp_ajax_get_data_pengaturan_menu',  $plugin_public, 'get_data_pengaturan_menu');
 		$this->loader->add_action('wp_ajax_get_pengaturan_menu_by_id',  $plugin_public, 'get_pengaturan_menu_by_id');
