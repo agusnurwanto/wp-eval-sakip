@@ -555,6 +555,7 @@ if(!empty($_GET['excel'])){
             data: {
                 'action': "get_penjelasan_lke",
                 'api_key': esakip.api_key,
+                'id_jadwal': <?php echo $id_jadwal; ?>,
                 'id': id,
             },
             dataType: "json",

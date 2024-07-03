@@ -388,6 +388,8 @@ CREATE TABLE esakip_komponen_penilaian_history (
   `jenis_bukti_dukung` text DEFAULT NULL,
   `active` tinyint(4) NOT NULL DEFAULT '1',
   `bobot` float DEFAULT NULL,
+  `penjelasan` text DEFAULT NULL,
+  `langkah_kerja` text DEFAULT NULL,
   `id_asli` int(11) DEFAULT NULL,
   `id_jadwal` int(11) NOT NULL,
   PRIMARY KEY  (`id`)
