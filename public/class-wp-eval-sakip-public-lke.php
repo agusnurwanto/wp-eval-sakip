@@ -774,12 +774,12 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 														// Rata-rata
 														$avg_nilai_sub_penetapan = $wpdb->get_var(
 															$wpdb->prepare("
-															SELECT AVG(nilai_penetapan)
-															FROM esakip_pengisian_lke
-															WHERE id_subkomponen = %d
-																AND id_skpd = %d
-																AND tahun_anggaran=%d
-														", $kl['id_komponen_pembanding'], $id_skpd, $tahun_anggaran)
+																SELECT AVG(nilai_penetapan)
+																FROM esakip_pengisian_lke
+																WHERE id_subkomponen = %d
+																	AND id_skpd = %d
+																	AND tahun_anggaran=%d
+															", $kl['id_komponen_pembanding'], $id_skpd, $tahun_anggaran)
 														);
 
 														if ($avg_nilai_sub_penetapan < $penilaian['pl_nilai_penetapan']) {
@@ -789,12 +789,12 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 														// Nilai
 														$nilai_komponen_penilaian_penetapan = $wpdb->get_var(
 															$wpdb->prepare("
-															SELECT nilai_penetapan
-															FROM esakip_pengisian_lke
-															WHERE id_komponen_penilaian = %d
-																AND id_skpd = %d
-																AND tahun_anggaran=%d
-														", $kl['id_komponen_pembanding'], $id_skpd, $tahun_anggaran)
+																SELECT nilai_penetapan
+																FROM esakip_pengisian_lke
+																WHERE id_komponen_penilaian = %d
+																	AND id_skpd = %d
+																	AND tahun_anggaran=%d
+															", $kl['id_komponen_pembanding'], $id_skpd, $tahun_anggaran)
 														);
 														if ($penilaian['pl_nilai_penetapan'] > $nilai_komponen_penilaian_penetapan) {
 															$pesan_kesalahan_penetapan[] = $kl['pesan_kesalahan'];
@@ -1036,9 +1036,9 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						//nilai penetapan diset dimenu jadwal
 						if ($tampil_nilai_penetapan == 1 && $can_verify == true) {
 							$merged_data['total_nilai_penetapan'] = number_format($total_nilai_penetapan, 2);
-						} else if ($tampil_nilai_penetapan == 0 && $can_verify == false){
+						} else if ($tampil_nilai_penetapan == 0 && $can_verify == false) {
 							$merged_data['total_nilai_penetapan'] = '-';
-						} else if ($tampil_nilai_penetapan == 0 && $can_verify == true){
+						} else if ($tampil_nilai_penetapan == 0 && $can_verify == true) {
 							$merged_data['total_nilai_penetapan'] = number_format($total_nilai_penetapan, 2) . '<br><small class="text-muted">disembunyikan</>';
 						} else {
 							$merged_data['total_nilai_penetapan'] = number_format($total_nilai_penetapan, 2);
