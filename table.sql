@@ -388,6 +388,8 @@ CREATE TABLE esakip_komponen_penilaian_history (
   `jenis_bukti_dukung` text DEFAULT NULL,
   `active` tinyint(4) NOT NULL DEFAULT '1',
   `bobot` float DEFAULT NULL,
+  `penjelasan` text DEFAULT NULL,
+  `langkah_kerja` text DEFAULT NULL,
   `id_asli` int(11) DEFAULT NULL,
   `id_jadwal` int(11) NOT NULL,
   PRIMARY KEY  (`id`)
@@ -1050,6 +1052,14 @@ CREATE TABLE `esakip_prog_keg` (
   `update_at` datetime DEFAULT NULL,
   `tahun_anggaran` year(4) NOT NULL DEFAULT '2021',
   PRIMARY KEY  (id)
+);
+
+CREATE TABLE `esakip_capaian_iku_pemda` (
+  `id` int(11) NOT NULL auto_increment,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
 );
 
 CREATE TABLE `esakip_croscutting_opd` (
