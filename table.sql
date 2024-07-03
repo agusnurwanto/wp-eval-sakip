@@ -1067,3 +1067,27 @@ CREATE TABLE `esakip_croscutting_opd` (
   `updated_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id)
 );
+
+CREATE TABLE `esakip_capaian_indikator` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `indikator_kinerja` text DEFAULT NULL,
+  `satuan` varchar(255) DEFAULT NULL,
+  `kondisi_awal` varchar(255) DEFAULT NULL,
+  `target_akhir_p_rpjmd` varchar(255) DEFAULT NULL,
+  `bps_tahun_1` varchar(255) DEFAULT NULL,
+  `bps_tahun_2` varchar(255) DEFAULT NULL,
+  `bps_tahun_3` varchar(255) DEFAULT NULL,
+  `bps_tahun_4` varchar(255) DEFAULT NULL,
+  `bps_tahun_5` varchar(255) DEFAULT NULL,
+  `lkpj_tahun_1` varchar(255) DEFAULT NULL,
+  `lkpj_tahun_2` varchar(255) DEFAULT NULL,
+  `lkpj_tahun_3` varchar(255) DEFAULT NULL,
+  `lkpj_tahun_4` varchar(255) DEFAULT NULL,
+  `lkpj_tahun_5` varchar(255) DEFAULT NULL,
+  `sumber_data` text DEFAULT NULL,
+  `keterangan` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp,
+  `active` tinyint(4) DEFAULT 1,
+ PRIMARY KEY(id)
+);
