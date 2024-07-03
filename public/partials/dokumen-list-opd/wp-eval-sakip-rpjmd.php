@@ -49,6 +49,16 @@ $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
 $is_admin_panrb = in_array('admin_panrb', $user_roles);
 
+$status_iku = $wpdb->get_row(
+    $wpdb->prepare("
+        SELECT  *
+        FROM esakip_menu_dokumen
+        WHERE nama_tabel='esakip_capaian_iku_pemda'
+            AND id_jadwal=%d"
+        ,$input['periode'])
+        , ARRAY_A
+);
+
 ?>
 <style type="text/css">
     .wrap-table {
@@ -98,6 +108,11 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 </table>
             </div>
         </div>
+        <?php if(!empty($status_iku['active']) AND $status_iku['active'] == 1): ?>
+            <div style="padding: 10px;margin:0 0 3rem 0;">
+                <h1 class="text-center" style="margin:3rem;">Capaian Indikator Makro <br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 

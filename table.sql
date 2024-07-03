@@ -1052,6 +1052,14 @@ CREATE TABLE `esakip_prog_keg` (
   PRIMARY KEY  (id)
 );
 
+CREATE TABLE `esakip_capaian_iku_pemda` (
+  `id` int(11) NOT NULL auto_increment,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
+);
+
 CREATE TABLE `esakip_croscutting_opd` (
   `id` int(11) NOT NULL auto_increment,
   `parent_pohon_kinerja` int(11) NOT NULL,
