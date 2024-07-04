@@ -1414,8 +1414,10 @@ foreach ($user_penilai as $key => $val) {
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
                     jQuery('#subkomponenPembanding').html(response.data);
-                    jQuery('#subkomponenPembanding').select2();
-                  
+                    jQuery('#subkomponenPembanding').select2({
+                        dropdownParent: jQuery('#tambahKerangkaLogisModal')
+                    });
+
                 } else {
                     alert(response.message);
                 }
@@ -1444,8 +1446,10 @@ foreach ($user_penilai as $key => $val) {
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
                     jQuery('#komponenPenilaianPembanding').html(response.data);
-                    jQuery('#komponenPenilaianPembanding').select2();
-                   
+                    jQuery('#komponenPenilaianPembanding').select2({
+                        dropdownParent: jQuery('#tambahKerangkaLogisModal')
+                    });
+
                 } else {
                     alert(response.message);
                 }

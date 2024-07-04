@@ -1252,7 +1252,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 										*
 									FROM esakip_rpd_program
 									WHERE kode_sasaran = %s
-										AND 1=1
 										AND id_unik_indikator IS NOT NULL
 										AND active=1
 								", $sas['id_unik']),
@@ -1312,7 +1311,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							}
 							$data .= '</ul>';
 						} else {
-							$data .= '<button class="btn btn-lg btn-warning"></button>';
+							$data .= '<button class="btn btn-lg btn-warning">belum</button>';
 						}
 						$data .= '</td>';
 					}
@@ -1337,11 +1336,11 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								</tr>
 								<tr>
 									<td class="text-center"><button class="btn btn-lg btn-info">SASARAN RPD</button></td>
-									<td class="text-center">' . $sasaran_html . '</td>
+									<td class="text-center" colspan='.$colspan_tujuan.'>' . $sasaran_html . '</td>
 								</tr>
 								<tr>
 									<td class="text-center"><button class="btn btn-lg btn-info">INDIKATOR SASARAN RPD</button></td>
-									<td class="text-center">' . $indikator_sasaran_html . '</td>
+									<td class="text-center" colspan='.$colspan_tujuan.'>' . $indikator_sasaran_html . '</td>
 								</tr>
 								<tr>
 									<td class="text-center"><button class="btn btn-lg btn-info">URUSAN PENGAMPU</button></td>
