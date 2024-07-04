@@ -247,7 +247,7 @@ foreach ($user_penilai as $key => $val) {
                         <div class="form-group col-md-4">
                             <label for="tipeJawaban">Tipe Jawaban</label>
                             <select class="form-control" id="tipeJawaban" name="tipeJawaban" required>
-                               
+
                             </select>
                         </div>
                         <div class="form-group col-md-4" id="bobotPenilaianLabel">
@@ -370,7 +370,7 @@ foreach ($user_penilai as $key => $val) {
 </div>
 
 <!-- Modal untuk menambah kerangka logis komponen penilaian -->
-<div class="modal fade bd-example-modal-lg" id="tambahKerangkaLogisModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<div class="modal fade bd-example-modal-lg" id="tambahKerangkaLogisModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" data-bs-focus="false">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -505,8 +505,6 @@ foreach ($user_penilai as $key => $val) {
 <script>
     jQuery(document).ready(function() {
         get_table_desain_sakip();
-        get_option_sub_pembanding();
-        get_option_penilaian_pembanding();
 
         jQuery('#subkomponenPembandingContainer').hide();
         jQuery('#komponenPenilaianPembandingContainer').hide();
@@ -519,9 +517,11 @@ foreach ($user_penilai as $key => $val) {
 
             let jenisKerangkaLogis = jQuery(this).val();
             if (jenisKerangkaLogis == '1') {
+                get_option_sub_pembanding();
                 jQuery('#subkomponenPembandingContainer').show();
                 jQuery('#komponenPenilaianPembandingContainer').hide();
             } else if (jenisKerangkaLogis == '2') {
+                get_option_penilaian_pembanding();
                 jQuery('#komponenPenilaianPembandingContainer').show();
                 jQuery('#subkomponenPembandingContainer').hide();
             } else {
@@ -1413,7 +1413,11 @@ foreach ($user_penilai as $key => $val) {
                 console.log(response);
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
-                    jQuery('#subkomponenPembanding').html(response.data)
+                    jQuery('#subkomponenPembanding').html(response.data);
+                    jQuery('#subkomponenPembanding').select2({
+                        dropdownParent: jQuery('#tambahKerangkaLogisModal')
+                    });
+
                 } else {
                     alert(response.message);
                 }
@@ -1423,7 +1427,7 @@ foreach ($user_penilai as $key => $val) {
                 console.error(xhr.responseText);
                 alert('Terjadi kesalahan saat mengirim data!');
             }
-        })
+        });
     }
 
     function get_option_penilaian_pembanding() {
@@ -1441,7 +1445,11 @@ foreach ($user_penilai as $key => $val) {
                 console.log(response);
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
-                    jQuery('#komponenPenilaianPembanding').html(response.data)
+                    jQuery('#komponenPenilaianPembanding').html(response.data);
+                    jQuery('#komponenPenilaianPembanding').select2({
+                        dropdownParent: jQuery('#tambahKerangkaLogisModal')
+                    });
+
                 } else {
                     alert(response.message);
                 }
@@ -1451,7 +1459,7 @@ foreach ($user_penilai as $key => $val) {
                 console.error(xhr.responseText);
                 alert('Terjadi kesalahan saat mengirim data!');
             }
-        })
+        });
     }
 
     function hapus_kerangka_logis(id, id_penilaian) {

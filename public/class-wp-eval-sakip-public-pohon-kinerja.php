@@ -1252,7 +1252,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 										*
 									FROM esakip_rpd_program
 									WHERE kode_sasaran = %s
-										AND 1=1
 										AND id_unik_indikator IS NOT NULL
 										AND active=1
 								", $sas['id_unik']),
@@ -1312,7 +1311,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							}
 							$data .= '</ul>';
 						} else {
-							$data .= '<button class="btn btn-lg btn-warning"></button>';
+							$data .= '<button class="btn btn-lg btn-warning">belum</button>';
 						}
 						$data .= '</td>';
 					}
@@ -1337,11 +1336,11 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								</tr>
 								<tr>
 									<td class="text-center"><button class="btn btn-lg btn-info">SASARAN RPD</button></td>
-									<td class="text-center">' . $sasaran_html . '</td>
+									<td class="text-center" colspan='.$colspan_tujuan.'>' . $sasaran_html . '</td>
 								</tr>
 								<tr>
 									<td class="text-center"><button class="btn btn-lg btn-info">INDIKATOR SASARAN RPD</button></td>
-									<td class="text-center">' . $indikator_sasaran_html . '</td>
+									<td class="text-center" colspan='.$colspan_tujuan.'>' . $indikator_sasaran_html . '</td>
 								</tr>
 								<tr>
 									<td class="text-center"><button class="btn btn-lg btn-info">URUSAN PENGAMPU</button></td>
@@ -1623,27 +1622,29 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					$parent_pokin_id = $input['parentCroscutting'];
 
-					$data_cek_croscutting = $wpdb->get_row($wpdb->prepare("
-						SELECT *
-						FROM esakip_croscutting_opd
-						WHERE parent_pohon_kinerja=%d
-						AND id_skpd_croscutting=%d
-						AND keterangan=%s
-					", $parent_pokin_id, $id_skpd_croscutting, $keterangan_croscutting)
-					, ARRAY_A);
+					foreach ($id_skpd_croscutting as $k_skpd => $v_skpd) {
+						$data_cek_croscutting = $wpdb->get_row($wpdb->prepare("
+							SELECT *
+							FROM esakip_croscutting_opd
+							WHERE parent_pohon_kinerja=%d
+							AND id_skpd_croscutting=%d
+							AND keterangan=%s
+						", $parent_pokin_id, $v_skpd, $keterangan_croscutting)
+						, ARRAY_A);
 
-					if(empty($data_cek_croscutting)){
-						$insert_crocutting = $wpdb->insert('esakip_croscutting_opd', [
-							'parent_pohon_kinerja' => $parent_pokin_id,
-							'keterangan' => trim($keterangan_croscutting),
-							'id_skpd_croscutting' => $id_skpd_croscutting,
-							'active' => 1,
-							'status_croscutting' => 0,
-							'created_at' => current_time('mysql'),
-							'updated_at' => current_time('mysql')
-						]);
-					}else{
-						throw new Exception("Data Croscutting sudah ada!", 1);
+						if(empty($data_cek_croscutting)){
+							$insert_crocutting = $wpdb->insert('esakip_croscutting_opd', [
+								'parent_pohon_kinerja' => $parent_pokin_id,
+								'keterangan' => trim($keterangan_croscutting),
+								'id_skpd_croscutting' => $v_skpd,
+								'active' => 1,
+								'status_croscutting' => 0,
+								'created_at' => current_time('mysql'),
+								'updated_at' => current_time('mysql')
+							]);
+						}else{
+							throw new Exception("Data Croscutting sudah ada!", 1);
+						}
 					}
 
 					echo json_encode([
@@ -1744,34 +1745,36 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						}
 					}
 					
-					$data_cek_croscutting = $wpdb->get_row($wpdb->prepare("
-						SELECT *
-						FROM esakip_croscutting_opd
-						WHERE parent_pohon_kinerja =%d
-							AND id !=%d
-							AND id_skpd_croscutting =%d
-							AND keterangan =%s
-					", $input['idParentCroscutting'], $input['id'], $id_skpd_croscutting, $keterangan_croscutting)
-					, ARRAY_A);
+					foreach ($id_skpd_croscutting as $k_skpd => $v_skpd) {
+						$data_cek_croscutting = $wpdb->get_row($wpdb->prepare("
+							SELECT *
+							FROM esakip_croscutting_opd
+							WHERE parent_pohon_kinerja =%d
+								AND id !=%d
+								AND id_skpd_croscutting =%d
+								AND keterangan =%s
+						", $input['idParentCroscutting'], $input['id'], $v_skpd, $keterangan_croscutting)
+						, ARRAY_A);
 
-					if(empty($data_cek_croscutting)){
-						$update_crocutting = $wpdb->update('esakip_croscutting_opd', 
-							array(
-								'keterangan' => trim($keterangan_croscutting),
-								'id_skpd_croscutting' => $id_skpd_croscutting,
-								'active' => 1,
-								'updated_at' => current_time('mysql')
-							),
-							array(
-								'id' => $input['id']
-							)
-						);
+						if(empty($data_cek_croscutting)){
+							$update_crocutting = $wpdb->update('esakip_croscutting_opd', 
+								array(
+									'keterangan' => trim($keterangan_croscutting),
+									'id_skpd_croscutting' => $v_skpd,
+									'active' => 1,
+									'updated_at' => current_time('mysql')
+								),
+								array(
+									'id' => $input['id']
+								)
+							);
 
-						if($update_crocutting === false){
-							error_log("Error updating croscutting: " . $wpdb->last_error);
+							if($update_crocutting === false){
+								error_log("Error updating croscutting: " . $wpdb->last_error);
+							}
+						}else{
+							throw new Exception("Data Sudah Ada", 1);
 						}
-					}else{
-						throw new Exception("Data Sudah Ada", 1);
 					}
 
 					echo json_encode([

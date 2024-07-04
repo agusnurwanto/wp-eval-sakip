@@ -289,8 +289,24 @@ if(!empty($data_all['data'])){
   			display: none;
   		}
   	}
+  	#val-range {
+  		width: 80px;
+	    height: 35px;
+	    text-align: center;
+	    font-size: 20px;
+	    padding: 0;
+	    vertical-align: middle;
+	    font-weight: bold;
+	    margin-top: 20px;
+  	}
 </style>
-<div class="text-center" id="action-sakip"><button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button></div>
+<div class="text-center" id="action-sakip">
+	<button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button>
+	<br>
+	Perkecil (-) <input title="Perbesar/Perkecil Layar" id="test" min="1" max="15" value='10' step="1" onchange="showVal(this.value)" type="range" style="max-width: 400px; margin-top: 40px;" /> (+) Perbesar
+	<br>
+	<textarea id="val-range" disabled>100%</textarea>
+</div>
 <h1 style="text-align: center; margin-top: 30px; font-weight: bold;">Pohon Kinerja<br><?php echo $nama_skpd.$periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1><br>
 <div id="cetak" title="Laporan Pohon Kinerja" style="padding: 5px; overflow: auto; max-width: 100vw;">
     <div id="chart_div" ></div>
@@ -298,27 +314,49 @@ if(!empty($data_all['data'])){
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
+google.charts.load('current', {packages:["orgchart"]});
+google.charts.setOnLoadCallback(drawChart);
 
-    google.charts.load('current', {packages:["orgchart"]});
-    google.charts.setOnLoadCallback(drawChart);
+function drawChart() {
+  	window.data_all = <?php echo json_encode(array_values($data_temp)); ?>;
+  	console.log(data_all);
 
-    function drawChart() {
-      	window.data_all = <?php echo json_encode(array_values($data_temp)); ?>;
-      	console.log(data_all);
+  	window.data = new google.visualization.DataTable();
+    data.addColumn('string', 'Name');
+    data.addColumn('string', 'Manager');
+    data.addColumn('string', 'ToolTip');
+    data.addRows(data_all);
+    data.setRowProperty(2, 'selectedStyle');
+   
+    // Create the chart.
+    window.chart = new google.visualization.OrgChart(document.getElementById('chart_div'));
+    // Draw the chart, setting the allowHtml option to true for the tooltips.
+    chart.draw(data, {
+      'allowHtml':true,
+      'allowCollapse': true
+    });
+}
 
-      	window.data = new google.visualization.DataTable();
-        data.addColumn('string', 'Name');
-        data.addColumn('string', 'Manager');
-        data.addColumn('string', 'ToolTip');
-        data.addRows(data_all);
-        data.setRowProperty(2, 'selectedStyle');
-       
-        // Create the chart.
-        window.chart = new google.visualization.OrgChart(document.getElementById('chart_div'));
-        // Draw the chart, setting the allowHtml option to true for the tooltips.
-        chart.draw(data, {
-          'allowHtml':true,
-          'allowCollapse': true
-        });
+function setZoom(zoom,el) {
+  
+  transformOrigin = [0,0];
+    el = el || instance.getContainer();
+    var p = ["webkit", "moz", "ms", "o"],
+        s = "scale(" + zoom + ")",
+        oString = (transformOrigin[0] * 100) + "% " + (transformOrigin[1] * 100) + "%";
+
+    for (var i = 0; i < p.length; i++) {
+        el.style[p[i] + "Transform"] = s;
+        el.style[p[i] + "TransformOrigin"] = oString;
     }
+
+    el.style["transform"] = s;
+    el.style["transformOrigin"] = oString;
+      
+}
+
+function showVal(val){
+	jQuery('#val-range').val((val*10)+'%');
+	setZoom(val/10, document.getElementById('chart_div'));
+}
 </script>

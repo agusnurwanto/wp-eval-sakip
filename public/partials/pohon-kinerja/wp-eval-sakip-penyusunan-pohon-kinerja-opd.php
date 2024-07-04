@@ -249,7 +249,8 @@ if(!empty($pohon_kinerja_level_1)){
 										'label' => $level_4['label'],
 										'level' => $level_4['level'],
 										'indikator' => array(),
-										'data' => array()
+										'data' => array(),
+										'croscutting' => array()
 									];
 								}
 
@@ -274,6 +275,29 @@ if(!empty($pohon_kinerja_level_1)){
 													'parent' => $indikator_level_4['parent'],
 													'label_indikator_kinerja' => $indikator_level_4['label_indikator_kinerja'],
 													'level' => $indikator_level_4['level']
+												];
+											}
+										}
+									}
+								}
+								
+								// croscutting pokin level 4
+								$croscutting_pohon_kinerja_level_4 = $wpdb->get_results($wpdb->prepare("
+									SELECT 
+										* 
+									FROM esakip_croscutting_opd 
+									WHERE parent_pohon_kinerja=%d 
+										AND active=1 
+									ORDER BY id
+								", $level_4['id']), ARRAY_A);
+								if(!empty($croscutting_pohon_kinerja_level_4)){
+									foreach ($croscutting_pohon_kinerja_level_4 as $croscutting_level_4) {
+										if(!empty($croscutting_level_4['keterangan'])){
+											if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['croscutting'][(trim($croscutting_level_4['keterangan']))])){
+												$data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['croscutting'][(trim($croscutting_level_4['keterangan']))] = [
+													'id' => $croscutting_level_4['id'],
+													'parent_pohon_kinerja' => $croscutting_level_4['parent_pohon_kinerja'],
+													'keterangan' => $croscutting_level_4['keterangan']
 												];
 											}
 										}
@@ -1670,7 +1694,7 @@ jQuery(document).ready(function(){
 		let view = jQuery(this).data('view');
 		let form = getFormData(jQuery("#form-croscutting"));
 		form['id_jadwal'] = '<?php echo $input['periode']; ?>';
-		
+
 		jQuery.ajax({
 			method:'POST',
 			url:esakip.url,
@@ -1725,7 +1749,7 @@ jQuery(document).on('click', '.edit-croscutting', function(){
 					+`<input type="hidden" name="idParentCroscutting" value="${response.data_croscutting.parent_pohon_kinerja}">`
 					+`<div class="form-group" id="showSkpdCroscutting">`
 						+`<label for="skpdCroscutting">Pilih Perangkat Daerah</label>`
-						+`<select class="form-control" name="skpdCroscutting" id="skpdCroscutting">`
+						+`<select class="form-control" name="skpdCroscutting[]" multiple="multiple" id="skpdCroscutting">`
 						+`<?php echo $option_skpd; ?>`
 						+`</select>`
 					+`</div>`
@@ -1738,10 +1762,10 @@ jQuery(document).on('click', '.edit-croscutting', function(){
 			jQuery("#modal-croscutting").find(`.modal-footer`).html(``
 				+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
 					+`Tutup`
-				+`</button>`
-				+`<button type="button" class="btn btn-success" id="simpan-data-croscutting" data-action="update_croscutting">`
-					+`Update`
 				+`</button>`);
+				// +`<button type="button" class="btn btn-success" id="simpan-data-croscutting" data-action="update_croscutting">`
+				// 	+`Update`
+				// +`</button>`
 			jQuery("#modal-croscutting").find('.modal-dialog').css('maxWidth','');
 			jQuery("#modal-croscutting").find('.modal-dialog').css('width','');
 			jQuery("#modal-croscutting").modal('show');
@@ -1753,36 +1777,36 @@ jQuery(document).on('click', '.edit-croscutting', function(){
 })
 
 jQuery(document).on('click', '#tambah-croscuting-level', function(){
-		jQuery("#modal-croscutting").find('.modal-title').html('Tambah croscutting');
-		jQuery("#modal-croscutting").find('.modal-body').html(``
-			+`<form id="form-croscutting">`				
-				+`<input type="hidden" name="parentCroscutting" value="${jQuery(this).data('parent-croscutting')}">`
-				+`<input type="hidden" name="settingCroscutting" value="${jQuery(this).data('setting-croscutting')}">`
-				+`<div class="form-group" id="showSkpdCroscutting">`
-					+`<label for="skpdCroscutting">Pilih Perangkat Daerah</label>`
-					+`<select class="form-control" name="skpdCroscutting" id="skpdCroscutting">`
-					+`<?php echo $option_skpd; ?>`
-					+`</select>`
-				+`</div>`
-				+`<div class="form-group" id="showKeteranganCroscutting">`
-					+`<label for="keteranganCroscutting">Keterangan Croscutting</label>`
-					+`<textarea class="form-control" id="keteranganCroscutting" name="keteranganCroscutting"></textarea>`
-				+`</div>`
-			+`</form>`);
-			jQuery("#modal-croscutting").find('.modal-footer').html(''
-			+'<button type="button" class="btn btn-danger" data-dismiss="modal">'
-				+'Tutup'
-			+'</button>'
-			+'<button type="button" class="btn btn-success" id="simpan-data-croscutting" data-action="create_croscutting">'
-				+'Simpan'
-			+'</button>');
-		jQuery("#modal-croscutting").find('.modal-dialog').css('maxWidth','');
-		jQuery("#modal-croscutting").find('.modal-dialog').css('width','');
-		jQuery("#modal-croscutting").modal('show');
-		jQuery('#skpdCroscutting').select2({
-								width: '100%'
-							});
-	})
+	jQuery("#modal-croscutting").find('.modal-title').html('Tambah croscutting');
+	jQuery("#modal-croscutting").find('.modal-body').html(``
+		+`<form id="form-croscutting">`				
+			+`<input type="hidden" name="parentCroscutting" value="${jQuery(this).data('parent-croscutting')}">`
+			+`<input type="hidden" name="settingCroscutting" value="${jQuery(this).data('setting-croscutting')}">`
+			+`<div class="form-group" id="showSkpdCroscutting">`
+				+`<label for="skpdCroscutting">Pilih Perangkat Daerah</label>`
+				+`<select class="form-control" name="skpdCroscutting[]" multiple="multiple" id="skpdCroscutting">`
+				+`<?php echo $option_skpd; ?>`
+				+`</select>`
+			+`</div>`
+			+`<div class="form-group" id="showKeteranganCroscutting">`
+				+`<label for="keteranganCroscutting">Keterangan Croscutting</label>`
+				+`<textarea class="form-control" id="keteranganCroscutting" name="keteranganCroscutting"></textarea>`
+			+`</div>`
+		+`</form>`);
+		jQuery("#modal-croscutting").find('.modal-footer').html(''
+		+'<button type="button" class="btn btn-danger" data-dismiss="modal">'
+			+'Tutup'
+		+'</button>'
+		+'<button type="button" class="btn btn-success" id="simpan-data-croscutting" data-action="create_croscutting">'
+			+'Simpan'
+		+'</button>');
+	jQuery("#modal-croscutting").find('.modal-dialog').css('maxWidth','');
+	jQuery("#modal-croscutting").find('.modal-dialog').css('width','');
+	jQuery("#modal-croscutting").modal('show');
+	jQuery('#skpdCroscutting').select2({
+							width: '100%'
+						});
+})
 
 	
 jQuery(document).on('click', '.delete-croscutting', function(){
@@ -2233,7 +2257,16 @@ function getFormData($form) {
     let indexed_array = {};
 
     jQuery.map(unindexed_array, function (n, i) {
-    	indexed_array[n['name']] = n['value'];
+		var nama_baru = n['name'].split('[');
+            if(nama_baru.length > 1){
+                nama_baru = nama_baru[0];
+                if(!indexed_array[nama_baru]){
+                    indexed_array[nama_baru] = [];
+                }
+                indexed_array[nama_baru].push(n['value']);
+            }else{
+				indexed_array[n['name']] = n['value'];
+            }
     });
 
     return indexed_array;

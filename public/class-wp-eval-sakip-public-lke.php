@@ -1681,6 +1681,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							$v != 'esakip_renstra'
 							&& $v != 'esakip_rpjmd'
 							&& $v != 'esakip_rpjpd'
+							&& $v != 'esakip_pohon_kinerja_dan_cascading'
 						) {
 							$sql .= $wpdb->prepare(' AND tahun_anggaran=%d', $_POST['tahun_anggaran']);
 						}
@@ -1724,6 +1725,39 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 									$dokumen['url'] .= '&id_skpd=' . $_POST['id_skpd'];
 									$title_renstra = 'Dokumen RENSTRA | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
 									$ret['upload_bukti_dukung'] .= '<a style="margin-left: 5px;" class="btn btn-warning" target="_blank" href="' . $dokumen['url'] . '">' . $title_renstra . '</a>';
+								}
+							}
+							continue;
+						}
+
+						if ($v == 'esakip_pohon_kinerja_dan_cascading') {
+							$jadwal_periode = $wpdb->get_results(
+								$wpdb->prepare("
+									SELECT 
+										id,
+										nama_jadwal,
+										tahun_anggaran,
+										lama_pelaksanaan
+									FROM esakip_data_jadwal
+									WHERE tipe = %s
+									  	AND status = 1
+									ORDER BY id ASC
+								", 'RPJMD'),
+								ARRAY_A
+							);
+							foreach ($jadwal_periode as $jadwal_periode_item) {
+								$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
+								if ($v == 'esakip_pohon_kinerja_dan_cascading') {
+									$dokumen = $this->functions->generatePage(array(
+										'nama_page' => 'Pohon Kinerja dan Cascading | ' . $jadwal_periode_item['id'],
+										'content' => '[dokumen_detail_pohon_kinerja_dan_cascading periode=' . $jadwal_periode_item['id'] . ']',
+										'show_header' => 1,
+										'post_status' => 'private'
+									));
+
+									$dokumen['url'] .= '&id_skpd=' . $_POST['id_skpd'];
+									$title_pokin = 'Dokumen Pohon Kinerja dan Cascading | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+									$ret['upload_bukti_dukung'] .= '<a style="margin-left: 5px;" class="btn btn-warning" target="_blank" href="' . $dokumen['url'] . '">' . $title_pokin . '</a>';
 								}
 							}
 							continue;
@@ -1796,13 +1830,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							$dokumen = $this->functions->generatePage(array(
 								'nama_page' => 'Perjanjian Kinerja ' . $_POST['tahun_anggaran'],
 								'content' => '[dokumen_detail_perjanjian_kinerja tahun=' . $_POST['tahun_anggaran'] . ']',
-								'show_header' => 1,
-								'post_status' => 'private'
-							));
-						} else if ($v == 'esakip_pohon_kinerja_dan_cascading') {
-							$dokumen = $this->functions->generatePage(array(
-								'nama_page' => 'Pohon Kinerja dan Cascading' . $_POST['tahun_anggaran'],
-								'content' => '[dokumen_detail_pohon_kinerja_dan_cascading tahun=' . $_POST['tahun_anggaran'] . ']',
 								'show_header' => 1,
 								'post_status' => 'private'
 							));
