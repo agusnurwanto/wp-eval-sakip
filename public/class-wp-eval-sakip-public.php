@@ -23478,75 +23478,84 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	}
 
 	public function get_table_capaian_indikator()
-	{
-		global $wpdb;
-		$ret = array(
-			'status' => 'success',
-			'message' => 'Berhasil get data!',
-			'data' => array()
-		);
+{
+    global $wpdb;
+    $ret = array(
+        'status' => 'success',
+        'message' => 'Berhasil get data!',
+        'data' => array()
+    );
 
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if (!empty($_POST['id_periode'])) {
-					$id_jadwal = $_POST['id_periode'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Id Jadwal kosong!';
-				}
-				$get_data = $wpdb->get_results(
-					$wpdb->prepare("
-						SELECT 
-							* 
-						FROM esakip_capaian_indikator
-						WHERE id_jadwal = %d 
-						  AND active = 1
-					", $id_jadwal),
-					ARRAY_A
-				);
+    if (!empty($_POST)) {
+        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+            if (!empty($_POST['id_periode'])) {
+                $id_jadwal = $_POST['id_periode'];
+            } else {
+                $ret['status'] = 'error';
+                $ret['message'] = 'Id Jadwal kosong!';
+                die(json_encode($ret));
+            }
 
-				if (!empty($get_data)) {
-					$counter = 1;
-					$tbody = '';
+            $get_data = $wpdb->get_results(
+                $wpdb->prepare("
+                    SELECT 
+                        * 
+                    FROM esakip_capaian_indikator
+                    WHERE id_jadwal = %d 
+                      AND active = 1
+                ", $id_jadwal),
+                ARRAY_A
+            );
 
-					foreach ($get_data as $kk => $vv) {
-						$tbody .= "<tr>";
-						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td class='text-left'>" . ($vv['indikator_kinerja'] ?: '-') . "</td>";
-						$tbody .= "<td>" . ($vv['satuan'] ?: '-') . "</td>";
-						$tbody .= "<td>" . ($vv['kondisi_awal'] ?: '-') . "</td>";
-						$tbody .= "<td>" . ($vv['target_akhir_p_rpjmd'] ?: '-') . "</td>";
-						$tbody .= "<td></td>";
-						$tbody .= "<td>" . ($vv['lkpj_tahun_1'] ?: '-') . "</td>";
-						$tbody .= "<td></td>";
-						$tbody .= "<td>" . ($vv['lkpj_tahun_2'] ?: '-') . "</td>";
-						$tbody .= "<td></td>";
-						$tbody .= "<td>" . ($vv['lkpj_tahun_3'] ?: '-') . "</td>";
-						$tbody .= "<td></td>";
-						$tbody .= "<td>" . ($vv['lkpj_tahun_4'] ?: '-') . "</td>";
-						$tbody .= "<td></td>";
-						$tbody .= "<td>" . ($vv['lkpj_tahun_5'] ?: '-') . "</td>";
-						$tbody .= "<td class='text-left'>" . ($vv['sumber_data'] ?: '-') . "</td>";
-						$tbody .= "<td class='text-left'>" . ($vv['keterangan'] ?: '-') . "</td>";
-						$tbody .= "</tr>";
-					}
+            if (!empty($get_data)) {
+                $counter = 1;
+                $tbody = '';
 
-					$ret['data'] = $tbody;
-				} else {
-					$ret['data'] = "<tr><td colspan='13' class='text-center'>Tidak ada data tersedia</td></tr>";
-				}
-			} else {
-				$ret = array(
-					'status' => 'error',
-					'message'   => 'Api Key tidak sesuai!'
-				);
-			}
-		} else {
-			$ret = array(
-				'status' => 'error',
-				'message'   => 'Format tidak sesuai!'
-			);
-		}
-		die(json_encode($ret));
-	}
+                foreach ($get_data as $kk => $vv) {
+                    $tbody .= "<tr>";
+                    $tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+                    $tbody .= "<td class='text-left'>" . ($vv['indikator_kinerja'] ?: '-') . "</td>";
+                    $tbody .= "<td>" . ($vv['satuan'] ?: '-') . "</td>";
+                    $tbody .= "<td>" . ($vv['kondisi_awal'] ?: '-') . "</td>";
+                    $tbody .= "<td>" . ($vv['target_akhir_p_rpjmd'] ?: '-') . "</td>";
+                    $tbody .= "<td></td>";
+                    $tbody .= "<td>" . ($vv['bps_tahun_1'] ?: '-') . "</td>";
+                    $tbody .= "<td></td>";
+                    $tbody .= "<td>" . ($vv['bps_tahun_2'] ?: '-') . "</td>";
+                    $tbody .= "<td></td>";
+                    $tbody .= "<td>" . ($vv['bps_tahun_3'] ?: '-') . "</td>";
+                    $tbody .= "<td></td>";
+                    $tbody .= "<td>" . ($vv['bps_tahun_4'] ?: '-') . "</td>";
+                    $tbody .= "<td></td>";
+                    $tbody .= "<td>" . ($vv['bps_tahun_5'] ?: '-') . "</td>";
+                    $tbody .= "<td class='text-left'>" . ($vv['sumber_data'] ?: '-') . "</td>";
+                    $tbody .= "<td class='text-left'>" . ($vv['keterangan'] ?: '-') . "</td>";
+                    $tbody .= "</tr>";
+                }
+
+                $ret['data'] = $tbody;
+            } else {
+                $colspan = 0;
+                if (count($get_data) > 0) {
+                    $colspan = count(array_keys($get_data[0]));
+                } else {
+                    $colspan = 13; 
+                }
+                $ret['data'] = "<tr><td colspan=".$colspan." class='text-center'>Tidak ada data tersedia</td></tr>";
+            }
+        } else {
+            $ret = array(
+                'status' => 'error',
+                'message'   => 'Api Key tidak sesuai!'
+            );
+        }
+    } else {
+        $ret = array(
+            'status' => 'error',
+            'message'   => 'Format tidak sesuai!'
+        );
+    }
+    die(json_encode($ret));
+}
+
 }
