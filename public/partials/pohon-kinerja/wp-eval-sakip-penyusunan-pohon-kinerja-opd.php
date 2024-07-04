@@ -1758,20 +1758,25 @@ jQuery(document).on('click', '.edit-croscutting', function(){
 						+`<textarea class="form-control" id="keteranganCroscutting" name="keteranganCroscutting">${keterangan}</textarea>`
 					+`</div>`
 				+`</form>`);
-			jQuery(`#skpdCroscutting option[value="${id_skpd_croscutting}"]`).prop('selected', true);
+			// jQuery(`#skpdCroscutting option[value="${id_skpd_croscutting}"]`).prop('selected', true);
 			jQuery("#modal-croscutting").find(`.modal-footer`).html(``
 				+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
 					+`Tutup`
+				+`</button>`
+				+`<button type="button" class="btn btn-success" id="simpan-data-croscutting" data-action="update_croscutting">`
+					+`Update`
 				+`</button>`);
-				// +`<button type="button" class="btn btn-success" id="simpan-data-croscutting" data-action="update_croscutting">`
-				// 	+`Update`
-				// +`</button>`
 			jQuery("#modal-croscutting").find('.modal-dialog').css('maxWidth','');
 			jQuery("#modal-croscutting").find('.modal-dialog').css('width','');
 			jQuery("#modal-croscutting").modal('show');
 			jQuery('#skpdCroscutting').select2({
 							width: '100%'
 						});
+			// let id_skpd = [];
+			// id_skpd_croscutting.map(function(value, index){
+			// 	id_skpd.push(value.id_label_giat);
+			// })
+			jQuery('#skpdCroscutting').val(id_skpd_croscutting).trigger('change');
 		}
 	});
 })
