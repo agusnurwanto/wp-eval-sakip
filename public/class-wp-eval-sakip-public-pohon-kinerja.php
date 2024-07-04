@@ -1219,15 +1219,17 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					if ($jml_sasaran != 0) {
 						$width_sasaran = 100 / $jml_sasaran;
 						$width_ind_sasaran = 100 / $jml_sasaran;
-						$colspan_sasaran = 100 / $jml_sasaran;
 					}
 
 					$indikator_sasaran_html = '
 					<table>
 						<tbody>';
 					$data_sasaran = '';
+					$data_program = '';
 					$indikator_sasarans = array();
-					$skpd_programs = array();
+					$skpd_program_html = '
+					<table>
+						<tbody>';
 					foreach ($sasaran as $sas) {
 						// indikator sasaran sasaran rpd
 						$indikator_sasaran = $wpdb->get_results(
@@ -1236,14 +1238,15 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									*
 								FROM esakip_rpd_sasaran
 								WHERE id_unik = %s
-								AND id_unik_indikator IS NOT NULL
-								AND active=1
+								  AND id_unik_indikator IS NOT NULL
+								  AND active=1
 							", $sas['id_unik']),
 							ARRAY_A
 						);
 						$width_ind_sasaran = $width_sasaran / count($indikator_sasaran);
 						foreach ($indikator_sasaran as $ind) {
 							$data_sasaran .= '<td class="text-center" width="' . $width_ind_sasaran . '%"><button class="btn btn-lg btn-warning">' . $ind['indikator_teks'] . '</button></td>';
+							$data_program .= '<td class="text-center" width="' . $width_ind_sasaran . '%"><ul class="list-skpd" style="list-style-type: none; margin: 0">';
 
 							// indikator sasaran sasaran rpd
 							$skpd_program = $wpdb->get_results(
@@ -1252,28 +1255,36 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 										*
 									FROM esakip_rpd_program
 									WHERE kode_sasaran = %s
-										AND id_unik_indikator IS NOT NULL
-										AND active=1
-								", $sas['id_unik']),
+									  AND id_unik_indikator_sasaran =%s
+									  AND id_unik_indikator IS NOT NULL
+									  AND active=1
+								", $ind['id_unik'], $ind['id_unik_indikator']),
 								ARRAY_A
 							);
+							foreach($skpd_program as $prog){
+								$data_program .= '<li style="margin-bottom:14px;"><button class="btn btn-lg btn-warning">' . $prog['nama_skpd'] . '</button></li>';
+							}
+							if(empty($skpd_program)){
+								$data_program .= '<li style="margin-bottom:14px;"><button class="btn btn-lg btn-warning"></button></li>';
+							}
+							$data_program .= '</ul></td>';
 						}
 						if (empty($data_sasaran)) {
 							$data_sasaran = '<td class="text-center" width="' . $width_ind_sasaran . '%"><button class="btn btn-lg btn-warning"></button></td>';
+							$data_program = '<td class="text-center" width="' . $width_ind_sasaran . '%"><button class="btn btn-lg btn-warning"></button></td>';
 						}
 						$indikator_sasarans = array_merge($indikator_sasarans, $indikator_sasaran);
-						$skpd_programs = array_merge($skpd_programs, $skpd_program);
 					}
 					$indikator_sasaran_html .= $data_sasaran . '
+						</tbody>
+					</table>';
+					$skpd_program_html .= $data_program . '
 						</tbody>
 					</table>';
 
 					$jml_ind_sasaran = count($indikator_sasarans);
 
 					$colspan_tujuan = $jml_ind_sasaran;
-					if ($jml_ind_sasaran % 2 == 1) {
-						$colspan_sasaran;
-					}
 
 					// indikator tujuan rpd
 					$indikator_tujuan_html = '';
@@ -1299,23 +1310,22 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					$sasaran_html .= $data . '
 						</tbody>
 					</table>';
+					// die(print_r($skpd_programs));
 
-					$skpd_program_html = '';
-					$data = '';
-					foreach ($sasaran as $sas) {
-						$data .= '<td class="text-center" style="width: ' . $width_ind_sasaran . '%">';
-						if (!empty($skpd_programs[$sas['id_unik']])) {
-							$data .= '<ul class="list-skpd">';
-							foreach ($skpd_programs[$sas['id_unik']] as $skpd) {
-								$data .= '<li><button class="btn btn-lg btn-warning">' . $skpd['nama_skpd'] . '</button></li>';
-							}
-							$data .= '</ul>';
-						} else {
-							$data .= '<button class="btn btn-lg btn-warning">belum</button>';
-						}
-						$data .= '</td>';
-					}
-					$skpd_program_html .= $data;
+					// $data = '';
+					// foreach ($sasaran as $sas) {
+					// 	$data .= '<td class="text-center" style="width: ' . $width_ind_sasaran . '%">';
+					// 	if (!empty($skpd_programs[0]['id_unik'])) {
+					// 		$data .= '<ul class="list-skpd" style="list-style-type: none;">';
+					// 		foreach ($skpd_programs as $k => $v) {
+					// 			$data .= '<li style="margin-bottom:14px"><button class="btn btn-lg btn-warning">' . $v['nama_skpd'] . '</button></li>';
+					// 		}
+					// 		$data .= '</ul>';
+					// 	} else {
+					// 		$data .= '<button class="btn btn-lg btn-warning">belum</button>';
+					// 	}
+					// 	$data .= '</td>';
+					// }
 
 					// render html
 					$html = '
@@ -1344,7 +1354,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								</tr>
 								<tr>
 									<td class="text-center"><button class="btn btn-lg btn-info">URUSAN PENGAMPU</button></td>
-									' . $skpd_program_html . '
+									<td class="text-center" colspan='.$colspan_tujuan.'>' . $skpd_program_html . '</td>
 								</tr>
 							</tbody>
 						</table>
