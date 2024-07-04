@@ -326,16 +326,28 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				$user_penilai = $this->get_user_penilai();
 				$user_penilai[''] = '-';
 
-				$data_komponen = $wpdb->get_results(
-					$wpdb->prepare("
+				if (empty($prefix_history)) {
+					$data_komponen = $wpdb->get_results(
+						$wpdb->prepare("
 						SELECT * 
 						FROM esakip_komponen
 						WHERE id_jadwal = %d
 						  AND active = 1
 						ORDER BY nomor_urut ASC
 						", $id_jadwal),
-					ARRAY_A
-				);
+						ARRAY_A
+					);
+				} else if (!empty($prefix_history)) {
+					$data_komponen = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT * 
+						FROM esakip_komponen_history
+						WHERE id_jadwal = %d
+						ORDER BY nomor_urut ASC
+						", $id_jadwal),
+						ARRAY_A
+					);
+				}
 
 				$merged_data = array('debug' => array());
 
@@ -363,17 +375,29 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						$total_nilai_kom_penetapan = 0;
 						$persentase_kom = 0;
 						$persentase_kom_penetapan = 0;
-
-						$data_subkomponen = $wpdb->get_results(
-							$wpdb->prepare("
+						if (empty($prefix_history)) {
+							$data_subkomponen = $wpdb->get_results(
+								$wpdb->prepare("
 								SELECT * 
 								FROM esakip_subkomponen
 								WHERE id_komponen = %d
 								  AND active = 1
 								ORDER BY nomor_urut ASC
 								", $komponen['id']),
-							ARRAY_A
-						);
+								ARRAY_A
+							);
+						} else if (!empty($prefix_history)) {
+							$data_subkomponen = $wpdb->get_results(
+								$wpdb->prepare("
+								SELECT * 
+								FROM esakip_subkomponen_history
+								WHERE id_komponen = %d
+								  AND id_jadwal = %d
+								ORDER BY nomor_urut ASC
+								", $komponen['id_asli'], $id_jadwal),
+								ARRAY_A
+							);
+						}
 						if (!empty($data_subkomponen)) {
 							foreach ($data_subkomponen as $subkomponen) {
 								$disabled = 'disabled';
@@ -406,45 +430,87 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 									// Jika jadwal sudah tutup
 									$disabled = 'disabled';
 								}
-
-								$sum_nilai_usulan = $wpdb->get_var(
-									$wpdb->prepare("
-										SELECT SUM(nilai_usulan)
-										FROM esakip_pengisian_lke p
-										INNER JOIN esakip_komponen_penilaian k on p.id_komponen_penilaian=k.id
-										WHERE p.id_subkomponen = %d
-										  AND p.id_skpd = %d
-                                      	  AND p.tahun_anggaran = %d
-										  AND k.active=1
-									", $subkomponen['id'], $id_skpd, $tahun_anggaran)
-								);
-								$count_nilai_usulan = $wpdb->get_var(
-									$wpdb->prepare("
-										SELECT COUNT(id)
-										FROM esakip_komponen_penilaian
-										WHERE id_subkomponen = %d
-										  AND active = 1
-									", $subkomponen['id'])
-								);
-								$sum_nilai_penetapan = $wpdb->get_var(
-									$wpdb->prepare("
-										SELECT SUM(nilai_penetapan)
-										FROM esakip_pengisian_lke p
-										INNER JOIN esakip_komponen_penilaian k on p.id_komponen_penilaian=k.id
-										WHERE p.id_subkomponen = %d
-										  AND p.id_skpd = %d
-                                      	  AND p.tahun_anggaran = %d
-										  AND k.active=1
-									", $subkomponen['id'], $id_skpd, $tahun_anggaran)
-								);
-								$count_nilai_penetapan = $wpdb->get_var(
-									$wpdb->prepare("
-										SELECT COUNT(id)
-										FROM esakip_komponen_penilaian
-										WHERE id_subkomponen = %d
-										  AND active = 1
-									", $subkomponen['id'])
-								);
+								if (empty($prefix_history)) {
+									$sum_nilai_usulan = $wpdb->get_var(
+										$wpdb->prepare("
+											SELECT SUM(nilai_usulan)
+											FROM esakip_pengisian_lke p
+											INNER JOIN esakip_komponen_penilaian k on p.id_komponen_penilaian=k.id
+											WHERE p.id_subkomponen = %d
+											  AND p.id_skpd = %d
+											  AND p.tahun_anggaran = %d
+											  AND k.active=1
+										", $subkomponen['id'], $id_skpd, $tahun_anggaran)
+									);
+									$count_nilai_usulan = $wpdb->get_var(
+										$wpdb->prepare("
+											SELECT COUNT(id)
+											FROM esakip_komponen_penilaian
+											WHERE id_subkomponen = %d
+											  AND active = 1
+										", $subkomponen['id'])
+									);
+									$sum_nilai_penetapan = $wpdb->get_var(
+										$wpdb->prepare("
+											SELECT SUM(nilai_penetapan)
+											FROM esakip_pengisian_lke p
+											INNER JOIN esakip_komponen_penilaian k on p.id_komponen_penilaian=k.id
+											WHERE p.id_subkomponen = %d
+											  AND p.id_skpd = %d
+											  AND p.tahun_anggaran = %d
+											  AND k.active=1
+										", $subkomponen['id'], $id_skpd, $tahun_anggaran)
+									);
+									$count_nilai_penetapan = $wpdb->get_var(
+										$wpdb->prepare("
+											SELECT COUNT(id)
+											FROM esakip_komponen_penilaian
+											WHERE id_subkomponen = %d
+											  AND active = 1
+										", $subkomponen['id'])
+									);
+								} else if (!empty($prefix_history)) {
+									$sum_nilai_usulan = $wpdb->get_var(
+										$wpdb->prepare("
+											SELECT SUM(nilai_usulan)
+											FROM esakip_pengisian_lke_history p
+											INNER JOIN esakip_komponen_penilaian_history k on p.id_komponen_penilaian=k.id_asli
+											WHERE p.id_subkomponen = %d
+											  AND p.id_skpd = %d
+											  AND p.tahun_anggaran = %d
+											  AND p.id_jadwal =%d
+											  AND k.id_jadwal =%d
+										", $subkomponen['id_asli'], $id_skpd, $tahun_anggaran, $id_jadwal, $id_jadwal)
+									);
+									$count_nilai_usulan = $wpdb->get_var(
+										$wpdb->prepare("
+											SELECT COUNT(id)
+											FROM esakip_komponen_penilaian_history
+											WHERE id_subkomponen = %d
+											  AND id_jadwal = %d
+										", $subkomponen['id_asli'], $id_jadwal)
+									);
+									$sum_nilai_penetapan = $wpdb->get_var(
+										$wpdb->prepare("
+											SELECT SUM(nilai_penetapan)
+											FROM esakip_pengisian_lke_history p
+											INNER JOIN esakip_komponen_penilaian_history k on p.id_komponen_penilaian=k.id_asli
+											WHERE p.id_subkomponen = %d
+											  AND p.id_skpd = %d
+											  AND p.tahun_anggaran = %d
+											  AND p.id_jadwal = %d
+											  AND k.id_jadwal = %d
+										", $subkomponen['id_asli'], $id_skpd, $tahun_anggaran, $id_jadwal, $id_jadwal)
+									);
+									$count_nilai_penetapan = $wpdb->get_var(
+										$wpdb->prepare("
+											SELECT COUNT(id)
+											FROM esakip_komponen_penilaian_history
+											WHERE id_subkomponen = %d
+											  AND id_jadwal =%d
+										", $subkomponen['id_asli'], $id_jadwal)
+									);
+								}
 
 								//jumlah nilai sub
 								$total_nilai_sub = 0;
@@ -560,6 +626,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 										$wpdb->prepare("
 											SELECT 
 												kp.id AS kp_id,
+												kp.id_asli AS kp_id_asli,
 												kp.id_subkomponen AS kp_id_subkomponen,
 												kp.nomor_urut AS kp_nomor_urut,
 												kp.nama AS kp_nama,
@@ -583,31 +650,45 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												pl.bukti_dukung AS pl_bukti_dukung,
 												pl.create_at AS pl_create_at,
 												pl.update_at AS pl_update_at
-											FROM esakip_komponen_penilaian AS kp
+											FROM esakip_komponen_penilaian_history AS kp
 											LEFT JOIN esakip_pengisian_lke_history AS pl 
-												ON kp.id = pl.id_komponen_penilaian AND pl.id_skpd = %d
+												ON kp.id_asli = pl.id_komponen_penilaian 
+												AND pl.id_skpd = %d
 												AND pl.tahun_anggaran=%d
 												AND pl.id_jadwal=%d
 											WHERE kp.id_subkomponen = %d
-											AND kp.active = 1
+											  AND kp.active = 1
 											ORDER BY kp.nomor_urut ASC
-										",  $id_skpd, $tahun_anggaran, $id_jadwal, $subkomponen['id']),
+										",  $id_skpd, $tahun_anggaran, $id_jadwal, $subkomponen['id_asli']),
 										ARRAY_A
 									);
 								}
 
 								if (!empty($data_komponen_penilaian)) {
 									foreach ($data_komponen_penilaian as $penilaian) {
-										$opsi_custom = $wpdb->get_results(
-											$wpdb->prepare("
-												SELECT *
-												FROM esakip_penilaian_custom
-												WHERE id_komponen_penilaian =%d	
-												  AND active = 1
-												ORDER BY nomor_urut ASC
-											", $penilaian['kp_id']),
-											ARRAY_A
-										);
+										if (empty($prefix_history)) {
+											$opsi_custom = $wpdb->get_results(
+												$wpdb->prepare("
+													SELECT *
+													FROM esakip_penilaian_custom
+													WHERE id_komponen_penilaian =%d	
+													  AND active = 1
+													ORDER BY nomor_urut ASC
+												", $penilaian['kp_id']),
+												ARRAY_A
+											);
+										} else if (!empty($prefix_history)) {
+											$opsi_custom = $wpdb->get_results(
+												$wpdb->prepare("
+													SELECT *
+													FROM esakip_penilaian_custom_history
+													WHERE id_komponen_penilaian =%d
+													  AND id_jadwal = %d
+													ORDER BY nomor_urut ASC
+												", $penilaian['kp_id'], $id_jadwal),
+												ARRAY_A
+											);
+										}
 
 										//opsi jawaban usulan
 										$opsi = "<option value=''>Pilih Jawaban</option>";
@@ -703,15 +784,27 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 										}
 
 										// Ambil data kerangka logis yang aktif berdasarkan id_komponen_penilaian
-										$data_kerangka_logis = $wpdb->get_results(
-											$wpdb->prepare("
-												SELECT *
-												FROM esakip_kontrol_kerangka_logis
-												WHERE id_komponen_penilaian = %d
-												  AND active = 1
-											", $penilaian['pl_id_komponen_penilaian']),
-											ARRAY_A
-										);
+										if (empty($prefix_history)) {
+											$data_kerangka_logis = $wpdb->get_results(
+												$wpdb->prepare("
+													SELECT *
+													FROM esakip_kontrol_kerangka_logis
+													WHERE id_komponen_penilaian = %d
+													  AND active = 1
+												", $penilaian['pl_id_komponen_penilaian']),
+												ARRAY_A
+											);
+										} else if (!empty($prefix_history)) {
+											$data_kerangka_logis = $wpdb->get_results(
+												$wpdb->prepare("
+													SELECT *
+													FROM esakip_kontrol_kerangka_logis_history
+													WHERE id_komponen_penilaian = %d
+													  AND id_jadwal = %d
+												", $penilaian['pl_id_komponen_penilaian'], $id_jadwal),
+												ARRAY_A
+											);
+										}
 
 										// Default pesan kerangka logis
 										$kerangka_logis = "<td class='text-center table-warning'>Belum Diisi</td>";
@@ -724,30 +817,56 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 											foreach ($data_kerangka_logis as $kl) {
 												if ($kl['jenis_kerangka_logis'] == 1) {
 													// Rata-rata
-													$avg_nilai_sub = $wpdb->get_var(
-														$wpdb->prepare("
+													if (empty($prefix_history)) {
+														$avg_nilai_sub = $wpdb->get_var(
+															$wpdb->prepare("
 															SELECT AVG(nilai_usulan)
 															FROM esakip_pengisian_lke
 															WHERE id_subkomponen = %d
-																AND id_skpd = %d
-																AND tahun_anggaran = %d
+															  AND id_skpd = %d
+															  AND tahun_anggaran = %d
+															  AND active = 1
 														", $kl['id_komponen_pembanding'], $id_skpd, $tahun_anggaran)
-													);
-
+														);
+													} else if (!empty($prefix_history)) {
+														$avg_nilai_sub = $wpdb->get_var(
+															$wpdb->prepare("
+															SELECT AVG(nilai_usulan)
+															FROM esakip_pengisian_lke_history
+															WHERE id_subkomponen = %d
+															  AND id_skpd = %d
+															  AND tahun_anggaran = %d
+															  AND id_jadwal = %d
+														", $kl['id_komponen_pembanding'], $id_skpd, $tahun_anggaran, $id_jadwal)
+														);
+													}
 													if ($avg_nilai_sub < $penilaian['pl_nilai_usulan']) {
 														$pesan_kesalahan[] = $kl['pesan_kesalahan'];
 													}
 												} else if ($kl['jenis_kerangka_logis'] == 2) {
 													// Nilai
-													$nilai_komponen_penilaian = $wpdb->get_var(
-														$wpdb->prepare("
+													if (empty($prefix_history)) {
+														$nilai_komponen_penilaian = $wpdb->get_var(
+															$wpdb->prepare("
 															SELECT nilai_usulan
 															FROM esakip_pengisian_lke
 															WHERE id_komponen_penilaian = %d
-																AND id_skpd = %d
-																AND tahun_anggaran = %d
+															  AND id_skpd = %d
+															  AND tahun_anggaran = %d
 														", $kl['id_komponen_pembanding'], $id_skpd, $tahun_anggaran)
-													);
+														);
+													} else if (!empty($prefix_history)) {
+														$nilai_komponen_penilaian = $wpdb->get_var(
+															$wpdb->prepare("
+															SELECT nilai_usulan
+															FROM esakip_pengisian_lke_history
+															WHERE id_komponen_penilaian = %d
+															  AND id_skpd = %d
+															  AND tahun_anggaran = %d
+															  AND id_jadwal = %d
+														", $kl['id_komponen_pembanding'], $id_skpd, $tahun_anggaran, $id_jadwal)
+														);
+													}
 
 													if ($penilaian['pl_nilai_usulan'] > $nilai_komponen_penilaian) {
 														$pesan_kesalahan[] = $kl['pesan_kesalahan'];
@@ -772,30 +891,57 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 												foreach ($data_kerangka_logis as $kl) {
 													if ($kl['jenis_kerangka_logis'] == 1) {
 														// Rata-rata
-														$avg_nilai_sub_penetapan = $wpdb->get_var(
-															$wpdb->prepare("
+														if (empty($prefix_history)) {
+															$avg_nilai_sub_penetapan = $wpdb->get_var(
+																$wpdb->prepare("
 																SELECT AVG(nilai_penetapan)
 																FROM esakip_pengisian_lke
 																WHERE id_subkomponen = %d
-																	AND id_skpd = %d
-																	AND tahun_anggaran=%d
+																  AND id_skpd = %d
+																  AND tahun_anggaran=%d
+																  AND active=1
 															", $kl['id_komponen_pembanding'], $id_skpd, $tahun_anggaran)
-														);
+															);
+														} else if (!empty($prefix_history)) {
+															$avg_nilai_sub_penetapan = $wpdb->get_var(
+																$wpdb->prepare("
+																SELECT AVG(nilai_penetapan)
+																FROM esakip_pengisian_lke_history
+																WHERE id_subkomponen = %d
+																  AND id_skpd = %d
+																  AND tahun_anggaran=%d
+																  AND id_jadwal=%d
+															", $kl['id_komponen_pembanding'], $id_skpd, $tahun_anggaran, $id_jadwal)
+															);
+														}
 
 														if ($avg_nilai_sub_penetapan < $penilaian['pl_nilai_penetapan']) {
 															$pesan_kesalahan_penetapan[] = $kl['pesan_kesalahan'];
 														}
 													} else if ($kl['jenis_kerangka_logis'] == 2) {
 														// Nilai
-														$nilai_komponen_penilaian_penetapan = $wpdb->get_var(
-															$wpdb->prepare("
+														if (empty($prefix_history)) {
+															$nilai_komponen_penilaian_penetapan = $wpdb->get_var(
+																$wpdb->prepare("
 																SELECT nilai_penetapan
 																FROM esakip_pengisian_lke
 																WHERE id_komponen_penilaian = %d
-																	AND id_skpd = %d
-																	AND tahun_anggaran=%d
+																  AND id_skpd = %d
+																  AND tahun_anggaran=%d
 															", $kl['id_komponen_pembanding'], $id_skpd, $tahun_anggaran)
-														);
+															);
+														} else if (!empty($prefix_history)) {
+															$nilai_komponen_penilaian_penetapan = $wpdb->get_var(
+																$wpdb->prepare("
+																SELECT nilai_penetapan
+																FROM esakip_pengisian_lke_history
+																WHERE id_komponen_penilaian = %d
+																  AND id_skpd = %d
+																  AND tahun_anggaran=%d
+																  AND id_jadwal=%d
+															", $kl['id_komponen_pembanding'], $id_skpd, $tahun_anggaran, $id_jadwal)
+															);
+														}
 														if ($penilaian['pl_nilai_penetapan'] > $nilai_komponen_penilaian_penetapan) {
 															$pesan_kesalahan_penetapan[] = $kl['pesan_kesalahan'];
 														}
@@ -815,6 +961,8 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 											$bobot_komponen_penilaian = $penilaian['kp_bobot'];
 										} else if ($subkomponen['metode_penilaian'] == 1) {
 											$bobot_komponen_penilaian = '-';
+											$nilai_usulan = '-';
+											$nilai_penetapan = '-';
 										}
 
 										$bukti_dukung = json_decode(stripslashes($penilaian['pl_bukti_dukung']), true);
@@ -1871,16 +2019,40 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$penjelasans = $wpdb->get_row(
+				$status_jadwal = $wpdb->get_var(
 					$wpdb->prepare("
-						SELECT 
-							penjelasan,
-							langkah_kerja
-						FROM esakip_komponen_penilaian
+						SELECT status
+						FROM esakip_data_jadwal
 						WHERE id =%d
-					", $_POST['id']),
-					ARRAY_A
+					", $_POST['id_jadwal'])
 				);
+				// die(print_r($status_jadwal));
+
+				if ($status_jadwal == 2) {
+					$penjelasans = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT 
+								penjelasan,
+								langkah_kerja
+							FROM esakip_komponen_penilaian_history
+							WHERE id_asli =%d
+							  AND id_jadwal = %d
+						", $_POST['id'], $_POST['id_jadwal']),
+						ARRAY_A
+					);
+					// die(print_r($penjelasans));
+				} else {
+					$penjelasans = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT 
+								penjelasan,
+								langkah_kerja
+							FROM esakip_komponen_penilaian
+							WHERE id =%d
+						", $_POST['id']),
+						ARRAY_A
+					);
+				}
 
 				if ($penjelasans) {
 					$tbody = "
@@ -1893,7 +2065,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						</td>
 					</tr>";
 				} else {
-					$tbody = "<tr class='text-left' colspan='2'>tidak ada data tersedia</tr>";
+					$tbody = "<tr class='text-center'><td colspan='2'>tidak ada data tersedia</td></tr>";
 				}
 				$ret['data'] = $tbody;
 			} else {

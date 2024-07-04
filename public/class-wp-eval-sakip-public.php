@@ -8153,58 +8153,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											}
 										}
 
-										$update_penilaian_lke = $wpdb->update(
-											'esakip_pengisian_lke',
-											array(
-												'id_komponen' => $id_komponen_baru,
-												'id_subkomponen' => $id_subkomponen_baru,
-												'id_komponen_penilaian' => $id_komponen_penilaian_baru
-											),
-											array(
-												'id_komponen' => $komponen['id'],
-												'id_subkomponen' => $subkomponen['id'],
-												'id_komponen_penilaian' => $penilaian['id'],
-												'tahun_anggaran' => $tahun_anggaran,
-												'active' => 1
-											)
-										);
-
-										// Check if update data failed, if not then get data from history
-										if (!$update_penilaian_lke) {
-											$data_penilaian_lke_terbaru_history = $wpdb->get_row(
-												$wpdb->prepare("
-                                                SELECT *
-                                                FROM esakip_pengisian_lke_history
-                                                WHERE id_komponen = %d
-                                                  AND id_subkomponen = %d 
-                                                  AND id_komponen_penilaian = %d
-                                                  AND tahun_anggaran = %d
-                                                  AND id_jadwal = %d
-                                            ", $komponen['id'], $subkomponen['id'], $penilaian['id'], $tahun_anggaran, $id_jadwal_sebelumnya),
-												ARRAY_A
-											);
-
-											if (!empty($data_penilaian_lke_terbaru_history)) {
-												$wpdb->insert('esakip_pengisian_lke', array(
-													'id_user' => $data_penilaian_lke_terbaru_history['id_user'],
-													'id_skpd' => $data_penilaian_lke_terbaru_history['id_skpd'],
-													'id_user_penilai' => $data_penilaian_lke_terbaru_history['id_user_penilai'],
-													'id_komponen' => $id_komponen_baru,
-													'id_subkomponen' => $id_subkomponen_baru,
-													'id_komponen_penilaian' => $id_komponen_penilaian_baru,
-													'nilai_usulan' => $data_penilaian_lke_terbaru_history['nilai_usulan'],
-													'nilai_penetapan' => $data_penilaian_lke_terbaru_history['nilai_penetapan'],
-													'keterangan' => $data_penilaian_lke_terbaru_history['keterangan'],
-													'keterangan_penilai' => $data_penilaian_lke_terbaru_history['keterangan_penilai'],
-													'bukti_dukung' => $data_penilaian_lke_terbaru_history['bukti_dukung'],
-													'create_at' => $data_penilaian_lke_terbaru_history['create_at'],
-													'update_at' => $data_penilaian_lke_terbaru_history['update_at'],
-													'tahun_anggaran' => $data_penilaian_lke_terbaru_history['tahun_anggaran'],
-													'active' => 1
-												));
-											}
-										}
-
 										$data_kerangka_logis = $wpdb->get_results(
 											$wpdb->prepare("
                                             SELECT * 
@@ -10323,7 +10271,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		global $wpdb;
 		$return = array(
 			'status' => 'error',
-			'message'	=> 'Format tidak sesuai!'
+			'message' => 'Format tidak sesuai!'
 		);
 
 		$nama_tabel_history = $nama_tabel . "_history";
@@ -10331,15 +10279,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$delete = $wpdb->delete($nama_tabel_history, array('id_jadwal' => $id_jadwal));
 		if ($delete == false) {
 			$return = array(
-				'status' 	=> 'error',
-				'message'	=> 'Delete error, harap hubungi admin!'
+				'status'    => 'error',
+				'message'    => 'Delete error, harap hubungi admin!'
 			);
 		}
 
 		return $return;
 	}
 
-	/** Submit lock data jadwal RPJM */
+	// lock jadwal lke
 	public function lock_jadwal_lke()
 	{
 		global $wpdb;
@@ -10354,13 +10302,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$id = trim(htmlspecialchars($_POST['id']));
 
 					// Ambil data jadwal berdasarkan ID
-					$data_this_id = $wpdb->get_row(
+					$data_jadwal = $wpdb->get_row(
 						$wpdb->prepare('
-							SELECT 
-								* 
-							FROM esakip_data_jadwal 
-							WHERE id = %d
-						', $id),
+                        SELECT 
+                            * 
+                        FROM esakip_data_jadwal 
+                        WHERE id = %d
+                    ', $id),
 						ARRAY_A
 					);
 
@@ -10380,14 +10328,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$time_now = $dateTime->format('Y-m-d H:i:s');
 
 					// Cek apakah waktu sekarang lebih besar dari waktu mulai
-					if ($time_now > $data_this_id['started_at']) {
+					if ($time_now > $data_jadwal['started_at']) {
 						$status_check = array(1, NULL, 2);
-						if (in_array($data_this_id['status'], $status_check)) {
+						if (in_array($data_jadwal['status'], $status_check)) {
 							// Kunci data penjadwalan
 							$wpdb->update('esakip_data_jadwal', array('end_at' => $time_now, 'status' => 2), array('id' => $id));
 
 							// Backup komponen
-							$this->delete_data_lokal_history('esakip_komponen', $data_this_id['id']);
+							$this->delete_data_lokal_history('esakip_komponen', $data_jadwal['id']);
 
 							$columns_1 = array(
 								'id_jadwal',
@@ -10401,12 +10349,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							INSERT INTO esakip_komponen_history (" . implode(', ', $columns_1) . ", id_asli)
 							SELECT " . implode(', ', $columns_1) . ", id as id_asli
 							FROM esakip_komponen
-							WHERE active=1";
+							WHERE id_jadwal = " . $data_jadwal['id'] . " AND active=1";
 
 							$queryRecords1 = $wpdb->query($sql_backup_esakip_komponen);
 
 							// Backup subkomponen
-							$this->delete_data_lokal_history('esakip_subkomponen', $data_this_id['id']);
+							$this->delete_data_lokal_history('esakip_subkomponen', $data_jadwal['id']);
 
 							$columns_2 = array(
 								'id_komponen',
@@ -10419,14 +10367,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 							$sql_backup_esakip_subkomponen = "
 							INSERT INTO esakip_subkomponen_history (" . implode(', ', $columns_2) . ", id_asli, id_jadwal)
-							SELECT " . implode(', ', $columns_2) . ", id as id_asli, " . $data_this_id['id'] . "
+							SELECT " . implode(', ', $columns_2) . ", id as id_asli, " . $data_jadwal['id'] . "
 							FROM esakip_subkomponen
-							WHERE active=1";
+							WHERE id_komponen IN (
+								SELECT id FROM esakip_komponen WHERE id_jadwal = " . $data_jadwal['id'] . " AND active=1
+							) AND active=1";
 
 							$queryRecords2 = $wpdb->query($sql_backup_esakip_subkomponen);
 
 							// Backup komponen penilaian
-							$this->delete_data_lokal_history('esakip_komponen_penilaian', $data_this_id['id']);
+							$this->delete_data_lokal_history('esakip_komponen_penilaian', $data_jadwal['id']);
 
 							$columns_3 = array(
 								'id_subkomponen',
@@ -10440,14 +10390,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 							$sql_backup_esakip_komponen_penilaian = "
 							INSERT INTO esakip_komponen_penilaian_history (" . implode(', ', $columns_3) . ", id_asli, id_jadwal)
-							SELECT " . implode(', ', $columns_3) . ", id as id_asli, " . $data_this_id['id'] . "
+							SELECT " . implode(', ', $columns_3) . ", id as id_asli, " . $data_jadwal['id'] . "
 							FROM esakip_komponen_penilaian
-							WHERE active=1";
+							WHERE id_subkomponen IN (
+								SELECT id FROM esakip_subkomponen WHERE id_komponen IN (
+									SELECT id FROM esakip_komponen WHERE id_jadwal = " . $data_jadwal['id'] . " AND active=1
+								) AND active=1
+							) AND active=1";
 
 							$queryRecords3 = $wpdb->query($sql_backup_esakip_komponen_penilaian);
 
 							// Backup kerangka logis
-							$this->delete_data_lokal_history('esakip_kontrol_kerangka_logis', $data_this_id['id']);
+							$this->delete_data_lokal_history('esakip_kontrol_kerangka_logis', $data_jadwal['id']);
 
 							$columns_4 = array(
 								'id_komponen_penilaian',
@@ -10458,14 +10412,20 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 							$sql_backup_esakip_kontrol_kerangka_logis = "
 							INSERT INTO esakip_kontrol_kerangka_logis_history (" . implode(', ', $columns_4) . ", id_asli, id_jadwal)
-							SELECT " . implode(', ', $columns_4) . ", id as id_asli, " . $data_this_id['id'] . "
+							SELECT " . implode(', ', $columns_4) . ", id as id_asli, " . $data_jadwal['id'] . "
 							FROM esakip_kontrol_kerangka_logis
-							WHERE active=1";
+							WHERE id_komponen_penilaian IN (
+								SELECT id FROM esakip_komponen_penilaian WHERE id_subkomponen IN (
+									SELECT id FROM esakip_subkomponen WHERE id_komponen IN (
+										SELECT id FROM esakip_komponen WHERE id_jadwal = " . $data_jadwal['id'] . " AND active=1
+									) AND active=1
+								) AND active=1
+							) AND active=1";
 
 							$queryRecords4 = $wpdb->query($sql_backup_esakip_kontrol_kerangka_logis);
 
 							// Backup penilaian custom
-							$this->delete_data_lokal_history('esakip_penilaian_custom', $data_this_id['id']);
+							$this->delete_data_lokal_history('esakip_penilaian_custom', $data_jadwal['id']);
 
 							$columns_5 = array(
 								'id_komponen_penilaian',
@@ -10476,14 +10436,20 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 							$sql_backup_esakip_penilaian_custom = "
 							INSERT INTO esakip_penilaian_custom_history (" . implode(', ', $columns_5) . ", id_asli, id_jadwal)
-							SELECT " . implode(', ', $columns_5) . ", id as id_asli, " . $data_this_id['id'] . "
+							SELECT " . implode(', ', $columns_5) . ", id as id_asli, " . $data_jadwal['id'] . "
 							FROM esakip_penilaian_custom
-							WHERE active=1";
+							WHERE id_komponen_penilaian IN (
+								SELECT id FROM esakip_komponen_penilaian WHERE id_subkomponen IN (
+									SELECT id FROM esakip_subkomponen WHERE id_komponen IN (
+										SELECT id FROM esakip_komponen WHERE id_jadwal = " . $data_jadwal['id'] . " AND active=1
+									) AND active=1
+								) AND active=1
+							) AND active=1";
 
 							$queryRecords5 = $wpdb->query($sql_backup_esakip_penilaian_custom);
 
 							// Backup pengisian LKE
-							$this->delete_data_lokal_history('esakip_pengisian_lke', $data_this_id['id']);
+							$this->delete_data_lokal_history('esakip_pengisian_lke', $data_jadwal['id']);
 
 							$columns_6 = array(
 								'id_user',
@@ -10504,7 +10470,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 							$sql_backup_esakip_pengisian_lke = "
 							INSERT INTO esakip_pengisian_lke_history (" . implode(', ', $columns_6) . ", id_asli, id_jadwal)
-							SELECT " . implode(', ', $columns_6) . ", id as id_asli, " . $data_this_id['id'] . "
+							SELECT " . implode(', ', $columns_6) . ", id as id_asli, " . $data_jadwal['id'] . "
 							FROM esakip_pengisian_lke 
 							WHERE active=1";
 
@@ -10541,7 +10507,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 		die(json_encode($return));
 	}
-
 
 	/** Ambil data penjadwalan RPJMD */
 	public function get_data_penjadwalan_rpjmd()
@@ -16081,7 +16046,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									SELECT nama
 									FROM esakip_subkomponen
 									WHERE id=%d
-									AND active = 1
+									  AND active = 1
 								", $kerangka_logis['id_komponen_pembanding'])
 							);
 							$tbody .= '<td class="text-left">Rata Rata</td>';
@@ -19140,6 +19105,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							SELECT id_komponen
 							FROM esakip_subkomponen
 							WHERE id_komponen=%d
+							  AND active = 1
 						", $_POST['id'])
 					);
 					if (empty($cek_id)) {
@@ -19180,7 +19146,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		global $wpdb;
 		$ret = array(
 			'status' => 'success',
-			'message' => 'Berhasil hapus data!',
+			'message' => "Berhasil hapus data!\n",
 			'data' => array()
 		);
 
@@ -19188,58 +19154,80 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				if (!empty($_POST['id'])) {
 					$id = intval($_POST['id']);
-					$wpdb->update(
+
+					// Hapus komponen penilaian
+					$update_result = $wpdb->update(
 						'esakip_komponen_penilaian',
 						array('active' => 0),
 						array('id' => $id)
 					);
 
-					// cek id berkaitan
-					$cek_penilaian = $wpdb->get_results(
-						$wpdb->prepare("
-							SELECT id
-							FROM esakip_pengisian_lke
-							WHERE id_komponen_penilaian = %d 
-							  AND active = 1
-						", $id)
-					);
-					$cek_kerangka_logis = $wpdb->get_results(
-						$wpdb->prepare("
-							SELECT id
-							FROM esakip_kontrol_kerangka_logis
-							WHERE id_komponen_penilaian = %d 
-							  AND active = 1
-						", $id)
-					);
-					$cek_opsi_custom = $wpdb->get_results(
-						$wpdb->prepare("
-							SELECT id
-							FROM esakip_penilaian_custom
-							WHERE id_komponen_penilaian = %d 
-							  AND active = 1
-						", $id)
-					);
+					if ($update_result !== false) {
+						$ret['message'] .= " Komponen penilaian berhasil dihapus.\n";
 
-					// update(delete) if exist
-					if (!empty($cek_penilaian)) {
-						$wpdb->update(
-							'esakip_pengisian_lke',
-							array('active' => 0),
-							array('id_komponen_penilaian' => $id)
-						);
-					}
-					if (!empty($cek_kerangka_logis)) {
-						$wpdb->update(
-							'esakip_kontrol_kerangka_logis',
-							array('active' => 0),
-							array('id_komponen_penilaian' => $id)
-						);
-					}
-					if (!empty($cek_opsi_custom)) {
-						$wpdb->update(
-							'esakip_penilaian_custom',
-							array('active' => 0),
-							array('id_komponen_penilaian' => $id)
+						// Cek dan hapus data berkaitan
+						$related_tables = [
+							'esakip_pengisian_lke' => 'id_komponen_penilaian',
+							'esakip_kontrol_kerangka_logis' => 'id_komponen_penilaian',
+							'esakip_penilaian_custom' => 'id_komponen_penilaian',
+						];
+
+						foreach ($related_tables as $table => $column) {
+							$cek_data = $wpdb->get_results(
+								$wpdb->prepare("
+                                SELECT id
+                                FROM $table
+                                WHERE $column = %d 
+                                  AND active = 1
+                            ", $id)
+							);
+
+							if (!empty($cek_data)) {
+								$delete_result = $wpdb->update(
+									$table,
+									array('active' => 0),
+									array($column => $id)
+								);
+
+								if ($delete_result !== false) {
+									$ret['message'] .= " Data di tabel $table berhasil dihapus.\n";
+								} else {
+									$ret['message'] .= " Gagal menghapus data di tabel $table.\n";
+									$ret['status'] = 'error';
+								}
+							}
+
+							// Jika tabel esakip_kontrol_kerangka_logis, update juga kolom id_pembanding
+							if ($table == 'esakip_kontrol_kerangka_logis') {
+								$cek_pembanding = $wpdb->get_results(
+									$wpdb->prepare("
+										SELECT id
+										FROM esakip_kontrol_kerangka_logis
+										WHERE id_komponen_pembanding = %d
+										  AND active = 1
+									", $id)
+								);
+	
+								if (!empty($cek_pembanding)) {
+									$update_pembanding_result = $wpdb->update(
+										'esakip_kontrol_kerangka_logis',
+										array('active' => 0),
+										array('id_komponen_pembanding' => $id)
+									);
+	
+									if ($update_pembanding_result !== false) {
+										$ret['message'] .= " Data di tabel esakip_kontrol_kerangka_logis (id_komponen_pembanding) berhasil dihapus.\n";
+									} else {
+										$ret['message'] .= " Gagal menghapus data di tabel esakip_kontrol_kerangka_logis (id_komponen_pembanding).\n";
+										$ret['status'] = 'error';
+									}
+								}
+							}	
+						}
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message'   => 'Gagal menghapus komponen penilaian.'
 						);
 					}
 				} else {
@@ -19263,12 +19251,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
+
 	public function hapus_subkomponen_lke()
 	{
 		global $wpdb;
 		$ret = array(
 			'status' => 'success',
-			'message' => 'Berhasil hapus data!',
+			'message' => "Berhasil hapus data!.\n",
 			'data' => array()
 		);
 
@@ -19280,8 +19269,31 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							SELECT id_subkomponen
 							FROM esakip_komponen_penilaian
 							WHERE id_subkomponen=%d
+							  AND active = 1
 						", $_POST['id'])
 					);
+					$cek_kl = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT id_komponen_pembanding
+							FROM esakip_kontrol_kerangka_logis
+							WHERE id_komponen_pembanding=%d
+							  AND active = 1
+						", $_POST['id'])
+					);
+
+					if (!empty($cek_kl)) {
+						$delete_kl = $wpdb->update(
+							'esakip_kontrol_kerangka_logis',
+							array('active' => 0),
+							array('id_komponen_pembanding' => $_POST['id'])
+						);
+						if ($delete_kl !== false) {
+							$ret['message'] .= " Data di tabel esakip_kontrol_kerangka_logis (id_komponen_pembanding) berhasil dihapus.\n";
+						} else {
+							$ret['message'] .= " Gagal menghapus data di tabel esakip_kontrol_kerangka_logis (id_komponen_pembanding).\n";
+							$ret['status'] = 'error';
+						}
+					} 
 					if (empty($cek_id)) {
 						$ret['data'] = $wpdb->update(
 							'esakip_subkomponen',
@@ -23449,6 +23461,79 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						'status' => 'error',
 						'message'   => 'Id Kosong!'
 					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_table_capaian_indikator()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_periode'])) {
+					$id_jadwal = $_POST['id_periode'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
+				}
+				$get_data = $wpdb->get_results(
+					$wpdb->prepare("
+						SELECT 
+							* 
+						FROM esakip_capaian_indikator
+						WHERE id_jadwal = %d 
+						  AND active = 1
+					", $id_jadwal),
+					ARRAY_A
+				);
+
+				if (!empty($get_data)) {
+					$counter = 1;
+					$tbody = '';
+
+					foreach ($get_data as $kk => $vv) {
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+						$tbody .= "<td class='text-left'>" . ($vv['indikator_kinerja'] ?: '-') . "</td>";
+						$tbody .= "<td>" . ($vv['satuan'] ?: '-') . "</td>";
+						$tbody .= "<td>" . ($vv['kondisi_awal'] ?: '-') . "</td>";
+						$tbody .= "<td>" . ($vv['target_akhir_p_rpjmd'] ?: '-') . "</td>";
+						$tbody .= "<td>" . ($vv['bps_tahun_1'] ?: '-') . "</td>";
+						$tbody .= "<td>" . ($vv['bps_tahun_2'] ?: '-') . "</td>";
+						$tbody .= "<td>" . ($vv['bps_tahun_3'] ?: '-') . "</td>";
+						$tbody .= "<td>" . ($vv['bps_tahun_4'] ?: '-') . "</td>";
+						$tbody .= "<td>" . ($vv['bps_tahun_5'] ?: '-') . "</td>";
+						$tbody .= "<td>" . ($vv['lkpj_tahun_1'] ?: '-') . "</td>";
+						$tbody .= "<td>" . ($vv['lkpj_tahun_2'] ?: '-') . "</td>";
+						$tbody .= "<td>" . ($vv['lkpj_tahun_3'] ?: '-') . "</td>";
+						$tbody .= "<td>" . ($vv['lkpj_tahun_4'] ?: '-') . "</td>";
+						$tbody .= "<td>" . ($vv['lkpj_tahun_5'] ?: '-') . "</td>";
+						$tbody .= "<td class='text-left'>" . ($vv['sumber_data'] ?: '-') . "</td>";
+						$tbody .= "<td class='text-left'>" . ($vv['keterangan'] ?: '-') . "</td>";
+						$tbody .= "</tr>";
+					}
+
+					$ret['data'] = $tbody;
+				} else {
+					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 			} else {
 				$ret = array(
