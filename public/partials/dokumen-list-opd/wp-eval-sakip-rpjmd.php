@@ -49,6 +49,16 @@ $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
 $is_admin_panrb = in_array('admin_panrb', $user_roles);
 
+$status_iku = $wpdb->get_row(
+    $wpdb->prepare("
+        SELECT  *
+        FROM esakip_menu_dokumen
+        WHERE nama_tabel='esakip_capaian_iku_pemda'
+            AND id_jadwal=%d"
+        ,$input['periode'])
+        , ARRAY_A
+);
+
 ?>
 <style type="text/css">
     .wrap-table {
@@ -68,6 +78,11 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     }
 
     #table_dokumen_rpjmd th {
+        vertical-align: middle;
+    }
+    #table_capaian_indikator_mikro th, 
+    #table_capaian_indikator_mikro td {
+        text-align: center;
         vertical-align: middle;
     }
 </style>
@@ -91,6 +106,51 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                             <th class="text-center" rowspan="2">Keterangan</th>
                             <th class="text-center" rowspan="2">Waktu Upload</th>
                             <th class="text-center" rowspan="2" style="width: 150px;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <?php if(!empty($status_iku['active']) AND $status_iku['active'] == 1): ?>
+            <div style="padding: 10px;margin:0 0 3rem 0;">
+                <h1 class="text-center" style="margin:3rem;">Capaian Indikator Makro <br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+<div class="container-md">
+    <div class="cetak">
+        <div style="padding: 10px;margin:0 0 3rem 0;">
+            <h1 class="text-center" style="margin:3rem;">Capaian Indikator Mikro</h1>
+            <div class="wrap-table">
+                <table id="table_capaian_indikator_mikro" cellpadding="2" cellspacing="0" style="font-family: 'Open Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" class="text-center" style="width: 50px;">No</th>
+                            <th rowspan="2" class="text-center">Aspek/Fokus/ Bidang/Urusan/ Indikator Kinerja Pembangunan Daerah</th>
+                            <th rowspan="2" class="text-center">Satuan</th>
+                            <th colspan="1" class="text-center">Kondisi kinerja pada awal periode RPJMD</th>
+                            <th rowspan="2" class="text-center">Target Akhir P-RPJMD</th>
+                            <th colspan="5" class="text-center">Capaian IKU (Sumber: PRPJMD, BPS)</th>
+                            <th colspan="5" class="text-center">Capaian IKU (Sumber: LKPJ)</th>
+                            <th rowspan="2" class="text-center">Sumber Data</th>
+                            <th rowspan="2" class="text-center">Keterangan</th>
+                        </tr>
+                        <tr>
+                            <th class="text-center">2018</th>
+                            <th class="text-center">2018</th>
+                            <th class="text-center">2019</th>
+                            <th class="text-center">2020</th>
+                            <th class="text-center">2021</th>
+                            <th class="text-center">2022</th>
+                            <th class="text-center">2018</th>
+                            <th class="text-center">2019</th>
+                            <th class="text-center">2020</th>
+                            <th class="text-center">2021</th>
+                            <th class="text-center">2022</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -172,6 +232,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 <script>
     jQuery(document).ready(function() {
         getTableRpjmd();
+        getTableCapaianIndikator();
         getTableTahun();
         jQuery("#fileUpload").on('change', function() {
             var id_dokumen = jQuery('#idDokumen').val();
@@ -181,6 +242,34 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             }
         });
     });
+
+    function getTableCapaianIndikator() {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_table_capaian_indikator',
+                api_key: esakip.api_key,
+                id_periode: <?php echo $input['periode']; ?>,
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                console.log(response);
+                if (response.status === 'success') {
+                    jQuery('#table_capaian_indikator_mikro tbody').html(response.data);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data Rpjmd!');
+            }
+        });
+    }
 
     function getTableRpjmd() {
         jQuery('#wrap-loading').show();

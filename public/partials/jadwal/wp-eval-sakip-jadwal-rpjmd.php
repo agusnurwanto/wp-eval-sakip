@@ -211,6 +211,28 @@ $body = '';
 						</div>
 					</div>
 				</div>
+				<div class="card" style="margin: 1.5rem 0;">
+  					<div class="card-body">
+						<div class="form-group">
+							<label class="d-block">Pengaturan Menu IKU</label>
+							<tr>
+								<td>
+									<div class="custom-control custom-radio custom-control-inline">
+										<input class="custom-control-input" type="radio" name="menu_iku" id="menu_iku_tampil" value="tampil">
+										<label class="custom-control-label" for="menu_iku_tampil">Tampilkan</label>
+									</div>
+								</td>
+								<td>
+									<div class="custom-control custom-radio custom-control-inline">
+										<input class="custom-control-input" type="radio" name="menu_iku" id="menu_iku_sembunyi" value="sembunyi" checked>
+										<label class="custom-control-label" for="menu_iku_sembunyi">Sembunyikan</label>
+									</div>
+								</td>
+							</tr>
+							<small class="d-block form-text text-muted">Setting Menu IKU Yang Tampil Di Halaman Upload Dokumen RPJMD</small>
+						</div>
+					</div>
+				</div>
 				<!--<div class="card" style="margin: 1.5rem 0;">
   					<div class="card-body">
 						<div class="form-group">
@@ -366,6 +388,7 @@ $body = '';
 		let akses_user_pohon_kinerja = jQuery("input[name='akses_user_upload_dokumen_pohon_kinerja']:checked").val();
 		let menu_dokumen = jQuery("input[name='menu_dokumen']:checked").val();
 		let menu_dokumen_pohon_kinerja = jQuery("input[name='menu_dokumen_pohon_kinerja']:checked").val();
+		let menu_iku = jQuery("input[name='menu_iku']:checked").val();
 
 		if (nama_jadwal.trim() == '' || nama_jadwal_renstra == ''|| keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '' || jenis_khusus_rpjmd == '' || akses_user == '' || akses_user_pohon_kinerja == '' || menu_dokumen == '' || menu_dokumen_pohon_kinerja == '') {
 			jQuery("#wrap-loading").hide()
@@ -391,7 +414,8 @@ $body = '';
 					'akses_user': akses_user,
 					'akses_user_pohon_kinerja': akses_user_pohon_kinerja,
 					'menu_dokumen': menu_dokumen,
-					'menu_dokumen_pohon_kinerja': menu_dokumen_pohon_kinerja
+					'menu_dokumen_pohon_kinerja': menu_dokumen_pohon_kinerja,
+					'menu_iku': menu_iku
 				},
 				beforeSend: function() {
 					jQuery('.submitBtn').attr('disabled', 'disabled')
@@ -455,6 +479,8 @@ $body = '';
 
 				jQuery("input[name=menu_dokumen][value='"+response.data.hak_akses_renstra+"']").prop("checked",true);
 
+				jQuery("input[name=menu_iku][value='"+response.data.hak_akses_menu_iku+"']").prop("checked",true);
+
 				// setting pohon kinerja
 				let akses_user_pohon_kinerja = '';
 				if(response.data.jenis_role_pohon_kinerja == 1){
@@ -484,6 +510,7 @@ $body = '';
 		let akses_user_pohon_kinerja = jQuery("input[name='akses_user_upload_dokumen_pohon_kinerja']:checked").val();
 		let menu_dokumen = jQuery("input[name='menu_dokumen']:checked").val();
 		let menu_dokumen_pohon_kinerja = jQuery("input[name='menu_dokumen_pohon_kinerja']:checked").val();
+		let menu_iku = jQuery("input[name='menu_iku']:checked").val();
 		// let menu_penyusunan_pohon_kinerja_pemda = jQuery("input[name='menu_penyusunan_pohon_kinerja_pemda']:checked").val();
 		// let menu_penyusunan_pohon_kinerja_opd = jQuery("input[name='menu_penyusunan_pohon_kinerja_opd']:checked").val();
 
@@ -511,7 +538,8 @@ $body = '';
 					'akses_user' : akses_user,
 					'akses_user_pohon_kinerja' : akses_user_pohon_kinerja,
 					'menu_dokumen' : menu_dokumen,
-					'menu_dokumen_pohon_kinerja' : menu_dokumen_pohon_kinerja
+					'menu_dokumen_pohon_kinerja' : menu_dokumen_pohon_kinerja,
+					'menu_iku': menu_iku
 				},
 				beforeSend: function() {
 					jQuery('.submitBtn').attr('disabled', 'disabled')

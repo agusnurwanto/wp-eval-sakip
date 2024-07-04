@@ -388,6 +388,8 @@ CREATE TABLE esakip_komponen_penilaian_history (
   `jenis_bukti_dukung` text DEFAULT NULL,
   `active` tinyint(4) NOT NULL DEFAULT '1',
   `bobot` float DEFAULT NULL,
+  `penjelasan` text DEFAULT NULL,
+  `langkah_kerja` text DEFAULT NULL,
   `id_asli` int(11) DEFAULT NULL,
   `id_jadwal` int(11) NOT NULL,
   PRIMARY KEY  (`id`)
@@ -1052,6 +1054,14 @@ CREATE TABLE `esakip_prog_keg` (
   PRIMARY KEY  (id)
 );
 
+CREATE TABLE `esakip_capaian_iku_pemda` (
+  `id` int(11) NOT NULL auto_increment,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
+);
+
 CREATE TABLE `esakip_croscutting_opd` (
   `id` int(11) NOT NULL auto_increment,
   `parent_pohon_kinerja` int(11) NOT NULL,
@@ -1059,8 +1069,35 @@ CREATE TABLE `esakip_croscutting_opd` (
   `label_croscutting` varchar(255) DEFAULT NULL,
   `label_indikator_croscutting` varchar(255) DEFAULT null,
   `id_skpd_croscutting` int(11) DEFAULT NULL,
+  `keterangan_croscutting` varchar(255) DEFAULT null,
+  `parent_croscutting` int(11) NOT NULL,
+  `status_croscutting` tinyint(4) NOT NULL COMMENT '0 = MENUNGGU, 1 = DISETUJUI, 2 = DITOLAK',
   `active` tinyint(4) NOT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id)
+);
+
+CREATE TABLE `esakip_capaian_indikator` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `indikator_kinerja` text DEFAULT NULL,
+  `satuan` varchar(255) DEFAULT NULL,
+  `kondisi_awal` varchar(255) DEFAULT NULL,
+  `target_akhir_p_rpjmd` varchar(255) DEFAULT NULL,
+  `bps_tahun_1` varchar(255) DEFAULT NULL,
+  `bps_tahun_2` varchar(255) DEFAULT NULL,
+  `bps_tahun_3` varchar(255) DEFAULT NULL,
+  `bps_tahun_4` varchar(255) DEFAULT NULL,
+  `bps_tahun_5` varchar(255) DEFAULT NULL,
+  `lkpj_tahun_1` varchar(255) DEFAULT NULL,
+  `lkpj_tahun_2` varchar(255) DEFAULT NULL,
+  `lkpj_tahun_3` varchar(255) DEFAULT NULL,
+  `lkpj_tahun_4` varchar(255) DEFAULT NULL,
+  `lkpj_tahun_5` varchar(255) DEFAULT NULL,
+  `sumber_data` text DEFAULT NULL,
+  `keterangan` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp,
+  `active` tinyint(4) DEFAULT 1,
+ PRIMARY KEY(id)
 );
