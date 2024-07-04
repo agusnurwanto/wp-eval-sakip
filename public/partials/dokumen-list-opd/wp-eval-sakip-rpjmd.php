@@ -20,7 +20,23 @@ $periode = $wpdb->get_row(
     ARRAY_A
 );
 
-$tahun_periode = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
+$tahun_periode = $periode['tahun_selesai_anggaran'];
+$tahun_mulai_anggaran = ($periode['tahun_selesai_anggaran'] - $periode['lama_pelaksanaan']) + 1;
+
+$colspan = $periode['lama_pelaksanaan']*2;
+$header_tahun = '<tr>';
+$header_target = '<tr><th class="text-center">'.$tahun_mulai_anggaran.'</th>';
+for($i=$tahun_mulai_anggaran; $i<=$tahun_periode; $i++){
+    $header_tahun .= '
+        <th colspan ="2" class="text-center">'.$i.'</th>
+    ';
+    $header_target.='
+        <th class="text-center">Target</th>
+        <th class="text-center">Capaian</th>
+    ';
+}
+$header_tahun .= '</tr>';
+$header_target .= '</tr>';
 
 $idtahun = $wpdb->get_results(
     $wpdb->prepare(
@@ -124,34 +140,21 @@ $status_iku = $wpdb->get_row(
 <div class="container-md">
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Capaian Indikator Mikro</h1>
+            <h1 class="text-center" style="margin:3rem;">Capaian Indikator Makro</h1>
             <div class="wrap-table">
                 <table id="table_capaian_indikator_mikro" cellpadding="2" cellspacing="0" style="font-family: 'Open Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
                         <tr>
-                            <th rowspan="2" class="text-center" style="width: 50px;">No</th>
-                            <th rowspan="2" class="text-center">Aspek/Fokus/ Bidang/Urusan/ Indikator Kinerja Pembangunan Daerah</th>
-                            <th rowspan="2" class="text-center">Satuan</th>
-                            <th colspan="1" class="text-center">Kondisi kinerja pada awal periode RPJMD</th>
-                            <th rowspan="2" class="text-center">Target Akhir P-RPJMD</th>
-                            <th colspan="5" class="text-center">Capaian IKU (Sumber: PRPJMD, BPS)</th>
-                            <th colspan="5" class="text-center">Capaian IKU (Sumber: LKPJ)</th>
-                            <th rowspan="2" class="text-center">Sumber Data</th>
-                            <th rowspan="2" class="text-center">Keterangan</th>
+                            <th rowspan="3" class="text-center" style="width: 50px;">No</th>
+                            <th rowspan="3" class="text-center">Aspek/Fokus/ Bidang/Urusan/ Indikator Kinerja Pembangunan Daerah</th>
+                            <th rowspan="3" class="text-center">Satuan</th>
+                            <th colspan="1" rowspan="2" class="text-center">Kondisi kinerja pada awal periode RPJMD</th>
+                            <th rowspan="3" class="text-center">Target Akhir P-RPJMD</th>
+                            <th colspan="<?php echo $colspan; ?>" class="text-center">Capaian IKU </th>
+                            <th rowspan="3" class="text-center">Sumber Data</th>
+                            <th rowspan="3" class="text-center">Keterangan</th>
                         </tr>
-                        <tr>
-                            <th class="text-center">2018</th>
-                            <th class="text-center">2018</th>
-                            <th class="text-center">2019</th>
-                            <th class="text-center">2020</th>
-                            <th class="text-center">2021</th>
-                            <th class="text-center">2022</th>
-                            <th class="text-center">2018</th>
-                            <th class="text-center">2019</th>
-                            <th class="text-center">2020</th>
-                            <th class="text-center">2021</th>
-                            <th class="text-center">2022</th>
-                        </tr>
+                        <?php echo $header_tahun.$header_target; ?>
                     </thead>
                     <tbody>
                     </tbody>
