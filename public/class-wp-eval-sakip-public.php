@@ -19105,6 +19105,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							SELECT id_komponen
 							FROM esakip_subkomponen
 							WHERE id_komponen=%d
+							  AND active = 1
 						", $_POST['id'])
 					);
 					if (empty($cek_id)) {
@@ -19268,6 +19269,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							SELECT id_subkomponen
 							FROM esakip_komponen_penilaian
 							WHERE id_subkomponen=%d
+							  AND active = 1
 						", $_POST['id'])
 					);
 					$cek_kl = $wpdb->get_var(
@@ -19275,6 +19277,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							SELECT id_komponen_pembanding
 							FROM esakip_kontrol_kerangka_logis
 							WHERE id_komponen_pembanding=%d
+							  AND active = 1
 						", $_POST['id'])
 					);
 
