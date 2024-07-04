@@ -1762,10 +1762,10 @@ jQuery(document).on('click', '.edit-croscutting', function(){
 			jQuery("#modal-croscutting").find(`.modal-footer`).html(``
 				+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
 					+`Tutup`
-				+`</button>`
-				+`<button type="button" class="btn btn-success" id="simpan-data-croscutting" data-action="update_croscutting">`
-					+`Update`
 				+`</button>`);
+				// +`<button type="button" class="btn btn-success" id="simpan-data-croscutting" data-action="update_croscutting">`
+				// 	+`Update`
+				// +`</button>`
 			jQuery("#modal-croscutting").find('.modal-dialog').css('maxWidth','');
 			jQuery("#modal-croscutting").find('.modal-dialog').css('width','');
 			jQuery("#modal-croscutting").modal('show');
