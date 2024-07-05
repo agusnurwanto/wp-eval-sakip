@@ -58,18 +58,20 @@ $unit_croscutting = $wpdb->get_results(
 			nama_skpd, 
 			id_skpd, 
 			kode_skpd, 
-			nipkepala 
+			nipkepala,
+			tahun_anggaran 
 		FROM esakip_data_unit 
-		WHERE tahun_anggaran=%d
-		AND active=1 
+		WHERE active=1 
 		AND is_skpd=1 
 		AND id_skpd!=%d
+		AND tahun_anggaran=%d
+		GROUP BY id_skpd
 		ORDER BY kode_skpd ASC
-	", $tahun_anggaran_sakip,$id_skpd),
+	", $id_skpd, $tahun_anggaran_sakip),
 	ARRAY_A
 );
 
-$option_skpd = "<option value='seluruh'>Pilih Seluruh Perangkat Daerah</option>";
+$option_skpd = "<option value='seluruh'>Pilih Perangkat Daerah</option>";
 if(!empty($unit_croscutting)){
 	foreach ($unit_croscutting as $v_unit) {
 		$option_skpd .="<option value='" . $v_unit['id_skpd'] . "'>" . $v_unit['nama_skpd'] . "</option>";
@@ -291,15 +293,39 @@ if(!empty($pohon_kinerja_level_1)){
 									ORDER BY id
 								", $level_4['id']), ARRAY_A);
 								if(!empty($croscutting_pohon_kinerja_level_4)){
-									foreach ($croscutting_pohon_kinerja_level_4 as $croscutting_level_4) {
+									foreach ($croscutting_pohon_kinerja_level_4 as $key_croscutting_level_4 => $croscutting_level_4) {
+										$nama_skpd = $wpdb->get_row(
+											$wpdb->prepare("
+												SELECT 
+													nama_skpd,
+													id_skpd,
+													tahun_anggaran
+												FROM esakip_data_unit 
+												WHERE active=1 
+												AND is_skpd=1 
+												AND id_skpd=%d
+												AND tahun_anggaran=%d
+												GROUP BY id_skpd
+												ORDER BY kode_skpd ASC
+											", $croscutting_level_4['id_skpd_croscutting'], $tahun_anggaran_sakip),
+											ARRAY_A
+										);
+
 										if(!empty($croscutting_level_4['keterangan'])){
 											if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['croscutting'][(trim($croscutting_level_4['keterangan']))])){
 												$data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['croscutting'][(trim($croscutting_level_4['keterangan']))] = [
 													'id' => $croscutting_level_4['id'],
-													'parent_pohon_kinerja' => $croscutting_level_4['parent_pohon_kinerja'],
-													'keterangan' => $croscutting_level_4['keterangan']
+													'keterangan' => $croscutting_level_4['keterangan'],
+													'data' => array()
 												];
 											}
+
+											$data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['croscutting'][(trim($croscutting_level_4['keterangan']))]['data'][$key_croscutting_level_4] = [
+												'id' => $croscutting_level_4['id'],
+												'parent_pohon_kinerja' => $croscutting_level_4['parent_pohon_kinerja'],
+												'keterangan' => $croscutting_level_4['keterangan'],
+												'nama_skpd' => $nama_skpd['nama_skpd']
+											];
 										}
 									}
 								}
@@ -431,6 +457,22 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 				foreach ($level_4['indikator'] as $indikatorlevel4) {
 					$indikator[]=$indikatorlevel4['label_indikator_kinerja'];
 				}
+				$croscutting = array();
+				foreach ($level_4['croscutting'] as $croscuttinglevel4) {
+					$nama_skpd_all = array();
+					foreach ($croscuttinglevel4['data'] as $k_cross_4 => $v_cross_4) {
+						$nama_skpd_all[] = $v_cross_4['nama_skpd'];
+					}
+					$croscutting[]= '<div>'. ucfirst($croscuttinglevel4['keterangan']) ."</div><div style='margin-top: 10px;'>". implode(', ', $nama_skpd_all) .'</div>';
+				}
+				
+				$show_croscutting = '';
+				$padding_parent = '';
+				if(!empty($croscutting)){
+					$show_croscutting .='<div class="text-center label-croscutting">CROSCUTTING</div>';
+					$show_croscutting .='<div class="croscutting-1">'.implode("</div><div class='croscutting-2'>", $croscutting).'</div>';
+					$padding_parent = 'padding-bottom: 0px;';
+				}
 				$html.='
 				<tr>
 					<td></td>
@@ -439,7 +481,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 					<td></td>
 					<td></td>
 					<td></td>
-					<td class="level4">'.$level_4['label'].'</td>
+					<td class="level4" style="' . $padding_parent . '">' . $level_4['label'] . ' ' . $show_croscutting . '</td>
 					<td class="indikator">'.implode("</br>", $indikator).'</td>
 					<td></td>
 					<td></td>
@@ -492,6 +534,28 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 	}
 	.indikator {
 		background: #b5d9ea;
+	}
+
+	.label-croscutting {
+		background-color: #FFC6FF;
+		margin: 10px -16px 0px;
+		padding:  .5em .9em;
+	}
+	.croscutting-1 {
+		background-color: #FFC6FF;
+		margin: 0px -16px 0px;
+		padding:  .5em .9em;
+		border-width: 1px 0 0;
+		border-style: solid;
+		border-color: gray;
+	}
+	.croscutting-2 {
+		background-color: #FFC6FF;
+		margin: 0px -16px;
+		padding: .5em .9em;
+		border-width: 1px 0 0;
+		border-style: solid;
+		border-color: gray;
 	}
 </style>
 <h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Pohon Kinerja <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $periode['nama_jadwal_renstra'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h3><br>
