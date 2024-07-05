@@ -143,6 +143,18 @@ if(!empty($data_all['data'])){
 						            }
 					            }
 
+								// croscutting level 4
+								if(!empty($level_4['croscutting'])){
+									$data_temp[$keylevel4][0]->f.="<div class='croscutting-2'>CROSCUTTING</div>";
+				            		foreach ($level_4['croscutting'] as $keyCross => $valCross) {
+										$nama_skpd_all = array();
+										foreach ($valCross['data'] as $k_cross_4 => $v_cross_4) {
+											$nama_skpd_all[] = $v_cross_4['nama_skpd'];
+										}
+						                $data_temp[$keylevel4][0]->f.="<div class='croscutting'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode(", ",$nama_skpd_all) ."</div></div>";
+						            }
+					            }
+
 					            $data_temp[$keylevel4][1] = $level_3['label'];
 					            $data_temp[$keylevel4][2] = '';
 
@@ -299,6 +311,28 @@ if(!empty($data_all['data'])){
 	    font-weight: bold;
 	    margin-top: 20px;
   	}
+	.croscutting {
+		color: #0d0909; 
+  		font-size:11px; 
+  		font-weight:600;
+  		font-style:italic; 
+  		padding:10px; 
+  		min-height:70px;
+		background: #FFC6FF;
+	}
+
+	.croscutting .cros-opd {
+		margin: 0px -10px;
+		font-size: 12px;
+	}
+
+	.croscutting-2 {
+		color: #0d0909; 
+  		font-size:13px; 
+  		font-weight:600; 
+  		padding:10px; 
+		background: #FFC6FF;
+	}
 </style>
 <div class="text-center" id="action-sakip">
 	<button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button>

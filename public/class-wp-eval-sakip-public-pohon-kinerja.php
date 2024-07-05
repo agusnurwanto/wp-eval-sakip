@@ -482,18 +482,23 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					$table_croscutting = '';
 					$no = 1;
 					if(!empty($data_croscutting)){
+						$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 						foreach ($data_croscutting as $k_cross => $v_cross) {
 
 							$nama_skpd = $wpdb->get_row(
 								$wpdb->prepare("
 									SELECT 
-										nama_skpd
+										nama_skpd,
+										id_skpd,
+										tahun_anggaran
 									FROM esakip_data_unit 
 									WHERE active=1 
 									AND is_skpd=1 
 									AND id_skpd=%d
+									AND tahun_anggaran=%d
+									GROUP BY id_skpd
 									ORDER BY kode_skpd ASC
-								", $v_cross['id_skpd_croscutting']),
+								", $v_cross['id_skpd_croscutting'], $tahun_anggaran_sakip),
 								ARRAY_A
 							);
 							
@@ -1883,7 +1888,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						'label' => $level['label'],
 						'level' => $level['level'],
 						'indikator' => [],
-						'data' => []
+						'data' => [],
+						'croscutting' => []
 					];
 				}
 
@@ -1911,6 +1917,54 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							}
 						}
 					}
+				}
+				// data croscutting
+				$data_croscutting_level = $wpdb->get_results($wpdb->prepare("
+					SELECT 
+						* 
+					FROM esakip_croscutting_opd
+					WHERE parent_pohon_kinerja=%d 
+						AND active=1 
+					ORDER BY id
+				", $level['id']), ARRAY_A);
+				if(!empty($data_croscutting_level)){
+						$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+						foreach ($data_croscutting_level as $key_croscutting_level => $croscutting_level) {
+							$nama_skpd = $wpdb->get_row(
+								$wpdb->prepare("
+									SELECT 
+										nama_skpd,
+										id_skpd,
+										tahun_anggaran
+									FROM esakip_data_unit 
+									WHERE active=1 
+									AND is_skpd=1 
+									AND id_skpd=%d
+									AND tahun_anggaran=%d
+									GROUP BY id_skpd
+									ORDER BY kode_skpd ASC
+								", $croscutting_level['id_skpd_croscutting'], $tahun_anggaran_sakip),
+								ARRAY_A
+							);
+
+							if(!empty($croscutting_level['keterangan'])){
+								if(empty($data_ret[trim($level['label'])]['croscutting'][(trim($croscutting_level['keterangan']))])){
+									$data_ret[trim($level['label'])]['croscutting'][(trim($croscutting_level['keterangan']))] = [
+										'id' => $croscutting_level['id'],
+										'keterangan' => $croscutting_level['keterangan'],
+										'data' => array()
+									];
+								}
+
+								$data_ret[trim($level['label'])]['croscutting'][(trim($croscutting_level['keterangan']))]['data'][$key_croscutting_level] = [
+									'id' => $croscutting_level['id'],
+									'parent_pohon_kinerja' => $croscutting_level['parent_pohon_kinerja'],
+									'keterangan' => $croscutting_level['keterangan'],
+									'nama_skpd' => $nama_skpd['nama_skpd']
+								];
+							}
+						}
+					// }
 				}
 				if(
 					(
