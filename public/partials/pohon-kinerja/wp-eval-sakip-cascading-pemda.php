@@ -21,7 +21,7 @@ $periode = $wpdb->get_row(
 ", $input['periode']),
     ARRAY_A
 );
-if(!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggaran'] > 1){
+if (!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggaran'] > 1) {
     $tahun_periode = $periode['tahun_selesai_anggaran'];
 } else {
     $tahun_periode = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
@@ -51,13 +51,16 @@ $data_temp = [''];
         vertical-align: middle;
     }
 
-    #tabel-cascading, #tabel-cascading td, #tabel-cascading table {
+    #tabel-cascading,
+    #tabel-cascading td,
+    #tabel-cascading table {
         padding: 0;
         border: 4px solid white;
         margin: 0;
         vertical-align: top;
     }
-    #tabel-cascading > tbody > tr > td{
+
+    #tabel-cascading>tbody>tr>td {
         padding: 10px;
     }
 
@@ -66,10 +69,28 @@ $data_temp = [''];
         width: 100%;
         min-height: 75px;
     }
+
+    @media print {
+        #cetak {
+            max-width: auto !important;
+            height: auto !important;
+        }
+
+        @page {
+            size: landscape;
+        }
+
+        #action-sakip,
+        .site-header,
+        .site-footer,
+        #container-table-cascading {
+            display: none;
+        }
+    }
 </style>
 
 <!-- Table -->
-<div class="container-md">
+<div class="container-md" id="container-table-cascading">
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
             <h1 class="text-center" style="margin:3rem;">Cascading <?php echo $periode['nama_jadwal'] . ' ' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ''; ?></h1>
@@ -129,8 +150,21 @@ $data_temp = [''];
 <script type="text/javascript">
     jQuery(document).ready(function() {
         getTableCascading();
-       
+
     });
+
+    function printDiv(divId) {
+        var divToPrint = jQuery(divId);
+        var newWin = window.open('', 'Print-Window');
+        newWin.document.open();
+        newWin.document.write('<html><head><title>Print</title>');
+        newWin.document.write('<link rel="stylesheet" href="path_to_your_stylesheet.css" type="text/css" />'); // Include your styles if necessary
+        newWin.document.write('</head><body onload="window.print()">' + divToPrint.innerHTML + '</body></html>');
+        newWin.document.close();
+        setTimeout(function() {
+            newWin.close();
+        }, 10);
+    }
 
     function getDataChart() {
         jQuery('#wrap-loading').show();
@@ -274,7 +308,7 @@ $data_temp = [''];
         });
     }
 
-    function view_cascading(id_tujuan){
+    function view_cascading(id_tujuan) {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
