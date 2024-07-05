@@ -1126,6 +1126,167 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		die(json_encode($ret));
 	}
 
+	public function get_table_crosscutting()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (empty($_POST['id_jadwal'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id periode kosong!';
+					die(json_encode($ret));
+				}
+				$id_jadwal = $_POST['id_jadwal'];
+				$periode = $wpdb->get_row(
+					$wpdb->prepare("
+						SELECT 
+							*
+						FROM esakip_data_jadwal
+						WHERE id=%d
+						AND status = 1
+					", $id_jadwal),
+					ARRAY_A
+				);
+				$get_tujuan = $wpdb->get_results("
+                    SELECT 
+                    	* 
+                    FROM esakip_rpd_tujuan
+                    WHERE id_unik_indikator IS NULL
+                     	AND active = 1
+                ", ARRAY_A);
+
+				if (!empty($get_tujuan)) {
+					$counter = 1;
+					$tbody = '';
+
+					foreach ($get_tujuan as $kk => $vv) {
+						$detail_crosscutting_pemda = $this->functions->generatePage(array(
+							'nama_page' => 'Crosscutting Pemerintah Daerah | ' . $periode['nama_jadwal'] . ' ' . 'Periode ' . $periode['tahun_anggaran'] . ' - ' . $periode['tahun_anggaran_selesai']  . ' Perangkat Daerah',
+							'content' => '[detail_croscutting_pemda periode=' . $id_jadwal . ']',
+							'show_header' => 1,
+							'post_status' => 'private'
+						));
+
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+						$tbody .= "<td>" . $vv['nama_crosscutting'] . "</td>";
+						$tbody .= "<td>" . $vv['tujuan_teks'] . "</td>";
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= '<button class="btn btn-sm btn-warning" onclick="editCrosscuttingPemda(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit"><span class="dashicons dashicons-edit"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-secondary" onclick="toDetailUrl(\'' . $detail_crosscutting_pemda['url'] . '\'); return false;" href="#" title="Detail Crosscutting"><span class="dashicons dashicons-controls-forward"></span></button>';
+						$btn .= '</div>';
+
+						$tbody .= "<td class='text-center'>" . $btn . "</td>";
+						$tbody .= "</tr>";
+					}
+
+					$ret['data'] = $tbody;
+				} else {
+					$ret['data'] = "<tr><td colspan='8' class='text-center'>Tidak ada data tersedia</td></tr>";
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function edit_crosscutting_pemda()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT 
+								*
+							FROM esakip_rpd_tujuan
+							WHERE id = %d
+						", $_POST['id']),
+						ARRAY_A
+					);
+					$ret['data'] = $data;
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function submit_edit_crosscutting()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil edit data!',
+			'data' => array()
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (empty($_POST['id'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id kosong!';
+					die(json_encode($ret));
+				} else if (empty($_POST['nama_crosscutting'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Nama Crosscutting kosong!';
+					die(json_encode($ret));
+				} else {
+					$nama_crosscutting = $_POST['nama_crosscutting'];
+					$data = array(
+						'nama_crosscutting' => $nama_crosscutting,
+						'update_at' => current_time('mysql')
+					);
+					$wpdb->update('esakip_rpd_tujuan', $data, array('id' => $_POST['id']));
+				}
+			} else {
+				$ret['status']  = 'error';
+				$ret['message'] = 'Api key tidak ditemukan!';
+			}
+		} else {
+			$ret['status']  = 'error';
+			$ret['message'] = 'Format Salah!';
+		}
+
+		die(json_encode($ret));
+	}
+
 	public function view_cascading_pemda()
 	{
 		global $wpdb;
