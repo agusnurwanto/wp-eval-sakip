@@ -92,14 +92,15 @@ $status_iku = $wpdb->get_row(
     .btn-action-group .btn {
         margin: 0 5px;
     }
-
-    #table_dokumen_rpjmd th {
-        vertical-align: middle;
+    #table_capaian_indikator_mikro thead{
+        position: sticky;
+        top: -6px;
+        background: #ffc491;
     }
-    #table_capaian_indikator_mikro th, 
-    #table_capaian_indikator_mikro td {
-        text-align: center;
-        vertical-align: middle;
+    #table_capaian_indikator_mikro tfoot{
+        position: sticky;
+        bottom: -6px;
+        background: #ffc491;
     }
 </style>
 
