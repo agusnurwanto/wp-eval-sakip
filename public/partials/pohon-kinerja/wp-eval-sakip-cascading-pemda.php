@@ -83,7 +83,8 @@ $data_temp = [''];
         #action-sakip,
         .site-header,
         .site-footer,
-        #container-table-cascading {
+        #container-table-cascading,
+        #ast-scroll-top {
             display: none;
         }
     }
@@ -152,19 +153,6 @@ $data_temp = [''];
         getTableCascading();
 
     });
-
-    function printDiv(divId) {
-        var divToPrint = jQuery(divId);
-        var newWin = window.open('', 'Print-Window');
-        newWin.document.open();
-        newWin.document.write('<html><head><title>Print</title>');
-        newWin.document.write('<link rel="stylesheet" href="path_to_your_stylesheet.css" type="text/css" />'); // Include your styles if necessary
-        newWin.document.write('</head><body onload="window.print()">' + divToPrint.innerHTML + '</body></html>');
-        newWin.document.close();
-        setTimeout(function() {
-            newWin.close();
-        }, 10);
-    }
 
     function getDataChart() {
         jQuery('#wrap-loading').show();

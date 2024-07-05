@@ -507,6 +507,10 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_submit_edit_cascading',  $plugin_public, 'submit_edit_cascading');
 		$this->loader->add_action('wp_ajax_view_cascading_pemda',  $plugin_public, 'view_cascading_pemda');
 
+		$this->loader->add_action('wp_ajax_get_table_crosscutting',  $plugin_public, 'get_table_crosscutting');
+		$this->loader->add_action('wp_ajax_edit_crosscutting_pemda',  $plugin_public, 'edit_crosscutting_pemda');
+		$this->loader->add_action('wp_ajax_submit_edit_crosscutting',  $plugin_public, 'submit_edit_crosscutting');
+
 		$this->loader->add_action('wp_ajax_get_table_capaian_indikator',  $plugin_public, 'get_table_capaian_indikator');
 		
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
@@ -600,6 +604,9 @@ class Wp_Eval_Sakip {
 		add_shortcode('input_rpjmd', array($plugin_public, 'input_rpjmd'));
 		add_shortcode('halaman_cek_dokumen', array($plugin_public, 'halaman_cek_dokumen'));
 		add_shortcode('cascading_pemda', array($plugin_public, 'cascading_pemda'));
+		
+		add_shortcode('croscutting_pemda', array($plugin_public, 'croscutting_pemda'));
+		add_shortcode('detail_croscutting_pemda', array($plugin_public, 'detail_croscutting_pemda'));
 	}
 
 	/**
