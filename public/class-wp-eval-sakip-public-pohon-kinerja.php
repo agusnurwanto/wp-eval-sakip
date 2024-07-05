@@ -1248,7 +1248,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						$width_ind_sasaran = $width_sasaran / count($indikator_sasaran);
 						foreach ($indikator_sasaran as $ind) {
 							$data_sasaran .= '<td class="text-center" width="' . $width_ind_sasaran . '%"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . $ind['indikator_teks'] . '</button></td>';
-							$data_program .= '<td class="text-center" width="' . $width_ind_sasaran . '%"><ul class="list-skpd" style="list-style-type: none; margin: 0">';
+							$data_program .= '<td class="text-center" width="' . $width_ind_sasaran . '%"><ul class="list-skpd" style="list-style-type: none; margin: 0; padding: 0;">';
 
 							// indikator sasaran sasaran rpd
 							$skpd_program = $wpdb->get_results(
