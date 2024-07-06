@@ -480,15 +480,16 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_update_indikator_pokin',  $plugin_public, 'update_indikator_pokin');
 		$this->loader->add_action('wp_ajax_delete_indikator_pokin',  $plugin_public, 'delete_indikator_pokin');
 		
-		$this->loader->add_action('wp_ajax_get_data_crosscutting',  $plugin_public, 'get_data_crosscutting');
-		$this->loader->add_action('wp_ajax_create_crosscutting',  $plugin_public, 'create_crosscutting');
-		$this->loader->add_action('wp_ajax_edit_crosscutting',  $plugin_public, 'edit_crosscutting');
-		$this->loader->add_action('wp_ajax_update_crosscutting',  $plugin_public, 'update_crosscutting');
-		$this->loader->add_action('wp_ajax_delete_crosscutting',  $plugin_public, 'delete_crosscutting');
-		$this->loader->add_action('wp_ajax_create_indikator_crosscutting',  $plugin_public, 'create_indikator_crosscutting');
-		$this->loader->add_action('wp_ajax_edit_indikator_crosscutting',  $plugin_public, 'edit_indikator_crosscutting');
-		$this->loader->add_action('wp_ajax_update_indikator_crosscutting',  $plugin_public, 'update_indikator_crosscutting');
-		$this->loader->add_action('wp_ajax_delete_indikator_crosscutting',  $plugin_public, 'delete_indikator_crosscutting');
+		$this->loader->add_action('wp_ajax_get_data_crosscutting_pemda',  $plugin_public, 'get_data_crosscutting_pemda');
+		$this->loader->add_action('wp_ajax_create_crosscutting_pemda',  $plugin_public, 'create_crosscutting_pemda');
+		$this->loader->add_action('wp_ajax_edit_crosscutting_pemda',  $plugin_public, 'edit_crosscutting_pemda');
+		$this->loader->add_action('wp_ajax_update_crosscutting_pemda',  $plugin_public, 'update_crosscutting_pemda');
+		$this->loader->add_action('wp_ajax_delete_crosscutting_pemda',  $plugin_public, 'delete_crosscutting_pemda');
+		$this->loader->add_action('wp_ajax_create_indikator_crosscutting_pemda',  $plugin_public, 'create_indikator_crosscutting_pemda');
+		$this->loader->add_action('wp_ajax_edit_indikator_crosscutting_pemda',  $plugin_public, 'edit_indikator_crosscutting_pemda');
+		$this->loader->add_action('wp_ajax_update_indikator_crosscutting_pemda',  $plugin_public, 'update_indikator_crosscutting_pemda');
+		$this->loader->add_action('wp_ajax_delete_indikator_crosscutting_pemda',  $plugin_public, 'delete_indikator_crosscutting_pemda');
+		$this->loader->add_action('wp_ajax_get_crosscutting_pemda',  $plugin_public, 'get_crosscutting_pemda');
 		
 		$this->loader->add_action('wp_ajax_create_croscutting',  $plugin_public, 'create_croscutting');
 		$this->loader->add_action('wp_ajax_edit_croscutting',  $plugin_public, 'edit_croscutting');
@@ -518,7 +519,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_view_cascading_pemda',  $plugin_public, 'view_cascading_pemda');
 
 		$this->loader->add_action('wp_ajax_get_table_crosscutting',  $plugin_public, 'get_table_crosscutting');
-		$this->loader->add_action('wp_ajax_edit_crosscutting_pemda',  $plugin_public, 'edit_crosscutting_pemda');
+		$this->loader->add_action('wp_ajax_edit_crosscutting_pemda_tujuan',  $plugin_public, 'edit_crosscutting_pemda');
 		$this->loader->add_action('wp_ajax_submit_edit_crosscutting',  $plugin_public, 'submit_edit_crosscutting');
 
 		$this->loader->add_action('wp_ajax_get_table_capaian_indikator',  $plugin_public, 'get_table_capaian_indikator');
@@ -617,6 +618,7 @@ class Wp_Eval_Sakip {
 		
 		add_shortcode('croscutting_pemda', array($plugin_public, 'crosscutting_pemda'));
 		add_shortcode('detail_croscutting_pemda', array($plugin_public, 'detail_crosscutting_pemda'));
+		add_shortcode('view_crosscutting_pemda',array($plugin_public,'view_crosscutting_pemda'));
 	}
 
 	/**

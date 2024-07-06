@@ -184,7 +184,7 @@ if (!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggar
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'edit_crosscutting_pemda',
+                action: 'edit_crosscutting_pemda_tujuan',
                 api_key: esakip.api_key,
                 id_jadwal: <?php echo $input['periode']; ?>,
                 id: id,

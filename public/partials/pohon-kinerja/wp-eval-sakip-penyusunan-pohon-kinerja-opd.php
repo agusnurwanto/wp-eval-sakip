@@ -2449,24 +2449,4 @@ function runFunction(name, arguments){
 	});
 }
 
-function getFormData($form) {
-    let unindexed_array = $form.serializeArray();
-    let indexed_array = {};
-
-    jQuery.map(unindexed_array, function (n, i) {
-		var nama_baru = n['name'].split('[');
-            if(nama_baru.length > 1){
-                nama_baru = nama_baru[0];
-                if(!indexed_array[nama_baru]){
-                    indexed_array[nama_baru] = [];
-                }
-                indexed_array[nama_baru].push(n['value']);
-            }else{
-				indexed_array[n['name']] = n['value'];
-            }
-    });
-
-    return indexed_array;
-}
-
 </script>
