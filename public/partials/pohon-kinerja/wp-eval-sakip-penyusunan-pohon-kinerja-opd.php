@@ -324,7 +324,8 @@ if(!empty($pohon_kinerja_level_1)){
 												'id' => $croscutting_level_4['id'],
 												'parent_pohon_kinerja' => $croscutting_level_4['parent_pohon_kinerja'],
 												'keterangan' => $croscutting_level_4['keterangan'],
-												'nama_skpd' => $nama_skpd['nama_skpd']
+												'nama_skpd' => $nama_skpd['nama_skpd'],
+												'status_croscutting' => $croscutting_level_4['status_croscutting']
 											];
 										}
 									}
@@ -422,7 +423,8 @@ if(!empty($pohon_kinerja_level_1)){
 														'id' => $croscutting_level_5['id'],
 														'parent_pohon_kinerja' => $croscutting_level_5['parent_pohon_kinerja'],
 														'keterangan' => $croscutting_level_5['keterangan'],
-														'nama_skpd' => $nama_skpd['nama_skpd']
+														'nama_skpd' => $nama_skpd['nama_skpd'],
+														'status_croscutting' => $croscutting_level_5['status_croscutting']
 													];
 												}
 											}
@@ -509,7 +511,22 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 				foreach ($level_4['croscutting'] as $croscuttinglevel4) {
 					$nama_skpd_all = array();
 					foreach ($croscuttinglevel4['data'] as $k_cross_4 => $v_cross_4) {
-						$nama_skpd_all[] = $v_cross_4['nama_skpd'];
+						switch ($v_cross_4['status_croscutting']) {
+							case '1':
+								$status_croscutting = 'Disetujui';
+								$label_color = 'success text-white';
+								break;
+							case '2':
+								$status_croscutting = 'Ditolak';
+								$label_color = 'danger text-white';
+								break;
+							
+							default:
+								$status_croscutting = 'Menunggu';
+								$label_color = 'secondary text-white';
+								break;
+						}
+						$nama_skpd_all[] = $v_cross_4['nama_skpd'] . ' <span class="badge bg-'. $label_color .'" style="padding: .5em;">'. $status_croscutting.'</span> ';
 					}
 					$croscutting[]= '<div>'. ucfirst($croscuttinglevel4['keterangan']) ."</div><div style='margin-top: 10px;font-weight: 500;'>". implode(', ', $nama_skpd_all) .'</div>';
 				}
@@ -573,7 +590,22 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 					foreach ($level_5['croscutting'] as $croscuttinglevel5) {
 						$nama_skpd_all = array();
 						foreach ($croscuttinglevel5['data'] as $k_cross_5 => $v_cross_5) {
-							$nama_skpd_all[] = $v_cross_5['nama_skpd'];
+							switch ($v_cross_5['status_croscutting']) {
+								case '1':
+									$status_croscutting = 'Disetujui';
+									$label_color = 'success text-white';
+									break;
+								case '2':
+									$status_croscutting = 'Ditolak';
+									$label_color = 'danger text-white';
+									break;
+								
+								default:
+									$status_croscutting = 'Menunggu';
+									$label_color = 'secondary text-white';
+									break;
+							}
+							$nama_skpd_all[] = $v_cross_5['nama_skpd'] . ' <span class="badge bg-'. $label_color .'" style="padding: .5em;">'. $status_croscutting.'</span> ';
 						}
 						$croscutting5[]= '<div>'. ucfirst($croscuttinglevel5['keterangan']) ."</div><div style='margin-top: 10px;font-weight: 500;'>". implode(', ', $nama_skpd_all) .'</div>';
 					}

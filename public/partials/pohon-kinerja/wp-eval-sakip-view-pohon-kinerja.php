@@ -353,15 +353,13 @@ if(!empty($data_all['data'])){
 </style>
 <div class="text-center" id="action-sakip">
 	<button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button>
-	<br>
-	Perkecil (-) <input title="Perbesar/Perkecil Layar" id="test" min="1" max="15" value='10' step="1" onchange="showVal(this.value)" type="range" style="max-width: 400px; margin-top: 40px;" /> (+) Perbesar
-	<br>
-	<textarea id="val-range" disabled>100%</textarea>
-	<br>
 	<div class="custom-control custom-checkbox mt-4">
 		<input type="checkbox" class="custom-control-input" id="show_croscutting">
 		<label class="custom-control-label" for="show_croscutting">Tampilkan Croscutting</label>
 	</div>
+	Perkecil (-) <input title="Perbesar/Perkecil Layar" id="test" min="1" max="15" value='10' step="1" onchange="showVal(this.value)" type="range" style="max-width: 400px; margin-top: 40px;" /> (+) Perbesar
+	<br>
+	<textarea id="val-range" disabled>100%</textarea>
 </div>
 <h1 style="text-align: center; margin-top: 30px; font-weight: bold;">Pohon Kinerja<br><?php echo $nama_skpd.$periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1><br>
 <div id="cetak" title="Laporan Pohon Kinerja" style="padding: 5px; overflow: auto; max-width: 100vw;">
