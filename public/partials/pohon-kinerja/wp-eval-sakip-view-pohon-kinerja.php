@@ -171,6 +171,18 @@ if(!empty($data_all['data'])){
 												$data_temp[$keylevel5][0]->f.="<div ".$style5.">IK: ".$indikator['label_indikator_kinerja']."</div>";
 											}
 										}
+
+										// croscutting level 5
+										if(!empty($level_5['croscutting'])){
+											$data_temp[$keylevel5][0]->f.="<div class='croscutting-2'>CROSCUTTING</div>";
+											foreach ($level_5['croscutting'] as $keyCross => $valCross) {
+												$nama_skpd_all = array();
+												foreach ($valCross['data'] as $k_cross_5 => $v_cross_5) {
+													$nama_skpd_all[] = $v_cross_5['nama_skpd'];
+												}
+												$data_temp[$keylevel5][0]->f.="<div class='croscutting'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode(", ",$nama_skpd_all) ."</div></div>";
+											}
+										}
 		
 										$data_temp[$keylevel5][1] = $level_4['label'];
 										$data_temp[$keylevel5][2] = $level_5['label'];
@@ -324,6 +336,7 @@ if(!empty($data_all['data'])){
 	.croscutting .cros-opd {
 		margin: 0px -10px;
 		font-size: 12px;
+		font-style: normal;
 	}
 
 	.croscutting-2 {

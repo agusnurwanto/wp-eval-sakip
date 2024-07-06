@@ -349,7 +349,8 @@ if(!empty($pohon_kinerja_level_1)){
 												'id' => $level_5['id'],
 												'label' => $level_5['label'],
 												'level' => $level_5['level'],
-												'indikator' => array()
+												'indikator' => array(),
+												'croscutting' => array()
 											];
 										}
 
@@ -376,6 +377,53 @@ if(!empty($pohon_kinerja_level_1)){
 														'level' => $indikator_level_5['level']
 														];
 													}
+												}
+											}
+										}
+
+										// croscutting pokin level 5
+										$croscutting_pohon_kinerja_level_5 = $wpdb->get_results($wpdb->prepare("
+											SELECT 
+												* 
+											FROM esakip_croscutting_opd 
+											WHERE parent_pohon_kinerja=%d 
+												AND active=1 
+											ORDER BY id
+										", $level_5['id']), ARRAY_A);
+										if(!empty($croscutting_pohon_kinerja_level_5)){
+											foreach ($croscutting_pohon_kinerja_level_5 as $key_croscutting_level_5 => $croscutting_level_5) {
+												$nama_skpd = $wpdb->get_row(
+													$wpdb->prepare("
+														SELECT 
+															nama_skpd,
+															id_skpd,
+															tahun_anggaran
+														FROM esakip_data_unit 
+														WHERE active=1 
+														AND is_skpd=1 
+														AND id_skpd=%d
+														AND tahun_anggaran=%d
+														GROUP BY id_skpd
+														ORDER BY kode_skpd ASC
+													", $croscutting_level_5['id_skpd_croscutting'], $tahun_anggaran_sakip),
+													ARRAY_A
+												);
+
+												if(!empty($croscutting_level_5['keterangan'])){
+													if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['data'][trim($level_5['label'])]['croscutting'][(trim($croscutting_level_5['keterangan']))])){
+														$data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['data'][trim($level_5['label'])]['croscutting'][(trim($croscutting_level_5['keterangan']))] = [
+															'id' => $croscutting_level_5['id'],
+															'keterangan' => $croscutting_level_5['keterangan'],
+															'data' => array()
+														];
+													}
+
+													$data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['data'][trim($level_5['label'])]['croscutting'][(trim($croscutting_level_5['keterangan']))]['data'][$key_croscutting_level_5] = [
+														'id' => $croscutting_level_5['id'],
+														'parent_pohon_kinerja' => $croscutting_level_5['parent_pohon_kinerja'],
+														'keterangan' => $croscutting_level_5['keterangan'],
+														'nama_skpd' => $nama_skpd['nama_skpd']
+													];
 												}
 											}
 										}
@@ -463,15 +511,13 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 					foreach ($croscuttinglevel4['data'] as $k_cross_4 => $v_cross_4) {
 						$nama_skpd_all[] = $v_cross_4['nama_skpd'];
 					}
-					$croscutting[]= '<div>'. ucfirst($croscuttinglevel4['keterangan']) ."</div><div style='margin-top: 10px;'>". implode(', ', $nama_skpd_all) .'</div>';
+					$croscutting[]= '<div>'. ucfirst($croscuttinglevel4['keterangan']) ."</div><div style='margin-top: 10px;font-weight: 500;'>". implode(', ', $nama_skpd_all) .'</div>';
 				}
 				
 				$show_croscutting = '';
-				$padding_parent = '';
 				if(!empty($croscutting)){
 					$show_croscutting .='<div class="text-center label-croscutting">CROSCUTTING</div>';
-					$show_croscutting .='<div class="croscutting-1">'.implode("</div><div class='croscutting-2'>", $croscutting).'</div>';
-					$padding_parent = 'padding-bottom: 0px;';
+					$show_croscutting .='<div class="croscutting-1">'.implode('</div><div class="croscutting-2">', $croscutting).'</div>';
 				}
 				$html.='
 				<tr>
@@ -481,11 +527,28 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 					<td></td>
 					<td></td>
 					<td></td>
-					<td class="level4" style="' . $padding_parent . '">' . $level_4['label'] . ' ' . $show_croscutting . '</td>
+					<td class="level4">' . $level_4['label'] . '</td>
 					<td class="indikator">'.implode("</br>", $indikator).'</td>
 					<td></td>
 					<td></td>
 				</tr>';
+				
+				if(!empty($show_croscutting)){
+					$html.='
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="croscutting" colspan="2">' . $show_croscutting . '</td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>';
+				}
+				
 				foreach (array_values($level_4['data']) as $key5 => $level_5) {
 					$indikator=array();
 					foreach ($level_5['indikator'] as $indikatorlevel5) {
@@ -504,6 +567,39 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 						<td class="level5">'.$level_5['label'].'</td>
 						<td class="indikator">'.implode("</br>", $indikator).'</td>
 					</tr>';
+
+					// show croscutting
+					$croscutting5 = array();
+					foreach ($level_5['croscutting'] as $croscuttinglevel5) {
+						$nama_skpd_all = array();
+						foreach ($croscuttinglevel5['data'] as $k_cross_5 => $v_cross_5) {
+							$nama_skpd_all[] = $v_cross_5['nama_skpd'];
+						}
+						$croscutting5[]= '<div>'. ucfirst($croscuttinglevel5['keterangan']) ."</div><div style='margin-top: 10px;font-weight: 500;'>". implode(', ', $nama_skpd_all) .'</div>';
+					}
+
+					$show_croscutting5 = '';
+					if(!empty($croscutting5)){
+						$show_croscutting5 .='<div class="text-center label-croscutting">CROSCUTTING</div>';
+						$show_croscutting5 .='<div class="croscutting-1">'.implode('</div><div class="croscutting-2">', $croscutting5).'</div>';
+					}
+
+					if(!empty($show_croscutting5)){
+						$html.='
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td class="croscutting" colspan="2">' . $show_croscutting5 . '</td>
+							<td></td>
+						</tr>';
+					}
+
 				}
 			}
 		}
@@ -536,13 +632,14 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 		background: #b5d9ea;
 	}
 
-	.label-croscutting {
+	.croscutting {
 		background-color: #FFC6FF;
-		margin: 10px -16px 0px;
-		padding:  .5em .9em;
+	}
+
+	.label-croscutting {
+		padding: 0 .7em .7em;
 	}
 	.croscutting-1 {
-		background-color: #FFC6FF;
 		margin: 0px -16px 0px;
 		padding:  .5em .9em;
 		border-width: 1px 0 0;
@@ -550,7 +647,6 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 		border-color: gray;
 	}
 	.croscutting-2 {
-		background-color: #FFC6FF;
 		margin: 0px -16px;
 		padding: .5em .9em;
 		border-width: 1px 0 0;
