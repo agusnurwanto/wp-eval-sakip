@@ -368,22 +368,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/input-perencanaan/wp-eval-sakip-input_rpjpd.php';
 	}
 	
-	public function croscutting_pemda($atts)
+	public function crosscutting_pemda($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/pohon-kinerja/wp-eval-sakip-croscutting_pemda.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/pohon-kinerja/wp-eval-sakip-crosscutting_pemda.php';
 	}
 
-	public function detail_croscutting_pemda($atts)
+	public function detail_crosscutting_pemda($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/pohon-kinerja/wp-eval-sakip-detail_croscutting_pemda.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/pohon-kinerja/wp-eval-sakip-detail_crosscutting_pemda.php';
 	}
 
 	public function mapping_skpd()

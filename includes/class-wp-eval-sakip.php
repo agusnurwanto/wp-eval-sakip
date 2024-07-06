@@ -480,6 +480,16 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_update_indikator_pokin',  $plugin_public, 'update_indikator_pokin');
 		$this->loader->add_action('wp_ajax_delete_indikator_pokin',  $plugin_public, 'delete_indikator_pokin');
 		
+		$this->loader->add_action('wp_ajax_get_data_crosscutting',  $plugin_public, 'get_data_crosscutting');
+		$this->loader->add_action('wp_ajax_create_crosscutting',  $plugin_public, 'create_crosscutting');
+		$this->loader->add_action('wp_ajax_edit_crosscutting',  $plugin_public, 'edit_crosscutting');
+		$this->loader->add_action('wp_ajax_update_crosscutting',  $plugin_public, 'update_crosscutting');
+		$this->loader->add_action('wp_ajax_delete_crosscutting',  $plugin_public, 'delete_crosscutting');
+		$this->loader->add_action('wp_ajax_create_indikator_crosscutting',  $plugin_public, 'create_indikator_crosscutting');
+		$this->loader->add_action('wp_ajax_edit_indikator_crosscutting',  $plugin_public, 'edit_indikator_crosscutting');
+		$this->loader->add_action('wp_ajax_update_indikator_crosscutting',  $plugin_public, 'update_indikator_crosscutting');
+		$this->loader->add_action('wp_ajax_delete_indikator_crosscutting',  $plugin_public, 'delete_indikator_crosscutting');
+		
 		$this->loader->add_action('wp_ajax_create_croscutting',  $plugin_public, 'create_croscutting');
 		$this->loader->add_action('wp_ajax_edit_croscutting',  $plugin_public, 'edit_croscutting');
 		$this->loader->add_action('wp_ajax_update_croscutting',  $plugin_public, 'update_croscutting');
@@ -605,8 +615,8 @@ class Wp_Eval_Sakip {
 		add_shortcode('halaman_cek_dokumen', array($plugin_public, 'halaman_cek_dokumen'));
 		add_shortcode('cascading_pemda', array($plugin_public, 'cascading_pemda'));
 		
-		add_shortcode('croscutting_pemda', array($plugin_public, 'croscutting_pemda'));
-		add_shortcode('detail_croscutting_pemda', array($plugin_public, 'detail_croscutting_pemda'));
+		add_shortcode('croscutting_pemda', array($plugin_public, 'crosscutting_pemda'));
+		add_shortcode('detail_croscutting_pemda', array($plugin_public, 'detail_crosscutting_pemda'));
 	}
 
 	/**

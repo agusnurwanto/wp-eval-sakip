@@ -37,18 +37,18 @@ if (!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggar
 }
 
 // crosscutting level 1
-$pohon_kinerja_level_1 = $wpdb->get_results($wpdb->prepare("
+$crosscutting_level_1 = $wpdb->get_results($wpdb->prepare("
 	SELECT 
 		* 
-	FROM esakip_pohon_kinerja 
+	FROM esakip_croscutting 
 	WHERE parent=0 
 		AND level=1 
 		AND active=1 
 		AND id_jadwal=%d 
 	ORDER BY id
 ", $input['periode']), ARRAY_A);
-if (!empty($pohon_kinerja_level_1)) {
-    foreach ($pohon_kinerja_level_1 as $level_1) {
+if (!empty($crosscutting_level_1)) {
+    foreach ($crosscutting_level_1 as $level_1) {
         if (empty($data_all['data'][trim($level_1['label'])])) {
             $data_all['data'][trim($level_1['label'])] = [
                 'id' => $level_1['id'],
@@ -60,18 +60,18 @@ if (!empty($pohon_kinerja_level_1)) {
         }
 
         // indikator crosscutting level 1
-        $indikator_pohon_kinerja_level_1 = $wpdb->get_results($wpdb->prepare("
+        $indikator_crosscutting_level_1 = $wpdb->get_results($wpdb->prepare("
 			SELECT 
 				* 
-			FROM esakip_pohon_kinerja 
+			FROM esakip_croscutting 
 			WHERE parent=%d 
 				AND level=1 
 				AND active=1 
 				AND id_jadwal=%d 
 			ORDER BY id
 		", $level_1['id'], $input['periode']), ARRAY_A);
-        if (!empty($indikator_pohon_kinerja_level_1)) {
-            foreach ($indikator_pohon_kinerja_level_1 as $indikator_level_1) {
+        if (!empty($indikator_crosscutting_level_1)) {
+            foreach ($indikator_crosscutting_level_1 as $indikator_level_1) {
                 if (!empty($indikator_level_1['label_indikator_kinerja'])) {
                     if (empty($data_all['data'][trim($level_1['label'])]['indikator'][(trim($indikator_level_1['label_indikator_kinerja']))])) {
                         $data_all['data'][trim($level_1['label'])]['indikator'][(trim($indikator_level_1['label_indikator_kinerja']))] = [
@@ -86,18 +86,18 @@ if (!empty($pohon_kinerja_level_1)) {
         }
 
         // crosscutting level 2 
-        $pohon_kinerja_level_2 = $wpdb->get_results($wpdb->prepare("
+        $crosscutting_level_2 = $wpdb->get_results($wpdb->prepare("
 			SELECT 
 				* 
-			FROM esakip_pohon_kinerja 
+			FROM esakip_croscutting 
 			WHERE parent=%d 
 				AND level=2
 				AND active=1 
 				AND id_jadwal=%d 
 			ORDER by id
 		", $level_1['id'], $input['periode']), ARRAY_A);
-        if (!empty($pohon_kinerja_level_2)) {
-            foreach ($pohon_kinerja_level_2 as $level_2) {
+        if (!empty($crosscutting_level_2)) {
+            foreach ($crosscutting_level_2 as $level_2) {
                 if (empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])])) {
                     $data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])] = [
                         'id' => $level_2['id'],
@@ -109,18 +109,18 @@ if (!empty($pohon_kinerja_level_1)) {
                 }
 
                 // indikator crosscutting level 2
-                $indikator_pohon_kinerja_level_2 = $wpdb->get_results($wpdb->prepare("
+                $indikator_crosscutting_level_2 = $wpdb->get_results($wpdb->prepare("
 					SELECT 
 						* 
-					FROM esakip_pohon_kinerja 
+					FROM esakip_croscutting 
 					WHERE parent=%d 
 						AND level=2 
 						AND active=1 
 						AND id_jadwal=%d 
 					ORDER BY id
 				", $level_2['id'], $input['periode']), ARRAY_A);
-                if (!empty($indikator_pohon_kinerja_level_2)) {
-                    foreach ($indikator_pohon_kinerja_level_2 as $indikator_level_2) {
+                if (!empty($indikator_crosscutting_level_2)) {
+                    foreach ($indikator_crosscutting_level_2 as $indikator_level_2) {
                         if (!empty($indikator_level_2['label_indikator_kinerja'])) {
                             if (empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['indikator'][(trim($indikator_level_2['label_indikator_kinerja']))])) {
                                 $data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['indikator'][(trim($indikator_level_2['label_indikator_kinerja']))] = [
@@ -135,18 +135,18 @@ if (!empty($pohon_kinerja_level_1)) {
                 }
 
                 // crosscutting level 3
-                $pohon_kinerja_level_3 = $wpdb->get_results($wpdb->prepare("
+                $crosscutting_level_3 = $wpdb->get_results($wpdb->prepare("
 					SELECT 
 						* 
-					FROM esakip_pohon_kinerja 
+					FROM esakip_croscutting 
 					WHERE parent=%d 
 						AND level=3 
 						AND active=1 
 						AND id_jadwal=%d 
 					ORDER by id
 				", $level_2['id'], $input['periode']), ARRAY_A);
-                if (!empty($pohon_kinerja_level_3)) {
-                    foreach ($pohon_kinerja_level_3 as $level_3) {
+                if (!empty($crosscutting_level_3)) {
+                    foreach ($crosscutting_level_3 as $level_3) {
                         if (empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])])) {
                             $data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])] = [
                                 'id' => $level_3['id'],
@@ -158,18 +158,18 @@ if (!empty($pohon_kinerja_level_1)) {
                         }
 
                         // indikator crosscutting level 3
-                        $indikator_pohon_kinerja_level_3 = $wpdb->get_results($wpdb->prepare("
+                        $indikator_crosscutting_level_3 = $wpdb->get_results($wpdb->prepare("
 							SELECT 
 								* 
-							FROM esakip_pohon_kinerja 
+							FROM esakip_croscutting 
 							WHERE parent=%d 
 								AND level=3 
 								AND active=1 
 								AND id_jadwal=%d
 							ORDER BY id
 						", $level_3['id'], $input['periode']), ARRAY_A);
-                        if (!empty($indikator_pohon_kinerja_level_3)) {
-                            foreach ($indikator_pohon_kinerja_level_3 as $indikator_level_3) {
+                        if (!empty($indikator_crosscutting_level_3)) {
+                            foreach ($indikator_crosscutting_level_3 as $indikator_level_3) {
                                 if (!empty($indikator_level_3['label_indikator_kinerja'])) {
                                     if (empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['indikator'][(trim($indikator_level_3['label_indikator_kinerja']))])) {
                                         $data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['indikator'][(trim($indikator_level_3['label_indikator_kinerja']))] = [
@@ -184,18 +184,18 @@ if (!empty($pohon_kinerja_level_1)) {
                         }
 
                         // crosscutting level 4
-                        $pohon_kinerja_level_4 = $wpdb->get_results($wpdb->prepare("
+                        $crosscutting_level_4 = $wpdb->get_results($wpdb->prepare("
 							SELECT 
 								* 
-							FROM esakip_pohon_kinerja 
+							FROM esakip_croscutting 
 							WHERE parent=%d 
 								AND level=4
 								AND active=1 
 								AND id_jadwal=%d
 							ORDER by id
 						", $level_3['id'], $input['periode']), ARRAY_A);
-                        if (!empty($pohon_kinerja_level_4)) {
-                            foreach ($pohon_kinerja_level_4 as $level_4) {
+                        if (!empty($crosscutting_level_4)) {
+                            foreach ($crosscutting_level_4 as $level_4) {
                                 if (empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])])) {
                                     $data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])] = [
                                         'id' => $level_4['id'],
@@ -206,18 +206,18 @@ if (!empty($pohon_kinerja_level_1)) {
                                 }
 
                                 // indikator crosscutting level 4
-                                $indikator_pohon_kinerja_level_4 = $wpdb->get_results($wpdb->prepare("
+                                $indikator_crosscutting_level_4 = $wpdb->get_results($wpdb->prepare("
 									SELECT 
 										* 
-									FROM esakip_pohon_kinerja 
+									FROM esakip_croscutting 
 									WHERE parent=%d 
 										AND level=4 
 										AND active=1 
 										AND id_jadwal=%d
 									ORDER BY id
 								", $level_4['id'], $input['periode']), ARRAY_A);
-                                if (!empty($indikator_pohon_kinerja_level_4)) {
-                                    foreach ($indikator_pohon_kinerja_level_4 as $indikator_level_4) {
+                                if (!empty($indikator_crosscutting_level_4)) {
+                                    foreach ($indikator_crosscutting_level_4 as $indikator_level_4) {
                                         if (!empty($indikator_level_4['label_indikator_kinerja'])) {
                                             if (empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['indikator'][(trim($indikator_level_4['label_indikator_kinerja']))])) {
                                                 $data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['indikator'][(trim($indikator_level_4['label_indikator_kinerja']))] = [
@@ -239,11 +239,10 @@ if (!empty($pohon_kinerja_level_1)) {
     }
 }
 
-// echo '<pre>'; print_r(array_values($data_all['data'])); echo '</pre>';die();
 
-$view_kinerja = $this->functions->generatePage(array(
+$view_crosscutting = $this->functions->generatePage(array(
     'nama_page' => 'View Crosscutting Pemerintah Daerah',
-    'content' => '[view_pohon_kinerja]',
+    'content' => '[view_crosscutting_pemda]',
     'show_header' => 1,
     'post_status' => 'private'
 ));
@@ -255,7 +254,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
     }
     $html .= '
 	<tr>
-		<td class="level1"><a href="' . $view_kinerja['url'] . '&id=' . $level_1['id'] . '&id_jadwal=' . $input['periode'] . '" target="_blank">' . $level_1['label'] . '</a></td>
+		<td class="level1"><a href="' . $view_crosscutting['url'] . '&id=' . $level_1['id'] . '&id_jadwal=' . $input['periode'] . '" target="_blank">' . $level_1['label'] . '</a></td>
 		<td class="indikator">' . implode("</br>", $indikator) . '</td>
 		<td></td>
 		<td></td>
@@ -343,6 +342,25 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     .indikator {
         background: #b5d9ea;
     }
+
+    #modal-crosscutting .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .table-responsive {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 1rem;
+        background-color: transparent;
+    }
 </style>
 <h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Crosscutting<br><?php echo $nama_pemda; ?><br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h3><br>
 <?php if (!$is_admin_panrb) : ?>
@@ -420,27 +438,6 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         </div>
     </div>
 </div>
-<style>
-    #modal-crosscutting .modal-body {
-        max-height: 70vh;
-        overflow-y: auto;
-    }
-
-    .table-responsive {
-        display: block;
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .table {
-        width: 100%;
-        max-width: 100%;
-        margin-bottom: 1rem;
-        background-color: transparent;
-    }
-</style>
-
 <script type="text/javascript">
     jQuery(document).ready(function() {
 
