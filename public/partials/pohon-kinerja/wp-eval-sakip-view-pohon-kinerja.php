@@ -145,13 +145,13 @@ if(!empty($data_all['data'])){
 
 								// croscutting level 4
 								if(!empty($level_4['croscutting'])){
-									$data_temp[$keylevel4][0]->f.="<div class='croscutting-2'>CROSCUTTING</div>";
+									$data_temp[$keylevel4][0]->f.="<div class='croscutting-2 tampil_croscutting'>CROSCUTTING</div>";
 				            		foreach ($level_4['croscutting'] as $keyCross => $valCross) {
 										$nama_skpd_all = array();
 										foreach ($valCross['data'] as $k_cross_4 => $v_cross_4) {
 											$nama_skpd_all[] = $v_cross_4['nama_skpd'];
 										}
-						                $data_temp[$keylevel4][0]->f.="<div class='croscutting'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode(", ",$nama_skpd_all) ."</div></div>";
+						                $data_temp[$keylevel4][0]->f.="<div class='croscutting tampil_croscutting'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode(", ",$nama_skpd_all) ."</div></div>";
 						            }
 					            }
 
@@ -174,13 +174,13 @@ if(!empty($data_all['data'])){
 
 										// croscutting level 5
 										if(!empty($level_5['croscutting'])){
-											$data_temp[$keylevel5][0]->f.="<div class='croscutting-2'>CROSCUTTING</div>";
+											$data_temp[$keylevel5][0]->f.="<div class='croscutting-2 tampil_croscutting'>CROSCUTTING</div>";
 											foreach ($level_5['croscutting'] as $keyCross => $valCross) {
 												$nama_skpd_all = array();
 												foreach ($valCross['data'] as $k_cross_5 => $v_cross_5) {
 													$nama_skpd_all[] = $v_cross_5['nama_skpd'];
 												}
-												$data_temp[$keylevel5][0]->f.="<div class='croscutting'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode(", ",$nama_skpd_all) ."</div></div>";
+												$data_temp[$keylevel5][0]->f.="<div class='croscutting tampil_croscutting'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode(", ",$nama_skpd_all) ."</div></div>";
 											}
 										}
 		
@@ -346,6 +346,10 @@ if(!empty($data_all['data'])){
   		padding:10px; 
 		background: #FFC6FF;
 	}
+
+	.tampil_croscutting {
+		display: none;
+	}
 </style>
 <div class="text-center" id="action-sakip">
 	<button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button>
@@ -353,6 +357,11 @@ if(!empty($data_all['data'])){
 	Perkecil (-) <input title="Perbesar/Perkecil Layar" id="test" min="1" max="15" value='10' step="1" onchange="showVal(this.value)" type="range" style="max-width: 400px; margin-top: 40px;" /> (+) Perbesar
 	<br>
 	<textarea id="val-range" disabled>100%</textarea>
+	<br>
+	<div class="custom-control custom-checkbox mt-4">
+		<input type="checkbox" class="custom-control-input" id="show_croscutting">
+		<label class="custom-control-label" for="show_croscutting">Tampilkan Croscutting</label>
+	</div>
 </div>
 <h1 style="text-align: center; margin-top: 30px; font-weight: bold;">Pohon Kinerja<br><?php echo $nama_skpd.$periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1><br>
 <div id="cetak" title="Laporan Pohon Kinerja" style="padding: 5px; overflow: auto; max-width: 100vw;">
@@ -363,6 +372,14 @@ if(!empty($data_all['data'])){
 <script type="text/javascript">
 google.charts.load('current', {packages:["orgchart"]});
 google.charts.setOnLoadCallback(drawChart);
+
+jQuery("#show_croscutting").on('click', function(){
+	if(this.checked) {
+		jQuery(".tampil_croscutting").show();
+	}else{
+		jQuery(".tampil_croscutting").hide();
+	}
+});
 
 function drawChart() {
   	window.data_all = <?php echo json_encode(array_values($data_temp)); ?>;
