@@ -1090,6 +1090,7 @@ CREATE TABLE `esakip_croscutting_opd` (
   `active` tinyint(4) NOT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp(),
+  `is_lembaga_lainnya` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY key (id)
 );
 
@@ -1120,4 +1121,14 @@ CREATE TABLE `esakip_capaian_indikator` (
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
  PRIMARY KEY(id)
+);
+
+CREATE TABLE `esakip_data_lembaga_lainnya` (
+  `id` int(11) NOT NULL auto_increment,
+  `nama_lembaga` text DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `tahun_anggaran` year(4) NOT NULL DEFAULT '2021',
+  `active` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY  (id)
 );

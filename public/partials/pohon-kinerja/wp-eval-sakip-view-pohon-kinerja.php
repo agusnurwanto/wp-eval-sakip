@@ -151,7 +151,7 @@ if(!empty($data_all['data'])){
 										foreach ($valCross['data'] as $k_cross_4 => $v_cross_4) {
 											$nama_skpd_all[] = $v_cross_4['nama_skpd'];
 										}
-						                $data_temp[$keylevel4][0]->f.="<div class='croscutting tampil_croscutting'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode(", ",$nama_skpd_all) ."</div></div>";
+						                $data_temp[$keylevel4][0]->f.="<div class='croscutting tampil_croscutting'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode("<br>",$nama_skpd_all) ."</div></div>";
 						            }
 					            }
 
@@ -180,7 +180,7 @@ if(!empty($data_all['data'])){
 												foreach ($valCross['data'] as $k_cross_5 => $v_cross_5) {
 													$nama_skpd_all[] = $v_cross_5['nama_skpd'];
 												}
-												$data_temp[$keylevel5][0]->f.="<div class='croscutting tampil_croscutting'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode(", ",$nama_skpd_all) ."</div></div>";
+												$data_temp[$keylevel5][0]->f.="<div class='croscutting tampil_croscutting'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode("<br>",$nama_skpd_all) ."</div></div>";
 											}
 										}
 		
