@@ -49,6 +49,16 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		require_once ESAKIP_PLUGIN_PATH . 'public/partials/pohon-kinerja/wp-eval-sakip-view-pohon-kinerja.php';
 	}
 
+	public function view_crosscutting_pemda($atts)
+	{
+		if (!empty($_GET) && !empty($_GET['post'])) {
+			return '';
+		}
+
+		$tipe = 'pemda';
+		require_once ESAKIP_PLUGIN_PATH . 'public/partials/pohon-kinerja/wp-eval-sakip-view_crosscutting_pemda.php';
+	}
+
 	public function cascading_pemda($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
@@ -1223,7 +1233,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		die(json_encode($ret));
 	}
 
-	public function edit_crosscutting_pemda()
+	public function edit_crosscutting_pemda_tujuan()
 	{
 		global $wpdb;
 		$ret = array(
@@ -2298,7 +2308,99 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		return $data_ret;
 	}
 
-	public function get_data_crosscutting()
+	function get_crosscutting_pemda($opsi)
+	{
+		global $wpdb;
+		$data_ret = array();
+		$table = 'esakip_croscutting';
+		$where_skpd = '';
+		if ($opsi['tipe'] == 'opd') {
+			$table = 'esakip_croscutting_opd';
+			$where_skpd = $wpdb->prepare('AND id_skpd=%d', $opsi['id_skpd']);
+		}
+		if ($opsi['level'] == 1) {
+			$crosscutting = $wpdb->get_results($wpdb->prepare("
+				SELECT 
+					* 
+				FROM $table 
+				WHERE id=%d
+				  AND parent=0 
+				  AND level=%d 
+				  AND active=1 
+				  AND id_jadwal=%d 
+				  $where_skpd
+				ORDER BY id
+			", $opsi['id'], $opsi['level'], $opsi['periode']), ARRAY_A);
+		} else {
+			$crosscutting = $wpdb->get_results($wpdb->prepare("
+				SELECT 
+					* 
+				FROM $table 
+				WHERE parent=%d
+				  AND level=%d 
+				  AND active=1 
+				  AND id_jadwal=%d
+				  $where_skpd
+				ORDER BY id
+			", $opsi['id'], $opsi['level'], $opsi['periode']), ARRAY_A);
+		}
+		if (!empty($crosscutting)) {
+			foreach ($crosscutting as $level) {
+				if (empty($data_ret[trim($level['label'])])) {
+					$data_ret[trim($level['label'])] = [
+						'id' => $level['id'],
+						'label' => $level['label'],
+						'level' => $level['level'],
+						'indikator' => [],
+						'data' => [],
+					];
+				}
+
+				$indikator_crosscutting_level = $wpdb->get_results($wpdb->prepare("
+					SELECT 
+						* 
+					FROM $table 
+					WHERE parent=%d 
+					  AND level=%d 
+					  AND active=1 
+					  AND id_jadwal=%d
+					  $where_skpd
+					ORDER BY id
+				", $level['id'], $level['level'], $opsi['periode']), ARRAY_A);
+				if (!empty($indikator_crosscutting_level)) {
+					foreach ($indikator_crosscutting_level as $indikator_level) {
+						if (!empty($indikator_level['label_id_skpd'])) {
+							if (empty($data_ret[trim($level['label'])]['indikator'][(trim($indikator_level['label_id_skpd']))])) {
+								$data_ret[trim($level['label'])]['indikator'][(trim($indikator_level['label_id_skpd']))] = [
+									'id' => $indikator_level['id'],
+									'parent' => $indikator_level['parent'],
+									'label_id_skpd' => $indikator_level['label_id_skpd'],
+									'level' => $indikator_level['level']
+								];
+							}
+						}
+					}
+				}
+				if (
+					(
+						$level['level'] <= 4
+						&& $opsi['tipe'] == 'pemda'
+					)
+					|| (
+						$level['level'] <= 5
+						&& $opsi['tipe'] == 'opd'
+					)
+				) {
+					$opsi['id'] = $level['id'];
+					$opsi['level'] = $level['level'] + 1;
+					$data_ret[trim($level['label'])]['data'] = $this->get_crosscutting($opsi);
+				}
+			}
+		}
+		return $data_ret;
+	}
+
+	public function get_data_crosscutting_pemda()
 	{
 		global $wpdb;
 		try {
@@ -2457,7 +2559,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								a.parent,
 								a.active,
 								b.id AS id_indikator,
-								b.label_indikator_croscutting
+								b.label_id_skpd
 							FROM esakip_croscutting a
 								LEFT JOIN esakip_croscutting b 
 									ON a.id=b.parent AND a.level=b.level 
@@ -2481,7 +2583,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								a.parent,
 								a.active,
 								b.id AS id_indikator,
-								b.label_indikator_croscutting
+								b.label_id_skpd
 							FROM esakip_croscutting_opd a
 								LEFT JOIN esakip_croscutting_opd b 
 									ON a.id=b.parent AND a.level=b.level 
@@ -2558,7 +2660,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							if (empty($data['data'][$crosscutting['id']]['indikator'][$crosscutting['id_indikator']])) {
 								$data['data'][$crosscutting['id']]['indikator'][$crosscutting['id_indikator']] = [
 									'id' => $crosscutting['id_indikator'],
-									'label' => $crosscutting['label_indikator_croscutting']
+									'label' => $crosscutting['label_id_skpd']
 								];
 							}
 						}
@@ -2603,7 +2705,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 			exit();
 		}
 	}
-	public function create_crosscutting()
+	public function create_crosscutting_pemda()
 	{
 		global $wpdb;
 		try {
@@ -2679,7 +2781,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		}
 	}
 
-	public function edit_crosscutting()
+	public function edit_crosscutting_pemda()
 	{
 		global $wpdb;
 		try {
@@ -2799,7 +2901,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		}
 	}
 
-	public function update_crosscutting()
+	public function update_crosscutting_pemda()
 	{
 		global $wpdb;
 		try {
@@ -2846,7 +2948,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							UPDATE esakip_croscutting 
 							SET label=%s 
 							WHERE parent=%d 
-								AND label_indikator_croscutting IS NOT NULL
+								AND label_id_skpd IS NOT NULL
 						", trim($input['label']), $input['id']));
 					} else {
 						// untuk crosscutting opd  //////////////////////////////////////////////////////////////////////////////
@@ -2861,7 +2963,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							UPDATE esakip_croscutting$_prefix_opd 
 							SET label=%s 
 							WHERE parent=%d 
-								AND label_indikator_croscutting IS NOT NULL
+								AND label_id_skpd IS NOT NULL
 								AND id_skpd=%d
 						", trim($input['label']), $input['id'], $id_skpd));
 					}
@@ -2886,7 +2988,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		}
 	}
 
-	public function delete_crosscutting()
+	public function delete_crosscutting_pemda()
 	{
 		global $wpdb;
 		try {
@@ -2909,7 +3011,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							id 
 						FROM esakip_croscutting$_prefix_opd 
 						WHERE parent=%d 
-							AND label_indikator_croscutting IS NOT NULL 
+							AND label_id_skpd IS NOT NULL 
 							AND level=%d 
 							AND active=%d$_where_opd
 					", $_POST['id'], $_POST['level'], 1),  ARRAY_A);
@@ -2964,7 +3066,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		}
 	}
 
-	public function create_indikator_crosscutting()
+	public function create_indikator_crosscutting_pemda()
 	{
 		global $wpdb;
 		try {
@@ -2983,16 +3085,15 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					}
 
 					$input = json_decode(stripslashes($_POST['data']), true);
-
 					$id = $wpdb->get_var($wpdb->prepare("
 						SELECT 
 							id 
 						FROM esakip_croscutting$_prefix_opd 
-						WHERE label_indikator_croscutting=%s 
+						WHERE label_id_skpd=%d 
 							AND parent=%d 
 							AND level=%d 
 							AND active=%d$_where_opd
-					", trim($input['indikator_label']), $input['parent'], $input['level'], 1),  ARRAY_A);
+					", trim($input['skpd-label']), $input['parent'], $input['level'], 1),  ARRAY_A);
 
 					if (!empty($id)) {
 						throw new Exception("Data sudah ada!", 1);
@@ -3000,8 +3101,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					if ($_prefix_opd == '') {
 						$data = $wpdb->insert('esakip_croscutting', [
-							// 'label' => trim($input['label']),
-							'label_indikator_croscutting' => trim($input['indikator_label']),
+							'label_id_skpd' => trim($input['skpd-label']),
 							'parent' => $input['parent'],
 							'level' => $input['level'],
 							'id_jadwal' => $input['id_jadwal'],
@@ -3009,8 +3109,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						]);
 					} else {
 						$data = $wpdb->insert('esakip_croscutting' . $_prefix_opd, [
-							// 'label' => trim($input['label']),
-							'label_indikator_croscutting' => trim($input['indikator_label']),
+							'label_id_skpd' => trim($input['skpd-label']),
 							'parent' => $input['parent'],
 							'level' => $input['level'],
 							'id_jadwal' => $input['id_jadwal'],
@@ -3039,7 +3138,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		}
 	}
 
-	public function edit_indikator_crosscutting()
+	public function edit_indikator_crosscutting_pemda()
 	{
 		global $wpdb;
 		try {
@@ -3063,7 +3162,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							a.id, 
 							a.label, 
 							a.parent, 
-							a.label_indikator_croscutting, 
+							a.label_id_skpd, 
 							a.level,
 							b.parent AS parent_all 
 						FROM 
@@ -3100,7 +3199,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		}
 	}
 
-	public function update_indikator_crosscutting()
+	public function update_indikator_crosscutting_pemda()
 	{
 		global $wpdb;
 		try {
@@ -3128,8 +3227,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							AND parent=%d 
 							AND level=%d 
 							AND active=%d 
-							AND label_indikator_croscutting=%s$_where_opd
-					", $input['id'], $input['parent'], $input['level'], 1, trim($input['indikator_label'])),  ARRAY_A);
+							AND label_id_skpd=%d$_where_opd
+					", $input['id'], $input['parent'], $input['level'], 1, trim($input['skpd-label'])),  ARRAY_A);
 
 					if (!empty($id)) {
 						throw new Exception("Data sudah ada!", 1);
@@ -3138,7 +3237,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					if ($_prefix_opd == '') {
 						// untuk pemda
 						$data = $wpdb->update('esakip_croscutting', [
-							'label_indikator_croscutting' => trim($input['indikator_label']),
+							'label_id_skpd' => trim($input['skpd-label']),
 						], [
 							'id' => $input['id'],
 							'parent' => $input['parent'],
@@ -3146,7 +3245,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						]);
 					} else {
 						$data = $wpdb->update('esakip_croscutting' . $_prefix_opd, [
-							'label_indikator_croscutting' => trim($input['indikator_label']),
+							'label_id_skpd' => trim($input['skpd-label']),
 						], [
 							'id' => $input['id'],
 							'parent' => $input['parent'],
@@ -3175,7 +3274,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		}
 	}
 
-	public function delete_indikator_crosscutting()
+	public function delete_indikator_crosscutting_pemda()
 	{
 		global $wpdb;
 		try {
