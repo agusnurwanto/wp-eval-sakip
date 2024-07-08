@@ -149,9 +149,14 @@ if(!empty($data_all['data'])){
 				            		foreach ($level_4['croscutting'] as $keyCross => $valCross) {
 										$nama_skpd_all = array();
 										foreach ($valCross['data'] as $k_cross_4 => $v_cross_4) {
+											$class_cc_opd_lain = '';
+											if($v_cross_4['croscutting_opd_lain'] == 1){
+												$class_cc_opd_lain = 'cc-opd-lain';
+											}
 											$nama_skpd_all[] = $v_cross_4['nama_skpd'];
 										}
-						                $data_temp[$keylevel4][0]->f.="<div class='croscutting tampil_croscutting'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode("<br>",$nama_skpd_all) ."</div></div>";
+										
+						                $data_temp[$keylevel4][0]->f.="<div class='croscutting tampil_croscutting ".$class_cc_opd_lain."'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode("<br>",$nama_skpd_all) ." ". $valCross['croscutting_opd_lain'] ." </div></div>";
 						            }
 					            }
 
@@ -178,9 +183,13 @@ if(!empty($data_all['data'])){
 											foreach ($level_5['croscutting'] as $keyCross => $valCross) {
 												$nama_skpd_all = array();
 												foreach ($valCross['data'] as $k_cross_5 => $v_cross_5) {
+													$class_cc_opd_lain = '';
+													if($v_cross_4['croscutting_opd_lain'] == 1){
+														$class_cc_opd_lain = 'cc-opd-lain';
+													}
 													$nama_skpd_all[] = $v_cross_5['nama_skpd'];
 												}
-												$data_temp[$keylevel5][0]->f.="<div class='croscutting tampil_croscutting'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode("<br>",$nama_skpd_all) ."</div></div>";
+												$data_temp[$keylevel5][0]->f.="<div class='croscutting tampil_croscutting ".$class_cc_opd_lain."'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode("<br>",$nama_skpd_all) ."</div></div>";
 											}
 										}
 		
@@ -337,6 +346,10 @@ if(!empty($data_all['data'])){
 		margin: 0px -10px;
 		font-size: 12px;
 		font-style: normal;
+	}
+
+	.croscutting.cc-opd-lain {
+		background-color: #9BF6FF;
 	}
 
 	.croscutting-2 {

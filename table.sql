@@ -1091,6 +1091,7 @@ CREATE TABLE `esakip_croscutting_opd` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp(),
   `is_lembaga_lainnya` tinyint(4) NOT NULL DEFAULT '0',
+  `keterangan_tolak` varchar(255) DEFAULT null,
   PRIMARY key (id)
 );
 

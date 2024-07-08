@@ -488,6 +488,22 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								WHERE parent_pohon_kinerja=%d 
 									AND active=%d
 							", $_POST['id'], 1),  ARRAY_A);
+
+						$data_croscutting_pengusul = $wpdb->get_results($wpdb->prepare("
+							SELECT 
+								cc.*,
+								pk.id_skpd as id_skpd_parent
+							FROM esakip_croscutting_opd as cc
+							JOIN esakip_pohon_kinerja_opd as pk
+							ON cc.parent_pohon_kinerja = pk.id
+							WHERE cc.id_skpd_croscutting=%d
+								AND cc.status_croscutting=1 
+								AND cc.active=1
+								AND cc.parent_croscutting=%d
+						", $id_skpd, $_POST['id']),  ARRAY_A);
+						if(!empty($data_croscutting) && !empty($data_croscutting_pengusul)){
+							$data_croscutting = array_merge($data_croscutting,$data_croscutting_pengusul);
+						}
 					}
 
 					$table_croscutting = '';
@@ -530,6 +546,29 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								);
 							}
 
+							if(!empty($v_cross['id_skpd_parent'])){
+								$this_data_id_skpd = $v_cross['id_skpd_parent'];
+							}else{
+								$this_data_id_skpd = $id_skpd;
+							}
+
+							$this_data_perangkat = $wpdb->get_row(
+								$wpdb->prepare("
+									SELECT 
+										nama_skpd as nama_perangkat,
+										id_skpd,
+										tahun_anggaran
+									FROM esakip_data_unit 
+									WHERE active=1 
+									AND is_skpd=1 
+									AND id_skpd=%d
+									AND tahun_anggaran=%d
+									GROUP BY id_skpd
+									ORDER BY kode_skpd ASC
+								", $this_data_id_skpd, $tahun_anggaran_sakip),
+								ARRAY_A
+							);
+
 							switch ($v_cross['status_croscutting']) {
 								case '1':
 									$status_croscutting = 'disetujui';
@@ -547,16 +586,25 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							$table_croscutting .= '<tr>';
 
 							$table_croscutting .= '<td>' . $no++ . '</td>';
+							$table_croscutting .= '<td>' . $this_data_perangkat['nama_perangkat'] . '</td>';
 							$table_croscutting .= '<td>' . $v_cross['keterangan'] . '</td>';
 							$table_croscutting .= '<td>' . $v_cross['keterangan_croscutting'] . '</td>';
 							$table_croscutting .= '<td>' . $data_perangkat['nama_perangkat'] . '</td>';
 							$table_croscutting .= '<td>' . $status_croscutting . '</td>';
 
 							$aksi = '';
-							$aksi .= '<a href="javascript:void(0)" class="btn btn-sm btn-warning edit-croscutting" data-id="' . $v_cross['id'] . '" href="#" title="Edit Croscutting"><span class="dashicons dashicons-edit"></span></a>';
-							$aksi .= '<a href="javascript:void(0)" class="btn btn-sm btn-danger delete-croscutting" data-id="' . $v_cross['id'] . '" style="margin-left: 5px;" href="#" title="Hapus Croscutting"><span class="dashicons dashicons-trash"></span></a>';
+							if($status_croscutting == 'disetujui'){
+								$aksi .= '<a href="javascript:void(0)" class="btn btn-sm btn-primary" data-id="' . $v_cross['id'] . '" href="#" title="Croscutting Disetujui">Disetujui</a>';
+							}else{
+								$aksi .= '<a href="javascript:void(0)" class="btn btn-sm btn-warning edit-croscutting" data-id="' . $v_cross['id'] . '" href="#" title="Edit Croscutting"><span class="dashicons dashicons-edit"></span></a>';
+								$aksi .= '<a href="javascript:void(0)" class="btn btn-sm btn-danger delete-croscutting" data-id="' . $v_cross['id'] . '" style="margin-left: 5px;" href="#" title="Hapus Croscutting"><span class="dashicons dashicons-trash"></span></a>';
+							}
 
-							$table_croscutting .= '<td>' . $aksi . '</td>';
+							if(!empty($v_cross['id_skpd_parent'])){
+								$aksi = '<a href="javascript:void(0)" class="btn btn-sm btn-success verifikasi-croscutting" data-id="' . $v_cross['id'] . '" data-skpd-asal="'. $this_data_perangkat['nama_perangkat'] .'" data-keterangan-asal="'. $v_cross['keterangan'] .'" href="#" title="Verifikasi Croscutting"><span class="dashicons dashicons-yes"></span></a>';
+							}
+
+							$table_croscutting .= '<td class="text-center">' . $aksi . '</td>';
 
 							$table_croscutting .= '</tr>';
 						}
@@ -2145,6 +2193,113 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 			exit();
 		}
 	}
+	
+	public function verify_croscutting()
+	{
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+					$input = json_decode(stripslashes($_POST['data']), true);
+
+					$_prefix_opd = $_where_opd = $id_skpd = $id_skpd_croscutting = $keterangan_croscutting = $id_lembaga_lainnya = $keterangan_tolak = '';
+					if(!empty($input['idCroscutting'])){
+						if (!empty($_POST['tipe_pokin'])) {
+							if (!empty($_POST['id_skpd'])) {
+								if (!empty($input['verify_cc']) || $input['verify_cc'] == 0) {
+									$status_verify = $input['verify_cc'] == 1 ? 1 : 2;
+									
+									if(!empty($input['levelPokinCroscutting']) && $input['verify_cc'] == 1){
+										$keterangan_croscutting = $input['keterangan_cc'];
+									}else if(!empty($input['keterangan_cc_tolak']) && $input['verify_cc'] == 0){
+										$keterangan_tolak = $input['keterangan_cc_tolak'];
+									}else{
+										throw new Exception("Ada yang kosong, wajib diisi!", 1);	
+									}
+								} else {
+									throw new Exception("Verifikasi Croscutting Ditolak!", 1);
+								}
+	
+								$id_skpd = $_POST['id_skpd'];
+								$_prefix_opd = $_POST['tipe_pokin'] == "opd" ? "_opd" : "";
+								$_where_opd = $_POST['tipe_pokin'] == "opd" ? ' AND id_skpd=' . $id_skpd : '';
+							} else {
+								throw new Exception("Id SKPD tidak ditemukan!", 1);
+							}
+						}
+					}else{
+						throw new Exception("Ada data yang kosong!", 1);
+					}
+
+					$data_verify_croscutting = $wpdb->get_row(
+						$wpdb->prepare("
+						SELECT *
+						FROM esakip_croscutting_opd
+						WHERE id=%d
+							AND active=1
+					", $input['idCroscutting']),
+						ARRAY_A
+					);
+
+					$cek_pohon_kinerja = $wpdb->get_row(
+						$wpdb->prepare("
+						SELECT *
+						FROM esakip_pohon_kinerja_opd
+						WHERE id=%d
+							AND active=1
+					", $input['levelPokinCroscutting']),
+						ARRAY_A
+					);
+
+					if(empty($cek_pohon_kinerja) && $input['verify_cc'] == 1){
+						throw new Exception("Verifikasi gagal!", 1);		
+					}
+
+					if(!empty($data_verify_croscutting)){
+						$opsi = array(
+							'keterangan_croscutting' => trim($keterangan_croscutting),
+							'status_croscutting' => $status_verify,
+							'keterangan_tolak' => $keterangan_tolak,
+							'updated_at' => current_time('mysql')
+						);
+						if(!empty($cek_pohon_kinerja) && $input['verify_cc'] == 1){
+							$opsi['parent_croscutting'] = $input['levelPokinCroscutting'];
+						}
+						
+						$verify_crocutting = $wpdb->update(
+							'esakip_croscutting_opd',
+							$opsi,
+							array(
+								'id' => $input['idCroscutting']
+							)
+						);
+
+						if ($verify_crocutting === false) {
+							error_log("Error updating croscutting: " . $wpdb->last_error);
+						}
+					}else{
+						throw new Exception("Verifikasi gagal!", 1);	
+					}
+
+					echo json_encode([
+						'status' => true,
+						'message' => 'Sukses Verifikasi Croscutting!'
+					]);
+					exit();
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
+	}
 
 	function get_pokin($opsi)
 	{
@@ -2229,6 +2384,24 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						AND active=1 
 					ORDER BY id
 				", $level['id']), ARRAY_A);
+
+				$data_croscutting_level_pengusul = $wpdb->get_results($wpdb->prepare("
+					SELECT 
+						cc.*,
+						pk.id_skpd as id_skpd_parent
+					FROM esakip_croscutting_opd as cc
+					JOIN esakip_pohon_kinerja_opd as pk
+					ON cc.parent_pohon_kinerja = pk.id
+					WHERE cc.id_skpd_croscutting=%d
+						AND cc.status_croscutting=1 
+						AND cc.active=1
+						AND cc.parent_croscutting=%d
+				", $opsi['id_skpd'], $level['id']),  ARRAY_A);
+
+				if(!empty($data_croscutting_level) && !empty($data_croscutting_level_pengusul)){
+					$data_croscutting_level = array_merge($data_croscutting_level,$data_croscutting_level_pengusul);
+				}
+
 				if (!empty($data_croscutting_level)) {
 					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 					foreach ($data_croscutting_level as $key_croscutting_level => $croscutting_level) {
@@ -2251,6 +2424,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							);
 							$nama_perangkat = $nama_lembaga['nama_lembaga'];
 						}else{
+							if(!empty($croscutting_level['id_skpd_parent'])){
+								$this_data_id_skpd = $croscutting_level['id_skpd_parent'];
+							}else{
+								$this_data_id_skpd = $croscutting_level['id_skpd_croscutting'];
+							}
+
 							$nama_skpd = $wpdb->get_row(
 								$wpdb->prepare("
 									SELECT 
@@ -2264,7 +2443,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									AND tahun_anggaran=%d
 									GROUP BY id_skpd
 									ORDER BY kode_skpd ASC
-								", $croscutting_level['id_skpd_croscutting'], $tahun_anggaran_sakip),
+								", $this_data_id_skpd, $tahun_anggaran_sakip),
 								ARRAY_A
 							);
 							$nama_perangkat = $nama_skpd['nama_skpd'];
@@ -2279,15 +2458,21 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								];
 							}
 
+							if(!empty($croscutting_level['id_skpd_parent'])){
+								$croscutting_opd_lain = 1;
+							}else{
+								$croscutting_opd_lain = 0;
+							}		
+
 							$data_ret[trim($level['label'])]['croscutting'][(trim($croscutting_level['keterangan']))]['data'][$key_croscutting_level] = [
 								'id' => $croscutting_level['id'],
 								'parent_pohon_kinerja' => $croscutting_level['parent_pohon_kinerja'],
 								'keterangan' => $croscutting_level['keterangan'],
-								'nama_skpd' => $nama_perangkat
+								'nama_skpd' => $nama_perangkat,
+								'croscutting_opd_lain' => $croscutting_opd_lain
 							];
 						}
 					}
-					// }
 				}
 				if (
 					(
