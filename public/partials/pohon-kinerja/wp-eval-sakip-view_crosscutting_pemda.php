@@ -9,29 +9,27 @@ global $wpdb;
 
 $input = shortcode_atts(array(
     'periode' => '',
+    'id_tujuan' => '',
 ), $atts);
 if (!empty($_GET) && !empty($_GET['id_jadwal'])) {
     $input['periode'] = $_GET['id_jadwal'];
 }
+if (!empty($_GET) && !empty($_GET['id_tujuan'])) {
+    $id_tujuan = $_GET['id_tujuan'];
+}
+
+$nama_crosscutting = $wpdb->get_var(
+    $wpdb->prepare("
+        SELECT 
+            nama_crosscutting
+        FROM esakip_rpd_tujuan
+        WHERE id_unik=%s
+          AND active = 1
+", $id_tujuan)
+);
 
 $id_skpd = false;
-$nama_skpd = '';
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
-if (!empty($_GET) && !empty($_GET['id_skpd'])) {
-    $id_skpd = $_GET['id_skpd'];
-    $skpd = $wpdb->get_row(
-        $wpdb->prepare("
-	    SELECT 
-	        nama_skpd
-	    FROM esakip_data_unit
-	    WHERE id_skpd=%d
-	      AND tahun_anggaran=%d
-	      AND active = 1
-	", $id_skpd, $tahun_anggaran_sakip),
-        ARRAY_A
-    );
-    $nama_skpd = $skpd['nama_skpd'] . '<br>';
-}
 
 $periode = $wpdb->get_row(
     $wpdb->prepare("
@@ -67,12 +65,12 @@ $crosscutting_level = $wpdb->get_var($wpdb->prepare("
 	ORDER BY id
 ", $_GET['id'], $input['periode']));
 
-$data_all = array('data' => $this->get_crosscutting(array(
+$data_all = array('data' => $this->get_crosscutting_pemda(array(
     'id' => $_GET['id'],
     'level' => $crosscutting_level,
     'periode' => $input['periode'],
     'tipe' => $tipe,
-    'id_skpd' => $id_skpd
+    'id_tujuan' => $id_tujuan
 )));
 // print_r($data_all); die();
 
@@ -94,7 +92,7 @@ if (!empty($data_all['data'])) {
 
         if (!empty($level_1['indikator'])) {
             foreach ($level_1['indikator'] as $keyindikatorlevel1 => $indikator) {
-                $data_temp[$keylevel1][0]->f .= "<div " . $style1 . ">IK: " . $indikator['label_indikator_kinerja'] . "</div>";
+                $data_temp[$keylevel1][0]->f .= "<div " . $style1 . ">OPD: " . $indikator['label_nama_skpd'] . "</div>";
             }
         }
 
@@ -108,7 +106,7 @@ if (!empty($data_all['data'])) {
 
                 if (!empty($level_2['indikator'])) {
                     foreach ($level_2['indikator'] as $keyindikatorlevel2 => $indikator) {
-                        $data_temp[$keylevel2][0]->f .= "<div " . $style2 . ">IK: " . $indikator['label_indikator_kinerja'] . "</div>";
+                        $data_temp[$keylevel2][0]->f .= "<div " . $style2 . ">OPD: " . $indikator['label_nama_skpd'] . "</div>";
                     }
                 }
 
@@ -122,74 +120,12 @@ if (!empty($data_all['data'])) {
 
                         if (!empty($level_3['indikator'])) {
                             foreach ($level_3['indikator'] as $keyindikatorlevel3 => $indikator) {
-                                $data_temp[$keylevel3][0]->f .= "<div " . $style3 . ">IK: " . $indikator['label_indikator_kinerja'] . "</div>";
+                                $data_temp[$keylevel3][0]->f .= "<div " . $style3 . ">OPD: " . $indikator['label_nama_skpd'] . "</div>";
                             }
                         }
 
                         $data_temp[$keylevel3][1] = $level_2['label'];
                         $data_temp[$keylevel3][2] = '';
-
-                        if (!empty($level_3['data'])) {
-
-                            foreach ($level_3['data'] as $keylevel4 => $level_4) {
-                                $data_temp[$keylevel4][0] = (object)[
-                                    'v' => $level_4['label'],
-                                    'f' => "<div class=\"" . $style0 . " label4\">" . trim($level_4['label']) . "</div>",
-                                ];
-
-                                if (!empty($level_4['indikator'])) {
-                                    foreach ($level_4['indikator'] as $keyindikatorlevel4 => $indikator) {
-                                        $data_temp[$keylevel4][0]->f .= "<div " . $style4 . ">IK: " . $indikator['label_indikator_kinerja'] . "</div>";
-                                    }
-                                }
-
-                                // croscutting level 4
-                                if (!empty($level_4['croscutting'])) {
-                                    $data_temp[$keylevel4][0]->f .= "<div class='croscutting-2'>CROSCUTTING</div>";
-                                    foreach ($level_4['croscutting'] as $keyCross => $valCross) {
-                                        $nama_skpd_all = array();
-                                        foreach ($valCross['data'] as $k_cross_4 => $v_cross_4) {
-                                            $nama_skpd_all[] = $v_cross_4['nama_skpd'];
-                                        }
-                                        $data_temp[$keylevel4][0]->f .= "<div class='croscutting'><div>" . $valCross['keterangan'] . "</div><div class='cros-opd'>" . implode(", ", $nama_skpd_all) . "</div></div>";
-                                    }
-                                }
-
-                                $data_temp[$keylevel4][1] = $level_3['label'];
-                                $data_temp[$keylevel4][2] = '';
-
-                                if (!empty($level_4['data'])) {
-
-                                    foreach ($level_4['data'] as $keylevel5 => $level_5) {
-                                        $data_temp[$keylevel5][0] = (object)[
-                                            'v' => $level_5['label'],
-                                            'f' => "<div class=\"" . $style0 . " label5\">" . trim($level_5['label']) . "</div>",
-                                        ];
-
-                                        if (!empty($level_5['indikator'])) {
-                                            foreach ($level_5['indikator'] as $keyindikatorlevel5 => $indikator) {
-                                                $data_temp[$keylevel5][0]->f .= "<div " . $style5 . ">IK: " . $indikator['label_indikator_kinerja'] . "</div>";
-                                            }
-                                        }
-
-                                        // croscutting level 5
-                                        if (!empty($level_5['croscutting'])) {
-                                            $data_temp[$keylevel5][0]->f .= "<div class='croscutting-2'>CROSCUTTING</div>";
-                                            foreach ($level_5['croscutting'] as $keyCross => $valCross) {
-                                                $nama_skpd_all = array();
-                                                foreach ($valCross['data'] as $k_cross_5 => $v_cross_5) {
-                                                    $nama_skpd_all[] = $v_cross_5['nama_skpd'];
-                                                }
-                                                $data_temp[$keylevel5][0]->f .= "<div class='croscutting'><div>" . $valCross['keterangan'] . "</div><div class='cros-opd'>" . implode(", ", $nama_skpd_all) . "</div></div>";
-                                            }
-                                        }
-
-                                        $data_temp[$keylevel5][1] = $level_4['label'];
-                                        $data_temp[$keylevel5][2] = $level_5['label'];
-                                    }
-                                }
-                            }
-                        }
                     }
                 }
 
@@ -240,7 +176,7 @@ if (!empty($data_all['data'])) {
         font-size: 13px;
         font-weight: 600;
         padding: 10px;
-        min-height: 80px;
+        min-height: 80;
         min-width: 200px;
     }
 
@@ -255,7 +191,7 @@ if (!empty($data_all['data'])) {
         font-weight: 600;
         font-style: italic;
         padding: 10px;
-        min-height: 70px;
+        min-height: 40px;
     }
 
     .label2 {
@@ -269,7 +205,7 @@ if (!empty($data_all['data'])) {
         font-weight: 600;
         font-style: italic;
         padding: 10px;
-        min-height: 70px;
+        min-height: 40px;
     }
 
     .label3 {
@@ -283,37 +219,8 @@ if (!empty($data_all['data'])) {
         font-weight: 600;
         font-style: italic;
         padding: 10px;
-        min-height: 70px;
+        min-height: 40px;
     }
-
-    .label4 {
-        background: #c979e3;
-        border-radius: 5px 5px 0 0;
-    }
-
-    .level4 {
-        color: #0d0909;
-        font-size: 11px;
-        font-weight: 600;
-        font-style: italic;
-        padding: 10px;
-        min-height: 70px;
-    }
-
-    .label5 {
-        background: #28a745;
-        border-radius: 5px 5px 0 0;
-    }
-
-    .level5 {
-        color: #0d0909;
-        font-size: 11px;
-        font-weight: 600;
-        font-style: italic;
-        padding: 10px;
-        min-height: 70px;
-    }
-
     #action-sakip {
         padding-top: 20px;
     }
@@ -377,7 +284,7 @@ if (!empty($data_all['data'])) {
     <br>
     <textarea id="val-range" disabled>100%</textarea>
 </div>
-<h1 style="text-align: center; margin-top: 30px; font-weight: bold;">Crosscutting<br><?php echo $nama_skpd . $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1><br>
+<h1 style="text-align: center; margin-top: 30px; font-weight: bold;">Crosscutting<br><?php echo $nama_crosscutting . '<br>' . $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1><br>
 <div id="cetak" title="Laporan Crosscutting" style="padding: 5px; overflow: auto; max-width: 100vw;">
     <div id="chart_div"></div>
 </div>
