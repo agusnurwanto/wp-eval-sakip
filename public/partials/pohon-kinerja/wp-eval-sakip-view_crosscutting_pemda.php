@@ -271,18 +271,17 @@ if (!empty($data_all['data'])) {
         min-height: 40px;
     }
     .label4 {
-        background: #57b2ec;
-        border-radius: 5px 5px 0 0;
-    }
-
-    .level4 {
-        color: #0d0909;
-        font-size: 11px;
-        font-weight: 600;
-        font-style: italic;
-        padding: 10px;
-        min-height: 40px;
-    }
+  		background: #c979e3; 
+  		border-radius: 5px 5px 0 0;
+  	}
+  	.level4 {
+  		color: #0d0909; 
+  		font-size:11px; 
+  		font-weight:600;
+  		font-style:italic; 
+  		padding:10px; 
+  		min-height:70px;
+  	}
     #action-sakip {
         padding-top: 20px;
     }
