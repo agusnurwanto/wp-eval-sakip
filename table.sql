@@ -1065,6 +1065,7 @@ CREATE TABLE `esakip_capaian_iku_pemda` (
 
 CREATE TABLE `esakip_croscutting` (
   `id` int(11) NOT NULL auto_increment,
+  `id_unik_tujuan` text DEFAULT NULL,
   `label` varchar(255) NOT NULL,
   `parent` int(11) DEFAULT 0,
   `label_id_skpd` int(11) DEFAULT NULL,

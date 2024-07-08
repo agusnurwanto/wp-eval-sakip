@@ -518,9 +518,9 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_submit_edit_cascading',  $plugin_public, 'submit_edit_cascading');
 		$this->loader->add_action('wp_ajax_view_cascading_pemda',  $plugin_public, 'view_cascading_pemda');
 
-		$this->loader->add_action('wp_ajax_get_table_crosscutting',  $plugin_public, 'get_table_crosscutting');
-		$this->loader->add_action('wp_ajax_edit_crosscutting_pemda_tujuan',  $plugin_public, 'edit_crosscutting_pemda');
-		$this->loader->add_action('wp_ajax_submit_edit_crosscutting',  $plugin_public, 'submit_edit_crosscutting');
+		$this->loader->add_action('wp_ajax_get_table_crosscutting_pemda',  $plugin_public, 'get_table_crosscutting_pemda');
+		$this->loader->add_action('wp_ajax_edit_crosscutting_pemda_tujuan',  $plugin_public, 'edit_crosscutting_pemda_tujuan');
+		$this->loader->add_action('wp_ajax_submit_edit_crosscutting_pemda',  $plugin_public, 'submit_edit_crosscutting_pemda');
 
 		$this->loader->add_action('wp_ajax_get_table_capaian_indikator',  $plugin_public, 'get_table_capaian_indikator');
 		

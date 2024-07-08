@@ -495,7 +495,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					if (!empty($data_croscutting)) {
 						$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 						foreach ($data_croscutting as $k_cross => $v_cross) {
-							if($v_cross['is_lembaga_lainnya'] == 1){
+							if ($v_cross['is_lembaga_lainnya'] == 1) {
 								$data_perangkat = $wpdb->get_row(
 									$wpdb->prepare("
 										SELECT 
@@ -511,7 +511,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									", $v_cross['id_skpd_croscutting'], $tahun_anggaran_sakip),
 									ARRAY_A
 								);
-							}else{
+							} else {
 								$data_perangkat = $wpdb->get_row(
 									$wpdb->prepare("
 										SELECT 
@@ -1153,7 +1153,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		die(json_encode($ret));
 	}
 
-	public function get_table_crosscutting()
+	public function get_table_crosscutting_pemda()
 	{
 		global $wpdb;
 		$ret = array(
@@ -1185,7 +1185,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
                     	* 
                     FROM esakip_rpd_tujuan
                     WHERE id_unik_indikator IS NULL
-                     	AND active = 1
+                      AND active = 1
                 ", ARRAY_A);
 
 				if (!empty($get_tujuan)) {
@@ -1207,7 +1207,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-warning" onclick="editCrosscuttingPemda(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit"><span class="dashicons dashicons-edit"></span></button>';
-						$btn .= '<button class="btn btn-sm btn-secondary" onclick="toDetailUrl(\'' . $detail_crosscutting_pemda['url'] . '\'); return false;" href="#" title="Detail Crosscutting"><span class="dashicons dashicons-controls-forward"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-secondary" onclick="toDetailUrl(\'' . $detail_crosscutting_pemda['url'] . '&id_tujuan=' . $vv['id_unik'] . '\'); return false;" href="#" title="Detail Crosscutting"><span class="dashicons dashicons-controls-forward"></span></button>';
 						$btn .= '</div>';
 
 						$tbody .= "<td class='text-center'>" . $btn . "</td>";
@@ -1276,7 +1276,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		die(json_encode($ret));
 	}
 
-	public function submit_edit_crosscutting()
+	public function submit_edit_crosscutting_pemda()
 	{
 		global $wpdb;
 		$ret = array(
@@ -1814,12 +1814,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					if (!empty($_POST['tipe_pokin'])) {
 						if (!empty($_POST['id_skpd'])) {
 							if (!empty($input['keteranganCroscutting'])) {
-								if(!empty($input['skpdCroscutting']) || !empty($input['lembagaLainnyaCroscutting'])){
+								if (!empty($input['skpdCroscutting']) || !empty($input['lembagaLainnyaCroscutting'])) {
 									$id_skpd_croscutting = $input['skpdCroscutting'];
 									$id_lembaga_lainnya = $input['lembagaLainnyaCroscutting'];
 									$keterangan_croscutting = $input['keteranganCroscutting'];
-								}else{
-									throw new Exception("Input Croscutting wajib diisi!", 1);	
+								} else {
+									throw new Exception("Input Croscutting wajib diisi!", 1);
 								}
 							} else {
 								throw new Exception("Input Croscutting wajib diisi!", 1);
@@ -1836,7 +1836,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					$parent_pokin_id = $input['parentCroscutting'];
 
 					// input skpd
-					if(!empty($id_skpd_croscutting)){
+					if (!empty($id_skpd_croscutting)) {
 						foreach ($id_skpd_croscutting as $k_skpd => $v_skpd) {
 							$data_cek_croscutting = $wpdb->get_row(
 								$wpdb->prepare("
@@ -1848,7 +1848,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							", $parent_pokin_id, $v_skpd, $keterangan_croscutting),
 								ARRAY_A
 							);
-	
+
 							if (empty($data_cek_croscutting)) {
 								$insert_crocutting = $wpdb->insert('esakip_croscutting_opd', [
 									'parent_pohon_kinerja' => $parent_pokin_id,
@@ -1866,7 +1866,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					}
 
 					// input lembaga vertikal
-					if(!empty($id_lembaga_lainnya)){
+					if (!empty($id_lembaga_lainnya)) {
 						foreach ($id_lembaga_lainnya as $k_lainnya => $v_lainnya) {
 							$data_cek_croscutting_lainnya = $wpdb->get_row(
 								$wpdb->prepare("
@@ -1879,7 +1879,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							", $parent_pokin_id, $v_lainnya, $keterangan_croscutting),
 								ARRAY_A
 							);
-	
+
 							if (empty($data_cek_croscutting_lainnya)) {
 								$insert_crocutting = $wpdb->insert('esakip_croscutting_opd', [
 									'parent_pohon_kinerja' => $parent_pokin_id,
@@ -1985,12 +1985,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					if (!empty($_POST['tipe_pokin'])) {
 						if (!empty($_POST['id_skpd'])) {
 							if (!empty($input['keteranganCroscutting'])) {
-								if(!empty($input['skpdCroscutting']) || !empty($input['lembagaLainnyaCroscutting'])){
+								if (!empty($input['skpdCroscutting']) || !empty($input['lembagaLainnyaCroscutting'])) {
 									$id_skpd_croscutting = $input['skpdCroscutting'];
 									$id_lembaga_lainnya = $input['lembagaLainnyaCroscutting'];
 									$keterangan_croscutting = $input['keteranganCroscutting'];
-								}else{
-									throw new Exception("Input Croscutting wajib diisi!", 1);	
+								} else {
+									throw new Exception("Input Croscutting wajib diisi!", 1);
 								}
 							} else {
 								throw new Exception("Input Croscutting wajib diisi!", 1);
@@ -2005,7 +2005,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					}
 
 					// update skpd
-					if(!empty($id_skpd_croscutting)){
+					if (!empty($id_skpd_croscutting)) {
 						$data_cek_croscutting = $wpdb->get_row(
 							$wpdb->prepare("
 							SELECT *
@@ -2044,7 +2044,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					}
 
 					// update lembaga vertikal
-					if(!empty($id_lembaga_lainnya)){
+					if (!empty($id_lembaga_lainnya)) {
 						$data_cek_croscutting = $wpdb->get_row(
 							$wpdb->prepare("
 							SELECT *
@@ -2233,7 +2233,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 					foreach ($data_croscutting_level as $key_croscutting_level => $croscutting_level) {
 						$nama_perangkat = '';
-						if($croscutting_level['is_lembaga_lainnya'] == 1){
+						if ($croscutting_level['is_lembaga_lainnya'] == 1) {
 							$nama_lembaga = $wpdb->get_row(
 								$wpdb->prepare("
 									SELECT 
@@ -2250,7 +2250,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								ARRAY_A
 							);
 							$nama_perangkat = $nama_lembaga['nama_lembaga'];
-						}else{
+						} else {
 							$nama_skpd = $wpdb->get_row(
 								$wpdb->prepare("
 									SELECT 
@@ -2328,9 +2328,10 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 				  AND level=%d 
 				  AND active=1 
 				  AND id_jadwal=%d 
+				  AND id_unik_tujuan=%s
 				  $where_skpd
 				ORDER BY id
-			", $opsi['id'], $opsi['level'], $opsi['periode']), ARRAY_A);
+			", $opsi['id'], $opsi['level'], $opsi['periode'], $opsi['id_tujuan']), ARRAY_A);
 		} else {
 			$crosscutting = $wpdb->get_results($wpdb->prepare("
 				SELECT 
@@ -2340,9 +2341,10 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 				  AND level=%d 
 				  AND active=1 
 				  AND id_jadwal=%d
+				  AND id_unik_tujuan=%s
 				  $where_skpd
 				ORDER BY id
-			", $opsi['id'], $opsi['level'], $opsi['periode']), ARRAY_A);
+			", $opsi['id'], $opsi['level'], $opsi['periode'], $opsi['id_tujuan']), ARRAY_A);
 		}
 		if (!empty($crosscutting)) {
 			foreach ($crosscutting as $level) {
@@ -2364,9 +2366,10 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					  AND level=%d 
 					  AND active=1 
 					  AND id_jadwal=%d
+					  AND id_unik_tujuan=%s
 					  $where_skpd
 					ORDER BY id
-				", $level['id'], $level['level'], $opsi['periode']), ARRAY_A);
+				", $level['id'], $level['level'], $opsi['periode'], $opsi['id_tujuan']), ARRAY_A);
 				if (!empty($indikator_crosscutting_level)) {
 					foreach ($indikator_crosscutting_level as $indikator_level) {
 						if (!empty($indikator_level['label_id_skpd'])) {
@@ -2375,6 +2378,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									'id' => $indikator_level['id'],
 									'parent' => $indikator_level['parent'],
 									'label_id_skpd' => $indikator_level['label_id_skpd'],
+									'label_nama_skpd' => $indikator_level['label'],
 									'level' => $indikator_level['level']
 								];
 							}
@@ -2393,7 +2397,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 				) {
 					$opsi['id'] = $level['id'];
 					$opsi['level'] = $level['level'] + 1;
-					$data_ret[trim($level['label'])]['data'] = $this->get_crosscutting($opsi);
+					$data_ret[trim($level['label'])]['data'] = $this->get_crosscutting_pemda($opsi);
 				}
 			}
 		}
@@ -2559,17 +2563,20 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								a.parent,
 								a.active,
 								b.id AS id_indikator,
-								b.label_id_skpd
+								b.label_id_skpd,
+								b.label as nama_skpd
 							FROM esakip_croscutting a
 								LEFT JOIN esakip_croscutting b 
 									ON a.id=b.parent AND a.level=b.level 
 							WHERE 
 								a.id_jadwal=%d AND 
+								a.id_unik_tujuan=%s AND 
 								a.parent=%d AND 
 								a.level=%d AND 
 								a.active=%d 
 							ORDER BY a.id",
 							$_POST['id_jadwal'],
+							$_POST['id_tujuan'],
 							$_POST['parent'],
 							$_POST['level'],
 							1
@@ -2589,12 +2596,14 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									ON a.id=b.parent AND a.level=b.level 
 							WHERE 
 								a.id_jadwal=%d AND 
+								a.id_unik_tujuan=%s AND 
 								a.parent=%d AND 
 								a.level=%d AND 
 								a.active=%d AND 
 								a.id_skpd=%d
 							ORDER BY a.id",
 							$_POST['id_jadwal'],
+							$_POST['id_tujuan'],
 							$_POST['parent'],
 							$_POST['level'],
 							1,
@@ -2612,10 +2621,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									FROM esakip_croscutting a 
 									WHERE 
 										a.id_jadwal=%d AND 
+										a.id_unik_tujuan=%s AND 
 										a.id=%d AND
 										a.active=%d
 									ORDER BY a.id",
 								$_POST['id_jadwal'],
+								$_POST['id_tujuan'],
 								$_POST['parent'],
 								1
 							), ARRAY_A);
@@ -2629,11 +2640,13 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									FROM esakip_croscutting_opd a 
 									WHERE 
 										a.id_jadwal=%d AND 
+										a.id_unik_tujuan=%s AND 
 										a.id=%d AND
 										a.active=%d AND 
 										a.id_skpd=%d
 									ORDER BY a.id",
 								$_POST['id_jadwal'],
+								$_POST['id_tujuan'],
 								$_POST['parent'],
 								1,
 								$id_skpd
@@ -2660,7 +2673,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							if (empty($data['data'][$crosscutting['id']]['indikator'][$crosscutting['id_indikator']])) {
 								$data['data'][$crosscutting['id']]['indikator'][$crosscutting['id_indikator']] = [
 									'id' => $crosscutting['id_indikator'],
-									'label' => $crosscutting['label_id_skpd']
+									'label' => $crosscutting['label_id_skpd'],
+									'label_nama' => $crosscutting['nama_skpd']
 								];
 							}
 						}
@@ -2747,6 +2761,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							'parent' => $input['parent'],
 							'level' => $input['level'],
 							'id_jadwal' => $input['id_jadwal'],
+							'id_unik_tujuan' => $input['id_tujuan'],
 							'active' => 1
 						]);
 					} else {
@@ -2756,6 +2771,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							'parent' => $input['parent'],
 							'level' => $input['level'],
 							'id_jadwal' => $input['id_jadwal'],
+							'id_unik_tujuan' => $input['id_tujuan'],
 							'active' => 1,
 							'id_skpd' => $id_skpd
 						]);
@@ -2926,10 +2942,10 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							id 
 						FROM esakip_croscutting$_prefix_opd 
 						WHERE label=%s 
-							AND id!=%d 
-							AND parent=%d 
-							AND level=%d 
-							AND active=%d$_where_opd
+						  AND id!=%d 
+						  AND parent=%d 
+						  AND level=%d 
+						  AND active=%d$_where_opd
 						", trim($input['label']), $input['id'], $input['parent'], $input['level'], 1),  ARRAY_A);
 
 					if (!empty($id)) {
@@ -2944,12 +2960,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							'id' => $input['id']
 						]);
 
-						$child = $wpdb->query($wpdb->prepare("
-							UPDATE esakip_croscutting 
-							SET label=%s 
-							WHERE parent=%d 
-								AND label_id_skpd IS NOT NULL
-						", trim($input['label']), $input['id']));
+						// $child = $wpdb->query($wpdb->prepare("
+						// 	UPDATE esakip_croscutting 
+						// 	SET label=%s 
+						// 	WHERE parent=%d 
+						// 	  AND label_id_skpd IS NOT NULL
+						// ", trim($input['label']), $input['id']));
 					} else {
 						// untuk crosscutting opd  //////////////////////////////////////////////////////////////////////////////
 						$data = $wpdb->update('esakip_croscutting' . $_prefix_opd, [
@@ -2959,13 +2975,13 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							'id_skpd' => $id_skpd
 						]);
 
-						$child = $wpdb->query($wpdb->prepare("
-							UPDATE esakip_croscutting$_prefix_opd 
-							SET label=%s 
-							WHERE parent=%d 
-								AND label_id_skpd IS NOT NULL
-								AND id_skpd=%d
-						", trim($input['label']), $input['id'], $id_skpd));
+						// $child = $wpdb->query($wpdb->prepare("
+						// 	UPDATE esakip_croscutting$_prefix_opd 
+						// 	SET label=%s 
+						// 	WHERE parent=%d 
+						// 		AND label_id_skpd IS NOT NULL
+						// 		AND id_skpd=%d
+						// ", trim($input['label']), $input['id'], $id_skpd));
 					}
 
 					echo json_encode([
@@ -3090,29 +3106,44 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							id 
 						FROM esakip_croscutting$_prefix_opd 
 						WHERE label_id_skpd=%d 
-							AND parent=%d 
-							AND level=%d 
-							AND active=%d$_where_opd
+						  AND parent=%d 
+						  AND level=%d 
+						  AND active=%d$_where_opd
 					", trim($input['skpd-label']), $input['parent'], $input['level'], 1),  ARRAY_A);
 
 					if (!empty($id)) {
 						throw new Exception("Data sudah ada!", 1);
 					}
+					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
+					$nama_skpd = $wpdb->get_var($wpdb->prepare("
+						SELECT
+							nama_skpd
+						FROM esakip_data_unit
+						WHERE active = 1
+						  AND is_skpd = 1
+						  AND id_skpd = %d
+						  AND tahun_anggaran = %d
+					", $input['skpd-label'], $tahun_anggaran_sakip));
 
 					if ($_prefix_opd == '') {
 						$data = $wpdb->insert('esakip_croscutting', [
 							'label_id_skpd' => trim($input['skpd-label']),
+							'label' => $nama_skpd,
 							'parent' => $input['parent'],
 							'level' => $input['level'],
 							'id_jadwal' => $input['id_jadwal'],
+							'id_unik_tujuan' => $input['id_tujuan'],
 							'active' => 1
 						]);
 					} else {
 						$data = $wpdb->insert('esakip_croscutting' . $_prefix_opd, [
 							'label_id_skpd' => trim($input['skpd-label']),
+							'label' => $nama_skpd,
 							'parent' => $input['parent'],
 							'level' => $input['level'],
 							'id_jadwal' => $input['id_jadwal'],
+							'id_unik_tujuan' => $input['id_tujuan'],
 							'active' => 1,
 							'id_skpd' => $id_skpd
 						]);
@@ -3120,7 +3151,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					echo json_encode([
 						'status' => true,
-						'message' => 'Sukses simpan indikator!'
+						'message' => 'Sukses simpan Perangkat Daerah!'
 					]);
 					exit();
 				} else {
@@ -3233,10 +3264,22 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					if (!empty($id)) {
 						throw new Exception("Data sudah ada!", 1);
 					}
+					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
+					$nama_skpd = $wpdb->get_var($wpdb->prepare("
+						SELECT
+							nama_skpd
+						FROM esakip_data_unit
+						WHERE active = 1
+						  AND is_skpd = 1
+						  AND id_skpd = %d
+						  AND tahun_anggaran = %d
+					", $input['skpd-label'], $tahun_anggaran_sakip));
 
 					if ($_prefix_opd == '') {
 						// untuk pemda
 						$data = $wpdb->update('esakip_croscutting', [
+							'label' => $nama_skpd,
 							'label_id_skpd' => trim($input['skpd-label']),
 						], [
 							'id' => $input['id'],
@@ -3245,6 +3288,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						]);
 					} else {
 						$data = $wpdb->update('esakip_croscutting' . $_prefix_opd, [
+							'label' => $nama_skpd,
 							'label_id_skpd' => trim($input['skpd-label']),
 						], [
 							'id' => $input['id'],
@@ -3256,7 +3300,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					echo json_encode([
 						'status' => true,
-						'message' => 'Sukses ubah indikator!'
+						'message' => 'Sukses ubah Perangkat Daerah!'
 					]);
 					exit();
 				} else {
@@ -3307,7 +3351,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					echo json_encode([
 						'status' => true,
-						'message' => 'Sukses hapus indikator!'
+						'message' => 'Sukses hapus Perangkat Daerah!'
 					]);
 					exit();
 				} else {

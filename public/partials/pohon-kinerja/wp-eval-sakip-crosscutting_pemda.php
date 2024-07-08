@@ -21,6 +21,7 @@ $periode = $wpdb->get_row(
 ", $input['periode']),
     ARRAY_A
 );
+
 if (!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggaran'] > 1) {
     $tahun_periode = $periode['tahun_selesai_anggaran'];
 } else {
@@ -122,41 +123,13 @@ if (!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggar
 
     });
 
-    function getDataChart() {
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: 'POST',
-            data: {
-                action: 'get_chart_crosscutting',
-                api_key: esakip.api_key,
-                id_jadwal: <?php echo $input['periode']; ?>,
-            },
-            dataType: 'json',
-            success: function(response) {
-                jQuery('#wrap-loading').hide();
-                console.log(response);
-                if (response.status === 'success') {
-                    jQuery('#table_dokumen_crosscutting tbody').html(response.data);
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                jQuery('#wrap-loading').hide();
-                console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data!');
-            }
-        });
-    }
-
     function getTableCrosscutting() {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'get_table_crosscutting',
+                action: 'get_table_crosscutting_pemda',
                 api_key: esakip.api_key,
                 id_jadwal: <?php echo $input['periode']; ?>,
             },
@@ -231,7 +204,7 @@ if (!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggar
         }
 
         let form_data = new FormData();
-        form_data.append('action', 'submit_edit_crosscutting');
+        form_data.append('action', 'submit_edit_crosscutting_pemda');
         form_data.append('api_key', esakip.api_key);
         form_data.append('id', id);
         form_data.append('nama_crosscutting', nama_crosscutting);

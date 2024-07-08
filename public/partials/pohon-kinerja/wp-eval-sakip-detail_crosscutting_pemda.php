@@ -17,6 +17,22 @@ $data_all = [
     'data' => array()
 ];
 
+if (!empty($_GET) && !empty($_GET['id_tujuan'])) {
+    $id_tujuan = $_GET['id_tujuan'];
+} else {
+    die("ID Tujuan Kosong !");
+}
+
+$nama_crosscutting = $wpdb->get_var(
+    $wpdb->prepare("
+        SELECT 
+            nama_crosscutting
+        FROM esakip_rpd_tujuan
+        WHERE id_unik=%s
+          AND active = 1
+", $id_tujuan)
+);
+
 $option_opd = '<option value="" selected disabled>Pilih Perangkat Daerah</option>';
 
 $all_skpd = $wpdb->get_results(
@@ -65,11 +81,12 @@ $crosscutting_level_1 = $wpdb->get_results($wpdb->prepare("
 		* 
 	FROM esakip_croscutting 
 	WHERE parent=0 
-		AND level=1 
-		AND active=1 
-		AND id_jadwal=%d 
+	  AND level=1 
+	  AND active=1 
+	  AND id_jadwal=%d 
+	  AND id_unik_tujuan=%s 
 	ORDER BY id
-", $input['periode']), ARRAY_A);
+", $input['periode'], $id_tujuan), ARRAY_A);
 if (!empty($crosscutting_level_1)) {
     foreach ($crosscutting_level_1 as $level_1) {
         if (empty($data_all['data'][trim($level_1['label'])])) {
@@ -88,11 +105,12 @@ if (!empty($crosscutting_level_1)) {
 				* 
 			FROM esakip_croscutting 
 			WHERE parent=%d 
-				AND level=1 
-				AND active=1 
-				AND id_jadwal=%d 
+			  AND level=1 
+			  AND active=1 
+			  AND id_jadwal=%d 
+			  AND id_unik_tujuan=%s 
 			ORDER BY id
-		", $level_1['id'], $input['periode']), ARRAY_A);
+		", $level_1['id'], $input['periode'], $id_tujuan), ARRAY_A);
         if (!empty($indikator_crosscutting_level_1)) {
             foreach ($indikator_crosscutting_level_1 as $indikator_level_1) {
                 if (!empty($indikator_level_1['label_id_skpd'])) {
@@ -114,11 +132,12 @@ if (!empty($crosscutting_level_1)) {
 				* 
 			FROM esakip_croscutting 
 			WHERE parent=%d 
-				AND level=2
-				AND active=1 
-				AND id_jadwal=%d 
+			  AND level=2
+			  AND active=1 
+			  AND id_jadwal=%d 
+			  AND id_unik_tujuan=%s
 			ORDER by id
-		", $level_1['id'], $input['periode']), ARRAY_A);
+		", $level_1['id'], $input['periode'], $id_tujuan), ARRAY_A);
         if (!empty($crosscutting_level_2)) {
             foreach ($crosscutting_level_2 as $level_2) {
                 if (empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])])) {
@@ -137,11 +156,12 @@ if (!empty($crosscutting_level_1)) {
 						* 
 					FROM esakip_croscutting 
 					WHERE parent=%d 
-						AND level=2 
-						AND active=1 
-						AND id_jadwal=%d 
+					  AND level=2 
+					  AND active=1 
+					  AND id_jadwal=%d 
+					  AND id_unik_tujuan=%s
 					ORDER BY id
-				", $level_2['id'], $input['periode']), ARRAY_A);
+				", $level_2['id'], $input['periode'],$id_tujuan), ARRAY_A);
                 if (!empty($indikator_crosscutting_level_2)) {
                     foreach ($indikator_crosscutting_level_2 as $indikator_level_2) {
                         if (!empty($indikator_level_2['label_id_skpd'])) {
@@ -150,6 +170,7 @@ if (!empty($crosscutting_level_1)) {
                                     'id' => $indikator_level_2['id'],
                                     'parent' => $indikator_level_2['parent'],
                                     'label_id_skpd' => $indikator_level_2['label_id_skpd'],
+                                    'label_nama_skpd' => $indikator_level_2['label'],
                                     'level' => $indikator_level_2['level']
                                 ];
                             }
@@ -163,11 +184,12 @@ if (!empty($crosscutting_level_1)) {
 						* 
 					FROM esakip_croscutting 
 					WHERE parent=%d 
-						AND level=3 
-						AND active=1 
-						AND id_jadwal=%d 
+					  AND level=3 
+					  AND active=1 
+					  AND id_jadwal=%d 
+					  AND id_unik_tujuan=%s 
 					ORDER by id
-				", $level_2['id'], $input['periode']), ARRAY_A);
+				", $level_2['id'], $input['periode'], $id_tujuan), ARRAY_A);
                 if (!empty($crosscutting_level_3)) {
                     foreach ($crosscutting_level_3 as $level_3) {
                         if (empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])])) {
@@ -186,11 +208,12 @@ if (!empty($crosscutting_level_1)) {
 								* 
 							FROM esakip_croscutting 
 							WHERE parent=%d 
-								AND level=3 
-								AND active=1 
-								AND id_jadwal=%d
+							  AND level=3 
+							  AND active=1 
+							  AND id_jadwal=%d
+							  AND id_unik_tujuan=%s
 							ORDER BY id
-						", $level_3['id'], $input['periode']), ARRAY_A);
+						", $level_3['id'], $input['periode'], $id_tujuan), ARRAY_A);
                         if (!empty($indikator_crosscutting_level_3)) {
                             foreach ($indikator_crosscutting_level_3 as $indikator_level_3) {
                                 if (!empty($indikator_level_3['label_id_skpd'])) {
@@ -199,6 +222,7 @@ if (!empty($crosscutting_level_1)) {
                                             'id' => $indikator_level_3['id'],
                                             'parent' => $indikator_level_3['parent'],
                                             'label_id_skpd' => $indikator_level_3['label_id_skpd'],
+                                            'label_nama_skpd' => $indikator_level_3['label'],
                                             'level' => $indikator_level_3['level']
                                         ];
                                     }
@@ -224,7 +248,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
     $indikator = array();
     $html .= '
 	<tr>
-		<td class="level1"><a href="' . $view_crosscutting['url'] . '&id=' . $level_1['id'] . '&id_jadwal=' . $input['periode'] . '" target="_blank">' . $level_1['label'] . '</a></td>
+		<td class="level1"><a href="' . $view_crosscutting['url'] . '&id=' . $level_1['id'] . '&id_jadwal=' . $input['periode'] . '&id_tujuan=' . $id_tujuan . '" target="_blank">' . $level_1['label'] . '</a></td>
 		<td></td>
 		<td></td>
 		<td></td>
@@ -233,20 +257,20 @@ foreach ($data_all['data'] as $key1 => $level_1) {
     foreach (array_values($level_1['data']) as $key2 => $level_2) {
         $indikator = array();
         foreach ($level_2['indikator'] as $indikatorlevel2) {
-            $indikator[] = $indikatorlevel2['label_id_skpd'];
+            $indikator[] = $indikatorlevel2['label_nama_skpd'];
         }
         $html .= '
 		<tr>
 			<td></td>
 			<td class="level2">' . $level_2['label'] . '</td>
-			<td class="indikator">' . implode("</br>", $indikator) . '</td>
+			<td class="indikator">' . implode("<hr>", $indikator) . '</td>
 			<td></td>
 			<td></td>
 		</tr>';
         foreach (array_values($level_2['data']) as $key3 => $level_3) {
             $indikator = array();
             foreach ($level_3['indikator'] as $indikatorlevel3) {
-                $indikator[] = $indikatorlevel3['label_id_skpd'];
+                $indikator[] = $indikatorlevel3['label_nama_skpd'];
             }
             $html .= '
 			<tr>
@@ -254,22 +278,8 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 				<td></td>
 				<td></td>
 				<td class="level3">' . $level_3['label'] . '</td>
-				<td class="indikator">' . implode("</br>", $indikator) . '</td>
+				<td class="indikator">' . implode("<hr>", $indikator) . '</td>
 			</tr>';
-            foreach (array_values($level_3['data']) as $key4 => $level_4) {
-                $indikator = array();
-                foreach ($level_4['indikator'] as $indikatorlevel4) {
-                    $indikator[] = $indikatorlevel4['label_id_skpd'];
-                }
-                $html .= '
-				<tr>
-					<td></td>
-					<td></td>
-					<td></td>
-					<td></td>
-					<td></td>
-				</tr>';
-            }
         }
     }
 }
@@ -320,7 +330,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         background-color: transparent;
     }
 </style>
-<h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Crosscutting<br><?php echo $nama_pemda; ?><br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h3><br>
+<h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Crosscutting<br><?php echo $nama_pemda; ?><br><?php echo $nama_crosscutting; ?><br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h3><br>
 <?php if (!$is_admin_panrb) : ?>
     <div id="action" style="text-align: center; margin-top:30px; margin-bottom: 30px;">
         <a style="margin-left: 10px;" id="tambah-crosscutting" onclick="return false;" href="#" class="btn btn-success">Tambah Data</a>
@@ -330,11 +340,11 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     <table>
         <thead>
             <tr>
-                <th>Level 1</th>
-                <th>Level 2</th>
-                <th>Perangkat Daerah</th>
-                <th>Level 3</th>
-                <th>Perangkat Daerah</th>
+                <th width="20%">Level 1</th>
+                <th width="20%">Level 2</th>
+                <th width="20%">Perangkat Daerah</th>
+                <th width="20%">Level 3</th>
+                <th width="20%">Perangkat Daerah</th>
             </tr>
         </thead>
         <tbody>
@@ -393,7 +403,6 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 </div>
 <script type="text/javascript">
     jQuery(document).ready(function() {
-
 
         jQuery("#tambah-crosscutting").on('click', function() {
             crosscuttingLevel1().then(function() {
@@ -905,6 +914,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             let view = jQuery(this).data('view');
             let form = getFormData(jQuery("#form-crosscutting"));
             form['id_jadwal'] = '<?php echo $input['periode']; ?>';
+            form['id_tujuan'] = '<?php echo $id_tujuan; ?>';
 
             jQuery.ajax({
                 method: 'POST',
@@ -938,6 +948,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                     "level": 1,
                     "parent": 0,
                     "id_jadwal": '<?php echo $input['periode']; ?>',
+                    "id_tujuan": '<?php echo $id_tujuan; ?>',
                     "api_key": esakip.api_key
                 },
                 dataType: "json",
@@ -1007,6 +1018,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                     "level": 2,
                     "parent": parent,
                     "id_jadwal": '<?php echo $input['periode']; ?>',
+                    "id_tujuan": '<?php echo $id_tujuan; ?>',
                     "api_key": esakip.api_key
                 },
                 dataType: "json",
@@ -1057,7 +1069,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                                 level2 += `` +
                                     `<tr>` +
                                     `<td><span style="display:none">${index+1}</span></td>` +
-                                    `<td>${index+1}.${indikator_index+1} ${indikator_value.label}</td>` +
+                                    `<td>${index+1}.${indikator_index+1} ${indikator_value.label_nama}</td>` +
                                     `<td class="text-center">` +
                                     `<a href="javascript:void(0)" data-id="${indikator_value.id}" class="btn btn-sm btn-primary edit-skpd-crosscutting-level2" title="Edit"><i class="dashicons dashicons-edit"></i></a> ` +
                                     `<a href="javascript:void(0)" data-id="${indikator_value.id}" data-parent="${value.parent}" class="btn btn-sm btn-danger hapus-skpd-crosscutting-level2" title="Hapus"><i class="dashicons dashicons-trash"></i></a>` +
@@ -1090,6 +1102,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                     "level": 3,
                     "parent": parent,
                     "id_jadwal": '<?php echo $input['periode']; ?>',
+                    "id_tujuan": '<?php echo $id_tujuan; ?>',
                     "api_key": esakip.api_key
                 },
                 dataType: "json",
@@ -1139,7 +1152,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                                 level3 += `` +
                                     `<tr>` +
                                     `<td><span style="display:none">${index+1}</span></td>` +
-                                    `<td>${index+1}.${indikator_index+1} ${indikator_value.label}</td>` +
+                                    `<td>${index+1}.${indikator_index+1} ${indikator_value.label_nama}</td>` +
                                     `<td class="text-center">` +
                                     `<a href="javascript:void(0)" data-id="${indikator_value.id}" class="btn btn-sm btn-primary edit-skpd-crosscutting-level3" title="Edit"><i class="dashicons dashicons-edit"></i></a> ` +
                                     `<a href="javascript:void(0)" data-id="${indikator_value.id}" data-parent="${value.parent}" class="btn btn-sm btn-danger hapus-skpd-crosscutting-level3" title="Hapus"><i class="dashicons dashicons-trash"></i></a>` +
