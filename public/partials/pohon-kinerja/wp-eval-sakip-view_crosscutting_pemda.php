@@ -126,6 +126,55 @@ if (!empty($data_all['data'])) {
 
                         $data_temp[$keylevel3][1] = $level_2['label'];
                         $data_temp[$keylevel3][2] = '';
+
+                        if(!empty($level_3['data'])){
+
+		            		foreach ($level_3['data'] as $keylevel4 => $level_4) {
+			            		$data_temp[$keylevel4][0] = (object)[
+					              'v' => $level_4['label'],
+					              'f' => "<div class=\"".$style0." label4\">".trim($level_4['label'])."</div>",
+					            ];
+
+					            if(!empty($level_4['indikator'])){
+				            		foreach ($level_4['indikator'] as $keyindikatorlevel4 => $indikator) {
+						                $data_temp[$keylevel4][0]->f.="<div ".$style4.">OPD: ".$indikator['label_nama_skpd']."</div>";
+						            }
+					            }
+
+								// croscutting level 4
+								if(!empty($level_4['croscutting'])){
+									$data_temp[$keylevel4][0]->f.="<div class='croscutting-2 tampil_croscutting'>CROSSCUTTING</div>";
+				            		foreach ($level_4['croscutting'] as $keyCross => $valCross) {
+										$nama_skpd_all = array();
+										foreach ($valCross['data'] as $k_cross_4 => $v_cross_4) {
+											$nama_skpd_all[] = $v_cross_4['nama_skpd'];
+										}
+						                $data_temp[$keylevel4][0]->f.="<div class='croscutting tampil_croscutting'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode("<br>",$nama_skpd_all) ."</div></div>";
+						            }
+					            }
+
+					            $data_temp[$keylevel4][1] = $level_3['label'];
+					            $data_temp[$keylevel4][2] = '';
+
+					            if(!empty($level_4['data'])){
+
+									foreach ($level_4['data'] as $keylevel5 => $level_5) {
+										$data_temp[$keylevel5][0] = (object)[
+										  'v' => $level_5['label'],
+										  'f' => "<div class=\"".$style0." label5\">".trim($level_5['label'])."</div>",
+										];
+		
+										if(!empty($level_5['indikator'])){
+											foreach ($level_5['indikator'] as $keyindikatorlevel5 => $indikator) {
+												$data_temp[$keylevel5][0]->f.="<div ".$style5.">OPD: ".$indikator['label_nama_skpd']."</div>";
+											}
+										}
+
+										$data_temp[$keylevel5][1] = $level_4['label'];
+									}
+								}
+					        }
+			            }
                     }
                 }
 
@@ -214,6 +263,19 @@ if (!empty($data_all['data'])) {
     }
 
     .level3 {
+        color: #0d0909;
+        font-size: 11px;
+        font-weight: 600;
+        font-style: italic;
+        padding: 10px;
+        min-height: 40px;
+    }
+    .label4 {
+        background: #57b2ec;
+        border-radius: 5px 5px 0 0;
+    }
+
+    .level4 {
         color: #0d0909;
         font-size: 11px;
         font-weight: 600;
