@@ -34,6 +34,7 @@ $nama_crosscutting = $wpdb->get_var(
 );
 
 $option_opd = '<option value="" selected disabled>Pilih Perangkat Daerah</option>';
+$option_opd .= '<option value="0">Seluruh Perangkat Daerah</option>';
 
 $all_skpd = $wpdb->get_results(
     $wpdb->prepare("
@@ -43,7 +44,6 @@ $all_skpd = $wpdb->get_results(
         FROM esakip_data_unit 
         WHERE active=1 
           AND tahun_anggaran=%d
-          AND is_skpd=1 
         ORDER BY kode_skpd ASC
     ", $tahun_anggaran_sakip),
     ARRAY_A
