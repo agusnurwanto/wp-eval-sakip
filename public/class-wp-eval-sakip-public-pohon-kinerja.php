@@ -1097,7 +1097,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
                     	* 
                     FROM esakip_rpd_tujuan
                     WHERE id_unik_indikator IS NULL
-                     	AND active = 1
+                      AND active = 1
                 ", ARRAY_A);
 
 				if (!empty($get_tujuan)) {

@@ -161,7 +161,7 @@ if (!empty($crosscutting_level_1)) {
 					  AND id_jadwal=%d 
 					  AND id_unik_tujuan=%s
 					ORDER BY id
-				", $level_2['id'], $input['periode'],$id_tujuan), ARRAY_A);
+				", $level_2['id'], $input['periode'], $id_tujuan), ARRAY_A);
                 if (!empty($indikator_crosscutting_level_2)) {
                     foreach ($indikator_crosscutting_level_2 as $indikator_level_2) {
                         if (!empty($indikator_level_2['label_id_skpd'])) {
@@ -229,6 +229,58 @@ if (!empty($crosscutting_level_1)) {
                                 }
                             }
                         }
+                        // crosscutting level 4
+                        $crosscutting_level_4 = $wpdb->get_results($wpdb->prepare("
+                            SELECT 
+                                * 
+                            FROM esakip_croscutting 
+                            WHERE parent=%d 
+                              AND level=4
+                              AND active=1 
+                              AND id_jadwal=%d
+                              AND id_unik_tujuan=%s
+                            ORDER by id
+                        ", $level_3['id'], $input['periode'], $id_tujuan), ARRAY_A);
+                        if (!empty($crosscutting_level_4)) {
+                            foreach ($crosscutting_level_4 as $level_4) {
+                                if (empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])])) {
+                                    $data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])] = [
+                                        'id' => $level_4['id'],
+                                        'label' => $level_4['label'],
+                                        'level' => $level_4['level'],
+                                        'indikator' => array()
+                                    ];
+                                }
+
+                                // indikator crosscutting level 4
+                                $indikator_crosscutting_level_4 = $wpdb->get_results($wpdb->prepare("
+                                    SELECT 
+                                        * 
+                                    FROM esakip_croscutting 
+                                    WHERE parent=%d 
+                                        AND level=4 
+                                        AND active=1 
+                                        AND id_jadwal=%d
+                                        AND id_unik_tujuan=%s
+                                    ORDER BY id
+                                ", $level_4['id'], $input['periode'], $id_tujuan), ARRAY_A);
+                                if (!empty($indikator_crosscutting_level_4)) {
+                                    foreach ($indikator_crosscutting_level_4 as $indikator_level_4) {
+                                        if (!empty($indikator_level_4['label_id_skpd'])) {
+                                            if (empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['indikator'][(trim($indikator_level_4['label_id_skpd']))])) {
+                                                $data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['indikator'][(trim($indikator_level_4['label_id_skpd']))] = [
+                                                    'id' => $indikator_level_4['id'],
+                                                    'parent' => $indikator_level_4['parent'],
+                                                    'label_id_skpd' => $indikator_level_4['label_id_skpd'],
+                                                    'label_nama_skpd' => $indikator_level_4['label'],
+                                                    'level' => $indikator_level_4['level']
+                                                ];
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -253,6 +305,8 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 		<td></td>
 		<td></td>
 		<td></td>
+        <td></td>
+		<td></td>
 	</tr>';
     foreach (array_values($level_1['data']) as $key2 => $level_2) {
         $indikator = array();
@@ -265,6 +319,8 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 			<td class="level2">' . $level_2['label'] . '</td>
 			<td class="indikator">' . implode("<hr>", $indikator) . '</td>
 			<td></td>
+			<td></td>
+            <td></td>
 			<td></td>
 		</tr>';
         foreach (array_values($level_2['data']) as $key3 => $level_3) {
@@ -279,7 +335,25 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 				<td></td>
 				<td class="level3">' . $level_3['label'] . '</td>
 				<td class="indikator">' . implode("<hr>", $indikator) . '</td>
+                <td></td>
+				<td></td>
 			</tr>';
+            foreach (array_values($level_3['data']) as $key4 => $level_4) {
+                $indikator = array();
+                foreach ($level_4['indikator'] as $indikatorlevel4) {
+                    $indikator[] = $indikatorlevel4['label_nama_skpd'];
+                }
+                $html .= '
+				<tr>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td class="level4">' . $level_4['label'] . '</td>
+					<td class="indikator">' . implode("</br>", $indikator) . '</td>
+				</tr>';
+            }
         }
     }
 }
@@ -340,11 +414,13 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     <table>
         <thead>
             <tr>
-                <th width="20%">Level 1</th>
-                <th width="20%">Level 2</th>
-                <th width="20%">Perangkat Daerah</th>
-                <th width="20%">Level 3</th>
-                <th width="20%">Perangkat Daerah</th>
+                <th width="10%">Level 1</th>
+                <th width="15%">Level 2</th>
+                <th width="15%">Perangkat Daerah</th>
+                <th width="15%">Level 3</th>
+                <th width="15%">Perangkat Daerah</th>
+                <th width="15%">Level 4</th>
+                <th width="15%">Perangkat Daerah</th>
             </tr>
         </thead>
         <tbody>
@@ -373,12 +449,14 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                         <a class="nav-item nav-link" id="nav-level-1-tab" data-toggle="tab" href="#nav-level-1" role="tab" aria-controls="nav-level-1" aria-selected="false">Level 1</a>
                         <a class="nav-item nav-link" id="nav-level-2-tab" data-toggle="tab" href="#nav-level-2" role="tab" aria-controls="nav-level-2" aria-selected="false">Level 2</a>
                         <a class="nav-item nav-link" id="nav-level-3-tab" data-toggle="tab" href="#nav-level-3" role="tab" aria-controls="nav-level-3" aria-selected="false">Level 3</a>
+                        <a class="nav-item nav-link" id="nav-level-4-tab" data-toggle="tab" href="#nav-level-4" role="tab" aria-controls="nav-level-4" aria-selected="false">Level 4</a>
                     </div>
                 </nav>
                 <div class="tab-content" id="nav-tabContent">
                     <div class="tab-pane fade show active" id="nav-level-1" role="tabpanel" aria-labelledby="nav-level-1-tab"></div>
                     <div class="tab-pane fade" id="nav-level-2" role="tabpanel" aria-labelledby="nav-level-2-tab"></div>
                     <div class="tab-pane fade" id="nav-level-3" role="tabpanel" aria-labelledby="nav-level-3-tab"></div>
+                    <div class="tab-pane fade" id="nav-level-4" role="tabpanel" aria-labelledby="nav-level-4-tab"></div>
                 </div>
             </div>
         </div>
@@ -907,6 +985,199 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             }
         });
 
+        jQuery(document).on('click', '.view-crosscutting-level4', function() {
+            crosscuttingLevel4({
+                'parent': jQuery(this).data('id')
+            }).then(function() {
+                jQuery("#crosscuttingLevel4").DataTable();
+            });
+        })
+
+        jQuery(document).on('click', '#tambah-crosscutting-level4', function() {
+            jQuery("#modal-crud").find('.modal-title').html('Tambah Crosscutting Pemerintah Daerah');
+            jQuery("#modal-crud").find('.modal-body').html(`` +
+                `<form id="form-crosscutting">` +
+                `<input type="hidden" name="parent" value="${jQuery(this).data('parent')}">` +
+                `<input type="hidden" name="level" value="4">` +
+                `<div class="form-group">` +
+                `<textarea class="form-control" name="label" placeholder="Tuliskan crosscutting level 4..."></textarea>` +
+                `</div>` +
+                `</form>`);
+            jQuery("#modal-crud").find('.modal-footer').html('' +
+                '<button type="button" class="btn btn-danger" data-dismiss="modal">' +
+                'Tutup' +
+                '</button>' +
+                '<button type="button" class="btn btn-success" id="simpan-data-crosscutting" data-action="create_crosscutting_pemda" data-view="crosscuttingLevel4">' +
+                'Simpan' +
+                '</button>');
+            jQuery("#modal-crud").find('.modal-dialog').css('maxWidth', '');
+            jQuery("#modal-crud").find('.modal-dialog').css('width', '');
+            jQuery("#modal-crud").modal('show');
+        })
+
+        jQuery(document).on('click', '.edit-crosscutting-level4', function() {
+            jQuery("#wrap-loading").show();
+            jQuery.ajax({
+                method: 'POST',
+                url: esakip.url,
+                data: {
+                    "action": "edit_crosscutting_pemda",
+                    "api_key": esakip.api_key,
+                    'id': jQuery(this).data('id')
+                },
+                dataType: 'json',
+                success: function(response) {
+                    jQuery("#wrap-loading").hide();
+                    jQuery("#modal-crud").find('.modal-title').html('Edit Crosscutting Pemerintah Daerah');
+                    jQuery("#modal-crud").find('.modal-body').html(`` +
+                        `<form id="form-crosscutting">` +
+                        `<input type="hidden" name="id" value="${response.data.id}">` +
+                        `<input type="hidden" name="parent" value="${response.data.parent}">` +
+                        `<input type="hidden" name="level" value="${response.data.level}">` +
+                        `<div class="form-group">` +
+                        `<textarea class="form-control" name="label">${response.data.label}</textarea>` +
+                        `</div>` +
+                        `</form>`);
+                    jQuery("#modal-crud").find(`.modal-footer`).html(`` +
+                        `<button type="button" class="btn btn-danger" data-dismiss="modal">` +
+                        `Tutup` +
+                        `</button>` +
+                        `<button type="button" class="btn btn-success" id="simpan-data-crosscutting" data-action="update_crosscutting_pemda" data-view="crosscuttingLevel4">` +
+                        `Update` +
+                        `</button>`);
+                    jQuery("#modal-crud").find('.modal-dialog').css('maxWidth', '');
+                    jQuery("#modal-crud").find('.modal-dialog').css('width', '');
+                    jQuery("#modal-crud").modal('show');
+                }
+            });
+        })
+
+        jQuery(document).on('click', '.hapus-crosscutting-level4', function() {
+            let parent = jQuery(this).data('parent');
+            if (confirm(`Data akan dihapus?`)) {
+                jQuery("#wrap-loading").show();
+                jQuery.ajax({
+                    method: 'POST',
+                    url: esakip.url,
+                    data: {
+                        'action': 'delete_crosscutting_pemda',
+                        'api_key': esakip.api_key,
+                        'id': jQuery(this).data('id'),
+                        'level': 3,
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        jQuery("#wrap-loading").hide();
+                        alert(response.message);
+                        if (response.status) {
+                            crosscuttingLevel4({
+                                'parent': parent
+                            }).then(function() {
+                                jQuery("#crosscuttingLevel4").DataTable();
+                            });
+                        }
+                    }
+                })
+            }
+        });
+
+        jQuery(document).on('click', '.tambah-skpd-crosscutting-level4', function() {
+            jQuery("#modal-crud").find('.modal-title').html('Tambah Perangkat Daerah');
+            jQuery("#modal-crud").find('.modal-body').html(`` +
+                `<form id="form-crosscutting">` +
+                `<input type="hidden" name="parent_all" value="${jQuery(this).data('parent')}">` +
+                `<input type="hidden" name="parent" value="${jQuery(this).data('id')}">` +
+                `<input type="hidden" name="label" value="${jQuery(this).parent().parent().find('.label-level4').text()}">` +
+                `<input type="hidden" name="level" value="4">` +
+                `<div class="form-group">` +
+                `<label for="indikator-label">${jQuery(this).parent().parent().find('.label-level4').text()}</label>` +
+                `<select class="form-select" name="skpd-label" style="width:100%"><?php echo $option_opd; ?></select>` +
+                `</div>` +
+                `</form>`);
+            jQuery("select[name*='skpd-label']").select2()
+            jQuery("#modal-crud").find('.modal-footer').html(`` +
+                `<button type="button" class="btn btn-danger" data-dismiss="modal">` +
+                `Tutup` +
+                `</button>` +
+                `<button type="button" class="btn btn-success" id="simpan-data-crosscutting" data-action="create_indikator_crosscutting_pemda" data-view="crosscuttingLevel4">` +
+                `Simpan` +
+                `</button>`);
+            jQuery("#modal-crud").find('.modal-dialog').css('maxWidth', '');
+            jQuery("#modal-crud").find('.modal-dialog').css('width', '');
+            jQuery("#modal-crud").modal('show');
+        })
+
+        jQuery(document).on('click', '.edit-skpd-crosscutting-level4', function() {
+            jQuery("#wrap-loading").show();
+            jQuery.ajax({
+                method: 'POST',
+                url: esakip.url,
+                data: {
+                    "action": "edit_indikator_crosscutting_pemda",
+                    "api_key": esakip.api_key,
+                    'id': jQuery(this).data('id')
+                },
+                dataType: 'json',
+                success: function(response) {
+                    jQuery("#wrap-loading").hide();
+                    jQuery("#modal-crud").find('.modal-title').html('Edit Perangkat Daerah');
+                    jQuery("#modal-crud").find('.modal-body').html(`` +
+                        `<form id="form-crosscutting">` +
+                        `<input type="hidden" name="id" value="${response.data.id}">` +
+                        `<input type="hidden" name="parent_all" value="${response.data.parent_all}">` +
+                        `<input type="hidden" name="parent" value="${response.data.parent}">` +
+                        `<input type="hidden" name="level" value="${response.data.level}">` +
+                        `<div class="form-group">` +
+                        `<label for="indikator-label">${response.data.label}</label>` +
+                        `<select class="form-select" name="skpd-label" style="width:100%"><?php echo $option_opd; ?></select>` +
+                        `</div>` +
+                        `</form>`);
+                    jQuery("select[name*='skpd-label']").select2({
+                        tags: true,
+                        tokenSeparators: [',', ' ']
+                    })
+                    jQuery("#modal-crud").find(`.modal-footer`).html(`` +
+                        `<button type="button" class="btn btn-danger" data-dismiss="modal">` +
+                        `Tutup` +
+                        `</button>` +
+                        `<button type="button" class="btn btn-success" id="simpan-data-crosscutting" data-action="update_indikator_crosscutting_pemda" data-view="crosscuttingLevel4">` +
+                        `Update` +
+                        `</button>`);
+                    jQuery("#modal-crud").find('.modal-dialog').css('maxWidth', '');
+                    jQuery("#modal-crud").find('.modal-dialog').css('width', '');
+                    jQuery("#modal-crud").modal('show');
+                }
+            });
+        })
+
+        jQuery(document).on('click', '.hapus-skpd-crosscutting-level4', function() {
+            let parent = jQuery(this).data('parent');
+            if (confirm(`Data akan dihapus?`)) {
+                jQuery("#wrap-loading").show();
+                jQuery.ajax({
+                    method: 'POST',
+                    url: esakip.url,
+                    data: {
+                        'action': 'delete_indikator_crosscutting_pemda',
+                        'api_key': esakip.api_key,
+                        'id': jQuery(this).data('id')
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        jQuery("#wrap-loading").hide();
+                        alert(response.message);
+                        if (response.status) {
+                            crosscuttingLevel4({
+                                'parent': parent
+                            }).then(function() {
+                                jQuery("#crosscuttingLevel4").DataTable();
+                            });
+                        }
+                    }
+                })
+            }
+        });
+
         jQuery(document).on('click', '#simpan-data-crosscutting', function() {
             jQuery('#wrap-loading').show();
             let modal = jQuery("#modal-crud");
@@ -1141,6 +1412,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                             `<td class="label-level3">${value.label}</td>` +
                             `<td class="text-center">` +
                             `<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-success tambah-skpd-crosscutting-level3" title="Tambah Perangkat Daerah"><i class="dashicons dashicons-plus"></i></a> ` +
+                            `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning view-crosscutting-level4" title="Lihat crosscutting level 4"><i class="dashicons dashicons dashicons-menu-alt"></i></a> ` +
                             `<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-primary edit-crosscutting-level3" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;` +
                             `<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-danger hapus-crosscutting-level3" title="Hapus"><i class="dashicons dashicons-trash"></i></a>` +
                             `</td>` +
@@ -1166,6 +1438,89 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 
                     jQuery("#nav-level-3").html(level3);
                     jQuery('.nav-tabs a[href="#nav-level-3"]').tab('show');
+                    jQuery('#modal-crosscutting').modal('show');
+                    resolve();
+                }
+            });
+        });
+    }
+
+    function crosscuttingLevel4(params) {
+        jQuery("#wrap-loading").show();
+        let parent = params.parent_all ?? params.parent;
+        return new Promise(function(resolve, reject) {
+            jQuery.ajax({
+                url: esakip.url,
+                type: "post",
+                data: {
+                    "action": "get_data_crosscutting_pemda",
+                    "level": 4,
+                    "parent": parent,
+                    "id_jadwal": '<?php echo $input['periode']; ?>',
+                    "id_tujuan": '<?php echo $id_tujuan; ?>',
+                    "api_key": esakip.api_key
+                },
+                dataType: "json",
+                success: function(res) {
+                    jQuery('#wrap-loading').hide();
+                    let level4 = `` +
+                        `<div style="margin-top:10px">` +
+                        `<button type="button" data-parent="${parent}" class="btn btn-success mb-2" id="tambah-crosscutting-level4"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>` +
+                        `</div>` +
+                        `<table class="table">` +
+                        `<thead>`;
+                    res.parent.map(function(value, index) {
+                        if (value != null) {
+                            level4 += `` +
+                                `<tr>` +
+                                `<th class="text-center" style="width: 160px;">Level ${(index+1)}</th>` +
+                                `<th>${value}</th>` +
+                                `</tr>`;
+                        }
+                    });
+                    level4 += `</thead>` +
+                        `</table>` +
+                        `<table class="table" id="crosscuttingLevel4">` +
+                        `<thead>` +
+                        `<tr>` +
+                        `<th class="text-center" style="width:20%">No</th>` +
+                        `<th class="text-center" style="width:60%">Label Crosscutting Pemerintah Daerah</th>` +
+                        `<th class="text-center" style="width:20%">Aksi</th>` +
+                        `</tr>` +
+                        `</thead>` +
+                        `<tbody>`;
+                    res.data.map(function(value, index) {
+                        level4 += `` +
+                            `<tr>` +
+                            `<td class="text-center">${index+1}.</td>` +
+                            `<td class="label-level4">${value.label}</td>` +
+                            `<td class="text-center">` +
+                            `<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-success tambah-skpd-crosscutting-level4" title="Tambah Perangkat Daerah"><i class="dashicons dashicons-plus"></i></a> ` +
+                            `<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-primary edit-crosscutting-level4" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;` +
+                            `<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-danger hapus-crosscutting-level4" title="Hapus"><i class="dashicons dashicons-trash"></i></a>` +
+                            `</td>` +
+                            `</tr>`;
+
+                        let indikator = Object.values(value.indikator);
+                        if (indikator.length > 0) {
+                            indikator.map(function(indikator_value, indikator_index) {
+                                level4 += `` +
+                                    `<tr>` +
+                                    `<td><span style="display:none">${index+1}</span></td>` +
+                                    `<td>${index+1}.${indikator_index+1} ${indikator_value.label_nama}</td>` +
+                                    `<td class="text-center">` +
+                                    `<a href="javascript:void(0)" data-id="${indikator_value.id}" class="btn btn-sm btn-primary edit-skpd-crosscutting-level4" title="Edit"><i class="dashicons dashicons-edit"></i></a> ` +
+                                    `<a href="javascript:void(0)" data-id="${indikator_value.id}" data-parent="${value.parent}" class="btn btn-sm btn-danger hapus-skpd-crosscutting-level4" title="Hapus"><i class="dashicons dashicons-trash"></i></a>` +
+                                    `</td>` +
+                                    `</tr>`;
+                            });
+                        }
+                    });
+                    level4 += `<tbody>` +
+                        `</table>`;
+
+                    jQuery("#nav-level-4").html(level4);
+                    jQuery('.nav-tabs a[href="#nav-level-4"]').tab('show');
                     jQuery('#modal-crosscutting').modal('show');
                     resolve();
                 }
