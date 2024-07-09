@@ -754,6 +754,24 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						throw new Exception("Indikator harus dihapus dulu!", 1);
 					}
 
+					// cek croscutting
+					$croscutting = $wpdb->get_row($wpdb->prepare("
+						SELECT 
+							pk.id as id_pokin,
+							cc.id as id_croscutting
+						FROM esakip_pohon_kinerja$_prefix_opd as pk
+						JOIN esakip_croscutting$_prefix_opd as cc
+						ON pk.id = cc.parent_pohon_kinerja
+						WHERE pk.id=%d  
+							AND pk.level=%d 
+							AND cc.active=%d
+							AND pk.active=%d$_where_opd
+					", $_POST['id'], $_POST['level'], 1, 1),  ARRAY_A);
+
+					if (!empty($croscutting)) {
+						throw new Exception("Croscutting harus dihapus dulu!", 1);
+					}
+
 					$child = $wpdb->get_row($wpdb->prepare("
 						SELECT 
 							id 
