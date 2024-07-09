@@ -3324,7 +3324,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								nama_skpd
 							FROM esakip_data_unit
 							WHERE active = 1
-							  AND is_skpd = 1
 							  AND id_skpd = %d
 							  AND tahun_anggaran = %d
 						", $input['skpd-label'], $tahun_anggaran_sakip));
