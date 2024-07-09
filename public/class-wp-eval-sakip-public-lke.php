@@ -1305,13 +1305,13 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				// 		$wpdb->prepare("
 				// 			SELECT nilai
 				// 			FROM esakip_penilaian_custom
-				// 			WHERE id=%d
+				// 			WHERE id_komponen_penilaian=%d
 				// 		", $id_komponen_penilaian),
 				// 		ARRAY_A
 				// 	);
-				// 	$valid_values_custom_flat = array_column($valid_values_custom, 'nilai');
+				// 	// $valid_values_custom_flat = array_column($valid_values_custom, 'nilai');
 
-				// 	if (!in_array($nilai_penetapan, $valid_values_custom_flat)) {
+				// 	if (!in_array($nilai_penetapan, $valid_values_custom)) {
 				// 		$ret['status'] = 'error';
 				// 		$ret['message'] = 'Aksi ditolak - nilai yang dimasukkan tidak valid!';
 				// 		die(json_encode($ret));
@@ -1507,7 +1507,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				// 		$wpdb->prepare("
 				// 			SELECT nilai
 				// 			FROM esakip_penilaian_custom
-				// 			WHERE id=%d
+				// 			WHERE id_komponen_penilaian=%d
 				// 		", $id_komponen_penilaian),
 				// 		ARRAY_A
 				// 	);

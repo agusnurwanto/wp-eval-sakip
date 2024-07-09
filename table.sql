@@ -1068,7 +1068,7 @@ CREATE TABLE `esakip_croscutting` (
   `id_unik_tujuan` text DEFAULT NULL,
   `label` varchar(255) NOT NULL,
   `parent` int(11) DEFAULT 0,
-  `label_id_skpd` int(11) DEFAULT NULL,
+  `label_id_skpd` int(11) DEFAULT NULL COMMENT '0= Seluruh Perangkat Daerah',
   `level` int(11) NOT null,
   `tahun_anggaran` year(4) DEFAULT NULL,
   `id_jadwal` int(11) DEFAULT NULL,

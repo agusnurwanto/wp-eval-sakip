@@ -3318,16 +3318,18 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						throw new Exception("Data sudah ada!", 1);
 					}
 					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
-
-					$nama_skpd = $wpdb->get_var($wpdb->prepare("
-						SELECT
-							nama_skpd
-						FROM esakip_data_unit
-						WHERE active = 1
-						  AND is_skpd = 1
-						  AND id_skpd = %d
-						  AND tahun_anggaran = %d
-					", $input['skpd-label'], $tahun_anggaran_sakip));
+					if ($input['skpd-label'] != 0) {
+						$nama_skpd = $wpdb->get_var($wpdb->prepare("
+							SELECT
+								nama_skpd
+							FROM esakip_data_unit
+							WHERE active = 1
+							  AND id_skpd = %d
+							  AND tahun_anggaran = %d
+						", $input['skpd-label'], $tahun_anggaran_sakip));
+					} else {
+						$nama_skpd =  "Seluruh Perangkat Daerah";
+					}
 
 					if ($_prefix_opd == '') {
 						$data = $wpdb->insert('esakip_croscutting', [
