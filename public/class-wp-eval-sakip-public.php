@@ -23524,7 +23524,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                 ", $id_jadwal),
                 ARRAY_A
             );
-
+            $json = array();
             if (!empty($get_data)) {
                 $counter = 1;
                 $tbody = '';
@@ -23549,6 +23549,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                     $tbody .= "<td class='text-left'>" . ($vv['sumber_data'] ?: '-') . "</td>";
                     $tbody .= "<td class='text-left'>" . ($vv['keterangan'] ?: '-') . "</td>";
                     $tbody .= "</tr>";
+                    if(is_numeric($vv['kondisi_awal']) || $vv['kondisi_awal'] == '-'){
+                    	$json[] = $vv;
+                    }
                 }
 
                 $ret['data'] = $tbody;
@@ -23561,6 +23564,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                 }
                 $ret['data'] = "<tr><td colspan=".$colspan." class='text-center'>Tidak ada data tersedia</td></tr>";
             }
+            $ret['json'] = $json;
         } else {
             $ret = array(
                 'status' => 'error',

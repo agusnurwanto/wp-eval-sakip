@@ -2393,28 +2393,29 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						}
 					}
 				}
-				// data croscutting
-				$data_croscutting_level = $wpdb->get_results($wpdb->prepare("
-					SELECT 
-						* 
-					FROM esakip_croscutting_opd
-					WHERE parent_pohon_kinerja=%d 
-						AND active=1 
-					ORDER BY id
-				", $level['id']), ARRAY_A);
+				if($opsi['tipe'] == 'opd'){
+					// data croscutting
+					$data_croscutting_level = $wpdb->get_results($wpdb->prepare("
+						SELECT 
+							* 
+						FROM esakip_croscutting_opd
+						WHERE parent_pohon_kinerja=%d 
+							AND active=1 
+						ORDER BY id
+					", $level['id']), ARRAY_A);
 
-				$data_croscutting_level_pengusul = $wpdb->get_results($wpdb->prepare("
-					SELECT 
-						cc.*,
-						pk.id_skpd as id_skpd_parent
-					FROM esakip_croscutting_opd as cc
-					JOIN esakip_pohon_kinerja_opd as pk
-					ON cc.parent_pohon_kinerja = pk.id
-					WHERE cc.id_skpd_croscutting=%d
-						AND cc.status_croscutting=1 
-						AND cc.active=1
-						AND cc.parent_croscutting=%d
-				", $opsi['id_skpd'], $level['id']),  ARRAY_A);
+					$data_croscutting_level_pengusul = $wpdb->get_results($wpdb->prepare("
+						SELECT 
+							cc.*,
+							pk.id_skpd as id_skpd_parent
+						FROM esakip_croscutting_opd as cc
+						JOIN esakip_pohon_kinerja_opd as pk
+						ON cc.parent_pohon_kinerja = pk.id
+						WHERE cc.id_skpd_croscutting=%d
+							AND cc.status_croscutting=1 
+							AND cc.active=1
+							AND cc.parent_croscutting=%d
+					", $opsi['id_skpd'], $level['id']),  ARRAY_A);
 
 				if(!empty($data_croscutting_level) && !empty($data_croscutting_level_pengusul)){
 					$data_croscutting_level = array_merge($data_croscutting_level,$data_croscutting_level_pengusul);
@@ -2422,78 +2423,80 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					$data_croscutting_level = $data_croscutting_level_pengusul;
 				}
 
-				if (!empty($data_croscutting_level)) {
-					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
-					foreach ($data_croscutting_level as $key_croscutting_level => $croscutting_level) {
-						$nama_perangkat = '';
-						if ($croscutting_level['is_lembaga_lainnya'] == 1) {
-							$nama_lembaga = $wpdb->get_row(
-								$wpdb->prepare("
-									SELECT 
-										nama_lembaga,
-										id,
-										tahun_anggaran
-									FROM esakip_data_lembaga_lainnya 
-									WHERE active=1 
-									AND id=%d
-									AND tahun_anggaran=%d
-									GROUP BY id
-									ORDER BY nama_lembaga ASC
-								", $croscutting_level['id_skpd_croscutting'], $tahun_anggaran_sakip),
-								ARRAY_A
-							);
-							$nama_perangkat = $nama_lembaga['nama_lembaga'];
-						}else{
-							if(!empty($croscutting_level['id_skpd_parent'])){
-								$this_data_id_skpd = $croscutting_level['id_skpd_parent'];
+					if (!empty($data_croscutting_level)) {
+						$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+						foreach ($data_croscutting_level as $key_croscutting_level => $croscutting_level) {
+							$nama_perangkat = '';
+							if ($croscutting_level['is_lembaga_lainnya'] == 1) {
+								$nama_lembaga = $wpdb->get_row(
+									$wpdb->prepare("
+										SELECT 
+											nama_lembaga,
+											id,
+											tahun_anggaran
+										FROM esakip_data_lembaga_lainnya 
+										WHERE active=1 
+										AND id=%d
+										AND tahun_anggaran=%d
+										GROUP BY id
+										ORDER BY nama_lembaga ASC
+									", $croscutting_level['id_skpd_croscutting'], $tahun_anggaran_sakip),
+									ARRAY_A
+								);
+								$nama_perangkat = $nama_lembaga['nama_lembaga'];
 							}else{
-								$this_data_id_skpd = $croscutting_level['id_skpd_croscutting'];
+								if(!empty($croscutting_level['id_skpd_parent'])){
+									$this_data_id_skpd = $croscutting_level['id_skpd_parent'];
+								}else{
+									$this_data_id_skpd = $croscutting_level['id_skpd_croscutting'];
+								}
+
+								$nama_skpd = $wpdb->get_row(
+									$wpdb->prepare("
+										SELECT 
+											nama_skpd,
+											id_skpd,
+											tahun_anggaran
+										FROM esakip_data_unit 
+										WHERE active=1 
+										AND is_skpd=1 
+										AND id_skpd=%d
+										AND tahun_anggaran=%d
+										GROUP BY id_skpd
+										ORDER BY kode_skpd ASC
+									", $this_data_id_skpd, $tahun_anggaran_sakip),
+									ARRAY_A
+								);
+								$nama_perangkat = $nama_skpd['nama_skpd'];
 							}
 
-							$nama_skpd = $wpdb->get_row(
-								$wpdb->prepare("
-									SELECT 
-										nama_skpd,
-										id_skpd,
-										tahun_anggaran
-									FROM esakip_data_unit 
-									WHERE active=1 
-									AND is_skpd=1 
-									AND id_skpd=%d
-									AND tahun_anggaran=%d
-									GROUP BY id_skpd
-									ORDER BY kode_skpd ASC
-								", $this_data_id_skpd, $tahun_anggaran_sakip),
-								ARRAY_A
-							);
-							$nama_perangkat = $nama_skpd['nama_skpd'];
-						}
+							if (!empty($croscutting_level['keterangan'])) {
+								if (empty($data_ret[trim($level['label'])]['croscutting'][(trim($croscutting_level['keterangan']))])) {
+									$data_ret[trim($level['label'])]['croscutting'][(trim($croscutting_level['keterangan']))] = [
+										'id' => $croscutting_level['id'],
+										'keterangan' => $croscutting_level['keterangan'],
+										'data' => array()
+									];
+								}
 
-						if (!empty($croscutting_level['keterangan'])) {
-							if (empty($data_ret[trim($level['label'])]['croscutting'][(trim($croscutting_level['keterangan']))])) {
-								$data_ret[trim($level['label'])]['croscutting'][(trim($croscutting_level['keterangan']))] = [
+								if(!empty($croscutting_level['id_skpd_parent'])){
+									$croscutting_opd_lain = 1;
+								}else{
+									$croscutting_opd_lain = 0;
+								}		
+
+								$data_ret[trim($level['label'])]['croscutting'][(trim($croscutting_level['keterangan']))]['data'][$key_croscutting_level] = [
 									'id' => $croscutting_level['id'],
+									'parent_pohon_kinerja' => $croscutting_level['parent_pohon_kinerja'],
 									'keterangan' => $croscutting_level['keterangan'],
-									'data' => array()
+									'nama_skpd' => $nama_perangkat,
+									'croscutting_opd_lain' => $croscutting_opd_lain
 								];
 							}
-
-							if(!empty($croscutting_level['id_skpd_parent'])){
-								$croscutting_opd_lain = 1;
-							}else{
-								$croscutting_opd_lain = 0;
-							}		
-
-							$data_ret[trim($level['label'])]['croscutting'][(trim($croscutting_level['keterangan']))]['data'][$key_croscutting_level] = [
-								'id' => $croscutting_level['id'],
-								'parent_pohon_kinerja' => $croscutting_level['parent_pohon_kinerja'],
-								'keterangan' => $croscutting_level['keterangan'],
-								'nama_skpd' => $nama_perangkat,
-								'croscutting_opd_lain' => $croscutting_opd_lain
-							];
 						}
 					}
 				}
+				
 				if (
 					(
 						$level['level'] <= 4

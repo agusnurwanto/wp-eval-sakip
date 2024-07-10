@@ -399,11 +399,13 @@ if(!empty($data_all['data'])){
 	}
 </style>
 <div class="text-center" id="action-sakip">
-	<button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button>
-	<div class="custom-control custom-checkbox mt-4">
-		<input type="checkbox" class="custom-control-input" id="show_croscutting">
-		<label class="custom-control-label" for="show_croscutting">Tampilkan Croscutting</label>
-	</div>
+	<button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button><br>
+	<?php if($tipe == 'opd'): ?>
+		<div class="custom-control custom-checkbox mt-4">
+			<input type="checkbox" class="custom-control-input" id="show_croscutting">
+			<label class="custom-control-label" for="show_croscutting">Tampilkan Croscutting</label>
+		</div>
+	<?php endif; ?>
 	Perkecil (-) <input title="Perbesar/Perkecil Layar" id="test" min="1" max="15" value='10' step="1" onchange="showVal(this.value)" type="range" style="max-width: 400px; margin-top: 40px;" /> (+) Perbesar
 	<br>
 	<textarea id="val-range" disabled>100%</textarea>

@@ -166,6 +166,7 @@ $status_iku = $wpdb->get_row(
                     </tbody>
                 </table>
             </div>
+            <div id="chart-capaian-indikator" class="row"></div>
         </div>
     </div>
 </div>
@@ -238,6 +239,7 @@ $status_iku = $wpdb->get_row(
 <div id="tahunContainer" class="container-md">
 </div>
 
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script>
     jQuery(document).ready(function() {
         getTableRpjmd();
@@ -251,6 +253,42 @@ $status_iku = $wpdb->get_row(
             }
         });
     });
+
+    function drawColColors() {
+        json_chart.map(function(b, i){
+            var id_cart = 'chart-capaian-indikator-'+b.id;
+            var html = '<div id="'+id_cart+'" style="margin-buttom: 20px; min-height: 400px;" class="col-md-6"></div>';
+            jQuery('#chart-capaian-indikator').append(html);
+            var data_cart = [
+                ['Tahun', 'Target', 'Realisasi'],
+                ['Tahun Awal', +b.kondisi_awal, 0],
+                ['Tahun 1', +b.target_bps_tahun_1, +b.bps_tahun_1],
+                ['Tahun 2', +b.target_bps_tahun_2, +b.bps_tahun_2],
+                ['Tahun 3', +b.target_bps_tahun_3, +b.bps_tahun_3],
+                ['Tahun 4', +b.target_bps_tahun_4, +b.bps_tahun_4],
+                ['Tahun 5', +b.target_bps_tahun_5, +b.bps_tahun_5],
+                ['Tahun Akhir', +b.target_akhir_p_rpjmd, 0],
+            ];
+            console.log('data_cart', data_cart);
+            
+            var data = new google.visualization.arrayToDataTable(data_cart);
+
+            var options = {
+                title: b.indikator_kinerja,
+                colors: ['#9575cd', '#33ac71'],
+                hAxis: {
+                    title: b.satuan,
+                    minValue: 0
+                },
+                vAxis: {
+                    title: 'Nilai'
+                }
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById(id_cart));
+            chart.draw(data, options);
+        });
+    }
 
     function getTableCapaianIndikator() {
         jQuery('#wrap-loading').show();
@@ -268,6 +306,10 @@ $status_iku = $wpdb->get_row(
                 console.log(response);
                 if (response.status === 'success') {
                     jQuery('#table_capaian_indikator_mikro tbody').html(response.data);
+
+                    window.json_chart = response.json;
+                    google.charts.load('current', {packages: ['corechart', 'bar']});
+                    google.charts.setOnLoadCallback(drawColColors);
                 } else {
                     alert(response.message);
                 }
