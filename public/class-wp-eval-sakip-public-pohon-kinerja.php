@@ -603,7 +603,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							}
 
 							if(!empty($v_cross['id_skpd_parent'])){
-								$aksi = '<a href="javascript:void(0)" class="btn btn-sm btn-success verifikasi-croscutting" data-id="' . $v_cross['id'] . '" data-skpd-asal="'. $this_data_perangkat['nama_perangkat'] .'" data-keterangan-asal="'. $v_cross['keterangan'] .'" href="#" title="Verifikasi Croscutting"><span class="dashicons dashicons-yes"></span></a>';
+								$aksi = '<a href="javascript:void(0)" class="btn btn-sm btn-success edit-verifikasi-croscutting" data-id="' . $v_cross['id'] . '" data-skpd-asal="'. $this_data_perangkat['nama_perangkat'] .'" data-keterangan-asal="'. $v_cross['keterangan'] .'" href="#" title="Verifikasi Croscutting"><span class="dashicons dashicons-yes"></span></a>';
 							}
 
 							$table_croscutting .= '<td class="text-center">' . $aksi . '</td>';
@@ -2094,6 +2094,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									'keterangan' => trim($keterangan_croscutting),
 									'id_skpd_croscutting' => $id_skpd_croscutting,
 									'active' => 1,
+									'status_croscutting' => 0,
 									'updated_at' => current_time('mysql')
 								),
 								array(
@@ -2280,7 +2281,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							'keterangan_croscutting' => trim($keterangan_croscutting),
 							'status_croscutting' => $status_verify,
 							'keterangan_tolak' => $keterangan_tolak,
-							'updated_at' => current_time('mysql')
+							'updated_at' => current_time('mysql'),
+							'parent_croscutting' => 0
 						);
 						if(!empty($cek_pohon_kinerja) && $input['verify_cc'] == 1){
 							$opsi['parent_croscutting'] = $input['levelPokinCroscutting'];
@@ -2304,6 +2306,93 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					echo json_encode([
 						'status' => true,
 						'message' => 'Sukses Verifikasi Croscutting!'
+					]);
+					exit();
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
+	}
+
+	
+	public function edit_verify_croscutting()
+	{
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+					$_prefix_opd = $_where_opd = $id_skpd = '';
+					if (!empty($_POST['tipe_pokin'])) {
+						if (!empty($_POST['id_skpd'])) {
+							$id_skpd = $_POST['id_skpd'];
+							$_prefix_opd = $_POST['tipe_pokin'] == "opd" ? "_opd" : "";
+							$_where_opd = $_POST['tipe_pokin'] == "opd" ? ' AND id_skpd=' . $id_skpd : '';
+						} else {
+							throw new Exception("Id SKPD tidak ditemukan!", 1);
+						}
+					}
+
+					$data_croscutting = array();
+					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+					if (!empty($_prefix_opd) && $_prefix_opd == "_opd") {
+						$data_croscutting = $wpdb->get_row($wpdb->prepare("
+								SELECT 
+									cc.keterangan,
+									cc.keterangan_croscutting,
+									cc.parent_pohon_kinerja,
+									cc.id_skpd_croscutting,
+									cc.is_lembaga_lainnya,
+									cc.parent_croscutting, 
+									cc.status_croscutting,
+									pk.id_skpd as id_skpd_parent 
+								FROM esakip_croscutting_opd as cc 
+								JOIN esakip_pohon_kinerja_opd as pk 
+								ON cc.parent_pohon_kinerja = pk.id
+								WHERE cc.id=%d 
+									AND cc.active=%d
+							", $_POST['id'], 1),  ARRAY_A);
+
+							if(!empty($data_croscutting)){
+								$data_croscutting['nama_perangkat_parent'] = '';
+								$nama_skpd = $wpdb->get_row(
+									$wpdb->prepare("
+										SELECT 
+											nama_skpd,
+											id_skpd,
+											tahun_anggaran
+										FROM esakip_data_unit 
+										WHERE active=1 
+										AND is_skpd=1 
+										AND id_skpd=%d
+										AND tahun_anggaran=%d
+										GROUP BY id_skpd
+										ORDER BY kode_skpd ASC
+									", $data_croscutting['id_skpd_parent'], $tahun_anggaran_sakip),
+									ARRAY_A
+								);
+								if(!empty($nama_skpd)){
+									$data_croscutting['nama_perangkat_parent'] = $nama_skpd['nama_skpd'];
+								}
+							}
+					}
+
+					if (empty($data_croscutting)) {
+						throw new Exception("Data tidak ditemukan!", 1);
+					}
+
+					echo json_encode([
+						'status' => true,
+						'data_croscutting' => $data_croscutting
 					]);
 					exit();
 				} else {
