@@ -885,10 +885,10 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 				foreach ($croscuttinglevel2['data'] as $k_cross_2 => $v_cross_2) {
 					$class_pengusul = "";
 					$link_pengusul = $v_cross_2['nama_skpd'];
-					// if($v_cross_4['croscutting_opd_lain'] == 1){
-					// 	$class_pengusul = "croscutting-pengusul";
-					// 	$link_pengusul = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $v_cross_4['id_skpd_asal']  . "&id=67&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $v_cross_4['nama_skpd'] . "</a>";
-					// }
+					if($v_cross_2['croscutting_opd_lain'] == 1){
+						$class_pengusul = "croscutting-pengusul";
+					// 	$link_pengusul = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $v_cross_2['id_skpd_asal']  . "&id=67&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $v_cross_4['nama_skpd'] . "</a>";
+					}
 					switch ($v_cross_2['status_croscutting']) {
 						case '1':
 							$status_croscutting = 'Disetujui';
@@ -953,10 +953,10 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 					foreach ($croscuttinglevel3['data'] as $k_cross_3 => $v_cross_3) {
 						$class_pengusul = "";
 						$link_pengusul = $v_cross_3['nama_skpd'];
-						// if($v_cross_4['croscutting_opd_lain'] == 1){
-						// 	$class_pengusul = "croscutting-pengusul";
-						// 	$link_pengusul = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $v_cross_4['id_skpd_asal']  . "&id=67&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $v_cross_4['nama_skpd'] . "</a>";
-						// }
+						if($v_cross_3['croscutting_opd_lain'] == 1){
+							$class_pengusul = "croscutting-pengusul";
+						// 	$link_pengusul = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $v_cross_3['id_skpd_asal']  . "&id=67&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $v_cross_4['nama_skpd'] . "</a>";
+						}
 						switch ($v_cross_3['status_croscutting']) {
 							case '1':
 								$status_croscutting = 'Disetujui';
@@ -1021,10 +1021,10 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 					foreach ($croscuttinglevel4['data'] as $k_cross_4 => $v_cross_4) {
 						$class_pengusul = "";
 						$link_pengusul = $v_cross_4['nama_skpd'];
-						// if($v_cross_4['croscutting_opd_lain'] == 1){
-						// 	$class_pengusul = "croscutting-pengusul";
+						if($v_cross_4['croscutting_opd_lain'] == 1){
+							$class_pengusul = "croscutting-pengusul";
 						// 	$link_pengusul = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $v_cross_4['id_skpd_asal']  . "&id=67&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $v_cross_4['nama_skpd'] . "</a>";
-						// }
+						}
 						switch ($v_cross_4['status_croscutting']) {
 							case '1':
 								$status_croscutting = 'Disetujui';
