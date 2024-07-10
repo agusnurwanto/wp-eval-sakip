@@ -112,6 +112,23 @@ if(!empty($data_all['data'])){
 			        }
 		        }
 
+				// croscutting level 2
+				if(!empty($level_2['croscutting'])){
+					$data_temp[$keylevel2][0]->f.="<div class='croscutting-2 tampil_croscutting'>CROSCUTTING</div>";
+					foreach ($level_2['croscutting'] as $keyCross => $valCross) {
+						$nama_skpd_all = array();
+						foreach ($valCross['data'] as $k_cross_2 => $v_cross_2) {
+							$class_cc_opd_lain = '';
+							if($v_cross_2['croscutting_opd_lain'] == 1){
+								$class_cc_opd_lain = 'cc-opd-lain';
+							}
+							$nama_skpd_all[] = $v_cross_2['nama_skpd'];
+						}
+						
+						$data_temp[$keylevel2][0]->f.="<div class='croscutting tampil_croscutting ".$class_cc_opd_lain."'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode("<br>",$nama_skpd_all) ." ". $valCross['croscutting_opd_lain'] ." </div></div>";
+					}
+				}
+
 		        if(!empty($level_2['data'])){
 
 			        foreach ($level_2['data'] as $keylevel3 => $level_3) {
@@ -125,6 +142,23 @@ if(!empty($data_all['data'])){
 				                $data_temp[$keylevel3][0]->f.="<div ".$style3.">IK: ".$indikator['label_indikator_kinerja']."</div>";
 				            }
 			            }
+
+						// croscutting level 3
+						if(!empty($level_3['croscutting'])){
+							$data_temp[$keylevel3][0]->f.="<div class='croscutting-2 tampil_croscutting'>CROSCUTTING</div>";
+							foreach ($level_3['croscutting'] as $keyCross => $valCross) {
+								$nama_skpd_all = array();
+								foreach ($valCross['data'] as $k_cross_3 => $v_cross_3) {
+									$class_cc_opd_lain = '';
+									if($v_cross_3['croscutting_opd_lain'] == 1){
+										$class_cc_opd_lain = 'cc-opd-lain';
+									}
+									$nama_skpd_all[] = $v_cross_3['nama_skpd'];
+								}
+								
+								$data_temp[$keylevel3][0]->f.="<div class='croscutting tampil_croscutting ".$class_cc_opd_lain."'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode("<br>",$nama_skpd_all) ." ". $valCross['croscutting_opd_lain'] ." </div></div>";
+							}
+						}
 
 			            $data_temp[$keylevel3][1] = $level_2['label'];
 			            $data_temp[$keylevel3][2] = '';

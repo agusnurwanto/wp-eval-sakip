@@ -2418,6 +2418,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 				if(!empty($data_croscutting_level) && !empty($data_croscutting_level_pengusul)){
 					$data_croscutting_level = array_merge($data_croscutting_level,$data_croscutting_level_pengusul);
+				}else if(empty($data_croscutting_level) && !empty($data_croscutting_level_pengusul)){
+					$data_croscutting_level = $data_croscutting_level_pengusul;
 				}
 
 				if (!empty($data_croscutting_level)) {
@@ -3572,5 +3574,71 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 			]);
 			exit();
 		}
+	}
+
+	function get_parent_croscutting($opsi)
+	{
+		global $wpdb;
+		$data_ret = array();
+		$table = 'esakip_pohon_kinerja';
+		$table_croscutting = 'esakip_croscutting';
+		$where_skpd = '';
+		$parent_level_1 = 0;
+		if ($opsi['tipe'] == 'opd') {
+			$table = 'esakip_pohon_kinerja_opd';
+			$table_croscutting = 'esakip_croscutting_opd';
+			$where_skpd = $wpdb->prepare('AND id_skpd=%d', $opsi['id_skpd']);
+		}
+
+		// data croscutting
+		$data_croscutting = $wpdb->get_row($wpdb->prepare("
+			SELECT 
+				* 
+			FROM $table_croscutting
+			WHERE id=%d 
+				AND active=1 
+			ORDER BY id
+		", $opsi['id']), ARRAY_A);
+
+		// $data_ret['cek'] = $data_croscutting;
+		$no = 1;
+		if(!empty($data_croscutting)){
+			$data_pokin = $wpdb->get_row($wpdb->prepare("
+				SELECT 
+					* 
+				FROM $table
+				WHERE id=%d 
+					AND active=1 
+					AND label_indikator_kinerja IS NULL
+					AND level=%d
+					AND id_jadwal=%d
+				ORDER BY id
+			", $opsi['id_parent'], $opsi['level'], $opsi['periode']), ARRAY_A);
+
+			if(!empty($data_pokin)){
+				if (empty($data_ret[trim($data_pokin['level'])])) {
+					$data_ret[trim($data_pokin['level'])] = [
+						'id' => $data_pokin['id'],
+						'label' => $data_pokin['label'],
+						'level_pokin_parent' => $data_pokin['level'],
+						'data' => []
+					];
+				}
+				if($data_pokin['level'] == 1){
+					$parent_level_1 = $data_pokin['id'];
+				}
+
+				if($data_pokin['parent'] != 0){
+					$opsi['id_parent'] = $data_pokin['parent'];
+					$opsi['level'] = $data_pokin['level'] - 1;
+					$data_ret[trim($data_pokin['level'])]['data'] = $this->get_parent_croscutting($opsi);
+				}
+
+			}
+		}
+
+		// $data_ret[trim($opsi['level'])]['parent_level_1'] = $parent_level_1; 
+		
+		return $data_ret;
 	}
 }
