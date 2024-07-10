@@ -906,7 +906,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 					}
 					$nama_skpd_all[] = $link_pengusul . ' <span class="badge bg-'. $label_color .'" style="padding: .5em;">'. $status_croscutting.'</span> ';
 				}
-				$croscutting[]= '<div class="croscutting-isi '. $class_pengusul .'"><div>'. ucfirst($croscuttinglevel4['keterangan']) ."</div><div style='margin-top: 10px;font-weight: 500;'>". implode('<br>', $nama_skpd_all) .'</div></div>';
+				$croscutting[]= '<div class="croscutting-isi '. $class_pengusul .'"><div>'. ucfirst($croscuttinglevel2['keterangan']) ."</div><div style='margin-top: 10px;font-weight: 500;'>". implode('<br>', $nama_skpd_all) .'</div></div>';
 			}
 			
 			$show_croscutting = '';
@@ -974,7 +974,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 						}
 						$nama_skpd_all[] = $link_pengusul . ' <span class="badge bg-'. $label_color .'" style="padding: .5em;">'. $status_croscutting.'</span> ';
 					}
-					$croscutting[]= '<div class="croscutting-isi '. $class_pengusul .'"><div>'. ucfirst($croscuttinglevel4['keterangan']) ."</div><div style='margin-top: 10px;font-weight: 500;'>". implode('<br>', $nama_skpd_all) .'</div></div>';
+					$croscutting[]= '<div class="croscutting-isi '. $class_pengusul .'"><div>'. ucfirst($croscuttinglevel3['keterangan']) ."</div><div style='margin-top: 10px;font-weight: 500;'>". implode('<br>', $nama_skpd_all) .'</div></div>';
 				}
 				
 				$show_croscutting = '';
