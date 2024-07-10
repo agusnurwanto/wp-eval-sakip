@@ -503,6 +503,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						", $id_skpd, $_POST['id']),  ARRAY_A);
 						if(!empty($data_croscutting) && !empty($data_croscutting_pengusul)){
 							$data_croscutting = array_merge($data_croscutting,$data_croscutting_pengusul);
+						}else if(empty($data_croscutting) && !empty($data_croscutting_pengusul)){
+							$data_croscutting = $data_croscutting_pengusul;
 						}
 					}
 
