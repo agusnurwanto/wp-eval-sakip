@@ -1458,7 +1458,10 @@ if(!empty($data_level_pokin)){
 <script type="text/javascript">
 jQuery(document).ready(function(){
 
-	jQuery('#table_notifikasi_croscutting').dataTable();
+	jQuery('#table_notifikasi_croscutting').dataTable({   
+		pageLength : 5,
+    	lengthMenu: [[5, 10, 20], [5, 10, 20]]
+	});
 
 	jQuery("#tambah-pohon-kinerja").on('click', function(){
 		pokinLevel1().then(function(){
