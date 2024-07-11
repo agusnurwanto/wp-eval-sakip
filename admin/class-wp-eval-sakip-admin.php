@@ -166,9 +166,9 @@ class Wp_Eval_Sakip_Admin
 					$body_pemda = '<ol>';
 					foreach ($jadwal_periode as $jadwal_periode_item) {
 						// Cek setting tahun anggaran selesai
-						if(!empty($jadwal_periode_item['tahun_selesai_anggaran']) && $jadwal_periode_item['tahun_selesai_anggaran'] > 1){
+						if (!empty($jadwal_periode_item['tahun_selesai_anggaran']) && $jadwal_periode_item['tahun_selesai_anggaran'] > 1) {
 							$tahun_anggaran_selesai = $jadwal_periode_item['tahun_selesai_anggaran'];
-						}else{
+						} else {
 							$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
 						}
 
@@ -1656,7 +1656,7 @@ class Wp_Eval_Sakip_Admin
 
 		$pengisian_pokin_menu = Container::make('theme_options', __('Pohon Kinerja'))
 			->set_page_menu_position(3.4)
-			->set_icon('dashicons-edit-page')
+			->set_icon('dashicons-rest-api')
 			->add_fields(array(
 				Field::make('html', 'crb_pengisian_pokin_hide_sidebar')
 					->set_html('
@@ -1748,7 +1748,7 @@ class Wp_Eval_Sakip_Admin
 
 		$monev_ren_aksi_menu = Container::make('theme_options', __('MONEV Rencana Aksi'))
 			->set_page_menu_position(3.5)
-			->set_icon('dashicons-edit-page')
+			->set_icon('dashicons-analytics')
 			->add_fields(array(
 				Field::make('html', 'crb_monev_pokin_hide_sidebar')
 					->set_html('
@@ -1787,6 +1787,7 @@ class Wp_Eval_Sakip_Admin
 
 		Container::make('theme_options', __('Input RPJPD'))
 			->set_page_menu_position(3.6)
+			->set_icon('dashicons-welcome-write-blog')
 			->add_fields(array(
 				Field::make('html', 'crb_perencanaan_rpjpd_hide_sidebar')
 					->set_html('
@@ -1800,6 +1801,7 @@ class Wp_Eval_Sakip_Admin
 
 		Container::make('theme_options', __('Input RPJMD'))
 			->set_page_menu_position(3.7)
+			->set_icon('dashicons-welcome-write-blog')
 			->add_fields(array(
 				Field::make('html', 'crb_perencanaan_rpjmd_hide_sidebar')
 					->set_html('
@@ -1859,6 +1861,13 @@ class Wp_Eval_Sakip_Admin
 			Field::make('html', 'crb_pengaturan_menu')
 				->set_html('
 					<ol>' . $list_data . '</ol>
+				'),
+			Field::make('html', 'crb_menu_settings_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
 				')
 		);
 		return $label;
