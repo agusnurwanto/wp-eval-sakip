@@ -68,6 +68,24 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/pohon-kinerja/wp-eval-sakip-cascading-pemda.php';
 	}
 
+	public function list_pengisian_rencana_aksi($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-pengisian-rencana-aksi.php';
+	}
+	
+	public function detail_pengisian_rencana_aksi($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-pengisian-rencana-aksi-per-skpd.php';
+	}
+
 	public function get_data_pokin()
 	{
 		global $wpdb;
@@ -2492,6 +2510,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						FROM esakip_croscutting_opd
 						WHERE parent_pohon_kinerja=%d 
 							AND active=1 
+							AND status_croscutting IN (0,1)
 						ORDER BY id
 					", $level['id']), ARRAY_A);
 
@@ -3734,5 +3753,390 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		// $data_ret[trim($opsi['level'])]['parent_level_1'] = $parent_level_1; 
 		
 		return $data_ret;
+	}
+	
+	public function get_table_skpd_pengisian_rencana_aksi()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
+				$unit = $wpdb->get_results(
+					$wpdb->prepare("
+					SELECT 
+						nama_skpd, 
+						id_skpd, 
+						kode_skpd, 
+						nipkepala 
+					FROM esakip_data_unit 
+					WHERE active=1 
+					  AND tahun_anggaran=%d
+					  AND is_skpd=1 
+					ORDER BY kode_skpd ASC
+					", $tahun_anggaran_sakip),
+					ARRAY_A
+				);
+
+				if (!empty($unit)) {
+					$tbody = '';
+					$counter = 1;
+					foreach ($unit as $kk => $vv) {
+						$detail_pengisian_rencana_aksi = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Detail Pengisian Rencana Aksi ' . $tahun_anggaran,
+							'content' => '[detail_pengisian_rencana_aksi tahun=' . $tahun_anggaran . ']',
+							'show_header' => 1,
+							'post_status' => 'private'
+						)); //dokumen_detail_rencana_aksi
+
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_pengisian_rencana_aksi['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+						$btn .= '</div>';
+
+						$tbody .= "<td>" . $btn . "</td>";
+
+						$tbody .= "</tr>";
+					}
+					$ret['data'] = $tbody;
+				} else {
+					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	
+	public function get_data_renaksi()
+	{
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+					$_prefix_opd = $_where_opd = $id_skpd = '';
+					if (!empty($_POST['tipe_pokin'])) {
+						if (!empty($_POST['id_skpd'])) {
+							$id_skpd = $_POST['id_skpd'];
+							$_prefix_opd = $_POST['tipe_pokin'] == "opd" ? "_opd" : "";
+							$_where_opd = $_POST['tipe_pokin'] == "opd" ? ' AND id_skpd=' . $id_skpd : '';
+						} else {
+							throw new Exception("Id SKPD tidak ditemukan!", 1);
+						}
+					}
+
+					switch ($_POST['tipe']) {
+						case 'kegiatan_utama':
+							$label_parent = '
+							(
+								SELECT 
+									label 
+								FROM esakip_pohon_kinerja' . $_prefix_opd . ' 
+								WHERE id=a.id ' . $_where_opd . '
+							) label_parent_1';
+							break;
+
+						case '3':
+							$label_parent = '
+							(
+								SELECT 
+									label 
+								FROM esakip_pohon_kinerja' . $_prefix_opd . ' 
+								WHERE id=(
+									SELECT 
+										parent 
+									FROM esakip_pohon_kinerja' . $_prefix_opd . ' 
+									WHERE id=a.id ' . $_where_opd . '
+								) ' . $_where_opd . '
+							) label_parent_1,
+							(
+								SELECT 
+									label 
+								FROM esakip_pohon_kinerja' . $_prefix_opd . ' 
+								WHERE id=a.id ' . $_where_opd . '
+							) label_parent_2';
+							break;
+
+						case '4':
+							$label_parent = '
+							(
+								SELECT 
+									label 
+								FROM esakip_pohon_kinerja' . $_prefix_opd . ' 
+								WHERE id=(
+									SELECT 
+										parent 
+									FROM esakip_pohon_kinerja' . $_prefix_opd . ' 
+									WHERE id=(
+										SELECT 
+											parent 
+										FROM esakip_pohon_kinerja' . $_prefix_opd . ' 
+										WHERE id=a.id ' . $_where_opd . '
+									) ' . $_where_opd . '
+								) ' . $_where_opd . '
+							) label_parent_1,
+							(
+								SELECT 
+									label 
+								FROM esakip_pohon_kinerja' . $_prefix_opd . ' 
+								WHERE id=(
+									SELECT 
+										parent 
+									FROM esakip_pohon_kinerja' . $_prefix_opd . ' 
+									WHERE id=a.id ' . $_where_opd . '
+								) ' . $_where_opd . '
+							) label_parent_2,
+							(
+								SELECT 
+									label 
+								FROM esakip_pohon_kinerja' . $_prefix_opd . ' 
+								WHERE id=a.id ' . $_where_opd . '
+							) label_parent_3';
+							break;
+
+						case '5':
+							$label_parent = '
+							(
+								SELECT 
+									label 
+								FROM esakip_pohon_kinerja' . $_prefix_opd . ' 
+								WHERE id=(
+									SELECT 
+										parent 
+									FROM esakip_pohon_kinerja' . $_prefix_opd . ' 
+									WHERE id=(
+										SELECT 
+											parent 
+										FROM esakip_pohon_kinerja' . $_prefix_opd . ' 
+										WHERE id=(
+											SELECT 
+												parent 
+											FROM esakip_pohon_kinerja' . $_prefix_opd . ' 
+											WHERE id=a.id ' . $_where_opd . '
+										) ' . $_where_opd . '
+									) ' . $_where_opd . '
+								) ' . $_where_opd . '
+							) label_parent_1,
+							(
+								SELECT 
+									label 
+								FROM esakip_pohon_kinerja' . $_prefix_opd . ' 
+								WHERE id=(
+									SELECT 
+										parent 
+									FROM esakip_pohon_kinerja' . $_prefix_opd . ' 
+									WHERE id=(
+										SELECT 
+											parent 
+										FROM esakip_pohon_kinerja' . $_prefix_opd . ' 
+										WHERE id=a.id ' . $_where_opd . '
+									) ' . $_where_opd . '
+								) ' . $_where_opd . '
+							) label_parent_2,
+							(
+								SELECT 
+									label 
+								FROM esakip_pohon_kinerja' . $_prefix_opd . ' 
+								WHERE id=(
+									SELECT 
+										parent 
+									FROM esakip_pohon_kinerja' . $_prefix_opd . ' 
+									WHERE id=a.id ' . $_where_opd . '
+								) ' . $_where_opd . '
+							) label_parent_3,
+							(
+								SELECT 
+									label 
+								FROM esakip_pohon_kinerja' . $_prefix_opd . ' 
+								WHERE id=a.id ' . $_where_opd . '
+							) label_parent_4';
+							break;
+
+						default:
+							$label_parent = '';
+							break;
+					}
+
+					if ($_prefix_opd == '') {
+						$dataPokin = $wpdb->get_results($wpdb->prepare(
+							"
+							SELECT 
+								a.id,
+								a.label,
+								a.parent,
+								a.active,
+								b.id AS id_indikator,
+								b.label_indikator_kinerja
+							FROM esakip_pohon_kinerja a
+								LEFT JOIN esakip_pohon_kinerja b 
+									ON a.id=b.parent AND a.level=b.level 
+							WHERE 
+								a.id_jadwal=%d AND 
+								a.parent=%d AND 
+								a.level=%d AND 
+								a.active=%d 
+							ORDER BY a.id",
+							$_POST['id_jadwal'],
+							$_POST['parent'],
+							$_POST['level'],
+							1
+						), ARRAY_A);
+					} else if ($_prefix_opd == '_opd') {
+						$dataPokin = $wpdb->get_results($wpdb->prepare(
+							"
+							SELECT 
+								a.id,
+								a.label,
+								a.parent,
+								a.active,
+								b.id AS id_indikator,
+								b.label_indikator_kinerja
+							FROM esakip_pohon_kinerja_opd a
+								LEFT JOIN esakip_pohon_kinerja_opd b 
+									ON a.id=b.parent AND a.level=b.level 
+							WHERE 
+								a.id_jadwal=%d AND 
+								a.parent=%d AND 
+								a.level=%d AND 
+								a.active=%d AND 
+								a.id_skpd=%d
+							ORDER BY a.id",
+							$_POST['id_jadwal'],
+							$_POST['parent'],
+							$_POST['level'],
+							1,
+							$id_skpd
+						), ARRAY_A);
+					}
+
+					$dataParent = array();
+					if ($_prefix_opd == '') {
+						if (!empty($label_parent)) {
+							$dataParent = $wpdb->get_results($wpdb->prepare(
+								"
+									SELECT 
+										" . $label_parent . "
+									FROM esakip_pohon_kinerja a 
+									WHERE 
+										a.id_jadwal=%d AND 
+										a.id=%d AND
+										a.active=%d
+									ORDER BY a.id",
+								$_POST['id_jadwal'],
+								$_POST['parent'],
+								1
+							), ARRAY_A);
+						}
+					} else if ($_prefix_opd == '_opd') {
+						if (!empty($label_parent)) {
+							$dataParent = $wpdb->get_results($wpdb->prepare(
+								"
+									SELECT 
+										" . $label_parent . "
+									FROM esakip_pohon_kinerja_opd a 
+									WHERE 
+										a.id_jadwal=%d AND 
+										a.id=%d AND
+										a.active=%d AND 
+										a.id_skpd=%d
+									ORDER BY a.id",
+								$_POST['id_jadwal'],
+								$_POST['parent'],
+								1,
+								$id_skpd
+							), ARRAY_A);
+						}
+					}
+
+					$data = [
+						'data' => [],
+						'parent' => []
+					];
+					foreach ($dataPokin as $key => $pokin) {
+						if (empty($data['data'][$pokin['id']])) {
+							$data['data'][$pokin['id']] = [
+								'id' => $pokin['id'],
+								'label' => $pokin['label'],
+								'parent' => $pokin['parent'],
+								'label_parent_1' => $pokin['label_parent_1'],
+								'indikator' => []
+							];
+						}
+
+						if (!empty($pokin['id_indikator'])) {
+							if (empty($data['data'][$pokin['id']]['indikator'][$pokin['id_indikator']])) {
+								$data['data'][$pokin['id']]['indikator'][$pokin['id_indikator']] = [
+									'id' => $pokin['id_indikator'],
+									'label' => $pokin['label_indikator_kinerja']
+								];
+							}
+						}
+					}
+
+					foreach ($dataParent as $v_parent) {
+
+						if (empty($data['parent'][$v_parent['label_parent_1']])) {
+							$data['parent'][$v_parent['label_parent_1']] = $v_parent['label_parent_1'];
+						}
+
+						if (empty($data['parent'][$v_parent['label_parent_2']])) {
+							$data['parent'][$v_parent['label_parent_2']] = $v_parent['label_parent_2'];
+						}
+
+						if (empty($data['parent'][$v_parent['label_parent_3']])) {
+							$data['parent'][$v_parent['label_parent_3']] = $v_parent['label_parent_3'];
+						}
+
+						if (empty($data['parent'][$v_parent['label_parent_4']])) {
+							$data['parent'][$v_parent['label_parent_4']] = $v_parent['label_parent_4'];
+						}
+					}
+
+					echo json_encode([
+						'status' => true,
+						'data' => array_values($data['data']),
+						'parent' => array_values($data['parent'])
+					]);
+					exit();
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
 	}
 }

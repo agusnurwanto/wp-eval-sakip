@@ -17187,6 +17187,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			ARRAY_A
 		);
 		$pengisian_lke = '';
+		$pengisian_rencana_aksi = '';
 		foreach ($get_jadwal_lke as $get_jadwal_lke_sakip) {
 			$tahun_anggaran_selesai = $get_jadwal_lke_sakip['tahun_anggaran'] + $get_jadwal_lke_sakip['lama_pelaksanaan'];
 
@@ -17199,6 +17200,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$lke['url'] .= '&id_jadwal=' . $get_jadwal_lke_sakip['id'];
 			$pengisian_lke .= '<li><a target="_blank" href="' . $lke['url'] . '" class="btn btn-primary">' . $lke['title'] . '</a></li>';
 		}
+
+		$list_skpd_pengisian_rencana_aksi = $this->functions->generatePage(array(
+			'nama_page' => 'Pengisian Rencana Aksi - ' . $_GET['tahun'],
+			'content' => '[list_pengisian_rencana_aksi tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$title_pengisian_rencana_aksi = 'Pengisian Rencana Aksi';
+		$pengisian_rencana_aksi = '<li><a target="_blank" href="' . $list_skpd_pengisian_rencana_aksi['url'] . '" class="btn btn-primary">' .  $title_pengisian_rencana_aksi . '</a></li>';
 
 		if (empty($pengisian_lke)) {
 			$pengisian_lke = '<li><a return="false" href="#" class="btn btn-secondary">Pengisian LKE kosong atau belum dibuat</a></li>';
@@ -17245,6 +17255,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				<div class="esakip-body-tahun" data-id="lke">
 					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 						' . $pengisian_lke . '
+					</ul>
+				</div>
+			</div>';
+		$halaman_pengisian_rencana_aksi = '
+			<div class="accordion">
+				<h5 class="esakip-header-tahun" data-id="pengisian-rencana_aksi" style="margin: 0;">Pengisian Rencana Aksi</h5>
+				<div class="esakip-body-tahun" data-id="pengisian-rencana_aksi">
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+						' . $pengisian_rencana_aksi . '
 					</ul>
 				</div>
 			</div>';
@@ -17469,6 +17488,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			) {
 				echo $halaman_input_rpjpd_rpjmd;
 			}
+			echo '<li>' . $halaman_pengisian_rencana_aksi . '</li>';
 			echo '</ul>';
 		} else if (
 			in_array("pa", $user_meta->roles)
@@ -17873,12 +17893,33 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							</div>';
 				}
 
+				$pengisian_rencana_aksi_skpd = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Pengisian Rencana Aksi ' . $_GET['tahun'],
+					'content' => '[detail_pengisian_rencana_aksi tahun=' . $_GET['tahun'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$title_pengisian_rencana_aksi_skpd = 'Pengisian Rencana Aksi';
+				$pengisian_rencana_aksi_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+				$pengisian_rencana_aksi_per_skpd_page = '<li><a href="' . $pengisian_rencana_aksi_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $title_pengisian_rencana_aksi_skpd . '</a></li>';
+
+				$halaman_input_renaksi = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="pengisian-rencana-aksi-' . $skpd_db['id_skpd'] . '" style="margin: 0;">Pengisian Rencana Aksi</h5>
+					<div class="esakip-body-tahun" data-id="pengisian-rencana-aksi-' . $skpd_db['id_skpd'] . '">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+							' . $pengisian_rencana_aksi_per_skpd_page . '
+						</ul>
+					</div>
+				</div>';
+
 				echo '
 					<h2 class="text-center">' . $skpd_db['nama_skpd'] . '</h2>
 					<ul class="daftar-menu-sakip" style="margin-bottom: 3rem;">
 						<li>' . $halaman_sakip_skpd . '</li>
 						<li>' . $halaman_lke_per_skpd . '</li>
 						<li>' . $halaman_sakip_pokin_opd . '</li>
+						<li>' . $halaman_input_renaksi . '</li>
 					</ul>';
 			}
 		}

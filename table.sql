@@ -1134,3 +1134,14 @@ CREATE TABLE `esakip_data_lembaga_lainnya` (
   `active` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY  (id)
 );
+
+
+CREATE TABLE `esakip_data_rencana_aksi_opd` (
+  `id` int(11) NOT NULL auto_increment,
+  `tahun_anggaran` year(4) DEFAULT NULL,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
+);

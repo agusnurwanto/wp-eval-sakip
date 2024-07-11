@@ -524,6 +524,9 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_edit_crosscutting_pemda_tujuan',  $plugin_public, 'edit_crosscutting_pemda_tujuan');
 		$this->loader->add_action('wp_ajax_submit_edit_crosscutting_pemda',  $plugin_public, 'submit_edit_crosscutting_pemda');
 
+		$this->loader->add_action('wp_ajax_get_table_skpd_pengisian_rencana_aksi', $plugin_public, 'get_table_skpd_pengisian_rencana_aksi');
+		$this->loader->add_action('wp_ajax_get_data_renaksi', $plugin_public, 'get_data_renaksi');
+
 		$this->loader->add_action('wp_ajax_get_table_capaian_indikator',  $plugin_public, 'get_table_capaian_indikator');
 		
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
@@ -547,6 +550,8 @@ class Wp_Eval_Sakip {
 		add_shortcode('laporan_kinerja', array($plugin_public, 'laporan_kinerja'));
 		add_shortcode('evaluasi_internal', array($plugin_public, 'evaluasi_internal'));
 		add_shortcode('dokumen_lainnya', array($plugin_public, 'dokumen_lainnya'));
+		add_shortcode('list_pengisian_rencana_aksi', array($plugin_public, 'list_pengisian_rencana_aksi'));
+		add_shortcode('detail_pengisian_rencana_aksi', array($plugin_public, 'detail_pengisian_rencana_aksi'));
 
 		add_shortcode('rpjmd', array($plugin_public, 'rpjmd'));
 		add_shortcode('rkpd', array($plugin_public, 'rkpd'));
