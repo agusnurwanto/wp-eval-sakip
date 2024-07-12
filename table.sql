@@ -1135,9 +1135,22 @@ CREATE TABLE `esakip_data_lembaga_lainnya` (
   PRIMARY KEY  (id)
 );
 
-
 CREATE TABLE `esakip_data_rencana_aksi_opd` (
   `id` int(11) NOT NULL auto_increment,
+  `label` varchar(255) NOT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `parent` int(11) DEFAULT 0,
+  `label_indikator` varchar(255) DEFAULT null,
+  `level` int(11) NOT null COMMENT '1 = kegiatan, 1 = rencana aksi, 2 = uraian kegiatan',
+  `target` text DEFAULT NULL,
+  `realisasi` text DEFAULT NULL,
+  `satuan` text DEFAULT NULL,
+  `target_1` text DEFAULT NULL,
+  `target_2` text DEFAULT NULL,
+  `target_3` text DEFAULT NULL,
+  `target_4` text DEFAULT NULL,
+  `target_akhir` text DEFAULT NULL,
+  `pagu` double(20, 0) DEFAULT NULL,
   `tahun_anggaran` year(4) DEFAULT NULL,
   `id_jadwal` int(11) DEFAULT NULL,
   `active` tinyint(4) NOT NULL,

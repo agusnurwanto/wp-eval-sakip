@@ -222,23 +222,6 @@ $is_administrator = in_array('administrator', $user_roles);
     </div>
 </div>
 
-<!-- Modal crud -->
-<div class="modal fade" id="modal-crud" data-backdrop="static"  role="dialog" aria-labelledby="modal-crud-label" aria-hidden="true">
-  	<div class="modal-dialog modal-dialog-scrollable" role="document">
-    	<div class="modal-content">
-      		<div class="modal-header">
-		        <h5 class="modal-title">Modal title</h5>
-		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-		          	<span aria-hidden="true">&times;</span>
-		        </button>
-	      	</div>
-	      	<div class="modal-body">
-	      	</div>
-	      	<div class="modal-footer"></div>
-    	</div>
-  	</div>
-</div>
-
 <!-- Modal Renaksi -->
 <div class="modal fade" id="modal-renaksi" role="dialog" data-backdrop="static" aria-hidden="true">'
     <div class="modal-dialog" style="max-width: 1200px;" role="document">
@@ -263,6 +246,23 @@ $is_administrator = in_array('administrator', $user_roles);
 			</div>
 		</div>
     </div>
+</div>
+
+<!-- Modal crud -->
+<div class="modal fade" id="modal-crud" data-backdrop="static"  role="dialog" aria-labelledby="modal-crud-label" aria-hidden="true">
+  	<div class="modal-dialog modal-dialog-scrollable" role="document">
+    	<div class="modal-content">
+      		<div class="modal-header">
+		        <h5 class="modal-title">Modal title</h5>
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		          	<span aria-hidden="true">&times;</span>
+		        </button>
+	      	</div>
+	      	<div class="modal-body">
+	      	</div>
+	      	<div class="modal-footer"></div>
+    	</div>
+  	</div>
 </div>
 
 
@@ -299,8 +299,35 @@ $is_administrator = in_array('administrator', $user_roles);
             jQuery("#modal-crud").find('.modal-dialog').css('width','');
             jQuery("#modal-crud").modal('show');
         })
-    });
 
+        jQuery(document).on('click', '#tambah-kegiatan-utama', function(){
+            jQuery("#modal-crud").find('.modal-title').html('Tambah Rencana Aksi');
+            jQuery("#modal-crud").find('.modal-body').html(''
+                +`<form id="form-renaksi">`
+                    +`<input type="hidden" name="parent" value="0">`
+                    +`<input type="hidden" name="level" value="1">`
+                    +`<div class="form-group">`
+                            +`<textarea class="form-control" name="label" placeholder="Tuliskan Kegiatan Utama..."></textarea>`
+                    +`</div>`
+                    +`<div class="form-group" id="showSkpdCroscutting">`
+						+`<label for="skpdCroscutting">Pilih Pokin Level 2</label>`
+						+`<select class="form-control" name="skpdCroscutting" id="skpdCroscutting">`
+						// +`<?php echo $option_skpd; ?>`
+						+`</select>`
+					+`</div>`
+                +`</form>`);
+            jQuery("#modal-crud").find('.modal-footer').html(''
+                +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
+                    +'Tutup'
+                +'</button>'
+                +'<button type="button" class="btn btn-success" id="simpan-data-renaksi" data-action="create_renaksi" data-view="kegiatanUtama">'
+                    +'Simpan'
+                +'</button>');
+            jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
+            jQuery("#modal-crud").find('.modal-dialog').css('width','');
+            jQuery("#modal-crud").modal('show');
+        })
+    });
     
     function kegiatanUtama(){
         jQuery("#wrap-loading").show();
@@ -310,7 +337,7 @@ $is_administrator = in_array('administrator', $user_roles);
                 type: "post",
                 data: {
                     "action": "get_data_renaksi",
-                    "tipe": 'kegiatan_utama',
+                    "level": 1,
                     "parent": 0,
                     "id_jadwal": '<?php echo $input['periode']; ?>',
                     "api_key": esakip.api_key,
@@ -328,7 +355,9 @@ $is_administrator = in_array('administrator', $user_roles);
                             +`<thead>`
                                 +`<tr>`
                                     +`<th class="text-center" style="width:20%">No</th>`
-                                    +`<th class="text-center" style="width:60%">Label Pohon Kinerja</th>`
+                                    +`<th class="text-center" style="width:60%">Label Kegiatan Utama</th>`
+                                    +`<th class="text-center" style="width:60%">Target</th>`
+                                    +`<th class="text-center" style="width:60%">Realisasi</th>`
                                     +`<th class="text-center" style="width:20%">Aksi</th>`
                                 +`</tr>`
                             +`</thead>`

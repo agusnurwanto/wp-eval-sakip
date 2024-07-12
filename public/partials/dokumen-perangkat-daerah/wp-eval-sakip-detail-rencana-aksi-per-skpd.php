@@ -203,22 +203,23 @@ $is_administrator = in_array('administrator', $user_roles);
         });
     });
 
-    function getTableTahun() {
+    function getTableRencanaAksi() {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'get_table_tahun_rencana_aksi',
+                action: 'get_table_rencana_aksi',
                 api_key: esakip.api_key,
                 id_skpd: <?php echo $id_skpd; ?>,
+                tahun_anggaran: '<?php echo $input['tahun'] ?>'
             },
             dataType: 'json',
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 console.log(response);
                 if (response.status === 'success') {
-                    jQuery('#tahunContainer').html(response.data);
+                    jQuery('#table_dokumen_rencana_aksi tbody').html(response.data);
                 } else {
                     alert(response.message);
                 }
@@ -226,7 +227,7 @@ $is_administrator = in_array('administrator', $user_roles);
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat tabel!');
+                alert('Terjadi kesalahan saat memuat data Rencana Aksi!');
             }
         });
     }
@@ -269,35 +270,6 @@ $is_administrator = in_array('administrator', $user_roles);
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
                 alert('Terjadi kesalahan saat mengirim data!');
-            }
-        });
-    }
-
-    function getTableRencanaAksi() {
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: 'POST',
-            data: {
-                action: 'get_table_rencana_aksi',
-                api_key: esakip.api_key,
-                id_skpd: <?php echo $id_skpd; ?>,
-                tahun_anggaran: '<?php echo $input['tahun'] ?>'
-            },
-            dataType: 'json',
-            success: function(response) {
-                jQuery('#wrap-loading').hide();
-                console.log(response);
-                if (response.status === 'success') {
-                    jQuery('#table_dokumen_rencana_aksi tbody').html(response.data);
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                jQuery('#wrap-loading').hide();
-                console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data Rencana Aksi!');
             }
         });
     }

@@ -83,6 +83,13 @@ $style3 = 'class="level3"';
 $style4 = 'class="level4"';
 $style5 = 'class="level5"';
 
+$view_kinerja_asal = $this->functions->generatePage(array(
+	'nama_page' => 'View Pohon Kinerja OPD'.$nama_skpd,
+	'content' => '[view_pohon_kinerja_opd periode='. $input['periode'] .']',
+	'show_header' => 1,
+	'post_status' => 'private'
+));
+
 $data_temp= [];
 if(!empty($data_all['data'])){
 
@@ -122,7 +129,12 @@ if(!empty($data_all['data'])){
 							if($v_cross_2['croscutting_opd_lain'] == 1){
 								$class_cc_opd_lain = 'cc-opd-lain';
 							}
-							$nama_skpd_all[] = $v_cross_2['nama_skpd'];
+							$show_nama_skpd = $v_cross_2['nama_skpd'];
+							if($v_cross_2['id_level_1_parent'] !== 0){
+								$show_nama_skpd = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $v_cross_2['id_skpd_view_pokin']  . "&id=" . $v_cross_2['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $v_cross_2['nama_skpd'] . "</a>";
+							}
+
+							$nama_skpd_all[] = $show_nama_skpd;
 						}
 						
 						$data_temp[$keylevel2][0]->f.="<div class='croscutting tampil_croscutting ".$class_cc_opd_lain."'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode("<br>",$nama_skpd_all) ." ". $valCross['croscutting_opd_lain'] ." </div></div>";
@@ -153,7 +165,13 @@ if(!empty($data_all['data'])){
 									if($v_cross_3['croscutting_opd_lain'] == 1){
 										$class_cc_opd_lain = 'cc-opd-lain';
 									}
-									$nama_skpd_all[] = $v_cross_3['nama_skpd'];
+									
+									$show_nama_skpd = $v_cross_3['nama_skpd'];
+									if($v_cross_3['id_level_1_parent'] !== 0){
+										$show_nama_skpd = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $v_cross_3['id_skpd_view_pokin']  . "&id=" . $v_cross_3['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $v_cross_3['nama_skpd'] . "</a>";
+									}
+
+									$nama_skpd_all[] = $show_nama_skpd;
 								}
 								
 								$data_temp[$keylevel3][0]->f.="<div class='croscutting tampil_croscutting ".$class_cc_opd_lain."'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode("<br>",$nama_skpd_all) ." ". $valCross['croscutting_opd_lain'] ." </div></div>";
@@ -187,7 +205,13 @@ if(!empty($data_all['data'])){
 											if($v_cross_4['croscutting_opd_lain'] == 1){
 												$class_cc_opd_lain = 'cc-opd-lain';
 											}
-											$nama_skpd_all[] = $v_cross_4['nama_skpd'];
+											
+											$show_nama_skpd = $v_cross_4['nama_skpd'];
+											if(!empty($v_cross_4['id_level_1_parent']) && $v_cross_4['id_level_1_parent'] !== 0){
+												$show_nama_skpd = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $v_cross_4['id_skpd_view_pokin']  . "&id=" . $v_cross_4['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $v_cross_4['nama_skpd'] . "</a>";
+											}
+
+											$nama_skpd_all[] = $show_nama_skpd;
 										}
 										
 						                $data_temp[$keylevel4][0]->f.="<div class='croscutting tampil_croscutting ".$class_cc_opd_lain."'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode("<br>",$nama_skpd_all) ." ". $valCross['croscutting_opd_lain'] ." </div></div>";
@@ -221,7 +245,13 @@ if(!empty($data_all['data'])){
 													if($v_cross_4['croscutting_opd_lain'] == 1){
 														$class_cc_opd_lain = 'cc-opd-lain';
 													}
-													$nama_skpd_all[] = $v_cross_5['nama_skpd'];
+													
+													$show_nama_skpd = $v_cross_5['nama_skpd'];
+													if($v_cross_5['id_level_1_parent'] !== 0){
+														$show_nama_skpd = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $v_cross_5['id_skpd_view_pokin']  . "&id=" . $v_cross_5['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $v_cross_5['nama_skpd'] . "</a>";
+													}
+
+													$nama_skpd_all[] = $show_nama_skpd;
 												}
 												$data_temp[$keylevel5][0]->f.="<div class='croscutting tampil_croscutting ".$class_cc_opd_lain."'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode("<br>",$nama_skpd_all) ."</div></div>";
 											}
