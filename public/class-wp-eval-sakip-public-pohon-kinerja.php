@@ -613,7 +613,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							$table_croscutting .= '<td>' . $status_croscutting . '</td>';
 
 							$aksi = '';
-							if($status_croscutting == 'disetujui'){
+							if($status_croscutting == 'disetujui' && $v_cross['is_lembaga_lainnya'] != 1){
 								$aksi .= '<a href="javascript:void(0)" class="btn btn-sm btn-primary" data-id="' . $v_cross['id'] . '" href="#" title="Croscutting Disetujui">Disetujui</a>';
 							}else{
 								$aksi .= '<a href="javascript:void(0)" class="btn btn-sm btn-warning edit-croscutting" data-id="' . $v_cross['id'] . '" href="#" title="Edit Croscutting"><span class="dashicons dashicons-edit"></span></a>';
