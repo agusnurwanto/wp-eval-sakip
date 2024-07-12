@@ -123,21 +123,26 @@ if(!empty($data_all['data'])){
 				if(!empty($level_2['croscutting'])){
 					$data_temp[$keylevel2][0]->f.="<div class='croscutting-2 tampil_croscutting'>CROSCUTTING</div>";
 					foreach ($level_2['croscutting'] as $keyCross => $valCross) {
-						$nama_skpd_all = array();
-						foreach ($valCross['data'] as $k_cross_2 => $v_cross_2) {
+							$nama_skpd_all = array();
 							$class_cc_opd_lain = '';
-							if($v_cross_2['croscutting_opd_lain'] == 1){
+							if($valCross['croscutting_opd_lain'] == 1){
 								$class_cc_opd_lain = 'cc-opd-lain';
 							}
-							$show_nama_skpd = $v_cross_2['nama_skpd'];
-							if($v_cross_2['id_level_1_parent'] !== 0){
-								$show_nama_skpd = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $v_cross_2['id_skpd_view_pokin']  . "&id=" . $v_cross_2['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $v_cross_2['nama_skpd'] . "</a>";
+							
+							$show_nama_skpd = $valCross['nama_skpd'];
+							$label_parent = $valCross['label_parent'];
+							if(!empty($valCross['id_level_1_parent']) && $valCross['is_lembaga_lainnya'] != 1){
+								$show_nama_skpd = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $valCross['id_skpd_view_pokin']  . "&id=" . $valCross['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
 							}
-
-							$nama_skpd_all[] = $show_nama_skpd;
-						}
-						
-						$data_temp[$keylevel2][0]->f.="<div class='croscutting tampil_croscutting ".$class_cc_opd_lain."'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode("<br>",$nama_skpd_all) ." ". $valCross['croscutting_opd_lain'] ." </div></div>";
+							if(!empty($valCross['label_parent_tujuan'])){
+								$label_parent = $valCross['label_parent_tujuan'];
+							}
+							$class_cc_vertikal = '';
+							if($valCross['is_lembaga_lainnya'] == 1){
+								$label_parent = "??";
+								$class_cc_vertikal = "croscutting-lembaga-vertikal";
+							}
+							$data_temp[$keylevel2][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ."</div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
 					}
 				}
 
@@ -160,21 +165,25 @@ if(!empty($data_all['data'])){
 							$data_temp[$keylevel3][0]->f.="<div class='croscutting-2 tampil_croscutting'>CROSCUTTING</div>";
 							foreach ($level_3['croscutting'] as $keyCross => $valCross) {
 								$nama_skpd_all = array();
-								foreach ($valCross['data'] as $k_cross_3 => $v_cross_3) {
-									$class_cc_opd_lain = '';
-									if($v_cross_3['croscutting_opd_lain'] == 1){
-										$class_cc_opd_lain = 'cc-opd-lain';
-									}
-									
-									$show_nama_skpd = $v_cross_3['nama_skpd'];
-									if($v_cross_3['id_level_1_parent'] !== 0){
-										$show_nama_skpd = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $v_cross_3['id_skpd_view_pokin']  . "&id=" . $v_cross_3['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $v_cross_3['nama_skpd'] . "</a>";
-									}
-
-									$nama_skpd_all[] = $show_nama_skpd;
+								$class_cc_opd_lain = '';
+								if($valCross['croscutting_opd_lain'] == 1){
+									$class_cc_opd_lain = 'cc-opd-lain';
 								}
 								
-								$data_temp[$keylevel3][0]->f.="<div class='croscutting tampil_croscutting ".$class_cc_opd_lain."'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode("<br>",$nama_skpd_all) ." ". $valCross['croscutting_opd_lain'] ." </div></div>";
+								$show_nama_skpd = $valCross['nama_skpd'];
+								$label_parent = $valCross['label_parent'];
+								if(!empty($valCross['id_level_1_parent']) && $valCross['is_lembaga_lainnya'] != 1){
+									$show_nama_skpd = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $valCross['id_skpd_view_pokin']  . "&id=" . $valCross['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
+								}
+								if(!empty($valCross['label_parent_tujuan'])){
+									$label_parent = $valCross['label_parent_tujuan'];
+								}
+								$class_cc_vertikal = '';
+								if($valCross['is_lembaga_lainnya'] == 1){
+									$label_parent = "??";
+									$class_cc_vertikal = "croscutting-lembaga-vertikal";
+								}
+								$data_temp[$keylevel3][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ."</div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
 							}
 						}
 
@@ -200,21 +209,25 @@ if(!empty($data_all['data'])){
 									$data_temp[$keylevel4][0]->f.="<div class='croscutting-2 tampil_croscutting'>CROSCUTTING</div>";
 				            		foreach ($level_4['croscutting'] as $keyCross => $valCross) {
 										$nama_skpd_all = array();
-										foreach ($valCross['data'] as $k_cross_4 => $v_cross_4) {
-											$class_cc_opd_lain = '';
-											if($v_cross_4['croscutting_opd_lain'] == 1){
-												$class_cc_opd_lain = 'cc-opd-lain';
-											}
-											
-											$show_nama_skpd = $v_cross_4['nama_skpd'];
-											if(!empty($v_cross_4['id_level_1_parent']) && $v_cross_4['id_level_1_parent'] !== 0){
-												$show_nama_skpd = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $v_cross_4['id_skpd_view_pokin']  . "&id=" . $v_cross_4['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $v_cross_4['nama_skpd'] . "</a>";
-											}
-
-											$nama_skpd_all[] = $show_nama_skpd;
+										$class_cc_opd_lain = '';
+										if($valCross['croscutting_opd_lain'] == 1){
+											$class_cc_opd_lain = 'cc-opd-lain';
 										}
 										
-						                $data_temp[$keylevel4][0]->f.="<div class='croscutting tampil_croscutting ".$class_cc_opd_lain."'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode("<br>",$nama_skpd_all) ." ". $valCross['croscutting_opd_lain'] ." </div></div>";
+										$show_nama_skpd = $valCross['nama_skpd'];
+										$label_parent = $valCross['label_parent'];
+										if(!empty($valCross['id_level_1_parent']) && $valCross['is_lembaga_lainnya'] != 1){
+											$show_nama_skpd = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $valCross['id_skpd_view_pokin']  . "&id=" . $valCross['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
+										}
+										if(!empty($valCross['label_parent_tujuan']) && $valCross['is_lembaga_lainnya'] != 1){
+											$label_parent = $valCross['label_parent_tujuan'];
+										}
+										$class_cc_vertikal = '';
+										if($valCross['is_lembaga_lainnya'] == 1){
+											$label_parent = "??";
+											$class_cc_vertikal = "croscutting-lembaga-vertikal";
+										}
+						                $data_temp[$keylevel4][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ."</div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
 						            }
 					            }
 
@@ -240,20 +253,25 @@ if(!empty($data_all['data'])){
 											$data_temp[$keylevel5][0]->f.="<div class='croscutting-2 tampil_croscutting'>CROSCUTTING</div>";
 											foreach ($level_5['croscutting'] as $keyCross => $valCross) {
 												$nama_skpd_all = array();
-												foreach ($valCross['data'] as $k_cross_5 => $v_cross_5) {
-													$class_cc_opd_lain = '';
-													if($v_cross_4['croscutting_opd_lain'] == 1){
-														$class_cc_opd_lain = 'cc-opd-lain';
-													}
-													
-													$show_nama_skpd = $v_cross_5['nama_skpd'];
-													if($v_cross_5['id_level_1_parent'] !== 0){
-														$show_nama_skpd = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $v_cross_5['id_skpd_view_pokin']  . "&id=" . $v_cross_5['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $v_cross_5['nama_skpd'] . "</a>";
-													}
-
-													$nama_skpd_all[] = $show_nama_skpd;
+												$class_cc_opd_lain = '';
+												if($valCross['croscutting_opd_lain'] == 1){
+													$class_cc_opd_lain = 'cc-opd-lain';
 												}
-												$data_temp[$keylevel5][0]->f.="<div class='croscutting tampil_croscutting ".$class_cc_opd_lain."'><div>". $valCross['keterangan'] ."</div><div class='cros-opd'>". implode("<br>",$nama_skpd_all) ."</div></div>";
+												
+												$show_nama_skpd = $valCross['nama_skpd'];
+												$label_parent = $valCross['label_parent'];
+												if(!empty($valCross['id_level_1_parent']) && $valCross['is_lembaga_lainnya'] != 1){
+													$show_nama_skpd = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $valCross['id_skpd_view_pokin']  . "&id=" . $valCross['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
+												}
+												if(!empty($valCross['label_parent_tujuan'])){
+													$label_parent = $valCross['label_parent_tujuan'];
+												}
+												$class_cc_vertikal = '';
+												if($valCross['is_lembaga_lainnya'] == 1){
+													$label_parent = "??";
+													$class_cc_vertikal = "croscutting-lembaga-vertikal";
+												}
+												$data_temp[$keylevel5][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ."</div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
 											}
 										}
 		
@@ -398,7 +416,7 @@ if(!empty($data_all['data'])){
   	}
 	.croscutting {
 		color: #0d0909; 
-  		font-size:11px; 
+  		font-size:12px; 
   		font-weight:600;
   		font-style:italic; 
   		padding:10px; 
@@ -422,6 +440,10 @@ if(!empty($data_all['data'])){
   		font-weight:600; 
   		padding:10px; 
 		background: #FFC6FF;
+	}
+
+	.croscutting-lembaga-vertikal{
+		background-color: #f1b82a;
 	}
 
 	.tampil_croscutting {

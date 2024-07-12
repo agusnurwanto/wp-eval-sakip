@@ -2508,26 +2508,30 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 				}
 				if($opsi['tipe'] == 'opd'){
 					// data croscutting
+					// dapatkan croscutinh pengusulan
 					$data_croscutting_level = $wpdb->get_results($wpdb->prepare("
 						SELECT 
 							cc.*,
 							pk.id as id_parent_asal,
-							pk.level as level_parent
+							pk.level as level_parent,
+							pk.label as label_parent,
+							pkt.label as label_parent_tujuan
 						FROM esakip_croscutting_opd as cc
-						JOIN esakip_pohon_kinerja_opd as pk
-						ON cc.parent_pohon_kinerja = pk.id
+						JOIN esakip_pohon_kinerja_opd as pk ON cc.parent_pohon_kinerja = pk.id
+						LEFT JOIN esakip_pohon_kinerja_opd as pkt ON cc.parent_croscutting = pkt.id
 						WHERE cc.parent_pohon_kinerja=%d 
 							AND cc.active=1 
 							AND cc.status_croscutting=1
 						ORDER BY cc.id
 					", $level['id']), ARRAY_A);
-
+					//  dapatkan croscutting yang diusulkan
 					$data_croscutting_level_pengusul = $wpdb->get_results($wpdb->prepare("
 						SELECT 
 							cc.*,
 							pk.id_skpd as id_skpd_parent,
 							pk.id as id_parent_asal,
-							pk.level as level_parent
+							pk.level as level_parent,
+							pk.label as label_parent
 						FROM esakip_croscutting_opd as cc
 						JOIN esakip_pohon_kinerja_opd as pk
 						ON cc.parent_pohon_kinerja = pk.id
@@ -2591,14 +2595,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							}
 
 							if (!empty($croscutting_level['keterangan'])) {
-								if (empty($data_ret[trim($level['label'])]['croscutting'][(trim($croscutting_level['keterangan']))])) {
-									$data_ret[trim($level['label'])]['croscutting'][(trim($croscutting_level['keterangan']))] = [
-										'id' => $croscutting_level['id'],
-										'keterangan' => $croscutting_level['keterangan'],
-										'data' => array()
-									];
-								}
-
 								if(!empty($croscutting_level['id_skpd_parent'])){
 									$croscutting_opd_lain = 1;
 								}else{
@@ -2629,14 +2625,20 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									$id_level_1_parent = $data_parent_tujuan['data'];
 								}
 
-								$data_ret[trim($level['label'])]['croscutting'][(trim($croscutting_level['keterangan']))]['data'][$key_croscutting_level] = [
-									'id' => $croscutting_level['id'],
-									'parent_pohon_kinerja' => $croscutting_level['parent_pohon_kinerja'],
-									'keterangan' => $croscutting_level['keterangan'],
-									'nama_skpd' => $nama_perangkat,
-									'id_skpd_view_pokin' => $id_skpd_view_pokin,
-									'id_level_1_parent' => $id_level_1_parent
-								];
+								if (empty($data_ret[trim($level['label'])]['croscutting'][$key_croscutting_level])) {
+									$data_ret[trim($level['label'])]['croscutting'][$key_croscutting_level] = [
+										'id' => $croscutting_level['id'],
+										'parent_pohon_kinerja' => $croscutting_level['parent_pohon_kinerja'],
+										'keterangan' => $croscutting_level['keterangan'],
+										'is_lembaga_lainnya' => $croscutting_level['is_lembaga_lainnya'],
+										'label_parent' => $croscutting_level['label_parent'],
+										'label_parent_tujuan' => $croscutting_level['label_parent_tujuan'],
+										'croscutting_opd_lain' => $croscutting_opd_lain,
+										'nama_skpd' => $nama_perangkat,
+										'id_skpd_view_pokin' => $id_skpd_view_pokin,
+										'id_level_1_parent' => $id_level_1_parent
+									];
+								}
 							}
 						}
 					}
