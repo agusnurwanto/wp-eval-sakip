@@ -275,455 +275,497 @@ $is_administrator = in_array('administrator', $user_roles);
 
 
 <script>
-    jQuery(document).ready(function() {
-        // getTablePengisianRencanaAksi();
-        jQuery("#fileUpload").on('change', function() {
-            var id_dokumen = jQuery('#idDokumen').val();
-            if (id_dokumen == '') {
-                var name = jQuery("#fileUpload").prop('files')[0].name;
-                jQuery('#nama_file').val(name);
+jQuery(document).ready(function() {
+    // getTablePengisianRencanaAksi();
+    jQuery("#fileUpload").on('change', function() {
+        var id_dokumen = jQuery('#idDokumen').val();
+        if (id_dokumen == '') {
+            var name = jQuery("#fileUpload").prop('files')[0].name;
+            jQuery('#nama_file').val(name);
+        }
+    });
+
+    jQuery("#tambah-rencana-aksi").on('click', function(){
+        kegiatanUtama().then(function(){
+            jQuery("#kegiatanUtama").DataTable();
+        });
+    });
+    
+    jQuery(document).on('click', '#ll', function(){
+        jQuery("#modal-crud").find('.modal-title').html('Tambah Rencana Aksi');
+        jQuery("#modal-crud").find('.modal-body').html(''
+            +'<form id="form-pokin">'
+            +'</form>');
+        jQuery("#modal-crud").find('.modal-footer').html(''
+            +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
+                +'Tutup'
+            +'</button>'
+            +'<button type="button" class="btn btn-success" id="simpan-rencana-aksi" data-action="tambah_rencan_aksi">'
+                +'Simpan'
+            +'</button>');
+        jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
+        jQuery("#modal-crud").find('.modal-dialog').css('width','');
+        jQuery("#modal-crud").modal('show');
+    })
+
+    jQuery(document).on('click', '#tambah-kegiatan-utama', function(){
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: "post",
+            data: {
+                "action": "get_data_pokin",
+                "level": 1,
+                "parent": 0,
+                "api_key": esakip.api_key,
+                "tipe_pokin": "opd",
+                "id_jadwal": <?php echo $id_jadwal; ?>,
+                "id_skpd": <?php echo $id_skpd; ?>
+            },
+            dataType: "json",
+            success: function(res){
+                var html = '<option value="">Pilih Pokin Level 1</option>';
+                res.data.map(function(value, index){
+                    html += '<option value="'+value.id+'">'+value.label+'</option>';
+                });
+                jQuery('#wrap-loading').hide();
+                jQuery("#modal-crud").find('.modal-title').html('Tambah Rencana Aksi');
+                jQuery("#modal-crud").find('.modal-body').html(''
+                    +`<form id="form-renaksi">`
+                        +`<div class="form-group">`
+    						+`<label for="pokin-level-1">Pilih Pokin Level 1</label>`
+    						+`<select class="form-control" name="pokin-level-1" id="pokin-level-1" onchange="get_data_pokin(this.value, 2, 'pokin-level-2')">`
+                                +html
+    						+`</select>`
+    					+`</div>`
+                        +`<div class="form-group">`
+                            +`<label for="pokin-level-2">Pilih Pokin Level 2</label>`
+                            +`<select class="form-control" name="pokin-level-2" id="pokin-level-2">`
+                            +`</select>`
+                        +`</div>`
+                        +`<div class="form-group">`
+                                +`<textarea class="form-control" name="label" id="kegiatan-utama" placeholder="Tuliskan Kegiatan Utama..."></textarea>`
+                        +`</div>`
+                    +`</form>`);
+                jQuery("#modal-crud").find('.modal-footer').html(''
+                    +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
+                        +'Tutup'
+                    +'</button>'
+                    +'<button type="button" class="btn btn-success" id="simpan-data-renaksi" data-action="create_renaksi" data-view="kegiatanUtama">'
+                        +'Simpan'
+                    +'</button>');
+                jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
+                jQuery("#modal-crud").find('.modal-dialog').css('width','');
+                jQuery("#modal-crud").modal('show');
+                jQuery('#pokin-level-1').select2({width: '100%'});
+                jQuery('#pokin-level-2').select2({width: '100%'});
             }
-        });
-
-        jQuery("#tambah-rencana-aksi").on('click', function(){
-            kegiatanUtama().then(function(){
-                jQuery("#kegiatanUtama").DataTable();
-            });
-        });
-        
-        jQuery(document).on('click', '#ll', function(){
-            jQuery("#modal-crud").find('.modal-title').html('Tambah Rencana Aksi');
-            jQuery("#modal-crud").find('.modal-body').html(''
-                +'<form id="form-pokin">'
-                +'</form>');
-            jQuery("#modal-crud").find('.modal-footer').html(''
-                +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
-                    +'Tutup'
-                +'</button>'
-                +'<button type="button" class="btn btn-success" id="simpan-rencana-aksi" data-action="tambah_rencan_aksi">'
-                    +'Simpan'
-                +'</button>');
-            jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
-            jQuery("#modal-crud").find('.modal-dialog').css('width','');
-            jQuery("#modal-crud").modal('show');
-        })
-
-        jQuery(document).on('click', '#tambah-kegiatan-utama', function(){
-            jQuery('#wrap-loading').show();
-            jQuery.ajax({
-                url: esakip.url,
-                type: "post",
-                data: {
-                    "action": "get_data_pokin",
-                    "level": 1,
-                    "parent": 0,
-                    "api_key": esakip.api_key,
-                    "tipe_pokin": "opd",
-                    "id_jadwal": <?php echo $id_jadwal; ?>,
-                    "id_skpd": <?php echo $id_skpd; ?>
-                },
-                dataType: "json",
-                success: function(res){
-                    var html = '<option value="">Pilih Pokin Level 1</option>';
-                    res.data.map(function(value, index){
-                        html += '<option value="'+value.id+'">'+value.label+'</option>';
-                    });
-                    jQuery('#wrap-loading').hide();
-                    jQuery("#modal-crud").find('.modal-title').html('Tambah Rencana Aksi');
-                    jQuery("#modal-crud").find('.modal-body').html(''
-                        +`<form id="form-renaksi">`
-                            +`<input type="hidden" name="parent" value="0">`
-                            +`<input type="hidden" name="level" value="1">`
-                            +`<div class="form-group">`
-                                    +`<textarea class="form-control" name="label" placeholder="Tuliskan Kegiatan Utama..."></textarea>`
-                            +`</div>`
-                            +`<div class="form-group">`
-        						+`<label for="pokin-level-1">Pilih Pokin Level 1</label>`
-        						+`<select class="form-control" name="pokin-level-1" id="pokin-level-1" onchange="get_data_pokin(this.value, 2, 'pokin-level-2')">`
-                                    +html
-        						+`</select>`
-        					+`</div>`
-                            +`<div class="form-group">`
-                                +`<label for="pokin-level-2">Pilih Pokin Level 2</label>`
-                                +`<select class="form-control" name="pokin-level-2" id="pokin-level-2">`
-                                +`</select>`
-                            +`</div>`
-                        +`</form>`);
-                    jQuery("#modal-crud").find('.modal-footer').html(''
-                        +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
-                            +'Tutup'
-                        +'</button>'
-                        +'<button type="button" class="btn btn-success" id="simpan-data-renaksi" data-action="create_renaksi" data-view="kegiatanUtama">'
-                            +'Simpan'
-                        +'</button>');
-                    jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
-                    jQuery("#modal-crud").find('.modal-dialog').css('width','');
-                    jQuery("#modal-crud").modal('show');
-                    jQuery('#pokin-level-1').select2({width: '100%'});
-                    jQuery('#pokin-level-2').select2({width: '100%'});
-                }
-            });
         });
     });
 
-    function get_data_pokin(parent, level, tag){
+    jQuery(document).on('click', '#simpan-data-renaksi', function(){
+        var id_pokin_1 = jQuery('#pokin-level-1').val();
+        var id_pokin_2 = jQuery('#pokin-level-2').val();
+        var label_pokin_1 = jQuery('#pokin-level-1 option:selected').text();
+        var label_pokin_2 = jQuery('#pokin-level-2 option:selected').text();;
+        var kegiatan_utama = jQuery('#kegiatan-utama').val();
+        if(kegiatan_utama == ''){
+            return alert('Kegiatan Utama tidak boleh kosong!')
+        }
+        if(id_pokin_2 == ''){
+            return alert('Level 2 pohon kinerja tidak boleh kosong!')
+        }
         jQuery('#wrap-loading').show();
-        return new Promise(function(resolve, reject){
-            jQuery.ajax({
-                url: esakip.url,
-                type: "post",
-                data: {
-                    "action": "get_data_pokin",
-                    "level": level,
-                    "parent": parent,
-                    "api_key": esakip.api_key,
-                    "tipe_pokin": "opd",
-                    "id_jadwal": <?php echo $id_jadwal; ?>,
-                    "id_skpd": <?php echo $id_skpd; ?>
-                },
-                dataType: "json",
-                success: function(res){
-                    var html = '<option value="">Pilih Pokin Level '+level+'</option>';
-                    res.data.map(function(value, index){
-                        html += '<option value="'+value.id+'">'+value.label+'</option>';
+        var action = jQuery('#simpan-data-renaksi').attr('data-action');
+        jQuery.ajax({
+            url: esakip.url,
+            type: "post",
+            data: {
+                "action": action,
+                "api_key": esakip.api_key,
+                "tipe_pokin": "opd",
+                "id_pokin_1": id_pokin_1,
+                "id_pokin_2": id_pokin_2,
+                "label_pokin_1": label_pokin_1,
+                "label_pokin_2": label_pokin_2,
+                "kegiatan_utama": kegiatan_utama,
+                "tahun_anggaran": <?php echo $input['tahun']; ?>,
+                "id_jadwal": <?php echo $id_jadwal; ?>,
+                "id_skpd": <?php echo $id_skpd; ?>
+            },
+            dataType: "json",
+            success: function(res){
+                jQuery('#wrap-loading').hide();
+                alert(res.message);
+                if(res.status=='success'){
+                    jQuery("#modal-crud").modal('hide');
+                    kegiatanUtama().then(function(){
+                        jQuery("#kegiatanUtama").DataTable();
                     });
-                    jQuery('#'+tag).html(html).trigger('change');
-                    jQuery('#wrap-loading').hide();
-                    resolve();
                 }
-            });
+            }
         });
-    }
-    
-    function kegiatanUtama(){
-        jQuery("#wrap-loading").show();
-        return new Promise(function(resolve, reject){
-            jQuery.ajax({
-                url: esakip.url,
-                type: "post",
-                data: {
-                    "action": "get_data_renaksi",
-                    "level": 1,
-                    "parent": 0,
-                    "api_key": esakip.api_key,
-                    "tipe_pokin": "opd",
-                    "id_skpd": <?php echo $id_skpd; ?>
-                },
-                dataType: "json",
-                success: function(res){
-                    jQuery('#wrap-loading').hide();
-                    let kegiatanUtama = ``
-                        +`<div style="margin-top:10px">`
-                            +`<button type="button" class="btn btn-success mb-2" id="tambah-kegiatan-utama"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
-                        +`</div>`
-                        +`<table class="table" id="kegiatanUtama">`
-                            +`<thead>`
-                                +`<tr>`
-                                    +`<th class="text-center" style="width:20%">No</th>`
-                                    +`<th class="text-center" style="width:60%">Label Kegiatan Utama</th>`
-                                    +`<th class="text-center" style="width:60%">Target</th>`
-                                    +`<th class="text-center" style="width:60%">Realisasi</th>`
-                                    +`<th class="text-center" style="width:20%">Aksi</th>`
-                                +`</tr>`
-                            +`</thead>`
-                            +`<tbody>`;
-                                // res.data.map(function(value, index){
-                                //     level1 += ``
-                                //         +`<tr id="pokinLevel1_${value.id}">`
-                                //             +`<td class="text-center">${index+1}.</td>`
-                                //             +`<td class="label-level1">${value.label}</td>`
-                                //             +`<td class="text-center">`
-                                //                 +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-success tambah-indikator-pokin-level1" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
-                                //                 +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning view-pokin-level2" title="Lihat pohon kinerja level 2"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
-                                //                 +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-primary edit-pokin-level1" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`
-                                //                 +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger hapus-pokin-level1" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
-                                //             +`</td>`
-                                //         +`</tr>`;
+    });
+});
 
-                                //     let indikator = Object.values(value.indikator);
-                                //     if(indikator.length > 0){
-                                //         indikator.map(function(indikator_value, indikator_index){
-                                //             level1 += ``
-                                //             +`<tr>`
-                                //                 +`<td><span style="display:none">${index+1}</span></td>`
-                                //                 +`<td>${index+1}.${indikator_index+1} ${indikator_value.label}</td>`
-                                //                 +`<td class="text-center">`
-                                //                     +`<a href="javascript:void(0)" data-id="${indikator_value.id}" class="btn btn-sm btn-primary edit-indikator-pokin-level1" title="Edit"><i class="dashicons dashicons-edit"></i></a> `
-                                //                     +`<a href="javascript:void(0)" data-id="${indikator_value.id}" class="btn btn-sm btn-danger hapus-indikator-pokin-level1" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
-                                //                 +`</td>`
-                                //             +`</tr>`;
-                                //         });
-                                //     }
-                                // });
-                                kegiatanUtama+=`<tbody>`
-                        +`</table>`;
-
-                    jQuery("#nav-level-1").html(kegiatanUtama);
-                    jQuery('.nav-tabs a[href="#nav-level-1"]').tab('show');
-                    jQuery('#modal-renaksi').modal('show');
-                    resolve();
-                }
-            });
-        });
-    }
-
-    function submit_tahun_rencana_aksi() {
-        let id = jQuery("#idDokumen").val();
-        if (id == '') {
-            return alert('id tidak boleh kosong');
-        }
-
-        let tahunAnggaran = jQuery("#tahunAnggaran").val();
-        if (tahunAnggaran == '') {
-            return alert('Tahun Anggaran tidak boleh kosong');
-        }
-
-        jQuery('#wrap-loading').show();
+function get_data_pokin(parent, level, tag){
+    jQuery('#wrap-loading').show();
+    return new Promise(function(resolve, reject){
         jQuery.ajax({
             url: esakip.url,
-            type: 'POST',
+            type: "post",
             data: {
-                action: 'c',
-                id: id,
-                tahunAnggaran: tahunAnggaran,
-                api_key: esakip.api_key
+                "action": "get_data_pokin",
+                "level": level,
+                "parent": parent,
+                "api_key": esakip.api_key,
+                "tipe_pokin": "opd",
+                "id_jadwal": <?php echo $id_jadwal; ?>,
+                "id_skpd": <?php echo $id_skpd; ?>
             },
-            dataType: 'json',
-            success: function(response) {
-                console.log(response);
+            dataType: "json",
+            success: function(res){
+                var html = '<option value="">Pilih Pokin Level '+level+'</option>';
+                res.data.map(function(value, index){
+                    html += '<option value="'+value.id+'">'+value.label+'</option>';
+                });
+                jQuery('#'+tag).html(html).trigger('change');
                 jQuery('#wrap-loading').hide();
-                if (response.status === 'success') {
-                    alert(response.message);
-                    jQuery('#tahunModal').modal('hide');
-                    getTableTahun();
-                    getTableRencanaAksi();
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                jQuery('#wrap-loading').hide();
-                console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat mengirim data!');
+                resolve();
             }
         });
-    }
+    });
+}
 
-    function getTablePengisianRencanaAksi() {
-        jQuery('#wrap-loading').show();
+function kegiatanUtama(){
+    jQuery("#wrap-loading").show();
+    return new Promise(function(resolve, reject){
         jQuery.ajax({
             url: esakip.url,
-            type: 'POST',
+            type: "post",
             data: {
-                action: 'get_table_rencana_aksi',
-                api_key: esakip.api_key,
-                id_skpd: <?php echo $id_skpd; ?>,
-                tahun_anggaran: '<?php echo $input['tahun'] ?>'
+                "action": "get_data_renaksi",
+                "level": 1,
+                "parent": 0,
+                "api_key": esakip.api_key,
+                "tipe_pokin": "opd",
+                "id_skpd": <?php echo $id_skpd; ?>
             },
-            dataType: 'json',
-            success: function(response) {
+            dataType: "json",
+            success: function(res){
                 jQuery('#wrap-loading').hide();
-                console.log(response);
-                if (response.status === 'success') {
-                    jQuery('#table_dokumen_rencana_aksi tbody').html(response.data);
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                jQuery('#wrap-loading').hide();
-                console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data Rencana Aksi!');
+                let kegiatanUtama = ``
+                    +`<div style="margin-top:10px">`
+                        +`<button type="button" class="btn btn-success mb-2" id="tambah-kegiatan-utama"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
+                    +`</div>`
+                    +`<table class="table" id="kegiatanUtama">`
+                        +`<thead>`
+                            +`<tr>`
+                                +`<th class="text-center" style="width:20%">No</th>`
+                                +`<th class="text-center" style="width:60%">Label Kegiatan Utama</th>`
+                                +`<th class="text-center" style="width:60%">Target</th>`
+                                +`<th class="text-center" style="width:60%">Realisasi</th>`
+                                +`<th class="text-center" style="width:20%">Aksi</th>`
+                            +`</tr>`
+                        +`</thead>`
+                        +`<tbody>`;
+                            // res.data.map(function(value, index){
+                            //     level1 += ``
+                            //         +`<tr id="pokinLevel1_${value.id}">`
+                            //             +`<td class="text-center">${index+1}.</td>`
+                            //             +`<td class="label-level1">${value.label}</td>`
+                            //             +`<td class="text-center">`
+                            //                 +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-success tambah-indikator-pokin-level1" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
+                            //                 +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning view-pokin-level2" title="Lihat pohon kinerja level 2"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
+                            //                 +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-primary edit-pokin-level1" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`
+                            //                 +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger hapus-pokin-level1" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
+                            //             +`</td>`
+                            //         +`</tr>`;
+
+                            //     let indikator = Object.values(value.indikator);
+                            //     if(indikator.length > 0){
+                            //         indikator.map(function(indikator_value, indikator_index){
+                            //             level1 += ``
+                            //             +`<tr>`
+                            //                 +`<td><span style="display:none">${index+1}</span></td>`
+                            //                 +`<td>${index+1}.${indikator_index+1} ${indikator_value.label}</td>`
+                            //                 +`<td class="text-center">`
+                            //                     +`<a href="javascript:void(0)" data-id="${indikator_value.id}" class="btn btn-sm btn-primary edit-indikator-pokin-level1" title="Edit"><i class="dashicons dashicons-edit"></i></a> `
+                            //                     +`<a href="javascript:void(0)" data-id="${indikator_value.id}" class="btn btn-sm btn-danger hapus-indikator-pokin-level1" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
+                            //                 +`</td>`
+                            //             +`</tr>`;
+                            //         });
+                            //     }
+                            // });
+                            kegiatanUtama+=`<tbody>`
+                    +`</table>`;
+
+                jQuery("#nav-level-1").html(kegiatanUtama);
+                jQuery('.nav-tabs a[href="#nav-level-1"]').tab('show');
+                jQuery('#modal-renaksi').modal('show');
+                resolve();
             }
         });
+    });
+}
+
+function submit_tahun_rencana_aksi() {
+    let id = jQuery("#idDokumen").val();
+    if (id == '') {
+        return alert('id tidak boleh kosong');
     }
 
-    function tambah_dokumen_rencana_aksi() {
-        jQuery("#editModalLabel").hide();
-        jQuery("#uploadModalLabel").show();
-        jQuery("#idDokumen").val('');
-        jQuery("#fileUpload").val('');
-        jQuery("#keterangan").val('');
-        jQuery("#nama_file").val('');
-        jQuery('#fileUploadExisting').removeAttr('href').empty();
-        jQuery("#uploadModal").modal('show');
+    let tahunAnggaran = jQuery("#tahunAnggaran").val();
+    if (tahunAnggaran == '') {
+        return alert('Tahun Anggaran tidak boleh kosong');
     }
 
-    function edit_dokumen_rencana_aksi(id) {
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: 'POST',
-            data: {
-                action: 'get_detail_rencana_aksi_by_id',
-                api_key: esakip.api_key,
-                id: id
-            },
-            dataType: 'json',
-            success: function(response) {
-                jQuery('#wrap-loading').hide();
-                console.log(response);
-                if (response.status === 'success') {
-                    let data = response.data;
-                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + data.dokumen;
-                    jQuery("#idDokumen").val(data.id);
-                    jQuery("#fileUpload").val('');
-                    jQuery("#nama_file").val(data.dokumen);
-                    jQuery('#fileUploadExisting').attr('href', url).html(data.dokumen);
-                    jQuery("#keterangan").val(data.keterangan);
-                    jQuery("#uploadModalLabel").hide();
-                    jQuery("#editModalLabel").show();
-                    jQuery('#uploadModal').modal('show');
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                jQuery('#wrap-loading').hide();
-                console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data!');
+    jQuery('#wrap-loading').show();
+    jQuery.ajax({
+        url: esakip.url,
+        type: 'POST',
+        data: {
+            action: 'c',
+            id: id,
+            tahunAnggaran: tahunAnggaran,
+            api_key: esakip.api_key
+        },
+        dataType: 'json',
+        success: function(response) {
+            console.log(response);
+            jQuery('#wrap-loading').hide();
+            if (response.status === 'success') {
+                alert(response.message);
+                jQuery('#tahunModal').modal('hide');
+                getTableTahun();
+                getTableRencanaAksi();
+            } else {
+                alert(response.message);
             }
-        });
-    }
+        },
+        error: function(xhr, status, error) {
+            jQuery('#wrap-loading').hide();
+            console.error(xhr.responseText);
+            alert('Terjadi kesalahan saat mengirim data!');
+        }
+    });
+}
 
-    function submit_dokumen(that) {
-        let id_dokumen = jQuery("#idDokumen").val();
-
-        let skpd = jQuery("#perangkatDaerah").val();
-        if (skpd == '') {
-            return alert('Perangkat Daerah tidak boleh kosong');
-        }
-        let idSkpd = jQuery("#idSkpd").val();
-        if (idSkpd == '') {
-            return alert('Id Skpd tidak boleh kosong');
-        }
-        let keterangan = jQuery("#keterangan").val();
-        if (keterangan == '') {
-            return alert('Keterangan tidak boleh kosong');
-        }
-        let tahunAnggaran = jQuery("#tahunAnggaran").val();
-        if (tahunAnggaran == '') {
-            return alert('Tahun Anggaran tidak boleh kosong');
-        }
-        let fileDokumen = jQuery("#fileUpload").prop('files')[0];
-        if (fileDokumen == '') {
-            return alert('File Upload tidak boleh kosong');
-        }
-        let namaDokumen = jQuery("#nama_file").val();
-        if (namaDokumen == '') {
-            return alert('Nama Dokumen tidak boleh kosong');
-        }
-
-        let form_data = new FormData();
-        form_data.append('action', 'tambah_dokumen_rencana_aksi');
-        form_data.append('api_key', esakip.api_key);
-        form_data.append('id_dokumen', id_dokumen);
-        form_data.append('skpd', skpd);
-        form_data.append('idSkpd', idSkpd);
-        form_data.append('keterangan', keterangan);
-        form_data.append('tahunAnggaran', tahunAnggaran);
-        form_data.append('fileUpload', fileDokumen);
-        form_data.append('namaDokumen', namaDokumen);
-
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: 'POST',
-            data: form_data,
-            contentType: false,
-            processData: false,
-            dataType: 'json',
-            success: function(response) {
-                console.log(response);
-                jQuery('#wrap-loading').hide();
-                if (response.status === 'success') {
-                    jQuery('#uploadModal').modal('hide');
-                    alert(response.message);
-                    getTableRencanaAksi();
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat mengirim data!');
-                jQuery('#wrap-loading').hide();
+function getTablePengisianRencanaAksi() {
+    jQuery('#wrap-loading').show();
+    jQuery.ajax({
+        url: esakip.url,
+        type: 'POST',
+        data: {
+            action: 'get_table_rencana_aksi',
+            api_key: esakip.api_key,
+            id_skpd: <?php echo $id_skpd; ?>,
+            tahun_anggaran: '<?php echo $input['tahun'] ?>'
+        },
+        dataType: 'json',
+        success: function(response) {
+            jQuery('#wrap-loading').hide();
+            console.log(response);
+            if (response.status === 'success') {
+                jQuery('#table_dokumen_rencana_aksi tbody').html(response.data);
+            } else {
+                alert(response.message);
             }
-        });
-    }
-
-    function lihatDokumen(dokumen) {
-        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + dokumen;
-        window.open(url, '_blank');
-    }
-
-    function set_tahun_dokumen(id) {
-        jQuery('#tahunModal').modal('show');
-        jQuery('#idDokumen').val(id);
-    }
-
-    function hapus_dokumen_rencana_aksi(id) {
-        if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
-            return;
+        },
+        error: function(xhr, status, error) {
+            jQuery('#wrap-loading').hide();
+            console.error(xhr.responseText);
+            alert('Terjadi kesalahan saat memuat data Rencana Aksi!');
         }
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: 'POST',
-            data: {
-                action: 'hapus_dokumen_rencana_aksi',
-                api_key: esakip.api_key,
-                id: id
-            },
-            dataType: 'json',
-            success: function(response) {
-                console.log(response);
-                jQuery('#wrap-loading').hide();
-                if (response.status === 'success') {
-                    alert(response.message);
-                    getTableRencanaAksi();
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText);
-                jQuery('#wrap-loading').hide();
-                alert('Terjadi kesalahan saat mengirim data!');
+    });
+}
+
+function tambah_dokumen_rencana_aksi() {
+    jQuery("#editModalLabel").hide();
+    jQuery("#uploadModalLabel").show();
+    jQuery("#idDokumen").val('');
+    jQuery("#fileUpload").val('');
+    jQuery("#keterangan").val('');
+    jQuery("#nama_file").val('');
+    jQuery('#fileUploadExisting').removeAttr('href').empty();
+    jQuery("#uploadModal").modal('show');
+}
+
+function edit_dokumen_rencana_aksi(id) {
+    jQuery('#wrap-loading').show();
+    jQuery.ajax({
+        url: esakip.url,
+        type: 'POST',
+        data: {
+            action: 'get_detail_rencana_aksi_by_id',
+            api_key: esakip.api_key,
+            id: id
+        },
+        dataType: 'json',
+        success: function(response) {
+            jQuery('#wrap-loading').hide();
+            console.log(response);
+            if (response.status === 'success') {
+                let data = response.data;
+                let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + data.dokumen;
+                jQuery("#idDokumen").val(data.id);
+                jQuery("#fileUpload").val('');
+                jQuery("#nama_file").val(data.dokumen);
+                jQuery('#fileUploadExisting').attr('href', url).html(data.dokumen);
+                jQuery("#keterangan").val(data.keterangan);
+                jQuery("#uploadModalLabel").hide();
+                jQuery("#editModalLabel").show();
+                jQuery('#uploadModal').modal('show');
+            } else {
+                alert(response.message);
             }
-        });
+        },
+        error: function(xhr, status, error) {
+            jQuery('#wrap-loading').hide();
+            console.error(xhr.responseText);
+            alert('Terjadi kesalahan saat memuat data!');
+        }
+    });
+}
+
+function submit_dokumen(that) {
+    let id_dokumen = jQuery("#idDokumen").val();
+
+    let skpd = jQuery("#perangkatDaerah").val();
+    if (skpd == '') {
+        return alert('Perangkat Daerah tidak boleh kosong');
+    }
+    let idSkpd = jQuery("#idSkpd").val();
+    if (idSkpd == '') {
+        return alert('Id Skpd tidak boleh kosong');
+    }
+    let keterangan = jQuery("#keterangan").val();
+    if (keterangan == '') {
+        return alert('Keterangan tidak boleh kosong');
+    }
+    let tahunAnggaran = jQuery("#tahunAnggaran").val();
+    if (tahunAnggaran == '') {
+        return alert('Tahun Anggaran tidak boleh kosong');
+    }
+    let fileDokumen = jQuery("#fileUpload").prop('files')[0];
+    if (fileDokumen == '') {
+        return alert('File Upload tidak boleh kosong');
+    }
+    let namaDokumen = jQuery("#nama_file").val();
+    if (namaDokumen == '') {
+        return alert('Nama Dokumen tidak boleh kosong');
     }
 
-    function hapus_tahun_dokumen_rencana_aksi(id) {
-        if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
-            return;
-        }
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: 'POST',
-            data: {
-                action: 'hapus_tahun_dokumen_rencana_aksi',
-                api_key: esakip.api_key,
-                id: id
-            },
-            dataType: 'json',
-            success: function(response) {
-                console.log(response);
-                jQuery('#wrap-loading').hide();
-                if (response.status === 'success') {
-                    alert(response.message);
-                    getTableRencanaAksi();
-                    getTableTahun();
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText);
-                jQuery('#wrap-loading').hide();
-                alert('Terjadi kesalahan saat mengirim data!');
+    let form_data = new FormData();
+    form_data.append('action', 'tambah_dokumen_rencana_aksi');
+    form_data.append('api_key', esakip.api_key);
+    form_data.append('id_dokumen', id_dokumen);
+    form_data.append('skpd', skpd);
+    form_data.append('idSkpd', idSkpd);
+    form_data.append('keterangan', keterangan);
+    form_data.append('tahunAnggaran', tahunAnggaran);
+    form_data.append('fileUpload', fileDokumen);
+    form_data.append('namaDokumen', namaDokumen);
+
+    jQuery('#wrap-loading').show();
+    jQuery.ajax({
+        url: esakip.url,
+        type: 'POST',
+        data: form_data,
+        contentType: false,
+        processData: false,
+        dataType: 'json',
+        success: function(response) {
+            console.log(response);
+            jQuery('#wrap-loading').hide();
+            if (response.status === 'success') {
+                jQuery('#uploadModal').modal('hide');
+                alert(response.message);
+                getTableRencanaAksi();
+            } else {
+                alert(response.message);
             }
-        });
+        },
+        error: function(xhr, status, error) {
+            console.error(xhr.responseText);
+            alert('Terjadi kesalahan saat mengirim data!');
+            jQuery('#wrap-loading').hide();
+        }
+    });
+}
+
+function lihatDokumen(dokumen) {
+    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + dokumen;
+    window.open(url, '_blank');
+}
+
+function set_tahun_dokumen(id) {
+    jQuery('#tahunModal').modal('show');
+    jQuery('#idDokumen').val(id);
+}
+
+function hapus_dokumen_rencana_aksi(id) {
+    if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
+        return;
     }
+    jQuery('#wrap-loading').show();
+    jQuery.ajax({
+        url: esakip.url,
+        type: 'POST',
+        data: {
+            action: 'hapus_dokumen_rencana_aksi',
+            api_key: esakip.api_key,
+            id: id
+        },
+        dataType: 'json',
+        success: function(response) {
+            console.log(response);
+            jQuery('#wrap-loading').hide();
+            if (response.status === 'success') {
+                alert(response.message);
+                getTableRencanaAksi();
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error(xhr.responseText);
+            jQuery('#wrap-loading').hide();
+            alert('Terjadi kesalahan saat mengirim data!');
+        }
+    });
+}
+
+function hapus_tahun_dokumen_rencana_aksi(id) {
+    if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
+        return;
+    }
+    jQuery('#wrap-loading').show();
+    jQuery.ajax({
+        url: esakip.url,
+        type: 'POST',
+        data: {
+            action: 'hapus_tahun_dokumen_rencana_aksi',
+            api_key: esakip.api_key,
+            id: id
+        },
+        dataType: 'json',
+        success: function(response) {
+            console.log(response);
+            jQuery('#wrap-loading').hide();
+            if (response.status === 'success') {
+                alert(response.message);
+                getTableRencanaAksi();
+                getTableTahun();
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error(xhr.responseText);
+            jQuery('#wrap-loading').hide();
+            alert('Terjadi kesalahan saat mengirim data!');
+        }
+    });
+}
 </script>

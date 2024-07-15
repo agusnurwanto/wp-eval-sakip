@@ -526,6 +526,7 @@ class Wp_Eval_Sakip {
 
 		$this->loader->add_action('wp_ajax_get_table_skpd_pengisian_rencana_aksi', $plugin_public, 'get_table_skpd_pengisian_rencana_aksi');
 		$this->loader->add_action('wp_ajax_get_data_renaksi', $plugin_public, 'get_data_renaksi');
+		$this->loader->add_action('wp_ajax_create_renaksi', $plugin_public, 'create_renaksi');
 
 		$this->loader->add_action('wp_ajax_get_table_capaian_indikator',  $plugin_public, 'get_table_capaian_indikator');
 		
