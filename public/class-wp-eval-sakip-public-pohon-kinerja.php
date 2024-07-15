@@ -374,7 +374,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					echo json_encode([
 						'status' => true,
 						'data' => array_values($data['data']),
-						'parent' => array_values($data['parent'])
+						'parent' => array_values($data['parent']),
+						'sql' => $wpdb->last_query
 					]);
 					exit();
 				} else {

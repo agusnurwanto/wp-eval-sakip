@@ -14,6 +14,14 @@ if (!empty($_GET) && !empty($_GET['id_skpd'])) {
 }
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
+$id_jadwal = $wpdb->get_var("
+    SELECT 
+        id
+    FROM esakip_data_jadwal
+    WHERE tipe = 'RPJMD'
+    ORDER by status DESC, id DESC
+");
+
 $skpd = $wpdb->get_row(
     $wpdb->prepare("
     SELECT 
@@ -301,33 +309,91 @@ $is_administrator = in_array('administrator', $user_roles);
         })
 
         jQuery(document).on('click', '#tambah-kegiatan-utama', function(){
-            jQuery("#modal-crud").find('.modal-title').html('Tambah Rencana Aksi');
-            jQuery("#modal-crud").find('.modal-body').html(''
-                +`<form id="form-renaksi">`
-                    +`<input type="hidden" name="parent" value="0">`
-                    +`<input type="hidden" name="level" value="1">`
-                    +`<div class="form-group">`
-                            +`<textarea class="form-control" name="label" placeholder="Tuliskan Kegiatan Utama..."></textarea>`
-                    +`</div>`
-                    +`<div class="form-group" id="showSkpdCroscutting">`
-						+`<label for="skpdCroscutting">Pilih Pokin Level 2</label>`
-						+`<select class="form-control" name="skpdCroscutting" id="skpdCroscutting">`
-						// +`<?php echo $option_skpd; ?>`
-						+`</select>`
-					+`</div>`
-                +`</form>`);
-            jQuery("#modal-crud").find('.modal-footer').html(''
-                +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
-                    +'Tutup'
-                +'</button>'
-                +'<button type="button" class="btn btn-success" id="simpan-data-renaksi" data-action="create_renaksi" data-view="kegiatanUtama">'
-                    +'Simpan'
-                +'</button>');
-            jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
-            jQuery("#modal-crud").find('.modal-dialog').css('width','');
-            jQuery("#modal-crud").modal('show');
-        })
+            jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                url: esakip.url,
+                type: "post",
+                data: {
+                    "action": "get_data_pokin",
+                    "level": 1,
+                    "parent": 0,
+                    "api_key": esakip.api_key,
+                    "tipe_pokin": "opd",
+                    "id_jadwal": <?php echo $id_jadwal; ?>,
+                    "id_skpd": <?php echo $id_skpd; ?>
+                },
+                dataType: "json",
+                success: function(res){
+                    var html = '<option value="">Pilih Pokin Level 1</option>';
+                    res.data.map(function(value, index){
+                        html += '<option value="'+value.id+'">'+value.label+'</option>';
+                    });
+                    jQuery('#wrap-loading').hide();
+                    jQuery("#modal-crud").find('.modal-title').html('Tambah Rencana Aksi');
+                    jQuery("#modal-crud").find('.modal-body').html(''
+                        +`<form id="form-renaksi">`
+                            +`<input type="hidden" name="parent" value="0">`
+                            +`<input type="hidden" name="level" value="1">`
+                            +`<div class="form-group">`
+                                    +`<textarea class="form-control" name="label" placeholder="Tuliskan Kegiatan Utama..."></textarea>`
+                            +`</div>`
+                            +`<div class="form-group">`
+        						+`<label for="pokin-level-1">Pilih Pokin Level 1</label>`
+        						+`<select class="form-control" name="pokin-level-1" id="pokin-level-1" onchange="get_data_pokin(this.value, 2, 'pokin-level-2')">`
+                                    +html
+        						+`</select>`
+        					+`</div>`
+                            +`<div class="form-group">`
+                                +`<label for="pokin-level-2">Pilih Pokin Level 2</label>`
+                                +`<select class="form-control" name="pokin-level-2" id="pokin-level-2">`
+                                +`</select>`
+                            +`</div>`
+                        +`</form>`);
+                    jQuery("#modal-crud").find('.modal-footer').html(''
+                        +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
+                            +'Tutup'
+                        +'</button>'
+                        +'<button type="button" class="btn btn-success" id="simpan-data-renaksi" data-action="create_renaksi" data-view="kegiatanUtama">'
+                            +'Simpan'
+                        +'</button>');
+                    jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
+                    jQuery("#modal-crud").find('.modal-dialog').css('width','');
+                    jQuery("#modal-crud").modal('show');
+                    jQuery('#pokin-level-1').select2({width: '100%'});
+                    jQuery('#pokin-level-2').select2({width: '100%'});
+                }
+            });
+        });
     });
+
+    function get_data_pokin(parent, level, tag){
+        jQuery('#wrap-loading').show();
+        return new Promise(function(resolve, reject){
+            jQuery.ajax({
+                url: esakip.url,
+                type: "post",
+                data: {
+                    "action": "get_data_pokin",
+                    "level": level,
+                    "parent": parent,
+                    "api_key": esakip.api_key,
+                    "tipe_pokin": "opd",
+                    "id_jadwal": <?php echo $id_jadwal; ?>,
+                    "id_skpd": <?php echo $id_skpd; ?>
+                },
+                dataType: "json",
+                success: function(res){
+                    var html = '<option value="">Pilih Pokin Level '+level+'</option>';
+                    res.data.map(function(value, index){
+                        html += '<option value="'+value.id+'">'+value.label+'</option>';
+                    });
+                    jQuery('#'+tag).html(html).trigger('change');
+                    jQuery('#wrap-loading').hide();
+                    resolve();
+                }
+            });
+        });
+    }
     
     function kegiatanUtama(){
         jQuery("#wrap-loading").show();
@@ -339,7 +405,6 @@ $is_administrator = in_array('administrator', $user_roles);
                     "action": "get_data_renaksi",
                     "level": 1,
                     "parent": 0,
-                    "id_jadwal": '<?php echo $input['periode']; ?>',
                     "api_key": esakip.api_key,
                     "tipe_pokin": "opd",
                     "id_skpd": <?php echo $id_skpd; ?>
