@@ -109,6 +109,11 @@ $is_administrator = in_array('administrator', $user_roles);
         max-height: 70vh;
         overflow-y: auto;
     }
+    #table_dokumen_rencana_aksi thead {
+        position: sticky;
+        top: -6px;
+        background: #fff;
+    }
 </style>
 
 <!-- Table -->
@@ -125,6 +130,7 @@ $is_administrator = in_array('administrator', $user_roles);
                 <table id="table_dokumen_rencana_aksi" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
                         <tr>
+                            <th class="text-center" rowspan="2" style="width: 40px;">No</th>
                             <th class="text-center" rowspan="2">KEGIATAN UTAMA</th>
                             <th class="text-center" rowspan="2">INDIKATOR KEGIATAN UTAMA</th>
                             <th class="text-center" rowspan="2">TARGET</th>
@@ -276,7 +282,7 @@ $is_administrator = in_array('administrator', $user_roles);
 
 <script>
 jQuery(document).ready(function() {
-    // getTablePengisianRencanaAksi();
+    getTablePengisianRencanaAksi();
     jQuery("#fileUpload").on('change', function() {
         var id_dokumen = jQuery('#idDokumen').val();
         if (id_dokumen == '') {
@@ -582,7 +588,7 @@ function getTablePengisianRencanaAksi() {
         url: esakip.url,
         type: 'POST',
         data: {
-            action: 'get_table_rencana_aksi',
+            action: 'get_table_input_rencana_aksi',
             api_key: esakip.api_key,
             id_skpd: <?php echo $id_skpd; ?>,
             tahun_anggaran: '<?php echo $input['tahun'] ?>'

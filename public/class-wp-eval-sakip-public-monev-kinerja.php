@@ -330,4 +330,77 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		}
 		die(json_encode($ret));
 	}
+
+	function get_table_input_rencana_aksi(){
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data rencana aksi!',
+			'data'  => ''
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if ($ret['status'] != 'error' && empty($_POST['id_skpd'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID OPD tidak boleh kosong!';
+				} else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
+				}
+				if ($ret['status'] != 'error'){
+					$data = $wpdb->get_results($wpdb->prepare("
+						SELECT
+							*
+						FROM esakip_data_rencana_aksi_opd
+						WHERE id_skpd=%d
+							AND tahun_anggaran=%d
+							AND active=1
+					", $_POST['id_skpd'], $_POST['tahun_anggaran']), ARRAY_A);
+					$html = '';
+					$no = 0;
+					foreach($data as $v){
+						$no++;
+						$html .= '
+						<tr>
+							<td class="text-center">'.$no.'</td>
+							<td><span class="badge bg-success text-white">'.$v['label_pokin_2'].'</span><br>'.$v['label'].'</td>
+							<td class="indikator_kegiatan_utama"></td>
+							<td class="target_kegiatan_utama"></td>
+							<td class="realisasi_target_kegiatan_utama"></td>
+							<td class="recana_aksi"></td>
+							<td class="satuan_indikator_renaksi"></td>
+							<td class="indikator_renaksi"></td>
+							<td class="target_indikator_renaksi"></td>
+							<td class="realisasi_target_indikator_renaksi"></td>
+							<td class="urian_renaksi"></td>
+							<td class="satuan_urian_renaksi"></td>
+							<td class="target_tw1_urian_renaksi"></td>
+							<td class="target_tw2_urian_renaksi"></td>
+							<td class="target_tw3_urian_renaksi"></td>
+							<td class="target_tw4_urian_renaksi"></td>
+							<td class="target_akhir_urian_renaksi"></td>
+							<td class="anggaran_urian_renaksi"></td>
+						</tr>
+						';
+					}
+					if(empty($html)){
+						$html = '<tr><td class="text-center" colspan="17">Data masih kosong!</td></tr>';
+					}
+					$ret['data'] = $html;
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
 }
