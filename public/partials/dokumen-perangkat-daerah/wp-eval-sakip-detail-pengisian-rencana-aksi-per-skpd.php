@@ -461,43 +461,68 @@ function kegiatanUtama(){
                     +`<table class="table" id="kegiatanUtama">`
                         +`<thead>`
                             +`<tr>`
-                                +`<th class="text-center" style="width:20%">No</th>`
-                                +`<th class="text-center" style="width:60%">Label Kegiatan Utama</th>`
-                                +`<th class="text-center" style="width:60%">Target</th>`
-                                +`<th class="text-center" style="width:60%">Realisasi</th>`
-                                +`<th class="text-center" style="width:20%">Aksi</th>`
+                                +`<th class="text-center" style="width:40px;">No</th>`
+                                +`<th class="text-center" style="width:250px;">Label Pokin</th>`
+                                +`<th class="text-center">Kegiatan Utama</th>`
+                                +`<th class="text-center" style="width:150px;">Aksi</th>`
                             +`</tr>`
                         +`</thead>`
                         +`<tbody>`;
-                            // res.data.map(function(value, index){
-                            //     level1 += ``
-                            //         +`<tr id="pokinLevel1_${value.id}">`
-                            //             +`<td class="text-center">${index+1}.</td>`
-                            //             +`<td class="label-level1">${value.label}</td>`
-                            //             +`<td class="text-center">`
-                            //                 +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-success tambah-indikator-pokin-level1" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
-                            //                 +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning view-pokin-level2" title="Lihat pohon kinerja level 2"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
-                            //                 +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-primary edit-pokin-level1" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`
-                            //                 +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger hapus-pokin-level1" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
-                            //             +`</td>`
-                            //         +`</tr>`;
+                            res.data.map(function(value, index){
+                                kegiatanUtama += ``
+                                    +`<tr id="pokinLevel1_${value.id}">`
+                                        +`<td class="text-center">${index+1}.</td>`
+                                        +`<td class="label">${value.label_pokin_2}</td>`
+                                        +`<td class="label">${value.label}</td>`
+                                        +`<td class="text-center">`
+                                            +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-success tambah-indikator-kegiatan-utama" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
+                                            +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning view-kegiatan-utama-level2" title="Lihat Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
+                                            +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`
+                                            +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger hapus-kegiatan-utama" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
+                                        +`</td>`
+                                    +`</tr>`;
 
-                            //     let indikator = Object.values(value.indikator);
-                            //     if(indikator.length > 0){
-                            //         indikator.map(function(indikator_value, indikator_index){
-                            //             level1 += ``
-                            //             +`<tr>`
-                            //                 +`<td><span style="display:none">${index+1}</span></td>`
-                            //                 +`<td>${index+1}.${indikator_index+1} ${indikator_value.label}</td>`
-                            //                 +`<td class="text-center">`
-                            //                     +`<a href="javascript:void(0)" data-id="${indikator_value.id}" class="btn btn-sm btn-primary edit-indikator-pokin-level1" title="Edit"><i class="dashicons dashicons-edit"></i></a> `
-                            //                     +`<a href="javascript:void(0)" data-id="${indikator_value.id}" class="btn btn-sm btn-danger hapus-indikator-pokin-level1" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
-                            //                 +`</td>`
-                            //             +`</tr>`;
-                            //         });
-                            //     }
-                            // });
-                            kegiatanUtama+=`<tbody>`
+                                let indikator = Object.values(value.indikator);
+                                if(indikator.length > 0){
+                                    kegiatanUtama += ``
+                                    +'<td colspan="4">'
+                                        +`<table class="table" id="kegiatanUtama">`
+                                            +`<thead>`
+                                                +`<tr>`
+                                                    +`<th class="text-center" style="width:20%">No</th>`
+                                                    +`<th class="text-center" style="width:60%">Indikator</th>`
+                                                    +`<th class="text-center" style="width:60%">Target Awal</th>`
+                                                    +`<th class="text-center" style="width:60%">Target TW 1</th>`
+                                                    +`<th class="text-center" style="width:60%">Target TW 2</th>`
+                                                    +`<th class="text-center" style="width:60%">Target TW 3</th>`
+                                                    +`<th class="text-center" style="width:60%">Target TW 4</th>`
+                                                    +`<th class="text-center" style="width:60%">Realisasi TW 1</th>`
+                                                    +`<th class="text-center" style="width:60%">Realisasi TW 2</th>`
+                                                    +`<th class="text-center" style="width:60%">Realisasi TW 3</th>`
+                                                    +`<th class="text-center" style="width:60%">Realisasi TW 4</th>`
+                                                    +`<th class="text-center" style="width:20%">Aksi</th>`
+                                                +`</tr>`
+                                            +`</thead>`
+                                            +`<tbody>`;
+                                    indikator.map(function(indikator_value, indikator_index){
+                                        kegiatanUtama += ``
+                                            +`<tr>`
+                                                +`<td><span style="display:none">${index+1}</span></td>`
+                                                +`<td>${index+1}.${indikator_index+1} ${indikator_value.label}</td>`
+                                                +`<td class="text-center">`
+                                                    +`<a href="javascript:void(0)" data-id="${indikator_value.id}" class="btn btn-sm btn-primary edit-indikator-pokin" title="Edit"><i class="dashicons dashicons-edit"></i></a> `
+                                                    +`<a href="javascript:void(0)" data-id="${indikator_value.id}" class="btn btn-sm btn-danger hapus-indikator-pokin" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
+                                                +`</td>`
+                                            +`</tr>`;
+                                    });
+                                    kegiatanUtama += ``
+                                            +'</tbody>'
+                                        +'</table>'
+                                    +'</td>';
+                                }
+                            });
+                            kegiatanUtama+=''
+                        +`<tbody>`
                     +`</table>`;
 
                 jQuery("#nav-level-1").html(kegiatanUtama);
