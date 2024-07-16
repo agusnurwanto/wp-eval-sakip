@@ -1362,8 +1362,6 @@ if(!empty($data_level_pokin)){
         position: sticky;
         top: -6px;
         background: #fff;
-		text-align: center;
-		box-shadow: inset 0 1px 0 var(--ast-border-color), inset 0 -1px 0 var(--ast-border-color);
     }
 </style>
 <h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Pohon Kinerja <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $periode['nama_jadwal_renstra'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h3><br>

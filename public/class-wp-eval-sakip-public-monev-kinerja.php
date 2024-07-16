@@ -385,7 +385,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						';
 					}
 					if(empty($html)){
-						$html = '<tr><td class="text-center" colspan="17">Data masih kosong!</td></tr>';
+						$html = '<tr><td class="text-center" colspan="18">Data masih kosong!</td></tr>';
 					}
 					$ret['data'] = $html;
 				}
