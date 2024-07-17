@@ -1110,6 +1110,7 @@ function simpan_data_renaksi(tipe){
             "label_pokin_2": label_pokin_2,
             "label_renaksi": label_renaksi,
             "level": tipe,
+            "parent": parent_renaksi,
             "tahun_anggaran": <?php echo $input['tahun']; ?>,
             "id_jadwal": <?php echo $id_jadwal; ?>,
             "id_skpd": <?php echo $id_skpd; ?>

@@ -108,13 +108,21 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$ret['status'] = 'error';
 					$ret['message'] = 'Level 2 POKIN tidak boleh kosong!';
 				}
+
+				if (
+					(
+						$_POST['level'] == 2 
+						|| $_POST['level'] == 3 
+					)
+					&& $ret['status'] != 'error' 
+					&& empty($_POST['parent'])
+				) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID parent rencana aksi tidak boleh kosong!';
+				}
 				if ($ret['status'] != 'error'){
 					$data = array(
 						'label' => $_POST['label_renaksi'],
-						'id_pokin_1' => $_POST['id_pokin_1'],
-						'id_pokin_2' => $_POST['id_pokin_2'],
-						'label_pokin_1' => $_POST['label_pokin_1'],
-						'label_pokin_2' => $_POST['label_pokin_2'],
 						'id_skpd' => $_POST['id_skpd'],
 						'id_jadwal' => $_POST['id_jadwal'],
 						'level' => $_POST['level'],
@@ -122,6 +130,22 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'tahun_anggaran' => $_POST['tahun_anggaran'],
 						'created_at' => current_time('mysql'),
 					);
+					if($_POST['level'] == 1){
+						$data['id_pokin_1'] = $_POST['id_pokin_1'];
+						$data['id_pokin_2'] = $_POST['id_pokin_2'];
+						$data['label_pokin_1'] = $_POST['label_pokin_1'];
+						$data['label_pokin_2'] = $_POST['label_pokin_2'];
+					}else if($_POST['level'] == 2){
+						$data['parent'] = $_POST['parent'];
+						$data['id_pokin_3'] = $_POST['id_pokin_1'];
+						$data['label_pokin_3'] = $_POST['label_pokin_1'];
+					}else if($_POST['level'] == 3){
+						$data['parent'] = $_POST['parent'];
+						$data['id_pokin_4'] = $_POST['id_pokin_1'];
+						$data['label_pokin_4'] = $_POST['label_pokin_1'];
+						$data['id_pokin_5'] = $_POST['id_pokin_2'];
+						$data['label_pokin_5'] = $_POST['label_pokin_2'];
+					}
 					if(!empty($_POST['id'])){
 						$cek_id = $_POST['id'];
 					}else{
