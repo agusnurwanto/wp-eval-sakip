@@ -2345,7 +2345,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		}
 	}
 
-	
 	public function edit_verify_croscutting()
 	{
 		global $wpdb;
@@ -2410,6 +2409,124 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					if (empty($data_croscutting)) {
 						throw new Exception("Data tidak ditemukan!", 1);
+					}
+
+					echo json_encode([
+						'status' => true,
+						'data_croscutting' => $data_croscutting
+					]);
+					exit();
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
+	}
+
+	public function detail_croscutting_by_id()
+	{
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
+					$_prefix_opd = $_where_opd = $id_skpd = '';
+					if (!empty($_POST['tipe_pokin'])) {
+						if (!empty($_POST['id_skpd'])) {
+							$id_skpd = $_POST['id_skpd'];
+							$_prefix_opd = $_POST['tipe_pokin'] == "opd" ? "_opd" : "";
+							$_where_opd = $_POST['tipe_pokin'] == "opd" ? ' AND id_skpd=' . $id_skpd : '';
+						} else {
+							throw new Exception("Id SKPD tidak ditemukan!", 1);
+						}
+					}
+
+					$data_croscutting = array();
+					if (!empty($_prefix_opd) && $_prefix_opd == "_opd") {
+						$data_croscutting = $wpdb->get_row($wpdb->prepare("
+								SELECT 
+									cc.keterangan,
+									cc.keterangan_croscutting as keterangan_tujuan,
+									cc.is_lembaga_lainnya,
+									cc.id_skpd_croscutting as id_skpd_tujuan,
+									pk.id_skpd as id_skpd_parent,
+									pk.label as label_parent,
+                                    pkt.label as label_parent_tujuan
+								FROM esakip_croscutting_opd as cc
+								LEFT JOIN esakip_pohon_kinerja_opd as pk ON cc.parent_pohon_kinerja = pk.id
+                                LEFT JOIN esakip_pohon_kinerja_opd as pkt ON cc.parent_croscutting = pkt.id
+								WHERE cc.id=%d 
+									AND cc.active=%d
+							", $_POST['id'], 1),  ARRAY_A);
+
+						if(!empty($data_croscutting)){
+							$nama_skpd_pengusul = $wpdb->get_row(
+								$wpdb->prepare("
+									SELECT 
+										nama_skpd
+									FROM esakip_data_unit 
+									WHERE active=1 
+									AND is_skpd=1 
+									AND id_skpd=%d
+									AND tahun_anggaran=%d
+									GROUP BY id_skpd
+									ORDER BY kode_skpd ASC
+								", $data_croscutting['id_skpd_parent'], $tahun_anggaran_sakip),
+								ARRAY_A
+							);
+
+							$data_croscutting['nama_perangkat'] = strtoupper($nama_skpd_pengusul['nama_skpd']);
+							
+							$nama_perangkat_tujuan = '';
+							if($data_croscutting['is_lembaga_lainnya'] == 1){
+								$nama_lembaga = $wpdb->get_row(
+									$wpdb->prepare("
+										SELECT 
+											nama_lembaga,
+											id,
+											tahun_anggaran
+										FROM esakip_data_lembaga_lainnya 
+										WHERE active=1 
+										AND id=%d
+										AND tahun_anggaran=%d
+										GROUP BY id
+										ORDER BY nama_lembaga ASC
+									", $data_croscutting['id_skpd_tujuan'], $tahun_anggaran_sakip),
+									ARRAY_A
+								);
+								$nama_perangkat_tujuan = strtoupper($nama_lembaga['nama_lembaga']);
+							}else{
+								$nama_skpd = $wpdb->get_row(
+									$wpdb->prepare("
+										SELECT 
+											nama_skpd,
+											id_skpd,
+											tahun_anggaran
+										FROM esakip_data_unit 
+										WHERE active=1 
+										AND is_skpd=1 
+										AND id_skpd=%d
+										AND tahun_anggaran=%d
+										GROUP BY id_skpd
+										ORDER BY kode_skpd ASC
+									", $data_croscutting['id_skpd_tujuan'], $tahun_anggaran_sakip),
+									ARRAY_A
+								);
+								$nama_perangkat_tujuan = strtoupper($nama_skpd['nama_skpd']);
+							}
+							$data_croscutting['nama_perangkat_tujuan'] = $nama_perangkat_tujuan;
+						}else{
+							throw new Exception("Data tidak ditemukan!", 1);	
+						}
 					}
 
 					echo json_encode([
@@ -2506,35 +2623,34 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						}
 					}
 				}
+
 				if($opsi['tipe'] == 'opd'){
 					// data croscutting
 					// dapatkan croscutinh pengusulan
 					$data_croscutting_level = $wpdb->get_results($wpdb->prepare("
 						SELECT 
 							cc.*,
-							pk.id as id_parent_asal,
+							pk.id as id_parent,
 							pk.level as level_parent,
-							pk.label as label_parent,
-							pkt.label as label_parent_tujuan
+							pk.label as label_parent
 						FROM esakip_croscutting_opd as cc
-						JOIN esakip_pohon_kinerja_opd as pk ON cc.parent_pohon_kinerja = pk.id
-						LEFT JOIN esakip_pohon_kinerja_opd as pkt ON cc.parent_croscutting = pkt.id
+						LEFT JOIN esakip_pohon_kinerja_opd as pk ON cc.parent_croscutting = pk.id
 						WHERE cc.parent_pohon_kinerja=%d 
 							AND cc.active=1 
 							AND cc.status_croscutting=1
 						ORDER BY cc.id
 					", $level['id']), ARRAY_A);
+
 					//  dapatkan croscutting yang diusulkan
 					$data_croscutting_level_pengusul = $wpdb->get_results($wpdb->prepare("
 						SELECT 
 							cc.*,
 							pk.id_skpd as id_skpd_parent,
-							pk.id as id_parent_asal,
+							pk.id as id_parent,
 							pk.level as level_parent,
 							pk.label as label_parent
 						FROM esakip_croscutting_opd as cc
-						JOIN esakip_pohon_kinerja_opd as pk
-						ON cc.parent_pohon_kinerja = pk.id
+						JOIN esakip_pohon_kinerja_opd as pk ON cc.parent_pohon_kinerja = pk.id
 						WHERE cc.id_skpd_croscutting=%d
 							AND cc.status_croscutting=1 
 							AND cc.active=1
@@ -2597,27 +2713,22 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							if (!empty($croscutting_level['keterangan'])) {
 								if(!empty($croscutting_level['id_skpd_parent'])){
 									$croscutting_opd_lain = 1;
-								}else{
-									$croscutting_opd_lain = 0;
-								}		
-								
-								if(!empty($croscutting_level['id_skpd_parent'])){
 									$id_skpd_view_pokin = $croscutting_level['id_skpd_parent'];
 								}else{
+									$croscutting_opd_lain = 0;
 									$id_skpd_view_pokin = $croscutting_level['id_skpd_croscutting'];
 								}
 
 								$data_parent_tujuan = array();
 								$id_level_1_parent = 0;
 								if($croscutting_level['status_croscutting'] == 1){
-									// untuk mendapatkan id parent ke 1 suatu opd
+									// untuk mendapatkan id parent level 1 suatu opd
 									$data_parent_tujuan = array('data' => $this->get_parent_1(array(
 										'id' => $croscutting_level['id'],
 										'level' => $croscutting_level['level_parent'],
 										'periode' => $opsi['periode'],
 										'tipe' => $opsi['tipe'],
-										'id_parent' => $croscutting_level['id_parent_asal'],
-										'id_skpd' => $id_skpd_view_pokin
+										'id_parent' => $croscutting_level['id_parent']
 									)));
 								}
 
@@ -2632,7 +2743,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 										'keterangan' => $croscutting_level['keterangan'],
 										'is_lembaga_lainnya' => $croscutting_level['is_lembaga_lainnya'],
 										'label_parent' => $croscutting_level['label_parent'],
-										'label_parent_tujuan' => $croscutting_level['label_parent_tujuan'],
 										'croscutting_opd_lain' => $croscutting_opd_lain,
 										'nama_skpd' => $nama_perangkat,
 										'id_skpd_view_pokin' => $id_skpd_view_pokin,
