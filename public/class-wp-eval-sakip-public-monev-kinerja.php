@@ -83,12 +83,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				if ($ret['status'] != 'error' && empty($_POST['id_pokin_1'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Level 1 POKIN tidak boleh kosong!';
-				} else if ($ret['status'] != 'error' && empty($_POST['id_pokin_2'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Level 2 POKIN tidak boleh kosong!';
-				} else if ($ret['status'] != 'error' && empty($_POST['kegiatan_utama'])) {
+				} else if ($ret['status'] != 'error' && empty($_POST['label_renaksi'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Kegiatan Utama tidak boleh kosong!';
+				} else if ($ret['status'] != 'error' && empty($_POST['level'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tipe tidak boleh kosong!';
 				} else if ($ret['status'] != 'error' && empty($_POST['id_jadwal'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'ID jadwal tidak boleh kosong!';
@@ -99,16 +99,25 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
 				}
+
+				if (
+					$_POST['level'] == 1 
+					&& $ret['status'] != 'error' 
+					&& empty($_POST['id_pokin_2'])
+				) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Level 2 POKIN tidak boleh kosong!';
+				}
 				if ($ret['status'] != 'error'){
 					$data = array(
-						'label' => $_POST['kegiatan_utama'],
+						'label' => $_POST['label_renaksi'],
 						'id_pokin_1' => $_POST['id_pokin_1'],
 						'id_pokin_2' => $_POST['id_pokin_2'],
 						'label_pokin_1' => $_POST['label_pokin_1'],
 						'label_pokin_2' => $_POST['label_pokin_2'],
 						'id_skpd' => $_POST['id_skpd'],
 						'id_jadwal' => $_POST['id_jadwal'],
-						'level' => 1,
+						'level' => $_POST['level'],
 						'active' => 1,
 						'tahun_anggaran' => $_POST['tahun_anggaran'],
 						'created_at' => current_time('mysql'),
@@ -251,6 +260,60 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$wpdb->update('esakip_data_rencana_aksi_indikator_opd', array(
 						'active' => 0
 					), array('id' => $_POST['id']));
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	function hapus_rencana_aksi(){
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus rencana aksi!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if ($ret['status'] != 'error' && empty($_POST['id'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID rencana aksi tidak boleh kosong!';
+				} else if ($ret['status'] != 'error' && empty($_POST['tipe'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tipe tidak boleh kosong!';
+				} else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
+				}
+				if ($ret['status'] != 'error'){
+					$cek_child = $wpdb->get_results($wpdb->prepare("
+						SELECT
+							*
+						FROM esakip_data_rencana_aksi_opd
+						WHERE level=%d
+							AND parent=%d
+							AND active=1
+					", $_POST['tipe']+1, $_POST['id']), ARRAY_A);
+					if(empty($cek_child)){
+						$wpdb->update('esakip_data_rencana_aksi_opd', array(
+							'active' => 0
+						), array('id' => $_POST['id']));
+					}else{
+						$ret['status'] = 'error';
+						$ret['child'] = $cek_child;
+						$ret['message'] = 'Gagal menghapus, data sudah digunakan!';
+					}
 				}
 			} else {
 				$ret = array(
