@@ -56,6 +56,7 @@ class Wp_Eval_Sakip {
 	 * @var      string    $version    The current version of the plugin.
 	 */
 	protected $version;
+	protected $functions;
 
 	/**
 	 * Define the core functionality of the plugin.
@@ -531,6 +532,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_create_indikator_renaksi', $plugin_public, 'create_indikator_renaksi');
 		$this->loader->add_action('wp_ajax_hapus_indikator_rencana_aksi', $plugin_public, 'hapus_indikator_rencana_aksi');
 		$this->loader->add_action('wp_ajax_get_indikator_rencana_aksi', $plugin_public, 'get_indikator_rencana_aksi');
+		$this->loader->add_action('wp_ajax_get_rencana_aksi', $plugin_public, 'get_rencana_aksi');
 
 		$this->loader->add_action('wp_ajax_get_table_capaian_indikator',  $plugin_public, 'get_table_capaian_indikator');
 		

@@ -113,21 +113,66 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'tahun_anggaran' => $_POST['tahun_anggaran'],
 						'created_at' => current_time('mysql'),
 					);
-					$cek_id = $wpdb->get_var($wpdb->prepare("
-						SELECT
-							id
-						FROM esakip_data_rencana_aksi_opd
-						WHERE label=%s
-							AND active=0
-							AND tahun_anggaran=%d
-							AND id_skpd=%d
-							AND id_pokin_2=%d
-					", $_POST['kegiatan_utama'], $_POST['tahun_anggaran'], $_POST['id_skpd'], $_POST['id_pokin_2']));
+					if(!empty($_POST['id'])){
+						$cek_id = $_POST['id'];
+					}else{
+						$cek_id = $wpdb->get_var($wpdb->prepare("
+							SELECT
+								id
+							FROM esakip_data_rencana_aksi_opd
+							WHERE label=%s
+								AND active=0
+								AND tahun_anggaran=%d
+								AND id_skpd=%d
+								AND id_pokin_2=%d
+						", $_POST['kegiatan_utama'], $_POST['tahun_anggaran'], $_POST['id_skpd'], $_POST['id_pokin_2']));
+					}
 					if(empty($cek_id)){
 						$wpdb->insert('esakip_data_rencana_aksi_opd', $data);
 					}else{
 						$wpdb->update('esakip_data_rencana_aksi_opd', $data, array('id' => $cek_id));
 					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	function get_rencana_aksi(){
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get rencana aksi!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if ($ret['status'] != 'error' && empty($_POST['id'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID rencana aksi tidak boleh kosong!';
+				} else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
+				}
+				if ($ret['status'] != 'error'){
+					$ret['data'] = $wpdb->get_row($wpdb->prepare('
+						SELECT
+							*
+						FROM esakip_data_rencana_aksi_opd
+						WHERE id=%d
+							AND tahun_anggaran=%d
+					',$_POST['id'], $_POST['tahun_anggaran']), ARRAY_A);
 				}
 			} else {
 				$ret = array(

@@ -514,7 +514,7 @@ class Esakip_Functions
         return $fullUrl;
     }
 
-    function modifyGetParameter($url=false, $paramName, $paramValue) {
+    function modifyGetParameter($url, $paramName, $paramValue) {
         if(empty($url)){
             $url = $this->getFullUrl();
         }

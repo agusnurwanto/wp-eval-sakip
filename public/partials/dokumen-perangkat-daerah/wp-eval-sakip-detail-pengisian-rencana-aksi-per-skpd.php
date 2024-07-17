@@ -289,61 +289,6 @@ jQuery(document).ready(function() {
         kegiatanUtama();
     });
 
-    jQuery(document).on('click', '#tambah-kegiatan-utama', function(){
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: "post",
-            data: {
-                "action": "get_data_pokin",
-                "level": 1,
-                "parent": 0,
-                "api_key": esakip.api_key,
-                "tipe_pokin": "opd",
-                "id_jadwal": <?php echo $id_jadwal; ?>,
-                "id_skpd": <?php echo $id_skpd; ?>
-            },
-            dataType: "json",
-            success: function(res){
-                var html = '<option value="">Pilih Pokin Level 1</option>';
-                res.data.map(function(value, index){
-                    html += '<option value="'+value.id+'">'+value.label+'</option>';
-                });
-                jQuery('#wrap-loading').hide();
-                jQuery("#modal-crud").find('.modal-title').html('Tambah Rencana Aksi');
-                jQuery("#modal-crud").find('.modal-body').html(''
-                    +`<form id="form-renaksi">`
-                        +`<div class="form-group">`
-    						+`<label for="pokin-level-1">Pilih Pokin Level 1</label>`
-    						+`<select class="form-control" name="pokin-level-1" id="pokin-level-1" onchange="get_data_pokin(this.value, 2, 'pokin-level-2')">`
-                                +html
-    						+`</select>`
-    					+`</div>`
-                        +`<div class="form-group">`
-                            +`<label for="pokin-level-2">Pilih Pokin Level 2</label>`
-                            +`<select class="form-control" name="pokin-level-2" id="pokin-level-2">`
-                            +`</select>`
-                        +`</div>`
-                        +`<div class="form-group">`
-                                +`<textarea class="form-control" name="label" id="kegiatan-utama" placeholder="Tuliskan Kegiatan Utama..."></textarea>`
-                        +`</div>`
-                    +`</form>`);
-                jQuery("#modal-crud").find('.modal-footer').html(''
-                    +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
-                        +'Tutup'
-                    +'</button>'
-                    +'<button type="button" class="btn btn-success" id="simpan-data-renaksi" data-action="create_renaksi" data-view="kegiatanUtama">'
-                        +'Simpan'
-                    +'</button>');
-                jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
-                jQuery("#modal-crud").find('.modal-dialog').css('width','');
-                jQuery("#modal-crud").modal('show');
-                jQuery('#pokin-level-1').select2({width: '100%'});
-                jQuery('#pokin-level-2').select2({width: '100%'});
-            }
-        });
-    });
-
     jQuery(document).on('click', '#simpan-data-renaksi', function(){
         var id_pokin_1 = jQuery('#pokin-level-1').val();
         var id_pokin_2 = jQuery('#pokin-level-2').val();
@@ -365,6 +310,7 @@ jQuery(document).ready(function() {
                 "action": action,
                 "api_key": esakip.api_key,
                 "tipe_pokin": "opd",
+                "id": jQuery('#id_kegiatan_utama').val(),
                 "id_pokin_1": id_pokin_1,
                 "id_pokin_2": id_pokin_2,
                 "label_pokin_1": label_pokin_1,
@@ -457,6 +403,94 @@ jQuery(document).ready(function() {
     });
 });
 
+function tambah_rencana_aksi(){
+    return new Promise(function(resolve, reject){
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: "post",
+            data: {
+                "action": "get_data_pokin",
+                "level": 1,
+                "parent": 0,
+                "api_key": esakip.api_key,
+                "tipe_pokin": "opd",
+                "id_jadwal": <?php echo $id_jadwal; ?>,
+                "id_skpd": <?php echo $id_skpd; ?>
+            },
+            dataType: "json",
+            success: function(res){
+                var html = '<option value="">Pilih Pokin Level 1</option>';
+                res.data.map(function(value, index){
+                    html += '<option value="'+value.id+'">'+value.label+'</option>';
+                });
+                jQuery('#wrap-loading').hide();
+                jQuery("#modal-crud").find('.modal-title').html('Tambah Rencana Aksi');
+                jQuery("#modal-crud").find('.modal-body').html(''
+                    +`<form id="form-renaksi">`
+                        +'<input type="hidden" id="id_kegiatan_utama" value=""/>'
+                        +`<div class="form-group">`
+                            +`<label for="pokin-level-1">Pilih Pokin Level 1</label>`
+                            +`<select class="form-control" name="pokin-level-1" id="pokin-level-1" onchange="get_data_pokin(this.value, 2, 'pokin-level-2')">`
+                                +html
+                            +`</select>`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +`<label for="pokin-level-2">Pilih Pokin Level 2</label>`
+                            +`<select class="form-control" name="pokin-level-2" id="pokin-level-2">`
+                            +`</select>`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +`<textarea class="form-control" name="label" id="kegiatan-utama" placeholder="Tuliskan Kegiatan Utama..."></textarea>`
+                        +`</div>`
+                    +`</form>`);
+                jQuery("#modal-crud").find('.modal-footer').html(''
+                    +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
+                        +'Tutup'
+                    +'</button>'
+                    +'<button type="button" class="btn btn-success" id="simpan-data-renaksi" data-action="create_renaksi" data-view="kegiatanUtama">'
+                        +'Simpan'
+                    +'</button>');
+                jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
+                jQuery("#modal-crud").find('.modal-dialog').css('width','');
+                jQuery("#modal-crud").modal('show');
+                jQuery('#pokin-level-1').select2({width: '100%'});
+                jQuery('#pokin-level-2').select2({width: '100%'});
+                resolve();
+            }
+        });
+    });
+}
+
+function edit_rencana_aksi(id, tipe){
+    tambah_rencana_aksi().then(function(){
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_rencana_aksi',
+                api_key: esakip.api_key,
+                id: id,
+                tahun_anggaran: '<?php echo $input['tahun'] ?>'
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                if(response.status == 'error'){
+                    alert(response.message)
+                }else if(response.data != null){
+                    jQuery('#id_kegiatan_utama').val(id);
+                    jQuery("#modal-crud").find('.modal-title').html('Edit Rencana Aksi');
+                    jQuery('#pokin-level-2').attr('val-id', response.data.id_pokin_2);
+                    jQuery('#pokin-level-1').val(response.data.id_pokin_1).trigger('change');
+                    jQuery('#kegiatan-utama').val(response.data.label);
+                }
+            }
+        });
+    });
+}
+
 function get_data_pokin(parent, level, tag){
     jQuery('#wrap-loading').show();
     return new Promise(function(resolve, reject){
@@ -474,10 +508,18 @@ function get_data_pokin(parent, level, tag){
             },
             dataType: "json",
             success: function(res){
+                var default_value = jQuery('#'+tag).attr('val-id');
                 var html = '<option value="">Pilih Pokin Level '+level+'</option>';
                 res.data.map(function(value, index){
-                    html += '<option value="'+value.id+'">'+value.label+'</option>';
+                    var selected = '';
+                    if(value.id==default_value){
+                        selected = 'selected';
+                    }
+                    html += '<option value="'+value.id+'" '+selected+'>'+value.label+'</option>';
                 });
+                // reset default value
+                jQuery('#'+tag).attr('val-id', '');
+
                 jQuery('#'+tag).html(html).trigger('change');
                 jQuery('#wrap-loading').hide();
                 resolve();
@@ -505,7 +547,7 @@ function kegiatanUtama(){
                 jQuery('#wrap-loading').hide();
                 let kegiatanUtama = ``
                     +`<div style="margin-top:10px">`
-                        +`<button type="button" class="btn btn-success mb-2" id="tambah-kegiatan-utama"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
+                        +`<button type="button" class="btn btn-success mb-2" onclick="tambah_rencana_aksi();"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
                     +`</div>`
                     +`<table class="table" id="kegiatanUtama">`
                         +`<thead>`
@@ -526,7 +568,7 @@ function kegiatanUtama(){
                                         +`<td class="text-center">`
                                             +`<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indiaktor_rencana_aksi(${value.id}, 1)" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
                                             +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning view-kegiatan-utama-level2" title="Lihat Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
-                                            +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`
+                                            +`<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, 1)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`
                                             +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger hapus-kegiatan-utama" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
                                         +`</td>`
                                     +`</tr>`;
