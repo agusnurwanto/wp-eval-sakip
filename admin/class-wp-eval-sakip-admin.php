@@ -372,7 +372,7 @@ class Wp_Eval_Sakip_Admin
 								tahun_anggaran 
 							FROM esakip_data_unit 
 							GROUP BY tahun_anggaran
-							ORDER BY tahun_anggaran ASC
+							ORDER BY tahun_anggaran DESC
 						"),
 						ARRAY_A
 					);
@@ -1020,6 +1020,22 @@ class Wp_Eval_Sakip_Admin
 								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
 									<ul style="margin-left: 20px;">
 										<li><a target="_blank" href="' . $pedoman_teknis_evaluasi_internal_pemda['url'] . '">' . $pedoman_teknis_evaluasi_internal_pemda['title'] . '</a></li>
+									</ul>
+								</div>
+							</div>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'monev_rencana_aksi_opd') {
+							$list_skpd_pengisian_rencana_aksi = $this->functions->generatePage(array(
+								'nama_page' => 'Pengisian Rencana Aksi - ' . $tahun_item['tahun_anggaran'],
+								'content' => '[list_pengisian_rencana_aksi tahun=' . $tahun_item['tahun_anggaran'] . ']',
+								'show_header' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+							<div class="accordion">
+								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+									<ul style="margin-left: 20px;">
+										<li><a target="_blank" href="' . $list_skpd_pengisian_rencana_aksi['url'] . '">' . $list_skpd_pengisian_rencana_aksi['title'] . '</a></li>
 									</ul>
 								</div>
 							</div>';

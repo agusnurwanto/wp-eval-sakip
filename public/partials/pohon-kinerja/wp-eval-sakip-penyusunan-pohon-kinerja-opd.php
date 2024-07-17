@@ -1377,8 +1377,6 @@ if(!empty($data_level_pokin)){
         position: sticky;
         top: -6px;
         background: #fff;
-		text-align: center;
-		box-shadow: inset 0 1px 0 var(--ast-border-color), inset 0 -1px 0 var(--ast-border-color);
     }
 
 	.croscutting-lembaga-vertikal{
