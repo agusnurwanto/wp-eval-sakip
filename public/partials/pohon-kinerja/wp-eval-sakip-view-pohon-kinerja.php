@@ -134,15 +134,13 @@ if(!empty($data_all['data'])){
 							if(!empty($valCross['id_level_1_parent']) && $valCross['is_lembaga_lainnya'] != 1){
 								$show_nama_skpd = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $valCross['id_skpd_view_pokin']  . "&id=" . $valCross['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
 							}
-							if(!empty($valCross['label_parent_tujuan'])){
-								$label_parent = $valCross['label_parent_tujuan'];
-							}
+							
 							$class_cc_vertikal = '';
 							if($valCross['is_lembaga_lainnya'] == 1){
-								$label_parent = "??";
+								$label_parent = "?";
 								$class_cc_vertikal = "croscutting-lembaga-vertikal";
 							}
-							$data_temp[$keylevel2][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ."</div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
+							$data_temp[$keylevel2][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ." <a href='javascript:void(0)' data-id='". $valCross['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;' style='text-decoration: none; color: black;' title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
 					}
 				}
 
@@ -175,15 +173,13 @@ if(!empty($data_all['data'])){
 								if(!empty($valCross['id_level_1_parent']) && $valCross['is_lembaga_lainnya'] != 1){
 									$show_nama_skpd = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $valCross['id_skpd_view_pokin']  . "&id=" . $valCross['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
 								}
-								if(!empty($valCross['label_parent_tujuan'])){
-									$label_parent = $valCross['label_parent_tujuan'];
-								}
+
 								$class_cc_vertikal = '';
 								if($valCross['is_lembaga_lainnya'] == 1){
-									$label_parent = "??";
+									$label_parent = "?";
 									$class_cc_vertikal = "croscutting-lembaga-vertikal";
 								}
-								$data_temp[$keylevel3][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ."</div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
+								$data_temp[$keylevel3][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ." <a href='javascript:void(0)' data-id='". $valCross['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;' style='text-decoration: none; color: black;' title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
 							}
 						}
 
@@ -219,15 +215,13 @@ if(!empty($data_all['data'])){
 										if(!empty($valCross['id_level_1_parent']) && $valCross['is_lembaga_lainnya'] != 1){
 											$show_nama_skpd = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $valCross['id_skpd_view_pokin']  . "&id=" . $valCross['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
 										}
-										if(!empty($valCross['label_parent_tujuan']) && $valCross['is_lembaga_lainnya'] != 1){
-											$label_parent = $valCross['label_parent_tujuan'];
-										}
+
 										$class_cc_vertikal = '';
 										if($valCross['is_lembaga_lainnya'] == 1){
-											$label_parent = "??";
+											$label_parent = "?";
 											$class_cc_vertikal = "croscutting-lembaga-vertikal";
 										}
-						                $data_temp[$keylevel4][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ."</div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
+						                $data_temp[$keylevel4][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ." <a href='javascript:void(0)' data-id='". $valCross['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;' style='text-decoration: none; color: black;' title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
 						            }
 					            }
 
@@ -263,15 +257,13 @@ if(!empty($data_all['data'])){
 												if(!empty($valCross['id_level_1_parent']) && $valCross['is_lembaga_lainnya'] != 1){
 													$show_nama_skpd = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $valCross['id_skpd_view_pokin']  . "&id=" . $valCross['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
 												}
-												if(!empty($valCross['label_parent_tujuan'])){
-													$label_parent = $valCross['label_parent_tujuan'];
-												}
+
 												$class_cc_vertikal = '';
 												if($valCross['is_lembaga_lainnya'] == 1){
-													$label_parent = "??";
+													$label_parent = "?";
 													$class_cc_vertikal = "croscutting-lembaga-vertikal";
 												}
-												$data_temp[$keylevel5][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ."</div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
+												$data_temp[$keylevel5][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ." <a href='javascript:void(0)' data-id='". $valCross['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;' style='text-decoration: none; color: black;' title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
 											}
 										}
 		
@@ -449,6 +441,11 @@ if(!empty($data_all['data'])){
 	.tampil_croscutting {
 		display: none;
 	}
+
+	.detail_crocutting{
+		background-color: #f4f6f8 !important;
+		color: #010407 !important;
+	}
 </style>
 <div class="text-center" id="action-sakip">
 	<button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button><br>
@@ -467,10 +464,102 @@ if(!empty($data_all['data'])){
     <div id="chart_div" ></div>
 </div>
 
+<!-- Modal detail -->
+<div class="modal fade mt-5" id="modal-detail" tabindex="-1" role="dialog" aria-labelledby="modal-detailLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal-detailLabel">Detail Croscutting</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-6">
+					<div class="form-group">
+						<label>Label Pengusul</label>
+						<textarea class="form-control detail_crocutting" id="label-pengusul" rows="3" disabled></textarea>
+					</div>
+					<div class="form-group">
+						<label>Perangkat Daerah Pengusul</label>
+						<input class="form-control detail_crocutting" type="text" id="perangkat-pengusul" disabled>
+					</div>
+					<div class="form-group">
+						<label for="">Keterangan Pengusul</label>
+						<textarea class="form-control detail_crocutting" id="keterangan-pengusul" rows="3" disabled></textarea>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="form-group">
+						<label>Label Tujuan</label>
+						<textarea class="form-control detail_crocutting" id="label-tujuan" rows="3" disabled></textarea>
+					</div>
+					<div class="form-group">
+						<label>Perangkat Daerah Tujuan</label>
+						<input class="form-control detail_crocutting" type="text" id="perangkat-tujuan" disabled>
+					</div>
+					<div class="form-group">
+						<label for="">Keterangan Tujuan</label>
+						<textarea class="form-control detail_crocutting" id="keterangan-tujuan" rows="3" disabled></textarea>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12 d-flex justify-content-center">
+					<div class="form-group text-center">
+						<label for="">Status</label>
+						<button type="button" class="btn btn-success d-block"">Disetujui</button>
+					</div>
+				</div>
+			</div>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
 google.charts.load('current', {packages:["orgchart"]});
 google.charts.setOnLoadCallback(drawChart);
+
+function detail_cc(id){
+		jQuery("#wrap-loading").show();
+		console.log('cekyo')
+		if(id == undefined){
+			alert("Id tidak ditemukan")
+		}
+
+		jQuery.ajax({
+			method:'POST',
+			url:esakip.url,
+			data:{
+	  			"action": "detail_croscutting_by_id",
+	  			"api_key": esakip.api_key,
+	  			'id': id,
+				'tipe_pokin': "opd",
+				'id_skpd': <?php echo $id_skpd; ?>
+			},
+			dataType:'json',
+			success:function(response){
+				jQuery("#wrap-loading").hide();
+				if(response.status){
+					jQuery("#label-pengusul").val(response.data_croscutting.label_parent)
+					jQuery("#perangkat-pengusul").val(response.data_croscutting.nama_perangkat)
+					jQuery("#keterangan-pengusul").val(response.data_croscutting.keterangan)
+					jQuery("#perangkat-tujuan").val(response.data_croscutting.nama_perangkat_tujuan)
+					jQuery("#label-tujuan").val(response.data_croscutting.label_parent_tujuan)
+					jQuery("#keterangan-tujuan").val(response.data_croscutting.keterangan_tujuan)
+					jQuery("#modal-detail").modal('show');
+				}
+			}
+		});
+	};
 
 jQuery("#show_croscutting").on('click', function(){
 	if(this.checked) {
