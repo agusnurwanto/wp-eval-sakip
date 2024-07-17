@@ -286,9 +286,7 @@ jQuery(document).ready(function() {
     });
 
     jQuery("#tambah-rencana-aksi").on('click', function(){
-        kegiatanUtama().then(function(){
-            jQuery("#kegiatanUtama").DataTable();
-        });
+        kegiatanUtama();
     });
 
     jQuery(document).on('click', '#tambah-kegiatan-utama', function(){
@@ -382,15 +380,14 @@ jQuery(document).ready(function() {
                 alert(res.message);
                 if(res.status=='success'){
                     jQuery("#modal-crud").modal('hide');
-                    kegiatanUtama().then(function(){
-                        jQuery("#kegiatanUtama").DataTable();
-                    });
+                    kegiatanUtama();
                 }
             }
         });
     });
 
     jQuery(document).on('click', '#simpan-indikator-renaksi', function(){
+        var id = jQuery('#id_label_indikator').val();
         var id_label = jQuery('#id_label').val();
         var indikator = jQuery('#indikator').val();
         if(indikator == ''){
@@ -433,6 +430,7 @@ jQuery(document).ready(function() {
                 "action": action,
                 "api_key": esakip.api_key,
                 "tipe_pokin": "opd",
+                "id_label_indikator": id,
                 "id_label": id_label,
                 "indikator": indikator,
                 "satuan": satuan,
@@ -451,9 +449,7 @@ jQuery(document).ready(function() {
                 alert(res.message);
                 if(res.status=='success'){
                     jQuery("#modal-crud").modal('hide');
-                    kegiatanUtama().then(function(){
-                        jQuery("#kegiatanUtama").DataTable();
-                    });
+                    kegiatanUtama();
                     getTablePengisianRencanaAksi(1);
                 }
             }
@@ -515,9 +511,9 @@ function kegiatanUtama(){
                         +`<thead>`
                             +`<tr>`
                                 +`<th class="text-center" style="width:40px;">No</th>`
-                                +`<th class="text-center" style="width:250px;">Label Pokin</th>`
+                                +`<th class="text-center" style="width:300px;">Label Pokin</th>`
                                 +`<th class="text-center">Kegiatan Utama</th>`
-                                +`<th class="text-center" style="width:150px;">Aksi</th>`
+                                +`<th class="text-center" style="width:200px;">Aksi</th>`
                             +`</tr>`
                         +`</thead>`
                         +`<tbody>`;
@@ -544,14 +540,14 @@ function kegiatanUtama(){
                                                 +`<tr>`
                                                     +`<th class="text-center" style="width:20px">No</th>`
                                                     +`<th class="text-center">Indikator</th>`
-                                                    +`<th class="text-center" style="width:100px;">Satuan</th>`
+                                                    +`<th class="text-center" style="width:120px;">Satuan</th>`
                                                     +`<th class="text-center" style="width:50px;">Target Awal</th>`
                                                     +`<th class="text-center" style="width:50px;">Target Akhir</th>`
                                                     +`<th class="text-center" style="width:50px;">Target TW 1</th>`
                                                     +`<th class="text-center" style="width:50px;">Target TW 2</th>`
                                                     +`<th class="text-center" style="width:50px;">Target TW 3</th>`
                                                     +`<th class="text-center" style="width:50px;">Target TW 4</th>`
-                                                    +`<th class="text-center" style="width:100px">Aksi</th>`
+                                                    +`<th class="text-center" style="width:110px">Aksi</th>`
                                                 +`</tr>`
                                             +`</thead>`
                                             +`<tbody>`;
@@ -568,8 +564,8 @@ function kegiatanUtama(){
                                                 +`<td class="text-center">${b.target_3}</td>`
                                                 +`<td class="text-center">${b.target_4}</td>`
                                                 +`<td class="text-center">`
-                                                    +`<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary edit-indikator-renaksi" title="Edit"><i class="dashicons dashicons-edit"></i></a> `
-                                                    +`<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-danger hapus-indikator-renaksi" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
+                                                    +`<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_indikator(${b.id}, 1)" title="Edit"><i class="dashicons dashicons-edit"></i></a> `
+                                                    +`<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-danger" onclick="hapus_indikator(${b.id}, 1);" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
                                                 +`</td>`
                                             +`</tr>`;
                                     });
@@ -680,93 +676,170 @@ function tambah_indiaktor_rencana_aksi(id, tipe){
     var label_pokin = tr.find('.label_pokin').text();
     var label_renaksi = tr.find('.label_renaksi').text();
     jQuery("#modal-crud").find('.modal-title').html('Tambah '+title);
-        jQuery("#modal-crud").find('.modal-body').html(''
-            +`<form id="form-renaksi">`
-                +'<input type="hidden" value="'+id+'" id="id_label">'
-                +`<div class="form-group row">`
-                    +'<div class="col-md-2">'
-                        +`<label for="label_pokin_indikator">Label Pohon Kinerja</label>`
-                    +'</div>'
-                    +'<div class="col-md-10">'
-                        +'<input class="form-control" type="text" disabled id="label_pokin_indikator" value="'+label_pokin+'"/>'
-                    +'</div>'
-                +`</div>`
-                +`<div class="form-group row">`
-                    +'<div class="col-md-2">'
-                        +`<label for="kegiatan_utama_indikator">`+title.replace('Indikator ', '')+`</label>`
-                    +'</div>'
-                    +'<div class="col-md-10">'
-                        +'<input type="text" disabled class="form-control" id="kegiatan_utama_indikator" value="'+label_renaksi+'"/>'
-                    +'</div>'
-                +`</div>`
-                +`<div class="form-group row">`
-                    +'<div class="col-md-2">'
-                        +'<label for="indikator">'+title+'</label>'
-                    +'</div>'
-                    +'<div class="col-md-10">'
-                        +`<textarea class="form-control" name="label" id="indikator" placeholder="Tuliskan Indikator Kegiatan Utama..."></textarea>`
-                    +'</div>'
-                +`</div>`
-                +`<div class="form-group row">`
-                    +'<div class="col-md-2">'
-                        +`<label for="satuan_indikator">Satuan</label>`
-                    +'</div>'
-                    +'<div class="col-md-10">'
-                        +`<input type="text" class="form-control" id="satuan_indikator"/>`
-                    +'</div>'
-                +`</div>`
-                +`<div class="form-group row">`
-                    +'<div class="col-md-2">'
-                        +`<label for="target_awal">Target Awal</label>`
-                    +'</div>'
-                    +'<div class="col-md-4">'
-                        +`<input type="text" class="form-control" id="target_awal"/>`
-                    +'</div>'
-                    +'<div class="col-md-2">'
-                        +`<label for="target_akhir">Target Akhir</label>`
-                    +'</div>'
-                    +'<div class="col-md-4">'
-                        +`<input type="text" class="form-control" id="target_akhir"/>`
-                    +'</div>'
-                +`</div>`
-                +`<div class="form-group row">`
-                    +'<div class="col-md-2">'
-                        +`<label for="target_tw_1">TW 1</label>`
-                    +'</div>'
-                    +'<div class="col-md-4">'
-                        +`<input type="text" class="form-control" id="target_tw_1"/>`
-                    +'</div>'
-                    +'<div class="col-md-2">'
-                        +`<label for="target_tw_2">TW 2</label>`
-                    +'</div>'
-                    +'<div class="col-md-4">'
-                        +`<input type="text" class="form-control" id="target_tw_2"/>`
-                    +'</div>'
-                +`</div>`
-                +`<div class="form-group row">`
-                    +'<div class="col-md-2">'
-                        +`<label for="target_tw_3">TW 3</label>`
-                    +'</div>'
-                    +'<div class="col-md-4">'
-                        +`<input type="text" class="form-control" id="target_tw_3"/>`
-                    +'</div>'
-                    +'<div class="col-md-2">'
-                        +`<label for="target_tw_4">TW 4</label>`
-                    +'</div>'
-                    +'<div class="col-md-4">'
-                        +`<input type="text" class="form-control" id="target_tw_4"/>`
-                    +'</div>'
-                +`</div>`
-            +`</form>`);
-        jQuery("#modal-crud").find('.modal-footer').html(''
-            +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
-                +'Tutup'
-            +'</button>'
-            +'<button type="button" class="btn btn-success" id="simpan-indikator-renaksi" data-action="create_indikator_renaksi" data-view="kegiatanUtama">'
-                +'Simpan'
-            +'</button>');
-        jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
-        jQuery("#modal-crud").find('.modal-dialog').css('width','');
-        jQuery("#modal-crud").modal('show');
+    jQuery("#modal-crud").find('.modal-body').html(''
+        +`<form id="form-renaksi">`
+            +'<input type="hidden" value="" id="id_label_indikator">'
+            +'<input type="hidden" value="'+id+'" id="id_label">'
+            +`<div class="form-group row">`
+                +'<div class="col-md-2">'
+                    +`<label for="label_pokin_indikator">Label Pohon Kinerja</label>`
+                +'</div>'
+                +'<div class="col-md-10">'
+                    +'<input class="form-control" type="text" disabled id="label_pokin_indikator" value="'+label_pokin+'"/>'
+                +'</div>'
+            +`</div>`
+            +`<div class="form-group row">`
+                +'<div class="col-md-2">'
+                    +`<label for="kegiatan_utama_indikator">`+title.replace('Indikator ', '')+`</label>`
+                +'</div>'
+                +'<div class="col-md-10">'
+                    +'<input type="text" disabled class="form-control" id="kegiatan_utama_indikator" value="'+label_renaksi+'"/>'
+                +'</div>'
+            +`</div>`
+            +`<div class="form-group row">`
+                +'<div class="col-md-2">'
+                    +'<label for="indikator">'+title+'</label>'
+                +'</div>'
+                +'<div class="col-md-10">'
+                    +`<textarea class="form-control" name="label" id="indikator" placeholder="Tuliskan Indikator Kegiatan Utama..."></textarea>`
+                +'</div>'
+            +`</div>`
+            +`<div class="form-group row">`
+                +'<div class="col-md-2">'
+                    +`<label for="satuan_indikator">Satuan</label>`
+                +'</div>'
+                +'<div class="col-md-10">'
+                    +`<input type="text" class="form-control" id="satuan_indikator"/>`
+                +'</div>'
+            +`</div>`
+            +`<div class="form-group row">`
+                +'<div class="col-md-2">'
+                    +`<label for="target_awal">Target Awal</label>`
+                +'</div>'
+                +'<div class="col-md-4">'
+                    +`<input type="number" class="form-control" id="target_awal"/>`
+                +'</div>'
+                +'<div class="col-md-2">'
+                    +`<label for="target_akhir">Target Akhir</label>`
+                +'</div>'
+                +'<div class="col-md-4">'
+                    +`<input type="number" class="form-control" id="target_akhir"/>`
+                +'</div>'
+            +`</div>`
+            +`<div class="form-group row">`
+                +'<div class="col-md-2">'
+                    +`<label for="target_tw_1">TW 1</label>`
+                +'</div>'
+                +'<div class="col-md-4">'
+                    +`<input type="number" class="form-control" id="target_tw_1"/>`
+                +'</div>'
+                +'<div class="col-md-2">'
+                    +`<label for="target_tw_2">TW 2</label>`
+                +'</div>'
+                +'<div class="col-md-4">'
+                    +`<input type="number" class="form-control" id="target_tw_2"/>`
+                +'</div>'
+            +`</div>`
+            +`<div class="form-group row">`
+                +'<div class="col-md-2">'
+                    +`<label for="target_tw_3">TW 3</label>`
+                +'</div>'
+                +'<div class="col-md-4">'
+                    +`<input type="number" class="form-control" id="target_tw_3"/>`
+                +'</div>'
+                +'<div class="col-md-2">'
+                    +`<label for="target_tw_4">TW 4</label>`
+                +'</div>'
+                +'<div class="col-md-4">'
+                    +`<input type="number" class="form-control" id="target_tw_4"/>`
+                +'</div>'
+            +`</div>`
+        +`</form>`);
+    jQuery("#modal-crud").find('.modal-footer').html(''
+        +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
+            +'Tutup'
+        +'</button>'
+        +'<button type="button" class="btn btn-success" id="simpan-indikator-renaksi" data-action="create_indikator_renaksi" data-view="kegiatanUtama">'
+            +'Simpan'
+        +'</button>');
+    jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
+    jQuery("#modal-crud").find('.modal-dialog').css('width','');
+    jQuery("#modal-crud").modal('show');
+}
+
+function edit_indikator(id, tipe){
+    jQuery('#wrap-loading').show();
+    jQuery.ajax({
+        url: esakip.url,
+        type: 'POST',
+        data: {
+            action: 'get_indikator_rencana_aksi',
+            api_key: esakip.api_key,
+            id: id,
+            tahun_anggaran: '<?php echo $input['tahun'] ?>'
+        },
+        dataType: 'json',
+        success: function(response) {
+            if(
+                response.status == 'success' 
+                && response.data != null
+            ){
+                tambah_indiaktor_rencana_aksi(response.data.id_renaksi, tipe);
+                jQuery("#modal-crud").find('.modal-title').text(jQuery("#modal-crud").find('.modal-title').text().replace('Tambah', 'Edit'));
+                jQuery('#id_label_indikator').val(id);
+                jQuery('#indikator').val(response.data.indikator);
+                jQuery('#satuan_indikator').val(response.data.satuan);
+                jQuery('#target_awal').val(response.data.target_awal);
+                jQuery('#target_akhir').val(response.data.target_akhir);
+                jQuery('#target_tw_1').val(response.data.target_1);
+                jQuery('#target_tw_2').val(response.data.target_2);
+                jQuery('#target_tw_3').val(response.data.target_3);
+                jQuery('#target_tw_4').val(response.data.target_4);
+            }else if(response.status == 'error'){
+                alert(response.message);
+            }
+            jQuery('#wrap-loading').hide();
+        }
+    });
+}
+
+function hapus_indikator(id, tipe){
+    var title = '';
+    if(tipe == 1){
+        title = 'Kegiatan Utama';
+    }else if(tipe == 2){
+        title = 'Rencana Aksi';
+    }else if(tipe == 3){
+        title = 'Uraian Kegiatan Rencana Aksi';
+    }
+    if(confirm('Apakah kamu yakin untuk menghapus indikator '+title+'?')){
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'hapus_indikator_rencana_aksi',
+                api_key: esakip.api_key,
+                id: id,
+                tahun_anggaran: '<?php echo $input['tahun'] ?>'
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                console.log(response);
+                alert(response.message);
+                if (response.status === 'success') {
+                    if(tipe==1){
+                        kegiatanUtama();
+                    }
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data Rencana Aksi!');
+            }
+        });
+    }
 }
 </script>
