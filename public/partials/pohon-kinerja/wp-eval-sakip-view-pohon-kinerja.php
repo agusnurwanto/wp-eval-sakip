@@ -395,6 +395,15 @@ if(!empty($data_all['data'])){
   		#action-sakip, .site-header, .site-footer {
   			display: none;
   		}
+
+		.detail-cc {
+			display: none;
+		}
+
+		.tampil_croscutting a {
+			text-decoration: none !important;
+			color: #0d0909 !important;
+		}
   	}
   	#val-range {
   		width: 80px;
