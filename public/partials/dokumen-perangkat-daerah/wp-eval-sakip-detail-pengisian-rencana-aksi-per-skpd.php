@@ -114,6 +114,10 @@ $is_administrator = in_array('administrator', $user_roles);
         top: -6px;
         background: #ffc491;
     }
+    #table_dokumen_rencana_aksi .badge {
+        white-space: normal;
+        line-height: 1.3;
+    }
 </style>
 
 <!-- Table -->
@@ -131,14 +135,15 @@ $is_administrator = in_array('administrator', $user_roles);
                     <thead>
                         <tr>
                             <th class="text-center" rowspan="2" style="width: 40px;">No</th>
-                            <th class="text-center" rowspan="2">KEGIATAN UTAMA</th>
-                            <th class="text-center" rowspan="2">INDIKATOR KEGIATAN UTAMA</th>
-                            <th class="text-center" rowspan="2">RENCANA AKSI</th>
-                            <th class="text-center" rowspan="2">OUTCOME/OUTPUT</th>
-                            <th class="text-center" rowspan="2">URAIAN KEGIATAN RENCANA AKSI</th>
-                            <th class="text-center" rowspan="2">SATUAN</th>
-                            <th class="text-center" colspan="6">TARGET KEGIATAN PER TRIWULAN</th>
-                            <th class="text-center" rowspan="2">JUMLAH ANGGARAN</th>
+                            <th class="text-center" rowspan="2" style="width: 200px;">KEGIATAN UTAMA</th>
+                            <th class="text-center" rowspan="2" style="width: 200px;">INDIKATOR KEGIATAN UTAMA</th>
+                            <th class="text-center" rowspan="2" style="width: 200px;">RENCANA AKSI</th>
+                            <th class="text-center" rowspan="2" style="width: 200px;">OUTCOME/OUTPUT</th>
+                            <th class="text-center" rowspan="2" style="width: 200px;">URAIAN KEGIATAN RENCANA AKSI</th>
+                            <th class="text-center" rowspan="2" style="width: 200px;">INDIKATOR</th>
+                            <th class="text-center" rowspan="2" style="width: 100px;">SATUAN</th>
+                            <th class="text-center" colspan="6" style="width: 300px;">TARGET KEGIATAN PER TRIWULAN</th>
+                            <th class="text-center" rowspan="2" style="width: 140px;">JUMLAH ANGGARAN</th>
                         </tr>
                         <tr>
                             <th>AWAL</th>
@@ -288,77 +293,86 @@ jQuery(document).ready(function() {
     jQuery("#tambah-rencana-aksi").on('click', function(){
         kegiatanUtama();
     });
-
-    jQuery(document).on('click', '#simpan-indikator-renaksi', function(){
-        var id = jQuery('#id_label_indikator').val();
-        var id_label = jQuery('#id_label').val();
-        var indikator = jQuery('#indikator').val();
-        if(indikator == ''){
-            return alert('Indikator tidak boleh kosong!')
-        }
-        var satuan = jQuery('#satuan_indikator').val();
-        if(satuan == ''){
-            return alert('Satuan tidak boleh kosong!')
-        }
-        var target_awal = jQuery('#target_awal').val();
-        if(target_awal == ''){
-            return alert('Target awal tidak boleh kosong!')
-        }
-        var target_akhir = jQuery('#target_akhir').val();
-        if(target_akhir == ''){
-            return alert('Target akhir tidak boleh kosong!')
-        }
-        var target_tw_1 = jQuery('#target_tw_1').val();
-        if(target_tw_1 == ''){
-            return alert('Target triwulan 1 tidak boleh kosong!')
-        }
-        var target_tw_2 = jQuery('#target_tw_2').val();
-        if(target_tw_2 == ''){
-            return alert('Target triwulan 2 tidak boleh kosong!')
-        }
-        var target_tw_3 = jQuery('#target_tw_3').val();
-        if(target_tw_3 == ''){
-            return alert('Target triwulan 3 tidak boleh kosong!')
-        }
-        var target_tw_4 = jQuery('#target_tw_4').val();
-        if(target_tw_4 == ''){
-            return alert('Target triwulan 4 tidak boleh kosong!')
-        }
-        jQuery('#wrap-loading').show();
-        var action = jQuery('#simpan-indikator-renaksi').attr('data-action');
-        jQuery.ajax({
-            url: esakip.url,
-            type: "post",
-            data: {
-                "action": action,
-                "api_key": esakip.api_key,
-                "tipe_pokin": "opd",
-                "id_label_indikator": id,
-                "id_label": id_label,
-                "indikator": indikator,
-                "satuan": satuan,
-                "target_awal": target_awal,
-                "target_akhir": target_akhir,
-                "target_tw_1": target_tw_1,
-                "target_tw_2": target_tw_2,
-                "target_tw_3": target_tw_3,
-                "target_tw_4": target_tw_4,
-                "tahun_anggaran": <?php echo $input['tahun']; ?>,
-                "id_skpd": <?php echo $id_skpd; ?>
-            },
-            dataType: "json",
-            success: function(res){
-                jQuery('#wrap-loading').hide();
-                alert(res.message);
-                if(res.status=='success'){
-                    jQuery("#modal-crud").modal('hide');
-                    kegiatanUtama();
-                    getTablePengisianRencanaAksi(1);
-                }
-            }
-        });
-    });
 });
+
+function simpan_indikator_renaksi(tipe){
+    var id = jQuery('#id_label_indikator').val();
+    var id_label = jQuery('#id_label').val();
+    var indikator = jQuery('#indikator').val();
+    if(indikator == ''){
+        return alert('Indikator tidak boleh kosong!')
+    }
+    var satuan = jQuery('#satuan_indikator').val();
+    if(satuan == ''){
+        return alert('Satuan tidak boleh kosong!')
+    }
+    var target_awal = jQuery('#target_awal').val();
+    if(target_awal == ''){
+        return alert('Target awal tidak boleh kosong!')
+    }
+    var target_akhir = jQuery('#target_akhir').val();
+    if(target_akhir == ''){
+        return alert('Target akhir tidak boleh kosong!')
+    }
+    var target_tw_1 = jQuery('#target_tw_1').val();
+    if(target_tw_1 == ''){
+        return alert('Target triwulan 1 tidak boleh kosong!')
+    }
+    var target_tw_2 = jQuery('#target_tw_2').val();
+    if(target_tw_2 == ''){
+        return alert('Target triwulan 2 tidak boleh kosong!')
+    }
+    var target_tw_3 = jQuery('#target_tw_3').val();
+    if(target_tw_3 == ''){
+        return alert('Target triwulan 3 tidak boleh kosong!')
+    }
+    var target_tw_4 = jQuery('#target_tw_4').val();
+    if(target_tw_4 == ''){
+        return alert('Target triwulan 4 tidak boleh kosong!')
+    }
+    jQuery('#wrap-loading').show();
+    jQuery.ajax({
+        url: esakip.url,
+        type: "post",
+        data: {
+            "action": 'create_indikator_renaksi',
+            "api_key": esakip.api_key,
+            "tipe_pokin": "opd",
+            "id_label_indikator": id,
+            "id_label": id_label,
+            "indikator": indikator,
+            "satuan": satuan,
+            "target_awal": target_awal,
+            "target_akhir": target_akhir,
+            "target_tw_1": target_tw_1,
+            "target_tw_2": target_tw_2,
+            "target_tw_3": target_tw_3,
+            "target_tw_4": target_tw_4,
+            "tahun_anggaran": <?php echo $input['tahun']; ?>,
+            "id_skpd": <?php echo $id_skpd; ?>
+        },
+        dataType: "json",
+        success: function(res){
+            jQuery('#wrap-loading').hide();
+            alert(res.message);
+            if(res.status=='success'){
+                jQuery("#modal-crud").modal('hide');
+                if(tipe == 1){
+                    kegiatanUtama();
+                }else if(tipe == 2){
+                    var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
+                    var parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
+                    lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin);
+                }else if(tipe == 3){
+                    var parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
+                    var parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
+                    lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin);
+                }
+                getTablePengisianRencanaAksi(1);
+            }
+        }
+    });
+};
 
 function tambah_rencana_aksi(){
     return new Promise(function(resolve, reject){
@@ -420,32 +434,66 @@ function tambah_rencana_aksi(){
 }
 
 function edit_rencana_aksi(id, tipe){
-    tambah_rencana_aksi().then(function(){
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: 'POST',
-            data: {
-                action: 'get_rencana_aksi',
-                api_key: esakip.api_key,
-                id: id,
-                tahun_anggaran: '<?php echo $input['tahun'] ?>'
-            },
-            dataType: 'json',
-            success: function(response) {
-                jQuery('#wrap-loading').hide();
-                if(response.status == 'error'){
-                    alert(response.message)
-                }else if(response.data != null){
-                    jQuery('#id_kegiatan_utama').val(id);
-                    jQuery("#modal-crud").find('.modal-title').html('Edit Rencana Aksi');
-                    jQuery('#pokin-level-2').attr('val-id', response.data.id_pokin_2);
-                    jQuery('#pokin-level-1').val(response.data.id_pokin_1).trigger('change');
-                    jQuery('#kegiatan-utama').val(response.data.label);
+    if(tipe==1){
+        tambah_rencana_aksi().then(function(){
+            jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                url: esakip.url,
+                type: 'POST',
+                data: {
+                    action: 'get_rencana_aksi',
+                    api_key: esakip.api_key,
+                    id: id,
+                    tahun_anggaran: '<?php echo $input['tahun'] ?>'
+                },
+                dataType: 'json',
+                success: function(response) {
+                    jQuery('#wrap-loading').hide();
+                    if(response.status == 'error'){
+                        alert(response.message)
+                    }else if(response.data != null){
+                        jQuery('#id_kegiatan_utama').val(id);
+                        jQuery("#modal-crud").find('.modal-title').html('Edit Kegiatan Utama');
+                        jQuery('#pokin-level-2').attr('val-id', response.data.id_pokin_2);
+                        jQuery('#pokin-level-1').val(response.data.id_pokin_1).trigger('change');
+                        jQuery('#kegiatan-utama').val(response.data.label);
+                    }
                 }
-            }
+            });
         });
-    });
+    }else{
+        tambah_renaksi_2(tipe).then(function(){
+            jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                url: esakip.url,
+                type: 'POST',
+                data: {
+                    action: 'get_rencana_aksi',
+                    api_key: esakip.api_key,
+                    id: id,
+                    tahun_anggaran: '<?php echo $input['tahun'] ?>'
+                },
+                dataType: 'json',
+                success: function(response) {
+                    jQuery('#wrap-loading').hide();
+                    if(response.status == 'error'){
+                        alert(response.message)
+                    }else if(response.data != null){
+                        jQuery('#id_renaksi').val(id);
+                        if(tipe == 2){
+                            jQuery("#modal-crud").find('.modal-title').html('Edit Rencana Aksi');
+                            jQuery('#pokin-level-1').val(response.data.id_pokin_3).trigger('change');
+                        }else if(tipe == 3){
+                            jQuery("#modal-crud").find('.modal-title').html('Edit Uraian Rencana Aksi');
+                            jQuery('#pokin-level-2').attr('val-id', response.data.id_pokin_5);
+                            jQuery('#pokin-level-1').val(response.data.id_pokin_4).trigger('change');
+                        }
+                        jQuery('#label_renaksi').val(response.data.label);
+                    }
+                }
+            });
+        });
+    }
 }
 
 function get_data_pokin(parent, level, tag){
@@ -523,7 +571,7 @@ function kegiatanUtama(){
                                         +`<td class="label_pokin">${value.label_pokin_2}</td>`
                                         +`<td class="label_renaksi">${value.label}</td>`
                                         +`<td class="text-center">`
-                                            +`<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indiaktor_rencana_aksi(${value.id}, 1)" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
+                                            +`<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, 1)" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
                                             +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, 2, ${value.id_pokin_2})" title="Lihat Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
                                             +`<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, 1)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`
                                             +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_rencana_aksi(${value.id}, 1)" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
@@ -662,7 +710,7 @@ function getTablePengisianRencanaAksi(no_loading=false) {
     });
 }
 
-function tambah_indiaktor_rencana_aksi(id, tipe){
+function tambah_indikator_rencana_aksi(id, tipe){
     var title = '';
     if(tipe == 1){
         title = 'Indikator Kegiatan Utama';
@@ -758,7 +806,7 @@ function tambah_indiaktor_rencana_aksi(id, tipe){
         +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
             +'Tutup'
         +'</button>'
-        +'<button type="button" class="btn btn-success" id="simpan-indikator-renaksi" data-action="create_indikator_renaksi" data-view="kegiatanUtama">'
+        +'<button type="button" class="btn btn-success" onclick="simpan_indikator_renaksi('+tipe+')" data-view="kegiatanUtama">'
             +'Simpan'
         +'</button>');
     jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
@@ -783,7 +831,7 @@ function edit_indikator(id, tipe){
                 response.status == 'success' 
                 && response.data != null
             ){
-                tambah_indiaktor_rencana_aksi(response.data.id_renaksi, tipe);
+                tambah_indikator_rencana_aksi(response.data.id_renaksi, tipe);
                 jQuery("#modal-crud").find('.modal-title').text(jQuery("#modal-crud").find('.modal-title').text().replace('Tambah', 'Edit'));
                 jQuery('#id_label_indikator').val(id);
                 jQuery('#indikator').val(response.data.indikator);
@@ -888,14 +936,17 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
     return new Promise(function(resolve, reject){
         var title = '';
         var fungsi_tambah = '';
+        var id_tabel = '';
 
         // rencana aksi
         if(tipe == 2){
+            id_tabel = 'tabel_rencana_aksi';
             title = 'Rencana Aksi';
             fungsi_tambah = 'tambah_renaksi_2';
-        }else if(tipe == 2){
+        }else if(tipe == 3){
+            id_tabel = 'tabel_uraian_rencana_aksi';
             title = 'Uraian Rencana Aksi';
-            fungsi_tambah = 'tambah_uraian_renaksi';
+            fungsi_tambah = 'tambah_renaksi_2';
         }
         jQuery.ajax({
             url: esakip.url,
@@ -915,7 +966,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
                     +`<div style="margin-top:10px">`
                         +`<button type="button" class="btn btn-success mb-2" onclick="`+fungsi_tambah+`(`+tipe+`);"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data `+title+`</button>`
                     +`</div>`
-                    +`<table class="table" id="tabel_rencana_aksi" parent_renaksi="`+parent_renaksi+`" parent_pokin="`+parent_pokin+`">`
+                    +'<table class="table" id="'+id_tabel+'" parent_renaksi="'+parent_renaksi+'" parent_pokin="'+parent_pokin+'">'
                         +`<thead>`
                             +`<tr>`
                                 +`<th class="text-center" style="width:40px;">No</th>`
@@ -928,9 +979,12 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
                             res.data.map(function(value, index){
                                 var label_pokin = '';
                                 var id_pokin = 0;
+                                var tombol_detail = '';
                                 if(tipe == 2){
                                     label_pokin = value['label_pokin_3'];
                                     id_pokin = value['id_pokin_3'];
+                                    tombol_detail = ''
+                                        +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, `+(tipe+1)+`, `+id_pokin+`)" title="Lihat Uraian Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                                 }else if(tipe == 3){
                                     label_pokin = value['label_pokin_4'];
                                     id_pokin = value['id_pokin_4'];
@@ -945,8 +999,8 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
                                         +`<td class="label_pokin">`+label_pokin+`</td>`
                                         +`<td class="label_renaksi">${value.label}</td>`
                                         +`<td class="text-center">`
-                                            +`<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indiaktor_rencana_aksi(${value.id}, `+tipe+`)" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
-                                            +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, `+(tipe+1)+`, `+id_pokin+`)" title="Lihat Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
+                                            +`<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, `+tipe+`)" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
+                                            +tombol_detail
                                             +`<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, `+tipe+`)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`
                                             +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_rencana_aksi(${value.id}, `+tipe+`)" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
                                         +`</td>`
@@ -1059,6 +1113,7 @@ function tambah_renaksi_2(tipe){
                                 +html
                             +'</select>'
                         +'</div>'
+                        +pokin_5
                         +'<div class="form-group">'
                             +'<textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan '+title+'..."></textarea>'
                         +'</div>'
