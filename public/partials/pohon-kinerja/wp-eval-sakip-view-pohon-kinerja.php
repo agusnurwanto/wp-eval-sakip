@@ -140,7 +140,7 @@ if(!empty($data_all['data'])){
 								$label_parent = "?";
 								$class_cc_vertikal = "croscutting-lembaga-vertikal";
 							}
-							$data_temp[$keylevel2][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ." <a href='javascript:void(0)' data-id='". $valCross['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;' style='text-decoration: none; color: black;' title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
+							$data_temp[$keylevel2][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ." <a href='javascript:void(0)' data-id='". $valCross['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
 					}
 				}
 
@@ -179,7 +179,7 @@ if(!empty($data_all['data'])){
 									$label_parent = "?";
 									$class_cc_vertikal = "croscutting-lembaga-vertikal";
 								}
-								$data_temp[$keylevel3][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ." <a href='javascript:void(0)' data-id='". $valCross['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;' style='text-decoration: none; color: black;' title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
+								$data_temp[$keylevel3][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ." <a href='javascript:void(0)' data-id='". $valCross['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
 							}
 						}
 
@@ -221,7 +221,7 @@ if(!empty($data_all['data'])){
 											$label_parent = "?";
 											$class_cc_vertikal = "croscutting-lembaga-vertikal";
 										}
-						                $data_temp[$keylevel4][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ." <a href='javascript:void(0)' data-id='". $valCross['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;' style='text-decoration: none; color: black;' title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
+						                $data_temp[$keylevel4][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ." <a href='javascript:void(0)' data-id='". $valCross['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
 						            }
 					            }
 
@@ -263,7 +263,7 @@ if(!empty($data_all['data'])){
 													$label_parent = "?";
 													$class_cc_vertikal = "croscutting-lembaga-vertikal";
 												}
-												$data_temp[$keylevel5][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ." <a href='javascript:void(0)' data-id='". $valCross['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;' style='text-decoration: none; color: black;' title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
+												$data_temp[$keylevel5][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ." <a href='javascript:void(0)' data-id='". $valCross['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
 											}
 										}
 		
@@ -444,7 +444,13 @@ if(!empty($data_all['data'])){
 
 	.detail_crocutting{
 		background-color: #f4f6f8 !important;
-		color: #010407 !important;
+		color: #111827 !important;
+	}
+
+	.detail-cc .dashicons{
+		text-decoration: none; 
+		color: black;
+		vertical-align: text-bottom !important;
 	}
 </style>
 <div class="text-center" id="action-sakip">
@@ -529,37 +535,36 @@ google.charts.load('current', {packages:["orgchart"]});
 google.charts.setOnLoadCallback(drawChart);
 
 function detail_cc(id){
-		jQuery("#wrap-loading").show();
-		console.log('cekyo')
-		if(id == undefined){
-			alert("Id tidak ditemukan")
-		}
+	jQuery("#wrap-loading").show();
+	if(id == undefined){
+		alert("Id tidak ditemukan")
+	}
 
-		jQuery.ajax({
-			method:'POST',
-			url:esakip.url,
-			data:{
-	  			"action": "detail_croscutting_by_id",
-	  			"api_key": esakip.api_key,
-	  			'id': id,
-				'tipe_pokin': "opd",
-				'id_skpd': <?php echo $id_skpd; ?>
-			},
-			dataType:'json',
-			success:function(response){
-				jQuery("#wrap-loading").hide();
-				if(response.status){
-					jQuery("#label-pengusul").val(response.data_croscutting.label_parent)
-					jQuery("#perangkat-pengusul").val(response.data_croscutting.nama_perangkat)
-					jQuery("#keterangan-pengusul").val(response.data_croscutting.keterangan)
-					jQuery("#perangkat-tujuan").val(response.data_croscutting.nama_perangkat_tujuan)
-					jQuery("#label-tujuan").val(response.data_croscutting.label_parent_tujuan)
-					jQuery("#keterangan-tujuan").val(response.data_croscutting.keterangan_tujuan)
-					jQuery("#modal-detail").modal('show');
-				}
+	jQuery.ajax({
+		method:'POST',
+		url:esakip.url,
+		data:{
+			"action": "detail_croscutting_by_id",
+			"api_key": esakip.api_key,
+			'id': id,
+			'tipe_pokin': "opd",
+			'id_skpd': <?php echo $id_skpd; ?>
+		},
+		dataType:'json',
+		success:function(response){
+			jQuery("#wrap-loading").hide();
+			if(response.status){
+				jQuery("#label-pengusul").val(response.data_croscutting.label_parent)
+				jQuery("#perangkat-pengusul").val(response.data_croscutting.nama_perangkat)
+				jQuery("#keterangan-pengusul").val(response.data_croscutting.keterangan)
+				jQuery("#perangkat-tujuan").val(response.data_croscutting.nama_perangkat_tujuan)
+				jQuery("#label-tujuan").val(response.data_croscutting.label_parent_tujuan)
+				jQuery("#keterangan-tujuan").val(response.data_croscutting.keterangan_tujuan)
+				jQuery("#modal-detail").modal('show');
 			}
-		});
-	};
+		}
+	});
+};
 
 jQuery("#show_croscutting").on('click', function(){
 	if(this.checked) {

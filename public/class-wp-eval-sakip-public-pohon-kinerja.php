@@ -2459,6 +2459,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									cc.keterangan_croscutting as keterangan_tujuan,
 									cc.is_lembaga_lainnya,
 									cc.id_skpd_croscutting as id_skpd_tujuan,
+									cc.status_croscutting,
+									cc.keterangan_tolak,
 									pk.id_skpd as id_skpd_parent,
 									pk.label as label_parent,
                                     pkt.label as label_parent_tujuan
