@@ -14,13 +14,15 @@ if (!empty($_GET) && !empty($_GET['id_skpd'])) {
 }
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-$id_jadwal = $wpdb->get_var("
+$id_jadwal = $wpdb->get_var(
+    $wpdb->prepare("
     SELECT 
         id
     FROM esakip_data_jadwal
     WHERE tipe = 'RPJMD'
-    ORDER by status DESC, id DESC
-");
+    AND tahun_anggaran <=%d
+    ORDER by status DESC, tahun_anggaran DESC, id DESC
+", $input['tahun']));
 
 $skpd = $wpdb->get_row(
     $wpdb->prepare("
@@ -552,7 +554,7 @@ function kegiatanUtama(){
                 jQuery('#wrap-loading').hide();
                 let kegiatanUtama = ``
                     +`<div style="margin-top:10px">`
-                        +`<button type="button" class="btn btn-success mb-2" onclick="tambah_rencana_aksi();"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
+                        +`<button type="button" class="btn btn-success mb-2" onclick="tambah_rencana_aksi();"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data Kegiatan Utama</button>`
                     +`</div>`
                     +`<table class="table" id="kegiatanUtama">`
                         +`<thead>`
@@ -939,7 +941,11 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
         var id_tabel = '';
 
         // rencana aksi
-        if(tipe == 2){
+        if(tipe ==1){
+            id_tabel = 'kegiatanUtama';
+            title = 'Kegiatan Utama';
+            fungsi_tambah = 'tambah_rencana_aksi';
+        }else if(tipe == 2){
             id_tabel = 'tabel_rencana_aksi';
             title = 'Rencana Aksi';
             fungsi_tambah = 'tambah_renaksi_2';
@@ -980,7 +986,12 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
                                 var label_pokin = '';
                                 var id_pokin = 0;
                                 var tombol_detail = '';
-                                if(tipe == 2){
+                                if(tipe == 1){
+                                    label_pokin = value['label_pokin_2'];
+                                    id_pokin = value['id_pokin_2'];
+                                    tombol_detail = ''
+                                        +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, `+(tipe+1)+`, `+id_pokin+`)" title="Lihat Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
+                                }else if(tipe == 2){
                                     label_pokin = value['label_pokin_3'];
                                     id_pokin = value['id_pokin_3'];
                                     tombol_detail = ''
@@ -1137,8 +1148,8 @@ function tambah_renaksi_2(tipe){
 }
 
 function simpan_data_renaksi(tipe){
-    var parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
-    var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
+    var parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin') != undefined ? jQuery('#tabel_rencana_aksi').attr('parent_pokin') : 0;
+    var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi') != undefined ? jQuery('#tabel_rencana_aksi').attr('parent_renaksi') : 0;
     var id_pokin_1 = jQuery('#pokin-level-1').val();
     var id_pokin_2 = jQuery('#pokin-level-2').val();
     var label_pokin_1 = jQuery('#pokin-level-1 option:selected').text();
