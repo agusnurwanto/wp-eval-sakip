@@ -401,7 +401,7 @@ function tambah_rencana_aksi(){
                 jQuery("#modal-crud").find('.modal-title').html('Tambah Rencana Aksi');
                 jQuery("#modal-crud").find('.modal-body').html(''
                     +`<form id="form-renaksi">`
-                        +'<input type="hidden" id="id_kegiatan_utama" value=""/>'
+                        +'<input type="hidden" id="id_renaksi" value=""/>'
                         +`<div class="form-group">`
                             +`<label for="pokin-level-1">Pilih Pokin Level 1</label>`
                             +`<select class="form-control" name="pokin-level-1" id="pokin-level-1" onchange="get_data_pokin(this.value, 2, 'pokin-level-2')">`
@@ -454,11 +454,11 @@ function edit_rencana_aksi(id, tipe){
                     if(response.status == 'error'){
                         alert(response.message)
                     }else if(response.data != null){
-                        jQuery('#id_kegiatan_utama').val(id);
+                        jQuery('#id_renaksi').val(id);
                         jQuery("#modal-crud").find('.modal-title').html('Edit Kegiatan Utama');
                         jQuery('#pokin-level-2').attr('val-id', response.data.id_pokin_2);
                         jQuery('#pokin-level-1').val(response.data.id_pokin_1).trigger('change');
-                        jQuery('#kegiatan-utama').val(response.data.label);
+                        jQuery('#label_renaksi').val(response.data.label);
                     }
                 }
             });
@@ -894,13 +894,20 @@ function hapus_indikator(id, tipe){
 
 function hapus_rencana_aksi(id, tipe){
     var title = '';
+    var parent_pokin = 0;
+    var parent_renaksi = 0;
     if(tipe == 1){
         title = 'Kegiatan Utama';
     }else if(tipe == 2){
         title = 'Rencana Aksi';
+        parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
+        parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
     }else if(tipe == 3){
         title = 'Uraian Kegiatan Rencana Aksi';
+        parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
+        parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
     }
+
     if(confirm('Apakah kamu yakin untuk menghapus '+title+'?')){
         jQuery('#wrap-loading').show();
         jQuery.ajax({
@@ -921,6 +928,8 @@ function hapus_rencana_aksi(id, tipe){
                 if (response.status === 'success') {
                     if(tipe==1){
                         kegiatanUtama();
+                    }else{
+                        lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin)
                     }
                 }
             },
@@ -1010,10 +1019,10 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
                                         +`<td class="label_pokin">`+label_pokin+`</td>`
                                         +`<td class="label_renaksi">${value.label}</td>`
                                         +`<td class="text-center">`
-                                            +`<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, `+tipe+`)" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
+                                            +`<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, ${tipe})" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
                                             +tombol_detail
                                             +`<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, `+tipe+`)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`
-                                            +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_rencana_aksi(${value.id}, `+tipe+`)" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
+                                            +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_rencana_aksi(${value.id}, ${tipe})" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
                                         +`</td>`
                                     +`</tr>`;
 
@@ -1082,6 +1091,8 @@ function tambah_renaksi_2(tipe){
         if(tipe == 3){
             level_pokin = 4;
             title = 'Uraian Rencana Aksi';
+            parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
+            parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
         }
         jQuery('#wrap-loading').show();
         jQuery.ajax({
@@ -1148,8 +1159,22 @@ function tambah_renaksi_2(tipe){
 }
 
 function simpan_data_renaksi(tipe){
-    var parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin') != undefined ? jQuery('#tabel_rencana_aksi').attr('parent_pokin') : 0;
-    var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi') != undefined ? jQuery('#tabel_rencana_aksi').attr('parent_renaksi') : 0;
+    var parent_pokin = 0;
+    var parent_renaksi = 0;
+    switch (tipe) {
+        case 2 :
+            parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
+            parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
+            break;
+        case 3 :
+            parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
+            parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
+            break;
+        default:
+            parent_pokin = 0;
+            parent_renaksi = 0;
+        }
+    
     var id_pokin_1 = jQuery('#pokin-level-1').val();
     var id_pokin_2 = jQuery('#pokin-level-2').val();
     var label_pokin_1 = jQuery('#pokin-level-1 option:selected').text();

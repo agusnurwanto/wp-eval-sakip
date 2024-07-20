@@ -320,6 +320,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
 				}
+				$child_level = $_POST['tipe']+1;
 				if ($ret['status'] != 'error'){
 					$cek_child = $wpdb->get_results($wpdb->prepare("
 						SELECT
@@ -328,7 +329,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						WHERE level=%d
 							AND parent=%d
 							AND active=1
-					", $_POST['tipe']+1, $_POST['id']), ARRAY_A);
+					", $child_level, $_POST['id']), ARRAY_A);
 					if(empty($cek_child)){
 						$wpdb->update('esakip_data_rencana_aksi_opd', array(
 							'active' => 0
@@ -336,7 +337,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					}else{
 						$ret['status'] = 'error';
 						$ret['child'] = $cek_child;
-						$ret['message'] = 'Gagal menghapus, data sudah digunakan!';
+						$ret['message'] = 'Gagal menghapus, data di level data di level '. $child_level .' harus dihapus dahulu!';
 					}
 				}
 			} else {
