@@ -561,7 +561,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									WHERE id_skpd=%d
 										AND tahun_anggaran=%d
 										AND active=1
-										AND level=3
+										AND level=4
 										AND parent=%d
 								", $_POST['id_skpd'], $_POST['tahun_anggaran'], $v3['id']), ARRAY_A);
 							
@@ -624,6 +624,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							<td class="indikator_renaksi"></td>
 							<td class="urian_renaksi"></td>
 							<td class="indikator_uraian_renaksi"></td>
+							<td class="uraian_teknis_kegiatan"></td>
+							<td class="indikator_uraian_teknis_kegiatan"></td>
 							<td class="text-center satuan_renaksi">'.$satuan_html.'</td>
 							<td class="text-center target_awal_urian_renaksi">'.$target_awal_html.'</td>
 							<td class="text-center target_tw1_urian_renaksi">'.$target_1_html.'</td>
@@ -684,6 +686,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								<td class="indikator_renaksi">'.$indikator_html.'</td>
 								<td class="urian_renaksi"></td>
 								<td class="indikator_uraian_renaksi"></td>
+								<td class="uraian_teknis_kegiatan"></td>
+								<td class="indikator_uraian_teknis_kegiatan"></td>
 								<td class="text-center satuan_renaksi">'.$satuan_html.'</td>
 								<td class="text-center target_awal_urian_renaksi">'.$target_awal_html.'</td>
 								<td class="text-center target_tw1_urian_renaksi">'.$target_1_html.'</td>
@@ -749,6 +753,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									<td class="indikator_renaksi"></td>
 									<td class="urian_renaksi"><span class="badge bg-success text-white">'.$label_pokin.'</span><br>'.$uraian_renaksi['detail']['label'].'</td>
 									<td class="indikator_uraian_renaksi">'.$indikator_html.'</td>
+									<td class="uraian_teknis_kegiatan"></td>
+									<td class="indikator_uraian_teknis_kegiatan"></td>
 									<td class="text-center satuan_renaksi">'.$satuan_html.'</td>
 									<td class="text-center target_awal_urian_renaksi">'.$target_awal_html.'</td>
 									<td class="text-center target_tw1_urian_renaksi">'.$target_1_html.'</td>
@@ -766,13 +772,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									<td class=""></td>
 									<td class=""></td>
 									<td class=""></td>
-									<td class=""></td>
-									<td class=""></td>
 									<td class="anggaran_urian_renaksi"></td>
 								</tr>
 								';
 
-								foreach($renaksi['data'] as $uraian_renaksi){
+								foreach($uraian_renaksi['data'] as $uraian_teknis_kegiatan){
 									$no_uraian_renaksi++;
 									$indikator_html = array();
 									$satuan_html = array();
@@ -782,7 +786,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$target_2_html = array();
 									$target_3_html = array();
 									$target_4_html = array();
-									foreach($uraian_renaksi['indikator'] as $key => $ind){
+									foreach($uraian_teknis_kegiatan['indikator'] as $key => $ind){
 										$indikator_html[$key] = $ind['indikator'];
 										$satuan_html[$key] = $ind['satuan'];
 										$target_awal_html[$key] = $ind['target_awal'];
@@ -801,9 +805,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$target_3_html = implode('<br>', $target_3_html);
 									$target_4_html = implode('<br>', $target_4_html);
 
-									$label_pokin = $uraian_renaksi['detail']['label_pokin_5'];
+									$label_pokin = $uraian_teknis_kegiatan['detail']['label_pokin_5'];
 									if(empty($label_pokin)){
-										$label_pokin = $uraian_renaksi['detail']['label_pokin_4'];
+										$label_pokin = $uraian_teknis_kegiatan['detail']['label_pokin_4'];
 									}
 									$html .= '
 									<tr>
@@ -812,8 +816,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										<td class="indikator_kegiatan_utama"></td>
 										<td class="recana_aksi"></td>
 										<td class="indikator_renaksi"></td>
-										<td class="urian_renaksi"><span class="badge bg-success text-white">'.$label_pokin.'</span><br>'.$uraian_renaksi['detail']['label'].'</td>
-										<td class="indikator_uraian_renaksi">'.$indikator_html.'</td>
+										<td class="urian_renaksi"></td>
+										<td class="indikator_uraian_renaksi"></td>
+										<td class="uraian_teknis_kegiatan"><span class="badge bg-success text-white">'.$label_pokin.'</span><br>'.$uraian_teknis_kegiatan['detail']['label'].'</td>
+										<td class="indikator_uraian_teknis_kegiatan">'.$indikator_html.'</td>
 										<td class="text-center satuan_renaksi">'.$satuan_html.'</td>
 										<td class="text-center target_awal_urian_renaksi">'.$target_awal_html.'</td>
 										<td class="text-center target_tw1_urian_renaksi">'.$target_1_html.'</td>
@@ -821,8 +827,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										<td class="text-center target_tw3_urian_renaksi">'.$target_3_html.'</td>
 										<td class="text-center target_tw4_urian_renaksi">'.$target_4_html.'</td>
 										<td class="text-center target_akhir_urian_renaksi">'.$target_akhir_html.'</td>
-										<td class=""></td>
-										<td class=""></td>
 										<td class=""></td>
 										<td class=""></td>
 										<td class=""></td>

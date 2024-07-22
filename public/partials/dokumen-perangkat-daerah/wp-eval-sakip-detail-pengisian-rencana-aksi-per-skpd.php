@@ -392,6 +392,10 @@ function simpan_indikator_renaksi(tipe){
                     var parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
                     var parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
                     lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin);
+                }else if(tipe == 4){
+                    var parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
+                    var parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
+                    lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin);
                 }
                 getTablePengisianRencanaAksi(1);
             }
@@ -607,7 +611,7 @@ function kegiatanUtama(){
                                 if(indikator.length > 0){
                                     kegiatanUtama += ``
                                     +'<td colspan="4" style="padding: 0;">'
-                                        +`<table class="table" id="kegiatanUtama" style="margin: 0;">`
+                                        +`<table class="table" id="indikatorKegiatanUtama" style="margin: 30px 0;">`
                                             +`<thead>`
                                                 +`<tr>`
                                                     +`<th class="text-center" style="width:20px">No</th>`
@@ -879,14 +883,22 @@ function edit_indikator(id, tipe){
 
 function hapus_indikator(id, tipe){
     var title = '';
+    var parent_renaksi = 0;
+    var parent_pokin = 0;
     if(tipe == 1){
         title = 'Kegiatan Utama';
     }else if(tipe == 2){
         title = 'Rencana Aksi';
+        var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
+        var parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
     }else if(tipe == 3){
         title = 'Uraian Kegiatan Rencana Aksi';
+        var parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
+        var parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
     }else if(tipe == 4){
         title = 'Uraian Teknis Kegiatan';
+        var parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
+        var parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
     }
     if(confirm('Apakah kamu yakin untuk menghapus indikator '+title+'?')){
         jQuery('#wrap-loading').show();
@@ -907,6 +919,8 @@ function hapus_indikator(id, tipe){
                 if (response.status === 'success') {
                     if(tipe==1){
                         kegiatanUtama();
+                    }else{
+                        lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin);
                     }
                 }
             },
@@ -1070,7 +1084,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
                                 if(indikator.length > 0){
                                     renaksi += ``
                                     +'<td colspan="4" style="padding: 0;">'
-                                        +`<table class="table" style="margin: 0;">`
+                                        +`<table class="table" style="margin: 30px 0;">`
                                             +`<thead>`
                                                 +`<tr>`
                                                     +`<th class="text-center" style="width:20px">No</th>`
