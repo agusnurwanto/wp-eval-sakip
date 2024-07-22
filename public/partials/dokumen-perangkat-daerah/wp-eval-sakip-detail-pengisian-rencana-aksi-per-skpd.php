@@ -111,6 +111,14 @@ $is_administrator = in_array('administrator', $user_roles);
         max-height: 70vh;
         overflow-y: auto;
     }
+    #table_dokumen_rencana_aksi {
+        font-family:'Open Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; 
+        border-collapse: collapse; 
+        width: 2900px; 
+        table-layout: fixed; 
+        overflow-wrap: break-word; 
+        font-size: 90%;
+    }
     #table_dokumen_rencana_aksi thead {
         position: sticky;
         top: -6px;
@@ -136,16 +144,25 @@ $is_administrator = in_array('administrator', $user_roles);
                 <table id="table_dokumen_rencana_aksi" cellpadding="2" cellspacing="0" class="table table-bordered">
                     <thead>
                         <tr>
-                            <th class="text-center" rowspan="2" style="width: 40px;">No</th>
+                            <th class="text-center" rowspan="2" style="width: 60px;">No</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">KEGIATAN UTAMA</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">INDIKATOR KEGIATAN UTAMA</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">RENCANA AKSI</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">OUTCOME/OUTPUT</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">URAIAN KEGIATAN RENCANA AKSI</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">INDIKATOR</th>
+                            <th class="text-center" rowspan="2" style="width: 200px;">URAIAN TEKNIS KEGIATAN</th>
+                            <th class="text-center" rowspan="2" style="width: 200px;">INDIKATOR</th>
                             <th class="text-center" rowspan="2" style="width: 100px;">SATUAN</th>
-                            <th class="text-center" colspan="6" style="width: 300px;">TARGET KEGIATAN PER TRIWULAN</th>
-                            <th class="text-center" rowspan="2" style="width: 140px;">JUMLAH ANGGARAN</th>
+                            <th class="text-center" colspan="6" style="width: 400px;">TARGET KEGIATAN PER TRIWULAN</th>
+                            <th class="text-center" colspan="4" style="width: 250px;">REALISASI KEGIATAN PER TRIWULAN</th>
+                            <th class="text-center" rowspan="2" style="width: 140px;">CAPAIAN REALISASI (%)</th>
+                            <th class="text-center" rowspan="2" style="width: 140px;">RENCANA PAGU</th>
+                            <th class="text-center" rowspan="2" style="width: 140px;">ALOKASI PAGU</th>
+                            <th class="text-center" rowspan="2" style="width: 140px;">REALISASI PAGU</th>
+                            <th class="text-center" rowspan="2" style="width: 140px;">CAPAIAN REALISASI PAGU</th>
+                            <th class="text-center" rowspan="2" style="width: 140px;">PAGU SUB KEGIATAN</th>
+                            <th class="text-center" rowspan="2" style="width: 140px;">KETERANGAN</th>
                         </tr>
                         <tr>
                             <th>AWAL</th>
@@ -154,6 +171,10 @@ $is_administrator = in_array('administrator', $user_roles);
                             <th>TW-III</th>
                             <th>TW-IV</th>
                             <th>AKHIR</th>
+                            <th>TW-I</th>
+                            <th>TW-II</th>
+                            <th>TW-III</th>
+                            <th>TW-IV</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -251,12 +272,14 @@ $is_administrator = in_array('administrator', $user_roles);
 					    <a class="nav-item nav-link" id="nav-level-1-tab" data-toggle="tab" href="#nav-level-1" role="tab" aria-controls="nav-level-1" aria-selected="false">Kegiatan Utama</a>
 					    <a class="nav-item nav-link" id="nav-level-2-tab" data-toggle="tab" href="#nav-level-2" role="tab" aria-controls="nav-level-2" aria-selected="false">Rencana Aksi</a>
 					    <a class="nav-item nav-link" id="nav-level-3-tab" data-toggle="tab" href="#nav-level-3" role="tab" aria-controls="nav-level-3" aria-selected="false">Uraian Kegiatan Rencana Aksi</a>
+                        <a class="nav-item nav-link" id="nav-level-4-tab" data-toggle="tab" href="#nav-level-4" role="tab" aria-controls="nav-level-4" aria-selected="false">Uraian Teknis Kegiatan</a>
 				  	</div>
 				</nav>
 				<div class="tab-content" id="nav-tabContent">
 				  	<div class="tab-pane fade show active" id="nav-level-1" role="tabpanel" aria-labelledby="nav-level-1-tab"></div>
 				  	<div class="tab-pane fade" id="nav-level-2" role="tabpanel" aria-labelledby="nav-level-2-tab"></div>
 				  	<div class="tab-pane fade" id="nav-level-3" role="tabpanel" aria-labelledby="nav-level-3-tab"></div>
+				  	<div class="tab-pane fade" id="nav-level-4" role="tabpanel" aria-labelledby="nav-level-4-tab"></div>
 				</div>
 			</div>
 		</div>
@@ -720,6 +743,8 @@ function tambah_indikator_rencana_aksi(id, tipe){
         title = 'Indikator Rencana Aksi';
     }else if(tipe == 3){
         title = 'Uraian Kegiatan Rencana Aksi';
+    }else if(tipe == 4){
+        title = 'Uraian Teknis Kegiatan';
     }
     var tr = jQuery('#kegiatan_utama_'+id);
     var label_pokin = tr.find('.label_pokin').text();
@@ -860,6 +885,8 @@ function hapus_indikator(id, tipe){
         title = 'Rencana Aksi';
     }else if(tipe == 3){
         title = 'Uraian Kegiatan Rencana Aksi';
+    }else if(tipe == 4){
+        title = 'Uraian Teknis Kegiatan';
     }
     if(confirm('Apakah kamu yakin untuk menghapus indikator '+title+'?')){
         jQuery('#wrap-loading').show();
@@ -904,6 +931,10 @@ function hapus_rencana_aksi(id, tipe){
         parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
     }else if(tipe == 3){
         title = 'Uraian Kegiatan Rencana Aksi';
+        parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
+        parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
+    }else if(tipe == 4){
+        title = 'Uraian Teknis Kegiatan';
         parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
         parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
     }
@@ -962,6 +993,10 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
             id_tabel = 'tabel_uraian_rencana_aksi';
             title = 'Uraian Rencana Aksi';
             fungsi_tambah = 'tambah_renaksi_2';
+        }else if(tipe == 4){
+            id_tabel = 'tabel_uraian_teknis_kegiatan';
+            title = 'Uraian Teknis Kegiatan';
+            fungsi_tambah = 'tambah_renaksi_2';
         }
         jQuery.ajax({
             url: esakip.url,
@@ -1008,10 +1043,15 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
                                 }else if(tipe == 3){
                                     label_pokin = value['label_pokin_4'];
                                     id_pokin = value['id_pokin_4'];
-                                    if(value['id_pokin_5'] != ''){
-                                        label_pokin = value['label_pokin_5'];
-                                        id_pokin = value['id_pokin_5'];
-                                    }
+                                    // if(value['id_pokin_5'] != ''){
+                                    //     label_pokin = value['label_pokin_5'];
+                                    //     id_pokin = value['id_pokin_5'];
+                                    // }
+                                    tombol_detail = ''
+                                        +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, `+(tipe+1)+`, `+id_pokin+`)" title="Lihat Teknis Kegiatan"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
+                                }else if(tipe == 4){
+                                    label_pokin = value['label_pokin_5'];
+                                    id_pokin = value['id_pokin_5'];
                                 }
                                 renaksi += ``
                                     +`<tr id="kegiatan_utama_${value.id}">`
@@ -1093,6 +1133,11 @@ function tambah_renaksi_2(tipe){
             title = 'Uraian Rencana Aksi';
             parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
             parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
+        }else if(tipe == 4){
+            level_pokin = 5;
+            title = 'Uraian Teknis Kegiatan';
+            parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
+            parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
         }
         jQuery('#wrap-loading').show();
         jQuery.ajax({
@@ -1117,15 +1162,6 @@ function tambah_renaksi_2(tipe){
                 jQuery("#modal-crud").find('.modal-title').html('Tambah '+title);
                 var pokin_5 = '';
                 var onchange_pokin = '';
-                if(tipe == 3){
-                    pokin_5 = ''
-                    +'<div class="form-group">'
-                        +'<label for="pokin-level-2">Pilih Pokin Level '+(level_pokin+1)+'</label>'
-                        +'<select class="form-control" name="pokin-level-2" id="pokin-level-2">'
-                        +'</select>'
-                    +'</div>';
-                    onchange_pokin = 'onchange="get_data_pokin(this.value, '+(level_pokin+1)+', \'pokin-level-2\')"';
-                }
                 jQuery("#modal-crud").find('.modal-body').html(''
                     +'<form>'
                         +'<input type="hidden" id="id_renaksi" value=""/>'
@@ -1169,6 +1205,10 @@ function simpan_data_renaksi(tipe){
         case 3 :
             parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
             parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
+            break;
+        case 4 :
+            parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
+            parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
             break;
         default:
             parent_pokin = 0;

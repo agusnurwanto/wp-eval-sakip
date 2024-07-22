@@ -113,6 +113,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					(
 						$_POST['level'] == 2 
 						|| $_POST['level'] == 3 
+						|| $_POST['level'] == 4 
 					)
 					&& $ret['status'] != 'error' 
 					&& empty($_POST['parent'])
@@ -143,8 +144,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$data['parent'] = $_POST['parent'];
 						$data['id_pokin_4'] = $_POST['id_pokin_1'];
 						$data['label_pokin_4'] = $_POST['label_pokin_1'];
-						$data['id_pokin_5'] = $_POST['id_pokin_2'];
-						$data['label_pokin_5'] = $_POST['label_pokin_2'];
+					}else if($_POST['level'] == 4){
+						$data['parent'] = $_POST['parent'];
+						$data['id_pokin_5'] = $_POST['id_pokin_1'];
+						$data['label_pokin_5'] = $_POST['label_pokin_1'];
 					}
 					if(!empty($_POST['id'])){
 						$cek_id = $_POST['id'];
@@ -551,6 +554,32 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									'data' => array(),
 									'indikator' => $indikator
 								);
+								$data4 = $wpdb->get_results($wpdb->prepare("
+									SELECT
+										*
+									FROM esakip_data_rencana_aksi_opd
+									WHERE id_skpd=%d
+										AND tahun_anggaran=%d
+										AND active=1
+										AND level=3
+										AND parent=%d
+								", $_POST['id_skpd'], $_POST['tahun_anggaran'], $v3['id']), ARRAY_A);
+							
+								// uraian teknis kegiatan
+								foreach($data4 as $v4){
+									$indikator = $wpdb->get_results($wpdb->prepare("
+										SELECT
+											*
+										FROM esakip_data_rencana_aksi_indikator_opd
+										WHERE id_renaksi=%d
+											AND active=1
+									", $v4['id']), ARRAY_A);
+									$data_all['data'][$v['id']]['data'][$v2['id']]['data'][$v3['id']]['data'][$v4['id']] = array(
+										'detail' => $v4,
+										'data' => array(),
+										'indikator' => $indikator
+									);
+								}
 							}
 						}
 					}
@@ -602,6 +631,18 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							<td class="text-center target_tw3_urian_renaksi">'.$target_3_html.'</td>
 							<td class="text-center target_tw4_urian_renaksi">'.$target_4_html.'</td>
 							<td class="text-center target_akhir_urian_renaksi">'.$target_akhir_html.'</td>
+							<td class=""></td>
+							<td class=""></td>
+							<td class=""></td>
+							<td class=""></td>
+							<td class=""></td>
+							<td class=""></td>
+							<td class=""></td>
+							<td class=""></td>
+							<td class=""></td>
+							<td class=""></td>
+							<td class=""></td>
+							<td class=""></td>
 							<td class="anggaran_urian_renaksi"></td>
 						</tr>
 						';
@@ -650,6 +691,18 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								<td class="text-center target_tw3_urian_renaksi">'.$target_3_html.'</td>
 								<td class="text-center target_tw4_urian_renaksi">'.$target_4_html.'</td>
 								<td class="text-center target_akhir_urian_renaksi">'.$target_akhir_html.'</td>
+								<td class=""></td>
+								<td class=""></td>
+								<td class=""></td>
+								<td class=""></td>
+								<td class=""></td>
+								<td class=""></td>
+								<td class=""></td>
+								<td class=""></td>
+								<td class=""></td>
+								<td class=""></td>
+								<td class=""></td>
+								<td class=""></td>
 								<td class="anggaran_urian_renaksi"></td>
 							</tr>
 							';
@@ -703,9 +756,87 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									<td class="text-center target_tw3_urian_renaksi">'.$target_3_html.'</td>
 									<td class="text-center target_tw4_urian_renaksi">'.$target_4_html.'</td>
 									<td class="text-center target_akhir_urian_renaksi">'.$target_akhir_html.'</td>
+									<td class=""></td>
+									<td class=""></td>
+									<td class=""></td>
+									<td class=""></td>
+									<td class=""></td>
+									<td class=""></td>
+									<td class=""></td>
+									<td class=""></td>
+									<td class=""></td>
+									<td class=""></td>
+									<td class=""></td>
+									<td class=""></td>
 									<td class="anggaran_urian_renaksi"></td>
 								</tr>
 								';
+
+								foreach($renaksi['data'] as $uraian_renaksi){
+									$no_uraian_renaksi++;
+									$indikator_html = array();
+									$satuan_html = array();
+									$target_awal_html = array();
+									$target_akhir_html = array();
+									$target_1_html = array();
+									$target_2_html = array();
+									$target_3_html = array();
+									$target_4_html = array();
+									foreach($uraian_renaksi['indikator'] as $key => $ind){
+										$indikator_html[$key] = $ind['indikator'];
+										$satuan_html[$key] = $ind['satuan'];
+										$target_awal_html[$key] = $ind['target_awal'];
+										$target_akhir_html[$key] = $ind['target_akhir'];
+										$target_1_html[$key] = $ind['target_1'];
+										$target_2_html[$key] = $ind['target_2'];
+										$target_3_html[$key] = $ind['target_3'];
+										$target_4_html[$key] = $ind['target_4'];
+									}
+									$indikator_html = implode('<br>', $indikator_html);
+									$satuan_html = implode('<br>', $satuan_html);
+									$target_awal_html = implode('<br>', $target_awal_html);
+									$target_akhir_html = implode('<br>', $target_akhir_html);
+									$target_1_html = implode('<br>', $target_1_html);
+									$target_2_html = implode('<br>', $target_2_html);
+									$target_3_html = implode('<br>', $target_3_html);
+									$target_4_html = implode('<br>', $target_4_html);
+
+									$label_pokin = $uraian_renaksi['detail']['label_pokin_5'];
+									if(empty($label_pokin)){
+										$label_pokin = $uraian_renaksi['detail']['label_pokin_4'];
+									}
+									$html .= '
+									<tr>
+										<td>'.$no.'.'.$no_renaksi.'.'.$no_uraian_renaksi.'</td>
+										<td class="kegiatan_utama"></td>
+										<td class="indikator_kegiatan_utama"></td>
+										<td class="recana_aksi"></td>
+										<td class="indikator_renaksi"></td>
+										<td class="urian_renaksi"><span class="badge bg-success text-white">'.$label_pokin.'</span><br>'.$uraian_renaksi['detail']['label'].'</td>
+										<td class="indikator_uraian_renaksi">'.$indikator_html.'</td>
+										<td class="text-center satuan_renaksi">'.$satuan_html.'</td>
+										<td class="text-center target_awal_urian_renaksi">'.$target_awal_html.'</td>
+										<td class="text-center target_tw1_urian_renaksi">'.$target_1_html.'</td>
+										<td class="text-center target_tw2_urian_renaksi">'.$target_2_html.'</td>
+										<td class="text-center target_tw3_urian_renaksi">'.$target_3_html.'</td>
+										<td class="text-center target_tw4_urian_renaksi">'.$target_4_html.'</td>
+										<td class="text-center target_akhir_urian_renaksi">'.$target_akhir_html.'</td>
+										<td class=""></td>
+										<td class=""></td>
+										<td class=""></td>
+										<td class=""></td>
+										<td class=""></td>
+										<td class=""></td>
+										<td class=""></td>
+										<td class=""></td>
+										<td class=""></td>
+										<td class=""></td>
+										<td class=""></td>
+										<td class=""></td>
+										<td class="anggaran_urian_renaksi"></td>
+									</tr>
+									';
+								}
 							}
 						}
 					}
