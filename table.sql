@@ -1181,5 +1181,7 @@ CREATE TABLE `esakip_data_rencana_aksi_indikator_opd` (
   `active` tinyint(4) NOT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `update_at` datetime DEFAULT current_timestamp(),
+  `rencana_pagu` double(20, 0) DEFAULT NULL,
+  `realisasi_pagu` double(20, 0) DEFAULT NULL,
   PRIMARY key (id)
 );

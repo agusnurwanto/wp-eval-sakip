@@ -407,6 +407,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'id_renaksi' => $_POST['id_label'],
 						'indikator' => $_POST['indikator'],
 						'satuan' => $_POST['satuan'],
+						'rencana_pagu' => $_POST['rencana_pagu'],
+						'realisasi_pagu' => $_POST['realisasi_pagu'],
 						'target_awal' => $_POST['target_awal'],
 						'target_akhir' => $_POST['target_akhir'],
 						'target_1' => $_POST['target_tw_1'],
@@ -587,6 +589,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$no = 0;
 					$no_renaksi = 0;
 					$no_uraian_renaksi = 0;
+					$no_uraian_teknis = 0;
 					foreach($data_all['data'] as $v){
 						$no++;
 						$indikator_html = array();
@@ -597,6 +600,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$target_2_html = array();
 						$target_3_html = array();
 						$target_4_html = array();
+						$rencana_pagu_html = array();
+						$realisasi_pagu_html = array();
 						foreach($v['indikator'] as $key => $ind){
 							$indikator_html[$key] = $ind['indikator'];
 							$satuan_html[$key] = $ind['satuan'];
@@ -606,6 +611,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$target_2_html[$key] = $ind['target_2'];
 							$target_3_html[$key] = $ind['target_3'];
 							$target_4_html[$key] = $ind['target_4'];
+							$rencana_pagu_html[$key] = !empty($ind['rencana_pagu']) ? $ind['rencana_pagu'] : 0;
+							$realisasi_pagu_html[$key] = !empty($ind['realisasi_pagu']) ? $ind['realisasi_pagu'] : 0;
 						}
 						$indikator_html = implode('<br>', $indikator_html);
 						$satuan_html = implode('<br>', $satuan_html);
@@ -615,6 +622,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$target_2_html = implode('<br>', $target_2_html);
 						$target_3_html = implode('<br>', $target_3_html);
 						$target_4_html = implode('<br>', $target_4_html);
+						$rencana_pagu_html = implode('<br>', $rencana_pagu_html);
+						$realisasi_pagu_html = implode('<br>', $realisasi_pagu_html);
 						$html .= '
 						<tr>
 							<td>'.$no.'</td>
@@ -659,6 +668,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$target_2_html = array();
 							$target_3_html = array();
 							$target_4_html = array();
+							$rencana_pagu_html = array();
+							$realisasi_pagu_html = array();
 							foreach($renaksi['indikator'] as $key => $ind){
 								$indikator_html[$key] = $ind['indikator'];
 								$satuan_html[$key] = $ind['satuan'];
@@ -668,6 +679,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$target_2_html[$key] = $ind['target_2'];
 								$target_3_html[$key] = $ind['target_3'];
 								$target_4_html[$key] = $ind['target_4'];
+								$rencana_pagu_html[$key] = !empty($ind['rencana_pagu']) ? $ind['rencana_pagu'] : 0;
+								$realisasi_pagu_html[$key] = !empty($ind['realisasi_pagu']) ? $ind['realisasi_pagu'] : 0;
 							}
 							$indikator_html = implode('<br>', $indikator_html);
 							$satuan_html = implode('<br>', $satuan_html);
@@ -677,6 +690,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$target_2_html = implode('<br>', $target_2_html);
 							$target_3_html = implode('<br>', $target_3_html);
 							$target_4_html = implode('<br>', $target_4_html);
+							$rencana_pagu_html = implode('<br>', $rencana_pagu_html);
+							$realisasi_pagu_html = implode('<br>', $realisasi_pagu_html);
+
 							$html .= '
 							<tr>
 								<td>'.$no.'.'.$no_renaksi.'</td>
@@ -721,6 +737,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$target_2_html = array();
 								$target_3_html = array();
 								$target_4_html = array();
+								$rencana_pagu_html = array();
+								$realisasi_pagu_html = array();
 								foreach($uraian_renaksi['indikator'] as $key => $ind){
 									$indikator_html[$key] = $ind['indikator'];
 									$satuan_html[$key] = $ind['satuan'];
@@ -730,6 +748,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$target_2_html[$key] = $ind['target_2'];
 									$target_3_html[$key] = $ind['target_3'];
 									$target_4_html[$key] = $ind['target_4'];
+									$rencana_pagu_html[$key] = !empty($ind['rencana_pagu']) ? $ind['rencana_pagu'] : 0;
+									$realisasi_pagu_html[$key] = !empty($ind['realisasi_pagu']) ? $ind['realisasi_pagu'] : 0;
 								}
 								$indikator_html = implode('<br>', $indikator_html);
 								$satuan_html = implode('<br>', $satuan_html);
@@ -739,6 +759,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$target_2_html = implode('<br>', $target_2_html);
 								$target_3_html = implode('<br>', $target_3_html);
 								$target_4_html = implode('<br>', $target_4_html);
+								$rencana_pagu_html = implode('<br>', $rencana_pagu_html);
+								$realisasi_pagu_html = implode('<br>', $realisasi_pagu_html);
 
 								$label_pokin = $uraian_renaksi['detail']['label_pokin_5'];
 								if(empty($label_pokin)){
@@ -777,7 +799,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								';
 
 								foreach($uraian_renaksi['data'] as $uraian_teknis_kegiatan){
-									$no_uraian_renaksi++;
+									$no_uraian_teknis++;
 									$indikator_html = array();
 									$satuan_html = array();
 									$target_awal_html = array();
@@ -786,6 +808,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$target_2_html = array();
 									$target_3_html = array();
 									$target_4_html = array();
+									$rencana_pagu_html = array();
+									$realisasi_pagu_html = array();
 									foreach($uraian_teknis_kegiatan['indikator'] as $key => $ind){
 										$indikator_html[$key] = $ind['indikator'];
 										$satuan_html[$key] = $ind['satuan'];
@@ -795,6 +819,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										$target_2_html[$key] = $ind['target_2'];
 										$target_3_html[$key] = $ind['target_3'];
 										$target_4_html[$key] = $ind['target_4'];
+										$rencana_pagu_html[$key] = !empty($ind['rencana_pagu']) ? $ind['rencana_pagu'] : 0;
+										$realisasi_pagu_html[$key] = !empty($ind['realisasi_pagu']) ? $ind['realisasi_pagu'] : 0;
 									}
 									$indikator_html = implode('<br>', $indikator_html);
 									$satuan_html = implode('<br>', $satuan_html);
@@ -804,6 +830,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$target_2_html = implode('<br>', $target_2_html);
 									$target_3_html = implode('<br>', $target_3_html);
 									$target_4_html = implode('<br>', $target_4_html);
+									$rencana_pagu_html = implode('<br>', $rencana_pagu_html);
+									$realisasi_pagu_html = implode('<br>', $realisasi_pagu_html);
 
 									$label_pokin = $uraian_teknis_kegiatan['detail']['label_pokin_5'];
 									if(empty($label_pokin)){
@@ -811,7 +839,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									}
 									$html .= '
 									<tr>
-										<td>'.$no.'.'.$no_renaksi.'.'.$no_uraian_renaksi.'</td>
+										<td>'.$no.'.'.$no_renaksi.'.'.$no_uraian_renaksi.'.'.$no_uraian_teknis.'</td>
 										<td class="kegiatan_utama"></td>
 										<td class="indikator_kegiatan_utama"></td>
 										<td class="recana_aksi"></td>
@@ -832,9 +860,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										<td class=""></td>
 										<td class=""></td>
 										<td class=""></td>
+										<td class="text-right">'.$rencana_pagu_html.'</td>
 										<td class=""></td>
-										<td class=""></td>
-										<td class=""></td>
+										<td class="text-right">'.$realisasi_pagu_html.'</td>
 										<td class=""></td>
 										<td class=""></td>
 										<td class="anggaran_urian_renaksi"></td>

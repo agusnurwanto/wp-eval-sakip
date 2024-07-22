@@ -144,7 +144,7 @@ $is_administrator = in_array('administrator', $user_roles);
                 <table id="table_dokumen_rencana_aksi" cellpadding="2" cellspacing="0" class="table table-bordered">
                     <thead>
                         <tr>
-                            <th class="text-center" rowspan="2" style="width: 60px;">No</th>
+                            <th class="text-center" rowspan="2" style="width: 85px;">No</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">KEGIATAN UTAMA</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">INDIKATOR KEGIATAN UTAMA</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">RENCANA AKSI</th>
@@ -331,6 +331,14 @@ function simpan_indikator_renaksi(tipe){
     if(satuan == ''){
         return alert('Satuan tidak boleh kosong!')
     }
+    var rencana_pagu = jQuery('#rencana_pagu').val();
+    if(rencana_pagu == ''){
+        rencana_pagu = 0;
+    }
+    // var realisasi_pagu = jQuery('#realisasi_pagu').val();
+    // if(realisasi_pagu == ''){
+    //     realisasi_pagu = 0;
+    // }
     var target_awal = jQuery('#target_awal').val();
     if(target_awal == ''){
         return alert('Target awal tidak boleh kosong!')
@@ -367,6 +375,7 @@ function simpan_indikator_renaksi(tipe){
             "id_label": id_label,
             "indikator": indikator,
             "satuan": satuan,
+            "rencana_pagu": rencana_pagu,
             "target_awal": target_awal,
             "target_akhir": target_akhir,
             "target_tw_1": target_tw_1,
@@ -585,7 +594,7 @@ function kegiatanUtama(){
                     +`</div>`
                     +`<table class="table" id="kegiatanUtama">`
                         +`<thead>`
-                            +`<tr>`
+                            +`<tr class="table-secondary">`
                                 +`<th class="text-center" style="width:40px;">No</th>`
                                 +`<th class="text-center" style="width:300px;">Label Pokin</th>`
                                 +`<th class="text-center">Kegiatan Utama</th>`
@@ -611,9 +620,9 @@ function kegiatanUtama(){
                                 if(indikator.length > 0){
                                     kegiatanUtama += ``
                                     +'<td colspan="4" style="padding: 0;">'
-                                        +`<table class="table" id="indikatorKegiatanUtama" style="margin: 30px 0;">`
+                                        +`<table class="table" id="indikatorKegiatanUtama" style="margin: .5rem 0 2rem;">`
                                             +`<thead>`
-                                                +`<tr>`
+                                                +`<tr class="table-secondary">`
                                                     +`<th class="text-center" style="width:20px">No</th>`
                                                     +`<th class="text-center">Indikator</th>`
                                                     +`<th class="text-center" style="width:120px;">Satuan</th>`
@@ -741,6 +750,7 @@ function getTablePengisianRencanaAksi(no_loading=false) {
 
 function tambah_indikator_rencana_aksi(id, tipe){
     var title = '';
+    let input_pagu = '';
     if(tipe == 1){
         title = 'Indikator Kegiatan Utama';
     }else if(tipe == 2){
@@ -749,6 +759,23 @@ function tambah_indikator_rencana_aksi(id, tipe){
         title = 'Uraian Kegiatan Rencana Aksi';
     }else if(tipe == 4){
         title = 'Uraian Teknis Kegiatan';
+        input_pagu = ''
+            +`<div class="form-group row">`
+                +'<div class="col-md-2">'
+                    +`<label for="satuan_indikator">Rencana Pagu</label>`
+                +'</div>'
+                +'<div class="col-md-10">'
+                    +`<input type="number" class="form-control" id="rencana_pagu"/>`
+                +'</div>'
+            +`</div>`;
+            // +`<div class="form-group row">`
+            //     +'<div class="col-md-2">'
+            //         +`<label for="satuan_indikator">Realisasi Pagu</label>`
+            //     +'</div>'
+                // +'<div class="col-md-10">'
+                //     +`<input type="number" class="form-control" id="realisasi_pagu"/>`
+                // +'</div>'
+            // +`</div>`;
     }
     var tr = jQuery('#kegiatan_utama_'+id);
     var label_pokin = tr.find('.label_pokin').text();
@@ -790,6 +817,7 @@ function tambah_indikator_rencana_aksi(id, tipe){
                     +`<input type="text" class="form-control" id="satuan_indikator"/>`
                 +'</div>'
             +`</div>`
+            +`${input_pagu}`
             +`<div class="form-group row">`
                 +'<div class="col-md-2">'
                     +`<label for="target_awal">Target Awal</label>`
@@ -862,6 +890,9 @@ function edit_indikator(id, tipe){
                 response.status == 'success' 
                 && response.data != null
             ){
+                
+                let rencana_pagu = response.data.rencana_pagu != null ? response.data.rencana_pagu : 0;
+                // let realisasi_pagu = response.data.realisasi_pagu != null ? response.data.realisasi_pagu : 0;
                 tambah_indikator_rencana_aksi(response.data.id_renaksi, tipe);
                 jQuery("#modal-crud").find('.modal-title').text(jQuery("#modal-crud").find('.modal-title').text().replace('Tambah', 'Edit'));
                 jQuery('#id_label_indikator').val(id);
@@ -873,6 +904,8 @@ function edit_indikator(id, tipe){
                 jQuery('#target_tw_2').val(response.data.target_2);
                 jQuery('#target_tw_3').val(response.data.target_3);
                 jQuery('#target_tw_4').val(response.data.target_4);
+                jQuery('#rencana_pagu').val(response.data.rencana_pagu);
+                // jQuery('#realisasi_pagu').val(response.data.realisasi_pagu);
             }else if(response.status == 'error'){
                 alert(response.message);
             }
@@ -993,6 +1026,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
         var title = '';
         var fungsi_tambah = '';
         var id_tabel = '';
+        let header_pagu = '';
 
         // rencana aksi
         if(tipe ==1){
@@ -1011,6 +1045,9 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
             id_tabel = 'tabel_uraian_teknis_kegiatan';
             title = 'Uraian Teknis Kegiatan';
             fungsi_tambah = 'tambah_renaksi_2';
+            header_pagu = ''
+                +`<th class="text-center" style="width:50px;">Rencana Pagu</th>`;
+                // +`<th class="text-center" style="width:50px;">Realisasi Pagu</th>`;
         }
         jQuery.ajax({
             url: esakip.url,
@@ -1032,7 +1069,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
                     +`</div>`
                     +'<table class="table" id="'+id_tabel+'" parent_renaksi="'+parent_renaksi+'" parent_pokin="'+parent_pokin+'">'
                         +`<thead>`
-                            +`<tr>`
+                            +`<tr class="table-secondary">`
                                 +`<th class="text-center" style="width:40px;">No</th>`
                                 +`<th class="text-center" style="width:300px;">Label Pokin</th>`
                                 +`<th class="text-center">`+title+`</th>`
@@ -1084,9 +1121,9 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
                                 if(indikator.length > 0){
                                     renaksi += ``
                                     +'<td colspan="4" style="padding: 0;">'
-                                        +`<table class="table" style="margin: 30px 0;">`
+                                        +`<table class="table" style="margin: .5rem 0 2rem;">`
                                             +`<thead>`
-                                                +`<tr>`
+                                                +`<tr class="table-secondary">`
                                                     +`<th class="text-center" style="width:20px">No</th>`
                                                     +`<th class="text-center">Indikator</th>`
                                                     +`<th class="text-center" style="width:120px;">Satuan</th>`
@@ -1096,11 +1133,20 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
                                                     +`<th class="text-center" style="width:50px;">Target TW 2</th>`
                                                     +`<th class="text-center" style="width:50px;">Target TW 3</th>`
                                                     +`<th class="text-center" style="width:50px;">Target TW 4</th>`
+                                                    +`${header_pagu}`
                                                     +`<th class="text-center" style="width:110px">Aksi</th>`
                                                 +`</tr>`
                                             +`</thead>`
                                             +`<tbody>`;
                                     indikator.map(function(b, i){
+                                        let rencana_pagu = b.rencana_pagu != null ? b.rencana_pagu : 0;
+                                        let realisasi_pagu = b.realisasi_pagu != null ? b.realisasi_pagu : 0;
+                                        let val_pagu = '';
+                                        if(tipe == 4){
+                                            val_pagu = ''    
+                                                +`<td class="text-center">${rencana_pagu}</td>`;
+                                                // +`<td class="text-center">${realisasi_pagu}</td>`;
+                                        }
                                         renaksi += ``
                                             +`<tr>`
                                                 +`<td class="text-center">${index+1}.${i+1}</td>`
@@ -1112,6 +1158,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
                                                 +`<td class="text-center">${b.target_2}</td>`
                                                 +`<td class="text-center">${b.target_3}</td>`
                                                 +`<td class="text-center">${b.target_4}</td>`
+                                                +`${val_pagu}`
                                                 +`<td class="text-center">`
                                                     +`<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_indikator(${b.id}, `+tipe+`)" title="Edit"><i class="dashicons dashicons-edit"></i></a> `
                                                     +`<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-danger" onclick="hapus_indikator(${b.id}, `+tipe+`);" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
