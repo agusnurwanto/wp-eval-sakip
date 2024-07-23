@@ -6297,9 +6297,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						// if($can_verify){
-						// 	$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
-						// }
+						if($can_verify){
+							$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
+						}
 						// if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen_renstra('RENSTRA')) {
 						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('RENSTRA', $id_jadwal)) {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_renstra(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
@@ -20372,7 +20372,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Keterangan kosong!';
 				}
-				if ($_POST['tipe_dokumen'] != 'renstra') {
+				if ($_POST['tipe_dokumen'] == 'renstra') {
+					if (!empty($_POST['id_jadwal'])) {
+						$id_jadwal = $_POST['id_jadwal'];
+					} else {
+						$ret['status'] = 'error';
+						$ret['message'] = 'ID Jadwal Kosong!';
+					}
+				}else{
 					if (!empty($_POST['tahunAnggaran'])) {
 						$tahunAnggaran = $_POST['tahunAnggaran'];
 					} else {
@@ -20412,33 +20419,57 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					);
 
 					// Cek data verifikasi yg sudah ada
-					$data_terverifikasi = $wpdb->get_row(
-						$wpdb->prepare("
-							SELECT *
-							FROM esakip_keterangan_verifikator
-							WHERE id_dokumen = %d
-								AND nama_tabel_dokumen = %s
-								AND active=1
-								AND tahun_anggaran=%d
-						", $id_dokumen, $nama_tabel[$tipe_dokumen], $tahunAnggaran),
-						ARRAY_A
-					);
-					if (empty($data_terverifikasi)) {
-						$wpdb->insert(
-							'esakip_keterangan_verifikator',
-							array(
-								'id_dokumen' => $id_dokumen,
-								'status_verifikasi' => $input_verifikasi,
-								'keterangan_verifikasi' => $keterangan,
-								'active' => 1,
-								'user_id' => $current_user->ID,
-								'id_skpd' => $idSkpd,
-								'tahun_anggaran' => $tahunAnggaran,
-								'created_at' => current_time('mysql'),
-								'nama_tabel_dokumen' => $nama_tabel[$tipe_dokumen]
-							),
-							array('%d', '%d', '%s', '%d', '%d', '%d', '%d', '%s', '%s')
+					if($_POST['tipe_dokumen'] == 'renstra'){
+						$data_terverifikasi = $wpdb->get_row(
+							$wpdb->prepare("
+								SELECT *
+								FROM esakip_keterangan_verifikator
+								WHERE id_dokumen = %d
+									AND nama_tabel_dokumen = %s
+									AND active=1
+									AND id_jadwal=%d
+							", $id_dokumen, $nama_tabel[$tipe_dokumen], $id_jadwal),
+							ARRAY_A
 						);
+					}else{
+						$data_terverifikasi = $wpdb->get_row(
+							$wpdb->prepare("
+								SELECT *
+								FROM esakip_keterangan_verifikator
+								WHERE id_dokumen = %d
+									AND nama_tabel_dokumen = %s
+									AND active=1
+									AND tahun_anggaran=%d
+							", $id_dokumen, $nama_tabel[$tipe_dokumen], $tahunAnggaran),
+							ARRAY_A
+						);
+					}
+					if (empty($data_terverifikasi)) {
+						$insert_data = array(
+							'id_dokumen' => $id_dokumen,
+							'status_verifikasi' => $input_verifikasi,
+							'keterangan_verifikasi' => $keterangan,
+							'active' => 1,
+							'user_id' => $current_user->ID,
+							'id_skpd' => $idSkpd,
+							'created_at' => current_time('mysql'),
+							'nama_tabel_dokumen' => $nama_tabel[$tipe_dokumen]
+						);
+						if($_POST['tipe_dokumen'] == 'renstra'){
+							$insert_data['id_jadwal'] = $id_jadwal;
+							$wpdb->insert(
+								'esakip_keterangan_verifikator',
+								$insert_data,
+								array('%d', '%d', '%s', '%d', '%d', '%d', '%s', '%s', '%d')
+							);
+						}else{
+							$insert_data['tahun_anggaran'] = $tahunAnggaran;
+							$wpdb->insert(
+								'esakip_keterangan_verifikator',
+								$insert_data,
+								array('%d', '%d', '%s', '%d', '%d', '%d', '%s', '%s', '%d')
+							);
+						}
 
 						if (!$wpdb->insert_id) {
 							$ret = array(
