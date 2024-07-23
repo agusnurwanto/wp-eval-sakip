@@ -12,11 +12,19 @@ $input = shortcode_atts(array(
 if (!empty($_GET) && !empty($_GET['id_skpd'])) {
     $id_skpd = $_GET['id_skpd'];
 }
+global $wpdb;
 
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 $data_notifikasi_croscutting = array();
 
-global $wpdb;
+$current_user = wp_get_current_user();
+$user_roles = $current_user->roles;
+$is_admin_panrb = in_array('admin_panrb', $user_roles);
+$is_admin_bappeda = in_array('admin_bappeda', $user_roles);
+if($is_admin_bappeda == false){
+    $is_admin_bappeda = in_array('administrator', $user_roles);
+}
+
 $data_all = [
 	'data' => array()
 ];
@@ -79,19 +87,16 @@ if(!empty($unit_croscutting)){
 	}
 }
 
-$lembaga_lainnya_croscutting = $wpdb->get_results(
-	$wpdb->prepare("
-		SELECT 
-			nama_lembaga, 
-			id,
-			tahun_anggaran 
-		FROM esakip_data_lembaga_lainnya 
-		WHERE active=1 
-		GROUP BY id
-		ORDER BY nama_lembaga ASC
-	"),
-	ARRAY_A
-);
+$lembaga_lainnya_croscutting = $wpdb->get_results("
+	SELECT 
+		nama_lembaga, 
+		id,
+		tahun_anggaran 
+	FROM esakip_data_lembaga_lainnya 
+	WHERE active=1 
+	GROUP BY id
+	ORDER BY nama_lembaga ASC
+", ARRAY_A);
 
 $option_lainnya = "<option value=''>Pilih Lembaga Vertikal</option>";
 if(!empty($lembaga_lainnya_croscutting)){
@@ -1228,10 +1233,6 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 	}
 }
 
-$current_user = wp_get_current_user();
-$user_roles = $current_user->roles;
-$is_admin_panrb = in_array('admin_panrb', $user_roles);
-
 $data_notifikasi_croscutting = $wpdb->get_results($wpdb->prepare("
 	SELECT 
 		cc.*,
@@ -1401,6 +1402,24 @@ if(!empty($data_level_pokin)){
 		background-color: #f4f6f8 !important;
 		color: #111827 !important;
 	}
+    #modal-pokin .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .table-responsive {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 1rem;
+        background-color: transparent;
+    }
 </style>
 <h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Pohon Kinerja <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $periode['nama_jadwal_renstra'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h3><br>
 
@@ -1519,27 +1538,6 @@ if(!empty($data_level_pokin)){
     	</div>
   	</div>
 </div>
-
-<style>
-    #modal-pokin .modal-body {
-        max-height: 70vh;
-        overflow-y: auto;
-    }
-
-    .table-responsive {
-        display: block;
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .table {
-        width: 100%;
-        max-width: 100%;
-        margin-bottom: 1rem;
-        background-color: transparent;
-    }
-</style>
 
 <!-- Modal detail -->
 <div class="modal fade mt-5" id="modal-detail" tabindex="-1" role="dialog" aria-labelledby="modal-detailLabel" aria-hidden="true">
@@ -1794,7 +1792,7 @@ jQuery(document).ready(function(){
 					alert(response.message);
 					if(response.status){
 						pokinLevel1().then(function(){
-							jQuery("#pokinLevel1").DataTable();
+							// jQuery("#pokinLevel1").DataTable();
 						});
 					}
 				}
@@ -1806,7 +1804,7 @@ jQuery(document).ready(function(){
 		pokinLevel2({
 			'parent':jQuery(this).data('id')
 		}).then(function(){
-			jQuery("#pokinLevel2").DataTable();
+			// jQuery("#pokinLevel2").DataTable();
 		});
 	})
 
@@ -1927,7 +1925,7 @@ jQuery(document).ready(function(){
 						pokinLevel2({
 							'parent':parent
 						}).then(function(){
-							jQuery("#pokinLevel2").DataTable();
+							// jQuery("#pokinLevel2").DataTable();
 						});
 					}
 				}
@@ -2023,7 +2021,7 @@ jQuery(document).ready(function(){
 						pokinLevel2({
 							'parent':parent
 						}).then(function(){
-							jQuery("#pokinLevel2").DataTable();
+							// jQuery("#pokinLevel2").DataTable();
 						});
 					}
 				}
@@ -2035,7 +2033,7 @@ jQuery(document).ready(function(){
 		pokinLevel3({
 			'parent':jQuery(this).data('id')
 		}).then(function(){
-			jQuery("#pokinLevel3").DataTable();
+			// jQuery("#pokinLevel3").DataTable();
 		});
 	})
 
@@ -2157,7 +2155,7 @@ jQuery(document).ready(function(){
 						pokinLevel3({
 							'parent':parent
 						}).then(function(){
-							jQuery("#pokinLevel3").DataTable();
+							// jQuery("#pokinLevel3").DataTable();
 						});
 					}
 				}
@@ -2253,7 +2251,7 @@ jQuery(document).ready(function(){
 						pokinLevel3({
 							'parent':parent
 						}).then(function(){
-							jQuery("#pokinLevel3").DataTable();
+							// jQuery("#pokinLevel3").DataTable();
 						});
 					}
 				}
@@ -2265,7 +2263,7 @@ jQuery(document).ready(function(){
 		pokinLevel4({
 			'parent':jQuery(this).data('id'),
 		}).then(function(){
-			jQuery("#pokinLevel4").DataTable();
+			// jQuery("#pokinLevel4").DataTable();
 		});
 	})
 
@@ -2394,7 +2392,7 @@ jQuery(document).ready(function(){
 						pokinLevel4({
 							'parent':parent
 						}).then(function(){
-							jQuery("#pokinLevel4").DataTable();
+							// jQuery("#pokinLevel4").DataTable();
 						});
 					}
 				}
@@ -2490,7 +2488,7 @@ jQuery(document).ready(function(){
 						pokinLevel4({
 							'parent':parent
 						}).then(function(){
-							jQuery("#pokinLevel4").DataTable();
+							// jQuery("#pokinLevel4").DataTable();
 						});
 					}
 				}
@@ -2502,7 +2500,7 @@ jQuery(document).ready(function(){
 		pokinLevel5({
 			'parent':jQuery(this).data('id'),
 		}).then(function(){
-			jQuery("#pokinLevel5").DataTable();
+			// jQuery("#pokinLevel5").DataTable();
 		});
 	})
 
@@ -2623,7 +2621,7 @@ jQuery(document).ready(function(){
 						pokinLevel5({
 							'parent':parent
 						}).then(function(){
-							jQuery("#pokinLevel5").DataTable();
+							// jQuery("#pokinLevel5").DataTable();
 						});
 					}
 				}
@@ -2719,7 +2717,7 @@ jQuery(document).ready(function(){
 						pokinLevel5({
 							'parent':parent
 						}).then(function(){
-							jQuery("#pokinLevel5").DataTable();
+							// jQuery("#pokinLevel5").DataTable();
 						});
 					}
 				}
@@ -3146,16 +3144,16 @@ function pokinLevel1(){
 	          		+`<table class="table" id="pokinLevel1">`
 	          			+`<thead>`
 	          				+`<tr>`
-	          					+`<th class="text-center" style="width:20%">No</th>`
-	          					+`<th class="text-center" style="width:60%">Label Pohon Kinerja</th>`
-	          					+`<th class="text-center" style="width:20%">Aksi</th>`
+	          					+`<th class="text-center" style="width:50px">No</th>`
+	          					+`<th class="text-center">Label Pohon Kinerja</th>`
+	          					+`<th class="text-center" style="width:230px">Aksi</th>`
 	          				+`</tr>`
 	          			+`</thead>`
 	          			+`<tbody>`;
 			          		res.data.map(function(value, index){
 			          			level1 += ``
 				          			+`<tr id="pokinLevel1_${value.id}">`
-					          			+`<td class="text-center">${index+1}.</td>`
+					          			+`<td class="text-center">${index+1}</td>`
 					          			+`<td class="label-level1">${value.label}</td>`
 					          			+`<td class="text-center">`
 					          				+`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-success tambah-indikator-pokin-level1" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
@@ -3231,22 +3229,25 @@ function pokinLevel2(params){
 	          		+`<table class="table" id="pokinLevel2">`
 	          			+`<thead>`
 	          				+`<tr>`
-	          					+`<th class="text-center" style="width:20%">No</th>`
-	          					+`<th class="text-center" style="width:60%">Label Pohon Kinerja</th>`
-	          					+`<th class="text-center" style="width:20%">Aksi</th>`
+	          					+`<th class="text-center" style="width:50px">No</th>`
+	          					+`<th class="text-center">Label Pohon Kinerja</th>`
+	          					+`<th class="text-center" style="width:230px">Aksi</th>`
 	          				+`</tr>`
 	          			+`</thead>`
 	          			+`<tbody>`;
 			          		res.data.map(function(value, index){
 			          			level2 += ``
 				          			+`<tr>`
-					          			+`<td class="text-center">${index+1}.</td>`
+					          			+`<td class="text-center">${index+1}</td>`
 					          			+`<td class="label-level2">${value.label}</td>`
 					          			+`<td class="text-center">`
 					          				+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-success tambah-indikator-pokin-level2" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
 					          				+`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning view-pokin-level3" title="Lihat pohon kinerja level 3"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
-				          					+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-primary edit-pokin-level2" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`
-				          					+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-danger hapus-pokin-level2" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
+				          					+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-primary edit-pokin-level2" title="Edit"><i class="dashicons dashicons-edit"></i></a> `
+				          					+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-danger hapus-pokin-level2" title="Hapus"><i class="dashicons dashicons-trash"></i></a> `
+                                            <?php if($is_admin_bappeda == true): ?>
+                                                +'<a href="javascript:void(0)" data-id="'+value.id+'" data-parent="'+value.parent+'" class="btn btn-sm btn-warning" onclick="copy_data_pokin(this)" title="Copy Data Ke Semua OPD"><i class="dashicons dashicons-images-alt"></i></a>'
+                                            <?php endif; ?>
 					          			+`</td>`
 					          		+`</tr>`;
 
@@ -3316,16 +3317,16 @@ function pokinLevel3(params){
 	          		+`<table class="table" id="pokinLevel3">`
 	          			+`<thead>`
 	          				+`<tr>`
-	          					+`<th class="text-center" style="width:20%">No</th>`
-	          					+`<th class="text-center" style="width:60%">Label Pohon Kinerja</th>`
-	          					+`<th class="text-center" style="width:20%">Aksi</th>`
+	          					+`<th class="text-center" style="width:50px">No</th>`
+	          					+`<th class="text-center">Label Pohon Kinerja</th>`
+	          					+`<th class="text-center" style="width:230px">Aksi</th>`
 	          				+`</tr>`
 	          			+`</thead>`
 	          			+`<tbody>`;
 			          		res.data.map(function(value, index){
 			          			level3 += ``
 				          			+`<tr>`
-					          			+`<td class="text-center">${index+1}.</td>`
+					          			+`<td class="text-center">${index+1}</td>`
 					          			+`<td class="label-level3">${value.label}</td>`
 					          			+`<td class="text-center">`
 					          				+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-success tambah-indikator-pokin-level3" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
@@ -3401,16 +3402,16 @@ function pokinLevel4(params){
 	          		+`<table class="table" id="pokinLevel4">`
 	          			+`<thead>`
 	          				+`<tr>`
-	          					+`<th class="text-center" style="width:20%">No</th>`
-	          					+`<th class="text-center" style="width:60%">Label Pohon Kinerja</th>`
-	          					+`<th class="text-center" style="width:20%">Aksi</th>`
+	          					+`<th class="text-center" style="width:50px">No</th>`
+	          					+`<th class="text-center">Label Pohon Kinerja</th>`
+	          					+`<th class="text-center" style="width:230px">Aksi</th>`
 	          				+`</tr>`
 	          			+`</thead>`
 	          			+`<tbody>`;
 			          		res.data.map(function(value, index){
 			          			level4 += ``
 				          			+`<tr>`
-					          			+`<td class="text-center">${index+1}.</td>`
+					          			+`<td class="text-center">${index+1}</td>`
 					          			+`<td class="label-level4">${value.label}</td>`
 					          			+`<td class="text-center">`
 					          				+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-success tambah-indikator-pokin-level4" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
@@ -3486,16 +3487,16 @@ function pokinLevel5(params){
 	          		+`<table class="table" id="pokinLevel5">`
 	          			+`<thead>`
 	          				+`<tr>`
-	          					+`<th class="text-center" style="width:20%">No</th>`
-	          					+`<th class="text-center" style="width:60%">Label Pohon Kinerja</th>`
-	          					+`<th class="text-center" style="width:20%">Aksi</th>`
+	          					+`<th class="text-center" style="width:50px">No</th>`
+	          					+`<th class="text-center">Label Pohon Kinerja</th>`
+	          					+`<th class="text-center" style="width:230px">Aksi</th>`
 	          				+`</tr>`
 	          			+`</thead>`
 	          			+`<tbody>`;
 			          		res.data.map(function(value, index){
 			          			level5 += ``
 				          			+`<tr>`
-					          			+`<td class="text-center">${index+1}.</td>`
+					          			+`<td class="text-center">${index+1}</td>`
 					          			+`<td class="label-level5">${value.label}</td>`
 					          			+`<td class="text-center">`
 					          				+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-success tambah-indikator-pokin-level5" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
@@ -3538,8 +3539,62 @@ function runFunction(name, arguments){
 
     var run = fn.apply(window, arguments);
     run.then(function(){
- 		jQuery("#"+name).DataTable();
+ 		// jQuery("#"+name).DataTable();
 	});
 }
 
+<?php if($is_admin_bappeda == true): ?>
+function copy_data_pokin(that){
+    var id = jQuery(that).attr('data-id');
+    var parent = jQuery(that).attr('data-parent');
+    jQuery("#modal-crud").find('.modal-title').html('Copy Data Pohon Kinerja');
+    jQuery("#modal-crud").find('.modal-body').html(''
+        +'<form id="form-copy-pokin">'
+            +'<input type="hidden" id="parent_pokin_copy" value="'+parent+'">'
+            +'<input type="hidden" id="id_pokin_copy" value="'+id+'">'
+            +'<div class="form-group">'
+                +'<textarea class="form-control" id="copy_rubah_kata" name="label" placeholder="Tuliskan kata yang mau dirubah">[Bappeda Litbang|nama_opd]</textarea>'
+                +'<ul>'
+                    +'<li>Variable <b>nama_opd</b> untuk nama OPD</li>'
+                    +'<li>Cara penulisannya didalam kotak dan dipisah garis lurus. Jika lebih dari satu maka dipisah dengan koma.</li>'
+                +'</ul>'
+            +'</div>'
+        +'</form>');
+    jQuery("#modal-crud").find('.modal-footer').html(''
+        +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
+            +'Tutup'
+        +'</button>'
+        +'<button type="button" class="btn btn-success" onclick="simpan_copy_data_pokin();">'
+            +'Simpan'
+        +'</button>');
+    jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
+    jQuery("#modal-crud").find('.modal-dialog').css('width','');
+    jQuery("#modal-crud").modal('show');
+}
+
+function simpan_copy_data_pokin(){
+    if(confirm('Apakah anda yakin melakukan copy data POKIN level 2 ke semua OPD? Data level dibawahnya akan ikut tercopy.')){
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: "post",
+            data: {
+                "action": "simpan_copy_data_pokin",
+                "parent": jQuery('#parent_pokin_copy').val(),
+                "id": jQuery('#id_pokin_copy').val(),
+                "copy_rubah_kata": jQuery('#copy_rubah_kata').val(),
+                "tahun_anggaran": <?php echo $tahun_anggaran_sakip; ?>,
+                "api_key": esakip.api_key
+            },
+            dataType: "json",
+            success: function(res){
+                alert(res.message);
+                if(res.status=='success'){
+                    jQuery("#modal-crud").modal('hide');
+                }
+            }
+        });
+    }
+}
+<?php endif; ?>
 </script>

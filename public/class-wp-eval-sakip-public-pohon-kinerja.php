@@ -4026,4 +4026,70 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		}
 		die(json_encode($ret));
 	}
+	
+	public function ganti_kata($text, $copy_rubah_kata, $kata_baru){
+		$copy_rubah_kata = explode(',', $copy_rubah_kata);
+		foreach($copy_rubah_kata as $copy){
+			$copy = str_replace('[', '', $copy);
+			$copy = str_replace(']', '', $copy);
+			$kata = explode('|', $copy);
+			if(!empty($kata[1]) && !empty($kata_baru[$kata[1]])){
+				$text = str_replace($kata[0], $kata_baru[$kata[1]], $text);
+			}
+		}
+		return $text;
+	}
+
+	public function simpan_copy_data_pokin(){
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil copy data POKIN!'
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if ($ret['status']=='error' && empty($_POST['parent'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID parent tidak boleh kosong!';
+				}else if ($ret['status']=='error' && empty($_POST['id'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID POKIN tidak boleh kosong!';
+				}else if ($ret['status']=='error' && empty($_POST['tahun_anggaran'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
+				}else{
+					$copy_rubah_kata = '';
+					if(!empty($_POST['copy_rubah_kata'])){
+						$copy_rubah_kata = $_POST['copy_rubah_kata'];
+					}
+					$data_perangkat = $wpdb->get_results($wpdb->prepare("
+						SELECT 
+							nama_skpd
+						FROM esakip_data_unit 
+						WHERE active=1 
+							AND is_skpd=1
+						AND tahun_anggaran=%d
+						GROUP BY id_skpd
+						ORDER BY kode_skpd ASC
+					", $_POST['tahun_anggaran']), ARRAY_A);
+					foreach($data_perangkat as $opd){
+						$text = '';
+						$new_text = $this->ganti_kata($text, $copy_rubah_kata, array('nama_skpd' => $opd['nama_skpd']));
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
 }
