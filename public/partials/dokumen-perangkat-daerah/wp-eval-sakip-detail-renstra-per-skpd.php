@@ -241,6 +241,7 @@ $is_administrator = in_array('administrator', $user_roles);
             <div class="modal-body">
                 <form>
                     <input type="hidden" value="<?php echo $id_skpd; ?>" id="idSkpd">
+                    <input type="hidden" value="<?php echo $input['periode']; ?>" id="id_jadwal">
                     <input type="hidden" value="" id="idDokumen">
                     <tr>
                         <td>
@@ -341,6 +342,11 @@ $is_administrator = in_array('administrator', $user_roles);
             return alert('Verifikasi tidak boleh kosong');
         }
 
+        let id_jadwal = jQuery("#id_jadwal").val();
+        if (id_jadwal == '') {
+            return alert('ID Jadwal tidak boleh kosong');
+        }
+
         let form_data = new FormData();
         form_data.append('action', 'submit_verifikasi_dokumen');
         form_data.append('api_key', esakip.api_key);
@@ -349,6 +355,7 @@ $is_administrator = in_array('administrator', $user_roles);
         form_data.append('keterangan', keterangan);
         form_data.append('verifikasi_dokumen', verifikasi_dokumen);
         form_data.append('tipe_dokumen', tipe_dokumen);
+        form_data.append('id_jadwal', id_jadwal);
 
         jQuery('#wrap-loading').show();
         jQuery.ajax({
