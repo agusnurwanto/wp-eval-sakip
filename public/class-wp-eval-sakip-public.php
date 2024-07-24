@@ -6965,6 +6965,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						if (is_file($upload_dir . $dokumen_lama)) {
 							unlink($upload_dir . $dokumen_lama);
 						}
+						
+						$wpdb->update(
+							'esakip_keterangan_verifikator',
+							array('active' => 0),
+							array('id_dokumen' => $_POST['id'], 'nama_tabel_dokumen' => 'esakip_renja_rkt')
+						);
 					}
 				} else {
 					$ret = array(
@@ -7019,6 +7025,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						if (is_file($upload_dir . $dokumen_lama)) {
 							unlink($upload_dir . $dokumen_lama);
 						}
+						
+						$wpdb->update(
+							'esakip_keterangan_verifikator',
+							array('active' => 0),
+							array('id_dokumen' => $_POST['id'], 'nama_tabel_dokumen' => 'esakip_perjanjian_kinerja')
+						);
 					}
 				} else {
 					$ret = array(
@@ -7343,6 +7355,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						if (is_file($upload_dir . $dokumen_lama)) {
 							unlink($upload_dir . $dokumen_lama);
 						}
+						
+						$wpdb->update(
+							'esakip_keterangan_verifikator',
+							array('active' => 0),
+							array('id_dokumen' => $_POST['id'], 'nama_tabel_dokumen' => 'esakip_laporan_kinerja')
+						);
 					}
 				} else {
 					$ret = array(
@@ -7505,6 +7523,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						if (is_file($upload_dir . $dokumen_lama)) {
 							unlink($upload_dir . $dokumen_lama);
 						}
+						
+						$wpdb->update(
+							'esakip_keterangan_verifikator',
+							array('active' => 0),
+							array('id_dokumen' => $_POST['id'], 'nama_tabel_dokumen' => 'esakip_renstra')
+						);
 					}
 				} else {
 					$ret = array(
@@ -20987,6 +21011,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						if (is_file($upload_dir . $dokumen_lama)) {
 							unlink($upload_dir . $dokumen_lama);
 						}
+						
+						$wpdb->update(
+							'esakip_keterangan_verifikator',
+							array('active' => 0),
+							array('id_dokumen' => $_POST['id'], 'nama_tabel_dokumen' => 'esakip_dpa')
+						);
 					}
 				} else {
 					$ret = array(
