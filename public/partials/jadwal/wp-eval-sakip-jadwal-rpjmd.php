@@ -517,6 +517,13 @@ $body = '';
 				jQuery("input[name=akses_user_upload_dokumen_pohon_kinerja][value='"+akses_user_pohon_kinerja+"']").prop("checked",true);
 
 				jQuery("input[name=menu_dokumen_pohon_kinerja][value='"+response.data.hak_akses_pohon_kinerja+"']").prop("checked",true);
+
+				// setting renstra
+				let langsung_verifikasi = 'tidak';
+				if(response.data.default_verifikasi_upload == 1){
+					langsung_verifikasi = 'iya';
+				}
+				jQuery("input[name=langsung_verifikasi][value='"+langsung_verifikasi+"']").prop("checked",true);
 			}
 		})
 	}
