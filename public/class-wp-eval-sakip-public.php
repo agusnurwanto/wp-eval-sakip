@@ -4904,27 +4904,40 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							);
 						} else {
 							$current_user = wp_get_current_user();
-							$wpdb->insert(
-								'esakip_keterangan_verifikator',
-								array(
-									'id_dokumen' => $wpdb->insert_id,
-									'status_verifikasi' => 1,
-									'active' => 1,
-									'user_id' => $current_user->ID,
-									'id_skpd' => $idSkpd,
-									'id_jadwal' => $id_jadwal,
-									'created_at' => current_time('mysql'),
-									'nama_tabel_dokumen' => 'esakip_renstra'
-								),
-								array('%d', '%d', '%d', '%d', '%d', '%d', '%s', '%s')
-							);
 
-							if (!$wpdb->insert_id) {
-								error_log("Error inserting into esakip_keterangan_verifikator: " . $wpdb->last_error);
-								$return = array(
-									'status' => 'error',
-									'message' => 'Gagal menyimpan data ke database!'
-								);
+							$cek_langsung_verifikasi = $wpdb->get_var($wpdb->prepare('
+								SELECT 
+									default_verifikasi_upload
+								FROM esakip_data_jadwal
+								WHERE id=%d
+									AND status != 0
+							', $id_jadwal));
+
+							if(!empty($cek_langsung_verifikasi)){
+								if($cek_langsung_verifikasi == 1){
+									$wpdb->insert(
+										'esakip_keterangan_verifikator',
+										array(
+											'id_dokumen' => $wpdb->insert_id,
+											'status_verifikasi' => 1,
+											'active' => 1,
+											'user_id' => $current_user->ID,
+											'id_skpd' => $idSkpd,
+											'id_jadwal' => $id_jadwal,
+											'created_at' => current_time('mysql'),
+											'nama_tabel_dokumen' => 'esakip_renstra'
+										),
+										array('%d', '%d', '%d', '%d', '%d', '%d', '%s', '%s')
+									);
+		
+									if (!$wpdb->insert_id) {
+										error_log("Error inserting into esakip_keterangan_verifikator: " . $wpdb->last_error);
+										$return = array(
+											'status' => 'error',
+											'message' => 'Gagal menyimpan data ke database!'
+										);
+									}
+								}
 							}
 						}
 					} else {
@@ -5195,7 +5208,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											FROM esakip_keterangan_verifikator
 											WHERE id_dokumen=%d
 												AND active=1
-										', $vv['id']), ARRAY_A);
+												AND nama_tabel_dokumen=%s
+										', $vv['id'], 'esakip_renja_rkt'), ARRAY_A);
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
@@ -5384,7 +5398,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											FROM esakip_keterangan_verifikator
 											WHERE id_dokumen=%d
 												AND active=1
-										', $vv['id']), ARRAY_A);
+												AND nama_tabel_dokumen=%s
+										', $vv['id'], 'esakip_perjanjian_kinerja'), ARRAY_A);
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
@@ -5496,7 +5511,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											FROM esakip_keterangan_verifikator
 											WHERE id_dokumen=%d
 												AND active=1
-										', $vv['id']), ARRAY_A);
+												AND nama_tabel_dokumen=%s
+										', $vv['id'], 'esakip_laporan_kinerja'), ARRAY_A);
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
@@ -6274,7 +6290,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											FROM esakip_keterangan_verifikator
 											WHERE id_dokumen=%d
 												AND active=1
-										', $vv['id']), ARRAY_A);
+												AND nama_tabel_dokumen=%s
+										', $vv['id'],'esakip_renstra'), ARRAY_A);
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
@@ -10816,6 +10833,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$menu_dokumen	= trim(htmlspecialchars($_POST['menu_dokumen']));
 					$menu_dokumen_pohon_kinerja	= trim(htmlspecialchars($_POST['menu_dokumen_pohon_kinerja']));
 					$menu_iku	= trim(htmlspecialchars($_POST['menu_iku']));
+					$langsung_verifikasi= trim(htmlspecialchars($_POST['langsung_verifikasi']));
 
 					$input_menu_dokumen = 0;
 					if ($menu_dokumen == 'tampil') {
@@ -10832,6 +10850,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$input_menu_iku = 1;
 					}
 
+					$langsung_verifikasi = ($langsung_verifikasi == 'iya') ? 1 : 0;
 
 					$data_this_id = $wpdb->get_row($wpdb->prepare('SELECT * FROM esakip_data_jadwal WHERE id = %d', $id), ARRAY_A);
 
@@ -10846,7 +10865,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						'status'				=> '1',
 						'lama_pelaksanaan'		=> $lama_pelaksanaan,
 						'tahun_selesai_anggaran' => $tahun_selesai_anggaran,
-						'jenis_jadwal_khusus'	=> $jenis_jadwal_khusus
+						'jenis_jadwal_khusus'	=> $jenis_jadwal_khusus,
+						'default_verifikasi_upload'     => $langsung_verifikasi
 					);
 
 					$wpdb->insert('esakip_data_jadwal', $data_jadwal);
@@ -11026,6 +11046,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$menu_dokumen	= trim(htmlspecialchars($_POST['menu_dokumen']));
 					$menu_dokumen_pohon_kinerja	= trim(htmlspecialchars($_POST['menu_dokumen_pohon_kinerja']));
 					$menu_iku	= trim(htmlspecialchars($_POST['menu_iku']));
+					$langsung_verifikasi	= trim(htmlspecialchars($_POST['langsung_verifikasi']));
 					// $menu_penyusunan_pohon_kinerja_pemda	= trim(htmlspecialchars($_POST['menu_penyusunan_pohon_kinerja_pemda']));
 					// $menu_penyusunan_pohon_kinerja_opd	= trim(htmlspecialchars($_POST['menu_penyusunan_pohon_kinerja_opd']));
 
@@ -11072,6 +11093,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$input_menu_iku = 1;
 					}
 
+					$langsung_verifikasi = ($langsung_verifikasi == 'iya') ? 1 : 0;
+
 					$data_this_id = $wpdb->get_row($wpdb->prepare('SELECT * FROM esakip_data_jadwal WHERE id = %d', $id), ARRAY_A);
 
 					//update data penjadwalan
@@ -11083,7 +11106,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						'tipe'					=> 'RPJMD',
 						'lama_pelaksanaan'		=> $lama_pelaksanaan,
 						'tahun_selesai_anggaran' => $tahun_selesai_anggaran,
-						'jenis_jadwal_khusus'	=> $jenis_khusus_rpjmd
+						'jenis_jadwal_khusus'	=> $jenis_khusus_rpjmd,
+						'default_verifikasi_upload'     => $langsung_verifikasi
 					);
 
 					$wpdb->update('esakip_data_jadwal', $data_jadwal, array(
@@ -20659,7 +20683,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							FROM esakip_keterangan_verifikator
 							WHERE id_dokumen=%d
 								AND active=1
-						', $vv['id']), ARRAY_A);
+								AND nama_tabel_dokumen=%s
+						', $vv['id'], 'esakip_dpa'), ARRAY_A);
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';

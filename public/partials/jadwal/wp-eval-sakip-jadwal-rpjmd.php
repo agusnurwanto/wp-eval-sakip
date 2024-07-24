@@ -233,6 +233,28 @@ $body = '';
 						</div>
 					</div>
 				</div>
+				<div class="card" style="margin: 1.5rem 0;">
+  					<div class="card-body">
+						<div class="form-group">
+							<label class="d-block">Pengaturan Verifikasi Upload Dokumen RENSTRA</label>
+							<tr>
+								<td>
+									<div class="custom-control custom-radio custom-control-inline">
+										<input class="custom-control-input" type="radio" name="langsung_verifikasi" id="langsung_verifikasi_iya" value="iya" checked>
+										<label class="custom-control-label" for="langsung_verifikasi_iya">Iya</label>
+									</div>
+								</td>
+								<td>
+									<div class="custom-control custom-radio custom-control-inline">
+										<input class="custom-control-input" type="radio" name="langsung_verifikasi" id="langsung_verifikasi_tidak" value="tidak">
+										<label class="custom-control-label" for="langsung_verifikasi_tidak">Tidak</label>
+									</div>
+								</td>
+							</tr>
+							<small class="d-block form-text text-muted">*Pengaturan ini menentukan langsung verifikasi atau tidak saat upload dokumen.</small>
+						</div>
+					</div>
+				</div>
 				<!--<div class="card" style="margin: 1.5rem 0;">
   					<div class="card-body">
 						<div class="form-group">
@@ -389,8 +411,9 @@ $body = '';
 		let menu_dokumen = jQuery("input[name='menu_dokumen']:checked").val();
 		let menu_dokumen_pohon_kinerja = jQuery("input[name='menu_dokumen_pohon_kinerja']:checked").val();
 		let menu_iku = jQuery("input[name='menu_iku']:checked").val();
+		let langsung_verifikasi = jQuery("input[name='langsung_verifikasi']:checked").val();
 
-		if (nama_jadwal.trim() == '' || nama_jadwal_renstra == ''|| keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '' || jenis_khusus_rpjmd == '' || akses_user == '' || akses_user_pohon_kinerja == '' || menu_dokumen == '' || menu_dokumen_pohon_kinerja == '') {
+		if (nama_jadwal.trim() == '' || nama_jadwal_renstra == ''|| keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '' || jenis_khusus_rpjmd == '' || akses_user == '' || akses_user_pohon_kinerja == '' || menu_dokumen == '' || menu_dokumen_pohon_kinerja == '' || langsung_verifikasi == '') {
 			jQuery("#wrap-loading").hide()
 			alert("Ada yang kosong, Harap diisi semua")
 			return false
@@ -415,7 +438,8 @@ $body = '';
 					'akses_user_pohon_kinerja': akses_user_pohon_kinerja,
 					'menu_dokumen': menu_dokumen,
 					'menu_dokumen_pohon_kinerja': menu_dokumen_pohon_kinerja,
-					'menu_iku': menu_iku
+					'menu_iku': menu_iku,
+					'langsung_verifikasi':langsung_verifikasi
 				},
 				beforeSend: function() {
 					jQuery('.submitBtn').attr('disabled', 'disabled')
@@ -511,10 +535,11 @@ $body = '';
 		let menu_dokumen = jQuery("input[name='menu_dokumen']:checked").val();
 		let menu_dokumen_pohon_kinerja = jQuery("input[name='menu_dokumen_pohon_kinerja']:checked").val();
 		let menu_iku = jQuery("input[name='menu_iku']:checked").val();
+		let langsung_verifikasi = jQuery("input[name='langsung_verifikasi']:checked").val();
 		// let menu_penyusunan_pohon_kinerja_pemda = jQuery("input[name='menu_penyusunan_pohon_kinerja_pemda']:checked").val();
 		// let menu_penyusunan_pohon_kinerja_opd = jQuery("input[name='menu_penyusunan_pohon_kinerja_opd']:checked").val();
 
-		if (nama_jadwal.trim() == '' || nama_jadwal_renstra == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '' || jenis_khusus_rpjmd == '' || akses_user == '' || akses_user_pohon_kinerja == '' || menu_dokumen == '' || menu_dokumen_pohon_kinerja == '') {
+		if (nama_jadwal.trim() == '' || nama_jadwal_renstra == '' || keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '' || jenis_khusus_rpjmd == '' || akses_user == '' || akses_user_pohon_kinerja == '' || menu_dokumen == '' || menu_dokumen_pohon_kinerja == '' || langsung_verifikasi == '') {
 			jQuery("#wrap-loading").hide()
 			alert("Ada yang kosong, Harap diisi semua")
 			return false
@@ -539,7 +564,8 @@ $body = '';
 					'akses_user_pohon_kinerja' : akses_user_pohon_kinerja,
 					'menu_dokumen' : menu_dokumen,
 					'menu_dokumen_pohon_kinerja' : menu_dokumen_pohon_kinerja,
-					'menu_iku': menu_iku
+					'menu_iku': menu_iku,
+					'langsung_verifikasi': langsung_verifikasi
 				},
 				beforeSend: function() {
 					jQuery('.submitBtn').attr('disabled', 'disabled')
