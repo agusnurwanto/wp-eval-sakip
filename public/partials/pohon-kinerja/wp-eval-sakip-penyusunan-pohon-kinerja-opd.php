@@ -1616,7 +1616,7 @@ jQuery(document).ready(function(){
 
 	jQuery("#tambah-pohon-kinerja").on('click', function(){
 		pokinLevel1().then(function(){
-			jQuery("#pokinLevel1").DataTable();
+			// jQuery("#pokinLevel1").DataTable();
 		});
 	});
 
@@ -1701,7 +1701,7 @@ jQuery(document).ready(function(){
 					alert(response.message);
 					if(response.status){
 						pokinLevel1().then(function(){
-							jQuery("#pokinLevel1").DataTable();
+							// jQuery("#pokinLevel1").DataTable();
 						});
 					}
 				}
@@ -3553,7 +3553,7 @@ function copy_data_pokin(that){
             +'<input type="hidden" id="parent_pokin_copy" value="'+parent+'">'
             +'<input type="hidden" id="id_pokin_copy" value="'+id+'">'
             +'<div class="form-group">'
-                +'<textarea class="form-control" id="copy_rubah_kata" name="label" placeholder="Tuliskan kata yang mau dirubah">[Bappeda Litbang|nama_opd]</textarea>'
+                +'<textarea class="form-control" id="copy_rubah_kata" name="label" placeholder="Tuliskan kata yang mau dirubah" style="height: 200px;">[Bappeda Litbang|nama_opd]</textarea>'
                 +'<ul>'
                     +'<li>Variable <b>nama_opd</b> untuk nama OPD</li>'
                     +'<li>Cara penulisannya didalam kotak dan dipisah garis lurus. Jika lebih dari satu maka dipisah dengan koma.</li>'
@@ -3575,22 +3575,25 @@ function copy_data_pokin(that){
 function simpan_copy_data_pokin(){
     if(confirm('Apakah anda yakin melakukan copy data POKIN level 2 ke semua OPD? Data level dibawahnya akan ikut tercopy.')){
         jQuery('#wrap-loading').show();
+        var parent = jQuery('#parent_pokin_copy').val();
         jQuery.ajax({
             url: esakip.url,
             type: "post",
             data: {
                 "action": "simpan_copy_data_pokin",
-                "parent": jQuery('#parent_pokin_copy').val(),
+                "parent": parent,
                 "id": jQuery('#id_pokin_copy').val(),
                 "copy_rubah_kata": jQuery('#copy_rubah_kata').val(),
-                "tahun_anggaran": <?php echo $tahun_anggaran_sakip; ?>,
+                "id_jadwal": <?php echo $input['periode']; ?>,
                 "api_key": esakip.api_key
             },
             dataType: "json",
             success: function(res){
                 alert(res.message);
+                jQuery('#wrap-loading').hide();
                 if(res.status=='success'){
                     jQuery("#modal-crud").modal('hide');
+                    pokinLevel2({parent: parent});
                 }
             }
         });
