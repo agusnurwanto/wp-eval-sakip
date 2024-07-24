@@ -5208,7 +5208,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											FROM esakip_keterangan_verifikator
 											WHERE id_dokumen=%d
 												AND active=1
-										', $vv['id']), ARRAY_A);
+												AND nama_tabel_dokumen=%s
+										', $vv['id'], 'esakip_renja_rkt'), ARRAY_A);
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
@@ -5397,7 +5398,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											FROM esakip_keterangan_verifikator
 											WHERE id_dokumen=%d
 												AND active=1
-										', $vv['id']), ARRAY_A);
+												AND nama_tabel_dokumen=%s
+										', $vv['id'], 'esakip_perjanjian_kinerja'), ARRAY_A);
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
@@ -5509,7 +5511,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											FROM esakip_keterangan_verifikator
 											WHERE id_dokumen=%d
 												AND active=1
-										', $vv['id']), ARRAY_A);
+												AND nama_tabel_dokumen=%s
+										', $vv['id'], 'esakip_laporan_kinerja'), ARRAY_A);
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
@@ -6287,7 +6290,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											FROM esakip_keterangan_verifikator
 											WHERE id_dokumen=%d
 												AND active=1
-										', $vv['id']), ARRAY_A);
+												AND nama_tabel_dokumen=%s
+										', $vv['id'],'esakip_renstra'), ARRAY_A);
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
@@ -20679,7 +20683,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							FROM esakip_keterangan_verifikator
 							WHERE id_dokumen=%d
 								AND active=1
-						', $vv['id']), ARRAY_A);
+								AND nama_tabel_dokumen=%s
+						', $vv['id'], 'esakip_dpa'), ARRAY_A);
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
