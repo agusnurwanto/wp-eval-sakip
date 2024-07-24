@@ -606,6 +606,7 @@ CREATE TABLE `esakip_pohon_kinerja_opd` (
   `level` int(11) NOT null,
   `tahun_anggaran` year(4) DEFAULT NULL,
   `id_jadwal` int(11) DEFAULT NULL,
+  `id_asal_copy` int(11) DEFAULT NULL COMMENT 'id dari data asal',
   `active` tinyint(4) NOT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `update_at` datetime DEFAULT current_timestamp(),

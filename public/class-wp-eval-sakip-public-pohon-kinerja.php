@@ -4028,7 +4028,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 	}
 	
 	public function ganti_kata($text, $copy_rubah_kata, $kata_baru){
-		$copy_rubah_kata = explode(',', $copy_rubah_kata);
+		$text = trim(preg_replace('/\s+/', ' ', $text));
+		$copy_rubah_kata = explode('],[', $copy_rubah_kata);
 		foreach($copy_rubah_kata as $copy){
 			$copy = str_replace('[', '', $copy);
 			$copy = str_replace(']', '', $copy);
@@ -4055,16 +4056,18 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 				}else if ($ret['status']=='error' && empty($_POST['id'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'ID POKIN tidak boleh kosong!';
-				}else if ($ret['status']=='error' && empty($_POST['tahun_anggaran'])) {
+				}else if ($ret['status']=='error' && empty($_POST['id_jadwal'])) {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
+					$ret['message'] = 'ID jadwal tidak boleh kosong!';
 				}else{
 					$copy_rubah_kata = '';
 					if(!empty($_POST['copy_rubah_kata'])){
 						$copy_rubah_kata = $_POST['copy_rubah_kata'];
 					}
+					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 					$data_perangkat = $wpdb->get_results($wpdb->prepare("
 						SELECT 
+							id_skpd,
 							nama_skpd
 						FROM esakip_data_unit 
 						WHERE active=1 
@@ -4072,11 +4075,440 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						AND tahun_anggaran=%d
 						GROUP BY id_skpd
 						ORDER BY kode_skpd ASC
-					", $_POST['tahun_anggaran']), ARRAY_A);
-					foreach($data_perangkat as $opd){
-						$text = '';
-						$new_text = $this->ganti_kata($text, $copy_rubah_kata, array('nama_skpd' => $opd['nama_skpd']));
+					", $tahun_anggaran_sakip), ARRAY_A);
+					$ret['level_2'] = array();
+					$ret['level_3'] = array();
+					$ret['level_4'] = array();
+					$ret['level_5'] = array();
+
+					$level_2_db = $wpdb->get_results($wpdb->prepare("
+						SELECT 
+							a.id,
+							a.label,
+							a.parent,
+							a.id_skpd,
+							b.id AS id_indikator,
+							b.label_indikator_kinerja
+						FROM esakip_pohon_kinerja_opd a
+						LEFT JOIN esakip_pohon_kinerja_opd b ON a.id=b.parent AND a.level=b.level 
+						WHERE 
+							a.id_jadwal=%d AND 
+							a.parent=%d AND 
+							a.id=%d AND 
+							a.level=2 AND 
+							a.active=1
+						ORDER BY a.id
+					", $_POST['id_jadwal'], $_POST['parent'], $_POST['id']), ARRAY_A);
+					$ret['level_2'][$_POST['id']] = $level_2_db;
+
+					$id_parent_all = array();
+					foreach($level_2_db as $level_2){
+						if(empty($id_parent_all[$opd['id_skpd']])){
+							$id_parent_all[$opd['id_skpd']] = array('data' => array());
+						}
+
+						// copy data level 2
+						foreach($data_perangkat as $opd){
+							// insert label pokin
+							if(empty($id_parent_all[$opd['id_skpd']]['data'][$level_2['id']])){
+								if($level_2['id_skpd'] == $opd['id_skpd']){
+									$level_1_tujuan = $level_2['parent'];
+								}else{
+									$level_1_tujuan_db = $wpdb->get_row($wpdb->prepare("
+										SELECT 
+											a.id
+										FROM esakip_pohon_kinerja_opd a
+										WHERE 
+											a.id_jadwal=%d AND 
+											a.id_skpd=%d AND 
+											a.parent=0 AND 
+											a.level=1 AND 
+											a.active=1
+										ORDER BY a.id
+										LIMIT 1
+									", $_POST['id_jadwal'], $opd['id_skpd']), ARRAY_A);
+									$level_1_tujuan = $level_1_tujuan_db['id'];
+								}
+								$new_text = $this->ganti_kata($level_2['label'], $copy_rubah_kata, array('nama_opd' => $opd['nama_skpd']));
+								$data = array(
+									'label' => $new_text,
+									'parent' => $level_1_tujuan,
+									'id_skpd' => $opd['id_skpd'],
+									'level' => 2,
+									'id_jadwal' => $_POST['id_jadwal'],
+									'active' => 1,
+									'id_asal_copy' => $level_2['id'],
+									'update_at' => current_time('mysql')
+								);
+								if($level_2['id_skpd'] == $opd['id_skpd']){
+									$cek_id = $level_2['id'];
+								}else{
+									$cek_id = $wpdb->get_var($wpdb->prepare("
+										SELECT 
+											a.id
+										FROM esakip_pohon_kinerja_opd a
+										WHERE 
+											a.id_jadwal=%d AND 
+											a.id_skpd=%d AND 
+											a.level=2 AND 
+											a.parent=%d AND 
+											a.id_asal_copy=%d
+									", $_POST['id_jadwal'], $opd['id_skpd'], $level_1_tujuan_db['id'], $level_2['id']));
+								}
+								if(empty($cek_id)){
+									$data['created_at'] = current_time('mysql');
+									$wpdb->insert('esakip_pohon_kinerja_opd', $data);
+									$cek_id = $wpdb->insert_id;
+								}else{
+									$wpdb->update('esakip_pohon_kinerja_opd', $data, array('id' => $cek_id));
+								}
+								$id_parent_all[$opd['id_skpd']]['data'][$level_2['id']] = array(
+									'id_parent_tujuan' => $cek_id,
+									'data' => array()
+								);
+							}
+
+							// insert indikator
+							$id_parent = $id_parent_all[$opd['id_skpd']]['data'][$level_2['id']]['id_parent_tujuan'];
+							$new_text = $this->ganti_kata($level_2['label_indikator_kinerja'], $copy_rubah_kata, array('nama_opd' => $opd['nama_skpd']));
+							$data = array(
+								'label_indikator_kinerja' => $new_text,
+								'parent' => $id_parent,
+								'id_skpd' => $opd['id_skpd'],
+								'level' => 2,
+								'id_jadwal' => $_POST['id_jadwal'],
+								'active' => 1,
+								'id_asal_copy' => $level_2['id'],
+								'update_at' => current_time('mysql')
+							);
+							if($level_2['id_skpd'] == $opd['id_skpd']){
+								$cek_id = $level_2['id_indikator'];
+							}else{
+								$cek_id = $wpdb->get_var($wpdb->prepare("
+									SELECT 
+										a.id
+									FROM esakip_pohon_kinerja_opd a
+									WHERE 
+										a.id_jadwal=%d AND 
+										a.id_skpd=%d AND 
+										a.level=2 AND 
+										a.parent=%d AND 
+										a.id_asal_copy=%d
+								", $_POST['id_jadwal'], $opd['id_skpd'], $id_parent, $level_2['id_indikator']));
+							}
+							if(empty($cek_id)){
+								$data['created_at'] = current_time('mysql');
+								$wpdb->insert('esakip_pohon_kinerja_opd', $data);
+							}else{
+								$wpdb->update('esakip_pohon_kinerja_opd', $data, array('id' => $cek_id));
+							}
+						}
+
+						$level_3_db = $wpdb->get_results($wpdb->prepare("
+							SELECT 
+								a.id,
+								a.label,
+								a.parent,
+								a.id_skpd,
+								b.id AS id_indikator,
+								b.label_indikator_kinerja
+							FROM esakip_pohon_kinerja_opd a
+							LEFT JOIN esakip_pohon_kinerja_opd b ON a.id=b.parent AND a.level=b.level 
+							WHERE 
+								a.id_jadwal=%d AND 
+								a.parent=%d AND 
+								a.level=3 AND 
+								a.active=1
+							ORDER BY a.id
+						", $_POST['id_jadwal'], $level_2['id']), ARRAY_A);
+						$ret['level_3'][$level_2['id']] = $level_3_db;
+
+						foreach($level_3_db as $level_3){
+							// copy data level 3
+							foreach($data_perangkat as $opd){
+								// insert label pokin
+								if(empty($id_parent_all[$opd['id_skpd']]['data'][$level_2['id']]['data'][$level_3['id']])){
+									$level_2_tujuan = $id_parent_all[$opd['id_skpd']]['data'][$level_2['id']]['id_parent_tujuan'];
+									$new_text = $this->ganti_kata($level_3['label'], $copy_rubah_kata, array('nama_opd' => $opd['nama_skpd']));
+									$data = array(
+										'label' => $new_text,
+										'parent' => $level_2_tujuan,
+										'id_skpd' => $opd['id_skpd'],
+										'level' => 3,
+										'id_jadwal' => $_POST['id_jadwal'],
+										'active' => 1,
+										'id_asal_copy' => $level_3['id'],
+										'update_at' => current_time('mysql')
+									);
+									if($level_3['id_skpd'] == $opd['id_skpd']){
+										$cek_id = $level_3['id'];
+									}else{
+										$cek_id = $wpdb->get_var($wpdb->prepare("
+											SELECT 
+												a.id
+											FROM esakip_pohon_kinerja_opd a
+											WHERE 
+												a.id_jadwal=%d AND 
+												a.id_skpd=%d AND 
+												a.level=3 AND 
+												a.parent=%d AND 
+												a.id_asal_copy=%d
+										", $_POST['id_jadwal'], $opd['id_skpd'], $level_2_tujuan, $level_3['id']));
+									}
+									if(empty($cek_id)){
+										$data['created_at'] = current_time('mysql');
+										$wpdb->insert('esakip_pohon_kinerja_opd', $data);
+										$cek_id = $wpdb->insert_id;
+									}else{
+										$wpdb->update('esakip_pohon_kinerja_opd', $data, array('id' => $cek_id));
+									}
+									$id_parent_all[$opd['id_skpd']]['data'][$level_2['id']]['data'][$level_3['id']] = array(
+										'id_parent_tujuan' => $cek_id,
+										'data' => array()
+									);
+								}
+
+								// insert indikator
+								$id_parent = $id_parent_all[$opd['id_skpd']]['data'][$level_2['id']]['data'][$level_3['id']]['id_parent_tujuan'];
+								$new_text = $this->ganti_kata($level_3['label_indikator_kinerja'], $copy_rubah_kata, array('nama_opd' => $opd['nama_skpd']));
+								$data = array(
+									'label_indikator_kinerja' => $new_text,
+									'parent' => $id_parent,
+									'id_skpd' => $opd['id_skpd'],
+									'level' => 3,
+									'id_jadwal' => $_POST['id_jadwal'],
+									'active' => 1,
+									'id_asal_copy' => $level_3['id'],
+									'update_at' => current_time('mysql')
+								);
+								if($level_3['id_skpd'] == $opd['id_skpd']){
+									$cek_id = $level_3['id_indikator'];
+								}else{
+									$cek_id = $wpdb->get_var($wpdb->prepare("
+										SELECT 
+											a.id
+										FROM esakip_pohon_kinerja_opd a
+										WHERE 
+											a.id_jadwal=%d AND 
+											a.id_skpd=%d AND 
+											a.level=3 AND 
+											a.parent=%d AND 
+											a.id_asal_copy=%d
+									", $_POST['id_jadwal'], $opd['id_skpd'], $id_parent, $level_3['id_indikator']));
+								}
+								if(empty($cek_id)){
+									$data['created_at'] = current_time('mysql');
+									$wpdb->insert('esakip_pohon_kinerja_opd', $data);
+								}else{
+									$wpdb->update('esakip_pohon_kinerja_opd', $data, array('id' => $cek_id));
+								}
+							}
+
+							$level_4_db = $wpdb->get_results($wpdb->prepare("
+								SELECT 
+									a.id,
+									a.label,
+									a.parent,
+									a.id_skpd,
+									b.id AS id_indikator,
+									b.label_indikator_kinerja
+								FROM esakip_pohon_kinerja_opd a
+								LEFT JOIN esakip_pohon_kinerja_opd b ON a.id=b.parent AND a.level=b.level 
+								WHERE 
+									a.id_jadwal=%d AND 
+									a.parent=%d AND 
+									a.level=4 AND 
+									a.active=1
+								ORDER BY a.id
+							", $_POST['id_jadwal'], $level_3['id']), ARRAY_A);
+							$ret['level_4'][$level_3['id']] = $level_4_db;
+
+							foreach($level_4_db as $level_4){
+								// copy data level 4
+								foreach($data_perangkat as $opd){
+									// insert label pokin
+									if(empty($id_parent_all[$opd['id_skpd']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']])){
+										$level_3_tujuan = $id_parent_all[$opd['id_skpd']]['data'][$level_2['id']]['data'][$level_3['id']]['id_parent_tujuan'];
+										$new_text = $this->ganti_kata($level_4['label'], $copy_rubah_kata, array('nama_opd' => $opd['nama_skpd']));
+										$data = array(
+											'label' => $new_text,
+											'parent' => $level_3_tujuan,
+											'id_skpd' => $opd['id_skpd'],
+											'level' => 4,
+											'id_jadwal' => $_POST['id_jadwal'],
+											'active' => 1,
+											'id_asal_copy' => $level_4['id'],
+											'update_at' => current_time('mysql')
+										);
+										if($level_4['id_skpd'] == $opd['id_skpd']){
+											$cek_id = $level_4['id'];
+										}else{
+											$cek_id = $wpdb->get_var($wpdb->prepare("
+												SELECT 
+													a.id
+												FROM esakip_pohon_kinerja_opd a
+												WHERE 
+													a.id_jadwal=%d AND 
+													a.id_skpd=%d AND 
+													a.level=4 AND 
+													a.parent=%d AND 
+													a.id_asal_copy=%d
+											", $_POST['id_jadwal'], $opd['id_skpd'], $level_3_tujuan, $level_4['id']));
+										}
+										if(empty($cek_id)){
+											$data['created_at'] = current_time('mysql');
+											$wpdb->insert('esakip_pohon_kinerja_opd', $data);
+											$cek_id = $wpdb->insert_id;
+										}else{
+											$wpdb->update('esakip_pohon_kinerja_opd', $data, array('id' => $cek_id));
+										}
+										$id_parent_all[$opd['id_skpd']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']] = array(
+											'id_parent_tujuan' => $cek_id,
+											'data' => array()
+										);
+									}
+
+									// insert indikator
+									$id_parent = $id_parent_all[$opd['id_skpd']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['id_parent_tujuan'];
+									$new_text = $this->ganti_kata($level_4['label_indikator_kinerja'], $copy_rubah_kata, array('nama_opd' => $opd['nama_skpd']));
+									$data = array(
+										'label_indikator_kinerja' => $new_text,
+										'parent' => $id_parent,
+										'id_skpd' => $opd['id_skpd'],
+										'level' => 4,
+										'id_jadwal' => $_POST['id_jadwal'],
+										'active' => 1,
+										'id_asal_copy' => $level_4['id'],
+										'update_at' => current_time('mysql')
+									);
+									if($level_4['id_skpd'] == $opd['id_skpd']){
+										$cek_id = $level_4['id_indikator'];
+									}else{
+										$cek_id = $wpdb->get_var($wpdb->prepare("
+											SELECT 
+												a.id
+											FROM esakip_pohon_kinerja_opd a
+											WHERE 
+												a.id_jadwal=%d AND 
+												a.id_skpd=%d AND 
+												a.level=4 AND 
+												a.parent=%d AND 
+												a.id_asal_copy=%d
+										", $_POST['id_jadwal'], $opd['id_skpd'], $id_parent, $level_4['id_indikator']));
+									}
+									if(empty($cek_id)){
+										$data['created_at'] = current_time('mysql');
+										$wpdb->insert('esakip_pohon_kinerja_opd', $data);
+									}else{
+										$wpdb->update('esakip_pohon_kinerja_opd', $data, array('id' => $cek_id));
+									}
+								}
+
+								$level_5_db = $wpdb->get_results($wpdb->prepare("
+									SELECT 
+										a.id,
+										a.label,
+										a.parent,
+										a.id_skpd,
+										b.id AS id_indikator,
+										b.label_indikator_kinerja
+									FROM esakip_pohon_kinerja_opd a
+									LEFT JOIN esakip_pohon_kinerja_opd b ON a.id=b.parent AND a.level=b.level 
+									WHERE 
+										a.id_jadwal=%d AND 
+										a.parent=%d AND 
+										a.level=5 AND 
+										a.active=1
+									ORDER BY a.id
+								", $_POST['id_jadwal'], $level_4['id']), ARRAY_A);
+								$ret['level_5'][$level_4['id']] = $level_5_db;
+
+								foreach($level_5_db as $level_5){
+									// copy data level 5
+									foreach($data_perangkat as $opd){
+										// insert label pokin
+										if(empty($id_parent_all[$opd['id_skpd']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['data'][$level_5['id']])){
+											$level_4_tujuan = $id_parent_all[$opd['id_skpd']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['id_parent_tujuan'];
+											$new_text = $this->ganti_kata($level_5['label'], $copy_rubah_kata, array('nama_opd' => $opd['nama_skpd']));
+											$data = array(
+												'label' => $new_text,
+												'parent' => $level_4_tujuan,
+												'id_skpd' => $opd['id_skpd'],
+												'level' => 5,
+												'id_jadwal' => $_POST['id_jadwal'],
+												'active' => 1,
+												'id_asal_copy' => $level_5['id'],
+												'update_at' => current_time('mysql')
+											);
+											if($level_5['id_skpd'] == $opd['id_skpd']){
+												$cek_id = $level_5['id'];
+											}else{
+												$cek_id = $wpdb->get_var($wpdb->prepare("
+													SELECT 
+														a.id
+													FROM esakip_pohon_kinerja_opd a
+													WHERE 
+														a.id_jadwal=%d AND 
+														a.id_skpd=%d AND 
+														a.level=5 AND 
+														a.parent=%d AND 
+														a.id_asal_copy=%d
+												", $_POST['id_jadwal'], $opd['id_skpd'], $level_4_tujuan, $level_5['id']));
+											}
+											if(empty($cek_id)){
+												$data['created_at'] = current_time('mysql');
+												$wpdb->insert('esakip_pohon_kinerja_opd', $data);
+												$cek_id = $wpdb->insert_id;
+											}else{
+												$wpdb->update('esakip_pohon_kinerja_opd', $data, array('id' => $cek_id));
+											}
+											$id_parent_all[$opd['id_skpd']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['data'][$level_5['id']] = array(
+												'id_parent_tujuan' => $cek_id,
+												'data' => array()
+											);
+										}
+
+										// insert indikator
+										$id_parent = $id_parent_all[$opd['id_skpd']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['data'][$level_5['id']]['id_parent_tujuan'];
+										$new_text = $this->ganti_kata($level_5['label_indikator_kinerja'], $copy_rubah_kata, array('nama_opd' => $opd['nama_skpd']));
+										$data = array(
+											'label_indikator_kinerja' => $new_text,
+											'parent' => $id_parent,
+											'id_skpd' => $opd['id_skpd'],
+											'level' => 5,
+											'id_jadwal' => $_POST['id_jadwal'],
+											'active' => 1,
+											'id_asal_copy' => $level_5['id'],
+											'update_at' => current_time('mysql')
+										);
+										if($level_5['id_skpd'] == $opd['id_skpd']){
+											$cek_id = $level_5['id_indikator'];
+										}else{
+											$cek_id = $wpdb->get_var($wpdb->prepare("
+												SELECT 
+													a.id
+												FROM esakip_pohon_kinerja_opd a
+												WHERE 
+													a.id_jadwal=%d AND 
+													a.id_skpd=%d AND 
+													a.level=5 AND 
+													a.parent=%d AND 
+													a.id_asal_copy=%d
+											", $_POST['id_jadwal'], $opd['id_skpd'], $id_parent, $level_5['id_indikator']));
+										}
+										if(empty($cek_id)){
+											$data['created_at'] = current_time('mysql');
+											$wpdb->insert('esakip_pohon_kinerja_opd', $data);
+										}else{
+											$wpdb->update('esakip_pohon_kinerja_opd', $data, array('id' => $cek_id));
+										}
+									}
+								}
+							}
+						}
 					}
+
+					$ret['id_parent_all'] = $id_parent_all;
 				}
 			} else {
 				$ret = array(
