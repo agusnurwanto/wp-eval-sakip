@@ -4178,7 +4178,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								'level' => 2,
 								'id_jadwal' => $_POST['id_jadwal'],
 								'active' => 1,
-								'id_asal_copy' => $level_2['id'],
+								'id_asal_copy' => $level_2['id_indikator'],
 								'update_at' => current_time('mysql')
 							);
 							if($level_2['id_skpd'] == $opd['id_skpd']){
@@ -4278,7 +4278,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									'level' => 3,
 									'id_jadwal' => $_POST['id_jadwal'],
 									'active' => 1,
-									'id_asal_copy' => $level_3['id'],
+									'id_asal_copy' => $level_3['id_indikator'],
 									'update_at' => current_time('mysql')
 								);
 								if($level_3['id_skpd'] == $opd['id_skpd']){
@@ -4378,7 +4378,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 										'level' => 4,
 										'id_jadwal' => $_POST['id_jadwal'],
 										'active' => 1,
-										'id_asal_copy' => $level_4['id'],
+										'id_asal_copy' => $level_4['id_indikator'],
 										'update_at' => current_time('mysql')
 									);
 									if($level_4['id_skpd'] == $opd['id_skpd']){
@@ -4478,7 +4478,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 											'level' => 5,
 											'id_jadwal' => $_POST['id_jadwal'],
 											'active' => 1,
-											'id_asal_copy' => $level_5['id'],
+											'id_asal_copy' => $level_5['id_indikator'],
 											'update_at' => current_time('mysql')
 										);
 										if($level_5['id_skpd'] == $opd['id_skpd']){

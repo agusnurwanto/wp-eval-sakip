@@ -904,7 +904,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 	$html.='
 	<tr>
 		<td class="level1"><a href="'.$view_kinerja['url'].'&id='.$level_1['id'].'&id_jadwal='.$input['periode'].'" target="_blank">'.$level_1['label'].'</a></td>
-		<td class="indikator">'.implode("</br>", $indikator).'</td>
+		<td class="indikator">'.implode("<hr/>", $indikator).'</td>
 		<td></td>
 		<td></td>
 		<td></td>
@@ -971,7 +971,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 			<td></td>
 			<td></td>
 			<td class="level2">'.$level_2['label'].'</td>
-			<td class="indikator">'.implode("</br>", $indikator).'</td>
+			<td class="indikator">'.implode("<hr/>", $indikator).'</td>
 			<td></td>
 			<td></td>
 			<td></td>
@@ -1049,7 +1049,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 				<td></td>
 				<td></td>
 				<td class="level3">'.$level_3['label'].'</td>
-				<td class="indikator">'.implode("</br>", $indikator).'</td>
+				<td class="indikator">'.implode("<hr/>", $indikator).'</td>
 				<td></td>
 				<td></td>
 				<td></td>
@@ -1127,7 +1127,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 					<td></td>
 					<td></td>
 					<td class="level4">' . $level_4['label'] . '</td>
-					<td class="indikator">'.implode("</br>", $indikator).'</td>
+					<td class="indikator">'.implode("<hr/>", $indikator).'</td>
 					<td></td>
 					<td></td>
 				</tr>';
@@ -1163,7 +1163,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 						<td></td>
 						<td></td>
 						<td class="level5">'.$level_5['label'].'</td>
-						<td class="indikator">'.implode("</br>", $indikator).'</td>
+						<td class="indikator">'.implode("<hr/>", $indikator).'</td>
 					</tr>';
 
 					// show croscutting
@@ -1385,7 +1385,7 @@ if(!empty($data_level_pokin)){
 	#penyusunan_pohon_kinerja_opd thead{
         position: sticky;
         top: -6px;
-        background: #fff;
+        background: #ffc491;
     }
 
 	.croscutting-lembaga-vertikal{
@@ -3146,7 +3146,7 @@ function pokinLevel1(){
 	          				+`<tr>`
 	          					+`<th class="text-center" style="width:50px">No</th>`
 	          					+`<th class="text-center">Label Pohon Kinerja</th>`
-	          					+`<th class="text-center" style="width:230px">Aksi</th>`
+	          					+`<th class="text-center" style="width:250px">Aksi</th>`
 	          				+`</tr>`
 	          			+`</thead>`
 	          			+`<tbody>`;
@@ -3231,7 +3231,7 @@ function pokinLevel2(params){
 	          				+`<tr>`
 	          					+`<th class="text-center" style="width:50px">No</th>`
 	          					+`<th class="text-center">Label Pohon Kinerja</th>`
-	          					+`<th class="text-center" style="width:230px">Aksi</th>`
+	          					+`<th class="text-center" style="width:250px">Aksi</th>`
 	          				+`</tr>`
 	          			+`</thead>`
 	          			+`<tbody>`;
@@ -3319,7 +3319,7 @@ function pokinLevel3(params){
 	          				+`<tr>`
 	          					+`<th class="text-center" style="width:50px">No</th>`
 	          					+`<th class="text-center">Label Pohon Kinerja</th>`
-	          					+`<th class="text-center" style="width:230px">Aksi</th>`
+	          					+`<th class="text-center" style="width:250px">Aksi</th>`
 	          				+`</tr>`
 	          			+`</thead>`
 	          			+`<tbody>`;
@@ -3404,7 +3404,7 @@ function pokinLevel4(params){
 	          				+`<tr>`
 	          					+`<th class="text-center" style="width:50px">No</th>`
 	          					+`<th class="text-center">Label Pohon Kinerja</th>`
-	          					+`<th class="text-center" style="width:230px">Aksi</th>`
+	          					+`<th class="text-center" style="width:250px">Aksi</th>`
 	          				+`</tr>`
 	          			+`</thead>`
 	          			+`<tbody>`;
@@ -3489,7 +3489,7 @@ function pokinLevel5(params){
 	          				+`<tr>`
 	          					+`<th class="text-center" style="width:50px">No</th>`
 	          					+`<th class="text-center">Label Pohon Kinerja</th>`
-	          					+`<th class="text-center" style="width:230px">Aksi</th>`
+	          					+`<th class="text-center" style="width:250px">Aksi</th>`
 	          				+`</tr>`
 	          			+`</thead>`
 	          			+`<tbody>`;

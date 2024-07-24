@@ -254,7 +254,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 	$html.='
 	<tr>
 		<td class="level1"><a href="'.$view_kinerja['url'].'&id='.$level_1['id'].'&id_jadwal='.$input['periode'].'" target="_blank">'.$level_1['label'].'</a></td>
-		<td class="indikator">'.implode("</br>", $indikator).'</td>
+		<td class="indikator">'.implode("<hr/>", $indikator).'</td>
 		<td></td>
 		<td></td>
 		<td></td>
@@ -272,7 +272,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 			<td></td>
 			<td></td>
 			<td class="level2">'.$level_2['label'].'</td>
-			<td class="indikator">'.implode("</br>", $indikator).'</td>
+			<td class="indikator">'.implode("<hr/>", $indikator).'</td>
 			<td></td>
 			<td></td>
 			<td></td>
@@ -290,7 +290,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 				<td></td>
 				<td></td>
 				<td class="level3">'.$level_3['label'].'</td>
-				<td class="indikator">'.implode("</br>", $indikator).'</td>
+				<td class="indikator">'.implode("<hr/>", $indikator).'</td>
 				<td></td>
 				<td></td>
 			</tr>';
@@ -308,7 +308,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 					<td></td>
 					<td></td>
 					<td class="level4">'.$level_4['label'].'</td>
-					<td class="indikator">'.implode("</br>", $indikator).'</td>
+					<td class="indikator">'.implode("<hr/>", $indikator).'</td>
 				</tr>';
 			}
 		}
@@ -337,6 +337,29 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 	.indikator {
 		background: #b5d9ea;
 	}
+	#penyusunan_pohon_kinerja thead{
+        position: sticky;
+        top: -6px;
+        background: #ffc491;
+    }
+    #modal-pokin .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .table-responsive {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 1rem;
+        background-color: transparent;
+    }
 </style>
 <h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Pohon Kinerja<br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h3><br>
 <?php if (!$is_admin_panrb): ?>
@@ -345,7 +368,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 </div>
 <?php endif; ?>
 <div id="cetak" title="Penyusunan Pohon Kinerja" style="padding: 5px; overflow: auto; height: 100vh;">
-	<table>
+	<table id="penyusunan_pohon_kinerja" class="table table-bordered">
 		<thead>
 			<tr>
 				<th>Level 1</th>
@@ -414,33 +437,13 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     	</div>
   	</div>
 </div>
-<style>
-    #modal-pokin .modal-body {
-        max-height: 70vh;
-        overflow-y: auto;
-    }
-
-    .table-responsive {
-        display: block;
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .table {
-        width: 100%;
-        max-width: 100%;
-        margin-bottom: 1rem;
-        background-color: transparent;
-    }
-</style>
 
 <script type="text/javascript">
 jQuery(document).ready(function(){
 
 	jQuery("#tambah-pohon-kinerja").on('click', function(){
 		pokinLevel1().then(function(){
-			jQuery("#pokinLevel1").DataTable();
+			// jQuery("#pokinLevel1").DataTable();
 		});
 	});
 
@@ -521,7 +524,7 @@ jQuery(document).ready(function(){
 					alert(response.message);
 					if(response.status){
 						pokinLevel1().then(function(){
-							jQuery("#pokinLevel1").DataTable();
+							// jQuery("#pokinLevel1").DataTable();
 						});
 					}
 				}
@@ -608,7 +611,7 @@ jQuery(document).ready(function(){
 					alert(response.message);
 					if(response.status){
 						pokinLevel1().then(function(){
-							jQuery("#pokinLevel1").DataTable();
+							// jQuery("#pokinLevel1").DataTable();
 						});
 					}
 				}
@@ -620,7 +623,7 @@ jQuery(document).ready(function(){
 		pokinLevel2({
 			'parent':jQuery(this).data('id')
 		}).then(function(){
-			jQuery("#pokinLevel2").DataTable();
+			// jQuery("#pokinLevel2").DataTable();
 		});
 	})
 
@@ -704,7 +707,7 @@ jQuery(document).ready(function(){
 						pokinLevel2({
 							'parent':parent
 						}).then(function(){
-							jQuery("#pokinLevel2").DataTable();
+							// jQuery("#pokinLevel2").DataTable();
 						});
 					}
 				}
@@ -796,7 +799,7 @@ jQuery(document).ready(function(){
 						pokinLevel2({
 							'parent':parent
 						}).then(function(){
-							jQuery("#pokinLevel2").DataTable();
+							// jQuery("#pokinLevel2").DataTable();
 						});
 					}
 				}
@@ -808,7 +811,7 @@ jQuery(document).ready(function(){
 		pokinLevel3({
 			'parent':jQuery(this).data('id')
 		}).then(function(){
-			jQuery("#pokinLevel3").DataTable();
+			// jQuery("#pokinLevel3").DataTable();
 		});
 	})
 
@@ -892,7 +895,7 @@ jQuery(document).ready(function(){
 						pokinLevel3({
 							'parent':parent
 						}).then(function(){
-							jQuery("#pokinLevel3").DataTable();
+							// jQuery("#pokinLevel3").DataTable();
 						});
 					}
 				}
@@ -984,7 +987,7 @@ jQuery(document).ready(function(){
 						pokinLevel3({
 							'parent':parent
 						}).then(function(){
-							jQuery("#pokinLevel3").DataTable();
+							// jQuery("#pokinLevel3").DataTable();
 						});
 					}
 				}
@@ -996,7 +999,7 @@ jQuery(document).ready(function(){
 		pokinLevel4({
 			'parent':jQuery(this).data('id'),
 		}).then(function(){
-			jQuery("#pokinLevel4").DataTable();
+			// jQuery("#pokinLevel4").DataTable();
 		});
 	})
 
@@ -1080,7 +1083,7 @@ jQuery(document).ready(function(){
 						pokinLevel4({
 							'parent':parent
 						}).then(function(){
-							jQuery("#pokinLevel4").DataTable();
+							// jQuery("#pokinLevel4").DataTable();
 						});
 					}
 				}
@@ -1172,7 +1175,7 @@ jQuery(document).ready(function(){
 						pokinLevel4({
 							'parent':parent
 						}).then(function(){
-							jQuery("#pokinLevel4").DataTable();
+							// jQuery("#pokinLevel4").DataTable();
 						});
 					}
 				}
@@ -1232,9 +1235,9 @@ function pokinLevel1(){
 	          		+`<table class="table" id="pokinLevel1">`
 	          			+`<thead>`
 	          				+`<tr>`
-	          					+`<th class="text-center" style="width:20%">No</th>`
-	          					+`<th class="text-center" style="width:60%">Label Pohon Kinerja</th>`
-	          					+`<th class="text-center" style="width:20%">Aksi</th>`
+	          					+`<th class="text-center" style="width:50px">No</th>`
+	          					+`<th class="text-center">Label Pohon Kinerja</th>`
+	          					+`<th class="text-center" style="width:250px">Aksi</th>`
 	          				+`</tr>`
 	          			+`</thead>`
 	          			+`<tbody>`;
@@ -1315,9 +1318,9 @@ function pokinLevel2(params){
 	          		+`<table class="table" id="pokinLevel2">`
 	          			+`<thead>`
 	          				+`<tr>`
-	          					+`<th class="text-center" style="width:20%">No</th>`
-	          					+`<th class="text-center" style="width:60%">Label Pohon Kinerja</th>`
-	          					+`<th class="text-center" style="width:20%">Aksi</th>`
+	          					+`<th class="text-center" style="width:50px">No</th>`
+	          					+`<th class="text-center">Label Pohon Kinerja</th>`
+	          					+`<th class="text-center" style="width:250px">Aksi</th>`
 	          				+`</tr>`
 	          			+`</thead>`
 	          			+`<tbody>`;
@@ -1398,9 +1401,9 @@ function pokinLevel3(params){
 	          		+`<table class="table" id="pokinLevel3">`
 	          			+`<thead>`
 	          				+`<tr>`
-	          					+`<th class="text-center" style="width:20%">No</th>`
-	          					+`<th class="text-center" style="width:60%">Label Pohon Kinerja</th>`
-	          					+`<th class="text-center" style="width:20%">Aksi</th>`
+	          					+`<th class="text-center" style="width:50px">No</th>`
+	          					+`<th class="text-center">Label Pohon Kinerja</th>`
+	          					+`<th class="text-center" style="width:250px">Aksi</th>`
 	          				+`</tr>`
 	          			+`</thead>`
 	          			+`<tbody>`;
@@ -1481,9 +1484,9 @@ function pokinLevel4(params){
 	          		+`<table class="table" id="pokinLevel4">`
 	          			+`<thead>`
 	          				+`<tr>`
-	          					+`<th class="text-center" style="width:20%">No</th>`
-	          					+`<th class="text-center" style="width:60%">Label Pohon Kinerja</th>`
-	          					+`<th class="text-center" style="width:20%">Aksi</th>`
+	          					+`<th class="text-center" style="width:50px">No</th>`
+	          					+`<th class="text-center">Label Pohon Kinerja</th>`
+	          					+`<th class="text-center" style="width:250px">Aksi</th>`
 	          				+`</tr>`
 	          			+`</thead>`
 	          			+`<tbody>`;
@@ -1533,7 +1536,7 @@ function runFunction(name, arguments){
 
     var run = fn.apply(window, arguments);
     run.then(function(){
- 		jQuery("#"+name).DataTable();
+ 		// jQuery("#"+name).DataTable();
 	});
 }
 
