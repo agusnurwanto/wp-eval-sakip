@@ -3996,9 +3996,22 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							'post_status' => 'private'
 						)); //dokumen_detail_rencana_aksi
 
+						$jumlah_dokumen = $wpdb->get_var(
+							$wpdb->prepare("
+								SELECT 
+									COUNT(id)
+								FROM esakip_data_rencana_aksi_opd
+								WHERE id_skpd = %d
+								  AND tahun_anggaran = %d
+								  AND active = 1
+								  AND level=1
+							", $vv['id_skpd'], $tahun_anggaran)
+						);
+
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
+						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</td>";
+						$tbody .= "<td class='text-center' style='text-transform: uppercase;'>". $jumlah_dokumen ."</td>";
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_pengisian_rencana_aksi['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
