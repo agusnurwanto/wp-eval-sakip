@@ -157,7 +157,8 @@ class Wp_Eval_Sakip_Admin
 								*
 							FROM esakip_data_jadwal
 							WHERE tipe = %s
-							  AND status = 1",
+							  	AND status = 1
+							ORDER BY tahun_anggaran DESC",
 							'RPJMD'
 						),
 						ARRAY_A
@@ -293,7 +294,8 @@ class Wp_Eval_Sakip_Admin
 								lama_pelaksanaan
 							FROM esakip_data_jadwal
 							WHERE tipe = %s
-							  AND status =1",
+							  	AND status =1
+							ORDER BY tahun_anggaran DESC",
 							'LKE'
 						),
 						ARRAY_A
@@ -332,7 +334,8 @@ class Wp_Eval_Sakip_Admin
 								lama_pelaksanaan
 							FROM esakip_data_jadwal
 							WHERE tipe = %s
-							  AND status = 1",
+							  	AND status = 1
+							ORDER BY tahun_anggaran DESC",
 							'RPJPD'
 						),
 						ARRAY_A
@@ -1893,7 +1896,7 @@ class Wp_Eval_Sakip_Admin
 	public function generate_jadwal()
 	{
 		global $wpdb;
-		$get_tahun = $wpdb->get_results('select tahun_anggaran from esakip_data_unit group by tahun_anggaran order by tahun_anggaran ASC', ARRAY_A);
+		$get_tahun = $wpdb->get_results('select tahun_anggaran from esakip_data_unit group by tahun_anggaran order by tahun_anggaran DESC', ARRAY_A);
 		$list_data = '';
 
 		// jadwal rpjpd
