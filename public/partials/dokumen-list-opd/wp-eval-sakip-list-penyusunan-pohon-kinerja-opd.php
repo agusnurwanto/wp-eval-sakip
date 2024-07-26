@@ -76,6 +76,9 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
         position: sticky;
         top: -6px;
     }
+	.table_dokumen_skpd thead th{
+        vertical-align: middle;
+    }
 	.table_dokumen_skpd tfoot{
         position: sticky;
         bottom: 0;
@@ -87,27 +90,25 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
 			<h1 class="text-center table-title">Input Pohon Kinerja <br><?php echo $periode['nama_jadwal_renstra'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1>
 			<div id="action" class="action-section"></div>
 			<div class="wrap-table">
-				<table id="cetak" class="table_dokumen_skpd table table-bordered">
+				<table id="cetak" title="Rekapitulasi Pohon Kinerja Perangkat Daerah" class="table_dokumen_skpd table table-bordered">
 					<thead style="background: #ffc491;">
 						<tr>
-							<th class="text-center">No</th>
 							<th class="text-center">Nama Perangkat Daerah</th>
-							<th class="text-center">POKIN Level 1</th>
-							<th class="text-center">POKIN Level 2</th>
-							<th class="text-center">POKIN Level 3</th>
-							<th class="text-center">POKIN Level 4</th>
-							<th class="text-center">POKIN Level 5</th>
-							<th class="text-center">Usulan Croscutting</th>
-							<th class="text-center">Usulan Croscutting Lembaga Vertikal</th>
-							<th class="text-center">Tujuan Croscutting</th>
-							<th class="text-center">Aksi</th>
+							<th class="text-center" width="80px">POKIN Level 1</th>
+							<th class="text-center" width="80px">POKIN Level 2</th>
+							<th class="text-center" width="80px">POKIN Level 3</th>
+							<th class="text-center" width="80px">POKIN Level 4</th>
+							<th class="text-center" width="80px">POKIN Level 5</th>
+							<th class="text-center" width="80px">Croscutting Pengusul</th>
+							<th class="text-center" width="80px">Croscutting Lembaga Vertikal</th>
+							<th class="text-center" width="80px">Croscutting Dituju</th>
 						</tr>
 					</thead>
 					<tbody>
 					</tbody>
 					<tfoot style="background: #ffc491;">
 						<tr>
-							<th class="text-center" colspan="2">Jumlah</th>
+							<th class="text-center">Jumlah</th>
 							<th class="text-center" id="total_level_1">0</th>
 							<th class="text-center" id="total_level_2">0</th>
 							<th class="text-center" id="total_level_3">0</th>
@@ -116,7 +117,6 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
 							<th class="text-center" id="total_crosscutting_usulan">0</th>
 							<th class="text-center" id="total_crosscutting_usulan_vertikal">0</th>
 							<th class="text-center" id="total_crosscutting_tujuan">0</th>
-							<th></th>
 						</tr>
 					</tfoot>
 				</table>
@@ -167,6 +167,13 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
 					jQuery('#total_crosscutting_usulan').html(response.total_crosscutting_usulan);
 					jQuery('#total_crosscutting_usulan_vertikal').html(response.total_crosscutting_usulan_vertikal);
 					jQuery('#total_crosscutting_tujuan').html(response.total_crosscutting_tujuan);
+					jQuery('.table_dokumen_skpd').dataTable({
+						 aLengthMenu: [
+					        [25, 50, 100, 200, -1],
+					        [25, 50, 100, 200, "All"]
+					    ],
+					    iDisplayLength: -1
+					});
 				} else {
 					alert(response.message);
 				}

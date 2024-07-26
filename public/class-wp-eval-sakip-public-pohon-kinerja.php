@@ -1905,14 +1905,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									AND pk.id_jadwal=%d
 							", $vv['id_skpd'], $id_jadwal));
 
-							$btn = '
-							<div class="btn-action-group">'."
-								<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_penyusunan_pohon_kinerja_opd['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>".'
-							</div>';
-
 							$tbody .= "<tr>";
-							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-							$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
+							$tbody .= "<td style='text-transform: uppercase;'><a href='".$detail_penyusunan_pohon_kinerja_opd['url']."&id_skpd=".$vv['id_skpd']."' target='_blank'>".$vv['kode_skpd']." ".$vv['nama_skpd']."</a></td>";
 							$tbody .= "<td class='text-center'>" . $jumlah_level_1 . "</td>";
 							$tbody .= "<td class='text-center'>" . $jumlah_level_2 . "</td>";
 							$tbody .= "<td class='text-center'>" . $jumlah_level_3 . "</td>";
@@ -1921,7 +1915,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							$tbody .= "<td class='text-center'>" . $croscutting_pohon_kinerja_pengusul . "</td>";
 							$tbody .= "<td class='text-center'>" . $croscutting_pohon_kinerja_pengusul_vertikal . "</td>";
 							$tbody .= "<td class='text-center'>" . $croscutting_pohon_kinerja_dituju . "</td>";
-							$tbody .= "<td>" . $btn . "</td>";
 							$tbody .= "</tr>";
 
 							$total_level_1 += $jumlah_level_1;
