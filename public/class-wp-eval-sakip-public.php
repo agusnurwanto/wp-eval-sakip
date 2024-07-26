@@ -2829,6 +2829,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							}
 						}
 					} else {
+						$current_user = wp_get_current_user();
+						$user_roles = $current_user->roles;
+						$edit_pa = (in_array($user_roles[0],['pa'])) ? true : false ;
+
 						$opsi = array(
 							'keterangan' => $keterangan,
 							'created_at' => current_time('mysql'),
@@ -2859,6 +2863,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'status' => 'error',
 								'message' => 'Gagal memperbarui data ke database!'
 							);
+						}else{
+							// untuk edit status verifikasi setelah ditolak verifikator
+							if($edit_pa){
+								$wpdb->update(
+									'esakip_keterangan_verifikator',
+									array(
+										'status_verifikasi'=>0
+									),
+									array(
+										'id_dokumen' => $id_dokumen,
+										'nama_tabel_dokumen' => 'esakip_renja_rkt'),
+									array('%d'),
+									array('%d','%s')
+								);	
+							}
 						}
 					}
 				}
@@ -3003,6 +3022,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							}
 						}
 					} else {
+						$current_user = wp_get_current_user();
+						$user_roles = $current_user->roles;
+						$edit_pa = (in_array($user_roles[0],['pa'])) ? true : false ;
+
 						$opsi = array(
 							'keterangan' => $keterangan,
 							'created_at' => current_time('mysql'),
@@ -3033,6 +3056,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'status' => 'error',
 								'message' => 'Gagal memperbarui data ke database!'
 							);
+						}else{
+							// untuk edit status verifikasi setelah ditolak verifikator
+							if($edit_pa){
+								$wpdb->update(
+									'esakip_keterangan_verifikator',
+									array(
+										'status_verifikasi'=>0
+									),
+									array(
+										'id_dokumen' => $id_dokumen,
+										'nama_tabel_dokumen' => 'esakip_perjanjian_kinerja'),
+									array('%d'),
+									array('%d','%s')
+								);	
+							}
 						}
 					}
 				}
@@ -3339,6 +3377,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							}
 						}
 					} else {
+						$current_user = wp_get_current_user();
+						$user_roles = $current_user->roles;
+						$edit_pa = (in_array($user_roles[0],['pa'])) ? true : false ;
 						$opsi = array(
 							'keterangan' => $keterangan,
 							'created_at' => current_time('mysql'),
@@ -3369,6 +3410,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'status' => 'error',
 								'message' => 'Gagal memperbarui data ke database!'
 							);
+						}else{
+							// untuk edit status verifikasi setelah ditolak verifikator
+							if($edit_pa){
+								$wpdb->update(
+									'esakip_keterangan_verifikator',
+									array(
+										'status_verifikasi'=>0
+									),
+									array(
+										'id_dokumen' => $id_dokumen,
+										'nama_tabel_dokumen' => 'esakip_laporan_kinerja'),
+									array('%d'),
+									array('%d','%s')
+								);	
+							}
 						}
 					}
 				}
@@ -4941,6 +4997,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							}
 						}
 					} else {
+						$current_user = wp_get_current_user();
+						$user_roles = $current_user->roles;
+						$edit_pa = (in_array($user_roles[0],['pa'])) ? true : false ;
+
 						$opsi = array(
 							'keterangan' => $keterangan,
 							'created_at' => current_time('mysql'),
@@ -4971,6 +5031,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'status' => 'error',
 								'message' => 'Gagal memperbarui data ke database!'
 							);
+						}else{
+							// untuk edit status verifikasi setelah ditolak verifikator
+							if($edit_pa){
+								$wpdb->update(
+									'esakip_keterangan_verifikator',
+									array(
+										'status_verifikasi'=>0
+									),
+									array(
+										'id_dokumen' => $id_dokumen,
+										'nama_tabel_dokumen' => 'esakip_renstra'),
+									array('%d'),
+									array('%d','%s')
+								);	
+							}
 						}
 					}
 				}
@@ -5213,12 +5288,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
+						$show_button = false;
 						if ($data_verifikasi['status_verifikasi'] == 1) {
 							$color_badge_verify = 'success';
 							$text_badge = 'Diterima';
 						} else if ($data_verifikasi['status_verifikasi'] == 2) {
 							$color_badge_verify = 'danger';
 							$text_badge = 'Ditolak';
+							$show_button = true;
 						}
 
 						$tbody .= "<tr>";
@@ -5232,12 +5309,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if ($can_verify) {
-							$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
-						}
-						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('RENJA/RKT', $tahun_anggaran)) {
-							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_renja(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
-							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_renja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+						if($show_button || $can_verify){
+							if ($can_verify) {
+								$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
+							}
+							if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('RENJA/RKT', $tahun_anggaran)) {
+								$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_renja(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
+								$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_renja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+							}
 						}
 						$btn .= '</div>';
 
@@ -5403,12 +5482,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
+						$show_button = false;
 						if ($data_verifikasi['status_verifikasi'] == 1) {
 							$color_badge_verify = 'success';
 							$text_badge = 'Diterima';
 						} else if ($data_verifikasi['status_verifikasi'] == 2) {
 							$color_badge_verify = 'danger';
 							$text_badge = 'Ditolak';
+							$show_button = true;
 						}
 
 						$tbody .= "<tr>";
@@ -5422,12 +5503,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if ($can_verify) {
-							$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
-						}
-						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Perjanjian Kinerja', $tahun_anggaran)) {
-							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_perjanjian_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
-							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_perjanjian_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+						if($show_button || $can_verify){
+							if ($can_verify) {
+								$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
+							}
+							if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Perjanjian Kinerja', $tahun_anggaran)) {
+								$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_perjanjian_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
+								$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_perjanjian_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+							}
 						}
 						$btn .= '</div>';
 
@@ -5516,6 +5599,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
+						$show_button = false;
 						if (!empty($data_verifikasi)) {
 							if ($data_verifikasi['status_verifikasi'] == 1) {
 								$color_badge_verify = 'success';
@@ -5523,6 +5607,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							} else if ($data_verifikasi['status_verifikasi'] == 2) {
 								$color_badge_verify = 'danger';
 								$text_badge = 'Ditolak';
+								$show_button = true;
 							}
 							$keterangan = '';
 							if (!empty($data_verifikasi['keterangan_verifikasi'])) {
@@ -5539,13 +5624,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$tbody .= "<td>" . $keterangan . "</td>";
 
 						$btn = '<div class="btn-action-group">';
-						if ($can_verify) {
-							$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
-						}
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Laporan Kinerja', $tahun_anggaran)) {
-							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_laporan_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
-							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_laporan_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+						if($show_button || $can_verify){
+							if ($can_verify) {
+								$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
+							}
+							if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Laporan Kinerja', $tahun_anggaran)) {
+								$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_laporan_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
+								$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_laporan_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+							}
 						}
 						$btn .= '</div>';
 
@@ -6295,12 +6382,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
+						$show_button = false;
 						if ($data_verifikasi['status_verifikasi'] == 1) {
 							$color_badge_verify = 'success';
 							$text_badge = 'Diterima';
 						} else if ($data_verifikasi['status_verifikasi'] == 2) {
 							$color_badge_verify = 'danger';
 							$text_badge = 'Ditolak';
+							$show_button = true;
 						}
 
 						$tbody .= "<tr>";
@@ -6314,13 +6403,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if($can_verify){
-							$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
-						}
-						// if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen_renstra('RENSTRA')) {
-						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('RENSTRA', $id_jadwal)) {
-							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_renstra(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
-							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_renstra(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+						if($show_button || $can_verify){
+							if($can_verify){
+								$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
+							}
+							// if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen_renstra('RENSTRA')) {
+							if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('RENSTRA', $id_jadwal)) {
+								$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_renstra(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
+								$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_renstra(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+							}
 						}
 						$btn .= '</div>';
 
@@ -6965,6 +7056,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						if (is_file($upload_dir . $dokumen_lama)) {
 							unlink($upload_dir . $dokumen_lama);
 						}
+						
+						$wpdb->update(
+							'esakip_keterangan_verifikator',
+							array('active' => 0),
+							array('id_dokumen' => $_POST['id'], 'nama_tabel_dokumen' => 'esakip_renja_rkt')
+						);
 					}
 				} else {
 					$ret = array(
@@ -7019,6 +7116,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						if (is_file($upload_dir . $dokumen_lama)) {
 							unlink($upload_dir . $dokumen_lama);
 						}
+						
+						$wpdb->update(
+							'esakip_keterangan_verifikator',
+							array('active' => 0),
+							array('id_dokumen' => $_POST['id'], 'nama_tabel_dokumen' => 'esakip_perjanjian_kinerja')
+						);
 					}
 				} else {
 					$ret = array(
@@ -7343,6 +7446,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						if (is_file($upload_dir . $dokumen_lama)) {
 							unlink($upload_dir . $dokumen_lama);
 						}
+						
+						$wpdb->update(
+							'esakip_keterangan_verifikator',
+							array('active' => 0),
+							array('id_dokumen' => $_POST['id'], 'nama_tabel_dokumen' => 'esakip_laporan_kinerja')
+						);
 					}
 				} else {
 					$ret = array(
@@ -7505,6 +7614,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						if (is_file($upload_dir . $dokumen_lama)) {
 							unlink($upload_dir . $dokumen_lama);
 						}
+						
+						$wpdb->update(
+							'esakip_keterangan_verifikator',
+							array('active' => 0),
+							array('id_dokumen' => $_POST['id'], 'nama_tabel_dokumen' => 'esakip_renstra')
+						);
 					}
 				} else {
 					$ret = array(
@@ -20688,12 +20803,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
+						$show_button = false;
 						if ($data_verifikasi['status_verifikasi'] == 1) {
 							$color_badge_verify = 'success';
 							$text_badge = 'Diterima';
 						} else if ($data_verifikasi['status_verifikasi'] == 2) {
 							$color_badge_verify = 'danger';
 							$text_badge = 'Ditolak';
+							$show_button = true;
 						}
 
 						$tbody .= "<tr>";
@@ -20707,12 +20824,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						if ($can_verify) {
-							$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
-						}
-						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('DPA', $tahun_anggaran)) {
-							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_dpa(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
-							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_dpa(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+						if($show_button || $can_verify){
+							if ($can_verify) {
+								$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
+							}
+							if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('DPA', $tahun_anggaran)) {
+								$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_dpa(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
+								$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_dpa(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+							}
 						}
 						$btn .= '</div>';
 
@@ -20907,6 +21026,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							}
 						}
 					} else {
+						$current_user = wp_get_current_user();
+						$user_roles = $current_user->roles;
+						$edit_pa = (in_array($user_roles[0],['pa'])) ? true : false ;
+
 						$opsi = array(
 							'keterangan' => $keterangan,
 							'created_at' => current_time('mysql'),
@@ -20937,6 +21060,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'status' => 'error',
 								'message' => 'Gagal memperbarui data ke database!'
 							);
+						}else{
+							// untuk edit status verifikasi setelah ditolak verifikator
+							if($edit_pa){
+								$wpdb->update(
+									'esakip_keterangan_verifikator',
+									array(
+										'status_verifikasi'=>0
+									),
+									array(
+										'id_dokumen' => $id_dokumen,
+										'nama_tabel_dokumen' => 'esakip_dpa'),
+									array('%d'),
+									array('%d','%s')
+								);	
+							}
 						}
 					}
 				}
@@ -20987,6 +21125,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						if (is_file($upload_dir . $dokumen_lama)) {
 							unlink($upload_dir . $dokumen_lama);
 						}
+						
+						$wpdb->update(
+							'esakip_keterangan_verifikator',
+							array('active' => 0),
+							array('id_dokumen' => $_POST['id'], 'nama_tabel_dokumen' => 'esakip_dpa')
+						);
 					}
 				} else {
 					$ret = array(
