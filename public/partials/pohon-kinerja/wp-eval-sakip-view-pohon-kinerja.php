@@ -543,6 +543,7 @@ if(!empty($data_all['data'])){
 google.charts.load('current', {packages:["orgchart"]});
 google.charts.setOnLoadCallback(drawChart);
 
+<?php if($tipe == 'opd'): ?>
 function detail_cc(id){
 	jQuery("#wrap-loading").show();
 	if(id == undefined){
@@ -582,6 +583,7 @@ jQuery("#show_croscutting").on('click', function(){
 		jQuery(".tampil_croscutting").hide();
 	}
 });
+<?php endif; ?>
 
 function drawChart() {
   	window.data_all = <?php echo json_encode(array_values($data_temp)); ?>;
