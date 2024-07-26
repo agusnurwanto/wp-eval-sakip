@@ -291,14 +291,6 @@ if(!empty($pohon_kinerja_level_1)){
 						}
 
 						if(!empty($croscutting_level_2['keterangan'])){
-							// if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['croscutting'][(trim($croscutting_level_2['keterangan']))])){
-							// 	$data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['croscutting'][(trim($croscutting_level_2['keterangan']))] = [
-							// 		'id' => $croscutting_level_2['id'],
-							// 		'keterangan' => $croscutting_level_2['keterangan'],
-							// 		'data' => array()
-							// 	];
-							// }
-
 							if(!empty($croscutting_level_2['id_skpd_parent'])){
 								$croscutting_opd_lain = 1;
 								$id_skpd_view_pokin = $croscutting_level_2['id_skpd_parent'];
@@ -324,8 +316,8 @@ if(!empty($pohon_kinerja_level_1)){
 								$id_level_1_parent = $data_parent_tujuan['data'];
 							}	
 
-							if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['croscutting'][$key_croscutting_level_3])){
-								$data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['croscutting'][$key_croscutting_level_3] = [
+							if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['croscutting'][$key_croscutting_level_2])){
+								$data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['croscutting'][$key_croscutting_level_2] = [
 									'id' => $croscutting_level_2['id'],
 									'parent_pohon_kinerja' => $croscutting_level_2['parent_pohon_kinerja'],
 									'keterangan' => $croscutting_level_2['keterangan'],
@@ -2864,6 +2856,15 @@ jQuery(document).on('click', '.edit-croscutting', function(){
 					is_lembaga_lainnya = 1
 				}
 			}
+
+			let keterangan_tolak = ``
+			if(response.data_croscutting.status_croscutting == 2){
+				keterangan_tolak = ``
+				+`<div class="form-group" id="showKeteranganTolakCroscutting">`
+					+`<label for="keteranganTolakCroscutting">Keterangan Ditolak Croscutting</label>`
+					+`<textarea class="form-control" id="keteranganTolakCroscutting" name="keteranganTolakCroscutting" disabled>${response.data_croscutting.keterangan_tolak}</textarea>`
+				+`</div>`;
+			}
 			jQuery("#wrap-loading").hide();
 			jQuery("#modal-croscutting").find('.modal-title').html('Edit Croscutting');
 			jQuery("#modal-croscutting").find('.modal-body').html(``
@@ -2886,6 +2887,7 @@ jQuery(document).on('click', '.edit-croscutting', function(){
 						+`<label for="keteranganCroscutting">Keterangan Croscutting</label>`
 						+`<textarea class="form-control" id="keteranganCroscutting" name="keteranganCroscutting">${keterangan}</textarea>`
 					+`</div>`
+					+`${keterangan_tolak}`
 				+`</form>`);
 			// jQuery(`#skpdCroscutting option[value="${id_skpd_croscutting}"]`).prop('selected', true);
 			jQuery("#modal-croscutting").find(`.modal-footer`).html(``

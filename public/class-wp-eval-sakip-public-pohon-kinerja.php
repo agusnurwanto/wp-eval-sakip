@@ -789,8 +789,27 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							AND pk.active=%d$_where_opd
 					", $_POST['id'], $_POST['level'], 1, 1),  ARRAY_A);
 
+					$croscutting_pengusul = $wpdb->get_row($wpdb->prepare("
+						SELECT 
+							pk.id as id_pokin,
+							cc.id as id_croscutting
+						FROM esakip_croscutting$_prefix_opd as cc
+						JOIN esakip_pohon_kinerja$_prefix_opd as pk
+						ON cc.parent_pohon_kinerja = pk.id
+						WHERE cc.id_skpd_croscutting=%d
+							AND cc.status_croscutting=1 
+							AND cc.active=1
+							AND cc.parent_croscutting=%d
+					", $id_skpd, $_POST['id']),  ARRAY_A);
+
+					if(!empty($croscutting) && !empty($croscutting_pengusul)){
+						$croscutting = array_merge($croscutting,$croscutting_pengusul);
+					}else if(empty($croscutting) && !empty($croscutting_pengusul)){
+						$croscutting = $croscutting_pengusul;
+					}
+
 					if (!empty($croscutting)) {
-						throw new Exception("Croscutting harus dihapus dulu!", 1);
+						throw new Exception("Croscutting harus dihapus/ditolak dahulu!", 1);
 					}
 
 					$child = $wpdb->get_row($wpdb->prepare("
@@ -2029,7 +2048,9 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									keterangan,
 									parent_pohon_kinerja,
 									id_skpd_croscutting,
-									is_lembaga_lainnya
+									is_lembaga_lainnya,
+									keterangan_tolak,
+									status_croscutting
 								FROM esakip_croscutting_opd
 								WHERE id=%d 
 									AND active=%d
