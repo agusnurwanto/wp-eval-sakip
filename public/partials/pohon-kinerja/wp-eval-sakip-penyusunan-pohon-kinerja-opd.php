@@ -1656,8 +1656,13 @@ jQuery(document).ready(function(){
 						+`<input type="hidden" name="parent" value="${response.data.parent}">`
 						+`<input type="hidden" name="level" value="${response.data.level}">`
 						+`<div class="form-group">`
-							+`<textarea class="form-control" name="label">${response.data.label}</textarea>`
+                            +'<label for="label-pokin">Label POKIN</label>'
+							+`<textarea class="form-control" id="label-pokin" name="label">${response.data.label}</textarea>`
 						+`</div>`
+                        +`<div class="form-group">`
+                            +'<label>Nomor Urut</label>'
+                            +`<input type="number" class="form-control" name="nomor_urut">${response.data.nomor_urut}</textarea>`
+                        +`</div>`
 					+`</form>`);
 				jQuery("#modal-crud").find(`.modal-footer`).html(``
 					+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
