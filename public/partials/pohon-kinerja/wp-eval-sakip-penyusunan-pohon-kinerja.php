@@ -253,8 +253,8 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 	}
 	$html.='
 	<tr>
-		<td class="level1"><a href="'.$view_kinerja['url'].'&id='.$level_1['id'].'&id_jadwal='.$input['periode'].'" target="_blank">'.$level_1['label'].'</a></td>
-		<td class="indikator">'.implode("<hr/>", $indikator).'</td>
+		<td class="level1" style="background: #efd655;"><a href="'.$view_kinerja['url'].'&id='.$level_1['id'].'&id_jadwal='.$input['periode'].'" target="_blank">'.$level_1['label'].'</a></td>
+		<td class="indikator" style="background: #b5d9ea;">'.implode("<hr/>", $indikator).'</td>
 		<td></td>
 		<td></td>
 		<td></td>
@@ -271,8 +271,8 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 		<tr>
 			<td></td>
 			<td></td>
-			<td class="level2">'.$level_2['label'].'</td>
-			<td class="indikator">'.implode("<hr/>", $indikator).'</td>
+			<td class="level2" style="background: #fe7373;">'.$level_2['label'].'</td>
+			<td class="indikator" style="background: #b5d9ea;">'.implode("<hr/>", $indikator).'</td>
 			<td></td>
 			<td></td>
 			<td></td>
@@ -289,8 +289,8 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 				<td></td>
 				<td></td>
 				<td></td>
-				<td class="level3">'.$level_3['label'].'</td>
-				<td class="indikator">'.implode("<hr/>", $indikator).'</td>
+				<td class="level3" style="background: #57b2ec;">'.$level_3['label'].'</td>
+				<td class="indikator" style="background: #b5d9ea;">'.implode("<hr/>", $indikator).'</td>
 				<td></td>
 				<td></td>
 			</tr>';
@@ -307,8 +307,8 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 					<td></td>
 					<td></td>
 					<td></td>
-					<td class="level4">'.$level_4['label'].'</td>
-					<td class="indikator">'.implode("<hr/>", $indikator).'</td>
+					<td class="level4" style="background: #c979e3;">'.$level_4['label'].'</td>
+					<td class="indikator" style="background: #b5d9ea;">'.implode("<hr/>", $indikator).'</td>
 				</tr>';
 			}
 		}
@@ -337,7 +337,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 	.indikator {
 		background: #b5d9ea;
 	}
-	#penyusunan_pohon_kinerja thead{
+	.penyusunan_pohon_kinerja thead{
         position: sticky;
         top: -6px;
         background: #ffc491;
@@ -363,13 +363,11 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 </style>
 <h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Pohon Kinerja<br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h3><br>
 <?php if (!$is_admin_panrb): ?>
-<div id="action" style="text-align: center; margin-top:30px; margin-bottom: 30px;">
-		<a style="margin-left: 10px;" id="tambah-pohon-kinerja" onclick="return false;" href="#" class="btn btn-success">Tambah Data</a>
-</div>
+<div id="action" class="action-section"></div>
 <?php endif; ?>
-<div id="cetak" title="Penyusunan Pohon Kinerja" style="padding: 5px; overflow: auto; height: 100vh;">
-	<table id="penyusunan_pohon_kinerja" class="table table-bordered">
-		<thead>
+<div style="padding: 5px; overflow: auto; height: 100vh;">
+	<table id="cetak" title="Penyusunan Pohon Kinerja Pemerintah Daerah" class="table table-bordered penyusunan_pohon_kinerja">
+		<thead style="background: #ffc491;">
 			<tr>
 				<th>Level 1</th>
 				<th>Indikator Kinerja</th>
@@ -385,13 +383,12 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 			<?php echo $html; ?>
 		</tbody>
 	</table>
-	
-	<div class="hide-print" id="catatan_dokumentasi" style="max-width: 1200px; margin: auto;">
-		<h4 style="margin: 30px 0 10px; font-weight: bold;">Catatan Dokumentasi:</h4>
-		<ul>
-			<li>Pohon kinerja bisa dilihat ketika data terisi minimal sampai dengan level ke-2.</li>
-		</ul>
-	</div>
+</div>
+<div class="hide-print" id="catatan_dokumentasi" style="max-width: 1200px; margin: auto;">
+	<h4 style="margin: 30px 0 10px; font-weight: bold;">Catatan Dokumentasi:</h4>
+	<ul>
+		<li>Pohon kinerja bisa dilihat ketika data terisi minimal sampai dengan level ke-2.</li>
+	</ul>
 </div>
 
 <div class="modal fade" id="modal-pokin" role="dialog" data-backdrop="static" aria-hidden="true">'
@@ -440,6 +437,8 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 
 <script type="text/javascript">
 jQuery(document).ready(function(){
+    run_download_excel_sakip();
+    jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-pohon-kinerja" onclick="return false;" href="#" class="btn btn-primary"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
 
 	jQuery("#tambah-pohon-kinerja").on('click', function(){
 		pokinLevel1().then(function(){

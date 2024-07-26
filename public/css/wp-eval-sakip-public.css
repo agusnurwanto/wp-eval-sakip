@@ -244,3 +244,9 @@ thead {
 .modal a {
     text-decoration: none !important;
 }
+.action-sakip {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}

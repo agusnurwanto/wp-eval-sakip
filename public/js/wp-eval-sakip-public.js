@@ -29,23 +29,8 @@ function run_download_excel_sakip(type) {
     var body =
         '<a id="excel" onclick="return false;" href="#" class="btn btn-success"><span class="dashicons dashicons-media-spreadsheet"></span>Download Excel</a>';
     var download_excel =
-        '<div id="action-sakip" class="hide-print">' + body + "</div>";
+        '<div id="action-sakip" class="hide-print text-white">' + body + "</div>";
     jQuery(".action-section").append(download_excel);
-
-    jQuery(".action-section").css({
-        display: "flex",
-        "justify-content": "center",
-        "align-items": "center",
-        "margin-bottom": "20px",
-    });
-
-    jQuery(".cetak").css({
-        "font-family":
-            "'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-        padding: "0",
-        margin: "0",
-        "font-size": "13px",
-    });
 
     var td = document.getElementsByTagName("td");
     for (var i = 0; i < td.length; i++) {
