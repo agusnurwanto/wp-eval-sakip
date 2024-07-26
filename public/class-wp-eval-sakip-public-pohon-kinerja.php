@@ -1745,6 +1745,14 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 				if (!empty($unit)) {
 					$tbody = '';
 					$counter = 1;
+					$total_level_1 = 0;
+					$total_level_2 = 0;
+					$total_level_3 = 0;
+					$total_level_4 = 0;
+					$total_level_5 = 0;
+					$total_crosscutting_usulan = 0;
+					$total_crosscutting_usulan_vertikal = 0;
+					$total_crosscutting_tujuan = 0;
 					foreach ($unit as $kk => $vv) {
 
 						if ($penyusunan_pohon_kinerja_opd == false) {
@@ -1786,11 +1794,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								'post_status' => 'private'
 							));
 
-							$tbody .= "<tr>";
-							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-							$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
-
-							$jumlah_dokumen = $wpdb->get_var(
+							$jumlah_level_1 = $wpdb->get_var(
 								$wpdb->prepare("
 									SELECT 
 										COUNT(id)
@@ -1802,18 +1806,143 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 										AND id_jadwal = %d
 								", $vv['id_skpd'], $id_jadwal)
 							);
+							$jumlah_level_2 = $wpdb->get_var(
+								$wpdb->prepare("
+									SELECT 
+										COUNT(p.id)
+									FROM esakip_pohon_kinerja_opd p
+									INNER JOIN esakip_pohon_kinerja_opd parent ON parent.id=p.parent
+										AND parent.active=p.active
+										AND parent.id_jadwal=p.id_jadwal
+										AND parent.level=1
+									WHERE p.level=2 
+										AND p.active=1
+										AND p.id_skpd = %d
+										AND p.id_jadwal = %d
+								", $vv['id_skpd'], $id_jadwal)
+							);
+							$jumlah_level_3 = $wpdb->get_var(
+								$wpdb->prepare("
+									SELECT 
+										COUNT(p.id)
+									FROM esakip_pohon_kinerja_opd p
+									INNER JOIN esakip_pohon_kinerja_opd parent ON parent.id=p.parent
+										AND parent.active=p.active
+										AND parent.id_jadwal=p.id_jadwal
+										AND parent.level=2
+									WHERE p.level=3 
+										AND p.active=1
+										AND p.id_skpd = %d
+										AND p.id_jadwal = %d
+								", $vv['id_skpd'], $id_jadwal)
+							);
+							$jumlah_level_4 = $wpdb->get_var(
+								$wpdb->prepare("
+									SELECT 
+										COUNT(p.id)
+									FROM esakip_pohon_kinerja_opd p
+									INNER JOIN esakip_pohon_kinerja_opd parent ON parent.id=p.parent
+										AND parent.active=p.active
+										AND parent.id_jadwal=p.id_jadwal
+										AND parent.level=3
+									WHERE p.level=4 
+										AND p.active=1
+										AND p.id_skpd = %d
+										AND p.id_jadwal = %d
+								", $vv['id_skpd'], $id_jadwal)
+							);
+							$jumlah_level_5 = $wpdb->get_var(
+								$wpdb->prepare("
+									SELECT 
+										COUNT(p.id)
+									FROM esakip_pohon_kinerja_opd p
+									INNER JOIN esakip_pohon_kinerja_opd parent ON parent.id=p.parent
+										AND parent.active=p.active
+										AND parent.id_jadwal=p.id_jadwal
+										AND parent.level=4
+									WHERE p.level=5 
+										AND p.active=1
+										AND p.id_skpd = %d
+										AND p.id_jadwal = %d
+								", $vv['id_skpd'], $id_jadwal)
+							);
 
-							$btn = '<div class="btn-action-group">';
-							$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_penyusunan_pohon_kinerja_opd['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
-							$btn .= '</div>';
+							$croscutting_pohon_kinerja_pengusul = $wpdb->get_var($wpdb->prepare("
+								SELECT 
+									COUNT(cc.id)
+								FROM esakip_croscutting_opd as cc
+								INNER JOIN esakip_pohon_kinerja_opd as pk ON cc.parent_pohon_kinerja = pk.id
+									AND pk.active=cc.active
+								WHERE pk.id_skpd=%d
+									AND cc.status_croscutting=1 
+									AND cc.active=1
+									AND cc.is_lembaga_lainnya=0
+									AND pk.id_jadwal=%d
+							", $vv['id_skpd'], $id_jadwal));
 
-							$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
+							$croscutting_pohon_kinerja_pengusul_vertikal = $wpdb->get_var($wpdb->prepare("
+								SELECT 
+									COUNT(cc.id)
+								FROM esakip_croscutting_opd as cc
+								INNER JOIN esakip_pohon_kinerja_opd as pk ON cc.parent_pohon_kinerja = pk.id
+									AND pk.active=cc.active
+								WHERE pk.id_skpd=%d
+									AND cc.status_croscutting=1 
+									AND cc.is_lembaga_lainnya=1
+									AND cc.active=1
+									AND pk.id_jadwal=%d
+							", $vv['id_skpd'], $id_jadwal));
+
+							$croscutting_pohon_kinerja_dituju = $wpdb->get_var($wpdb->prepare("
+								SELECT 
+									COUNT(cc.id)
+								FROM esakip_croscutting_opd as cc
+								INNER JOIN esakip_pohon_kinerja_opd as pk ON cc.parent_croscutting = pk.id
+									AND pk.active=cc.active
+								WHERE cc.id_skpd_croscutting=%d
+									AND cc.status_croscutting=1 
+									AND cc.active=1
+									AND pk.id_jadwal=%d
+							", $vv['id_skpd'], $id_jadwal));
+
+							$btn = '
+							<div class="btn-action-group">'."
+								<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_penyusunan_pohon_kinerja_opd['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>".'
+							</div>';
+
+							$tbody .= "<tr>";
+							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+							$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
+							$tbody .= "<td class='text-center'>" . $jumlah_level_1 . "</td>";
+							$tbody .= "<td class='text-center'>" . $jumlah_level_2 . "</td>";
+							$tbody .= "<td class='text-center'>" . $jumlah_level_3 . "</td>";
+							$tbody .= "<td class='text-center'>" . $jumlah_level_4 . "</td>";
+							$tbody .= "<td class='text-center'>" . $jumlah_level_5 . "</td>";
+							$tbody .= "<td class='text-center'>" . $croscutting_pohon_kinerja_pengusul . "</td>";
+							$tbody .= "<td class='text-center'>" . $croscutting_pohon_kinerja_pengusul_vertikal . "</td>";
+							$tbody .= "<td class='text-center'>" . $croscutting_pohon_kinerja_dituju . "</td>";
 							$tbody .= "<td>" . $btn . "</td>";
-
 							$tbody .= "</tr>";
+
+							$total_level_1 += $jumlah_level_1;
+							$total_level_2 += $jumlah_level_2;
+							$total_level_3 += $jumlah_level_3;
+							$total_level_4 += $jumlah_level_4;
+							$total_level_5 += $jumlah_level_5;
+							$total_crosscutting_usulan_vertikal += $croscutting_pohon_kinerja_pengusul_vertikal;
+							$total_crosscutting_usulan += $croscutting_pohon_kinerja_pengusul;
+							$total_crosscutting_tujuan += $croscutting_pohon_kinerja_dituju;
 						}
 					}
 					$ret['data'] = $tbody;
+					$ret['total_level_1'] = $total_level_1;
+					$ret['total_level_2'] = $total_level_2;
+					$ret['total_level_3'] = $total_level_3;
+					$ret['total_level_4'] = $total_level_4;
+					$ret['total_level_5'] = $total_level_5;
+					$ret['total_crosscutting_usulan_vertikal'] = $total_crosscutting_usulan_vertikal;
+					$ret['total_crosscutting_usulan'] = $total_crosscutting_usulan;
+					$ret['total_crosscutting_tujuan'] = $total_crosscutting_tujuan;
 				} else {
 					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}

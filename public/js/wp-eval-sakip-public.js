@@ -26,10 +26,8 @@ jQuery(document).ready(function () {
 });
 
 function run_download_excel_sakip(type) {
-    var body =
-        '<a id="excel" onclick="return false;" href="#" class="btn btn-success"><span class="dashicons dashicons-media-spreadsheet"></span>Download Excel</a>';
-    var download_excel =
-        '<div id="action-sakip" class="hide-print text-white">' + body + "</div>";
+    var body = '<a id="excel" onclick="return false;" href="#" class="btn btn-success"><span class="dashicons dashicons-media-spreadsheet"></span>Download Excel</a>';
+    var download_excel = '<div id="action-sakip" class="hide-print text-white">' + body + "</div>";
     jQuery(".action-section").append(download_excel);
 
     var td = document.getElementsByTagName("td");

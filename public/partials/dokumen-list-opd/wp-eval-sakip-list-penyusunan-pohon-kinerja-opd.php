@@ -72,23 +72,53 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
 	.btn-action-group .btn {
 		margin: 0 5px;
 	}
+	.table_dokumen_skpd thead{
+        position: sticky;
+        top: -6px;
+    }
+	.table_dokumen_skpd tfoot{
+        position: sticky;
+        bottom: 0;
+    }
 </style>
 <div class="container-md">
 	<div class="cetak">
 		<div style="padding: 10px;margin:0 0 3rem 0;">
 			<h1 class="text-center table-title">Input Pohon Kinerja <br><?php echo $periode['nama_jadwal_renstra'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1>
+			<div id="action" class="action-section"></div>
 			<div class="wrap-table">
-				<table id="table_dokumen_skpd" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
-					<thead>
+				<table id="cetak" class="table_dokumen_skpd table table-bordered">
+					<thead style="background: #ffc491;">
 						<tr>
 							<th class="text-center">No</th>
 							<th class="text-center">Nama Perangkat Daerah</th>
-							<th class="text-center">Jumlah Pohon Kinerja</th>
+							<th class="text-center">POKIN Level 1</th>
+							<th class="text-center">POKIN Level 2</th>
+							<th class="text-center">POKIN Level 3</th>
+							<th class="text-center">POKIN Level 4</th>
+							<th class="text-center">POKIN Level 5</th>
+							<th class="text-center">Usulan Croscutting</th>
+							<th class="text-center">Usulan Croscutting Lembaga Vertikal</th>
+							<th class="text-center">Tujuan Croscutting</th>
 							<th class="text-center">Aksi</th>
 						</tr>
 					</thead>
 					<tbody>
 					</tbody>
+					<tfoot style="background: #ffc491;">
+						<tr>
+							<th class="text-center" colspan="2">Jumlah</th>
+							<th class="text-center" id="total_level_1">0</th>
+							<th class="text-center" id="total_level_2">0</th>
+							<th class="text-center" id="total_level_3">0</th>
+							<th class="text-center" id="total_level_4">0</th>
+							<th class="text-center" id="total_level_5">0</th>
+							<th class="text-center" id="total_crosscutting_usulan">0</th>
+							<th class="text-center" id="total_crosscutting_usulan_vertikal">0</th>
+							<th class="text-center" id="total_crosscutting_tujuan">0</th>
+							<th></th>
+						</tr>
+					</tfoot>
 				</table>
 			</div>
 		</div>
@@ -100,6 +130,7 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
 
 <script>
 	jQuery(document).ready(function() {
+    	run_download_excel_sakip();
 		window.penyusunan_pohon_kinerja_opd = 'true';
 		getTableSkpd();
 	});
@@ -127,7 +158,15 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
 				jQuery('#wrap-loading').hide();
 				console.log(response);
 				if (response.status === 'success') {
-					jQuery('#table_dokumen_skpd tbody').html(response.data);
+					jQuery('.table_dokumen_skpd tbody').html(response.data);
+					jQuery('#total_level_1').html(response.total_level_1);
+					jQuery('#total_level_2').html(response.total_level_2);
+					jQuery('#total_level_3').html(response.total_level_3);
+					jQuery('#total_level_4').html(response.total_level_4);
+					jQuery('#total_level_5').html(response.total_level_5);
+					jQuery('#total_crosscutting_usulan').html(response.total_crosscutting_usulan);
+					jQuery('#total_crosscutting_usulan_vertikal').html(response.total_crosscutting_usulan_vertikal);
+					jQuery('#total_crosscutting_tujuan').html(response.total_crosscutting_tujuan);
 				} else {
 					alert(response.message);
 				}
