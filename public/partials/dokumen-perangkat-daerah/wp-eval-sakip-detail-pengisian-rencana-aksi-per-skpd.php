@@ -111,7 +111,7 @@ $is_administrator = in_array('administrator', $user_roles);
         max-height: 70vh;
         overflow-y: auto;
     }
-    #table_dokumen_rencana_aksi {
+    .table_dokumen_rencana_aksi {
         font-family:'Open Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; 
         border-collapse: collapse; 
         width: 2900px; 
@@ -119,12 +119,11 @@ $is_administrator = in_array('administrator', $user_roles);
         overflow-wrap: break-word; 
         font-size: 90%;
     }
-    #table_dokumen_rencana_aksi thead {
+    .table_dokumen_rencana_aksi thead {
         position: sticky;
         top: -6px;
-        background: #ffc491;
     }
-    #table_dokumen_rencana_aksi .badge {
+    .table_dokumen_rencana_aksi .badge {
         white-space: normal;
         line-height: 1.3;
     }
@@ -132,17 +131,15 @@ $is_administrator = in_array('administrator', $user_roles);
 
 <!-- Table -->
 <div class="container-md">
-    <div class="cetak">
+    <div id="cetak" title="Rencana Aksi Perangkat Daerah">
         <div style="padding: 10px;margin:0 0 3rem 0;">
             <h1 class="text-center" style="margin:3rem;">Rencana Aksi <br><?php echo $skpd['nama_skpd'] ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
             <?php if (!$is_admin_panrb && $hak_akses_user): ?>
-            <div id="action" style="text-align: center; margin-top:30px; margin-bottom: 30px;">
-                    <a style="margin-left: 10px;" id="tambah-rencana-aksi" onclick="return false;" href="#" class="btn btn-success">Tambah Data</a>
-            </div>
+            <div id="action" class="action-section hide-excel"></div>
             <?php endif; ?>
             <div class="wrap-table">
-                <table id="table_dokumen_rencana_aksi" cellpadding="2" cellspacing="0" class="table table-bordered">
-                    <thead>
+                <table cellpadding="2" cellspacing="0" class="table_dokumen_rencana_aksi table table-bordered">
+                    <thead style="background: #ffc491;">
                         <tr>
                             <th class="text-center" rowspan="2" style="width: 85px;">No</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">KEGIATAN UTAMA</th>
@@ -304,8 +301,11 @@ $is_administrator = in_array('administrator', $user_roles);
 </div>
 
 
-<script>
+<script type="text/javascript">
 jQuery(document).ready(function() {
+    run_download_excel_sakip();
+    jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-rencana-aksi" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
+
     getTablePengisianRencanaAksi();
     jQuery("#fileUpload").on('change', function() {
         var id_dokumen = jQuery('#idDokumen').val();
@@ -781,7 +781,7 @@ function getTablePengisianRencanaAksi(no_loading=false) {
             }
             console.log(response);
             if (response.status === 'success') {
-                jQuery('#table_dokumen_rencana_aksi tbody').html(response.data);
+                jQuery('.table_dokumen_rencana_aksi tbody').html(response.data);
             } else {
                 alert(response.message);
             }
