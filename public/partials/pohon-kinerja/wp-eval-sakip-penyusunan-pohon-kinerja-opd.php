@@ -895,8 +895,8 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 	}
 	$html.='
 	<tr>
-		<td class="level1"><a href="'.$view_kinerja['url'].'&id='.$level_1['id'].'&id_jadwal='.$input['periode'].'" target="_blank">'.$level_1['label'].'</a></td>
-		<td class="indikator">'.implode("<hr/>", $indikator).'</td>
+		<td class="level1" style="background: #efd655;"><a href="'.$view_kinerja['url'].'&id='.$level_1['id'].'&id_jadwal='.$input['periode'].'" target="_blank">'.$level_1['label'].'</a></td>
+		<td class="indikator" style="background: #b5d9ea;">'.implode("<hr/>", $indikator).'</td>
 		<td></td>
 		<td></td>
 		<td></td>
@@ -962,8 +962,8 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 		<tr>
 			<td></td>
 			<td></td>
-			<td class="level2">'.$level_2['label'].'</td>
-			<td class="indikator">'.implode("<hr/>", $indikator).'</td>
+			<td class="level2" style="background: #fe7373;">'.$level_2['label'].'</td>
+			<td class="indikator" style="background: #b5d9ea;">'.implode("<hr/>", $indikator).'</td>
 			<td></td>
 			<td></td>
 			<td></td>
@@ -977,7 +977,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 			<tr>
 				<td></td>
 				<td></td>
-				<td class="croscutting" colspan="2">' . $show_croscutting . '</td>
+				<td class="croscutting" style="background-color: #FFC6FF;" colspan="2">' . $show_croscutting . '</td>
 				<td></td>
 				<td></td>
 				<td></td>
@@ -1040,8 +1040,8 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 				<td></td>
 				<td></td>
 				<td></td>
-				<td class="level3">'.$level_3['label'].'</td>
-				<td class="indikator">'.implode("<hr/>", $indikator).'</td>
+				<td class="level3" style="background: #57b2ec;">'.$level_3['label'].'</td>
+				<td class="indikator" style="background: #b5d9ea;">'.implode("<hr/>", $indikator).'</td>
 				<td></td>
 				<td></td>
 				<td></td>
@@ -1055,7 +1055,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 					<td></td>
 					<td></td>
 					<td></td>
-					<td class="croscutting" colspan="2">' . $show_croscutting . '</td>
+					<td class="croscutting" style="background-color: #FFC6FF;" colspan="2">' . $show_croscutting . '</td>
 					<td></td>
 					<td></td>
 					<td></td>
@@ -1118,8 +1118,8 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 					<td></td>
 					<td></td>
 					<td></td>
-					<td class="level4">' . $level_4['label'] . '</td>
-					<td class="indikator">'.implode("<hr/>", $indikator).'</td>
+					<td class="level4" style="background: #c979e3;">' . $level_4['label'] . '</td>
+					<td class="indikator" style="background: #b5d9ea;">'.implode("<hr/>", $indikator).'</td>
 					<td></td>
 					<td></td>
 				</tr>';
@@ -1133,7 +1133,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 						<td></td>
 						<td></td>
 						<td></td>
-						<td class="croscutting" colspan="2">' . $show_croscutting . '</td>
+						<td class="croscutting" style="background-color: #FFC6FF;" colspan="2">' . $show_croscutting . '</td>
 						<td></td>
 						<td></td>
 					</tr>';
@@ -1154,8 +1154,8 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 						<td></td>
 						<td></td>
 						<td></td>
-						<td class="level5">'.$level_5['label'].'</td>
-						<td class="indikator">'.implode("<hr/>", $indikator).'</td>
+						<td class="level5" style="background: #CAFFBF;">'.$level_5['label'].'</td>
+						<td class="indikator" style="background: #b5d9ea;">'.implode("<hr/>", $indikator).'</td>
 					</tr>';
 
 					// show croscutting
@@ -1215,7 +1215,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 							<td></td>
 							<td></td>
 							<td></td>
-							<td class="croscutting" colspan="2">' . $show_croscutting5 . '</td>
+							<td class="croscutting" style="background-color: #FFC6FF;" colspan="2">' . $show_croscutting5 . '</td>
 						</tr>';
 					}
 
@@ -1336,7 +1336,7 @@ if(!empty($data_level_pokin)){
 	.level4 {
 		background: #c979e3;
 	}
-  .level5 {
+    .level5 {
 		background: #CAFFBF;
 	}
 	.indikator {
@@ -1374,7 +1374,7 @@ if(!empty($data_level_pokin)){
 		text-decoration: none !important;
 	}
 
-	#penyusunan_pohon_kinerja_opd thead{
+	.penyusunan_pohon_kinerja_opd thead{
         position: sticky;
         top: -6px;
         background: #ffc491;
@@ -1417,7 +1417,7 @@ if(!empty($data_level_pokin)){
 
 <?php if(!empty($data_notifikasi_croscutting)): ?>
 <h4 style="text-align: center; margin-top: 10px; font-weight: bold;margin-bottom: .5em;">Notifikasi Croscutting</h4>
-<div id="cetak" title="Notifikasi Croscutting" style="padding: 5px; overflow: auto; display:flex; justify-content:center;">
+<div title="Notifikasi Croscutting" style="padding: 5px; overflow: auto; display:flex; justify-content:center;">
 	<table id="table_notifikasi_croscutting" style="width: 50em;text-align: center;">
 		<thead>
 			<tr>
@@ -1435,13 +1435,11 @@ if(!empty($data_level_pokin)){
 <?php endif; ?>
 
 <?php if (!$is_admin_panrb): ?>
-<div id="action" style="text-align: center; margin-top:30px; margin-bottom: 30px;">
-		<a style="margin-left: 10px;" id="tambah-pohon-kinerja" onclick="return false;" href="#" class="btn btn-success">Tambah Data</a>
-</div>
+<div id="action" class="action-section"></div>
 <?php endif; ?>
-<div id="cetak" title="Penyusunan Pohon Kinerja" style="padding: 5px; overflow: auto; height: 100vh;">
-	<table id="penyusunan_pohon_kinerja_opd">
-		<thead>
+<div style="padding: 5px; overflow: auto; height: 100vh;">
+	<table id="cetak" title="Penyusunan Pohon Kinerja Perangkat Daerah" class="penyusunan_pohon_kinerja_opd">
+		<thead style="background: #ffc491;">
 			<tr>
 				<th>Level 1</th>
 				<th>Indikator Kinerja</th>
@@ -1459,13 +1457,12 @@ if(!empty($data_level_pokin)){
 			<?php echo $html; ?>
 		</tbody>
 	</table>
-	
-	<div class="hide-print" id="catatan_dokumentasi" style="max-width: 1200px; margin: auto;">
-		<h4 style="margin: 30px 0 10px; font-weight: bold;">Catatan Dokumentasi:</h4>
-		<ul>
-			<li>Pohon kinerja bisa dilihat ketika data terisi minimal sampai dengan level ke-2.</li>
-		</ul>
-	</div>
+</div>
+<div class="hide-print" id="catatan_dokumentasi" style="max-width: 1200px; margin: auto;">
+	<h4 style="margin: 30px 0 10px; font-weight: bold;">Catatan Dokumentasi:</h4>
+	<ul>
+		<li>Pohon kinerja bisa dilihat ketika data terisi minimal sampai dengan level ke-2.</li>
+	</ul>
 </div>
 
 <div class="modal fade" id="modal-pokin" role="dialog" data-backdrop="static" aria-hidden="true">'
@@ -1600,6 +1597,8 @@ if(!empty($data_level_pokin)){
 
 <script type="text/javascript">
 jQuery(document).ready(function(){
+    run_download_excel_sakip();
+    jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-pohon-kinerja" onclick="return false;" href="#" class="btn btn-primary"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
 
 	jQuery('#table_notifikasi_croscutting').dataTable({   
 		pageLength : 5,
