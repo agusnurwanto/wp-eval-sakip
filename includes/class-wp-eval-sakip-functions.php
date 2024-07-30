@@ -116,6 +116,11 @@ class Esakip_Functions
                 }
             }
         }
+        if(is_404()){
+            header("HTTP/1.1 301 Moved Permanently");
+            header("Location: ".get_bloginfo('url'));
+            exit();
+        }
     }
 
     function gen_key($key_db = false, $options = array())
