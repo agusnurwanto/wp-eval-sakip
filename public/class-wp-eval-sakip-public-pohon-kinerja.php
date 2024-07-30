@@ -1,6 +1,7 @@
 <?php
 
 use GuzzleHttp\Psr7\Query;
+use WpOrg\Requests\Response;
 
 require_once ESAKIP_PLUGIN_PATH . "/public/class-wp-eval-sakip-public-monev-kinerja.php";
 class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
@@ -4558,4 +4559,66 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		}
 		die(json_encode($ret));
 	}
+	
+	// public function get_tujuan_sasaran_cascading()
+	// {
+	// 	global $wpdb;
+	// 	try {
+	// 		if (!empty($_POST)) {
+	// 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+	// 				if(!empty($_POST['id_skpd'])){
+	// 					$id_skpd = $_POST['id_skpd'];
+	// 				}else{
+	// 					throw new Exception("Id Skpd Kosong!", 1);
+	// 				}
+	// 				if(!empty($_POST['tahun_anggaran'])){
+	// 					$tahun_anggaran = $_POST['tahun_anggaran'];
+	// 				}else{
+	// 					throw new Exception("Tahun Anggaran Kosong!", 1);
+	// 				}
+	// 				if(!empty($_POST['jenis'])){
+	// 					$jenis = $_POST['jenis'];
+	// 				}else{
+	// 					throw new Exception("Jenis Data Kosong!", 1);
+	// 				}
+
+	// 				$api_params = array(
+	// 					'action' => 'get_tujuan_sasaran_renstra',
+	// 					'api_key'	=> 'wc_order_kQriVU1VkGIup',
+	// 					'tahun_anggaran' => $tahun_anggaran,
+	// 					'id_skpd' => $id_skpd
+	// 				);
+
+	// 				$response = wp_remote_post('http://my-sipd.test/wp-admin/admin-ajax.php', array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
+
+	// 				$response = wp_remote_retrieve_body($response);
+					
+	// 				$response = json_decode($response);
+
+	// 				if($_POST['jenis'] == 'sasaran'){
+	// 					$data = $response->data_sasaran;
+	// 				}else{
+	// 					$data = $response->data_tujuan;
+	// 				}
+	// 				echo json_encode([
+	// 					'status' => 'success',
+	// 					'jenis' => $_POST['jenis'],
+	// 					'data' => $data
+	// 				]);
+
+	// 				exit();
+	// 			} else {
+	// 				throw new Exception("API tidak ditemukan!", 1);
+	// 			}
+	// 		} else {
+	// 			throw new Exception("Format tidak sesuai!", 1);
+	// 		}
+	// 	} catch (Exception $e) {
+	// 		echo json_encode([
+	// 			'status' => false,
+	// 			'message' => $e->getMessage()
+	// 		]);
+	// 		exit();
+	// 	}
+	// }
 }

@@ -413,61 +413,107 @@ function simpan_indikator_renaksi(tipe){
 };
 
 function tambah_rencana_aksi(){
-    return new Promise(function(resolve, reject){
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: "post",
-            data: {
-                "action": "get_data_pokin",
-                "level": 1,
-                "parent": 0,
-                "api_key": esakip.api_key,
-                "tipe_pokin": "opd",
-                "id_jadwal": <?php echo $id_jadwal; ?>,
-                "id_skpd": <?php echo $id_skpd; ?>
-            },
-            dataType: "json",
-            success: function(res){
-                var html = '<option value="">Pilih Pokin Level 1</option>';
-                res.data.map(function(value, index){
-                    html += '<option value="'+value.id+'">'+value.label+'</option>';
-                });
-                jQuery('#wrap-loading').hide();
-                jQuery("#modal-crud").find('.modal-title').html('Tambah Rencana Aksi');
-                jQuery("#modal-crud").find('.modal-body').html(''
-                    +`<form id="form-renaksi">`
-                        +'<input type="hidden" id="id_renaksi" value=""/>'
-                        +`<div class="form-group">`
-                            +`<label for="pokin-level-1">Pilih Pokin Level 1</label>`
-                            +`<select class="form-control" name="pokin-level-1" id="pokin-level-1" onchange="get_data_pokin(this.value, 2, 'pokin-level-2')">`
-                                +html
-                            +`</select>`
-                        +`</div>`
-                        +`<div class="form-group">`
-                            +`<label for="pokin-level-2">Pilih Pokin Level 2</label>`
-                            +`<select class="form-control" name="pokin-level-2" id="pokin-level-2">`
-                            +`</select>`
-                        +`</div>`
-                        +`<div class="form-group">`
-                            +`<textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan Kegiatan Utama..."></textarea>`
-                        +`</div>`
-                    +`</form>`);
-                jQuery("#modal-crud").find('.modal-footer').html(''
-                    +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
-                        +'Tutup'
-                    +'</button>'
-                    +'<button type="button" class="btn btn-success" onclick="simpan_data_renaksi(1)">'
-                        +'Simpan'
-                    +'</button>');
-                jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
-                jQuery("#modal-crud").find('.modal-dialog').css('width','');
-                jQuery("#modal-crud").modal('show');
-                jQuery('#pokin-level-1').select2({width: '100%'});
-                jQuery('#pokin-level-2').select2({width: '100%'});
-                resolve();
-            }
+    // get_tujuan_sasaran_cascading('sasaran')
+    // .then(function(){
+        return new Promise(function(resolve, reject){
+            jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                url: esakip.url,
+                type: "post",
+                data: {
+                    "action": "get_data_pokin",
+                    "level": 1,
+                    "parent": 0,
+                    "api_key": esakip.api_key,
+                    "tipe_pokin": "opd",
+                    "id_jadwal": <?php echo $id_jadwal; ?>,
+                    "id_skpd": <?php echo $id_skpd; ?>
+                },
+                dataType: "json",
+                success: function(res){
+                    var html = '<option value="">Pilih Pokin Level 1</option>';
+                    res.data.map(function(value, index){
+                        html += '<option value="'+value.id+'">'+value.label+'</option>';
+                    });
+                    jQuery('#wrap-loading').hide();
+                    jQuery("#modal-crud").find('.modal-title').html('Tambah Rencana Aksi');
+                    jQuery("#modal-crud").find('.modal-body').html(''
+                        +`<form id="form-renaksi">`
+                            +'<input type="hidden" id="id_renaksi" value=""/>'
+                            +`<div class="form-group">`
+                                +`<label for="pokin-level-1">Pilih Pokin Level 1</label>`
+                                +`<select class="form-control" name="pokin-level-1" id="pokin-level-1" onchange="get_data_pokin_2(this.value, 2, 'pokin-level-2')">`
+                                    +html
+                                +`</select>`
+                            +`</div>`
+                            +`<div class="form-group">`
+                                +`<label for="pokin-level-2">Pilih Pokin Level 2</label>`
+                                +`<select class="form-control" name="pokin-level-2" id="pokin-level-2">`
+                                +`</select>`
+                            +`</div>`
+                            +`<div class="form-group">`
+                                +`<textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan Kegiatan Utama..."></textarea>`
+                            +`</div>`
+                            // +`<div class="form-group">`
+                            //     +`<label for="sasaran-cascading">Pilih Sasaran Cascading</label>`
+                            //     +`<select class="form-control" name="sasaran-cascading" id="sasaran-cascading">`
+                            //     +`</select>`
+                            // +`</div>`
+                        +`</form>`);
+                    jQuery("#modal-crud").find('.modal-footer').html(''
+                        +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
+                            +'Tutup'
+                        +'</button>'
+                        +'<button type="button" class="btn btn-success" onclick="simpan_data_renaksi(1)">'
+                            +'Simpan'
+                        +'</button>');
+                    jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
+                    jQuery("#modal-crud").find('.modal-dialog').css('width','');
+                    jQuery("#modal-crud").modal('show');
+                    jQuery('#pokin-level-1').select2({width: '100%'});
+                    jQuery('#pokin-level-2').select2({width: '100%',placeholder: "Pilih Pokin Level 2"}).place;
+
+                    // if(data_sasaran_cascasding != undefined){
+                    //     let html_cascading = '<option value="">Pilih Sasaran Cascading</option>';
+                    //     data_sasaran_cascasding.data.map(function(value, index){
+                    //         if(value.id_unik_indikator == null){
+                    //             html_cascading += '<option value="'+value.id+'">'+value.sasaran_teks+'</option>';
+                    //         }
+                    //     });
+                    //     jQuery("#sasaran-cascading").html(html_cascading);
+                    //     jQuery('#sasaran-cascading').select2({width: '100%'});
+                    // }
+
+                    resolve();
+                }
+            // });
         });
+    });
+}
+
+function get_tujuan_sasaran_cascading(jenis='sasaran'){
+    return new Promise(function(resolve, reject){
+        if(typeof data_sasaran_cascasding == 'undefined'){
+            jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                url: esakip.url,
+                type: "post",
+                data: {
+                    "action": 'get_tujuan_sasaran_cascading',
+                    "api_key": esakip.api_key,
+                    "id_skpd": <?php echo $id_skpd; ?>,
+                    "tahun_anggaran": <?php echo $input['tahun']; ?>,
+                    "jenis": jenis
+                },
+                dataType: "json",
+                success: function(response){
+                    window.data_sasaran_cascasding = response;
+                    resolve();
+                }
+            });
+        }else{
+            resolve();
+        }
     });
 }
 
@@ -534,7 +580,7 @@ function edit_rencana_aksi(id, tipe){
     }
 }
 
-function get_data_pokin(parent, level, tag){
+function get_data_pokin_2(parent, level, tag){
     jQuery('#wrap-loading').show();
     return new Promise(function(resolve, reject){
         jQuery.ajax({
@@ -1281,6 +1327,7 @@ function simpan_data_renaksi(tipe){
     var label_pokin_1 = jQuery('#pokin-level-1 option:selected').text();
     var label_pokin_2 = jQuery('#pokin-level-2 option:selected').text();;
     var label_renaksi = jQuery('#label_renaksi').val();
+    // var cascading = jQuery('#sasaran-cascading').val();
     if(label_renaksi == ''){
         return alert('Kegiatan Utama tidak boleh kosong!')
     }

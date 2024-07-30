@@ -1040,6 +1040,23 @@ class Wp_Eval_Sakip_Admin
 									</ul>
 								</div>
 							</div>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'monev_rencana_aksi_setting') {
+							$pengisian_rencana_aksi_setting = $this->functions->generatePage(array(
+								'nama_page' => 'Pengisian Rencana Aksi Setting - ' . $tahun_item['tahun_anggaran'],
+								'content' => '[pengisian_rencana_aksi_setting tahun=' . $tahun_item['tahun_anggaran'] . ']',
+								'show_header' => 1,
+								'post_status' => 'private'
+							));
+							$title = 'Rencana Aksi Setting';
+							$body_pemda = '
+							<div class="accordion">
+								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+									<ul style="margin-left: 20px;">
+										<li><a target="_blank" href="' . $pengisian_rencana_aksi_setting['url'] . '">' . $title . '</a></li>
+									</ul>
+								</div>
+							</div>';
 						}
 						$ret['message'] .= $body_pemda;
 					}
@@ -1801,6 +1818,38 @@ class Wp_Eval_Sakip_Admin
 				')
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'monev_rencana_aksi_opd')));
+
+			
+		Container::make('theme_options', __('MONEV Rencana Aksi Setting'))
+		->set_page_parent($monev_ren_aksi_menu)
+		// ->add_fields(array(
+		// 	Field::make('html', 'crb_esakip_halaman_terkait')
+		// 		->set_html('
+		// 		<h4>Monev Rencana Aksi Setting</h4>
+		// 		<ol>
+		// 		</ol>'),
+		// 	Field::make('text', 'crb_apikey_esakip', 'API KEY')
+		// 		->set_default_value($this->functions->generateRandomString())
+		// 		->set_help_text('Wajib diisi. API KEY digunakan untuk integrasi data.'),
+		// 	Field::make('html', 'crb_sql_migrate')
+		// 		->set_html('<a onclick="sql_migrate_esakip(); return false;" href="#" class="button button-primary button-large">SQL Migrate</a>')
+		// 		->set_help_text('Tombol untuk memperbaiki struktur database E-SAKIP.'),
+		// 	Field::make('text', 'crb_maksimal_upload_dokumen_esakip', 'Maksimal Upload Dokumen')
+		// 		->set_default_value(10)
+		// 		->set_help_text('Wajib diisi. Setting batas ukuran maksimal untuk upload dokumen. Ukuran dalam MB'),
+		// 	Field::make('text', 'crb_nama_pemda', 'Nama Pemerintah Daerah')
+		// 		->set_help_text('Wajib diisi.'),
+		// ))
+		->add_fields(array(
+			Field::make('html', 'crb_pengisian_monev_setting_hide_sidebar')
+				->set_html('
+				<style>
+					.postbox-container { display: none; }
+					#poststuff #post-body.columns-2 { margin: 0 !important; }
+				</style>
+			')
+		))
+		->add_fields($this->get_ajax_field(array('type' => 'monev_rencana_aksi_setting')));
 
 		Container::make('theme_options', __('Input RPJPD'))
 			->set_page_menu_position(3.6)
