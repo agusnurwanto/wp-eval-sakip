@@ -860,9 +860,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										<td class=""></td>
 										<td class=""></td>
 										<td class=""></td>
-										<td class="text-right">'.$rencana_pagu_html.'</td>
+										<td class="text-right" style="visibility: hidden;">'.$rencana_pagu_html.'</td>
 										<td class=""></td>
-										<td class="text-right">'.$realisasi_pagu_html.'</td>
+										<td class="text-right" style="visibility: hidden;">'.$realisasi_pagu_html.'</td>
 										<td class=""></td>
 										<td class=""></td>
 										<td class="anggaran_urian_renaksi"></td>
