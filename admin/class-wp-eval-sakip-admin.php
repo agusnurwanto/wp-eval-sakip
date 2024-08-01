@@ -1044,9 +1044,35 @@ class Wp_Eval_Sakip_Admin
 								</div>
 							</div>';
 						} else if (!empty($_POST['type']) && $_POST['type'] == 'monev_rencana_aksi_setting') {
+							$jadwal_renstra = $wpdb->get_results(
+								"
+								SELECT 
+									id,
+									nama_jadwal,
+									nama_jadwal_renstra,
+									tahun_anggaran,
+									lama_pelaksanaan,
+									tahun_selesai_anggaran
+								FROM esakip_data_jadwal
+								WHERE tipe = 'RPJMD'
+								  AND status = 1
+									ORDER BY tahun_anggaran DESC",
+								ARRAY_A
+							);
+							$opsion_jadwal_renstra = "<option value=''>Pilih Periode</option>";
+
+							foreach ($jadwal_renstra as $v_renstra) {
+								if (!empty($v_renstra['tahun_selesai_anggaran']) && $v_renstra['tahun_selesai_anggaran'] > 1) {
+									$tahun_anggaran_selesai = $v_renstra['tahun_selesai_anggaran'];
+								} else {
+									$tahun_anggaran_selesai = $v_renstra['tahun_anggaran'] + $v_renstra['lama_pelaksanaan'];
+								}
+
+								$opsion_jadwal_renstra .= "<option value='". $v_renstra['id'] ."'>". $v_renstra['nama_jadwal_renstra'] ." Periode ". $v_renstra['tahun_anggaran'] ." - ". $tahun_anggaran_selesai ."</option>";
+							}
 							$pengisian_rencana_aksi_setting = $this->functions->generatePage(array(
-								'nama_page' => 'Pengisian Rencana Aksi Setting - ' . $tahun_item['tahun_anggaran'],
-								'content' => '[pengisian_rencana_aksi_setting tahun=' . $tahun_item['tahun_anggaran'] . ']',
+								'nama_page' => 'Pengisian Rencana Aksi Setting ',
+								'content' => '[pengisian_rencana_aksi_setting]',
 								'show_header' => 1,
 								'post_status' => 'private'
 							));
@@ -1056,7 +1082,7 @@ class Wp_Eval_Sakip_Admin
 								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
 								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
 									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $pengisian_rencana_aksi_setting['url'] . '">' . $title . '</a></li>
+										<li><a target="_blank" href="' . $pengisian_rencana_aksi_setting['url'] . '&tahun_anggaran=' . $tahun_item['tahun_anggaran'] . '">' . $title . '</a></li>
 									</ul>
 								</div>
 							</div>';
@@ -1825,32 +1851,16 @@ class Wp_Eval_Sakip_Admin
 			
 		Container::make('theme_options', __('MONEV Rencana Aksi Setting'))
 		->set_page_parent($monev_ren_aksi_menu)
-		// ->add_fields(array(
-		// 	Field::make('html', 'crb_esakip_halaman_terkait')
-		// 		->set_html('
-		// 		<h4>Monev Rencana Aksi Setting</h4>
-		// 		<ol>
-		// 		</ol>'),
-		// 	Field::make('text', 'crb_apikey_esakip', 'API KEY')
-		// 		->set_default_value($this->functions->generateRandomString())
-		// 		->set_help_text('Wajib diisi. API KEY digunakan untuk integrasi data.'),
-		// 	Field::make('html', 'crb_sql_migrate')
-		// 		->set_html('<a onclick="sql_migrate_esakip(); return false;" href="#" class="button button-primary button-large">SQL Migrate</a>')
-		// 		->set_help_text('Tombol untuk memperbaiki struktur database E-SAKIP.'),
-		// 	Field::make('text', 'crb_maksimal_upload_dokumen_esakip', 'Maksimal Upload Dokumen')
-		// 		->set_default_value(10)
-		// 		->set_help_text('Wajib diisi. Setting batas ukuran maksimal untuk upload dokumen. Ukuran dalam MB'),
-		// 	Field::make('text', 'crb_nama_pemda', 'Nama Pemerintah Daerah')
-		// 		->set_help_text('Wajib diisi.'),
-		// ))
 		->add_fields(array(
-			Field::make('html', 'crb_pengisian_monev_setting_hide_sidebar')
+			Field::make('html', 'crb_esakip_halaman_terkait')
 				->set_html('
-				<style>
-					.postbox-container { display: none; }
-					#poststuff #post-body.columns-2 { margin: 0 !important; }
-				</style>
-			')
+				<h4>Monev Rencana Aksi Setting</h4>
+				<ol>
+				</ol>'),
+			Field::make('text', 'crb_url_server_wp_sipd', 'URL Server WP-SIPD')
+				->set_help_text('Wajib diisi. URL Server digunakan untuk integrasi data.'),	
+			Field::make('text', 'crb_apikey_server_wp_sipd', 'APIKEY Server WP-SIPD')
+				->set_help_text('Wajib diisi. API Key digunakan untuk integrasi data.')
 		))
 		->add_fields($this->get_ajax_field(array('type' => 'monev_rencana_aksi_setting')));
 

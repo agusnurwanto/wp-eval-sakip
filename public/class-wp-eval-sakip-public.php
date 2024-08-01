@@ -10809,6 +10809,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$ret['data']['hak_akses_pohon_kinerja'] = (!empty($v_hak_akses['active']) && $v_hak_akses['active'] == 1) ? 'tampil' : 'sembunyi';
 						} else if ($v_hak_akses['nama_tabel'] == 'esakip_capaian_iku_pemda') {
 							$ret['data']['hak_akses_menu_iku'] = (!empty($v_hak_akses['active']) && $v_hak_akses['active'] == 1) ? 'tampil' : 'sembunyi';
+						} else if ($v_hak_akses['nama_tabel'] == 'esakip_pohon_kinerja_opd') {
+							$ret['data']['hak_input_pohon_kinerja'] = (!empty($v_hak_akses['active']) && $v_hak_akses['active'] == 1) ? 'iya' : 'tidak';
 						}
 					}
 				}
@@ -10949,6 +10951,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$menu_dokumen_pohon_kinerja	= trim(htmlspecialchars($_POST['menu_dokumen_pohon_kinerja']));
 					$menu_iku	= trim(htmlspecialchars($_POST['menu_iku']));
 					$langsung_verifikasi= trim(htmlspecialchars($_POST['langsung_verifikasi']));
+					$setting_input_pokin= trim(htmlspecialchars($_POST['setting_input_pokin']));
 
 					$input_menu_dokumen = 0;
 					if ($menu_dokumen == 'tampil') {
@@ -10966,6 +10969,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					}
 
 					$langsung_verifikasi = ($langsung_verifikasi == 'iya') ? 1 : 0;
+
+					$setting_input_pokin = ($setting_input_pokin == 'iya') ? 1 : 0;
 
 					$data_this_id = $wpdb->get_row($wpdb->prepare('SELECT * FROM esakip_data_jadwal WHERE id = %d', $id), ARRAY_A);
 
@@ -11041,6 +11046,28 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$opsi['verifikasi_upload_dokumen'] = 0;
 
 					if (empty($get_akses_user_this_periode_pohon_kinerja)) {
+						$insert = $wpdb->insert(
+							'esakip_menu_dokumen',
+							$opsi,
+							array('%s', '%s', '%s', '%d', '%d', '%s', '%d', '%f', '%d')
+						);
+
+						if (!$insert) {
+							error_log("Error Insert: " . $wpdb->last_error);
+						}
+					}
+					
+					// insert hak input pohon kinerja perangakat daerah per periode
+					$get_data_input_this_periode_pohon_kinerja = $wpdb->get_row($wpdb->prepare('SELECT * FROM esakip_menu_dokumen WHERE nama_tabel=%s AND id_jadwal=%d', 'esakip_pohon_kinerja_opd', $id_jadwal_new), ARRAY_A);
+					$input_akses_user_pohon_kinerja = 3;
+
+					$opsi['nama_tabel']		= 'esakip_pohon_kinerja_opd';
+					$opsi['nama_dokumen']	= 'Penyusunan Pohon Kinerja';
+					$opsi['jenis_role']		= $input_akses_user_pohon_kinerja;
+					$opsi['active']			= $setting_input_pokin;
+					$opsi['verifikasi_upload_dokumen'] = 0;
+
+					if (empty($get_data_input_this_periode_pohon_kinerja)) {
 						$insert = $wpdb->insert(
 							'esakip_menu_dokumen',
 							$opsi,
@@ -11162,6 +11189,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$menu_dokumen_pohon_kinerja	= trim(htmlspecialchars($_POST['menu_dokumen_pohon_kinerja']));
 					$menu_iku	= trim(htmlspecialchars($_POST['menu_iku']));
 					$langsung_verifikasi	= trim(htmlspecialchars($_POST['langsung_verifikasi']));
+					$setting_input_pokin	= trim(htmlspecialchars($_POST['setting_input_pokin']));
 					// $menu_penyusunan_pohon_kinerja_pemda	= trim(htmlspecialchars($_POST['menu_penyusunan_pohon_kinerja_pemda']));
 					// $menu_penyusunan_pohon_kinerja_opd	= trim(htmlspecialchars($_POST['menu_penyusunan_pohon_kinerja_opd']));
 
@@ -11209,6 +11237,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					}
 
 					$langsung_verifikasi = ($langsung_verifikasi == 'iya') ? 1 : 0;
+
+					$setting_input_pokin = ($setting_input_pokin == 'iya') ? 1 : 0;
 
 					$data_this_id = $wpdb->get_row($wpdb->prepare('SELECT * FROM esakip_data_jadwal WHERE id = %d', $id), ARRAY_A);
 
@@ -11283,6 +11313,39 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						}
 					} else {
 						error_log("Gagal Update Data Tidak Ditemukan");
+					}
+
+					// update input pohon kinerja perangkat daerah per periode rpjmd //
+					$get_data_input_this_periode_pohon_kinerja = $wpdb->get_row($wpdb->prepare('SELECT * FROM esakip_menu_dokumen WHERE nama_tabel=%s AND id_jadwal=%d', 'esakip_pohon_kinerja_opd', $id), ARRAY_A);
+					$opsi['nama_tabel']		= 'esakip_pohon_kinerja_opd';
+					$opsi['nama_dokumen']	= 'Penyusunan Pohon Kinerja';
+					$opsi['jenis_role']		= 3;
+					$opsi['active']			= $setting_input_pokin;
+					$opsi['verifikasi_upload_dokumen'] = 0;
+
+					if (!empty($get_data_input_this_periode_pohon_kinerja)) {
+						$update = $wpdb->update(
+							'esakip_menu_dokumen',
+							$opsi,
+							array('id' => $get_data_input_this_periode_pohon_kinerja['id']),
+							array('%s', '%s', '%s', '%d', '%d', '%s', '%d', '%f', '%d'),
+							array('%d')
+						);
+
+						if (!$update) {
+							error_log("Error Update: " . $wpdb->last_error);
+						}
+					} else {
+						$insert = $wpdb->insert(
+							'esakip_menu_dokumen',
+							$opsi,
+							array('%s', '%s', '%s', '%d', '%d', '%s', '%d', '%f', '%d')
+						);
+
+						if (!$insert) {
+							error_log("Error Update: " . $wpdb->last_error);
+						}
+						// error_log("Gagal Update Data Tidak Ditemukan");
 					}
 
 					// update hak akses user IKU per periode rpjmd////////////////////////////////////////////////////////////////////////////////////////////////
@@ -11405,6 +11468,28 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					// Jika data dengan ID yang sama ditemukan di tabel lain, tampilkan pesan
 					$ret['status'] = 'confirm';
 					$ret['message'] = 'Jadwal tidak bisa dihapus karena sudah terpakai di dokumen RPJMD / RPD.';
+				}
+				$cek_id_jadwal_pokin_opd = $wpdb->get_var($wpdb->prepare('
+                    SELECT id_jadwal
+                    FROM esakip_pohon_kinerja_opd
+                    WHERE id_jadwal=%d
+                    	AND active=1
+                ', $id));
+				if ($cek_id_jadwal_pokin_opd) {
+					// Jika data dengan ID yang sama ditemukan di tabel lain, tampilkan pesan
+					$ret['status'] = 'confirm';
+					$ret['message'] = 'Jadwal tidak bisa dihapus karena sudah terpakai di penyusunan Pohon Kinerja OPD.';
+				}
+				$cek_id_jadwal_pokin = $wpdb->get_var($wpdb->prepare('
+                    SELECT id_jadwal
+                    FROM esakip_pohon_kinerja
+                    WHERE id_jadwal=%d
+                    	AND active=1
+                ', $id));
+				if ($cek_id_jadwal_pokin) {
+					// Jika data dengan ID yang sama ditemukan di tabel lain, tampilkan pesan
+					$ret['status'] = 'confirm';
+					$ret['message'] = 'Jadwal tidak bisa dihapus karena sudah terpakai di penyusunan Pohon Kinerja.';
 				}
 				if ($ret['status'] != 'confirm') {
 					// Jika tidak ada data dengan ID yang sama di tabel lain, lanjutkan penghapusan seperti biasa

@@ -4131,7 +4131,11 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 				if (!empty($unit)) {
 					$tbody = '';
-					$counter = 1;
+					$total_level_1 = 0;
+					$total_level_2 = 0;
+					$total_level_3 = 0;
+					$total_level_4 = 0;
+
 					foreach ($unit as $kk => $vv) {
 						$detail_pengisian_rencana_aksi = $this->functions->generatePage(array(
 							'nama_page' => 'Halaman Detail Pengisian Rencana Aksi ' . $tahun_anggaran,
@@ -4140,7 +4144,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							'post_status' => 'private'
 						)); //dokumen_detail_rencana_aksi
 
-						$jumlah_dokumen = $wpdb->get_var(
+						$jumlah_kegiatan_utama = $wpdb->get_var(
 							$wpdb->prepare("
 								SELECT 
 									COUNT(id)
@@ -4152,20 +4156,60 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							", $vv['id_skpd'], $tahun_anggaran)
 						);
 
+						$jumlah_rencana_aksi = $wpdb->get_var(
+							$wpdb->prepare("
+								SELECT 
+									COUNT(id)
+								FROM esakip_data_rencana_aksi_opd
+								WHERE id_skpd = %d
+								  AND tahun_anggaran = %d
+								  AND active = 1
+								  AND level=2
+							", $vv['id_skpd'], $tahun_anggaran)
+						);
+						
+						$jumlah_uraian_kegiatan_rencana_aksi = $wpdb->get_var(
+							$wpdb->prepare("
+								SELECT 
+									COUNT(id)
+								FROM esakip_data_rencana_aksi_opd
+								WHERE id_skpd = %d
+								  AND tahun_anggaran = %d
+								  AND active = 1
+								  AND level=3
+							", $vv['id_skpd'], $tahun_anggaran)
+						);
+						
+						$jumlah_uraian_teknis_kegiatan = $wpdb->get_var(
+							$wpdb->prepare("
+								SELECT 
+									COUNT(id)
+								FROM esakip_data_rencana_aksi_opd
+								WHERE id_skpd = %d
+								  AND tahun_anggaran = %d
+								  AND active = 1
+								  AND level=4
+							", $vv['id_skpd'], $tahun_anggaran)
+						);
+
 						$tbody .= "<tr>";
-						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</td>";
-						$tbody .= "<td class='text-center' style='text-transform: uppercase;'>". $jumlah_dokumen ."</td>";
-
-						$btn = '<div class="btn-action-group">';
-						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_pengisian_rencana_aksi['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
-						$btn .= '</div>';
-
-						$tbody .= "<td>" . $btn . "</td>";
-
+						$tbody .= "<td style='text-transform: uppercase;'><a href='".$detail_pengisian_rencana_aksi['url']."&id_skpd=".$vv['id_skpd']."' target='_blank'>".$vv['kode_skpd']." " . $vv['nama_skpd'] . "</a></td>";
+						$tbody .= "<td class='text-center' style='text-transform: uppercase;'>". $jumlah_kegiatan_utama ."</td>";
+						$tbody .= "<td class='text-center' style='text-transform: uppercase;'>". $jumlah_rencana_aksi ."</td>";
+						$tbody .= "<td class='text-center' style='text-transform: uppercase;'>". $jumlah_uraian_kegiatan_rencana_aksi ."</td>";
+						$tbody .= "<td class='text-center' style='text-transform: uppercase;'>". $jumlah_uraian_teknis_kegiatan ."</td>";
 						$tbody .= "</tr>";
+
+						$total_level_1 += $jumlah_kegiatan_utama;
+						$total_level_2 += $jumlah_rencana_aksi;
+						$total_level_3 += $jumlah_uraian_kegiatan_rencana_aksi;
+						$total_level_4 += $jumlah_uraian_teknis_kegiatan;
 					}
 					$ret['data'] = $tbody;
+					$ret['total_level_1'] = $total_level_1;
+					$ret['total_level_2'] = $total_level_2;
+					$ret['total_level_3'] = $total_level_3;
+					$ret['total_level_4'] = $total_level_4;
 				} else {
 					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}

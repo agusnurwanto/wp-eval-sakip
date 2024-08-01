@@ -1188,3 +1188,14 @@ CREATE TABLE `esakip_data_rencana_aksi_indikator_opd` (
   `realisasi_pagu` double(20, 0) DEFAULT NULL,
   PRIMARY key (id)
 );
+
+CREATE TABLE `esakip_pengaturan_rencana_aksi` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `tahun_anggaran` year(4) NOT NULL DEFAULT '2022',
+  `keterangan` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY  (id)
+);

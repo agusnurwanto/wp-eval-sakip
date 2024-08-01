@@ -1320,6 +1320,31 @@ if(!empty($data_level_pokin)){
 	}
 }
 
+$current_user = wp_get_current_user();
+$user_roles = $current_user->roles;
+$is_admin_panrb = in_array('admin_panrb', $user_roles);
+$is_administrator = in_array('administrator', $user_roles);
+
+    $admin_role_pemda = array(
+        'admin_bappeda',
+        'admin_ortala'
+    );
+
+    $this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? true : false ;
+
+$cek_settingan_menu = $wpdb->get_var(
+	$wpdb->prepare(
+	"SELECT 
+		jenis_role
+	FROM esakip_menu_dokumen 
+	WHERE nama_dokumen='Penyusunan Pohon Kinerja'
+	  AND active = 1
+	  AND id_jadwal=%d
+",$input['periode'])
+);
+
+$hak_akses_user = ($this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? 1 : 0;
+
 ?>
 
 <style type="text/css">
@@ -1598,7 +1623,10 @@ if(!empty($data_level_pokin)){
 <script type="text/javascript">
 jQuery(document).ready(function(){
     run_download_excel_sakip();
-    jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-pohon-kinerja" onclick="return false;" href="#" class="btn btn-primary"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
+	let hak_akses_user = <?php echo $hak_akses_user ?>;
+	if(hak_akses_user == 1){
+		jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-pohon-kinerja" onclick="return false;" href="#" class="btn btn-primary"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
+	}
 
 	jQuery('#table_notifikasi_croscutting').dataTable({   
 		pageLength : 5,

@@ -43,52 +43,49 @@ foreach ($idtahun as $val) {
 	.btn-action-group .btn {
 		margin: 0 5px;
 	}
+	.table_dokumen_skpd thead{
+		position: sticky;
+        top: -6px;
+	}.table_dokumen_skpd thead th{
+		vertical-align: middle;
+	}
+	.table_dokumen_skpd tfoot{
+        position: sticky;
+        bottom: 0;
+    }
+
+	.table_dokumen_skpd tfoot th{
+		vertical-align: middle;
+	}
 </style>
 <div class="container-md">
 	<div class="cetak">
 		<div style="padding: 10px;margin:0 0 3rem 0;">
-			<h1 class="text-center table-title">Pengisian Rencana Aksi Tahun <?php echo $input['tahun']; ?></h1>
+			<h1 class="text-center table-title">Pengisian Rencana Aksi</br>Tahun Anggaran <?php echo $input['tahun']; ?></h1>
+			<div id="action" class="action-section hide-excel"></div>
 			<div class="wrap-table">
-				<table id="table_dokumen_skpd" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
-					<thead>
+				<table id="cetak" title="Rekapitulasi Rencana Aksi Perangkat Daerah" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered table_dokumen_skpd">
+					<thead style="background: #ffc491;">
 						<tr>
-							<th class="text-center">No</th>
 							<th class="text-center">Nama Perangkat Daerah</th>
-							<th class="text-center">Jumlah Rencana Aksi</th>
-							<th class="text-center">Aksi</th>
+							<th class="text-center" width="160px">Kegiatan Utama</th>
+							<th class="text-center" width="160px">Rencana Aksi</th>
+							<th class="text-center" width="160px">Uraian Kegiatan Rencana Aksi</th>
+							<th class="text-center" width="160px">Uraian Teknis Kegiatan</th>
 						</tr>
 					</thead>
 					<tbody>
 					</tbody>
+					<tfoot style="background: #ffc491;">
+						<tr>
+							<th class="text-center">Jumlah</th>
+							<th class="text-center" id="total_kegiatan_utama">0</th>
+							<th class="text-center" id="total_rencana_aksi">0</th>
+							<th class="text-center" id="total_uraian_kegiatan_rencana_aksi">0</th>
+							<th class="text-center" id="total_uraian_teknis_kegiatan">0</th>
+						</tr>
+					</tfoot>
 				</table>
-			</div>
-		</div>
-	</div>
-</div>
-
-<div id="tahunContainer" class="container-md">
-</div>
-
-<div class="modal fade" id="tahunModal" tabindex="-1" role="dialog" aria-labelledby="tahunModalLabel" aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="tahunModalLabel">Pilih Tahun Anggaran</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="modal-body">
-				<form id="tahunForm">
-					<div class="form-group">
-						<label for="tahunAnggaran">Tahun Anggaran:</label>
-						<select class="form-control" id="tahunAnggaran" name="tahunAnggaran">
-							<?php echo $tahun; ?>
-						</select>
-						<input type="hidden" id="idDokumen" value="">
-					</div>
-					<button type="submit" class="btn btn-primary" onclick="submit_tahun_rencana_aksi(); return false">Simpan</button>
-				</form>
 			</div>
 		</div>
 	</div>
@@ -96,6 +93,7 @@ foreach ($idtahun as $val) {
 
 <script>
 	jQuery(document).ready(function() {
+    	run_download_excel_sakip();
 		getTableSkpd();
 	});
 
@@ -114,7 +112,18 @@ foreach ($idtahun as $val) {
 				jQuery('#wrap-loading').hide();
 				console.log(response);
 				if (response.status === 'success') {
-					jQuery('#table_dokumen_skpd tbody').html(response.data);
+					jQuery('#total_kegiatan_utama').html(response.total_level_1);
+					jQuery('#total_rencana_aksi').html(response.total_level_2);
+					jQuery('#total_uraian_kegiatan_rencana_aksi').html(response.total_level_3);
+					jQuery('#total_uraian_teknis_kegiatan').html(response.total_level_4);
+					jQuery('.table_dokumen_skpd tbody').html(response.data);
+					jQuery('.table_dokumen_skpd').dataTable({
+						 aLengthMenu: [
+					        [5, 10, 25, 100, -1],
+					        [5, 10, 25, 100, "All"]
+					    ],
+					    iDisplayLength: -1
+					});
 				} else {
 					alert(response.message);
 				}

@@ -119,7 +119,7 @@ $body = '';
 						<?php echo $select_rpjpd; ?>
 					</select>
 				</div>
-				<div class="card" style="margin: 1.5rem 0;">
+				<div class="card bg-light" style="margin: 1.5rem 0;">
   					<div class="card-body">
 						<div class="form-group">
 							<label class="d-block">Pengaturan Menu Upload Dokumen RENSTRA</label>
@@ -165,7 +165,7 @@ $body = '';
 						</div>
 					</div>
 				</div>
-				<div class="card" style="margin: 1.5rem 0;">
+				<div class="card bg-light" style="margin: 1.5rem 0;">
   					<div class="card-body">
 						<div class="form-group">
 							<label class="d-block">Pengaturan Menu Upload Dokumen Pohon Kinerja dan Cascading</label>
@@ -186,7 +186,7 @@ $body = '';
 							<small class="d-block form-text text-muted">Setting Menu Upload Dokumen Yang Tampil Di Dashboard User Per Periode</small>
 						</div>
 						<div class="form-group" style="margin: 1.5rem 0 0 0;">
-							<label class="d-block">Pengaturan Akses User Upload Dokumen Pohon Kinerja</label>
+							<label class="d-block">Pengaturan Akses User Upload Dokumen Pohon Kinerja dan Cascading</label>
 							<tr>
 								<td>
 									<div class="custom-control custom-radio custom-control-inline">
@@ -211,7 +211,29 @@ $body = '';
 						</div>
 					</div>
 				</div>
-				<div class="card" style="margin: 1.5rem 0;">
+				<div class="card bg-light" style="margin: 1.5rem 0;">
+  					<div class="card-body">
+						<div class="form-group">
+							<label class="d-block">Pengaturan Input Pohon Kinerja Perangkat Daerah</label>
+							<tr>
+								<td>
+									<div class="custom-control custom-radio custom-control-inline">
+										<input class="custom-control-input" type="radio" name="setting_input_pokin" id="setting_input_pokin_buka" value="iya" checked>
+										<label class="custom-control-label" for="setting_input_pokin_buka">Buka Input</label>
+									</div>
+								</td>
+								<td>
+									<div class="custom-control custom-radio custom-control-inline">
+										<input class="custom-control-input" type="radio" name="setting_input_pokin" id="setting_input_pokin_tutup" value="tidak">
+										<label class="custom-control-label" for="setting_input_pokin_tutup">Tutup Input</label>
+									</div>
+								</td>
+							</tr>
+							<small class="d-block form-text text-muted">*Pengaturan ini menentukan buka/tutup input Penyusunan Pohon Kinerja Perangkat Daerah.</small>
+						</div>
+					</div>
+				</div>
+				<div class="card bg-light" style="margin: 1.5rem 0;">
   					<div class="card-body">
 						<div class="form-group">
 							<label class="d-block">Pengaturan Menu IKU</label>
@@ -233,7 +255,7 @@ $body = '';
 						</div>
 					</div>
 				</div>
-				<div class="card" style="margin: 1.5rem 0;">
+				<div class="card bg-light" style="margin: 1.5rem 0;">
   					<div class="card-body">
 						<div class="form-group">
 							<label class="d-block">Pengaturan Verifikasi Upload Dokumen RENSTRA</label>
@@ -412,6 +434,7 @@ $body = '';
 		let menu_dokumen_pohon_kinerja = jQuery("input[name='menu_dokumen_pohon_kinerja']:checked").val();
 		let menu_iku = jQuery("input[name='menu_iku']:checked").val();
 		let langsung_verifikasi = jQuery("input[name='langsung_verifikasi']:checked").val();
+		let setting_input_pokin = jQuery("input[name='setting_input_pokin']:checked").val();
 
 		if (nama_jadwal.trim() == '' || nama_jadwal_renstra == ''|| keterangan == '' || tahun_anggaran == '' || lama_pelaksanaan == '' || jenis_khusus_rpjmd == '' || akses_user == '' || akses_user_pohon_kinerja == '' || menu_dokumen == '' || menu_dokumen_pohon_kinerja == '' || langsung_verifikasi == '') {
 			jQuery("#wrap-loading").hide()
@@ -439,7 +462,8 @@ $body = '';
 					'menu_dokumen': menu_dokumen,
 					'menu_dokumen_pohon_kinerja': menu_dokumen_pohon_kinerja,
 					'menu_iku': menu_iku,
-					'langsung_verifikasi':langsung_verifikasi
+					'langsung_verifikasi':langsung_verifikasi,
+					'setting_input_pokin': setting_input_pokin
 				},
 				beforeSend: function() {
 					jQuery('.submitBtn').attr('disabled', 'disabled')
@@ -524,6 +548,8 @@ $body = '';
 					langsung_verifikasi = 'iya';
 				}
 				jQuery("input[name=langsung_verifikasi][value='"+langsung_verifikasi+"']").prop("checked",true);
+
+				jQuery("input[name=setting_input_pokin][value='"+response.data.hak_input_pohon_kinerja+"']").prop("checked",true);
 			}
 		})
 	}
@@ -543,6 +569,7 @@ $body = '';
 		let menu_dokumen_pohon_kinerja = jQuery("input[name='menu_dokumen_pohon_kinerja']:checked").val();
 		let menu_iku = jQuery("input[name='menu_iku']:checked").val();
 		let langsung_verifikasi = jQuery("input[name='langsung_verifikasi']:checked").val();
+		let setting_input_pokin = jQuery("input[name='setting_input_pokin']:checked").val();
 		// let menu_penyusunan_pohon_kinerja_pemda = jQuery("input[name='menu_penyusunan_pohon_kinerja_pemda']:checked").val();
 		// let menu_penyusunan_pohon_kinerja_opd = jQuery("input[name='menu_penyusunan_pohon_kinerja_opd']:checked").val();
 
@@ -572,7 +599,8 @@ $body = '';
 					'menu_dokumen' : menu_dokumen,
 					'menu_dokumen_pohon_kinerja' : menu_dokumen_pohon_kinerja,
 					'menu_iku': menu_iku,
-					'langsung_verifikasi': langsung_verifikasi
+					'langsung_verifikasi': langsung_verifikasi,
+					'setting_input_pokin': setting_input_pokin
 				},
 				beforeSend: function() {
 					jQuery('.submitBtn').attr('disabled', 'disabled')
