@@ -70,6 +70,7 @@ $body = '';
 					<div class="form-group">
 						<label for='jadwal_tanggal' style='display:inline-block'>Jadwal Pelaksanaan</label>
 						<input type="text" id='jadwal_tanggal' name="datetimes" style='display:block;width:100%;' />
+						<small class="d-block form-text text-muted">*Jadwal Pelaksanaan sementara belum bisa digunakan.</small>
 					</div>
 					<div class="form-group">
 						<label for='keterangan' style='display:inline-block'>Keterangan</label>
