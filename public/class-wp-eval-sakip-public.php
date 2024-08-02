@@ -17434,6 +17434,37 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$title_pengisian_rencana_aksi = 'Pengisian Rencana Aksi';
 		$pengisian_rencana_aksi = '<li><a target="_blank" href="' . $list_skpd_pengisian_rencana_aksi['url'] . '" class="btn btn-primary">' .  $title_pengisian_rencana_aksi . '</a></li>';
 
+		$list_setting_jadwal = '';
+		// jadwal rpjpd
+		$jadwal_rpjpd = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman Jadwal RPJPD',
+			'content' => '[jadwal_rpjpd]',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$list_setting_jadwal .= '<li><a class="btn btn-primary" target="_blank" href="' . $jadwal_rpjpd['url'] . '">' . $jadwal_rpjpd['title'] . '</a></li>';
+
+		$jadwal_rpjmd = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman Jadwal RPJMD / RPD ',
+			'content' => '[jadwal_rpjmd]',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+		$list_setting_jadwal .= '<li><a class="btn btn-primary" target="_blank" href="' . $jadwal_rpjmd['url'] . '">' . $jadwal_rpjmd['title'] . '</a></li>';
+
+		// jadwal verifikasi upload dokumen
+		$no = 0;
+		$get_tahun = $wpdb->get_results('select tahun_anggaran from esakip_data_unit group by tahun_anggaran order by tahun_anggaran DESC', ARRAY_A);
+		foreach ($get_tahun as $k => $v) {
+			$jadwal_verifikasi = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Jadwal Verifikasi Upload Dokumen Tahun Anggaran | ' . $v['tahun_anggaran'],
+				'content' => '[jadwal_verifikasi_upload_dokumen tahun_anggaran="' . $v["tahun_anggaran"] . '"]',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$list_setting_jadwal .= '<li><a class="btn btn-primary" target="_blank" href="' . $jadwal_verifikasi['url'] . '">' . $jadwal_verifikasi['title'] . '</a></li>';
+		}
+
 		if (empty($pengisian_lke)) {
 			$pengisian_lke = '<li><a return="false" href="#" class="btn btn-secondary">Pengisian LKE kosong atau belum dibuat</a></li>';
 		}
@@ -17488,6 +17519,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				<div class="esakip-body-tahun" data-id="pengisian-rencana_aksi">
 					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 						' . $pengisian_rencana_aksi . '
+					</ul>
+				</div>
+			</div>';
+		$halaman_menu_jadwal_admin = '
+			<div class="accordion">
+				<h5 class="esakip-header-tahun" data-id="menu-jadwal-admin" style="margin: 0;">Setting Menu Jadwal</h5>
+				<div class="esakip-body-tahun" data-id="menu-jadwal-admin">
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+						' . $list_setting_jadwal . '
 					</ul>
 				</div>
 			</div>';
@@ -17713,6 +17753,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				echo $halaman_input_rpjpd_rpjmd;
 			}
 			echo '<li>' . $halaman_pengisian_rencana_aksi . '</li>';
+			echo '<li>' . $halaman_menu_jadwal_admin . '</li>';
 			echo '</ul>';
 		} else if (
 			in_array("pa", $user_meta->roles)
