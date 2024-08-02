@@ -245,8 +245,10 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								a.label,
 								a.parent,
 								a.active,
+								a.nomor_urut,
 								b.id AS id_indikator,
-								b.label_indikator_kinerja
+								b.label_indikator_kinerja,
+								b.nomor_urut as nomor_urut_indikator
 							FROM esakip_pohon_kinerja a
 								LEFT JOIN esakip_pohon_kinerja b 
 									ON a.id=b.parent AND a.level=b.level 
@@ -255,7 +257,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								a.parent=%d AND 
 								a.level=%d AND 
 								a.active=%d 
-							ORDER BY a.id",
+							ORDER BY a.nomor_urut ASC, b.nomor_urut ASC",
 							$_POST['id_jadwal'],
 							$_POST['parent'],
 							$_POST['level'],
@@ -269,8 +271,10 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								a.label,
 								a.parent,
 								a.active,
+								a.nomor_urut,
 								b.id AS id_indikator,
-								b.label_indikator_kinerja
+								b.label_indikator_kinerja,
+								b.nomor_urut as nomor_urut_indikator
 							FROM esakip_pohon_kinerja_opd a
 								LEFT JOIN esakip_pohon_kinerja_opd b 
 									ON a.id=b.parent AND a.level=b.level 
@@ -280,7 +284,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								a.level=%d AND 
 								a.active=%d AND 
 								a.id_skpd=%d
-							ORDER BY a.id",
+							ORDER BY a.nomor_urut ASC, b.nomor_urut ASC",
 							$_POST['id_jadwal'],
 							$_POST['parent'],
 							$_POST['level'],
@@ -339,6 +343,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								'label' => $pokin['label'],
 								'parent' => $pokin['parent'],
 								'label_parent_1' => $pokin['label_parent_1'],
+								'nomor_urut' => $pokin['nomor_urut'],
 								'indikator' => []
 							];
 						}
@@ -347,7 +352,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							if (empty($data['data'][$pokin['id']]['indikator'][$pokin['id_indikator']])) {
 								$data['data'][$pokin['id']]['indikator'][$pokin['id_indikator']] = [
 									'id' => $pokin['id_indikator'],
-									'label' => $pokin['label_indikator_kinerja']
+									'label' => $pokin['label_indikator_kinerja'],
+									'nomor_urut' => $pokin['nomor_urut_indikator']
 								];
 							}
 						}
@@ -436,6 +442,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							'parent' => $input['parent'],
 							'level' => $input['level'],
 							'id_jadwal' => $input['id_jadwal'],
+							'nomor_urut' => $input['nomor_urut'],
 							'active' => 1
 						]);
 					} else {
@@ -445,6 +452,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							'parent' => $input['parent'],
 							'level' => $input['level'],
 							'id_jadwal' => $input['id_jadwal'],
+							'nomor_urut' => $input['nomor_urut'],
 							'active' => 1,
 							'id_skpd' => $id_skpd
 						]);
@@ -490,10 +498,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					$data = $wpdb->get_row($wpdb->prepare("
 						SELECT 
-							id, 
-							parent, 
-							level, 
-							label 
+							*
 						FROM esakip_pohon_kinerja$_prefix_opd 
 						WHERE id=%d 
 							AND active=%d$_where_opd
@@ -634,6 +639,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					if (empty($data)) {
 						throw new Exception("Data tidak ditemukan!", 1);
+					}else if(empty($data['nomor_urut'])){
+						$data['nomor_urut'] = $data['id'];
 					}
 
 					echo json_encode([
@@ -692,10 +699,14 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						throw new Exception("Data sudah ada!", 1);
 					}
 
+					if(empty($input['no_urut'])){
+						$input['no_urut'] = $input['id'];
+					}
 					if ($_prefix_opd == '') {
 						// untuk pokin pemda //////////////////////////////////////////////////////////////////////////////
 						$data = $wpdb->update('esakip_pohon_kinerja', [
-							'label' => trim($input['label'])
+							'label' => trim($input['label']),
+							'nomor_urut' => $input['nomor_urut']
 						], [
 							'id' => $input['id']
 						]);
@@ -709,7 +720,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					} else {
 						// untuk pokin opd  //////////////////////////////////////////////////////////////////////////////
 						$data = $wpdb->update('esakip_pohon_kinerja' . $_prefix_opd, [
-							'label' => trim($input['label'])
+							'label' => trim($input['label']),
+							'nomor_urut' => $input['nomor_urut']
 						], [
 							'id' => $input['id'],
 							'id_skpd' => $id_skpd
@@ -900,6 +912,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							'parent' => $input['parent'],
 							'level' => $input['level'],
 							'id_jadwal' => $input['id_jadwal'],
+							'nomor_urut' => $input['nomor_urut'],
 							'active' => 1
 						]);
 					} else {
@@ -909,6 +922,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							'parent' => $input['parent'],
 							'level' => $input['level'],
 							'id_jadwal' => $input['id_jadwal'],
+							'nomor_urut' => $input['nomor_urut'],
 							'active' => 1,
 							'id_skpd' => $id_skpd
 						]);
@@ -960,6 +974,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							a.parent, 
 							a.label_indikator_kinerja, 
 							a.level,
+							a.nomor_urut,
 							b.parent AS parent_all 
 						FROM 
 							esakip_pohon_kinerja$_prefix_opd a
@@ -1037,6 +1052,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						], [
 							'id' => $input['id'],
 							'parent' => $input['parent'],
+							'nomor_urut' => $input['nomor_urut'],
 							'level' => $input['level'],
 						]);
 					} else {
@@ -1045,6 +1061,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						], [
 							'id' => $input['id'],
 							'parent' => $input['parent'],
+							'nomor_urut' => $input['nomor_urut'],
 							'level' => $input['level'],
 							'id_skpd' => $id_skpd
 						]);

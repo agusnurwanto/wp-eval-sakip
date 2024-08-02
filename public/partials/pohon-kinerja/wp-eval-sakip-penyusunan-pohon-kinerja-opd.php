@@ -115,7 +115,7 @@ $pohon_kinerja_level_1 = $wpdb->get_results($wpdb->prepare("
 		AND active=1 
 		AND id_jadwal=%d 
 		AND id_skpd=%d
-	ORDER BY id
+    ORDER BY nomor_urut ASC
 ", $input['periode'], $id_skpd), ARRAY_A);
 if(!empty($pohon_kinerja_level_1)){
 	foreach ($pohon_kinerja_level_1 as $level_1) {
@@ -139,7 +139,7 @@ if(!empty($pohon_kinerja_level_1)){
 				AND active=1 
 				AND id_jadwal=%d  
 				AND id_skpd=%d
-			ORDER BY id
+            ORDER BY nomor_urut ASC
 		", $level_1['id'], $input['periode'], $id_skpd), ARRAY_A);
 		if(!empty($indikator_pohon_kinerja_level_1)){
 			foreach ($indikator_pohon_kinerja_level_1 as $indikator_level_1) {
@@ -166,7 +166,7 @@ if(!empty($pohon_kinerja_level_1)){
 				AND active=1 
 				AND id_jadwal=%d 
 				AND id_skpd=%d 
-			ORDER by id
+            ORDER BY nomor_urut ASC
 		", $level_1['id'], $input['periode'], $id_skpd), ARRAY_A);
 		if(!empty($pohon_kinerja_level_2)){
 			foreach ($pohon_kinerja_level_2 as $level_2) {
@@ -191,7 +191,7 @@ if(!empty($pohon_kinerja_level_1)){
 						AND active=1 
 						AND id_jadwal=%d  
 						AND id_skpd=%d
-					ORDER BY id
+                    ORDER BY nomor_urut ASC
 				", $level_2['id'], $input['periode'], $id_skpd), ARRAY_A);
 				if(!empty($indikator_pohon_kinerja_level_2)){
 					foreach ($indikator_pohon_kinerja_level_2 as $indikator_level_2) {
@@ -344,7 +344,7 @@ if(!empty($pohon_kinerja_level_1)){
 						AND active=1 
 						AND id_jadwal=%d  
 						AND id_skpd=%d
-					ORDER by id
+                    ORDER BY nomor_urut ASC
 				", $level_2['id'], $input['periode'], $id_skpd), ARRAY_A);
 				if(!empty($pohon_kinerja_level_3)){
 					foreach ($pohon_kinerja_level_3 as $level_3) {
@@ -369,7 +369,7 @@ if(!empty($pohon_kinerja_level_1)){
 								AND active=1 
 								AND id_jadwal=%d 
 								AND id_skpd=%d
-							ORDER BY id
+                            ORDER BY nomor_urut ASC
 						", $level_3['id'], $input['periode'], $id_skpd), ARRAY_A);
 						if(!empty($indikator_pohon_kinerja_level_3)){
 							foreach ($indikator_pohon_kinerja_level_3 as $indikator_level_3) {
@@ -521,7 +521,7 @@ if(!empty($pohon_kinerja_level_1)){
 								AND active=1 
 								AND id_jadwal=%d 
 								AND id_skpd=%d
-							ORDER by id
+                            ORDER BY nomor_urut ASC
 						", $level_3['id'], $input['periode'], $id_skpd), ARRAY_A);
 						if(!empty($pohon_kinerja_level_4)){
 							foreach ($pohon_kinerja_level_4 as $level_4) {
@@ -546,7 +546,7 @@ if(!empty($pohon_kinerja_level_1)){
 										AND active=1 
 										AND id_jadwal=%d 
 										AND id_skpd=%d
-									ORDER BY id
+                                    ORDER BY nomor_urut ASC
 								", $level_4['id'], $input['periode'], $id_skpd), ARRAY_A);
 								if(!empty($indikator_pohon_kinerja_level_4)){
 									foreach ($indikator_pohon_kinerja_level_4 as $indikator_level_4) {
@@ -699,7 +699,7 @@ if(!empty($pohon_kinerja_level_1)){
 										AND active=1 
 										AND id_jadwal=%d 
 										AND id_skpd=%d
-									ORDER by id
+                                    ORDER BY nomor_urut ASC
 									", $level_4['id'], $input['periode'], $id_skpd), ARRAY_A);
 								if(!empty($pohon_kinerja_level_5)){
 									foreach ($pohon_kinerja_level_5 as $level_5) {
@@ -723,7 +723,7 @@ if(!empty($pohon_kinerja_level_1)){
 												AND active=1 
 												AND id_jadwal=%d 
 												AND id_skpd=%d
-											ORDER BY id
+											ORDER BY nomor_urut ASC
 											", $level_5['id'], $input['periode'], $id_skpd), ARRAY_A);
 										if(!empty($indikator_pohon_kinerja_level_5)){
 											foreach ($indikator_pohon_kinerja_level_5 as $indikator_level_5) {
@@ -1641,13 +1641,19 @@ jQuery(document).ready(function(){
 
 	jQuery(document).on('click', '#tambah-pokin-level1', function(){
 		jQuery("#modal-crud").find('.modal-title').html('Tambah Pohon Kinerja');
+        var last_urutan = +jQuery(this).attr('last-urutan');
 		jQuery("#modal-crud").find('.modal-body').html(''
 			+'<form id="form-pokin">'
 				+'<input type="hidden" name="parent" value="0">'
 				+'<input type="hidden" name="level" value="1">'
-				+'<div class="form-group">'
-						+'<textarea class="form-control" name="label" placeholder="Tuliskan pohon kinerja level 1..."></textarea>'
-				+'</div>'
+                +`<div class="form-group">`
+                    +'<label for="label-pokin">Label POKIN</label>'
+                    +`<textarea class="form-control" id="label-pokin" name="label" placeholder="Tuliskan pohon kinerja level 1..."></textarea>`
+                +`</div>`
+                +`<div class="form-group">`
+                    +'<label>Nomor Urut</label>'
+                    +`<input type="number" class="form-control" name="nomor_urut" value="${last_urutan+1}">`
+                +`</div>`
 			+'</form>');
 		jQuery("#modal-crud").find('.modal-footer').html(''
 			+'<button type="button" class="btn btn-danger" data-dismiss="modal">'
@@ -1688,7 +1694,7 @@ jQuery(document).ready(function(){
 						+`</div>`
                         +`<div class="form-group">`
                             +'<label>Nomor Urut</label>'
-                            +`<input type="number" class="form-control" name="nomor_urut">${response.data.nomor_urut}</textarea>`
+                            +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
                         +`</div>`
 					+`</form>`);
 				jQuery("#modal-crud").find(`.modal-footer`).html(``
@@ -1735,15 +1741,20 @@ jQuery(document).ready(function(){
 
 	jQuery(document).on('click', '.tambah-indikator-pokin-level1', function(){
 		jQuery("#modal-crud").find('.modal-title').html('Tambah Indikator');
+        var last_urutan = +jQuery(this).attr('last-urutan');
 		jQuery("#modal-crud").find('.modal-body').html(``
 			+`<form id="form-pokin">`
 				+`<input type="hidden" name="parent" value="${jQuery(this).data('id')}">`
 				+`<input type="hidden" name="label" value="${jQuery(this).parent().parent().find('.label-level1').text()}">`
 				+`<input type="hidden" name="level" value="1">`
-				+`<div class="form-group">`
-					+`<label for="indikator-label">${jQuery(this).parent().parent().find('.label-level1').text()}</label>`
-					+`<textarea class="form-control" name="indikator_label" placeholder="Tuliskan indikator..."></textarea>`
-				+`</div>`
+                +`<div class="form-group">`
+                    +'<label for="indikator_label">Label POKIN: '+jQuery(this).parent().parent().find('.label-level1').text()+'</label>'
+                    +`<textarea class="form-control" id="indikator_label" name="indikator_label" placeholder="Tuliskan indikator..."></textarea>`
+                +`</div>`
+                +`<div class="form-group">`
+                    +'<label>Nomor Urut</label>'
+                    +`<input type="number" class="form-control" name="nomor_urut" value="${last_urutan+1}">`
+                +`</div>`
 			+`</form>`);
 		jQuery("#modal-crud").find('.modal-footer').html(``
 			+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
@@ -1778,10 +1789,14 @@ jQuery(document).ready(function(){
 						+`<input type="hidden" name="id" value="${response.data.id}">`
 						+`<input type="hidden" name="parent" value="${response.data.parent}">`
 						+`<input type="hidden" name="level" value="${response.data.level}">`
-						+`<div class="form-group">`
-							+`<label for="indikator-label">${response.data.label}</label>`
-							+`<textarea class="form-control" name="indikator_label">${response.data.label_indikator_kinerja}</textarea>`
-						+`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="indikator_label">Label POKIN: '+response.data.label+'</label>'
+                            +`<textarea class="form-control" id="indikator_label" name="indikator_label" placeholder="Tuliskan indikator...">${response.data.label_indikator_kinerja}</textarea>`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +'<label>Nomor Urut</label>'
+                            +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
+                        +`</div>`
 					+`</form>`);
 				jQuery("#modal-crud").find(`.modal-footer`).html(``
 					+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
@@ -1876,8 +1891,13 @@ jQuery(document).ready(function(){
 						+`<input type="hidden" name="parent" value="${response.data.parent}">`
 						+`<input type="hidden" name="level" value="${response.data.level}">`
 						+`<div class="form-group">`
-							+`<textarea class="form-control" name="label">${response.data.label}</textarea>`
+                            +'<label for="label-pokin">Label POKIN</label>'
+							+`<textarea class="form-control" id="label-pokin" name="label">${response.data.label}</textarea>`
 						+`</div>`
+                        +`<div class="form-group">`
+                            +'<label>Nomor Urut</label>'
+                            +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
+                        +`</div>`
 						+`<div class="custom-control custom-checkbox">`
 							+`<input type="checkbox" class="custom-control-input" name="settingCroscutting" value="false" id="settingCroscutting">`
 							+`<label class="custom-control-label" for="settingCroscutting">Setting Croscutting</label>`
@@ -1959,16 +1979,21 @@ jQuery(document).ready(function(){
 
 	jQuery(document).on('click', '.tambah-indikator-pokin-level2', function(){
 		jQuery("#modal-crud").find('.modal-title').html('Tambah Indikator');
+        var last_urutan = +jQuery(this).attr('last-urutan');
 		jQuery("#modal-crud").find('.modal-body').html(``
 			+`<form id="form-pokin">`
 				+`<input type="hidden" name="parent_all" value="${jQuery(this).data('parent')}">`
 				+`<input type="hidden" name="parent" value="${jQuery(this).data('id')}">`
 				+`<input type="hidden" name="label" value="${jQuery(this).parent().parent().find('.label-level2').text()}">`
 				+`<input type="hidden" name="level" value="2">`
-				+`<div class="form-group">`
-					+`<label for="indikator-label">${jQuery(this).parent().parent().find('.label-level2').text()}</label>`
-					+`<textarea class="form-control" name="indikator_label" placeholder="Tuliskan indikator..."></textarea>`
-				+`</div>`
+                +`<div class="form-group">`
+                    +'<label for="indikator_label">Label POKIN: '+jQuery(this).parent().parent().find('.label-level2').text()+'</label>'
+                    +`<textarea class="form-control" id="indikator_label" name="indikator_label" placeholder="Tuliskan indikator..."></textarea>`
+                +`</div>`
+                +`<div class="form-group">`
+                    +'<label>Nomor Urut</label>'
+                    +`<input type="number" class="form-control" name="nomor_urut" value="${last_urutan+1}">`
+                +`</div>`
 			+`</form>`);
 		jQuery("#modal-crud").find('.modal-footer').html(``
 			+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
@@ -2004,10 +2029,14 @@ jQuery(document).ready(function(){
 						+`<input type="hidden" name="parent_all" value="${response.data.parent_all}">`
 						+`<input type="hidden" name="parent" value="${response.data.parent}">`
 						+`<input type="hidden" name="level" value="${response.data.level}">`
-						+`<div class="form-group">`
-							+`<label for="indikator-label">${response.data.label}</label>`
-							+`<textarea class="form-control" name="indikator_label">${response.data.label_indikator_kinerja}</textarea>`
-						+`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="indikator_label">Label POKIN: '+response.data.label+'</label>'
+                            +`<textarea class="form-control" id="indikator_label" name="indikator_label" placeholder="Tuliskan indikator...">${response.data.label_indikator_kinerja}</textarea>`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +'<label>Nomor Urut</label>'
+                            +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
+                        +`</div>`
 					+`</form>`);
 				jQuery("#modal-crud").find(`.modal-footer`).html(``
 					+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
@@ -2104,9 +2133,14 @@ jQuery(document).ready(function(){
 						+`<input type="hidden" name="id" value="${response.data.id}">`
 						+`<input type="hidden" name="parent" value="${response.data.parent}">`
 						+`<input type="hidden" name="level" value="${response.data.level}">`
-						+`<div class="form-group">`
-							+`<textarea class="form-control" name="label">${response.data.label}</textarea>`
-						+`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="label-pokin">Label POKIN</label>'
+                            +`<textarea class="form-control" id="label-pokin" name="label">${response.data.label}</textarea>`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +'<label>Nomor Urut</label>'
+                            +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
+                        +`</div>`
 						+`<div class="custom-control custom-checkbox">`
 							+`<input type="checkbox" class="custom-control-input" name="settingCroscutting" value="false" id="settingCroscutting">`
 							+`<label class="custom-control-label" for="settingCroscutting">Setting Croscutting</label>`
@@ -2189,16 +2223,21 @@ jQuery(document).ready(function(){
 
 	jQuery(document).on('click', '.tambah-indikator-pokin-level3', function(){
 		jQuery("#modal-crud").find('.modal-title').html('Tambah Indikator');
+        var last_urutan = +jQuery(this).attr('last-urutan');
 		jQuery("#modal-crud").find('.modal-body').html(``
 			+`<form id="form-pokin">`
 				+`<input type="hidden" name="parent_all" value="${jQuery(this).data('parent')}">`
 				+`<input type="hidden" name="parent" value="${jQuery(this).data('id')}">`
 				+`<input type="hidden" name="label" value="${jQuery(this).parent().parent().find('.label-level3').text()}">`
 				+`<input type="hidden" name="level" value="3">`
-				+`<div class="form-group">`
-					+`<label for="indikator-label">${jQuery(this).parent().parent().find('.label-level3').text()}</label>`
-					+`<textarea class="form-control" name="indikator_label" placeholder="Tuliskan indikator..."></textarea>`
-				+`</div>`
+                +`<div class="form-group">`
+                    +'<label for="indikator_label">Label POKIN: '+jQuery(this).parent().parent().find('.label-level3').text()+'</label>'
+                    +`<textarea class="form-control" id="indikator_label" name="indikator_label" placeholder="Tuliskan indikator..."></textarea>`
+                +`</div>`
+                +`<div class="form-group">`
+                    +'<label>Nomor Urut</label>'
+                    +`<input type="number" class="form-control" name="nomor_urut" value="${last_urutan+1}">`
+                +`</div>`
 			+`</form>`);
 		jQuery("#modal-crud").find('.modal-footer').html(``
 			+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
@@ -2234,10 +2273,14 @@ jQuery(document).ready(function(){
 						+`<input type="hidden" name="parent_all" value="${response.data.parent_all}">`
 						+`<input type="hidden" name="parent" value="${response.data.parent}">`
 						+`<input type="hidden" name="level" value="${response.data.level}">`
-						+`<div class="form-group">`
-							+`<label for="indikator-label">${response.data.label}</label>`
-							+`<textarea class="form-control" name="indikator_label">${response.data.label_indikator_kinerja}</textarea>`
-						+`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="indikator_label">Label POKIN: '+response.data.label+'</label>'
+                            +`<textarea class="form-control" id="indikator_label" name="indikator_label" placeholder="Tuliskan indikator...">${response.data.label_indikator_kinerja}</textarea>`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +'<label>Nomor Urut</label>'
+                            +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
+                        +`</div>`
 					+`</form>`);
 				jQuery("#modal-crud").find(`.modal-footer`).html(``
 					+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
@@ -2334,9 +2377,14 @@ jQuery(document).ready(function(){
 						+`<input type="hidden" name="id" value="${response.data.id}">`
 						+`<input type="hidden" name="parent" value="${response.data.parent}">`
 						+`<input type="hidden" name="level" value="${response.data.level}">`
-						+`<div class="form-group">`
-							+`<textarea class="form-control" name="label">${response.data.label}</textarea>`
-						+`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="label-pokin">Label POKIN</label>'
+                            +`<textarea class="form-control" id="label-pokin" name="label">${response.data.label}</textarea>`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +'<label>Nomor Urut</label>'
+                            +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
+                        +`</div>`
 						+`<div class="custom-control custom-checkbox">`
 							+`<input type="checkbox" class="custom-control-input" name="settingCroscutting" value="false" id="settingCroscutting">`
 							+`<label class="custom-control-label" for="settingCroscutting">Setting Croscutting</label>`
@@ -2426,16 +2474,21 @@ jQuery(document).ready(function(){
 
 	jQuery(document).on('click', '.tambah-indikator-pokin-level4', function(){
 		jQuery("#modal-crud").find('.modal-title').html('Tambah Indikator');
+        var last_urutan = +jQuery(this).attr('last-urutan');
 		jQuery("#modal-crud").find('.modal-body').html(``
 			+`<form id="form-pokin">`
 				+`<input type="hidden" name="parent_all" value="${jQuery(this).data('parent')}">`
 				+`<input type="hidden" name="parent" value="${jQuery(this).data('id')}">`
 				+`<input type="hidden" name="label" value="${jQuery(this).parent().parent().find('.label-level4').text()}">`
 				+`<input type="hidden" name="level" value="4">`
-				+`<div class="form-group">`
-					+`<label for="indikator-label">${jQuery(this).parent().parent().find('.label-level4').text()}</label>`
-					+`<textarea class="form-control" name="indikator_label" placeholder="Tuliskan indikator..."></textarea>`
-				+`</div>`
+                +`<div class="form-group">`
+                    +'<label for="indikator_label">Label POKIN: '+jQuery(this).parent().parent().find('.label-level4').text()+'</label>'
+                    +`<textarea class="form-control" id="indikator_label" name="indikator_label" placeholder="Tuliskan indikator..."></textarea>`
+                +`</div>`
+                +`<div class="form-group">`
+                    +'<label>Nomor Urut</label>'
+                    +`<input type="number" class="form-control" name="nomor_urut" value="${last_urutan+1}">`
+                +`</div>`
 			+`</form>`);
 		jQuery("#modal-crud").find('.modal-footer').html(``
 			+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
@@ -2471,10 +2524,14 @@ jQuery(document).ready(function(){
 						+`<input type="hidden" name="parent_all" value="${response.data.parent_all}">`
 						+`<input type="hidden" name="parent" value="${response.data.parent}">`
 						+`<input type="hidden" name="level" value="${response.data.level}">`
-						+`<div class="form-group">`
-							+`<label for="indikator-label">${response.data.label}</label>`
-							+`<textarea class="form-control" name="indikator_label">${response.data.label_indikator_kinerja}</textarea>`
-						+`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="indikator_label">Label POKIN: '+response.data.label+'</label>'
+                            +`<textarea class="form-control" id="indikator_label" name="indikator_label" placeholder="Tuliskan indikator...">${response.data.label_indikator_kinerja}</textarea>`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +'<label>Nomor Urut</label>'
+                            +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
+                        +`</div>`
 					+`</form>`);
 				jQuery("#modal-crud").find(`.modal-footer`).html(``
 					+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
@@ -2571,9 +2628,14 @@ jQuery(document).ready(function(){
 						+`<input type="hidden" name="id" value="${response.data.id}">`
 						+`<input type="hidden" name="parent" value="${response.data.parent}">`
 						+`<input type="hidden" name="level" value="${response.data.level}">`
-						+`<div class="form-group">`
-							+`<textarea class="form-control" name="label">${response.data.label}</textarea>`
-						+`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="label-pokin">Label POKIN</label>'
+                            +`<textarea class="form-control" id="label-pokin" name="label">${response.data.label}</textarea>`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +'<label>Nomor Urut</label>'
+                            +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
+                        +`</div>`
 						+`<div class="custom-control custom-checkbox">`
 							+`<input type="checkbox" class="custom-control-input" name="settingCroscutting" value="false" id="settingCroscutting">`
 							+`<label class="custom-control-label" for="settingCroscutting">Setting Croscutting</label>`
@@ -2655,16 +2717,21 @@ jQuery(document).ready(function(){
 
 	jQuery(document).on('click', '.tambah-indikator-pokin-level5', function(){
 		jQuery("#modal-crud").find('.modal-title').html('Tambah Indikator');
+        var last_urutan = +jQuery(this).attr('last-urutan');
 		jQuery("#modal-crud").find('.modal-body').html(``
 			+`<form id="form-pokin">`
 				+`<input type="hidden" name="parent_all" value="${jQuery(this).data('parent')}">`
 				+`<input type="hidden" name="parent" value="${jQuery(this).data('id')}">`
 				+`<input type="hidden" name="label" value="${jQuery(this).parent().parent().find('.label-level5').text()}">`
 				+`<input type="hidden" name="level" value="5">`
-				+`<div class="form-group">`
-					+`<label for="indikator-label">${jQuery(this).parent().parent().find('.label-level5').text()}</label>`
-					+`<textarea class="form-control" name="indikator_label" placeholder="Tuliskan indikator..."></textarea>`
-				+`</div>`
+                +`<div class="form-group">`
+                    +'<label for="indikator_label">Label POKIN: '+jQuery(this).parent().parent().find('.label-level5').text()+'</label>'
+                    +`<textarea class="form-control" id="indikator_label" name="indikator_label" placeholder="Tuliskan indikator..."></textarea>`
+                +`</div>`
+                +`<div class="form-group">`
+                    +'<label>Nomor Urut</label>'
+                    +`<input type="number" class="form-control" name="nomor_urut" value="${last_urutan+1}">`
+                +`</div>`
 			+`</form>`);
 		jQuery("#modal-crud").find('.modal-footer').html(``
 			+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
@@ -2700,10 +2767,14 @@ jQuery(document).ready(function(){
 						+`<input type="hidden" name="parent_all" value="${response.data.parent_all}">`
 						+`<input type="hidden" name="parent" value="${response.data.parent}">`
 						+`<input type="hidden" name="level" value="${response.data.level}">`
-						+`<div class="form-group">`
-							+`<label for="indikator-label">${response.data.label}</label>`
-							+`<textarea class="form-control" name="indikator_label">${response.data.label_indikator_kinerja}</textarea>`
-						+`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="indikator_label">Label POKIN: '+response.data.label+'</label>'
+                            +`<textarea class="form-control" id="indikator_label" name="indikator_label" placeholder="Tuliskan indikator...">${response.data.label_indikator_kinerja}</textarea>`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +'<label>Nomor Urut</label>'
+                            +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
+                        +`</div>`
 					+`</form>`);
 				jQuery("#modal-crud").find(`.modal-footer`).html(``
 					+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
@@ -3173,7 +3244,7 @@ function pokinLevel1(){
           		jQuery('#wrap-loading').hide();
           		let level1 = ``
 	          		+`<div style="margin-top:10px">`
-          				+`<button type="button" class="btn btn-success mb-2" id="tambah-pokin-level1"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
+          				+`<button type="button" class="btn btn-success mb-2" id="tambah-pokin-level1" last-urutan="${res.data[res.data.length-1].nomor_urut}"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
 	          		+`</div>`
 	          		+`<table class="table" id="pokinLevel1">`
 	          			+`<thead>`
@@ -3185,19 +3256,23 @@ function pokinLevel1(){
 	          			+`</thead>`
 	          			+`<tbody>`;
 			          		res.data.map(function(value, index){
+                                let indikator = Object.values(value.indikator);
+                                var last_urutan = 0;
+                                if(indikator.length > 0){
+                                    var last_urutan = indikator[indikator.length-1].nomor_urut;
+                                }
 			          			level1 += ``
 				          			+`<tr id="pokinLevel1_${value.id}">`
 					          			+`<td class="text-center">${index+1}</td>`
 					          			+`<td class="label-level1">${value.label}</td>`
 					          			+`<td class="text-center">`
-					          				+`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-success tambah-indikator-pokin-level1" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
+					          				+`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-success tambah-indikator-pokin-level1" title="Tambah Indikator" last-urutan="${last_urutan}"><i class="dashicons dashicons-plus"></i></a> `
 					          				+`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning view-pokin-level2" title="Lihat pohon kinerja level 2"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
 				          					+`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-primary edit-pokin-level1" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`
 				          					+`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger hapus-pokin-level1" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
 					          			+`</td>`
 					          		+`</tr>`;
 
-					          	let indikator = Object.values(value.indikator);
 					          	if(indikator.length > 0){
 									indikator.map(function(indikator_value, indikator_index){
 										level1 += ``
@@ -3245,7 +3320,7 @@ function pokinLevel2(params){
           		jQuery('#wrap-loading').hide();
           		let level2 = ``
 	          		+`<div style="margin-top:10px">`
-          				+`<button type="button" data-parent="${parent}" class="btn btn-success mb-2" id="tambah-pokin-level2"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
+          				+`<button type="button" data-parent="${parent}" class="btn btn-success mb-2" id="tambah-pokin-level2"><i class="dashicons dashicons-plus" style="margin-top: 2px;" last-urutan="${res.data[res.data.length-1].nomor_urut}"></i>Tambah Data</button>`
 	          		+`</div>`
 	          		+`<table class="table">`
       					+`<thead>`;
@@ -3270,12 +3345,17 @@ function pokinLevel2(params){
 	          			+`</thead>`
 	          			+`<tbody>`;
 			          		res.data.map(function(value, index){
+					          	let indikator = Object.values(value.indikator);
+                                var last_urutan = 0;
+                                if(indikator.length > 0){
+                                    var last_urutan = indikator[indikator.length-1].nomor_urut;
+                                }
 			          			level2 += ``
 				          			+`<tr>`
 					          			+`<td class="text-center">${index+1}</td>`
 					          			+`<td class="label-level2">${value.label}</td>`
 					          			+`<td class="text-center">`
-					          				+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-success tambah-indikator-pokin-level2" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
+					          				+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-success tambah-indikator-pokin-level2" title="Tambah Indikator" last-urutan="${last_urutan}"><i class="dashicons dashicons-plus"></i></a> `
 					          				+`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning view-pokin-level3" title="Lihat pohon kinerja level 3"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
 				          					+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-primary edit-pokin-level2" title="Edit"><i class="dashicons dashicons-edit"></i></a> `
 				          					+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-danger hapus-pokin-level2" title="Hapus"><i class="dashicons dashicons-trash"></i></a> `
@@ -3285,7 +3365,6 @@ function pokinLevel2(params){
 					          			+`</td>`
 					          		+`</tr>`;
 
-					          	let indikator = Object.values(value.indikator);
 					          	if(indikator.length > 0){
 									indikator.map(function(indikator_value, indikator_index){
 										level2 += ``
@@ -3333,7 +3412,7 @@ function pokinLevel3(params){
           		jQuery('#wrap-loading').hide();
           		let level3 = ``
 	          		+`<div style="margin-top:10px">`
-          				+`<button type="button" data-parent="${parent}" class="btn btn-success mb-2" id="tambah-pokin-level3"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
+          				+`<button type="button" data-parent="${parent}" class="btn btn-success mb-2" id="tambah-pokin-level3"><i class="dashicons dashicons-plus" style="margin-top: 2px;" last-urutan="${res.data[res.data.length-1].nomor_urut}"></i>Tambah Data</button>`
 	          		+`</div>`
 	          		+`<table class="table">`
       					+`<thead>`;
@@ -3358,19 +3437,23 @@ function pokinLevel3(params){
 	          			+`</thead>`
 	          			+`<tbody>`;
 			          		res.data.map(function(value, index){
+                                let indikator = Object.values(value.indikator);
+                                var last_urutan = 0;
+                                if(indikator.length > 0){
+                                    var last_urutan = indikator[indikator.length-1].nomor_urut;
+                                }
 			          			level3 += ``
 				          			+`<tr>`
 					          			+`<td class="text-center">${index+1}</td>`
 					          			+`<td class="label-level3">${value.label}</td>`
 					          			+`<td class="text-center">`
-					          				+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-success tambah-indikator-pokin-level3" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
+					          				+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-success tambah-indikator-pokin-level3" title="Tambah Indikator" last-urutan="${last_urutan}"><i class="dashicons dashicons-plus"></i></a> `
 					          				+`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning view-pokin-level4" title="Lihat pohon kinerja level 4"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
 				          					+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-primary edit-pokin-level3" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`
 				          					+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-danger hapus-pokin-level3" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
 					          			+`</td>`
 					          		+`</tr>`;
 
-					          	let indikator = Object.values(value.indikator);
 					          	if(indikator.length > 0){
 									indikator.map(function(indikator_value, indikator_index){
 										level3 += ``
@@ -3418,7 +3501,7 @@ function pokinLevel4(params){
           		jQuery('#wrap-loading').hide();
           		let level4 = ``
 	          		+`<div style="margin-top:10px">`
-          				+`<button type="button" data-parent="${parent}" class="btn btn-success mb-2" id="tambah-pokin-level4"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
+          				+`<button type="button" data-parent="${parent}" class="btn btn-success mb-2" id="tambah-pokin-level4"><i class="dashicons dashicons-plus" style="margin-top: 2px;" last-urutan="${res.data[res.data.length-1].nomor_urut}"></i>Tambah Data</button>`
 	          		+`</div>`
 	          		+`<table class="table">`
       					+`<thead>`;
@@ -3443,19 +3526,23 @@ function pokinLevel4(params){
 	          			+`</thead>`
 	          			+`<tbody>`;
 			          		res.data.map(function(value, index){
+                                let indikator = Object.values(value.indikator);
+                                var last_urutan = 0;
+                                if(indikator.length > 0){
+                                    var last_urutan = indikator[indikator.length-1].nomor_urut;
+                                }
 			          			level4 += ``
 				          			+`<tr>`
 					          			+`<td class="text-center">${index+1}</td>`
 					          			+`<td class="label-level4">${value.label}</td>`
 					          			+`<td class="text-center">`
-					          				+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-success tambah-indikator-pokin-level4" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
+					          				+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-success tambah-indikator-pokin-level4" title="Tambah Indikator" last-urutan="${last_urutan}"><i class="dashicons dashicons-plus"></i></a> `
 											+`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning view-pokin-level5" title="Lihat pohon kinerja level 5"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
 					          				+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-primary edit-pokin-level4" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`
 				          					+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-danger hapus-pokin-level4" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
 					          			+`</td>`
 					          		+`</tr>`;
 
-					          	let indikator = Object.values(value.indikator);
 					          	if(indikator.length > 0){
 									indikator.map(function(indikator_value, indikator_index){
 										level4 += ``
@@ -3503,7 +3590,7 @@ function pokinLevel5(params){
           		jQuery('#wrap-loading').hide();
           		let level5 = ``
 	          		+`<div style="margin-top:10px">`
-          				+`<button type="button" data-parent="${parent}" class="btn btn-success mb-2" id="tambah-pokin-level5"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
+          				+`<button type="button" data-parent="${parent}" class="btn btn-success mb-2" id="tambah-pokin-level5"><i class="dashicons dashicons-plus" style="margin-top: 2px;" last-urutan="${res.data[res.data.length-1].nomor_urut}"></i>Tambah Data</button>`
 	          		+`</div>`
 	          		+`<table class="table">`
       					+`<thead>`;
@@ -3528,18 +3615,22 @@ function pokinLevel5(params){
 	          			+`</thead>`
 	          			+`<tbody>`;
 			          		res.data.map(function(value, index){
+                                let indikator = Object.values(value.indikator);
+                                var last_urutan = 0;
+                                if(indikator.length > 0){
+                                    var last_urutan = indikator[indikator.length-1].nomor_urut;
+                                }
 			          			level5 += ``
 				          			+`<tr>`
 					          			+`<td class="text-center">${index+1}</td>`
 					          			+`<td class="label-level5">${value.label}</td>`
 					          			+`<td class="text-center">`
-					          				+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-success tambah-indikator-pokin-level5" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
+					          				+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-success tambah-indikator-pokin-level5" title="Tambah Indikator" last-urutan="${last_urutan}"><i class="dashicons dashicons-plus"></i></a> `
 					          				+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-primary edit-pokin-level5" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`
 				          					+`<a href="javascript:void(0)" data-id="${value.id}" data-parent="${value.parent}" class="btn btn-sm btn-danger hapus-pokin-level5" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
 					          			+`</td>`
 					          		+`</tr>`;
 
-					          	let indikator = Object.values(value.indikator);
 					          	if(indikator.length > 0){
 									indikator.map(function(indikator_value, indikator_index){
 										level5 += ``
