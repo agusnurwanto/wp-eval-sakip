@@ -250,8 +250,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								b.label_indikator_kinerja,
 								b.nomor_urut as nomor_urut_indikator
 							FROM esakip_pohon_kinerja a
-								LEFT JOIN esakip_pohon_kinerja b 
-									ON a.id=b.parent AND a.level=b.level 
+							LEFT JOIN esakip_pohon_kinerja b ON a.id=b.parent AND a.level=b.level 
 							WHERE 
 								a.id_jadwal=%d AND 
 								a.parent=%d AND 
@@ -276,8 +275,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								b.label_indikator_kinerja,
 								b.nomor_urut as nomor_urut_indikator
 							FROM esakip_pohon_kinerja_opd a
-								LEFT JOIN esakip_pohon_kinerja_opd b 
-									ON a.id=b.parent AND a.level=b.level 
+							LEFT JOIN esakip_pohon_kinerja_opd b ON a.id=b.parent AND a.level=b.level 
 							WHERE 
 								a.id_jadwal=%d AND 
 								a.parent=%d AND 
@@ -305,7 +303,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 										a.id_jadwal=%d AND 
 										a.id=%d AND
 										a.active=%d
-									ORDER BY a.id",
+									ORDER BY a.nomor_urut ASC",
 								$_POST['id_jadwal'],
 								$_POST['parent'],
 								1
@@ -323,7 +321,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 										a.id=%d AND
 										a.active=%d AND 
 										a.id_skpd=%d
-									ORDER BY a.id",
+									ORDER BY a.nomor_urut ASC",
 								$_POST['id_jadwal'],
 								$_POST['parent'],
 								1,
@@ -349,8 +347,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						}
 
 						if (!empty($pokin['id_indikator'])) {
-							if (empty($data['data'][$pokin['id']]['indikator'][$pokin['id_indikator']])) {
-								$data['data'][$pokin['id']]['indikator'][$pokin['id_indikator']] = [
+							if (empty($data['data'][$pokin['id']]['indikator'][$pokin['id_indikator'].' '.$pokin['nomor_urut_indikator']])) {
+								$data['data'][$pokin['id']]['indikator'][$pokin['id_indikator'].' '.$pokin['nomor_urut_indikator']] = [
 									'id' => $pokin['id_indikator'],
 									'label' => $pokin['label_indikator_kinerja'],
 									'nomor_urut' => $pokin['nomor_urut_indikator']
@@ -1049,19 +1047,19 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						// untuk pemda
 						$data = $wpdb->update('esakip_pohon_kinerja', [
 							'label_indikator_kinerja' => trim($input['indikator_label']),
+							'nomor_urut' => $input['nomor_urut'],
 						], [
 							'id' => $input['id'],
 							'parent' => $input['parent'],
-							'nomor_urut' => $input['nomor_urut'],
 							'level' => $input['level'],
 						]);
 					} else {
 						$data = $wpdb->update('esakip_pohon_kinerja' . $_prefix_opd, [
 							'label_indikator_kinerja' => trim($input['indikator_label']),
+							'nomor_urut' => $input['nomor_urut'],
 						], [
 							'id' => $input['id'],
 							'parent' => $input['parent'],
-							'nomor_urut' => $input['nomor_urut'],
 							'level' => $input['level'],
 							'id_skpd' => $id_skpd
 						]);
