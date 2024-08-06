@@ -2732,7 +2732,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					AND active=1 
 					AND id_jadwal=%d 
 					$where_skpd
-				ORDER BY id
+				ORDER BY nomor_urut
 			", $opsi['id'], $opsi['level'], $opsi['periode']), ARRAY_A);
 		} else {
 			$pohon_kinerja = $wpdb->get_results($wpdb->prepare("
@@ -2744,13 +2744,13 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					AND active=1 
 					AND id_jadwal=%d
 					$where_skpd
-				ORDER BY id
+				ORDER BY nomor_urut
 			", $opsi['id'], $opsi['level'], $opsi['periode']), ARRAY_A);
 		}
 		if (!empty($pohon_kinerja)) {
 			foreach ($pohon_kinerja as $level) {
-				if (empty($data_ret[trim($level['label'])])) {
-					$data_ret[trim($level['label'])] = [
+				if (empty($data_ret[$level['id']])) {
+					$data_ret[$level['id']] = [
 						'id' => $level['id'],
 						'label' => $level['label'],
 						'level' => $level['level'],
@@ -2769,13 +2769,13 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						AND active=1 
 						AND id_jadwal=%d
 						$where_skpd
-					ORDER BY id
+					ORDER BY nomor_urut
 				", $level['id'], $level['level'], $opsi['periode']), ARRAY_A);
 				if (!empty($indikator_pohon_kinerja_level)) {
 					foreach ($indikator_pohon_kinerja_level as $indikator_level) {
 						if (!empty($indikator_level['label_indikator_kinerja'])) {
-							if (empty($data_ret[trim($level['label'])]['indikator'][(trim($indikator_level['label_indikator_kinerja']))])) {
-								$data_ret[trim($level['label'])]['indikator'][(trim($indikator_level['label_indikator_kinerja']))] = [
+							if (empty($data_ret[$level['id']]['indikator'][$indikator_level['id']])) {
+								$data_ret[$level['id']]['indikator'][$indikator_level['id']] = [
 									'id' => $indikator_level['id'],
 									'parent' => $indikator_level['parent'],
 									'label_indikator_kinerja' => $indikator_level['label_indikator_kinerja'],
@@ -2898,8 +2898,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									$id_level_1_parent = $data_parent_tujuan['data'];
 								}
 
-								if (empty($data_ret[trim($level['label'])]['croscutting'][$key_croscutting_level])) {
-									$data_ret[trim($level['label'])]['croscutting'][$key_croscutting_level] = [
+								if (empty($data_ret[$level['id']]['croscutting'][$key_croscutting_level])) {
+									$data_ret[$level['id']]['croscutting'][$key_croscutting_level] = [
 										'id' => $croscutting_level['id'],
 										'parent_pohon_kinerja' => $croscutting_level['parent_pohon_kinerja'],
 										'keterangan' => $croscutting_level['keterangan'],
@@ -2928,7 +2928,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 				) {
 					$opsi['id'] = $level['id'];
 					$opsi['level'] = $level['level'] + 1;
-					$data_ret[trim($level['label'])]['data'] = $this->get_pokin($opsi);
+					$data_ret[$level['id']]['data'] = $this->get_pokin($opsi);
 				}
 			}
 		}

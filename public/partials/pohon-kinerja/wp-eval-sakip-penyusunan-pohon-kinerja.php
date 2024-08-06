@@ -43,7 +43,7 @@ $pohon_kinerja_level_1 = $wpdb->get_results($wpdb->prepare("
 		AND level=1 
 		AND active=1 
 		AND id_jadwal=%d 
-	ORDER BY id
+	ORDER BY nomor_urut
 ", $input['periode']), ARRAY_A);
 if(!empty($pohon_kinerja_level_1)){
 	foreach ($pohon_kinerja_level_1 as $level_1) {
@@ -66,7 +66,7 @@ if(!empty($pohon_kinerja_level_1)){
 				AND level=1 
 				AND active=1 
 				AND id_jadwal=%d 
-			ORDER BY id
+			ORDER BY nomor_urut
 		", $level_1['id'], $input['periode']), ARRAY_A);
 		if(!empty($indikator_pohon_kinerja_level_1)){
 			foreach ($indikator_pohon_kinerja_level_1 as $indikator_level_1) {
@@ -92,7 +92,7 @@ if(!empty($pohon_kinerja_level_1)){
 				AND level=2
 				AND active=1 
 				AND id_jadwal=%d 
-			ORDER by id
+			ORDER by nomor_urut
 		", $level_1['id'], $input['periode']), ARRAY_A);
 		if(!empty($pohon_kinerja_level_2)){
 			foreach ($pohon_kinerja_level_2 as $level_2) {
@@ -115,7 +115,7 @@ if(!empty($pohon_kinerja_level_1)){
 						AND level=2 
 						AND active=1 
 						AND id_jadwal=%d 
-					ORDER BY id
+					ORDER BY nomor_urut
 				", $level_2['id'], $input['periode']), ARRAY_A);
 				if(!empty($indikator_pohon_kinerja_level_2)){
 					foreach ($indikator_pohon_kinerja_level_2 as $indikator_level_2) {
@@ -141,7 +141,7 @@ if(!empty($pohon_kinerja_level_1)){
 						AND level=3 
 						AND active=1 
 						AND id_jadwal=%d 
-					ORDER by id
+					ORDER by nomor_urut
 				", $level_2['id'], $input['periode']), ARRAY_A);
 				if(!empty($pohon_kinerja_level_3)){
 					foreach ($pohon_kinerja_level_3 as $level_3) {
@@ -164,7 +164,7 @@ if(!empty($pohon_kinerja_level_1)){
 								AND level=3 
 								AND active=1 
 								AND id_jadwal=%d
-							ORDER BY id
+							ORDER BY nomor_urut
 						", $level_3['id'], $input['periode']), ARRAY_A);
 						if(!empty($indikator_pohon_kinerja_level_3)){
 							foreach ($indikator_pohon_kinerja_level_3 as $indikator_level_3) {
@@ -190,7 +190,7 @@ if(!empty($pohon_kinerja_level_1)){
 								AND level=4
 								AND active=1 
 								AND id_jadwal=%d
-							ORDER by id
+							ORDER by nomor_urut
 						", $level_3['id'], $input['periode']), ARRAY_A);
 						if(!empty($pohon_kinerja_level_4)){
 							foreach ($pohon_kinerja_level_4 as $level_4) {
@@ -212,7 +212,7 @@ if(!empty($pohon_kinerja_level_1)){
 										AND level=4 
 										AND active=1 
 										AND id_jadwal=%d
-									ORDER BY id
+									ORDER BY nomor_urut
 								", $level_4['id'], $input['periode']), ARRAY_A);
 								if(!empty($indikator_pohon_kinerja_level_4)){
 									foreach ($indikator_pohon_kinerja_level_4 as $indikator_level_4) {
