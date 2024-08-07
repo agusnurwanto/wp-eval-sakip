@@ -119,14 +119,19 @@ $pohon_kinerja_level_1 = $wpdb->get_results($wpdb->prepare("
 ", $input['periode'], $id_skpd), ARRAY_A);
 if(!empty($pohon_kinerja_level_1)){
 	foreach ($pohon_kinerja_level_1 as $level_1) {
-		if(empty($data_all['data'][trim($level_1['label'])])){
-			$data_all['data'][trim($level_1['label'])] = [
+		if(empty($data_all['data'][$level_1['id']])){
+			$data_all['data'][$level_1['id']] = [
 				'id' => $level_1['id'],
 				'label' => $level_1['label'],
 				'level' => $level_1['level'],
 				'indikator' => array(),
 				'data' => array()
 			];
+            if(empty($level_1['nomor_urut'])){
+                $level_1['nomor_urut'] = count($data_all['data']);
+                $wpdb->update('esakip_pohon_kinerja_opd', array('nomor_urut' => $level_1['nomor_urut']), array(
+                    'id' => $level_1['id']));
+            }
 		}
 
 		// indikator pokin level 1
@@ -144,13 +149,18 @@ if(!empty($pohon_kinerja_level_1)){
 		if(!empty($indikator_pohon_kinerja_level_1)){
 			foreach ($indikator_pohon_kinerja_level_1 as $indikator_level_1) {
 				if(!empty($indikator_level_1['label_indikator_kinerja'])){
-					if(empty($data_all['data'][trim($level_1['label'])]['indikator'][(trim($indikator_level_1['label_indikator_kinerja']))])){
-						$data_all['data'][trim($level_1['label'])]['indikator'][(trim($indikator_level_1['label_indikator_kinerja']))] = [
+					if(empty($data_all['data'][$level_1['id']]['indikator'][$indikator_level_1['id']])){
+						$data_all['data'][$level_1['id']]['indikator'][$indikator_level_1['id']] = [
 							'id' => $indikator_level_1['id'],
 							'parent' => $indikator_level_1['parent'],
 							'label_indikator_kinerja' => $indikator_level_1['label_indikator_kinerja'],
 							'level' => $indikator_level_1['level']
 						];
+                        if(empty($indikator_level_1['nomor_urut'])){
+                            $indikator_level_1['nomor_urut'] = count($data_all['data'][$level_1['id']]['indikator']);
+                            $wpdb->update('esakip_pohon_kinerja_opd', array('nomor_urut' => $indikator_level_1['nomor_urut']), array(
+                                'id' => $indikator_level_1['id']));
+                        }
 					}
 				}
 			}
@@ -170,8 +180,8 @@ if(!empty($pohon_kinerja_level_1)){
 		", $level_1['id'], $input['periode'], $id_skpd), ARRAY_A);
 		if(!empty($pohon_kinerja_level_2)){
 			foreach ($pohon_kinerja_level_2 as $level_2) {
-				if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])])){
-					$data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])] = [
+				if(empty($data_all['data'][$level_1['id']]['data'][$level_2['id']])){
+					$data_all['data'][$level_1['id']]['data'][$level_2['id']] = [
 						'id' => $level_2['id'],
 						'label' => $level_2['label'],
 						'level' => $level_2['level'],
@@ -179,6 +189,11 @@ if(!empty($pohon_kinerja_level_1)){
 						'croscutting' => array(),
 						'data' => array()
 					];
+                    if(empty($level_2['nomor_urut'])){
+                        $level_2['nomor_urut'] = count($data_all['data'][$level_1['id']]['data']);
+                        $wpdb->update('esakip_pohon_kinerja_opd', array('nomor_urut' => $level_2['nomor_urut']), array(
+                            'id' => $level_2['id']));
+                    }
 				}
 
 				// indikator pokin level 2
@@ -196,13 +211,18 @@ if(!empty($pohon_kinerja_level_1)){
 				if(!empty($indikator_pohon_kinerja_level_2)){
 					foreach ($indikator_pohon_kinerja_level_2 as $indikator_level_2) {
 						if(!empty($indikator_level_2['label_indikator_kinerja'])){
-							if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['indikator'][(trim($indikator_level_2['label_indikator_kinerja']))])){
-								$data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['indikator'][(trim($indikator_level_2['label_indikator_kinerja']))] = [
+							if(empty($data_all['data'][$level_1['id']]['data'][$level_2['id']]['indikator'][$indikator_level_2['id']])){
+								$data_all['data'][$level_1['id']]['data'][$level_2['id']]['indikator'][$indikator_level_2['id']] = [
 									'id' => $indikator_level_2['id'],
 									'parent' => $indikator_level_2['parent'],
 									'label_indikator_kinerja' => $indikator_level_2['label_indikator_kinerja'],
 									'level' => $indikator_level_2['level']
 								];
+                                if(empty($indikator_level_2['nomor_urut'])){
+                                    $indikator_level_2['nomor_urut'] = count($data_all['data'][$level_1['id']]['data'][$level_2['id']]['indikator']);
+                                    $wpdb->update('esakip_pohon_kinerja_opd', array('nomor_urut' => $indikator_level_2['nomor_urut']), array(
+                                        'id' => $indikator_level_2['id']));
+                                }
 							}
 						}
 					}
@@ -316,8 +336,8 @@ if(!empty($pohon_kinerja_level_1)){
 								$id_level_1_parent = $data_parent_tujuan['data'];
 							}	
 
-							if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['croscutting'][$key_croscutting_level_2])){
-								$data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['croscutting'][$key_croscutting_level_2] = [
+							if(empty($data_all['data'][$level_1['id']]['data'][$level_2['id']]['croscutting'][$key_croscutting_level_2])){
+								$data_all['data'][$level_1['id']]['data'][$level_2['id']]['croscutting'][$key_croscutting_level_2] = [
 									'id' => $croscutting_level_2['id'],
 									'parent_pohon_kinerja' => $croscutting_level_2['parent_pohon_kinerja'],
 									'keterangan' => $croscutting_level_2['keterangan'],
@@ -348,8 +368,8 @@ if(!empty($pohon_kinerja_level_1)){
 				", $level_2['id'], $input['periode'], $id_skpd), ARRAY_A);
 				if(!empty($pohon_kinerja_level_3)){
 					foreach ($pohon_kinerja_level_3 as $level_3) {
-						if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])])){
-							$data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])] = [
+						if(empty($data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']])){
+							$data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']] = [
 								'id' => $level_3['id'],
 								'label' => $level_3['label'],
 								'level' => $level_3['level'],
@@ -357,6 +377,11 @@ if(!empty($pohon_kinerja_level_1)){
 								'croscutting' => array(),
 								'data' => array()
 							];
+                            if(empty($level_3['nomor_urut'])){
+                                $level_3['nomor_urut'] = count($data_all['data'][$level_1['id']]['data'][$level_2['id']]['data']);
+                                $wpdb->update('esakip_pohon_kinerja_opd', array('nomor_urut' => $level_3['nomor_urut']), array(
+                                    'id' => $level_3['id']));
+                            }
 						}
 
 						// indikator pokin level 3
@@ -374,13 +399,18 @@ if(!empty($pohon_kinerja_level_1)){
 						if(!empty($indikator_pohon_kinerja_level_3)){
 							foreach ($indikator_pohon_kinerja_level_3 as $indikator_level_3) {
 								if(!empty($indikator_level_3['label_indikator_kinerja'])){
-									if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['indikator'][(trim($indikator_level_3['label_indikator_kinerja']))])){
-										$data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['indikator'][(trim($indikator_level_3['label_indikator_kinerja']))] = [
+									if(empty($data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['indikator'][$indikator_level_3['label_indikator_kinerja']])){
+										$data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['indikator'][$indikator_level_3['label_indikator_kinerja']] = [
 											'id' => $indikator_level_3['id'],
 											'parent' => $indikator_level_3['parent'],
 											'label_indikator_kinerja' => $indikator_level_3['label_indikator_kinerja'],
 											'level' => $indikator_level_3['level']
 										];
+                                        if(empty($indikator_level_3['nomor_urut'])){
+                                            $indikator_level_3['nomor_urut'] = count($data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['indikator']);
+                                            $wpdb->update('esakip_pohon_kinerja_opd', array('nomor_urut' => $indikator_level_3['nomor_urut']), array(
+                                                'id' => $indikator_level_3['id']));
+                                        }
 									}
 								}
 							}
@@ -493,8 +523,8 @@ if(!empty($pohon_kinerja_level_1)){
 										$id_level_1_parent = $data_parent_tujuan['data'];
 									}	
 
-									if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['croscutting'][$key_croscutting_level_3])){
-										$data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['croscutting'][$key_croscutting_level_3] = [
+									if(empty($data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['croscutting'][$key_croscutting_level_3])){
+										$data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['croscutting'][$key_croscutting_level_3] = [
 											'id' => $croscutting_level_3['id'],
 											'parent_pohon_kinerja' => $croscutting_level_3['parent_pohon_kinerja'],
 											'keterangan' => $croscutting_level_3['keterangan'],
@@ -525,8 +555,8 @@ if(!empty($pohon_kinerja_level_1)){
 						", $level_3['id'], $input['periode'], $id_skpd), ARRAY_A);
 						if(!empty($pohon_kinerja_level_4)){
 							foreach ($pohon_kinerja_level_4 as $level_4) {
-								if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])])){
-									$data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])] = [
+								if(empty($data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']])){
+									$data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']] = [
 										'id' => $level_4['id'],
 										'label' => $level_4['label'],
 										'level' => $level_4['level'],
@@ -534,6 +564,11 @@ if(!empty($pohon_kinerja_level_1)){
 										'data' => array(),
 										'croscutting' => array()
 									];
+                                    if(empty($level_4['nomor_urut'])){
+                                        $level_4['nomor_urut'] = count($data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['data']);
+                                        $wpdb->update('esakip_pohon_kinerja_opd', array('nomor_urut' => $level_4['nomor_urut']), array(
+                                            'id' => $level_4['id']));
+                                    }
 								}
 
 								// indikator pokin level 4
@@ -551,13 +586,18 @@ if(!empty($pohon_kinerja_level_1)){
 								if(!empty($indikator_pohon_kinerja_level_4)){
 									foreach ($indikator_pohon_kinerja_level_4 as $indikator_level_4) {
 										if(!empty($indikator_level_4['label_indikator_kinerja'])){
-											if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['indikator'][(trim($indikator_level_4['label_indikator_kinerja']))])){
-												$data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['indikator'][(trim($indikator_level_4['label_indikator_kinerja']))] = [
+											if(empty($data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['indikator'][$indikator_level_4['id']])){
+												$data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['indikator'][$indikator_level_4['id']] = [
 													'id' => $indikator_level_4['id'],
 													'parent' => $indikator_level_4['parent'],
 													'label_indikator_kinerja' => $indikator_level_4['label_indikator_kinerja'],
 													'level' => $indikator_level_4['level']
 												];
+                                                if(empty($indikator_level_4['nomor_urut'])){
+                                                    $indikator_level_4['nomor_urut'] = count($data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['indikator']);
+                                                    $wpdb->update('esakip_pohon_kinerja_opd', array('nomor_urut' => $indikator_level_4['nomor_urut']), array(
+                                                        'id' => $indikator_level_4['id']));
+                                                }
 											}
 										}
 									}
@@ -671,8 +711,8 @@ if(!empty($pohon_kinerja_level_1)){
 												$id_level_1_parent = $data_parent_tujuan['data'];
 											}
 
-											if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['croscutting'][$key_croscutting_level_4])){
-												$data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['croscutting'][$key_croscutting_level_4] = [
+											if(empty($data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['croscutting'][$key_croscutting_level_4])){
+												$data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['croscutting'][$key_croscutting_level_4] = [
 													'id' => $croscutting_level_4['id'],
 													'parent_pohon_kinerja' => $croscutting_level_4['parent_pohon_kinerja'],
 													'keterangan' => $croscutting_level_4['keterangan'],
@@ -703,14 +743,19 @@ if(!empty($pohon_kinerja_level_1)){
 									", $level_4['id'], $input['periode'], $id_skpd), ARRAY_A);
 								if(!empty($pohon_kinerja_level_5)){
 									foreach ($pohon_kinerja_level_5 as $level_5) {
-										if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['data'][trim($level_5['label'])])){
-											$data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['data'][trim($level_5['label'])] = [
+										if(empty($data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['data'][$level_5['id']])){
+											$data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['data'][$level_5['id']] = [
 												'id' => $level_5['id'],
 												'label' => $level_5['label'],
 												'level' => $level_5['level'],
 												'indikator' => array(),
 												'croscutting' => array()
 											];
+                                            if(empty($level_5['nomor_urut'])){
+                                                $level_5['nomor_urut'] = count($data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['data']);
+                                                $wpdb->update('esakip_pohon_kinerja_opd', array('nomor_urut' => $level_5['nomor_urut']), array(
+                                                    'id' => $level_5['id']));
+                                            }
 										}
 
 										// indikator pokin level 5
@@ -728,13 +773,18 @@ if(!empty($pohon_kinerja_level_1)){
 										if(!empty($indikator_pohon_kinerja_level_5)){
 											foreach ($indikator_pohon_kinerja_level_5 as $indikator_level_5) {
 												if(!empty($indikator_level_5['label_indikator_kinerja'])){
-													if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['data'][trim($level_5['label'])]['indikator'][(trim($indikator_level_5['label_indikator_kinerja']))])){
-														$data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['data'][trim($level_5['label'])]['indikator'][(trim($indikator_level_5['label_indikator_kinerja']))] = [
-														'id' => $indikator_level_5['id'],
-														'parent' => $indikator_level_5['parent'],
-														'label_indikator_kinerja' => $indikator_level_5['label_indikator_kinerja'],
-														'level' => $indikator_level_5['level']
+													if(empty($data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['data'][$level_5['id']]['indikator'][$indikator_level_5['id']])){
+														$data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['data'][$level_5['id']]['indikator'][$indikator_level_5['id']] = [
+    														'id' => $indikator_level_5['id'],
+    														'parent' => $indikator_level_5['parent'],
+    														'label_indikator_kinerja' => $indikator_level_5['label_indikator_kinerja'],
+    														'level' => $indikator_level_5['level']
 														];
+                                                        if(empty($indikator_level_5['nomor_urut'])){
+                                                            $indikator_level_5['nomor_urut'] = count($data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['data'][$level_5['id']]['indikator']);
+                                                            $wpdb->update('esakip_pohon_kinerja_opd', array('nomor_urut' => $indikator_level_5['nomor_urut']), array(
+                                                                'id' => $indikator_level_5['id']));
+                                                        }
 													}
 												}
 											}
@@ -848,8 +898,8 @@ if(!empty($pohon_kinerja_level_1)){
 					
 													}
 
-													if(empty($data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['data'][trim($level_5['label'])]['croscutting'][$key_croscutting_level_5])){
-														$data_all['data'][trim($level_1['label'])]['data'][trim($level_2['label'])]['data'][trim($level_3['label'])]['data'][trim($level_4['label'])]['data'][trim($level_5['label'])]['croscutting'][$key_croscutting_level_5] = [
+													if(empty($data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['data'][$level_5['id']]['croscutting'][$key_croscutting_level_5])){
+														$data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['data'][$level_5['id']]['croscutting'][$key_croscutting_level_5] = [
 															'id' => $croscutting_level_5['id'],
 															'parent_pohon_kinerja' => $croscutting_level_5['parent_pohon_kinerja'],
 															'keterangan' => $croscutting_level_5['keterangan'],
