@@ -135,7 +135,7 @@ $is_administrator = in_array('administrator', $user_roles);
         <div style="padding: 10px;margin:0 0 3rem 0;">
             <h1 class="text-center" style="margin:3rem;">Rencana Aksi <br><?php echo $skpd['nama_skpd'] ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
             <?php if (!$is_admin_panrb && $hak_akses_user): ?>
-            <div id="action" class="action-section hide-excel"></div>
+                <div id="action" class="action-section hide-excel"></div>
             <?php endif; ?>
             <div class="wrap-table">
                 <table cellpadding="2" cellspacing="0" class="table_dokumen_rencana_aksi table table-bordered">
@@ -413,8 +413,8 @@ function simpan_indikator_renaksi(tipe){
 };
 
 function tambah_rencana_aksi(){
-    // get_tujuan_sasaran_cascading('sasaran')
-    // .then(function(){
+    return get_tujuan_sasaran_cascading('sasaran')
+    .then(function(){
         return new Promise(function(resolve, reject){
             jQuery('#wrap-loading').show();
             jQuery.ajax({
@@ -454,11 +454,11 @@ function tambah_rencana_aksi(){
                             +`<div class="form-group">`
                                 +`<textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan Kegiatan Utama..."></textarea>`
                             +`</div>`
-                            // +`<div class="form-group">`
-                            //     +`<label for="sasaran-cascading">Pilih Sasaran Cascading</label>`
-                            //     +`<select class="form-control" name="sasaran-cascading" id="sasaran-cascading">`
-                            //     +`</select>`
-                            // +`</div>`
+                            +`<div class="form-group">`
+                                +`<label for="sasaran-cascading">Pilih Sasaran Cascading</label>`
+                                +`<select class="form-control" name="cascading-renstra" id="cascading-renstra">`
+                                +`</select>`
+                            +`</div>`
                         +`</form>`);
                     jQuery("#modal-crud").find('.modal-footer').html(''
                         +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
@@ -473,44 +473,133 @@ function tambah_rencana_aksi(){
                     jQuery('#pokin-level-1').select2({width: '100%'});
                     jQuery('#pokin-level-2').select2({width: '100%',placeholder: "Pilih Pokin Level 2"}).place;
 
-                    // if(data_sasaran_cascasding != undefined){
-                    //     let html_cascading = '<option value="">Pilih Sasaran Cascading</option>';
-                    //     data_sasaran_cascasding.data.map(function(value, index){
-                    //         if(value.id_unik_indikator == null){
-                    //             html_cascading += '<option value="'+value.id+'">'+value.sasaran_teks+'</option>';
-                    //         }
-                    //     });
-                    //     jQuery("#sasaran-cascading").html(html_cascading);
-                    //     jQuery('#sasaran-cascading').select2({width: '100%'});
-                    // }
+                    if(data_sasaran_cascading != undefined){
+                        let html_cascading = '<option value="">Pilih Sasaran Cascading</option>';
+                        data_sasaran_cascading.data.map(function(value, index){
+                            if(value.id_unik_indikator == null){
+                                html_cascading += '<option value="'+value.kode_bidang_urusan+'">'+value.kode_bidang_urusan+' '+value.sasaran_teks+'</option>';
+                            }
+                        });
+                        jQuery("#cascading-renstra").html(html_cascading);
+                        jQuery('#cascading-renstra').select2({width: '100%'});
+                    }
 
                     resolve();
                 }
-            // });
+            });
         });
     });
 }
 
-function get_tujuan_sasaran_cascading(jenis='sasaran'){
+function get_tujuan_sasaran_cascading(jenis='sasaran', parent_cascading='x.xx'){
     return new Promise(function(resolve, reject){
-        if(typeof data_sasaran_cascasding == 'undefined'){
-            jQuery('#wrap-loading').show();
-            jQuery.ajax({
-                url: esakip.url,
-                type: "post",
-                data: {
-                    "action": 'get_tujuan_sasaran_cascading',
-                    "api_key": esakip.api_key,
-                    "id_skpd": <?php echo $id_skpd; ?>,
-                    "tahun_anggaran": <?php echo $input['tahun']; ?>,
-                    "jenis": jenis
-                },
-                dataType: "json",
-                success: function(response){
-                    window.data_sasaran_cascasding = response;
-                    resolve();
-                }
-            });
+        if(jenis == 'sasaran'){
+            if(typeof data_sasaran_cascading == 'undefined'){
+                jQuery('#wrap-loading').show();
+                jQuery.ajax({
+                    url: esakip.url,
+                    type: "post",
+                    data: {
+                        "action": 'get_tujuan_sasaran_cascading',
+                        "api_key": esakip.api_key,
+                        "id_skpd": <?php echo $id_skpd; ?>,
+                        "tahun_anggaran": <?php echo $input['tahun']; ?>,
+                        "jenis": jenis
+                    },
+                    dataType: "json",
+                    success: function(response){
+                        if(response.status){
+                            window.data_sasaran_cascading = response;
+                        }else{
+                            alert("Data cascading tidak ditemukan")
+                        }
+                        resolve();
+                    }
+                });
+            }else{
+                resolve();
+            }
+        }else if(jenis == 'program'){
+            if(typeof data_program_cascading == 'undefined'){
+                jQuery('#wrap-loading').show();
+                jQuery.ajax({
+                    url: esakip.url,
+                    type: "post",
+                    data: {
+                        "action": 'get_tujuan_sasaran_cascading',
+                        "api_key": esakip.api_key,
+                        "id_skpd": <?php echo $id_skpd; ?>,
+                        "tahun_anggaran": <?php echo $input['tahun']; ?>,
+                        "jenis": jenis,
+                        "parent_cascading": parent_cascading
+                    },
+                    dataType: "json",
+                    success: function(response){
+                        if(response.status){
+                            window.data_program_cascading = response;
+                        }else{
+                            alert("Data cascading tidak ditemukan")
+                        }
+                        resolve();
+                    }
+                });
+            }else{
+                resolve();
+            }
+        }else if(jenis == 'kegiatan'){
+            if(typeof data_kegiatan_cascading == 'undefined'){
+                jQuery('#wrap-loading').show();
+                jQuery.ajax({
+                    url: esakip.url,
+                    type: "post",
+                    data: {
+                        "action": 'get_tujuan_sasaran_cascading',
+                        "api_key": esakip.api_key,
+                        "id_skpd": <?php echo $id_skpd; ?>,
+                        "tahun_anggaran": <?php echo $input['tahun']; ?>,
+                        "jenis": jenis,
+                        "parent_cascading": parent_cascading
+                    },
+                    dataType: "json",
+                    success: function(response){
+                        if(response.status){
+                            window.data_kegiatan_cascading = response;
+                        }else{
+                            alert("Data cascading tidak ditemukan")
+                        }
+                        resolve();
+                    }
+                });
+            }else{
+                resolve();
+            }
+        }else if(jenis == 'sub_kegiatan'){
+            if(typeof data_sub_kegiatan_cascading == 'undefined'){
+                jQuery('#wrap-loading').show();
+                jQuery.ajax({
+                    url: esakip.url,
+                    type: "post",
+                    data: {
+                        "action": 'get_tujuan_sasaran_cascading',
+                        "api_key": esakip.api_key,
+                        "id_skpd": <?php echo $id_skpd; ?>,
+                        "tahun_anggaran": <?php echo $input['tahun']; ?>,
+                        "jenis": jenis,
+                        "parent_cascading": parent_cascading
+                    },
+                    dataType: "json",
+                    success: function(response){
+                        if(response.status){
+                            window.data_sub_kegiatan_cascading = response;
+                        }else{
+                            alert("Data cascading tidak ditemukan")
+                        }
+                        resolve();
+                    }
+                });
+            }else{
+                resolve();
+            }
         }else{
             resolve();
         }
@@ -541,6 +630,7 @@ function edit_rencana_aksi(id, tipe){
                         jQuery('#pokin-level-2').attr('val-id', response.data.id_pokin_2);
                         jQuery('#pokin-level-1').val(response.data.id_pokin_1).trigger('change');
                         jQuery('#label_renaksi').val(response.data.label);
+                        jQuery('#cascading-renstra').val(response.data.kode_cascading_sasaran).trigger('change');
                     }
                 }
             });
@@ -567,10 +657,17 @@ function edit_rencana_aksi(id, tipe){
                         if(tipe == 2){
                             jQuery("#modal-crud").find('.modal-title').html('Edit Rencana Aksi');
                             jQuery('#pokin-level-1').val(response.data.id_pokin_3).trigger('change');
+                            jQuery('#cascading-renstra').val(response.data.kode_cascading_program).trigger('change');
                         }else if(tipe == 3){
                             jQuery("#modal-crud").find('.modal-title').html('Edit Uraian Rencana Aksi');
                             jQuery('#pokin-level-2').attr('val-id', response.data.id_pokin_5);
                             jQuery('#pokin-level-1').val(response.data.id_pokin_4).trigger('change');
+                            jQuery('#cascading-renstra').val(response.data.kode_cascading_kegiatan).trigger('change');
+                        }else if(tipe == 4){
+                            jQuery("#modal-crud").find('.modal-title').html('Edit Uraian Teknis Kegiatan');
+                            jQuery('#pokin-level-2').attr('val-id', response.data.id_pokin_5);
+                            jQuery('#pokin-level-1').val(response.data.id_pokin_5).trigger('change');
+                            jQuery('#cascading-renstra').val(response.data.kode_cascading_sub_kegiatan).trigger('change');
                         }
                         jQuery('#label_renaksi').val(response.data.label);
                     }
@@ -656,7 +753,7 @@ function kegiatanUtama(){
                                         +`<td class="label_renaksi">${value.label}</td>`
                                         +`<td class="text-center">`
                                             +`<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, 1)" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
-                                            +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, 2, ${value.id_pokin_2})" title="Lihat Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
+                                            +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, 2, ${value.id_pokin_2}, '${value.kode_cascading_sasaran}')" title="Lihat Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
                                             +`<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, 1)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`
                                             +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_rencana_aksi(${value.id}, 1)" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
                                         +`</td>`
@@ -1066,7 +1163,7 @@ function hapus_rencana_aksi(id, tipe){
     }
 }
 
-function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
+function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading){
     jQuery("#wrap-loading").show();
     return new Promise(function(resolve, reject){
         var title = '';
@@ -1085,7 +1182,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
             fungsi_tambah = 'tambah_renaksi_2';
         }else if(tipe == 3){
             id_tabel = 'tabel_uraian_rencana_aksi';
-            title = 'Uraian Rencana Aksi';
+            title = 'Uraian Kegiatan Rencana Aksi';
             fungsi_tambah = 'tambah_renaksi_2';
         }else if(tipe == 4){
             id_tabel = 'tabel_uraian_teknis_kegiatan';
@@ -1113,7 +1210,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
                     +`<div style="margin-top:10px">`
                         +`<button type="button" class="btn btn-success mb-2" onclick="`+fungsi_tambah+`(`+tipe+`);"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data `+title+`</button>`
                     +`</div>`
-                    +'<table class="table" id="'+id_tabel+'" parent_renaksi="'+parent_renaksi+'" parent_pokin="'+parent_pokin+'">'
+                    +'<table class="table" id="'+id_tabel+'" parent_renaksi="'+parent_renaksi+'" parent_pokin="'+parent_pokin+'" parent_cascading="'+parent_cascading+'">'
                         +`<thead>`
                             +`<tr class="table-secondary">`
                                 +`<th class="text-center" style="width:40px;">No</th>`
@@ -1127,25 +1224,29 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
                                 var label_pokin = '';
                                 var id_pokin = 0;
                                 var tombol_detail = '';
+                                var id_parent_cascading = 0;
                                 if(tipe == 1){
                                     label_pokin = value['label_pokin_2'];
                                     id_pokin = value['id_pokin_2'];
+                                    id_parent_cascading = value['kode_cascading_sasaran'];
                                     tombol_detail = ''
-                                        +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, `+(tipe+1)+`, `+id_pokin+`)" title="Lihat Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
+                                        +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, `+(tipe+1)+`, `+id_pokin+`, '`+id_parent_cascading+`')" title="Lihat Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                                 }else if(tipe == 2){
                                     label_pokin = value['label_pokin_3'];
                                     id_pokin = value['id_pokin_3'];
+                                    id_parent_cascading = value['kode_cascading_program'];
                                     tombol_detail = ''
-                                        +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, `+(tipe+1)+`, `+id_pokin+`)" title="Lihat Uraian Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
+                                        +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, `+(tipe+1)+`, `+id_pokin+`, '`+id_parent_cascading+`')" title="Lihat Uraian Kegiatan Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                                 }else if(tipe == 3){
                                     label_pokin = value['label_pokin_4'];
+                                    id_parent_cascading = value['kode_cascading_kegiatan'];
                                     id_pokin = value['id_pokin_4'];
                                     // if(value['id_pokin_5'] != ''){
                                     //     label_pokin = value['label_pokin_5'];
                                     //     id_pokin = value['id_pokin_5'];
                                     // }
                                     tombol_detail = ''
-                                        +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, `+(tipe+1)+`, `+id_pokin+`)" title="Lihat Teknis Kegiatan"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
+                                        +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, `+(tipe+1)+`, `+id_pokin+`, '`+id_parent_cascading+`')" title="Lihat Uraian Teknis Kegiatan"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                                 }else if(tipe == 4){
                                     label_pokin = value['label_pokin_5'];
                                     id_pokin = value['id_pokin_5'];
@@ -1230,75 +1331,134 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
 }
 
 function tambah_renaksi_2(tipe){
-    return new Promise(function(resolve, reject){
-        var parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
-        var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
-        var level_pokin = 3;
-        var title = 'Rencana Aksi';
-        if(tipe == 3){
-            level_pokin = 4;
-            title = 'Uraian Rencana Aksi';
-            parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
-            parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
-        }else if(tipe == 4){
-            level_pokin = 5;
-            title = 'Uraian Teknis Kegiatan';
-            parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
-            parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
-        }
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: "post",
-            data: {
-                "action": "get_data_pokin",
-                "level": level_pokin,
-                "parent": parent_pokin,
-                "api_key": esakip.api_key,
-                "tipe_pokin": "opd",
-                "id_jadwal": <?php echo $id_jadwal; ?>,
-                "id_skpd": <?php echo $id_skpd; ?>
-            },
-            dataType: "json",
-            success: function(res){
-                var html = '<option value="">Pilih Pokin Level '+level_pokin+'</option>';
-                res.data.map(function(value, index){
-                    html += '<option value="'+value.id+'">'+value.label+'</option>';
-                });
-                jQuery('#wrap-loading').hide();
-                jQuery("#modal-crud").find('.modal-title').html('Tambah '+title);
-                var pokin_5 = '';
-                var onchange_pokin = '';
-                jQuery("#modal-crud").find('.modal-body').html(''
-                    +'<form>'
-                        +'<input type="hidden" id="id_renaksi" value=""/>'
-                        +'<div class="form-group">'
-                            +'<label for="pokin-level-1">Pilih Pokin Level '+level_pokin+'</label>'
-                            +'<select class="form-control" name="pokin-level-1" id="pokin-level-1" '+onchange_pokin+'>'
-                                +html
-                            +'</select>'
-                        +'</div>'
-                        +pokin_5
-                        +'<div class="form-group">'
-                            +'<textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan '+title+'..."></textarea>'
-                        +'</div>'
-                    +'</form>');
-                jQuery("#modal-crud").find('.modal-footer').html(''
-                    +'<button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>'
-                    +'<button type="button" class="btn btn-success" onclick="simpan_data_renaksi('+tipe+')">'
-                        +'Simpan'
-                    +'</button>');
-                jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
-                jQuery("#modal-crud").find('.modal-dialog').css('width','');
-                jQuery("#modal-crud").modal('show');
-                jQuery('#pokin-level-1').select2({width: '100%'});
-                if(tipe == 3){
-                    jQuery('#pokin-level-2').select2({width: '100%'});
-                }
-                resolve();
+    let jenis = '';
+    let parent_cascading = '';
+    let jenis_cascading = '';
+    switch (tipe) {
+        case 3:
+            jenis = "kegiatan";
+            jenis_cascading = "Kegiatan";
+            parent_cascading = jQuery('#tabel_uraian_rencana_aksi').attr('parent_cascading');
+            break;
+
+        case 4:
+            jenis = "sub_kegiatan";
+            jenis_cascading = "Sub Kegiatan";
+            parent_cascading = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_cascading');
+            break;
+    
+        default:
+            jenis = "program";
+            jenis_cascading = "Program";
+            parent_cascading = jQuery('#tabel_rencana_aksi').attr('parent_cascading');
+            break;
+    }
+
+    return get_tujuan_sasaran_cascading(jenis, parent_cascading)
+    .then(function(){
+        return new Promise(function(resolve, reject){
+            var parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
+            var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
+            var level_pokin = 3;
+            var title = 'Rencana Aksi';
+            let data_cascading = 'data_program_cascading' in window ? data_program_cascading : '';
+            if(tipe == 3){
+                level_pokin = 4;
+                title = 'Uraian Rencana Aksi';
+                parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
+                parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
+                data_cascading = data_kegiatan_cascading;
+            }else if(tipe == 4){
+                level_pokin = 5;
+                title = 'Uraian Teknis Kegiatan';
+                parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
+                parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
+                data_cascading = data_sub_kegiatan_cascading;
             }
+            jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                url: esakip.url,
+                type: "post",
+                data: {
+                    "action": "get_data_pokin",
+                    "level": level_pokin,
+                    "parent": parent_pokin,
+                    "api_key": esakip.api_key,
+                    "tipe_pokin": "opd",
+                    "id_jadwal": <?php echo $id_jadwal; ?>,
+                    "id_skpd": <?php echo $id_skpd; ?>
+                },
+                dataType: "json",
+                success: function(res){
+                    var html = '<option value="">Pilih Pokin Level '+level_pokin+'</option>';
+                    res.data.map(function(value, index){
+                        html += '<option value="'+value.id+'">'+value.label+'</option>';
+                    });
+                    jQuery('#wrap-loading').hide();
+                    jQuery("#modal-crud").find('.modal-title').html('Tambah '+title);
+                    var pokin_5 = '';
+                    var onchange_pokin = '';
+                    jQuery("#modal-crud").find('.modal-body').html(''
+                        +'<form>'
+                            +'<input type="hidden" id="id_renaksi" value=""/>'
+                            +'<div class="form-group">'
+                                +'<label for="pokin-level-1">Pilih Pokin Level '+level_pokin+'</label>'
+                                +'<select class="form-control" name="pokin-level-1" id="pokin-level-1" '+onchange_pokin+'>'
+                                    +html
+                                +'</select>'
+                            +'</div>'
+                            +pokin_5
+                            +'<div class="form-group">'
+                                +'<textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan '+title+'..."></textarea>'
+                            +'</div>'
+                            +'<div class="form-group">'
+                                +'<label for="sasaran-cascading">Pilih '+jenis_cascading+' Cascading</label>'
+                                +'<select class="form-control" name="cascading-renstra" id="cascading-renstra">'
+                                +'</select>'
+                            +'</div>'
+                        +'</form>');
+                    jQuery("#modal-crud").find('.modal-footer').html(''
+                        +'<button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>'
+                        +'<button type="button" class="btn btn-success" onclick="simpan_data_renaksi('+tipe+')">'
+                            +'Simpan'
+                        +'</button>');
+                    jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
+                    jQuery("#modal-crud").find('.modal-dialog').css('width','');
+                    jQuery("#modal-crud").modal('show');
+                    jQuery('#pokin-level-1').select2({width: '100%'});
+                    if(tipe == 3){
+                        jQuery('#pokin-level-2').select2({width: '100%'});
+                    }
+
+                    if(data_cascading.data != undefined){
+                        let html_cascading = '<option value="">Pilih '+jenis_cascading+' Cascading</option>';
+                        data_cascading.data.map(function(value, index){
+                            if(value.id_unik_indikator == null){
+                                switch (tipe) {
+                                    case 3:
+                                        html_cascading += '<option value="'+value.kode_giat+'">'+value.kode_giat+' '+value.nama_giat+'</option>';
+                                        break;
+
+                                    case 4:
+                                        html_cascading += '<option value="'+value.kode_sub_giat+'">'+value.kode_sub_giat+' '+value.nama_sub_giat+'</option>';
+                                        break;
+                                
+                                    default:
+                                        html_cascading += '<option value="'+value.kode_program+'">'+value.kode_program+' '+value.nama_program+'</option>';
+                                        break;
+                                }
+                            }
+                        });
+                        jQuery("#cascading-renstra").html(html_cascading);
+                        jQuery('#cascading-renstra').select2({width: '100%'});
+                    }else{
+                        alert("Data Cascading Kosong!")
+                    }
+                    resolve();
+                }
+            });
         });
-    });
+    })
 }
 
 function simpan_data_renaksi(tipe){
@@ -1327,7 +1487,7 @@ function simpan_data_renaksi(tipe){
     var label_pokin_1 = jQuery('#pokin-level-1 option:selected').text();
     var label_pokin_2 = jQuery('#pokin-level-2 option:selected').text();;
     var label_renaksi = jQuery('#label_renaksi').val();
-    // var cascading = jQuery('#sasaran-cascading').val();
+    var kode_cascading_renstra = jQuery('#cascading-renstra').val();
     if(label_renaksi == ''){
         return alert('Kegiatan Utama tidak boleh kosong!')
     }
@@ -1352,7 +1512,8 @@ function simpan_data_renaksi(tipe){
             "parent": parent_renaksi,
             "tahun_anggaran": <?php echo $input['tahun']; ?>,
             "id_jadwal": <?php echo $id_jadwal; ?>,
-            "id_skpd": <?php echo $id_skpd; ?>
+            "id_skpd": <?php echo $id_skpd; ?>,
+            'kode_cascading_renstra': kode_cascading_renstra
         },
         dataType: "json",
         success: function(res){

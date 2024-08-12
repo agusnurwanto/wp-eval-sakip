@@ -17435,7 +17435,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$pengisian_rencana_aksi = '<li><a target="_blank" href="' . $list_skpd_pengisian_rencana_aksi['url'] . '" class="btn btn-primary">' .  $title_pengisian_rencana_aksi . '</a></li>';
 
 		$list_setting_jadwal = '';
-		// jadwal rpjpd
+		// jadwal rpjpd mengikuti yang ada di class-wp-eval-sakip-admin.php
 		$jadwal_rpjpd = $this->functions->generatePage(array(
 			'nama_page' => 'Halaman Jadwal RPJPD',
 			'content' => '[jadwal_rpjpd]',
@@ -17444,6 +17444,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		));
 		$list_setting_jadwal .= '<li><a class="btn btn-primary" target="_blank" href="' . $jadwal_rpjpd['url'] . '">' . $jadwal_rpjpd['title'] . '</a></li>';
 
+		// jadwal rpjmd mengikuti yang ada di class-wp-eval-sakip-admin.php
 		$jadwal_rpjmd = $this->functions->generatePage(array(
 			'nama_page' => 'Halaman Jadwal RPJMD / RPD ',
 			'content' => '[jadwal_rpjmd]',
@@ -17452,7 +17453,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		));
 		$list_setting_jadwal .= '<li><a class="btn btn-primary" target="_blank" href="' . $jadwal_rpjmd['url'] . '">' . $jadwal_rpjmd['title'] . '</a></li>';
 
-		// jadwal verifikasi upload dokumen
+		// jadwal verifikasi upload dokumen mengikuti yang ada di class-wp-eval-sakip-admin.php
 		$no = 0;
 		$get_tahun = $wpdb->get_results('select tahun_anggaran from esakip_data_unit group by tahun_anggaran order by tahun_anggaran DESC', ARRAY_A);
 		foreach ($get_tahun as $k => $v) {

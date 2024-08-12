@@ -1848,19 +1848,35 @@ class Wp_Eval_Sakip_Admin
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'monev_rencana_aksi_opd')));
 
+		$api_key_wpspd = get_option('_crb_apikey_esakip');
+		$url_server_wpspd = get_option('_crb_url_server_sakip');
 			
 		Container::make('theme_options', __('MONEV Rencana Aksi Setting'))
 		->set_page_parent($monev_ren_aksi_menu)
 		->add_fields(array(
 			Field::make('html', 'crb_esakip_halaman_terkait')
 				->set_html('
-				<h4>Monev Rencana Aksi Setting</h4>
-				<ol>
-				</ol>'),
-			Field::make('text', 'crb_url_server_wp_sipd', 'URL Server WP-SIPD')
-				->set_help_text('Wajib diisi. URL Server digunakan untuk integrasi data.'),	
-			Field::make('text', 'crb_apikey_server_wp_sipd', 'APIKEY Server WP-SIPD')
-				->set_help_text('Wajib diisi. API Key digunakan untuk integrasi data.')
+				<table class="form-table">
+					<tbody>
+						<tr>
+							<th scope="row">
+								<label>URL Server WP-SIPD</label>
+							</th>
+							<td>
+								<input type="text" style="width: 30em;" value="'. $url_server_wpspd .'" disabled>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">
+								<label>API KEY WP-SIPD</label>
+							</th>
+							<td>
+								<input type="text" style="width: 30em;" value="'. $api_key_wpspd .'" disabled>
+								<p>Setting Url Server dan Api Key ada di menu pengaturan perangkat daerah</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>')
 		))
 		->add_fields($this->get_ajax_field(array('type' => 'monev_rencana_aksi_setting')));
 

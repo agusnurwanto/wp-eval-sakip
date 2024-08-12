@@ -4198,6 +4198,9 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						$tbody .= "<td class='text-center' style='text-transform: uppercase;'>". $jumlah_rencana_aksi ."</td>";
 						$tbody .= "<td class='text-center' style='text-transform: uppercase;'>". $jumlah_uraian_kegiatan_rencana_aksi ."</td>";
 						$tbody .= "<td class='text-center' style='text-transform: uppercase;'>". $jumlah_uraian_teknis_kegiatan ."</td>";
+						$tbody .= "<td class='text-right' style='text-transform: uppercase;'>0</td>";
+						$tbody .= "<td class='text-right' style='text-transform: uppercase;'>0</td>";
+						$tbody .= "<td class='text-right' style='text-transform: uppercase;'>0</td>";
 						$tbody .= "</tr>";
 
 						$total_level_1 += $jumlah_kegiatan_utama;
@@ -4726,65 +4729,72 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		die(json_encode($ret));
 	}
 	
-	// public function get_tujuan_sasaran_cascading()
-	// {
-	// 	global $wpdb;
-	// 	try {
-	// 		if (!empty($_POST)) {
-	// 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-	// 				if(!empty($_POST['id_skpd'])){
-	// 					$id_skpd = $_POST['id_skpd'];
-	// 				}else{
-	// 					throw new Exception("Id Skpd Kosong!", 1);
-	// 				}
-	// 				if(!empty($_POST['tahun_anggaran'])){
-	// 					$tahun_anggaran = $_POST['tahun_anggaran'];
-	// 				}else{
-	// 					throw new Exception("Tahun Anggaran Kosong!", 1);
-	// 				}
-	// 				if(!empty($_POST['jenis'])){
-	// 					$jenis = $_POST['jenis'];
-	// 				}else{
-	// 					throw new Exception("Jenis Data Kosong!", 1);
-	// 				}
+	public function get_tujuan_sasaran_cascading()
+	{
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+					if(!empty($_POST['id_skpd'])){
+						$id_skpd = $_POST['id_skpd'];
+					}else{
+						throw new Exception("Id Skpd Kosong!", 1);
+					}
+					if(!empty($_POST['tahun_anggaran'])){
+						$tahun_anggaran = $_POST['tahun_anggaran'];
+					}else{
+						throw new Exception("Tahun Anggaran Kosong!", 1);
+					}
+					if(!empty($_POST['jenis'])){
+						$jenis = $_POST['jenis'];
+					}else{
+						throw new Exception("Jenis Data Kosong!", 1);
+					}
+					$parent_cascading = '';
+					if($jenis != 'sasaran' && $jenis != 'program'){
+						if(!empty($_POST['parent_cascading'])){
+							$parent_cascading = $_POST['parent_cascading'];
+						}else{
+							throw new Exception("Parent Cascading Data Kosong!", 1);
+						}
+					}
 
-	// 				$api_params = array(
-	// 					'action' => 'get_tujuan_sasaran_renstra',
-	// 					'api_key'	=> 'wc_order_kQriVU1VkGIup',
-	// 					'tahun_anggaran' => $tahun_anggaran,
-	// 					'id_skpd' => $id_skpd
-	// 				);
+					$api_params = array(
+						'action' => 'get_cascading_renstra',
+						'api_key'	=> 'wc_order_kQriVU1VkGIup',
+						'tahun_anggaran' => $tahun_anggaran,
+						'id_skpd' => $id_skpd,
+						'jenis' => $jenis,
+						'parent_cascading' => $parent_cascading
+					);
 
-	// 				$response = wp_remote_post('http://my-sipd.test/wp-admin/admin-ajax.php', array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
+					$response = wp_remote_post(get_option('_crb_url_server_sakip'), array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
 
-	// 				$response = wp_remote_retrieve_body($response);
+					$response = wp_remote_retrieve_body($response);
 					
-	// 				$response = json_decode($response);
+					$response = json_decode($response);
 
-	// 				if($_POST['jenis'] == 'sasaran'){
-	// 					$data = $response->data_sasaran;
-	// 				}else{
-	// 					$data = $response->data_tujuan;
-	// 				}
-	// 				echo json_encode([
-	// 					'status' => 'success',
-	// 					'jenis' => $_POST['jenis'],
-	// 					'data' => $data
-	// 				]);
+					$data = $response->data;
 
-	// 				exit();
-	// 			} else {
-	// 				throw new Exception("API tidak ditemukan!", 1);
-	// 			}
-	// 		} else {
-	// 			throw new Exception("Format tidak sesuai!", 1);
-	// 		}
-	// 	} catch (Exception $e) {
-	// 		echo json_encode([
-	// 			'status' => false,
-	// 			'message' => $e->getMessage()
-	// 		]);
-	// 		exit();
-	// 	}
-	// }
+					echo json_encode([
+						'status' => 'success',
+						'jenis' => $_POST['jenis'],
+						'data' => $data
+					]);
+
+					exit();
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
+	}
 }

@@ -109,6 +109,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
 				}
 
+				$kode_cascading_renstra = !empty($_POST['kode_cascading_renstra']) || $_POST['kode_cascading_renstra'] != NULL ? $_POST['kode_cascading_renstra'] : NULL;
+
 				if (
 					$_POST['level'] == 1 
 					&& $ret['status'] != 'error' 
@@ -145,18 +147,22 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$data['id_pokin_2'] = $_POST['id_pokin_2'];
 						$data['label_pokin_1'] = $_POST['label_pokin_1'];
 						$data['label_pokin_2'] = $_POST['label_pokin_2'];
+						$data['kode_cascading_sasaran'] = $kode_cascading_renstra;
 					}else if($_POST['level'] == 2){
 						$data['parent'] = $_POST['parent'];
 						$data['id_pokin_3'] = $_POST['id_pokin_1'];
 						$data['label_pokin_3'] = $_POST['label_pokin_1'];
+						$data['kode_cascading_program'] = $kode_cascading_renstra;
 					}else if($_POST['level'] == 3){
 						$data['parent'] = $_POST['parent'];
 						$data['id_pokin_4'] = $_POST['id_pokin_1'];
 						$data['label_pokin_4'] = $_POST['label_pokin_1'];
+						$data['kode_cascading_kegiatan'] = $kode_cascading_renstra;
 					}else if($_POST['level'] == 4){
 						$data['parent'] = $_POST['parent'];
 						$data['id_pokin_5'] = $_POST['id_pokin_1'];
 						$data['label_pokin_5'] = $_POST['label_pokin_1'];
+						$data['kode_cascading_sub_kegiatan'] = $kode_cascading_renstra;
 					}
 					if(!empty($_POST['id'])){
 						$cek_id = $_POST['id'];

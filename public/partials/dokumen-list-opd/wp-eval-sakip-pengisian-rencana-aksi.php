@@ -64,14 +64,17 @@ foreach ($idtahun as $val) {
 			<h1 class="text-center table-title">Pengisian Rencana Aksi</br>Tahun Anggaran <?php echo $input['tahun']; ?></h1>
 			<div id="action" class="action-section hide-excel"></div>
 			<div class="wrap-table">
-				<table id="cetak" title="Rekapitulasi Rencana Aksi Perangkat Daerah" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered table_dokumen_skpd">
+				<table id="cetak" title="Rekapitulasi Rencana Aksi Perangkat Daerah" class="table table-bordered table_dokumen_skpd" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;">
 					<thead style="background: #ffc491;">
 						<tr>
 							<th class="text-center">Nama Perangkat Daerah</th>
-							<th class="text-center" width="160px">Kegiatan Utama</th>
-							<th class="text-center" width="160px">Rencana Aksi</th>
-							<th class="text-center" width="160px">Uraian Kegiatan Rencana Aksi</th>
-							<th class="text-center" width="160px">Uraian Teknis Kegiatan</th>
+							<th class="text-center" width="100px">Kegiatan Utama</th>
+							<th class="text-center" width="100px">Rencana Aksi</th>
+							<th class="text-center" width="100px">Uraian Kegiatan Rencana Aksi</th>
+							<th class="text-center" width="100px">Uraian Teknis Kegiatan</th>
+							<th class="text-center" width="100px">Rencana Pagu</th>
+							<th class="text-center" width="100px">Alokasi Pagu</th>
+							<th class="text-center" width="100px">Realisasi Pagu</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -83,6 +86,9 @@ foreach ($idtahun as $val) {
 							<th class="text-center" id="total_rencana_aksi">0</th>
 							<th class="text-center" id="total_uraian_kegiatan_rencana_aksi">0</th>
 							<th class="text-center" id="total_uraian_teknis_kegiatan">0</th>
+							<th class="text-right" id="total_rencana_pagu">0</th>
+							<th class="text-right" id="total_alokasi_pagu">0</th>
+							<th class="text-right" id="total_realisasi_pagu">0</th>
 						</tr>
 					</tfoot>
 				</table>
