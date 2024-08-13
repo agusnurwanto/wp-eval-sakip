@@ -110,7 +110,13 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				}
 
 				$kode_cascading_renstra = !empty($_POST['kode_cascading_renstra']) || $_POST['kode_cascading_renstra'] != NULL ? $_POST['kode_cascading_renstra'] : NULL;
+				$label_cascading_renstra = !empty($_POST['label_cascading_renstra']) || $_POST['label_cascading_renstra'] != NULL ? $_POST['label_cascading_renstra'] : NULL;
+				if(!empty($label_cascading_renstra)){
+					$label = explode(' ', $label_cascading_renstra);
+        			unset($label[0]);
 
+					$label_cascading_renstra = implode(' ', $label);
+				}
 				if (
 					$_POST['level'] == 1 
 					&& $ret['status'] != 'error' 
@@ -148,21 +154,25 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$data['label_pokin_1'] = $_POST['label_pokin_1'];
 						$data['label_pokin_2'] = $_POST['label_pokin_2'];
 						$data['kode_cascading_sasaran'] = $kode_cascading_renstra;
+						$data['label_cascading_sasaran'] = $label_cascading_renstra;
 					}else if($_POST['level'] == 2){
 						$data['parent'] = $_POST['parent'];
 						$data['id_pokin_3'] = $_POST['id_pokin_1'];
 						$data['label_pokin_3'] = $_POST['label_pokin_1'];
 						$data['kode_cascading_program'] = $kode_cascading_renstra;
+						$data['label_cascading_program'] = $label_cascading_renstra;
 					}else if($_POST['level'] == 3){
 						$data['parent'] = $_POST['parent'];
 						$data['id_pokin_4'] = $_POST['id_pokin_1'];
 						$data['label_pokin_4'] = $_POST['label_pokin_1'];
 						$data['kode_cascading_kegiatan'] = $kode_cascading_renstra;
+						$data['label_cascading_kegiatan'] = $label_cascading_renstra;
 					}else if($_POST['level'] == 4){
 						$data['parent'] = $_POST['parent'];
 						$data['id_pokin_5'] = $_POST['id_pokin_1'];
 						$data['label_pokin_5'] = $_POST['label_pokin_1'];
 						$data['kode_cascading_sub_kegiatan'] = $kode_cascading_renstra;
+						$data['label_cascading_sub_kegiatan'] = $label_cascading_renstra;
 					}
 					if(!empty($_POST['id'])){
 						$cek_id = $_POST['id'];

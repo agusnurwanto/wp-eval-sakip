@@ -257,7 +257,7 @@ $is_administrator = in_array('administrator', $user_roles);
 
 <!-- Modal Renaksi -->
 <div class="modal fade" id="modal-renaksi" role="dialog" data-backdrop="static" aria-hidden="true">'
-    <div class="modal-dialog" style="max-width: 1200px;" role="document">
+    <div class="modal-dialog" style="max-width: 1500px;" role="document">
         <div class="modal-content">
             <div class="modal-header bgpanel-theme">
                 <h4 style="margin: 0;" class="modal-title">Data Rencana Aksi</h4>
@@ -396,15 +396,18 @@ function simpan_indikator_renaksi(tipe){
                 }else if(tipe == 2){
                     var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
                     var parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
-                    lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin);
+                    var parent_cascading = jQuery('#tabel_rencana_aksi').attr('parent_cascading');
+                    lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading);
                 }else if(tipe == 3){
                     var parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
                     var parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
-                    lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin);
+                    var parent_cascading = jQuery('#tabel_uraian_rencana_aksi').attr('parent_cascading');
+                    lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading);
                 }else if(tipe == 4){
                     var parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
                     var parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
-                    lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin);
+                    var parent_cascading = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_cascading');
+                    lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading);
                 }
                 getTablePengisianRencanaAksi(1);
             }
@@ -741,16 +744,19 @@ function kegiatanUtama(){
                                 +`<th class="text-center" style="width:40px;">No</th>`
                                 +`<th class="text-center" style="width:300px;">Label Pokin</th>`
                                 +`<th class="text-center">Kegiatan Utama</th>`
+                                +`<th class="text-center">Sasaran Cascading</th>`
                                 +`<th class="text-center" style="width:200px;">Aksi</th>`
                             +`</tr>`
                         +`</thead>`
                         +`<tbody>`;
                             res.data.map(function(value, index){
+                                let label_cascading = value.label_cascading_sasaran != null ? value.kode_cascading_sasaran+' '+value.label_cascading_sasaran : '-';
                                 kegiatanUtama += ``
                                     +`<tr id="kegiatan_utama_${value.id}">`
                                         +`<td class="text-center">${index+1}</td>`
                                         +`<td class="label_pokin">${value.label_pokin_2}</td>`
                                         +`<td class="label_renaksi">${value.label}</td>`
+                                        +`<td class="label_cascading">${label_cascading}</td>`
                                         +`<td class="text-center">`
                                             +`<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, 1)" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
                                             +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, 2, ${value.id_pokin_2}, '${value.kode_cascading_sasaran}')" title="Lihat Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
@@ -1061,20 +1067,24 @@ function hapus_indikator(id, tipe){
     var title = '';
     var parent_renaksi = 0;
     var parent_pokin = 0;
+    var parent_cascading = 0;
     if(tipe == 1){
         title = 'Kegiatan Utama';
     }else if(tipe == 2){
         title = 'Rencana Aksi';
         var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
         var parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
+        var parent_cascading = jQuery('#tabel_rencana_aksi').attr('parent_cascading');
     }else if(tipe == 3){
         title = 'Uraian Kegiatan Rencana Aksi';
         var parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
         var parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
+        var parent_cascading = jQuery('#tabel_uraian_rencana_aksi').attr('parent_cascading');
     }else if(tipe == 4){
         title = 'Uraian Teknis Kegiatan';
         var parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
         var parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
+        var parent_cascading = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_cascading');
     }
     if(confirm('Apakah kamu yakin untuk menghapus indikator '+title+'?')){
         jQuery('#wrap-loading').show();
@@ -1096,7 +1106,7 @@ function hapus_indikator(id, tipe){
                     if(tipe==1){
                         kegiatanUtama();
                     }else{
-                        lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin);
+                        lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading);
                     }
                 }
             },
@@ -1113,20 +1123,24 @@ function hapus_rencana_aksi(id, tipe){
     var title = '';
     var parent_pokin = 0;
     var parent_renaksi = 0;
+    var parent_cascading = 0;
     if(tipe == 1){
         title = 'Kegiatan Utama';
     }else if(tipe == 2){
         title = 'Rencana Aksi';
         parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
         parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
+        parent_cascading = jQuery('#tabel_rencana_aksi').attr('parent_cascading');
     }else if(tipe == 3){
         title = 'Uraian Kegiatan Rencana Aksi';
         parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
         parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
+        parent_cascading = jQuery('#tabel_uraian_rencana_aksi').attr('parent_cascading');
     }else if(tipe == 4){
         title = 'Uraian Teknis Kegiatan';
         parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
         parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
+        parent_cascading = jQuery('#tabel_uraian_rencana_aksi').attr('parent_cascading');
     }
 
     if(confirm('Apakah kamu yakin untuk menghapus '+title+'?')){
@@ -1150,7 +1164,7 @@ function hapus_rencana_aksi(id, tipe){
                     if(tipe==1){
                         kegiatanUtama();
                     }else{
-                        lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin)
+                        lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading)
                     }
                 }
             },
@@ -1170,6 +1184,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
         var fungsi_tambah = '';
         var id_tabel = '';
         let header_pagu = '';
+        let title_cascading = '';
 
         // rencana aksi
         if(tipe ==1){
@@ -1180,14 +1195,17 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
             id_tabel = 'tabel_rencana_aksi';
             title = 'Rencana Aksi';
             fungsi_tambah = 'tambah_renaksi_2';
+            title_cascading = 'Program Cascading';
         }else if(tipe == 3){
             id_tabel = 'tabel_uraian_rencana_aksi';
             title = 'Uraian Kegiatan Rencana Aksi';
             fungsi_tambah = 'tambah_renaksi_2';
+            title_cascading = 'Kegiatan Cascading';
         }else if(tipe == 4){
             id_tabel = 'tabel_uraian_teknis_kegiatan';
             title = 'Uraian Teknis Kegiatan';
             fungsi_tambah = 'tambah_renaksi_2';
+            title_cascading = 'Sub Kegiatan Cascading';
             header_pagu = ''
                 +`<th class="text-center" style="width:50px;">Rencana Pagu</th>`;
                 // +`<th class="text-center" style="width:50px;">Realisasi Pagu</th>`;
@@ -1210,12 +1228,21 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                     +`<div style="margin-top:10px">`
                         +`<button type="button" class="btn btn-success mb-2" onclick="`+fungsi_tambah+`(`+tipe+`);"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data `+title+`</button>`
                     +`</div>`
+                    // +`<table>`
+                    //     +`<tbody>`
+                    //         +`<tr>`
+                    //             +`<td>nama</td>`
+                    //             +`<td>isi</td>`
+                    //         +`</tr>`
+                    //     +`</tbody>`
+                    // +`</table>`
                     +'<table class="table" id="'+id_tabel+'" parent_renaksi="'+parent_renaksi+'" parent_pokin="'+parent_pokin+'" parent_cascading="'+parent_cascading+'">'
                         +`<thead>`
                             +`<tr class="table-secondary">`
                                 +`<th class="text-center" style="width:40px;">No</th>`
                                 +`<th class="text-center" style="width:300px;">Label Pokin</th>`
                                 +`<th class="text-center">`+title+`</th>`
+                                +`<th class="text-center">`+title_cascading+`</th>`
                                 +`<th class="text-center" style="width:200px;">Aksi</th>`
                             +`</tr>`
                         +`</thead>`
@@ -1225,21 +1252,25 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                 var id_pokin = 0;
                                 var tombol_detail = '';
                                 var id_parent_cascading = 0;
+                                var label_cascading = '';
                                 if(tipe == 1){
                                     label_pokin = value['label_pokin_2'];
                                     id_pokin = value['id_pokin_2'];
                                     id_parent_cascading = value['kode_cascading_sasaran'];
+                                    label_cascading = value['label_cascading_sasaran'] != null ? value['kode_cascading_sasaran']+' '+value['label_cascading_sasaran'] : '-';
                                     tombol_detail = ''
                                         +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, `+(tipe+1)+`, `+id_pokin+`, '`+id_parent_cascading+`')" title="Lihat Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                                 }else if(tipe == 2){
                                     label_pokin = value['label_pokin_3'];
                                     id_pokin = value['id_pokin_3'];
                                     id_parent_cascading = value['kode_cascading_program'];
+                                    label_cascading = value['label_cascading_program'] != null ? value['kode_cascading_program']+' '+value['label_cascading_program'] : '-';
                                     tombol_detail = ''
                                         +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, `+(tipe+1)+`, `+id_pokin+`, '`+id_parent_cascading+`')" title="Lihat Uraian Kegiatan Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                                 }else if(tipe == 3){
                                     label_pokin = value['label_pokin_4'];
                                     id_parent_cascading = value['kode_cascading_kegiatan'];
+                                    label_cascading = value['label_cascading_kegiatan'] != null ? value['kode_cascading_kegiatan']+' '+value['label_cascading_kegiatan'] : '-';
                                     id_pokin = value['id_pokin_4'];
                                     // if(value['id_pokin_5'] != ''){
                                     //     label_pokin = value['label_pokin_5'];
@@ -1250,12 +1281,14 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                 }else if(tipe == 4){
                                     label_pokin = value['label_pokin_5'];
                                     id_pokin = value['id_pokin_5'];
+                                    label_cascading = value['label_cascading_sub_kegiatan'] != null ? value['kode_cascading_sub_kegiatan']+' '+value['label_cascading_sub_kegiatan'] : '-';
                                 }
                                 renaksi += ``
                                     +`<tr id="kegiatan_utama_${value.id}">`
                                         +`<td class="text-center">${index+1}</td>`
                                         +`<td class="label_pokin">`+label_pokin+`</td>`
                                         +`<td class="label_renaksi">${value.label}</td>`
+                                        +`<td class="label_renaksi">${label_cascading}</td>`
                                         +`<td class="text-center">`
                                             +`<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, ${tipe})" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
                                             +tombol_detail
@@ -1464,30 +1497,36 @@ function tambah_renaksi_2(tipe){
 function simpan_data_renaksi(tipe){
     var parent_pokin = 0;
     var parent_renaksi = 0;
+    var parent_cascading = 0;
     switch (tipe) {
         case 2 :
             parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
             parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
+            parent_cascading = jQuery('#tabel_rencana_aksi').attr('parent_cascading');
             break;
         case 3 :
             parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
             parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
+            parent_cascading = jQuery('#tabel_uraian_rencana_aksi').attr('parent_cascading');
             break;
         case 4 :
             parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
             parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
+            parent_cascading = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_cascading');
             break;
         default:
             parent_pokin = 0;
             parent_renaksi = 0;
+            parent_cascading = 0;
         }
     
     var id_pokin_1 = jQuery('#pokin-level-1').val();
     var id_pokin_2 = jQuery('#pokin-level-2').val();
     var label_pokin_1 = jQuery('#pokin-level-1 option:selected').text();
-    var label_pokin_2 = jQuery('#pokin-level-2 option:selected').text();;
+    var label_pokin_2 = jQuery('#pokin-level-2 option:selected').text();
     var label_renaksi = jQuery('#label_renaksi').val();
     var kode_cascading_renstra = jQuery('#cascading-renstra').val();
+    var label_cascading_renstra = jQuery('#cascading-renstra option:selected').text();
     if(label_renaksi == ''){
         return alert('Kegiatan Utama tidak boleh kosong!')
     }
@@ -1513,7 +1552,8 @@ function simpan_data_renaksi(tipe){
             "tahun_anggaran": <?php echo $input['tahun']; ?>,
             "id_jadwal": <?php echo $id_jadwal; ?>,
             "id_skpd": <?php echo $id_skpd; ?>,
-            'kode_cascading_renstra': kode_cascading_renstra
+            'kode_cascading_renstra': kode_cascading_renstra,
+            'label_cascading_renstra': label_cascading_renstra
         },
         dataType: "json",
         success: function(res){
@@ -1521,7 +1561,7 @@ function simpan_data_renaksi(tipe){
             alert(res.message);
             if(res.status=='success'){
                 jQuery("#modal-crud").modal('hide');
-                lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin);
+                lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin,parent_cascading);
             }
         }
     });

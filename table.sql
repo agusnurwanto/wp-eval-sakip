@@ -1162,9 +1162,13 @@ CREATE TABLE `esakip_data_rencana_aksi_opd` (
   `created_at` datetime DEFAULT current_timestamp(),
   `update_at` datetime DEFAULT current_timestamp(),
   `kode_cascading_sasaran` text DEFAULT null,
+  `label_cascading_sasaran` text DEFAULT null,
   `kode_cascading_program` text DEFAULT null,
+  `label_cascading_program` text DEFAULT null,
   `kode_cascading_kegiatan` text DEFAULT null,
+  `label_cascading_kegiatan` text DEFAULT null,
   `kode_cascading_sub_kegiatan` text DEFAULT null,
+  `label_cascading_sub_kegiatan` text DEFAULT null,
   PRIMARY key (id)
 );
 
