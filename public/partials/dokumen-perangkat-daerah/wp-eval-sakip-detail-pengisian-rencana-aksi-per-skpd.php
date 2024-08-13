@@ -768,7 +768,7 @@ function kegiatanUtama(){
                                 let indikator = value.indikator;
                                 if(indikator.length > 0){
                                     kegiatanUtama += ``
-                                    +'<td colspan="4" style="padding: 0;">'
+                                    +'<td colspan="5" style="padding: 0;">'
                                         +`<table class="table" id="indikatorKegiatanUtama" style="margin: .5rem 0 2rem;">`
                                             +`<thead>`
                                                 +`<tr class="table-secondary">`
@@ -1300,7 +1300,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                 let indikator = value.indikator;
                                 if(indikator.length > 0){
                                     renaksi += ``
-                                    +'<td colspan="4" style="padding: 0;">'
+                                    +'<td colspan="5" style="padding: 0;">'
                                         +`<table class="table" style="margin: .5rem 0 2rem;">`
                                             +`<thead>`
                                                 +`<tr class="table-secondary">`
