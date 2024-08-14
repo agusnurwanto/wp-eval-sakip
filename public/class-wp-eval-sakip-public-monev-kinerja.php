@@ -59,9 +59,123 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								AND active=1
 						", $val['id']));
 					}
+
+					switch ($_POST['level']) {
+						case '2':
+							$label_parent = '
+							(
+								SELECT 
+									label 
+								FROM esakip_data_rencana_aksi_opd 
+								WHERE id=a.id
+							) label_parent_1';
+							break;
+
+						case '3':
+							$label_parent = '
+							(
+								SELECT 
+									label 
+								FROM esakip_data_rencana_aksi_opd 
+								WHERE id=(
+									SELECT 
+										parent 
+									FROM esakip_data_rencana_aksi_opd 
+									WHERE id=a.id 
+								) 
+							) label_parent_1,
+							(
+								SELECT 
+									label 
+								FROM esakip_data_rencana_aksi_opd 
+								WHERE id=a.id 
+							) label_parent_2';
+							break;
+
+						case '4':
+							$label_parent = '
+							(
+								SELECT 
+									label 
+								FROM esakip_data_rencana_aksi_opd 
+								WHERE id=(
+									SELECT 
+										parent 
+									FROM esakip_data_rencana_aksi_opd 
+									WHERE id=(
+										SELECT 
+											parent 
+										FROM esakip_data_rencana_aksi_opd 
+										WHERE id=a.id 
+									) 
+								) 
+							) label_parent_1,
+							(
+								SELECT 
+									label 
+								FROM esakip_data_rencana_aksi_opd 
+								WHERE id=(
+									SELECT 
+										parent 
+									FROM esakip_data_rencana_aksi_opd 
+									WHERE id=a.id 
+								) 
+							) label_parent_2,
+							(
+								SELECT 
+									label 
+								FROM esakip_data_rencana_aksi_opd 
+								WHERE id=a.id 
+							) label_parent_3';
+							break;
+
+						default:
+							$label_parent = '';
+							break;
+					}
+
+					$dataParent = array();
+					if(!empty($label_parent)){
+						$dataParent = $wpdb->get_results($wpdb->prepare(
+							"
+								SELECT 
+									" . $label_parent . "
+								FROM esakip_data_rencana_aksi_opd a 
+								WHERE  
+									a.id=%d AND
+									a.active=%d AND 
+									a.id_skpd=%d
+								ORDER BY a.id ASC",
+							$_POST['parent'],
+							1,
+							$id_skpd
+						), ARRAY_A);
+					}
+
+					$data_parent = array();
+					foreach ($dataParent as $v_parent) {
+
+						if (empty($data_parent[$v_parent['label_parent_1']])) {
+							$data_parent[$v_parent['label_parent_1']] = $v_parent['label_parent_1'];
+						}
+
+						if (empty($data_parent[$v_parent['label_parent_2']])) {
+							$data_parent[$v_parent['label_parent_2']] = $v_parent['label_parent_2'];
+						}
+
+						if (empty($data_parent[$v_parent['label_parent_3']])) {
+							$data_parent[$v_parent['label_parent_3']] = $v_parent['label_parent_3'];
+						}
+
+						if (empty($data_parent[$v_parent['label_parent_4']])) {
+							$data_parent[$v_parent['label_parent_4']] = $v_parent['label_parent_4'];
+						}
+					}
+
 					die(json_encode([
 						'status' => true,
 						'data' => $data_renaksi,
+						'data_parent' => array_values($data_parent),
 						'sql' => $wpdb->last_query
 					]));
 				} else {
@@ -111,7 +225,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 				$kode_cascading_renstra = !empty($_POST['kode_cascading_renstra']) || $_POST['kode_cascading_renstra'] != NULL ? $_POST['kode_cascading_renstra'] : NULL;
 				$label_cascading_renstra = !empty($_POST['label_cascading_renstra']) || $_POST['label_cascading_renstra'] != NULL ? $_POST['label_cascading_renstra'] : NULL;
-				if(!empty($label_cascading_renstra)){
+				if(!empty($label_cascading_renstra) && $_POST['level'] != 1){
 					$label = explode(' ', $label_cascading_renstra);
         			unset($label[0]);
 

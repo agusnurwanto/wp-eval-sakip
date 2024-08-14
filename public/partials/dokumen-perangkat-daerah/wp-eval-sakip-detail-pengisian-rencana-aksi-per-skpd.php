@@ -107,6 +107,10 @@ $is_administrator = in_array('administrator', $user_roles);
         text-align: center;
     }
 
+    #modal-renaksi thead th {
+        font-size: medium !important;
+    }
+
     #modal-renaksi .modal-body {
         max-height: 70vh;
         overflow-y: auto;
@@ -480,7 +484,7 @@ function tambah_rencana_aksi(){
                         let html_cascading = '<option value="">Pilih Sasaran Cascading</option>';
                         data_sasaran_cascading.data.map(function(value, index){
                             if(value.id_unik_indikator == null){
-                                html_cascading += '<option value="'+value.kode_bidang_urusan+'">'+value.kode_bidang_urusan+' '+value.sasaran_teks+'</option>';
+                                html_cascading += '<option value="'+value.kode_bidang_urusan+'">'+value.sasaran_teks+'</option>';
                             }
                         });
                         jQuery("#cascading-renstra").html(html_cascading);
@@ -750,7 +754,7 @@ function kegiatanUtama(){
                         +`</thead>`
                         +`<tbody>`;
                             res.data.map(function(value, index){
-                                let label_cascading = value.label_cascading_sasaran != null ? value.kode_cascading_sasaran+' '+value.label_cascading_sasaran : '-';
+                                let label_cascading = value.label_cascading_sasaran != null ? value.label_cascading_sasaran : '-';
                                 kegiatanUtama += ``
                                     +`<tr id="kegiatan_utama_${value.id}">`
                                         +`<td class="text-center">${index+1}</td>`
@@ -1228,14 +1232,39 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                     +`<div style="margin-top:10px">`
                         +`<button type="button" class="btn btn-success mb-2" onclick="`+fungsi_tambah+`(`+tipe+`);"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data `+title+`</button>`
                     +`</div>`
-                    // +`<table>`
-                    //     +`<tbody>`
-                    //         +`<tr>`
-                    //             +`<td>nama</td>`
-                    //             +`<td>isi</td>`
-                    //         +`</tr>`
-                    //     +`</tbody>`
-                    // +`</table>`
+	          		+`<table class="table">`
+      					+`<thead>`;
+      						res.data_parent.map(function(value, index){
+      							if(value!=null){
+                                    let label_parent = '';
+                                    switch (index+1) {
+                                        case 1:
+                                            label_parent = "Kegiatan Utama"
+                                            break;
+
+                                        case 2:
+                                            label_parent = "Rencana Aksi"
+                                            break;
+                                        
+                                        case 3:
+                                            label_parent = "Uraian Kegiatan Rencana Aksi"
+                                            break;
+
+                                        default:
+                                            label_parent = "-";
+                                            break;
+                                    }
+
+                                    // let detail = "<a href='javascript:void(0)' data-id='". $croscuttinglevel2['id'] ."' class='detail-cc text-primary' onclick='detail_cc(" . $croscuttinglevel2['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>";
+		          					renaksi += ``
+				          				+`<tr>`
+				          					+`<th class="text-center" style="width: 160px;">${label_parent}</th>`
+				          					+`<th class="text-left">${value}</th>`
+				          				+`</tr>`;
+      							}
+	          				});
+      					renaksi+=`</thead>`
+      				+`</table>`
                     +'<table class="table" id="'+id_tabel+'" parent_renaksi="'+parent_renaksi+'" parent_pokin="'+parent_pokin+'" parent_cascading="'+parent_cascading+'">'
                         +`<thead>`
                             +`<tr class="table-secondary">`
@@ -1257,7 +1286,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                     label_pokin = value['label_pokin_2'];
                                     id_pokin = value['id_pokin_2'];
                                     id_parent_cascading = value['kode_cascading_sasaran'];
-                                    label_cascading = value['label_cascading_sasaran'] != null ? value['kode_cascading_sasaran']+' '+value['label_cascading_sasaran'] : '-';
+                                    label_cascading = value['label_cascading_sasaran'] != null ? value['label_cascading_sasaran'] : '-';
                                     tombol_detail = ''
                                         +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, `+(tipe+1)+`, `+id_pokin+`, '`+id_parent_cascading+`')" title="Lihat Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                                 }else if(tipe == 2){
