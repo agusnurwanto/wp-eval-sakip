@@ -316,7 +316,7 @@ jQuery(document).ready(function() {
 
     let id_jadwal = <?php echo $cek_id_jadwal; ?>;
     if(id_jadwal == 0){
-        alert("Jadwal RENSTRA untuk data Pokin belum disetting.")
+        alert("Jadwal RENSTRA untuk data Pokin belum disetting.\nSetting Jadwal RENSTRA ada di admin dashboard di menu Monev Rencana Aksi -> Monev Rencana Aksi Setting")
     }
 
     window.id_jadwal = <?php echo $id_jadwal; ?>;
