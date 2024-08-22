@@ -537,7 +537,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_hapus_rencana_aksi', $plugin_public, 'hapus_rencana_aksi');
 
 		$this->loader->add_action('wp_ajax_get_data_pengaturan_rencana_aksi', $plugin_public, 'get_data_pengaturan_rencana_aksi');
-		$this->loader->add_action('wp_ajax_submit_setting_rencana_aksi', $plugin_public, 'submit_setting_rencana_aksi');
+		$this->loader->add_action('wp_ajax_submit_pengaturan_rencana_aksi', $plugin_public, 'submit_pengaturan_rencana_aksi');
 
 		$this->loader->add_action('wp_ajax_simpan_copy_data_pokin', $plugin_public, 'simpan_copy_data_pokin');
 		$this->loader->add_action('wp_ajax_get_table_capaian_indikator',  $plugin_public, 'get_table_capaian_indikator');

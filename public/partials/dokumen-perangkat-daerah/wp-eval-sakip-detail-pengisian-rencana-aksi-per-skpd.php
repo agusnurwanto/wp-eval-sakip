@@ -17,12 +17,16 @@ $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 $id_jadwal = $wpdb->get_var(
     $wpdb->prepare("
     SELECT 
-        id
-    FROM esakip_data_jadwal
-    WHERE tipe = 'RPJMD'
-    AND tahun_anggaran <=%d
-    ORDER by status DESC, tahun_anggaran DESC, id DESC
+        id_jadwal
+    FROM esakip_pengaturan_rencana_aksi
+    WHERE tahun_anggaran =%d
+    AND active=1
 ", $input['tahun']));
+
+if(empty($id_jadwal)){
+    $id_jadwal = 0;
+}
+$cek_id_jadwal = empty($id_jadwal) ? 0 : 1;
 
 $skpd = $wpdb->get_row(
     $wpdb->prepare("
@@ -310,6 +314,13 @@ jQuery(document).ready(function() {
     run_download_excel_sakip();
     jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-rencana-aksi" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
 
+    let id_jadwal = <?php echo $cek_id_jadwal; ?>;
+    if(id_jadwal == 0){
+        alert("Jadwal RENSTRA untuk data Pokin belum disetting.")
+    }
+
+    window.id_jadwal = <?php echo $id_jadwal; ?>;
+
     getTablePengisianRencanaAksi();
     jQuery("#fileUpload").on('change', function() {
         var id_dokumen = jQuery('#idDokumen').val();
@@ -433,7 +444,7 @@ function tambah_rencana_aksi(){
                     "parent": 0,
                     "api_key": esakip.api_key,
                     "tipe_pokin": "opd",
-                    "id_jadwal": <?php echo $id_jadwal; ?>,
+                    "id_jadwal": id_jadwal,
                     "id_skpd": <?php echo $id_skpd; ?>
                 },
                 dataType: "json",
@@ -696,7 +707,7 @@ function get_data_pokin_2(parent, level, tag){
                 "parent": parent,
                 "api_key": esakip.api_key,
                 "tipe_pokin": "opd",
-                "id_jadwal": <?php echo $id_jadwal; ?>,
+                "id_jadwal": id_jadwal,
                 "id_skpd": <?php echo $id_skpd; ?>
             },
             dataType: "json",
@@ -1447,7 +1458,7 @@ function tambah_renaksi_2(tipe){
                     "parent": parent_pokin,
                     "api_key": esakip.api_key,
                     "tipe_pokin": "opd",
-                    "id_jadwal": <?php echo $id_jadwal; ?>,
+                    "id_jadwal": id_jadwal,
                     "id_skpd": <?php echo $id_skpd; ?>
                 },
                 dataType: "json",
@@ -1579,7 +1590,7 @@ function simpan_data_renaksi(tipe){
             "level": tipe,
             "parent": parent_renaksi,
             "tahun_anggaran": <?php echo $input['tahun']; ?>,
-            "id_jadwal": <?php echo $id_jadwal; ?>,
+            "id_jadwal": id_jadwal,
             "id_skpd": <?php echo $id_skpd; ?>,
             'kode_cascading_renstra': kode_cascading_renstra,
             'label_cascading_renstra': label_cascading_renstra

@@ -1036,7 +1036,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		$ret = array(
 			'status' => 'success',
 			'message' => 'Berhasil get data pengaturan rencana aksi!',
-			'data'  => ''
+			'data'  => array(),
+			'option_renstra' => ''
 		);
 
 		if (!empty($_POST)) {
@@ -1046,9 +1047,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
 				}
 				if ($ret['status'] != 'error'){
-					// $ret['data']['id_periode'] = 36;
 
-					$jadwal_renstra = $wpdb->get_results(
+					$jadwal_periode = $wpdb->get_results(
 						"
 						SELECT 
 							id,
@@ -1063,46 +1063,34 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							ORDER BY tahun_anggaran DESC",
 						ARRAY_A
 					);
-					$opsion_jadwal_renstra = "<option value=''>Pilih Periode</option>";
-
-					foreach ($jadwal_renstra as $v_renstra) {
-						if (!empty($v_renstra['tahun_selesai_anggaran']) && $v_renstra['tahun_selesai_anggaran'] > 1) {
-							$tahun_anggaran_selesai = $v_renstra['tahun_selesai_anggaran'];
-						} else {
-							$tahun_anggaran_selesai = $v_renstra['tahun_anggaran'] + $v_renstra['lama_pelaksanaan'];
+					
+					$option_renstra = '<option>Pilih Jadwal RENSTRA</option>';
+					if(!empty($jadwal_periode)){
+						foreach ($jadwal_periode as $jadwal_periode_item) {
+							if (!empty($jadwal_periode_item['tahun_selesai_anggaran']) && $jadwal_periode_item['tahun_selesai_anggaran'] > 1) {
+								$tahun_anggaran_selesai = $jadwal_periode_item['tahun_selesai_anggaran'];
+							} else {
+								$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
+							}
+					
+							$option_renstra .= '<option value="' . $jadwal_periode_item['id'] . '">' . $jadwal_periode_item['nama_jadwal_renstra'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . '</option>';
 						}
-
-						$opsion_jadwal_renstra .= "<option value='". $v_renstra['id'] ."'>". $v_renstra['nama_jadwal_renstra'] ." Periode ". $v_renstra['tahun_anggaran'] ." - ". $tahun_anggaran_selesai ."</option>";
 					}
 
-					$data = $wpdb->get_results($wpdb->prepare("
+					$data = $wpdb->get_row($wpdb->prepare("
 								SELECT
 									pr.*
 								FROM esakip_pengaturan_rencana_aksi as pr
 								JOIN esakip_data_jadwal as jj
 								ON pr.id_jadwal = jj.id
-								WHERE tahun_anggaran=%d
-									AND active=1
+								WHERE pr.tahun_anggaran=%d
+									AND pr.active=1
 							", $_POST['tahun_anggaran']), ARRAY_A);
 					
-							$html = '';
-							foreach ($data as $v_renaksi) {
-								$html .='
-									<tr>
-										<td>
-											<select class="form-control" id="pilih_jadwal_renstra_renaksi" name="jadwal_renstra_">
-												'. $opsion_jadwal_renstra .'
-											</select>
-										</td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td>
-											<a class="btn btn-sm btn-success mr-2" style="text-decoration: none;" onclick="simpan_data_pengaturan(\'' . $v_renaksi['id'] . '\'); return false;" href="#" title="Simpan Data Pengaturan"><i class="dashicons dashicons-saved"></i></a>
-										</td>
-									</tr>';
-							}
-							
+					if(!empty($data)){
+						$ret['data'] = $data;
+					}
+					$ret['option_renstra'] = $option_renstra;
 				}
 			} else {
 				$ret = array(
@@ -1117,5 +1105,79 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			);
 		}
 		die(json_encode($ret));
+	}
+	
+	function submit_pengaturan_rencana_aksi(){
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+					if (empty($_POST['tahun_anggaran']) || empty($_POST['id_jadwal_renstra'])) {
+						throw new Exception("Ada data yang kosong!", 1);
+					}
+
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+					$id_jadwal_renstra = $_POST['id_jadwal_renstra'];
+
+					// pengaturan rencana aksi
+					$cek_data_jadwal = $wpdb->get_var(
+						$wpdb->prepare("
+						SELECT 
+							id
+						FROM 
+							esakip_data_jadwal
+						WHERE id=%d
+						AND tipe='RPJMD'
+						AND status=1
+					", $id_jadwal_renstra));
+
+					if (empty($cek_data_jadwal)) {
+						throw new Exception("Id Jadwal tidak cocok!", 1);
+					}
+
+					$cek_data_pengaturan = $wpdb->get_var(
+						$wpdb->prepare("
+						SELECT 
+							id
+						FROM 
+							esakip_pengaturan_rencana_aksi
+						WHERE tahun_anggaran=%d
+						AND active=1
+					", $tahun_anggaran));
+
+					$data = array(
+						'id_jadwal' => $id_jadwal_renstra,
+						'tahun_anggaran' => $tahun_anggaran,
+						'active' => 1,
+						'created_at' => current_time('mysql'),
+						'update_at' => current_time('mysql')
+					);
+
+					if (empty($cek_data_pengaturan)) {
+						$wpdb->insert('esakip_pengaturan_rencana_aksi', $data);
+						$message = "Sukses tambah data";
+					} else {
+						$wpdb->update('esakip_pengaturan_rencana_aksi', $data, array('id' => $cek_data_pengaturan));
+						$message = "Sukses edit data";
+					}
+
+					echo json_encode([
+						'status' => true,
+						'message' => $message,
+					]);
+					exit();
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
 	}
 }
