@@ -14,19 +14,29 @@ if (!empty($_GET) && !empty($_GET['id_skpd'])) {
 }
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-$id_jadwal = $wpdb->get_var(
+$data_id_jadwal = $wpdb->get_row(
     $wpdb->prepare("
     SELECT 
-        id_jadwal
+        id_jadwal,
+        id_jadwal_wp_sipd
     FROM esakip_pengaturan_rencana_aksi
     WHERE tahun_anggaran =%d
     AND active=1
-", $input['tahun']));
+", $input['tahun']), ARRAY_A);
 
-if(empty($id_jadwal)){
+if(empty($data_id_jadwal['id_jadwal'])){
     $id_jadwal = 0;
+}else{
+    $id_jadwal = $data_id_jadwal['id_jadwal'];
 }
-$cek_id_jadwal = empty($id_jadwal) ? 0 : 1;
+$cek_id_jadwal = empty($data_id_jadwal['id_jadwal']) ? 0 : 1;
+
+if(empty($data_id_jadwal['id_jadwal_wp_sipd'])){
+    $id_jadwal_wpsipd = 0;
+}else{
+    $id_jadwal_wpsipd = $data_id_jadwal['id_jadwal_wp_sipd'];
+}
+$cek_id_jadwal_wpsipd = empty($data_id_jadwal['id_jadwal_wp_sipd']) ? 0 : 1;
 
 $skpd = $wpdb->get_row(
     $wpdb->prepare("
@@ -315,11 +325,14 @@ jQuery(document).ready(function() {
     jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-rencana-aksi" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
 
     let id_jadwal = <?php echo $cek_id_jadwal; ?>;
-    if(id_jadwal == 0){
+    let id_jadwal_wpsipd = <?php echo $cek_id_jadwal_wpsipd; ?>;
+    if(id_jadwal == 0 || id_jadwal_wpsipd == 0){
         alert("Jadwal RENSTRA untuk data Pokin belum disetting.\nSetting Jadwal RENSTRA ada di admin dashboard di menu Monev Rencana Aksi -> Monev Rencana Aksi Setting")
     }
 
     window.id_jadwal = <?php echo $id_jadwal; ?>;
+
+    window.id_jadwal_wpsipd = <?php echo $id_jadwal_wpsipd; ?>;
 
     getTablePengisianRencanaAksi();
     jQuery("#fileUpload").on('change', function() {
@@ -493,11 +506,13 @@ function tambah_rencana_aksi(){
 
                     if(data_sasaran_cascading != undefined){
                         let html_cascading = '<option value="">Pilih Sasaran Cascading</option>';
-                        data_sasaran_cascading.data.map(function(value, index){
-                            if(value.id_unik_indikator == null){
-                                html_cascading += '<option value="'+value.kode_bidang_urusan+'">'+value.sasaran_teks+'</option>';
-                            }
-                        });
+                        if(data_sasaran_cascading.data !== null){
+                            data_sasaran_cascading.data.map(function(value, index){
+                                if(value.id_unik_indikator == null){
+                                    html_cascading += '<option value="'+value.kode_bidang_urusan+'">'+value.sasaran_teks+'</option>';
+                                }
+                            });
+                        }
                         jQuery("#cascading-renstra").html(html_cascading);
                         jQuery('#cascading-renstra').select2({width: '100%'});
                     }
@@ -522,7 +537,8 @@ function get_tujuan_sasaran_cascading(jenis='sasaran', parent_cascading='x.xx'){
                         "api_key": esakip.api_key,
                         "id_skpd": <?php echo $id_skpd; ?>,
                         "tahun_anggaran": <?php echo $input['tahun']; ?>,
-                        "jenis": jenis
+                        "jenis": jenis,
+                        "id_jadwal_wpsipd": id_jadwal_wpsipd
                     },
                     dataType: "json",
                     success: function(response){

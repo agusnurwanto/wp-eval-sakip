@@ -38,17 +38,12 @@ $body = '';
 							</select>
 							<small class="form-text text-muted">Untuk mendapatkan Pohon Kinerja sesuai jadwal RENSTRA. digunakan diinput Rencana Aksi.</small>
 						</div>
-						<!-- <div class="form-group">
+						<div class="form-group">
 							<label for="jadwal-renstra">Pilih Jadwal RENSTRA WP-SIPD</label>
-							<select class="form-control" id="jadwal-renstra-wp-sipd">
-								<option>1</option>
-								<option>2</option>
-								<option>3</option>
-								<option>4</option>
-								<option>5</option>
+							<select class="form-control" id="jadwal-renstra-wpsipd">
 							</select>
 							<small class="form-text text-muted">Untuk mendapatkan Sasaran Cascading di WP-SIPD sesuai jadwal yang digunakan di input Rencana Aksi.</small>
-						</div> -->
+						</div>
 						<div class="form-group d-flex">
 							<button onclick="submit_pengaturan_menu(); return false;" class="btn btn-primary ml-auto">Simpan</button>
 						</div>
@@ -83,9 +78,13 @@ $body = '';
 				console.log(response);
 				if (response.status === 'success') {
 					jQuery('#jadwal-renstra').html(response.option_renstra)
+					jQuery('#jadwal-renstra-wpsipd').html(response.option_renstra_wpsipd)
 					if(response.data.length != 0){
 						console.log(response.data.id_jadwal)
 						jQuery('#jadwal-renstra').val(response.data.id_jadwal);
+						if(response.data.id_jadwal_wp_sipd !== null){
+							jQuery('#jadwal-renstra-wpsipd').val(response.data.id_jadwal_wp_sipd);
+						}
 					}
 				} else {
 					alert(response.message);
@@ -100,8 +99,9 @@ $body = '';
 	}
 
     function submit_pengaturan_menu(){
-		let id_jadwal_renstra = jQuery("#jadwal-renstra").val();;
-        if (id_jadwal_renstra == '') {
+		let id_jadwal_renstra = jQuery("#jadwal-renstra").val();
+		let id_jadwal_renstra_wpsipd = jQuery("#jadwal-renstra-wpsipd").val();
+        if (id_jadwal_renstra == '' || id_jadwal_renstra_wpsipd == '') {
             return alert('Ada data yang kosong!');
         }
 
@@ -115,6 +115,7 @@ $body = '';
 					'action': 'submit_pengaturan_rencana_aksi',
 					'api_key': esakip.api_key,
 					'id_jadwal_renstra': id_jadwal_renstra,
+					'id_jadwal_renstra_wpsipd': id_jadwal_renstra_wpsipd,
 					'tahun_anggaran': tahun_anggaran
 				},
 				success: function(response) {

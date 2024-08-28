@@ -4774,6 +4774,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						}
 					}
 
+					if($jenis == 'sasaran' && empty($_POST['id_jadwal_wpsipd'])){
+						throw new Exception("Id Jadwal WpSipd Kosong!", 1);
+					}else{
+						$id_jadwal_wpsipd = $_POST['id_jadwal_wpsipd'];
+					}
+
 					$api_params = array(
 						'action' => 'get_cascading_renstra',
 						'api_key'	=> 'wc_order_kQriVU1VkGIup',
@@ -4782,6 +4788,10 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						'jenis' => $jenis,
 						'parent_cascading' => $parent_cascading
 					);
+
+					if($jenis == 'sasaran'){
+						$api_params['id_jadwal'] = $id_jadwal_wpsipd;
+					}
 
 					$response = wp_remote_post(get_option('_crb_url_server_sakip'), array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
 

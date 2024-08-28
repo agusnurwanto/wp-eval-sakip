@@ -1091,6 +1091,36 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$ret['data'] = $data;
 					}
 					$ret['option_renstra'] = $option_renstra;
+
+					//jadwal renstra wpsipd
+					$api_params = array(
+						'action' => 'get_data_jadwal_wpsipd',
+						'api_key'	=> 'wc_order_kQriVU1VkGIup',
+						'tipe_perencanaan' => 'monev_renstra'
+					);
+
+					$response = wp_remote_post(get_option('_crb_url_server_sakip'), array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
+
+					$response = wp_remote_retrieve_body($response);
+					
+					$data_jadwal_wpsipd = json_decode($response);
+
+					if(!empty($data_jadwal_wpsipd)){
+						$option_renstra_wpsipd = '<option>Pilih Jadwal RENSTRA WP-SIPD</option>';
+						if(!empty($data_jadwal_wpsipd->data)){
+							foreach ($data_jadwal_wpsipd->data as $jadwal_periode_item_wpsipd) {
+								if (!empty($jadwal_periode_item_wpsipd->tahun_akhir_anggaran) && $jadwal_periode_item_wpsipd->tahun_akhir_anggaran > 1) {
+									$tahun_anggaran_selesai = $jadwal_periode_item_wpsipd->tahun_akhir_anggaran;
+								} else {
+									$tahun_anggaran_selesai = $jadwal_periode_item_wpsipd->tahun_anggaran + $jadwal_periode_item_wpsipd->lama_pelaksanaan;
+								}
+						
+								$option_renstra_wpsipd .= '<option value="' . $jadwal_periode_item_wpsipd->id_jadwal_lokal . '">' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai . '</option>';
+							}
+						}
+					}
+
+					$ret['option_renstra_wpsipd'] = $option_renstra_wpsipd;
 				}
 			} else {
 				$ret = array(
@@ -1118,6 +1148,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 					$tahun_anggaran = $_POST['tahun_anggaran'];
 					$id_jadwal_renstra = $_POST['id_jadwal_renstra'];
+					$id_jadwal_renstra_wpsipd = $_POST['id_jadwal_renstra_wpsipd'];
 
 					// pengaturan rencana aksi
 					$cek_data_jadwal = $wpdb->get_var(
@@ -1147,6 +1178,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 					$data = array(
 						'id_jadwal' => $id_jadwal_renstra,
+						'id_jadwal_wp_sipd' => $id_jadwal_renstra_wpsipd,
 						'tahun_anggaran' => $tahun_anggaran,
 						'active' => 1,
 						'created_at' => current_time('mysql'),
