@@ -1282,11 +1282,12 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                             break;
                                     }
 
-                                    // let detail = "<a href='javascript:void(0)' data-id='". $croscuttinglevel2['id'] ."' class='detail-cc text-primary' onclick='detail_cc(" . $croscuttinglevel2['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>";
+                                    let tipe_parent = tipe-1;
+                                    let detail_parent = "<a href='javascript:void(0)' onclick='detail_parent("+tipe_parent+"); return false;' title='Detail Parent'><i class='dashicons dashicons-info'></i></a>";
 		          					renaksi += ``
 				          				+`<tr>`
 				          					+`<th class="text-center" style="width: 160px;">${label_parent}</th>`
-				          					+`<th class="text-left">${value}</th>`
+				          					+`<th class="text-left">${value} ${detail_parent}</th>`
 				          				+`</tr>`;
       							}
 	          				});
@@ -1417,6 +1418,10 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
             }
         });
     });
+}
+
+function detail_parent(tipe_parent) {
+    jQuery('.nav-tabs a[href="#nav-level-'+tipe_parent+'"]').tab('show');
 }
 
 function tambah_renaksi_2(tipe){
