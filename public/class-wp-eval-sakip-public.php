@@ -16891,6 +16891,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$pedoman_teknis_evaluasi_internal_detail = '';
 		$periode_input_cascading = '';
 		$periode_input_croscutting = '';
+		$halaman_input_perangkat_daerah = '';
 
 		foreach ($jadwal_periode as $jadwal_periode_item) {
 			if (!empty($jadwal_periode_item['tahun_selesai_anggaran']) && $jadwal_periode_item['tahun_selesai_anggaran'] > 1) {
@@ -17412,6 +17413,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		);
 		$pengisian_lke = '';
 		$pengisian_rencana_aksi = '';
+		$pengisian_rencana_aksi_pemda = '';
 		foreach ($get_jadwal_lke as $get_jadwal_lke_sakip) {
 			$tahun_anggaran_selesai = $get_jadwal_lke_sakip['tahun_anggaran'] + $get_jadwal_lke_sakip['lama_pelaksanaan'];
 
@@ -17511,15 +17513,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				<div class="esakip-body-tahun" data-id="lke">
 					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 						' . $pengisian_lke . '
-					</ul>
-				</div>
-			</div>';
-		$halaman_pengisian_rencana_aksi = '
-			<div class="accordion">
-				<h5 class="esakip-header-tahun" data-id="pengisian-rencana_aksi" style="margin: 0;">Pengisian Rencana Aksi</h5>
-				<div class="esakip-body-tahun" data-id="pengisian-rencana_aksi">
-					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-						' . $pengisian_rencana_aksi . '
 					</ul>
 				</div>
 			</div>';
@@ -17694,8 +17687,32 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					</div>
 				</li>';
 		}
+
+		$halaman_input_rpjpd_rpjmd .= '
+			<li>
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="halaman-input-cascading" style="margin: 0;">Input Cascading Pemerintah Daerah</h5>
+					<div class="esakip-body-tahun" data-id="halaman-input-cascading">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+							' . $halaman_input_cascading_pemda . '
+						</ul>
+					</div>
+				</div>
+			</li>
+			<li>
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="halaman-input-croscutting" style="margin: 0;">Input Croscutting Pemerintah Daerah</h5>
+					<div class="esakip-body-tahun" data-id="halaman-input-croscutting">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+							' . $halaman_input_croscutting_pemda . '
+						</ul>
+					</div>
+				</div>
+			</li>
+			';
+
 		if (!empty($cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']) && $cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']['active'] == 1) {
-			$halaman_input_rpjpd_rpjmd .= '
+			$halaman_input_perangkat_daerah .= '
 				<li>
 					<div class="accordion">
 						<h5 class="esakip-header-tahun" data-id="halaman-input-pokin-opd" style="margin: 0;">Input Pohon Kinerja Perangkat Daerah</h5>
@@ -17707,29 +17724,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					</div>
 				</li>';
 		}
-
-		$halaman_input_rpjpd_rpjmd .= '
-			<li>
-				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="halaman-input-cascading" style="margin: 0;">Input Cascading</h5>
-					<div class="esakip-body-tahun" data-id="halaman-input-cascading">
-						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-							' . $halaman_input_cascading_pemda . '
-						</ul>
-					</div>
+		$halaman_pengisian_rencana_aksi = '
+			<div class="accordion">
+				<h5 class="esakip-header-tahun" data-id="pengisian-rencana_aksi" style="margin: 0;">Pengisian Rencana Aksi Perangkat Daerah</h5>
+				<div class="esakip-body-tahun" data-id="pengisian-rencana_aksi">
+					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+						' . $pengisian_rencana_aksi . '
+					</ul>
 				</div>
-			</li>
-			<li>
-				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="halaman-input-croscutting" style="margin: 0;">Input Croscutting</h5>
-					<div class="esakip-body-tahun" data-id="halaman-input-croscutting">
-						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-							' . $halaman_input_croscutting_pemda . '
-						</ul>
-					</div>
-				</div>
-			</li>
-			';
+			</div>';
 		$halaman_sakip_opd .= '
 					</ul>
 				</div>
@@ -17751,7 +17754,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				|| in_array("admin_bappeda", $user_meta->roles)
 				|| in_array("administrator", $user_meta->roles)
 			) {
-				echo $halaman_input_rpjpd_rpjmd;
+				echo '<li>' . $halaman_input_rpjpd_rpjmd .'</li>';
+				echo '<li>' . $halaman_input_perangkat_daerah .'</li>';
 			}
 			echo '<li>' . $halaman_pengisian_rencana_aksi . '</li>';
 			echo '<li>' . $halaman_menu_jadwal_admin . '</li>';
