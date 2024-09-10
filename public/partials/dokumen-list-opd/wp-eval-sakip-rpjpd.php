@@ -476,7 +476,6 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 data: {
                     action: 'sync_from_esr',
                     api_key: esakip.api_key,
-                    list: list
                 },
                 dataType: 'json',
                 success: function(response) {

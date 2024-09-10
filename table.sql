@@ -1241,3 +1241,13 @@ CREATE TABLE `esakip_data_iku_pemda` (
   `updated_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id)
 );
+
+CREATE TABLE `esakip_data_esr` (
+  `id` int(11) NOT NULL auto_increment,
+  `url` text NOT NULL,
+  `method` text DEFAULT null,
+  `param_json` text DEFAULT null,
+  `response_json` text DEFAULT null,
+  `updated_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
+);
