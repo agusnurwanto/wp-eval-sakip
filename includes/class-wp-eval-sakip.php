@@ -536,6 +536,14 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_rencana_aksi', $plugin_public, 'get_rencana_aksi');
 		$this->loader->add_action('wp_ajax_hapus_rencana_aksi', $plugin_public, 'hapus_rencana_aksi');
 
+		$this->loader->add_action('wp_ajax_get_table_input_iku', $plugin_public, 'get_table_input_iku');
+		$this->loader->add_action('wp_ajax_tambah_iku', $plugin_public, 'tambah_iku');
+		$this->loader->add_action('wp_ajax_hapus_iku', $plugin_public, 'hapus_iku');
+		$this->loader->add_action('wp_ajax_get_iku_by_id', $plugin_public, 'get_iku_by_id');
+		
+		$this->loader->add_action('wp_ajax_get_table_skpd_input_iku', $plugin_public, 'get_table_skpd_input_iku');
+		$this->loader->add_action('wp_ajax_get_table_skpd_input_cascading', $plugin_public, 'get_table_skpd_input_cascading');
+
 		$this->loader->add_action('wp_ajax_get_data_pengaturan_rencana_aksi', $plugin_public, 'get_data_pengaturan_rencana_aksi');
 		$this->loader->add_action('wp_ajax_submit_pengaturan_rencana_aksi', $plugin_public, 'submit_pengaturan_rencana_aksi');
 
@@ -543,6 +551,9 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_table_capaian_indikator',  $plugin_public, 'get_table_capaian_indikator');
 
 		$this->loader->add_action('wp_ajax_get_tujuan_sasaran_cascading',  $plugin_public, 'get_tujuan_sasaran_cascading');
+		
+		$this->loader->add_action('wp_ajax_sync_from_esr',  $plugin_public, 'sync_from_esr');
+		$this->loader->add_action('wp_ajax_sync_to_esr',  $plugin_public, 'sync_to_esr');
 		
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
@@ -569,6 +580,10 @@ class Wp_Eval_Sakip {
 		add_shortcode('detail_pengisian_rencana_aksi', array($plugin_public, 'detail_pengisian_rencana_aksi'));
 		add_shortcode('pengisian_rencana_aksi_setting',array($plugin_public,'pengisian_rencana_aksi_setting'));
 
+		add_shortcode('list_input_iku', array($plugin_public, 'list_input_iku'));
+		add_shortcode('detail_input_iku', array($plugin_public, 'detail_input_iku'));
+		add_shortcode('input_iku_pemda', array($plugin_public, 'input_iku_pemda'));
+
 		add_shortcode('rpjmd', array($plugin_public, 'rpjmd'));
 		add_shortcode('rkpd', array($plugin_public, 'rkpd'));
 		add_shortcode('lkjip_lppd', array($plugin_public, 'lkjip_lppd'));
@@ -582,7 +597,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('pedoman_teknis_evaluasi_internal', array($plugin_public, 'pedoman_teknis_evaluasi_internal'));
 
 		add_shortcode('jadwal_rpjmd', array($plugin_public, 'jadwal_rpjmd'));
-		add_shortcode('jadwal_rpjpd', array($plugin_public, 'jadwal_rpjpd'));
+		add_shortcode('jadwal_rpjpd_sakip', array($plugin_public, 'jadwal_rpjpd_sakip'));
 
 		add_shortcode('pengaturan_menu', array($plugin_public, 'pengaturan_menu'));
 
@@ -642,6 +657,9 @@ class Wp_Eval_Sakip {
 		add_shortcode('croscutting_pemda', array($plugin_public, 'crosscutting_pemda'));
 		add_shortcode('detail_croscutting_pemda', array($plugin_public, 'detail_crosscutting_pemda'));
 		add_shortcode('view_crosscutting_pemda',array($plugin_public,'view_crosscutting_pemda'));
+
+		add_shortcode('cascading_pd', array($plugin_public, 'cascading_pd'));
+		add_shortcode('detail_input_cascading_pd', array($plugin_public, 'detail_input_cascading_pd'));
 	}
 
 	/**
