@@ -369,6 +369,88 @@ class Wp_Eval_Sakip_Admin
 					}
 					$body_pemda .= '</ol>';
 					$ret['message'] .= $body_pemda;
+				} else if (
+					!empty($_POST['type'])
+					&& $_POST['type'] == 'input_iku_opd'
+				) {
+					//jadwal renstra wpsipd
+					$api_params = array(
+						'action' => 'get_data_jadwal_wpsipd',
+						'api_key'	=> get_option('_crb_apikey_wpsipd'),
+						'tipe_perencanaan' => 'monev_renstra'
+					);
+
+					$response = wp_remote_post(get_option('_crb_url_server_sakip'), array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
+
+					$response = wp_remote_retrieve_body($response);
+					
+					$data_jadwal_wpsipd = json_decode($response);
+
+					$body_pemda = '<h3>Halaman Input IKU</h3>';
+					$body_pemda .= '<ol>';
+					if(!empty($data_jadwal_wpsipd->data)){
+						foreach ($data_jadwal_wpsipd->data as $jadwal_periode_item_wpsipd) {
+							if (!empty($jadwal_periode_item_wpsipd->tahun_akhir_anggaran) && $jadwal_periode_item_wpsipd->tahun_akhir_anggaran > 1) {
+								$tahun_anggaran_selesai = $jadwal_periode_item_wpsipd->tahun_akhir_anggaran;
+							} else {
+								$tahun_anggaran_selesai = $jadwal_periode_item_wpsipd->tahun_anggaran + $jadwal_periode_item_wpsipd->lama_pelaksanaan;
+							}
+							
+							$input_iku = $this->functions->generatePage(array(
+								'nama_page' => 'List Perangkat Daerah Halaman Pengisian IKU ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai,
+								'content' => '[list_input_iku periode=' . $jadwal_periode_item_wpsipd->id_jadwal_lokal . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda .= '
+							<li><a target="_blank" href="' . $input_iku['url'] . '">Halaman Input IKU Perangkat Daerah ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai .'</a></li>';
+						}
+					}
+					$body_pemda .= '</ol>';
+					$ret['message'] .= $body_pemda;
+				} else if (
+					!empty($_POST['type'])
+					&& $_POST['type'] == 'input_iku_pemda'
+				) {
+					//jadwal rpjmd/rpd sakip
+					$data_jadwal = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT
+							*
+						FROM
+							esakip_data_jadwal
+						WHERE
+							tipe='RPJMD'
+							AND status!=0"),
+						ARRAY_A);
+					
+					if(empty($data_jadwal)){
+						die("JADWAL KOSONG");
+					}
+
+					$body_pemda = '<h3>Halaman Input IKU</h3>';
+					$body_pemda .= '<ol>';
+					if(!empty($data_jadwal)){
+						foreach ($data_jadwal as $jadwal_periode) {
+							$lama_pelaksanaan = $jadwal_periode['lama_pelaksanaan'] ?? 4;
+							$tahun_anggaran = $jadwal_periode['tahun_anggaran'];
+							$tahun_awal = $jadwal_periode['tahun_anggaran'];
+							$tahun_akhir = $tahun_awal + $jadwal_periode['lama_pelaksanaan'] - 1;
+							
+							$input_iku_pemda = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Pengisian IKU Pemerintah Daerah ' . $jadwal_periode['jenis_jadwal_khusus'] .' '. $jadwal_periode['nama_jadwal'] . ' ' . 'Periode ' . $tahun_awal . ' - ' . $tahun_akhir,
+								'content' => '[input_iku_pemda id_periode=' . $jadwal_periode['id'] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda .= '
+							<li><a target="_blank" href="' . $input_iku_pemda['url'] . '">Halaman Input IKU Pemerintah Daerah ' . $jadwal_periode['jenis_jadwal_khusus'] .' '. $jadwal_periode['nama_jadwal'] . ' ' . 'Periode ' . $tahun_awal . ' - ' . $tahun_akhir .'</a></li>';
+						}
+					}
+					$body_pemda .= '</ol>';
+					$ret['message'] .= $body_pemda;
 				} else {
 					$tahun = $wpdb->get_results(
 						$wpdb->prepare("
@@ -1127,6 +1209,12 @@ class Wp_Eval_Sakip_Admin
 					->set_help_text('Wajib diisi. Setting batas ukuran maksimal untuk upload dokumen. Ukuran dalam MB'),
 				Field::make('text', 'crb_nama_pemda', 'Nama Pemerintah Daerah')
 					->set_help_text('Wajib diisi.'),
+				Field::make('text', 'crb_url_api_esr', 'Url API ESR')
+					->set_help_text('Wajib diisi. URL integrasi dokumen ke API ESR'),
+				Field::make('text', 'crb_username_api_esr', 'Username API ESR')
+					->set_help_text('Wajib diisi. Auth Type : Basic Auth dengan Username yang digunakan untuk integrasi dokumen ke API ESR'),
+				Field::make('text', 'crb_password_api_esr', 'Password API ESR')
+					->set_help_text('Wajib diisi. Auth Type : Basic Auth dengan Password yang digunakan untuk integrasi dokumen ke API ESR')
 			));
 
 		Container::make('theme_options', __('Pengaturan Perangkat Daerah'))
@@ -1848,7 +1936,7 @@ class Wp_Eval_Sakip_Admin
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'monev_rencana_aksi_opd')));
 
-		$api_key_wpspd = get_option('_crb_apikey_esakip');
+		$api_key_wpspd = get_option('_crb_apikey_wpsipd');
 		$url_server_wpspd = get_option('_crb_url_server_sakip');
 			
 		Container::make('theme_options', __('MONEV Rencana Aksi Setting'))
@@ -1880,8 +1968,90 @@ class Wp_Eval_Sakip_Admin
 		))
 		->add_fields($this->get_ajax_field(array('type' => 'monev_rencana_aksi_setting')));
 
-		Container::make('theme_options', __('Input RPJPD'))
+		$input_iku_menu = Container::make('theme_options', __('Input IKU'))
 			->set_page_menu_position(3.6)
+			->set_icon('dashicons-edit-page')
+			->add_fields(array(
+				Field::make('html', 'crb_input_iku_pd_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+					<table class="form-table">
+						<tbody>
+							<tr>
+								<th scope="row">
+									<label>URL Server WP-SIPD</label>
+								</th>
+								<td>
+									<input type="text" style="width: 30em;" value="'. $url_server_wpspd .'" disabled>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">
+									<label>API KEY WP-SIPD</label>
+								</th>
+								<td>
+									<input type="text" style="width: 30em;" value="'. $api_key_wpspd .'" disabled>
+									<p>Setting Url Server dan Api Key ada di menu pengaturan perangkat daerah</p>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'input_iku_opd')));
+
+		Container::make('theme_options', __('Input IKU Pemerintah Daerah'))
+			->set_page_parent($input_iku_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_input_iku_pemda_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'input_iku_pemda')));
+
+		Container::make('theme_options', __('Input IKU Perangkat Daerah'))
+			->set_page_parent($input_iku_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_input_iku_pd_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+					<table class="form-table">
+						<tbody>
+							<tr>
+								<th scope="row">
+									<label>URL Server WP-SIPD</label>
+								</th>
+								<td>
+									<input type="text" style="width: 30em;" value="'. $url_server_wpspd .'" disabled>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">
+									<label>API KEY WP-SIPD</label>
+								</th>
+								<td>
+									<input type="text" style="width: 30em;" value="'. $api_key_wpspd .'" disabled>
+									<p>Setting Url Server dan Api Key ada di menu pengaturan perangkat daerah</p>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'input_iku_opd')));
+
+		Container::make('theme_options', __('Input RPJPD'))
+			->set_page_menu_position(3.7)
 			->set_icon('dashicons-welcome-write-blog')
 			->add_fields(array(
 				Field::make('html', 'crb_perencanaan_rpjpd_hide_sidebar')
@@ -1895,7 +2065,7 @@ class Wp_Eval_Sakip_Admin
 			->add_fields($this->get_ajax_field(array('type' => 'input_perencanaan_rpjpd')));
 
 		Container::make('theme_options', __('Input RPJMD'))
-			->set_page_menu_position(3.7)
+			->set_page_menu_position(3.8)
 			->set_icon('dashicons-welcome-write-blog')
 			->add_fields(array(
 				Field::make('html', 'crb_perencanaan_rpjmd_hide_sidebar')
@@ -1977,7 +2147,7 @@ class Wp_Eval_Sakip_Admin
 		// jadwal rpjpd
 		$jadwal_rpjpd = $this->functions->generatePage(array(
 			'nama_page' => 'Halaman Jadwal RPJPD',
-			'content' => '[jadwal_rpjpd]',
+			'content' => '[jadwal_rpjpd_sakip]',
 			'show_header' => 1,
 			'no_key' => 1,
 			'post_status' => 'private'

@@ -1208,3 +1208,36 @@ CREATE TABLE `esakip_pengaturan_rencana_aksi` (
   `update_at` datetime DEFAULT current_timestamp(),
   PRIMARY KEY  (id)
 );
+
+CREATE TABLE `esakip_data_iku_opd` (
+  `id` int(11) NOT NULL auto_increment,
+  `kode_sasaran` text NOT NULL,
+  `label_sasaran` text DEFAULT null,
+  `id_unik_indikator` text DEFAULT null,
+  `label_indikator` text DEFAULT null,
+  `formulasi` varchar(255) DEFAULT null,
+  `sumber_data` varchar(255) DEFAULT null,
+  `penanggung_jawab` varchar(255) DEFAULT null,
+  `id_skpd` int(11) DEFAULT NULL,
+  `id_jadwal_wpsipd` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
+);
+
+CREATE TABLE `esakip_data_iku_pemda` (
+  `id` int(11) NOT NULL auto_increment,
+  `kode_sasaran` text NOT NULL,
+  `label_sasaran` text DEFAULT null,
+  `id_unik_indikator` text DEFAULT null,
+  `label_indikator` text DEFAULT null,
+  `formulasi` varchar(255) DEFAULT null,
+  `sumber_data` varchar(255) DEFAULT null,
+  `penanggung_jawab` varchar(255) DEFAULT null,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
+);

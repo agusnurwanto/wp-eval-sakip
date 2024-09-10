@@ -69,6 +69,15 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/pohon-kinerja/wp-eval-sakip-cascading-pemda.php';
 	}
 
+	public function cascading_pd($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-input-cascading-opd.php';
+	}
+
 	public function list_pengisian_rencana_aksi($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
@@ -85,6 +94,42 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 			return '';
 		}
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-pengisian-rencana-aksi-per-skpd.php';
+	}
+	
+	public function list_input_iku($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-input-iku.php';
+	}
+	
+	public function detail_input_iku($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-input-iku-per-skpd.php';
+	}
+	
+	public function detail_input_cascading_pd($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/pohon-kinerja/wp-eval-sakip-cascading-opd.php';
+	}
+
+	public function input_iku_pemda($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-input-iku-pemda.php';
 	}
 
 	public function get_data_pokin()
@@ -4750,15 +4795,11 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		try {
 			if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+					// if()
 					if(!empty($_POST['id_skpd'])){
 						$id_skpd = $_POST['id_skpd'];
 					}else{
 						throw new Exception("Id Skpd Kosong!", 1);
-					}
-					if(!empty($_POST['tahun_anggaran'])){
-						$tahun_anggaran = $_POST['tahun_anggaran'];
-					}else{
-						throw new Exception("Tahun Anggaran Kosong!", 1);
 					}
 					if(!empty($_POST['jenis'])){
 						$jenis = $_POST['jenis'];
@@ -4772,6 +4813,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						}else{
 							throw new Exception("Parent Cascading Data Kosong!", 1);
 						}
+						
+						if(!empty($_POST['tahun_anggaran'])){
+							$tahun_anggaran = $_POST['tahun_anggaran'];
+						}else{
+							throw new Exception("Tahun Anggaran Kosong!", 1);
+						}
 					}
 
 					if($jenis == 'sasaran' && empty($_POST['id_jadwal_wpsipd'])){
@@ -4782,7 +4829,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					$api_params = array(
 						'action' => 'get_cascading_renstra',
-						'api_key'	=> 'wc_order_kQriVU1VkGIup',
+						'api_key'	=> get_option('_crb_apikey_wpsipd'),
 						'tahun_anggaran' => $tahun_anggaran,
 						'id_skpd' => $id_skpd,
 						'jenis' => $jenis,
@@ -4821,5 +4868,224 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 			]);
 			exit();
 		}
+	}
+	
+	public function get_table_skpd_input_iku()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_jadwal_wpsipd'])) {
+					$id_jadwal_wpsipd = $_POST['id_jadwal_wpsipd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Jadwal RENSTRA kosong!';
+				}
+
+				if($ret['status'] == 'success'){
+					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+	
+					$unit = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT 
+							nama_skpd, 
+							id_skpd, 
+							kode_skpd, 
+							nipkepala 
+						FROM esakip_data_unit 
+						WHERE active=1 
+						  AND tahun_anggaran=%d
+						  AND is_skpd=1 
+						ORDER BY kode_skpd ASC
+						", $tahun_anggaran_sakip),
+						ARRAY_A
+					);
+
+					if (!empty($unit)) {
+						$tbody = '';
+	
+						foreach ($unit as $kk => $vv) {
+							$detail_input_iku = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Detail Pengisian IKU ',
+								'content' => '[detail_input_iku]',
+								'show_header' => 1,
+								'post_status' => 'private'
+							)); //dokumen_detail_input_iku
+							
+							$jumlah_iku = $wpdb->get_var(
+								$wpdb->prepare("
+									SELECT 
+										COUNT(id)
+									FROM esakip_data_iku_opd
+									WHERE id_skpd = %d
+									AND id_jadwal_wpsipd = %d 
+									AND active = 1
+								", $vv['id_skpd'], $id_jadwal_wpsipd)
+							);
+	
+							$tbody .= "<tr>";
+							$tbody .= "<td style='text-transform: uppercase;'><a href='".$detail_input_iku['url']."&id_skpd=".$vv['id_skpd']."&id_periode=".$id_jadwal_wpsipd."' target='_blank'>".$vv['kode_skpd']." " . $vv['nama_skpd'] . "</a></td>";
+							$tbody .= "<td class='text-center' style='text-transform: uppercase;'>". $jumlah_iku . "</td>";
+							$tbody .= "</tr>";
+						}
+						$ret['data'] = $tbody;
+					} else {
+						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+	
+	public function get_table_skpd_input_cascading()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['periode'])) {
+					$periode = $_POST['periode'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Jadwal RENSTRA kosong!';
+				}
+
+				if($ret['status'] == 'success'){
+					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+	
+					$unit = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT 
+							nama_skpd, 
+							id_skpd, 
+							kode_skpd, 
+							nipkepala 
+						FROM esakip_data_unit 
+						WHERE active=1 
+						  AND tahun_anggaran=%d
+						  AND is_skpd=1 
+						ORDER BY kode_skpd ASC
+						", $tahun_anggaran_sakip),
+						ARRAY_A
+					);
+
+					if (!empty($unit)) {
+						$tbody = '';
+	
+						$detail_input_cascading = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Detail Pengisian Cascading OPD',
+							'content' => '[detail_input_cascading_pd]',
+							'show_header' => 1,
+							'post_status' => 'private'
+						));
+						foreach ($unit as $kk => $vv) {
+							$tbody .= "
+							<tr>
+								<td style='text-transform: uppercase;'><a href='".$detail_input_cascading['url']."&id_skpd=".$vv['id_skpd']."&id_periode=".$periode."' target='_blank'>".$vv['kode_skpd']." " . $vv['nama_skpd'] . "</a></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>";
+						}
+						$ret['data'] = $tbody;
+					} else {
+						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+	
+	public function get_table_cascading_pd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['periode'])) {
+					$periode = $_POST['periode'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Jadwal RENSTRA kosong!';
+				}
+
+				if($ret['status'] == 'success'){
+					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+	
+					$unit = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT 
+							nama_skpd, 
+							id_skpd, 
+							kode_skpd, 
+							nipkepala 
+						FROM esakip_data_unit 
+						WHERE active=1 
+						  AND tahun_anggaran=%d
+						  AND is_skpd=1 
+						ORDER BY kode_skpd ASC
+						", $tahun_anggaran_sakip),
+						ARRAY_A
+					);
+
+					if (!empty($unit)) {
+						$tbody = '';
+						
+						$ret['data'] = $tbody;
+					} else {
+						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
 	}
 }

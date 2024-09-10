@@ -586,9 +586,8 @@ jQuery("#show_croscutting").on('click', function(){
 <?php endif; ?>
 
 function drawChart() {
-  	window.data_all = <?php echo json_encode(array_values($data_temp)); ?>;
-  	console.log(data_all);
-
+   	window.data_all = <?php echo json_encode(array_values($data_temp)); ?>;
+   	console.log(data_all);
   	window.data = new google.visualization.DataTable();
     data.addColumn('string', 'Name');
     data.addColumn('string', 'Manager');

@@ -80,12 +80,15 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             <?php if (!$is_admin_panrb): ?>
                 <div style="margin-bottom: 25px;">
                     <button class="btn btn-primary" onclick="tambah_dokumen_rpjpd();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
+                    <button class="btn btn-success" onclick="sync_from_esr();"><i class="dashicons dashicons-arrow-down-alt"></i> Ambil data dari ESR</button>
+                    <button class="btn btn-warning" onclick="sync_to_esr();"><i class="dashicons dashicons-arrow-up-alt"></i> Kirim Data ke ESR</button>
                 </div>
             <?php endif; ?>
             <div class="wrap-table">
-                <table id="table_dokumen_rpjpd" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                <table id="table_dokumen_rpjpd" cellpadding="2" cellspacing="0" style="font-family:'Open Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
                     <tr>
+                            <th class="text-center" rowspan="2">Checklist ESR</th>
                             <th class="text-center" rowspan="2">No</th>
                             <th class="text-center" rowspan="2">Nama Dokumen</th>
                             <th class="text-center" rowspan="2">Keterangan</th>
@@ -463,5 +466,61 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 alert('Terjadi kesalahan saat mengirim data!');
             }
         });
+    }
+
+    function sync_from_esr(){
+       jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                url: esakip.url,
+                type: 'POST',
+                data: {
+                    action: 'sync_from_esr',
+                    api_key: esakip.api_key,
+                    list: list
+                },
+                dataType: 'json',
+                success: function(response) {
+                    jQuery('#wrap-loading').hide();
+                    alert(response.message);
+                },
+                error: function(xhr, status, error) {
+                    jQuery('#wrap-loading').hide();
+                    alert('Terjadi kesalahan saat ambil data!');
+                }
+        }); 
+    }
+
+    function sync_to_esr(){
+        let list = jQuery("input:checkbox[name=checklist_esr]:checked")
+                .map(function (){
+                return jQuery(this).val();
+        }).toArray();            
+            
+        if(list.length){
+            if (!confirm('Apakah Anda ingin melakukan singkronisasi dokumen ke ESR?')) {
+                return;
+            }
+            jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                url: esakip.url,
+                type: 'POST',
+                data: {
+                    action: 'sync_to_esr',
+                    api_key: esakip.api_key,
+                    list: list
+                },
+                dataType: 'json',
+                success: function(response) {
+                    jQuery('#wrap-loading').hide();
+                    alert(response.message);
+                },
+                error: function(xhr, status, error) {
+                    jQuery('#wrap-loading').hide();
+                    alert('Terjadi kesalahan saat kirim data!');
+                }
+            });
+        }else{
+            alert('Checklist ESR belum dipilih!'); 
+        }
     }
 </script>
