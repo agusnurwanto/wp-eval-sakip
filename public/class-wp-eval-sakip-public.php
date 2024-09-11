@@ -24236,4 +24236,32 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
+	public function mapping_user_esr(){
+		global $wpdb;
+
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+
+					echo json_encode([
+						'status' => true,
+						'message' => 'Sukses mapping user ESR!'
+					]);
+					exit;
+				} else {
+					throw new Exception('Api key tidak sesuai');
+				}
+			} else {
+				throw new Exception('Format tidak sesuai');
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit;
+		}
+	}
+
 }

@@ -45,7 +45,7 @@ foreach ($unit as $kk => $vv) {
 			<td>'.$vv['nama_skpd'].'</td>
 			<td class="text-center">'.$vv['namakepala'].'<br>'.$vv['nipkepala'].'</td>
 			<td>'.$selectUserEsr.'</td>
-			<td class="text-center"><button class="btn btn-primary" onclick="proses_mapping_skpd(\''.$vv['id_skpd'].'\');">Proses</button></td>
+			<td class="text-center"><button class="btn btn-primary" onclick="proses_mapping_user_esr(\''.$vv['id_skpd'].'\');">Proses</button></td>
 		</tr>
 	';
 }
@@ -71,7 +71,7 @@ foreach ($unit as $kk => $vv) {
 	</table>
 </div>
 <script type="text/javascript">
-	function proses_mapping_skpd(id_skpd) {
+	function proses_mapping_user_esr(id_skpd) {
 		var nama_skpd_sakip = jQuery('#_nama_skpd_sakip_'+id_skpd).val();
 		
 	    jQuery('#wrap-loading').show();
