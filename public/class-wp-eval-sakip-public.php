@@ -24242,7 +24242,25 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		try {
 			if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+					if (empty($_POST['user_esr'])) {
+						throw new Exception('User ESR wajib dipilih!');
+					}
 
+					$user_esr = $_POST['user_esr'];
+					$skpd = $wpdb->get_row($wpdb->prepare('
+	                        SELECT
+	                        	id_skpd
+	                        FROM esakip_data_unit
+	                        WHERE id_skpd=%s
+	                        	AND active=1
+	                        order by tahun_anggaran DESC
+	                    ', $_POST['id_skpd']), ARRAY_A);
+					
+					if (empty($skpd)) {
+						throw new Exception('ID Perangkat Daerah tidak ditemukan!');
+					}
+
+					update_option('_user_esr_' . $skpd['id_skpd'], $user_esr);
 
 					echo json_encode([
 						'status' => true,

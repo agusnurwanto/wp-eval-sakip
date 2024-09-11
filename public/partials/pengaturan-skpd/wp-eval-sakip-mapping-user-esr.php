@@ -6,6 +6,16 @@ global $wpdb;
 $tahun_anggaran= get_option('_crb_tahun_wpsipd');
 $api_key = get_option('_crb_apikey_esakip');
 
+$users_esr_pemda = $wpdb->get_results($wpdb->prepare("
+	SELECT 
+		user_id,
+		usr,
+		unit_kerja
+	FROM esakip_data_user_esr
+	WHERE role_id=%d
+	ORDER BY unit_kerja ASC
+", 21), ARRAY_A);
+
 $users_esr = $wpdb->get_results($wpdb->prepare("
 	SELECT 
 		user_id,
@@ -13,16 +23,10 @@ $users_esr = $wpdb->get_results($wpdb->prepare("
 		unit_kerja
 	FROM esakip_data_user_esr
 	WHERE role_id=%d
-	ORDER BY id
-", 22), ARRAY_A);
+	ORDER BY unit_kerja ASC
+", 22), ARRAY_A);  
 
-$selectUserEsr='<select class="form-control select2" name="user_esr"><option value="">Pilih User ESR</option>';
-foreach ($users_esr as $key => $user) {
-	$selectUserEsr.='<option value="'.$user['user_id'].'">'.$user['unit_kerja'].'</option>';
-}
-$selectUserEsr.='</select>';
-
-$unit = $wpdb->get_results("
+$units = $wpdb->get_results("
 	SELECT 
 		nama_skpd, 
 		id_skpd, 
@@ -36,25 +40,49 @@ $unit = $wpdb->get_results("
 	group by id_skpd
 	order by kode_skpd ASC
 ", ARRAY_A);
+
 $html = '';
-foreach ($unit as $kk => $vv) {
-	$nama_skpd_sakip = get_option('_nama_skpd_sakip_'.$vv['id_skpd']);
+$selectUserEsr = '';
+foreach ($units as $unit) {
+	$selectUserEsr='<select class="form-control" name="user_esr"><option value="">Pilih User ESR</option>';
+	foreach ($users_esr as $key => $user) {
+		$selected='';
+		if(get_option('_user_esr_' . $unit['id_skpd'])==$user['user_id']){
+			$selected='selected';
+		}
+		$selectUserEsr.='<option value="'.$user['user_id'].'" '.$selected.'> '.$user['usr'].' ~ '.$user['unit_kerja'].'</option>';
+	}
+	$selectUserEsr.='</select>';
+
 	$html .= '
-		<tr>
-			<td>'.$vv['kode_skpd'].'</td>
-			<td>'.$vv['nama_skpd'].'</td>
-			<td class="text-center">'.$vv['namakepala'].'<br>'.$vv['nipkepala'].'</td>
+		<tr id="row_'.$unit['id_skpd'].'">
+			<td>'.$unit['kode_skpd'].'</td>
+			<td>'.$unit['nama_skpd'].'</td>
+			<td class="text-center">'.$unit['namakepala'].'<br>'.$unit['nipkepala'].'</td>
 			<td>'.$selectUserEsr.'</td>
-			<td class="text-center"><button class="btn btn-primary" onclick="proses_mapping_user_esr(\''.$vv['id_skpd'].'\');">Proses</button></td>
+			<td class="text-center"><button class="btn btn-primary" onclick="proses_mapping_user_esr(\''.$unit['id_skpd'].'\');">Proses</button></td>
 		</tr>
 	';
 }
 ?>
 <div id="wrap-table" style="padding: 10px">
-	<h1 class="text-center">Mapping User ESR Menpanrb</h1>
+	<h1 class="text-center">Mapping User ESR MENPANRB</h1>
 	<div style="margin-bottom: 25px;">
         <button class="btn btn-success" onclick="sync_user_from_esr();"><i class="dashicons dashicons-arrow-down-alt"></i> Tarik Data User ESR</button>
     </div>
+    <table>
+		<thead>
+			<tr>
+				<th class="text-center">Kode Pemerintah Daerah SIPD</th>
+				<th class="text-center" style="width: 500px;">Nama Pemerintah Daerah SIPD</th>
+				<th class="text-center" style="width: 500px;">Nama dan NIP</th>
+				<th class="text-center" style="width: 500px;">User ESR</th>
+				<th class="text-center">Aksi</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
 	<table>
 		<thead>
 			<tr>
@@ -72,9 +100,9 @@ foreach ($unit as $kk => $vv) {
 </div>
 <script type="text/javascript">
 	function proses_mapping_user_esr(id_skpd) {
-		var nama_skpd_sakip = jQuery('#_nama_skpd_sakip_'+id_skpd).val();
-		
-	    jQuery('#wrap-loading').show();
+		var user_esr = jQuery('#row_'+id_skpd+' select[name=user_esr]').val();
+
+		jQuery('#wrap-loading').show();
 		jQuery.ajax({
 	        method: 'post',
 	        url: '<?php echo admin_url('admin-ajax.php'); ?>',
@@ -82,13 +110,16 @@ foreach ($unit as $kk => $vv) {
 	        data: {
 	            'action': 'mapping_user_esr',
 	            'api_key':'<?php echo $api_key; ?>',
+	            'id_skpd':id_skpd,
+	            'user_esr':user_esr,
 	     	},
 	        success: function(res) {
+	            jQuery('#wrap-loading').hide();
 	            alert(res.message);
-	            if (res.status == 'success') {
-	                jQuery('#wrap-table').modal('hide');
-	                jQuery('#wrap-loading').hide();
-	            } 
+	        },
+	        error:function(xhr, status, error){
+	        	jQuery('#wrap-loading').hide();
+	            alert('Terjadi kesalahan saat mapping data!');
 	        }
 	    });
 	}
