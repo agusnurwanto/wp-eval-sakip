@@ -5028,4 +5028,64 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		}
 		die(json_encode($ret));
 	}
+	
+	public function get_table_cascading_pd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['periode'])) {
+					$periode = $_POST['periode'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Jadwal RENSTRA kosong!';
+				}
+
+				if($ret['status'] == 'success'){
+					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+	
+					$unit = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT 
+							nama_skpd, 
+							id_skpd, 
+							kode_skpd, 
+							nipkepala 
+						FROM esakip_data_unit 
+						WHERE active=1 
+						  AND tahun_anggaran=%d
+						  AND is_skpd=1 
+						ORDER BY kode_skpd ASC
+						", $tahun_anggaran_sakip),
+						ARRAY_A
+					);
+
+					if (!empty($unit)) {
+						$tbody = '';
+						
+						$ret['data'] = $tbody;
+					} else {
+						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
 }

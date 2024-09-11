@@ -273,6 +273,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_submit_tahun_iku', $plugin_public, 'submit_tahun_iku');
 		$this->loader->add_action('wp_ajax_hapus_dokumen_iku', $plugin_public, 'hapus_dokumen_iku');
 		$this->loader->add_action('wp_ajax_get_table_iku', $plugin_public, 'get_table_iku');
+		
+		$this->loader->add_action('wp_ajax_get_table_cascading_pd', $plugin_public, 'get_table_cascading_pd');
 
 		$this->loader->add_action('wp_ajax_get_detail_dokumen_by_id', $plugin_public, 'get_detail_dokumen_by_id');
 		$this->loader->add_action('wp_ajax_submit_tambah_dokumen', $plugin_public, 'submit_tambah_dokumen');
