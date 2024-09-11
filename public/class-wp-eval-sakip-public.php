@@ -323,6 +323,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/pengaturan-skpd/wp-eval-sakip-mapping-skpd.php';
 	}
 
+	public function halaman_mapping_user_esr()
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/pengaturan-skpd/wp-eval-sakip-mapping-user-esr.php';
+	}
+
 	public function jadwal_rpjmd()
 	{
 		// untuk disable render shortcode di halaman edit page/post

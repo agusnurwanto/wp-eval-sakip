@@ -1189,6 +1189,13 @@ class Wp_Eval_Sakip_Admin
 			'no_key' => 1,
 			'post_status' => 'private'
 		));
+		$halaman_mapping_user_esr = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman Mapping User ESR',
+			'content' => '[halaman_mapping_user_esr]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
 
 		$basic_options_container = Container::make('theme_options', __('E-SAKIP Options'))
 			->set_page_menu_position(3)
@@ -1225,6 +1232,7 @@ class Wp_Eval_Sakip_Admin
 					<h4>HALAMAN TERKAIT</h4>
 	            	<ol>
 	            		<li><a href="' . $halaman_mapping_skpd['url'] . '">' . $halaman_mapping_skpd['title'] . '</a></li>
+	            		<li><a href="' . $halaman_mapping_user_esr['url'] . '">' . $halaman_mapping_user_esr['title'] . '</a></li>
 	            	</ol>'),
 				Field::make('text', 'crb_url_server_sakip', 'URL Server WP-SIPD')
 					->set_default_value(admin_url('admin-ajax.php'))

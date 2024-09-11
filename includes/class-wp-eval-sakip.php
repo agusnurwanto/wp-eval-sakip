@@ -663,6 +663,8 @@ class Wp_Eval_Sakip {
 
 		add_shortcode('cascading_pd', array($plugin_public, 'cascading_pd'));
 		add_shortcode('detail_input_cascading_pd', array($plugin_public, 'detail_input_cascading_pd'));
+
+		add_shortcode('halaman_mapping_user_esr', array($plugin_public, 'halaman_mapping_user_esr'));
 	}
 
 	/**
