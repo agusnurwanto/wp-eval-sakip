@@ -556,6 +556,7 @@ class Wp_Eval_Sakip {
 		
 		$this->loader->add_action('wp_ajax_sync_from_esr',  $plugin_public, 'sync_from_esr');
 		$this->loader->add_action('wp_ajax_sync_to_esr',  $plugin_public, 'sync_to_esr');
+		$this->loader->add_action('wp_ajax_sync_user_from_esr',  $plugin_public, 'sync_user_from_esr');
 		
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));

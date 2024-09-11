@@ -1261,6 +1261,7 @@ CREATE TABLE `esakip_data_user_esr` (
   `usr` varchar(255) DEFAULT null,
   `email` varchar(255) DEFAULT null,
   `unit_kerja` varchar(255) DEFAULT null,
-  `created_at` datetime DEFAULT current_timestamp()
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id)
 );

@@ -24160,4 +24160,71 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
+	public function sync_user_from_esr(){
+		global $wpdb;
+
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+					$response = wp_remote_get(get_option('_crb_url_api_esr').'get_user_id', [
+						'headers' => array(
+					        'Accept' => 'application/json',
+					        'Authorization' => 'Basic ' . base64_encode(get_option('_crb_username_api_esr').':'.get_option('_crb_password_api_esr')),
+					    ),
+					]);
+
+					$users = json_decode(wp_remote_retrieve_body($response));
+					if(empty($users->data)){
+						throw new Exception("Data tidak ditemukan di API ESR", 1);
+					}
+
+					foreach ($users->data as $key => $user) {
+						$check = $wpdb->get_var($wpdb->prepare("SELECT id FROM esakip_data_user_esr WHERE user_id=%d", $user->user_id));
+						if(empty($check)){
+							$wpdb->insert('esakip_data_user_esr', [
+								'user_id' => $user->user_id,
+								'role_id' => $user->role_id,
+								'parent_id' => $user->parent_id,
+								'instansi_id' => $user->instansi_id,
+								'usr' => $user->usr,
+								'email' => $user->email,
+								'unit_kerja' => $user->unit_kerja,
+								'created_at' => current_time('mysql')
+							], ['%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s']);
+						}else{
+							$wpdb->update('esakip_data_user_esr', [
+								'role_id' => $user->role_id,
+								'parent_id' => $user->parent_id,
+								'instansi_id' => $user->instansi_id,
+								'usr' => $user->usr,
+								'email' => $user->email,
+								'unit_kerja' => $user->unit_kerja,
+								'updated_at' => current_time('mysql')
+							], [
+								'user_id' => $user->user_id
+							], ['%d', '%d', '%d', '%d', '%s', '%s', '%s']);
+						}
+					}
+
+					echo json_encode([
+						'status' => true,
+						'message' => 'Sukses ambil data dari API ESR!'
+					]);
+					exit;
+				} else {
+					throw new Exception('Api key tidak sesuai');
+				}
+			} else {
+				throw new Exception('Format tidak sesuai');
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit;
+		}
+	}
+
 }

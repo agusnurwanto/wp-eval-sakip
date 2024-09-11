@@ -29,13 +29,17 @@ foreach ($unit as $kk => $vv) {
 			<td>'.$vv['nama_skpd'].'</td>
 			<td class="text-center">'.$vv['namakepala'].'<br>'.$vv['nipkepala'].'</td>
 			<td><input type="text" value="'.$nama_skpd_sakip.'" id="_nama_skpd_sakip_'.$vv['id_skpd'].'" class="form-control"></td>
+			<td></td>
 			<td class="text-center"><button class="btn btn-primary" onclick="proses_mapping_skpd(\''.$vv['id_skpd'].'\');">Proses</button></td>
 		</tr>
 	';
 }
 ?>
-<div id="wrap-table">
+<div id="wrap-table" style="padding: 10px">
 	<h1 class="text-center">Mapping Perangkat Daerah Tahun <?php echo $tahun_anggaran; ?></h1>
+	<div style="margin-bottom: 25px;">
+        <button class="btn btn-success" onclick="sync_user_from_esr();"><i class="dashicons dashicons-arrow-down-alt"></i> Tarik Data User ESR</button>
+    </div>
 	<table>
 		<thead>
 			<tr>
@@ -43,6 +47,7 @@ foreach ($unit as $kk => $vv) {
 				<th class="text-center" style="width: 500px;">Nama Perangkat Daerah SIPD</th>
 				<th class="text-center" style="width: 500px;">Nama dan NIP</th>
 				<th class="text-center" style="width: 500px;">Nama Perangkat Daerah SAKIP</th>
+				<th class="text-center" style="width: 500px;">User ESR</th>
 				<th class="text-center">Aksi</th>
 			</tr>
 		</thead>
@@ -74,5 +79,26 @@ function proses_mapping_skpd(id_skpd) {
             } 
         }
     });
+}
+
+function sync_user_from_esr(){
+    jQuery('#wrap-loading').show();
+    jQuery.ajax({
+        url: esakip.url,
+        type: 'POST',
+        data: {
+            action: 'sync_user_from_esr',
+            api_key: esakip.api_key,
+        },
+        dataType: 'json',
+        success: function(response) {
+            jQuery('#wrap-loading').hide();
+            alert(response.message);
+        },
+        error: function(xhr, status, error) {
+    	    jQuery('#wrap-loading').hide();
+            alert('Terjadi kesalahan saat ambil data!');
+        }
+    }); 
 }
 </script>
