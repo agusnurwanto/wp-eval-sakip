@@ -17449,15 +17449,39 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				));
 				$title = 'Input IKU | ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai;
 				$periode_input_iku_opd .= '<li><a target="_blank" href="' . $input_iku_wpsipd['url'] . '" class="btn btn-primary">' . $title . '</a></li>';
+			}
+			//jadwal rpjmd/rpd sakip
+			$data_jadwal = $wpdb->get_results(
+				$wpdb->prepare("
+				SELECT
+					*
+				FROM
+					esakip_data_jadwal
+				WHERE
+					tipe='RPJMD'
+					AND status!=0"),
+				ARRAY_A);
+			
+			if(empty($data_jadwal)){
+				die("JADWAL KOSONG");
+			}
 
+			if(!empty($data_jadwal)){
+				foreach ($data_jadwal as $jadwal_periode) {
+					$lama_pelaksanaan = $jadwal_periode['lama_pelaksanaan'] ?? 4;
+					$tahun_anggaran = $jadwal_periode['tahun_anggaran'];
+					$tahun_awal = $jadwal_periode['tahun_anggaran'];
+					$tahun_akhir = $tahun_awal + $jadwal_periode['lama_pelaksanaan'] - 1;
+					
 				$input_iku_pemda = $this->functions->generatePage(array(
-					'nama_page' => 'Input IKU Pemerintah Daerah ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai,
-					'content' => '[list_input_iku_pemda periode=' . $jadwal_periode_item_wpsipd->id_jadwal_lokal . ']',
+					'nama_page' => 'Input IKU Pemerintah Daerah ' . $jadwal_periode['jenis_jadwal_khusus'] .' '. $jadwal_periode['nama_jadwal'] . ' ' . 'Periode ' . $tahun_awal . ' - ' . $tahun_akhir,
+					'content' => '[input_iku_pemda id_periode=' . $jadwal_periode['id'] . ']',
 					'show_header' => 1,
 					'post_status' => 'private'
 				));
-				$title = 'Input IKU | ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai;
+				$title = 'Input IKU | ' . $jadwal_periode['jenis_jadwal_khusus'] .' '. $jadwal_periode['nama_jadwal'] . ' ' . 'Periode ' . $tahun_awal . ' - ' . $tahun_akhir;
 				$periode_input_iku_pemda .= '<li><a target="_blank" href="' . $input_iku_pemda['url'] . '" class="btn btn-primary">' . $title . '</a></li>';
+				}
 			}
 		}
 

@@ -118,7 +118,7 @@ $cek_id_jadwal = empty($input['id_periode']) ? 0 : 1;
 
 <!-- Table -->
 <div class="container-md">
-    <div id="cetak" title="Rencana Aksi Perangkat Daerah">
+    <div id="cetak" title="Rencana Aksi Pemerintah Daerah">
         <div style="padding: 10px;margin:0 0 3rem 0;">
             <h1 class="text-center" style="margin:3rem;">Pengisian IKU <br>Pemerintah Daerah<br><?php echo $nama_jadwal ?></h1>
             <div id="action" class="action-section hide-excel"></div>
@@ -132,7 +132,7 @@ $cek_id_jadwal = empty($input['id_periode']) ? 0 : 1;
                             <th class="text-center">Definisi Operasional/Formulasi</th>
                             <th class="text-center">Sumber Data</th>
                             <th class="text-center">Penanggung Jawab</th>
-                            <th class="text-center" style="width: 150px;">Aksi</th>
+                            <th class="text-center hide-excel" style="width: 150px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -162,7 +162,7 @@ $cek_id_jadwal = empty($input['id_periode']) ? 0 : 1;
                     </div>
                     <div class="form-group">
                         <label for="indikator">Indikator Sasaran</label>
-                        <textarea name="" id="indikator" disabled></textarea>
+                        <select name="" id="indikator"></select>
                     </div>
                     <div class="form-group">
                         <label for="formulasi">Definisi Operasional/Formulasi</label>
@@ -180,7 +180,7 @@ $cek_id_jadwal = empty($input['id_periode']) ? 0 : 1;
 	      	</div>
 	      	<div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
-                <button type="button" class="btn btn-success" onclick="simpan_data_iku()">Simpan</button>
+                <button type="button" class="btn btn-success" onclick="simpanDataIkuPemda()">Simpan</button>
             </div>
     	</div>
   	</div>
@@ -190,7 +190,7 @@ $cek_id_jadwal = empty($input['id_periode']) ? 0 : 1;
 <script type="text/javascript">
 jQuery(document).ready(function() {
     run_download_excel_sakip();
-    // jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-iku" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
+    jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-iku-pemda" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
 
     let id_jadwal = <?php echo $cek_id_jadwal; ?>;
     if(id_jadwal == 0){
@@ -201,8 +201,8 @@ jQuery(document).ready(function() {
 
     getTableIKUPemda();
 
-    jQuery("#tambah-iku").on('click', function(){
-        tambahIku();
+    jQuery("#tambah-iku-pemda").on('click', function(){
+        tambahIkuPemda();
     });
 });
 
@@ -235,13 +235,13 @@ function getTableIKUPemda() {
     });
 }
 
-function tambahIku(){
+function tambahIkuPemda(){
     jQuery('#wrap-loading').show();
-    return get_sasaran()
+    return getSasaran()
     .then(function(){
         return new Promise(function(resolve, reject){
             jQuery('#wrap-loading').hide();
-            if(typeof data_sasaran_cascading != 'undefined'){
+            if(typeof data_sasaran_rpjmd != 'undefined'){
                 jQuery('#wrap-loading').hide();
                 jQuery("#modal-iku").modal('show');
                 jQuery("#modal-iku").find('.modal-title').html('Tambah IKU');
@@ -249,22 +249,22 @@ function tambahIku(){
                     +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
                         +'Tutup'
                     +'</button>'
-                    +'<button type="button" class="btn btn-success" onclick="simpan_data_iku()">'
+                    +'<button type="button" class="btn btn-success" onclick="simpanDataIkuPemda()">'
                         +'Simpan'
                     +'</button>');
     
-                if(data_sasaran_cascading != undefined){
-                    let html_cascading = '<option value="">Pilih Tujuan/Sasaran</option>';
-                    if(data_sasaran_cascading.data !== null){
-                        data_sasaran_cascading.data.map(function(value, index){
+                if(data_sasaran_rpjmd != undefined){
+                    let html_sasaran = '<option value="">Pilih Sasaran Strategis</option>';
+                    if(data_sasaran_rpjmd.data !== null){
+                        data_sasaran_rpjmd.data.map(function(value, index){
                             if(value.id_unik_indikator == null){
-                                html_cascading += '<option value="'+value.kode_bidang_urusan+'">'+value.sasaran_teks+'</option>';
+                                html_sasaran += '<option value="'+value.id_unik+'">'+value.sasaran_teks+'</option>';
                             }
                         });
                     }
-                    jQuery("#tujuan-sasaran").html(html_cascading);
+                    jQuery("#tujuan-sasaran").html(html_sasaran);
                     jQuery('#tujuan-sasaran').select2({width: '100%'});
-                    jQuery('#tujuan-sasaran').attr("onchange","get_indikator(this.value)")
+                    jQuery('#tujuan-sasaran').attr("onchange","getIndikator(this.value)")
                 }
              
                 resolve();
@@ -273,15 +273,16 @@ function tambahIku(){
     })
 }
 
-function simpan_data_iku(){
+function simpanDataIkuPemda(){
     let id_iku = jQuery('#id_iku').val();
-    let kode_sasaran = jQuery('#tujuan-sasaran').val();
+    let id_sasaran = jQuery('#tujuan-sasaran').val();
     let label_tujuan_sasaran = jQuery('#tujuan-sasaran option:selected').text();
-    let label_indikator = jQuery('#indikator').val();
+    let id_indikator = jQuery('#indikator').val();
+    let label_indikator = jQuery('#indikator option:selected').text();
     let formulasi = jQuery('#formulasi').val();
     let sumber_data = jQuery('#sumber-data').val();
     let penanggung_jawab = jQuery('#penanggung-jawab').val();
-    if(kode_sasaran == '' || label_indikator == '' || formulasi == '' || sumber_data == '' || penanggung_jawab == ''){
+    if(id_sasaran == '' || id_indikator == '' || formulasi == '' || sumber_data == '' || penanggung_jawab == ''){
         return alert('Ada Input Data Yang Kosong!')
     }
     jQuery('#wrap-loading').show();
@@ -289,16 +290,17 @@ function simpan_data_iku(){
         url: esakip.url,
         type: "post",
         data: {
-            "action": 'tambah_iku',
+            "action": 'tambah_iku_pemda',
             "api_key": esakip.api_key,
             "tipe_iku": "opd",
-            "kode_sasaran": kode_sasaran,
+            "id_sasaran": id_sasaran,
             "label_tujuan_sasaran": label_tujuan_sasaran,
+            "id_indikator": id_indikator,
             "label_indikator": label_indikator,
             "formulasi": formulasi,
             "sumber_data": sumber_data,
             "penanggung_jawab": penanggung_jawab,
-            "id_jadwal_wpsipd": id_jadwal_wpsipd,
+            "id_jadwal": id_jadwal,
             "id_iku" : id_iku
         },
         dataType: "json",
@@ -307,14 +309,14 @@ function simpan_data_iku(){
             alert(res.message);
             if(res.status=='success'){
                 jQuery("#modal-iku").modal('hide');
-                getTableIKU();
+                getTableIKUPemda();
             }
         }
     });
 }
 
 function edit_iku(id) {
-    tambahIku().then(function(){
+    tambahIkuPemda().then(function(){
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -322,7 +324,8 @@ function edit_iku(id) {
             data: {
                 action: 'get_iku_by_id',
                 api_key: esakip.api_key,
-                id: id
+                id: id,
+                tipe: 'pemda'
             },
             dataType: 'json',
             success: function(response) {
@@ -331,13 +334,15 @@ function edit_iku(id) {
                 if (response.status === 'success') {
                     let data = response.data;
                     jQuery('#id_iku').val(id);
-                    jQuery("#tujuan-sasaran").val(data.kode_sasaran).trigger('change');
+                    jQuery("#tujuan-sasaran").val(data.id_sasaran).trigger('change');
                     jQuery("#formulasi").val(data.formulasi);
                     jQuery("#sumber-data").val(data.sumber_data);
                     jQuery("#penanggung-jawab").val(data.penanggung_jawab);
                     jQuery("#modal-iku").find('.modal-title').html('Edit IKU');
                     jQuery('#modal-iku').modal('show');
-                    get_indikator(data.kode_sasaran);
+                    getIndikator(data.id_sasaran).then(function(){
+                        jQuery("#indikator").val(data.id_unik_indikator).trigger('change');
+                    })
                 } else {
                     alert(response.message);
                 }
@@ -362,7 +367,8 @@ function hapus_iku(id) {
         data: {
             action: 'hapus_iku',
             api_key: esakip.api_key,
-            id: id
+            id: id,
+            tipe: "pemda"
         },
         dataType: 'json',
         success: function(response) {
@@ -370,7 +376,7 @@ function hapus_iku(id) {
             jQuery('#wrap-loading').hide();
             if (response.status === 'success') {
                 alert(response.message);
-                getTableIKU();
+                getTableIKUPemda();
             } else {
                 alert(response.message);
             }
@@ -383,49 +389,51 @@ function hapus_iku(id) {
     });
 }
 
-function get_indikator(that){
+function getIndikator(that){
     jQuery('#wrap-loading').show();
-    get_tujuan_sasaran()
+    return getSasaran()
     .then(function(){
-        jQuery('#wrap-loading').hide();
-        if(typeof data_sasaran_cascading != 'undefined'){
-            if(data_sasaran_cascading != undefined){
-                let html_indikator = '';
-                if(data_sasaran_cascading.data !== null){
-                    data_sasaran_cascading.data.map(function(value, index){
-                        if(value.id_unik_indikator != null){
-                            if(value.kode_bidang_urusan == that){
-                                html_indikator += '- '+value.indikator_teks+'\n';
+        return new Promise(function(resolve, reject){
+            jQuery('#wrap-loading').hide();
+            if(typeof data_sasaran_rpjmd != 'undefined'){
+                if(data_sasaran_rpjmd != undefined){
+                    let html_indikator = '';
+                    if(data_sasaran_rpjmd.data !== null){
+                        html_indikator = '<option value="">Pilih Indikator Sasaran</option>';
+                        data_sasaran_rpjmd.data.map(function(value, index){
+                            if(value.id_unik_indikator != null && value.id_unik == that){
+                                html_indikator += '<option value="'+value.id_unik_indikator+'">'+value.indikator_teks+'</option>';
                             }
-                        }
-                    });
+                        });
+                    }
+                    jQuery("#indikator").html(html_indikator);
+                    jQuery('#indikator').select2({width: '100%'});
+
+                    resolve();
                 }
-                jQuery("#indikator").html(html_indikator);
             }
-        }
+        })
     })
 }
 
-function get_sasaran() {
+function getSasaran() {
     return new Promise(function(resolve, reject){
-        if(typeof data_sasaran_cascading == 'undefined'){
+        if(typeof data_sasaran_rpjmd == 'undefined'){
             jQuery('#wrap-loading').show();
             jQuery.ajax({
                 url: esakip.url,
                 type: "post",
                 data: {
-                    "action": 'get_tujuan_sasaran_cascading',
+                    "action": 'get_sasaran_rpjmd',
                     "api_key": esakip.api_key,
-                    "jenis": 'sasaran',
-                    "id_jadwal": id_jadwal,
-                    'tipe': 'pemda'
+                    "id_jadwal": id_jadwal
                 },
                 dataType: "json",
                 success: function(response){
                     if(response.status){
-                        window.data_sasaran_cascading = response;
+                        window.data_sasaran_rpjmd = response;
                     }else{
-                        alert("Data cascading tidak ditemukan")
+                        alert("Data sasaran tidak ditemukan")
                     }
                     resolve();
                 }

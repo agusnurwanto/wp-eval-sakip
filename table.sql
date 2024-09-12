@@ -1228,7 +1228,7 @@ CREATE TABLE `esakip_data_iku_opd` (
 
 CREATE TABLE `esakip_data_iku_pemda` (
   `id` int(11) NOT NULL auto_increment,
-  `kode_sasaran` text NOT NULL,
+  `id_sasaran` text NOT NULL,
   `label_sasaran` text DEFAULT null,
   `id_unik_indikator` text DEFAULT null,
   `label_indikator` text DEFAULT null,

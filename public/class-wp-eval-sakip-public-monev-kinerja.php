@@ -1426,14 +1426,25 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				if (!empty($_POST['id'])) {
-					$data = $wpdb->get_row(
-						$wpdb->prepare("
-							SELECT *
-							FROM esakip_data_iku_opd
-							WHERE id = %d
-						", $_POST['id']),
-						ARRAY_A
-					);
+					if(!empty($_POST['tipe']) && $_POST['tipe'] == "pemda"){
+						$data = $wpdb->get_row(
+							$wpdb->prepare("
+								SELECT *
+								FROM esakip_data_iku_pemda
+								WHERE id = %d
+							", $_POST['id']),
+							ARRAY_A
+						);
+					}else{
+						$data = $wpdb->get_row(
+							$wpdb->prepare("
+								SELECT *
+								FROM esakip_data_iku_opd
+								WHERE id = %d
+							", $_POST['id']),
+							ARRAY_A
+						);
+					}
 					$ret['data'] = $data;
 				} else {
 					$ret = array(
@@ -1468,21 +1479,40 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				if (!empty($_POST['id'])) {
-					$data_iku_lama = $wpdb->get_var(
-						$wpdb->prepare("
-							SELECT
-								id
-							FROM esakip_data_iku_opd
-							WHERE id=%d
-						", $_POST['id'])
-					);
-
-					if(!empty($data_iku_lama)){
-						$ret['data'] = $wpdb->update(
-							'esakip_data_iku_opd',
-							array('active' => 0),
-							array('id' => $_POST['id'])
+					if(!empty($_POST['tipe']) && $_POST['tipe'] == "pemda"){
+						$data_iku_lama = $wpdb->get_var(
+							$wpdb->prepare("
+								SELECT
+									id
+								FROM esakip_data_iku_pemda
+								WHERE id=%d
+							", $_POST['id'])
 						);
+	
+						if(!empty($data_iku_lama)){
+							$ret['data'] = $wpdb->update(
+								'esakip_data_iku_pemda',
+								array('active' => 0),
+								array('id' => $_POST['id'])
+							);
+						}
+					}else{
+						$data_iku_lama = $wpdb->get_var(
+							$wpdb->prepare("
+								SELECT
+									id
+								FROM esakip_data_iku_opd
+								WHERE id=%d
+							", $_POST['id'])
+						);
+	
+						if(!empty($data_iku_lama)){
+							$ret['data'] = $wpdb->update(
+								'esakip_data_iku_opd',
+								array('active' => 0),
+								array('id' => $_POST['id'])
+							);
+						}
 					}
 
 					if ($wpdb->rows_affected == 0) {
@@ -1493,6 +1523,125 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'status' => 'error',
 						'message'   => 'Id Kosong!'
 					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	function get_sasaran_rpjmd(){
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+					$data = $wpdb->get_results(
+						$wpdb->prepare("
+							SELECT 
+								*
+							FROM 
+								esakip_rpd_sasaran
+							WHERE 
+								active=1
+							order by sasaran_no_urut
+						"),
+						ARRAY_A
+					);
+					if(!empty($data)){
+						$ret['data'] = $data;
+					}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+	
+	function tambah_iku_pemda(){
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil simpan Iku!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if ($ret['status'] != 'error' && empty($_POST['id_sasaran'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Sasaran tidak boleh kosong!';
+				} else if ($ret['status'] != 'error' && empty($_POST['id_indikator'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Indikator tidak boleh kosong!';
+				} else if ($ret['status'] != 'error' && empty($_POST['formulasi'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Definisi Operasional/Formulasi boleh kosong!';
+				} else if ($ret['status'] != 'error' && empty($_POST['sumber_data'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Sumber Data tidak boleh kosong!';
+				} else if ($ret['status'] != 'error' && empty($_POST['penanggung_jawab'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Penanggung_jawab tidak boleh kosong!';
+				} else if ($ret['status'] != 'error' && empty($_POST['id_jadwal'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID Jadwal tidak boleh kosong!';
+				}
+
+				if ($ret['status'] != 'error'){
+					$data = array(
+						'id_sasaran' => $_POST['id_sasaran'],
+						'label_sasaran' => $_POST['label_tujuan_sasaran'],
+						'id_unik_indikator' => $_POST['id_indikator'],
+						'label_indikator' => $_POST['label_indikator'],
+						'formulasi' => $_POST['formulasi'],
+						'sumber_data' => $_POST['sumber_data'],
+						'penanggung_jawab' => $_POST['penanggung_jawab'],
+						'id_jadwal' => $_POST['id_jadwal'],
+						'active' => 1,
+						'updated_at' => current_time('mysql'),
+					);
+
+					if(!empty($_POST['id_iku'])){
+						$cek_id = $_POST['id_iku'];
+						$data_cek_iku = $wpdb->get_results($wpdb->prepare("
+							SELECT
+								id
+							FROM esakip_data_iku_pemda
+							WHERE id=%d
+						", $cek_id), ARRAY_A);
+
+						$cek_id = !empty($data_cek_iku) ? $cek_id : null;
+					}
+
+					if(empty($cek_id)){
+						$data['created_at'] = current_time('mysql');
+
+						$wpdb->insert('esakip_data_iku_pemda', $data);
+					}else{
+						$wpdb->update('esakip_data_iku_pemda', $data, array('id' => $cek_id));
+					}
 				}
 			} else {
 				$ret = array(

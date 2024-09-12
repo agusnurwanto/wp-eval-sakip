@@ -146,7 +146,7 @@ $skpd = $wpdb->get_row(
                             <th class="text-center">Definisi Operasional/Formulasi</th>
                             <th class="text-center">Sumber Data</th>
                             <th class="text-center">Penanggung Jawab</th>
-                            <th class="text-center" style="width: 150px;">Aksi</th>
+                            <th class="text-center hide-excel" style="width: 150px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>

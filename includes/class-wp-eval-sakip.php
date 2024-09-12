@@ -543,6 +543,9 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_hapus_iku', $plugin_public, 'hapus_iku');
 		$this->loader->add_action('wp_ajax_get_iku_by_id', $plugin_public, 'get_iku_by_id');
 		
+		$this->loader->add_action('wp_ajax_get_sasaran_rpjmd', $plugin_public, 'get_sasaran_rpjmd');
+		$this->loader->add_action('wp_ajax_tambah_iku_pemda', $plugin_public, 'tambah_iku_pemda');
+		
 		$this->loader->add_action('wp_ajax_get_table_skpd_input_iku', $plugin_public, 'get_table_skpd_input_iku');
 		$this->loader->add_action('wp_ajax_get_table_skpd_input_cascading', $plugin_public, 'get_table_skpd_input_cascading');
 
