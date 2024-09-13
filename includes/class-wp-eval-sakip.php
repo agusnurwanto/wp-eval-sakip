@@ -551,6 +551,7 @@ class Wp_Eval_Sakip {
 
 		$this->loader->add_action('wp_ajax_get_data_pengaturan_rencana_aksi', $plugin_public, 'get_data_pengaturan_rencana_aksi');
 		$this->loader->add_action('wp_ajax_submit_pengaturan_rencana_aksi', $plugin_public, 'submit_pengaturan_rencana_aksi');
+		$this->loader->add_action('wp_ajax_submit_pengaturan_rencana_aksi_pemda', $plugin_public, 'submit_pengaturan_rencana_aksi_pemda');
 
 		$this->loader->add_action('wp_ajax_simpan_copy_data_pokin', $plugin_public, 'simpan_copy_data_pokin');
 		$this->loader->add_action('wp_ajax_get_table_capaian_indikator',  $plugin_public, 'get_table_capaian_indikator');
@@ -577,6 +578,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('renja_rkt', array($plugin_public, 'renja_rkt'));
 		add_shortcode('perjanjian_kinerja', array($plugin_public, 'perjanjian_kinerja'));
 		add_shortcode('rencana_aksi', array($plugin_public, 'rencana_aksi'));
+		add_shortcode('list_pengisian_rencana_aksi_pemda', array($plugin_public, 'list_pengisian_rencana_aksi_pemda'));
 		add_shortcode('iku', array($plugin_public, 'iku'));
 		add_shortcode('skp', array($plugin_public, 'skp'));
 		add_shortcode('pengukuran_kinerja', array($plugin_public, 'pengukuran_kinerja'));
