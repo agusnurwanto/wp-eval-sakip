@@ -1353,7 +1353,33 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$ret['status'] = 'error';
 						$ret['message'] = 'ID jadwal tidak boleh kosong!';
 					}
-					if ($ret['status'] != 'error'){
+					if ($ret['status'] != 'error'){		
+						$skpd = $wpdb->get_row(
+							$wpdb->prepare("
+							SELECT 
+								nama_skpd,
+								nipkepala
+							FROM esakip_data_unit
+							WHERE id_skpd=%d
+							AND tahun_anggaran=%d
+							AND active = 1
+						", $_POST['id_skpd'], get_option(ESAKIP_TAHUN_ANGGARAN)),
+							ARRAY_A
+						);
+
+						$current_user = wp_get_current_user();
+						$nip_kepala = $current_user->data->user_login;
+						$user_roles = $current_user->roles;
+						$is_admin_panrb = in_array('admin_panrb', $user_roles);
+						$is_administrator = in_array('administrator', $user_roles);
+						
+						$admin_role_pemda = array(
+							'admin_bappeda',
+							'admin_ortala'
+						);
+					
+						$this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2 ;
+
 						$data_iku = $wpdb->get_results($wpdb->prepare("
 							SELECT
 								*
@@ -1384,6 +1410,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_iku(\'' . $v['id'] . '\'); return false;" href="#" title="Edit IKU"><span class="dashicons dashicons-edit"></span></button>';
 								$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_iku(\'' . $v['id'] . '\'); return false;" href="#" title="Hapus IKU"><span class="dashicons dashicons-trash"></span></button>';
 								$btn .= '</div>';
+
+								$hak_akses_user = ($nip_kepala == $skpd['nipkepala'] || $is_administrator || $this_jenis_role == 1) ? true : false;
+
+								if(!$hak_akses_user){
+									$btn = '';
+								}
 	
 								$html .= "<td class='text-center'>" . $btn . "</td>";
 								$html .='</tr>';
