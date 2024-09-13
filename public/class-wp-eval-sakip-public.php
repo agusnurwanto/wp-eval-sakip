@@ -24246,21 +24246,34 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						throw new Exception('User ESR wajib dipilih!');
 					}
 
+					$id_skpd = $_POST['id_skpd'];
 					$user_esr = $_POST['user_esr'];
-					$skpd = $wpdb->get_row($wpdb->prepare('
-	                        SELECT
-	                        	id_skpd
-	                        FROM esakip_data_unit
-	                        WHERE id_skpd=%s
-	                        	AND active=1
-	                        order by tahun_anggaran DESC
-	                    ', $_POST['id_skpd']), ARRAY_A);
-					
-					if (empty($skpd)) {
-						throw new Exception('ID Perangkat Daerah tidak ditemukan!');
-					}
+					$type_skpd = $_POST['type_skpd'];
+					switch ($type_skpd) {
+						case 21:
+							update_option('_user_esr_' . $id_skpd, $user_esr);
+							break;
 
-					update_option('_user_esr_' . $skpd['id_skpd'], $user_esr);
+						case 22:
+							$skpd = $wpdb->get_row($wpdb->prepare('
+			                        SELECT
+			                        	id_skpd
+			                        FROM esakip_data_unit
+			                        WHERE id_skpd=%s
+			                        	AND active=1
+			                        order by tahun_anggaran DESC', $id_skpd), ARRAY_A);
+							
+							if (empty($skpd)) {
+								throw new Exception('ID Perangkat Daerah tidak ditemukan!');
+							}
+
+							update_option('_user_esr_' . $skpd['id_skpd'], $user_esr);
+							break;
+						
+						default:
+							throw new Exception('SKPD tidak ditemukan!');
+							break;
+					}
 
 					echo json_encode([
 						'status' => true,
