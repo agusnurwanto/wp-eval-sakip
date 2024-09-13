@@ -540,4 +540,13 @@ class Esakip_Functions
         
         return $newUrl;
     }
+    function add_param_get($url, $param){
+        $data = explode('?', $url);
+        if(count($data) > 1){
+            $url .= $param;
+        }else{
+            $url .= '?'.$param;
+        }
+        return $url;
+    }
 }
