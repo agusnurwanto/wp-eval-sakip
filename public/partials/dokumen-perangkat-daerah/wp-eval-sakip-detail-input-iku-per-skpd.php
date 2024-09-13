@@ -51,7 +51,8 @@ $cek_id_jadwal_wpsipd = empty($id_periode) ? 0 : 1;
 $skpd = $wpdb->get_row(
     $wpdb->prepare("
     SELECT 
-        nama_skpd
+        nama_skpd,
+        nipkepala
     FROM esakip_data_unit
     WHERE id_skpd=%d
       AND tahun_anggaran=%d
@@ -60,17 +61,18 @@ $skpd = $wpdb->get_row(
     ARRAY_A
 );
 
-// $current_user = wp_get_current_user();
-// $user_roles = $current_user->roles;
-// $is_admin_panrb = in_array('admin_panrb', $user_roles);
-// $is_administrator = in_array('administrator', $user_roles);
+$current_user = wp_get_current_user();
+$nip_kepala = $current_user->data->user_login;
+$user_roles = $current_user->roles;
+$is_admin_panrb = in_array('admin_panrb', $user_roles);
+$is_administrator = in_array('administrator', $user_roles);
 
-//     $admin_role_pemda = array(
-//         'admin_bappeda',
-//         'admin_ortala'
-//     );
+    $admin_role_pemda = array(
+        'admin_bappeda',
+        'admin_ortala'
+    );
 
-//     $this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2 ;
+    $this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2 ;
 
 //     $cek_settingan_menu = $wpdb->get_var(
 //         $wpdb->prepare(
@@ -85,6 +87,7 @@ $skpd = $wpdb->get_row(
 //     );
 
 //     $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
+$hak_akses_user = ($nip_kepala == $skpd['nipkepala'] || $is_administrator || $this_jenis_role == 1) ? true : false;
 ?>
 <style type="text/css">
     .wrap-table {
@@ -204,8 +207,9 @@ $skpd = $wpdb->get_row(
 <script type="text/javascript">
 jQuery(document).ready(function() {
     run_download_excel_sakip();
-    jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-iku" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
-
+    <?php if($hak_akses_user): ?>
+        jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-iku" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
+    <?php endif; ?>
     let id_jadwal_wpsipd = <?php echo $cek_id_jadwal_wpsipd; ?>;
     if(id_jadwal_wpsipd == 0){
         alert("Jadwal RENSTRA WP-SIPD untuk data Tujuan/Sasaran belum disetting.\nPastikan Jadwal RENSTRA di WP-SIPD tersedia.")
