@@ -567,6 +567,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_mapping_user_esr',  $plugin_public, 'mapping_user_esr');
 
 		$this->loader->add_action('wp_ajax_get_table_renaksi_pemda',  $plugin_public, 'get_table_renaksi_pemda');
+
+		$this->loader->add_action('wp_ajax_mapping_jenis_dokumen',  $plugin_public, 'mapping_jenis_dokumen');
 		
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
@@ -677,6 +679,7 @@ class Wp_Eval_Sakip {
 
 		add_shortcode('halaman_mapping_user_esr', array($plugin_public, 'halaman_mapping_user_esr'));
 		add_shortcode('input_rencana_aksi_pemda', array($plugin_public, 'input_rencana_aksi_pemda'));
+		add_shortcode('halaman_mapping_jenis_dokumen', array($plugin_public, 'halaman_mapping_jenis_dokumen'));
 	}
 
 	/**

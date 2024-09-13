@@ -332,6 +332,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/pengaturan-skpd/wp-eval-sakip-mapping-user-esr.php';
 	}
 
+	public function halaman_mapping_jenis_dokumen()
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/pengaturan-skpd/wp-eval-sakip-mapping-jenis-dokumen.php';
+	}
+
 	public function jadwal_rpjmd()
 	{
 		// untuk disable render shortcode di halaman edit page/post
@@ -24390,6 +24399,33 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				throw new Exception('Format tidak sesuai');
 			}
 		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit;
+		}
+	}
+
+	public function mapping_jenis_dokumen(){
+		global $wpdb;
+
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+					echo json_encode([
+						'status' => true,
+						'message' => 'Sukses mapping jenis dokumen!'
+					]);
+					exit;
+				}else{
+					throw new Exception('Api key tidak sesuai');
+				}
+			}else{
+				throw new Exception('Format tidak sesuai');
+			}
+		}catch(Exception $e){
 			echo json_encode([
 				'status' => false,
 				'message' => $e->getMessage()
