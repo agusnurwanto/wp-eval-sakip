@@ -1266,3 +1266,12 @@ CREATE TABLE `esakip_data_user_esr` (
   `updated_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id)
 );
+
+CREATE TABLE `esakip_data_jenis_dokumen_esr` (
+  `id` int(11) NOT NULL auto_increment,
+  `nama` varchar(255) NOT NULL,
+  `jenis_dokumen_esr_id` int(11) NOT null,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
+);
