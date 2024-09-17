@@ -568,7 +568,8 @@ class Wp_Eval_Sakip {
 
 		$this->loader->add_action('wp_ajax_get_table_renaksi_pemda',  $plugin_public, 'get_table_renaksi_pemda');
 
-		$this->loader->add_action('wp_ajax_mapping_jenis_dokumen',  $plugin_public, 'mapping_jenis_dokumen');
+		$this->loader->add_action('wp_ajax_mapping_jenis_dokumen_esr',  $plugin_public, 'mapping_jenis_dokumen_esr');
+		$this->loader->add_action('wp_ajax_generate_master_jenis_dokumen_esr',  $plugin_public, 'generate_master_jenis_dokumen_esr');
 		
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));

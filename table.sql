@@ -1269,8 +1269,20 @@ CREATE TABLE `esakip_data_user_esr` (
 
 CREATE TABLE `esakip_data_jenis_dokumen_esr` (
   `id` int(11) NOT NULL auto_increment,
-  `nama` varchar(255) NOT NULL,
   `jenis_dokumen_esr_id` int(11) NOT null,
+  `nama` varchar(255) NOT NULL,
+  `active` tinyint(4) NOT null,
+  `tahun_anggaran` year(4) NOT NULL DEFAULT '2022',
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
+);
+
+CREATE TABLE `esakip_data_mapping_jenis_dokumen_esr` (
+  `id` int(11) NOT NULL auto_increment,
+  `esakip_menu_dokumen_id` int(11) NOT null,
+  `jenis_dokumen_esr_id` varchar(255) NOT NULL,
+  `tahun_anggaran` year(4) NOT NULL DEFAULT '2022',
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id)
