@@ -332,7 +332,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/pengaturan-skpd/wp-eval-sakip-mapping-user-esr.php';
 	}
 
-	public function halaman_mapping_jenis_dokumen()
+	public function halaman_mapping_jenis_dokumen($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
 		if (!empty($_GET) && !empty($_GET['POST'])) {
@@ -24407,16 +24407,123 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
-	public function mapping_jenis_dokumen(){
+	public function mapping_jenis_dokumen_esr(){
 		global $wpdb;
 
 		try {
 			if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 
+					if(empty($_POST['esakip_menu_dokumen_id'])){
+						throw new Exception("Dokumen lokal wajib dipilih!", 1);
+					}
+
+					if(empty($_POST['jenis_dokumen_esr_id'])){
+						throw new Exception("Dokumen ESR wajib dipilih!", 1);
+					}
+
+					if(empty($_POST['tahun_anggaran'])){
+						throw new Exception("Tahun anggaran kosong, hubungi admin!", 1);
+					}
+
+					$existing = $wpdb->get_var($wpdb->prepare("SELECT id FROM esakip_data_mapping_jenis_dokumen_esr WHERE esakip_menu_dokumen_id=%d AND tahun_anggaran=%d", $_POST['esakip_menu_dokumen_id'], $_POST['tahun_anggaran']));
+
+					if(empty($existing)){
+						$wpdb->insert('esakip_data_mapping_jenis_dokumen_esr', [
+							'esakip_menu_dokumen_id' => $_POST['esakip_menu_dokumen_id'],
+							'jenis_dokumen_esr_id' => $_POST['jenis_dokumen_esr_id'],
+							'tahun_anggaran' => $_POST['tahun_anggaran'],
+							'created_at' => current_time('mysql')
+						], ['%d', '%d', '%d', '%s']);
+					}else{
+						$wpdb->update('esakip_data_mapping_jenis_dokumen_esr', [
+							'jenis_dokumen_esr_id' => $_POST['jenis_dokumen_esr_id'],
+							'updated_at' => current_time('mysql')
+						], [
+							'esakip_menu_dokumen_id' => $_POST['esakip_menu_dokumen_id'],
+							'tahun_anggaran' => $_POST['tahun_anggaran'],
+						], ['%d', '%s']);
+					}
+
 					echo json_encode([
 						'status' => true,
-						'message' => 'Sukses mapping jenis dokumen!'
+						'message' => 'Sukses mapping jenis dokumen ESR!'
+					]);
+					exit;
+				}else{
+					throw new Exception('Api key tidak sesuai');
+				}
+			}else{
+				throw new Exception('Format tidak sesuai');
+			}
+		}catch(Exception $e){
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit;
+		}
+	}
+
+	public function generate_master_jenis_dokumen_esr(){
+		global $wpdb;
+
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+					if(empty($_POST['tahun_anggaran'])){
+						throw new Exception("Tahun anggaran kosong, hubungi admin!", 1);
+					}
+
+					$jenis_dokumen_esr = [
+						1 => 'RPJMD',
+						2 => 'Renstra',
+						3 => 'IKU',
+						4 => 'Renja/RKT',
+						5 => 'RKPD',
+						6 => 'Perjanjian Kinerja',
+						7 => 'Rencana Aksi',
+						8 => 'Laporan Kinerja',
+						9 => 'Pedoman Teknis Evaluasi Internal',
+						10 => 'Lainnya',
+						11 => 'RPJPD',
+						12 => 'DPA',
+						13 => 'Pohon Kinerja & Cascading',
+						14 => 'LHE AKIP Internal',
+						15 => 'TL LHE AKIP Internal',
+						16 => 'Laporan Monev Renaksi',
+						17 => 'Pedoman Teknis Perencanaan',
+						18 => 'Pedoman Teknis Pengukuran & Pengumpulan Data Kinerja',
+						19 => 'TL LHE AKIP Kemenpan'
+					];
+
+					foreach ($jenis_dokumen_esr as $key => $jenis_dokumen) {
+						$existing = $wpdb->get_var($wpdb->prepare("SELECT id FROM esakip_data_jenis_dokumen_esr WHERE jenis_dokumen_esr_id=%d AND tahun_anggaran=%d", $key, $_POST['tahun_anggaran']));
+
+						if(empty($existing)){
+							$wpdb->insert('esakip_data_jenis_dokumen_esr', [
+								'jenis_dokumen_esr_id' => $key,
+								'nama' => $jenis_dokumen,
+								'tahun_anggaran' => $_POST['tahun_anggaran'],
+								'active' => 1,
+								'created_at' => date('Y-m-d H:i:s')
+							]);
+						}else{
+							$wpdb->update('esakip_data_jenis_dokumen_esr', [
+								'jenis_dokumen_esr_id' => $key,
+								'nama' => $jenis_dokumen,
+								'updated_at' => date('Y-m-d H:i:s')
+							], [
+								'jenis_dokumen_esr_id' => $key,
+								'tahun_anggaran' => $_POST['tahun_anggaran'],
+							]);
+						}
+					}
+
+					echo json_encode([
+						'status' => true,
+						'message' => 'Sukses mapping jenis dokumen ESR!'
 					]);
 					exit;
 				}else{

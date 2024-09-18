@@ -1196,13 +1196,19 @@ class Wp_Eval_Sakip_Admin
 			'no_key' => 1,
 			'post_status' => 'private'
 		));
-		$halaman_mapping_jenis_dokumen = $this->functions->generatePage(array(
-			'nama_page' => 'Halaman Mapping Jenis Dokumen',
-			'content' => '[halaman_mapping_jenis_dokumen]',
-			'show_header' => 1,
-			'no_key' => 1,
-			'post_status' => 'private'
-		));
+
+		$get_tahun = $wpdb->get_results('select tahun_anggaran from esakip_data_unit group by tahun_anggaran order by tahun_anggaran ASC', ARRAY_A);
+		$list_mapping_jenis_dokumen = '';
+		foreach ($get_tahun as $k => $v) {			
+			$halaman_mapping_jenis_dokumen = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Mapping Jenis Dokumen Tahun Anggaran | '. $v['tahun_anggaran'],
+				'content' => '[halaman_mapping_jenis_dokumen tahun_anggaran="'.$v['tahun_anggaran'].'"]',
+				'show_header' => 1,
+				'no_key' => 1,
+				'post_status' => 'private'
+			));
+			$list_mapping_jenis_dokumen .= '<li><a target="_blank" href="' . $halaman_mapping_jenis_dokumen['url'] . '">' . $halaman_mapping_jenis_dokumen['title'] . '</a></li>';
+		}
 
 		$basic_options_container = Container::make('theme_options', __('E-SAKIP Options'))
 			->set_page_menu_position(3)
@@ -1240,7 +1246,7 @@ class Wp_Eval_Sakip_Admin
 	            	<ol>
 	            		<li><a href="' . $halaman_mapping_skpd['url'] . '">' . $halaman_mapping_skpd['title'] . '</a></li>
 	            		<li><a href="' . $halaman_mapping_user_esr['url'] . '">' . $halaman_mapping_user_esr['title'] . '</a></li>
-	            		<li><a href="' . $halaman_mapping_jenis_dokumen['url'] . '">' . $halaman_mapping_jenis_dokumen['title'] . '</a></li>
+	            		'.$list_mapping_jenis_dokumen.'
 	            	</ol>'),
 				Field::make('text', 'crb_url_server_sakip', 'URL Server WP-SIPD')
 					->set_default_value(admin_url('admin-ajax.php'))
