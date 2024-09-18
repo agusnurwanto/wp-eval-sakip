@@ -1270,6 +1270,8 @@ CREATE TABLE `esakip_cascading_opd_tujuan` (
 
 CREATE TABLE `esakip_cascading_opd_sasaran` (
   `id` int(11) NOT NULL auto_increment,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
   `id_tujuan` int(11) DEFAULT NULL,
   `id_sasaran` int(11) DEFAULT NULL,
   `id_unik` text DEFAULT NULL,
@@ -1284,11 +1286,13 @@ CREATE TABLE `esakip_cascading_opd_sasaran` (
 
 CREATE TABLE `esakip_cascading_opd_program` (
   `id` int(11) NOT NULL auto_increment,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
   `id_sasaran` int(11) DEFAULT NULL,
   `id_program` int(11) DEFAULT NULL,
   `id_unik` text DEFAULT NULL,
   `id_unik_indikator` text DEFAULT NULL,
-  `no_urut` int(11) DEFAULT NULL,
+  `no_urut` text DEFAULT NULL,
   `program` text DEFAULT NULL,
   `indikator` text DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
