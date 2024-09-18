@@ -34,7 +34,7 @@ foreach ($unit as $kk => $vv) {
 	';
 }
 ?>
-<div id="wrap-table">
+<div id="wrap-table" style="padding: 10px">
 	<h1 class="text-center">Mapping Perangkat Daerah Tahun <?php echo $tahun_anggaran; ?></h1>
 	<table>
 		<thead>
@@ -52,27 +52,27 @@ foreach ($unit as $kk => $vv) {
 	</table>
 </div>
 <script type="text/javascript">
-function proses_mapping_skpd(id_skpd) {
-	var nama_skpd_sakip = jQuery('#_nama_skpd_sakip_'+id_skpd).val();
-	
-    jQuery('#wrap-loading').show();
-	jQuery.ajax({
-        method: 'post',
-        url: '<?php echo admin_url('admin-ajax.php'); ?>',
-        dataType: 'json',
-        data: {
-            'action': 'mapping_skpd',
-            'api_key':'<?php echo $api_key; ?>',
-            'id_skpd' : id_skpd,
-            'nama_skpd_sakip' : nama_skpd_sakip
-     	},
-        success: function(res) {
-            alert(res.message);
-            if (res.status == 'success') {
-                jQuery('#wrap-table').modal('hide');
-                jQuery('#wrap-loading').hide();
-            } 
-        }
-    });
-}
+	function proses_mapping_skpd(id_skpd) {
+		var nama_skpd_sakip = jQuery('#_nama_skpd_sakip_'+id_skpd).val();
+		
+	    jQuery('#wrap-loading').show();
+		jQuery.ajax({
+	        method: 'post',
+	        url: '<?php echo admin_url('admin-ajax.php'); ?>',
+	        dataType: 'json',
+	        data: {
+	            'action': 'mapping_skpd',
+	            'api_key':'<?php echo $api_key; ?>',
+	            'id_skpd' : id_skpd,
+	            'nama_skpd_sakip' : nama_skpd_sakip
+	     	},
+	        success: function(res) {
+	            alert(res.message);
+	            if (res.status == 'success') {
+	                jQuery('#wrap-table').modal('hide');
+	                jQuery('#wrap-loading').hide();
+	            } 
+	        }
+	    });
+	}
 </script>

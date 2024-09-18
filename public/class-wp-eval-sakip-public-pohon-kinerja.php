@@ -132,6 +132,15 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-input-iku-pemda.php';
 	}
 
+	public function input_rencana_aksi_pemda($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-input-rencana-aksi-pemda.php';
+	}
+
 	public function get_data_pokin()
 	{
 		global $wpdb;
@@ -1212,7 +1221,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						$tbody .= "<td>" . $vv['tujuan_teks'] . "</td>";
 
 						$btn = '<div class="btn-action-group">';
-						$btn .= '<button class="btn btn-sm btn-info" onclick="view_cascading(\'' . $vv['id'] . '\'); return false;" href="#" title="View"><span class="dashicons dashicons-visibility"></span></button>';
+						$btn .= '<button class="btn btn-sm btn-info" onclick="view_cascading(\'' . $vv['id'] . '\'); return false;" href="#" title="View"><span class="dashicons dashicons-get_table_cascading"></span></button>';
 						$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_cascading_pemda(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit"><span class="dashicons dashicons-edit"></span></button>';
 						$btn .= '</div>';
 
@@ -5316,6 +5325,95 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					$_POST['jenis'] = 'program_renstra';
 					$ret['program'] = $this->get_tujuan_sasaran_cascading(true);
 				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_table_renaksi_pemda()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$jadwal_renaksi = $wpdb->get_results($wpdb->prepare("
+                SELECT 
+                    j.id,
+                    j.nama_jadwal,
+                    j.nama_jadwal_renstra,
+                    j.tahun_anggaran,
+                    j.lama_pelaksanaan,
+                    j.tahun_selesai_anggaran,
+                    r.id_jadwal_rpjmd
+                FROM esakip_data_jadwal j
+                INNER JOIN esakip_pengaturan_rencana_aksi r
+                    ON r.id_jadwal_rpjmd = j.id
+                WHERE j.tipe = %s
+                  AND j.status = %d
+                ORDER BY j.tahun_anggaran DESC", 'RPJMD', 1), ARRAY_A);
+            
+	            if ($jadwal_renaksi) {
+	                foreach ($jadwal_renaksi as $jadwal_renaksi_pemda) {
+	                    $tahun_anggaran_selesai = !empty($jadwal_renaksi_pemda['tahun_selesai_anggaran']) && $jadwal_renaksi_pemda['tahun_selesai_anggaran'] > 1 
+	                        ? $jadwal_renaksi_pemda['tahun_selesai_anggaran'] 
+	                        : $jadwal_renaksi_pemda['tahun_anggaran'] + $jadwal_renaksi_pemda['lama_pelaksanaan'];
+
+	                    $input_renaksi_pemda = $this->functions->generatePage(array(
+	                        'nama_page' => 'Halaman Input Rencana Aksi Pemda ' . esc_html($jadwal_renaksi_pemda['nama_jadwal']) . ' Periode ' . $jadwal_renaksi_pemda['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+	                        'content' => '[input_rencana_aksi_pemda periode=' . intval($jadwal_renaksi_pemda['id']) . ']',
+	                        'show_header' => 1,
+	                        'post_status' => 'private'
+	                    ));
+	                }
+
+	                $get_tujuan = $wpdb->get_results("
+	                    SELECT 
+	                        * 
+	                    FROM esakip_rpd_tujuan
+	                    WHERE id_unik_indikator IS NULL
+	                      AND active = 1
+	                ", ARRAY_A);
+
+	                if ($get_tujuan) {
+	                    $counter = 1;
+	                    $tbody = '';
+
+	                    foreach ($get_tujuan as $tujuan) {
+	                        $tbody .= "<tr>";
+	                        $tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+	                        $tbody .= "<td>" . esc_html($tujuan['nama_cascading']) . "</td>";
+	                        $tbody .= "<td>" . esc_html($tujuan['tujuan_teks']) . "</td>";
+
+	                        $btn = '<div class="btn-action-group">';
+	                        $btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . esc_url($this->functions->add_param_get($input_renaksi_pemda['url'], '&id_tujuan=' . intval($tujuan['id']))) . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+	                        $btn .= '</div>';
+
+	                        $tbody .= "<td class='text-center'>" . $btn . "</td>";
+	                        $tbody .= "</tr>";
+	                    }
+
+	                    $ret['data'] = $tbody;
+	                } else {
+	                    $ret['data'] = "<tr><td colspan='8' class='text-center'>Tidak ada data tersedia</td></tr>";
+	                }
+	            } else {
+	                $ret['data'] = "<tr><td colspan='8' class='text-center'>Tidak ada data tersedia</td></tr>";
+	            }
 			} else {
 				$ret = array(
 					'status' => 'error',

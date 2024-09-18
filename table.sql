@@ -1201,6 +1201,7 @@ CREATE TABLE `esakip_pengaturan_rencana_aksi` (
   `id` int(11) NOT NULL auto_increment,
   `id_jadwal` int(11) DEFAULT NULL,
   `id_jadwal_wp_sipd` int(11) DEFAULT NULL,
+  `id_jadwal_rpjmd` int(11) DEFAULT NULL,
   `active` tinyint(4) NOT NULL,
   `tahun_anggaran` year(4) NOT NULL DEFAULT '2022',
   `keterangan` varchar(255) DEFAULT NULL,
@@ -1228,7 +1229,7 @@ CREATE TABLE `esakip_data_iku_opd` (
 
 CREATE TABLE `esakip_data_iku_pemda` (
   `id` int(11) NOT NULL auto_increment,
-  `kode_sasaran` text NOT NULL,
+  `id_sasaran` text NOT NULL,
   `label_sasaran` text DEFAULT null,
   `id_unik_indikator` text DEFAULT null,
   `label_indikator` text DEFAULT null,
@@ -1293,4 +1294,39 @@ CREATE TABLE `esakip_cascading_opd_program` (
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
   PRIMARY KEY(id)
+);
+
+CREATE TABLE `esakip_data_user_esr` (
+  `id` int(11) NOT NULL auto_increment,
+  `user_id` int(11) NOT NULL,
+  `role_id` int(11) DEFAULT null,
+  `parent_id` int(11) DEFAULT null,
+  `instansi_id` int(11) DEFAULT null,
+  `usr` varchar(255) DEFAULT null,
+  `email` varchar(255) DEFAULT null,
+  `unit_kerja` varchar(255) DEFAULT null,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
+);
+
+CREATE TABLE `esakip_data_jenis_dokumen_esr` (
+  `id` int(11) NOT NULL auto_increment,
+  `jenis_dokumen_esr_id` int(11) NOT null,
+  `nama` varchar(255) NOT NULL,
+  `active` tinyint(4) NOT null,
+  `tahun_anggaran` year(4) NOT NULL DEFAULT '2022',
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
+);
+
+CREATE TABLE `esakip_data_mapping_jenis_dokumen_esr` (
+  `id` int(11) NOT NULL auto_increment,
+  `esakip_menu_dokumen_id` int(11) NOT null,
+  `jenis_dokumen_esr_id` varchar(255) NOT NULL,
+  `tahun_anggaran` year(4) NOT NULL DEFAULT '2022',
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
 );
