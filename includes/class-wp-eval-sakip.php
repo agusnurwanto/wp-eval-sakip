@@ -554,6 +554,8 @@ class Wp_Eval_Sakip {
 
 		$this->loader->add_action('wp_ajax_get_tujuan_sasaran_cascading',  $plugin_public, 'get_tujuan_sasaran_cascading');
 		
+		$this->loader->add_action('wp_ajax_get_cascading_pd_from_renstra',  $plugin_public, 'get_cascading_pd_from_renstra');
+		
 		$this->loader->add_action('wp_ajax_sync_from_esr',  $plugin_public, 'sync_from_esr');
 		$this->loader->add_action('wp_ajax_sync_to_esr',  $plugin_public, 'sync_to_esr');
 		

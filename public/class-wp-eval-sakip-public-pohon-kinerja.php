@@ -4789,7 +4789,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		die(json_encode($ret));
 	}
 	
-	public function get_tujuan_sasaran_cascading()
+	public function get_tujuan_sasaran_cascading($return_text)
 	{
 		global $wpdb;
 		try {
@@ -4807,7 +4807,13 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						throw new Exception("Jenis Data Kosong!", 1);
 					}
 					$parent_cascading = '';
-					if($jenis != 'sasaran' && $jenis != 'program'){
+					$tahun_anggaran = '';
+					if(
+						$jenis != 'sasaran' 
+						&& $jenis != 'program_renstra'
+						&& $jenis != 'program'
+						&& $jenis != 'tujuan'
+					){
 						if(!empty($_POST['parent_cascading'])){
 							$parent_cascading = $_POST['parent_cascading'];
 						}else{
@@ -4836,7 +4842,11 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						'parent_cascading' => $parent_cascading
 					);
 
-					if($jenis == 'sasaran'){
+					if(
+						$jenis == 'sasaran'
+						|| $jenis == 'tujuan'
+						|| $jenis == 'program_renstra'
+					){
 						$api_params['id_jadwal'] = $id_jadwal_wpsipd;
 					}
 
@@ -4848,13 +4858,16 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					$data = $response->data;
 
-					echo json_encode([
+					$return = array(
 						'status' => 'success',
 						'jenis' => $_POST['jenis'],
 						'data' => $data
-					]);
-
-					exit();
+					);
+					if(!empty($return_text)){
+						return $return;
+					}else{
+						die(json_encode($return));
+					}
 				} else {
 					throw new Exception("API tidak ditemukan!", 1);
 				}
@@ -5040,39 +5053,268 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if (!empty($_POST['periode'])) {
-					$periode = $_POST['periode'];
+				if (empty($_POST['id_jadwal'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'id_jadwal tidak boleh kosong!';
+				} else if(empty($_POST['id_skpd'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'id_skpd tidak boleh kosong!';
+				}
+
+				if($ret['status'] == 'success'){
+					$id_jadwal = $_POST['id_jadwal'];
+					$id_skpd = $_POST['id_skpd'];
+					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+	
+					$tujuan = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT 
+							*
+						FROM esakip_cascading_opd_tujuan 
+						WHERE active=1 
+						  AND id_jadwal=%d
+						  AND id_skpd=%d
+						  AND id_tujuan is NULL
+						ORDER BY no_urut ASC
+						", $id_jadwal, $id_skpd),
+						ARRAY_A
+					);
+
+					if (!empty($tujuan)) {
+						$body_all = array();
+						foreach($tujuan as $t){
+							$indikator_tujuan = $wpdb->get_results(
+								$wpdb->prepare("
+								SELECT 
+									*
+								FROM esakip_cascading_opd_tujuan 
+								WHERE active=1 
+								  AND id_tujuan=%d
+								ORDER BY no_urut ASC
+								", $t['id']),
+								ARRAY_A
+							);
+							if(empty($body_all[$t['id']])){
+								$body_all[$t['id']] = array(
+									'colspan_sasaran' 	=> 0,
+									'colspan_program' 	=> 0,
+									'tujuan' 	=> $t['tujuan'],
+									'indikator' => $indikator_tujuan,
+									'data'		=> array()
+								);
+							}
+							$sasaran = $wpdb->get_results(
+								$wpdb->prepare("
+								SELECT 
+									*
+								FROM esakip_cascading_opd_sasaran 
+								WHERE active=1 
+								  AND id_tujuan=%d
+								  AND id_sasaran IS NULL
+								ORDER BY no_urut ASC
+								", $t['id']),
+								ARRAY_A
+							);
+							foreach($sasaran as $s){
+								$body_all[$t['id']]['colspan_sasaran']++;
+								$indikator_sasaran = $wpdb->get_results(
+									$wpdb->prepare("
+									SELECT 
+										*
+									FROM esakip_cascading_opd_sasaran 
+									WHERE active=1 
+									  AND id_sasaran=%d
+									ORDER BY no_urut ASC
+									", $s['id']),
+									ARRAY_A
+								);
+								if(empty($body_all[$t['id']]['data'][$s['id']])){
+									$body_all[$t['id']]['data'][$s['id']] = array(
+										'colspan_program' 	=> 0,
+										'sasaran' 	=> $s['sasaran'],
+										'indikator' => $indikator_sasaran,
+										'data'		=> array()
+									);
+								}
+								$program = $wpdb->get_results(
+									$wpdb->prepare("
+									SELECT 
+										*
+									FROM esakip_cascading_opd_program 
+									WHERE active=1 
+									  AND id_sasaran=%d
+									  AND id_program IS NULL
+									ORDER BY no_urut ASC
+									", $s['id']),
+									ARRAY_A
+								);
+								foreach($program as $p){
+									$body_all[$t['id']]['data'][$s['id']]['colspan_program']++;
+									$body_all[$t['id']]['colspan_program']++;
+									$indikator_program = $wpdb->get_results(
+										$wpdb->prepare("
+										SELECT 
+											*
+										FROM esakip_cascading_opd_program 
+										WHERE active=1 
+										  AND id_program=%d
+										ORDER BY no_urut ASC
+										", $s['id']),
+										ARRAY_A
+									);
+									if(empty($body_all[$t['id']]['data'][$s['id']]['data'][$p['id']])){
+										$body_all[$t['id']]['data'][$s['id']]['data'][$p['id']] = array(
+											'program' 	=> $p['program'],
+											'indikator' => $indikator_program
+										);
+									}
+								}
+							}
+						}
+						
+						$tujuan_html = '';
+						$sasaran_html = '';
+						$program_html = '';
+						foreach($body_all as $t){
+							$tujuan_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">'.$t['tujuan'].'</button></td>';
+							foreach($t['data'] as $s){
+								$sasaran_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">'.$s['sasaran'].'</button></td>';
+								foreach($s['data'] as $p){
+									$sasaran_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">'.$p['program'].'</button></td>';
+								}
+							}
+						}
+						if(empty($tujuan_html)){
+							$tujuan_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;"></button></td>';
+						}
+						if(empty($sasaran_html)){
+							$sasaran_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;"></button></td>';
+						}
+						if(empty($program_html)){
+							$program_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;"></button></td>';
+						}
+
+						$tbody = '
+							<tr>
+			                    <td class="text-center" style="width: 200px;"><button class="btn btn-lg btn-info">TUJUAN</button></td>
+			                    '.$tujuan_html.'
+			                </tr>
+			                <tr>
+			                    <td class="text-center"><button class="btn btn-lg btn-info">SASARAN</button></td>
+			                    '.$sasaran_html.'
+			                </tr>
+			                <tr>
+			                    <td class="text-center"><button class="btn btn-lg btn-info">PROGRAM</button></td>
+			                    '.$program_html.'
+			                </tr>';
+
+						$ret['body_all'] = $body_all;
+						$ret['data'] = $tbody;
+					} else {
+						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+						$ret['sql'] = $wpdb->last_query;
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	function get_cascading_pd_from_renstra(){
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil ambil data CASCADING dari RENSTRA!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_jadwal_wpsipd'])) {
+					$id_jadwal = $_POST['id_jadwal_wpsipd'];
 				} else {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Jadwal RENSTRA kosong!';
 				}
 
 				if($ret['status'] == 'success'){
-					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
-	
-					$unit = $wpdb->get_results(
-						$wpdb->prepare("
-						SELECT 
-							nama_skpd, 
-							id_skpd, 
-							kode_skpd, 
-							nipkepala 
-						FROM esakip_data_unit 
-						WHERE active=1 
-						  AND tahun_anggaran=%d
-						  AND is_skpd=1 
-						ORDER BY kode_skpd ASC
-						", $tahun_anggaran_sakip),
-						ARRAY_A
+					$data_all = array(
+						'tujuan' => array(),
+						'sasaran' => array(),
+						'program' => array()
 					);
 
-					if (!empty($unit)) {
-						$tbody = '';
-						
-						$ret['data'] = $tbody;
-					} else {
-						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+					$_POST['jenis'] = 'tujuan';
+					$ret['tujuan'] = $this->get_tujuan_sasaran_cascading(true);
+
+					$wpdb->update('esakip_cascading_opd_tujuan', array('active' => 0), array(
+						'active' => 1,
+						'id_skpd' => $_POST['id_skpd']
+					));
+					foreach($ret['tujuan']['data'] as $t){
+						$data_db = array(
+							'id_jadwal'	=> $t->id_jadwal,
+							'id_skpd'	=> $t->id_unit,
+							'id_unik'	=> $t->id_unik, 
+							'no_urut'	=> $t->urut_tujuan, 
+							'tujuan'	=> $t->tujuan_teks, 
+							'indikator'	=> $t->indikator_teks, 
+							'active'	=> 1,
+							'created_at'	=> current_time('mysql')
+						);
+						if(empty($t->id_unik_indikator)){
+							$cek_id = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									id
+								FROM esakip_cascading_opd_tujuan
+								WHERE id_skpd=%d
+									AND id_unik=%s
+									AND id_unik_indikator is NULL
+							", $t->id_unit, $t->id_unik));
+							$data_all['tujuan'][$t->id_unik] = array(
+								'id' => $cek_id
+							);
+						}else{
+							if(empty($data_all['tujuan'][$t->id_unik]['id'])){
+								$ret['tujuan_error'] = $t;
+								continue;
+							}
+							$data_db['id_unik_indikator'] = $t->id_unik_indikator;
+							$data_db['id_tujuan'] = $data_all['tujuan'][$t->id_unik]['id'];
+
+							$cek_id = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									id
+								FROM esakip_cascading_opd_tujuan
+								WHERE id_skpd=%d
+									AND id_unik=%s
+									AND id_unik_indikator=%s
+							", $t->id_unit, $t->id_unik, $t->id_unik_indikator));
+						}
+						if(!empty($cek_id)){
+							$wpdb->update('esakip_cascading_opd_tujuan', $data_db, array('id' => $cek_id));
+						}else{
+							$wpdb->insert('esakip_cascading_opd_tujuan', $data_db);
+
+							if(empty($t->id_unik_indikator)){
+								$data_all['tujuan'][$t->id_unik]['id'] = $wpdb->insert_id;
+							}
+						}
 					}
+					$_POST['jenis'] = 'sasaran';
+					$ret['sasaran'] = $this->get_tujuan_sasaran_cascading(true);
+					$_POST['jenis'] = 'program_renstra';
+					$ret['program'] = $this->get_tujuan_sasaran_cascading(true);
 				}
 			} else {
 				$ret = array(

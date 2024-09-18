@@ -1251,3 +1251,46 @@ CREATE TABLE `esakip_data_esr` (
   `updated_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id)
 );
+
+CREATE TABLE `esakip_cascading_opd_tujuan` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `id_tujuan` int(11) DEFAULT NULL,
+  `id_unik` text DEFAULT NULL,
+  `id_unik_indikator` text DEFAULT NULL,
+  `no_urut` int(11) DEFAULT NULL,
+  `tujuan` text DEFAULT NULL,
+  `indikator` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp,
+  `active` tinyint(4) DEFAULT 1,
+  PRIMARY KEY(id)
+);
+
+CREATE TABLE `esakip_cascading_opd_sasaran` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_tujuan` int(11) DEFAULT NULL,
+  `id_sasaran` int(11) DEFAULT NULL,
+  `id_unik` text DEFAULT NULL,
+  `id_unik_indikator` text DEFAULT NULL,
+  `no_urut` int(11) DEFAULT NULL,
+  `sasaran` text DEFAULT NULL,
+  `indikator` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp,
+  `active` tinyint(4) DEFAULT 1,
+  PRIMARY KEY(id)
+);
+
+CREATE TABLE `esakip_cascading_opd_program` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_sasaran` int(11) DEFAULT NULL,
+  `id_program` int(11) DEFAULT NULL,
+  `id_unik` text DEFAULT NULL,
+  `id_unik_indikator` text DEFAULT NULL,
+  `no_urut` int(11) DEFAULT NULL,
+  `program` text DEFAULT NULL,
+  `indikator` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp,
+  `active` tinyint(4) DEFAULT 1,
+  PRIMARY KEY(id)
+);
