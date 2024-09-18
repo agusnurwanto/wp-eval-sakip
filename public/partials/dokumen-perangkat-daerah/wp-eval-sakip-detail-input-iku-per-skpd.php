@@ -33,6 +33,10 @@ $response = wp_remote_retrieve_body($response);
 
 $data_jadwal_wpsipd = json_decode($response, true);
 
+if(empty($data_jadwal_wpsipd['data'])){
+    echo "Data jadwal WP-SIPD tidak ditemukan!";
+    die();
+}
 if (!empty($data_jadwal_wpsipd['data'][0]['tahun_akhir_anggaran']) && $data_jadwal_wpsipd['data'][0]['tahun_akhir_anggaran'] > 1) {
 	$tahun_anggaran_selesai = $data_jadwal_wpsipd['data'][0]['tahun_akhir_anggaran'];
 } else {
