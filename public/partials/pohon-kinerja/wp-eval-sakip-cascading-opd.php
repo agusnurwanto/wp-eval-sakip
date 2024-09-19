@@ -90,13 +90,24 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
     }
 
     #tabel-cascading>tbody>tr>td {
-        padding: 10px;
+        padding: 2px;
     }
 
     #tabel-cascading button.btn.btn-lg.btn-info,
-    #tabel-cascading button.btn.btn-lg.btn-warning {
+    #tabel-cascading button.btn.btn-lg.btn-warning,
+    #tabel-cascading button.btn.btn-lg.btn-success,
+    #tabel-cascading button.btn.btn-lg.btn-danger {
         width: 100%;
-        min-height: 75px;
+        min-height: 450px;
+        font-weight: bold;
+    }
+
+    #tabel-cascading button hr{
+        background: #fff;
+    }
+
+    .indikator {
+        font-size: 14px;
     }
 
     @media print {
@@ -105,14 +116,9 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
             height: auto !important;
         }
 
-        @page {
-            size: landscape;
-        }
-
         #action-sakip,
         .site-header,
         .site-footer,
-        #container-table-cascading,
         #ast-scroll-top {
             display: none;
         }
@@ -123,9 +129,10 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
 <div class="container-md" id="container-table-cascading">
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">CASCADING <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $nama_jadwal; ?></h1>
-            <div id="action" class="action-section text-center">
+            <h1 class="text-center">CASCADING <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $nama_jadwal; ?></h1>
+            <div id="action-sakip" class="action-section text-center">
                 <a style="margin-right: 10px;" id="singkron-cascading-renstra" href="#" class="btn btn-primary"><i class="dashicons dashicons-download"></i> Ambil dari Data RENSTRA</a>
+                <a style="margin-right: 10px;" onclick="window.print();" href="#" class="btn btn-success"><i class="dashicons dashicons-printer"></i> CETAK / PRINT</a>
             </div>
         </div>
         <table id="tabel-cascading">

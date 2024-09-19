@@ -5185,19 +5185,31 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						$sasaran_html = '';
 						$program_html = '';
 						foreach($body_all as $t){
-							$tujuan_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">'.$t['tujuan'].'</button></td>';
+							$indikator = array();
+							foreach($t['indikator'] as $i){
+								$indikator[] = $i['indikator'];
+							}
+							$tujuan_html .= '<td class="text-center" colspan="'.$t['colspan_program'].'"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">'.$t['tujuan'].'<hr/><span class="indikator">IND: '.implode(', ', $indikator).'</span></button></td>';
 							foreach($t['data'] as $s){
-								$sasaran_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">'.$s['sasaran'].'</button></td>';
+								$indikator = array();
+								foreach($s['indikator'] as $i){
+									$indikator[] = $i['indikator'];
+								}
+								$sasaran_html .= '<td class="text-center" colspan="'.$s['colspan_program'].'"><button class="btn btn-lg btn-success" style="text-transform:uppercase;">'.$s['sasaran'].'<hr/><span class="indikator">IND: '.implode(', ', $indikator).'</span></button></td>';
 								foreach($s['data'] as $p){
-									$program_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">'.$p['program'].'</button></td>';
+									$indikator = array();
+									foreach($p['indikator'] as $i){
+										$indikator[] = $i['indikator'];
+									}
+									$program_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-danger" style="text-transform:uppercase;">'.$p['program'].'<hr/><span class="indikator">IND: '.implode(', ', $indikator).'</span></button></td>';
 								}
 								if(empty($s['data'])){
-									$program_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;"></button></td>';
+									$program_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-danger" style="text-transform:uppercase;"></button></td>';
 								}
 							}
 							if(empty($t['data'])){
-								$sasaran_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;"></button></td>';
-								$program_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;"></button></td>';
+								$sasaran_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-success" style="text-transform:uppercase;"></button></td>';
+								$program_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-danger" style="text-transform:uppercase;"></button></td>';
 							}
 						}
 						if(empty($tujuan_html)){
@@ -5212,7 +5224,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 						$tbody = '
 							<tr>
-			                    <td class="text-center" style="width: 200px;"><button class="btn btn-lg btn-info">TUJUAN</button></td>
+			                    <td class="text-center" style="width: 150px;"><button class="btn btn-lg btn-info">TUJUAN</button></td>
 			                    '.$tujuan_html.'
 			                </tr>
 			                <tr>
