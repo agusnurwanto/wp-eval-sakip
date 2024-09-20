@@ -5023,12 +5023,37 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							'post_status' => 'private'
 						));
 						foreach ($unit as $kk => $vv) {
+							$jumlah_tujuan = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									COUNT(id)
+								FROM esakip_cascading_opd_tujuan
+								WHERE active=1
+									AND id_skpd=%d
+									AND id_tujuan is NULL
+							", $vv['id_skpd']));
+							$jumlah_sasaran = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									COUNT(id)
+								FROM esakip_cascading_opd_sasaran
+								WHERE active=1
+									AND id_skpd=%d
+									AND id_sasaran is NULL
+							", $vv['id_skpd']));
+							$jumlah_program = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									COUNT(id)
+								FROM esakip_cascading_opd_program
+								WHERE active=1
+									AND id_skpd=%d
+									AND id_program is NULL
+							", $vv['id_skpd']));
 							$tbody .= "
 							<tr>
-								<td style='text-transform: uppercase;'><a href='".$detail_input_cascading['url']."&id_skpd=".$vv['id_skpd']."&id_periode=".$periode."' target='_blank'>".$vv['kode_skpd']." " . $vv['nama_skpd'] . "</a></td>
-								<td></td>
-								<td></td>
-								<td></td>
+								<td class='text-center'><input class='nama-opd' type='checkbox' value='".$vv['id_skpd']."'></td>
+								<td style='text-transform: uppercase;' class='nama-opd-asli'><a href='".$detail_input_cascading['url']."&id_skpd=".$vv['id_skpd']."&id_periode=".$periode."' target='_blank'>".$vv['kode_skpd']." " . $vv['nama_skpd'] . "</a></td>
+								<td class='text-center'>$jumlah_tujuan</td>
+								<td class='text-center'>$jumlah_sasaran</td>
+								<td class='text-center'>$jumlah_program</td>
 							</tr>";
 						}
 						$ret['data'] = $tbody;

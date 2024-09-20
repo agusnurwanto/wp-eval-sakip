@@ -143,7 +143,6 @@ class Wp_Eval_Sakip_Admin
 						|| $_POST['type'] == 'input_pohon_kinerja_pemda'
 						|| $_POST['type'] == 'input_pohon_kinerja_opd'
 						|| $_POST['type'] == 'cascading_pemda'
-						|| $_POST['type'] == 'cascading_pd'
 						|| $_POST['type'] == 'croscutting_pemda'
 						|| $_POST['type'] == 'croscutting_pd'
 						|| $_POST['type'] == 'pohon_kinerja_dan_cascading'
@@ -199,16 +198,6 @@ class Wp_Eval_Sakip_Admin
 							$cascading = $this->functions->generatePage(array(
 								'nama_page' => 'Halaman Input Cascading Pemerintah Daerah ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
 								'content' => '[cascading_pemda periode=' . $jadwal_periode_item['id'] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda .= '
-								<li><a target="_blank" href="' . $cascading['url'] . '">' . $cascading['title'] . '</a></li>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'cascading_pd') {
-							$cascading = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Input Cascading Perangkat Daerah ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-								'content' => '[cascading_pd periode=' . $jadwal_periode_item['id'] . ']',
 								'show_header' => 1,
 								'no_key' => 1,
 								'post_status' => 'private'
@@ -371,7 +360,10 @@ class Wp_Eval_Sakip_Admin
 					$ret['message'] .= $body_pemda;
 				} else if (
 					!empty($_POST['type'])
-					&& $_POST['type'] == 'input_iku_opd'
+					&& (
+						$_POST['type'] == 'input_iku_opd'
+						|| $_POST['type'] == 'cascading_pd'
+					)
 				) {
 					//jadwal renstra wpsipd
 					$api_params = array(
@@ -386,7 +378,12 @@ class Wp_Eval_Sakip_Admin
 					
 					$data_jadwal_wpsipd = json_decode($response);
 
-					$body_pemda = '<h3>Halaman Input IKU</h3>';
+					$body_pemda = '';
+					if (!empty($_POST['type']) && $_POST['type'] == 'cascading_pd') {
+						$body_pemda = '<h3>Halaman Input Cascading Perangkat Daerah</h3>';
+					} else if (!empty($_POST['type']) && $_POST['type'] == 'input_iku_opd'){
+						$body_pemda = '<h3>Halaman Input IKU</h3>';
+					}
 					$body_pemda .= '<ol>';
 					if(!empty($data_jadwal_wpsipd->data)){
 						foreach ($data_jadwal_wpsipd->data as $jadwal_periode_item_wpsipd) {
@@ -395,16 +392,26 @@ class Wp_Eval_Sakip_Admin
 							} else {
 								$tahun_anggaran_selesai = $jadwal_periode_item_wpsipd->tahun_anggaran + $jadwal_periode_item_wpsipd->lama_pelaksanaan;
 							}
-							
-							$input_iku = $this->functions->generatePage(array(
-								'nama_page' => 'List Perangkat Daerah Halaman Pengisian IKU ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai,
-								'content' => '[list_input_iku periode=' . $jadwal_periode_item_wpsipd->id_jadwal_lokal . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda .= '
-							<li><a target="_blank" href="' . $input_iku['url'] . '">Halaman Input IKU Perangkat Daerah ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai .'</a></li>';
+							if (!empty($_POST['type']) && $_POST['type'] == 'cascading_pd') {
+								$input_cascading_opd = $this->functions->generatePage(array(
+									'nama_page' => 'Halaman Input Cascading Perangkat Daerah ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai,
+									'content' => '[cascading_pd periode=' . $jadwal_periode_item_wpsipd->id_jadwal_lokal . ']',
+									'show_header' => 1,
+									'post_status' => 'private'
+								));
+								$title = 'Input Cascading OPD | ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai;
+								$body_pemda .= '<li><a target="_blank" href="' . $input_cascading_opd['url'] . '">' . $title . '</a></li>';
+							} else if (!empty($_POST['type']) && $_POST['type'] == 'input_iku_opd'){
+								$input_iku = $this->functions->generatePage(array(
+									'nama_page' => 'List Perangkat Daerah Halaman Pengisian IKU ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai,
+									'content' => '[list_input_iku periode=' . $jadwal_periode_item_wpsipd->id_jadwal_lokal . ']',
+									'show_header' => 1,
+									'no_key' => 1,
+									'post_status' => 'private'
+								));
+								$body_pemda .= '
+								<li><a target="_blank" href="' . $input_iku['url'] . '">Halaman Input IKU Perangkat Daerah ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai .'</a></li>';
+							}
 						}
 					}
 					$body_pemda .= '</ol>';
@@ -1199,6 +1206,7 @@ class Wp_Eval_Sakip_Admin
 
 		$get_tahun = $wpdb->get_results('select tahun_anggaran from esakip_data_unit group by tahun_anggaran order by tahun_anggaran ASC', ARRAY_A);
 		$list_mapping_jenis_dokumen = '';
+		$halaman_monitor_upload_dokumen = '';
 		foreach ($get_tahun as $k => $v) {			
 			$halaman_mapping_jenis_dokumen = $this->functions->generatePage(array(
 				'nama_page' => 'Halaman Mapping Jenis Dokumen Tahun Anggaran | '. $v['tahun_anggaran'],
@@ -1208,6 +1216,14 @@ class Wp_Eval_Sakip_Admin
 				'post_status' => 'private'
 			));
 			$list_mapping_jenis_dokumen .= '<li><a target="_blank" href="' . $halaman_mapping_jenis_dokumen['url'] . '">' . $halaman_mapping_jenis_dokumen['title'] . '</a></li>';
+
+			$monitor_upload_dokumen = $this->functions->generatePage(array(
+				'nama_page' => 'Laporan Upload Dokumen' . $v['tahun_anggaran'],
+				'content' => '[halaman_cek_dokumen tahun_anggaran=' . $v['tahun_anggaran'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$halaman_monitor_upload_dokumen .= '<li><a target="_blank" href="' . $monitor_upload_dokumen['url'] . '" class="btn btn-primary">Laporan Monitor Upload Dokumen Tahun ' . $v['tahun_anggaran'].' </a></li>';
 		}
 
 		$basic_options_container = Container::make('theme_options', __('E-SAKIP Options'))
@@ -1217,6 +1233,7 @@ class Wp_Eval_Sakip_Admin
 					->set_html('
 					<h4>HALAMAN TERKAIT</h4>
 	            	<ol>
+	            		'.$halaman_monitor_upload_dokumen.'
 	            	</ol>'),
 				Field::make('text', 'crb_apikey_esakip', 'API KEY')
 					->set_default_value($this->functions->generateRandomString())
