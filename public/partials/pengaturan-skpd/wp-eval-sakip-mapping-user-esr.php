@@ -16,6 +16,17 @@ $users_esr_pemda = $wpdb->get_results($wpdb->prepare("
 	ORDER BY unit_kerja ASC
 ", 21), ARRAY_A);
 
+$pemda = str_replace(" ","_",get_option('_crb_nama_pemda'));
+$selectUserEsrPemda='<select class="form-control" name="user_esr"><option value="">Pilih User ESR</option>';
+foreach ($users_esr_pemda as $key => $user) {
+	$selected='';
+	if(get_option('_user_esr_' . $pemda)==$user['user_id']){
+		$selected='selected';
+	}
+	$selectUserEsrPemda.='<option value="'.$user['user_id'].'" '.$selected.'> '.$user['usr'].' ~ '.$user['unit_kerja'].'</option>';
+}
+$selectUserEsrPemda.='</select>';
+
 $users_esr = $wpdb->get_results($wpdb->prepare("
 	SELECT 
 		user_id,
@@ -25,6 +36,7 @@ $users_esr = $wpdb->get_results($wpdb->prepare("
 	WHERE role_id=%d
 	ORDER BY unit_kerja ASC
 ", 22), ARRAY_A);  
+
 
 $units = $wpdb->get_results("
 	SELECT 
@@ -60,7 +72,7 @@ foreach ($units as $unit) {
 			<td>'.$unit['nama_skpd'].'</td>
 			<td class="text-center">'.$unit['namakepala'].'<br>'.$unit['nipkepala'].'</td>
 			<td>'.$selectUserEsr.'</td>
-			<td class="text-center"><button class="btn btn-primary" onclick="proses_mapping_user_esr(\''.$unit['id_skpd'].'\');">Proses</button></td>
+			<td class="text-center"><button class="btn btn-primary" onclick="proses_mapping_user_esr(\''.$unit['id_skpd'].'\', 22);">Proses</button></td>
 		</tr>
 	';
 }
@@ -73,14 +85,17 @@ foreach ($units as $unit) {
     <table>
 		<thead>
 			<tr>
-				<th class="text-center">Kode Pemerintah Daerah SIPD</th>
-				<th class="text-center" style="width: 500px;">Nama Pemerintah Daerah SIPD</th>
-				<th class="text-center" style="width: 500px;">Nama dan NIP</th>
+				<th class="text-center" style="width: 500px;">Nama Pemerintah Daerah</th>
 				<th class="text-center" style="width: 500px;">User ESR</th>
 				<th class="text-center">Aksi</th>
 			</tr>
 		</thead>
 		<tbody>
+			<tr id="row_<?php echo $pemda; ?>">
+				<td><?php echo get_option('_crb_nama_pemda'); ?></td>
+				<td><?php echo $selectUserEsrPemda;?></td>
+				<td class="text-center"><button class="btn btn-primary" onclick="proses_mapping_user_esr('<?php echo $pemda; ?>', 21)">Proses</button></td>
+			</tr>
 		</tbody>
 	</table>
 	<table>
@@ -99,7 +114,7 @@ foreach ($units as $unit) {
 	</table>
 </div>
 <script type="text/javascript">
-	function proses_mapping_user_esr(id_skpd) {
+	function proses_mapping_user_esr(id_skpd, type_skpd) {
 		var user_esr = jQuery('#row_'+id_skpd+' select[name=user_esr]').val();
 
 		jQuery('#wrap-loading').show();
@@ -111,6 +126,7 @@ foreach ($units as $unit) {
 	            'action': 'mapping_user_esr',
 	            'api_key':'<?php echo $api_key; ?>',
 	            'id_skpd':id_skpd,
+	            'type_skpd':type_skpd,
 	            'user_esr':user_esr,
 	     	},
 	        success: function(res) {

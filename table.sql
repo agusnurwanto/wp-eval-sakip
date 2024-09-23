@@ -1253,6 +1253,53 @@ CREATE TABLE `esakip_data_esr` (
   PRIMARY key (id)
 );
 
+CREATE TABLE `esakip_cascading_opd_tujuan` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `id_tujuan` int(11) DEFAULT NULL,
+  `id_unik` text DEFAULT NULL,
+  `id_unik_indikator` text DEFAULT NULL,
+  `no_urut` int(11) DEFAULT NULL,
+  `tujuan` text DEFAULT NULL,
+  `indikator` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp,
+  `active` tinyint(4) DEFAULT 1,
+  PRIMARY KEY(id)
+);
+
+CREATE TABLE `esakip_cascading_opd_sasaran` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `id_tujuan` int(11) DEFAULT NULL,
+  `id_sasaran` int(11) DEFAULT NULL,
+  `id_unik` text DEFAULT NULL,
+  `id_unik_indikator` text DEFAULT NULL,
+  `no_urut` int(11) DEFAULT NULL,
+  `sasaran` text DEFAULT NULL,
+  `indikator` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp,
+  `active` tinyint(4) DEFAULT 1,
+  PRIMARY KEY(id)
+);
+
+CREATE TABLE `esakip_cascading_opd_program` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `id_sasaran` int(11) DEFAULT NULL,
+  `id_program` int(11) DEFAULT NULL,
+  `id_unik` text DEFAULT NULL,
+  `id_unik_indikator` text DEFAULT NULL,
+  `no_urut` text DEFAULT NULL,
+  `program` text DEFAULT NULL,
+  `indikator` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp,
+  `active` tinyint(4) DEFAULT 1,
+  PRIMARY KEY(id)
+);
+
 CREATE TABLE `esakip_data_user_esr` (
   `id` int(11) NOT NULL auto_increment,
   `user_id` int(11) NOT NULL,
@@ -1323,5 +1370,24 @@ CREATE TABLE `esakip_data_rencana_aksi_indikator_pemda` (
   `update_at` datetime DEFAULT current_timestamp(),
   `rencana_pagu` double(20, 0) DEFAULT NULL,
   `realisasi_pagu` double(20, 0) DEFAULT NULL,
+
+CREATE TABLE `esakip_data_jenis_dokumen_esr` (
+  `id` int(11) NOT NULL auto_increment,
+  `jenis_dokumen_esr_id` int(11) NOT null,
+  `nama` varchar(255) NOT NULL,
+  `active` tinyint(4) NOT null,
+  `tahun_anggaran` year(4) NOT NULL DEFAULT '2022',
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
+);
+
+CREATE TABLE `esakip_data_mapping_jenis_dokumen_esr` (
+  `id` int(11) NOT NULL auto_increment,
+  `esakip_menu_dokumen_id` int(11) NOT null,
+  `jenis_dokumen_esr_id` varchar(255) NOT NULL,
+  `tahun_anggaran` year(4) NOT NULL DEFAULT '2022',
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id)
 );
