@@ -5187,4 +5187,331 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		}
 		die(json_encode($ret));
 	}
+
+	public function get_tujuan_sasaran_cascading_pemda()
+	{
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+					// if()
+					if(!empty($_POST['jenis'])){
+						$jenis = $_POST['jenis'];
+					}else{
+						throw new Exception("Jenis Data Kosong!", 1);
+					}
+					$parent_cascading = '';
+					if($jenis != 'sasaran' && $jenis != 'program'){
+						if(!empty($_POST['parent_cascading'])){
+							$parent_cascading = $_POST['parent_cascading'];
+						}else{
+							throw new Exception("Parent Cascading Data Kosong!", 1);
+						}
+						
+						if(!empty($_POST['tahun_anggaran'])){
+							$tahun_anggaran = $_POST['tahun_anggaran'];
+						}else{
+							throw new Exception("Tahun Anggaran Kosong!", 1);
+						}
+					}
+
+					if($jenis == 'sasaran' && empty($_POST['id_jadwal_rpjmd'])){
+						throw new Exception("Id Jadwal WpSipd Kosong!", 1);
+					}else{
+						$id_jadwal_rpjmd = $_POST['id_jadwal_rpjmd'];
+					}
+
+					$api_params = array(
+						'action' => 'get_cascading_renstra',
+						'api_key'	=> get_option('_crb_apikey_wpsipd'),
+						'tahun_anggaran' => $tahun_anggaran,
+						'jenis' => $jenis,
+						'parent_cascading' => $parent_cascading
+					);
+
+					if($jenis == 'sasaran'){
+						$api_params['id_jadwal'] = $id_jadwal_rpjmd;
+					}
+
+					$response = wp_remote_post(get_option('_crb_url_server_sakip'), array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
+
+					$response = wp_remote_retrieve_body($response);
+					
+					$response = json_decode($response);
+
+					$data = $response->data;
+
+					echo json_encode([
+						'status' => 'success',
+						'jenis' => $_POST['jenis'],
+						'data' => $data
+					]);
+
+					exit();
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
+	}
+	public function get_data_pokin_pemda()
+	{
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+					$_prefix_pemda = $_where_pemda = '';
+					if (!empty($_POST['tipe_pokin'])) {
+						$_prefix_pemda = $_POST['tipe_pokin'] == "pemda" ? "_pemda" : "";
+					}
+
+					switch ($_POST['level']) {
+						case '2':
+							$id_parent = '
+							(
+								SELECT 
+									id 
+								FROM esakip_pohon_kinerja
+								WHERE id=a.id
+							) id_parent_1';
+							break;
+
+						case '3':
+							$id_parent = '
+							(
+								SELECT 
+									id 
+								FROM esakip_pohon_kinerja
+								WHERE id=(
+									SELECT 
+										parent 
+									FROM esakip_pohon_kinerja
+									WHERE id=a.id
+								)
+							) id_parent_1,
+							(
+								SELECT 
+									id 
+								FROM esakip_pohon_kinerja
+								WHERE id=a.id
+							) id_parent_2';
+							break;
+
+						case '4':
+							$id_parent = '
+							(
+								SELECT 
+									id 
+								FROM esakip_pohon_kinerja
+								WHERE id=(
+									SELECT 
+										parent 
+									FROM esakip_pohon_kinerja
+										WHERE id=(
+											SELECT 
+												parent 
+											FROM esakip_pohon_kinerja
+												WHERE id=a.id
+										)
+								)
+							) id_parent_1,
+							(
+								SELECT 
+									id 
+								FROM esakip_pohon_kinerja
+								WHERE id=(
+									SELECT 
+										parent 
+									FROM esakip_pohon_kinerja
+									WHERE id=a.id
+								)
+							) id_parent_2,
+							(
+								SELECT 
+									id 
+								FROM esakip_pohon_kinerja
+								WHERE id=a.id
+							) id_parent_3';
+							break;
+
+						case '5':
+							$id_parent = '
+							(
+								SELECT 
+									id 
+								FROM esakip_pohon_kinerja
+								WHERE id=(
+									SELECT 
+										parent 
+									FROM esakip_pohon_kinerja
+									WHERE id=(
+										SELECT 
+											parent 
+										FROM esakip_pohon_kinerja
+										WHERE id=(
+											SELECT 
+												parent 
+											FROM esakip_pohon_kinerja
+											WHERE id=a.id
+										)
+									)
+								)
+							) id_parent_1,
+							(
+								SELECT 
+									id 
+								FROM esakip_pohon_kinerja
+								WHERE id=(
+									SELECT 
+										parent 
+									FROM esakip_pohon_kinerja
+									WHERE id=(
+										SELECT 
+											parent 
+										FROM esakip_pohon_kinerja
+										WHERE id=a.id
+									)
+								)
+							) id_parent_2,
+							(
+								SELECT 
+									id 
+								FROM esakip_pohon_kinerja
+								WHERE id=(
+									SELECT 
+										parent 
+									FROM esakip_pohon_kinerja
+									WHERE id=a.id
+								)
+							) id_parent_3,
+							(
+								SELECT 
+									id 
+								FROM esakip_pohon_kinerja
+								WHERE id=a.id
+							) id_parent_4';
+							break;
+
+						default:
+							$id_parent = '';
+							break;
+					}
+
+					$dataPokin = $wpdb->get_results($wpdb->prepare(
+						"
+						SELECT 
+							a.id,
+							a.label,
+							a.parent,
+							a.active,
+							a.nomor_urut,
+							b.id AS id_indikator,
+							b.label_indikator_kinerja,
+							b.nomor_urut as nomor_urut_indikator
+						FROM esakip_pohon_kinerja a
+						LEFT JOIN esakip_pohon_kinerja b ON a.id=b.parent AND a.level=b.level 
+						WHERE 
+							a.id_jadwal=%d AND 
+							a.parent=%d AND 
+							a.level=%d AND 
+							a.active=%d 
+						ORDER BY a.nomor_urut ASC, b.nomor_urut ASC",
+						$_POST['id_jadwal'],
+						$_POST['parent'],
+						$_POST['level'],
+						1
+					), ARRAY_A);
+
+					$dataParent = array();
+					if (!empty($id_parent)) {
+						$dataParent = $wpdb->get_results($wpdb->prepare(
+							"
+								SELECT 
+									" . $id_parent . "
+								FROM esakip_pohon_kinerja a 
+								WHERE 
+									a.id_jadwal=%d AND 
+									a.id=%d AND
+									a.active=%d
+								ORDER BY a.nomor_urut ASC",
+							$_POST['id_jadwal'],
+							$_POST['parent'],
+							1
+						), ARRAY_A);
+					}
+
+					$data = [
+						'data' => [],
+						'parent' => []
+					];
+					foreach ($dataPokin as $key => $pokin) {
+						if (empty($data['data'][$pokin['id']])) {
+							$data['data'][$pokin['id']] = [
+								'id' => $pokin['id'],
+								'label' => $pokin['label'],
+								'parent' => $pokin['parent'],
+								'nomor_urut' => $pokin['nomor_urut'],
+								'indikator' => []
+							];
+						}
+
+						if (!empty($pokin['id_indikator'])) {
+							if (empty($data['data'][$pokin['id']]['indikator'][$pokin['id_indikator'].' '.$pokin['nomor_urut_indikator']])) {
+								$data['data'][$pokin['id']]['indikator'][$pokin['id_indikator'].' '.$pokin['nomor_urut_indikator']] = [
+									'id' => $pokin['id_indikator'],
+									'label' => $pokin['label_indikator_kinerja'],
+									'nomor_urut' => $pokin['nomor_urut_indikator']
+								];
+							}
+						}
+					}
+
+					foreach ($dataParent as $v_parent) {
+						if (empty($data['parent'][$v_parent['id_parent_1']])) {
+							$data['parent'][$v_parent['id_parent_1']] = $v_parent['id_parent_1'];
+						}
+
+						if (empty($data['parent'][$v_parent['id_parent_2']])) {
+							$data['parent'][$v_parent['id_parent_2']] = $v_parent['id_parent_2'];
+						}
+
+						if (empty($data['parent'][$v_parent['id_parent_3']])) {
+							$data['parent'][$v_parent['id_parent_3']] = $v_parent['id_parent_3'];
+						}
+
+						if (empty($data['parent'][$v_parent['id_parent_4']])) {
+							$data['parent'][$v_parent['id_parent_4']] = $v_parent['id_parent_4'];
+						}
+					}
+
+					echo json_encode([
+						'status' => true,
+						'data' => array_values($data['data']),
+						'parent' => array_values($data['parent']),
+						'sql' => $wpdb->last_query
+					]);
+					exit();
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
+	}
 }
