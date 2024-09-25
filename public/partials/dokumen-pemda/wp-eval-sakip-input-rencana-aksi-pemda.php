@@ -555,54 +555,55 @@ function tambah_indikator_rencana_aksi(id, tipe){
     jQuery("#modal-crud").modal('show');
 }
 
-function simpan_indikator_renaksi(tipe){
+function simpan_indikator_renaksi(tipe) {
     var id = jQuery('#id_label_indikator').val();
     var id_label = jQuery('#id_label').val();
     var indikator = jQuery('#indikator').val();
-    if(indikator == ''){
-        return alert('Indikator tidak boleh kosong!')
-    }
-    var satuan = jQuery('#satuan_indikator').val();
-    if(satuan == ''){
-        return alert('Satuan tidak boleh kosong!')
+    if ((tipe == 1 || tipe == 2) && indikator == '') {
+        return alert('Indikator tidak boleh kosong!');
     }
     var mitra_bidang = jQuery('#mitra_bidang').val();
-    if(mitra_bidang == ''){
-        return alert('Mitra Bidang tidak boleh kosong!')
+    if (mitra_bidang == '') {
+        return alert('Mitra Bidang tidak boleh kosong!');
     }
     var rencana_pagu = jQuery('#rencana_pagu').val();
-    if(rencana_pagu == ''){
+    if (rencana_pagu == '') {
         rencana_pagu = 0;
     }
-    // var realisasi_pagu = jQuery('#realisasi_pagu').val();
-    // if(realisasi_pagu == ''){
-    //     realisasi_pagu = 0;
-    // }
+
+    // Check satuan and target_akhir based on tipe
+    var satuan = jQuery('#satuan_indikator').val();
+    if ((tipe == 2 || tipe == 3) && satuan == '') {
+        return alert('Satuan tidak boleh kosong!');
+    }
 
     var target_akhir = jQuery('#target_akhir').val();
-    if(target_akhir == ''){
-        return alert('Target akhir tidak boleh kosong!')
+    if ((tipe == 3) && target_akhir == '') {
+        return alert('Target akhir tidak boleh kosong!');
     }
+
     var target_tw_1 = jQuery('#target_tw_1').val();
-    if(target_tw_1 == ''){
-        return alert('Target triwulan 1 tidak boleh kosong!')
+    if ((tipe == 3) && target_tw_1 == '') {
+        return alert('Target triwulan 1 tidak boleh kosong!');
     }
     var target_tw_2 = jQuery('#target_tw_2').val();
-    if(target_tw_2 == ''){
-        return alert('Target triwulan 2 tidak boleh kosong!')
+    if ((tipe == 3) && target_tw_2 == '') {
+        return alert('Target triwulan 2 tidak boleh kosong!');
     }
     var target_tw_3 = jQuery('#target_tw_3').val();
-    if(target_tw_3 == ''){
-        return alert('Target triwulan 3 tidak boleh kosong!')
+    if ((tipe == 3) && target_tw_3 == '') {
+        return alert('Target triwulan 3 tidak boleh kosong!');
     }
     var target_tw_4 = jQuery('#target_tw_4').val();
-    if(target_tw_4 == ''){
-        return alert('Target triwulan 4 tidak boleh kosong!')
+    if ((tipe == 3) && target_tw_4 == '') {
+        return alert('Target triwulan 4 tidak boleh kosong!');
     }
+
     var id_skpd = jQuery('#id_skpd').val();
-    if(id_skpd == ''){
+    if ((tipe == 3) && id_skpd == '') {
         return alert('Pilih SKPD dulu!');
     }
+
     jQuery('#wrap-loading').show();
     jQuery.ajax({
         url: esakip.url,
@@ -626,18 +627,18 @@ function simpan_indikator_renaksi(tipe){
             "tahun_anggaran": <?php echo $input['tahun']; ?>
         },
         dataType: "json",
-        success: function(res){
+        success: function(res) {
             jQuery('#wrap-loading').hide();
             alert(res.message);
-            if(res.status=='success'){
+            if (res.status == 'success') {
                 jQuery("#modal-crud").modal('hide');
-                if(tipe == 1){
+                if (tipe == 1) {
                     kegiatanUtama();
-                }else if(tipe == 2){
+                } else if (tipe == 2) {
                     var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
                     var parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
                     lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin);
-                }else if(tipe == 3){
+                } else if (tipe == 3) {
                     var parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
                     var parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
                     lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin);
@@ -646,7 +647,8 @@ function simpan_indikator_renaksi(tipe){
             }
         }
     });
-};
+}
+
 
 function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
     jQuery("#wrap-loading").show();
