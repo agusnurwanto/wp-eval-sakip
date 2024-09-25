@@ -1253,6 +1253,53 @@ CREATE TABLE `esakip_data_esr` (
   PRIMARY key (id)
 );
 
+CREATE TABLE `esakip_cascading_opd_tujuan` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `id_tujuan` int(11) DEFAULT NULL,
+  `id_unik` text DEFAULT NULL,
+  `id_unik_indikator` text DEFAULT NULL,
+  `no_urut` int(11) DEFAULT NULL,
+  `tujuan` text DEFAULT NULL,
+  `indikator` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp,
+  `active` tinyint(4) DEFAULT 1,
+  PRIMARY KEY(id)
+);
+
+CREATE TABLE `esakip_cascading_opd_sasaran` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `id_tujuan` int(11) DEFAULT NULL,
+  `id_sasaran` int(11) DEFAULT NULL,
+  `id_unik` text DEFAULT NULL,
+  `id_unik_indikator` text DEFAULT NULL,
+  `no_urut` int(11) DEFAULT NULL,
+  `sasaran` text DEFAULT NULL,
+  `indikator` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp,
+  `active` tinyint(4) DEFAULT 1,
+  PRIMARY KEY(id)
+);
+
+CREATE TABLE `esakip_cascading_opd_program` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `id_sasaran` int(11) DEFAULT NULL,
+  `id_program` int(11) DEFAULT NULL,
+  `id_unik` text DEFAULT NULL,
+  `id_unik_indikator` text DEFAULT NULL,
+  `no_urut` text DEFAULT NULL,
+  `program` text DEFAULT NULL,
+  `indikator` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp,
+  `active` tinyint(4) DEFAULT 1,
+  PRIMARY KEY(id)
+);
+
 CREATE TABLE `esakip_data_user_esr` (
   `id` int(11) NOT NULL auto_increment,
   `user_id` int(11) NOT NULL,
@@ -1264,6 +1311,66 @@ CREATE TABLE `esakip_data_user_esr` (
   `unit_kerja` varchar(255) DEFAULT null,
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
+);
+
+CREATE TABLE `esakip_data_rencana_aksi_pemda` (
+  `id` int(11) NOT NULL auto_increment,
+  `label` varchar(255) NOT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `parent` int(11) DEFAULT 0,
+  `label_pokin_1` text DEFAULT null,
+  `id_pokin_1` int(11) DEFAULT null,
+  `label_pokin_2` text DEFAULT null,
+  `id_pokin_2` int(11) DEFAULT null,
+  `label_pokin_3` text DEFAULT null,
+  `id_pokin_3` int(11) DEFAULT null,
+  `label_pokin_4` text DEFAULT null,
+  `id_pokin_4` int(11) DEFAULT null,
+  `label_pokin_5` text DEFAULT null,
+  `id_pokin_5` int(11) DEFAULT null,
+  `level` int(11) NOT null COMMENT '1 = kegiatan, 1 = rencana aksi, 2 = uraian kegiatan',
+  `pagu` double(20, 0) DEFAULT NULL,
+  `realisasi` double(20, 0) DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  `kode_cascading_sasaran` text DEFAULT null,
+  `label_cascading_sasaran` text DEFAULT null,
+  `kode_cascading_program` text DEFAULT null,
+  `label_cascading_program` text DEFAULT null,
+  `kode_cascading_kegiatan` text DEFAULT null,
+  `label_cascading_kegiatan` text DEFAULT null,
+  `kode_cascading_sub_kegiatan` text DEFAULT null,
+  `label_cascading_sub_kegiatan` text DEFAULT null,
+  PRIMARY key (id)
+);
+
+CREATE TABLE `esakip_data_rencana_aksi_indikator_pemda` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_renaksi` int(11) NOT NULL,
+  `indikator` text DEFAULT null,
+  `target_awal` text DEFAULT NULL,
+  `target_akhir` text DEFAULT NULL,
+  `satuan` text DEFAULT NULL,
+  `target_1` text DEFAULT NULL,
+  `target_2` text DEFAULT NULL,
+  `target_3` text DEFAULT NULL,
+  `target_4` text DEFAULT NULL,
+  `realisasi_target_1` text DEFAULT NULL,
+  `realisasi_target_2` text DEFAULT NULL,
+  `realisasi_target_3` text DEFAULT NULL,
+  `realisasi_target_4` text DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  `rencana_pagu` double(20, 0) DEFAULT NULL,
+  `realisasi_pagu` double(20, 0) DEFAULT NULL,
+  `mitra_bidang` text DEFAULT NULL,
   PRIMARY key (id)
 );
 

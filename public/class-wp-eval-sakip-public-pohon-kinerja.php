@@ -4798,7 +4798,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		die(json_encode($ret));
 	}
 	
-	public function get_tujuan_sasaran_cascading()
+	public function get_tujuan_sasaran_cascading($return_text)
 	{
 		global $wpdb;
 		try {
@@ -4816,7 +4816,13 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						throw new Exception("Jenis Data Kosong!", 1);
 					}
 					$parent_cascading = '';
-					if($jenis != 'sasaran' && $jenis != 'program'){
+					$tahun_anggaran = '';
+					if(
+						$jenis != 'sasaran' 
+						&& $jenis != 'program_renstra'
+						&& $jenis != 'program'
+						&& $jenis != 'tujuan'
+					){
 						if(!empty($_POST['parent_cascading'])){
 							$parent_cascading = $_POST['parent_cascading'];
 						}else{
@@ -4845,7 +4851,11 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						'parent_cascading' => $parent_cascading
 					);
 
-					if($jenis == 'sasaran'){
+					if(
+						$jenis == 'sasaran'
+						|| $jenis == 'tujuan'
+						|| $jenis == 'program_renstra'
+					){
 						$api_params['id_jadwal'] = $id_jadwal_wpsipd;
 					}
 
@@ -4857,13 +4867,16 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 					$data = $response->data;
 
-					echo json_encode([
+					$return = array(
 						'status' => 'success',
 						'jenis' => $_POST['jenis'],
 						'data' => $data
-					]);
-
-					exit();
+					);
+					if(!empty($return_text)){
+						return $return;
+					}else{
+						die(json_encode($return));
+					}
 				} else {
 					throw new Exception("API tidak ditemukan!", 1);
 				}
@@ -5010,12 +5023,37 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							'post_status' => 'private'
 						));
 						foreach ($unit as $kk => $vv) {
+							$jumlah_tujuan = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									COUNT(id)
+								FROM esakip_cascading_opd_tujuan
+								WHERE active=1
+									AND id_skpd=%d
+									AND id_tujuan is NULL
+							", $vv['id_skpd']));
+							$jumlah_sasaran = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									COUNT(id)
+								FROM esakip_cascading_opd_sasaran
+								WHERE active=1
+									AND id_skpd=%d
+									AND id_sasaran is NULL
+							", $vv['id_skpd']));
+							$jumlah_program = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									COUNT(id)
+								FROM esakip_cascading_opd_program
+								WHERE active=1
+									AND id_skpd=%d
+									AND id_program is NULL
+							", $vv['id_skpd']));
 							$tbody .= "
 							<tr>
-								<td style='text-transform: uppercase;'><a href='".$detail_input_cascading['url']."&id_skpd=".$vv['id_skpd']."&id_periode=".$periode."' target='_blank'>".$vv['kode_skpd']." " . $vv['nama_skpd'] . "</a></td>
-								<td></td>
-								<td></td>
-								<td></td>
+								<td class='text-center'><input class='nama-opd' type='checkbox' value='".$vv['id_skpd']."'></td>
+								<td style='text-transform: uppercase;' class='nama-opd-asli'><a href='".$detail_input_cascading['url']."&id_skpd=".$vv['id_skpd']."&id_periode=".$periode."' target='_blank'>".$vv['kode_skpd']." " . $vv['nama_skpd'] . "</a></td>
+								<td class='text-center'>$jumlah_tujuan</td>
+								<td class='text-center'>$jumlah_sasaran</td>
+								<td class='text-center'>$jumlah_program</td>
 							</tr>";
 						}
 						$ret['data'] = $tbody;
@@ -5049,38 +5087,420 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if (!empty($_POST['periode'])) {
-					$periode = $_POST['periode'];
+				if (empty($_POST['id_jadwal'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'id_jadwal tidak boleh kosong!';
+				} else if(empty($_POST['id_skpd'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'id_skpd tidak boleh kosong!';
+				}
+
+				if($ret['status'] == 'success'){
+					$id_jadwal = $_POST['id_jadwal'];
+					$id_skpd = $_POST['id_skpd'];
+					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+	
+					$tujuan = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT 
+							*
+						FROM esakip_cascading_opd_tujuan 
+						WHERE active=1 
+						  AND id_jadwal=%d
+						  AND id_skpd=%d
+						  AND id_tujuan is NULL
+						ORDER BY no_urut ASC
+						", $id_jadwal, $id_skpd),
+						ARRAY_A
+					);
+
+					if (!empty($tujuan)) {
+						$body_all = array();
+						foreach($tujuan as $t){
+							$indikator_tujuan = $wpdb->get_results(
+								$wpdb->prepare("
+								SELECT 
+									*
+								FROM esakip_cascading_opd_tujuan 
+								WHERE active=1 
+								  AND id_tujuan=%d
+								ORDER BY no_urut ASC
+								", $t['id']),
+								ARRAY_A
+							);
+							if(empty($body_all[$t['id']])){
+								$body_all[$t['id']] = array(
+									'colspan_sasaran' 	=> 0,
+									'colspan_program' 	=> 0,
+									'tujuan' 	=> $t['tujuan'],
+									'indikator' => $indikator_tujuan,
+									'data'		=> array()
+								);
+							}
+							$sasaran = $wpdb->get_results(
+								$wpdb->prepare("
+								SELECT 
+									*
+								FROM esakip_cascading_opd_sasaran 
+								WHERE active=1 
+								  AND id_tujuan=%d
+								  AND id_sasaran IS NULL
+								ORDER BY no_urut ASC
+								", $t['id']),
+								ARRAY_A
+							);
+							foreach($sasaran as $s){
+								$body_all[$t['id']]['colspan_sasaran']++;
+								$indikator_sasaran = $wpdb->get_results(
+									$wpdb->prepare("
+									SELECT 
+										*
+									FROM esakip_cascading_opd_sasaran 
+									WHERE active=1 
+									  AND id_sasaran=%d
+									ORDER BY no_urut ASC
+									", $s['id']),
+									ARRAY_A
+								);
+								if(empty($body_all[$t['id']]['data'][$s['id']])){
+									$body_all[$t['id']]['data'][$s['id']] = array(
+										'colspan_program' 	=> 0,
+										'sasaran' 	=> $s['sasaran'],
+										'indikator' => $indikator_sasaran,
+										'data'		=> array()
+									);
+								}
+								$program = $wpdb->get_results(
+									$wpdb->prepare("
+									SELECT 
+										*
+									FROM esakip_cascading_opd_program 
+									WHERE active=1 
+									  AND id_sasaran=%d
+									  AND id_program IS NULL
+									ORDER BY no_urut ASC
+									", $s['id']),
+									ARRAY_A
+								);
+								foreach($program as $p){
+									$body_all[$t['id']]['data'][$s['id']]['colspan_program']++;
+									$body_all[$t['id']]['colspan_program']++;
+									$indikator_program = $wpdb->get_results(
+										$wpdb->prepare("
+										SELECT 
+											*
+										FROM esakip_cascading_opd_program 
+										WHERE active=1 
+										  AND id_program=%d
+										ORDER BY no_urut ASC
+										", $s['id']),
+										ARRAY_A
+									);
+									if(empty($body_all[$t['id']]['data'][$s['id']]['data'][$p['id']])){
+										$body_all[$t['id']]['data'][$s['id']]['data'][$p['id']] = array(
+											'program' 	=> $p['program'],
+											'indikator' => $indikator_program
+										);
+									}
+								}
+							}
+						}
+						
+						$tujuan_html = '';
+						$sasaran_html = '';
+						$program_html = '';
+						foreach($body_all as $t){
+							$indikator = array();
+							foreach($t['indikator'] as $i){
+								$indikator[] = $i['indikator'];
+							}
+							$tujuan_html .= '<td class="text-center" colspan="'.$t['colspan_program'].'"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">'.$t['tujuan'].'<hr/><span class="indikator">IND: '.implode(', ', $indikator).'</span></button></td>';
+							foreach($t['data'] as $s){
+								$indikator = array();
+								foreach($s['indikator'] as $i){
+									$indikator[] = $i['indikator'];
+								}
+								$sasaran_html .= '<td class="text-center" colspan="'.$s['colspan_program'].'"><button class="btn btn-lg btn-success" style="text-transform:uppercase;">'.$s['sasaran'].'<hr/><span class="indikator">IND: '.implode(', ', $indikator).'</span></button></td>';
+								foreach($s['data'] as $p){
+									$indikator = array();
+									foreach($p['indikator'] as $i){
+										$indikator[] = $i['indikator'];
+									}
+									$program_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-danger" style="text-transform:uppercase;">'.$p['program'].'<hr/><span class="indikator">IND: '.implode(', ', $indikator).'</span></button></td>';
+								}
+								if(empty($s['data'])){
+									$program_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-danger" style="text-transform:uppercase;"></button></td>';
+								}
+							}
+							if(empty($t['data'])){
+								$sasaran_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-success" style="text-transform:uppercase;"></button></td>';
+								$program_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-danger" style="text-transform:uppercase;"></button></td>';
+							}
+						}
+						if(empty($tujuan_html)){
+							$tujuan_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;"></button></td>';
+						}
+						if(empty($sasaran_html)){
+							$sasaran_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;"></button></td>';
+						}
+						if(empty($program_html)){
+							$program_html .= '<td class="text-center" colspan="0"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;"></button></td>';
+						}
+
+						$tbody = '
+							<tr>
+			                    <td class="text-center" style="width: 150px;"><button class="btn btn-lg btn-info">TUJUAN</button></td>
+			                    '.$tujuan_html.'
+			                </tr>
+			                <tr>
+			                    <td class="text-center"><button class="btn btn-lg btn-info">SASARAN</button></td>
+			                    '.$sasaran_html.'
+			                </tr>
+			                <tr>
+			                    <td class="text-center"><button class="btn btn-lg btn-info">PROGRAM</button></td>
+			                    '.$program_html.'
+			                </tr>';
+
+						$ret['body_all'] = $body_all;
+						$ret['data'] = $tbody;
+					} else {
+						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+						$ret['sql'] = $wpdb->last_query;
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	function get_cascading_pd_from_renstra(){
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil ambil data CASCADING dari RENSTRA!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_jadwal_wpsipd'])) {
+					$id_jadwal = $_POST['id_jadwal_wpsipd'];
 				} else {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Jadwal RENSTRA kosong!';
 				}
 
 				if($ret['status'] == 'success'){
-					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
-	
-					$unit = $wpdb->get_results(
-						$wpdb->prepare("
-						SELECT 
-							nama_skpd, 
-							id_skpd, 
-							kode_skpd, 
-							nipkepala 
-						FROM esakip_data_unit 
-						WHERE active=1 
-						  AND tahun_anggaran=%d
-						  AND is_skpd=1 
-						ORDER BY kode_skpd ASC
-						", $tahun_anggaran_sakip),
-						ARRAY_A
+					$data_all = array(
+						'tujuan' => array(),
+						'sasaran' => array(),
+						'program' => array()
 					);
 
-					if (!empty($unit)) {
-						$tbody = '';
-						
-						$ret['data'] = $tbody;
-					} else {
-						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+					$_POST['jenis'] = 'tujuan';
+					$ret['tujuan'] = $this->get_tujuan_sasaran_cascading(true);
+
+					$wpdb->update('esakip_cascading_opd_tujuan', array('active' => 0), array(
+						'active' => 1,
+						'id_skpd' => $_POST['id_skpd'],
+						'id_jadwal' => $id_jadwal
+					));
+					$ret['tujuan_error'] = array();
+					foreach($ret['tujuan']['data'] as $t){
+						$data_db = array(
+							'id_jadwal'	=> $t->id_jadwal,
+							'id_skpd'	=> $t->id_unit,
+							'id_unik'	=> $t->id_unik, 
+							'no_urut'	=> $t->urut_tujuan, 
+							'tujuan'	=> $t->tujuan_teks, 
+							'indikator'	=> $t->indikator_teks, 
+							'active'	=> 1,
+							'created_at'	=> current_time('mysql')
+						);
+						if(empty($t->id_unik_indikator)){
+							$cek_id = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									id
+								FROM esakip_cascading_opd_tujuan
+								WHERE id_skpd=%d
+									AND id_jadwal=%s
+									AND id_unik=%s
+									AND id_unik_indikator is NULL
+							", $t->id_unit, $t->id_jadwal, $t->id_unik));
+							$data_all['tujuan'][$t->id_unik] = array(
+								'id' => $cek_id
+							);
+						}else{
+							if(empty($data_all['tujuan'][$t->id_unik]['id'])){
+								$ret['tujuan_error'][] = $t;
+								continue;
+							}
+							$data_db['id_unik_indikator'] = $t->id_unik_indikator;
+							$data_db['id_tujuan'] = $data_all['tujuan'][$t->id_unik]['id'];
+
+							$cek_id = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									id
+								FROM esakip_cascading_opd_tujuan
+								WHERE id_skpd=%d
+									AND id_jadwal=%s
+									AND id_unik=%s
+									AND id_unik_indikator=%s
+							", $t->id_unit, $t->id_jadwal, $t->id_unik, $t->id_unik_indikator));
+						}
+						if(!empty($cek_id)){
+							$wpdb->update('esakip_cascading_opd_tujuan', $data_db, array('id' => $cek_id));
+						}else{
+							$wpdb->insert('esakip_cascading_opd_tujuan', $data_db);
+
+							if(empty($t->id_unik_indikator)){
+								$data_all['tujuan'][$t->id_unik]['id'] = $wpdb->insert_id;
+							}
+						}
+					}
+
+					$_POST['jenis'] = 'sasaran';
+					$ret['sasaran'] = $this->get_tujuan_sasaran_cascading(true);
+
+					$wpdb->update('esakip_cascading_opd_sasaran', array('active' => 0), array(
+						'active' => 1,
+						'id_skpd' => $_POST['id_skpd'],
+						'id_jadwal' => $id_jadwal
+					));
+					$ret['sasaran_error'] = array();
+					foreach($ret['sasaran']['data'] as $s){
+						if(empty($data_all['tujuan'][$s->kode_tujuan])){
+							$ret['sasaran_error'][] = $s;
+							continue;
+						}
+						$data_db = array(
+							'id_jadwal'	=> $s->id_jadwal,
+							'id_skpd'	=> $s->id_unit,
+							'id_tujuan'	=> $data_all['tujuan'][$s->kode_tujuan]['id'],
+							'id_unik'	=> $s->id_unik, 
+							'no_urut'	=> $s->urut_sasaran, 
+							'sasaran'	=> $s->sasaran_teks, 
+							'indikator'	=> $s->indikator_teks, 
+							'active'	=> 1,
+							'created_at'	=> current_time('mysql')
+						);
+						if(empty($s->id_unik_indikator)){
+							$cek_id = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									id
+								FROM esakip_cascading_opd_sasaran
+								WHERE id_skpd=%d
+									AND id_jadwal=%d
+									AND id_unik=%s
+									AND id_unik_indikator is NULL
+							", $s->id_unit, $s->id_jadwal, $s->id_unik));
+							$data_all['sasaran'][$s->id_unik] = array(
+								'id' => $cek_id
+							);
+						}else{
+							if(empty($data_all['sasaran'][$s->id_unik]['id'])){
+								$ret['sasaran_error'][] = $s;
+								continue;
+							}
+							$data_db['id_unik_indikator'] = $s->id_unik_indikator;
+							$data_db['id_sasaran'] = $data_all['sasaran'][$s->id_unik]['id'];
+
+							$cek_id = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									id
+								FROM esakip_cascading_opd_sasaran
+								WHERE id_skpd=%d
+									AND id_jadwal=%d
+									AND id_unik=%s
+									AND id_unik_indikator=%s
+							", $s->id_unit, $s->id_jadwal, $s->id_unik, $s->id_unik_indikator));
+						}
+						if(!empty($cek_id)){
+							$wpdb->update('esakip_cascading_opd_sasaran', $data_db, array('id' => $cek_id));
+						}else{
+							$wpdb->insert('esakip_cascading_opd_sasaran', $data_db);
+
+							if(empty($s->id_unik_indikator)){
+								$data_all['sasaran'][$s->id_unik]['id'] = $wpdb->insert_id;
+							}
+						}
+					}
+
+					$_POST['jenis'] = 'program_renstra';
+					$ret['program'] = $this->get_tujuan_sasaran_cascading(true);
+
+					$wpdb->update('esakip_cascading_opd_program', array('active' => 0), array(
+						'active' => 1,
+						'id_skpd' => $_POST['id_skpd'],
+						'id_jadwal' => $id_jadwal
+					));
+					$ret['program_error'] = array();
+					foreach($ret['program']['data'] as $p){
+						if(empty($data_all['sasaran'][$p->kode_sasaran])){
+							$ret['program_error'][] = $p;
+							continue;
+						}
+						$data_db = array(
+							'id_jadwal'	=> $p->id_jadwal,
+							'id_skpd'	=> $p->id_unit,
+							'id_sasaran'	=> $data_all['sasaran'][$p->kode_sasaran]['id'],
+							'id_unik'	=> $p->id_unik, 
+							'no_urut'	=> $p->kode_program, 
+							'program'	=> str_replace($p->kode_program, '', $p->nama_program), 
+							'indikator'	=> $p->indikator, 
+							'active'	=> 1,
+							'created_at'	=> current_time('mysql')
+						);
+						if(empty($p->id_unik_indikator)){
+							$cek_id = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									id
+								FROM esakip_cascading_opd_program
+								WHERE id_skpd=%d
+									AND id_jadwal=%d
+									AND id_unik=%s
+									AND id_unik_indikator is NULL
+							", $p->id_unit, $p->id_jadwal, $p->id_unik));
+							$data_all['program'][$p->id_unik] = array(
+								'id' => $cek_id
+							);
+						}else{
+							if(empty($data_all['program'][$p->id_unik]['id'])){
+								$ret['program_error'][] = $p;
+								continue;
+							}
+							$data_db['id_unik_indikator'] = $p->id_unik_indikator;
+							$data_db['id_program'] = $data_all['program'][$p->id_unik]['id'];
+
+							$cek_id = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									id
+								FROM esakip_cascading_opd_program
+								WHERE id_skpd=%d
+									AND id_jadwal=%d
+									AND id_unik=%s
+									AND id_unik_indikator=%s
+							", $p->id_unit, $p->id_jadwal, $p->id_unik, $p->id_unik_indikator));
+						}
+						if(!empty($cek_id)){
+							$wpdb->update('esakip_cascading_opd_program', $data_db, array('id' => $cek_id));
+						}else{
+							$wpdb->insert('esakip_cascading_opd_program', $data_db);
+
+							if(empty($p->id_unik_indikator)){
+								$data_all['program'][$p->id_unik]['id'] = $wpdb->insert_id;
+							}
+						}
 					}
 				}
 			} else {
@@ -5109,7 +5529,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-
 				$jadwal_renaksi = $wpdb->get_results($wpdb->prepare("
                 SELECT 
                     j.id,
@@ -5186,5 +5605,332 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 			);
 		}
 		die(json_encode($ret));
+	}
+
+	public function get_tujuan_sasaran_cascading_pemda()
+	{
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+					// if()
+					if(!empty($_POST['jenis'])){
+						$jenis = $_POST['jenis'];
+					}else{
+						throw new Exception("Jenis Data Kosong!", 1);
+					}
+					$parent_cascading = '';
+					if($jenis != 'sasaran' && $jenis != 'program'){
+						if(!empty($_POST['parent_cascading'])){
+							$parent_cascading = $_POST['parent_cascading'];
+						}else{
+							throw new Exception("Parent Cascading Data Kosong!", 1);
+						}
+						
+						if(!empty($_POST['tahun_anggaran'])){
+							$tahun_anggaran = $_POST['tahun_anggaran'];
+						}else{
+							throw new Exception("Tahun Anggaran Kosong!", 1);
+						}
+					}
+
+					if($jenis == 'sasaran' && empty($_POST['id_jadwal_rpjmd'])){
+						throw new Exception("Id Jadwal WpSipd Kosong!", 1);
+					}else{
+						$id_jadwal_rpjmd = $_POST['id_jadwal_rpjmd'];
+					}
+
+					$api_params = array(
+						'action' => 'get_cascading_renstra',
+						'api_key'	=> get_option('_crb_apikey_wpsipd'),
+						'tahun_anggaran' => $tahun_anggaran,
+						'jenis' => $jenis,
+						'parent_cascading' => $parent_cascading
+					);
+
+					if($jenis == 'sasaran'){
+						$api_params['id_jadwal'] = $id_jadwal_rpjmd;
+					}
+
+					$response = wp_remote_post(get_option('_crb_url_server_sakip'), array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
+
+					$response = wp_remote_retrieve_body($response);
+					
+					$response = json_decode($response);
+
+					$data = $response->data;
+
+					echo json_encode([
+						'status' => 'success',
+						'jenis' => $_POST['jenis'],
+						'data' => $data
+					]);
+
+					exit();
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
+	}
+	public function get_data_pokin_pemda()
+	{
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+					$_prefix_pemda = $_where_pemda = '';
+					if (!empty($_POST['tipe_pokin'])) {
+						$_prefix_pemda = $_POST['tipe_pokin'] == "pemda" ? "_pemda" : "";
+					}
+
+					switch ($_POST['level']) {
+						case '2':
+							$id_parent = '
+							(
+								SELECT 
+									id 
+								FROM esakip_pohon_kinerja
+								WHERE id=a.id
+							) id_parent_1';
+							break;
+
+						case '3':
+							$id_parent = '
+							(
+								SELECT 
+									id 
+								FROM esakip_pohon_kinerja
+								WHERE id=(
+									SELECT 
+										parent 
+									FROM esakip_pohon_kinerja
+									WHERE id=a.id
+								)
+							) id_parent_1,
+							(
+								SELECT 
+									id 
+								FROM esakip_pohon_kinerja
+								WHERE id=a.id
+							) id_parent_2';
+							break;
+
+						case '4':
+							$id_parent = '
+							(
+								SELECT 
+									id 
+								FROM esakip_pohon_kinerja
+								WHERE id=(
+									SELECT 
+										parent 
+									FROM esakip_pohon_kinerja
+										WHERE id=(
+											SELECT 
+												parent 
+											FROM esakip_pohon_kinerja
+												WHERE id=a.id
+										)
+								)
+							) id_parent_1,
+							(
+								SELECT 
+									id 
+								FROM esakip_pohon_kinerja
+								WHERE id=(
+									SELECT 
+										parent 
+									FROM esakip_pohon_kinerja
+									WHERE id=a.id
+								)
+							) id_parent_2,
+							(
+								SELECT 
+									id 
+								FROM esakip_pohon_kinerja
+								WHERE id=a.id
+							) id_parent_3';
+							break;
+
+						case '5':
+							$id_parent = '
+							(
+								SELECT 
+									id 
+								FROM esakip_pohon_kinerja
+								WHERE id=(
+									SELECT 
+										parent 
+									FROM esakip_pohon_kinerja
+									WHERE id=(
+										SELECT 
+											parent 
+										FROM esakip_pohon_kinerja
+										WHERE id=(
+											SELECT 
+												parent 
+											FROM esakip_pohon_kinerja
+											WHERE id=a.id
+										)
+									)
+								)
+							) id_parent_1,
+							(
+								SELECT 
+									id 
+								FROM esakip_pohon_kinerja
+								WHERE id=(
+									SELECT 
+										parent 
+									FROM esakip_pohon_kinerja
+									WHERE id=(
+										SELECT 
+											parent 
+										FROM esakip_pohon_kinerja
+										WHERE id=a.id
+									)
+								)
+							) id_parent_2,
+							(
+								SELECT 
+									id 
+								FROM esakip_pohon_kinerja
+								WHERE id=(
+									SELECT 
+										parent 
+									FROM esakip_pohon_kinerja
+									WHERE id=a.id
+								)
+							) id_parent_3,
+							(
+								SELECT 
+									id 
+								FROM esakip_pohon_kinerja
+								WHERE id=a.id
+							) id_parent_4';
+							break;
+
+						default:
+							$id_parent = '';
+							break;
+					}
+
+					$dataPokin = $wpdb->get_results($wpdb->prepare(
+						"
+						SELECT 
+							a.id,
+							a.label,
+							a.parent,
+							a.active,
+							a.nomor_urut,
+							b.id AS id_indikator,
+							b.label_indikator_kinerja,
+							b.nomor_urut as nomor_urut_indikator
+						FROM esakip_pohon_kinerja a
+						LEFT JOIN esakip_pohon_kinerja b ON a.id=b.parent AND a.level=b.level 
+						WHERE 
+							a.id_jadwal=%d AND 
+							a.parent=%d AND 
+							a.level=%d AND 
+							a.active=%d 
+						ORDER BY a.nomor_urut ASC, b.nomor_urut ASC",
+						$_POST['id_jadwal'],
+						$_POST['parent'],
+						$_POST['level'],
+						1
+					), ARRAY_A);
+
+					$dataParent = array();
+					if (!empty($id_parent)) {
+						$dataParent = $wpdb->get_results($wpdb->prepare(
+							"
+								SELECT 
+									" . $id_parent . "
+								FROM esakip_pohon_kinerja a 
+								WHERE 
+									a.id_jadwal=%d AND 
+									a.id=%d AND
+									a.active=%d
+								ORDER BY a.nomor_urut ASC",
+							$_POST['id_jadwal'],
+							$_POST['parent'],
+							1
+						), ARRAY_A);
+					}
+
+					$data = [
+						'data' => [],
+						'parent' => []
+					];
+					foreach ($dataPokin as $key => $pokin) {
+						if (empty($data['data'][$pokin['id']])) {
+							$data['data'][$pokin['id']] = [
+								'id' => $pokin['id'],
+								'label' => $pokin['label'],
+								'parent' => $pokin['parent'],
+								'nomor_urut' => $pokin['nomor_urut'],
+								'indikator' => []
+							];
+						}
+
+						if (!empty($pokin['id_indikator'])) {
+							if (empty($data['data'][$pokin['id']]['indikator'][$pokin['id_indikator'].' '.$pokin['nomor_urut_indikator']])) {
+								$data['data'][$pokin['id']]['indikator'][$pokin['id_indikator'].' '.$pokin['nomor_urut_indikator']] = [
+									'id' => $pokin['id_indikator'],
+									'label' => $pokin['label_indikator_kinerja'],
+									'nomor_urut' => $pokin['nomor_urut_indikator']
+								];
+							}
+						}
+					}
+
+					foreach ($dataParent as $v_parent) {
+						if (empty($data['parent'][$v_parent['id_parent_1']])) {
+							$data['parent'][$v_parent['id_parent_1']] = $v_parent['id_parent_1'];
+						}
+
+						if (empty($data['parent'][$v_parent['id_parent_2']])) {
+							$data['parent'][$v_parent['id_parent_2']] = $v_parent['id_parent_2'];
+						}
+
+						if (empty($data['parent'][$v_parent['id_parent_3']])) {
+							$data['parent'][$v_parent['id_parent_3']] = $v_parent['id_parent_3'];
+						}
+
+						if (empty($data['parent'][$v_parent['id_parent_4']])) {
+							$data['parent'][$v_parent['id_parent_4']] = $v_parent['id_parent_4'];
+						}
+					}
+
+					echo json_encode([
+						'status' => true,
+						'data' => array_values($data['data']),
+						'parent' => array_values($data['parent']),
+						'sql' => $wpdb->last_query
+					]);
+					exit();
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
 	}
 }
