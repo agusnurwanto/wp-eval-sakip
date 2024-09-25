@@ -69,6 +69,7 @@ $skpd = $wpdb->get_results($wpdb->prepare('
     FROM esakip_data_unit
     WHERE tahun_anggaran=%d
         AND active=1
+    ORDER BY kode_skpd ASC
 ', $input['tahun']), ARRAY_A);
 $select_skpd = '<option value="">Pilih SKPD</option>';
 foreach($skpd as $get_skpd){

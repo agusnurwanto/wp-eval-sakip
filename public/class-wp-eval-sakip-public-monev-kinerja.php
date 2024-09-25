@@ -2314,7 +2314,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				if ($ret['status'] != 'error' && empty($_POST['id_label'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'ID label tidak boleh kosong!';
-				} else if ($ret['status'] != 'error' && empty($_POST['indikator'])) {
+				} else if ($ret['status'] != 'error' && empty($_POST['indikator']) && $_POST['tipe'] == 1 && $_POST['tipe'] == 2) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Indikator tidak boleh kosong!';
 				} else if ($ret['status'] != 'error' && empty($_POST['satuan']) && $_POST['tipe'] == 2 && $_POST['tipe'] == 3) {
