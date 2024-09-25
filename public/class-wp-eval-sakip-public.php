@@ -24211,7 +24211,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					    ),
 					]);
 
-					$body = wp_remote_retrieve_body($response);
+					$body = json_encode(wp_remote_retrieve_body($response));
 					if(empty($body)){
 						throw new Exception("Data tidak ditemukan di API ESR", 1);
 					}
@@ -24222,16 +24222,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'url' => 'get_data',
 							'method' => 'GET',
 							'response_json' => $body,
-							'update_at' => current_time('mysql')
-						], ['%s', '%s', '%s', '%s']);
+							'updated_at' => current_time('mysql')
+						]);
 					}else{
 						$wpdb->update('esakip_data_esr', [
 							'response_json' => $body,
-							'update_at' => current_time('mysql')
+							'updated_at' => current_time('mysql')
 						], [
 							'url' => 'get_data'
-						], [
-							'%s', '%s'
 						]);
 					}
 
@@ -24261,6 +24259,56 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		try {
 			if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+					// ambil dokumen id dari table mapping_jenis_dokumen_esr join table esakip_menu_dokumen dg kriteria nama_tabel = 'esakip_rpjpd' dan tahun anggaran = 2024
+					$dokumen_id = '';
+
+					// ambil user_id
+					$user_id = get_option('_user_esr_'.str_replace(" ", "_", get_option('_crb_nama_pemda')));
+
+					// ambil file
+					$lists = $_POST['list'];
+					if(is_array($lists)){
+						$length = count($lists);
+						$condition = '(';
+						$i=1;
+						foreach ($lists as $key => $value) {
+							if($i<$length){
+								$condition.=$value.',';
+							}else{
+								$condition.=$value;
+							}
+							$i++;
+						}
+						$condition.=')';
+					}
+					
+					$rpjpds = $wpdb->get_results(
+						$wpdb->prepare("
+							SELECT * 
+							FROM esakip_rpjpd
+							WHERE id IN ".$condition." 
+							  AND active = 1"),
+						ARRAY_A
+					);
+
+					// kirim ke esr
+					foreach ($rpjpds as $key => $rpjpd) {
+						$response = wp_remote_post(get_option('_crb_url_api_esr').'insert_data', [
+							'body' => [
+								'dokumen_id' => $dokumen_id,
+								'user_id' => $user_id,
+								'nama_file' => $rpjpd['dokumen'],
+								'path' => ESAKIP_PLUGIN_URL . 'public/media/dokumen/'.$rpjpd['dokumen'],
+								'keterangan' => $rpjpd['keterangan']
+							],
+							'headers' => array(
+						        'Accept' => 'application/json',
+						        'Authorization' => 'Basic ' . base64_encode(get_option('_crb_username_api_esr').':'.get_option('_crb_password_api_esr')),
+						    ),
+						]);
+					}
+
 					echo json_encode([
 						'status' => true,
 						'message' => 'Sukses kirim data!'

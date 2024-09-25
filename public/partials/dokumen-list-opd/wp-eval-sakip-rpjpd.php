@@ -80,6 +80,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             <?php if (!$is_admin_panrb): ?>
                 <div style="margin-bottom: 25px;">
                     <button class="btn btn-primary" onclick="tambah_dokumen_rpjpd();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
+                    <!-- <button class="btn btn-success" onclick="sync_from_esr();"><i class="dashicons dashicons-arrow-down-alt"></i> Ambil Data dari ESR</button> -->
                     <button class="btn btn-warning" onclick="sync_to_esr();"><i class="dashicons dashicons-arrow-up-alt"></i> Kirim Data ke ESR</button>
                 </div>
             <?php endif; ?>
@@ -241,6 +242,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 
     function lihatDokumen(dokumen) {
         let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + dokumen;
+        console.log(url);
         window.open(url, '_blank');
     }
 
