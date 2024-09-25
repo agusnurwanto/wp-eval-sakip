@@ -2257,10 +2257,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				} else if ($ret['status'] != 'error' && empty($_POST['level'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Level tidak boleh kosong!';
-				} else if ($ret['status'] != 'error' && empty($_POST['parent'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Parent tidak boleh kosong!';
-				} 
+				}  
 				if ($ret['status'] != 'error'){
 					$data = array(
 						'label' => $_POST['label_renaksi'],
