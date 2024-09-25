@@ -1766,7 +1766,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			);
 		}
 		die(json_encode($ret));
-	}
+	}	
 
 	function get_table_input_rencana_aksi_pemda(){
 		global $wpdb;
@@ -1845,211 +1845,206 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							", $_POST['tahun_anggaran'], $v2['id']), ARRAY_A);
 						
 							// uraian rencana aksi
-							foreach($data3 as $v3){
-								$indikator = $wpdb->get_results($wpdb->prepare("
-									SELECT
-										*
-									FROM esakip_data_rencana_aksi_indikator_pemda
-									WHERE id_renaksi=%d
-										AND active=1
-								", $v3['id']), ARRAY_A);
-								$data_all['data'][$v['id']]['data'][$v2['id']]['data'][$v3['id']] = array(
-									'detail' => $v3,
-									'data' => array(),
-									'indikator' => $indikator
-								);
-								$data4 = $wpdb->get_results($wpdb->prepare("
-									SELECT
-										*
-									FROM esakip_data_rencana_aksi_pemda
-									WHERE tahun_anggaran=%d
-										AND active=1
-										AND level=4
-										AND parent=%d
-								", $_POST['tahun_anggaran'], $v3['id']), ARRAY_A);
-							
-								// uraian teknis kegiatan
-								foreach($data4 as $v4){
-									$indikator = $wpdb->get_results($wpdb->prepare("
-										SELECT
-											*
-										FROM esakip_data_rencana_aksi_indikator_pemda
-										WHERE id_renaksi=%d
-											AND active=1
-									", $v4['id']), ARRAY_A);
-									$data_all['data'][$v['id']]['data'][$v2['id']]['data'][$v3['id']]['data'][$v4['id']] = array(
-										'detail' => $v4,
-										'data' => array(),
-										'indikator' => $indikator
-									);
-								}
+							foreach($data3 as $v3) {
+							    $indikator = $wpdb->get_results($wpdb->prepare("
+							        SELECT
+							            s.*,
+							            u.*
+							        FROM esakip_data_rencana_aksi_indikator_pemda AS s
+							        INNER JOIN esakip_data_unit as u on s.id_skpd=u.id_skpd
+					            		AND s.tahun_anggaran=u.tahun_anggaran
+					            		AND s.active=u.active
+							        WHERE s.id_renaksi = %d
+							            AND s.active=u.active
+							    ", $v3['id']), ARRAY_A);
+
+							    $data_all['data'][$v['id']]['data'][$v2['id']]['data'][$v3['id']] = array(
+							        'detail' => $v3,
+							        'data' => array(),
+							        'indikator' => $indikator
+							    );
 							}
 						}
 					}
 
 					$no = 0;
-					$no_renaksi = 0;
-					$no_uraian_renaksi = 0;
-					$no_uraian_teknis = 0;
 					foreach($data_all['data'] as $v){
-						$no++;
-						$indikator_html = array();
-						$satuan_html = array();
-						$target_awal_html = array();
-						$target_akhir_html = array();
-						$target_1_html = array();
-						$target_2_html = array();
-						$target_3_html = array();
-						$target_4_html = array();
-						foreach($v['indikator'] as $key => $ind){
-							$indikator_html[$key] = $ind['indikator'];
-							$satuan_html[$key] = $ind['satuan'];
-							$target_awal_html[$key] = $ind['target_awal'];
-							$target_akhir_html[$key] = $ind['target_akhir'];
-							$target_1_html[$key] = $ind['target_1'];
-							$target_2_html[$key] = $ind['target_2'];
-							$target_3_html[$key] = $ind['target_3'];
-							$target_4_html[$key] = $ind['target_4'];
-						}
-						$indikator_html = implode( $indikator_html);
-						$satuan_html = implode( $satuan_html);
-						$target_awal_html = implode( $target_awal_html);
-						$target_akhir_html = implode( $target_akhir_html);
-						$target_1_html = implode( $target_1_html);
-						$target_2_html = implode( $target_2_html);
-						$target_3_html = implode( $target_3_html);
-						$target_4_html = implode( $target_4_html);
-						$html .= '
-						<tr>
-							<td>'.$no.'</td>
-							<td class="kegiatan_utama"><b>'.$v['detail']['label'].'</td>
-							<td class="indikator_kegiatan_utama"><b>'.$indikator_html.'</td>
-							<td class="recana_aksi"><b></td>
-							<td class="urian_renaksi"><b></td>
-							<td class="text-center satuan_renaksi"><b>'.$satuan_html.'</td>
-							<td class="indikator_renaksi"><b></td>
-							<td class="text-right target_akhir_urian_renaksi"><b>'.$target_akhir_html.'</td>
-							<td class="text-right target_tw1_urian_renaksi"><b>'.$target_1_html.'</td>
-							<td class="text-right target_tw2_urian_renaksi"><b>'.$target_2_html.'</td>
-							<td class="text-right target_tw3_urian_renaksi"><b>'.$target_3_html.'</td>
-							<td class="text-right target_tw4_urian_renaksi"><b>'.$target_4_html.'</td>
-							<td class="text-right target_akhir_urian_renaksi"><b>'.$target_akhir_html.'</td>
-							<td class=""><b></td>
-							<td class=""><b></td>
-							<td class=""><b></td>
-						</tr>
-						';
+					    $no++;
+					    $no_renaksi = 0; 
+					    $indikator_html = array();
+					    $satuan_html = array();
+					    $target_awal_html = array();
+					    $target_akhir_html = array();
+					    $target_1_html = array();
+					    $target_2_html = array();
+					    $target_3_html = array();
+					    $target_4_html = array();
 
-						foreach($v['data'] as $renaksi){
-							$no_renaksi++;
-							$indikator_html = array();
-							$satuan_html = array();
-							$target_awal_html = array();
-							$target_akhir_html = array();
-							$target_1_html = array();
-							$target_2_html = array();
-							$target_3_html = array();
-							$target_4_html = array();
-							$rencana_pagu_html = array();
-							$realisasi_pagu_html = array();
-							foreach($renaksi['indikator'] as $key => $ind){
-								$indikator_html[$key] = $ind['indikator'];
-								$satuan_html[$key] = $ind['satuan'];
-								$target_awal_html[$key] = $ind['target_awal'];
-								$target_akhir_html[$key] = $ind['target_akhir'];
-								$target_1_html[$key] = $ind['target_1'];
-								$target_2_html[$key] = $ind['target_2'];
-								$target_3_html[$key] = $ind['target_3'];
-								$target_4_html[$key] = $ind['target_4'];
-							}
-							$indikator_html = implode( $indikator_html);
-							$satuan_html = implode( $satuan_html);
-							$target_awal_html = implode( $target_awal_html);
-							$target_akhir_html = implode( $target_akhir_html);
-							$target_1_html = implode( $target_1_html);
-							$target_2_html = implode( $target_2_html);
-							$target_3_html = implode( $target_3_html);
-							$target_4_html = implode( $target_4_html);
+					    foreach($v['indikator'] as $key => $ind){
+					        $indikator_html[$key] = $ind['indikator'];
+					        $satuan_html[$key] = $ind['satuan'];
+					        $target_awal_html[$key] = $ind['target_awal'];
+					        $target_akhir_html[$key] = $ind['target_akhir'];
+					        $target_1_html[$key] = $ind['target_1'];
+					        $target_2_html[$key] = $ind['target_2'];
+					        $target_3_html[$key] = $ind['target_3'];
+					        $target_4_html[$key] = $ind['target_4'];
+					    }
 
-							$html .= '
-							<tr>
-								<td>'.$no.'.'.$no_renaksi.'</td>
-								<td class="kegiatan_utama"><b><i></td>
-								<td class="indikator_kegiatan_utama"><b><i></td>
-								<td class="recana_aksi"><b><i>'.$renaksi['detail']['label'].'</td>
-								<td class="urian_renaksi"><b><i></td>
-								<td class="text-center satuan_renaksi"><b><i>'.$satuan_html.'</td>
-								<td class="indikator_renaksi"><b><i>'.$indikator_html.'</td>
-								<td class="text-right target_akhir_urian_renaksi"><b><i>'.$target_akhir_html.'</td>
-								<td class="text-right target_tw1_urian_renaksi"><b><i>'.$target_1_html.'</td>
-								<td class="text-right target_tw2_urian_renaksi"><b><i>'.$target_2_html.'</td>
-								<td class="text-right target_tw3_urian_renaksi"><b><i>'.$target_3_html.'</td>
-								<td class="text-right target_tw4_urian_renaksi"><b><i>'.$target_4_html.'</td>
-								<td class="text-right target_akhir_urian_renaksi"><b><i>'.$target_akhir_html.'</td>
-								<td class=""><b><i></td>
-								<td class=""><b><i></td>
-								<td class=""><b><i></td>
-							</tr>
-							';
+					    $indikator_html = implode($indikator_html);
+					    $satuan_html = implode($satuan_html);
+					    $target_awal_html = implode($target_awal_html);
+					    $target_akhir_html = implode($target_akhir_html);
+					    $target_1_html = implode($target_1_html);
+					    $target_2_html = implode($target_2_html);
+					    $target_3_html = implode($target_3_html);
+					    $target_4_html = implode($target_4_html);
 
-							foreach($renaksi['data'] as $uraian_renaksi){
-								$no_uraian_renaksi++;
-								$indikator_html = array();
-								$satuan_html = array();
-								$target_awal_html = array();
-								$target_akhir_html = array();
-								$target_1_html = array();
-								$target_2_html = array();
-								$target_3_html = array();
-								$target_4_html = array();
-								$rencana_pagu_html = array();
-								$realisasi_pagu_html = array();
-								foreach($uraian_renaksi['indikator'] as $key => $ind){
-									$indikator_html[$key] = $ind['indikator'];
-									$satuan_html[$key] = $ind['satuan'];
-									$target_awal_html[$key] = $ind['target_awal'];
-									$target_akhir_html[$key] = $ind['target_akhir'];
-									$target_1_html[$key] = $ind['target_1'];
-									$target_2_html[$key] = $ind['target_2'];
-									$target_3_html[$key] = $ind['target_3'];
-									$target_4_html[$key] = $ind['target_4'];
-								}
-								$indikator_html = implode( $indikator_html);
-								$satuan_html = implode( $satuan_html);
-								$target_awal_html = implode( $target_awal_html);
-								$target_akhir_html = implode( $target_akhir_html);
-								$target_1_html = implode( $target_1_html);
-								$target_2_html = implode( $target_2_html);
-								$target_3_html = implode( $target_3_html);
-								$target_4_html = implode( $target_4_html);
+					    $html .= '
+					    <tr>
+					        <td>'.$no.'</td>
+					        <td class="kegiatan_utama"><b>'.$v['detail']['label'].'</td>
+					        <td class="indikator_kegiatan_utama"><b>'.$indikator_html.'</td>
+					        <td class="recana_aksi"><b></td>
+					        <td class="urian_renaksi"><b></td>
+					        <td class="text-center satuan_renaksi"><b>'.$satuan_html.'</td>
+					        <td class="indikator_renaksi"><b></td>
+					        <td class="text-right target_akhir_urian_renaksi"><b>'.$target_akhir_html.'</td>
+					        <td class="text-right target_tw1_urian_renaksi"><b>'.$target_1_html.'</td>
+					        <td class="text-right target_tw2_urian_renaksi"><b>'.$target_2_html.'</td>
+					        <td class="text-right target_tw3_urian_renaksi"><b>'.$target_3_html.'</td>
+					        <td class="text-right target_tw4_urian_renaksi"><b>'.$target_4_html.'</td>
+					        <td class="text-right target_akhir_urian_renaksi"><b>'.$target_akhir_html.'</td>
+					        <td class="text-right rencana_pagu"></td>
+					        <td class="text-left nama_skpd"></td>
+					        <td class="text-left mitra_bidang"></td>
+					    </tr>
+					    ';
 
-								$label_pokin = $uraian_renaksi['detail']['label_pokin_5'];
-								if(empty($label_pokin)){
-									$label_pokin = $uraian_renaksi['detail']['label_pokin_4'];
-								}
-								$html .= '
-								<tr>
-									<td>'.$no.'.'.$no_renaksi.'.'.$no_uraian_renaksi.'</td>
-									<td class="kegiatan_utama"></td>
-									<td class="indikator_kegiatan_utama"></td>
-									<td class="recana_aksi"></td>
-									<td class="urian_renaksi">'.$uraian_renaksi['detail']['label'].'</td>
-									<td class="text-center satuan_renaksi">'.$satuan_html.'</td>	
-									<td class="indikator_uraian_renaksi">'.$indikator_html.'</td>
-									<td class="text-right target_akhir_urian_renaksi">'.$target_akhir_html.'</td>
-									<td class="text-right target_tw1_urian_renaksi">'.$target_1_html.'</td>
-									<td class="text-right target_tw2_urian_renaksi">'.$target_2_html.'</td>
-									<td class="text-right target_tw3_urian_renaksi">'.$target_3_html.'</td>
-									<td class="text-right target_tw4_urian_renaksi">'.$target_4_html.'</td>
-									<td class="text-right target_akhir_urian_renaksi">'.$target_akhir_html.'</td>
-									<td class=""></td>
-									<td class=""></td>
-									<td class=""></td>
-								</tr>
-								';
-							}
-						}
+					    foreach($v['data'] as $renaksi){
+					        $no_renaksi++; 
+					        $no_uraian_renaksi = 0; 
+					        $indikator_html = array();
+					        $satuan_html = array();
+					        $target_awal_html = array();
+					        $target_akhir_html = array();
+					        $target_1_html = array();
+					        $target_2_html = array();
+					        $target_3_html = array();
+					        $target_4_html = array();
+					        $rencana_pagu_html = array();
+					        $realisasi_pagu_html = array();
+
+					        foreach($renaksi['indikator'] as $key => $ind){
+					            $indikator_html[$key] = $ind['indikator'];
+					            $satuan_html[$key] = $ind['satuan'];
+					            $target_awal_html[$key] = $ind['target_awal'];
+					            $target_akhir_html[$key] = $ind['target_akhir'];
+					            $target_1_html[$key] = $ind['target_1'];
+					            $target_2_html[$key] = $ind['target_2'];
+					            $target_3_html[$key] = $ind['target_3'];
+					            $target_4_html[$key] = $ind['target_4'];
+					        }
+
+					        $indikator_html = implode($indikator_html);
+					        $satuan_html = implode($satuan_html);
+					        $target_awal_html = implode($target_awal_html);
+					        $target_akhir_html = implode($target_akhir_html);
+					        $target_1_html = implode($target_1_html);
+					        $target_2_html = implode($target_2_html);
+					        $target_3_html = implode($target_3_html);
+					        $target_4_html = implode($target_4_html);
+
+					        $html .= '
+					        <tr>
+					            <td>'.$no.'.'.$no_renaksi.'</td>
+					            <td class="kegiatan_utama"><b><i></td>
+					            <td class="indikator_kegiatan_utama"><b><i></td>
+					            <td class="recana_aksi"><b><i>'.$renaksi['detail']['label'].'</td>
+					            <td class="urian_renaksi"><b><i></td>
+					            <td class="text-center satuan_renaksi"><b><i>'.$satuan_html.'</td>
+					            <td class="indikator_renaksi"><b><i>'.$indikator_html.'</td>
+					            <td class="text-right target_akhir_urian_renaksi"><b><i>'.$target_akhir_html.'</td>
+					            <td class="text-right target_tw1_urian_renaksi"><b><i>'.$target_1_html.'</td>
+					            <td class="text-right target_tw2_urian_renaksi"><b><i>'.$target_2_html.'</td>
+					            <td class="text-right target_tw3_urian_renaksi"><b><i>'.$target_3_html.'</td>
+					            <td class="text-right target_tw4_urian_renaksi"><b><i>'.$target_4_html.'</td>
+					            <td class="text-right target_akhir_urian_renaksi"><b><i>'.$target_akhir_html.'</td>
+					            <td class="text-right rencana_pagu"></td>`
+					            <td class="text-left nama_skpd"></td>
+					            <td class="text-left mitra_bidang"></td>
+					        </tr>
+					        ';
+
+					        foreach($renaksi['data'] as $uraian_renaksi){
+					            $no_uraian_renaksi++; 
+					            $indikator_html = array();
+					            $satuan_html = array();
+					            $target_awal_html = array();
+					            $target_akhir_html = array();
+					            $target_1_html = array();
+					            $target_2_html = array();
+					            $target_3_html = array();
+					            $target_4_html = array();
+					            $rencana_pagu_html = array();
+					            $realisasi_pagu_html = array();
+					            $mitra_bidang_html = array();
+					            $nama_skpd_html = array();
+
+					            foreach($uraian_renaksi['indikator'] as $key => $ind){
+					                $indikator_html[$key] = $ind['indikator'];
+					                $satuan_html[$key] = $ind['satuan'];
+					                $target_awal_html[$key] = $ind['target_awal'];
+					                $target_akhir_html[$key] = $ind['target_akhir'];
+					                $target_1_html[$key] = $ind['target_1'];
+					                $target_2_html[$key] = $ind['target_2'];
+					                $target_3_html[$key] = $ind['target_3'];
+					                $target_4_html[$key] = $ind['target_4'];
+					                $rencana_pagu_html[$key] = $ind['rencana_pagu'];
+					                $mitra_bidang_html[$key] = $ind['mitra_bidang'];
+					                $nama_skpd_html[$key] = $ind['nama_skpd'];
+					            }
+
+					            $indikator_html = implode($indikator_html);
+					            $satuan_html = implode($satuan_html);
+					            $target_awal_html = implode($target_awal_html);
+					            $target_akhir_html = implode($target_akhir_html);
+					            $target_1_html = implode($target_1_html);
+					            $target_2_html = implode($target_2_html);
+					            $target_3_html = implode($target_3_html);
+					            $target_4_html = implode($target_4_html);
+					            $rencana_pagu = !empty($rencana_pagu_html) ? number_format((float) $rencana_pagu_html[0], 0, ",", ".") : 0;
+					            $mitra_bidang_html = implode($mitra_bidang_html);
+					            $nama_skpd_html = implode($nama_skpd_html);
+
+					            $label_pokin = $uraian_renaksi['detail']['label_pokin_5'];
+					            if(empty($label_pokin)){
+					                $label_pokin = $uraian_renaksi['detail']['label_pokin_4'];
+					            }
+					            $html .= '
+					            <tr>
+					                <td>'.$no.'.'.$no_renaksi.'.'.$no_uraian_renaksi.'</td>
+					                <td class="kegiatan_utama"></td>
+					                <td class="indikator_kegiatan_utama"></td>
+					                <td class="recana_aksi"></td>
+					                <td class="urian_renaksi">'.$uraian_renaksi['detail']['label'].'</td>
+					                <td class="text-center satuan_renaksi">'.$satuan_html.'</td>	
+					                <td class="indikator_uraian_renaksi">'.$indikator_html.'</td>
+					                <td class="text-right target_akhir_urian_renaksi">'.$target_akhir_html.'</td>
+					                <td class="text-right target_tw1_urian_renaksi">'.$target_1_html.'</td>
+					                <td class="text-right target_tw2_urian_renaksi">'.$target_2_html.'</td>
+					                <td class="text-right target_tw3_urian_renaksi">'.$target_3_html.'</td>
+					                <td class="text-right target_tw4_urian_renaksi">'.$target_4_html.'</td>
+					                <td class="text-right target_akhir_urian_renaksi">'.$target_akhir_html.'</td>
+					                <td class="text-right rencana_pagu">'.$rencana_pagu.'</td>
+					                <td class="text-left nama_skpd">'.$nama_skpd_html.'</td>
+					                <td class="text-left mitra_bidang">'.$mitra_bidang_html.'</td>
+					            </tr>
+					            ';
+					        }
+					    }
 					}
+
 					if(empty($html)){
 						$html = '<tr><td class="text-center" colspan="18">Data masih kosong!</td></tr>';
 					}
@@ -2080,9 +2075,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$_prefix_pemda = '';
 					if (!empty($_POST['tipe_pokin'])) {
 						$_prefix_pemda = $_POST['tipe_pokin'] == "pemda" ? "_pemda" : "";
-					} else {
-						throw new Exception("Tipe Pokin tidak ditemukan!", 1);
-					}
+					} 
 
 					if ($_prefix_pemda == '') {
 						$data_renaksi = array();
@@ -2258,7 +2251,16 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				if ($ret['status'] != 'error' && empty($_POST['label_renaksi'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Kegiatan Utama tidak boleh kosong!';
-				}
+				} else if ($ret['status'] != 'error' && empty($_POST['id_jadwal'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID Jadwal tidak boleh kosong!';
+				} else if ($ret['status'] != 'error' && empty($_POST['level'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Level tidak boleh kosong!';
+				} else if ($ret['status'] != 'error' && empty($_POST['parent'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Parent tidak boleh kosong!';
+				} 
 				if ($ret['status'] != 'error'){
 					$data = array(
 						'label' => $_POST['label_renaksi'],
@@ -2266,6 +2268,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'active' => 1,
 						'level' => $_POST['level'],
 						'tahun_anggaran' => $_POST['tahun_anggaran'],
+						'parent' => $_POST['parent'],
 						'created_at' => current_time('mysql'),
 					);
 					if(!empty($_POST['id'])){
@@ -2338,6 +2341,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				} else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
+				} else if ($ret['status'] != 'error' && empty($_POST['id_skpd'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'SKPD tidak boleh kosong!';
 				} 
 				if ($ret['status'] != 'error'){
 					$data = array(
@@ -2354,6 +2360,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'target_4' => $_POST['target_tw_4'],
 						'active' => 1,
 						'tahun_anggaran' => $_POST['tahun_anggaran'],
+						'id_skpd' => $_POST['id_skpd'],
+						'mitra_bidang' => $_POST['mitra_bidang'],
 						'created_at' => current_time('mysql'),
 					);
 					if(empty($_POST['id_label_indikator'])){
@@ -2567,5 +2575,36 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			);
 		}
 		die(json_encode($ret));
+	}
+
+	public function get_skpd_renaksi(){
+	    global $wpdb;
+	    $ret = array(
+	        'status' => 'success',
+	        'message' => 'Berhasil mengambil data!',
+	        'data' => array()
+	    );
+
+	    if(!empty($_POST)){
+	        if(!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+	            $data_skpd = $wpdb->get_results($wpdb->prepare('
+	                SELECT *
+	                FROM esakip_data_unit
+	                WHERE tahun_anggaran = %d 
+	                	AND active = 1
+	            ', $_POST['tahun']), ARRAY_A);
+
+	            $ret['data'] = $data_skpd;
+	        } else {
+	            $ret['status']  = 'error';
+	            $ret['message'] = 'API key tidak valid!';
+	        }
+	    } else {
+	        $ret['status']  = 'error';
+	        $ret['message'] = 'Permintaan tidak valid!';
+	    }
+
+	    echo json_encode($ret);
+	    wp_die(); 
 	}
 }

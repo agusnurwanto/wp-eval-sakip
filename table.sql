@@ -1370,6 +1370,9 @@ CREATE TABLE `esakip_data_rencana_aksi_indikator_pemda` (
   `update_at` datetime DEFAULT current_timestamp(),
   `rencana_pagu` double(20, 0) DEFAULT NULL,
   `realisasi_pagu` double(20, 0) DEFAULT NULL,
+  `mitra_bidang` text DEFAULT NULL,
+  PRIMARY key (id)
+);
 
 CREATE TABLE `esakip_data_jenis_dokumen_esr` (
   `id` int(11) NOT NULL auto_increment,
