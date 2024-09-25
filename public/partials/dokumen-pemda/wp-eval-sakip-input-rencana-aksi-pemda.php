@@ -579,28 +579,17 @@ function simpan_indikator_renaksi(tipe) {
     }
 
     var target_akhir = jQuery('#target_akhir').val();
-    if ((tipe == 3) && target_akhir == '') {
-        return alert('Target akhir tidak boleh kosong!');
-    }
 
     var target_tw_1 = jQuery('#target_tw_1').val();
-    if ((tipe == 3) && target_tw_1 == '') {
-        return alert('Target triwulan 1 tidak boleh kosong!');
-    }
+
     var target_tw_2 = jQuery('#target_tw_2').val();
-    if ((tipe == 3) && target_tw_2 == '') {
-        return alert('Target triwulan 2 tidak boleh kosong!');
-    }
+
     var target_tw_3 = jQuery('#target_tw_3').val();
-    if ((tipe == 3) && target_tw_3 == '') {
-        return alert('Target triwulan 3 tidak boleh kosong!');
-    }
-    var target_tw_4 = jQuery('#target_tw_4').val();
-    if ((tipe == 3) && target_tw_4 == '') {
-        return alert('Target triwulan 4 tidak boleh kosong!');
-    }
+
+    var target_tw_4 = jQuery('#target_tw_4').val();    
 
     var id_skpd = jQuery('#id_skpd').val();
+    
     if ((tipe == 3) && id_skpd == '') {
         return alert('Pilih SKPD dulu!');
     }

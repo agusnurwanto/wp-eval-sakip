@@ -2320,21 +2320,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				} else if ($ret['status'] != 'error' && empty($_POST['satuan']) && $_POST['tipe'] == 2 && $_POST['tipe'] == 3) {
 				    $ret['status'] = 'error';
 				    $ret['message'] = 'Satuan tidak boleh kosong!';
-				} else if ($ret['status'] != 'error' && !isset($_POST['target_akhir']) && $_POST['tipe'] == 3) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Target akhir tidak boleh kosong!';
-				} else if ($ret['status'] != 'error' && !isset($_POST['target_tw_1']) && $_POST['tipe'] == 3) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Target triwulan 11 tidak boleh kosong!';
-				} else if ($ret['status'] != 'error' && !isset($_POST['target_tw_2']) && $_POST['tipe'] == 3) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Target triwulan 2 tidak boleh kosong!';
-				} else if ($ret['status'] != 'error' && !isset($_POST['target_tw_3']) && $_POST['tipe'] == 3) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Target triwulan 3 tidak boleh kosong!';
-				} else if ($ret['status'] != 'error' && !isset($_POST['target_tw_4']) && $_POST['tipe'] == 3) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Target triwulan 4 tidak boleh kosong!';
 				} else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
