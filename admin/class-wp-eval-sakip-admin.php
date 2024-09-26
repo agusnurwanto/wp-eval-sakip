@@ -1246,6 +1246,13 @@ class Wp_Eval_Sakip_Admin
 					->set_help_text('Wajib diisi. Setting batas ukuran maksimal untuk upload dokumen. Ukuran dalam MB'),
 				Field::make('text', 'crb_nama_pemda', 'Nama Pemerintah Daerah')
 					->set_help_text('Wajib diisi.'),
+				Field::make('radio', 'crb_api_esr_status', 'Status API ESR')
+					->add_options(array(
+						'1' => __('Dikunci'),
+						'2' => __('Dibuka')
+					))
+					->set_default_value('1')
+					->set_help_text('Digunakan untuk mengunci atau membuka akses untuk kirim dokumen ke aplikasi ESR Menpan RB'),
 				Field::make('text', 'crb_url_api_esr', 'Url API ESR')
 					->set_help_text('Wajib diisi. URL integrasi dokumen ke API ESR'),
 				Field::make('text', 'crb_username_api_esr', 'Username API ESR')
