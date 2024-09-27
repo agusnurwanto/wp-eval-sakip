@@ -822,6 +822,9 @@ CREATE TABLE `esakip_dpa_pemda` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `status_esr` tinyint(4) DEFAULT 0,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -1246,6 +1249,7 @@ CREATE TABLE `esakip_data_iku_pemda` (
 CREATE TABLE `esakip_data_esr` (
   `id` int(11) NOT NULL auto_increment,
   `url` text NOT NULL,
+  `user_esr_id` int(11) DEFAULT null,
   `method` text DEFAULT null,
   `param_json` text DEFAULT null,
   `response_json` text DEFAULT null,

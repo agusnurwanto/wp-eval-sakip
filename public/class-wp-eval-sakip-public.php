@@ -24204,6 +24204,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 
+					$user_esr_id = get_option('_user_esr_'.str_replace(" ", "_", get_option('_crb_nama_pemda')));
+					
 					$response = wp_remote_get(get_option('_crb_url_api_esr').'get_data', [
 						'headers' => array(
 					        'Accept' => 'application/json',
@@ -24211,25 +24213,39 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					    ),
 					]);
 
-					$body = json_encode(wp_remote_retrieve_body($response));
+					$body = json_decode(wp_remote_retrieve_body($response));
+
 					if(empty($body)){
 						throw new Exception("Data tidak ditemukan di API ESR", 1);
 					}
 
-					$check = $wpdb->get_var($wpdb->prepare("SELECT id FROM esakip_data_esr WHERE url=%s", 'get_data'));
+					if(isset($body->error)){
+						throw new Exception("Api ESR : ".$body->error, 1);	
+					}
+
+					$array_data = [];
+					foreach ($body->data as $key => $value) {
+						if($user_esr_id==$value->user_id){
+							$array_data[]=$value;
+						}
+					}
+
+					$check = $wpdb->get_var($wpdb->prepare("SELECT id FROM esakip_data_esr WHERE user_esr_id=%d AND url=%s", $user_esr_id, 'get_data'));
 					if(empty($check)){
 						$wpdb->insert('esakip_data_esr', [
 							'url' => 'get_data',
 							'method' => 'GET',
-							'response_json' => $body,
-							'updated_at' => current_time('mysql')
+							'response_json' => json_encode($array_data),
+							'updated_at' => current_time('mysql'),
+							'user_esr_id' => $user_esr_id
 						]);
 					}else{
 						$wpdb->update('esakip_data_esr', [
-							'response_json' => $body,
+							'response_json' => json_encode($array_data),
 							'updated_at' => current_time('mysql')
 						], [
-							'url' => 'get_data'
+							'url' => 'get_data',
+							'user_esr_id' => $user_esr_id 
 						]);
 					}
 
