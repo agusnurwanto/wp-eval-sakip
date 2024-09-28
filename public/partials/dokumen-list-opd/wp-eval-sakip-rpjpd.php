@@ -48,7 +48,7 @@ foreach ($idtahun as $val) {
 $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
 $is_admin_panrb = in_array('admin_panrb', $user_roles);
-
+$status_api_esr = get_option('_crb_api_esr_status');
 ?>
 <style type="text/css">
     .wrap-table {
@@ -80,16 +80,25 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             <?php if (!$is_admin_panrb): ?>
                 <div style="margin-bottom: 25px;">
                     <button class="btn btn-primary" onclick="tambah_dokumen_rpjpd();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
-                    <!-- <button class="btn btn-success" onclick="sync_from_esr();"><i class="dashicons dashicons-arrow-down-alt"></i> Ambil Data dari ESR</button> -->
-                    <button class="btn btn-warning" onclick="sync_to_esr();"><i class="dashicons dashicons-arrow-up-alt"></i> Kirim Data ke ESR</button>
+                    <?php
+                    if($status_api_esr==2){
+                        echo '
+                            <!-- <button class="btn btn-success" onclick="sync_from_esr();"><i class="dashicons dashicons-arrow-down-alt"></i> Ambil Data dari ESR</button> -->
+                            <button class="btn btn-warning" onclick="sync_to_esr();"><i class="dashicons dashicons-arrow-up-alt"></i> Kirim Data ke ESR</button>';
+                    }
+                    ?>
                 </div>
             <?php endif; ?>
             <div class="wrap-table">
                 <table id="table_dokumen_rpjpd" cellpadding="2" cellspacing="0" style="font-family:'Open Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
                     <tr>
-                            <th class="text-center" rowspan="2">Checklist ESR</th>
                             <th class="text-center" rowspan="2">No</th>
+                            <?php
+                            if($status_api_esr==2){
+                                echo '<th class="text-center" rowspan="2">Checklist ESR</th>';
+                            }
+                            ?>
                             <th class="text-center" rowspan="2">Nama Dokumen</th>
                             <th class="text-center" rowspan="2">Keterangan</th>
                             <th class="text-center" rowspan="2">Waktu Upload</th>

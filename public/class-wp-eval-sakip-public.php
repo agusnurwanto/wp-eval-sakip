@@ -6705,9 +6705,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$counter = 1;
 						$tbody = '';
 
+						$status_api_esr = get_option('_crb_api_esr_status');
 						foreach ($datas as $kk => $vv) {
 							$tbody .= "<tr>";
 							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+							if($status_api_esr==2){
+								$tbody .= "<td class='text-center'><input type='checkbox' name='checklist_esr' value='".$vv['id']."'></td>";
+							}
 							$tbody .= "<td>" . $vv['dokumen'] . "</td>";
 							$tbody .= "<td>" . $vv['keterangan'] . "</td>";
 							$tbody .= "<td>" . $vv['created_at'] . "</td>";
@@ -20259,10 +20263,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$counter = 1;
 					$tbody = '';
 
+					$status_api_esr=get_option('_crb_api_esr_status');
 					foreach ($rpjpds as $kk => $vv) {
 						$tbody .= "<tr>";
-						$tbody .= "<td class='text-center'><input type='checkbox' name='checklist_esr' value='".$vv['id']."'></td>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+						if($status_api_esr==2){
+							$tbody .= "<td class='text-center'><input type='checkbox' name='checklist_esr' value='".$vv['id']."'></td>";
+						}
 						$tbody .= "<td>" . $vv['dokumen'] . "</td>";
 						$tbody .= "<td>" . $vv['keterangan'] . "</td>";
 						$tbody .= "<td>" . $vv['created_at'] . "</td>";
