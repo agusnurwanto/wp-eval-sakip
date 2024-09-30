@@ -1322,6 +1322,7 @@ CREATE TABLE `esakip_data_rencana_aksi_pemda` (
   `id` int(11) NOT NULL auto_increment,
   `label` varchar(255) NOT NULL,
   `id_skpd` int(11) DEFAULT NULL,
+  `id_tujuan` int(11) NOT NULL,
   `parent` int(11) DEFAULT 0,
   `label_pokin_1` text DEFAULT null,
   `id_pokin_1` int(11) DEFAULT null,
@@ -1355,6 +1356,7 @@ CREATE TABLE `esakip_data_rencana_aksi_pemda` (
 CREATE TABLE `esakip_data_rencana_aksi_indikator_pemda` (
   `id` int(11) NOT NULL auto_increment,
   `id_renaksi` int(11) NOT NULL,
+  `id_tujuan` int(11) NOT NULL,
   `indikator` text DEFAULT null,
   `target_awal` text DEFAULT NULL,
   `target_akhir` text DEFAULT NULL,
