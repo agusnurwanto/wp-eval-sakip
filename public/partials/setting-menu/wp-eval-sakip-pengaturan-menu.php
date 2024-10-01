@@ -29,7 +29,7 @@ $body = '';
 	<div style="padding: 10px;margin:0 0 3rem 0;">
 	<input type="hidden" value="<?php echo get_option( '_crb_apikey_esakip' ); ?>" id="api_key">
 	<h1 class="text-center" style="margin:3rem;">Halaman Pengaturan Menu Upload Dokumen <br>Pemerintah Daerah<br>Tahun <?php echo $input['tahun_anggaran']; ?></h1>
-		<table id="data_pengaturan_menu_pemda_table" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+		<table id="data_pengaturan_menu_pemda_table" cellpadding="2" cellspacing="0">
 			<thead id="data_header">
 				<tr>
 					<th class="text-center">No</th>
@@ -46,7 +46,7 @@ $body = '';
 		</table>
 
 	<h1 class="text-center" style="margin:10rem 0 0;">Halaman Pengaturan Menu Upload Dokumen <br>Perangkat Daerah<br>Tahun <?php echo $input['tahun_anggaran']; ?></h1>
-		<table id="data_pengaturan_menu_perangkat_daerah_table" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+		<table id="data_pengaturan_menu_perangkat_daerah_table" cellpadding="2" cellspacing="0">
 			<thead id="data_header">
 				<tr>
 					<th class="text-center">No</th>
@@ -64,7 +64,7 @@ $body = '';
 		</table>
 
 	<h1 class="text-center" style="margin:10rem 0 0;">Halaman Pengaturan Menu Khusus<br>Tahun <?php echo $input['tahun_anggaran']; ?></h1>
-		<table id="data_pengaturan_menu_khusus_table" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+		<table id="data_pengaturan_menu_khusus_table" cellpadding="2" cellspacing="0">
 			<thead id="data_header">
 				<tr>
 					<th class="text-center" style="width: 4rem;">No</th>
