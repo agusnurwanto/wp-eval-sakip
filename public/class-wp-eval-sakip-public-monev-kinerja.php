@@ -2406,21 +2406,27 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if ($ret['status'] != 'error' && empty($_POST['id'])) {
+				if (empty($_POST['id'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'ID rencana aksi tidak boleh kosong!';
-				} else if ($ret['status'] != 'error' && empty($_POST['tipe'])) {
+				} else if (empty($_POST['tipe'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tipe tidak boleh kosong!';
-				} else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
+				} else if (empty($_POST['tahun_anggaran'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
-				}else if ($ret['status'] != 'error' && empty($_POST['id_tujuan'])) {
+				} else if (empty($_POST['id_tujuan'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'ID Tujuan tidak boleh kosong!';
-				}
-				$child_level = $_POST['tipe']+1;
-				if ($ret['status'] != 'error'){
+				} else {
+					$child_level = $_POST['tipe'] + 1;
+
+					if ($child_level == 2) {
+						$level_name = "Rencana Aksi";
+					} else if ($child_level == 3) {
+						$level_name = "Uraian Kegiatan Rencana Aksi";
+					} 
+
 					$cek_child = $wpdb->get_results($wpdb->prepare("
 						SELECT
 							*
@@ -2429,14 +2435,15 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							AND parent=%d
 							AND active=1
 					", $child_level, $_POST['id']), ARRAY_A);
-					if(empty($cek_child)){
+
+					if (empty($cek_child)) {
 						$wpdb->update('esakip_data_rencana_aksi_pemda', array(
 							'active' => 0
 						), array('id' => $_POST['id']));
-					}else{
+					} else {
 						$ret['status'] = 'error';
 						$ret['child'] = $cek_child;
-						$ret['message'] = 'Gagal menghapus, data di level data di level '. $child_level .' harus dihapus dahulu!';
+						$ret['message'] = 'Gagal menghapus, data di ' . $level_name . ' harus dihapus dahulu!';
 					}
 				}
 			} else {
