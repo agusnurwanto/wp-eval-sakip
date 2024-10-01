@@ -46,6 +46,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             *
                         FROM esakip_menu_dokumen 
                         WHERE tahun_anggaran =%d 
+                            and active=1
                             $where_jenis_user
                         ORDER BY nomor_urut ASC
                     ", $tahun_anggaran), ARRAY_A);
@@ -248,6 +249,18 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
                 if (!empty($tahun_anggaran) && !empty($tipe)) {
+                    $cek_menu_all_db = $wpdb->get_results($wpdb->prepare("
+                        SELECT 
+                            *
+                        FROM esakip_menu_dokumen 
+                        WHERE tahun_anggaran =%d
+                            AND user_role=%s
+                            AND active=1
+                    ", $tahun_anggaran, $tipe), ARRAY_A);
+                    $cek_menu_all = array();
+                    foreach($cek_menu_all_db as $m){
+                        $cek_menu_all[$m['nama_tabel']] = $m;
+                    }
                     if($tipe == 'pemerintah_daerah'){
                         $design_menu = array(
                             array(
@@ -270,13 +283,13 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             ),
                             array(
                                 'nama_dokumen' => 'RKPD',
-                                'nama_tabel' => 'esakip_rkpd',
+                                'nama_tabel' => 'esakip_rkpd_pemda',
                                 'user_role' => 'pemerintah_daerah',
                                 'jenis_role'    => 1
                             ),
                             array(
                                 'nama_dokumen' => 'LKJIP/LPPD',
-                                'nama_tabel' => 'esakip_lkjip_lppd',
+                                'nama_tabel' => 'esakip_lkjip_lppd_pemda',
                                 'user_role' => 'pemerintah_daerah',
                                 'jenis_role'    => 1
                             ),
@@ -312,7 +325,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             ),
                             array(
                                 'nama_dokumen' => 'TL LHE AKIP Kemenpan',
-                                'nama_tabel' => 'esakip_tl_lhe_akip_kemenpan',
+                                'nama_tabel' => 'esakip_tl_lhe_akip_kemenpan_pemda',
                                 'user_role' => 'pemerintah_daerah',
                                 'jenis_role'    => 1
                             ),
@@ -367,15 +380,9 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                         );
                         $nomor_urut = 1.00;
                         foreach ($design_menu as $menu) {
-                            $cek_menu = $wpdb->get_results($wpdb->prepare("
-                                SELECT 
-                                    *
-                                FROM esakip_menu_dokumen 
-                                WHERE tahun_anggaran =%d
-                                    AND nama_dokumen=%s
-                                    AND user_role=%s
-                            ", $tahun_anggaran, $menu['nama_dokumen'], $menu['user_role']), ARRAY_A);
-                            if(empty($cek_menu)){
+                            if(
+                                empty($cek_menu_all[$menu['nama_tabel']])
+                            ){
                                 if($menu['user_role'] == 'pemerintah_daerah'){
                                     $jenis_role = 1;
                                 }else if($menu['user_role'] == 'perangkat_daerah'){
@@ -403,6 +410,10 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                                     continue;
                                 }
                             }
+                            unset($cek_menu_all[$menu['nama_tabel']]);
+                        }
+                        foreach($cek_menu_all as $m){
+                            $wpdb->update('esakip_menu_dokumen', array('active' => 0), array('id' => $m['id']));
                         }
                     }else if($tipe == 'perangkat_daerah'){
                         $design_menu = array(
@@ -511,15 +522,9 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
     
                         $nomor_urut = 1.00;
                         foreach ($design_menu as $menu) {
-                            $cek_menu = $wpdb->get_results($wpdb->prepare("
-                                SELECT 
-                                    *
-                                FROM esakip_menu_dokumen 
-                                WHERE tahun_anggaran =%d
-                                    AND nama_dokumen=%s
-                                    AND user_role=%s
-                                ", $tahun_anggaran, $menu['nama_dokumen'], $menu['user_role']), ARRAY_A);
-                            if(empty($cek_menu)){
+                            if(
+                                empty($cek_menu_all[$menu['nama_tabel']])
+                            ){
                                 if($menu['user_role'] == 'pemerintah_daerah'){
                                     $jenis_role = 1;
                                 }else if($menu['user_role'] == 'perangkat_daerah'){
@@ -547,7 +552,10 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                                     continue;
                                 }
                             }
-                            
+                            unset($cek_menu_all[$menu['nama_tabel']]);
+                        }
+                        foreach($cek_menu_all as $m){
+                            $wpdb->update('esakip_menu_dokumen', array('active' => 0), array('id' => $m['id']));
                         }
                     }
                 } else {
