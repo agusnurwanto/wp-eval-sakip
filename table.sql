@@ -822,6 +822,9 @@ CREATE TABLE `esakip_dpa_pemda` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `status_esr` tinyint(4) DEFAULT 0,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -1246,6 +1249,7 @@ CREATE TABLE `esakip_data_iku_pemda` (
 CREATE TABLE `esakip_data_esr` (
   `id` int(11) NOT NULL auto_increment,
   `url` text NOT NULL,
+  `user_esr_id` int(11) DEFAULT null,
   `method` text DEFAULT null,
   `param_json` text DEFAULT null,
   `response_json` text DEFAULT null,
@@ -1318,6 +1322,7 @@ CREATE TABLE `esakip_data_rencana_aksi_pemda` (
   `id` int(11) NOT NULL auto_increment,
   `label` varchar(255) NOT NULL,
   `id_skpd` int(11) DEFAULT NULL,
+  `id_tujuan` int(11) NOT NULL,
   `parent` int(11) DEFAULT 0,
   `label_pokin_1` text DEFAULT null,
   `id_pokin_1` int(11) DEFAULT null,
@@ -1351,6 +1356,7 @@ CREATE TABLE `esakip_data_rencana_aksi_pemda` (
 CREATE TABLE `esakip_data_rencana_aksi_indikator_pemda` (
   `id` int(11) NOT NULL auto_increment,
   `id_renaksi` int(11) NOT NULL,
+  `id_tujuan` int(11) NOT NULL,
   `indikator` text DEFAULT null,
   `target_awal` text DEFAULT NULL,
   `target_akhir` text DEFAULT NULL,

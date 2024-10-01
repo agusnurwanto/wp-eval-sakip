@@ -5,13 +5,23 @@ if (!defined('WPINC')) {
     die;
 }
 
+$id_tujuan = isset($_GET['id_tujuan']) ? intval($_GET['id_tujuan']) : 0;
+
 $input = shortcode_atts(array(
     'tahun' => '2024',
     'id_skpd' => 0,
     'periode' => '',
+    'id_tujuan' => $id_tujuan
 ), $atts);
 
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
+$rpd = $wpdb->get_row($wpdb->prepare('
+    SELECT 
+        * 
+    FROM esakip_rpd_tujuan
+    WHERE id=%d
+',$input['id_tujuan']), ARRAY_A);
 
 $periode = $wpdb->get_row(
     $wpdb->prepare("
@@ -133,11 +143,18 @@ foreach($skpd as $get_skpd){
     <div id="cetak" style="padding: 5px; overflow: auto; max-height: 80vh;">
         <div style="padding: 10px;margin:0 0 3rem 0;">
             <h1 style="margin-top: 20px;" class="text-center">Rencana Aksi <?php echo $periode['nama_jadwal'] . ' ' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ''; ?><br>Pemerintah Daerah<br> Tahun Anggaran <?php echo $input['tahun']; ?></h1 style="margin-top: 20px;">
+            <tr>
+                <td>
+                    <strong>Judul Cascading: <?php echo $rpd['nama_cascading']; ?></strong><br/>
+                    <strong>Tujuan <?php echo $periode['nama_jadwal']; ?>: <?php echo $rpd['tujuan_teks']; ?></strong>
+                </td>
+            </tr>
             <div class="text-center" style="margin-bottom: 25px;">
             <div id="action" class="action-section hide-excel"></div>
             <div class="wrap-table">
                 <table id="table_dokumen_rencana_aksi_pemda" cellpadding="2" cellspacing="0" contenteditable="false">
                     <thead style="background: #ffc491;">
+
                         <tr>
                             <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 85px;">No</th>
                             <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 200px;">KEGIATAN UTAMA</th>
@@ -268,7 +285,8 @@ function getTablePengisianRencanaAksiPemda(no_loading=false) {
         data: {
             action: 'get_table_input_rencana_aksi_pemda',
             api_key: esakip.api_key,
-            tahun_anggaran: '<?php echo $input['tahun'] ?>'
+            tahun_anggaran: '<?php echo $input['tahun'] ?>',
+            id_tujuan: '<?php echo $input['id_tujuan'] ?>'
         },
         dataType: 'json',
         success: function(response) {
@@ -614,7 +632,8 @@ function simpan_indikator_renaksi(tipe) {
             "target_tw_4": target_tw_4,
             "mitra_bidang": mitra_bidang,
             "id_skpd": id_skpd,
-            "tahun_anggaran": <?php echo $input['tahun']; ?>
+            "tahun_anggaran": <?php echo $input['tahun']; ?>,
+            "id_tujuan": <?php echo $input['id_tujuan'] ?>
         },
         dataType: "json",
         success: function(res) {
@@ -908,7 +927,8 @@ function hapus_rencana_aksi(id, tipe){
                 api_key: esakip.api_key,
                 id: id,
                 tipe: tipe,
-                tahun_anggaran: '<?php echo $input['tahun'] ?>'
+                tahun_anggaran: '<?php echo $input['tahun'] ?>',
+                id_tujuan: '<?php echo $input['id_tujuan'] ?>'
             },
             dataType: 'json',
             success: function(response) {
@@ -966,7 +986,8 @@ function simpan_data_renaksi(tipe){
             "level": tipe,
             "parent": parent_renaksi,
             "tahun_anggaran": <?php echo $input['tahun']; ?>,
-            "id_jadwal": id_jadwal
+            "id_jadwal": id_jadwal,
+            "id_tujuan": <?php echo $input['id_tujuan'] ?>
         },
         dataType: "json",
         success: function(res){
@@ -991,7 +1012,8 @@ function edit_rencana_aksi(id, tipe){
                     action: 'get_rencana_aksi_pemda',
                     api_key: esakip.api_key,
                     id: id,
-                    tahun_anggaran: '<?php echo $input['tahun'] ?>'
+                    tahun_anggaran: '<?php echo $input['tahun'] ?>',
+                    id_tujuan: '<?php echo $input['id_tujuan'] ?>'
                 },
                 dataType: 'json',
                 success: function(response) {
@@ -1016,7 +1038,8 @@ function edit_rencana_aksi(id, tipe){
                     action: 'get_rencana_aksi_pemda',
                     api_key: esakip.api_key,
                     id: id,
-                    tahun_anggaran: '<?php echo $input['tahun'] ?>'
+                    tahun_anggaran: '<?php echo $input['tahun'] ?>',
+                    id_tujuan: '<?php echo $input['id_tujuan'] ?>'
                 },
                 dataType: 'json',
                 success: function(response) {
@@ -1047,7 +1070,8 @@ function edit_indikator(id, tipe){
             action: 'get_indikator_rencana_aksi_pemda',
             api_key: esakip.api_key,
             id: id,
-            tahun_anggaran: '<?php echo $input['tahun'] ?>'
+            tahun_anggaran: '<?php echo $input['tahun'] ?>',
+            id_tujuan: '<?php echo $input['id_tujuan'] ?>'
         },
         dataType: 'json',
         success: function(response) {
@@ -1102,7 +1126,8 @@ function hapus_indikator(id, tipe){
                 action: 'hapus_indikator_rencana_aksi_pemda',
                 api_key: esakip.api_key,
                 id: id,
-                tahun_anggaran: '<?php echo $input['tahun'] ?>'
+                tahun_anggaran: '<?php echo $input['tahun'] ?>',
+                id_tujuan: '<?php echo $input['id_tujuan'] ?>'
             },
             dataType: 'json',
             success: function(response) {

@@ -1781,16 +1781,20 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
+				}elseif ($ret['status'] != 'error' && empty($_POST['id_tujuan'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID Tujuan tidak boleh kosong!';
 				}
 				if ($ret['status'] != 'error'){
 					$data = $wpdb->get_results($wpdb->prepare("
 						SELECT
 							*
 						FROM esakip_data_rencana_aksi_pemda
-						WHERE tahun_anggaran=%d
+						WHERE id_tujuan=%d
+							AND tahun_anggaran=%d
 							AND active=1
 							AND level=1
-					", $_POST['tahun_anggaran']), ARRAY_A);
+					", $_POST['id_tujuan'], $_POST['tahun_anggaran']), ARRAY_A);
 					$html = '';
 					$data_all = array(
 						'total' => 0,
@@ -1814,11 +1818,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							SELECT
 								*
 							FROM esakip_data_rencana_aksi_pemda
-							WHERE tahun_anggaran=%d
+							WHERE id_tujuan=%d
+								AND tahun_anggaran=%d
 								AND active=1
 								AND level=2
 								AND parent=%d
-						", $_POST['tahun_anggaran'], $v['id']), ARRAY_A);
+						", $_POST['id_tujuan'], $_POST['tahun_anggaran'], $v['id']), ARRAY_A);
 						
 						// rencana aksi
 						foreach($data2 as $v2){
@@ -1838,11 +1843,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								SELECT
 									*
 								FROM esakip_data_rencana_aksi_pemda
-								WHERE tahun_anggaran=%d
+								WHERE id_tujuan=%d
+									AND tahun_anggaran=%d
 									AND active=1
 									AND level=3
 									AND parent=%d
-							", $_POST['tahun_anggaran'], $v2['id']), ARRAY_A);
+							", $_POST['id_tujuan'], $_POST['tahun_anggaran'], $v2['id']), ARRAY_A);
 						
 							// uraian rencana aksi
 							foreach($data3 as $v3) {
@@ -1891,14 +1897,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					        $target_4_html[$key] = $ind['target_4'];
 					    }
 
-					    $indikator_html = implode($indikator_html);
-					    $satuan_html = implode($satuan_html);
-					    $target_awal_html = implode($target_awal_html);
-					    $target_akhir_html = implode($target_akhir_html);
-					    $target_1_html = implode($target_1_html);
-					    $target_2_html = implode($target_2_html);
-					    $target_3_html = implode($target_3_html);
-					    $target_4_html = implode($target_4_html);
+					    $indikator_html = implode('<br>', $indikator_html);
+					    $satuan_html = implode('<br>', $satuan_html);
+					    $target_awal_html = implode('<br>', $target_awal_html);
+					    $target_akhir_html = implode('<br>', $target_akhir_html);
+					    $target_1_html = implode('<br>', $target_1_html);
+					    $target_2_html = implode('<br>', $target_2_html);
+					    $target_3_html = implode('<br>', $target_3_html);
+					    $target_4_html = implode('<br>', $target_4_html);
 
 					    $html .= '
 					    <tr>
@@ -1946,14 +1952,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					            $target_4_html[$key] = $ind['target_4'];
 					        }
 
-					        $indikator_html = implode($indikator_html);
-					        $satuan_html = implode($satuan_html);
-					        $target_awal_html = implode($target_awal_html);
-					        $target_akhir_html = implode($target_akhir_html);
-					        $target_1_html = implode($target_1_html);
-					        $target_2_html = implode($target_2_html);
-					        $target_3_html = implode($target_3_html);
-					        $target_4_html = implode($target_4_html);
+					        $indikator_html = implode('<br>', $indikator_html);
+					        $satuan_html = implode('<br>', $satuan_html);
+					        $target_awal_html = implode('<br>', $target_awal_html);
+					        $target_akhir_html = implode('<br>', $target_akhir_html);
+					        $target_1_html = implode('<br>', $target_1_html);
+					        $target_2_html = implode('<br>', $target_2_html);
+					        $target_3_html = implode('<br>', $target_3_html);
+					        $target_4_html = implode('<br>', $target_4_html);
 
 					        $html .= '
 					        <tr>
@@ -2005,17 +2011,18 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					                $nama_skpd_html[$key] = $ind['nama_skpd'];
 					            }
 
-					            $indikator_html = implode($indikator_html);
-					            $satuan_html = implode($satuan_html);
-					            $target_awal_html = implode($target_awal_html);
-					            $target_akhir_html = implode($target_akhir_html);
-					            $target_1_html = implode($target_1_html);
-					            $target_2_html = implode($target_2_html);
-					            $target_3_html = implode($target_3_html);
-					            $target_4_html = implode($target_4_html);
-					            $rencana_pagu = !empty($rencana_pagu_html) ? number_format((float) $rencana_pagu_html[0], 0, ",", ".") : 0;
-					            $mitra_bidang_html = implode($mitra_bidang_html);
-					            $nama_skpd_html = implode($nama_skpd_html);
+					            $indikator_html = implode('<br>', $indikator_html);
+					            $satuan_html = implode('<br>', $satuan_html);
+					            $target_awal_html = implode('<br>', $target_awal_html);
+					            $target_akhir_html = implode('<br>', $target_akhir_html);
+					            $target_1_html = implode('<br>', $target_1_html);
+					            $target_2_html = implode('<br>', $target_2_html);
+					            $target_3_html = implode('<br>', $target_3_html);
+								$target_4_html = implode('<br>', $target_4_html);
+								$rencana_pagu = !empty($rencana_pagu_html) ? implode('<br>', array_map(function($item) { return number_format((float) $item, 0, ",", ".");
+								}, $rencana_pagu_html)) : 0;
+					            $mitra_bidang_html = implode('<br>', $mitra_bidang_html);
+					            $nama_skpd_html = implode('<br>', $nama_skpd_html);
 
 					            $label_pokin = $uraian_renaksi['detail']['label_pokin_5'];
 					            if(empty($label_pokin)){
@@ -2265,6 +2272,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'active' => 1,
 						'level' => $_POST['level'],
 						'tahun_anggaran' => $_POST['tahun_anggaran'],
+						'id_tujuan' => $_POST['id_tujuan'],
 						'parent' => $_POST['parent'],
 						'created_at' => current_time('mysql'),
 					);
@@ -2278,7 +2286,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							WHERE label=%s
 								AND active=0
 								AND tahun_anggaran=%d
-						", $_POST['kegiatan_utama'], $_POST['tahun_anggaran']));
+								AND id_tujuan=%d
+						", $_POST['kegiatan_utama'], $_POST['tahun_anggaran'], $_POST['tahun_anggaran']));
 					}
 					if(empty($cek_id)){
 						$wpdb->insert('esakip_data_rencana_aksi_pemda', $data);
@@ -2345,6 +2354,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'id_skpd' => $_POST['id_skpd'],
 						'mitra_bidang' => $_POST['mitra_bidang'],
 						'created_at' => current_time('mysql'),
+						'id_tujuan' => $_POST['id_tujuan'],
 					);
 					if(empty($_POST['id_label_indikator'])){
 						$cek_id = $wpdb->get_var($wpdb->prepare("
@@ -2354,7 +2364,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							WHERE indikator=%s
 								AND active=0
 								AND tahun_anggaran=%d
-						", $_POST['indikator'], $_POST['tahun_anggaran']));
+								AND id_tujuan=%d
+						", $_POST['indikator'], $_POST['tahun_anggaran'], $_POST['id_tujuan']));
 					}else{
 						$cek_id = $wpdb->get_var($wpdb->prepare("
 							SELECT
@@ -2404,6 +2415,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				} else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
+				}else if ($ret['status'] != 'error' && empty($_POST['id_tujuan'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID Tujuan tidak boleh kosong!';
 				}
 				$child_level = $_POST['tipe']+1;
 				if ($ret['status'] != 'error'){
@@ -2456,6 +2470,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				} else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
+				} else if ($ret['status'] != 'error' && empty($_POST['id_tujuan'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID Tujuan tidak boleh kosong!';
 				}
 				if ($ret['status'] != 'error'){
 					$ret['data'] = $wpdb->get_row($wpdb->prepare('
@@ -2464,7 +2481,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						FROM esakip_data_rencana_aksi_pemda
 						WHERE id=%d
 							AND tahun_anggaran=%d
-					',$_POST['id'], $_POST['tahun_anggaran']), ARRAY_A);
+							AND id_tujuan=%d
+					',$_POST['id'], $_POST['tahun_anggaran'], $_POST['id_tujuan']), ARRAY_A);
 				}
 			} else {
 				$ret = array(
@@ -2497,6 +2515,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				} else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
+				} else if ($ret['status'] != 'error' && empty($_POST['id_tujuan'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID Tujuan tidak boleh kosong!';
 				}
 				if ($ret['status'] != 'error'){
 					$ret['data'] = $wpdb->get_row($wpdb->prepare('
@@ -2505,7 +2526,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						FROM esakip_data_rencana_aksi_indikator_pemda
 						WHERE id=%d
 							AND tahun_anggaran=%d
-					',$_POST['id'], $_POST['tahun_anggaran']), ARRAY_A);
+							AND tahun_anggaran=%d
+					',$_POST['id'], $_POST['tahun_anggaran'], $_POST['id_tujuan']), ARRAY_A);
 				}
 			} else {
 				$ret = array(
@@ -2538,6 +2560,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				} else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
+				} else if ($ret['status'] != 'error' && empty($_POST['id_tujuan'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID Tujuan tidak boleh kosong!';
 				}
 				if ($ret['status'] != 'error'){
 					$wpdb->update('esakip_data_rencana_aksi_indikator_pemda', array(
