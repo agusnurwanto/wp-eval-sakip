@@ -5,13 +5,23 @@ if (!defined('WPINC')) {
     die;
 }
 
+$id_tujuan = isset($_GET['id_tujuan']) ? intval($_GET['id_tujuan']) : 0;
+
 $input = shortcode_atts(array(
     'tahun' => '2024',
     'id_skpd' => 0,
     'periode' => '',
+    'id_tujuan' => $id_tujuan
 ), $atts);
 
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
+$rpd = $wpdb->get_row($wpdb->prepare('
+    SELECT 
+        * 
+    FROM esakip_rpd_tujuan
+    WHERE id=%d
+',$input['id_tujuan']), ARRAY_A);
 
 $periode = $wpdb->get_row(
     $wpdb->prepare("
@@ -134,10 +144,18 @@ foreach($skpd as $get_skpd){
         <div style="padding: 10px;margin:0 0 3rem 0;">
             <h1 style="margin-top: 20px;" class="text-center">Rencana Aksi <?php echo $periode['nama_jadwal'] . ' ' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ''; ?><br>Pemerintah Daerah<br> Tahun Anggaran <?php echo $input['tahun']; ?></h1 style="margin-top: 20px;">
             <div class="text-center" style="margin-bottom: 25px;">
-            <div id="action" class="action-section hide-excel"></div>
+                <div id="action" class="action-section hide-excel"></div>
+            </div>
+            <tr>
+                <td>
+                    <strong style="font-size: 85%;">JUDUL CASCADING : <?php echo $rpd['nama_cascading']; ?></strong><br/>
+                    <strong style="font-size: 85%;">TUJUAN <?php echo $periode['nama_jadwal']; ?> : <?php echo $rpd['tujuan_teks']; ?></strong>
+                </td>
+            </tr>
             <div class="wrap-table">
                 <table id="table_dokumen_rencana_aksi_pemda" cellpadding="2" cellspacing="0" contenteditable="false">
                     <thead style="background: #ffc491;">
+
                         <tr>
                             <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 85px;">No</th>
                             <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 200px;">KEGIATAN UTAMA</th>
@@ -268,7 +286,8 @@ function getTablePengisianRencanaAksiPemda(no_loading=false) {
         data: {
             action: 'get_table_input_rencana_aksi_pemda',
             api_key: esakip.api_key,
-            tahun_anggaran: '<?php echo $input['tahun'] ?>'
+            tahun_anggaran: '<?php echo $input['tahun'] ?>',
+            id_tujuan: '<?php echo $input['id_tujuan'] ?>'
         },
         dataType: 'json',
         success: function(response) {
@@ -301,12 +320,13 @@ function kegiatanUtama(){
                 "level": 1,
                 "parent": 0,
                 "api_key": esakip.api_key,
-                "tipe_pokin": "pemda"
+                "tipe_pokin": "pemda",
+                "id_tujuan": <?php echo $input['id_tujuan'] ?>
             },
             dataType: "json",
             success: function(res){
                 jQuery('#wrap-loading').hide();
-                let kegiatanUtama = ``
+                let kegiatanUtama = `` 
                     +`<div style="margin-top:10px">`
                         +`<button type="button" class="btn btn-success mb-2" onclick="tambah_rencana_aksi();"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data Kegiatan Utama</button>`
                     +`</div>`
@@ -319,65 +339,71 @@ function kegiatanUtama(){
                             +`</tr>`
                         +`</thead>`
                         +`<tbody>`;
-                            res.data.map(function(value, index){
-                                let label_cascading = value.label_cascading_sasaran != null ? value.label_cascading_sasaran : '-';
-                                kegiatanUtama += ``
-                                    +`<tr id="kegiatan_utama_${value.id}">`
-                                        +`<td class="text-center">${index+1}</td>`
-                                        +`<td class="label_renaksi">${value.label}</td>`
-                                        +`<td class="text-center">`
-                                            +`<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, 1)" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
-                                            +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, 2, ${value.id_pokin_2}, '${value.kode_cascading_sasaran}')" title="Lihat Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
-                                            +`<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, 1)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`
-                                            +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_rencana_aksi(${value.id}, 1)" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
-                                        +`</td>`
-                                    +`</tr>`;
 
-                                let indikator = value.indikator;
-                                if(indikator.length > 0){
-                                    kegiatanUtama += ``
-                                    +'<td colspan="5" style="padding: 0;">'
-                                        +`<table class="table" id="indikatorKegiatanUtama" style="margin: .5rem 0 2rem;">`
-                                            +`<thead>`
-                                                +`<tr class="table-secondary">`
-                                                    +`<th class="text-center" style="width:20px">No</th>`
-                                                    +`<th class="text-center">Indikator</th>`
-                                                    +`<th class="text-center" style="width:120px;">Satuan</th>`
-                                                    +`<th class="text-center" style="width:50px;">Target Akhir</th>`
-                                                    +`<th class="text-center" style="width:50px;">Target TW 1</th>`
-                                                    +`<th class="text-center" style="width:50px;">Target TW 2</th>`
-                                                    +`<th class="text-center" style="width:50px;">Target TW 3</th>`
-                                                    +`<th class="text-center" style="width:50px;">Target TW 4</th>`
-                                                    +`<th class="text-center" style="width:110px">Aksi</th>`
-                                                +`</tr>`
-                                            +`</thead>`
-                                            +`<tbody>`;
-                                    indikator.map(function(b, i){
-                                        kegiatanUtama += ``
-                                            +`<tr>`
-                                                +`<td class="text-center">${index+1}.${i+1}</td>`
-                                                +`<td>${b.indikator}</td>`
-                                                +`<td class="text-center">${b.satuan}</td>`
-                                                +`<td class="text-center">${b.target_akhir}</td>`
-                                                +`<td class="text-center">${b.target_1}</td>`
-                                                +`<td class="text-center">${b.target_2}</td>`
-                                                +`<td class="text-center">${b.target_3}</td>`
-                                                +`<td class="text-center">${b.target_4}</td>`
-                                                +`<td class="text-center">`
-                                                    +`<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_indikator(${b.id}, 1)" title="Edit"><i class="dashicons dashicons-edit"></i></a> `
-                                                    +`<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-danger" onclick="hapus_indikator(${b.id}, 1);" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
-                                                +`</td>`
-                                            +`</tr>`;
-                                    });
-                                    kegiatanUtama += ``
-                                            +'</tbody>'
-                                        +'</table>'
-                                    +'</td>';
-                                }
-                            });
-                            kegiatanUtama+=''
-                        +`<tbody>`
-                    +`</table>`;
+                res.data.filter(function(item) {
+                    return item.id_tujuan == <?php echo $input['id_tujuan']; ?>;
+                }).map(function(value, index){
+                    let label_cascading = value.label_cascading_sasaran != null ? value.label_cascading_sasaran : '-';
+                    kegiatanUtama += `` 
+                        +`<tr id="kegiatan_utama_${value.id}">`
+                            +`<td class="text-center">${index+1}</td>`
+                            +`<td class="label_renaksi">${value.label}</td>`
+                            +`<td class="text-center">`
+                                +`<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, 1)" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
+                                +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, 2, ${value.id_pokin_2}, '${value.kode_cascading_sasaran}')" title="Lihat Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
+                                +`<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, 1)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`
+                                +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_rencana_aksi(${value.id}, 1)" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
+                            +`</td>`
+                        +`</tr>`;
+
+                    let indikator = value.indikator;
+                    if(indikator.length > 0){
+                        kegiatanUtama += `` 
+                        +'<td colspan="5" style="padding: 0;">'
+                            +`<table class="table" id="indikatorKegiatanUtama" style="margin: .5rem 0 2rem;">`
+                                +`<thead>`
+                                    +`<tr class="table-secondary">`
+                                        +`<th class="text-center" style="width:20px">No</th>`
+                                        +`<th class="text-center">Indikator</th>`
+                                        +`<th class="text-center" style="width:120px;">Satuan</th>`
+                                        +`<th class="text-center" style="width:50px;">Target Akhir</th>`
+                                        +`<th class="text-center" style="width:50px;">Target TW 1</th>`
+                                        +`<th class="text-center" style="width:50px;">Target TW 2</th>`
+                                        +`<th class="text-center" style="width:50px;">Target TW 3</th>`
+                                        +`<th class="text-center" style="width:50px;">Target TW 4</th>`
+                                        +`<th class="text-center" style="width:110px">Aksi</th>`
+                                    +`</tr>`
+                                +`</thead>`
+                                +`<tbody>`;
+
+                        indikator.map(function(b, i){
+                            kegiatanUtama += `` 
+                                +`<tr>`
+                                    +`<td class="text-center">${index+1}.${i+1}</td>`
+                                    +`<td>${b.indikator}</td>`
+                                    +`<td class="text-center">${b.satuan}</td>`
+                                    +`<td class="text-center">${b.target_akhir}</td>`
+                                    +`<td class="text-center">${b.target_1}</td>`
+                                    +`<td class="text-center">${b.target_2}</td>`
+                                    +`<td class="text-center">${b.target_3}</td>`
+                                    +`<td class="text-center">${b.target_4}</td>`
+                                    +`<td class="text-center">`
+                                        +`<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_indikator(${b.id}, 1)" title="Edit"><i class="dashicons dashicons-edit"></i></a> `
+                                        +`<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-danger" onclick="hapus_indikator(${b.id}, 1);" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
+                                    +`</td>`
+                                +`</tr>`;
+                        });
+
+                        kegiatanUtama += `` 
+                                +'</tbody>'
+                            +'</table>'
+                        +'</td>';
+                    }
+                });
+
+                kegiatanUtama += `` 
+                    +`<tbody>`
+                +`</table>`;
 
                 jQuery("#nav-level-1").html(kegiatanUtama);
                 jQuery('.nav-tabs a[href="#nav-level-1"]').tab('show');
@@ -614,7 +640,8 @@ function simpan_indikator_renaksi(tipe) {
             "target_tw_4": target_tw_4,
             "mitra_bidang": mitra_bidang,
             "id_skpd": id_skpd,
-            "tahun_anggaran": <?php echo $input['tahun']; ?>
+            "tahun_anggaran": <?php echo $input['tahun']; ?>,
+            "id_tujuan": <?php echo $input['id_tujuan'] ?>
         },
         dataType: "json",
         success: function(res) {
@@ -674,6 +701,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
                 "parent": parent_renaksi,
                 "api_key": esakip.api_key,
                 "tipe_pokin": "pemda",
+                "id_tujuan": <?php echo $input['id_tujuan'] ?>,
             },
             dataType: "json",
             success: function(res){
@@ -908,7 +936,8 @@ function hapus_rencana_aksi(id, tipe){
                 api_key: esakip.api_key,
                 id: id,
                 tipe: tipe,
-                tahun_anggaran: '<?php echo $input['tahun'] ?>'
+                tahun_anggaran: '<?php echo $input['tahun'] ?>',
+                id_tujuan: '<?php echo $input['id_tujuan'] ?>'
             },
             dataType: 'json',
             success: function(response) {
@@ -966,7 +995,8 @@ function simpan_data_renaksi(tipe){
             "level": tipe,
             "parent": parent_renaksi,
             "tahun_anggaran": <?php echo $input['tahun']; ?>,
-            "id_jadwal": id_jadwal
+            "id_jadwal": id_jadwal,
+            "id_tujuan": <?php echo $input['id_tujuan'] ?>
         },
         dataType: "json",
         success: function(res){
@@ -991,7 +1021,8 @@ function edit_rencana_aksi(id, tipe){
                     action: 'get_rencana_aksi_pemda',
                     api_key: esakip.api_key,
                     id: id,
-                    tahun_anggaran: '<?php echo $input['tahun'] ?>'
+                    tahun_anggaran: '<?php echo $input['tahun'] ?>',
+                    id_tujuan: '<?php echo $input['id_tujuan'] ?>'
                 },
                 dataType: 'json',
                 success: function(response) {
@@ -1016,7 +1047,8 @@ function edit_rencana_aksi(id, tipe){
                     action: 'get_rencana_aksi_pemda',
                     api_key: esakip.api_key,
                     id: id,
-                    tahun_anggaran: '<?php echo $input['tahun'] ?>'
+                    tahun_anggaran: '<?php echo $input['tahun'] ?>',
+                    id_tujuan: '<?php echo $input['id_tujuan'] ?>'
                 },
                 dataType: 'json',
                 success: function(response) {
@@ -1047,7 +1079,8 @@ function edit_indikator(id, tipe){
             action: 'get_indikator_rencana_aksi_pemda',
             api_key: esakip.api_key,
             id: id,
-            tahun_anggaran: '<?php echo $input['tahun'] ?>'
+            tahun_anggaran: '<?php echo $input['tahun'] ?>',
+            id_tujuan: '<?php echo $input['id_tujuan'] ?>'
         },
         dataType: 'json',
         success: function(response) {
@@ -1102,7 +1135,8 @@ function hapus_indikator(id, tipe){
                 action: 'hapus_indikator_rencana_aksi_pemda',
                 api_key: esakip.api_key,
                 id: id,
-                tahun_anggaran: '<?php echo $input['tahun'] ?>'
+                tahun_anggaran: '<?php echo $input['tahun'] ?>',
+                id_tujuan: '<?php echo $input['id_tujuan'] ?>'
             },
             dataType: 'json',
             success: function(response) {

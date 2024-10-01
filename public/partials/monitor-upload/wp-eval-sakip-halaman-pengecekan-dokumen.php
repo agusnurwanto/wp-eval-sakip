@@ -144,7 +144,7 @@ $unit_html_pemda .= "
 
 // RPJPD DAN RPJM
 
-$dokumen_rpjpd_rpjmd = $wpdb->get_results($wpdb->prepare("
+$dokumen_rpjpd_rpjmd = $wpdb->get_results("
 	SELECT 
 		id,
 		nama_jadwal,
@@ -155,7 +155,7 @@ $dokumen_rpjpd_rpjmd = $wpdb->get_results($wpdb->prepare("
 	WHERE tipe IN ('RPJPD','RPJMD')
 		AND status = 1
 	ORDER BY tipe DESC, id ASC
-",), ARRAY_A);
+", ARRAY_A);
 
 $get_dok_html_rpjpd_rpjmd = "";
 $unit_html_rpjpd_rpjmd = "";
@@ -192,7 +192,7 @@ $unit_html_rpjpd_rpjmd .= "
 
 <div class="container-md">
 	<div class="cetak">
-		<div style="padding: 10px;margin:0 0 3rem 0;">
+		<div style="padding: 10px;margin:0 0 3rem 0; overflow: auto;">
 			<h1 class="text-center table-title">Monitor Upload Dokumen RPJPD dan RPJMD</h1>
 			<table>
 				<thead>
@@ -210,7 +210,7 @@ $unit_html_rpjpd_rpjmd .= "
 
 <div class="container-md">
 	<div class="cetak">
-		<div style="padding: 10px;margin:0 0 3rem 0;">
+		<div style="padding: 10px;margin:0 0 3rem 0; overflow: auto;">
 			<h1 class="text-center table-title">Monitor Upload Dokumen RENSTRA</h1>
 			<table>
 				<thead>
@@ -230,7 +230,7 @@ $unit_html_rpjpd_rpjmd .= "
 
 <div class="container-md">
 	<div class="cetak">
-		<div style="padding: 10px;margin:0 0 3rem 0;">
+		<div style="padding: 10px;margin:0 0 3rem 0; overflow: auto;">
 			<h1 class="text-center table-title">Monitor Upload Dokumen Pemerintah Daerah Tahun <?php echo $input['tahun_anggaran']; ?></h1>
 			<table>
 				<thead>
@@ -248,7 +248,7 @@ $unit_html_rpjpd_rpjmd .= "
 
 <div class="container-md">
 	<div class="cetak">
-		<div style="padding: 10px;margin:0 0 3rem 0;">
+		<div style="padding: 10px;margin:0 0 3rem 0; overflow: auto;">
 			<h1 class="text-center table-title">Monitor Upload Dokumen Perangkat Daerah Tahun <?php echo $input['tahun_anggaran']; ?></h1>
 			<table>
 				<thead>

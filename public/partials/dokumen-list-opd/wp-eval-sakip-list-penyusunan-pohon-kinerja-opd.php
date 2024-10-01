@@ -6,7 +6,6 @@ if (!defined('WPINC')) {
 }
 
 $input = shortcode_atts(array(
-	'tahun' => '2022',
     'periode'   => ''
 ), $atts);
 
@@ -148,7 +147,6 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
 			data: {
 				action: 'get_table_skpd_pohon_kinerja',
 				api_key: esakip.api_key,
-				tahun_anggaran: <?php echo $input['tahun']; ?>,
 				id_periode: <?php echo $input['periode']; ?>,
 				tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
 				penyusunan_pohon_kinerja_opd: penyusunan_pohon_kinerja_opd,
