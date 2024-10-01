@@ -701,6 +701,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
                 "parent": parent_renaksi,
                 "api_key": esakip.api_key,
                 "tipe_pokin": "pemda",
+                "id_tujuan": <?php echo $input['id_tujuan'] ?>,
             },
             dataType: "json",
             success: function(res){
