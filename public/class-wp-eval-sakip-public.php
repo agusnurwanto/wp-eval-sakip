@@ -24593,30 +24593,42 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	public function save_from_esr(){
 		global $wpdb;
 
+		/**
+		 * 
+		 * alur :
+		1. select data lokal where update at <= time expired and user = user yang dipilih and end_point = get_data
+		2. kalo ada data lokal maka return data lokal
+		3. kalo g ada di lokal maka get api esr 
+		4. lakukan looping dan cek ke data lokal lagi where user = user yang dipilih and end_point = get_data (di pengecekan ini tidak ada filter update_at)
+		5. jika ada update json per user dan per end point (get_data), 
+		6. jika kosong insert sebagai data baru
+		 * 
+		 * 
+		 * 
+		 * */
+
 		if(get_option('_crb_api_esr_status')==2){
 						
 			$user_esr_id = get_option('_user_esr_'.str_replace(" ", "_", get_option('_crb_nama_pemda')));
 
 			$time_expired = get_option('_crb_expired_time_esr_lokal') / 60;
 
-			// AND TIMESTAMPDIFF(HOUR, updated_at, DATE_SUB(NOW(),INTERVAL 1 HOUR)) >
+			$esrLokal = $wpdb->get_row($wpdb->prepare("SELECT * FROM esakip_data_esr WHERE now() <= date_add(updated_at, INTERVAL ".$time_expired." hour) AND user_esr_id=%d AND url=%s", $user_esr_id, 'get_data'));
 
-			$esrLokal = $wpdb->get_row($wpdb->prepare("SELECT * FROM esakip_data_esr WHERE user_esr_id=%d AND url=%s", $user_esr_id, 'get_data'));
-
-			if(empty($esrLokal)){
-				
-				$response = wp_remote_get('http://localhost/sipdlocal/wp-content/plugins/wp-eval-sakip/public/media/json/get_data.json', [
-						'headers' => array(
-					        'Accept' => 'application/json',
-					    ),
-					]);
-
-				// $response = wp_remote_get(get_option('_crb_url_api_esr').'get_data', [
-				// 			'headers' => array(
-				// 		        'Accept' => 'application/json',
-				// 		        'Authorization' => 'Basic ' . base64_encode(get_option('_crb_username_api_esr').':'.get_option('_crb_password_api_esr')),
-				// 		    ),
-				// 		]);
+			if(!empty($esrLokal)){
+				return [
+					'status' => true,
+					'message' => 'Sukses ambil data dari ESR Lokal!',
+					'data_esr_lokal' => $esrLokal
+				];
+				exit;
+			}else{
+				$response = wp_remote_get(get_option('_crb_url_api_esr').'get_data', [
+							'headers' => array(
+						        'Accept' => 'application/json',
+						        'Authorization' => 'Basic ' . base64_encode(get_option('_crb_username_api_esr').':'.get_option('_crb_password_api_esr')),
+						    ),
+						]);
 
 				$body = json_decode(wp_remote_retrieve_body($response));
 
@@ -24635,37 +24647,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					}
 				}
 
-				$wpdb->insert('esakip_data_esr', [
-							'url' => 'get_data',
-							'method' => 'GET',
-							'response_json' => json_encode($array_data),
-							'updated_at' => current_time('mysql'),
-							'user_esr_id' => $user_esr_id
-					]);
+				$esrLokalRaw = $wpdb->get_row($wpdb->prepare("SELECT * FROM esakip_data_esr WHERE user_esr_id=%d AND url=%s", $user_esr_id, 'get_data'));
 
-				return [
-					'status' => true,
-					'message' => 'Sukses ambil data dari API ESR!',
-					'data_esr_lokal' => $wpdb->get_row($wpdb->prepare("SELECT * FROM esakip_data_esr WHERE user_esr_id=%d AND url=%s", $user_esr_id, 'get_data'))
-				];
-				exit;
-			}else{
-
-				// klo data local ada, cek jml jam, jika jam >= 1 jam maka diupdate
-				
-					$response = wp_remote_get('http://localhost/sipdlocal/wp-content/plugins/wp-eval-sakip/public/media/json/get_data.json', [
-						'headers' => array(
-					        'Accept' => 'application/json',
-					    ),
-					]);
-
-				// $response = wp_remote_get(get_option('_crb_url_api_esr').'get_data', [
-				// 			'headers' => array(
-				// 		        'Accept' => 'application/json',
-				// 		        'Authorization' => 'Basic ' . base64_encode(get_option('_crb_username_api_esr').':'.get_option('_crb_password_api_esr')),
-				// 		    ),
-				// 		]);
-
+				if(empty($esrLokalRaw)){
+					$wpdb->insert('esakip_data_esr', [
+								'url' => 'get_data',
+								'method' => 'GET',
+								'response_json' => json_encode($array_data),
+								'updated_at' => current_time('mysql'),
+								'user_esr_id' => $user_esr_id
+						]);
+				}else{
 					$wpdb->update('esakip_data_esr', [
 							'response_json' => json_encode($array_data),
 							'updated_at' => current_time('mysql')
@@ -24673,11 +24665,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'url' => 'get_data',
 							'user_esr_id' => $user_esr_id 
 					]);
+				}
+
+				// ambil data esr terbaru setelah insert atau update
+				$newEsrLokal = $wpdb->get_row($wpdb->prepare("SELECT * FROM esakip_data_esr WHERE user_esr_id=%d AND url=%s", $user_esr_id, 'get_data'));
 
 				return [
 					'status' => true,
 					'message' => 'Sukses ambil data dari API ESR!',
-					'data_esr_lokal' => $esrLokal
+					'data_esr_lokal' => $newEsrLokal
 				];
 				exit;
 			}
