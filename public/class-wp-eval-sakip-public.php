@@ -24593,20 +24593,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	public function save_from_esr(){
 		global $wpdb;
 
-		/**
-		 * 
-		 * alur :
-		1. select data lokal where update at <= time expired and user = user yang dipilih and end_point = get_data
-		2. kalo ada data lokal maka return data lokal
-		3. kalo g ada di lokal maka get api esr 
-		4. lakukan looping dan cek ke data lokal lagi where user = user yang dipilih and end_point = get_data (di pengecekan ini tidak ada filter update_at)
-		5. jika ada update json per user dan per end point (get_data), 
-		6. jika kosong insert sebagai data baru
-		 * 
-		 * 
-		 * 
-		 * */
-
 		if(get_option('_crb_api_esr_status')==2){
 						
 			$user_esr_id = get_option('_user_esr_'.str_replace(" ", "_", get_option('_crb_nama_pemda')));
