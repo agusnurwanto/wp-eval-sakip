@@ -24374,7 +24374,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					foreach ($data_lokal as $key => $data) {
 						$response = wp_remote_post(get_option('_crb_url_api_esr').'insert_data', [
 							'body' => [
-								'dokumen_id' => $mapping_jenis_dokumen_esr['dokumen_id'],
+								'dokumen_id' => $mapping_jenis_dokumen_esr['jenis_dokumen_esr_id'],
 								'user_id' => $user_id,
 								'nama_file' => $data['dokumen'],
 								'path' => ESAKIP_PLUGIN_URL . 'public/media/dokumen/'.$data['dokumen'],
@@ -24684,6 +24684,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			try {
 
 				$user_esr_id = get_option('_user_esr_'.str_replace(" ", "_", get_option('_crb_nama_pemda')));
+
+				if(empty($user_esr_id)){
+					throw new Exception("User ESR belum di-mapping, pastikan sebelumnya sudah menarik data user ESR!", 1);
+				}
 
 				$option_expired_time = floatval(get_option('_crb_expired_time_esr_lokal'));
 
