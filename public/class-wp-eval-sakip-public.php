@@ -6751,7 +6751,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 							$array_data_esr = [];
 							foreach ($data_esr as $key => $esr) {
+
 								if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
+									$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE upload_id=%d AND tahun_anggaran=%d AND active=%d", $esr->upload_id, $tahun_anggaran, 1), ARRAY_A);
+									if(!empty($esr_lokal)){
+										$wpdb->update($nama_tabel, [
+											'path' => $esr->path
+										], [
+											'id' => $esr_lokal['id']
+										]);
+									}
+
 									$path = explode("/", $esr->path);
 									$nama_file = end($path);
 									$array_data_esr[]=[
@@ -24302,6 +24312,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		try {
 			if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+					
+					$nama_tabel = $_POST['nama_tabel_database'];
+					if(empty($nama_tabel)){
+						throw new Exception("Nama tabel database belum ditentukan!", 1);
+					}
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+					if(empty($tahun_anggaran)){
+						throw new Exception("Tahun anggaran kosong!", 1);
+					}
+
 					$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 								SELECT 
 										a.*
@@ -24316,7 +24336,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		                                    where 
 		                            	a.tahun_anggaran=%d and
 		                                b.nama_tabel=%s;
-								", $_POST['tahun_anggaran'], $_POST['nama_tabel_database']), ARRAY_A);
+								", $tahun_anggaran, $nama_tabel), ARRAY_A);
 					if(empty($mapping_jenis_dokumen_esr)){
 						throw new Exception("Jenis dokumen lokal dan jenis dokumen ESR belum di-mapping!", 1);
 					}
@@ -24341,29 +24361,40 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$condition.=')';
 					}
 					
-					$rpjpds = $wpdb->get_results(
+					$data_lokal = $wpdb->get_results(
 						$wpdb->prepare("
 							SELECT * 
-							FROM esakip_rpjpd
+							FROM ".$nama_tabel."
 							WHERE id IN ".$condition." 
-							  AND active = 1"),
+							  AND active = %d
+							  AND tahun_anggaran = %d", 1, $tahun_anggaran),
 						ARRAY_A
 					);
 
-					foreach ($rpjpds as $key => $rpjpd) {
+					foreach ($data_lokal as $key => $data) {
 						$response = wp_remote_post(get_option('_crb_url_api_esr').'insert_data', [
 							'body' => [
 								'dokumen_id' => $mapping_jenis_dokumen_esr['dokumen_id'],
 								'user_id' => $user_id,
-								'nama_file' => $rpjpd['dokumen'],
-								'path' => ESAKIP_PLUGIN_URL . 'public/media/dokumen/'.$rpjpd['dokumen'],
-								'keterangan' => $rpjpd['keterangan']
+								'nama_file' => $data['dokumen'],
+								'path' => ESAKIP_PLUGIN_URL . 'public/media/dokumen/'.$data['dokumen'],
+								'keterangan' => $data['keterangan']
 							],
 							'headers' => array(
 						        'Accept' => 'application/json',
 						        'Authorization' => 'Basic ' . base64_encode(get_option('_crb_username_api_esr').':'.get_option('_crb_password_api_esr')),
 						    ),
 						]);
+
+						if(!empty($response->data)){
+							foreach ($response->data as $key => $value) {
+								$wpdb->update($nama_tabel, [
+									'upload_id' => $value->upload_id
+								], [
+									'id' => $data['id']
+								]);
+							}
+						}
 					}
 
 					echo json_encode([
