@@ -6705,33 +6705,75 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$counter = 1;
 						$tbody = '';
 
-						// value nama tabel admin diambil sebagai filter ke table mapping jenis dokumen esr
+						$status_api_esr = get_option('_crb_api_esr_status');
+						if($status_api_esr){
+							
+							$nama_tabel = $_POST['nama_tabel_database'];
+							if(empty($nama_tabel)){
+								$ret['status'] = 'error';
+								$ret['message'] = 'Jenis dokumen sakip kosong!';
+							}
+							
+							$menu_dokumen = $wpdb->get_row($wpdb->prepare("SELECT id FROM esakip_menu_dokumen WHERE nama_tabel=%s AND tahun_anggaran=%d", $nama_tabel, $tahun_anggaran), ARRAY_A);
+							if(empty($menu_dokumen['id']) || is_null($menu_dokumen['id'])){
+								$ret['status'] = 'error';
+								$ret['message'] = 'Jenis dokumen sakip di pengaturan menu tahun anggaran '. $tahun_anggaran . ' belum digenerate!';	
+							}
+							
+							$jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("SELECT id FROM esakip_data_jenis_dokumen_esr WHERE tahun_anggaran=%d", $tahun_anggaran), ARRAY_A);
+							if(empty($jenis_dokumen_esr['id']) || is_null($jenis_dokumen_esr['id'])){
+								$ret['status'] = 'error';
+								$ret['message'] = 'Jenis dokumen ESR tahun anggaran '. $tahun_anggaran . ' belum digenerate!';
+							}
 
-						// update data esr lokal, jika ada data maka lakukan pengolahan untuk menandai dokumen lokal mana yang sudah dikirim ke api esr. Cek juga kolom dokumen_id(punya esr hasil post) di table $nama_tabel_admin[$tipe_dokumen]
-						
-						$data_esr_lokal = $this->save_from_esr();
-						$data_esr_lokal = json_decode($data_esr_lokal['data_esr_lokal']->response_json);
+							$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
+								SELECT 
+										a.*
+									FROM 
+										esakip_data_mapping_jenis_dokumen_esr a 
+											JOIN esakip_menu_dokumen b 
+												ON b.id=a.esakip_menu_dokumen_id AND 
+													a.tahun_anggaran=b.tahun_anggaran AND b.active=1
+		                                    JOIN esakip_data_jenis_dokumen_esr c 
+		                                    	ON c.jenis_dokumen_esr_id=a.jenis_dokumen_esr_id  AND 
+		                                    		c.tahun_anggaran=a.tahun_anggaran AND c.active=1
+		                                    where 
+		                            	a.tahun_anggaran=%d and
+		                                b.nama_tabel=%s;
+								", $tahun_anggaran, $nama_tabel), ARRAY_A);
+							if(empty($mapping_jenis_dokumen_esr)){
+								$ret['status'] = 'error';
+								$ret['message'] = 'Jenis dokumen lokal dan jenis dokumen ESR belum di-mapping!';
+							}
 
-						$array_data_esr = [];
-						foreach ($data_esr_lokal as $key => $esr) {
-							// id dokumen esr dibuat dinamis sesuai select mapping
-							if($esr->dokumen_id==5){
-								$array_data_esr[]=$esr->keterangan;
+							$data_esr = $this->data_esr();
+							$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
+
+							$array_data_esr = [];
+							foreach ($data_esr as $key => $esr) {
+								if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
+									$path = explode("/", $esr->path);
+									$nama_file = end($path);
+									$array_data_esr[]=[
+										'nama_file' => $nama_file,
+										'keterangan' => $esr->keterangan
+									];
+								}
 							}
 						}
 
-						$status_api_esr = get_option('_crb_api_esr_status');
 						foreach ($datas as $kk => $vv) {
 							$tbody .= "<tr>";
 							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-							if($status_api_esr==2){
-								// 1. cek upload_id ke table dokumen
-								// 2. cek nama dokumen
-								// 3. cek berdasarkan keterangan diganti path explode
-								if(in_array($vv['keterangan'], $array_data_esr)){
-									$tbody .= "<td class='text-center'><input type='checkbox' name='checklist_esr' value='".$vv['id']."'></td>";
-								}else{
+							if($status_api_esr){
+								if(!empty($vv['upload_id'])){
 									$tbody .= "<td></td>";
+								}else if(in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))){
+									$tbody .= "<td></td>";
+								}else if(in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))){
+									$tbody .= "<td></td>";
+								}else{
+									$tbody .= "<td class='text-center'><input type='checkbox' name='checklist_esr' value='".$vv['id']."'></td>";
 								}
 							}
 							$tbody .= "<td>" . $vv['dokumen'] . "</td>";
@@ -24590,77 +24632,89 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
-	public function save_from_esr(){
+	public function data_esr(){
 		global $wpdb;
 
-		if(get_option('_crb_api_esr_status')==2){
-						
-			$user_esr_id = get_option('_user_esr_'.str_replace(" ", "_", get_option('_crb_nama_pemda')));
+		if(get_option('_crb_api_esr_status')){			
+			try {
 
-			$time_expired = get_option('_crb_expired_time_esr_lokal') / 60;
+				$user_esr_id = get_option('_user_esr_'.str_replace(" ", "_", get_option('_crb_nama_pemda')));
 
-			$esrLokal = $wpdb->get_row($wpdb->prepare("SELECT * FROM esakip_data_esr WHERE now() <= date_add(updated_at, INTERVAL ".$time_expired." hour) AND user_esr_id=%d AND url=%s", $user_esr_id, 'get_data'));
+				$option_expired_time = get_option('_crb_expired_time_esr_lokal');
 
-			if(!empty($esrLokal)){
-				return [
-					'status' => true,
-					'message' => 'Sukses ambil data dari ESR Lokal!',
-					'data_esr_lokal' => $esrLokal
-				];
-				exit;
-			}else{
-				$response = wp_remote_get(get_option('_crb_url_api_esr').'get_data', [
-							'headers' => array(
-						        'Accept' => 'application/json',
-						        'Authorization' => 'Basic ' . base64_encode(get_option('_crb_username_api_esr').':'.get_option('_crb_password_api_esr')),
-						    ),
-						]);
-
-				$body = json_decode(wp_remote_retrieve_body($response));
-
-				if(empty($body)){
-					throw new Exception("Data tidak ditemukan di API ESR", 1);
+				if(empty($option_expired_time)){
+					throw new Exception("Maksimum waktu expire akses data ESR Lokal belum disetting!", 1);
 				}
 
-				if(isset($body->error)){
-					throw new Exception("Api ESR : ".$body->error, 1);	
-				}
+				$time_expired = $option_expired_time / 60;
 
-				$array_data = [];
-				foreach ($body->data as $key => $value) {
-					if($user_esr_id==$value->user_id){
-						$array_data[]=$value;
-					}
-				}
+				$esrLokal = $wpdb->get_row($wpdb->prepare("SELECT * FROM esakip_data_esr WHERE now() <= date_add(updated_at, INTERVAL ".$time_expired." hour) AND user_esr_id=%d AND url=%s", $user_esr_id, 'get_data'));
 
-				$esrLokalRaw = $wpdb->get_row($wpdb->prepare("SELECT * FROM esakip_data_esr WHERE user_esr_id=%d AND url=%s", $user_esr_id, 'get_data'));
-
-				if(empty($esrLokalRaw)){
-					$wpdb->insert('esakip_data_esr', [
-								'url' => 'get_data',
-								'method' => 'GET',
-								'response_json' => json_encode($array_data),
-								'updated_at' => current_time('mysql'),
-								'user_esr_id' => $user_esr_id
-						]);
+				if(!empty($esrLokal)){
+					return [
+						'status' => true,
+						'message' => 'Sukses ambil data dari ESR Lokal!',
+						'data_esr_lokal' => $esrLokal
+					];
 				}else{
-					$wpdb->update('esakip_data_esr', [
-							'response_json' => json_encode($array_data),
-							'updated_at' => current_time('mysql')
-						], [
-							'url' => 'get_data',
-							'user_esr_id' => $user_esr_id 
-					]);
+					$response = wp_remote_get(get_option('_crb_url_api_esr').'get_data', [
+								'headers' => array(
+							        'Accept' => 'application/json',
+							        'Authorization' => 'Basic ' . base64_encode(get_option('_crb_username_api_esr').':'.get_option('_crb_password_api_esr')),
+							    ),
+							]);
+
+					$body = json_decode(wp_remote_retrieve_body($response));
+
+					if(empty($body)){
+						throw new Exception("Data tidak ditemukan di API ESR", 1);
+					}
+
+					if(isset($body->error)){
+						throw new Exception("Api ESR : ".$body->error, 1);	
+					}
+
+					$array_data = [];
+					foreach ($body->data as $key => $value) {
+						if($user_esr_id==$value->user_id){
+							$array_data[]=$value;
+						}
+					}
+
+					$esrLokalRaw = $wpdb->get_row($wpdb->prepare("SELECT * FROM esakip_data_esr WHERE user_esr_id=%d AND url=%s", $user_esr_id, 'get_data'));
+
+					if(empty($esrLokalRaw)){
+						$wpdb->insert('esakip_data_esr', [
+									'url' => 'get_data',
+									'method' => 'GET',
+									'response_json' => json_encode($array_data),
+									'updated_at' => current_time('mysql'),
+									'user_esr_id' => $user_esr_id
+							]);
+					}else{
+						$wpdb->update('esakip_data_esr', [
+								'response_json' => json_encode($array_data),
+								'updated_at' => current_time('mysql')
+							], [
+								'url' => 'get_data',
+								'user_esr_id' => $user_esr_id 
+						]);
+					}
+
+					// ambil data esr terbaru setelah insert atau update
+					$newEsrLokal = $wpdb->get_row($wpdb->prepare("SELECT * FROM esakip_data_esr WHERE user_esr_id=%d AND url=%s", $user_esr_id, 'get_data'));
+
+					return [
+						'status' => true,
+						'message' => 'Sukses ambil data dari API ESR!',
+						'data_esr_lokal' => $newEsrLokal
+					];
 				}
-
-				// ambil data esr terbaru setelah insert atau update
-				$newEsrLokal = $wpdb->get_row($wpdb->prepare("SELECT * FROM esakip_data_esr WHERE user_esr_id=%d AND url=%s", $user_esr_id, 'get_data'));
-
-				return [
-					'status' => true,
-					'message' => 'Sukses ambil data dari API ESR!',
-					'data_esr_lokal' => $newEsrLokal
-				];
+			} catch (Exception $e) {
+				echo json_encode([
+					'status' => 'error',
+					'message' => $e->getMessage()
+				]);
 				exit;
 			}
 		}else{

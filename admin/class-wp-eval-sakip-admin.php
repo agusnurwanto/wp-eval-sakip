@@ -1248,8 +1248,8 @@ class Wp_Eval_Sakip_Admin
 					->set_help_text('Wajib diisi.'),
 				Field::make('radio', 'crb_api_esr_status', 'Status API ESR')
 					->add_options(array(
-						'1' => __('Dikunci'),
-						'2' => __('Dibuka')
+						'0' => __('Dikunci'),
+						'1' => __('Dibuka')
 					))
 					->set_default_value('1')
 					->set_help_text('Digunakan untuk mengunci atau membuka akses untuk kirim dokumen ke aplikasi ESR Menpan RB'),

@@ -62,7 +62,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
             <div style="margin-bottom: 25px;">
                 <button class="btn btn-primary" onclick="tambah_dokumen();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
                 <?php
-                if($status_api_esr==2){
+                if($status_api_esr){
                     echo '<button class="btn btn-warning" onclick="sync_to_esr();"><i class="dashicons dashicons-arrow-up-alt"></i> Kirim Data ke ESR</button>';
                 }
                 ?>
@@ -74,7 +74,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
                         <tr>
                             <th class="text-center">No</th>
                             <?php
-                                if($status_api_esr==2){
+                                if($status_api_esr){
                                     echo '<th class="text-center">Checklist ESR</th>';
                                 }
                             ?>
@@ -183,6 +183,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
                 api_key: esakip.api_key,
                 tahun_anggaran: '<?php echo $input['tahun'] ?>',
                 tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
+                nama_tabel_database: 'esakip_rkpd_pemda'
             },
             dataType: 'json',
             success: function(response) {
