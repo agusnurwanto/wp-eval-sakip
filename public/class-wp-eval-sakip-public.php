@@ -24302,9 +24302,24 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		try {
 			if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-
-					// ambil dokumen id dari table mapping_jenis_dokumen_esr join table esakip_menu_dokumen dg kriteria nama_tabel = 'esakip_rpjpd' dan tahun anggaran = 2024
-					$dokumen_id = '';
+					$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
+								SELECT 
+										a.*
+									FROM 
+										esakip_data_mapping_jenis_dokumen_esr a 
+											JOIN esakip_menu_dokumen b 
+												ON b.id=a.esakip_menu_dokumen_id AND 
+													a.tahun_anggaran=b.tahun_anggaran AND b.active=1
+		                                    JOIN esakip_data_jenis_dokumen_esr c 
+		                                    	ON c.jenis_dokumen_esr_id=a.jenis_dokumen_esr_id  AND 
+		                                    		c.tahun_anggaran=a.tahun_anggaran AND c.active=1
+		                                    where 
+		                            	a.tahun_anggaran=%d and
+		                                b.nama_tabel=%s;
+								", $_POST['tahun_anggaran'], $_POST['nama_tabel_database']), ARRAY_A);
+					if(empty($mapping_jenis_dokumen_esr)){
+						throw new Exception("Jenis dokumen lokal dan jenis dokumen ESR belum di-mapping!", 1);
+					}
 
 					// ambil user_id
 					$user_id = get_option('_user_esr_'.str_replace(" ", "_", get_option('_crb_nama_pemda')));
@@ -24335,11 +24350,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						ARRAY_A
 					);
 
-					// kirim ke esr
 					foreach ($rpjpds as $key => $rpjpd) {
 						$response = wp_remote_post(get_option('_crb_url_api_esr').'insert_data', [
 							'body' => [
-								'dokumen_id' => $dokumen_id,
+								'dokumen_id' => $mapping_jenis_dokumen_esr['dokumen_id'],
 								'user_id' => $user_id,
 								'nama_file' => $rpjpd['dokumen'],
 								'path' => ESAKIP_PLUGIN_URL . 'public/media/dokumen/'.$rpjpd['dokumen'],
@@ -24640,15 +24654,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				$user_esr_id = get_option('_user_esr_'.str_replace(" ", "_", get_option('_crb_nama_pemda')));
 
-				$option_expired_time = get_option('_crb_expired_time_esr_lokal');
+				$option_expired_time = floatval(get_option('_crb_expired_time_esr_lokal'));
 
 				if(empty($option_expired_time)){
-					throw new Exception("Maksimum waktu expire akses data ESR Lokal belum disetting!", 1);
+					throw new Exception("Waktu expired akses data ESR Lokal belum disetting!", 1);
 				}
 
-				$time_expired = $option_expired_time / 60;
+				if($option_expired_time < 1){
+					throw new Exception("Waktu expired data ESR lokal minimal 1 jam!", 1);
+				}
 
-				$esrLokal = $wpdb->get_row($wpdb->prepare("SELECT * FROM esakip_data_esr WHERE now() <= date_add(updated_at, INTERVAL ".$time_expired." hour) AND user_esr_id=%d AND url=%s", $user_esr_id, 'get_data'));
+				$esrLokal = $wpdb->get_row($wpdb->prepare("SELECT * FROM esakip_data_esr WHERE now() <= date_add(updated_at, INTERVAL ".$option_expired_time." hour) AND user_esr_id=%d AND url=%s", $user_esr_id, 'get_data'));
 
 				if(!empty($esrLokal)){
 					return [

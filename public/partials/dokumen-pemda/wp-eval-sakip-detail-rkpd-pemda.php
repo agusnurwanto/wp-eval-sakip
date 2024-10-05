@@ -478,7 +478,9 @@ $status_api_esr = get_option('_crb_api_esr_status');
                 data: {
                     action: 'sync_rkpd_to_esr',
                     api_key: esakip.api_key,
-                    list: list
+                    list: list,
+                    tahun_anggaran:'<?php echo $input['tahun']; ?>',
+                    nama_tabel_database:'esakip_rkpd_pemda'
                 },
                 dataType: 'json',
                 success: function(response) {
