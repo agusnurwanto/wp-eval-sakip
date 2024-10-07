@@ -6756,7 +6756,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE upload_id=%d AND tahun_anggaran=%d AND active=%d", $esr->upload_id, $tahun_anggaran, 1), ARRAY_A);
 									if(!empty($esr_lokal)){
 										$wpdb->update($nama_tabel, [
-											'path' => $esr->path
+											'path_esr' => $esr->path
 										], [
 											'id' => $esr_lokal['id']
 										]);
