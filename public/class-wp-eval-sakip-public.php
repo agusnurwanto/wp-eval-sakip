@@ -24131,6 +24131,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	                die(json_encode($ret));
 	            }
 
+	            $periode = $wpdb->get_row(
+	                $wpdb->prepare("
+	                    SELECT lama_pelaksanaan 
+	                    FROM esakip_data_jadwal
+	                    WHERE id = %d", 
+	                    $id_jadwal
+	                ),
+	                ARRAY_A
+	            );
+	            
+	            $lama_pelaksanaan = !empty($periode['lama_pelaksanaan']) ? $periode['lama_pelaksanaan'] : 5;
+
 	            $get_data = $wpdb->get_results(
 	                $wpdb->prepare("
 	                    SELECT 
@@ -24141,6 +24153,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	                ", $id_jadwal),
 	                ARRAY_A
 	            );
+
 	            $json = array();
 	            if (!empty($get_data)) {
 	                $counter = 1;
@@ -24153,34 +24166,27 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	                    $tbody .= "<td>" . ($vv['satuan'] ?: '-') . "</td>";
 	                    $tbody .= "<td>" . ($vv['kondisi_awal'] ?: '-') . "</td>";
 	                    $tbody .= "<td>" . ($vv['target_akhir_p_rpjmd'] ?: '-') . "</td>";
-	                    $tbody .= "<td>" . ($vv['target_bps_tahun_1'] ?: '-') . "</td>";
-	                    $tbody .= "<td>" . ($vv['bps_tahun_1'] ?: '-') . "</td>";
-	                    $tbody .= "<td>" . ($vv['target_bps_tahun_2'] ?: '-') . "</td>";
-	                    $tbody .= "<td>" . ($vv['bps_tahun_2'] ?: '-') . "</td>";
-	                    $tbody .= "<td>" . ($vv['target_bps_tahun_3'] ?: '-') . "</td>";
-	                    $tbody .= "<td>" . ($vv['bps_tahun_3'] ?: '-') . "</td>";
-	                    $tbody .= "<td>" . ($vv['target_bps_tahun_4'] ?: '-') . "</td>";
-	                    $tbody .= "<td>" . ($vv['bps_tahun_4'] ?: '-') . "</td>";
-	                    $tbody .= "<td>" . ($vv['target_bps_tahun_5'] ?: '-') . "</td>";
-	                    $tbody .= "<td>" . ($vv['bps_tahun_5'] ?: '-') . "</td>";
+
+	                    for ($i = 1; $i <= $lama_pelaksanaan; $i++) {
+	                        $tbody .= "<td>" . ($vv['target_bps_tahun_' . $i] ?: '-') . "</td>";
+	                        $tbody .= "<td>" . ($vv['bps_tahun_' . $i] ?: '-') . "</td>";
+	                    }
+
 	                    $tbody .= "<td class='text-left'>" . ($vv['sumber_data'] ?: '-') . "</td>";
 	                    $tbody .= "<td class='text-left'>" . ($vv['keterangan'] ?: '-') . "</td>";
 	                    $tbody .= "</tr>";
-	                    if(is_numeric($vv['kondisi_awal']) || $vv['kondisi_awal'] == '-'){
-	                    	$json[] = $vv;
+
+	                    if (is_numeric($vv['kondisi_awal']) || $vv['kondisi_awal'] == '-') {
+	                        $json[] = $vv;
 	                    }
 	                }
 
 	                $ret['data'] = $tbody;
 	            } else {
-	                $colspan = 0;
-	                if (count($get_data) > 0) {
-	                    $colspan = count(array_keys($get_data[0]));
-	                } else {
-	                    $colspan = 13; 
-	                }
+	                $colspan = 6 + ($lama_pelaksanaan * 2); 
 	                $ret['data'] = "<tr><td colspan=".$colspan." class='text-center'>Tidak ada data tersedia</td></tr>";
 	            }
+
 	            $ret['json'] = $json;
 	        } else {
 	            $ret = array(
@@ -24194,8 +24200,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	            'message'   => 'Format tidak sesuai!'
 	        );
 	    }
+
 	    die(json_encode($ret));
 	}
+
 
 	public function sync_from_esr(){
 		global $wpdb;
@@ -24605,4 +24613,218 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
+	public function get_data_capaian_indikator()
+	{
+	    global $wpdb;
+	    try {
+	        if (!empty($_POST)) {
+	            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+	                
+	                if (empty($_POST['id_jadwal'])) {
+	                    $ret['status'] = 'error';
+	                    $ret['message'] = 'ID Jadwal tidak boleh kosong!';
+	                    die(json_encode($ret));
+	                }
+
+	                $data_capaian_indikator = array();
+	                
+	                $data_capaian_indikator = $wpdb->get_results($wpdb->prepare("
+	                    SELECT 
+	                        a.*
+	                    FROM esakip_capaian_indikator a
+	                    WHERE 
+	                        a.id_jadwal=%d AND 
+	                        a.active=%d  
+	                    ORDER BY a.id
+	                ",
+	                $_POST['id_jadwal'],
+	                1
+	                ), ARRAY_A);
+
+	                if (empty($data_capaian_indikator)) {
+	                    $data_capaian_indikator = [];
+	                }
+
+	                die(json_encode([
+	                    'status' => true,
+	                    'data' => $data_capaian_indikator,
+	                    'sql' => $wpdb->last_query
+	                ]));
+	            } else {
+	                throw new Exception("API tidak ditemukan!", 1);
+	            }
+	        } else {
+	            throw new Exception("Format tidak sesuai!", 1);
+	        }
+	    } catch (Exception $e) {
+	        echo json_encode([
+	            'status' => false,
+	            'message' => $e->getMessage()
+	        ]);
+	        exit();
+	    }
+	}
+
+
+	function simpan_data_capaian_indikator(){
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil simpan rencana aksi!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if ($ret['status'] != 'error' && empty($_POST['id_jadwal'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID Jadwal tidak boleh kosong!';
+				} elseif ($ret['status'] != 'error' && empty($_POST['indikator_kinerja'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'indikator kinerja tidak boleh kosong!';
+				} elseif ($ret['status'] != 'error' && empty($_POST['sumber_data'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'sumber data tidak boleh kosong!';
+				}  
+				if ($ret['status'] != 'error'){
+					$data = array(
+						'id_jadwal' => $_POST['id_jadwal'],
+						'indikator_kinerja' => $_POST['indikator_kinerja'],
+						'sumber_data' => $_POST['sumber_data'],
+						'satuan' => $_POST['satuan'],
+						'keterangan' => $_POST['keterangan'],
+						'kondisi_awal' => $_POST['kondisi_awal'],
+						'target_akhir_p_rpjmd' => $_POST['target_akhir_p_rpjmd'],
+						'bps_tahun_1' => $_POST['bps_tahun_1'],
+						'target_bps_tahun_1' => $_POST['target_bps_tahun_1'],
+						'bps_tahun_2' => $_POST['bps_tahun_2'],
+						'target_bps_tahun_2' => $_POST['target_bps_tahun_2'],
+						'bps_tahun_3' => $_POST['bps_tahun_3'],
+						'target_bps_tahun_3' => $_POST['target_bps_tahun_3'],
+						'bps_tahun_4' => $_POST['bps_tahun_4'],
+						'target_bps_tahun_4' => $_POST['target_bps_tahun_4'],
+						'bps_tahun_5' => $_POST['bps_tahun_5'],
+						'target_bps_tahun_5' => $_POST['target_bps_tahun_5'],
+						'active' => 1,
+						'created_at' => current_time('mysql'),
+					);
+					if(!empty($_POST['id'])){
+						$cek_id = $_POST['id'];
+					}else{
+						$cek_id = $wpdb->get_var($wpdb->prepare("
+							SELECT
+								id
+							FROM esakip_capaian_indikator
+							WHERE id_jadwal=%d
+								AND active=0
+						", $_POST['id_jadwal']));
+					}
+					if(empty($cek_id)){
+						$wpdb->insert('esakip_capaian_indikator', $data);
+					}else{
+						$wpdb->update('esakip_capaian_indikator', $data, array('id' => $cek_id));
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	function edit_capaian_indikator(){
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get rencana aksi!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if ($ret['status'] != 'error' && empty($_POST['id'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID tidak boleh kosong!';
+				} elseif ($ret['status'] != 'error' && empty($_POST['id_jadwal'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID Jadwal tidak boleh kosong!';
+				}  
+				if ($ret['status'] != 'error'){
+					$ret['data'] = $wpdb->get_row($wpdb->prepare('
+						SELECT
+							*
+						FROM esakip_capaian_indikator
+						WHERE id=%d
+							AND id_jadwal=%d
+					',$_POST['id'], $_POST['id_jadwal']), ARRAY_A);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_capaian_indikator()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$get_data = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_capaian_indikator
+							WHERE id=%d
+						", $_POST['id'])
+					);
+
+					if ($get_data) {
+						$ret['data'] = $wpdb->delete('esakip_capaian_indikator', array(
+							'id' => $_POST['id']
+						));
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
 }

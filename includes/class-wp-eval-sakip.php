@@ -578,6 +578,11 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_indikator_rencana_aksi_pemda', $plugin_public, 'get_indikator_rencana_aksi_pemda');
 		$this->loader->add_action('wp_ajax_hapus_indikator_rencana_aksi_pemda', $plugin_public, 'hapus_indikator_rencana_aksi_pemda');
 		$this->loader->add_action('wp_ajax_get_skpd_renaksi', $plugin_public, 'get_skpd_renaksi');
+		
+		$this->loader->add_action('wp_ajax_get_data_capaian_indikator', $plugin_public, 'get_data_capaian_indikator');
+		$this->loader->add_action('wp_ajax_simpan_data_capaian_indikator', $plugin_public, 'simpan_data_capaian_indikator');
+		$this->loader->add_action('wp_ajax_edit_capaian_indikator', $plugin_public, 'edit_capaian_indikator');
+		$this->loader->add_action('wp_ajax_hapus_capaian_indikator', $plugin_public, 'hapus_capaian_indikator');
 
 		$this->loader->add_action('wp_ajax_mapping_jenis_dokumen_esr',  $plugin_public, 'mapping_jenis_dokumen_esr');
 		$this->loader->add_action('wp_ajax_generate_master_jenis_dokumen_esr',  $plugin_public, 'generate_master_jenis_dokumen_esr');
