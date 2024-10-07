@@ -33,6 +33,7 @@ $tipe_dokumen = "rkpd";
 $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
 $is_admin_panrb = in_array('admin_panrb', $user_roles);
+$status_api_esr = get_option('_crb_api_esr_status');
 ?>
 <style type="text/css">
     .wrap-table {
@@ -60,6 +61,11 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             <?php if (!$is_admin_panrb): ?>
             <div style="margin-bottom: 25px;">
                 <button class="btn btn-primary" onclick="tambah_dokumen();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
+                <?php
+                if($status_api_esr){
+                    echo '<button class="btn btn-warning" onclick="sync_to_esr();"><i class="dashicons dashicons-arrow-up-alt"></i> Kirim Data ke ESR</button>';
+                }
+                ?>
             </div>
             <?php endif; ?>
             <div class="wrap-table">
@@ -67,6 +73,11 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
+                            <?php
+                                if($status_api_esr){
+                                    echo '<th class="text-center">Checklist ESR</th>';
+                                }
+                            ?>
                             <th class="text-center">Nama Dokumen</th>
                             <th class="text-center">Keterangan</th>
                             <th class="text-center">Waktu Upload</th>
@@ -172,6 +183,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 api_key: esakip.api_key,
                 tahun_anggaran: '<?php echo $input['tahun'] ?>',
                 tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
+                nama_tabel_database: 'esakip_rkpd_pemda'
             },
             dataType: 'json',
             success: function(response) {
@@ -448,4 +460,40 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     //         }
     //     });
     // }
+
+    function sync_to_esr(){
+        let list = jQuery("input:checkbox[name=checklist_esr]:checked")
+                .map(function (){
+                return jQuery(this).val();
+        }).toArray();            
+            
+        if(list.length){
+            if (!confirm('Apakah Anda ingin melakukan singkronisasi dokumen ke ESR?')) {
+                return;
+            }
+            jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                url: esakip.url,
+                type: 'POST',
+                data: {
+                    action: 'sync_to_esr',
+                    api_key: esakip.api_key,
+                    list: list,
+                    tahun_anggaran:'<?php echo $input['tahun']; ?>',
+                    nama_tabel_database:'esakip_rkpd_pemda'
+                },
+                dataType: 'json',
+                success: function(response) {
+                    jQuery('#wrap-loading').hide();
+                    alert(response.message);
+                },
+                error: function(xhr, status, error) {
+                    jQuery('#wrap-loading').hide();
+                    alert('Terjadi kesalahan saat kirim data!');
+                }
+            });
+        }else{
+            alert('Checklist ESR belum dipilih!'); 
+        }
+    }
 </script>

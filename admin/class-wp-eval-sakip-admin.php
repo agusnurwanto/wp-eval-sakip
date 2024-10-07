@@ -1248,8 +1248,8 @@ class Wp_Eval_Sakip_Admin
 					->set_help_text('Wajib diisi.'),
 				Field::make('radio', 'crb_api_esr_status', 'Status API ESR')
 					->add_options(array(
-						'1' => __('Dikunci'),
-						'2' => __('Dibuka')
+						'0' => __('Dikunci'),
+						'1' => __('Dibuka')
 					))
 					->set_default_value('1')
 					->set_help_text('Digunakan untuk mengunci atau membuka akses untuk kirim dokumen ke aplikasi ESR Menpan RB'),
@@ -1259,8 +1259,8 @@ class Wp_Eval_Sakip_Admin
 					->set_help_text('Wajib diisi. Auth Type : Basic Auth dengan Username yang digunakan untuk integrasi dokumen ke API ESR'),
 				Field::make('text', 'crb_password_api_esr', 'Password API ESR')
 					->set_help_text('Wajib diisi. Auth Type : Basic Auth dengan Password yang digunakan untuk integrasi dokumen ke API ESR'),
-				Field::make('text', 'crb_expired_time_esr_lokal', 'Maksimum Waktu Expire Akses Data ESR Lokal (Menit)')
-					->set_help_text('Wajib diisi. Waktu maksimum system menggunakan data ESR yang disimpan di lokal. Jika melebihi waktu maksimum maka data ESR lokal akan diupdate berdasarkan data ESR terbaru via API.')
+				Field::make('text', 'crb_expired_time_esr_lokal', 'Waktu Expired Akses Data ESR Lokal (Minimal 1 Jam)')
+					->set_help_text('Wajib diisi. Waktu maksimal system menggunakan data ESR yang disimpan di lokal. Jika melebihi waktu maksimal maka data ESR lokal akan diupdate berdasarkan data ESR terbaru via API.')
 			));
 
 		Container::make('theme_options', __('Pengaturan Perangkat Daerah'))
