@@ -20,6 +20,8 @@ $periode = $wpdb->get_row(
     ARRAY_A
 );
 
+
+//tabel capaian indikator makro
 $tahun_periode = $periode['tahun_selesai_anggaran'];
 $tahun_mulai_anggaran = ($periode['tahun_selesai_anggaran'] - $periode['lama_pelaksanaan']) + 1;
 
@@ -38,6 +40,24 @@ for($i=$tahun_mulai_anggaran; $i<=$tahun_periode; $i++){
 $header_tahun .= '</tr>';
 $header_target .= '</tr>';
 
+//tabel tambah data capaian indikator makro
+$tahun_periode_makro = $periode['tahun_selesai_anggaran'];
+$tahun_mulai_anggaran_makro = ($periode['tahun_selesai_anggaran'] - $periode['lama_pelaksanaan']) + 1;
+
+$colspan_makro = $periode['lama_pelaksanaan']*2;
+$header_tahun_makro = '<tr>';
+$header_target_makro = '<tr><th class="text-center table-secondary">'.$tahun_mulai_anggaran.'</th>';
+for($i=$tahun_mulai_anggaran; $i<=$tahun_periode; $i++){
+    $header_tahun_makro .= '
+        <th colspan ="2" class="text-center table-secondary">'.$i.'</th>
+    ';
+    $header_target_makro.='
+        <th class="text-center table-secondary">Target</th>
+        <th class="text-center table-secondary">Capaian</th>
+    ';
+}
+$header_tahun_makro .= '</tr>';
+$header_target_makro .= '</tr>';
 $idtahun = $wpdb->get_results(
     $wpdb->prepare(
         "
@@ -77,6 +97,12 @@ $status_iku = $wpdb->get_row(
 
 ?>
 <style type="text/css">
+    thead th {
+        vertical-align: middle !important;
+        font-size: small;
+        text-align: center;
+    }
+
     .wrap-table {
         overflow: auto;
         max-height: 100vh;
@@ -107,6 +133,12 @@ $status_iku = $wpdb->get_row(
         bottom: -6px;
         background: #ffc491;
     }
+
+    #modal-tambah-capaian-indikator .modal-body {
+        max-height: 100vh;
+        overflow-y: auto;
+    }
+
 </style>
 
 <!-- Table -->
@@ -135,18 +167,21 @@ $status_iku = $wpdb->get_row(
                 </table>
             </div>
         </div>
-        <?php if(!empty($status_iku['active']) AND $status_iku['active'] == 1): ?>
-            <div style="padding: 10px;margin:0 0 3rem 0;">
-                <h1 class="text-center" style="margin:3rem;">Capaian Indikator Makro <br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1>
-            </div>
-        <?php endif; ?>
     </div>
 </div>
 
+<!-- Table Capaian Indikator -->
 <div class="container-md">
     <div class="cetak">
-        <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Capaian Indikator Makro</h1>
+        <div>
+        <?php if(!empty($status_iku['active']) AND $status_iku['active'] == 1): ?>
+            <div>
+                <h1 class="text-center" >Capaian Indikator Makro <br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1>
+            </div>
+        <?php endif; ?>
+            <div class="text-center" style="margin-bottom: 25px;">
+                <div id="action" class="action-section hide-excel"></div>
+            </div>
             <div class="wrap-table">
                 <table id="table_capaian_indikator_mikro" cellpadding="2" cellspacing="0" style="font-family: 'Open Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
@@ -238,7 +273,39 @@ $status_iku = $wpdb->get_row(
 <!-- Tahun Tabel -->
 <div id="tahunContainer" class="container-md">
 </div>
+<!-- Modal Renaksi -->
+<div class="modal fade" id="modal-tambah-capaian-indikator" role="dialog" data-backdrop="static" aria-hidden="true">'
+    <div class="modal-dialog" style="max-width: 100%;" role="document">
+        <div class="modal-content">
+            <div class="modal-header bgpanel-theme">
+                <h4 style="margin: 0;" class="modal-title">Data Capaian Indikator Makro</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span><i class="dashicons dashicons-dismiss"></i></span></button>
+            </div>
+            <div class="modal-body">
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade show active" id="capaian-indikator" role="tabpanel" aria-labelledby="capaian-indikator-tab"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- Modal crud -->
+<div class="modal fade" id="modal-crud" data-backdrop="static"  role="dialog" aria-labelledby="modal-crud-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script>
     jQuery(document).ready(function() {
@@ -252,7 +319,87 @@ $status_iku = $wpdb->get_row(
                 jQuery('#nama_file').val(name);
             }
         });
+
+        run_download_excel_sakip();
+        jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-capaian-indikator" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
+        jQuery("#tambah-capaian-indikator").on('click', function(){
+            getCapaianIndikator();
+        });
     });
+
+    function getCapaianIndikator() {
+        jQuery("#wrap-loading").show();
+        return new Promise(function(resolve, reject) {
+            jQuery.ajax({
+                url: esakip.url,
+                type: "post",
+                data: {
+                    "action": "get_data_capaian_indikator",
+                    "api_key": esakip.api_key,
+                    "id_jadwal": <?php echo $input['periode']; ?>
+                },
+                dataType: "json",
+                success: function(res) {
+                    jQuery('#wrap-loading').hide();
+                    
+                    let getCapaianIndikator = ''
+                        + `<div style="margin-top:10px">`
+                            + `<button type="button" class="btn btn-success mb-2" onclick="tambah_capaian_indikator();"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
+                        + `</div>`
+                        + `<table class="table" id="getCapaianIndikator" style="margin: .5rem 0 2rem;">`
+                            + `<thead>` 
+                                + `<tr class="table-secondary">`
+                                    + `<th rowspan="3" class="text-center" style="width:20px ">No</th>`
+                                    + `<th rowspan="3" class="text-center">Aspek/Fokus/ Bidang/Urusan/ Indikator Kinerja Pembangunan Daerah</th>`
+                                    + `<th rowspan="3" class="text-center">Sumber Data</th>`
+                                    + `<th rowspan="3" class="text-center">Keterangan</th>`
+                                    + `<th rowspan="3" class="text-center" style="width:120px;">Satuan</th>`
+                                    + `<th colspan="1" rowspan="2" class="text-center" style="width:50px;">Kondisi Awal</th>`
+                                    + `<th rowspan="3" class="text-center" style="width:50px;">Target Akhir</th>`
+                                    + `<th colspan="<?php echo $colspan_makro; ?>" class="text-center">Capaian IKU</th>`
+                                    + `<th rowspan="3" class="text-center" style="width:110px">Aksi</th>`
+                                + `</tr>`
+                                + `<?php echo $header_tahun_makro.$header_target_makro; ?>`
+                            + `</thead>`
+                            + `<tbody>`;
+
+                    res.data.map(function(value, index) {
+                        getCapaianIndikator += ''
+                            + `<tr>`
+                                + `<td class="text-center">${index+1}</td>`
+                                + `<td class="indikator_kinerja">${value.indikator_kinerja}</td>`
+                                + `<td class="sumber_data">${value.sumber_data}</td>`
+                                + `<td class="keterangan_capaian_indikator">${value.keterangan}</td>`
+                                + `<td class="text-center satuan">${value.satuan}</td>`
+                                + `<td class="text-center kondisi_awal">${value.kondisi_awal}</td>`
+                                + `<td class="text-center target_akhir_p_rpjmd">${value.target_akhir_p_rpjmd}</td>`;
+
+                        for(let i = 1; i <= <?php echo $periode['lama_pelaksanaan']; ?>; i++) {
+                            getCapaianIndikator += `
+                                <td class="text-center">${value['target_bps_tahun_' + i] || ''}</td>
+                                <td class="text-center">${value['bps_tahun_' + i] || ''}</td>`;
+                        }
+
+                        getCapaianIndikator += `
+                                <td class="text-center">
+                                    <a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-primary" onclick="edit_capaian_indikator(${value.id}, 1)" title="Edit"><i class="dashicons dashicons-edit"></i></a> <br>
+                                    <a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_capaian_indikator(${value.id}, 1);" title="Hapus" style="margin-top: 10px;"><i class="dashicons dashicons-trash"></i></a>
+                                </td>
+                            </tr>`;
+                    });
+
+                    getCapaianIndikator += ''
+                        + `</tbody>`
+                        + `</table>`;
+
+                    jQuery("#capaian-indikator").html(getCapaianIndikator);
+                    jQuery('.nav-tabs a[href="#capaian-indikator"]').tab('show');
+                    jQuery('#modal-tambah-capaian-indikator').modal('show');
+                    resolve();
+                }
+            });
+        });
+    }
 
     function drawColColors() {
         json_chart.map(function(b, i){
@@ -538,7 +685,6 @@ $status_iku = $wpdb->get_row(
         window.open(url, '_blank');
     }
 
-
     function hapus_dokumen_rpjmd(id) {
         if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
             return;
@@ -593,6 +739,249 @@ $status_iku = $wpdb->get_row(
                     alert(response.message);
                     getTableRpjmd();
                     getTableTahun();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                jQuery('#wrap-loading').hide();
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }
+
+    function tambah_capaian_indikator(){
+        return new Promise(function(resolve, reject){
+            jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                url: esakip.url,
+                type: "post",
+                data: {
+                    "action": "get_data_capaian_indikator",
+                    "api_key": esakip.api_key,
+                    "id_jadwal": <?php echo $input['periode']; ?>
+                },
+                dataType: "json",
+                success: function(res){
+                    jQuery('#wrap-loading').hide();
+                    jQuery("#modal-crud").find('.modal-title').html('Tambah Capaian Indikator');
+                    let get_bps = '';
+                    
+                    <?php for ($i = 1; $i <= $periode['lama_pelaksanaan']; $i++) : ?>
+                        get_bps += `
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    <label for="target_bps_tahun_<?php echo $i; ?>">Target BPS Tahun <?php echo $i; ?></label>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" id="target_bps_tahun_<?php echo $i; ?>" name="target_bps_tahun_<?php echo $i; ?>"/>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="bps_tahun_<?php echo $i; ?>">BPS Tahun <?php echo $i; ?></label>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" id="bps_tahun_<?php echo $i; ?>" name="bps_tahun_<?php echo $i; ?>"/>
+                                </div>
+                            </div>`;
+                    <?php endfor; ?>
+
+                    jQuery("#modal-crud").find('.modal-body').html(''
+                        +`<form id="form-renaksi">`
+                            +'<input type="hidden" id="id_capaian_indikator" value=""/>'
+                            +`<div class="form-group row">`
+                                +'<div class="col-md-2">'
+                                    +`<label for="indikator_kinerja">Aspek/Fokus/ Bidang/Urusan/ Indikator Kinerja</label>`
+                                +'</div>'
+                                +'<div class="col-md-10">'
+                                    +`<textarea class="form-control" name="label" id="indikator_kinerja" placeholder="Tuliskan Aspek/Fokus/ Bidang/Urusan/ Indikator Kinerja Pembangunan Daerah..."></textarea>`
+                                +'</div>'
+                            +`</div>`
+                            +`<div class="form-group row">`
+                                +'<div class="col-md-2">'
+                                    +`<label for="sumber_data">Sumber Data</label>`
+                                +'</div>'
+                                +'<div class="col-md-10">'
+                                    +`<input type="text" class="form-control" id="sumber_data"/>`
+                                +'</div>'
+                            +`</div>`
+                            +`<div class="form-group row">`
+                                +'<div class="col-md-2">'
+                                    +`<label for="satuan">Satuan</label>`
+                                +'</div>'
+                                +'<div class="col-md-10">'
+                                    +`<input type="text" class="form-control" id="satuan"/>`
+                                +'</div>'
+                            +`</div>`
+                            +`<div class="form-group row">`
+                                +'<div class="col-md-2">'
+                                    +`<label for="keterangan_capaian_indikator">Keterangan</label>`
+                                +'</div>'
+                                +'<div class="col-md-10">'
+                                    +`<input type="text" class="form-control" id="keterangan_capaian_indikator"/>`
+                                +'</div>'
+                            +`</div>`
+                            +`<div class="form-group row">`
+                                +'<div class="col-md-2">'
+                                    +`<label for="kondisi_awal">Target Awal</label>`
+                                +'</div>'
+                                +'<div class="col-md-4">'
+                                    +`<input type="text" class="form-control" id="kondisi_awal"/>`
+                                +'</div>'
+                                +'<div class="col-md-2">'
+                                    +`<label for="target_akhir_p_rpjmd">Target Akhir</label>`
+                                +'</div>'
+                                +'<div class="col-md-4">'
+                                    +`<input type="text" class="form-control" id="target_akhir_p_rpjmd"/>`
+                                +'</div>'
+                            +`</div>`
+                            + get_bps 
+                        +`</form>`);
+
+                    jQuery("#modal-crud").find('.modal-footer').html(''
+                        +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
+                            +'Tutup'
+                        +'</button>'
+                        +'<button type="button" class="btn btn-success" onclick="simpan_data_capaian_indikator(1)">'
+                            +'Simpan'
+                        +'</button>');
+                    jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
+                    jQuery("#modal-crud").find('.modal-dialog').css('width','');
+                    jQuery("#modal-crud").modal('show');
+
+                    resolve();
+                }
+            });
+        });
+    }
+
+    function simpan_data_capaian_indikator() {
+        let satuan = jQuery("#satuan").val();
+        let keterangan = jQuery("#keterangan_capaian_indikator").val();
+        let kondisi_awal = jQuery("#kondisi_awal").val();
+        let target_akhir_p_rpjmd = jQuery("#target_akhir_p_rpjmd").val();
+        let bps_tahun_1 = jQuery("#bps_tahun_1").val();
+        let target_bps_tahun_1 = jQuery("#target_bps_tahun_1").val();
+        let bps_tahun_2 = jQuery("#bps_tahun_2").val();
+        let target_bps_tahun_2 = jQuery("#target_bps_tahun_2").val();
+        let bps_tahun_3 = jQuery("#bps_tahun_3").val();
+        let target_bps_tahun_3 = jQuery("#target_bps_tahun_3").val();
+        let bps_tahun_4 = jQuery("#bps_tahun_4").val();
+        let target_bps_tahun_4 = jQuery("#target_bps_tahun_4").val();
+        let bps_tahun_5 = jQuery("#bps_tahun_5").val();
+        let target_bps_tahun_5 = jQuery("#target_bps_tahun_5").val();
+
+        let indikator_kinerja = jQuery("#indikator_kinerja").val();
+        if (indikator_kinerja == '') {
+            return alert('indikator kinerja tidak boleh kosong');
+        }
+
+        let sumber_data = jQuery("#sumber_data").val();
+        if (sumber_data == '') {
+            return alert('sumber data tidak boleh kosong');
+        }
+
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            method: 'post',
+            url: esakip.url,
+            dataType: 'json',
+            data: {
+                "action": 'simpan_data_capaian_indikator',
+                "api_key": esakip.api_key,
+                "id": jQuery('#id_capaian_indikator').val(),
+                "indikator_kinerja": indikator_kinerja,
+                "sumber_data": sumber_data,
+                "satuan": satuan,
+                "keterangan": keterangan,
+                "kondisi_awal": kondisi_awal,
+                "target_akhir_p_rpjmd": target_akhir_p_rpjmd,
+                "bps_tahun_1": bps_tahun_1,
+                "target_bps_tahun_1": target_bps_tahun_1,
+                "bps_tahun_2": bps_tahun_2,
+                "target_bps_tahun_2": target_bps_tahun_2,
+                "bps_tahun_3": bps_tahun_3,
+                "target_bps_tahun_3": target_bps_tahun_3,
+                "bps_tahun_4": bps_tahun_4,
+                "target_bps_tahun_4": target_bps_tahun_4,
+                "bps_tahun_5": bps_tahun_5,
+                "target_bps_tahun_5": target_bps_tahun_5,
+                "id_jadwal": <?php echo $input['periode']; ?>
+            },
+            success: function(res) {
+                alert(res.message);
+                if (res.status == 'success') {
+                    jQuery('#modal-crud').modal('hide');
+                    getCapaianIndikator();
+                } else {
+                    jQuery('#wrap-loading').hide();
+                }
+            }
+        });
+    }
+
+    function edit_capaian_indikator(id){
+        tambah_capaian_indikator().then(function(){
+            jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                url: esakip.url,
+                type: 'POST',
+                data: {
+                    action: 'edit_capaian_indikator',
+                    api_key: esakip.api_key,
+                    id: id,
+                    id_jadwal: '<?php echo $input["periode"]; ?>' 
+                },
+                dataType: 'json',
+                success: function(response) {
+                    jQuery('#wrap-loading').hide();
+                    if(response.status == 'error'){
+                        alert(response.message)
+                    }else if(response.data != null){
+                        jQuery('#id_capaian_indikator').val(id);
+                        jQuery("#modal-crud").find('.modal-title').html('Edit Capaian Indikator');
+                        jQuery('#indikator_kinerja').val(response.data.indikator_kinerja);
+                        jQuery('#sumber_data').val(response.data.sumber_data);
+                        jQuery('#satuan').val(response.data.satuan);
+                        jQuery('#keterangan_capaian_indikator').val(response.data.keterangan);
+                        jQuery('#kondisi_awal').val(response.data.kondisi_awal);
+                        jQuery('#target_akhir_p_rpjmd').val(response.data.target_akhir_p_rpjmd);
+                        jQuery('#bps_tahun_1').val(response.data.bps_tahun_1);
+                        jQuery('#target_bps_tahun_1').val(response.data.target_bps_tahun_1);
+                        jQuery('#bps_tahun_2').val(response.data.bps_tahun_2);
+                        jQuery('#target_bps_tahun_2').val(response.data.target_bps_tahun_2);
+                        jQuery('#bps_tahun_3').val(response.data.bps_tahun_3);
+                        jQuery('#target_bps_tahun_3').val(response.data.target_bps_tahun_3);
+                        jQuery('#bps_tahun_4').val(response.data.bps_tahun_4);
+                        jQuery('#target_bps_tahun_4').val(response.data.target_bps_tahun_4);
+                        jQuery('#bps_tahun_5').val(response.data.bps_tahun_5);
+                        jQuery('#target_bps_tahun_5').val(response.data.target_bps_tahun_5);
+                    }
+                }
+            });
+        });    
+    }
+
+    function hapus_capaian_indikator(id) {
+        if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
+            return;
+        }
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'hapus_capaian_indikator',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    getCapaianIndikator();
                 } else {
                     alert(response.message);
                 }
