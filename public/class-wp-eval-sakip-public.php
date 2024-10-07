@@ -24685,7 +24685,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
-<<<<<<< HEAD
 	public function get_data_capaian_indikator()
 	{
 	    global $wpdb;
@@ -24900,7 +24899,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 		die(json_encode($ret));
 	}
-=======
+
 	public function data_esr(){
 		global $wpdb;
 
@@ -24999,7 +24998,5 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'data_esr_lokal' => []
 			];
 		}	
-	}
-
->>>>>>> fdee76ec3db89d4cbc74885ee22348831215251b
+	}	
 }
