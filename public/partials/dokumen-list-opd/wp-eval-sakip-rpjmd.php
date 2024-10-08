@@ -321,7 +321,9 @@ $status_iku = $wpdb->get_row(
         });
 
         run_download_excel_sakip();
-        jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-capaian-indikator" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
+        <?php if (!$is_admin_panrb): ?>
+            jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-capaian-indikator" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
+        <?php endif; ?>
         jQuery("#tambah-capaian-indikator").on('click', function(){
             getCapaianIndikator();
         });
