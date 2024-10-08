@@ -6756,7 +6756,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE upload_id=%d AND tahun_anggaran=%d AND active=%d", $esr->upload_id, $tahun_anggaran, 1), ARRAY_A);
 									if(!empty($esr_lokal)){
 										$wpdb->update($nama_tabel, [
-											'path' => $esr->path
+											'path_esr' => $esr->path
 										], [
 											'id' => $esr_lokal['id']
 										]);
@@ -24381,21 +24381,27 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 					foreach ($data_lokal as $key => $data) {
 						$response = wp_remote_post(get_option('_crb_url_api_esr').'insert_data', [
-							'body' => [
-								'dokumen_id' => $mapping_jenis_dokumen_esr['jenis_dokumen_esr_id'],
-								'user_id' => $user_id,
+							'headers' => array(
+						        'Accept' => 'application/json',
+						        'Content-Type' => 'application/json; charset=utf-8',
+						        'Authorization' => 'Basic ' . base64_encode(get_option('_crb_username_api_esr').':'.get_option('_crb_password_api_esr')),
+						    ),
+							'body' => json_encode([
+								'dokumen_id' => intval($mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']),
+								'user_id' => intval($user_id),
 								'nama_file' => $data['dokumen'],
 								'path' => ESAKIP_PLUGIN_URL . 'public/media/dokumen/'.$data['dokumen'],
 								'keterangan' => $data['keterangan']
-							],
-							'headers' => array(
-						        'Accept' => 'application/json',
-						        'Authorization' => 'Basic ' . base64_encode(get_option('_crb_username_api_esr').':'.get_option('_crb_password_api_esr')),
-						    ),
+							]),
 						]);
 
-						if(!empty($response->data)){
-							foreach ($response->data as $key => $value) {
+						$body = json_decode(wp_remote_retrieve_body($response));
+						if(isset($body->error)){
+							// simpan error sebagai log
+						}
+
+						if(!empty($body->data)){
+							foreach ($body->data as $key => $value) {
 								$wpdb->update($nama_tabel, [
 									'upload_id' => $value->upload_id
 								], [

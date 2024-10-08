@@ -486,6 +486,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
                 success: function(response) {
                     jQuery('#wrap-loading').hide();
                     alert(response.message);
+                    location.reload();
                 },
                 error: function(xhr, status, error) {
                     jQuery('#wrap-loading').hide();
