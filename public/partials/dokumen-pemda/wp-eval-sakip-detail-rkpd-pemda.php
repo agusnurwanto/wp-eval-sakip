@@ -63,19 +63,19 @@ $status_api_esr = get_option('_crb_api_esr_status');
                 <button class="btn btn-primary" onclick="tambah_dokumen();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
                 <?php
                 if($status_api_esr){
-                    echo '<button class="btn btn-warning" onclick="sync_to_esr();"><i class="dashicons dashicons-arrow-up-alt"></i> Kirim Data ke ESR</button>';
+                    echo '<button class="btn btn-warning" onclick="sync_to_esr();" id="btn-sync-to-esr" style="display:none"><i class="dashicons dashicons-arrow-up-alt"></i> Kirim Data ke ESR</button>';
                 }
                 ?>
             </div>
             <?php endif; ?>
             <div class="wrap-table">
-                <table id="table_dokumen" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                <table id="table_dokumen" cellpadding="2" cellspacing="0" style="font-family:Open Sans,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
                             <?php
                                 if($status_api_esr){
-                                    echo '<th class="text-center">Checklist ESR</th>';
+                                    echo '<th class="text-center" id="check-list-esr" style="display:none">Checklist ESR</th>';
                                 }
                             ?>
                             <th class="text-center">Nama Dokumen</th>
@@ -189,6 +189,10 @@ $status_api_esr = get_option('_crb_api_esr_status');
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 console.log(response);
+                if(response.status_mapping_esr){
+                    jQuery("#btn-sync-to-esr").show();
+                    jQuery("#check-list-esr").show();
+                }
                 if (response.status === 'success') {
                     jQuery('#table_dokumen tbody').html(response.data);
                 } else {
@@ -491,6 +495,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
                 error: function(xhr, status, error) {
                     jQuery('#wrap-loading').hide();
                     alert('Terjadi kesalahan saat kirim data!');
+                    location.reload();
                 }
             });
         }else{
