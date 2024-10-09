@@ -24764,7 +24764,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		global $wpdb;
 		$ret = array(
 			'status' => 'success',
-			'message' => 'Berhasil simpan rencana aksi!',
+			'message' => 'Berhasil simpan capaian indikator!',
 			'data'  => array()
 		);
 
@@ -24838,7 +24838,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		global $wpdb;
 		$ret = array(
 			'status' => 'success',
-			'message' => 'Berhasil get rencana aksi!',
+			'message' => 'Berhasil get capaian indikator!',
 			'data'  => array()
 		);
 

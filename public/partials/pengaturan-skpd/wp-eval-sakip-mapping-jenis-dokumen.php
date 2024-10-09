@@ -12,7 +12,14 @@ if (!empty($_GET) && !empty($_GET['tahun_anggaran'])) {
 }
 $tahun_anggaran = $input['tahun_anggaran'];
 
-$dokumen_esr = $wpdb->get_results($wpdb->prepare("SELECT * FROM esakip_data_jenis_dokumen_esr WHERE tahun_anggaran=%d AND active=%d ORDER BY id", $tahun_anggaran, 1), ARRAY_A);
+$dokumen_esr = $wpdb->get_results($wpdb->prepare("
+	SELECT 
+		* 
+	FROM esakip_data_jenis_dokumen_esr 
+	WHERE tahun_anggaran=%d 
+		AND active=%d 
+		ORDER BY id
+", $tahun_anggaran, 1), ARRAY_A);
 
 $dokumen_menu = $wpdb->get_results($wpdb->prepare("
 	SELECT 
@@ -21,13 +28,14 @@ $dokumen_menu = $wpdb->get_results($wpdb->prepare("
 		a.nama_dokumen,
 		a.user_role,
 		b.jenis_dokumen_esr_id
-	FROM esakip_menu_dokumen a LEFT JOIN esakip_data_mapping_jenis_dokumen_esr b 
-			ON a.id=b.esakip_menu_dokumen_id AND a.tahun_anggaran=b.tahun_anggaran 
-	WHERE 
-		a.tahun_anggaran=%d AND 
-		a.user_role=%s 
-	ORDER BY a.nomor_urut ASC", 
-	$tahun_anggaran, 'pemerintah_daerah'), ARRAY_A);
+	FROM esakip_menu_dokumen a 
+	LEFT JOIN esakip_data_mapping_jenis_dokumen_esr b ON a.id=b.esakip_menu_dokumen_id 
+		AND a.tahun_anggaran=b.tahun_anggaran 
+	WHERE a.tahun_anggaran=%d 
+		AND a.user_role=%s 
+		AND a.active=1
+	ORDER BY a.nomor_urut ASC, a.id ASC
+", $tahun_anggaran, 'pemerintah_daerah'), ARRAY_A);
 
 $body='';
 $i=1;
@@ -50,11 +58,50 @@ foreach ($dokumen_menu as $dokumen) {
 	</tr>';
 	$i++;
 }
+
+$dokumen_menu = $wpdb->get_results($wpdb->prepare("
+	SELECT 
+		a.id,
+		a.nama_tabel,
+		a.nama_dokumen,
+		a.user_role,
+		b.jenis_dokumen_esr_id
+	FROM esakip_menu_dokumen a 
+	LEFT JOIN esakip_data_mapping_jenis_dokumen_esr b ON a.id=b.esakip_menu_dokumen_id 
+		AND a.tahun_anggaran=b.tahun_anggaran 
+	WHERE a.tahun_anggaran=%d 
+		AND a.user_role=%s 
+		AND a.active=1
+	ORDER BY a.nomor_urut ASC, a.id ASC
+", $tahun_anggaran, 'perangkat_daerah'), ARRAY_A);
+
+$body_opd='';
+$i=1;
+foreach ($dokumen_menu as $dokumen) {
+	$select='<select class="form-control" onchange="mappingJenisDokumenEsr(\''.$dokumen['id'].'\', this, '.$tahun_anggaran.')"><option value="">Pilih Jenis Dokumen ESR</option>';
+	foreach ($dokumen_esr as $dok_esr) {
+		$selected='';
+		if($dokumen['jenis_dokumen_esr_id']==$dok_esr['jenis_dokumen_esr_id']){
+			$selected='selected';
+		}
+		$select.='<option value="'.$dok_esr['jenis_dokumen_esr_id'].'" '.$selected.'>'.$dok_esr['nama'].'</option>';
+	}
+	$select.='</select>';
+	$body_opd.='<tr>
+		<td class="text-center">'.$i.'</td>
+		<td>'.$dokumen['nama_tabel'].'</td>
+		<td>'.$dokumen['nama_dokumen'].'</td>
+		<td class="text-center">'.$dokumen['jenis_dokumen_esr_id'].'</td>
+		<td>'.$select.'</td>
+	</tr>';
+	$i++;
+}
 ?>
 
-<div id="wrap-table" style="padding: 10px">
+<div id="wrap-table" style="padding: 10px; text-align: center;">
 	<h1 class="text-center">Mapping Jenis Dokumen Tahun Anggaran <?php echo $tahun_anggaran ?></h1>
 	<button class="btn btn-success mb-4" onclick="generateMasterJenisDokumenEsr('<?php echo $tahun_anggaran; ?>')">Generate Master Jenis Dokumen ESR</button>
+	<h3 class="text-center">Dokumen Pemerintah Daerah</h3>
 	<table>
 		<thead>
 			<tr>
@@ -69,7 +116,21 @@ foreach ($dokumen_menu as $dokumen) {
 			<?php echo $body; ?>
 		</tbody>
 	</table>
+	<h3 class="text-center">Dokumen Perangkat Daerah</h3>
 	<table>
+		<thead>
+			<tr>
+				<th class="text-center" style="width:10px">No.</th>
+				<th class="text-center" style="width: 500px;">Tabel Dokumen Lokal</th>
+				<th class="text-center" style="width: 500px;">Nama Dokumen Lokal</th>
+				<th class="text-center" style="width: 100px;">ID Dokumen ESR</th>
+				<th class="text-center" style="width: 500px;">Nama Dokumen ESR</th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php echo $body_opd; ?>
+		</tbody>
+	</table>
 </div>
 
 <script type="text/javascript">

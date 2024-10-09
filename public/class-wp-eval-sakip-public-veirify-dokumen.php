@@ -46,7 +46,6 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             *
                         FROM esakip_menu_dokumen 
                         WHERE tahun_anggaran =%d 
-                            and active=1
                             $where_jenis_user
                         ORDER BY nomor_urut ASC
                     ", $tahun_anggaran), ARRAY_A);
@@ -255,7 +254,6 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                         FROM esakip_menu_dokumen 
                         WHERE tahun_anggaran =%d
                             AND user_role=%s
-                            AND active=1
                     ", $tahun_anggaran, $tipe), ARRAY_A);
                     $cek_menu_all = array();
                     foreach($cek_menu_all_db as $m){
@@ -413,7 +411,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             unset($cek_menu_all[$menu['nama_tabel']]);
                         }
                         foreach($cek_menu_all as $m){
-                            $wpdb->update('esakip_menu_dokumen', array('active' => 0), array('id' => $m['id']));
+                            $wpdb->delete('esakip_menu_dokumen', array('id' => $m['id']));
                         }
                     }else if($tipe == 'perangkat_daerah'){
                         $design_menu = array(
@@ -555,7 +553,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             unset($cek_menu_all[$menu['nama_tabel']]);
                         }
                         foreach($cek_menu_all as $m){
-                            $wpdb->update('esakip_menu_dokumen', array('active' => 0), array('id' => $m['id']));
+                            $wpdb->delete('esakip_menu_dokumen', array('id' => $m['id']));
                         }
                     }
                 } else {

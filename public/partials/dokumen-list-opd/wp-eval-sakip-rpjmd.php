@@ -135,7 +135,7 @@ $status_iku = $wpdb->get_row(
     }
 
     #modal-tambah-capaian-indikator .modal-body {
-        max-height: 100vh;
+        max-height: 90vh;
         overflow-y: auto;
     }
 
@@ -321,7 +321,9 @@ $status_iku = $wpdb->get_row(
         });
 
         run_download_excel_sakip();
-        jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-capaian-indikator" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
+        <?php if (!$is_admin_panrb): ?>
+            jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-capaian-indikator" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
+        <?php endif; ?>
         jQuery("#tambah-capaian-indikator").on('click', function(){
             getCapaianIndikator();
         });
@@ -778,7 +780,7 @@ $status_iku = $wpdb->get_row(
                                     <input type="text" class="form-control" id="target_bps_tahun_<?php echo $i; ?>" name="target_bps_tahun_<?php echo $i; ?>"/>
                                 </div>
                                 <div class="col-md-2">
-                                    <label for="bps_tahun_<?php echo $i; ?>">BPS Tahun <?php echo $i; ?></label>
+                                    <label for="bps_tahun_<?php echo $i; ?>">Capaian BPS Tahun <?php echo $i; ?></label>
                                 </div>
                                 <div class="col-md-4">
                                     <input type="text" class="form-control" id="bps_tahun_<?php echo $i; ?>" name="bps_tahun_<?php echo $i; ?>"/>
@@ -787,7 +789,7 @@ $status_iku = $wpdb->get_row(
                     <?php endfor; ?>
 
                     jQuery("#modal-crud").find('.modal-body').html(''
-                        +`<form id="form-renaksi">`
+                        +`<form id="form-capaian-indikator">`
                             +'<input type="hidden" id="id_capaian_indikator" value=""/>'
                             +`<div class="form-group row">`
                                 +'<div class="col-md-2">'
@@ -963,7 +965,7 @@ $status_iku = $wpdb->get_row(
     }
 
     function hapus_capaian_indikator(id) {
-        if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
+        if (!confirm('Apakah Anda yakin ingin menghapus data ini?')) {
             return;
         }
         jQuery('#wrap-loading').show();
