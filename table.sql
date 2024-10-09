@@ -623,7 +623,7 @@ CREATE TABLE `esakip_menu_dokumen` (
   `jenis_role` int(11) DEFAULT NULL,
   `keterangan` varchar(255) DEFAULT NULL,
   `nomor_urut` DECIMAL(10,2) NOT NULL,
-  `active` tinyint(4) NOT NULL,
+  `active` tinyint(4) NOT NULL COMMENT '1 = Tampil, 0 = Sembunyikan',
   `tahun_anggaran` year NOT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp,
   `updated_at` datetime NOT NULL DEFAULT current_timestamp,
