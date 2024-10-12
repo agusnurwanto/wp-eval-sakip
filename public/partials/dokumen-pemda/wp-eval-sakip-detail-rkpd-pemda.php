@@ -88,6 +88,20 @@ $status_api_esr = get_option('_crb_api_esr_status');
                     </tbody>
                 </table>
             </div>
+            <div class="wrap-table" id="non_esr_lokal" style="display:none;">
+                <h3 class="text-center" style="margin:3rem;">Dokumen ESR yang tidak ada di Lokal</h3>
+                <table id="table_non_esr_lokal" cellpadding="2" cellspacing="0" style="font-family:Open Sans,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">No</th>
+                            <th class="text-center">Nama Dokumen</th>
+                            <th class="text-center">Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -188,10 +202,24 @@ $status_api_esr = get_option('_crb_api_esr_status');
             dataType: 'json',
             success: function(response) {
                 jQuery('#wrap-loading').hide();
-                console.log(response);
                 if(response.status_mapping_esr){
+                    let body_non_esr_lokal=``;
+                    if(response.non_esr_lokal.length > 0){
+                        response.non_esr_lokal.forEach((value, index) => {
+                            body_non_esr_lokal+=`
+                                <tr>
+                                    <td class="text-center" data-upload-id="${value.upload_id}">${index+1}.</td>
+                                    <td>${value.nama_file}</td>
+                                    <td>${value.keterangan}</td>
+                                </tr>
+                            `;
+                        });
+                        jQuery("#table_non_esr_lokal tbody").html(body_non_esr_lokal);
+                    }
+
                     jQuery("#btn-sync-to-esr").show();
                     jQuery("#check-list-esr").show();
+                    jQuery("#non_esr_lokal").show();
                 }
                 if (response.status === 'success') {
                     jQuery('#table_dokumen tbody').html(response.data);
