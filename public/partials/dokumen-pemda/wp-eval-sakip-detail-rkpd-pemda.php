@@ -96,6 +96,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
                             <th class="text-center">No</th>
                             <th class="text-center">Nama Dokumen</th>
                             <th class="text-center">Keterangan</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -211,6 +212,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
                                     <td class="text-center" data-upload-id="${value.upload_id}">${index+1}.</td>
                                     <td>${value.nama_file}</td>
                                     <td>${value.keterangan}</td>
+                                    <td class="text-center"><a class="btn btn-sm btn-info" href="${value.path}" title="Lihat Dokumen" target="_blank"><span class="dashicons dashicons-visibility"></span></a></td>
                                 </tr>
                             `;
                         });

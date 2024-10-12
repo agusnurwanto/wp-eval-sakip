@@ -6768,7 +6768,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										$array_data_esr[]=[
 											'upload_id' => $esr->upload_id,
 											'nama_file' => $nama_file,
-											'keterangan' => $esr->keterangan
+											'keterangan' => $esr->keterangan,
+											'path' => $esr->path
 										];
 									}
 								}
