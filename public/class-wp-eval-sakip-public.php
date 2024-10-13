@@ -6768,7 +6768,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										$array_data_esr[]=[
 											'upload_id' => $esr->upload_id,
 											'nama_file' => $nama_file,
-											'keterangan' => $esr->keterangan
+											'keterangan' => $esr->keterangan,
+											'path' => $esr->path
 										];
 									}
 								}
@@ -6815,6 +6816,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 							$tbody .= "<td class='text-center'>" . $btn . "</td>";
 							$tbody .= "</tr>";
+						}
+
+						$non_esr_lokal=[];
+						if($status_api_esr && !empty($mapping_jenis_dokumen_esr)){
+							foreach ($array_data_esr as $data_esr) {
+								foreach ($datas as $esr_lokal) {
+									if(!empty($esr_lokal['upload_id']) && $esr_lokal['upload_id']!=$data_esr['upload_id']){
+										$non_esr_lokal[]=$data_esr;
+									}else if($esr_lokal['dokumen']!=$esr_lokal['nama_file']){
+										$non_esr_lokal[]=$data_esr;
+									}else if($esr_lokal['keterangan']!=$esr_lokal['keterangan']){
+										$non_esr_lokal[]=$data_esr;
+									}
+								}
+							}
+							$ret['non_esr_lokal']=$non_esr_lokal;
 						}
 
 						$ret['data'] = $tbody;
