@@ -704,6 +704,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		return array_intersect($cek, $current_user->roles);
 	}
 
+	public function admin_user(){
+		return [
+			'administrator',
+			'admin_bappeda',
+			'admin_ortala',
+			'admin_inspektor',
+		];
+	}
+
 	public function hak_akses_upload_dokumen($nama_dokumen, $tahun_anggaran)
 	{
 		global $wpdb;
@@ -6747,7 +6756,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								// $ret['status'] = 'error';
 								// $ret['message'] = 'Jenis dokumen lokal dan jenis dokumen ESR belum di-mapping!';
 								
-								$data_esr = $this->data_esr();
+								$data_esr = $this->data_esr($tahun_anggaran);
 								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
 								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
 
@@ -24939,13 +24948,20 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
-	public function data_esr(){
+	public function data_esr($tahun_anggaran){
 		global $wpdb;
 
 		if(get_option('_crb_api_esr_status')){			
 			try {
 
-				$user_esr_id = get_option('_user_esr_'.str_replace(" ", "_", get_option('_crb_nama_pemda')));
+				$current_user = wp_get_current_user();
+
+				if(in_array($current_user->roles[0], $this->admin_user())){
+					$user_esr_id = get_option('_user_esr_'.str_replace(" ", "_", get_option('_crb_nama_pemda')));
+				}else{
+					$data_unit = $wpdb->get_row($wpdb->prepare("SELECT id_unit FROM esakip_data_unit WHERE nipkepala=%s AND active=%d AND tahun_anggaran=%d", $current_user->user_login, 1, $tahun_anggaran), ARRAY_A);
+					$user_esr_id = get_option('_user_esr_'.$data_unit['id_unit']);
+				}
 
 				if(empty($user_esr_id)){
 					throw new Exception("User ESR belum di-mapping, pastikan sebelumnya sudah menarik data user ESR!", 1);
