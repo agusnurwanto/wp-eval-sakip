@@ -1219,6 +1219,7 @@ CREATE TABLE `esakip_pengaturan_rencana_aksi` (
   PRIMARY KEY  (id)
 );
 
+
 CREATE TABLE `esakip_data_iku_opd` (
   `id` int(11) NOT NULL auto_increment,
   `kode_sasaran` text NOT NULL,
@@ -1405,4 +1406,18 @@ CREATE TABLE `esakip_data_mapping_jenis_dokumen_esr` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id)
+);
+
+CREATE TABLE `esakip_pengaturan_upload_dokumen` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `id_jadwal_rpjpd` int(11) DEFAULT NULL,
+  `id_jadwal_rpjmd` int(11) DEFAULT NULL,
+  `id_jadwal_renstra` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `tahun_anggaran` year(4) NOT NULL DEFAULT '2024',
+  `keterangan` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY  (id)
 );
