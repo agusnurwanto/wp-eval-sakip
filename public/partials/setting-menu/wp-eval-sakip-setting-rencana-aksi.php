@@ -33,7 +33,7 @@ $body = '';
 				  <div class="card-body">
 					<form>
 						<div class="form-group">
-							<label for="jadwal-rpjmd">Jadwal Rencana Aksi SI KSATRIA</label>
+							<label for="jadwal-rpjmd">Jadwal Rencana Aksi</label>
 							<select class="form-control" id="jadwal-rpjmd" disabled>
 							</select>
 							<small class="form-text text-muted">Silahkan setting di halaman monitor upload dokumen untuk mendapatkan periode jadwal Pohon Kinerja yang nantinya akan digunakan menginput Rencana Aksi Pemerintah Daerah.</small>
@@ -53,7 +53,7 @@ $body = '';
 				  <div class="card-body">
 					<form>
 						<div class="form-group">
-							<label for="jadwal-renstra">Jadwal Rencana Aksi SI KSATRIA</label>
+							<label for="jadwal-renstra">Jadwal Rencana Aksi</label>
 							<select class="form-control" id="jadwal-renstra" disabled>
 							</select>
 							<small class="form-text text-muted">Silahkan setting di halaman monitor upload dokumen untuk mendapatkan periode jadwal Pohon Kinerja yang nantinya akan digunakan menginput Rencana Aksi Perangkat Daerah.</small>
