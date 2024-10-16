@@ -73,11 +73,11 @@ $dokumen_renstra = $wpdb->get_results(
         j.tahun_anggaran AS tahun,
         j.lama_pelaksanaan,
         j.tahun_selesai_anggaran,
-        r.id_jadwal_renstra,
+        r.id_jadwal_rpjmd,
         r.tahun_anggaran
     FROM esakip_data_jadwal j
     INNER JOIN esakip_pengaturan_upload_dokumen r
-        ON r.id_jadwal_renstra = j.id
+        ON r.id_jadwal_rpjmd = j.id
     WHERE j.tipe = 'RPJMD'
       AND j.status = 1
       AND r.tahun_anggaran = %d
@@ -122,8 +122,7 @@ foreach($unit as $opd_renstra){
 	        j.tahun_anggaran AS tahun,
 	        j.lama_pelaksanaan,
 	        j.tahun_selesai_anggaran,
-	        r.id_jadwal_renstra,
-	        r.id_jadwal_renstra
+	        r.id_jadwal_rpjmd
 	    FROM esakip_data_jadwal j
 	    INNER JOIN esakip_pengaturan_upload_dokumen r
 	        ON r.id_jadwal_rpjmd = j.id
@@ -330,7 +329,7 @@ $dokumen_pokin_pemda = $wpdb->get_results(
         j.tahun_anggaran AS tahun,
         j.lama_pelaksanaan,
         j.tahun_selesai_anggaran,
-        r.id_jadwal_renstra
+        r.id_jadwal_rpjmd
     FROM esakip_data_jadwal j
     INNER JOIN esakip_pengaturan_upload_dokumen r
         ON r.id_jadwal_rpjmd = j.id
@@ -385,28 +384,22 @@ foreach ($user_roles as $role) {
 <div>
     <div style="padding: 10px;margin:0 0 3rem 0;">
     <input type="hidden" value="<?php echo get_option( '_crb_apikey_esakip' ); ?>" id="api_key">
-    <h1 class="text-center" style="margin:3rem;">Setting Periode Dokumen untuk Tahun Anggaran <?php echo $input['tahun_anggaran']; ?></h1>
+    <h1 class="text-center" style="margin:3rem;">Setting Periode untuk Tahun Anggaran <?php echo $input['tahun_anggaran']; ?></h1>
         <div class="d-flex justify-content-center">
             <div class="card" style="width: 50%;">
                 <div class="card-body">
                     <form>
                         <div class="form-group">
-                            <label for="jadwal-renstra">Pilih Jadwal RPJPD SI KSATRIA</label>
+                            <label for="jadwal-rpjpd">Pilih Jadwal RPJPD SI KSATRIA</label>
                             <select class="form-control" id="jadwal-rpjpd" <?php echo $is_admin_panrb ? 'disabled' : ''; ?>>
                             </select>
-                            <small class="form-text text-muted">Untuk mendapatkan Periode sesuai jadwal RPJPD. digunakan untuk periode upload dokumen.</small>
+                            <small class="form-text text-muted">Untuk mendapatkan Periode sesuai jadwal RPJPD. digunakan untuk periode upload dokumen RPJPD.</small>
                         </div>
                         <div class="form-group">
-                            <label for="jadwal-renstra">Pilih Jadwal RPJMD/RPD SI KSATRIA</label>
+                            <label for="jadwal-rpjmd">Pilih Jadwal RPJMD/RPD SI KSATRIA</label>
                             <select class="form-control" id="jadwal-rpjmd" <?php echo $is_admin_panrb ? 'disabled' : ''; ?>>
                             </select>
-                            <small class="form-text text-muted">Untuk mendapatkan Periode sesuai jadwal RPJMD/RPD. digunakan untuk periode upload dokumen.</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="jadwal-renstra">Pilih Jadwal RENSTRA SI KSATRIA</label>
-                            <select class="form-control" id="jadwal-renstra" <?php echo $is_admin_panrb ? 'disabled' : ''; ?>>
-                            </select>
-                            <small class="form-text text-muted">Untuk mendapatkan Periode sesuai jadwal RENSTRA. digunakan untuk periode upload dokumen.</small>
+                            <small class="form-text text-muted">Untuk mendapatkan Periode sesuai jadwal RPJMD/RPD. digunakan untuk periode upload dokumen RPJMD dan RENSTRA, Rencana Aksi Pemerintah Daerah dan Rencana Aksi Perangkat Daerah  .</small>
                         </div>
                         <?php if (!$is_admin_panrb) : ?>
                         <div class="form-group d-flex">
@@ -519,14 +512,12 @@ foreach ($user_roles as $role) {
                 jQuery('#wrap-loading').hide();
                 console.log(response);
                 if (response.status === 'success') {
-                    jQuery('#jadwal-renstra').html(response.option_renstra)
                     jQuery('#jadwal-rpjmd').html(response.option_rpjmd)
                     jQuery('#jadwal-rpjpd').html(response.option_rpjpd)
                     if(response.data.length != 0){
                         console.log(response.data.id_jadwal)
                         jQuery('#jadwal-rpjpd').val(response.data.id_jadwal_rpjpd);                    
                         jQuery('#jadwal-rpjmd').val(response.data.id_jadwal_rpjmd);
-                        jQuery('#jadwal-renstra').val(response.data.id_jadwal_renstra);
                     }
                 } else {
                     alert(response.message);
@@ -543,12 +534,11 @@ foreach ($user_roles as $role) {
     function submit_pengaturan_menu(){
         let id_jadwal_rpjpd = jQuery("#jadwal-rpjpd").val();
         let id_jadwal_rpjmd = jQuery("#jadwal-rpjmd").val();
-        let id_jadwal_renstra = jQuery("#jadwal-renstra").val();
-        if (id_jadwal_rpjpd == '' || id_jadwal_rpjmd == '' ||  id_jadwal_renstra == '') {
+        if (id_jadwal_rpjpd == '' || id_jadwal_rpjmd == '') {
             return alert('Ada data yang kosong!');
         }
 
-        if(confirm("Apakah kamu yakin untuk mengubah data periode jadwal upload dokumen?")){
+        if(confirm("Apakah kamu yakin untuk mengubah data periode jadwal upload dokumen dan rencana aksi?")){
             jQuery('#wrap-loading').show();
             jQuery.ajax({
                 method: 'POST',
@@ -559,7 +549,6 @@ foreach ($user_roles as $role) {
                     'api_key': esakip.api_key,
                     'id_jadwal_rpjpd': id_jadwal_rpjpd,
                     'id_jadwal_rpjmd': id_jadwal_rpjmd,
-                    'id_jadwal_renstra': id_jadwal_renstra,
                     'tahun_anggaran': tahun_anggaran
                 },
                 success: function(response) {

@@ -1412,6 +1412,7 @@ CREATE TABLE `esakip_pengaturan_upload_dokumen` (
   `id_jadwal_rpjpd` int(11) DEFAULT NULL,
   `id_jadwal_rpjmd` int(11) DEFAULT NULL,
   `id_jadwal_renstra` int(11) DEFAULT NULL,
+  `id_jadwal_wp_sipd` int(11) DEFAULT NULL,
   `active` tinyint(4) NOT NULL,
   `tahun_anggaran` year(4) NOT NULL DEFAULT '2024',
   `keterangan` varchar(255) DEFAULT NULL,

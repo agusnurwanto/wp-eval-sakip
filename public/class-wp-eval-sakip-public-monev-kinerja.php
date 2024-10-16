@@ -1037,7 +1037,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			'status' => 'success',
 			'message' => 'Berhasil get data pengaturan rencana aksi!',
 			'data'  => array(),
-			'option_renstra' => ''
+			'option_renstra_wpsipd' => ''
 		);
 
 		if (!empty($_POST)) {
@@ -1048,53 +1048,21 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				}
 				if ($ret['status'] != 'error'){
 
-					$jadwal_periode = $wpdb->get_results(
-						"
-						SELECT 
-							id,
-							nama_jadwal,
-							nama_jadwal_renstra,
-							tahun_anggaran,
-							lama_pelaksanaan,
-							tahun_selesai_anggaran
-						FROM esakip_data_jadwal
-						WHERE tipe = 'RPJMD'
-						  AND status = 1
-							ORDER BY tahun_anggaran DESC",
-						ARRAY_A
-					);
-					
-					$option_renstra = '<option>Pilih Jadwal RENSTRA</option>';
-					$option_rpjmd = '<option>Pilih Jadwal RPJMD/RPD</option>';
-					if(!empty($jadwal_periode)){
-						foreach ($jadwal_periode as $jadwal_periode_item) {
-							if (!empty($jadwal_periode_item['tahun_selesai_anggaran']) && $jadwal_periode_item['tahun_selesai_anggaran'] > 1) {
-								$tahun_anggaran_selesai = $jadwal_periode_item['tahun_selesai_anggaran'];
-							} else {
-								$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
-							}
-					
-							$option_renstra .= '<option value="' . $jadwal_periode_item['id'] . '">' . $jadwal_periode_item['nama_jadwal_renstra'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . '</option>';
-					
-							$option_rpjmd .= '<option value="' . $jadwal_periode_item['id'] . '">' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . '</option>';
-						}
-					}
-
-					$data = $wpdb->get_row($wpdb->prepare("
-								SELECT
-									pr.*
-								FROM esakip_pengaturan_rencana_aksi as pr
-								JOIN esakip_data_jadwal as jj
-								ON pr.id_jadwal = jj.id
-								WHERE pr.tahun_anggaran=%d
-									AND pr.active=1
-							", $_POST['tahun_anggaran']), ARRAY_A);
+					$data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT
+								pr.*
+							FROM esakip_pengaturan_upload_dokumen as pr
+							JOIN esakip_data_jadwal as jj
+							ON pr.id_jadwal_rpjpd = jj.id
+							WHERE pr.tahun_anggaran=%d
+								AND pr.active=1
+						", $_POST['tahun_anggaran']), 
+					ARRAY_A);
 					
 					if(!empty($data)){
 						$ret['data'] = $data;
 					}
-					$ret['option_renstra'] = $option_renstra;
-					$ret['option_rpjmd'] = $option_rpjmd;
 
 					//jadwal renstra wpsipd
 					$api_params = array(
@@ -1146,42 +1114,25 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		try {
 			if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-					if (empty($_POST['tahun_anggaran']) || empty($_POST['id_jadwal_renstra'])) {
+					if (empty($_POST['tahun_anggaran'])) {
 						throw new Exception("Ada data yang kosong!", 1);
 					}
 
 					$tahun_anggaran = $_POST['tahun_anggaran'];
-					$id_jadwal_renstra = $_POST['id_jadwal_renstra'];
 					$id_jadwal_renstra_wpsipd = $_POST['id_jadwal_renstra_wpsipd'];
 
 					// pengaturan rencana aksi
-					$cek_data_jadwal = $wpdb->get_var(
-						$wpdb->prepare("
-						SELECT 
-							id
-						FROM 
-							esakip_data_jadwal
-						WHERE id=%d
-						AND tipe='RPJMD'
-						AND status=1
-					", $id_jadwal_renstra));
-
-					if (empty($cek_data_jadwal)) {
-						throw new Exception("Id Jadwal tidak cocok!", 1);
-					}
-
 					$cek_data_pengaturan = $wpdb->get_var(
 						$wpdb->prepare("
 						SELECT 
 							id
 						FROM 
-							esakip_pengaturan_rencana_aksi
+							esakip_pengaturan_upload_dokumen
 						WHERE tahun_anggaran=%d
 						AND active=1
 					", $tahun_anggaran));
 
 					$data = array(
-						'id_jadwal' => $id_jadwal_renstra,
 						'id_jadwal_wp_sipd' => $id_jadwal_renstra_wpsipd,
 						'tahun_anggaran' => $tahun_anggaran,
 						'active' => 1,
@@ -1190,84 +1141,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					);
 
 					if (empty($cek_data_pengaturan)) {
-						$wpdb->insert('esakip_pengaturan_rencana_aksi', $data);
+						$wpdb->insert('esakip_pengaturan_upload_dokumen', $data);
 						$message = "Sukses tambah data";
 					} else {
-						$wpdb->update('esakip_pengaturan_rencana_aksi', $data, array('id' => $cek_data_pengaturan));
-						$message = "Sukses edit data";
-					}
-
-					echo json_encode([
-						'status' => true,
-						'message' => $message,
-					]);
-					exit();
-				} else {
-					throw new Exception("API tidak ditemukan!", 1);
-				}
-			} else {
-				throw new Exception("Format tidak sesuai!", 1);
-			}
-		} catch (Exception $e) {
-			echo json_encode([
-				'status' => false,
-				'message' => $e->getMessage()
-			]);
-			exit();
-		}
-	}
-	
-	function submit_pengaturan_rencana_aksi_pemda(){
-		global $wpdb;
-		try {
-			if (!empty($_POST)) {
-				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-					if (empty($_POST['tahun_anggaran']) || empty($_POST['id_jadwal_rpjmd'])) {
-						throw new Exception("Ada data yang kosong!", 1);
-					}
-
-					$tahun_anggaran = $_POST['tahun_anggaran'];
-					$id_jadwal_rpjmd = $_POST['id_jadwal_rpjmd'];
-
-					// pengaturan rencana aksi
-					$cek_data_jadwal = $wpdb->get_var(
-						$wpdb->prepare("
-						SELECT 
-							id
-						FROM 
-							esakip_data_jadwal
-						WHERE id=%d
-						AND tipe='RPJMD'
-						AND status=1
-					", $id_jadwal_rpjmd));
-
-					if (empty($cek_data_jadwal)) {
-						throw new Exception("Id Jadwal tidak cocok!", 1);
-					}
-
-					$cek_data_pengaturan = $wpdb->get_var(
-						$wpdb->prepare("
-						SELECT 
-							id
-						FROM 
-							esakip_pengaturan_rencana_aksi
-						WHERE tahun_anggaran=%d
-						AND active=1
-					", $tahun_anggaran));
-
-					$data = array(
-						'id_jadwal_rpjmd' => $id_jadwal_rpjmd,
-						'tahun_anggaran' => $tahun_anggaran,
-						'active' => 1,
-						'created_at' => current_time('mysql'),
-						'update_at' => current_time('mysql')
-					);
-
-					if (empty($cek_data_pengaturan)) {
-						$wpdb->insert('esakip_pengaturan_rencana_aksi', $data);
-						$message = "Sukses tambah data";
-					} else {
-						$wpdb->update('esakip_pengaturan_rencana_aksi', $data, array('id' => $cek_data_pengaturan));
+						$wpdb->update('esakip_pengaturan_upload_dokumen', $data, array('id' => $cek_data_pengaturan));
 						$message = "Sukses edit data";
 					}
 
