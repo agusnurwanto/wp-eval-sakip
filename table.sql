@@ -695,6 +695,8 @@ CREATE TABLE `esakip_perjanjian_kinerja_pemda` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -708,6 +710,8 @@ CREATE TABLE `esakip_rencana_aksi_pemda` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
