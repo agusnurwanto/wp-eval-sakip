@@ -102,6 +102,12 @@ $status_api_esr = get_option('_crb_api_esr_status');
                     <tbody>
                     </tbody>
                 </table>
+                <div class="hide-print" id="catatan_dokumentasi" style="max-width: 1000px; margin: 40px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
+                    <h4 style="font-weight: bold; margin-bottom: 20px; color: #333;">Catatan:</h4>
+                    <ul style="list-style-type: disc; padding-left: 20px; line-height: 1.6; color: #555;">
+                        <li>Abaikan perbedaan nama atau keterangan jika kedua dokumen PDF (ESR dan LOKAL) masih identik.</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
