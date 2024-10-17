@@ -1634,14 +1634,13 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
         try {
             if (!empty($_POST)) {
                 if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-                    if (empty($_POST['tahun_anggaran']) || empty($_POST['id_jadwal_rpjpd']) || empty($_POST['id_jadwal_rpjmd']) || empty($_POST['id_jadwal_renstra'])) {
+                    if (empty($_POST['tahun_anggaran']) || empty($_POST['id_jadwal_rpjpd']) || empty($_POST['id_jadwal_rpjmd'])) {
                         throw new Exception("Ada data yang kosong!", 1);
                     }
 
                     $tahun_anggaran = $_POST['tahun_anggaran'];
                     $id_jadwal_rpjpd = $_POST['id_jadwal_rpjpd'];
                     $id_jadwal_rpjmd = $_POST['id_jadwal_rpjmd'];
-                    $id_jadwal_renstra = $_POST['id_jadwal_renstra'];
 
                     $cek_data_jadwal = $wpdb->get_var(
                         $wpdb->prepare("
@@ -1652,7 +1651,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                         WHERE id=%d
                         AND tipe IN ('RPJPD','RPJMD')
                         AND status=1
-                    ", $id_jadwal_rpjpd, $id_jadwal_rpjmd, $id_jadwal_renstra));
+                    ", $id_jadwal_rpjpd, $id_jadwal_rpjmd));
 
                     if (empty($cek_data_jadwal)) {
                         throw new Exception("Id Jadwal tidak cocok!", 1);
@@ -1671,7 +1670,6 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                     $data = array(
                         'id_jadwal_rpjpd' => $id_jadwal_rpjpd,
                         'id_jadwal_rpjmd' => $id_jadwal_rpjmd,
-                        'id_jadwal_renstra' => $id_jadwal_renstra,
                         'tahun_anggaran' => $tahun_anggaran,
                         'active' => 1,
                         'created_at' => current_time('mysql'),

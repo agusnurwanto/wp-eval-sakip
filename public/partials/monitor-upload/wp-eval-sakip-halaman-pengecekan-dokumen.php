@@ -391,22 +391,16 @@ foreach ($user_roles as $role) {
                 <div class="card-body">
                     <form>
                         <div class="form-group">
-                            <label for="jadwal-renstra">Pilih Jadwal RPJPD SI KSATRIA</label>
+                            <label for="jadwal-renstra">Pilih Jadwal RPJPD</label>
                             <select class="form-control" id="jadwal-rpjpd" <?php echo $is_admin_panrb ? 'disabled' : ''; ?>>
                             </select>
                             <small class="form-text text-muted">Untuk mendapatkan Periode sesuai jadwal RPJPD. digunakan untuk periode upload dokumen.</small>
                         </div>
                         <div class="form-group">
-                            <label for="jadwal-renstra">Pilih Jadwal RPJMD/RPD SI KSATRIA</label>
+                            <label for="jadwal-renstra">Pilih Jadwal RPJMD/RPD</label>
                             <select class="form-control" id="jadwal-rpjmd" <?php echo $is_admin_panrb ? 'disabled' : ''; ?>>
                             </select>
                             <small class="form-text text-muted">Untuk mendapatkan Periode sesuai jadwal RPJMD/RPD. digunakan untuk periode upload dokumen.</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="jadwal-renstra">Pilih Jadwal RENSTRA SI KSATRIA</label>
-                            <select class="form-control" id="jadwal-renstra" <?php echo $is_admin_panrb ? 'disabled' : ''; ?>>
-                            </select>
-                            <small class="form-text text-muted">Untuk mendapatkan Periode sesuai jadwal RENSTRA. digunakan untuk periode upload dokumen.</small>
                         </div>
                         <?php if (!$is_admin_panrb) : ?>
                         <div class="form-group d-flex">

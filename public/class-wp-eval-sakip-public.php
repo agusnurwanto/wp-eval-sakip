@@ -16927,15 +16927,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		$jadwal_periode_rpjpd = $wpdb->get_results(
 			"
-			SELECT 
-				id,
-				nama_jadwal,
-				tahun_anggaran,
-				lama_pelaksanaan
-			FROM esakip_data_jadwal
-			WHERE tipe = 'RPJPD'
-			  AND status = 1",
-			ARRAY_A
+			 SELECT 
+		        j.id,
+		        j.nama_jadwal,
+		        j.nama_jadwal_renstra,
+		        j.tahun_anggaran,
+		        j.lama_pelaksanaan,
+		        j.tahun_selesai_anggaran,
+		        r.id_jadwal_rpjpd
+		    FROM esakip_data_jadwal j
+		    INNER JOIN esakip_pengaturan_upload_dokumen r
+		        ON r.id_jadwal_rpjpd = j.id
+		    WHERE j.tipe = 'RPJPD'
+		      AND j.status = 1
+		    ORDER BY j.tahun_anggaran DESC",
+		    ARRAY_A
 		);
 		$periode_rpjpd = '';
 		$periode_input_rpjpd = '';
@@ -16961,18 +16967,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		$jadwal_periode = $wpdb->get_results(
 			"
-			SELECT 
-				id,
-				nama_jadwal,
-				nama_jadwal_renstra,
-				tahun_anggaran,
-				lama_pelaksanaan,
-				tahun_selesai_anggaran
-			FROM esakip_data_jadwal
-			WHERE tipe = 'RPJMD'
-			  AND status = 1
-				ORDER BY tahun_anggaran DESC",
-			ARRAY_A
+			 SELECT 
+		        j.id,
+		        j.nama_jadwal,
+		        j.nama_jadwal_renstra,
+		        j.tahun_anggaran,
+		        j.lama_pelaksanaan,
+		        j.tahun_selesai_anggaran,
+		        r.id_jadwal_rpjmd
+		    FROM esakip_data_jadwal j
+		    INNER JOIN esakip_pengaturan_upload_dokumen r
+		        ON r.id_jadwal_rpjmd = j.id
+		    WHERE j.tipe = 'RPJMD'
+		      AND j.status = 1
+		    ORDER BY j.tahun_anggaran DESC",
+		    ARRAY_A
 		);
 		// SAKIP PEMDA
 		$halaman_monitor_upload_dokumen = '';
@@ -17592,15 +17601,24 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		//jadwal rpjmd/rpd sakip
 		$data_jadwal = $wpdb->get_results(
 			$wpdb->prepare("
-			SELECT
-				*
-			FROM
-				esakip_data_jadwal
-			WHERE
-				tipe='RPJMD'
-				AND status!=0"),
-			ARRAY_A);
-		
+			 SELECT 
+		        j.id,
+		        j.nama_jadwal,
+		        j.nama_jadwal_renstra,
+		        j.tahun_anggaran,
+		        j.lama_pelaksanaan,
+		        j.tahun_selesai_anggaran,
+		        j.jenis_jadwal_khusus,
+		        r.id_jadwal_rpjmd
+		    FROM esakip_data_jadwal j
+		    INNER JOIN esakip_pengaturan_upload_dokumen r
+		        ON r.id_jadwal_rpjmd = j.id
+		    WHERE j.tipe = 'RPJMD'
+		      AND j.status!=0
+		    ORDER BY j.tahun_anggaran DESC"),
+			ARRAY_A
+		);
+
 		if(empty($data_jadwal)){
 			die("JADWAL KOSONG");
 		}
@@ -17706,7 +17724,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		        j.tahun_selesai_anggaran,
 		        r.id_jadwal_rpjmd
 		    FROM esakip_data_jadwal j
-		    INNER JOIN esakip_pengaturan_rencana_aksi r
+		    INNER JOIN esakip_pengaturan_upload_dokumen r
 		        ON r.id_jadwal_rpjmd = j.id
 		    WHERE j.tipe = 'RPJMD'
 		      AND j.status = 1
@@ -18145,17 +18163,20 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$jadwal_periode_rpjmd_renstra = $wpdb->get_results(
 					"
 					SELECT 
-						id,
-						nama_jadwal,
-						nama_jadwal_renstra,
-						tahun_anggaran,
-						lama_pelaksanaan,
-						tahun_selesai_anggaran
-					FROM esakip_data_jadwal
-					WHERE tipe = 'RPJMD'
-					  AND status = 1
-						ORDER BY tahun_anggaran DESC",
-					ARRAY_A
+				        j.id,
+				        j.nama_jadwal,
+				        j.nama_jadwal_renstra,
+				        j.tahun_anggaran,
+				        j.lama_pelaksanaan,
+				        j.tahun_selesai_anggaran,
+				        r.id_jadwal_rpjmd
+				    FROM esakip_data_jadwal j
+				    INNER JOIN esakip_pengaturan_upload_dokumen r
+				        ON r.id_jadwal_rpjmd = j.id
+				    WHERE j.tipe = 'RPJMD'
+				      AND j.status = 1
+				    ORDER BY j.tahun_anggaran DESC",
+				    ARRAY_A
 				);
 
 				foreach ($jadwal_periode_rpjmd_renstra as $jadwal_periode_item) {
