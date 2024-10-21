@@ -808,6 +808,8 @@ CREATE TABLE `esakip_pedoman_teknis_pengukuran_dan_p_d_k_pemda` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 

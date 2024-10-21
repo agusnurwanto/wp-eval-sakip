@@ -88,7 +88,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
                     </tbody>
                 </table>
             </div>
-                        <div class="wrap-table" id="non_esr_lokal" style="display:none;">
+            <div class="wrap-table" id="non_esr_lokal" style="display:none;">
                 <h3 class="text-center" style="margin:3rem;">Dokumen ESR yang tidak ada di Lokal</h3>
                 <table id="table_non_esr_lokal" cellpadding="2" cellspacing="0" style="font-family:Open Sans,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
