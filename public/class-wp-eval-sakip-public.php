@@ -6831,11 +6831,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						if($status_api_esr && !empty($mapping_jenis_dokumen_esr)){
 							foreach ($array_data_esr as $data_esr) {
 								foreach ($datas as $esr_lokal) {
-									if(!empty($esr_lokal['upload_id']) && $esr_lokal['upload_id']!=$data_esr['upload_id']){
+									if(!empty($esr_lokal['upload_id']) && $data_esr['upload_id']!=$esr_lokal['upload_id']){
 										$non_esr_lokal[]=$data_esr;
-									}else if($esr_lokal['dokumen']!=$esr_lokal['nama_file']){
+									}else if(trim($data_esr['nama_file'])!=trim($esr_lokal['dokumen'])){
 										$non_esr_lokal[]=$data_esr;
-									}else if($esr_lokal['keterangan']!=$esr_lokal['keterangan']){
+									}else if(trim($data_esr['keterangan'])!=trim($esr_lokal['keterangan'])){
 										$non_esr_lokal[]=$data_esr;
 									}
 								}
