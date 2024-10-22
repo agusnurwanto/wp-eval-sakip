@@ -153,11 +153,19 @@ class Wp_Eval_Sakip_Admin
 						$wpdb->prepare(
 							"
 							SELECT 
-								*
-							FROM esakip_data_jadwal
-							WHERE tipe = %s
-							  	AND status = 1
-							ORDER BY tahun_anggaran DESC",
+						        j.id,
+						        j.nama_jadwal,
+						        j.nama_jadwal_renstra,
+						        j.tahun_anggaran,
+						        j.lama_pelaksanaan,
+						        j.tahun_selesai_anggaran,
+						        r.id_jadwal_rpjmd
+						    FROM esakip_data_jadwal j
+						    INNER JOIN esakip_pengaturan_upload_dokumen r
+						        ON r.id_jadwal_rpjmd = j.id
+						    WHERE j.tipe = %s
+						      AND j.status = 1
+						    ORDER BY j.tahun_anggaran DESC",
 							'RPJMD'
 						),
 						ARRAY_A
@@ -265,6 +273,16 @@ class Wp_Eval_Sakip_Admin
 							));
 							$body_pemda .= '
 							<li><a target="_blank" href="' . $pohon_kinerja_cascading['url'] . '">' . $pohon_kinerja_cascading['title'] . '</a></li>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'pohon_kinerja_dan_cascading_pemda') {
+							$pohon_kinerja_cascading = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Dokumen Pemda Pohon Kinerja dan Cascading ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+								'content' => '[dokumen_detail_pohon_kinerja_dan_cascading_pemda periode=' . $jadwal_periode_item['id'] . ']',
+								'show_header' => 1,
+								'no_key' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda .= '
+							<li><a target="_blank" href="' . $pohon_kinerja_cascading['url'] . '">Halaman Dokumen Pohon Kinerja dan Cascading ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . '</a></li>';
 						}
 					}
 					$body_pemda .= '</ol>';
@@ -317,14 +335,19 @@ class Wp_Eval_Sakip_Admin
 						$wpdb->prepare(
 							"
 							SELECT 
-								id,
-								nama_jadwal,
-								tahun_anggaran,
-								lama_pelaksanaan
-							FROM esakip_data_jadwal
-							WHERE tipe = %s
-							  	AND status = 1
-							ORDER BY tahun_anggaran DESC",
+						        j.id,
+						        j.nama_jadwal,
+						        j.nama_jadwal_renstra,
+						        j.tahun_anggaran,
+						        j.lama_pelaksanaan,
+						        j.tahun_selesai_anggaran,
+						        r.id_jadwal_rpjpd
+						    FROM esakip_data_jadwal j
+						    INNER JOIN esakip_pengaturan_upload_dokumen r
+						        ON r.id_jadwal_rpjpd = j.id
+						    WHERE j.tipe = %s
+						      AND j.status = 1
+						    ORDER BY j.tahun_anggaran DESC",
 							'RPJPD'
 						),
 						ARRAY_A
