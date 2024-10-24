@@ -4627,7 +4627,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
 
-				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
@@ -6696,6 +6696,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						"pedoman_teknis_perencanaan" => "esakip_pedoman_teknis_perencanaan_pemda",
 						"pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja" => "esakip_pedoman_teknis_pengukuran_dan_p_d_k_pemda",
 						"pedoman_teknis_evaluasi_internal" => "esakip_pedoman_teknis_evaluasi_internal_pemda",
+						"dokumen_lain_pemda" => "esakip_other_file",
 						"lkjip" => "esakip_lkjip_lppd_pemda",
 						"rkpd" => "esakip_rkpd_pemda"
 					);
@@ -6921,10 +6922,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						"pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja" => "esakip_pedoman_teknis_pengukuran_dan_p_d_k_pemda",
 						"pedoman_teknis_evaluasi_internal" => "esakip_pedoman_teknis_evaluasi_internal_pemda",
 						"lkjip" => "esakip_lkjip_lppd_pemda",
+						"pohon_kinerja_dan_cascading_pemda" => "esakip_pohon_kinerja_dan_cascading_pemda",
+						"dokumen_lain_pemda" => "esakip_other_file",
 						"rkpd" => "esakip_rkpd_pemda"
 					);
 
-					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
 
 					if ($ret['status'] != 'error' && !empty($_FILES['fileUpload'])) {
 						$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
@@ -7065,6 +7068,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						"pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja" => "esakip_pedoman_teknis_pengukuran_dan_p_d_k_pemda",
 						"pedoman_teknis_evaluasi_internal" => "esakip_pedoman_teknis_evaluasi_internal_pemda",
 						"lkjip" => "esakip_lkjip_lppd_pemda",
+						"dokumen_lain_pemda" => "esakip_other_file",
 						"rkpd" => "esakip_rkpd_pemda",
 					);
 
@@ -7115,6 +7119,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					// untuk mengatur tabel sesuai tipe dokumen
 					$nama_tabel = array(
 						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading_pemda",
+						"pohon_kinerja_dan_cascading_pemda" => "esakip_pohon_kinerja_dan_cascading_pemda",
 						"iku" => "esakip_iku_pemda",
 						"dpa" => "esakip_dpa_pemda",
 						"rencana_aksi" => "esakip_rencana_aksi_pemda",
@@ -7129,10 +7134,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						"pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja" => "esakip_pedoman_teknis_pengukuran_dan_p_d_k_pemda",
 						"pedoman_teknis_evaluasi_internal" => "esakip_pedoman_teknis_evaluasi_internal_pemda",
 						"lkjip" => "esakip_lkjip_lppd_pemda",
+						"dokumen_lain_pemda" => "esakip_other_file",
 						"rkpd" => "esakip_rkpd_pemda"
 					);
 
-					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
 					$dokumen_lama = $wpdb->get_var(
 						$wpdb->prepare("
 							SELECT
@@ -7804,7 +7810,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				if (!empty($_POST['id'])) {
-					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
 					$dokumen_lama = $wpdb->get_var(
 						$wpdb->prepare("
 							SELECT
@@ -7970,7 +7976,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					// untuk mengatur tabel sesuai tipe dokumen
 					$nama_tabel = array(
 						"pohon_kinerja_dan_cascading" => "esakip_pohon_kinerja_dan_cascading",
-						"pohon_kinerja_dan_cascading_pemda" => "esakip_pohon_kinerja_dan_cascading_pemda",
 						"lhe_akip_internal" => "esakip_lhe_akip_internal",
 						"tl_lhe_akip_internal" => "esakip_tl_lhe_akip_internal",
 						"tl_lhe_akip_kemenpan" => "esakip_tl_lhe_akip_kemenpan"
@@ -8030,7 +8035,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				if (!empty($_POST['id'])) {
-					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
 					$dokumen_lama = $wpdb->get_var(
 						$wpdb->prepare("
 							SELECT
@@ -20725,7 +20730,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
 
-				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
@@ -24040,6 +24045,190 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 
 				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
+					$upload = $this->functions->uploadFile(
+						$_POST['api_key'],
+						$upload_dir,
+						$_FILES['fileUpload'],
+						array('pdf'),
+						1048576 * $maksimal_upload,
+						$_POST['namaDokumen']
+					);
+					if ($upload['status'] == false) {
+						$ret = array(
+							'status' => 'error',
+							'message' => $upload['message']
+						);
+					}
+				} else if ($ret['status'] != 'error' && !empty($_POST['namaDokumen'])) {
+					$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+						SELECT
+							dokumen
+						FROM esakip_pohon_kinerja_dan_cascading$_prefix_tipe
+						WHERE id=%d
+					", $id_dokumen));
+					if ($dokumen_lama != $_POST['namaDokumen']) {
+						$ret_rename = $this->functions->renameFile($upload_dir . $dokumen_lama, $upload_dir . $_POST['namaDokumen']);
+						if ($ret_rename['status'] != 'error') {
+							$wpdb->update(
+								'esakip_pohon_kinerja_dan_cascading' . $_prefix_tipe,
+								array('dokumen' => $_POST['namaDokumen']),
+								array('id' => $id_dokumen),
+							);
+						} else {
+							$ret = $ret_rename;
+						}
+					}
+				}
+
+				if ($ret['status'] == 'success') {
+					if (empty($id_dokumen)) {
+						if ($_prefix_tipe == "") {
+							$wpdb->insert(
+								'esakip_pohon_kinerja_dan_cascading',
+								array(
+									'opd' => $skpd,
+									'id_skpd' => $idSkpd,
+									'dokumen' => $upload['filename'],
+									'keterangan' => $keterangan,
+									'id_jadwal' => $id_jadwal,
+									'created_at' => current_time('mysql'),
+									'tanggal_upload' => current_time('mysql')
+								),
+								array('%s', '%d', '%s', '%s', '%d', '%s', '%s')
+							);
+						} else {
+							$wpdb->insert(
+								'esakip_pohon_kinerja_dan_cascading_pemda',
+								array(
+									'dokumen' => $upload['filename'],
+									'keterangan' => $keterangan,
+									'id_jadwal' => $id_jadwal,
+									'created_at' => current_time('mysql'),
+									'tanggal_upload' => current_time('mysql')
+								),
+								array('%s', '%s', '%d', '%s', '%s')
+							);
+						}
+					} else {
+						$opsi = array(
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_pohon_kinerja_dan_cascading$_prefix_tipe
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
+						$wpdb->update(
+							'esakip_pohon_kinerja_dan_cascading' . $_prefix_tipe,
+							$opsi,
+							array('id' => $id_dokumen),
+							array('%s', '%s'),
+							array('%d')
+						);
+
+						if ($wpdb->rows_affected == 0) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal memperbarui data ke database!'
+							);
+						}
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function tambah_dokumen_pohon_kinerja_pemda()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$id_dokumen = null;
+
+				if (!empty($_POST['id_dokumen'])) {
+					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
+				}
+				$where_skpd = "";
+				$idSkpd = "";
+				if ($_POST['tipe_dokumen'] == 'pohon_kinerja_dan_cascading') {
+					if (!empty($_POST['idSkpd'])) {
+						$idSkpd = $_POST['idSkpd'];
+						$where_skpd = " AND id_skpd=" . $idSkpd;
+					} else {
+						$ret['status'] = 'error';
+						$ret['message'] = 'Id Perangkat Daerah kosong!';
+					}
+				}
+				$skpd = "";
+				if ($_POST['tipe_dokumen'] == 'pohon_kinerja_dan_cascading') {
+					if (!empty($_POST['skpd'])) {
+						$skpd = $_POST['skpd'];
+					} else {
+						$ret['status'] = 'error';
+						$ret['message'] = 'Perangkat Daerah kosong!';
+					}
+				}
+				if (!empty($_POST['keterangan'])) {
+					$keterangan = $_POST['keterangan'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Keterangan kosong!';
+				}
+				if (!empty($_POST['id_periode'])) {
+					$id_jadwal = $_POST['id_periode'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
+				}
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if (empty($_POST['namaDokumen']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if (empty(get_option('_crb_maksimal_upload_dokumen_esakip'))) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
+				}
+				if (!empty($_POST['tipe_dokumen'])) {
+					$tipe_dokumen = $_POST['tipe_dokumen'];
+					$_prefix_tipe = $tipe_dokumen == "pohon_kinerja_dan_cascading" ? "" : "_pemda";
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tipe dokumen kosong!';
+				}
+
+				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(

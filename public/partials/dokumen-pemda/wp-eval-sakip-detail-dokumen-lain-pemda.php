@@ -32,6 +32,8 @@ foreach ($idtahun as $val) {
 $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
 $is_admin_panrb = in_array('admin_panrb', $user_roles);
+
+$tipe_dokumen = "dokumen_lain_pemda";
 ?>
 <style type="text/css">
     .wrap-table {
@@ -169,6 +171,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             data: {
                 action: 'get_table_dokumen_pemerintah_daerah',
                 api_key: esakip.api_key,
+                tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
                 tahun_anggaran: '<?php echo $input['tahun'] ?>',
             },
             dataType: 'json',
@@ -285,6 +288,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 action: 'get_detail_dokumen_by_id_pemerintah_daerah',
                 api_key: esakip.api_key,
                 id: id,
+                tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
             },
             dataType: 'json',
             success: function(response) {
@@ -292,7 +296,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 console.log(response);
                 if (response.status === 'success') {
                     let data = response.data;
-                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + data.dokumen;
+                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/'; ?>' + data.dokumen;
                     jQuery("#idDokumen").val(data.id);
                     jQuery("#fileUpload").val('');
                     jQuery("#nama_file").val(data.dokumen);
@@ -373,7 +377,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     }
 
     function lihatDokumen(dokumen) {
-        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + dokumen;
+        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/'; ?>' + dokumen;
         window.open(url, '_blank');
     }
 

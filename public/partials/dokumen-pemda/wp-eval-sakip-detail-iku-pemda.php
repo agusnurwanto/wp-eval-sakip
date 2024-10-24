@@ -343,7 +343,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
                 console.log(response);
                 if (response.status === 'success') {
                     let data = response.data;
-                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + data.dokumen;
+                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/'; ?>' + data.dokumen;
                     jQuery("#idDokumen").val(data.id);
                     jQuery("#fileUpload").val('');
                     jQuery("#nama_file").val(data.dokumen);
@@ -424,7 +424,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
     }
 
     function lihatDokumen(dokumen) {
-        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + dokumen;
+        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/'; ?>' + dokumen;
         window.open(url, '_blank');
     }
 

@@ -199,7 +199,6 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             data: {
                 action: 'get_table_pohon_kinerja',
                 api_key: esakip.api_key,
-                tahun_anggaran: '<?php echo $input['tahun'] ?>',
                 tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
                 id_periode: <?php echo $input['periode']; ?>,
             },
@@ -325,7 +324,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 console.log(response);
                 if (response.status === 'success') {
                     let data = response.data;
-                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + data.dokumen;
+                    let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/'; ?>' + data.dokumen;
                     jQuery("#idDokumen").val(data.id);
                     jQuery("#fileUpload").val('');
                     jQuery("#nama_file").val(data.dokumen);
@@ -365,7 +364,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
         let tipe_dokumen = '<?php echo $tipe_dokumen; ?>';
 
         let form_data = new FormData();
-        form_data.append('action', 'tambah_dokumen_pohon_kinerja');
+        form_data.append('action', 'tambah_dokumen_pohon_kinerja_pemda');
         form_data.append('api_key', esakip.api_key);
         form_data.append('id_dokumen', id_dokumen);
         form_data.append('keterangan', keterangan);
@@ -403,7 +402,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
     }
 
     function lihatDokumen(dokumen) {
-        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + dokumen;
+        let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/'; ?>' + dokumen;
         window.open(url, '_blank');
     }
 
@@ -417,7 +416,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'hapus_dokumen',
+                action: 'hapus_dokumen_pemerintah_daerah',
                 api_key: esakip.api_key,
                 id: id,
                 tipe_dokumen: '<?php echo $tipe_dokumen; ?>',

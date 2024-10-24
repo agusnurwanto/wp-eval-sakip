@@ -314,6 +314,7 @@ class Wp_Eval_Sakip {
 
 		$this->loader->add_action('wp_ajax_get_detail_pohon_kinerja_by_id', $plugin_public, 'get_detail_pohon_kinerja_by_id');
 		$this->loader->add_action('wp_ajax_tambah_dokumen_pohon_kinerja', $plugin_public, 'tambah_dokumen_pohon_kinerja');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_pohon_kinerja_pemda', $plugin_public, 'tambah_dokumen_pohon_kinerja_pemda');
 		$this->loader->add_action('wp_ajax_hapus_dokumen_pohon_kinerja', $plugin_public, 'hapus_dokumen_pohon_kinerja');
 		$this->loader->add_action('wp_ajax_submit_tahun_pohon_kinerja', $plugin_public, 'submit_tahun_pohon_kinerja');
 		$this->loader->add_action('wp_ajax_get_table_pohon_kinerja', $plugin_public, 'get_table_pohon_kinerja');
