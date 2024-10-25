@@ -6833,18 +6833,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							foreach ($array_data_esr as $data_esr) {
 								foreach ($datas as $esr_lokal) {
 									if(!empty($esr_lokal['upload_id']) && $data_esr['upload_id']!=$esr_lokal['upload_id']){
-										$non_esr_lokal[]=$data_esr;
-										continue;
+										if(empty($non_esr_lokal[$data_esr['nama_file']])){
+											$non_esr_lokal[$data_esr['nama_file']]=$data_esr;
+										}
 									}else if(trim($data_esr['nama_file'])!=trim($esr_lokal['dokumen'])){
-										$non_esr_lokal[]=$data_esr;
-										continue;
+										if(empty($non_esr_lokal[$data_esr['nama_file']])){
+											$non_esr_lokal[$data_esr['nama_file']]=$data_esr;
+										}
 									}else if(trim($data_esr['keterangan'])!=trim($esr_lokal['keterangan'])){
-										$non_esr_lokal[]=$data_esr;
-										continue;
+										if(empty($non_esr_lokal[$data_esr['nama_file']])){
+											$non_esr_lokal[$data_esr['nama_file']]=$data_esr;
+										}
 									}
 								}
 							}
-							$ret['non_esr_lokal']=$non_esr_lokal;
+							$ret['non_esr_lokal']=array_values($non_esr_lokal);
 						}
 
 						$ret['data'] = $tbody;
@@ -20411,7 +20414,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$tbody = '';
 					$status_api_esr=get_option('_crb_api_esr_status');
 					if($status_api_esr){
-						$nama_tabel=$_POST['esakip_rpjpd'];
 						$pengaturan_periode_dokumen=$wpdb->get_row($wpdb->prepare("
 							SELECT 
 								* 
@@ -20451,7 +20453,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
 										$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM esakip_rpjpd WHERE upload_id=%d AND active=%d", $esr->upload_id, 1), ARRAY_A);
 										if(!empty($esr_lokal)){
-											$wpdb->update($nama_tabel, [
+											$wpdb->update('esakip_rpjpd', [
 												'path_esr' => $esr->path
 											], [
 												'id' => $esr_lokal['id']
@@ -20481,7 +20483,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								if(!empty($vv['upload_id'])){
 									if(in_array($vv['upload_id'], array_column($array_data_esr, 'upload_id'))){
 										$status_integrasi_esr=true;
-										$tbody .= "<td class='text-center'><a href='#'>Integrasi<a></td>";
+										$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
 									}else{
 										$tbody .= "<td class='text-center'><input type='checkbox' name='checklist_esr' value='".$vv['id']."'><a href='#'>Integrasi<a></td>";
 									}
@@ -20490,7 +20492,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
 								}else if(in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))){
 									$status_integrasi_esr=true;
-									$tbody .= "<td class='text-center'><a href='#'>Integrasi<a></td>";
+									$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
 								}else{
 									$tbody .= "<td class='text-center'><input type='checkbox' name='checklist_esr' value='".$vv['id']."'></td>";
 								}
@@ -20518,18 +20520,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						foreach ($array_data_esr as $data_esr) {
 							foreach ($datas as $esr_lokal) {
 								if(!empty($esr_lokal['upload_id']) && $data_esr['upload_id']!=$esr_lokal['upload_id']){
-									$non_esr_lokal[]=$data_esr;
-									continue;
+									if(empty($non_esr_lokal[$data_esr['nama_file']])){
+										$non_esr_lokal[$data_esr['nama_file']]=$data_esr;
+									}
 								}else if(trim($data_esr['nama_file'])!=trim($esr_lokal['dokumen'])){
-									$non_esr_lokal[]=$data_esr;
-									continue;
+									if(empty($non_esr_lokal[$data_esr['nama_file']])){
+										$non_esr_lokal[$data_esr['nama_file']]=$data_esr;
+									}
 								}else if(trim($data_esr['keterangan'])!=trim($esr_lokal['keterangan'])){
-									$non_esr_lokal[]=$data_esr;
-									continue;
+									if(empty($non_esr_lokal[$data_esr['nama_file']])){
+										$non_esr_lokal[$data_esr['nama_file']]=$data_esr;
+									}
 								}
 							}
 						}
-						$ret['non_esr_lokal']=$non_esr_lokal;
+						$ret['non_esr_lokal']=array_values($non_esr_lokal);
 					}
 					$ret['data'] = $tbody;
 				} else {
