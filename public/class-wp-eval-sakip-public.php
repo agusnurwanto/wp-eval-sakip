@@ -6795,16 +6795,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									if(!empty($vv['upload_id'])){
 										if(in_array($vv['upload_id'], array_column($array_data_esr, 'upload_id'))){
 											$status_integrasi_esr=true;
-											$tbody .= "<td class='text-center'><a href='#'>Integrasi<a></td>";
+											$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
 										}else{
-											$tbody .= "<td class='text-center'><input type='checkbox' name='checklist_esr' value='".$vv['id']."'><a href='#'>Integrasi<a></td>";
+											$tbody .= "<td class='text-center'><input type='checkbox' name='checklist_esr' value='".$vv['id']."'></td>";
 										}
 									}else if(in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))){
 										$status_integrasi_esr=true;
 										$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
 									}else if(in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))){
 										$status_integrasi_esr=true;
-										$tbody .= "<td class='text-center'><a href='#'>Integrasi<a></td>";
+										$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
 									}else{
 										$tbody .= "<td class='text-center'><input type='checkbox' name='checklist_esr' value='".$vv['id']."'></td>";
 									}
