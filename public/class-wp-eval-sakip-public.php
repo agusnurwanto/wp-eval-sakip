@@ -24690,6 +24690,36 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						throw new Exception("Tahun anggaran kosong!", 1);
 					}
 
+					//tentukan path
+					$dokumen_menu = $wpdb->get_row($wpdb->prepare("
+                        SELECT 
+                            *
+                        FROM esakip_menu_dokumen 
+                        WHERE 
+                        	tahun_anggaran=%d AND
+                            nama_tabel=%s AND
+                            active=%d
+                        LIMIT 1
+                    ", $tahun_anggaran, $nama_tabel, 1), ARRAY_A);
+
+                    if(empty($dokumen_menu)){
+                    	throw new Exception("Nama tabel dokumen di setting menu dokumen tidak ditemukan!", 1);
+                    }
+
+                    switch ($dokumen_menu['user_role']) {
+                    	case 'pemerintah_daerah':
+							$path_dokumen = 'public/media/dokumen/dokumen_pemda/';
+                    		break;
+
+                    	case 'perangkat_daerah':
+							$path_dokumen = 'public/media/dokumen/';
+							break;
+                    	
+                    	default:
+                    		throw new Exception("User role jenis dokumen menu tidak diketahui!", 1);
+                    		break;
+                    }
+                    
 					$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 								SELECT 
 										a.*
@@ -24713,14 +24743,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$current_user = wp_get_current_user();
 					if(in_array($current_user->roles[0], $this->admin_user())){
 						$user_id = get_option('_user_esr_'.str_replace(" ", "_", get_option('_crb_nama_pemda')));
-						$path_dokumen = 'public/media/dokumen/dokumen_pemda/';
 					}else{
 						if(in_array($current_user->roles[0], 'admin_panrb')){
 							throw new Exception("Tidak diizinkan!", 1);
 						}
 						$data_unit = $wpdb->get_row($wpdb->prepare("SELECT id_unit FROM esakip_data_unit WHERE nipkepala=%s AND active=%d AND tahun_anggaran=%d", $current_user->user_login, 1, $tahun_anggaran), ARRAY_A);
 						$user_id = get_option('_user_esr_'.$data_unit['id_unit']);
-						$path_dokumen = 'public/media/dokumen/';
 					}
 
 					// ambil file
