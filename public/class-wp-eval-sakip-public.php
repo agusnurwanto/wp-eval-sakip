@@ -24710,7 +24710,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					}
 
 					// ambil user_id
-					$user_id = get_option('_user_esr_'.str_replace(" ", "_", get_option('_crb_nama_pemda')));
+					$current_user = wp_get_current_user();
+					if(in_array($current_user->roles[0], $this->admin_user())){
+						$user_esr_id = get_option('_user_esr_'.str_replace(" ", "_", get_option('_crb_nama_pemda')));
+					}else{
+						$data_unit = $wpdb->get_row($wpdb->prepare("SELECT id_unit FROM esakip_data_unit WHERE nipkepala=%s AND active=%d AND tahun_anggaran=%d", $current_user->user_login, 1, $tahun_anggaran), ARRAY_A);
+						$user_esr_id = get_option('_user_esr_'.$data_unit['id_unit']);
+					}
 
 					// ambil file
 					$lists = $_POST['list'];
