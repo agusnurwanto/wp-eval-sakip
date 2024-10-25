@@ -74,9 +74,11 @@ $status_api_esr = get_option('_crb_api_esr_status');
                         <tr>
                             <th class="text-center">No</th>
                             <?php
-                            if($status_api_esr){
-                                echo '<th class="text-center" id="check-list-esr" style="display:none">Checklist ESR</th>';
-                            }
+                            if (!$is_admin_panrb):
+                                if($status_api_esr){
+                                    echo '<th class="text-center" id="check-list-esr" style="display:none">Checklist ESR</th>';
+                                }
+                            endif;
                             ?>
                             <th class="text-center">Nama Dokumen</th>
                             <th class="text-center">Keterangan</th>

@@ -20485,7 +20485,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										$status_integrasi_esr=true;
 										$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
 									}else{
-										$tbody .= "<td class='text-center'><input type='checkbox' name='checklist_esr' value='".$vv['id']."'><a href='#'>Integrasi<a></td>";
+										$tbody .= "<td class='text-center'><input type='checkbox' name='checklist_esr' value='".$vv['id']."'></td>";
 									}
 								}else if(in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))){
 									$status_integrasi_esr=true;
@@ -24712,10 +24712,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					// ambil user_id
 					$current_user = wp_get_current_user();
 					if(in_array($current_user->roles[0], $this->admin_user())){
-						$user_esr_id = get_option('_user_esr_'.str_replace(" ", "_", get_option('_crb_nama_pemda')));
+						$user_id = get_option('_user_esr_'.str_replace(" ", "_", get_option('_crb_nama_pemda')));
+						$path_dokumen = 'public/media/dokumen/dokumen_pemda/';
 					}else{
+						if(in_array($current_user->roles[0], 'admin_panrb')){
+							throw new Exception("Tidak diizinkan!", 1);
+						}
 						$data_unit = $wpdb->get_row($wpdb->prepare("SELECT id_unit FROM esakip_data_unit WHERE nipkepala=%s AND active=%d AND tahun_anggaran=%d", $current_user->user_login, 1, $tahun_anggaran), ARRAY_A);
-						$user_esr_id = get_option('_user_esr_'.$data_unit['id_unit']);
+						$user_id = get_option('_user_esr_'.$data_unit['id_unit']);
+						$path_dokumen = 'public/media/dokumen/';
 					}
 
 					// ambil file
@@ -24772,7 +24777,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'dokumen_id' => intval($mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']),
 								'user_id' => intval($user_id),
 								'nama_file' => $data['dokumen'],
-								'path' => ESAKIP_PLUGIN_URL . 'public/media/dokumen/'.$data['dokumen'],
+								'path' => ESAKIP_PLUGIN_URL . $path_dokumen.$data['dokumen'],
 								'keterangan' => $data['keterangan']
 							]),
 						]);
