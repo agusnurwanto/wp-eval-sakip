@@ -537,6 +537,10 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_indikator_rencana_aksi', $plugin_public, 'get_indikator_rencana_aksi');
 		$this->loader->add_action('wp_ajax_get_rencana_aksi', $plugin_public, 'get_rencana_aksi');
 		$this->loader->add_action('wp_ajax_hapus_rencana_aksi', $plugin_public, 'hapus_rencana_aksi');
+		$this->loader->add_action('wp_ajax_get_data_rekening_akun_wp_sipd', $plugin_public, 'get_data_rekening_akun_wp_sipd');
+		$this->loader->add_action('wp_ajax_get_data_rincian_belanja', $plugin_public, 'get_data_rincian_belanja');
+
+		$this->loader->add_action('wp_ajax_crate_tagging_rincian_belanja', $plugin_public, 'crate_tagging_rincian_belanja');
 		
 		$this->loader->add_action('wp_ajax_get_table_input_rencana_aksi_pemda', $plugin_public, 'get_table_input_rencana_aksi_pemda');
 

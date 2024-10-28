@@ -1169,6 +1169,7 @@ CREATE TABLE `esakip_data_rencana_aksi_opd` (
   `label_cascading_kegiatan` text DEFAULT null,
   `kode_cascading_sub_kegiatan` text DEFAULT null,
   `label_cascading_sub_kegiatan` text DEFAULT null,
+  `kode_sbl` varchar(50) DEFAULT NULL,
   PRIMARY key (id)
 );
 
@@ -1286,4 +1287,30 @@ CREATE TABLE `esakip_data_mapping_jenis_dokumen_esr` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id)
+);
+
+CREATE TABLE `esakip_data_tagging_rincian_belanja` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_uraian_teknis_kegiatan` int(11) DEFAULT NULL,
+  `id_indikator_teknis_kegiatan` int(11) DEFAULT NULL,
+  `kode_sbl` varchar(50) NOT NULL,
+  `kode_rekening` varchar(50) DEFAULT NULL,
+  `nama_rekening` text DEFAULT NULL,
+  `id_rinci_sub_bl` int(11) DEFAULT NULL,
+  `nama_komponen` text DEFAULT NULL,  
+  `spek_komponen` text DEFAULT NULL,
+  `koefisien` text DEFAULT NULL,
+  `koefisien_murni` text DEFAULT NULL,
+  `rincian` double(20,2) DEFAULT NULL,
+  `rincian_murni` double(20,2) DEFAULT NULL,
+  `nama_komponen_tagging_rincian` text DEFAULT NULL,  
+  `koefisien_tagging_rincian` text DEFAULT NULL,
+  `rincian_tagging_rincian` double(20,2) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `active` tinyint(4) DEFAULT 1,
+  `jenis_tagging` varchar(255) NOT NULL,
+  `tahun_anggaran` year(4) NOT NULL DEFAULT '2024',
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (id)
 );
