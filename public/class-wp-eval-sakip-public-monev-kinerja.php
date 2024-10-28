@@ -287,6 +287,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$data['label_pokin_5'] = $_POST['label_pokin_1'];
 						$data['kode_cascading_sub_kegiatan'] = $kode_cascading_renstra;
 						$data['label_cascading_sub_kegiatan'] = $label_cascading_renstra;
+						$data['kode_sbl'] = $_POST['kode_sbl'];
 					}
 					if(!empty($_POST['id'])){
 						$cek_id = $_POST['id'];
@@ -1947,6 +1948,239 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			);
 		}
 		die(json_encode($ret));
+	}
+
+	public function get_data_rekening_akun_wp_sipd(){
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+					// if()
+					if(!empty($_POST['id_skpd'])){
+						$id_skpd = $_POST['id_skpd'];
+					}else{
+						throw new Exception("Id Skpd Kosong!", 1);
+					}
+					if(!empty($_POST['tahun_anggaran'])){
+						$tahun_anggaran = $_POST['tahun_anggaran'];
+					}else{
+						throw new Exception("Tahun Anggaran Kosong!", 1);
+					}
+					if(!empty($_POST['kode_sbl'])){
+						$kode_sbl = $_POST['kode_sbl'];
+					}else{
+						throw new Exception("Kode Sub Kegiatan Kosong!", 1);
+					}
+
+					$api_params = array(
+						'action' 			=> 'get_rka_sub_keg_akun',
+						'api_key'			=> get_option('_crb_apikey_wpsipd'),
+						'tahun_anggaran' 	=> $tahun_anggaran,
+						'kode_sbl' 			=> $kode_sbl,
+						'jenis_data'		=> 'sakip'
+					);
+
+					$response = wp_remote_post(get_option('_crb_url_server_sakip'), array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
+
+					$response = wp_remote_retrieve_body($response);
+					
+					if(is_wp_error( $response ) ){
+						echo json_encode([
+							'status' => 'gagal',
+							'data' => $response,
+							'cek' => $api_params
+						]);
+	
+						exit();	
+					}
+					
+					$response = json_decode($response);
+
+					$data = $response;
+					
+					echo json_encode([
+						'status' => 'success',
+						'data' => $data
+					]);
+
+					exit();
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
+	}
+
+	public function get_data_rincian_belanja(){
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+					// if()
+					if(!empty($_POST['kode_sbl'])){
+						$kode_sbl = $_POST['kode_sbl'];
+					}else{
+						throw new Exception("Kode Sbl Kosong!", 1);
+					}
+					if(!empty($_POST['tahun_anggaran'])){
+						$tahun_anggaran = $_POST['tahun_anggaran'];
+					}else{
+						throw new Exception("Tahun Anggaran Kosong!", 1);
+					}
+					if(!empty($_POST['kode_akun'])){
+						$kode_akun = $_POST['kode_akun'];
+					}else{
+						throw new Exception("Kode Akun Kosong!", 1);
+					}
+
+					$api_params = array(
+						'action' 			=> 'get_data_rincian_belanja_rka',
+						'api_key'			=> get_option('_crb_apikey_wpsipd'),
+						'tahun_anggaran' 	=> $tahun_anggaran,
+						'kode_sbl' 			=> $kode_sbl,
+						'kode_akun'			=> $kode_akun
+					);
+
+					$response = wp_remote_post(get_option('_crb_url_server_sakip'), array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
+
+					$response = wp_remote_retrieve_body($response);
+					
+					if(is_wp_error( $response ) ){
+						echo json_encode([
+							'status' => 'gagal',
+							'data' => $response,
+							'cek' => $api_params
+						]);
+	
+						exit();	
+					}
+					
+					$response = json_decode($response);
+
+					$data = $response->data;
+					
+					echo json_encode([
+						'status' => 'success',
+						'data' => $data
+					]);
+
+					exit();
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
+	}
+
+	public function crate_tagging_rincian_belanja(){
+		global $wpdb;
+
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+					if(!empty($_POST['id_indikator_teknis_kegiatan'])){
+						$id_indikator_teknis_kegiatan = $_POST['id_indikator_teknis_kegiatan'];
+					}else{
+						throw new Exception("Indikator Teknis Kegiatan Tidak Boleh Kosong!", 1);
+					}
+					if(!empty($_POST['id_uraian_teknis_kegiatan'])){
+						$id_uraian_teknis_kegiatan = $_POST['id_uraian_teknis_kegiatan'];
+					}else{
+						throw new Exception("Indikator Teknis Kegiatan Tidak Boleh Kosong!", 1);
+					}
+					if(!empty($_POST['kode_sbl'])){
+						$kode_sbl = $_POST['kode_sbl'];
+					}else{
+						throw new Exception("Kode Sbl Tidak Boleh kosong!", 1);
+					}
+					if(!empty($_POST['tahun_anggaran'])){
+						$tahun_anggaran = $_POST['tahun_anggaran'];
+					}else{
+						throw new Exception("Tahun Anggaran Tidak Boleh Kosong!", 1);
+					}
+					if(!empty($_POST['id_skpd'])){
+						$id_skpd = $_POST['id_skpd'];
+					}else{
+						throw new Exception("ID OPD Tidak Boleh Kosong!", 1);
+					}
+
+					$data = json_decode(stripslashes($_POST['data']), true);
+
+					$cek = [];
+					foreach ($data as $key => $data_tagging) {
+						$data = array(
+							'id_uraian_teknis_kegiatan'=> $id_uraian_teknis_kegiatan,
+							'id_indikator_teknis_kegiatan'=> $id_indikator_teknis_kegiatan,
+							'kode_sbl'=> $kode_sbl,
+							'nama_komponen_tagging_rincian'=> $data_tagging['uraian_tagging'],  
+							'koefisien_tagging_rincian'=> $data_tagging['volume_satuan_tagging'],
+							'rincian_tagging_rincian'=> $data_tagging['nilai_tagging'],
+							'active'=> 1,
+							'jenis_tagging'=> $data_tagging['jenis_tagging'],
+							'tahun_anggaran'=> $tahun_anggaran,
+							'id_skpd' => $id_skpd,
+							'created_at'=> current_time('mysql'),
+							'update_at'=> current_time('mysql') 
+						);
+						// if(!empty($_POST['id'])){
+						// 	$cek_id = $_POST['id'];
+						// }else{
+						// 	$cek_id = $wpdb->get_var($wpdb->prepare("
+						// 		SELECT
+						// 			id
+						// 		FROM esakip_data_rencana_aksi_opd
+						// 		WHERE label=%s
+						// 			AND active=0
+						// 			AND tahun_anggaran=%d
+						// 			AND id_skpd=%d
+						// 			AND id_pokin_2=%d
+						// 	", $_POST['kegiatan_utama'], $_POST['tahun_anggaran'], $_POST['id_skpd'], $_POST['id_pokin_2']));
+						// }
+						// if(empty($cek_id)){
+							$insert = $wpdb->insert('esakip_data_tagging_rincian_belanja', $data);
+							array_push($cek, $insert);
+						// }else{
+						// 	$wpdb->update('esakip_data_rencana_aksi_opd', $data, array('id' => $cek_id));
+						// }
+					}
+					
+					echo json_encode([
+						'status' => 'success',
+						'data' => $data,
+						'cek' => $cek,
+						'message' => "Berhasil Menambahkan Tagging Rincian Belanja"
+					]);
+
+					exit();
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
 	}
 
 	public function get_data_renaksi_pemda()

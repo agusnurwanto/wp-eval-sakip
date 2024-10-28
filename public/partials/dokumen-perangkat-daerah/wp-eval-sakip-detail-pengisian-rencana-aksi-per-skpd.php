@@ -1310,6 +1310,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                 var tombol_detail = '';
                                 var id_parent_cascading = 0;
                                 var label_cascading = '';
+                                var data_tagging_rincian = '';
                                 if(tipe == 1){
                                     label_pokin = value['label_pokin_2'];
                                     id_pokin = value['id_pokin_2'];
@@ -1339,6 +1340,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                     label_pokin = value['label_pokin_5'];
                                     id_pokin = value['id_pokin_5'];
                                     label_cascading = value['label_cascading_sub_kegiatan'] != null ? value['kode_cascading_sub_kegiatan']+' '+value['label_cascading_sub_kegiatan'] : '-';
+                                    data_tagging_rincian = '<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" title="Lihat Data Tagging Rincian Belanja"><i class="dashicons dashicons dashicons-arrow-down-alt2"></i></a> ';
                                 }
                                 renaksi += ``
                                     +`<tr id="kegiatan_utama_${value.id}">`
@@ -1358,7 +1360,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                 if(indikator.length > 0){
                                     renaksi += ``
                                     +'<td colspan="5" style="padding: 0;">'
-                                        +`<table class="table" style="margin: .5rem 0 2rem;">`
+                                        +`<table class="table" style="margin: 0 0 2rem;">`
                                             +`<thead>`
                                                 +`<tr class="table-secondary">`
                                                     +`<th class="text-center" style="width:20px">No</th>`
@@ -1371,7 +1373,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                                     +`<th class="text-center" style="width:50px;">Target TW 3</th>`
                                                     +`<th class="text-center" style="width:50px;">Target TW 4</th>`
                                                     +`${header_pagu}`
-                                                    +`<th class="text-center" style="width:110px">Aksi</th>`
+                                                    +`<th class="text-center" style="width:200px">Aksi</th>`
                                                 +`</tr>`
                                             +`</thead>`
                                             +`<tbody>`;
@@ -1379,10 +1381,12 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                         let rencana_pagu = b.rencana_pagu != null ? b.rencana_pagu : 0;
                                         let realisasi_pagu = b.realisasi_pagu != null ? b.realisasi_pagu : 0;
                                         let val_pagu = '';
+                                        let html_akun = '';
                                         if(tipe == 4){
                                             val_pagu = ''    
                                                 +`<td class="text-center">${rencana_pagu}</td>`;
                                                 // +`<td class="text-center">${realisasi_pagu}</td>`;
+                                            html_akun = `<a href="javascript:void(0)" class="btn btn-sm btn-info" onclick="tambah_rincian_belanja_rencana_aksi(${b.id},${value.id},'${value.kode_sbl}')" title="Tambah Rincian Belanja"><i class="dashicons dashicons-plus"></i></a> `;
                                         }
                                         renaksi += ``
                                             +`<tr>`
@@ -1397,6 +1401,8 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                                 +`<td class="text-center">${b.target_4}</td>`
                                                 +`${val_pagu}`
                                                 +`<td class="text-center">`
+                                                    +`${html_akun}`
+                                                    +data_tagging_rincian
                                                     +`<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_indikator(${b.id}, `+tipe+`)" title="Edit"><i class="dashicons dashicons-edit"></i></a> `
                                                     +`<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-danger" onclick="hapus_indikator(${b.id}, `+tipe+`);" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
                                                 +`</td>`
@@ -1534,7 +1540,7 @@ function tambah_renaksi_2(tipe){
                                         break;
 
                                     case 4:
-                                        html_cascading += '<option value="'+value.kode_sub_giat+'">'+value.kode_sub_giat+' '+value.nama_sub_giat+'</option>';
+                                        html_cascading += '<option data-kodesbl="'+value.kode_sbl+'" value="'+value.kode_sub_giat+'">'+value.kode_sub_giat+' '+value.nama_sub_giat+'</option>';
                                         break;
                                 
                                     default:
@@ -1588,6 +1594,10 @@ function simpan_data_renaksi(tipe){
     var label_renaksi = jQuery('#label_renaksi').val();
     var kode_cascading_renstra = jQuery('#cascading-renstra').val();
     var label_cascading_renstra = jQuery('#cascading-renstra option:selected').text();
+    var kode_sbl = '';
+    if(tipe == 4){
+        kode_sbl = jQuery('#cascading-renstra option:selected').data('kodesbl');;
+    }
     if(label_renaksi == ''){
         return alert('Kegiatan Utama tidak boleh kosong!')
     }
@@ -1614,7 +1624,8 @@ function simpan_data_renaksi(tipe){
             "id_jadwal": id_jadwal,
             "id_skpd": <?php echo $id_skpd; ?>,
             'kode_cascading_renstra': kode_cascading_renstra,
-            'label_cascading_renstra': label_cascading_renstra
+            'label_cascading_renstra': label_cascading_renstra,
+            'kode_sbl': kode_sbl
         },
         dataType: "json",
         success: function(res){
@@ -1626,5 +1637,405 @@ function simpan_data_renaksi(tipe){
             }
         }
     });
+}
+
+function tambah_rincian_belanja_rencana_aksi(id_indikator, id_uraian_teknis_kegiatan, kode_sbl){
+    if(kode_sbl == '' || kode_sbl== null){
+        alert("Harap perbarui data Uraian Teknis Kegiatan\nCukup \"Edit\" lalu \"Simpan\" jika tidak ada perubahan.")
+        return;
+    }
+    get_data_rekening_akun_wp_sipd(kode_sbl)
+    .then(function(){
+        jQuery("#modal-crud").find('.modal-title').html('Tambah Tagging Rincian Belanja');
+        jQuery("#modal-crud").find('.modal-body').html(''
+            +'<form id="form-tagging-renaksi">'
+                +'<div class="form-group row">'
+                    +'<label class="d-block col-sm-3">Jenis Tagging</label>'
+                    +'<div class="col-sm-9">'
+                        +'<label for="rka_dpa"><input onclick="set_jenis_tagging(this.value)" type="radio" class="ml-2 jenis_tagging" id="rka_dpa" name="jenis_tagging" value="rka_dpa" checked> Rincian Belanja RKA/DPA</label>'
+                        +'<label style="margin-left: 30px;" for="manual"><input onclick="set_jenis_tagging(this.value)" type="radio" class="jenis_tagging" id="manual" name="jenis_tagging" value="manual"> Rincian Belanja Manual</label>'
+                    +'</div>'
+                +'</div>'
+                // +'<div class="form-group row">'
+                //     +'<div class="col-md-3">'
+                //         +'<label for="label_rekening_belanja">Rekening Belanja</label>'
+                //     +'</div>'
+                //     +'<div class="col-md-9" id="html_rekening_akun">'
+                //         // +'<select class="form-control" name="rekening_akun" id="rekening_akun" onchange="get_data_rincian_belanja(this.value,\''+ kode_sbl +'\')">'
+                //         //     +'<option value="">Pilih Rekening</option>'
+                //         // +'</select>'
+                //     +'</div>'
+                //     +'<div class="col-md-10" id="form_rincian_belanja">'
+                //     +'</div>'
+                // +'</div>'
+                // +'<div class="form-group set_manual" style="display: none;" id="form_input_rincian_manual">'
+                //     +'<div class="form-group row">'
+                //         +'<div class="col-md-3">'
+                //             +'<label for="uraian_tagging_manual">Uraian Tagging</label>'
+                //         +'</div>'
+                //         +'<div class="col-md-9">'
+                //             +'<input type="text" class="form-control" id="uraian_tagging_manual" name="uraian_tagging_manual" required>'
+                //         +'</div>'
+                //     +'</div>'
+                //     +'<div class="form-group row">'
+                //         +'<div class="col-md-3">'
+                //             +'<label for="volume_satuan_tagging">Volume Satuan Tagging</label>'
+                //         +'</div>'
+                //         +'<div class="col-md-9">'
+                //             +'<input type="text" class="form-control" id="volume_satuan_tagging" name="volume_satuan_tagging" required>'
+                //         +'</div>'
+                //     +'</div>'
+                //     +'<div class="form-group row">'
+                //         +'<div class="col-md-3">'
+                //             +'<label for="nilai_tagging">Nilai Tagging</label>'
+                //         +'</div>'
+                //         +'<div class="col-md-9">'
+                //             +'<input type="number" class="form-control" id="nilai_tagging" name="nilai_tagging" required>'
+                //         +'</div>'
+                //     +'</div>'
+                // +'</div>'
+                +'<div class="form-group" id="html_rekening_akun">'
+                +'</div>'
+                +'<div class="form-group set_rka_dpa" id="form_input_rka_dpa">'
+                +'</div>'
+            +'</form>');
+        jQuery("#modal-crud").find('.modal-footer').html(''
+            +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
+                +'Tutup'
+            +'</button>'
+            +'<button type="button" class="btn btn-success" onclick="simpan_rincian_belanja_renaksi('+id_indikator+','+id_uraian_teknis_kegiatan+',\''+kode_sbl+'\')" data-view="kegiatanUtama">'
+                +'Simpan'
+            +'</button>');
+        jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','1400px');
+        jQuery("#modal-crud").find('.modal-dialog').css('width','');
+        jQuery("#modal-crud").modal('show');
+
+        if(data_rekening_akun != undefined){
+            let html_rekening_belanja = '';
+                let no = 0;
+                html_rekening_belanja +=``
+                    +`<table class="table" style="margin: 0 0 2rem;">`
+                        +`<thead>`
+                            +`<tr class="table-secondary">`
+                                +`<th class="text-center" style="width:20px">`
+                                    +`<div class="form-check">`
+                                        +`<input class="form-check-input" type="checkbox" name="input_rekening_belanja_all" id="rekening-belanja-all" onchange="check_all_rekening();">`
+                                    +`</div>`
+                                +`</th>`
+                                +`<th class="text-center">Kode Rekening</th>`
+                                +`<th class="text-center">Nama Rekening</th>`
+                                +`<th class="text-center">Nilai Rincian</th>`
+                                +`<th class="text-center">Nilai Tertagging</th>`
+                                +`<th class="text-center set_manual" style="display: none;">Uraian Tagging</th>`
+                                +`<th class="text-center set_manual" style="display: none;">Volume Satuan Tagging</th>`
+                                +`<th class="text-center set_manual" style="display: none;">Nilai Tagging</th>`
+                                // +`<th class="text-center">Aksi</th>`
+                            +`</tr>`
+                        +`</thead>`
+                        +`<tbody>`;
+                    data_rekening_akun.map(function(b, i){
+                        number = no++;
+                        html_rekening_belanja +=``
+                        +`<tr>`
+                            +`<td>`
+                                +`<div class="form-check">`
+                                    +`<input class="form-check-input input_checkbox_rekening" type="checkbox" name="input_rekening_belanja_${number}" value="${b.kode_akun}" id="rekening-belanja-${number}" number="${number}">`
+                                +`</div>`
+                            +`</td>`
+                            +`<td>`
+                                +`<div class="form-group">`
+                                    +`<input type="text" class="form-control" id="kode-rekening-${number}" name="kode_rekening_${number}" required disabled value="${b.kode_akun}">`
+                                +`</div>`
+                            +`</td>`
+                            +`<td>`
+                                +`<div class="form-group">`
+                                    +`<textarea class="form-control" rows="2" cols="50" id="nama-rekening-${number}" required disabled>`
+                                        +`${b.nama_akun.replace(b.kode_akun+' ', '')}`
+                                    +`</textarea>`
+                                +`</div>`
+                            +`</td>`
+                            +`<td>`
+                                +`<div class="form-group">`
+                                    +`<input type="text" class="form-control" id="nilai-rincian-${number}" value="0" required disabled>`
+                                +`</div>`
+                            +`</td>`
+                            +`<td>`
+                                +`<div class="form-group">`
+                                    +`<input type="text" class="form-control" id="nilai-tertaggin-${number}" value="0" required disabled>`
+                                +`</div>`
+                            +`</td>`
+                            +`<td class="set_manual" style="display: none;">`
+                                +`<div class="form-group">`
+                                    +`<textarea class="form-control" rows="2" cols="50" id="uraian-tagging-${number}" name="uraian_tagging_${number}" required></textarea>`
+                                +`</div>`
+                            +`</td>`
+                            +`<td class="set_manual" style="display: none;">`
+                                +`<div class="form-group">`
+                                    +`<input type="text" class="form-control" id="volume-satuan-tagging-${number}" name="volume_satuan_tagging_${number}" required>`
+                                +`</div>`
+                            +`</td>`
+                            +`<td class="set_manual" style="display: none;">`
+                                +`<div class="form-group">`
+                                    +`<input type="number" class="form-control" id="nilai-tagging-${number}" name="nilai_tagging_${number}" required>`
+                                +`</div>`
+                            +`</td>`
+                            // +`<td>`
+                            //     +`<div class="form-group">`
+                            //         // +`<input type="text" class="form-control" id="aksi-${number}" name="nilai_rincian" value="0" required disabled>`
+                            //     +`</div>`
+                            // +`</td>`
+                        +`</tr>`;
+                    });
+                    html_rekening_belanja +=``
+                            +`</tbody>`
+                        +`</table>`
+                    jQuery('#html_rekening_akun').html(html_rekening_belanja);
+        }else{
+            alert("Data Rekening Akun Kosong!")
+        }
+    });
+}
+
+function check_all_rekening(){
+    const allChecked = jQuery('.input_checkbox_rekening:checked').length === jQuery('.input_checkbox_rekening').length;
+
+    // Toggle all checkboxes
+    jQuery('.input_checkbox_rekening').prop('checked', !allChecked);
+}
+
+function get_data_rekening_akun_wp_sipd(kode_sbl='0'){
+    return new Promise(function(resolve, reject){
+        if(typeof data_rekening_akun == 'undefined'){
+            jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                url: esakip.url,
+                type: "post",
+                data: {
+                    "action": 'get_data_rekening_akun_wp_sipd',
+                    "api_key": esakip.api_key,
+                    "id_skpd": <?php echo $id_skpd; ?>,
+                    "tahun_anggaran": <?php echo $input['tahun']; ?>,
+                    "kode_sbl": kode_sbl
+                },
+                dataType: "json",
+                success: function(response){
+                    jQuery('#wrap-loading').hide();
+                    if(response.status == 'success'){
+                        if(response.data){
+                            window.data_rekening_akun = response.data.data_akun;
+                        }else{
+                            alert("Data rekening akun tidak ditemukan")    
+                        }
+                    }else{
+                        alert("Data rekening akun tidak ditemukan")
+                    }
+                    resolve();
+                }
+            });
+        }else{
+            resolve();
+        }
+    });
+}
+
+function get_data_rincian_belanja(kode_akun, kode_sbl){
+    let val_check = jQuery("input[name='jenis_tagging']:checked").val()
+    // form_input_rka_dpa
+    if(val_check == 'rka_dpa'){
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: "post",
+            data: {
+                "action": "get_data_rincian_belanja",
+                "api_key": esakip.api_key,
+                "tahun_anggaran": <?php echo $input['tahun']; ?>,
+                "id_skpd": <?php echo $id_skpd; ?>,
+                "kode_sbl": kode_sbl,
+                "kode_akun": kode_akun
+            },
+            dataType: "json",
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                // menampilkan popup
+                if (response.status == 'success') {
+                    let html_rincian_belanja = '';
+                    let no = 0;
+                    html_rincian_belanja +=``
+                        +`<table class="table" style="margin: 0 0 2rem;">`
+                            +`<thead>`
+                                +`<tr class="table-secondary">`
+                                    +`<th class="text-center" style="width:20px">`
+                                        +`<div class="form-check">`
+                                            +`<input class="form-check-input" type="checkbox" name="input_rincian_belanja_all" id="rincian-belanja-all">`
+                                        +`</div>`
+                                    +`</th>`
+                                    +`<th class="text-center">Uraian Rka</th>`
+                                    +`<th class="text-center">Volume Satuan</th>`
+                                    +`<th class="text-center">Nilai Rka</th>`
+                                    +`<th class="text-center">Uraian Tagging</th>`
+                                    +`<th class="text-center">Volume Satuan Tagging</th>`
+                                    +`<th class="text-center">Nilai Tagging</th>`
+                                +`</tr>`
+                            +`</thead>`
+                            +`<tbody>`;
+                    response.data.map(function(b, i){
+                        number = no++;
+                        html_rincian_belanja +=``
+                        +`<tr>`
+                            +`<td>`
+                                +`<div class="form-check">`
+                                    +`<input class="form-check-input" type="checkbox" name="input_rincian_belanja" value="${b.id_rinci_sub_bl}" id="rincian-belanja-${number}" number="${number}" onchange="copy_rincian(${number});">`
+                                +`</div>`
+                            +`</td>`
+                            +`<td>`
+                                +`<div class="form-group">`
+                                    +`<textarea class="form-control" rows="2" cols="50" id="uraian-rka-${number}" name="uraian_rka" required disabled>`
+                                        +`${b.nama_komponen} ${b.spek_komponen}`
+                                    +`</textarea>`
+                                +`</div>`
+                            +`</td>`
+                            +`<td>`
+                                +`<div class="form-group">`
+                                    +`<input type="text" class="form-control" id="volume-satuan-rka-${number}" name="volume_satuan_rka" value="${b.koefisien}" required disabled>`
+                                +`</div>`
+                            +`</td>`
+                            +`<td>`
+                                +`<div class="form-group">`
+                                    +`<input type="text" class="form-control" id="nilai-rka-${number}" name="nilai_rka" value="${parseFloat(b.rincian)}" required disabled>`
+                                +`</div>`
+                            +`</td>`
+                            +`<td>`
+                                +`<div class="form-group">`
+                                    +`<textarea rows="2" cols="50" id="uraian-tagging-${number}" name="uraian_tagging" required></textarea>`
+                                +`</div>`
+                            +`</td>`
+                            +`<td>`
+                                +`<div class="form-group">`
+                                    +`<input type="text" class="form-control" id="volume-satuan-tagging-${number}" name="volume_satuan_tagging" required>`
+                                +`</div>`
+                            +`</td>`
+                            +`<td>`
+                                +`<div class="form-group">`
+                                    +`<input type="text" class="form-control" id="nilai-tagging-${number}" name="nilai_tagging" required>`
+                                +`</div>`
+                            +`</td>`
+                        +`</tr>`;
+                    });
+                    html_rincian_belanja +=``
+                            +`</tbody>`
+                        +`</table>`
+                    jQuery('#form_input_rka_dpa').html(html_rincian_belanja);
+                }
+            }
+        });
+    }
+}
+
+function simpan_rincian_belanja_renaksi(id_indikator,id_uraian_teknis_kegiatan, kode_sbl){
+    if(confirm('Apakah anda yakin untuk menyimpan data ini?')){
+        jQuery('#wrap-loading').show();
+        let form = getFormData(jQuery("#form-tagging-renaksi"));
+        try {
+            if(Object.keys(form).length === 0){
+                alert("Inputan Kosong!")
+                jQuery('#wrap-loading').hide();
+                throw new Error("Inputan Kosong!");
+                return;
+            }
+            Object.entries(form).forEach(([key, value]) => {
+                Object.entries(value).forEach(([k_rincian, v_rincian]) => {
+                    if(v_rincian === undefined || v_rincian === ""){
+                        alert("Pastikan semua inputan terisi!")
+                        jQuery('#wrap-loading').hide();
+                        throw new Error("Harap Semua Inputan Yang Terchecklist Terisi!");
+                        return;
+                    }
+                })    
+            })
+        
+            jQuery.ajax({
+                url: esakip.url,
+                type: "post",
+                data: {
+                    "action": "crate_tagging_rincian_belanja",
+                    "api_key": esakip.api_key,
+                    "tahun_anggaran": <?php echo $input['tahun']; ?>,
+                    "id_skpd": <?php echo $id_skpd; ?>,
+                    "id_indikator_teknis_kegiatan": id_indikator,
+                    "id_uraian_teknis_kegiatan": id_uraian_teknis_kegiatan,
+                    "kode_sbl": kode_sbl,
+                    "data": JSON.stringify(form)
+                },
+                dataType: "json",
+                success: function(response) {
+                    jQuery('#wrap-loading').hide();
+                    if(response.status == 'success'){
+                        alert(response.message)
+                        jQuery("#modal-crud").modal('hide');
+                    }else{
+                        alert(response.message)
+                    }
+                }
+            });
+        } catch (error) {
+            console.error(error.message);
+        }
+    }
+}
+
+function getFormData($form){
+    let unindexed_array = $form.serializeArray();
+    var data = {};
+    let terceklist = [];
+    let jenis_tagging = '';
+    unindexed_array.map(function(b, i){
+        if(b.name === 'jenis_tagging'){
+            jenis_tagging = b.value
+        }
+        let nama_baru = b.name.split('_');
+        let number = nama_baru[nama_baru.length - 1];
+        nama_baru.pop(); // Remove the last element
+        nama_baru =  nama_baru.join('_');   
+        if(nama_baru === 'input_rekening_belanja'){
+            terceklist.push(number);
+        }
+
+        if(terceklist.includes(number)){
+            if(!data[number]){
+                data[number] = {};
+            }
+            data[number][nama_baru] = b.value ;
+            data[number]['jenis_tagging'] = jenis_tagging ;
+        }
+    })
+    console.log('data', data);
+    return data;
+}
+
+function copy_rincian(that){
+    if(jQuery("#rincian-belanja-"+that).is(':checked')) {
+        uraian_rka = jQuery("#uraian-rka-"+that).val();
+        jQuery("#uraian-tagging-"+that).val(uraian_rka);
+        volume_satuan_rka = jQuery("#volume-satuan-rka-"+that).val();
+        jQuery("#volume-satuan-tagging-"+that).val(volume_satuan_rka);
+        nilai_rka = jQuery("#nilai-rka-"+that).val();
+        jQuery("#nilai-tagging-"+that).val(nilai_rka);
+    }else{
+        jQuery("#uraian-tagging-"+that).val("");
+        jQuery("#volume-satuan-tagging-"+that).val("");
+        jQuery("#nilai-tagging-"+that).val("");
+    }
+}
+
+function set_jenis_tagging(jenis_tagging){
+    let val_check = jQuery("input[name='jenis_tagging']:checked").val()
+    if(val_check == 'rka_dpa'){
+        jQuery(".set_rka_dpa").show();
+        jQuery(".set_manual").hide();
+    }else{
+        jQuery(".set_rka_dpa").hide();
+        jQuery(".set_manual").show();
+    }
 }
 </script>
