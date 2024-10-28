@@ -426,6 +426,8 @@ CREATE TABLE `esakip_rpjpd` (
   `tanggal_upload` varchar(50) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(`id`)
 );
  
@@ -623,7 +625,7 @@ CREATE TABLE `esakip_menu_dokumen` (
   `jenis_role` int(11) DEFAULT NULL,
   `keterangan` varchar(255) DEFAULT NULL,
   `nomor_urut` DECIMAL(10,2) NOT NULL,
-  `active` tinyint(4) NOT NULL,
+  `active` tinyint(4) NOT NULL COMMENT '1 = Tampil, 0 = Sembunyikan',
   `tahun_anggaran` year NOT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp,
   `updated_at` datetime NOT NULL DEFAULT current_timestamp,
@@ -655,6 +657,8 @@ CREATE TABLE `esakip_iku_pemda` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -667,7 +671,9 @@ CREATE TABLE `esakip_laporan_kinerja_pemda` (
   `tanggal_upload` varchar(50) DEFAULT NULL,
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
-  `active` tinyint(4) DEFAULT 1,
+  `active` tinyint(4) DEFAULT 1,  
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -680,6 +686,8 @@ CREATE TABLE `esakip_lkjip_lppd_pemda` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -693,6 +701,8 @@ CREATE TABLE `esakip_perjanjian_kinerja_pemda` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -706,6 +716,8 @@ CREATE TABLE `esakip_rencana_aksi_pemda` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -718,6 +730,8 @@ CREATE TABLE `esakip_rkpd_pemda` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -731,6 +745,8 @@ CREATE TABLE `esakip_lhe_akip_internal_pemda` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -744,6 +760,8 @@ CREATE TABLE `esakip_tl_lhe_akip_internal_pemda` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -757,6 +775,8 @@ CREATE TABLE `esakip_tl_lhe_akip_kemenpan_pemda` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -770,6 +790,8 @@ CREATE TABLE `esakip_laporan_monev_renaksi_pemda` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -783,6 +805,8 @@ CREATE TABLE `esakip_pedoman_teknis_perencanaan_pemda` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -796,6 +820,8 @@ CREATE TABLE `esakip_pedoman_teknis_pengukuran_dan_p_d_k_pemda` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -809,6 +835,8 @@ CREATE TABLE `esakip_pedoman_teknis_evaluasi_internal_pemda` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -822,6 +850,9 @@ CREATE TABLE `esakip_dpa_pemda` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `status_esr` tinyint(4) DEFAULT 0,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -1211,6 +1242,7 @@ CREATE TABLE `esakip_pengaturan_rencana_aksi` (
   PRIMARY KEY  (id)
 );
 
+
 CREATE TABLE `esakip_data_iku_opd` (
   `id` int(11) NOT NULL auto_increment,
   `kode_sasaran` text NOT NULL,
@@ -1247,11 +1279,59 @@ CREATE TABLE `esakip_data_iku_pemda` (
 CREATE TABLE `esakip_data_esr` (
   `id` int(11) NOT NULL auto_increment,
   `url` text NOT NULL,
+  `user_esr_id` int(11) DEFAULT null,
   `method` text DEFAULT null,
   `param_json` text DEFAULT null,
   `response_json` text DEFAULT null,
   `updated_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id)
+);
+
+CREATE TABLE `esakip_cascading_opd_tujuan` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `id_tujuan` int(11) DEFAULT NULL,
+  `id_unik` text DEFAULT NULL,
+  `id_unik_indikator` text DEFAULT NULL,
+  `no_urut` int(11) DEFAULT NULL,
+  `tujuan` text DEFAULT NULL,
+  `indikator` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp,
+  `active` tinyint(4) DEFAULT 1,
+  PRIMARY KEY(id)
+);
+
+CREATE TABLE `esakip_cascading_opd_sasaran` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `id_tujuan` int(11) DEFAULT NULL,
+  `id_sasaran` int(11) DEFAULT NULL,
+  `id_unik` text DEFAULT NULL,
+  `id_unik_indikator` text DEFAULT NULL,
+  `no_urut` int(11) DEFAULT NULL,
+  `sasaran` text DEFAULT NULL,
+  `indikator` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp,
+  `active` tinyint(4) DEFAULT 1,
+  PRIMARY KEY(id)
+);
+
+CREATE TABLE `esakip_cascading_opd_program` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `id_sasaran` int(11) DEFAULT NULL,
+  `id_program` int(11) DEFAULT NULL,
+  `id_unik` text DEFAULT NULL,
+  `id_unik_indikator` text DEFAULT NULL,
+  `no_urut` text DEFAULT NULL,
+  `program` text DEFAULT NULL,
+  `indikator` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp,
+  `active` tinyint(4) DEFAULT 1,
+  PRIMARY KEY(id)
 );
 
 CREATE TABLE `esakip_data_user_esr` (
@@ -1265,6 +1345,68 @@ CREATE TABLE `esakip_data_user_esr` (
   `unit_kerja` varchar(255) DEFAULT null,
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
+);
+
+CREATE TABLE `esakip_data_rencana_aksi_pemda` (
+  `id` int(11) NOT NULL auto_increment,
+  `label` varchar(255) NOT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `id_tujuan` int(11) NOT NULL,
+  `parent` int(11) DEFAULT 0,
+  `label_pokin_1` text DEFAULT null,
+  `id_pokin_1` int(11) DEFAULT null,
+  `label_pokin_2` text DEFAULT null,
+  `id_pokin_2` int(11) DEFAULT null,
+  `label_pokin_3` text DEFAULT null,
+  `id_pokin_3` int(11) DEFAULT null,
+  `label_pokin_4` text DEFAULT null,
+  `id_pokin_4` int(11) DEFAULT null,
+  `label_pokin_5` text DEFAULT null,
+  `id_pokin_5` int(11) DEFAULT null,
+  `level` int(11) NOT null COMMENT '1 = kegiatan, 1 = rencana aksi, 2 = uraian kegiatan',
+  `pagu` double(20, 0) DEFAULT NULL,
+  `realisasi` double(20, 0) DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  `kode_cascading_sasaran` text DEFAULT null,
+  `label_cascading_sasaran` text DEFAULT null,
+  `kode_cascading_program` text DEFAULT null,
+  `label_cascading_program` text DEFAULT null,
+  `kode_cascading_kegiatan` text DEFAULT null,
+  `label_cascading_kegiatan` text DEFAULT null,
+  `kode_cascading_sub_kegiatan` text DEFAULT null,
+  `label_cascading_sub_kegiatan` text DEFAULT null,
+  PRIMARY key (id)
+);
+
+CREATE TABLE `esakip_data_rencana_aksi_indikator_pemda` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_renaksi` int(11) NOT NULL,
+  `id_tujuan` int(11) NOT NULL,
+  `indikator` text DEFAULT null,
+  `target_awal` text DEFAULT NULL,
+  `target_akhir` text DEFAULT NULL,
+  `satuan` text DEFAULT NULL,
+  `target_1` text DEFAULT NULL,
+  `target_2` text DEFAULT NULL,
+  `target_3` text DEFAULT NULL,
+  `target_4` text DEFAULT NULL,
+  `realisasi_target_1` text DEFAULT NULL,
+  `realisasi_target_2` text DEFAULT NULL,
+  `realisasi_target_3` text DEFAULT NULL,
+  `realisasi_target_4` text DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  `rencana_pagu` double(20, 0) DEFAULT NULL,
+  `realisasi_pagu` double(20, 0) DEFAULT NULL,
+  `mitra_bidang` text DEFAULT NULL,
   PRIMARY key (id)
 );
 
@@ -1313,4 +1455,19 @@ CREATE TABLE `esakip_data_tagging_rincian_belanja` (
   `created_at` datetime DEFAULT current_timestamp(),
   `update_at` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (id)
+);
+
+CREATE TABLE `esakip_pengaturan_upload_dokumen` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `id_jadwal_rpjpd` int(11) DEFAULT NULL,
+  `id_jadwal_rpjmd` int(11) DEFAULT NULL,
+  `id_jadwal_renstra` int(11) DEFAULT NULL,
+  `id_jadwal_wp_sipd` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `tahun_anggaran` year(4) NOT NULL DEFAULT '2024',
+  `keterangan` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY  (id)
 );

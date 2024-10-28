@@ -248,6 +248,17 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
                 if (!empty($tahun_anggaran) && !empty($tipe)) {
+                    $cek_menu_all_db = $wpdb->get_results($wpdb->prepare("
+                        SELECT 
+                            *
+                        FROM esakip_menu_dokumen 
+                        WHERE tahun_anggaran =%d
+                            AND user_role=%s
+                    ", $tahun_anggaran, $tipe), ARRAY_A);
+                    $cek_menu_all = array();
+                    foreach($cek_menu_all_db as $m){
+                        $cek_menu_all[$m['nama_tabel']] = $m;
+                    }
                     if($tipe == 'pemerintah_daerah'){
                         $design_menu = array(
                             array(
@@ -270,13 +281,13 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             ),
                             array(
                                 'nama_dokumen' => 'RKPD',
-                                'nama_tabel' => 'esakip_rkpd',
+                                'nama_tabel' => 'esakip_rkpd_pemda',
                                 'user_role' => 'pemerintah_daerah',
                                 'jenis_role'    => 1
                             ),
                             array(
                                 'nama_dokumen' => 'LKJIP/LPPD',
-                                'nama_tabel' => 'esakip_lkjip_lppd',
+                                'nama_tabel' => 'esakip_lkjip_lppd_pemda',
                                 'user_role' => 'pemerintah_daerah',
                                 'jenis_role'    => 1
                             ),
@@ -312,7 +323,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             ),
                             array(
                                 'nama_dokumen' => 'TL LHE AKIP Kemenpan',
-                                'nama_tabel' => 'esakip_tl_lhe_akip_kemenpan',
+                                'nama_tabel' => 'esakip_tl_lhe_akip_kemenpan_pemda',
                                 'user_role' => 'pemerintah_daerah',
                                 'jenis_role'    => 1
                             ),
@@ -367,15 +378,9 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                         );
                         $nomor_urut = 1.00;
                         foreach ($design_menu as $menu) {
-                            $cek_menu = $wpdb->get_results($wpdb->prepare("
-                                SELECT 
-                                    *
-                                FROM esakip_menu_dokumen 
-                                WHERE tahun_anggaran =%d
-                                    AND nama_dokumen=%s
-                                    AND user_role=%s
-                            ", $tahun_anggaran, $menu['nama_dokumen'], $menu['user_role']), ARRAY_A);
-                            if(empty($cek_menu)){
+                            if(
+                                empty($cek_menu_all[$menu['nama_tabel']])
+                            ){
                                 if($menu['user_role'] == 'pemerintah_daerah'){
                                     $jenis_role = 1;
                                 }else if($menu['user_role'] == 'perangkat_daerah'){
@@ -403,6 +408,10 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                                     continue;
                                 }
                             }
+                            unset($cek_menu_all[$menu['nama_tabel']]);
+                        }
+                        foreach($cek_menu_all as $m){
+                            $wpdb->delete('esakip_menu_dokumen', array('id' => $m['id']));
                         }
                     }else if($tipe == 'perangkat_daerah'){
                         $design_menu = array(
@@ -511,15 +520,9 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
     
                         $nomor_urut = 1.00;
                         foreach ($design_menu as $menu) {
-                            $cek_menu = $wpdb->get_results($wpdb->prepare("
-                                SELECT 
-                                    *
-                                FROM esakip_menu_dokumen 
-                                WHERE tahun_anggaran =%d
-                                    AND nama_dokumen=%s
-                                    AND user_role=%s
-                                ", $tahun_anggaran, $menu['nama_dokumen'], $menu['user_role']), ARRAY_A);
-                            if(empty($cek_menu)){
+                            if(
+                                empty($cek_menu_all[$menu['nama_tabel']])
+                            ){
                                 if($menu['user_role'] == 'pemerintah_daerah'){
                                     $jenis_role = 1;
                                 }else if($menu['user_role'] == 'perangkat_daerah'){
@@ -547,7 +550,10 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                                     continue;
                                 }
                             }
-                            
+                            unset($cek_menu_all[$menu['nama_tabel']]);
+                        }
+                        foreach($cek_menu_all as $m){
+                            $wpdb->delete('esakip_menu_dokumen', array('id' => $m['id']));
                         }
                     }
                 } else {
@@ -1511,5 +1517,190 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
             );
         }
         return $return;
+    }
+
+    function get_data_upload_dokumen(){
+        global $wpdb;
+        $ret = array(
+            'status' => 'success',
+            'message' => 'Berhasil get data pengaturan rencana aksi!',
+            'data'  => array(),
+            'option_renstra' => ''
+        );
+
+        if (!empty($_POST)) {
+            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+                if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Tahun anggaran tidak boleh kosong!';
+                }
+                if ($ret['status'] != 'error'){
+
+                    $jadwal_periode = $wpdb->get_results(
+                        "
+                        SELECT 
+                            id,
+                            nama_jadwal,
+                            nama_jadwal_renstra,
+                            tahun_anggaran,
+                            lama_pelaksanaan,
+                            tahun_selesai_anggaran
+                        FROM esakip_data_jadwal
+                        WHERE tipe = 'RPJMD'
+                          AND status = 1
+                            ORDER BY tahun_anggaran DESC",
+                        ARRAY_A
+                    );
+                    
+                    $option_rpjmd = '<option>Pilih Jadwal RPJMD/RPD</option>';
+                    $option_renstra = '<option>Pilih Jadwal RENSTRA</option>';
+                    if(!empty($jadwal_periode)){
+                        foreach ($jadwal_periode as $jadwal_periode_item) {
+                            if (!empty($jadwal_periode_item['tahun_selesai_anggaran']) && $jadwal_periode_item['tahun_selesai_anggaran'] > 1) {
+                                $tahun_anggaran_selesai = $jadwal_periode_item['tahun_selesai_anggaran'];
+                            } else {
+                                $tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
+                            }
+                            
+                            $option_rpjmd .= '<option value="' . $jadwal_periode_item['id'] . '">' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . '</option>';
+
+                            $option_renstra .= '<option value="' . $jadwal_periode_item['id'] . '">' . $jadwal_periode_item['nama_jadwal_renstra'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . '</option>';
+                        }
+                    }
+
+                    $jadwal_periode_rpjpd = $wpdb->get_results(
+                        "
+                        SELECT 
+                            id,
+                            nama_jadwal,
+                            nama_jadwal_renstra,
+                            tahun_anggaran,
+                            lama_pelaksanaan,
+                            tahun_selesai_anggaran
+                        FROM esakip_data_jadwal
+                        WHERE tipe = 'RPJPD'
+                          AND status = 1
+                            ORDER BY tahun_anggaran DESC",
+                        ARRAY_A
+                    );
+
+                    $option_rpjpd = '<option>Pilih Jadwal RPJPD</option>';
+                    if(!empty($jadwal_periode_rpjpd)){
+                        foreach ($jadwal_periode_rpjpd as $jadwal_periode_item_rpjpd) {
+                            if (!empty($jadwal_periode_item_rpjpd['tahun_selesai_anggaran']) && $jadwal_periode_item_rpjpd['tahun_selesai_anggaran'] > 1) {
+                                $tahun_anggaran_selesai = $jadwal_periode_item_rpjpd['tahun_selesai_anggaran'];
+                            } else {
+                                $tahun_anggaran_selesai = $jadwal_periode_item_rpjpd['tahun_anggaran'] + $jadwal_periode_item_rpjpd['lama_pelaksanaan'];
+                            }
+                    
+                            $option_rpjpd .= '<option value="' . $jadwal_periode_item_rpjpd['id'] . '">' . $jadwal_periode_item_rpjpd['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item_rpjpd['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . '</option>';
+                        }
+                    }
+
+                    $data = $wpdb->get_row($wpdb->prepare("
+                                SELECT
+                                    p.*
+                                FROM esakip_pengaturan_upload_dokumen as p
+                                JOIN esakip_data_jadwal as j
+                                ON p.id_jadwal_rpjmd = j.id
+                                WHERE p.tahun_anggaran=%d
+                                    AND p.active=1
+                            ", $_POST['tahun_anggaran']), ARRAY_A);
+                    
+                    if(!empty($data)){
+                        $ret['data'] = $data;
+                    }
+                    $ret['option_rpjpd'] = $option_rpjpd;
+                    $ret['option_rpjmd'] = $option_rpjmd;
+                    $ret['option_renstra'] = $option_renstra;
+                }
+            } else {
+                $ret = array(
+                    'status' => 'error',
+                    'message'   => 'Api Key tidak sesuai!'
+                );
+            }
+        } else {
+            $ret = array(
+                'status' => 'error',
+                'message'   => 'Format tidak sesuai!'
+            );
+        }
+        die(json_encode($ret));
+    }
+
+    function submit_pengaturan_upload_dokumen(){
+        global $wpdb;
+        try {
+            if (!empty($_POST)) {
+                if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+                    if (empty($_POST['tahun_anggaran']) || empty($_POST['id_jadwal_rpjpd']) || empty($_POST['id_jadwal_rpjmd'])) {
+                        throw new Exception("Ada data yang kosong!", 1);
+                    }
+
+                    $tahun_anggaran = $_POST['tahun_anggaran'];
+                    $id_jadwal_rpjpd = $_POST['id_jadwal_rpjpd'];
+                    $id_jadwal_rpjmd = $_POST['id_jadwal_rpjmd'];
+
+                    $cek_data_jadwal = $wpdb->get_var(
+                        $wpdb->prepare("
+                        SELECT 
+                            id
+                        FROM 
+                            esakip_data_jadwal
+                        WHERE id=%d
+                        AND tipe IN ('RPJPD','RPJMD')
+                        AND status=1
+                    ", $id_jadwal_rpjpd, $id_jadwal_rpjmd));
+
+                    if (empty($cek_data_jadwal)) {
+                        throw new Exception("Id Jadwal tidak cocok!", 1);
+                    }
+
+                    $cek_data_pengaturan = $wpdb->get_var(
+                        $wpdb->prepare("
+                        SELECT 
+                            id
+                        FROM 
+                            esakip_pengaturan_upload_dokumen
+                        WHERE tahun_anggaran=%d
+                        AND active=1
+                    ", $tahun_anggaran));
+
+                    $data = array(
+                        'id_jadwal_rpjpd' => $id_jadwal_rpjpd,
+                        'id_jadwal_rpjmd' => $id_jadwal_rpjmd,
+                        'tahun_anggaran' => $tahun_anggaran,
+                        'active' => 1,
+                        'created_at' => current_time('mysql'),
+                        'update_at' => current_time('mysql')
+                    );
+
+                    if (empty($cek_data_pengaturan)) {
+                        $wpdb->insert('esakip_pengaturan_upload_dokumen', $data);
+                        $message = "Sukses tambah data";
+                    } else {
+                        $wpdb->update('esakip_pengaturan_upload_dokumen', $data, array('id' => $cek_data_pengaturan));
+                        $message = "Sukses edit data";
+                    }
+
+                    echo json_encode([
+                        'status' => true,
+                        'message' => $message,
+                    ]);
+                    exit();
+                } else {
+                    throw new Exception("API tidak ditemukan!", 1);
+                }
+            } else {
+                throw new Exception("Format tidak sesuai!", 1);
+            }
+        } catch (Exception $e) {
+            echo json_encode([
+                'status' => false,
+                'message' => $e->getMessage()
+            ]);
+            exit();
+        }
     }
 }

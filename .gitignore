@@ -2,3 +2,5 @@ public/media/dokumen/*.pdf
 public/media/dokumen/*.PDF
 public/media/dokumen/dokumen_pemda/*.pdf
 public/media/dokumen/dokumen_pemda/*.PDF
+public/media/json/*.json
+public/media/json/*.JSON

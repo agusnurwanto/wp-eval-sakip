@@ -73,6 +73,7 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
 				<table id="cetak" title="Rekapitulasi Pengisian Cascading OPD" class="table table-bordered table_dokumen_skpd" cellpadding="2" cellspacing="0">
 					<thead style="background: #ffc491;">
 						<tr>
+							<th class="text-center"><input type="checkbox" id="cek_all"></th>
 							<th class="text-center">Nama Perangkat Daerah</th>
 							<th class="text-center">Jumlah Tujuan</th>
 							<th class="text-center">Jumlah Sasaran</th>
@@ -90,10 +91,78 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
 <script>
 	jQuery(document).ready(function() {
     	run_download_excel_sakip();
+    	jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="singkron-cascading-renstra" href="#" class="btn btn-primary"><i class="dashicons dashicons-download"></i> Ambil dari Data RENSTRA</a>');
 		getTableSkpd();
+
+		jQuery('#cek_all').on('click', function(e){
+			jQuery('.table_dokumen_skpd tbody .nama-opd').prop('checked', jQuery(this).is(':checked'));
+		});
+
+		jQuery('#singkron-cascading-renstra').on('click', function(e){
+            e.preventDefault();
+            var id_skpd_all = [];
+            jQuery('.table_dokumen_skpd tbody .nama-opd').map(function(i, b){
+            	if(jQuery(b).is(':checked')){
+	            	id_skpd_all.push({
+	            		id: jQuery(b).val(),
+	            		nama_skpd: jQuery(b).closest('tr').find('.nama-opd-asli').text()
+	            	});
+	            }
+            });
+            if(id_skpd_all.length == 0){
+            	return alert('Pilih perangkat daerah dulu!');
+            }
+            if(confirm('Apakah anda yakin untuk mengambil data CASCADING dari RENSTRA? Data lama akan diupdate dengan data baru!')){
+                jQuery('#wrap-loading').show();
+                jQuery('#persen-loading').attr('persen', 0);
+				jQuery('#persen-loading').html('0%');
+                var last = id_skpd_all.length-1;
+				id_skpd_all.reduce(function(sequence, nextData){
+		            return sequence.then(function(current_data){
+		        		return new Promise(function(resolve_reduce, reject_reduce){
+							jQuery('#pesan-loading').html('Singkron CASCADING '+current_data.nama_skpd);
+			                jQuery.ajax({
+			                    url: esakip.url,
+			                    type: 'POST',
+			                    data: {
+			                        action: 'get_cascading_pd_from_renstra',
+			                        api_key: esakip.api_key,
+			                        id_jadwal_wpsipd: <?php echo $input['periode']; ?>,
+			                        id_skpd: current_data.id
+			                    },
+			                    dataType: 'json',
+			                    success: function(response) {
+				        			var c_persen = +jQuery('#persen-loading').attr('persen');
+									c_persen++;
+									jQuery('#persen-loading').attr('persen', c_persen);
+									jQuery('#persen-loading').html(((c_persen/id_skpd_all.length)*100).toFixed(2)+'%'+'<br>'+current_data.nama_skpd);
+			                        resolve_reduce(nextData);
+			                    },
+			                    error: function(xhr, status, error) {
+			                        console.error(xhr.responseText);
+			                        resolve_reduce(nextData);
+			                    }
+			                });
+		        		})
+		                .catch(function(e){
+		                    console.log(e);
+		                    return Promise.resolve(nextData);
+		                });
+		            })
+		            .catch(function(e){
+		                console.log(e);
+		                return Promise.resolve(nextData);
+		        	});
+		        }, Promise.resolve(id_skpd_all[last]))
+		        .then(function(data_last){
+			        jQuery('#wrap-loading').hide();
+		        	getTableSkpd(1);
+		        });
+            }
+        });
 	});
 
-	function getTableSkpd() {
+	function getTableSkpd(destroy) {
 		jQuery('#wrap-loading').show();
 		jQuery.ajax({
 			url: esakip.url,
@@ -108,8 +177,11 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
 				jQuery('#wrap-loading').hide();
 				console.log(response);
 				if (response.status === 'success') {
+					if(destroy == 1){
+						table_cascading.fnDestroy();
+					}
 					jQuery('.table_dokumen_skpd tbody').html(response.data);
-					jQuery('.table_dokumen_skpd').dataTable({
+					window.table_cascading = jQuery('.table_dokumen_skpd').dataTable({
 						 aLengthMenu: [
 					        [5, 10, 25, 100, -1],
 					        [5, 10, 25, 100, "All"]
