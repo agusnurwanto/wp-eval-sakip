@@ -17859,8 +17859,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		$pengisian_rencana_aksi_pemda = '';
 			$list_pemda_pengisian_rencana_aksi = $this->functions->generatePage(array(
-				'nama_page' => 'Pengisian Rencana Aksi Pemda ' . $jadwal_renaksi_pemda['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_renaksi_pemda['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-				'content' => '[list_pengisian_rencana_aksi_pemda periode=' . $jadwal_renaksi_pemda['id'] . ']',
+				'nama_page' => 'Pengisian Rencana Aksi Pemda ' . $_GET['tahun'] . ' ' . $jadwal_renaksi_pemda['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_renaksi_pemda['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[list_pengisian_rencana_aksi_pemda tahun=' . $_GET['tahun'] . ' periode=' . $jadwal_renaksi_pemda['id'] . ' ]',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));

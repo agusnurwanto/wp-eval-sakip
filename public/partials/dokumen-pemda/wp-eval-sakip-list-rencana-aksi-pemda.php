@@ -6,7 +6,8 @@ if (!defined('WPINC')) {
 }
 
 $input = shortcode_atts(array(
-    'periode' => '',
+    'tahun' => '2022',
+    'periode' => ''
 ), $atts);
 
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
@@ -28,6 +29,20 @@ if (!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggar
 }
 
 $data_temp = [''];
+$pokin = $wpdb->get_results($wpdb->prepare('
+    SELECT 
+        *
+    FROM esakip_pohon_kinerja
+    WHERE tahun_anggaran=%d
+        AND id_jadwal=%d
+        AND level=1
+        AND parent=0
+', $input['tahun'], $input['periode']), ARRAY_A);
+
+$select_pokin = '<option value="">Pilih Pohon Kinerja</option>';
+foreach($pokin as $get_pokin){
+    $select_pokin .= '<option value="'.$get_pokin['id'].'">'.$get_pokin['label'].'</option>';
+}
 
 ?>
 <style type="text/css">
@@ -75,20 +90,58 @@ $data_temp = [''];
 <div class="container-md" id="container-table-rencanaaksi">
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Rencana Aksi <?php echo $periode['nama_jadwal'] . ' ' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ''; ?></h1>
+            <h1 class="text-center" style="margin:3rem;">Rencana Aksi Tahun Anggaran <?php echo $input['tahun']; ?><br><?php echo $periode['nama_jadwal'] . ' ' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ''; ?></h1>
             <div class="wrap-table">
                 <table id="table_dokumen_renaksi" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
                         <tr>
-                            <th class="text-center" style="width: 100px;">No</th>
-                            <th class="text-center">Judul Cascading</th>
-                            <th class="text-center" style="width: 50%;">Tujuan RPJMD/RPD</th>
-                            <th class="text-center" style="width: 150px;">Aksi</th>
+                            <th class="text-center" style="width: 10px;">No</th>
+                            <th class="text-center" style="width: 30px;">Judul Cascading</th>
+                            <th class="text-center" style="width: 40%;">Tujuan RPJMD/RPD</th>
+                            <th class="text-center" style="width: 20%;">Pohon Kinerja</th>
+                            <th class="text-center" style="width: 10%;">Pagu Anggaran</th>
+                            <th class="text-center" style="width: 10%;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Upload -->
+<div class="modal fade mt-4" id="modalpokin" tabindex="-1" role="dialog" aria-labelledby="modalpokinLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalpokinLabel">Edit Rencana Aksi</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" value="" id="id">
+                <div class="form-group">
+                    <label for="judul_cascading">Judul Cascading</label>
+                    <input type="text" class="form-control" id="judul_cascading" name="judul_cascading" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="tujuan_rpd">Tujuan RPJMD / RPD</label>
+                    <input type="text" class="form-control" id="tujuan_rpd" name="tujuan_rpd" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="id_pokin">Pohon Kinerja</label>
+                    <select class="form-control" id="id_pokin" name="id_pokin" onchange="get_pokin_renaksi();"><?php echo $select_pokin; ?></select>
+                </div>
+                <div class="form-group">
+                    <label for="pagu">Pagu Anggaran</label>
+                    <input type="text" class="form-control" id="pagu" name="pagu" disabled value="0">
+                </div>
+            </div> 
+            <div class="modal-footer">
+                <button class="btn btn-primary submitBtn" onclick="submit_data()">Simpan</button>
+                <button type="submit" class="components-button btn btn-secondary" data-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
@@ -129,5 +182,118 @@ $data_temp = [''];
 
     function toDetailUrl(url) {
         window.open(url, '_blank');
+    }
+
+    function edit_pokin_pemda(id) {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_pokin_renaksi_by_id',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                console.log(response);
+                if (response.status === 'success') {
+                    let data = response.data;   
+                    jQuery("#id").val(data.id);                 
+                    jQuery("#judul_cascading").val(data.nama_cascading);                 
+                    jQuery("#tujuan_rpd").val(data.tujuan_teks);                 
+                    jQuery("#id_pokin").val(data.id_pokin);                  
+                    jQuery('#modalpokin').modal('show');
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data!');
+            }
+        });
+    }
+
+    function submit_data() {
+        var id = jQuery('#id').val();
+
+        var id_pokin = jQuery('#id_pokin').val();
+        if(id_pokin == ''){
+            return alert('Data Pohon Kinerja tidak boleh kosong!');
+        }
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: "post",
+            data: {
+                "action": 'tambah_pokin_renaksi',
+                "api_key": esakip.api_key,
+                "id": id,
+                "id_pokin": id_pokin
+            },
+            dataType: "json",
+            success: function(res) {
+                jQuery('#wrap-loading').hide();
+                alert(res.message);
+                if (res.status == 'success') {
+                    jQuery("#modalpokin").modal('hide');
+                    getTableRencanaAksi();
+                }
+            }
+        });
+    }
+
+    function get_pokin_renaksi(no_loading = false) {
+        return new Promise(function(resolve, reject) {
+            var id_pokin = jQuery('#id_pokin').val();
+            if (id_pokin == '') {
+                jQuery('#daftar_pokin tbody').html('');
+                return;
+            }
+            if (!no_loading) {
+                jQuery("#wrap-loading").show();
+            }
+            if (typeof global_response_pokin == 'undefined') {
+                global_response_pokin = {};
+            }
+            if (!global_response_pokin[id_pokin]) {
+                jQuery.ajax({
+                    url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                    type: 'post',
+                    data: {
+                        'action': 'get_pokin_renaksi',
+                        'api_key': esakip.api_key,
+                        'id_pokin': id_pokin
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (!no_loading) {
+                            jQuery("#wrap-loading").hide();
+                        }
+                        if (response.status == 'success') {
+                            window.global_response_pokin[id_pokin] = response;
+                            jQuery('#daftar_pokin tbody').html(response.html);
+                            jQuery('#id_pokin').select2({'width': '100%'});
+                            resolve();
+                        } else {
+                            alert(`GAGAL! \n${response.message}`);
+                        }
+                    },
+                    error: function(error) {
+                        if (!no_loading) {
+                            jQuery("#wrap-loading").hide();
+                        }
+                        alert('Terjadi kesalahan. Coba lagi.');
+                        reject(error);
+                    }
+                });
+            } else {
+                jQuery('#daftar_pokin tbody').html(global_response_pokin[id_pokin].html);
+                resolve();
+            }
+        });
     }
 </script>
