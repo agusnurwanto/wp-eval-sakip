@@ -99,7 +99,7 @@ $is_administrator = in_array('administrator', $user_roles);
             </div>
             <?php endif; ?>
             <div class="wrap-table">
-                <table id="table_dokumen_rencana_aksi" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                <table id="table_dokumen_rencana_aksi" cellpadding="2" cellspacing="0" class="table table-bordered">
                     <thead>
                         <tr>
                             <th class="text-center">No</th>

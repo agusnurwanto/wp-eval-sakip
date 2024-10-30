@@ -1973,11 +1973,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					}
 
 					$api_params = array(
-						'action' 			=> 'get_rka_sub_keg_akun',
+						'action' 			=> 'get_sub_keg_rka_sipd',
 						'api_key'			=> get_option('_crb_apikey_wpsipd'),
 						'tahun_anggaran' 	=> $tahun_anggaran,
-						'kode_sbl' 			=> $kode_sbl,
-						'jenis_data'		=> 'sakip'
+						'kode_sbl' 			=> $kode_sbl
 					);
 
 					$response = wp_remote_post(get_option('_crb_url_server_sakip'), array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
@@ -1994,14 +1993,23 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						exit();	
 					}
 					
-					$response = json_decode($response);
-
-					$data = $response;
+					$response = json_decode($response, true);
+					if($response['status'] == 'success'){
+						$response['akun'] = array();
+						foreach($response['data'] as $rinc){
+							if(empty($response['akun'][$rinc['kode_akun']])){
+								$response['akun'][$rinc['kode_akun']] = array(
+									'kode_akun' => $rinc['kode_akun'],
+									'nama_akun' => $rinc['nama_akun'],
+									'total' => 0
+								);
+							}
+							$response['akun'][$rinc['kode_akun']]['total'] += $rinc['total_harga'];
+						}
+						ksort($response['akun']);
+					}
 					
-					echo json_encode([
-						'status' => 'success',
-						'data' => $data
-					]);
+					echo json_encode($response);
 
 					exit();
 				} else {

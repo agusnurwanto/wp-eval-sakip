@@ -73,26 +73,26 @@ $user_roles = $current_user->roles;
 $is_admin_panrb = in_array('admin_panrb', $user_roles);
 $is_administrator = in_array('administrator', $user_roles);
 
-    $admin_role_pemda = array(
-        'admin_bappeda',
-        'admin_ortala'
-    );
+$admin_role_pemda = array(
+    'admin_bappeda',
+    'admin_ortala'
+);
 
-    $this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2 ;
+$this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2 ;
 
-    $cek_settingan_menu = $wpdb->get_var(
-        $wpdb->prepare(
-        "SELECT 
-            jenis_role
-        FROM esakip_menu_dokumen 
-        WHERE nama_dokumen='Rencana Aksi'
-          AND user_role='perangkat_daerah' 
-          AND active = 1
-          AND tahun_anggaran=%d
-    ", $input['tahun'])
-    );
+$cek_settingan_menu = $wpdb->get_var(
+    $wpdb->prepare(
+    "SELECT 
+        jenis_role
+    FROM esakip_menu_dokumen 
+    WHERE nama_dokumen='Rencana Aksi'
+      AND user_role='perangkat_daerah' 
+      AND active = 1
+      AND tahun_anggaran=%d
+", $input['tahun'])
+);
 
-    $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
+$hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
 ?>
 <style type="text/css">
     .wrap-table {
@@ -504,10 +504,11 @@ function tambah_rencana_aksi(){
                     jQuery('#pokin-level-1').select2({width: '100%'});
                     jQuery('#pokin-level-2').select2({width: '100%',placeholder: "Pilih Pokin Level 2"}).place;
 
-                    if(data_sasaran_cascading != undefined){
+                    var key = 'sasaran'+'-'+'x.xx';
+                    if(data_sasaran_cascading[key] != undefined){
                         let html_cascading = '<option value="">Pilih Sasaran Cascading</option>';
-                        if(data_sasaran_cascading.data !== null){
-                            data_sasaran_cascading.data.map(function(value, index){
+                        if(data_sasaran_cascading[key].data !== null){
+                            data_sasaran_cascading[key].data.map(function(value, index){
                                 if(value.id_unik_indikator == null){
                                     html_cascading += '<option value="'+value.kode_bidang_urusan+'">'+value.sasaran_teks+'</option>';
                                 }
@@ -526,8 +527,21 @@ function tambah_rencana_aksi(){
 
 function get_tujuan_sasaran_cascading(jenis='sasaran', parent_cascading='x.xx'){
     return new Promise(function(resolve, reject){
+        if(typeof data_sasaran_cascading == 'undefined'){
+            data_sasaran_cascading = {};
+        }
+        if(typeof data_program_cascading == 'undefined'){
+            data_program_cascading = {};
+        }
+        if(typeof data_kegiatan_cascading == 'undefined'){
+            data_kegiatan_cascading = {};
+        }
+        if(typeof data_sub_kegiatan_cascading == 'undefined'){
+            data_sub_kegiatan_cascading = {};
+        }
+        var key = jenis+'-'+parent_cascading;
         if(jenis == 'sasaran'){
-            if(typeof data_sasaran_cascading == 'undefined'){
+            if(typeof data_sasaran_cascading[key] == 'undefined'){
                 jQuery('#wrap-loading').show();
                 jQuery.ajax({
                     url: esakip.url,
@@ -543,9 +557,9 @@ function get_tujuan_sasaran_cascading(jenis='sasaran', parent_cascading='x.xx'){
                     dataType: "json",
                     success: function(response){
                         if(response.status){
-                            window.data_sasaran_cascading = response;
+                            window.data_sasaran_cascading[key] = response;
                         }else{
-                            alert("Data cascading tidak ditemukan")
+                            alert("Data cascading tidak ditemukan");
                         }
                         resolve();
                     }
@@ -554,7 +568,7 @@ function get_tujuan_sasaran_cascading(jenis='sasaran', parent_cascading='x.xx'){
                 resolve();
             }
         }else if(jenis == 'program'){
-            if(typeof data_program_cascading == 'undefined'){
+            if(typeof data_program_cascading[key] == 'undefined'){
                 jQuery('#wrap-loading').show();
                 jQuery.ajax({
                     url: esakip.url,
@@ -570,9 +584,9 @@ function get_tujuan_sasaran_cascading(jenis='sasaran', parent_cascading='x.xx'){
                     dataType: "json",
                     success: function(response){
                         if(response.status){
-                            window.data_program_cascading = response;
+                            window.data_program_cascading[key] = response;
                         }else{
-                            alert("Data cascading tidak ditemukan")
+                            alert("Data cascading tidak ditemukan");
                         }
                         resolve();
                     }
@@ -581,7 +595,7 @@ function get_tujuan_sasaran_cascading(jenis='sasaran', parent_cascading='x.xx'){
                 resolve();
             }
         }else if(jenis == 'kegiatan'){
-            if(typeof data_kegiatan_cascading == 'undefined'){
+            if(typeof data_kegiatan_cascading[key] == 'undefined'){
                 jQuery('#wrap-loading').show();
                 jQuery.ajax({
                     url: esakip.url,
@@ -597,9 +611,9 @@ function get_tujuan_sasaran_cascading(jenis='sasaran', parent_cascading='x.xx'){
                     dataType: "json",
                     success: function(response){
                         if(response.status){
-                            window.data_kegiatan_cascading = response;
+                            window.data_kegiatan_cascading[key] = response;
                         }else{
-                            alert("Data cascading tidak ditemukan")
+                            alert("Data cascading tidak ditemukan");
                         }
                         resolve();
                     }
@@ -608,7 +622,7 @@ function get_tujuan_sasaran_cascading(jenis='sasaran', parent_cascading='x.xx'){
                 resolve();
             }
         }else if(jenis == 'sub_kegiatan'){
-            if(typeof data_sub_kegiatan_cascading == 'undefined'){
+            if(typeof data_sub_kegiatan_cascading[key] == 'undefined'){
                 jQuery('#wrap-loading').show();
                 jQuery.ajax({
                     url: esakip.url,
@@ -624,9 +638,9 @@ function get_tujuan_sasaran_cascading(jenis='sasaran', parent_cascading='x.xx'){
                     dataType: "json",
                     success: function(response){
                         if(response.status){
-                            window.data_sub_kegiatan_cascading = response;
+                            window.data_sub_kegiatan_cascading[key] = response;
                         }else{
-                            alert("Data cascading tidak ditemukan")
+                            alert("Data cascading tidak ditemukan");
                         }
                         resolve();
                     }
@@ -1461,19 +1475,21 @@ function tambah_renaksi_2(tipe){
             var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
             var level_pokin = 3;
             var title = 'Rencana Aksi';
-            let data_cascading = 'data_program_cascading' in window ? data_program_cascading : '';
+            var key = jenis+'-'+parent_cascading;
+            let data_cascading = data_program_cascading[key];
+            var key = jenis+'-'+parent_cascading;
             if(tipe == 3){
                 level_pokin = 4;
                 title = 'Uraian Rencana Aksi';
                 parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
                 parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
-                data_cascading = data_kegiatan_cascading;
+                data_cascading = data_kegiatan_cascading[key];
             }else if(tipe == 4){
                 level_pokin = 5;
                 title = 'Uraian Teknis Kegiatan';
                 parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
                 parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
-                data_cascading = data_sub_kegiatan_cascading;
+                data_cascading = data_sub_kegiatan_cascading[key];
             }
             jQuery('#wrap-loading').show();
             jQuery.ajax({
@@ -1540,7 +1556,8 @@ function tambah_renaksi_2(tipe){
                                         break;
 
                                     case 4:
-                                        html_cascading += '<option data-kodesbl="'+value.kode_sbl+'" value="'+value.kode_sub_giat+'">'+value.kode_sub_giat+' '+value.nama_sub_giat+'</option>';
+                                        var nama_sub_giat = value.kode_sub_giat+' '+value.nama_sub_giat.replace(value.kode_sub_giat, '');
+                                        html_cascading += '<option data-kodesbl="'+value.kode_sbl+'" value="'+value.kode_sub_giat+'">'+nama_sub_giat+'</option>';
                                         break;
                                 
                                     default:
@@ -1640,7 +1657,7 @@ function simpan_data_renaksi(tipe){
 }
 
 function tambah_rincian_belanja_rencana_aksi(id_indikator, id_uraian_teknis_kegiatan, kode_sbl){
-    if(kode_sbl == '' || kode_sbl== null){
+    if(kode_sbl == '' || kode_sbl=='null'){
         alert("Harap perbarui data Uraian Teknis Kegiatan\nCukup \"Edit\" lalu \"Simpan\" jika tidak ada perubahan.")
         return;
     }
@@ -1710,7 +1727,7 @@ function tambah_rincian_belanja_rencana_aksi(id_indikator, id_uraian_teknis_kegi
         jQuery("#modal-crud").find('.modal-dialog').css('width','');
         jQuery("#modal-crud").modal('show');
 
-        if(data_rekening_akun != undefined){
+        if(data_rekening_akun[kode_sbl] != undefined){
             let html_rekening_belanja = '';
                 let no = 0;
                 html_rekening_belanja +=``
@@ -1733,7 +1750,8 @@ function tambah_rincian_belanja_rencana_aksi(id_indikator, id_uraian_teknis_kegi
                             +`</tr>`
                         +`</thead>`
                         +`<tbody>`;
-                    data_rekening_akun.map(function(b, i){
+                    for(var i in data_rekening_akun[kode_sbl].akun){
+                        var b = data_rekening_akun[kode_sbl].akun[i];
                         number = no++;
                         html_rekening_belanja +=``
                         +`<tr>`
@@ -1756,7 +1774,7 @@ function tambah_rincian_belanja_rencana_aksi(id_indikator, id_uraian_teknis_kegi
                             +`</td>`
                             +`<td>`
                                 +`<div class="form-group">`
-                                    +`<input type="text" class="form-control" id="nilai-rincian-${number}" value="0" required disabled>`
+                                    +`<input type="text" class="form-control" id="nilai-rincian-${number}" value="0" required disabled value="${b.total}">`
                                 +`</div>`
                             +`</td>`
                             +`<td>`
@@ -1785,7 +1803,7 @@ function tambah_rincian_belanja_rencana_aksi(id_indikator, id_uraian_teknis_kegi
                             //     +`</div>`
                             // +`</td>`
                         +`</tr>`;
-                    });
+                    };
                     html_rekening_belanja +=``
                             +`</tbody>`
                         +`</table>`
@@ -1806,6 +1824,9 @@ function check_all_rekening(){
 function get_data_rekening_akun_wp_sipd(kode_sbl='0'){
     return new Promise(function(resolve, reject){
         if(typeof data_rekening_akun == 'undefined'){
+            window.data_rekening_akun = {};
+        }
+        if(typeof data_rekening_akun[kode_sbl] == 'undefined'){
             jQuery('#wrap-loading').show();
             jQuery.ajax({
                 url: esakip.url,
@@ -1821,13 +1842,9 @@ function get_data_rekening_akun_wp_sipd(kode_sbl='0'){
                 success: function(response){
                     jQuery('#wrap-loading').hide();
                     if(response.status == 'success'){
-                        if(response.data){
-                            window.data_rekening_akun = response.data.data_akun;
-                        }else{
-                            alert("Data rekening akun tidak ditemukan")    
-                        }
+                        data_rekening_akun[kode_sbl] = response;
                     }else{
-                        alert("Data rekening akun tidak ditemukan")
+                        alert("Error get data dari DPA, "+response.message);
                     }
                     resolve();
                 }
