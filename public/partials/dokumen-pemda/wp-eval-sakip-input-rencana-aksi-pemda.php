@@ -6,12 +6,14 @@ if (!defined('WPINC')) {
 }
 
 $id_tujuan = isset($_GET['id_tujuan']) ? intval($_GET['id_tujuan']) : 0;
+$id_pokin = isset($_GET['id_pokin']) ? intval($_GET['id_pokin']) : 0;
 
 $input = shortcode_atts(array(
     'tahun' => '2024',
     'id_skpd' => 0,
     'periode' => '',
-    'id_tujuan' => $id_tujuan
+    'id_tujuan' => $id_tujuan,
+    'id_pokin' => $id_pokin
 ), $atts);
 
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);

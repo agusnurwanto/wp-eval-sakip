@@ -941,6 +941,7 @@ CREATE TABLE `esakip_rpd_tujuan` (
   `urut_saspok` tinyint(4) DEFAULT NULL,
   `urut_tujuan` tinyint(4) DEFAULT NULL,
   `visi_teks` text DEFAULT NULL,
+  `id_pokin` int(11) DEFAULT NULL,
   `id_isu` int(11) DEFAULT NULL,
   `no_urut` int(11) NOT NULL,
   `catatan_teks_tujuan` text DEFAULT NULL,
