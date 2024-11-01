@@ -1729,85 +1729,88 @@ function tambah_rincian_belanja_rencana_aksi(id_indikator, id_uraian_teknis_kegi
 
         if(data_rekening_akun[kode_sbl] != undefined){
             let html_rekening_belanja = '';
-                let no = 0;
-                html_rekening_belanja +=``
-                    +`<table class="table" style="margin: 0 0 2rem;">`
-                        +`<thead>`
-                            +`<tr class="table-secondary">`
-                                +`<th class="text-center" style="width:20px">`
-                                    +`<div class="form-check">`
-                                        +`<input class="form-check-input" type="checkbox" name="input_rekening_belanja_all" id="rekening-belanja-all" onchange="check_all_rekening();">`
-                                    +`</div>`
-                                +`</th>`
-                                +`<th class="text-center">Kode Rekening</th>`
-                                +`<th class="text-center">Nama Rekening</th>`
-                                +`<th class="text-center">Nilai Rincian</th>`
-                                +`<th class="text-center">Nilai Tertagging</th>`
-                                +`<th class="text-center set_manual" style="display: none;">Uraian Tagging</th>`
-                                +`<th class="text-center set_manual" style="display: none;">Volume Satuan Tagging</th>`
-                                +`<th class="text-center set_manual" style="display: none;">Nilai Tagging</th>`
-                                // +`<th class="text-center">Aksi</th>`
-                            +`</tr>`
-                        +`</thead>`
-                        +`<tbody>`;
-                    for(var i in data_rekening_akun[kode_sbl].akun){
-                        var b = data_rekening_akun[kode_sbl].akun[i];
-                        number = no++;
-                        html_rekening_belanja +=``
-                        +`<tr>`
-                            +`<td>`
+            let no = 0;
+            html_rekening_belanja +=``
+                +`<table class="table" style="margin: 0 0 2rem;">`
+                    +`<thead>`
+                        +`<tr class="table-secondary">`
+                            +`<th class="text-center" style="width:20px">`
                                 +`<div class="form-check">`
-                                    +`<input class="form-check-input input_checkbox_rekening" type="checkbox" name="input_rekening_belanja_${number}" value="${b.kode_akun}" id="rekening-belanja-${number}" number="${number}">`
+                                    +`<input class="form-check-input" type="checkbox" name="input_rekening_belanja_all" id="rekening-belanja-all" onchange="check_all_rekening();">`
                                 +`</div>`
-                            +`</td>`
-                            +`<td>`
-                                +`<div class="form-group">`
-                                    +`<input type="text" class="form-control" id="kode-rekening-${number}" name="kode_rekening_${number}" required disabled value="${b.kode_akun}">`
-                                +`</div>`
-                            +`</td>`
-                            +`<td>`
-                                +`<div class="form-group">`
-                                    +`<textarea class="form-control" rows="2" cols="50" id="nama-rekening-${number}" required disabled>`
-                                        +`${b.nama_akun.replace(b.kode_akun+' ', '')}`
-                                    +`</textarea>`
-                                +`</div>`
-                            +`</td>`
-                            +`<td>`
-                                +`<div class="form-group">`
-                                    +`<input type="text" class="form-control" id="nilai-rincian-${number}" value="0" required disabled value="${b.total}">`
-                                +`</div>`
-                            +`</td>`
-                            +`<td>`
-                                +`<div class="form-group">`
-                                    +`<input type="text" class="form-control" id="nilai-tertaggin-${number}" value="0" required disabled>`
-                                +`</div>`
-                            +`</td>`
-                            +`<td class="set_manual" style="display: none;">`
-                                +`<div class="form-group">`
-                                    +`<textarea class="form-control" rows="2" cols="50" id="uraian-tagging-${number}" name="uraian_tagging_${number}" required></textarea>`
-                                +`</div>`
-                            +`</td>`
-                            +`<td class="set_manual" style="display: none;">`
-                                +`<div class="form-group">`
-                                    +`<input type="text" class="form-control" id="volume-satuan-tagging-${number}" name="volume_satuan_tagging_${number}" required>`
-                                +`</div>`
-                            +`</td>`
-                            +`<td class="set_manual" style="display: none;">`
-                                +`<div class="form-group">`
-                                    +`<input type="number" class="form-control" id="nilai-tagging-${number}" name="nilai_tagging_${number}" required>`
-                                +`</div>`
-                            +`</td>`
-                            // +`<td>`
-                            //     +`<div class="form-group">`
-                            //         // +`<input type="text" class="form-control" id="aksi-${number}" name="nilai_rincian" value="0" required disabled>`
-                            //     +`</div>`
-                            // +`</td>`
-                        +`</tr>`;
-                    };
-                    html_rekening_belanja +=``
-                            +`</tbody>`
-                        +`</table>`
-                    jQuery('#html_rekening_akun').html(html_rekening_belanja);
+                            +`</th>`
+                            +`<th class="text-center">Kode Rekening</th>`
+                            +`<th class="text-center">Nama Rekening</th>`
+                            +`<th class="text-center">Nilai Rincian</th>`
+                            +`<th class="text-center">Nilai Tertagging</th>`
+                            +`<th class="text-center set_manual" style="display: none;">Uraian Tagging</th>`
+                            +`<th class="text-center set_manual" style="display: none;">Volume Satuan Tagging</th>`
+                            +`<th class="text-center set_manual" style="display: none;">Nilai Tagging</th>`
+                            // +`<th class="text-center">Aksi</th>`
+                        +`</tr>`
+                    +`</thead>`
+                    +`<tbody>`;
+            for(var i in data_rekening_akun[kode_sbl].akun){
+                var b = data_rekening_akun[kode_sbl].akun[i];
+                number = no++;
+                html_rekening_belanja +=``
+                +`<tr>`
+                    +`<td>`
+                        +`<div class="form-check">`
+                            +`<input class="form-check-input input_checkbox_rekening" type="checkbox" name="input_rekening_belanja_${number}" value="${b.kode_akun}" id="rekening-belanja-${number}" number="${number}">`
+                        +`</div>`
+                    +`</td>`
+                    +`<td>`
+                        +`<div class="form-group">`
+                            +b.kode_akun
+                            +`<input type="hidden" class="form-control" id="kode-rekening-${number}" name="kode_rekening_${number}" required disabled value="${b.kode_akun}">`
+                        +`</div>`
+                    +`</td>`
+                    +`<td>`
+                        +`<div class="form-group">`
+                            +b.nama_akun.replace(b.kode_akun+' ', '')
+                            +`<textarea class="form-control hide" rows="2" cols="50" id="nama-rekening-${number}" required disabled>`
+                                +`${b.nama_akun.replace(b.kode_akun+' ', '')}`
+                            +`</textarea>`
+                        +`</div>`
+                    +`</td>`
+                    +`<td>`
+                        +`<div class="form-group">`
+                            +b.total
+                            +`<input type="hidden" class="form-control text-right" id="nilai-rincian-${number}" required disabled value="${b.total}">`
+                        +`</div>`
+                    +`</td>`
+                    +`<td>`
+                        +`<div class="form-group">`
+                            +`<input type="text" class="form-control text-right" id="nilai-tertaggin-${number}" value="0" required disabled>`
+                        +`</div>`
+                    +`</td>`
+                    +`<td class="set_manual" style="display: none;">`
+                        +`<div class="form-group">`
+                            +`<textarea class="form-control" rows="2" cols="50" id="uraian-tagging-${number}" name="uraian_tagging_${number}" required></textarea>`
+                        +`</div>`
+                    +`</td>`
+                    +`<td class="set_manual" style="display: none;">`
+                        +`<div class="form-group">`
+                            +`<input type="text" class="form-control" id="volume-satuan-tagging-${number}" name="volume_satuan_tagging_${number}" required>`
+                        +`</div>`
+                    +`</td>`
+                    +`<td class="set_manual" style="display: none;">`
+                        +`<div class="form-group">`
+                            +`<input type="number" class="form-control" id="nilai-tagging-${number}" name="nilai_tagging_${number}" required>`
+                        +`</div>`
+                    +`</td>`
+                    // +`<td>`
+                    //     +`<div class="form-group">`
+                    //         // +`<input type="text" class="form-control" id="aksi-${number}" name="nilai_rincian" value="0" required disabled>`
+                    //     +`</div>`
+                    // +`</td>`
+                +`</tr>`;
+            };
+            html_rekening_belanja +=``
+                    +`</tbody>`
+                +`</table>`
+            jQuery('#html_rekening_akun').html(html_rekening_belanja);
         }else{
             alert("Data Rekening Akun Kosong!")
         }

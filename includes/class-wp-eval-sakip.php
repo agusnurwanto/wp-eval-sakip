@@ -709,6 +709,8 @@ class Wp_Eval_Sakip {
 		add_shortcode('halaman_mapping_user_esr', array($plugin_public, 'halaman_mapping_user_esr'));
 		add_shortcode('input_rencana_aksi_pemda', array($plugin_public, 'input_rencana_aksi_pemda'));
 		add_shortcode('halaman_mapping_jenis_dokumen', array($plugin_public, 'halaman_mapping_jenis_dokumen'));
+		
+		add_shortcode('tagging_rincian_sakip', array($plugin_public, 'tagging_rincian_sakip'));
 	}
 
 	/**

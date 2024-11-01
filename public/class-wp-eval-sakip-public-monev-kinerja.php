@@ -11,6 +11,15 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/setting-menu/wp-eval-sakip-setting-rencana-aksi.php';
 	}
 
+	public function tagging_rincian_sakip($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/monev-kinerja/wp-eval-sakip-tagging-rincian.php';
+	}
+
 	public function get_data_renaksi()
 	{
 		global $wpdb;
@@ -726,6 +735,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						}
 					}
 
+					$rincian_tagging = $this->functions->generatePage(array(
+						'nama_page' => 'Halaman Tagging Rincian Belanja',
+						'content' => '[tagging_rincian_sakip]',
+						'show_header' => 1,
+						'post_status' => 'private'
+					));
 					$no = 0;
 					$no_renaksi = 0;
 					$no_uraian_renaksi = 0;
@@ -951,7 +966,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$rencana_pagu_html = array();
 									$realisasi_pagu_html = array();
 									foreach($uraian_teknis_kegiatan['indikator'] as $key => $ind){
-										$indikator_html[$key] = $ind['indikator'];
+										$indikator_html[$key] = '<a href="'.$this->functions->add_param_get($rincian_tagging['url'], 'tahun=' . $_POST['tahun_anggaran'] . '&id_skpd=' . $_POST['id_skpd'].'&id_indikator='.$ind['id']).'" target="_blank">'.$ind['indikator'].'</a>';
 										$satuan_html[$key] = $ind['satuan'];
 										$target_awal_html[$key] = $ind['target_awal'];
 										$target_akhir_html[$key] = $ind['target_akhir'];
