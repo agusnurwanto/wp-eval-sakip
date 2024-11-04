@@ -744,12 +744,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						}
 					}
 
-					$rincian_tagging = $this->functions->generatePage(array(
-						'nama_page' => 'Halaman Tagging Rincian Belanja',
-						'content' => '[tagging_rincian_sakip]',
-						'show_header' => 1,
-						'post_status' => 'private'
-					));
 					$no = 0;
 					$no_renaksi = 0;
 					$no_uraian_renaksi = 0;
@@ -1775,6 +1769,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						}
 					}
 
+
 					$no = 0;
 					foreach($data_all['data'] as $v){
 					    $no++;
@@ -1811,7 +1806,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					    $html .= '
 					    <tr>
 					        <td>'.$no.'</td>
-					        <td class="kegiatan_utama"><b>'.$v['detail']['label'].'</td>
+							<td class="kegiatan_utama"><span class="badge bg-success text-white"><b>'.$v['detail']['label_pokin_2'].'</span><br>'.$v['detail']['label'].'</td>
 					        <td class="indikator_kegiatan_utama"><b>'.$indikator_html.'</td>
 					        <td class="recana_aksi"><b></td>
 					        <td class="urian_renaksi"><b></td>
@@ -1868,7 +1863,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					            <td>'.$no.'.'.$no_renaksi.'</td>
 					            <td class="kegiatan_utama"><b><i></td>
 					            <td class="indikator_kegiatan_utama"><b><i></td>
-					            <td class="recana_aksi"><b><i>'.$renaksi['detail']['label'].'</td>
+								<td class="recana_aksi"><span class="badge bg-success text-white">'.$renaksi['detail']['label_pokin_3'].'</span><br><b><i>'.$renaksi['detail']['label'].'</td>
 					            <td class="urian_renaksi"><b><i></td>
 					            <td class="text-center satuan_renaksi"><b><i>'.$satuan_html.'</td>
 					            <td class="indikator_renaksi"><b><i>'.$indikator_html.'</td>
@@ -1936,7 +1931,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					                <td class="kegiatan_utama"></td>
 					                <td class="indikator_kegiatan_utama"></td>
 					                <td class="recana_aksi"></td>
-					                <td class="urian_renaksi">'.$uraian_renaksi['detail']['label'].'</td>
+									<td class="urian_renaksi"><span class="badge bg-success text-white">'.$label_pokin.'</span><br>'.$uraian_renaksi['detail']['label'].'</td>
 					                <td class="text-center satuan_renaksi">'.$satuan_html.'</td>	
 					                <td class="indikator_uraian_renaksi">'.$indikator_html.'</td>
 					                <td class="text-right target_akhir_urian_renaksi">'.$target_akhir_html.'</td>
@@ -1997,10 +1992,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					}
 
 					$api_params = array(
-						'action' 			=> 'get_sub_keg_rka_sipd',
+						'action' 			=> 'get_rka_sub_keg_akun',
 						'api_key'			=> get_option('_crb_apikey_wpsipd'),
 						'tahun_anggaran' 	=> $tahun_anggaran,
-						'kode_sbl' 			=> $kode_sbl
+						'kode_sbl' 			=> $kode_sbl,
+						'jenis_data'		=> 'sakip'
 					);
 
 					$response = wp_remote_post(get_option('_crb_url_server_sakip'), array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
@@ -2017,23 +2013,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						exit();	
 					}
 					
-					$response = json_decode($response, true);
-					if($response['status'] == 'success'){
-						$response['akun'] = array();
-						foreach($response['data'] as $rinc){
-							if(empty($response['akun'][$rinc['kode_akun']])){
-								$response['akun'][$rinc['kode_akun']] = array(
-									'kode_akun' => $rinc['kode_akun'],
-									'nama_akun' => $rinc['nama_akun'],
-									'total' => 0
-								);
-							}
-							$response['akun'][$rinc['kode_akun']]['total'] += $rinc['total_harga'];
-						}
-						ksort($response['akun']);
-					}
+					$response = json_decode($response);
+
+					$data = $response;
 					
-					echo json_encode($response);
+					echo json_encode([
+						'status' => 'success',
+						'data' => $data
+					]);
 
 					exit();
 				} else {
@@ -2225,41 +2212,37 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	                $_prefix_pemda = '';
 	                if (!empty($_POST['tipe_pokin'])) {
 	                    $_prefix_pemda = $_POST['tipe_pokin'] == "pemda" ? "_pemda" : "";
-	                }elseif (empty($_POST['id_tujuan'])) {
-						$ret['status'] = 'error';
-						$ret['message'] = 'ID Tujuan tidak boleh kosong!';
-					}
-
-	                if ($_prefix_pemda == '') {
-	                    $data_renaksi = array();
-	                } else if ($_prefix_pemda == '_pemda') {
-	                    $data_renaksi = $wpdb->get_results($wpdb->prepare("
-	                        SELECT 
-	                            a.*
-	                        FROM esakip_data_rencana_aksi_pemda a
-	                        WHERE 
-	                            a.parent=%d AND 
-	                            a.level=%d AND 
-	                            a.active=%d AND 
-	                            a.id_tujuan=%d
-	                        ORDER BY a.id
-	                    ",
-	                    $_POST['parent'],
-	                    $_POST['level'],
-	                    1,
-	                    $_POST['id_tujuan']
-	                    ), ARRAY_A);
+	                } elseif (empty($_POST['id_tujuan'])) {
+	                    $ret['status'] = 'error';
+	                    $ret['message'] = 'ID Tujuan tidak boleh kosong!';
+	                    die(json_encode($ret));
 	                }
 
-	                // Ambil indikator terkait untuk setiap data rencana aksi
+	                $data_renaksi = ($_prefix_pemda == '_pemda') ? $wpdb->get_results($wpdb->prepare("
+	                    SELECT 
+	                        a.*
+	                    FROM esakip_data_rencana_aksi_pemda a
+	                    WHERE 
+	                        a.parent=%d AND 
+	                        a.level=%d AND 
+	                        a.active=%d AND 
+	                        a.id_tujuan=%d
+	                    ORDER BY a.id
+	                ", $_POST['parent'], $_POST['level'], 1, $_POST['id_tujuan']), ARRAY_A) : [];
+
 	                foreach($data_renaksi as $key => $val){
 	                    $data_renaksi[$key]['indikator'] = $wpdb->get_results($wpdb->prepare("
 	                        SELECT
-	                            *
-	                        FROM esakip_data_rencana_aksi_indikator_pemda
-	                        WHERE id_renaksi=%d
-	                            AND active=1
-	                    ", $val['id']));
+	                            s.*,
+	                            u.*,
+	                            u.id AS id_data_unit
+	                        FROM esakip_data_rencana_aksi_indikator_pemda AS s
+	                        LEFT JOIN esakip_data_unit as u ON s.id_skpd=u.id_skpd
+	                            AND s.tahun_anggaran=u.tahun_anggaran
+	                            AND s.active=u.active
+	                        WHERE s.id_renaksi = %d
+	                            AND s.active=%d
+	                    ", $val['id'], 1));
 	                }
 
 	                switch ($_POST['level']) {
@@ -2279,18 +2262,13 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	                            SELECT 
 	                                label 
 	                            FROM esakip_data_rencana_aksi_pemda 
-	                            WHERE id=(
-	                                SELECT 
-	                                    parent 
-	                                FROM esakip_data_rencana_aksi_pemda 
-	                                WHERE id=a.id 
-	                            ) 
+	                            WHERE id=(SELECT parent FROM esakip_data_rencana_aksi_pemda WHERE id=a.id)
 	                        ) label_parent_1,
 	                        (
 	                            SELECT 
 	                                label 
 	                            FROM esakip_data_rencana_aksi_pemda 
-	                            WHERE id=a.id 
+	                            WHERE id=a.id
 	                        ) label_parent_2';
 	                        break;
 
@@ -2300,34 +2278,19 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	                            SELECT 
 	                                label 
 	                            FROM esakip_data_rencana_aksi_pemda 
-	                            WHERE id=(
-	                                SELECT 
-	                                    parent 
-	                                FROM esakip_data_rencana_aksi_pemda 
-	                                WHERE id=(
-	                                    SELECT 
-	                                        parent 
-	                                    FROM esakip_data_rencana_aksi_pemda 
-	                                    WHERE id=a.id 
-	                                ) 
-	                            ) 
+	                            WHERE id=(SELECT parent FROM esakip_data_rencana_aksi_pemda WHERE id=(SELECT parent FROM esakip_data_rencana_aksi_pemda WHERE id=a.id))
 	                        ) label_parent_1,
 	                        (
 	                            SELECT 
 	                                label 
 	                            FROM esakip_data_rencana_aksi_pemda 
-	                            WHERE id=(
-	                                SELECT 
-	                                    parent 
-	                                FROM esakip_data_rencana_aksi_pemda 
-	                                WHERE id=a.id 
-	                            ) 
+	                            WHERE id=(SELECT parent FROM esakip_data_rencana_aksi_pemda WHERE id=a.id)
 	                        ) label_parent_2,
 	                        (
 	                            SELECT 
 	                                label 
 	                            FROM esakip_data_rencana_aksi_pemda 
-	                            WHERE id=a.id 
+	                            WHERE id=a.id
 	                        ) label_parent_3';
 	                        break;
 
@@ -2336,40 +2299,23 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	                        break;
 	                }
 
-	                $dataParent = array();
-	                if(!empty($label_parent)){
-	                    $dataParent = $wpdb->get_results($wpdb->prepare(
-	                        "
-	                            SELECT 
-	                                " . $label_parent . "
-	                            FROM esakip_data_rencana_aksi_pemda a 
-	                            WHERE  
-	                                a.id=%d AND
-	                                a.active=%d
-	                            ORDER BY a.id ASC",
-	                        $_POST['parent'],
-	                        1
-	                    ), ARRAY_A);
-	                }
+	                $dataParent = !empty($label_parent) ? $wpdb->get_results($wpdb->prepare(
+	                    "
+	                        SELECT 
+	                            " . $label_parent . "
+	                        FROM esakip_data_rencana_aksi_pemda a 
+	                        WHERE  
+	                            a.id=%d AND
+	                            a.active=%d
+	                        ORDER BY a.id ASC",
+	                    $_POST['parent'], 1
+	                ), ARRAY_A) : [];
 
-	                $data_parent = array();
+	                $data_parent = [];
 	                foreach ($dataParent as $v_parent) {
-
-	                    if (empty($data_parent[$v_parent['label_parent_1']])) {
-	                        $data_parent[$v_parent['label_parent_1']] = $v_parent['label_parent_1'];
-	                    }
-
-	                    if (empty($data_parent[$v_parent['label_parent_2']])) {
-	                        $data_parent[$v_parent['label_parent_2']] = $v_parent['label_parent_2'];
-	                    }
-
-	                    if (empty($data_parent[$v_parent['label_parent_3']])) {
-	                        $data_parent[$v_parent['label_parent_3']] = $v_parent['label_parent_3'];
-	                    }
-
-	                    if (empty($data_parent[$v_parent['label_parent_4']])) {
-	                        $data_parent[$v_parent['label_parent_4']] = $v_parent['label_parent_4'];
-	                    }
+	                    if (!empty($v_parent['label_parent_1'])) $data_parent[$v_parent['label_parent_1']] = $v_parent['label_parent_1'];
+	                    if (!empty($v_parent['label_parent_2'])) $data_parent[$v_parent['label_parent_2']] = $v_parent['label_parent_2'];
+	                    if (!empty($v_parent['label_parent_3'])) $data_parent[$v_parent['label_parent_3']] = $v_parent['label_parent_3'];
 	                }
 
 	                die(json_encode([
@@ -2392,6 +2338,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	        exit();
 	    }
 	}
+
 
 	function tambah_renaksi_pemda(){
 		global $wpdb;
@@ -2424,6 +2371,20 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'parent' => $_POST['parent'],
 						'created_at' => current_time('mysql'),
 					);
+					if($_POST['level'] == 1){
+						$data['id_pokin_1'] = $_POST['id_pokin_1'];
+						$data['id_pokin_2'] = $_POST['id_pokin_2'];
+						$data['label_pokin_1'] = $_POST['label_pokin_1'];
+						$data['label_pokin_2'] = $_POST['label_pokin_2'];
+					}else if($_POST['level'] == 2){
+						$data['parent'] = $_POST['parent'];
+						$data['id_pokin_3'] = $_POST['id_pokin_1'];
+						$data['label_pokin_3'] = $_POST['label_pokin_1'];
+					}else if($_POST['level'] == 3){
+						$data['parent'] = $_POST['parent'];
+						$data['id_pokin_4'] = $_POST['id_pokin_1'];
+						$data['label_pokin_4'] = $_POST['label_pokin_1'];
+					}
 					if(!empty($_POST['id'])){
 						$cek_id = $_POST['id'];
 					}else{

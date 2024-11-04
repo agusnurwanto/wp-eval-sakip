@@ -131,7 +131,7 @@ foreach($pokin as $get_pokin){
                     <input type="text" class="form-control" id="tujuan_rpd" name="tujuan_rpd" disabled>
                 </div>
                 <div class="form-group">
-                    <label for="id_pokin">Pohon Kinerja</label>
+                    <label for="id_pokin">Pohon Kinerja Level 1</label>
                     <select class="form-control" id="id_pokin" name="id_pokin" onchange="get_pokin_renaksi();"><?php echo $select_pokin; ?></select>
                 </div>
                 <div class="form-group">
