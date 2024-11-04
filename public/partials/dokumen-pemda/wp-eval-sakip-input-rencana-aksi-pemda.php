@@ -88,6 +88,21 @@ foreach($skpd as $get_skpd){
     $select = $get_skpd['id_skpd'] == $input['id_skpd'] ? 'selected' : '';
     $select_skpd .= '<option value="'.$get_skpd['id_skpd'].'" '.$select.'>'.$get_skpd['nama_skpd'].'</option>';
 }
+
+$pokin = $wpdb->get_results($wpdb->prepare('
+    SELECT 
+        *
+    FROM esakip_pohon_kinerja
+    WHERE tahun_anggaran=%d
+        AND id_jadwal=%d
+        AND parent=%d
+        AND level=2
+', $input['tahun'], $input['periode'], $input['id_pokin']), ARRAY_A);
+
+$select_pokin = '<option value="">Pilih Pohon Kinerja</option>';
+foreach($pokin as $get_pokin){
+    $select_pokin .= '<option value="'.$get_pokin['id'].'">'.$get_pokin['label'].'</option>';
+}
 ?>
 <style type="text/css">
     .wrap-table {
@@ -155,30 +170,29 @@ foreach($skpd as $get_skpd){
                 </td>
             </tr>
             <div class="wrap-table">
-                <table id="table_dokumen_rencana_aksi_pemda" cellpadding="2" cellspacing="0" contenteditable="false">
+                <table cellpadding="2" cellspacing="0" class="table_dokumen_rencana_aksi_pemda table table-bordered">
                     <thead style="background: #ffc491;">
-
                         <tr>
                             <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 85px;">No</th>
-                            <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 200px;">KEGIATAN UTAMA</th>
-                            <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 200px;">INDIKATOR KEGIATAN UTAMA</th>
-                            <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 200px;">RENCANA AKSI</th>
-                            <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 200px;">URAIAN KEGIATAN RENCANA AKSI</th>
-                            <th class="atas kiri bawah kanan text-center" colspan="2" style="width: 200px;">OUTCOME/OUTPUT</th>
+                            <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 300px;">KEGIATAN UTAMA</th>
+                            <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 300px;">INDIKATOR KEGIATAN UTAMA</th>
+                            <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 400px;">RENCANA AKSI</th>
+                            <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 300px;">URAIAN KEGIATAN RENCANA AKSI</th>
+                            <th class="atas kiri bawah kanan text-center" colspan="2" style="width: 400px;">OUTCOME/OUTPUT</th>
                             <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 140px;">TARGET</th>
                             <th class="atas kiri bawah kanan text-center" colspan="5" style="width: 400px;">TARGET KEGIATAN PER TRIWULAN</th>
                             <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 140px;">JUMLAH ANGGARAN</th>
-                            <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 140px;">NAMA PERANGKAT DAERAH</th>
+                            <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 300px;">NAMA PERANGKAT DAERAH</th>
                             <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 140px;">MITRA BIDANG</th>
                         </tr>
                         <tr>
-                            <th class="atas kiri bawah kanan text-center" style="width: 100px;">SATUAN</th>
-                            <th class="atas kiri bawah kanan text-center" style="width: 200px;">INDIKATOR</th>
-                            <th>TW-I</th>
-                            <th>TW-II</th>
-                            <th>TW-III</th>
-                            <th>TW-IV</th>
-                            <th>AKHIR</th>
+                            <th class="atas kiri bawah kanan text-center" style="width: 50px;">SATUAN</th>
+                            <th class="atas kiri bawah kanan text-center" style="width: 400px;">INDIKATOR</th>
+                            <th class="atas kiri bawah kanan text-right" style="width: 200px;">TW-I</th>
+                            <th class="atas kiri bawah kanan text-right" style="width: 200px;">TW-II</th>
+                            <th class="atas kiri bawah kanan text-right" style="width: 200px;">TW-III</th>
+                            <th class="atas kiri bawah kanan text-right" style="width: 200px;">TW-IV</th>
+                            <th class="atas kiri bawah kanan text-right" style="width: 200px;">AKHIR</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -298,7 +312,7 @@ function getTablePengisianRencanaAksiPemda(no_loading=false) {
             }
             console.log(response);
             if (response.status === 'success') {
-                jQuery('#table_dokumen_rencana_aksi_pemda tbody').html(response.data);
+                jQuery('.table_dokumen_rencana_aksi_pemda tbody').html(response.data);
             } else {
                 alert(response.message);
             }
@@ -336,6 +350,7 @@ function kegiatanUtama(){
                         +`<thead>`
                             +`<tr class="table-secondary">`
                                 +`<th class="text-center" style="width:40px;">No</th>`
+                                +`<th class="text-center" style="width:300px;">Label Pokin</th>`
                                 +`<th class="text-center">Kegiatan Utama</th>`
                                 +`<th class="text-center" style="width:200px;">Aksi</th>`
                             +`</tr>`
@@ -349,6 +364,7 @@ function kegiatanUtama(){
                     kegiatanUtama += `` 
                         +`<tr id="kegiatan_utama_${value.id}">`
                             +`<td class="text-center">${index+1}</td>`
+                            +`<td class="label_pokin">${value.label_pokin_2}</td>`
                             +`<td class="label_renaksi">${value.label}</td>`
                             +`<td class="text-center">`
                                 +`<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, 1)" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
@@ -437,6 +453,11 @@ function tambah_rencana_aksi(){
                 jQuery("#modal-crud").find('.modal-body').html(''
                     +`<form id="form-renaksi">`
                         +'<input type="hidden" id="id_renaksi" value=""/>'
+                        +`<div class="form-group">`
+                            +`<label for="pokin-level-2">Pilih Pokin Level 2</label>`
+                            + `<select class="form-control" name="pokin-level-2" id="pokin-level-2"><?php echo $select_pokin; ?></select>`
+                            +`</select>`
+                        +`</div>`
                         +`<div class="form-group">`
                             +`<textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan Kegiatan Utama..."></textarea>`
                         +`</div>`
@@ -600,7 +621,6 @@ function simpan_indikator_renaksi(tipe) {
         rencana_pagu = 0;
     }
 
-    // Check satuan and target_akhir based on tipe
     var satuan = jQuery('#satuan_indikator').val();
     if ((tipe == 2 || tipe == 3) && satuan == '') {
         return alert('Satuan tidak boleh kosong!');
@@ -676,6 +696,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
         var fungsi_tambah = '';
         var id_tabel = '';
         let header_pagu = '';
+        let header_skpd = '';
         let title_cascading = '';
 
         // rencana aksi
@@ -693,6 +714,8 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
             fungsi_tambah = 'tambah_renaksi_2';
             header_pagu = ''
                 +`<th class="text-center" style="width:50px;">Rencana Pagu</th>`;
+            header_skpd = ''
+                +`<th class="text-center">Perangkat Daerah</th>`;
         }
         jQuery.ajax({
             url: esakip.url,
@@ -750,6 +773,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
                         +`<thead>`
                             +`<tr class="table-secondary">`
                                 +`<th class="text-center" style="width:40px;">No</th>`
+                                +`<th class="text-center" style="width:300px;">Label Pokin</th>`
                                 +`<th class="text-center">`+title+`</th>`
                                 +`<th class="text-center" style="width:200px;">Aksi</th>`
                             +`</tr>`
@@ -775,10 +799,16 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
                                     label_cascading = value['label_cascading_program'] != null ? value['kode_cascading_program']+' '+value['label_cascading_program'] : '-';
                                     tombol_detail = ''
                                         +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, `+(tipe+1)+`, `+id_pokin+`, '`+id_parent_cascading+`')" title="Lihat Uraian Kegiatan Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
+                                }else if(tipe == 3){
+                                    label_pokin = value['label_pokin_4'];
+                                    id_parent_cascading = value['kode_cascading_kegiatan'];
+                                    label_cascading = value['label_cascading_kegiatan'] != null ? value['kode_cascading_kegiatan']+' '+value['label_cascading_kegiatan'] : '-';
+                                    id_pokin = value['id_pokin_4'];
                                 }
                                 renaksi += ``
                                     +`<tr id="kegiatan_utama_${value.id}">`
                                         +`<td class="text-center">${index+1}</td>`
+                                        +`<td class="label_pokin">`+label_pokin+`</td>`
                                         +`<td class="label_renaksi">${value.label}</td>`
                                         +`<td class="text-center">`
                                             +`<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, ${tipe})" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
@@ -804,29 +834,35 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
                                                     +`<th class="text-center" style="width:50px;">Target TW 3</th>`
                                                     +`<th class="text-center" style="width:50px;">Target TW 4</th>`
                                                     +`${header_pagu}`
+                                                    +`${header_skpd}`
                                                     +`<th class="text-center" style="width:110px">Aksi</th>`
                                                 +`</tr>`
                                             +`</thead>`
                                             +`<tbody>`;
                                     indikator.map(function(b, i){
                                         let rencana_pagu = b.rencana_pagu != null ? b.rencana_pagu : 0;
+                                        let nama_skpd = b.nama_skpd != null ? b.nama_skpd : 0;
                                         let realisasi_pagu = b.realisasi_pagu != null ? b.realisasi_pagu : 0;
                                         let val_pagu = '';
+                                        let skpd = '';
                                         if(tipe == 3){
                                             val_pagu = ''    
                                                 +`<td class="text-center">${rencana_pagu}</td>`;
+                                            skpd = ''    
+                                                +`<td class="text-left">${nama_skpd}</td>`;
                                         }
                                         renaksi += ``
                                             +`<tr>`
                                                 +`<td class="text-center">${index+1}.${i+1}</td>`
                                                 +`<td>${b.indikator}</td>`
                                                 +`<td class="text-center">${b.satuan}</td>`
-                                                +`<td class="text-center">${b.target_akhir}</td>`
-                                                +`<td class="text-center">${b.target_1}</td>`
-                                                +`<td class="text-center">${b.target_2}</td>`
-                                                +`<td class="text-center">${b.target_3}</td>`
-                                                +`<td class="text-center">${b.target_4}</td>`
+                                                +`<td class="text-right">${b.target_akhir}</td>`
+                                                +`<td class="text-right">${b.target_1}</td>`
+                                                +`<td class="text-right">${b.target_2}</td>`
+                                                +`<td class="text-right">${b.target_3}</td>`
+                                                +`<td class="text-right">${b.target_4}</td>`
                                                 +`${val_pagu}`
+                                                +`${skpd}`
                                                 +`<td class="text-center">`
                                                     +`<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_indikator(${b.id}, `+tipe+`)" title="Edit"><i class="dashicons dashicons-edit"></i></a> `
                                                     +`<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-danger" onclick="hapus_indikator(${b.id}, `+tipe+`);" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
@@ -850,6 +886,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
         });
     });
 }
+
 function tambah_renaksi_2(tipe) {
     return new Promise(function(resolve, reject) {
         setTimeout(function() {
@@ -885,11 +922,22 @@ function tambah_renaksi_2(tipe) {
             },
             dataType: "json",
             success: function(res){
+                var html = '<option value="">Pilih Pokin Level '+level_pokin+'</option>';
+                res.data.map(function(value, index){
+                    html += '<option value="'+value.id+'">'+value.label+'</option>';
+                });
                 jQuery('#wrap-loading').hide();
                 jQuery("#modal-crud").find('.modal-title').html('Tambah '+title);
+                var onchange_pokin = '';
                 jQuery("#modal-crud").find('.modal-body').html(''
                     +'<form>'
                         +'<input type="hidden" id="id_renaksi" value=""/>'
+                        +'<div class="form-group">'
+                            +'<label for="pokin-level-1">Pilih Pokin Level '+level_pokin+'</label>'
+                            +'<select class="form-control" name="pokin-level-1" id="pokin-level-1" '+onchange_pokin+'>'
+                                +html
+                            +'</select>'
+                        +'</div>'
                         +'<div class="form-group">'
                             +'<textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan '+title+'..."></textarea>'
                         +'</div>'
@@ -984,6 +1032,10 @@ function simpan_data_renaksi(tipe){
     if(label_renaksi == ''){
         return alert('Kegiatan Utama tidak boleh kosong!')
     }
+    var id_pokin_1 = jQuery('#pokin-level-1').val();
+    var id_pokin_2 = jQuery('#pokin-level-2').val();
+    var label_pokin_1 = jQuery('#pokin-level-1 option:selected').text();
+    var label_pokin_2 = jQuery('#pokin-level-2 option:selected').text();
     jQuery('#wrap-loading').show();
     jQuery.ajax({
         url: esakip.url,
@@ -993,6 +1045,10 @@ function simpan_data_renaksi(tipe){
             "api_key": esakip.api_key,
             "tipe_pokin": "pemda",
             "id": jQuery('#id_renaksi').val(),
+            "id_pokin_1": id_pokin_1,
+            "id_pokin_2": id_pokin_2,
+            "label_pokin_1": label_pokin_1,
+            "label_pokin_2": label_pokin_2,
             "label_renaksi": label_renaksi,
             "level": tipe,
             "parent": parent_renaksi,
@@ -1034,6 +1090,7 @@ function edit_rencana_aksi(id, tipe){
                     }else if(response.data != null){
                         jQuery('#id_renaksi').val(id);
                         jQuery("#modal-crud").find('.modal-title').html('Edit Kegiatan Utama');
+                        jQuery('#pokin-level-2').val(response.data.id_pokin_2).trigger('change');
                         jQuery('#label_renaksi').val(response.data.label);
                     }
                 }
@@ -1061,8 +1118,10 @@ function edit_rencana_aksi(id, tipe){
                         jQuery('#id_renaksi').val(id);
                         if(tipe == 2){
                             jQuery("#modal-crud").find('.modal-title').html('Edit Rencana Aksi');
+                            jQuery('#pokin-level-1').val(response.data.id_pokin_3).trigger('change');
                         }else if(tipe == 3){
                             jQuery("#modal-crud").find('.modal-title').html('Edit Uraian Rencana Aksi');
+                            jQuery('#pokin-level-1').val(response.data.id_pokin_4).trigger('change');
                         }
                         jQuery('#label_renaksi').val(response.data.label);
                     }
@@ -1207,4 +1266,38 @@ function get_skpd(no_loading=false) {
     });
 }
 
+function get_pokin_renaksi(parent, level, tag){
+    jQuery('#wrap-loading').show();
+    return new Promise(function(resolve, reject){
+        jQuery.ajax({
+            url: esakip.url,
+            type: "post",
+            data: {
+                "action": "get_data_pokin_pemda",
+                "level": level,
+                "parent": <?php echo $input['id_pokin']; ?>,
+                "api_key": esakip.api_key,
+                "tipe_pokin": "pemda",
+                "id_jadwal": id_jadwal,
+            },
+            dataType: "json",
+            success: function(res){
+                var default_value = jQuery('#'+tag).attr('val-id');
+                var html = '<option value="">Pilih Pokin Level '+level+'</option>';
+                res.data.map(function(value, index){
+                    var selected = '';
+                    if(value.id==default_value){
+                        selected = 'selected';
+                    }
+                    html += '<option value="'+value.id+'" '+selected+'>'+value.label+'</option>';
+                });
+                jQuery('#'+tag).attr('val-id', '');
+
+                jQuery('#'+tag).html(html).trigger('change');
+                jQuery('#wrap-loading').hide();
+                resolve();
+            }
+        });
+    });
+}
 </script>
