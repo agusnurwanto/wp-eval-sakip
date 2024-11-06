@@ -50,49 +50,31 @@ $skpd = $wpdb->get_row(
     ARRAY_A
 );
 
-$idtahun = $wpdb->get_results(
-    "
-		SELECT DISTINCT 
-			tahun_anggaran 
-		FROM esakip_data_unit        
-        ORDER BY tahun_anggaran DESC",
-    ARRAY_A
-);
-$tahun = "<option value='-1'>Pilih Tahun</option>";
-
-foreach ($idtahun as $val) {
-    $selected = '';
-    if (!empty($input['tahun_anggaran']) && $val['tahun_anggaran'] == $input['tahun_anggaran']) {
-        $selected = 'selected';
-    }
-    $tahun .= "<option value='$val[tahun_anggaran]' $selected>$val[tahun_anggaran]</option>";
-}
-
 $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
 $is_admin_panrb = in_array('admin_panrb', $user_roles);
 $is_administrator = in_array('administrator', $user_roles);
 
-    $admin_role_pemda = array(
-        'admin_bappeda',
-        'admin_ortala'
-    );
+$admin_role_pemda = array(
+    'admin_bappeda',
+    'admin_ortala'
+);
 
-    $this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2 ;
+$this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2 ;
 
-    $cek_settingan_menu = $wpdb->get_var(
-        $wpdb->prepare(
-        "SELECT 
-            jenis_role
-        FROM esakip_menu_dokumen 
-        WHERE nama_dokumen='Rencana Aksi'
-          AND user_role='perangkat_daerah' 
-          AND active = 1
-          AND tahun_anggaran=%d
-    ", $input['tahun'])
-    );
+$cek_settingan_menu = $wpdb->get_var(
+    $wpdb->prepare(
+    "SELECT 
+        jenis_role
+    FROM esakip_menu_dokumen 
+    WHERE nama_dokumen='Rencana Aksi'
+      AND user_role='perangkat_daerah' 
+      AND active = 1
+      AND tahun_anggaran=%d
+", $input['tahun'])
+);
 
-    $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
+$hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
 ?>
 <style type="text/css">
     .wrap-table {
@@ -195,79 +177,6 @@ $is_administrator = in_array('administrator', $user_roles);
                     <tbody>
                     </tbody>
                 </table>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Tahun Tabel -->
-<div id="tahunContainer" class="container-md">
-</div>
-
-<!-- Modal Upload -->
-<div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="uploadModalLabel">Tambah Dokumen</h5>
-                <h5 class="modal-title" id="editModalLabel">Edit Dokumen</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form enctype="multipart/form-data">
-                    <input type="hidden" value="<?php echo $id_skpd; ?>" id="idSkpd">
-                    <input type="hidden" value="<?php echo $input['tahun']; ?>" id="tahunAnggaran">
-                    <input type="hidden" value="" id="idDokumen">
-                    <div class="form-group">
-                        <label for="perangkatDaerah">Perangkat Daerah</label>
-                        <input type="text" class="form-control" id="perangkatDaerah" name="perangkatDaerah" style="text-transform: uppercase;" value="<?php echo $skpd['nama_skpd']; ?>" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label for="fileUpload">Pilih File</label>
-                        <input type="file" class="form-control-file" id="fileUpload" name="fileUpload" accept="application/pdf" required>
-                        <div style="padding-top: 10px; padding-bottom: 10px;"><a id="fileUploadExisting" target="_blank"></a></div>
-                    </div>
-                    <div class="alert alert-warning mt-2" role="alert">
-                        Maksimal ukuran file: <?php echo get_option('_crb_maksimal_upload_dokumen_esakip'); ?> MB. Format file yang diperbolehkan: PDF.
-                    </div>
-                    <div class="form-group">
-                        <label for="nama_file">Nama Dokumen</label>
-                        <input type="text" class="form-control" id="nama_file" name="nama_file" rows="3" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="keterangan">Keterangan</label>
-                        <textarea class="form-control" id="keterangan" name="keterangan" rows="3" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary" onclick="submit_dokumen(this); return false">Unggah</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Tahun -->
-<div class="modal fade" id="tahunModal" tabindex="-1" role="dialog" aria-labelledby="tahunModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="tahunModalLabel">Pilih Tahun Anggaran</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="tahunForm">
-                    <div class="form-group">
-                        <label for="tahunAnggaran">Tahun Anggaran:</label>
-                        <select class="form-control" id="tahunAnggaran" name="tahunAnggaran">
-                            <?php echo $tahun; ?>
-                        </select>
-                        <input type="hidden" id="idDokumen" value="">
-                    </div>
-                    <button type="submit" class="btn btn-primary" onclick="submit_tahun_renja_rkt(); return false">Simpan</button>
-                </form>
             </div>
         </div>
     </div>
@@ -504,10 +413,11 @@ function tambah_rencana_aksi(){
                     jQuery('#pokin-level-1').select2({width: '100%'});
                     jQuery('#pokin-level-2').select2({width: '100%',placeholder: "Pilih Pokin Level 2"}).place;
 
-                    if(data_sasaran_cascading != undefined){
+                    var key = 'sasaran'+'-'+'x.xx';
+                    if(data_sasaran_cascading[key] != undefined){
                         let html_cascading = '<option value="">Pilih Sasaran Cascading</option>';
-                        if(data_sasaran_cascading.data !== null){
-                            data_sasaran_cascading.data.map(function(value, index){
+                        if(data_sasaran_cascading[key].data !== null){
+                            data_sasaran_cascading[key].data.map(function(value, index){
                                 if(value.id_unik_indikator == null){
                                     html_cascading += '<option value="'+value.kode_bidang_urusan+'">'+value.sasaran_teks+'</option>';
                                 }
@@ -526,8 +436,21 @@ function tambah_rencana_aksi(){
 
 function get_tujuan_sasaran_cascading(jenis='sasaran', parent_cascading='x.xx'){
     return new Promise(function(resolve, reject){
+        if(typeof data_sasaran_cascading == 'undefined'){
+            data_sasaran_cascading = {};
+        }
+        if(typeof data_program_cascading == 'undefined'){
+            data_program_cascading = {};
+        }
+        if(typeof data_kegiatan_cascading == 'undefined'){
+            data_kegiatan_cascading = {};
+        }
+        if(typeof data_sub_kegiatan_cascading == 'undefined'){
+            data_sub_kegiatan_cascading = {};
+        }
+        var key = jenis+'-'+parent_cascading;
         if(jenis == 'sasaran'){
-            if(typeof data_sasaran_cascading == 'undefined'){
+            if(typeof data_sasaran_cascading[key] == 'undefined'){
                 jQuery('#wrap-loading').show();
                 jQuery.ajax({
                     url: esakip.url,
@@ -543,9 +466,9 @@ function get_tujuan_sasaran_cascading(jenis='sasaran', parent_cascading='x.xx'){
                     dataType: "json",
                     success: function(response){
                         if(response.status){
-                            window.data_sasaran_cascading = response;
+                            window.data_sasaran_cascading[key] = response;
                         }else{
-                            alert("Data cascading tidak ditemukan")
+                            alert("Data cascading tidak ditemukan");
                         }
                         resolve();
                     }
@@ -554,7 +477,7 @@ function get_tujuan_sasaran_cascading(jenis='sasaran', parent_cascading='x.xx'){
                 resolve();
             }
         }else if(jenis == 'program'){
-            if(typeof data_program_cascading == 'undefined'){
+            if(typeof data_program_cascading[key] == 'undefined'){
                 jQuery('#wrap-loading').show();
                 jQuery.ajax({
                     url: esakip.url,
@@ -570,9 +493,9 @@ function get_tujuan_sasaran_cascading(jenis='sasaran', parent_cascading='x.xx'){
                     dataType: "json",
                     success: function(response){
                         if(response.status){
-                            window.data_program_cascading = response;
+                            window.data_program_cascading[key] = response;
                         }else{
-                            alert("Data cascading tidak ditemukan")
+                            alert("Data cascading tidak ditemukan");
                         }
                         resolve();
                     }
@@ -581,7 +504,7 @@ function get_tujuan_sasaran_cascading(jenis='sasaran', parent_cascading='x.xx'){
                 resolve();
             }
         }else if(jenis == 'kegiatan'){
-            if(typeof data_kegiatan_cascading == 'undefined'){
+            if(typeof data_kegiatan_cascading[key] == 'undefined'){
                 jQuery('#wrap-loading').show();
                 jQuery.ajax({
                     url: esakip.url,
@@ -597,9 +520,9 @@ function get_tujuan_sasaran_cascading(jenis='sasaran', parent_cascading='x.xx'){
                     dataType: "json",
                     success: function(response){
                         if(response.status){
-                            window.data_kegiatan_cascading = response;
+                            window.data_kegiatan_cascading[key] = response;
                         }else{
-                            alert("Data cascading tidak ditemukan")
+                            alert("Data cascading tidak ditemukan");
                         }
                         resolve();
                     }
@@ -608,7 +531,7 @@ function get_tujuan_sasaran_cascading(jenis='sasaran', parent_cascading='x.xx'){
                 resolve();
             }
         }else if(jenis == 'sub_kegiatan'){
-            if(typeof data_sub_kegiatan_cascading == 'undefined'){
+            if(typeof data_sub_kegiatan_cascading[key] == 'undefined'){
                 jQuery('#wrap-loading').show();
                 jQuery.ajax({
                     url: esakip.url,
@@ -624,9 +547,9 @@ function get_tujuan_sasaran_cascading(jenis='sasaran', parent_cascading='x.xx'){
                     dataType: "json",
                     success: function(response){
                         if(response.status){
-                            window.data_sub_kegiatan_cascading = response;
+                            window.data_sub_kegiatan_cascading[key] = response;
                         }else{
-                            alert("Data cascading tidak ditemukan")
+                            alert("Data cascading tidak ditemukan");
                         }
                         resolve();
                     }
@@ -850,48 +773,6 @@ function kegiatanUtama(){
                 resolve();
             }
         });
-    });
-}
-
-function submit_tahun_rencana_aksi() {
-    let id = jQuery("#idDokumen").val();
-    if (id == '') {
-        return alert('id tidak boleh kosong');
-    }
-
-    let tahunAnggaran = jQuery("#tahunAnggaran").val();
-    if (tahunAnggaran == '') {
-        return alert('Tahun Anggaran tidak boleh kosong');
-    }
-
-    jQuery('#wrap-loading').show();
-    jQuery.ajax({
-        url: esakip.url,
-        type: 'POST',
-        data: {
-            action: 'c',
-            id: id,
-            tahunAnggaran: tahunAnggaran,
-            api_key: esakip.api_key
-        },
-        dataType: 'json',
-        success: function(response) {
-            console.log(response);
-            jQuery('#wrap-loading').hide();
-            if (response.status === 'success') {
-                alert(response.message);
-                jQuery('#tahunModal').modal('hide');
-                getTableTahun();
-                getTableRencanaAksi();
-            } else {
-                alert(response.message);
-            }
-        },
-        error: function(xhr, status, error) {
-            jQuery('#wrap-loading').hide();
-            console.error(xhr.responseText);
-            alert('Terjadi kesalahan saat mengirim data!');
-        }
     });
 }
 
@@ -1461,19 +1342,21 @@ function tambah_renaksi_2(tipe){
             var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
             var level_pokin = 3;
             var title = 'Rencana Aksi';
-            let data_cascading = 'data_program_cascading' in window ? data_program_cascading : '';
+            var key = jenis+'-'+parent_cascading;
+            let data_cascading = data_program_cascading[key];
+            var key = jenis+'-'+parent_cascading;
             if(tipe == 3){
                 level_pokin = 4;
                 title = 'Uraian Rencana Aksi';
                 parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
                 parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
-                data_cascading = data_kegiatan_cascading;
+                data_cascading = data_kegiatan_cascading[key];
             }else if(tipe == 4){
                 level_pokin = 5;
                 title = 'Uraian Teknis Kegiatan';
                 parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
                 parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
-                data_cascading = data_sub_kegiatan_cascading;
+                data_cascading = data_sub_kegiatan_cascading[key];
             }
             jQuery('#wrap-loading').show();
             jQuery.ajax({
@@ -1540,7 +1423,8 @@ function tambah_renaksi_2(tipe){
                                         break;
 
                                     case 4:
-                                        html_cascading += '<option data-kodesbl="'+value.kode_sbl+'" value="'+value.kode_sub_giat+'">'+value.kode_sub_giat+' '+value.nama_sub_giat+'</option>';
+                                        var nama_sub_giat = value.kode_sub_giat+' '+value.nama_sub_giat.replace(value.kode_sub_giat, '');
+                                        html_cascading += '<option data-kodesbl="'+value.kode_sbl+'" value="'+value.kode_sub_giat+'">'+nama_sub_giat+'</option>';
                                         break;
                                 
                                     default:
@@ -1640,7 +1524,7 @@ function simpan_data_renaksi(tipe){
 }
 
 function tambah_rincian_belanja_rencana_aksi(id_indikator, id_uraian_teknis_kegiatan, kode_sbl){
-    if(kode_sbl == '' || kode_sbl== null){
+    if(kode_sbl == '' || kode_sbl=='null'){
         alert("Harap perbarui data Uraian Teknis Kegiatan\nCukup \"Edit\" lalu \"Simpan\" jika tidak ada perubahan.")
         return;
     }
@@ -1710,86 +1594,90 @@ function tambah_rincian_belanja_rencana_aksi(id_indikator, id_uraian_teknis_kegi
         jQuery("#modal-crud").find('.modal-dialog').css('width','');
         jQuery("#modal-crud").modal('show');
 
-        if(data_rekening_akun != undefined){
+        if(data_rekening_akun[kode_sbl] != undefined){
             let html_rekening_belanja = '';
-                let no = 0;
-                html_rekening_belanja +=``
-                    +`<table class="table" style="margin: 0 0 2rem;">`
-                        +`<thead>`
-                            +`<tr class="table-secondary">`
-                                +`<th class="text-center" style="width:20px">`
-                                    +`<div class="form-check">`
-                                        +`<input class="form-check-input" type="checkbox" name="input_rekening_belanja_all" id="rekening-belanja-all" onchange="check_all_rekening();">`
-                                    +`</div>`
-                                +`</th>`
-                                +`<th class="text-center">Kode Rekening</th>`
-                                +`<th class="text-center">Nama Rekening</th>`
-                                +`<th class="text-center">Nilai Rincian</th>`
-                                +`<th class="text-center">Nilai Tertagging</th>`
-                                +`<th class="text-center set_manual" style="display: none;">Uraian Tagging</th>`
-                                +`<th class="text-center set_manual" style="display: none;">Volume Satuan Tagging</th>`
-                                +`<th class="text-center set_manual" style="display: none;">Nilai Tagging</th>`
-                                // +`<th class="text-center">Aksi</th>`
-                            +`</tr>`
-                        +`</thead>`
-                        +`<tbody>`;
-                    data_rekening_akun.map(function(b, i){
-                        number = no++;
-                        html_rekening_belanja +=``
-                        +`<tr>`
-                            +`<td>`
+            let no = 0;
+            html_rekening_belanja +=``
+                +`<table class="table" style="margin: 0 0 2rem;">`
+                    +`<thead>`
+                        +`<tr class="table-secondary">`
+                            +`<th class="text-center" style="width:20px">`
                                 +`<div class="form-check">`
-                                    +`<input class="form-check-input input_checkbox_rekening" type="checkbox" name="input_rekening_belanja_${number}" value="${b.kode_akun}" id="rekening-belanja-${number}" number="${number}">`
+                                    +`<input class="form-check-input" type="checkbox" name="input_rekening_belanja_all" id="rekening-belanja-all" onchange="check_all_rekening();">`
                                 +`</div>`
-                            +`</td>`
-                            +`<td>`
-                                +`<div class="form-group">`
-                                    +`<input type="text" class="form-control" id="kode-rekening-${number}" name="kode_rekening_${number}" required disabled value="${b.kode_akun}">`
-                                +`</div>`
-                            +`</td>`
-                            +`<td>`
-                                +`<div class="form-group">`
-                                    +`<textarea class="form-control" rows="2" cols="50" id="nama-rekening-${number}" required disabled>`
-                                        +`${b.nama_akun.replace(b.kode_akun+' ', '')}`
-                                    +`</textarea>`
-                                +`</div>`
-                            +`</td>`
-                            +`<td>`
-                                +`<div class="form-group">`
-                                    +`<input type="text" class="form-control" id="nilai-rincian-${number}" value="0" required disabled>`
-                                +`</div>`
-                            +`</td>`
-                            +`<td>`
-                                +`<div class="form-group">`
-                                    +`<input type="text" class="form-control" id="nilai-tertaggin-${number}" value="0" required disabled>`
-                                +`</div>`
-                            +`</td>`
-                            +`<td class="set_manual" style="display: none;">`
-                                +`<div class="form-group">`
-                                    +`<textarea class="form-control" rows="2" cols="50" id="uraian-tagging-${number}" name="uraian_tagging_${number}" required></textarea>`
-                                +`</div>`
-                            +`</td>`
-                            +`<td class="set_manual" style="display: none;">`
-                                +`<div class="form-group">`
-                                    +`<input type="text" class="form-control" id="volume-satuan-tagging-${number}" name="volume_satuan_tagging_${number}" required>`
-                                +`</div>`
-                            +`</td>`
-                            +`<td class="set_manual" style="display: none;">`
-                                +`<div class="form-group">`
-                                    +`<input type="number" class="form-control" id="nilai-tagging-${number}" name="nilai_tagging_${number}" required>`
-                                +`</div>`
-                            +`</td>`
-                            // +`<td>`
-                            //     +`<div class="form-group">`
-                            //         // +`<input type="text" class="form-control" id="aksi-${number}" name="nilai_rincian" value="0" required disabled>`
-                            //     +`</div>`
-                            // +`</td>`
-                        +`</tr>`;
-                    });
-                    html_rekening_belanja +=``
-                            +`</tbody>`
-                        +`</table>`
-                    jQuery('#html_rekening_akun').html(html_rekening_belanja);
+                            +`</th>`
+                            +`<th class="text-center">Kode Rekening</th>`
+                            +`<th class="text-center">Nama Rekening</th>`
+                            +`<th class="text-center">Nilai Rincian</th>`
+                            +`<th class="text-center">Nilai Tertagging</th>`
+                            +`<th class="text-center set_manual" style="display: none;">Uraian Tagging</th>`
+                            +`<th class="text-center set_manual" style="display: none;">Volume Satuan Tagging</th>`
+                            +`<th class="text-center set_manual" style="display: none;">Nilai Tagging</th>`
+                            // +`<th class="text-center">Aksi</th>`
+                        +`</tr>`
+                    +`</thead>`
+                    +`<tbody>`;
+            for(var i in data_rekening_akun[kode_sbl].akun){
+                var b = data_rekening_akun[kode_sbl].akun[i];
+                number = no++;
+                html_rekening_belanja +=``
+                +`<tr>`
+                    +`<td>`
+                        +`<div class="form-check">`
+                            +`<input class="form-check-input input_checkbox_rekening" type="checkbox" name="input_rekening_belanja_${number}" value="${b.kode_akun}" id="rekening-belanja-${number}" number="${number}">`
+                        +`</div>`
+                    +`</td>`
+                    +`<td>`
+                        +`<div class="form-group">`
+                            +b.kode_akun
+                            +`<input type="hidden" class="form-control" id="kode-rekening-${number}" name="kode_rekening_${number}" required disabled value="${b.kode_akun}">`
+                        +`</div>`
+                    +`</td>`
+                    +`<td>`
+                        +`<div class="form-group">`
+                            +b.nama_akun.replace(b.kode_akun+' ', '')
+                            +`<textarea class="form-control hide" rows="2" cols="50" id="nama-rekening-${number}" required disabled>`
+                                +`${b.nama_akun.replace(b.kode_akun+' ', '')}`
+                            +`</textarea>`
+                        +`</div>`
+                    +`</td>`
+                    +`<td>`
+                        +`<div class="form-group">`
+                            +b.total
+                            +`<input type="hidden" class="form-control text-right" id="nilai-rincian-${number}" required disabled value="${b.total}">`
+                        +`</div>`
+                    +`</td>`
+                    +`<td>`
+                        +`<div class="form-group">`
+                            +`<input type="text" class="form-control text-right" id="nilai-tertaggin-${number}" value="0" required disabled>`
+                        +`</div>`
+                    +`</td>`
+                    +`<td class="set_manual" style="display: none;">`
+                        +`<div class="form-group">`
+                            +`<textarea class="form-control" rows="2" cols="50" id="uraian-tagging-${number}" name="uraian_tagging_${number}" required></textarea>`
+                        +`</div>`
+                    +`</td>`
+                    +`<td class="set_manual" style="display: none;">`
+                        +`<div class="form-group">`
+                            +`<input type="text" class="form-control" id="volume-satuan-tagging-${number}" name="volume_satuan_tagging_${number}" required>`
+                        +`</div>`
+                    +`</td>`
+                    +`<td class="set_manual" style="display: none;">`
+                        +`<div class="form-group">`
+                            +`<input type="number" class="form-control" id="nilai-tagging-${number}" name="nilai_tagging_${number}" required>`
+                        +`</div>`
+                    +`</td>`
+                    // +`<td>`
+                    //     +`<div class="form-group">`
+                    //         // +`<input type="text" class="form-control" id="aksi-${number}" name="nilai_rincian" value="0" required disabled>`
+                    //     +`</div>`
+                    // +`</td>`
+                +`</tr>`;
+            };
+            html_rekening_belanja +=``
+                    +`</tbody>`
+                +`</table>`
+            jQuery('#html_rekening_akun').html(html_rekening_belanja);
         }else{
             alert("Data Rekening Akun Kosong!")
         }
@@ -1806,6 +1694,9 @@ function check_all_rekening(){
 function get_data_rekening_akun_wp_sipd(kode_sbl='0'){
     return new Promise(function(resolve, reject){
         if(typeof data_rekening_akun == 'undefined'){
+            window.data_rekening_akun = {};
+        }
+        if(typeof data_rekening_akun[kode_sbl] == 'undefined'){
             jQuery('#wrap-loading').show();
             jQuery.ajax({
                 url: esakip.url,
@@ -1821,13 +1712,9 @@ function get_data_rekening_akun_wp_sipd(kode_sbl='0'){
                 success: function(response){
                     jQuery('#wrap-loading').hide();
                     if(response.status == 'success'){
-                        if(response.data){
-                            window.data_rekening_akun = response.data.data_akun;
-                        }else{
-                            alert("Data rekening akun tidak ditemukan")    
-                        }
+                        data_rekening_akun[kode_sbl] = response;
                     }else{
-                        alert("Data rekening akun tidak ditemukan")
+                        alert("Error get data dari DPA, "+response.message);
                     }
                     resolve();
                 }
