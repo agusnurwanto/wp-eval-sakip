@@ -124,8 +124,7 @@ $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_men
     }
     .table_dokumen_rencana_aksi {
         font-family:'Open Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; 
-        border-collapse: collapse; 
-        width: 2900px; 
+        border-collapse: collapse;
         table-layout: fixed; 
         overflow-wrap: break-word; 
         font-size: 90%;
@@ -144,45 +143,173 @@ $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_men
 <div class="container-md">
     <div id="cetak" title="Rencana Aksi Perangkat Daerah">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Rincian Belanja Rencana Aksi <br><?php echo $skpd['nama_skpd'] ?><br> Tahun Anggaran <?php echo $tahun; ?></h1>
+            <h1 class="text-center" style="margin:3rem;">Rencana Hasil Kerja<br>Rincian Belanja Teknis Kegiatan<br><?php echo $skpd['nama_skpd'] ?><br> Tahun Anggaran <?php echo $tahun; ?></h1>
             <?php if (!$is_admin_panrb && $hak_akses_user): ?>
                 <div id="action" class="action-section hide-excel"></div>
             <?php endif; ?>
+            <table class="table table-bordered">
+		        <tbody>
+		            <tr>
+		                <td style="width: 270px;">Pohon Kinerja Pemda Level 1</td>
+		                <td style="width: 20px;" class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		            <tr>
+		                <td style="width: 270px;">Rencana Hasil Kerja Pemda Level 1</td>
+		                <td>:</td>
+		                <td></td>
+		            </tr>
+		            <tr>
+		                <td style="width: 270px;">Tujuan RPJMD</td>
+		                <td>:</td>
+		                <td></td>
+		            </tr>
+		        </tbody>
+		    </table>
+            <table class="table table-bordered">
+		        <tbody>
+		            <tr>
+		                <td style="width: 270px;">Pohon Kinerja Pemda Level 2</td>
+		                <td style="width: 20px;" class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		            <tr>
+		                <td>Rencana Hasil Kerja Pemda Level 2</td>
+		                <td class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		            <tr>
+		                <td>Sasaran RPJMD</td>
+		                <td class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		        </tbody>
+		    </table>
+            <table class="table table-bordered">
+		        <tbody>
+		            <tr>
+		                <td style="width: 270px;">Pohon Kinerja Pemda Level 3</td>
+		                <td style="width: 20px;" class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		            <tr>
+		                <td>Rencana Hasil Kerja Pemda Level 3</td>
+		                <td class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		            <tr>
+		                <td>Strategi RPJMD</td>
+		                <td class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		        </tbody>
+		    </table>
+            <table class="table table-bordered">
+		        <tbody>
+		            <tr>
+		                <td style="width: 270px;">Pohon Kinerja Pemda Level 4</td>
+		                <td style="width: 20px;" class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		            <tr>
+		                <td>Rencana Hasil Kerja Pemda Level 4</td>
+		                <td class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		            <tr>
+		                <td>Arah Kebijakan</td>
+		                <td class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		        </tbody>
+		    </table>
+            <table class="table table-bordered">
+		        <tbody>
+		            <tr>
+		                <td style="width: 270px;">Pohon Kinerja OPD Level 1</td>
+		                <td style="width: 20px;" class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		            <tr>
+		                <td>Rencana Hasil Kerja OPD Level 1</td>
+		                <td class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		            <tr>
+		                <td>Sasaran RENSTRA</td>
+		                <td class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		        </tbody>
+		    </table>
+            <table class="table table-bordered">
+		        <tbody>
+		            <tr>
+		                <td style="width: 270px;">Pohon Kinerja OPD Level 2</td>
+		                <td style="width: 20px;" class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		            <tr>
+		                <td>Rencana Hasil Kerja OPD Level 2</td>
+		                <td class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		            <tr>
+		                <td>Program</td>
+		                <td class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		        </tbody>
+		    </table>
+            <table class="table table-bordered">
+		        <tbody>
+		            <tr>
+		                <td style="width: 270px;">Pohon Kinerja OPD Level 3</td>
+		                <td style="width: 20px;" class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		            <tr>
+		                <td>Rencana Hasil Kerja OPD Level 3</td>
+		                <td class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		            <tr>
+		                <td>Kegiatan</td>
+		                <td class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		        </tbody>
+		    </table>
+            <table class="table table-bordered">
+		        <tbody>
+		            <tr>
+		                <td style="width: 270px;">Pohon Kinerja OPD Level 4</td>
+		                <td style="width: 20px;" class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		            <tr>
+		                <td>Rencana Hasil Kerja OPD Level 4</td>
+		                <td class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		            <tr>
+		                <td>Sub Kegiatan</td>
+		                <td class="text-center">:</td>
+		                <td></td>
+		            </tr>
+		        </tbody>
+		    </table>
             <div class="wrap-table">
                 <table cellpadding="2" cellspacing="0" class="table_dokumen_rencana_aksi table table-bordered">
                     <thead style="background: #ffc491;">
                         <tr>
-                            <th class="text-center" rowspan="2" style="width: 85px;">No</th>
-                            <th class="text-center" rowspan="2" style="width: 200px;">KEGIATAN UTAMA</th>
-                            <th class="text-center" rowspan="2" style="width: 200px;">INDIKATOR KEGIATAN UTAMA</th>
-                            <th class="text-center" rowspan="2" style="width: 200px;">RENCANA AKSI</th>
-                            <th class="text-center" rowspan="2" style="width: 200px;">OUTCOME/OUTPUT</th>
-                            <th class="text-center" rowspan="2" style="width: 200px;">URAIAN KEGIATAN RENCANA AKSI</th>
-                            <th class="text-center" rowspan="2" style="width: 200px;">INDIKATOR</th>
-                            <th class="text-center" rowspan="2" style="width: 200px;">URAIAN TEKNIS KEGIATAN</th>
-                            <th class="text-center" rowspan="2" style="width: 200px;">INDIKATOR</th>
+                            <th class="text-center" rowspan="2" style="width: 200px;">KODE REKENING</th>
+                            <th class="text-center" rowspan="2">URAIAN</th>
+                            <th class="text-center" rowspan="2" style="width: 140px;">HARGA SATUAN</th>
+                            <th class="text-center" rowspan="2" style="width: 90px;">JUMLAH</th>
                             <th class="text-center" rowspan="2" style="width: 100px;">SATUAN</th>
-                            <th class="text-center" colspan="6" style="width: 400px;">TARGET KEGIATAN PER TRIWULAN</th>
-                            <th class="text-center" colspan="4" style="width: 250px;">REALISASI KEGIATAN PER TRIWULAN</th>
-                            <th class="text-center" rowspan="2" style="width: 140px;">CAPAIAN REALISASI (%)</th>
-                            <th class="text-center" rowspan="2" style="width: 140px;">RENCANA PAGU</th>
-                            <th class="text-center" rowspan="2" style="width: 140px;">ALOKASI PAGU</th>
-                            <th class="text-center" rowspan="2" style="width: 140px;">REALISASI PAGU</th>
-                            <th class="text-center" rowspan="2" style="width: 140px;">CAPAIAN REALISASI PAGU</th>
-                            <th class="text-center" rowspan="2" style="width: 140px;">PAGU SUB KEGIATAN</th>
-                            <th class="text-center" rowspan="2" style="width: 140px;">KETERANGAN</th>
-                        </tr>
-                        <tr>
-                            <th>AWAL</th>
-                            <th>TW-I</th>
-                            <th>TW-II</th>
-                            <th>TW-III</th>
-                            <th>TW-IV</th>
-                            <th>AKHIR</th>
-                            <th>TW-I</th>
-                            <th>TW-II</th>
-                            <th>TW-III</th>
-                            <th>TW-IV</th>
+                            <th class="text-center" rowspan="2" style="width: 140px;">TOTAL</th>
+                            <th class="text-center" rowspan="2" style="width: 300px;">KETERANGAN</th>
                         </tr>
                     </thead>
                     <tbody>
