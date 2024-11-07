@@ -766,7 +766,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
                 error: function(xhr, status, error) {
                     jQuery('#wrap-loading').hide();
                     alert('Terjadi kesalahan saat kirim data!');
-                    // location.reload();
+                    location.reload();
                 }
             });
         }else{
