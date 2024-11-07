@@ -744,6 +744,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						}
 					}
 
+					$rincian_tagging = $this->functions->generatePage(array(
+						'nama_page' => 'Halaman Tagging Rincian Belanja',
+						'content' => '[tagging_rincian_sakip]',
+						'show_header' => 1,
+						'post_status' => 'private'
+					));
 					$no = 0;
 					$no_renaksi = 0;
 					$no_uraian_renaksi = 0;
