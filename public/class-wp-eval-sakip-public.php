@@ -6268,6 +6268,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$ret = array(
 			'status' => 'success',
 			'message' => 'Berhasil get data!',
+			'status_mapping_esr' => false,
 			'data' => array()
 		);
 
@@ -18797,29 +18798,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					</ul>
 				</div>
 			</div>';
-				/**
-		 * 
-		 *  UNTUK LOCAL
-		 * 
-		 * */
-
-				echo '
-				<div class="text-center" style="margin: 0 0 10px 0;">' . $halaman_monitor_upload_dokumen . '</div>
-        		<ul class="daftar-menu-sakip">
-            		<li>' . $halaman_sakip . '</li>
-           			<li>' . $halaman_sakip_opd . '</li>
-            		<li>' . $halaman_lke . '</li>';
-          echo '<li>' . $halaman_input_rpjpd_rpjmd .'</li>';
-				echo '<li>' . $halaman_input_perangkat_daerah .'</li>';
-				echo '<li>' . $halaman_pengisian_rencana_aksi . '</li>';
-			echo '<li>' . $halaman_menu_jadwal_admin . '</li>';
-			echo '</ul>';
-
-		/**
-		 * 
-		 *  UNTUK LOCAL
-		 * 
-		 * */
 		if (
 			in_array("administrator", $user_meta->roles)
 			|| in_array("admin_bappeda", $user_meta->roles)
