@@ -13,7 +13,7 @@ if (!empty($_GET) && !empty($_GET['id_skpd'])) {
     $id_skpd = $_GET['id_skpd'];
 }
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
-
+$renaksi_pemda = array();
 $data_id_jadwal = $wpdb->get_row(
     $wpdb->prepare("
     SELECT 
@@ -75,6 +75,65 @@ $cek_settingan_menu = $wpdb->get_var(
 );
 
 $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
+
+$renaksi_pemda = $wpdb->get_results(
+    $wpdb->prepare("
+        SELECT
+            p.*,
+            p.id AS id_data_renaksi_pemda,
+            i.*,
+            i.id AS id_data_indikator,
+            u.*,
+            u.id AS id_data_unit
+        FROM esakip_data_rencana_aksi_pemda AS p
+        INNER JOIN esakip_data_rencana_aksi_indikator_pemda AS i
+            ON p.id = i.id_renaksi
+            AND p.tahun_anggaran = i.tahun_anggaran
+            AND p.active = i.active
+        INNER JOIN esakip_data_unit AS u
+            ON i.id_skpd = u.id_skpd
+            AND i.tahun_anggaran = u.tahun_anggaran
+            AND i.active = u.active
+        WHERE i.id_skpd = %d
+    ", $id_skpd),
+    ARRAY_A
+);
+// print_r($renaksi_pemda); die($wpdb->last_query);
+$renaksi_opd = $wpdb->get_results(
+    $wpdb->prepare("
+        SELECT
+            *
+        FROM esakip_data_rencana_aksi_opd
+        WHERE id_skpd = %d
+          AND active = 1
+          AND level = 2
+          AND parent IS NOT NULL
+    ", $id_skpd),
+    ARRAY_A
+);
+
+$html_renaksi_pemda = '';
+$no_renaksi_pemda = 1;
+
+if (!empty($renaksi_pemda)) {
+    foreach ($renaksi_pemda as $k_renaksi_pemda => $v_renaksi_pemda) {
+        $renaksi_opd_label = !empty($renaksi_opd) ? esc_attr($renaksi_opd[0]['label']) : '';
+        $renaksi_opd_id = !empty($renaksi_opd) ? esc_attr($renaksi_opd[0]['id']) : '';  
+
+        $aksi = '<a href="javascript:void(0)" class="btn btn-sm btn-success verifikasi-renaksi-pemda" data-id="' . $renaksi_opd_id . '" data-label="' . esc_attr($v_renaksi_pemda['label']) . '" data-id_renaksi_pemda="' . esc_attr($v_renaksi_pemda['id_data_renaksi_pemda']) . '" data-id_indikator="' . esc_attr($v_renaksi_pemda['id_data_indikator']) . '" data-indikator="' . esc_attr($v_renaksi_pemda['indikator']) . '"data-satuan="' . esc_attr($v_renaksi_pemda['satuan']) . '" data-target_akhir="' . esc_attr($v_renaksi_pemda['target_akhir']) . '" data-renaksi-opd="' . $renaksi_opd_label . '" title="Verifikasi Rencana Aksi"><span class="dashicons dashicons-yes"></span></a>';
+
+        $html_renaksi_pemda .= '
+            <tr>
+                <td>' . $no_renaksi_pemda++ . '</td>
+                <td class="text-left">' . esc_html($v_renaksi_pemda['label']) . '</td>
+                <td class="text-left">' . esc_html($v_renaksi_pemda['indikator']) . '</td>
+                <td class="text-center">' . esc_html($v_renaksi_pemda['satuan']) . '</td>
+                <td class="text-center">' . esc_html($v_renaksi_pemda['target_akhir']) . '</td>
+                <td>' . $aksi . '</td>
+            </tr>';
+    }
+}
+
 ?>
 <style type="text/css">
     .wrap-table {
@@ -134,6 +193,26 @@ $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_men
     <div id="cetak" title="Rencana Aksi Perangkat Daerah">
         <div style="padding: 10px;margin:0 0 3rem 0;">
             <h1 class="text-center" style="margin:3rem;">Rencana Aksi <br><?php echo $skpd['nama_skpd'] ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
+
+            <?php if(!empty($renaksi_pemda)): ?>
+            <h4 style="text-align: center; margin-top: 10px; font-weight: bold;margin-bottom: .5em;">Notifikasi Rencana Hasil Kerja Pemda</h4>
+            <div title="Notifikasi Rencana Aksi Pemda" style="padding: 5px; overflow: auto; display:flex; justify-content:center;">
+                <table class="table_notifikasi_pemda" style="width: 50em;text-align: center;">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Rencana Hasil Kerja</th>
+                            <th>Indikator Rencana Hasil Kerja</th>
+                            <th>Satuan</th>
+                            <th>Target Akhir</th>
+                            <th style="min-width: 10em;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <?php endif; ?>
             <?php if (!$is_admin_panrb && $hak_akses_user): ?>
                 <div id="action" class="action-section hide-excel"></div>
             <?php endif; ?>
@@ -227,6 +306,22 @@ $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_men
   	</div>
 </div>
 
+<!-- Modal crud renaksi pemda -->
+<div class="modal fade" id="modal-renaksi-pemda" data-backdrop="static"  role="dialog" aria-labelledby="modal-renaksi-pemda-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
 
 <script type="text/javascript">
 jQuery(document).ready(function() {
@@ -255,7 +350,91 @@ jQuery(document).ready(function() {
     jQuery("#tambah-rencana-aksi").on('click', function(){
         kegiatanUtama();
     });
+
 });
+
+jQuery(document).on('click', '.verifikasi-renaksi-pemda', function() {
+    let id = jQuery(this).data('id');
+    let get_renaksi_opd = <?php echo json_encode($renaksi_opd); ?>;
+    let checklist_renaksi_opd = '';
+
+    if (get_renaksi_opd.length > 0) {
+        checklist_renaksi_opd += '<div class="form-group"><label>Label Rencana Hasil Kerja | Level 2</label><div>';
+        get_renaksi_opd.forEach(function(item, index) {
+            checklist_renaksi_opd += `
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="label_renaksi_opd_${index}" name="checklist_renaksi_opd[]" value="${item.label}" id_label_renaksi_opd="${item.id}">
+                    <label class="form-check-label" for="label_renaksi_opd_${index}">${item.label}</label>
+                </div>
+            `;
+        });
+        checklist_renaksi_opd += '</div></div>';
+    }
+
+    jQuery("#modal-renaksi-pemda").find('.modal-title').html('Verifikasi Rencana Aksi Pemda');
+    jQuery("#modal-renaksi-pemda").find('.modal-body').html(`
+        <form id="form-renaksi-pemda">
+            <input type="hidden" name="id" value="${id}">
+            <input type="hidden" name="id_indikator_renaksi_pemda" value="${jQuery(this).data('id_indikator')}"> 
+            <input type="hidden" name="id_renaksi_pemda" value="${jQuery(this).data('id_renaksi_pemda')}"> 
+            <div class="form-group">
+                <label>Rencana Hasil Kerja Pemda</label>
+                <input type="text" id="label_uraian_kegiatan" name="label_uraian_kegiatan" value="${jQuery(this).data('label')}" disabled>
+            </div>
+            <div class="form-group">
+                <label>Indikator Rencana Hasil Kerja Pemda</label>
+                <input type="text" id="label_indikator" name="label_indikator" value="${jQuery(this).data('indikator')}" class="mt-1" disabled>
+            </div>
+            <div class="form-group">
+                <label>Satuan</label>
+                <input type="text" id="satuan" name="satuan" value="${jQuery(this).data('satuan')}" disabled>
+            </div>
+            <div class="form-group">
+                <label>Target Akhir</label>
+                <input type="text" id="target_akhir" name="target_akhir" value="${jQuery(this).data('target_akhir')}" class="mt-1" disabled>
+            </div>
+            ${checklist_renaksi_opd}
+        </form>
+    `);
+    jQuery("#modal-renaksi-pemda").find('.modal-footer').html(`
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
+        <button type="button" class="btn btn-success" id="simpan-data-renaksi-pemda" data-action="verify_renaksi-pemda">Simpan</button>
+    `);
+    jQuery("#modal-renaksi-pemda").modal('show');
+});
+
+jQuery(document).on('click', '#simpan-data-renaksi-pemda', function() {
+    let formData = jQuery('#form-renaksi-pemda').serialize();
+
+    let label_uraian_kegiatan = jQuery('#label_uraian_kegiatan').val();
+    let label_indikator = jQuery('#label_indikator').val();
+
+    jQuery('input[name="checklist_renaksi_opd[]"]:checked').each(function() {
+        let idLabelRenaksiOpd = jQuery(this).attr('id_label_renaksi_opd');
+        formData += '&id_label_renaksi_opd[]=' + idLabelRenaksiOpd;
+    });
+
+    jQuery('#wrap-loading').show();
+    jQuery.ajax({
+        type: 'POST',
+        url: esakip.url,
+        data: formData + '&action=simpan_renaksi_pemda' + '&api_key=' + esakip.api_key + '&id_skpd=' + <?php echo $id_skpd; ?>,
+        success: function(response) {
+            jQuery('#wrap-loading').hide();
+            if (response.success) {
+                alert(response.data);  
+                jQuery("#modal-renaksi-pemda").modal('hide');
+                location.reload(); 
+            } else {
+                alert(response.data);  
+            }
+        },
+        error: function() {
+            alert('Gagal menyimpan data.');
+        }
+    });
+});
+
 
 function simpan_indikator_renaksi(tipe){
     var id = jQuery('#id_label_indikator').val();
@@ -593,7 +772,7 @@ function edit_rencana_aksi(id, tipe){
             });
         });
     }else{
-        tambah_renaksi_2(tipe).then(function(){
+        tambah_renaksi_2(tipe, true).then(function() {
             jQuery('#wrap-loading').show();
             jQuery.ajax({
                 url: esakip.url,
@@ -608,19 +787,72 @@ function edit_rencana_aksi(id, tipe){
                 success: function(response) {
                     jQuery('#wrap-loading').hide();
                     if(response.status == 'error'){
-                        alert(response.message)
-                    }else if(response.data != null){
+                        alert(response.message);
+                    } else if(response.data != null){
                         jQuery('#id_renaksi').val(id);
                         if(tipe == 2){
                             jQuery("#modal-crud").find('.modal-title').html('Edit Rencana Aksi');
                             jQuery('#pokin-level-1').val(response.data.id_pokin_3).trigger('change');
                             jQuery('#cascading-renstra').val(response.data.kode_cascading_program).trigger('change');
-                        }else if(tipe == 3){
+                            jQuery('#label_renaksi_opd_').val(response.data.label_renaksi_opd_);
+                            jQuery('#label_uraian_kegiatan').val(response.data.label_uraian_kegiatan);
+                            jQuery('#label_indikator_uraian_kegiatan').val(response.data.label_indikator_uraian_kegiatan);
+
+                            var renaksi_pemda = "";
+                            response.data.renaksi_pemda.map(function(b, i){
+                                renaksi_pemda += `
+                                    <tr>
+                                        <td><input class="text-right" type="checkbox" class="form-check-input" id="label_renaksi_pemda"name="checklist_renaksi_pemda[]" value="${b.label_uraian_kegiatan}" id_label_renaksi_pemda="${b.id_pemda}"id_label_indikator_renaksi_pemda="${b.id_indikator}" ${b.id_label != null ? 'checked' : ''}>
+                                        </td>
+                                        <td>
+                                            <label class="form-check-label" id="label_uraian_kegiatan" for="label_uraian_kegiatan">${b.label_uraian_kegiatan}</label>
+                                        </td>
+                                        <td>
+                                            <label class="form-check-label" id="label_indikator_uraian_kegiatan" for="label_indikator_uraian_kegiatan">${b.label_indikator_uraian_kegiatan}</label>
+                                        </td>
+                                        <td  class="text-center">
+                                            <label class="form-check-label" id="satuan" for="satuan">${b.satuan_pemda}</label>
+                                        </td>
+                                        <td  class="text-center">
+                                            <label class="form-check-label" id="target_akhir" for="target_akhir">${b.target_akhir_pemda}</label>
+                                        </td>
+                                    </tr>
+                                `;
+                            });
+                            let checklist_renaksi_pemda = `
+                                <div class="form-group">
+                                    <label>Rencana Hasil Kerja Pemerintah Daerah | Level 4</label>
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <input class="text-right" type="checkbox" id="check_all" class="form-check-input">
+                                                </th>
+                                                <th>Rencana Hasil Kerja</th>
+                                                <th>Indikator Rencana Hasil Kerja</th>
+                                                <th>Satuan</th>
+                                                <th>Target Akhir</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${renaksi_pemda}
+                                        </tbody>
+                                    </table>
+                                </div>`;
+
+                            jQuery("#modal-crud").find('.modal-body').append(checklist_renaksi_pemda);
+
+                            jQuery("#check_all").on('change', function() {
+                                var checklist_all = jQuery(this).prop('checked'); 
+                                jQuery("input[name='checklist_renaksi_pemda[]']").prop('checked', checklist_all); 
+                            });
+
+                        } else if(tipe == 3){
                             jQuery("#modal-crud").find('.modal-title').html('Edit Uraian Rencana Aksi');
                             jQuery('#pokin-level-2').attr('val-id', response.data.id_pokin_5);
                             jQuery('#pokin-level-1').val(response.data.id_pokin_4).trigger('change');
                             jQuery('#cascading-renstra').val(response.data.kode_cascading_kegiatan).trigger('change');
-                        }else if(tipe == 4){
+                        } else if(tipe == 4){
                             jQuery("#modal-crud").find('.modal-title').html('Edit Uraian Teknis Kegiatan');
                             jQuery('#pokin-level-2').attr('val-id', response.data.id_pokin_5);
                             jQuery('#pokin-level-1').val(response.data.id_pokin_5).trigger('change');
@@ -631,6 +863,7 @@ function edit_rencana_aksi(id, tipe){
                 }
             });
         });
+
     }
 }
 
@@ -797,6 +1030,8 @@ function getTablePengisianRencanaAksi(no_loading=false) {
             console.log(response);
             if (response.status === 'success') {
                 jQuery('.table_dokumen_rencana_aksi tbody').html(response.data);
+                
+                jQuery('.table_notifikasi_pemda tbody').html(response.data_pemda);
             } else {
                 alert(response.message);
             }
@@ -808,6 +1043,7 @@ function getTablePengisianRencanaAksi(no_loading=false) {
         }
     });
 }
+
 
 function tambah_indikator_rencana_aksi(id, tipe){
     var title = '';
@@ -1311,10 +1547,11 @@ function detail_parent(tipe_parent) {
     jQuery('.nav-tabs a[href="#nav-level-'+tipe_parent+'"]').tab('show');
 }
 
-function tambah_renaksi_2(tipe){
+function tambah_renaksi_2(tipe, isEdit = false) {
     let jenis = '';
     let parent_cascading = '';
     let jenis_cascading = '';
+
     switch (tipe) {
         case 3:
             jenis = "kegiatan";
@@ -1327,7 +1564,7 @@ function tambah_renaksi_2(tipe){
             jenis_cascading = "Sub Kegiatan";
             parent_cascading = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_cascading');
             break;
-    
+
         default:
             jenis = "program";
             jenis_cascading = "Program";
@@ -1336,28 +1573,54 @@ function tambah_renaksi_2(tipe){
     }
 
     return get_tujuan_sasaran_cascading(jenis, parent_cascading)
-    .then(function(){
-        return new Promise(function(resolve, reject){
-            var parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
-            var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
-            var level_pokin = 3;
-            var title = 'Rencana Aksi';
-            var key = jenis+'-'+parent_cascading;
-            let data_cascading = data_program_cascading[key];
-            var key = jenis+'-'+parent_cascading;
-            if(tipe == 3){
+    .then(function() {
+        return new Promise(function(resolve, reject) {
+            let parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
+            let parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
+            let level_pokin = 3;
+            let title = 'Rencana Aksi';
+            let data_cascading = data_program_cascading[`${jenis}-${parent_cascading}`];
+            let get_renaksi_pemda = <?php echo json_encode($renaksi_pemda); ?>;
+            let checklist_renaksi_pemda = '';
+
+            if (tipe === 3) {
                 level_pokin = 4;
                 title = 'Uraian Rencana Aksi';
                 parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
                 parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
-                data_cascading = data_kegiatan_cascading[key];
-            }else if(tipe == 4){
-                level_pokin = 5;
-                title = 'Uraian Teknis Kegiatan';
-                parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
-                parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
-                data_cascading = data_sub_kegiatan_cascading[key];
+                data_cascading = data_kegiatan_cascading[`${jenis}-${parent_cascading}`];
             }
+
+            if (!isEdit && tipe === 2 && get_renaksi_pemda.length > 0) {
+                checklist_renaksi_pemda += `
+
+                    <label>Rencana Hasil Kerja Pemerintah Daerah | Level 4</label>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center"><input type="checkbox" id="select_all"></th>
+                                <th>Rencana Hasil Kerja</th>
+                                <th>Indikator Rencana Hasil Kerja</th>
+                                <th>Satuan</th>
+                                <th>Target Akhir</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                get_renaksi_pemda.forEach(function(item, index) {
+                    checklist_renaksi_pemda += `
+                        <tr>
+                            <td><input class="text-right" type="checkbox" class="form-check-input" id="label_renaksi_pemda${index}"name="checklist_renaksi_pemda[]" value="${item.label}" id_label_renaksi_pemda="${item.id_data_renaksi_pemda}"id_label_indikator_renaksi_pemda="${item.id_data_indikator}"></td>
+                            <td for="label_renaksi_pemda${index}">${item.label}</td>
+                            <td for="label_renaksi_pemda${index}">${item.indikator}</td>
+                            <td class="text-center" for="label_renaksi_pemda${index}">${item.satuan}</td>
+                            <td class="text-center" for="label_renaksi_pemda${index}">${item.target_akhir}</td>
+                        </tr>
+                    `;
+                });
+                checklist_renaksi_pemda += '</tbody></table>';
+            }
+
             jQuery('#wrap-loading').show();
             jQuery.ajax({
                 url: esakip.url,
@@ -1372,95 +1635,115 @@ function tambah_renaksi_2(tipe){
                     "id_skpd": <?php echo $id_skpd; ?>
                 },
                 dataType: "json",
-                success: function(res){
-                    var html = '<option value="">Pilih Pokin Level '+level_pokin+'</option>';
-                    res.data.map(function(value, index){
-                        html += '<option value="'+value.id+'">'+value.label+'</option>';
-                    });
-                    jQuery('#wrap-loading').hide();
-                    jQuery("#modal-crud").find('.modal-title').html('Tambah '+title);
-                    var pokin_5 = '';
-                    var onchange_pokin = '';
-                    jQuery("#modal-crud").find('.modal-body').html(''
-                        +'<form>'
-                            +'<input type="hidden" id="id_renaksi" value=""/>'
-                            +'<div class="form-group">'
-                                +'<label for="pokin-level-1">Pilih Pokin Level '+level_pokin+'</label>'
-                                +'<select class="form-control" name="pokin-level-1" id="pokin-level-1" '+onchange_pokin+'>'
-                                    +html
-                                +'</select>'
-                            +'</div>'
-                            +pokin_5
-                            +'<div class="form-group">'
-                                +'<textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan '+title+'..."></textarea>'
-                            +'</div>'
-                            +'<div class="form-group">'
-                                +'<label for="sasaran-cascading">Pilih '+jenis_cascading+' Cascading</label>'
-                                +'<select class="form-control" name="cascading-renstra" id="cascading-renstra">'
-                                +'</select>'
-                            +'</div>'
-                        +'</form>');
-                    jQuery("#modal-crud").find('.modal-footer').html(''
-                        +'<button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>'
-                        +'<button type="button" class="btn btn-success" onclick="simpan_data_renaksi('+tipe+')">'
-                            +'Simpan'
-                        +'</button>');
-                    jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
-                    jQuery("#modal-crud").find('.modal-dialog').css('width','');
-                    jQuery("#modal-crud").modal('show');
-                    jQuery('#pokin-level-1').select2({width: '100%'});
-                    if(tipe == 3){
-                        jQuery('#pokin-level-2').select2({width: '100%'});
+                success: function(res) {
+                    let html = '<option value="">Pilih Pokin Level ' + level_pokin + '</option>';
+                    
+                    if (Array.isArray(res.data)) {
+                        res.data.map(value => {
+                            html += '<option value="' + value.id + '">' + value.label + '</option>';
+                        });
+                    } else {
+                        alert("Data Pokin Kosong atau Tidak Sesuai!");
                     }
 
-                    if(data_cascading.data != undefined){
-                        let html_cascading = '<option value="">Pilih '+jenis_cascading+' Cascading</option>';
-                        data_cascading.data.map(function(value, index){
-                            if(value.id_unik_indikator == null){
+                    jQuery('#wrap-loading').hide();
+                    jQuery("#modal-crud").find('.modal-title').html('Tambah ' + title);
+
+                    jQuery("#modal-crud").find('.modal-body').html(`
+                        <form>
+                            <input type="hidden" id="id_renaksi" value=""/>
+                            <div class="form-group">
+                                <label for="pokin-level-1">Pilih Pokin Level ${level_pokin}</label>
+                                <select class="form-control" name="pokin-level-1" id="pokin-level-1">
+                                    ${html}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan ${title}..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="sasaran-cascading">Pilih ${jenis_cascading} Cascading</label>
+                                <select class="form-control" name="cascading-renstra" id="cascading-renstra"></select>
+                            </div>
+                            <?php if(!empty($renaksi_pemda)): ?>
+                                ${checklist_renaksi_pemda}  
+                            <?php endif; ?>
+                        </form>
+                    `);
+
+                    jQuery("#modal-crud").find('.modal-footer').html(`
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
+                        <button type="button" class="btn btn-success" onclick="simpan_data_renaksi(${tipe})">Simpan</button>
+                    `);
+
+                    jQuery('#select_all').on('click', function() {
+                        var isChecked = this.checked;
+                        jQuery('input[name="checklist_renaksi_pemda[]"]').prop('checked', isChecked);
+                    });
+
+                    jQuery('input[name="checklist_renaksi_pemda[]"]').on('change', function() {
+                        var allChecked = jQuery('input[name="checklist_renaksi_pemda[]"]').length === jQuery('input[name="checklist_renaksi_pemda[]"]:checked').length;
+                        jQuery('#select_all').prop('checked', allChecked);
+                    });
+                    jQuery("#modal-crud").modal('show');
+                    jQuery('#pokin-level-1').select2({ width: '100%' });
+                    if (tipe === 3) {
+                        jQuery('#pokin-level-2').select2({ width: '100%' });
+                    }
+
+                    if (data_cascading && Array.isArray(data_cascading.data)) {
+                        let html_cascading = '<option value="">Pilih ' + jenis_cascading + ' Cascading</option>';
+                        data_cascading.data.map(value => {
+                            if (value.id_unik_indikator == null) {
                                 switch (tipe) {
                                     case 3:
-                                        html_cascading += '<option value="'+value.kode_giat+'">'+value.kode_giat+' '+value.nama_giat+'</option>';
+                                        html_cascading += `<option value="${value.kode_giat}">${value.kode_giat} ${value.nama_giat}</option>`;
                                         break;
-
                                     case 4:
-                                        var nama_sub_giat = value.kode_sub_giat+' '+value.nama_sub_giat.replace(value.kode_sub_giat, '');
-                                        html_cascading += '<option data-kodesbl="'+value.kode_sbl+'" value="'+value.kode_sub_giat+'">'+nama_sub_giat+'</option>';
+                                        let nama_sub_giat = `${value.kode_sub_giat} ${value.nama_sub_giat.replace(value.kode_sub_giat, '')}`;
+                                        html_cascading += `<option data-kodesbl="${value.kode_sbl}" value="${value.kode_sub_giat}">${nama_sub_giat}</option>`;
                                         break;
-                                
                                     default:
-                                        html_cascading += '<option value="'+value.kode_program+'">'+value.kode_program+' '+value.nama_program+'</option>';
+                                        html_cascading += `<option value="${value.kode_program}">${value.kode_program} ${value.nama_program}</option>`;
                                         break;
                                 }
                             }
                         });
                         jQuery("#cascading-renstra").html(html_cascading);
-                        jQuery('#cascading-renstra').select2({width: '100%'});
-                    }else{
-                        alert("Data Cascading Kosong!")
+                        jQuery('#cascading-renstra').select2({ width: '100%' });
+                    } else {
+                        alert("Data Cascading Kosong!");
                     }
+
+
                     resolve();
+                },
+                error: function() {
+                    jQuery('#wrap-loading').hide();
+                    alert("Gagal memuat data Pokin.");
+                    reject();
                 }
             });
         });
-    })
+    });
 }
 
-function simpan_data_renaksi(tipe){
+function simpan_data_renaksi(tipe) {
     var parent_pokin = 0;
     var parent_renaksi = 0;
     var parent_cascading = 0;
     switch (tipe) {
-        case 2 :
+        case 2:
             parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
             parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
             parent_cascading = jQuery('#tabel_rencana_aksi').attr('parent_cascading');
             break;
-        case 3 :
+        case 3:
             parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
             parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
             parent_cascading = jQuery('#tabel_uraian_rencana_aksi').attr('parent_cascading');
             break;
-        case 4 :
+        case 4:
             parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
             parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
             parent_cascading = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_cascading');
@@ -1469,8 +1752,8 @@ function simpan_data_renaksi(tipe){
             parent_pokin = 0;
             parent_renaksi = 0;
             parent_cascading = 0;
-        }
-    
+    }
+
     var id_pokin_1 = jQuery('#pokin-level-1').val();
     var id_pokin_2 = jQuery('#pokin-level-2').val();
     var label_pokin_1 = jQuery('#pokin-level-1 option:selected').text();
@@ -1479,15 +1762,31 @@ function simpan_data_renaksi(tipe){
     var kode_cascading_renstra = jQuery('#cascading-renstra').val();
     var label_cascading_renstra = jQuery('#cascading-renstra option:selected').text();
     var kode_sbl = '';
-    if(tipe == 4){
-        kode_sbl = jQuery('#cascading-renstra option:selected').data('kodesbl');;
+    if (tipe == 4) {
+        kode_sbl = jQuery('#cascading-renstra option:selected').data('kodesbl');
     }
-    if(label_renaksi == ''){
-        return alert('Kegiatan Utama tidak boleh kosong!')
+    if (label_renaksi == '') {
+        return alert('Kegiatan Utama tidak boleh kosong!');
     }
-    if(id_pokin_1 == ''){
-        return alert('Level 2 pohon kinerja tidak boleh kosong!')
+    if (id_pokin_1 == '') {
+        return alert('Level 2 pohon kinerja tidak boleh kosong!');
     }
+
+    // Mendapatkan data checklist pemda
+    var selectedChecklistPemda = jQuery('input[name="checklist_renaksi_pemda[]"]:checked');
+    var checklistDataPemda = [];
+    selectedChecklistPemda.each(function () {
+        var row = jQuery(this).closest('tr');
+        checklistDataPemda.push({
+            id_data_renaksi_pemda: jQuery(this).attr('id_label_renaksi_pemda'),
+            id_data_indikator: jQuery(this).attr('id_label_indikator_renaksi_pemda')
+        });
+    });
+
+    if (tipe === 2 && selectedChecklistPemda.length === 0) {
+        return alert("Pilih salah satu label Rencana Hasil Kerja Pemerintah Daerah!");
+    }
+
     jQuery('#wrap-loading').show();
     jQuery.ajax({
         url: esakip.url,
@@ -1509,19 +1808,21 @@ function simpan_data_renaksi(tipe){
             "id_skpd": <?php echo $id_skpd; ?>,
             'kode_cascading_renstra': kode_cascading_renstra,
             'label_cascading_renstra': label_cascading_renstra,
-            'kode_sbl': kode_sbl
+            'kode_sbl': kode_sbl,
+            'checklistDataPemda': checklistDataPemda
         },
         dataType: "json",
-        success: function(res){
+        success: function (res) {
             jQuery('#wrap-loading').hide();
             alert(res.message);
-            if(res.status=='success'){
+            if (res.status == 'success') {
                 jQuery("#modal-crud").modal('hide');
-                lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin,parent_cascading);
+                lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading);
             }
         }
     });
 }
+
 
 function tambah_rincian_belanja_rencana_aksi(id_indikator, id_uraian_teknis_kegiatan, kode_sbl){
     if(kode_sbl == '' || kode_sbl=='null'){
