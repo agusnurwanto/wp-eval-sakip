@@ -147,6 +147,7 @@ class Wp_Eval_Sakip_Admin
 						|| $_POST['type'] == 'croscutting_pd'
 						|| $_POST['type'] == 'pohon_kinerja_dan_cascading'
 						|| $_POST['type'] == 'pohon_kinerja_dan_cascading_pemda'
+						|| $_POST['type'] == 'monev_rencana_aksi_pemda'
 					)
 				) {
 					$jadwal_periode = $wpdb->get_results(
@@ -159,9 +160,10 @@ class Wp_Eval_Sakip_Admin
 						        j.tahun_anggaran,
 						        j.lama_pelaksanaan,
 						        j.tahun_selesai_anggaran,
-						        r.id_jadwal_rpjmd
+						        r.id_jadwal_rpjmd,
+						        r.tahun_anggaran as tahun_anggaran_menu
 						    FROM esakip_data_jadwal j
-						    INNER JOIN esakip_pengaturan_upload_dokumen r
+						    LEFT JOIN esakip_pengaturan_upload_dokumen r
 						        ON r.id_jadwal_rpjmd = j.id
 						    WHERE j.tipe = %s
 						      AND j.status = 1
@@ -283,6 +285,33 @@ class Wp_Eval_Sakip_Admin
 							));
 							$body_pemda .= '
 							<li><a target="_blank" href="' . $pohon_kinerja_cascading['url'] . '">Halaman Dokumen Pohon Kinerja dan Cascading ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . '</a></li>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'monev_rencana_aksi_pemda') {
+							$tahun = $wpdb->get_results("
+								SELECT 
+									u.tahun_anggaran
+								FROM esakip_data_unit u
+								GROUP BY u.tahun_anggaran
+								ORDER BY u.tahun_anggaran DESC
+							", ARRAY_A);
+							foreach($tahun as $tahun_item){
+								if(
+									empty($jadwal_periode_item['id_jadwal_rpjmd']) 
+									|| $jadwal_periode_item['tahun_anggaran_menu'] == $tahun_item['tahun_anggaran']
+								){
+									$list_pemda_pengisian_rencana_aksi = $this->functions->generatePage(array(
+										'nama_page' => 'Pengisian Rencana Aksi Pemda Tahun ' . $tahun_item['tahun_anggaran'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+										'content' => '[list_pengisian_rencana_aksi_pemda tahun=' . $tahun_item['tahun_anggaran'] . ' periode=' . $jadwal_periode_item['id'] . ' ]',
+										'show_header' => 1,
+										'no_key' => 1,
+										'post_status' => 'private'
+									));
+									$ket = '';
+									if(empty($jadwal_periode_item['id_jadwal_rpjmd'])){
+										$ket = ' ( Periode belum diset di pengaturan menu )';
+									}
+									$body_pemda .= '<li><a target="_blank" href="' . $list_pemda_pengisian_rencana_aksi['url'] . '" class="btn btn-primary">' .  $list_pemda_pengisian_rencana_aksi['title'] .$ket. '</a></li>';
+								}
+							}
 						}
 					}
 					$body_pemda .= '</ol>';
@@ -343,7 +372,7 @@ class Wp_Eval_Sakip_Admin
 						        j.tahun_selesai_anggaran,
 						        r.id_jadwal_rpjpd
 						    FROM esakip_data_jadwal j
-						    INNER JOIN esakip_pengaturan_upload_dokumen r
+						    LEFT JOIN esakip_pengaturan_upload_dokumen r
 						        ON r.id_jadwal_rpjpd = j.id
 						    WHERE j.tipe = %s
 						      AND j.status = 1

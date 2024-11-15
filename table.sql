@@ -45,6 +45,8 @@ CREATE TABLE `esakip_iku` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -58,6 +60,8 @@ CREATE TABLE `esakip_laporan_kinerja` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -133,6 +137,8 @@ CREATE TABLE `esakip_perjanjian_kinerja` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -146,6 +152,8 @@ CREATE TABLE `esakip_rencana_aksi` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -159,6 +167,8 @@ CREATE TABLE `esakip_renja_rkt` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -172,6 +182,8 @@ CREATE TABLE `esakip_renstra` (
   `tanggal_upload` varchar(50) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -465,6 +477,8 @@ CREATE TABLE `esakip_pohon_kinerja_dan_cascading` (
   `id_jadwal` int(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -478,6 +492,8 @@ CREATE TABLE `esakip_lhe_akip_internal` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -491,6 +507,8 @@ CREATE TABLE `esakip_tl_lhe_akip_internal` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -517,6 +535,8 @@ CREATE TABLE `esakip_laporan_monev_renaksi` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -584,6 +604,8 @@ CREATE TABLE `esakip_dpa` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
