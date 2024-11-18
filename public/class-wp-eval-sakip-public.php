@@ -18092,6 +18092,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$cek_data[$menu['user_role']][$menu['nama_dokumen']] = $menu;
 			}
 		}
+		
+		$cek_data_pengaturan = $wpdb->get_row($wpdb->prepare("
+            SELECT 
+                *
+            FROM 
+                esakip_pengaturan_upload_dokumen
+            WHERE tahun_anggaran=%d
+            AND active=1
+        ", $_GET['tahun']), ARRAY_A);
+        $where_id_jadwal_rpjpd = '';
+        $where_id_jadwal_rpjmd = '';
+        if(!empty($cek_data_pengaturan)){
+	        $where_id_jadwal_rpjpd = ' AND id='.$cek_data_pengaturan['id_jadwal_rpjpd'];
+	        $where_id_jadwal_rpjmd = ' AND id='.$cek_data_pengaturan['id_jadwal_rpjmd'];
+        }
 
 		$jadwal_periode_rpjpd = $wpdb->get_results(
 			"
@@ -18101,13 +18116,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		        j.nama_jadwal_renstra,
 		        j.tahun_anggaran,
 		        j.lama_pelaksanaan,
-		        j.tahun_selesai_anggaran,
-		        r.id_jadwal_rpjpd
+		        j.tahun_selesai_anggaran
 		    FROM esakip_data_jadwal j
-		    INNER JOIN esakip_pengaturan_upload_dokumen r
-		        ON r.id_jadwal_rpjpd = j.id
 		    WHERE j.tipe = 'RPJPD'
 		      AND j.status = 1
+		      $where_id_jadwal_rpjpd
 		    ORDER BY j.tahun_anggaran DESC",
 		    ARRAY_A
 		);
@@ -18141,13 +18154,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		        j.nama_jadwal_renstra,
 		        j.tahun_anggaran,
 		        j.lama_pelaksanaan,
-		        j.tahun_selesai_anggaran,
-		        r.id_jadwal_rpjmd
+		        j.tahun_selesai_anggaran
 		    FROM esakip_data_jadwal j
-		    INNER JOIN esakip_pengaturan_upload_dokumen r
-		        ON r.id_jadwal_rpjmd = j.id
 		    WHERE j.tipe = 'RPJMD'
 		      AND j.status = 1
+		      $where_id_jadwal_rpjmd
 		    ORDER BY j.tahun_anggaran DESC",
 		    ARRAY_A
 		);
@@ -18335,6 +18346,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$periode_dokumen_pohon_kinerja_pemda .= '<li><a target="_blank" href="' . $dokumen_pohon_kinerja_pemda['url'] . '" class="btn btn-primary">' . $dokumen_pohon_kinerja_pemda['title'] . '</a></li>';
+				
+			$input_iku_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'Input IKU Pemerintah Daerah | '. $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[input_iku_pemda id_periode=' . $jadwal_periode_item['id'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$periode_input_iku_pemda .= '<li><a target="_blank" href="' . $input_iku_pemda['url'] . '" class="btn btn-primary">' . $input_iku_pemda['title'] . '</a></li>';
+
+			$list_pemda_pengisian_rencana_aksi = $this->functions->generatePage(array(
+				'nama_page' => 'Pengisian Rencana Aksi Pemda Tahun ' . $_GET['tahun'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[list_pengisian_rencana_aksi_pemda tahun=' . $_GET['tahun'] . ' periode=' . $jadwal_periode_item['id'] . ' ]',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$pengisian_rencana_aksi_pemda = '<li><a target="_blank" href="' . $list_pemda_pengisian_rencana_aksi['url'] . '" class="btn btn-primary">' .  $list_pemda_pengisian_rencana_aksi['title'] . '</a></li>';
 		}
 		// PEMDA
 
@@ -18766,48 +18793,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$periode_input_iku_opd .= '<li><a target="_blank" href="' . $input_iku_wpsipd['url'] . '" class="btn btn-primary">' . $title . '</a></li>';
 			}
 		}
-		//jadwal rpjmd/rpd sakip
-		$data_jadwal = $wpdb->get_results(
-			$wpdb->prepare("
-			 SELECT 
-		        j.id,
-		        j.nama_jadwal,
-		        j.nama_jadwal_renstra,
-		        j.tahun_anggaran,
-		        j.lama_pelaksanaan,
-		        j.tahun_selesai_anggaran,
-		        j.jenis_jadwal_khusus,
-		        r.id_jadwal_rpjmd
-		    FROM esakip_data_jadwal j
-		    INNER JOIN esakip_pengaturan_upload_dokumen r
-		        ON r.id_jadwal_rpjmd = j.id
-		    WHERE j.tipe = 'RPJMD'
-		      AND j.status!=0
-		    ORDER BY j.tahun_anggaran DESC"),
-			ARRAY_A
-		);
-
-		if(empty($data_jadwal)){
-			die("JADWAL KOSONG");
-		}
-
-		if(!empty($data_jadwal)){
-			foreach ($data_jadwal as $jadwal_periode) {
-				$lama_pelaksanaan = $jadwal_periode['lama_pelaksanaan'] ?? 4;
-				$tahun_anggaran = $jadwal_periode['tahun_anggaran'];
-				$tahun_awal = $jadwal_periode['tahun_anggaran'];
-				$tahun_akhir = $tahun_awal + $jadwal_periode['lama_pelaksanaan'] - 1;
-				
-			$input_iku_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'Input IKU Pemerintah Daerah ' . $jadwal_periode['jenis_jadwal_khusus'] .' '. $jadwal_periode['nama_jadwal'] . ' ' . 'Periode ' . $tahun_awal . ' - ' . $tahun_akhir,
-				'content' => '[input_iku_pemda id_periode=' . $jadwal_periode['id'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title = 'Input IKU | ' . $jadwal_periode['jenis_jadwal_khusus'] .' '. $jadwal_periode['nama_jadwal'] . ' ' . 'Periode ' . $tahun_awal . ' - ' . $tahun_akhir;
-			$periode_input_iku_pemda .= '<li><a target="_blank" href="' . $input_iku_pemda['url'] . '" class="btn btn-primary">' . $title . '</a></li>';
-			}
-		}
 
 		$get_jadwal_lke = $wpdb->get_results(
 			$wpdb->prepare(
@@ -18881,43 +18866,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			));
 			$list_setting_jadwal .= '<li><a class="btn btn-primary" target="_blank" href="' . $jadwal_verifikasi['url'] . '">' . $jadwal_verifikasi['title'] . '</a></li>';
 		}
-		$jadwal_renaksi = $wpdb->get_results(
-		    "
-		    SELECT 
-		        j.id,
-		        j.nama_jadwal,
-		        j.nama_jadwal_renstra,
-		        j.tahun_anggaran,
-		        j.lama_pelaksanaan,
-		        j.tahun_selesai_anggaran,
-		        r.id_jadwal_rpjmd
-		    FROM esakip_data_jadwal j
-		    INNER JOIN esakip_pengaturan_upload_dokumen r
-		        ON r.id_jadwal_rpjmd = j.id
-		    WHERE j.tipe = 'RPJMD'
-		      AND j.status = 1
-		    ORDER BY j.tahun_anggaran DESC",
-		    ARRAY_A
-		);
-		$pengisian_rencana_aksi_pemda = '';
-		foreach ($jadwal_renaksi as $jadwal_renaksi_pemda) {
-			if (!empty($jadwal_renaksi_pemda['tahun_selesai_anggaran']) && $jadwal_renaksi_pemda['tahun_selesai_anggaran'] > 1) {
-				$tahun_anggaran_selesai = $jadwal_renaksi_pemda['tahun_selesai_anggaran'];
-			} else {
-				$tahun_anggaran_selesai = $jadwal_renaksi_pemda['tahun_anggaran'] + $jadwal_renaksi_pemda['lama_pelaksanaan'];
-			}
-
-		$pengisian_rencana_aksi_pemda = '';
-			$list_pemda_pengisian_rencana_aksi = $this->functions->generatePage(array(
-				'nama_page' => 'Pengisian Rencana Aksi Pemda ' . $_GET['tahun'] . ' ' . $jadwal_renaksi_pemda['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_renaksi_pemda['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-				'content' => '[list_pengisian_rencana_aksi_pemda tahun=' . $_GET['tahun'] . ' periode=' . $jadwal_renaksi_pemda['id'] . ' ]',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_pengisian_rencana_aksi_pemda = 'Pengisian Rencana Aksi';
-			$pengisian_rencana_aksi_pemda = '<li><a target="_blank" href="' . $list_pemda_pengisian_rencana_aksi['url'] . '" class="btn btn-primary">' .  $title_pengisian_rencana_aksi_pemda . '</a></li>';
-		}
-
 
 		if (empty($pengisian_lke)) {
 			$pengisian_lke = '<li><a return="false" href="#" class="btn btn-secondary">Pengisian LKE kosong atau belum dibuat</a></li>';
@@ -18928,7 +18876,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (empty($periode_rpjmd)) {
 			$periode_rpjmd = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
 		}
-
+		if (empty($periode_dokumen_pohon_kinerja_pemda)) {
+			$periode_dokumen_pohon_kinerja_pemda = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
+		}
+		if (empty($periode_input_iku_pemda)) {
+			$periode_input_iku_pemda = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
+		}
+		if (empty($pengisian_rencana_aksi_pemda)) {
+			$pengisian_rencana_aksi_pemda = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
+		}
 		if (empty($periode_dokumen_pohon_kinerja_pemda)) {
 			$periode_dokumen_pohon_kinerja_pemda = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
 		}
@@ -19337,13 +19293,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				        j.nama_jadwal_renstra,
 				        j.tahun_anggaran,
 				        j.lama_pelaksanaan,
-				        j.tahun_selesai_anggaran,
-				        r.id_jadwal_rpjmd
+				        j.tahun_selesai_anggaran
 				    FROM esakip_data_jadwal j
-				    INNER JOIN esakip_pengaturan_upload_dokumen r
-				        ON r.id_jadwal_rpjmd = j.id
 				    WHERE j.tipe = 'RPJMD'
 				      AND j.status = 1
+				      $where_id_jadwal_rpjmd
 				    ORDER BY j.tahun_anggaran DESC",
 				    ARRAY_A
 				);

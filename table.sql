@@ -1500,3 +1500,16 @@ CREATE TABLE `esakip_pengaturan_upload_dokumen` (
   `update_at` datetime DEFAULT current_timestamp(),
   PRIMARY KEY  (id)
 );
+
+CREATE TABLE `esakip_data_label_rencana_aksi` (
+  `id` int(11) NOT NULL auto_increment,
+  `parent_renaksi_opd` int(11) NOT NULL,
+  `parent_renaksi_pemda` int(11) NOT NULL,
+  `parent_indikator_renaksi_pemda` int(11) NOT NULL,
+  `tahun_anggaran` year(4) NOT NULL DEFAULT '2024',
+  `id_skpd` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
+);

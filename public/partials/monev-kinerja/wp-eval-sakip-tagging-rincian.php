@@ -86,6 +86,46 @@ $cek_settingan_menu = $wpdb->get_var(
 );
 
 $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
+
+$ind_renaksi = $wpdb->get_row($wpdb->prepare("
+	SELECT
+		*
+	FROM esakip_data_rencana_aksi_indikator_opd
+	WHERE id=%d
+", $id_indikator), ARRAY_A);
+if(empty($ind_renaksi)){
+	die('<h1 class="text-center">Indikator Rencana Hasil Pekerjaan tidak ditemukan!</h1>');
+}
+
+$renaksi = $wpdb->get_row($wpdb->prepare("
+	SELECT
+		*
+	FROM esakip_data_rencana_aksi_opd
+	WHERE id=%d
+", $ind_renaksi['id_renaksi']), ARRAY_A);
+
+$renaksi_parent1 = $wpdb->get_row($wpdb->prepare("
+	SELECT
+		*
+	FROM esakip_data_rencana_aksi_opd
+	WHERE id=%d
+", $renaksi['parent']), ARRAY_A);
+
+$renaksi_parent2 = $wpdb->get_row($wpdb->prepare("
+	SELECT
+		*
+	FROM esakip_data_rencana_aksi_opd
+	WHERE id=%d
+", $renaksi_parent1['parent']), ARRAY_A);
+
+$renaksi_parent3 = $wpdb->get_row($wpdb->prepare("
+	SELECT
+		*
+	FROM esakip_data_rencana_aksi_opd
+	WHERE id=%d
+", $renaksi_parent2['parent']), ARRAY_A);
+
+print_r($renaksi_parent3);
 ?>
 <style type="text/css">
     .wrap-table {
@@ -228,36 +268,22 @@ $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_men
 		            <tr>
 		                <td style="width: 270px;">Pohon Kinerja OPD Level 1</td>
 		                <td style="width: 20px;" class="text-center">:</td>
-		                <td></td>
+		                <td><?php echo $renaksi_parent3['label_pokin_1']; ?></td>
+		            </tr>
+		            <tr>
+		                <td style="width: 270px;">Pohon Kinerja OPD Level 2</td>
+		                <td style="width: 20px;" class="text-center">:</td>
+		                <td><?php echo $renaksi_parent3['label_pokin_2']; ?></td>
 		            </tr>
 		            <tr>
 		                <td>Rencana Hasil Kerja OPD Level 1</td>
 		                <td class="text-center">:</td>
-		                <td></td>
+		                <td><?php echo $renaksi_parent3['label']; ?></td>
 		            </tr>
 		            <tr>
 		                <td>Sasaran RENSTRA</td>
 		                <td class="text-center">:</td>
-		                <td></td>
-		            </tr>
-		        </tbody>
-		    </table>
-            <table class="table table-bordered">
-		        <tbody>
-		            <tr>
-		                <td style="width: 270px;">Pohon Kinerja OPD Level 2</td>
-		                <td style="width: 20px;" class="text-center">:</td>
-		                <td></td>
-		            </tr>
-		            <tr>
-		                <td>Rencana Hasil Kerja OPD Level 2</td>
-		                <td class="text-center">:</td>
-		                <td></td>
-		            </tr>
-		            <tr>
-		                <td>Program</td>
-		                <td class="text-center">:</td>
-		                <td></td>
+		                <td><?php echo $renaksi_parent3['kode_cascading_sasaran'].' '.$renaksi_parent3['label_cascading_sasaran']; ?></td>
 		            </tr>
 		        </tbody>
 		    </table>
@@ -266,17 +292,17 @@ $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_men
 		            <tr>
 		                <td style="width: 270px;">Pohon Kinerja OPD Level 3</td>
 		                <td style="width: 20px;" class="text-center">:</td>
-		                <td></td>
+		                <td><?php echo $renaksi_parent2['label_pokin_3']; ?></td>
 		            </tr>
 		            <tr>
-		                <td>Rencana Hasil Kerja OPD Level 3</td>
+		                <td>Rencana Hasil Kerja OPD Level 2</td>
 		                <td class="text-center">:</td>
-		                <td></td>
+		                <td><?php echo $renaksi_parent2['label']; ?></td>
 		            </tr>
 		            <tr>
-		                <td>Kegiatan</td>
+		                <td>Program</td>
 		                <td class="text-center">:</td>
-		                <td></td>
+		                <td><?php echo $renaksi_parent2['kode_cascading_program'].' '.$renaksi_parent2['label_cascading_program']; ?></td>
 		            </tr>
 		        </tbody>
 		    </table>
@@ -285,17 +311,95 @@ $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_men
 		            <tr>
 		                <td style="width: 270px;">Pohon Kinerja OPD Level 4</td>
 		                <td style="width: 20px;" class="text-center">:</td>
-		                <td></td>
+		                <td><?php echo $renaksi_parent1['label_pokin_4']; ?></td>
+		            </tr>
+		            <tr>
+		                <td>Rencana Hasil Kerja OPD Level 3</td>
+		                <td class="text-center">:</td>
+		                <td><?php echo $renaksi_parent1['label']; ?></td>
+		            </tr>
+		            <tr>
+		                <td>Kegiatan</td>
+		                <td class="text-center">:</td>
+		                <td><?php echo $renaksi_parent1['kode_cascading_kegiatan'].' '.$renaksi_parent1['label_cascading_kegiatan']; ?></td>
+		            </tr>
+		        </tbody>
+		    </table>
+            <table class="table table-bordered">
+		        <tbody>
+		            <tr>
+		                <td style="width: 270px;">Pohon Kinerja OPD Level 5</td>
+		                <td style="width: 20px;" class="text-center">:</td>
+		                <td><?php echo $renaksi['label_pokin_5']; ?></td>
 		            </tr>
 		            <tr>
 		                <td>Rencana Hasil Kerja OPD Level 4</td>
 		                <td class="text-center">:</td>
-		                <td></td>
+		                <td><?php echo $renaksi['label']; ?></td>
+		            </tr>
+		            <tr>
+		                <td>Dasar Kegiatan</td>
+		                <td class="text-center">:</td>
+		                <td>Mandatory Pusat, Kebijakan Kepala Daerah, POKIR, MUSRENBANG</td>
 		            </tr>
 		            <tr>
 		                <td>Sub Kegiatan</td>
 		                <td class="text-center">:</td>
+		                <td><?php echo $renaksi['kode_cascading_sub_kegiatan'].' '.$renaksi['label_cascading_sub_kegiatan']; ?></td>
+		            </tr>
+		            <tr>
+		                <td>Pagu Sub Kegiatan</td>
+		                <td class="text-center">:</td>
+		                <td>Rp 0</td>
+		            </tr>
+		        </tbody>
+		    </table>
+            <table class="table table-bordered">
+		        <thead>
+		            <tr>
+		                <th class="text-center" rowspan="2" style="width: 400px;">INDIKATOR</th>
+		                <th class="text-center" rowspan="2">SATUAN</th>
+		                <th class="text-center" colspan="6">TARGET KEGIATAN PER TRIWULAN</th>
+		                <th class="text-center" rowspan="2" style="width: 400px;">KETERANGAN</th>
+		            </tr>
+		            <tr>
+		                <th class="text-center">AWAL</th>
+		                <th class="text-center">TW-I</th>
+		                <th class="text-center">TW-II</th>
+		                <th class="text-center">TW-III</th>
+		                <th class="text-center">TW-IV</th>
+		                <th class="text-center">AKHIR</th>
+		            </tr>
+		        </thead>
+		        <tbody>
+		        	<tr>
+		        		<td><?php echo $ind_renaksi['indikator']; ?></td>
+		        		<td class="text-center"><?php echo $ind_renaksi['satuan']; ?></td>
+		        		<td class="text-center"><?php echo $ind_renaksi['target_awal']; ?></td>
+		        		<td class="text-center"><?php echo $ind_renaksi['target_1']; ?></td>
+		        		<td class="text-center"><?php echo $ind_renaksi['target_2']; ?></td>
+		        		<td class="text-center"><?php echo $ind_renaksi['target_3']; ?></td>
+		        		<td class="text-center"><?php echo $ind_renaksi['target_4']; ?></td>
+		        		<td class="text-center"><?php echo $ind_renaksi['target_akhir']; ?></td>
 		                <td></td>
+		        	</tr>
+		        </tbody>
+		    </table>
+            <table class="table table-bordered">
+            	<thead>
+		            <tr>
+		                <th class="text-center" style="width: 25%;">PAGU RENCANA HASIL KERJA</th>
+		                <th class="text-center" style="width: 25%;">ALOKASI APBD</th>
+		                <th class="text-center" style="width: 25%;">REALISASI APBD</th>
+		                <th class="text-center" style="width: 25%;">CAPAIAN REALIASI TERHADAP RENCANA PAGU</th>
+		            </tr>
+		        </thead>
+		        <tbody>
+		            <tr>
+		        		<td class="text-center">Rp <?php echo $ind_renaksi['rencana_pagu']; ?></td>
+		                <td class="text-center">Rp 0</td>
+		        		<td class="text-center">Rp <?php echo $ind_renaksi['realisasi_pagu']; ?></td>
+		                <td class="text-center">0%</td>
 		            </tr>
 		        </tbody>
 		    </table>
