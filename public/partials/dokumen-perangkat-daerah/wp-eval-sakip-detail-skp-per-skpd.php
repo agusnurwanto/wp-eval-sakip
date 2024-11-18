@@ -109,6 +109,13 @@ $status_api_esr = get_option('_crb_api_esr_status');
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
+                            <?php
+                                if (!$is_admin_panrb && $hak_akses_user):
+                                    if($status_api_esr){
+                                        echo '<th class="text-center" rowspan="2" id="check-list-esr" style="display:none">Checklist ESR</th>';
+                                    }
+                                endif;
+                            ?>
                             <th class="text-center">Perangkat Daerah</th>
                             <th class="text-center">Nama Dokumen</th>
                             <th class="text-center">Keterangan</th>
@@ -126,13 +133,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
-                            <?php
-                                if (!$is_admin_panrb && $hak_akses_user):
-                                    if($status_api_esr){
-                                        echo '<th class="text-center" rowspan="2" id="check-list-esr" style="display:none">Checklist ESR</th>';
-                                    }
-                                endif;
-                            ?>
                             <th class="text-center">Nama Dokumen</th>
                             <th class="text-center">Keterangan</th>
                             <th class="text-center">Aksi</th>
