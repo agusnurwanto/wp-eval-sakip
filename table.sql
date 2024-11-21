@@ -19,6 +19,8 @@ CREATE TABLE `esakip_dokumen_lainnya` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -32,6 +34,8 @@ CREATE TABLE `esakip_evaluasi_internal` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -223,6 +227,8 @@ CREATE TABLE `esakip_skp` (
   `tahun_anggaran` year(4) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp,
   `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  `path_esr` text DEFAULT NULL,
  PRIMARY KEY(id)
 );
 
@@ -1495,6 +1501,19 @@ CREATE TABLE `esakip_pengaturan_upload_dokumen` (
   `created_at` datetime DEFAULT current_timestamp(),
   `update_at` datetime DEFAULT current_timestamp(),
   PRIMARY KEY  (id)
+);
+
+CREATE TABLE `esakip_koneksi_pokin_pemda_opd` (
+  `id` int(11) NOT NULL auto_increment,
+  `parent_pohon_kinerja` int(11) NOT NULL,
+  `id_skpd_koneksi` int(11) DEFAULT NULL,
+  `parent_pohon_kinerja_koneksi` int(11) NOT NULL,
+  `status_koneksi` tinyint(4) NOT NULL COMMENT '0 = MENUNGGU, 1 = DISETUJUI, 2 = DITOLAK',
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
+  `keterangan_tolak` varchar(255) DEFAULT null,
+  PRIMARY key (id)
 );
 
 CREATE TABLE `esakip_data_label_rencana_aksi` (

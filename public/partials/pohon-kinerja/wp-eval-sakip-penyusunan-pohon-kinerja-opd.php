@@ -16,6 +16,7 @@ global $wpdb;
 
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 $data_notifikasi_croscutting = array();
+$data_notifikasi_koneksi_pokin_pemda = array();
 
 $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
@@ -163,6 +164,53 @@ if(!empty($pohon_kinerja_level_1)){
                         }
 					}
 				}
+			}
+		}
+
+		/**
+		 * koneksi pokin pemda dan opd
+		 */
+		$koneksi_pohon_kinerja_pemda_level_1 = $wpdb->get_results($wpdb->prepare("
+			SELECT 
+				koneksi.* ,
+				pk.id as id_parent,
+				pk.level as level_parent,
+				pk.label as label_parent
+			FROM esakip_koneksi_pokin_pemda_opd koneksi
+			LEFT JOIN esakip_pohon_kinerja as pk ON koneksi.parent_pohon_kinerja = pk.id
+			WHERE koneksi.parent_pohon_kinerja_koneksi=%d 
+				AND koneksi.active=1 
+				AND koneksi.status_koneksi=1
+			ORDER BY koneksi.id
+		", $level_1['id']), ARRAY_A);
+
+		if(!empty($koneksi_pohon_kinerja_pemda_level_1)){
+			foreach ($koneksi_pohon_kinerja_pemda_level_1 as $key_koneksi_level_1 => $koneksi_pokin_level_1) {
+					$data_parent_tujuan = array();
+					$id_level_1_parent = 0;
+					if($koneksi_pokin_level_1['status_koneksi'] == 1){
+						// untuk mendapatkan id parent ke 1 pemda
+						$data_parent_tujuan = array('data' => $this->get_parent_1_koneksi_pokin_pemda_opd(array(
+							'id' => $koneksi_pokin_level_1['id'],
+							'level' => $koneksi_pokin_level_1['level_parent'],
+							'periode' => $input['periode'],
+							'id_parent' => $koneksi_pokin_level_1['id_parent']
+						)));
+					}
+
+					if(!empty($data_parent_tujuan)){
+						$id_level_1_parent = $data_parent_tujuan['data'];
+					}	
+
+					if(empty($data_all['data'][$level_1['id']]['koneksi_pokin'][$key_koneksi_level_1])){
+						$data_all['data'][$level_1['id']]['koneksi_pokin'][$key_koneksi_level_1] = [
+							'id' => $koneksi_pokin_level_1['id'],
+							'parent_pohon_kinerja' => $koneksi_pokin_level_1['parent_pohon_kinerja'],
+							'status_koneksi' => $koneksi_pokin_level_1['status_koneksi'],
+							'label_parent' => $koneksi_pokin_level_1['label_parent'],
+							'id_level_1_parent' => $id_level_1_parent
+						];
+					}
 			}
 		}
 
@@ -354,6 +402,53 @@ if(!empty($pohon_kinerja_level_1)){
 					}
 				}
 
+				/**
+				 * koneksi pokin pemda dan opd
+				 */
+				$koneksi_pohon_kinerja_pemda_level_2 = $wpdb->get_results($wpdb->prepare("
+					SELECT 
+						koneksi.* ,
+						pk.id as id_parent,
+						pk.level as level_parent,
+						pk.label as label_parent
+					FROM esakip_koneksi_pokin_pemda_opd koneksi
+					LEFT JOIN esakip_pohon_kinerja as pk ON koneksi.parent_pohon_kinerja = pk.id
+					WHERE koneksi.parent_pohon_kinerja_koneksi=%d 
+						AND koneksi.active=1 
+						AND koneksi.status_koneksi=1
+					ORDER BY koneksi.id
+				", $level_2['id']), ARRAY_A);
+
+				if(!empty($koneksi_pohon_kinerja_pemda_level_2)){
+					foreach ($koneksi_pohon_kinerja_pemda_level_2 as $key_koneksi_level_2 => $koneksi_pokin_level_2) {
+						$data_parent_tujuan = array();
+						$id_level_1_parent = 0;
+						if($koneksi_pokin_level_2['status_koneksi'] == 1){
+							// untuk mendapatkan id parent ke 1 pemda
+							$data_parent_tujuan = array('data' => $this->get_parent_1_koneksi_pokin_pemda_opd(array(
+								'id' => $koneksi_pokin_level_2['id'],
+								'level' => $koneksi_pokin_level_2['level_parent'],
+								'periode' => $input['periode'],
+								'id_parent' => $koneksi_pokin_level_2['id_parent']
+							)));
+						}
+
+						if(!empty($data_parent_tujuan)){
+							$id_level_1_parent = $data_parent_tujuan['data'];
+						}	
+
+						if(empty($data_all['data'][$level_1['id']]['data'][$level_2['id']]['koneksi_pokin'][$key_koneksi_level_2])){
+							$data_all['data'][$level_1['id']]['data'][$level_2['id']]['koneksi_pokin'][$key_koneksi_level_2] = [
+								'id' => $koneksi_pokin_level_2['id'],
+								'parent_pohon_kinerja' => $koneksi_pokin_level_2['parent_pohon_kinerja'],
+								'status_koneksi' => $koneksi_pokin_level_2['status_koneksi'],
+								'label_parent' => $koneksi_pokin_level_2['label_parent'],
+								'id_level_1_parent' => $id_level_1_parent
+							];
+						}
+					}
+				}
+
 				// pokin level 3
 				$pohon_kinerja_level_3 = $wpdb->get_results($wpdb->prepare("
 					SELECT 
@@ -537,6 +632,53 @@ if(!empty($pohon_kinerja_level_1)){
 											'id_level_1_parent' => $id_level_1_parent
 										];
 									}
+								}
+							}
+						}
+
+						/**
+						 * koneksi pokin pemda dan opd
+						 */
+						$koneksi_pohon_kinerja_pemda_level_3 = $wpdb->get_results($wpdb->prepare("
+							SELECT 
+								koneksi.* ,
+								pk.id as id_parent,
+								pk.level as level_parent,
+								pk.label as label_parent
+							FROM esakip_koneksi_pokin_pemda_opd koneksi
+							LEFT JOIN esakip_pohon_kinerja as pk ON koneksi.parent_pohon_kinerja = pk.id
+							WHERE koneksi.parent_pohon_kinerja_koneksi=%d 
+								AND koneksi.active=1 
+								AND koneksi.status_koneksi=1
+							ORDER BY koneksi.id
+						", $level_3['id']), ARRAY_A);
+
+						if(!empty($koneksi_pohon_kinerja_pemda_level_3)){
+							foreach ($koneksi_pohon_kinerja_pemda_level_3 as $key_koneksi_level_3 => $koneksi_pokin_level_3) {
+								$data_parent_tujuan = array();
+								$id_level_1_parent = 0;
+								if($koneksi_pokin_level_3['status_koneksi'] == 1){
+									// untuk mendapatkan id parent ke 1 pemda
+									$data_parent_tujuan = array('data' => $this->get_parent_1_koneksi_pokin_pemda_opd(array(
+										'id' => $koneksi_pokin_level_3['id'],
+										'level' => $koneksi_pokin_level_3['level_parent'],
+										'periode' => $input['periode'],
+										'id_parent' => $koneksi_pokin_level_3['id_parent']
+									)));
+								}
+
+								if(!empty($data_parent_tujuan)){
+									$id_level_1_parent = $data_parent_tujuan['data'];
+								}	
+
+								if(empty($data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['koneksi_pokin'][$key_koneksi_level_3])){
+									$data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['koneksi_pokin'][$key_koneksi_level_3] = [
+										'id' => $koneksi_pokin_level_3['id'],
+										'parent_pohon_kinerja' => $koneksi_pokin_level_3['parent_pohon_kinerja'],
+										'status_koneksi' => $koneksi_pokin_level_3['status_koneksi'],
+										'label_parent' => $koneksi_pokin_level_3['label_parent'],
+										'id_level_1_parent' => $id_level_1_parent
+									];
 								}
 							}
 						}
@@ -729,6 +871,53 @@ if(!empty($pohon_kinerja_level_1)){
 									}
 								}
 
+								/**
+								 * koneksi pokin pemda dan opd
+								 */
+								$koneksi_pohon_kinerja_pemda_level_4 = $wpdb->get_results($wpdb->prepare("
+									SELECT 
+										koneksi.* ,
+										pk.id as id_parent,
+										pk.level as level_parent,
+										pk.label as label_parent
+									FROM esakip_koneksi_pokin_pemda_opd koneksi
+									LEFT JOIN esakip_pohon_kinerja as pk ON koneksi.parent_pohon_kinerja = pk.id
+									WHERE koneksi.parent_pohon_kinerja_koneksi=%d 
+										AND koneksi.active=1 
+										AND koneksi.status_koneksi=1
+									ORDER BY koneksi.id
+								", $level_4['id']), ARRAY_A);
+
+								if(!empty($koneksi_pohon_kinerja_pemda_level_4)){
+									foreach ($koneksi_pohon_kinerja_pemda_level_4 as $key_koneksi_level_4 => $koneksi_pokin_level_4) {
+										$data_parent_tujuan = array();
+										$id_level_1_parent = 0;
+										if($koneksi_pokin_level_4['status_koneksi'] == 1){
+											// untuk mendapatkan id parent ke 1 pemda
+											$data_parent_tujuan = array('data' => $this->get_parent_1_koneksi_pokin_pemda_opd(array(
+												'id' => $koneksi_pokin_level_4['id'],
+												'level' => $koneksi_pokin_level_4['level_parent'],
+												'periode' => $input['periode'],
+												'id_parent' => $koneksi_pokin_level_4['id_parent']
+											)));
+										}
+
+										if(!empty($data_parent_tujuan)){
+											$id_level_1_parent = $data_parent_tujuan['data'];
+										}	
+
+										if(empty($data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['koneksi_pokin'][$key_koneksi_level_4])){
+											$data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['koneksi_pokin'][$key_koneksi_level_4] = [
+												'id' => $koneksi_pokin_level_4['id'],
+												'parent_pohon_kinerja' => $koneksi_pokin_level_4['parent_pohon_kinerja'],
+												'status_koneksi' => $koneksi_pokin_level_4['status_koneksi'],
+												'label_parent' => $koneksi_pokin_level_4['label_parent'],
+												'id_level_1_parent' => $id_level_1_parent
+											];
+										}
+									}
+								}
+
 								// pokin level 5
 								$pohon_kinerja_level_5 = $wpdb->get_results($wpdb->prepare("
 									SELECT 
@@ -915,6 +1104,54 @@ if(!empty($pohon_kinerja_level_1)){
 												}
 											}
 										}
+
+										/**
+										 * koneksi pokin pemda dan opd
+										 */
+										$koneksi_pohon_kinerja_pemda_level_5 = $wpdb->get_results($wpdb->prepare("
+											SELECT 
+												koneksi.* ,
+												pk.id as id_parent,
+												pk.level as level_parent,
+												pk.label as label_parent
+											FROM esakip_koneksi_pokin_pemda_opd koneksi
+											LEFT JOIN esakip_pohon_kinerja as pk ON koneksi.parent_pohon_kinerja = pk.id
+											WHERE koneksi.parent_pohon_kinerja_koneksi=%d 
+												AND koneksi.active=1 
+												AND koneksi.status_koneksi=1
+											ORDER BY koneksi.id
+										", $level_5['id']), ARRAY_A);
+
+										if(!empty($koneksi_pohon_kinerja_pemda_level_5)){
+											foreach ($koneksi_pohon_kinerja_pemda_level_5 as $key_koneksi_level_5 => $koneksi_pokin_level_5) {
+												$data_parent_tujuan = array();
+												$id_level_1_parent = 0;
+												if($koneksi_pokin_level_5['status_koneksi'] == 1){
+													// untuk mendapatkan id parent ke 1 pemda
+													$data_parent_tujuan = array('data' => $this->get_parent_1_koneksi_pokin_pemda_opd(array(
+														'id' => $koneksi_pokin_level_5['id'],
+														'level' => $koneksi_pokin_level_5['level_parent'],
+														'periode' => $input['periode'],
+														'id_parent' => $koneksi_pokin_level_5['id_parent']
+													)));
+												}
+
+												if(!empty($data_parent_tujuan)){
+													$id_level_1_parent = $data_parent_tujuan['data'];
+												}	
+
+												if(empty($data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['data'][$level_5['id']]['koneksi_pokin'][$key_koneksi_level_5])){
+													$data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['data'][$level_5['id']]['koneksi_pokin'][$key_koneksi_level_5] = [
+														'id' => $koneksi_pokin_level_5['id'],
+														'parent_pohon_kinerja' => $koneksi_pokin_level_5['parent_pohon_kinerja'],
+														'status_koneksi' => $koneksi_pokin_level_5['status_koneksi'],
+														'label_parent' => $koneksi_pokin_level_5['label_parent'],
+														'id_level_1_parent' => $id_level_1_parent
+													];
+												}
+											}
+										}
+										// end of foreach data level 5
 									}
 								}
 							}
@@ -934,6 +1171,13 @@ $view_kinerja = $this->functions->generatePage(array(
 ));
 $view_kinerja_asal = $view_kinerja;
 $view_kinerja['url'] .= '&id_skpd=' . $id_skpd;
+
+$view_kinerja_pokin_pemda = $this->functions->generatePage(array(
+	'nama_page' => 'View Pohon Kinerja',
+	'content' => '[view_pohon_kinerja]',
+	'show_header' => 1,
+	'post_status' => 'private'
+));
 $html = '';
 // echo "<pre>";
 // print_r($data_all['data']);
@@ -942,6 +1186,45 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 	$indikator=array();
 	foreach ($level_1['indikator'] as $indikatorlevel1) {
 		$indikator[]=$indikatorlevel1['label_indikator_kinerja'];
+	}
+	$koneksi_pokin_pemda = array();
+
+	foreach ($level_1['koneksi_pokin'] as $koneksi_pokin_level_1) {
+		$class_pengusul = "";
+
+		if($koneksi_pokin_level_1['id_level_1_parent'] !== 0){
+			$nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $koneksi_pokin_level_1['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". ucfirst($koneksi_pokin_level_1['label_parent']) ."</a>";
+		}
+		
+		switch ($koneksi_pokin_level_1['status_koneksi']) {
+			case '1':
+				$status_koneksi = 'Disetujui';
+				$label_color = 'success text-white';
+				break;
+			case '2':
+				$status_koneksi = 'Ditolak';
+				$label_color = 'danger text-white';
+				break;
+			
+			default:
+				$status_koneksi = 'Menunggu';
+				$label_color = 'secondary text-white';
+				break;
+		}
+
+		$show_nama_skpd = $nama_skpd . ' <span class="badge bg-'. $label_color .'" style="padding: .5em;">'. $status_koneksi.'</span> ';
+		
+		$class_koneksi_pokin_vertikal = '';
+
+		// $detail = "<a href='javascript:void(0)' data-id='". $koneksi_pokin_level_1['id'] ."' class='detail-koneksi-pokin text-primary' onclick='detail_koneksi_pokin(" . $koneksi_pokin_level_1['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>";
+
+		$koneksi_pokin[]= '<div class="koneksi-pokin-isi '. $class_pengusul .' '. $class_koneksi_pokin_vertikal .'"><div style="margin-top: 10px;font-weight: 500;">'. $show_nama_skpd .'</div></div>';
+	}
+
+	$show_koneksi_pokin = '';
+	if(!empty($koneksi_pokin)){
+		$show_koneksi_pokin .='<div class="text-center label-koneksi-pokin">KONEKSI POHON KINERJA<br>PEMERINTAH DAERAH</div>';
+		$show_koneksi_pokin .=implode("", $koneksi_pokin);
 	}
 	$html.='
 	<tr>
@@ -956,6 +1239,22 @@ foreach ($data_all['data'] as $key1 => $level_1) {
     <td></td>
     <td></td>
 	</tr>';
+
+	if(!empty($show_koneksi_pokin)){
+		$html.='
+		<tr>
+			<td class="koneksi-pokin" style="background-color: #FDFFB6;" colspan="2">' . $show_koneksi_pokin . '</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>';
+	}
 	foreach (array_values($level_1['data']) as $key2 => $level_2) {
 		$indikator=array();
 		foreach ($level_2['indikator'] as $indikatorlevel2) {
@@ -1008,6 +1307,47 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 			$show_croscutting .='<div class="text-center label-croscutting">CROSCUTTING</div>';
 			$show_croscutting .=implode("", $croscutting);
 		}
+
+		// show koneksi pokin opd pemda
+		$koneksi_pokin = array();
+		foreach ($level_2['koneksi_pokin'] as $koneksi_pokin_level_2) {
+			$class_pengusul = "";
+
+			if($koneksi_pokin_level_2['id_level_1_parent'] !== 0){
+				$nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $koneksi_pokin_level_2['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". ucfirst($koneksi_pokin_level_2['label_parent']) ."</a>";
+			}
+			
+			switch ($koneksi_pokin_level_2['status_koneksi']) {
+				case '1':
+					$status_koneksi = 'Disetujui';
+					$label_color = 'success text-white';
+					break;
+				case '2':
+					$status_koneksi = 'Ditolak';
+					$label_color = 'danger text-white';
+					break;
+				
+				default:
+					$status_koneksi = 'Menunggu';
+					$label_color = 'secondary text-white';
+					break;
+			}
+
+			$show_nama_skpd = $nama_skpd . ' <span class="badge bg-'. $label_color .'" style="padding: .5em;">'. $status_koneksi.'</span> ';
+			
+			$class_koneksi_pokin_vertikal = '';
+
+			// $detail = "<a href='javascript:void(0)' data-id='". $koneksi_pokin_level_2['id'] ."' class='detail-koneksi-pokin text-primary' onclick='detail_koneksi_pokin(" . $koneksi_pokin_level_2['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>";
+
+			$koneksi_pokin[]= '<div class="koneksi-pokin-isi '. $class_pengusul .' '. $class_koneksi_pokin_vertikal .'"><div style="margin-top: 10px;font-weight: 500;">'. $show_nama_skpd .'</div></div>';
+		}
+
+		$show_koneksi_pokin = '';
+		if(!empty($koneksi_pokin)){
+			$show_koneksi_pokin .='<div class="text-center label-koneksi-pokin">KONEKSI POHON KINERJA<br>PEMERINTAH DAERAH</div>';
+			$show_koneksi_pokin .=implode("", $koneksi_pokin);
+		}
+
 		$html.='
 		<tr>
 			<td></td>
@@ -1028,6 +1368,20 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 				<td></td>
 				<td></td>
 				<td class="croscutting" style="background-color: #FFC6FF;" colspan="2">' . $show_croscutting . '</td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>';
+		}
+		if(!empty($show_koneksi_pokin)){
+			$html.='
+			<tr>
+				<td></td>
+				<td></td>
+				<td class="koneksi-pokin" style="background-color: #FDFFB6;" colspan="2">' . $show_koneksi_pokin . '</td>
 				<td></td>
 				<td></td>
 				<td></td>
@@ -1084,6 +1438,46 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 				$show_croscutting .='<div class="text-center label-croscutting">CROSCUTTING</div>';
 				$show_croscutting .=implode("", $croscutting);
 			}
+
+			// show koneksi pokin opd pemda
+			$koneksi_pokin = array();
+			foreach ($level_3['koneksi_pokin'] as $koneksi_pokin_level_3) {
+				$class_pengusul = "";
+
+				if($koneksi_pokin_level_3['id_level_1_parent'] !== 0){
+					$nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $koneksi_pokin_level_3['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". ucfirst($koneksi_pokin_level_3['label_parent']) ."</a>";
+				}
+				
+				switch ($koneksi_pokin_level_3['status_koneksi']) {
+					case '1':
+						$status_koneksi = 'Disetujui';
+						$label_color = 'success text-white';
+						break;
+					case '2':
+						$status_koneksi = 'Ditolak';
+						$label_color = 'danger text-white';
+						break;
+					
+					default:
+						$status_koneksi = 'Menunggu';
+						$label_color = 'secondary text-white';
+						break;
+				}
+
+				$show_nama_skpd = $nama_skpd . ' <span class="badge bg-'. $label_color .'" style="padding: .5em;">'. $status_koneksi.'</span> ';
+				
+				$class_koneksi_pokin_vertikal = '';
+
+				// $detail = "<a href='javascript:void(0)' data-id='". $koneksi_pokin_level_3['id'] ."' class='detail-koneksi-pokin text-primary' onclick='detail_koneksi_pokin(" . $koneksi_pokin_level_3['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>";
+
+				$koneksi_pokin[]= '<div class="koneksi-pokin-isi '. $class_pengusul .' '. $class_koneksi_pokin_vertikal .'"><div style="margin-top: 10px;font-weight: 500;">'. $show_nama_skpd .'</div></div>';
+			}
+
+			$show_koneksi_pokin = '';
+			if(!empty($koneksi_pokin)){
+				$show_koneksi_pokin .='<div class="text-center label-koneksi-pokin">KONEKSI POHON KINERJA<br>PEMERINTAH DAERAH</div>';
+				$show_koneksi_pokin .=implode("", $koneksi_pokin);
+			}
 			$html.='
 			<tr>
 				<td></td>
@@ -1106,6 +1500,20 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 					<td></td>
 					<td></td>
 					<td class="croscutting" style="background-color: #FFC6FF;" colspan="2">' . $show_croscutting . '</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>';
+			}
+			if(!empty($show_koneksi_pokin)){
+				$html.='
+				<tr>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td class="koneksi-pokin" style="background-color: #FDFFB6;" colspan="2">' . $show_koneksi_pokin . '</td>
 					<td></td>
 					<td></td>
 					<td></td>
@@ -1160,6 +1568,46 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 					$show_croscutting .='<div class="text-center label-croscutting">CROSCUTTING</div>';
 					$show_croscutting .=implode("", $croscutting);
 				}
+
+				// show koneksi pokin opd pemda
+				$koneksi_pokin = array();
+				foreach ($level_4['koneksi_pokin'] as $koneksi_pokin_level_4) {
+					$class_pengusul = "";
+
+					if($koneksi_pokin_level_4['id_level_1_parent'] !== 0){
+						$nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $koneksi_pokin_level_4['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". ucfirst($koneksi_pokin_level_4['label_parent']) ."</a>";
+					}
+					
+					switch ($koneksi_pokin_level_4['status_koneksi']) {
+						case '1':
+							$status_koneksi = 'Disetujui';
+							$label_color = 'success text-white';
+							break;
+						case '2':
+							$status_koneksi = 'Ditolak';
+							$label_color = 'danger text-white';
+							break;
+						
+						default:
+							$status_koneksi = 'Menunggu';
+							$label_color = 'secondary text-white';
+							break;
+					}
+
+					$show_nama_skpd = $nama_skpd . ' <span class="badge bg-'. $label_color .'" style="padding: .5em;">'. $status_koneksi.'</span> ';
+					
+					$class_koneksi_pokin_vertikal = '';
+
+					// $detail = "<a href='javascript:void(0)' data-id='". $koneksi_pokin_level_4['id'] ."' class='detail-koneksi-pokin text-primary' onclick='detail_koneksi_pokin(" . $koneksi_pokin_level_4['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>";
+
+					$koneksi_pokin[]= '<div class="koneksi-pokin-isi '. $class_pengusul .' '. $class_koneksi_pokin_vertikal .'"><div style="margin-top: 10px;font-weight: 500;">'. $show_nama_skpd .'</div></div>';
+				}
+
+				$show_koneksi_pokin = '';
+				if(!empty($koneksi_pokin)){
+					$show_koneksi_pokin .='<div class="text-center label-koneksi-pokin">KONEKSI POHON KINERJA<br>PEMERINTAH DAERAH</div>';
+					$show_koneksi_pokin .=implode("", $koneksi_pokin);
+				}
 				$html.='
 				<tr>
 					<td></td>
@@ -1184,6 +1632,20 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 						<td></td>
 						<td></td>
 						<td class="croscutting" style="background-color: #FFC6FF;" colspan="2">' . $show_croscutting . '</td>
+						<td></td>
+						<td></td>
+					</tr>';
+				}
+				if(!empty($show_koneksi_pokin)){
+					$html.='
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="koneksi-pokin" style="background-color: #FDFFB6;" colspan="2">' . $show_koneksi_pokin . '</td>
 						<td></td>
 						<td></td>
 					</tr>';
@@ -1269,6 +1731,61 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 						</tr>';
 					}
 
+					// show koneksi pokin opd pemda
+					$koneksi_pokin = array();
+					foreach ($level_5['koneksi_pokin'] as $koneksi_pokin_level_5) {
+						$class_pengusul = "";
+
+						if($koneksi_pokin_level_5['id_level_1_parent'] !== 0){
+							$nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $koneksi_pokin_level_5['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". ucfirst($koneksi_pokin_level_5['label_parent']) ."</a>";
+						}
+						
+						switch ($koneksi_pokin_level_5['status_koneksi']) {
+							case '1':
+								$status_koneksi = 'Disetujui';
+								$label_color = 'success text-white';
+								break;
+							case '2':
+								$status_koneksi = 'Ditolak';
+								$label_color = 'danger text-white';
+								break;
+							
+							default:
+								$status_koneksi = 'Menunggu';
+								$label_color = 'secondary text-white';
+								break;
+						}
+
+						$show_nama_skpd = $nama_skpd . ' <span class="badge bg-'. $label_color .'" style="padding: .5em;">'. $status_koneksi.'</span> ';
+						
+						$class_koneksi_pokin_vertikal = '';
+
+						// $detail = "<a href='javascript:void(0)' data-id='". $koneksi_pokin_level_5['id'] ."' class='detail-koneksi-pokin text-primary' onclick='detail_koneksi_pokin(" . $koneksi_pokin_level_5['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>";
+
+						$koneksi_pokin[]= '<div class="koneksi-pokin-isi '. $class_pengusul .' '. $class_koneksi_pokin_vertikal .'"><div style="margin-top: 10px;font-weight: 500;">'. $show_nama_skpd .'</div></div>';
+					}
+
+					$show_koneksi_pokin = '';
+					if(!empty($koneksi_pokin)){
+						$show_koneksi_pokin .='<div class="text-center label-koneksi-pokin">KONEKSI POHON KINERJA<br>PEMERINTAH DAERAH</div>';
+						$show_koneksi_pokin .=implode("", $koneksi_pokin);
+					}
+
+					if(!empty($show_koneksi_pokin)){
+						$html.='
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td class="koneksi-pokin" style="background-color: #FDFFB6;" colspan="2">' . $show_koneksi_pokin . '</td>
+						</tr>';
+					}
+
 				}
 			}
 		}
@@ -1346,6 +1863,63 @@ if(!empty($data_notifikasi_croscutting)){
 	}
 }
 
+$data_notifikasi_koneksi_pokin_pemda = $wpdb->get_results($wpdb->prepare("
+	SELECT 
+		koneksi.*,
+		pk.id as id_parent_pemda,
+		pk.label as label_parent_pemda
+	FROM 
+		esakip_koneksi_pokin_pemda_opd as koneksi
+	LEFT JOIN esakip_pohon_kinerja as pk
+		ON koneksi.parent_pohon_kinerja = pk.id
+	WHERE koneksi.active=1 
+	AND koneksi.status_koneksi=0
+	AND koneksi.id_skpd_koneksi=%d
+", $id_skpd)
+,ARRAY_A);
+
+$html_notifikasi_koneksi_pokin = '';
+$no_notif_koneksi_pokin = 1;
+if(!empty($data_notifikasi_koneksi_pokin_pemda)){
+	foreach ($data_notifikasi_koneksi_pokin_pemda as $k_notif_koneksi => $v_notif_koneksi) {
+		$data_label_indikator_pokin_pemda = $wpdb->get_results($wpdb->prepare("
+			SELECT 
+				pk.label_indikator_kinerja as indikator_parent_pemda
+			FROM 
+				esakip_pohon_kinerja as pk
+			WHERE pk.parent=%d
+			AND active=1 
+		", $v_notif_koneksi['id_parent_pemda'])
+		,ARRAY_A);
+
+		$indikator_pokin_pemda = array();
+		$show_indikator_pokin_pemda = '';
+		if(!empty($data_label_indikator_pokin_pemda)){
+			$no = 1;
+			foreach ($data_label_indikator_pokin_pemda as $key => $v_indikator_pemda) {
+				$class_indikator_pemda = count($data_label_indikator_pokin_pemda) > 1 ? 'koneksi-indikator-pemda-isi' : '';
+				$class_indikator_pemda_1 = $no == 1 && $class_indikator_pemda != '' ? 'border-style: none;margin-top: -8px;' : '';
+				$indikator_pokin_pemda[]= '<div class="'. $class_indikator_pemda .'" style="'. $class_indikator_pemda_1 .'">'. $v_indikator_pemda['indikator_parent_pemda'] .'</div>';
+				$no++;
+			}
+		}
+		if(!empty($indikator_pokin_pemda)){
+			$show_indikator_pokin_pemda .=implode("", $indikator_pokin_pemda);
+		}
+
+
+		$aksi = '<a href="javascript:void(0)" class="btn btn-sm btn-success verifikasi-koneksi-pokin-pemda" data-id="' . $v_notif_koneksi['id'] . '" href="#" title="Verifikasi Koneksi Pohon Kinerja"><span class="dashicons dashicons-yes"></span></a>';
+
+		$html_notifikasi_koneksi_pokin .='
+			<tr>
+				<td>'. $no_notif_koneksi_pokin++ .'</td>
+				<td>'. $v_notif_koneksi['label_parent_pemda'] .'</td>
+				<td>'. $show_indikator_pokin_pemda .'</td>
+				<td>'. $aksi .'</td>
+			</tr>';
+	}
+}
+
 $data_level_pokin = $wpdb->get_results(
 	$wpdb->prepare("
 		SELECT 
@@ -1356,7 +1930,7 @@ $data_level_pokin = $wpdb->get_results(
 			id_jadwal=%d 
 		AND active=1 
 		AND id_skpd=%d 
-		AND level IN (2,3,4,5) 
+		AND level IN (1,2,3,4,5) 
 		AND label_indikator_kinerja IS NULL
 		ORDER BY level
 	", $input['periode'],$id_skpd),
@@ -1366,7 +1940,17 @@ $data_level_pokin = $wpdb->get_results(
 $option_tautan_pokin = "<option value=''>Pilih Tautan Level Pokin</option>";
 if(!empty($data_level_pokin)){
 	foreach ($data_level_pokin as $v_pokin) {
+		if($v_pokin['level'] == 1){
+			continue;
+		}
 		$option_tautan_pokin .="<option value='" . $v_pokin['id'] . "'>Level " . $v_pokin['level'] . " | " . $v_pokin['label'] . "</option>";
+	}
+}
+
+$option_tautan_pokin_koneksi = "<option value=''>Pilih Tautan Level Pokin</option>";
+if(!empty($data_level_pokin)){
+	foreach ($data_level_pokin as $v_pokin) {
+		$option_tautan_pokin_koneksi .="<option value='" . $v_pokin['id'] . "'>Level " . $v_pokin['level'] . " | " . $v_pokin['label'] . "</option>";
 	}
 }
 
@@ -1487,6 +2071,37 @@ $hak_akses_user = ($this_jenis_role || $cek_settingan_menu == 3 || $is_administr
         margin-bottom: 1rem;
         background-color: transparent;
     }
+	
+	.label-koneksi-pokin {
+		padding: 0 .7em .7em;
+	}
+	.koneksi-pokin-1 {
+		margin: 0px -16px 0px;
+		padding:  .5em .9em;
+		border-width: 1px 0 0;
+		border-style: solid;
+		border-color: gray;
+	}
+	.koneksi-pokin-isi {
+		margin: 0px -16px;
+		padding: .7em .9em;
+		border-width: 1px 0 0;
+		border-style: solid;
+		border-color: gray;
+	}
+	
+	.detail-koneksi-pokin .dashicons{
+		text-decoration: none;
+		vertical-align: text-bottom !important;
+		font-size: 23px !important;
+	}
+	.koneksi-indikator-pemda-isi {
+		margin: 0px -10px;
+		padding: .7em .9em;
+		border-width: 1px 0 0;
+		border-style: solid;
+		border-color: gray;
+	}
 </style>
 <h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Pohon Kinerja <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $periode['nama_jadwal_renstra'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h3><br>
 
@@ -1503,6 +2118,25 @@ $hak_akses_user = ($this_jenis_role || $cek_settingan_menu == 3 || $is_administr
 			</tr>
 		</thead>
 		<?php echo $html_notifikasi_cc; ?>
+		<tbody>
+		</tbody>
+	</table>
+</div>
+<?php endif; ?>
+
+<?php if(!empty($data_notifikasi_koneksi_pokin_pemda)): ?>
+<h4 style="text-align: center; margin-top: 80px; font-weight: bold;margin-bottom: .5em;">Notifikasi Koneksi Pohon Kinerja Pemerintah Daerah</h4>
+<div title="Notifikasi Koneksi Pohon Kinerja Pemerintah Daerah" style="padding: 5px; overflow: auto; display:flex; justify-content:center;">
+	<table id="table_notifikasi_koneksi_pokin_pemda" style="width: 50em;text-align: center;">
+		<thead>
+			<tr>
+				<th>No</th>
+				<th>Label Pohon Kinerja Pemda</th>
+				<th>Indikator Pohon Kinerja Pemda</th>
+				<th style="min-width: 10em;">Aksi</th>
+			</tr>
+		</thead>
+		<?php echo $html_notifikasi_koneksi_pokin; ?>
 		<tbody>
 		</tbody>
 	</table>
@@ -1682,6 +2316,11 @@ jQuery(document).ready(function(){
 		pageLength : 5,
     	lengthMenu: [[5, 10, 20], [5, 10, 20]]
 	});
+	
+	jQuery('#table_notifikasi_koneksi_pokin_pemda').dataTable({   
+		pageLength : 5,
+    	lengthMenu: [[5, 10, 20], [5, 10, 20]]
+	});
 
 	jQuery("#tambah-pohon-kinerja").on('click', function(){
 		pokinLevel1().then(function(){
@@ -1746,6 +2385,21 @@ jQuery(document).ready(function(){
                             +'<label>Nomor Urut</label>'
                             +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
                         +`</div>`
+						+`<div class="setting-koneksi-pokin">`
+							+`<h5 style="margin: 30px 0 5px 0;">Setting Koneksi Pohon Kinerja Pemerintah Daerah</h5>`
+							+`<table id="table_koneksi_pokin" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">`
+								+`<thead>`
+									+`<tr>`
+										+`<th class="text-center">No</th>`
+										+`<th class="text-center">Label Pohon Kinerja Pemda</th>`
+										+`<th class="text-center">Indikator Pohon Kinerja Pemda</th>`
+										+`<th class="text-center">Status</th>`
+										+`<th class="text-center" style="width: 150px;">Aksi</th>`
+									+`</tr>`
+								+`</thead>`
+								+`<tbody>${response.data_koneksi_pokin}</tbody>`
+							+`</table>`
+						+`</div>`
 					+`</form>`);
 				jQuery("#modal-crud").find(`.modal-footer`).html(``
 					+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
@@ -1754,9 +2408,17 @@ jQuery(document).ready(function(){
 					+`<button type="button" class="btn btn-success" id="simpan-data-pokin" data-action="update_pokin" data-view="pokinLevel1">`
 						+`Update`
 					+`</button>`);
-				jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
+				
 				jQuery("#modal-crud").find('.modal-dialog').css('width','');
 				jQuery("#modal-crud").modal('show');
+
+				if(response.data_koneksi_pokin == "" || response.data_koneksi_pokin == undefined){
+					jQuery(".setting-koneksi-pokin").hide()
+					jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
+				}else{
+					jQuery(".setting-koneksi-pokin").show()
+					jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','1100px');
+				}
 			}
 		});
 	})
@@ -1977,6 +2639,21 @@ jQuery(document).ready(function(){
 								+`<tbody>${response.data_croscutting}</tbody>`
 							+`</table>`
 						+`</div>`
+						+`<div class="setting-koneksi-pokin">`
+							+`<h5 style="margin: 30px 0 5px 0;">Setting Koneksi Pohon Kinerja Pemerintah Daerah</h5>`
+							+`<table id="table_koneksi_pokin" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">`
+								+`<thead>`
+									+`<tr>`
+										+`<th class="text-center">No</th>`
+										+`<th class="text-center">Label Pohon Kinerja Pemda</th>`
+										+`<th class="text-center">Indikator Pohon Kinerja Pemda</th>`
+										+`<th class="text-center">Status</th>`
+										+`<th class="text-center" style="width: 150px;">Aksi</th>`
+									+`</tr>`
+								+`</thead>`
+								+`<tbody>${response.data_koneksi_pokin}</tbody>`
+							+`</table>`
+						+`</div>`
 					+`</form>`);
 				jQuery("#modal-crud").find(`.modal-footer`).html(``
 					+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
@@ -1997,6 +2674,12 @@ jQuery(document).ready(function(){
 					jQuery('#settingCroscutting').prop('checked', true);
 					jQuery(".setting-croscutting").show()
 					jQuery('#tambah-croscuting-level').attr('data-setting-croscutting', 'true');
+				}
+
+				if(response.data_koneksi_pokin == "" || response.data_koneksi_pokin == undefined){
+					jQuery(".setting-koneksi-pokin").hide()
+				}else{
+					jQuery(".setting-koneksi-pokin").show()
 				}
 			}
 		});
@@ -2226,6 +2909,21 @@ jQuery(document).ready(function(){
 								+`<tbody>${response.data_croscutting}</tbody>`
 							+`</table>`
 						+`</div>`
+						+`<div class="setting-koneksi-pokin">`
+							+`<h5 style="margin: 30px 0 5px 0;">Setting Koneksi Pohon Kinerja Pemerintah Daerah</h5>`
+							+`<table id="table_koneksi_pokin" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">`
+								+`<thead>`
+									+`<tr>`
+										+`<th class="text-center">No</th>`
+										+`<th class="text-center">Label Pohon Kinerja Pemda</th>`
+										+`<th class="text-center">Indikator Pohon Kinerja Pemda</th>`
+										+`<th class="text-center">Status</th>`
+										+`<th class="text-center" style="width: 150px;">Aksi</th>`
+									+`</tr>`
+								+`</thead>`
+								+`<tbody>${response.data_koneksi_pokin}</tbody>`
+							+`</table>`
+						+`</div>`
 					+`</form>`);
 				jQuery("#modal-crud").find(`.modal-footer`).html(``
 					+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
@@ -2247,6 +2945,12 @@ jQuery(document).ready(function(){
 					jQuery('#settingCroscutting').prop('checked', true);
 					jQuery(".setting-croscutting").show()
 					jQuery('#tambah-croscuting-level').attr('data-setting-croscutting', 'true');
+				}
+
+				if(response.data_koneksi_pokin == "" || response.data_koneksi_pokin == undefined){
+					jQuery(".setting-koneksi-pokin").hide()
+				}else{
+					jQuery(".setting-koneksi-pokin").show()
 				}
 			}
 		});
@@ -2476,6 +3180,21 @@ jQuery(document).ready(function(){
 								+`<tbody>${response.data_croscutting}</tbody>`
 							+`</table>`
 						+`</div>`
+						+`<div class="setting-koneksi-pokin">`
+							+`<h5 style="margin: 30px 0 5px 0;">Setting Koneksi Pohon Kinerja Pemerintah Daerah</h5>`
+							+`<table id="table_koneksi_pokin" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">`
+								+`<thead>`
+									+`<tr>`
+										+`<th class="text-center">No</th>`
+										+`<th class="text-center">Label Pohon Kinerja Pemda</th>`
+										+`<th class="text-center">Indikator Pohon Kinerja Pemda</th>`
+										+`<th class="text-center">Status</th>`
+										+`<th class="text-center" style="width: 150px;">Aksi</th>`
+									+`</tr>`
+								+`</thead>`
+								+`<tbody>${response.data_koneksi_pokin}</tbody>`
+							+`</table>`
+						+`</div>`
 					+`</form>`);
 				jQuery("#modal-crud").find(`.modal-footer`).html(``
 					+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
@@ -2496,6 +3215,12 @@ jQuery(document).ready(function(){
 					jQuery('#settingCroscutting').prop('checked', true);
 					jQuery(".setting-croscutting").show()
 					jQuery('#tambah-croscuting-level').attr('data-setting-croscutting', 'true');
+				}
+
+				if(response.data_koneksi_pokin == "" || response.data_koneksi_pokin == undefined){
+					jQuery(".setting-koneksi-pokin").hide()
+				}else{
+					jQuery(".setting-koneksi-pokin").show()
 				}
 			}
 		});
@@ -2733,6 +3458,21 @@ jQuery(document).ready(function(){
 								+`<tbody>${response.data_croscutting}</tbody>`
 							+`</table>`
 						+`</div>`
+						+`<div class="setting-koneksi-pokin">`
+							+`<h5 style="margin: 30px 0 5px 0;">Setting Koneksi Pohon Kinerja Pemerintah Daerah</h5>`
+							+`<table id="table_koneksi_pokin" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">`
+								+`<thead>`
+									+`<tr>`
+										+`<th class="text-center">No</th>`
+										+`<th class="text-center">Label Pohon Kinerja Pemda</th>`
+										+`<th class="text-center">Indikator Pohon Kinerja Pemda</th>`
+										+`<th class="text-center">Status</th>`
+										+`<th class="text-center" style="width: 150px;">Aksi</th>`
+									+`</tr>`
+								+`</thead>`
+								+`<tbody>${response.data_koneksi_pokin}</tbody>`
+							+`</table>`
+						+`</div>`
 					+`</form>`);
 				jQuery("#modal-crud").find(`.modal-footer`).html(``
 					+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
@@ -2753,6 +3493,12 @@ jQuery(document).ready(function(){
 					jQuery('#settingCroscutting').prop('checked', true);
 					jQuery(".setting-croscutting").show()
 					jQuery('#tambah-croscuting-level').attr('data-setting-croscutting', 'true');
+				}
+
+				if(response.data_koneksi_pokin == "" || response.data_koneksi_pokin == undefined){
+					jQuery(".setting-koneksi-pokin").hide()
+				}else{
+					jQuery(".setting-koneksi-pokin").show()
 				}
 			}
 		});
@@ -2942,6 +3688,34 @@ jQuery(document).ready(function(){
 				'data': JSON.stringify(form),
 				'tipe_pokin': "opd",
 				'id_skpd': <?php echo $id_skpd; ?>
+			},
+			success:function(response){
+				jQuery('#wrap-loading').hide();
+				alert(response.message);
+				if(response.status){
+					runFunction(view, [form])
+					modal.modal('hide');
+					jQuery("#modal-crud").modal('hide');
+				}
+			}
+		})
+	});
+
+	jQuery(document).on('click', '#simpan-data-koneksi-pokin-pemda', function(){
+		jQuery('#wrap-loading').show();
+		let modal = jQuery("#modal-croscutting");
+		let action = jQuery(this).data('action');
+		let view = jQuery(this).data('view');
+		let form = getFormData(jQuery("#form-koneksi-pokin-pemda"));
+
+		jQuery.ajax({
+			method:'POST',
+			url:esakip.url,
+			dataType:'json',
+			data:{
+				'action': action,
+        		'api_key': esakip.api_key,
+				'data': JSON.stringify(form),
 			},
 			success:function(response){
 				jQuery('#wrap-loading').hide();
@@ -3819,4 +4593,109 @@ function simpan_copy_data_pokin(){
     }
 }
 <?php endif; ?>
+
+jQuery(document).on('click', '.verifikasi-koneksi-pokin-pemda', function(){
+	let id = jQuery(this).data('id');
+	jQuery("#modal-croscutting").find('.modal-title').html('Verifikasi Koneksi Pohon Kinerja Pemerintah Daerah');
+	jQuery("#modal-croscutting").find('.modal-body').html(``
+		+`<form id="form-koneksi-pokin-pemda">`				
+			+`<input type="hidden" name="idKoneksiPokin" value="${id}">`
+			+`<table>`
+			+`<tr>`
+			+`<td><input id='verify-koneksi-yes' name='verify_koneksi_pokin' value='1' type='radio' style="margin-right: .5em;" checked><label for='verify-koneksi-yes'>Terima</label></td>`
+			+`<td><input id='verify-koneksi-no' name='verify_koneksi_pokin' value='0' type='radio'  style="margin-right: .5em;"><label for='verify-koneksi-no'>Tolak</label></td>`
+			+`</tr>`
+			+`</table>`
+			+`<div class="form-group showKoneksiPokin" id="showLevelPokinKoneksi">`
+				+`<label for="levelPokinKoneksi">Tautkan dengan Level Pohon Kinerja</label>`
+				+`<select class="form-control" name="levelPokinKoneksi" id="levelPokinKoneksi">`
+				+`<?php echo $option_tautan_pokin_koneksi; ?>`
+				+`</select>`
+			+`</div>`
+		+`</form>`);
+		jQuery("#modal-croscutting").find('.modal-footer').html(''
+		+'<button type="button" class="btn btn-danger" data-dismiss="modal">'
+			+'Tutup'
+		+'</button>'
+		+'<button type="button" class="btn btn-success" id="simpan-data-koneksi-pokin-pemda" data-action="verify_koneksi_pokin_pemda_opd">'
+			+'Simpan'
+		+'</button>');
+	jQuery("#modal-croscutting").find('.modal-dialog').css('maxWidth','');
+	jQuery("#modal-croscutting").find('.modal-dialog').css('width','');
+	jQuery("#modal-croscutting").modal('show');
+	jQuery('#levelPokinKoneksi').select2({ width: '100%' });
+})
+
+jQuery(document).on('click', '.edit-verifikasi-koneksi-pokin-pemda', function(){
+	jQuery("#wrap-loading").show();
+	let id = jQuery(this).data('id');
+	jQuery.ajax({
+		method:'POST',
+		url:esakip.url,
+		data:{
+			"action": "edit_verify_koneksi_pokin_pemda",
+			"api_key": esakip.api_key,
+			'id':id,
+			'tipe_pokin': "opd",
+			'id_skpd': <?php echo $id_skpd; ?>
+		},
+		dataType:'json',
+		success:function(response){
+			jQuery("#wrap-loading").hide();
+			jQuery("#modal-croscutting").find('.modal-title').html('Verifikasi Koneksi Pohon Kinerja Pemerintah Daerah');
+			jQuery("#modal-croscutting").find('.modal-body').html(``
+				+`<form id="form-koneksi-pokin-pemda">`				
+					+`<input type="hidden" name="idKoneksiPokin" value="${id}">`
+					+`<table>`
+					+`<tr>`
+					+`<td><input id='verify-koneksi-yes' name='verify_koneksi_pokin' value='1' type='radio' style="margin-right: .5em;" checked><label for='verify-koneksi-yes'>Terima</label></td>`
+					+`<td><input id='verify-koneksi-no' name='verify_koneksi_pokin' value='0' type='radio'  style="margin-right: .5em;"><label for='verify-koneksi-no'>Tolak</label></td>`
+					+`</tr>`
+					+`</table>`
+					+`<div class="form-group showKoneksiPokinTolak" id="showKeteranganTolak" style="display: none;">`
+						+`<label for="keteranganKoneksiPokinTolak">Alasan</label>`
+						+`<textarea class="form-control" name="keterangan_koneksi_tolak" id="keteranganKoneksiPokinTolak"></textarea>`
+					+`</div>`
+					+`<div class="form-group showKoneksiPokin" id="showLevelPokinKoneksi">`
+						+`<label for="levelPokinKoneksi">Tautkan dengan Level Pohon Kinerja</label>`
+						+`<select class="form-control" name="levelPokinKoneksi" id="levelPokinKoneksi">`
+						+`<?php echo $option_tautan_pokin_koneksi; ?>`
+						+`</select>`
+					+`</div>`
+				+`</form>`);
+				jQuery("#modal-croscutting").find('.modal-footer').html(''
+				+'<button type="button" class="btn btn-danger" data-dismiss="modal">'
+					+'Tutup'
+				+'</button>'
+				+'<button type="button" class="btn btn-success" id="simpan-data-koneksi-pokin-pemda" data-action="verify_koneksi_pokin_pemda_opd">'
+					+'Simpan'
+				+'</button>');
+			jQuery("#modal-croscutting").find('.modal-dialog').css('maxWidth','');
+			jQuery("#modal-croscutting").find('.modal-dialog').css('width','');
+			jQuery("#modal-croscutting").modal('show');
+			jQuery('#levelPokinKoneksi').select2({
+									width: '100%'
+								});
+			jQuery('#levelPokinKoneksi').val(response.data_koneksi_pokin.parent_pohon_kinerja_koneksi).trigger('change');
+			if(response.data_koneksi_pokin.status_koneksi == 1){
+				jQuery( "#verify-koneksi-yes" ).prop( "checked", true );
+				jQuery( "#verify-koneksi-no" ).prop( "checked", false );
+			}else{
+				jQuery( "#verify-koneksi-yes" ).prop( "checked", false );
+				jQuery( "#verify-koneksi-no" ).prop( "checked", true );
+			}
+		}
+	});
+})
+
+jQuery(document).on('change', 'input[type=radio][name=verify_koneksi_pokin]', function(){
+        var selectedValue = jQuery(this).val();
+		if(selectedValue == 1){
+			jQuery(".showKoneksiPokin").show();
+			jQuery(".showKoneksiPokinTolak").hide();
+		}else{
+			jQuery(".showKoneksiPokin").hide();
+			jQuery(".showKoneksiPokinTolak").show();
+		}
+});
 </script>
