@@ -228,6 +228,13 @@ foreach($pokin as $get_pokin){
     </div>
 </div>
 
+<div class="hide-print" id="catatan" style="max-width: 900px; margin: 40px auto; padding: 20px; border: 1px solid #e5e5e5; border-radius: 8px; background-color: #f9f9f9;">
+    <h4 style="font-weight: bold; margin-bottom: 20px; color: #333;">Catatan</h4>
+    <ul style="list-style-type: disc; padding-left: 20px; line-height: 1.6; color: #555;">
+        <li>Nama Perangkat Daerah Dengan Background Warna <strong>Merah</strong> Belum Terkoneksi Dengan Rencana Aksi Perangkat Daerah</li>
+    </ul>
+</div>
+
 <!-- Modal Renaksi -->
 <div class="modal fade" id="modal-renaksi-pemda" role="dialog" data-backdrop="static" aria-hidden="true">'
     <div class="modal-dialog" style="max-width: 1500px;" role="document">

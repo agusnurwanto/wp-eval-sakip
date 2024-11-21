@@ -48,6 +48,7 @@ $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
 $is_admin_panrb = in_array('admin_panrb', $user_roles);
 $is_administrator = in_array('administrator', $user_roles);
+$status_api_esr = get_option('_crb_api_esr_status');
 
     $admin_role_pemda = array(
         'admin_bappeda',
@@ -96,6 +97,11 @@ $is_administrator = in_array('administrator', $user_roles);
             <?php if (!$is_admin_panrb && $hak_akses_user): ?>
             <div style="margin-bottom: 25px;">
                 <button class="btn btn-primary" onclick="tambah_dokumen_skp();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
+                <?php
+                if($status_api_esr){
+                    echo '<button class="btn btn-warning" onclick="sync_to_esr();" id="btn-sync-to-esr" style="display:none"><i class="dashicons dashicons-arrow-up-alt"></i> Kirim Data ke ESR</button>';
+                }
+                ?>
             </div>
             <?php endif; ?>
             <div class="wrap-table">
@@ -103,6 +109,13 @@ $is_administrator = in_array('administrator', $user_roles);
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
+                            <?php
+                                if (!$is_admin_panrb && $hak_akses_user):
+                                    if($status_api_esr){
+                                        echo '<th class="text-center" rowspan="2" id="check-list-esr" style="display:none">Checklist ESR</th>';
+                                    }
+                                endif;
+                            ?>
                             <th class="text-center">Perangkat Daerah</th>
                             <th class="text-center">Nama Dokumen</th>
                             <th class="text-center">Keterangan</th>
@@ -113,6 +126,27 @@ $is_administrator = in_array('administrator', $user_roles);
                     <tbody>
                     </tbody>
                 </table>
+            </div>
+            <div class="wrap-table" id="non_esr_lokal" style="display:none;">
+                <h3 class="text-center" style="margin:3rem;">Dokumen ESR yang tidak ada di Lokal</h3>
+                <table id="table_non_esr_lokal" cellpadding="2" cellspacing="0" style="font-family:Open Sans,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">No</th>
+                            <th class="text-center">Nama Dokumen</th>
+                            <th class="text-center">Keterangan</th>
+                            <th class="text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <div class="hide-print" id="catatan_dokumentasi" style="max-width: 1000px; margin: 40px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #f8f9fa;">
+                    <h4 style="font-weight: bold; margin-bottom: 20px; color: #333;">Catatan:</h4>
+                    <ul style="list-style-type: disc; padding-left: 20px; line-height: 1.6; color: #555;">
+                        <li>Abaikan perbedaan nama atau keterangan jika kedua dokumen PDF (ESR dan LOKAL) masih identik.</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -213,12 +247,33 @@ $is_administrator = in_array('administrator', $user_roles);
                 action: 'get_table_skp',
                 api_key: esakip.api_key,
                 id_skpd: <?php echo $id_skpd; ?>,
-                tahun_anggaran: '<?php echo $input['tahun'] ?>'
+                tahun_anggaran: '<?php echo $input['tahun'] ?>',
+                nama_tabel_database:'esakip_skp'
             },
             dataType: 'json',
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 console.log(response);
+                if(response.status_mapping_esr){
+                    tahun_anggaran_periode_dokumen = response.tahun_anggaran_periode_dokumen;
+                    let body_non_esr_lokal=``;
+                    if(response.non_esr_lokal.length > 0){
+                        response.non_esr_lokal.forEach((value, index) => {
+                            body_non_esr_lokal+=`
+                                <tr>
+                                    <td class="text-center" data-upload-id="${value.upload_id}">${index+1}.</td>
+                                    <td>${value.nama_file}</td>
+                                    <td>${value.keterangan}</td>
+                                    <td class="text-center"><a class="btn btn-sm btn-info" href="${value.path}" title="Lihat Dokumen" target="_blank"><span class="dashicons dashicons-visibility"></span></a></td>
+                                </tr>
+                            `;
+                        });
+                        jQuery("#table_non_esr_lokal tbody").html(body_non_esr_lokal);
+                    }
+                    jQuery("#btn-sync-to-esr").show();
+                    jQuery("#check-list-esr").show();
+                    jQuery("#non_esr_lokal").show();
+                }
                 if (response.status === 'success') {
                     jQuery('#table_dokumen_skp tbody').html(response.data);
                 } else {
@@ -497,5 +552,43 @@ $is_administrator = in_array('administrator', $user_roles);
                 alert('Terjadi kesalahan saat mengirim data!');
             }
         });
+    }
+
+    function sync_to_esr(){
+        let list = jQuery("input:checkbox[name=checklist_esr]:checked")
+                .map(function (){
+                return jQuery(this).val();
+        }).toArray();            
+            
+        if(list.length){
+            if (!confirm('Apakah Anda ingin melakukan singkronisasi dokumen ke ESR?')) {
+                return;
+            }
+            jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                url: esakip.url,
+                type: 'POST',
+                data: {
+                    action: 'sync_to_esr',
+                    api_key: esakip.api_key,
+                    list: list,
+                    tahun_anggaran:'<?php echo $input['tahun'] ?>',
+                    nama_tabel_database:'esakip_skp'
+                },
+                dataType: 'json',
+                success: function(response) {
+                    jQuery('#wrap-loading').hide();
+                    alert(response.message);
+                    location.reload();
+                },
+                error: function(xhr, status, error) {
+                    jQuery('#wrap-loading').hide();
+                    alert('Terjadi kesalahan saat kirim data!');
+                    location.reload();
+                }
+            });
+        }else{
+            alert('Checklist ESR belum dipilih!'); 
+        }
     }
 </script>

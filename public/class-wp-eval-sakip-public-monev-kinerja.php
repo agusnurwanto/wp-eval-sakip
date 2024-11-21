@@ -243,6 +243,18 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 				$kode_cascading_renstra = !empty($_POST['kode_cascading_renstra']) || $_POST['kode_cascading_renstra'] != NULL ? $_POST['kode_cascading_renstra'] : NULL;
 				$label_cascading_renstra = !empty($_POST['label_cascading_renstra']) || $_POST['label_cascading_renstra'] != NULL ? $_POST['label_cascading_renstra'] : NULL;
+				
+
+	            $kode_cascading_renstra = !empty($_POST['kode_cascading_renstra']) ? $_POST['kode_cascading_renstra'] : NULL;
+	            $label_cascading_renstra = !empty($_POST['label_cascading_renstra']) ? $_POST['label_cascading_renstra'] : NULL;
+	            $id_indikator_renaksi_pemda = isset($_POST['id_indikator_renaksi_pemda']) ? intval($_POST['id_indikator_renaksi_pemda']) : 0;
+	            $id_data_renaksi_pemda = isset($_POST['id_data_renaksi_pemda']) ? intval($_POST['id_data_renaksi_pemda']) : 0;
+	            $checklist_renaksi_opd = isset($_POST['checklist_renaksi_opd']) ? $_POST['checklist_renaksi_opd'] : [];
+	            $id_skpd = isset($_POST['id_skpd']) ? intval($_POST['id_skpd']) : 0;
+	            $id_label_renaksi_opd = isset($_POST['id_label_renaksi_opd']) ? $_POST['id_label_renaksi_opd'] : [];
+	            $id_indikator = isset($_POST['id_indikator']) ? $_POST['id_indikator'] : [];
+
+
 				if(!empty($label_cascading_renstra) && $_POST['level'] != 1){
 					$label = explode(' ', $label_cascading_renstra);
         			unset($label[0]);
@@ -323,9 +335,56 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					}
 					if(empty($cek_id)){
 						$wpdb->insert('esakip_data_rencana_aksi_opd', $data);
+						$cek_id = $wpdb->insert_id;
 					}else{
 						$wpdb->update('esakip_data_rencana_aksi_opd', $data, array('id' => $cek_id));
 					}
+
+                    $wpdb->update(
+                        'esakip_data_label_rencana_aksi',
+                        array(
+                            'active' => 0,
+                        ),
+                        array(
+                            'parent_renaksi_opd' => $cek_id,
+                            'tahun_anggaran' => $_POST['tahun_anggaran'],
+                            'id_skpd' => $_POST['id_skpd'],
+                            'active' => 1
+                        )
+                    );
+	                if (!empty($_POST['checklistDataPemda'])) {
+	                    foreach ($_POST['checklistDataPemda'] as $checklist) {
+	                    	$cek = $wpdb->get_var($wpdb->prepare("
+	                    		SELECT
+									id
+								FROM esakip_data_label_rencana_aksi
+								WHERE id_skpd=%d
+									AND tahun_anggaran=%d
+									AND parent_renaksi_opd=%d
+									AND parent_renaksi_pemda=%d
+									AND parent_indikator_renaksi_pemda=%d
+							",$_POST['id_skpd'], $_POST['tahun_anggaran'], $cek_id, $ceklist['id_data_renaksi_pemda'], $ceklist['id_indikator']));
+	                    	if(empty($cek)){
+		                        $wpdb->insert('esakip_data_label_rencana_aksi', array(
+		                            'parent_renaksi_pemda' => $checklist['id_data_renaksi_pemda'],
+		                            'parent_indikator_renaksi_pemda' => $checklist['id_data_indikator'],
+		                            'parent_renaksi_opd' => $cek_id,
+		                            'tahun_anggaran' => $_POST['tahun_anggaran'],
+		                            'id_skpd' => $_POST['id_skpd'],
+		                            'active' => 1,
+		                        ));
+	                    	}else{
+			                    $wpdb->update(
+			                        'esakip_data_label_rencana_aksi',
+			                        array(
+			                            'active' => 1,
+			                        ),
+			                        array('id' => $cek)
+			                    );
+	                    	}
+	                    }
+	                }
+		            // die($wpdb->last_query);
 				}
 			} else {
 				$ret = array(
@@ -342,45 +401,80 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		die(json_encode($ret));
 	}
 
-	function get_rencana_aksi(){
-		global $wpdb;
-		$ret = array(
-			'status' => 'success',
-			'message' => 'Berhasil get rencana aksi!',
-			'data'  => array()
-		);
 
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if ($ret['status'] != 'error' && empty($_POST['id'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'ID rencana aksi tidak boleh kosong!';
-				} else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
-				}
-				if ($ret['status'] != 'error'){
-					$ret['data'] = $wpdb->get_row($wpdb->prepare('
-						SELECT
-							*
-						FROM esakip_data_rencana_aksi_opd
-						WHERE id=%d
-							AND tahun_anggaran=%d
-					',$_POST['id'], $_POST['tahun_anggaran']), ARRAY_A);
-				}
-			} else {
-				$ret = array(
-					'status' => 'error',
-					'message'   => 'Api Key tidak sesuai!'
-				);
-			}
-		} else {
-			$ret = array(
-				'status' => 'error',
-				'message'   => 'Format tidak sesuai!'
-			);
-		}
-		die(json_encode($ret));
+	function get_rencana_aksi(){
+	    global $wpdb;
+	    $ret = array(
+	        'status' => 'success',
+	        'message' => 'Berhasil mendapatkan rencana aksi!',
+	        'data'  => array()
+	    );
+
+	    if (!empty($_POST)) {
+	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+	            if (empty($_POST['id'])) {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'ID rencana aksi tidak boleh kosong!';
+	            } elseif (empty($_POST['tahun_anggaran'])) {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Tahun anggaran tidak boleh kosong!';
+	            } else {
+	                $ret['data'] = $wpdb->get_row($wpdb->prepare('
+	                     SELECT
+	                        r.*
+	                    FROM esakip_data_rencana_aksi_opd AS r
+	                    WHERE r.id = %d 
+	                        AND r.tahun_anggaran = %s
+	                ', $_POST['id'], $_POST['tahun_anggaran']), ARRAY_A);
+
+	                if(!empty($ret['data'])){
+		                $ret['data']['renaksi_pemda'] = $wpdb->get_results($wpdb->prepare("
+		                	SELECT
+		                        p.id AS id_pemda,
+		                        p.label AS label_uraian_kegiatan,
+		                        p.tahun_anggaran AS tahun_anggaran_pemda,
+		                        i.id AS id_indikator,
+		                        i.indikator AS label_indikator_uraian_kegiatan,
+		                        i.satuan AS satuan_pemda,
+		                        i.target_akhir AS target_akhir_pemda,
+		                        i.tahun_anggaran AS tahun_anggaran_indikator,
+	                        	l.id AS id_label
+		                    FROM esakip_data_rencana_aksi_pemda AS p
+		                    INNER JOIN esakip_data_rencana_aksi_indikator_pemda AS i ON i.id_renaksi = p.id
+	                    	LEFT JOIN esakip_data_label_rencana_aksi AS l ON l.parent_indikator_renaksi_pemda = i.id
+	                    		AND l.active=i.active
+	                    		AND l.tahun_anggaran=i.tahun_anggaran
+	                    		AND l.parent_renaksi_opd=%d
+	                    		AND l.id_skpd=i.id_skpd
+		                    WHERE i.id_skpd=%d
+		                    	AND i.active=1
+		                    	AND i.tahun_anggaran=%d
+		                ", $ret['data']['id'], $ret['data']['id_skpd'], $_POST['tahun_anggaran']), ARRAY_A);
+		            }else{
+		            	$ret['data']['renaksi_pemda'] = array();
+		            }
+
+	                // print_r($ret['data']); die($wpdb->last_query);
+
+	                if (empty($ret['data'])) {
+	                    $ret['status'] = 'error';
+	                    $ret['message'] = 'Data tidak ditemukan!';
+	                }
+	            }
+	        } else {
+	            $ret = array(
+	                'status' => 'error',
+	                'message' => 'Api Key tidak sesuai!'
+	            );
+	        }
+	    } else {
+	        $ret = array(
+	            'status' => 'error',
+	            'message' => 'Format tidak sesuai!'
+	        );
+	    }
+
+	    die(json_encode($ret));
 	}
 
 	function get_indikator_rencana_aksi(){
@@ -744,12 +838,19 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						}
 					}
 
+					$rincian_tagging = $this->functions->generatePage(array(
+						'nama_page' => 'Halaman Tagging Rincian Belanja',
+						'content' => '[tagging_rincian_sakip]',
+						'show_header' => 1,
+						'post_status' => 'private'
+					));
 					$no = 0;
 					$no_renaksi = 0;
 					$no_uraian_renaksi = 0;
 					$no_uraian_teknis = 0;
 					foreach($data_all['data'] as $v){
 						$no++;
+						$no_renaksi = 0;
 						$indikator_html = array();
 						$satuan_html = array();
 						$target_awal_html = array();
@@ -818,6 +919,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 						foreach($v['data'] as $renaksi){
 							$no_renaksi++;
+							$no_uraian_renaksi = 0;
 							$indikator_html = array();
 							$satuan_html = array();
 							$target_awal_html = array();
@@ -850,43 +952,137 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$target_4_html = implode('<br>', $target_4_html);
 							$rencana_pagu_html = implode('<br>', $rencana_pagu_html);
 							$realisasi_pagu_html = implode('<br>', $realisasi_pagu_html);
+					
+							$get_renaksi_pemda = $wpdb->get_results(
+					        	$wpdb->prepare("
+									SELECT 
+										l.*,
+										r.*,
+										r.id AS id_renaksi,
+										i.*,
+										i.id AS id_indikator
+									FROM esakip_data_label_rencana_aksi AS l
+							        INNER JOIN esakip_data_rencana_aksi_pemda AS r
+							            ON r.id = l.parent_renaksi_pemda
+							            AND r.tahun_anggaran = l.tahun_anggaran
+							            AND r.active = l.active
+							        INNER JOIN esakip_data_rencana_aksi_indikator_pemda AS i
+							            ON i.id = l.parent_indikator_renaksi_pemda
+							            AND i.tahun_anggaran = l.tahun_anggaran
+							            AND i.active = l.active
+									WHERE l.parent_renaksi_opd = %d 
+								", $renaksi['detail']['id']),
+    							ARRAY_A
+					    	);
+					    	// print_r($get_renaksi_pemda); die($wpdb->last_query);
+                            // print_r($get_renaksi_pemda); die($wpdb->last_query);
+                            $renaksi_html = '';
+                            $indikator_renaksi_html = '';
+                            $satuan_renaksi_html = '';
+                            $target_renaksi_html = '';
+                            $target_awal_renaksi_html = '';
+                            $target_1_renaksi_html = '';
+                            $target_2_renaksi_html = '';
+                            $target_3_renaksi_html = '';
+                            $target_4_renaksi_html = '';
+                            if(!empty($get_renaksi_pemda)){
+                                foreach($get_renaksi_pemda as $renaksi_pemda){
+                                    // $label_renaksi_pemda = $renaksi_pemda['label'];
+                                    $label_renaksi_pemda = !empty($renaksi_pemda['label']) ? $renaksi_pemda['label'] : '<br>';
+                                    $label_indikator_renaksi_pemda = !empty($renaksi_pemda['indikator']) ? $renaksi_pemda['indikator'] : '<br>';
+                                    $label_satuan_renaksi_pemda = !empty($renaksi_pemda['satuan']) ? $renaksi_pemda['satuan'] : '<br>';
+                                    $label_target_renaksi_pemda = !empty($renaksi_pemda['target_akhir']) ? $renaksi_pemda['target_akhir'] : '<br>';
+                                    $label_target_awal_renaksi_pemda = !empty($renaksi_pemda['target_awal']) ? $renaksi_pemda['target_awal'] : '<br>';
+                                    $label_target_1_renaksi_pemda = !empty($renaksi_pemda['target_1']) ? $renaksi_pemda['target_1'] : '<br>';
+                                    $label_target_2_renaksi_pemda = !empty($renaksi_pemda['target_2']) ? $renaksi_pemda['target_2'] : '<br>';
+                                    $label_target_3_renaksi_pemda = !empty($renaksi_pemda['target_3']) ? $renaksi_pemda['target_3'] : '<br>';
+                                    $label_target_4_renaksi_pemda = !empty($renaksi_pemda['target_4']) ? $renaksi_pemda['target_4'] : '<br>';
+
+                                    $background_primary = !empty($renaksi_pemda['label']) ? 'bg-primary' : '';
+                                    $renaksi_html .= '<div class="d-flex align-items-center mb-2">';
+                                    $renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center me-2">' . $label_renaksi_pemda . '</span>';
+                                    $renaksi_html .= '</div>';
+
+                                    $background_primary = !empty($renaksi_pemda['indikator']) ? 'bg-primary' : '';
+                                    $indikator_renaksi_html .= '<div class="d-flex align-items-center mb-2">';
+                                    $indikator_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center me-2">' . $label_indikator_renaksi_pemda . '</span>';
+                                    $indikator_renaksi_html .= '</div>';
+
+                                    $background_primary = !empty($renaksi_pemda['satuan']) ? 'bg-primary' : '';
+                                    $satuan_renaksi_html .= '<div class="d-flex align-items-center mb-2">';
+                                    $satuan_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center me-2">' . $label_satuan_renaksi_pemda . '</span>';
+                                    $satuan_renaksi_html .= '</div>';
+
+                                    $background_primary = !empty($renaksi_pemda['target_akhir']) ? 'bg-primary' : '';
+                                    $target_renaksi_html .= '<div class="d-flex align-items-center mb-2">';
+                                    $target_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center me-2">' . $label_target_renaksi_pemda . '</span>';
+                                    $target_renaksi_html .= '</div>';
+
+                                    $background_primary = !empty($renaksi_pemda['target_awal']) ? 'bg-primary' : '';
+                                    $target_awal_renaksi_html .= '<div class="d-flex align-items-center mb-2">';
+                                    $target_awal_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center me-2">' . $label_target_awal_renaksi_pemda . '</span>';
+                                    $target_awal_renaksi_html .= '</div>';
+
+                                    $background_primary = !empty($renaksi_pemda['target_1']) ? 'bg-primary' : '';
+                                    $target_1_renaksi_html .= '<div class="d-flex align-items-center mb-2">';
+                                    $target_1_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center me-2">' . $label_target_1_renaksi_pemda . '</span>';
+                                    $target_1_renaksi_html .= '</div>';
+
+                                    $background_primary = !empty($renaksi_pemda['target_2']) ? 'bg-primary' : '';
+                                    $target_2_renaksi_html .= '<div class="d-flex align-items-center mb-2">';
+                                    $target_2_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center me-2">' . $label_target_2_renaksi_pemda . '</span>';
+                                    $target_2_renaksi_html .= '</div>';
+
+                                    $background_primary = !empty($renaksi_pemda['target_3']) ? 'bg-primary' : '';
+                                    $target_3_renaksi_html .= '<div class="d-flex align-items-center mb-2">';
+                                    $target_3_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center me-2">' . $label_target_3_renaksi_pemda . '</span>';
+                                    $target_3_renaksi_html .= '</div>';
+
+                                    $background_primary = !empty($renaksi_pemda['target_4']) ? 'bg-primary' : '';
+                                    $target_4_renaksi_html .= '<div class="d-flex align-items-center mb-2">';
+                                    $target_4_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center me-2">' . $label_target_4_renaksi_pemda . '</span>';
+                                    $target_4_renaksi_html .= '</div>';
+                                }
+                            }
 
 							$html .= '
-							<tr>
-								<td>'.$no.'.'.$no_renaksi.'</td>
-								<td class="kegiatan_utama"></td>
-								<td class="indikator_kegiatan_utama"></td>
-								<td class="recana_aksi"><span class="badge bg-success text-white">'.$renaksi['detail']['label_pokin_3'].'</span><br>'.$renaksi['detail']['label'].'</td>
-								<td class="indikator_renaksi">'.$indikator_html.'</td>
-								<td class="urian_renaksi"></td>
-								<td class="indikator_uraian_renaksi"></td>
-								<td class="uraian_teknis_kegiatan"></td>
-								<td class="indikator_uraian_teknis_kegiatan"></td>
-								<td class="text-center satuan_renaksi">'.$satuan_html.'</td>
-								<td class="text-center target_awal_urian_renaksi">'.$target_awal_html.'</td>
-								<td class="text-center target_tw1_urian_renaksi">'.$target_1_html.'</td>
-								<td class="text-center target_tw2_urian_renaksi">'.$target_2_html.'</td>
-								<td class="text-center target_tw3_urian_renaksi">'.$target_3_html.'</td>
-								<td class="text-center target_tw4_urian_renaksi">'.$target_4_html.'</td>
-								<td class="text-center target_akhir_urian_renaksi">'.$target_akhir_html.'</td>
-								<td class=""></td>
-								<td class=""></td>
-								<td class=""></td>
-								<td class=""></td>
-								<td class=""></td>
-								<td class=""></td>
-								<td class=""></td>
-								<td class=""></td>
-								<td class=""></td>
-								<td class=""></td>
-								<td class=""></td>
-								<td class=""></td>
-								<td class="anggaran_urian_renaksi"></td>
-							</tr>
+							    <tr>
+							        <td>'.$no.'.'.$no_renaksi.'</td>
+							        <td class="kegiatan_utama"></td>
+							        <td class="indikator_kegiatan_utama"></td>
+							        <td class="recana_aksi">'.$renaksi_html.'<br><span class="badge bg-success text-white">'.$renaksi['detail']['label_pokin_3'].'</span><br>'.$renaksi['detail']['label'].'</td>
+							        <td class="indikator_renaksi">'.$indikator_renaksi_html.'<br>'.$indikator_html.'</td>
+							        <td class="urian_renaksi"></td>
+							        <td class="indikator_uraian_renaksi"></td>
+							        <td class="uraian_teknis_kegiatan"></td>
+							        <td class="indikator_uraian_teknis_kegiatan"></td>
+							        <td class="text-center satuan_renaksi">'.$satuan_renaksi_html.'<br>'.$satuan_html.'</td>
+							        <td class="text-center target_awal_urian_renaksi">'.$target_awal_renaksi_html.'<br>'.$target_awal_html.'</td>
+							        <td class="text-center target_tw1_urian_renaksi">'.$target_1_renaksi_html.'<br>'.$target_1_html.'</td>
+							        <td class="text-center target_tw2_urian_renaksi">'.$target_2_renaksi_html.'<br>'.$target_2_html.'</td>
+							        <td class="text-center target_tw3_urian_renaksi">'.$target_3_renaksi_html.'<br>'.$target_3_html.'</td>
+							        <td class="text-center target_tw4_urian_renaksi">'.$target_4_renaksi_html.'<br>'.$target_4_html.'</td>
+							        <td class="text-center target_akhir_urian_renaksi">'.$target_renaksi_html.'<br>'.$target_akhir_html.'</td>
+							        <td class=""></td>
+							        <td class=""></td>
+							        <td class=""></td>
+							        <td class=""></td>
+							        <td class=""></td>
+							        <td class=""></td>
+							        <td class=""></td>
+							        <td class=""></td>
+							        <td class=""></td>
+							        <td class=""></td>
+							        <td class=""></td>
+							        <td class=""></td>
+							        <td class="anggaran_urian_renaksi"></td>
+							    </tr>
 							';
+
 
 							foreach($renaksi['data'] as $uraian_renaksi){
 								$no_uraian_renaksi++;
+								$no_uraian_teknis = 0;
 								$indikator_html = array();
 								$satuan_html = array();
 								$target_awal_html = array();
@@ -1034,6 +1230,54 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$html = '<tr><td class="text-center" colspan="18">Data masih kosong!</td></tr>';
 					}
 					$ret['data'] = $html;
+
+					$renaksi_pemda = $wpdb->get_results(
+					    $wpdb->prepare("
+					        SELECT
+					            p.*,
+					            p.id AS id_data_renaksi_pemda,
+					            i.*,
+					            i.id AS id_data_indikator,
+					            u.*,
+					            u.id AS id_data_unit,
+					            l.*,
+					            l.id AS id_label
+					        FROM esakip_data_rencana_aksi_pemda AS p
+					        INNER JOIN esakip_data_rencana_aksi_indikator_pemda AS i
+					            ON p.id = i.id_renaksi
+					            AND p.tahun_anggaran = i.tahun_anggaran
+					            AND p.active = i.active
+					        INNER JOIN esakip_data_unit AS u
+					            ON i.id_skpd = u.id_skpd
+					            AND i.tahun_anggaran = u.tahun_anggaran
+					            AND i.active = u.active
+					        LEFT JOIN esakip_data_label_rencana_aksi AS l
+					            ON l.parent_indikator_renaksi_pemda = i.id 
+					        WHERE i.id_skpd = %d
+					        AND l.id IS NULL
+					    ", $_POST['id_skpd']),
+					    ARRAY_A
+					);
+					$html_renaksi_pemda = '';
+					$no_renaksi_pemda = 1;
+
+					if (!empty($renaksi_pemda)) {
+					    foreach ($renaksi_pemda as $k_renaksi_pemda => $v_renaksi_pemda) { 
+
+					        $aksi = '<a href="javascript:void(0)" class="btn btn-sm btn-success verifikasi-renaksi-pemda" data-label="' . esc_attr($v_renaksi_pemda['label']) . '" data-id_renaksi_pemda="' . esc_attr($v_renaksi_pemda['id_data_renaksi_pemda']) . '" data-id_indikator="' . esc_attr($v_renaksi_pemda['id_data_indikator']) . '" data-indikator="' . esc_attr($v_renaksi_pemda['indikator']) . '" data-satuan="' . esc_attr($v_renaksi_pemda['satuan']) . '" data-target_akhir="' . esc_attr($v_renaksi_pemda['target_akhir']) . '" title="Verifikasi Rencana Aksi"><span class="dashicons dashicons-yes"></span></a>';
+
+					        $html_renaksi_pemda .= '
+					            <tr>
+					                <td>' . $no_renaksi_pemda++ . '</td>
+					                <td class="text-left">' . esc_html($v_renaksi_pemda['label']) . '</td>
+					                <td class="text-left">' . esc_html($v_renaksi_pemda['indikator']) . '</td>
+					                <td class="text-center">' . esc_html($v_renaksi_pemda['satuan']) . '</td>
+					                <td class="text-center">' . esc_html($v_renaksi_pemda['target_akhir']) . '</td>
+					                <td>' . $aksi . '</td>
+					            </tr>';
+					    }
+					}
+					$ret['data_pemda'] = $html_renaksi_pemda;
 				}
 			} else {
 				$ret = array(
@@ -1751,7 +1995,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							    $indikator = $wpdb->get_results($wpdb->prepare("
 							        SELECT
 							            s.*,
-							            u.*
+							            u.nama_skpd,
+							            u.id_skpd
 							        FROM esakip_data_rencana_aksi_indikator_pemda AS s
 							        INNER JOIN esakip_data_unit as u on s.id_skpd=u.id_skpd
 					            		AND s.tahun_anggaran=u.tahun_anggaran
@@ -1879,74 +2124,111 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					        </tr>
 					        ';
 
-					        foreach($renaksi['data'] as $uraian_renaksi){
-					            $no_uraian_renaksi++; 
-					            $indikator_html = array();
-					            $satuan_html = array();
-					            $target_awal_html = array();
-					            $target_akhir_html = array();
-					            $target_1_html = array();
-					            $target_2_html = array();
-					            $target_3_html = array();
-					            $target_4_html = array();
-					            $rencana_pagu_html = array();
-					            $realisasi_pagu_html = array();
-					            $mitra_bidang_html = array();
-					            $nama_skpd_html = array();
+					        foreach($renaksi['data'] as $uraian_renaksi) {
+							    $no_uraian_renaksi++; 
+							    $indikator_html = array();
+							    $satuan_html = array();
+							    $target_awal_html = array();
+							    $target_akhir_html = array();
+							    $target_1_html = array();
+							    $target_2_html = array();
+							    $target_3_html = array();
+							    $target_4_html = array();
+							    $rencana_pagu_html = array();
+							    $mitra_bidang_html = array();
+							    $nama_skpd_html = array();
+							    
+							    $label_pokin = false;
+							    
+							    foreach($uraian_renaksi['indikator'] as $key => $ind) {
+							        $indikator_html[$key] = $ind['indikator'];
+							        $satuan_html[$key] = $ind['satuan'];
+							        $target_awal_html[$key] = $ind['target_awal'];
+							        $target_akhir_html[$key] = $ind['target_akhir'];
+							        $target_1_html[$key] = $ind['target_1'];
+							        $target_2_html[$key] = $ind['target_2'];
+							        $target_3_html[$key] = $ind['target_3'];
+							        $target_4_html[$key] = $ind['target_4'];
+							        $rencana_pagu_html[$key] = $ind['rencana_pagu'];
+							        $mitra_bidang_html[$key] = $ind['mitra_bidang'];
+							        $nama_skpd_html[$key] = $ind['nama_skpd'];
+							    }
+							    
+							    $indikator_html = implode('<br>', $indikator_html);
+							    $satuan_html = implode('<br>', $satuan_html);
+							    $target_awal_html = implode('<br>', $target_awal_html);
+							    $target_akhir_html = implode('<br>', $target_akhir_html);
+							    $target_1_html = implode('<br>', $target_1_html);
+							    $target_2_html = implode('<br>', $target_2_html);
+							    $target_3_html = implode('<br>', $target_3_html);
+							    $target_4_html = implode('<br>', $target_4_html);
+							    $rencana_pagu = !empty($rencana_pagu_html) ? implode('<br>', array_map(function($item) { return number_format((float) $item, 0, ",", "."); }, $rencana_pagu_html)) : 0;
+							    $mitra_bidang_html = implode('<br>', $mitra_bidang_html);
+							    $nama_skpd_html = implode('<br>', $nama_skpd_html);
 
-					            foreach($uraian_renaksi['indikator'] as $key => $ind){
-					                $indikator_html[$key] = $ind['indikator'];
-					                $satuan_html[$key] = $ind['satuan'];
-					                $target_awal_html[$key] = $ind['target_awal'];
-					                $target_akhir_html[$key] = $ind['target_akhir'];
-					                $target_1_html[$key] = $ind['target_1'];
-					                $target_2_html[$key] = $ind['target_2'];
-					                $target_3_html[$key] = $ind['target_3'];
-					                $target_4_html[$key] = $ind['target_4'];
-					                $rencana_pagu_html[$key] = $ind['rencana_pagu'];
-					                $mitra_bidang_html[$key] = $ind['mitra_bidang'];
-					                $nama_skpd_html[$key] = $ind['nama_skpd'];
-					            }
+							    $label_pokin = $uraian_renaksi['detail']['label_pokin_5'];
+							    if (empty($label_pokin)) {
+							        $label_pokin = $uraian_renaksi['detail']['label_pokin_4'];
+							    }
 
-					            $indikator_html = implode('<br>', $indikator_html);
-					            $satuan_html = implode('<br>', $satuan_html);
-					            $target_awal_html = implode('<br>', $target_awal_html);
-					            $target_akhir_html = implode('<br>', $target_akhir_html);
-					            $target_1_html = implode('<br>', $target_1_html);
-					            $target_2_html = implode('<br>', $target_2_html);
-					            $target_3_html = implode('<br>', $target_3_html);
-								$target_4_html = implode('<br>', $target_4_html);
-								$rencana_pagu = !empty($rencana_pagu_html) ? implode('<br>', array_map(function($item) { return number_format((float) $item, 0, ",", ".");
-								}, $rencana_pagu_html)) : 0;
-					            $mitra_bidang_html = implode('<br>', $mitra_bidang_html);
-					            $nama_skpd_html = implode('<br>', $nama_skpd_html);
+							    foreach ($uraian_renaksi['indikator'] as $i => $ind) {
+							        $label_html = '';
+							        if (!$label_pokin_shown) {
+							            $label_html = '<span class="badge bg-success text-white">'.$label_pokin.'</span><br>'.$uraian_renaksi['detail']['label'];
+							            $label_pokin_shown = true; 
+							        }
 
-					            $label_pokin = $uraian_renaksi['detail']['label_pokin_5'];
-					            if(empty($label_pokin)){
-					                $label_pokin = $uraian_renaksi['detail']['label_pokin_4'];
-					            }
-					            $html .= '
-					            <tr>
-					                <td>'.$no.'.'.$no_renaksi.'.'.$no_uraian_renaksi.'</td>
-					                <td class="kegiatan_utama"></td>
-					                <td class="indikator_kegiatan_utama"></td>
-					                <td class="recana_aksi"></td>
-									<td class="urian_renaksi"><span class="badge bg-success text-white">'.$label_pokin.'</span><br>'.$uraian_renaksi['detail']['label'].'</td>
-					                <td class="text-center satuan_renaksi">'.$satuan_html.'</td>	
-					                <td class="indikator_uraian_renaksi">'.$indikator_html.'</td>
-					                <td class="text-right target_akhir_urian_renaksi">'.$target_akhir_html.'</td>
-					                <td class="text-right target_tw1_urian_renaksi">'.$target_1_html.'</td>
-					                <td class="text-right target_tw2_urian_renaksi">'.$target_2_html.'</td>
-					                <td class="text-right target_tw3_urian_renaksi">'.$target_3_html.'</td>
-					                <td class="text-right target_tw4_urian_renaksi">'.$target_4_html.'</td>
-					                <td class="text-right target_akhir_urian_renaksi">'.$target_akhir_html.'</td>
-					                <td class="text-right rencana_pagu">'.$rencana_pagu.'</td>
-					                <td class="text-left nama_skpd">'.$nama_skpd_html.'</td>
-					                <td class="text-left mitra_bidang">'.$mitra_bidang_html.'</td>
-					            </tr>
-					            ';
-					        }
-					    }
+							        $cek = $wpdb->get_var(
+							        	$wpdb->prepare("
+											SELECT 
+												id
+											FROM esakip_data_label_rencana_aksi
+											WHERE parent_indikator_renaksi_pemda = %d 
+												AND active=1
+												AND tahun_anggaran=%d
+										", $ind['id'], $_POST['tahun_anggaran'])
+							    	);
+
+									// print_r($cek); die($wpdb->last_query);
+							        
+									$detail_pengisian_rencana_aksi = $this->functions->generatePage(array(
+									    'nama_page' => 'Halaman Detail Pengisian Rencana Aksi ' . $_POST['tahun_anggaran'],
+									    'content' => '[detail_pengisian_rencana_aksi tahun=' . $_POST['tahun_anggaran'] . ']',
+									    'show_header' => 1,
+									    'post_status' => 'private'
+									));
+									$bg = '';
+									$link = '';
+
+									if ($cek) {
+									    $link = "<a href='" . $detail_pengisian_rencana_aksi['url'] . "&id_skpd=" . $ind['id_skpd'] . "' target='_blank'>" . $ind['nama_skpd'] . "</a>";
+									    $bg = ''; 
+									} else {
+									    $bg = 'background-color: #ff00002e;';
+									    $link = $ind['nama_skpd']; 
+									}
+							        $html .= '
+							        <tr>
+							            <td>'.$no.'.'.$no_uraian_renaksi.'.'.($i+1).'</td>
+							            <td class="kegiatan_utama"></td>
+							            <td class="indikator_kegiatan_utama"></td>
+							            <td class="recana_aksi"></td>
+							            <td class="urian_renaksi">'.$label_html.'</td>
+							            <td class="text-center">'.$ind['satuan'].'</td>
+							            <td>'.$ind['indikator'].'</td>
+							            <td class="text-center">'.$ind['target_awal'].'</td>
+							            <td class="text-center">'.$ind['target_1'].'</td>
+							            <td class="text-center">'.$ind['target_2'].'</td>
+							            <td class="text-center">'.$ind['target_3'].'</td>
+							            <td class="text-center">'.$ind['target_4'].'</td>
+							            <td class="text-center">'.$ind['target_akhir'].'</td>
+									    <td class="text-right">'.number_format((float)$ind['rencana_pagu'], 0, ",", ".").'</td>
+									    <td class="text-center" style="'.$bg.'">'.$link.'</td>
+									    <td class="text-left mitra_bidang">'.$ind['mitra_bidang'].'</td>
+							        </tr>';
+							    }
+							}					    
+						}
 					}
 
 					if(empty($html)){
@@ -2233,9 +2515,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	                foreach($data_renaksi as $key => $val){
 	                    $data_renaksi[$key]['indikator'] = $wpdb->get_results($wpdb->prepare("
 	                        SELECT
-	                            s.*,
-	                            u.*,
-	                            u.id AS id_data_unit
+	                            s.*,	
+						        u.id_skpd,
+						        u.nama_skpd,
+						        u.active,
+						        u.tahun_anggaran
 	                        FROM esakip_data_rencana_aksi_indikator_pemda AS s
 	                        LEFT JOIN esakip_data_unit as u ON s.id_skpd=u.id_skpd
 	                            AND s.tahun_anggaran=u.tahun_anggaran
@@ -2506,69 +2790,82 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	}
 
 	function hapus_rencana_aksi_pemda(){
-		global $wpdb;
-		$ret = array(
-			'status' => 'success',
-			'message' => 'Berhasil hapus rencana aksi!',
-			'data'  => array()
-		);
+	global $wpdb;
+	$ret = array(
+		'status' => 'success',
+		'message' => 'Berhasil hapus rencana aksi!',
+		'data'  => array()
+	);
 
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if (empty($_POST['id'])) {
+	if (!empty($_POST)) {
+		if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+			if (empty($_POST['id'])) {
+				$ret['status'] = 'error';
+				$ret['message'] = 'ID rencana aksi tidak boleh kosong!';
+			} else if (empty($_POST['tipe'])) {
+				$ret['status'] = 'error';
+				$ret['message'] = 'Tipe tidak boleh kosong!';
+			} else if (empty($_POST['tahun_anggaran'])) {
+				$ret['status'] = 'error';
+				$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
+			} else if (empty($_POST['id_tujuan'])) {
+				$ret['status'] = 'error';
+				$ret['message'] = 'ID Tujuan tidak boleh kosong!';
+			} else {
+				$child_level = $_POST['tipe'] + 1;
+				$level_name = ($child_level == 2) ? "Rencana Aksi" : "Uraian Kegiatan Rencana Aksi";
+
+				$cek_id = $wpdb->get_var($wpdb->prepare("
+					SELECT 
+						i.*,
+						l.*
+					FROM esakip_data_rencana_aksi_indikator_pemda AS i
+					INNER JOIN esakip_data_label_rencana_aksi AS l
+						ON l.parent_indikator_renaksi_pemda=i.id
+					WHERE i.id_renaksi = %d 
+				", $_POST['id']));
+				// print_r($cek_id); die($wpdb->last_query);
+
+				if ($cek_id) {
 					$ret['status'] = 'error';
-					$ret['message'] = 'ID rencana aksi tidak boleh kosong!';
-				} else if (empty($_POST['tipe'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Tipe tidak boleh kosong!';
-				} else if (empty($_POST['tahun_anggaran'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
-				} else if (empty($_POST['id_tujuan'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'ID Tujuan tidak boleh kosong!';
+					$ret['message'] = 'Rencana Aksi tidak bisa dihapus karena beberapa indikator sudah terkoneksi dengan Rencana Aksi Perangkat Daerah.';
 				} else {
-					$child_level = $_POST['tipe'] + 1;
-
-					if ($child_level == 2) {
-						$level_name = "Rencana Aksi";
-					} else if ($child_level == 3) {
-						$level_name = "Uraian Kegiatan Rencana Aksi";
-					} 
+					$ret['data'] = $wpdb->update(
+						'esakip_data_rencana_aksi_indikator_pemda',
+						array('active' => 0),
+						array('id' => $_POST['id'])
+					);
 
 					$cek_child = $wpdb->get_results($wpdb->prepare("
-						SELECT
-							*
+						SELECT *
 						FROM esakip_data_rencana_aksi_pemda
-						WHERE level=%d
-							AND parent=%d
-							AND active=1
+						WHERE level = %d AND parent = %d AND active = 1
 					", $child_level, $_POST['id']), ARRAY_A);
 
 					if (empty($cek_child)) {
-						$wpdb->update('esakip_data_rencana_aksi_pemda', array(
-							'active' => 0
-						), array('id' => $_POST['id']));
+						$wpdb->update('esakip_data_rencana_aksi_pemda', array('active' => 0), array('id' => $_POST['id']));
 					} else {
 						$ret['status'] = 'error';
 						$ret['child'] = $cek_child;
 						$ret['message'] = 'Gagal menghapus, data di ' . $level_name . ' harus dihapus dahulu!';
 					}
 				}
-			} else {
-				$ret = array(
-					'status' => 'error',
-					'message'   => 'Api Key tidak sesuai!'
-				);
 			}
 		} else {
 			$ret = array(
 				'status' => 'error',
-				'message'   => 'Format tidak sesuai!'
+				'message'   => 'Api Key tidak sesuai!'
 			);
 		}
-		die(json_encode($ret));
+	} else {
+		$ret = array(
+			'status' => 'error',
+			'message'   => 'Format tidak sesuai!'
+		);
 	}
+	die(json_encode($ret));
+}
+
 
 	function get_rencana_aksi_pemda(){
 		global $wpdb;
@@ -2642,7 +2939,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						FROM esakip_data_rencana_aksi_indikator_pemda
 						WHERE id=%d
 							AND tahun_anggaran=%d
-							AND tahun_anggaran=%d
 					',$_POST['id'], $_POST['tahun_anggaran'], $_POST['id_tujuan']), ARRAY_A);
 				}
 			} else {
@@ -2670,20 +2966,33 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if ($ret['status'] != 'error' && empty($_POST['id'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'ID indikator tidak boleh kosong!';
-				} else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
+				$id = trim(htmlspecialchars($_POST['id']));
+
+				if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
 				} else if ($ret['status'] != 'error' && empty($_POST['id_tujuan'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'ID Tujuan tidak boleh kosong!';
 				}
-				if ($ret['status'] != 'error'){
-					$wpdb->update('esakip_data_rencana_aksi_indikator_pemda', array(
-						'active' => 0
-					), array('id' => $_POST['id']));
+                $cek_id = $wpdb->get_var($wpdb->prepare("
+					SELECT 
+						i.*,
+						l.*
+					FROM esakip_data_rencana_aksi_indikator_pemda AS i
+					INNER JOIN esakip_data_label_rencana_aksi AS l
+						ON l.parent_indikator_renaksi_pemda=i.id
+					WHERE i.id = %d 
+				", $id));
+				if ($cek_id) {
+					$ret['status'] = 'confirm';
+					$ret['message'] = 'Rencana Aksi tidak bisa dihapus karena sudah sudah terkoneksi dengan Rencana Aksi Perangkat Daerah.';
+				}
+
+				if ($ret['status'] != 'confirm') {
+					$ret['data'] = $wpdb->update('esakip_data_rencana_aksi_indikator_pemda', array('active' => 0), array(
+						'id' => $id
+					));
 				}
 			} else {
 				$ret = array(
@@ -2730,4 +3039,49 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	    echo json_encode($ret);
 	    wp_die(); 
 	}
+
+	function simpan_renaksi_pemda(){
+	    global $wpdb;
+
+	    if (!empty($_POST)) {
+	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+	            $id_indikator_renaksi_pemda = isset($_POST['id_indikator_renaksi_pemda']) ? intval($_POST['id_indikator_renaksi_pemda']) : 0;
+	            $id_renaksi_pemda = isset($_POST['id_renaksi_pemda']) ? intval($_POST['id_renaksi_pemda']) : 0;
+	            $checklist_renaksi_opd = isset($_POST['checklist_renaksi_opd']) ? $_POST['checklist_renaksi_opd'] : [];
+	            $id_skpd = isset($_POST['id_skpd']) ? intval($_POST['id_skpd']) : 0;
+	            $id_label_renaksi_opd = isset($_POST['id_label_renaksi_opd']) ? $_POST['id_label_renaksi_opd'] : [];
+	            $id_indikator = isset($_POST['id_indikator']) ? $_POST['id_indikator'] : [];
+
+	            if (!empty($checklist_renaksi_opd) && !empty($id_label_renaksi_opd)) {
+	                foreach ($checklist_renaksi_opd as $index => $label_renaksi_opd) {
+	                    $parent_renaksi_opd = isset($id_label_renaksi_opd[$index]) ? intval($id_label_renaksi_opd[$index]) : 0;
+
+	                    $data = array(
+	                        'parent_renaksi_opd' => $parent_renaksi_opd,  
+	                        'parent_renaksi_pemda' => $id_renaksi_pemda,  
+	                        'parent_indikator_renaksi_pemda' => $id_indikator_renaksi_pemda,  
+	                        'id_skpd' => $id_skpd,
+	                        'active' => 1 
+	                    );	
+
+	                    $wpdb->insert(
+	                        'esakip_data_label_rencana_aksi', 
+	                        $data
+	                    );
+	                }
+	                wp_send_json_success('Berhasil simpan rencana aksi.');
+	            } else {
+	                wp_send_json_error('Tidak ada label yang dipilih, silahkan pilih minimal 1 .');
+	            }
+	        } else {
+	            wp_send_json_error('API Key tidak sesuai!');
+	        }
+	    } else {
+	        wp_send_json_error('Format data tidak sesuai!');
+	    }
+	    die();
+	}
+
+
 }
