@@ -186,6 +186,9 @@ if (!empty($renaksi_pemda)) {
         white-space: normal;
         line-height: 1.3;
     }
+    .table_notifikasi_pemda {
+        display: none; /* Default disembunyikan */
+}
 </style>
 
 <!-- Table -->
@@ -193,14 +196,11 @@ if (!empty($renaksi_pemda)) {
     <div id="cetak" title="Rencana Aksi Perangkat Daerah">
         <div style="padding: 10px;margin:0 0 3rem 0;">
             <h1 class="text-center" style="margin:3rem;">Rencana Aksi <br><?php echo $skpd['nama_skpd'] ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
-
-            <?php if(!empty($renaksi_pemda)): ?>
-            <h4 style="text-align: center; margin-top: 10px; font-weight: bold;margin-bottom: .5em;">Notifikasi Rencana Hasil Kerja Pemda</h4>
+            <h4 id = "notifikasi-title" style="text-align: center; margin-top: 10px; font-weight: bold;margin-bottom: .5em;">Notifikasi Rencana Hasil Kerja Pemda</h4>
             <div title="Notifikasi Rencana Aksi Pemda" style="padding: 5px; overflow: auto; display:flex; justify-content:center;">
                 <table class="table_notifikasi_pemda" style="width: 50em;text-align: center;">
                     <thead>
                         <tr>
-                            <th>No</th>
                             <th>Rencana Hasil Kerja</th>
                             <th>Indikator Rencana Hasil Kerja</th>
                             <th>Satuan</th>
@@ -212,7 +212,6 @@ if (!empty($renaksi_pemda)) {
                     </tbody>
                 </table>
             </div>
-            <?php endif; ?>
             <?php if (!$is_admin_panrb && $hak_akses_user): ?>
                 <div id="action" class="action-section hide-excel"></div>
             <?php endif; ?>
@@ -1009,8 +1008,8 @@ function kegiatanUtama(){
     });
 }
 
-function getTablePengisianRencanaAksi(no_loading=false) {
-    if(no_loading == false){
+function getTablePengisianRencanaAksi(no_loading = false) {
+    if (no_loading == false) {
         jQuery('#wrap-loading').show();
     }
     jQuery.ajax({
@@ -1024,14 +1023,35 @@ function getTablePengisianRencanaAksi(no_loading=false) {
         },
         dataType: 'json',
         success: function(response) {
-            if(no_loading == false){
+            if (no_loading == false) {
                 jQuery('#wrap-loading').hide();
             }
             console.log(response);
+
             if (response.status === 'success') {
                 jQuery('.table_dokumen_rencana_aksi tbody').html(response.data);
-                
-                jQuery('.table_notifikasi_pemda tbody').html(response.data_pemda);
+
+                if (response.data_pemda && response.data_pemda.trim() !== '') {
+                    jQuery('#notifikasi-title').show();
+                    jQuery('.table_notifikasi_pemda').show();
+                    jQuery('.table_notifikasi_pemda tbody').html(response.data_pemda);
+
+                    jQuery('.table_notifikasi_pemda').DataTable({
+                        "aoColumnDefs": [
+                            { "bSortable": false, "aTargets": [0] },
+                            { "bSearchable": false, "aTargets": [0] }
+                        ],
+                        "order": [[2, 'asc'], [3, 'asc']],
+                        "lengthMenu": [[10, 20, 100, -1], [10, 20, 100, "All"]]
+                    });
+                } else {
+                    jQuery('#notifikasi-title').hide();
+                    jQuery('.table_notifikasi_pemda').hide();
+
+                    if (jQuery.fn.DataTable.isDataTable('.table_notifikasi_pemda')) {
+                        jQuery('.table_notifikasi_pemda').DataTable().clear().destroy();
+                    }
+                }
             } else {
                 alert(response.message);
             }
@@ -1043,6 +1063,7 @@ function getTablePengisianRencanaAksi(no_loading=false) {
         }
     });
 }
+
 
 
 function tambah_indikator_rencana_aksi(id, tipe){

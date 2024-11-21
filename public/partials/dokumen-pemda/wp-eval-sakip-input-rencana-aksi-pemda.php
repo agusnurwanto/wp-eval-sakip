@@ -180,7 +180,7 @@ foreach($pokin as $get_pokin){
                             <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 300px;">URAIAN KEGIATAN RENCANA AKSI</th>
                             <th class="atas kiri bawah kanan text-center" colspan="2" style="width: 400px;">OUTCOME/OUTPUT</th>
                             <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 140px;">TARGET</th>
-                            <th class="atas kiri bawah kanan text-center" colspan="5" style="width: 400px;">TARGET KEGIATAN PER TRIWULAN</th>
+                            <th class="atas kiri bawah kanan text-center" colspan="6" style="width: 400px;">TARGET KEGIATAN PER TRIWULAN</th>
                             <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 140px;">JUMLAH ANGGARAN</th>
                             <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 300px;">NAMA PERANGKAT DAERAH</th>
                             <th class="atas kiri bawah kanan text-center" rowspan="2" style="width: 140px;">MITRA BIDANG</th>
@@ -188,6 +188,7 @@ foreach($pokin as $get_pokin){
                         <tr>
                             <th class="atas kiri bawah kanan text-center" style="width: 50px;">SATUAN</th>
                             <th class="atas kiri bawah kanan text-center" style="width: 400px;">INDIKATOR</th>
+                            <th class="atas kiri bawah kanan text-right" style="width: 200px;">AWAL</th>
                             <th class="atas kiri bawah kanan text-right" style="width: 200px;">TW-I</th>
                             <th class="atas kiri bawah kanan text-right" style="width: 200px;">TW-II</th>
                             <th class="atas kiri bawah kanan text-right" style="width: 200px;">TW-III</th>
@@ -294,7 +295,7 @@ jQuery(document).ready(function() {
     jQuery("#tambah-rencana-aksi").on('click', function(){
         kegiatanUtama();
     });
-    jQuery('#id_skpd').select2({
+    jQuery('#skpd').select2({
         'width': '100%'
     });
 });
@@ -391,6 +392,7 @@ function kegiatanUtama(){
                                         +`<th class="text-center" style="width:20px">No</th>`
                                         +`<th class="text-center">Indikator</th>`
                                         +`<th class="text-center" style="width:120px;">Satuan</th>`
+                                        +`<th class="text-center" style="width:50px;">Target Awal</th>`
                                         +`<th class="text-center" style="width:50px;">Target Akhir</th>`
                                         +`<th class="text-center" style="width:50px;">Target TW 1</th>`
                                         +`<th class="text-center" style="width:50px;">Target TW 2</th>`
@@ -407,6 +409,7 @@ function kegiatanUtama(){
                                     +`<td class="text-center">${index+1}.${i+1}</td>`
                                     +`<td>${b.indikator}</td>`
                                     +`<td class="text-center">${b.satuan}</td>`
+                                    +`<td class="text-center">${b.target_awal}</td>`
                                     +`<td class="text-center">${b.target_akhir}</td>`
                                     +`<td class="text-center">${b.target_1}</td>`
                                     +`<td class="text-center">${b.target_2}</td>`
@@ -503,7 +506,7 @@ function tambah_indikator_rencana_aksi(id, tipe){
                     + `<label for="id_skpd">Nama Perangkat Daerah</label>`
                 + '</div>'
                 + '<div class="col-md-10">'
-                    + `<select class="form-control" id="id_skpd" name="id_skpd" onchange="get_skpd();"><?php echo $select_skpd; ?></select>`
+                    + `<select class="form-control select2" id="id_skpd" name="id_skpd" onchange="get_skpd();"><?php echo $select_skpd; ?></select>`
                 + '</div>'
             + `</div>`;
         input_mitra_bidang = ''
@@ -516,12 +519,14 @@ function tambah_indikator_rencana_aksi(id, tipe){
                 +'</div>'
             +`</div>`
         input_pagu = ''
-            +'<div class="col-md-2">'
-                    +`<label for="satuan_indikator">Rencana Pagu</label>`
+            +`<div class="form-group row">`
+                +'<div class="col-md-2">'
+                    +`<label for="rencana_pagu">Rencana Pagu</label>`
                 +'</div>'
-                +'<div class="col-md-4">'
-                    +`<input type="number" class="form-control" id="rencana_pagu"/>`
+                +'<div class="col-md-10">'
+                    +`<input type="text" class="form-control" id="rencana_pagu"/>`
                 +'</div>'
+            +`</div>`
     }
     var tr = jQuery('#kegiatan_utama_'+id);
     var label_renaksi = tr.find('.label_renaksi').text();
@@ -563,7 +568,12 @@ function tambah_indikator_rencana_aksi(id, tipe){
                 +'</div>'
             +`</div>`
             +`<div class="form-group row">`
-                +`${input_pagu}`
+                +'<div class="col-md-2">'
+                    +`<label for="target_awal">Target Awal</label>`
+                +'</div>'
+                +'<div class="col-md-4">'
+                    +`<input type="number" class="form-control" id="target_awal"/>`
+                +'</div>'
                 +'<div class="col-md-2">'
                     +`<label for="target_akhir">Target Akhir</label>`
                 +'</div>'
@@ -599,6 +609,7 @@ function tambah_indikator_rencana_aksi(id, tipe){
                     +`<input type="number" class="form-control" id="target_tw_4"/>`
                 +'</div>'
             +`</div>`
+            +`${input_pagu}`
         +`</form>`);
     jQuery("#modal-crud").find('.modal-footer').html(''
         +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
@@ -610,6 +621,11 @@ function tambah_indikator_rencana_aksi(id, tipe){
     jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
     jQuery("#modal-crud").find('.modal-dialog').css('width','');
     jQuery("#modal-crud").modal('show');
+    jQuery('#id_skpd').select2({
+        width: '100%', 
+        placeholder: 'Pilih Perangkat Daerah',
+        allowClear: true
+    });
 }
 
 function simpan_indikator_renaksi(tipe) {
@@ -632,6 +648,8 @@ function simpan_indikator_renaksi(tipe) {
     if ((tipe == 2 || tipe == 3) && satuan == '') {
         return alert('Satuan tidak boleh kosong!');
     }
+
+    var target_awal = jQuery('#target_awal').val();
 
     var target_akhir = jQuery('#target_akhir').val();
 
@@ -662,6 +680,7 @@ function simpan_indikator_renaksi(tipe) {
             "indikator": indikator,
             "satuan": satuan,
             "rencana_pagu": rencana_pagu,
+            "target_awal": target_awal,
             "target_akhir": target_akhir,
             "target_tw_1": target_tw_1,
             "target_tw_2": target_tw_2,
@@ -835,6 +854,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
                                                     +`<th class="text-center" style="width:20px">No</th>`
                                                     +`<th class="text-center">Indikator</th>`
                                                     +`<th class="text-center" style="width:120px;">Satuan</th>`
+                                                    +`<th class="text-center" style="width:50px;">Target Awal</th>`
                                                     +`<th class="text-center" style="width:50px;">Target Akhir</th>`
                                                     +`<th class="text-center" style="width:50px;">Target TW 1</th>`
                                                     +`<th class="text-center" style="width:50px;">Target TW 2</th>`
@@ -863,6 +883,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin){
                                                 +`<td class="text-center">${index+1}.${i+1}</td>`
                                                 +`<td>${b.indikator}</td>`
                                                 +`<td class="text-center">${b.satuan}</td>`
+                                                +`<td class="text-right">${b.target_awal}</td>`
                                                 +`<td class="text-right">${b.target_akhir}</td>`
                                                 +`<td class="text-right">${b.target_1}</td>`
                                                 +`<td class="text-right">${b.target_2}</td>`
@@ -929,37 +950,37 @@ function tambah_renaksi_2(tipe) {
             },
             dataType: "json",
             success: function(res){
-                var html = '<option value="">Pilih Pokin Level '+level_pokin+'</option>';
-                res.data.map(function(value, index){
-                    html += '<option value="'+value.id+'">'+value.label+'</option>';
+                var html = '<option value="">Pilih Pokin Level ' + level_pokin + '</option>';
+                res.data.map(function(value, index) {
+                    html += '<option value="' + value.id + '">' + value.label + '</option>';
                 });
                 jQuery('#wrap-loading').hide();
-                jQuery("#modal-crud").find('.modal-title').html('Tambah '+title);
+                jQuery("#modal-crud").find('.modal-title').html('Tambah ' + title);
                 var onchange_pokin = '';
                 jQuery("#modal-crud").find('.modal-body').html(''
-                    +'<form>'
-                        +'<input type="hidden" id="id_renaksi" value=""/>'
-                        +'<div class="form-group">'
-                            +'<label for="pokin-level-1">Pilih Pokin Level '+level_pokin+'</label>'
-                            +'<select class="form-control" name="pokin-level-1" id="pokin-level-1" '+onchange_pokin+'>'
-                                +html
-                            +'</select>'
-                        +'</div>'
-                        +'<div class="form-group">'
-                            +'<textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan '+title+'..."></textarea>'
-                        +'</div>'
-                    +'</form>');
+                    + '<form>'
+                        + '<input type="hidden" id="id_renaksi" value=""/>'
+                        + '<div class="form-group">'
+                            + '<label for="pokin-level-1">Pilih Pokin Level ' + level_pokin + '</label>'
+                            + '<select class="form-control" name="pokin-level-1" id="pokin-level-1" ' + onchange_pokin + '>'
+                                + html
+                            + '</select>'
+                        + '</div>'
+                        + '<div class="form-group">'
+                            + '<textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan ' + title + '..."></textarea>'
+                        + '</div>'
+                    + '</form>');
                 jQuery("#modal-crud").find('.modal-footer').html(''
-                    +'<button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>'
-                    +'<button type="button" class="btn btn-success" onclick="simpan_data_renaksi('+tipe+')">'
-                        +'Simpan'
-                    +'</button>');
-                jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
-                jQuery("#modal-crud").find('.modal-dialog').css('width','');
+                    + '<button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>'
+                    + '<button type="button" class="btn btn-success" onclick="simpan_data_renaksi(' + tipe + ')">'
+                        + 'Simpan'
+                    + '</button>');
+                jQuery("#modal-crud").find('.modal-dialog').css('maxWidth', '');
+                jQuery("#modal-crud").find('.modal-dialog').css('width', '');
                 jQuery("#modal-crud").modal('show');
-                jQuery('#pokin-level-1').select2({width: '100%'});
-                if(tipe == 3){
-                    jQuery('#pokin-level-2').select2({width: '100%'});
+                jQuery('#pokin-level-1').select2({ width: '100%' });
+                if (tipe == 3) {
+                    jQuery('#pokin-level-2').select2({ width: '100%' });
                 }
             }
         });
@@ -1018,15 +1039,15 @@ function hapus_rencana_aksi(id, tipe){
     }
 }
 
-function simpan_data_renaksi(tipe){
+function simpan_data_renaksi(tipe) {
     var parent_pokin = 0;
     var parent_renaksi = 0;
     switch (tipe) {
-        case 2 :
+        case 2:
             parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
             parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
             break;
-        case 3 :
+        case 3:
             parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
             parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
             break;
@@ -1036,13 +1057,16 @@ function simpan_data_renaksi(tipe){
     }
 
     var label_renaksi = jQuery('#label_renaksi').val();
-    if(label_renaksi == ''){
-        return alert('Kegiatan Utama tidak boleh kosong!')
-    }
     var id_pokin_1 = jQuery('#pokin-level-1').val();
     var id_pokin_2 = jQuery('#pokin-level-2').val();
-    var label_pokin_1 = jQuery('#pokin-level-1 option:selected').text();
-    var label_pokin_2 = jQuery('#pokin-level-2 option:selected').text();
+
+    var label_pokin_1 = (id_pokin_1 !== '') ? jQuery('#pokin-level-1 option:selected').text() : '';
+    var label_pokin_2 = (id_pokin_2 !== '') ? jQuery('#pokin-level-2 option:selected').text() : '';
+
+    if (label_renaksi.trim() === '') {
+        return alert('Kegiatan Utama tidak boleh kosong!');
+    }
+
     jQuery('#wrap-loading').show();
     jQuery.ajax({
         url: esakip.url,
@@ -1052,28 +1076,29 @@ function simpan_data_renaksi(tipe){
             "api_key": esakip.api_key,
             "tipe_pokin": "pemda",
             "id": jQuery('#id_renaksi').val(),
-            "id_pokin_1": id_pokin_1,
-            "id_pokin_2": id_pokin_2,
-            "label_pokin_1": label_pokin_1,
-            "label_pokin_2": label_pokin_2,
+            "id_pokin_1": id_pokin_1 || null, 
+            "id_pokin_2": id_pokin_2 || null, 
+            "label_pokin_1": label_pokin_1,   
+            "label_pokin_2": label_pokin_2,   
             "label_renaksi": label_renaksi,
             "level": tipe,
             "parent": parent_renaksi,
             "tahun_anggaran": <?php echo $input['tahun']; ?>,
             "id_jadwal": id_jadwal,
-            "id_tujuan": <?php echo $input['id_tujuan'] ?>
+            "id_tujuan": <?php echo $input['id_tujuan']; ?>
         },
         dataType: "json",
-        success: function(res){
+        success: function(res) {
             jQuery('#wrap-loading').hide();
             alert(res.message);
-            if(res.status=='success'){
+            if (res.status === 'success') {
                 jQuery("#modal-crud").modal('hide');
                 lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin);
             }
         }
     });
 }
+
 
 function edit_rencana_aksi(id, tipe){
     if(tipe==1){
@@ -1165,6 +1190,7 @@ function edit_indikator(id, tipe){
                 jQuery('#id_skpd').val(response.data.id_skpd).trigger('change').prop('disabled', false);
                 jQuery('#satuan_indikator').val(response.data.satuan);
                 jQuery('#target_akhir').val(response.data.target_akhir);
+                jQuery('#target_awal').val(response.data.target_awal);
                 jQuery('#target_tw_1').val(response.data.target_1);
                 jQuery('#target_tw_2').val(response.data.target_2);
                 jQuery('#target_tw_3').val(response.data.target_3);

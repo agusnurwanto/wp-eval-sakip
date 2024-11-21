@@ -1000,47 +1000,47 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
                                     $background_primary = !empty($renaksi_pemda['label']) ? 'bg-primary' : '';
                                     $renaksi_html .= '<div class="d-flex align-items-center mb-2">';
-                                    $renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center me-2">' . $label_renaksi_pemda . '</span>';
+                                    $renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center" style="margin: auto;">' . $label_renaksi_pemda . '</span>';
                                     $renaksi_html .= '</div>';
 
                                     $background_primary = !empty($renaksi_pemda['indikator']) ? 'bg-primary' : '';
                                     $indikator_renaksi_html .= '<div class="d-flex align-items-center mb-2">';
-                                    $indikator_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center me-2">' . $label_indikator_renaksi_pemda . '</span>';
+                                    $indikator_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center" style="margin: auto;">' . $label_indikator_renaksi_pemda . '</span>';
                                     $indikator_renaksi_html .= '</div>';
 
                                     $background_primary = !empty($renaksi_pemda['satuan']) ? 'bg-primary' : '';
                                     $satuan_renaksi_html .= '<div class="d-flex align-items-center mb-2">';
-                                    $satuan_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center me-2">' . $label_satuan_renaksi_pemda . '</span>';
+                                    $satuan_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center" style="margin: auto;">' . $label_satuan_renaksi_pemda . '</span>';
                                     $satuan_renaksi_html .= '</div>';
 
                                     $background_primary = !empty($renaksi_pemda['target_akhir']) ? 'bg-primary' : '';
                                     $target_renaksi_html .= '<div class="d-flex align-items-center mb-2">';
-                                    $target_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center me-2">' . $label_target_renaksi_pemda . '</span>';
+                                    $target_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center" style="margin: auto;">' . $label_target_renaksi_pemda . '</span>';
                                     $target_renaksi_html .= '</div>';
 
                                     $background_primary = !empty($renaksi_pemda['target_awal']) ? 'bg-primary' : '';
                                     $target_awal_renaksi_html .= '<div class="d-flex align-items-center mb-2">';
-                                    $target_awal_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center me-2">' . $label_target_awal_renaksi_pemda . '</span>';
+                                    $target_awal_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center" style="margin: auto;">' . $label_target_awal_renaksi_pemda . '</span>';
                                     $target_awal_renaksi_html .= '</div>';
 
                                     $background_primary = !empty($renaksi_pemda['target_1']) ? 'bg-primary' : '';
                                     $target_1_renaksi_html .= '<div class="d-flex align-items-center mb-2">';
-                                    $target_1_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center me-2">' . $label_target_1_renaksi_pemda . '</span>';
+                                    $target_1_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center" style="margin: auto;">' . $label_target_1_renaksi_pemda . '</span>';
                                     $target_1_renaksi_html .= '</div>';
 
                                     $background_primary = !empty($renaksi_pemda['target_2']) ? 'bg-primary' : '';
                                     $target_2_renaksi_html .= '<div class="d-flex align-items-center mb-2">';
-                                    $target_2_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center me-2">' . $label_target_2_renaksi_pemda . '</span>';
+                                    $target_2_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center" style="margin: auto;">' . $label_target_2_renaksi_pemda . '</span>';
                                     $target_2_renaksi_html .= '</div>';
 
                                     $background_primary = !empty($renaksi_pemda['target_3']) ? 'bg-primary' : '';
                                     $target_3_renaksi_html .= '<div class="d-flex align-items-center mb-2">';
-                                    $target_3_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center me-2">' . $label_target_3_renaksi_pemda . '</span>';
+                                    $target_3_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center" style="margin: auto;">' . $label_target_3_renaksi_pemda . '</span>';
                                     $target_3_renaksi_html .= '</div>';
 
                                     $background_primary = !empty($renaksi_pemda['target_4']) ? 'bg-primary' : '';
                                     $target_4_renaksi_html .= '<div class="d-flex align-items-center mb-2">';
-                                    $target_4_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center me-2">' . $label_target_4_renaksi_pemda . '</span>';
+                                    $target_4_renaksi_html .= '<span class="badge '.$background_primary.' text-white text-center" style="margin: auto;">' . $label_target_4_renaksi_pemda . '</span>';
                                     $target_4_renaksi_html .= '</div>';
                                 }
                             }
@@ -1050,19 +1050,19 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							        <td>'.$no.'.'.$no_renaksi.'</td>
 							        <td class="kegiatan_utama"></td>
 							        <td class="indikator_kegiatan_utama"></td>
-							        <td class="recana_aksi">'.$renaksi_html.'<br><span class="badge bg-success text-white">'.$renaksi['detail']['label_pokin_3'].'</span><br>'.$renaksi['detail']['label'].'</td>
-							        <td class="indikator_renaksi">'.$indikator_renaksi_html.'<br>'.$indikator_html.'</td>
+							        <td class="recana_aksi">'.$renaksi_html.'<span class="badge bg-success text-white">'.$renaksi['detail']['label_pokin_3'].'</span><br>'.$renaksi['detail']['label'].'</td>
+							        <td class="indikator_renaksi">'.$indikator_renaksi_html.''.$indikator_html.'</td>
 							        <td class="urian_renaksi"></td>
 							        <td class="indikator_uraian_renaksi"></td>
 							        <td class="uraian_teknis_kegiatan"></td>
 							        <td class="indikator_uraian_teknis_kegiatan"></td>
-							        <td class="text-center satuan_renaksi">'.$satuan_renaksi_html.'<br>'.$satuan_html.'</td>
-							        <td class="text-center target_awal_urian_renaksi">'.$target_awal_renaksi_html.'<br>'.$target_awal_html.'</td>
-							        <td class="text-center target_tw1_urian_renaksi">'.$target_1_renaksi_html.'<br>'.$target_1_html.'</td>
-							        <td class="text-center target_tw2_urian_renaksi">'.$target_2_renaksi_html.'<br>'.$target_2_html.'</td>
-							        <td class="text-center target_tw3_urian_renaksi">'.$target_3_renaksi_html.'<br>'.$target_3_html.'</td>
-							        <td class="text-center target_tw4_urian_renaksi">'.$target_4_renaksi_html.'<br>'.$target_4_html.'</td>
-							        <td class="text-center target_akhir_urian_renaksi">'.$target_renaksi_html.'<br>'.$target_akhir_html.'</td>
+							        <td class="text-center satuan_renaksi">'.$satuan_renaksi_html.''.$satuan_html.'</td>
+							        <td class="text-center target_awal_urian_renaksi">'.$target_awal_renaksi_html.''.$target_awal_html.'</td>
+							        <td class="text-center target_tw1_urian_renaksi">'.$target_1_renaksi_html.''.$target_1_html.'</td>
+							        <td class="text-center target_tw2_urian_renaksi">'.$target_2_renaksi_html.''.$target_2_html.'</td>
+							        <td class="text-center target_tw3_urian_renaksi">'.$target_3_renaksi_html.''.$target_3_html.'</td>
+							        <td class="text-center target_tw4_urian_renaksi">'.$target_4_renaksi_html.''.$target_4_html.'</td>
+							        <td class="text-center target_akhir_urian_renaksi">'.$target_renaksi_html.''.$target_akhir_html.'</td>
 							        <td class=""></td>
 							        <td class=""></td>
 							        <td class=""></td>
@@ -1259,7 +1259,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					    ARRAY_A
 					);
 					$html_renaksi_pemda = '';
-					$no_renaksi_pemda = 1;
 
 					if (!empty($renaksi_pemda)) {
 					    foreach ($renaksi_pemda as $k_renaksi_pemda => $v_renaksi_pemda) { 
@@ -1268,7 +1267,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 					        $html_renaksi_pemda .= '
 					            <tr>
-					                <td>' . $no_renaksi_pemda++ . '</td>
 					                <td class="text-left">' . esc_html($v_renaksi_pemda['label']) . '</td>
 					                <td class="text-left">' . esc_html($v_renaksi_pemda['indikator']) . '</td>
 					                <td class="text-center">' . esc_html($v_renaksi_pemda['satuan']) . '</td>
@@ -2057,6 +2055,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					        <td class="urian_renaksi"><b></td>
 					        <td class="text-center satuan_renaksi"><b>'.$satuan_html.'</td>
 					        <td class="indikator_renaksi"><b></td>
+					        <td class="text-right target_akhir_urian_renaksi"><b>'.$target_awal_html.'</td>
 					        <td class="text-right target_akhir_urian_renaksi"><b>'.$target_akhir_html.'</td>
 					        <td class="text-right target_tw1_urian_renaksi"><b>'.$target_1_html.'</td>
 					        <td class="text-right target_tw2_urian_renaksi"><b>'.$target_2_html.'</td>
@@ -2113,6 +2112,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					            <td class="text-center satuan_renaksi"><b><i>'.$satuan_html.'</td>
 					            <td class="indikator_renaksi"><b><i>'.$indikator_html.'</td>
 					            <td class="text-right target_akhir_urian_renaksi"><b><i>'.$target_akhir_html.'</td>
+					            <td class="text-right target_akhir_urian_renaksi"><b><i>'.$target_awal_html.'</td>
 					            <td class="text-right target_tw1_urian_renaksi"><b><i>'.$target_1_html.'</td>
 					            <td class="text-right target_tw2_urian_renaksi"><b><i>'.$target_2_html.'</td>
 					            <td class="text-right target_tw3_urian_renaksi"><b><i>'.$target_3_html.'</td>
@@ -2173,10 +2173,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 							    foreach ($uraian_renaksi['indikator'] as $i => $ind) {
 							        $label_html = '';
-							        if (!$label_pokin_shown) {
-							            $label_html = '<span class="badge bg-success text-white">'.$label_pokin.'</span><br>'.$uraian_renaksi['detail']['label'];
-							            $label_pokin_shown = true; 
-							        }
+						            $label_html = '<span class="badge bg-success text-white">'.$label_pokin.'</span><br>'.$uraian_renaksi['detail']['label'];
+							        // if (!$label_pokin_shown) {
+							        //     $label_pokin_shown = true; 
+							        // }
 
 							        $cek = $wpdb->get_var(
 							        	$wpdb->prepare("
@@ -2216,6 +2216,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							            <td class="urian_renaksi">'.$label_html.'</td>
 							            <td class="text-center">'.$ind['satuan'].'</td>
 							            <td>'.$ind['indikator'].'</td>
+							            <td class="text-center">'.$ind['target_akhir'].'</td>
 							            <td class="text-center">'.$ind['target_awal'].'</td>
 							            <td class="text-center">'.$ind['target_1'].'</td>
 							            <td class="text-center">'.$ind['target_2'].'</td>
