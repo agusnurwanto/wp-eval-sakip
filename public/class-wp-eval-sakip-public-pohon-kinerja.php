@@ -680,6 +680,140 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						}
 					}
 
+					/**
+					 * Get Data Koneksi Pokin Pemda dan OPD
+					 */
+					$data_koneksi_pokin = array();
+					if (empty($_prefix_opd) && !empty($data)) {
+						$data_koneksi_pokin = $wpdb->get_results($wpdb->prepare("
+								SELECT 
+									*
+								FROM esakip_koneksi_pokin_pemda_opd
+								WHERE parent_pohon_kinerja=%d 
+									AND active=%d
+							", $_POST['id'], 1),  ARRAY_A);
+					}else if(!empty($_prefix_opd) && $_prefix_opd == '_opd' && !empty($data)){
+						// get data koneksi pokin pemda
+						$data_koneksi_pokin = $wpdb->get_results($wpdb->prepare("
+							SELECT 
+								koneksi.*,
+								pk.id as id_parent_pemda,
+								pk.label as label_pokin_pemda
+							FROM esakip_koneksi_pokin_pemda_opd as koneksi
+							JOIN esakip_pohon_kinerja as pk
+							ON koneksi.parent_pohon_kinerja = pk.id
+							WHERE koneksi.id_skpd_koneksi=%d
+								AND koneksi.status_koneksi=1 
+								AND koneksi.active=1
+								AND koneksi.parent_pohon_kinerja_koneksi=%d
+						", $id_skpd, $_POST['id']),  ARRAY_A);
+
+						if(!empty($data_koneksi_pokin)){
+							foreach ($data_koneksi_pokin as $k_koneksi_pokin => $v_koneksi_pokin) {
+								$data_label_indikator_pokin_pemda = $wpdb->get_results($wpdb->prepare("
+									SELECT 
+										pk.label_indikator_kinerja as indikator_parent_pemda
+									FROM 
+										esakip_pohon_kinerja as pk
+									WHERE pk.parent=%d
+									AND active=1 
+								", $v_koneksi_pokin['id_parent_pemda'])
+								,ARRAY_A);
+	
+								$indikator_pokin_pemda = array();
+								$data_koneksi_pokin[$k_koneksi_pokin]['indikator_pokin_pemda'] = '';
+								if(!empty($data_label_indikator_pokin_pemda)){
+									$no = 1;
+									foreach ($data_label_indikator_pokin_pemda as $key => $v_indikator_pemda) {
+										$class_indikator_pemda = '';
+										$border_color = ''; 
+										if(count($data_label_indikator_pokin_pemda) > 1){
+											$class_indikator_pemda = 'koneksi-indikator-pemda-isi';
+											$border_color = 'border-color: #dee2e6;';
+										 }
+										$class_indikator_pemda_1 = $no == 1 && $class_indikator_pemda != '' ? 'border-style: none;margin-top: -8px;' : '';
+										$indikator_pokin_pemda[]= '<div class="'. $class_indikator_pemda .'" style="'. $class_indikator_pemda_1 .' ' . $border_color . '">'. $v_indikator_pemda['indikator_parent_pemda'] .'</div>';
+										$no++;
+									}
+								}
+								if(!empty($indikator_pokin_pemda)){
+									$data_koneksi_pokin[$k_koneksi_pokin]['indikator_pokin_pemda'] .=implode("", $indikator_pokin_pemda);
+								}
+							}
+						}
+					}
+
+					$table_koneksi_pokin = '';
+					$no = 1;
+					if (!empty($data_koneksi_pokin)) {
+						$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+						foreach ($data_koneksi_pokin as $k_koneksi_pokin => $v_koneksi_pokin) {
+							$data_perangkat = $wpdb->get_row(
+								$wpdb->prepare("
+									SELECT 
+										nama_skpd as nama_perangkat,
+										id_skpd,
+										tahun_anggaran
+									FROM esakip_data_unit 
+									WHERE active=1 
+									AND is_skpd=1 
+									AND id_skpd=%d
+									AND tahun_anggaran=%d
+									GROUP BY id_skpd
+									ORDER BY kode_skpd ASC
+								", $v_koneksi_pokin['id_skpd_koneksi'], $tahun_anggaran_sakip),
+								ARRAY_A
+							);
+
+							switch ($v_koneksi_pokin['status_koneksi']) {
+								case '1':
+									$status_koneksi = 'disetujui';
+									break;
+
+								case '2':
+									$status_koneksi = 'ditolak';
+									break;
+
+								default:
+									$status_koneksi = 'menunggu';
+									break;
+							}
+
+							if(!empty($_prefix_opd) && $_prefix_opd == '_opd' && !empty($data)){
+								$table_koneksi_pokin .= '<tr>';
+	
+								$table_koneksi_pokin .= '<td>' . $no++ . '</td>';
+								$table_koneksi_pokin .= '<td>' . $v_koneksi_pokin['label_pokin_pemda'] . '</td>';
+								$table_koneksi_pokin .= '<td>' . $v_koneksi_pokin['indikator_pokin_pemda'] . '</td>';
+								$table_koneksi_pokin .= '<td>' . $status_koneksi . '</td>';
+	
+								$aksi_koneksi = '<a href="javascript:void(0)" class="btn btn-sm btn-success edit-verifikasi-koneksi-pokin-pemda" data-id="' . $v_koneksi_pokin['id'] . '" data-label-pokin-pemda="'. $v_koneksi_pokin['label_pokin_pemda'] .'" href="#" title="Verifikasi Koneksi Pohon Kinerja Pemerintah Daerah"><span class="dashicons dashicons-yes"></span></a>';
+	
+								$table_koneksi_pokin .= '<td class="text-center">' . $aksi_koneksi . '</td>';
+	
+								$table_koneksi_pokin .= '</tr>';
+							}else{
+								$table_koneksi_pokin .= '<tr>';
+	
+								$table_koneksi_pokin .= '<td>' . $no++ . '</td>';
+								$table_koneksi_pokin .= '<td>' . $data_perangkat['nama_perangkat'] . '</td>';
+								$table_koneksi_pokin .= '<td>' . $status_koneksi . '</td>';
+	
+								$aksi_koneksi = '';
+								if($status_koneksi == 'disetujui'){
+									$aksi_koneksi .= '<a href="javascript:void(0)" class="btn btn-sm btn-primary" data-id="' . $v_koneksi_pokin['id'] . '" href="#" title="Koneksi Pohon Kinerja Disetujui">Disetujui</a>';
+								}else{
+									// $aksi_koneksi .= '<a href="javascript:void(0)" class="btn btn-sm btn-warning edit-koneksi-pokin" data-id="' . $v_koneksi_pokin['id'] . '" href="#" title="Edit Koneksi Pohon Kinerja"><span class="dashicons dashicons-edit"></span></a>';
+									$aksi_koneksi .= '<a href="javascript:void(0)" class="btn btn-sm btn-danger delete-koneksi-pokin" data-id="' . $v_koneksi_pokin['id'] . '" style="margin-left: 5px;" href="#" title="Hapus Koneksi Pohon Kinerja"><span class="dashicons dashicons-trash"></span></a>';
+								}
+	
+								$table_koneksi_pokin .= '<td class="text-center">' . $aksi_koneksi . '</td>';
+	
+								$table_koneksi_pokin .= '</tr>';
+							}
+						}
+					}
+
 					if (empty($data)) {
 						throw new Exception("Data tidak ditemukan!", 1);
 					}else if(empty($data['nomor_urut'])){
@@ -689,7 +823,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					echo json_encode([
 						'status' => true,
 						'data' => $data,
-						'data_croscutting' => $table_croscutting
+						'data_croscutting' => $table_croscutting,
+						'data_koneksi_pokin' => $table_koneksi_pokin
 					]);
 					exit();
 				} else {
@@ -6054,4 +6189,410 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 	    die(json_encode($ret));
 	}
 
+	public function create_koneksi_pokin()
+	{
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+					$id_skpd_koneksi = '';
+					$input = json_decode(stripslashes($_POST['data']), true);
+
+					if (!empty($input['skpdKoneksi'])) {
+						$id_skpd_koneksi = $input['skpdKoneksi'];
+					} else {
+						throw new Exception("Input Perangkat Daerah Wajib Diisi!", 1);
+					}
+
+					$parent_pokin_id = $input['parentKoneksi'];
+
+					// input skpd
+					if (!empty($id_skpd_koneksi)) {
+						/**
+						 * setting edit data koneksi
+						 */
+
+						$inputan_baru = 0;
+						foreach ($id_skpd_koneksi as $k_skpd => $v_skpd) {
+							$data_cek_koneksi = $wpdb->get_row(
+								$wpdb->prepare("
+								SELECT *
+								FROM esakip_koneksi_pokin_pemda_opd
+								WHERE parent_pohon_kinerja=%d
+								AND id_skpd_koneksi=%d
+							", $parent_pokin_id, $v_skpd),
+								ARRAY_A
+							);
+
+							if (empty($data_cek_koneksi)) {
+								$insert_koneksi = $wpdb->insert('esakip_koneksi_pokin_pemda_opd', [
+									'parent_pohon_kinerja' => $parent_pokin_id,
+									'id_skpd_koneksi' => $v_skpd,
+									'active' => 1,
+									'status_koneksi' => 0,
+									'created_at' => current_time('mysql'),
+									'updated_at' => current_time('mysql')
+								]);
+
+								if($insert_koneksi){
+									$inputan_baru++;
+								}
+							}
+						}
+					}
+
+					echo json_encode([
+						'status' => true,
+						'message' => 'Sukses Koneksi Pohon Kinerja!',
+						'success_new_input' => $inputan_baru
+					]);
+					exit();
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
+	}
+
+	public function delete_koneksi_pokin()
+	{
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+					$data = $wpdb->delete('esakip_koneksi_pokin_pemda_opd', [
+						'id' => $_POST['id']
+					]);
+
+					if ($data === false) {
+						error_log("Error deleting koneksi pokin: " . $wpdb->last_error);
+					}
+
+					echo json_encode([
+						'status' => true,
+						'message' => 'Sukses Hapus Koneksi Pokin!'
+					]);
+					exit();
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
+	}
+	
+	public function get_skpd_koneksi_pokin_by_id()
+	{
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+					$data_skpd_by_parent_id = $wpdb->get_results($wpdb->prepare("
+								SELECT 
+									id_skpd_koneksi
+								FROM esakip_koneksi_pokin_pemda_opd
+								WHERE parent_pohon_kinerja=%d 
+									AND active=%d
+							", $_POST['id_parent_pokin'], 1),  ARRAY_A);
+
+					echo json_encode([
+						'status' => true,
+						'message' => 'Sukses Mendapatkan Data Skpd Koneksi Pokin By Id!',
+						'data' => $data_skpd_by_parent_id
+					]);
+					exit();
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
+	}
+
+	
+	public function verify_koneksi_pokin_pemda_opd()
+	{
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+					$input = json_decode(stripslashes($_POST['data']), true);
+
+					$keterangan_tolak = '';
+					if(!empty($input['idKoneksiPokin'])){
+						if (!empty($input['verify_koneksi_pokin']) || $input['verify_koneksi_pokin'] == 0) {
+							$status_verify = $input['verify_koneksi_pokin'] == 1 ? 1 : 2;
+
+							if($input['verify_koneksi_pokin'] == 0){
+								if(!empty($input['keterangan_koneksi_tolak'])){
+									$keterangan_tolak = $input['keterangan_koneksi_tolak'];
+								}else{
+									throw new Exception("Ada yang kosong, wajib diisi!", 1);	
+								}
+							}
+						} else {
+							throw new Exception("Verifikasi Gagal!", 1);
+						}
+					}else{
+						throw new Exception("Ada data yang kosong!", 1);
+					}
+
+					$data_verify_koneksi_pokin = $wpdb->get_row(
+						$wpdb->prepare("
+						SELECT *
+						FROM esakip_koneksi_pokin_pemda_opd
+						WHERE id=%d
+							AND active=1
+					", $input['idKoneksiPokin']),
+						ARRAY_A
+					);
+
+					$cek_pohon_kinerja = $wpdb->get_row(
+						$wpdb->prepare("
+						SELECT *
+						FROM esakip_pohon_kinerja_opd
+						WHERE id=%d
+							AND active=1
+					", $input['levelPokinKoneksi']),
+						ARRAY_A
+					);
+
+					if(empty($cek_pohon_kinerja) && $input['verify_koneksi_pokin'] == 1){
+						throw new Exception("Verifikasi Gagal!", 1);		
+					}
+
+					if(!empty($data_verify_koneksi_pokin)){
+						$opsi = array(
+							'status_koneksi' => $status_verify,
+							'updated_at' => current_time('mysql'),
+							'parent_pohon_kinerja_koneksi' => 0,
+							'keterangan_tolak' => $keterangan_tolak
+						);
+						if(!empty($cek_pohon_kinerja) && $input['verify_koneksi_pokin'] == 1){
+							$opsi['parent_pohon_kinerja_koneksi'] = $input['levelPokinKoneksi'];
+						}
+						
+						$verify_koneksi_pokin = $wpdb->update(
+							'esakip_koneksi_pokin_pemda_opd',
+							$opsi,
+							array(
+								'id' => $input['idKoneksiPokin']
+							)
+						);
+
+						if ($verify_koneksi_pokin === false) {
+							error_log("Error Updating Koneksi Pokin Pemda dan Perangkat Daerah: " . $wpdb->last_error);
+						}
+					}else{
+						throw new Exception("Verifikasi gagal!", 1);	
+					}
+
+					echo json_encode([
+						'status' => true,
+						'message' => "Sukses Verifikasi Koneksi Pokin Pemerintah Daerah Dan Pokin Perangkat Daerah!\n"
+					]);
+					exit();
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
+	}
+	
+	function get_parent_koneksi_pokin_pemda_opd($opsi){
+		global $wpdb;
+		$data_ret = array();
+		$table = 'esakip_pohon_kinerja';
+		$table_koneksi_pokin = 'esakip_koneksi_pokin_pemda_opd';
+		$where_skpd = '';
+		$parent_level_1 = 0;
+		if ($opsi['tipe'] == 'opd') {
+			$table = 'esakip_pohon_kinerja_opd';
+		}
+
+		// data koneksi pokin
+		$data_koneksi_pokin = $wpdb->get_row($wpdb->prepare("
+			SELECT 
+				* 
+			FROM $table_koneksi_pokin
+			WHERE id=%d 
+				AND active=1 
+			ORDER BY id
+		", $opsi['id']), ARRAY_A);
+
+		if(!empty($data_koneksi_pokin)){
+			$data_pokin = $wpdb->get_row($wpdb->prepare("
+				SELECT 
+					* 
+				FROM $table
+				WHERE id=%d 
+					AND active=1 
+					AND label_indikator_kinerja IS NULL
+					AND level=%d
+					AND id_jadwal=%d
+				ORDER BY id
+			", $opsi['id_parent'], $opsi['level'], $opsi['periode']), ARRAY_A);
+
+			if(!empty($data_pokin)){
+				if (empty($data_ret[trim($data_pokin['level'])])) {
+					$data_ret[trim($data_pokin['level'])] = [
+						'id' => $data_pokin['id'],
+						'label' => $data_pokin['label'],
+						'level_pokin_parent' => $data_pokin['level'],
+						'data' => []
+					];
+				}
+				if($data_pokin['level'] == 1){
+					$parent_level_1 = $data_pokin['id'];
+				}
+
+				if($data_pokin['parent'] != 0){
+					$opsi['id_parent'] = $data_pokin['parent'];
+					$opsi['level'] = $data_pokin['level'] - 1;
+					$data_ret[trim($data_pokin['level'])]['data'] = $this->get_parent_koneksi_pokin_pemda_opd($opsi);
+				}
+			}
+		}
+		
+		return $data_ret;
+	}
+	
+	public function get_parent_1_koneksi_pokin_pemda_opd($opsi){
+
+		$data_ret = $this->get_parent_koneksi_pokin_pemda_opd($opsi);
+		
+		foreach($data_ret as $v){
+			if(!empty($v['data'])){
+				foreach($v['data'] as $vv){
+					if(!empty($vv['data'])){
+						foreach ($vv['data'] as $key => $vvv) {
+							if(!empty($vvv['data'])){
+								foreach ($vvv['data'] as $key => $vvvv) {
+									if(!empty($vvvv['data'])){
+										foreach ($vvvv['data'] as $key => $vvvvv) {
+											if(!empty($vvvvv['data'])){
+												foreach ($vvvvv['data'] as $key => $vvvvvv) {
+													if(!empty($vvvvvv['data'])){
+														foreach ($vvvvvv['data'] as $key => $vvvvvvv) {
+															# code...
+														}
+													}else{
+														$id = $vvvvvv['id'];
+													}
+												}
+											}else{
+												$id = $vvvvv['id'];
+											}
+										}
+									}else{
+										$id = $vvvv['id'];
+									}
+								}
+							}else{
+								$id = $vvv['id'];
+							}
+						}
+					}else{
+						$id = $vv['id'];
+					}
+				}
+			}else{
+				$id = $v['id'];
+			}
+		}
+		return $id;
+	}
+	
+	public function edit_verify_koneksi_pokin_pemda()
+	{
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+					$_prefix_opd = $_where_opd = $id_skpd = '';
+					if (!empty($_POST['tipe_pokin'])) {
+						if (!empty($_POST['id_skpd'])) {
+							$id_skpd = $_POST['id_skpd'];
+							$_prefix_opd = $_POST['tipe_pokin'] == "opd" ? "_opd" : "";
+							$_where_opd = $_POST['tipe_pokin'] == "opd" ? ' AND id_skpd=' . $id_skpd : '';
+						} else {
+							throw new Exception("Id SKPD tidak ditemukan!", 1);
+						}
+					}
+
+					$data_koneksi_pokin = array();
+					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+					if (!empty($_prefix_opd) && $_prefix_opd == "_opd") {
+						$data_koneksi_pokin = $wpdb->get_row($wpdb->prepare("
+								SELECT 
+									koneksi.parent_pohon_kinerja,
+									koneksi.id_skpd_koneksi,
+									koneksi.parent_pohon_kinerja_koneksi, 
+									koneksi.status_koneksi,
+									pk.label as label_pokin_pemda 
+								FROM esakip_koneksi_pokin_pemda_opd as koneksi 
+								JOIN esakip_pohon_kinerja as pk 
+								ON koneksi.parent_pohon_kinerja = pk.id
+								WHERE koneksi.id=%d 
+									AND koneksi.active=%d
+							", $_POST['id'], 1),  ARRAY_A);
+					}
+
+					if (empty($data_koneksi_pokin)) {
+						throw new Exception("Data tidak ditemukan!", 1);
+					}
+
+					echo json_encode([
+						'status' => true,
+						'data_koneksi_pokin' => $data_koneksi_pokin
+					]);
+					exit();
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
+	}
 }
