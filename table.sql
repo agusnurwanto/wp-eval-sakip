@@ -1386,6 +1386,7 @@ CREATE TABLE `esakip_data_rencana_aksi_pemda` (
   `id_tujuan` int(11) NOT NULL,
   `parent` int(11) DEFAULT 0,
   `label_pokin_1` text DEFAULT null,
+  `id_pokin` int(11) DEFAULT null,
   `id_pokin_1` int(11) DEFAULT null,
   `label_pokin_2` text DEFAULT null,
   `id_pokin_2` int(11) DEFAULT null,

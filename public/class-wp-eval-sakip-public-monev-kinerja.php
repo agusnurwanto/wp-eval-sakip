@@ -2174,9 +2174,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							    foreach ($uraian_renaksi['indikator'] as $i => $ind) {
 							        $label_html = '';
 						            $label_html = '<span class="badge bg-success text-white">'.$label_pokin.'</span><br>'.$uraian_renaksi['detail']['label'];
-							        // if (!$label_pokin_shown) {
-							        //     $label_pokin_shown = true; 
-							        // }
+							        if (!$label_pokin_shown) {
+							            $label_pokin_shown = true; 
+							        }
 
 							        $cek = $wpdb->get_var(
 							        	$wpdb->prepare("
@@ -2657,17 +2657,17 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'created_at' => current_time('mysql'),
 					);
 					if($_POST['level'] == 1){
-						$data['id_pokin_1'] = $_POST['id_pokin_1'];
-						$data['id_pokin_2'] = $_POST['id_pokin_2'];
+						$data['id_pokin'] = $_POST['id_pokin_1'];
+						$data['id_pokin'] = $_POST['id_pokin_2'];
 						$data['label_pokin_1'] = $_POST['label_pokin_1'];
 						$data['label_pokin_2'] = $_POST['label_pokin_2'];
 					}else if($_POST['level'] == 2){
 						$data['parent'] = $_POST['parent'];
-						$data['id_pokin_3'] = $_POST['id_pokin_1'];
+						$data['id_pokin'] = $_POST['id_pokin_1'];
 						$data['label_pokin_3'] = $_POST['label_pokin_1'];
 					}else if($_POST['level'] == 3){
 						$data['parent'] = $_POST['parent'];
-						$data['id_pokin_4'] = $_POST['id_pokin_1'];
+						$data['id_pokin'] = $_POST['id_pokin_1'];
 						$data['label_pokin_4'] = $_POST['label_pokin_1'];
 					}
 					if(!empty($_POST['id'])){
