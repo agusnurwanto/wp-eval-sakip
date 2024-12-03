@@ -139,21 +139,22 @@ $hak_akses_user = ($nip_kepala == $skpd['nipkepala'] || $is_administrator || $th
 
 <!-- Table -->
 <div class="container-md">
-    <div id="cetak" title="Rencana Aksi Perangkat Daerah">
+    <div id="cetak" title="Pengisian IKU <?php echo $skpd['nama_skpd'] ?> - <?php echo $nama_jadwal ?>">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Pengisian IKU <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $nama_jadwal ?></h1>
+            <h1 style="text-align: center; margin: 10px auto; min-width: 450px;">Pengisian IKU <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $nama_jadwal ?></h1> <!--  class="text-center" style="margin:3rem;" -->
             <div id="action" class="action-section hide-excel"></div>
+            <br>
             <div class="wrap-table">
                 <table cellpadding="2" cellspacing="0" class="table_dokumen_iku table table-bordered">
                     <thead style="background: #ffc491;">
                         <tr>
-                            <th class="text-center">No</th>
-                            <th class="text-center">Tujuan/Sasaran</th>
-                            <th class="text-center">Indikator</th>
-                            <th class="text-center">Definisi Operasional/Formulasi</th>
-                            <th class="text-center">Sumber Data</th>
-                            <th class="text-center">Penanggung Jawab</th>
-                            <th class="text-center hide-excel" style="width: 150px;">Aksi</th>
+                            <th class="text-center atas kanan bawah kiri">No</th>
+                            <th class="text-center atas kanan bawah kiri">Tujuan/Sasaran</th>
+                            <th class="text-center atas kanan bawah kiri">Indikator</th>
+                            <th class="text-center atas kanan bawah kiri">Definisi Operasional/Formulasi</th>
+                            <th class="text-center atas kanan bawah kiri">Sumber Data</th>
+                            <th class="text-center atas kanan bawah kiri">Penanggung Jawab</th>
+                            <th class="text-center atas kanan bawah kiri hide-excel" style="width: 150px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -175,7 +176,7 @@ $hak_akses_user = ($nip_kepala == $skpd['nipkepala'] || $is_administrator || $th
 		        </button>
 	      	</div>
 	      	<div class="modal-body">
-                <form>
+                <form name="input_iku">
                     <input type="hidden" id="id_iku" value="">
                     <div class="form-group">
                         <label for="tujuan-sasaran">Tujuan/Sasaran</label>
@@ -210,10 +211,6 @@ $hak_akses_user = ($nip_kepala == $skpd['nipkepala'] || $is_administrator || $th
 
 <script type="text/javascript">
 jQuery(document).ready(function() {
-    run_download_excel_sakip();
-    <?php if($hak_akses_user): ?>
-        jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-iku" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
-    <?php endif; ?>
     let id_jadwal_wpsipd = <?php echo $cek_id_jadwal_wpsipd; ?>;
     if(id_jadwal_wpsipd == 0){
         alert("Jadwal RENSTRA WP-SIPD untuk data Tujuan/Sasaran belum disetting.\nPastikan Jadwal RENSTRA di WP-SIPD tersedia.")
@@ -221,40 +218,52 @@ jQuery(document).ready(function() {
 
     window.id_jadwal_wpsipd = <?php echo $id_jadwal_wpsipd; ?>;
 
-    getTableIKU();
+    getTableIKU().then(function(){
+        run_download_excel_sakip() 
 
-    jQuery("#tambah-iku").on('click', function(){
-        tambahIku();
+        <?php if($hak_akses_user): ?>
+            jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-iku" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
+        <?php endif; ?>  
+
+        jQuery("#tambah-iku").on('click', function(){
+            tambahIku();
+        });
     });
+
 });
 
 function getTableIKU() {
     jQuery('#wrap-loading').show();
-    jQuery.ajax({
-        url: esakip.url,
-        type: 'POST',
-        data: {
-            action: 'get_table_input_iku',
-            api_key: esakip.api_key,
-            id_skpd: <?php echo $id_skpd; ?>,
-            id_jadwal_wpsipd: id_jadwal_wpsipd
-        },
-        dataType: 'json',
-        success: function(response) {
-            jQuery('#wrap-loading').hide();
-            console.log(response);
-            if (response.status === 'success') {
-                jQuery('.table_dokumen_iku tbody').html(response.data);
-            } else {
-                alert(response.message);
+    return new Promise(function(resolve, reject){
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_table_input_iku',
+                api_key: esakip.api_key,
+                id_skpd: <?php echo $id_skpd; ?>,
+                id_jadwal_wpsipd: id_jadwal_wpsipd
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                console.log(response);
+                if (response.status === 'success') {
+                    jQuery('.table_dokumen_iku tbody').html(response.data);
+                    style_css_download_excel_sakip();
+                } else {
+                    alert(response.message);
+                }
+                resolve();
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data IKU!');
+                resolve();
             }
-        },
-        error: function(xhr, status, error) {
-            jQuery('#wrap-loading').hide();
-            console.error(xhr.responseText);
-            alert('Terjadi kesalahan saat memuat data IKU!');
-        }
-    });
+        });
+    })
 }
 
 function tambahIku(){
@@ -263,6 +272,8 @@ function tambahIku(){
     .then(function(){
         return new Promise(function(resolve, reject){
             jQuery('#wrap-loading').hide();
+            document.input_iku.reset();
+            jQuery('#id_iku').val("");
             if(typeof data_sasaran_cascading != 'undefined'){
                 jQuery('#wrap-loading').hide();
                 jQuery("#modal-iku").modal('show');
