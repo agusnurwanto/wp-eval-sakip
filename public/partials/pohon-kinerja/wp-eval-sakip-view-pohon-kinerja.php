@@ -13,6 +13,7 @@ $input = shortcode_atts(array(
 if(!empty($_GET) && !empty($_GET['id_jadwal'])){
 	$input['periode'] = $_GET['id_jadwal'];
 }
+$nama_pemda = get_option(ESAKIP_NAMA_PEMDA);
 
 $id_skpd = false;
 $nama_skpd = '';
@@ -90,6 +91,13 @@ $view_kinerja_asal = $this->functions->generatePage(array(
 	'post_status' => 'private'
 ));
 
+$view_kinerja_pokin_pemda = $this->functions->generatePage(array(
+	'nama_page' => 'View Pohon Kinerja',
+	'content' => '[view_pohon_kinerja]',
+	'show_header' => 1,
+	'post_status' => 'private'
+));
+
 $data_temp= [];
 if(!empty($data_all['data'])){
 
@@ -104,6 +112,21 @@ if(!empty($data_all['data'])){
 		        $data_temp[$keylevel1][0]->f.="<div ".$style1.">IK: ".$indikator['label_indikator_kinerja']."</div>";
 		    }
 	    }
+
+		// data koneksi pokin
+		if(!empty($level_1['koneksi_pokin'])){
+			$data_temp[$keylevel1][0]->f.="<div class='koneksi-pokin-2 tampil_koneksi_pokin'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
+			foreach ($level_1['koneksi_pokin'] as $key_koneksi => $val_koneksi) {
+
+					$label_parent = $val_koneksi['label_parent'];
+					if(!empty($val_koneksi['id_level_1_parent'])){
+						$show_nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". ucfirst($val_koneksi['label_parent']) ."</a>";
+					}
+
+					//  <a href='javascript:void(0)' data-id='". $val_koneksi['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>
+					$data_temp[$keylevel1][0]->f.="<div class='koneksi-pokin tampil_koneksi_pokin'><div>". $label_parent ."</div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
+			}
+		}
 
 	    if(!empty($level_1['data'])){
 
@@ -141,6 +164,21 @@ if(!empty($data_all['data'])){
 								$class_cc_vertikal = "croscutting-lembaga-vertikal";
 							}
 							$data_temp[$keylevel2][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ." <a href='javascript:void(0)' data-id='". $valCross['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
+					}
+				}
+
+				// data koneksi pokin
+				if(!empty($level_2['koneksi_pokin'])){
+					$data_temp[$keylevel2][0]->f.="<div class='koneksi-pokin-2 tampil_koneksi_pokin'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
+					foreach ($level_2['koneksi_pokin'] as $key_koneksi => $val_koneksi) {
+
+							$label_parent = $val_koneksi['label_parent'];
+							if(!empty($val_koneksi['id_level_1_parent'])){
+								$show_nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". ucfirst($val_koneksi['label_parent']) ."</a>";
+							}
+
+							//  <a href='javascript:void(0)' data-id='". $val_koneksi['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>
+							$data_temp[$keylevel2][0]->f.="<div class='koneksi-pokin tampil_koneksi_pokin'><div>". $label_parent ."</div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
 					}
 				}
 
@@ -183,6 +221,21 @@ if(!empty($data_all['data'])){
 							}
 						}
 
+						// data koneksi pokin
+						if(!empty($level_3['koneksi_pokin'])){
+							$data_temp[$keylevel3][0]->f.="<div class='koneksi-pokin-2 tampil_koneksi_pokin'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
+							foreach ($level_3['koneksi_pokin'] as $key_koneksi => $val_koneksi) {
+
+									$label_parent = $val_koneksi['label_parent'];
+									if(!empty($val_koneksi['id_level_1_parent'])){
+										$show_nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". ucfirst($val_koneksi['label_parent']) ."</a>";
+									}
+
+									//  <a href='javascript:void(0)' data-id='". $val_koneksi['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>
+									$data_temp[$keylevel3][0]->f.="<div class='koneksi-pokin tampil_koneksi_pokin'><div>". $label_parent ."</div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
+							}
+						}
+
 			            if(!empty($level_3['data'])){
 
 		            		foreach ($level_3['data'] as $keylevel4 => $level_4) {
@@ -222,6 +275,25 @@ if(!empty($data_all['data'])){
 						            }
 					            }
 
+								// data koneksi pokin
+								if(!empty($level_4['koneksi_pokin'])){
+									$data_temp[$keylevel4][0]->f.="<div class='koneksi-pokin-2 tampil_koneksi_pokin'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
+									foreach ($level_4['koneksi_pokin'] as $key_koneksi => $val_koneksi) {
+
+											$label_parent = $val_koneksi['label_parent'];
+											if(!empty($val_koneksi['id_level_1_parent'])){
+												if($tipe == 'opd'){
+													$show_nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". ucfirst($val_koneksi['label_parent']) ."</a>";
+												}else{
+													$show_nama_skpd = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "</a>";
+												}
+											}
+											
+											// <a href='javascript:void(0)' data-id='". $val_koneksi['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>
+											$data_temp[$keylevel4][0]->f.="<div class='koneksi-pokin tampil_koneksi_pokin'><div>". $label_parent ."</div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
+									}
+								}
+
 					            if(!empty($level_4['data'])){
 
 									foreach ($level_4['data'] as $keylevel5 => $level_5) {
@@ -258,6 +330,21 @@ if(!empty($data_all['data'])){
 													$class_cc_vertikal = "croscutting-lembaga-vertikal";
 												}
 												$data_temp[$keylevel5][0]->f.="<div class='croscutting tampil_croscutting ". $class_cc_opd_lain ." ". $class_cc_vertikal ."'><div>". $label_parent ." <a href='javascript:void(0)' data-id='". $valCross['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
+											}
+										}
+
+										// data koneksi pokin
+										if(!empty($level_5['koneksi_pokin'])){
+											$data_temp[$keylevel5][0]->f.="<div class='koneksi-pokin-2 tampil_koneksi_pokin'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
+											foreach ($level_5['koneksi_pokin'] as $key_koneksi => $val_koneksi) {
+
+													$label_parent = $val_koneksi['label_parent'];
+													if(!empty($val_koneksi['id_level_1_parent'])){
+														$show_nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". ucfirst($val_koneksi['label_parent']) ."</a>";
+													}
+
+													//  <a href='javascript:void(0)' data-id='". $val_koneksi['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>
+													$data_temp[$keylevel5][0]->f.="<div class='koneksi-pokin tampil_koneksi_pokin'><div>". $label_parent ."</div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
 											}
 										}
 		
@@ -461,15 +548,43 @@ if(!empty($data_all['data'])){
 		color: black;
 		vertical-align: text-bottom !important;
 	}
+
+	.koneksi-pokin {
+		color: #0d0909; 
+  		font-size:12px; 
+  		font-weight:600;
+  		font-style:italic; 
+  		padding:10px; 
+  		min-height:70px;
+		background: #FDFFB6;
+	}
+
+	.koneksi-pokin-2 {
+		color: #0d0909; 
+  		font-size:13px; 
+  		font-weight:600; 
+  		padding:10px; 
+		background: #FDFFB6;
+	}
+
+	.tampil_koneksi_pokin {
+		display: none;
+	}
 </style>
 <div class="text-center" id="action-sakip">
 	<button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button><br>
-	<?php if($tipe == 'opd'): ?>
-		<div class="custom-control custom-checkbox mt-4">
-			<input type="checkbox" class="custom-control-input" id="show_croscutting">
-			<label class="custom-control-label" for="show_croscutting">Tampilkan Croscutting</label>
+	<div style="display: block;">
+		<?php if($tipe == 'opd'): ?>
+			<div class="custom-control custom-checkbox custom-control-inline mt-4">
+				<input type="checkbox" class="custom-control-input" id="show_croscutting">
+				<label class="custom-control-label" for="show_croscutting">Tampilkan Croscutting</label>
+			</div>
+		<?php endif; ?>
+		<div class="custom-control custom-checkbox custom-control-inline mt-4">
+			<input type="checkbox" class="custom-control-input" id="show_koneksi_pokin_pemda">
+			<label class="custom-control-label" for="show_koneksi_pokin_pemda">Tampilkan Koneksi Pokin <?php echo $nama_pemda; ?></label>
 		</div>
-	<?php endif; ?>
+	</div>
 	Perkecil (-) <input title="Perbesar/Perkecil Layar" id="test" min="1" max="15" value='10' step="1" onchange="showVal(this.value)" type="range" style="max-width: 400px; margin-top: 40px;" /> (+) Perbesar
 	<br>
 	<textarea id="val-range" disabled>100%</textarea>
@@ -584,6 +699,16 @@ jQuery("#show_croscutting").on('click', function(){
 	}
 });
 <?php endif; ?>
+
+jQuery("#show_koneksi_pokin_pemda").on('click', function(){
+	if(this.checked) {
+		jQuery(".tampil_koneksi_pokin").show();
+		console.log("harusnya muncul");
+	}else{
+		jQuery(".tampil_koneksi_pokin").hide();
+		console.log("harusnya tutup");
+	}
+});
 
 function drawChart() {
    	window.data_all = <?php echo json_encode(array_values($data_temp)); ?>;

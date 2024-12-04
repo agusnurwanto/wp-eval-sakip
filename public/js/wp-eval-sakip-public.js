@@ -30,6 +30,98 @@ function run_download_excel_sakip(type) {
     var download_excel = '<div id="action-sakip" class="hide-print text-white">' + body + "</div>";
     jQuery(".action-section").append(download_excel);
 
+    var style = "";
+
+	style = jQuery(".cetak").attr("style");
+	if (typeof style == "undefined") {
+		style = "";
+	}
+	jQuery(".cetak").attr(
+		"style",
+		style +
+		" font-family:'Open Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; padding:0; margin:0; font-size:13px;"
+	);
+
+	jQuery(".bawah").map(function (i, b) {
+		style = jQuery(b).attr("style");
+		if (typeof style == "undefined") {
+			style = "";
+		}
+		jQuery(b).attr("style", style + " border-bottom:1px solid #000;");
+	});
+
+	jQuery(".kiri").map(function (i, b) {
+		style = jQuery(b).attr("style");
+		if (typeof style == "undefined") {
+			style = "";
+		}
+		jQuery(b).attr("style", style + " border-left:1px solid #000;");
+	});
+
+	jQuery(".kanan").map(function (i, b) {
+		style = jQuery(b).attr("style");
+		if (typeof style == "undefined") {
+			style = "";
+		}
+		jQuery(b).attr("style", style + " border-right:1px solid #000;");
+	});
+
+	jQuery(".atas").map(function (i, b) {
+		style = jQuery(b).attr("style");
+		if (typeof style == "undefined") {
+			style = "";
+		}
+		jQuery(b).attr("style", style + " border-top:1px solid #000;");
+	});
+    
+	jQuery(".text_tengah").map(function (i, b) {
+		style = jQuery(b).attr("style");
+		if (typeof style == "undefined") {
+			style = "";
+		}
+		jQuery(b).attr("style", style + " text-align: center;");
+	});
+
+	jQuery(".text_kiri").map(function (i, b) {
+		style = jQuery(b).attr("style");
+		if (typeof style == "undefined") {
+			style = "";
+		}
+		jQuery(b).attr("style", style + " text-align: left;");
+	});
+
+	jQuery(".text_kanan").map(function (i, b) {
+		style = jQuery(b).attr("style");
+		if (typeof style == "undefined") {
+			style = "";
+		}
+		jQuery(b).attr("style", style + " text-align: right;");
+	});
+
+	jQuery(".text_block").map(function (i, b) {
+		style = jQuery(b).attr("style");
+		if (typeof style == "undefined") {
+			style = "";
+		}
+		jQuery(b).attr("style", style + " font-weight: bold;");
+	});
+
+	jQuery(".text_15").map(function (i, b) {
+		style = jQuery(b).attr("style");
+		if (typeof style == "undefined") {
+			style = "";
+		}
+		jQuery(b).attr("style", style + " font-size: 15px;");
+	});
+
+	jQuery(".text_20").map(function (i, b) {
+		style = jQuery(b).attr("style");
+		if (typeof style == "undefined") {
+			style = "";
+		}
+		jQuery(b).attr("style", style + " font-size: 20px;");
+	});
+
     var td = document.getElementsByTagName("td");
     for (var i = 0; i < td.length; i++) {
         var style = td[i].getAttribute("style") || "";
@@ -252,4 +344,104 @@ function getFormData($form) {
     });
 
     return indexed_array;
+}
+
+function style_css_download_excel_sakip(type) {
+    var style = "";
+
+	style = jQuery(".cetak").attr("style");
+	if (typeof style == "undefined") {
+		style = "";
+	}
+	jQuery(".cetak").attr(
+		"style",
+		style +
+		" font-family:'Open Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; padding:0; margin:0; font-size:13px;"
+	);
+
+	jQuery(".bawah").map(function (i, b) {
+		style = jQuery(b).attr("style");
+		if (typeof style == "undefined") {
+			style = "";
+		}
+		jQuery(b).attr("style", style + " border-bottom:1px solid #000;");
+	});
+
+	jQuery(".kiri").map(function (i, b) {
+		style = jQuery(b).attr("style");
+		if (typeof style == "undefined") {
+			style = "";
+		}
+		jQuery(b).attr("style", style + " border-left:1px solid #000;");
+	});
+
+	jQuery(".kanan").map(function (i, b) {
+		style = jQuery(b).attr("style");
+		if (typeof style == "undefined") {
+			style = "";
+		}
+		jQuery(b).attr("style", style + " border-right:1px solid #000;");
+	});
+
+	jQuery(".atas").map(function (i, b) {
+		style = jQuery(b).attr("style");
+		if (typeof style == "undefined") {
+			style = "";
+		}
+		jQuery(b).attr("style", style + " border-top:1px solid #000;");
+	});
+    
+	jQuery(".text_tengah").map(function (i, b) {
+		style = jQuery(b).attr("style");
+		if (typeof style == "undefined") {
+			style = "";
+		}
+		jQuery(b).attr("style", style + " text-align: center;");
+	});
+
+	jQuery(".text_kiri").map(function (i, b) {
+		style = jQuery(b).attr("style");
+		if (typeof style == "undefined") {
+			style = "";
+		}
+		jQuery(b).attr("style", style + " text-align: left;");
+	});
+
+	jQuery(".text_kanan").map(function (i, b) {
+		style = jQuery(b).attr("style");
+		if (typeof style == "undefined") {
+			style = "";
+		}
+		jQuery(b).attr("style", style + " text-align: right;");
+	});
+
+	jQuery(".text_block").map(function (i, b) {
+		style = jQuery(b).attr("style");
+		if (typeof style == "undefined") {
+			style = "";
+		}
+		jQuery(b).attr("style", style + " font-weight: bold;");
+	});
+
+	jQuery(".text_15").map(function (i, b) {
+		style = jQuery(b).attr("style");
+		if (typeof style == "undefined") {
+			style = "";
+		}
+		jQuery(b).attr("style", style + " font-size: 15px;");
+	});
+
+	jQuery(".text_20").map(function (i, b) {
+		style = jQuery(b).attr("style");
+		if (typeof style == "undefined") {
+			style = "";
+		}
+		jQuery(b).attr("style", style + " font-size: 20px;");
+	});
+
+    var td = document.getElementsByTagName("td");
+    for (var i = 0; i < td.length; i++) {
+        var style = td[i].getAttribute("style") || "";
+        td[i].setAttribute("style", style + "; mso-number-format:\\@;");
+    }
 }
