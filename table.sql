@@ -1232,6 +1232,10 @@ CREATE TABLE `esakip_data_rencana_aksi_opd` (
   `kode_cascading_sub_kegiatan` text DEFAULT null,
   `label_cascading_sub_kegiatan` text DEFAULT null,
   `kode_sbl` varchar(50) DEFAULT NULL,
+  `mandatori_pusat` tinyint(4) DEFAULT null,
+  `inisiatif_kd` tinyint(4) DEFAULT null,
+  `musrembang` tinyint(4) DEFAULT null,
+  `pokir` tinyint(4) DEFAULT null,
   PRIMARY key (id)
 );
 
@@ -1250,6 +1254,16 @@ CREATE TABLE `esakip_data_rencana_aksi_indikator_opd` (
   `realisasi_target_2` text DEFAULT NULL,
   `realisasi_target_3` text DEFAULT NULL,
   `realisasi_target_4` text DEFAULT NULL,
+  `realisasi_tw_1` text DEFAULT NULL,
+  `realisasi_tw_2` text DEFAULT NULL,
+  `realisasi_tw_3` text DEFAULT NULL,
+  `realisasi_tw_4` text DEFAULT NULL,
+  `ket_tw_1` text DEFAULT NULL,
+  `ket_tw_2` text DEFAULT NULL,
+  `ket_tw_3` text DEFAULT NULL,
+  `ket_tw_4` text DEFAULT NULL,
+  `keterangan` text DEFAULT NULL,
+  `realisasi_akhir` text DEFAULT NULL,
   `tahun_anggaran` year(4) DEFAULT NULL,
   `id_skpd` int(11) DEFAULT NULL,
   `active` tinyint(4) NOT NULL,
@@ -1523,6 +1537,24 @@ CREATE TABLE `esakip_data_label_rencana_aksi` (
   `parent_renaksi_pemda` int(11) NOT NULL,
   `parent_indikator_renaksi_pemda` int(11) NOT NULL,
   `tahun_anggaran` year(4) NOT NULL DEFAULT '2024',
+  `id_skpd` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
+);
+
+CREATE TABLE `esakip_data_bulanan_rencana_aksi_opd` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_indikator_renaksi_opd` int(11) NOT NULL, 
+  `bulan` tinyint(2) NOT NULL,
+  `volume` text DEFAULT NULL,
+  `rencana_aksi` text DEFAULT NULL,
+  `satuan` text DEFAULT NULL,
+  `realisasi` double(20, 0) DEFAULT NULL,
+  `capaian` text DEFAULT NULL,
+  `keterangan` text DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
   `id_skpd` int(11) DEFAULT NULL,
   `active` tinyint(4) NOT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
