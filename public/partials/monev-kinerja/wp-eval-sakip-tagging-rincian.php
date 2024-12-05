@@ -125,7 +125,46 @@ $renaksi_parent3 = $wpdb->get_row($wpdb->prepare("
 	WHERE id=%d
 ", $renaksi_parent2['parent']), ARRAY_A);
 
-print_r($renaksi_parent3);
+$renaksi_parent_pemda = $wpdb->get_results($wpdb->prepare("
+	SELECT 
+		i.*,
+		r.label,
+		r.id as id_renaksi,
+		r.parent
+	FROM `esakip_data_label_rencana_aksi` l
+	INNER JOIN esakip_data_rencana_aksi_indikator_pemda i ON l.parent_indikator_renaksi_pemda=i.id
+	INNER JOIN esakip_data_rencana_aksi_pemda r ON l.parent_renaksi_pemda=r.id
+	WHERE l.parent_renaksi_opd=%d
+		AND i.active=1
+		AND i.tahun_anggaran=%d
+", $renaksi_parent1['parent'], $tahun), ARRAY_A);
+
+$renaksi_pemda4 = array(
+	'label' => array(),
+	'pokin' => array(),
+	'nomenklatur' => array()
+);
+$renaksi_pemda3 = array(
+	'label' => array(),
+	'pokin' => array(),
+	'nomenklatur' => array()
+);
+$renaksi_pemda2 = array(
+	'label' => array(),
+	'pokin' => array(),
+	'nomenklatur' => array()
+);
+$renaksi_pemda1 = array(
+	'label' => array(),
+	'pokin' => array(),
+	'nomenklatur' => array()
+);
+foreach ($renaksi_parent_pemda as $val) {
+	$renaksi_pemda4['label'][$val['id_renaksi']] = $val['label'].' ( '.$val['indikator'].' '.$val['target_akhir'].' '.$val['satuan'].' )';
+
+}
+
+// print_r($renaksi_parent_pemda); echo $wpdb->last_query;
 ?>
 <style type="text/css">
     .wrap-table {
@@ -254,7 +293,7 @@ print_r($renaksi_parent3);
 		            <tr>
 		                <td>Rencana Hasil Kerja Pemda Level 4</td>
 		                <td class="text-center">:</td>
-		                <td></td>
+		                <td><?php echo implode('<br>', $renaksi_pemda4['label']); ?></td>
 		            </tr>
 		            <tr>
 		                <td>Arah Kebijakan</td>

@@ -5982,6 +5982,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
 						$show_button = false;
+						$keterangan = '';
 						if (!empty($data_verifikasi)) {
 							if ($data_verifikasi['status_verifikasi'] == 1) {
 								$color_badge_verify = 'success';
@@ -5991,7 +5992,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								$text_badge = 'Ditolak';
 								$show_button = true;
 							}
-							$keterangan = '';
+							
 							if (!empty($data_verifikasi['keterangan_verifikasi'])) {
 								$keterangan = $data_verifikasi['keterangan_verifikasi'];
 							}

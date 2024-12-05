@@ -321,7 +321,8 @@ if(!empty($pohon_kinerja_level_1)){
 												'periode' => $input['periode'],
 												'tipe' => 'opd',
 												'id_parent' => $koneksi_pokin_level_4['id_parent'],
-												'id_skpd' => $id_skpd_view_pokin
+												'id_skpd' => $id_skpd_view_pokin,
+												'keterangan_tolak' => $koneksi_pokin_level_4['keterangan_tolak']
 											)));
 										}
 
@@ -335,6 +336,7 @@ if(!empty($pohon_kinerja_level_1)){
 												'parent_pohon_kinerja' => $koneksi_pokin_level_4['parent_pohon_kinerja'],
 												'status_koneksi' => $koneksi_pokin_level_4['status_koneksi'],
 												'label_parent' => $koneksi_pokin_level_4['label_parent'],
+												'keterangan_tolak' => $koneksi_pokin_level_4['keterangan_tolak'],
 												'nama_skpd' => $nama_perangkat_koneksi,
 												'id_skpd_view_pokin' => $id_skpd_view_pokin,
 												'id_level_1_parent' => $id_level_1_parent
@@ -453,7 +455,9 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 		
 					$detail = "<a href='javascript:void(0)' data-id='". $koneksi_pokin_level_4['id'] ."' class='detail-koneksi-pokin text-primary' onclick='detail_koneksi_pokin(" . $koneksi_pokin_level_4['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>";
 
-					$koneksi_pokin[]= '<div class="koneksi-pokin-isi '. $class_pengusul .' '. $class_koneksi_pokin_vertikal .'"><div>'. ucfirst($koneksi_pokin_level_4['label_parent']) .'</div><div style="margin-top: 10px;font-weight: 500;">'. $show_nama_skpd .'</div></div>';
+					$keterangan_tolak_koneksi = !empty($koneksi_pokin_level_4['keterangan_tolak']) ? "( ket: ". $koneksi_pokin_level_4['keterangan_tolak'] ." )" : '';
+
+					$koneksi_pokin[]= '<div class="koneksi-pokin-isi '. $class_pengusul .' '. $class_koneksi_pokin_vertikal .'"><div>'. ucfirst($koneksi_pokin_level_4['label_parent']) .'</div><div style="margin-top: 10px;font-weight: 500;">'. $show_nama_skpd .'</div>' . $keterangan_tolak_koneksi . '</div>';
 				}
 		
 				$show_koneksi_pokin = '';
@@ -1345,6 +1349,15 @@ jQuery(document).ready(function(){
 			success:function(response){
 				jQuery("#wrap-loading").hide();
 				jQuery("#modal-crud").find('.modal-title').html('Edit Pohon Kinerja');
+				let table_data_koneksi_pokin = '';
+				if(response.data_koneksi_pokin == "" || response.data_koneksi_pokin == undefined){
+					table_data_koneksi_pokin = ``
+					+`<tr>`
+						+`<td colspan="5" class="text-center">Data tidak ditemukan!</td>`
+					+`</tr>`;
+				}else{
+					table_data_koneksi_pokin = response.data_koneksi_pokin;
+				}
 				jQuery("#modal-crud").find('.modal-body').html(``
 					+`<form id="form-pokin">`
 						+`<input type="hidden" name="id" value="${response.data.id}">`
@@ -1368,11 +1381,13 @@ jQuery(document).ready(function(){
 										+`<th class="text-center">No</th>`
 										+`<th class="text-center">Pohon Kinerja Perangkat Daerah</th>`
 										+`<th class="text-center">Status</th>`
+										+`<th class="text-center">Keterangan</th>`
 										+`<th class="text-center" style="width: 150px;">Aksi</th>`
 									+`</tr>`
 								+`</thead>`
-								+`<tbody>${response.data_koneksi_pokin}</tbody>`
+								+`<tbody>${table_data_koneksi_pokin}</tbody>`
 							+`</table>`
+							+`<small class="text-body-secondary">Jika akan membatalkan koneksi pokin, pastikan perangkat daerah terkait membatalkan koneksi pokin terlebih dahulu!</small>`
 						+`</div>`
 					+`</form>`);
 				jQuery("#modal-crud").find(`.modal-footer`).html(``

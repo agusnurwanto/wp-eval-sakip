@@ -295,22 +295,21 @@ class Wp_Eval_Sakip_Admin
 							", ARRAY_A);
 							foreach($tahun as $tahun_item){
 								if(
-									empty($jadwal_periode_item['id_jadwal_rpjmd']) 
-									|| $jadwal_periode_item['tahun_anggaran_menu'] == $tahun_item['tahun_anggaran']
+									!empty($jadwal_periode_item['id_jadwal_rpjmd']) 
+									&& $jadwal_periode_item['tahun_anggaran_menu'] == $tahun_item['tahun_anggaran']
 								){
 									$list_pemda_pengisian_rencana_aksi = $this->functions->generatePage(array(
-										'nama_page' => 'Pengisian Rencana Aksi Pemda Tahun ' . $tahun_item['tahun_anggaran'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+										'nama_page' => 'Input Rencana Hasil Kerja Pemda Tahun ' . $tahun_item['tahun_anggaran'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
 										'content' => '[list_pengisian_rencana_aksi_pemda tahun=' . $tahun_item['tahun_anggaran'] . ' periode=' . $jadwal_periode_item['id'] . ' ]',
 										'show_header' => 1,
 										'no_key' => 1,
 										'post_status' => 'private'
 									));
-									$ket = '';
-									if(empty($jadwal_periode_item['id_jadwal_rpjmd'])){
-										$ket = ' ( Periode belum diset di pengaturan menu )';
-									}
-									$body_pemda .= '<li><a target="_blank" href="' . $list_pemda_pengisian_rencana_aksi['url'] . '" class="btn btn-primary">' .  $list_pemda_pengisian_rencana_aksi['title'] .$ket. '</a></li>';
+									$body_pemda .= '<li><a target="_blank" href="' . $list_pemda_pengisian_rencana_aksi['url'] . '" class="btn btn-primary">' .  $list_pemda_pengisian_rencana_aksi['title'] .'</a></li>';
 								}
+							}
+							if(empty($jadwal_periode_item['id_jadwal_rpjmd'])){
+								$body_pemda .= '<li>'.$jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai.' ( Periode belum diset di pengaturan menu )</li>';
 							}
 						}
 					}
@@ -1170,7 +1169,7 @@ class Wp_Eval_Sakip_Admin
 							</div>';
 						} else if (!empty($_POST['type']) && $_POST['type'] == 'monev_rencana_aksi_opd') {
 							$list_skpd_pengisian_rencana_aksi = $this->functions->generatePage(array(
-								'nama_page' => 'Pengisian Rencana Aksi - ' . $tahun_item['tahun_anggaran'],
+								'nama_page' => 'Input Rencana Hasil Kerja - ' . $tahun_item['tahun_anggaran'],
 								'content' => '[list_pengisian_rencana_aksi tahun=' . $tahun_item['tahun_anggaran'] . ']',
 								'show_header' => 1,
 								'post_status' => 'private'
@@ -1212,7 +1211,7 @@ class Wp_Eval_Sakip_Admin
 								$opsion_jadwal_renstra .= "<option value='". $v_renstra['id'] ."'>". $v_renstra['nama_jadwal_renstra'] ." Periode ". $v_renstra['tahun_anggaran'] ." - ". $tahun_anggaran_selesai ."</option>";
 							}
 							$pengisian_rencana_aksi_setting = $this->functions->generatePage(array(
-								'nama_page' => 'Pengisian Rencana Aksi Setting ',
+								'nama_page' => 'Input Rencana Hasil Kerja Setting ',
 								'content' => '[pengisian_rencana_aksi_setting]',
 								'show_header' => 1,
 								'post_status' => 'private'
@@ -1997,7 +1996,7 @@ class Wp_Eval_Sakip_Admin
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'croscutting_pd')));
 
-		$monev_ren_aksi_menu = Container::make('theme_options', __('MONEV Rencana Aksi'))
+		$monev_ren_aksi_menu = Container::make('theme_options', __('Rencana Hasil Kerja'))
 			->set_page_menu_position(3.5)
 			->set_icon('dashicons-analytics')
 			->add_fields(array(
@@ -2008,9 +2007,10 @@ class Wp_Eval_Sakip_Admin
 		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
 		        		</style>
 		        	')
-			));
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'monev_rencana_aksi_pemda')));
 
-		Container::make('theme_options', __('MONEV Rencana Aksi Pemerintah Daerah'))
+		Container::make('theme_options', __('Rencana Hasil Kerja Pemerintah Daerah'))
 			->set_page_parent($monev_ren_aksi_menu)
 			->add_fields(array(
 				Field::make('html', 'crb_pengisian_monev_pemda_hide_sidebar')
@@ -2023,7 +2023,7 @@ class Wp_Eval_Sakip_Admin
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'monev_rencana_aksi_pemda')));
 
-		Container::make('theme_options', __('MONEV Rencana Aksi Perangkat Daerah'))
+		Container::make('theme_options', __('Rencana Hasil Kerja Perangkat Daerah'))
 			->set_page_parent($monev_ren_aksi_menu)
 			->add_fields(array(
 				Field::make('html', 'crb_pengisian_monev_pd_hide_sidebar')
@@ -2039,7 +2039,7 @@ class Wp_Eval_Sakip_Admin
 		$api_key_wpspd = get_option('_crb_apikey_wpsipd');
 		$url_server_wpspd = get_option('_crb_url_server_sakip');
 			
-		Container::make('theme_options', __('MONEV Rencana Aksi Setting'))
+		Container::make('theme_options', __('Rencana Hasil Kerja Setting'))
 		->set_page_parent($monev_ren_aksi_menu)
 		->add_fields(array(
 			Field::make('html', 'crb_esakip_halaman_terkait')

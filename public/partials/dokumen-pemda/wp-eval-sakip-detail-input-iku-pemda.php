@@ -118,21 +118,22 @@ $cek_id_jadwal = empty($input['id_periode']) ? 0 : 1;
 
 <!-- Table -->
 <div class="container-md">
-    <div id="cetak" title="Rencana Aksi Pemerintah Daerah">
+    <div id="cetak" title="Pengisian IKU Pemerintah Daerah <?php echo $nama_jadwal ?>">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Pengisian IKU <br>Pemerintah Daerah<br><?php echo $nama_jadwal ?></h1>
+            <h1 style="text-align: center; margin: 10px auto; min-width: 450px;">Pengisian IKU <br>Pemerintah Daerah<br><?php echo $nama_jadwal ?></h1>
             <div id="action" class="action-section hide-excel"></div>
+            <br>
             <div class="wrap-table">
                 <table cellpadding="2" cellspacing="0" class="table_dokumen_iku table table-bordered">
                     <thead style="background: #ffc491;">
                         <tr>
-                            <th class="text-center">No</th>
-                            <th class="text-center">Sasaran Strategis</th>
-                            <th class="text-center">Indikator Sasaran</th>
-                            <th class="text-center">Definisi Operasional/Formulasi</th>
-                            <th class="text-center">Sumber Data</th>
-                            <th class="text-center">Penanggung Jawab</th>
-                            <th class="text-center hide-excel" style="width: 150px;">Aksi</th>
+                            <th class="text-center atas kanan bawah kiri">No</th>
+                            <th class="text-center atas kanan bawah kiri">Sasaran Strategis</th>
+                            <th class="text-center atas kanan bawah kiri">Indikator Sasaran</th>
+                            <th class="text-center atas kanan bawah kiri">Definisi Operasional/Formulasi</th>
+                            <th class="text-center atas kanan bawah kiri">Sumber Data</th>
+                            <th class="text-center atas kanan bawah kiri">Penanggung Jawab</th>
+                            <th class="text-center  atas kanan bawah kiri hide-excel" style="width: 150px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -154,7 +155,7 @@ $cek_id_jadwal = empty($input['id_periode']) ? 0 : 1;
 		        </button>
 	      	</div>
 	      	<div class="modal-body">
-                <form>
+                <form name="input_iku">
                     <input type="hidden" id="id_iku" value="">
                     <div class="form-group">
                         <label for="tujuan-sasaran">Sasaran Strategis</label>
@@ -189,9 +190,6 @@ $cek_id_jadwal = empty($input['id_periode']) ? 0 : 1;
 
 <script type="text/javascript">
 jQuery(document).ready(function() {
-    run_download_excel_sakip();
-    jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-iku-pemda" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
-
     let id_jadwal = <?php echo $cek_id_jadwal; ?>;
     if(id_jadwal == 0){
         alert("Jadwal RENSTRA untuk data Sasaran belum disetting.\nPastikan Jadwal RENSTRA tersedia.")
@@ -199,39 +197,48 @@ jQuery(document).ready(function() {
 
     window.id_jadwal = <?php echo $id_jadwal; ?>;
 
-    getTableIKUPemda();
+    getTableIKUPemda().then(function(){
+        run_download_excel_sakip();
+        jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-iku-pemda" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
 
-    jQuery("#tambah-iku-pemda").on('click', function(){
-        tambahIkuPemda();
+        jQuery("#tambah-iku-pemda").on('click', function(){
+            tambahIkuPemda();
+        });
     });
+
 });
 
 function getTableIKUPemda() {
     jQuery('#wrap-loading').show();
-    jQuery.ajax({
-        url: esakip.url,
-        type: 'POST',
-        data: {
-            action: 'get_table_input_iku',
-            api_key: esakip.api_key,
-            id_jadwal: id_jadwal,
-            tipe: 'pemda'
-        },
-        dataType: 'json',
-        success: function(response) {
-            jQuery('#wrap-loading').hide();
-            console.log(response);
-            if (response.status === 'success') {
-                jQuery('.table_dokumen_iku tbody').html(response.data);
-            } else {
-                alert(response.message);
+    return new Promise(function(resolve, reject){
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_table_input_iku',
+                api_key: esakip.api_key,
+                id_jadwal: id_jadwal,
+                tipe: 'pemda'
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                console.log(response);
+                if (response.status === 'success') {
+                    jQuery('.table_dokumen_iku tbody').html(response.data);
+                    style_css_download_excel_sakip();
+                } else {
+                    alert(response.message);
+                }
+                resolve();
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data IKU!');
+                resolve();
             }
-        },
-        error: function(xhr, status, error) {
-            jQuery('#wrap-loading').hide();
-            console.error(xhr.responseText);
-            alert('Terjadi kesalahan saat memuat data IKU!');
-        }
+        });
     });
 }
 
@@ -241,6 +248,8 @@ function tambahIkuPemda(){
     .then(function(){
         return new Promise(function(resolve, reject){
             jQuery('#wrap-loading').hide();
+            document.input_iku.reset();
+            jQuery('#id_iku').val("");
             if(typeof data_sasaran_rpjmd != 'undefined'){
                 jQuery('#wrap-loading').hide();
                 jQuery("#modal-iku").modal('show');

@@ -29,6 +29,15 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/monev-kinerja/wp-eval-sakip-tagging-rincian.php';
 	}
 
+	public function input_rencana_aksi_pemda($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/monev-kinerja/wp-eval-sakip-input-rencana-aksi-pemda.php';
+	}
+
 	public function get_data_renaksi()
 	{
 		global $wpdb;
@@ -1500,12 +1509,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$no++;
 								$html .= '
 								<tr>
-									<td>'.$no.'</td>
-									<td class="text-left tujuan-sasaran">'. $v['label_sasaran'] .'</td>
-									<td class="text-left indikator_sasaran">'. $v['label_indikator'] .'</td>
-									<td class="text-left formulasi">'. $v['formulasi'] .'</td>
-									<td class="text-left sumber_data">'. $v['sumber_data'] .'</td>
-									<td class="text-left penanggung_jawab">'. $v['penanggung_jawab'] .'</td>
+									<td class="atas kanan bawah kiri">'.$no.'</td>
+									<td class="text-left tujuan-sasaran atas kanan bawah kiri">'. $v['label_sasaran'] .'</td>
+									<td class="text-left indikator_sasaran atas kanan bawah kiri">'. $v['label_indikator'] .'</td>
+									<td class="text-left formulasi atas kanan bawah kiri">'. $v['formulasi'] .'</td>
+									<td class="text-left sumber_data atas kanan bawah kiri">'. $v['sumber_data'] .'</td>
+									<td class="text-left penanggung_jawab atas kanan bawah kiri">'. $v['penanggung_jawab'] .'</td>
 								';
 	
 								$btn = '<div class="btn-action-group">';
@@ -1513,7 +1522,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_iku(\'' . $v['id'] . '\'); return false;" href="#" title="Hapus IKU"><span class="dashicons dashicons-trash"></span></button>';
 								$btn .= '</div>';
 	
-								$html .= "<td class='text-center'>" . $btn . "</td>";
+								$html .= "<td class='text-center atas kanan bawah kiri hide-excel'>" . $btn . "</td>";
 								$html .='</tr>';
 							}
 						}
@@ -1575,12 +1584,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$indikator = implode("</br>- ", $indikator);
 								$html .= '
 								<tr>
-									<td>'.$no.'</td>
-									<td class="text-left tujuan-sasaran">'. $v['label_sasaran'] .'</td>
-									<td class="text-left indikator_sasaran">'. $indikator .'</td>
-									<td class="text-left formulasi">'. $v['formulasi'] .'</td>
-									<td class="text-left sumber_data">'. $v['sumber_data'] .'</td>
-									<td class="text-left penanggung_jawab">'. $v['penanggung_jawab'] .'</td>
+									<td class="atas kanan bawah kiri">'.$no.'</td>
+									<td class="text-left tujuan-sasaran atas kanan bawah kiri">'. $v['label_sasaran'] .'</td>
+									<td class="text-left indikator_sasaran atas kanan bawah kiri">'. $indikator .'</td>
+									<td class="text-left formulasi atas kanan bawah kiri">'. $v['formulasi'] .'</td>
+									<td class="text-left sumber_data atas kanan bawah kiri">'. $v['sumber_data'] .'</td>
+									<td class="text-left penanggung_jawab atas kanan bawah kiri">'. $v['penanggung_jawab'] .'</td>
 								';
 	
 								$btn = '<div class="btn-action-group">';
@@ -1594,7 +1603,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$btn = '';
 								}
 	
-								$html .= "<td class='text-center'>" . $btn . "</td>";
+								$html .= "<td class='text-center atas kanan bawah kiri hide-excel'>" . $btn . "</td>";
 								$html .='</tr>';
 							}
 						}
