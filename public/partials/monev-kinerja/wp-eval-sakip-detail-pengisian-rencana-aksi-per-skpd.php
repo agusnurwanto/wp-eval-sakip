@@ -1783,32 +1783,20 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                                             + `<tbody>`;
 
                                             get_bulan.forEach((bulan, bulan_index) => {
-                                                // renaksi += ''
-                                                //     + `<tr>`
-                                                //         + `<td class="text-center">${bulan}</td>`
-                                                //         + `<td class="text-center"><textarea class="form-control" name="rencana_aksi_${b.id}_${bulan_index + 1}" id="rencana_aksi_${b.id}_${bulan_index + 1}">${b.rencana_aksi}</textarea></td>`
-                                                //         + `<td class="text-center"><input type="text" class="form-control" name="volume_${b.id}_${bulan_index + 1}" id="volume_${b.id}_${bulan_index + 1}" value="${b.volume}"></td>`
-                                                //         + `<td class="text-center"><input type="text" class="form-control" name="satuan_bulan_${b.id}_${bulan_index + 1}" id="satuan_bulan_${b.id}_${bulan_index + 1}" value="${b.satuan_bulan}"></td>`
-                                                //         + `<td class="text-center"><input type="number" class="form-control" name="realisasi_${b.id}_${bulan_index + 1}" id="realisasi_${b.id}_${bulan_index + 1}" value="${b.realisasi}"></td>`
-                                                //         + `<td class="text-center" name="capaian_${b.id}_${bulan_index + 1}" id="capaian_${b.id}_${bulan_index + 1}" value="${b.capaian}"></td>`
-                                                //         + `<td class="text-center"><textarea class="form-control" name="keterangan_${b.id}_${bulan_index + 1}" id="keterangan_${b.id}_${bulan_index + 1}">${b.keterangan}</textarea></td>`
-                                                //         + `<td class="text-center">`
-                                                //             + `<a href="javascript:void(0)" data-id="${b.id}" data-bulan="${bulan_index + 1}" class="btn btn-sm btn-success" onclick="simpan_bulanan(${b.id}, ${bulan_index + 1})" title="Simpan"><i class="dashicons dashicons-yes"></i></a>`
-                                                //         + `</td>`
-                                                //     + `</tr>`;
-                                                 renaksi += ''
+                                                renaksi += ''
                                                     + `<tr>`
                                                         + `<td class="text-center">${bulan}</td>`
-                                                        + `<td class="text-center"><textarea class="form-control" name="rencana_aksi_${b.id}_${bulan_index + 1}" id="rencana_aksi_${b.id}_${bulan_index + 1}"></textarea></td>`
-                                                        + `<td class="text-center"><input type="text" class="form-control" name="volume_${b.id}_${bulan_index + 1}" id="volume_${b.id}_${bulan_index + 1}"></td>`
-                                                        + `<td class="text-center"><input type="text" class="form-control" name="satuan_bulan_${b.id}_${bulan_index + 1}" id="satuan_bulan_${b.id}_${bulan_index + 1}"></td>`
-                                                        + `<td class="text-center"><input type="number" class="form-control" name="realisasi_${b.id}_${bulan_index + 1}" id="realisasi_${b.id}_${bulan_index + 1}"></td>`
-                                                        + `<td class="text-center" name="capaian_${b.id}_${bulan_index + 1}" id="capaian_${b.id}_${bulan_index + 1}"></td>`
-                                                        + `<td class="text-center"><textarea class="form-control" name="keterangan_${b.id}_${bulan_index + 1}" id="keterangan_${b.id}_${bulan_index + 1}"></textarea></td>`
+                                                        + `<td class="text-center"><textarea class="form-control" name="rencana_aksi_${b.id}_${bulan_index + 1}" id="rencana_aksi_${b.id}_${bulan_index + 1}">${b.rencana_aksi || ''}</textarea></td>`
+                                                        + `<td class="text-center"><input type="text" class="form-control" name="volume_${b.id}_${bulan_index + 1}" id="volume_${b.id}_${bulan_index + 1}" value="${b.volume || ''}"></td>`
+                                                        + `<td class="text-center"><input type="text" class="form-control" name="satuan_bulan_${b.id}_${bulan_index + 1}" id="satuan_bulan_${b.id}_${bulan_index + 1}" value="${b.satuan_bulan || ''}"></td>`
+                                                        + `<td class="text-center"><input type="number" class="form-control" name="realisasi_${b.id}_${bulan_index + 1}" id="realisasi_${b.id}_${bulan_index + 1}" value="${b.realisasi || ''}"></td>`
+                                                        + `<td class="text-center" name="capaian_${b.id}_${bulan_index + 1}" id="capaian_${b.id}_${bulan_index + 1}" value="${b.capaian || ''}"></td>`
+                                                        + `<td class="text-center"><textarea class="form-control" name="keterangan_${b.id}_${bulan_index + 1}" id="keterangan_${b.id}_${bulan_index + 1}">${b.keterangan || ''}</textarea></td>`
                                                         + `<td class="text-center">`
                                                             + `<a href="javascript:void(0)" data-id="${b.id}" data-bulan="${bulan_index + 1}" class="btn btn-sm btn-success" onclick="simpan_bulanan(${b.id}, ${bulan_index + 1})" title="Simpan"><i class="dashicons dashicons-yes"></i></a>`
                                                         + `</td>`
                                                     + `</tr>`;
+
                                                 if((bulan_index+1) % 3 == 0){
                                                     var triwulan = (bulan_index+1)/3;
                                                     renaksi += ''
