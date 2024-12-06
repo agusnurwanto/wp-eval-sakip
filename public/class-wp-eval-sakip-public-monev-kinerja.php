@@ -106,20 +106,53 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					              AND active=1
 					        ", $val3->id));
 					    }
+					    $data_renaksi[$key]['get_dasar_2'] = $wpdb->get_results($wpdb->prepare("
+						    SELECT *
+						    FROM esakip_data_rencana_aksi_opd
+						    WHERE parent=%d
+						      AND level=2
+						      AND active=1
+						", $val['id']));
+
+						if (!empty($data_renaksi[$key]['get_dasar_2'])) {
+						    foreach ($data_renaksi[$key]['get_dasar_2'] as $key2 => $val2) {
+						        $data_renaksi[$key]['get_dasar_2'][$key2]->get_dasar_to_level_3 = $wpdb->get_results($wpdb->prepare("
+						            SELECT *
+						            FROM esakip_data_rencana_aksi_opd
+						            WHERE parent=%d
+						              AND level=3
+						              AND active=1
+						        ", $val2->id));
+
+						        if (!empty($data_renaksi[$key]['get_dasar_2'][$key2]->get_dasar_to_level_3)) {
+						            foreach ($data_renaksi[$key]['get_dasar_2'][$key2]->get_dasar_to_level_3 as $key3 => $val3) {
+						                $data_renaksi[$key]['get_dasar_2'][$key2]->get_dasar_to_level_3[$key3]->get_dasar_to_level_4 = $wpdb->get_results($wpdb->prepare("
+						                    SELECT *
+						                    FROM esakip_data_rencana_aksi_opd
+						                    WHERE parent=%d
+						                      AND level=4
+						                      AND active=1
+						                ", $val3->id));
+						            }
+						        }
+						    }
+						}
+
 						$data_renaksi[$key]['indikator'] = $wpdb->get_results($wpdb->prepare("
 							SELECT
-								*
-							FROM esakip_data_rencana_aksi_indikator_opd
-							WHERE id_renaksi=%d
-								AND active=1
+								i.*,
+								o.satuan_bulan,
+								o.tahun_anggaran,
+								o.id_skpd
+							FROM esakip_data_rencana_aksi_indikator_opd AS i
+							LEFT JOIN esakip_data_bulanan_rencana_aksi_opd AS o
+								ON i.id = o.id_indikator_renaksi_opd
+								AND i.id_skpd = o.id_skpd
+								AND i.active = o.active
+								AND i.tahun_anggaran = o.tahun_anggaran
+							WHERE i.id_renaksi=%d
+								AND i.active = 1
 						", $val['id']));
-						$data_renaksi[$key]['bulanan'] = $wpdb->get_results($wpdb->prepare("
-							SELECT
-								*
-							FROM esakip_data_bulanan_rencana_aksi_opd
-							WHERE id_indikator_renaksi_opd=%d
-								AND active=1
-						", $data_renaksi[$key]['indikator']['id']));
 					}
 					switch ($_POST['level']) {
 						case '2':
@@ -3159,7 +3192,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	                    'bulan' => $_POST['bulan'],
 	                    'volume' => $_POST['volume'],
 	                    'rencana_aksi' => $_POST['rencana_aksi'],
-	                    'satuan' => $_POST['satuan'],
+	                    'satuan_bulan' => $_POST['satuan_bulan'],
 	                    'realisasi' => $_POST['realisasi'],
 	                    'keterangan' => $_POST['keterangan'],
 	                    'capaian' => $_POST['capaian'],
@@ -3289,7 +3322,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	                    'id_skpd' => $_POST['id_skpd'],
 	                    'tahun_anggaran' => $_POST['tahun_anggaran'],
 	                    'realisasi_akhir' => $_POST['realisasi_akhir'],
-	                    'keterangan' => $_POST['keterangan'],
+	                    'ket_total' => $_POST['ket_total'],
 	                    'active' => 1,
 	                    'created_at' => current_time('mysql'),
 	                );

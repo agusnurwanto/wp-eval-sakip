@@ -951,11 +951,36 @@ function kegiatanUtama(){
                                 +`<th class="text-center" style="width:300px;">Label Pokin</th>`
                                 +`<th class="text-center">Kegiatan Utama</th>`
                                 +`<th class="text-center">Sasaran Cascading</th>`
+                                +`<th class="text-center">Dasar Pelaksanaan</th>`
                                 +`<th class="text-center" style="width:200px;">Aksi</th>`
                             +`</tr>`
                         +`</thead>`
                         +`<tbody>`;
                             res.data.map(function(value, index){
+                                var label_dasar_pelaksanaan = '';
+                                let get_data_dasar_pelaksanaan = []; 
+                                 value.get_dasar_2.forEach(function (dasar_level_2) {
+                                    dasar_level_2.get_dasar_to_level_3.forEach(function (dasar_to_level_3) {
+                                        dasar_to_level_3.get_dasar_to_level_4.forEach(function (dasar_to_level_4) {
+                                            if (dasar_to_level_4.mandatori_pusat == 1 && !get_data_dasar_pelaksanaan.includes('Mandatori Pusat')) {
+                                                get_data_dasar_pelaksanaan.push('Mandatori Pusat');
+                                            }
+                                            if (dasar_to_level_4.inisiatif_kd == 1 && !get_data_dasar_pelaksanaan.includes('Inisiatif Kepala Daerah')) {
+                                                get_data_dasar_pelaksanaan.push('Inisiatif Kepala Daerah');
+                                            }
+                                            if (dasar_to_level_4.musrembang == 1 && !get_data_dasar_pelaksanaan.includes('MUSREMBANG (Musyawarah Rencana Pembangunan)')) {
+                                                get_data_dasar_pelaksanaan.push('MUSREMBANG (Musyawarah Rencana Pembangunan)');
+                                            }
+                                            if (dasar_to_level_4.pokir == 1 && !get_data_dasar_pelaksanaan.includes('POKIR (Pokok Pikiran)')) {
+                                                get_data_dasar_pelaksanaan.push('POKIR (Pokok Pikiran)');
+                                            }
+                                        });
+                                    });
+                                });
+
+                                if (get_data_dasar_pelaksanaan.length > 0) {
+                                    label_dasar_pelaksanaan = `<ul><li>${get_data_dasar_pelaksanaan.join('</li><li>')}</li></ul>`;
+                                }
                                 let label_cascading = value.label_cascading_sasaran != null ? value.label_cascading_sasaran : '-';
                                 kegiatanUtama += ``
                                     +`<tr id="kegiatan_utama_${value.id}">`
@@ -963,6 +988,7 @@ function kegiatanUtama(){
                                         +`<td class="label_pokin">${value.label_pokin_2}</td>`
                                         +`<td class="label_renaksi">${value.label}</td>`
                                         +`<td class="label_cascading">${label_cascading}</td>`
+                                        +`<td class="label_renaksi">${label_dasar_pelaksanaan}</td>`
                                         +`<td class="text-center">`
                                             +`<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, 1)" title="Tambah Indikator"><i class="dashicons dashicons-plus"></i></a> `
                                             +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, 2, ${value.id_pokin_2}, '${value.kode_cascading_sasaran}')" title="Lihat Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
@@ -974,7 +1000,7 @@ function kegiatanUtama(){
                                 let indikator = value.indikator;
                                 if(indikator.length > 0){
                                     kegiatanUtama += ``
-                                    +'<td colspan="5" style="padding: 0;">'
+                                    +'<td colspan="6" style="padding: 0;">'
                                         +`<table class="table" id="indikatorKegiatanUtama" style="margin: .5rem 0 2rem;">`
                                             +`<thead>`
                                                 +`<tr class="table-secondary">`
@@ -1091,135 +1117,126 @@ function tambah_indikator_rencana_aksi(id, tipe){
     let input_pagu = '';
     if(tipe == 1){
         title = 'Indikator Kegiatan Utama';
-        input_pagu = ''
-            +`<div class="form-group row">`
-                +'<div class="col-md-2">'
-                    +`<label for="rencana_pagu">Rencana Pagu</label>`
-                +'</div>'
-                +'<div class="col-md-4">'
-                    + `<div class="input-group">`
-                        + `<input type="number" class="form-control" id="akumulasi_rencana_pagu" max="100" />`
-                        + `<span class="input-group-text">%</span>`
-                    + `</div>`
-                +'</div>'
-                +'<div class="col-md-2">'
-                    +`<label for="total_rincian">Total Rincian</label>`
-                +'</div>'
-                +'<div class="col-md-4">'
-                    + `<div class="input-group">`
-                        + `<input type="number" class="form-control" id="total_rincian" max="100" />`
-                        + `<span class="input-group-text">%</span>`
-                    + `</div>`
-                +'</div>'
-            +`</div>`
-            +`<div class="form-group row">`
-                +'<div class="col-md-2">'
-                    +`<label for="akumulasi_realisasi">Realisasi</label>`
-                +'</div>'
-                +'<div class="col-md-4">'
-                    + `<div class="input-group">`
-                        + `<input type="number" class="form-control" id="akumulasi_realisasi" max="100" />`
-                        + `<span class="input-group-text">%</span>`
-                    + `</div>`
-                +'</div>'
-                +'<div class="col-md-2">'
-                    +`<label for="akumulasi_capaian">Capaian</label>`
-                +'</div>'
-                +'<div class="col-md-4">'
-                    + `<div class="input-group">`
-                        + `<input type="number" class="form-control" id="akumulasi_capaian" max="100" />`
-                        + `<span class="input-group-text">%</span>`
-                    + `</div>`
-                +'</div>'
-            +`</div>`
+        // input_pagu = ''
+        //     +`<div class="form-group row">`
+        //         +'<div class="col-md-2">'
+        //             +`<label for="rencana_pagu">Rencana Pagu</label>`
+        //         +'</div>'
+        //         +'<div class="col-md-4">'
+        //             + `<div class="input-group">`
+        //                 + `<input type="number" class="form-control" id="akumulasi_rencana_pagu" max="100" />`
+        //                 + `<span class="input-group-text">%</span>`
+        //             + `</div>`
+        //         +'</div>'
+        //         +'<div class="col-md-2">'
+        //             +`<label for="total_rincian">Total Rincian</label>`
+        //         +'</div>'
+        //         +'<div class="col-md-4">'
+        //             + `<div class="input-group">`
+        //                 + `<input type="number" class="form-control" id="total_rincian" max="100" />`
+        //                 + `<span class="input-group-text">%</span>`
+        //             + `</div>`
+        //         +'</div>'
+        //     +`</div>`
+        //     +`<div class="form-group row">`
+        //         +'<div class="col-md-2">'
+        //             +`<label for="akumulasi_realisasi">Realisasi</label>`
+        //         +'</div>'
+        //         +'<div class="col-md-4">'
+        //             + `<div class="input-group">`
+        //                 + `<input type="number" class="form-control" id="akumulasi_realisasi" max="100" />`
+        //                 + `<span class="input-group-text">%</span>`
+        //             + `</div>`
+        //         +'</div>'
+        //         +'<div class="col-md-2">'
+        //             +`<label for="akumulasi_capaian">Capaian</label>`
+        //         +'</div>'
+        //         +'<div class="col-md-4">'
+        //             + `<div class="input-group">`
+        //                 + `<input type="number" class="form-control" id="akumulasi_capaian" max="100" />`
+        //                 + `<span class="input-group-text">%</span>`
+        //             + `</div>`
+        //         +'</div>'
+        //     +`</div>`
     }else if(tipe == 2){
         title = 'Indikator Rencana Aksi';
-         input_pagu = ''
-            +`<div class="form-group row">`
-                +'<div class="col-md-2">'
-                    +`<label for="rencana_pagu">Rencana Pagu</label>`
-                +'</div>'
-                +'<div class="col-md-4">'
-                    + `<div class="input-group">`
-                        + `<input type="number" class="form-control" id="akumulasi_rencana_pagu" max="100" />`
-                        + `<span class="input-group-text">%</span>`
-                    + `</div>`
-                +'</div>'
-                +'<div class="col-md-2">'
-                    +`<label for="total_rincian">Total Rincian</label>`
-                +'</div>'
-                +'<div class="col-md-4">'
-                    + `<div class="input-group">`
-                        + `<input type="number" class="form-control" id="total_rincian" max="100" />`
-                        + `<span class="input-group-text">%</span>`
-                    + `</div>`
-                +'</div>'
-            +`</div>`
-            +`<div class="form-group row">`
-                +'<div class="col-md-2">'
-                    +`<label for="akumulasi_realisasi">Realisasi</label>`
-                +'</div>'
-                +'<div class="col-md-4">'
-                    + `<div class="input-group">`
-                        + `<input type="number" class="form-control" id="akumulasi_realisasi" max="100" />`
-                        + `<span class="input-group-text">%</span>`
-                    + `</div>`
-                +'</div>'
-                +'<div class="col-md-2">'
-                    +`<label for="akumulasi_capaian">Capaian</label>`
-                +'</div>'
-                +'<div class="col-md-4">'
-                    + `<div class="input-group">`
-                        + `<input type="number" class="form-control" id="akumulasi_capaian" max="100" />`
-                        + `<span class="input-group-text">%</span>`
-                    + `</div>`
-                +'</div>'
-            +`</div>`
+         // input_pagu = ''
+         //    +`<div class="form-group row">`
+         //        +'<div class="col-md-2">'
+         //            +`<label for="rencana_pagu">Rencana Pagu</label>`
+         //        +'</div>'
+         //        +'<div class="col-md-4">'
+         //            + `<div class="input-group">`
+         //                + `<input type="number" class="form-control" id="akumulasi_rencana_pagu" max="100" />`
+         //                + `<span class="input-group-text">%</span>`
+         //            + `</div>`
+         //        +'</div>'
+         //        +'<div class="col-md-2">'
+         //            +`<label for="total_rincian">Total Rincian</label>`
+         //        +'</div>'
+         //        +'<div class="col-md-4">'
+         //            + `<div class="input-group">`
+         //                + `<input type="number" class="form-control" id="total_rincian" max="100" />`
+         //                + `<span class="input-group-text">%</span>`
+         //            + `</div>`
+         //        +'</div>'
+         //    +`</div>`
+         //    +`<div class="form-group row">`
+         //        +'<div class="col-md-2">'
+         //            +`<label for="akumulasi_realisasi">Realisasi</label>`
+         //        +'</div>'
+         //        +'<div class="col-md-4">'
+         //            + `<div class="input-group">`
+         //                + `<input type="number" class="form-control" id="akumulasi_realisasi" max="100" />`
+         //                + `<span class="input-group-text">%</span>`
+         //            + `</div>`
+         //        +'</div>'
+         //        +'<div class="col-md-2">'
+         //            +`<label for="akumulasi_capaian">Capaian</label>`
+         //        +'</div>'
+         //        +'<div class="col-md-4">'
+         //            + `<div class="input-group">`
+         //                + `<input type="number" class="form-control" id="akumulasi_capaian" max="100" />`
+         //                + `<span class="input-group-text">%</span>`
+         //            + `</div>`
+         //        +'</div>'
+         //    +`</div>`
     }else if(tipe == 3){
-        title = 'Uraian Kegiatan Rencana Aksi';
+        title = 'Indikator Uraian Kegiatan Rencana Aksi';
          input_pagu = ''
             +`<div class="form-group row">`
                 +'<div class="col-md-2">'
-                    +`<label for="rencana_pagu">Rencana Pagu</label>`
+                    +`<label for="rencana_pagu">Rencana Pagu Teknis Kegiatan</label>`
                 +'</div>'
-                +'<div class="col-md-4">'
+                +'<div class="col-md-10">'
                     + `<div class="input-group">`
-                        + `<input type="number" class="form-control" id="akumulasi_rencana_pagu" max="100" />`
-                        + `<span class="input-group-text">%</span>`
+                        + `<input type="number" disabled class="form-control" id="rencana_pagu_tk" />`
                     + `</div>`
                 +'</div>'
+            +'</div>'
+            +`<div class="form-group row">`
                 +'<div class="col-md-2">'
                     +`<label for="total_rincian">Total Rincian</label>`
                 +'</div>'
-                +'<div class="col-md-4">'
+                +'<div class="col-md-10">'
                     + `<div class="input-group">`
                         + `<input type="number" class="form-control" id="total_rincian" max="100" />`
                         + `<span class="input-group-text">%</span>`
                     + `</div>`
                 +'</div>'
-            +`</div>`
+            +'</div>'
             +`<div class="form-group row">`
                 +'<div class="col-md-2">'
-                    +`<label for="akumulasi_realisasi">Realisasi</label>`
+                    +`<label for="rencana_pagu">Rencana Pagu Uraian Kegiatan</label>`
                 +'</div>'
-                +'<div class="col-md-4">'
+                +'<div class="col-md-10">'
                     + `<div class="input-group">`
-                        + `<input type="number" class="form-control" id="akumulasi_realisasi" max="100" />`
-                        + `<span class="input-group-text">%</span>`
-                    + `</div>`
-                +'</div>'
-                +'<div class="col-md-2">'
-                    +`<label for="akumulasi_capaian">Capaian</label>`
-                +'</div>'
-                +'<div class="col-md-4">'
-                    + `<div class="input-group">`
-                        + `<input type="number" class="form-control" id="akumulasi_capaian" max="100" />`
-                        + `<span class="input-group-text">%</span>`
+                        + `<input type="number" disabled class="form-control" id="rencana_pagu_tk" />`
                     + `</div>`
                 +'</div>'
             +`</div>`
     }else if(tipe == 4){
-        title = 'Uraian Teknis Kegiatan';
+        title = 'Indikator Uraian Teknis Kegiatan';
         input_pagu = ''
             +`<div class="form-group row">`
                 +'<div class="col-md-2">'
@@ -1592,6 +1609,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                 var id_pokin = 0;
                                 var tombol_detail = '';
                                 var id_parent_cascading = 0;
+                                var total_rencana_pagu = 0;
                                 var label_cascading = '';
                                 var data_tagging_rincian = '';
                                 var label_dasar_pelaksanaan = '';
@@ -1713,11 +1731,12 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                     indikator.map(function(b, i) {
                                         let rencana_pagu = b.rencana_pagu != null ? b.rencana_pagu : 0;
                                         let realisasi_pagu = b.realisasi_pagu != null ? b.realisasi_pagu : 0;
+                                        total_rencana_pagu = parseInt(rencana_pagu);
                                         let val_pagu = '';
                                         let html_akun = '';
                                         if (tipe == 4) {
                                             val_pagu = ''
-                                                + `<td class="text-center">${rencana_pagu}</td>`;
+                                                + `<td class="text-right">${rencana_pagu}</td>`;
                                             html_akun = `<a href="javascript:void(0)" class="btn btn-sm btn-info" onclick="tambah_rincian_belanja_rencana_aksi(${b.id},${value.id},'${value.kode_sbl}')" title="Tambah Rincian Belanja"><i class="dashicons dashicons-plus"></i></a> `;
                                         }
 
@@ -1742,7 +1761,6 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                             "Juli", "Agustus", "September", "Oktober", "November", "Desember"
                                         ];
 
-                                        if (tipe === 4) {
                                             let bulanan = b.bulanan || [];
 
                                             renaksi += ''
@@ -1756,7 +1774,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                                                     + `<th class="text-center">Rencana Aksi</th>`
                                                                     + `<th class="text-center" style="width:100px;">Target</th>`
                                                                     + `<th class="text-center" style="width:100px;">Satuan</th>`
-                                                                    + `<th class="text-center" style="width:100px;">Realisasi</th>`
+                                                                    + `<th class="text-center" style="width:150px;">Realisasi</th>`
                                                                     + `<th class="text-center" style="width:60px">Capaian</th>`
                                                                     + `<th class="text-center">Keterangan</th>`
                                                                     + `<th class="text-center" style="width:60px">Aksi</th>`
@@ -1768,12 +1786,12 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                                 renaksi += ''
                                                     + `<tr>`
                                                         + `<td class="text-center">${bulan}</td>`
-                                                        + `<td class="text-center"><textarea class="form-control" name="rencana_aksi_${b.id}_${bulan_index + 1}" id="rencana_aksi_${b.id}_${bulan_index + 1}" value="${b.rencana_aksi}"></textarea></td>`
-                                                        + `<td class="text-center"><input type="text" class="form-control" name="volume_${b.id}_${bulan_index + 1}" id="volume_${b.id}_${bulan_index + 1}"></td>`
-                                                        + `<td class="text-center"><input type="text" class="form-control" name="satuan_${b.id}_${bulan_index + 1}" id="satuan_${b.id}_${bulan_index + 1}"></td>`
-                                                        + `<td class="text-center"><input type="number" class="form-control" name="realisasi_${b.id}_${bulan_index + 1}" id="realisasi_${b.id}_${bulan_index + 1}"></td>`
-                                                        + `<td class="text-center" name="capaian_${b.id}_${bulan_index + 1}" id="capaian_${b.id}_${bulan_index + 1}"></td>`
-                                                        + `<td class="text-center"><textarea class="form-control" name="keterangan_${b.id}_${bulan_index + 1}" id="keterangan_${b.id}_${bulan_index + 1}"></textarea></td>`
+                                                        + `<td class="text-center"><textarea class="form-control" name="rencana_aksi_${b.id}_${bulan_index + 1}" id="rencana_aksi_${b.id}_${bulan_index + 1}">${b.rencana_aksi}</textarea></td>`
+                                                        + `<td class="text-center"><input type="text" class="form-control" name="volume_${b.id}_${bulan_index + 1}" id="volume_${b.id}_${bulan_index + 1}" value="${b.volume}"></td>`
+                                                        + `<td class="text-center"><input type="text" class="form-control" name="satuan_bulan_${b.id}_${bulan_index + 1}" id="satuan_bulan_${b.id}_${bulan_index + 1}" value="${b.satuan_bulan}"></td>`
+                                                        + `<td class="text-center"><input type="number" class="form-control" name="realisasi_${b.id}_${bulan_index + 1}" id="realisasi_${b.id}_${bulan_index + 1}" value="${b.realisasi}"></td>`
+                                                        + `<td class="text-center" name="capaian_${b.id}_${bulan_index + 1}" id="capaian_${b.id}_${bulan_index + 1}" value="${b.capaian}"></td>`
+                                                        + `<td class="text-center"><textarea class="form-control" name="keterangan_${b.id}_${bulan_index + 1}" id="keterangan_${b.id}_${bulan_index + 1}">${b.keterangan}</textarea></td>`
                                                         + `<td class="text-center">`
                                                             + `<a href="javascript:void(0)" data-id="${b.id}" data-bulan="${bulan_index + 1}" class="btn btn-sm btn-success" onclick="simpan_bulanan(${b.id}, ${bulan_index + 1})" title="Simpan"><i class="dashicons dashicons-yes"></i></a>`
                                                         + `</td>`
@@ -1810,7 +1828,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                                                 + `<td class="text-center">${b.satuan}</td>`
                                                                 + `<td class="text-center"><input type="number" class="form-control" name="realisasi_akhir_${b.id}" id="realisasi_akhir_${b.id}" value="${b['realisasi_akhir'] || ''}"></td>`
                                                                 + `<td class="text-center"></td>`
-                                                                + `<td class="text-center"><textarea class="form-control" name="keterangan_${b.id}" id="keterangan_${b.id}" value="${b['keterangan'] || ''}"></textarea></td>`
+                                                                + `<td class="text-center"><textarea class="form-control" name="ket_total_${b.id}" id="ket_total_${b.id}">${b['ket_total'] || ''}</textarea></td>`
                                                                 + `<td class="text-center">`
                                                                 + `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-success" onclick="simpan_total(${b.id})" title="Simpan Total"><i class="dashicons dashicons-yes"></i></a>`
                                                                 + `</td>`
@@ -1819,7 +1837,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                                     + `</table>`
                                                 + `</td>`
                                             + `</tr>`;
-                                        }
+                                        
 
                                     });
 
@@ -2569,7 +2587,7 @@ function set_jenis_tagging(jenis_tagging){
 function simpan_bulanan(id, bulan) {
     var volume = jQuery(`input[name="volume_${id}_${bulan}"]`).val();
     var rencana_aksi = jQuery(`textarea[name="rencana_aksi_${id}_${bulan}"]`).val();
-    var satuan = jQuery(`input[name="satuan_${id}_${bulan}"]`).val();
+    var satuan_bulan = jQuery(`input[name="satuan_bulan_${id}_${bulan}"]`).val();
     var realisasi = jQuery(`input[name="realisasi_${id}_${bulan}"]`).val();
     var capaian = jQuery(`input[name="capaian_${id}_${bulan}"]`).val();
     var keterangan = jQuery(`textarea[name="keterangan_${id}_${bulan}"]`).val();
@@ -2585,7 +2603,7 @@ function simpan_bulanan(id, bulan) {
             bulan: bulan,
             volume: volume,
             rencana_aksi: rencana_aksi,
-            satuan: satuan,
+            satuan_bulan: satuan_bulan,
             realisasi: realisasi,
             capaian: capaian,
             keterangan: keterangan,
@@ -2625,7 +2643,7 @@ function simpan_triwulan(id, triwulan) {
 }
 function simpan_total(id) {
     var realisasi_akhir = jQuery(`input[name="realisasi_akhir_${id}"]`).val();
-    var keterangan = jQuery(`textarea[name="keterangan_${id}"]`).val();
+    var ket_total = jQuery(`textarea[name="ket_total_${id}"]`).val();
 
     // jQuery('#wrap-loading').show();
     jQuery.ajax({
@@ -2636,7 +2654,7 @@ function simpan_total(id) {
             api_key: esakip.api_key,
             id: id,
             realisasi_akhir: realisasi_akhir,
-            keterangan: keterangan,
+            ket_total: ket_total,
             tahun_anggaran: <?php echo $input['tahun']; ?>,
             id_skpd: <?php echo $id_skpd; ?>
         },
