@@ -1609,11 +1609,11 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                 var id_pokin = 0;
                                 var tombol_detail = '';
                                 var id_parent_cascading = 0;
-                                var total_rencana_pagu = 0;
                                 var label_cascading = '';
                                 var data_tagging_rincian = '';
                                 var label_dasar_pelaksanaan = '';
                                 let get_data_dasar_pelaksanaan = []; 
+                                let get_data_pagu = 0; 
 
                                 if(tipe == 1){
                                     label_pokin = value['label_pokin_2'];
@@ -1756,10 +1756,10 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                                 + `</td>`
                                             + `</tr>`;
 
-                                        const get_bulan = [
-                                            "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-                                            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-                                        ];
+                                            const get_bulan = [
+                                                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                                                "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                                            ];
 
                                             let bulanan = b.bulanan || [];
 
@@ -1783,15 +1783,20 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                                             + `<tbody>`;
 
                                             get_bulan.forEach((bulan, bulan_index) => {
+                                                // b.bulanan.forEach((bulanan) => {
+                                                // const bulan_index = bulanan.bulan - 1;
+                                                // const bulan_name = get_bulan[bulan_index];
+                                               
+                                               let get_data_bulanan = b.bulanan.find(bulanan => bulanan.bulan == (bulan_index + 1)) || {};  
                                                 renaksi += ''
                                                     + `<tr>`
                                                         + `<td class="text-center">${bulan}</td>`
-                                                        + `<td class="text-center"><textarea class="form-control" name="rencana_aksi_${b.id}_${bulan_index + 1}" id="rencana_aksi_${b.id}_${bulan_index + 1}">${b.rencana_aksi || ''}</textarea></td>`
-                                                        + `<td class="text-center"><input type="text" class="form-control" name="volume_${b.id}_${bulan_index + 1}" id="volume_${b.id}_${bulan_index + 1}" value="${b.volume || ''}"></td>`
-                                                        + `<td class="text-center"><input type="text" class="form-control" name="satuan_bulan_${b.id}_${bulan_index + 1}" id="satuan_bulan_${b.id}_${bulan_index + 1}" value="${b.satuan_bulan || ''}"></td>`
-                                                        + `<td class="text-center"><input type="number" class="form-control" name="realisasi_${b.id}_${bulan_index + 1}" id="realisasi_${b.id}_${bulan_index + 1}" value="${b.realisasi || ''}"></td>`
-                                                        + `<td class="text-center" name="capaian_${b.id}_${bulan_index + 1}" id="capaian_${b.id}_${bulan_index + 1}" value="${b.capaian || ''}"></td>`
-                                                        + `<td class="text-center"><textarea class="form-control" name="keterangan_${b.id}_${bulan_index + 1}" id="keterangan_${b.id}_${bulan_index + 1}">${b.keterangan || ''}</textarea></td>`
+                                                        + `<td class="text-center"><textarea class="form-control" name="rencana_aksi_${b.id}_${bulan_index + 1}" id="rencana_aksi_${b.id}_${bulan_index + 1}">${get_data_bulanan.rencana_aksi || ''}</textarea></td>`
+                                                        + `<td class="text-center"><input type="text" class="form-control" name="volume_${b.id}_${bulan_index + 1}" id="volume_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.volume || ''}"></td>`
+                                                        + `<td class="text-center"><input type="text" class="form-control" name="satuan_bulan_${b.id}_${bulan_index + 1}" id="satuan_bulan_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.satuan || ''}"></td>`
+                                                        + `<td class="text-center"><input type="number" class="form-control" name="realisasi_${b.id}_${bulan_index + 1}" id="realisasi_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.realisasi || ''}"></td>`
+                                                        + `<td class="text-center" name="capaian_${b.id}_${bulan_index + 1}" id="capaian_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.capaian || ''}"></td>`
+                                                        + `<td class="text-center"><textarea class="form-control" name="keterangan_${b.id}_${bulan_index + 1}" id="keterangan_${b.id}_${bulan_index + 1}">${get_data_bulanan.keterangan || ''}</textarea></td>`
                                                         + `<td class="text-center">`
                                                             + `<a href="javascript:void(0)" data-id="${b.id}" data-bulan="${bulan_index + 1}" class="btn btn-sm btn-success" onclick="simpan_bulanan(${b.id}, ${bulan_index + 1})" title="Simpan"><i class="dashicons dashicons-yes"></i></a>`
                                                         + `</td>`

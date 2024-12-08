@@ -88,6 +88,17 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					          AND level=4
 					          AND active=1
 					    ", $val['id']));
+					    if (!empty($data_renaksi[$key]['get_data_dasar_4'])) {
+						    foreach ($data_renaksi[$key]['get_data_dasar_4'] as $get_pagu_key => $get_pagu_indikator) {
+						        $data_renaksi[$key]['get_data_dasar_4'][$get_pagu_key]->get_data_pagu = $wpdb->get_results($wpdb->prepare("
+						            SELECT
+						                SUM(rencana_pagu)
+						            FROM esakip_data_rencana_aksi_indikator_opd 
+						            WHERE id_renaksi=%d
+						                AND active = 1
+						        ", $get_pagu_indikator->id));
+						    }
+						}
 					    $data_renaksi[$key]['get_dasar_level_3'] = $wpdb->get_results($wpdb->prepare("
 					        SELECT
 					            *
@@ -107,7 +118,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					        ", $val3->id));
 					    }
 					    $data_renaksi[$key]['get_dasar_2'] = $wpdb->get_results($wpdb->prepare("
-						    SELECT *
+						    SELECT 
+						    	*
 						    FROM esakip_data_rencana_aksi_opd
 						    WHERE parent=%d
 						      AND level=2
@@ -117,7 +129,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						if (!empty($data_renaksi[$key]['get_dasar_2'])) {
 						    foreach ($data_renaksi[$key]['get_dasar_2'] as $key2 => $val2) {
 						        $data_renaksi[$key]['get_dasar_2'][$key2]->get_dasar_to_level_3 = $wpdb->get_results($wpdb->prepare("
-						            SELECT *
+						            SELECT 
+						            	*
 						            FROM esakip_data_rencana_aksi_opd
 						            WHERE parent=%d
 						              AND level=3
@@ -127,7 +140,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						        if (!empty($data_renaksi[$key]['get_dasar_2'][$key2]->get_dasar_to_level_3)) {
 						            foreach ($data_renaksi[$key]['get_dasar_2'][$key2]->get_dasar_to_level_3 as $key3 => $val3) {
 						                $data_renaksi[$key]['get_dasar_2'][$key2]->get_dasar_to_level_3[$key3]->get_dasar_to_level_4 = $wpdb->get_results($wpdb->prepare("
-						                    SELECT *
+						                    SELECT 
+						                    	*
 						                    FROM esakip_data_rencana_aksi_opd
 						                    WHERE parent=%d
 						                      AND level=4
@@ -137,22 +151,26 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						        }
 						    }
 						}
-
 						$data_renaksi[$key]['indikator'] = $wpdb->get_results($wpdb->prepare("
-							SELECT
-								i.*,
-								o.satuan_bulan,
-								o.tahun_anggaran,
-								o.id_skpd
-							FROM esakip_data_rencana_aksi_indikator_opd AS i
-							LEFT JOIN esakip_data_bulanan_rencana_aksi_opd AS o
-								ON i.id = o.id_indikator_renaksi_opd
-								AND i.id_skpd = o.id_skpd
-								AND i.active = o.active
-								AND i.tahun_anggaran = o.tahun_anggaran
-							WHERE i.id_renaksi=%d
-								AND i.active = 1
+						    SELECT
+						        *
+						    FROM esakip_data_rencana_aksi_indikator_opd 
+						    WHERE id_renaksi=%d
+						        AND active = 1
 						", $val['id']));
+
+						if (!empty($data_renaksi[$key]['indikator'])) {
+						    foreach ($data_renaksi[$key]['indikator'] as $indikator_key => $indikator) {
+						        $data_renaksi[$key]['indikator'][$indikator_key]->bulanan = $wpdb->get_results($wpdb->prepare("
+						            SELECT
+						                *
+						            FROM esakip_data_bulanan_rencana_aksi_opd 
+						            WHERE id_indikator_renaksi_opd=%d
+						                AND active = 1
+						            ORDER BY bulan ASC
+						        ", $indikator->id));
+						    }
+						}
 					}
 					switch ($_POST['level']) {
 						case '2':
@@ -3206,10 +3224,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	                    SELECT id 
 	                    FROM esakip_data_bulanan_rencana_aksi_opd
 	                    WHERE active = 1
+	                        AND id_indikator_renaksi_opd = %d
 	                        AND tahun_anggaran = %d
 	                        AND id_skpd = %d
 	                        AND bulan = %d
-	                ", $_POST['tahun_anggaran'], $_POST['id_skpd'], $_POST['bulan']));
+	                ", $_POST['id_indikator_renaksi_opd'], $_POST['tahun_anggaran'], $_POST['id_skpd'], $_POST['bulan']));
 
 	                if (empty($cek_id)) {
 	                    $wpdb->insert('esakip_data_bulanan_rencana_aksi_opd', $data);
