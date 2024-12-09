@@ -507,7 +507,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_verify_croscutting',  $plugin_public, 'verify_croscutting');
 		$this->loader->add_action('wp_ajax_edit_verify_croscutting',  $plugin_public, 'edit_verify_croscutting');
 		$this->loader->add_action('wp_ajax_detail_croscutting_by_id',  $plugin_public, 'detail_croscutting_by_id');
-		
+
 		$this->loader->add_action('wp_ajax_get_data_koneksi_pokin',  $plugin_public, 'get_data_koneksi_pokin');
 		$this->loader->add_action('wp_ajax_create_koneksi_pokin',  $plugin_public, 'create_koneksi_pokin');
 		$this->loader->add_action('wp_ajax_delete_koneksi_pokin',  $plugin_public, 'delete_koneksi_pokin');
@@ -552,6 +552,9 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_hapus_rencana_aksi', $plugin_public, 'hapus_rencana_aksi');
 		$this->loader->add_action('wp_ajax_get_data_rekening_akun_wp_sipd', $plugin_public, 'get_data_rekening_akun_wp_sipd');
 		$this->loader->add_action('wp_ajax_get_data_rincian_belanja', $plugin_public, 'get_data_rincian_belanja');
+		$this->loader->add_action('wp_ajax_simpan_bulanan_renaksi_opd', $plugin_public, 'simpan_bulanan_renaksi_opd');
+		$this->loader->add_action('wp_ajax_simpan_triwulan_renaksi_opd', $plugin_public, 'simpan_triwulan_renaksi_opd');
+		$this->loader->add_action('wp_ajax_simpan_total_bulanan', $plugin_public, 'simpan_total_bulanan');
 
 		$this->loader->add_action('wp_ajax_crate_tagging_rincian_belanja', $plugin_public, 'crate_tagging_rincian_belanja');
 

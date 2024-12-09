@@ -89,6 +89,41 @@ foreach($skpd as $get_skpd){
     $select_skpd .= '<option value="'.$get_skpd['id_skpd'].'" '.$select.'>'.$get_skpd['nama_skpd'].'</option>';
 }
 
+$pokin_level_1 = $wpdb->get_row($wpdb->prepare('
+    SELECT 
+        *
+    FROM esakip_pohon_kinerja
+    WHERE tahun_anggaran=%d
+        AND id_jadwal=%d
+        AND id=%d
+        AND parent=0
+        AND level=1
+', $input['tahun'], $input['periode'], $input['id_pokin']), ARRAY_A);
+
+$label_pokin_1 = '-';
+if(!empty($pokin_level_1)){
+    $indikator = array();
+    $ind_pokin_level_1 = $wpdb->get_results($wpdb->prepare('
+        SELECT 
+            *
+        FROM esakip_pohon_kinerja
+        WHERE tahun_anggaran=%d
+            AND id_jadwal=%d
+            AND id=%d
+            AND parent=%d
+            AND level=1
+            AND active=1
+    ', $input['tahun'], $input['periode'], $input['id_pokin'], $input['id_pokin']), ARRAY_A);
+    foreach($ind_pokin_level_1 as $ind){
+        $indikator[] = $ind['label_indikator_kinerja'];
+    }
+    if(!empty($indikator)){
+        $label_pokin_1 = $pokin_level_1['label'].' ( '.implode(', ', $indikator).' )';
+    }else{
+        $label_pokin_1 = $pokin_level_1['label'];
+    }
+}
+
 $pokin = $wpdb->get_results($wpdb->prepare('
     SELECT 
         *
@@ -97,6 +132,7 @@ $pokin = $wpdb->get_results($wpdb->prepare('
         AND id_jadwal=%d
         AND parent=%d
         AND level=2
+        AND active=1
 ', $input['tahun'], $input['periode'], $input['id_pokin']), ARRAY_A);
 
 $select_pokin = '<option value="">Pilih Pohon Kinerja</option>';
@@ -157,18 +193,31 @@ foreach($pokin as $get_pokin){
     }
 </style>
 <div class="container-md">
-    <div id="cetak" style="padding: 5px; overflow: auto; max-height: 80vh;">
+    <div id="cetak" style="padding: 5px;">
         <div style="padding: 10px;margin:0 0 3rem 0;">
             <h1 style="margin-top: 20px;" class="text-center">Rencana Aksi <?php echo $periode['nama_jadwal'] . ' ' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ''; ?><br>Pemerintah Daerah<br> Tahun Anggaran <?php echo $input['tahun']; ?></h1 style="margin-top: 20px;">
             <div class="text-center" style="margin-bottom: 25px;">
                 <div id="action" class="action-section hide-excel"></div>
             </div>
-            <tr>
-                <td>
-                    <strong style="font-size: 85%;">JUDUL CASCADING : <?php echo $rpd['nama_cascading']; ?></strong><br/>
-                    <strong style="font-size: 85%;">TUJUAN <?php echo $periode['nama_jadwal']; ?> : <?php echo $rpd['tujuan_teks']; ?></strong>
-                </td>
-            </tr>
+            <table cellpadding="2" cellspacing="0" class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <td style="width: 200px;">JUDUL CASCADING</td>
+                        <td class="text-center" style="width: 30px;">:</td>
+                        <td><?php echo $rpd['nama_cascading']; ?></td>
+                    </tr>
+                    <tr>
+                        <td>TUJUAN <?php echo $periode['nama_jadwal']; ?></td>
+                        <td class="text-center" style="width: 30px;">:</td>
+                        <td><?php echo $rpd['tujuan_teks']; ?></td>
+                    </tr>
+                    <tr>
+                        <td>POKIN LEVEL 1</td>
+                        <td class="text-center" style="width: 30px;">:</td>
+                        <td><?php echo $label_pokin_1; ?></td>
+                    </tr>
+                </tbody>
+            </table>
             <div class="wrap-table">
                 <table cellpadding="2" cellspacing="0" class="table_dokumen_rencana_aksi_pemda table table-bordered">
                     <thead style="background: #ffc491;">
