@@ -249,6 +249,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_submit_tahun_perjanjian_kinerja', $plugin_public, 'submit_tahun_perjanjian_kinerja');
 		$this->loader->add_action('wp_ajax_hapus_dokumen_perjanjian_kinerja', $plugin_public, 'hapus_dokumen_perjanjian_kinerja');
 		$this->loader->add_action('wp_ajax_get_table_perjanjian_kinerja', $plugin_public, 'get_table_perjanjian_kinerja');
+		$this->loader->add_action('wp_ajax_unggah_draft_dokumen', $plugin_public, 'unggah_draft_dokumen');
 		
 		$this->loader->add_action('wp_ajax_get_detail_rencana_aksi_by_id', $plugin_public, 'get_detail_rencana_aksi_by_id');
 		$this->loader->add_action('wp_ajax_tambah_dokumen_rencana_aksi', $plugin_public, 'tambah_dokumen_rencana_aksi');

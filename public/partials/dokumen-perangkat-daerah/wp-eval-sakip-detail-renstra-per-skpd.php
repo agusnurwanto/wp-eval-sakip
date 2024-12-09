@@ -156,12 +156,12 @@ $status_api_esr = get_option('_crb_api_esr_status');
                             <th class="text-center" rowspan="2">Nama Dokumen</th>
                             <th class="text-center" rowspan="2">Keterangan</th>
                             <th class="text-center" rowspan="2">Waktu Upload</th>
-                            <th class="text-center" colspan="2">Verfikasi</th>
+                            <th class="text-center" colspan="2">Verifikasi</th>
                             <th class="text-center" rowspan="2" style="width: 150px;">Aksi</th>
                         </tr>
                         <tr>
                             <th class="text-center">Status</th>
-                            <th class="text-center">Keterangan</th>
+                            <th class="text-center">Catatan</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -292,7 +292,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
                         </td>
                     </tr>
                     <div class="form-group">
-                        <label for="keterangan_verifikasi">Keterangan</label>
+                        <label for="keterangan_verifikasi">Catatan</label>
                         <textarea class="form-control" id="keterangan_verifikasi" name="keterangan_verifikasi" rows="3" required></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary" onclick="submit_verifikasi_dokumen(this); return false">Simpan</button>
@@ -772,5 +772,36 @@ $status_api_esr = get_option('_crb_api_esr_status');
         }else{
             alert('Checklist ESR belum dipilih!'); 
         }
+    }
+    
+    function usulkan_dokumen(id_dokumen){
+        if (!confirm('Apakah Anda Yakin Akan Mengusulkan Dokumen Ini?')) {
+                return;
+            }
+            jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                url: esakip.url,
+                type: 'POST',
+                data: {
+                    action: 'unggah_draft_dokumen',
+                    api_key: esakip.api_key,
+                    id_dokumen: id_dokumen,
+                    id_skpd: <?php echo $id_skpd; ?>,
+                    id_periode: <?php echo $input['periode']; ?>,
+                    nama_tabel_database:'esakip_renstra',
+                    tipe_dokumen: 'renstra'
+                },
+                dataType: 'json',
+                success: function(response) {
+                    jQuery('#wrap-loading').hide();
+                    alert(response.message);
+                    getTableRenstra();
+                },
+                error: function(xhr, status, error) {
+                    jQuery('#wrap-loading').hide();
+                    alert('Terjadi kesalahan saat kirim data!');
+                    getTableRenstra();
+                }
+        });
     }
 </script>
