@@ -27400,4 +27400,110 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 		die(json_encode($ret));
 	}
+
+	public function halaman_mapping_sipd_simpeg()
+	{
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/pengaturan-skpd/wp-eval-sakip-mapping-skpd-sipd-simpeg.php';
+	}
+
+	public function curlData(
+		string $url, 
+		string $path, 
+		string $method, 
+		array $data = []
+	){
+		
+		$curl = curl_init();
+
+		curl_setopt_array($curl, array(
+		  CURLOPT_URL => $url . $path,
+		  CURLOPT_RETURNTRANSFER => true,
+		  CURLOPT_ENCODING => '',
+		  CURLOPT_MAXREDIRS => 10,
+		  CURLOPT_TIMEOUT => 0,
+		  CURLOPT_FOLLOWLOCATION => true,
+		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		  CURLOPT_CUSTOMREQUEST => $method,
+		  CURLOPT_SSL_VERIFYHOST => 0,
+		  CURLOPT_SSL_VERIFYPEER => 0,
+		  CURLOPT_HTTPHEADER => $data['header'],
+		));
+
+		$response = curl_exec($curl);
+
+		curl_close($curl);
+
+		return $response;
+	}
+
+	public function get_satker_simpeg(){
+		global $wpdb;
+
+		if(get_option('crb_api_simpeg_status')){
+			try {
+				
+				$response = $this->curlData(get_option('crb_url_api_simpeg'), 'api/satker/', 'GET', [
+					'header' => [
+					    'Authorization: Basic ' . get_option('crb_authorization_api_simpeg')
+					  ]
+				]);			
+
+				$dataSatker = json_decode($response, true);
+
+				if (json_last_error() !== JSON_ERROR_NONE) {
+				    throw new Exception("Terjadi kesalahan ketika mengakses API, Error : ". json_last_error_msg(), 1);
+				}
+
+				if(empty($dataSatker)){
+					throw new Exception("respon API kosong!", 1);
+				}
+
+				$table = 'esakip_data_satker_simpeg';
+				foreach ($dataSatker as $key => $data) {
+					$exists = $wpdb->get_var($wpdb->prepare("SELECT id FROM ".$table." WHERE satker_id=%s AND active=%d AND tahun_anggaran=%d", $data['satker_id'], 1, $_POST['tahun_anggaran']), ARRAY_A);
+					if(!empty($exists['id'])){
+						$wpdb->update($table, [
+							'satker_id' => $data['satker_id'],
+							'satker_id_parent' => $data['satker_id_parent'],
+							'nama' => $data['nama'],
+							'update_at' => current_time('mysql')
+						], [
+							'satker_id' => $data['satker_id'],
+							'tahun_anggaran' => $_POST['tahun_anggaran'],
+						]);
+					}else{
+						$wpdb->insert($table, [
+							'satker_id' => $data['satker_id'],
+							'satker_id_parent' => $data['satker_id_parent'],
+							'nama' => $data['nama'],
+							'created_at' => current_time('mysql'),
+							'tahun_anggaran' => $_POST['tahun_anggaran'],
+						]);
+					}
+				}
+
+				echo json_encode([
+					'status' => true,
+					'message' => 'Sukses ambil data satker Simpeg!'
+				]);
+				exit;
+
+			}catch(Exception $e){
+				echo json_encode([
+					'status' => 'error',
+					'message' => $e->getMessage()
+				]);
+				exit;
+			}
+		}else{
+			echo json_encode([
+					'status' => true,
+					'message' => 'Pengaturan Status API Kepegawaian ditutup!'
+				]);
+			exit;
+		}
+	}
 }

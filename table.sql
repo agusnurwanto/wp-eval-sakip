@@ -1547,3 +1547,26 @@ CREATE TABLE `esakip_data_bulanan_rencana_aksi_opd` (
   `update_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id)
 );
+
+CREATE TABLE `esakip_data_satker_simpeg` (
+  `id` int(11) NOT NULL auto_increment,
+  `satker_id` text NOT NULL, 
+  `satker_id_parent` text DEFAULT NULL,
+  `nama` text DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
+);
+
+CREATE TABLE `esakip_data_pegawai_simpeg` (
+  `id` int(11) NOT NULL auto_increment,
+  `nip_baru` text NOT NULL,
+  `nama_pegawai` text NOT NULL, 
+  `satker_id` text NOT NULL, 
+  `jabatan` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
+);
