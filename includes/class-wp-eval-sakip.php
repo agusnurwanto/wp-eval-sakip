@@ -612,6 +612,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_data_upload_dokumen',  $plugin_public, 'get_data_upload_dokumen');
 		$this->loader->add_action('wp_ajax_submit_pengaturan_upload_dokumen',  $plugin_public, 'submit_pengaturan_upload_dokumen');
 		
+		$this->loader->add_action('wp_ajax_get_satker_simpeg',  $plugin_public, 'get_satker_simpeg');
+		
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_evaluasi_sakip', array($plugin_public, 'jadwal_evaluasi_sakip'));
@@ -724,6 +726,8 @@ class Wp_Eval_Sakip {
 		add_shortcode('halaman_mapping_jenis_dokumen', array($plugin_public, 'halaman_mapping_jenis_dokumen'));
 		
 		add_shortcode('tagging_rincian_sakip', array($plugin_public, 'tagging_rincian_sakip'));
+
+		add_shortcode('halaman_mapping_sipd_simpeg', array($plugin_public, 'halaman_mapping_sipd_simpeg'));
 	}
 
 	/**
