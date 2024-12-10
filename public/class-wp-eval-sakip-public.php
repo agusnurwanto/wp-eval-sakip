@@ -15181,6 +15181,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				if (!empty($unit)) {
 					$tbody = '';
 					$counter = 1;
+					$total_menunggu = 0;
+					$total_disetujui = 0;
+					$total_ditolak = 0;
+					$total_draft = 0;
+					$total_dokumen = 0;
 					foreach ($unit as $kk => $vv) {
 						$detail_perjanjian_kinerja = $this->functions->generatePage(array(
 							'nama_page' => 'Halaman Detail Dokumen Perjanjian Kinerja ' . $tahun_anggaran,
@@ -15208,16 +15213,61 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							)
 						);
 
+						$jumlah_status = $wpdb->get_row(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(case when kv.status_verifikasi = 1 then 1 end) as jumlah_disetujui,
+									COUNT(case when kv.status_verifikasi = 2 then 1 end) as jumlah_ditolak,
+									COUNT(case when kv.status_verifikasi = 3 then 1 end) as jumlah_draft
+								FROM 
+									esakip_perjanjian_kinerja pk 
+								JOIN 
+									esakip_keterangan_verifikator kv 
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.tahun_anggaran = %d
+								AND pk.active = 1
+								AND kv.active = 1
+								",
+								$vv['id_skpd'],
+								$tahun_anggaran
+							), ARRAY_A
+						);
+
+						$jumlah_menunggu = 0;
+						if(!empty($jumlah_status)){
+							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_status['jumlah_disetujui'] + $jumlah_status['jumlah_ditolak'] + $jumlah_status['jumlah_draft']);
+						}
+						$jumlah_disetujui = !empty($jumlah_status) ? $jumlah_status['jumlah_disetujui'] : '0';
+						$jumlah_ditolak = !empty($jumlah_status) ? $jumlah_status['jumlah_ditolak'] : '0';
+						$jumlah_draft = !empty($jumlah_status) ? $jumlah_status['jumlah_draft'] : '0';
+
 						$btn = '<div class="btn-action-group">';
 						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_perjanjian_kinerja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 						$btn .= '</div>';
 
+						$tbody .= "<td class='text-center'>" . $jumlah_menunggu . "</td>";
+						$tbody .= "<td class='text-center'>" . $jumlah_disetujui . "</td>";
+						$tbody .= "<td class='text-center'>" . $jumlah_ditolak . "</td>";
+						$tbody .= "<td class='text-center'>" . $jumlah_draft . "</td>";
 						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
 						$tbody .= "<td>" . $btn . "</td>";
 
 						$tbody .= "</tr>";
+
+						$total_menunggu += $jumlah_menunggu;
+						$total_disetujui += $jumlah_disetujui;
+						$total_ditolak += $jumlah_ditolak;
+						$total_draft += $jumlah_draft;
+						$total_dokumen += $jumlah_dokumen;
 					}
 					$ret['data'] = $tbody;
+					$ret['total_menunggu'] = $total_menunggu;
+					$ret['total_disetujui'] = $total_disetujui;
+					$ret['total_ditolak'] = $total_ditolak;
+					$ret['total_draft'] = $total_draft;
+					$ret['total_dokumen'] = $total_dokumen;
 				} else {
 					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
@@ -16398,6 +16448,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				if (!empty($unit)) {
 					$tbody = '';
 					$counter = 1;
+					$total_menunggu = 0;
+					$total_disetujui = 0;
+					$total_ditolak = 0;
+					$total_draft = 0;
+					$total_dokumen = 0;
 					foreach ($unit as $kk => $vv) {
 						$detail_laporan_kinerja = $this->functions->generatePage(array(
 							'nama_page' => 'Halaman Detail Dokumen Laporan Kinerja ' . $tahun_anggaran,
@@ -16425,16 +16480,61 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							)
 						);
 
+						$jumlah_status = $wpdb->get_row(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(case when kv.status_verifikasi = 1 then 1 end) as jumlah_disetujui,
+									COUNT(case when kv.status_verifikasi = 2 then 1 end) as jumlah_ditolak,
+									COUNT(case when kv.status_verifikasi = 3 then 1 end) as jumlah_draft
+								FROM 
+									esakip_laporan_kinerja lk 
+								JOIN 
+									esakip_keterangan_verifikator kv 
+									ON lk.id=kv.id_dokumen
+								WHERE lk.id_skpd = %d
+								AND lk.tahun_anggaran = %d
+								AND lk.active = 1
+								AND kv.active = 1
+								",
+								$vv['id_skpd'],
+								$tahun_anggaran
+							), ARRAY_A
+						);
+
+						$jumlah_menunggu = 0;
+						if(!empty($jumlah_status)){
+							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_status['jumlah_disetujui'] + $jumlah_status['jumlah_ditolak'] + $jumlah_status['jumlah_draft']);
+						}
+						$jumlah_disetujui = !empty($jumlah_status) ? $jumlah_status['jumlah_disetujui'] : '0';
+						$jumlah_ditolak = !empty($jumlah_status) ? $jumlah_status['jumlah_ditolak'] : '0';
+						$jumlah_draft = !empty($jumlah_status) ? $jumlah_status['jumlah_draft'] : '0';
+
 						$btn = '<div class="btn-action-group">';
 						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_laporan_kinerja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 						$btn .= '</div>';
 
+						$tbody .= "<td class='text-center'>" . $jumlah_menunggu . "</td>";
+						$tbody .= "<td class='text-center'>" . $jumlah_disetujui . "</td>";
+						$tbody .= "<td class='text-center'>" . $jumlah_ditolak . "</td>";
+						$tbody .= "<td class='text-center'>" . $jumlah_draft . "</td>";
 						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
 						$tbody .= "<td>" . $btn . "</td>";
 
 						$tbody .= "</tr>";
+
+						$total_menunggu += $jumlah_menunggu;
+						$total_disetujui += $jumlah_disetujui;
+						$total_ditolak += $jumlah_ditolak;
+						$total_draft += $jumlah_draft;
+						$total_dokumen += $jumlah_dokumen;
 					}
 					$ret['data'] = $tbody;
+					$ret['total_menunggu'] = $total_menunggu;
+					$ret['total_disetujui'] = $total_disetujui;
+					$ret['total_ditolak'] = $total_ditolak;
+					$ret['total_draft'] = $total_draft;
+					$ret['total_dokumen'] = $total_dokumen;
 				} else {
 					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
@@ -16757,6 +16857,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				if (!empty($unit)) {
 					$tbody = '';
 					$counter = 1;
+					$total_menunggu = 0;
+					$total_disetujui = 0;
+					$total_ditolak = 0;
+					$total_draft = 0;
+					$total_dokumen = 0;
 					foreach ($unit as $kk => $vv) {
 						$detail_renja = $this->functions->generatePage(array(
 							'nama_page' => 'Halaman Detail Dokumen RENJA/RKT ' . $tahun_anggaran,
@@ -16784,16 +16889,62 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							)
 						);
 
+						
+						$jumlah_status = $wpdb->get_row(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(case when kv.status_verifikasi = 1 then 1 end) as jumlah_disetujui,
+									COUNT(case when kv.status_verifikasi = 2 then 1 end) as jumlah_ditolak,
+									COUNT(case when kv.status_verifikasi = 3 then 1 end) as jumlah_draft
+								FROM 
+									esakip_renja_rkt pk 
+								JOIN 
+									esakip_keterangan_verifikator kv 
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.tahun_anggaran = %d
+								AND pk.active = 1
+								AND kv.active = 1
+								",
+								$vv['id_skpd'],
+								$tahun_anggaran
+							), ARRAY_A
+						);
+
+						$jumlah_menunggu = 0;
+						if(!empty($jumlah_status)){
+							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_status['jumlah_disetujui'] + $jumlah_status['jumlah_ditolak'] + $jumlah_status['jumlah_draft']);
+						}
+						$jumlah_disetujui = !empty($jumlah_status) ? $jumlah_status['jumlah_disetujui'] : '0';
+						$jumlah_ditolak = !empty($jumlah_status) ? $jumlah_status['jumlah_ditolak'] : '0';
+						$jumlah_draft = !empty($jumlah_status) ? $jumlah_status['jumlah_draft'] : '0';
+
 						$btn = '<div class="btn-action-group">';
 						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_renja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 						$btn .= '</div>';
 
+						$tbody .= "<td class='text-center'>" . $jumlah_menunggu . "</td>";
+						$tbody .= "<td class='text-center'>" . $jumlah_disetujui . "</td>";
+						$tbody .= "<td class='text-center'>" . $jumlah_ditolak . "</td>";
+						$tbody .= "<td class='text-center'>" . $jumlah_draft . "</td>";
 						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
 						$tbody .= "<td>" . $btn . "</td>";
 
 						$tbody .= "</tr>";
+
+						$total_menunggu += $jumlah_menunggu;
+						$total_disetujui += $jumlah_disetujui;
+						$total_ditolak += $jumlah_ditolak;
+						$total_draft += $jumlah_draft;
+						$total_dokumen += $jumlah_dokumen;
 					}
 					$ret['data'] = $tbody;
+					$ret['total_menunggu'] = $total_menunggu;
+					$ret['total_disetujui'] = $total_disetujui;
+					$ret['total_ditolak'] = $total_ditolak;
+					$ret['total_draft'] = $total_draft;
+					$ret['total_dokumen'] = $total_dokumen;
 				} else {
 					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
@@ -17378,6 +17529,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				if (!empty($unit)) {
 					$tbody = '';
 					$counter = 1;
+					$total_menunggu = 0;
+					$total_disetujui = 0;
+					$total_ditolak = 0;
+					$total_draft = 0;
+					$total_dokumen = 0;
 					foreach ($unit as $kk => $vv) {
 						$detail_renstra = $this->functions->generatePage(array(
 							'nama_page' => 'Halaman Detail Dokumen RENSTRA ' . $id_jadwal,
@@ -17401,16 +17557,61 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							", $vv['id_skpd'], $id_jadwal)
 						);
 
+						$jumlah_status = $wpdb->get_row(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(case when kv.status_verifikasi = 1 then 1 end) as jumlah_disetujui,
+									COUNT(case when kv.status_verifikasi = 2 then 1 end) as jumlah_ditolak,
+									COUNT(case when kv.status_verifikasi = 3 then 1 end) as jumlah_draft
+								FROM 
+									esakip_renstra ren 
+								JOIN 
+									esakip_keterangan_verifikator kv 
+									ON ren.id=kv.id_dokumen
+								WHERE ren.id_skpd = %d
+								AND ren.id_jadwal = %d
+								AND ren.active = 1
+								AND kv.active = 1
+								",
+								$vv['id_skpd'],
+								$id_jadwal
+							), ARRAY_A
+						);
+
+						$jumlah_menunggu = 0;
+						if(!empty($jumlah_status)){
+							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_status['jumlah_disetujui'] + $jumlah_status['jumlah_ditolak'] + $jumlah_status['jumlah_draft']);
+						}
+						$jumlah_disetujui = !empty($jumlah_status) ? $jumlah_status['jumlah_disetujui'] : '0';
+						$jumlah_ditolak = !empty($jumlah_status) ? $jumlah_status['jumlah_ditolak'] : '0';
+						$jumlah_draft = !empty($jumlah_status) ? $jumlah_status['jumlah_draft'] : '0';
+
 						$btn = '<div class="btn-action-group">';
 						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_renstra['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 						$btn .= '</div>';
 
+						$tbody .= "<td class='text-center'>" . $jumlah_menunggu . "</td>";
+						$tbody .= "<td class='text-center'>" . $jumlah_disetujui . "</td>";
+						$tbody .= "<td class='text-center'>" . $jumlah_ditolak . "</td>";
+						$tbody .= "<td class='text-center'>" . $jumlah_draft . "</td>";
 						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
 						$tbody .= "<td>" . $btn . "</td>";
 
 						$tbody .= "</tr>";
+
+						$total_menunggu += $jumlah_menunggu;
+						$total_disetujui += $jumlah_disetujui;
+						$total_ditolak += $jumlah_ditolak;
+						$total_draft += $jumlah_draft;
+						$total_dokumen += $jumlah_dokumen;
 					}
 					$ret['data'] = $tbody;
+					$ret['total_menunggu'] = $total_menunggu;
+					$ret['total_disetujui'] = $total_disetujui;
+					$ret['total_ditolak'] = $total_ditolak;
+					$ret['total_draft'] = $total_draft;
+					$ret['total_dokumen'] = $total_dokumen;
 				} else {
 					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
@@ -17499,6 +17700,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					if (!empty($unit)) {
 						$tbody = '';
 						$counter = 1;
+						$total_menunggu = 0;
+						$total_disetujui = 0;
+						$total_ditolak = 0;
+						$total_draft = 0;
+						$total_dokumen = 0;
 						foreach ($unit as $kk => $vv) {
 							$detail_dokumen = $this->functions->generatePage(array(
 								'nama_page' => 'Halaman Detail Dokumen ' . $nama_page[$tipe_dokumen] . ' ' . $tahun_anggaran,
@@ -17526,16 +17732,67 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								)
 							);
 
+							if($tipe_dokumen == 'dpa'){
+								$jumlah_status = $wpdb->get_row(
+									$wpdb->prepare(
+										"
+										SELECT 
+											COUNT(case when kv.status_verifikasi = 1 then 1 end) as jumlah_disetujui,
+											COUNT(case when kv.status_verifikasi = 2 then 1 end) as jumlah_ditolak,
+											COUNT(case when kv.status_verifikasi = 3 then 1 end) as jumlah_draft
+										FROM 
+											$nama_tabel[$tipe_dokumen] dt 
+										JOIN 
+											esakip_keterangan_verifikator kv 
+											ON dt.id=kv.id_dokumen
+										WHERE dt.id_skpd = %d
+										AND dt.tahun_anggaran = %d
+										AND dt.active = 1
+										AND kv.active = 1
+										",
+										$vv['id_skpd'],
+										$tahun_anggaran
+									), ARRAY_A
+								);
+		
+								$jumlah_menunggu = 0;
+								if(!empty($jumlah_status)){
+									$jumlah_menunggu = $jumlah_dokumen - ($jumlah_status['jumlah_disetujui'] + $jumlah_status['jumlah_ditolak'] + $jumlah_status['jumlah_draft']);
+								}
+								$jumlah_disetujui = !empty($jumlah_status) ? $jumlah_status['jumlah_disetujui'] : '0';
+								$jumlah_ditolak = !empty($jumlah_status) ? $jumlah_status['jumlah_ditolak'] : '0';
+								$jumlah_draft = !empty($jumlah_status) ? $jumlah_status['jumlah_draft'] : '0';
+							}
+
 							$btn = '<div class="btn-action-group">';
 							$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_dokumen['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 							$btn .= '</div>';
 
+							if($tipe_dokumen == 'dpa'){
+								$tbody .= "<td class='text-center'>" . $jumlah_menunggu . "</td>";
+								$tbody .= "<td class='text-center'>" . $jumlah_disetujui . "</td>";
+								$tbody .= "<td class='text-center'>" . $jumlah_ditolak . "</td>";
+								$tbody .= "<td class='text-center'>" . $jumlah_draft . "</td>";
+							}
 							$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
 							$tbody .= "<td>" . $btn . "</td>";
 
 							$tbody .= "</tr>";
+
+							if($tipe_dokumen == 'dpa'){
+								$total_menunggu += $jumlah_menunggu;
+								$total_disetujui += $jumlah_disetujui;
+								$total_ditolak += $jumlah_ditolak;
+								$total_draft += $jumlah_draft;
+								$total_dokumen += $jumlah_dokumen;
+							}
 						}
 						$ret['data'] = $tbody;
+						$ret['total_menunggu'] = $total_menunggu;
+						$ret['total_disetujui'] = $total_disetujui;
+						$ret['total_ditolak'] = $total_ditolak;
+						$ret['total_draft'] = $total_draft;
+						$ret['total_dokumen'] = $total_dokumen;
 					} else {
 						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 					}
