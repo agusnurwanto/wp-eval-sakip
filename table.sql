@@ -1236,6 +1236,7 @@ CREATE TABLE `esakip_data_rencana_aksi_opd` (
   `inisiatif_kd` tinyint(4) DEFAULT null,
   `musrembang` tinyint(4) DEFAULT null,
   `pokir` tinyint(4) DEFAULT null,
+  `id_jabatan` varchar(30) DEFAULT NULL,
   PRIMARY key (id)
 );
 
