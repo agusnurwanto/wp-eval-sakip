@@ -403,12 +403,17 @@ $status_api_esr = get_option('_crb_api_esr_status');
                 action: 'get_table_renja',
                 api_key: esakip.api_key,
                 id_skpd: <?php echo $id_skpd; ?>,
-                tahun_anggaran: '<?php echo $input['tahun'] ?>',
-                nama_tabel_database:'esakip_renja_rkt'
+                tahun_anggaran: '<?php echo $input['tahun'] ?>'
             },
             dataType: 'json',
             success: function(response) {
                 jQuery('#wrap-loading').hide();
+                if(
+                    response.data_esr 
+                    && response.data_esr.status == 'error'
+                ){
+                    alert(response.data_esr.message);
+                }
                 console.log(response);
                 if(response.status_mapping_esr){
                     tahun_anggaran_periode_dokumen = response.tahun_anggaran_periode_dokumen;
