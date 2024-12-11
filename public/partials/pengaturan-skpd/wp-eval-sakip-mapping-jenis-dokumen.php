@@ -98,9 +98,11 @@ foreach ($dokumen_menu as $dokumen) {
 }
 ?>
 
-<div id="wrap-table" style="padding: 10px; text-align: center;">
+<div id="wrap-table" style="padding: 10px;">
 	<h1 class="text-center">Mapping Jenis Dokumen Tahun Anggaran <?php echo $tahun_anggaran ?></h1>
-	<button class="btn btn-success mb-4" onclick="generateMasterJenisDokumenEsr('<?php echo $tahun_anggaran; ?>')">Generate Master Jenis Dokumen ESR</button>
+	<div class="aksi-sakip text-center">
+		<button class="btn btn-success mb-4" onclick="generateMasterJenisDokumenEsr('<?php echo $tahun_anggaran; ?>')">Generate Master Jenis Dokumen ESR</button>
+	</div>
 	<h3 class="text-center">Dokumen Pemerintah Daerah</h3>
 	<table>
 		<thead>

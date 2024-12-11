@@ -249,6 +249,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_submit_tahun_perjanjian_kinerja', $plugin_public, 'submit_tahun_perjanjian_kinerja');
 		$this->loader->add_action('wp_ajax_hapus_dokumen_perjanjian_kinerja', $plugin_public, 'hapus_dokumen_perjanjian_kinerja');
 		$this->loader->add_action('wp_ajax_get_table_perjanjian_kinerja', $plugin_public, 'get_table_perjanjian_kinerja');
+		$this->loader->add_action('wp_ajax_unggah_draft_dokumen', $plugin_public, 'unggah_draft_dokumen');
 		
 		$this->loader->add_action('wp_ajax_get_detail_rencana_aksi_by_id', $plugin_public, 'get_detail_rencana_aksi_by_id');
 		$this->loader->add_action('wp_ajax_tambah_dokumen_rencana_aksi', $plugin_public, 'tambah_dokumen_rencana_aksi');
@@ -555,6 +556,9 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_simpan_triwulan_renaksi_opd', $plugin_public, 'simpan_triwulan_renaksi_opd');
 		$this->loader->add_action('wp_ajax_simpan_total_bulanan', $plugin_public, 'simpan_total_bulanan');
 
+		$this->loader->add_action('wp_ajax_get_rencana_hasil_kerja', $plugin_public, 'get_rencana_hasil_kerja');
+		$this->loader->add_action('wp_ajax_nopriv_get_rencana_hasil_kerja', $plugin_public, 'get_rencana_hasil_kerja');
+
 		$this->loader->add_action('wp_ajax_crate_tagging_rincian_belanja', $plugin_public, 'crate_tagging_rincian_belanja');
 
 		$this->loader->add_action('wp_ajax_get_table_input_iku', $plugin_public, 'get_table_input_iku');
@@ -610,6 +614,8 @@ class Wp_Eval_Sakip {
 		
 		$this->loader->add_action('wp_ajax_get_data_upload_dokumen',  $plugin_public, 'get_data_upload_dokumen');
 		$this->loader->add_action('wp_ajax_submit_pengaturan_upload_dokumen',  $plugin_public, 'submit_pengaturan_upload_dokumen');
+		
+		$this->loader->add_action('wp_ajax_get_satker_simpeg',  $plugin_public, 'get_satker_simpeg');
 		
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
@@ -723,6 +729,8 @@ class Wp_Eval_Sakip {
 		add_shortcode('halaman_mapping_jenis_dokumen', array($plugin_public, 'halaman_mapping_jenis_dokumen'));
 		
 		add_shortcode('tagging_rincian_sakip', array($plugin_public, 'tagging_rincian_sakip'));
+
+		add_shortcode('halaman_mapping_sipd_simpeg', array($plugin_public, 'halaman_mapping_sipd_simpeg'));
 	}
 
 	/**

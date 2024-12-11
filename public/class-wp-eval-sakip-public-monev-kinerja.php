@@ -3428,4 +3428,102 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 	    die(json_encode($ret));
 	}
+
+	function get_rencana_hasil_kerja(){
+		global $wpdb;
+		try{
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+					$nip = $tahun_anggaran = '';
+					if (!empty($_POST['nip'])) {
+						$nip = $_POST['nip'];
+					}else{
+						throw new Exception("NIP Pegawai Tidak Boleh Kosong!", 1);
+					} 
+					if (!empty($_POST['tahun_anggaran'])) {
+						$tahun_anggaran = $_POST['tahun_anggaran'];
+					}else{
+						throw new Exception("Tahun Anggaran Tidak Boleh Kosong!", 1);
+					}
+					
+					$data = $wpdb->get_results($wpdb->prepare("
+						SELECT
+							id,
+							label,
+							id_skpd,
+							parent,
+							level,
+							tahun_anggaran,
+							id_jadwal,
+							active,
+							created_at,
+							update_at,
+							label_pokin_1,
+							id_pokin_1,
+							label_pokin_2,
+							id_pokin_2,
+							label_pokin_3,
+							id_pokin_3,
+							label_pokin_4,
+							id_pokin_4,
+							label_pokin_5,
+							id_pokin_5,
+							kode_cascading_sasaran,
+							kode_cascading_program,
+							kode_cascading_kegiatan,
+							kode_cascading_sub_kegiatan,
+							label_cascading_sasaran,
+							label_cascading_program,
+							label_cascading_kegiatan,
+							label_cascading_sub_kegiatan,
+							kode_sbl,
+							mandatori_pusat,
+							inisiatif_kd,
+							musrembang,
+							pokir
+						FROM esakip_data_rencana_aksi_opd
+						WHERE tahun_anggaran=%d
+							AND active=1
+							LIMIT 5
+					", $tahun_anggaran), ARRAY_A);
+						
+					// AND nipkepala=%d
+					$data_all = array(
+						'total' => 0,
+						'data' => array(),
+	                    'status' => true,
+						'message' => 'Berhasil get data rencana hasil kerja!',
+					);
+					// kegiatan utama
+					foreach($data as $v){
+						$data_all['total']++;
+						$indikator = $wpdb->get_results($wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_data_rencana_aksi_indikator_opd
+							WHERE id_renaksi=%d
+								AND active=1
+						", $v['id']), ARRAY_A);
+						$data_all['data'][$v['id']] = array(
+							'detail' => $v,
+							'indikator' => $indikator
+						);
+					}
+
+					echo json_encode($data_all);
+					exit;
+				} else {
+					throw new Exception('Api key tidak sesuai');
+				}
+			} else {
+				throw new Exception('Format tidak sesuai');
+			}
+		}catch(Exception $e){
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit;
+		}
+	}
 }

@@ -282,13 +282,18 @@ $status_api_esr = get_option('_crb_api_esr_status');
                 api_key: esakip.api_key,
                 id_skpd: <?php echo $id_skpd; ?>,
 				id_periode: <?php echo $input['periode']; ?>,
-                tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
-                nama_tabel_database:'esakip_pohon_kinerja_dan_cascading'
+                tipe_dokumen: '<?php echo $tipe_dokumen; ?>'
             },
             dataType: 'json',
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 console.log(response);
+                if(
+                    response.data_esr 
+                    && response.data_esr.status == 'error'
+                ){
+                    alert(response.data_esr.message);
+                }
                 if(response.status_mapping_esr){
                     tahun_anggaran_periode_dokumen = response.tahun_anggaran_periode_dokumen;
                     let body_non_esr_lokal=``;
@@ -559,40 +564,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
             }
         });
     }
-
-    // function hapus_tahun_dokumen(id) {
-    //     if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
-    //         return;
-    //     }
-    //     jQuery('#wrap-loading').show();
-    //     jQuery.ajax({
-    //         url: esakip.url,
-    //         type: 'POST',
-    //         data: {
-    //             action: 'hapus_tahun_dokumen_tipe',
-    //             api_key: esakip.api_key,
-    //             tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
-    //             id: id
-    //         },
-    //         dataType: 'json',
-    //         success: function(response) {
-    //             console.log(response);
-    //             jQuery('#wrap-loading').hide();
-    //             if (response.status === 'success') {
-    //                 alert(response.message);
-    //                 getTableSkpd();
-    //                 getTableTahun();
-    //             } else {
-    //                 alert(response.message);
-    //             }
-    //         },
-    //         error: function(xhr, status, error) {
-    //             console.error(xhr.responseText);
-    //             jQuery('#wrap-loading').hide();
-    //             alert('Terjadi kesalahan saat mengirim data!');
-    //         }
-    //     });
-    // }
 
     function sync_to_esr(){
         let list = jQuery("input:checkbox[name=checklist_esr]:checked")

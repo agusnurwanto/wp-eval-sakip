@@ -1247,6 +1247,13 @@ class Wp_Eval_Sakip_Admin
 			'no_key' => 1,
 			'post_status' => 'private'
 		));
+		$halaman_mapping_sipd_simpeg = $this->functions->generatePage(array(
+			'nama_page' => 'Halaman Mapping Perangkat Daerah SIPD-SIMPEG',
+			'content' => '[halaman_mapping_sipd_simpeg]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
 		$halaman_mapping_user_esr = $this->functions->generatePage(array(
 			'nama_page' => 'Halaman Mapping User ESR',
 			'content' => '[halaman_mapping_user_esr]',
@@ -1297,6 +1304,16 @@ class Wp_Eval_Sakip_Admin
 					->set_help_text('Wajib diisi. Setting batas ukuran maksimal untuk upload dokumen. Ukuran dalam MB'),
 				Field::make('text', 'crb_nama_pemda', 'Nama Pemerintah Daerah')
 					->set_help_text('Wajib diisi.'),
+				Field::make('radio', 'crb_api_simpeg_status', 'Status API Kepegawaian')
+					->add_options(array(
+						'0' => __('Dikunci'),
+						'1' => __('Dibuka')
+					))
+					->set_default_value('0')
+					->set_help_text('Digunakan untuk mengunci atau membuka akses untuk mengakses data kepegawaian.'),
+				Field::make('text', 'crb_authorization_api_simpeg', 'Authorization API Kepegawaian')
+					->set_help_text('Wajib diisi.'),
+				Field::make('text', 'crb_url_api_simpeg', 'Url API Kepegawaian'),
 				Field::make('radio', 'crb_api_esr_status', 'Status API ESR')
 					->add_options(array(
 						'0' => __('Dikunci'),
@@ -1322,6 +1339,7 @@ class Wp_Eval_Sakip_Admin
 					<h4>HALAMAN TERKAIT</h4>
 	            	<ol>
 	            		<li><a href="' . $halaman_mapping_skpd['url'] . '">' . $halaman_mapping_skpd['title'] . '</a></li>
+	            		<li><a href="' . $halaman_mapping_sipd_simpeg['url'] . '">' . $halaman_mapping_sipd_simpeg['title'] . '</a></li>
 	            		<li><a href="' . $halaman_mapping_user_esr['url'] . '">' . $halaman_mapping_user_esr['title'] . '</a></li>
 	            		'.$list_mapping_jenis_dokumen.'
 	            	</ol>'),

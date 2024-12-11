@@ -40,15 +40,37 @@ $no = 0;
 foreach($unit as $opd){
 	$no++;
 	$dok_html_opd = "";
+    $dok_perlu_verif = array(
+        "esakip_perjanjian_kinerja",
+        "esakip_dpa",
+        "esakip_renja_rkt",
+        "esakip_renstra",
+        "esakip_laporan_kinerja"
+    );
 	foreach($dokumen as $dok){
-		$jml_dokumen = $wpdb->get_var($wpdb->prepare("
-			SELECT 
-				count(id)
-			FROM $dok[nama_tabel]
-			WHERE id_skpd=%d
-				AND active=1
-				AND tahun_anggaran=%d
-		", $opd['id_skpd'], $input['tahun_anggaran']));
+        if(in_array($dok['nama_tabel'], $dok_perlu_verif)){
+            $jml_dokumen = $wpdb->get_var($wpdb->prepare("
+                SELECT 
+                    count(dok.id)
+                FROM $dok[nama_tabel] dok
+                INNER JOIN esakip_keterangan_verifikator ver ON dok.id = ver.id_dokumen
+                WHERE dok.id_skpd=%d
+                    AND dok.active=1
+                    AND dok.tahun_anggaran=%d
+                    AND ver.active=1
+                    AND ver.status_verifikasi=1
+                    AND ver.nama_tabel_dokumen=%s
+            ", $opd['id_skpd'], $input['tahun_anggaran'], $dok['nama_tabel']));
+        }else{
+            $jml_dokumen = $wpdb->get_var($wpdb->prepare("
+                SELECT 
+                    count(id)
+                FROM $dok[nama_tabel]
+                WHERE id_skpd=%d
+                    AND active=1
+                    AND tahun_anggaran=%d
+            ", $opd['id_skpd'], $input['tahun_anggaran']));
+        }
 	$warning = "bg-success";
 	if($jml_dokumen == 0){
 		$warning="bg-danger";
@@ -106,6 +128,18 @@ foreach($unit as $opd_renstra){
 				AND active=1
 				AND id_jadwal=%d
 		", $opd_renstra['id_skpd'], $dok_renstra['id']));
+        // $jml_dokumen_renstra = $wpdb->get_var($wpdb->prepare("
+        //         SELECT 
+        //             count(dok.id)
+        //         FROM esakip_renstra dok
+        //         INNER JOIN esakip_keterangan_verifikator ver ON dok.id = ver.id_dokumen
+        //         WHERE dok.id_skpd=%d
+        //             AND dok.active=1
+        //             AND dok.id_jadwal=%d
+        //             AND ver.active=1
+        //             AND ver.status_verifikasi=1
+        //             AND ver.nama_tabel_dokumen=%s
+        //     ", $opd_renstra['id_skpd'], $dok_renstra['id'],'esakip_renstra'));
 	$warning = "bg-success";
 	if($jml_dokumen_renstra == 0){
 		$warning="bg-danger";
