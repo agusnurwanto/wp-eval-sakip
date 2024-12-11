@@ -15318,10 +15318,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_perjanjian_kinerja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 						$btn .= '</div>';
 
-						$tbody .= "<td class='text-center'>" . $jumlah_menunggu . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_disetujui . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_ditolak . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_draft . "</td>";
+						$tbody .= "<td class='text-center bg-info text-white'>" . $jumlah_draft . "</td>";
+						$tbody .= "<td class='text-center bg-secondary text-white'>" . $jumlah_menunggu . "</td>";
+						$tbody .= "<td class='text-center bg-success text-white'>" . $jumlah_disetujui . "</td>";
+						$tbody .= "<td class='text-center bg-danger text-white'>" . $jumlah_ditolak . "</td>";
 						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
 						$tbody .= "<td>" . $btn . "</td>";
 
@@ -16636,10 +16636,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_laporan_kinerja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 						$btn .= '</div>';
 
-						$tbody .= "<td class='text-center'>" . $jumlah_menunggu . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_disetujui . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_ditolak . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_draft . "</td>";
+						$tbody .= "<td class='text-center bg-info text-white'>" . $jumlah_draft . "</td>";
+						$tbody .= "<td class='text-center bg-secondary text-white'>" . $jumlah_menunggu . "</td>";
+						$tbody .= "<td class='text-center bg-success text-white'>" . $jumlah_disetujui . "</td>";
+						$tbody .= "<td class='text-center bg-danger text-white'>" . $jumlah_ditolak . "</td>";
 						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
 						$tbody .= "<td>" . $btn . "</td>";
 
@@ -17093,10 +17093,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_renja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 						$btn .= '</div>';
 
-						$tbody .= "<td class='text-center'>" . $jumlah_menunggu . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_disetujui . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_ditolak . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_draft . "</td>";
+						$tbody .= "<td class='text-center bg-info text-white'>" . $jumlah_draft . "</td>";
+						$tbody .= "<td class='text-center bg-secondary text-white'>" . $jumlah_menunggu . "</td>";
+						$tbody .= "<td class='text-center bg-success text-white'>" . $jumlah_disetujui . "</td>";
+						$tbody .= "<td class='text-center bg-danger text-white'>" . $jumlah_ditolak . "</td>";
 						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
 						$tbody .= "<td>" . $btn . "</td>";
 
@@ -17811,10 +17811,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_renstra['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 						$btn .= '</div>';
 
-						$tbody .= "<td class='text-center'>" . $jumlah_menunggu . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_disetujui . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_ditolak . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_draft . "</td>";
+						$tbody .= "<td class='text-center bg-info text-white'>" . $jumlah_draft . "</td>";
+						$tbody .= "<td class='text-center bg-secondary text-white'>" . $jumlah_menunggu . "</td>";
+						$tbody .= "<td class='text-center bg-success text-white'>" . $jumlah_disetujui . "</td>";
+						$tbody .= "<td class='text-center bg-danger text-white'>" . $jumlah_ditolak . "</td>";
 						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
 						$tbody .= "<td>" . $btn . "</td>";
 
@@ -18037,10 +18037,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$btn .= '</div>';
 
 							if($tipe_dokumen == 'dpa'){
-								$tbody .= "<td class='text-center'>" . $jumlah_menunggu . "</td>";
-								$tbody .= "<td class='text-center'>" . $jumlah_disetujui . "</td>";
-								$tbody .= "<td class='text-center'>" . $jumlah_ditolak . "</td>";
-								$tbody .= "<td class='text-center'>" . $jumlah_draft . "</td>";
+								$tbody .= "<td class='text-center bg-info text-white'>" . $jumlah_draft . "</td>";
+								$tbody .= "<td class='text-center bg-secondary text-white'>" . $jumlah_menunggu . "</td>";
+								$tbody .= "<td class='text-center bg-success text-white'>" . $jumlah_disetujui . "</td>";
+								$tbody .= "<td class='text-center bg-danger text-white'>" . $jumlah_ditolak . "</td>";
 							}
 							$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
 							$tbody .= "<td>" . $btn . "</td>";
