@@ -27449,7 +27449,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					'header' => [
 					    'Authorization: Basic ' . get_option('crb_authorization_api_simpeg')
 					  ]
-				]);			
+				]);	
 
 				$dataSatker = json_decode($response, true);
 
@@ -27493,7 +27493,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 			}catch(Exception $e){
 				echo json_encode([
-					'status' => 'error',
+					'status' => false,
 					'message' => $e->getMessage()
 				]);
 				exit;
