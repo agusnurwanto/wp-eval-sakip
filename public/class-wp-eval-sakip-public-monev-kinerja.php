@@ -80,6 +80,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					}
 
 					foreach($data_renaksi as $key => $val){
+						// mengambil data dari level 4 untuk menampilkan di level / tipe 3
 						$data_renaksi[$key]['get_data_dasar_4'] = $wpdb->get_results($wpdb->prepare("
 					        SELECT
 					            *
@@ -89,34 +90,59 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					          AND active=1
 					    ", $val['id']));
 					    if (!empty($data_renaksi[$key]['get_data_dasar_4'])) {
-						    foreach ($data_renaksi[$key]['get_data_dasar_4'] as $get_pagu_key => $get_pagu_indikator) {
-						        $data_renaksi[$key]['get_data_dasar_4'][$get_pagu_key]->get_data_pagu = $wpdb->get_results($wpdb->prepare("
+						    foreach ($data_renaksi[$key]['get_data_dasar_4'] as $key4 => $val4) {
+						        $data_renaksi[$key]['get_data_dasar_4'][$key4]->get_pagu_4 = $wpdb->get_results($wpdb->prepare("
 						            SELECT
-						                SUM(rencana_pagu)
+						                SUM(rencana_pagu) as total_pagu
 						            FROM esakip_data_rencana_aksi_indikator_opd 
 						            WHERE id_renaksi=%d
 						                AND active = 1
-						        ", $get_pagu_indikator->id));
+						        ", $val4->id));
+						    }
+						    $data_renaksi[$key]['total_pagu_4'] = array_sum(array_map(function ($item) {
+						        return isset($item->get_pagu_4[0]->total_pagu) ? $item->get_pagu_4[0]->total_pagu : 0;
+						    }, $data_renaksi[$key]['get_data_dasar_4']));
+						}
+						// mengambil data dari level 3 untuk menampilkan di level / tipe 2
+					   	$data_renaksi[$key]['get_dasar_level_3'] = $wpdb->get_results($wpdb->prepare("
+						    SELECT
+						        *
+						    FROM esakip_data_rencana_aksi_opd
+						    WHERE parent=%d
+						      AND level=3
+						      AND active=1
+						", $val['id']));
+
+						foreach ($data_renaksi[$key]['get_dasar_level_3'] as $key3 => $val3) {
+						    $data_renaksi[$key]['get_dasar_level_3'][$key3]->get_dasar_level_4 = $wpdb->get_results($wpdb->prepare("
+						        SELECT
+						            *
+						        FROM esakip_data_rencana_aksi_opd
+						        WHERE parent=%d
+						          AND level=4
+						          AND active=1
+						    ", $val3->id));
+						    
+						    if (!empty($data_renaksi[$key]['get_dasar_level_3'][$key3]->get_dasar_level_4)) {
+						        foreach ($data_renaksi[$key]['get_dasar_level_3'][$key3]->get_dasar_level_4 as $keypagu3 => $valpagu3) {
+						            $data_renaksi[$key]['get_dasar_level_3'][$key3]->get_dasar_level_4[$keypagu3]->get_pagu_3 = $wpdb->get_results($wpdb->prepare("
+						                SELECT
+						                    SUM(rencana_pagu) as total_pagu
+						                FROM esakip_data_rencana_aksi_indikator_opd
+						                WHERE id_renaksi=%d
+						                  AND active = 1
+						            ", $valpagu3->id));
+						        }
 						    }
 						}
-					    $data_renaksi[$key]['get_dasar_level_3'] = $wpdb->get_results($wpdb->prepare("
-					        SELECT
-					            *
-					        FROM esakip_data_rencana_aksi_opd
-					        WHERE parent=%d
-					          AND level=3
-					          AND active=1
-					    ", $val['id']));
-					    foreach ($data_renaksi[$key]['get_dasar_level_3'] as $key3 => $val3) {
-					        $data_renaksi[$key]['get_dasar_level_3'][$key3]->get_dasar_level_4 = $wpdb->get_results($wpdb->prepare("
-					            SELECT
-					                *
-					            FROM esakip_data_rencana_aksi_opd
-					            WHERE parent=%d
-					              AND level=4
-					              AND active=1
-					        ", $val3->id));
-					    }
+
+						$data_renaksi[$key]['total_pagu_3'] = array_sum(array_map(function ($item) {
+						    return isset($item->get_dasar_level_4) ? array_sum(array_map(function ($subitem) {
+						        return isset($subitem->get_pagu_3[0]->total_pagu) ? $subitem->get_pagu_3[0]->total_pagu : 0;
+						    }, $item->get_dasar_level_4)) : 0;
+						}, $data_renaksi[$key]['get_dasar_level_3']));
+
+						// mengambil data dari level 4 untuk menampilkan di level / tipe 1
 					    $data_renaksi[$key]['get_dasar_2'] = $wpdb->get_results($wpdb->prepare("
 						    SELECT 
 						    	*
@@ -147,10 +173,28 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						                      AND level=4
 						                      AND active=1
 						                ", $val3->id));
+
+						                if (!empty($data_renaksi[$key]['get_dasar_2'][$key2]->get_dasar_to_level_3[$key3]->get_dasar_to_level_4)) {
+									        foreach ($data_renaksi[$key]['get_dasar_2'][$key2]->get_dasar_to_level_3[$key3]->get_dasar_to_level_4 as $keypagu2 => $valpagu2) {
+									            $data_renaksi[$key]['get_dasar_2'][$key2]->get_dasar_to_level_3[$key3]->get_dasar_to_level_4[$keypagu2]->get_pagu_2 = $wpdb->get_results($wpdb->prepare("
+									                SELECT
+									                    SUM(rencana_pagu) as total_pagu
+									                FROM esakip_data_rencana_aksi_indikator_opd
+									                WHERE id_renaksi=%d
+									                  AND active = 1
+									            ", $valpagu2->id));
+									        }
+									    }
 						            }
 						        }
 						    }
 						}
+
+						$data_renaksi[$key]['total_pagu_2'] = array_sum(array_map(function ($item) {
+						    return isset($item->get_dasar_to_level_4) ? array_sum(array_map(function ($subitem) {
+						        return isset($subitem->get_pagu_2[0]->total_pagu) ? $subitem->get_pagu_2[0]->total_pagu : 0;
+						    }, $item->get_dasar_to_level_4)) : 0;
+						}, $data_renaksi[$key]['get_dasar_2']));
 						$data_renaksi[$key]['indikator'] = $wpdb->get_results($wpdb->prepare("
 						    SELECT
 						        *
@@ -1480,6 +1524,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 					$tahun_anggaran = $_POST['tahun_anggaran'];
 					$id_jadwal_renstra_wpsipd = $_POST['id_jadwal_renstra_wpsipd'];
+					$input_renaksi = $_POST['input_renaksi'];
 
 					// pengaturan rencana aksi
 					$cek_data_pengaturan = $wpdb->get_var(
@@ -1507,6 +1552,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$wpdb->update('esakip_pengaturan_upload_dokumen', $data, array('id' => $cek_data_pengaturan));
 						$message = "Sukses edit data";
 					}
+
+    				update_option('_crb_input_renaksi', $input_renaksi);
 
 					echo json_encode([
 						'status' => true,

@@ -73,11 +73,11 @@ $dokumen_renstra = $wpdb->get_results(
         j.tahun_anggaran AS tahun,
         j.lama_pelaksanaan,
         j.tahun_selesai_anggaran,
-        r.id_jadwal_renstra,
+        r.id_jadwal_rpjmd,
         r.tahun_anggaran
     FROM esakip_data_jadwal j
     INNER JOIN esakip_pengaturan_upload_dokumen r
-        ON r.id_jadwal_renstra = j.id
+        ON r.id_jadwal_rpjmd = j.id
     WHERE j.tipe = 'RPJMD'
       AND j.status = 1
       AND r.tahun_anggaran = %d
@@ -122,8 +122,7 @@ foreach($unit as $opd_renstra){
 	        j.tahun_anggaran AS tahun,
 	        j.lama_pelaksanaan,
 	        j.tahun_selesai_anggaran,
-	        r.id_jadwal_renstra,
-	        r.id_jadwal_renstra
+	        r.id_jadwal_rpjmd
 	    FROM esakip_data_jadwal j
 	    INNER JOIN esakip_pengaturan_upload_dokumen r
 	        ON r.id_jadwal_rpjmd = j.id
@@ -330,7 +329,7 @@ $dokumen_pokin_pemda = $wpdb->get_results(
         j.tahun_anggaran AS tahun,
         j.lama_pelaksanaan,
         j.tahun_selesai_anggaran,
-        r.id_jadwal_renstra
+        r.id_jadwal_rpjmd
     FROM esakip_data_jadwal j
     INNER JOIN esakip_pengaturan_upload_dokumen r
         ON r.id_jadwal_rpjmd = j.id
@@ -520,7 +519,6 @@ foreach ($user_roles as $role) {
                         console.log(response.data.id_jadwal)
                         jQuery('#jadwal-rpjpd').val(response.data.id_jadwal_rpjpd);                    
                         jQuery('#jadwal-rpjmd').val(response.data.id_jadwal_rpjmd);
-                        jQuery('#jadwal-renstra').val(response.data.id_jadwal_renstra);
                     }
                 } else {
                     alert(response.message);
@@ -537,8 +535,7 @@ foreach ($user_roles as $role) {
     function submit_pengaturan_menu(){
         let id_jadwal_rpjpd = jQuery("#jadwal-rpjpd").val();
         let id_jadwal_rpjmd = jQuery("#jadwal-rpjmd").val();
-        let id_jadwal_renstra = jQuery("#jadwal-renstra").val();
-        if (id_jadwal_rpjpd == '' || id_jadwal_rpjmd == '' ||  id_jadwal_renstra == '') {
+        if (id_jadwal_rpjpd == '' || id_jadwal_rpjmd == '') {
             return alert('Ada data yang kosong!');
         }
 
@@ -553,7 +550,6 @@ foreach ($user_roles as $role) {
                     'api_key': esakip.api_key,
                     'id_jadwal_rpjpd': id_jadwal_rpjpd,
                     'id_jadwal_rpjmd': id_jadwal_rpjmd,
-                    'id_jadwal_renstra': id_jadwal_renstra,
                     'tahun_anggaran': tahun_anggaran
                 },
                 success: function(response) {

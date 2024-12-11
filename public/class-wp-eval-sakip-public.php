@@ -26284,7 +26284,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
-	public function update_data_esr_lokal(array $data_esr = [], int $user_esr_id){
+	public function update_data_esr_lokal($data_esr, $user_esr_id){
 		global $wpdb;
 		if(!empty($data_esr)){
 			$esrLokal = $wpdb->get_row($wpdb->prepare("SELECT response_json FROM esakip_data_esr WHERE user_esr_id=%d AND url=%s", $user_esr_id, 'get_data'));

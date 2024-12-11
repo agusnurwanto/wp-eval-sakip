@@ -15,6 +15,7 @@ if (!empty($_GET) && !empty($_GET['tahun_anggaran'])) {
 }
 $tahun_anggaran = $input['tahun_anggaran'];
 
+$set_renaksi = get_option('_crb_input_renaksi'); 
 $body = '';
 ?>
 <style>
@@ -43,6 +44,14 @@ $body = '';
 							<select class="form-control" id="jadwal-renstra-wpsipd">
 							</select>
 							<small class="form-text text-muted">Untuk mendapatkan Sasaran Cascading di WP-SIPD sesuai jadwal yang digunakan di input Rencana Hasil Kerja.</small>
+						</div>
+						<div class="form-group">
+							<label for="input-renaksi">Input Rencana Aksi Bulanan dan Triwulan</label><br>
+							<input type="radio" id="input-renaksi-0" name="crb_input_renaksi" value="0" <?php echo ($set_renaksi == 0) ? 'checked' : ''; ?>>
+							<label for="input-renaksi-0">Iya</label><br>
+							<input type="radio" id="input-renaksi-1" name="crb_input_renaksi" value="1" <?php echo ($set_renaksi == 1) ? 'checked' : ''; ?>>
+							<label for="input-renaksi-1">Tidak</label>
+							<small class="form-text text-muted">Pilih apakah input Rencana Aksi bulanan diinput atau didisable.</small>
 						</div>
 						<div class="form-group d-flex">
 							<button onclick="submit_pengaturan_menu(); return false;" class="btn btn-primary ml-auto">Simpan</button>
@@ -129,44 +138,57 @@ $body = '';
 	}
 
 	function submit_pengaturan_menu() {
-		let id_jadwal_renstra = jQuery("#jadwal-renstra").val();
-		let id_jadwal_renstra_wpsipd = jQuery("#jadwal-renstra-wpsipd").val();
-		if (id_jadwal_renstra == '' || id_jadwal_renstra_wpsipd == '') {
-			return alert('Ada data yang kosong!');
-		}
+	    let id_jadwal_renstra = jQuery("#jadwal-renstra").val();
+	    let id_jadwal_renstra_wpsipd = jQuery("#jadwal-renstra-wpsipd").val();
+	    let input_renaksi = jQuery('input[name="crb_input_renaksi"]:checked').val();
 
-		if (confirm("Apakah kamu yakin untuk mengubah data pokin di Rencana Hasil Kerja?\n\nPokin di Rencana Hasil Kerja yang sudah ada juga harus diperbarui!")) {
-			jQuery('#wrap-loading').show();
-			jQuery.ajax({
-				method: 'POST',
-				url: esakip.url,
-				dataType: 'json',
-				data: {
-					'action': 'submit_pengaturan_rencana_aksi',
-					'api_key': esakip.api_key,
-					'id_jadwal_renstra': id_jadwal_renstra,
-					'id_jadwal_renstra_wpsipd': id_jadwal_renstra_wpsipd,
-					'tahun_anggaran': tahun_anggaran
-				},
-				success: function(response) {
-					console.log(response);
-					jQuery('#wrap-loading').hide();
-					if (response.status === 'success') {
-						alert(response.message);
-						get_data_pengaturan_rencana_aksi();
-						afterSubmitForm();
-					} else {
-						alert(response.message);
-					}
-				},
-				error: function(xhr, status, error) {
-					console.error(xhr.responseText);
-					alert('Terjadi kesalahan saat mengirim data!');
-					jQuery('#wrap-loading').hide();
-				}
-			});
-		}
+	    if (id_jadwal_renstra == '' || id_jadwal_renstra_wpsipd == '') {
+	        return alert('Ada data yang kosong!');
+	    }
+
+	    if (confirm("Apakah kamu yakin untuk mengubah data pokin di Rencana Hasil Kerja?\n\nPokin di Rencana Hasil Kerja yang sudah ada juga harus diperbarui!")) {
+	        jQuery('#wrap-loading').show();
+	        jQuery.ajax({
+	            method: 'POST',
+	            url: esakip.url,
+	            dataType: 'json',
+	            data: {
+	                'action': 'submit_pengaturan_rencana_aksi',
+	                'api_key': esakip.api_key,
+	                'id_jadwal_renstra': id_jadwal_renstra,
+	                'id_jadwal_renstra_wpsipd': id_jadwal_renstra_wpsipd,
+	                'tahun_anggaran': tahun_anggaran,
+	                'input_renaksi': input_renaksi 
+	            },
+	            success: function(response) {
+	                console.log(response);
+	                jQuery('#wrap-loading').hide();
+	                if (response.status === 'success') {
+	                    alert(response.message);
+
+	                    if (input_renaksi == '1') {
+	                        jQuery('#input-renaksi-0').prop('checked', false);
+	                        jQuery('#input-renaksi-1').prop('checked', true);
+	                    } else {
+	                        jQuery('#input-renaksi-0').prop('checked', true);
+	                        jQuery('#input-renaksi-1').prop('checked', false);
+	                    }
+
+	                    get_data_pengaturan_rencana_aksi();
+	                    afterSubmitForm();
+	                } else {
+	                    alert(response.message);
+	                }
+	            },
+	            error: function(xhr, status, error) {
+	                console.error(xhr.responseText);
+	                alert('Terjadi kesalahan saat mengirim data!');
+	                jQuery('#wrap-loading').hide();
+	            }
+	        });
+	    }
 	}
+
 
 	function afterSubmitForm() {
 		jQuery("#keterangan").val("")
