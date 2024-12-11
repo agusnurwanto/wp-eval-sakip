@@ -4,6 +4,11 @@ global $wpdb;
 if (!defined('WPINC')) {
     die;
 }
+$current_user = wp_get_current_user();
+$data_unit = $wpdb->get_row($wpdb->prepare("SELECT id_unit FROM esakip_data_unit WHERE nipkepala=%s AND active=%d AND tahun_anggaran=%d", $current_user->user_login, 1, 2024), ARRAY_A);
+echo "<pre>";
+print_r(($data_unit));
+echo "</pre>";
 
 $input = shortcode_atts(array(
     'tahun' => '2022',
@@ -722,7 +727,8 @@ $status_api_esr = get_option('_crb_api_esr_status');
                     api_key: esakip.api_key,
                     list: list,
                     tahun_anggaran:'<?php echo $input['tahun'] ?>',
-                    nama_tabel_database:'esakip_perjanjian_kinerja'
+                    nama_tabel_database:'esakip_perjanjian_kinerja',
+                    id_skpd: <?php echo $id_skpd; ?>
                 },
                 dataType: 'json',
                 success: function(response) {
