@@ -5309,10 +5309,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
+				$nama_tabel = 'esakip_renja_rkt';
 				$renjas = $wpdb->get_results(
 					$wpdb->prepare("
                     SELECT * 
-                    FROM esakip_renja_rkt 
+                    FROM $nama_tabel 
                     WHERE id_skpd = %d 
                       AND tahun_anggaran = %d 
                       AND active = 1
@@ -5327,7 +5328,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$status_api_esr = get_option('_crb_api_esr_status');
 
 					if($status_api_esr){
-						$nama_tabel = $_POST['nama_tabel_database'];
 						$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 								SELECT 
 										a.*
@@ -5346,32 +5346,36 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						if(!empty($mapping_jenis_dokumen_esr)){
 
-							$data_esr = $this->data_esr($tahun_anggaran);
-							$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
-							$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
-
 							$array_data_esr = [];
-							foreach ($data_esr as $key => $esr) {
-								if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
-									$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
-					
-									if(!empty($esr_lokal)){
-										$wpdb->update($nama_tabel, [
-												'path_esr' => $esr->path
-											], [
-												'id' => $esr_lokal['id']
-											]);
-									}
+							$data_esr = $this->data_esr($tahun_anggaran);
+							if($data_esr['status'] == 'success'){
+								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
 
-									$path = explode("/", $esr->path);
-									$nama_file = end($path);
-									$array_data_esr[]=[
-										'upload_id' => $esr->upload_id,
-										'nama_file' => $nama_file,
-										'keterangan' => $esr->keterangan,
-										'path' => $esr->path
-									];
+								foreach ($data_esr as $key => $esr) {
+									if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
+										$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+						
+										if(!empty($esr_lokal)){
+											$wpdb->update($nama_tabel, [
+													'path_esr' => $esr->path
+												], [
+													'id' => $esr_lokal['id']
+												]);
+										}
+
+										$path = explode("/", $esr->path);
+										$nama_file = end($path);
+										$array_data_esr[]=[
+											'upload_id' => $esr->upload_id,
+											'nama_file' => $nama_file,
+											'keterangan' => $esr->keterangan,
+											'path' => $esr->path
+										];
+									}
 								}
+							}else{
+								$ret['data_esr'] = $data_esr;
 							}
 						}
 					}
@@ -5546,10 +5550,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
+				$nama_tabel = 'esakip_rencana_aksi';
 				$rencana_aksis = $wpdb->get_results(
 					$wpdb->prepare("
                     SELECT * 
-                    FROM esakip_rencana_aksi
+                    FROM $nama_tabel
                     WHERE id_skpd = %d 
                       AND tahun_anggaran = %d 
                       AND active = 1
@@ -5564,7 +5569,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$status_api_esr = get_option('_crb_api_esr_status');
 
 					if($status_api_esr){
-						$nama_tabel = $_POST['nama_tabel_database'];
 						$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 								SELECT 
 										a.*
@@ -5580,35 +5584,38 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			                      	a.tahun_anggaran=%d and
 			                        b.nama_tabel=%s;
 						", $tahun_anggaran, $nama_tabel), ARRAY_A);
-
+						
 						if(!empty($mapping_jenis_dokumen_esr)){
-
-							$data_esr = $this->data_esr($tahun_anggaran);
-							$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
-							$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
-
 							$array_data_esr = [];
-							foreach ($data_esr as $key => $esr) {
-								if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
-									$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
-					
-									if(!empty($esr_lokal)){
-										$wpdb->update($nama_tabel, [
-												'path_esr' => $esr->path
-											], [
-												'id' => $esr_lokal['id']
-											]);
-									}
+							$data_esr = $this->data_esr($tahun_anggaran);
+							if($data_esr['status'] == 'success'){
+								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
 
-									$path = explode("/", $esr->path);
-									$nama_file = end($path);
-									$array_data_esr[]=[
-										'upload_id' => $esr->upload_id,
-										'nama_file' => $nama_file,
-										'keterangan' => $esr->keterangan,
-										'path' => $esr->path
-									];
+								foreach ($data_esr as $key => $esr) {
+									if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
+										$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+						
+										if(!empty($esr_lokal)){
+											$wpdb->update($nama_tabel, [
+													'path_esr' => $esr->path
+												], [
+													'id' => $esr_lokal['id']
+												]);
+										}
+
+										$path = explode("/", $esr->path);
+										$nama_file = end($path);
+										$array_data_esr[]=[
+											'upload_id' => $esr->upload_id,
+											'nama_file' => $nama_file,
+											'keterangan' => $esr->keterangan,
+											'path' => $esr->path
+										];
+									}
 								}
+							}else{
+								$ret['data_esr'] = $data_esr;
 							}
 						}
 					}
@@ -5721,10 +5728,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
+				$nama_tabel = 'esakip_perjanjian_kinerja';
 				$perjanjian_kinerjas = $wpdb->get_results(
 					$wpdb->prepare("
                     SELECT * 
-                    FROM esakip_perjanjian_kinerja
+                    FROM $nama_tabel
                     WHERE id_skpd = %d 
                       AND tahun_anggaran = %d 
                       AND active = 1
@@ -5739,7 +5747,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$status_api_esr = get_option('_crb_api_esr_status');
 
 					if($status_api_esr){
-						$nama_tabel = $_POST['nama_tabel_database'];
 						$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 								SELECT 
 										a.*
@@ -5757,33 +5764,36 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						", $tahun_anggaran, $nama_tabel), ARRAY_A);
 
 						if(!empty($mapping_jenis_dokumen_esr)){
-
-							$data_esr = $this->data_esr($tahun_anggaran);
-							$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
-							$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
-
 							$array_data_esr = [];
-							foreach ($data_esr as $key => $esr) {
-								if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
-									$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
-					
-									if(!empty($esr_lokal)){
-										$wpdb->update($nama_tabel, [
-												'path_esr' => $esr->path
-											], [
-												'id' => $esr_lokal['id']
-											]);
-									}
+							$data_esr = $this->data_esr($tahun_anggaran);
+							if($data_esr['status'] == 'success'){
+								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
 
-									$path = explode("/", $esr->path);
-									$nama_file = end($path);
-									$array_data_esr[]=[
-										'upload_id' => $esr->upload_id,
-										'nama_file' => $nama_file,
-										'keterangan' => $esr->keterangan,
-										'path' => $esr->path
-									];
+								foreach ($data_esr as $key => $esr) {
+									if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
+										$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+						
+										if(!empty($esr_lokal)){
+											$wpdb->update($nama_tabel, [
+													'path_esr' => $esr->path
+												], [
+													'id' => $esr_lokal['id']
+												]);
+										}
+
+										$path = explode("/", $esr->path);
+										$nama_file = end($path);
+										$array_data_esr[]=[
+											'upload_id' => $esr->upload_id,
+											'nama_file' => $nama_file,
+											'keterangan' => $esr->keterangan,
+											'path' => $esr->path
+										];
+									}
 								}
+							}else{
+								$ret['data_esr'] = $data_esr;
 							}
 						}
 					}
@@ -5959,10 +5969,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
+				$nama_tabel = 'esakip_laporan_kinerja';
 				$laporan_kinerjas = $wpdb->get_results(
 					$wpdb->prepare("
                     SELECT * 
-                    FROM esakip_laporan_kinerja
+                    FROM $nama_tabel
                     WHERE id_skpd = %d 
                       AND tahun_anggaran = %d 
                       AND active = 1
@@ -5977,7 +5988,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$status_api_esr = get_option('_crb_api_esr_status');
 
 					if($status_api_esr){
-						$nama_tabel = $_POST['nama_tabel_database'];
 						$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 								SELECT 
 										a.*
@@ -5995,33 +6005,36 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						", $tahun_anggaran, $nama_tabel), ARRAY_A);
 
 						if(!empty($mapping_jenis_dokumen_esr)){
-
-							$data_esr = $this->data_esr($tahun_anggaran);
-							$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
-							$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
-
 							$array_data_esr = [];
-							foreach ($data_esr as $key => $esr) {
-								if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
-									$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
-					
-									if(!empty($esr_lokal)){
-										$wpdb->update($nama_tabel, [
-												'path_esr' => $esr->path
-											], [
-												'id' => $esr_lokal['id']
-											]);
-									}
+							$data_esr = $this->data_esr($tahun_anggaran);
+							if($data_esr['status'] == 'success'){
+								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
 
-									$path = explode("/", $esr->path);
-									$nama_file = end($path);
-									$array_data_esr[]=[
-										'upload_id' => $esr->upload_id,
-										'nama_file' => $nama_file,
-										'keterangan' => $esr->keterangan,
-										'path' => $esr->path
-									];
+								foreach ($data_esr as $key => $esr) {
+									if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
+										$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+						
+										if(!empty($esr_lokal)){
+											$wpdb->update($nama_tabel, [
+													'path_esr' => $esr->path
+												], [
+													'id' => $esr_lokal['id']
+												]);
+										}
+
+										$path = explode("/", $esr->path);
+										$nama_file = end($path);
+										$array_data_esr[]=[
+											'upload_id' => $esr->upload_id,
+											'nama_file' => $nama_file,
+											'keterangan' => $esr->keterangan,
+											'path' => $esr->path
+										];
+									}
 								}
+							}else{
+								$ret['data_esr'] = $data_esr;
 							}
 						}
 					}
@@ -6203,10 +6216,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
+				$nama_tabel = 'esakip_iku';
 				$ikus = $wpdb->get_results(
 					$wpdb->prepare("
                     SELECT * 
-                    FROM esakip_iku
+                    FROM $nama_tabel
                     WHERE id_skpd = %d 
                       AND tahun_anggaran = %d 
                       AND active = 1
@@ -6221,7 +6235,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$status_api_esr = get_option('_crb_api_esr_status');
 
 					if($status_api_esr){
-						$nama_tabel = $_POST['nama_tabel_database'];
 						$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 								SELECT 
 										a.*
@@ -6239,33 +6252,36 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						", $tahun_anggaran, $nama_tabel), ARRAY_A);
 
 						if(!empty($mapping_jenis_dokumen_esr)){
-
-							$data_esr = $this->data_esr($tahun_anggaran);
-							$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
-							$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
-
 							$array_data_esr = [];
-							foreach ($data_esr as $key => $esr) {
-								if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
-									$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
-					
-									if(!empty($esr_lokal)){
-										$wpdb->update($nama_tabel, [
-												'path_esr' => $esr->path
-											], [
-												'id' => $esr_lokal['id']
-											]);
-									}
+							$data_esr = $this->data_esr($tahun_anggaran);
+							if($data_esr['status'] == 'success'){
+								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
 
-									$path = explode("/", $esr->path);
-									$nama_file = end($path);
-									$array_data_esr[]=[
-										'upload_id' => $esr->upload_id,
-										'nama_file' => $nama_file,
-										'keterangan' => $esr->keterangan,
-										'path' => $esr->path
-									];
+								foreach ($data_esr as $key => $esr) {
+									if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
+										$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+						
+										if(!empty($esr_lokal)){
+											$wpdb->update($nama_tabel, [
+													'path_esr' => $esr->path
+												], [
+													'id' => $esr_lokal['id']
+												]);
+										}
+
+										$path = explode("/", $esr->path);
+										$nama_file = end($path);
+										$array_data_esr[]=[
+											'upload_id' => $esr->upload_id,
+											'nama_file' => $nama_file,
+											'keterangan' => $esr->keterangan,
+											'path' => $esr->path
+										];
+									}
 								}
+							}else{
+								$ret['data_esr'] = $data_esr;
 							}
 						}
 					}
@@ -6379,10 +6395,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
+				$nama_tabel = 'esakip_dokumen_lainnya';
 				$dokumen_lains = $wpdb->get_results(
 					$wpdb->prepare("
                     SELECT * 
-                    FROM esakip_dokumen_lainnya
+                    FROM $nama_tabel
                     WHERE id_skpd = %d 
                       AND tahun_anggaran = %d 
                       AND active = 1
@@ -6397,7 +6414,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$status_api_esr = get_option('_crb_api_esr_status');
 
 					if($status_api_esr){
-						$nama_tabel = $_POST['nama_tabel_database'];
 						$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 								SELECT 
 										a.*
@@ -6415,33 +6431,36 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						", $tahun_anggaran, $nama_tabel), ARRAY_A);
 
 						if(!empty($mapping_jenis_dokumen_esr)){
-
-							$data_esr = $this->data_esr($tahun_anggaran);
-							$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
-							$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
-
 							$array_data_esr = [];
-							foreach ($data_esr as $key => $esr) {
-								if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
-									$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
-					
-									if(!empty($esr_lokal)){
-										$wpdb->update($nama_tabel, [
-												'path_esr' => $esr->path
-											], [
-												'id' => $esr_lokal['id']
-											]);
-									}
+							$data_esr = $this->data_esr($tahun_anggaran);
+							if($data_esr['status'] == 'success'){
+								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
 
-									$path = explode("/", $esr->path);
-									$nama_file = end($path);
-									$array_data_esr[]=[
-										'upload_id' => $esr->upload_id,
-										'nama_file' => $nama_file,
-										'keterangan' => $esr->keterangan,
-										'path' => $esr->path
-									];
+								foreach ($data_esr as $key => $esr) {
+									if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
+										$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+						
+										if(!empty($esr_lokal)){
+											$wpdb->update($nama_tabel, [
+													'path_esr' => $esr->path
+												], [
+													'id' => $esr_lokal['id']
+												]);
+										}
+
+										$path = explode("/", $esr->path);
+										$nama_file = end($path);
+										$array_data_esr[]=[
+											'upload_id' => $esr->upload_id,
+											'nama_file' => $nama_file,
+											'keterangan' => $esr->keterangan,
+											'path' => $esr->path
+										];
+									}
 								}
+							}else{
+								$ret['data_esr'] = $data_esr;
 							}
 						}
 					}
@@ -6918,10 +6937,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Jadwal kosong!';
 				}
+				$table_name = 'esakip_rpjmd';
 				$rpjmds = $wpdb->get_results(
 					$wpdb->prepare("
 						SELECT * 
-						FROM esakip_rpjmd
+						FROM $nama_tabel
 						WHERE id_jadwal = %d 
 						  AND active = 1
 					", $id_jadwal),
@@ -6957,36 +6977,42 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				                        WHERE 
 				                            a.tahun_anggaran=%d AND
 				                            b.nama_tabel=%s;
-							", $pengaturan_periode_dokumen['tahun_anggaran'], 'esakip_rpjmd'), ARRAY_A);
+							", $pengaturan_periode_dokumen['tahun_anggaran'], $table_name), ARRAY_A);
 
 							if(!empty($mapping_jenis_dokumen_esr)){
-								$ret['status_mapping_esr'] = true;
-								$data_esr = $this->data_esr($tahun_anggaran);
-								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
-								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
-
+								$tahun_anggaran = $pengaturan_periode_dokumen['tahun_anggaran'];
 								$array_data_esr = [];
-								foreach ($data_esr as $key => $esr) {
-									if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
-										$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM esakip_rpjmd WHERE upload_id=%d AND active=%d", $esr->upload_id, 1), ARRAY_A);
-										if(!empty($esr_lokal)){
-											$wpdb->update('esakip_rpjmd', [
-												'path_esr' => $esr->path
-											], [
-												'id' => $esr_lokal['id']
-											]);
-										}
+								$data_esr = $this->data_esr($tahun_anggaran);
+								if($data_esr['status'] == 'success'){
+									$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+									$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
 
-										$path = explode("/", $esr->path);
-										$nama_file = end($path);
-										$array_data_esr[]=[
-											'upload_id' => $esr->upload_id,
-											'nama_file' => $nama_file,
-											'keterangan' => $esr->keterangan,
-											'path' => $esr->path
-										];
+									foreach ($data_esr as $key => $esr) {
+										if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
+											$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+							
+											if(!empty($esr_lokal)){
+												$wpdb->update($nama_tabel, [
+														'path_esr' => $esr->path
+													], [
+														'id' => $esr_lokal['id']
+													]);
+											}
+
+											$path = explode("/", $esr->path);
+											$nama_file = end($path);
+											$array_data_esr[]=[
+												'upload_id' => $esr->upload_id,
+												'nama_file' => $nama_file,
+												'keterangan' => $esr->keterangan,
+												'path' => $esr->path
+											];
+										}
 									}
+								}else{
+									$ret['data_esr'] = $data_esr;
 								}
+								$ret['status_mapping_esr'] = true;
 							}
 						}
 					}
@@ -7169,10 +7195,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Jadwal kosong!';
 				}
+				$nama_tabel = 'esakip_renstra';
 				$renstras = $wpdb->get_results(
 					$wpdb->prepare("
                     SELECT * 
-                    FROM esakip_renstra
+                    FROM $nama_tabel
                     WHERE id_skpd = %d 
                       AND id_jadwal = %d 
                       AND active = 1
@@ -7200,7 +7227,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						if(!empty($pengaturan_periode_dokumen)){
 							$ret['tahun_anggaran_periode_dokumen'] = $pengaturan_periode_dokumen['tahun_anggaran'];
-							$nama_tabel = $_POST['nama_tabel_database'];
 							$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 								SELECT 
 										a.*
@@ -7218,33 +7244,37 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							", $pengaturan_periode_dokumen['tahun_anggaran'], $nama_tabel), ARRAY_A);
 
 							if(!empty($mapping_jenis_dokumen_esr)){
-
-								$data_esr = $this->data_esr($pengaturan_periode_dokumen['tahun_anggaran']);
-								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
-								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
-
+								$tahun_anggaran = $pengaturan_periode_dokumen['tahun_anggaran'];
 								$array_data_esr = [];
-								foreach ($data_esr as $key => $esr) {
-									if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
-										$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE upload_id=%d AND active=%d", $esr->upload_id, 1), ARRAY_A);
-					
-										if(!empty($esr_lokal)){
-											$wpdb->update($nama_tabel, [
-													'path_esr' => $esr->path
-												], [
-													'id' => $esr_lokal['id']
-												]);
-										}
+								$data_esr = $this->data_esr($tahun_anggaran);
+								if($data_esr['status'] == 'success'){
+									$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+									$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
 
-										$path = explode("/", $esr->path);
-										$nama_file = end($path);
-										$array_data_esr[]=[
-											'upload_id' => $esr->upload_id,
-											'nama_file' => $nama_file,
-											'keterangan' => $esr->keterangan,
-											'path' => $esr->path
-										];
+									foreach ($data_esr as $key => $esr) {
+										if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
+											$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+							
+											if(!empty($esr_lokal)){
+												$wpdb->update($nama_tabel, [
+														'path_esr' => $esr->path
+													], [
+														'id' => $esr_lokal['id']
+													]);
+											}
+
+											$path = explode("/", $esr->path);
+											$nama_file = end($path);
+											$array_data_esr[]=[
+												'upload_id' => $esr->upload_id,
+												'nama_file' => $nama_file,
+												'keterangan' => $esr->keterangan,
+												'path' => $esr->path
+											];
+										}
 									}
+								}else{
+									$ret['data_esr'] = $data_esr;
 								}
 							}
 						}
@@ -7422,10 +7452,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
+				$nama_tabel = 'esakip_skp';
 				$skp = $wpdb->get_results(
 					$wpdb->prepare("
                     SELECT * 
-                    FROM esakip_skp 
+                    FROM $nama_tabel 
                     WHERE id_skpd = %d 
                       AND tahun_anggaran = %d 
                       AND active = 1
@@ -7440,7 +7471,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$status_api_esr = get_option('_crb_api_esr_status');
 
 					if($status_api_esr){
-						$nama_tabel = $_POST['nama_tabel_database'];
 						$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 								SELECT 
 										a.*
@@ -7458,33 +7488,36 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						", $tahun_anggaran, $nama_tabel), ARRAY_A);
 
 						if(!empty($mapping_jenis_dokumen_esr)){
-
-							$data_esr = $this->data_esr($tahun_anggaran);
-							$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
-							$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
-
 							$array_data_esr = [];
-							foreach ($data_esr as $key => $esr) {
-								if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
-									$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
-					
-									if(!empty($esr_lokal)){
-										$wpdb->update($nama_tabel, [
-												'path_esr' => $esr->path
-											], [
-												'id' => $esr_lokal['id']
-											]);
-									}
+							$data_esr = $this->data_esr($tahun_anggaran);
+							if($data_esr['status'] == 'success'){
+								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
 
-									$path = explode("/", $esr->path);
-									$nama_file = end($path);
-									$array_data_esr[]=[
-										'upload_id' => $esr->upload_id,
-										'nama_file' => $nama_file,
-										'keterangan' => $esr->keterangan,
-										'path' => $esr->path
-									];
+								foreach ($data_esr as $key => $esr) {
+									if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
+										$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+						
+										if(!empty($esr_lokal)){
+											$wpdb->update($nama_tabel, [
+													'path_esr' => $esr->path
+												], [
+													'id' => $esr_lokal['id']
+												]);
+										}
+
+										$path = explode("/", $esr->path);
+										$nama_file = end($path);
+										$array_data_esr[]=[
+											'upload_id' => $esr->upload_id,
+											'nama_file' => $nama_file,
+											'keterangan' => $esr->keterangan,
+											'path' => $esr->path
+										];
+									}
 								}
+							}else{
+								$ret['data_esr'] = $data_esr;
 							}
 						}
 					}
@@ -7656,33 +7689,36 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							", $tahun_anggaran, $nama_tabel[$tipe_dokumen]), ARRAY_A);
 
 							if(!empty($mapping_jenis_dokumen_esr)){
-
-								$data_esr = $this->data_esr($tahun_anggaran);
-								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
-								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
-
 								$array_data_esr = [];
-								foreach ($data_esr as $key => $esr) {
-									if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
-										$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel[$tipe_dokumen]." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
-						
-										if(!empty($esr_lokal)){
-											$wpdb->update($nama_tabel[$tipe_dokumen], [
-													'path_esr' => $esr->path
-												], [
-													'id' => $esr_lokal['id']
-												]);
-										}
+								$data_esr = $this->data_esr($tahun_anggaran);
+								if($data_esr['status'] == 'success'){
+									$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+									$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
 
-										$path = explode("/", $esr->path);
-										$nama_file = end($path);
-										$array_data_esr[]=[
-											'upload_id' => $esr->upload_id,
-											'nama_file' => $nama_file,
-											'keterangan' => $esr->keterangan,
-											'path' => $esr->path
-										];
+									foreach ($data_esr as $key => $esr) {
+										if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
+											$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+							
+											if(!empty($esr_lokal)){
+												$wpdb->update($nama_tabel, [
+														'path_esr' => $esr->path
+													], [
+														'id' => $esr_lokal['id']
+													]);
+											}
+
+											$path = explode("/", $esr->path);
+											$nama_file = end($path);
+											$array_data_esr[]=[
+												'upload_id' => $esr->upload_id,
+												'nama_file' => $nama_file,
+												'keterangan' => $esr->keterangan,
+												'path' => $esr->path
+											];
+										}
 									}
+								}else{
+									$ret['data_esr'] = $data_esr;
 								}
 							}
 						}
@@ -7820,6 +7856,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						"rkpd" => "esakip_rkpd_pemda"
 					);
 
+					$nama_tabel = $nama_tabel_admin[$tipe_dokumen];
 					$datas = $wpdb->get_results(
 						$wpdb->prepare("
 						SELECT * 
@@ -7837,24 +7874,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$mapping_jenis_dokumen_esr = [];
 						$status_api_esr = get_option('_crb_api_esr_status');
 						if($status_api_esr){
-							$nama_tabel = $_POST['nama_tabel_database'];
-
-							// if(empty($nama_tabel)){
-							// 	$ret['status'] = 'error';
-							// 	$ret['message'] = 'Jenis dokumen sakip kosong!';
-							// }
-							
-							// $menu_dokumen = $wpdb->get_row($wpdb->prepare("SELECT id FROM esakip_menu_dokumen WHERE nama_tabel=%s AND tahun_anggaran=%d", $nama_tabel, $tahun_anggaran), ARRAY_A);
-							// if(empty($menu_dokumen['id']) || is_null($menu_dokumen['id'])){
-							// 	$ret['status'] = 'error';
-							// 	$ret['message'] = 'Jenis dokumen sakip di pengaturan menu tahun anggaran '. $tahun_anggaran . ' belum digenerate!';	
-							// }
-							
-							// $jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("SELECT id FROM esakip_data_jenis_dokumen_esr WHERE tahun_anggaran=%d", $tahun_anggaran), ARRAY_A);
-							// if(empty($jenis_dokumen_esr['id']) || is_null($jenis_dokumen_esr['id'])){
-							// 	$ret['status'] = 'error';
-							// 	$ret['message'] = 'Jenis dokumen ESR tahun anggaran '. $tahun_anggaran . ' belum digenerate!';
-							// }
 
 							$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 								SELECT 
@@ -7872,35 +7891,36 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		                                b.nama_tabel=%s;
 								", $tahun_anggaran, $nama_tabel), ARRAY_A);
 							if(!empty($mapping_jenis_dokumen_esr)){
-								
-								// $ret['status'] = 'error';
-								// $ret['message'] = 'Jenis dokumen lokal dan jenis dokumen ESR belum di-mapping!';
-								
-								$data_esr = $this->data_esr($tahun_anggaran);
-								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
-								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
-
 								$array_data_esr = [];
-								foreach ($data_esr as $key => $esr) {
-									if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
-										$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE upload_id=%d AND tahun_anggaran=%d AND active=%d", $esr->upload_id, $tahun_anggaran, 1), ARRAY_A);
-										if(!empty($esr_lokal)){
-											$wpdb->update($nama_tabel, [
-												'path_esr' => $esr->path
-											], [
-												'id' => $esr_lokal['id']
-											]);
-										}
+								$data_esr = $this->data_esr($tahun_anggaran);
+								if($data_esr['status'] == 'success'){
+									$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+									$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
 
-										$path = explode("/", $esr->path);
-										$nama_file = end($path);
-										$array_data_esr[]=[
-											'upload_id' => $esr->upload_id,
-											'nama_file' => $nama_file,
-											'keterangan' => $esr->keterangan,
-											'path' => $esr->path
-										];
+									foreach ($data_esr as $key => $esr) {
+										if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
+											$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+							
+											if(!empty($esr_lokal)){
+												$wpdb->update($nama_tabel, [
+														'path_esr' => $esr->path
+													], [
+														'id' => $esr_lokal['id']
+													]);
+											}
+
+											$path = explode("/", $esr->path);
+											$nama_file = end($path);
+											$array_data_esr[]=[
+												'upload_id' => $esr->upload_id,
+												'nama_file' => $nama_file,
+												'keterangan' => $esr->keterangan,
+												'path' => $esr->path
+											];
+										}
 									}
+								}else{
+									$ret['data_esr'] = $data_esr;
 								}
 							}
 						}
@@ -13728,10 +13748,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
+				$nama_tabel = 'esakip_laporan_monev_renaksi';
 				$laporan_monev_renaksis = $wpdb->get_results(
 					$wpdb->prepare("
                     SELECT * 
-                    FROM esakip_laporan_monev_renaksi
+                    FROM $nama_tabel
                     WHERE id_skpd = %d 
                       AND tahun_anggaran = %d 
                       AND active = 1
@@ -13746,7 +13767,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$status_api_esr = get_option('_crb_api_esr_status');
 
 					if($status_api_esr){
-						$nama_tabel = $_POST['nama_tabel_database'];
 						$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 								SELECT 
 										a.*
@@ -13764,33 +13784,36 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						", $tahun_anggaran, $nama_tabel), ARRAY_A);
 
 						if(!empty($mapping_jenis_dokumen_esr)){
-
-							$data_esr = $this->data_esr($tahun_anggaran);
-							$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
-							$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
-
 							$array_data_esr = [];
-							foreach ($data_esr as $key => $esr) {
-								if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
-									$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
-					
-									if(!empty($esr_lokal)){
-										$wpdb->update($nama_tabel, [
-												'path_esr' => $esr->path
-											], [
-												'id' => $esr_lokal['id']
-											]);
-									}
+							$data_esr = $this->data_esr($tahun_anggaran);
+							if($data_esr['status'] == 'success'){
+								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
 
-									$path = explode("/", $esr->path);
-									$nama_file = end($path);
-									$array_data_esr[]=[
-										'upload_id' => $esr->upload_id,
-										'nama_file' => $nama_file,
-										'keterangan' => $esr->keterangan,
-										'path' => $esr->path
-									];
+								foreach ($data_esr as $key => $esr) {
+									if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
+										$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+						
+										if(!empty($esr_lokal)){
+											$wpdb->update($nama_tabel, [
+													'path_esr' => $esr->path
+												], [
+													'id' => $esr_lokal['id']
+												]);
+										}
+
+										$path = explode("/", $esr->path);
+										$nama_file = end($path);
+										$array_data_esr[]=[
+											'upload_id' => $esr->upload_id,
+											'nama_file' => $nama_file,
+											'keterangan' => $esr->keterangan,
+											'path' => $esr->path
+										];
+									}
 								}
+							}else{
+								$ret['data_esr'] = $data_esr;
 							}
 						}
 					}
@@ -15213,13 +15236,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							)
 						);
 
-						$jumlah_status = $wpdb->get_row(
+						$jumlah_status_disetujui = $wpdb->get_var(
 							$wpdb->prepare(
 								"
 								SELECT 
-									COUNT(case when kv.status_verifikasi = 1 then 1 end) as jumlah_disetujui,
-									COUNT(case when kv.status_verifikasi = 2 then 1 end) as jumlah_ditolak,
-									COUNT(case when kv.status_verifikasi = 3 then 1 end) as jumlah_draft
+									COUNT(kv.id)
 								FROM 
 									esakip_perjanjian_kinerja pk 
 								JOIN 
@@ -15229,28 +15250,78 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								AND pk.tahun_anggaran = %d
 								AND pk.active = 1
 								AND kv.active = 1
+								AND kv.status_verifikasi=1
+								AND kv.nama_tabel_dokumen = %s
 								",
 								$vv['id_skpd'],
-								$tahun_anggaran
-							), ARRAY_A
+								$tahun_anggaran,
+								'esakip_perjanjian_kinerja'
+							)
 						);
 
-						$jumlah_menunggu = 0;
-						if(!empty($jumlah_status)){
-							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_status['jumlah_disetujui'] + $jumlah_status['jumlah_ditolak'] + $jumlah_status['jumlah_draft']);
-						}
-						$jumlah_disetujui = !empty($jumlah_status) ? $jumlah_status['jumlah_disetujui'] : '0';
-						$jumlah_ditolak = !empty($jumlah_status) ? $jumlah_status['jumlah_ditolak'] : '0';
-						$jumlah_draft = !empty($jumlah_status) ? $jumlah_status['jumlah_draft'] : '0';
+						$jumlah_status_ditolak = $wpdb->get_var(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(kv.id)
+								FROM 
+									esakip_perjanjian_kinerja pk 
+								JOIN 
+									esakip_keterangan_verifikator kv 
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.tahun_anggaran = %d
+								AND pk.active = 1
+								AND kv.active = 1
+								AND kv.status_verifikasi=2
+								AND kv.nama_tabel_dokumen = %s
+								",
+								$vv['id_skpd'],
+								$tahun_anggaran,
+								'esakip_perjanjian_kinerja'
+							)
+						);
 
+						$jumlah_status_draft = $wpdb->get_var(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(kv.id)
+								FROM 
+									esakip_perjanjian_kinerja pk 
+								JOIN 
+									esakip_keterangan_verifikator kv 
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.tahun_anggaran = %d
+								AND pk.active = 1
+								AND kv.active = 1
+								AND kv.status_verifikasi=3
+								AND kv.nama_tabel_dokumen = %s
+								",
+								$vv['id_skpd'],
+								$tahun_anggaran,
+								'esakip_perjanjian_kinerja'
+							)
+						);
+						
+
+						$jumlah_disetujui = !empty($jumlah_status_disetujui) ? $jumlah_status_disetujui : 0;
+						$jumlah_ditolak = !empty($jumlah_status_ditolak) ? $jumlah_status_ditolak : 0;
+						$jumlah_draft = !empty($jumlah_status_draft) ? $jumlah_status_draft : 0;
+						$jumlah_menunggu = 0;
+						if(!empty($jumlah_dokumen)){
+							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_disetujui + $jumlah_ditolak + $jumlah_draft);
+						}
+						
 						$btn = '<div class="btn-action-group">';
 						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_perjanjian_kinerja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 						$btn .= '</div>';
 
-						$tbody .= "<td class='text-center'>" . $jumlah_menunggu . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_disetujui . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_ditolak . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_draft . "</td>";
+						$tbody .= "<td class='text-center bg-info text-white'>" . $jumlah_draft . "</td>";
+						$tbody .= "<td class='text-center bg-secondary text-white'>" . $jumlah_menunggu . "</td>";
+						$tbody .= "<td class='text-center bg-success text-white'>" . $jumlah_disetujui . "</td>";
+						$tbody .= "<td class='text-center bg-danger text-white'>" . $jumlah_ditolak . "</td>";
 						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
 						$tbody .= "<td>" . $btn . "</td>";
 
@@ -15865,11 +15936,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$where .= " AND id_skpd = $id_skpd";
 				}
 
+				$nama_tabel = 'esakip_evaluasi_internal';
 				$dokumen_unset = $wpdb->get_results(
 					"
 					SELECT 
 						*
-					FROM esakip_evaluasi_internal 
+					FROM $nama_tabel 
 					WHERE $where
 					  AND active = 1
 					",
@@ -15883,7 +15955,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$status_api_esr = get_option('_crb_api_esr_status');
 
 					if($status_api_esr){
-						$nama_tabel = $_POST['nama_tabel_database'];
 						$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 								SELECT 
 										a.*
@@ -15901,33 +15972,36 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						", $tahun_anggaran, $nama_tabel), ARRAY_A);
 
 						if(!empty($mapping_jenis_dokumen_esr)){
-
-							$data_esr = $this->data_esr($tahun_anggaran);
-							$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
-							$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
-
 							$array_data_esr = [];
-							foreach ($data_esr as $key => $esr) {
-								if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
-									$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
-					
-									if(!empty($esr_lokal)){
-										$wpdb->update($nama_tabel, [
-												'path_esr' => $esr->path
-											], [
-												'id' => $esr_lokal['id']
-											]);
-									}
+							$data_esr = $this->data_esr($tahun_anggaran);
+							if($data_esr['status'] == 'success'){
+								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
 
-									$path = explode("/", $esr->path);
-									$nama_file = end($path);
-									$array_data_esr[]=[
-										'upload_id' => $esr->upload_id,
-										'nama_file' => $nama_file,
-										'keterangan' => $esr->keterangan,
-										'path' => $esr->path
-									];
+								foreach ($data_esr as $key => $esr) {
+									if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
+										$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+						
+										if(!empty($esr_lokal)){
+											$wpdb->update($nama_tabel, [
+													'path_esr' => $esr->path
+												], [
+													'id' => $esr_lokal['id']
+												]);
+										}
+
+										$path = explode("/", $esr->path);
+										$nama_file = end($path);
+										$array_data_esr[]=[
+											'upload_id' => $esr->upload_id,
+											'nama_file' => $nama_file,
+											'keterangan' => $esr->keterangan,
+											'path' => $esr->path
+										];
+									}
 								}
+							}else{
+								$ret['data_esr'] = $data_esr;
 							}
 						}
 					}
@@ -16479,45 +16553,93 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								$tahun_anggaran
 							)
 						);
-
-						$jumlah_status = $wpdb->get_row(
+						
+						$jumlah_status_disetujui = $wpdb->get_var(
 							$wpdb->prepare(
 								"
 								SELECT 
-									COUNT(case when kv.status_verifikasi = 1 then 1 end) as jumlah_disetujui,
-									COUNT(case when kv.status_verifikasi = 2 then 1 end) as jumlah_ditolak,
-									COUNT(case when kv.status_verifikasi = 3 then 1 end) as jumlah_draft
+									COUNT(kv.id)
 								FROM 
-									esakip_laporan_kinerja lk 
+									esakip_laporan_kinerja pk 
 								JOIN 
 									esakip_keterangan_verifikator kv 
-									ON lk.id=kv.id_dokumen
-								WHERE lk.id_skpd = %d
-								AND lk.tahun_anggaran = %d
-								AND lk.active = 1
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.tahun_anggaran = %d
+								AND pk.active = 1
 								AND kv.active = 1
+								AND kv.status_verifikasi=1
+								AND kv.nama_tabel_dokumen = %s
 								",
 								$vv['id_skpd'],
-								$tahun_anggaran
-							), ARRAY_A
+								$tahun_anggaran,
+								'esakip_laporan_kinerja'
+							)
 						);
 
+						$jumlah_status_ditolak = $wpdb->get_var(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(kv.id)
+								FROM 
+									esakip_laporan_kinerja pk 
+								JOIN 
+									esakip_keterangan_verifikator kv 
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.tahun_anggaran = %d
+								AND pk.active = 1
+								AND kv.active = 1
+								AND kv.status_verifikasi=2
+								AND kv.nama_tabel_dokumen = %s
+								",
+								$vv['id_skpd'],
+								$tahun_anggaran,
+								'esakip_laporan_kinerja'
+							)
+						);
+
+						$jumlah_status_draft = $wpdb->get_var(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(kv.id)
+								FROM 
+									esakip_laporan_kinerja pk 
+								JOIN 
+									esakip_keterangan_verifikator kv 
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.tahun_anggaran = %d
+								AND pk.active = 1
+								AND kv.active = 1
+								AND kv.status_verifikasi=3
+								AND kv.nama_tabel_dokumen = %s
+								",
+								$vv['id_skpd'],
+								$tahun_anggaran,
+								'esakip_laporan_kinerja'
+							)
+						);
+						
+
+						$jumlah_disetujui = !empty($jumlah_status_disetujui) ? $jumlah_status_disetujui : 0;
+						$jumlah_ditolak = !empty($jumlah_status_ditolak) ? $jumlah_status_ditolak : 0;
+						$jumlah_draft = !empty($jumlah_status_draft) ? $jumlah_status_draft : 0;
 						$jumlah_menunggu = 0;
-						if(!empty($jumlah_status)){
-							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_status['jumlah_disetujui'] + $jumlah_status['jumlah_ditolak'] + $jumlah_status['jumlah_draft']);
+						if(!empty($jumlah_dokumen)){
+							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_disetujui + $jumlah_ditolak + $jumlah_draft);
 						}
-						$jumlah_disetujui = !empty($jumlah_status) ? $jumlah_status['jumlah_disetujui'] : '0';
-						$jumlah_ditolak = !empty($jumlah_status) ? $jumlah_status['jumlah_ditolak'] : '0';
-						$jumlah_draft = !empty($jumlah_status) ? $jumlah_status['jumlah_draft'] : '0';
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_laporan_kinerja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 						$btn .= '</div>';
 
-						$tbody .= "<td class='text-center'>" . $jumlah_menunggu . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_disetujui . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_ditolak . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_draft . "</td>";
+						$tbody .= "<td class='text-center bg-info text-white'>" . $jumlah_draft . "</td>";
+						$tbody .= "<td class='text-center bg-secondary text-white'>" . $jumlah_menunggu . "</td>";
+						$tbody .= "<td class='text-center bg-success text-white'>" . $jumlah_disetujui . "</td>";
+						$tbody .= "<td class='text-center bg-danger text-white'>" . $jumlah_ditolak . "</td>";
 						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
 						$tbody .= "<td>" . $btn . "</td>";
 
@@ -16889,14 +17011,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							)
 						);
 
-						
-						$jumlah_status = $wpdb->get_row(
+						$jumlah_status_disetujui = $wpdb->get_var(
 							$wpdb->prepare(
 								"
 								SELECT 
-									COUNT(case when kv.status_verifikasi = 1 then 1 end) as jumlah_disetujui,
-									COUNT(case when kv.status_verifikasi = 2 then 1 end) as jumlah_ditolak,
-									COUNT(case when kv.status_verifikasi = 3 then 1 end) as jumlah_draft
+									COUNT(kv.id)
 								FROM 
 									esakip_renja_rkt pk 
 								JOIN 
@@ -16906,28 +17025,78 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								AND pk.tahun_anggaran = %d
 								AND pk.active = 1
 								AND kv.active = 1
+								AND kv.status_verifikasi=1
+								AND kv.nama_tabel_dokumen = %s
 								",
 								$vv['id_skpd'],
-								$tahun_anggaran
-							), ARRAY_A
+								$tahun_anggaran,
+								'esakip_renja_rkt'
+							)
 						);
 
+						$jumlah_status_ditolak = $wpdb->get_var(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(kv.id)
+								FROM 
+									esakip_renja_rkt pk 
+								JOIN 
+									esakip_keterangan_verifikator kv 
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.tahun_anggaran = %d
+								AND pk.active = 1
+								AND kv.active = 1
+								AND kv.status_verifikasi=2
+								AND kv.nama_tabel_dokumen = %s
+								",
+								$vv['id_skpd'],
+								$tahun_anggaran,
+								'esakip_renja_rkt'
+							)
+						);
+
+						$jumlah_status_draft = $wpdb->get_var(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(kv.id)
+								FROM 
+									esakip_renja_rkt pk 
+								JOIN 
+									esakip_keterangan_verifikator kv 
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.tahun_anggaran = %d
+								AND pk.active = 1
+								AND kv.active = 1
+								AND kv.status_verifikasi=3
+								AND kv.nama_tabel_dokumen = %s
+								",
+								$vv['id_skpd'],
+								$tahun_anggaran,
+								'esakip_renja_rkt'
+							)
+						);
+						
+
+						$jumlah_disetujui = !empty($jumlah_status_disetujui) ? $jumlah_status_disetujui : 0;
+						$jumlah_ditolak = !empty($jumlah_status_ditolak) ? $jumlah_status_ditolak : 0;
+						$jumlah_draft = !empty($jumlah_status_draft) ? $jumlah_status_draft : 0;
 						$jumlah_menunggu = 0;
-						if(!empty($jumlah_status)){
-							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_status['jumlah_disetujui'] + $jumlah_status['jumlah_ditolak'] + $jumlah_status['jumlah_draft']);
+						if(!empty($jumlah_dokumen)){
+							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_disetujui + $jumlah_ditolak + $jumlah_draft);
 						}
-						$jumlah_disetujui = !empty($jumlah_status) ? $jumlah_status['jumlah_disetujui'] : '0';
-						$jumlah_ditolak = !empty($jumlah_status) ? $jumlah_status['jumlah_ditolak'] : '0';
-						$jumlah_draft = !empty($jumlah_status) ? $jumlah_status['jumlah_draft'] : '0';
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_renja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 						$btn .= '</div>';
 
-						$tbody .= "<td class='text-center'>" . $jumlah_menunggu . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_disetujui . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_ditolak . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_draft . "</td>";
+						$tbody .= "<td class='text-center bg-info text-white'>" . $jumlah_draft . "</td>";
+						$tbody .= "<td class='text-center bg-secondary text-white'>" . $jumlah_menunggu . "</td>";
+						$tbody .= "<td class='text-center bg-success text-white'>" . $jumlah_disetujui . "</td>";
+						$tbody .= "<td class='text-center bg-danger text-white'>" . $jumlah_ditolak . "</td>";
 						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
 						$tbody .= "<td>" . $btn . "</td>";
 
@@ -17356,11 +17525,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$where .= " AND id_skpd = $id_skpd";
 				}
 
+				$nama_tabel = 'esakip_skp';
 				$dokumen_unset = $wpdb->get_results(
 					"
 					SELECT 
 						*
-					FROM esakip_skp 
+					FROM $nama_tabel 
 					WHERE $where
 					  AND active = 1
 					",
@@ -17374,7 +17544,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$status_api_esr = get_option('_crb_api_esr_status');
 
 					if($status_api_esr){
-						$nama_tabel = $_POST['nama_tabel_database'];
 						$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 								SELECT 
 										a.*
@@ -17392,33 +17561,36 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						", $tahun_anggaran, $nama_tabel), ARRAY_A);
 
 						if(!empty($mapping_jenis_dokumen_esr)){
-
-							$data_esr = $this->data_esr($tahun_anggaran);
-							$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
-							$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
-
 							$array_data_esr = [];
-							foreach ($data_esr as $key => $esr) {
-								if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
-									$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
-					
-									if(!empty($esr_lokal)){
-										$wpdb->update($nama_tabel, [
-												'path_esr' => $esr->path
-											], [
-												'id' => $esr_lokal['id']
-											]);
-									}
+							$data_esr = $this->data_esr($tahun_anggaran);
+							if($data_esr['status'] == 'success'){
+								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
 
-									$path = explode("/", $esr->path);
-									$nama_file = end($path);
-									$array_data_esr[]=[
-										'upload_id' => $esr->upload_id,
-										'nama_file' => $nama_file,
-										'keterangan' => $esr->keterangan,
-										'path' => $esr->path
-									];
+								foreach ($data_esr as $key => $esr) {
+									if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
+										$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+						
+										if(!empty($esr_lokal)){
+											$wpdb->update($nama_tabel, [
+													'path_esr' => $esr->path
+												], [
+													'id' => $esr_lokal['id']
+												]);
+										}
+
+										$path = explode("/", $esr->path);
+										$nama_file = end($path);
+										$array_data_esr[]=[
+											'upload_id' => $esr->upload_id,
+											'nama_file' => $nama_file,
+											'keterangan' => $esr->keterangan,
+											'path' => $esr->path
+										];
+									}
 								}
+							}else{
+								$ret['data_esr'] = $data_esr;
 							}
 						}
 					}
@@ -17557,44 +17729,92 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							", $vv['id_skpd'], $id_jadwal)
 						);
 
-						$jumlah_status = $wpdb->get_row(
+						$jumlah_status_disetujui = $wpdb->get_var(
 							$wpdb->prepare(
 								"
 								SELECT 
-									COUNT(case when kv.status_verifikasi = 1 then 1 end) as jumlah_disetujui,
-									COUNT(case when kv.status_verifikasi = 2 then 1 end) as jumlah_ditolak,
-									COUNT(case when kv.status_verifikasi = 3 then 1 end) as jumlah_draft
+									COUNT(kv.id)
 								FROM 
-									esakip_renstra ren 
+									esakip_renstra pk 
 								JOIN 
 									esakip_keterangan_verifikator kv 
-									ON ren.id=kv.id_dokumen
-								WHERE ren.id_skpd = %d
-								AND ren.id_jadwal = %d
-								AND ren.active = 1
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.id_jadwal = %d
+								AND pk.active = 1
 								AND kv.active = 1
+								AND kv.status_verifikasi=1
+								AND kv.nama_tabel_dokumen = %s
 								",
 								$vv['id_skpd'],
-								$id_jadwal
-							), ARRAY_A
+								$id_jadwal,
+								'esakip_renstra'
+							)
 						);
 
+						$jumlah_status_ditolak = $wpdb->get_var(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(kv.id)
+								FROM 
+									esakip_renstra pk 
+								JOIN 
+									esakip_keterangan_verifikator kv 
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.id_jadwal = %d
+								AND pk.active = 1
+								AND kv.active = 1
+								AND kv.status_verifikasi=2
+								AND kv.nama_tabel_dokumen = %s
+								",
+								$vv['id_skpd'],
+								$id_jadwal,
+								'esakip_renstra'
+							)
+						);
+
+						$jumlah_status_draft = $wpdb->get_var(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(kv.id)
+								FROM 
+									esakip_renstra pk 
+								JOIN 
+									esakip_keterangan_verifikator kv 
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.id_jadwal = %d
+								AND pk.active = 1
+								AND kv.active = 1
+								AND kv.status_verifikasi=3
+								AND kv.nama_tabel_dokumen = %s
+								",
+								$vv['id_skpd'],
+								$id_jadwal,
+								'esakip_renstra'
+							)
+						);
+						
+
+						$jumlah_disetujui = !empty($jumlah_status_disetujui) ? $jumlah_status_disetujui : 0;
+						$jumlah_ditolak = !empty($jumlah_status_ditolak) ? $jumlah_status_ditolak : 0;
+						$jumlah_draft = !empty($jumlah_status_draft) ? $jumlah_status_draft : 0;
 						$jumlah_menunggu = 0;
-						if(!empty($jumlah_status)){
-							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_status['jumlah_disetujui'] + $jumlah_status['jumlah_ditolak'] + $jumlah_status['jumlah_draft']);
+						if(!empty($jumlah_dokumen)){
+							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_disetujui + $jumlah_ditolak + $jumlah_draft);
 						}
-						$jumlah_disetujui = !empty($jumlah_status) ? $jumlah_status['jumlah_disetujui'] : '0';
-						$jumlah_ditolak = !empty($jumlah_status) ? $jumlah_status['jumlah_ditolak'] : '0';
-						$jumlah_draft = !empty($jumlah_status) ? $jumlah_status['jumlah_draft'] : '0';
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_renstra['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 						$btn .= '</div>';
 
-						$tbody .= "<td class='text-center'>" . $jumlah_menunggu . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_disetujui . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_ditolak . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_draft . "</td>";
+						$tbody .= "<td class='text-center bg-info text-white'>" . $jumlah_draft . "</td>";
+						$tbody .= "<td class='text-center bg-secondary text-white'>" . $jumlah_menunggu . "</td>";
+						$tbody .= "<td class='text-center bg-success text-white'>" . $jumlah_disetujui . "</td>";
+						$tbody .= "<td class='text-center bg-danger text-white'>" . $jumlah_ditolak . "</td>";
 						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
 						$tbody .= "<td>" . $btn . "</td>";
 
@@ -17733,35 +17953,83 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							);
 
 							if($tipe_dokumen == 'dpa'){
-								$jumlah_status = $wpdb->get_row(
+								$jumlah_status_disetujui = $wpdb->get_var(
 									$wpdb->prepare(
 										"
 										SELECT 
-											COUNT(case when kv.status_verifikasi = 1 then 1 end) as jumlah_disetujui,
-											COUNT(case when kv.status_verifikasi = 2 then 1 end) as jumlah_ditolak,
-											COUNT(case when kv.status_verifikasi = 3 then 1 end) as jumlah_draft
+											COUNT(kv.id)
 										FROM 
-											$nama_tabel[$tipe_dokumen] dt 
+											$nama_tabel[$tipe_dokumen] pk 
 										JOIN 
 											esakip_keterangan_verifikator kv 
-											ON dt.id=kv.id_dokumen
-										WHERE dt.id_skpd = %d
-										AND dt.tahun_anggaran = %d
-										AND dt.active = 1
+											ON pk.id=kv.id_dokumen
+										WHERE pk.id_skpd = %d
+										AND pk.tahun_anggaran = %d
+										AND pk.active = 1
 										AND kv.active = 1
+										AND kv.status_verifikasi=1
+										AND kv.nama_tabel_dokumen = %s
 										",
 										$vv['id_skpd'],
-										$tahun_anggaran
-									), ARRAY_A
+										$tahun_anggaran,
+										$nama_tabel[$tipe_dokumen]
+									)
 								);
 		
+								$jumlah_status_ditolak = $wpdb->get_var(
+									$wpdb->prepare(
+										"
+										SELECT 
+											COUNT(kv.id)
+										FROM 
+											$nama_tabel[$tipe_dokumen] pk 
+										JOIN 
+											esakip_keterangan_verifikator kv 
+											ON pk.id=kv.id_dokumen
+										WHERE pk.id_skpd = %d
+										AND pk.tahun_anggaran = %d
+										AND pk.active = 1
+										AND kv.active = 1
+										AND kv.status_verifikasi=2
+										AND kv.nama_tabel_dokumen = %s
+										",
+										$vv['id_skpd'],
+										$tahun_anggaran,
+										$nama_tabel[$tipe_dokumen]
+									)
+								);
+		
+								$jumlah_status_draft = $wpdb->get_var(
+									$wpdb->prepare(
+										"
+										SELECT 
+											COUNT(kv.id)
+										FROM 
+											$nama_tabel[$tipe_dokumen] pk 
+										JOIN 
+											esakip_keterangan_verifikator kv 
+											ON pk.id=kv.id_dokumen
+										WHERE pk.id_skpd = %d
+										AND pk.tahun_anggaran = %d
+										AND pk.active = 1
+										AND kv.active = 1
+										AND kv.status_verifikasi=3
+										AND kv.nama_tabel_dokumen = %s
+										",
+										$vv['id_skpd'],
+										$tahun_anggaran,
+										$nama_tabel[$tipe_dokumen]
+									)
+								);
+								
+		
+								$jumlah_disetujui = !empty($jumlah_status_disetujui) ? $jumlah_status_disetujui : 0;
+								$jumlah_ditolak = !empty($jumlah_status_ditolak) ? $jumlah_status_ditolak : 0;
+								$jumlah_draft = !empty($jumlah_status_draft) ? $jumlah_status_draft : 0;
 								$jumlah_menunggu = 0;
-								if(!empty($jumlah_status)){
-									$jumlah_menunggu = $jumlah_dokumen - ($jumlah_status['jumlah_disetujui'] + $jumlah_status['jumlah_ditolak'] + $jumlah_status['jumlah_draft']);
+								if(!empty($jumlah_dokumen)){
+									$jumlah_menunggu = $jumlah_dokumen - ($jumlah_disetujui + $jumlah_ditolak + $jumlah_draft);
 								}
-								$jumlah_disetujui = !empty($jumlah_status) ? $jumlah_status['jumlah_disetujui'] : '0';
-								$jumlah_ditolak = !empty($jumlah_status) ? $jumlah_status['jumlah_ditolak'] : '0';
-								$jumlah_draft = !empty($jumlah_status) ? $jumlah_status['jumlah_draft'] : '0';
 							}
 
 							$btn = '<div class="btn-action-group">';
@@ -17769,10 +18037,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$btn .= '</div>';
 
 							if($tipe_dokumen == 'dpa'){
-								$tbody .= "<td class='text-center'>" . $jumlah_menunggu . "</td>";
-								$tbody .= "<td class='text-center'>" . $jumlah_disetujui . "</td>";
-								$tbody .= "<td class='text-center'>" . $jumlah_ditolak . "</td>";
-								$tbody .= "<td class='text-center'>" . $jumlah_draft . "</td>";
+								$tbody .= "<td class='text-center bg-info text-white'>" . $jumlah_draft . "</td>";
+								$tbody .= "<td class='text-center bg-secondary text-white'>" . $jumlah_menunggu . "</td>";
+								$tbody .= "<td class='text-center bg-success text-white'>" . $jumlah_disetujui . "</td>";
+								$tbody .= "<td class='text-center bg-danger text-white'>" . $jumlah_ditolak . "</td>";
 							}
 							$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
 							$tbody .= "<td>" . $btn . "</td>";
@@ -21981,10 +22249,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Jadwal kosong!';
 				}
+				$nama_tabel = 'esakip_rpjpd';
 				$rpjpds = $wpdb->get_results(
 					$wpdb->prepare("
 						SELECT * 
-						FROM esakip_rpjpd
+						FROM $nama_tabel
 						WHERE id_jadwal = %d 
 						  AND active = 1
 					", $id_jadwal),
@@ -22026,31 +22295,36 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 							if(!empty($mapping_jenis_dokumen_esr)){
 								$ret['status_mapping_esr'] = true;
-								$data_esr = $this->data_esr($tahun_anggaran);
-								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
-								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
-
 								$array_data_esr = [];
-								foreach ($data_esr as $key => $esr) {
-									if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
-										$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM esakip_rpjpd WHERE upload_id=%d AND active=%d", $esr->upload_id, 1), ARRAY_A);
-										if(!empty($esr_lokal)){
-											$wpdb->update('esakip_rpjpd', [
-												'path_esr' => $esr->path
-											], [
-												'id' => $esr_lokal['id']
-											]);
-										}
+								$data_esr = $this->data_esr($tahun_anggaran);
+								if($data_esr['status'] == 'success'){
+									$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+									$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
 
-										$path = explode("/", $esr->path);
-										$nama_file = end($path);
-										$array_data_esr[]=[
-											'upload_id' => $esr->upload_id,
-											'nama_file' => $nama_file,
-											'keterangan' => $esr->keterangan,
-											'path' => $esr->path
-										];
+									foreach ($data_esr as $key => $esr) {
+										if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
+											$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+							
+											if(!empty($esr_lokal)){
+												$wpdb->update($nama_tabel, [
+														'path_esr' => $esr->path
+													], [
+														'id' => $esr_lokal['id']
+													]);
+											}
+
+											$path = explode("/", $esr->path);
+											$nama_file = end($path);
+											$array_data_esr[]=[
+												'upload_id' => $esr->upload_id,
+												'nama_file' => $nama_file,
+												'keterangan' => $esr->keterangan,
+												'path' => $esr->path
+											];
+										}
 									}
+								}else{
+									$ret['data_esr'] = $data_esr;
 								}
 							}
 						}
@@ -22980,10 +23254,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
 				}
+				$nama_tabel = 'esakip_dpa';
 				$dpas = $wpdb->get_results(
 					$wpdb->prepare("
                     SELECT * 
-                    FROM esakip_dpa
+                    FROM $nama_tabel
                     WHERE id_skpd = %d 
                       AND tahun_anggaran = %d 
                       AND active = 1
@@ -22998,7 +23273,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$status_api_esr = get_option('_crb_api_esr_status');
 
 					if($status_api_esr){
-						$nama_tabel = $_POST['nama_tabel_database'];
 						$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 								SELECT 
 										a.*
@@ -23016,33 +23290,36 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						", $tahun_anggaran, $nama_tabel), ARRAY_A);
 
 						if(!empty($mapping_jenis_dokumen_esr)){
-
-							$data_esr = $this->data_esr($tahun_anggaran);
-							$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
-							$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
-
 							$array_data_esr = [];
-							foreach ($data_esr as $key => $esr) {
-								if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
-									$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
-					
-									if(!empty($esr_lokal)){
-										$wpdb->update($nama_tabel, [
-												'path_esr' => $esr->path
-											], [
-												'id' => $esr_lokal['id']
-											]);
-									}
+							$data_esr = $this->data_esr($tahun_anggaran);
+							if($data_esr['status'] == 'success'){
+								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
 
-									$path = explode("/", $esr->path);
-									$nama_file = end($path);
-									$array_data_esr[]=[
-										'upload_id' => $esr->upload_id,
-										'nama_file' => $nama_file,
-										'keterangan' => $esr->keterangan,
-										'path' => $esr->path
-									];
+								foreach ($data_esr as $key => $esr) {
+									if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
+										$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+						
+										if(!empty($esr_lokal)){
+											$wpdb->update($nama_tabel, [
+													'path_esr' => $esr->path
+												], [
+													'id' => $esr_lokal['id']
+												]);
+										}
+
+										$path = explode("/", $esr->path);
+										$nama_file = end($path);
+										$array_data_esr[]=[
+											'upload_id' => $esr->upload_id,
+											'nama_file' => $nama_file,
+											'keterangan' => $esr->keterangan,
+											'path' => $esr->path
+										];
+									}
 								}
+							}else{
+								$ret['data_esr'] = $data_esr;
 							}
 						}
 					}
@@ -25611,10 +25888,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['message'] = 'Tipe dokumen kosong!';
 				}
 
+				$nama_tabel = "esakip_pohon_kinerja_dan_cascading".$_prefix_tipe;
 				$data_pohon_kinerja = $wpdb->get_results(
 					$wpdb->prepare("
                     SELECT * 
-                    FROM esakip_pohon_kinerja_dan_cascading$_prefix_tipe
+                    FROM $nama_tabel
                     WHERE id_jadwal = %d 
                       AND active = 1 $where_skpd
                 ", $id_jadwal),
@@ -25659,33 +25937,37 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							", $pengaturan_periode_dokumen['tahun_anggaran'], $nama_tabel), ARRAY_A);
 
 							if(!empty($mapping_jenis_dokumen_esr)){
-
-								$data_esr = $this->data_esr($pengaturan_periode_dokumen['tahun_anggaran']);
-								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
-								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
-
+								$tahun_anggaran = $pengaturan_periode_dokumen['tahun_anggaran'];
 								$array_data_esr = [];
-								foreach ($data_esr as $key => $esr) {
-									if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
-										$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE upload_id=%d AND active=%d", $esr->upload_id, 1), ARRAY_A);
-					
-										if(!empty($esr_lokal)){
-											$wpdb->update($nama_tabel, [
-													'path_esr' => $esr->path
-												], [
-													'id' => $esr_lokal['id']
-												]);
-										}
+								$data_esr = $this->data_esr($tahun_anggaran);
+								if($data_esr['status'] == 'success'){
+									$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+									$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
 
-										$path = explode("/", $esr->path);
-										$nama_file = end($path);
-										$array_data_esr[]=[
-											'upload_id' => $esr->upload_id,
-											'nama_file' => $nama_file,
-											'keterangan' => $esr->keterangan,
-											'path' => $esr->path
-										];
+									foreach ($data_esr as $key => $esr) {
+										if($esr->dokumen_id==$mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
+											$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM ".$nama_tabel." WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+							
+											if(!empty($esr_lokal)){
+												$wpdb->update($nama_tabel, [
+														'path_esr' => $esr->path
+													], [
+														'id' => $esr_lokal['id']
+													]);
+											}
+
+											$path = explode("/", $esr->path);
+											$nama_file = end($path);
+											$array_data_esr[]=[
+												'upload_id' => $esr->upload_id,
+												'nama_file' => $nama_file,
+												'keterangan' => $esr->keterangan,
+												'path' => $esr->path
+											];
+										}
 									}
+								}else{
+									$ret['data_esr'] = $data_esr;
 								}
 							}
 						}
@@ -26491,6 +26773,43 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
+	public function all_tables_dokumen($nama_tabel){
+		$nama_tabels = array(
+			'esakip_dpa_pemda' => 'esakip_dpa_pemda',
+			'esakip_iku_pemda' => 'esakip_iku_pemda',
+			'esakip_laporan_kinerja_pemda' => 'esakip_laporan_kinerja_pemda',
+			'esakip_laporan_monev_renaksi_pemda' => 'esakip_laporan_monev_renaksi_pemda',
+			'esakip_lhe_akip_internal_pemda' => 'esakip_lhe_akip_internal_pemda',
+			'esakip_lkjip_lppd_pemda' => 'esakip_lkjip_lppd_pemda',
+			'esakip_pedoman_teknis_evaluasi_internal_pemda' => 'esakip_pedoman_teknis_evaluasi_internal_pemda',
+			'esakip_pedoman_teknis_pengukuran_dan_p_d_k_pemda' => 'esakip_pedoman_teknis_pengukuran_dan_p_d_k_pemda',
+			'esakip_pedoman_teknis_perencanaan_pemda' => 'esakip_pedoman_teknis_perencanaan_pemda',
+			'esakip_perjanjian_kinerja_pemda' => 'esakip_perjanjian_kinerja_pemda',
+			'esakip_rencana_aksi_pemda' => 'esakip_rencana_aksi_pemda',
+			'esakip_rkpd_pemda' => 'esakip_rkpd_pemda',
+			'esakip_tl_lhe_akip_internal_pemda' => 'esakip_tl_lhe_akip_internal_pemda',
+			'esakip_tl_lhe_akip_kemenpan_pemda' => 'esakip_tl_lhe_akip_kemenpan_pemda',
+			'esakip_renja_rkt' => 'esakip_renja_rkt',
+			'esakip_renstra' => 'esakip_renstra',
+			'esakip_skp' => 'esakip_skp',
+			'esakip_dokumen_lainnya' => 'esakip_dokumen_lainnya',
+			'esakip_dpa' => 'esakip_dpa',
+			'esakip_evaluasi_internal' => 'esakip_evaluasi_internal',
+			'esakip_iku' => 'esakip_iku',
+			'esakip_laporan_kinerja' => 'esakip_laporan_kinerja',
+			'esakip_laporan_monev_renaksi' => 'esakip_laporan_monev_renaksi',
+			'esakip_lhe_akip_internal' => 'esakip_lhe_akip_internal',
+			'esakip_perjanjian_kinerja' => 'esakip_perjanjian_kinerja',
+			'esakip_pohon_kinerja_dan_cascading' => 'esakip_pohon_kinerja_dan_cascading',
+			'esakip_rencana_aksi' => 'esakip_rencana_aksi',
+		);
+		if(empty($nama_tabels[$nama_tabel])){
+			return false;
+		}else{
+			return $nama_tabels[$nama_tabel];
+		}
+	}
+
 	public function sync_to_esr(){
 		global $wpdb;
 
@@ -26498,7 +26817,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 					
-					$nama_tabel = $_POST['nama_tabel_database'];
+					$nama_tabel = $this->all_tables_dokumen($_POST['nama_tabel_database']);
 					if(empty($nama_tabel)){
 						throw new Exception("Nama tabel database belum ditentukan!", 1);
 					}
@@ -26679,7 +26998,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
-	public function update_data_esr_lokal(array $data_esr = [], int $user_esr_id){
+	public function update_data_esr_lokal($data_esr, $user_esr_id){
 		global $wpdb;
 		if(!empty($data_esr)){
 			$esrLokal = $wpdb->get_row($wpdb->prepare("SELECT response_json FROM esakip_data_esr WHERE user_esr_id=%d AND url=%s", $user_esr_id, 'get_data'));
@@ -27208,7 +27527,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				if(!empty($esrLokal)){
 					return [
-						'status' => true,
+						'status' => 'success',
 						'message' => 'Sukses ambil data dari ESR Lokal!',
 						'data_esr_lokal' => $esrLokal
 					];
@@ -27261,21 +27580,20 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$newEsrLokal = $wpdb->get_row($wpdb->prepare("SELECT *, (TIMESTAMPDIFF(MINUTE, updated_at, now())) as diff FROM esakip_data_esr WHERE user_esr_id=%d AND url=%s", $user_esr_id, 'get_data'));
 
 					return [
-						'status' => true,
+						'status' => 'success',
 						'message' => 'Sukses ambil data dari API ESR!',
 						'data_esr_lokal' => $newEsrLokal
 					];
 				}
 			} catch (Exception $e) {
-				echo json_encode([
+				return [
 					'status' => 'error',
 					'message' => $e->getMessage()
-				]);
-				exit;
+				];
 			}
 		}else{
 			return [
-				'status' => true,
+				'status' => 'success',
 				'message' => 'Pengaturan Status API ESR ditutup!',
 				'data_esr_lokal' => []
 			];

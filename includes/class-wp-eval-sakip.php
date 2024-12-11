@@ -557,6 +557,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_simpan_total_bulanan', $plugin_public, 'simpan_total_bulanan');
 
 		$this->loader->add_action('wp_ajax_get_rencana_hasil_kerja', $plugin_public, 'get_rencana_hasil_kerja');
+		$this->loader->add_action('wp_ajax_nopriv_get_rencana_hasil_kerja', $plugin_public, 'get_rencana_hasil_kerja');
 
 		$this->loader->add_action('wp_ajax_crate_tagging_rincian_belanja', $plugin_public, 'crate_tagging_rincian_belanja');
 

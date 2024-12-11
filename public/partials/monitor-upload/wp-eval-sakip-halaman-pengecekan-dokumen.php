@@ -59,7 +59,8 @@ foreach($unit as $opd){
                     AND dok.tahun_anggaran=%d
                     AND ver.active=1
                     AND ver.status_verifikasi=1
-            ", $opd['id_skpd'], $input['tahun_anggaran']));
+                    AND ver.nama_tabel_dokumen=%s
+            ", $opd['id_skpd'], $input['tahun_anggaran'], $dok['nama_tabel']));
         }else{
             $jml_dokumen = $wpdb->get_var($wpdb->prepare("
                 SELECT 
@@ -94,11 +95,11 @@ $dokumen_renstra = $wpdb->get_results(
         j.tahun_anggaran AS tahun,
         j.lama_pelaksanaan,
         j.tahun_selesai_anggaran,
-        r.id_jadwal_renstra,
+        r.id_jadwal_rpjmd,
         r.tahun_anggaran
     FROM esakip_data_jadwal j
     INNER JOIN esakip_pengaturan_upload_dokumen r
-        ON r.id_jadwal_renstra = j.id
+        ON r.id_jadwal_rpjmd = j.id
     WHERE j.tipe = 'RPJMD'
       AND j.status = 1
       AND r.tahun_anggaran = %d
@@ -119,14 +120,18 @@ foreach($unit as $opd_renstra){
 	$no_renstra++;
 	$dok_html_renstra = "";
 	foreach($dokumen_renstra as $dok_renstra){
-		$jml_dokumen_renstra = $wpdb->get_var($wpdb->prepare("
-			SELECT 
-				count(id)
-			FROM esakip_renstra
-			WHERE id_skpd=%d
-				AND active=1
-				AND id_jadwal=%d
-		", $opd_renstra['id_skpd'], $dok_renstra['id']));
+        $jml_dokumen_renstra = $wpdb->get_var($wpdb->prepare("
+            SELECT 
+                count(dok.id)
+            FROM esakip_renstra dok
+            INNER JOIN esakip_keterangan_verifikator ver ON dok.id = ver.id_dokumen
+            WHERE dok.id_skpd=%d
+                AND dok.active=1
+                AND dok.id_jadwal=%d
+                AND ver.active=1
+                AND ver.status_verifikasi=1
+                AND ver.nama_tabel_dokumen=%s
+        ", $opd_renstra['id_skpd'], $dok_renstra['id'],'esakip_renstra'));
 	$warning = "bg-success";
 	if($jml_dokumen_renstra == 0){
 		$warning="bg-danger";
@@ -143,8 +148,7 @@ foreach($unit as $opd_renstra){
 	        j.tahun_anggaran AS tahun,
 	        j.lama_pelaksanaan,
 	        j.tahun_selesai_anggaran,
-	        r.id_jadwal_renstra,
-	        r.id_jadwal_renstra
+	        r.id_jadwal_rpjmd
 	    FROM esakip_data_jadwal j
 	    INNER JOIN esakip_pengaturan_upload_dokumen r
 	        ON r.id_jadwal_rpjmd = j.id
@@ -351,7 +355,7 @@ $dokumen_pokin_pemda = $wpdb->get_results(
         j.tahun_anggaran AS tahun,
         j.lama_pelaksanaan,
         j.tahun_selesai_anggaran,
-        r.id_jadwal_renstra
+        r.id_jadwal_rpjmd
     FROM esakip_data_jadwal j
     INNER JOIN esakip_pengaturan_upload_dokumen r
         ON r.id_jadwal_rpjmd = j.id
@@ -541,7 +545,6 @@ foreach ($user_roles as $role) {
                         console.log(response.data.id_jadwal)
                         jQuery('#jadwal-rpjpd').val(response.data.id_jadwal_rpjpd);                    
                         jQuery('#jadwal-rpjmd').val(response.data.id_jadwal_rpjmd);
-                        jQuery('#jadwal-renstra').val(response.data.id_jadwal_renstra);
                     }
                 } else {
                     alert(response.message);
@@ -558,9 +561,7 @@ foreach ($user_roles as $role) {
     function submit_pengaturan_menu(){
         let id_jadwal_rpjpd = jQuery("#jadwal-rpjpd").val();
         let id_jadwal_rpjmd = jQuery("#jadwal-rpjmd").val();
-        let id_jadwal_renstra = jQuery("#jadwal-renstra").val();
-        console.log(id_jadwal_renstra)
-        if (id_jadwal_rpjpd == '' || id_jadwal_rpjmd == '' ||  id_jadwal_renstra == '') {
+        if (id_jadwal_rpjpd == '' || id_jadwal_rpjmd == '') {
             return alert('Ada data yang kosong!');
         }
 
@@ -575,7 +576,6 @@ foreach ($user_roles as $role) {
                     'api_key': esakip.api_key,
                     'id_jadwal_rpjpd': id_jadwal_rpjpd,
                     'id_jadwal_rpjmd': id_jadwal_rpjmd,
-                    'id_jadwal_renstra': id_jadwal_renstra,
                     'tahun_anggaran': tahun_anggaran
                 },
                 success: function(response) {
