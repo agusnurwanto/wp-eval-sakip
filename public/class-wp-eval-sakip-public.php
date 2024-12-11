@@ -15213,13 +15213,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							)
 						);
 
-						$jumlah_status = $wpdb->get_row(
+						$jumlah_status_disetujui = $wpdb->get_var(
 							$wpdb->prepare(
 								"
 								SELECT 
-									COUNT(case when kv.status_verifikasi = 1 then 1 end) as jumlah_disetujui,
-									COUNT(case when kv.status_verifikasi = 2 then 1 end) as jumlah_ditolak,
-									COUNT(case when kv.status_verifikasi = 3 then 1 end) as jumlah_draft
+									COUNT(kv.id)
 								FROM 
 									esakip_perjanjian_kinerja pk 
 								JOIN 
@@ -15229,20 +15227,70 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								AND pk.tahun_anggaran = %d
 								AND pk.active = 1
 								AND kv.active = 1
+								AND kv.status_verifikasi=1
+								AND kv.nama_tabel_dokumen = %s
 								",
 								$vv['id_skpd'],
-								$tahun_anggaran
-							), ARRAY_A
+								$tahun_anggaran,
+								'esakip_perjanjian_kinerja'
+							)
 						);
 
-						$jumlah_menunggu = 0;
-						if(!empty($jumlah_status)){
-							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_status['jumlah_disetujui'] + $jumlah_status['jumlah_ditolak'] + $jumlah_status['jumlah_draft']);
-						}
-						$jumlah_disetujui = !empty($jumlah_status) ? $jumlah_status['jumlah_disetujui'] : '0';
-						$jumlah_ditolak = !empty($jumlah_status) ? $jumlah_status['jumlah_ditolak'] : '0';
-						$jumlah_draft = !empty($jumlah_status) ? $jumlah_status['jumlah_draft'] : '0';
+						$jumlah_status_ditolak = $wpdb->get_var(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(kv.id)
+								FROM 
+									esakip_perjanjian_kinerja pk 
+								JOIN 
+									esakip_keterangan_verifikator kv 
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.tahun_anggaran = %d
+								AND pk.active = 1
+								AND kv.active = 1
+								AND kv.status_verifikasi=2
+								AND kv.nama_tabel_dokumen = %s
+								",
+								$vv['id_skpd'],
+								$tahun_anggaran,
+								'esakip_perjanjian_kinerja'
+							)
+						);
 
+						$jumlah_status_draft = $wpdb->get_var(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(kv.id)
+								FROM 
+									esakip_perjanjian_kinerja pk 
+								JOIN 
+									esakip_keterangan_verifikator kv 
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.tahun_anggaran = %d
+								AND pk.active = 1
+								AND kv.active = 1
+								AND kv.status_verifikasi=3
+								AND kv.nama_tabel_dokumen = %s
+								",
+								$vv['id_skpd'],
+								$tahun_anggaran,
+								'esakip_perjanjian_kinerja'
+							)
+						);
+						
+
+						$jumlah_disetujui = !empty($jumlah_status_disetujui) ? $jumlah_status_disetujui : 0;
+						$jumlah_ditolak = !empty($jumlah_status_ditolak) ? $jumlah_status_ditolak : 0;
+						$jumlah_draft = !empty($jumlah_status_draft) ? $jumlah_status_draft : 0;
+						$jumlah_menunggu = 0;
+						if(!empty($jumlah_dokumen)){
+							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_disetujui + $jumlah_ditolak + $jumlah_draft);
+						}
+						
 						$btn = '<div class="btn-action-group">';
 						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_perjanjian_kinerja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 						$btn .= '</div>';
@@ -16479,36 +16527,84 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								$tahun_anggaran
 							)
 						);
-
-						$jumlah_status = $wpdb->get_row(
+						
+						$jumlah_status_disetujui = $wpdb->get_var(
 							$wpdb->prepare(
 								"
 								SELECT 
-									COUNT(case when kv.status_verifikasi = 1 then 1 end) as jumlah_disetujui,
-									COUNT(case when kv.status_verifikasi = 2 then 1 end) as jumlah_ditolak,
-									COUNT(case when kv.status_verifikasi = 3 then 1 end) as jumlah_draft
+									COUNT(kv.id)
 								FROM 
-									esakip_laporan_kinerja lk 
+									esakip_laporan_kinerja pk 
 								JOIN 
 									esakip_keterangan_verifikator kv 
-									ON lk.id=kv.id_dokumen
-								WHERE lk.id_skpd = %d
-								AND lk.tahun_anggaran = %d
-								AND lk.active = 1
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.tahun_anggaran = %d
+								AND pk.active = 1
 								AND kv.active = 1
+								AND kv.status_verifikasi=1
+								AND kv.nama_tabel_dokumen = %s
 								",
 								$vv['id_skpd'],
-								$tahun_anggaran
-							), ARRAY_A
+								$tahun_anggaran,
+								'esakip_laporan_kinerja'
+							)
 						);
 
+						$jumlah_status_ditolak = $wpdb->get_var(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(kv.id)
+								FROM 
+									esakip_laporan_kinerja pk 
+								JOIN 
+									esakip_keterangan_verifikator kv 
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.tahun_anggaran = %d
+								AND pk.active = 1
+								AND kv.active = 1
+								AND kv.status_verifikasi=2
+								AND kv.nama_tabel_dokumen = %s
+								",
+								$vv['id_skpd'],
+								$tahun_anggaran,
+								'esakip_laporan_kinerja'
+							)
+						);
+
+						$jumlah_status_draft = $wpdb->get_var(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(kv.id)
+								FROM 
+									esakip_laporan_kinerja pk 
+								JOIN 
+									esakip_keterangan_verifikator kv 
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.tahun_anggaran = %d
+								AND pk.active = 1
+								AND kv.active = 1
+								AND kv.status_verifikasi=3
+								AND kv.nama_tabel_dokumen = %s
+								",
+								$vv['id_skpd'],
+								$tahun_anggaran,
+								'esakip_laporan_kinerja'
+							)
+						);
+						
+
+						$jumlah_disetujui = !empty($jumlah_status_disetujui) ? $jumlah_status_disetujui : 0;
+						$jumlah_ditolak = !empty($jumlah_status_ditolak) ? $jumlah_status_ditolak : 0;
+						$jumlah_draft = !empty($jumlah_status_draft) ? $jumlah_status_draft : 0;
 						$jumlah_menunggu = 0;
-						if(!empty($jumlah_status)){
-							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_status['jumlah_disetujui'] + $jumlah_status['jumlah_ditolak'] + $jumlah_status['jumlah_draft']);
+						if(!empty($jumlah_dokumen)){
+							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_disetujui + $jumlah_ditolak + $jumlah_draft);
 						}
-						$jumlah_disetujui = !empty($jumlah_status) ? $jumlah_status['jumlah_disetujui'] : '0';
-						$jumlah_ditolak = !empty($jumlah_status) ? $jumlah_status['jumlah_ditolak'] : '0';
-						$jumlah_draft = !empty($jumlah_status) ? $jumlah_status['jumlah_draft'] : '0';
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_laporan_kinerja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
@@ -16889,14 +16985,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							)
 						);
 
-						
-						$jumlah_status = $wpdb->get_row(
+						$jumlah_status_disetujui = $wpdb->get_var(
 							$wpdb->prepare(
 								"
 								SELECT 
-									COUNT(case when kv.status_verifikasi = 1 then 1 end) as jumlah_disetujui,
-									COUNT(case when kv.status_verifikasi = 2 then 1 end) as jumlah_ditolak,
-									COUNT(case when kv.status_verifikasi = 3 then 1 end) as jumlah_draft
+									COUNT(kv.id)
 								FROM 
 									esakip_renja_rkt pk 
 								JOIN 
@@ -16906,19 +16999,69 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								AND pk.tahun_anggaran = %d
 								AND pk.active = 1
 								AND kv.active = 1
+								AND kv.status_verifikasi=1
+								AND kv.nama_tabel_dokumen = %s
 								",
 								$vv['id_skpd'],
-								$tahun_anggaran
-							), ARRAY_A
+								$tahun_anggaran,
+								'esakip_renja_rkt'
+							)
 						);
 
+						$jumlah_status_ditolak = $wpdb->get_var(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(kv.id)
+								FROM 
+									esakip_renja_rkt pk 
+								JOIN 
+									esakip_keterangan_verifikator kv 
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.tahun_anggaran = %d
+								AND pk.active = 1
+								AND kv.active = 1
+								AND kv.status_verifikasi=2
+								AND kv.nama_tabel_dokumen = %s
+								",
+								$vv['id_skpd'],
+								$tahun_anggaran,
+								'esakip_renja_rkt'
+							)
+						);
+
+						$jumlah_status_draft = $wpdb->get_var(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(kv.id)
+								FROM 
+									esakip_renja_rkt pk 
+								JOIN 
+									esakip_keterangan_verifikator kv 
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.tahun_anggaran = %d
+								AND pk.active = 1
+								AND kv.active = 1
+								AND kv.status_verifikasi=3
+								AND kv.nama_tabel_dokumen = %s
+								",
+								$vv['id_skpd'],
+								$tahun_anggaran,
+								'esakip_renja_rkt'
+							)
+						);
+						
+
+						$jumlah_disetujui = !empty($jumlah_status_disetujui) ? $jumlah_status_disetujui : 0;
+						$jumlah_ditolak = !empty($jumlah_status_ditolak) ? $jumlah_status_ditolak : 0;
+						$jumlah_draft = !empty($jumlah_status_draft) ? $jumlah_status_draft : 0;
 						$jumlah_menunggu = 0;
-						if(!empty($jumlah_status)){
-							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_status['jumlah_disetujui'] + $jumlah_status['jumlah_ditolak'] + $jumlah_status['jumlah_draft']);
+						if(!empty($jumlah_dokumen)){
+							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_disetujui + $jumlah_ditolak + $jumlah_draft);
 						}
-						$jumlah_disetujui = !empty($jumlah_status) ? $jumlah_status['jumlah_disetujui'] : '0';
-						$jumlah_ditolak = !empty($jumlah_status) ? $jumlah_status['jumlah_ditolak'] : '0';
-						$jumlah_draft = !empty($jumlah_status) ? $jumlah_status['jumlah_draft'] : '0';
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_renja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
@@ -17557,35 +17700,83 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							", $vv['id_skpd'], $id_jadwal)
 						);
 
-						$jumlah_status = $wpdb->get_row(
+						$jumlah_status_disetujui = $wpdb->get_var(
 							$wpdb->prepare(
 								"
 								SELECT 
-									COUNT(case when kv.status_verifikasi = 1 then 1 end) as jumlah_disetujui,
-									COUNT(case when kv.status_verifikasi = 2 then 1 end) as jumlah_ditolak,
-									COUNT(case when kv.status_verifikasi = 3 then 1 end) as jumlah_draft
+									COUNT(kv.id)
 								FROM 
-									esakip_renstra ren 
+									esakip_renstra pk 
 								JOIN 
 									esakip_keterangan_verifikator kv 
-									ON ren.id=kv.id_dokumen
-								WHERE ren.id_skpd = %d
-								AND ren.id_jadwal = %d
-								AND ren.active = 1
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.id_jadwal = %d
+								AND pk.active = 1
 								AND kv.active = 1
+								AND kv.status_verifikasi=1
+								AND kv.nama_tabel_dokumen = %s
 								",
 								$vv['id_skpd'],
-								$id_jadwal
-							), ARRAY_A
+								$id_jadwal,
+								'esakip_renstra'
+							)
 						);
 
+						$jumlah_status_ditolak = $wpdb->get_var(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(kv.id)
+								FROM 
+									esakip_renstra pk 
+								JOIN 
+									esakip_keterangan_verifikator kv 
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.id_jadwal = %d
+								AND pk.active = 1
+								AND kv.active = 1
+								AND kv.status_verifikasi=2
+								AND kv.nama_tabel_dokumen = %s
+								",
+								$vv['id_skpd'],
+								$id_jadwal,
+								'esakip_renstra'
+							)
+						);
+
+						$jumlah_status_draft = $wpdb->get_var(
+							$wpdb->prepare(
+								"
+								SELECT 
+									COUNT(kv.id)
+								FROM 
+									esakip_renstra pk 
+								JOIN 
+									esakip_keterangan_verifikator kv 
+									ON pk.id=kv.id_dokumen
+								WHERE pk.id_skpd = %d
+								AND pk.id_jadwal = %d
+								AND pk.active = 1
+								AND kv.active = 1
+								AND kv.status_verifikasi=3
+								AND kv.nama_tabel_dokumen = %s
+								",
+								$vv['id_skpd'],
+								$id_jadwal,
+								'esakip_renstra'
+							)
+						);
+						
+
+						$jumlah_disetujui = !empty($jumlah_status_disetujui) ? $jumlah_status_disetujui : 0;
+						$jumlah_ditolak = !empty($jumlah_status_ditolak) ? $jumlah_status_ditolak : 0;
+						$jumlah_draft = !empty($jumlah_status_draft) ? $jumlah_status_draft : 0;
 						$jumlah_menunggu = 0;
-						if(!empty($jumlah_status)){
-							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_status['jumlah_disetujui'] + $jumlah_status['jumlah_ditolak'] + $jumlah_status['jumlah_draft']);
+						if(!empty($jumlah_dokumen)){
+							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_disetujui + $jumlah_ditolak + $jumlah_draft);
 						}
-						$jumlah_disetujui = !empty($jumlah_status) ? $jumlah_status['jumlah_disetujui'] : '0';
-						$jumlah_ditolak = !empty($jumlah_status) ? $jumlah_status['jumlah_ditolak'] : '0';
-						$jumlah_draft = !empty($jumlah_status) ? $jumlah_status['jumlah_draft'] : '0';
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_renstra['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
@@ -17733,35 +17924,83 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							);
 
 							if($tipe_dokumen == 'dpa'){
-								$jumlah_status = $wpdb->get_row(
+								$jumlah_status_disetujui = $wpdb->get_var(
 									$wpdb->prepare(
 										"
 										SELECT 
-											COUNT(case when kv.status_verifikasi = 1 then 1 end) as jumlah_disetujui,
-											COUNT(case when kv.status_verifikasi = 2 then 1 end) as jumlah_ditolak,
-											COUNT(case when kv.status_verifikasi = 3 then 1 end) as jumlah_draft
+											COUNT(kv.id)
 										FROM 
-											$nama_tabel[$tipe_dokumen] dt 
+											$nama_tabel[$tipe_dokumen] pk 
 										JOIN 
 											esakip_keterangan_verifikator kv 
-											ON dt.id=kv.id_dokumen
-										WHERE dt.id_skpd = %d
-										AND dt.tahun_anggaran = %d
-										AND dt.active = 1
+											ON pk.id=kv.id_dokumen
+										WHERE pk.id_skpd = %d
+										AND pk.tahun_anggaran = %d
+										AND pk.active = 1
 										AND kv.active = 1
+										AND kv.status_verifikasi=1
+										AND kv.nama_tabel_dokumen = %s
 										",
 										$vv['id_skpd'],
-										$tahun_anggaran
-									), ARRAY_A
+										$tahun_anggaran,
+										$nama_tabel[$tipe_dokumen]
+									)
 								);
 		
+								$jumlah_status_ditolak = $wpdb->get_var(
+									$wpdb->prepare(
+										"
+										SELECT 
+											COUNT(kv.id)
+										FROM 
+											$nama_tabel[$tipe_dokumen] pk 
+										JOIN 
+											esakip_keterangan_verifikator kv 
+											ON pk.id=kv.id_dokumen
+										WHERE pk.id_skpd = %d
+										AND pk.tahun_anggaran = %d
+										AND pk.active = 1
+										AND kv.active = 1
+										AND kv.status_verifikasi=2
+										AND kv.nama_tabel_dokumen = %s
+										",
+										$vv['id_skpd'],
+										$tahun_anggaran,
+										$nama_tabel[$tipe_dokumen]
+									)
+								);
+		
+								$jumlah_status_draft = $wpdb->get_var(
+									$wpdb->prepare(
+										"
+										SELECT 
+											COUNT(kv.id)
+										FROM 
+											$nama_tabel[$tipe_dokumen] pk 
+										JOIN 
+											esakip_keterangan_verifikator kv 
+											ON pk.id=kv.id_dokumen
+										WHERE pk.id_skpd = %d
+										AND pk.tahun_anggaran = %d
+										AND pk.active = 1
+										AND kv.active = 1
+										AND kv.status_verifikasi=3
+										AND kv.nama_tabel_dokumen = %s
+										",
+										$vv['id_skpd'],
+										$tahun_anggaran,
+										$nama_tabel[$tipe_dokumen]
+									)
+								);
+								
+		
+								$jumlah_disetujui = !empty($jumlah_status_disetujui) ? $jumlah_status_disetujui : 0;
+								$jumlah_ditolak = !empty($jumlah_status_ditolak) ? $jumlah_status_ditolak : 0;
+								$jumlah_draft = !empty($jumlah_status_draft) ? $jumlah_status_draft : 0;
 								$jumlah_menunggu = 0;
-								if(!empty($jumlah_status)){
-									$jumlah_menunggu = $jumlah_dokumen - ($jumlah_status['jumlah_disetujui'] + $jumlah_status['jumlah_ditolak'] + $jumlah_status['jumlah_draft']);
+								if(!empty($jumlah_dokumen)){
+									$jumlah_menunggu = $jumlah_dokumen - ($jumlah_disetujui + $jumlah_ditolak + $jumlah_draft);
 								}
-								$jumlah_disetujui = !empty($jumlah_status) ? $jumlah_status['jumlah_disetujui'] : '0';
-								$jumlah_ditolak = !empty($jumlah_status) ? $jumlah_status['jumlah_ditolak'] : '0';
-								$jumlah_draft = !empty($jumlah_status) ? $jumlah_status['jumlah_draft'] : '0';
 							}
 
 							$btn = '<div class="btn-action-group">';

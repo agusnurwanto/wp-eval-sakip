@@ -59,7 +59,8 @@ foreach($unit as $opd){
                     AND dok.tahun_anggaran=%d
                     AND ver.active=1
                     AND ver.status_verifikasi=1
-            ", $opd['id_skpd'], $input['tahun_anggaran']));
+                    AND ver.nama_tabel_dokumen=%s
+            ", $opd['id_skpd'], $input['tahun_anggaran'], $dok['nama_tabel']));
         }else{
             $jml_dokumen = $wpdb->get_var($wpdb->prepare("
                 SELECT 
@@ -127,6 +128,18 @@ foreach($unit as $opd_renstra){
 				AND active=1
 				AND id_jadwal=%d
 		", $opd_renstra['id_skpd'], $dok_renstra['id']));
+        // $jml_dokumen_renstra = $wpdb->get_var($wpdb->prepare("
+        //         SELECT 
+        //             count(dok.id)
+        //         FROM esakip_renstra dok
+        //         INNER JOIN esakip_keterangan_verifikator ver ON dok.id = ver.id_dokumen
+        //         WHERE dok.id_skpd=%d
+        //             AND dok.active=1
+        //             AND dok.id_jadwal=%d
+        //             AND ver.active=1
+        //             AND ver.status_verifikasi=1
+        //             AND ver.nama_tabel_dokumen=%s
+        //     ", $opd_renstra['id_skpd'], $dok_renstra['id'],'esakip_renstra'));
 	$warning = "bg-success";
 	if($jml_dokumen_renstra == 0){
 		$warning="bg-danger";
@@ -559,7 +572,6 @@ foreach ($user_roles as $role) {
         let id_jadwal_rpjpd = jQuery("#jadwal-rpjpd").val();
         let id_jadwal_rpjmd = jQuery("#jadwal-rpjmd").val();
         let id_jadwal_renstra = jQuery("#jadwal-renstra").val();
-        console.log(id_jadwal_renstra)
         if (id_jadwal_rpjpd == '' || id_jadwal_rpjmd == '' ||  id_jadwal_renstra == '') {
             return alert('Ada data yang kosong!');
         }
