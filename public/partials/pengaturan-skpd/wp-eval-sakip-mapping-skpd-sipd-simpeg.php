@@ -100,11 +100,10 @@ foreach ($unit as $kk => $vv) {
 	}
 
 	function getPegawai(){
-		let optionSatker = `<option value=''>Pilih Salah Satu</option>`;
 		if(unorList.length > 0){
-		    optionSatker += `<option value='all'>Semua Unit Organisasi</option>`;
+			let optionSatker = `<option value=''>Pilih Salah Satu</option>`;
 		    unorList.forEach(function(value, index){
-		        optionSatker+=`<option value'${value.satker_id}'>${value.nama}</option>`;
+		        optionSatker+=`<option value='${value.satker_id}'>${value.nama}</option>`;
 		    })
 		    jQuery("#modal").find('.modal-title').html('Singkronisasi Data Pegawai Simpeg');
 			jQuery("#modal").find('.modal-body').html(`
@@ -151,33 +150,36 @@ foreach ($unit as $kk => $vv) {
 			case '#nav-asn':
 				type = 'asn';
 				value = jQuery("#nip").val();
-				console.log(hrefValue);
 				break;
 			default:
 				alert('Pilihan tidak diketahui');
 				return false;
 		}
 
-		jQuery('#wrap-loading').show();
-	    jQuery.ajax({
-	        url: esakip.url,
-	        type: 'POST',
-	        data: {
-	            action: 'get_pegawai_simpeg',
-	            api_key: esakip.api_key,
-	            type: type,
-	            value: value,
-	        },
-	        dataType: 'json',
-	        success: function(response) {
-	            jQuery('#wrap-loading').hide();
-	            alert(response.message);
-	        },
-	        error: function(xhr, status, error) {
-	    	    jQuery('#wrap-loading').hide();
-	            alert('Terjadi kesalahan saat ambil data!');
-	        }
-	    });
+		if(value.length > 0){
+			jQuery('#wrap-loading').show();
+		    jQuery.ajax({
+		        url: esakip.url,
+		        type: 'POST',
+		        data: {
+		            action: 'get_pegawai_simpeg',
+		            api_key: esakip.api_key,
+		            type: type,
+		            value: value,
+		        },
+		        dataType: 'json',
+		        success: function(response) {
+		            jQuery('#wrap-loading').hide();
+		            alert(response.message);
+		        },
+		        error: function(xhr, status, error) {
+		    	    jQuery('#wrap-loading').hide();
+		            alert('Terjadi kesalahan saat ambil data!');
+		        }
+		    });
+		}else{
+			alert('Pilih Unit Organisasi atau Masukkan NIP!');
+		}
 	}
 
 	function getUnorList(){
