@@ -1311,9 +1311,10 @@ class Wp_Eval_Sakip_Admin
 					))
 					->set_default_value('0')
 					->set_help_text('Digunakan untuk mengunci atau membuka akses untuk mengakses data kepegawaian.'),
+				Field::make('text', 'crb_url_api_simpeg', 'Url API Kepegawaian')
+					->set_help_text('Wajib diisi. Url integrasi ke server SIMPEG.'),
 				Field::make('text', 'crb_authorization_api_simpeg', 'Authorization API Kepegawaian')
-					->set_help_text('Wajib diisi.'),
-				Field::make('text', 'crb_url_api_simpeg', 'Url API Kepegawaian'),
+					->set_help_text('Wajib diisi. Basic Auth encrypted.'),
 				Field::make('radio', 'crb_api_esr_status', 'Status API ESR')
 					->add_options(array(
 						'0' => __('Dikunci'),
