@@ -1572,3 +1572,14 @@ CREATE TABLE `esakip_data_pegawai_simpeg` (
   `update_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id)
 );
+
+CREATE TABLE `esakip_data_mapping_unit_sipd_simpeg` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_skpd` int(11) DEFAULT NULL,
+  `id_satker_simpeg` int(11) DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
+);

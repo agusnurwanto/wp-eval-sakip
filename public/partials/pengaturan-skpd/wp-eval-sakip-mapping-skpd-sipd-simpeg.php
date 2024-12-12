@@ -8,26 +8,38 @@ $api_key = get_option('_crb_apikey_esakip');
 
 $unit = $wpdb->get_results("
 	SELECT 
-		nama_skpd, 
-		id_skpd, 
-		kode_skpd, 
-		namakepala , 
-		nipkepala 
-	from esakip_data_unit 
-	where active=1
-		and tahun_anggaran=$tahun_anggaran
-	group by id_skpd
-	order by kode_skpd ASC
+		a.nama_skpd, 
+		a.id_skpd, 
+		a.kode_skpd, 
+		a.namakepala, 
+		a.nipkepala,
+		c.id AS id_unit_simpeg,
+		c.nama AS unit_simpeg
+	FROM esakip_data_unit a
+		LEFT JOIN esakip_data_mapping_unit_sipd_simpeg b
+			ON a.id_skpd=b.id_skpd AND a.tahun_anggaran=b.tahun_anggaran
+		LEFT JOIN esakip_data_satker_simpeg c
+			ON c.id=b.id_satker_simpeg
+	WHERE a.active=1
+		AND a.tahun_anggaran=$tahun_anggaran
+	GROUP BY a.id_skpd
+	ORDER BY a.kode_skpd ASC
 ", ARRAY_A);
 
 $html = '';
 foreach ($unit as $kk => $vv) {
+	$option_selected='';
+	if(!empty($vv['id_unit_simpeg'])){
+		$option_selected = '<option>'.$vv['unit_simpeg'].'</option>';
+	}
 	$html .= '
 		<tr>
 			<td>'.$vv['kode_skpd'].'</td>
 			<td>'.$vv['nama_skpd'].'</td>
 			<td class="text-center">'.$vv['namakepala'].'<br>'.$vv['nipkepala'].'</td>
-			<td><select class="form-class unor" style="width:100%"></select></td>
+			<td>
+				<select class="form-class unor" style="width:100%" onchange="mappingUnor(this)" data-idskpd="'.$vv['id_skpd'].'">'.$option_selected.'</select>
+			</td>
 		</tr>
 	';
 }
@@ -74,35 +86,33 @@ foreach ($unit as $kk => $vv) {
 	var unorList;
 
 	jQuery(document).ready(function(){
-
 		getUnorList();
-
 		jQuery(".unor").select2({
 		  	ajax: {
-		    	    url: esakip.url,
-			        type: 'POST',
-				    dataType: 'json',
-				    delay: 250,
-				    data: function (params) {
-				      return {
-				       	action: 'get_list_satker_simpeg',
+		    	url: esakip.url,
+			    type: 'POST',
+				dataType: 'json',
+				delay: 250,
+				data: function (params) {
+				    return {
+					   	action: 'get_list_satker_simpeg',
 					    api_key: esakip.api_key,
 					    tahun_anggaran:'<?php echo $tahun_anggaran ?>',
 					    type:'search',
 						q: params.term,
 				      };
-				    },
-				    processResults: function (data, params) {
-				      params.page = params.page || 1;
+				},
+				processResults: function (data, params) {
+				    params.page = params.page || 1;
 
-				      return {
-				        results: data.data,
-				        pagination: {
-				          more: (params.page * 30) < data.total_count
-				        }
-				      };
-				    },
-				    cache: true
+				    return {
+				       results: data.data,
+				       pagination: {
+				         more: (params.page * 30) < data.total_count
+				       }
+				     };
+				},
+				cache: true
 		  },
 		  placeholder: 'Cari unit organisasi',
 		  minimumInputLength: 5,
@@ -130,9 +140,32 @@ foreach ($unit as $kk => $vv) {
 	}
 
 	function formatUnorSelection (response) {
-	  return response.nama || response.text;
+	   return response.nama || response.text;
 	}
 
+	function mappingUnor(that){
+		jQuery('#wrap-loading').show();
+	    jQuery.ajax({
+	        url: esakip.url,
+	        type: 'POST',
+	        data: {
+	            action: 'mapping_unit_sipd_simpeg',
+	            api_key: esakip.api_key,
+	            idskpd_sipd: jQuery(that).data('idskpd'),
+	            id_satker_simpeg: jQuery(that).val(),
+	            tahun_anggaran:'<?php echo $tahun_anggaran ?>'
+	        },
+	        dataType: 'json',
+	        success: function(response) {
+	            jQuery('#wrap-loading').hide();
+	            alert(response.message);
+	        },
+	        error: function(xhr, status, error) {
+	    	    jQuery('#wrap-loading').hide();
+	            alert('Terjadi kesalahan saat ambil data!');
+	        }
+	    });
+	}
 
 	function getUnor(){
 	    jQuery('#wrap-loading').show();

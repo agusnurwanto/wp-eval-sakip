@@ -27920,4 +27920,51 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			exit;
 		}
 	}
+
+	public function mapping_unit_sipd_simpeg(){
+		global $wpdb;
+
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+					$exists = $wpdb->get_row($wpdb->prepare("SELECT id FROM esakip_data_mapping_unit_sipd_simpeg WHERE id_skpd=%d AND id_satker_simpeg=%d AND active=%d AND tahun_anggaran=%d", $_POST['idskpd_sipd'], $_POST['id_satker_simpeg'], 1, $_POST['tahun_anggaran']), ARRAY_A);
+					if(!empty($exists)){
+						$wpdb->update('esakip_data_mapping_unit_sipd_simpeg', [
+							'id_skpd' => $_POST['idskpd_sipd'],
+							'id_satker_simpeg' => $_POST['id_satker_simpeg'],
+							'tahun_anggaran' => $_POST['tahun_anggaran'],
+							'update_at' => current_time('mysql')
+						], [
+							'id_skpd' => $_POST['idskpd_sipd'],
+							'tahun_anggaran' => $_POST['tahun_anggaran'],
+						]);
+					}else{
+						$wpdb->insert('esakip_data_mapping_unit_sipd_simpeg', [
+							'id_skpd' => $_POST['idskpd_sipd'],
+							'id_satker_simpeg' => $_POST['id_satker_simpeg'],
+							'tahun_anggaran' => $_POST['tahun_anggaran'],
+							'active' => 1,
+							'created_at' => current_time('mysql'),
+						]);
+					}
+
+					echo json_encode([
+						'status' => true,
+						'message' => 'Sukses mapping data!'
+					]);
+					exit;
+				}else{
+					throw new Exception("API key tidak ditemukan!", 1);
+				}
+			}else{
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		}catch(Exception $e){
+			echo json_encode([
+					'status' => false,
+					'message' => $e->getMessage()
+				]);
+			exit;
+		}
+	}
 }
