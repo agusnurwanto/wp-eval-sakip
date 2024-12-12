@@ -4,11 +4,6 @@ global $wpdb;
 if (!defined('WPINC')) {
     die;
 }
-$current_user = wp_get_current_user();
-$data_unit = $wpdb->get_row($wpdb->prepare("SELECT id_unit FROM esakip_data_unit WHERE nipkepala=%s AND active=%d AND tahun_anggaran=%d", $current_user->user_login, 1, 2024), ARRAY_A);
-echo "<pre>";
-print_r(($data_unit));
-echo "</pre>";
 
 $input = shortcode_atts(array(
     'tahun' => '2022',
