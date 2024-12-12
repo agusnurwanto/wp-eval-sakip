@@ -44,13 +44,20 @@ foreach ($unit as $kk => $vv) {
 	';
 }
 ?>
+<style>
+	.table-sticky thead {
+	    position: sticky;
+	    top: -6px;
+        background: #ffc491;
+	}
+</style>
 <div id="wrap-table" style="padding: 10px">
 	<h1 class="text-center">Mapping Perangkat Daerah SIPD-SIMPEG </br>Tahun <?php echo $tahun_anggaran; ?></h1>
 	<div style="margin-bottom: 25px;">
         <button class="btn btn-success" onclick="getUnor();"><i class="dashicons dashicons-arrow-down-alt"></i> Singkron Data Unit Organisasi Simpeg</button>
         <button class="btn btn-success" onclick="getPegawai();"><i class="dashicons dashicons-arrow-down-alt"></i> Singkron Data Pegawai Simpeg</button>
     </div>
-	<table>
+	<table class="table table-bordered table-sticky">
 		<thead>
 			<tr>
 				<th class="text-center">Kode Perangkat Daerah SIPD</th>
@@ -66,7 +73,7 @@ foreach ($unit as $kk => $vv) {
 </div>
 
 <div class="modal fade" id="modal" data-backdrop="static"  role="dialog" aria-labelledby="modal-label" aria-hidden="true">
-  	<div class="modal-dialog modal-dialog-scrollable" role="document">
+  	<div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
     	<div class="modal-content">
       		<div class="modal-header">
 		        <h5 class="modal-title">Modal title</h5>
@@ -120,6 +127,14 @@ foreach ($unit as $kk => $vv) {
 		  templateSelection: formatUnorSelection
 		});
 	});
+
+	function check_all(that){
+		if(jQuery(that).is(':checked')){
+			jQuery(that).closest('table').find('tbody input[type="checkbox"]').prop('checked', true);
+		}else{
+			jQuery(that).closest('table').find('tbody input[type="checkbox"]').prop('checked', false);
+		}
+	}
 
 	function formatUnor (response) {
 	  if (response.loading) {
@@ -181,6 +196,7 @@ foreach ($unit as $kk => $vv) {
 	        success: function(response) {
 	            jQuery('#wrap-loading').hide();
 	            alert(response.message);
+	            window.location = location.href;
 	        },
 	        error: function(xhr, status, error) {
 	    	    jQuery('#wrap-loading').hide();
@@ -191,9 +207,13 @@ foreach ($unit as $kk => $vv) {
 
 	function getPegawai(){
 		if(unorList.length > 0){
-			let optionSatker = `<option value=''>Pilih Salah Satu</option>`;
+			var tbody = '';
 		    unorList.forEach(function(value, index){
-		        optionSatker+=`<option value='${value.satker_id}'>${value.nama}</option>`;
+		        tbody += ''
+			        +'<tr>'
+			        	+'<td class="text-center"><input type="checkbox" value="'+value.satker_id+'"></td>'
+			        	+'<td>'+value.nama+'</td>'
+			        +'<tr>';
 		    })
 		    jQuery("#modal").find('.modal-title').html('Singkronisasi Data Pegawai Simpeg');
 			jQuery("#modal").find('.modal-body').html(`
@@ -205,7 +225,17 @@ foreach ($unit as $kk => $vv) {
 				</nav>
 				<div class="tab-content" id="nav-tabContent">
 				  	<div class="tab-pane fade show active" id="nav-unor" role="tabpanel" aria-labelledby="nav-unor-tab">
-				  		<select class'form-control' id="unor-list">${optionSatker}</select>
+				  		<table class="table table-bordered table-sticky table-modal-satker">
+				  			<thead>
+				  				<tr>
+				  					<th class="text-center"><input type="checkbox" class="check_all" onclick="check_all(this);"></th>
+				  					<th class="text-center">Nama OPD</th>
+				  				</tr>
+				  			</thead>
+				  			<tbody>
+				  				${tbody}
+				  			</tbody>
+				  		</table>
 				  	</div>
 				  	<div class="tab-pane fade" id="nav-asn" role="tabpanel" aria-labelledby="nav-asn-tab">
 						<input type="text" class="form-control" id="nip" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" placeholder="Masukkan NIP ASN">
@@ -235,41 +265,87 @@ foreach ($unit as $kk => $vv) {
 		switch(hrefValue){
 			case '#nav-unor':
 				type = 'unor';
-				value = jQuery("#unor-list").val();
+				value = [];
+				jQuery('.table-modal-satker tbody input[type="checkbox"]').map(function(i, b){
+					if(jQuery(b).is(":checked")){
+						value.push(jQuery(b).val());
+					}
+				});
+				if(value.length == 0){
+					return alert('OPD belum dipilih!');
+				}
 				break;
 			case '#nav-asn':
 				type = 'asn';
 				value = jQuery("#nip").val();
+				if(value == ''){
+					return alert('NIP harus diisi!');
+				}else{
+					value = [value];
+				}
 				break;
 			default:
 				alert('Pilihan tidak diketahui');
 				return false;
 		}
 
-		if(value.length > 0){
-			jQuery('#wrap-loading').show();
+		jQuery('#wrap-loading').show();
+		var last = value.length-1;
+        value.reduce(function(sequence, nextData){
+            return sequence.then(function(current_data){
+                return new Promise(function(resolve_reduce, reject_reduce){
+                	var nama_opd = jQuery('.table-modal-satker tbody input[type="checkbox"][value="'+current_data+'"]').closest('tr').find('td').eq(1).text();
+                	pesan_loading('Get data pegawai dari OPD '+nama_opd);
+					ajax_get_pegawai({
+						type: type,
+						value: current_data
+					})
+					.then(function(){
+						return resolve_reduce(nextData);
+					});
+                })
+                .catch(function(e){
+                    console.log(e);
+                    return Promise.resolve(nextData);
+                });
+            })
+            .catch(function(e){
+                console.log(e);
+                return Promise.resolve(nextData);
+            });
+        }, Promise.resolve(value[last]))
+        .then(function(data_last){
+            alert('Berhasil singkronisasi data pegawai.');
+            jQuery('#wrap-loading').hide();
+        })
+        .catch(function(err){
+            console.log('err', err);
+            alert('Ada kesalahan sistem!');
+            jQuery('#wrap-loading').hide();
+        });
+	}
+
+	function ajax_get_pegawai(options){
+		return new Promise(function(resolve, reject){
 		    jQuery.ajax({
 		        url: esakip.url,
 		        type: 'POST',
 		        data: {
 		            action: 'get_pegawai_simpeg',
 		            api_key: esakip.api_key,
-		            type: type,
-		            value: value,
+		            type: options.type,
+		            value: options.value,
 		        },
 		        dataType: 'json',
 		        success: function(response) {
-		            jQuery('#wrap-loading').hide();
-		            alert(response.message);
+		            resolve();
 		        },
 		        error: function(xhr, status, error) {
-		    	    jQuery('#wrap-loading').hide();
-		            alert('Terjadi kesalahan saat ambil data!');
+		    	    console.log('error', error);
+		            resolve();
 		        }
 		    });
-		}else{
-			alert('Pilih Unit Organisasi atau Masukkan NIP!');
-		}
+		});
 	}
 
 	function getUnorList(){
