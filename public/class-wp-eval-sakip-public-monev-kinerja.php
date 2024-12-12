@@ -816,15 +816,38 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'created_at' => current_time('mysql'),
 					);
 					if(empty($_POST['id_label_indikator'])){
-						$cek_id = $wpdb->get_var($wpdb->prepare("
-							SELECT
-								id
-							FROM esakip_data_rencana_aksi_indikator_opd
-							WHERE indikator=%s
-								AND active=0
-								AND tahun_anggaran=%d
-								AND id_skpd=%d
-						", $_POST['indikator'], $_POST['tahun_anggaran'], $_POST['id_skpd']));
+					    $total_pagu_renaksi = $wpdb->get_var($wpdb->prepare("
+					        SELECT 
+					        	SUM(rencana_pagu)
+					        FROM esakip_data_rencana_aksi_indikator_opd
+					        WHERE id_renaksi = %d 
+					        	AND tahun_anggaran = %d 
+					        	AND id_skpd = %d 
+					        	AND active = 1
+					    ", $_POST['id_label'], $_POST['tahun_anggaran'], $_POST['id_skpd']));
+					    // print_r($total_pagu_renaksi); die($wpdb->last_query);
+
+					    $ret['total_pagu'] = $_POST['rencana_pagu_tk'];
+					    $ret['total_pagu_sebelum_perubahan'] = $total_pagu_renaksi;
+					    $total_pagu_renaksi += $_POST['rencana_pagu'];
+
+					    $ret['total_pagu_setelah_perubahan'] = $total_pagu_renaksi;
+
+					    if ($total_pagu_renaksi > $_POST['rencana_pagu_tk']) {
+					        $ret['status'] = 'error';
+					        $ret['message'] = 'Total rencana pagu tidak boleh melebihi 100% atau total pagu.';
+					    }
+					    if($ret['status'] == 'success'){
+							$cek_id = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									id
+								FROM esakip_data_rencana_aksi_indikator_opd
+								WHERE indikator=%s
+									AND active=0
+									AND tahun_anggaran=%d
+									AND id_skpd=%d
+							", $_POST['indikator'], $_POST['tahun_anggaran'], $_POST['id_skpd']));	
+					    }
 					}else{
 						$cek_id = $wpdb->get_var($wpdb->prepare("
 							SELECT
@@ -834,11 +857,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						", $_POST['id_label_indikator']));
 						$ret['message'] = "Berhasil edit indikator!";
 					}
-					if(empty($cek_id)){
-						$wpdb->insert('esakip_data_rencana_aksi_indikator_opd', $data);
-					}else{
-						$wpdb->update('esakip_data_rencana_aksi_indikator_opd', $data, array('id' => $cek_id));
+					if($ret['status'] == 'success'){
+						if(empty($cek_id)){
+							$wpdb->insert('esakip_data_rencana_aksi_indikator_opd', $data);
+						}else{
+							$wpdb->update('esakip_data_rencana_aksi_indikator_opd', $data, array('id' => $cek_id));
+						}
 					}
+
 				}
 			} else {
 				$ret = array(
@@ -1285,8 +1311,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									<td class=""></td>
 									<td class=""></td>
 									<td class=""></td>
-									<td class=""></td>
-									<td class=""></td>
+									<td class=""></td>	
+									<td class=""></td>	
 									<td class=""></td>
 									<td class=""></td>
 									<td class=""></td>
@@ -1357,7 +1383,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										<td class=""></td>
 										<td class=""></td>
 										<td class=""></td>
-										<td class="text-right" style="visibility: hidden;">'.$rencana_pagu_html.'</td>
+										<td class="text-right" style="visibility: hidden;">'.$ind['rencana_pagu'].'</td>
 										<td class=""></td>
 										<td class="text-right" style="visibility: hidden;">'.$realisasi_pagu_html.'</td>
 										<td class=""></td>

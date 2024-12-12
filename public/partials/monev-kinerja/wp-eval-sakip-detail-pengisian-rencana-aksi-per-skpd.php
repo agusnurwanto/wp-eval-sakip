@@ -487,6 +487,7 @@ function simpan_indikator_renaksi(tipe){
     if(target_tw_4 == ''){
         return alert('Target triwulan 4 tidak boleh kosong!')
     }
+    var rencana_pagu_tk = jQuery('#rencana_pagu_tk').val();
     jQuery('#wrap-loading').show();
     jQuery.ajax({
         url: esakip.url,
@@ -506,6 +507,7 @@ function simpan_indikator_renaksi(tipe){
             "target_tw_2": target_tw_2,
             "target_tw_3": target_tw_3,
             "target_tw_4": target_tw_4,
+            "rencana_pagu_tk": rencana_pagu_tk,
             "tahun_anggaran": <?php echo $input['tahun']; ?>,
             "id_skpd": <?php echo $id_skpd; ?>
         },
@@ -995,7 +997,7 @@ function kegiatanUtama(){
                                         +`<td class="label_cascading">${label_cascading}</td>`
                                         +`<td class="label_renaksi">${label_dasar_pelaksanaan}</td>`
                                         +`<td class="text-center">`
-                                            +`<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, 1,${total_pagu})" title="Tambah Indikator (Total Pagu: ${total_pagu})"><i class="dashicons dashicons-plus"></i></a> `
+                                            +`<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, 1, ${total_pagu})" title="Tambah Indikator (Total Pagu: ${total_pagu})"><i class="dashicons dashicons-plus"></i></a> `
                                             +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, 2, ${value.id_pokin_2}, '${value.kode_cascading_sasaran}')" title="Lihat Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
                                             +`<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, 1)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`
                                             +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_rencana_aksi(${value.id}, 1)" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
@@ -1030,7 +1032,7 @@ function kegiatanUtama(){
                                                 +`<td class="text-right">${b.rencana_pagu || 0}</td>`
                                                 +`<td class="text-center">`                
                                                     +`<input type="checkbox" title="Lihat Rencana Aksi Per Bulan" class="lihat_bulanan" data-id="${b.id}" onclick="lihat_bulanan(this);" style="margin: 0 6px;">`
-                                                    +`<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_indikator(${b.id}, 1)" title="Edit"><i class="dashicons dashicons-edit"></i></a> `
+                                                    +`<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_indikator(${b.id}, 1, ${total_pagu})" title="Edit"><i class="dashicons dashicons-edit"></i></a> `
                                                     +`<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-danger" onclick="hapus_indikator(${b.id}, 1);" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
                                                 +`</td>`
                                             +`</tr>`;
@@ -1151,9 +1153,10 @@ function kegiatanUtama(){
 }
 
 function getTablePengisianRencanaAksi(no_loading = false) {
-    if (no_loading == false) {
+    if (!no_loading) {
         jQuery('#wrap-loading').show();
     }
+
     jQuery.ajax({
         url: esakip.url,
         type: 'POST',
@@ -1165,7 +1168,7 @@ function getTablePengisianRencanaAksi(no_loading = false) {
         },
         dataType: 'json',
         success: function(response) {
-            if (no_loading == false) {
+            if (!no_loading) {
                 jQuery('#wrap-loading').hide();
             }
             console.log(response);
@@ -1178,13 +1181,21 @@ function getTablePengisianRencanaAksi(no_loading = false) {
                     jQuery('.table_notifikasi_pemda').show();
                     jQuery('.table_notifikasi_pemda tbody').html(response.data_pemda);
 
+                    if (jQuery.fn.DataTable.isDataTable('.table_notifikasi_pemda')) {
+                        jQuery('.table_notifikasi_pemda').DataTable().clear().destroy();
+                    }
+
                     jQuery('.table_notifikasi_pemda').DataTable({
-                        "aoColumnDefs": [
-                            { "bSortable": false, "aTargets": [0] },
-                            { "bSearchable": false, "aTargets": [0] }
-                        ],
-                        "order": [[2, 'asc'], [3, 'asc']],
-                        "lengthMenu": [[10, 20, 100, -1], [10, 20, 100, "All"]]
+                        paging: true,
+                        searching: true,
+                        ordering: true,
+                        info: true,
+                        fixedHeader: true,
+                        scrollX: true, // Enables horizontal scrolling
+                        scrollY: '600px',
+                        scrollCollapse: true,
+                        pageLength: 10, // Default number of rows per page
+                        lengthMenu: [10, 25, 50, 100, 200] // Options for rows per page
                     });
                 } else {
                     jQuery('#notifikasi-title').hide();
