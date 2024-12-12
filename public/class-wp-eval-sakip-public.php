@@ -27736,56 +27736,28 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/pengaturan-skpd/wp-eval-sakip-mapping-skpd-sipd-simpeg.php';
 	}
 
-	public function curlData(
-		string $url, 
-		string $path, 
-		string $method, 
-		array $data = []
-	){
-		
-		$curl = curl_init();
-
-		curl_setopt_array($curl, array(
-		  CURLOPT_URL => $url . $path,
-		  CURLOPT_RETURNTRANSFER => true,
-		  CURLOPT_ENCODING => '',
-		  CURLOPT_MAXREDIRS => 10,
-		  CURLOPT_TIMEOUT => 0,
-		  CURLOPT_FOLLOWLOCATION => true,
-		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-		  CURLOPT_CUSTOMREQUEST => $method,
-		  CURLOPT_SSL_VERIFYHOST => 0,
-		  CURLOPT_SSL_VERIFYPEER => 0,
-		  CURLOPT_HTTPHEADER => $data['header'],
-		));
-
-		$response = curl_exec($curl);
-
-		curl_close($curl);
-
-		return $response;
-	}
-
 	public function get_satker_simpeg(){
 		global $wpdb;
 
 		if(get_option('_crb_api_simpeg_status')){
 			try {
-				
-				$response = $this->curlData(get_option('_crb_url_api_simpeg'), 'api/satker/', 'GET', [
-					'header' => [
-					    'Authorization: Basic ' . get_option('_crb_authorization_api_simpeg')
-					  ]
-				]);
+				$opsi = array(
+					'url' => get_option('_crb_url_api_simpeg').'api/satker/',
+					'type' => 'get',
+					'header' => array('Authorization: Basic ' . get_option('_crb_authorization_api_simpeg'))
+				);
+				$response = $this->functions->curl_post($opsi);
+
+				if(empty($response)){
+					throw new Exception("Respon API kosong!", 1);
+				}else if($response == 'Unauthorized'){
+					throw new Exception($response.' '.json_encode($opsi), 1);
+				}
 
 				$dataSatker = json_decode($response, true);
 
 				if (json_last_error() !== JSON_ERROR_NONE) {
 				    throw new Exception("Terjadi kesalahan ketika mengakses API, Error : ". json_last_error_msg(), 1);
-				}
-
-				if(empty($dataSatker)){
-					throw new Exception("Respon API kosong!", 1);
 				}
 
 				$table = 'esakip_data_satker_simpeg';
@@ -27815,7 +27787,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				echo json_encode([
 					'status' => true,
-					'message' => 'Sukses ambil data Unit Organisasi!'
+					'message' => 'Sukses ambil data Unit Organisasi!',
+					'data_satker' => $dataSatker
 				]);
 				exit;
 
@@ -27851,20 +27824,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						break;
 				}
 
-				$response = $this->curlData(get_option('_crb_url_api_simpeg'), $path, 'GET', [
-					'header' => [
-					    'Authorization: Basic ' . get_option('_crb_authorization_api_simpeg')
-					  ]
-				]);
+				$response = $this->functions->curl_post(array(
+					'url' => get_option('_crb_url_api_simpeg').$path,
+					'type' => 'get',
+					'header' => array('Authorization: Basic ' . get_option('_crb_authorization_api_simpeg'))
+				));
+
+				if(empty($response)){
+					throw new Exception("Respon API kosong!", 1);
+				}else if($response == 'Unauthorized'){
+					throw new Exception($response.' '.json_encode($opsi), 1);
+				}
 
 				$dataPegawai = json_decode($response, true);
 
 				if (json_last_error() !== JSON_ERROR_NONE) {
 				    throw new Exception("Terjadi kesalahan ketika mengakses API, Error : ". json_last_error_msg(), 1);
-				}
-
-				if(empty($dataPegawai)){
-					throw new Exception("respon API kosong!", 1);
 				}
 
 				$table = 'esakip_data_pegawai_simpeg';

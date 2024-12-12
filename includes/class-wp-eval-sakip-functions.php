@@ -362,7 +362,6 @@ class Esakip_Functions
     {
         $curl = curl_init();
         set_time_limit(0);
-        $req = http_build_query($options['data']);
         $url = $options['url'];
         if (empty($url)) {
             return false;
@@ -374,22 +373,30 @@ class Esakip_Functions
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => $req,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_SSL_VERIFYPEER => 0,
+            CURLOPT_SSL_VERIFYHOST => 0,
             CURLOPT_CONNECTTIMEOUT => 0,
             CURLOPT_TIMEOUT => 10000
         );
+        if(!empty($options['type']) && strtolower($options['type']) != 'get'){
+            $opsi_curl[CURLOPT_CUSTOMREQUEST] = 'POST';
+            $req = http_build_query($options['data']);
+            $opsi_curl[CURLOPT_POSTFIELDS] = $req;
+        }else{
+            $opsi_curl[CURLOPT_CUSTOMREQUEST] = 'GET';
+        }
 
         if (!empty($options['header'])) {
+            if(gettype($options['header']) == 'string'){
+                $options['header'] = array($options['header']);
+            }
             $opsi_curl[CURLOPT_HTTPHEADER] = $options['header'];
         }
 
         curl_setopt_array($curl, $opsi_curl);
 
         $response = curl_exec($curl);
-        // die($response);
+        // print_r($opsi_curl); die($response);
         $err = curl_error($curl);
         curl_close($curl);
 
