@@ -1566,6 +1566,8 @@ CREATE TABLE `esakip_data_pegawai_simpeg` (
   `nama_pegawai` text NOT NULL, 
   `satker_id` text NOT NULL, 
   `jabatan` text DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `eselon_id` text DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `update_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id)

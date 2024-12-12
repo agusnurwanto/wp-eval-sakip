@@ -56,6 +56,12 @@ $tipe_dokumen = "dpa";
         position: sticky;
         bottom: 0;
     }
+    #table_dokumen_skpd tbody td{
+        vertical-align: middle;
+    }
+	.status-verifikasi {
+		width: 7rem;
+	}
 </style>
 <div class="container-md">
     <div class="cetak">
@@ -72,10 +78,10 @@ $tipe_dokumen = "dpa";
 							<th class="text-center" rowspan="2">Aksi</th>
 						</tr>
 						<tr>
-							<th class="text-center">Menunggu</th>
-							<th class="text-center">Disetujui</th>
-							<th class="text-center">Ditolak</th>
-							<th class="text-center">Draft</th>
+							<th class="text-center status-verifikasi">Draft</th>
+							<th class="text-center status-verifikasi">Menunggu</th>
+							<th class="text-center status-verifikasi">Disetujui</th>
+							<th class="text-center status-verifikasi">Ditolak</th>
 						</tr>
 					</thead>
                     <tbody>
@@ -83,10 +89,10 @@ $tipe_dokumen = "dpa";
 					<tfoot style="background: #ffc491;">
 						<tr>
 							<th class="text-center" colspan="2">Jumlah</th>
+							<th class="text-center" id="total_draft">0</th>
 							<th class="text-center" id="total_menunggu">0</th>
 							<th class="text-center" id="total_disetujui">0</th>
 							<th class="text-center" id="total_ditolak">0</th>
-							<th class="text-center" id="total_draft">0</th>
 							<th class="text-center" id="total_dokumen">0</th>
 							<th class="text-center"></th>
 						</tr>
@@ -182,10 +188,10 @@ $tipe_dokumen = "dpa";
                 console.log(response);
                 if (response.status === 'success') {
                     jQuery('#table_dokumen_skpd tbody').html(response.data);
+					jQuery('#total_draft').html(response.total_draft);
 					jQuery('#total_menunggu').html(response.total_menunggu);
 					jQuery('#total_disetujui').html(response.total_disetujui);
 					jQuery('#total_ditolak').html(response.total_ditolak);
-					jQuery('#total_draft').html(response.total_draft);
 					jQuery('#total_dokumen').html(response.total_dokumen);
                 } else {
                     alert(response.message);

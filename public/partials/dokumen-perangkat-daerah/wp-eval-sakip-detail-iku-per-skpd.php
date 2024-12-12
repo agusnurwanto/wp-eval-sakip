@@ -575,7 +575,8 @@ $status_api_esr = get_option('_crb_api_esr_status');
                     api_key: esakip.api_key,
                     list: list,
                     tahun_anggaran:'<?php echo $input['tahun'] ?>',
-                    nama_tabel_database:'esakip_iku'
+                    nama_tabel_database:'esakip_iku',
+                    id_skpd: <?php echo $id_skpd; ?>
                 },
                 dataType: 'json',
                 success: function(response) {
