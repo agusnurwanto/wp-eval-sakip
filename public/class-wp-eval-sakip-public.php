@@ -27760,14 +27760,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	public function get_satker_simpeg(){
 		global $wpdb;
 
-		if(get_option('crb_api_simpeg_status')){
+		if(get_option('_crb_api_simpeg_status')){
 			try {
 				
-				$response = $this->curlData(get_option('crb_url_api_simpeg'), 'api/satker/', 'GET', [
+				$response = $this->curlData(get_option('_crb_url_api_simpeg'), 'api/satker/', 'GET', [
 					'header' => [
-					    'Authorization: Basic ' . get_option('crb_authorization_api_simpeg')
+					    'Authorization: Basic ' . get_option('_crb_authorization_api_simpeg')
 					  ]
-				]);	
+				]);
 
 				$dataSatker = json_decode($response, true);
 
@@ -27776,12 +27776,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 
 				if(empty($dataSatker)){
-					throw new Exception("respon API kosong!", 1);
+					throw new Exception("Respon API kosong!", 1);
 				}
 
 				$table = 'esakip_data_satker_simpeg';
 				foreach ($dataSatker as $key => $data) {
-					$exists = $wpdb->get_var($wpdb->prepare("SELECT id FROM ".$table." WHERE satker_id=%s AND active=%d AND tahun_anggaran=%d", $data['satker_id'], 1, $_POST['tahun_anggaran']), ARRAY_A);
+					$exists = $wpdb->get_var($wpdb->prepare("SELECT id FROM ".$table." WHERE satker_id=%s AND active=%d AND tahun_anggaran=%d", trim($data['satker_id']), 1, $_POST['tahun_anggaran']), ARRAY_A);
 					if(!empty($exists['id'])){
 						$wpdb->update($table, [
 							'satker_id' => $data['satker_id'],
@@ -27797,6 +27797,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'satker_id' => $data['satker_id'],
 							'satker_id_parent' => $data['satker_id_parent'],
 							'nama' => $data['nama'],
+							'active' => 1,
 							'created_at' => current_time('mysql'),
 							'tahun_anggaran' => $_POST['tahun_anggaran'],
 						]);
@@ -27805,7 +27806,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				echo json_encode([
 					'status' => true,
-					'message' => 'Sukses ambil data satker Simpeg!'
+					'message' => 'Sukses ambil data Unit Organisasi!'
 				]);
 				exit;
 
@@ -27820,6 +27821,112 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			echo json_encode([
 					'status' => true,
 					'message' => 'Pengaturan Status API Kepegawaian ditutup!'
+				]);
+			exit;
+		}
+	}
+
+	public function get_pegawai_simpeg(){
+		global $wpdb;
+
+		if(get_option('_crb_api_simpeg_status')){
+			try {
+
+				switch ($_POST['type']) {
+					case 'unor':
+						$path = 'api/satker/'.$_POST['value'].'/pegawai';
+						break;
+
+					case 'asn':
+						$path = 'api/pegawai/'.$_POST['value'].'/jabatan';
+						break;
+				}
+
+				$response = $this->curlData(get_option('_crb_url_api_simpeg'), $path, 'GET', [
+					'header' => [
+					    'Authorization: Basic ' . get_option('_crb_authorization_api_simpeg')
+					  ]
+				]);
+
+				$dataPegawai = json_decode($response, true);
+
+				if (json_last_error() !== JSON_ERROR_NONE) {
+				    throw new Exception("Terjadi kesalahan ketika mengakses API, Error : ". json_last_error_msg(), 1);
+				}
+
+				if(empty($dataPegawai)){
+					throw new Exception("respon API kosong!", 1);
+				}
+
+				$table = 'esakip_data_pegawai_simpeg';
+				foreach ($dataPegawai as $key => $data) {
+					$exists = $wpdb->get_row($wpdb->prepare("SELECT id FROM ".$table." WHERE nip_baru=%s AND active=%d", trim($data['nip_baru']), 1), ARRAY_A);
+					if(!empty($exists['id'])){
+						$wpdb->update($table, [
+							'nama_pegawai' => $data['nama_pegawai'],
+							'satker_id' => $data['satker_id'],
+							'jabatan' => $data['jabatan'],
+							'update_at' => current_time('mysql')
+						], [
+							'nip_baru' => $data['nip_baru']
+						]);
+					}else{
+						$wpdb->insert($table, [
+							'nip_baru' => $data['nip_baru'],
+							'nama_pegawai' => $data['nama_pegawai'],
+							'satker_id' => $data['satker_id'],
+							'jabatan' => $data['jabatan'],
+							'active' => 1,
+							'created_at' => current_time('mysql'),
+						]);
+					}
+				}
+
+				echo json_encode([
+					'status' => true,
+					'message' => 'Sukses ambil data pegawai!'
+				]);
+				exit;
+
+			}catch(Exception $e){
+				echo json_encode([
+					'status' => false,
+					'message' => $e->getMessage()
+				]);
+				exit;
+			}
+		}else{
+			echo json_encode([
+					'status' => true,
+					'message' => 'Pengaturan Status API Kepegawaian ditutup!'
+				]);
+			exit;
+		}
+	}
+
+	public function get_list_satker_simpeg(){
+		global $wpdb;
+
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+					$dataSatker = $wpdb->get_results($wpdb->prepare("SELECT * FROM esakip_data_satker_simpeg WHERE satker_id_parent=%s AND active=%d AND tahun_anggaran=%d ORDER BY satker_id ASC", '0', 1, $_POST['tahun_anggaran']), ARRAY_A);
+
+					echo json_encode([
+						'status' => true,
+						'data' => $dataSatker
+					]);
+				exit;
+				}else{
+					throw new Exception("API key tidak ditemukan!", 1);
+				}
+			}else{
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		}catch(Exception $e){
+			echo json_encode([
+					'status' => false,
+					'message' => $e->getMessage()
 				]);
 			exit;
 		}
