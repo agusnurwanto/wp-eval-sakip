@@ -19,6 +19,7 @@ $unit = $wpdb->get_results("
 	group by id_skpd
 	order by kode_skpd ASC
 ", ARRAY_A);
+
 $html = '';
 foreach ($unit as $kk => $vv) {
 	$html .= '
@@ -26,7 +27,7 @@ foreach ($unit as $kk => $vv) {
 			<td>'.$vv['kode_skpd'].'</td>
 			<td>'.$vv['nama_skpd'].'</td>
 			<td class="text-center">'.$vv['namakepala'].'<br>'.$vv['nipkepala'].'</td>
-			<td></td>
+			<td><select class="form-class unor" style="width:100%"></select></td>
 		</tr>
 	';
 }
@@ -73,8 +74,64 @@ foreach ($unit as $kk => $vv) {
 	var unorList;
 
 	jQuery(document).ready(function(){
+
 		getUnorList();
+
+		jQuery(".unor").select2({
+		  	ajax: {
+		    	    url: esakip.url,
+			        type: 'POST',
+				    dataType: 'json',
+				    delay: 250,
+				    data: function (params) {
+				      return {
+				       	action: 'get_list_satker_simpeg',
+					    api_key: esakip.api_key,
+					    tahun_anggaran:'<?php echo $tahun_anggaran ?>',
+					    type:'search',
+						q: params.term,
+				      };
+				    },
+				    processResults: function (data, params) {
+				      params.page = params.page || 1;
+
+				      return {
+				        results: data.data,
+				        pagination: {
+				          more: (params.page * 30) < data.total_count
+				        }
+				      };
+				    },
+				    cache: true
+		  },
+		  placeholder: 'Cari unit organisasi',
+		  minimumInputLength: 5,
+		  templateResult: formatUnor,
+		  templateSelection: formatUnorSelection
+		});
 	});
+
+	function formatUnor (response) {
+	  if (response.loading) {
+	    return response.text;
+	  }
+
+	  var $container = jQuery(
+	    "<div class='select2-result-repository clearfix'>" +
+	      "<div class='select2-result-repository__meta'>" +
+	        "<div class='select2-result-repository__title'></div>" +
+	      "</div>" +
+	    "</div>"
+	  );
+
+	  $container.find(".select2-result-repository__title").text(response.nama);
+
+	  return $container;
+	}
+
+	function formatUnorSelection (response) {
+	  return response.nama || response.text;
+	}
 
 
 	function getUnor(){

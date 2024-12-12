@@ -27790,21 +27790,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				$table = 'esakip_data_satker_simpeg';
 				foreach ($dataSatker as $key => $data) {
-					$exists = $wpdb->get_var($wpdb->prepare("SELECT id FROM ".$table." WHERE satker_id=%s AND active=%d AND tahun_anggaran=%d", trim($data['satker_id']), 1, $_POST['tahun_anggaran']), ARRAY_A);
-					if(!empty($exists['id'])){
+					$exists = $wpdb->get_row($wpdb->prepare("SELECT id FROM ".$table." WHERE satker_id=%s AND active=%d AND tahun_anggaran=%d", trim($data['satker_id']), 1, $_POST['tahun_anggaran']), ARRAY_A);
+					if(!empty($exists)){
 						$wpdb->update($table, [
-							'satker_id' => $data['satker_id'],
-							'satker_id_parent' => $data['satker_id_parent'],
+							'satker_id' => trim($data['satker_id']),
+							'satker_id_parent' => trim($data['satker_id_parent']),
 							'nama' => $data['nama'],
 							'update_at' => current_time('mysql')
 						], [
-							'satker_id' => $data['satker_id'],
+							'satker_id' => trim($data['satker_id']),
 							'tahun_anggaran' => $_POST['tahun_anggaran'],
 						]);
 					}else{
 						$wpdb->insert($table, [
-							'satker_id' => $data['satker_id'],
-							'satker_id_parent' => $data['satker_id_parent'],
+							'satker_id' => trim($data['satker_id']),
+							'satker_id_parent' => trim($data['satker_id_parent']),
 							'nama' => $data['nama'],
 							'active' => 1,
 							'created_at' => current_time('mysql'),
@@ -27870,7 +27870,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$table = 'esakip_data_pegawai_simpeg';
 				foreach ($dataPegawai as $key => $data) {
 					$exists = $wpdb->get_row($wpdb->prepare("SELECT id FROM ".$table." WHERE nip_baru=%s AND active=%d", trim($data['nip_baru']), 1), ARRAY_A);
-					if(!empty($exists['id'])){
+					if(!empty($exists)){
 						$wpdb->update($table, [
 							'nama_pegawai' => $data['nama_pegawai'],
 							'satker_id' => $data['satker_id'],
@@ -27919,7 +27919,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		try {
 			if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-					$dataSatker = $wpdb->get_results($wpdb->prepare("SELECT * FROM esakip_data_satker_simpeg WHERE satker_id_parent=%s AND active=%d AND tahun_anggaran=%d ORDER BY satker_id ASC", '0', 1, $_POST['tahun_anggaran']), ARRAY_A);
+
+					if($_POST['type']=='search'){
+						$dataSatker = $wpdb->get_results($wpdb->prepare("SELECT * FROM esakip_data_satker_simpeg WHERE nama LIKE %s AND active=%d AND tahun_anggaran=%d ORDER BY satker_id ASC", "%".$_POST['q']."%", 1, $_POST['tahun_anggaran']), ARRAY_A);
+					}else{
+						$dataSatker = $wpdb->get_results($wpdb->prepare("SELECT * FROM esakip_data_satker_simpeg WHERE satker_id_parent=%s AND active=%d AND tahun_anggaran=%d ORDER BY satker_id ASC", '0', 1, $_POST['tahun_anggaran']), ARRAY_A);
+					}
 
 					echo json_encode([
 						'status' => true,
