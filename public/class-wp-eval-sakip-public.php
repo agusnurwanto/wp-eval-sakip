@@ -27927,7 +27927,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		try {
 			if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-					$exists = $wpdb->get_row($wpdb->prepare("SELECT id FROM esakip_data_mapping_unit_sipd_simpeg WHERE id_skpd=%d AND id_satker_simpeg=%d AND active=%d AND tahun_anggaran=%d", $_POST['idskpd_sipd'], $_POST['id_satker_simpeg'], 1, $_POST['tahun_anggaran']), ARRAY_A);
+					$exists = $wpdb->get_row($wpdb->prepare("SELECT id FROM esakip_data_mapping_unit_sipd_simpeg WHERE id_skpd=%d AND active=%d AND tahun_anggaran=%d", $_POST['idskpd_sipd'], 1, $_POST['tahun_anggaran']), ARRAY_A);
 					if(!empty($exists)){
 						$wpdb->update('esakip_data_mapping_unit_sipd_simpeg', [
 							'id_skpd' => $_POST['idskpd_sipd'],
