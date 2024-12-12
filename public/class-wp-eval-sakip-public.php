@@ -5347,7 +5347,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						if(!empty($mapping_jenis_dokumen_esr)){
 
 							$array_data_esr = [];
-							$data_esr = $this->data_esr($tahun_anggaran);
+							$data_esr = $this->data_esr($id_skpd);
 							if($data_esr['status'] == 'success'){
 								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
 								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
@@ -5587,7 +5587,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						
 						if(!empty($mapping_jenis_dokumen_esr)){
 							$array_data_esr = [];
-							$data_esr = $this->data_esr($tahun_anggaran);
+							$data_esr = $this->data_esr($id_skpd);
 							if($data_esr['status'] == 'success'){
 								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
 								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
@@ -5765,7 +5765,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						if(!empty($mapping_jenis_dokumen_esr)){
 							$array_data_esr = [];
-							$data_esr = $this->data_esr($tahun_anggaran);
+							$data_esr = $this->data_esr($id_skpd);
 							if($data_esr['status'] == 'success'){
 								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
 								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
@@ -6006,7 +6006,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						if(!empty($mapping_jenis_dokumen_esr)){
 							$array_data_esr = [];
-							$data_esr = $this->data_esr($tahun_anggaran);
+							$data_esr = $this->data_esr($id_skpd);
 							if($data_esr['status'] == 'success'){
 								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
 								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
@@ -6253,7 +6253,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						if(!empty($mapping_jenis_dokumen_esr)){
 							$array_data_esr = [];
-							$data_esr = $this->data_esr($tahun_anggaran);
+							$data_esr = $this->data_esr($id_skpd);
 							if($data_esr['status'] == 'success'){
 								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
 								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
@@ -6432,7 +6432,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						if(!empty($mapping_jenis_dokumen_esr)){
 							$array_data_esr = [];
-							$data_esr = $this->data_esr($tahun_anggaran);
+							$data_esr = $this->data_esr($id_skpd);
 							if($data_esr['status'] == 'success'){
 								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
 								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
@@ -6982,7 +6982,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							if(!empty($mapping_jenis_dokumen_esr)){
 								$tahun_anggaran = $pengaturan_periode_dokumen['tahun_anggaran'];
 								$array_data_esr = [];
-								$data_esr = $this->data_esr($tahun_anggaran);
+								$data_esr = $this->data_esr();
 								if($data_esr['status'] == 'success'){
 									$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
 									$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
@@ -7246,7 +7246,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							if(!empty($mapping_jenis_dokumen_esr)){
 								$tahun_anggaran = $pengaturan_periode_dokumen['tahun_anggaran'];
 								$array_data_esr = [];
-								$data_esr = $this->data_esr($tahun_anggaran);
+								$data_esr = $this->data_esr($id_skpd);
 								if($data_esr['status'] == 'success'){
 									$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
 									$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
@@ -7489,7 +7489,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						if(!empty($mapping_jenis_dokumen_esr)){
 							$array_data_esr = [];
-							$data_esr = $this->data_esr($tahun_anggaran);
+							$data_esr = $this->data_esr($id_skpd);
 							if($data_esr['status'] == 'success'){
 								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
 								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
@@ -7690,7 +7690,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 							if(!empty($mapping_jenis_dokumen_esr)){
 								$array_data_esr = [];
-								$data_esr = $this->data_esr($tahun_anggaran);
+								$data_esr = $this->data_esr($id_skpd);
 								if($data_esr['status'] == 'success'){
 									$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
 									$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
@@ -7892,7 +7892,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								", $tahun_anggaran, $nama_tabel), ARRAY_A);
 							if(!empty($mapping_jenis_dokumen_esr)){
 								$array_data_esr = [];
-								$data_esr = $this->data_esr($tahun_anggaran);
+								$data_esr = $this->data_esr();
 								if($data_esr['status'] == 'success'){
 									$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
 									$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
@@ -13785,7 +13785,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						if(!empty($mapping_jenis_dokumen_esr)){
 							$array_data_esr = [];
-							$data_esr = $this->data_esr($tahun_anggaran);
+							$data_esr = $this->data_esr($id_skpd);
 							if($data_esr['status'] == 'success'){
 								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
 								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
@@ -15931,9 +15931,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				$where = 'tahun_anggaran IS NULL';
 
+				$esr_skpd = '';
 				if (!empty($_POST['id_skpd'])) {
 					$id_skpd = $_POST['id_skpd'];
 					$where .= " AND id_skpd = $id_skpd";
+					$esr_skpd = $_POST['id_skpd'];
 				}
 
 				$nama_tabel = 'esakip_evaluasi_internal';
@@ -15973,7 +15975,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						if(!empty($mapping_jenis_dokumen_esr)){
 							$array_data_esr = [];
-							$data_esr = $this->data_esr($tahun_anggaran);
+							$data_esr = $this->data_esr($esr_skpd);
 							if($data_esr['status'] == 'success'){
 								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
 								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
@@ -17520,9 +17522,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				$where = 'tahun_anggaran IS NULL';
 
+				$esr_skpd = '';
 				if (!empty($_POST['id_skpd'])) {
 					$id_skpd = $_POST['id_skpd'];
 					$where .= " AND id_skpd = $id_skpd";
+					$esr_skpd = $_POST['id_skpd'];
 				}
 
 				$nama_tabel = 'esakip_skp';
@@ -17562,7 +17566,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						if(!empty($mapping_jenis_dokumen_esr)){
 							$array_data_esr = [];
-							$data_esr = $this->data_esr($tahun_anggaran);
+							$data_esr = $this->data_esr($esr_skpd);
 							if($data_esr['status'] == 'success'){
 								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
 								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
@@ -22296,7 +22300,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							if(!empty($mapping_jenis_dokumen_esr)){
 								$ret['status_mapping_esr'] = true;
 								$array_data_esr = [];
-								$data_esr = $this->data_esr($tahun_anggaran);
+								$data_esr = $this->data_esr();
 								if($data_esr['status'] == 'success'){
 									$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
 									$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
@@ -23291,7 +23295,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						if(!empty($mapping_jenis_dokumen_esr)){
 							$array_data_esr = [];
-							$data_esr = $this->data_esr($tahun_anggaran);
+							$data_esr = $this->data_esr($id_skpd);
 							if($data_esr['status'] == 'success'){
 								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
 								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
@@ -25865,10 +25869,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				$where_skpd = "";
+				$esr_skpd = '';
 				if ($_POST['tipe_dokumen'] == 'pohon_kinerja_dan_cascading') {
 					if (!empty($_POST['id_skpd'])) {
 						$id_skpd = $_POST['id_skpd'];
 						$where_skpd = " AND id_skpd=" . $id_skpd;
+						$esr_skpd = $_POST['id_skpd'];
 					} else {
 						$ret['status'] = 'error';
 						$ret['message'] = 'Id Perangkat Daerah kosong!';
@@ -25939,7 +25945,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							if(!empty($mapping_jenis_dokumen_esr)){
 								$tahun_anggaran = $pengaturan_periode_dokumen['tahun_anggaran'];
 								$array_data_esr = [];
-								$data_esr = $this->data_esr($tahun_anggaran);
+								$data_esr = $this->data_esr($esr_skpd);
 								if($data_esr['status'] == 'success'){
 									$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
 									$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
@@ -26842,6 +26848,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                     	throw new Exception("Nama tabel dokumen di setting menu dokumen tidak ditemukan!", 1);
                     }
 
+					$id_skpd = '';
+					if($dokumen_menu['user_role'] == 'perangkat_daerah' && !empty($_POST['id_skpd'])){
+						$id_skpd = $_POST['id_skpd'];
+					}else if($dokumen_menu['user_role'] == 'perangkat_daerah' && empty($_POST['id_skpd'])){
+						throw new Exception("Id Skpd kosong!", 1);
+					}
+
                     switch ($dokumen_menu['user_role']) {
                     	case 'pemerintah_daerah':
 							$path_dokumen = 'public/media/dokumen/dokumen_pemda/';
@@ -26877,14 +26890,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 					// ambil user_id
 					$current_user = wp_get_current_user();
-					if(in_array($current_user->roles[0], $this->admin_user())){
+					if(empty($id_skpd)){
 						$user_id = get_option('_user_esr_'.str_replace(" ", "_", get_option('_crb_nama_pemda')));
 					}else{
-						if(in_array($current_user->roles[0], 'admin_panrb')){
+						if(in_array($current_user->roles[0], array('admin_panrb'))){
 							throw new Exception("Tidak diizinkan!", 1);
 						}
-						$data_unit = $wpdb->get_row($wpdb->prepare("SELECT id_unit FROM esakip_data_unit WHERE nipkepala=%s AND active=%d AND tahun_anggaran=%d", $current_user->user_login, 1, $tahun_anggaran), ARRAY_A);
-						$user_id = get_option('_user_esr_'.$data_unit['id_unit']);
+						$user_id = get_option('_user_esr_'.$id_skpd);
 					}
 
 					// ambil file
@@ -27494,19 +27506,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
-	public function data_esr($tahun_anggaran){
+	public function data_esr($id_skpd){
 		global $wpdb;
 
 		if(get_option('_crb_api_esr_status')){			
 			try {
 
-				$current_user = wp_get_current_user();
-
-				if(in_array($current_user->roles[0], $this->admin_user())){
+				if(empty($id_skpd)){
 					$user_esr_id = get_option('_user_esr_'.str_replace(" ", "_", get_option('_crb_nama_pemda')));
 				}else{
-					$data_unit = $wpdb->get_row($wpdb->prepare("SELECT id_unit FROM esakip_data_unit WHERE nipkepala=%s AND active=%d AND tahun_anggaran=%d", $current_user->user_login, 1, $tahun_anggaran), ARRAY_A);
-					$user_esr_id = get_option('_user_esr_'.$data_unit['id_unit']);
+					$user_esr_id = get_option('_user_esr_'.$id_skpd);
 				}
 
 				if(empty($user_esr_id)){
