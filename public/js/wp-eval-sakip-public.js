@@ -25,6 +25,14 @@ jQuery(document).ready(function () {
     });
 });
 
+function pesan_loading(pesan, loading=false){
+    if(loading){
+        pesan = '<div style="padding: 20px;">LOADING...</div>'+pesan;
+    }
+    jQuery('#pesan-loading').html(pesan);
+    console.log(pesan);
+}
+
 function run_download_excel_sakip(type) {
     var body = '<a id="excel" onclick="return false;" href="#" class="btn btn-success"><span class="dashicons dashicons-media-spreadsheet"></span>Download Excel</a>';
     var download_excel = '<div id="action-sakip" class="hide-print text-white">' + body + "</div>";
