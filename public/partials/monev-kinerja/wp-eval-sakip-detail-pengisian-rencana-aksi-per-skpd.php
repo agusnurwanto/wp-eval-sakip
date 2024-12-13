@@ -121,7 +121,7 @@ if (!empty($renaksi_pemda)) {
         $renaksi_opd_label = !empty($renaksi_opd) ? esc_attr($renaksi_opd[0]['label']) : '';
         $renaksi_opd_id = !empty($renaksi_opd) ? esc_attr($renaksi_opd[0]['id']) : '';  
 
-        $aksi = '<a href="javascript:void(0)" class="btn btn-sm btn-success verifikasi-renaksi-pemda" data-id="' . $renaksi_opd_id . '" data-label="' . esc_attr($v_renaksi_pemda['label']) . '" data-id_renaksi_pemda="' . esc_attr($v_renaksi_pemda['id_data_renaksi_pemda']) . '" data-id_indikator="' . esc_attr($v_renaksi_pemda['id_data_indikator']) . '" data-indikator="' . esc_attr($v_renaksi_pemda['indikator']) . '"data-satuan="' . esc_attr($v_renaksi_pemda['satuan']) . '" data-target_akhir="' . esc_attr($v_renaksi_pemda['target_akhir']) . '" data-renaksi-opd="' . $renaksi_opd_label . '" title="Verifikasi Rencana Aksi"><span class="dashicons dashicons-yes"></span></a>';
+        $aksi = '<a href="javascript:void(0)" class="btn btn-sm btn-success verifikasi-renaksi-pemda" data-id="' . $renaksi_opd_id . '" data-label="' . esc_attr($v_renaksi_pemda['label']) . '" data-id_renaksi_pemda="' . esc_attr($v_renaksi_pemda['id_data_renaksi_pemda']) . '" data-id_indikator="' . esc_attr($v_renaksi_pemda['id_data_indikator']) . '" data-indikator="' . esc_attr($v_renaksi_pemda['indikator']) . '"data-satuan="' . esc_attr($v_renaksi_pemda['satuan']) . '" data-target_akhir="' . esc_attr($v_renaksi_pemda['target_akhir']) . '" data-renaksi-opd="' . $renaksi_opd_label . '" title="Verifikasi Rencana Hasil Kerja"><span class="dashicons dashicons-yes"></span></a>';
 
         $html_renaksi_pemda .= '
             <tr>
@@ -194,11 +194,11 @@ $set_renaksi = get_option('_crb_input_renaksi');
 
 <!-- Table -->
 <div class="container-md">
-    <div id="cetak" title="Rencana Aksi Perangkat Daerah">
+    <div id="cetak" title="Rencana Hasil Kerja Perangkat Daerah">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Rencana Aksi <br><?php echo !empty($skpd['nama_skpd']) ? $skpd['nama_skpd'] : '' ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
+            <h1 class="text-center" style="margin:3rem;">Rencana Hasil Kerja <br><?php echo !empty($skpd['nama_skpd']) ? $skpd['nama_skpd'] : '' ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
             <h4 id = "notifikasi-title" style="text-align: center; margin-top: 10px; font-weight: bold;margin-bottom: .5em;">Notifikasi Rencana Hasil Kerja Pemda</h4>
-            <div title="Notifikasi Rencana Aksi Pemda" style="padding: 5px; overflow: auto; display:flex; justify-content:center;">
+            <div title="Notifikasi Rencana Hasil Kerja Pemda" style="padding: 5px; overflow: auto; display:flex; justify-content:center;">
                 <table class="table_notifikasi_pemda" style="width: 50em;text-align: center;">
                     <thead>
                         <tr>
@@ -223,9 +223,9 @@ $set_renaksi = get_option('_crb_input_renaksi');
                             <th class="text-center" rowspan="2" style="width: 85px;">No</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">KEGIATAN UTAMA<br>LEVEL 2</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">INDIKATOR KEGIATAN UTAMA</th>
-                            <th class="text-center" rowspan="2" style="width: 200px;">RENCANA AKSI<br>LEVEL 3</th>
+                            <th class="text-center" rowspan="2" style="width: 200px;">RENCANA HASIL KERJA<br>LEVEL 3</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">OUTCOME/OUTPUT</th>
-                            <th class="text-center" rowspan="2" style="width: 200px;">URAIAN KEGIATAN RENCANA AKSI<br>LEVEL 4</th>
+                            <th class="text-center" rowspan="2" style="width: 200px;">URAIAN KEGIATAN RENCANA HASIL KERJA<br>LEVEL 4</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">INDIKATOR</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">URAIAN TEKNIS KEGIATAN<br>LEVEL 5</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">INDIKATOR</th>
@@ -264,8 +264,8 @@ $set_renaksi = get_option('_crb_input_renaksi');
     <h4 style="font-weight: bold; margin-bottom: 20px; color: #333;">Catatan</h4>
     <ul style="list-style-type: disc; padding-left: 20px; line-height: 1.6; color: #555;">
         <li>Baris Kolom Tabel Dengan Background Warna <strong>Kuning</strong> Menunjukkan Data Kegiatan Utama dan Pohon Kinerja Level 2</li>
-        <li>Baris Kolom Tabel Dengan Background Warna <strong>Ungu</strong> Menunjukkan Data Rencana Aksi dan Pohon Kinerja Level 3</li>
-        <li>Baris Kolom Tabel Dengan Background Warna <strong>Biru</strong> Menunjukkan Data Uraian Kegiatan Rencana Aksi dan Pohon Kinerja Level 4</li>
+        <li>Baris Kolom Tabel Dengan Background Warna <strong>Ungu</strong> Menunjukkan Data Rencana Hasil Kerja dan Pohon Kinerja Level 3</li>
+        <li>Baris Kolom Tabel Dengan Background Warna <strong>Biru</strong> Menunjukkan Data Uraian Kegiatan Rencana Hasil Kerja dan Pohon Kinerja Level 4</li>
         <li>Baris Kolom Tabel Dengan Background Warna <strong>Putih</strong> Menunjukkan Data Uraian Teknis Kegiatan dan Pohon Kinerja Level 5</li>
     </ul>
 </div>
@@ -274,15 +274,15 @@ $set_renaksi = get_option('_crb_input_renaksi');
     <div class="modal-dialog" style="max-width: 1500px;" role="document">
         <div class="modal-content">
             <div class="modal-header bgpanel-theme">
-                <h4 style="margin: 0;" class="modal-title">Data Rencana Aksi</h4>
+                <h4 style="margin: 0;" class="modal-title">Data Rencana Hasil Kerja</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span><i class="dashicons dashicons-dismiss"></i></span></button>
             </div>
             <div class="modal-body">
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
                         <a class="nav-item nav-link" id="nav-level-1-tab" data-toggle="tab" href="#nav-level-1" role="tab" aria-controls="nav-level-1" aria-selected="false">Kegiatan Utama</a>
-                        <a class="nav-item nav-link" id="nav-level-2-tab" data-toggle="tab" href="#nav-level-2" role="tab" aria-controls="nav-level-2" aria-selected="false">Rencana Aksi</a>
-                        <a class="nav-item nav-link" id="nav-level-3-tab" data-toggle="tab" href="#nav-level-3" role="tab" aria-controls="nav-level-3" aria-selected="false">Uraian Kegiatan Rencana Aksi</a>
+                        <a class="nav-item nav-link" id="nav-level-2-tab" data-toggle="tab" href="#nav-level-2" role="tab" aria-controls="nav-level-2" aria-selected="false">Rencana Hasil Kerja</a>
+                        <a class="nav-item nav-link" id="nav-level-3-tab" data-toggle="tab" href="#nav-level-3" role="tab" aria-controls="nav-level-3" aria-selected="false">Uraian Kegiatan Rencana Hasil Kerja</a>
                         <a class="nav-item nav-link" id="nav-level-4-tab" data-toggle="tab" href="#nav-level-4" role="tab" aria-controls="nav-level-4" aria-selected="false">Uraian Teknis Kegiatan</a>
                     </div>
                 </nav>
@@ -339,7 +339,7 @@ jQuery(document).ready(function() {
     let id_jadwal = <?php echo $cek_id_jadwal; ?>;
     let id_jadwal_wpsipd = <?php echo $cek_id_jadwal_wpsipd; ?>;
     if(id_jadwal == 0 || id_jadwal_wpsipd == 0){
-        alert("Jadwal RENSTRA untuk data Pokin belum disetting.\nSetting Jadwal RENSTRA ada di admin dashboard di menu Monev Rencana Aksi -> Monev Rencana Aksi Setting")
+        alert("Jadwal RENSTRA untuk data Pokin belum disetting.\nSetting Jadwal RENSTRA ada di admin dashboard di menu Monev Rencana Hasil Kerja -> Monev Rencana Hasil Kerja Setting")
     }
 
     window.id_jadwal = <?php echo $id_jadwal; ?>;
@@ -379,7 +379,7 @@ jQuery(document).on('click', '.verifikasi-renaksi-pemda', function() {
         checklist_renaksi_opd += '</div></div>';
     }
 
-    jQuery("#modal-renaksi-pemda").find('.modal-title').html('Verifikasi Rencana Aksi Pemda');
+    jQuery("#modal-renaksi-pemda").find('.modal-title').html('Verifikasi Rencana Hasil Kerja Pemda');
     jQuery("#modal-renaksi-pemda").find('.modal-body').html(`
         <form id="form-renaksi-pemda">
             <input type="hidden" name="id" value="${id}">
@@ -565,7 +565,7 @@ function tambah_rencana_aksi(){
                         html += '<option value="'+value.id+'">'+value.label+'</option>';
                     });
                     jQuery('#wrap-loading').hide();
-                    jQuery("#modal-crud").find('.modal-title').html('Tambah Rencana Aksi');
+                    jQuery("#modal-crud").find('.modal-title').html('Tambah Rencana Hasil Kerja');
                     jQuery("#modal-crud").find('.modal-body').html(''
                         +`<form id="form-renaksi">`
                             +'<input type="hidden" id="id_renaksi" value=""/>'
@@ -801,7 +801,7 @@ function edit_rencana_aksi(id, tipe){
                     } else if(response.data != null){
                         jQuery('#id_renaksi').val(id);
                         if(tipe == 2){
-                            jQuery("#modal-crud").find('.modal-title').html('Edit Rencana Aksi');
+                            jQuery("#modal-crud").find('.modal-title').html('Edit Rencana Hasil Kerja');
                             jQuery('#pokin-level-1').val(response.data.id_pokin_3).trigger('change');
                             jQuery('#cascading-renstra').val(response.data.kode_cascading_program).trigger('change');
                             jQuery('#label_renaksi_opd_').val(response.data.label_renaksi_opd_);
@@ -858,7 +858,7 @@ function edit_rencana_aksi(id, tipe){
                             });
 
                         } else if(tipe == 3){
-                            jQuery("#modal-crud").find('.modal-title').html('Edit Uraian Rencana Aksi');
+                            jQuery("#modal-crud").find('.modal-title').html('Edit Uraian Rencana Hasil Kerja');
                             jQuery('#pokin-level-2').attr('val-id', response.data.id_pokin_5);
                             jQuery('#pokin-level-1').val(response.data.id_pokin_4).trigger('change');
                             jQuery('#cascading-renstra').val(response.data.kode_cascading_kegiatan).trigger('change');
@@ -998,7 +998,7 @@ function kegiatanUtama(){
                                         +`<td class="label_renaksi">${label_dasar_pelaksanaan}</td>`
                                         +`<td class="text-center">`
                                             +`<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, 1, ${total_pagu})" title="Tambah Indikator (Total Pagu: ${total_pagu})"><i class="dashicons dashicons-plus"></i></a> `
-                                            +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, 2, ${value.id_pokin_2}, '${value.kode_cascading_sasaran}')" title="Lihat Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
+                                            +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, 2, ${value.id_pokin_2}, '${value.kode_cascading_sasaran}')" title="Lihat Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
                                             +`<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, 1)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`
                                             +`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_rencana_aksi(${value.id}, 1)" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
                                         +`</td>`
@@ -1031,7 +1031,7 @@ function kegiatanUtama(){
                                                 +`<td class="text-center">${b.target_akhir}</td>`
                                                 +`<td class="text-right">${b.rencana_pagu || 0}</td>`
                                                 +`<td class="text-center">`                
-                                                    +`<input type="checkbox" title="Lihat Rencana Aksi Per Bulan" class="lihat_bulanan" data-id="${b.id}" onclick="lihat_bulanan(this);" style="margin: 0 6px;">`
+                                                    +`<input type="checkbox" title="Lihat Rencana Hasil Kerja Per Bulan" class="lihat_bulanan" data-id="${b.id}" onclick="lihat_bulanan(this);" style="margin: 0 6px;">`
                                                     +`<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_indikator(${b.id}, 1, ${total_pagu})" title="Edit"><i class="dashicons dashicons-edit"></i></a> `
                                                     +`<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-danger" onclick="hapus_indikator(${b.id}, 1);" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
                                                 +`</td>`
@@ -1049,12 +1049,12 @@ function kegiatanUtama(){
                                             kegiatanUtama += ''
                                                 + `<tr style="display: none;" class="data_bulanan_${b.id}">`
                                                     + `<td colspan="10" style="padding: 10px;">`
-                                                        +`<h3 class="text-center" style="margin: 10px;">Rencana Aksi Per Bulan</h3>`
+                                                        +`<h3 class="text-center" style="margin: 10px;">Rencana Hasil Kerja Per Bulan</h3>`
                                                         + `<table class="table" style="margin: 0;">`
                                                             + `<thead>`
                                                                 + `<tr class="table-secondary">`
                                                                     + `<th class="text-center">Bulan/TW</th>`
-                                                                    + `<th class="text-center">Rencana Aksi</th>`
+                                                                    + `<th class="text-center">Rencana Hasil Kerja</th>`
                                                                     + `<th class="text-center" style="width:100px;">Target</th>`
                                                                     + `<th class="text-center" style="width:100px;">Satuan</th>`
                                                                     + `<th class="text-center" style="width:150px;">Realisasi</th>`
@@ -1212,7 +1212,7 @@ function getTablePengisianRencanaAksi(no_loading = false) {
         error: function(xhr, status, error) {
             jQuery('#wrap-loading').hide();
             console.error(xhr.responseText);
-            alert('Terjadi kesalahan saat memuat data Rencana Aksi!');
+            alert('Terjadi kesalahan saat memuat data Rencana Hasil Kerja!');
         }
     });
 }
@@ -1257,7 +1257,7 @@ function tambah_indikator_rencana_aksi(id, tipe, total_pagu){
                 +'</div>'
             +`</div>`
     }else if(tipe == 2){
-        title = 'Indikator Rencana Aksi';
+        title = 'Indikator Rencana Hasil Kerja';
         input_pagu = ''
             +`<div class="form-group row">`
                 +'<div class="col-md-2">'
@@ -1291,7 +1291,7 @@ function tambah_indikator_rencana_aksi(id, tipe, total_pagu){
                 +'</div>'
             +`</div>`
     }else if(tipe == 3){
-        title = 'Indikator Uraian Kegiatan Rencana Aksi';
+        title = 'Indikator Uraian Kegiatan Rencana Hasil Kerja';
          input_pagu = ''
             +`<div class="form-group row">`
                 +'<div class="col-md-2">'
@@ -1510,12 +1510,12 @@ function hapus_indikator(id, tipe){
     if(tipe == 1){
         title = 'Kegiatan Utama';
     }else if(tipe == 2){
-        title = 'Rencana Aksi';
+        title = 'Rencana Hasil Kerja';
         var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
         var parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
         var parent_cascading = jQuery('#tabel_rencana_aksi').attr('parent_cascading');
     }else if(tipe == 3){
-        title = 'Uraian Kegiatan Rencana Aksi';
+        title = 'Uraian Kegiatan Rencana Hasil Kerja';
         var parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
         var parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
         var parent_cascading = jQuery('#tabel_uraian_rencana_aksi').attr('parent_cascading');
@@ -1552,7 +1552,7 @@ function hapus_indikator(id, tipe){
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data Rencana Aksi!');
+                alert('Terjadi kesalahan saat memuat data Rencana Hasil Kerja!');
             }
         });
     }
@@ -1566,12 +1566,12 @@ function hapus_rencana_aksi(id, tipe){
     if(tipe == 1){
         title = 'Kegiatan Utama';
     }else if(tipe == 2){
-        title = 'Rencana Aksi';
+        title = 'Rencana Hasil Kerja';
         parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
         parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
         parent_cascading = jQuery('#tabel_rencana_aksi').attr('parent_cascading');
     }else if(tipe == 3){
-        title = 'Uraian Kegiatan Rencana Aksi';
+        title = 'Uraian Kegiatan Rencana Hasil Kerja';
         parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
         parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
         parent_cascading = jQuery('#tabel_uraian_rencana_aksi').attr('parent_cascading');
@@ -1610,7 +1610,7 @@ function hapus_rencana_aksi(id, tipe){
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data Rencana Aksi!');
+                alert('Terjadi kesalahan saat memuat data Rencana Hasil Kerja!');
             }
         });
     }
@@ -1633,12 +1633,12 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
             fungsi_tambah = 'tambah_rencana_aksi';
         }else if(tipe == 2){
             id_tabel = 'tabel_rencana_aksi';
-            title = 'Rencana Aksi';
+            title = 'Rencana Hasil Kerja';
             fungsi_tambah = 'tambah_renaksi_2';
             title_cascading = 'Program Cascading';
         }else if(tipe == 3){
             id_tabel = 'tabel_uraian_rencana_aksi';
-            title = 'Uraian Kegiatan Rencana Aksi';
+            title = 'Uraian Kegiatan Rencana Hasil Kerja';
             fungsi_tambah = 'tambah_renaksi_2';
             title_cascading = 'Kegiatan Cascading';
         }else if(tipe == 4){
@@ -1677,11 +1677,11 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                             break;
 
                                         case 2:
-                                            label_parent = "Rencana Aksi"
+                                            label_parent = "Rencana Hasil Kerja"
                                             break;
                                         
                                         case 3:
-                                            label_parent = "Uraian Kegiatan Rencana Aksi"
+                                            label_parent = "Uraian Kegiatan Rencana Hasil Kerja"
                                             break;
 
                                         default:
@@ -1729,7 +1729,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                     id_parent_cascading = value['kode_cascading_sasaran'];
                                     label_cascading = value['label_cascading_sasaran'] != null ? value['label_cascading_sasaran'] : '-';
                                     tombol_detail = ''
-                                        + `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, ` + (tipe + 1) + `, ` + id_pokin + `, '` + id_parent_cascading + `')" title="Lihat Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
+                                        + `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, ` + (tipe + 1) + `, ` + id_pokin + `, '` + id_parent_cascading + `')" title="Lihat Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                                 } else if (tipe == 2) {
                                     label_pokin = value['label_pokin_3'];
                                     id_pokin = value['id_pokin_3'];
@@ -1761,7 +1761,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                     }
 
                                     tombol_detail = ''
-                                        + `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, ` + (tipe + 1) + `, ` + id_pokin + `, '` + id_parent_cascading + `')" title="Lihat Uraian Kegiatan Rencana Aksi"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
+                                        + `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, ` + (tipe + 1) + `, ` + id_pokin + `, '` + id_parent_cascading + `')" title="Lihat Uraian Kegiatan Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                                 } else if (tipe == 3) {
                                     label_pokin = value['label_pokin_4'];
                                     id_parent_cascading = value['kode_cascading_kegiatan'];
@@ -1861,7 +1861,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                                 + `<td class="text-center">${b.target_akhir}</td>`
                                                 + `<td class="text-right">${b.rencana_pagu || 0}</td>`
                                                 + `<td class="text-center">`
-                                                    +`<input type="checkbox" title="Lihat Rencana Aksi Per Bulan" class="lihat_bulanan" data-id="${b.id}" onclick="lihat_bulanan(this);" style="margin: 0 6px;">`
+                                                    +`<input type="checkbox" title="Lihat Rencana Hasil Kerja Per Bulan" class="lihat_bulanan" data-id="${b.id}" onclick="lihat_bulanan(this);" style="margin: 0 6px;">`
                                                     + data_tagging_rincian
                                                     + `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_indikator(${b.id}, ` + tipe + `,${total_pagu})" title="Edit"><i class="dashicons dashicons-edit"></i></a> `
                                                     + `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-danger" onclick="hapus_indikator(${b.id}, ` + tipe + `);" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
@@ -1878,12 +1878,12 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                             renaksi += ''
                                                 + `<tr style="display: none;" class="data_bulanan_${b.id}">`
                                                     + `<td colspan="7" style="padding: 10px;">`
-                                                        +`<h3 class="text-center" style="margin: 10px;">Rencana Aksi Per Bulan</h3>`
+                                                        +`<h3 class="text-center" style="margin: 10px;">Rencana Hasil Kerja Per Bulan</h3>`
                                                         + `<table class="table" style="margin: 0;">`
                                                             + `<thead>`
                                                                 + `<tr class="table-secondary">`
                                                                     + `<th class="text-center">Bulan/TW</th>`
-                                                                    + `<th class="text-center">Rencana Aksi</th>`
+                                                                    + `<th class="text-center">Rencana Hasil Kerja</th>`
                                                                     + `<th class="text-center" style="width:100px;">Target</th>`
                                                                     + `<th class="text-center" style="width:100px;">Satuan</th>`
                                                                     + `<th class="text-center" style="width:150px;">Realisasi</th>`
@@ -2024,7 +2024,7 @@ function tambah_renaksi_2(tipe, isEdit = false) {
             var parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
             var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
             var level_pokin = 3;
-            var title = 'Rencana Aksi';
+            var title = 'Rencana Hasil Kerja';
             var key = jenis+'-'+parent_cascading;
             let data_cascading = data_program_cascading[key];
             var key = jenis+'-'+parent_cascading;
@@ -2034,7 +2034,7 @@ function tambah_renaksi_2(tipe, isEdit = false) {
 
             if(tipe == 3){
                 level_pokin = 4;
-                title = 'Uraian Rencana Aksi';
+                title = 'Uraian Rencana Hasil Kerja';
                 parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
                 parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
                 data_cascading = data_kegiatan_cascading[key];

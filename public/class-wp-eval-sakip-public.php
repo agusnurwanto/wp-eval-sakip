@@ -19098,7 +19098,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$periode_input_iku_pemda .= '<li><a target="_blank" href="' . $input_iku_pemda['url'] . '" class="btn btn-primary">' . $input_iku_pemda['title'] . '</a></li>';
 
 			$list_pemda_pengisian_rencana_aksi = $this->functions->generatePage(array(
-				'nama_page' => 'Pengisian Rencana Aksi Pemda Tahun ' . $_GET['tahun'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'nama_page' => 'Pengisian Rencana Hasil Kerja Pemda Tahun ' . $_GET['tahun'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
 				'content' => '[list_pengisian_rencana_aksi_pemda tahun=' . $_GET['tahun'] . ' periode=' . $jadwal_periode_item['id'] . ' ]',
 				'show_header' => 1,
 				'post_status' => 'private'
@@ -19569,12 +19569,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 
 		$list_skpd_pengisian_rencana_aksi = $this->functions->generatePage(array(
-			'nama_page' => 'Pengisian Rencana Aksi - ' . $_GET['tahun'],
+			'nama_page' => 'Pengisian Rencana Hasil Kerja - ' . $_GET['tahun'],
 			'content' => '[list_pengisian_rencana_aksi tahun=' . $_GET['tahun'] . ']',
 			'show_header' => 1,
 			'post_status' => 'private'
 		));
-		$title_pengisian_rencana_aksi = 'Pengisian Rencana Aksi';
+		$title_pengisian_rencana_aksi = 'Pengisian Rencana Hasil Kerja';
 		$pengisian_rencana_aksi = '<li><a target="_blank" href="' . $list_skpd_pengisian_rencana_aksi['url'] . '" class="btn btn-primary">' .  $title_pengisian_rencana_aksi . '</a></li>';
 
 		$list_setting_jadwal = '';
@@ -19873,7 +19873,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			</li>
 			<li>
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="pengisian-rencana-pemda" style="margin: 0;">Input Rencana Aksi Pemerintah Daerah</h5>
+					<h5 class="esakip-header-tahun" data-id="pengisian-rencana-pemda" style="margin: 0;">Input Rencana Hasil Kerja Pemerintah Daerah</h5>
 					<div class="esakip-body-tahun" data-id="pengisian-rencana-pemda">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $pengisian_rencana_aksi_pemda . '
@@ -19919,7 +19919,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			</li>
 			<li>
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="pengisian-rencana_aksi" style="margin: 0;">Input Rencana Aksi Perangkat Daerah</h5>
+					<h5 class="esakip-header-tahun" data-id="pengisian-rencana_aksi" style="margin: 0;">Input Rencana Hasil Kerja Perangkat Daerah</h5>
 					<div class="esakip-body-tahun" data-id="pengisian-rencana_aksi">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $pengisian_rencana_aksi . '
@@ -20371,18 +20371,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 
 				$pengisian_rencana_aksi_skpd = $this->functions->generatePage(array(
-					'nama_page' => 'Halaman Pengisian Rencana Aksi ' . $_GET['tahun'],
+					'nama_page' => 'Halaman Pengisian Rencana Hasil Kerja ' . $_GET['tahun'],
 					'content' => '[detail_pengisian_rencana_aksi tahun=' . $_GET['tahun'] . ']',
 					'show_header' => 1,
 					'post_status' => 'private'
 				));
-				$title_pengisian_rencana_aksi_skpd = 'Pengisian Rencana Aksi';
+				$title_pengisian_rencana_aksi_skpd = 'Pengisian Rencana Hasil Kerja';
 				$pengisian_rencana_aksi_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 				$pengisian_rencana_aksi_per_skpd_page = '<li><a href="' . $pengisian_rencana_aksi_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $title_pengisian_rencana_aksi_skpd . '</a></li>';
 
 				$halaman_input_renaksi = '
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="pengisian-rencana-aksi-' . $skpd_db['id_skpd'] . '" style="margin: 0;">Pengisian Rencana Aksi</h5>
+					<h5 class="esakip-header-tahun" data-id="pengisian-rencana-aksi-' . $skpd_db['id_skpd'] . '" style="margin: 0;">Pengisian Rencana Hasil Kerja</h5>
 					<div class="esakip-body-tahun" data-id="pengisian-rencana-aksi-' . $skpd_db['id_skpd'] . '">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $pengisian_rencana_aksi_per_skpd_page . '
