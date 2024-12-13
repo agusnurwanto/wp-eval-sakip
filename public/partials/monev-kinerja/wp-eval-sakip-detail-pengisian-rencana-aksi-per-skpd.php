@@ -1049,7 +1049,7 @@ function kegiatanUtama(){
                                             kegiatanUtama += ''
                                                 + `<tr style="display: none;" class="data_bulanan_${b.id}">`
                                                     + `<td colspan="10" style="padding: 10px;">`
-                                                        +`<h3 class="text-center" style="margin: 10px;">Rencana Hasil Kerja Per Bulan</h3>`
+                                                        +`<h3 class="text-center" style="margin: 10px;">Rencana Aksi Per Bulan</h3>`
                                                         + `<table class="table" style="margin: 0;">`
                                                             + `<thead>`
                                                                 + `<tr class="table-secondary">`
@@ -1878,7 +1878,7 @@ function lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading
                                             renaksi += ''
                                                 + `<tr style="display: none;" class="data_bulanan_${b.id}">`
                                                     + `<td colspan="7" style="padding: 10px;">`
-                                                        +`<h3 class="text-center" style="margin: 10px;">Rencana Hasil Kerja Per Bulan</h3>`
+                                                        +`<h3 class="text-center" style="margin: 10px;">Rencana Aksi Per Bulan</h3>`
                                                         + `<table class="table" style="margin: 0;">`
                                                             + `<thead>`
                                                                 + `<tr class="table-secondary">`
