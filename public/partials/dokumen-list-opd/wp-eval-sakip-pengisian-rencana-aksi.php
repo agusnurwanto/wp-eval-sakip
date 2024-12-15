@@ -61,16 +61,16 @@ foreach ($idtahun as $val) {
 <div class="container-md">
 	<div class="cetak">
 		<div style="padding: 10px;margin:0 0 3rem 0;">
-			<h1 class="text-center table-title">Pengisian Rencana Aksi</br>Tahun Anggaran <?php echo $input['tahun']; ?></h1>
+			<h1 class="text-center table-title">Pengisian Rencana Hasil Kerja</br>Tahun Anggaran <?php echo $input['tahun']; ?></h1>
 			<div id="action" class="action-section hide-excel"></div>
 			<div class="wrap-table">
-				<table id="cetak" title="Rekapitulasi Rencana Aksi Perangkat Daerah" class="table table-bordered table_dokumen_skpd" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;">
+				<table id="cetak" title="Rekapitulasi Rencana Hasil Kerja Perangkat Daerah" class="table table-bordered table_dokumen_skpd" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;">
 					<thead style="background: #ffc491;">
 						<tr>
 							<th class="text-center">Nama Perangkat Daerah</th>
 							<th class="text-center" width="100px">Kegiatan Utama</th>
-							<th class="text-center" width="100px">Rencana Aksi</th>
-							<th class="text-center" width="100px">Uraian Kegiatan Rencana Aksi</th>
+							<th class="text-center" width="100px">Rencana Hasil Kerja</th>
+							<th class="text-center" width="100px">Uraian Kegiatan Rencana Hasil Kerja</th>
 							<th class="text-center" width="100px">Uraian Teknis Kegiatan</th>
 							<th class="text-center" width="100px">Rencana Pagu</th>
 							<th class="text-center" width="100px">Alokasi Pagu</th>
@@ -122,6 +122,7 @@ foreach ($idtahun as $val) {
 					jQuery('#total_rencana_aksi').html(response.total_level_2);
 					jQuery('#total_uraian_kegiatan_rencana_aksi').html(response.total_level_3);
 					jQuery('#total_uraian_teknis_kegiatan').html(response.total_level_4);
+					jQuery('#total_rencana_pagu').html(response.total_pagu);
 					jQuery('.table_dokumen_skpd tbody').html(response.data);
 					jQuery('.table_dokumen_skpd').dataTable({
 						 aLengthMenu: [

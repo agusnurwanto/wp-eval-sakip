@@ -618,6 +618,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_satker_simpeg',  $plugin_public, 'get_satker_simpeg');
 		$this->loader->add_action('wp_ajax_get_list_satker_simpeg',  $plugin_public, 'get_list_satker_simpeg');
 		$this->loader->add_action('wp_ajax_get_pegawai_simpeg',  $plugin_public, 'get_pegawai_simpeg');
+		$this->loader->add_action('wp_ajax_mapping_unit_sipd_simpeg',  $plugin_public, 'mapping_unit_sipd_simpeg');
 		
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));

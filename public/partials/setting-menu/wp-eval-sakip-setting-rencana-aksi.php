@@ -16,6 +16,7 @@ if (!empty($_GET) && !empty($_GET['tahun_anggaran'])) {
 $tahun_anggaran = $input['tahun_anggaran'];
 
 $set_renaksi = get_option('_crb_input_renaksi'); 
+$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi'); 
 $body = '';
 ?>
 <style>
@@ -46,12 +47,20 @@ $body = '';
 							<small class="form-text text-muted">Untuk mendapatkan Sasaran Cascading di WP-SIPD sesuai jadwal yang digunakan di input Rencana Hasil Kerja.</small>
 						</div>
 						<div class="form-group">
-							<label for="input-renaksi">Input Rencana Aksi Bulanan dan Triwulan</label><br>
+							<label for="input-renaksi">Input Rencana Hasil Kerja Bulanan dan Triwulan</label><br>
 							<input type="radio" id="input-renaksi-0" name="crb_input_renaksi" value="0" <?php echo ($set_renaksi == 0) ? 'checked' : ''; ?>>
 							<label for="input-renaksi-0">Iya</label><br>
 							<input type="radio" id="input-renaksi-1" name="crb_input_renaksi" value="1" <?php echo ($set_renaksi == 1) ? 'checked' : ''; ?>>
 							<label for="input-renaksi-1">Tidak</label>
-							<small class="form-text text-muted">Pilih apakah input Rencana Aksi bulanan diinput atau didisable.</small>
+							<small class="form-text text-muted">Pilih apakah input Rencana Hasil Kerja bulanan diinput atau didisable.</small>
+						</div>
+						<div class="form-group">
+							<label for="set-pagu-renaksi">Menampilkan Rencana Pagu Rencana Hasil Kerja</label><br>
+							<input type="radio" id="set-pagu-renaksi-0" name="crb_set_pagu_renaksi" value="0" <?php echo ($set_pagu_renaksi == 0) ? 'checked' : ''; ?>>
+							<label for="set-pagu-renaksi-0">Iya</label><br>
+							<input type="radio" id="set-pagu-renaksi-1" name="crb_set_pagu_renaksi" value="1" <?php echo ($set_pagu_renaksi == 1) ? 'checked' : ''; ?>>
+							<label for="set-pagu-renaksi-1">Tidak</label>
+							<small class="form-text text-muted">Pilih apakah Rencana Pagu Rencana Hasil Kerja ditampilkan atau disembunyikan.</small>
 						</div>
 						<div class="form-group d-flex">
 							<button onclick="submit_pengaturan_menu(); return false;" class="btn btn-primary ml-auto">Simpan</button>
@@ -141,6 +150,7 @@ $body = '';
 	    let id_jadwal_renstra = jQuery("#jadwal-renstra").val();
 	    let id_jadwal_renstra_wpsipd = jQuery("#jadwal-renstra-wpsipd").val();
 	    let input_renaksi = jQuery('input[name="crb_input_renaksi"]:checked').val();
+	    let set_pagu_renaksi = jQuery('input[name="crb_set_pagu_renaksi"]:checked').val();
 
 	    if (id_jadwal_renstra == '' || id_jadwal_renstra_wpsipd == '') {
 	        return alert('Ada data yang kosong!');
@@ -158,7 +168,8 @@ $body = '';
 	                'id_jadwal_renstra': id_jadwal_renstra,
 	                'id_jadwal_renstra_wpsipd': id_jadwal_renstra_wpsipd,
 	                'tahun_anggaran': tahun_anggaran,
-	                'input_renaksi': input_renaksi 
+	                'input_renaksi': input_renaksi, 
+	                'set_pagu_renaksi': set_pagu_renaksi 
 	            },
 	            success: function(response) {
 	                console.log(response);
@@ -172,6 +183,14 @@ $body = '';
 	                    } else {
 	                        jQuery('#input-renaksi-0').prop('checked', true);
 	                        jQuery('#input-renaksi-1').prop('checked', false);
+	                    }
+
+	                    if (set_pagu_renaksi == '1') {
+	                        jQuery('#set-pagu-renaksi-0').prop('checked', false);
+	                        jQuery('#set-pagu-renaksi-1').prop('checked', true);
+	                    } else {
+	                        jQuery('#set-pagu-renaksi-0').prop('checked', true);
+	                        jQuery('#set-pagu-renaksi-1').prop('checked', false);
 	                    }
 
 	                    get_data_pengaturan_rencana_aksi();

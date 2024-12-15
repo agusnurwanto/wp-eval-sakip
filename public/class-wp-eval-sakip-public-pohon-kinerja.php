@@ -4587,6 +4587,19 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								  AND level=4
 							", $vv['id_skpd'], $tahun_anggaran)
 						);
+						$get_pagu = 0;
+						if (get_option('_crb_set_pagu_renaksi') == 1) {
+						    $get_pagu = 0;
+						} else {
+						    $get_pagu = $wpdb->get_var($wpdb->prepare("
+						        SELECT 
+						            IFNULL(SUM(rencana_pagu), 0)
+						        FROM esakip_data_rencana_aksi_indikator_opd
+						        WHERE id_skpd = %d 
+						            AND tahun_anggaran = %d 
+						            AND active = 1
+						    ", $vv['id_skpd'], $tahun_anggaran));
+						}
 
 						$tbody .= "<tr>";
 						$tbody .= "<td style='text-transform: uppercase;'><a href='".$detail_pengisian_rencana_aksi['url']."&id_skpd=".$vv['id_skpd']."' target='_blank'>".$vv['kode_skpd']." " . $vv['nama_skpd'] . "</a></td>";
@@ -4594,7 +4607,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						$tbody .= "<td class='text-center' style='text-transform: uppercase;'>". $jumlah_rencana_aksi ."</td>";
 						$tbody .= "<td class='text-center' style='text-transform: uppercase;'>". $jumlah_uraian_kegiatan_rencana_aksi ."</td>";
 						$tbody .= "<td class='text-center' style='text-transform: uppercase;'>". $jumlah_uraian_teknis_kegiatan ."</td>";
-						$tbody .= "<td class='text-right' style='text-transform: uppercase;'>0</td>";
+						$tbody .= "<td class='text-right' style='text-transform: uppercase;'>".$get_pagu."</td>";
 						$tbody .= "<td class='text-right' style='text-transform: uppercase;'>0</td>";
 						$tbody .= "<td class='text-right' style='text-transform: uppercase;'>0</td>";
 						$tbody .= "</tr>";
@@ -4603,12 +4616,14 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						$total_level_2 += $jumlah_rencana_aksi;
 						$total_level_3 += $jumlah_uraian_kegiatan_rencana_aksi;
 						$total_level_4 += $jumlah_uraian_teknis_kegiatan;
+						$total_pagu += $get_pagu;
 					}
 					$ret['data'] = $tbody;
 					$ret['total_level_1'] = $total_level_1;
 					$ret['total_level_2'] = $total_level_2;
 					$ret['total_level_3'] = $total_level_3;
 					$ret['total_level_4'] = $total_level_4;
+					$ret['total_pagu'] = $total_pagu;
 				} else {
 					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}

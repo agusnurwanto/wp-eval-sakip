@@ -19428,7 +19428,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$periode_input_iku_pemda .= '<li><a target="_blank" href="' . $input_iku_pemda['url'] . '" class="btn btn-primary">' . $input_iku_pemda['title'] . '</a></li>';
 
 			$list_pemda_pengisian_rencana_aksi = $this->functions->generatePage(array(
-				'nama_page' => 'Pengisian Rencana Aksi Pemda Tahun ' . $_GET['tahun'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'nama_page' => 'Pengisian Rencana Hasil Kerja Pemda Tahun ' . $_GET['tahun'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
 				'content' => '[list_pengisian_rencana_aksi_pemda tahun=' . $_GET['tahun'] . ' periode=' . $jadwal_periode_item['id'] . ' ]',
 				'show_header' => 1,
 				'post_status' => 'private'
@@ -19899,12 +19899,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 
 		$list_skpd_pengisian_rencana_aksi = $this->functions->generatePage(array(
-			'nama_page' => 'Pengisian Rencana Aksi - ' . $_GET['tahun'],
+			'nama_page' => 'Pengisian Rencana Hasil Kerja - ' . $_GET['tahun'],
 			'content' => '[list_pengisian_rencana_aksi tahun=' . $_GET['tahun'] . ']',
 			'show_header' => 1,
 			'post_status' => 'private'
 		));
-		$title_pengisian_rencana_aksi = 'Pengisian Rencana Aksi';
+		$title_pengisian_rencana_aksi = 'Pengisian Rencana Hasil Kerja';
 		$pengisian_rencana_aksi = '<li><a target="_blank" href="' . $list_skpd_pengisian_rencana_aksi['url'] . '" class="btn btn-primary">' .  $title_pengisian_rencana_aksi . '</a></li>';
 
 		$list_setting_jadwal = '';
@@ -20203,7 +20203,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			</li>
 			<li>
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="pengisian-rencana-pemda" style="margin: 0;">Input Rencana Aksi Pemerintah Daerah</h5>
+					<h5 class="esakip-header-tahun" data-id="pengisian-rencana-pemda" style="margin: 0;">Input Rencana Hasil Kerja Pemerintah Daerah</h5>
 					<div class="esakip-body-tahun" data-id="pengisian-rencana-pemda">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $pengisian_rencana_aksi_pemda . '
@@ -20249,7 +20249,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			</li>
 			<li>
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="pengisian-rencana_aksi" style="margin: 0;">Input Rencana Aksi Perangkat Daerah</h5>
+					<h5 class="esakip-header-tahun" data-id="pengisian-rencana_aksi" style="margin: 0;">Input Rencana Hasil Kerja Perangkat Daerah</h5>
 					<div class="esakip-body-tahun" data-id="pengisian-rencana_aksi">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $pengisian_rencana_aksi . '
@@ -20701,18 +20701,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 
 				$pengisian_rencana_aksi_skpd = $this->functions->generatePage(array(
-					'nama_page' => 'Halaman Pengisian Rencana Aksi ' . $_GET['tahun'],
+					'nama_page' => 'Halaman Pengisian Rencana Hasil Kerja ' . $_GET['tahun'],
 					'content' => '[detail_pengisian_rencana_aksi tahun=' . $_GET['tahun'] . ']',
 					'show_header' => 1,
 					'post_status' => 'private'
 				));
-				$title_pengisian_rencana_aksi_skpd = 'Pengisian Rencana Aksi';
+				$title_pengisian_rencana_aksi_skpd = 'Pengisian Rencana Hasil Kerja';
 				$pengisian_rencana_aksi_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 				$pengisian_rencana_aksi_per_skpd_page = '<li><a href="' . $pengisian_rencana_aksi_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $title_pengisian_rencana_aksi_skpd . '</a></li>';
 
 				$halaman_input_renaksi = '
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="pengisian-rencana-aksi-' . $skpd_db['id_skpd'] . '" style="margin: 0;">Pengisian Rencana Aksi</h5>
+					<h5 class="esakip-header-tahun" data-id="pengisian-rencana-aksi-' . $skpd_db['id_skpd'] . '" style="margin: 0;">Pengisian Rencana Hasil Kerja</h5>
 					<div class="esakip-body-tahun" data-id="pengisian-rencana-aksi-' . $skpd_db['id_skpd'] . '">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $pengisian_rencana_aksi_per_skpd_page . '
@@ -28077,47 +28077,23 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/pengaturan-skpd/wp-eval-sakip-mapping-skpd-sipd-simpeg.php';
 	}
 
-	public function curlData(
-		string $url, 
-		string $path, 
-		string $method, 
-		array $data = []
-	){
-		
-		$curl = curl_init();
-
-		curl_setopt_array($curl, array(
-		  CURLOPT_URL => $url . $path,
-		  CURLOPT_RETURNTRANSFER => true,
-		  CURLOPT_ENCODING => '',
-		  CURLOPT_MAXREDIRS => 10,
-		  CURLOPT_TIMEOUT => 0,
-		  CURLOPT_FOLLOWLOCATION => true,
-		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-		  CURLOPT_CUSTOMREQUEST => $method,
-		  CURLOPT_SSL_VERIFYHOST => 0,
-		  CURLOPT_SSL_VERIFYPEER => 0,
-		  CURLOPT_HTTPHEADER => $data['header'],
-		));
-
-		$response = curl_exec($curl);
-
-		curl_close($curl);
-
-		return $response;
-	}
-
 	public function get_satker_simpeg(){
 		global $wpdb;
 
 		if(get_option('_crb_api_simpeg_status')){
 			try {
-				
-				$response = $this->curlData(get_option('_crb_url_api_simpeg'), 'api/satker/', 'GET', [
-					'header' => [
-					    'Authorization: Basic ' . get_option('_crb_authorization_api_simpeg')
-					  ]
-				]);
+				$opsi = array(
+					'url' => get_option('_crb_url_api_simpeg').'api/satker/',
+					'type' => 'get',
+					'header' => array('Authorization: Basic ' . get_option('_crb_authorization_api_simpeg'))
+				);
+				$response = $this->functions->curl_post($opsi);
+
+				if(empty($response)){
+					throw new Exception("Respon API kosong!", 1);
+				}else if($response == 'Unauthorized'){
+					throw new Exception($response.' '.json_encode($opsi), 1);
+				}
 
 				$dataSatker = json_decode($response, true);
 
@@ -28125,27 +28101,23 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				    throw new Exception("Terjadi kesalahan ketika mengakses API, Error : ". json_last_error_msg(), 1);
 				}
 
-				if(empty($dataSatker)){
-					throw new Exception("Respon API kosong!", 1);
-				}
-
 				$table = 'esakip_data_satker_simpeg';
 				foreach ($dataSatker as $key => $data) {
-					$exists = $wpdb->get_var($wpdb->prepare("SELECT id FROM ".$table." WHERE satker_id=%s AND active=%d AND tahun_anggaran=%d", trim($data['satker_id']), 1, $_POST['tahun_anggaran']), ARRAY_A);
-					if(!empty($exists['id'])){
+					$exists = $wpdb->get_row($wpdb->prepare("SELECT id FROM ".$table." WHERE satker_id=%s AND active=%d AND tahun_anggaran=%d", trim($data['satker_id']), 1, $_POST['tahun_anggaran']), ARRAY_A);
+					if(!empty($exists)){
 						$wpdb->update($table, [
-							'satker_id' => $data['satker_id'],
-							'satker_id_parent' => $data['satker_id_parent'],
+							'satker_id' => trim($data['satker_id']),
+							'satker_id_parent' => trim($data['satker_id_parent']),
 							'nama' => $data['nama'],
 							'update_at' => current_time('mysql')
 						], [
-							'satker_id' => $data['satker_id'],
+							'satker_id' => trim($data['satker_id']),
 							'tahun_anggaran' => $_POST['tahun_anggaran'],
 						]);
 					}else{
 						$wpdb->insert($table, [
-							'satker_id' => $data['satker_id'],
-							'satker_id_parent' => $data['satker_id_parent'],
+							'satker_id' => trim($data['satker_id']),
+							'satker_id_parent' => trim($data['satker_id_parent']),
 							'nama' => $data['nama'],
 							'active' => 1,
 							'created_at' => current_time('mysql'),
@@ -28156,7 +28128,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				echo json_encode([
 					'status' => true,
-					'message' => 'Sukses ambil data Unit Organisasi!'
+					'message' => 'Sukses ambil data Unit Organisasi!',
+					'data_satker' => $dataSatker
 				]);
 				exit;
 
@@ -28192,11 +28165,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						break;
 				}
 
-				$response = $this->curlData(get_option('_crb_url_api_simpeg'), $path, 'GET', [
-					'header' => [
-					    'Authorization: Basic ' . get_option('_crb_authorization_api_simpeg')
-					  ]
-				]);
+				$response = $this->functions->curl_post(array(
+					'url' => get_option('_crb_url_api_simpeg').$path,
+					'type' => 'get',
+					'header' => array('Authorization: Basic ' . get_option('_crb_authorization_api_simpeg'))
+				));
+
+				if(empty($response)){
+					throw new Exception("Respon API kosong!", 1);
+				}else if($response == 'Unauthorized'){
+					throw new Exception($response.' '.json_encode($opsi), 1);
+				}
 
 				$dataPegawai = json_decode($response, true);
 
@@ -28204,14 +28183,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				    throw new Exception("Terjadi kesalahan ketika mengakses API, Error : ". json_last_error_msg(), 1);
 				}
 
-				if(empty($dataPegawai)){
-					throw new Exception("respon API kosong!", 1);
-				}
-
 				$table = 'esakip_data_pegawai_simpeg';
 				foreach ($dataPegawai as $key => $data) {
 					$exists = $wpdb->get_row($wpdb->prepare("SELECT id FROM ".$table." WHERE nip_baru=%s AND active=%d", trim($data['nip_baru']), 1), ARRAY_A);
-					if(!empty($exists['id'])){
+					if(!empty($exists)){
 						$wpdb->update($table, [
 							'nama_pegawai' => $data['nama_pegawai'],
 							'satker_id' => $data['satker_id'],
@@ -28260,7 +28235,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		try {
 			if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-					$dataSatker = $wpdb->get_results($wpdb->prepare("SELECT * FROM esakip_data_satker_simpeg WHERE satker_id_parent=%s AND active=%d AND tahun_anggaran=%d ORDER BY satker_id ASC", '0', 1, $_POST['tahun_anggaran']), ARRAY_A);
+
+					if($_POST['type']=='search'){
+						$dataSatker = $wpdb->get_results($wpdb->prepare("SELECT * FROM esakip_data_satker_simpeg WHERE nama LIKE %s AND active=%d AND tahun_anggaran=%d ORDER BY satker_id ASC", "%".$_POST['q']."%", 1, $_POST['tahun_anggaran']), ARRAY_A);
+					}else{
+						$dataSatker = $wpdb->get_results($wpdb->prepare("SELECT * FROM esakip_data_satker_simpeg WHERE satker_id_parent=%s AND active=%d AND tahun_anggaran=%d ORDER BY satker_id ASC", '0', 1, $_POST['tahun_anggaran']), ARRAY_A);
+					}
 
 					echo json_encode([
 						'status' => true,
@@ -28532,5 +28512,52 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'mapping_jenis_dokumen' => false
 			];
 		} 
+	}
+
+	public function mapping_unit_sipd_simpeg(){
+		global $wpdb;
+
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+					$exists = $wpdb->get_row($wpdb->prepare("SELECT id FROM esakip_data_mapping_unit_sipd_simpeg WHERE id_skpd=%d AND active=%d AND tahun_anggaran=%d", $_POST['idskpd_sipd'], 1, $_POST['tahun_anggaran']), ARRAY_A);
+					if(!empty($exists)){
+						$wpdb->update('esakip_data_mapping_unit_sipd_simpeg', [
+							'id_skpd' => $_POST['idskpd_sipd'],
+							'id_satker_simpeg' => $_POST['id_satker_simpeg'],
+							'tahun_anggaran' => $_POST['tahun_anggaran'],
+							'update_at' => current_time('mysql')
+						], [
+							'id_skpd' => $_POST['idskpd_sipd'],
+							'tahun_anggaran' => $_POST['tahun_anggaran'],
+						]);
+					}else{
+						$wpdb->insert('esakip_data_mapping_unit_sipd_simpeg', [
+							'id_skpd' => $_POST['idskpd_sipd'],
+							'id_satker_simpeg' => $_POST['id_satker_simpeg'],
+							'tahun_anggaran' => $_POST['tahun_anggaran'],
+							'active' => 1,
+							'created_at' => current_time('mysql'),
+						]);
+					}
+
+					echo json_encode([
+						'status' => true,
+						'message' => 'Sukses mapping data!'
+					]);
+					exit;
+				}else{
+					throw new Exception("API key tidak ditemukan!", 1);
+				}
+			}else{
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		}catch(Exception $e){
+			echo json_encode([
+					'status' => false,
+					'message' => $e->getMessage()
+				]);
+			exit;
+		}
 	}
 }

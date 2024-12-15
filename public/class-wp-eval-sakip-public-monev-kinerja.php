@@ -816,15 +816,38 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'created_at' => current_time('mysql'),
 					);
 					if(empty($_POST['id_label_indikator'])){
-						$cek_id = $wpdb->get_var($wpdb->prepare("
-							SELECT
-								id
-							FROM esakip_data_rencana_aksi_indikator_opd
-							WHERE indikator=%s
-								AND active=0
-								AND tahun_anggaran=%d
-								AND id_skpd=%d
-						", $_POST['indikator'], $_POST['tahun_anggaran'], $_POST['id_skpd']));
+					    $total_pagu_renaksi = $wpdb->get_var($wpdb->prepare("
+					        SELECT 
+					        	SUM(rencana_pagu)
+					        FROM esakip_data_rencana_aksi_indikator_opd
+					        WHERE id_renaksi = %d 
+					        	AND tahun_anggaran = %d 
+					        	AND id_skpd = %d 
+					        	AND active = 1
+					    ", $_POST['id_label'], $_POST['tahun_anggaran'], $_POST['id_skpd']));
+					    // print_r($total_pagu_renaksi); die($wpdb->last_query);
+
+					    $ret['total_pagu'] = $_POST['rencana_pagu_tk'];
+					    $ret['total_pagu_sebelum_perubahan'] = $total_pagu_renaksi;
+					    $total_pagu_renaksi += $_POST['rencana_pagu'];
+
+					    $ret['total_pagu_setelah_perubahan'] = $total_pagu_renaksi;
+
+					    if ($total_pagu_renaksi > $_POST['rencana_pagu_tk']) {
+					        $ret['status'] = 'error';
+					        $ret['message'] = 'Total rencana pagu tidak boleh melebihi 100% atau total pagu.';
+					    }
+					    if($ret['status'] == 'success'){
+							$cek_id = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									id
+								FROM esakip_data_rencana_aksi_indikator_opd
+								WHERE indikator=%s
+									AND active=0
+									AND tahun_anggaran=%d
+									AND id_skpd=%d
+							", $_POST['indikator'], $_POST['tahun_anggaran'], $_POST['id_skpd']));	
+					    }
 					}else{
 						$cek_id = $wpdb->get_var($wpdb->prepare("
 							SELECT
@@ -834,11 +857,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						", $_POST['id_label_indikator']));
 						$ret['message'] = "Berhasil edit indikator!";
 					}
-					if(empty($cek_id)){
-						$wpdb->insert('esakip_data_rencana_aksi_indikator_opd', $data);
-					}else{
-						$wpdb->update('esakip_data_rencana_aksi_indikator_opd', $data, array('id' => $cek_id));
+					if($ret['status'] == 'success'){
+						if(empty($cek_id)){
+							$wpdb->insert('esakip_data_rencana_aksi_indikator_opd', $data);
+						}else{
+							$wpdb->update('esakip_data_rencana_aksi_indikator_opd', $data, array('id' => $cek_id));
+						}
 					}
+
 				}
 			} else {
 				$ret = array(
@@ -1004,6 +1030,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$target_4_html = array();
 						$rencana_pagu_html = array();
 						$realisasi_pagu_html = array();
+
+					    $set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 						foreach($v['indikator'] as $key => $ind){
 							$indikator_html[$key] = $ind['indikator'];
 							$satuan_html[$key] = $ind['satuan'];
@@ -1013,7 +1041,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$target_2_html[$key] = $ind['target_2'];
 							$target_3_html[$key] = $ind['target_3'];
 							$target_4_html[$key] = $ind['target_4'];
-							$rencana_pagu_html[$key] = !empty($ind['rencana_pagu']) ? $ind['rencana_pagu'] : 0;
+					        $rencana_pagu_html[$key] = ($set_pagu_renaksi == 1) ? 0 : (!empty($ind['rencana_pagu']) ? $ind['rencana_pagu'] : 0);
 							$realisasi_pagu_html[$key] = !empty($ind['realisasi_pagu']) ? $ind['realisasi_pagu'] : 0;
 						}
 						$indikator_html = implode('<br>', $indikator_html);
@@ -1049,7 +1077,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							<td class=""></td>
 							<td class=""></td>
 							<td class=""></td>
-							<td class=""></td>
+							<td class="text-right">'.$rencana_pagu_html.'</td>
 							<td class=""></td>
 							<td class=""></td>
 							<td class=""></td>
@@ -1073,6 +1101,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$target_4_html = array();
 							$rencana_pagu_html = array();
 							$realisasi_pagu_html = array();
+						    $set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 							foreach($renaksi['indikator'] as $key => $ind){
 								$indikator_html[$key] = $ind['indikator'];
 								$satuan_html[$key] = $ind['satuan'];
@@ -1082,7 +1111,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$target_2_html[$key] = $ind['target_2'];
 								$target_3_html[$key] = $ind['target_3'];
 								$target_4_html[$key] = $ind['target_4'];
-								$rencana_pagu_html[$key] = !empty($ind['rencana_pagu']) ? $ind['rencana_pagu'] : 0;
+						        $rencana_pagu_html[$key] = ($set_pagu_renaksi == 1) ? 0 : (!empty($ind['rencana_pagu']) ? $ind['rencana_pagu'] : 0);
 								$realisasi_pagu_html[$key] = !empty($ind['realisasi_pagu']) ? $ind['realisasi_pagu'] : 0;
 							}
 							$indikator_html = implode('<br>', $indikator_html);
@@ -1211,7 +1240,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							        <td class=""></td>
 							        <td class=""></td>
 							        <td class=""></td>
-							        <td class=""></td>
+									<td class="text-right">'.$rencana_pagu_html.'</td>
 							        <td class=""></td>
 							        <td class=""></td>
 							        <td class=""></td>
@@ -1236,6 +1265,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$target_4_html = array();
 								$rencana_pagu_html = array();
 								$realisasi_pagu_html = array();
+							    $set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 								foreach($uraian_renaksi['indikator'] as $key => $ind){
 									$indikator_html[$key] = $ind['indikator'];
 									$satuan_html[$key] = $ind['satuan'];
@@ -1245,7 +1275,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$target_2_html[$key] = $ind['target_2'];
 									$target_3_html[$key] = $ind['target_3'];
 									$target_4_html[$key] = $ind['target_4'];
-									$rencana_pagu_html[$key] = !empty($ind['rencana_pagu']) ? $ind['rencana_pagu'] : 0;
+							        $rencana_pagu_html[$key] = ($set_pagu_renaksi == 1) ? 0 : (!empty($ind['rencana_pagu']) ? $ind['rencana_pagu'] : 0);
 									$realisasi_pagu_html[$key] = !empty($ind['realisasi_pagu']) ? $ind['realisasi_pagu'] : 0;
 								}
 								$indikator_html = implode('<br>', $indikator_html);
@@ -1285,8 +1315,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									<td class=""></td>
 									<td class=""></td>
 									<td class=""></td>
-									<td class=""></td>
-									<td class=""></td>
+									<td class=""></td>	
+									<td class="text-right">'.$rencana_pagu_html.'</td>
 									<td class=""></td>
 									<td class=""></td>
 									<td class=""></td>
@@ -1307,6 +1337,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$target_4_html = array();
 									$rencana_pagu_html = array();
 									$realisasi_pagu_html = array();
+								    $set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 									foreach($uraian_teknis_kegiatan['indikator'] as $key => $ind){
 										$indikator_html[$key] = '<a href="'.$this->functions->add_param_get($rincian_tagging['url'], '&tahun=' . $_POST['tahun_anggaran'] . '&id_skpd=' . $_POST['id_skpd'].'&id_indikator='.$ind['id']).'" target="_blank">'.$ind['indikator'].'</a>';
 										$satuan_html[$key] = $ind['satuan'];
@@ -1316,7 +1347,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										$target_2_html[$key] = $ind['target_2'];
 										$target_3_html[$key] = $ind['target_3'];
 										$target_4_html[$key] = $ind['target_4'];
-										$rencana_pagu_html[$key] = !empty($ind['rencana_pagu']) ? $ind['rencana_pagu'] : 0;
+								        $rencana_pagu_html[$key] = ($set_pagu_renaksi == 1) ? 0 : (!empty($ind['rencana_pagu']) ? $ind['rencana_pagu'] : 0);;
 										$realisasi_pagu_html[$key] = !empty($ind['realisasi_pagu']) ? $ind['realisasi_pagu'] : 0;
 									}
 									$indikator_html = implode('<br>', $indikator_html);
@@ -1357,7 +1388,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										<td class=""></td>
 										<td class=""></td>
 										<td class=""></td>
-										<td class="text-right" style="visibility: hidden;">'.$rencana_pagu_html.'</td>
+										<td class="text-right">'.$rencana_pagu_html.'</td>
 										<td class=""></td>
 										<td class="text-right" style="visibility: hidden;">'.$realisasi_pagu_html.'</td>
 										<td class=""></td>
@@ -1525,6 +1556,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$tahun_anggaran = $_POST['tahun_anggaran'];
 					$id_jadwal_renstra_wpsipd = $_POST['id_jadwal_renstra_wpsipd'];
 					$input_renaksi = $_POST['input_renaksi'];
+					$set_pagu_renaksi = $_POST['set_pagu_renaksi'];
 
 					// pengaturan rencana aksi
 					$cek_data_pengaturan = $wpdb->get_var(
@@ -1554,6 +1586,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					}
 
     				update_option('_crb_input_renaksi', $input_renaksi);
+    				update_option('_crb_set_pagu_renaksi', $set_pagu_renaksi);
 
 					echo json_encode([
 						'status' => true,
