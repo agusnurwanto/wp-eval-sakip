@@ -1952,235 +1952,275 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-				$unit = $wpdb->get_results(
-					$wpdb->prepare("
+				if ($ret['status'] != 'error'){
+					$unit = $wpdb->get_results(
+						$wpdb->prepare("
+							SELECT 
+								nama_skpd, 
+								id_skpd, 
+								kode_skpd, 
+								nipkepala 
+							FROM esakip_data_unit 
+							WHERE tahun_anggaran=%d
+							AND active=1 
+							AND is_skpd=1 
+							ORDER BY kode_skpd ASC
+						", $tahun_anggaran_sakip),
+						ARRAY_A
+					);
+
+					$periode = $wpdb->get_row(
+						$wpdb->prepare("
 						SELECT 
-							nama_skpd, 
-							id_skpd, 
-							kode_skpd, 
-							nipkepala 
-						FROM esakip_data_unit 
-						WHERE tahun_anggaran=%d
-						AND active=1 
-						AND is_skpd=1 
-						ORDER BY kode_skpd ASC
-					", $tahun_anggaran_sakip),
-					ARRAY_A
-				);
+							*
+						FROM esakip_data_jadwal
+						WHERE id=%d
+						AND status = 1
+					", $id_jadwal),
+						ARRAY_A
+					);
 
-				$periode = $wpdb->get_row(
-					$wpdb->prepare("
-					SELECT 
-						*
-					FROM esakip_data_jadwal
-					WHERE id=%d
-					  AND status = 1
-				", $id_jadwal),
-					ARRAY_A
-				);
+					if (!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggaran'] > 1) {
+						$tahun_periode_selesai = $periode['tahun_selesai_anggaran'];
+					} else {
+						$tahun_periode_selesai = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
+					}
 
-				if (!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggaran'] > 1) {
-					$tahun_periode_selesai = $periode['tahun_selesai_anggaran'];
-				} else {
-					$tahun_periode_selesai = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
-				}
-
-				if (!empty($unit)) {
-					$tbody = '';
-					$counter = 1;
-					$total_level_1 = 0;
-					$total_level_2 = 0;
-					$total_level_3 = 0;
-					$total_level_4 = 0;
-					$total_level_5 = 0;
-					$total_crosscutting_usulan = 0;
-					$total_crosscutting_usulan_vertikal = 0;
-					$total_crosscutting_tujuan = 0;
-					foreach ($unit as $kk => $vv) {
+					if (!empty($unit)) {
+						$tbody = '';
+						$counter = 1;
+						$total_level_1 = 0;
+						$total_level_2 = 0;
+						$total_level_3 = 0;
+						$total_level_4 = 0;
+						$total_level_5 = 0;
+						$total_crosscutting_usulan = 0;
+						$total_crosscutting_usulan_vertikal = 0;
+						$total_crosscutting_tujuan = 0;
+						$total_integrasi = 0;
 
 						if ($penyusunan_pohon_kinerja_opd == false) {
-							$detail_pohon_kinerja = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Detail Dokumen Pohon Kinerja dan Cascading | ' . $periode['nama_jadwal'] . ' ' . 'Periode ' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode_selesai  . ' Perangkat Daerah',
-								'content' => '[dokumen_detail_pohon_kinerja_dan_cascading periode=' . $id_jadwal . ']',
-								'show_header' => 1,
-								'post_status' => 'private'
-							));
-
-							$tbody .= "<tr>";
-							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-							$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
-
-							$jumlah_dokumen = $wpdb->get_var(
-								$wpdb->prepare("
+							/** get data esr */
+							$data_dokumen_terintegrasi = array();
+							$status_api_esr = get_option('_crb_api_esr_status');
+							if($status_api_esr){
+								$pengaturan_periode_dokumen=$wpdb->get_row($wpdb->prepare("
 									SELECT 
-										COUNT(id)
-									FROM esakip_pohon_kinerja_dan_cascading
-									WHERE id_skpd = %d
-									  AND id_jadwal = %d
-									  AND active = 1
-								", $vv['id_skpd'], $id_jadwal)
-							);
+										* 
+									FROM 
+										esakip_pengaturan_upload_dokumen 
+									WHERE 
+										id_jadwal_rpjmd=%d AND 
+										active=%d", 
+								$id_jadwal, 1), ARRAY_A);
 
-							$btn = '<div class="btn-action-group">';
-							$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_pohon_kinerja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
-							$btn .= '</div>';
+								if(!empty($pengaturan_periode_dokumen)){
+									$data_dokumen_terintegrasi = $this->get_total_integrasi_esr('esakip_pohon_kinerja_dan_cascading', $pengaturan_periode_dokumen['tahun_anggaran']);
+								}
+							}
 
-							$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
-							$tbody .= "<td>" . $btn . "</td>";
-
-							$tbody .= "</tr>";
-						} else if ($penyusunan_pohon_kinerja_opd == true) {
-							$detail_penyusunan_pohon_kinerja_opd = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Detail Dokumen Pohon Kinerja Perangkat Daerah | ' . $periode['nama_jadwal'] . ' ' . 'Periode ' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode_selesai  . ' Perangkat Daerah',
-								'content' => '[penyusunan_pohon_kinerja_opd periode=' . $id_jadwal . ']',
-								'show_header' => 1,
-								'post_status' => 'private'
-							));
-
-							$jumlah_level_1 = $wpdb->get_var(
-								$wpdb->prepare("
-									SELECT 
-										COUNT(id)
-									FROM esakip_pohon_kinerja_opd
-									WHERE parent=0 
-										AND level=1 
-										AND active=1
-										AND id_skpd = %d
-										AND id_jadwal = %d
-								", $vv['id_skpd'], $id_jadwal)
-							);
-							$jumlah_level_2 = $wpdb->get_var(
-								$wpdb->prepare("
-									SELECT 
-										COUNT(p.id)
-									FROM esakip_pohon_kinerja_opd p
-									INNER JOIN esakip_pohon_kinerja_opd parent ON parent.id=p.parent
-										AND parent.active=p.active
-										AND parent.id_jadwal=p.id_jadwal
-										AND parent.level=1
-									WHERE p.level=2 
-										AND p.active=1
-										AND p.id_skpd = %d
-										AND p.id_jadwal = %d
-								", $vv['id_skpd'], $id_jadwal)
-							);
-							$jumlah_level_3 = $wpdb->get_var(
-								$wpdb->prepare("
-									SELECT 
-										COUNT(p.id)
-									FROM esakip_pohon_kinerja_opd p
-									INNER JOIN esakip_pohon_kinerja_opd parent ON parent.id=p.parent
-										AND parent.active=p.active
-										AND parent.id_jadwal=p.id_jadwal
-										AND parent.level=2
-									WHERE p.level=3 
-										AND p.active=1
-										AND p.id_skpd = %d
-										AND p.id_jadwal = %d
-								", $vv['id_skpd'], $id_jadwal)
-							);
-							$jumlah_level_4 = $wpdb->get_var(
-								$wpdb->prepare("
-									SELECT 
-										COUNT(p.id)
-									FROM esakip_pohon_kinerja_opd p
-									INNER JOIN esakip_pohon_kinerja_opd parent ON parent.id=p.parent
-										AND parent.active=p.active
-										AND parent.id_jadwal=p.id_jadwal
-										AND parent.level=3
-									WHERE p.level=4 
-										AND p.active=1
-										AND p.id_skpd = %d
-										AND p.id_jadwal = %d
-								", $vv['id_skpd'], $id_jadwal)
-							);
-							$jumlah_level_5 = $wpdb->get_var(
-								$wpdb->prepare("
-									SELECT 
-										COUNT(p.id)
-									FROM esakip_pohon_kinerja_opd p
-									INNER JOIN esakip_pohon_kinerja_opd parent ON parent.id=p.parent
-										AND parent.active=p.active
-										AND parent.id_jadwal=p.id_jadwal
-										AND parent.level=4
-									WHERE p.level=5 
-										AND p.active=1
-										AND p.id_skpd = %d
-										AND p.id_jadwal = %d
-								", $vv['id_skpd'], $id_jadwal)
-							);
-
-							$croscutting_pohon_kinerja_pengusul = $wpdb->get_var($wpdb->prepare("
-								SELECT 
-									COUNT(cc.id)
-								FROM esakip_croscutting_opd as cc
-								INNER JOIN esakip_pohon_kinerja_opd as pk ON cc.parent_pohon_kinerja = pk.id
-									AND pk.active=cc.active
-								WHERE pk.id_skpd=%d
-									AND cc.status_croscutting=1 
-									AND cc.active=1
-									AND cc.is_lembaga_lainnya=0
-									AND pk.id_jadwal=%d
-							", $vv['id_skpd'], $id_jadwal));
-
-							$croscutting_pohon_kinerja_pengusul_vertikal = $wpdb->get_var($wpdb->prepare("
-								SELECT 
-									COUNT(cc.id)
-								FROM esakip_croscutting_opd as cc
-								INNER JOIN esakip_pohon_kinerja_opd as pk ON cc.parent_pohon_kinerja = pk.id
-									AND pk.active=cc.active
-								WHERE pk.id_skpd=%d
-									AND cc.status_croscutting=1 
-									AND cc.is_lembaga_lainnya=1
-									AND cc.active=1
-									AND pk.id_jadwal=%d
-							", $vv['id_skpd'], $id_jadwal));
-
-							$croscutting_pohon_kinerja_dituju = $wpdb->get_var($wpdb->prepare("
-								SELECT 
-									COUNT(cc.id)
-								FROM esakip_croscutting_opd as cc
-								INNER JOIN esakip_pohon_kinerja_opd as pk ON cc.parent_croscutting = pk.id
-									AND pk.active=cc.active
-								WHERE cc.id_skpd_croscutting=%d
-									AND cc.status_croscutting=1 
-									AND cc.active=1
-									AND pk.id_jadwal=%d
-							", $vv['id_skpd'], $id_jadwal));
-
-							$tbody .= "<tr>";
-							$tbody .= "<td style='text-transform: uppercase;'><a href='".$detail_penyusunan_pohon_kinerja_opd['url']."&id_skpd=".$vv['id_skpd']."' target='_blank'>".$vv['kode_skpd']." ".$vv['nama_skpd']."</a></td>";
-							$tbody .= "<td class='text-center'>" . $jumlah_level_1 . "</td>";
-							$tbody .= "<td class='text-center'>" . $jumlah_level_2 . "</td>";
-							$tbody .= "<td class='text-center'>" . $jumlah_level_3 . "</td>";
-							$tbody .= "<td class='text-center'>" . $jumlah_level_4 . "</td>";
-							$tbody .= "<td class='text-center'>" . $jumlah_level_5 . "</td>";
-							$tbody .= "<td class='text-center'>" . $croscutting_pohon_kinerja_pengusul . "</td>";
-							$tbody .= "<td class='text-center'>" . $croscutting_pohon_kinerja_pengusul_vertikal . "</td>";
-							$tbody .= "<td class='text-center'>" . $croscutting_pohon_kinerja_dituju . "</td>";
-							$tbody .= "</tr>";
-
-							$total_level_1 += $jumlah_level_1;
-							$total_level_2 += $jumlah_level_2;
-							$total_level_3 += $jumlah_level_3;
-							$total_level_4 += $jumlah_level_4;
-							$total_level_5 += $jumlah_level_5;
-							$total_crosscutting_usulan_vertikal += $croscutting_pohon_kinerja_pengusul_vertikal;
-							$total_crosscutting_usulan += $croscutting_pohon_kinerja_pengusul;
-							$total_crosscutting_tujuan += $croscutting_pohon_kinerja_dituju;
+							if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+								$ret['status_mapping'] = 1;
+							}else{
+								$ret['status_mapping'] = 0;
+								$ret['message_get_total_integrasi_dokumen_esr'] = $data_dokumen_terintegrasi['message'];
+							}
 						}
+
+						foreach ($unit as $kk => $vv) {
+
+							if ($penyusunan_pohon_kinerja_opd == false) {
+								$detail_pohon_kinerja = $this->functions->generatePage(array(
+									'nama_page' => 'Halaman Detail Dokumen Pohon Kinerja dan Cascading | ' . $periode['nama_jadwal'] . ' ' . 'Periode ' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode_selesai  . ' Perangkat Daerah',
+									'content' => '[dokumen_detail_pohon_kinerja_dan_cascading periode=' . $id_jadwal . ']',
+									'show_header' => 1,
+									'post_status' => 'private'
+								));
+
+								$tbody .= "<tr>";
+								$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+								$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
+
+								$jumlah_dokumen = $wpdb->get_var(
+									$wpdb->prepare("
+										SELECT 
+											COUNT(id)
+										FROM esakip_pohon_kinerja_dan_cascading
+										WHERE id_skpd = %d
+										AND id_jadwal = %d
+										AND active = 1
+									", $vv['id_skpd'], $id_jadwal)
+								);
+
+								$jumlah_dokumen_terintegrasi = 0;
+								if($data_dokumen_terintegrasi['status'] == 'success'){
+									$jumlah_dokumen_terintegrasi = !empty($data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']]) ? $data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']] : 0;
+								}
+
+								$btn = '<div class="btn-action-group">';
+								$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_pohon_kinerja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+								$btn .= '</div>';
+
+								$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
+								if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+									$tbody .= "<td class='text-center'>" . $jumlah_dokumen_terintegrasi . "</td>";
+								}
+								$tbody .= "<td>" . $btn . "</td>";
+
+								$tbody .= "</tr>";
+							} else if ($penyusunan_pohon_kinerja_opd == true) {
+								$detail_penyusunan_pohon_kinerja_opd = $this->functions->generatePage(array(
+									'nama_page' => 'Halaman Detail Dokumen Pohon Kinerja Perangkat Daerah | ' . $periode['nama_jadwal'] . ' ' . 'Periode ' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode_selesai  . ' Perangkat Daerah',
+									'content' => '[penyusunan_pohon_kinerja_opd periode=' . $id_jadwal . ']',
+									'show_header' => 1,
+									'post_status' => 'private'
+								));
+
+								$jumlah_level_1 = $wpdb->get_var(
+									$wpdb->prepare("
+										SELECT 
+											COUNT(id)
+										FROM esakip_pohon_kinerja_opd
+										WHERE parent=0 
+											AND level=1 
+											AND active=1
+											AND id_skpd = %d
+											AND id_jadwal = %d
+									", $vv['id_skpd'], $id_jadwal)
+								);
+								$jumlah_level_2 = $wpdb->get_var(
+									$wpdb->prepare("
+										SELECT 
+											COUNT(p.id)
+										FROM esakip_pohon_kinerja_opd p
+										INNER JOIN esakip_pohon_kinerja_opd parent ON parent.id=p.parent
+											AND parent.active=p.active
+											AND parent.id_jadwal=p.id_jadwal
+											AND parent.level=1
+										WHERE p.level=2 
+											AND p.active=1
+											AND p.id_skpd = %d
+											AND p.id_jadwal = %d
+									", $vv['id_skpd'], $id_jadwal)
+								);
+								$jumlah_level_3 = $wpdb->get_var(
+									$wpdb->prepare("
+										SELECT 
+											COUNT(p.id)
+										FROM esakip_pohon_kinerja_opd p
+										INNER JOIN esakip_pohon_kinerja_opd parent ON parent.id=p.parent
+											AND parent.active=p.active
+											AND parent.id_jadwal=p.id_jadwal
+											AND parent.level=2
+										WHERE p.level=3 
+											AND p.active=1
+											AND p.id_skpd = %d
+											AND p.id_jadwal = %d
+									", $vv['id_skpd'], $id_jadwal)
+								);
+								$jumlah_level_4 = $wpdb->get_var(
+									$wpdb->prepare("
+										SELECT 
+											COUNT(p.id)
+										FROM esakip_pohon_kinerja_opd p
+										INNER JOIN esakip_pohon_kinerja_opd parent ON parent.id=p.parent
+											AND parent.active=p.active
+											AND parent.id_jadwal=p.id_jadwal
+											AND parent.level=3
+										WHERE p.level=4 
+											AND p.active=1
+											AND p.id_skpd = %d
+											AND p.id_jadwal = %d
+									", $vv['id_skpd'], $id_jadwal)
+								);
+								$jumlah_level_5 = $wpdb->get_var(
+									$wpdb->prepare("
+										SELECT 
+											COUNT(p.id)
+										FROM esakip_pohon_kinerja_opd p
+										INNER JOIN esakip_pohon_kinerja_opd parent ON parent.id=p.parent
+											AND parent.active=p.active
+											AND parent.id_jadwal=p.id_jadwal
+											AND parent.level=4
+										WHERE p.level=5 
+											AND p.active=1
+											AND p.id_skpd = %d
+											AND p.id_jadwal = %d
+									", $vv['id_skpd'], $id_jadwal)
+								);
+
+								$croscutting_pohon_kinerja_pengusul = $wpdb->get_var($wpdb->prepare("
+									SELECT 
+										COUNT(cc.id)
+									FROM esakip_croscutting_opd as cc
+									INNER JOIN esakip_pohon_kinerja_opd as pk ON cc.parent_pohon_kinerja = pk.id
+										AND pk.active=cc.active
+									WHERE pk.id_skpd=%d
+										AND cc.status_croscutting=1 
+										AND cc.active=1
+										AND cc.is_lembaga_lainnya=0
+										AND pk.id_jadwal=%d
+								", $vv['id_skpd'], $id_jadwal));
+
+								$croscutting_pohon_kinerja_pengusul_vertikal = $wpdb->get_var($wpdb->prepare("
+									SELECT 
+										COUNT(cc.id)
+									FROM esakip_croscutting_opd as cc
+									INNER JOIN esakip_pohon_kinerja_opd as pk ON cc.parent_pohon_kinerja = pk.id
+										AND pk.active=cc.active
+									WHERE pk.id_skpd=%d
+										AND cc.status_croscutting=1 
+										AND cc.is_lembaga_lainnya=1
+										AND cc.active=1
+										AND pk.id_jadwal=%d
+								", $vv['id_skpd'], $id_jadwal));
+
+								$croscutting_pohon_kinerja_dituju = $wpdb->get_var($wpdb->prepare("
+									SELECT 
+										COUNT(cc.id)
+									FROM esakip_croscutting_opd as cc
+									INNER JOIN esakip_pohon_kinerja_opd as pk ON cc.parent_croscutting = pk.id
+										AND pk.active=cc.active
+									WHERE cc.id_skpd_croscutting=%d
+										AND cc.status_croscutting=1 
+										AND cc.active=1
+										AND pk.id_jadwal=%d
+								", $vv['id_skpd'], $id_jadwal));
+
+								$tbody .= "<tr>";
+								$tbody .= "<td style='text-transform: uppercase;'><a href='".$detail_penyusunan_pohon_kinerja_opd['url']."&id_skpd=".$vv['id_skpd']."' target='_blank'>".$vv['kode_skpd']." ".$vv['nama_skpd']."</a></td>";
+								$tbody .= "<td class='text-center'>" . $jumlah_level_1 . "</td>";
+								$tbody .= "<td class='text-center'>" . $jumlah_level_2 . "</td>";
+								$tbody .= "<td class='text-center'>" . $jumlah_level_3 . "</td>";
+								$tbody .= "<td class='text-center'>" . $jumlah_level_4 . "</td>";
+								$tbody .= "<td class='text-center'>" . $jumlah_level_5 . "</td>";
+								$tbody .= "<td class='text-center'>" . $croscutting_pohon_kinerja_pengusul . "</td>";
+								$tbody .= "<td class='text-center'>" . $croscutting_pohon_kinerja_pengusul_vertikal . "</td>";
+								$tbody .= "<td class='text-center'>" . $croscutting_pohon_kinerja_dituju . "</td>";
+								$tbody .= "</tr>";
+
+								$total_level_1 += $jumlah_level_1;
+								$total_level_2 += $jumlah_level_2;
+								$total_level_3 += $jumlah_level_3;
+								$total_level_4 += $jumlah_level_4;
+								$total_level_5 += $jumlah_level_5;
+								$total_crosscutting_usulan_vertikal += $croscutting_pohon_kinerja_pengusul_vertikal;
+								$total_crosscutting_usulan += $croscutting_pohon_kinerja_pengusul;
+								$total_crosscutting_tujuan += $croscutting_pohon_kinerja_dituju;
+							}
+						}
+						$ret['data'] = $tbody;
+						$ret['total_level_1'] = $total_level_1;
+						$ret['total_level_2'] = $total_level_2;
+						$ret['total_level_3'] = $total_level_3;
+						$ret['total_level_4'] = $total_level_4;
+						$ret['total_level_5'] = $total_level_5;
+						$ret['total_crosscutting_usulan_vertikal'] = $total_crosscutting_usulan_vertikal;
+						$ret['total_crosscutting_usulan'] = $total_crosscutting_usulan;
+						$ret['total_crosscutting_tujuan'] = $total_crosscutting_tujuan;
+					} else {
+						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 					}
-					$ret['data'] = $tbody;
-					$ret['total_level_1'] = $total_level_1;
-					$ret['total_level_2'] = $total_level_2;
-					$ret['total_level_3'] = $total_level_3;
-					$ret['total_level_4'] = $total_level_4;
-					$ret['total_level_5'] = $total_level_5;
-					$ret['total_crosscutting_usulan_vertikal'] = $total_crosscutting_usulan_vertikal;
-					$ret['total_crosscutting_usulan'] = $total_crosscutting_usulan;
-					$ret['total_crosscutting_tujuan'] = $total_crosscutting_tujuan;
-				} else {
-					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 			} else {
 				$ret = array(

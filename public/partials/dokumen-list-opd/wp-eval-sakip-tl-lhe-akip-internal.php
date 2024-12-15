@@ -57,6 +57,7 @@ $tipe_dokumen = "tl_lhe_akip_internal";
 							<th class="text-center">No</th>
 							<th class="text-center">Nama Perangkat Daerah</th>
 							<th class="text-center">Jumlah Dokumen</th>
+							<th class="text-center kolom-integrasi-esr" style="width: 10rem;">Jumlah Dokumen Integrasi ESR</th>
 							<th class="text-center">Aksi</th>
 						</tr>
 					</thead>
@@ -108,7 +109,6 @@ $tipe_dokumen = "tl_lhe_akip_internal";
 	}
 
 	function getTableTahun() {
-		jQuery('#wrap-loading').show();
 		jQuery.ajax({
 			url: esakip.url,
 			type: 'POST',
@@ -119,7 +119,6 @@ $tipe_dokumen = "tl_lhe_akip_internal";
 			},
 			dataType: 'json',
 			success: function(response) {
-				jQuery('#wrap-loading').hide();
 				console.log(response);
 				if (response.status === 'success') {
 					jQuery('#tahunContainer').html(response.data);
@@ -128,7 +127,6 @@ $tipe_dokumen = "tl_lhe_akip_internal";
 				}
 			},
 			error: function(xhr, status, error) {
-				jQuery('#wrap-loading').hide();
 				console.error(xhr.responseText);
 				alert('Terjadi kesalahan saat memuat tabel!');
 			}
@@ -152,6 +150,11 @@ $tipe_dokumen = "tl_lhe_akip_internal";
 				console.log(response);
 				if (response.status === 'success') {
 					jQuery('#table_dokumen_skpd tbody').html(response.data);
+					if(response.status_mapping == 1){
+						jQuery('.kolom-integrasi-esr').show();
+					}else{
+						jQuery('.kolom-integrasi-esr').hide();
+					}
 				} else {
 					alert(response.message);
 				}

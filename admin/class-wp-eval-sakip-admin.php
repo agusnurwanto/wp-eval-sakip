@@ -1327,7 +1327,8 @@ class Wp_Eval_Sakip_Admin
 					->set_help_text('Wajib diisi. Auth Type : Basic Auth dengan Username yang digunakan untuk integrasi dokumen ke API ESR'),
 				Field::make('text', 'crb_password_api_esr', 'Password API ESR')
 					->set_help_text('Wajib diisi. Auth Type : Basic Auth dengan Password yang digunakan untuk integrasi dokumen ke API ESR'),
-				Field::make('text', 'crb_expired_time_esr_lokal', 'Waktu Expired Akses Data ESR Lokal (Minimal 1 Jam)')
+				Field::make('text', 'crb_expired_time_esr_lokal', 'Waktu Expired Akses Data ESR Lokal (Minimal 1 Detik)')
+					->set_default_value('60')
 					->set_help_text('Wajib diisi. Waktu maksimal system menggunakan data ESR yang disimpan di lokal. Jika melebihi waktu maksimal maka data ESR lokal akan diupdate berdasarkan data ESR terbaru via API.')
 			));
 
