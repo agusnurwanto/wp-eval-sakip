@@ -1326,7 +1326,6 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 			<td></td>
 			<td></td>
 			<td></td>
-			<td></td>
 		</tr>';
 	}
 	foreach (array_values($level_1['data']) as $key2 => $level_2) {
@@ -2298,6 +2297,15 @@ $hak_akses_user = ($this_jenis_role || $cek_settingan_menu == 3 || $is_administr
 	<h4 style="margin: 30px 0 10px; font-weight: bold;">Catatan Dokumentasi:</h4>
 	<ul>
 		<li>Pohon kinerja bisa dilihat ketika data terisi minimal sampai dengan level ke-2.</li>
+		<li>Background warna <span class="badge" style="background: #efd655; padding: 5px;">kuning tua</span> adalah baris level ke 1</li>
+		<li>Background warna <span class="badge" style="background: #fe7373; padding: 5px;">merah tua</span> adalah baris level ke 2</li>
+		<li>Background warna <span class="badge" style="background: #57b2ec; padding: 5px;">biru tua</span> adalah baris level ke 3</li>
+		<li>Background warna <span class="badge" style="background: #c979e3; padding: 5px;">ungu tua</span> adalah baris level ke 4</li>
+		<li>Background warna <span class="badge" style="background: #CAFFBF; padding: 5px;">hijau</span> adalah baris level ke 5</li>
+		<li>Background warna <span class="badge" style="background: #b5d9ea; padding: 5px;">abu-abu</span> adalah baris indikator</li>
+		<li>Background warna <span class="badge" style="background: #FDFFB6; padding: 5px;">kuning</span> adalah baris koneksi pokin dengan pemda</li>
+		<li>Background warna <span class="badge" style="background: #FFC6FF; padding: 5px;">ungu</span> adalah baris croscutting</li>
+		<li>Background warna <span class="badge" style="background: #9BF6FF; padding: 5px;">hijau tosca</span> adalah baris croscutting dari perangkat daerah lain</li>
 	</ul>
 </div>
 
