@@ -5868,12 +5868,20 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								}
 							}
 						}
+
+						$data_keterangan = json_decode($data_verifikasi['keterangan_verifikasi'], true);
+						if(json_last_error() === JSON_ERROR_NONE){
+							$keterangan_verifikasi = $data_keterangan['keterangan_baru'];
+						}else{
+							$keterangan_verifikasi = $data_verifikasi['keterangan_verifikasi'];
+						}
+						
 						$tbody .= "<td>" . $vv['opd'] . "</td>";
 						$tbody .= "<td>" . $vv['dokumen'] . "</td>";
 						$tbody .= "<td>" . $vv['keterangan'] . "</td>";
 						$tbody .= "<td>" . $vv['created_at'] . "</td>";
 						$tbody .= "<td class='text-center'><span class='badge badge-" . $color_badge_verify . "' style='padding: .5em 1.4em;'>" . $text_badge . "</span></td>";
-						$tbody .= "<td>" . $data_verifikasi['keterangan_verifikasi'] . "</td>";
+						$tbody .= "<td>" . $keterangan_verifikasi . "</td>";
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
@@ -23407,10 +23415,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						);
 					}
 					if (empty($data_terverifikasi)) {
+						$keterangan_verifikasi = array(
+													"keterangan_baru" => $keterangan,
+													"keterangan_lama"=> array()
+												);
 						$insert_data = array(
 							'id_dokumen' => $id_dokumen,
 							'status_verifikasi' => $input_verifikasi,
-							'keterangan_verifikasi' => $keterangan,
+							'keterangan_verifikasi' => json_encode($keterangan_verifikasi),
 							'active' => 1,
 							'user_id' => $current_user->ID,
 							'id_skpd' => $idSkpd,
@@ -23440,9 +23452,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							);
 						}
 					} else {
+						$data_keterangan = json_decode($data_terverifikasi['keterangan_verifikasi'], true);
+						if(json_last_error() === JSON_ERROR_NONE){
+							array_unshift($data_keterangan['keterangan_lama'], $data_keterangan['keterangan_baru']);
+							$keterangan_lama = $data_keterangan['keterangan_lama'];
+						}else{
+							$keterangan_lama = array($data_terverifikasi['keterangan_verifikasi']);
+						}
+
+						$keterangan_verifikasi = array(
+							'keterangan_baru' => $keterangan,
+							'keterangan_lama' => $keterangan_lama
+						);
+
 						$opsi = array(
 							'status_verifikasi' => $input_verifikasi,
-							'keterangan_verifikasi' => $keterangan,
+							'keterangan_verifikasi' => json_encode($keterangan_verifikasi),
 							'user_id' => $current_user->ID
 						);
 
@@ -23522,10 +23547,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								ARRAY_A
 							);
 
+							if(!empty($data_verifikasi)){
+								$data_keterangan = json_decode($data_verifikasi['keterangan_verifikasi'], true);
+								if(json_last_error() === JSON_ERROR_NONE){
+									$data_verifikasi['keterangan_verifikasi'] = $data_keterangan['keterangan_baru'];
+								}else{
+									$data_verifikasi['keterangan_verifikasi'] = $data_verifikasi['keterangan_verifikasi'];
+								}
+							}
+
 							$ret['data'] = $data_verifikasi;
 							if (empty($data_verifikasi)) {
 								$ret = array(
-									'cek' => $wpdb->last_query,
 									'data' => array(),
 									'status' => 'success',
 									'message'   => 'Data Belum Diverifikasi!'
@@ -27870,7 +27903,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								FROM 
 									esakip_data_esr 
 								WHERE 
-									update_at>=%s
+									updated_at>=%s
 								AND user_esr_id=%d 
 								AND url=%s", 
 								$expired_time, $user_esr_id, 'get_data'));

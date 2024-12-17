@@ -301,6 +301,9 @@ $status_api_esr = get_option('_crb_api_esr_status');
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 console.log(response);
+                jQuery("#idDokumen").val(0);
+                jQuery("#keterangan_verifikasi").val("");
+                jQuery("input[name=verifikasi_dokumen][value='terima']").prop("checked",true);
                 if (response.status === 'success') {
                     let data = response.data;
                     if(data.length !== 0 || data.status_verifikasi != null){
