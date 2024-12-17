@@ -307,7 +307,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
                 if (response.status === 'success') {
                     let data = response.data;
                     if(data.length !== 0 || data.status_verifikasi != null){
-                        let verifikasi = (data.status_verifikasi == 1) ? "terima" : "tolak";
+                        let verifikasi = (data.status_verifikasi == 2) ? "tolak" : "terima";
                         jQuery("input[name=verifikasi_dokumen][value='"+verifikasi+"']").prop("checked",true);
                         jQuery("#keterangan_verifikasi").val(data.keterangan_verifikasi);
                     }

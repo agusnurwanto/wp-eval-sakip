@@ -5450,12 +5450,27 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								}
 							}
 						}
+						
+						$data_keterangan = json_decode($data_verifikasi['keterangan_verifikasi'], true);
+						if(json_last_error() === JSON_ERROR_NONE){
+							$keterangan_verifikasi = $data_keterangan['keterangan_baru'];
+							if(!empty($data_keterangan['keterangan_lama'])){
+								$keterangan_verifikasi .= "<br><br><small class='text-muted'>Riwayat Catatan:</small><ul style='margin: 0 auto;'>";
+								foreach ($data_keterangan['keterangan_lama'] as $key => $v_ket_lama) {
+									$keterangan_verifikasi .= "<li class='text-muted'><small class='text-muted'>$v_ket_lama</small></li>";	
+								}
+								$keterangan_verifikasi .= "</ul>";
+							}
+						}else{
+							$keterangan_verifikasi = $data_verifikasi['keterangan_verifikasi'];
+						}
+
 						$tbody .= "<td>" . $vv['opd'] . "</td>";
 						$tbody .= "<td>" . $vv['dokumen'] . "</td>";
 						$tbody .= "<td>" . $vv['keterangan'] . "</td>";
 						$tbody .= "<td>" . $vv['created_at'] . "</td>";
 						$tbody .= "<td class='text-center'><span class='badge badge-" . $color_badge_verify . "' style='padding: .5em 1.4em;'>" . $text_badge . "</span></td>";
-						$tbody .= "<td>" . $data_verifikasi['keterangan_verifikasi'] . "</td>";
+						$tbody .= "<td>" . $keterangan_verifikasi . "</td>";
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
@@ -5872,6 +5887,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$data_keterangan = json_decode($data_verifikasi['keterangan_verifikasi'], true);
 						if(json_last_error() === JSON_ERROR_NONE){
 							$keterangan_verifikasi = $data_keterangan['keterangan_baru'];
+							if(!empty($data_keterangan['keterangan_lama'])){
+								$keterangan_verifikasi .= "<br><br><small class='text-muted'>Riwayat Catatan:</small><ul style='margin: 0 auto;'>";
+								foreach ($data_keterangan['keterangan_lama'] as $key => $v_ket_lama) {
+									$keterangan_verifikasi .= "<li class='text-muted'><small class='text-muted'>$v_ket_lama</small></li>";	
+								}
+								$keterangan_verifikasi .= "</ul>";
+							}
 						}else{
 							$keterangan_verifikasi = $data_verifikasi['keterangan_verifikasi'];
 						}
@@ -6088,8 +6110,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								$show_button = true;
 								$draft = true;
 							}
-							
-							if (!empty($data_verifikasi['keterangan_verifikasi'])) {
+
+							$data_keterangan = json_decode($data_verifikasi['keterangan_verifikasi'], true);
+							if(json_last_error() === JSON_ERROR_NONE){
+								$keterangan = $data_keterangan['keterangan_baru'];
+								if(!empty($data_keterangan['keterangan_lama'])){
+									$keterangan .= "<br><br><small class='text-muted'>Riwayat Catatan:</small><ul style='margin: 0 auto;'>";
+									foreach ($data_keterangan['keterangan_lama'] as $key => $v_ket_lama) {
+										$keterangan .= "<li class='text-muted'><small class='text-muted'>$v_ket_lama</small></li>";	
+									}
+									$keterangan .= "</ul>";
+								}
+							}else{
 								$keterangan = $data_verifikasi['keterangan_verifikasi'];
 							}
 						}
@@ -7359,12 +7391,27 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								}
 							}
 						}
+												
+						$data_keterangan = json_decode($data_verifikasi['keterangan_verifikasi'], true);
+						if(json_last_error() === JSON_ERROR_NONE){
+							$keterangan_verifikasi = $data_keterangan['keterangan_baru'];
+							if(!empty($data_keterangan['keterangan_lama'])){
+								$keterangan_verifikasi .= "<br><br><small class='text-muted'>Riwayat Catatan:</small><ul style='margin: 0 auto;'>";
+								foreach ($data_keterangan['keterangan_lama'] as $key => $v_ket_lama) {
+									$keterangan_verifikasi .= "<li class='text-muted'><small class='text-muted'>$v_ket_lama</small></li>";	
+								}
+								$keterangan_verifikasi .= "</ul>";
+							}
+						}else{
+							$keterangan_verifikasi = $data_verifikasi['keterangan_verifikasi'];
+						}
+
 						$tbody .= "<td>" . $vv['opd'] . "</td>";
 						$tbody .= "<td>" . $vv['dokumen'] . "</td>";
 						$tbody .= "<td>" . $vv['keterangan'] . "</td>";
 						$tbody .= "<td>" . $vv['created_at'] . "</td>";
 						$tbody .= "<td class='text-center'><span class='badge badge-" . $color_badge_verify . "' style='padding: .5em 1.4em;'>" . $text_badge . "</span></td>";
-						$tbody .= "<td>" . $data_verifikasi['keterangan_verifikasi'] . "</td>";
+						$tbody .= "<td>" . $keterangan_verifikasi . "</td>";
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
@@ -23457,7 +23504,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							array_unshift($data_keterangan['keterangan_lama'], $data_keterangan['keterangan_baru']);
 							$keterangan_lama = $data_keterangan['keterangan_lama'];
 						}else{
-							$keterangan_lama = array($data_terverifikasi['keterangan_verifikasi']);
+							if(!empty($data_terverifikasi['keterangan_verifikasi'])){
+								$keterangan_lama = array($data_terverifikasi['keterangan_verifikasi']);
+							}else{
+								$keterangan_lama = array();
+							}
 						}
 
 						$keterangan_verifikasi = array(
@@ -23761,12 +23812,27 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								}
 							}
 						}
+
+						$data_keterangan = json_decode($data_verifikasi['keterangan_verifikasi'], true);
+						if(json_last_error() === JSON_ERROR_NONE){
+							$keterangan_verifikasi = $data_keterangan['keterangan_baru'];
+							if(!empty($data_keterangan['keterangan_lama'])){
+								$keterangan_verifikasi .= "<br><br><small class='text-muted'>Riwayat Catatan:</small><ul style='margin: 0 auto;'>";
+								foreach ($data_keterangan['keterangan_lama'] as $key => $v_ket_lama) {
+									$keterangan_verifikasi .= "<li class='text-muted'><small class='text-muted'>$v_ket_lama</small></li>";	
+								}
+								$keterangan_verifikasi .= "</ul>";
+							}
+						}else{
+							$keterangan_verifikasi = $data_verifikasi['keterangan_verifikasi'];
+						}
+
 						$tbody .= "<td>" . $vv['opd'] . "</td>";
 						$tbody .= "<td>" . $vv['dokumen'] . "</td>";
 						$tbody .= "<td>" . $vv['keterangan'] . "</td>";
 						$tbody .= "<td>" . $vv['created_at'] . "</td>";
 						$tbody .= "<td class='text-center'><span class='badge badge-" . $color_badge_verify . "' style='padding: .5em 1.4em;'>" . $text_badge . "</span></td>";
-						$tbody .= "<td>" . $data_verifikasi['keterangan_verifikasi'] . "</td>";
+						$tbody .= "<td>" . $keterangan_verifikasi . "</td>";
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
