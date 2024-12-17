@@ -13015,64 +13015,90 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-				$unit = $wpdb->get_results(
-					$wpdb->prepare("
-					SELECT 
-						nama_skpd, 
-						id_skpd, 
-						kode_skpd, 
-						nipkepala 
-					FROM esakip_data_unit 
-					WHERE active=1 
-					  AND tahun_anggaran=%d
-					  AND is_skpd=1 
-					ORDER BY kode_skpd ASC
-					", $tahun_anggaran_sakip),
-					ARRAY_A
-				);
+				if ($ret['status'] != 'error'){
+					$unit = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT 
+							nama_skpd, 
+							id_skpd, 
+							kode_skpd, 
+							nipkepala 
+						FROM esakip_data_unit 
+						WHERE active=1 
+						AND tahun_anggaran=%d
+						AND is_skpd=1 
+						ORDER BY kode_skpd ASC
+						", $tahun_anggaran_sakip),
+						ARRAY_A
+					);
 
-				if (!empty($unit)) {
-					$tbody = '';
-					$counter = 1;
-					foreach ($unit as $kk => $vv) {
-						$detail_dokumen_lainnya = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Detail Dokumen Lainnya ' . $tahun_anggaran,
-							'content' => '[dokumen_detail_dokumen_lainnya tahun=' . $tahun_anggaran . ']',
-							'show_header' => 1,
-							'post_status' => 'private'
-						));
+					if (!empty($unit)) {
+						$tbody = '';
+						$counter = 1;
+						$total_integrasi = 0;
 
-						$tbody .= "<tr>";
-						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
+						/** get data esr */
+						$data_dokumen_terintegrasi = array();
+						$status_api_esr = get_option('_crb_api_esr_status');
+						if($status_api_esr){
+							$data_dokumen_terintegrasi = $this->get_total_integrasi_esr('esakip_dokumen_lainnya', $tahun_anggaran);
+						}
+						
+						if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+							$ret['status_mapping'] = 1;
+						}else{
+							$ret['status_mapping'] = 0;
+							$ret['message_get_total_integrasi_dokumen_esr'] = $data_dokumen_terintegrasi['message'];
+						}
 
-						$jumlah_dokumen = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(id)
-								FROM esakip_dokumen_lainnya 
-								WHERE id_skpd = %d
-								AND tahun_anggaran = %d
-								AND active = 1
-								",
-								$vv['id_skpd'],
-								$tahun_anggaran
-							)
-						);
+						foreach ($unit as $kk => $vv) {
+							$detail_dokumen_lainnya = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Detail Dokumen Lainnya ' . $tahun_anggaran,
+								'content' => '[dokumen_detail_dokumen_lainnya tahun=' . $tahun_anggaran . ']',
+								'show_header' => 1,
+								'post_status' => 'private'
+							));
 
-						$btn = '<div class="btn-action-group">';
-						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_dokumen_lainnya['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
-						$btn .= '</div>';
+							$tbody .= "<tr>";
+							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+							$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
-						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
-						$tbody .= "<td>" . $btn . "</td>";
+							$jumlah_dokumen = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(id)
+									FROM esakip_dokumen_lainnya 
+									WHERE id_skpd = %d
+									AND tahun_anggaran = %d
+									AND active = 1
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran
+								)
+							);
+							
+							$jumlah_dokumen_terintegrasi = 0;
+							if($data_dokumen_terintegrasi['status'] == 'success'){
+								$jumlah_dokumen_terintegrasi = !empty($data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']]) ? $data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']] : 0;
+							}
 
-						$tbody .= "</tr>";
+							$btn = '<div class="btn-action-group">';
+							$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_dokumen_lainnya['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+							$btn .= '</div>';
+
+							$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
+							if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+								$tbody .= "<td class='text-center'>" . $jumlah_dokumen_terintegrasi . "</td>";
+							}
+							$tbody .= "<td>" . $btn . "</td>";
+
+							$tbody .= "</tr>";
+						}
+						$ret['data'] = $tbody;
+					} else {
+						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 					}
-					$ret['data'] = $tbody;
-				} else {
-					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 			} else {
 				$ret = array(
@@ -13575,64 +13601,89 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-				$unit = $wpdb->get_results(
-					$wpdb->prepare("
-					SELECT 
-						nama_skpd, 
-						id_skpd, 
-						kode_skpd, 
-						nipkepala 
-					FROM esakip_data_unit 
-					WHERE active=1 
-					  AND tahun_anggaran=%d
-					  AND is_skpd=1 
-					ORDER BY kode_skpd ASC
-					", $tahun_anggaran_sakip),
-					ARRAY_A
-				);
+				if ($ret['status'] != 'error'){
+					$unit = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT 
+							nama_skpd, 
+							id_skpd, 
+							kode_skpd, 
+							nipkepala 
+						FROM esakip_data_unit 
+						WHERE active=1 
+						AND tahun_anggaran=%d
+						AND is_skpd=1 
+						ORDER BY kode_skpd ASC
+						", $tahun_anggaran_sakip),
+						ARRAY_A
+					);
 
-				if (!empty($unit)) {
-					$tbody = '';
-					$counter = 1;
-					foreach ($unit as $kk => $vv) {
-						$detail_laporan_monev_renaksi = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Detail Dokumen Laporan Monev Renaksi ' . $tahun_anggaran,
-							'content' => '[dokumen_detail_laporan_monev_renaksi tahun=' . $tahun_anggaran . ']',
-							'show_header' => 1,
-							'post_status' => 'private'
-						));
+					if (!empty($unit)) {
+						$tbody = '';
+						$counter = 1;
+						$total_integrasi = 0;
 
-						$tbody .= "<tr>";
-						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
+						/** get data esr */
+						$data_dokumen_terintegrasi = array();
+						$status_api_esr = get_option('_crb_api_esr_status');
+						if($status_api_esr){
+							$data_dokumen_terintegrasi = $this->get_total_integrasi_esr('esakip_laporan_monev_renaksi', $tahun_anggaran);
+						}
 
-						$jumlah_dokumen = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(id)
-								FROM esakip_laporan_monev_renaksi 
-								WHERE id_skpd = %d
-								AND tahun_anggaran = %d
-								AND active = 1
-								",
-								$vv['id_skpd'],
-								$tahun_anggaran
-							)
-						);
+						if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+							$ret['status_mapping'] = 1;
+						}else{
+							$ret['status_mapping'] = 0;
+							$ret['message_get_total_integrasi_dokumen_esr'] = $data_dokumen_terintegrasi['message'];
+						}
+						foreach ($unit as $kk => $vv) {
+							$detail_laporan_monev_renaksi = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Detail Dokumen Laporan Monev Renaksi ' . $tahun_anggaran,
+								'content' => '[dokumen_detail_laporan_monev_renaksi tahun=' . $tahun_anggaran . ']',
+								'show_header' => 1,
+								'post_status' => 'private'
+							));
 
-						$btn = '<div class="btn-action-group">';
-						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_laporan_monev_renaksi['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
-						$btn .= '</div>';
+							$tbody .= "<tr>";
+							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+							$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
-						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
-						$tbody .= "<td>" . $btn . "</td>";
+							$jumlah_dokumen = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(id)
+									FROM esakip_laporan_monev_renaksi 
+									WHERE id_skpd = %d
+									AND tahun_anggaran = %d
+									AND active = 1
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran
+								)
+							);
 
-						$tbody .= "</tr>";
+							$btn = '<div class="btn-action-group">';
+							$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_laporan_monev_renaksi['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+							$btn .= '</div>';
+
+							$jumlah_dokumen_terintegrasi = 0;
+							if($data_dokumen_terintegrasi['status'] == 'success'){
+								$jumlah_dokumen_terintegrasi = !empty($data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']]) ? $data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']] : 0;
+							}
+
+							$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
+							if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+								$tbody .= "<td class='text-center'>" . $jumlah_dokumen_terintegrasi . "</td>";
+							}
+							$tbody .= "<td>" . $btn . "</td>";
+
+							$tbody .= "</tr>";
+						}
+						$ret['data'] = $tbody;
+					} else {
+						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 					}
-					$ret['data'] = $tbody;
-				} else {
-					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 			} else {
 				$ret = array(
@@ -15185,162 +15236,189 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-				$unit = $wpdb->get_results(
-					$wpdb->prepare("
-					SELECT 
-						nama_skpd, 
-						id_skpd, 
-						kode_skpd, 
-						nipkepala 
-					FROM esakip_data_unit 
-					WHERE active=1 
-					  AND tahun_anggaran=%d
-					  AND is_skpd=1 
-					ORDER BY kode_skpd ASC
-					", $tahun_anggaran_sakip),
-					ARRAY_A
-				);
+				if ($ret['status'] != 'error'){
+					$unit = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT 
+							nama_skpd, 
+							id_skpd, 
+							kode_skpd, 
+							nipkepala 
+						FROM esakip_data_unit 
+						WHERE active=1 
+							AND tahun_anggaran=%d
+							AND is_skpd=1 
+						ORDER BY kode_skpd ASC
+						", $tahun_anggaran_sakip),
+						ARRAY_A
+					);
+	
+					if (!empty($unit)) {
+						$tbody = '';
+						$counter = 1;
+						$total_menunggu = 0;
+						$total_disetujui = 0;
+						$total_ditolak = 0;
+						$total_draft = 0;
+						$total_dokumen = 0;
+						$total_integrasi = 0;
 
-				if (!empty($unit)) {
-					$tbody = '';
-					$counter = 1;
-					$total_menunggu = 0;
-					$total_disetujui = 0;
-					$total_ditolak = 0;
-					$total_draft = 0;
-					$total_dokumen = 0;
-					foreach ($unit as $kk => $vv) {
-						$detail_perjanjian_kinerja = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Detail Dokumen Perjanjian Kinerja ' . $tahun_anggaran,
-							'content' => '[dokumen_detail_perjanjian_kinerja tahun=' . $tahun_anggaran . ']',
-							'show_header' => 1,
-							'post_status' => 'private'
-						));
-
-						$tbody .= "<tr>";
-						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
-
-						$jumlah_dokumen = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(id)
-								FROM esakip_perjanjian_kinerja 
-								WHERE id_skpd = %d
-								AND tahun_anggaran = %d
-								AND active = 1
-								",
-								$vv['id_skpd'],
-								$tahun_anggaran
-							)
-						);
-
-						$jumlah_status_disetujui = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(kv.id)
-								FROM 
-									esakip_perjanjian_kinerja pk 
-								JOIN 
-									esakip_keterangan_verifikator kv 
-									ON pk.id=kv.id_dokumen
-								WHERE pk.id_skpd = %d
-								AND pk.tahun_anggaran = %d
-								AND pk.active = 1
-								AND kv.active = 1
-								AND kv.status_verifikasi=1
-								AND kv.nama_tabel_dokumen = %s
-								",
-								$vv['id_skpd'],
-								$tahun_anggaran,
-								'esakip_perjanjian_kinerja'
-							)
-						);
-
-						$jumlah_status_ditolak = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(kv.id)
-								FROM 
-									esakip_perjanjian_kinerja pk 
-								JOIN 
-									esakip_keterangan_verifikator kv 
-									ON pk.id=kv.id_dokumen
-								WHERE pk.id_skpd = %d
-								AND pk.tahun_anggaran = %d
-								AND pk.active = 1
-								AND kv.active = 1
-								AND kv.status_verifikasi=2
-								AND kv.nama_tabel_dokumen = %s
-								",
-								$vv['id_skpd'],
-								$tahun_anggaran,
-								'esakip_perjanjian_kinerja'
-							)
-						);
-
-						$jumlah_status_draft = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(kv.id)
-								FROM 
-									esakip_perjanjian_kinerja pk 
-								JOIN 
-									esakip_keterangan_verifikator kv 
-									ON pk.id=kv.id_dokumen
-								WHERE pk.id_skpd = %d
-								AND pk.tahun_anggaran = %d
-								AND pk.active = 1
-								AND kv.active = 1
-								AND kv.status_verifikasi=3
-								AND kv.nama_tabel_dokumen = %s
-								",
-								$vv['id_skpd'],
-								$tahun_anggaran,
-								'esakip_perjanjian_kinerja'
-							)
-						);
-						
-
-						$jumlah_disetujui = !empty($jumlah_status_disetujui) ? $jumlah_status_disetujui : 0;
-						$jumlah_ditolak = !empty($jumlah_status_ditolak) ? $jumlah_status_ditolak : 0;
-						$jumlah_draft = !empty($jumlah_status_draft) ? $jumlah_status_draft : 0;
-						$jumlah_menunggu = 0;
-						if(!empty($jumlah_dokumen)){
-							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_disetujui + $jumlah_ditolak + $jumlah_draft);
+						/** get data esr */
+						$data_dokumen_terintegrasi = array();
+						$status_api_esr = get_option('_crb_api_esr_status');
+						if($status_api_esr){
+							$data_dokumen_terintegrasi = $this->get_total_integrasi_esr('esakip_perjanjian_kinerja', $tahun_anggaran);
 						}
-						
-						$btn = '<div class="btn-action-group">';
-						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_perjanjian_kinerja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
-						$btn .= '</div>';
+						if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+							$ret['status_mapping'] = 1;
+						}else{
+							$ret['status_mapping'] = 0;
+							$ret['message_get_total_integrasi_dokumen_esr'] = $data_dokumen_terintegrasi['message'];
+						}
 
-						$tbody .= "<td class='text-center bg-info text-white'>" . $jumlah_draft . "</td>";
-						$tbody .= "<td class='text-center bg-secondary text-white'>" . $jumlah_menunggu . "</td>";
-						$tbody .= "<td class='text-center bg-success text-white'>" . $jumlah_disetujui . "</td>";
-						$tbody .= "<td class='text-center bg-danger text-white'>" . $jumlah_ditolak . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
-						$tbody .= "<td>" . $btn . "</td>";
-
-						$tbody .= "</tr>";
-
-						$total_menunggu += $jumlah_menunggu;
-						$total_disetujui += $jumlah_disetujui;
-						$total_ditolak += $jumlah_ditolak;
-						$total_draft += $jumlah_draft;
-						$total_dokumen += $jumlah_dokumen;
+						foreach ($unit as $kk => $vv) {
+							$detail_perjanjian_kinerja = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Detail Dokumen Perjanjian Kinerja ' . $tahun_anggaran,
+								'content' => '[dokumen_detail_perjanjian_kinerja tahun=' . $tahun_anggaran . ']',
+								'show_header' => 1,
+								'post_status' => 'private'
+							));
+	
+							$tbody .= "<tr>";
+							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+							$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
+	
+							$jumlah_dokumen = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(id)
+									FROM esakip_perjanjian_kinerja 
+									WHERE id_skpd = %d
+									AND tahun_anggaran = %d
+									AND active = 1
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran
+								)
+							);
+	
+							$jumlah_status_disetujui = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(kv.id)
+									FROM 
+										esakip_perjanjian_kinerja pk 
+									JOIN 
+										esakip_keterangan_verifikator kv 
+										ON pk.id=kv.id_dokumen
+									WHERE pk.id_skpd = %d
+									AND pk.tahun_anggaran = %d
+									AND pk.active = 1
+									AND kv.active = 1
+									AND kv.status_verifikasi=1
+									AND kv.nama_tabel_dokumen = %s
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran,
+									'esakip_perjanjian_kinerja'
+								)
+							);
+	
+							$jumlah_status_ditolak = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(kv.id)
+									FROM 
+										esakip_perjanjian_kinerja pk 
+									JOIN 
+										esakip_keterangan_verifikator kv 
+										ON pk.id=kv.id_dokumen
+									WHERE pk.id_skpd = %d
+									AND pk.tahun_anggaran = %d
+									AND pk.active = 1
+									AND kv.active = 1
+									AND kv.status_verifikasi=2
+									AND kv.nama_tabel_dokumen = %s
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran,
+									'esakip_perjanjian_kinerja'
+								)
+							);
+	
+							$jumlah_status_draft = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(kv.id)
+									FROM 
+										esakip_perjanjian_kinerja pk 
+									JOIN 
+										esakip_keterangan_verifikator kv 
+										ON pk.id=kv.id_dokumen
+									WHERE pk.id_skpd = %d
+									AND pk.tahun_anggaran = %d
+									AND pk.active = 1
+									AND kv.active = 1
+									AND kv.status_verifikasi=3
+									AND kv.nama_tabel_dokumen = %s
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran,
+									'esakip_perjanjian_kinerja'
+								)
+							);
+							
+	
+							$jumlah_disetujui = !empty($jumlah_status_disetujui) ? $jumlah_status_disetujui : 0;
+							$jumlah_ditolak = !empty($jumlah_status_ditolak) ? $jumlah_status_ditolak : 0;
+							$jumlah_draft = !empty($jumlah_status_draft) ? $jumlah_status_draft : 0;
+							$jumlah_menunggu = 0;
+							if(!empty($jumlah_dokumen)){
+								$jumlah_menunggu = $jumlah_dokumen - ($jumlah_disetujui + $jumlah_ditolak + $jumlah_draft);
+							}
+							
+							$jumlah_dokumen_terintegrasi = 0;
+							if($data_dokumen_terintegrasi['status'] == 'success'){
+								$jumlah_dokumen_terintegrasi = !empty($data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']]) ? $data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']] : 0;
+							}
+							
+							$btn = '<div class="btn-action-group">';
+							$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_perjanjian_kinerja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+							$btn .= '</div>';
+	
+							$tbody .= "<td class='text-center bg-info text-white'>" . $jumlah_draft . "</td>";
+							$tbody .= "<td class='text-center bg-secondary text-white'>" . $jumlah_menunggu . "</td>";
+							$tbody .= "<td class='text-center bg-success text-white'>" . $jumlah_disetujui . "</td>";
+							$tbody .= "<td class='text-center bg-danger text-white'>" . $jumlah_ditolak . "</td>";
+							$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
+							if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+								$tbody .= "<td class='text-center'>" . $jumlah_dokumen_terintegrasi . "</td>";
+							}
+							$tbody .= "<td>" . $btn . "</td>";
+	
+							$tbody .= "</tr>";
+	
+							$total_menunggu += $jumlah_menunggu;
+							$total_disetujui += $jumlah_disetujui;
+							$total_ditolak += $jumlah_ditolak;
+							$total_draft += $jumlah_draft;
+							$total_dokumen += $jumlah_dokumen;
+							$total_integrasi += $jumlah_dokumen_terintegrasi;
+						}
+						$ret['data'] = $tbody;
+						$ret['total_menunggu'] = $total_menunggu;
+						$ret['total_disetujui'] = $total_disetujui;
+						$ret['total_ditolak'] = $total_ditolak;
+						$ret['total_draft'] = $total_draft;
+						$ret['total_dokumen'] = $total_dokumen;
+						$ret['total_integrasi'] = $total_integrasi;
+					} else {
+						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 					}
-					$ret['data'] = $tbody;
-					$ret['total_menunggu'] = $total_menunggu;
-					$ret['total_disetujui'] = $total_disetujui;
-					$ret['total_ditolak'] = $total_ditolak;
-					$ret['total_draft'] = $total_draft;
-					$ret['total_dokumen'] = $total_dokumen;
-				} else {
-					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 			} else {
 				$ret = array(
@@ -15470,64 +15548,90 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-				$unit = $wpdb->get_results(
-					$wpdb->prepare("
-					SELECT 
-						nama_skpd, 
-						id_skpd, 
-						kode_skpd, 
-						nipkepala 
-					FROM esakip_data_unit 
-					WHERE active=1 
-					  AND tahun_anggaran=%d
-					  AND is_skpd=1 
-					ORDER BY kode_skpd ASC
-					", $tahun_anggaran_sakip),
-					ARRAY_A
-				);
+				if ($ret['status'] != 'error'){
+					$unit = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT 
+							nama_skpd, 
+							id_skpd, 
+							kode_skpd, 
+							nipkepala 
+						FROM esakip_data_unit 
+						WHERE active=1 
+						AND tahun_anggaran=%d
+						AND is_skpd=1 
+						ORDER BY kode_skpd ASC
+						", $tahun_anggaran_sakip),
+						ARRAY_A
+					);
 
-				if (!empty($unit)) {
-					$tbody = '';
-					$counter = 1;
-					foreach ($unit as $kk => $vv) {
-						$detail_rencana_aksi = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Detail Dokumen Rencana Aksi ' . $tahun_anggaran,
-							'content' => '[dokumen_detail_rencana_aksi tahun=' . $tahun_anggaran . ']',
-							'show_header' => 1,
-							'post_status' => 'private'
-						));
+					if (!empty($unit)) {
+						$tbody = '';
+						$counter = 1;
+						$total_integrasi = 0;
 
-						$tbody .= "<tr>";
-						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
+						/** get data esr */
+						$data_dokumen_terintegrasi = array();
+						$status_api_esr = get_option('_crb_api_esr_status');
+						if($status_api_esr){
+							$data_dokumen_terintegrasi = $this->get_total_integrasi_esr('esakip_rencana_aksi', $tahun_anggaran);
+						}
+						
+						if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+							$ret['status_mapping'] = 1;
+						}else{
+							$ret['status_mapping'] = 0;
+							$ret['message_get_total_integrasi_dokumen_esr'] = $data_dokumen_terintegrasi['message'];
+						}
+						
+						foreach ($unit as $kk => $vv) {
+							$detail_rencana_aksi = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Detail Dokumen Rencana Aksi ' . $tahun_anggaran,
+								'content' => '[dokumen_detail_rencana_aksi tahun=' . $tahun_anggaran . ']',
+								'show_header' => 1,
+								'post_status' => 'private'
+							));
 
-						$jumlah_dokumen = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(id)
-								FROM esakip_rencana_aksi 
-								WHERE id_skpd = %d
-								AND tahun_anggaran = %d
-								AND active = 1
-								",
-								$vv['id_skpd'],
-								$tahun_anggaran
-							)
-						);
+							$tbody .= "<tr>";
+							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+							$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
-						$btn = '<div class="btn-action-group">';
-						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_rencana_aksi['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
-						$btn .= '</div>';
+							$jumlah_dokumen = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(id)
+									FROM esakip_rencana_aksi 
+									WHERE id_skpd = %d
+									AND tahun_anggaran = %d
+									AND active = 1
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran
+								)
+							);
 
-						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
-						$tbody .= "<td>" . $btn . "</td>";
+							$jumlah_dokumen_terintegrasi = 0;
+							if($data_dokumen_terintegrasi['status'] == 'success'){
+								$jumlah_dokumen_terintegrasi = !empty($data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']]) ? $data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']] : 0;
+							}
 
-						$tbody .= "</tr>";
+							$btn = '<div class="btn-action-group">';
+							$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_rencana_aksi['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+							$btn .= '</div>';
+
+							$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
+							if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+								$tbody .= "<td class='text-center'>" . $jumlah_dokumen_terintegrasi . "</td>";
+							}
+							$tbody .= "<td>" . $btn . "</td>";
+
+							$tbody .= "</tr>";
+						}
+						$ret['data'] = $tbody;
+					} else {
+						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 					}
-					$ret['data'] = $tbody;
-				} else {
-					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 			} else {
 				$ret = array(
@@ -15656,64 +15760,91 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-				$unit = $wpdb->get_results(
-					$wpdb->prepare("
-					SELECT 
-						nama_skpd, 
-						id_skpd, 
-						kode_skpd, 
-						nipkepala 
-					FROM esakip_data_unit 
-					WHERE active=1 
-					  AND tahun_anggaran=%d
-					  AND is_skpd=1 
-					ORDER BY kode_skpd ASC
-					", $tahun_anggaran_sakip),
-					ARRAY_A
-				);
+				if ($ret['status'] != 'error'){
+					$unit = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT 
+							nama_skpd, 
+							id_skpd, 
+							kode_skpd, 
+							nipkepala 
+						FROM esakip_data_unit 
+						WHERE active=1 
+						AND tahun_anggaran=%d
+						AND is_skpd=1 
+						ORDER BY kode_skpd ASC
+						", $tahun_anggaran_sakip),
+						ARRAY_A
+					);
 
-				if (!empty($unit)) {
-					$tbody = '';
-					$counter = 1;
-					foreach ($unit as $kk => $vv) {
-						$detail_iku = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Detail Dokumen IKU ' . $tahun_anggaran,
-							'content' => '[dokumen_detail_iku tahun=' . $tahun_anggaran . ']',
-							'show_header' => 1,
-							'post_status' => 'private'
-						));
+					if (!empty($unit)) {
+						$tbody = '';
+						$counter = 1;
+						$total_integrasi = 0;
 
-						$tbody .= "<tr>";
-						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
+						/** get data esr */
+						$data_dokumen_terintegrasi = array();
+						$status_api_esr = get_option('_crb_api_esr_status');
+						if($status_api_esr){
+							$data_dokumen_terintegrasi = $this->get_total_integrasi_esr('esakip_iku', $tahun_anggaran);
+						}
+						
+						if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+							$ret['status_mapping'] = 1;
+						}else{
+							$ret['status_mapping'] = 0;
+							$ret['message_get_total_integrasi_dokumen_esr'] = $data_dokumen_terintegrasi['message'];
+						}
 
-						$jumlah_dokumen = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(id)
-								FROM esakip_iku 
-								WHERE id_skpd = %d
-								AND tahun_anggaran = %d
-								AND active = 1
-								",
-								$vv['id_skpd'],
-								$tahun_anggaran
-							)
-						);
+						foreach ($unit as $kk => $vv) {
+							$detail_iku = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Detail Dokumen IKU ' . $tahun_anggaran,
+								'content' => '[dokumen_detail_iku tahun=' . $tahun_anggaran . ']',
+								'show_header' => 1,
+								'post_status' => 'private'
+							));
 
-						$btn = '<div class="btn-action-group">';
-						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_iku['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
-						$btn .= '</div>';
+							$tbody .= "<tr>";
+							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+							$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
-						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
-						$tbody .= "<td>" . $btn . "</td>";
+							$jumlah_dokumen = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(id)
+									FROM esakip_iku 
+									WHERE id_skpd = %d
+									AND tahun_anggaran = %d
+									AND active = 1
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran
+								)
+							);
 
-						$tbody .= "</tr>";
+							
+							$jumlah_dokumen_terintegrasi = 0;
+							if($data_dokumen_terintegrasi['status'] == 'success'){
+								$jumlah_dokumen_terintegrasi = !empty($data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']]) ? $data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']] : 0;
+							}
+
+							$btn = '<div class="btn-action-group">';
+							$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_iku['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+							$btn .= '</div>';
+
+							$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
+							if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+								$tbody .= "<td class='text-center'>" . $jumlah_dokumen_terintegrasi . "</td>";
+							}
+							$tbody .= "<td>" . $btn . "</td>";
+
+							$tbody .= "</tr>";
+						}
+						$ret['data'] = $tbody;
+					} else {
+						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 					}
-					$ret['data'] = $tbody;
-				} else {
-					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 			} else {
 				$ret = array(
@@ -15843,64 +15974,89 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-				$unit = $wpdb->get_results(
-					$wpdb->prepare("
-					SELECT 
-						nama_skpd, 
-						id_skpd, 
-						kode_skpd, 
-						nipkepala 
-					FROM esakip_data_unit 
-					WHERE active=1 
-					  AND tahun_anggaran=%d
-					  AND is_skpd=1 
-					ORDER BY kode_skpd ASC
-					", $tahun_anggaran_sakip),
-					ARRAY_A
-				);
+				if ($ret['status'] != 'error'){
+					$unit = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT 
+							nama_skpd, 
+							id_skpd, 
+							kode_skpd, 
+							nipkepala 
+						FROM esakip_data_unit 
+						WHERE active=1 
+						AND tahun_anggaran=%d
+						AND is_skpd=1 
+						ORDER BY kode_skpd ASC
+						", $tahun_anggaran_sakip),
+						ARRAY_A
+					);
 
-				if (!empty($unit)) {
-					$tbody = '';
-					$counter = 1;
-					foreach ($unit as $kk => $vv) {
-						$detail_evaluasi_internal = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Detail Dokumen Evaluasi Internal ' . $tahun_anggaran,
-							'content' => '[dokumen_detail_evaluasi_internal tahun=' . $tahun_anggaran . ']',
-							'show_header' => 1,
-							'post_status' => 'private'
-						));
+					if (!empty($unit)) {
+						$tbody = '';
+						$counter = 1;
+						$total_integrasi = 0;
 
-						$tbody .= "<tr>";
-						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
+						/** get data esr */
+						$data_dokumen_terintegrasi = array();
+						$status_api_esr = get_option('_crb_api_esr_status');
+						if($status_api_esr){
+							$data_dokumen_terintegrasi = $this->get_total_integrasi_esr('esakip_evaluasi_internal', $tahun_anggaran);
+						}
+						
+						if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+							$ret['status_mapping'] = 1;
+						}else{
+							$ret['status_mapping'] = 0;
+							$ret['message_get_total_integrasi_dokumen_esr'] = $data_dokumen_terintegrasi['message'];
+						}
+						foreach ($unit as $kk => $vv) {
+							$detail_evaluasi_internal = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Detail Dokumen Evaluasi Internal ' . $tahun_anggaran,
+								'content' => '[dokumen_detail_evaluasi_internal tahun=' . $tahun_anggaran . ']',
+								'show_header' => 1,
+								'post_status' => 'private'
+							));
 
-						$jumlah_dokumen = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(id)
-								FROM esakip_evaluasi_internal 
-								WHERE id_skpd = %d
-								AND tahun_anggaran = %d
-								AND active = 1
-								",
-								$vv['id_skpd'],
-								$tahun_anggaran
-							)
-						);
+							$tbody .= "<tr>";
+							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+							$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
-						$btn = '<div class="btn-action-group">';
-						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_evaluasi_internal['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
-						$btn .= '</div>';
+							$jumlah_dokumen = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(id)
+									FROM esakip_evaluasi_internal 
+									WHERE id_skpd = %d
+									AND tahun_anggaran = %d
+									AND active = 1
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran
+								)
+							);
 
-						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
-						$tbody .= "<td>" . $btn . "</td>";
+							$jumlah_dokumen_terintegrasi = 0;
+							if($data_dokumen_terintegrasi['status'] == 'success'){
+								$jumlah_dokumen_terintegrasi = !empty($data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']]) ? $data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']] : 0;
+							}
 
-						$tbody .= "</tr>";
+							$btn = '<div class="btn-action-group">';
+							$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_evaluasi_internal['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+							$btn .= '</div>';
+
+							$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
+							if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+								$tbody .= "<td class='text-center'>" . $jumlah_dokumen_terintegrasi . "</td>";
+							}
+							$tbody .= "<td>" . $btn . "</td>";
+
+							$tbody .= "</tr>";
+						}
+						$ret['data'] = $tbody;
+					} else {
+						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 					}
-					$ret['data'] = $tbody;
-				} else {
-					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 			} else {
 				$ret = array(
@@ -16133,64 +16289,90 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-				$unit = $wpdb->get_results(
-					$wpdb->prepare("
-					SELECT 
-						nama_skpd, 
-						id_skpd, 
-						kode_skpd, 
-						nipkepala 
-					FROM esakip_data_unit 
-					WHERE active=1 
-					  AND tahun_anggaran=%d
-					  AND is_skpd=1 
-					ORDER BY kode_skpd ASC
-					", $tahun_anggaran_sakip),
-					ARRAY_A
-				);
+				if ($ret['status'] != 'error'){
+					$unit = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT 
+							nama_skpd, 
+							id_skpd, 
+							kode_skpd, 
+							nipkepala 
+						FROM esakip_data_unit 
+						WHERE active=1 
+						AND tahun_anggaran=%d
+						AND is_skpd=1 
+						ORDER BY kode_skpd ASC
+						", $tahun_anggaran_sakip),
+						ARRAY_A
+					);
 
-				if (!empty($unit)) {
-					$tbody = '';
-					$counter = 1;
-					foreach ($unit as $kk => $vv) {
-						$detail_pengukuran_kinerja = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Detail Dokumen Pengukuran Kinerja ' . $tahun_anggaran,
-							'content' => '[dokumen_detail_pengukuran_kinerja tahun=' . $tahun_anggaran . ']',
-							'show_header' => 1,
-							'post_status' => 'private'
-						));
+					if (!empty($unit)) {
+						$tbody = '';
+						$counter = 1;
+						$total_integrasi = 0;
 
-						$tbody .= "<tr>";
-						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
+						/** get data esr */
+						$data_dokumen_terintegrasi = array();
+						$status_api_esr = get_option('_crb_api_esr_status');
+						if($status_api_esr){
+							$data_dokumen_terintegrasi = $this->get_total_integrasi_esr('esakip_pengukuran_kinerja', $tahun_anggaran);
+						}
+						
+						if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+							$ret['status_mapping'] = 1;
+						}else{
+							$ret['status_mapping'] = 0;
+							$ret['message_get_total_integrasi_dokumen_esr'] = $data_dokumen_terintegrasi['message'];
+						}
 
-						$jumlah_dokumen = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(id)
-								FROM esakip_pengukuran_kinerja 
-								WHERE id_skpd = %d
-								AND tahun_anggaran = %d
-								AND active = 1
-								",
-								$vv['id_skpd'],
-								$tahun_anggaran
-							)
-						);
+						foreach ($unit as $kk => $vv) {
+							$detail_pengukuran_kinerja = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Detail Dokumen Pengukuran Kinerja ' . $tahun_anggaran,
+								'content' => '[dokumen_detail_pengukuran_kinerja tahun=' . $tahun_anggaran . ']',
+								'show_header' => 1,
+								'post_status' => 'private'
+							));
 
-						$btn = '<div class="btn-action-group">';
-						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_pengukuran_kinerja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
-						$btn .= '</div>';
+							$tbody .= "<tr>";
+							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+							$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
-						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
-						$tbody .= "<td>" . $btn . "</td>";
+							$jumlah_dokumen = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(id)
+									FROM esakip_pengukuran_kinerja 
+									WHERE id_skpd = %d
+									AND tahun_anggaran = %d
+									AND active = 1
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran
+								)
+							);
 
-						$tbody .= "</tr>";
+							$jumlah_dokumen_terintegrasi = 0;
+							if($data_dokumen_terintegrasi['status'] == 'success'){
+								$jumlah_dokumen_terintegrasi = !empty($data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']]) ? $data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']] : 0;
+							}
+
+							$btn = '<div class="btn-action-group">';
+							$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_pengukuran_kinerja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+							$btn .= '</div>';
+
+							$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
+							if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+								$tbody .= "<td class='text-center'>" . $jumlah_dokumen_terintegrasi . "</td>";
+							}
+							$tbody .= "<td>" . $btn . "</td>";
+
+							$tbody .= "</tr>";
+						}
+						$ret['data'] = $tbody;
+					} else {
+						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 					}
-					$ret['data'] = $tbody;
-				} else {
-					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 			} else {
 				$ret = array(
@@ -16505,162 +16687,190 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-				$unit = $wpdb->get_results(
-					$wpdb->prepare("
-					SELECT 
-						nama_skpd, 
-						id_skpd, 
-						kode_skpd, 
-						nipkepala 
-					FROM esakip_data_unit 
-					WHERE active=1 
-					  AND tahun_anggaran=%d
-					  AND is_skpd=1 
-					ORDER BY kode_skpd ASC
-					", $tahun_anggaran_sakip),
-					ARRAY_A
-				);
+				if ($ret['status'] != 'error'){
+					$unit = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT 
+							nama_skpd, 
+							id_skpd, 
+							kode_skpd, 
+							nipkepala 
+						FROM esakip_data_unit 
+						WHERE active=1 
+						AND tahun_anggaran=%d
+						AND is_skpd=1 
+						ORDER BY kode_skpd ASC
+						", $tahun_anggaran_sakip),
+						ARRAY_A
+					);
 
-				if (!empty($unit)) {
-					$tbody = '';
-					$counter = 1;
-					$total_menunggu = 0;
-					$total_disetujui = 0;
-					$total_ditolak = 0;
-					$total_draft = 0;
-					$total_dokumen = 0;
-					foreach ($unit as $kk => $vv) {
-						$detail_laporan_kinerja = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Detail Dokumen Laporan Kinerja ' . $tahun_anggaran,
-							'content' => '[dokumen_detail_laporan_kinerja tahun=' . $tahun_anggaran . ']',
-							'show_header' => 1,
-							'post_status' => 'private'
-						));
+					if (!empty($unit)) {
+						$tbody = '';
+						$counter = 1;
+						$total_menunggu = 0;
+						$total_disetujui = 0;
+						$total_ditolak = 0;
+						$total_draft = 0;
+						$total_dokumen = 0;
+						$total_integrasi = 0;
 
-						$tbody .= "<tr>";
-						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
-
-						$jumlah_dokumen = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(id)
-								FROM esakip_laporan_kinerja 
-								WHERE id_skpd = %d
-								AND tahun_anggaran = %d
-								AND active = 1
-								",
-								$vv['id_skpd'],
-								$tahun_anggaran
-							)
-						);
+						/** get data esr */
+						$data_dokumen_terintegrasi = array();
+						$status_api_esr = get_option('_crb_api_esr_status');
+						if($status_api_esr){
+							$data_dokumen_terintegrasi = $this->get_total_integrasi_esr('esakip_laporan_kinerja', $tahun_anggaran);
+						}
 						
-						$jumlah_status_disetujui = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(kv.id)
-								FROM 
-									esakip_laporan_kinerja pk 
-								JOIN 
-									esakip_keterangan_verifikator kv 
-									ON pk.id=kv.id_dokumen
-								WHERE pk.id_skpd = %d
-								AND pk.tahun_anggaran = %d
-								AND pk.active = 1
-								AND kv.active = 1
-								AND kv.status_verifikasi=1
-								AND kv.nama_tabel_dokumen = %s
-								",
-								$vv['id_skpd'],
-								$tahun_anggaran,
-								'esakip_laporan_kinerja'
-							)
-						);
-
-						$jumlah_status_ditolak = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(kv.id)
-								FROM 
-									esakip_laporan_kinerja pk 
-								JOIN 
-									esakip_keterangan_verifikator kv 
-									ON pk.id=kv.id_dokumen
-								WHERE pk.id_skpd = %d
-								AND pk.tahun_anggaran = %d
-								AND pk.active = 1
-								AND kv.active = 1
-								AND kv.status_verifikasi=2
-								AND kv.nama_tabel_dokumen = %s
-								",
-								$vv['id_skpd'],
-								$tahun_anggaran,
-								'esakip_laporan_kinerja'
-							)
-						);
-
-						$jumlah_status_draft = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(kv.id)
-								FROM 
-									esakip_laporan_kinerja pk 
-								JOIN 
-									esakip_keterangan_verifikator kv 
-									ON pk.id=kv.id_dokumen
-								WHERE pk.id_skpd = %d
-								AND pk.tahun_anggaran = %d
-								AND pk.active = 1
-								AND kv.active = 1
-								AND kv.status_verifikasi=3
-								AND kv.nama_tabel_dokumen = %s
-								",
-								$vv['id_skpd'],
-								$tahun_anggaran,
-								'esakip_laporan_kinerja'
-							)
-						);
-						
-
-						$jumlah_disetujui = !empty($jumlah_status_disetujui) ? $jumlah_status_disetujui : 0;
-						$jumlah_ditolak = !empty($jumlah_status_ditolak) ? $jumlah_status_ditolak : 0;
-						$jumlah_draft = !empty($jumlah_status_draft) ? $jumlah_status_draft : 0;
-						$jumlah_menunggu = 0;
-						if(!empty($jumlah_dokumen)){
-							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_disetujui + $jumlah_ditolak + $jumlah_draft);
+						if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+							$ret['status_mapping'] = 1;
+						}else{
+							$ret['status_mapping'] = 0;
+							$ret['message_get_total_integrasi_dokumen_esr'] = $data_dokumen_terintegrasi['message'];
 						}
 
-						$btn = '<div class="btn-action-group">';
-						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_laporan_kinerja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
-						$btn .= '</div>';
+						foreach ($unit as $kk => $vv) {
+							$detail_laporan_kinerja = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Detail Dokumen Laporan Kinerja ' . $tahun_anggaran,
+								'content' => '[dokumen_detail_laporan_kinerja tahun=' . $tahun_anggaran . ']',
+								'show_header' => 1,
+								'post_status' => 'private'
+							));
 
-						$tbody .= "<td class='text-center bg-info text-white'>" . $jumlah_draft . "</td>";
-						$tbody .= "<td class='text-center bg-secondary text-white'>" . $jumlah_menunggu . "</td>";
-						$tbody .= "<td class='text-center bg-success text-white'>" . $jumlah_disetujui . "</td>";
-						$tbody .= "<td class='text-center bg-danger text-white'>" . $jumlah_ditolak . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
-						$tbody .= "<td>" . $btn . "</td>";
+							$tbody .= "<tr>";
+							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+							$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
-						$tbody .= "</tr>";
+							$jumlah_dokumen = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(id)
+									FROM esakip_laporan_kinerja 
+									WHERE id_skpd = %d
+									AND tahun_anggaran = %d
+									AND active = 1
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran
+								)
+							);
+							
+							$jumlah_status_disetujui = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(kv.id)
+									FROM 
+										esakip_laporan_kinerja pk 
+									JOIN 
+										esakip_keterangan_verifikator kv 
+										ON pk.id=kv.id_dokumen
+									WHERE pk.id_skpd = %d
+									AND pk.tahun_anggaran = %d
+									AND pk.active = 1
+									AND kv.active = 1
+									AND kv.status_verifikasi=1
+									AND kv.nama_tabel_dokumen = %s
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran,
+									'esakip_laporan_kinerja'
+								)
+							);
 
-						$total_menunggu += $jumlah_menunggu;
-						$total_disetujui += $jumlah_disetujui;
-						$total_ditolak += $jumlah_ditolak;
-						$total_draft += $jumlah_draft;
-						$total_dokumen += $jumlah_dokumen;
+							$jumlah_status_ditolak = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(kv.id)
+									FROM 
+										esakip_laporan_kinerja pk 
+									JOIN 
+										esakip_keterangan_verifikator kv 
+										ON pk.id=kv.id_dokumen
+									WHERE pk.id_skpd = %d
+									AND pk.tahun_anggaran = %d
+									AND pk.active = 1
+									AND kv.active = 1
+									AND kv.status_verifikasi=2
+									AND kv.nama_tabel_dokumen = %s
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran,
+									'esakip_laporan_kinerja'
+								)
+							);
+
+							$jumlah_status_draft = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(kv.id)
+									FROM 
+										esakip_laporan_kinerja pk 
+									JOIN 
+										esakip_keterangan_verifikator kv 
+										ON pk.id=kv.id_dokumen
+									WHERE pk.id_skpd = %d
+									AND pk.tahun_anggaran = %d
+									AND pk.active = 1
+									AND kv.active = 1
+									AND kv.status_verifikasi=3
+									AND kv.nama_tabel_dokumen = %s
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran,
+									'esakip_laporan_kinerja'
+								)
+							);
+							
+
+							$jumlah_disetujui = !empty($jumlah_status_disetujui) ? $jumlah_status_disetujui : 0;
+							$jumlah_ditolak = !empty($jumlah_status_ditolak) ? $jumlah_status_ditolak : 0;
+							$jumlah_draft = !empty($jumlah_status_draft) ? $jumlah_status_draft : 0;
+							$jumlah_menunggu = 0;
+							if(!empty($jumlah_dokumen)){
+								$jumlah_menunggu = $jumlah_dokumen - ($jumlah_disetujui + $jumlah_ditolak + $jumlah_draft);
+							}
+
+							$jumlah_dokumen_terintegrasi = 0;
+							if($data_dokumen_terintegrasi['status'] == 'success'){
+								$jumlah_dokumen_terintegrasi = !empty($data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']]) ? $data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']] : 0;
+							}
+
+							$btn = '<div class="btn-action-group">';
+							$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_laporan_kinerja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+							$btn .= '</div>';
+
+							$tbody .= "<td class='text-center bg-info text-white'>" . $jumlah_draft . "</td>";
+							$tbody .= "<td class='text-center bg-secondary text-white'>" . $jumlah_menunggu . "</td>";
+							$tbody .= "<td class='text-center bg-success text-white'>" . $jumlah_disetujui . "</td>";
+							$tbody .= "<td class='text-center bg-danger text-white'>" . $jumlah_ditolak . "</td>";
+							$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
+							if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+								$tbody .= "<td class='text-center'>" . $jumlah_dokumen_terintegrasi . "</td>";
+							}
+							$tbody .= "<td>" . $btn . "</td>";
+
+							$tbody .= "</tr>";
+
+							$total_menunggu += $jumlah_menunggu;
+							$total_disetujui += $jumlah_disetujui;
+							$total_ditolak += $jumlah_ditolak;
+							$total_draft += $jumlah_draft;
+							$total_dokumen += $jumlah_dokumen;
+							$total_integrasi += $jumlah_dokumen_terintegrasi;
+						}
+						$ret['data'] = $tbody;
+						$ret['total_menunggu'] = $total_menunggu;
+						$ret['total_disetujui'] = $total_disetujui;
+						$ret['total_ditolak'] = $total_ditolak;
+						$ret['total_draft'] = $total_draft;
+						$ret['total_dokumen'] = $total_dokumen;
+						$ret['total_integrasi'] = $total_integrasi;
+					} else {
+						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 					}
-					$ret['data'] = $tbody;
-					$ret['total_menunggu'] = $total_menunggu;
-					$ret['total_disetujui'] = $total_disetujui;
-					$ret['total_ditolak'] = $total_ditolak;
-					$ret['total_draft'] = $total_draft;
-					$ret['total_dokumen'] = $total_dokumen;
-				} else {
-					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 			} else {
 				$ret = array(
@@ -16962,162 +17172,190 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-				$unit = $wpdb->get_results(
-					$wpdb->prepare("
-					SELECT 
-						nama_skpd, 
-						id_skpd, 
-						kode_skpd, 
-						nipkepala 
-					FROM esakip_data_unit 
-					WHERE active=1 
-					  AND tahun_anggaran=%d
-					  AND is_skpd=1 
-					ORDER BY kode_skpd ASC
-					", $tahun_anggaran_sakip),
-					ARRAY_A
-				);
+				if ($ret['status'] != 'error'){
+					$unit = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT 
+							nama_skpd, 
+							id_skpd, 
+							kode_skpd, 
+							nipkepala 
+						FROM esakip_data_unit 
+						WHERE active=1 
+						AND tahun_anggaran=%d
+						AND is_skpd=1 
+						ORDER BY kode_skpd ASC
+						", $tahun_anggaran_sakip),
+						ARRAY_A
+					);
 
-				if (!empty($unit)) {
-					$tbody = '';
-					$counter = 1;
-					$total_menunggu = 0;
-					$total_disetujui = 0;
-					$total_ditolak = 0;
-					$total_draft = 0;
-					$total_dokumen = 0;
-					foreach ($unit as $kk => $vv) {
-						$detail_renja = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Detail Dokumen RENJA/RKT ' . $tahun_anggaran,
-							'content' => '[dokumen_detail_renja_rkt tahun=' . $tahun_anggaran . ']',
-							'show_header' => 1,
-							'post_status' => 'private'
-						));
+					if (!empty($unit)) {
+						$tbody = '';
+						$counter = 1;
+						$total_menunggu = 0;
+						$total_disetujui = 0;
+						$total_ditolak = 0;
+						$total_draft = 0;
+						$total_dokumen = 0;
+						$total_integrasi = 0;
 
-						$tbody .= "<tr>";
-						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
-
-						$jumlah_dokumen = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(id)
-								FROM esakip_renja_rkt 
-								WHERE id_skpd = %d
-								AND tahun_anggaran = %d
-								AND active = 1
-								",
-								$vv['id_skpd'],
-								$tahun_anggaran
-							)
-						);
-
-						$jumlah_status_disetujui = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(kv.id)
-								FROM 
-									esakip_renja_rkt pk 
-								JOIN 
-									esakip_keterangan_verifikator kv 
-									ON pk.id=kv.id_dokumen
-								WHERE pk.id_skpd = %d
-								AND pk.tahun_anggaran = %d
-								AND pk.active = 1
-								AND kv.active = 1
-								AND kv.status_verifikasi=1
-								AND kv.nama_tabel_dokumen = %s
-								",
-								$vv['id_skpd'],
-								$tahun_anggaran,
-								'esakip_renja_rkt'
-							)
-						);
-
-						$jumlah_status_ditolak = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(kv.id)
-								FROM 
-									esakip_renja_rkt pk 
-								JOIN 
-									esakip_keterangan_verifikator kv 
-									ON pk.id=kv.id_dokumen
-								WHERE pk.id_skpd = %d
-								AND pk.tahun_anggaran = %d
-								AND pk.active = 1
-								AND kv.active = 1
-								AND kv.status_verifikasi=2
-								AND kv.nama_tabel_dokumen = %s
-								",
-								$vv['id_skpd'],
-								$tahun_anggaran,
-								'esakip_renja_rkt'
-							)
-						);
-
-						$jumlah_status_draft = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(kv.id)
-								FROM 
-									esakip_renja_rkt pk 
-								JOIN 
-									esakip_keterangan_verifikator kv 
-									ON pk.id=kv.id_dokumen
-								WHERE pk.id_skpd = %d
-								AND pk.tahun_anggaran = %d
-								AND pk.active = 1
-								AND kv.active = 1
-								AND kv.status_verifikasi=3
-								AND kv.nama_tabel_dokumen = %s
-								",
-								$vv['id_skpd'],
-								$tahun_anggaran,
-								'esakip_renja_rkt'
-							)
-						);
+						/** get data esr */
+						$data_dokumen_terintegrasi = array();
+						$status_api_esr = get_option('_crb_api_esr_status');
+						if($status_api_esr){
+							$data_dokumen_terintegrasi = $this->get_total_integrasi_esr('esakip_renja_rkt', $tahun_anggaran);
+						}
 						
-
-						$jumlah_disetujui = !empty($jumlah_status_disetujui) ? $jumlah_status_disetujui : 0;
-						$jumlah_ditolak = !empty($jumlah_status_ditolak) ? $jumlah_status_ditolak : 0;
-						$jumlah_draft = !empty($jumlah_status_draft) ? $jumlah_status_draft : 0;
-						$jumlah_menunggu = 0;
-						if(!empty($jumlah_dokumen)){
-							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_disetujui + $jumlah_ditolak + $jumlah_draft);
+						if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+							$ret['status_mapping'] = 1;
+						}else{
+							$ret['status_mapping'] = 0;
+							$ret['message_get_total_integrasi_dokumen_esr'] = $data_dokumen_terintegrasi['message'];
 						}
 
-						$btn = '<div class="btn-action-group">';
-						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_renja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
-						$btn .= '</div>';
+						foreach ($unit as $kk => $vv) {
+							$detail_renja = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Detail Dokumen RENJA/RKT ' . $tahun_anggaran,
+								'content' => '[dokumen_detail_renja_rkt tahun=' . $tahun_anggaran . ']',
+								'show_header' => 1,
+								'post_status' => 'private'
+							));
 
-						$tbody .= "<td class='text-center bg-info text-white'>" . $jumlah_draft . "</td>";
-						$tbody .= "<td class='text-center bg-secondary text-white'>" . $jumlah_menunggu . "</td>";
-						$tbody .= "<td class='text-center bg-success text-white'>" . $jumlah_disetujui . "</td>";
-						$tbody .= "<td class='text-center bg-danger text-white'>" . $jumlah_ditolak . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
-						$tbody .= "<td>" . $btn . "</td>";
+							$tbody .= "<tr>";
+							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+							$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
-						$tbody .= "</tr>";
+							$jumlah_dokumen = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(id)
+									FROM esakip_renja_rkt 
+									WHERE id_skpd = %d
+									AND tahun_anggaran = %d
+									AND active = 1
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran
+								)
+							);
 
-						$total_menunggu += $jumlah_menunggu;
-						$total_disetujui += $jumlah_disetujui;
-						$total_ditolak += $jumlah_ditolak;
-						$total_draft += $jumlah_draft;
-						$total_dokumen += $jumlah_dokumen;
+							$jumlah_status_disetujui = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(kv.id)
+									FROM 
+										esakip_renja_rkt pk 
+									JOIN 
+										esakip_keterangan_verifikator kv 
+										ON pk.id=kv.id_dokumen
+									WHERE pk.id_skpd = %d
+									AND pk.tahun_anggaran = %d
+									AND pk.active = 1
+									AND kv.active = 1
+									AND kv.status_verifikasi=1
+									AND kv.nama_tabel_dokumen = %s
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran,
+									'esakip_renja_rkt'
+								)
+							);
+
+							$jumlah_status_ditolak = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(kv.id)
+									FROM 
+										esakip_renja_rkt pk 
+									JOIN 
+										esakip_keterangan_verifikator kv 
+										ON pk.id=kv.id_dokumen
+									WHERE pk.id_skpd = %d
+									AND pk.tahun_anggaran = %d
+									AND pk.active = 1
+									AND kv.active = 1
+									AND kv.status_verifikasi=2
+									AND kv.nama_tabel_dokumen = %s
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran,
+									'esakip_renja_rkt'
+								)
+							);
+
+							$jumlah_status_draft = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(kv.id)
+									FROM 
+										esakip_renja_rkt pk 
+									JOIN 
+										esakip_keterangan_verifikator kv 
+										ON pk.id=kv.id_dokumen
+									WHERE pk.id_skpd = %d
+									AND pk.tahun_anggaran = %d
+									AND pk.active = 1
+									AND kv.active = 1
+									AND kv.status_verifikasi=3
+									AND kv.nama_tabel_dokumen = %s
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran,
+									'esakip_renja_rkt'
+								)
+							);
+							
+
+							$jumlah_disetujui = !empty($jumlah_status_disetujui) ? $jumlah_status_disetujui : 0;
+							$jumlah_ditolak = !empty($jumlah_status_ditolak) ? $jumlah_status_ditolak : 0;
+							$jumlah_draft = !empty($jumlah_status_draft) ? $jumlah_status_draft : 0;
+							$jumlah_menunggu = 0;
+							if(!empty($jumlah_dokumen)){
+								$jumlah_menunggu = $jumlah_dokumen - ($jumlah_disetujui + $jumlah_ditolak + $jumlah_draft);
+							}
+
+							$jumlah_dokumen_terintegrasi = 0;
+							if($data_dokumen_terintegrasi['status'] == 'success'){
+								$jumlah_dokumen_terintegrasi = !empty($data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']]) ? $data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']] : 0;
+							}
+
+							$btn = '<div class="btn-action-group">';
+							$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_renja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+							$btn .= '</div>';
+
+							$tbody .= "<td class='text-center bg-info text-white'>" . $jumlah_draft . "</td>";
+							$tbody .= "<td class='text-center bg-secondary text-white'>" . $jumlah_menunggu . "</td>";
+							$tbody .= "<td class='text-center bg-success text-white'>" . $jumlah_disetujui . "</td>";
+							$tbody .= "<td class='text-center bg-danger text-white'>" . $jumlah_ditolak . "</td>";
+							$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
+							if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+								$tbody .= "<td class='text-center'>" . $jumlah_dokumen_terintegrasi . "</td>";
+							}
+							$tbody .= "<td>" . $btn . "</td>";
+
+							$tbody .= "</tr>";
+
+							$total_menunggu += $jumlah_menunggu;
+							$total_disetujui += $jumlah_disetujui;
+							$total_ditolak += $jumlah_ditolak;
+							$total_draft += $jumlah_draft;
+							$total_dokumen += $jumlah_dokumen;
+							$total_integrasi += $jumlah_dokumen_terintegrasi;
+						}
+						$ret['data'] = $tbody;
+						$ret['total_menunggu'] = $total_menunggu;
+						$ret['total_disetujui'] = $total_disetujui;
+						$ret['total_ditolak'] = $total_ditolak;
+						$ret['total_draft'] = $total_draft;
+						$ret['total_dokumen'] = $total_dokumen;
+						$ret['total_integrasi'] = $total_integrasi;
+					} else {
+						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 					}
-					$ret['data'] = $tbody;
-					$ret['total_menunggu'] = $total_menunggu;
-					$ret['total_disetujui'] = $total_disetujui;
-					$ret['total_ditolak'] = $total_ditolak;
-					$ret['total_draft'] = $total_draft;
-					$ret['total_dokumen'] = $total_dokumen;
-				} else {
-					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 			} else {
 				$ret = array(
@@ -17154,64 +17392,89 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-				$unit = $wpdb->get_results(
-					$wpdb->prepare("
-					SELECT 
-						nama_skpd, 
-						id_skpd, 
-						kode_skpd, 
-						nipkepala 
-					FROM esakip_data_unit 
-					WHERE active=1 
-					  AND tahun_anggaran=%d
-					  AND is_skpd=1 
-					ORDER BY kode_skpd ASC
-					", $tahun_anggaran_sakip),
-					ARRAY_A
-				);
+				if ($ret['status'] != 'error'){
+					$unit = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT 
+							nama_skpd, 
+							id_skpd, 
+							kode_skpd, 
+							nipkepala 
+						FROM esakip_data_unit 
+						WHERE active=1 
+						AND tahun_anggaran=%d
+						AND is_skpd=1 
+						ORDER BY kode_skpd ASC
+						", $tahun_anggaran_sakip),
+						ARRAY_A
+					);
 
-				if (!empty($unit)) {
-					$tbody = '';
-					$counter = 1;
-					foreach ($unit as $kk => $vv) {
-						$detail_skp = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Detail Dokumen SKP ' . $tahun_anggaran,
-							'content' => '[dokumen_detail_skp tahun=' . $tahun_anggaran . ']',
-							'show_header' => 1,
-							'post_status' => 'private'
-						));
+					if (!empty($unit)) {
+						$tbody = '';
+						$counter = 1;
+						$total_integrasi = 0;
 
-						$tbody .= "<tr>";
-						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
+						/** get data esr */
+						$data_dokumen_terintegrasi = array();
+						$status_api_esr = get_option('_crb_api_esr_status');
+						if($status_api_esr){
+							$data_dokumen_terintegrasi = $this->get_total_integrasi_esr('esakip_skp', $tahun_anggaran);
+						}
 
-						$jumlah_dokumen = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(id)
-								FROM esakip_skp 
-								WHERE id_skpd = %d
-								AND tahun_anggaran = %d
-								AND active = 1
-								",
-								$vv['id_skpd'],
-								$tahun_anggaran
-							)
-						);
+						if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+							$ret['status_mapping'] = 1;
+						}else{
+							$ret['status_mapping'] = 0;
+							$ret['message_get_total_integrasi_dokumen_esr'] = $data_dokumen_terintegrasi['message'];
+						}
+						foreach ($unit as $kk => $vv) {
+							$detail_skp = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Detail Dokumen SKP ' . $tahun_anggaran,
+								'content' => '[dokumen_detail_skp tahun=' . $tahun_anggaran . ']',
+								'show_header' => 1,
+								'post_status' => 'private'
+							));
 
-						$btn = '<div class="btn-action-group">';
-						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_skp['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
-						$btn .= '</div>';
+							$tbody .= "<tr>";
+							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+							$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
-						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
-						$tbody .= "<td>" . $btn . "</td>";
+							$jumlah_dokumen = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(id)
+									FROM esakip_skp 
+									WHERE id_skpd = %d
+									AND tahun_anggaran = %d
+									AND active = 1
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran
+								)
+							);
 
-						$tbody .= "</tr>";
+							$jumlah_dokumen_terintegrasi = 0;
+							if($data_dokumen_terintegrasi['status'] == 'success'){
+								$jumlah_dokumen_terintegrasi = !empty($data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']]) ? $data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']] : 0;
+							}
+
+							$btn = '<div class="btn-action-group">';
+							$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_skp['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+							$btn .= '</div>';
+
+							$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
+							if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+								$tbody .= "<td class='text-center'>" . $jumlah_dokumen_terintegrasi . "</td>";
+							}
+							$tbody .= "<td>" . $btn . "</td>";
+
+							$tbody .= "</tr>";
+						}
+						$ret['data'] = $tbody;
+					} else {
+						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 					}
-					$ret['data'] = $tbody;
-				} else {
-					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 			} else {
 				$ret = array(
@@ -17686,158 +17949,197 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-				$unit = $wpdb->get_results(
-					$wpdb->prepare("
-						SELECT 
-							nama_skpd, 
-							id_skpd, 
-							kode_skpd, 
-							nipkepala 
-						FROM esakip_data_unit 
-						WHERE tahun_anggaran=%d
-						AND active=1 
-						AND is_skpd=1 
-						ORDER BY kode_skpd ASC
-					", $tahun_anggaran_sakip),
-					ARRAY_A
-				);
+				if ($ret['status'] != 'error'){
+					$unit = $wpdb->get_results(
+						$wpdb->prepare("
+							SELECT 
+								nama_skpd, 
+								id_skpd, 
+								kode_skpd, 
+								nipkepala 
+							FROM esakip_data_unit 
+							WHERE tahun_anggaran=%d
+							AND active=1 
+							AND is_skpd=1 
+							ORDER BY kode_skpd ASC
+						", $tahun_anggaran_sakip),
+						ARRAY_A
+					);
 
-				if (!empty($unit)) {
-					$tbody = '';
-					$counter = 1;
-					$total_menunggu = 0;
-					$total_disetujui = 0;
-					$total_ditolak = 0;
-					$total_draft = 0;
-					$total_dokumen = 0;
-					foreach ($unit as $kk => $vv) {
-						$detail_renstra = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Detail Dokumen RENSTRA ' . $id_jadwal,
-							'content' => '[upload_dokumen_renstra periode=' . $id_jadwal . ']',
-							'show_header' => 1,
-							'post_status' => 'private'
-						));
+					if (!empty($unit)) {
+						$tbody = '';
+						$counter = 1;
+						$total_menunggu = 0;
+						$total_disetujui = 0;
+						$total_ditolak = 0;
+						$total_draft = 0;
+						$total_dokumen = 0;
+						$total_integrasi = 0;
 
-						$tbody .= "<tr>";
-						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
-						$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
-
-						$jumlah_dokumen = $wpdb->get_var(
-							$wpdb->prepare("
+						/** get data esr */
+						$data_dokumen_terintegrasi = array();
+						$status_api_esr = get_option('_crb_api_esr_status');
+						if($status_api_esr){
+							$pengaturan_periode_dokumen=$wpdb->get_row($wpdb->prepare("
 								SELECT 
-									COUNT(id)
-								FROM esakip_renstra
-								WHERE id_skpd = %d
-								  AND id_jadwal = %d
-								  AND active = 1
-							", $vv['id_skpd'], $id_jadwal)
-						);
-
-						$jumlah_status_disetujui = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(kv.id)
+									* 
 								FROM 
-									esakip_renstra pk 
-								JOIN 
-									esakip_keterangan_verifikator kv 
-									ON pk.id=kv.id_dokumen
-								WHERE pk.id_skpd = %d
-								AND pk.id_jadwal = %d
-								AND pk.active = 1
-								AND kv.active = 1
-								AND kv.status_verifikasi=1
-								AND kv.nama_tabel_dokumen = %s
-								",
-								$vv['id_skpd'],
-								$id_jadwal,
-								'esakip_renstra'
-							)
-						);
+									esakip_pengaturan_upload_dokumen 
+								WHERE 
+									id_jadwal_rpjmd=%d AND 
+									active=%d", 
+							$id_jadwal, 1), ARRAY_A);
 
-						$jumlah_status_ditolak = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(kv.id)
-								FROM 
-									esakip_renstra pk 
-								JOIN 
-									esakip_keterangan_verifikator kv 
-									ON pk.id=kv.id_dokumen
-								WHERE pk.id_skpd = %d
-								AND pk.id_jadwal = %d
-								AND pk.active = 1
-								AND kv.active = 1
-								AND kv.status_verifikasi=2
-								AND kv.nama_tabel_dokumen = %s
-								",
-								$vv['id_skpd'],
-								$id_jadwal,
-								'esakip_renstra'
-							)
-						);
-
-						$jumlah_status_draft = $wpdb->get_var(
-							$wpdb->prepare(
-								"
-								SELECT 
-									COUNT(kv.id)
-								FROM 
-									esakip_renstra pk 
-								JOIN 
-									esakip_keterangan_verifikator kv 
-									ON pk.id=kv.id_dokumen
-								WHERE pk.id_skpd = %d
-								AND pk.id_jadwal = %d
-								AND pk.active = 1
-								AND kv.active = 1
-								AND kv.status_verifikasi=3
-								AND kv.nama_tabel_dokumen = %s
-								",
-								$vv['id_skpd'],
-								$id_jadwal,
-								'esakip_renstra'
-							)
-						);
-						
-
-						$jumlah_disetujui = !empty($jumlah_status_disetujui) ? $jumlah_status_disetujui : 0;
-						$jumlah_ditolak = !empty($jumlah_status_ditolak) ? $jumlah_status_ditolak : 0;
-						$jumlah_draft = !empty($jumlah_status_draft) ? $jumlah_status_draft : 0;
-						$jumlah_menunggu = 0;
-						if(!empty($jumlah_dokumen)){
-							$jumlah_menunggu = $jumlah_dokumen - ($jumlah_disetujui + $jumlah_ditolak + $jumlah_draft);
+							if(!empty($pengaturan_periode_dokumen)){
+								$data_dokumen_terintegrasi = $this->get_total_integrasi_esr('esakip_renstra', $pengaturan_periode_dokumen['tahun_anggaran']);
+							}
 						}
 
-						$btn = '<div class="btn-action-group">';
-						$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_renstra['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
-						$btn .= '</div>';
+						if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+							$ret['status_mapping'] = 1;
+						}else{
+							$ret['status_mapping'] = 0;
+							$ret['message_get_total_integrasi_dokumen_esr'] = $data_dokumen_terintegrasi['message'];
+						}
+						foreach ($unit as $kk => $vv) {
+							$detail_renstra = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Detail Dokumen RENSTRA ' . $id_jadwal,
+								'content' => '[upload_dokumen_renstra periode=' . $id_jadwal . ']',
+								'show_header' => 1,
+								'post_status' => 'private'
+							));
 
-						$tbody .= "<td class='text-center bg-info text-white'>" . $jumlah_draft . "</td>";
-						$tbody .= "<td class='text-center bg-secondary text-white'>" . $jumlah_menunggu . "</td>";
-						$tbody .= "<td class='text-center bg-success text-white'>" . $jumlah_disetujui . "</td>";
-						$tbody .= "<td class='text-center bg-danger text-white'>" . $jumlah_ditolak . "</td>";
-						$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
-						$tbody .= "<td>" . $btn . "</td>";
+							$tbody .= "<tr>";
+							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+							$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
-						$tbody .= "</tr>";
+							$jumlah_dokumen = $wpdb->get_var(
+								$wpdb->prepare("
+									SELECT 
+										COUNT(id)
+									FROM esakip_renstra
+									WHERE id_skpd = %d
+									AND id_jadwal = %d
+									AND active = 1
+								", $vv['id_skpd'], $id_jadwal)
+							);
 
-						$total_menunggu += $jumlah_menunggu;
-						$total_disetujui += $jumlah_disetujui;
-						$total_ditolak += $jumlah_ditolak;
-						$total_draft += $jumlah_draft;
-						$total_dokumen += $jumlah_dokumen;
+							$jumlah_status_disetujui = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(kv.id)
+									FROM 
+										esakip_renstra pk 
+									JOIN 
+										esakip_keterangan_verifikator kv 
+										ON pk.id=kv.id_dokumen
+									WHERE pk.id_skpd = %d
+									AND pk.id_jadwal = %d
+									AND pk.active = 1
+									AND kv.active = 1
+									AND kv.status_verifikasi=1
+									AND kv.nama_tabel_dokumen = %s
+									",
+									$vv['id_skpd'],
+									$id_jadwal,
+									'esakip_renstra'
+								)
+							);
+
+							$jumlah_status_ditolak = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(kv.id)
+									FROM 
+										esakip_renstra pk 
+									JOIN 
+										esakip_keterangan_verifikator kv 
+										ON pk.id=kv.id_dokumen
+									WHERE pk.id_skpd = %d
+									AND pk.id_jadwal = %d
+									AND pk.active = 1
+									AND kv.active = 1
+									AND kv.status_verifikasi=2
+									AND kv.nama_tabel_dokumen = %s
+									",
+									$vv['id_skpd'],
+									$id_jadwal,
+									'esakip_renstra'
+								)
+							);
+
+							$jumlah_status_draft = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(kv.id)
+									FROM 
+										esakip_renstra pk 
+									JOIN 
+										esakip_keterangan_verifikator kv 
+										ON pk.id=kv.id_dokumen
+									WHERE pk.id_skpd = %d
+									AND pk.id_jadwal = %d
+									AND pk.active = 1
+									AND kv.active = 1
+									AND kv.status_verifikasi=3
+									AND kv.nama_tabel_dokumen = %s
+									",
+									$vv['id_skpd'],
+									$id_jadwal,
+									'esakip_renstra'
+								)
+							);
+							
+
+							$jumlah_disetujui = !empty($jumlah_status_disetujui) ? $jumlah_status_disetujui : 0;
+							$jumlah_ditolak = !empty($jumlah_status_ditolak) ? $jumlah_status_ditolak : 0;
+							$jumlah_draft = !empty($jumlah_status_draft) ? $jumlah_status_draft : 0;
+							$jumlah_menunggu = 0;
+							if(!empty($jumlah_dokumen)){
+								$jumlah_menunggu = $jumlah_dokumen - ($jumlah_disetujui + $jumlah_ditolak + $jumlah_draft);
+							}
+							 
+							$jumlah_dokumen_terintegrasi = 0;
+							if($data_dokumen_terintegrasi['status'] == 'success'){
+								$jumlah_dokumen_terintegrasi = !empty($data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']]) ? $data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']] : 0;
+							}
+
+							$btn = '<div class="btn-action-group">';
+							$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_renstra['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+							$btn .= '</div>';
+
+							$tbody .= "<td class='text-center bg-info text-white'>" . $jumlah_draft . "</td>";
+							$tbody .= "<td class='text-center bg-secondary text-white'>" . $jumlah_menunggu . "</td>";
+							$tbody .= "<td class='text-center bg-success text-white'>" . $jumlah_disetujui . "</td>";
+							$tbody .= "<td class='text-center bg-danger text-white'>" . $jumlah_ditolak . "</td>";
+							$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
+							if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+								$tbody .= "<td class='text-center'>" . $jumlah_dokumen_terintegrasi . "</td>";
+							}
+							$tbody .= "<td>" . $btn . "</td>";
+
+							$tbody .= "</tr>";
+
+							$total_menunggu += $jumlah_menunggu;
+							$total_disetujui += $jumlah_disetujui;
+							$total_ditolak += $jumlah_ditolak;
+							$total_draft += $jumlah_draft;
+							$total_dokumen += $jumlah_dokumen;
+							$total_integrasi += $jumlah_dokumen_terintegrasi;
+						}
+						$ret['data'] = $tbody;
+						$ret['total_menunggu'] = $total_menunggu;
+						$ret['total_disetujui'] = $total_disetujui;
+						$ret['total_ditolak'] = $total_ditolak;
+						$ret['total_draft'] = $total_draft;
+						$ret['total_dokumen'] = $total_dokumen;
+						$ret['total_integrasi'] = $total_integrasi;
+					} else {
+						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 					}
-					$ret['data'] = $tbody;
-					$ret['total_menunggu'] = $total_menunggu;
-					$ret['total_disetujui'] = $total_disetujui;
-					$ret['total_ditolak'] = $total_ditolak;
-					$ret['total_draft'] = $total_draft;
-					$ret['total_dokumen'] = $total_dokumen;
-				} else {
-					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 			} else {
 				$ret = array(
@@ -17929,6 +18231,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$total_ditolak = 0;
 						$total_draft = 0;
 						$total_dokumen = 0;
+						$total_integrasi = 0;
+
+						/** get data esr */
+						$data_dokumen_terintegrasi = array();
+						$status_api_esr = get_option('_crb_api_esr_status');
+						if($status_api_esr){
+							$data_dokumen_terintegrasi = $this->get_total_integrasi_esr($nama_tabel[$tipe_dokumen], $tahun_anggaran);
+						}
+						
+						if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+							$ret['status_mapping'] = 1;
+						}else{
+							$ret['status_mapping'] = 0;
+							$ret['message_get_total_integrasi_dokumen_esr'] = $data_dokumen_terintegrasi['message'];
+						}
+
 						foreach ($unit as $kk => $vv) {
 							$detail_dokumen = $this->functions->generatePage(array(
 								'nama_page' => 'Halaman Detail Dokumen ' . $nama_page[$tipe_dokumen] . ' ' . $tahun_anggaran,
@@ -18036,6 +18354,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								}
 							}
 
+							$jumlah_dokumen_terintegrasi = 0;
+							if($data_dokumen_terintegrasi['status'] == 'success'){
+								$jumlah_dokumen_terintegrasi = !empty($data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']]) ? $data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']] : 0;
+							}
+
 							$btn = '<div class="btn-action-group">';
 							$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_dokumen['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 							$btn .= '</div>';
@@ -18047,6 +18370,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								$tbody .= "<td class='text-center bg-danger text-white'>" . $jumlah_ditolak . "</td>";
 							}
 							$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
+
+							if($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']){
+								$tbody .= "<td class='text-center'>" . $jumlah_dokumen_terintegrasi . "</td>";
+							}
+
 							$tbody .= "<td>" . $btn . "</td>";
 
 							$tbody .= "</tr>";
@@ -18056,8 +18384,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								$total_disetujui += $jumlah_disetujui;
 								$total_ditolak += $jumlah_ditolak;
 								$total_draft += $jumlah_draft;
-								$total_dokumen += $jumlah_dokumen;
 							}
+							$total_dokumen += $jumlah_dokumen;
+							$total_integrasi += $jumlah_dokumen_terintegrasi;
 						}
 						$ret['data'] = $tbody;
 						$ret['total_menunggu'] = $total_menunggu;
@@ -18065,6 +18394,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$ret['total_ditolak'] = $total_ditolak;
 						$ret['total_draft'] = $total_draft;
 						$ret['total_dokumen'] = $total_dokumen;
+						$ret['total_integrasi'] = $total_integrasi;
 					} else {
 						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 					}
@@ -27506,7 +27836,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
-	public function data_esr($id_skpd){
+	public function data_esr($id_skpd = 0){
 		global $wpdb;
 
 		if(get_option('_crb_api_esr_status')){			
@@ -27529,10 +27859,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 
 				if($option_expired_time < 1){
-					throw new Exception("Waktu expired data ESR lokal minimal 1 jam!", 1);
+					throw new Exception("Waktu expired data ESR lokal minimal 1 detik!", 1);
 				}
 
-				$esrLokal = $wpdb->get_row($wpdb->prepare("SELECT *, (TIMESTAMPDIFF(MINUTE, updated_at, now())) as diff FROM esakip_data_esr WHERE now() <= date_add(updated_at, INTERVAL ".$option_expired_time." hour) AND user_esr_id=%d AND url=%s", $user_esr_id, 'get_data'));
+				$expired_time =  date('Y-m-d H:i:s', strtotime(current_time('mysql') . ' -' . $option_expired_time . ' seconds'));
+				$esrLokal = $wpdb->get_row($wpdb->prepare(
+								"SELECT 
+									*, 
+									(TIMESTAMPDIFF(MINUTE, updated_at, now())) as diff 
+								FROM 
+									esakip_data_esr 
+								WHERE 
+									update_at>=%s
+								AND user_esr_id=%d 
+								AND url=%s", 
+								$expired_time, $user_esr_id, 'get_data'));
 
 				if(!empty($esrLokal)){
 					return [
@@ -27919,6 +28260,258 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				]);
 			exit;
 		}
+	}
+
+	public function get_total_integrasi_esr($nama_tabel_dokumen, $tahun_anggaran = 0){
+		global $wpdb;
+
+		if(get_option('_crb_api_esr_status')){			
+			try {
+				if(empty($nama_tabel_dokumen)){
+					throw new Exception("Nama tabel dokumen kosong!", 1);
+				}
+
+				if(empty($tahun_anggaran)){
+					throw new Exception("Tahun anggaran kosong!", 1);
+				}
+
+				$option_expired_time = floatval(get_option('_crb_expired_time_esr_lokal'));
+
+				if(empty($option_expired_time)){
+					throw new Exception("Waktu expired akses data ESR Lokal belum disetting!", 1);
+				}
+
+				if($option_expired_time < 1){
+					throw new Exception("Waktu expired data ESR lokal minimal 1 Detik!", 1);
+				}
+
+				$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
+					SELECT
+						a.*
+					FROM
+						esakip_data_mapping_jenis_dokumen_esr a
+					JOIN esakip_menu_dokumen b
+						ON b.id=a.esakip_menu_dokumen_id AND
+							a.tahun_anggaran=b.tahun_anggaran AND b.active=1
+					JOIN esakip_data_jenis_dokumen_esr c
+						ON c.jenis_dokumen_esr_id=a.jenis_dokumen_esr_id AND
+							c.tahun_anggaran=a.tahun_anggaran AND c.active=1
+					WHERE
+						a.tahun_anggaran=%d AND
+						b.nama_tabel=%s;
+				", $tahun_anggaran, $nama_tabel_dokumen), ARRAY_A);
+
+				$data_esr_server = array();
+				if(!empty($mapping_jenis_dokumen_esr)){
+					$array_data_esr = [];
+					$response = wp_remote_get(get_option('_crb_url_api_esr').'get_data', [
+								'headers' => array(
+									'Accept' => 'application/json',
+									'Authorization' => 'Basic ' . base64_encode(get_option('_crb_username_api_esr').':'.get_option('_crb_password_api_esr')),
+								),
+							]);
+
+					$data_esr_server = json_decode(wp_remote_retrieve_body($response));
+
+					if(empty($data_esr_server)){
+						throw new Exception("Data tidak ditemukan di API ESR!!", 1);
+					}
+
+					if(isset($data_esr_server->error)){
+						throw new Exception("Api ESR : ".$data_esr_server->error, 1);
+					}
+				}else{
+					return [
+						'status' => 'error',
+						'message' => 'Jenis Dokumen ESR belum di-mapping, pastikan sebelumnya sudah menarik data jenis dokumen ESR!',
+						'data_total_integrasi_esr' => [],
+						'mapping_jenis_dokumen' => false
+					];
+				}
+
+				if(!empty($data_esr_server)){
+					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
+					$unit = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT 
+							nama_skpd, 
+							id_skpd, 
+							kode_skpd, 
+							nipkepala 
+						FROM esakip_data_unit 
+						WHERE active=1 
+						  AND tahun_anggaran=%d
+						  AND is_skpd=1 
+						ORDER BY kode_skpd ASC
+						", $tahun_anggaran_sakip),
+						ARRAY_A
+					);
+
+					$data_dokumen_terintegrasi_per_skpd = array();
+					foreach ($unit as $key => $vv) {
+						$data_esr_lokal = array();
+						$user_esr_id = get_option('_user_esr_'.$vv['id_skpd']);
+						$array_data_integrasi = [];
+						if(!empty($user_esr_id)){
+							foreach ($data_esr_server->data as $key => $value) {
+								if($user_esr_id==$value->user_id){
+									$array_data_integrasi[]=$value;
+								}
+							}
+	
+							$esrLokalRaw = $wpdb->get_row($wpdb->prepare("
+												SELECT 
+													* 
+												FROM 
+													esakip_data_esr 
+												WHERE 
+													user_esr_id=%d 
+												AND url=%s", 
+												$user_esr_id, 'get_data'));
+	
+							if(empty($esrLokalRaw)){
+								$wpdb->insert('esakip_data_esr', [
+											'url' => 'get_data',
+											'method' => 'GET',
+											'response_json' => json_encode($array_data_integrasi),
+											'updated_at' => current_time('mysql'),
+											'user_esr_id' => $user_esr_id
+									]);
+							}else{
+								$expired_time =  date('Y-m-d H:i:s', strtotime(current_time('mysql') . ' -' . $option_expired_time . ' seconds'));
+								$esrLokal = $wpdb->get_row($wpdb->prepare("
+												SELECT 
+													*
+												FROM 
+													esakip_data_esr 
+												WHERE 
+													updated_at>=%s
+													AND user_esr_id=%d 
+													AND url=%s",
+													$expired_time, $user_esr_id, 'get_data'));
+
+								if(empty($esrLokal)){
+									$wpdb->update('esakip_data_esr', [
+											'response_json' => json_encode($array_data_integrasi),
+											'updated_at' => current_time('mysql')
+										], [
+											'url' => 'get_data',
+											'user_esr_id' => $user_esr_id 
+									]);
+								}
+							}
+	
+							/** ambil data esr lokal terbaru setelah insert atau update */
+							$data_esr_lokal = $wpdb->get_row($wpdb->prepare("
+												SELECT 
+													* 
+												FROM 
+													esakip_data_esr 
+												WHERE 
+													user_esr_id=%d 
+												AND url=%s", 
+												$user_esr_id, 'get_data'));
+							$data_esr_lokal = $data_esr_lokal->response_json;
+	
+							$array_data_esr = [];
+	
+							if(!empty($data_esr_lokal)){
+								foreach ($data_esr_lokal as $key => $v_esr_lokal) {
+									if($v_esr_lokal->dokumen_id == $mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']){
+										$esr_lokal = $wpdb->get_row($wpdb->prepare("
+															SELECT 
+																id,
+																upload_id,
+															FROM
+																$nama_tabel_dokumen
+															WHERE
+																tahun_anggaran=%d
+																AND upload_id=%d
+																AND active=1",
+															$tahun_anggaran,$v_esr_lokal->upload_id), ARRAY_A);
+	
+										if(!empty($esr_lokal)){
+											$wpdb->update($nama_tabel_dokumen, [
+												'path_esr' => $v_esr_lokal->path
+											], [
+												'id' => $esr_lokal['id']
+											]);
+										}
+	
+										$path = explode("/", $v_esr_lokal->path);
+										$nama_file = end($path);
+										$array_data_esr[]=[
+											'upload_id' => $v_esr_lokal->upload_id,
+											'nama_file' => $nama_file,
+											'keterangan' => $v_esr_lokal->keterangan,
+											'path' => $v_esr_lokal->path
+										];
+									}
+								}
+	
+							}
+	
+							$data_dokumen_terintegrasi = 0;
+							$get_data_dokumen = $wpdb->get_results(
+								$wpdb->prepare(
+									"
+									SELECT 
+										upload_id,
+										dokumen,
+										keterangan
+									FROM 
+										$nama_tabel_dokumen 
+									WHERE id_skpd=%d
+										AND tahun_anggaran=%d
+										AND active=1
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran
+								), ARRAY_A
+							);
+	
+							if(!empty($get_data_dokumen)){
+								foreach ($get_data_dokumen as $key => $v_dok) {
+									if(!empty($v_dok['upload_id'])){
+										if(in_array($v_dok['upload_id'], array_column($array_data_esr, 'upload_id'))){
+											$data_dokumen_terintegrasi++;
+										}
+									}else if(in_array($v_dok['dokumen'], array_column($array_data_esr, 'nama_file'))){
+										$data_dokumen_terintegrasi++;
+									}else if(in_array($v_dok['keterangan'], array_column($array_data_esr, 'keterangan'))){
+										$data_dokumen_terintegrasi++;
+									}
+								}
+							}
+							
+							$data_dokumen_terintegrasi_per_skpd[$vv['id_skpd']] = $data_dokumen_terintegrasi;
+						}
+					}
+
+					return [
+						'status' => 'success',
+						'message' => 'Sukses ambil data dari ESR Lokal!',
+						'data_total_integrasi_esr' => $data_dokumen_terintegrasi_per_skpd,
+						'mapping_jenis_dokumen' => true
+					];
+				}
+			} catch (Exception $e) {
+				return [
+					'status' => 'error',
+					'message' => $e->getMessage(),
+					'data_total_integrasi_esr' => [],
+					'mapping_jenis_dokumen' => false
+				];
+			}
+		}else{
+			return [
+				'status' => 'success',
+				'message' => 'Pengaturan Status API ESR ditutup!',
+				'data_total_integrasi_esr' => [],
+				'mapping_jenis_dokumen' => false
+			];
+		} 
 	}
 
 	public function mapping_unit_sipd_simpeg(){

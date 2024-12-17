@@ -95,6 +95,7 @@ foreach ($idtahun as $val) {
 							<th class="text-center" rowspan="2">Nama Perangkat Daerah</th>
 							<th class="text-center" colspan="4">Status Dokumen</th>
 							<th class="text-center" rowspan="2">Jumlah Dokumen</th>
+							<th class="text-center kolom-integrasi-esr" rowspan="2" style="width: 10rem;">Jumlah Dokumen Integrasi ESR</th>
 							<th class="text-center" rowspan="2">Aksi</th>
 						</tr>
 						<tr>
@@ -114,6 +115,7 @@ foreach ($idtahun as $val) {
 							<th class="text-center" id="total_disetujui">0</th>
 							<th class="text-center" id="total_ditolak">0</th>
 							<th class="text-center" id="total_dokumen">0</th>
+							<th class="text-center kolom-integrasi-esr" id="total_dokumen_integrasi">0</th>
 							<th class="text-center"></th>
 						</tr>
 					</tfoot>
@@ -157,7 +159,6 @@ foreach ($idtahun as $val) {
 	});
 
 	function getTableTahun() {
-		jQuery('#wrap-loading').show();
 		jQuery.ajax({
 			url: esakip.url,
 			type: 'POST',
@@ -168,7 +169,6 @@ foreach ($idtahun as $val) {
 			},
 			dataType: 'json',
 			success: function(response) {
-				jQuery('#wrap-loading').hide();
 				console.log(response);
 				if (response.status === 'success') {
 					jQuery('#tahunContainer').html(response.data);
@@ -177,7 +177,6 @@ foreach ($idtahun as $val) {
 				}
 			},
 			error: function(xhr, status, error) {
-				jQuery('#wrap-loading').hide();
 				console.error(xhr.responseText);
 				alert('Terjadi kesalahan saat memuat tabel!');
 			}
@@ -206,6 +205,13 @@ foreach ($idtahun as $val) {
 					jQuery('#total_disetujui').html(response.total_disetujui);
 					jQuery('#total_ditolak').html(response.total_ditolak);
 					jQuery('#total_dokumen').html(response.total_dokumen);
+					jQuery('#total_dokumen_integrasi').html(response.total_integrasi);
+
+					if(response.status_mapping == 1){
+						jQuery('.kolom-integrasi-esr').show();
+					}else{
+						jQuery('.kolom-integrasi-esr').hide();
+					}
 				} else {
 					alert(response.message);
 				}
