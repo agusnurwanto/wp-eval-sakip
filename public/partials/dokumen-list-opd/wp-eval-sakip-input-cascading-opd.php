@@ -78,6 +78,8 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
 							<th class="text-center">Jumlah Tujuan</th>
 							<th class="text-center">Jumlah Sasaran</th>
 							<th class="text-center">Jumlah Program</th>
+							<th class="text-center">Jumlah Kegiatan</th>
+							<th class="text-center">Jumlah Sub Kegiatan</th>
 						</tr>
 					</thead>
 					<tbody>
