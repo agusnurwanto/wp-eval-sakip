@@ -1077,7 +1077,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							<td class=""></td>
 							<td class=""></td>
 							<td class=""></td>
-							<td class="text-right">'.$rencana_pagu_html.'</td>
+							<td class="text-right">'.number_format((float)$rencana_pagu_html, 0, ",", ".").'</td>
 							<td class=""></td>
 							<td class=""></td>
 							<td class=""></td>
@@ -1240,7 +1240,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							        <td class=""></td>
 							        <td class=""></td>
 							        <td class=""></td>
-									<td class="text-right">'.$rencana_pagu_html.'</td>
+									<td class="text-right">'.number_format((float)$rencana_pagu_html, 0, ",", ".").'</td>
 							        <td class=""></td>
 							        <td class=""></td>
 							        <td class=""></td>
@@ -1316,7 +1316,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									<td class=""></td>
 									<td class=""></td>
 									<td class=""></td>	
-									<td class="text-right">'.$rencana_pagu_html.'</td>
+									<td class="text-right">'.number_format((float)$rencana_pagu_html, 0, ",", ".").'</td>
 									<td class=""></td>
 									<td class=""></td>
 									<td class=""></td>
@@ -1388,7 +1388,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										<td class=""></td>
 										<td class=""></td>
 										<td class=""></td>
-										<td class="text-right">'.$rencana_pagu_html.'</td>
+										<td class="text-right">'.number_format((float)$rencana_pagu_html, 0, ",", ".").'</td>
 										<td class=""></td>
 										<td class="text-right" style="visibility: hidden;">'.$realisasi_pagu_html.'</td>
 										<td class=""></td>

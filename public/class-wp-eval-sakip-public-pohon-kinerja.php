@@ -4567,7 +4567,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						$tbody .= "<td class='text-center' style='text-transform: uppercase;'>". $jumlah_rencana_aksi ."</td>";
 						$tbody .= "<td class='text-center' style='text-transform: uppercase;'>". $jumlah_uraian_kegiatan_rencana_aksi ."</td>";
 						$tbody .= "<td class='text-center' style='text-transform: uppercase;'>". $jumlah_uraian_teknis_kegiatan ."</td>";
-						$tbody .= "<td class='text-right' style='text-transform: uppercase;'>".$get_pagu."</td>";
+						$tbody .= "<td class='text-right' style='text-transform: uppercase;'>".number_format((float)$get_pagu, 0, ",", ".")."</td>";
 						$tbody .= "<td class='text-right' style='text-transform: uppercase;'>0</td>";
 						$tbody .= "<td class='text-right' style='text-transform: uppercase;'>0</td>";
 						$tbody .= "</tr>";
@@ -4583,7 +4583,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					$ret['total_level_2'] = $total_level_2;
 					$ret['total_level_3'] = $total_level_3;
 					$ret['total_level_4'] = $total_level_4;
-					$ret['total_pagu'] = $total_pagu;
+					$ret['total_pagu'] = number_format((float)$total_pagu, 0, ",", ".");
 				} else {
 					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
@@ -5124,6 +5124,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						&& $jenis != 'program_renstra'
 						&& $jenis != 'program'
 						&& $jenis != 'tujuan'
+						&& $jenis != 'kegiatan_renstra'
+						&& $jenis != 'sub_giat_renstra'
 					){
 						if(!empty($_POST['parent_cascading'])){
 							$parent_cascading = $_POST['parent_cascading'];
@@ -5157,6 +5159,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						$jenis == 'sasaran'
 						|| $jenis == 'tujuan'
 						|| $jenis == 'program_renstra'
+						|| $jenis == 'kegiatan_renstra'
+						|| $jenis == 'sub_giat_renstra'
 					){
 						$api_params['id_jadwal'] = $id_jadwal_wpsipd;
 					}
@@ -5349,6 +5353,22 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									AND id_skpd=%d
 									AND id_program is NULL
 							", $vv['id_skpd']));
+							$jumlah_kegiatan = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									COUNT(id)
+								FROM esakip_cascading_opd_kegiatan
+								WHERE active=1
+									AND id_skpd=%d
+									AND id_giat is NULL
+							", $vv['id_skpd']));
+							$jumlah_sub_giat = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									COUNT(id)
+								FROM esakip_cascading_opd_sub_giat
+								WHERE active=1
+									AND id_skpd=%d
+									AND id_sub_giat is NULL
+							", $vv['id_skpd']));
 							$tbody .= "
 							<tr>
 								<td class='text-center'><input class='nama-opd' type='checkbox' value='".$vv['id_skpd']."'></td>
@@ -5356,6 +5376,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								<td class='text-center'>$jumlah_tujuan</td>
 								<td class='text-center'>$jumlah_sasaran</td>
 								<td class='text-center'>$jumlah_program</td>
+								<td class='text-center'>$jumlah_kegiatan</td>
+								<td class='text-center'>$jumlah_sub_giat</td>
 							</tr>";
 						}
 						$ret['data'] = $tbody;
@@ -5606,9 +5628,11 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					$data_all = array(
 						'tujuan' => array(),
 						'sasaran' => array(),
-						'program' => array()
+						'program' => array(),
+						'kegiatan_renstra' => array(),
+						'sub_kegiatan_renstra' => array(),
 					);
-
+					// TUJUAN
 					$_POST['jenis'] = 'tujuan';
 					$ret['tujuan'] = $this->get_tujuan_sasaran_cascading(true);
 
@@ -5670,7 +5694,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							}
 						}
 					}
-
+					// SASARAN
 					$_POST['jenis'] = 'sasaran';
 					$ret['sasaran'] = $this->get_tujuan_sasaran_cascading(true);
 
@@ -5737,7 +5761,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							}
 						}
 					}
-
+					// PROGRAM
 					$_POST['jenis'] = 'program_renstra';
 					$ret['program'] = $this->get_tujuan_sasaran_cascading(true);
 
@@ -5801,6 +5825,142 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 							if(empty($p->id_unik_indikator)){
 								$data_all['program'][$p->id_unik]['id'] = $wpdb->insert_id;
+							}
+						}
+					}
+
+					//KEGIATAN
+					$_POST['jenis'] = 'kegiatan_renstra';
+					$ret['kegiatan'] = $this->get_tujuan_sasaran_cascading(true);
+
+					$wpdb->update('esakip_cascading_opd_kegiatan', array('active' => 0), array(
+						'active' => 1,
+						'id_skpd' => $_POST['id_skpd'],
+						'id_jadwal' => $id_jadwal
+					));
+					$ret['kegiatan_error'] = array();
+					foreach($ret['kegiatan']['data'] as $k){
+						if(empty($data_all['program'][$k->kode_program])){
+							$ret['kegiatan_error'][] = $k;
+							continue;
+						}
+						$data_db = array(
+							'id_jadwal'	=> $k->id_jadwal,
+							'id_skpd'	=> $k->id_unit,
+							'id_program'	=> $data_all['program'][$k->kode_program]['id'],
+							'id_unik'	=> $k->id_unik, 
+							'no_urut'	=> $k->kode_giat, 
+							'kegiatan'	=> str_replace($k->kode_giat, '', $k->nama_giat), 
+							'indikator'	=> $k->indikator, 
+							'active'	=> 1,
+							'created_at'	=> current_time('mysql')
+						);
+						if(empty($k->id_unik_indikator)){
+							$cek_id = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									id
+								FROM esakip_cascading_opd_kegiatan
+								WHERE id_skpd=%d
+									AND id_jadwal=%d
+									AND id_unik=%s
+									AND id_unik_indikator is NULL
+							", $k->id_unit, $k->id_jadwal, $k->id_unik));
+							$data_all['kegiatan'][$k->id_unik] = array(
+								'id' => $cek_id
+							);
+						}else{
+							if(empty($data_all['kegiatan'][$k->id_unik]['id'])){
+								$ret['kegiatan_error'][] = $k;
+								continue;
+							}
+							$data_db['id_unik_indikator'] = $k->id_unik_indikator;
+							$data_db['id_giat'] = $data_all['kegiatan'][$k->id_unik]['id'];
+
+							$cek_id = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									id
+								FROM esakip_cascading_opd_kegiatan
+								WHERE id_skpd=%d
+									AND id_jadwal=%d
+									AND id_unik=%s
+									AND id_unik_indikator=%s
+							", $k->id_unit, $k->id_jadwal, $k->id_unik, $k->id_unik_indikator));
+						}
+						if(!empty($cek_id)){
+							$wpdb->update('esakip_cascading_opd_kegiatan', $data_db, array('id' => $cek_id));
+						}else{
+							$wpdb->insert('esakip_cascading_opd_kegiatan', $data_db);
+
+							if(empty($k->id_unik_indikator)){
+								$data_all['kegiatan'][$k->id_unik]['id'] = $wpdb->insert_id;
+							}
+						}
+					}
+
+					//SUB KEGIATAN
+					$_POST['jenis'] = 'sub_giat_renstra';
+					$ret['sub_giat'] = $this->get_tujuan_sasaran_cascading(true);
+
+					$wpdb->update('esakip_cascading_opd_sub_giat', array('active' => 0), array(
+						'active' => 1,
+						'id_skpd' => $_POST['id_skpd'],
+						'id_jadwal' => $id_jadwal
+					));
+					$ret['sub_giat_error'] = array();
+					foreach($ret['sub_giat']['data'] as $g){
+						if(empty($data_all['kegiatan'][$g->kode_kegiatan])){
+							$ret['sub_giat_error'][] = $g;
+							continue;
+						}
+						$data_db = array(
+							'id_jadwal'	=> $g->id_jadwal,
+							'id_skpd'	=> $g->id_unit,
+							'id_giat'	=> $data_all['kegiatan'][$g->kode_kegiatan]['id'],
+							'id_unik'	=> $g->id_unik, 
+							'no_urut'	=> $g->kode_sub_giat, 
+							'sub_giat'	=> str_replace($g->kode_sub_giat, '', $g->nama_sub_giat), 
+							'indikator'	=> $g->indikator, 
+							'active'	=> 1,
+							'created_at'	=> current_time('mysql')
+						);
+						if(empty($g->id_unik_indikator)){
+							$cek_id = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									id
+								FROM esakip_cascading_opd_sub_giat
+								WHERE id_skpd=%d
+									AND id_jadwal=%d
+									AND id_unik=%s
+									AND id_unik_indikator is NULL
+							", $g->id_unit, $g->id_jadwal, $g->id_unik));
+							$data_all['sub_giat'][$g->id_unik] = array(
+								'id' => $cek_id
+							);
+						}else{
+							if(empty($data_all['sub_giat'][$g->id_unik]['id'])){
+								$ret['sub_giat_error'][] = $g;
+								continue;
+							}
+							$data_db['id_unik_indikator'] = $g->id_unik_indikator;
+							$data_db['id_sub_giat'] = $data_all['sub_giat'][$g->id_unik]['id'];
+
+							$cek_id = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									id
+								FROM esakip_cascading_opd_sub_giat
+								WHERE id_skpd=%d
+									AND id_jadwal=%d
+									AND id_unik=%s
+									AND id_unik_indikator=%s
+							", $g->id_unit, $g->id_jadwal, $g->id_unik, $g->id_unik_indikator));
+						}
+						if(!empty($cek_id)){
+							$wpdb->update('esakip_cascading_opd_sub_giat', $data_db, array('id' => $cek_id));
+						}else{
+							$wpdb->insert('esakip_cascading_opd_sub_giat', $data_db);
+
+							if(empty($g->id_unik_indikator)){
+								$data_all['sub_giat'][$g->id_unik]['id'] = $wpdb->insert_id;
 							}
 						}
 					}
