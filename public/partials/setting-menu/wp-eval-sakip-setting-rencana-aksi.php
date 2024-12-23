@@ -156,7 +156,7 @@ $body = '';
 	        return alert('Ada data yang kosong!');
 	    }
 
-	    if (confirm("Apakah kamu yakin untuk mengubah data pokin di Rencana Hasil Kerja?\n\nPokin di Rencana Hasil Kerja yang sudah ada juga harus diperbarui!")) {
+	    if (confirm("Apakah kamu yakin?")) {
 	        jQuery('#wrap-loading').show();
 	        jQuery.ajax({
 	            method: 'POST',

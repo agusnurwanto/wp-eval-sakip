@@ -93,17 +93,70 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
         padding: 2px;
     }
 
-    #tabel-cascading button.btn.btn-lg.btn-info,
-    #tabel-cascading button.btn.btn-lg.btn-warning,
-    #tabel-cascading button.btn.btn-lg.btn-success,
-    #tabel-cascading button.btn.btn-lg.btn-danger {
+    #tabel-cascading div.btn.btn-lg.btn-info,
+    #tabel-cascading div.btn.btn-lg.btn-warning,
+    #tabel-cascading div.btn.btn-lg.btn-success,
+    #tabel-cascading div.btn.btn-lg.btn-danger {
         width: 100%;
         min-height: 450px;
         font-weight: bold;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center; 
+        text-align: center; 
     }
 
-    #tabel-cascading button hr{
+    #tabel-cascading div hr {
         background: #fff;
+        width: 100%; 
+        margin: 10px 0; 
+    }
+
+    #tabel-cascading div span.indikator {
+        font-size: 14px;
+        margin-top: 10px; 
+        display: block; 
+    }
+
+    #tabel-cascading-kegiatan,
+    #tabel-cascading-kegiatan td,
+    #tabel-cascading-kegiatan table {
+        padding: 0;
+        border: 4px solid white;
+        margin: 0;
+        vertical-align: top;
+    }
+
+    #tabel-cascading-kegiatan>tbody>tr>td {
+        padding: 2px;
+    }
+
+    #tabel-cascading-kegiatan div.btn.btn-lg.btn-info,
+    #tabel-cascading-kegiatan div.btn.btn-lg.btn-warning,
+    #tabel-cascading-kegiatan div.btn.btn-lg.btn-success,
+    #tabel-cascading-kegiatan div.btn.btn-lg.btn-secondary,
+    #tabel-cascading-kegiatan div.btn.btn-lg.btn-danger {
+        width: 100%;
+        min-height: 450px;
+        font-weight: bold;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center; 
+        text-align: center; 
+    }
+
+    #tabel-cascading-kegiatan div hr {
+        background: #fff;
+        width: 100%; 
+        margin: 10px 0; 
+    }
+
+    #tabel-cascading-kegiatan div span.indikator {
+        font-size: 14px;
+        margin-top: 10px; 
+        display: block; 
     }
 
     .indikator {
@@ -123,34 +176,87 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
             display: none;
         }
     }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    td {
+        border: 1px solid #ccc; 
+        padding: 0; 
+        height: 100px; 
+    }
+    .button-container {
+        display: flex;
+        align-items: stretch;
+        height: 100%;
+    }
+    .get_button {
+        flex: 1;
+        padding: 10px;
+    }
+
+    .view-kegiatan-button {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+    }
+
+    .view-kegiatan-button i {
+        font-size: 2rem;
+        color: #fff; 
+    }
+
+    .view-kegiatan-button:hover i {
+        color: #f0f0f0; 
+    }
+
+
 </style>
 
 <!-- Table -->
 <div class="container-md" id="container-table-cascading">
     <div class="cetak">
-        <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center">CASCADING <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $nama_jadwal; ?></h1>
+        <div style="padding: 10px; margin: 0 0 3rem 0;">
+            <h1 class="text-center">CASCADING <br><?php echo $skpd['nama_skpd']; ?><br><?php echo $nama_jadwal; ?></h1>
             <div id="action-sakip" class="action-section text-center">
                 <a style="margin-right: 10px;" id="singkron-cascading-renstra" href="#" class="btn btn-primary"><i class="dashicons dashicons-download"></i> Ambil dari Data RENSTRA</a>
                 <a style="margin-right: 10px;" onclick="window.print();" href="#" class="btn btn-success"><i class="dashicons dashicons-printer"></i> CETAK / PRINT</a>
             </div>
         </div>
-        <table id="tabel-cascading">
-            <tbody>
-                <tr>
-                    <td class="text-center" style="width: 200px;"><button class="btn btn-lg btn-info">TUJUAN</button></td>
-                    <td class="text-center" colspan="0"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;"></button></td>
-                </tr>
-                <tr>
-                    <td class="text-center"><button class="btn btn-lg btn-info">SASARAN</button></td>
-                    <td class="text-center" colspan="0"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;"></button></td>
-                </tr>
-                <tr>
-                    <td class="text-center"><button class="btn btn-lg btn-info">PROGRAM</button></td>
-                    <td class="text-center" colspan="0"><button class="btn btn-lg btn-warning"></button></td>
-                </tr>
-            </tbody>
-        </table>
+        <div style="overflow-x: auto; max-width: 100%;">
+            <table id="tabel-cascading" style="min-width: 600px;">
+                <tbody>
+                    <tr>
+                        <td class="text-center" style="width: 200px;"><div class="btn btn-lg btn-info">TUJUAN</div></td>
+                        <td class="text-center" colspan="0"><div class="btn btn-lg btn-warning" style="text-transform:uppercase;"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center"><div class="btn btn-lg btn-info">SASARAN</div></td>
+                        <td class="text-center" colspan="0"><div class="btn btn-lg btn-warning" style="text-transform:uppercase;"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center"><div class="btn btn-lg btn-info">PROGRAM</div></td>
+                        <td class="text-center" colspan="0"><div class="btn btn-lg btn-warning"></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="overflow-x: auto; max-width: 100%;">
+            <table id="tabel-cascading-kegiatan" style="min-width: 600px;">
+                <h2 class="text-center get-nama-program">Cascading Kegiatan dan Sub Kegiatan<br>Program: Program belum dipilih </h2>
+                <tbody>
+                    <tr>
+                        <td class="text-center" style="width: 200px;"><div class="btn btn-lg btn-info">KEGIATAN</div></td>
+                        <td class="text-center" colspan="0"><div class="btn btn-lg btn-warning" style="text-transform:uppercase;"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center"><div class="btn btn-lg btn-info">SUB KEGIATAN</div></td>
+                        <td class="text-center" colspan="0"><div class="btn btn-lg btn-warning" style="text-transform:uppercase;"></button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -246,5 +352,10 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
                 alert('Terjadi kesalahan saat memuat data!');
             }
         });
+    }
+
+    function view_kegiatan(id) {
+        let value_nama_program = jQuery('#program-ke-'+id).attr("data-nama-program");
+        jQuery(".get-nama-program").html('Cascading Kegiatan dan Sub Kegiatan<br>Program:'+value_nama_program);
     }
 </script>
