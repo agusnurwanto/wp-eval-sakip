@@ -5162,17 +5162,15 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					if(
 						$jenis != 'sasaran' 
 						&& $jenis != 'program_renstra'
-						&& $jenis != 'program'
 						&& $jenis != 'tujuan'
 						&& $jenis != 'kegiatan_renstra'
 						&& $jenis != 'sub_giat_renstra'
-					){
+					){	
 						if(!empty($_POST['parent_cascading'])){
 							$parent_cascading = $_POST['parent_cascading'];
 						}else{
 							throw new Exception("Parent Cascading Data Kosong!", 1);
 						}
-						
 						if(!empty($_POST['tahun_anggaran'])){
 							$tahun_anggaran = $_POST['tahun_anggaran'];
 						}else{
