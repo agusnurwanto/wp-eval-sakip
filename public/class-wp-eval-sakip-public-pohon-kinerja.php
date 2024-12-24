@@ -5622,64 +5622,64 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 	                    $sasaran_html = '';
 	                    $program_html = '';
 	                    foreach ($body_all as $t) {
-	                        $indikator = implode(', ', $t['indikator']);
+	                        $indikator = implode('<br>IND: ', $t['indikator']);
 	                        $tujuan_html .= '<td class="text-center" colspan="' . $t['colspan_program'] . '">
-	                         	<div class="button-container">
-		                            <div class="btn btn-lg btn-warning get_button" style="text-transform:uppercase;">' . $t['tujuan'] . '
-		                                <hr/><span class="indikator">IND: ' . $indikator . '</span>
-		                            </div>
-		                        </div>
+	                            <div class="button-container">
+	                                <div class="btn btn-lg btn-warning get_button" style="text-transform:uppercase;">' . $t['tujuan'] . '
+	                                    <hr/><span class="indikator">IND: ' . $indikator . '</span>
+	                                </div>
+	                            </div>
 	                        </td>';
 	                        foreach ($t['data'] as $s) {
-	                            $indikator = implode(', ', $s['indikator']);
+	                            $indikator = implode('<br>IND: ', $s['indikator']);
 	                            $sasaran_html .= '<td class="text-center" colspan="' . $s['colspan_program'] . '">
-	                         		<div class="button-container">
-		                                <div class="btn btn-lg btn-success get_button" style="text-transform:uppercase;">' . $s['sasaran'] . '
-		                                    <hr/><span class="indikator">IND: ' . $indikator . '</span>
-		                                </div>
-		                            </div>
+	                                <div class="button-container">
+	                                    <div class="btn btn-lg btn-success get_button" style="text-transform:uppercase;">' . $s['sasaran'] . '
+	                                        <hr/><span class="indikator">IND: ' . $indikator . '</span>
+	                                    </div>
+	                                </div>
 	                            </td>';
 	                            foreach ($s['data'] as $p) {
-								    $indikator = implode(', ', $p['indikator']);
-								    $program_html .= '<td class="text-center">
-								        <div class="button-container">
-								            <div class="btn btn-lg btn-danger get_button" id="program-ke-'.$p["id"].'" data-nama-program="' . $p['program'] . '" style="text-transform:uppercase; position: relative;">
-								                ' . $p['program'] . '
-								                <hr />
-								                <span class="indikator">IND: ' . $indikator . '</span>
-								                <br />
-								                <button class="btn btn-danger view-kegiatan-button" onclick="view_kegiatan('.$p["id"].');" style="margin-top: 10px; display: inline-block;">
-								                    <i style="font-size: 2rem;" class="dashicons dashicons-visibility"></i>
-								                </button>
-								            </div>
-								        </div>
-								    </td>';
-								}
+	                                $indikator = implode('<br>IND: ', $p['indikator']);
+	                                $program_html .= '<td class="text-center">
+	                                    <div class="button-container">
+	                                        <div class="btn btn-lg btn-danger get_button" id="program-ke-' . $p["id"] . '" data-nama-program="' . $p['program'] . '" style="text-transform:uppercase; position: relative;">
+	                                            ' . $p['program'] . '
+	                                            <hr />
+	                                            <span class="indikator">IND: ' . $indikator . '</span>
+	                                            <br />
+	                                            <button class="btn btn-danger view-kegiatan-button" onclick="view_kegiatan(this, ' . $p['id'] . '' . $p['nama_program'] . ');" style="margin-top: 10px; display: inline-block;">
+												    <i style="font-size: 2rem;" class="dashicons dashicons-hidden visibility-icon"></i>
+												</button>
+	                                        </div>	
+	                                    </div>
+	                                </td>';
+	                            }
 	                        }
 	                    }
 
 	                    $tbody = '
 	                        <tr>
 	                            <td class="text-center" style="width: 150px;">
-		                            <div class="button-container">
-			                            <div class="btn btn-lg btn-info">TUJUAN</div>
-		                            </div>
-		                        </td>
-		                        ' . $tujuan_html . '
+	                                <div class="button-container">
+	                                    <div class="btn btn-lg btn-info">TUJUAN</div>
+	                                </div>
+	                            </td>
+	                            ' . $tujuan_html . '
 	                        </tr>
 	                        <tr>
 	                            <td class="text-center">
-                            		<div class="button-container">
-	                            		<div class="btn btn-lg btn-info">SASARAN</div>
-                            		</div>
+	                                <div class="button-container">
+	                                    <div class="btn btn-lg btn-info">SASARAN</div>
+	                                </div>
 	                            </td>
 	                            ' . $sasaran_html . '
 	                        </tr>
 	                        <tr>
 	                            <td class="text-center">
-		                            <div class="button-container">
-	                            		<div class="btn btn-lg btn-info">PROGRAM</div>
-                            		</div>
+	                                <div class="button-container">
+	                                    <div class="btn btn-lg btn-info">PROGRAM</div>
+	                                </div>
 	                            </td>
 	                            ' . $program_html . '
 	                        </tr>';
@@ -5702,6 +5702,128 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 	            'message' => 'Format tidak sesuai!'
 	        );
 	    }
+	    die(json_encode($ret));
+	}
+
+	public function get_kegiatan_by_program() 
+	{
+	    global $wpdb;
+	    $ret = array(
+	        'status' => 'success',
+	        'message' => 'Berhasil mendapatkan data kegiatan!',
+	        'data' => ''
+	    );
+
+	    if (!empty($_POST)) {
+	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+	            if (empty($_POST['id'])) {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'ID tidak boleh kosong!';
+	            }
+
+	            if ($ret['status'] === 'success') {
+	                $id = intval($_POST['id']);
+
+	                $kegiatan_data = $wpdb->get_results(
+	                    $wpdb->prepare("SELECT * FROM esakip_cascading_opd_kegiatan WHERE active = 1 AND id_program = %d ORDER BY no_urut ASC", $id),
+	                    ARRAY_A
+	                );
+
+	                if (!empty($kegiatan_data)) {
+	                    $body_all = array();
+	                    foreach ($kegiatan_data as $k) {
+	                        $indikator_kegiatan = $wpdb->get_results(
+	                            $wpdb->prepare("SELECT indikator FROM esakip_cascading_opd_kegiatan WHERE active = 1 AND id_giat = %d ORDER BY no_urut ASC", $k['id']),
+	                            ARRAY_A
+	                        );
+
+	                        $indikator_texts = array_column($indikator_kegiatan, 'indikator');
+
+	                        if (!isset($body_all[$k['kegiatan']])) {
+	                            $body_all[$k['kegiatan']] = array(
+	                                'colspan_sub_giat' => 0,
+	                                'kegiatan' => $k['kegiatan'],
+	                                'indikator' => array(),
+	                                'data' => array()
+	                            );
+	                        }
+
+	                        $body_all[$k['kegiatan']]['indikator'] = array_unique(array_merge($body_all[$k['kegiatan']]['indikator'], $indikator_texts));
+
+	                        $sub_giat = $wpdb->get_results(
+	                            $wpdb->prepare("SELECT * FROM esakip_cascading_opd_sub_giat WHERE active = 1 AND id_giat = %d AND id_sub_giat IS NULL ORDER BY no_urut ASC", $k['id']),
+	                            ARRAY_A
+	                        );
+
+	                        foreach ($sub_giat as $g) {
+	                            $body_all[$k['kegiatan']]['colspan_sub_giat']++;
+	                            $indikator_sub_giat = $wpdb->get_results(
+	                                $wpdb->prepare("SELECT indikator FROM esakip_cascading_opd_sub_giat WHERE active = 1 AND id_sub_giat = %d ORDER BY no_urut ASC", $g['id']),
+	                                ARRAY_A
+	                            );
+
+	                            $body_all[$k['kegiatan']]['data'][$g['sub_giat']] = array(
+	                                'sub_giat' => $g['sub_giat'],
+	                                'indikator' => array_column($indikator_sub_giat, 'indikator'),
+	                            );
+	                        }
+	                    }
+
+	                    $kegiatan_html = '';
+	                    $sub_giat_html = '';
+
+	                    foreach ($body_all as $k) {
+	                        $indikator = implode('<br>IND: ', $k['indikator']);
+	                        $kegiatan_html .= '<td class="text-center" colspan="' . $k['colspan_sub_giat'] . '">' .
+	                            '<div class="button-container">' .
+		                            '<div class="btn btn-lg btn-primary get_button" style="text-transform:uppercase;">' . $k['kegiatan'] .
+		                            '<hr/><span class="indikator">IND: ' . $indikator . '</span>' .
+		                            '</div>
+		                        </div>
+		                    </td>';
+
+	                        foreach ($k['data'] as $g) {
+	                            $indikator = implode('<br>IND: ', $g['indikator']);
+	                            $sub_giat_html .= '<td class="text-center">' .
+	                                '<div class="button-container">' .
+		                                '<div class="btn btn-lg btn-secondary get_button" style="text-transform:uppercase;">' . $g['sub_giat'] .
+		                                '<hr/><span class="indikator">IND: ' . $indikator . '</span>' .
+		                                '</div>
+		                            </div>
+		                        </td>';
+	                        }
+	                    }
+
+	                    $ret['data'] = 
+	                    	'<tr>
+		                    	<td class="text-center" style="width: 150px;">' .
+			                        '<div class="button-container">
+			                        	<div class="btn btn-lg btn-info">KEGIATAN</div>
+			                        </div>
+		                        </td>
+		                        ' .$kegiatan_html . '
+		                    </tr>' .
+	                        '<tr>
+	                        	<td class="text-center">' .
+		                        	'<div class="button-container">
+		                        		<div class="btn btn-lg btn-info">SUB KEGIATAN</div>
+		                        	</div>
+		                       	</td>
+		                       	' .$sub_giat_html . '
+		                    </tr>';
+	                } else {
+	                    $ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+	                }
+	            }
+	        } else {
+	            $ret['status'] = 'error';
+	            $ret['message'] = 'Api Key tidak sesuai!';
+	        }
+	    } else {
+	        $ret['status'] = 'error';
+	        $ret['message'] = 'Format tidak sesuai!';
+	    }
+
 	    die(json_encode($ret));
 	}
 

@@ -136,6 +136,7 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
     #tabel-cascading-kegiatan div.btn.btn-lg.btn-warning,
     #tabel-cascading-kegiatan div.btn.btn-lg.btn-success,
     #tabel-cascading-kegiatan div.btn.btn-lg.btn-secondary,
+    #tabel-cascading-kegiatan div.btn.btn-lg.btn-primary,
     #tabel-cascading-kegiatan div.btn.btn-lg.btn-danger {
         width: 100%;
         min-height: 450px;
@@ -210,8 +211,6 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
     .view-kegiatan-button:hover i {
         color: #f0f0f0; 
     }
-
-
 </style>
 
 <!-- Table -->
@@ -244,16 +243,8 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
         </div>
         <div style="overflow-x: auto; max-width: 100%;">
             <table id="tabel-cascading-kegiatan" style="min-width: 600px;">
-                <h2 class="text-center get-nama-program">Cascading Kegiatan dan Sub Kegiatan<br>Program: Program belum dipilih </h2>
+                <h2 class="text-center get-nama-program">Cascading Kegiatan dan Sub Kegiatan<br>PROGRAM: Program belum dipilih </h2>
                 <tbody>
-                    <tr>
-                        <td class="text-center" style="width: 200px;"><div class="btn btn-lg btn-info">KEGIATAN</div></td>
-                        <td class="text-center" colspan="0"><div class="btn btn-lg btn-warning" style="text-transform:uppercase;"></div></td>
-                    </tr>
-                    <tr>
-                        <td class="text-center"><div class="btn btn-lg btn-info">SUB KEGIATAN</div></td>
-                        <td class="text-center" colspan="0"><div class="btn btn-lg btn-warning" style="text-transform:uppercase;"></button></td>
-                    </tr>
                 </tbody>
             </table>
         </div>
@@ -323,6 +314,7 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
                 });
             }
         });
+
     });
 
     function getTableCascading() {
@@ -354,8 +346,68 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
         });
     }
 
-    function view_kegiatan(id) {
-        let value_nama_program = jQuery('#program-ke-'+id).attr("data-nama-program");
-        jQuery(".get-nama-program").html('Cascading Kegiatan dan Sub Kegiatan<br>Program:'+value_nama_program);
+    function view_kegiatan(button, id) {
+        let icon = jQuery(button).find('.visibility-icon');
+        let body = jQuery('#tabel-cascading-kegiatan tbody');
+
+        jQuery('.view-kegiatan-button').not(button).each(function() {
+            let otherIcon = jQuery(this).find('.visibility-icon');
+            if (jQuery(this).data('loaded')) {
+                jQuery('#tabel-cascading-kegiatan tbody').hide();
+                otherIcon.removeClass('dashicons-visibility').addClass('dashicons-hidden');
+                jQuery(this).data('loaded', false); 
+            }
+        });
+
+        jQuery('#wrap-loading').show();
+
+        if (icon.hasClass('dashicons-hidden')) {
+            let value_nama_program = jQuery(`#program-ke-${id}`).attr('data-nama-program') || 'Program belum dipilih';
+
+            jQuery.ajax({
+                url: esakip.url,
+                type: 'POST',
+                data: {
+                    action: 'get_kegiatan_by_program',
+                    api_key: esakip.api_key,
+                    id: id
+                },
+                dataType: 'json',
+                success: function(response) {
+                    jQuery('#wrap-loading').hide();
+                    if (response.status === 'success') {
+                        jQuery(".get-nama-program").html('Cascading Kegiatan dan Sub Kegiatan<br>PROGRAM: ' + value_nama_program);
+                        body.html(response.data).show();
+                        jQuery(button).data('loaded', true);
+                        icon.removeClass('dashicons-hidden').addClass('dashicons-visibility');
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    jQuery('#wrap-loading').hide();
+                    console.error(xhr.responseText);
+                    alert('Terjadi kesalahan saat memuat data!');
+                }
+            });
+        } else {
+            if (body.is(':visible')) {
+                body.hide();
+                icon.removeClass('dashicons-visibility').addClass('dashicons-hidden');
+            } else {
+                body.show();
+                icon.removeClass('dashicons-hidden').addClass('dashicons-visibility');
+            }
+
+            jQuery(".get-nama-program").html(function() {
+                if (!body.is(':visible')) {
+                    return 'Cascading Kegiatan dan Sub Kegiatan<br>PROGRAM: Program belum dipilih';
+                }
+                return jQuery(".get-nama-program").html();
+            });
+
+            jQuery('#wrap-loading').hide();
+        }
     }
+
 </script>
