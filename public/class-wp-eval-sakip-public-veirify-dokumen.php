@@ -21,6 +21,33 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/jadwal/wp-eval-sakip-jadwal-verifikasi-upload-dokumen_renstra.php';
     }
 
+    public function list_halaman_laporan_pk($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-laporan-pk.php';
+	}
+
+    public function detail_laporan_pk($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-laporan-pk-per-skpd.php';
+	}
+
+    public function halaman_laporan_pk_setting($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-laporan-pk-setting.php';
+	}
+
     public function get_data_pengaturan_menu()
     {
         global $wpdb;
@@ -1778,4 +1805,389 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
             exit();
         }
     }
+
+    public function get_table_skpd_laporan_pk()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
+                if($ret['status'] == 'success'){
+                    $unit = $wpdb->get_results(
+                        $wpdb->prepare("
+                        SELECT 
+                            nama_skpd, 
+                            id_skpd, 
+                            kode_skpd, 
+                            nipkepala 
+                        FROM esakip_data_unit 
+                        WHERE active=1 
+                          AND tahun_anggaran=%d
+                          AND is_skpd=1 
+                        ORDER BY kode_skpd ASC
+                        ", $tahun_anggaran_sakip),
+                        ARRAY_A
+                    );
+    
+                    if (!empty($unit)) {
+                        $tbody = '';
+    
+                        foreach ($unit as $kk => $vv) {
+
+
+                            
+                            $detail_laporan_pk = $this->functions->generatePage(array(
+                                'nama_page' => 'Halaman Detail Laporan PK ' . $tahun_anggaran,
+                                'content' => '[detail_laporan_pk tahun=' . $tahun_anggaran . ']',
+                                'show_header' => 1,
+                                'post_status' => 'private'
+                            )); //dokumen_detail_rencana_aksi
+    
+                            $tbody .= "<tr>";
+                            $tbody .= "<td style='text-transform: uppercase;'><a href='".$detail_laporan_pk['url']."&id_skpd=".$vv['id_skpd']."' target='_blank'>".$vv['kode_skpd']." " . $vv['nama_skpd'] . "</a></td>";
+                            $tbody .= "<td style='text-transform: uppercase;'></td>";
+                            $tbody .= "</tr>";
+                        }
+                        $ret['data'] = $tbody;
+                    } else {
+                        $ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+                    }
+                }
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+    public function get_table_skpd_laporan_pk_setting()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
+                if($ret['status'] == 'success'){
+                    $unit = $wpdb->get_results(
+                        $wpdb->prepare("
+                        SELECT 
+                            nama_skpd, 
+                            id_skpd, 
+                            kode_skpd, 
+                            nipkepala 
+                        FROM esakip_data_unit 
+                        WHERE active=1 
+                          AND tahun_anggaran=%d
+                          AND is_skpd=1 
+                        ORDER BY kode_skpd ASC
+                        ", $tahun_anggaran_sakip),
+                        ARRAY_A
+                    );
+    
+                    if (!empty($unit)) {
+                        $tbody = '';
+                        foreach ($unit as $kk => $vv) {
+                            $data_detail = $wpdb->get_row(
+                                $wpdb->prepare(
+                                    "SELECT 
+                                        *
+                                    FROM 
+                                        esakip_detail_data_unit 
+                                    WHERE 
+                                        id_skpd = %d
+                                ", $vv['id_skpd']),
+                                ARRAY_A
+                            );
+
+                            $alamat_kantor = !empty($data_detail['alamat_kantor']) ? $data_detail['alamat_kantor'] : '';
+
+                            $tbody .= "<tr>";
+                            $tbody .= "<td>".$vv['kode_skpd']." " . $vv['nama_skpd'] . "</td>";
+                            $tbody .= "<td class='text-left'>" . $alamat_kantor . "</td>";
+
+                            $btn = '<button class="btn btn-sm btn-warning" onclick="edit_setting_laporan_pk(\'' . $vv['id_skpd'] . '\'); return false;" href="#" title="Edit Setting laporan PK"><span class="dashicons dashicons-edit"></span></button>';
+
+                            $tbody .= "<td class='text-center'>" . $btn . "</td>";
+                            $tbody .= "</tr>";
+                        }
+                        $ret['data'] = $tbody;
+                    } else {
+                        $ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+                    }
+                }
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+    public function tambah_logo_pemda_laporan_pk()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+            'nama_logo' => ''
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$id_dokumen = null;
+                
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+
+				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
+                    $nama_file = 'logo_pemda_'.date('Y-m-d-H-i-s').'_'.$_FILES['fileUpload']['name'];
+					$upload = $this->functions->uploadFile(
+						$_POST['api_key'],
+						$upload_dir,
+						$_FILES['fileUpload'],
+						array('png','jpeg','jpg'),
+						1048576 * 5,
+						$nama_file
+					);
+					if ($upload['status'] == false) {
+						$ret = array(
+							'status' => 'error',
+							'message' => $upload['message']
+						);
+					}
+				}
+
+				if ($ret['status'] == 'success') {
+                    $path_logo_pemda_laporan_pk = get_option('_logo_pemda_laporan_pk');
+					if (empty($path_logo_pemda_laporan_pk)) {
+                        update_option('_logo_pemda_laporan_pk', $upload['filename']);
+					} else {
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							
+							if (is_file($upload_dir . $path_logo_pemda_laporan_pk)) {
+								unlink($upload_dir . $path_logo_pemda_laporan_pk);
+							}
+						}
+						update_option('_logo_pemda_laporan_pk', $upload['filename']);
+					}
+
+                    $ret['nama_logo'] = get_option("_logo_pemda_laporan_pk");
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function submit_edit_laporan_pk_setting()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil Edit laporan PK Setting!'
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_skpd'])) {
+					$id_skpd = $_POST['id_skpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
+				}
+				if (!empty($_POST['alamat'])) {
+					$alamat = $_POST['alamat'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Alamat kosong!';
+				}
+
+				if ($ret['status'] == 'success') {
+
+                    $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
+                    $unit = $wpdb->get_row(
+                        $wpdb->prepare("
+                        SELECT 
+                            nama_skpd, 
+                            id_skpd, 
+                            kode_skpd, 
+                            nipkepala 
+                        FROM esakip_data_unit 
+                        WHERE active=1 
+                            AND tahun_anggaran=%d
+                            AND is_skpd=1 
+                            AND id_skpd=%d
+                        ORDER BY kode_skpd ASC
+                        ", $tahun_anggaran_sakip, $id_skpd),
+                        ARRAY_A
+                    );
+
+                    $cek_data = $wpdb->get_row($wpdb->prepare(
+                        "SELECT
+                            id
+                        FROM 
+                            esakip_detail_data_unit
+                        WHERE
+                            id_skpd=%d
+                            AND active=1
+                        ", $id_skpd
+                    ), ARRAY_A);
+                    
+                    $opsi = array(
+                        'id_skpd' => $unit['id_skpd'],
+                        'nama_skpd' => $unit['nama_skpd'],
+                        'alamat_kantor' => $alamat,
+                        'active' => 1,
+                        'updated_at' => current_time('mysql')
+                    );
+
+                    if(empty($cek_data)){
+                        $opsi['created_at'] = current_time('mysql');
+                        $send_data = $wpdb->insert(
+							'esakip_detail_data_unit',
+							$opsi,
+							array('%d', '%s', '%s', '%d', '%s', '%s')
+						);
+                    }else{
+                        $send_data = $wpdb->update(
+                            'esakip_detail_data_unit',
+                            $opsi,
+                            array('id_skpd' => $id_skpd, 'active' => 1),
+                            array('%d', '%s', '%s', '%d', '%s'),
+                            array('%d', '%d')
+                        );
+
+                    }
+					
+                    if ($wpdb->rows_affected == 0) {
+                        $ret = array(
+                            'status' => 'error',
+                            'message' => 'Gagal memperbarui data ke database!'
+                        );
+                    }
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_detail_setting_laporan_pk_by_id()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_skpd'])) {
+
+                    $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+                    
+					$data = $wpdb->get_row(
+						$wpdb->prepare(
+                            "SELECT 
+                                a.id,
+                                a.id_skpd,
+                                a.alamat_kantor
+							FROM 
+                                esakip_detail_data_unit a
+                            JOIN 
+                                esakip_data_unit b
+                            ON b.id_skpd=a.id_skpd 
+                                AND b.tahun_anggaran=%d
+							WHERE 
+                                a.id_skpd = %d
+						",$tahun_anggaran_sakip, $_POST['id_skpd']),
+						ARRAY_A
+					);
+					$ret['data'] = $data;
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
 }

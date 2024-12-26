@@ -211,7 +211,7 @@ foreach ($unit as $kk => $vv) {
 		    unorList.forEach(function(value, index){
 		        tbody += ''
 			        +'<tr>'
-			        	+'<td class="text-center"><input type="checkbox" value="'+value.satker_id+'"></td>'
+			        	+'<td class="text-center"><input type="checkbox" value="'+value.id+'"></td>'
 			        	+'<td>'+value.nama+'</td>'
 			        +'<tr>';
 		    })

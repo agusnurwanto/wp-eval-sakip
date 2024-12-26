@@ -619,6 +619,12 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_list_satker_simpeg',  $plugin_public, 'get_list_satker_simpeg');
 		$this->loader->add_action('wp_ajax_get_pegawai_simpeg',  $plugin_public, 'get_pegawai_simpeg');
 		$this->loader->add_action('wp_ajax_mapping_unit_sipd_simpeg',  $plugin_public, 'mapping_unit_sipd_simpeg');
+
+		$this->loader->add_action('wp_ajax_get_table_skpd_laporan_pk', $plugin_public, 'get_table_skpd_laporan_pk');
+		$this->loader->add_action('wp_ajax_get_table_skpd_laporan_pk_setting', $plugin_public, 'get_table_skpd_laporan_pk_setting');
+		$this->loader->add_action('wp_ajax_get_detail_setting_laporan_pk_by_id', $plugin_public, 'get_detail_setting_laporan_pk_by_id');
+		$this->loader->add_action('wp_ajax_submit_edit_laporan_pk_setting', $plugin_public, 'submit_edit_laporan_pk_setting');
+		$this->loader->add_action('wp_ajax_tambah_logo_pemda_laporan_pk', $plugin_public, 'tambah_logo_pemda_laporan_pk');
 		
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
@@ -734,6 +740,10 @@ class Wp_Eval_Sakip {
 		add_shortcode('tagging_rincian_sakip', array($plugin_public, 'tagging_rincian_sakip'));
 
 		add_shortcode('halaman_mapping_sipd_simpeg', array($plugin_public, 'halaman_mapping_sipd_simpeg'));
+
+		add_shortcode('list_halaman_laporan_pk', array($plugin_public, 'list_halaman_laporan_pk'));
+		add_shortcode('detail_laporan_pk', array($plugin_public, 'detail_laporan_pk'));
+		add_shortcode('halaman_laporan_pk_setting', array($plugin_public, 'halaman_laporan_pk_setting'));
 	}
 
 	/**

@@ -1615,3 +1615,14 @@ CREATE TABLE `esakip_data_mapping_unit_sipd_simpeg` (
   `update_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id)
 );
+
+CREATE TABLE `esakip_detail_data_unit` (
+  `id` int NOT NULL auto_increment,
+  `id_skpd` int(11) DEFAULT NULL,
+  `nama_skpd` varchar(64) DEFAULT NULL,
+  `alamat_kantor` varchar(255) DEFAULT NULL,
+  `active` tinyint DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
+ PRIMARY KEY(id)
+);

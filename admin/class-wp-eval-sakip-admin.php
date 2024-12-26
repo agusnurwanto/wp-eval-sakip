@@ -1226,6 +1226,22 @@ class Wp_Eval_Sakip_Admin
 									</ul>
 								</div>
 							</div>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'laporan_pk_opd') {
+							$list_skpd_laporan_pk = $this->functions->generatePage(array(
+								'nama_page' => 'Laporan PK - ' . $tahun_item['tahun_anggaran'],
+								'content' => '[list_halaman_laporan_pk tahun=' . $tahun_item['tahun_anggaran'] . ']',
+								'show_header' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+							<div class="accordion">
+								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+									<ul style="margin-left: 20px;">
+										<li><a target="_blank" href="' . $list_skpd_laporan_pk['url'] . '">' . $list_skpd_laporan_pk['title'] . '</a></li>
+									</ul>
+								</div>
+							</div>';
 						}
 						$ret['message'] .= $body_pemda;
 					}
@@ -1259,6 +1275,13 @@ class Wp_Eval_Sakip_Admin
 			'content' => '[halaman_mapping_user_esr]',
 			'show_header' => 1,
 			'no_key' => 1,
+			'post_status' => 'private'
+		));
+
+		$list_skpd_laporan_pk_setting = $this->functions->generatePage(array(
+			'nama_page' => 'Laporan PK Setting',
+			'content' => '[halaman_laporan_pk_setting]',
+			'show_header' => 1,
 			'post_status' => 'private'
 		));
 
@@ -1340,9 +1363,10 @@ class Wp_Eval_Sakip_Admin
 					->set_html('
 					<h4>HALAMAN TERKAIT</h4>
 	            	<ol>
-	            		<li><a href="' . $halaman_mapping_skpd['url'] . '">' . $halaman_mapping_skpd['title'] . '</a></li>
-	            		<li><a href="' . $halaman_mapping_sipd_simpeg['url'] . '">' . $halaman_mapping_sipd_simpeg['title'] . '</a></li>
-	            		<li><a href="' . $halaman_mapping_user_esr['url'] . '">' . $halaman_mapping_user_esr['title'] . '</a></li>
+	            		<li><a href="' . $halaman_mapping_skpd['url'] . '" target="_blank">' . $halaman_mapping_skpd['title'] . '</a></li>
+	            		<li><a href="' . $halaman_mapping_sipd_simpeg['url'] . '" target="_blank">' . $halaman_mapping_sipd_simpeg['title'] . '</a></li>
+	            		<li><a href="' . $halaman_mapping_user_esr['url'] . '" target="_blank">' . $halaman_mapping_user_esr['title'] . '</a></li>
+						<li><a href="' . $list_skpd_laporan_pk_setting['url'] . '" target="_blank">Halaman Profile Perangkat Daerah</a></li>
 	            		'.$list_mapping_jenis_dokumen.'
 	            	</ol>'),
 				Field::make('text', 'crb_url_server_sakip', 'URL Server WP-SIPD')
@@ -2197,6 +2221,54 @@ class Wp_Eval_Sakip_Admin
 				')
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'input_perencanaan_rpjmd')));
+
+		$laporan_pk_menu = Container::make('theme_options', __('Laporan PK'))
+			->set_page_menu_position(3.9)
+			->set_icon('dashicons-media-default')
+			->add_fields(array(
+				Field::make('html', 'crb_laporan_pk_pd_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+					<table class="form-table">
+						<tbody>
+						</tbody>
+					</table>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'laporan_pk_opd')));
+			
+		Container::make('theme_options', __('Laporan PK Pemerintah Daerah'))
+			->set_page_parent($laporan_pk_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_laporan_pk_pemda_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'laporan_pk_pemda')));
+
+		Container::make('theme_options', __('Laporan PK Perangkat Daerah'))
+			->set_page_parent($laporan_pk_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_laporan_pk_pd_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+					<table class="form-table">
+						<tbody>
+						</tbody>
+					</table>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'laporan_pk_opd')));
 
 		// Container::make('theme_options', __('RKPD'))
 		// 	->set_page_parent($dokumen_pemda_menu)
