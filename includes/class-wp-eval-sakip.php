@@ -627,6 +627,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_submit_edit_laporan_pk_setting', $plugin_public, 'submit_edit_laporan_pk_setting');
 		$this->loader->add_action('wp_ajax_tambah_logo_pemda_laporan_pk', $plugin_public, 'tambah_logo_pemda_laporan_pk');
 		
+		$this->loader->add_action('wp_ajax_get_sub_keg_rka_wpsipd',  $plugin_public, 'get_sub_keg_rka_wpsipd');
+		
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_evaluasi_sakip', array($plugin_public, 'jadwal_evaluasi_sakip'));

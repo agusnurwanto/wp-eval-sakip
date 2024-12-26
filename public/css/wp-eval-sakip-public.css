@@ -7,6 +7,7 @@
     background: #00000073;
     top: 0;
 }
+
 .lds-hourglass {
     position: fixed;
     width: 64px;
@@ -16,6 +17,7 @@
     z-index: 99999;
     margin-left: -32px;
 }
+
 .lds-hourglass:after {
     content: " ";
     display: block;
@@ -28,15 +30,18 @@
     border-color: #fff transparent #fff transparent;
     animation: lds-hourglass 1.2s infinite;
 }
+
 @keyframes lds-hourglass {
     0% {
         transform: rotate(0);
         animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
     }
+
     50% {
         transform: rotate(900deg);
         animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
     }
+
     100% {
         transform: rotate(1800deg);
     }
@@ -56,15 +61,18 @@
     border-bottom-left-radius: 0.6em;
     border-bottom-right-radius: 0.6em;
 }
+
 #penjadwalanHitungMundur span {
     display: block;
     font-size: 13px;
     color: white;
 }
+
 #penjadwalanHitungMundur #titles span {
     display: inline-block !important;
     font-size: 15px !important;
 }
+
 #penjadwalanHitungMundur div {
     display: inline-block;
     line-height: 1;
@@ -73,6 +81,7 @@
     width: 20%;
     height: 40px;
 }
+
 #penjadwalanHitungMundur #titles {
     display: block;
     font-size: 15px;
@@ -82,16 +91,19 @@
     text-align: center;
     line-height: 1;
 }
+
 #penjadwalanHitungMundur #days {
     font-size: 20px;
     color: #db4844;
     text-align: center;
 }
+
 #penjadwalanHitungMundur #hours {
     font-size: 20px;
     color: #f07c22;
     text-align: center;
 }
+
 #penjadwalanHitungMundur #minutes {
     font-size: 20px;
     color: #f6da74;
@@ -121,7 +133,7 @@
     margin: 5px;
 }
 
-.daftar-menu-sakip li .esakip-body-tahun .accordion{
+.daftar-menu-sakip li .esakip-body-tahun .accordion {
     margin: 5px;
 }
 
@@ -159,68 +171,88 @@
     margin: 0;
     font-size: 11pt;
 }
+
 .esakip-m-t-20 {
     margin-top: 20px;
 }
+
 .esakip-bawah {
     border-bottom: 1px solid #000;
 }
+
 .esakip-kiri {
     border-left: 1px solid #000;
 }
+
 .esakip-kanan {
     border-right: 1px solid #000;
 }
+
 .esakip-atas {
     border-top: 1px solid #000;
 }
+
 .esakip-text_tengah {
     text-align: center;
 }
+
 .esakip-text_kiri {
     text-align: left;
 }
+
 .esakip-text_kanan {
     text-align: right;
 }
+
 .esakip-text_blok {
     font-weight: bold;
 }
+
 .esakip-text_12 {
     font-size: 12px !important;
 }
+
 .esakip-text_15 {
     font-size: 15px !important;
 }
+
 .esakip-text_20 {
     font-size: 20px !important;
 }
+
 .esakip-logoprinter {
     position: absolute;
     top: 150px;
     right: 600px;
 }
+
 thead {
     display: table-header-group;
 }
+
 .esakip-setbreakafter {
     page-break-after: always;
 }
+
 .esakip-setbreakbefore {
     page-break-before: always;
 }
+
 #action-sakip {
     padding: 20px 0;
     text-align: center;
 }
+
 #action-sakip a {
     text-decoration: none;
 }
+
 @media print {
     .hide-print {
         display: none;
     }
 }
+
 .edit-mapping,
 .edit-monev,
 .edit-monev-file {
@@ -231,6 +263,7 @@ thead {
     margin-left: 10px;
     cursor: pointer;
 }
+
 .edit-monev {
     padding: 1px 1px 7px;
 }
@@ -244,13 +277,15 @@ thead {
 .modal a {
     text-decoration: none !important;
 }
+
 .action-sakip {
     display: flex;
     justify-content: center;
     align-items: center;
     margin-bottom: 20px;
 }
-#persen-loading{
+
+#persen-loading {
     text-align: center;
     position: fixed;
     height: 64px;
@@ -265,7 +300,8 @@ thead {
     font-weight: bold;
     margin-left: -50vw;
 }
-#pesan-loading{
+
+#pesan-loading {
     text-align: center;
     position: fixed;
     height: 64px;
@@ -280,12 +316,21 @@ thead {
     font-weight: bold;
     margin-left: -50vw;
 }
-.keg-utama{
+
+.keg-utama {
     background: #FDFFB6;
 }
-.re-naksi{
+
+.re-naksi {
     background: #e5d9f2;
 }
-.ur-kegiatan{
+
+.ur-kegiatan {
     background: #13d0d03d;
+}
+
+.borderless-table,
+.borderless-table tr,
+.borderless-table td {
+    border: 0;
 }
