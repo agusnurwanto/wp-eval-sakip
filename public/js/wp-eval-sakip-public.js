@@ -453,3 +453,33 @@ function style_css_download_excel_sakip(type) {
         td[i].setAttribute("style", style + "; mso-number-format:\\@;");
     }
 }
+
+function validateForm(fields) {
+	const formData = {};
+
+	for (const [name, message] of Object.entries(fields)) {
+		const $field = jQuery(`[name="${name}"]`);
+
+		if ($field.is(':radio')) {
+			const checkedValue = jQuery(`[name="${name}"]:checked`).val();
+			if (!checkedValue) {
+				return { error: message };
+			}
+			formData[name] = checkedValue;
+		} else if ($field.is(':checkbox')) {
+			const isChecked = $field.is(':checked');
+			if (!isChecked) {
+				return { error: message };
+			}
+			formData[name] = isChecked;
+		} else if ($field.is('select') || $field.is('textarea') || $field.is(':input')) {
+			const value = $field.val().trim();
+			if (value === '') {
+				return { error: message };
+			}
+			formData[name] = value;
+		}
+	}
+
+	return { error: null, data: formData };
+}

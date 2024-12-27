@@ -178,6 +178,101 @@ $renaksi_pemda1 = array(
 foreach ($renaksi_parent_pemda as $val) {
 	$renaksi_pemda4['label'][$val['id_renaksi']] = $val['label'] . ' ( ' . $val['indikator'] . ' ' . $val['target_akhir'] . ' ' . $val['satuan'] . ' )';
 }
+
+// Fetch saved data for table rendering
+$data_tagging = $wpdb->get_results(
+	$wpdb->prepare("
+		SELECT * 
+		FROM esakip_tagging_rincian_belanja 
+		WHERE active = 1 
+		  AND id_skpd = %d
+		  AND id_indikator = %d
+		  AND kode_sbl = %s
+		GROUP BY kode_akun, subs_bl_teks, ket_bl_teks
+	", $id_skpd, $id_indikator, $renaksi['kode_sbl']),
+	ARRAY_A
+);
+
+$tbody = "";
+if (!empty($data_tagging)) {
+	foreach ($data_tagging as $v) {
+		// Row for Kode Akun
+		$tbody .= "
+		<tr class='akun-row'>
+			<td class='esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+				{$v['kode_akun']}
+			</td>
+		</td>
+		<td colspan='7' class='pl-3 esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+				{$v['nama_akun']}
+			</td>
+		</tr>";
+
+		// Row for Subs BL
+		$tbody .= "
+		<tr class='subs-row'>
+		<td class='esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+		</td>
+			<td colspan='7' class='pl-4 esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+				[#] {$v['subs_bl_teks']}
+			</td>
+		</tr>";
+
+		// Row for Ket BL
+		$tbody .= "
+		<tr class='ket-row'>
+		<td class='esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+		</td>
+			<td colspan='7' class='pl-5 esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+				[-] {$v['ket_bl_teks']}
+			</td>
+		</tr>";
+
+		// Row for Detail Rincian
+		$tbody .= "
+		<tr class='rinci-row'>
+		<td class='esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+		</td>
+			<td class='pl-5 esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+				{$v['nama_komponen']}
+			</td>
+			<td class='esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+				<span class='delete-icon ml-2 mb-3' onclick='hapus_data_rincian({$v['id']});' title='Hapus Rincian Belanja'>
+					<i class='dashicons dashicons-trash'></i>
+				</span>
+				<span class='edit-icon ml-2' onclick='edit_data_akun({$v['kode_akun']});' title='Edit'>
+					<i class='dashicons dashicons-edit'></i>
+				</span>
+
+			</td>
+			<td class='esakip-text_kanan esakip-kiri esakip-kanan esakip-atas esakip-bawah' style='text-align: right;'>
+				" . number_format($v['harga_satuan'], 2, ',', '.') . "
+			</td>
+			<td class='esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah' style='text-align: right;'>
+				" . number_format($v['volume'], 2, ',', '.') . "
+			</td>
+			<td class='esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+				{$v['satuan']}
+			</td>
+			<td class='esakip-text_kanan esakip-kiri esakip-kanan esakip-atas esakip-bawah' style='text-align: right;'>
+				" . number_format($v['volume'] * $v['harga_satuan'], 2, ',', '.') . "
+			</td>
+			<td class='esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+				{$v['keterangan']}
+			</td>
+		</tr>";
+	}
+} else {
+	// Row for no data
+	$tbody = "
+	<tr>
+		<td colspan='6' class='esakip-text_kiri'>
+			Tidak ada data tersedia
+		</td>
+	</tr>";
+}
+
+
 $disabled = '';
 $wpsipd_status = get_option('_crb_url_server_sakip');
 if (empty($wpsipd_status)) {
@@ -281,7 +376,7 @@ if (empty($wpsipd_status)) {
 </style>
 
 <!-- Table -->
-<div id="cetak" title="Rencana Hasil Kerja Perangkat Daerah">
+<div id="cetak">
 	<div style="padding: 10px;margin:0 0 3rem 0;">
 		<h1 class="text-center" style="margin: 3rem; font-weight: 700; font-size: 2rem; line-height: 1.5;">
 			Rencana Hasil Kerja<br>
@@ -522,6 +617,7 @@ if (empty($wpsipd_status)) {
 					<tr>
 						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 200px;">KODE REKENING</th>
 						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2">URAIAN</th>
+						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 60px;">AKSI</th>
 						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">HARGA SATUAN</th>
 						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 90px;">JUMLAH</th>
 						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 100px;">SATUAN</th>
@@ -530,6 +626,7 @@ if (empty($wpsipd_status)) {
 					</tr>
 				</thead>
 				<tbody>
+					<?php echo $tbody; ?>
 				</tbody>
 			</table>
 		</div>
@@ -577,7 +674,81 @@ if (empty($wpsipd_status)) {
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button type="submit" class="btn btn-primary" onclick="simpanTagRinciBl()">Simpan</button>
+				<button type="submit" class="btn btn-primary" onclick="simpanCheckedTagRinciBl()">Simpan</button>
+				<button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Tutup</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade mt-4" id="modalTambahDataManual" tabindex="-1" role="dialog" aria-labelledby="modalTambahDataManual" aria-hidden="true">
+	<div class="modal-dialog modal-xl" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="title-label">Tambah Rincian Belanja</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<input type="hidden" id="id_data" name="id_data">
+				<div class="card bg-light mb-3">
+					<div class="card-body">
+						<div class="form-row">
+							<div class="form-group col-md-12">
+								<label for="subKegiatan">Sub Kegiatan</label>
+								<input type="text" name="subKegiatan" class="form-control" value="<?php echo $renaksi['label_cascading_sub_kegiatan']; ?>" disabled>
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group col-md-6">
+								<label for="kode_akun">Kode Akun</label>
+								<input type="text" class="form-control" id="kode_akun" name="kode_akun" placeholder="Masukkan Kode Akun">
+							</div>
+							<div class="form-group col-md-6">
+								<label for="nama_akun">Nama Akun</label>
+								<input type="text" class="form-control" id="nama_akun" name="nama_akun" placeholder="Masukkan Nama Akun">
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group col-md-6">
+								<label for="subs_bl_teks">Pengelompokan</label>
+								<input type="text" class="form-control" id="subs_bl_teks" name="subs_bl_teks" placeholder="Masukkan Pengelompokan">
+							</div>
+							<div class="form-group col-md-6">
+								<label for="ket_bl_teks">Keterangan</label>
+								<input type="text" class="form-control" id="ket_bl_teks" name="ket_bl_teks" placeholder="Masukkan Keterangan">
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group col-md-6">
+								<label for="nama_komponen">Nama Komponen</label>
+								<input type="text" class="form-control" id="nama_komponen" name="nama_komponen" placeholder="Masukkan Nama Komponen">
+							</div>
+							<div class="form-group col-md-3">
+								<label for="volume">Volume</label>
+								<input type="number" class="form-control" id="volume" name="volume" placeholder="Masukkan Volume">
+							</div>
+							<div class="form-group col-md-3">
+								<label for="satuan">Satuan</label>
+								<input type="text" class="form-control" id="satuan" name="satuan" placeholder="Masukkan Satuan">
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group col-md-6">
+								<label for="harga_satuan">Harga Satuan</label>
+								<input type="number" class="form-control" id="harga_satuan" name="harga_satuan" placeholder="Masukkan Harga Satuan">
+							</div>
+							<div class="form-group col-md-6">
+								<label for="keterangan">Keterangan</label>
+								<textarea class="form-control" id="keterangan" name="keterangan" rows="3" placeholder="Masukkan Keterangan"></textarea>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="submit" class="btn btn-primary" onclick="simpanRinciBlManual()">Simpan</button>
 				<button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Tutup</button>
 			</div>
 		</div>
@@ -585,9 +756,9 @@ if (empty($wpsipd_status)) {
 </div>
 <script>
 	jQuery(document).ready(() => {
-		const statusWpsipd = '<?php echo esc_js($wpsipd_status); ?>';
-		const tahunAnggaran = '<?php echo esc_js($tahun); ?>';
-		const kodeSbl = '<?php echo esc_js($renaksi['kode_sbl']); ?>';
+		window.statusWpsipd = '<?php echo esc_js($wpsipd_status); ?>';
+		window.tahunAnggaran = '<?php echo esc_js($tahun); ?>';
+		window.kodeSbl = '<?php echo esc_js($renaksi['kode_sbl']); ?>';
 
 		if (statusWpsipd) {
 			loadRkaWpSipd(tahunAnggaran, kodeSbl);
@@ -737,112 +908,250 @@ if (empty($wpsipd_status)) {
 	}
 
 	function handleCheckboxRinci() {
-        // Checkbox utama (select all)
-        jQuery("#checkAll").on("change", function() {
-            const isChecked = jQuery(this).is(":checked");
-            jQuery(".akun-checkbox, .subs-checkbox, .ket-checkbox, .rinci-checkbox").prop("checked", isChecked);
-        });
+		// Checkbox utama (select all)
+		jQuery("#checkAll").on("change", function() {
+			const isChecked = jQuery(this).is(":checked");
+			jQuery(".akun-checkbox, .subs-checkbox, .ket-checkbox, .rinci-checkbox").prop("checked", isChecked);
+		});
 
-        // Akun ke subs_bl_teks
-        jQuery(".akun-checkbox").on("change", function() {
-            const isChecked = jQuery(this).is(":checked"); //bool
-            const akunId = jQuery(this).val();
-            jQuery(`.subs-row[data-parent-id="${akunId}"] .subs-checkbox`).prop("checked", isChecked);
-            jQuery(`.ket-row[data-grandparent-id="${akunId}"] .ket-checkbox`).prop("checked", isChecked);
-            jQuery(`.rinci-row[data-greatgrandparent-id="${akunId}"] .rinci-checkbox`).prop("checked", isChecked);
+		// Akun ke subs_bl_teks
+		jQuery(".akun-checkbox").on("change", function() {
+			const isChecked = jQuery(this).is(":checked"); //bool
+			const akunId = jQuery(this).val();
+			jQuery(`.subs-row[data-parent-id="${akunId}"] .subs-checkbox`).prop("checked", isChecked);
+			jQuery(`.ket-row[data-grandparent-id="${akunId}"] .ket-checkbox`).prop("checked", isChecked);
+			jQuery(`.rinci-row[data-greatgrandparent-id="${akunId}"] .rinci-checkbox`).prop("checked", isChecked);
 
-            updateSelectAllState();
-        });
+			updateSelectAllState();
+		});
 
-        // Subs_bl_teks ke ket_bl_teks
-        jQuery(".subs-checkbox").on("change", function() {
-            const isChecked = jQuery(this).is(":checked");
-            const subsId = jQuery(this).val();
-            const parentId = jQuery(this).closest(".subs-row").data("parent-id");
+		// Subs_bl_teks ke ket_bl_teks
+		jQuery(".subs-checkbox").on("change", function() {
+			const isChecked = jQuery(this).is(":checked");
+			const subsId = jQuery(this).val();
+			const parentId = jQuery(this).closest(".subs-row").data("parent-id");
 
-            jQuery(`.ket-row[data-parent-id="${subsId}"] .ket-checkbox`).prop("checked", isChecked);
-            jQuery(`.rinci-row[data-grandparent-id="${subsId}"] .rinci-checkbox`).prop("checked", isChecked);
+			jQuery(`.ket-row[data-parent-id="${subsId}"] .ket-checkbox`).prop("checked", isChecked);
+			jQuery(`.rinci-row[data-grandparent-id="${subsId}"] .rinci-checkbox`).prop("checked", isChecked);
 
-            updateSelectAllStateAkun(parentId) //akun
+			updateSelectAllStateAkun(parentId) //akun
 
-            updateParentCheckbox(parentId, ".akun-checkbox", ".subs-checkbox");
-            updateSelectAllState();
-        });
+			updateParentCheckbox(parentId, ".akun-checkbox", ".subs-checkbox");
+			updateSelectAllState();
+		});
 
-        // Ket_bl_teks ke id_rinci_sub_bl
-        jQuery(".ket-checkbox").on("change", function() {
-            const isChecked = jQuery(this).is(":checked");
-            const ketId = jQuery(this).val();
-            const parentId = jQuery(this).closest(".ket-row").data("parent-id");
-            const grandParentId = jQuery(`.subs-row[data-id="${parentId}"]`).data("parent-id");
+		// Ket_bl_teks ke id_rinci_sub_bl
+		jQuery(".ket-checkbox").on("change", function() {
+			const isChecked = jQuery(this).is(":checked");
+			const ketId = jQuery(this).val();
+			const parentId = jQuery(this).closest(".ket-row").data("parent-id");
+			const grandParentId = jQuery(`.subs-row[data-id="${parentId}"]`).data("parent-id");
 
-            jQuery(`.rinci-row[data-parent-id="${ketId}"] .rinci-checkbox`).prop("checked", isChecked);
+			console.log("parentId:", parentId);
+			console.log("grandParentId:", grandParentId);
+			console.log("greatGrandParentId:", greatGrandParentId);
 
-            updateSelectAllStateKelompok(parentId) //kelompok
-            updateSelectAllStateAkun(grandParentId) //akun
+			jQuery(`.rinci-row[data-parent-id="${ketId}"] .rinci-checkbox`).prop("checked", isChecked);
 
-            updateParentCheckbox(parentId, ".subs-checkbox", ".ket-checkbox");
-            updateSelectAllState();
-        });
+			updateSelectAllStateKelompok(parentId) //kelompok
+			updateSelectAllStateAkun(grandParentId) //akun
 
-        // Id_rinci_sub_bl ke ket_bl_teks
-        jQuery(".rinci-checkbox").on("change", function() {
-            const parentId = jQuery(this).closest(".rinci-row").data("parent-id"); //keterangan
-            const grandParentId = jQuery(`.ket-row[data-id="${parentId}"]`).data("parent-id"); //kelompok
-            const greatGrandParentId = jQuery(`.subs-row[data-id="${grandParentId}"]`).data("parent-id"); //akun
+			updateParentCheckbox(parentId, ".subs-checkbox", ".ket-checkbox");
+			updateSelectAllState();
+		});
 
-            updateSelectAllStateKeterangan(parentId)
-            updateSelectAllStateKelompok(grandParentId)
-            updateSelectAllStateAkun(greatGrandParentId) //akun
+		// Id_rinci_sub_bl ke ket_bl_teks
+		jQuery(".rinci-checkbox").on("change", function() {
+			const parentId = jQuery(this).closest(".rinci-row").data("parent-id"); //keterangan
+			const grandParentId = jQuery(`.ket-row[data-id="${parentId}"]`).data("parent-id"); //kelompok
+			const greatGrandParentId = jQuery(`.subs-row[data-id="${grandParentId}"]`).data("parent-id"); //akun
 
-            updateParentCheckbox(parentId, ".ket-checkbox", ".rinci-checkbox");
-            updateParentCheckbox(grandParentId, ".subs-checkbox", ".ket-checkbox");
-            updateParentCheckbox(greatGrandParentId, ".akun-checkbox", ".subs-checkbox");
+			console.log("parentId:", parentId);
+			console.log("grandParentId:", grandParentId);
+			console.log("greatGrandParentId:", greatGrandParentId);
 
-            updateSelectAllState();
-        });
+			updateSelectAllStateKeterangan(parentId)
+			updateSelectAllStateKelompok(grandParentId)
+			updateSelectAllStateAkun(greatGrandParentId) //akun
 
-        // Update state of "select all" checkbox
-        function updateSelectAllState() {
-            const allChecked = jQuery(".rinci-checkbox").length === jQuery(".rinci-checkbox:checked").length;
-            jQuery("#checkAll").prop("checked", allChecked);
-        }
+			updateParentCheckbox(parentId, ".ket-checkbox", ".rinci-checkbox");
+			updateParentCheckbox(grandParentId, ".subs-checkbox", ".ket-checkbox");
+			updateParentCheckbox(greatGrandParentId, ".akun-checkbox", ".subs-checkbox");
 
-        function updateSelectAllStateAkun(akunId) {
-            const allChildren = jQuery(`.subs-row[data-parent-id="${akunId}"] .subs-checkbox`);
-            const allChecked = allChildren.length === allChildren.filter(":checked").length;
+			updateSelectAllState();
+		});
 
-            jQuery(`.akun-checkbox[value="${akunId}"]`).prop("checked", allChecked);
-        }
+		// Update state of "select all" checkbox
+		function updateSelectAllState() {
+			const allChecked = jQuery(".rinci-checkbox").length === jQuery(".rinci-checkbox:checked").length;
+			jQuery("#checkAll").prop("checked", allChecked);
+		}
 
-        function updateSelectAllStateKelompok(kelompokId) {
-            const allChildren = jQuery(`.ket-row[data-parent-id="${kelompokId}"] .ket-checkbox`);
-            const allChecked = allChildren.length === allChildren.filter(":checked").length;
+		function updateSelectAllStateAkun(akunId) {
+			const allChildren = jQuery(`.subs-row[data-parent-id="${akunId}"] .subs-checkbox`);
+			const allChecked = allChildren.length === allChildren.filter(":checked").length;
 
-            jQuery(`.subs-checkbox[value="${kelompokId}"]`).prop("checked", allChecked);
-        }
+			jQuery(`.akun-checkbox[value="${akunId}"]`).prop("checked", allChecked);
+		}
 
-        function updateSelectAllStateKeterangan(keteranganId) {
-            const allChildren = jQuery(`.rinci-row[data-parent-id="${keteranganId}"] .rinci-checkbox`);
-            const allChecked = allChildren.length === allChildren.filter(":checked").length;
+		function updateSelectAllStateKelompok(kelompokId) {
+			const allChildren = jQuery(`.ket-row[data-parent-id="${kelompokId}"] .ket-checkbox`);
+			const allChecked = allChildren.length === allChildren.filter(":checked").length;
 
-            jQuery(`.ket-checkbox[value="${keteranganId}"]`).prop("checked", allChecked);
-        }
+			jQuery(`.subs-checkbox[value="${kelompokId}"]`).prop("checked", allChecked);
+		}
+
+		function updateSelectAllStateKeterangan(keteranganId) {
+			const allChildren = jQuery(`.rinci-row[data-parent-id="${keteranganId}"] .rinci-checkbox`);
+			const allChecked = allChildren.length === allChildren.filter(":checked").length;
+
+			jQuery(`.ket-checkbox[value="${keteranganId}"]`).prop("checked", allChecked);
+		}
 
 
-        // Update parent checkbox
-        function updateParentCheckbox(parentId, parentSelector, childSelector) {
-            const allChildren = jQuery(`${childSelector}[data-parent-id="${parentId}"]`);
-            const parentCheckbox = jQuery(`${parentSelector}[data-id="${parentId}"]`);
-            parentCheckbox.prop("checked", allChildren.length === allChildren.filter(":checked").length);
-        }
-    }
+		// Update parent checkbox
+		function updateParentCheckbox(parentId, parentSelector, childSelector) {
+			const allChildren = jQuery(`${childSelector}[data-parent-id="${parentId}"]`);
+			const parentCheckbox = jQuery(`${parentSelector}[data-id="${parentId}"]`);
+			parentCheckbox.prop("checked", allChildren.length === allChildren.filter(":checked").length);
+		}
+	}
 
 	function handleModalTambahDataManual() {
-		jQuery('#modalTambahData').modal('show')
+		jQuery('#modalTambahDataManual').modal('show')
 	}
 
 	function handleModalTambahDataWpsipd() {
 		jQuery('#modalTambahData').modal('show')
+	}
+
+	function simpanCheckedTagRinciBl() {
+		let checkedRinci = [];
+		jQuery(".rinci-checkbox:checked").each(function() {
+			let row = jQuery(this).closest("tr");
+			checkedRinci.push({
+				kode_akun: row.data("kode-akun"),
+				nama_akun: row.data("nama-akun"),
+				subs_bl_teks: row.data("subs-bl"),
+				ket_bl_teks: row.data("ket-bl"),
+				id_rinci_sub_bl: jQuery(this).val(),
+				nama_komponen: row.data("nama-komponen"),
+				volume: row.data("volume"),
+				satuan: row.data("satuan"),
+				harga_satuan: row.data("harga-satuan"),
+				keterangan: row.data("keterangan")
+			});
+		});
+
+		if (checkedRinci.length === 0) {
+			return alert("Harap pilih rincian belanja yang akan ditag!");
+		}
+
+		const tempData = new FormData();
+		tempData.append("action", "simpan_rinci_bl_tagging");
+		tempData.append("api_key", esakip.api_key);
+		tempData.append("rincian_belanja_ids", JSON.stringify(checkedRinci));
+		tempData.append("tahun_anggaran", tahunAnggaran);
+		tempData.append("kode_sbl", kodeSbl);
+		tempData.append("id_skpd", '<?php echo $id_skpd; ?>');
+		tempData.append("id_indikator", '<?php echo $id_indikator; ?>');
+		tempData.append("tipe", 1);
+
+		jQuery("#wrap-loading").show();
+
+		jQuery.ajax({
+			method: "POST",
+			url: esakip.url,
+			data: tempData,
+			processData: false,
+			contentType: false,
+			cache: false,
+			success: function(res) {
+				alert(res.message);
+				jQuery("#wrap-loading").hide();
+				if (res.status === "success") {
+					location.reload();
+				}
+			},
+			error: function(xhr, status, error) {
+				console.error(xhr.responseText);
+				jQuery("#wrap-loading").hide();
+				alert("Terjadi kesalahan saat menyimpan data!");
+			},
+		});
+	}
+
+	function simpanRinciBlManual() {
+		const validationRules = {
+			'kode_akun': 'Kode Akun harus diisi!',
+			'nama_akun': 'Nama Akun harus diisi!',
+			'subs_bl_teks': 'Subs BL Teks harus diisi!',
+			'ket_bl_teks': 'Ket BL Teks harus diisi!',
+			'nama_komponen': 'Nama Komponen harus diisi!',
+			'volume': 'Volume harus diisi!',
+			'satuan': 'Satuan harus diisi!',
+			'harga_satuan': 'Harga Satuan harus diisi!',
+			'tahun_anggaran': 'Tahun Anggaran harus diisi!',
+			'keterangan': 'Keterangan harus diisi!'
+		};
+
+		const {
+			error,
+			data
+		} = validateForm(validationRules);
+		if (error) {
+			return alert(error);
+		}
+
+		const id_data = jQuery('#id_data').val();
+
+		const tempData = new FormData();
+		tempData.append("action", "simpan_rinci_bl_tagging_manual");
+		tempData.append("api_key", esakip.api_key);
+		tempData.append("tahun_anggaran", tahunAnggaran);
+		tempData.append("kode_sbl", kodeSbl);
+		tempData.append("id_skpd", '<?php echo $id_skpd; ?>');
+		tempData.append("id_indikator", '<?php echo $id_indikator; ?>');
+		tempData.append("tipe", 1);
+
+		for (const [key, value] of Object.entries(data)) {
+			tempData.append(key, value);
+		}
+
+		if (id_data) {
+			tempData.append("id_data", id_data);
+		}
+
+		jQuery("#wrap-loading").show();
+
+		jQuery.ajax({
+			method: "POST",
+			url: esakip.url,
+			data: tempData,
+			processData: false,
+			contentType: false,
+			cache: false,
+			dataType: "json",
+			success: function(res) {
+				alert(res.message);
+				jQuery("#wrap-loading").hide();
+				if (res.status === "success") {
+					location.reload();
+				}
+			},
+			error: function(xhr, status, error) {
+				console.error(xhr.responseText);
+				jQuery("#wrap-loading").hide();
+				alert("Terjadi kesalahan saat menyimpan data!");
+			},
+		});
+	}
+
+	function hapus_data_rincian(idRincian) {
+		alert(`data rincian dengan id ${idRincian}`)
+	}
+
+	function edit_data_akun(kdAkun) {
+		alert(`data akun dengan id ${kdAkun}`)
 	}
 </script>

@@ -3649,4 +3649,212 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		}
 		die(json_encode($ret));
 	}
+
+	function simpan_rinci_bl_tagging()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil menyimpan data tagging rincian belanja!'
+		);
+
+		if (!empty($_POST)) {
+			// Validasi API key
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (empty($_POST['tahun_anggaran'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun anggaran kosong!';
+				}
+				if (empty($_POST['kode_sbl'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Kode SBL kosong!';
+				}
+
+				if ($ret['status'] != 'error') {
+					// Decode rincian_belanja_ids dari JSON
+					$rincianBelanjaIds = json_decode(stripslashes($_POST['rincian_belanja_ids']), true);
+
+					if (empty($rincianBelanjaIds) || !is_array($rincianBelanjaIds)) {
+						$ret['status'] = 'error';
+						$ret['message'] = 'Format rincian belanja tidak valid!';
+						die(json_encode($ret));
+					}
+
+					// Insert atau update data ke database
+					foreach ($rincianBelanjaIds as $rinci) {
+						$data = array(
+							'id_skpd'       => sanitize_text_field($_POST['id_skpd']),
+							'id_indikator'  => sanitize_text_field($_POST['id_indikator']),
+							'kode_sbl'      => sanitize_text_field($_POST['kode_sbl']),
+							'tipe'          => sanitize_text_field($_POST['tipe']),
+							'kode_akun'     => sanitize_text_field($rinci['kode_akun']),
+							'nama_akun'     => sanitize_text_field($rinci['nama_akun']),
+							'subs_bl_teks'  => sanitize_text_field($rinci['subs_bl_teks']),
+							'ket_bl_teks'   => sanitize_text_field($rinci['ket_bl_teks']),
+							'id_rinci_sub_bl' => sanitize_text_field($rinci['id_rinci_sub_bl']),
+							'nama_komponen' => sanitize_text_field($rinci['nama_komponen']),
+							'volume'        => sanitize_text_field($rinci['volume']),
+							'satuan'        => sanitize_text_field($rinci['satuan']),
+							'harga_satuan'  => sanitize_text_field($rinci['harga_satuan']),
+							'keterangan'    => sanitize_textarea_field($rinci['keterangan']),
+							'tahun_anggaran' => sanitize_text_field($_POST['tahun_anggaran']),
+							'active'        => 1,
+						);
+
+						// Cek apakah data sudah ada
+						$cek_data = $wpdb->get_var(
+							$wpdb->prepare(
+								'SELECT id FROM esakip_tagging_rincian_belanja 
+								 WHERE id_rinci_sub_bl = %d AND tahun_anggaran = %d AND kode_sbl = %s',
+								$rinci['id_rinci_sub_bl'],
+								$_POST['tahun_anggaran'],
+								$_POST['kode_sbl']
+							)
+						);
+
+						// Update jika data sudah ada, insert jika belum
+						if ($cek_data) {
+							$wpdb->update(
+								'esakip_tagging_rincian_belanja',
+								$data,
+								array('id' => $cek_data)
+							);
+						} else {
+							$wpdb->insert('esakip_tagging_rincian_belanja', $data);
+						}
+					}
+				}
+			} else {
+				$ret['status'] = 'error';
+				$ret['message'] = 'API key tidak ditemukan!';
+			}
+		} else {
+			$ret['status'] = 'error';
+			$ret['message'] = 'Format salah!';
+		}
+
+		die(json_encode($ret));
+	}
+
+	function simpan_rinci_bl_tagging_manual()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil menyimpan data tagging rincian belanja manual!'
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$postData = $_POST;
+
+				// Define validation rules
+				$validationRules = [
+					'tahun_anggaran' => 'required',
+					'kode_akun' 	 => 'required',
+					'nama_akun' 	 => 'required',
+					'subs_bl_teks' 	 => 'required',
+					'ket_bl_teks' 	 => 'required',
+					'nama_komponen'  => 'required',
+					'volume' 		 => 'required|numeric',
+					'satuan' 		 => 'required',
+					'harga_satuan' 	 => 'required|numeric'
+				];
+
+				// Validate data
+				$errors = $this->validate($postData, $validationRules);
+
+				if (!empty($errors)) {
+					$ret['status'] = 'error';
+					$ret['message'] = implode(" \n ", $errors);
+					die(json_encode($ret));
+				}
+
+				// Prepare data for insertion or update
+				$data = [
+					'id_skpd' 		 => $postData['id_skpd'],
+					'id_indikator'   => $postData['id_indikator'],
+					'kode_sbl' 		 => $postData['kode_sbl'],
+					'tipe' 			 => $postData['tipe'],
+					'kode_akun' 	 => $postData['kode_akun'],
+					'nama_akun' 	 => $postData['nama_akun'],
+					'subs_bl_teks' 	 => $postData['subs_bl_teks'],
+					'ket_bl_teks' 	 => $postData['ket_bl_teks'],
+					'nama_komponen'  => $postData['nama_komponen'],
+					'volume' 		 => $postData['volume'],
+					'satuan' 		 => $postData['satuan'],
+					'harga_satuan'   => $postData['harga_satuan'],
+					'keterangan' 	 => $postData['keterangan'],
+					'tahun_anggaran' => $postData['tahun_anggaran']
+				];
+
+				if (!empty($postData['id_data'])) {
+					// Update existing record
+					$wpdb->update(
+						'esakip_tagging_rincian_belanja',
+						$data,
+						['id' => $postData['id_data']]
+					);
+					$ret['message'] = 'Berhasil mengedit data tagging rincian belanja manual!';
+				} else {
+					// Insert new record
+					$wpdb->insert('esakip_tagging_rincian_belanja', $data);
+				}
+			} else {
+				$ret['status'] = 'error';
+				$ret['message'] = 'API key tidak ditemukan!';
+			}
+		} else {
+			$ret['status'] = 'error';
+			$ret['message'] = 'Format salah!';
+		}
+
+		die(json_encode($ret));
+	}
+
+	function validate($data, $rules)
+	{
+		$errors = [];
+
+		foreach ($rules as $field => $ruleSet) {
+			$rulesArray = explode('|', $ruleSet);
+
+			foreach ($rulesArray as $rule) {
+				if ($rule == 'required' && (!isset($data[$field]))) {
+					$errors[] = "$field is required";
+				}
+
+				if ($rule == 'string' && isset($data[$field]) && !is_string($data[$field])) {
+					$errors[] = "$field must be a string";
+				}
+
+				if ($rule == 'numeric' && isset($data[$field]) && !is_numeric($data[$field])) {
+					$errors[] = "$field must be numeric";
+				}
+
+				if (strpos($rule, 'min:') === 0) {
+					$min = (int)explode(':', $rule)[1];
+					if (isset($data[$field]) && strlen($data[$field]) < $min) {
+						$errors[] = "$field must be at least $min characters";
+					}
+				}
+
+				if (strpos($rule, 'max:') === 0) {
+					$max = (int)explode(':', $rule)[1];
+					if (isset($data[$field]) && strlen($data[$field]) > $max) {
+						$errors[] = "$field cannot exceed $max characters";
+					}
+				}
+
+				if (strpos($rule, 'in:') === 0) {
+					$allowed = explode(',', explode(':', $rule)[1]);
+					if (isset($data[$field]) && !in_array($data[$field], $allowed)) {
+						$errors[] = "$field must be one of: " . implode(', ', $allowed);
+					}
+				}
+			}
+		}
+
+		return $errors;
+	}
 }
