@@ -1616,6 +1616,7 @@ CREATE TABLE `esakip_data_mapping_unit_sipd_simpeg` (
   PRIMARY key (id)
 );
 
+<<<<<<< HEAD
 CREATE TABLE `esakip_data_pegawai_cascading` (
   `id` int(11) NOT NULL auto_increment,
   `id_satker` int(11) DEFAULT NULL,
@@ -1630,4 +1631,39 @@ CREATE TABLE `esakip_data_pegawai_cascading` (
   `created_at` datetime DEFAULT current_timestamp(),
   `update_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id)
+=======
+CREATE TABLE `esakip_tagging_rincian_belanja` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `id_skpd` INT(11) NOT NULL,
+  `id_indikator` INT(11) NOT NULL,
+  `kode_sbl` VARCHAR(50) NOT NULL,
+  `tipe` TINYINT(2) NOT NULL,
+  `kode_akun` VARCHAR(50) DEFAULT NULL,
+  `nama_akun` VARCHAR(255) DEFAULT NULL,
+  `subs_bl_teks` VARCHAR(255) DEFAULT NULL,
+  `ket_bl_teks` VARCHAR(255) DEFAULT NULL,
+  `id_rinci_sub_bl` INT(11) DEFAULT NULL,
+  `nama_komponen` VARCHAR(255) DEFAULT NULL,
+  `volume` double(20, 0) DEFAULT NULL,
+  `satuan` VARCHAR(50) DEFAULT NULL,
+  `harga_satuan` double(20, 0) DEFAULT NULL,
+  `keterangan` TEXT,
+  `tahun_anggaran` year(4) NOT NULL,
+  `active` TINYINT(1) NOT NULL DEFAULT 1,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+);
+
+
+CREATE TABLE `esakip_detail_data_unit` (
+  `id` int NOT NULL auto_increment,
+  `id_skpd` int(11) DEFAULT NULL,
+  `nama_skpd` varchar(64) DEFAULT NULL,
+  `alamat_kantor` varchar(255) DEFAULT NULL,
+  `active` tinyint DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
+ PRIMARY KEY(id)
+>>>>>>> dded91512547b15a2a238b00a83746375d3d1263
 );

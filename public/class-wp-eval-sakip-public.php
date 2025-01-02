@@ -28264,11 +28264,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						break;
 				}
 
-				$response = $this->functions->curl_post(array(
+				$option = array(
 					'url' => get_option('_crb_url_api_simpeg').$path,
 					'type' => 'get',
 					'header' => array('Authorization: Basic ' . get_option('_crb_authorization_api_simpeg'))
-				));
+				);
+
+				$response = $this->functions->curl_post($option);
 
 				if(empty($response)){
 					throw new Exception("Respon API kosong!", 1);
@@ -28336,9 +28338,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 
 					if($_POST['type']=='search'){
-						$dataSatker = $wpdb->get_results($wpdb->prepare("SELECT * FROM esakip_data_satker_simpeg WHERE nama LIKE %s AND active=%d AND tahun_anggaran=%d ORDER BY satker_id ASC", "%".$_POST['q']."%", 1, $_POST['tahun_anggaran']), ARRAY_A);
+						$dataSatker = $wpdb->get_results($wpdb->prepare("SELECT satker_id as id, nama FROM esakip_data_satker_simpeg WHERE nama LIKE %s AND active=%d AND tahun_anggaran=%d ORDER BY satker_id ASC", "%".$_POST['q']."%", 1, $_POST['tahun_anggaran']), ARRAY_A);
 					}else{
-						$dataSatker = $wpdb->get_results($wpdb->prepare("SELECT * FROM esakip_data_satker_simpeg WHERE satker_id_parent=%s AND active=%d AND tahun_anggaran=%d ORDER BY satker_id ASC", '0', 1, $_POST['tahun_anggaran']), ARRAY_A);
+						$dataSatker = $wpdb->get_results($wpdb->prepare("SELECT satker_id as id, nama FROM esakip_data_satker_simpeg WHERE satker_id_parent=%s AND active=%d AND tahun_anggaran=%d ORDER BY satker_id ASC", '0', 1, $_POST['tahun_anggaran']), ARRAY_A);
 					}
 
 					echo json_encode([
