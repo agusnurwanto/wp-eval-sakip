@@ -1616,7 +1616,6 @@ CREATE TABLE `esakip_data_mapping_unit_sipd_simpeg` (
   PRIMARY key (id)
 );
 
-<<<<<<< HEAD
 CREATE TABLE `esakip_data_pegawai_cascading` (
   `id` int(11) NOT NULL auto_increment,
   `id_satker` int(11) DEFAULT NULL,
@@ -1631,7 +1630,7 @@ CREATE TABLE `esakip_data_pegawai_cascading` (
   `created_at` datetime DEFAULT current_timestamp(),
   `update_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id)
-=======
+
 CREATE TABLE `esakip_tagging_rincian_belanja` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `id_skpd` INT(11) NOT NULL,
@@ -1665,5 +1664,4 @@ CREATE TABLE `esakip_detail_data_unit` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp(),
  PRIMARY KEY(id)
->>>>>>> dded91512547b15a2a238b00a83746375d3d1263
 );
