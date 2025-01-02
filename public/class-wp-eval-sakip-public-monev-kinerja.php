@@ -3595,10 +3595,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 	function get_sub_keg_rka_wpsipd()
 	{
+		global $wpdb;
 		$ret = array(
-			'status'  => 'success',
-			'message' => 'Berhasil get data rka wp-sipd!',
-			'data'    => array()
+			'status'    => 'success',
+			'message'   => 'Berhasil get data rka wp-sipd!',
+			'data'      => array()
 		);
 
 		if (!empty($_POST)) {
@@ -3611,42 +3612,96 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$ret['status'] = 'error';
 					$ret['message'] = 'Kode Sbl kosong!';
 				}
+				if (empty($_POST['id_indikator'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'id indikator kosong!';
+				}
 				if ($ret['status'] != 'error') {
-					//params post
+					// Params post
 					$api_params = array(
-						'action' 		 => 'get_sub_keg_rka_sipd',
-						'api_key'		 => get_option('_crb_apikey_wpsipd'),
+						'action'         => 'get_sub_keg_rka_sipd',
+						'api_key'        => get_option('_crb_apikey_wpsipd'),
 						'tahun_anggaran' => $_POST['tahun_anggaran'],
-						'kode_sbl' 		 => $_POST['kode_sbl']
+						'kode_sbl'       => $_POST['kode_sbl']
 					);
 
-					//post to wp-sipd
+					// Post to wp-sipd
 					$post = wp_remote_post(
 						get_option('_crb_url_server_sakip'),
 						array(
-							'timeout' 	=> 1000,
-							'sslverify' => false,
-							'body' 		=> $api_params
+							'timeout'    => 1000,
+							'sslverify'  => false,
+							'body'       => $api_params
 						)
 					);
 
-					//retrieve data
+					// Retrieve data
 					$response = wp_remote_retrieve_body($post);
+					$data_rka = json_decode($response, true); // Decode JSON to associative array
 
-					$ret['data'] = json_decode($response);
+					if (isset($data_rka['data']) && is_array($data_rka['data'])) {
+						foreach ($data_rka['data'] as &$item) {
+							$id_rinci_sub_bl = $item['id_rinci_sub_bl'];
+
+							$labels = $wpdb->get_row(
+								$wpdb->prepare('
+									SELECT 
+										id_indikator,
+										id_rinci_sub_bl,
+										volume,
+										realisasi,
+										keterangan
+									FROM esakip_tagging_rincian_belanja
+									WHERE tahun_anggaran = %d
+									  AND tipe = 2
+									  AND kode_sbl = %s
+									  AND id_rinci_sub_bl = %d
+									  AND active = 1
+								', $_POST['tahun_anggaran'], $_POST['kode_sbl'], $id_rinci_sub_bl),
+								ARRAY_A
+							);
+
+							if (!empty($labels)) {
+								$nama_indikator = $wpdb->get_var(
+									$wpdb->prepare('
+										SELECT 
+											indikator
+										FROM esakip_data_rencana_aksi_indikator_opd
+										WHERE id = %d
+										  AND active = 1
+									', $labels['id_indikator'])
+								);
+
+								$labels['nama_indikator'] = $nama_indikator;
+
+								$item['labels'][] = $labels;
+								$item['is_checked'] = true;
+							} else {
+								$item['labels'] = [];
+								$item['is_checked'] = false;
+							}
+						}
+
+						// Menyimpan hasil akhir ke dalam $ret
+						$ret['data'] = $data_rka['data'];
+					} else {
+						$ret['status'] = 'error';
+						$ret['message'] = 'Data dari API kosong atau tidak valid!';
+					}
 				}
 			} else {
 				$ret = array(
 					'status' => 'error',
-					'message'   => 'Api Key tidak sesuai!'
+					'message' => 'Api Key tidak sesuai!'
 				);
 			}
 		} else {
 			$ret = array(
 				'status' => 'error',
-				'message'   => 'Format tidak sesuai!'
+				'message' => 'Format tidak sesuai!'
 			);
 		}
+
 		die(json_encode($ret));
 	}
 
@@ -3654,75 +3709,94 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	{
 		global $wpdb;
 		$ret = array(
-			'status' => 'success',
+			'status'  => 'success',
 			'message' => 'Berhasil menyimpan data tagging rincian belanja!'
 		);
 
 		if (!empty($_POST)) {
-			// Validasi API key
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				if (empty($_POST['tahun_anggaran'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun anggaran kosong!';
+					die(json_encode($ret));
 				}
 				if (empty($_POST['kode_sbl'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Kode SBL kosong!';
+					die(json_encode($ret));
+				}
+				if (empty($_POST['id_indikator'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Indikator kosong!';
+					die(json_encode($ret));
+				}
+				if (empty($_POST['id_skpd'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id SKPD kosong!';
+					die(json_encode($ret));
 				}
 
-				if ($ret['status'] != 'error') {
-					// Decode rincian_belanja_ids dari JSON
-					$rincianBelanjaIds = json_decode(stripslashes($_POST['rincian_belanja_ids']), true);
+				// Decode rincian_belanja_ids dan data_rinci dari JSON
+				$rincianBelanjaIds = json_decode(stripslashes($_POST['rincian_belanja_ids']), true);
+				$dataRinci = json_decode(stripslashes($_POST['data_rinci']), true);
 
-					if (empty($rincianBelanjaIds) || !is_array($rincianBelanjaIds)) {
+				if (empty($rincianBelanjaIds) || !is_array($rincianBelanjaIds) || empty($dataRinci) || !is_array($dataRinci)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Format rincian belanja tidak valid!';
+					die(json_encode($ret));
+				}
+
+				//set active = 0 semua sebelum ditambah
+				$wpdb->update(
+					'esakip_tagging_rincian_belanja',
+					array('active' => 0),
+					array(
+						'tahun_anggaran' => $_POST['tahun_anggaran'],
+						'kode_sbl' 		 => $_POST['kode_sbl'],
+						'id_indikator'   => $_POST['id_indikator'],
+						'id_skpd' 		 => $_POST['id_skpd'],
+						'active' 		 => 1
+					)
+				);
+				// Insert atau update data ke database
+				foreach ($rincianBelanjaIds as $index => $rinciId) {
+					// Ambil rincian berdasarkan index
+					$rinci = isset($dataRinci[$index]) ? $dataRinci[$index] : null;
+
+					if (!is_array($rinci)) {
 						$ret['status'] = 'error';
-						$ret['message'] = 'Format rincian belanja tidak valid!';
+						$ret['message'] = 'Rincian data tidak sesuai!';
 						die(json_encode($ret));
 					}
 
-					// Insert atau update data ke database
-					foreach ($rincianBelanjaIds as $rinci) {
-						$data = array(
-							'id_skpd'       => sanitize_text_field($_POST['id_skpd']),
-							'id_indikator'  => sanitize_text_field($_POST['id_indikator']),
-							'kode_sbl'      => sanitize_text_field($_POST['kode_sbl']),
-							'tipe'          => sanitize_text_field($_POST['tipe']),
-							'kode_akun'     => sanitize_text_field($rinci['kode_akun']),
-							'nama_akun'     => sanitize_text_field($rinci['nama_akun']),
-							'subs_bl_teks'  => sanitize_text_field($rinci['subs_bl_teks']),
-							'ket_bl_teks'   => sanitize_text_field($rinci['ket_bl_teks']),
-							'id_rinci_sub_bl' => sanitize_text_field($rinci['id_rinci_sub_bl']),
-							'nama_komponen' => sanitize_text_field($rinci['nama_komponen']),
-							'volume'        => sanitize_text_field($rinci['volume']),
-							'satuan'        => sanitize_text_field($rinci['satuan']),
-							'harga_satuan'  => sanitize_text_field($rinci['harga_satuan']),
-							'keterangan'    => sanitize_textarea_field($rinci['keterangan']),
-							'tahun_anggaran' => sanitize_text_field($_POST['tahun_anggaran']),
-							'active'        => 1,
-						);
-
-						// Cek apakah data sudah ada
-						$cek_data = $wpdb->get_var(
-							$wpdb->prepare(
-								'SELECT id FROM esakip_tagging_rincian_belanja 
-								 WHERE id_rinci_sub_bl = %d AND tahun_anggaran = %d AND kode_sbl = %s',
-								$rinci['id_rinci_sub_bl'],
-								$_POST['tahun_anggaran'],
-								$_POST['kode_sbl']
-							)
-						);
-
-						// Update jika data sudah ada, insert jika belum
-						if ($cek_data) {
-							$wpdb->update(
-								'esakip_tagging_rincian_belanja',
-								$data,
-								array('id' => $cek_data)
-							);
-						} else {
-							$wpdb->insert('esakip_tagging_rincian_belanja', $data);
-						}
-					}
+					$volume = isset($rinci['volume']) ? sanitize_text_field($rinci['volume']) : '';
+					$realisasi = isset($rinci['realisasi']) ? sanitize_text_field($rinci['realisasi']) : '';
+					$keterangan = isset($rinci['keterangan']) ? sanitize_textarea_field($rinci['keterangan']) : '';
+					$data = array(
+						'id_skpd'         => sanitize_text_field($_POST['id_skpd']),
+						'id_indikator'    => sanitize_text_field($_POST['id_indikator']),
+						'kode_sbl'        => sanitize_text_field($_POST['kode_sbl']),
+						'tipe'            => 2,
+						'kode_akun'       => sanitize_text_field($rinci['kode_akun']),
+						'nama_akun'       => sanitize_text_field($rinci['nama_akun']),
+						'subs_bl_teks'    => sanitize_text_field($rinci['subs']),
+						'ket_bl_teks'     => sanitize_text_field($rinci['ket']),
+						'id_rinci_sub_bl' => sanitize_text_field($rinci['id_rincian']),
+						'nama_komponen'   => sanitize_text_field($rinci['nama_komponen']),
+						'volume'          => $volume,
+						'satuan'          => sanitize_text_field($rinci['satuan']),
+						'harga_satuan'    => sanitize_text_field($rinci['harga_satuan']),
+						'keterangan'      => $keterangan,
+						'tahun_anggaran'  => sanitize_text_field($_POST['tahun_anggaran']),
+						'realisasi'       => $realisasi,
+						'active'          => 1,
+					);
+					
+					$wpdb->insert(
+						'esakip_tagging_rincian_belanja',
+						$data
+					);
+					
 				}
 			} else {
 				$ret['status'] = 'error';
@@ -3775,11 +3849,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					'id_skpd' 		 => $postData['id_skpd'],
 					'id_indikator'   => $postData['id_indikator'],
 					'kode_sbl' 		 => $postData['kode_sbl'],
-					'tipe' 			 => $postData['tipe'],
+					'tipe' 			 => 1,
 					'kode_akun' 	 => $postData['kode_akun'],
 					'nama_akun' 	 => $postData['nama_akun'],
-					'subs_bl_teks' 	 => $postData['subs_bl_teks'],
-					'ket_bl_teks' 	 => $postData['ket_bl_teks'],
+					'subs_bl_teks' 	 => '[#]' . $postData['subs_bl_teks'],
+					'ket_bl_teks' 	 => '[-]' . $postData['ket_bl_teks'],
 					'nama_komponen'  => $postData['nama_komponen'],
 					'volume' 		 => $postData['volume'],
 					'satuan' 		 => $postData['satuan'],
@@ -3800,6 +3874,65 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					// Insert new record
 					$wpdb->insert('esakip_tagging_rincian_belanja', $data);
 				}
+			} else {
+				$ret['status'] = 'error';
+				$ret['message'] = 'API key tidak ditemukan!';
+			}
+		} else {
+			$ret['status'] = 'error';
+			$ret['message'] = 'Format salah!';
+		}
+
+		die(json_encode($ret));
+	}
+
+	function delete_rincian_tagging_by_id_rinci_bl()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus tagging rincian!'
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$wpdb->update(
+					'esakip_tagging_rincian_belanja',
+					array('active' => 0),
+					array('id' => $_POST['id'])
+				);
+			} else {
+				$ret['status'] = 'error';
+				$ret['message'] = 'API key tidak ditemukan!';
+			}
+		} else {
+			$ret['status'] = 'error';
+			$ret['message'] = 'Format salah!';
+		}
+
+		die(json_encode($ret));
+	}
+
+	function get_rinci_tagging_by_id()
+	{
+		global $wpdb;
+		$ret = array(
+			'status'  => 'success',
+			'message' => 'Berhasil get data tagging rincian by id!',
+			'data' 	  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$ret['data'] = $wpdb->get_row(
+					$wpdb->prepare('
+						SELECT *
+						FROM esakip_tagging_rincian_belanja
+						WHERE id = %d
+						  AND active = 1
+					', $_POST['id']),
+					ARRAY_A
+				);
 			} else {
 				$ret['status'] = 'error';
 				$ret['message'] = 'API key tidak ditemukan!';
