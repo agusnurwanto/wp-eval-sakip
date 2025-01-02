@@ -1615,3 +1615,19 @@ CREATE TABLE `esakip_data_mapping_unit_sipd_simpeg` (
   `update_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id)
 );
+
+CREATE TABLE `esakip_data_pegawai_cascading` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_satker` int(11) DEFAULT NULL,
+  `nama_satker` text DEFAULT NULL,
+  `jabatan` text DEFAULT NULL,
+  `nip` text DEFAULT NULL ,
+  `nama` text DEFAULT NULL,
+  `jenis_data` tinyint(4) NOT NULL COMMENT '1 = TUJUAN RENSTRA, 2 = SASARAN RENSTRA, 3 = PROGRAM RENSTRA, 4 = KEGIATAN RENSTRA, 5 = SUB KEGIATAN RENSTRA, 6 = RHK',
+  `id_data` int(11) NOT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id)
+);

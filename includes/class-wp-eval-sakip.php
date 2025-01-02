@@ -277,6 +277,13 @@ class Wp_Eval_Sakip {
 		
 		$this->loader->add_action('wp_ajax_get_table_cascading_pd', $plugin_public, 'get_table_cascading_pd');
 		$this->loader->add_action('wp_ajax_get_kegiatan_by_program', $plugin_public, 'get_kegiatan_by_program');
+		$this->loader->add_action('wp_ajax_get_tujuan_cascading', $plugin_public, 'get_tujuan_cascading');
+		$this->loader->add_action('wp_ajax_get_sasaran_cascading', $plugin_public, 'get_sasaran_cascading');
+		$this->loader->add_action('wp_ajax_get_program_cascading', $plugin_public, 'get_program_cascading');
+		$this->loader->add_action('wp_ajax_get_kegiatan_cascading', $plugin_public, 'get_kegiatan_cascading');
+		$this->loader->add_action('wp_ajax_get_sub_giat_cascading', $plugin_public, 'get_sub_giat_cascading');
+		$this->loader->add_action('wp_ajax_get_jabatan_cascading', $plugin_public, 'get_jabatan_cascading');
+		$this->loader->add_action('wp_ajax_submit_pegawai_cascading', $plugin_public, 'submit_pegawai_cascading');
 
 		$this->loader->add_action('wp_ajax_get_detail_dokumen_by_id', $plugin_public, 'get_detail_dokumen_by_id');
 		$this->loader->add_action('wp_ajax_submit_tambah_dokumen', $plugin_public, 'submit_tambah_dokumen');
