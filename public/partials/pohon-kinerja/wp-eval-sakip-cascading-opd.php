@@ -573,8 +573,8 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                     jQuery('#kegiatan_cascading').hide();
                     jQuery('label[for="sub_giat_cascading"]').hide();
                     jQuery('#sub_giat_cascading').hide();
-                    if(response.jabatan && response.jabatan.satker_id){
-                        jQuery('#satker_id').html('<option value="'+response.jabatan.satker_id+'">'+response.jabatan.nama_satker+'</option>').trigger('change');
+                    if(response.jabatan && response.jabatan.id_satker){
+                        jQuery('#satker_id').html('<option value="'+response.jabatan.id_satker+'">'+response.jabatan.nama_satker+'</option>').trigger('change');
                     }else{
                         jQuery('#satker_id').html('<option value=""></option>').trigger('change');
                     }
@@ -618,13 +618,11 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                     jQuery('label[for="sub_giat_cascading"]').hide();
                     jQuery('#sub_giat_cascading').hide();
                     jQuery('#tipe').val(2);
-
-                    jQuery('#satker_id').select2({
-                        width: '100%', 
-                        placeholder: 'Pilih Nama / Jabatan',
-                        allowClear: true,
-                        dropdownParent: jQuery('#modalUpload') 
-                    });
+                    if(response.jabatan && response.jabatan.id_satker){
+                        jQuery('#satker_id').html('<option value="'+response.jabatan.id_satker+'">'+response.jabatan.nama_satker+'</option>').trigger('change');
+                    }else{
+                        jQuery('#satker_id').html('<option value=""></option>').trigger('change');
+                    }
                 } else {
                     alert(response.message);
                 }
@@ -665,13 +663,11 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                     jQuery('label[for="sub_giat_cascading"]').hide();
                     jQuery('#sub_giat_cascading').hide();
                     jQuery('#tipe').val(3);
-
-                    jQuery('#satker_id').select2({
-                        width: '100%', 
-                        placeholder: 'Pilih Nama / Jabatan',
-                        allowClear: true,
-                        dropdownParent: jQuery('#modalUpload') 
-                    });
+                    if(response.jabatan && response.jabatan.id_satker){
+                        jQuery('#satker_id').html('<option value="'+response.jabatan.id_satker+'">'+response.jabatan.nama_satker+'</option>').trigger('change');
+                    }else{
+                        jQuery('#satker_id').html('<option value=""></option>').trigger('change');
+                    }
                 } else {
                     alert(response.message);
                 }
@@ -713,13 +709,11 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                     jQuery('label[for="sub_giat_cascading"]').hide();
                     jQuery('#sub_giat_cascading').hide();
                     jQuery('#tipe').val(4);
-
-                    jQuery('#satker_id').select2({
-                        width: '100%', 
-                        placeholder: 'Pilih Nama / Jabatan',
-                        allowClear: true,
-                        dropdownParent: jQuery('#modalUpload') 
-                    });
+                    if(response.jabatan && response.jabatan.id_satker){
+                        jQuery('#satker_id').html('<option value="'+response.jabatan.id_satker+'">'+response.jabatan.nama_satker+'</option>').trigger('change');
+                    }else{
+                        jQuery('#satker_id').html('<option value=""></option>').trigger('change');
+                    }
                 } else {
                     alert(response.message);
                 }
@@ -762,13 +756,11 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                     jQuery('label[for="sub_giat_cascading"]').show();
                     jQuery('#sub_giat_cascading').show();
                     jQuery('#tipe').val(5);
-
-                    jQuery('#satker_id').select2({
-                        width: '100%', 
-                        placeholder: 'Pilih Nama / Jabatan',
-                        allowClear: true,
-                        dropdownParent: jQuery('#modalUpload') 
-                    });
+                    if(response.jabatan && response.jabatan.id_satker){
+                        jQuery('#satker_id').html('<option value="'+response.jabatan.id_satker+'">'+response.jabatan.nama_satker+'</option>').trigger('change');
+                    }else{
+                        jQuery('#satker_id').html('<option value=""></option>').trigger('change');
+                    }
                 } else {
                     alert(response.message);
                 }
@@ -792,27 +784,25 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
         if (satker_id == '') {
             return alert('ID Satker tidak boleh kosong');
         }
-
+        let nama_satker = jQuery('#satker_id').select2('data')[0].nama;
         jQuery.ajax({
             url: esakip.url,
             type: "post",
             data: {
                 action: 'submit_pegawai_cascading',
                 api_key: esakip.api_key,
-                tahun_anggaran: <?php echo $input['tahun']; ?>,
+                tahun_anggaran: <?php echo $tahun_anggaran_sakip; ?>,
                 id_skpd: <?php echo $id_skpd; ?>,
                 id_data: id_data,
                 tipe: tipe,
-                nip_baru: nip_baru,
-                nama_pegawai: nama_pegawai,
-                satker_id: satker_id
+                satker_id: satker_id,
+                nama_satker: nama_satker
             },
             dataType: "json",
             success: function(res) {
                 jQuery('#wrap-loading').hide();
                 alert(res.message);
                 if (res.status === 'success') {
-                    // Tutup modal jika berhasil
                     jQuery('#modalUpload').modal('hide');
                 }
             },
