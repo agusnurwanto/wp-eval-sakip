@@ -3595,10 +3595,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 	function get_sub_keg_rka_wpsipd()
 	{
+		global $wpdb;
 		$ret = array(
-			'status'  => 'success',
-			'message' => 'Berhasil get data rka wp-sipd!',
-			'data'    => array()
+			'status'    => 'success',
+			'message'   => 'Berhasil get data rka wp-sipd!',
+			'data'      => array()
 		);
 
 		if (!empty($_POST)) {
@@ -3611,42 +3612,382 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$ret['status'] = 'error';
 					$ret['message'] = 'Kode Sbl kosong!';
 				}
+				if (empty($_POST['id_indikator'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'id indikator kosong!';
+				}
 				if ($ret['status'] != 'error') {
-					//params post
+					// Params post
 					$api_params = array(
-						'action' 		 => 'get_sub_keg_rka_sipd',
-						'api_key'		 => get_option('_crb_apikey_wpsipd'),
+						'action'         => 'get_sub_keg_rka_sipd',
+						'api_key'        => get_option('_crb_apikey_wpsipd'),
 						'tahun_anggaran' => $_POST['tahun_anggaran'],
-						'kode_sbl' 		 => $_POST['kode_sbl']
+						'kode_sbl'       => $_POST['kode_sbl']
 					);
 
-					//post to wp-sipd
+					// Post to wp-sipd
 					$post = wp_remote_post(
 						get_option('_crb_url_server_sakip'),
 						array(
-							'timeout' 	=> 1000,
-							'sslverify' => false,
-							'body' 		=> $api_params
+							'timeout'    => 1000,
+							'sslverify'  => false,
+							'body'       => $api_params
 						)
 					);
 
-					//retrieve data
+					// Retrieve data
 					$response = wp_remote_retrieve_body($post);
+					$data_rka = json_decode($response, true); // Decode JSON to associative array
 
-					$ret['data'] = json_decode($response);
+					if (isset($data_rka['data']) && is_array($data_rka['data'])) {
+						foreach ($data_rka['data'] as &$item) {
+							$id_rinci_sub_bl = $item['id_rinci_sub_bl'];
+
+							$labels = $wpdb->get_row(
+								$wpdb->prepare('
+									SELECT 
+										id_indikator,
+										id_rinci_sub_bl,
+										volume,
+										realisasi,
+										keterangan
+									FROM esakip_tagging_rincian_belanja
+									WHERE tahun_anggaran = %d
+									  AND tipe = 2
+									  AND kode_sbl = %s
+									  AND id_rinci_sub_bl = %d
+									  AND active = 1
+								', $_POST['tahun_anggaran'], $_POST['kode_sbl'], $id_rinci_sub_bl),
+								ARRAY_A
+							);
+
+							if (!empty($labels)) {
+								$nama_indikator = $wpdb->get_var(
+									$wpdb->prepare('
+										SELECT 
+											indikator
+										FROM esakip_data_rencana_aksi_indikator_opd
+										WHERE id = %d
+										  AND active = 1
+									', $labels['id_indikator'])
+								);
+
+								$labels['nama_indikator'] = $nama_indikator;
+
+								$item['labels'][] = $labels;
+								$item['is_checked'] = true;
+							} else {
+								$item['labels'] = [];
+								$item['is_checked'] = false;
+							}
+						}
+
+						// Menyimpan hasil akhir ke dalam $ret
+						$ret['data'] = $data_rka['data'];
+					} else {
+						$ret['status'] = 'error';
+						$ret['message'] = 'Data dari API kosong atau tidak valid!';
+					}
 				}
 			} else {
 				$ret = array(
 					'status' => 'error',
-					'message'   => 'Api Key tidak sesuai!'
+					'message' => 'Api Key tidak sesuai!'
 				);
 			}
 		} else {
 			$ret = array(
 				'status' => 'error',
-				'message'   => 'Format tidak sesuai!'
+				'message' => 'Format tidak sesuai!'
 			);
 		}
+
 		die(json_encode($ret));
+	}
+
+	function simpan_rinci_bl_tagging()
+	{
+		global $wpdb;
+		$ret = array(
+			'status'  => 'success',
+			'message' => 'Berhasil menyimpan data tagging rincian belanja!'
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (empty($_POST['tahun_anggaran'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun anggaran kosong!';
+					die(json_encode($ret));
+				}
+				if (empty($_POST['kode_sbl'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Kode SBL kosong!';
+					die(json_encode($ret));
+				}
+				if (empty($_POST['id_indikator'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Indikator kosong!';
+					die(json_encode($ret));
+				}
+				if (empty($_POST['id_skpd'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id SKPD kosong!';
+					die(json_encode($ret));
+				}
+
+				// Decode rincian_belanja_ids dan data_rinci dari JSON
+				$rincianBelanjaIds = json_decode(stripslashes($_POST['rincian_belanja_ids']), true);
+				$dataRinci = json_decode(stripslashes($_POST['data_rinci']), true);
+
+				if (empty($rincianBelanjaIds) || !is_array($rincianBelanjaIds) || empty($dataRinci) || !is_array($dataRinci)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Format rincian belanja tidak valid!';
+					die(json_encode($ret));
+				}
+
+				//set active = 0 semua sebelum ditambah
+				$wpdb->update(
+					'esakip_tagging_rincian_belanja',
+					array('active' => 0),
+					array(
+						'tahun_anggaran' => $_POST['tahun_anggaran'],
+						'kode_sbl' 		 => $_POST['kode_sbl'],
+						'id_indikator'   => $_POST['id_indikator'],
+						'id_skpd' 		 => $_POST['id_skpd'],
+						'active' 		 => 1
+					)
+				);
+				// Insert atau update data ke database
+				foreach ($rincianBelanjaIds as $index => $rinciId) {
+					// Ambil rincian berdasarkan index
+					$rinci = isset($dataRinci[$index]) ? $dataRinci[$index] : null;
+
+					if (!is_array($rinci)) {
+						$ret['status'] = 'error';
+						$ret['message'] = 'Rincian data tidak sesuai!';
+						die(json_encode($ret));
+					}
+
+					$volume = isset($rinci['volume']) ? sanitize_text_field($rinci['volume']) : '';
+					$realisasi = isset($rinci['realisasi']) ? sanitize_text_field($rinci['realisasi']) : '';
+					$keterangan = isset($rinci['keterangan']) ? sanitize_textarea_field($rinci['keterangan']) : '';
+					$data = array(
+						'id_skpd'         => sanitize_text_field($_POST['id_skpd']),
+						'id_indikator'    => sanitize_text_field($_POST['id_indikator']),
+						'kode_sbl'        => sanitize_text_field($_POST['kode_sbl']),
+						'tipe'            => 2,
+						'kode_akun'       => sanitize_text_field($rinci['kode_akun']),
+						'nama_akun'       => sanitize_text_field($rinci['nama_akun']),
+						'subs_bl_teks'    => sanitize_text_field($rinci['subs']),
+						'ket_bl_teks'     => sanitize_text_field($rinci['ket']),
+						'id_rinci_sub_bl' => sanitize_text_field($rinci['id_rincian']),
+						'nama_komponen'   => sanitize_text_field($rinci['nama_komponen']),
+						'volume'          => $volume,
+						'satuan'          => sanitize_text_field($rinci['satuan']),
+						'harga_satuan'    => sanitize_text_field($rinci['harga_satuan']),
+						'keterangan'      => $keterangan,
+						'tahun_anggaran'  => sanitize_text_field($_POST['tahun_anggaran']),
+						'realisasi'       => $realisasi,
+						'active'          => 1,
+					);
+					
+					$wpdb->insert(
+						'esakip_tagging_rincian_belanja',
+						$data
+					);
+					
+				}
+			} else {
+				$ret['status'] = 'error';
+				$ret['message'] = 'API key tidak ditemukan!';
+			}
+		} else {
+			$ret['status'] = 'error';
+			$ret['message'] = 'Format salah!';
+		}
+
+		die(json_encode($ret));
+	}
+
+	function simpan_rinci_bl_tagging_manual()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil menyimpan data tagging rincian belanja manual!'
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$postData = $_POST;
+
+				// Define validation rules
+				$validationRules = [
+					'tahun_anggaran' => 'required',
+					'kode_akun' 	 => 'required',
+					'nama_akun' 	 => 'required',
+					'subs_bl_teks' 	 => 'required',
+					'ket_bl_teks' 	 => 'required',
+					'nama_komponen'  => 'required',
+					'volume' 		 => 'required|numeric',
+					'satuan' 		 => 'required',
+					'harga_satuan' 	 => 'required|numeric'
+				];
+
+				// Validate data
+				$errors = $this->validate($postData, $validationRules);
+
+				if (!empty($errors)) {
+					$ret['status'] = 'error';
+					$ret['message'] = implode(" \n ", $errors);
+					die(json_encode($ret));
+				}
+
+				// Prepare data for insertion or update
+				$data = [
+					'id_skpd' 		 => $postData['id_skpd'],
+					'id_indikator'   => $postData['id_indikator'],
+					'kode_sbl' 		 => $postData['kode_sbl'],
+					'tipe' 			 => 1,
+					'kode_akun' 	 => $postData['kode_akun'],
+					'nama_akun' 	 => $postData['nama_akun'],
+					'subs_bl_teks' 	 => '[#]' . $postData['subs_bl_teks'],
+					'ket_bl_teks' 	 => '[-]' . $postData['ket_bl_teks'],
+					'nama_komponen'  => $postData['nama_komponen'],
+					'volume' 		 => $postData['volume'],
+					'satuan' 		 => $postData['satuan'],
+					'harga_satuan'   => $postData['harga_satuan'],
+					'keterangan' 	 => $postData['keterangan'],
+					'tahun_anggaran' => $postData['tahun_anggaran']
+				];
+
+				if (!empty($postData['id_data'])) {
+					// Update existing record
+					$wpdb->update(
+						'esakip_tagging_rincian_belanja',
+						$data,
+						['id' => $postData['id_data']]
+					);
+					$ret['message'] = 'Berhasil mengedit data tagging rincian belanja manual!';
+				} else {
+					// Insert new record
+					$wpdb->insert('esakip_tagging_rincian_belanja', $data);
+				}
+			} else {
+				$ret['status'] = 'error';
+				$ret['message'] = 'API key tidak ditemukan!';
+			}
+		} else {
+			$ret['status'] = 'error';
+			$ret['message'] = 'Format salah!';
+		}
+
+		die(json_encode($ret));
+	}
+
+	function delete_rincian_tagging_by_id_rinci_bl()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus tagging rincian!'
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$wpdb->update(
+					'esakip_tagging_rincian_belanja',
+					array('active' => 0),
+					array('id' => $_POST['id'])
+				);
+			} else {
+				$ret['status'] = 'error';
+				$ret['message'] = 'API key tidak ditemukan!';
+			}
+		} else {
+			$ret['status'] = 'error';
+			$ret['message'] = 'Format salah!';
+		}
+
+		die(json_encode($ret));
+	}
+
+	function get_rinci_tagging_by_id()
+	{
+		global $wpdb;
+		$ret = array(
+			'status'  => 'success',
+			'message' => 'Berhasil get data tagging rincian by id!',
+			'data' 	  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$ret['data'] = $wpdb->get_row(
+					$wpdb->prepare('
+						SELECT *
+						FROM esakip_tagging_rincian_belanja
+						WHERE id = %d
+						  AND active = 1
+					', $_POST['id']),
+					ARRAY_A
+				);
+			} else {
+				$ret['status'] = 'error';
+				$ret['message'] = 'API key tidak ditemukan!';
+			}
+		} else {
+			$ret['status'] = 'error';
+			$ret['message'] = 'Format salah!';
+		}
+
+		die(json_encode($ret));
+	}
+
+	function validate($data, $rules)
+	{
+		$errors = [];
+
+		foreach ($rules as $field => $ruleSet) {
+			$rulesArray = explode('|', $ruleSet);
+
+			foreach ($rulesArray as $rule) {
+				if ($rule == 'required' && (!isset($data[$field]))) {
+					$errors[] = "$field is required";
+				}
+
+				if ($rule == 'string' && isset($data[$field]) && !is_string($data[$field])) {
+					$errors[] = "$field must be a string";
+				}
+
+				if ($rule == 'numeric' && isset($data[$field]) && !is_numeric($data[$field])) {
+					$errors[] = "$field must be numeric";
+				}
+
+				if (strpos($rule, 'min:') === 0) {
+					$min = (int)explode(':', $rule)[1];
+					if (isset($data[$field]) && strlen($data[$field]) < $min) {
+						$errors[] = "$field must be at least $min characters";
+					}
+				}
+
+				if (strpos($rule, 'max:') === 0) {
+					$max = (int)explode(':', $rule)[1];
+					if (isset($data[$field]) && strlen($data[$field]) > $max) {
+						$errors[] = "$field cannot exceed $max characters";
+					}
+				}
+
+				if (strpos($rule, 'in:') === 0) {
+					$allowed = explode(',', explode(':', $rule)[1]);
+					if (isset($data[$field]) && !in_array($data[$field], $allowed)) {
+						$errors[] = "$field must be one of: " . implode(', ', $allowed);
+					}
+				}
+			}
+		}
+
+		return $errors;
 	}
 }

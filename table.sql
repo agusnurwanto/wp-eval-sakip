@@ -1495,32 +1495,6 @@ CREATE TABLE `esakip_data_mapping_jenis_dokumen_esr` (
   PRIMARY key (id)
 );
 
-CREATE TABLE `esakip_data_tagging_rincian_belanja` (
-  `id` int(11) NOT NULL auto_increment,
-  `id_uraian_teknis_kegiatan` int(11) DEFAULT NULL,
-  `id_indikator_teknis_kegiatan` int(11) DEFAULT NULL,
-  `kode_sbl` varchar(50) NOT NULL,
-  `kode_rekening` varchar(50) DEFAULT NULL,
-  `nama_rekening` text DEFAULT NULL,
-  `id_rinci_sub_bl` int(11) DEFAULT NULL,
-  `nama_komponen` text DEFAULT NULL,  
-  `spek_komponen` text DEFAULT NULL,
-  `koefisien` text DEFAULT NULL,
-  `koefisien_murni` text DEFAULT NULL,
-  `rincian` double(20,2) DEFAULT NULL,
-  `rincian_murni` double(20,2) DEFAULT NULL,
-  `nama_komponen_tagging_rincian` text DEFAULT NULL,  
-  `koefisien_tagging_rincian` text DEFAULT NULL,
-  `rincian_tagging_rincian` double(20,2) DEFAULT NULL,
-  `id_skpd` int(11) DEFAULT NULL,
-  `active` tinyint(4) DEFAULT 1,
-  `jenis_tagging` varchar(255) NOT NULL,
-  `tahun_anggaran` year(4) NOT NULL DEFAULT '2024',
-  `created_at` datetime DEFAULT current_timestamp(),
-  `update_at` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (id)
-);
-
 CREATE TABLE `esakip_pengaturan_upload_dokumen` (
   `id` int(11) NOT NULL auto_increment,
   `id_jadwal` int(11) DEFAULT NULL,
@@ -1618,12 +1592,29 @@ CREATE TABLE `esakip_data_mapping_unit_sipd_simpeg` (
   PRIMARY key (id)
 );
 
+CREATE TABLE `esakip_data_pegawai_cascading` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_satker` int(11) DEFAULT NULL,
+  `nama_satker` text DEFAULT NULL,
+  `jabatan` text DEFAULT NULL,
+  `nip` text DEFAULT NULL ,
+  `nama` text DEFAULT NULL,
+  `jenis_data` tinyint(4) NOT NULL COMMENT '1 = TUJUAN RENSTRA, 2 = SASARAN RENSTRA, 3 = PROGRAM RENSTRA, 4 = KEGIATAN RENSTRA, 5 = SUB KEGIATAN RENSTRA, 6 = RHK',
+  `id_data` int(11) NOT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
+  `id_skpd` int(11) NOT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+);
+
 CREATE TABLE `esakip_tagging_rincian_belanja` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `id_skpd` INT(11) NOT NULL,
   `id_indikator` INT(11) NOT NULL,
   `kode_sbl` VARCHAR(50) NOT NULL,
-  `tipe` TINYINT(2) NOT NULL,
+  `tipe` TINYINT(2) NOT NULL COMMENT '1 = MANUAL, 2 = WP-SIPD',
   `kode_akun` VARCHAR(50) DEFAULT NULL,
   `nama_akun` VARCHAR(255) DEFAULT NULL,
   `subs_bl_teks` VARCHAR(255) DEFAULT NULL,
@@ -1633,6 +1624,7 @@ CREATE TABLE `esakip_tagging_rincian_belanja` (
   `volume` double(20, 0) DEFAULT NULL,
   `satuan` VARCHAR(50) DEFAULT NULL,
   `harga_satuan` double(20, 0) DEFAULT NULL,
+  `realisasi` double(20, 0) DEFAULT NULL,
   `keterangan` TEXT,
   `tahun_anggaran` year(4) NOT NULL,
   `active` TINYINT(1) NOT NULL DEFAULT 1,

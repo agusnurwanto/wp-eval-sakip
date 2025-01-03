@@ -254,8 +254,8 @@ thead {
 }
 
 .edit-mapping,
-.edit-monev,
-.edit-monev-file {
+.edit-icon,
+.edit-icon-file {
     border: 2px solid;
     padding: 2px;
     border-radius: 50%;
@@ -264,12 +264,12 @@ thead {
     cursor: pointer;
 }
 
-.edit-monev {
+.edit-icon {
     padding: 1px 1px 7px;
 }
 
 .edit-mapping:hover,
-.edit-monev:hover {
+.edit-icon:hover {
     background: #00bcd4;
     color: #fff;
 }
@@ -333,4 +333,49 @@ thead {
 .borderless-table tr,
 .borderless-table td {
     border: 0;
+}
+
+/* Base Styles */
+.edit-icon,
+.delete-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 33px;
+    height: 33px;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+/* Edit Buttons */
+.edit-icon {
+    background-color: #fdfd96;
+    color: #333;
+    border-color: #f7e700;
+}
+
+.edit-icon:hover {
+    background-color: #ffcc00;
+    color: #fff;
+    border-color: #ffa500;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Delete Button */
+.delete-icon {
+    background-color: #ffe5e5;
+    color: #d9534f;
+    border-color: #d9534f;
+}
+
+.delete-icon:hover {
+    background-color: #ff4444;
+    color: #fff;
+    border-color: #ff0000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }

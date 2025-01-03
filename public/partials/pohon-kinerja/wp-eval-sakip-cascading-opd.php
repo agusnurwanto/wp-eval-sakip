@@ -6,7 +6,7 @@ if (!defined('WPINC')) {
 }
 
 $input = shortcode_atts(array(
-	'tahun' => '2022',
+	'tahun' => '2024',
 	'periode' => '1'
 ), $atts);
 
@@ -62,6 +62,24 @@ $skpd = $wpdb->get_row(
 
 $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal_wpsipd['data'][0]['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ')';
 
+
+$get_satker = $wpdb->get_results($wpdb->prepare('
+    SELECT 
+        u.id_satker_simpeg,
+        u.active,
+        u.tahun_anggaran,
+        u.id_skpd,
+        s.id,
+        s.satker_id,
+        s.active
+    FROM esakip_data_mapping_unit_sipd_simpeg AS u
+    LEFT JOIN esakip_data_satker_simpeg AS s
+        ON s.id = u.id_satker_simpeg
+        AND s.active = u.active
+    WHERE u.tahun_anggaran = %d
+        AND u.id_skpd = %d
+        AND u.active = 1
+', $tahun_anggaran_sakip, $id_skpd), ARRAY_A);
 ?>
 <style type="text/css">
     .wrap-table {
@@ -211,6 +229,22 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
     .view-kegiatan-button:hover i {
         color: #f0f0f0; 
     }
+
+    .edit-pegawai-button {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+    }
+
+    .edit-pegawai-button i {
+        font-size: 2rem;
+        color: #fff; 
+    }
+
+    .edit-pegawai-button:hover i {
+        color: #f0f0f0; 
+    }
 </style>
 
 <!-- Table -->
@@ -280,6 +314,50 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
         </div>
     </div>
 </div>
+<!-- Modal Pegawai -->
+<div class="modal fade" id="modalUpload" tabindex="-1" role="dialog" aria-labelledby="modalUploadLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Data Cascading</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form-jabatan">
+                    <input type="hidden" value="" id="id_data">
+                    <input type="hidden" value="" id="tipe">
+                    <div class="form-group">
+                        <label>Tujuan</label>
+                        <input type="text" id="tujuan_cascading" class="form-control" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="sasaran_cascading">Sasaran</label>
+                        <input type="text" id="sasaran_cascading" class="form-control" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="program_cascading">Program</label>
+                        <input type="text" id="program_cascading" class="form-control" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="kegiatan_cascading">Kegiatan</label>
+                        <input type="text" id="kegiatan_cascading" class="form-control" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="sub_giat_cascading">Sub Kegiatan</label>
+                        <input type="text" id="sub_giat_cascading" class="form-control" disabled>
+                    </div>
+                    <div id="daftar_jabatan" class="form-group">
+                        <label for="satker_id">Pilih Jabatan</label>
+                        <select class="form-control select2" id="satker_id" name="satker_id"></select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" onclick="submit_pegawai_cascading(this); return false;">Simpan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <script type="text/javascript">
     jQuery(document).ready(function() {
         getTableCascading();
@@ -314,6 +392,62 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
                 });
             }
         });
+        jQuery('#nama_pegawai').select2({
+            
+        });
+
+        jQuery("#satker_id").select2({
+            ajax: {
+                url: esakip.url,
+                type: 'POST',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        action: 'get_jabatan_cascading',
+                        api_key: esakip.api_key,
+                        id_skpd: <?php echo $id_skpd; ?>,
+                        type:'search',
+                        q: params.term,
+                      };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+
+                    return {
+                       results: data.data,
+                       pagination: {
+                         more: (params.page * 30) < data.total_count
+                       }
+                     };
+                },
+                cache: true
+            },
+            placeholder: 'Cari satuan kerja / jabatan',
+            minimumInputLength: 5,
+            templateResult: function (response) {
+                if (response.loading) {
+                    return response.text;
+                }
+
+                var $container = jQuery(
+                "<div class='select2-result-repository clearfix'>" +
+                  "<div class='select2-result-repository__meta'>" +
+                    "<div class='select2-result-repository__title'></div>" +
+                  "</div>" +
+                "</div>"
+                );
+
+                $container.find(".select2-result-repository__title").text(response.nama);
+
+                return $container;
+            },
+            templateSelection: function(response) {
+                return response.nama || response.text;
+            },
+            'width': '100%',
+            dropdownParent: jQuery('#modalUpload') 
+        });
 
     });
 
@@ -346,23 +480,23 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
         });
     }
 
-    function view_kegiatan(button, id) {
+    function view_kegiatan(button, id, program, sasaran, tujuan) {
         let icon = jQuery(button).find('.visibility-icon');
         let body = jQuery('#tabel-cascading-kegiatan tbody');
 
         jQuery('.view-kegiatan-button').not(button).each(function() {
             let otherIcon = jQuery(this).find('.visibility-icon');
             if (jQuery(this).data('loaded')) {
-                jQuery('#tabel-cascading-kegiatan tbody').hide();
-                otherIcon.removeClass('dashicons-visibility').addClass('dashicons-hidden');
-                jQuery(this).data('loaded', false); 
+                body.hide();
+                otherIcon.removeClass('dashicons-hidden').addClass('dashicons-visibility');
+                jQuery(this).data('loaded', false);
             }
         });
 
         jQuery('#wrap-loading').show();
 
-        if (icon.hasClass('dashicons-hidden')) {
-            let value_nama_program = jQuery(`#program-ke-${id}`).attr('data-nama-program') || 'Program belum dipilih';
+        if (icon.hasClass('dashicons-visibility')) {
+            let value_program = jQuery(`#program-ke-${id}`).attr('data-nama-program') || 'Program belum dipilih';
 
             jQuery.ajax({
                 url: esakip.url,
@@ -370,16 +504,19 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
                 data: {
                     action: 'get_kegiatan_by_program',
                     api_key: esakip.api_key,
-                    id: id
+                    id: id,
+                    tujuan: tujuan,
+                    sasaran: sasaran,
+                    program: program
                 },
                 dataType: 'json',
                 success: function(response) {
                     jQuery('#wrap-loading').hide();
                     if (response.status === 'success') {
-                        jQuery(".get-nama-program").html('Cascading Kegiatan dan Sub Kegiatan<br>PROGRAM: ' + value_nama_program);
+                        jQuery(".get-nama-program").html('Cascading Kegiatan dan Sub Kegiatan<br>PROGRAM: ' + value_program);
                         body.html(response.data).show();
                         jQuery(button).data('loaded', true);
-                        icon.removeClass('dashicons-hidden').addClass('dashicons-visibility');
+                        icon.removeClass('dashicons-visibility').addClass('dashicons-hidden');
                     } else {
                         alert(response.message);
                     }
@@ -393,10 +530,10 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
         } else {
             if (body.is(':visible')) {
                 body.hide();
-                icon.removeClass('dashicons-visibility').addClass('dashicons-hidden');
+                icon.removeClass('dashicons-hidden').addClass('dashicons-visibility');
             } else {
                 body.show();
-                icon.removeClass('dashicons-hidden').addClass('dashicons-visibility');
+                icon.removeClass('dashicons-visibility').addClass('dashicons-hidden');
             }
 
             jQuery(".get-nama-program").html(function() {
@@ -408,6 +545,273 @@ $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal
 
             jQuery('#wrap-loading').hide();
         }
+    }
+    function get_tujuan_cascading(button, id, tujuan) {
+        jQuery('#wrap-loading').show();
+
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_tujuan_cascading',
+                api_key: esakip.api_key,
+                id: id,
+                id_skpd: <?php echo $id_skpd; ?>
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    jQuery('#id_data').val(response.data.id);
+                    jQuery('#modalUpload').modal('show');
+                    jQuery('#tujuan_cascading').val(tujuan); 
+                    jQuery('label[for="sasaran_cascading"]').hide();
+                    jQuery('#sasaran_cascading').hide();
+                    jQuery('label[for="program_cascading"]').hide();
+                    jQuery('#program_cascading').hide();
+                    jQuery('label[for="kegiatan_cascading"]').hide();
+                    jQuery('#kegiatan_cascading').hide();
+                    jQuery('label[for="sub_giat_cascading"]').hide();
+                    jQuery('#sub_giat_cascading').hide();
+                    if(response.jabatan && response.jabatan.id_satker){
+                        jQuery('#satker_id').html('<option value="'+response.jabatan.id_satker+'">'+response.jabatan.nama_satker+'</option>').trigger('change');
+                    }else{
+                        jQuery('#satker_id').html('<option value=""></option>').trigger('change');
+                    }
+                    jQuery('#tipe').val(1);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data!');
+            }
+        });
+    }
+    function get_sasaran_cascading(button, id, sasaran, tujuan) {
+        jQuery('#wrap-loading').show();
+
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_sasaran_cascading',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    jQuery('#id_data').val(response.data.id);
+                    jQuery('#modalUpload').modal('show');
+                    jQuery('#tujuan_cascading').val(tujuan); 
+                    jQuery('#sasaran_cascading').val(sasaran); 
+                    jQuery('label[for="sasaran_cascading"]').show();
+                    jQuery('#sasaran_cascading').show();
+                    jQuery('label[for="program_cascading"]').hide();
+                    jQuery('#program_cascading').hide();
+                    jQuery('label[for="kegiatan_cascading"]').hide();
+                    jQuery('#kegiatan_cascading').hide();
+                    jQuery('label[for="sub_giat_cascading"]').hide();
+                    jQuery('#sub_giat_cascading').hide();
+                    jQuery('#tipe').val(2);
+                    if(response.jabatan && response.jabatan.id_satker){
+                        jQuery('#satker_id').html('<option value="'+response.jabatan.id_satker+'">'+response.jabatan.nama_satker+'</option>').trigger('change');
+                    }else{
+                        jQuery('#satker_id').html('<option value=""></option>').trigger('change');
+                    }
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data!');
+            }
+        });
+    }
+    function get_program_cascading(button, id, program, sasaran, tujuan) {
+        jQuery('#wrap-loading').show();
+
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_program_cascading',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    jQuery('#id_data').val(response.data.id);
+                    jQuery('#modalUpload').modal('show');
+                    jQuery('#tujuan_cascading').val(tujuan); 
+                    jQuery('#sasaran_cascading').val(sasaran); 
+                    jQuery('#program_cascading').val(program); 
+                    jQuery('label[for="sasaran_cascading"]').show();
+                    jQuery('#sasaran_cascading').show();
+                    jQuery('label[for="program_cascading"]').show();
+                    jQuery('#program_cascading').show();
+                    jQuery('label[for="kegiatan_cascading"]').hide();
+                    jQuery('#kegiatan_cascading').hide();
+                    jQuery('label[for="sub_giat_cascading"]').hide();
+                    jQuery('#sub_giat_cascading').hide();
+                    jQuery('#tipe').val(3);
+                    if(response.jabatan && response.jabatan.id_satker){
+                        jQuery('#satker_id').html('<option value="'+response.jabatan.id_satker+'">'+response.jabatan.nama_satker+'</option>').trigger('change');
+                    }else{
+                        jQuery('#satker_id').html('<option value=""></option>').trigger('change');
+                    }
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data!');
+            }
+        });
+    }
+    function get_kegiatan_cascading(button, id, kegiatan, program, sasaran, tujuan) {
+        jQuery('#wrap-loading').show();
+
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_kegiatan_cascading',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    jQuery('#id_data').val(response.data.id);
+                    jQuery('#modalUpload').modal('show');
+                    jQuery('#tujuan_cascading').val(tujuan); 
+                    jQuery('#sasaran_cascading').val(sasaran); 
+                    jQuery('#program_cascading').val(program); 
+                    jQuery('#kegiatan_cascading').val(kegiatan); 
+                    jQuery('label[for="sasaran_cascading"]').show();
+                    jQuery('#sasaran_cascading').show();
+                    jQuery('label[for="program_cascading"]').show();
+                    jQuery('#program_cascading').show();
+                    jQuery('label[for="kegiatan_cascading"]').show();
+                    jQuery('#kegiatan_cascading').show();
+                    jQuery('label[for="sub_giat_cascading"]').hide();
+                    jQuery('#sub_giat_cascading').hide();
+                    jQuery('#tipe').val(4);
+                    if(response.jabatan && response.jabatan.id_satker){
+                        jQuery('#satker_id').html('<option value="'+response.jabatan.id_satker+'">'+response.jabatan.nama_satker+'</option>').trigger('change');
+                    }else{
+                        jQuery('#satker_id').html('<option value=""></option>').trigger('change');
+                    }
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data!');
+            }
+        });
+    }
+    function get_sub_giat_cascading(button, id, sub_giat, kegiatan, program, sasaran, tujuan) {
+        jQuery('#wrap-loading').show();
+
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_sub_giat_cascading',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    jQuery('#id_data').val(response.data.id);
+                    jQuery('#modalUpload').modal('show');
+                    jQuery('#tujuan_cascading').val(tujuan); 
+                    jQuery('#sasaran_cascading').val(sasaran); 
+                    jQuery('#program_cascading').val(program); 
+                    jQuery('#kegiatan_cascading').val(kegiatan); 
+                    jQuery('#sub_giat_cascading').val(sub_giat); 
+                    jQuery('label[for="sasaran_cascading"]').show();
+                    jQuery('#sasaran_cascading').show();
+                    jQuery('label[for="program_cascading"]').show();
+                    jQuery('#program_cascading').show();
+                    jQuery('label[for="kegiatan_cascading"]').show();
+                    jQuery('#kegiatan_cascading').show();
+                    jQuery('label[for="sub_giat_cascading"]').show();
+                    jQuery('#sub_giat_cascading').show();
+                    jQuery('#tipe').val(5);
+                    if(response.jabatan && response.jabatan.id_satker){
+                        jQuery('#satker_id').html('<option value="'+response.jabatan.id_satker+'">'+response.jabatan.nama_satker+'</option>').trigger('change');
+                    }else{
+                        jQuery('#satker_id').html('<option value=""></option>').trigger('change');
+                    }
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data!');
+            }
+        });
+    }
+
+    function submit_pegawai_cascading(button) {
+        jQuery('#wrap-loading').show();
+        let id_data = jQuery('#id_data').val();
+        let tipe = jQuery('#tipe').val();
+        if (tipe == '') {
+            return alert('Tipe tidak boleh kosong');
+        }
+        let satker_id = jQuery('#satker_id').val();
+        if (satker_id == '') {
+            return alert('ID Satker tidak boleh kosong');
+        }
+        let nama_satker = jQuery('#satker_id').select2('data')[0].nama;
+        jQuery.ajax({
+            url: esakip.url,
+            type: "post",
+            data: {
+                action: 'submit_pegawai_cascading',
+                api_key: esakip.api_key,
+                tahun_anggaran: <?php echo $tahun_anggaran_sakip; ?>,
+                id_skpd: <?php echo $id_skpd; ?>,
+                id_data: id_data,
+                tipe: tipe,
+                satker_id: satker_id,
+                nama_satker: nama_satker
+            },
+            dataType: "json",
+            success: function(res) {
+                jQuery('#wrap-loading').hide();
+                alert(res.message);
+                if (res.status === 'success') {
+                    jQuery('#modalUpload').modal('hide');
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat menyimpan data!');
+            }
+        });
     }
 
 </script>
