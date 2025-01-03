@@ -86,6 +86,7 @@ $path_logo_pemda_laporan_pk = get_option('_logo_pemda_laporan_pk');
 	</div>
 </div>
 
+
 <!-- Modal Upload -->
 <!-- <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered" style="max-width: 22rem;" role="document">

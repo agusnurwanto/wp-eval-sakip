@@ -47,6 +47,15 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
 		}
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-laporan-pk-setting.php';
 	}
+    
+    public function list_pegawai_laporan_pk($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-list-pegawai-laporan-pk.php';
+	}
 
     public function get_data_pengaturan_menu()
     {
@@ -1847,22 +1856,408 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                         $tbody = '';
     
                         foreach ($unit as $kk => $vv) {
+                            $total_pegawai_all = 0;
 
+                            $mapping_unit_simpeg = $wpdb->get_row($wpdb->prepare("
+                                SELECT 
+                                    a.*,
+                                    b.satker_id
+                                FROM 
+                                    esakip_data_mapping_unit_sipd_simpeg a 
+                                LEFT JOIN esakip_data_satker_simpeg b 
+                                    ON b.satker_id=a.id_satker_simpeg AND 
+                                    b.tahun_anggaran=a.tahun_anggaran AND b.active=1
+                                WHERE 
+                                    a.tahun_anggaran=%d and
+                                    a.id_skpd=%d;
+                            ", $tahun_anggaran, $vv['id_skpd']), ARRAY_A);
 
-                            
-                            $detail_laporan_pk = $this->functions->generatePage(array(
-                                'nama_page' => 'Halaman Detail Laporan PK ' . $tahun_anggaran,
-                                'content' => '[detail_laporan_pk tahun=' . $tahun_anggaran . ']',
+                            $satker_id = 0;
+                            if(!empty($mapping_unit_simpeg)){
+                                $satker_id = $mapping_unit_simpeg['satker_id'];
+                                // $data_option = array(
+                                //     'id_skpd' => $vv['id_skpd'],
+                                //     'tahun_anggaran' => $tahun_anggaran,
+                                //     'satker_id_parent' => $mapping_unit_simpeg['satker_id']
+                                // );
+
+                                // $get_total_pegawai = $this->get_pegawai_simpeg_skpd($data_option);
+
+                                // if($get_total_pegawai['status'] == 'success' && !empty($get_total_pegawai['data_pegawai'])){
+                                    // foreach($get_total_pegawai['data_pegawai'] as $v_1){
+                                    //     // get total pegawai
+                                    //     if(!empty($v_1['total_pegawai'])){
+                                    //         $total_pegawai_all += $v_1['total_pegawai'];
+                                    //     }
+                                    //     // if(!empty($v_1['data_pegawai'])){
+                                    //     //     foreach($v_1['data_pegawai'] as $v_2){
+                                    //     //         // get total pegawai
+                                    //     //         if(!empty($v_2['total_pegawai'])){
+                                    //     //             $total_pegawai_all += $v_2['total_pegawai'];
+                                    //     //         }
+                                    //     //         // if(!empty($v_2['data_pegawai'])){
+                                    //     //         //     foreach ($v_2['data_pegawai'] as $v_3) {
+                                    //     //         //         // get total pegawai
+                                    //     //         //         if(!empty($v_3['total_pegawai'])){
+                                    //     //         //             $total_pegawai_all += $v_3['total_pegawai'];
+                                    //     //         //         }
+                                    //     //         //         if(!empty($v_3['data_pegawai'])){
+                                    //     //         //             foreach ($v_3['data_pegawai'] as $v_4) {
+                                    //     //         //                 // get total pegawai
+                                    //     //         //                 if(!empty($v_4['total_pegawai'])){
+                                    //     //         //                     $total_pegawai_all += $v_4['total_pegawai'];
+                                    //     //         //                 }
+                                    //     //         //                 if(!empty($v_4['data_pegawai'])){
+                                    //     //         //                     foreach ($v_4['data_pegawai'] as $v_5) {
+                                    //     //         //                         // get total pegawai
+                                    //     //         //                         if(!empty($v_5['total_pegawai'])){
+                                    //     //         //                             $total_pegawai_all += $v_5['total_pegawai'];
+                                    //     //         //                         }
+                                    //     //         //                         if(!empty($v_5['data_pegawai'])){
+                                    //     //         //                             foreach ($v_5['data_pegawai'] as $v_6) {
+                                    //     //         //                                 // get total pegawai
+                                    //     //         //                                 if(!empty($v_6['total_pegawai'])){
+                                    //     //         //                                     $total_pegawai_all += $v_6['total_pegawai'];
+                                    //     //         //                                 }
+                                    //     //         //                                 if(!empty($v_6['data_pegawai'])){
+                                    //     //         //                                     foreach ($v_6['data_pegawai'] as $v_7) {
+                                    //     //         //                                         // get total pegawai
+                                    //     //         //                                         if(!empty($v_7['total_pegawai'])){
+                                    //     //         //                                             $total_pegawai_all += $v_7['total_pegawai'];
+                                    //     //         //                                         }
+                                    //     //         //                                     }
+                                    //     //         //                                 }
+                                    //     //         //                             }
+                                    //     //         //                         }
+                                    //     //         //                     }
+                                    //     //         //                 }
+                                    //     //         //             }
+                                    //     //         //         }
+                                    //     //         //     }
+                                    //     //         // }
+                                    //     //     }
+                                    //     // }
+                                    // }
+                                // }    
+                                $data_pegawai = $wpdb->get_row($wpdb->prepare("
+                                        SELECT 
+                                            COUNT(id) total_pegawai
+                                        FROM 
+                                            esakip_data_pegawai_simpeg
+                                        WHERE
+                                            satker_id LIKE '$satker_id%' AND
+                                            active=%d",
+                                1), ARRAY_A);
+                                $cek_q = $wpdb->last_query;
+                                if(!empty($data_pegawai)){
+                                    $total_pegawai_all = $data_pegawai['total_pegawai'];
+                                }
+                            }
+
+                            $halaman_pegawai_skpd = $this->functions->generatePage(array(
+                                'nama_page' => 'Halaman List Pegawai Laporan PK ' . $tahun_anggaran,
+                                'content' => '[list_pegawai_laporan_pk tahun_anggaran=' . $tahun_anggaran . ']',
                                 'show_header' => 1,
                                 'post_status' => 'private'
-                            )); //dokumen_detail_rencana_aksi
+                            )); 
     
                             $tbody .= "<tr>";
-                            $tbody .= "<td style='text-transform: uppercase;'><a href='".$detail_laporan_pk['url']."&id_skpd=".$vv['id_skpd']."' target='_blank'>".$vv['kode_skpd']." " . $vv['nama_skpd'] . "</a></td>";
-                            $tbody .= "<td style='text-transform: uppercase;'></td>";
+                            $tbody .= "<td style='text-transform: uppercase;'><a href='".$halaman_pegawai_skpd['url']."&id_skpd=".$vv['id_skpd']."' target='_blank'>".$vv['kode_skpd']." " . $vv['nama_skpd'] . "</a></td>";
+                            $tbody .= "<td class='text-center'>" . number_format($total_pegawai_all, 0, ",", ".") . "</td>";
                             $tbody .= "</tr>";
                         }
                         $ret['data'] = $tbody;
+                    } else {
+                        $ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+                    }
+                }
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+    // public function get_pegawai_simpeg_skpd($param){
+    //     global $wpdb;
+    //     $data_ret = array(
+    //         'status' => 'success',
+    //         'message' => 'Berhasil mendapatkan data pegawai simpeg per skpd',
+    //         'data_pegawai' => array()
+    //     );
+
+    //     if(empty($param['satker_id_parent'])){
+    //         $data_ret = [
+    //             'status' => 'error',
+    //             'message' => 'ID Satker Kosong'
+    //         ];
+    //     }else if(empty($param['id_skpd'])){
+    //         $data_ret = [
+    //             'status' => 'error',
+    //             'message' => 'Id Skpd Kosong'
+    //         ];
+    //     }else if(empty($param['tahun_anggaran'])){
+    //         $data_ret = [
+    //             'status' => 'error',
+    //             'message' => 'Tahun Anggaran Kosong'
+    //         ];
+    //     }
+
+    //     if($data_ret['status'] == 'success'){
+    //         $data_pegawai = $wpdb->get_row($wpdb->prepare("
+    //             SELECT 
+    //                 COUNT(id) total_pegawai
+    //             FROM 
+    //                 esakip_data_pegawai_simpeg
+    //             WHERE
+    //                 satker_id=%d AND
+    //                 active=1",
+    //         $param['satker_id_parent']), ARRAY_A);
+
+    //         // $data_ret['data_pegawai'][trim($param['satker_id_parent'])] = $data_pegawai;
+    //         if(!empty($data_pegawai)){
+    //             if (empty($data_ret['data_pegawai'][trim($param['satker_id_parent'])])) {
+    //                 $data_ret['data_pegawai'][trim($param['satker_id_parent'])] = [
+    //                     'id_satker_parent' => $param['satker_id_parent'],
+    //                     'total_pegawai' => $data_pegawai['total_pegawai']
+    //                 ];
+    //             }
+    //         }
+
+    //         $data_id_child_pegawai = $wpdb->get_results($wpdb->prepare("
+    //             SELECT 
+    //                 *
+    //             FROM 
+    //                 esakip_data_satker_simpeg
+    //             WHERE
+    //                 satker_id_parent=%d AND
+    //                 tahun_anggaran=%d AND
+    //                 active=1",
+    //         $param['satker_id_parent'], $param['tahun_anggaran']), ARRAY_A);
+
+    //         if(!empty($data_id_child_pegawai)){
+    //             foreach ($data_id_child_pegawai as $k => $v_id_child) {
+    //                 if(!empty($v_id_child['satker_id'])){
+    //                     // $param['satker_id_parent'] = $v_id_child['satker_id'];
+    //                     $data_ret['data_pegawai'][trim($v_id_child['satker_id'])] = $this->get_pegawai_simpeg_skpd($param);
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     return $data_ret;
+    // }
+
+    // public function get_child_pegawai_simpeg_skpd($param){
+    //     global $wpdb;
+    //     $data_ret = array(
+    //         'status' => 'success',
+    //         'message' => 'Berhasil mendapatkan data child skpd',
+    //         'data' => array()
+    //     );
+
+    //     if(empty($param['id_satker_simpeg'])){
+    //         $data_ret = [
+    //             'status' => 'error',
+    //             'message' => 'ID satker simpeg kosong'
+    //         ];
+    //     }
+
+    //     if($data_ret['status'] == 'success'){
+    //         $cek_parent = $wpdb->get_results($wpdb->prepare("
+    //             SELECT 
+    //                 *
+    //             FROM 
+    //                 esakip_data_satker_simpeg
+    //             WHERE
+    //                 satker_id_parent=%d",
+    //         $param['id_satker_simpeg']), ARRAY_A);
+
+    //         if(!empty($cek_parent)){
+    //             $get_data_pegawai_simpeg = $wpdb->get_results($wpdb->prepare("
+    //                 SELECT 
+    //                     *
+    //                 FROM 
+    //                     esakip_data_pegawai_simpeg
+    //                 WHERE
+    //                     satker_id=%d",
+    //             $param['id_satker_simpeg']), ARRAY_A);
+
+    //         }else{
+    //             $data_ret['message'] = 'Data tidak ditemukan';
+    //         }
+
+    //     }
+
+
+    //     return $data_ret;
+        
+    // }
+
+    public function get_table_pegawai_simpeg_pk()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+                if (!empty($_POST['id_skpd'])) {
+					$id_skpd = $_POST['id_skpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID SKPD kosong!';
+				}
+
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
+                if($ret['status'] == 'success'){
+                    $unit = $wpdb->get_row(
+                        $wpdb->prepare("
+                        SELECT 
+                            nama_skpd, 
+                            id_skpd, 
+                            kode_skpd, 
+                            nipkepala 
+                        FROM esakip_data_unit 
+                        WHERE active=1 
+                          AND tahun_anggaran=%d
+                          AND is_skpd=1 
+                          AND id_unit=%d
+                        ORDER BY kode_skpd ASC
+                        ", $tahun_anggaran_sakip, $id_skpd),
+                        ARRAY_A
+                    );
+    
+                    if (!empty($unit)) {
+                        $tbody = '';
+
+                        $mapping_unit_simpeg = $wpdb->get_row($wpdb->prepare("
+                            SELECT 
+                                a.*,
+                                b.satker_id
+                            FROM 
+                                esakip_data_mapping_unit_sipd_simpeg a 
+                            LEFT JOIN esakip_data_satker_simpeg b 
+                                ON b.satker_id=a.id_satker_simpeg AND 
+                                b.tahun_anggaran=a.tahun_anggaran AND b.active=1
+                            WHERE 
+                                a.tahun_anggaran=%d and
+                                a.id_skpd=%d;
+                        ", $tahun_anggaran, $unit['id_skpd']), ARRAY_A);
+
+                        $satker_id = 0;
+                        if(!empty($mapping_unit_simpeg)){  
+                            $data_pegawai_all = array();
+                            $satker_id = $mapping_unit_simpeg['satker_id'];
+
+                            $data_pegawai = $wpdb->get_results($wpdb->prepare("
+                                    SELECT 
+                                        p.nip_baru,
+                                        p.nama_pegawai,
+                                        p.satker_id,
+                                        p.jabatan,
+                                        p.tipe_pegawai,
+                                        p.tipe_pegawai_id,
+                                        s.nama AS nama_bidang
+                                    FROM 
+                                        esakip_data_pegawai_simpeg p
+                                    LEFT JOIN
+                                        esakip_data_satker_simpeg s
+                                    ON s.satker_id = p.satker_id
+                                    WHERE
+                                        p.satker_id LIKE %s AND
+                                        p.active=%d
+                                        ORDER BY p.satker_id,p.tipe_pegawai_id",
+                                        $satker_id.'%',1), ARRAY_A);
+                            
+                            if(!empty($data_pegawai)){
+                                foreach ($data_pegawai as $v_1) {
+                                    if(strtoupper(trim($v_1['jabatan'])) == 'KEPALA' && $v_1['satker_id'] == $satker_id){
+                                        array_unshift($data_pegawai_all, $v_1);
+                                    }else{
+                                        $data_pegawai_all[] = $v_1;
+                                    }
+                                }
+                            }
+
+
+                            if(!empty($data_pegawai_all)){
+                                // $data_satker_child = $wpdb->get_results($wpdb->prepare("
+                                //     SELECT
+                                //         *
+                                //     FROM
+                                //         esakip_data_satker_simpeg
+                                //     WHERE
+                                //         satker_id_parent=%d
+                                //     ORDER BY satker_id",
+                                //     $mapping_unit_simpeg['satker_id']), ARRAY_A);
+                                
+                                // if(!empty($data_satker_child)){
+                                //     foreach ($data_satker_child as $k_pgc => $v_pgc) {
+                                //         $data_pegawai_child = $wpdb->get_results($wpdb->prepare("
+                                //             SELECT 
+                                //                 nip_baru,
+                                //                 nama_pegawai,
+                                //                 satker_id,
+                                //                 jabatan
+                                //             FROM 
+                                //                 esakip_data_pegawai_simpeg
+                                //             WHERE
+                                //                 satker_id=%d AND
+                                //                 active=1
+                                //             ORDER BY satker_id",
+                                //             $v_pgc['satker_id']), ARRAY_A);
+
+                                //             if(!empty($data_pegawai_child)){
+                                //                 foreach ($data_pegawai_child as $v_2) {
+                                //                     $data_pegawai_all[] = $v_2;
+                                //                 }
+                                //             }
+                                //     }
+                                // }
+                                
+                                $ret['cek'] = $data_pegawai_all;
+
+                                foreach ($data_pegawai_all as $key => $v_pgw) {
+                                    $detail_laporan_pk = $this->functions->generatePage(array(
+                                        'nama_page' => 'Halaman Detail Laporan PK ' . $tahun_anggaran,
+                                        'content' => '[detail_laporan_pk tahun=' . $tahun_anggaran . ']',
+                                        'show_header' => 1,
+                                        'post_status' => 'private'
+                                    ));
+                
+                                    $tbody .= "<tr>";
+                                    $tbody .= "<td class='text-left'>" . $v_pgw['nama_bidang'] . "</td>";
+                                    $tbody .= "<td class='text-left'>" . $v_pgw['tipe_pegawai'] . "</td>";
+                                    $tbody .= "<td style='text-transform: uppercase;'><a href='".$detail_laporan_pk['url']."&id_skpd=".$unit['id_skpd']."&nip=".$v_pgw['nip_baru']."' target='_blank'>" . $v_pgw['nip_baru'] . "</a></td>";
+                                    $tbody .= "<td class='text-left'>" . $v_pgw['nama_pegawai'] . "</td>";
+                                    $tbody .= "<td class='text-left'>" . $v_pgw['jabatan'] . "</td>";
+                                    $tbody .= "</tr>";
+                                }
+                            }
+                            // $ret['cek'] = $data_pegawai_all;
+                            $ret['data'] = $tbody;
+                        }else{
+                            $ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+                        }
                     } else {
                         $ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
                     }

@@ -13,13 +13,13 @@ $unit = $wpdb->get_results("
 		a.kode_skpd, 
 		a.namakepala, 
 		a.nipkepala,
-		c.id AS id_unit_simpeg,
+		c.satker_id AS id_unit_simpeg,
 		c.nama AS unit_simpeg
 	FROM esakip_data_unit a
 		LEFT JOIN esakip_data_mapping_unit_sipd_simpeg b
 			ON a.id_skpd=b.id_skpd AND a.tahun_anggaran=b.tahun_anggaran
 		LEFT JOIN esakip_data_satker_simpeg c
-			ON c.id=b.id_satker_simpeg
+			ON c.satker_id=b.id_satker_simpeg
 	WHERE a.active=1
 		AND a.tahun_anggaran=$tahun_anggaran
 	GROUP BY a.id_skpd

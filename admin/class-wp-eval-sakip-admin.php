@@ -1228,7 +1228,7 @@ class Wp_Eval_Sakip_Admin
 							</div>';
 						} else if (!empty($_POST['type']) && $_POST['type'] == 'laporan_pk_opd') {
 							$list_skpd_laporan_pk = $this->functions->generatePage(array(
-								'nama_page' => 'Laporan PK - ' . $tahun_item['tahun_anggaran'],
+								'nama_page' => 'Laporan PK Perangkat Daerah - ' . $tahun_item['tahun_anggaran'],
 								'content' => '[list_halaman_laporan_pk tahun=' . $tahun_item['tahun_anggaran'] . ']',
 								'show_header' => 1,
 								'post_status' => 'private'
@@ -2232,6 +2232,7 @@ class Wp_Eval_Sakip_Admin
 						.postbox-container { display: none; }
 						#poststuff #post-body.columns-2 { margin: 0 !important; }
 					</style>
+					<h3>Halaman Laporan PK Perangkat Daerah</h3>
 					<table class="form-table">
 						<tbody>
 						</tbody>
@@ -2262,6 +2263,7 @@ class Wp_Eval_Sakip_Admin
 						.postbox-container { display: none; }
 						#poststuff #post-body.columns-2 { margin: 0 !important; }
 					</style>
+					<h3>Halaman Laporan PK Perangkat Daerah</h3>
 					<table class="form-table">
 						<tbody>
 						</tbody>

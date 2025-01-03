@@ -9,22 +9,50 @@ $input = shortcode_atts(array(
     'tahun' => '2022',
 ), $atts);
 
+$id_skpd = $nip = '';
 if (!empty($_GET) && !empty($_GET['id_skpd'])) {
     $id_skpd = $_GET['id_skpd'];
+}
+if (!empty($_GET) && !empty($_GET['nip'])) {
+    $nip = $_GET['nip'];
 }
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
 $skpd = $wpdb->get_row(
     $wpdb->prepare("
     SELECT 
-        nama_skpd
-    FROM esakip_data_unit
-    WHERE id_skpd=%d
-      AND tahun_anggaran=%d
-      AND active = 1
+        u.nama_skpd,
+        d.alamat_kantor
+    FROM 
+        esakip_data_unit u
+    LEFT JOIN 
+        esakip_detail_data_unit d
+    ON d.id_skpd = u.id_skpd
+    WHERE u.id_skpd=%d
+      AND u.tahun_anggaran=%d
+      AND u.active = 1
 ", $id_skpd, $tahun_anggaran_sakip),
     ARRAY_A
 );
+
+$alamat = '';
+if(!empty($nip)){
+    $data_satker = $wpdb->get_row(
+        $wpdb->prepare("
+        SELECT 
+            *
+        FROM 
+            esakip_data_pegawai_simpeg
+        WHERE nip_baru=%d
+          AND active = 1
+    ", $nip),
+        ARRAY_A
+    );
+
+    if(!empty($data_satker)){
+        $alamat = $data_satker['alamat_kantor'];
+    }
+}
 
 $current_user = wp_get_current_user();
 $nama_pemda = get_option(ESAKIP_NAMA_PEMDA);
@@ -111,9 +139,7 @@ $nama_pemda = get_option(ESAKIP_NAMA_PEMDA);
             <!-- <div class="card-body"> -->
                 <p>PEMERINTAH <?php echo strtoupper($nama_pemda); ?></p>
                 <p><?php echo strtoupper($skpd['nama_skpd']); ?></p>
-                <p>Jalan Basuki</p>
-                <p>Telephone: 0823467234234 Faks. 421314131412314124</p>
-                <p>Email : jfasfasdjjjj</p>
+                <?php echo $alamat ?>
                 <br>
                 <br>
                 <p>PERJANJIAN KINERJA TAHUN <?php echo $input['tahun']; ?></p>
