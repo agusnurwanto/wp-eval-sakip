@@ -1633,7 +1633,6 @@ CREATE TABLE `esakip_tagging_rincian_belanja` (
   PRIMARY KEY (`id`)
 );
 
-
 CREATE TABLE `esakip_detail_data_unit` (
   `id` int NOT NULL auto_increment,
   `id_skpd` int(11) DEFAULT NULL,
@@ -1643,4 +1642,27 @@ CREATE TABLE `esakip_detail_data_unit` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp(),
  PRIMARY KEY(id)
+);
+
+CREATE TABLE `esakip_data_rekening_akun` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `id_akun` VARCHAR(64) DEFAULT NULL,
+  `kode_akun` VARCHAR(64) DEFAULT NULL,
+  `nama_akun` TEXT DEFAULT NULL,
+  `tahun_anggaran` year(4) NOT NULL,
+  `active` TINYINT(1) NOT NULL DEFAULT 1,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `esakip_data_satuan` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `id_satuan` VARCHAR(64) DEFAULT NULL,
+  `nama_satuan` varchar(64) DEFAULT NULL,
+  `tahun_anggaran` year(4) NOT NULL,
+  `active` TINYINT(1) NOT NULL DEFAULT 1,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
 );

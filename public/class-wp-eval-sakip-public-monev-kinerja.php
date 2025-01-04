@@ -3662,27 +3662,39 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							);
 
 							if (!empty($labels)) {
-								$nama_indikator = $wpdb->get_var(
+								$data_indikator = $wpdb->get_row(
 									$wpdb->prepare('
-										SELECT 
-											indikator
+										SELECT *
 										FROM esakip_data_rencana_aksi_indikator_opd
 										WHERE id = %d
 										  AND active = 1
-									', $labels['id_indikator'])
+									', $labels['id_indikator']),
+									ARRAY_A
 								);
-
-								$labels['nama_indikator'] = $nama_indikator;
-
-								$item['labels'][] = $labels;
-								$item['is_checked'] = true;
+								$nama_rhk = $wpdb->get_row(
+									$wpdb->prepare('
+										SELECT *
+										FROM esakip_data_rencana_aksi_opd
+										WHERE id = %d
+										  AND active = 1
+									', $data_indikator['id_renaksi']),
+									ARRAY_A
+								);
+								$labels['nama_indikator'] = $data_indikator['indikator'];
+								$labels['nama_rhk'] = $nama_rhk['label'];
+								if ($labels['id_indikator'] == $_POST['id_indikator']) {
+									$item['labels'][] = $labels;
+									$item['is_checked'] = true;
+								} else {
+									$item['labels'][] = $labels;
+									$item['is_checked'] = false;
+								}
 							} else {
 								$item['labels'] = [];
 								$item['is_checked'] = false;
 							}
 						}
 
-						// Menyimpan hasil akhir ke dalam $ret
 						$ret['data'] = $data_rka['data'];
 					} else {
 						$ret['status'] = 'error';
@@ -3703,6 +3715,70 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		}
 
 		die(json_encode($ret));
+	}
+
+	public function get_data_akun()
+	{
+		global $wpdb;
+		$return = array(
+			'status' => 'success',
+			'results'	=> array(),
+			'pagination' => array(
+				"more" => false
+			)
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$tahun_anggaran = $_POST['tahun_anggaran'];
+				$where = '';
+				if (!empty($_POST['search'])) {
+					if ($_POST['search']) {
+						$where .= $wpdb->prepare('
+								AND kode_akun LIKE %s
+							', $_POST['search']);
+					} else {
+						$where .= $wpdb->prepare('
+								AND nama_akun LIKE %s
+							', '%' . $_POST['search'] . '%');
+					}
+				}
+
+				$data_akun = $wpdb->get_results($wpdb->prepare("
+						SELECT 
+							id_akun,
+							kode_akun,
+							nama_akun 
+						FROM esakip_data_akun 
+						WHERE set_input = %d
+							AND tahun_anggaran = %d
+							AND kode_akun LIKE '5.%'
+							AND active=1
+							$where
+						LIMIT %d, 20
+					", 1, $tahun_anggaran, $_POST['page'] * 20), ARRAY_A);
+				$return['sql'] = $wpdb->last_query;
+
+				foreach ($data_akun as $key => $value) {
+					$return['results'][] = array(
+						'id' => $value['id_akun'],
+						'text' => $value['kode_akun'] . ' ' . $value['nama_akun']
+					);
+				}
+
+				if (count($return['results']) > 0) {
+					$return['pagination']['more'] = true;
+				}
+			} else {
+				$return['status'] = 'error';
+				$return['message'] = 'Api Key tidak sesuai!';
+			}
+		} else {
+			$return['status'] = 'error';
+			$return['message'] = 'Format tidak sesuai!';
+		}
+			die(json_encode($return));
+		
 	}
 
 	function simpan_rinci_bl_tagging()
@@ -3791,12 +3867,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'realisasi'       => $realisasi,
 						'active'          => 1,
 					);
-					
+
 					$wpdb->insert(
 						'esakip_tagging_rincian_belanja',
 						$data
 					);
-					
 				}
 			} else {
 				$ret['status'] = 'error';

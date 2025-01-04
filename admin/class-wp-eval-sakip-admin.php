@@ -293,11 +293,11 @@ class Wp_Eval_Sakip_Admin
 								GROUP BY u.tahun_anggaran
 								ORDER BY u.tahun_anggaran DESC
 							", ARRAY_A);
-							foreach($tahun as $tahun_item){
-								if(
-									!empty($jadwal_periode_item['id_jadwal_rpjmd']) 
+							foreach ($tahun as $tahun_item) {
+								if (
+									!empty($jadwal_periode_item['id_jadwal_rpjmd'])
 									&& $jadwal_periode_item['tahun_anggaran_menu'] == $tahun_item['tahun_anggaran']
-								){
+								) {
 									$list_pemda_pengisian_rencana_aksi = $this->functions->generatePage(array(
 										'nama_page' => 'Input Rencana Hasil Kerja Pemda Tahun ' . $tahun_item['tahun_anggaran'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
 										'content' => '[list_pengisian_rencana_aksi_pemda tahun=' . $tahun_item['tahun_anggaran'] . ' periode=' . $jadwal_periode_item['id'] . ' ]',
@@ -305,11 +305,11 @@ class Wp_Eval_Sakip_Admin
 										'no_key' => 1,
 										'post_status' => 'private'
 									));
-									$body_pemda .= '<li><a target="_blank" href="' . $list_pemda_pengisian_rencana_aksi['url'] . '" class="btn btn-primary">' .  $list_pemda_pengisian_rencana_aksi['title'] .'</a></li>';
+									$body_pemda .= '<li><a target="_blank" href="' . $list_pemda_pengisian_rencana_aksi['url'] . '" class="btn btn-primary">' .  $list_pemda_pengisian_rencana_aksi['title'] . '</a></li>';
 								}
 							}
-							if(empty($jadwal_periode_item['id_jadwal_rpjmd'])){
-								$body_pemda .= '<li>'.$jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai.' ( Periode belum diset di pengaturan menu )</li>';
+							if (empty($jadwal_periode_item['id_jadwal_rpjmd'])) {
+								$body_pemda .= '<li>' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' ( Periode belum diset di pengaturan menu )</li>';
 							}
 						}
 					}
@@ -426,17 +426,17 @@ class Wp_Eval_Sakip_Admin
 					$response = wp_remote_post(get_option('_crb_url_server_sakip'), array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
 
 					$response = wp_remote_retrieve_body($response);
-					
+
 					$data_jadwal_wpsipd = json_decode($response);
 
 					$body_pemda = '';
 					if (!empty($_POST['type']) && $_POST['type'] == 'cascading_pd') {
 						$body_pemda = '<h3>Halaman Input Cascading Perangkat Daerah</h3>';
-					} else if (!empty($_POST['type']) && $_POST['type'] == 'input_iku_opd'){
+					} else if (!empty($_POST['type']) && $_POST['type'] == 'input_iku_opd') {
 						$body_pemda = '<h3>Halaman Input IKU</h3>';
 					}
 					$body_pemda .= '<ol>';
-					if(!empty($data_jadwal_wpsipd->data)){
+					if (!empty($data_jadwal_wpsipd->data)) {
 						foreach ($data_jadwal_wpsipd->data as $jadwal_periode_item_wpsipd) {
 							if (!empty($jadwal_periode_item_wpsipd->tahun_akhir_anggaran) && $jadwal_periode_item_wpsipd->tahun_akhir_anggaran > 1) {
 								$tahun_anggaran_selesai = $jadwal_periode_item_wpsipd->tahun_akhir_anggaran;
@@ -452,7 +452,7 @@ class Wp_Eval_Sakip_Admin
 								));
 								$title = 'Input Cascading OPD | ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai;
 								$body_pemda .= '<li><a target="_blank" href="' . $input_cascading_opd['url'] . '">' . $title . '</a></li>';
-							} else if (!empty($_POST['type']) && $_POST['type'] == 'input_iku_opd'){
+							} else if (!empty($_POST['type']) && $_POST['type'] == 'input_iku_opd') {
 								$input_iku = $this->functions->generatePage(array(
 									'nama_page' => 'List Perangkat Daerah Halaman Pengisian IKU ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai,
 									'content' => '[list_input_iku periode=' . $jadwal_periode_item_wpsipd->id_jadwal_lokal . ']',
@@ -461,7 +461,7 @@ class Wp_Eval_Sakip_Admin
 									'post_status' => 'private'
 								));
 								$body_pemda .= '
-								<li><a target="_blank" href="' . $input_iku['url'] . '">Halaman Input IKU Perangkat Daerah ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai .'</a></li>';
+								<li><a target="_blank" href="' . $input_iku['url'] . '">Halaman Input IKU Perangkat Daerah ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai . '</a></li>';
 							}
 						}
 					}
@@ -481,30 +481,31 @@ class Wp_Eval_Sakip_Admin
 						WHERE
 							tipe='RPJMD'
 							AND status!=0"),
-						ARRAY_A);
-					
-					if(empty($data_jadwal)){
+						ARRAY_A
+					);
+
+					if (empty($data_jadwal)) {
 						die("JADWAL KOSONG");
 					}
 
 					$body_pemda = '<h3>Halaman Input IKU</h3>';
 					$body_pemda .= '<ol>';
-					if(!empty($data_jadwal)){
+					if (!empty($data_jadwal)) {
 						foreach ($data_jadwal as $jadwal_periode) {
 							$lama_pelaksanaan = $jadwal_periode['lama_pelaksanaan'] ?? 4;
 							$tahun_anggaran = $jadwal_periode['tahun_anggaran'];
 							$tahun_awal = $jadwal_periode['tahun_anggaran'];
 							$tahun_akhir = $tahun_awal + $jadwal_periode['lama_pelaksanaan'] - 1;
-							
+
 							$input_iku_pemda = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Pengisian IKU Pemerintah Daerah ' . $jadwal_periode['jenis_jadwal_khusus'] .' '. $jadwal_periode['nama_jadwal'] . ' ' . 'Periode ' . $tahun_awal . ' - ' . $tahun_akhir,
+								'nama_page' => 'Halaman Pengisian IKU Pemerintah Daerah ' . $jadwal_periode['jenis_jadwal_khusus'] . ' ' . $jadwal_periode['nama_jadwal'] . ' ' . 'Periode ' . $tahun_awal . ' - ' . $tahun_akhir,
 								'content' => '[input_iku_pemda id_periode=' . $jadwal_periode['id'] . ']',
 								'show_header' => 1,
 								'no_key' => 1,
 								'post_status' => 'private'
 							));
 							$body_pemda .= '
-							<li><a target="_blank" href="' . $input_iku_pemda['url'] . '">Halaman Input IKU Pemerintah Daerah ' . $jadwal_periode['jenis_jadwal_khusus'] .' '. $jadwal_periode['nama_jadwal'] . ' ' . 'Periode ' . $tahun_awal . ' - ' . $tahun_akhir .'</a></li>';
+							<li><a target="_blank" href="' . $input_iku_pemda['url'] . '">Halaman Input IKU Pemerintah Daerah ' . $jadwal_periode['jenis_jadwal_khusus'] . ' ' . $jadwal_periode['nama_jadwal'] . ' ' . 'Periode ' . $tahun_awal . ' - ' . $tahun_akhir . '</a></li>';
 						}
 					}
 					$body_pemda .= '</ol>';
@@ -1208,7 +1209,7 @@ class Wp_Eval_Sakip_Admin
 									$tahun_anggaran_selesai = $v_renstra['tahun_anggaran'] + $v_renstra['lama_pelaksanaan'];
 								}
 
-								$opsion_jadwal_renstra .= "<option value='". $v_renstra['id'] ."'>". $v_renstra['nama_jadwal_renstra'] ." Periode ". $v_renstra['tahun_anggaran'] ." - ". $tahun_anggaran_selesai ."</option>";
+								$opsion_jadwal_renstra .= "<option value='" . $v_renstra['id'] . "'>" . $v_renstra['nama_jadwal_renstra'] . " Periode " . $v_renstra['tahun_anggaran'] . " - " . $tahun_anggaran_selesai . "</option>";
 							}
 							$pengisian_rencana_aksi_setting = $this->functions->generatePage(array(
 								'nama_page' => 'Input Rencana Hasil Kerja Setting ',
@@ -1288,10 +1289,10 @@ class Wp_Eval_Sakip_Admin
 		$get_tahun = $wpdb->get_results('select tahun_anggaran from esakip_data_unit group by tahun_anggaran order by tahun_anggaran ASC', ARRAY_A);
 		$list_mapping_jenis_dokumen = '';
 		$halaman_monitor_upload_dokumen = '';
-		foreach ($get_tahun as $k => $v) {			
+		foreach ($get_tahun as $k => $v) {
 			$halaman_mapping_jenis_dokumen = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Mapping Jenis Dokumen Tahun Anggaran | '. $v['tahun_anggaran'],
-				'content' => '[halaman_mapping_jenis_dokumen tahun_anggaran="'.$v['tahun_anggaran'].'"]',
+				'nama_page' => 'Halaman Mapping Jenis Dokumen Tahun Anggaran | ' . $v['tahun_anggaran'],
+				'content' => '[halaman_mapping_jenis_dokumen tahun_anggaran="' . $v['tahun_anggaran'] . '"]',
 				'show_header' => 1,
 				'no_key' => 1,
 				'post_status' => 'private'
@@ -1304,7 +1305,7 @@ class Wp_Eval_Sakip_Admin
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$halaman_monitor_upload_dokumen .= '<li><a target="_blank" href="' . $monitor_upload_dokumen['url'] . '" class="btn btn-primary">Laporan Monitor Upload Dokumen Tahun ' . $v['tahun_anggaran'].' </a></li>';
+			$halaman_monitor_upload_dokumen .= '<li><a target="_blank" href="' . $monitor_upload_dokumen['url'] . '" class="btn btn-primary">Laporan Monitor Upload Dokumen Tahun ' . $v['tahun_anggaran'] . ' </a></li>';
 		}
 
 		$basic_options_container = Container::make('theme_options', __('E-SAKIP Options'))
@@ -1314,7 +1315,7 @@ class Wp_Eval_Sakip_Admin
 					->set_html('
 					<h4>HALAMAN TERKAIT</h4>
 	            	<ol>
-	            		'.$halaman_monitor_upload_dokumen.'
+	            		' . $halaman_monitor_upload_dokumen . '
 	            	</ol>'),
 				Field::make('text', 'crb_apikey_esakip', 'API KEY')
 					->set_default_value($this->functions->generateRandomString())
@@ -1367,7 +1368,7 @@ class Wp_Eval_Sakip_Admin
 	            		<li><a href="' . $halaman_mapping_sipd_simpeg['url'] . '" target="_blank">' . $halaman_mapping_sipd_simpeg['title'] . '</a></li>
 	            		<li><a href="' . $halaman_mapping_user_esr['url'] . '" target="_blank">' . $halaman_mapping_user_esr['title'] . '</a></li>
 						<li><a href="' . $list_skpd_laporan_pk_setting['url'] . '" target="_blank">Halaman Profile Perangkat Daerah</a></li>
-	            		'.$list_mapping_jenis_dokumen.'
+	            		' . $list_mapping_jenis_dokumen . '
 	            	</ol>'),
 				Field::make('text', 'crb_url_server_sakip', 'URL Server WP-SIPD')
 					->set_default_value(admin_url('admin-ajax.php'))
@@ -2082,12 +2083,12 @@ class Wp_Eval_Sakip_Admin
 
 		$api_key_wpspd = get_option('_crb_apikey_wpsipd');
 		$url_server_wpspd = get_option('_crb_url_server_sakip');
-			
+
 		Container::make('theme_options', __('Rencana Hasil Kerja Setting'))
-		->set_page_parent($monev_ren_aksi_menu)
-		->add_fields(array(
-			Field::make('html', 'crb_esakip_halaman_terkait')
-				->set_html('
+			->set_page_parent($monev_ren_aksi_menu)
+			->add_fields(array(
+				Field::make('html', 'crb_esakip_halaman_terkait')
+					->set_html('
 				<table class="form-table">
 					<tbody>
 						<tr>
@@ -2095,7 +2096,7 @@ class Wp_Eval_Sakip_Admin
 								<label>URL Server WP-SIPD</label>
 							</th>
 							<td>
-								<input type="text" style="width: 30em;" value="'. $url_server_wpspd .'" disabled>
+								<input type="text" style="width: 30em;" value="' . $url_server_wpspd . '" disabled>
 							</td>
 						</tr>
 						<tr>
@@ -2103,14 +2104,14 @@ class Wp_Eval_Sakip_Admin
 								<label>API KEY WP-SIPD</label>
 							</th>
 							<td>
-								<input type="text" style="width: 30em;" value="'. $api_key_wpspd .'" disabled>
+								<input type="text" style="width: 30em;" value="' . $api_key_wpspd . '" disabled>
 								<p>Setting Url Server dan Api Key ada di menu pengaturan perangkat daerah</p>
 							</td>
 						</tr>
 					</tbody>
 				</table>')
-		))
-		->add_fields($this->get_ajax_field(array('type' => 'monev_rencana_aksi_setting')));
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'monev_rencana_aksi_setting')));
 
 		$input_iku_menu = Container::make('theme_options', __('Input IKU'))
 			->set_page_menu_position(3.6)
@@ -2129,7 +2130,7 @@ class Wp_Eval_Sakip_Admin
 									<label>URL Server WP-SIPD</label>
 								</th>
 								<td>
-									<input type="text" style="width: 30em;" value="'. $url_server_wpspd .'" disabled>
+									<input type="text" style="width: 30em;" value="' . $url_server_wpspd . '" disabled>
 								</td>
 							</tr>
 							<tr>
@@ -2137,7 +2138,7 @@ class Wp_Eval_Sakip_Admin
 									<label>API KEY WP-SIPD</label>
 								</th>
 								<td>
-									<input type="text" style="width: 30em;" value="'. $api_key_wpspd .'" disabled>
+									<input type="text" style="width: 30em;" value="' . $api_key_wpspd . '" disabled>
 									<p>Setting Url Server dan Api Key ada di menu pengaturan perangkat daerah</p>
 								</td>
 							</tr>
@@ -2176,7 +2177,7 @@ class Wp_Eval_Sakip_Admin
 									<label>URL Server WP-SIPD</label>
 								</th>
 								<td>
-									<input type="text" style="width: 30em;" value="'. $url_server_wpspd .'" disabled>
+									<input type="text" style="width: 30em;" value="' . $url_server_wpspd . '" disabled>
 								</td>
 							</tr>
 							<tr>
@@ -2184,7 +2185,7 @@ class Wp_Eval_Sakip_Admin
 									<label>API KEY WP-SIPD</label>
 								</th>
 								<td>
-									<input type="text" style="width: 30em;" value="'. $api_key_wpspd .'" disabled>
+									<input type="text" style="width: 30em;" value="' . $api_key_wpspd . '" disabled>
 									<p>Setting Url Server dan Api Key ada di menu pengaturan perangkat daerah</p>
 								</td>
 							</tr>
@@ -2240,7 +2241,7 @@ class Wp_Eval_Sakip_Admin
 				')
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'laporan_pk_opd')));
-			
+
 		Container::make('theme_options', __('Laporan PK Pemerintah Daerah'))
 			->set_page_parent($laporan_pk_menu)
 			->add_fields(array(
@@ -2635,101 +2636,233 @@ class Wp_Eval_Sakip_Admin
 	function get_data_unit_wpsipd()
 	{
 		global $wpdb;
-
+		$ret = array(
+			'status'  => 'success',
+			'message' => 'Berhasil Get Data Unit WP-SIPD!'
+		);
 		if (empty($_POST['server'])) {
-			$data = array(
-				'status' => 'error',
-				'message' => 'URL Server Tidak Boleh Kosong'
-			);
-			$response = json_encode($data);
-			die($response);
+			$ret['status'] 	= 'error';
+			$ret['message'] = 'URL Server Tidak Boleh Kosong';
+			die(json_encode($ret));
 		} else if (empty($_POST['tahun_anggaran'])) {
-			$data = array(
-				'status' => 'error',
-				'message' => 'Tahun Tidak Boleh Kosong'
-			);
-			$response = json_encode($data);
-			die($response);
+			$ret['status'] 	= 'error';
+			$ret['message'] = 'Tahun Anggaran Tidak Boleh Kosong';
+			die(json_encode($ret));
 		} else if (empty($_POST['api_key'])) {
-			$data = array(
-				'status' => 'error',
-				'message' => 'API Key Tidak Boleh Kosong'
-			);
-			$response = json_encode($data);
-			die($response);
+			$ret['status'] 	= 'error';
+			$ret['message'] = 'API Key Tidak Boleh Kosong';
+			die(json_encode($ret));
 		}
 
-		// data to send in our API request
-		$api_params = array(
-			'action' => 'get_skpd',
-			'api_key'	=> $_POST['api_key'],
+		// data to send in API request
+		$api_params_get_skpd = array(
+			'action' 		 => 'get_skpd',
+			'api_key'		 => $_POST['api_key'],
 			'tahun_anggaran' => $_POST['tahun_anggaran']
 		);
 
-		$response = wp_remote_post($_POST['server'], array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
+		$api_params_get_rekening = array(
+			'action' 		 => 'get_rekening_akun',
+			'api_key'		 => $_POST['api_key'],
+			'tahun_anggaran' => $_POST['tahun_anggaran']
+		);
 
-		$response = wp_remote_retrieve_body($response);
+		$api_params_get_satuan = array(
+			'action' 		 => 'get_data_satuan_ssh',
+			'api_key'		 => $_POST['api_key'],
+			'tahun_anggaran' => $_POST['tahun_anggaran'],
+			'no_option' 	 => true
+		);
 
-		$data = json_decode($response);
+		$response_get_skpd = wp_remote_post(
+			$_POST['server'],
+			array(
+				'timeout' 	=> 1000,
+				'sslverify' => false,
+				'body' 		=> $api_params_get_skpd
+			)
+		);
 
-		$esakip_data_unit = $data->data;
+		$response_get_rekening = wp_remote_post(
+			$_POST['server'],
+			array(
+				'timeout' 	=> 1000,
+				'sslverify' => false,
+				'body' 		=> $api_params_get_rekening
+			)
+		);
 
-		if ($data->status == 'success' && !empty($esakip_data_unit)) {
-			$wpdb->update('esakip_data_unit', array('active' => 0), array('tahun_anggaran' => $api_params['tahun_anggaran']));
+		$response_get_satuan = wp_remote_post(
+			$_POST['server'],
+			array(
+				'timeout' 	=> 1000,
+				'sslverify' => false,
+				'body' 		=> $api_params_get_satuan
+			)
+		);
+
+		$response_get_skpd 		= wp_remote_retrieve_body($response_get_skpd);
+		$response_get_rekening 	= wp_remote_retrieve_body($response_get_rekening);
+		$response_get_satuan 	= wp_remote_retrieve_body($response_get_satuan);
+
+		$data_get_skpd 		= json_decode($response_get_skpd);
+		$data_get_rekening 	= json_decode($response_get_rekening);
+		$data_get_satuan	= json_decode($response_get_satuan);
+
+		$esakip_data_unit 			= $data_get_skpd->data;
+		$esakip_data_rekening_akun 	= $data_get_rekening->items;
+		$esakip_data_satuan 		= $data_get_satuan->data;
+
+		if ($data_get_skpd->status == 'success' && !empty($esakip_data_unit)) {
+			$wpdb->update(
+				'esakip_data_unit',
+				array('active' => 0),
+				array('tahun_anggaran' => $api_params_get_skpd['tahun_anggaran'])
+			);
 			foreach ($esakip_data_unit as $vdata) {
-				$cek = $wpdb->get_var($wpdb->prepare(
-					'
-					select 
-						id 
-					from esakip_data_unit 
-					where id_skpd = %d
-						and tahun_anggaran = %d',
-					$vdata->id_skpd,
-					$vdata->tahun_anggaran
-				));
-				$opsi = array(
-					'id_setup_unit' => $vdata->id_setup_unit,
-					'id_unit' => $vdata->id_unit,
-					'is_skpd' => $vdata->is_skpd,
-					'kode_skpd' => $vdata->kode_skpd,
-					'kunci_skpd' => $vdata->kunci_skpd,
-					'nama_skpd' => $vdata->nama_skpd,
-					'posisi' => $vdata->posisi,
-					'status' => $vdata->status,
-					'id_skpd' => $vdata->id_skpd,
-					'bidur_1' => $vdata->bidur_1,
-					'bidur_2' => $vdata->bidur_2,
-					'bidur_3' => $vdata->bidur_3,
-					'idinduk' => $vdata->idinduk,
-					'ispendapatan' => $vdata->ispendapatan,
-					'isskpd' => $vdata->isskpd,
-					'kode_skpd_1' => $vdata->kode_skpd_1,
-					'kode_skpd_2' => $vdata->kode_skpd_2,
-					'kodeunit' => $vdata->kodeunit,
-					'komisi' => $vdata->komisi,
-					'namabendahara' => $vdata->namabendahara,
-					'namakepala' => $vdata->namakepala,
-					'namaunit' => $vdata->namaunit,
-					'nipbendahara' => $vdata->nipbendahara,
-					'nipkepala' => $vdata->nipkepala,
-					'pangkatkepala' => $vdata->pangkatkepala,
-					'setupunit' => $vdata->setupunit,
-					'statuskepala' => $vdata->statuskepala,
-					'update_at' => $vdata->update_at,
+				$cek = $wpdb->get_var(
+					$wpdb->prepare('
+						SELECT id 
+						FROM esakip_data_unit 
+						WHERE id_skpd = %d
+						  AND tahun_anggaran = %d
+					', $vdata->id_skpd, $vdata->tahun_anggaran)
+				);
+				$data = array(
+					'id_setup_unit'  => $vdata->id_setup_unit,
+					'id_unit' 		 => $vdata->id_unit,
+					'is_skpd' 		 => $vdata->is_skpd,
+					'kode_skpd' 	 => $vdata->kode_skpd,
+					'kunci_skpd' 	 => $vdata->kunci_skpd,
+					'nama_skpd' 	 => $vdata->nama_skpd,
+					'posisi' 		 => $vdata->posisi,
+					'status' 		 => $vdata->status,
+					'id_skpd' 		 => $vdata->id_skpd,
+					'bidur_1' 		 => $vdata->bidur_1,
+					'bidur_2' 		 => $vdata->bidur_2,
+					'bidur_3' 		 => $vdata->bidur_3,
+					'idinduk' 		 => $vdata->idinduk,
+					'ispendapatan' 	 => $vdata->ispendapatan,
+					'isskpd' 		 => $vdata->isskpd,
+					'kode_skpd_1' 	 => $vdata->kode_skpd_1,
+					'kode_skpd_2' 	 => $vdata->kode_skpd_2,
+					'kodeunit' 		 => $vdata->kodeunit,
+					'komisi' 		 => $vdata->komisi,
+					'namabendahara'  => $vdata->namabendahara,
+					'namakepala' 	 => $vdata->namakepala,
+					'namaunit' 		 => $vdata->namaunit,
+					'nipbendahara' 	 => $vdata->nipbendahara,
+					'nipkepala' 	 => $vdata->nipkepala,
+					'pangkatkepala'  => $vdata->pangkatkepala,
+					'setupunit' 	 => $vdata->setupunit,
+					'statuskepala' 	 => $vdata->statuskepala,
+					'update_at' 	 => $vdata->update_at,
 					'tahun_anggaran' => $vdata->tahun_anggaran,
-					'active' => $vdata->active
+					'active' 		 => $vdata->active
 				);
 				if (empty($cek)) {
-					$wpdb->insert('esakip_data_unit', $opsi);
+					$wpdb->insert(
+						'esakip_data_unit',
+						$data
+					);
 				} else {
-					$wpdb->update('esakip_data_unit', $opsi, array('id' => $cek));
+					$wpdb->update(
+						'esakip_data_unit',
+						$data,
+						array('id' => $cek)
+					);
 				}
 			}
+		} else {
+			$ret['status'] 	= 'error';
+			$ret['message'] = 'Data Unit gagal untuk didapatkan!';
+			die(json_encode($ret));
 		}
 
-		$response = json_encode($data);
+		if ($data_get_rekening->status == true && !empty($esakip_data_rekening_akun)) {
+			$wpdb->update(
+				'esakip_data_rekening_akun',
+				array('active' => 0),
+				array('tahun_anggaran' => $api_params_get_rekening['tahun_anggaran'])
+			);
+			foreach ($esakip_data_rekening_akun as $vdata) {
+				$cek = $wpdb->get_var(
+					$wpdb->prepare('
+						SELECT id 
+						FROM esakip_data_rekening_akun 
+						WHERE id_akun = %d
+						  AND kode_akun = %s
+						  AND tahun_anggaran = %d
+					', $vdata->id_akun, $vdata->kode_akun, $vdata->tahun_anggaran)
+				);
+				$data = array(
+					'id_akun'		 => $vdata->id_akun,
+					'kode_akun'		 => $vdata->kode_akun,
+					'nama_akun'		 => $vdata->nama_akun,
+					'tahun_anggaran' => $api_params_get_rekening['tahun_anggaran'],
+					'active' 		 => 1
+				);
+				if (empty($cek)) {
+					$wpdb->insert(
+						'esakip_data_rekening_akun',
+						$data
+					);
+				} else {
+					$wpdb->update(
+						'esakip_data_rekening_akun',
+						$data,
+						array('id' => $cek)
+					);
+				}
+			}
+		} else {
+			$ret['status'] 	= 'error';
+			$ret['message'] = 'Data Rekening gagal untuk didapatkan!';
+			die(json_encode($ret));
+		}
 
-		die($response);
+		if ($data_get_satuan->status == true && !empty($esakip_data_satuan)) {
+			$wpdb->update(
+				'esakip_data_satuan',
+				array('active' => 0),
+				array('tahun_anggaran' => $api_params_get_rekening['tahun_anggaran'])
+			);
+			foreach ($esakip_data_satuan as $vdata) {
+				$cek = $wpdb->get_var(
+					$wpdb->prepare('
+						SELECT id 
+						FROM esakip_data_satuan 
+						WHERE tahun_anggaran = %d
+						  AND id_satuan = %d
+					', $vdata->id_satuan, $vdata->tahun_anggaran)
+				);
+
+				$data = array(
+					'id_satuan'		 => $vdata->id_satuan,
+					'nama_satuan'	 => $vdata->nama_satuan,
+					'tahun_anggaran' => $api_params_get_rekening['tahun_anggaran'],
+					'active' 		 => 1
+				);
+				if (empty($cek)) {
+					$wpdb->insert(
+						'esakip_data_satuan',
+						$data
+					);
+				} else {
+					$wpdb->update(
+						'esakip_data_satuan',
+						$data,
+						array('id' => $cek)
+					);
+				}
+			}
+		} else {
+			$ret['status'] 	= 'error';
+			$ret['message'] = 'Data Satuan gagal untuk didapatkan!';
+			die(json_encode($ret));
+		}
+
+		die(json_encode($ret));
 	}
 
 	function allow_access_private_post()
