@@ -127,6 +127,7 @@ if(!empty($pohon_kinerja_level_1)){
 				'label' => $level_1['label'],
 				'level' => $level_1['level'],
 				'indikator' => array(),
+				'koneksi_pokin' => array(),
 				'data' => array()
 			];
             if(empty($level_1['nomor_urut'])){
@@ -247,6 +248,7 @@ if(!empty($pohon_kinerja_level_1)){
 						'label' => $level_2['label'],
 						'level' => $level_2['level'],
 						'indikator' => array(),
+						'koneksi_pokin' => array(),
 						'croscutting' => array(),
 						'data' => array()
 					];
@@ -494,6 +496,7 @@ if(!empty($pohon_kinerja_level_1)){
 								'label' => $level_3['label'],
 								'level' => $level_3['level'],
 								'indikator' => array(),
+								'koneksi_pokin' => array(),
 								'croscutting' => array(),
 								'data' => array()
 							];
@@ -740,6 +743,7 @@ if(!empty($pohon_kinerja_level_1)){
 										'label' => $level_4['label'],
 										'level' => $level_4['level'],
 										'indikator' => array(),
+										'koneksi_pokin' => array(),
 										'data' => array(),
 										'croscutting' => array()
 									];
@@ -987,6 +991,7 @@ if(!empty($pohon_kinerja_level_1)){
 												'label' => $level_5['label'],
 												'level' => $level_5['level'],
 												'indikator' => array(),
+												'koneksi_pokin' => array(),
 												'croscutting' => array()
 											];
                                             if(empty($level_5['nomor_urut'])){
