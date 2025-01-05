@@ -3717,12 +3717,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		die(json_encode($ret));
 	}
 
-	public function get_data_akun()
+	function get_data_akun()
 	{
 		global $wpdb;
 		$return = array(
 			'status' => 'success',
-			'results'	=> array(),
+			'results' => array(),
 			'pagination' => array(
 				"more" => false
 			)
@@ -3730,43 +3730,38 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$tahun_anggaran = $_POST['tahun_anggaran'];
-				$where = '';
+				$tahun_anggaran = intval($_POST['tahun_anggaran']);
+				$page = isset($_POST['page']) ? intval($_POST['page']) : 0;
+
+				$search = '';
 				if (!empty($_POST['search'])) {
-					if ($_POST['search']) {
-						$where .= $wpdb->prepare('
-								AND kode_akun LIKE %s
-							', $_POST['search']);
-					} else {
-						$where .= $wpdb->prepare('
-								AND nama_akun LIKE %s
-							', '%' . $_POST['search'] . '%');
-					}
+					$search_term = '%' . $wpdb->esc_like($_POST['search']) . '%';
+					$search = $wpdb->prepare("AND (kode_akun LIKE %s OR nama_akun LIKE %s)", $search_term, $search_term);
 				}
 
 				$data_akun = $wpdb->get_results($wpdb->prepare("
-						SELECT 
-							id_akun,
-							kode_akun,
-							nama_akun 
-						FROM esakip_data_akun 
-						WHERE set_input = %d
-							AND tahun_anggaran = %d
-							AND kode_akun LIKE '5.%'
-							AND active=1
-							$where
-						LIMIT %d, 20
-					", 1, $tahun_anggaran, $_POST['page'] * 20), ARRAY_A);
+					SELECT 
+						id_akun,
+						kode_akun,
+						nama_akun 
+					FROM esakip_data_rekening_akun 
+					WHERE tahun_anggaran = %d
+					  AND kode_akun LIKE '5.%'
+					  AND active = 1
+					$search
+					LIMIT %d, 20
+				", $tahun_anggaran, $page * 20), ARRAY_A);
+
 				$return['sql'] = $wpdb->last_query;
 
 				foreach ($data_akun as $key => $value) {
 					$return['results'][] = array(
-						'id' => $value['id_akun'],
-						'text' => $value['kode_akun'] . ' ' . $value['nama_akun']
+						'id' => $value['kode_akun'],
+						'text' => $value['kode_akun'] . ' - ' . $value['nama_akun']
 					);
 				}
 
-				if (count($return['results']) > 0) {
+				if (count($data_akun) == 20) {
 					$return['pagination']['more'] = true;
 				}
 			} else {
@@ -3777,8 +3772,65 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			$return['status'] = 'error';
 			$return['message'] = 'Format tidak sesuai!';
 		}
-			die(json_encode($return));
-		
+
+		die(json_encode($return));
+	}
+
+	function get_data_satuan()
+	{
+		global $wpdb;
+		$return = array(
+			'status' => 'success',
+			'results' => array(),
+			'pagination' => array(
+				"more" => false
+			)
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$tahun_anggaran = intval($_POST['tahun_anggaran']);
+				$page = isset($_POST['page']) ? intval($_POST['page']) : 0;
+
+				$search = '';
+				if (!empty($_POST['search'])) {
+					$search_term = '%' . $wpdb->esc_like($_POST['search']) . '%';
+					$search = $wpdb->prepare("AND nama_satuan LIKE %s", $search_term);
+				}
+
+				$data_satuan = $wpdb->get_results($wpdb->prepare("
+					SELECT 
+						id_satuan,
+						nama_satuan 
+					FROM esakip_data_satuan 
+					WHERE tahun_anggaran = %d
+					  AND active = 1
+					  $search
+					LIMIT %d, 20
+				", $tahun_anggaran, $page * 20), ARRAY_A);
+
+				$return['sql'] = $wpdb->last_query;
+
+				foreach ($data_satuan as $key => $value) {
+					$return['results'][] = array(
+						'id' => $value['nama_satuan'],
+						'text' => $value['nama_satuan']
+					);
+				}
+
+				if (count($data_satuan) == 20) {
+					$return['pagination']['more'] = true;
+				}
+			} else {
+				$return['status'] = 'error';
+				$return['message'] = 'Api Key tidak sesuai!';
+			}
+		} else {
+			$return['status'] = 'error';
+			$return['message'] = 'Format tidak sesuai!';
+		}
+
+		die(json_encode($return));
 	}
 
 	function simpan_rinci_bl_tagging()
@@ -3901,7 +3953,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				$validationRules = [
 					'tahun_anggaran' => 'required',
 					'kode_akun' 	 => 'required',
-					'nama_akun' 	 => 'required',
 					'subs_bl_teks' 	 => 'required',
 					'ket_bl_teks' 	 => 'required',
 					'nama_komponen'  => 'required',
@@ -3919,6 +3970,26 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					die(json_encode($ret));
 				}
 
+				$nama_akun = $wpdb->get_var(
+					$wpdb->prepare(
+						'
+						SELECT nama_akun
+						FROM esakip_data_rekening_akun
+						WHERE tahun_anggaran = %d
+						  AND kode_akun = %s
+						  AND active = 1
+					',
+						$postData['tahun_anggaran'],
+						$postData['kode_akun']
+					)
+				);
+
+				if (empty($nama_akun)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Akun tidak ditemukan!';
+					die(json_encode($ret));
+				}
+
 				// Prepare data for insertion or update
 				$data = [
 					'id_skpd' 		 => $postData['id_skpd'],
@@ -3926,9 +3997,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					'kode_sbl' 		 => $postData['kode_sbl'],
 					'tipe' 			 => 1,
 					'kode_akun' 	 => $postData['kode_akun'],
-					'nama_akun' 	 => $postData['nama_akun'],
-					'subs_bl_teks' 	 => '[#]' . $postData['subs_bl_teks'],
-					'ket_bl_teks' 	 => '[-]' . $postData['ket_bl_teks'],
+					'nama_akun' 	 => $nama_akun,
+					'subs_bl_teks' 	 => '[#] ' . $postData['subs_bl_teks'],
+					'ket_bl_teks' 	 => '[-] ' . $postData['ket_bl_teks'],
 					'nama_komponen'  => $postData['nama_komponen'],
 					'volume' 		 => $postData['volume'],
 					'satuan' 		 => $postData['satuan'],
@@ -3999,7 +4070,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$ret['data'] = $wpdb->get_row(
+				$data = $wpdb->get_row(
 					$wpdb->prepare('
 						SELECT *
 						FROM esakip_tagging_rincian_belanja
@@ -4008,6 +4079,23 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					', $_POST['id']),
 					ARRAY_A
 				);
+
+				if ($data) {
+					// Hapus kode [#] dari subs_bl_teks
+					if (!empty($data['subs_bl_teks'])) {
+						$data['subs_bl_teks'] = preg_replace('/^\[\#\]\s*/', '', $data['subs_bl_teks']);
+					}
+
+					// Hapus kode [-] dari ket_bl_teks
+					if (!empty($data['ket_bl_teks'])) {
+						$data['ket_bl_teks'] = preg_replace('/^\[\-\]\s*/', '', $data['ket_bl_teks']);
+					}
+
+					$ret['data'] = $data;
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Data tidak ditemukan!';
+				}
 			} else {
 				$ret['status'] = 'error';
 				$ret['message'] = 'API key tidak ditemukan!';
@@ -4019,6 +4107,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 		die(json_encode($ret));
 	}
+
 
 	function validate($data, $rules)
 	{

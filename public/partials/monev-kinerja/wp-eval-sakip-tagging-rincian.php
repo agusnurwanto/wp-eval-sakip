@@ -319,7 +319,7 @@ foreach ($grouped_data as $kode_akun => $akun) {
         </tr>";
 
 		foreach ($subs['ket'] as $ket_bl => $ket) {
-			$value_keterangan = preg_replace('/^\[\#\]\s*-?\s*/', '', $ket['nama_keterangan']);
+			$value_keterangan = preg_replace('/^\[\-\]\s*/', '', $ket['nama_keterangan']);
 			$option_keterangan .= "<option value='{$value_keterangan}'>{$value_keterangan}</option>";
 
 			$tbody .= "
@@ -823,13 +823,10 @@ if (empty($wpsipd_status)) {
 							</div>
 						</div>
 						<div class="form-row">
-							<div class="form-group col-md-6">
-								<label for="kode_akun">Kode Akun</label>
-								<input type="text" class="form-control" id="kode_akun" name="kode_akun" placeholder="Masukkan Kode Akun">
-							</div>
-							<div class="form-group col-md-6">
-								<label for="nama_akun">Nama Akun</label>
-								<input type="text" class="form-control" id="nama_akun" name="nama_akun" placeholder="Masukkan Nama Akun">
+							<div class="form-group col-md-12">
+								<label for="kode_akun">Pilih Akun</label>
+								<select class="form-control" id="kode_akun" name="kode_akun" style="width: 100%;">
+								</select>
 							</div>
 						</div>
 						<div class="form-row">
@@ -859,7 +856,8 @@ if (empty($wpsipd_status)) {
 							</div>
 							<div class="form-group col-md-3">
 								<label for="satuan">Satuan</label>
-								<input type="text" class="form-control" id="satuan" name="satuan" placeholder="Masukkan Satuan">
+								<select class="form-control" id="satuan" name="satuan" style="width: 100%;">
+								</select>
 							</div>
 						</div>
 						<div class="form-row">
@@ -902,6 +900,82 @@ if (empty($wpsipd_status)) {
 				}
 			}
 		});
+
+		jQuery('#modalTambahData').on('hidden.bs.modal', function() {
+			// Tampilkan konfirmasi setelah modal tertutup dan ada data berubah
+			if (window.data_changed === true) {
+				if (confirm('Data telah berubah. Apakah Anda ingin merefresh halaman?')) {
+					location.reload(); // Refresh halaman
+				}
+			}
+		});
+
+		jQuery('#kode_akun').select2({
+			dropdownParent: jQuery('#modalTambahDataManual .modal-body'), // Tentukan modal sebagai parent dropdown agar select2 search tidak error
+			placeholder: 'Masukkan Kode atau Nama Akun',
+			ajax: {
+				url: esakip.url,
+				type: 'POST',
+				dataType: 'json',
+				delay: 250,
+				data: function(params) {
+					return {
+						action: "get_data_akun",
+						api_key: esakip.api_key,
+						tahun_anggaran: tahunAnggaran,
+						search: params.term,
+						page: params.page || 0
+					};
+				},
+				processResults: function(data) {
+					return {
+						results: data.results,
+						pagination: {
+							more: data.pagination.more
+						}
+					};
+				},
+				error: function(xhr) {
+					alert('Terjadi kesalahan: ' + xhr.responseJSON.message);
+				},
+				cache: true
+			},
+			minimumInputLength: 3
+		});
+
+		jQuery('#satuan').select2({
+			dropdownParent: jQuery('#modalTambahDataManual .modal-body'), // Tentukan modal sebagai parent dropdown
+			placeholder: 'Masukkan Nama Satuan',
+			ajax: {
+				url: esakip.url,
+				type: 'POST',
+				dataType: 'json',
+				delay: 250,
+				data: function(params) {
+					return {
+						action: "get_data_satuan",
+						api_key: esakip.api_key,
+						tahun_anggaran: tahunAnggaran,
+						search: params.term,
+						page: params.page || 0
+					};
+				},
+				processResults: function(data) {
+					return {
+						results: data.results,
+						pagination: {
+							more: data.pagination.more
+						}
+					};
+				},
+				error: function(xhr) {
+					alert('Terjadi kesalahan: ' + xhr.responseJSON.message);
+				},
+				cache: true
+			},
+			minimumInputLength: 1
+		});
+
 	});
 
 	function loadRkaWpSipd(tahunAnggaran, kodeSbl, idIndikator) {
@@ -1284,8 +1358,7 @@ if (empty($wpsipd_status)) {
 			tags: true,
 		});
 		jQuery('#id_data').val('')
-		jQuery('#kode_akun').val('')
-		jQuery('#nama_akun').val('')
+		jQuery('#kode_akun').val('').trigger('change')
 		jQuery('#subs_bl_teks').val('')
 		jQuery('#ket_bl_teks').val('')
 		jQuery('#nama_komponen').val('')
@@ -1383,8 +1456,8 @@ if (empty($wpsipd_status)) {
 				alert(res.message);
 				jQuery("#wrap-loading").hide();
 				if (res.status === "success") {
-					// location.reload();
-				}
+					jQuery('#modalTambahData').modal('hide');
+					window.data_changed = true				}
 			},
 			error: function(xhr, status, error) {
 				console.error(xhr.responseText);
@@ -1397,16 +1470,15 @@ if (empty($wpsipd_status)) {
 
 	function simpanRinciBlManual() {
 		const validationRules = {
-			'kode_akun': 'Kode Akun harus diisi!',
-			'nama_akun': 'Nama Akun harus diisi!',
-			'subs_bl_teks': 'Subs BL Teks harus diisi!',
-			'ket_bl_teks': 'Ket BL Teks harus diisi!',
-			'nama_komponen': 'Nama Komponen harus diisi!',
-			'volume': 'Volume harus diisi!',
-			'satuan': 'Satuan harus diisi!',
-			'harga_satuan': 'Harga Satuan harus diisi!',
-			'tahun_anggaran': 'Tahun Anggaran harus diisi!',
-			'keterangan': 'Keterangan harus diisi!'
+			'kode_akun': 'Silakan pilih akun terlebih dahulu.',
+			'subs_bl_teks': 'Harap mengisi Subs BL Teks.',
+			'ket_bl_teks': 'Harap mengisi Keterangan BL Teks.',
+			'nama_komponen': 'Nama Komponen tidak boleh kosong. Silakan diisi.',
+			'volume': 'Volume harus diisi. Mohon masukkan nilai volume.',
+			'satuan': 'Silakan pilih satuan terlebih dahulu.',
+			'harga_satuan': 'Harap mengisi Harga Satuan dengan benar.',
+			'tahun_anggaran': 'Tahun Anggaran wajib diisi. Mohon periksa kembali.',
+			'keterangan': 'Keterangan tidak boleh kosong. Harap diisi.'
 		};
 
 		const {
@@ -1449,7 +1521,7 @@ if (empty($wpsipd_status)) {
 				alert(res.message);
 				jQuery("#wrap-loading").hide();
 				if (res.status === "success") {
-					jQuery('#modalTambahDataManual').modal('show');
+					jQuery('#modalTambahDataManual').modal('hide');
 					window.data_changed = true
 				}
 			},
@@ -1506,19 +1578,39 @@ if (empty($wpsipd_status)) {
 			dataType: 'json',
 			success: function(response) {
 				jQuery('#wrap-loading').hide();
-				console.log(response);
 				if (response.status === 'success') {
 					let data = response.data;
-					jQuery('#id_data').val(data.id)
-					jQuery('#kode_akun').val(data.kode_akun)
-					jQuery('#nama_akun').val(data.nama_akun)
-					jQuery('#subs_bl_teks').val(data.subs_bl_teks)
-					jQuery('#ket_bl_teks').val(data.ket_bl_teks)
-					jQuery('#nama_komponen').val(data.nama_komponen)
-					jQuery('#volume').val(data.volume)
-					jQuery('#satuan').val(data.satuan)
-					jQuery('#harga_satuan').val(data.harga_satuan)
-					jQuery('#keterangan').val(data.keterangan)
+
+					// Input biasa
+					jQuery('#id_data').val(data.id);
+					jQuery('#nama_komponen').val(data.nama_komponen);
+					jQuery('#volume').val(data.volume);
+					jQuery('#harga_satuan').val(data.harga_satuan);
+					jQuery('#keterangan').val(data.keterangan);
+
+					// Select2 dengan Ajax (kode_akun)
+					if (data.kode_akun) {
+						jQuery('#kode_akun').select2("trigger", "select", {
+							data: {
+								id: data.kode_akun,
+								text: data.kode_akun + ' - ' + data.nama_akun
+							}
+						});
+					}
+
+					// Select2 dengan input bebas (subs_bl_teks dan ket_bl_teks)
+					if (data.subs_bl_teks) {
+						jQuery('#subs_bl_teks').append(new Option(data.subs_bl_teks, data.subs_bl_teks, true, true)).trigger('change');
+					}
+					if (data.ket_bl_teks) {
+						jQuery('#ket_bl_teks').append(new Option(data.ket_bl_teks, data.ket_bl_teks, true, true)).trigger('change');
+					}
+
+					// Select2 dengan Static Options (satuan)
+					if (data.satuan) {
+						jQuery('#satuan').append(new Option(data.satuan, data.satuan, true, true)).trigger('change');
+					}
+
 					jQuery('#modalTambahDataManual').modal('show');
 				} else {
 					alert(response.message);
