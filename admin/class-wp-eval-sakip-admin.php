@@ -1327,6 +1327,10 @@ class Wp_Eval_Sakip_Admin
 					->set_help_text('Wajib diisi. Setting batas ukuran maksimal untuk upload dokumen. Ukuran dalam MB'),
 				Field::make('text', 'crb_nama_pemda', 'Nama Pemerintah Daerah')
 					->set_help_text('Wajib diisi.'),
+				Field::make('image', 'crb_logo_dashboard', __('Logo Pemerintah Daerah'))
+					->set_value_type('url'),
+				Field::make('text', 'crb_kepala_daerah', 'Kepala Daerah')
+					->set_help_text('Wajib diisi.'),
 				Field::make('radio', 'crb_api_simpeg_status', 'Status API Kepegawaian')
 					->add_options(array(
 						'0' => __('Dikunci'),

@@ -2247,7 +2247,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                                     $tbody .= "<tr>";
                                     $tbody .= "<td class='text-left'>" . $v_pgw['nama_bidang'] . "</td>";
                                     $tbody .= "<td class='text-left'>" . $v_pgw['tipe_pegawai'] . "</td>";
-                                    $tbody .= "<td style='text-transform: uppercase;'><a href='".$detail_laporan_pk['url']."&id_skpd=".$unit['id_skpd']."&nip=".$v_pgw['nip_baru']."' target='_blank'>" . $v_pgw['nip_baru'] . "</a></td>";
+                                    $tbody .= "<td class='text-left' title='Halaman Detail Perjanjian Kinerja'><a href='".$detail_laporan_pk['url']."&id_skpd=".$unit['id_skpd']."&nip=".$v_pgw['nip_baru']."' target='_blank'>" . $v_pgw['nip_baru'] . "</a></td>";
                                     $tbody .= "<td class='text-left'>" . $v_pgw['nama_pegawai'] . "</td>";
                                     $tbody .= "<td class='text-left'>" . $v_pgw['jabatan'] . "</td>";
                                     $tbody .= "</tr>";
