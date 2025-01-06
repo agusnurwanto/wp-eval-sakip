@@ -137,6 +137,12 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
         display: block; 
     }
 
+    #tabel-cascading div span.nama_satker {
+        font-size: 14px;
+        margin-top: 10px; 
+        display: block; 
+    }
+
     #tabel-cascading-kegiatan,
     #tabel-cascading-kegiatan td,
     #tabel-cascading-kegiatan table {
@@ -179,6 +185,16 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
     }
 
     .indikator {
+        font-size: 14px;
+    }
+
+    #tabel-cascading-kegiatan div span.nama_satker {
+        font-size: 14px;
+        margin-top: 10px; 
+        display: block; 
+    }
+
+    .nama_satker {
         font-size: 14px;
     }
 
@@ -349,10 +365,12 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                         <input type="text" id="sub_giat_cascading" class="form-control" disabled>
                     </div>
                     <div id="daftar_jabatan" class="form-group">
-                        <label for="satker_id">Pilih Jabatan</label>
+                        <label for="satker_id">Pilih Satuan Kerja</label>
                         <select class="form-control select2" id="satker_id" name="satker_id"></select>
                     </div>
-                    <button type="submit" class="btn btn-primary" onclick="submit_pegawai_cascading(this); return false;">Simpan</button>
+                    <div style="text-align: right;">
+                        <button type="submit" class="btn btn-primary" onclick="submit_pegawai_cascading(this); return false;">Simpan</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -505,6 +523,7 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                     action: 'get_kegiatan_by_program',
                     api_key: esakip.api_key,
                     id: id,
+                    id_skpd: <?php echo $id_skpd; ?>,
                     tujuan: tujuan,
                     sasaran: sasaran,
                     program: program
@@ -653,7 +672,8 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                     jQuery('#modalUpload').modal('show');
                     jQuery('#tujuan_cascading').val(tujuan); 
                     jQuery('#sasaran_cascading').val(sasaran); 
-                    jQuery('#program_cascading').val(program); 
+                    let get_program = response.data.no_urut ? `${response.data.no_urut} ${program}` : program;
+                    jQuery('#program_cascading').val(get_program); 
                     jQuery('label[for="sasaran_cascading"]').show();
                     jQuery('#sasaran_cascading').show();
                     jQuery('label[for="program_cascading"]').show();
@@ -679,7 +699,7 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
             }
         });
     }
-    function get_kegiatan_cascading(button, id, kegiatan, program, sasaran, tujuan) {
+    function get_kegiatan_cascading(button, id, kegiatan, program, sasaran, tujuan, no_urut) {
         jQuery('#wrap-loading').show();
 
         jQuery.ajax({
@@ -698,8 +718,10 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                     jQuery('#modalUpload').modal('show');
                     jQuery('#tujuan_cascading').val(tujuan); 
                     jQuery('#sasaran_cascading').val(sasaran); 
-                    jQuery('#program_cascading').val(program); 
-                    jQuery('#kegiatan_cascading').val(kegiatan); 
+                    let get_program = no_urut ? `${no_urut} ${program}` : program;
+                    jQuery('#program_cascading').val(get_program); 
+                    let get_kegiatan = response.data.no_urut ? `${response.data.no_urut} ${kegiatan}` : kegiatan;
+                    jQuery('#kegiatan_cascading').val(get_kegiatan); 
                     jQuery('label[for="sasaran_cascading"]').show();
                     jQuery('#sasaran_cascading').show();
                     jQuery('label[for="program_cascading"]').show();
@@ -725,7 +747,7 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
             }
         });
     }
-    function get_sub_giat_cascading(button, id, sub_giat, kegiatan, program, sasaran, tujuan) {
+    function get_sub_giat_cascading(button, id, sub_giat, kegiatan, program, sasaran, tujuan, no_urut) {
         jQuery('#wrap-loading').show();
 
         jQuery.ajax({
@@ -744,9 +766,12 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                     jQuery('#modalUpload').modal('show');
                     jQuery('#tujuan_cascading').val(tujuan); 
                     jQuery('#sasaran_cascading').val(sasaran); 
-                    jQuery('#program_cascading').val(program); 
-                    jQuery('#kegiatan_cascading').val(kegiatan); 
-                    jQuery('#sub_giat_cascading').val(sub_giat); 
+                    let get_program = no_urut ? `${no_urut} ${program}` : program;
+                    jQuery('#program_cascading').val(get_program); 
+                    let get_kegiatan = response.get_kegiatan.no_urut ? `${response.get_kegiatan.no_urut} ${kegiatan}` : kegiatan;
+                    jQuery('#kegiatan_cascading').val(get_kegiatan); 
+                    let get_sub_giat = response.data.no_urut ? `${response.data.no_urut} ${sub_giat}` : sub_giat;
+                    jQuery('#sub_giat_cascading').val(get_sub_giat); 
                     jQuery('label[for="sasaran_cascading"]').show();
                     jQuery('#sasaran_cascading').show();
                     jQuery('label[for="program_cascading"]').show();
