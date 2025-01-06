@@ -4,3 +4,9 @@ public/media/dokumen/dokumen_pemda/*.pdf
 public/media/dokumen/dokumen_pemda/*.PDF
 public/media/json/*.json
 public/media/json/*.JSON
+public/media/dokumen/*.jpeg
+public/media/dokumen/*.JPEG
+public/media/dokumen/*.jpg
+public/media/dokumen/*.JPG
+public/media/dokumen/*.png
+public/media/dokumen/*.PNG

@@ -28292,7 +28292,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'nama_pegawai' => $data['nama_pegawai'],
 							'satker_id' => $data['satker_id'],
 							'jabatan' => $data['jabatan'],
-							'update_at' => current_time('mysql')
+							'update_at' => current_time('mysql'),
+							'tipe_pegawai' => $data['tipe_pegawai'],
+							'tipe_pegawai_id' => $data['tipe_pegawai_id']
 						], [
 							'nip_baru' => $data['nip_baru']
 						]);
@@ -28302,6 +28304,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'nama_pegawai' => $data['nama_pegawai'],
 							'satker_id' => $data['satker_id'],
 							'jabatan' => $data['jabatan'],
+							'tipe_pegawai' => $data['tipe_pegawai'],
+							'tipe_pegawai_id' => $data['tipe_pegawai_id'],
 							'active' => 1,
 							'created_at' => current_time('mysql'),
 						]);
