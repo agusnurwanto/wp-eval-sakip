@@ -1117,6 +1117,7 @@ if (empty($wpsipd_status)) {
 
 							Object.values(ketData.data).forEach((rinci) => {
 								const isChecked = rinci.is_checked ? "checked" : "";
+								let displayLabel = 'display:none;';
 
 								let list_labels = [];
 								let check_existing = false;
@@ -1156,6 +1157,10 @@ if (empty($wpsipd_status)) {
 										</tr>
 									`);
 								});
+
+								if (list_labels != '' || check_existing != false) {
+									displayLabel = '';
+								}
 
 								let label_nama_rhk = '<?php echo $renaksi['label']; ?>';
 								let label_nama_indikator = '<?php echo $ind_renaksi['indikator']; ?>'
@@ -1219,7 +1224,7 @@ if (empty($wpsipd_status)) {
 											${formatRupiah(rinci.realisasi)}
 										</td>
 									</tr>
-									<tr id="parentDetail${rinci.id_rinci_sub_bl}" style="display:none;" class="no-hover">
+									<tr id="parentDetail${rinci.id_rinci_sub_bl}" style="${displayLabel}" class="no-hover">
 										<td colspan="7">
 											<table class="table table-bordered">
 												<thead style="background-color: #343a40; color: #fff;">
@@ -1246,7 +1251,7 @@ if (empty($wpsipd_status)) {
 					});
 				});
 				handleCheckboxRinci()
-				jQuery('.rinci-checkbox').trigger('change')
+				// jQuery('.rinci-checkbox').trigger('change')
 				jQuery('.volume-pisah').keyup()
 			},
 			error: function(xhr, status, error) {
