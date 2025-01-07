@@ -131,13 +131,12 @@ if(empty($logo_pemda)){
 ?>
 <style type="text/css">
     body{
-        /* font-size: 18px; */
         font-size: 16px;
         line-height: 24px;
     }
     @media print {
-  		#cetak {
-  			max-width: auto !important;
+  		#laporan_pk {
+  			max-width: 900px !important;
   			height: auto !important;
             /* font-size: 12pt; */
   		}
@@ -177,15 +176,11 @@ if(empty($logo_pemda)){
     }
     
     #laporan_pk { 
-        /* font-family:'Times New Roman'; */
         font-family: Arial, Helvetica, sans-serif;
         margin-right: auto;
         margin-left: auto;
         background-color: var(--white-color);
-        padding: 70px;
-        /* font-size:12pt;  */
-        /* width: 210mm;
-        height: 330mm; */
+        padding: 20px;
     }
 
     #laporan_pk p {
@@ -228,97 +223,95 @@ if(empty($logo_pemda)){
 
 </style>
 
-<div class="container-md">
+<div class="container-md mx-auto" style="width: 900px;">
     <div class="text-center" id="action-sakip">
         <button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button><br>
     </div>
-    <div id="cetak" class="d-flex justify-content-center" style="padding: 10px;margin:0 0 3rem 0;">
-        <div id="laporan_pk" class="text-center">
-            <div class="row pb-3" style="border-bottom: 7px solid;">
-                <div class="col-2" style="height: 200px;">
-                    <?php if(!empty($logo_pemda)) : ?>
-                        <img style="max-width: 100%; max-height: 100%;" src="<?php echo $logo_pemda; ?>" alt="Logo Pemda">
-                    <?php endif; ?>
-                </div>
-                <div class="col my-auto">
-                    <p class="title-pk-1">PEMERINTAH <?php echo strtoupper($nama_pemda); ?></p>
-                    <p class="title-pk-2"><?php echo strtoupper($skpd['nama_skpd']); ?></p>
-                    <p class="title-pk-1"><?php echo $skpd['alamat_kantor'] ?></p>
-                </div>
-                <div class="col-1"></div>
+    <div id="laporan_pk" class="text-center">
+        <div class="row" style="border-bottom: 7px solid;">
+            <div class="col-2" style="display: flex; align-items: center; height: 200px;">
+                <?php if(!empty($logo_pemda)) : ?>
+                    <img style="max-width: 100%; height: auto;" src="<?php echo $logo_pemda; ?>" alt="Logo Pemda">
+                <?php endif; ?>
             </div>
-            <p class="title-laporan mt-3 mb-2">PERJANJIAN KINERJA TAHUN <?php echo $input['tahun']; ?></p>
-            <p class="text-left f-12 mt-5">Dalam rangka mewujudkan manajemen pemerintahan yang efektif, transparan dan akuntabel serta berorientasi pada hasil, kami yang bertanda tangan dibawah ini :</p>
-            <table id="table-1" class="text-left f-12">
-                <tr>
-                    <td>Nama</td>
-                    <td>:</td>
-                    <td><?php echo $data_satker['nama_pegawai']; ?></td>
-                </tr>
-                <tr>
-                    <td>Jabatan</td>
-                    <td>:</td>
-                    <td><?php echo $data_satker['jabatan']; ?> <?php echo $data_satker['nama_bidang']; ?></td>
-                </tr>
-                <tr>
-                    <td colspan="3">Selanjutnya disebut pihak pertama</td>
-                </tr>
-                <tr>
-                    <td>Nama</td>
-                    <td>:</td>
-                    <td><?php echo $data_atasan['nama_pegawai']; ?></td>
-                </tr>
-                <tr>
-                    <td>Jabatan</td>
-                    <td>:</td>
-                    <?php if(empty($data_atasan['status_kepala'])) : ?>
-                        <td><?php echo $data_atasan['jabatan']; ?> <?php echo $data_atasan['nama_bidang']; ?></td>
-                    <?php else : ?>
-                        <td><?php echo $data_atasan['jabatan']; ?></td>
-                    <?php endif; ?>
-                </tr>
-            </table>
-            <p class="text-left f-12">Pihak pertama berjanji akan mewujudkan target kinerja yang seharusnya sesuai lampiran perjanjian ini, dalam rangka mencapai target kinerja jangka menengah seperti yang telah ditetapkan dalam dokumen perencanaan. Keberhasilan dan kegagalan pencapaian target fahéijl tersebutmenjadi tanggung jawab kami.</p>
-            </br>
-            <p class="text-left f-12">Pihak kedua akan memberikan supervisi yang diperlukan serta akan melakukan evaluasi terhadap capaian kinerja dari perjanjian ini dan mengambil tindakan yang diperlukan Adiam rangka memberikan penghargaan dan sanksi</p>
-            <table id="table_data_pejabat" class="f-12">
-                <thead>
-                    <tr class="text-center">
-                        <td></td>
-                        <td><?php echo $pemda; ?>,&emsp;&emsp;-&emsp;&emsp;&emsp;&emsp;&emsp;-&ensp;<?php echo $input['tahun']; ?></td>
-                    </tr>
-                    <tr class="text-center">
-                        <td>Pihak Kedua,</td>
-                        <td>Pihak Pertama,</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr style="height: 7em;">
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr class="text-center">
-                        <td class="ttd-pejabat">
-                            <?php echo $data_atasan['nama_pegawai']; ?>
-                        </td>
-                        <td class="ttd-pejabat">
-                            <?php echo $data_satker['nama_pegawai']; ?>
-                        </td>
-                    </tr>
-                    <tr class="text-center">
-                        <td style="padding: 0;">
-                            <?php if(empty($data_atasan['status_kepala'])) : ?>
-                                NIP. <?php echo $data_atasan['nip_baru']; ?>
-                            <?php endif; ?>
-                        </td>
-                        <td style="padding: 0;">
-                            NIP. <?php echo $data_satker['nip_baru']; ?>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="col my-auto">
+                <p class="title-pk-1">PEMERINTAH <?php echo strtoupper($nama_pemda); ?></p>
+                <p class="title-pk-2"><?php echo strtoupper($skpd['nama_skpd']); ?></p>
+                <p class="title-pk-1"><?php echo $skpd['alamat_kantor'] ?></p>
+            </div>
+            <div class="col-1"></div>
         </div>
+        <p class="title-laporan mt-3 mb-2">PERJANJIAN KINERJA TAHUN <?php echo $input['tahun']; ?></p>
+        <p class="text-left f-12 mt-5">Dalam rangka mewujudkan manajemen pemerintahan yang efektif, transparan dan akuntabel serta berorientasi pada hasil, kami yang bertanda tangan dibawah ini :</p>
+        <table id="table-1" class="text-left f-12">
+            <tr>
+                <td>Nama</td>
+                <td>:</td>
+                <td><?php echo $data_satker['nama_pegawai']; ?></td>
+            </tr>
+            <tr>
+                <td>Jabatan</td>
+                <td>:</td>
+                <td><?php echo $data_satker['jabatan']; ?> <?php echo $data_satker['nama_bidang']; ?></td>
+            </tr>
+            <tr>
+                <td colspan="3">Selanjutnya disebut pihak pertama</td>
+            </tr>
+            <tr>
+                <td>Nama</td>
+                <td>:</td>
+                <td><?php echo $data_atasan['nama_pegawai']; ?></td>
+            </tr>
+            <tr>
+                <td>Jabatan</td>
+                <td>:</td>
+                <?php if(empty($data_atasan['status_kepala'])) : ?>
+                    <td><?php echo $data_atasan['jabatan']; ?> <?php echo $data_atasan['nama_bidang']; ?></td>
+                <?php else : ?>
+                    <td><?php echo $data_atasan['jabatan']; ?></td>
+                <?php endif; ?>
+            </tr>
+        </table>
+        <p class="text-left f-12">Pihak pertama berjanji akan mewujudkan target kinerja yang seharusnya sesuai lampiran perjanjian ini, dalam rangka mencapai target kinerja jangka menengah seperti yang telah ditetapkan dalam dokumen perencanaan. Keberhasilan dan kegagalan pencapaian target fahéijl tersebutmenjadi tanggung jawab kami.</p>
+        </br>
+        <p class="text-left f-12">Pihak kedua akan memberikan supervisi yang diperlukan serta akan melakukan evaluasi terhadap capaian kinerja dari perjanjian ini dan mengambil tindakan yang diperlukan Adiam rangka memberikan penghargaan dan sanksi</p>
+        <table id="table_data_pejabat" class="f-12">
+            <thead>
+                <tr class="text-center">
+                    <td></td>
+                    <td><?php echo $pemda; ?>,&emsp;&emsp;-&emsp;&emsp;&emsp;&emsp;&emsp;-&ensp;<?php echo $input['tahun']; ?></td>
+                </tr>
+                <tr class="text-center">
+                    <td>Pihak Kedua,</td>
+                    <td>Pihak Pertama,</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="height: 7em;">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr class="text-center">
+                    <td class="ttd-pejabat">
+                        <?php echo $data_atasan['nama_pegawai']; ?>
+                    </td>
+                    <td class="ttd-pejabat">
+                        <?php echo $data_satker['nama_pegawai']; ?>
+                    </td>
+                </tr>
+                <tr class="text-center">
+                    <td style="padding: 0;">
+                        <?php if(empty($data_atasan['status_kepala'])) : ?>
+                            NIP. <?php echo $data_atasan['nip_baru']; ?>
+                        <?php endif; ?>
+                    </td>
+                    <td style="padding: 0;">
+                        NIP. <?php echo $data_satker['nip_baru']; ?>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
