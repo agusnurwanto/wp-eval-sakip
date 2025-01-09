@@ -135,9 +135,10 @@ if(empty($logo_pemda)){
         line-height: 24px;
     }
     @media print {
-  		#laporan_pk {
+  		.page-print {
   			max-width: 900px !important;
   			height: auto !important;
+            margin: 0 auto;
             /* font-size: 12pt; */
   		}
 
@@ -150,6 +151,10 @@ if(empty($logo_pemda)){
   		#action-sakip, .site-header, .site-footer {
   			display: none;
   		}
+
+        .break-print {
+			break-after: page;
+		}
   	}
 
     #action-sakip {
@@ -175,19 +180,20 @@ if(empty($logo_pemda)){
         vertical-align: middle;
     }
     
-    #laporan_pk { 
+    .page-print { 
         font-family: Arial, Helvetica, sans-serif;
         margin-right: auto;
         margin-left: auto;
         background-color: var(--white-color);
-        padding: 20px;
+        padding: 30px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15)
     }
 
-    #laporan_pk p {
+    .page-print p {
         margin: 0pt;
     }
 
-    #laporan_pk table, td {
+    .page-print table, td {
         border: none;
     }
 
@@ -227,7 +233,7 @@ if(empty($logo_pemda)){
     <div class="text-center" id="action-sakip">
         <button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button><br>
     </div>
-    <div id="laporan_pk" class="text-center">
+    <div id="laporan_pk" class="text-center page-print">
         <div class="row" style="border-bottom: 7px solid;">
             <div class="col-2" style="display: flex; align-items: center; height: 200px;">
                 <?php if(!empty($logo_pemda)) : ?>
@@ -313,7 +319,49 @@ if(empty($logo_pemda)){
             </tbody>
         </table>
     </div>
-</div>
+    <div class="break-print"></div>
+    <div class="page-print mt-5 text-center">
+        <p class="title-laporan mt-3">PERJANJIAN KINERJA TAHUN <?php echo $input['tahun']; ?></p>
+        <p class="title-laporan"><?php echo $data_satker['nama_bidang']; ?></p>
+        <table id="table_data_pejabat" class="f-12 mt-5">
+                <thead>
+                    <tr class="text-center">
+                        <td></td>
+                        <td><?php echo $pemda; ?>,&emsp;&emsp;-&emsp;&emsp;&emsp;&emsp;&emsp;-&ensp;<?php echo $input['tahun']; ?></td>
+                    </tr>
+                    <tr class="text-center">
+                        <td>Pihak Kedua,</td>
+                        <td>Pihak Pertama,</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="height: 7em;">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="text-center">
+                        <td class="ttd-pejabat">
+                            <?php echo $data_atasan['nama_pegawai']; ?>
+                        </td>
+                        <td class="ttd-pejabat">
+                            <?php echo $data_satker['nama_pegawai']; ?>
+                        </td>
+                    </tr>
+                    <tr class="text-center">
+                        <td style="padding: 0;">
+                            <?php if(empty($data_atasan['status_kepala'])) : ?>
+                                NIP. <?php echo $data_atasan['nip_baru']; ?>
+                            <?php endif; ?>
+                        </td>
+                        <td style="padding: 0;">
+                            NIP. <?php echo $data_satker['nip_baru']; ?>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
 <script>
     jQuery(document).ready(function() {

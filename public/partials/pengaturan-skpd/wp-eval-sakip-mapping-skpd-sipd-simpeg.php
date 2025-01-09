@@ -317,11 +317,13 @@ foreach ($unit as $kk => $vv) {
         .then(function(data_last){
             alert('Berhasil singkronisasi data pegawai.');
             jQuery('#wrap-loading').hide();
+			jQuery('#pesan-loading').html('');
         })
         .catch(function(err){
             console.log('err', err);
             alert('Ada kesalahan sistem!');
             jQuery('#wrap-loading').hide();
+			jQuery('#pesan-loading').html('');
         });
 	}
 
