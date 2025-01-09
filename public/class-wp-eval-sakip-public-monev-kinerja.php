@@ -3776,63 +3776,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		die(json_encode($return));
 	}
 
-	function get_data_satuan()
-	{
-		global $wpdb;
-		$return = array(
-			'status' => 'success',
-			'results' => array(),
-			'pagination' => array(
-				"more" => false
-			)
-		);
-
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$tahun_anggaran = intval($_POST['tahun_anggaran']);
-				$page = isset($_POST['page']) ? intval($_POST['page']) : 0;
-
-				$search = '';
-				if (!empty($_POST['search'])) {
-					$search_term = '%' . $wpdb->esc_like($_POST['search']) . '%';
-					$search = $wpdb->prepare("AND nama_satuan LIKE %s", $search_term);
-				}
-
-				$data_satuan = $wpdb->get_results($wpdb->prepare("
-					SELECT 
-						id_satuan,
-						nama_satuan 
-					FROM esakip_data_satuan 
-					WHERE tahun_anggaran = %d
-					  AND active = 1
-					  $search
-					LIMIT %d, 20
-				", $tahun_anggaran, $page * 20), ARRAY_A);
-
-				$return['sql'] = $wpdb->last_query;
-
-				foreach ($data_satuan as $key => $value) {
-					$return['results'][] = array(
-						'id' => $value['nama_satuan'],
-						'text' => $value['nama_satuan']
-					);
-				}
-
-				if (count($data_satuan) == 20) {
-					$return['pagination']['more'] = true;
-				}
-			} else {
-				$return['status'] = 'error';
-				$return['message'] = 'Api Key tidak sesuai!';
-			}
-		} else {
-			$return['status'] = 'error';
-			$return['message'] = 'Format tidak sesuai!';
-		}
-
-		die(json_encode($return));
-	}
-
 	function simpan_rinci_bl_tagging()
 	{
 		global $wpdb;
@@ -3971,17 +3914,13 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				}
 
 				$nama_akun = $wpdb->get_var(
-					$wpdb->prepare(
-						'
+					$wpdb->prepare('
 						SELECT nama_akun
 						FROM esakip_data_rekening_akun
 						WHERE tahun_anggaran = %d
 						  AND kode_akun = %s
 						  AND active = 1
-					',
-						$postData['tahun_anggaran'],
-						$postData['kode_akun']
-					)
+					', $postData['tahun_anggaran'], $postData['kode_akun'])
 				);
 
 				if (empty($nama_akun)) {
@@ -4004,6 +3943,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					'volume' 		 => $postData['volume'],
 					'satuan' 		 => $postData['satuan'],
 					'harga_satuan'   => $postData['harga_satuan'],
+					'realisasi'      => $postData['realisasi'],
 					'keterangan' 	 => $postData['keterangan'],
 					'tahun_anggaran' => $postData['tahun_anggaran']
 				];
@@ -4153,5 +4093,72 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		}
 
 		return $errors;
+	}
+
+	function get_serapan_anggaran_capaian_kinerja()
+	{
+		global $wpdb;
+		$ret = array(
+			'status'  => 'success',
+			'message' => 'Berhasil get data serapan anggaran dan capaian kinerja!',
+			'data' 	  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$id_skpd = $wpdb->get_var(
+					$wpdb->prepare('
+						SELECT id_skpd
+						FROM esakip_data_mapping_unit_sipd_simpeg
+						WHERE id_satker_simpeg = %d
+						  AND tahun_anggaran = %d
+						  AND active = 1
+					', $_POST['id_satker_simpeg'], $_POST['tahun_anggaran'])
+				);
+
+				if (empty($id_skpd) || empty($_POST['tahun_anggaran'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Data tidak ditemukan!';
+					die(json_encode($ret));
+				}
+
+				$url_wpsipd = get_option(ESAKIP_URL_WPSIPD);
+				$api_key_wpsipd = get_option(ESAKIP_APIKEY_WPSIPD);
+
+				// data to send in API request
+				$api_params = array(
+					'action' 		 => 'get_serapan_anggaran_capaian_kinerja',
+					'id_skpd' 		 => $id_skpd,
+					'api_key'		 => $api_key_wpsipd,
+					'tahun_anggaran' => $_POST['tahun_anggaran']
+				);
+
+				$response = wp_remote_post(
+					$url_wpsipd,
+					array(
+						'timeout' 	=> 1000,
+						'sslverify' => false,
+						'body' 		=> $api_params
+					)
+				);
+				
+				$response_body = wp_remote_retrieve_body($response);
+				$response_data = json_decode($response_body, true);
+
+				if (isset($response_data['data'])) {
+					$ret['data'] = $response_data['data'];
+				} else {
+					$ret['data'] = 'data tidak ditemukan!';
+				}
+			} else {
+				$ret['status'] = 'error';
+				$ret['message'] = 'API key tidak ditemukan!';
+			}
+		} else {
+			$ret['status'] = 'error';
+			$ret['message'] = 'Format salah!';
+		}
+
+		die(json_encode($ret));
 	}
 }

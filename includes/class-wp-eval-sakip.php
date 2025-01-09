@@ -635,6 +635,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_tambah_logo_pemda_laporan_pk', $plugin_public, 'tambah_logo_pemda_laporan_pk');
 		$this->loader->add_action('wp_ajax_get_table_pegawai_simpeg_pk', $plugin_public, 'get_table_pegawai_simpeg_pk');
 		
+		$this->loader->add_action('wp_ajax_nopriv_get_serapan_anggaran_capaian_kinerja',  $plugin_public, 'get_serapan_anggaran_capaian_kinerja');
+
 		$this->loader->add_action('wp_ajax_get_sub_keg_rka_wpsipd',  $plugin_public, 'get_sub_keg_rka_wpsipd');
 		$this->loader->add_action('wp_ajax_get_data_akun',  $plugin_public, 'get_data_akun');
 		$this->loader->add_action('wp_ajax_get_data_satuan',  $plugin_public, 'get_data_satuan');
