@@ -40,6 +40,10 @@ $skpd = $wpdb->get_row(
                 ARRAY_A
             );
 
+$error_api = array(
+    'status' => 0,
+    'message' => 'Berhasil Get API'
+);
 if(!empty($nip)){
     $data_satker = $wpdb->get_row(
         $wpdb->prepare("
@@ -60,6 +64,9 @@ if(!empty($nip)){
     $data_atasan = array();
     $cek_kepala_skpd = 0;
     $cek_nama_kepala_daerah = 0;
+    $dataPegawai = array();
+    $nama_golruang = '';
+    $nama_golruang_atasan = '';
     if(!empty($data_satker)){
         $cek_kepala = strlen($data_satker['satker_id']);
         if($cek_kepala == 2 && $data_satker['tipe_pegawai_id'] == 11){
@@ -116,9 +123,69 @@ if(!empty($nip)){
                 ", $data_satker['satker_id'], 11), ARRAY_A);
             }
         }
+        if(empty($data_atasan['status_kepala'])){
+            $path = 'api/pegawai/'.$data_atasan['nip_baru'].'/jabatan';
+            $option = array(
+                'url' => get_option('_crb_url_api_simpeg').$path,
+                'type' => 'get',
+                'header' => array('Authorization: Basic ' . get_option('_crb_authorization_api_simpeg'))
+            );
+
+            $response = $this->functions->curl_post($option);
+
+            if(empty($response)){
+                $error_api = array(
+                    'status' => 1,
+                    'message' => 'Respon API kosong!'
+                );
+            }else if($response == 'Unauthorized'){
+                $error_api = array(
+                    'status' => 1,
+                    'message' => $response.' '.json_encode($opsi)
+                );
+            }
+
+            $dataPegawaiAtasan = json_decode($response, true);
+            if(!empty($dataPegawaiAtasan[0]['nmgolruang'])){
+                $nama_golruang_atasan = $dataPegawaiAtasan[0]['nmgolruang'];
+            }
+        }
     }else{
         echo "Data Pegawai Tidak Ditemukan!";
         die();   
+    }
+
+    $path = 'api/pegawai/'.$nip.'/jabatan';
+    $option = array(
+        'url' => get_option('_crb_url_api_simpeg').$path,
+        'type' => 'get',
+        'header' => array('Authorization: Basic ' . get_option('_crb_authorization_api_simpeg'))
+    );
+
+    $response = $this->functions->curl_post($option);
+
+    if(empty($response)){
+        $error_api = array(
+            'status' => 1,
+            'message' => 'Respon API kosong!'
+        );
+    }else if($response == 'Unauthorized'){
+        $error_api = array(
+            'status' => 1,
+            'message' => $response.' '.json_encode($opsi)
+        );
+    }
+
+    $dataPegawai = json_decode($response, true);
+    if(!empty($dataPegawai[0]['nmgolruang'])){
+        $nama_golruang = $dataPegawai[0]['nmgolruang'];
+    }
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        $error_api = array(
+            'status' => 1,
+            'message' => "Terjadi kesalahan ketika mengakses API, Error : ". json_last_error_msg()
+        );
     }
 }
 
@@ -309,6 +376,16 @@ if(empty($logo_pemda)){
                 <tr class="text-center">
                     <td style="padding: 0;">
                         <?php if(empty($data_atasan['status_kepala'])) : ?>
+                            <?php echo $nama_golruang_atasan; ?>
+                        <?php endif; ?>
+                    </td>
+                    <td style="padding: 0;">
+                        <?php echo $nama_golruang; ?>
+                    </td>
+                </tr>
+                <tr class="text-center">
+                    <td style="padding: 0;">
+                        <?php if(empty($data_atasan['status_kepala'])) : ?>
                             NIP. <?php echo $data_atasan['nip_baru']; ?>
                         <?php endif; ?>
                     </td>
@@ -351,6 +428,16 @@ if(empty($logo_pemda)){
                     <tr class="text-center">
                         <td style="padding: 0;">
                             <?php if(empty($data_atasan['status_kepala'])) : ?>
+                                <?php echo $nama_golruang_atasan; ?>
+                            <?php endif; ?>
+                        </td>
+                        <td style="padding: 0;">
+                            <?php echo $nama_golruang; ?>
+                        </td>
+                    </tr>
+                    <tr class="text-center">
+                        <td style="padding: 0;">
+                            <?php if(empty($data_atasan['status_kepala'])) : ?>
                                 NIP. <?php echo $data_atasan['nip_baru']; ?>
                             <?php endif; ?>
                         </td>
@@ -369,6 +456,10 @@ if(empty($logo_pemda)){
         let cek_nama_kepala_daerah = <?php echo $cek_nama_kepala_daerah; ?>;
         if(cek_kepala_skpd == 1 && (cek_nama_kepala_daerah == 0)){
             alert("Harap Isi Nama Kepala Daerah Di Esakip Options!");
+        }
+        let status_error_api = <?php echo $error_api['status']; ?>;
+        if(status_error_api == 1){
+            console.log("<?php echo $error_api['message']; ?>");
         }
     });
 </script>
