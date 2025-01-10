@@ -28285,8 +28285,29 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 
 				$table = 'esakip_data_pegawai_simpeg';
+
+				if($_POST['type'] == 'unor'){
+					$wpdb->query(
+						$wpdb->prepare(
+							"UPDATE $table SET active = %d WHERE satker_id LIKE %s",
+							0,
+							$_POST['value'].'%'
+						)
+					);
+				}
+
 				foreach ($dataPegawai as $key => $data) {
-					$exists = $wpdb->get_row($wpdb->prepare("SELECT id FROM ".$table." WHERE nip_baru=%s AND active=%d", trim($data['nip_baru']), 1), ARRAY_A);
+					$exists = $wpdb->get_var(
+						$wpdb->prepare(
+							"SELECT 
+								id 
+							FROM 
+								".$table."
+							WHERE 
+								nip_baru=%s", 
+							trim($data['nip_baru'])
+						));
+
 					if(!empty($exists)){
 						$wpdb->update($table, [
 							'nama_pegawai' => $data['nama_pegawai'],
@@ -28294,9 +28315,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'jabatan' => $data['jabatan'],
 							'update_at' => current_time('mysql'),
 							'tipe_pegawai' => $data['tipe_pegawai'],
-							'tipe_pegawai_id' => $data['tipe_pegawai_id']
+							'tipe_pegawai_id' => $data['tipe_pegawai_id'],
+							'active' => 1
 						], [
-							'nip_baru' => $data['nip_baru']
+							'id' => $exists
 						]);
 					}else{
 						$wpdb->insert($table, [

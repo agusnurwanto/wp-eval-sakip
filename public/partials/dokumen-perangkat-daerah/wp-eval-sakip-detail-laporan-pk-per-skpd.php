@@ -39,6 +39,8 @@ $skpd = $wpdb->get_row(
             ", $id_skpd, $tahun_anggaran_sakip),
                 ARRAY_A
             );
+$nama_skpd = (!empty($skpd)) ? $skpd['nama_skpd'] : '';
+$alamat_kantor = (!empty($skpd)) ? $skpd['alamat_kantor'] : '';
 
 $error_api = array(
     'status' => 0,
@@ -68,6 +70,11 @@ if(!empty($nip)){
     $nama_golruang = '';
     $nama_golruang_atasan = '';
     if(!empty($data_satker)){
+        $nama_pegawai = (!empty($data_satker)) ? $data_satker['nama_pegawai'] : '';
+        $nip_pegawai = (!empty($data_satker)) ? $data_satker['nip_baru'] : '';
+        $bidang_pegawai = (!empty($data_satker)) ? $data_satker['nama_bidang'] : '';
+        $jabatan_pegawai = (!empty($data_satker)) ? $data_satker['jabatan'].' '.$data_satker['nama_bidang'] : '';
+
         $cek_kepala = strlen($data_satker['satker_id']);
         if($cek_kepala == 2 && $data_satker['tipe_pegawai_id'] == 11){
             $cek_kepala_skpd = 1;
@@ -123,8 +130,18 @@ if(!empty($nip)){
                 ", $data_satker['satker_id'], 11), ARRAY_A);
             }
         }
+        $nama_pegawai_atasan = (!empty($data_atasan['nama_pegawai'])) ? $data_atasan['nama_pegawai'] : '';
+        $nip_pegawai_atasan = (!empty($data_atasan['nip_baru'])) ? $data_atasan['nip_baru'] : '';
+        if(!empty($data_atasan['status_kepala']) && !empty($data_atasan['jabatan'])){
+            $jabatan_pegawai_atasan = $data_atasan['jabatan'];
+        }else if(!empty($data_atasan['jabatan'])){
+            $jabatan_pegawai_atasan = $data_atasan['jabatan'].' '.$data_atasan['nama_bidang'];
+        }else{
+            $jabatan_pegawai_atasan = '';
+        }
+
         if(empty($data_atasan['status_kepala'])){
-            $path = 'api/pegawai/'.$data_atasan['nip_baru'].'/jabatan';
+            $path = 'api/pegawai/'.$nip_pegawai_atasan.'/jabatan';
             $option = array(
                 'url' => get_option('_crb_url_api_simpeg').$path,
                 'type' => 'get',
@@ -192,7 +209,6 @@ if(!empty($nip)){
 $logo_pemda = get_option('_crb_logo_dashboard');
 if(empty($logo_pemda)){
     $logo_pemda = '';
-    // $logo_pemda = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22200%22%20height%3D%22200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20200%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_194359332f4%20text%20%7B%20fill%3Argba(255%2C255%2C255%2C.75)%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A10pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_194359332f4%22%3E%3Crect%20width%3D%22200%22%20height%3D%22200%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%2274.421875%22%20y%3D%22104.5%22%3E200x200%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E';
 }
 
 ?>
@@ -276,6 +292,10 @@ if(empty($logo_pemda)){
         width: 0%;
     }
 
+    tr, td {
+        vertical-align: top;
+    }
+
     .ttd-pejabat {
         padding: 0; 
         font-weight: 700; 
@@ -309,8 +329,8 @@ if(empty($logo_pemda)){
             </div>
             <div class="col my-auto">
                 <p class="title-pk-1">PEMERINTAH <?php echo strtoupper($nama_pemda); ?></p>
-                <p class="title-pk-2"><?php echo strtoupper($skpd['nama_skpd']); ?></p>
-                <p class="title-pk-1"><?php echo $skpd['alamat_kantor'] ?></p>
+                <p class="title-pk-2"><?php echo strtoupper($nama_skpd); ?></p>
+                <p class="title-pk-1"><?php echo $alamat_kantor ?></p>
             </div>
             <div class="col-1"></div>
         </div>
@@ -320,12 +340,12 @@ if(empty($logo_pemda)){
             <tr>
                 <td>Nama</td>
                 <td>:</td>
-                <td><?php echo $data_satker['nama_pegawai']; ?></td>
+                <td><?php echo $nama_pegawai; ?></td>
             </tr>
             <tr>
                 <td>Jabatan</td>
                 <td>:</td>
-                <td><?php echo $data_satker['jabatan']; ?> <?php echo $data_satker['nama_bidang']; ?></td>
+                <td><?php echo $jabatan_pegawai; ?></td>
             </tr>
             <tr>
                 <td colspan="3">Selanjutnya disebut pihak pertama</td>
@@ -333,21 +353,17 @@ if(empty($logo_pemda)){
             <tr>
                 <td>Nama</td>
                 <td>:</td>
-                <td><?php echo $data_atasan['nama_pegawai']; ?></td>
+                <td><?php echo $nama_pegawai_atasan; ?></td>
             </tr>
             <tr>
                 <td>Jabatan</td>
                 <td>:</td>
-                <?php if(empty($data_atasan['status_kepala'])) : ?>
-                    <td><?php echo $data_atasan['jabatan']; ?> <?php echo $data_atasan['nama_bidang']; ?></td>
-                <?php else : ?>
-                    <td><?php echo $data_atasan['jabatan']; ?></td>
-                <?php endif; ?>
+                <td><?php echo $jabatan_pegawai_atasan; ?></td>
             </tr>
         </table>
-        <p class="text-left f-12">Pihak pertama berjanji akan mewujudkan target kinerja yang seharusnya sesuai lampiran perjanjian ini, dalam rangka mencapai target kinerja jangka menengah seperti yang telah ditetapkan dalam dokumen perencanaan. Keberhasilan dan kegagalan pencapaian target fahéijl tersebutmenjadi tanggung jawab kami.</p>
+        <p class="text-left f-12">Pihak pertama berjanji akan mewujudkan target kinerja yang seharusnya sesuai lampiran perjanjian ini, dalam rangka mencapai target kinerja jangka menengah seperti yang telah ditetapkan dalam dokumen perencanaan. Keberhasilan dan kegagalan pencapaian target tersebut menjadi tanggung jawab kami.</p>
         </br>
-        <p class="text-left f-12">Pihak kedua akan memberikan supervisi yang diperlukan serta akan melakukan evaluasi terhadap capaian kinerja dari perjanjian ini dan mengambil tindakan yang diperlukan Adiam rangka memberikan penghargaan dan sanksi</p>
+        <p class="text-left f-12">Pihak kedua akan memberikan supervisi yang diperlukan serta akan melakukan evaluasi terhadap capaian kinerja dari perjanjian ini dan mengambil tindakan yang diperlukan dalam rangka memberikan penghargaan dan sanksi.</p>
         <table id="table_data_pejabat" class="f-12">
             <thead>
                 <tr class="text-center">
@@ -367,10 +383,10 @@ if(empty($logo_pemda)){
                 </tr>
                 <tr class="text-center">
                     <td class="ttd-pejabat">
-                        <?php echo $data_atasan['nama_pegawai']; ?>
+                        <?php echo $nama_pegawai_atasan; ?>
                     </td>
                     <td class="ttd-pejabat">
-                        <?php echo $data_satker['nama_pegawai']; ?>
+                        <?php echo $nama_pegawai; ?>
                     </td>
                 </tr>
                 <tr class="text-center">
@@ -386,11 +402,11 @@ if(empty($logo_pemda)){
                 <tr class="text-center">
                     <td style="padding: 0;">
                         <?php if(empty($data_atasan['status_kepala'])) : ?>
-                            NIP. <?php echo $data_atasan['nip_baru']; ?>
+                            NIP. <?php echo $nip_pegawai_atasan; ?>
                         <?php endif; ?>
                     </td>
                     <td style="padding: 0;">
-                        NIP. <?php echo $data_satker['nip_baru']; ?>
+                        NIP. <?php echo $nip_pegawai; ?>
                     </td>
                 </tr>
             </tbody>
@@ -399,7 +415,7 @@ if(empty($logo_pemda)){
     <div class="break-print"></div>
     <div class="page-print mt-5 text-center">
         <p class="title-laporan mt-3">PERJANJIAN KINERJA TAHUN <?php echo $input['tahun']; ?></p>
-        <p class="title-laporan"><?php echo $data_satker['nama_bidang']; ?></p>
+        <p class="title-laporan"><?php echo $bidang_pegawai; ?></p>
         <table id="table_data_pejabat" class="f-12 mt-5">
                 <thead>
                     <tr class="text-center">
@@ -419,10 +435,10 @@ if(empty($logo_pemda)){
                     </tr>
                     <tr class="text-center">
                         <td class="ttd-pejabat">
-                            <?php echo $data_atasan['nama_pegawai']; ?>
+                            <?php echo $nama_pegawai_atasan; ?>
                         </td>
                         <td class="ttd-pejabat">
-                            <?php echo $data_satker['nama_pegawai']; ?>
+                            <?php echo $nama_pegawai; ?>
                         </td>
                     </tr>
                     <tr class="text-center">
@@ -438,11 +454,11 @@ if(empty($logo_pemda)){
                     <tr class="text-center">
                         <td style="padding: 0;">
                             <?php if(empty($data_atasan['status_kepala'])) : ?>
-                                NIP. <?php echo $data_atasan['nip_baru']; ?>
+                                NIP. <?php echo $nip_pegawai_atasan; ?>
                             <?php endif; ?>
                         </td>
                         <td style="padding: 0;">
-                            NIP. <?php echo $data_satker['nip_baru']; ?>
+                            NIP. <?php echo $nip_pegawai; ?>
                         </td>
                     </tr>
                 </tbody>

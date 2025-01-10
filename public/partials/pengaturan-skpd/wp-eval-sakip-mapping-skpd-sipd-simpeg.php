@@ -30,7 +30,7 @@ $html = '';
 foreach ($unit as $kk => $vv) {
 	$option_selected='';
 	if(!empty($vv['id_unit_simpeg'])){
-		$option_selected = '<option>'.$vv['unit_simpeg'].'</option>';
+		$option_selected = '<option>'.$vv['id_unit_simpeg'].' - '.$vv['unit_simpeg'].'</option>';
 	}
 	$html .= '
 		<tr>
@@ -149,13 +149,17 @@ foreach ($unit as $kk => $vv) {
 	    "</div>"
 	  );
 
-	  $container.find(".select2-result-repository__title").text(response.nama);
+	  $container.find(".select2-result-repository__title").text(response.id+" - "+response.nama);
 
 	  return $container;
 	}
 
 	function formatUnorSelection (response) {
-	   return response.nama || response.text;
+		if(!response.nama){
+			return response.text;
+		}else{
+			return response.id+" - "+response.nama;
+		}
 	}
 
 	function mappingUnor(that){
@@ -212,7 +216,7 @@ foreach ($unit as $kk => $vv) {
 		        tbody += ''
 			        +'<tr>'
 			        	+'<td class="text-center"><input type="checkbox" value="'+value.id+'"></td>'
-			        	+'<td>'+value.nama+'</td>'
+			        	+'<td>'+value.id+' - '+value.nama+'</td>'
 			        +'<tr>';
 		    })
 		    jQuery("#modal").find('.modal-title').html('Singkronisasi Data Pegawai Simpeg');
