@@ -39,7 +39,13 @@ $skpd = $wpdb->get_row(
             ", $id_skpd, $tahun_anggaran_sakip),
                 ARRAY_A
             );
+$nama_skpd = (!empty($skpd)) ? $skpd['nama_skpd'] : '';
+$alamat_kantor = (!empty($skpd)) ? $skpd['alamat_kantor'] : '';
 
+$error_api = array(
+    'status' => 0,
+    'message' => 'Berhasil Get API'
+);
 if(!empty($nip)){
     $data_satker = $wpdb->get_row(
         $wpdb->prepare("
@@ -60,7 +66,15 @@ if(!empty($nip)){
     $data_atasan = array();
     $cek_kepala_skpd = 0;
     $cek_nama_kepala_daerah = 0;
+    $dataPegawai = array();
+    $nama_golruang = '';
+    $nama_golruang_atasan = '';
     if(!empty($data_satker)){
+        $nama_pegawai = (!empty($data_satker)) ? $data_satker['nama_pegawai'] : '';
+        $nip_pegawai = (!empty($data_satker)) ? $data_satker['nip_baru'] : '';
+        $bidang_pegawai = (!empty($data_satker)) ? $data_satker['nama_bidang'] : '';
+        $jabatan_pegawai = (!empty($data_satker)) ? $data_satker['jabatan'].' '.$data_satker['nama_bidang'] : '';
+
         $cek_kepala = strlen($data_satker['satker_id']);
         if($cek_kepala == 2 && $data_satker['tipe_pegawai_id'] == 11){
             $cek_kepala_skpd = 1;
@@ -116,29 +130,98 @@ if(!empty($nip)){
                 ", $data_satker['satker_id'], 11), ARRAY_A);
             }
         }
+        $nama_pegawai_atasan = (!empty($data_atasan['nama_pegawai'])) ? $data_atasan['nama_pegawai'] : '';
+        $nip_pegawai_atasan = (!empty($data_atasan['nip_baru'])) ? $data_atasan['nip_baru'] : '';
+        if(!empty($data_atasan['status_kepala']) && !empty($data_atasan['jabatan'])){
+            $jabatan_pegawai_atasan = $data_atasan['jabatan'];
+        }else if(!empty($data_atasan['jabatan'])){
+            $jabatan_pegawai_atasan = $data_atasan['jabatan'].' '.$data_atasan['nama_bidang'];
+        }else{
+            $jabatan_pegawai_atasan = '';
+        }
+
+        if(empty($data_atasan['status_kepala'])){
+            $path = 'api/pegawai/'.$nip_pegawai_atasan.'/jabatan';
+            $option = array(
+                'url' => get_option('_crb_url_api_simpeg').$path,
+                'type' => 'get',
+                'header' => array('Authorization: Basic ' . get_option('_crb_authorization_api_simpeg'))
+            );
+
+            $response = $this->functions->curl_post($option);
+
+            if(empty($response)){
+                $error_api = array(
+                    'status' => 1,
+                    'message' => 'Respon API kosong!'
+                );
+            }else if($response == 'Unauthorized'){
+                $error_api = array(
+                    'status' => 1,
+                    'message' => $response.' '.json_encode($opsi)
+                );
+            }
+
+            $dataPegawaiAtasan = json_decode($response, true);
+            if(!empty($dataPegawaiAtasan[0]['nmgolruang'])){
+                $nama_golruang_atasan = $dataPegawaiAtasan[0]['nmgolruang'];
+            }
+        }
     }else{
         echo "Data Pegawai Tidak Ditemukan!";
         die();   
+    }
+
+    $path = 'api/pegawai/'.$nip.'/jabatan';
+    $option = array(
+        'url' => get_option('_crb_url_api_simpeg').$path,
+        'type' => 'get',
+        'header' => array('Authorization: Basic ' . get_option('_crb_authorization_api_simpeg'))
+    );
+
+    $response = $this->functions->curl_post($option);
+
+    if(empty($response)){
+        $error_api = array(
+            'status' => 1,
+            'message' => 'Respon API kosong!'
+        );
+    }else if($response == 'Unauthorized'){
+        $error_api = array(
+            'status' => 1,
+            'message' => $response.' '.json_encode($opsi)
+        );
+    }
+
+    $dataPegawai = json_decode($response, true);
+    if(!empty($dataPegawai[0]['nmgolruang'])){
+        $nama_golruang = $dataPegawai[0]['nmgolruang'];
+    }
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        $error_api = array(
+            'status' => 1,
+            'message' => "Terjadi kesalahan ketika mengakses API, Error : ". json_last_error_msg()
+        );
     }
 }
 
 $logo_pemda = get_option('_crb_logo_dashboard');
 if(empty($logo_pemda)){
     $logo_pemda = '';
-    // $logo_pemda = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22200%22%20height%3D%22200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20200%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_194359332f4%20text%20%7B%20fill%3Argba(255%2C255%2C255%2C.75)%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A10pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_194359332f4%22%3E%3Crect%20width%3D%22200%22%20height%3D%22200%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%2274.421875%22%20y%3D%22104.5%22%3E200x200%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E';
 }
 
 ?>
 <style type="text/css">
     body{
-        /* font-size: 18px; */
         font-size: 16px;
         line-height: 24px;
     }
     @media print {
-  		#cetak {
-  			max-width: auto !important;
+  		.page-print {
+  			max-width: 900px !important;
   			height: auto !important;
+            margin: 0 auto;
             /* font-size: 12pt; */
   		}
 
@@ -151,6 +234,10 @@ if(empty($logo_pemda)){
   		#action-sakip, .site-header, .site-footer {
   			display: none;
   		}
+
+        .break-print {
+			break-after: page;
+		}
   	}
 
     #action-sakip {
@@ -176,23 +263,20 @@ if(empty($logo_pemda)){
         vertical-align: middle;
     }
     
-    #laporan_pk { 
-        /* font-family:'Times New Roman'; */
+    .page-print { 
         font-family: Arial, Helvetica, sans-serif;
         margin-right: auto;
         margin-left: auto;
         background-color: var(--white-color);
-        padding: 70px;
-        /* font-size:12pt;  */
-        /* width: 210mm;
-        height: 330mm; */
+        padding: 30px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15)
     }
 
-    #laporan_pk p {
+    .page-print p {
         margin: 0pt;
     }
 
-    #laporan_pk table, td {
+    .page-print table, td {
         border: none;
     }
 
@@ -206,6 +290,10 @@ if(empty($logo_pemda)){
 
     #table-1 td:nth-child(2){
         width: 0%;
+    }
+
+    tr, td {
+        vertical-align: top;
     }
 
     .ttd-pejabat {
@@ -228,60 +316,107 @@ if(empty($logo_pemda)){
 
 </style>
 
-<div class="container-md">
+<div class="container-md mx-auto" style="width: 900px;">
     <div class="text-center" id="action-sakip">
         <button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button><br>
     </div>
-    <div id="cetak" class="d-flex justify-content-center" style="padding: 10px;margin:0 0 3rem 0;">
-        <div id="laporan_pk" class="text-center">
-            <div class="row pb-3" style="border-bottom: 7px solid;">
-                <div class="col-2" style="height: 200px;">
-                    <?php if(!empty($logo_pemda)) : ?>
-                        <img style="max-width: 100%; max-height: 100%;" src="<?php echo $logo_pemda; ?>" alt="Logo Pemda">
-                    <?php endif; ?>
-                </div>
-                <div class="col my-auto">
-                    <p class="title-pk-1">PEMERINTAH <?php echo strtoupper($nama_pemda); ?></p>
-                    <p class="title-pk-2"><?php echo strtoupper($skpd['nama_skpd']); ?></p>
-                    <p class="title-pk-1"><?php echo $skpd['alamat_kantor'] ?></p>
-                </div>
-                <div class="col-1"></div>
+    <div id="laporan_pk" class="text-center page-print">
+        <div class="row" style="border-bottom: 7px solid;">
+            <div class="col-2" style="display: flex; align-items: center; height: 200px;">
+                <?php if(!empty($logo_pemda)) : ?>
+                    <img style="max-width: 100%; height: auto;" src="<?php echo $logo_pemda; ?>" alt="Logo Pemda">
+                <?php endif; ?>
             </div>
-            <p class="title-laporan mt-3 mb-2">PERJANJIAN KINERJA TAHUN <?php echo $input['tahun']; ?></p>
-            <p class="text-left f-12 mt-5">Dalam rangka mewujudkan manajemen pemerintahan yang efektif, transparan dan akuntabel serta berorientasi pada hasil, kami yang bertanda tangan dibawah ini :</p>
-            <table id="table-1" class="text-left f-12">
-                <tr>
-                    <td>Nama</td>
-                    <td>:</td>
-                    <td><?php echo $data_satker['nama_pegawai']; ?></td>
+            <div class="col my-auto">
+                <p class="title-pk-1">PEMERINTAH <?php echo strtoupper($nama_pemda); ?></p>
+                <p class="title-pk-2"><?php echo strtoupper($nama_skpd); ?></p>
+                <p class="title-pk-1"><?php echo $alamat_kantor ?></p>
+            </div>
+            <div class="col-1"></div>
+        </div>
+        <p class="title-laporan mt-3 mb-2">PERJANJIAN KINERJA TAHUN <?php echo $input['tahun']; ?></p>
+        <p class="text-left f-12 mt-5">Dalam rangka mewujudkan manajemen pemerintahan yang efektif, transparan dan akuntabel serta berorientasi pada hasil, kami yang bertanda tangan dibawah ini :</p>
+        <table id="table-1" class="text-left f-12">
+            <tr>
+                <td>Nama</td>
+                <td>:</td>
+                <td><?php echo $nama_pegawai; ?></td>
+            </tr>
+            <tr>
+                <td>Jabatan</td>
+                <td>:</td>
+                <td><?php echo $jabatan_pegawai; ?></td>
+            </tr>
+            <tr>
+                <td colspan="3">Selanjutnya disebut pihak pertama</td>
+            </tr>
+            <tr>
+                <td>Nama</td>
+                <td>:</td>
+                <td><?php echo $nama_pegawai_atasan; ?></td>
+            </tr>
+            <tr>
+                <td>Jabatan</td>
+                <td>:</td>
+                <td><?php echo $jabatan_pegawai_atasan; ?></td>
+            </tr>
+        </table>
+        <p class="text-left f-12">Pihak pertama berjanji akan mewujudkan target kinerja yang seharusnya sesuai lampiran perjanjian ini, dalam rangka mencapai target kinerja jangka menengah seperti yang telah ditetapkan dalam dokumen perencanaan. Keberhasilan dan kegagalan pencapaian target tersebut menjadi tanggung jawab kami.</p>
+        </br>
+        <p class="text-left f-12">Pihak kedua akan memberikan supervisi yang diperlukan serta akan melakukan evaluasi terhadap capaian kinerja dari perjanjian ini dan mengambil tindakan yang diperlukan dalam rangka memberikan penghargaan dan sanksi.</p>
+        <table id="table_data_pejabat" class="f-12">
+            <thead>
+                <tr class="text-center">
+                    <td></td>
+                    <td><?php echo $pemda; ?>,&emsp;&emsp;-&emsp;&emsp;&emsp;&emsp;&emsp;-&ensp;<?php echo $input['tahun']; ?></td>
                 </tr>
-                <tr>
-                    <td>Jabatan</td>
-                    <td>:</td>
-                    <td><?php echo $data_satker['jabatan']; ?> <?php echo $data_satker['nama_bidang']; ?></td>
+                <tr class="text-center">
+                    <td>Pihak Kedua,</td>
+                    <td>Pihak Pertama,</td>
                 </tr>
-                <tr>
-                    <td colspan="3">Selanjutnya disebut pihak pertama</td>
+            </thead>
+            <tbody>
+                <tr style="height: 7em;">
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
-                <tr>
-                    <td>Nama</td>
-                    <td>:</td>
-                    <td><?php echo $data_atasan['nama_pegawai']; ?></td>
+                <tr class="text-center">
+                    <td class="ttd-pejabat">
+                        <?php echo $nama_pegawai_atasan; ?>
+                    </td>
+                    <td class="ttd-pejabat">
+                        <?php echo $nama_pegawai; ?>
+                    </td>
                 </tr>
-                <tr>
-                    <td>Jabatan</td>
-                    <td>:</td>
-                    <?php if(empty($data_atasan['status_kepala'])) : ?>
-                        <td><?php echo $data_atasan['jabatan']; ?> <?php echo $data_atasan['nama_bidang']; ?></td>
-                    <?php else : ?>
-                        <td><?php echo $data_atasan['jabatan']; ?></td>
-                    <?php endif; ?>
+                <tr class="text-center">
+                    <td style="padding: 0;">
+                        <?php if(empty($data_atasan['status_kepala'])) : ?>
+                            <?php echo $nama_golruang_atasan; ?>
+                        <?php endif; ?>
+                    </td>
+                    <td style="padding: 0;">
+                        <?php echo $nama_golruang; ?>
+                    </td>
                 </tr>
-            </table>
-            <p class="text-left f-12">Pihak pertama berjanji akan mewujudkan target kinerja yang seharusnya sesuai lampiran perjanjian ini, dalam rangka mencapai target kinerja jangka menengah seperti yang telah ditetapkan dalam dokumen perencanaan. Keberhasilan dan kegagalan pencapaian target fahéijl tersebutmenjadi tanggung jawab kami.</p>
-            </br>
-            <p class="text-left f-12">Pihak kedua akan memberikan supervisi yang diperlukan serta akan melakukan evaluasi terhadap capaian kinerja dari perjanjian ini dan mengambil tindakan yang diperlukan Adiam rangka memberikan penghargaan dan sanksi</p>
-            <table id="table_data_pejabat" class="f-12">
+                <tr class="text-center">
+                    <td style="padding: 0;">
+                        <?php if(empty($data_atasan['status_kepala'])) : ?>
+                            NIP. <?php echo $nip_pegawai_atasan; ?>
+                        <?php endif; ?>
+                    </td>
+                    <td style="padding: 0;">
+                        NIP. <?php echo $nip_pegawai; ?>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="break-print"></div>
+    <div class="page-print mt-5 text-center">
+        <p class="title-laporan mt-3">PERJANJIAN KINERJA TAHUN <?php echo $input['tahun']; ?></p>
+        <p class="title-laporan"><?php echo $bidang_pegawai; ?></p>
+        <table id="table_data_pejabat" class="f-12 mt-5">
                 <thead>
                     <tr class="text-center">
                         <td></td>
@@ -300,27 +435,36 @@ if(empty($logo_pemda)){
                     </tr>
                     <tr class="text-center">
                         <td class="ttd-pejabat">
-                            <?php echo $data_atasan['nama_pegawai']; ?>
+                            <?php echo $nama_pegawai_atasan; ?>
                         </td>
                         <td class="ttd-pejabat">
-                            <?php echo $data_satker['nama_pegawai']; ?>
+                            <?php echo $nama_pegawai; ?>
                         </td>
                     </tr>
                     <tr class="text-center">
                         <td style="padding: 0;">
                             <?php if(empty($data_atasan['status_kepala'])) : ?>
-                                NIP. <?php echo $data_atasan['nip_baru']; ?>
+                                <?php echo $nama_golruang_atasan; ?>
                             <?php endif; ?>
                         </td>
                         <td style="padding: 0;">
-                            NIP. <?php echo $data_satker['nip_baru']; ?>
+                            <?php echo $nama_golruang; ?>
+                        </td>
+                    </tr>
+                    <tr class="text-center">
+                        <td style="padding: 0;">
+                            <?php if(empty($data_atasan['status_kepala'])) : ?>
+                                NIP. <?php echo $nip_pegawai_atasan; ?>
+                            <?php endif; ?>
+                        </td>
+                        <td style="padding: 0;">
+                            NIP. <?php echo $nip_pegawai; ?>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
-</div>
 
 <script>
     jQuery(document).ready(function() {
@@ -328,6 +472,10 @@ if(empty($logo_pemda)){
         let cek_nama_kepala_daerah = <?php echo $cek_nama_kepala_daerah; ?>;
         if(cek_kepala_skpd == 1 && (cek_nama_kepala_daerah == 0)){
             alert("Harap Isi Nama Kepala Daerah Di Esakip Options!");
+        }
+        let status_error_api = <?php echo $error_api['status']; ?>;
+        if(status_error_api == 1){
+            console.log("<?php echo $error_api['message']; ?>");
         }
     });
 </script>

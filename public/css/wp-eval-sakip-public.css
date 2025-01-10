@@ -341,16 +341,17 @@ thead {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 33px;
-    height: 33px;
+    width: 36px;
+    height: 36px;
     border: 2px solid transparent;
     border-radius: 50%;
     transition: all 0.3s ease;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 1.2rem;
+    box-sizing: border-box;
 }
 
-/* Edit Buttons */
+/* Edit Button */
 .edit-icon {
     background-color: #fdfd96;
     color: #333;

@@ -4,24 +4,48 @@ if (!defined('WPINC')) {
 }
 global $wpdb;
 
-$id_skpd = false;
-$tahun = false;
-$id_indikator = false;
-if (!empty($_GET) && !empty($_GET['id_skpd'])) {
-	$id_skpd = $wpdb->prepare('%d', $_GET['id_skpd']);
-} else {
-	die('<h1 class="text-center">Param "id_skpd" tidak boleh kosong!</h1>');
+$params = ['id_skpd', 'tahun', 'id_indikator'];
+foreach ($params as $param) {
+	if (!empty($_GET[$param])) {
+		$$param = $wpdb->prepare('%d', $_GET[$param]);
+	} else {
+		die("<h1 class='text-center'>Param \"$param\" tidak boleh kosong!</h1>");
+	}
 }
-if (!empty($_GET) && !empty($_GET['tahun'])) {
-	$tahun = $wpdb->prepare('%d', $_GET['tahun']);
-} else {
-	die('<h1 class="text-center">Param "tahun" tidak boleh kosong!</h1>');
+
+$ind_renaksi = $wpdb->get_row(
+	$wpdb->prepare("
+		SELECT *
+		FROM esakip_data_rencana_aksi_indikator_opd
+		WHERE id=%d
+	", $id_indikator),
+	ARRAY_A
+);
+if (empty($ind_renaksi)) {
+	die('<h1 class="text-center">Indikator Rencana Hasil Pekerjaan tidak ditemukan!</h1>');
 }
-if (!empty($_GET) && !empty($_GET['id_indikator'])) {
-	$id_indikator = $wpdb->prepare('%d', $_GET['id_indikator']);
-} else {
-	die('<h1 class="text-center">Param "id_indikator" tidak boleh kosong!</h1>');
+
+$data_satuan = $wpdb->get_results(
+	$wpdb->prepare("
+		SELECT 
+			id_satuan,
+			nama_satuan 
+		FROM esakip_data_satuan 
+		WHERE tahun_anggaran = %d
+		  AND active = 1
+	", $tahun),
+	ARRAY_A
+);
+
+$data_satuan_key_value = array_column($data_satuan, 'nama_satuan', 'id_satuan');
+
+$option_satuan = '';
+if (!empty($data_satuan)) {
+	foreach ($data_satuan as $val) {
+		$option_satuan .= '<option value="' . $val['id_satuan'] . '">' . $val['nama_satuan'] . '</option>';
+	}
 }
+
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
 $data_id_jadwal = $wpdb->get_row(
@@ -87,18 +111,6 @@ $cek_settingan_menu = $wpdb->get_var(
 );
 
 $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
-
-$ind_renaksi = $wpdb->get_row(
-	$wpdb->prepare("
-		SELECT *
-		FROM esakip_data_rencana_aksi_indikator_opd
-		WHERE id=%d
-	", $id_indikator),
-	ARRAY_A
-);
-if (empty($ind_renaksi)) {
-	die('<h1 class="text-center">Indikator Rencana Hasil Pekerjaan tidak ditemukan!</h1>');
-}
 
 $renaksi = $wpdb->get_row(
 	$wpdb->prepare("
@@ -195,7 +207,8 @@ $data_tagging = $wpdb->get_results(
 );
 
 $grouped_data = [];
-
+if (!empty($data_tagging)) {
+}
 foreach ($data_tagging as $value) {
 	$badge_tipe = $value['tipe'] == 1
 		? "<span class='badge badge-primary'>Manual</span>"
@@ -278,118 +291,129 @@ $total_all_realisasi = 0;
 $option_subs = '';
 $option_keterangan = '';
 $tbody = "";
-foreach ($grouped_data as $kode_akun => $akun) {
-	$tbody .= "
-    <tr class='akun-row'>
-        <td class='esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
-            {$akun['kode_akun']}
-        </td>
-        <td colspan='5' class='pl-3 esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
-            {$akun['nama_akun']}
-        </td>
-        <td class='esakip-text_kanan esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
-			" . number_format($akun['total'], 2, ',', '.') . "
-        </td>
-        <td class='esakip-text_kanan esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
-			" . number_format($akun['total_realisasi'], 2, ',', '.') . "
-        </td>
-        <td class='esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
-        </td>
-    </tr>";
-
-	foreach ($akun['subs'] as $subs_bl => $subs) {
-		$value_kelompok = preg_replace('/^\[\#\]\s*-?\s*/', '', $subs['nama_kelompok']);
-		$option_subs .= "<option value='{$value_kelompok}'>{$value_kelompok}</option>";
-
+if (!empty($grouped_data)) {
+	foreach ($grouped_data as $kode_akun => $akun) {
 		$tbody .= "
-        <tr class='subs-row'>
-            <td class='esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
-            </td>
-            <td colspan='5' class='pl-4 esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
-                {$subs['nama_kelompok']}
-            </td>
-			<td class='esakip-text_kanan esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
-				" . number_format($subs['total'], 2, ',', '.') . "
+		<tr class='akun-row'>
+			<td class='esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+				{$akun['kode_akun']}
+			</td>
+			<td colspan='5' class='pl-3 esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+				{$akun['nama_akun']}
 			</td>
 			<td class='esakip-text_kanan esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
-				" . number_format($subs['total_realisasi'], 2, ',', '.') . "
+				" . number_format($akun['total'], 2, ',', '.') . "
+			</td>
+			<td class='esakip-text_kanan esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+				" . number_format($akun['total_realisasi'], 2, ',', '.') . "
 			</td>
 			<td class='esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
 			</td>
-        </tr>";
-
-		foreach ($subs['ket'] as $ket_bl => $ket) {
-			$value_keterangan = preg_replace('/^\[\-\]\s*/', '', $ket['nama_keterangan']);
-			$option_keterangan .= "<option value='{$value_keterangan}'>{$value_keterangan}</option>";
-
+		</tr>";
+	
+		foreach ($akun['subs'] as $subs_bl => $subs) {
+			$value_kelompok = preg_replace('/^\[\#\]\s*-?\s*/', '', $subs['nama_kelompok']);
+			$option_subs .= "<option value='{$value_kelompok}'>{$value_kelompok}</option>";
+	
 			$tbody .= "
-            <tr class='ket-row'>
-                <td class='esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
-                </td>
-                <td colspan='5' class='pl-5 esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
-                    {$ket['nama_keterangan']}
-                </td>
-				<td class='esakip-text_kanan esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
-				    " . number_format($ket['total'], 2, ',', '.') . "
+			<tr class='subs-row'>
+				<td class='esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+				</td>
+				<td colspan='5' class='pl-4 esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+					{$subs['nama_kelompok']}
 				</td>
 				<td class='esakip-text_kanan esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
-				    " . number_format($ket['total_realisasi'], 2, ',', '.') . "
+					" . number_format($subs['total'], 2, ',', '.') . "
+				</td>
+				<td class='esakip-text_kanan esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+					" . number_format($subs['total_realisasi'], 2, ',', '.') . "
 				</td>
 				<td class='esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
 				</td>
-            </tr>";
-
-			foreach ($ket['data'] as $item) {
-				$btn_edit = "";
-				if ($item['tipe'] == 1) {
-					$btn_edit = "<span class='edit-icon m-2' onclick='editDataRincian({$item['id_rincian']});' title='Edit Rincian Belanja'><i class='dashicons dashicons-edit'></i></span>";
-				}
-
+			</tr>";
+	
+			foreach ($subs['ket'] as $ket_bl => $ket) {
+				$value_keterangan = preg_replace('/^\[\-\]\s*/', '', $ket['nama_keterangan']);
+				$option_keterangan .= "<option value='{$value_keterangan}'>{$value_keterangan}</option>";
+	
 				$tbody .= "
-                <tr class='rinci-row'>
-                    <td class='esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
-                    </td>
-                    <td class='pl-5 esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
-                        {$item['nama_komponen']} {$item['badge']}
-                    </td>
-                    <td class='esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
-						<div class='align-middle'>
-							<span class='delete-icon m-2' onclick='deleteRincianById({$item['id_rincian']});' title='Hapus Rincian Belanja'>
-								<i class='dashicons dashicons-trash'></i>
-							</span>
-							{$btn_edit}
-						</div>
-                    </td>
-                    <td class='esakip-text_kanan esakip-kiri esakip-kanan esakip-atas esakip-bawah' style='text-align: right;'>
-                        " . number_format($item['harga_satuan'], 2, ',', '.') . "
-                    </td>
-                    <td class='esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah' style='text-align: right;'>
-                        " . number_format($item['volume'], 2, ',', '.') . "
-                    </td>
-                    <td class='esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
-                        {$item['satuan']}
-                    </td>
-                    <td class='esakip-text_kanan esakip-kiri esakip-kanan esakip-atas esakip-bawah' style='text-align: right;'>
-                        " . number_format($item['total_harga'], 2, ',', '.') . "
-                    </td>
-                    <td class='esakip-text_kanan esakip-kiri esakip-kanan esakip-atas esakip-bawah' style='text-align: right;'>
-                        " . number_format($item['total_realisasi'], 2, ',', '.') . "
-                    </td>
-                    <td class='esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
-                        {$item['keterangan']}
-                    </td>
-                </tr>";
-				$total_all += $item['total_harga'];
-				$total_all_realisasi += $item['total_realisasi'];
+				<tr class='ket-row'>
+					<td class='esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+					</td>
+					<td colspan='5' class='pl-5 esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+						{$ket['nama_keterangan']}
+					</td>
+					<td class='esakip-text_kanan esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+						" . number_format($ket['total'], 2, ',', '.') . "
+					</td>
+					<td class='esakip-text_kanan esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+						" . number_format($ket['total_realisasi'], 2, ',', '.') . "
+					</td>
+					<td class='esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+					</td>
+				</tr>";
+	
+				foreach ($ket['data'] as $item) {
+					$btn_edit = "";
+					$val_satuan = $item['satuan'];
+					if ($item['tipe'] == 1) {
+						$btn_edit = "<span class='btn btn-sm btn-warning' onclick='editDataRincian({$item['id_rincian']});' title='Edit Rincian Belanja'><i class='dashicons dashicons-edit'></i></span>";
+						$val_satuan = $data_satuan_key_value[$item['satuan']] ?? 'Tidak ditemukan';
+					}
+	
+					$tbody .= "
+					<tr class='rinci-row'>
+						<td class='esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+						</td>
+						<td class='pl-5 esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+							{$item['nama_komponen']} {$item['badge']}
+						</td>
+						<td class='esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+							<div class='align-middle'>
+								<span class='btn btn-sm btn-danger' onclick='deleteRincianById({$item['id_rincian']});' title='Hapus Rincian Belanja'>
+									<i class='dashicons dashicons-trash'></i>
+								</span>
+								{$btn_edit}
+							</div>
+						</td>
+						<td class='esakip-text_kanan esakip-kiri esakip-kanan esakip-atas esakip-bawah' style='text-align: right;'>
+							" . number_format($item['harga_satuan'], 2, ',', '.') . "
+						</td>
+						<td class='esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah' style='text-align: right;'>
+							" . number_format($item['volume'], 2, ',', '.') . "
+						</td>
+						<td class='esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+							{$val_satuan}
+						</td>
+						<td class='esakip-text_kanan esakip-kiri esakip-kanan esakip-atas esakip-bawah' style='text-align: right;'>
+							" . number_format($item['total_harga'], 2, ',', '.') . "
+						</td>
+						<td class='esakip-text_kanan esakip-kiri esakip-kanan esakip-atas esakip-bawah' style='text-align: right;'>
+							" . number_format($item['total_realisasi'], 2, ',', '.') . "
+						</td>
+						<td class='esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
+							{$item['keterangan']}
+						</td>
+					</tr>";
+					$total_all += $item['total_harga'];
+					$total_all_realisasi += $item['total_realisasi'];
+				}
 			}
 		}
 	}
+} else {
+	$tbody = "<tr><td colspan='9' class='esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah'>Tidak ada data tersedia</td></tr>";
 }
+$sisa_pagu_rhk = $ind_renaksi['rencana_pagu'] - $total_all;
 
 $disabled = '';
+$disabled_manual = '';
 $wpsipd_status = get_option('_crb_url_server_sakip');
 if (empty($wpsipd_status)) {
 	$disabled = 'disabled';
+} else if (empty($renaksi['kode_sbl'])) {
+	$disabled = 'disabled';
+	$disabled_manual = 'disabled';
 }
 ?>
 <style type="text/css">
@@ -494,6 +518,15 @@ if (empty($wpsipd_status)) {
 	.no-hover-but-input td {
 		pointer-events: auto;
 	}
+
+	.info-row {
+		border-bottom: 1px solid #eee;
+		padding: 0.8rem 0;
+	}
+
+	.amount {
+		font-size: 1.1rem;
+	}
 </style>
 <!-- Table -->
 <div id="cetak">
@@ -515,7 +548,7 @@ if (empty($wpsipd_status)) {
 					<td></td>
 				</tr>
 				<tr>
-					<td style="width: 270px;">Rencana Hasil Kerja Pemda Level 1</td>
+					<td style="width: 270px;">RHK Pemda Level 1</td>
 					<td>:</td>
 					<td></td>
 				</tr>
@@ -534,7 +567,7 @@ if (empty($wpsipd_status)) {
 					<td></td>
 				</tr>
 				<tr>
-					<td>Rencana Hasil Kerja Pemda Level 2</td>
+					<td>RHK Pemda Level 2</td>
 					<td class="text-center">:</td>
 					<td></td>
 				</tr>
@@ -553,7 +586,7 @@ if (empty($wpsipd_status)) {
 					<td></td>
 				</tr>
 				<tr>
-					<td>Rencana Hasil Kerja Pemda Level 3</td>
+					<td>RHK Pemda Level 3</td>
 					<td class="text-center">:</td>
 					<td></td>
 				</tr>
@@ -572,7 +605,7 @@ if (empty($wpsipd_status)) {
 					<td></td>
 				</tr>
 				<tr>
-					<td>Rencana Hasil Kerja Pemda Level 4</td>
+					<td>RHK Pemda Level 4</td>
 					<td class="text-center">:</td>
 					<td><?php echo implode('<br>', $renaksi_pemda4['label']); ?></td>
 				</tr>
@@ -596,7 +629,7 @@ if (empty($wpsipd_status)) {
 					<td><?php echo $renaksi_parent3['label_pokin_2']; ?></td>
 				</tr>
 				<tr>
-					<td>Rencana Hasil Kerja OPD Level 1</td>
+					<td>RHK OPD Level 1</td>
 					<td class="text-center">:</td>
 					<td><?php echo $renaksi_parent3['label']; ?></td>
 				</tr>
@@ -615,7 +648,7 @@ if (empty($wpsipd_status)) {
 					<td><?php echo $renaksi_parent2['label_pokin_3']; ?></td>
 				</tr>
 				<tr>
-					<td>Rencana Hasil Kerja OPD Level 2</td>
+					<td>RHK OPD Level 2</td>
 					<td class="text-center">:</td>
 					<td><?php echo $renaksi_parent2['label']; ?></td>
 				</tr>
@@ -634,7 +667,7 @@ if (empty($wpsipd_status)) {
 					<td><?php echo $renaksi_parent1['label_pokin_4']; ?></td>
 				</tr>
 				<tr>
-					<td>Rencana Hasil Kerja OPD Level 3</td>
+					<td>RHK OPD Level 3</td>
 					<td class="text-center">:</td>
 					<td><?php echo $renaksi_parent1['label']; ?></td>
 				</tr>
@@ -653,7 +686,7 @@ if (empty($wpsipd_status)) {
 					<td><?php echo $renaksi['label_pokin_5']; ?></td>
 				</tr>
 				<tr>
-					<td>Rencana Hasil Kerja OPD Level 4</td>
+					<td>RHK OPD Level 4</td>
 					<td class="text-center">:</td>
 					<td><?php echo $renaksi['label']; ?></td>
 				</tr>
@@ -716,15 +749,19 @@ if (empty($wpsipd_status)) {
 			</thead>
 			<tbody>
 				<tr>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Rp. <?php echo $ind_renaksi['rencana_pagu']; ?></td>
+					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Rp. <?php echo number_format($ind_renaksi['rencana_pagu'], 2, ',', '.'); ?></td>
 					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Rp. <?php echo number_format($total_all, 2, ',', '.'); ?></td>
 					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Rp. <?php echo number_format($total_all_realisasi, 2, ',', '.'); ?></td>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">0%</td>
+					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">
+						<?php echo $ind_renaksi['rencana_pagu'] > 0
+							? round(($total_all_realisasi / $ind_renaksi['rencana_pagu']) * 100, 2) . '%'
+							: '-'; ?>
+					</td>
 				</tr>
 			</tbody>
 		</table>
 		<div class="m-2 text-center">
-			<button class="btn btn-primary m-2 text-center" onclick="handleModalTambahDataManual()" title="Tambah Data">
+			<button class="btn btn-primary m-2 text-center" onclick="handleModalTambahDataManual()" title="Tambah Data" <?php echo $disabled_manual; ?>>
 				<span class="dashicons dashicons-plus"></span> Tambah Rincian Belanja Manual
 			</button>
 			<button class="btn btn-success m-2 text-center" title="Tambah Data Dari WP-SIPD" onclick="handleModalTambahDataWpsipd()" <?php echo $disabled; ?>>
@@ -735,7 +772,7 @@ if (empty($wpsipd_status)) {
 			<table cellpadding="2" cellspacing="0" class="table_dokumen_rencana_aksi">
 				<thead style="background-color: #dee2e6; text-align: center;">
 					<tr>
-						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 135px;">KODE REKENING</th>
+						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 150px;">KODE REKENING</th>
 						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2">URAIAN</th>
 						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 120px;">AKSI</th>
 						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">HARGA SATUAN</th>
@@ -743,7 +780,7 @@ if (empty($wpsipd_status)) {
 						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 100px;">SATUAN</th>
 						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">TOTAL</th>
 						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">REALISASI</th>
-						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 160px;">KETERANGAN</th>
+						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 160px;">CATATAN</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -759,7 +796,7 @@ if (empty($wpsipd_status)) {
 	<div class="modal-dialog modal-xl" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="title-label">Tambah Rincian Belanja</h5>
+				<h5 class="modal-title" id="title-label">Tambah Rincian Belanja RKA/DPA</h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
@@ -768,30 +805,74 @@ if (empty($wpsipd_status)) {
 				<input type="hidden" id="id_data" name="id_data">
 				<div class="card bg-light mb-3">
 					<div class="card-body" style="overflow:auto; height: 90vh;">
-						<div class="form-row">
-							<div class="form-group col-md-12">
-								<label for="subKegiatan">Sub Kegiatan</label>
-								<input type="text" name="subKegiatan" class="form-control" value="<?php echo $renaksi['kode_cascading_sub_kegiatan'] . ' ' . $nama_sub_keg; ?>" disabled>
+						<!-- Informasi RHK -->
+						<div class="card bg-light mb-3">
+							<div class="card-header">
+								<strong>Informasi RHK</strong>
+							</div>
+							<div class="card-body">
+								<table class="table borderless-table mb-4">
+									<tbody>
+										<tr>
+											<td class="text-left" style="width: 20%;"><strong>Nama RHK</strong></td>
+											<td class="text-left"><strong>:</strong></td>
+											<td class="text-left"><?php echo $renaksi['label']; ?></td>
+										</tr>
+										<tr>
+											<td class="text-left"><strong>Indikator</strong></td>
+											<td class="text-left"><strong>:</strong></td>
+											<td class="text-left"><?php echo $ind_renaksi['indikator']; ?></td>
+										</tr>
+										<tr>
+											<td class="text-left"><strong>Sub Kegiatan</strong></td>
+											<td class="text-left"><strong>:</strong></td>
+											<td class="text-left"><?php echo $renaksi['kode_cascading_sub_kegiatan'] . ' ' . $nama_sub_keg; ?></td>
+										</tr>
+									</tbody>
+								</table>
+
+								<div class="bg-light p-3 rounded">
+									<div class="row">
+										<div class="col-md-3 mb-3">
+											<div class="text-muted text-center">Rencana Pagu</div>
+											<div class="amount font-weight-bold text-primary text-center"><?php echo number_format($ind_renaksi['rencana_pagu'], 2, ',', '.'); ?></div>
+										</div>
+										<div class="col-md-3 mb-3">
+											<div class="text-muted text-center">Total Rincian</div>
+											<div class="amount font-weight-bold text-primary text-center"><?php echo number_format($total_all, 2, ',', '.'); ?></div>
+										</div>
+										<div class="col-md-3 mb-3">
+											<div class="text-muted text-center">Sisa Rencana Pagu</div>
+											<div class="amount font-weight-bold text-success text-center"><?php echo number_format($sisa_pagu_rhk, 2, ',', '.'); ?></div>
+										</div>
+										<div class="col-md-3 mb-3">
+											<div class="text-muted text-center">Total Realisasi</div>
+											<div class="amount font-weight-bold text-primary text-center"><?php echo number_format($total_all_realisasi, 2, ',', '.'); ?></div>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 
-						<table id="tableRincian" class="mt-2 table table-hover">
-							<thead style="background-color: #343a40; color: #fff; text-align: center;">
-								<tr>
-									<th scope="col" class="text-center" style="width: 35px;">
-										<input type="checkbox" value="" id="checkAll">
-									</th>
-									<th scope="col" class="text-center">Nama Akun / Rincian Belanja</th>
-									<th scope="col" class="text-center" style="width: 75px;">Harga Satuan</th>
-									<th scope="col" class="text-center" style="width: 75px;">Volume</th>
-									<th scope="col" class="text-center" style="width: 75px;">Satuan</th>
-									<th scope="col" class="text-center" style="width: 160px;">Total</th>
-									<th scope="col" class="text-center" style="width: 160px;">Realisasi</th>
-								</tr>
-							</thead>
-							<tbody>
-							</tbody>
-						</table>
+						<div class="card bg-light mb-3">
+							<table id="tableRincian" class="mt-2 table table-hover">
+								<thead style="background-color: #343a40; color: #fff; text-align: center;">
+									<tr>
+										<th scope="col" class="text-center" style="width: 35px;">
+											<input type="checkbox" value="" id="checkAll">
+										</th>
+										<th scope="col" class="text-center">Nama Akun / Rincian Belanja</th>
+										<th scope="col" class="text-center" style="width: 75px;">Harga Satuan</th>
+										<th scope="col" class="text-center" style="width: 75px;">Volume</th>
+										<th scope="col" class="text-center" style="width: 75px;">Satuan</th>
+										<th scope="col" class="text-center" style="width: 160px;">Total</th>
+										<th scope="col" class="text-center" style="width: 160px;">Realisasi</th>
+									</tr>
+								</thead>
+								<tbody>
+								</tbody>
+							</table>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -807,21 +888,69 @@ if (empty($wpsipd_status)) {
 	<div class="modal-dialog modal-xl" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="title-label">Tambah Rincian Belanja</h5>
+				<h5 class="modal-title" id="title-label">Tambah Rincian Belanja Manual</h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
 			<div class="modal-body">
 				<input type="hidden" id="id_data" name="id_data">
+
+				<!-- Informasi RHK -->
 				<div class="card bg-light mb-3">
+					<div class="card-header">
+						<strong>Informasi RHK</strong>
+					</div>
 					<div class="card-body">
-						<div class="form-row">
-							<div class="form-group col-md-12">
-								<label for="subKegiatan">Sub Kegiatan</label>
-								<input type="text" name="subKegiatan" class="form-control" value="<?php echo $renaksi['kode_cascading_sub_kegiatan'] . ' ' . $nama_sub_keg; ?>" disabled>
+						<table class="table borderless-table mb-4">
+							<tbody>
+								<tr>
+									<td class="text-left" style="width: 20%;"><strong>Nama RHK</strong></td>
+									<td class="text-left"><strong>:</strong></td>
+									<td class="text-left"><?php echo $renaksi['label']; ?></td>
+								</tr>
+								<tr>
+									<td class="text-left"><strong>Indikator</strong></td>
+									<td class="text-left"><strong>:</strong></td>
+									<td class="text-left"><?php echo $ind_renaksi['indikator']; ?></td>
+								</tr>
+								<tr>
+									<td class="text-left"><strong>Sub Kegiatan</strong></td>
+									<td class="text-left"><strong>:</strong></td>
+									<td class="text-left"><?php echo $renaksi['kode_cascading_sub_kegiatan'] . ' ' . $nama_sub_keg; ?></td>
+								</tr>
+							</tbody>
+						</table>
+
+						<div class="bg-light p-3 rounded">
+							<div class="row">
+								<div class="col-md-3 mb-3">
+									<div class="text-muted text-center">Rencana Pagu</div>
+									<div class="amount font-weight-bold text-primary text-center"><?php echo number_format($ind_renaksi['rencana_pagu'], 2, ',', '.'); ?></div>
+								</div>
+								<div class="col-md-3 mb-3">
+									<div class="text-muted text-center">Total Rincian</div>
+									<div class="amount font-weight-bold text-primary text-center"><?php echo number_format($total_all, 2, ',', '.'); ?></div>
+								</div>
+								<div class="col-md-3 mb-3">
+									<div class="text-muted text-center">Sisa Rencana Pagu</div>
+									<div class="amount font-weight-bold text-success text-center"><?php echo number_format($sisa_pagu_rhk, 2, ',', '.'); ?></div>
+								</div>
+								<div class="col-md-3 mb-3">
+									<div class="text-muted text-center">Total Realisasi</div>
+									<div class="amount font-weight-bold text-primary text-center"><?php echo number_format($total_all_realisasi, 2, ',', '.'); ?></div>
+								</div>
 							</div>
 						</div>
+					</div>
+				</div>
+
+				<!-- Informasi Akun -->
+				<div class="card bg-light mb-3">
+					<div class="card-header">
+						<strong>Akun</strong>
+					</div>
+					<div class="card-body">
 						<div class="form-row">
 							<div class="form-group col-md-12">
 								<label for="kode_akun">Pilih Akun</label>
@@ -845,29 +974,57 @@ if (empty($wpsipd_status)) {
 								</select>
 							</div>
 						</div>
+					</div>
+				</div>
+
+				<!-- Informasi Rincian -->
+				<div class="card bg-light mb-3">
+					<div class="card-header">
+						<strong>Komponen Rincian Belanja</strong>
+					</div>
+					<div class="card-body">
 						<div class="form-row">
-							<div class="form-group col-md-6">
-								<label for="nama_komponen">Nama Komponen</label>
-								<input type="text" class="form-control" id="nama_komponen" name="nama_komponen" placeholder="Masukkan Nama Komponen">
+							<!-- Kolom Kiri -->
+							<div class="col-md-6">
+								<div class="form-group">
+									<label for="nama_komponen">Nama Komponen</label>
+									<input type="text" class="form-control" id="nama_komponen" name="nama_komponen" placeholder="Masukkan Nama Komponen">
+								</div>
+								<div class="form-group">
+									<label for="keterangan">Catatan</label>
+									<textarea class="form-control" id="keterangan" name="keterangan" rows="5" placeholder="Masukkan Catatan"></textarea>
+								</div>
 							</div>
-							<div class="form-group col-md-3">
-								<label for="volume">Volume</label>
-								<input type="number" class="form-control" id="volume" name="volume" placeholder="Masukkan Volume">
-							</div>
-							<div class="form-group col-md-3">
-								<label for="satuan">Satuan</label>
-								<select class="form-control" id="satuan" name="satuan" style="width: 100%;">
-								</select>
-							</div>
-						</div>
-						<div class="form-row">
-							<div class="form-group col-md-6">
-								<label for="harga_satuan">Harga Satuan</label>
-								<input type="number" class="form-control" id="harga_satuan" name="harga_satuan" placeholder="Masukkan Harga Satuan">
-							</div>
-							<div class="form-group col-md-6">
-								<label for="keterangan">Keterangan</label>
-								<textarea class="form-control" id="keterangan" name="keterangan" rows="3" placeholder="Masukkan Keterangan"></textarea>
+
+							<!-- Kolom Kanan -->
+							<div class="col-md-6">
+								<div class="form-row">
+									<div class="form-group col-md-6">
+										<label for="volume">Volume</label>
+										<input type="number" class="form-control" id="volume" name="volume" placeholder="Masukkan Volume" oninput="hitungTotalHarga()">
+									</div>
+									<div class="form-group col-md-6">
+										<label for="satuan">Satuan</label>
+										<select class="form-control" id="satuan" name="satuan">
+											<option value="">Pilih Satuan</option>
+											<?php echo $option_satuan; ?>
+										</select>
+									</div>
+								</div>
+								<div class="form-row">
+									<div class="form-group col-md-6">
+										<label for="harga_satuan">Harga Satuan</label>
+										<input type="number" class="form-control" id="harga_satuan" name="harga_satuan" placeholder="Masukkan Harga Satuan" oninput="hitungTotalHarga()">
+									</div>
+									<div class="form-group col-md-6">
+										<label for="realisasi">Realisasi</label>
+										<input type="number" class="form-control" id="realisasi" name="realisasi" placeholder="Masukkan Realisasi">
+									</div>
+								</div>
+								<div class="form-group pl-3">
+									<label for="total_harga">Total Harga</label>
+									<h3 class="font-weight-bold" id="total_harga"></h3>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -880,6 +1037,7 @@ if (empty($wpsipd_status)) {
 		</div>
 	</div>
 </div>
+
 <script>
 	jQuery(document).ready(() => {
 		window.statusWpsipd = '<?php echo esc_js($wpsipd_status); ?>';
@@ -941,39 +1099,6 @@ if (empty($wpsipd_status)) {
 				cache: true
 			},
 			minimumInputLength: 3
-		});
-
-		jQuery('#satuan').select2({
-			dropdownParent: jQuery('#modalTambahDataManual .modal-body'), // Tentukan modal sebagai parent dropdown
-			placeholder: 'Masukkan Nama Satuan',
-			ajax: {
-				url: esakip.url,
-				type: 'POST',
-				dataType: 'json',
-				delay: 250,
-				data: function(params) {
-					return {
-						action: "get_data_satuan",
-						api_key: esakip.api_key,
-						tahun_anggaran: tahunAnggaran,
-						search: params.term,
-						page: params.page || 0
-					};
-				},
-				processResults: function(data) {
-					return {
-						results: data.results,
-						pagination: {
-							more: data.pagination.more
-						}
-					};
-				},
-				error: function(xhr) {
-					alert('Terjadi kesalahan: ' + xhr.responseJSON.message);
-				},
-				cache: true
-			},
-			minimumInputLength: 1
 		});
 
 	});
@@ -1281,6 +1406,18 @@ if (empty($wpsipd_status)) {
 		anggaranElement.text(new Intl.NumberFormat("id-ID").format(anggaran));
 	}
 
+	function hitungTotalHarga() {
+		const volume = parseFloat(jQuery('#volume').val()) || 0;
+		const hargaSatuan = parseFloat(jQuery('#harga_satuan').val()) || 0;
+		const totalHarga = volume * hargaSatuan;
+
+		jQuery('#total_harga').text(totalHarga.toLocaleString('id-ID', {
+			style: 'currency',
+			currency: 'IDR'
+		}));
+	}
+
+
 	function handleCheckboxRinci() {
 		// Checkbox utama (select all)
 		jQuery("#checkAll").on("change", function() {
@@ -1362,14 +1499,19 @@ if (empty($wpsipd_status)) {
 			placeholder: 'Pilih Keterangan / Masukan Nama Keterangan...',
 			tags: true,
 		});
+		jQuery('#satuan').select2({
+			width: '100%',
+			dropdownParent: jQuery('#modalTambahDataManual .modal-body'), // Tentukan modal sebagai parent dropdown agar select2 search tidak error
+			placeholder: 'Pilih Satuan...',
+		});
 		jQuery('#id_data').val('')
 		jQuery('#kode_akun').val('').trigger('change')
-		jQuery('#subs_bl_teks').val('')
-		jQuery('#ket_bl_teks').val('')
+		jQuery('#subs_bl_teks').val('').trigger('change')
+		jQuery('#ket_bl_teks').val('').trigger('change')
 		jQuery('#nama_komponen').val('')
-		jQuery('#volume').val('')
-		jQuery('#satuan').val('')
-		jQuery('#harga_satuan').val('')
+		jQuery('#volume').val('').trigger('input')
+		jQuery('#satuan').val('').trigger('change')
+		jQuery('#harga_satuan').val('').trigger('input')
 		jQuery('#keterangan').val('')
 		jQuery('#modalTambahDataManual').modal('show')
 	}
@@ -1462,7 +1604,8 @@ if (empty($wpsipd_status)) {
 				jQuery("#wrap-loading").hide();
 				if (res.status === "success") {
 					jQuery('#modalTambahData').modal('hide');
-					window.data_changed = true				}
+					window.data_changed = true
+				}
 			},
 			error: function(xhr, status, error) {
 				console.error(xhr.responseText);
@@ -1483,7 +1626,6 @@ if (empty($wpsipd_status)) {
 			'satuan': 'Silakan pilih satuan terlebih dahulu.',
 			'harga_satuan': 'Harap mengisi Harga Satuan dengan benar.',
 			'tahun_anggaran': 'Tahun Anggaran wajib diisi. Mohon periksa kembali.',
-			'keterangan': 'Keterangan tidak boleh kosong. Harap diisi.'
 		};
 
 		const {
@@ -1495,6 +1637,8 @@ if (empty($wpsipd_status)) {
 		}
 
 		const id_data = jQuery('#id_data').val();
+		const keterangan = jQuery('#keterangan').val();
+		const realisasi = jQuery('#realisasi').val();
 
 		const tempData = new FormData();
 		tempData.append("action", "simpan_rinci_bl_tagging_manual");
@@ -1503,6 +1647,8 @@ if (empty($wpsipd_status)) {
 		tempData.append("kode_sbl", kodeSbl);
 		tempData.append("id_skpd", '<?php echo $id_skpd; ?>');
 		tempData.append("id_indikator", '<?php echo $id_indikator; ?>');
+		tempData.append("keterangan", keterangan);
+		tempData.append("realisasi", realisasi);
 
 		for (const [key, value] of Object.entries(data)) {
 			tempData.append(key, value);
@@ -1589,32 +1735,28 @@ if (empty($wpsipd_status)) {
 					// Input biasa
 					jQuery('#id_data').val(data.id);
 					jQuery('#nama_komponen').val(data.nama_komponen);
-					jQuery('#volume').val(data.volume);
-					jQuery('#harga_satuan').val(data.harga_satuan);
+					jQuery('#volume').val(data.volume).trigger('input');
+					jQuery('#harga_satuan').val(data.harga_satuan).trigger('input');
+					jQuery('#realisasi').val(data.realisasi);
 					jQuery('#keterangan').val(data.keterangan);
 
 					// Select2 dengan Ajax (kode_akun)
-					if (data.kode_akun) {
-						jQuery('#kode_akun').select2("trigger", "select", {
-							data: {
-								id: data.kode_akun,
-								text: data.kode_akun + ' - ' + data.nama_akun
-							}
-						});
-					}
+					jQuery('#kode_akun').select2("trigger", "select", {
+						data: {
+							id: data.kode_akun,
+							text: data.kode_akun + ' - ' + data.nama_akun
+						}
+					});
 
 					// Select2 dengan input bebas (subs_bl_teks dan ket_bl_teks)
-					if (data.subs_bl_teks) {
-						jQuery('#subs_bl_teks').append(new Option(data.subs_bl_teks, data.subs_bl_teks, true, true)).trigger('change');
-					}
-					if (data.ket_bl_teks) {
-						jQuery('#ket_bl_teks').append(new Option(data.ket_bl_teks, data.ket_bl_teks, true, true)).trigger('change');
-					}
+					jQuery('#subs_bl_teks')
+						.append(new Option(data.subs_bl_teks, data.subs_bl_teks, true, true))
+						.trigger('change');
+					jQuery('#ket_bl_teks')
+						.append(new Option(data.ket_bl_teks, data.ket_bl_teks, true, true))
+						.trigger('change');
 
-					// Select2 dengan Static Options (satuan)
-					if (data.satuan) {
-						jQuery('#satuan').append(new Option(data.satuan, data.satuan, true, true)).trigger('change');
-					}
+					jQuery('#satuan').val(data.satuan).trigger('change');
 
 					jQuery('#modalTambahDataManual').modal('show');
 				} else {

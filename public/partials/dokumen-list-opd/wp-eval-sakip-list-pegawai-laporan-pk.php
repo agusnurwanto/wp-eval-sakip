@@ -67,6 +67,7 @@ $nama_skpd = $wpdb->get_row(
 				<table id="cetak" title="List Pegawai Laporan Perjanjian Kinerja Perangkat Daerah" class="table table-bordered table_list_pegawai" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;">
 					<thead style="background: #ffc491;">
 						<tr>
+							<th class="text-center">Satker ID</th>
 							<th class="text-center">Satuan Kerja</th>
 							<th class="text-center">Tipe Pegawai</th>
 							<th class="text-center">NIP</th>
