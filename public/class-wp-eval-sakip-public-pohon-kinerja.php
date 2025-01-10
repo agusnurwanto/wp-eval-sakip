@@ -5910,7 +5910,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							            <hr/>
 							            <span class="nama_satker">Nama Satker : ' . $nama_satker . '</span>
 							            <br />
-							            <button class="btn btn-secondary edit-pegawai-button" onclick="get_sub_giat_cascading(this, \'' . $k['id'] . '\', \'' . $g['sub_giat'] . '\', \'' . $k['kegiatan'] . '\', \'' . $program . '\', \'' . $sasaran . '\', \'' . $tujuan . '\', \'' . $no_urut . '\');"><i style="font-size: 2rem;" class="dashicons dashicons-edit"></i>
+							            <button class="btn btn-secondary edit-pegawai-button" onclick="get_sub_giat_cascading(this, \'' . $g['id'] . '\', \'' . $g['sub_giat'] . '\', \'' . $k['kegiatan'] . '\', \'' . $program . '\', \'' . $sasaran . '\', \'' . $tujuan . '\', \'' . $no_urut . '\');"><i style="font-size: 2rem;" class="dashicons dashicons-edit"></i>
 							            </button>
 							        </div>
 							    </div>

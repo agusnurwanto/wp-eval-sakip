@@ -199,6 +199,11 @@ $set_renaksi = get_option('_crb_input_renaksi');
         display: none;
         /* Default disembunyikan */
     }
+    .help-rhk .dashicons{
+        text-decoration: none;
+        vertical-align: text-bottom !important;
+        font-size: 23px !important;
+    }
 </style>
 
 <!-- Table -->
@@ -230,13 +235,14 @@ $set_renaksi = get_option('_crb_input_renaksi');
                     <thead style="background: #ffc491;">
                         <tr>
                             <th class="text-center" rowspan="2" style="width: 85px;">No</th>
-                            <th class="text-center" rowspan="2" style="width: 200px;">KEGIATAN UTAMA<br>LEVEL 2</th>
+                            <th class="text-center" rowspan="2" style="width: 140px;">KETERANGAN</th>
+                            <th class="text-center" rowspan="2" style="width: 200px;">KEGIATAN UTAMA<br>RHK LEVEL 1<br>POKIN LEVEL 2</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">INDIKATOR KEGIATAN UTAMA</th>
-                            <th class="text-center" rowspan="2" style="width: 200px;">RENCANA HASIL KERJA<br>LEVEL 3</th>
+                            <th class="text-center" rowspan="2" style="width: 200px;">RENCANA HASIL KERJA<br>RHK LEVEL 2<br>POKIN LEVEL 3</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">OUTCOME/OUTPUT</th>
-                            <th class="text-center" rowspan="2" style="width: 200px;">URAIAN KEGIATAN RENCANA HASIL KERJA<br>LEVEL 4</th>
+                            <th class="text-center" rowspan="2" style="width: 200px;">URAIAN KEGIATAN RENCANA HASIL KERJA<br>RHK LEVEL 3<br>POKIN LEVEL 4</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">INDIKATOR</th>
-                            <th class="text-center" rowspan="2" style="width: 200px;">URAIAN TEKNIS KEGIATAN<br>LEVEL 5</th>
+                            <th class="text-center" rowspan="2" style="width: 200px;">URAIAN TEKNIS KEGIATAN<br>RHK LEVEL 4<br>POKIN LEVEL 5</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">INDIKATOR</th>
                             <th class="text-center" rowspan="2" style="width: 100px;">SATUAN</th>
                             <th class="text-center" colspan="6" style="width: 400px;">TARGET KEGIATAN PER TRIWULAN</th>
@@ -247,7 +253,6 @@ $set_renaksi = get_option('_crb_input_renaksi');
                             <th class="text-center" rowspan="2" style="width: 140px;">REALISASI PAGU</th>
                             <th class="text-center" rowspan="2" style="width: 140px;">CAPAIAN REALISASI PAGU</th>
                             <th class="text-center" rowspan="2" style="width: 140px;">PAGU SUB KEGIATAN</th>
-                            <th class="text-center" rowspan="2" style="width: 140px;">KETERANGAN</th>
                         </tr>
                         <tr>
                             <th>AWAL</th>
@@ -289,10 +294,10 @@ $set_renaksi = get_option('_crb_input_renaksi');
             <div class="modal-body">
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                        <a class="nav-item nav-link" id="nav-level-1-tab" data-toggle="tab" href="#nav-level-1" role="tab" aria-controls="nav-level-1" aria-selected="false">Kegiatan Utama</a>
-                        <a class="nav-item nav-link" id="nav-level-2-tab" data-toggle="tab" href="#nav-level-2" role="tab" aria-controls="nav-level-2" aria-selected="false">Rencana Hasil Kerja</a>
-                        <a class="nav-item nav-link" id="nav-level-3-tab" data-toggle="tab" href="#nav-level-3" role="tab" aria-controls="nav-level-3" aria-selected="false">Uraian Kegiatan Rencana Hasil Kerja</a>
-                        <a class="nav-item nav-link" id="nav-level-4-tab" data-toggle="tab" href="#nav-level-4" role="tab" aria-controls="nav-level-4" aria-selected="false">Uraian Teknis Kegiatan</a>
+                        <a class="nav-item nav-link" id="nav-level-1-tab" data-toggle="tab" href="#nav-level-1" role="tab" aria-controls="nav-level-1" aria-selected="false">Kegiatan Utama | RHK LEVEL 1</a>
+                        <a class="nav-item nav-link" id="nav-level-2-tab" data-toggle="tab" href="#nav-level-2" role="tab" aria-controls="nav-level-2" aria-selected="false">Rencana Hasil Kerja | RHK LEVEL 2</a>
+                        <a class="nav-item nav-link" id="nav-level-3-tab" data-toggle="tab" href="#nav-level-3" role="tab" aria-controls="nav-level-3" aria-selected="false">Uraian Kegiatan Rencana Hasil Kerja | RHK LEVEL 3</a>
+                        <a class="nav-item nav-link" id="nav-level-4-tab" data-toggle="tab" href="#nav-level-4" role="tab" aria-controls="nav-level-4" aria-selected="false">Uraian Teknis Kegiatan | RHK LEVEL 4</a>
                     </div>
                 </nav>
                 <div class="tab-content" id="nav-tabContent">
@@ -340,6 +345,89 @@ $set_renaksi = get_option('_crb_input_renaksi');
     </div>
 </div>
 
+<!-- Modal detail renaksi opd -->
+<div class="modal fade mt-5" id="modal-detail-renaksi" tabindex="-1" role="dialog" aria-labelledby="modal-detail-renaksiLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal-detail-renaksiLabel">Detail Rencana Hasil Kerja</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+            <input type="hidden" value="" id="id_data">
+            <input type="hidden" value="" id="tipe">
+            <div class="form-group">
+                <label for="detail_kegiatan_utama">KEGIATAN UTAMA</label>
+                <input type="text" id="detail_kegiatan_utama" class="form-control" disabled>
+            </div>
+            <div class="form-group">
+                <label for="detail_rhk">RENCANA HASIL KERJA</label>
+                <input type="text" id="detail_rhk" class="form-control" disabled>
+            </div>
+            <div class="form-group">
+                <label for="detail_uraian_kegiatan">URAIAN KEGIATAN</label>
+                <input type="text" id="detail_uraian_kegiatan" class="form-control" disabled>
+            </div>
+            <div class="form-group">
+                <label for="detail_uraian_tk">URAIAN TEKNIS KEGIATAN</label>
+                <input type="text" id="detail_uraian_tk" class="form-control" disabled>
+            </div>
+            <div class="form-group">
+                <label for="detail_pokin_1">POKIN LEVEL 1</label>
+                <input type="text" id="detail_pokin_1" class="form-control" disabled>
+            </div>
+            <div class="form-group">
+                <label for="detail_pokin_2">POKIN LEVEL 2</label>
+                <input type="text" id="detail_pokin_2" class="form-control" disabled>
+            </div>
+            <div class="form-group">
+                <label for="detail_pokin_3">POKIN LEVEL 3</label>
+                <input type="text" id="detail_pokin_3" class="form-control" disabled>
+            </div>
+            <div class="form-group">
+                <label for="detail_pokin_4">POKIN LEVEL 4</label>
+                <input type="text" id="detail_pokin_4" class="form-control" disabled>
+            </div>
+            <div class="form-group">
+                <label for="detail_pokin_5">POKIN LEVEL 5</label>
+                <input type="text" id="detail_pokin_5" class="form-control" disabled>
+            </div>
+            <div class="form-group">
+                <label for="detail_cascading_sasaran">CASCADING SASARAN</label>
+                <input type="text" id="detail_cascading_sasaran" class="form-control" disabled>
+            </div>
+            <div class="form-group">
+                <label for="detail_cascading_program">CASCADING PROGRAM</label>
+                <input type="text" id="detail_cascading_program" class="form-control" disabled>
+            </div>
+            <div class="form-group">
+                <label for="detail_cascading_kegiatan">CASCADING KEGIATAN</label>
+                <input type="text" id="detail_cascading_kegiatan" class="form-control" disabled>
+            </div>
+            <div class="form-group">
+                <label for="detail_cascading_sub_giat">CASCADING SUB KEGIATAN</label>
+                <input type="text" id="detail_cascading_sub_giat" class="form-control" disabled>
+            </div>
+            <div class="form-group">
+                <label for="detail_satuan_kerja">SATUAN KERJA</label>
+                <input type="text" id="detail_satuan_kerja" class="form-control" disabled>
+            </div>
+            <div class="form-group">
+                <label for="detail_pegawai">PEGAWAI PELAKSANA</label>
+                <input type="text" id="detail_pegawai" class="form-control" disabled>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script type="text/javascript">
     jQuery(document).ready(function() {
         run_download_excel_sakip();
@@ -369,7 +457,6 @@ $set_renaksi = get_option('_crb_input_renaksi');
         });
 
     });
-
     jQuery(document).on('click', '.verifikasi-renaksi-pemda', function() {
         let id = jQuery(this).data('id');
         let get_renaksi_opd = <?php echo json_encode($renaksi_opd); ?>;
@@ -577,26 +664,36 @@ $set_renaksi = get_option('_crb_input_renaksi');
                             jQuery("#modal-crud").find('.modal-title').html('Tambah Rencana Hasil Kerja');
                             jQuery("#modal-crud").find('.modal-body').html('' +
                                 `<form id="form-renaksi">` +
-                                '<input type="hidden" id="id_renaksi" value=""/>' +
-                                `<div class="form-group">` +
-                                `<label for="pokin-level-1">Pilih Pokin Level 1</label>` +
-                                `<select class="form-control" name="pokin-level-1" id="pokin-level-1" onchange="get_data_pokin_2(this.value, 2, 'pokin-level-2')">` +
-                                html +
-                                `</select>` +
-                                `</div>` +
-                                `<div class="form-group">` +
-                                `<label for="pokin-level-2">Pilih Pokin Level 2</label>` +
-                                `<select class="form-control" name="pokin-level-2" id="pokin-level-2">` +
-                                `</select>` +
-                                `</div>` +
-                                `<div class="form-group">` +
-                                `<textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan Kegiatan Utama..."></textarea>` +
-                                `</div>` +
-                                `<div class="form-group">` +
-                                `<label for="sasaran-cascading">Pilih Sasaran Cascading</label>` +
-                                `<select class="form-control" name="cascading-renstra" id="cascading-renstra">` +
-                                `</select>` +
-                                `</div>` +
+                                    '<input type="hidden" id="id_renaksi" value=""/>' +
+                                    `<div class="form-group">` +
+                                        `<label for="pokin-level-1">Pilih Pokin Level 1</label>` +
+                                            `<select class="form-control" name="pokin-level-1" id="pokin-level-1" onchange="get_data_pokin_2(this.value, 2, 'pokin-level-2')">` +
+                                            html +
+                                            `</select>` +
+                                    `</div>` +
+                                    `<div class="form-group">` +
+                                        `<label for="pokin-level-2">Pilih Pokin Level 2</label>` +
+                                            `<select class="form-control" name="pokin-level-2" id="pokin-level-2">` +
+                                            `</select>` +
+                                    `</div>` +
+                                    `<div class="form-group">` +
+                                        `<textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan Kegiatan Utama..."></textarea>` +
+                                    `</div>` +
+                                    `<div class="form-group">` +
+                                        `<label for="sasaran-cascading">Pilih Sasaran Cascading</label>` +
+                                            `<select class="form-control" name="cascading-renstra" id="cascading-renstra">` +
+                                            `</select>` +
+                                    `</div>` +
+                                    `<div class="form-group">` +
+                                        `<label for="satker_id">Pilih Satuan Kerja</label>` +
+                                            `<select class="form-control select2" id="satker_id" name="satker_id" onchange="get_pegawai_rhk();">` +
+                                            `</select>` +
+                                    `</div>` +
+                                    `<div class="form-group">` +
+                                        `<label for="pegawai">Pilih Pegawai Pelaksana</label>` +
+                                            `<select class="form-control select2" id="pegawai" name="pegawai">` +
+                                            `</select>` +
+                                    `</div>` +
                                 `</form>`);
                             jQuery("#modal-crud").find('.modal-footer').html('' +
                                 '<button type="button" class="btn btn-danger" data-dismiss="modal">' +
@@ -615,7 +712,63 @@ $set_renaksi = get_option('_crb_input_renaksi');
                                 width: '100%',
                                 placeholder: "Pilih Pokin Level 2"
                             }).place;
+                            jQuery("#satker_id").select2({
+                                ajax: {
+                                    url: esakip.url,
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    delay: 250,
+                                    data: function (params) {
+                                        return {
+                                            action: 'get_jabatan_cascading',
+                                            api_key: esakip.api_key,
+                                            id_skpd: <?php echo $id_skpd; ?>,
+                                            type:'search',
+                                            q: params.term,
+                                          };
+                                    },
+                                    processResults: function (data, params) {
+                                        params.page = params.page || 1;
 
+                                        return {
+                                           results: data.data,
+                                           pagination: {
+                                             more: (params.page * 30) < data.total_count
+                                           }
+                                         };
+                                    },
+                                    cache: true
+                                },
+                                placeholder: 'Cari satuan kerja / jabatan',
+                                minimumInputLength: 5,
+                                templateResult: function (response) {
+                                    if (response.loading) {
+                                        return response.text;
+                                    }
+
+                                    var $container = jQuery(
+                                    "<div class='select2-result-repository clearfix'>" +
+                                      "<div class='select2-result-repository__meta'>" +
+                                        "<div class='select2-result-repository__title'></div>" +
+                                      "</div>" +
+                                    "</div>"
+                                    );
+
+                                    $container.find(".select2-result-repository__title").text(response.nama);
+
+                                    return $container;
+                                },
+                                templateSelection: function(response) {
+                                    return response.nama || response.text;
+                                },
+                                'width': '100%',
+                                dropdownParent: jQuery('#modal-crud') 
+                            });
+                            jQuery("#pegawai").select2({
+                                placeholder: 'Pilih pegawai pelaksana',
+                                width: '100%',
+                                dropdownParent: jQuery('#modal-crud'),
+                            });
                             var key = 'sasaran' + '-' + 'x.xx';
                             if (data_sasaran_cascading[key] != undefined) {
                                 let html_cascading = '<option value="">Pilih Sasaran Cascading</option>';
@@ -793,6 +946,16 @@ $set_renaksi = get_option('_crb_input_renaksi');
                             jQuery('#pokin-level-1').val(response.data.id_pokin_1).trigger('change');
                             jQuery('#label_renaksi').val(response.data.label);
                             jQuery('#cascading-renstra').val(response.data.kode_cascading_sasaran).trigger('change');
+                            if(response.data.jabatan && response.data.jabatan.satker_id){
+                                jQuery('#satker_id').html('<option value="'+response.data.jabatan.satker_id+'">'+response.data.jabatan.satker_id+' | '+response.data.jabatan.nama+'</option>').trigger('change');
+                            }else{
+                                jQuery('#satker_id').html('<option value=""></option>').trigger('change');
+                            }
+                            if(response.data.pegawai && response.data.pegawai.nip_baru){
+                                jQuery('#pegawai').html('<option value="'+response.data.pegawai.nip_baru+'">'+response.data.pegawai.nip_baru+' | '+response.data.pegawai.nama_pegawai+'</option>').trigger('change');
+                            }else{
+                                jQuery('#pegawai').html('<option value=""></option>').trigger('change');
+                            }
                         }
                     }
                 });
@@ -824,6 +987,17 @@ $set_renaksi = get_option('_crb_input_renaksi');
                                 jQuery('#label_uraian_kegiatan').val(response.data.label_uraian_kegiatan);
                                 jQuery('#label_indikator_uraian_kegiatan').val(response.data.label_indikator_uraian_kegiatan);
 
+                                if(response.data.jabatan && response.data.jabatan.satker_id){
+                                    jQuery('#satker_id').html('<option value="'+response.data.jabatan.satker_id+'">'+response.data.jabatan.satker_id+' | '+response.data.jabatan.nama+'</option>').trigger('change');
+                                }else{
+                                    jQuery('#satker_id').html('<option value=""></option>').trigger('change');
+                                }
+
+                                if(response.data.pegawai && response.data.pegawai.nip_baru){
+                                    jQuery('#pegawai').html('<option value="'+response.data.pegawai.nip_baru+'">'+response.data.pegawai.nip_baru+' | '+response.data.pegawai.nama_pegawai+'</option>').trigger('change');
+                                }else{
+                                    jQuery('#pegawai').html('<option value=""></option>').trigger('change');
+                                }
                                 var renaksi_pemda = "";
                                 response.data.renaksi_pemda.map(function(b, i) {
                                     renaksi_pemda += `
@@ -845,44 +1019,66 @@ $set_renaksi = get_option('_crb_input_renaksi');
                                     </tr>
                                 `;
                                 });
-                                let checklist_renaksi_pemda = `
-                                <div class="form-group">
-                                    <label>Rencana Hasil Kerja Pemerintah Daerah | Level 4</label>
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>
-                                                    <input class="text-right" type="checkbox" id="check_all" class="form-check-input">
-                                                </th>
-                                                <th>Rencana Hasil Kerja</th>
-                                                <th>Indikator Rencana Hasil Kerja</th>
-                                                <th>Satuan</th>
-                                                <th>Target Akhir</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            ${renaksi_pemda}
-                                        </tbody>
-                                    </table>
-                                </div>`;
+                                if (renaksi_pemda.length > 0) {
+                                    let checklist_renaksi_pemda = `
+                                    <div class="form-group">
+                                        <label>Rencana Hasil Kerja Pemerintah Daerah | Level 4</label>
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        <input class="text-right" type="checkbox" id="check_all" class="form-check-input">
+                                                    </th>
+                                                    <th>Rencana Hasil Kerja</th>
+                                                    <th>Indikator Rencana Hasil Kerja</th>
+                                                    <th>Satuan</th>
+                                                    <th>Target Akhir</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${renaksi_pemda}
+                                            </tbody>
+                                        </table>
+                                    </div>`;
 
-                                jQuery("#modal-crud").find('.modal-body').append(checklist_renaksi_pemda);
+                                    jQuery("#modal-crud").find('.modal-body').append(checklist_renaksi_pemda);
 
-                                jQuery("#check_all").on('change', function() {
-                                    var checklist_all = jQuery(this).prop('checked');
-                                    jQuery("input[name='checklist_renaksi_pemda[]']").prop('checked', checklist_all);
-                                });
+                                    jQuery("#check_all").on('change', function() {
+                                        var checklist_all = jQuery(this).prop('checked');
+                                        jQuery("input[name='checklist_renaksi_pemda[]']").prop('checked', checklist_all);
+                                    });
+                                }
 
                             } else if (tipe == 3) {
                                 jQuery("#modal-crud").find('.modal-title').html('Edit Uraian Rencana Hasil Kerja');
                                 jQuery('#pokin-level-2').attr('val-id', response.data.id_pokin_5);
                                 jQuery('#pokin-level-1').val(response.data.id_pokin_4).trigger('change');
                                 jQuery('#cascading-renstra').val(response.data.kode_cascading_kegiatan).trigger('change');
+                                if(response.data.jabatan && response.data.jabatan.satker_id){
+                                    jQuery('#satker_id').html('<option value="'+response.data.jabatan.satker_id+'">'+response.data.jabatan.satker_id+' | '+response.data.jabatan.nama+'</option>').trigger('change');
+                                }else{
+                                    jQuery('#satker_id').html('<option value=""></option>').trigger('change');
+                                }
+                                if(response.data.pegawai && response.data.pegawai.nip_baru){
+                                    jQuery('#pegawai').html('<option value="'+response.data.pegawai.nip_baru+'">'+response.data.pegawai.nip_baru+' | '+response.data.pegawai.nama_pegawai+'</option>').trigger('change');
+                                }else{
+                                    jQuery('#pegawai').html('<option value=""></option>').trigger('change');
+                                }
                             } else if (tipe == 4) {
                                 jQuery("#modal-crud").find('.modal-title').html('Edit Uraian Teknis Kegiatan');
                                 jQuery('#pokin-level-2').attr('val-id', response.data.id_pokin_5);
                                 jQuery('#pokin-level-1').val(response.data.id_pokin_5).trigger('change');
                                 jQuery('#cascading-renstra').val(response.data.kode_cascading_sub_kegiatan).trigger('change');
+                                if(response.data.jabatan && response.data.jabatan.satker_id){
+                                    jQuery('#satker_id').html('<option value="'+response.data.jabatan.satker_id+'">'+response.data.jabatan.satker_id+' | '+response.data.jabatan.nama+'</option>').trigger('change');
+                                }else{
+                                    jQuery('#satker_id').html('<option value=""></option>').trigger('change');
+                                }
+                                if(response.data.pegawai && response.data.pegawai.nip_baru){
+                                    jQuery('#pegawai').html('<option value="'+response.data.pegawai.nip_baru+'">'+response.data.pegawai.nip_baru+' | '+response.data.pegawai.nama_pegawai+'</option>').trigger('change');
+                                }else{
+                                    jQuery('#pegawai').html('<option value=""></option>').trigger('change');
+                                }
                                 var checklist_dasar_pelaksanaan = `
                                 <div class="form-group">
                                     <label>Pilih Dasar Pelaksanaan</label>
@@ -965,14 +1161,15 @@ $set_renaksi = get_option('_crb_input_renaksi');
                         `</div>` +
                         `<table class="table" id="kegiatanUtama">` +
                         `<thead>` +
-                        `<tr class="table-secondary">` +
-                        `<th class="text-center" style="width:40px;">No</th>` +
-                        `<th class="text-center" style="width:300px;">Label Pokin</th>` +
-                        `<th class="text-center">Kegiatan Utama</th>` +
-                        `<th class="text-center">Sasaran Cascading</th>` +
-                        `<th class="text-center">Dasar Pelaksanaan</th>` +
-                        `<th class="text-center" style="width:200px;">Aksi</th>` +
-                        `</tr>` +
+                            `<tr class="table-secondary">` +
+                                `<th class="text-center" style="width:40px;">No</th>` +
+                                `<th class="text-center" style="width:300px;">Label Pokin</th>` +
+                                `<th class="text-center">Kegiatan Utama</th>` +
+                                `<th class="text-center">Sasaran Cascading</th>` +
+                                `<th class="text-center">Dasar Pelaksanaan</th>` +
+                                `<th class="text-center">Pegawai Pelaksana</th>` +
+                                `<th class="text-center" style="width:200px;">Aksi</th>` +
+                            `</tr>` +
                         `</thead>` +
                         `<tbody>`;
                     res.data.map(function(value, index) {
@@ -1005,52 +1202,60 @@ $set_renaksi = get_option('_crb_input_renaksi');
                             label_dasar_pelaksanaan = `<ul><li>${get_data_dasar_pelaksanaan.join('</li><li>')}</li></ul>`;
                         }
                         let label_cascading = value.label_cascading_sasaran != null ? value.label_cascading_sasaran : '-';
+                        var nama_pegawai = '';
+                        if(value.detail_satker && value.detail_satker.nama){
+                            nama_pegawai += value.detail_satker.nama + '<br>';
+                        }
+                        if(value.detail_pegawai && value.detail_pegawai.nip_baru){
+                            nama_pegawai += value.detail_pegawai.nip_baru+' '+value.detail_pegawai.nama_pegawai;
+                        }
                         kegiatanUtama += `` +
                             `<tr id="kegiatan_utama_${value.id}">` +
-                            `<td class="text-center">${index+1}</td>` +
-                            `<td class="label_pokin">${value.label_pokin_2}</td>` +
-                            `<td class="label_renaksi">${value.label}</td>` +
-                            `<td class="label_cascading">${label_cascading}</td>` +
-                            `<td class="label_renaksi">${label_dasar_pelaksanaan}</td>` +
-                            `<td class="text-center">` +
-                            `<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, 1, ${total_pagu})" title="Tambah Indikator (Total Pagu: ${total_pagu})"><i class="dashicons dashicons-plus"></i></a> ` +
-                            `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, 2, ${value.id_pokin_2}, '${value.kode_cascading_sasaran}')" title="Lihat Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> ` +
-                            `<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, 1)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;` +
-                            `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_rencana_aksi(${value.id}, 1)" title="Hapus"><i class="dashicons dashicons-trash"></i></a>` +
-                            `</td>` +
+                                `<td class="text-center">${index+1}</td>` +
+                                `<td class="label_pokin">${value.label_pokin_2}</td>` +
+                                `<td class="label_renaksi">${value.label}</td>` +
+                                `<td class="label_cascading">${label_cascading}</td>` +
+                                `<td class="label_renaksi">${label_dasar_pelaksanaan}</td>` +
+                                `<td class="detail_pegawai">${nama_pegawai}</td>` +
+                                `<td class="text-center">` +
+                                `<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, 1, ${total_pagu})" title="Tambah Indikator (Total Pagu: ${total_pagu})"><i class="dashicons dashicons-plus"></i></a> ` +
+                                `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, 2, ${value.id_pokin_2}, '${value.kode_cascading_sasaran}')" title="Lihat Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> ` +
+                                `<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, 1)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;` +
+                                `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_rencana_aksi(${value.id}, 1)" title="Hapus"><i class="dashicons dashicons-trash"></i></a>` +
+                                `</td>` +
                             `</tr>`;
 
                         let indikator = value.indikator;
                         if (indikator.length > 0) {
                             kegiatanUtama += `` +
-                                '<td colspan="6" style="padding: 0;">' +
+                                '<td colspan="7" style="padding: 0;">' +
                                 `<table class="table" id="indikatorKegiatanUtama" style="margin: .5rem 0 2rem;">` +
                                 `<thead>` +
-                                `<tr class="table-secondary">` +
-                                `<th class="text-center" style="width:20px">No</th>` +
-                                `<th class="text-center">Indikator</th>` +
-                                `<th class="text-center" style="width:120px;">Satuan</th>` +
-                                `<th class="text-center" style="width:50px;">Target Awal</th>` +
-                                `<th class="text-center" style="width:50px;">Target Akhir</th>` +
-                                `<th class="text-center" style="width:120px;">Rencana Pagu</th>` +
-                                `<th class="text-center" style="width:135px">Aksi</th>` +
-                                `</tr>` +
+                                    `<tr class="table-secondary">` +
+                                        `<th class="text-center" style="width:20px">No</th>` +
+                                        `<th class="text-center">Indikator</th>` +
+                                        `<th class="text-center" style="width:120px;">Satuan</th>` +
+                                        `<th class="text-center" style="width:50px;">Target Awal</th>` +
+                                        `<th class="text-center" style="width:50px;">Target Akhir</th>` +
+                                        `<th class="text-center" style="width:120px;">Rencana Pagu</th>` +
+                                        `<th class="text-center" style="width:135px">Aksi</th>` +
+                                    `</tr>` +
                                 `</thead>` +
                                 `<tbody>`;
                             indikator.map(function(b, i) {
                                 kegiatanUtama += `` +
                                     `<tr>` +
-                                    `<td class="text-center">${index+1}.${i+1}</td>` +
-                                    `<td>${b.indikator}</td>` +
-                                    `<td class="text-center">${b.satuan}</td>` +
-                                    `<td class="text-center">${b.target_awal}</td>` +
-                                    `<td class="text-center">${b.target_akhir}</td>` +
-                                    `<td class="text-right">${b.rencana_pagu || 0}</td>` +
-                                    `<td class="text-center">` +
-                                    `<input type="checkbox" title="Lihat Rencana Hasil Kerja Per Bulan" class="lihat_bulanan" data-id="${b.id}" onclick="lihat_bulanan(this);" style="margin: 0 6px;">` +
-                                    `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_indikator(${b.id}, 1, ${total_pagu})" title="Edit"><i class="dashicons dashicons-edit"></i></a> ` +
-                                    `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-danger" onclick="hapus_indikator(${b.id}, 1);" title="Hapus"><i class="dashicons dashicons-trash"></i></a>` +
-                                    `</td>` +
+                                        `<td class="text-center">${index+1}.${i+1}</td>` +
+                                        `<td>${b.indikator}</td>` +
+                                        `<td class="text-center">${b.satuan}</td>` +
+                                        `<td class="text-center">${b.target_awal}</td>` +
+                                        `<td class="text-center">${b.target_akhir}</td>` +
+                                        `<td class="text-right">${b.rencana_pagu || 0}</td>` +
+                                        `<td class="text-center">` +
+                                        `<input type="checkbox" title="Lihat Rencana Hasil Kerja Per Bulan" class="lihat_bulanan" data-id="${b.id}" onclick="lihat_bulanan(this);" style="margin: 0 6px;">` +
+                                        `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_indikator(${b.id}, 1, ${total_pagu})" title="Edit"><i class="dashicons dashicons-edit"></i></a> ` +
+                                        `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-danger" onclick="hapus_indikator(${b.id}, 1);" title="Hapus"><i class="dashicons dashicons-trash"></i></a>` +
+                                        `</td>` +
                                     `</tr>`;
 
 
@@ -1069,14 +1274,14 @@ $set_renaksi = get_option('_crb_input_renaksi');
                                     `<table class="table" style="margin: 0;">` +
                                     `<thead>` +
                                     `<tr class="table-secondary">` +
-                                    `<th class="text-center">Bulan/TW</th>` +
-                                    `<th class="text-center">Rencana Hasil Kerja</th>` +
-                                    `<th class="text-center" style="width:100px;">Target</th>` +
-                                    `<th class="text-center" style="width:100px;">Satuan</th>` +
-                                    `<th class="text-center" style="width:150px;">Realisasi</th>` +
-                                    `<th class="text-center" style="width:60px">Capaian</th>` +
-                                    `<th class="text-center">Keterangan</th>` +
-                                    `<th class="text-center" style="width:60px">Aksi</th>` +
+                                        `<th class="text-center">Bulan/TW</th>` +
+                                        `<th class="text-center">Rencana Hasil Kerja</th>` +
+                                        `<th class="text-center" style="width:100px;">Target</th>` +
+                                        `<th class="text-center" style="width:100px;">Satuan</th>` +
+                                        `<th class="text-center" style="width:150px;">Realisasi</th>` +
+                                        `<th class="text-center" style="width:60px">Capaian</th>` +
+                                        `<th class="text-center">Keterangan</th>` +
+                                        `<th class="text-center" style="width:60px">Aksi</th>` +
                                     `</tr>` +
                                     `</thead>` +
                                     `<tbody>`;
@@ -1106,23 +1311,23 @@ $set_renaksi = get_option('_crb_input_renaksi');
                                         var triwulan = (bulan_index + 1) / 3;
                                         kegiatanUtama += '' +
                                             `<tr style="background: #FDFFB6;">` +
-                                            `<td class="text-center">triwulan ${triwulan}</td>` +
-                                            `<td class="text-center">${b.indikator}</td>` +
-                                            `<td class="text-center">${b['target_' + triwulan]}</td>` +
-                                            `<td class="text-center">${b.satuan}</td>` +
-                                            `<td class="text-center">` +
-                                            `<input type="number" class="form-control" name="realisasi_${b.id}_tw_${triwulan}" id="realisasi_${b.id}_tw_${triwulan}" ${isdisabled ? 'disabled' : ''} value="${b['realisasi_tw_' + triwulan] || ''}">` +
-                                            `</td>` +
-                                            `<td class="text-center"></td>` +
-                                            `<td class="text-center">` +
-                                            `<textarea class="form-control" name="keterangan_${b.id}_tw_${triwulan}" id="keterangan_${b.id}_tw_${triwulan}" ${isdisabled ? 'disabled' : ''}>${b['ket_tw_' + triwulan] || ''}</textarea>` +
-                                            `</td>` +
-                                            `<td class="text-center">` +
-                                            (isdisabled ?
-                                                `-` :
-                                                `<a href="javascript:void(0)" data-id="${b.id}" data-tw="${triwulan}" class="btn btn-sm btn-success" onclick="simpan_triwulan(${b.id}, ${triwulan})" title="Simpan"><i class="dashicons dashicons-yes"></i></a>`
-                                            ) +
-                                            `</td>` +
+                                                `<td class="text-center">triwulan ${triwulan}</td>` +
+                                                `<td class="text-center">${b.indikator}</td>` +
+                                                `<td class="text-center">${b['target_' + triwulan]}</td>` +
+                                                `<td class="text-center">${b.satuan}</td>` +
+                                                `<td class="text-center">` +
+                                                `<input type="number" class="form-control" name="realisasi_${b.id}_tw_${triwulan}" id="realisasi_${b.id}_tw_${triwulan}" ${isdisabled ? 'disabled' : ''} value="${b['realisasi_tw_' + triwulan] || ''}">` +
+                                                `</td>` +
+                                                `<td class="text-center"></td>` +
+                                                `<td class="text-center">` +
+                                                `<textarea class="form-control" name="keterangan_${b.id}_tw_${triwulan}" id="keterangan_${b.id}_tw_${triwulan}" ${isdisabled ? 'disabled' : ''}>${b['ket_tw_' + triwulan] || ''}</textarea>` +
+                                                `</td>` +
+                                                `<td class="text-center">` +
+                                                (isdisabled ?
+                                                    `-` :
+                                                    `<a href="javascript:void(0)" data-id="${b.id}" data-tw="${triwulan}" class="btn btn-sm btn-success" onclick="simpan_triwulan(${b.id}, ${triwulan})" title="Simpan"><i class="dashicons dashicons-yes"></i></a>`
+                                                ) +
+                                                `</td>` +
                                             `</tr>`;
                                     }
 
@@ -1130,16 +1335,16 @@ $set_renaksi = get_option('_crb_input_renaksi');
 
                                 kegiatanUtama += '' +
                                     `<tr class="table-secondary">` +
-                                    `<th class="text-center">Total</th>` +
-                                    `<td class="text-center">${b.indikator}</td>` +
-                                    `<td class="text-center">${b.target_akhir}</td>` +
-                                    `<td class="text-center">${b.satuan}</td>` +
-                                    `<td class="text-center"><input type="number" class="form-control" name="realisasi_akhir_${b.id}" id="realisasi_akhir_${b.id}" value="${b['realisasi_akhir'] || ''}"></td>` +
-                                    `<td class="text-center"></td>` +
-                                    `<td class="text-center"><textarea class="form-control" name="ket_total_${b.id}" id="ket_total_${b.id}">${b['ket_total'] || ''}</textarea></td>` +
-                                    `<td class="text-center">` +
-                                    `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-success" onclick="simpan_total(${b.id})" title="Simpan Total"><i class="dashicons dashicons-yes"></i></a>` +
-                                    `</td>` +
+                                        `<th class="text-center">Total</th>` +
+                                        `<td class="text-center">${b.indikator}</td>` +
+                                        `<td class="text-center">${b.target_akhir}</td>` +
+                                        `<td class="text-center">${b.satuan}</td>` +
+                                        `<td class="text-center"><input type="number" class="form-control" name="realisasi_akhir_${b.id}" id="realisasi_akhir_${b.id}" value="${b['realisasi_akhir'] || ''}"></td>` +
+                                        `<td class="text-center"></td>` +
+                                        `<td class="text-center"><textarea class="form-control" name="ket_total_${b.id}" id="ket_total_${b.id}">${b['ket_total'] || ''}</textarea></td>` +
+                                        `<td class="text-center">` +
+                                        `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-success" onclick="simpan_total(${b.id})" title="Simpan Total"><i class="dashicons dashicons-yes"></i></a>` +
+                                        `</td>` +
                                     `</tr>` +
                                     `</tbody>` +
                                     `</table>` +
@@ -1241,114 +1446,114 @@ $set_renaksi = get_option('_crb_input_renaksi');
             title = 'Indikator Kegiatan Utama';
             input_pagu = '' +
                 `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                `<label for="rencana_pagu">Rencana Pagu Teknis Kegiatan</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                `<div class="input-group">` +
-                `<input type="number" disabled class="form-control text-right" id="rencana_pagu_tk" value="` + total_pagu + `"/>` +
-                `</div>` +
-                '</div>' +
-                '</div>' +
-                `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                `<label for="total_rincian">Total Rincian</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                `<div class="input-group">` +
-                `<input type="number" class="form-control" id="total_rincian" max="100" value="100"/>` +
-                `<span class="input-group-text">%</span>` +
-                `</div>` +
-                '</div>' +
+                    '<div class="col-md-2">' +
+                        `<label for="rencana_pagu">Rencana Pagu Teknis Kegiatan</label>` +
+                    '</div>' +
+                    '<div class="col-md-10">' +
+                        `<div class="input-group">` +
+                        `   <input type="number" disabled class="form-control text-right" id="rencana_pagu_tk" value="` + total_pagu + `"/>` +
+                        `</div>` +
+                    '</div>' +
                 '</div>' +
                 `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                `<label for="rencana_pagu">Rencana Pagu Uraian Kegiatan</label>` +
+                    '<div class="col-md-2">' +
+                    `<label for="total_rincian">Total Rincian</label>` +
+                    '</div>' +
+                    '<div class="col-md-10">' +
+                        `<div class="input-group">` +
+                            `<input type="number" class="form-control" id="total_rincian" max="100" value="100"/>` +
+                            `<span class="input-group-text">%</span>` +
+                        `</div>` +
+                    '</div>' +
                 '</div>' +
-                '<div class="col-md-10">' +
-                `<div class="input-group">` +
-                `<input type="number" disabled class="form-control text-right" id="rencana_pagu" value="` + total_pagu + `" />` +
-                `</div>` +
-                '</div>' +
+                `<div class="form-group row">` +
+                    '<div class="col-md-2">' +
+                        `<label for="rencana_pagu">Rencana Pagu Uraian Kegiatan</label>` +
+                    '</div>' +
+                    '<div class="col-md-10">' +
+                        `<div class="input-group">` +
+                        `<input type="number" disabled class="form-control text-right" id="rencana_pagu" value="` + total_pagu + `" />` +
+                    `</div>` +
+                    '</div>' +
                 `</div>`
         } else if (tipe == 2) {
             title = 'Indikator Rencana Hasil Kerja';
             input_pagu = '' +
                 `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                `<label for="rencana_pagu">Rencana Pagu Teknis Kegiatan</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                `<div class="input-group">` +
-                `<input type="number" disabled class="form-control text-right" id="rencana_pagu_tk" value="` + total_pagu + `"/>` +
-                `</div>` +
-                '</div>' +
-                '</div>' +
-                `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                `<label for="total_rincian">Total Rincian</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                `<div class="input-group">` +
-                `<input type="number" class="form-control" id="total_rincian" max="100" value="100"/>` +
-                `<span class="input-group-text">%</span>` +
-                `</div>` +
-                '</div>' +
+                    '<div class="col-md-2">' +
+                        `<label for="rencana_pagu">Rencana Pagu Teknis Kegiatan</label>` +
+                    '</div>' +
+                    '<div class="col-md-10">' +
+                        `<div class="input-group">` +
+                        `<input type="number" disabled class="form-control text-right" id="rencana_pagu_tk" value="` + total_pagu + `"/>` +
+                        `</div>` +
+                    '</div>' +
                 '</div>' +
                 `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                `<label for="rencana_pagu">Rencana Pagu Uraian Kegiatan</label>` +
+                    '<div class="col-md-2">' +
+                        `<label for="total_rincian">Total Rincian</label>` +
+                    '</div>' +
+                    '<div class="col-md-10">' +
+                        `<div class="input-group">` +
+                            `<input type="number" class="form-control" id="total_rincian" max="100" value="100"/>` +
+                            `<span class="input-group-text">%</span>` +
+                        `</div>` +
+                    '</div>' +
                 '</div>' +
-                '<div class="col-md-10">' +
-                `<div class="input-group">` +
-                `<input type="number" disabled class="form-control text-right" id="rencana_pagu" value="` + total_pagu + `" />` +
-                `</div>` +
-                '</div>' +
+                `<div class="form-group row">` +
+                    '<div class="col-md-2">' +
+                        `<label for="rencana_pagu">Rencana Pagu Uraian Kegiatan</label>` +
+                    '</div>' +
+                    '<div class="col-md-10">' +
+                        `<div class="input-group">` +
+                        `<input type="number" disabled class="form-control text-right" id="rencana_pagu" value="` + total_pagu + `" />` +
+                        `</div>` +
+                    '</div>' +
                 `</div>`
         } else if (tipe == 3) {
             title = 'Indikator Uraian Kegiatan Rencana Hasil Kerja';
             input_pagu = '' +
                 `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                `<label for="rencana_pagu">Rencana Pagu Teknis Kegiatan</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                `<div class="input-group">` +
-                `<input type="number" disabled class="form-control text-right" id="rencana_pagu_tk" value="` + total_pagu + `"/>` +
-                `</div>` +
-                '</div>' +
-                '</div>' +
-                `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                `<label for="total_rincian">Total Rincian</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                `<div class="input-group">` +
-                `<input type="number" class="form-control" id="total_rincian" max="100" value="100"/>` +
-                `<span class="input-group-text">%</span>` +
-                `</div>` +
-                '</div>' +
+                    '<div class="col-md-2">' +
+                        `<label for="rencana_pagu">Rencana Pagu Teknis Kegiatan</label>` +
+                    '</div>' +
+                    '<div class="col-md-10">' +
+                        `<div class="input-group">` +
+                            `<input type="number" disabled class="form-control text-right" id="rencana_pagu_tk" value="` + total_pagu + `"/>` +
+                        `</div>` +
+                    '</div>' +
                 '</div>' +
                 `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                `<label for="rencana_pagu">Rencana Pagu Uraian Kegiatan</label>` +
+                    '<div class="col-md-2">' +
+                        `<label for="total_rincian">Total Rincian</label>` +
+                    '</div>' +
+                    '<div class="col-md-10">' +
+                        `<div class="input-group">` +
+                            `<input type="number" class="form-control" id="total_rincian" max="100" value="100"/>` +
+                            `<span class="input-group-text">%</span>` +
+                        `</div>` +
+                    '</div>' +
                 '</div>' +
-                '<div class="col-md-10">' +
-                `<div class="input-group">` +
-                `<input type="number" disabled class="form-control text-right" id="rencana_pagu" value="` + total_pagu + `" />` +
-                `</div>` +
-                '</div>' +
+                `<div class="form-group row">` +
+                    '<div class="col-md-2">' +
+                        `<label for="rencana_pagu">Rencana Pagu Uraian Kegiatan</label>` +
+                    '</div>' +
+                    '<div class="col-md-10">' +
+                        `<div class="input-group">` +
+                            `<input type="number" disabled class="form-control text-right" id="rencana_pagu" value="` + total_pagu + `" />` +
+                        `</div>` +
+                    '</div>' +
                 `</div>`
         } else if (tipe == 4) {
             title = 'Indikator Uraian Teknis Kegiatan';
             input_pagu = '' +
                 `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                `<label for="satuan_indikator">Rencana Pagu</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                `<input type="number" class="form-control" id="rencana_pagu"/>` +
-                '</div>' +
+                    '<div class="col-md-2">' +
+                        `<label for="satuan_indikator">Rencana Pagu</label>` +
+                    '</div>' +
+                    '<div class="col-md-10">' +
+                        `<input type="number" class="form-control" id="rencana_pagu"/>` +
+                    '</div>' +
                 `</div>`;
         }
         var tr = jQuery('#kegiatan_utama_' + id);
@@ -1360,79 +1565,79 @@ $set_renaksi = get_option('_crb_input_renaksi');
             '<input type="hidden" value="" id="id_label_indikator">' +
             '<input type="hidden" value="' + id + '" id="id_label">' +
             `<div class="form-group row">` +
-            '<div class="col-md-2">' +
-            `<label for="label_pokin_indikator">Label Pohon Kinerja</label>` +
-            '</div>' +
-            '<div class="col-md-10">' +
-            '<input class="form-control" type="text" disabled id="label_pokin_indikator" value="' + label_pokin + '"/>' +
-            '</div>' +
+                '<div class="col-md-2">' +
+                    `<label for="label_pokin_indikator">Label Pohon Kinerja</label>` +
+                '</div>' +
+                '<div class="col-md-10">' +
+                    '<input class="form-control" type="text" disabled id="label_pokin_indikator" value="' + label_pokin + '"/>' +
+                '</div>' +
             `</div>` +
             `<div class="form-group row">` +
-            '<div class="col-md-2">' +
-            `<label for="kegiatan_utama_indikator">` + title.replace('Indikator ', '') + `</label>` +
-            '</div>' +
-            '<div class="col-md-10">' +
-            '<input type="text" disabled class="form-control" id="kegiatan_utama_indikator" value="' + label_renaksi + '"/>' +
-            '</div>' +
+                '<div class="col-md-2">' +
+                    `<label for="kegiatan_utama_indikator">` + title.replace('Indikator ', '') + `</label>` +
+                '</div>' +
+                '<div class="col-md-10">' +
+                    '<input type="text" disabled class="form-control" id="kegiatan_utama_indikator" value="' + label_renaksi + '"/>' +
+                '</div>' +
             `</div>` +
             `<div class="form-group row">` +
-            '<div class="col-md-2">' +
-            '<label for="indikator">' + title + '</label>' +
-            '</div>' +
-            '<div class="col-md-10">' +
-            `<textarea class="form-control" name="label" id="indikator" placeholder="Tuliskan Indikator Kegiatan Utama..."></textarea>` +
-            '</div>' +
+                '<div class="col-md-2">' +
+                    '<label for="indikator">' + title + '</label>' +
+                '</div>' +
+                '<div class="col-md-10">' +
+                    `<textarea class="form-control" name="label" id="indikator" placeholder="Tuliskan Indikator Kegiatan Utama..."></textarea>` +
+                '</div>' +
             `</div>` +
             `<div class="form-group row">` +
-            '<div class="col-md-2">' +
-            `<label for="satuan_indikator">Satuan</label>` +
-            '</div>' +
-            '<div class="col-md-10">' +
-            `<input type="text" class="form-control" id="satuan_indikator"/>` +
-            '</div>' +
+                '<div class="col-md-2">' +
+                    `<label for="satuan_indikator">Satuan</label>` +
+                '</div>' +
+                '<div class="col-md-10">' +
+                    `<input type="text" class="form-control" id="satuan_indikator"/>` +
+                '</div>' +
             `</div>` +
             `${input_pagu}` +
             `<div class="form-group row">` +
-            '<div class="col-md-2">' +
-            `<label for="target_awal">Target Awal</label>` +
-            '</div>' +
-            '<div class="col-md-4">' +
-            `<input type="number" class="form-control" id="target_awal"/>` +
-            '</div>' +
-            '<div class="col-md-2">' +
-            `<label for="target_akhir">Target Akhir</label>` +
-            '</div>' +
-            '<div class="col-md-4">' +
-            `<input type="number" class="form-control" id="target_akhir"/>` +
-            '</div>' +
+                '<div class="col-md-2">' +
+                    `<label for="target_awal">Target Awal</label>` +
+                '</div>' +
+                '<div class="col-md-4">' +
+                    `<input type="number" class="form-control" id="target_awal"/>` +
+                '</div>' +
+                '<div class="col-md-2">' +
+                    `<label for="target_akhir">Target Akhir</label>` +
+                '</div>' +
+                '<div class="col-md-4">' +
+                    `<input type="number" class="form-control" id="target_akhir"/>` +
+                '</div>' +
             `</div>` +
             `<div class="form-group row">` +
-            '<div class="col-md-2">' +
-            `<label for="target_tw_1">TW 1</label>` +
-            '</div>' +
-            '<div class="col-md-4">' +
-            `<input type="number" class="form-control" id="target_tw_1"/>` +
-            '</div>' +
-            '<div class="col-md-2">' +
-            `<label for="target_tw_2">TW 2</label>` +
-            '</div>' +
-            '<div class="col-md-4">' +
-            `<input type="number" class="form-control" id="target_tw_2"/>` +
-            '</div>' +
+                '<div class="col-md-2">' +
+                    `<label for="target_tw_1">TW 1</label>` +
+                '</div>' +
+                '<div class="col-md-4">' +
+                    `<input type="number" class="form-control" id="target_tw_1"/>` +
+                '</div>' +
+                '<div class="col-md-2">' +
+                    `<label for="target_tw_2">TW 2</label>` +
+                '</div>' +
+                '<div class="col-md-4">' +
+                    `<input type="number" class="form-control" id="target_tw_2"/>` +
+                '</div>' +
             `</div>` +
             `<div class="form-group row">` +
-            '<div class="col-md-2">' +
-            `<label for="target_tw_3">TW 3</label>` +
-            '</div>' +
-            '<div class="col-md-4">' +
-            `<input type="number" class="form-control" id="target_tw_3"/>` +
-            '</div>' +
-            '<div class="col-md-2">' +
-            `<label for="target_tw_4">TW 4</label>` +
-            '</div>' +
-            '<div class="col-md-4">' +
-            `<input type="number" class="form-control" id="target_tw_4"/>` +
-            '</div>' +
+                '<div class="col-md-2">' +
+                    `<label for="target_tw_3">TW 3</label>` +
+                '</div>' +
+                '<div class="col-md-4">' +
+                    `<input type="number" class="form-control" id="target_tw_3"/>` +
+                '</div>' +
+                '<div class="col-md-2">' +
+                    `<label for="target_tw_4">TW 4</label>` +
+                '</div>' +
+                '<div class="col-md-4">' +
+                    `<input type="number" class="form-control" id="target_tw_4"/>` +
+                '</div>' +
             `</div>` +
             `</form>`);
         jQuery("#modal-crud").find('.modal-footer').html('' +
@@ -1636,6 +1841,7 @@ $set_renaksi = get_option('_crb_input_renaksi');
                 id_tabel = 'kegiatanUtama';
                 title = 'Kegiatan Utama';
                 fungsi_tambah = 'tambah_rencana_aksi';
+                title_cascading = 'Sasaran Cascading';
             } else if (tipe == 2) {
                 id_tabel = 'tabel_rencana_aksi';
                 title = 'Rencana Hasil Kerja';
@@ -1713,6 +1919,7 @@ $set_renaksi = get_option('_crb_input_renaksi');
                         `<th class="text-center">` + title + `</th>` +
                         `<th class="text-center">` + title_cascading + `</th>` +
                         `${header_dasar_pelaksanaan}` +
+                        `<th class="text-center" style="width:300px;">Pegawai Pelaksana</th>` +
                         `<th class="text-center" style="width:200px;">Aksi</th>` +
                         `</tr>` +
                         `</thead>` +
@@ -1728,11 +1935,43 @@ $set_renaksi = get_option('_crb_input_renaksi');
                         var total_pagu = 0;
                         let get_data_dasar_pelaksanaan = [];
 
+                        var nama_pegawai = '';
+                        if(value.detail_satker && value.detail_satker.nama){
+                            nama_pegawai += value.detail_satker.nama + '<br>';
+                        }
+                        if(value.detail_pegawai && value.detail_pegawai.nip_baru){
+                            nama_pegawai += value.detail_pegawai.nip_baru+' '+value.detail_pegawai.nama_pegawai;
+                        }
                         if (tipe == 1) {
                             label_pokin = value['label_pokin_2'];
                             id_pokin = value['id_pokin_2'];
                             id_parent_cascading = value['kode_cascading_sasaran'];
                             label_cascading = value['label_cascading_sasaran'] != null ? value['label_cascading_sasaran'] : '-';
+                            value.get_dasar_2.forEach(function(dasar_level_2) {
+                                dasar_level_2.get_dasar_to_level_3.forEach(function(dasar_to_level_3) {
+                                    dasar_to_level_3.get_dasar_to_level_4.forEach(function(dasar_to_level_4) {
+                                        if (dasar_to_level_4.get_pagu_2 && dasar_to_level_4.get_pagu_2.length > 0) {
+                                            total_pagu += parseFloat(dasar_to_level_4.get_pagu_2[0].total_pagu) || 0;
+                                        }
+                                        if (dasar_to_level_4.mandatori_pusat == 1 && !get_data_dasar_pelaksanaan.includes('Mandatori Pusat')) {
+                                            get_data_dasar_pelaksanaan.push('Mandatori Pusat');
+                                        }
+                                        if (dasar_to_level_4.inisiatif_kd == 1 && !get_data_dasar_pelaksanaan.includes('Inisiatif Kepala Daerah')) {
+                                            get_data_dasar_pelaksanaan.push('Inisiatif Kepala Daerah');
+                                        }
+                                        if (dasar_to_level_4.musrembang == 1 && !get_data_dasar_pelaksanaan.includes('MUSREMBANG (Musyawarah Rencana Pembangunan)')) {
+                                            get_data_dasar_pelaksanaan.push('MUSREMBANG (Musyawarah Rencana Pembangunan)');
+                                        }
+                                        if (dasar_to_level_4.pokir == 1 && !get_data_dasar_pelaksanaan.includes('POKIR (Pokok Pikiran)')) {
+                                            get_data_dasar_pelaksanaan.push('POKIR (Pokok Pikiran)');
+                                        }
+                                    });
+                                });
+                            });
+
+                        if (get_data_dasar_pelaksanaan.length > 0) {
+                            label_dasar_pelaksanaan = `<ul><li>${get_data_dasar_pelaksanaan.join('</li><li>')}</li></ul>`;
+                        }
                             tombol_detail = '' +
                                 `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, ` + (tipe + 1) + `, ` + id_pokin + `, '` + id_parent_cascading + `')" title="Lihat Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                         } else if (tipe == 2) {
@@ -1822,6 +2061,7 @@ $set_renaksi = get_option('_crb_input_renaksi');
                             `<td class="label_renaksi">${value.label}</td>` +
                             `<td class="label_renaksi">${label_cascading}</td>` +
                             `<td class="label_renaksi">${label_dasar_pelaksanaan}</td>` +
+                            `<td class="pegawai_pelaksana">${nama_pegawai}</td>` +
                             `<td class="text-center">` +
                             `<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, ${tipe},${total_pagu})" title="Tambah Indikator (Total Pagu: ${total_pagu})"><i class="dashicons dashicons-plus"></i></a> ` +
                             tombol_detail +
@@ -1833,7 +2073,7 @@ $set_renaksi = get_option('_crb_input_renaksi');
                         let indikator = value.indikator;
                         if (indikator.length > 0) {
                             renaksi += '' +
-                                '<td colspan="6" style="padding: 10px;">' +
+                                '<td colspan="7" style="padding: 10px;">' +
                                 `<table class="table" style="margin: 0;">` +
                                 `<thead>` +
                                 `<tr class="table-info">` +
@@ -2122,32 +2362,42 @@ $set_renaksi = get_option('_crb_input_renaksi');
                             jQuery("#modal-crud").find('.modal-title').html('Tambah ' + title);
 
                             jQuery("#modal-crud").find('.modal-body').html(`
-                        <form>
-                            <input type="hidden" id="id_renaksi" value=""/>
-                            <div class="form-group">
-                                <label for="pokin-level-1">Pilih Pokin Level ${level_pokin}</label>
-                                <select class="form-control" name="pokin-level-1" id="pokin-level-1">
-                                    ${html}
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan ${title}..."></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="sasaran-cascading">Pilih ${jenis_cascading} Cascading</label>
-                                <select class="form-control" name="cascading-renstra" id="cascading-renstra"></select>
-                            </div>
-                            <?php if (!empty($renaksi_pemda)): ?>
-                                ${checklist_renaksi_pemda}  
-                            <?php endif; ?>
-                            ${checklist_dasar_pelaksanaan}  
-                        </form>
-                    `);
+                                <form>
+                                    <input type="hidden" id="id_renaksi" value=""/>
+                                    <div class="form-group">
+                                        <label for="pokin-level-1">Pilih Pokin Level ${level_pokin}</label>
+                                        <select class="form-control" name="pokin-level-1" id="pokin-level-1">
+                                            ${html}
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan ${title}..."></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="sasaran-cascading">Pilih ${jenis_cascading} Cascading</label>
+                                        <select class="form-control" name="cascading-renstra" id="cascading-renstra"></select>
+                                    </div>
+                                    <?php if (!empty($renaksi_pemda)): ?>
+                                        ${checklist_renaksi_pemda}  
+                                    <?php endif; ?>
+                                    ${checklist_dasar_pelaksanaan}  
+                                    <div class="form-group"> 
+                                        <label for="satker_id">Pilih Satuan Kerja</label> 
+                                            <select class="form-control select2" id="satker_id" name="satker_id" onchange="get_pegawai_rhk();"> 
+                                            </select> 
+                                    </div> 
+                                    <div class="form-group"> 
+                                        <label for="pegawai">Pilih Pegawai Pelaksana</label> 
+                                            <select class="form-control select2" id="pegawai" name="pegawai"> 
+                                            </select> 
+                                    </div> 
+                                </form>
+                            `);
 
                             jQuery("#modal-crud").find('.modal-footer').html(`
-                        <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
-                        <button type="button" class="btn btn-success" onclick="simpan_data_renaksi(${tipe})">Simpan</button>
-                    `);
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
+                                <button type="button" class="btn btn-success" onclick="simpan_data_renaksi(${tipe})">Simpan</button>
+                            `);
 
                             jQuery('#select_all').on('click', function() {
                                 var isChecked = this.checked;
@@ -2168,6 +2418,63 @@ $set_renaksi = get_option('_crb_input_renaksi');
                                 });
                             }
 
+                            jQuery("#satker_id").select2({
+                                ajax: {
+                                    url: esakip.url,
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    delay: 250,
+                                    data: function (params) {
+                                        return {
+                                            action: 'get_jabatan_cascading',
+                                            api_key: esakip.api_key,
+                                            id_skpd: <?php echo $id_skpd; ?>,
+                                            type:'search',
+                                            q: params.term,
+                                          };
+                                    },
+                                    processResults: function (data, params) {
+                                        params.page = params.page || 1;
+
+                                        return {
+                                           results: data.data,
+                                           pagination: {
+                                             more: (params.page * 30) < data.total_count
+                                           }
+                                         };
+                                    },
+                                    cache: true
+                                },
+                                placeholder: 'Cari satuan kerja / jabatan',
+                                minimumInputLength: 5,
+                                templateResult: function (response) {
+                                    if (response.loading) {
+                                        return response.text;
+                                    }
+
+                                    var $container = jQuery(
+                                    "<div class='select2-result-repository clearfix'>" +
+                                      "<div class='select2-result-repository__meta'>" +
+                                        "<div class='select2-result-repository__title'></div>" +
+                                      "</div>" +
+                                    "</div>"
+                                    );
+
+                                    $container.find(".select2-result-repository__title").text(response.nama);
+
+                                    return $container;
+                                },
+                                templateSelection: function(response) {
+                                    return response.nama || response.text;
+                                },
+                                'width': '100%',
+                                dropdownParent: jQuery('#modal-crud') 
+                            });
+                            jQuery("#pegawai").select2({
+                                placeholder: 'Pilih pegawai pelaksana',
+                                width: '100%',
+                                dropdownParent: jQuery('#modal-crud'),
+                            });
                             if (data_cascading && Array.isArray(data_cascading.data)) {
                                 let html_cascading = '<option value="">Pilih ' + jenis_cascading + ' Cascading</option>';
                                 data_cascading.data.map(value => {
@@ -2239,7 +2546,7 @@ $set_renaksi = get_option('_crb_input_renaksi');
         var label_pokin_2 = jQuery('#pokin-level-2 option:selected').text();
         var label_renaksi = jQuery('#label_renaksi').val();
         var kode_cascading_renstra = jQuery('#cascading-renstra').val();
-        var label_cascading_renstra = jQuery('#cascading-renstra option:selected').text();
+        var label_cascading_renstra = (kode_cascading_renstra !== '') ? jQuery('#cascading-renstra option:selected').text() : '';
         var kode_sbl = '';
         if (tipe == 4) {
             kode_sbl = jQuery('#cascading-renstra option:selected').data('kodesbl');
@@ -2273,6 +2580,12 @@ $set_renaksi = get_option('_crb_input_renaksi');
         // if (Object.values(get_dasar_pelaksanaan).every(value => value === 0) && tipe === 4) {
         //     return alert('Pilih salah satu dasar pelaksanaan!');
         // }
+
+        let satker_id = jQuery('#satker_id').val();
+        if (satker_id == '') {
+            return alert('ID Satker tidak boleh kosong');
+        }
+        let nip = jQuery('#pegawai').select2('data')[0].nip_baru;
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -2296,7 +2609,9 @@ $set_renaksi = get_option('_crb_input_renaksi');
                 'label_cascading_renstra': label_cascading_renstra,
                 'kode_sbl': kode_sbl,
                 'checklistDataPemda': checklistDataPemda,
-                'get_dasar_pelaksanaan': get_dasar_pelaksanaan
+                'get_dasar_pelaksanaan': get_dasar_pelaksanaan,
+                nip: nip,
+                satker_id: satker_id
             },
             dataType: "json",
             success: function(res) {
@@ -2800,4 +3115,218 @@ $set_renaksi = get_option('_crb_input_renaksi');
             }
         });
     }
+    
+    function help_rhk(id, tipe){
+        jQuery("#wrap-loading").show();
+        if(id == undefined){
+            alert("Id tidak ditemukan")
+        }
+
+        jQuery.ajax({
+            method:'POST',
+            url:esakip.url,
+            data:{
+                "action": "help_rhk",
+                "api_key": esakip.api_key,
+                'id': id,
+                'tipe': tipe
+            },
+            dataType:'json',
+            success:function(response){
+                jQuery("#wrap-loading").hide();
+                if(response.status){
+                    jQuery("#modal-detail-renaksi").modal('show');
+                    var satker = response.get_satker && response.get_satker.satker_id && response.get_satker.nama 
+                                 ? response.get_satker.satker_id + ' ' + response.get_satker.nama 
+                                 : '';
+                    var pegawai = response.get_pegawai && response.get_pegawai.nip_baru && response.get_pegawai.nama_pegawai 
+                                 ? response.get_pegawai.nip_baru + ' ' + response.get_pegawai.nama_pegawai 
+                                 : '';
+                    if(tipe === 1){
+                        jQuery('label[for="detail_kegiatan_utama"]').show();
+                        jQuery('#detail_kegiatan_utama').val(response.data.label).show(); 
+                        jQuery('label[for="detail_rhk"]').hide();
+                        jQuery('#detail_rhk').hide();
+                        jQuery('label[for="detail_uraian_kegiatan"]').hide();
+                        jQuery('#detail_uraian_kegiatan').hide();
+                        jQuery('label[for="detail_uraian_tk"]').hide();
+                        jQuery('#detail_uraian_tk').hide();
+                        jQuery('label[for="detail_pokin_1"]').show();
+                        jQuery('#detail_pokin_1').val(response.get_pokin_1.label).show(); 
+                        jQuery('label[for="detail_pokin_2"]').show();
+                        jQuery('#detail_pokin_2').val(response.get_pokin_2.label).show(); 
+                        jQuery('label[for="detail_pokin_3"]').hide();
+                        jQuery('#detail_pokin_3').hide();
+                        jQuery('label[for="detail_pokin_4"]').hide();
+                        jQuery('#detail_pokin_4').hide();
+                        jQuery('label[for="detail_pokin_5"]').hide();
+                        jQuery('#detail_pokin_5').hide();
+                        jQuery('label[for="detail_cascading_sasaran"]').show();
+                        jQuery('#detail_cascading_sasaran').show();
+                        jQuery('label[for="detail_cascading_program"]').hide();
+                        jQuery('#detail_cascading_program').hide();
+                        jQuery('label[for="detail_cascading_kegiatan"]').hide();
+                        jQuery('#detail_cascading_kegiatan').hide();
+                        jQuery('label[for="detail_cascading_sub_giat"]').hide();
+                        jQuery('#detail_cascading_sub_giat').hide();
+                        jQuery('#detail_satuan_kerja').val(satker).show(); 
+                        jQuery('#detail_pegawai').val(pegawai).show(); 
+                    } else if(tipe === 2){
+                        jQuery('label[for="detail_kegiatan_utama"]').hide();
+                        jQuery('#detail_kegiatan_utama').hide();
+                        jQuery('label[for="detail_rhk"]').show();
+                        jQuery('#detail_rhk').val(response.data.label).show(); 
+                        jQuery('label[for="detail_uraian_kegiatan"]').hide();
+                        jQuery('#detail_uraian_kegiatan').hide();
+                        jQuery('label[for="detail_uraian_tk"]').hide();
+                        jQuery('#detail_uraian_tk').hide();
+                        jQuery('label[for="detail_pokin_1"]').hide();
+                        jQuery('#detail_pokin_1').hide();
+                        jQuery('label[for="detail_pokin_2"]').hide();
+                        jQuery('#detail_pokin_2').hide();
+                        jQuery('label[for="detail_pokin_3"]').show();
+                        jQuery('#detail_pokin_3').val(response.get_pokin_3.label).show();
+                        jQuery('label[for="detail_pokin_4"]').hide();
+                        jQuery('#detail_pokin_4').hide();
+                        jQuery('label[for="detail_pokin_5"]').hide();
+                        jQuery('#detail_pokin_5').hide();
+                        jQuery('label[for="detail_cascading_sasaran"]').hide();
+                        jQuery('#detail_cascading_sasaran').hide();
+                        jQuery('label[for="detail_cascading_program"]').show();
+                        jQuery('#detail_cascading_program').show();
+                        jQuery('label[for="detail_cascading_kegiatan"]').hide();
+                        jQuery('#detail_cascading_kegiatan').hide();
+                        jQuery('label[for="detail_cascading_sub_giat"]').hide();
+                        jQuery('#detail_cascading_sub_giat').hide();
+                        jQuery('#detail_satuan_kerja').val(satker).show(); 
+                        jQuery('#detail_pegawai').val(pegawai).show(); 
+                    } else if(tipe === 3){
+                        jQuery('label[for="detail_kegiatan_utama"]').hide();
+                        jQuery('#detail_kegiatan_utama').hide();
+                        jQuery('label[for="detail_rhk"]').hide();
+                        jQuery('#detail_rhk').hide();
+                        jQuery('label[for="detail_uraian_kegiatan"]').show();
+                        jQuery('#detail_uraian_kegiatan').val(response.data.label).show(); 
+                        jQuery('label[for="detail_uraian_tk"]').hide();
+                        jQuery('#detail_uraian_tk').hide();
+                        jQuery('label[for="detail_pokin_1"]').hide();
+                        jQuery('#detail_pokin_1').hide();
+                        jQuery('label[for="detail_pokin_2"]').hide();
+                        jQuery('#detail_pokin_2').hide();
+                        jQuery('label[for="detail_pokin_3"]').hide();
+                        jQuery('#detail_pokin_3').hide();
+                        jQuery('label[for="detail_pokin_4"]').show();
+                        jQuery('#detail_pokin_4').val(response.get_pokin_4.label).show();
+                        jQuery('label[for="detail_pokin_5"]').hide();
+                        jQuery('#detail_pokin_5').hide();
+                        jQuery('label[for="detail_cascading_sasaran"]').hide();
+                        jQuery('#detail_cascading_sasaran').hide();
+                        jQuery('label[for="detail_cascading_program"]').hide();
+                        jQuery('#detail_cascading_program').hide();
+                        jQuery('label[for="detail_cascading_kegiatan"]').show();
+                        jQuery('#detail_cascading_kegiatan').show();
+                        jQuery('label[for="detail_cascading_sub_giat"]').hide();
+                        jQuery('#detail_cascading_sub_giat').hide();
+                        jQuery('#detail_satuan_kerja').val(satker).show(); 
+                        jQuery('#detail_pegawai').val(pegawai).show(); 
+                    } else if(tipe === 4){
+                        jQuery('label[for="detail_kegiatan_utama"]').hide();
+                        jQuery('#detail_kegiatan_utama').hide();
+                        jQuery('label[for="detail_rhk"]').hide();
+                        jQuery('#detail_rhk').hide();
+                        jQuery('label[for="detail_uraian_kegiatan"]').hide();
+                        jQuery('#detail_uraian_kegiatan').hide();
+                        jQuery('label[for="detail_uraian_tk"]').show();
+                        jQuery('#detail_uraian_tk').val(response.data.label).show(); 
+                        jQuery('label[for="detail_pokin_1"]').hide();
+                        jQuery('#detail_pokin_1').hide();
+                        jQuery('label[for="detail_pokin_2"]').hide();
+                        jQuery('#detail_pokin_2').hide();
+                        jQuery('label[for="detail_pokin_3"]').hide();
+                        jQuery('#detail_pokin_3').hide();
+                        jQuery('label[for="detail_pokin_4"]').hide();
+                        jQuery('#detail_pokin_4').hide();
+                        jQuery('label[for="detail_pokin_5"]').show();
+                        jQuery('#detail_pokin_5').val(response.get_pokin_5.label).show();
+                        jQuery('label[for="detail_cascading_sasaran"]').hide();
+                        jQuery('#detail_cascading_sasaran').hide();
+                        jQuery('label[for="detail_cascading_program"]').hide();
+                        jQuery('#detail_cascading_program').hide();
+                        jQuery('label[for="detail_cascading_kegiatan"]').hide();
+                        jQuery('#detail_cascading_kegiatan').hide();
+                        jQuery('label[for="detail_cascading_sub_giat"]').show();
+                        jQuery('#detail_cascading_sub_giat').show();
+                        jQuery('#detail_satuan_kerja').val(satker).show(); 
+                        jQuery('#detail_pegawai').val(pegawai).show(); 
+                    } 
+                } else {
+                    alert("Gagal memuat data");
+                }
+            }
+        });
+    };
+    function get_pegawai_rhk() {
+        var satker_id = jQuery("#satker_id").val(); 
+        jQuery("#pegawai").val(null).trigger("change"); 
+        
+        jQuery("#pegawai").select2({ 
+            ajax: {
+                url: esakip.url,
+                type: 'POST',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        action: 'get_pegawai_rhk',
+                        api_key: esakip.api_key,
+                        satker_id: satker_id, 
+                        type: 'search',
+                        q: params.term, 
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.data,
+                        pagination: {
+                            more: (params.page * 30) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            placeholder: 'Cari pegawai pelaksana',
+            templateResult: function (response) {
+                if (response.loading) {
+                    return response.text;
+                }
+
+                var $container = jQuery(
+                    "<div class='select2-result-repository clearfix'>" +
+                    "<div class='select2-result-repository__meta'>" +
+                    "<div class='select2-result-repository__title'></div>" +
+                    "</div>" +
+                    "</div>"
+                );
+
+                $container.find(".select2-result-repository__title").text(response.nama);  
+                return $container;
+            },
+            templateSelection: function(response) {
+                return response.nama || response.text;  
+            },
+            width: '100%',
+            dropdownParent: jQuery('#modal-crud'),
+            escapeMarkup: function (markup) { return markup; },
+        });
+
+        jQuery("#pegawai").on('select2:open', function () {
+            var search = jQuery('.select2-search__field');
+            if (search.length) {
+                search.focus();
+            }
+        });
+    }
+
+
 </script>

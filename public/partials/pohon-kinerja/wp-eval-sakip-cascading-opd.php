@@ -668,11 +668,11 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
+                    let get_program = response.data.no_urut ? `${response.data.no_urut} ${program}` : program;
                     jQuery('#id_data').val(response.data.id);
                     jQuery('#modalUpload').modal('show');
                     jQuery('#tujuan_cascading').val(tujuan); 
                     jQuery('#sasaran_cascading').val(sasaran); 
-                    let get_program = response.data.no_urut ? `${response.data.no_urut} ${program}` : program;
                     jQuery('#program_cascading').val(get_program); 
                     jQuery('label[for="sasaran_cascading"]').show();
                     jQuery('#sasaran_cascading').show();
@@ -714,13 +714,13 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
+                    let get_program = no_urut ? `${no_urut} ${program}` : program;
+                    let get_kegiatan = response.data.no_urut ? `${response.data.no_urut} ${kegiatan}` : kegiatan;
                     jQuery('#id_data').val(response.data.id);
                     jQuery('#modalUpload').modal('show');
                     jQuery('#tujuan_cascading').val(tujuan); 
                     jQuery('#sasaran_cascading').val(sasaran); 
-                    let get_program = no_urut ? `${no_urut} ${program}` : program;
                     jQuery('#program_cascading').val(get_program); 
-                    let get_kegiatan = response.data.no_urut ? `${response.data.no_urut} ${kegiatan}` : kegiatan;
                     jQuery('#kegiatan_cascading').val(get_kegiatan); 
                     jQuery('label[for="sasaran_cascading"]').show();
                     jQuery('#sasaran_cascading').show();
@@ -762,15 +762,15 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
+                    let get_program = no_urut ? `${no_urut} ${program}` : program;
+                    let get_kegiatan = response.get_kegiatan.no_urut ? `${response.get_kegiatan.no_urut} ${kegiatan}` : kegiatan;
+                    let get_sub_giat = response.data.no_urut ? `${response.data.no_urut} ${sub_giat}` : sub_giat;
                     jQuery('#id_data').val(response.data.id);
                     jQuery('#modalUpload').modal('show');
                     jQuery('#tujuan_cascading').val(tujuan); 
                     jQuery('#sasaran_cascading').val(sasaran); 
-                    let get_program = no_urut ? `${no_urut} ${program}` : program;
                     jQuery('#program_cascading').val(get_program); 
-                    let get_kegiatan = response.get_kegiatan.no_urut ? `${response.get_kegiatan.no_urut} ${kegiatan}` : kegiatan;
                     jQuery('#kegiatan_cascading').val(get_kegiatan); 
-                    let get_sub_giat = response.data.no_urut ? `${response.data.no_urut} ${sub_giat}` : sub_giat;
                     jQuery('#sub_giat_cascading').val(get_sub_giat); 
                     jQuery('label[for="sasaran_cascading"]').show();
                     jQuery('#sasaran_cascading').show();
