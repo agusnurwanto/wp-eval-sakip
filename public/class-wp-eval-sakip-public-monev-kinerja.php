@@ -3605,14 +3605,15 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							mandatori_pusat,
 							inisiatif_kd,
 							musrembang,
-							pokir
+							pokir,
+							nip,
+							satker_id
 						FROM esakip_data_rencana_aksi_opd
 						WHERE tahun_anggaran=%d
 							AND active=1
-							LIMIT 5
-					", $tahun_anggaran), ARRAY_A);
+							AND nip=%s
+					", $tahun_anggaran, $nip), ARRAY_A);
 
-					// AND nipkepala=%d
 					$data_all = array(
 						'total' => 0,
 						'data' => array(),
@@ -3629,9 +3630,21 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							WHERE id_renaksi=%d
 								AND active=1
 						", $v['id']), ARRAY_A);
+						$rhk_parent = array();
+						if(!empty($v['parent'])){
+							$rhk_parent = $wpdb->get_row($wpdb->prepare("
+								SELECT
+									*
+								FROM esakip_data_rencana_aksi_opd
+								WHERE tahun_anggaran=%d
+									AND active=1
+									AND id=%d
+							", $tahun_anggaran, $v['parent']), ARRAY_A);
+						}
 						$data_all['data'][$v['id']] = array(
 							'detail' => $v,
-							'indikator' => $indikator
+							'indikator' => $indikator,
+							'detail_atasan' => $rhk_parent
 						);
 					}
 
