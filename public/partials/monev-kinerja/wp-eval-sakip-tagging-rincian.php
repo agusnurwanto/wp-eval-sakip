@@ -13,6 +13,42 @@ foreach ($params as $param) {
 	}
 }
 
+function get_pegawai_skpd_rhk($rhk, $wpdb)
+{
+	if (empty($rhk)) {
+		return null;
+	}
+
+	// Mengambil data pegawai berdasarkan NIP
+	$nama_pegawai = $wpdb->get_row(
+		$wpdb->prepare("
+            SELECT 
+                nip_baru,
+                nama_pegawai
+            FROM esakip_data_pegawai_simpeg
+            WHERE nip_baru = %s
+        ", $rhk['nip']),
+		ARRAY_A
+	);
+
+	// Mengambil nama SKPD berdasarkan tahun anggaran dan ID SKPD
+	$nama_skpd = $wpdb->get_var(
+		$wpdb->prepare("
+            SELECT 
+                nama_skpd
+            FROM esakip_data_unit
+            WHERE tahun_anggaran = %d
+              AND id_skpd = %d
+              AND active = 1
+        ", $rhk['tahun_anggaran'], $rhk['id_skpd'])
+	);
+
+	return [
+		'pegawai' => $nama_pegawai,
+		'skpd' 	  => $nama_skpd,
+	];
+}
+
 $ind_renaksi = $wpdb->get_row(
 	$wpdb->prepare("
 		SELECT *
@@ -22,7 +58,7 @@ $ind_renaksi = $wpdb->get_row(
 	ARRAY_A
 );
 if (empty($ind_renaksi)) {
-	die('<h1 class="text-center">Indikator Rencana Hasil Pekerjaan tidak ditemukan!</h1>');
+	die('<h1 class="text-center">Indikator Rencana Hasil Kerja tidak ditemukan!</h1>');
 }
 
 $data_satuan = $wpdb->get_results(
@@ -114,12 +150,23 @@ $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_men
 
 $renaksi = $wpdb->get_row(
 	$wpdb->prepare("
-		SELECT *
-		FROM esakip_data_rencana_aksi_opd
-		WHERE id=%d
-	", $ind_renaksi['id_renaksi']),
+        SELECT *
+        FROM esakip_data_rencana_aksi_opd
+        WHERE id = %d
+    ", $ind_renaksi['id_renaksi']),
 	ARRAY_A
 );
+
+if (!empty($renaksi)) {
+	$data = get_pegawai_skpd_rhk($renaksi, $wpdb);
+
+	$nama_pegawai_4 = $data['pegawai'] ?? null;
+	$nama_skpd_4 = $data['skpd'] ?? null;
+} else {
+	$nama_pegawai_4 = null;
+	$nama_skpd_4 = null;
+}
+
 
 $subkeg = explode(' ', $renaksi['label_cascading_sub_kegiatan'], 2);
 $nama_sub_keg = $subkeg[1];
@@ -133,6 +180,16 @@ $renaksi_parent1 = $wpdb->get_row(
 	ARRAY_A
 );
 
+if (!empty($renaksi_parent1)) {
+	$data = get_pegawai_skpd_rhk($renaksi_parent1, $wpdb);
+
+	$nama_pegawai_1 = $data['pegawai'] ?? null;
+	$nama_skpd_1 = $data['skpd'] ?? null;
+} else {
+	$nama_pegawai_1 = null;
+	$nama_skpd_1 = null;
+}
+
 $renaksi_parent2 = $wpdb->get_row(
 	$wpdb->prepare("
 		SELECT *
@@ -142,6 +199,16 @@ $renaksi_parent2 = $wpdb->get_row(
 	ARRAY_A
 );
 
+if (!empty($renaksi_parent2)) {
+	$data = get_pegawai_skpd_rhk($renaksi_parent2, $wpdb);
+
+	$nama_pegawai_2 = $data['pegawai'] ?? null;
+	$nama_skpd_2 = $data['skpd'] ?? null;
+} else {
+	$nama_pegawai_2 = null;
+	$nama_skpd_2 = null;
+}
+
 $renaksi_parent3 = $wpdb->get_row(
 	$wpdb->prepare("
 		SELECT *
@@ -150,6 +217,16 @@ $renaksi_parent3 = $wpdb->get_row(
 	", $renaksi_parent2['parent']),
 	ARRAY_A
 );
+
+if (!empty($renaksi_parent3)) {
+	$data = get_pegawai_skpd_rhk($renaksi_parent3, $wpdb);
+
+	$nama_pegawai_3 = $data['pegawai'] ?? null;
+	$nama_skpd_3 = $data['skpd'] ?? null;
+} else {
+	$nama_pegawai_3 = null;
+	$nama_skpd_3 = null;
+}
 
 $renaksi_parent_pemda = $wpdb->get_results(
 	$wpdb->prepare("
@@ -310,11 +387,11 @@ if (!empty($grouped_data)) {
 			<td class='esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
 			</td>
 		</tr>";
-	
+
 		foreach ($akun['subs'] as $subs_bl => $subs) {
 			$value_kelompok = preg_replace('/^\[\#\]\s*-?\s*/', '', $subs['nama_kelompok']);
 			$option_subs .= "<option value='{$value_kelompok}'>{$value_kelompok}</option>";
-	
+
 			$tbody .= "
 			<tr class='subs-row'>
 				<td class='esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
@@ -331,11 +408,11 @@ if (!empty($grouped_data)) {
 				<td class='esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
 				</td>
 			</tr>";
-	
+
 			foreach ($subs['ket'] as $ket_bl => $ket) {
 				$value_keterangan = preg_replace('/^\[\-\]\s*/', '', $ket['nama_keterangan']);
 				$option_keterangan .= "<option value='{$value_keterangan}'>{$value_keterangan}</option>";
-	
+
 				$tbody .= "
 				<tr class='ket-row'>
 					<td class='esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
@@ -352,7 +429,7 @@ if (!empty($grouped_data)) {
 					<td class='esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
 					</td>
 				</tr>";
-	
+
 				foreach ($ket['data'] as $item) {
 					$btn_edit = "";
 					$val_satuan = $item['satuan'];
@@ -360,7 +437,7 @@ if (!empty($grouped_data)) {
 						$btn_edit = "<span class='btn btn-sm btn-warning' onclick='editDataRincian({$item['id_rincian']});' title='Edit Rincian Belanja'><i class='dashicons dashicons-edit'></i></span>";
 						$val_satuan = $data_satuan_key_value[$item['satuan']] ?? 'Tidak ditemukan';
 					}
-	
+
 					$tbody .= "
 					<tr class='rinci-row'>
 						<td class='esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
@@ -634,6 +711,16 @@ if (empty($wpsipd_status)) {
 					<td><?php echo $renaksi_parent3['label']; ?></td>
 				</tr>
 				<tr>
+					<td style="width: 270px;">Perangkat Daerah</td>
+					<td>:</td>
+					<td><?php echo $nama_skpd_3; ?></td>
+				</tr>
+				<tr>
+					<td style="width: 270px;">Nama Pegawai</td>
+					<td>:</td>
+					<td><?php echo $nama_pegawai_3['nip_baru'] . ' - ' . $nama_pegawai_3['nama_pegawai']; ?></td>
+				</tr>
+				<tr>
 					<td>Sasaran RENSTRA</td>
 					<td class="text-center">:</td>
 					<td><?php echo $renaksi_parent3['kode_cascading_sasaran'] . ' ' . $renaksi_parent3['label_cascading_sasaran']; ?></td>
@@ -653,6 +740,16 @@ if (empty($wpsipd_status)) {
 					<td><?php echo $renaksi_parent2['label']; ?></td>
 				</tr>
 				<tr>
+					<td style="width: 270px;">Perangkat Daerah</td>
+					<td>:</td>
+					<td><?php echo $nama_skpd_2; ?></td>
+				</tr>
+				<tr>
+					<td style="width: 270px;">Nama Pegawai</td>
+					<td>:</td>
+					<td><?php echo $nama_pegawai_2['nip_baru'] . ' - ' . $nama_pegawai_2['nama_pegawai']; ?></td>
+				</tr>
+				<tr>
 					<td>Program</td>
 					<td class="text-center">:</td>
 					<td><?php echo $renaksi_parent2['kode_cascading_program'] . ' ' . $renaksi_parent2['label_cascading_program']; ?></td>
@@ -670,6 +767,16 @@ if (empty($wpsipd_status)) {
 					<td>RHK OPD Level 3</td>
 					<td class="text-center">:</td>
 					<td><?php echo $renaksi_parent1['label']; ?></td>
+				</tr>
+				<tr>
+					<td style="width: 270px;">Perangkat Daerah</td>
+					<td>:</td>
+					<td><?php echo $nama_skpd_1; ?></td>
+				</tr>
+				<tr>
+					<td style="width: 270px;">Nama Pegawai</td>
+					<td>:</td>
+					<td><?php echo $nama_pegawai_1['nip_baru'] . ' - ' . $nama_pegawai_1['nama_pegawai']; ?></td>
 				</tr>
 				<tr>
 					<td>Kegiatan</td>
@@ -694,6 +801,16 @@ if (empty($wpsipd_status)) {
 					<td>Dasar Kegiatan</td>
 					<td class="text-center">:</td>
 					<td>Mandatory Pusat, Kebijakan Kepala Daerah, POKIR, MUSRENBANG</td>
+				</tr>
+				<tr>
+					<td style="width: 270px;">Perangkat Daerah</td>
+					<td>:</td>
+					<td><?php echo $nama_skpd_4; ?></td>
+				</tr>
+				<tr>
+					<td style="width: 270px;">Nama Pegawai</td>
+					<td>:</td>
+					<td><?php echo $nama_pegawai_4['nip_baru'] . ' - ' . $nama_pegawai_4['nama_pegawai']; ?></td>
 				</tr>
 				<tr>
 					<td>Sub Kegiatan</td>
@@ -811,7 +928,7 @@ if (empty($wpsipd_status)) {
 								<strong>Informasi RHK</strong>
 							</div>
 							<div class="card-body">
-								<table class="table borderless-table mb-4">
+								<table class="borderless-table mb-4">
 									<tbody>
 										<tr>
 											<td class="text-left" style="width: 20%;"><strong>Nama RHK</strong></td>
@@ -902,7 +1019,7 @@ if (empty($wpsipd_status)) {
 						<strong>Informasi RHK</strong>
 					</div>
 					<div class="card-body">
-						<table class="table borderless-table mb-4">
+						<table class="borderless-table mb-4">
 							<tbody>
 								<tr>
 									<td class="text-left" style="width: 20%;"><strong>Nama RHK</strong></td>
@@ -1018,11 +1135,12 @@ if (empty($wpsipd_status)) {
 									</div>
 									<div class="form-group col-md-6">
 										<label for="realisasi">Realisasi</label>
-										<input type="number" class="form-control" id="realisasi" name="realisasi" placeholder="Masukkan Realisasi">
+										<input type="number" class="form-control" id="realisasi" name="realisasi" placeholder="Masukkan Realisasi" onkeyup="validasiNilaiRealisasi()">
 									</div>
 								</div>
 								<div class="form-group pl-3">
 									<label for="total_harga">Total Harga</label>
+									<input type="hidden" id="total_harga_asli" value="">
 									<h3 class="font-weight-bold" id="total_harga"></h3>
 								</div>
 							</div>
@@ -1415,6 +1533,8 @@ if (empty($wpsipd_status)) {
 			style: 'currency',
 			currency: 'IDR'
 		}));
+
+		jQuery('#total_harga_asli').val(totalHarga);
 	}
 
 
@@ -1505,6 +1625,7 @@ if (empty($wpsipd_status)) {
 			placeholder: 'Pilih Satuan...',
 		});
 		jQuery('#id_data').val('')
+		jQuery('#total_harga_asli').val('')
 		jQuery('#kode_akun').val('').trigger('change')
 		jQuery('#subs_bl_teks').val('').trigger('change')
 		jQuery('#ket_bl_teks').val('').trigger('change')
@@ -1537,16 +1658,29 @@ if (empty($wpsipd_status)) {
 			let subsNama = jQuery(`.subs-row[data-id="${subs}"]`).find("td:nth-child(2)").text().trim(); // Subs nama dari teks langsung
 			let ketNama = jQuery(`.ket-row[data-id="${ket}"]`).find("td:nth-child(2)").text().trim(); // Ket nama dari teks langsung
 			let hargaSatuanText = jQuery(this).closest(".rinci-row").find("td:nth-child(3)").text(); // Ambil teks harga satuan
-			let hargaSatuan = parseFloat(hargaSatuanText.replace(/\./g, '').replace(',', '.')); // Hapus pemisah ribuan dan ubah ke angka
+			let hargaSatuan = parseFloat(hargaSatuanText.replace(/\./g, "").replace(",", ".")); // Hapus pemisah ribuan dan ubah ke angka
 			let satuan = jQuery(this).closest(".rinci-row").find("td:nth-child(5)").text().trim(); // Satuan (kolom ke-5)
-			let volume = jQuery(`#volumePisah${rincianId}`).val(); // Input volume
-			let realisasi = jQuery(`#realisasiPisah${rincianId}`).val(); // Input realisasi
+			let volume = parseFloat(jQuery(`#volumePisah${rincianId}`).val()) || 0; // Input volume
+			let realisasi = parseFloat(jQuery(`#realisasiPisah${rincianId}`).val()) || 0; // Input realisasi
 			let keteranganPisah = jQuery(`#keteranganPisah${rincianId}`).val(); // Input keterangan
 
 			// Validasi volume wajib diisi
-			if (!volume || volume.trim() === "") {
+			if (!volume) {
 				valid = false;
 				alert(`Volume harus diisi untuk komponen: ${namaKomponen}!`);
+				return false;
+			}
+
+			// Validasi realisasi tidak boleh lebih besar dari (volume * hargaSatuan)
+			const maxRealisasi = volume * hargaSatuan;
+			if (realisasi > maxRealisasi) {
+				valid = false;
+				alert(
+					`Nilai realisasi untuk komponen "${namaKomponen}" tidak boleh lebih besar dari Total Harga (${maxRealisasi.toLocaleString(
+					"id-ID",
+					{ style: "currency", currency: "IDR" }
+				)})!`
+				);
 				return false;
 			}
 
@@ -1603,8 +1737,8 @@ if (empty($wpsipd_status)) {
 				alert(res.message);
 				jQuery("#wrap-loading").hide();
 				if (res.status === "success") {
-					jQuery('#modalTambahData').modal('hide');
-					window.data_changed = true
+					jQuery("#modalTambahData").modal("hide");
+					window.data_changed = true;
 				}
 			},
 			error: function(xhr, status, error) {
@@ -1614,6 +1748,7 @@ if (empty($wpsipd_status)) {
 			},
 		});
 	}
+
 
 
 	function simpanRinciBlManual() {
@@ -1639,7 +1774,6 @@ if (empty($wpsipd_status)) {
 		const id_data = jQuery('#id_data').val();
 		const keterangan = jQuery('#keterangan').val();
 		const realisasi = jQuery('#realisasi').val();
-
 		const tempData = new FormData();
 		tempData.append("action", "simpan_rinci_bl_tagging_manual");
 		tempData.append("api_key", esakip.api_key);
@@ -1682,6 +1816,18 @@ if (empty($wpsipd_status)) {
 				alert("Terjadi kesalahan saat menyimpan data!");
 			},
 		});
+	}
+
+	function validasiNilaiRealisasi() {
+		const totalHargaAsli = parseFloat(jQuery('#total_harga_asli').val()) || 0;
+		let realisasi = parseFloat(jQuery('#realisasi').val()) || 0;
+
+		if (realisasi > totalHargaAsli) {
+			alert('Nilai realisasi tidak boleh lebih besar dari Total Harga!');
+
+			realisasi = totalHargaAsli;
+			jQuery('#realisasi').val(realisasi);
+		}
 	}
 
 	function deleteRincianById(id) {
