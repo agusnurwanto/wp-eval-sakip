@@ -1272,7 +1272,8 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 		}
 
 		if($koneksi_pokin_level_1['id_level_1_parent'] !== 0){
-			$nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $koneksi_pokin_level_1['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". ucfirst($koneksi_pokin_level_1['label_parent']) ." " . $show_indikator_pokin_pemda . "</a>";
+			$label_parent_koneksi_1 = !empty($koneksi_pokin_level_1['label_parent']) ? ucfirst($koneksi_pokin_level_1['label_parent']) : '';
+			$nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $koneksi_pokin_level_1['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". $label_parent_koneksi_1 ." " . $show_indikator_pokin_pemda . "</a>";
 		}
 		
 		switch ($koneksi_pokin_level_1['status_koneksi']) {
@@ -1377,7 +1378,8 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 
 			$detail = "<a href='javascript:void(0)' data-id='". $croscuttinglevel2['id'] ."' class='detail-cc text-primary' onclick='detail_cc(" . $croscuttinglevel2['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>";
 
-			$croscutting[]= '<div class="croscutting-isi '. $class_pengusul .' '. $class_cc_vertikal .'"><div>'. ucfirst($croscuttinglevel2['label_parent']) ."</div><div style='margin-top: 10px;font-weight: 500;'>". $show_nama_skpd .' '. $detail .'</div></div>';
+			$label_parent_croscutting_2 = !empty($croscuttinglevel2['label_parent']) ? ucfirst($croscuttinglevel2['label_parent']) : '';
+			$croscutting[]= '<div class="croscutting-isi '. $class_pengusul .' '. $class_cc_vertikal .'"><div>'. $label_parent_croscutting_2 ."</div><div style='margin-top: 10px;font-weight: 500;'>". $show_nama_skpd .' '. $detail .'</div></div>';
 		}
 
 		$show_croscutting = '';
@@ -1421,7 +1423,8 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 			}
 
 			if($koneksi_pokin_level_2['id_level_1_parent'] !== 0){
-				$nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $koneksi_pokin_level_2['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". ucfirst($koneksi_pokin_level_2['label_parent']) ." " . $show_indikator_pokin_pemda . "</a>";
+				$label_parent_koneksi_2 = !empty($koneksi_pokin_level_2['label_parent']) ? ucfirst($koneksi_pokin_level_2['label_parent']) : '';
+				$nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $koneksi_pokin_level_2['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". $label_parent_koneksi_2 ." " . $show_indikator_pokin_pemda . "</a>";
 			}
 
 			$show_nama_skpd = $nama_skpd . ' <span class="badge bg-'. $label_color .'" style="padding: .5em;">'. $status_koneksi.'</span> ';
@@ -1521,7 +1524,8 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 
 				$detail = "<a href='javascript:void(0)' data-id='". $croscuttinglevel3['id'] ."' class='detail-cc text-primary' onclick='detail_cc(" . $croscuttinglevel3['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>";
 
-				$croscutting[]= '<div class="croscutting-isi '. $class_pengusul .' '. $class_cc_vertikal .'"><div>'. ucfirst($croscuttinglevel3['label_parent']) ."</div><div style='margin-top: 10px;font-weight: 500;'>". $show_nama_skpd .' '. $detail .'</div></div>';
+				$label_parent_croscutting_3 = !empty($croscuttinglevel3['label_parent']) ? ucfirst($croscuttinglevel3['label_parent']) : '';
+				$croscutting[]= '<div class="croscutting-isi '. $class_pengusul .' '. $class_cc_vertikal .'"><div>'. $label_parent_croscutting_3 ."</div><div style='margin-top: 10px;font-weight: 500;'>". $show_nama_skpd .' '. $detail .'</div></div>';
 			}
 			
 			$show_croscutting = '';
@@ -1549,7 +1553,8 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 				}
 
 				if($koneksi_pokin_level_3['id_level_1_parent'] !== 0){
-					$nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $koneksi_pokin_level_3['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". ucfirst($koneksi_pokin_level_3['label_parent']) ." " . $show_indikator_pokin_pemda . "</a>";
+					$label_parent_koneksi_3 = !empty($koneksi_pokin_level_3['label_parent']) ? ucfirst($koneksi_pokin_level_3['label_parent']) : '';
+					$nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $koneksi_pokin_level_3['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". $label_parent_koneksi_3 ." " . $show_indikator_pokin_pemda . "</a>";
 				}
 				
 				switch ($koneksi_pokin_level_3['status_koneksi']) {
@@ -1664,7 +1669,8 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 
 					$detail = "<a href='javascript:void(0)' data-id='". $croscuttinglevel4['id'] ."' class='detail-cc text-primary' onclick='detail_cc(" . $croscuttinglevel4['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>";
 
-					$croscutting[]= '<div class="croscutting-isi '. $class_pengusul .' '. $class_cc_vertikal .'"><div>'. ucfirst($croscuttinglevel4['label_parent']) ."</div><div style='margin-top: 10px;font-weight: 500;'>". $show_nama_skpd .' '. $detail .'</div></div>';
+					$label_parent_croscutting_4 = !empty($croscuttinglevel4['label_parent']) ? ucfirst($croscuttinglevel4['label_parent']) : '';
+					$croscutting[]= '<div class="croscutting-isi '. $class_pengusul .' '. $class_cc_vertikal .'"><div>'. $label_parent_croscutting_4 ."</div><div style='margin-top: 10px;font-weight: 500;'>". $show_nama_skpd .' '. $detail .'</div></div>';
 				}
 				
 				$show_croscutting = '';
@@ -1692,7 +1698,8 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 					}
 
 					if($koneksi_pokin_level_4['id_level_1_parent'] !== 0){
-						$nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $koneksi_pokin_level_4['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". ucfirst($koneksi_pokin_level_4['label_parent']) ." " . $show_indikator_pokin_pemda . "</a>";
+						$label_parent_koneksi_4 = !empty($koneksi_pokin_level_4['label_parent']) ? ucfirst($koneksi_pokin_level_4['label_parent']) : '';
+						$nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $koneksi_pokin_level_4['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". $label_parent_koneksi_4 ." " . $show_indikator_pokin_pemda . "</a>";
 					}
 					
 					switch ($koneksi_pokin_level_4['status_koneksi']) {
@@ -1824,7 +1831,8 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 
 						$detail = "<a href='javascript:void(0)' data-id='". $croscuttinglevel5['id'] ."' class='detail-cc text-primary' onclick='detail_cc(" . $croscuttinglevel5['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>";
 
-						$croscutting5[]= '<div class="croscutting-isi '. $class_pengusul .' '. $class_cc_vertikal .'"><div>'. ucfirst($croscuttinglevel5['label_parent']) ."</div><div style='margin-top: 10px;font-weight: 500;'>". $show_nama_skpd .' '. $detail .'</div></div>';
+						$label_parent_croscutting_5 = !empty($croscuttinglevel5['label_parent']) ? ucfirst($croscuttinglevel5['label_parent']) : '';
+						$croscutting5[]= '<div class="croscutting-isi '. $class_pengusul .' '. $class_cc_vertikal .'"><div>'. $label_parent_croscutting_5 ."</div><div style='margin-top: 10px;font-weight: 500;'>". $show_nama_skpd .' '. $detail .'</div></div>';
 					}
 
 					$show_croscutting5 = '';
@@ -1867,7 +1875,8 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 						}
 
 						if($koneksi_pokin_level_5['id_level_1_parent'] !== 0){
-							$nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $koneksi_pokin_level_5['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". ucfirst($koneksi_pokin_level_5['label_parent']) ."" . $show_indikator_pokin_pemda . "</a>";
+							$label_parent_koneksi_5 = !empty($koneksi_pokin_level_5['label_parent']) ? ucfirst($koneksi_pokin_level_5['label_parent']) : '';
+							$nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $koneksi_pokin_level_5['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". $label_parent_koneksi_5 ."" . $show_indikator_pokin_pemda . "</a>";
 						}
 						
 						switch ($koneksi_pokin_level_5['status_koneksi']) {
