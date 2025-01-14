@@ -1237,7 +1237,7 @@ CREATE TABLE `esakip_data_rencana_aksi_opd` (
   `musrembang` tinyint(4) DEFAULT null,
   `pokir` tinyint(4) DEFAULT null,
   `id_jabatan` varchar(30) DEFAULT NULL,
-  `nip` text NOT NULL,
+  `nip` text DEFAULT NULL,
   `satker_id` VARCHAR(50) NOT NULL, 
   PRIMARY key (id)
 );

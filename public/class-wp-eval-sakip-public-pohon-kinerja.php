@@ -5851,7 +5851,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								            TRIM(SUBSTRING_INDEX(nama_satker, '|', -1)) AS nama_satker
 								        FROM esakip_data_pegawai_cascading 
 								        WHERE active = 1 
-								          AND jenis_data = 4
+								          AND jenis_data = 5
 								          AND id_data = %d
 								          AND id_skpd = %d
 								    ", $g['id'], $id_skpd),
@@ -6330,18 +6330,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 	    if (!empty($_POST)) {
 	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-	            if (empty($_POST['nama_satker'])) {
-	                $ret['status'] = 'error';
-	                $ret['message'] = 'Nama Satker tidak boleh kosong!';
-	            } elseif (empty($_POST['tahun_anggaran'])) {
+	            if (empty($_POST['tahun_anggaran'])) {
 	                $ret['status'] = 'error';
 	                $ret['message'] = 'Tahun Anggaran tidak boleh kosong!';
 	            } elseif (empty($_POST['tipe'])) {
 	                $ret['status'] = 'error';
 	                $ret['message'] = 'Tipe tidak boleh kosong!';
-	            } elseif (empty($_POST['satker_id'])) {
-	                $ret['status'] = 'error';
-	                $ret['message'] = 'ID Satker tidak boleh kosong!';
 	            } elseif (empty($_POST['id_skpd'])) {
 	                $ret['status'] = 'error';
 	                $ret['message'] = 'ID SKPD tidak boleh kosong!';
