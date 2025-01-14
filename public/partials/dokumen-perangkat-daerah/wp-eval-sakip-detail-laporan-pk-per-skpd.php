@@ -202,7 +202,10 @@ if(!empty($nip)){
         );
 
         $html_lembar_2 = '';
-        $html_anggaran = '';
+        $html_sasaran = '';
+        $html_program = '';
+        $html_kegiatan = '';
+        $html_sub_kegiatan = '';
         $data_anggaran = array(
             'sasaran' => array(),
             'program' => array(),
@@ -300,7 +303,6 @@ if(!empty($nip)){
                     }
                 }
 
-                $html_sasaran = '';
                 if(!empty($data_anggaran['sasaran'])){
                     $html_sasaran = '<table class="table_data_anggaran" style="margin-top: 2rem;">
                         <thead>
@@ -316,14 +318,13 @@ if(!empty($nip)){
                     foreach ($data_anggaran['sasaran'] as $v_sasaran) {
                         $html_sub_kegiatan .= '<tr>
                             <td>'.$no++.'</td>
-                            <td>'.$v_sasaran['nama'].'</td>
+                            <td class="text-left">'.$v_sasaran['nama'].'</td>
                             <td class="text-right">'.number_format($v_sasaran['total_anggaran'], 0, ",", ".").'</td>
                             <td></td></tr>';
                     }
                     $html_sasaran .='</tbody></table>';
                 }
                 
-                $html_program = '';
                 if(!empty($data_anggaran['program'])){
                     $html_program = '<table class="table_data_anggaran" style="margin-top: 2rem;">
                         <thead>
@@ -339,14 +340,13 @@ if(!empty($nip)){
                     foreach ($data_anggaran['program'] as $v_program) {
                         $html_program .= '<tr>
                             <td>'.$no++.'</td>
-                            <td>'.$v_program['nama'].'</td>
+                            <td class="text-left">'.$v_program['nama'].'</td>
                             <td class="text-right">'.number_format($v_program['total_anggaran'], 0, ",", ".").'</td>
                             <td></td></tr>';
                     }
                     $html_program .='</tbody></table>';
                 }
                 
-                $html_kegiatan = '';
                 if(!empty($data_anggaran['kegiatan'])){
                     $html_kegiatan = '<table class="table_data_anggaran" style="margin-top: 2rem;">
                         <thead>
@@ -362,14 +362,13 @@ if(!empty($nip)){
                     foreach ($data_anggaran['kegiatan'] as $v_kegiatan) {
                         $html_kegiatan .= '<tr>
                             <td>'.$no++.'</td>
-                            <td>'.$v_kegiatan['nama'].'</td>
+                            <td class="text-left">'.$v_kegiatan['nama'].'</td>
                             <td class="text-right">'.number_format($v_kegiatan['total_anggaran'], 0, ",", ".").'</td>
                             <td></td></tr>';
                     }
                     $html_kegiatan .='</tbody></table>';
                 }
 
-                $html_sub_kegiatan = '';
                 if(!empty($data_anggaran['sub_kegiatan'])){
                     $html_sub_kegiatan = '<table class="table_data_anggaran" style="margin-top: 2rem;">
                         <thead>
@@ -385,7 +384,7 @@ if(!empty($nip)){
                     foreach ($data_anggaran['sub_kegiatan'] as $v_sub_kegiatan) {
                         $html_sub_kegiatan .= '<tr>
                             <td>'.$no++.'</td>
-                            <td>'.$v_sub_kegiatan['nama'].'</td>
+                            <td class="text-left">'.$v_sub_kegiatan['nama'].'</td>
                             <td class="text-right">'.number_format($v_sub_kegiatan['total_anggaran'], 0, ",", ".").'</td>
                             <td></td></tr>';
                     }
@@ -551,6 +550,10 @@ if(empty($logo_pemda)){
         border: solid 1px #000;
     }
 
+    #table_data_sasaran tr td:first-child, .table_data_anggaran tr td:first-child{
+        width: 3rem;
+    }
+
 </style>
 
 <div class="container-md mx-auto" style="width: 900px;">
@@ -656,21 +659,21 @@ if(empty($logo_pemda)){
     <div class="page-print mt-5 text-center">
         <p class="title-laporan mt-3">PERJANJIAN KINERJA TAHUN <?php echo $input['tahun']; ?></p>
         <p class="title-laporan"><?php echo $data_detail['bidang_pegawai']; ?></p>
-        <table id="table_data_sasaran" style="margin-top: 2rem;">
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Sasaran</th>
-                    <th>Indikator</th>
-                    <th>Target</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if($html_lembar_2 != '') : ?>
-                    <?php echo $html_lembar_2; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
+        <?php if($html_lembar_2 != '') : ?>
+            <table id="table_data_sasaran" style="margin-top: 2rem;">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Sasaran</th>
+                        <th>Indikator</th>
+                        <th>Target</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        <?php echo $html_lembar_2; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
         <?php echo $html_sasaran; ?>
         <?php echo $html_program; ?>
         <?php echo $html_kegiatan; ?>
