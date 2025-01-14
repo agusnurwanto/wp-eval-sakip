@@ -824,15 +824,104 @@ if (empty($wpsipd_status)) {
 				</tr>
 			</tbody>
 		</table>
+		<h5 class="text_tengah">Target dan Realisasi Per Bulan</h5>
 		<table>
 			<thead style="background-color: #bde0fe; color: #212529;">
 				<tr>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 400px;">INDIKATOR</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2">SATUAN</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="6">TARGET KEGIATAN PER TRIWULAN</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 400px;">KETERANGAN</th>
+					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Bulan</th>
+					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Target</th>
+					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Realisasi</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Januari</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 95.000.000</td>
 				</tr>
 				<tr>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Februari</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 98.000.000</td>
+				</tr>
+				<tr>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Maret</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 102.000.000</td>
+				</tr>
+				<tr>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">April</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 97.000.000</td>
+				</tr>
+				<tr>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Mei</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 99.000.000</td>
+				</tr>
+				<tr>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Juni</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 101.000.000</td>
+				</tr>
+				<tr>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Juli</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 96.000.000</td>
+				</tr>
+				<tr>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Agustus</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 103.000.000</td>
+				</tr>
+				<tr>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">September</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 100.000.000</td>
+				</tr>
+				<tr>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Oktober</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 98.000.000</td>
+				</tr>
+				<tr>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">November</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 97.000.000</td>
+				</tr>
+				<tr>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Desember</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
+					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 105.000.000
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<table>
+			<thead style="background-color: #bde0fe; color: #212529;">
+				<tr>
+					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="6" style="width: 400px;">INDIKATOR</th>
+					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="6">SATUAN</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="6"><?php echo $ind_renaksi['indikator']; ?></td>
+					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="6"><?php echo $ind_renaksi['satuan']; ?></td>
+				</tr>
+			</tbody>
+			<thead style="background-color: #bde0fe; color: #212529;">
+				<tr>
+					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="6">TARGET KEGIATAN PER TRIWULAN</th>
+					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="6">REALISASI KEGIATAN PER TRIWULAN</th>
+				</tr>
+				<tr>
+					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">AWAL</th>
+					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW-I</th>
+					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW-II</th>
+					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW-III</th>
+					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW-IV</th>
+					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">AKHIR</th>
 					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">AWAL</th>
 					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW-I</th>
 					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW-II</th>
@@ -843,14 +932,19 @@ if (empty($wpsipd_status)) {
 			</thead>
 			<tbody>
 				<tr>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['indikator']; ?></td>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['satuan']; ?></td>
+					<!-- target -->
 					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['target_awal']; ?></td>
 					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['target_1']; ?></td>
 					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['target_2']; ?></td>
 					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['target_3']; ?></td>
 					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['target_4']; ?></td>
 					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['target_akhir']; ?></td>
+					<!-- realisasi -->
+					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['realisasi_target_1']; ?></td>
+					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['realisasi_target_2']; ?></td>
+					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['realisasi_target_3']; ?></td>
+					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['realisasi_target_4']; ?></td>
 					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
 				</tr>
 			</tbody>
