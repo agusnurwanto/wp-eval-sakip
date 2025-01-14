@@ -826,7 +826,7 @@ if (empty($wpsipd_status)) {
 		</table>
 		<h5 class="text_tengah">Target dan Realisasi Per Bulan</h5>
 		<table>
-			<thead style="background-color: #bde0fe; color: #212529;">
+			<thead style="background-color: #bde0fe; color: #212529;"> 
 				<tr>
 					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Bulan</th>
 					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Target</th>
