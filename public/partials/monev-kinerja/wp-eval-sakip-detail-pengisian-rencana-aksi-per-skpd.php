@@ -281,6 +281,7 @@ $set_renaksi = get_option('_crb_input_renaksi');
         <li>Baris Kolom Tabel Dengan Background Warna <strong>Ungu</strong> Menunjukkan Data Rencana Hasil Kerja dan Pohon Kinerja Level 3</li>
         <li>Baris Kolom Tabel Dengan Background Warna <strong>Biru</strong> Menunjukkan Data Uraian Kegiatan Rencana Hasil Kerja dan Pohon Kinerja Level 4</li>
         <li>Baris Kolom Tabel Dengan Background Warna <strong>Putih</strong> Menunjukkan Data Uraian Teknis Kegiatan dan Pohon Kinerja Level 5</li>
+        <li>Label Dengan Background Warna <strong>Hijau</strong> Menunjukkan Data Pohon Kinerja</li>
     </ul>
 </div>
 <!-- Modal Renaksi -->
@@ -360,19 +361,19 @@ $set_renaksi = get_option('_crb_input_renaksi');
             <input type="hidden" value="" id="id_data">
             <input type="hidden" value="" id="tipe">
             <div class="form-group">
-                <label for="detail_kegiatan_utama">KEGIATAN UTAMA</label>
+                <label for="detail_kegiatan_utama">KEGIATAN UTAMA | RHK LEVEL 1</label>
                 <input type="text" id="detail_kegiatan_utama" class="form-control" disabled>
             </div>
             <div class="form-group">
-                <label for="detail_rhk">RENCANA HASIL KERJA</label>
+                <label for="detail_rhk">RENCANA HASIL KERJA | RHK LEVEL 2</label>
                 <input type="text" id="detail_rhk" class="form-control" disabled>
             </div>
             <div class="form-group">
-                <label for="detail_uraian_kegiatan">URAIAN KEGIATAN</label>
+                <label for="detail_uraian_kegiatan">URAIAN KEGIATAN | RHK LEVEL 3</label>
                 <input type="text" id="detail_uraian_kegiatan" class="form-control" disabled>
             </div>
             <div class="form-group">
-                <label for="detail_uraian_tk">URAIAN TEKNIS KEGIATAN</label>
+                <label for="detail_uraian_tk">URAIAN TEKNIS KEGIATAN | RHK LEVEL 4</label>
                 <input type="text" id="detail_uraian_tk" class="form-control" disabled>
             </div>
             <div class="form-group">
@@ -2582,10 +2583,9 @@ $set_renaksi = get_option('_crb_input_renaksi');
         // }
 
         let satker_id = jQuery('#satker_id').val();
-        if (satker_id == '') {
-            return alert('ID Satker tidak boleh kosong');
-        }
-        let nip = jQuery('#pegawai').select2('data')[0].nip_baru;
+        let nip = jQuery('#pegawai').val();
+        
+        console.log("tes"+nip);
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -3137,10 +3137,16 @@ $set_renaksi = get_option('_crb_input_renaksi');
                 if(response.status){
                     jQuery("#modal-detail-renaksi").modal('show');
                     var satker = response.get_satker && response.get_satker.satker_id && response.get_satker.nama 
-                                 ? response.get_satker.satker_id + ' ' + response.get_satker.nama 
-                                 : '';
+                                 ? response.get_satker.satker_id + ' ' + response.get_satker.nama : '';
                     var pegawai = response.get_pegawai && response.get_pegawai.nip_baru && response.get_pegawai.nama_pegawai 
-                                 ? response.get_pegawai.nip_baru + ' ' + response.get_pegawai.nama_pegawai 
+                                 ? response.get_pegawai.nip_baru + ' ' + response.get_pegawai.nama_pegawai : '';
+                    var get_cascading_sasaran = response.data && response.data.kode_cascading_sasaran && response.data.label_cascading_sasaran ? response.data.kode_cascading_sasaran + ' ' + response.data.label_cascading_sasaran 
+                                 : '';
+                    var get_cascading_program = response.data && response.data.kode_cascading_program && response.data.label_cascading_program ? response.data.kode_cascading_program + ' ' + response.data.label_cascading_program 
+                                 : '';
+                    var get_cascading_kegiatan = response.data && response.data.kode_cascading_kegiatan && response.data.label_cascading_kegiatan ? response.data.kode_cascading_kegiatan + ' ' + response.data.label_cascading_kegiatan 
+                                 : '';
+                    var get_cascading_sub_kegiatan = response.data && response.data.kode_cascading_sub_kegiatan && response.data.label_cascading_sub_kegiatan ? response.data.kode_cascading_sub_kegiatan + ' ' + response.data.label_cascading_sub_kegiatan 
                                  : '';
                     if(tipe === 1){
                         jQuery('label[for="detail_kegiatan_utama"]').show();
@@ -3162,7 +3168,7 @@ $set_renaksi = get_option('_crb_input_renaksi');
                         jQuery('label[for="detail_pokin_5"]').hide();
                         jQuery('#detail_pokin_5').hide();
                         jQuery('label[for="detail_cascading_sasaran"]').show();
-                        jQuery('#detail_cascading_sasaran').show();
+                        jQuery('#detail_cascading_sasaran').val(get_cascading_sasaran).show();
                         jQuery('label[for="detail_cascading_program"]').hide();
                         jQuery('#detail_cascading_program').hide();
                         jQuery('label[for="detail_cascading_kegiatan"]').hide();
@@ -3193,7 +3199,7 @@ $set_renaksi = get_option('_crb_input_renaksi');
                         jQuery('label[for="detail_cascading_sasaran"]').hide();
                         jQuery('#detail_cascading_sasaran').hide();
                         jQuery('label[for="detail_cascading_program"]').show();
-                        jQuery('#detail_cascading_program').show();
+                        jQuery('#detail_cascading_program').val(get_cascading_program).show();
                         jQuery('label[for="detail_cascading_kegiatan"]').hide();
                         jQuery('#detail_cascading_kegiatan').hide();
                         jQuery('label[for="detail_cascading_sub_giat"]').hide();
@@ -3224,7 +3230,7 @@ $set_renaksi = get_option('_crb_input_renaksi');
                         jQuery('label[for="detail_cascading_program"]').hide();
                         jQuery('#detail_cascading_program').hide();
                         jQuery('label[for="detail_cascading_kegiatan"]').show();
-                        jQuery('#detail_cascading_kegiatan').show();
+                        jQuery('#detail_cascading_kegiatan').val(get_cascading_kegiatan).show();
                         jQuery('label[for="detail_cascading_sub_giat"]').hide();
                         jQuery('#detail_cascading_sub_giat').hide();
                         jQuery('#detail_satuan_kerja').val(satker).show(); 
@@ -3255,7 +3261,7 @@ $set_renaksi = get_option('_crb_input_renaksi');
                         jQuery('label[for="detail_cascading_kegiatan"]').hide();
                         jQuery('#detail_cascading_kegiatan').hide();
                         jQuery('label[for="detail_cascading_sub_giat"]').show();
-                        jQuery('#detail_cascading_sub_giat').show();
+                        jQuery('#detail_cascading_sub_giat').val(get_cascading_sub_kegiatan).show();
                         jQuery('#detail_satuan_kerja').val(satker).show(); 
                         jQuery('#detail_pegawai').val(pegawai).show(); 
                     } 
