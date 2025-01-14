@@ -86,14 +86,18 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								*
 							FROM esakip_data_pegawai_simpeg
 							WHERE nip_baru = %d
-						", $val['nip']), ARRAY_A);
+						",
+							$val['nip']
+						), ARRAY_A);
 						$data_renaksi[$key]['detail_satker'] = $wpdb->get_row($wpdb->prepare(
 							"
 							SELECT
 								*
 							FROM esakip_data_satker_simpeg
 							WHERE satker_id = %d
-						", $val['satker_id']), ARRAY_A);
+						",
+							$val['satker_id']
+						), ARRAY_A);
 						// print_r($get_pegawai); die($wpdb->last_query);
 						// mengambil data dari level 4 untuk menampilkan di level / tipe 3
 						$data_renaksi[$key]['get_data_dasar_4'] = $wpdb->get_results($wpdb->prepare("
@@ -626,7 +630,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		                	FROM esakip_data_satker_simpeg
 		                	WHERE satker_id = %d		                		
 		                ', $ret['data']['satker_id']), ARRAY_A);
-		                $ret['data']['pegawai'] = $wpdb->get_row($wpdb->prepare('
+						$ret['data']['pegawai'] = $wpdb->get_row($wpdb->prepare('
 		                	SELECT
 		                		*
 		                	FROM esakip_data_pegawai_simpeg
@@ -3724,14 +3728,15 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							mandatori_pusat,
 							inisiatif_kd,
 							musrembang,
-							pokir
+							pokir,
+							nip,
+							satker_id
 						FROM esakip_data_rencana_aksi_opd
 						WHERE tahun_anggaran=%d
 							AND active=1
-							LIMIT 5
-					", $tahun_anggaran), ARRAY_A);
+							AND nip=%s
+					", $tahun_anggaran, $nip), ARRAY_A);
 
-					// AND nipkepala=%d
 					$data_all = array(
 						'total' => 0,
 						'data' => array(),
@@ -3748,9 +3753,21 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							WHERE id_renaksi=%d
 								AND active=1
 						", $v['id']), ARRAY_A);
+						$rhk_parent = array();
+						if(!empty($v['parent'])){
+							$rhk_parent = $wpdb->get_row($wpdb->prepare("
+								SELECT
+									*
+								FROM esakip_data_rencana_aksi_opd
+								WHERE tahun_anggaran=%d
+									AND active=1
+									AND id=%d
+							", $tahun_anggaran, $v['parent']), ARRAY_A);
+						}
 						$data_all['data'][$v['id']] = array(
 							'detail' => $v,
-							'indikator' => $indikator
+							'indikator' => $indikator,
+							'detail_atasan' => $rhk_parent
 						);
 					}
 
@@ -3821,7 +3838,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						foreach ($data_rka['data'] as &$item) {
 							$id_rinci_sub_bl = $item['id_rinci_sub_bl'];
 
-							$labels = $wpdb->get_row(
+							// Ambil semua data labels yang sesuai
+							$labels = $wpdb->get_results(
 								$wpdb->prepare('
 									SELECT 
 										id_indikator,
@@ -3839,37 +3857,43 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								ARRAY_A
 							);
 
+							// Inisialisasi labels dan is_checked
+							$item['labels'] = [];
+							$item['is_checked'] = false;
+
 							if (!empty($labels)) {
-								$data_indikator = $wpdb->get_row(
-									$wpdb->prepare('
-										SELECT *
-										FROM esakip_data_rencana_aksi_indikator_opd
-										WHERE id = %d
-										  AND active = 1
-									', $labels['id_indikator']),
-									ARRAY_A
-								);
-								$nama_rhk = $wpdb->get_row(
-									$wpdb->prepare('
-										SELECT *
-										FROM esakip_data_rencana_aksi_opd
-										WHERE id = %d
-										  AND active = 1
-									', $data_indikator['id_renaksi']),
-									ARRAY_A
-								);
-								$labels['nama_indikator'] = $data_indikator['indikator'];
-								$labels['nama_rhk'] = $nama_rhk['label'];
-								if ($labels['id_indikator'] == $_POST['id_indikator']) {
-									$item['labels'][] = $labels;
-									$item['is_checked'] = true;
-								} else {
-									$item['labels'][] = $labels;
-									$item['is_checked'] = false;
+								foreach ($labels as $label) {
+									$data_indikator = $wpdb->get_row(
+										$wpdb->prepare('
+											SELECT *
+											FROM esakip_data_rencana_aksi_indikator_opd
+											WHERE id = %d
+											  AND active = 1
+										', $label['id_indikator']),
+										ARRAY_A
+									);
+									$label['nama_indikator'] = $data_indikator['indikator'];
+
+									// Ambil nama RHK terkait
+									$nama_rhk = $wpdb->get_row(
+										$wpdb->prepare('
+											SELECT *
+											FROM esakip_data_rencana_aksi_opd
+											WHERE id = %d
+											  AND active = 1
+										', $data_indikator['id_renaksi']),
+										ARRAY_A
+									);
+									$label['nama_rhk'] = $nama_rhk['label'];
+
+									// jika id_indikator sama dengan halaman saat ini
+									if ($label['id_indikator'] == $_POST['id_indikator']) {
+										$item['is_checked'] = true;
+									}
+
+									// Tambahkan label ke array labels
+									$item['labels'][] = $label;
 								}
-							} else {
-								$item['labels'] = [];
-								$item['is_checked'] = false;
 							}
 						}
 
@@ -3995,6 +4019,24 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					die(json_encode($ret));
 				}
 
+				//validasi realisasi
+				foreach ($rincianBelanjaIds as $index => $rinciId) {
+					$rinci = isset($dataRinci[$index]) ? $dataRinci[$index] : null;
+
+					if (!is_array($rinci)) {
+						$ret['status'] = 'error';
+						$ret['message'] = 'Rincian data tidak sesuai!';
+						die(json_encode($ret));
+					}
+
+					$total_harga = $rinci['harga_satuan'] * $rinci['volume'];
+					if ($rinci['realisasi'] > $total_harga) {
+						$ret['status'] = 'error';
+						$ret['message'] = 'Realisasi lebih besar dari Total Harga!';
+						die(json_encode($ret));
+					}
+				}
+
 				//set active = 0 semua sebelum ditambah
 				$wpdb->update(
 					'esakip_tagging_rincian_belanja',
@@ -4004,6 +4046,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'kode_sbl' 		 => $_POST['kode_sbl'],
 						'id_indikator'   => $_POST['id_indikator'],
 						'id_skpd' 		 => $_POST['id_skpd'],
+						'tipe' 		 	 => 2,
 						'active' 		 => 1
 					)
 				);
@@ -4089,6 +4132,15 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$ret['status'] = 'error';
 					$ret['message'] = implode(" \n ", $errors);
 					die(json_encode($ret));
+				}
+
+				if (!empty($postData['realisasi'])) {
+					$total_harga = $postData['volume'] * $postData['harga_satuan'];
+					if ($postData['realisasi'] > $total_harga) {
+						$ret['status'] = 'error';
+						$ret['message'] = 'Realisasi Melebihi Total Harga!';
+						die(json_encode($ret));
+					}
 				}
 
 				$nama_akun = $wpdb->get_var(
@@ -4273,20 +4325,21 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		return $errors;
 	}
 
-	public function get_pegawai_rhk() {
-	    global $wpdb;
-	    $ret = array(
-	        'status' => 'success',
-	        'message' => 'Berhasil mengambil data!',
-	        'data' => array()
-	    );
+	public function get_pegawai_rhk()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil mengambil data!',
+			'data' => array()
+		);
 
-	    if (!empty($_POST)) {
-	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-	            $satker_id = $_POST['satker_id'];
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$satker_id = $_POST['satker_id'];
 
-	            // Query to get pegawai based on selected satker_id
-	            $get_pegawai = $wpdb->get_results($wpdb->prepare('
+				// Query to get pegawai based on selected satker_id
+				$get_pegawai = $wpdb->get_results($wpdb->prepare('
 	                SELECT 
 	                    p.id,
 	                    p.nama_pegawai,
@@ -4296,127 +4349,125 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	                ORDER BY p.nama_pegawai ASC
 	            ', $satker_id), ARRAY_A);
 
-	            $ret['sql'] = $wpdb->last_query;
-	            $ret['data'] = array();
-	            foreach ($get_pegawai as $pegawai) {
-	                $ret['data'][] = array(
-	                    'id' => $pegawai['id'], 
-	                    'nama' => $pegawai['nip_baru'] . ' | ' . $pegawai['nama_pegawai'],
-	                    'nip_baru' => $pegawai['nip_baru']
-	                );
-	            }
+				$ret['sql'] = $wpdb->last_query;
+				$ret['data'] = array();
+				foreach ($get_pegawai as $pegawai) {
+					$ret['data'][] = array(
+						'id' => $pegawai['id'],
+						'nama' => $pegawai['nip_baru'] . ' | ' . $pegawai['nama_pegawai'],
+						'nip_baru' => $pegawai['nip_baru']
+					);
+				}
+			} else {
+				$ret['status'] = 'error';
+				$ret['message'] = 'API key tidak valid!';
+			}
+		} else {
+			$ret['status'] = 'error';
+			$ret['message'] = 'Permintaan tidak valid!';
+		}
 
-	        } else {
-	            $ret['status'] = 'error';
-	            $ret['message'] = 'API key tidak valid!';
-	        }
-	    } else {
-	        $ret['status'] = 'error';
-	        $ret['message'] = 'Permintaan tidak valid!';
-	    }
-
-	    echo json_encode($ret);
-	    wp_die();
+		echo json_encode($ret);
+		wp_die();
 	}
 	public function help_rhk()
 	{
-	    global $wpdb;
-	    $ret = array(
-	        'status' => 'success',
-	        'message' => 'Berhasil mendapatkan data!',
-	        'data' => array()
-	    );
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil mendapatkan data!',
+			'data' => array()
+		);
 
-	    if (!empty($_POST)) {
-	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-	            if (!empty($_POST['id'])) {
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
 					$id = $_POST['id'];
-				}
-				else if (!empty($_POST['tipe'])) {
+				} else if (!empty($_POST['tipe'])) {
 					$tipe = $_POST['tipe'];
-				} 
+				}
 
-                $data = $wpdb->get_row(
-                    $wpdb->prepare("
+				$data = $wpdb->get_row(
+					$wpdb->prepare("
                     	SELECT 
                     		* 
                     	FROM esakip_data_rencana_aksi_opd
                     	WHERE id = %d
                     ", $id),
-                    ARRAY_A
-                );
-                if ($data) {
-                	$get_pokin_1 = $wpdb->get_row($wpdb->prepare('
+					ARRAY_A
+				);
+				if ($data) {
+					$get_pokin_1 = $wpdb->get_row($wpdb->prepare('
 	                	SELECT
 	                		*
 	                	FROM esakip_pohon_kinerja_opd
 	                	WHERE id=%d
 	                ', $data['id_pokin_1']), ARRAY_A);
-	                $get_pokin_2 = $wpdb->get_row($wpdb->prepare('
+					$get_pokin_2 = $wpdb->get_row($wpdb->prepare('
 	                	SELECT
 	                		*
 	                	FROM esakip_pohon_kinerja_opd
 	                	WHERE id=%d
 	                ', $data['id_pokin_2']), ARRAY_A);
-	                $get_pokin_3 = $wpdb->get_row($wpdb->prepare('
+					$get_pokin_3 = $wpdb->get_row($wpdb->prepare('
 	                	SELECT
 	                		*
 	                	FROM esakip_pohon_kinerja_opd
 	                	WHERE id=%d
 	                ', $data['id_pokin_3']), ARRAY_A);
-	                $get_pokin_4 = $wpdb->get_row($wpdb->prepare('
+					$get_pokin_4 = $wpdb->get_row($wpdb->prepare('
 	                	SELECT
 	                		*
 	                	FROM esakip_pohon_kinerja_opd
 	                	WHERE id=%d
 	                ', $data['id_pokin_4']), ARRAY_A);
-	                $get_pokin_5 = $wpdb->get_row($wpdb->prepare('
+					$get_pokin_5 = $wpdb->get_row($wpdb->prepare('
 	                	SELECT
 	                		*
 	                	FROM esakip_pohon_kinerja_opd
 	                	WHERE id=%d
 	                ', $data['id_pokin_5']), ARRAY_A);
-	                $get_satker = $wpdb->get_row($wpdb->prepare('
+					$get_satker = $wpdb->get_row($wpdb->prepare('
 	                	SELECT
 	                		*
 	                	FROM esakip_data_satker_simpeg
 	                	WHERE satker_id=%d
 	                ', $data['satker_id']), ARRAY_A);
-	                $get_pegawai = $wpdb->get_row($wpdb->prepare('
+					$get_pegawai = $wpdb->get_row($wpdb->prepare('
 	                	SELECT
 	                		*
 	                	FROM esakip_data_pegawai_simpeg
 	                	WHERE nip_baru=%d
 	                ', $data['nip']), ARRAY_A);
-	                // print_r($get_pokin_2); die($wpdb->last_query);
-	                $ret['get_pokin_1'] = $get_pokin_1;
-	                $ret['get_pokin_2'] = $get_pokin_2;
-	                $ret['get_pokin_3'] = $get_pokin_3;
-	                $ret['get_pokin_4'] = $get_pokin_4;
-	                $ret['get_pokin_5'] = $get_pokin_5;
-	                $ret['get_satker'] = $get_satker;
-	                $ret['get_pegawai'] = $get_pegawai;
-                    $ret['data'] = $data;
-                } else {
-                    $ret = array(
-                        'status' => 'error',
-                        'message' => 'Data tidak ditemukan!'
-                    );
-                }
-	        } else {
-	            $ret = array(
-	                'status' => 'error',
-	                'message' => 'API Key tidak sesuai!'
-	            );
-	        }
-	    } else {
-	        $ret = array(
-	            'status' => 'error',
-	            'message' => 'Format tidak sesuai!'
-	        );
-	    }
+					// print_r($get_pokin_2); die($wpdb->last_query);
+					$ret['get_pokin_1'] = $get_pokin_1;
+					$ret['get_pokin_2'] = $get_pokin_2;
+					$ret['get_pokin_3'] = $get_pokin_3;
+					$ret['get_pokin_4'] = $get_pokin_4;
+					$ret['get_pokin_5'] = $get_pokin_5;
+					$ret['get_satker'] = $get_satker;
+					$ret['get_pegawai'] = $get_pegawai;
+					$ret['data'] = $data;
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message' => 'Data tidak ditemukan!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'API Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
 
-	    die(json_encode($ret));
+		die(json_encode($ret));
 	}
 	function get_serapan_anggaran_capaian_kinerja()
 	{
@@ -4464,7 +4515,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'body' 		=> $api_params
 					)
 				);
-				
+
 				$response_body = wp_remote_retrieve_body($response);
 				$response_data = json_decode($response_body, true);
 
