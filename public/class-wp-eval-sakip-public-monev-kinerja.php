@@ -1113,31 +1113,32 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						", $v['detail']['nip'], $v['detail']['satker_id']));
 
 						if (empty($get_pegawai)) {
-						    $wpdb->update(
-						        'esakip_data_rencana_aksi_opd', array(
-						            'nip' => ''
-						        ), 
-						        array(
-						            'id' => $v['detail']['id']
-						        )
-						    );
-						    $v['detail']['nip'] = '';
+							$wpdb->update(
+								'esakip_data_rencana_aksi_opd',
+								array(
+									'nip' => ''
+								),
+								array(
+									'id' => $v['detail']['id']
+								)
+							);
+							$v['detail']['nip'] = '';
 						}
 
-						if(empty($v['detail']['satker_id'])){
+						if (empty($v['detail']['satker_id'])) {
 							$keterangan .= '<li>Satuan Kerja Belum Dipilih</li>';
 						}
-						if(empty($v['detail']['nip'])){
+						if (empty($v['detail']['nip'])) {
 							$keterangan .= '<li>Pegawai Pelaksana Belum Dipilih</li>';
 						}
 
-						if(empty($v['detail']['kode_cascading_sasaran'])){
+						if (empty($v['detail']['kode_cascading_sasaran'])) {
 							$keterangan .= '<li>Cascading Sasaran Belum dipilih</li>';
 						}
 						$html .= '
 						<tr class="keg-utama">
 							<td>' . $no . '</td>
-							<td class="ket_rhk">'.$keterangan.'</td>
+							<td class="ket_rhk">' . $keterangan . '</td>
 							<td class="kiri kanan bawah text_blok kegiatan_utama"><span class="badge bg-success text-white">' . $v['detail']['label_pokin_2'] . '</span><br>' . $v['detail']['label'] . '
 							    <a href="javascript:void(0)" data-id="' . $v['detail']['id'] . '" data-tipe="1" 
 								   class="help-rhk" onclick="help_rhk(' . $v['detail']['id'] . ', 1); return false;" title="Detail">
@@ -1219,23 +1220,24 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							", $renaksi['detail']['nip'], $renaksi['detail']['satker_id']));
 
 							if (empty($get_pegawai)) {
-							    $wpdb->update(
-							        'esakip_data_rencana_aksi_opd', array(
-							            'nip' => '', 
-							        ), 
-							        array(
-							            'id' => $renaksi['detail']['id']
-							        )
-							    );
-							    $renaksi['detail']['nip'] = '';
+								$wpdb->update(
+									'esakip_data_rencana_aksi_opd',
+									array(
+										'nip' => '',
+									),
+									array(
+										'id' => $renaksi['detail']['id']
+									)
+								);
+								$renaksi['detail']['nip'] = '';
 							}
-							if(empty($renaksi['detail']['satker_id'])){
+							if (empty($renaksi['detail']['satker_id'])) {
 								$keterangan .= '<li>Satuan Kerja Belum Dipilih</li>';
 							}
-							if(empty($renaksi['detail']['nip'])){
+							if (empty($renaksi['detail']['nip'])) {
 								$keterangan .= '<li>Pegawai Pelaksana Belum Dipilih</li>';
 							}
-							if(empty($renaksi['detail']['kode_cascading_program'])){
+							if (empty($renaksi['detail']['kode_cascading_program'])) {
 								$keterangan .= '<li>Cascading Program Belum dipilih</li>';
 							}
 
@@ -1334,7 +1336,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$html .= '
 							    <tr class="re-naksi">
 							        <td>' . $no . '.' . $no_renaksi . '</td>
-							        <td class="ket">'.$keterangan.'</td>
+							        <td class="ket">' . $keterangan . '</td>
 							        <td class="kiri kanan bawah text_blok kegiatan_utama"></td>
 							        <td class="kiri kanan bawah text_blok indikator_kegiatan_utama"></td>
 							        <td class="kiri kanan bawah text_blok recana_aksi">' . $renaksi_html . '<span class="badge bg-success text-white">' . $renaksi['detail']['label_pokin_3'] . '</span><br>' . $renaksi['detail']['label'] . '
@@ -1422,29 +1424,30 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								", $uraian_renaksi['detail']['nip'], $uraian_renaksi['detail']['satker_id']));
 
 								if (empty($get_pegawai)) {
-								    $wpdb->update(
-								        'esakip_data_rencana_aksi_opd', array(
-								            'nip' => ''
-								        ), 
-								        array(
-								            'id' => $uraian_renaksi['detail']['id']
-								        )
-								    );
-								    $uraian_renaksi['detail']['nip'] = '';
+									$wpdb->update(
+										'esakip_data_rencana_aksi_opd',
+										array(
+											'nip' => ''
+										),
+										array(
+											'id' => $uraian_renaksi['detail']['id']
+										)
+									);
+									$uraian_renaksi['detail']['nip'] = '';
 								}
-								if(empty($uraian_renaksi['detail']['satker_id'])){
+								if (empty($uraian_renaksi['detail']['satker_id'])) {
 									$keterangan .= '<li>Satuan Kerja Belum Dipilih</li>';
 								}
-								if(empty($uraian_renaksi['detail']['nip'])){
+								if (empty($uraian_renaksi['detail']['nip'])) {
 									$keterangan .= '<li>Pegawai Pelaksana Belum Dipilih</li>';
 								}
-								if(empty($uraian_renaksi['detail']['kode_cascading_kegiatan'])){
+								if (empty($uraian_renaksi['detail']['kode_cascading_kegiatan'])) {
 									$keterangan .= '<li>Cascading Kegiatan Belum dipilih</li>';
 								}
 								$html .= '
 								<tr class="ur-kegiatan">
 									<td>' . $no . '.' . $no_renaksi . '.' . $no_uraian_renaksi . '</td>
-									<td class="">'.$keterangan.'</td>
+									<td class="">' . $keterangan . '</td>
 									<td class="kiri kanan bawah text_blok kegiatan_utama"></td>
 									<td class="kiri kanan bawah text_blok indikator_kegiatan_utama"></td>
 									<td class="kiri kanan bawah text_blok recana_aksi"></td>
@@ -1528,29 +1531,30 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									", $uraian_teknis_kegiatan['detail']['nip'], $uraian_teknis_kegiatan['detail']['satker_id']));
 
 									if (empty($get_pegawai)) {
-									    $wpdb->update(
-									        'esakip_data_rencana_aksi_opd', array(
-									            'nip' => ''
-									        ), 
-									        array(
-									            'id' => $uraian_teknis_kegiatan['detail']['id']
-									        )
-									    );
-									    $uraian_teknis_kegiatan['detail']['nip'] = '';
+										$wpdb->update(
+											'esakip_data_rencana_aksi_opd',
+											array(
+												'nip' => ''
+											),
+											array(
+												'id' => $uraian_teknis_kegiatan['detail']['id']
+											)
+										);
+										$uraian_teknis_kegiatan['detail']['nip'] = '';
 									}
-									if(empty($uraian_teknis_kegiatan['detail']['satker_id'])){
+									if (empty($uraian_teknis_kegiatan['detail']['satker_id'])) {
 										$keterangan .= '<li>Satuan Kerja Belum Dipilih</li>';
 									}
-									if(empty($uraian_teknis_kegiatan['detail']['nip'])){
+									if (empty($uraian_teknis_kegiatan['detail']['nip'])) {
 										$keterangan .= '<li>Pegawai Pelaksana Belum Dipilih</li>';
 									}
-									if(empty($uraian_teknis_kegiatan['detail']['kode_cascading_sub_kegiatan'])){
+									if (empty($uraian_teknis_kegiatan['detail']['kode_cascading_sub_kegiatan'])) {
 										$keterangan .= '<li>Cascading Sub Kegiatan Belum dipilih</li>';
 									}
 									$html .= '
 									<tr>
 										<td>' . $no . '.' . $no_renaksi . '.' . $no_uraian_renaksi . '.' . $no_uraian_teknis . '</td>
-										<td class="">'.$keterangan.'</td>
+										<td class="">' . $keterangan . '</td>
 										<td class="kegiatan_utama"></td>
 										<td class="indikator_kegiatan_utama"></td>
 										<td class="recana_aksi"></td>
@@ -3754,7 +3758,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								AND active=1
 						", $v['id']), ARRAY_A);
 						$rhk_parent = array();
-						if(!empty($v['parent'])){
+						if (!empty($v['parent'])) {
 							$rhk_parent = $wpdb->get_row($wpdb->prepare("
 								SELECT
 									*
@@ -3941,25 +3945,26 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$search = $wpdb->prepare("AND (kode_akun LIKE %s OR nama_akun LIKE %s)", $search_term, $search_term);
 				}
 
-				$data_akun = $wpdb->get_results($wpdb->prepare("
-					SELECT 
-						id_akun,
-						kode_akun,
-						nama_akun 
-					FROM esakip_data_rekening_akun 
-					WHERE tahun_anggaran = %d
-					  AND kode_akun LIKE '5.%'
-					  AND active = 1
-					$search
-					LIMIT %d, 20
-				", $tahun_anggaran, $page * 20), ARRAY_A);
-
-				$return['sql'] = $wpdb->last_query;
+				$data_akun = $wpdb->get_results(
+					$wpdb->prepare("
+						SELECT 
+							id_akun,
+							kode_akun,
+							nama_akun 
+						FROM esakip_data_rekening_akun 
+						WHERE tahun_anggaran = %d
+						  AND kode_akun LIKE '5.%'
+						  AND active = 1
+						$search
+						LIMIT %d, 20
+					", $tahun_anggaran, $page * 20),
+					ARRAY_A
+				);
 
 				foreach ($data_akun as $key => $value) {
 					$return['results'][] = array(
-						'id' => $value['kode_akun'],
-						'text' => $value['kode_akun'] . ' - ' . $value['nama_akun']
+						'id' 	=> $value['kode_akun'],
+						'text' 	=> $value['kode_akun'] . ' - ' . $value['nama_akun']
 					);
 				}
 
@@ -4330,7 +4335,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		global $wpdb;
 		$ret = array(
 			'status' => 'success',
-			'message' => 'Berhasil mengambil data!',
 			'data' => array()
 		);
 
@@ -4338,24 +4342,27 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 				$satker_id = $_POST['satker_id'];
 
-				// Query to get pegawai based on selected satker_id
-				$get_pegawai = $wpdb->get_results($wpdb->prepare('
-	                SELECT 
-	                    p.id,
-	                    p.nama_pegawai,
-	                    p.nip_baru
-	                FROM esakip_data_pegawai_simpeg AS p
-	                WHERE p.satker_id = %d
-	                ORDER BY p.nama_pegawai ASC
-	            ', $satker_id), ARRAY_A);
+				$data_pegawai = $wpdb->get_results(
+					$wpdb->prepare("
+						SELECT 
+							id,
+							nama_pegawai,
+							nip_baru
+						FROM esakip_data_pegawai_simpeg
+						WHERE satker_id = %d
+						  AND active = 1
+						ORDER BY satker_id ASC, tipe_pegawai_id ASC, nama_pegawai ASC
+					", $satker_id),
+					ARRAY_A
+				);
 
 				$ret['sql'] = $wpdb->last_query;
-				$ret['data'] = array();
-				foreach ($get_pegawai as $pegawai) {
+
+				foreach ($data_pegawai as $value) {
 					$ret['data'][] = array(
-						'id' => $pegawai['id'],
-						'nama' => $pegawai['nip_baru'] . ' | ' . $pegawai['nama_pegawai'],
-						'nip_baru' => $pegawai['nip_baru']
+						'id'        => $value['id'],
+						'nama'      => $value['nip_baru'] . ' | ' . $value['nama_pegawai'],
+						'nip_baru'  => $value['nip_baru']
 					);
 				}
 			} else {
@@ -4364,12 +4371,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			}
 		} else {
 			$ret['status'] = 'error';
-			$ret['message'] = 'Permintaan tidak valid!';
+			$ret['message'] = 'Format tidak valid!';
 		}
 
-		echo json_encode($ret);
-		wp_die();
+		die(json_encode($ret));
 	}
+
 	public function help_rhk()
 	{
 		global $wpdb;
