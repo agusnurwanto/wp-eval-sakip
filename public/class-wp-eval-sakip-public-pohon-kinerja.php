@@ -5952,44 +5952,48 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 	}
 
 	public function get_tujuan_cascading()
-	{
-	    global $wpdb;
-	    $ret = array(
-	        'status' => 'success',
-	        'message' => 'Berhasil mendapatkan data!',
-	        'data' => array()
-	    );
+    {
+        global $wpdb;
+        $ret = array(
+            'status' => 'success',
+            'message' => 'Berhasil mendapatkan data!',
+            'data' => array()
+        );
 
-	    if (!empty($_POST)) {
-	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-	            if (!empty($_POST['id'])) {
-					$id = $_POST['id'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'ID kosong!';
-				}
-	        	$id_skpd = $_POST['id_skpd'];
-				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+        if (!empty($_POST)) {
+            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+                if (!empty($_POST['id'])) {
+                    $id = $_POST['id'];
+                } else {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'ID kosong!';
+                    die(json_encode($ret));
+                }
+                
+                $id_skpd = $_POST['id_skpd'];
+                $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
                 $data = $wpdb->get_row(
                     $wpdb->prepare("
-                    	SELECT 
-                    		* 
-                    	FROM esakip_cascading_opd_tujuan
-                    	WHERE id = %d
+                        SELECT 
+                            * 
+                        FROM esakip_cascading_opd_tujuan
+                        WHERE id = %d
                     ", $id),
                     ARRAY_A
                 );
 
                 if ($data) {
-	                $jabatan = $wpdb->get_row($wpdb->prepare('
-	                	SELECT
-	                		*
-	                	FROM esakip_data_pegawai_cascading
-	                	WHERE jenis_data=1
-	                		AND id_data=%d
-	                ', $id), ARRAY_A);
-	                $ret['jabatan'] = $jabatan;
+                    $jabatan = $wpdb->get_results($wpdb->prepare('
+                        SELECT
+                            *
+                        FROM esakip_data_pegawai_cascading
+                        WHERE jenis_data = 1
+                            AND id_data = %d
+                            AND active = 1
+                    ', $id), ARRAY_A);
+                    
+                    $ret['jabatan'] = $jabatan;
                     $ret['data'] = $data;
                 } else {
                     $ret = array(
@@ -5997,21 +6001,21 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
                         'message' => 'Data tidak ditemukan!'
                     );
                 }
-	        } else {
-	            $ret = array(
-	                'status' => 'error',
-	                'message' => 'API Key tidak sesuai!'
-	            );
-	        }
-	    } else {
-	        $ret = array(
-	            'status' => 'error',
-	            'message' => 'Format tidak sesuai!'
-	        );
-	    }
+            } else {
+                $ret = array(
+                    'status' => 'error',
+                    'message' => 'API Key tidak sesuai!'
+                );
+            }
+        } else {
+            $ret = array(
+                'status' => 'error',
+                'message' => 'Format tidak sesuai!'
+            );
+        }
 
-	    die(json_encode($ret));
-	}
+        die(json_encode($ret));
+    }
 
 	public function get_sasaran_cascading()
 	{
@@ -6042,12 +6046,13 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
                 );
 
                 if ($data) {
-	                $jabatan = $wpdb->get_row($wpdb->prepare('
+	                $jabatan = $wpdb->get_results($wpdb->prepare('
 	                	SELECT
 	                		*
 	                	FROM esakip_data_pegawai_cascading
 	                	WHERE jenis_data=2
 	                		AND id_data=%d
+                            AND active = 1
 	                ', $id), ARRAY_A);
 	                $ret['jabatan'] = $jabatan;
                     $ret['data'] = $data;
@@ -6101,12 +6106,13 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
                 );
 
                 if ($data) {
-	                $jabatan = $wpdb->get_row($wpdb->prepare('
+	                $jabatan = $wpdb->get_results($wpdb->prepare('
 	                	SELECT
 	                		*
 	                	FROM esakip_data_pegawai_cascading
 	                	WHERE jenis_data=3
 	                		AND id_data=%d
+                            AND active = 1
 	                ', $id), ARRAY_A);
 	                $ret['jabatan'] = $jabatan;
                     $ret['data'] = $data;
@@ -6160,12 +6166,13 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
                 );
 
                 if ($data) {
-	                $jabatan = $wpdb->get_row($wpdb->prepare('
+	                $jabatan = $wpdb->get_results($wpdb->prepare('
 	                	SELECT
 	                		*
 	                	FROM esakip_data_pegawai_cascading
 	                	WHERE jenis_data=4
 	                		AND id_data=%d
+                            AND active = 1
 	                ', $id), ARRAY_A);
 	                $ret['jabatan'] = $jabatan;
                     $ret['data'] = $data;
@@ -6219,12 +6226,13 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
                 );
 
                 if ($data) {
-	                $jabatan = $wpdb->get_row($wpdb->prepare('
+	                $jabatan = $wpdb->get_results($wpdb->prepare('
 	                	SELECT
 	                		*
 	                	FROM esakip_data_pegawai_cascading
 	                	WHERE jenis_data=5
 	                		AND id_data=%d
+                            AND active = 1
 	                ', $id), ARRAY_A);
 	                $kegiatan = $wpdb->get_row($wpdb->prepare('
 	                	SELECT
@@ -6319,131 +6327,189 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 	}
 
 
-	public function submit_pegawai_cascading()
-	{
-	    global $wpdb;
-	    $ret = array(
-	        'status' => 'success',
-	        'message' => 'Berhasil simpan data!',
-	        'data' => array()
-	    );
+	public function submit_pegawai_cascading() {
+        global $wpdb;
+        $ret = array(
+            'status' => 'success',
+            'message' => 'Berhasil simpan data!',
+            'data' => array()
+        );
 
-	    if (!empty($_POST)) {
-	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-	            if (empty($_POST['tahun_anggaran'])) {
-	                $ret['status'] = 'error';
-	                $ret['message'] = 'Tahun Anggaran tidak boleh kosong!';
-	            } elseif (empty($_POST['tipe'])) {
-	                $ret['status'] = 'error';
-	                $ret['message'] = 'Tipe tidak boleh kosong!';
-	            } elseif (empty($_POST['id_skpd'])) {
-	                $ret['status'] = 'error';
-	                $ret['message'] = 'ID SKPD tidak boleh kosong!';
-	            } else {
-	                $nama_satker = $_POST['nama_satker'];
-	                $tipe = $_POST['tipe'];
-	                $tahun_anggaran = $_POST['tahun_anggaran'];
-	                $satker_id = $_POST['satker_id'];
-	                $id_skpd = $_POST['id_skpd'];
-	                $id_data = $_POST['id_data'];
+        if (!empty($_POST)) {
+            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+                if (empty($_POST['tahun_anggaran'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Tahun Anggaran tidak boleh kosong!';
+                } elseif (empty($_POST['tipe'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Tipe tidak boleh kosong!';
+                } elseif (empty($_POST['id_skpd'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'ID SKPD tidak boleh kosong!';
+                } elseif (empty($_POST['get_satker']) || !is_array($_POST['get_satker'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data Satker kosong!';
+                } else {
+                    $tipe = $_POST['tipe'];
+                    $tahun_anggaran = $_POST['tahun_anggaran'];
+                    $id_skpd = $_POST['id_skpd'];
+                    $id_data = $_POST['id_data'];
+                    $get_satker = $_POST['get_satker'];
 
-	                if ($tipe == 1) {
-	                    $tujuan_data = $wpdb->get_results(
-	                        $wpdb->prepare("
-	                            SELECT 
-	                                id, 
-	                                tujuan 
-	                            FROM esakip_cascading_opd_tujuan 
-	                            WHERE indikator IS NULL 
-	                                AND tujuan = (
-	                                    SELECT 
-	                                        tujuan 
-	                                    FROM esakip_cascading_opd_tujuan 
-	                                    WHERE id = %d 
-	                                        AND indikator IS NULL
-	                                )
-	                        ", $id_data),
-	                        ARRAY_A
-	                    );
-
-	                    foreach ($tujuan_data as $tujuan) {
-	                        $data = array(
-	                            'id_satker' => $satker_id,
-	                            'nama_satker' => $nama_satker,
-	                            'id_data' => $tujuan['id'],
-	                            'jenis_data' => $tipe,
+                    if($tipe == 1){
+                    	$wpdb->update(
+	                        'esakip_data_pegawai_cascading',
+	                        array('active' => 0),
+	                        array(
 	                            'tahun_anggaran' => $tahun_anggaran,
 	                            'id_skpd' => $id_skpd,
-	                            'active' => 1,
-	                            'update_at' => current_time('mysql')
-	                        );
-
-	                        $cek_id = $wpdb->get_var(
-	                            $wpdb->prepare("
-	                                SELECT 
-	                                    id 
-	                                FROM esakip_data_pegawai_cascading 
-	                                WHERE tahun_anggaran = %d 
-	                                    AND id_skpd = %s 
-	                                    AND jenis_data = %s 
-	                                    AND id_data = %s
-	                            ", $tahun_anggaran, $id_skpd, $tipe, $tujuan['id'])
-	                        );
-
-	                        if (empty($cek_id)) {
-	                            $wpdb->insert('esakip_data_pegawai_cascading', $data);
-	                            $ret['message'] = "Berhasil simpan jabatan";
-	                        } else {
-	                            $wpdb->update('esakip_data_pegawai_cascading', $data, array('id' => $cek_id));
-	                            $ret['message'] = "Berhasil update jabatan";
-	                        }
-	                    }
-	                    $ret['data'] = $tujuan_data;
-	                } else {
-	                    $data = array(
-	                        'id_satker' => $satker_id,
-	                        'nama_satker' => $nama_satker,
-	                        'id_data' => $id_data,
-	                        'jenis_data' => $tipe,
-	                        'tahun_anggaran' => $tahun_anggaran,
-	                        'id_skpd' => $id_skpd,
-	                        'active' => 1,
-	                        'update_at' => current_time('mysql')
+	                            'jenis_data' => $tipe
+	                        )
 	                    );
-
-	                    $cek_id = $wpdb->get_var(
-	                        $wpdb->prepare("
-	                            SELECT 
-	                                id 
-	                            FROM esakip_data_pegawai_cascading 
-	                            WHERE tahun_anggaran = %d 
-	                                AND id_skpd = %s 
-	                                AND jenis_data = %s 
-	                                AND id_data = %s
-	                        ", $tahun_anggaran, $id_skpd, $tipe, $id_data)
+                    }else{
+                    	$wpdb->update(
+	                        'esakip_data_pegawai_cascading',
+	                        array('active' => 0),
+	                        array(
+	                            'tahun_anggaran' => $tahun_anggaran,
+	                            'id_skpd' => $id_skpd,
+	                            'jenis_data' => $tipe,
+	                            'id_data' => $id_data
+	                        )
 	                    );
+                    }
 
-	                    if (empty($cek_id)) {
-	                        $wpdb->insert('esakip_data_pegawai_cascading', $data);
-	                        $ret['message'] = "Berhasil simpan jabatan";
-	                    } else {
-	                        $wpdb->update('esakip_data_pegawai_cascading', $data, array('id' => $cek_id));
-	                        $ret['message'] = "Berhasil update jabatan";
-	                    }
-	                }
-	            }
-	        } else {
-	            $ret['status'] = 'error';
-	            $ret['message'] = 'API Key tidak ditemukan!';
-	        }
-	    } else {
-	        $ret['status'] = 'error';
-	        $ret['message'] = 'Format Salah!';
-	    }
+                    foreach ($get_satker as $satker) {
+                        $satker_id = $satker['satker_id'];
+                        $nama_satker = $satker['nama_satker'];
 
-	    die(json_encode($ret));
-	}
+                        if ($tipe == 1) {
+                            $tujuan_data = $wpdb->get_results(
+                                $wpdb->prepare("
+                                    SELECT 
+                                        id, 
+                                        tujuan 
+                                    FROM esakip_cascading_opd_tujuan 
+                                    WHERE indikator IS NULL 
+                                        AND tujuan = (
+                                            SELECT 
+                                                tujuan 
+                                            FROM esakip_cascading_opd_tujuan 
+                                            WHERE id = %d 
+                                                AND indikator IS NULL)
+                                ", $id_data),
+                                ARRAY_A
+                            );
 
+                            foreach ($tujuan_data as $tujuan) {
+                                $cek_id = $wpdb->get_var(
+                                    $wpdb->prepare("
+                                        SELECT 
+                                            id 
+                                            FROM esakip_data_pegawai_cascading 
+                                            WHERE tahun_anggaran = %d 
+                                                AND id_skpd = %s 
+                                                AND jenis_data = %s 
+                                                AND id_data = %s 
+                                                AND id_satker = %s
+                                    ", $tahun_anggaran, $id_skpd, $tipe, $tujuan['id'], $satker_id)
+                                );
+
+                                if (!empty($cek_id)) {
+                                    $cek_active = $wpdb->get_var(
+                                        $wpdb->prepare("
+                                            SELECT 
+                                                active 
+                                            FROM esakip_data_pegawai_cascading 
+                                            WHERE id = %d
+                                        ", $cek_id)
+                                    );
+
+                                    if ($cek_active == 0) {
+                                        $wpdb->update(
+                                            'esakip_data_pegawai_cascading',
+                                            array('active' => 1, 'update_at' => current_time('mysql')),
+                                            array('id' => $cek_id)
+                                        );
+                                        $ret['message'] = "Berhasil update data satker.";
+                                    }
+                                } else {
+                                    $data = array(
+                                        'id_satker' => $satker_id,
+                                        'nama_satker' => $nama_satker,
+                                        'id_data' => $tujuan['id'],
+                                        'jenis_data' => $tipe,
+                                        'tahun_anggaran' => $tahun_anggaran,
+                                        'id_skpd' => $id_skpd,
+                                        'active' => 1,
+                                        'update_at' => current_time('mysql')
+                                    );
+
+                                    $wpdb->insert('esakip_data_pegawai_cascading', $data);
+                                    $ret['message'] = "Berhasil menyimpan data satker.";
+                                }
+                            }
+                        } else {
+                            $cek_id = $wpdb->get_var(
+                                $wpdb->prepare("
+                                    SELECT 
+                                        id 
+                                    FROM esakip_data_pegawai_cascading 
+                                    WHERE tahun_anggaran = %d 
+                                        AND id_skpd = %s 
+                                        AND jenis_data = %s 
+                                        AND id_data = %s 
+                                        AND id_satker = %s
+                                ", $tahun_anggaran, $id_skpd, $tipe, $id_data, $satker_id)
+                            );
+
+                            if (!empty($cek_id)) {
+                                $cek_active = $wpdb->get_var(
+                                    $wpdb->prepare("
+                                        SELECT 
+                                            active 
+                                        FROM esakip_data_pegawai_cascading 
+                                        WHERE id = %d
+                                    ", $cek_id)
+                                );
+
+                                if ($cek_active == 0) {
+                                    $wpdb->update(
+                                        'esakip_data_pegawai_cascading',
+                                        array('active' => 1, 'update_at' => current_time('mysql')),
+                                        array('id' => $cek_id)
+                                    );
+                                    $ret['message'] = "Berhasil update data satker.";
+                                }
+                            } else {
+                                $data = array(
+                                    'id_satker' => $satker_id,
+                                    'nama_satker' => $nama_satker,
+                                    'id_data' => $id_data,
+                                    'jenis_data' => $tipe,
+                                    'tahun_anggaran' => $tahun_anggaran,
+                                    'id_skpd' => $id_skpd,
+                                    'active' => 1,
+                                    'update_at' => current_time('mysql')
+                                );
+
+                                $wpdb->insert('esakip_data_pegawai_cascading', $data);
+                                $ret['message'] = "Berhasil menyimpan data satker.";
+                            }
+                        }
+                    }
+                }
+            } else {
+                $ret['status'] = 'error';
+                $ret['message'] = 'API Key tidak ditemukan!';
+            }
+        } else {
+            $ret['status'] = 'error';
+            $ret['message'] = 'Format Salah!';
+        }
+
+        die(json_encode($ret));
+    }
 
 	function get_cascading_pd_from_renstra(){
 		global $wpdb;

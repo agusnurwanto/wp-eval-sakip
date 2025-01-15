@@ -6,8 +6,8 @@ if (!defined('WPINC')) {
 }
 
 $input = shortcode_atts(array(
-	'tahun' => '2024',
-	'periode' => '1'
+    'tahun' => '2024',
+    'periode' => '1'
 ), $atts);
 
 if (!empty($_GET) && !empty($_GET['id_periode'])) {
@@ -22,10 +22,10 @@ $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
 //jadwal renstra wpsipd
 $api_params = array(
-	'action' => 'get_data_jadwal_wpsipd',
-	'api_key'	=> get_option('_crb_apikey_wpsipd'),
-	'tipe_perencanaan' => 'monev_renstra',
-	'id_jadwal' => $input['periode']
+    'action' => 'get_data_jadwal_wpsipd',
+    'api_key'   => get_option('_crb_apikey_wpsipd'),
+    'tipe_perencanaan' => 'monev_renstra',
+    'id_jadwal' => $input['periode']
 );
 
 $response = wp_remote_post(get_option('_crb_url_server_sakip'), array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
@@ -37,15 +37,15 @@ if(
     empty($response)
     || empty($data_jadwal_wpsipd)
 ){
-	die('<h1 class="text-center">Jadwal periode WP-SIPD tidak ditemukan!</h1>');
+    die('<h1 class="text-center">Jadwal periode WP-SIPD tidak ditemukan!</h1>');
 }else if(empty($id_skpd)){
-	die('<h1 class="text-center">ID OPD tidak boleh kosong!</h1>');
+    die('<h1 class="text-center">ID OPD tidak boleh kosong!</h1>');
 }
 
 if (!empty($data_jadwal_wpsipd['data'][0]['tahun_akhir_anggaran']) && $data_jadwal_wpsipd['data'][0]['tahun_akhir_anggaran'] > 1) {
-	$tahun_anggaran_selesai = $data_jadwal_wpsipd['data'][0]['tahun_akhir_anggaran'];
+    $tahun_anggaran_selesai = $data_jadwal_wpsipd['data'][0]['tahun_akhir_anggaran'];
 } else {
-	$tahun_anggaran_selesai = $data_jadwal_wpsipd['data'][0]['tahun_anggaran'] + $data_jadwal_wpsipd['data'][0]['lama_pelaksanaan'];
+    $tahun_anggaran_selesai = $data_jadwal_wpsipd['data'][0]['tahun_anggaran'] + $data_jadwal_wpsipd['data'][0]['lama_pelaksanaan'];
 }
 
 $skpd = $wpdb->get_row(
@@ -366,7 +366,7 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                     </div>
                     <div id="daftar_jabatan" class="form-group">
                         <label for="satker_id">Pilih Satuan Kerja</label>
-                        <select class="form-control select2" id="satker_id" name="satker_id"></select>
+                        <select multiple class="form-control select2" id="satker_id" name="satker_id"></select>
                     </div>
                     <div style="text-align: right;">
                         <button type="submit" class="btn btn-primary" onclick="submit_pegawai_cascading(this); return false;">Simpan</button>
@@ -583,7 +583,7 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                 if (response.status === 'success') {
                     jQuery('#id_data').val(response.data.id);
                     jQuery('#modalUpload').modal('show');
-                    jQuery('#tujuan_cascading').val(tujuan); 
+                    jQuery('#tujuan_cascading').val(tujuan);
                     jQuery('label[for="sasaran_cascading"]').hide();
                     jQuery('#sasaran_cascading').hide();
                     jQuery('label[for="program_cascading"]').hide();
@@ -592,12 +592,14 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                     jQuery('#kegiatan_cascading').hide();
                     jQuery('label[for="sub_giat_cascading"]').hide();
                     jQuery('#sub_giat_cascading').hide();
-                    if(response.jabatan && response.jabatan.id_satker){
-                        jQuery('#satker_id').html('<option value="'+response.jabatan.id_satker+'">'+response.jabatan.nama_satker+'</option>').trigger('change');
-                    }else{
-                        jQuery('#satker_id').html('<option value=""></option>').trigger('change');
-                    }
                     jQuery('#tipe').val(1);
+                    jQuery("#satker_id").empty();
+                    response.jabatan.map(function(b) {
+                        var myText = b.nama_satker;
+                        var option = new Option(myText, b.satker_id, true, true);
+                        jQuery("#satker_id").append(option);
+                    });
+                    jQuery("#satker_id").trigger('change');
                 } else {
                     alert(response.message);
                 }
@@ -609,6 +611,7 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
             }
         });
     }
+
     function get_sasaran_cascading(button, id, sasaran, tujuan) {
         jQuery('#wrap-loading').show();
 
@@ -637,11 +640,13 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                     jQuery('label[for="sub_giat_cascading"]').hide();
                     jQuery('#sub_giat_cascading').hide();
                     jQuery('#tipe').val(2);
-                    if(response.jabatan && response.jabatan.id_satker){
-                        jQuery('#satker_id').html('<option value="'+response.jabatan.id_satker+'">'+response.jabatan.nama_satker+'</option>').trigger('change');
-                    }else{
-                        jQuery('#satker_id').html('<option value=""></option>').trigger('change');
-                    }
+                    jQuery("#satker_id").empty();
+                    response.jabatan.map(function(b) {
+                        var myText = b.nama_satker;
+                        var option = new Option(myText, b.satker_id, true, true);
+                        jQuery("#satker_id").append(option);
+                    });
+                    jQuery("#satker_id").trigger('change');
                 } else {
                     alert(response.message);
                 }
@@ -683,11 +688,13 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                     jQuery('label[for="sub_giat_cascading"]').hide();
                     jQuery('#sub_giat_cascading').hide();
                     jQuery('#tipe').val(3);
-                    if(response.jabatan && response.jabatan.id_satker){
-                        jQuery('#satker_id').html('<option value="'+response.jabatan.id_satker+'">'+response.jabatan.nama_satker+'</option>').trigger('change');
-                    }else{
-                        jQuery('#satker_id').html('<option value=""></option>').trigger('change');
-                    }
+                    jQuery("#satker_id").empty();
+                    response.jabatan.map(function(b) {
+                        var myText = b.nama_satker;
+                        var option = new Option(myText, b.satker_id, true, true);
+                        jQuery("#satker_id").append(option);
+                    });
+                    jQuery("#satker_id").trigger('change');
                 } else {
                     alert(response.message);
                 }
@@ -731,11 +738,13 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                     jQuery('label[for="sub_giat_cascading"]').hide();
                     jQuery('#sub_giat_cascading').hide();
                     jQuery('#tipe').val(4);
-                    if(response.jabatan && response.jabatan.id_satker){
-                        jQuery('#satker_id').html('<option value="'+response.jabatan.id_satker+'">'+response.jabatan.nama_satker+'</option>').trigger('change');
-                    }else{
-                        jQuery('#satker_id').html('<option value=""></option>').trigger('change');
-                    }
+                    jQuery("#satker_id").empty();
+                    response.jabatan.map(function(b) {
+                        var myText = b.nama_satker;
+                        var option = new Option(myText, b.satker_id, true, true);
+                        jQuery("#satker_id").append(option);
+                    });
+                    jQuery("#satker_id").trigger('change');
                 } else {
                     alert(response.message);
                 }
@@ -781,11 +790,13 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                     jQuery('label[for="sub_giat_cascading"]').show();
                     jQuery('#sub_giat_cascading').show();
                     jQuery('#tipe').val(5);
-                    if(response.jabatan && response.jabatan.id_satker){
-                        jQuery('#satker_id').html('<option value="'+response.jabatan.id_satker+'">'+response.jabatan.nama_satker+'</option>').trigger('change');
-                    }else{
-                        jQuery('#satker_id').html('<option value=""></option>').trigger('change');
-                    }
+                    jQuery("#satker_id").empty();
+                    response.jabatan.map(function(b) {
+                        var myText = b.nama_satker;
+                        var option = new Option(myText, b.satker_id, true, true);
+                        jQuery("#satker_id").append(option);
+                    });
+                    jQuery("#satker_id").trigger('change');
                 } else {
                     alert(response.message);
                 }
@@ -809,7 +820,10 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
         if (satker_id == '') {
             return alert('ID Satker tidak boleh kosong');
         }
-        let nama_satker = jQuery('#satker_id').select2('data')[0].nama;
+
+        let satker_data = jQuery('#satker_id').select2('data');
+        let get_satker = satker_data.map(item => ({ satker_id: item.id, nama_satker: item.nama }));
+
         jQuery.ajax({
             url: esakip.url,
             type: "post",
@@ -820,8 +834,7 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                 id_skpd: <?php echo $id_skpd; ?>,
                 id_data: id_data,
                 tipe: tipe,
-                satker_id: satker_id,
-                nama_satker: nama_satker
+                get_satker: get_satker
             },
             dataType: "json",
             success: function(res) {
@@ -829,6 +842,7 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                 alert(res.message);
                 if (res.status === 'success') {
                     jQuery('#modalUpload').modal('hide');
+                    location.reload();
                 }
             },
             error: function(xhr, status, error) {
@@ -838,5 +852,6 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
             }
         });
     }
+
 
 </script>
