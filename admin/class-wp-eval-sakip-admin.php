@@ -1368,6 +1368,23 @@ class Wp_Eval_Sakip_Admin
 					->set_value_type('url'),
 				Field::make('text', 'crb_kepala_daerah', 'Kepala Daerah')
 					->set_help_text('Wajib diisi.'),
+				Field::make('select', 'crb_status_jabatan_kepala_daerah', 'Status Jabatan Kepala Daerah')
+				->add_options(array(
+					'Gubernur' => 'Gubernur',
+					'Bupati' => 'Bupati',
+					'Walikota' => 'Walikota',
+					'Pj Gubernur' => 'Pj Gubernur',
+					'Plt Gubernur' => 'Plt Gubernur',
+					'Plh Gubernur' => 'Plh Gubernur',
+					'Pj Bupati' => 'Pj Bupati',
+					'Plt Bupati' => 'Plt Bupati',
+					'Plh Bupati' => 'Plh Bupati',
+					'Pj Walikota' => 'Pj Walikota',
+					'Plt Walikota' => 'Plt Walikota',
+					'Plh Walikota' => 'Plh Walikota'
+				))
+				->set_default_value('Bupati')
+				->set_help_text('Wajib diisi. Untuk kerpeluan status jabatan kepala daerah.'),
 				Field::make('radio', 'crb_api_simpeg_status', 'Status API Kepegawaian')
 					->add_options(array(
 						'0' => __('Dikunci'),

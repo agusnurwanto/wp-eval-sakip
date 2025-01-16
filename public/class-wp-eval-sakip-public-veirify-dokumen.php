@@ -2005,9 +2005,10 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                                     ON s.satker_id = p.satker_id
                                     WHERE
                                         p.satker_id LIKE %s AND
-                                        p.active=%d
-                                        ORDER BY p.satker_id,p.tipe_pegawai_id,p.nama_pegawai",
-                                        $satker_id.'%',1), ARRAY_A);
+                                        p.active=%d AND
+                                        s.tahun_anggaran=%d
+                                        ORDER BY p.satker_id, p.tipe_pegawai_id, p.berakhir DESC, p.nama_pegawai",
+                                        $satker_id.'%',1,$tahun_anggaran), ARRAY_A);
                             
                             if(!empty($data_pegawai)){
                                 foreach ($data_pegawai as $v_1) {

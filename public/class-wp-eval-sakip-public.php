@@ -28308,29 +28308,53 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							trim($data['nip_baru'])
 						));
 
+					$opsi_data_pegawai = array(
+						'nama_pegawai' => $data['nama_pegawai'],
+						'satker_id' => $data['satker_id'],
+						'jabatan' => $data['jabatan'],
+						'tipe_pegawai' => $data['tipe_pegawai'],
+						'tipe_pegawai_id' => $data['tipe_pegawai_id'],
+						'active' => 1,
+					);
+
+					$date_hari_ini = date('Y-m-d H:i:s');
+
+					if(!empty($data['plt_plh'])){
+						$opsi_data_pegawai['plt_plh'] = $data['plt_plh'];
+
+						// Membuat objek DateTime dari string ISO 8601
+						$date_tmt = new DateTime($data['tmt_sk_plth']);
+						$date_berakhir = new DateTime($data['berakhir']);
+
+						// Mengubah format menjadi 'Y-m-d H:i:s'
+						$format_baru_tmt = $date_tmt->format('Y-m-d H:i:s');
+						$format_baru_berakhir = $date_berakhir->format('Y-m-d H:i:s');
+
+						$opsi_data_pegawai['tmt_sk_plth'] = !empty($data['tmt_sk_plth']) ? $format_baru_tmt : NULL;
+						$opsi_data_pegawai['berakhir'] = !empty($data['berakhir']) ? $format_baru_berakhir : NULL;
+					}else{
+						$opsi_data_pegawai['plt_plh'] = NULL;
+						$opsi_data_pegawai['tmt_sk_plth'] = NULL;
+						$opsi_data_pegawai['berakhir'] = NULL;
+					}
+
 					if(!empty($exists)){
-						$wpdb->update($table, [
-							'nama_pegawai' => $data['nama_pegawai'],
-							'satker_id' => $data['satker_id'],
-							'jabatan' => $data['jabatan'],
-							'update_at' => current_time('mysql'),
-							'tipe_pegawai' => $data['tipe_pegawai'],
-							'tipe_pegawai_id' => $data['tipe_pegawai_id'],
-							'active' => 1
-						], [
+						$opsi_data_pegawai['update_at'] = current_time('mysql');
+
+						/**Jika masa PJ/PLT telah selesai,lewati karena inputan awal yang dipakai */
+						if(!empty($data['plt_plh']) && $date_hari_ini > $opsi_data_pegawai['berakhir']){
+							continue;
+						}
+
+						$wpdb->update($table, 
+							$opsi_data_pegawai, [
 							'id' => $exists
 						]);
 					}else{
-						$wpdb->insert($table, [
-							'nip_baru' => $data['nip_baru'],
-							'nama_pegawai' => $data['nama_pegawai'],
-							'satker_id' => $data['satker_id'],
-							'jabatan' => $data['jabatan'],
-							'tipe_pegawai' => $data['tipe_pegawai'],
-							'tipe_pegawai_id' => $data['tipe_pegawai_id'],
-							'active' => 1,
-							'created_at' => current_time('mysql'),
-						]);
+						$opsi_data_pegawai['nip_baru'] = $data['nip_baru'];
+						$opsi_data_pegawai['created_at'] = current_time('mysql');
+						$wpdb->insert($table, 
+							$opsi_data_pegawai);
 					}
 				}
 
