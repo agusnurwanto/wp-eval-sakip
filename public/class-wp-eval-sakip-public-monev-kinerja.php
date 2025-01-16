@@ -630,6 +630,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		                	FROM esakip_data_satker_simpeg
 		                	WHERE satker_id = %d		                		
 		                ', $ret['data']['satker_id']), ARRAY_A);
+		                // print_r($ret['data']['jabatan']);die($wpdb->last_query);
 						$ret['data']['pegawai'] = $wpdb->get_row($wpdb->prepare('
 		                	SELECT
 		                		*
@@ -882,7 +883,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 						$ret['total_pagu_setelah_perubahan'] = $total_pagu_renaksi;
 
-						if ($total_pagu_renaksi > $_POST['rencana_pagu_tk']) {
+						if (!empty($_POST['rencana_pagu_tk']) && ($total_pagu_renaksi > $_POST['rencana_pagu_tk'])) {
 							$ret['status'] = 'error';
 							$ret['message'] = 'Total rencana pagu tidak boleh melebihi 100% atau total pagu.';
 						}

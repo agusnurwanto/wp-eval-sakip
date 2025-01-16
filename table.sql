@@ -1668,3 +1668,17 @@ CREATE TABLE `esakip_data_satuan` (
   `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 );
+
+CREATE TABLE `esakip_data_pokin_rhk_opd` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_rhk_opd` int(11) DEFAULT null,
+  `level_rhk_opd` int(11) DEFAULT null COMMENT '1 = Kegiatan Utama, 2 = Rencana Hasil Kerja, 3 = Uraian Kegiatan, 4 = Uraian Teknis Kegiatan',
+  `id_pokin` int(11) DEFAULT null,
+  `level_pokin` int(11) DEFAULT null,
+  `tahun_anggaran` year(4) DEFAULT NULL,
+  `id_skpd` int(11) NOT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+);

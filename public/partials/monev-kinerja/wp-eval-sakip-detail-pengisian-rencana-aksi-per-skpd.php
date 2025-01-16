@@ -139,6 +139,43 @@ if (!empty($renaksi_pemda)) {
     }
 }
 $set_renaksi = get_option('_crb_input_renaksi');
+$get_mapping = $wpdb->get_var($wpdb->prepare('
+    SELECT 
+        u.id_satker_simpeg
+    FROM esakip_data_mapping_unit_sipd_simpeg AS u
+    WHERE u.tahun_anggaran = %d
+        AND u.id_skpd = %d
+        AND u.active = 1
+', $tahun_anggaran_sakip, $id_skpd));
+if(empty($get_mapping)){
+    $ret['message'] = 'ID Satker SIMPEG belum dimapping dengan ID SKPD!';
+}
+
+$get_satker = $wpdb->get_results($wpdb->prepare('
+    SELECT 
+        s.id,
+        s.satker_id,
+        s.active,
+        s.nama
+    FROM esakip_data_satker_simpeg AS s
+    WHERE s.satker_id like %s
+    ORDER BY satker_id ASC
+', $get_mapping.'%'), ARRAY_A);
+$select_satker = '<option value="">Pilih Satuan Kerja</option>';
+foreach($get_satker as $satker){
+    $select_satker .= '<option value="'.$satker['satker_id'].'">'.$satker['satker_id'].' | '.$satker['nama'].'</option>';
+}
+$get_pegawai = $wpdb->get_results($wpdb->prepare('
+    SELECT 
+        p.*
+    FROM esakip_data_pegawai_simpeg AS p
+    WHERE p.satker_id like %s
+    ORDER BY satker_id ASC
+', $get_mapping.'%'), ARRAY_A);
+$select_pegawai = '<option value="">Pilih Pegawai Pelaksana</option>';
+foreach($get_pegawai as $pegawai){
+    $select_pegawai .= '<option value="'.$pegawai['nip_baru'].'">'.$pegawai['nip_baru'].' '.$pegawai['nama_pegawai'].'</option>';
+}
 ?>
 <style type="text/css">
     .wrap-table {
@@ -662,6 +699,7 @@ $set_renaksi = get_option('_crb_input_renaksi');
                             res.data.map(function(value, index) {
                                 html += '<option value="' + value.id + '">' + value.label + '</option>';
                             });
+                            var get_pegawai = <?php echo json_encode($select_pegawai); ?>;
                             jQuery('#wrap-loading').hide();
                             jQuery("#modal-crud").find('.modal-title').html('Tambah Rencana Hasil Kerja');
                             jQuery("#modal-crud").find('.modal-body').html('' +
@@ -686,17 +724,15 @@ $set_renaksi = get_option('_crb_input_renaksi');
                                 `<select class="form-control" name="cascading-renstra" id="cascading-renstra">` +
                                 `</select>` +
                                 `</div>` +
-                                `<div class="form-group">` +
-                                `<label for="satker_id">Pilih Satuan Kerja</label>` +
-                                `<select class="form-control select2" id="satker_id" name="satker_id" onchange="get_pegawai_rhk();">` +
-                                `</select>` +
-                                `</div>` +
-                                `<div class="form-group">` +
-                                `<label for="pegawai">Pilih Pegawai Pelaksana</label>` +
-                                `<select class="form-control select2" id="pegawai" name="pegawai">` +
-                                `</select>` +
-                                `</div>` +
-                                `</form>`);
+                                + `<div class="form-group">`
+                                    + `<label for="satker_id">Pilih Satuan Kerja</label>`
+                                    + `<select class="form-control select2" id="satker_id" name="satker_id"><?php echo $select_satker; ?></select>`
+                                + `</div>`
+                                + `<div class="form-group">`
+                                    + `<label for="pegawai">Pilih Pegawai Pelaksana</label>`
+                                    + `<select class="form-control select2" id="pegawai" name="pegawai">${get_pegawai}</select>`
+                                + `</div>`
+                                +`</form>`);
                             jQuery("#modal-crud").find('.modal-footer').html('' +
                                 '<button type="button" class="btn btn-danger" data-dismiss="modal">' +
                                 'Tutup' +
@@ -714,62 +750,11 @@ $set_renaksi = get_option('_crb_input_renaksi');
                                 width: '100%',
                                 placeholder: "Pilih Pokin Level 2"
                             }).place;
-                            jQuery("#satker_id").select2({
-                                ajax: {
-                                    url: esakip.url,
-                                    type: 'POST',
-                                    dataType: 'json',
-                                    delay: 250,
-                                    data: function(params) {
-                                        return {
-                                            action: 'get_jabatan_cascading',
-                                            api_key: esakip.api_key,
-                                            id_skpd: <?php echo $id_skpd; ?>,
-                                            type: 'search',
-                                            q: params.term,
-                                        };
-                                    },
-                                    processResults: function(data, params) {
-                                        params.page = params.page || 1;
-
-                                        return {
-                                            results: data.data,
-                                            pagination: {
-                                                more: (params.page * 30) < data.total_count
-                                            }
-                                        };
-                                    },
-                                    cache: true
-                                },
-                                placeholder: 'Cari satuan kerja / jabatan',
-                                minimumInputLength: 5,
-                                templateResult: function(response) {
-                                    if (response.loading) {
-                                        return response.text;
-                                    }
-
-                                    var $container = jQuery(
-                                        "<div class='select2-result-repository clearfix'>" +
-                                        "<div class='select2-result-repository__meta'>" +
-                                        "<div class='select2-result-repository__title'></div>" +
-                                        "</div>" +
-                                        "</div>"
-                                    );
-
-                                    $container.find(".select2-result-repository__title").text(response.nama);
-
-                                    return $container;
-                                },
-                                templateSelection: function(response) {
-                                    return response.nama || response.text;
-                                },
-                                'width': '100%',
-                                dropdownParent: jQuery('#modal-crud')
+                            jQuery('#satker_id').select2({
+                                width: '100%'
                             });
-                            jQuery("#pegawai").select2({
-                                placeholder: 'Pilih pegawai pelaksana',
-                                width: '100%',
-                                dropdownParent: jQuery('#modal-crud'),
+                            jQuery('#pegawai').select2({
+                                width: '100%'
                             });
                             var key = 'sasaran' + '-' + 'x.xx';
                             if (data_sasaran_cascading[key] != undefined) {
@@ -948,16 +933,8 @@ $set_renaksi = get_option('_crb_input_renaksi');
                             jQuery('#pokin-level-1').val(response.data.id_pokin_1).trigger('change');
                             jQuery('#label_renaksi').val(response.data.label);
                             jQuery('#cascading-renstra').val(response.data.kode_cascading_sasaran).trigger('change');
-                            if (response.data.jabatan && response.data.jabatan.satker_id) {
-                                jQuery('#satker_id').html('<option value="' + response.data.jabatan.satker_id + '">' + response.data.jabatan.satker_id + ' | ' + response.data.jabatan.nama + '</option>').trigger('change');
-                            } else {
-                                jQuery('#satker_id').html('<option value=""></option>').trigger('change');
-                            }
-                            if (response.data.pegawai && response.data.pegawai.nip_baru) {
-                                jQuery('#pegawai').html('<option value="' + response.data.pegawai.nip_baru + '">' + response.data.pegawai.nip_baru + ' | ' + response.data.pegawai.nama_pegawai + '</option>').trigger('change');
-                            } else {
-                                jQuery('#pegawai').html('<option value=""></option>').trigger('change');
-                            }
+                            jQuery('#satker_id').val(response.data.jabatan.satker_id).trigger('change');
+                            jQuery('#pegawai').val(response.data.pegawai.nip_baru).trigger('change');
                         }
                     }
                 });
@@ -988,18 +965,8 @@ $set_renaksi = get_option('_crb_input_renaksi');
                                 jQuery('#label_renaksi_opd_').val(response.data.label_renaksi_opd_);
                                 jQuery('#label_uraian_kegiatan').val(response.data.label_uraian_kegiatan);
                                 jQuery('#label_indikator_uraian_kegiatan').val(response.data.label_indikator_uraian_kegiatan);
-
-                                if (response.data.jabatan && response.data.jabatan.satker_id) {
-                                    jQuery('#satker_id').html('<option value="' + response.data.jabatan.satker_id + '">' + response.data.jabatan.satker_id + ' | ' + response.data.jabatan.nama + '</option>').trigger('change');
-                                } else {
-                                    jQuery('#satker_id').html('<option value=""></option>').trigger('change');
-                                }
-
-                                if (response.data.pegawai && response.data.pegawai.nip_baru) {
-                                    jQuery('#pegawai').html('<option value="' + response.data.pegawai.nip_baru + '">' + response.data.pegawai.nip_baru + ' | ' + response.data.pegawai.nama_pegawai + '</option>').trigger('change');
-                                } else {
-                                    jQuery('#pegawai').html('<option value=""></option>').trigger('change');
-                                }
+                                jQuery('#satker_id').val(response.data.jabatan.satker_id).trigger('change');
+                                jQuery('#pegawai').val(response.data.pegawai.nip_baru).trigger('change');
                                 var renaksi_pemda = "";
                                 response.data.renaksi_pemda.map(function(b, i) {
                                     renaksi_pemda += `
@@ -1056,31 +1023,15 @@ $set_renaksi = get_option('_crb_input_renaksi');
                                 jQuery('#pokin-level-2').attr('val-id', response.data.id_pokin_5);
                                 jQuery('#pokin-level-1').val(response.data.id_pokin_4).trigger('change');
                                 jQuery('#cascading-renstra').val(response.data.kode_cascading_kegiatan).trigger('change');
-                                if (response.data.jabatan && response.data.jabatan.satker_id) {
-                                    jQuery('#satker_id').html('<option value="' + response.data.jabatan.satker_id + '">' + response.data.jabatan.satker_id + ' | ' + response.data.jabatan.nama + '</option>').trigger('change');
-                                } else {
-                                    jQuery('#satker_id').html('<option value=""></option>').trigger('change');
-                                }
-                                if (response.data.pegawai && response.data.pegawai.nip_baru) {
-                                    jQuery('#pegawai').html('<option value="' + response.data.pegawai.nip_baru + '">' + response.data.pegawai.nip_baru + ' | ' + response.data.pegawai.nama_pegawai + '</option>').trigger('change');
-                                } else {
-                                    jQuery('#pegawai').html('<option value=""></option>').trigger('change');
-                                }
+                                jQuery('#satker_id').val(response.data.jabatan.satker_id).trigger('change');
+                                jQuery('#pegawai').val(response.data.pegawai.nip_baru).trigger('change');
                             } else if (tipe == 4) {
                                 jQuery("#modal-crud").find('.modal-title').html('Edit Uraian Teknis Kegiatan');
                                 jQuery('#pokin-level-2').attr('val-id', response.data.id_pokin_5);
                                 jQuery('#pokin-level-1').val(response.data.id_pokin_5).trigger('change');
                                 jQuery('#cascading-renstra').val(response.data.kode_cascading_sub_kegiatan).trigger('change');
-                                if (response.data.jabatan && response.data.jabatan.satker_id) {
-                                    jQuery('#satker_id').html('<option value="' + response.data.jabatan.satker_id + '">' + response.data.jabatan.satker_id + ' | ' + response.data.jabatan.nama + '</option>').trigger('change');
-                                } else {
-                                    jQuery('#satker_id').html('<option value=""></option>').trigger('change');
-                                }
-                                if (response.data.pegawai && response.data.pegawai.nip_baru) {
-                                    jQuery('#pegawai').html('<option value="' + response.data.pegawai.nip_baru + '">' + response.data.pegawai.nip_baru + ' | ' + response.data.pegawai.nama_pegawai + '</option>').trigger('change');
-                                } else {
-                                    jQuery('#pegawai').html('<option value=""></option>').trigger('change');
-                                }
+                                jQuery('#satker_id').val(response.data.jabatan.satker_id).trigger('change');
+                                jQuery('#pegawai').val(response.data.pegawai.nip_baru).trigger('change');
                                 var checklist_dasar_pelaksanaan = `
                                 <div class="form-group">
                                     <label>Pilih Dasar Pelaksanaan</label>
@@ -2291,7 +2242,7 @@ $set_renaksi = get_option('_crb_input_renaksi');
                         parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
                         data_cascading = data_sub_kegiatan_cascading[key];
                     }
-                    if (!isEdit && tipe === 4 && get_renaksi_pemda.length > 0) {
+                    if (!isEdit && tipe === 4) {
                         checklist_dasar_pelaksanaan = `
                     <div class="form-group">
                         <label>Pilih Dasar Pelaksanaan</label>
@@ -2358,8 +2309,8 @@ $set_renaksi = get_option('_crb_input_renaksi');
                                 });
                             } else {
                                 alert("Data Pokin Kosong atau Tidak Sesuai!");
-                            }
-
+                            }                        
+                            var get_pegawai = <?php echo json_encode($select_pegawai); ?>;
                             jQuery('#wrap-loading').hide();
                             jQuery("#modal-crud").find('.modal-title').html('Tambah ' + title);
 
@@ -2379,20 +2330,20 @@ $set_renaksi = get_option('_crb_input_renaksi');
                                         <label for="sasaran-cascading">Pilih ${jenis_cascading} Cascading</label>
                                         <select class="form-control" name="cascading-renstra" id="cascading-renstra"></select>
                                     </div>
-                                    <?php if (!empty($renaksi_pemda)): ?>
-                                        ${checklist_renaksi_pemda}  
-                                    <?php endif; ?>
-                                    ${checklist_dasar_pelaksanaan}  
                                     <div class="form-group"> 
                                         <label for="satker_id">Pilih Satuan Kerja</label> 
-                                            <select class="form-control select2" id="satker_id" name="satker_id" onchange="get_pegawai_rhk();"> 
+                                            <select class="form-control select2" id="satker_id" name="satker_id"><?php echo $select_satker; ?> 
                                             </select> 
                                     </div> 
                                     <div class="form-group"> 
                                         <label for="pegawai">Pilih Pegawai Pelaksana</label> 
-                                            <select class="form-control select2" id="pegawai" name="pegawai"> 
+                                            <select class="form-control select2" id="pegawai" name="pegawai"> ${get_pegawai}
                                             </select> 
                                     </div> 
+                                    <?php if (!empty($renaksi_pemda)): ?>
+                                        ${checklist_renaksi_pemda}  
+                                    <?php endif; ?>
+                                    ${checklist_dasar_pelaksanaan}  
                                 </form>
                             `);
 
@@ -2419,63 +2370,11 @@ $set_renaksi = get_option('_crb_input_renaksi');
                                     width: '100%'
                                 });
                             }
-
-                            jQuery("#satker_id").select2({
-                                ajax: {
-                                    url: esakip.url,
-                                    type: 'POST',
-                                    dataType: 'json',
-                                    delay: 250,
-                                    data: function(params) {
-                                        return {
-                                            action: 'get_jabatan_cascading',
-                                            api_key: esakip.api_key,
-                                            id_skpd: <?php echo $id_skpd; ?>,
-                                            type: 'search',
-                                            q: params.term,
-                                        };
-                                    },
-                                    processResults: function(data, params) {
-                                        params.page = params.page || 1;
-
-                                        return {
-                                            results: data.data,
-                                            pagination: {
-                                                more: (params.page * 30) < data.total_count
-                                            }
-                                        };
-                                    },
-                                    cache: true
-                                },
-                                placeholder: 'Cari satuan kerja / jabatan',
-                                minimumInputLength: 5,
-                                templateResult: function(response) {
-                                    if (response.loading) {
-                                        return response.text;
-                                    }
-
-                                    var $container = jQuery(
-                                        "<div class='select2-result-repository clearfix'>" +
-                                        "<div class='select2-result-repository__meta'>" +
-                                        "<div class='select2-result-repository__title'></div>" +
-                                        "</div>" +
-                                        "</div>"
-                                    );
-
-                                    $container.find(".select2-result-repository__title").text(response.nama);
-
-                                    return $container;
-                                },
-                                templateSelection: function(response) {
-                                    return response.nama || response.text;
-                                },
-                                'width': '100%',
-                                dropdownParent: jQuery('#modal-crud')
+                            jQuery('#satker_id').select2({
+                                width: '100%'
                             });
-                            jQuery("#pegawai").select2({
-                                placeholder: 'Pilih pegawai pelaksana',
-                                width: '100%',
-                                dropdownParent: jQuery('#modal-crud'),
+                            jQuery('#pegawai').select2({
+                                width: '100%'
                             });
                             if (data_cascading && Array.isArray(data_cascading.data)) {
                                 let html_cascading = '<option value="">Pilih ' + jenis_cascading + ' Cascading</option>';
