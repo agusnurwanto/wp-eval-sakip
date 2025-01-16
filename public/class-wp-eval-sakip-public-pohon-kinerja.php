@@ -6905,7 +6905,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
                     j.tahun_selesai_anggaran,
                     r.id_jadwal_rpjmd
                 FROM esakip_data_jadwal j
-                INNER JOIN esakip_pengaturan_rencana_aksi r
+                INNER JOIN esakip_pengaturan_upload_dokumen r
                     ON r.id_jadwal_rpjmd = j.id
                 WHERE j.tipe = %s
                   AND j.status = %d

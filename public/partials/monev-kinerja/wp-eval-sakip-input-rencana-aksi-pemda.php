@@ -45,7 +45,7 @@ $data_id_jadwal_rpjmd = $wpdb->get_row(
     $wpdb->prepare("
     SELECT 
         id_jadwal_rpjmd
-    FROM esakip_pengaturan_rencana_aksi
+    FROM esakip_pengaturan_upload_dokumen
     WHERE tahun_anggaran =%d
     AND active=1
 ", $input['tahun']), ARRAY_A);

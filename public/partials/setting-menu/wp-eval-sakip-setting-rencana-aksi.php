@@ -47,7 +47,7 @@ $body = '';
 							<small class="form-text text-muted">Untuk mendapatkan Sasaran Cascading di WP-SIPD sesuai jadwal yang digunakan di input Rencana Hasil Kerja.</small>
 						</div>
 						<div class="form-group">
-							<label for="input-renaksi">Input Rencana Hasil Kerja Bulanan dan Triwulan</label><br>
+							<label for="input-renaksi">Input Rencana Aksi Bulanan dan realisasi Triwulan</label><br>
 							<input type="radio" id="input-renaksi-0" name="crb_input_renaksi" value="0" <?php echo ($set_renaksi == 0) ? 'checked' : ''; ?>>
 							<label for="input-renaksi-0">Iya</label><br>
 							<input type="radio" id="input-renaksi-1" name="crb_input_renaksi" value="1" <?php echo ($set_renaksi == 1) ? 'checked' : ''; ?>>
