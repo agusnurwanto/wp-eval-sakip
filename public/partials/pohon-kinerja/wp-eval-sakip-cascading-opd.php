@@ -135,12 +135,16 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
         font-size: 14px;
         margin-top: 10px; 
         display: block; 
+        width: 100%;
+        max-width: 300px;
     }
 
     #tabel-cascading div span.nama_satker {
         font-size: 14px;
         margin-top: 10px; 
         display: block; 
+        width: 100%;
+        max-width: 300px;
     }
 
     #tabel-cascading-kegiatan,
@@ -182,6 +186,8 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
         font-size: 14px;
         margin-top: 10px; 
         display: block; 
+        width: 100%;
+        max-width: 300px;
     }
 
     .indikator {
@@ -192,6 +198,8 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
         font-size: 14px;
         margin-top: 10px; 
         display: block; 
+        width: 100%;
+        max-width: 300px;
     }
 
     .nama_satker {

@@ -5491,7 +5491,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 	                            ARRAY_A
 	                        );
 
-	                        $indikator_texts = array_column($indikator_tujuan, 'indikator');
 	                        $satker_tujuan = $wpdb->get_results(
 							    $wpdb->prepare("
 							        SELECT 
@@ -5505,6 +5504,14 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							    ARRAY_A
 							);
 
+                            $ind_tujuan = array();
+                            $_satker_tujuan = array();
+                            foreach($indikator_tujuan as $ind){
+                            	$ind_tujuan[] = '<li>'.$ind['indikator'].'</li>';
+                            }
+                            foreach($satker_tujuan as $satker){
+                            	$_satker_tujuan[] = '<li>'.$satker['nama_satker'].'</li>';
+                            }
 	                        if (!isset($body_all[$t['tujuan']])) {
 	                            $body_all[$t['tujuan']] = array(
 	                                'colspan_sasaran' => 0,
@@ -5512,14 +5519,13 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 	                                'tujuan' => $t['tujuan'],
 	                                'id' => $t['id'],
 	                                'indikator' => array(),
-                                    'nama_satker' => array_column($satker_tujuan, 'nama_satker'),
+                                    'nama_satker' => $_satker_tujuan,
 	                                'data' => array()
 	                            );
 	                        }
 
-	                        $body_all[$t['tujuan']]['indikator'] = array_unique(
-	                            array_merge($body_all[$t['tujuan']]['indikator'], $indikator_texts)
-	                        );
+	                        // indikator ditambahkan terus disetiap looping, karena tujuannya dijadikan satu jika textnya sama
+	                        $body_all[$t['tujuan']]['indikator'] = array_merge($body_all[$t['tujuan']]['indikator'], $ind_tujuan);
 
 	                        $sasaran = $wpdb->get_results(
 	                            $wpdb->prepare("
@@ -5561,13 +5567,21 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								    ARRAY_A
 								);
 
+	                            $ind_sasaran = array();
+	                            $_satker_sasaran = array();
+	                            foreach($indikator_sasaran as $ind){
+	                            	$ind_sasaran[] = '<li>'.$ind['indikator'].'</li>';
+	                            }
+	                            foreach($satker_sasaran as $satker){
+	                            	$_satker_sasaran[] = '<li>'.$satker['nama_satker'].'</li>';
+	                            }
 	                            if (!isset($body_all[$t['tujuan']]['data'][$s['sasaran']])) {
 	                                $body_all[$t['tujuan']]['data'][$s['sasaran']] = array(
 	                                    'colspan_program' => 0,
 	                                    'sasaran' => $s['sasaran'],
 	                                    'id' => $s['id'],
-	                                    'indikator' => array_column($indikator_sasaran, 'indikator'),
-                                    	'nama_satker' => array_column($satker_sasaran, 'nama_satker'),
+	                                    'indikator' => $ind_sasaran,
+                                    	'nama_satker' => $_satker_sasaran,
 	                                    'data' => array()
 	                                );
 	                            }
@@ -5614,11 +5628,19 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									    ARRAY_A
 									);
 
+		                            $ind_prog = array();
+		                            $satker_prog = array();
+		                            foreach($indikator_program as $ind){
+		                            	$ind_prog[] = '<li>'.$ind['indikator'].'</li>';
+		                            }
+		                            foreach($satker_program as $satker){
+		                            	$satker_prog[] = '<li>'.$satker['nama_satker'].'</li>';
+		                            }
 	                                $body_all[$t['tujuan']]['data'][$s['sasaran']]['data'][$p['program']] = array(
 	                                    'program' => $p['program'],
 	                                    'id' => $p['id'],
-	                                    'indikator' => array_column($indikator_program, 'indikator'),
-                                    	'nama_satker' => array_column($satker_program, 'nama_satker')
+	                                    'indikator' => $ind_prog,
+                                    	'nama_satker' => $satker_prog
 	                                );
 	                            }
 	                        }
@@ -5628,16 +5650,16 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 	                    $sasaran_html = '';
 	                    $program_html = '';
 	                    foreach ($body_all as $t) {
-						    $indikator = implode('<br>IND: ', $t['indikator']);
-							$nama_satker = empty($t['nama_satker']) ? '-' : implode('<br>Nama Satker : ', $t['nama_satker']);
+						    $indikator = implode('', $t['indikator']);
+							$nama_satker = empty($t['nama_satker']) ? '<li>-</li>' : implode('', $t['nama_satker']);
 						    $tujuan_html .= '<td class="text-center" colspan="' . $t['colspan_program'] . '">
 							    <div class="button-container">
 							        <div class="btn btn-lg btn-warning get_button" style="text-transform:uppercase;">
 							            ' . $t['tujuan'] . '
 							            <hr/>
-							            <span class="indikator">IND: ' . $indikator . '</span>
+							            <span class="indikator">IND: <ol style="text-align: left;">' . $indikator . '</ol></span>
 							            <hr/>
-							            <span class="nama_satker">Nama Satker : ' . $nama_satker . '</span>
+							            <span class="nama_satker">Nama Satker : <ol style="text-align: left;">' . $nama_satker . '</ol></span>
 							            <br />
 							            <button class="btn btn-warning edit-pegawai-button" onclick="get_tujuan_cascading(this,\'' . $t['id'] . '\',\'' . $t['tujuan'] . '\');"><i style="font-size: 2rem;" class="dashicons dashicons-edit"></i>
 							            </button>
@@ -5646,16 +5668,16 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							</td>';
 
 						    foreach ($t['data'] as $s) {
-						        $indikator = implode('<br>IND: ', $s['indikator']);
-								$nama_satker = empty($s['nama_satker']) ? '-' : implode('<br>Nama Satker : ', $s['nama_satker']);
+						        $indikator = implode('', $s['indikator']);
+								$nama_satker = empty($s['nama_satker']) ? '<li>-</li>' : implode('', $s['nama_satker']);
 						        $sasaran_html .= '<td class="text-center" colspan="' . $s['colspan_program'] . '">
 								    <div class="button-container">
 								        <div class="btn btn-lg btn-success get_button" style="text-transform:uppercase;">
 								            ' . $s['sasaran'] . '
 								            <hr/>
-								            <span class="indikator">IND: ' . $indikator . '</span>
+								            <span class="indikator">IND: <ol style="text-align: left;">' . $indikator . '</ol></span>
 								            <hr/>
-								            <span class="nama_satker">Nama Satker : ' . $nama_satker . '</span>
+								            <span class="nama_satker">Nama Satker : <ol style="text-align: left;">' . $nama_satker . '</ol></span>
 								            <br />
 								            <button class="btn btn-success edit-pegawai-button" onclick="get_sasaran_cascading(this, \'' . $s['id'] . '\', \'' . $s['sasaran'] . '\', \'' . $t['tujuan'] . '\');"><i style="font-size: 2rem;" class="dashicons dashicons-edit"></i>
 							                </button>
@@ -5663,16 +5685,16 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								    </div>
 								</td>';
 						        foreach ($s['data'] as $p) {
-								    $indikator = implode('<br>IND: ', $p['indikator']);
-									$nama_satker = empty($p['nama_satker']) ? '-' : implode('<br>Nama Satker : ', $p['nama_satker']);
+								    $indikator = implode('', $p['indikator']);
+									$nama_satker = empty($p['nama_satker']) ? '<li>-</li>' : implode('', $p['nama_satker']);
 								    $program_html .= '<td class="text-center">
 									    <div class="button-container">
 									        <div class="btn btn-lg btn-danger get_button" id="program-ke-' . $p["id"] . '" data-nama-program="' . $p['program'] . '" style="text-transform:uppercase; position: relative;">
 	                                            ' . $p['program'] . '
 									            <hr/>
-									            <span class="indikator">IND: ' . $indikator . '</span>
+									            <span class="indikator">IND: <ol style="text-align: left;">' . $indikator . '</ol></span>
 									            <hr/>
-									            <span class="nama_satker">Nama Satker : ' . $nama_satker . '</span>
+									            <span class="nama_satker">Nama Satker : <ol style="text-align: left;">' . $nama_satker . '</ol></span>
 									            <br />
 								                <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: center;">
 										            <button class="btn btn-danger edit-pegawai-button" onclick="get_program_cascading(this, \'' . $p['id'] . '\', \'' . $p['program'] . '\',  \'' . $s['sasaran'] . '\', \'' . $t['tujuan'] . '\');"><i style="font-size: 2rem; margin-right: 10px;" class="dashicons dashicons-edit"></i>
@@ -5809,13 +5831,21 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							    ARRAY_A
 							);
 
+                            $ind_keg = array();
+                            $satker_keg = array();
+                            foreach($indikator_kegiatan as $ind){
+                            	$ind_keg[] = '<li>'.$ind['indikator'].'</li>';
+                            }
+                            foreach($satker_kegiatan as $satker){
+                            	$satker_keg[] = '<li>'.$satker['nama_satker'].'</li>';
+                            }
 	                        if (!isset($body_all[$k['kegiatan']])) {
 	                            $body_all[$k['kegiatan']] = array(
 	                                'colspan_sub_giat' => 0,
 	                                'kegiatan' => $k['kegiatan'],
 	                                'id' => $k['id'],
-	                                'indikator' => array_column($indikator_kegiatan, 'indikator'),
-                                   	'nama_satker' => array_column($satker_kegiatan, 'nama_satker'),
+	                                'indikator' => $ind_keg,
+                                   	'nama_satker' => $satker_keg,
 	                                'data' => array()
 	                            );
 	                        }
@@ -5858,11 +5888,19 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								    ARRAY_A
 								);
 								
+	                            $ind_sub = array();
+	                            $satker_sub = array();
+	                            foreach($indikator_sub_giat as $ind){
+	                            	$ind_sub[] = '<li>'.$ind['indikator'].'</li>';
+	                            }
+	                            foreach($satker_sub_giat as $satker){
+	                            	$satker_sub[] = '<li>'.$satker['nama_satker'].'</li>';
+	                            }
 	                            $body_all[$k['kegiatan']]['data'][$g['sub_giat']] = array(
 	                                'sub_giat' => $g['sub_giat'],
 	                                'id' => $g['id'],
-	                                'indikator' => array_column($indikator_sub_giat, 'indikator'),
-                                	'nama_satker' => array_column($satker_sub_giat, 'nama_satker')
+	                                'indikator' => $ind_sub,
+                                	'nama_satker' => $satker_sub
 	                            );
 	                        }
 	                    }
@@ -5880,16 +5918,16 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 	                    $sub_giat_html = '';
 						$no_urut = isset($get_program[0]['no_urut']) ? $get_program[0]['no_urut'] : '';
 	                    foreach ($body_all as $k) {
-	                        $indikator = implode('<br>IND: ', $k['indikator']);
-							$nama_satker = empty($k['nama_satker']) ? '-' : implode('<br>Nama Satker : ', $k['nama_satker']);
+	                        $indikator = implode('', $k['indikator']);
+							$nama_satker = empty($k['nama_satker']) ? '<li>-</li>' : implode('', $k['nama_satker']);
 	                        $kegiatan_html .= '<td class="text-center" colspan="' . $k['colspan_sub_giat'] . '">
 							    <div class="button-container">
 							        <div class="btn btn-lg btn-primary get_button" style="text-transform:uppercase;">
 							            ' . $k['kegiatan'] . '
 							            <hr/>
-							            <span class="indikator">IND: ' . $indikator . '</span>
+							            <span class="indikator">IND: <ol class="text-left">' . $indikator . '</ol></span>
 							            <hr/>
-							            <span class="nama_satker">Nama Satker : ' . $nama_satker . '</span>
+							            <span class="nama_satker">Nama Satker : <ol class="text-left">' . $nama_satker . '</ol></span>
 							            <br />
 							            <button class="btn btn-primary edit-pegawai-button" 
 							                onclick="get_kegiatan_cascading(this, \'' . $k['id'] . '\', \'' . $k['kegiatan'] . '\', \'' . $program . '\', \'' . $sasaran . '\', \'' . $tujuan . '\', \'' . $no_urut . '\');">
@@ -5899,16 +5937,16 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							    </div>
 							</td>';
 	                        foreach ($k['data'] as $g) {
-	                            $indikator = implode('<br>IND: ', $g['indikator']);
-								$nama_satker = empty($g['nama_satker']) ? '-' : implode('<br>Nama Satker : ', $g['nama_satker']);
+	                            $indikator = implode('', $g['indikator']);
+								$nama_satker = empty($g['nama_satker']) ? '<li>-</li>' : implode('', $g['nama_satker']);
 	                            $sub_giat_html .= '<td class="text-center">
 							    <div class="button-container">
 							        <div class="btn btn-lg btn-secondary get_button" style="text-transform:uppercase;">
 							            ' . $g['sub_giat'] . '
 							            <hr/>
-							            <span class="indikator">IND: ' . $indikator . '</span>
+							            <span class="indikator">IND: <ol class="text-left">' . $indikator . '</ol></span>
 							            <hr/>
-							            <span class="nama_satker">Nama Satker : ' . $nama_satker . '</span>
+							            <span class="nama_satker">Nama Satker : <ol class="text-left">' . $nama_satker . '</ol></span>
 							            <br />
 							            <button class="btn btn-secondary edit-pegawai-button" onclick="get_sub_giat_cascading(this, \'' . $g['id'] . '\', \'' . $g['sub_giat'] . '\', \'' . $k['kegiatan'] . '\', \'' . $program . '\', \'' . $sasaran . '\', \'' . $tujuan . '\', \'' . $no_urut . '\');"><i style="font-size: 2rem;" class="dashicons dashicons-edit"></i>
 							            </button>
