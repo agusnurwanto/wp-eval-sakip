@@ -87,9 +87,9 @@ $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 $data_id_jadwal = $wpdb->get_row(
 	$wpdb->prepare("
 		SELECT 
-			id_jadwal,
+			id_jadwal_rpjmd as id_jadwal,
 			id_jadwal_wp_sipd
-		FROM esakip_pengaturan_rencana_aksi
+		FROM esakip_pengaturan_upload_dokumen
 		WHERE tahun_anggaran =%d
 		  AND active=1
 	", $tahun),

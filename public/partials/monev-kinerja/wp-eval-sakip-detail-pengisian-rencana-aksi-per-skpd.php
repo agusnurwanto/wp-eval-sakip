@@ -17,9 +17,9 @@ $renaksi_pemda = array();
 $data_id_jadwal = $wpdb->get_row(
     $wpdb->prepare("
     SELECT 
-        id_jadwal,
+        id_jadwal_rpjmd as id_jadwal,
         id_jadwal_wp_sipd
-    FROM esakip_pengaturan_rencana_aksi
+    FROM esakip_pengaturan_upload_dokumen
     WHERE tahun_anggaran =%d
     AND active=1
 ", $input['tahun']),
@@ -31,14 +31,12 @@ if (empty($data_id_jadwal['id_jadwal'])) {
 } else {
     $id_jadwal = $data_id_jadwal['id_jadwal'];
 }
-$cek_id_jadwal = empty($data_id_jadwal['id_jadwal']) ? 0 : 1;
 
 if (empty($data_id_jadwal['id_jadwal_wp_sipd'])) {
     $id_jadwal_wpsipd = 0;
 } else {
     $id_jadwal_wpsipd = $data_id_jadwal['id_jadwal_wp_sipd'];
 }
-$cek_id_jadwal_wpsipd = empty($data_id_jadwal['id_jadwal_wp_sipd']) ? 0 : 1;
 
 $skpd = $wpdb->get_row(
     $wpdb->prepare("
@@ -171,11 +169,11 @@ $get_pegawai = $wpdb->get_results($wpdb->prepare('
         p.*
     FROM esakip_data_pegawai_simpeg AS p
     WHERE p.satker_id like %s
-    ORDER BY satker_id ASC
+    ORDER BY satker_id ASC, tipe_pegawai_id ASC, nama_pegawai ASC
 ', $get_mapping.'%'), ARRAY_A);
 $select_pegawai = '<option value="">Pilih Pegawai Pelaksana</option>';
 foreach($get_pegawai as $pegawai){
-    $select_pegawai .= '<option value="'.$pegawai['nip_baru'].'">'.$pegawai['nip_baru'].' '.$pegawai['nama_pegawai'].'</option>';
+    $select_pegawai .= '<option value="'.$pegawai['nip_baru'].'">'.$pegawai['nip_baru'].' | '.$pegawai['nama_pegawai'].'</option>';
 }
 ?>
 <style type="text/css">
@@ -473,15 +471,14 @@ foreach($get_pegawai as $pegawai){
         run_download_excel_sakip();
         jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-rencana-aksi" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
 
-        let id_jadwal = <?php echo $cek_id_jadwal; ?>;
-        let id_jadwal_wpsipd = <?php echo $cek_id_jadwal_wpsipd; ?>;
-        if (id_jadwal == 0 || id_jadwal_wpsipd == 0) {
-            alert("Jadwal RENSTRA untuk data Pokin belum disetting.\nSetting Jadwal RENSTRA ada di admin dashboard di menu Monev Rencana Hasil Kerja -> Monev Rencana Hasil Kerja Setting")
-        }
-
         window.id_jadwal = <?php echo $id_jadwal; ?>;
-
         window.id_jadwal_wpsipd = <?php echo $id_jadwal_wpsipd; ?>;
+        if (id_jadwal == 0) {
+            alert("Jadwal RPJMD/RPD untuk data Pokin belum disetting.\nSetting di admin dashboard di menu E-SAKIP Options -> Laporan Monitor Upload Dokumen Tahun <?php echo $input['tahun']; ?>")
+        }
+        if(id_jadwal_wpsipd == 0){
+            alert("Jadwal RENSTRA untuk data Cascading di WP-SIPD belum disetting.\nSetting di admin dashboard di menu Monev Rencana Hasil Kerja -> Monev Rencana Hasil Kerja Setting")
+        }
 
         getTablePengisianRencanaAksi();
         jQuery("#fileUpload").on('change', function() {
@@ -725,15 +722,15 @@ foreach($get_pegawai as $pegawai){
                                 `<select class="form-control" name="cascading-renstra" id="cascading-renstra">` +
                                 `</select>` +
                                 `</div>` +
-                                + `<div class="form-group">`
-                                    + `<label for="satker_id">Pilih Satuan Kerja</label>`
-                                    + `<select class="form-control select2" id="satker_id" name="satker_id"><?php echo $select_satker; ?></select>`
-                                + `</div>`
-                                + `<div class="form-group">`
-                                    + `<label for="pegawai">Pilih Pegawai Pelaksana</label>`
-                                    + `<select class="form-control select2" id="pegawai" name="pegawai">${get_pegawai}</select>`
-                                + `</div>`
-                                +`</form>`);
+                                `<div class="form-group">` +
+                                    `<label for="satker_id">Pilih Satuan Kerja</label>` +
+                                    `<select class="form-control select2" id="satker_id" name="satker_id"><?php echo $select_satker; ?></select>` +
+                                `</div>` +
+                                `<div class="form-group">` +
+                                    `<label for="pegawai">Pilih Pegawai Pelaksana</label>` +
+                                    `<select class="form-control select2" id="pegawai" name="pegawai">${get_pegawai}</select>` +
+                                `</div>` +
+                                `</form>`);
                             jQuery("#modal-crud").find('.modal-footer').html('' +
                                 '<button type="button" class="btn btn-danger" data-dismiss="modal">' +
                                 'Tutup' +
