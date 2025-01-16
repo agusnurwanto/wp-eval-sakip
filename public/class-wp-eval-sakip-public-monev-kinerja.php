@@ -79,6 +79,62 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					}
 
 					foreach ($data_renaksi as $key => $val) {
+						$data_renaksi[$key]['pokin'] = $wpdb->get_results(
+						    $wpdb->prepare("
+						        SELECT
+						            p.label AS pokin_label
+						        FROM esakip_data_pokin_rhk_opd AS o
+						        INNER JOIN esakip_pohon_kinerja_opd AS p 
+						            ON o.id_pokin = p.id
+						                AND o.level_pokin = p.level
+						        WHERE o.id_rhk_opd = %d
+						            AND o.level_rhk_opd = %d
+						            AND o.level_pokin = 2
+						    ", $val['id'], $val['level']),
+						    ARRAY_A
+						);
+						$data_renaksi[$key]['pokin_3'] = $wpdb->get_results(
+						    $wpdb->prepare("
+						        SELECT
+						            p.label AS pokin_label
+						        FROM esakip_data_pokin_rhk_opd AS o
+						        INNER JOIN esakip_pohon_kinerja_opd AS p 
+						            ON o.id_pokin = p.id
+						                AND o.level_pokin = p.level
+						        WHERE o.id_rhk_opd = %d
+						            AND o.level_rhk_opd = %d
+						            AND o.level_pokin = 3
+						    ", $val['id'], $val['level']),
+						    ARRAY_A
+						);
+						$data_renaksi[$key]['pokin_4'] = $wpdb->get_results(
+						    $wpdb->prepare("
+						        SELECT
+						            p.label AS pokin_label
+						        FROM esakip_data_pokin_rhk_opd AS o
+						        INNER JOIN esakip_pohon_kinerja_opd AS p 
+						            ON o.id_pokin = p.id
+						                AND o.level_pokin = p.level
+						        WHERE o.id_rhk_opd = %d
+						            AND o.level_rhk_opd = %d
+						            AND o.level_pokin = 4
+						    ", $val['id'], $val['level']),
+						    ARRAY_A
+						);
+						$data_renaksi[$key]['pokin_5'] = $wpdb->get_results(
+						    $wpdb->prepare("
+						        SELECT
+						            p.label AS pokin_label
+						        FROM esakip_data_pokin_rhk_opd AS o
+						        INNER JOIN esakip_pohon_kinerja_opd AS p 
+						            ON o.id_pokin = p.id
+						                AND o.level_pokin = p.level
+						        WHERE o.id_rhk_opd = %d
+						            AND o.level_rhk_opd = %d
+						            AND o.level_pokin = 5
+						    ", $val['id'], $val['level']),
+						    ARRAY_A
+						);
 
 						$data_renaksi[$key]['detail_pegawai'] = $wpdb->get_row($wpdb->prepare(
 							"
@@ -768,17 +824,92 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		                	FROM esakip_data_satker_simpeg
 		                	WHERE satker_id = %d		                		
 		                ', $ret['data']['satker_id']), ARRAY_A);
-		                // print_r($ret['data']['jabatan']);die($wpdb->last_query);
 						$ret['data']['pegawai'] = $wpdb->get_row($wpdb->prepare('
 		                	SELECT
 		                		*
 		                	FROM esakip_data_pegawai_simpeg
 		                	WHERE nip_baru = %d		                		
 		                ', $ret['data']['nip']), ARRAY_A);
+		                $ret['data']['pokin'] = $wpdb->get_results(
+						    $wpdb->prepare("
+						        SELECT
+						            p.label AS pokin_label
+						        FROM esakip_data_pokin_rhk_opd AS o
+						        INNER JOIN esakip_pohon_kinerja_opd AS p 
+						            ON o.id_pokin = p.id
+						                AND o.level_pokin = p.level
+						        WHERE o.id_rhk_opd = %d
+						            AND o.level_rhk_opd = %d
+						            AND o.level_pokin = 1
+						    ", $ret['data']['id'], $ret['data']['level']),
+						    ARRAY_A
+						);
+		                $ret['data']['pokin_2'] = $wpdb->get_results(
+						    $wpdb->prepare("
+						        SELECT
+						            p.label AS pokin_label
+						        FROM esakip_data_pokin_rhk_opd AS o
+						        INNER JOIN esakip_pohon_kinerja_opd AS p 
+						            ON o.id_pokin = p.id
+						                AND o.level_pokin = p.level
+						        WHERE o.id_rhk_opd = %d
+						            AND o.level_rhk_opd = %d
+						            AND o.level_pokin = 2
+						    ", $ret['data']['id'], $ret['data']['level']),
+						    ARRAY_A
+						);
+		                print_r($ret['data']['pokin_2']);die($wpdb->last_query);
+						$ret['data']['pokin_3'] = $wpdb->get_results(
+						    $wpdb->prepare("
+						        SELECT
+						            p.label AS pokin_label
+						        FROM esakip_data_pokin_rhk_opd AS o
+						        INNER JOIN esakip_pohon_kinerja_opd AS p 
+						            ON o.id_pokin = p.id
+						                AND o.level_pokin = p.level
+						        WHERE o.id_rhk_opd = %d
+						            AND o.level_rhk_opd = %d
+						            AND o.level_pokin = 3
+						    ", $ret['data']['id'], $ret['data']['level']),
+						    ARRAY_A
+						);
+						$ret['data']['pokin_4'] = $wpdb->get_results(
+						    $wpdb->prepare("
+						        SELECT
+						            p.label AS pokin_label
+						        FROM esakip_data_pokin_rhk_opd AS o
+						        INNER JOIN esakip_pohon_kinerja_opd AS p 
+						            ON o.id_pokin = p.id
+						                AND o.level_pokin = p.level
+						        WHERE o.id_rhk_opd = %d
+						            AND o.level_rhk_opd = %d
+						            AND o.level_pokin = 4
+						    ", $ret['data']['id'], $ret['data']['level']),
+						    ARRAY_A
+						);
+						$ret['data']['pokin_5'] = $wpdb->get_results(
+						    $wpdb->prepare("
+						        SELECT
+						            p.label AS pokin_label
+						        FROM esakip_data_pokin_rhk_opd AS o
+						        INNER JOIN esakip_pohon_kinerja_opd AS p 
+						            ON o.id_pokin = p.id
+						                AND o.level_pokin = p.level
+						        WHERE o.id_rhk_opd = %d
+						            AND o.level_rhk_opd = %d
+						            AND o.level_pokin = 5
+						    ", $ret['data']['id'], $ret['data']['level']),
+						    ARRAY_A
+						);
 					} else {
 						$ret['data']['renaksi_pemda'] = array();
 						$ret['data']['jabatan'] = array();
 						$ret['data']['pegawai'] = array();
+						$ret['data']['pokin'] = array();
+						$ret['data']['pokin_2'] = array();
+						$ret['data']['pokin_3'] = array();
+						$ret['data']['pokin_4'] = array();
+						$ret['data']['pokin_5'] = array();
 					}
 
 					// print_r($ret['data']['jabatan']); die($wpdb->last_query);
@@ -1278,7 +1409,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						<tr class="keg-utama">
 							<td>' . $no . '</td>
 							<td class="ket_rhk">' . $keterangan . '</td>
-							<td class="kiri kanan bawah text_blok kegiatan_utama"><span class="badge bg-success text-white">' . $v['detail']['label_pokin_2'] . '</span><br>' . $v['detail']['label'] . '
+							<td class="kiri kanan bawah text_blok kegiatan_utama">' . $v['detail']['label'] . '
 							    <a href="javascript:void(0)" data-id="' . $v['detail']['id'] . '" data-tipe="1" 
 								   class="help-rhk" onclick="help_rhk(' . $v['detail']['id'] . ', 1); return false;" title="Detail">
 								   <i class="dashicons dashicons-editor-help"></i>
@@ -1478,7 +1609,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							        <td class="ket">' . $keterangan . '</td>
 							        <td class="kiri kanan bawah text_blok kegiatan_utama"></td>
 							        <td class="kiri kanan bawah text_blok indikator_kegiatan_utama"></td>
-							        <td class="kiri kanan bawah text_blok recana_aksi">' . $renaksi_html . '<span class="badge bg-success text-white">' . $renaksi['detail']['label_pokin_3'] . '</span><br>' . $renaksi['detail']['label'] . '
+							        <td class="kiri kanan bawah text_blok recana_aksi">' . $renaksi_html . '' . $renaksi['detail']['label'] . '
 							        	<a href="javascript:void(0)" data-id="' . $renaksi['detail']['id'] . '" data-tipe="2" 
 										   class="help-rhk" onclick="help_rhk(' . $renaksi['detail']['id'] . ', 2); return false;" title="Detail">
 										   <i class="dashicons dashicons-editor-help"></i>
@@ -1591,7 +1722,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									<td class="kiri kanan bawah text_blok indikator_kegiatan_utama"></td>
 									<td class="kiri kanan bawah text_blok recana_aksi"></td>
 									<td class="kiri kanan bawah text_blok indikator_renaksi"></td>
-									<td class="urian_renaksi"><span class="badge bg-success text-white">' . $label_pokin . '</span><br>' . $uraian_renaksi['detail']['label'] . '
+									<td class="urian_renaksi">' . $uraian_renaksi['detail']['label'] . '
 										<a href="javascript:void(0)" data-id="' . $uraian_renaksi['detail']['id'] . '" data-tipe="3" 
 										   class="help-rhk" onclick="help_rhk(' . $uraian_renaksi['detail']['id'] . ', 3); return false;" title="Detail">
 										   <i class="dashicons dashicons-editor-help"></i>
@@ -1700,7 +1831,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										<td class="indikator_renaksi"></td>
 										<td class="urian_renaksi"></td>
 										<td class="indikator_uraian_renaksi"></td>
-										<td class="uraian_teknis_kegiatan"><span class="badge bg-success text-white">' . $label_pokin . '</span><br>' . $uraian_teknis_kegiatan['detail']['label'] . '
+										<td class="uraian_teknis_kegiatan">' . $uraian_teknis_kegiatan['detail']['label'] . '
 											<a href="javascript:void(0)" data-id="' . $uraian_teknis_kegiatan['detail']['id'] . '" data-tipe="4" 
 											   class="help-rhk" onclick="help_rhk(' . $uraian_teknis_kegiatan['detail']['id'] . ', 4); return false;" title="Detail">
 											   <i class="dashicons dashicons-editor-help"></i>
@@ -4543,36 +4674,78 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					ARRAY_A
 				);
 				if ($data) {
-					$get_pokin_1 = $wpdb->get_row($wpdb->prepare('
-	                	SELECT
-	                		*
-	                	FROM esakip_pohon_kinerja_opd
-	                	WHERE id=%d
-	                ', $data['id_pokin_1']), ARRAY_A);
-					$get_pokin_2 = $wpdb->get_row($wpdb->prepare('
-	                	SELECT
-	                		*
-	                	FROM esakip_pohon_kinerja_opd
-	                	WHERE id=%d
-	                ', $data['id_pokin_2']), ARRAY_A);
-					$get_pokin_3 = $wpdb->get_row($wpdb->prepare('
-	                	SELECT
-	                		*
-	                	FROM esakip_pohon_kinerja_opd
-	                	WHERE id=%d
-	                ', $data['id_pokin_3']), ARRAY_A);
-					$get_pokin_4 = $wpdb->get_row($wpdb->prepare('
-	                	SELECT
-	                		*
-	                	FROM esakip_pohon_kinerja_opd
-	                	WHERE id=%d
-	                ', $data['id_pokin_4']), ARRAY_A);
-					$get_pokin_5 = $wpdb->get_row($wpdb->prepare('
-	                	SELECT
-	                		*
-	                	FROM esakip_pohon_kinerja_opd
-	                	WHERE id=%d
-	                ', $data['id_pokin_5']), ARRAY_A);
+					$get_pokin_1 = $wpdb->get_results(
+					    $wpdb->prepare("
+					        SELECT
+					            p.label AS pokin_label
+					        FROM esakip_data_pokin_rhk_opd AS o
+					        INNER JOIN esakip_pohon_kinerja_opd AS p 
+					            ON o.id_pokin = p.id
+					                AND o.level_pokin = p.level
+					        WHERE o.id_rhk_opd = %d
+					            AND o.level_rhk_opd = %d
+					            AND o.level_pokin = 1
+					    ", $data['id'], $data['level']),
+					    ARRAY_A
+					);
+
+					// print_r($get_pokin_1); die($wpdb->last_query);
+					$get_pokin_2 = $wpdb->get_results(
+					    $wpdb->prepare("
+					        SELECT
+					            p.label AS pokin_label
+					        FROM esakip_data_pokin_rhk_opd AS o
+					        INNER JOIN esakip_pohon_kinerja_opd AS p 
+					            ON o.id_pokin = p.id
+					                AND o.level_pokin = p.level
+					        WHERE o.id_rhk_opd = %d
+					            AND o.level_rhk_opd = %d
+					            AND o.level_pokin = 2
+					    ", $data['id'], $data['level']),
+					    ARRAY_A
+					);
+					$get_pokin_3 = $wpdb->get_results(
+					    $wpdb->prepare("
+					        SELECT
+					            p.label AS pokin_label
+					        FROM esakip_data_pokin_rhk_opd AS o
+					        INNER JOIN esakip_pohon_kinerja_opd AS p 
+					            ON o.id_pokin = p.id
+					                AND o.level_pokin = p.level
+					        WHERE o.id_rhk_opd = %d
+					            AND o.level_rhk_opd = %d
+					            AND o.level_pokin = 3
+					    ", $data['id'], $data['level']),
+					    ARRAY_A
+					);
+					$get_pokin_4 = $wpdb->get_results(
+					    $wpdb->prepare("
+					        SELECT
+					            p.label AS pokin_label
+					        FROM esakip_data_pokin_rhk_opd AS o
+					        INNER JOIN esakip_pohon_kinerja_opd AS p 
+					            ON o.id_pokin = p.id
+					                AND o.level_pokin = p.level
+					        WHERE o.id_rhk_opd = %d
+					            AND o.level_rhk_opd = %d
+					            AND o.level_pokin = 4
+					    ", $data['id'], $data['level']),
+					    ARRAY_A
+					);
+					$get_pokin_5 = $wpdb->get_results(
+					    $wpdb->prepare("
+					        SELECT
+					            p.label AS pokin_label
+					        FROM esakip_data_pokin_rhk_opd AS o
+					        INNER JOIN esakip_pohon_kinerja_opd AS p 
+					            ON o.id_pokin = p.id
+					                AND o.level_pokin = p.level
+					        WHERE o.id_rhk_opd = %d
+					            AND o.level_rhk_opd = %d
+					            AND o.level_pokin = 5
+					    ", $data['id'], $data['level']),
+					    ARRAY_A
+					);
 					$get_satker = $wpdb->get_row($wpdb->prepare('
 	                	SELECT
 	                		*
@@ -4585,7 +4758,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	                	FROM esakip_data_pegawai_simpeg
 	                	WHERE nip_baru=%d
 	                ', $data['nip']), ARRAY_A);
-					// print_r($get_pokin_2); die($wpdb->last_query);
 					$ret['get_pokin_1'] = $get_pokin_1;
 					$ret['get_pokin_2'] = $get_pokin_2;
 					$ret['get_pokin_3'] = $get_pokin_3;

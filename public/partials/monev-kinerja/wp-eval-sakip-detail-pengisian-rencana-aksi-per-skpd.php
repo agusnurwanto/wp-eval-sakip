@@ -318,7 +318,6 @@ foreach($get_pegawai as $pegawai){
         <li>Baris Kolom Tabel Dengan Background Warna <strong>Ungu</strong> Menunjukkan Data Rencana Hasil Kerja dan Pohon Kinerja Level 3</li>
         <li>Baris Kolom Tabel Dengan Background Warna <strong>Biru</strong> Menunjukkan Data Uraian Kegiatan Rencana Hasil Kerja dan Pohon Kinerja Level 4</li>
         <li>Baris Kolom Tabel Dengan Background Warna <strong>Putih</strong> Menunjukkan Data Uraian Teknis Kegiatan dan Pohon Kinerja Level 5</li>
-        <li>Label Dengan Background Warna <strong>Hijau</strong> Menunjukkan Data Pohon Kinerja</li>
     </ul>
 </div>
 <!-- Modal Renaksi -->
@@ -927,8 +926,21 @@ foreach($get_pegawai as $pegawai){
                         } else if (response.data != null) {
                             jQuery('#id_renaksi').val(id);
                             jQuery("#modal-crud").find('.modal-title').html('Edit Kegiatan Utama');
-                            jQuery('#pokin-level-2').attr('val-id', response.data.id_pokin_2);
-                            jQuery('#pokin-level-1').val(response.data.id_pokin_1).trigger('change');
+                            jQuery('#cascading-renstra').val(response.data.kode_cascading_sasaran).trigger('change');
+                            jQuery("#pokin-level-1").empty();
+                            response.data.pokin.map(function(b) {
+                                var myText = b.pokin_label;
+                                var option = new Option(myText, b.id_rhk_opd, true, true);
+                                jQuery("#pokin-level-1").append(option);
+                            });
+                            jQuery("#pokin-level-1").trigger('change');
+                            jQuery("#pokin-level-2").empty();
+                            response.data.pokin_2.map(function(b) {
+                                var myText = b.pokin_label;
+                                var option = new Option(myText, b.id_rhk_opd, true, true);
+                                jQuery("#pokin-level-2").append(option);
+                            });
+                            jQuery("#pokin-level-2").trigger('change');
                             jQuery('#label_renaksi').val(response.data.label);
                             jQuery('#cascading-renstra').val(response.data.kode_cascading_sasaran).trigger('change');
                             if (response.data && response.data.jabatan && response.data.jabatan.satker_id) {
@@ -1181,10 +1193,18 @@ foreach($get_pegawai as $pegawai){
                         if (value.detail_pegawai && value.detail_pegawai.nip_baru) {
                             nama_pegawai += value.detail_pegawai.nip_baru + ' ' + value.detail_pegawai.nama_pegawai;
                         }
+                        let label_pokin = '-';
+                        if (value.pokin && value.pokin.length > 0) {
+                            label_pokin = `<ul>`;
+                            value.pokin.forEach(function(get_pokin) {
+                                label_pokin += `<li>${get_pokin.pokin_label}</li>`;
+                            });
+                            label_pokin += `</ul>`;
+                        }
                         kegiatanUtama += `` +
                             `<tr id="kegiatan_utama_${value.id}">` +
                             `<td class="text-center">${index+1}</td>` +
-                            `<td class="label_pokin">${value.label_pokin_2}</td>` +
+                            `<td class="label_pokin">${label_pokin}</td>` +
                             `<td class="label_renaksi">${value.label}</td>` +
                             `<td class="label_cascading">${label_cascading}</td>` +
                             `<td class="label_renaksi">${label_dasar_pelaksanaan}</td>` +
@@ -1897,7 +1917,6 @@ foreach($get_pegawai as $pegawai){
                         `</thead>` +
                         `<tbody>`;
                     res.data.map(function(value, index) {
-                        var label_pokin = '';
                         var id_pokin = 0;
                         var tombol_detail = '';
                         var id_parent_cascading = 0;
@@ -1906,6 +1925,7 @@ foreach($get_pegawai as $pegawai){
                         var label_dasar_pelaksanaan = '';
                         var total_pagu = 0;
                         let get_data_dasar_pelaksanaan = [];
+                        let label_pokin = '-';
 
                         var nama_pegawai = '';
                         if (value.detail_satker && value.detail_satker.nama) {
@@ -1915,7 +1935,6 @@ foreach($get_pegawai as $pegawai){
                             nama_pegawai += value.detail_pegawai.nip_baru + ' ' + value.detail_pegawai.nama_pegawai;
                         }
                         if (tipe == 1) {
-                            label_pokin = value['label_pokin_2'];
                             id_pokin = value['id_pokin_2'];
                             id_parent_cascading = value['kode_cascading_sasaran'];
                             label_cascading = value['label_cascading_sasaran'] != null ? value['label_cascading_sasaran'] : '-';
@@ -1944,10 +1963,16 @@ foreach($get_pegawai as $pegawai){
                             if (get_data_dasar_pelaksanaan.length > 0) {
                                 label_dasar_pelaksanaan = `<ul><li>${get_data_dasar_pelaksanaan.join('</li><li>')}</li></ul>`;
                             }
+                            if (value.pokin && value.pokin.length > 0) {
+                                label_pokin = `<ul>`;
+                                value.pokin.forEach(function(get_pokin) {
+                                    label_pokin += `<li>${get_pokin.pokin_label}</li>`;
+                                });
+                                label_pokin += `</ul>`;
+                            }
                             tombol_detail = '' +
                                 `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, ` + (tipe + 1) + `, ` + id_pokin + `, '` + id_parent_cascading + `')" title="Lihat Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                         } else if (tipe == 2) {
-                            label_pokin = value['label_pokin_3'];
                             id_pokin = value['id_pokin_3'];
                             id_parent_cascading = value['kode_cascading_program'];
                             label_cascading = value['label_cascading_program'] != null ? value['kode_cascading_program'] + ' ' + value['label_cascading_program'] : '-';
@@ -1975,11 +2000,17 @@ foreach($get_pegawai as $pegawai){
                             if (get_data_dasar_pelaksanaan.length > 0) {
                                 label_dasar_pelaksanaan = `<ul><li>${get_data_dasar_pelaksanaan.join('</li><li>')}</li></ul>`;
                             }
+                            if (value.pokin_3 && value.pokin_3.length > 0) {
+                                label_pokin = `<ul>`;
+                                value.pokin_3.forEach(function(get_pokin_2) {
+                                    label_pokin += `<li>${get_pokin_2.pokin_label}</li>`;
+                                });
+                                label_pokin += `</ul>`;
+                            }
 
                             tombol_detail = '' +
                                 `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, ` + (tipe + 1) + `, ` + id_pokin + `, '` + id_parent_cascading + `')" title="Lihat Uraian Kegiatan Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                         } else if (tipe == 3) {
-                            label_pokin = value['label_pokin_4'];
                             id_parent_cascading = value['kode_cascading_kegiatan'];
                             label_cascading = value['label_cascading_kegiatan'] != null ? value['kode_cascading_kegiatan'] + ' ' + value['label_cascading_kegiatan'] : '-';
                             id_pokin = value['id_pokin_4'];
@@ -2007,11 +2038,17 @@ foreach($get_pegawai as $pegawai){
                             if (get_data_dasar_pelaksanaan.length > 0) {
                                 label_dasar_pelaksanaan = `<ul><li>${get_data_dasar_pelaksanaan.join('</li><li>')}</li></ul>`;
                             }
+                            if (value.pokin_4 && value.pokin_4.length > 0) {
+                                label_pokin = `<ul>`;
+                                value.pokin_4.forEach(function(get_pokin_4) {
+                                    label_pokin += `<li>${get_pokin_4.pokin_label}</li>`;
+                                });
+                                label_pokin += `</ul>`;
+                            }
 
                             tombol_detail = '' +
                                 `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, ` + (tipe + 1) + `, ` + id_pokin + `, '` + id_parent_cascading + `')" title="Lihat Uraian Teknis Kegiatan"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                         } else if (tipe == 4) {
-                            label_pokin = value['label_pokin_5'];
                             id_pokin = value['id_pokin_5'];
                             label_cascading = value['label_cascading_sub_kegiatan'] != null ? value['kode_cascading_sub_kegiatan'] + ' ' + value['label_cascading_sub_kegiatan'] : '-';
                             data_tagging_rincian = '<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" title="Lihat Data Tagging Rincian Belanja"><i class="dashicons dashicons dashicons-arrow-down-alt2"></i></a> ';
@@ -2024,12 +2061,19 @@ foreach($get_pegawai as $pegawai){
                             if (get_data_dasar_pelaksanaan.length > 0) {
                                 label_dasar_pelaksanaan = `<ul><li>${get_data_dasar_pelaksanaan.join('</li><li>')}</li></ul>`;
                             }
+                            if (value.pokin_5 && value.pokin_5.length > 0) {
+                                label_pokin = `<ul>`;
+                                value.pokin_5.forEach(function(get_pokin_5) {
+                                    label_pokin += `<li>${get_pokin_5.pokin_label}</li>`;
+                                });
+                                label_pokin += `</ul>`;
+                            }
                         }
 
                         renaksi += `` +
                             `<tr id="kegiatan_utama_${value.id}">` +
                             `<td class="text-center">${index + 1}</td>` +
-                            `<td class="label_pokin">` + label_pokin + `</td>` +
+                            `<td class="label_pokin">${label_pokin}</td>` +
                             `<td class="label_renaksi">${value.label}</td>` +
                             `<td class="label_renaksi">${label_cascading}</td>` +
                             `<td class="label_renaksi">${label_dasar_pelaksanaan}</td>` +
@@ -2320,7 +2364,7 @@ foreach($get_pegawai as $pegawai){
                         },
                         dataType: "json",
                         success: function(res) {
-                            let html = '<option value="">Pilih Pokin Level ' + level_pokin + '</option>';
+                            let html = '';
 
                             if (Array.isArray(res.data)) {
                                 res.data.map(value => {
@@ -2338,7 +2382,7 @@ foreach($get_pegawai as $pegawai){
                                     <input type="hidden" id="id_renaksi" value=""/>
                                     <div class="form-group">
                                         <label for="pokin-level-1">Pilih Pokin Level ${level_pokin}</label>
-                                        <select class="form-control" name="pokin-level-1" id="pokin-level-1">
+                                        <select class="form-control" multiple name="pokin-level-1" id="pokin-level-1">
                                             ${html}
                                         </select>
                                     </div>
@@ -3051,23 +3095,25 @@ foreach($get_pegawai as $pegawai){
     function help_rhk(id, tipe) {
         jQuery("#wrap-loading").show();
         if (id == undefined) {
-            alert("Id tidak ditemukan")
+            alert("Id tidak ditemukan");
+            return;
         }
 
         jQuery.ajax({
             method: 'POST',
             url: esakip.url,
             data: {
-                "action": "help_rhk",
-                "api_key": esakip.api_key,
-                'id': id,
-                'tipe': tipe
+                action: "help_rhk",
+                api_key: esakip.api_key,
+                id: id,
+                tipe: tipe
             },
             dataType: 'json',
             success: function(response) {
                 jQuery("#wrap-loading").hide();
                 if (response.status) {
                     jQuery("#modal-detail-renaksi").modal('show');
+                    
                     var satker = response.get_satker && response.get_satker.satker_id && response.get_satker.nama ?
                         response.get_satker.satker_id + ' ' + response.get_satker.nama : '';
                     var pegawai = response.get_pegawai && response.get_pegawai.nip_baru && response.get_pegawai.nama_pegawai ?
@@ -3080,6 +3126,7 @@ foreach($get_pegawai as $pegawai){
                         '';
                     var get_cascading_sub_kegiatan = response.data && response.data.kode_cascading_sub_kegiatan && response.data.label_cascading_sub_kegiatan ? response.data.kode_cascading_sub_kegiatan + ' ' + response.data.label_cascading_sub_kegiatan :
                         '';
+
                     if (tipe === 1) {
                         jQuery('label[for="detail_kegiatan_utama"]').show();
                         jQuery('#detail_kegiatan_utama').val(response.data.label).show();
@@ -3089,10 +3136,12 @@ foreach($get_pegawai as $pegawai){
                         jQuery('#detail_uraian_kegiatan').hide();
                         jQuery('label[for="detail_uraian_tk"]').hide();
                         jQuery('#detail_uraian_tk').hide();
-                        jQuery('label[for="detail_pokin_1"]').show();
-                        jQuery('#detail_pokin_1').val(response.get_pokin_1.label).show();
                         jQuery('label[for="detail_pokin_2"]').show();
-                        jQuery('#detail_pokin_2').val(response.get_pokin_2.label).show();
+                        var pokin_1 = response.get_pokin_2.map(pokin => pokin.pokin_label).join(" - ");
+                        jQuery('#detail_pokin_2').val(pokin_1).show();
+                        jQuery('label[for="detail_pokin_2"]').show();
+                        var pokin_2 = response.get_pokin_2.map(pokin => pokin.pokin_label).join(" - ");
+                        jQuery('#detail_pokin_2').val(pokin_2).show();
                         jQuery('label[for="detail_pokin_3"]').hide();
                         jQuery('#detail_pokin_3').hide();
                         jQuery('label[for="detail_pokin_4"]').hide();
@@ -3123,7 +3172,8 @@ foreach($get_pegawai as $pegawai){
                         jQuery('label[for="detail_pokin_2"]').hide();
                         jQuery('#detail_pokin_2').hide();
                         jQuery('label[for="detail_pokin_3"]').show();
-                        jQuery('#detail_pokin_3').val(response.get_pokin_3.label).show();
+                        var pokin_3 = response.get_pokin_3.map(pokin => pokin.pokin_label).join(" - ");
+                        jQuery('#detail_pokin_3').val(pokin_3).show();
                         jQuery('label[for="detail_pokin_4"]').hide();
                         jQuery('#detail_pokin_4').hide();
                         jQuery('label[for="detail_pokin_5"]').hide();
@@ -3154,7 +3204,8 @@ foreach($get_pegawai as $pegawai){
                         jQuery('label[for="detail_pokin_3"]').hide();
                         jQuery('#detail_pokin_3').hide();
                         jQuery('label[for="detail_pokin_4"]').show();
-                        jQuery('#detail_pokin_4').val(response.get_pokin_4.label).show();
+                        var pokin_4 = response.get_pokin_4.map(pokin => pokin.pokin_label).join(" - ");
+                        jQuery('#detail_pokin_4').val(pokin_4).show();
                         jQuery('label[for="detail_pokin_5"]').hide();
                         jQuery('#detail_pokin_5').hide();
                         jQuery('label[for="detail_cascading_sasaran"]').hide();
@@ -3185,7 +3236,8 @@ foreach($get_pegawai as $pegawai){
                         jQuery('label[for="detail_pokin_4"]').hide();
                         jQuery('#detail_pokin_4').hide();
                         jQuery('label[for="detail_pokin_5"]').show();
-                        jQuery('#detail_pokin_5').val(response.get_pokin_5.label).show();
+                        var pokin_5 = response.get_pokin_5.map(pokin => pokin.pokin_label).join(" - ");
+                        jQuery('#detail_pokin_5').val(pokin_5).show();
                         jQuery('label[for="detail_cascading_sasaran"]').hide();
                         jQuery('#detail_cascading_sasaran').hide();
                         jQuery('label[for="detail_cascading_program"]').hide();
