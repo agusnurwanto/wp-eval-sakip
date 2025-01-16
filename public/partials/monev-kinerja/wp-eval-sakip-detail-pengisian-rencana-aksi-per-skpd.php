@@ -31,14 +31,12 @@ if (empty($data_id_jadwal['id_jadwal'])) {
 } else {
     $id_jadwal = $data_id_jadwal['id_jadwal'];
 }
-$cek_id_jadwal = empty($data_id_jadwal['id_jadwal']) ? 0 : 1;
 
 if (empty($data_id_jadwal['id_jadwal_wp_sipd'])) {
     $id_jadwal_wpsipd = 0;
 } else {
     $id_jadwal_wpsipd = $data_id_jadwal['id_jadwal_wp_sipd'];
 }
-$cek_id_jadwal_wpsipd = empty($data_id_jadwal['id_jadwal_wp_sipd']) ? 0 : 1;
 
 $skpd = $wpdb->get_row(
     $wpdb->prepare("
@@ -472,8 +470,8 @@ foreach($get_pegawai as $pegawai){
         run_download_excel_sakip();
         jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-rencana-aksi" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
 
-        window.id_jadwal = <?php echo $cek_id_jadwal; ?>;
-        window.id_jadwal_wpsipd = <?php echo $cek_id_jadwal_wpsipd; ?>;
+        window.id_jadwal = <?php echo $id_jadwal; ?>;
+        window.id_jadwal_wpsipd = <?php echo $id_jadwal_wpsipd; ?>;
         if (id_jadwal == 0) {
             alert("Jadwal RPJMD/RPD untuk data Pokin belum disetting.\nSetting di admin dashboard di menu E-SAKIP Options -> Laporan Monitor Upload Dokumen Tahun <?php echo $input['tahun']; ?>")
         }
