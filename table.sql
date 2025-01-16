@@ -1277,20 +1277,6 @@ CREATE TABLE `esakip_data_rencana_aksi_indikator_opd` (
   PRIMARY key (id)
 );
 
-CREATE TABLE `esakip_pengaturan_rencana_aksi` (
-  `id` int(11) NOT NULL auto_increment,
-  `id_jadwal` int(11) DEFAULT NULL,
-  `id_jadwal_wp_sipd` int(11) DEFAULT NULL,
-  `id_jadwal_rpjmd` int(11) DEFAULT NULL,
-  `active` tinyint(4) NOT NULL,
-  `tahun_anggaran` year(4) NOT NULL DEFAULT '2022',
-  `keterangan` varchar(255) DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `update_at` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY  (id)
-);
-
-
 CREATE TABLE `esakip_data_iku_opd` (
   `id` int(11) NOT NULL auto_increment,
   `kode_sasaran` text NOT NULL,
@@ -1671,5 +1657,19 @@ CREATE TABLE `esakip_data_satuan` (
   `active` TINYINT(1) NOT NULL DEFAULT 1,
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `esakip_data_pokin_rhk_opd` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_rhk_opd` int(11) DEFAULT null,
+  `level_rhk_opd` int(11) DEFAULT null COMMENT '1 = Kegiatan Utama, 2 = Rencana Hasil Kerja, 3 = Uraian Kegiatan, 4 = Uraian Teknis Kegiatan',
+  `id_pokin` int(11) DEFAULT null,
+  `level_pokin` int(11) DEFAULT null,
+  `tahun_anggaran` year(4) DEFAULT NULL,
+  `id_skpd` int(11) NOT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
 );

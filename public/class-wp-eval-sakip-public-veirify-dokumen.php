@@ -1762,39 +1762,6 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                         $message = "Sukses edit data";
                     }
 
-                    $cek_data_pengaturan = $wpdb->get_var(
-                        $wpdb->prepare("
-							SELECT 
-								id
-							FROM esakip_pengaturan_rencana_aksi
-							WHERE tahun_anggaran=%d
-							AND active=1
-						", $tahun_anggaran)
-                    );
-
-                    $data = array(
-                        'id_jadwal'         => $id_jadwal_rpjmd,
-                        'tahun_anggaran'     => $tahun_anggaran,
-                        'active'             => 1,
-                        'update_at'         => current_time('mysql')
-                    );
-
-                    if (empty($cek_data_pengaturan)) {
-                        $data['created_at'] = current_time('mysql');
-                        $wpdb->insert(
-                            'esakip_pengaturan_rencana_aksi',
-                            $data
-                        );
-                        $message = "Sukses tambah data";
-                    } else {
-                        $wpdb->update(
-                            'esakip_pengaturan_rencana_aksi',
-                            $data,
-                            array('id' => $cek_data_pengaturan)
-                        );
-                        $message = "Sukses edit data";
-                    }
-
                     echo json_encode([
                         'status' => true,
                         'message' => $message,
