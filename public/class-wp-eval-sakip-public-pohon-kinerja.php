@@ -6301,8 +6301,9 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 	                FROM esakip_data_satker_simpeg AS s
 	                WHERE s.satker_id like %s
 	                    AND s.nama like %s
+	                    AND tahun_anggaran = %d
 	                ORDER BY satker_id ASC
-	            ', $get_mapping.'%', '%'.$q.'%'), ARRAY_A);
+	            ', $get_mapping.'%', '%'.$q.'%', $tahun_anggaran_sakip), ARRAY_A);
 
 	            $ret['sql'] = $wpdb->last_query;
 	            $ret['data'] = array();
