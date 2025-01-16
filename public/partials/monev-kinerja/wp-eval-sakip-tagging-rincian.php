@@ -44,10 +44,11 @@ function get_pegawai_skpd_rhk($rhk, $wpdb)
 	);
 
 	return [
-		'pegawai' => $nama_pegawai,
-		'skpd' 	  => $nama_skpd,
+		'pegawai' => $nama_pegawai ?: null,
+		'skpd'    => $nama_skpd ?: null,
 	];
 }
+
 
 $ind_renaksi = $wpdb->get_row(
 	$wpdb->prepare("
@@ -248,24 +249,16 @@ $renaksi_parent_pemda = $wpdb->get_results(
 );
 
 $renaksi_pemda4 = array(
-	'label' => array(),
-	'pokin' => array(),
-	'nomenklatur' => array()
+	'label' => array()
 );
 $renaksi_pemda3 = array(
-	'label' => array(),
-	'pokin' => array(),
-	'nomenklatur' => array()
+	'label' => array()
 );
 $renaksi_pemda2 = array(
-	'label' => array(),
-	'pokin' => array(),
-	'nomenklatur' => array()
+	'label' => array()
 );
 $renaksi_pemda1 = array(
-	'label' => array(),
-	'pokin' => array(),
-	'nomenklatur' => array()
+	'label' => array()
 );
 foreach ($renaksi_parent_pemda as $val) {
 	$renaksi_pemda4['label'][$val['id_renaksi']] = $val['label'] . ' ( ' . $val['indikator'] . ' ' . $val['target_akhir'] . ' ' . $val['satuan'] . ' )';
@@ -481,8 +474,10 @@ if (!empty($grouped_data)) {
 } else {
 	$tbody = "<tr><td colspan='9' class='esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah'>Tidak ada data tersedia</td></tr>";
 }
+//sisa pagu rhk
 $sisa_pagu_rhk = $ind_renaksi['rencana_pagu'] - $total_all;
 
+//disabled button jika ada parameter yg tidak lengkap
 $disabled = '';
 $disabled_manual = '';
 $wpsipd_status = get_option('_crb_url_server_sakip');
@@ -617,15 +612,16 @@ if (empty($wpsipd_status)) {
 		<?php if (!$is_admin_panrb && $hak_akses_user): ?>
 			<div id="action" class="action-section hide-excel"></div>
 		<?php endif; ?>
+		<h3 class="text-center">Data Pemerintah Daerah</h3>
 		<table class="borderless-table">
 			<tbody>
 				<tr>
-					<td style="width: 270px;">Pohon Kinerja Pemda Level 1</td>
+					<td style="width: 270px;">Pohon Kinerja Level 1</td>
 					<td style="width: 20px;" class="text-center">:</td>
 					<td></td>
 				</tr>
 				<tr>
-					<td style="width: 270px;">RHK Pemda Level 1</td>
+					<td style="width: 270px;">RHK Level 1</td>
 					<td>:</td>
 					<td></td>
 				</tr>
@@ -639,12 +635,12 @@ if (empty($wpsipd_status)) {
 		<table class="borderless-table">
 			<tbody>
 				<tr>
-					<td style="width: 270px;">Pohon Kinerja Pemda Level 2</td>
+					<td style="width: 270px;">Pohon Kinerja Level 2</td>
 					<td style="width: 20px;" class="text-center">:</td>
 					<td></td>
 				</tr>
 				<tr>
-					<td>RHK Pemda Level 2</td>
+					<td>RHK Level 2</td>
 					<td class="text-center">:</td>
 					<td></td>
 				</tr>
@@ -658,12 +654,12 @@ if (empty($wpsipd_status)) {
 		<table class="borderless-table">
 			<tbody>
 				<tr>
-					<td style="width: 270px;">Pohon Kinerja Pemda Level 3</td>
+					<td style="width: 270px;">Pohon Kinerja Level 3</td>
 					<td style="width: 20px;" class="text-center">:</td>
 					<td></td>
 				</tr>
 				<tr>
-					<td>RHK Pemda Level 3</td>
+					<td>RHK Level 3</td>
 					<td class="text-center">:</td>
 					<td></td>
 				</tr>
@@ -677,12 +673,12 @@ if (empty($wpsipd_status)) {
 		<table class="borderless-table">
 			<tbody>
 				<tr>
-					<td style="width: 270px;">Pohon Kinerja Pemda Level 4</td>
+					<td style="width: 270px;">Pohon Kinerja Level 4</td>
 					<td style="width: 20px;" class="text-center">:</td>
 					<td></td>
 				</tr>
 				<tr>
-					<td>RHK Pemda Level 4</td>
+					<td>RHK Level 4</td>
 					<td class="text-center">:</td>
 					<td><?php echo implode('<br>', $renaksi_pemda4['label']); ?></td>
 				</tr>
@@ -693,107 +689,132 @@ if (empty($wpsipd_status)) {
 				</tr>
 			</tbody>
 		</table>
+		<h3 class="text-center">Data Organisasi Perangkat Daerah</h3>
 		<table class="borderless-table">
 			<tbody>
 				<tr>
-					<td style="width: 270px;">Pohon Kinerja OPD Level 1</td>
+					<td style="width: 270px;">Pohon Kinerja Level 1</td>
 					<td style="width: 20px;" class="text-center">:</td>
 					<td><?php echo $renaksi_parent3['label_pokin_1']; ?></td>
 				</tr>
 				<tr>
-					<td style="width: 270px;">Pohon Kinerja OPD Level 2</td>
+					<td style="width: 270px;">Pohon Kinerja Level 2</td>
 					<td style="width: 20px;" class="text-center">:</td>
 					<td><?php echo $renaksi_parent3['label_pokin_2']; ?></td>
 				</tr>
 				<tr>
-					<td>RHK OPD Level 1</td>
+					<td>Kegiatan Utama | RHK Level 1</td>
 					<td class="text-center">:</td>
 					<td><?php echo $renaksi_parent3['label']; ?></td>
-				</tr>
-				<tr>
-					<td style="width: 270px;">Perangkat Daerah</td>
-					<td>:</td>
-					<td><?php echo $nama_skpd_3; ?></td>
-				</tr>
-				<tr>
-					<td style="width: 270px;">Nama Pegawai</td>
-					<td>:</td>
-					<td><?php echo $nama_pegawai_3['nip_baru'] . ' - ' . $nama_pegawai_3['nama_pegawai']; ?></td>
 				</tr>
 				<tr>
 					<td>Sasaran RENSTRA</td>
 					<td class="text-center">:</td>
 					<td><?php echo $renaksi_parent3['kode_cascading_sasaran'] . ' ' . $renaksi_parent3['label_cascading_sasaran']; ?></td>
 				</tr>
+				<tr>
+					<td style="width: 270px;">Satuan Kerja</td>
+					<td>:</td>
+					<td><?php echo $nama_skpd_3; ?></td>
+				</tr>
+				<tr>
+					<td style="width: 270px;">Nama Pegawai</td>
+					<td>:</td>
+					<td>
+						<?php
+						if (!empty($nama_pegawai_3)) {
+							echo $nama_pegawai_3['nip_baru'] . ' - ' . $nama_pegawai_3['nama_pegawai'];
+						} else {
+							echo '-';
+						}
+						?>
+					</td>
+				</tr>
 			</tbody>
 		</table>
 		<table class="borderless-table">
 			<tbody>
 				<tr>
-					<td style="width: 270px;">Pohon Kinerja OPD Level 3</td>
+					<td style="width: 270px;">Pohon Kinerja Level 3</td>
 					<td style="width: 20px;" class="text-center">:</td>
 					<td><?php echo $renaksi_parent2['label_pokin_3']; ?></td>
 				</tr>
 				<tr>
-					<td>RHK OPD Level 2</td>
+					<td>Rencana Hasil Kerja | RHK Level 2</td>
 					<td class="text-center">:</td>
 					<td><?php echo $renaksi_parent2['label']; ?></td>
-				</tr>
-				<tr>
-					<td style="width: 270px;">Perangkat Daerah</td>
-					<td>:</td>
-					<td><?php echo $nama_skpd_2; ?></td>
-				</tr>
-				<tr>
-					<td style="width: 270px;">Nama Pegawai</td>
-					<td>:</td>
-					<td><?php echo $nama_pegawai_2['nip_baru'] . ' - ' . $nama_pegawai_2['nama_pegawai']; ?></td>
 				</tr>
 				<tr>
 					<td>Program</td>
 					<td class="text-center">:</td>
 					<td><?php echo $renaksi_parent2['kode_cascading_program'] . ' ' . $renaksi_parent2['label_cascading_program']; ?></td>
 				</tr>
+				<tr>
+					<td style="width: 270px;">Satuan Kerja</td>
+					<td>:</td>
+					<td><?php echo $nama_skpd_2; ?></td>
+				</tr>
+				<tr>
+					<td style="width: 270px;">Nama Pegawai</td>
+					<td>:</td>
+					<td>
+						<?php
+						if (!empty($nama_pegawai_2)) {
+							echo $nama_pegawai_2['nip_baru'] . ' - ' . $nama_pegawai_2['nama_pegawai'];
+						} else {
+							echo '-';
+						}
+						?>
+					</td>
+				</tr>
 			</tbody>
 		</table>
 		<table class="borderless-table">
 			<tbody>
 				<tr>
-					<td style="width: 270px;">Pohon Kinerja OPD Level 4</td>
+					<td style="width: 270px;">Pohon Kinerja Level 4</td>
 					<td style="width: 20px;" class="text-center">:</td>
 					<td><?php echo $renaksi_parent1['label_pokin_4']; ?></td>
 				</tr>
 				<tr>
-					<td>RHK OPD Level 3</td>
+					<td>Uraian Kegiatan RHK | RHK Level 3</td>
 					<td class="text-center">:</td>
 					<td><?php echo $renaksi_parent1['label']; ?></td>
-				</tr>
-				<tr>
-					<td style="width: 270px;">Perangkat Daerah</td>
-					<td>:</td>
-					<td><?php echo $nama_skpd_1; ?></td>
-				</tr>
-				<tr>
-					<td style="width: 270px;">Nama Pegawai</td>
-					<td>:</td>
-					<td><?php echo $nama_pegawai_1['nip_baru'] . ' - ' . $nama_pegawai_1['nama_pegawai']; ?></td>
 				</tr>
 				<tr>
 					<td>Kegiatan</td>
 					<td class="text-center">:</td>
 					<td><?php echo $renaksi_parent1['kode_cascading_kegiatan'] . ' ' . $renaksi_parent1['label_cascading_kegiatan']; ?></td>
 				</tr>
+				<tr>
+					<td style="width: 270px;">Satuan Kerja</td>
+					<td>:</td>
+					<td><?php echo $nama_skpd_1; ?></td>
+				</tr>
+				<tr>
+					<td style="width: 270px;">Nama Pegawai</td>
+					<td>:</td>
+					<td>
+						<?php
+						if (!empty($nama_pegawai_1)) {
+							echo $nama_pegawai_1['nip_baru'] . ' - ' . $nama_pegawai_1['nama_pegawai'];
+						} else {
+							echo '-';
+						}
+						?>
+					</td>
+				</tr>
 			</tbody>
 		</table>
 		<table class="borderless-table">
 			<tbody>
 				<tr>
-					<td style="width: 270px;">Pohon Kinerja OPD Level 5</td>
+					<td style="width: 270px;">Pohon Kinerja Level 5</td>
 					<td style="width: 20px;" class="text-center">:</td>
 					<td><?php echo $renaksi['label_pokin_5']; ?></td>
 				</tr>
 				<tr>
-					<td>RHK OPD Level 4</td>
+					<td>Uraian Teknis Kegiatan | RHK Level 4</td>
 					<td class="text-center">:</td>
 					<td><?php echo $renaksi['label']; ?></td>
 				</tr>
@@ -801,16 +822,6 @@ if (empty($wpsipd_status)) {
 					<td>Dasar Kegiatan</td>
 					<td class="text-center">:</td>
 					<td>Mandatory Pusat, Kebijakan Kepala Daerah, POKIR, MUSRENBANG</td>
-				</tr>
-				<tr>
-					<td style="width: 270px;">Perangkat Daerah</td>
-					<td>:</td>
-					<td><?php echo $nama_skpd_4; ?></td>
-				</tr>
-				<tr>
-					<td style="width: 270px;">Nama Pegawai</td>
-					<td>:</td>
-					<td><?php echo $nama_pegawai_4['nip_baru'] . ' - ' . $nama_pegawai_4['nama_pegawai']; ?></td>
 				</tr>
 				<tr>
 					<td>Sub Kegiatan</td>
@@ -822,133 +833,202 @@ if (empty($wpsipd_status)) {
 					<td class="text-center">:</td>
 					<td>Rp 0</td>
 				</tr>
-			</tbody>
-		</table>
-		<h5 class="text_tengah">Target dan Realisasi Per Bulan</h5>
-		<table>
-			<thead style="background-color: #bde0fe; color: #212529;"> 
 				<tr>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Bulan</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Target</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Realisasi</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Januari</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 95.000.000</td>
+					<td style="width: 270px;">Satuan Kerja</td>
+					<td>:</td>
+					<td><?php echo $nama_skpd_4; ?></td>
 				</tr>
 				<tr>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Februari</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 98.000.000</td>
-				</tr>
-				<tr>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Maret</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 102.000.000</td>
-				</tr>
-				<tr>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">April</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 97.000.000</td>
-				</tr>
-				<tr>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Mei</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 99.000.000</td>
-				</tr>
-				<tr>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Juni</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 101.000.000</td>
-				</tr>
-				<tr>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Juli</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 96.000.000</td>
-				</tr>
-				<tr>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Agustus</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 103.000.000</td>
-				</tr>
-				<tr>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">September</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 100.000.000</td>
-				</tr>
-				<tr>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Oktober</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 98.000.000</td>
-				</tr>
-				<tr>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">November</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 97.000.000</td>
-				</tr>
-				<tr>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Desember</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #007bff;">Rp 100.000.000</td>
-					<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="color: #28a745;">Rp 105.000.000
+					<td style="width: 270px;">Nama Pegawai</td>
+					<td>:</td>
+					<td>
+						<?php
+						if (!empty($nama_pegawai_4)) {
+							echo $nama_pegawai_4['nip_baru'] . ' - ' . $nama_pegawai_4['nama_pegawai'];
+						} else {
+							echo '-';
+						}
+						?>
 					</td>
 				</tr>
 			</tbody>
 		</table>
+
+
+		<h3 class="text-center">Target dan Realisasi Per Bulan</h3>
 		<table>
 			<thead style="background-color: #bde0fe; color: #212529;">
 				<tr>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="6" style="width: 400px;">INDIKATOR</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="6">SATUAN</th>
+					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="3">INDIKATOR</th>
+					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">SATUAN</th>
+					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TARGET AWAL</th>
+					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TARGET AKHIR</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="6"><?php echo $ind_renaksi['indikator']; ?></td>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="6"><?php echo $ind_renaksi['satuan']; ?></td>
-				</tr>
-			</tbody>
-			<thead style="background-color: #bde0fe; color: #212529;">
-				<tr>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="6">TARGET KEGIATAN PER TRIWULAN</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="6">REALISASI KEGIATAN PER TRIWULAN</th>
-				</tr>
-				<tr>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">AWAL</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW-I</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW-II</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW-III</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW-IV</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">AKHIR</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">AWAL</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW-I</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW-II</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW-III</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW-IV</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">AKHIR</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<!-- target -->
+					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="3"><?php echo $ind_renaksi['indikator']; ?></td>
+					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['satuan']; ?></td>
 					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['target_awal']; ?></td>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['target_1']; ?></td>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['target_2']; ?></td>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['target_3']; ?></td>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['target_4']; ?></td>
 					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['target_akhir']; ?></td>
-					<!-- realisasi -->
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['realisasi_target_1']; ?></td>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['realisasi_target_2']; ?></td>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['realisasi_target_3']; ?></td>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['realisasi_target_4']; ?></td>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+				</tr>
+				<tr>
+					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="6">
+						<table>
+							<thead style="background-color: #bde0fe; color: #212529;">
+								<tr>
+									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Bulan/TW</th>
+									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Satuan</th>
+									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Target</th>
+									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Realisasi</th>
+									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Capaian</th>
+									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Keterangan</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Januari</td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+								</tr>
+								<tr>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Februari</td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+								</tr>
+								<tr>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Maret</td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+								</tr>
+								<tr style="background-color:#FDFFB6;">
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW 1</td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['target_1']; ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+								</tr>
+								<tr>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">April</td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+								</tr>
+								<tr>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Mei</td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+								</tr>
+								<tr>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Juni</td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+								</tr>
+								<tr style="background-color:#FDFFB6;">
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW 2</td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['target_2']; ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+								</tr>
+								<tr>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Juli</td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+								</tr>
+								<tr>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Agustus</td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+								</tr>
+								<tr>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">September</td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+								</tr>
+								<tr style="background-color:#FDFFB6;">
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW 3</td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['target_3']; ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+								</tr>
+								<tr>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Oktober</td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+								</tr>
+								<tr>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">November</td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+								</tr>
+								<tr>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Desember</td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+								</tr>
+								<tr style="background-color:#FDFFB6;">
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW 4</td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['target_4']; ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+								</tr>
+								<tr style="background-color:#FDFFB6;">
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Total</td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+								</tr>
+							</tbody>
+						</table>
+					</td>
 				</tr>
 			</tbody>
 		</table>
+
 		<table>
 			<thead style="background-color: #bde0fe; color: #212529;">
 				<tr>
@@ -971,6 +1051,8 @@ if (empty($wpsipd_status)) {
 				</tr>
 			</tbody>
 		</table>
+
+		<h3 class="text-center">Rincian Belanja Teknis Kegiatan</h3>
 		<div class="m-2 text-center">
 			<button class="btn btn-primary m-2 text-center" onclick="handleModalTambahDataManual()" title="Tambah Data" <?php echo $disabled_manual; ?>>
 				<span class="dashicons dashicons-plus"></span> Tambah Rincian Belanja Manual
