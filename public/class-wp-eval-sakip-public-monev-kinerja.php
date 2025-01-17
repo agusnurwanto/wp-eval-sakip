@@ -858,7 +858,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						    ", $ret['data']['id'], $ret['data']['level']),
 						    ARRAY_A
 						);
-		                print_r($ret['data']['pokin_2']);die($wpdb->last_query);
 						$ret['data']['pokin_3'] = $wpdb->get_results(
 						    $wpdb->prepare("
 						        SELECT
