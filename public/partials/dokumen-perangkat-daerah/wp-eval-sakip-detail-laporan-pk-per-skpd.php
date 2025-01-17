@@ -100,7 +100,7 @@ if(!empty($nip)){
         $data_detail['jabatan_pegawai'] = $data_satker['jabatan'].' '.$data_satker['nama_bidang'];
 
         $cek_kepala = strlen($data_satker['satker_id']);
-        $date_hari_ini = date('Y-m-d H:i:s');
+        $date_hari_ini = current_datetime()->format('Y-m-d H:i:s');
         $status_kepala_skpd = 0;
         if($data_satker['plt_plh'] == 1 && ($data_satker['tmt_sk_plth'] < $date_hari_ini && $date_hari_ini < $data_satker['berakhir'])){
             $status_kepala_skpd = 1;
@@ -483,6 +483,32 @@ if(!empty($nip)){
             'message' => "Terjadi kesalahan ketika mengakses API, Error : ". json_last_error_msg()
         );
     }
+
+    function formatTanggalIndonesia($tanggal) {
+        // Array untuk nama bulan dalam bahasa Indonesia
+        $bulan = array(
+            1 => 'Januari',
+            2 => 'Februari',
+            3 => 'Maret',
+            4 => 'April',
+            5 => 'Mei',
+            6 => 'Juni',
+            7 => 'Juli',
+            8 => 'Agustus',
+            9 => 'September',
+            10 => 'Oktober',
+            11 => 'November',
+            12 => 'Desember'
+        );
+
+        $day = date('d', strtotime($tanggal));
+        $month = $bulan[date('n', strtotime($tanggal))];
+        $year = date('Y', strtotime($tanggal));
+
+        return "$day $month $year";
+    }
+
+    $text_tanggal_hari_ini = formatTanggalIndonesia(current_datetime()->format('Y-m-d'));
 }
 
 $logo_pemda = get_option('_crb_logo_dashboard');
@@ -517,6 +543,10 @@ if(empty($logo_pemda)){
         .break-print {
 			break-after: page;
 		}
+
+        td[contenteditable="true"] {
+            background: none !important;
+        }
   	}
 
     #action-sakip {
@@ -605,6 +635,10 @@ if(empty($logo_pemda)){
         width: 3rem;
     }
 
+    td[contenteditable="true"] {
+        background: #ff00002e;
+    }
+
 </style>
 
 <div class="container-md mx-auto" style="width: 900px;">
@@ -636,7 +670,7 @@ if(empty($logo_pemda)){
             <tr>
                 <td>Jabatan</td>
                 <td>:</td>
-                <td><?php echo $data_detail['jabatan_pegawai']; ?></td>
+                <td class="status-jabatan-pegawai-1"><?php echo $data_detail['jabatan_pegawai']; ?></td>
             </tr>
             <tr>
                 <td colspan="3">Selanjutnya disebut pihak pertama</td>
@@ -649,7 +683,7 @@ if(empty($logo_pemda)){
             <tr>
                 <td>Jabatan</td>
                 <td>:</td>
-                <td><?php echo $data_detail_atasan['jabatan_pegawai_atasan']; ?></td>
+                <td class="status-jabatan-pegawai-2"><?php echo $data_detail_atasan['jabatan_pegawai_atasan']; ?></td>
             </tr>
             <tr>
                 <td colspan="3">Selaku atasan langsung pihak pertama, selanjutnya disebut pihak kedua</td>
@@ -658,11 +692,13 @@ if(empty($logo_pemda)){
         <p class="text-left f-12">Pihak pertama berjanji akan mewujudkan target kinerja yang seharusnya sesuai lampiran perjanjian ini, dalam rangka mencapai target kinerja jangka menengah seperti yang telah ditetapkan dalam dokumen perencanaan. Keberhasilan dan kegagalan pencapaian target tersebut menjadi tanggung jawab kami.</p>
         </br>
         <p class="text-left f-12">Pihak kedua akan memberikan supervisi yang diperlukan serta akan melakukan evaluasi terhadap capaian kinerja dari perjanjian ini dan mengambil tindakan yang diperlukan dalam rangka memberikan penghargaan dan sanksi.</p>
-        <table id="table_data_pejabat" class="f-12">
+        <table id="table_data_pejabat" style="margin-top: 3rem;" class="f-12">
             <thead>
                 <tr class="text-center">
                     <td></td>
-                    <td><?php echo $pemda; ?>,&emsp;&emsp;-&emsp;&emsp;&emsp;&emsp;&emsp;-&ensp;<?php echo $input['tahun']; ?></td>
+                    <td contenteditable="true" title="Klik untuk ganti teks!">
+                        <?php echo $pemda; ?>, <?php echo $text_tanggal_hari_ini; ?>
+                    </td>
                 </tr>
                 <tr class="text-center">
                     <td>Pihak Kedua,</td>
@@ -733,7 +769,9 @@ if(empty($logo_pemda)){
                 <thead>
                     <tr class="text-center">
                         <td></td>
-                        <td><?php echo $pemda; ?>,&emsp;&emsp;-&emsp;&emsp;&emsp;&emsp;&emsp;-&ensp;<?php echo $input['tahun']; ?></td>
+                        <td contenteditable="true" title="Klik untuk ganti teks!">
+                            <?php echo $pemda; ?>, <?php echo $text_tanggal_hari_ini; ?>
+                        </td>
                     </tr>
                     <tr class="text-center">
                         <td>Pihak Kedua,</td>
@@ -796,72 +834,25 @@ if(empty($logo_pemda)){
         }
         let cek_status_jabatan_kepala_pihak_pertama = <?php echo $cek_status_jabatan_kepala_pihak_pertama; ?>;
         let nama_pejabat = "<?php echo $data_detail['nama_pegawai_lengkap']; ?>";
-        // if(cek_status_jabatan_kepala_pihak_pertama == 1){
-        //     var input_status_jabatan_pertama = window.prompt("Harap isi status jabatan (PJ, PLT, PLH) atas nama "+ nama_pejabat +" sebagai pihak pertama!")
-        // }
+        let input_status_jabatan_pertama = "";
+        if(cek_status_jabatan_kepala_pihak_pertama == 1){
+            input_status_jabatan_pertama = window.prompt("Harap isi status jabatan (PJ, PLT, PLH) atas nama "+ nama_pejabat +" sebagai pihak pertama!")
+        }
 
-        // if (input_status_jabatan_pertama !== null && input_status_jabatan_pertama.trim() !== "") {
-        //     jQuery('#wrap-loading').show();
-        //     jQuery.ajax({
-        //         url: esakip.url,
-        //         type: 'POST',
-        //         data: {
-        //             action: 'submit_status_jabatan',
-        //             api_key: esakip.api_key,
-        //             status_jabatan: input_status_jabatan_pertama,
-        //             nip: <?php echo $data_detail['nip_pegawai']; ?>,
-        //             tahun_anggaran: <?php echo $input['tahun']; ?>
-        //         },
-        //         dataType: 'json',
-        //         success: function(response) {
-        //             jQuery('#wrap-loading').hide();
-        //             if (response.status === 'success') {
-        //                 console.log("Berhasil Setting Status Jabatan")
-        //             } else {
-        //                 alert(response.message);
-        //             }
-        //         },
-        //         error: function(xhr, status, error) {
-        //             jQuery('#wrap-loading').hide();
-        //             console.error(xhr.responseText);
-        //             alert('Terjadi kesalahan saat memuat tabel!');
-        //         }
-        //     });
-        // }
+        if (input_status_jabatan_pertama !== null && input_status_jabatan_pertama.trim() !== "") {
+            jQuery(".status-jabatan-pegawai-1").prepend(input_status_jabatan_pertama+" ")
+        }
 
         let cek_status_jabatan_kepala_pihak_kedua = <?php echo $cek_status_jabatan_kepala_pihak_kedua; ?>;
+        console.log(cek_status_jabatan_kepala_pihak_kedua);
         let nama_pejabat_kedua = "<?php echo $data_detail_atasan['nama_pegawai_atasan_lengkap']; ?>";
-        // if(cek_status_jabatan_kepala_pihak_kedua == 1){
-        //     var input_status_jabatan_kedua = window.prompt("Harap isi status jabatan (PJ, PLT, PLH) atas nama "+ nama_pejabat_kedua +" sebagai pihak kedua!")
-        // }
+        let input_status_jabatan_kedua = "";
+        if(cek_status_jabatan_kepala_pihak_kedua == 1){
+            input_status_jabatan_kedua = window.prompt("Harap isi status jabatan (PJ, PLT, PLH) atas nama "+ nama_pejabat_kedua +" sebagai pihak kedua!")
+        }
 
-        // if (input_status_jabatan_kedua !== null && input_status_jabatan_kedua.trim() !== "") {
-        //     jQuery('#wrap-loading').show();
-        //     jQuery.ajax({
-        //         url: esakip.url,
-        //         type: 'POST',
-        //         data: {
-        //             action: 'submit_status_jabatan',
-        //             api_key: esakip.api_key,
-        //             status_jabatan: input_status_jabatan_kedua,
-        //             nip: <?php echo $data_detail['nip_pegawai']; ?>,
-        //             tahun_anggaran: <?php echo $input['tahun']; ?>
-        //         },
-        //         dataType: 'json',
-        //         success: function(response) {
-        //             jQuery('#wrap-loading').hide();
-        //             if (response.status === 'success') {
-        //                 console.log("Berhasil Setting Status Jabatan")
-        //             } else {
-        //                 alert(response.message);
-        //             }
-        //         },
-        //         error: function(xhr, status, error) {
-        //             jQuery('#wrap-loading').hide();
-        //             console.error(xhr.responseText);
-        //             alert('Terjadi kesalahan saat memuat tabel!');
-        //         }
-        //     });
-        // }
+        if (input_status_jabatan_kedua !== null && input_status_jabatan_kedua.trim() !== "") {
+            jQuery(".status-jabatan-pegawai-2").prepend(input_status_jabatan_kedua+" ")
+        }
     });
 </script>
