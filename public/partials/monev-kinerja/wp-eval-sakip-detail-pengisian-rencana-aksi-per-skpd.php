@@ -2532,8 +2532,16 @@ foreach($get_pegawai as $pegawai){
                 return alert('Uraian Teknis Kegiatan tidak boleh kosong!');
             }
         }
-        if (id_pokin_1 == '') {
+        if (id_pokin_1 == '' && tipe == 1) {
+            return alert('Level 1 pohon kinerja tidak boleh kosong!');
+        }else if (id_pokin_2 == '' && tipe == 1) {
             return alert('Level 2 pohon kinerja tidak boleh kosong!');
+        }else if (id_pokin_1 == '' && tipe == 2) {
+            return alert('Level 3 pohon kinerja tidak boleh kosong!');
+        }else if (id_pokin_1 == '' && tipe == 3) {
+            return alert('Level 4 pohon kinerja tidak boleh kosong!');
+        }else if (id_pokin_1 == '' && tipe == 4) {
+            return alert('Level 5 pohon kinerja tidak boleh kosong!');
         }
 
         var selectedChecklistPemda = jQuery('input[name="checklist_renaksi_pemda[]"]:checked');
