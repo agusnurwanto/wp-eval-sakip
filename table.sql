@@ -1673,3 +1673,14 @@ CREATE TABLE `esakip_data_pokin_rhk_opd` (
   `update_at` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
 );
+
+CREATE TABLE `esakip_finalisasi_dokumen_laporan_pk` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nip` text NOT NULL,
+  `nama_dokumen` text NOT NULL,
+  `active` TINYINT(1) NOT NULL DEFAULT 1,
+  `tahun_anggaran` year(4) NOT NULL,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+);
