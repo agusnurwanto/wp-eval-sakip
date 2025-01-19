@@ -864,7 +864,7 @@ if(!empty($pohon_kinerja_level_1)){
 												", $this_data_id_skpd, $tahun_anggaran_sakip),
 												ARRAY_A
 											);
-											$nama_perangkat = $nama_skpd['nama_skpd'];
+											$nama_perangkat = !empty($nama_skpd) ? $nama_skpd['nama_skpd'] : '';
 										}
 
 										if(!empty($croscutting_level_4['keterangan'])){

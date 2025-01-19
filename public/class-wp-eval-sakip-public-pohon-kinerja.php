@@ -299,6 +299,14 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							1
 						), ARRAY_A);
 					} else if ($_prefix_opd == '_opd') {
+						if(is_array($_POST['parent'])){
+							$in_parent = implode(", ", $_POST['parent']);
+							// $_where_parent = $wpdb->prepare(' AND a.parent IN (%s) ', $in_parent);
+							$_where_parent = ' AND a.parent IN ('.$in_parent.') ';
+						}else{
+							$_where_parent = $wpdb->prepare(' AND a.parent=%d ', $_POST['parent']);
+						}
+
 						$dataPokin = $wpdb->get_results($wpdb->prepare(
 							"
 							SELECT 
@@ -313,14 +321,13 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							FROM esakip_pohon_kinerja_opd a
 							LEFT JOIN esakip_pohon_kinerja_opd b ON a.id=b.parent AND a.level=b.level 
 							WHERE 
-								a.id_jadwal=%d AND 
-								a.parent=%d AND 
+								a.id_jadwal=%d AND
 								a.level=%d AND 
 								a.active=%d AND 
 								a.id_skpd=%d
+								$_where_parent
 							ORDER BY a.nomor_urut ASC, b.nomor_urut ASC",
 							$_POST['id_jadwal'],
-							$_POST['parent'],
 							$_POST['level'],
 							1,
 							$id_skpd
@@ -347,6 +354,14 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						}
 					} else if ($_prefix_opd == '_opd') {
 						if (!empty($label_parent)) {
+							if(is_array($_POST['parent'])){
+								$in_parent = implode(", ", $_POST['parent']);
+								// $_where_parent = $wpdb->prepare(' AND a.parent IN (%s) ', $in_parent);
+								$_where_parent = ' AND a.parent IN ('.$in_parent.') ';
+							}else{
+								$_where_parent = $wpdb->prepare(' AND a.parent=%d ', $_POST['parent']);
+							}
+
 							$dataParent = $wpdb->get_results($wpdb->prepare(
 								"
 									SELECT 
@@ -354,12 +369,11 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									FROM esakip_pohon_kinerja_opd a 
 									WHERE 
 										a.id_jadwal=%d AND 
-										a.id=%d AND
 										a.active=%d AND 
 										a.id_skpd=%d
+										$_where_parent
 									ORDER BY a.nomor_urut ASC",
 								$_POST['id_jadwal'],
-								$_POST['parent'],
 								1,
 								$id_skpd
 							), ARRAY_A);
@@ -4447,6 +4461,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 		$data_ret = $this->get_parent_croscutting($opsi);
 		
+		$id = 0;
 		foreach($data_ret as $v){
 			if(!empty($v['data'])){
 				foreach($v['data'] as $vv){
