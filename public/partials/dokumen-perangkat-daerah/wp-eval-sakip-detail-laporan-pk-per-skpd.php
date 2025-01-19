@@ -1,9 +1,8 @@
 <?php
-global $wpdb;
-
 if (!defined('WPINC')) {
     die;
 }
+global $wpdb;
 
 $input = shortcode_atts(array(
     'tahun' => '2022',
@@ -16,8 +15,7 @@ if (!empty($_GET) && !empty($_GET['id_skpd'])) {
 if (!empty($_GET) && !empty($_GET['nip'])) {
     $nip = $_GET['nip'];
 }
-$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
-$current_user = wp_get_current_user();
+
 $nama_pemda = get_option(ESAKIP_NAMA_PEMDA);
 $pemda = explode(" ", $nama_pemda);
 array_shift($pemda);
@@ -25,21 +23,19 @@ $pemda = implode(" ", $pemda);
 
 $skpd = array();
 $skpd = $wpdb->get_row(
-            $wpdb->prepare("
-                SELECT 
-                    u.nama_skpd,
-                    d.alamat_kantor
-                FROM 
-                    esakip_data_unit u
-                LEFT JOIN 
-                    esakip_detail_data_unit d
-                ON d.id_skpd = u.id_skpd
-                WHERE u.id_skpd=%d
-                AND u.tahun_anggaran=%d
-                AND u.active = 1
-            ", $id_skpd, $tahun_anggaran_sakip),
-                ARRAY_A
-            );
+    $wpdb->prepare("
+        SELECT 
+            u.nama_skpd,
+            d.alamat_kantor
+        FROM esakip_data_unit u
+        LEFT JOIN esakip_detail_data_unit d
+               ON d.id_skpd = u.id_skpd
+        WHERE u.id_skpd=%d
+          AND u.tahun_anggaran=%d
+          AND u.active = 1
+    ", $id_skpd, $input['tahun']),
+    ARRAY_A
+);
 $nama_skpd = (!empty($skpd)) ? $skpd['nama_skpd'] : '';
 $alamat_kantor = (!empty($skpd)) ? $skpd['alamat_kantor'] : '';
 
@@ -47,20 +43,18 @@ $error_api = array(
     'status' => 0,
     'message' => 'Berhasil Get API'
 );
-if(!empty($nip)){
+if (!empty($nip)) {
     $data_satker = $wpdb->get_row(
         $wpdb->prepare("
-        SELECT 
-            p.*,
-            ds.nama AS nama_bidang
-        FROM 
-            esakip_data_pegawai_simpeg p
-        LEFT JOIN
-            esakip_data_satker_simpeg ds
-        ON ds.satker_id = p.satker_id
-        WHERE p.nip_baru=%d
-          AND p.active = 1
-    ", $nip),
+            SELECT 
+                p.*,
+                ds.nama AS nama_bidang
+            FROM esakip_data_pegawai_simpeg p
+            LEFT JOIN esakip_data_satker_simpeg ds
+                   ON ds.satker_id = p.satker_id
+            WHERE p.nip_baru=%d
+              AND p.active = 1
+        ", $nip),
         ARRAY_A
     );
 
@@ -92,161 +86,154 @@ if(!empty($nip)){
         'gelar_belakang' => '',
         'nama_pegawai_atasan_lengkap' => ''
     );
-    if(!empty($data_satker)){
+    if (!empty($data_satker)) {
         $data_detail['nama_pegawai'] = $data_satker['nama_pegawai'];
         $data_detail['nama_pegawai_lengkap'] = $data_satker['nama_pegawai'];
         $data_detail['nip_pegawai'] = $data_satker['nip_baru'];
         $data_detail['bidang_pegawai'] = $data_satker['nama_bidang'];
-        $data_detail['jabatan_pegawai'] = $data_satker['jabatan'].' '.$data_satker['nama_bidang'];
+        $data_detail['jabatan_pegawai'] = $data_satker['jabatan'] . ' ' . $data_satker['nama_bidang'];
 
         $cek_kepala = strlen($data_satker['satker_id']);
         $date_hari_ini = current_datetime()->format('Y-m-d H:i:s');
         $status_kepala_skpd = 0;
-        if($data_satker['plt_plh'] == 1 && ($data_satker['tmt_sk_plth'] < $date_hari_ini && $date_hari_ini < $data_satker['berakhir'])){
+        if ($data_satker['plt_plh'] == 1 && ($data_satker['tmt_sk_plth'] < $date_hari_ini && $date_hari_ini < $data_satker['berakhir'])) {
             $status_kepala_skpd = 1;
             $cek_status_jabatan_kepala_pihak_pertama = 1;
         }
 
         /** cek pegawai kepala opd atau bukan */
-        if(($cek_kepala == 2 && $data_satker['tipe_pegawai_id'] == 11 && $status_kepala_skpd == 1) || ($cek_kepala == 2 && $data_satker['tipe_pegawai_id'] == 11 && $data_satker['plt_plh'] == 0)){
+        if (($cek_kepala == 2 && $data_satker['tipe_pegawai_id'] == 11 && $status_kepala_skpd == 1) || ($cek_kepala == 2 && $data_satker['tipe_pegawai_id'] == 11 && $data_satker['plt_plh'] == 0)) {
             $cek_kepala_skpd = 1;
             $nama_kepala_daerah = get_option('_crb_kepala_daerah');
             $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah');
-            if(!empty($nama_kepala_daerah)){
+            if (!empty($nama_kepala_daerah)) {
                 $cek_nama_kepala_daerah = 1;
             }
             $jabatan_kepala = '';
-            if(!empty($status_jabatan_kepala_daerah)){
+            if (!empty($status_jabatan_kepala_daerah)) {
                 $cek_status_jabatan_kepala_daerah = 1;
                 $jabatan_kepala = $status_jabatan_kepala_daerah;
             }
             $data_atasan = [
                 'nama_pegawai' => $nama_kepala_daerah,
-                'jabatan' => $jabatan_kepala.' '.$pemda,
+                'jabatan' => $jabatan_kepala . ' ' . $pemda,
                 'status_kepala' => 'kepala_daerah'
             ];
         }
-        if(empty($data_atasan)){
-            if($data_satker['tipe_pegawai_id'] == 11 && $data_satker['plt_plh'] == 1){
+        if (empty($data_atasan)) {
+            if ($data_satker['tipe_pegawai_id'] == 11 && $data_satker['plt_plh'] == 1) {
                 /**Jika satker id sama dengan kepala || setelah menjadi PJ selesai */
-                // $satker_id_atasan = substr($data_satker['satker_id'], 0, -2);
-                $data_atasan = $wpdb->get_row($wpdb->prepare("
-                    SELECT
-                        p.*,
-                        ds.nama AS nama_bidang
-                    FROM
-                        esakip_data_pegawai_simpeg p
-                    LEFT JOIN 
-                        esakip_data_satker_simpeg ds
-                    ON 
-                        ds.satker_id = p.satker_id
-                    WHERE
-                        p.satker_id=%s AND 
-                        p.tipe_pegawai_id=%d AND 
-                        p.active=1
-                    ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
-                ", $data_satker['satker_id'], 11), ARRAY_A);
-            }else if($data_satker['tipe_pegawai_id'] == 11){
+                $data_atasan = $wpdb->get_row(
+                    $wpdb->prepare("
+                        SELECT
+                            p.*,
+                            ds.nama AS nama_bidang
+                        FROM esakip_data_pegawai_simpeg p
+                        LEFT JOIN esakip_data_satker_simpeg ds
+                            ON ds.satker_id = p.satker_id
+                        WHERE p.satker_id=%s 
+                          AND p.tipe_pegawai_id=%d 
+                          AND p.active=1
+                        ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
+                    ", $data_satker['satker_id'], 11),
+                    ARRAY_A
+                );
+            } else if ($data_satker['tipe_pegawai_id'] == 11) {
                 /**Jika status jabatan kepala, berarti mengambil id satker atasannya */
                 $satker_id_atasan = substr($data_satker['satker_id'], 0, -2);
-                $data_atasan = $wpdb->get_row($wpdb->prepare("
-                    SELECT
-                        p.*,
-                        ds.nama AS nama_bidang
-                    FROM
-                        esakip_data_pegawai_simpeg p
-                    LEFT JOIN 
-                        esakip_data_satker_simpeg ds
-                    ON 
-                        ds.satker_id = p.satker_id
-                    WHERE
-                        p.satker_id=%s AND 
-                        p.tipe_pegawai_id=%d AND 
-                        p.active=1
-                    ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
-                ", $satker_id_atasan, 11), ARRAY_A);
-            }else{
-                $data_atasan = $wpdb->get_row($wpdb->prepare("
-                    SELECT
-                        p.*,
-                        ds.nama AS nama_bidang
-                    FROM
-                        esakip_data_pegawai_simpeg p
-                    LEFT JOIN
-                        esakip_data_satker_simpeg ds
-                    ON
-                        ds.satker_id = p.satker_id
-                    WHERE
-                        p.satker_id=%s AND 
-                        p.tipe_pegawai_id=%d AND 
-                        p.active=1
-                    ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
-                ", $data_satker['satker_id'], 11), ARRAY_A);
+                $data_atasan = $wpdb->get_row(
+                    $wpdb->prepare("
+                        SELECT
+                            p.*,
+                            ds.nama AS nama_bidang
+                        FROM esakip_data_pegawai_simpeg p
+                        LEFT JOIN esakip_data_satker_simpeg ds
+                               ON ds.satker_id = p.satker_id
+                        WHERE p.satker_id=%s 
+                          AND p.tipe_pegawai_id=%d 
+                          AND p.active=1
+                        ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
+                    ", $satker_id_atasan, 11),
+                    ARRAY_A
+                );
+            } else {
+                $data_atasan = $wpdb->get_row(
+                    $wpdb->prepare("
+                        SELECT
+                            p.*,
+                            ds.nama AS nama_bidang
+                        FROM esakip_data_pegawai_simpeg p
+                        LEFT JOIN esakip_data_satker_simpeg ds
+                               ON ds.satker_id = p.satker_id
+                        WHERE p.satker_id=%s 
+                          AND p.tipe_pegawai_id=%d 
+                          AND p.active=1
+                        ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
+                    ", $data_satker['satker_id'], 11),
+                    ARRAY_A
+                );
             }
         }
         $data_detail_atasan['nama_pegawai_atasan'] = (!empty($data_atasan['nama_pegawai'])) ? $data_atasan['nama_pegawai'] : '';
         $data_detail_atasan['nama_pegawai_atasan_lengkap'] = (!empty($data_atasan['nama_pegawai'])) ? $data_atasan['nama_pegawai'] : '';
         $data_detail_atasan['nip_pegawai_atasan'] = (!empty($data_atasan['nip_baru'])) ? $data_atasan['nip_baru'] : '';
 
-        if(!empty($data_atasan['plt_plh'])){
-            if($data_atasan['plt_plh'] == 1 && ($data_atasan['tmt_sk_plth'] < $date_hari_ini && $date_hari_ini < $data_atasan['berakhir'])){
+        if (!empty($data_atasan['plt_plh'])) {
+            if ($data_atasan['plt_plh'] == 1 && ($data_atasan['tmt_sk_plth'] < $date_hari_ini && $date_hari_ini < $data_atasan['berakhir'])) {
                 $cek_status_jabatan_kepala_pihak_kedua = 1;
             }
         }
-        if(!empty($data_atasan['status_kepala']) && !empty($data_atasan['jabatan'])){
+        if (!empty($data_atasan['status_kepala']) && !empty($data_atasan['jabatan'])) {
             $data_detail_atasan['jabatan_pegawai_atasan'] = $data_atasan['jabatan'];
-        }else if(!empty($data_atasan['jabatan'])){
-            $data_detail_atasan['jabatan_pegawai_atasan'] = $data_atasan['jabatan'].' '.$data_atasan['nama_bidang'];
+        } else if (!empty($data_atasan['jabatan'])) {
+            $data_detail_atasan['jabatan_pegawai_atasan'] = $data_atasan['jabatan'] . ' ' . $data_atasan['nama_bidang'];
         }
 
-        if(empty($data_atasan['status_kepala'])){
-            $path = 'api/pegawai/'.$data_detail_atasan['nip_pegawai_atasan'].'/jabatan';
+        if (empty($data_atasan['status_kepala'])) {
+            $path = 'api/pegawai/' . $data_detail_atasan['nip_pegawai_atasan'] . '/jabatan';
             $option = array(
-                'url' => get_option('_crb_url_api_simpeg').$path,
+                'url' => get_option('_crb_url_api_simpeg') . $path,
                 'type' => 'get',
                 'header' => array('Authorization: Basic ' . get_option('_crb_authorization_api_simpeg'))
             );
 
             $response = $this->functions->curl_post($option);
 
-            if(empty($response)){
+            if (empty($response)) {
                 $error_api = array(
                     'status' => 1,
                     'message' => 'Respon API kosong!'
                 );
-            }else if($response == 'Unauthorized'){
+            } else if ($response == 'Unauthorized') {
                 $error_api = array(
                     'status' => 1,
-                    'message' => $response.' '.json_encode($opsi)
+                    'message' => $response . ' ' . json_encode($opsi)
                 );
             }
 
             $dataPegawaiAtasan = json_decode($response, true);
-            if(!empty($dataPegawaiAtasan[0]['nmgolruang'])){
+            if (!empty($dataPegawaiAtasan[0]['nmgolruang'])) {
                 $data_detail_atasan['nama_golruang_atasan'] = $dataPegawaiAtasan[0]['nmgolruang'];
                 $data_detail_atasan['gelar_depan'] = $dataPegawaiAtasan[0]['gelar_depan'];
                 $data_detail_atasan['gelar_belakang'] = $dataPegawaiAtasan[0]['gelar_belakang'];
-                $data_detail_atasan['nama_pegawai_atasan_lengkap'] = $data_detail_atasan['gelar_depan']. ' '. $data_detail_atasan['nama_pegawai_atasan'] .', '. $data_detail_atasan['gelar_belakang'];
-
+                $data_detail_atasan['nama_pegawai_atasan_lengkap'] = $data_detail_atasan['gelar_depan'] . ' ' . $data_detail_atasan['nama_pegawai_atasan'] . ', ' . $data_detail_atasan['gelar_belakang'];
             }
         }
 
         // hasil ploting di halaman RHK
         $data_ploting_rhk = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT 
+            $wpdb->prepare("
+                SELECT 
                     id,
                     label,
                     level
-                FROM
-                    esakip_data_rencana_aksi_opd
-                WHERE
-                    id_skpd=%d AND
-                    tahun_anggaran=%d AND
-                    nip=%d AND
-                    active=%d",
-                $id_skpd, $input['tahun'], $data_satker['nip_baru'],1
-            ), ARRAY_A
+                FROM esakip_data_rencana_aksi_opd
+                WHERE id_skpd=%d 
+                  AND tahun_anggaran=%d 
+                  AND nip=%d 
+                  AND active=1
+            ", $id_skpd, $input['tahun'], $data_satker['nip_baru']),
+            ARRAY_A
         );
 
         $html_lembar_2 = '';
@@ -261,61 +248,54 @@ if(!empty($nip)){
             'sub_kegiatan' => array()
         );
         $no_2 = 1;
-        if(!empty($data_ploting_rhk)){
+        if (!empty($data_ploting_rhk)) {
             foreach ($data_ploting_rhk as $v_rhk) {
                 $data_indikator_ploting_rhk = $wpdb->get_results(
-                    $wpdb->prepare(
-                        "SELECT
+                    $wpdb->prepare("
+                        SELECT
                             indikator,
                             satuan,
                             target_awal,
                             target_akhir
-                        FROM 
-                            esakip_data_rencana_aksi_indikator_opd
-                        WHERE 
-                            id_renaksi=%d AND
-                            active=%d",
-                            $v_rhk['id'], 1
-                    ), ARRAY_A
+                        FROM esakip_data_rencana_aksi_indikator_opd
+                        WHERE id_renaksi=%d 
+                          AND active=1
+                    ", $v_rhk['id']),
+                    ARRAY_A
                 );
                 $html_indikator = '';
                 $p_i = 1;
-                if(!empty($data_indikator_ploting_rhk)){
-                    if(count($data_indikator_ploting_rhk) > 0){
-                        $p_i = count($data_indikator_ploting_rhk)+1;
+                if (!empty($data_indikator_ploting_rhk)) {
+                    if (count($data_indikator_ploting_rhk) > 0) {
+                        $p_i = count($data_indikator_ploting_rhk) + 1;
                     }
                     foreach ($data_indikator_ploting_rhk as $v_indikator) {
-                        $html_indikator .='<tr>
-                            <td class="text-left">'.$v_indikator['indikator'].'</td>
-                            <td class="text-left" style="width: 5rem;">'.$v_indikator['target_akhir'].' '.$v_indikator['satuan'].'</td></tr>';
+                        $html_indikator .= '<tr>
+                            <td class="text-left">' . $v_indikator['indikator'] . '</td>
+                            <td class="text-left" style="width: 5rem;">' . $v_indikator['target_akhir'] . ' ' . $v_indikator['satuan'] . '</td></tr>';
                     }
                 }
                 $html_indikator_if = !empty($html_indikator) ? '' : "<td></td><td></td>";
-                $html_lembar_2 .='<tr>
-                    <td rowspan="'.$p_i.'" style="width: 3rem;">'.$no_2++.'</td>
-                    <td rowspan="'.$p_i.'" class="text-left" style="width: 20rem;">'.$v_rhk['label'].'</td>
-                    '.$html_indikator_if.'
+                $html_lembar_2 .= '<tr>
+                    <td rowspan="' . $p_i . '" style="width: 3rem;">' . $no_2++ . '</td>
+                    <td rowspan="' . $p_i . '" class="text-left" style="width: 20rem;">' . $v_rhk['label'] . '</td>
+                    ' . $html_indikator_if . '
                     </tr>';
-                    
+
                 $html_lembar_2 .= $html_indikator;
 
-                $data_rhk_child = $wpdb->get_results($wpdb->prepare(
-                    "SELECT 
-                        *
-                    FROM 
-                        esakip_data_rencana_aksi_opd 
-                    WHERE 
-                        parent=%d AND 
-                        level=%d AND
-                        active=%d AND 
-                        id_skpd=%d
-                    ORDER BY id
-                ",
-                    $v_rhk['id'],
-                    $v_rhk['level']+1,
-                    1,
-                    $id_skpd
-                ), ARRAY_A);
+                $data_rhk_child = $wpdb->get_results(
+                    $wpdb->prepare("
+                        SELECT *
+                        FROM esakip_data_rencana_aksi_opd 
+                        WHERE parent=%d 
+                          AND level=%d 
+                          AND id_skpd=%d
+                          AND active=1
+                        ORDER BY id
+                    ", $v_rhk['id'], $v_rhk['level'] + 1, $id_skpd),
+                    ARRAY_A
+                );
 
                 $jenis_level = array(
                     '1' => 'sasaran',
@@ -324,27 +304,27 @@ if(!empty($nip)){
                     '4' => 'sub_kegiatan'
                 );
                 $no = 1;
-                if(!empty($data_rhk_child)){
+                if (!empty($data_rhk_child)) {
                     foreach ($data_rhk_child as $v_rhk_child) {
-                        if(!empty($v_rhk_child['label_cascading_'.$jenis_level[$v_rhk_child['level']]])){
-                            if(empty($data_anggaran[$jenis_level[$v_rhk_child['level']]][$v_rhk_child['kode_cascading_sub_kegiatan']])){
+                        if (!empty($v_rhk_child['label_cascading_' . $jenis_level[$v_rhk_child['level']]])) {
+                            if (empty($data_anggaran[$jenis_level[$v_rhk_child['level']]][$v_rhk_child['kode_cascading_sub_kegiatan']])) {
                                 $data_anggaran[$jenis_level[$v_rhk_child['level']]][$v_rhk_child['kode_cascading_sub_kegiatan']] = array(
-                                    'nama' => $v_rhk_child['label_cascading_'.$jenis_level[$v_rhk_child['level']]],
-                                    'kode' => $v_rhk_child['kode_cascading_'.$jenis_level[$v_rhk_child['level']]],
+                                    'nama' => $v_rhk_child['label_cascading_' . $jenis_level[$v_rhk_child['level']]],
+                                    'kode' => $v_rhk_child['kode_cascading_' . $jenis_level[$v_rhk_child['level']]],
                                     'total_anggaran' => 0,
                                 );
                             }
-    
-                            $data_indikator_anggaran = $wpdb->get_results($wpdb->prepare(
-                                "SELECT
-                                    rencana_pagu
-                                FROM 
-                                    esakip_data_rencana_aksi_indikator_opd 
-                                WHERE 
-                                    id_renaksi=%d AND 
-                                    active = 1
-                            ", $v_rhk_child['id']), ARRAY_A);
-                            if(!empty($data_indikator_anggaran)){
+
+                            $data_indikator_anggaran = $wpdb->get_results(
+                                $wpdb->prepare("
+                                    SELECT rencana_pagu
+                                    FROM esakip_data_rencana_aksi_indikator_opd 
+                                    WHERE id_renaksi=%d 
+                                      AND active = 1
+                                ", $v_rhk_child['id']),
+                                ARRAY_A
+                            );
+                            if (!empty($data_indikator_anggaran)) {
                                 foreach ($data_indikator_anggaran as $v_indikator_anggaran) {
                                     $data_anggaran[$jenis_level[$v_rhk_child['level']]][$v_rhk_child['kode_cascading_sub_kegiatan']]['total_anggaran'] += $v_indikator_anggaran['rencana_pagu'];
                                 }
@@ -353,7 +333,7 @@ if(!empty($nip)){
                     }
                 }
 
-                if(!empty($data_anggaran['sasaran'])){
+                if (!empty($data_anggaran['sasaran'])) {
                     $html_sasaran = '<table class="table_data_anggaran">
                         <thead>
                             <tr>
@@ -364,18 +344,18 @@ if(!empty($nip)){
                             </tr>
                         </thead>
                         <tbody>';
-                        $no=1;
+                    $no = 1;
                     foreach ($data_anggaran['sasaran'] as $v_sasaran) {
                         $html_sub_kegiatan .= '<tr>
-                            <td>'.$no++.'</td>
-                            <td class="text-left">'.$v_sasaran['nama'].'</td>
-                            <td class="text-right">'.number_format($v_sasaran['total_anggaran'], 0, ",", ".").'</td>
+                            <td>' . $no++ . '</td>
+                            <td class="text-left">' . $v_sasaran['nama'] . '</td>
+                            <td class="text-right">' . number_format($v_sasaran['total_anggaran'], 0, ",", ".") . '</td>
                             <td></td></tr>';
                     }
-                    $html_sasaran .='</tbody></table>';
+                    $html_sasaran .= '</tbody></table>';
                 }
-                
-                if(!empty($data_anggaran['program'])){
+
+                if (!empty($data_anggaran['program'])) {
                     $html_program = '<table class="table_data_anggaran">
                         <thead>
                             <tr>
@@ -386,18 +366,18 @@ if(!empty($nip)){
                             </tr>
                         </thead>
                         <tbody>';
-                        $no=1;
+                    $no = 1;
                     foreach ($data_anggaran['program'] as $v_program) {
                         $html_program .= '<tr>
-                            <td>'.$no++.'</td>
-                            <td class="text-left">'.$v_program['nama'].'</td>
-                            <td class="text-right">'.number_format($v_program['total_anggaran'], 0, ",", ".").'</td>
+                            <td>' . $no++ . '</td>
+                            <td class="text-left">' . $v_program['nama'] . '</td>
+                            <td class="text-right">' . number_format($v_program['total_anggaran'], 0, ",", ".") . '</td>
                             <td></td></tr>';
                     }
-                    $html_program .='</tbody></table>';
+                    $html_program .= '</tbody></table>';
                 }
-                
-                if(!empty($data_anggaran['kegiatan'])){
+
+                if (!empty($data_anggaran['kegiatan'])) {
                     $html_kegiatan = '<table class="table_data_anggaran">
                         <thead>
                             <tr>
@@ -408,18 +388,18 @@ if(!empty($nip)){
                             </tr>
                         </thead>
                         <tbody>';
-                        $no=1;
+                    $no = 1;
                     foreach ($data_anggaran['kegiatan'] as $v_kegiatan) {
                         $html_kegiatan .= '<tr>
-                            <td>'.$no++.'</td>
-                            <td class="text-left">'.$v_kegiatan['nama'].'</td>
-                            <td class="text-right">'.number_format($v_kegiatan['total_anggaran'], 0, ",", ".").'</td>
+                            <td>' . $no++ . '</td>
+                            <td class="text-left">' . $v_kegiatan['nama'] . '</td>
+                            <td class="text-right">' . number_format($v_kegiatan['total_anggaran'], 0, ",", ".") . '</td>
                             <td></td></tr>';
                     }
-                    $html_kegiatan .='</tbody></table>';
+                    $html_kegiatan .= '</tbody></table>';
                 }
 
-                if(!empty($data_anggaran['sub_kegiatan'])){
+                if (!empty($data_anggaran['sub_kegiatan'])) {
                     $html_sub_kegiatan = '<table class="table_data_anggaran">
                         <thead>
                             <tr>
@@ -430,61 +410,62 @@ if(!empty($nip)){
                             </tr>
                         </thead>
                         <tbody>';
-                        $no=1;
+                    $no = 1;
                     foreach ($data_anggaran['sub_kegiatan'] as $v_sub_kegiatan) {
                         $html_sub_kegiatan .= '<tr>
-                            <td>'.$no++.'</td>
-                            <td class="text-left">'.$v_sub_kegiatan['nama'].'</td>
-                            <td class="text-right">'.number_format($v_sub_kegiatan['total_anggaran'], 0, ",", ".").'</td>
+                            <td>' . $no++ . '</td>
+                            <td class="text-left">' . $v_sub_kegiatan['nama'] . '</td>
+                            <td class="text-right">' . number_format($v_sub_kegiatan['total_anggaran'], 0, ",", ".") . '</td>
                             <td></td></tr>';
                     }
-                    $html_sub_kegiatan .='</tbody></table>';
+                    $html_sub_kegiatan .= '</tbody></table>';
                 }
             }
         }
         // end
-    }else{
+    } else {
         echo "Data Pegawai Tidak Ditemukan!";
-        die();   
+        die();
     }
 
-    $path = 'api/pegawai/'.$nip.'/jabatan';
+    $path = 'api/pegawai/' . $nip . '/jabatan';
     $option = array(
-        'url' => get_option('_crb_url_api_simpeg').$path,
+        'url' => get_option('_crb_url_api_simpeg') . $path,
         'type' => 'get',
         'header' => array('Authorization: Basic ' . get_option('_crb_authorization_api_simpeg'))
     );
 
     $response = $this->functions->curl_post($option);
 
-    if(empty($response)){
+    if (empty($response)) {
         $error_api = array(
             'status' => 1,
             'message' => 'Respon API kosong!'
         );
-    }else if($response == 'Unauthorized'){
+    } else if ($response == 'Unauthorized') {
         $error_api = array(
             'status' => 1,
-            'message' => $response.' '.json_encode($opsi)
+            'message' => $response . ' ' . json_encode($opsi)
         );
     }
 
     $dataPegawai = json_decode($response, true);
-    if(!empty($dataPegawai[0]['nmgolruang'])){
+    if (!empty($dataPegawai[0]['nmgolruang'])) {
         $data_detail['nama_golruang'] = $dataPegawai[0]['nmgolruang'];
         $data_detail['gelar_depan'] = $dataPegawai[0]['gelar_depan'];
         $data_detail['gelar_belakang'] = $dataPegawai[0]['gelar_belakang'];
-        $data_detail['nama_pegawai_lengkap'] = $data_detail['gelar_depan']. ' '. $data_detail['nama_pegawai'] .', '. $data_detail['gelar_belakang'];
+        $data_detail['nama_pegawai_lengkap'] = $data_detail['gelar_depan'] . ' ' . $data_detail['nama_pegawai'] . ', ' . $data_detail['gelar_belakang'];
     }
 
     if (json_last_error() !== JSON_ERROR_NONE) {
         $error_api = array(
             'status' => 1,
-            'message' => "Terjadi kesalahan ketika mengakses API, Error : ". json_last_error_msg()
+            'message' => "Terjadi kesalahan ketika mengakses API, Error : " . json_last_error_msg()
         );
     }
 
-    function formatTanggalIndonesia($tanggal) {
+    function formatTanggalIndonesia($tanggal)
+    {
         // Array untuk nama bulan dalam bahasa Indonesia
         $bulan = array(
             1 => 'Januari',
@@ -512,260 +493,422 @@ if(!empty($nip)){
 }
 
 $logo_pemda = get_option('_crb_logo_dashboard');
-if(empty($logo_pemda)){
+if (empty($logo_pemda)) {
     $logo_pemda = '';
 }
 
 ?>
-<style type="text/css">
-    body{
-        font-size: 16px;
-        line-height: 24px;
-    }
-    @media print {
-  		.page-print {
-  			max-width: 900px !important;
-  			height: auto !important;
-            margin: 0 auto;
-            /* font-size: 12pt; */
-  		}
 
-        .f-12 {
+<head>
+    <style>
+        body {
             font-size: 16px;
             line-height: 24px;
-            color: #555;
         }
-  		@page {size: portrait;}
-  		#action-sakip, .site-header, .site-footer {
-  			display: none;
-  		}
 
-        .break-print {
-			break-after: page;
-		}
+        @media print {
+            .page-print {
+                max-width: 900px !important;
+                height: auto !important;
+                margin: 0 auto;
+                /* font-size: 12pt; */
+            }
+
+            .f-12 {
+                font-size: 16px;
+                line-height: 24px;
+                color: #555;
+            }
+
+            @page {
+                size: portrait;
+            }
+
+            #action-sakip,
+            .site-header,
+            .site-footer {
+                display: none;
+            }
+
+            .break-print {
+                break-after: page;
+            }
+
+            td[contenteditable="true"] {
+                background: none !important;
+            }
+        }
+
+        #action-sakip {
+            padding-top: 20px;
+        }
+
+        .wrap-table {
+            overflow: auto;
+            max-height: 100vh;
+            width: 100%;
+        }
+
+        #table_dokumen_perjanjian_kinerja th {
+            vertical-align: middle;
+        }
+
+        .page-print {
+            font-family: Arial, Helvetica, sans-serif;
+            margin-right: auto;
+            margin-left: auto;
+            background-color: var(--white-color);
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15)
+        }
+
+        .page-print p {
+            margin: 0pt;
+        }
+
+        .page-print table,
+        td {
+            border: none;
+        }
+
+        #table-1 tr td:first-child {
+            padding-left: 0;
+        }
+
+        #table-1 td:nth-child(1) {
+            width: 130px;
+        }
+
+        #table-1 td:nth-child(2) {
+            width: 0%;
+        }
+
+        tr,
+        td {
+            vertical-align: top;
+        }
+
+        .ttd-pejabat {
+            padding: 0;
+            font-weight: 700;
+            text-decoration: underline;
+            width: 50%;
+        }
+
+        .title-laporan {
+            font-weight: 700;
+            font-size: 16pt;
+        }
+
+        .title-pk-1 {
+            font-size: 14pt;
+        }
+
+        .title-pk-2 {
+            font-size: 16pt;
+            font-weight: 700;
+        }
+
+        #table_data_sasaran tr,
+        #table_data_sasaran td,
+        #table_data_sasaran th {
+            border: solid 1px #000;
+        }
+
+        .table_data_anggaran tr,
+        .table_data_anggaran td,
+        .table_data_anggaran th {
+            border: solid 1px #000;
+        }
+
+        .table_data_anggaran tr td:first-child {
+            width: 3rem;
+        }
 
         td[contenteditable="true"] {
-            background: none !important;
+            background: #ff00002e;
         }
-  	}
 
-    #action-sakip {
-  		padding-top: 20px;
-  	}
+        /* carousel */
+        .cr-container {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+        }
 
-    .wrap-table {
-        overflow: auto;
-        max-height: 100vh;
-        width: 100%;
-    }
+        .cr-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #23282d;
+            padding-left: 10px;
+        }
 
-    .btn-action-group {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+        .cr-carousel-wrapper {
+            position: relative;
+            padding: 0 10px;
+        }
 
-    .btn-action-group .btn {
-        margin: 0 5px;
-    }
-    #table_dokumen_perjanjian_kinerja th {
-        vertical-align: middle;
-    }
-    
-    .page-print { 
-        font-family: Arial, Helvetica, sans-serif;
-        margin-right: auto;
-        margin-left: auto;
-        background-color: var(--white-color);
-        padding: 30px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15)
-    }
+        .cr-carousel {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            gap: 20px;
+            padding: 10px 0;
+        }
 
-    .page-print p {
-        margin: 0pt;
-    }
+        .cr-carousel::-webkit-scrollbar {
+            display: none;
+        }
 
-    .page-print table, td {
-        border: none;
-    }
+        .cr-item {
+            flex: 0 0 calc(25% - 15px);
+            scroll-snap-align: start;
+        }
 
-    #table-1 tr td:first-child {
-        padding-left: 0;
-    }
+        .cr-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #dcdcde;
+            border-radius: 8px;
+            padding: 16px;
+            width: 200px;
+            /* Atur ukuran card */
+            height: 150px;
+            /* Atur tinggi card */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
 
-    #table-1 td:nth-child(1){
-        width: 130px;
-    }
+        .cr-card h3 {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            margin: 0;
+            word-wrap: break-word;
+            /* Menghindari teks keluar dari batas */
+        }
 
-    #table-1 td:nth-child(2){
-        width: 0%;
-    }
+        .cr-card .year {
+            font-size: 14px;
+            color: #666;
+            margin: 4px 0;
+        }
 
-    tr, td {
-        vertical-align: top;
-    }
+        .cr-card .cr-view-btn {
+            background-color: #fff;
+            border: 1px solid #dcdcde;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
 
-    .ttd-pejabat {
-        padding: 0; 
-        font-weight: 700; 
-        text-decoration:underline; 
-        width: 50%;
-    }
-    .title-laporan {
-        font-weight: 700;
-        font-size: 16pt;
-    }
-    .title-pk-1 {
-        font-size: 14pt;
-    }
-    .title-pk-2 {
-        font-size: 16pt;
-        font-weight: 700;
-    }
+        .cr-card .cr-view-btn:hover {
+            border-color: #007cba;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-    #table_data_sasaran tr, #table_data_sasaran td, #table_data_sasaran th {
-        border: solid 1px #000;
-    }
+        .cr-card .cr-view-btn .dashicons {
+            font-size: 18px;
+            color: #007cba;
+        }
 
-    .table_data_anggaran tr, .table_data_anggaran td, .table_data_anggaran th {
-        border: solid 1px #000;
-    }
+        .cr-card:hover {
+            border-color: #007cba;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-    .table_data_anggaran tr td:first-child{
-        width: 3rem;
-    }
+        .cr-scroll-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #fff;
+            border: 1px solid #dcdcde;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
 
-    td[contenteditable="true"] {
-        background: #ff00002e;
-    }
+        .cr-scroll-btn:hover {
+            border-color: #007cba;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-</style>
+        .cr-scroll-btn-left {
+            left: -8px;
+        }
 
-<div class="container-md mx-auto" style="width: 900px;">
-    <div class="text-center" id="action-sakip">
-        <button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button><br>
-    </div>
-    <div id="laporan_pk" class="text-center page-print">
-        <div class="row" style="border-bottom: 7px solid;">
-            <div class="col-2" style="display: flex; align-items: center; height: 200px;">
-                <?php if(!empty($logo_pemda)) : ?>
-                    <img style="max-width: 100%; height: auto;" src="<?php echo $logo_pemda; ?>" alt="Logo Pemda">
-                <?php endif; ?>
-            </div>
-            <div class="col my-auto">
-                <p class="title-pk-1">PEMERINTAH <?php echo strtoupper($nama_pemda); ?></p>
-                <p class="title-pk-2"><?php echo strtoupper($nama_skpd); ?></p>
-                <p class="title-pk-1"><?php echo $alamat_kantor ?></p>
-            </div>
-            <div class="col-1"></div>
+        .cr-scroll-btn-right {
+            right: -8px;
+        }
+
+        @media (max-width: 1024px) {
+            .cr-item {
+                flex: 0 0 calc(33.333% - 14px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .cr-item {
+                flex: 0 0 calc(50% - 10px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .cr-item {
+                flex: 0 0 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-md mx-auto" style="width: 900px;">
+        <div class="text-center" id="action-sakip">
+            <button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button><br>
         </div>
-        <p class="title-laporan mt-3 mb-2">PERJANJIAN KINERJA TAHUN <?php echo $input['tahun']; ?></p>
-        <p class="text-left f-12 mt-5">Dalam rangka mewujudkan manajemen pemerintahan yang efektif, transparan dan akuntabel serta berorientasi pada hasil, kami yang bertanda tangan dibawah ini :</p>
-        <table id="table-1" class="text-left f-12">
-            <tr>
-                <td>Nama</td>
-                <td>:</td>
-                <td><?php echo $data_detail['gelar_depan'].' '.$data_detail['nama_pegawai'].', '.$data_detail['gelar_belakang']; ?></td>
-            </tr>
-            <tr>
-                <td>Jabatan</td>
-                <td>:</td>
-                <td class="status-jabatan-pegawai-1"><?php echo $data_detail['jabatan_pegawai']; ?></td>
-            </tr>
-            <tr>
-                <td colspan="3">Selanjutnya disebut pihak pertama</td>
-            </tr>
-            <tr>
-                <td>Nama</td>
-                <td>:</td>
-                <td><?php echo $data_detail_atasan['gelar_depan'].' '.$data_detail_atasan['nama_pegawai_atasan'].', '.$data_detail_atasan['gelar_belakang']; ?></td>
-            </tr>
-            <tr>
-                <td>Jabatan</td>
-                <td>:</td>
-                <td class="status-jabatan-pegawai-2"><?php echo $data_detail_atasan['jabatan_pegawai_atasan']; ?></td>
-            </tr>
-            <tr>
-                <td colspan="3">Selaku atasan langsung pihak pertama, selanjutnya disebut pihak kedua</td>
-            </tr>
-        </table>
-        <p class="text-left f-12">Pihak pertama berjanji akan mewujudkan target kinerja yang seharusnya sesuai lampiran perjanjian ini, dalam rangka mencapai target kinerja jangka menengah seperti yang telah ditetapkan dalam dokumen perencanaan. Keberhasilan dan kegagalan pencapaian target tersebut menjadi tanggung jawab kami.</p>
-        </br>
-        <p class="text-left f-12">Pihak kedua akan memberikan supervisi yang diperlukan serta akan melakukan evaluasi terhadap capaian kinerja dari perjanjian ini dan mengambil tindakan yang diperlukan dalam rangka memberikan penghargaan dan sanksi.</p>
-        <table id="table_data_pejabat" style="margin-top: 3rem;" class="f-12">
-            <thead>
-                <tr class="text-center">
-                    <td></td>
-                    <td contenteditable="true" title="Klik untuk ganti teks!">
-                        <?php echo $pemda; ?>, <?php echo $text_tanggal_hari_ini; ?>
-                    </td>
+        <div class="cr-container m-4">
+            <h2 class="cr-title">Pilih Laporan Perjanjian Kinerja</h2>
+            <div class="cr-carousel-wrapper">
+                <div id="reportCarousel" class="cr-carousel">
+                    <div class="cr-item">
+                        <div class="cr-card">
+                            <h3>Dokumen Saat Ini</h3>
+                            <div class="year">2024</div>
+                            <div class="cr-view-btn">
+                                <span class='badge badge-sm badge-primary m-2'>Sedang Dilihat</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cr-item">
+                        <div class="cr-card">
+                            <h3>Perjanjian Kinerja 2024 Perubahan</h3>
+                            <div class="year">2024</div>
+                            <div class="cr-view-btn" onclick="viewReport('Perjanjian Kinerja 2024 Perubahan')">
+                                <span class="dashicons dashicons-visibility"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cr-item">
+                        <div class="cr-card">
+                            <h3>Perjanjian Kinerja 2024 Perubahan Fix</h3>
+                            <div class="year">2024</div>
+                            <div class="cr-view-btn" onclick="viewReport('Perjanjian Kinerja 2024 Perubahan Fix')">
+                                <span class="dashicons dashicons-visibility"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cr-item">
+                        <div class="cr-card">
+                            <h3>PK 2024</h3>
+                            <div class="year">2024</div>
+                            <div class="cr-view-btn" onclick="viewReport('PK 2024')">
+                                <span class="dashicons dashicons-visibility"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cr-item">
+                        <div class="cr-card">
+                            <h3>Perjanjian Kinerja Baru</h3>
+                            <div class="year">2024</div>
+                            <div class="cr-view-btn" onclick="viewReport('Perjanjian Kinerja Baru')">
+                                <span class="dashicons dashicons-visibility"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cr-item">
+                        <div class="cr-card">
+                            <h3>PK</h3>
+                            <div class="year">2024</div>
+                            <div class="cr-view-btn" onclick="viewReport('PK')">
+                                <span class="dashicons dashicons-visibility"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="cr-scroll-btn cr-scroll-btn-left" onclick="scrollCarousel(-1)">
+                    <span class="dashicons dashicons-arrow-left-alt2"></span>
+                </div>
+                <div class="cr-scroll-btn cr-scroll-btn-right" onclick="scrollCarousel(1)">
+                    <span class="dashicons dashicons-arrow-right-alt2"></span>
+                </div>
+            </div>
+        </div>
+        <div class="text-center page-print">
+            <div class="text-right m-2">
+                <button class="btn btn-sm btn-success" onclick="showModalFinalisasi()">
+                    <span class="dashicons dashicons-saved" title="Finalisasikan dokumen untuk disimpan"></span>
+                    Finalisasi Dokumen
+                </button>
+            </div>
+            <div class="row" style="border-bottom: 7px solid;">
+                <div class="col-2" style="display: flex; align-items: center; height: 200px;">
+                    <?php if (!empty($logo_pemda)) : ?>
+                        <img style="max-width: 100%; height: auto;" src="<?php echo $logo_pemda; ?>" alt="Logo Pemda">
+                    <?php endif; ?>
+                </div>
+                <div class="col my-auto">
+                    <p class="title-pk-1">PEMERINTAH <?php echo strtoupper($nama_pemda); ?></p>
+                    <p class="title-pk-2"><?php echo strtoupper($nama_skpd); ?></p>
+                    <p class="title-pk-1"><?php echo $alamat_kantor ?></p>
+                </div>
+                <div class="col-1"></div>
+            </div>
+            <p class="title-laporan mt-3 mb-2">PERJANJIAN KINERJA TAHUN <?php echo $input['tahun']; ?></p>
+            <p class="text-left f-12 mt-5">Dalam rangka mewujudkan manajemen pemerintahan yang efektif, transparan dan akuntabel serta berorientasi pada hasil, kami yang bertanda tangan dibawah ini :</p>
+            <table id="table-1" class="text-left f-12">
+                <tr>
+                    <td>Nama</td>
+                    <td>:</td>
+                    <td><?php echo $data_detail['gelar_depan'] . ' ' . $data_detail['nama_pegawai'] . ', ' . $data_detail['gelar_belakang']; ?></td>
                 </tr>
-                <tr class="text-center">
-                    <td>Pihak Kedua,</td>
-                    <td>Pihak Pertama,</td>
+                <tr>
+                    <td>Jabatan</td>
+                    <td>:</td>
+                    <td class="status-jabatan-pegawai-1"><?php echo $data_detail['jabatan_pegawai']; ?></td>
                 </tr>
-            </thead>
-            <tbody>
-                <tr style="height: 7em;">
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                <tr>
+                    <td colspan="3">Selanjutnya disebut pihak pertama</td>
                 </tr>
-                <tr class="text-center">
-                    <td class="ttd-pejabat">
-                        <?php echo $data_detail_atasan['gelar_depan'].' '.$data_detail_atasan['nama_pegawai_atasan'].', '.$data_detail_atasan['gelar_belakang']; ?>
-                    </td>
-                    <td class="ttd-pejabat">
-                        <?php echo $data_detail['gelar_depan'].' '.$data_detail['nama_pegawai'].', '.$data_detail['gelar_belakang']; ?>
-                    </td>
+                <tr>
+                    <td>Nama</td>
+                    <td>:</td>
+                    <td><?php echo $data_detail_atasan['gelar_depan'] . ' ' . $data_detail_atasan['nama_pegawai_atasan'] . ', ' . $data_detail_atasan['gelar_belakang']; ?></td>
                 </tr>
-                <tr class="text-center">
-                    <td style="padding: 0;">
-                        <?php if(empty($data_atasan['status_kepala'])) : ?>
-                            <?php echo $data_detail_atasan['nama_golruang_atasan']; ?>
-                        <?php endif; ?>
-                    </td>
-                    <td style="padding: 0;">
-                        <?php echo $data_detail['nama_golruang']; ?>
-                    </td>
+                <tr>
+                    <td>Jabatan</td>
+                    <td>:</td>
+                    <td class="status-jabatan-pegawai-2"><?php echo $data_detail_atasan['jabatan_pegawai_atasan']; ?></td>
                 </tr>
-                <tr class="text-center">
-                    <td style="padding: 0;">
-                        <?php if(empty($data_atasan['status_kepala'])) : ?>
-                            NIP. <?php echo $data_detail_atasan['nip_pegawai_atasan']; ?>
-                        <?php endif; ?>
-                    </td>
-                    <td style="padding: 0;">
-                        NIP. <?php echo $data_detail['nip_pegawai']; ?>
-                    </td>
+                <tr>
+                    <td colspan="3">Selaku atasan langsung pihak pertama, selanjutnya disebut pihak kedua</td>
                 </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="break-print"></div>
-    <div class="page-print mt-5 text-center">
-        <p class="title-laporan mt-3">PERJANJIAN KINERJA TAHUN <?php echo $input['tahun']; ?></p>
-        <p class="title-laporan"><?php echo $data_detail['bidang_pegawai']; ?></p>
-        <?php if($html_lembar_2 != '') : ?>
-            <table id="table_data_sasaran" style="margin: 2rem 0 4rem;">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Sasaran</th>
-                        <th>Indikator</th>
-                        <th>Target</th>
-                    </tr>
-                </thead>
-                <tbody>
-                        <?php echo $html_lembar_2; ?>
-                </tbody>
             </table>
-        <?php endif; ?>
-        <?php echo $html_sasaran; ?>
-        <?php echo $html_program; ?>
-        <?php echo $html_kegiatan; ?>
-        <?php echo $html_sub_kegiatan; ?>
-        <table id="table_data_pejabat" class="f-12 mt-5">
+            <p class="text-left f-12">Pihak pertama berjanji akan mewujudkan target kinerja yang seharusnya sesuai lampiran perjanjian ini, dalam rangka mencapai target kinerja jangka menengah seperti yang telah ditetapkan dalam dokumen perencanaan. Keberhasilan dan kegagalan pencapaian target tersebut menjadi tanggung jawab kami.</p>
+            </br>
+            <p class="text-left f-12">Pihak kedua akan memberikan supervisi yang diperlukan serta akan melakukan evaluasi terhadap capaian kinerja dari perjanjian ini dan mengambil tindakan yang diperlukan dalam rangka memberikan penghargaan dan sanksi.</p>
+            <table id="table_data_pejabat" style="margin-top: 3rem;" class="f-12">
                 <thead>
                     <tr class="text-center">
                         <td></td>
@@ -786,15 +929,15 @@ if(empty($logo_pemda)){
                     </tr>
                     <tr class="text-center">
                         <td class="ttd-pejabat">
-                            <?php echo $data_detail_atasan['gelar_depan'].' '.$data_detail_atasan['nama_pegawai_atasan'].', '.$data_detail_atasan['gelar_belakang']; ?>
+                            <?php echo $data_detail_atasan['gelar_depan'] . ' ' . $data_detail_atasan['nama_pegawai_atasan'] . ', ' . $data_detail_atasan['gelar_belakang']; ?>
                         </td>
                         <td class="ttd-pejabat">
-                            <?php echo $data_detail['gelar_depan'].' '.$data_detail['nama_pegawai'].', '.$data_detail['gelar_belakang']; ?>
+                            <?php echo $data_detail['gelar_depan'] . ' ' . $data_detail['nama_pegawai'] . ', ' . $data_detail['gelar_belakang']; ?>
                         </td>
                     </tr>
                     <tr class="text-center">
                         <td style="padding: 0;">
-                            <?php if(empty($data_atasan['status_kepala'])) : ?>
+                            <?php if (empty($data_atasan['status_kepala'])) : ?>
                                 <?php echo $data_detail_atasan['nama_golruang_atasan']; ?>
                             <?php endif; ?>
                         </td>
@@ -804,7 +947,80 @@ if(empty($logo_pemda)){
                     </tr>
                     <tr class="text-center">
                         <td style="padding: 0;">
-                            <?php if(empty($data_atasan['status_kepala'])) : ?>
+                            <?php if (empty($data_atasan['status_kepala'])) : ?>
+                                NIP. <?php echo $data_detail_atasan['nip_pegawai_atasan']; ?>
+                            <?php endif; ?>
+                        </td>
+                        <td style="padding: 0;">
+                            NIP. <?php echo $data_detail['nip_pegawai']; ?>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="break-print"></div>
+        <div class="page-print mt-5 text-center">
+            <p class="title-laporan mt-3">PERJANJIAN KINERJA TAHUN <?php echo $input['tahun']; ?></p>
+            <p class="title-laporan"><?php echo $data_detail['bidang_pegawai']; ?></p>
+            <?php if ($html_lembar_2 != '') : ?>
+                <table id="table_data_sasaran" style="margin: 2rem 0 4rem;">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Sasaran</th>
+                            <th>Indikator</th>
+                            <th>Target</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php echo $html_lembar_2; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
+            <?php echo $html_sasaran; ?>
+            <?php echo $html_program; ?>
+            <?php echo $html_kegiatan; ?>
+            <?php echo $html_sub_kegiatan; ?>
+            <table id="table_data_pejabat" class="f-12 mt-5">
+                <thead>
+                    <tr class="text-center">
+                        <td></td>
+                        <td contenteditable="true" title="Klik untuk ganti teks!">
+                            <?php echo $pemda; ?>, <?php echo $text_tanggal_hari_ini; ?>
+                        </td>
+                    </tr>
+                    <tr class="text-center">
+                        <td>Pihak Kedua,</td>
+                        <td>Pihak Pertama,</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="height: 7em;">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="text-center">
+                        <td class="ttd-pejabat">
+                            <?php echo $data_detail_atasan['gelar_depan'] . ' ' . $data_detail_atasan['nama_pegawai_atasan'] . ', ' . $data_detail_atasan['gelar_belakang']; ?>
+                        </td>
+                        <td class="ttd-pejabat">
+                            <?php echo $data_detail['gelar_depan'] . ' ' . $data_detail['nama_pegawai'] . ', ' . $data_detail['gelar_belakang']; ?>
+                        </td>
+                    </tr>
+                    <tr class="text-center">
+                        <td style="padding: 0;">
+                            <?php if (empty($data_atasan['status_kepala'])) : ?>
+                                <?php echo $data_detail_atasan['nama_golruang_atasan']; ?>
+                            <?php endif; ?>
+                        </td>
+                        <td style="padding: 0;">
+                            <?php echo $data_detail['nama_golruang']; ?>
+                        </td>
+                    </tr>
+                    <tr class="text-center">
+                        <td style="padding: 0;">
+                            <?php if (empty($data_atasan['status_kepala'])) : ?>
                                 NIP. <?php echo $data_detail_atasan['nip_pegawai_atasan']; ?>
                             <?php endif; ?>
                         </td>
@@ -816,43 +1032,159 @@ if(empty($logo_pemda)){
             </table>
         </div>
     </div>
+</body>
+<div class="modal fade mt-4" id="modalFinalisasi" tabindex="-1" role="dialog" aria-labelledby="modalFinalisasi" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="title-label">Finalisasi Dokumen Perjanjian Kinerja <?php echo $input['tahun']; ?></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="id_data" name="id_data">
 
+                <!-- Informasi Pegawai -->
+                <div class="card bg-light mb-3">
+                    <div class="card-header">
+                        <strong>Informasi Pegawai</strong>
+                    </div>
+                    <div class="card-body">
+                        <table class="borderless-table mb-4">
+                            <tbody>
+                                <tr>
+                                    <td class="text-left" style="width: 20%;"><strong>Nama Pegawai</strong></td>
+                                    <td class="text-left"><strong>:</strong></td>
+                                    <td class="text-left"><?php echo $data_detail['gelar_depan'] . ' ' . $data_detail['nama_pegawai'] . ', ' . $data_detail['gelar_belakang']; ?></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left"><strong>NIP</strong></td>
+                                    <td class="text-left"><strong>:</strong></td>
+                                    <td class="text-left"><?php echo $data_detail['nip_pegawai']; ?></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left"><strong>Jabatan</strong></td>
+                                    <td class="text-left"><strong>:</strong></td>
+                                    <td class="text-left"><?php echo $data_detail['jabatan_pegawai']; ?></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left"><strong>Satuan Kerja</strong></td>
+                                    <td class="text-left"><strong>:</strong></td>
+                                    <td class="text-left"><?php echo strtoupper($nama_skpd); ?></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Informasi RHK -->
+                <div class="card bg-light mb-3">
+                    <div class="card-header">
+                        <strong>RHK</strong>
+                    </div>
+                    <div class="card-body">
+                        <?php if ($html_lembar_2 != '') : ?>
+                            <table id="table_data_sasaran" style="margin: 2rem 0 4rem;">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Sasaran</th>
+                                        <th>Indikator</th>
+                                        <th>Target</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php echo $html_lembar_2; ?>
+                                </tbody>
+                            </table>
+                        <?php endif; ?>
+                        <?php echo $html_sasaran; ?>
+                        <?php echo $html_program; ?>
+                        <?php echo $html_kegiatan; ?>
+                        <?php echo $html_sub_kegiatan; ?>
+                    </div>
+                </div>
+
+                <div class="card bg-light mb-3">
+                    <div class="card-header">
+                        <strong>Perjanjian Kinerja</strong>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="nama_dokumen">Nama Perjanjian Kinerja</label>
+                            <input type="text" class="form-control" id="nama_dokumen" name="nama_dokumen" placeholder="ex : Perjanjian Kinerja tahun <?php echo $input['tahun']; ?>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" onclick="simpanFinalisasi()">Simpan</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     jQuery(document).ready(function() {
         let cek_kepala_skpd = <?php echo $cek_kepala_skpd; ?>;
         let cek_nama_kepala_daerah = <?php echo $cek_nama_kepala_daerah; ?>;
         let cek_status_jabatan_kepala_daerah = <?php echo $cek_status_jabatan_kepala_daerah; ?>;
-        if(cek_kepala_skpd == 1 && (cek_nama_kepala_daerah == 0)){
+        if (cek_kepala_skpd == 1 && (cek_nama_kepala_daerah == 0)) {
             alert("Harap Isi Nama Kepala Daerah Di Esakip Options!");
         }
-        if(cek_kepala_skpd == 1 && (cek_status_jabatan_kepala_daerah == 0)){
+        if (cek_kepala_skpd == 1 && (cek_status_jabatan_kepala_daerah == 0)) {
             alert("Harap Isi Status Jabatan Kepala Daerah Di Esakip Options!");
         }
         let status_error_api = <?php echo $error_api['status']; ?>;
-        if(status_error_api == 1){
+        if (status_error_api == 1) {
             console.log("<?php echo $error_api['message']; ?>");
         }
         let cek_status_jabatan_kepala_pihak_pertama = <?php echo $cek_status_jabatan_kepala_pihak_pertama; ?>;
         let nama_pejabat = "<?php echo $data_detail['nama_pegawai_lengkap']; ?>";
         let input_status_jabatan_pertama = "";
-        if(cek_status_jabatan_kepala_pihak_pertama == 1){
-            input_status_jabatan_pertama = window.prompt("Harap isi status jabatan (PJ, PLT, PLH) atas nama "+ nama_pejabat +" sebagai pihak pertama!")
+        if (cek_status_jabatan_kepala_pihak_pertama == 1) {
+            input_status_jabatan_pertama = window.prompt("Harap isi status jabatan (PJ, PLT, PLH) atas nama " + nama_pejabat + " sebagai pihak pertama!")
         }
 
         if (input_status_jabatan_pertama !== null && input_status_jabatan_pertama.trim() !== "") {
-            jQuery(".status-jabatan-pegawai-1").prepend(input_status_jabatan_pertama+" ")
+            jQuery(".status-jabatan-pegawai-1").prepend(input_status_jabatan_pertama + " ")
         }
 
         let cek_status_jabatan_kepala_pihak_kedua = <?php echo $cek_status_jabatan_kepala_pihak_kedua; ?>;
         console.log(cek_status_jabatan_kepala_pihak_kedua);
         let nama_pejabat_kedua = "<?php echo $data_detail_atasan['nama_pegawai_atasan_lengkap']; ?>";
         let input_status_jabatan_kedua = "";
-        if(cek_status_jabatan_kepala_pihak_kedua == 1){
-            input_status_jabatan_kedua = window.prompt("Harap isi status jabatan (PJ, PLT, PLH) atas nama "+ nama_pejabat_kedua +" sebagai pihak kedua!")
+        if (cek_status_jabatan_kepala_pihak_kedua == 1) {
+            input_status_jabatan_kedua = window.prompt("Harap isi status jabatan (PJ, PLT, PLH) atas nama " + nama_pejabat_kedua + " sebagai pihak kedua!")
         }
 
         if (input_status_jabatan_kedua !== null && input_status_jabatan_kedua.trim() !== "") {
-            jQuery(".status-jabatan-pegawai-2").prepend(input_status_jabatan_kedua+" ")
+            jQuery(".status-jabatan-pegawai-2").prepend(input_status_jabatan_kedua + " ")
         }
     });
+
+    function scrollCarousel(direction) {
+        const carousel = jQuery('#reportCarousel');
+        const scrollAmount = carousel[0].offsetWidth;
+        const currentScroll = carousel.scrollLeft();
+
+        carousel.animate({
+            scrollLeft: currentScroll + direction * scrollAmount
+        }, 500);
+    }
+
+
+    function viewReport(title) {
+        alert(`Viewing report: ${title}`);
+        // Add your logic here to view the report
+    }
+
+    function showModalFinalisasi() {
+        jQuery('#modalFinalisasi').modal('show')
+    }
+
+    function simpanFinalisasi() {
+        alert('Coming soon!')
+    }
 </script>
