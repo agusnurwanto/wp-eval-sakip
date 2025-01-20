@@ -526,7 +526,8 @@ if (empty($logo_pemda)) {
 
             #action-sakip,
             .site-header,
-            .site-footer {
+            .site-footer,
+            .hide-display-print {
                 display: none;
             }
 
@@ -788,7 +789,7 @@ if (empty($logo_pemda)) {
         <div class="text-center" id="action-sakip">
             <button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button><br>
         </div>
-        <div class="cr-container m-4">
+        <div class="cr-container m-4 hide-display-print">
             <h2 class="cr-title">Pilih Laporan Perjanjian Kinerja</h2>
             <div class="cr-carousel-wrapper">
                 <div id="reportCarousel" class="cr-carousel">
@@ -796,7 +797,7 @@ if (empty($logo_pemda)) {
                         <div class="cr-card">
                             <h3>Dokumen Saat Ini</h3>
                             <div class="year">2024</div>
-                            <div class="cr-view-btn">
+                            <div class="text-center">
                                 <span class='badge badge-sm badge-primary m-2'>Sedang Dilihat</span>
                             </div>
                         </div>
@@ -857,7 +858,7 @@ if (empty($logo_pemda)) {
         </div>
         <div class="text-center page-print">
             <div class="text-right m-2">
-                <button class="btn btn-sm btn-success" onclick="showModalFinalisasi()">
+                <button class="btn btn-sm btn-success hide-display-print" onclick="showModalFinalisasi()">
                     <span class="dashicons dashicons-saved" title="Finalisasikan dokumen untuk disimpan"></span>
                     Finalisasi Dokumen
                 </button>
