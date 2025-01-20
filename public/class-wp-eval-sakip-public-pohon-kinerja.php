@@ -4404,6 +4404,9 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		if ($opsi['tipe'] == 'opd') {
 			$table = 'esakip_pohon_kinerja_opd';
 			$table_croscutting = 'esakip_croscutting_opd';
+			if(empty($opsi['id_skpd'])){
+				return $data_ret;
+			}
 			$where_skpd = $wpdb->prepare('AND id_skpd=%d', $opsi['id_skpd']);
 		}
 
