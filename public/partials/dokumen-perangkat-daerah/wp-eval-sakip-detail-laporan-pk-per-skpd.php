@@ -242,10 +242,10 @@ if (!empty($nip)) {
         $html_kegiatan = '';
         $html_sub_kegiatan = '';
         $data_anggaran = array(
-            'sasaran' => array(),
-            'program' => array(),
-            'kegiatan' => array(),
-            'sub_kegiatan' => array()
+            'sasaran'       => array(),
+            'program'       => array(),
+            'kegiatan'      => array(),
+            'sub_kegiatan'  => array()
         );
         $no_2 = 1;
         if (!empty($data_ploting_rhk)) {
@@ -277,7 +277,7 @@ if (!empty($nip)) {
                 }
                 $html_indikator_if = !empty($html_indikator) ? '' : "<td></td><td></td>";
                 $html_lembar_2 .= '<tr>
-                    <td rowspan="' . $p_i . '" style="width: 3rem;">' . $no_2++ . '</td>
+                    <td rowspan="' . $p_i . '" class="text-center" style="width: 3rem;">' . $no_2++ . '</td>
                     <td rowspan="' . $p_i . '" class="text-left" style="width: 20rem;">' . $v_rhk['label'] . '</td>
                     ' . $html_indikator_if . '
                     </tr>';
@@ -308,8 +308,10 @@ if (!empty($nip)) {
                     foreach ($data_rhk_child as $v_rhk_child) {
                         if (!empty($v_rhk_child['label_cascading_' . $jenis_level[$v_rhk_child['level']]])) {
                             if (empty($data_anggaran[$jenis_level[$v_rhk_child['level']]][$v_rhk_child['kode_cascading_sub_kegiatan']])) {
+                                $nama_label = preg_replace('/^[A-Za-z0-9.]+ /', '', $v_rhk_child['label_cascading_' . $jenis_level[$v_rhk_child['level']]]);
+
                                 $data_anggaran[$jenis_level[$v_rhk_child['level']]][$v_rhk_child['kode_cascading_sub_kegiatan']] = array(
-                                    'nama' => $v_rhk_child['label_cascading_' . $jenis_level[$v_rhk_child['level']]],
+                                    'nama' => $nama_label,
                                     'kode' => $v_rhk_child['kode_cascading_' . $jenis_level[$v_rhk_child['level']]],
                                     'total_anggaran' => 0,
                                 );
@@ -334,20 +336,22 @@ if (!empty($nip)) {
                 }
 
                 if (!empty($data_anggaran['sasaran'])) {
-                    $html_sasaran = '<table class="table_data_anggaran">
+                    $html_sasaran = '<table class="table_data_anggaran" id="table_sasaran">
                         <thead>
                             <tr>
-                                <th>No</th>
-                                <th>Sasaran</th>
-                                <th>Anggaran</th>
-                                <th>Ket</th>
+                                <th class="esakip-text_tengah">No</th>
+                                <th class="esakip-text_tengah">Kode</th>
+                                <th class="esakip-text_tengah">Sasaran</th>
+                                <th class="esakip-text_tengah">Anggaran</th>
+                                <th class="esakip-text_tengah">Ket</th>
                             </tr>
                         </thead>
                         <tbody>';
                     $no = 1;
                     foreach ($data_anggaran['sasaran'] as $v_sasaran) {
                         $html_sub_kegiatan .= '<tr>
-                            <td>' . $no++ . '</td>
+                            <td class="text-center">' . $no++ . '</td>
+                            <td class="text-left">' . $v_sasaran['kode'] . '</td>
                             <td class="text-left">' . $v_sasaran['nama'] . '</td>
                             <td class="text-right">' . number_format($v_sasaran['total_anggaran'], 0, ",", ".") . '</td>
                             <td></td></tr>';
@@ -356,20 +360,22 @@ if (!empty($nip)) {
                 }
 
                 if (!empty($data_anggaran['program'])) {
-                    $html_program = '<table class="table_data_anggaran">
+                    $html_program = '<table class="table_data_anggaran" id="table_program">
                         <thead>
                             <tr>
-                                <th>No</th>
-                                <th>Program</th>
-                                <th>Anggaran</th>
-                                <th>Ket</th>
+                                <th class="esakip-text_tengah">No</th>
+                                <th class="esakip-text_tengah">Kode</th>
+                                <th class="esakip-text_tengah">Program</th>
+                                <th class="esakip-text_tengah">Anggaran</th>
+                                <th class="esakip-text_tengah">Ket</th>
                             </tr>
                         </thead>
                         <tbody>';
                     $no = 1;
                     foreach ($data_anggaran['program'] as $v_program) {
                         $html_program .= '<tr>
-                            <td>' . $no++ . '</td>
+                            <td class="text-center">' . $no++ . '</td>
+                            <td class="text-left">' . $v_program['kode'] . '</td>
                             <td class="text-left">' . $v_program['nama'] . '</td>
                             <td class="text-right">' . number_format($v_program['total_anggaran'], 0, ",", ".") . '</td>
                             <td></td></tr>';
@@ -378,20 +384,22 @@ if (!empty($nip)) {
                 }
 
                 if (!empty($data_anggaran['kegiatan'])) {
-                    $html_kegiatan = '<table class="table_data_anggaran">
+                    $html_kegiatan = '<table class="table_data_anggaran" id="table_kegiatan">
                         <thead>
                             <tr>
-                                <th>No</th>
-                                <th>Kegiatan</th>
-                                <th>Anggaran</th>
-                                <th>Ket</th>
+                                <th class="esakip-text_tengah">No</th>
+                                <th class="esakip-text_tengah">Kode</th>
+                                <th class="esakip-text_tengah">Kegiatan</th>
+                                <th class="esakip-text_tengah">Anggaran</th>
+                                <th class="esakip-text_tengah">Ket</th>
                             </tr>
                         </thead>
                         <tbody>';
                     $no = 1;
                     foreach ($data_anggaran['kegiatan'] as $v_kegiatan) {
                         $html_kegiatan .= '<tr>
-                            <td>' . $no++ . '</td>
+                            <td class="text-center">' . $no++ . '</td>
+                            <td class="text-left">' . $v_kegiatan['kode'] . '</td>
                             <td class="text-left">' . $v_kegiatan['nama'] . '</td>
                             <td class="text-right">' . number_format($v_kegiatan['total_anggaran'], 0, ",", ".") . '</td>
                             <td></td></tr>';
@@ -400,20 +408,22 @@ if (!empty($nip)) {
                 }
 
                 if (!empty($data_anggaran['sub_kegiatan'])) {
-                    $html_sub_kegiatan = '<table class="table_data_anggaran">
+                    $html_sub_kegiatan = '<table class="table_data_anggaran" id="table_subkegiatan">
                         <thead>
                             <tr>
-                                <th>No</th>
-                                <th>Sub Kegiatan</th>
-                                <th>Anggaran</th>
-                                <th>Ket</th>
+                                <th class="esakip-text_tengah">No</th>
+                                <th class="esakip-text_tengah">Kode</th>
+                                <th class="esakip-text_tengah">Sub Kegiatan</th>
+                                <th class="esakip-text_tengah">Anggaran</th>
+                                <th class="esakip-text_tengah">Ket</th>
                             </tr>
                         </thead>
                         <tbody>';
                     $no = 1;
                     foreach ($data_anggaran['sub_kegiatan'] as $v_sub_kegiatan) {
                         $html_sub_kegiatan .= '<tr>
-                            <td>' . $no++ . '</td>
+                            <td class="text-center">' . $no++ . '</td>
+                            <td class="text-left">' . $v_sub_kegiatan['kode'] . '</td>
                             <td class="text-left">' . $v_sub_kegiatan['nama'] . '</td>
                             <td class="text-right">' . number_format($v_sub_kegiatan['total_anggaran'], 0, ",", ".") . '</td>
                             <td></td></tr>';
@@ -430,8 +440,8 @@ if (!empty($nip)) {
 
     $path = 'api/pegawai/' . $nip . '/jabatan';
     $option = array(
-        'url' => get_option('_crb_url_api_simpeg') . $path,
-        'type' => 'get',
+        'url'    => get_option('_crb_url_api_simpeg') . $path,
+        'type'   => 'get',
         'header' => array('Authorization: Basic ' . get_option('_crb_authorization_api_simpeg'))
     );
 
@@ -439,12 +449,12 @@ if (!empty($nip)) {
 
     if (empty($response)) {
         $error_api = array(
-            'status' => 1,
+            'status'  => 1,
             'message' => 'Respon API kosong!'
         );
     } else if ($response == 'Unauthorized') {
         $error_api = array(
-            'status' => 1,
+            'status'  => 1,
             'message' => $response . ' ' . json_encode($opsi)
         );
     }
@@ -459,7 +469,7 @@ if (!empty($nip)) {
 
     if (json_last_error() !== JSON_ERROR_NONE) {
         $error_api = array(
-            'status' => 1,
+            'status'  => 1,
             'message' => "Terjadi kesalahan ketika mengakses API, Error : " . json_last_error_msg()
         );
     }
@@ -991,8 +1001,8 @@ if (empty($logo_pemda)) {
                         </td>
                     </tr>
                     <tr class="text-center">
-                        <td>Pihak Kedua,</td>
-                        <td>Pihak Pertama,</td>
+                        <td><?php echo $data_detail_atasan['jabatan_pegawai_atasan']; ?>,</td>
+                        <td><?php echo $data_detail['jabatan_pegawai']; ?>,</td>
                     </tr>
                 </thead>
                 <tbody>
@@ -1034,6 +1044,7 @@ if (empty($logo_pemda)) {
         </div>
     </div>
 </body>
+
 <div class="modal fade mt-4" id="modalFinalisasi" tabindex="-1" role="dialog" aria-labelledby="modalFinalisasi" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
@@ -1055,24 +1066,54 @@ if (empty($logo_pemda)) {
                         <table class="borderless-table mb-4">
                             <tbody>
                                 <tr>
-                                    <td class="text-left" style="width: 20%;"><strong>Nama Pegawai</strong></td>
-                                    <td class="text-left"><strong>:</strong></td>
-                                    <td class="text-left"><?php echo $data_detail['gelar_depan'] . ' ' . $data_detail['nama_pegawai'] . ', ' . $data_detail['gelar_belakang']; ?></td>
+                                    <td class="text-left" style="width: 20%;">
+                                        <strong>Nama Pegawai</strong>
+                                    </td>
+                                    <td class="text-left">
+                                        <strong>:</strong>
+                                    </td>
+                                    <td class="text-left" id="nama_pegawai"><?php echo $data_detail['gelar_depan'] . ' ' . $data_detail['nama_pegawai'] . ', ' . $data_detail['gelar_belakang']; ?>
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td class="text-left"><strong>NIP</strong></td>
-                                    <td class="text-left"><strong>:</strong></td>
-                                    <td class="text-left"><?php echo $data_detail['nip_pegawai']; ?></td>
+                                    <td class="text-left">
+                                        <strong>NIP</strong>
+                                    </td>
+                                    <td class="text-left">
+                                        <strong>:</strong>
+                                    </td>
+                                    <td class="text-left" id="nip_pegawai"><?php echo $data_detail['nip_pegawai']; ?>
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td class="text-left"><strong>Jabatan</strong></td>
-                                    <td class="text-left"><strong>:</strong></td>
-                                    <td class="text-left"><?php echo $data_detail['jabatan_pegawai']; ?></td>
+                                    <td class="text-left">
+                                        <strong>Jabatan</strong>
+                                    </td>
+                                    <td class="text-left">
+                                        <strong>:</strong>
+                                    </td>
+                                    <td class="text-left" id="jabatan_pegawai"><?php echo $data_detail['jabatan_pegawai']; ?>
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td class="text-left"><strong>Satuan Kerja</strong></td>
-                                    <td class="text-left"><strong>:</strong></td>
-                                    <td class="text-left"><?php echo strtoupper($nama_skpd); ?></td>
+                                    <td class="text-left">
+                                        <strong>Satuan Kerja</strong>
+                                    </td>
+                                    <td class="text-left">
+                                        <strong>:</strong>
+                                    </td>
+                                    <td class="text-left" id="satuan_kerja"><?php echo strtoupper($nama_skpd); ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left">
+                                        <strong>Bidang</strong>
+                                    </td>
+                                    <td class="text-left">
+                                        <strong>:</strong>
+                                    </td>
+                                    <td class="text-left" id="bidang_pegawai"><?php echo strtoupper($data_detail['bidang_pegawai']); ?>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1089,10 +1130,10 @@ if (empty($logo_pemda)) {
                             <table id="table_data_sasaran" style="margin: 2rem 0 4rem;">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
-                                        <th>Sasaran</th>
-                                        <th>Indikator</th>
-                                        <th>Target</th>
+                                        <th class="text-center">No</th>
+                                        <th class="text-center">Sasaran</th>
+                                        <th class="text-center">Indikator</th>
+                                        <th class="text-center">Target</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1112,10 +1153,17 @@ if (empty($logo_pemda)) {
                         <strong>Perjanjian Kinerja</strong>
                     </div>
                     <div class="card-body">
-                        <div class="form-group">
-                            <label for="nama_dokumen">Nama Perjanjian Kinerja</label>
-                            <input type="text" class="form-control" id="nama_dokumen" name="nama_dokumen" placeholder="ex : Perjanjian Kinerja tahun <?php echo $input['tahun']; ?>">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="nama_dokumen">Nama Tahapan</label>
+                                <input type="text" class="form-control" id="nama_dokumen" name="nama_dokumen" placeholder="ex : Perjanjian Kinerja tahun <?php echo $input['tahun']; ?>" maxlength="48">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="tanggal_dokumen">Tanggal Dokumen</label>
+                                <input type="date" class="form-control" id="tanggal_dokumen" name="tanggal_dokumen">
+                            </div>
                         </div>
+                        <small class="form-text text-muted">Pastikan data yang tertera benar, laporan yang sudah difinalisasi akan disimpan dan tidak dapat di edit kembali.</small>
                     </div>
                 </div>
             </div>
@@ -1186,6 +1234,92 @@ if (empty($logo_pemda)) {
     }
 
     function simpanFinalisasi() {
-        alert('Coming soon!')
+        let confirmFinalisasi = confirm('Apakah anda yakin ingin menyimpan data ini?');
+        if (!confirmFinalisasi) {
+            return;
+        }
+
+        let pegawaiData = {
+            nama: jQuery('#nama_pegawai').text(),
+            nip: jQuery('#nip_pegawai').text(),
+            jabatan: jQuery('#jabatan_pegawai').text(),
+            satuan_kerja: jQuery('#satuan_kerja').text(),
+            bidang: jQuery('#bidang_pegawai').text()
+        };
+
+        let dokumenPk = {
+            nama_tahapan: jQuery('#nama_dokumen').val(),
+            tanggal_dokumen: jQuery('#tanggal_dokumen').val()
+        };
+
+        let sasarans = [];
+        jQuery('#table_sasaran tbody tr').each(function() {
+            let row = {
+                sasaran: jQuery(this).find('td:nth-child(2)').text().trim(),
+                indikator: jQuery(this).find('td:nth-child(3)').text().trim(),
+                target: jQuery(this).find('td:nth-child(4)').text().trim(),
+            };
+            sasarans.push(row);
+        });
+
+        let programs = [];
+        jQuery('#table_program tbody tr').each(function() {
+            let row = {
+                kode: jQuery(this).find('td:nth-child(2)').text().trim(),
+                program: jQuery(this).find('td:nth-child(3)').text().trim(),
+                anggaran: jQuery(this).find('td:nth-child(4)').text().trim().replace(/\./g, ''),
+                keterangan: jQuery(this).find('td:nth-child(5)').text().trim(),
+            };
+            programs.push(row);
+        });
+
+        let kegiatans = [];
+        jQuery('#table_kegiatan tbody tr').each(function() {
+            let row = {
+                kode: jQuery(this).find('td:nth-child(2)').text().trim(),
+                kegiatan: jQuery(this).find('td:nth-child(3)').text().trim(),
+                anggaran: jQuery(this).find('td:nth-child(4)').text().trim().replace(/\./g, ''),
+                keterangan: jQuery(this).find('td:nth-child(5)').text().trim(),
+            };
+            kegiatans.push(row);
+        });
+
+        let subkegiatans = [];
+        jQuery('#table_subkegiatan tbody tr').each(function() {
+            let row = {
+                kode: jQuery(this).find('td:nth-child(2)').text().trim(),
+                subkegiatan: jQuery(this).find('td:nth-child(3)').text().trim(),
+                anggaran: jQuery(this).find('td:nth-child(4)').text().trim().replace(/\./g, ''),
+                keterangan: jQuery(this).find('td:nth-child(5)').text().trim(),
+            };
+            subkegiatans.push(row);
+        });
+
+        jQuery.ajax({
+            url: esakip.url,
+            method: 'POST',
+            data: {
+                action: "simpan_finalisasi_laporan_pk",
+                api_key: esakip.api_key,
+                sasaran: sasarans,
+                program: programs,
+                kegiatan: kegiatans,
+                subkegiatan: subkegiatans,
+                data_pegawai: pegawaiData,
+                data_pk: dokumenPk,
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    alert(response.message);
+                } else {
+                    alert('Terjadi kesalahan: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', error);
+                alert('Gagal menyimpan data. Silakan coba lagi.');
+            },
+        });
     }
 </script>

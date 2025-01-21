@@ -2562,7 +2562,7 @@ foreach($get_pegawai as $pegawai){
                                         <textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan ${title}..."></textarea>
                                     </div>
                                     <div class="form-group">
-                                        <label for="sasaran-cascading">Pilih ${jenis_cascading} Cascading</label>
+                                        <label for="cascading-renstra">Pilih ${jenis_cascading} Cascading</label>
                                         <select class="form-control" name="cascading-renstra" id="cascading-renstra"></select>
                                     </div>
                                     <div class="form-group"> 
