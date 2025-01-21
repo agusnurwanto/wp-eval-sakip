@@ -1274,6 +1274,18 @@ CREATE TABLE `esakip_data_rencana_aksi_indikator_opd` (
   `update_at` datetime DEFAULT current_timestamp(),
   `rencana_pagu` double(20, 0) DEFAULT NULL,
   `realisasi_pagu` double(20, 0) DEFAULT NULL,
+  `aspek_rhk` tinyint(4) NULL COMMENT '1 = kuantitas, 2 kualitas, 3 = waktu, 4 = biaya',
+  `set_target_teks` tinyint(4) DEFAULT NULL,
+  `target_teks_awal` VARCHAR(50) DEFAULT NULL,
+  `target_teks_akhir` VARCHAR(50) DEFAULT NULL,
+  `target_teks_1` VARCHAR(50) DEFAULT NULL,
+  `target_teks_2` VARCHAR(50) DEFAULT NULL,
+  `target_teks_3` VARCHAR(50) DEFAULT NULL,
+  `target_teks_4` VARCHAR(50) DEFAULT NULL,
+  `realisasi_target_teks_1` VARCHAR(50) DEFAULT NULL,
+  `realisasi_target_teks_2` VARCHAR(50) DEFAULT NULL,
+  `realisasi_target_teks_3` VARCHAR(50) DEFAULT NULL,
+  `realisasi_target_teks_4` VARCHAR(50) DEFAULT NULL,
   PRIMARY key (id)
 );
 

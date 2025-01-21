@@ -1132,7 +1132,26 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'active' => 1,
 						'tahun_anggaran' => $_POST['tahun_anggaran'],
 						'created_at' => current_time('mysql'),
+						'aspek_rhk' => $_POST['aspek_rhk']
 					);
+
+					if($_POST['set_target_teks'] == 1){
+						$data['set_target_teks'] = $_POST['set_target_teks'];
+						$data['target_teks_awal'] = $_POST['target_teks_awal'];
+						$data['target_teks_akhir'] = $_POST['target_teks_akhir'];
+						$data['target_teks_1'] = $_POST['target_teks_tw_1'];
+						$data['target_teks_2'] = $_POST['target_teks_tw_2'];
+						$data['target_teks_3'] = $_POST['target_teks_tw_3'];
+						$data['target_teks_4'] = $_POST['target_teks_tw_4'];
+					}else{
+						$data['set_target_teks'] = 0;
+						$data['target_teks_awal'] = NULL;
+						$data['target_teks_akhir'] = NULL;
+						$data['target_teks_1'] = NULL;
+						$data['target_teks_2'] = NULL;
+						$data['target_teks_3'] = NULL;
+						$data['target_teks_4'] = NULL;
+					}
 					if (empty($_POST['id_label_indikator'])) {
 						$total_pagu_renaksi = $wpdb->get_var($wpdb->prepare("
 					        SELECT 
