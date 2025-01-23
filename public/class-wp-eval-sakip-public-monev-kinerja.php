@@ -668,7 +668,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							);
 							$ret = array(
 								'status' => 'error',
-								'message'   => 'Data '.$nama_kolom[$_POST['level']].' Cascading Tidak Dapat Diubah! Harap Hapus Data Cascading Di RHK Level Bawahnya!.'
+								'message'   => 'Data '.$nama_kolom[$_POST['level']].' Cascading Tidak Dapat Diubah! Harap Hapus / Kosongkan / Perbarui Data Cascading Di RHK Level Bawahnya!.'
 							);
 							die(json_encode($ret));
 						}
