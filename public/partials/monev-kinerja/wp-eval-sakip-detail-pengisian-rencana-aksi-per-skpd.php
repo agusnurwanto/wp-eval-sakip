@@ -575,6 +575,13 @@ foreach($get_pegawai as $pegawai){
         });
     });
 
+    jQuery(document).on('change', '#cek-target-teks', function() {
+        if (jQuery(this).is(":checked")){
+            jQuery(".target-teks").show();
+        }else{
+            jQuery(".target-teks").hide();
+        }
+    });
 
     function simpan_indikator_renaksi(tipe) {
         var id = jQuery('#id_label_indikator').val();
@@ -620,6 +627,19 @@ foreach($get_pegawai as $pegawai){
             return alert('Target triwulan 4 tidak boleh kosong!')
         }
         var rencana_pagu_tk = jQuery('#rencana_pagu_tk').val();
+        var aspek_rhk = jQuery('#aspek_rhk').val();
+        var target_teks_awal = jQuery('#target_teks_awal').val();
+        var target_teks_akhir = jQuery('#target_teks_akhir').val();
+        var target_teks_tw_1 = jQuery("#target_teks_tw_1").val();
+        var target_teks_tw_2 = jQuery("#target_teks_tw_2").val();
+        var target_teks_tw_3 = jQuery("#target_teks_tw_3").val();
+        var target_teks_tw_4 = jQuery("#target_teks_tw_4").val();
+        var set_target_teks = 0;
+        if (jQuery("#cek-target-teks").is(":checked")){
+            set_target_teks = 1;
+        }else{
+            set_target_teks = 0;
+        }
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -641,7 +661,15 @@ foreach($get_pegawai as $pegawai){
                 "target_tw_4": target_tw_4,
                 "rencana_pagu_tk": rencana_pagu_tk,
                 "tahun_anggaran": <?php echo $input['tahun']; ?>,
-                "id_skpd": <?php echo $id_skpd; ?>
+                "id_skpd": <?php echo $id_skpd; ?>,
+                "aspek_rhk" : aspek_rhk,
+                "target_teks_awal" : target_teks_awal,
+                "target_teks_akhir" : target_teks_akhir,
+                "target_teks_tw_1" : target_teks_tw_1,
+                "target_teks_tw_2" : target_teks_tw_2,
+                "target_teks_tw_3" : target_teks_tw_3,
+                "target_teks_tw_4" : target_teks_tw_4,
+                "set_target_teks" : set_target_teks
             },
             dataType: "json",
             success: function(res) {
@@ -698,7 +726,7 @@ foreach($get_pegawai as $pegawai){
                             });
                             var get_pegawai = <?php echo json_encode($select_pegawai); ?>;
                             jQuery('#wrap-loading').hide();
-                            jQuery("#modal-crud").find('.modal-title').html('Tambah Rencana Hasil Kerja');
+                            jQuery("#modal-crud").find('.modal-title').html('Tambah Kegiatan Utama | RHK Level 1');
                             jQuery("#modal-crud").find('.modal-body').html('' +
                                 `<form id="form-renaksi">` +
                                 '<input type="hidden" id="id_renaksi" value=""/>' +
@@ -714,7 +742,7 @@ foreach($get_pegawai as $pegawai){
                                 `</select>` +
                                 `</div>` +
                                 `<div class="form-group">` +
-                                `<textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan Kegiatan Utama..."></textarea>` +
+                                `<textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan Kegiatan Utama | RHK Level 1..."></textarea>` +
                                 `</div>` +
                                 `<div class="form-group">` +
                                 `<label for="sasaran-cascading">Pilih Sasaran Cascading</label>` +
@@ -1222,7 +1250,7 @@ foreach($get_pegawai as $pegawai){
                         let label_pokin = '-';
                         let id_pokin_parent = [];
                         if (value.pokin && value.pokin.length > 0) {
-                            label_pokin = `<ul>`;
+                            label_pokin = `<ul style="margin: 0;">`;
                             value.pokin.forEach(function(get_pokin) {
                                 label_pokin += `<li>${get_pokin.pokin_label}</li>`;
                                 id_pokin_parent.push(+get_pokin.id_pokin);
@@ -1254,6 +1282,7 @@ foreach($get_pegawai as $pegawai){
                                 `<thead>` +
                                 `<tr class="table-secondary">` +
                                 `<th class="text-center" style="width:20px">No</th>` +
+                                `<th class="text-center">Aspek</th>` +
                                 `<th class="text-center">Indikator</th>` +
                                 `<th class="text-center" style="width:120px;">Satuan</th>` +
                                 `<th class="text-center" style="width:50px;">Target Awal</th>` +
@@ -1264,13 +1293,27 @@ foreach($get_pegawai as $pegawai){
                                 `</thead>` +
                                 `<tbody>`;
                             indikator.map(function(b, i) {
+                                let aspek_rhk = ["Kuantitas", "Kualitas", "Waktu", "Biaya"];
+                                let text_aspek_rhk = '';
+                                if(b.aspek_rhk != null || b.aspek_rhk != undefined){
+                                    text_aspek_rhk = aspek_rhk[b.aspek_rhk-1];
+                                }
+                                let target_teks_awal = '';
+                                if(b.target_teks_awal != null || b.target_teks_awal != undefined){
+                                    target_teks_awal = `</br>(${b.target_teks_awal})`;
+                                }
+                                let target_teks_akhir = '';
+                                if(b.target_teks_akhir != null || b.target_teks_akhir != undefined){
+                                    target_teks_akhir = `</br>(${b.target_teks_akhir})`;
+                                }
                                 kegiatanUtama += `` +
                                     `<tr>` +
                                     `<td class="text-center">${index+1}.${i+1}</td>` +
+                                    `<td>${text_aspek_rhk}</td>` +
                                     `<td>${b.indikator}</td>` +
                                     `<td class="text-center">${b.satuan}</td>` +
-                                    `<td class="text-center">${b.target_awal}</td>` +
-                                    `<td class="text-center">${b.target_akhir}</td>` +
+                                    `<td class="text-center">${b.target_awal} ${target_teks_awal}</td>` +
+                                    `<td class="text-center">${b.target_akhir} ${target_teks_akhir}</td>` +
                                     `<td class="text-right">${b.rencana_pagu || 0}</td>` +
                                     `<td class="text-center">` +
                                     `<input type="checkbox" title="Lihat Rencana Hasil Kerja Per Bulan" class="lihat_bulanan" data-id="${b.id}" onclick="lihat_bulanan(this);" style="margin: 0 6px;">` +
@@ -1464,117 +1507,102 @@ foreach($get_pegawai as $pegawai){
         var title = '';
         let input_pagu = '';
         if (tipe == 1) {
-            title = 'Indikator Kegiatan Utama';
+            title = 'Indikator Kegiatan Utama | RHK Level 1';
             input_pagu = '' +
                 `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                `<label for="rencana_pagu">Rencana Pagu Teknis Kegiatan</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                `<div class="input-group">` +
-                `   <input type="number" disabled class="form-control text-right" id="rencana_pagu_tk" value="` + total_pagu + `"/>` +
-                `</div>` +
-                '</div>' +
-                '</div>' +
-                `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                `<label for="total_rincian">Total Rincian</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                `<div class="input-group">` +
-                `<input type="number" class="form-control" id="total_rincian" max="100" value="100"/>` +
-                `<span class="input-group-text">%</span>` +
-                `</div>` +
-                '</div>' +
+                    '<div class="col-md-2">' +
+                        `<label for="rencana_pagu">Total RHK Level 4</label>` +
+                    '</div>' +
+                    '<div class="col-md-10">' +
+                        `<div class="input-group">` +
+                            `<input type="number" disabled class="form-control text-right" id="rencana_pagu_tk" value="` + total_pagu + `"/>` +
+                        `</div>` +
+                    '</div>' +
                 '</div>' +
                 `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                `<label for="rencana_pagu">Rencana Pagu Uraian Kegiatan</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                `<div class="input-group">` +
-                `<input type="number" disabled class="form-control text-right" id="rencana_pagu" value="` + total_pagu + `" />` +
-                `</div>` +
-                '</div>' +
-                `</div>`
+                    '<div class="col-md-2">' +
+                        `<label for="total_rincian">Rencana Pagu</label>` +
+                    '</div>' +
+                    '<div class="col-md-5">' +
+                        `<div class="input-group">` +
+                            `<input type="number" class="form-control" id="total_rincian" max="100" value="100"/>` +
+                                `<span class="input-group-text">%</span>` +
+                        `</div>` +
+                    '</div>' +
+                    '<div class="col-md-5">' +
+                        `<div class="input-group">` +
+                        `<input type="number" disabled class="form-control text-right" id="rencana_pagu" value="` + total_pagu + `" />` +
+                        `</div>` +
+                    '</div>' +
+                '</div>'
         } else if (tipe == 2) {
-            title = 'Indikator Rencana Hasil Kerja';
+            title = 'Indikator Rencana Hasil Kerja | RHK Level 2';
             input_pagu = '' +
                 `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                `<label for="rencana_pagu">Rencana Pagu Teknis Kegiatan</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                `<div class="input-group">` +
-                `<input type="number" disabled class="form-control text-right" id="rencana_pagu_tk" value="` + total_pagu + `"/>` +
-                `</div>` +
-                '</div>' +
-                '</div>' +
-                `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                `<label for="total_rincian">Total Rincian</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                `<div class="input-group">` +
-                `<input type="number" class="form-control" id="total_rincian" max="100" value="100"/>` +
-                `<span class="input-group-text">%</span>` +
-                `</div>` +
-                '</div>' +
+                    '<div class="col-md-2">' +
+                        `<label for="rencana_pagu">Total RHK Level 4</label>` +
+                    '</div>' +
+                    '<div class="col-md-10">' +
+                        `<div class="input-group">` +
+                            `<input type="number" disabled class="form-control text-right" id="rencana_pagu_tk" value="` + total_pagu + `"/>` +
+                        `</div>` +
+                    '</div>' +
                 '</div>' +
                 `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                `<label for="rencana_pagu">Rencana Pagu Uraian Kegiatan</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                `<div class="input-group">` +
-                `<input type="number" disabled class="form-control text-right" id="rencana_pagu" value="` + total_pagu + `" />` +
-                `</div>` +
-                '</div>' +
-                `</div>`
+                    '<div class="col-md-2">' +
+                        `<label for="total_rincian">Rencana Pagu</label>` +
+                    '</div>' +
+                    '<div class="col-md-5">' +
+                        `<div class="input-group">` +
+                            `<input type="number" class="form-control" id="total_rincian" max="100" value="100"/>` +
+                            `<span class="input-group-text">%</span>` +
+                        `</div>` +
+                    '</div>' +
+                    '<div class="col-md-5">' +
+                        `<div class="input-group">` +
+                            `<input type="number" disabled class="form-control text-right" id="rencana_pagu" value="` + total_pagu + `" />` +
+                        `</div>` +
+                    '</div>' +
+                '</div>'
         } else if (tipe == 3) {
-            title = 'Indikator Uraian Kegiatan Rencana Hasil Kerja';
+            title = 'Indikator Uraian Kegiatan Rencana Hasil Kerja | RHK Level 3';
             input_pagu = '' +
                 `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                `<label for="rencana_pagu">Rencana Pagu Teknis Kegiatan</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                `<div class="input-group">` +
-                `<input type="number" disabled class="form-control text-right" id="rencana_pagu_tk" value="` + total_pagu + `"/>` +
-                `</div>` +
-                '</div>' +
-                '</div>' +
-                `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                `<label for="total_rincian">Total Rincian</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                `<div class="input-group">` +
-                `<input type="number" class="form-control" id="total_rincian" max="100" value="100"/>` +
-                `<span class="input-group-text">%</span>` +
-                `</div>` +
-                '</div>' +
+                    '<div class="col-md-2">' +
+                        `<label for="rencana_pagu">Total RHK Level 4</label>` +
+                    '</div>' +
+                    '<div class="col-md-10">' +
+                        `<div class="input-group">` +
+                            `<input type="number" disabled class="form-control text-right" id="rencana_pagu_tk" value="` + total_pagu + `"/>` +
+                        `</div>` +
+                    '</div>' +
                 '</div>' +
                 `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                `<label for="rencana_pagu">Rencana Pagu Uraian Kegiatan</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                `<div class="input-group">` +
-                `<input type="number" disabled class="form-control text-right" id="rencana_pagu" value="` + total_pagu + `" />` +
-                `</div>` +
-                '</div>' +
-                `</div>`
+                    '<div class="col-md-2">' +
+                        `<label for="total_rincian">Rencana Pagu</label>` +
+                    '</div>' +
+                    '<div class="col-md-5">' +
+                        `<div class="input-group">` +
+                            `<input type="number" class="form-control" id="total_rincian" max="100" value="100"/>` +
+                            `<span class="input-group-text">%</span>` +
+                        `</div>` +
+                    '</div>' +
+                    '<div class="col-md-5">' +
+                        `<div class="input-group">` +
+                            `<input type="number" disabled class="form-control text-right" id="rencana_pagu" value="` + total_pagu + `" />` +
+                        `</div>` +
+                    '</div>' +
+                '</div>'
         } else if (tipe == 4) {
-            title = 'Indikator Uraian Teknis Kegiatan';
+            title = 'Indikator Uraian Teknis Kegiatan | RHK Level 4';
             input_pagu = '' +
                 `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                `<label for="satuan_indikator">Rencana Pagu</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                `<input type="number" class="form-control" id="rencana_pagu"/>` +
-                '</div>' +
+                    '<div class="col-md-2">' +
+                        `<label for="satuan_indikator">Rencana Pagu</label>` +
+                    '</div>' +
+                    '<div class="col-md-10">' +
+                        `<input type="number" class="form-control" id="rencana_pagu"/>` +
+                    '</div>' +
                 `</div>`;
         }
         var tr = jQuery('#kegiatan_utama_' + id);
@@ -1586,89 +1614,156 @@ foreach($get_pegawai as $pegawai){
             '<input type="hidden" value="" id="id_label_indikator">' +
             '<input type="hidden" value="' + id + '" id="id_label">' +
             `<div class="form-group row">` +
-            '<div class="col-md-2">' +
-            `<label for="label_pokin_indikator">Label Pohon Kinerja</label>` +
-            '</div>' +
-            '<div class="col-md-10">' +
-            '<input class="form-control" type="text" disabled id="label_pokin_indikator" value="' + label_pokin + '"/>' +
-            '</div>' +
+                '<div class="col-md-2">' +
+                    `<label for="label_pokin_indikator">Label Pokin</label>` +
+                '</div>' +
+                '<div class="col-md-10">' +
+                    '<input class="form-control" type="text" disabled id="label_pokin_indikator" value="' + label_pokin + '"/>' +
+                '</div>' +
             `</div>` +
             `<div class="form-group row">` +
-            '<div class="col-md-2">' +
-            `<label for="kegiatan_utama_indikator">` + title.replace('Indikator ', '') + `</label>` +
-            '</div>' +
-            '<div class="col-md-10">' +
-            '<input type="text" disabled class="form-control" id="kegiatan_utama_indikator" value="' + label_renaksi + '"/>' +
-            '</div>' +
+                '<div class="col-md-2">' +
+                    `<label for="kegiatan_utama_indikator">Aspek</label>` +
+                '</div>' +
+                '<div class="col-md-10">' +
+                    '<select class="form-control" id="aspek_rhk">'+
+                        '<option value="1">Kuantitas (Jumlah yang bisa dihitung. Pcs, Dokumen, %, Kegiatan, Dst.)</option>'+
+                        '<option value="2">Kualitas (Nilai mutu produk atau layanan. %, Dst.)</option>'+
+                        '<option value="3">Waktu (Hari, Bulan, Tahun, Dst.)</option>'+
+                        '<option value="4">Biaya (Rp.)</option>'+
+                    '</select>'+
+                '</div>' +
             `</div>` +
             `<div class="form-group row">` +
-            '<div class="col-md-2">' +
-            '<label for="indikator">' + title + '</label>' +
-            '</div>' +
-            '<div class="col-md-10">' +
-            `<textarea class="form-control" name="label" id="indikator" placeholder="Tuliskan Indikator Kegiatan Utama..."></textarea>` +
-            '</div>' +
+                '<div class="col-md-2">' +
+                    `<label for="kegiatan_utama_indikator">`+title.replace("Indikator", "")+`</label>` +
+                '</div>' +
+                '<div class="col-md-10">' +
+                    '<input type="text" disabled class="form-control" id="kegiatan_utama_indikator" value="' + label_renaksi + '"/>' +
+                '</div>' +
             `</div>` +
             `<div class="form-group row">` +
-            '<div class="col-md-2">' +
-            `<label for="satuan_indikator">Satuan</label>` +
-            '</div>' +
-            '<div class="col-md-10">' +
-            `<input type="text" class="form-control" id="satuan_indikator"/>` +
-            '</div>' +
+                '<div class="col-md-2">' +
+                    '<label for="indikator">Indikator</label>' +
+                '</div>' +
+                '<div class="col-md-10">' +
+                    `<textarea class="form-control" name="label" id="indikator" placeholder="Tuliskan Indikator..."></textarea>` +
+                '</div>' +
+            `</div>` +
+            `<div class="form-group row">` +
+                '<div class="col-md-2">' +
+                    `<label for="satuan_indikator">Satuan</label>` +
+                '</div>' +
+                '<div class="col-md-10">' +
+                    `<input type="text" class="form-control" id="satuan_indikator"/>` +
+                '</div>' +
             `</div>` +
             `${input_pagu}` +
             `<div class="form-group row">` +
-            '<div class="col-md-2">' +
-            `<label for="target_awal">Target Awal</label>` +
-            '</div>' +
-            '<div class="col-md-4">' +
-            `<input type="number" class="form-control" id="target_awal"/>` +
-            '</div>' +
-            '<div class="col-md-2">' +
-            `<label for="target_akhir">Target Akhir</label>` +
-            '</div>' +
-            '<div class="col-md-4">' +
-            `<input type="number" class="form-control" id="target_akhir"/>` +
-            '</div>' +
+                '<div class="col-md-2">' +
+                   `<label for="target_awal">Target Teks</label>` +
+                '</div>' +
+                '<div class="col-md-10">' +
+                    `<div class="form-check" style="margin-top: 5px;">`+
+                        `<input class="form-check-input" type="checkbox" id="cek-target-teks">`+
+                        `<label class="form-check-label" for="cek-target-teks">Target Teks</label>`+
+                    `</div>`+
+                    `<small id="passwordHelpBlock" class="form-text text-muted">Untuk menampung target yang berupa teks!</small>`+
+                '</div>' +
             `</div>` +
             `<div class="form-group row">` +
-            '<div class="col-md-2">' +
-            `<label for="target_tw_1">TW 1</label>` +
-            '</div>' +
-            '<div class="col-md-4">' +
-            `<input type="number" class="form-control" id="target_tw_1"/>` +
-            '</div>' +
-            '<div class="col-md-2">' +
-            `<label for="target_tw_2">TW 2</label>` +
-            '</div>' +
-            '<div class="col-md-4">' +
-            `<input type="number" class="form-control" id="target_tw_2"/>` +
-            '</div>' +
+                '<div class="col-md-2">' +
+                   `<label for="target_awal">Target Awal</label>` +
+                '</div>' +
+                '<div class="col-md-4">' +
+                    `<input type="number" class="form-control" id="target_awal"/>` +
+                '</div>' +
+                '<div class="col-md-2">' +
+                    `<label for="target_akhir">Target Akhir</label>` +
+                '</div>' +
+                '<div class="col-md-4">' +
+                    `<input type="number" class="form-control" id="target_akhir"/>` +
+                '</div>' +
+            `</div>` +
+            `<div class="form-group row target-teks" style="display: none; margin-bottom: 2rem;">` +
+                '<div class="col-md-2">' +
+                   `<label for="target_awal">Target Awal Teks</label>` +
+                '</div>' +
+                '<div class="col-md-4">' +
+                    `<input type="text" class="form-control" id="target_teks_awal"/>` +
+                '</div>' +
+                '<div class="col-md-2">' +
+                    `<label for="target_akhir">Target Akhir Teks</label>` +
+                '</div>' +
+                '<div class="col-md-4">' +
+                    `<input type="text" class="form-control" id="target_teks_akhir"/>` +
+                '</div>' +
             `</div>` +
             `<div class="form-group row">` +
-            '<div class="col-md-2">' +
-            `<label for="target_tw_3">TW 3</label>` +
-            '</div>' +
-            '<div class="col-md-4">' +
-            `<input type="number" class="form-control" id="target_tw_3"/>` +
-            '</div>' +
-            '<div class="col-md-2">' +
-            `<label for="target_tw_4">TW 4</label>` +
-            '</div>' +
-            '<div class="col-md-4">' +
-            `<input type="number" class="form-control" id="target_tw_4"/>` +
-            '</div>' +
+                '<div class="col-md-2">' +
+                    `<label for="target_tw_1">TW 1</label>` +
+                '</div>' +
+                '<div class="col-md-4">' +
+                    `<input type="number" class="form-control" id="target_tw_1"/>` +
+                '</div>' +
+                '<div class="col-md-2">' +
+                    `<label for="target_tw_2">TW 2</label>` +
+                '</div>' +
+                '<div class="col-md-4">' +
+                    `<input type="number" class="form-control" id="target_tw_2"/>` +
+                '</div>' +
+            `</div>` +
+            `<div class="form-group row target-teks" style="display:none; margin-bottom: 2rem;">` +
+                '<div class="col-md-2">' +
+                    `<label for="target_tw_1">Target Teks TW 1</label>` +
+                '</div>' +
+                '<div class="col-md-4">' +
+                    `<input type="text" class="form-control" id="target_teks_tw_1"/>` +
+                '</div>' +
+                '<div class="col-md-2">' +
+                    `<label for="target_tw_2">Target Teks TW 2</label>` +
+                '</div>' +
+                '<div class="col-md-4">' +
+                    `<input type="text" class="form-control" id="target_teks_tw_2"/>` +
+                '</div>' +
+            `</div>` +
+            `<div class="form-group row">` +
+                '<div class="col-md-2">' +
+                    `<label for="target_tw_3">TW 3</label>` +
+                '</div>' +
+                '<div class="col-md-4">' +
+                    `<input type="text" class="form-control" id="target_tw_3"/>` +
+                '</div>' +
+                '<div class="col-md-2">' +
+                    `<label for="target_tw_4">TW 4</label>` +
+                '</div>' +
+                '<div class="col-md-4">' +
+                    `<input type="text" class="form-control" id="target_tw_4"/>` +
+                '</div>' +
+            `</div>` +
+            `<div class="form-group row target-teks" style="display: none; margin-bottom: 2rem;">` +
+                '<div class="col-md-2">' +
+                    `<label for="target_tw_3">Target Teks TW 3</label>` +
+                '</div>' +
+                '<div class="col-md-4">' +
+                    `<input type="text" class="form-control" id="target_teks_tw_3"/>` +
+                '</div>' +
+                '<div class="col-md-2">' +
+                    `<label for="target_tw_4">Terget Teks TW 4</label>` +
+                '</div>' +
+                '<div class="col-md-4">' +
+                    `<input type="text" class="form-control" id="target_teks_tw_4"/>` +
+                '</div>' +
             `</div>` +
             `</form>`);
         jQuery("#modal-crud").find('.modal-footer').html('' +
             '<button type="button" class="btn btn-danger" data-dismiss="modal">' +
-            'Tutup' +
+                'Tutup' +
             '</button>' +
             '<button type="button" class="btn btn-success" onclick="simpan_indikator_renaksi(' + tipe + ')" data-view="kegiatanUtama">' +
-            'Simpan' +
+                'Simpan' +
             '</button>');
-        jQuery("#modal-crud").find('.modal-dialog').css('maxWidth', '');
+        jQuery("#modal-crud").find('.modal-dialog').css('maxWidth', '1000px');
         jQuery("#modal-crud").find('.modal-dialog').css('width', '');
         jQuery("#modal-crud").modal('show');
 
@@ -1722,9 +1817,23 @@ foreach($get_pegawai as $pegawai){
                     jQuery('#target_tw_2').val(response.data.target_2);
                     jQuery('#target_tw_3').val(response.data.target_3);
                     jQuery('#target_tw_4').val(response.data.target_4);
+                    jQuery('#aspek_rhk').val(response.data.aspek_rhk);
+                    jQuery('#target_teks_awal').val(response.data.target_teks_awal);
+                    jQuery('#target_teks_akhir').val(response.data.target_teks_akhir);
+                    jQuery('#target_teks_tw_1').val(response.data.target_teks_1);
+                    jQuery('#target_teks_tw_2').val(response.data.target_teks_2);
+                    jQuery('#target_teks_tw_3').val(response.data.target_teks_3);
+                    jQuery('#target_teks_tw_4').val(response.data.target_teks_4);
                     jQuery('#rencana_pagu').val(rencana_pagu);
                     jQuery('#total_rincian').val(persen.toFixed(0));
                     jQuery('#rencana_pagu_tk').val(total_pagu);
+                    if(response.data.set_target_teks == 1){
+                        jQuery('#cek-target-teks').prop('checked', true);
+                        jQuery(".target-teks").show();
+                    }else{
+                        jQuery('#cek-target-teks').prop('checked', false);
+                        jQuery(".target-teks").hide();
+                    }
                 } else if (response.status == 'error') {
                     alert(response.message);
                 }
@@ -2003,7 +2112,7 @@ foreach($get_pegawai as $pegawai){
                             }
                             id_pokin = [];
                             if (value.pokin && value.pokin.length > 0) {
-                                label_pokin = `<ul>`;
+                                label_pokin = `<ul style="margin: 0;">`;
                                 value.pokin.forEach(function(get_pokin) {
                                     label_pokin += `<li>${get_pokin.pokin_label}</li>`;
                                     id_pokin.push(+get_pokin.id_pokin);
@@ -2041,7 +2150,7 @@ foreach($get_pegawai as $pegawai){
                             }
                             id_pokin = [];
                             if (value.pokin_3 && value.pokin_3.length > 0) {
-                                label_pokin = `<ul>`;
+                                label_pokin = `<ul style="margin: 0;">`;
                                 value.pokin_3.forEach(function(get_pokin_2) {
                                     label_pokin += `<li>${get_pokin_2.pokin_label}</li>`;
                                     id_pokin.push(+get_pokin_2.id_pokin);
@@ -2080,7 +2189,7 @@ foreach($get_pegawai as $pegawai){
                             }
                             id_pokin = [];
                             if (value.pokin_4 && value.pokin_4.length > 0) {
-                                label_pokin = `<ul>`;
+                                label_pokin = `<ul style="margin: 0;">`;
                                 value.pokin_4.forEach(function(get_pokin_4) {
                                     label_pokin += `<li>${get_pokin_4.pokin_label}</li>`;
                                     id_pokin.push(+get_pokin_4.id_pokin);
@@ -2104,7 +2213,7 @@ foreach($get_pegawai as $pegawai){
                                 label_dasar_pelaksanaan = `<ul><li>${get_data_dasar_pelaksanaan.join('</li><li>')}</li></ul>`;
                             }
                             if (value.pokin_5 && value.pokin_5.length > 0) {
-                                label_pokin = `<ul>`;
+                                label_pokin = `<ul style="margin: 0;">`;
                                 value.pokin_5.forEach(function(get_pokin_5) {
                                     label_pokin += `<li>${get_pokin_5.pokin_label}</li>`;
                                 });
@@ -2136,6 +2245,7 @@ foreach($get_pegawai as $pegawai){
                                 `<thead>` +
                                 `<tr class="table-info">` +
                                 `<th class="text-center" style="width:20px">No</th>` +
+                                `<th class="text-center">Aspek</th>`+
                                 `<th class="text-center">Indikator</th>` +
                                 `<th class="text-center" style="width:120px;">Satuan</th>` +
                                 `<th class="text-center" style="width:50px;">Target Awal</th>` +
@@ -2155,13 +2265,28 @@ foreach($get_pegawai as $pegawai){
                                     html_akun = `<a href="javascript:void(0)" class="btn btn-sm btn-info" onclick="tambah_rincian_belanja_rencana_aksi(${b.id},${value.id},'${value.kode_sbl}')" title="Tambah Rincian Belanja"><i class="dashicons dashicons-plus"></i></a> `;
                                 }
 
+                                let aspek_rhk = ["Kuantitas", "Kualitas", "Waktu", "Biaya"];
+                                let text_aspek_rhk = '';
+                                if(b.aspek_rhk != null || b.aspek_rhk != undefined){
+                                    text_aspek_rhk = aspek_rhk[b.aspek_rhk-1];
+                                }
+                                let target_teks_awal = '';
+                                if(b.target_teks_awal != null || b.target_teks_awal != undefined){
+                                    target_teks_awal = `</br>(${b.target_teks_awal})`;
+                                }
+                                let target_teks_akhir = '';
+                                if(b.target_teks_akhir != null || b.target_teks_akhir != undefined){
+                                    target_teks_akhir = `</br>(${b.target_teks_akhir})`;
+                                }
+
                                 renaksi += '' +
                                     `<tr>` +
                                     `<td class="text-center">${index + 1}.${i + 1}</td>` +
+                                    `<td>${text_aspek_rhk}</td>` +
                                     `<td>${b.indikator}</td>` +
                                     `<td class="text-center">${b.satuan}</td>` +
-                                    `<td class="text-center">${b.target_awal}</td>` +
-                                    `<td class="text-center">${b.target_akhir}</td>` +
+                                    `<td class="text-center">${b.target_awal} ${target_teks_awal}</td>` +
+                                    `<td class="text-center">${b.target_akhir} ${target_teks_akhir}</td>` +
                                     `<td class="text-right">${b.rencana_pagu || 0}</td>` +
                                     `<td class="text-center">` +
                                     `<input type="checkbox" title="Lihat Rencana Hasil Kerja Per Bulan" class="lihat_bulanan" data-id="${b.id}" onclick="lihat_bulanan(this);" style="margin: 0 6px;">` +
@@ -2326,7 +2451,7 @@ foreach($get_pegawai as $pegawai){
                     var parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
                     var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
                     var level_pokin = 3;
-                    var title = 'Rencana Hasil Kerja';
+                    var title = 'Rencana Hasil Kerja | RHK Level 2';
                     var key = jenis + '-' + parent_cascading;
                     let data_cascading = data_program_cascading[key];
                     var key = jenis + '-' + parent_cascading;
@@ -2336,13 +2461,13 @@ foreach($get_pegawai as $pegawai){
 
                     if (tipe == 3) {
                         level_pokin = 4;
-                        title = 'Uraian Rencana Hasil Kerja';
+                        title = 'Uraian Rencana Hasil Kerja | RHK Level 3';
                         parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
                         parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
                         data_cascading = data_kegiatan_cascading[key];
                     } else if (tipe == 4) {
                         level_pokin = 5;
-                        title = 'Uraian Teknis Kegiatan';
+                        title = 'Uraian Teknis Kegiatan | RHK Level 4';
                         parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
                         parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
                         data_cascading = data_sub_kegiatan_cascading[key];
@@ -2437,7 +2562,7 @@ foreach($get_pegawai as $pegawai){
                                         <textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan ${title}..."></textarea>
                                     </div>
                                     <div class="form-group">
-                                        <label for="sasaran-cascading">Pilih ${jenis_cascading} Cascading</label>
+                                        <label for="cascading-renstra">Pilih ${jenis_cascading} Cascading</label>
                                         <select class="form-control" name="cascading-renstra" id="cascading-renstra"></select>
                                     </div>
                                     <div class="form-group"> 

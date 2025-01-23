@@ -402,7 +402,7 @@ class Esakip_Functions
 
         if ($err) {
             $msg = "cURL Error #:" . $err . " (" . $url . ")";
-            if ($options['debug'] == 1) {
+            if (!empty($options['debug']) && $options['debug'] == 1) {
                 die($msg);
             } else {
                 return $msg;
