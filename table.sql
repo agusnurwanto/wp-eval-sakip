@@ -1678,12 +1678,52 @@ CREATE TABLE `esakip_data_pokin_rhk_opd` (
   PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `esakip_finalisasi_dokumen_laporan_pk` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `nip` text NOT NULL,
-  `nama_dokumen` text NOT NULL,
+CREATE TABLE `esakip_finalisasi_tahap_laporan_pk` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `nip` VARCHAR(64) NOT NULL,
+  `id_skpd` INT(11) NOT NULL,
+  `alamat_kantor` VARCHAR(255) NOT NULL,
+  `nama_skpd` VARCHAR(128) NOT NULL,
+  `satuan_kerja` VARCHAR(256) NOT NULL,
+  `nama_tahapan` VARCHAR(48) NOT NULL,
+  `tanggal_dokumen` DATETIME NOT NULL,
+  `nama_pegawai` VARCHAR(256) NOT NULL,
+  `pangkat_pegawai` VARCHAR(128) DEFAULT NULL,
+  `jabatan_pegawai` VARCHAR(128) NOT NULL,
+  `nama_pegawai_atasan` VARCHAR(256) NOT NULL,
+  `nip_pegawai_atasan` VARCHAR(64) DEFAULT NULL,
+  `pangkat_pegawai_atasan` VARCHAR(128) DEFAULT NULL,
+  `jabatan_pegawai_atasan` VARCHAR(128) NOT NULL,
   `active` TINYINT(1) NOT NULL DEFAULT 1,
   `tahun_anggaran` year(4) NOT NULL,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `esakip_data_pokin_rhk_pemda` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_rhk_pemda` int(11) DEFAULT null,
+  `level_rhk_pemda` int(11) DEFAULT null COMMENT '1 = Kegiatan Utama, 2 = Rencana Hasil Kerja, 3 = Uraian Kegiatan, 4 = Uraian Teknis Kegiatan',
+  `id_pokin` int(11) DEFAULT null,
+  `level_pokin` int(11) DEFAULT null,
+  `tahun_anggaran` year(4) DEFAULT NULL,  
+  `id_tujuan` int(11) DEFAULT null,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+
+CREATE TABLE `esakip_finalisasi_rhk_laporan_pk` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `id_tahap_pk` INT(11) NOT NULL,
+  `tipe` INT(11) NOT NULL COMMENT '1 = Label Sasaran, 2 = Label Program, 3 = Label Kegiatan, 4 = Label Subkegiatan',
+  `kode` TEXT DEFAULT NULL,
+  `label` TEXT DEFAULT NULL,
+  `indikator` TEXT DEFAULT NULL,
+  `target` VARCHAR(64) DEFAULT NULL,
+  `anggaran` double(20, 0) DEFAULT NULL,
+  `keterangan` TEXT DEFAULT NULL,
+  `active` TINYINT(1) NOT NULL DEFAULT 1,
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)

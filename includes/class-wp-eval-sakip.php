@@ -610,6 +610,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_rencana_aksi_pemda', $plugin_public, 'get_rencana_aksi_pemda');
 		$this->loader->add_action('wp_ajax_get_indikator_rencana_aksi_pemda', $plugin_public, 'get_indikator_rencana_aksi_pemda');
 		$this->loader->add_action('wp_ajax_hapus_indikator_rencana_aksi_pemda', $plugin_public, 'hapus_indikator_rencana_aksi_pemda');
+		$this->loader->add_action('wp_ajax_help_rhk_pemda', $plugin_public, 'help_rhk_pemda');
 		$this->loader->add_action('wp_ajax_get_skpd_renaksi', $plugin_public, 'get_skpd_renaksi');
 		
 		$this->loader->add_action('wp_ajax_simpan_renaksi_pemda', $plugin_public, 'simpan_renaksi_pemda');
@@ -629,6 +630,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_pegawai_simpeg',  $plugin_public, 'get_pegawai_simpeg');
 		$this->loader->add_action('wp_ajax_mapping_unit_sipd_simpeg',  $plugin_public, 'mapping_unit_sipd_simpeg');
 
+		$this->loader->add_action('wp_ajax_simpan_finalisasi_laporan_pk', $plugin_public, 'simpan_finalisasi_laporan_pk');
 		$this->loader->add_action('wp_ajax_get_table_skpd_laporan_pk', $plugin_public, 'get_table_skpd_laporan_pk');
 		$this->loader->add_action('wp_ajax_get_table_skpd_laporan_pk_setting', $plugin_public, 'get_table_skpd_laporan_pk_setting');
 		$this->loader->add_action('wp_ajax_get_detail_setting_laporan_pk_by_id', $plugin_public, 'get_detail_setting_laporan_pk_by_id');
