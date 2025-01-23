@@ -1205,16 +1205,6 @@ CREATE TABLE `esakip_data_rencana_aksi_opd` (
   `label` varchar(255) NOT NULL,
   `id_skpd` int(11) DEFAULT NULL,
   `parent` int(11) DEFAULT 0,
-  `label_pokin_1` text DEFAULT null,
-  `id_pokin_1` int(11) DEFAULT null,
-  `label_pokin_2` text DEFAULT null,
-  `id_pokin_2` int(11) DEFAULT null,
-  `label_pokin_3` text DEFAULT null,
-  `id_pokin_3` int(11) DEFAULT null,
-  `label_pokin_4` text DEFAULT null,
-  `id_pokin_4` int(11) DEFAULT null,
-  `label_pokin_5` text DEFAULT null,
-  `id_pokin_5` int(11) DEFAULT null,
   `level` int(11) NOT null COMMENT '1 = kegiatan, 1 = rencana aksi, 2 = uraian kegiatan',
   `pagu` double(20, 0) DEFAULT NULL,
   `realisasi` double(20, 0) DEFAULT NULL,
@@ -1239,6 +1229,8 @@ CREATE TABLE `esakip_data_rencana_aksi_opd` (
   `id_jabatan` varchar(30) DEFAULT NULL,
   `nip` text DEFAULT NULL,
   `satker_id` VARCHAR(50) NOT NULL, 
+  `id_sub_skpd_cascading` int(11) DEFAULT NULL,
+  `pagu_cascading` double(20, 0) DEFAULT NULL,
   PRIMARY key (id)
 );
 

@@ -305,6 +305,26 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						        ", $indikator->id));
 							}
 						}
+
+						$data_renaksi[$key]['nama_sub_skpd'] = '';
+						if(!empty($val['id_sub_skpd_cascading'])){
+							$sub_skpd = $wpdb->get_row(
+								$wpdb->prepare("
+								SELECT 
+									kode_skpd,
+									nama_skpd
+								FROM esakip_data_unit
+								WHERE id_skpd=%d
+								AND tahun_anggaran=%d
+								AND active = 1
+							", $val['id_sub_skpd_cascading'], get_option(ESAKIP_TAHUN_ANGGARAN)
+							), ARRAY_A);
+
+							if(!empty($sub_skpd)){
+								$data_renaksi[$key]['nama_sub_skpd'] = $sub_skpd['nama_skpd'];
+								$data_renaksi[$key]['kode_sub_skpd'] = $sub_skpd['kode_skpd'];
+							}
+						}
 					}
 					switch ($_POST['level']) {
 						case '2':
@@ -499,6 +519,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				$id_skpd = isset($_POST['id_skpd']) ? intval($_POST['id_skpd']) : 0;
 				$id_label_renaksi_opd = isset($_POST['id_label_renaksi_opd']) ? $_POST['id_label_renaksi_opd'] : [];
 				$id_indikator = isset($_POST['id_indikator']) ? $_POST['id_indikator'] : [];
+				$id_sub_skpd_cascading = !empty($_POST['id_sub_skpd_cascading']) ? $_POST['id_sub_skpd_cascading'] : null;
+				$pagu_cascading = !empty($_POST['pagu_cascading']) ? $_POST['pagu_cascading'] : null;
 
 
 				$get_dasar_pelaksanaan = $_POST['get_dasar_pelaksanaan'];
@@ -543,7 +565,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'mandatori_pusat' => isset($get_dasar_pelaksanaan['mandatori_pusat']) ? $get_dasar_pelaksanaan['mandatori_pusat'] : 0,
 						'inisiatif_kd' => isset($get_dasar_pelaksanaan['inisiatif_kd']) ? $get_dasar_pelaksanaan['inisiatif_kd'] : 0,
 						'musrembang' => isset($get_dasar_pelaksanaan['musrembang']) ? $get_dasar_pelaksanaan['musrembang'] : 0,
-						'pokir' => isset($get_dasar_pelaksanaan['pokir']) ? $get_dasar_pelaksanaan['pokir'] : 0
+						'pokir' => isset($get_dasar_pelaksanaan['pokir']) ? $get_dasar_pelaksanaan['pokir'] : 0,
+						'id_sub_skpd_cascading' => $id_sub_skpd_cascading,
+						'pagu_cascading' => $pagu_cascading
 					);
 					if ($_POST['level'] == 1) {
 						$data['kode_cascading_sasaran'] = $kode_cascading_renstra;
@@ -581,13 +605,73 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								AND active=0
 								AND tahun_anggaran=%d
 								AND id_skpd=%d
-						", $_POST['kegiatan_utama'], $_POST['tahun_anggaran'], $_POST['id_skpd']));
+								AND level=%d
+								AND id_sub_skpd_cascading=%d
+						", $_POST['kegiatan_utama'], $_POST['tahun_anggaran'], $_POST['id_skpd'], $_POST['level'], $id_sub_skpd_cascading));
 					}
 					if (empty($cek_id)) {
 						$wpdb->insert('esakip_data_rencana_aksi_opd', $data);
 						$cek_id = $wpdb->insert_id;
 					} else {
-						$wpdb->update('esakip_data_rencana_aksi_opd', $data, array('id' => $cek_id));
+						$status_update = true;
+						if($_POST['level'] == 2 || $_POST['level'] == 3){
+							/** Untuk validasi agar cascading parent tetap sama dengan cascading child yang telah dipilih */
+							$status_update = false;
+							$level_child = $_POST['level']+1;
+							$nama_kolom = array(
+								'3' => 'kode_cascading_kegiatan',
+								'4' => 'kode_cascading_sub_kegiatan'
+							);
+							$nama_kolom = $nama_kolom[$level_child];
+
+							$cek_cascading_child = $wpdb->get_results(
+								$wpdb->prepare(
+									"SELECT
+										id,
+										id_sub_skpd_cascading,
+										$nama_kolom
+									FROM 
+										esakip_data_rencana_aksi_opd
+									WHERE 
+										parent=%d
+										AND tahun_anggaran=%d
+										AND id_skpd=%d
+										AND level=%d
+										AND active=1
+									GROUP BY $nama_kolom
+							", $_POST['id'], $_POST['tahun_anggaran'], $_POST['id_skpd'], $level_child)
+							,ARRAY_A);
+
+							if(!empty($cek_cascading_child)){
+								if(count($cek_cascading_child) == 1 && $cek_cascading_child[0][$nama_kolom] == NULL){
+									$status_update = true;
+								}else{
+									foreach ($cek_cascading_child as $cek_cas) {
+										if (strpos($cek_cas[$nama_kolom], $kode_cascading_renstra) === 0 && $cek_cas['id_sub_skpd_cascading'] === $id_sub_skpd_cascading) {
+											$status_update = true; // Jika ada yang cocok, set menjadi true
+											break;
+										}
+									}
+								}
+							}else{
+								$status_update = true;
+							}
+						}
+
+
+						if($status_update){
+							$wpdb->update('esakip_data_rencana_aksi_opd', $data, array('id' => $cek_id));
+						}else{
+							$nama_kolom = array(
+								'2' => 'Program',
+								'3' => 'Kegiatan'
+							);
+							$ret = array(
+								'status' => 'error',
+								'message'   => 'Data '.$nama_kolom[$_POST['level']].' Cascading Tidak Dapat Diubah! Harap Hapus Data Cascading Di RHK Level Bawahnya!.'
+							);
+							die(json_encode($ret));
+						}
 					}
 
 					$wpdb->update(
@@ -900,6 +984,23 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						    ", $ret['data']['id'], $ret['data']['level']),
 						    ARRAY_A
 						);
+						$data_skpd_cascading = $wpdb->get_row(
+							$wpdb->prepare(
+								"SELECT 
+									kode_skpd,
+									nama_skpd
+								FROM 
+									esakip_data_unit
+								WHERE 
+									id_skpd=%d
+									AND tahun_anggaran=%d
+									AND active = 1
+							", $ret['data']['id_sub_skpd_cascading'], get_option(ESAKIP_TAHUN_ANGGARAN)
+						), ARRAY_A);
+						$ret['data']['nama_skpd_cascading'] = '';
+						if(!empty($data_skpd_cascading)){
+							$ret['data']['nama_skpd_cascading'] = $data_skpd_cascading['nama_skpd']; 
+						}
 					} else {
 						$ret['data']['renaksi_pemda'] = array();
 						$ret['data']['jabatan'] = array();
