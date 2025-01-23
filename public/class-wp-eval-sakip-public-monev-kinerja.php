@@ -3719,6 +3719,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 						if (empty($cek_child)) {
 							$wpdb->update('esakip_data_rencana_aksi_pemda', array('active' => 0), array('id' => $_POST['id']));
+							$wpdb->update('esakip_data_pokin_rhk_pemda', array('active' => 0), array('id_rhk_pemda' => $_POST['id']));
 						} else {
 							$ret['status'] = 'error';
 							$ret['child'] = $cek_child;
