@@ -1712,12 +1712,11 @@ CREATE TABLE `esakip_finalisasi_tahap_laporan_pk` (
 CREATE TABLE `esakip_finalisasi_rhk_laporan_pk` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `id_tahap_pk` INT(11) NOT NULL,
-  `tipe` INT(11) NOT NULL COMMENT '1 = Label RHK, 2 = Label Program, 3 = Label Kegiatan, 4 = Label Subkegiatan',
+  `tipe` INT(11) NOT NULL COMMENT '1 = Label Sasaran, 2 = Label Program, 3 = Label Kegiatan, 4 = Label Subkegiatan',
   `kode` TEXT DEFAULT NULL,
   `label` TEXT DEFAULT NULL,
   `indikator` TEXT DEFAULT NULL,
   `target` VARCHAR(64) DEFAULT NULL,
-  `satuan` VARCHAR(64) DEFAULT NULL,
   `anggaran` double(20, 0) DEFAULT NULL,
   `keterangan` TEXT DEFAULT NULL,
   `active` TINYINT(1) NOT NULL DEFAULT 1,

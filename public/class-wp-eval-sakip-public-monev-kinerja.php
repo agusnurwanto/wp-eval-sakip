@@ -1134,7 +1134,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'aspek_rhk' => $_POST['aspek_rhk']
 					);
 
-					if($_POST['set_target_teks'] == 1){
+					if ($_POST['set_target_teks'] == 1) {
 						$data['set_target_teks'] = $_POST['set_target_teks'];
 						$data['target_teks_awal'] = $_POST['target_teks_awal'];
 						$data['target_teks_akhir'] = $_POST['target_teks_akhir'];
@@ -1142,7 +1142,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$data['target_teks_2'] = $_POST['target_teks_tw_2'];
 						$data['target_teks_3'] = $_POST['target_teks_tw_3'];
 						$data['target_teks_4'] = $_POST['target_teks_tw_4'];
-					}else{
+					} else {
 						$data['set_target_teks'] = 0;
 						$data['target_teks_awal'] = NULL;
 						$data['target_teks_akhir'] = NULL;
@@ -4883,7 +4883,115 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$ret['data'] = $_POST;
+				if (empty($_POST['data_pk']['nama_tahapan']) || empty($_POST['data_pk']['tanggal_dokumen'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Nama tahapan dan tanggal dokumen wajib diisi!';
+					die(json_encode($ret));
+				}
+				if (empty($_POST['id_skpd']) || empty($_POST['tahun_anggaran'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'SKPD / Tahun Anggaran kosong!';
+					die(json_encode($ret));
+				}
+
+				$data_pk = $_POST['data_pk'];
+				$data_pegawai = $_POST['data_pegawai'];
+				$sasaran = $_POST['sasaran'];
+				$program = $_POST['program'];
+				$kegiatan = $_POST['kegiatan'];
+				$subkegiatan = $_POST['subkegiatan'];
+
+				$insert_tahap = array(
+					'nip' 					 => $data_pegawai['nip'],
+					'pangkat_pegawai' 		 => $data_pegawai['pangkat'],
+					'id_skpd' 				 => $_POST['id_skpd'],
+					'alamat_kantor' 		 => $data_pegawai['alamat_kantor'],
+					'nama_skpd' 			 => $data_pegawai['nama_skpd'],
+					'satuan_kerja' 			 => $data_pegawai['satuan_kerja'],
+					'nama_tahapan' 			 => $data_pk['nama_tahapan'],
+					'tanggal_dokumen' 		 => $data_pk['tanggal_dokumen'],
+					'nama_pegawai' 			 => $data_pegawai['nama'],
+					'jabatan_pegawai' 		 => $data_pegawai['jabatan'],
+					'nama_pegawai_atasan' 	 => $data_pegawai['nama_atasan'],
+					'nip_pegawai_atasan' 	 => $data_pegawai['nip_atasan'],
+					'pangkat_pegawai_atasan' => $data_pegawai['pangkat_atasan'],
+					'tahun_anggaran' 		 => $_POST['tahun_anggaran']
+				);
+
+				$insert_result = $wpdb->insert('esakip_finalisasi_tahap_laporan_pk', $insert_tahap);
+				// if (!$insert_result) {
+				// 	$ret['status'] = 'error';
+				// 	$ret['message'] = 'Gagal menyimpan data tahap laporan PK!';
+				// 	$ret['sql'] = $wpdb->;
+				// 	die(json_encode($ret));
+				// }
+				$id_tahap_pk = $wpdb->insert_id;
+
+				if (!empty($sasaran)) {
+					foreach ($sasaran as $key => $s) {
+						foreach ($s['indikator'] as $indikator) {
+							$insert_sasaran = array(
+								'id_tahap_pk' 	=> $id_tahap_pk,
+								'tipe' 			=> 1, // Sasaran
+								'label' 		=> $s['sasaran'],
+								'indikator' 	=> $indikator['nama'],
+								'target' 		=> $indikator['target'],
+								'anggaran' 		=> 0,
+								'keterangan'	=> ''
+							);
+							$wpdb->insert('esakip_finalisasi_rhk_laporan_pk', $insert_sasaran);
+						}
+					}
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Sasaran RHK kosong!';
+					die(json_encode($ret));
+				}
+
+				// Program
+				if (!empty($program)) {
+					foreach ($program as $p) {
+						$insert_program = array(
+							'id_tahap_pk' 	=> $id_tahap_pk,
+							'tipe' 			=> 2, // Program
+							'kode' 			=> $p['kode'],
+							'label' 		=> $p['program'],
+							'anggaran' 		=> $p['anggaran'],
+							'keterangan' 	=> $p['keterangan']
+						);
+						$wpdb->insert('esakip_finalisasi_rhk_laporan_pk', $insert_program);
+					}
+				}
+
+				// Kegiatan
+				if (!empty($kegiatan)) {
+					foreach ($kegiatan as $k) {
+						$insert_kegiatan = array(
+							'id_tahap_pk' 	=> $id_tahap_pk,
+							'tipe' 			=> 3, // Kegiatan
+							'kode' 			=> $k['kode'],
+							'label' 		=> $k['kegiatan'],
+							'anggaran' 		=> $k['anggaran'],
+							'keterangan' 	=> $k['keterangan']
+						);
+						$wpdb->insert('esakip_finalisasi_rhk_laporan_pk', $insert_kegiatan);
+					}
+				}
+
+				// Subkegiatan
+				if (!empty($subkegiatan)) {
+					foreach ($subkegiatan as $sk) {
+						$insert_subkegiatan = array(
+							'id_tahap_pk' => $id_tahap_pk,
+							'tipe' 		  => 4, // Subkegiatan
+							'kode' 		  => $sk['kode'],
+							'label' 	  => $sk['subkegiatan'],
+							'anggaran' 	  => $sk['anggaran'],
+							'keterangan'  => $sk['keterangan']
+						);
+						$wpdb->insert('esakip_finalisasi_rhk_laporan_pk', $insert_subkegiatan);
+					}
+				}
 			} else {
 				$ret['status'] = 'error';
 				$ret['message'] = 'API key tidak ditemukan!';
