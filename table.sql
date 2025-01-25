@@ -1278,6 +1278,7 @@ CREATE TABLE `esakip_data_rencana_aksi_indikator_opd` (
   `realisasi_target_teks_2` VARCHAR(50) DEFAULT NULL,
   `realisasi_target_teks_3` VARCHAR(50) DEFAULT NULL,
   `realisasi_target_teks_4` VARCHAR(50) DEFAULT NULL,
+  `rumus_indikator` text DEFAULT NULL,
   PRIMARY key (id)
 );
 

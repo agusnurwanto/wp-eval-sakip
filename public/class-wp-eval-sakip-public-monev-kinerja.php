@@ -1232,7 +1232,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'active' => 1,
 						'tahun_anggaran' => $_POST['tahun_anggaran'],
 						'created_at' => current_time('mysql'),
-						'aspek_rhk' => $_POST['aspek_rhk']
+						'aspek_rhk' => $_POST['aspek_rhk'],
+						'rumus_indikator' => $_POST['rumus_indikator']
 					);
 
 					if ($_POST['set_target_teks'] == 1) {

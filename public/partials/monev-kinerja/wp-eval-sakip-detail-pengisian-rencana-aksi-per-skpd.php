@@ -640,6 +640,7 @@ foreach($get_pegawai as $pegawai){
         }else{
             set_target_teks = 0;
         }
+        var rumus_indikator = jQuery('#rumus-indikator').val();
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -669,7 +670,8 @@ foreach($get_pegawai as $pegawai){
                 "target_teks_tw_2" : target_teks_tw_2,
                 "target_teks_tw_3" : target_teks_tw_3,
                 "target_teks_tw_4" : target_teks_tw_4,
-                "set_target_teks" : set_target_teks
+                "set_target_teks" : set_target_teks,
+                "rumus_indikator": rumus_indikator
             },
             dataType: "json",
             success: function(res) {
@@ -1335,7 +1337,15 @@ foreach($get_pegawai as $pegawai){
                                     `</td>` +
                                     `</tr>`;
 
-
+                                    kegiatanUtama +=``+
+                                        `<tr style="display: none;" class="data_bulanan_${b.id}">` +
+                                            `<td colspan="8" style="padding: 10px;">` +
+                                                `<div style="display: none; max-width: 50%; margin: 1rem auto;" class="data_bulanan_${b.id}">`+
+                                                    `<h4 class="text-center" style="margin: 10px;">Rumus Indikator</h4>` +
+                                                    `<textarea class="form-control" id="show-rumus-indikator">${b.rumus_indikator}</textarea>` +
+                                                `</div>`+
+                                            `</td>`+
+                                        `</tr>`;
 
                                 const get_bulan = [
                                     "Januari", "Februari", "Maret", "April", "Mei", "Juni",
@@ -1664,6 +1674,14 @@ foreach($get_pegawai as $pegawai){
                 '</div>' +
             `</div>` +
             `<div class="form-group row">` +
+                `<div class="col-md-2">` +
+                    `<label for="rumus-indikator">Rumus Indikator</label>` +
+                `</div>` +
+                `<div class="col-md-10">` +
+                    `<textarea class="form-control" name="label" id="rumus-indikator" placeholder="Tuliskan Rumus Indikator..."></textarea>` +
+                `</div>` +
+            `</div>` +
+            `<div class="form-group row">` +
                 '<div class="col-md-2">' +
                     `<label for="satuan_indikator">Satuan</label>` +
                 '</div>' +
@@ -1840,6 +1858,7 @@ foreach($get_pegawai as $pegawai){
                     jQuery('#rencana_pagu').val(rencana_pagu);
                     jQuery('#total_rincian').val(persen.toFixed(0));
                     jQuery('#rencana_pagu_tk').val(total_pagu);
+                    jQuery('#rumus-indikator').val(response.data.rumus_indikator);
                     if(response.data.set_target_teks == 1){
                         jQuery('#cek-target-teks').prop('checked', true);
                         jQuery(".target-teks").show();
@@ -2311,6 +2330,16 @@ foreach($get_pegawai as $pegawai){
                                     `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-danger" onclick="hapus_indikator(${b.id}, ` + tipe + `);" title="Hapus"><i class="dashicons dashicons-trash"></i></a>` +
                                     `</td>` +
                                     `</tr>`;
+                                
+                                renaksi +=``+
+                                `<tr style="display: none;" class="data_bulanan_${b.id}">` +
+                                    `<td colspan="8" style="padding: 10px;">` +
+                                        `<div style="display: none; max-width: 50%; margin: 1rem auto;" class="data_bulanan_${b.id}">`+
+                                            `<h4 class="text-center" style="margin: 10px;">Rumus Indikator</h4>` +
+                                            `<textarea class="form-control" id="show-rumus-indikator">${b.rumus_indikator}</textarea>` +
+                                        `</div>`+
+                                    `</td>`+
+                                `</tr>`;
 
                                 const get_bulan = [
                                     "Januari", "Februari", "Maret", "April", "Mei", "Juni",
