@@ -1713,6 +1713,8 @@ CREATE TABLE `esakip_data_pokin_rhk_pemda` (
   `active` tinyint(4) NOT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `update_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+);
 
 CREATE TABLE `esakip_finalisasi_rhk_laporan_pk` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
