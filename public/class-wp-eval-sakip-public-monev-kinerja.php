@@ -4415,7 +4415,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$data_all['total']++;
 						$indikator = $wpdb->get_results($wpdb->prepare("
 							SELECT
-								*
+								*,
+								CASE 
+									WHEN aspek_rhk = 1 THEN 'Kuantitas'
+									WHEN aspek_rhk = 2 THEN 'Kualitas'
+									WHEN aspek_rhk = 3 THEN 'Waktu'
+									WHEN aspek_rhk = 4 THEN 'Biaya'
+										ELSE 'Kuntitas'
+									END AS aspek_rhk_teks
 							FROM esakip_data_rencana_aksi_indikator_opd
 							WHERE id_renaksi=%d
 								AND active=1

@@ -1678,7 +1678,7 @@ foreach($get_pegawai as $pegawai){
                     `<label for="rumus-indikator">Rumus Indikator</label>` +
                 `</div>` +
                 `<div class="col-md-10">` +
-                    `<textarea class="form-control" name="label" id="rumus-indikator" placeholder="Tuliskan Rumus Indikator..."></textarea>` +
+                    `<textarea class="form-control" name="label" id="rumus-indikator" placeholder="Tuliskan Rumus Indikator...">(Realisasi Indikator / Target Indikator) * 100 = Capaian </textarea>` +
                 `</div>` +
             `</div>` +
             `<div class="form-group row">` +
