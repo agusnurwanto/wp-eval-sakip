@@ -1231,7 +1231,10 @@ CREATE TABLE `esakip_data_rencana_aksi_opd` (
   `satker_id` VARCHAR(50) NOT NULL, 
   `id_sub_skpd_cascading` int(11) DEFAULT NULL,
   `pagu_cascading` double(20, 0) DEFAULT NULL,
-  PRIMARY key (id)
+  PRIMARY key (id),
+  KEY `tahun_anggaran` (`tahun_anggaran`),
+  KEY `active` (`active`),
+  KEY `id_skpd` (`id_skpd`)
 );
 
 CREATE TABLE `esakip_data_rencana_aksi_indikator_opd` (

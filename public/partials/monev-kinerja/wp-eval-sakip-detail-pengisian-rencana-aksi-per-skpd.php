@@ -1203,7 +1203,8 @@ foreach($get_pegawai as $pegawai){
                     "parent": 0,
                     "api_key": esakip.api_key,
                     "tipe_pokin": "opd",
-                    "id_skpd": <?php echo $id_skpd; ?>
+                    "id_skpd": <?php echo $id_skpd; ?>,
+                    "tahun_anggaran": '<?php echo $input['tahun'] ?>'
                 },
                 dataType: "json",
                 success: function(res) {
@@ -1340,7 +1341,7 @@ foreach($get_pegawai as $pegawai){
                                     kegiatanUtama +=``+
                                         `<tr style="display: none;" class="data_bulanan_${b.id}">` +
                                             `<td colspan="8" style="padding: 10px;">` +
-                                                `<div style="display: none; max-width: 50%; margin: 1rem auto;" class="data_bulanan_${b.id}">`+
+                                                `<div style="display: none; margin: 1rem auto;" class="data_bulanan_${b.id}">`+
                                                     `<h4 class="text-center" style="margin: 10px;">Rumus Indikator</h4>` +
                                                     `<textarea class="form-control" id="show-rumus-indikator">${b.rumus_indikator}</textarea>` +
                                                 `</div>`+
@@ -2040,7 +2041,8 @@ foreach($get_pegawai as $pegawai){
                     "parent": parent_renaksi,
                     "api_key": esakip.api_key,
                     "tipe_pokin": "opd",
-                    "id_skpd": <?php echo $id_skpd; ?>
+                    "id_skpd": <?php echo $id_skpd; ?>,
+                    "tahun_anggaran": '<?php echo $input['tahun'] ?>'
                 },
                 dataType: "json",
                 success: function(res) {
@@ -2334,7 +2336,7 @@ foreach($get_pegawai as $pegawai){
                                 renaksi +=``+
                                 `<tr style="display: none;" class="data_bulanan_${b.id}">` +
                                     `<td colspan="8" style="padding: 10px;">` +
-                                        `<div style="display: none; max-width: 50%; margin: 1rem auto;" class="data_bulanan_${b.id}">`+
+                                        `<div style="display: none; margin: 1rem auto;" class="data_bulanan_${b.id}">`+
                                             `<h4 class="text-center" style="margin: 10px;">Rumus Indikator</h4>` +
                                             `<textarea class="form-control" id="show-rumus-indikator">${b.rumus_indikator}</textarea>` +
                                         `</div>`+

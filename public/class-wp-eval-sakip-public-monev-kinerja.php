@@ -49,6 +49,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					if (!empty($_POST['tipe_pokin'])) {
 						if (!empty($_POST['id_skpd'])) {
 							$id_skpd = $_POST['id_skpd'];
+							$tahun_anggaran = $_POST['tahun_anggaran'];
 							$_prefix_opd = $_POST['tipe_pokin'] == "opd" ? "_opd" : "";
 							$_where_opd = $_POST['tipe_pokin'] == "opd" ? ' AND id_skpd=' . $id_skpd : '';
 						} else {
@@ -69,13 +70,15 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								a.level=%d AND 
 								a.active=%d AND 
 								a.id_skpd=%d AND
-								a.active=1
+								a.active=1 AND
+								a.tahun_anggaran=%d
 							ORDER BY a.id
 						",
 							$_POST['parent'],
 							$_POST['level'],
 							1,
-							$id_skpd
+							$id_skpd,
+							$tahun_anggaran
 						), ARRAY_A);
 					}
 
@@ -2191,6 +2194,220 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			]);
 			exit();
 		}
+	}
+
+	function copy_data_rencana_aksi()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil copy data rencana hasil kerja!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran_sumber_rhk'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran Sumber RHK Tidak Boleh Kosong!';
+				} else if ($ret['status'] != 'error' && empty($_POST['id_skpd'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Opd Tidak Boleh Kosong!';
+				} else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran_tujuan'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran Halaman Ini Tidak Boleh Kosong!';
+				}
+
+				if ($ret['status'] != 'error') {
+					$this_tahun_anggaran = $_POST['tahun_anggaran_tujuan'];
+					$id_skpd = $_POST['id_skpd'];
+					$tahun_anggaran_sumber_rhk = $_POST['tahun_anggaran_sumber_rhk'];
+
+					/** Kosongkan tabel data yang akan disii data baru hasil copy */
+					$wpdb->update(
+						'esakip_data_rencana_aksi_opd',
+						array(
+							'active' => 0
+						), 
+						array(
+							'tahun_anggaran' => $this_tahun_anggaran,
+							'id_skpd' => $id_skpd
+					));
+
+					$wpdb->update(
+						'esakip_data_rencana_aksi_indikator_opd',
+						array(
+							'active' => 0
+						), 
+						array(
+							'tahun_anggaran' => $this_tahun_anggaran,
+							'id_skpd' => $id_skpd
+					));
+
+					$wpdb->update(
+						'esakip_data_pokin_rhk_opd',
+						array(
+							'active' => 0
+						), 
+						array(
+							'tahun_anggaran' => $this_tahun_anggaran,
+							'id_skpd' => $id_skpd
+					));
+
+					$data_rhk_sumber = $wpdb->get_results(
+						$wpdb->prepare(
+							'SELECT
+								*
+							FROM
+								esakip_data_rencana_aksi_opd
+							WHERE
+								id_skpd=%d
+								AND tahun_anggaran=%d
+								AND active=%d
+							', $id_skpd, $tahun_anggaran_sumber_rhk, 1
+						), ARRAY_A);
+
+					// copy data rhk
+					$tampungan_parent = array();
+					if(!empty($data_rhk_sumber)){
+						foreach ($data_rhk_sumber as $ks => $valsum) {
+							$parent = $valsum['parent'];
+							if($valsum['level'] > 1 && $valsum['parent'] > 0){
+								$parent = $tampungan_parent[$valsum['parent']];
+							}
+							$data_param_rhk = array(
+								'label' => $valsum['label'],
+								'id_skpd' => $valsum['id_skpd'],
+								'id_jadwal' => $valsum['id_jadwal'],
+								'level' => $valsum['level'],
+								'nip' => $valsum['nip'],
+								'parent' => $parent,
+								'satker_id' => $valsum['satker_id'],
+								'mandatori_pusat' => $valsum['mandatori_pusat'],
+								'inisiatif_kd' => $valsum['inisiatif_kd'],
+								'musrembang' => $valsum['musrembang'],
+								'pokir' => $valsum['pokir'],
+								'id_sub_skpd_cascading' => $valsum['id_sub_skpd_cascading'],
+								'pagu_cascading' => $valsum['pagu_cascading'],
+								'kode_cascading_sasaran' => $valsum['kode_cascading_sasaran'],
+								'label_cascading_sasaran' => $valsum['label_cascading_sasaran'],
+								'kode_cascading_program' => $valsum['kode_cascading_program'],
+								'label_cascading_program' => $valsum['label_cascading_program'],
+								'kode_cascading_kegiatan' => $valsum['kode_cascading_kegiatan'],
+								'label_cascading_kegiatan' => $valsum['label_cascading_kegiatan'],
+								'kode_cascading_sub_kegiatan' => $valsum['kode_cascading_sub_kegiatan'],
+								'label_cascading_sub_kegiatan' => $valsum['label_cascading_sub_kegiatan'],
+								'kode_sbl' => $valsum['kode_sbl'],
+								'active' => 1,
+								'tahun_anggaran' => $this_tahun_anggaran,
+								'created_at' => current_time('mysql'),
+								'update_at' => current_time('mysql')
+							);
+
+							$wpdb->insert(
+								'esakip_data_rencana_aksi_opd',
+								$data_param_rhk);
+
+							$id_rhk_baru = $wpdb->insert_id;
+							$tampungan_parent[$valsum['id']] = $id_rhk_baru;
+
+							// copy pokin rhk
+							$data_pokin_rhk_sumber = $wpdb->get_results(
+								$wpdb->prepare(
+									"SELECT 
+										* 
+									FROM 
+										esakip_data_pokin_rhk_opd 
+									WHERE 
+										id_rhk_opd=%d
+										AND tahun_anggaran=%d 
+										AND id_skpd=%d 
+										AND active=%d
+								", $valsum['id'], $tahun_anggaran_sumber_rhk, $id_skpd, 1
+							), ARRAY_A);
+
+							if(!empty($data_pokin_rhk_sumber)){
+								foreach ($data_pokin_rhk_sumber as $kp => $valpok) {
+									$data_param_pokin = array(
+										'id_rhk_opd' => $id_rhk_baru,
+										'id_pokin' => $valpok['id_pokin'],
+										'level_pokin' => $valpok['level_pokin'],
+										'level_rhk_opd' => $valpok['level_rhk_opd'],
+										'tahun_anggaran' => $this_tahun_anggaran,
+										'id_skpd' => $valpok['id_skpd'],
+										'active' => 1,
+										'update_at' => current_time('mysql'),
+										'created_at' => current_time('mysql')
+									);
+
+									$wpdb->insert('esakip_data_pokin_rhk_opd', $data_param_pokin);
+								}
+							}
+
+							// copy indikator rhk
+							$data_indikator_rhk_sumber = $wpdb->get_results(
+								$wpdb->prepare(
+									"SELECT
+										*
+									FROM
+										esakip_data_rencana_aksi_indikator_opd
+									WHERE
+										id_renaksi=%d
+										AND tahun_anggaran=%d
+										AND id_skpd=%d
+										AND active=%d
+									", $valsum['id'], $tahun_anggaran_sumber_rhk, $id_skpd, 1
+								), ARRAY_A);
+
+							if(!empty($data_indikator_rhk_sumber)){
+								foreach ($data_indikator_rhk_sumber as $ki => $valin) {
+									$data_param_indikator = array(
+										'id_renaksi' => $id_rhk_baru,
+										'indikator' => $valin['indikator'],
+										'satuan' => $valin['satuan'],
+										'rencana_pagu' => $valin['rencana_pagu'],
+										'realisasi_pagu' => $valin['realisasi_pagu'],
+										'target_awal' => $valin['target_awal'],
+										'target_akhir' => $valin['target_akhir'],
+										'target_1' => $valin['target_1'],
+										'target_2' => $valin['target_2'],
+										'target_3' => $valin['target_3'],
+										'target_4' => $valin['target_4'],
+										'aspek_rhk' => $valin['aspek_rhk'],
+										'rumus_indikator' => $valin['rumus_indikator'],
+										'set_target_teks' => $valin['set_target_teks'],
+										'target_teks_awal' => $valin['target_teks_awal'],
+										'target_teks_akhir' => $valin['target_teks_akhir'],
+										'target_teks_1' => $valin['target_teks_1'],
+										'target_teks_2' => $valin['target_teks_2'],
+										'target_teks_3' => $valin['target_teks_3'],
+										'target_teks_4' => $valin['target_teks_4'],
+										'id_skpd' => $valin['id_skpd'],
+										'active' => 1,
+										'tahun_anggaran' => $this_tahun_anggaran,
+										'created_at' => current_time('mysql'),
+										'update_at' => current_time('mysql')
+									);
+
+									$wpdb->insert('esakip_data_rencana_aksi_indikator_opd', $data_param_indikator);
+								}
+							}
+						}
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
 	}
 
 	function get_table_input_iku()

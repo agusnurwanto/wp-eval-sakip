@@ -17,14 +17,17 @@ $idtahun = $wpdb->get_results(
 		ORDER BY tahun_anggaran DESC",
 	ARRAY_A
 );
-$tahun = "<option value='-1'>Pilih Tahun</option>";
+$tahun = '<option value="0">Pilih Tahun</option>';
 
 foreach ($idtahun as $val) {
+	if($val['tahun_anggaran'] == $input['tahun']){
+		continue;
+	}
 	$selected = '';
-	if (!empty($input['tahun_anggaran']) && $val['tahun_anggaran'] == $input['tahun_anggaran']) {
+	if($val['tahun_anggaran'] == $input['tahun']-1){
 		$selected = 'selected';
 	}
-	$tahun .= "<option value='$val[tahun_anggaran]' $selected>$val[tahun_anggaran]</option>";
+	$tahun .= '<option value="'. $val['tahun_anggaran']. '" '. $selected .'>'. $val['tahun_anggaran'] .'</option>';
 }
 ?>
 <style type="text/css">
@@ -97,11 +100,159 @@ foreach ($idtahun as $val) {
 	</div>
 </div>
 
+<div class="modal fade" id="modal" data-backdrop="static"  role="dialog" aria-labelledby="modal-label" aria-hidden="true">
+  	<div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    	<div class="modal-content">
+      		<div class="modal-header">
+		        <h5 class="modal-title">Modal title</h5>
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		          	<span aria-hidden="true">&times;</span>
+		        </button>
+	      	</div>
+	      	<div class="modal-body">
+	      	</div>
+	      	<div class="modal-footer"></div>
+    	</div>
+  	</div>
+</div>
+
 <script>
 	jQuery(document).ready(function() {
+		let listSkpd;
     	run_download_excel_sakip();
+		jQuery('#action-sakip').prepend('<button style="margin-right: 10px;" class="btn btn-danger" onclick="copyRhk();"><i class="dashicons dashicons-admin-page"></i> Copy Data RHK</button>');
 		getTableSkpd();
 	});
+
+	function copyRhk(){
+			let tbody = '';
+			let tahun = '<?php echo $tahun; ?>';
+		    listSkpd.forEach(function(value, index){
+		        tbody += ''
+			        +'<tr>'
+			        	+'<td class="text-center"><input type="checkbox" value="'+value.id_skpd+'"></td>'
+			        	+'<td>'+value.nama_skpd+'</td>'
+			        +'</tr>';
+		    })
+		jQuery("#modal").find('.modal-title').html('Copy Data Rencana Hasil Kerja');
+		jQuery("#modal").find('.modal-body').html(`
+			<div class="form-group row">
+				<label for="staticEmail" class="col-sm-3 col-form-label">Tahun Anggaran Sumber RHK</label>
+				<div class="col-sm-9 d-flex align-items-center justify-content-center">
+					<select id="tahunAnggaranCopy" class="form-control">
+						${tahun}
+					</select>
+				</div>
+			</div>
+			<table class="table table-bordered table-sticky table-modal-rhk">
+				<thead>
+					<tr>
+						<th class="text-center"><input type="checkbox" class="check_all" onclick="check_all(this);"></th>
+						<th class="text-center">Nama OPD</th>
+					</tr>
+				</thead>
+				<tbody>
+					${tbody}
+				</tbody>
+			</table>
+		`);
+		jQuery("#modal").find('.modal-footer').html(`
+			<button type="button" class="btn btn-warning" data-dismiss="modal">
+				Tutup
+			</button>
+			<button type="button" class="btn btn-danger" onclick="submitCopyRhk()">
+				Copy Data
+			</button>`);
+		jQuery("#modal").find('.modal-dialog').css('maxWidth','700');
+		jQuery("#modal").modal('show');
+	}
+
+	function check_all(that){
+		if(jQuery(that).is(':checked')){
+			jQuery(that).closest('table').find('tbody input[type="checkbox"]').prop('checked', true);
+		}else{
+			jQuery(that).closest('table').find('tbody input[type="checkbox"]').prop('checked', false);
+		}
+	}
+	
+	function submitCopyRhk(){
+		if (!confirm('Apakah anda yakin akan copy data RENCANA HASIL KERJA? \nData yang sudah ada akan ditimpa oleh data baru hasil copy data RENCANA HASIL KERJA!')) {
+            return;
+        }
+		var tahun_anggaran = jQuery("#tahunAnggaranCopy").val();
+		var value = '';
+
+		value = [];
+		jQuery('.table-modal-rhk tbody input[type="checkbox"]').map(function(i, b){
+			if(jQuery(b).is(":checked")){
+				value.push(jQuery(b).val());
+			}
+		});
+		if(value.length == 0){
+			return alert('OPD belum dipilih!');
+		}
+
+		jQuery('#wrap-loading').show();
+		var last = value.length-1;
+        value.reduce(function(sequence, nextData){
+            return sequence.then(function(current_data){
+                return new Promise(function(resolve_reduce, reject_reduce){
+                	var nama_opd = jQuery('.table-modal-rhk tbody input[type="checkbox"][value="'+current_data+'"]').closest('tr').find('td').eq(1).text();
+                	pesan_loading('Copy Data RHK OPD '+nama_opd);
+					ajax_copy_rhk({
+						tahun_anggaran: tahun_anggaran,
+						id_skpd: current_data
+					})
+					.then(function(){
+						return resolve_reduce(nextData);
+					});
+                })
+                .catch(function(e){
+                    console.log(e);
+                    return Promise.resolve(nextData);
+                });
+            })
+            .catch(function(e){
+                console.log(e);
+                return Promise.resolve(nextData);
+            });
+        }, Promise.resolve(value[last]))
+        .then(function(data_last){
+            alert('Berhasil Copy Data Rencana Hasil Kerja.');
+            jQuery('#wrap-loading').hide();
+			jQuery('#pesan-loading').html('');
+        })
+        .catch(function(err){
+            console.log('err', err);
+            alert('Ada kesalahan sistem!');
+            jQuery('#wrap-loading').hide();
+			jQuery('#pesan-loading').html('');
+        });
+	}
+
+	function ajax_copy_rhk(options){
+		return new Promise(function(resolve, reject){
+		    jQuery.ajax({
+		        url: esakip.url,
+		        type: 'POST',
+		        data: {
+		            action: 'copy_data_rencana_aksi',
+		            api_key: esakip.api_key,
+		            tahun_anggaran_sumber_rhk: options.tahun_anggaran,
+		            id_skpd: options.id_skpd,
+					tahun_anggaran_tujuan: <?php echo $input['tahun']; ?>
+		        },
+		        dataType: 'json',
+		        success: function(response) {
+		            resolve();
+		        },
+		        error: function(xhr, status, error) {
+		    	    console.log('error', error);
+		            resolve();
+		        }
+		    });
+		});
+	}
 
 	function getTableSkpd() {
 		jQuery('#wrap-loading').show();
@@ -131,6 +282,7 @@ foreach ($idtahun as $val) {
 					    ],
 					    iDisplayLength: -1
 					});
+					listSkpd = response.list_skpd;
 				} else {
 					alert(response.message);
 				}

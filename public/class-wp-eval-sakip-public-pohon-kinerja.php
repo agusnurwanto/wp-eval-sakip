@@ -4519,7 +4519,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		$ret = array(
 			'status' => 'success',
 			'message' => 'Berhasil get data!',
-			'data' => array()
+			'data' => array(),
+			'list_skpd' => array()
 		);
 
 		if (!empty($_POST)) {
@@ -4555,8 +4556,14 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					$total_level_2 = 0;
 					$total_level_3 = 0;
 					$total_level_4 = 0;
+					$total_pagu = 0;
+					$list_skpd = array();
 
 					foreach ($unit as $kk => $vv) {
+						$list_skpd[$kk] = array(
+							'id_skpd' => $vv['id_skpd'],
+							'nama_skpd' => $vv['nama_skpd']);
+
 						$detail_pengisian_rencana_aksi = $this->functions->generatePage(array(
 							'nama_page' => 'Halaman Detail Pengisian Rencana Aksi ' . $tahun_anggaran,
 							'content' => '[detail_pengisian_rencana_aksi tahun=' . $tahun_anggaran . ']',
@@ -4648,6 +4655,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					$ret['total_level_3'] = $total_level_3;
 					$ret['total_level_4'] = $total_level_4;
 					$ret['total_pagu'] = number_format((float)$total_pagu, 0, ",", ".");
+					$ret['list_skpd'] = $list_skpd;
 				} else {
 					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
