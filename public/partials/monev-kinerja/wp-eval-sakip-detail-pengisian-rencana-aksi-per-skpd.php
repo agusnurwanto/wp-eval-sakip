@@ -585,6 +585,7 @@ foreach ($get_pegawai as $pegawai) {
 
     function simpan_indikator_renaksi(tipe) {
         var id = jQuery('#id_label_indikator').val();
+        var rencana_pagu = jQuery('#rencana_pagu').val();
         var id_label = jQuery('#id_label').val();
         var indikator = jQuery('#indikator').val();
         if (indikator == '') {
@@ -656,6 +657,7 @@ foreach ($get_pegawai as $pegawai) {
             data: {
                 "action": 'create_indikator_renaksi',
                 "api_key": esakip.api_key,
+                "tipe": tipe,
                 "tipe_pokin": "opd",
                 "id_label_indikator": id,
                 "id_label": id_label,
@@ -667,6 +669,7 @@ foreach ($get_pegawai as $pegawai) {
                 "target_tw_2": target_tw_2,
                 "target_tw_3": target_tw_3,
                 "target_tw_4": target_tw_4,
+                "rencana_pagu": rencana_pagu,
                 "rencana_pagu_tk": rencana_pagu_tk,
                 "tahun_anggaran": <?php echo $input['tahun']; ?>,
                 "id_skpd": <?php echo $id_skpd; ?>,

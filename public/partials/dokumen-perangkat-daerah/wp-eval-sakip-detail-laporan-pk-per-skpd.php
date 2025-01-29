@@ -398,11 +398,13 @@ if (!empty($nip)) {
                     }
                 }
             }
+
         }
     } else {
         echo "Data Pegawai Tidak Ditemukan!";
         die();
     }
+    // die(print_r($data_anggaran));
 
     $path = 'api/pegawai/' . $nip . '/jabatan';
     $option = array(
@@ -902,7 +904,7 @@ if (empty($logo_pemda)) {
                 <table class="table_data_anggaran">
                     <thead>
                         <tr>
-                            <th class="esakip-text_tengah" style="width: 50px;">No</th>
+                            <th class="esakip-text_tengah" style="width: 45px;">No</th>
                             <th class="esakip-text_tengah" style="width: 450px;">Sasaran</th>
                             <th class="esakip-text_tengah" style="width: 150px;">Indikator</th>
                             <th class="esakip-text_tengah">Target</th>
@@ -1065,7 +1067,7 @@ if (empty($logo_pemda)) {
                                     <td class="text-left">
                                         <strong>:</strong>
                                     </td>
-                                    <td class="text-left" id="pangkat_pegawai"><?php echo $data_detail['nama_golruang']; ?>
+                                    <td class="text-left" id="pangkat_pegawai"><?php echo $data_detail['nama_golruang'] ?: '-'; ?>
                                     </td>
                                 </tr>
                                 <tr>
@@ -1111,9 +1113,9 @@ if (empty($logo_pemda)) {
                     <div class="card-body">
                         <?php if ($html_sasaran != '') : ?>
                             <table class="table_data_anggaran" id="table_sasaran">
-                                <thead>
+                                <thead class="bg-dark text-light">
                                     <tr>
-                                        <th class="esakip-text_tengah" style="width: 50px;">No</th>
+                                        <th class="esakip-text_tengah" style="width: 45px;">No</th>
                                         <th class="esakip-text_tengah" style="width: 450px;">Sasaran</th>
                                         <th class="esakip-text_tengah" style="width: 150px;">Indikator</th>
                                         <th class="esakip-text_tengah">Target</th>
@@ -1127,9 +1129,9 @@ if (empty($logo_pemda)) {
 
                         <?php if (!empty($html_program)) : ?>
                             <table class="table_data_anggaran" id="table_program">
-                                <thead>
+                                <thead class="bg-dark text-light">
                                     <tr>
-                                        <th class="esakip-text_tengah" style="width: 50px;">No</th>
+                                        <th class="esakip-text_tengah" style="width: 66px;">No</th>
                                         <th class="esakip-text_tengah" style="width: 150px;">Kode</th>
                                         <th class="esakip-text_tengah" style="width: 450px;">Program</th>
                                         <th class="esakip-text_tengah">Anggaran</th>
@@ -1144,9 +1146,9 @@ if (empty($logo_pemda)) {
 
                         <?php if (!empty($html_kegiatan)) : ?>
                             <table class="table_data_anggaran" id="table_kegiatan">
-                                <thead>
+                                <thead class="bg-dark text-light">
                                     <tr>
-                                        <th class="esakip-text_tengah" style="width: 50px;">No</th>
+                                        <th class="esakip-text_tengah" style="width: 66px;">No</th>
                                         <th class="esakip-text_tengah" style="width: 150px;">Kode</th>
                                         <th class="esakip-text_tengah" style="width: 450px;">Kegiatan</th>
                                         <th class="esakip-text_tengah">Anggaran</th>
@@ -1161,9 +1163,9 @@ if (empty($logo_pemda)) {
 
                         <?php if (!empty($html_sub_kegiatan)) : ?>
                             <table class="table_data_anggaran" id="table_subkegiatan">
-                                <thead>
+                                <thead class="bg-dark text-light">
                                     <tr>
-                                        <th class="esakip-text_tengah" style="width: 50px;">No</th>
+                                        <th class="esakip-text_tengah" style="width: 66px;">No</th>
                                         <th class="esakip-text_tengah" style="width: 150px;">Kode</th>
                                         <th class="esakip-text_tengah" style="width: 450px;">Sub Kegiatan</th>
                                         <th class="esakip-text_tengah">Anggaran</th>
@@ -1256,7 +1258,6 @@ if (empty($logo_pemda)) {
             scrollLeft: currentScroll + direction * scrollAmount
         }, 500);
     }
-
 
     function viewReport(idTahap) {
         jQuery('#wrap-loading').show()

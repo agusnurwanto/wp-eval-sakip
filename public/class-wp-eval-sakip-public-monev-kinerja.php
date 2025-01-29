@@ -1251,6 +1251,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'id_renaksi' => $_POST['id_label'],
 						'indikator' => $_POST['indikator'],
 						'satuan' => $_POST['satuan'],
+						'rencana_pagu' => $_POST['rencana_pagu'],
 						'realisasi_pagu' => $_POST['realisasi_pagu'],
 						'target_awal' => $_POST['target_awal'],
 						'target_akhir' => $_POST['target_akhir'],
@@ -1332,30 +1333,32 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$wpdb->insert('esakip_data_rencana_aksi_indikator_opd', $data);
 							$id_indikator_baru = $wpdb->insert_id;
 
-							// Input sumber dana dan rencana pagu
-							if (isset($_POST['sumber_danas'])) {
-								foreach ($_POST['sumber_danas'] as $v) {
-									$nama_dana = $v['nama_dana'];
-									$parts = explode(' ', $nama_dana, 2);
-									$kode = $parts[0];
-									$nama = isset($parts[1]) ? $parts[1] : '';
-
-									$data_sumber_dana = [
-										'id_indikator'   => $id_indikator_baru,
-										'id_sumber_dana' => $v['id_dana'],
-										'kode_dana'      => $kode,
-										'nama_dana'      => $nama,
-										'rencana_pagu'   => $v['pagu'],
-										'tahun_anggaran' => $_POST['tahun_anggaran']
-									];
-									$total_rencana_pagu += $v['pagu'];
-									$wpdb->insert('esakip_sumber_dana_indikator', $data_sumber_dana);
+							// Input sumber dana dan rencana pagu (jika subkeg)
+							if ($_POST['tipe'] == 4) {
+								if (isset($_POST['sumber_danas'])) {
+									foreach ($_POST['sumber_danas'] as $v) {
+										$nama_dana = $v['nama_dana'];
+										$parts = explode(' ', $nama_dana, 2);
+										$kode = $parts[0];
+										$nama = isset($parts[1]) ? $parts[1] : '';
+	
+										$data_sumber_dana = [
+											'id_indikator'   => $id_indikator_baru,
+											'id_sumber_dana' => $v['id_dana'],
+											'kode_dana'      => $kode,
+											'nama_dana'      => $nama,
+											'rencana_pagu'   => $v['pagu'],
+											'tahun_anggaran' => $_POST['tahun_anggaran']
+										];
+										$total_rencana_pagu += $v['pagu'];
+										$wpdb->insert('esakip_sumber_dana_indikator', $data_sumber_dana);
+									}
+									$wpdb->update(
+										'esakip_data_rencana_aksi_indikator_opd',
+										['rencana_pagu' => $total_rencana_pagu],
+										['id' => $id_indikator_baru]
+									);
 								}
-								$wpdb->update(
-									'esakip_data_rencana_aksi_indikator_opd',
-									['rencana_pagu' => $total_rencana_pagu],
-									['id' => $id_indikator_baru]
-								);
 							}
 						} else {
 							$wpdb->update(
@@ -1364,37 +1367,39 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								['id' => $cek_id]
 							);
 
-							$wpdb->update(
-								'esakip_sumber_dana_indikator',
-								['active' => 0],
-								['id_indikator' => $cek_id]
-							);
-
-							// Input sumber dana dan rencana pagu yang baru
-							if (!empty($_POST['sumber_danas'])) {
-								foreach ($_POST['sumber_danas'] as $v) {
-									$nama_dana = $v['nama_dana'];
-									$parts = explode(' ', $nama_dana, 2);
-									$kode = $parts[0];
-									$nama = isset($parts[1]) ? $parts[1] : '';
-
-									$data_sumber_dana = [
-										'id_indikator'   => $cek_id,
-										'id_sumber_dana' => $v['id_dana'],
-										'kode_dana'      => $kode,
-										'nama_dana'      => $nama,
-										'rencana_pagu'   => $v['pagu'],
-										'tahun_anggaran' => $_POST['tahun_anggaran']
-									];
-									$total_rencana_pagu += $v['pagu'];
-
-									$wpdb->insert('esakip_sumber_dana_indikator', $data_sumber_dana);
-								}
+							if ($_POST['tipe'] == 4) {
 								$wpdb->update(
-									'esakip_data_rencana_aksi_indikator_opd',
-									['rencana_pagu' => $total_rencana_pagu],
-									['id' => $cek_id]
+									'esakip_sumber_dana_indikator',
+									['active' => 0],
+									['id_indikator' => $cek_id]
 								);
+
+								// Input sumber dana dan rencana pagu yang baru
+								if (!empty($_POST['sumber_danas'])) {
+									foreach ($_POST['sumber_danas'] as $v) {
+										$nama_dana = $v['nama_dana'];
+										$parts = explode(' ', $nama_dana, 2);
+										$kode = $parts[0];
+										$nama = isset($parts[1]) ? $parts[1] : '';
+
+										$data_sumber_dana = [
+											'id_indikator'   => $cek_id,
+											'id_sumber_dana' => $v['id_dana'],
+											'kode_dana'      => $kode,
+											'nama_dana'      => $nama,
+											'rencana_pagu'   => $v['pagu'],
+											'tahun_anggaran' => $_POST['tahun_anggaran']
+										];
+										$total_rencana_pagu += $v['pagu'];
+
+										$wpdb->insert('esakip_sumber_dana_indikator', $data_sumber_dana);
+									}
+									$wpdb->update(
+										'esakip_data_rencana_aksi_indikator_opd',
+										['rencana_pagu' => $total_rencana_pagu],
+										['id' => $cek_id]
+									);
+								}
 							}
 						}
 					}
