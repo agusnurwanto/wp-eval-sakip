@@ -2089,3 +2089,20 @@ CREATE TABLE `esakip_finalisasi_rhk_laporan_pk` (
   KEY `tahun_anggaran` (`tahun_anggaran`),
   KEY `active` (`active`)
 );
+
+CREATE TABLE `esakip_sumber_dana_indikator` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `id_indikator` INT(11) NOT NULL,
+  `id_sumber_dana` VARCHAR(128) NOT NULL,
+  `kode_dana` VARCHAR(128) NOT NULL,
+  `nama_dana` TEXT NOT NULL,
+  `rencana_pagu` double(20, 0) DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
+  `active` TINYINT(1) NOT NULL DEFAULT 1,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `id_indikator` (`id_indikator`),
+  KEY `tahun_anggaran` (`tahun_anggaran`),
+  KEY `active` (`active`)
+);

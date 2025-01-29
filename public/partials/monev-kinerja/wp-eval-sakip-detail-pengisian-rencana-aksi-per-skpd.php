@@ -145,7 +145,7 @@ $get_mapping = $wpdb->get_var($wpdb->prepare('
         AND u.id_skpd = %d
         AND u.active = 1
 ', $tahun_anggaran_sakip, $id_skpd));
-if(empty($get_mapping)){
+if (empty($get_mapping)) {
     $ret['message'] = 'ID Satker SIMPEG belum dimapping dengan ID SKPD!';
 }
 
@@ -159,10 +159,10 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
     WHERE s.satker_id like %s
         AND s.tahun_anggaran = %d
     ORDER BY satker_id ASC
-', $get_mapping.'%', $tahun_anggaran_sakip), ARRAY_A);
+', $get_mapping . '%', $tahun_anggaran_sakip), ARRAY_A);
 $select_satker = '<option value="">Pilih Satuan Kerja</option>';
-foreach($get_satker as $satker){
-    $select_satker .= '<option value="'.$satker['satker_id'].'">'.$satker['satker_id'].' | '.$satker['nama'].'</option>';
+foreach ($get_satker as $satker) {
+    $select_satker .= '<option value="' . $satker['satker_id'] . '">' . $satker['satker_id'] . ' | ' . $satker['nama'] . '</option>';
 }
 $get_pegawai = $wpdb->get_results($wpdb->prepare('
     SELECT 
@@ -170,10 +170,10 @@ $get_pegawai = $wpdb->get_results($wpdb->prepare('
     FROM esakip_data_pegawai_simpeg AS p
     WHERE p.satker_id like %s
     ORDER BY satker_id ASC, tipe_pegawai_id ASC, nama_pegawai ASC
-', $get_mapping.'%'), ARRAY_A);
+', $get_mapping . '%'), ARRAY_A);
 $select_pegawai = '<option value="">Pilih Pegawai Pelaksana</option>';
-foreach($get_pegawai as $pegawai){
-    $select_pegawai .= '<option value="'.$pegawai['nip_baru'].'">'.$pegawai['nip_baru'].' | '.$pegawai['nama_pegawai'].'</option>';
+foreach ($get_pegawai as $pegawai) {
+    $select_pegawai .= '<option value="' . $pegawai['nip_baru'] . '">' . $pegawai['nip_baru'] . ' | ' . $pegawai['nama_pegawai'] . '</option>';
 }
 ?>
 <style type="text/css">
@@ -475,7 +475,7 @@ foreach($get_pegawai as $pegawai){
         if (id_jadwal == 0) {
             alert("Jadwal RPJMD/RPD untuk data Pokin belum disetting.\nSetting di admin dashboard di menu E-SAKIP Options -> Laporan Monitor Upload Dokumen Tahun <?php echo $input['tahun']; ?>")
         }
-        if(id_jadwal_wpsipd == 0){
+        if (id_jadwal_wpsipd == 0) {
             alert("Jadwal RENSTRA untuk data Cascading di WP-SIPD belum disetting.\nSetting di admin dashboard di menu Monev Rencana Hasil Kerja -> Monev Rencana Hasil Kerja Setting")
         }
 
@@ -576,9 +576,9 @@ foreach($get_pegawai as $pegawai){
     });
 
     jQuery(document).on('change', '#cek-target-teks', function() {
-        if (jQuery(this).is(":checked")){
+        if (jQuery(this).is(":checked")) {
             jQuery(".target-teks").show();
-        }else{
+        } else {
             jQuery(".target-teks").hide();
         }
     });
@@ -594,14 +594,6 @@ foreach($get_pegawai as $pegawai){
         if (satuan == '') {
             return alert('Satuan tidak boleh kosong!')
         }
-        var rencana_pagu = jQuery('#rencana_pagu').val();
-        if (rencana_pagu == '') {
-            rencana_pagu = 0;
-        }
-        // var realisasi_pagu = jQuery('#realisasi_pagu').val();
-        // if(realisasi_pagu == ''){
-        //     realisasi_pagu = 0;
-        // }
         var target_awal = jQuery('#target_awal').val();
         if (target_awal == '') {
             return alert('Target awal tidak boleh kosong!')
@@ -635,12 +627,28 @@ foreach($get_pegawai as $pegawai){
         var target_teks_tw_3 = jQuery("#target_teks_tw_3").val();
         var target_teks_tw_4 = jQuery("#target_teks_tw_4").val();
         var set_target_teks = 0;
-        if (jQuery("#cek-target-teks").is(":checked")){
+        if (jQuery("#cek-target-teks").is(":checked")) {
             set_target_teks = 1;
-        }else{
+        } else {
             set_target_teks = 0;
         }
         var rumus_indikator = jQuery('#rumus-indikator').val();
+
+        let sumberDanas = [];
+        jQuery('#sumber_dana tbody tr').each(function() {
+            let sumberDana = jQuery(this).find('select.sumber_dana').val();
+            let namaDana = jQuery(this).find('select.sumber_dana option:selected').text();
+            let pagu = jQuery(this).find('input').val();
+
+            if (sumberDana) {
+                sumberDanas.push({
+                    nama_dana: namaDana,
+                    id_dana: sumberDana,
+                    pagu: pagu
+                });
+            }
+        });
+
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -653,7 +661,6 @@ foreach($get_pegawai as $pegawai){
                 "id_label": id_label,
                 "indikator": indikator,
                 "satuan": satuan,
-                "rencana_pagu": rencana_pagu,
                 "target_awal": target_awal,
                 "target_akhir": target_akhir,
                 "target_tw_1": target_tw_1,
@@ -663,15 +670,16 @@ foreach($get_pegawai as $pegawai){
                 "rencana_pagu_tk": rencana_pagu_tk,
                 "tahun_anggaran": <?php echo $input['tahun']; ?>,
                 "id_skpd": <?php echo $id_skpd; ?>,
-                "aspek_rhk" : aspek_rhk,
-                "target_teks_awal" : target_teks_awal,
-                "target_teks_akhir" : target_teks_akhir,
-                "target_teks_tw_1" : target_teks_tw_1,
-                "target_teks_tw_2" : target_teks_tw_2,
-                "target_teks_tw_3" : target_teks_tw_3,
-                "target_teks_tw_4" : target_teks_tw_4,
-                "set_target_teks" : set_target_teks,
-                "rumus_indikator": rumus_indikator
+                "aspek_rhk": aspek_rhk,
+                "target_teks_awal": target_teks_awal,
+                "target_teks_akhir": target_teks_akhir,
+                "target_teks_tw_1": target_teks_tw_1,
+                "target_teks_tw_2": target_teks_tw_2,
+                "target_teks_tw_3": target_teks_tw_3,
+                "target_teks_tw_4": target_teks_tw_4,
+                "set_target_teks": set_target_teks,
+                "rumus_indikator": rumus_indikator,
+                "sumber_danas": sumberDanas
             },
             dataType: "json",
             success: function(res) {
@@ -752,12 +760,12 @@ foreach($get_pegawai as $pegawai){
                                 `</select>` +
                                 `</div>` +
                                 `<div class="form-group">` +
-                                    `<label for="satker_id">Pilih Satuan Kerja</label>` +
-                                    `<select class="form-control select2" id="satker_id" name="satker_id"><?php echo $select_satker; ?></select>` +
+                                `<label for="satker_id">Pilih Satuan Kerja</label>` +
+                                `<select class="form-control select2" id="satker_id" name="satker_id"><?php echo $select_satker; ?></select>` +
                                 `</div>` +
                                 `<div class="form-group">` +
-                                    `<label for="pegawai">Pilih Pegawai Pelaksana</label>` +
-                                    `<select class="form-control select2" id="pegawai" name="pegawai">${get_pegawai}</select>` +
+                                `<label for="pegawai">Pilih Pegawai Pelaksana</label>` +
+                                `<select class="form-control select2" id="pegawai" name="pegawai">${get_pegawai}</select>` +
                                 `</div>` +
                                 `</form>`);
                             jQuery("#modal-crud").find('.modal-footer').html('' +
@@ -823,7 +831,7 @@ foreach($get_pegawai as $pegawai){
             var key = jenis + '-' + parent_cascading;
             let id_skpd = <?php echo $id_skpd; ?>;
             /** Dibedakan karena ada kode yang sama tapi sub skpdnya berbeda */
-            if(id_sub_skpd_cascading != 0){
+            if (id_sub_skpd_cascading != 0) {
                 key = jenis + '-' + parent_cascading + '-' + id_sub_skpd_cascading;
                 id_skpd = id_sub_skpd_cascading;
             }
@@ -1018,7 +1026,7 @@ foreach($get_pegawai as $pegawai){
                             if (tipe == 2) {
                                 jQuery("#modal-crud").find('.modal-title').html('Edit Rencana Hasil Kerja');
                                 let kode_cascading_renstra = `${response.data.kode_cascading_program}_${response.data.id_skpd}`;
-                                if(response.data.id_sub_skpd_cascading){
+                                if (response.data.id_sub_skpd_cascading) {
                                     kode_cascading_renstra = `${response.data.kode_cascading_program}_${response.data.id_sub_skpd_cascading}`;
                                 }
                                 jQuery('#cascading-renstra').val(kode_cascading_renstra).trigger('change');
@@ -1147,8 +1155,8 @@ foreach($get_pegawai as $pegawai){
         }
     }
 
-    function get_data_pokin_2(parent, level, tag, getParentManual=false) {
-        if(getParentManual){
+    function get_data_pokin_2(parent, level, tag, getParentManual = false) {
+        if (getParentManual) {
             parent = jQuery("#pokin-level-1").val();
         }
         jQuery('#wrap-loading').show();
@@ -1273,7 +1281,7 @@ foreach($get_pegawai as $pegawai){
                             });
                             label_pokin += `</ul>`;
                         }
-                        
+
                         kegiatanUtama += `` +
                             `<tr id="kegiatan_utama_${value.id}">` +
                             `<td class="text-center">${index+1}</td>` +
@@ -1311,15 +1319,15 @@ foreach($get_pegawai as $pegawai){
                             indikator.map(function(b, i) {
                                 let aspek_rhk = ["Kuantitas", "Kualitas", "Waktu", "Biaya"];
                                 let text_aspek_rhk = '';
-                                if(b.aspek_rhk != null || b.aspek_rhk != undefined){
-                                    text_aspek_rhk = aspek_rhk[b.aspek_rhk-1];
+                                if (b.aspek_rhk != null || b.aspek_rhk != undefined) {
+                                    text_aspek_rhk = aspek_rhk[b.aspek_rhk - 1];
                                 }
                                 let target_teks_awal = '';
-                                if(b.target_teks_awal != null || b.target_teks_awal != undefined){
+                                if (b.target_teks_awal != null || b.target_teks_awal != undefined) {
                                     target_teks_awal = `</br>(${b.target_teks_awal})`;
                                 }
                                 let target_teks_akhir = '';
-                                if(b.target_teks_akhir != null || b.target_teks_akhir != undefined){
+                                if (b.target_teks_akhir != null || b.target_teks_akhir != undefined) {
                                     target_teks_akhir = `</br>(${b.target_teks_akhir})`;
                                 }
                                 kegiatanUtama += `` +
@@ -1338,15 +1346,15 @@ foreach($get_pegawai as $pegawai){
                                     `</td>` +
                                     `</tr>`;
 
-                                    kegiatanUtama +=``+
-                                        `<tr style="display: none;" class="data_bulanan_${b.id}">` +
-                                            `<td colspan="8" style="padding: 10px;">` +
-                                                `<div style="display: none; margin: 1rem auto;" class="data_bulanan_${b.id}">`+
-                                                    `<h4 class="text-center" style="margin: 10px;">Rumus Indikator</h4>` +
-                                                    `<textarea class="form-control" id="show-rumus-indikator">${b.rumus_indikator}</textarea>` +
-                                                `</div>`+
-                                            `</td>`+
-                                        `</tr>`;
+                                kegiatanUtama += `` +
+                                    `<tr style="display: none;" class="data_bulanan_${b.id}">` +
+                                    `<td colspan="8" style="padding: 10px;">` +
+                                    `<div style="display: none; margin: 1rem auto;" class="data_bulanan_${b.id}">` +
+                                    `<h4 class="text-center" style="margin: 10px;">Rumus Indikator</h4>` +
+                                    `<textarea class="form-control" id="show-rumus-indikator">${b.rumus_indikator}</textarea>` +
+                                    `</div>` +
+                                    `</td>` +
+                                    `</tr>`;
 
                                 const get_bulan = [
                                     "Januari", "Februari", "Maret", "April", "Mei", "Juni",
@@ -1525,109 +1533,172 @@ foreach($get_pegawai as $pegawai){
         });
     }
 
+    function get_sub_keg_rka_wpsipd(kode_sbl) {
+        return new Promise(function(resolve, reject) {
+            jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                url: esakip.url,
+                type: "post",
+                data: {
+                    "action": 'get_sub_keg_rka_wpsipd',
+                    "api_key": esakip.api_key,
+                    "tahun_anggaran": <?php echo $input['tahun']; ?>,
+                    "kode_sbl": kode_sbl,
+                    "sumber_dana": true
+                },
+                dataType: "json",
+                success: function(response) {
+                    jQuery('#wrap-loading').hide();
+                    if (response.status == 'success') {
+                        response.data.forEach(item => {
+                            jQuery(".sumber_dana").append(
+                                `<option value="${item.id_sumber_dana}">${item.kode_dana} ${item.nama_dana}</option>`
+                            );
+                            jQuery(".sumber_dana").select2({
+                                width: '100%'
+                            });
+                        });
+                    } else {
+                        alert("Error get data sumber dana, " + response.message);
+                    }
+                    resolve();
+                },
+                error: function(xhr, status, error) {
+                    jQuery('#wrap-loading').hide();
+                    console.error(xhr.responseText);
+                    alert('Terjadi kesalahan saat memuat data sumber dana!');
+                    resolve();
+                }
+            });
+        });
+    }
 
-
-    function tambah_indikator_rencana_aksi(id, tipe, total_pagu) {
+    function tambah_indikator_rencana_aksi(id, tipe, total_pagu, kode_sbl = false) {
         var title = '';
         let input_pagu = '';
+        let input_sumber_dana = '';
         if (tipe == 1) {
             title = 'Indikator Kegiatan Utama | RHK Level 1';
             input_pagu = '' +
                 `<div class="form-group row">` +
-                    '<div class="col-md-2">' +
-                        `<label for="rencana_pagu">Total RHK Level 4</label>` +
-                    '</div>' +
-                    '<div class="col-md-10">' +
-                        `<div class="input-group">` +
-                            `<input type="number" disabled class="form-control text-right" id="rencana_pagu_tk" value="` + total_pagu + `"/>` +
-                        `</div>` +
-                    '</div>' +
+                '<div class="col-md-2">' +
+                `<label for="rencana_pagu">Total RHK Level 4</label>` +
+                '</div>' +
+                '<div class="col-md-10">' +
+                `<div class="input-group">` +
+                `<input type="number" disabled class="form-control text-right" id="rencana_pagu_tk" value="` + total_pagu + `"/>` +
+                `</div>` +
+                '</div>' +
                 '</div>' +
                 `<div class="form-group row">` +
-                    '<div class="col-md-2">' +
-                        `<label for="total_rincian">Rencana Pagu</label>` +
-                    '</div>' +
-                    '<div class="col-md-5">' +
-                        `<div class="input-group">` +
-                            `<input type="number" class="form-control" id="total_rincian" max="100" value="100"/>` +
-                                `<span class="input-group-text">%</span>` +
-                        `</div>` +
-                    '</div>' +
-                    '<div class="col-md-5">' +
-                        `<div class="input-group">` +
-                        `<input type="number" disabled class="form-control text-right" id="rencana_pagu" value="` + total_pagu + `" />` +
-                        `</div>` +
-                    '</div>' +
+                '<div class="col-md-2">' +
+                `<label for="total_rincian">Rencana Pagu</label>` +
+                '</div>' +
+                '<div class="col-md-5">' +
+                `<div class="input-group">` +
+                `<input type="number" class="form-control" id="total_rincian" max="100" value="100"/>` +
+                `<span class="input-group-text">%</span>` +
+                `</div>` +
+                '</div>' +
+                '<div class="col-md-5">' +
+                `<div class="input-group">` +
+                `<input type="number" disabled class="form-control text-right" id="rencana_pagu" value="` + total_pagu + `" />` +
+                `</div>` +
+                '</div>' +
                 '</div>'
         } else if (tipe == 2) {
             title = 'Indikator Rencana Hasil Kerja | RHK Level 2';
             input_pagu = '' +
                 `<div class="form-group row">` +
-                    '<div class="col-md-2">' +
-                        `<label for="rencana_pagu">Total RHK Level 4</label>` +
-                    '</div>' +
-                    '<div class="col-md-10">' +
-                        `<div class="input-group">` +
-                            `<input type="number" disabled class="form-control text-right" id="rencana_pagu_tk" value="` + total_pagu + `"/>` +
-                        `</div>` +
-                    '</div>' +
+                '<div class="col-md-2">' +
+                `<label for="rencana_pagu">Total RHK Level 4</label>` +
+                '</div>' +
+                '<div class="col-md-10">' +
+                `<div class="input-group">` +
+                `<input type="number" disabled class="form-control text-right" id="rencana_pagu_tk" value="` + total_pagu + `"/>` +
+                `</div>` +
+                '</div>' +
                 '</div>' +
                 `<div class="form-group row">` +
-                    '<div class="col-md-2">' +
-                        `<label for="total_rincian">Rencana Pagu</label>` +
-                    '</div>' +
-                    '<div class="col-md-5">' +
-                        `<div class="input-group">` +
-                            `<input type="number" class="form-control" id="total_rincian" max="100" value="100"/>` +
-                            `<span class="input-group-text">%</span>` +
-                        `</div>` +
-                    '</div>' +
-                    '<div class="col-md-5">' +
-                        `<div class="input-group">` +
-                            `<input type="number" disabled class="form-control text-right" id="rencana_pagu" value="` + total_pagu + `" />` +
-                        `</div>` +
-                    '</div>' +
+                '<div class="col-md-2">' +
+                `<label for="total_rincian">Rencana Pagu</label>` +
+                '</div>' +
+                '<div class="col-md-5">' +
+                `<div class="input-group">` +
+                `<input type="number" class="form-control" id="total_rincian" max="100" value="100"/>` +
+                `<span class="input-group-text">%</span>` +
+                `</div>` +
+                '</div>' +
+                '<div class="col-md-5">' +
+                `<div class="input-group">` +
+                `<input type="number" disabled class="form-control text-right" id="rencana_pagu" value="` + total_pagu + `" />` +
+                `</div>` +
+                '</div>' +
                 '</div>'
         } else if (tipe == 3) {
             title = 'Indikator Uraian Kegiatan Rencana Hasil Kerja | RHK Level 3';
             input_pagu = '' +
                 `<div class="form-group row">` +
-                    '<div class="col-md-2">' +
-                        `<label for="rencana_pagu">Total RHK Level 4</label>` +
-                    '</div>' +
-                    '<div class="col-md-10">' +
-                        `<div class="input-group">` +
-                            `<input type="number" disabled class="form-control text-right" id="rencana_pagu_tk" value="` + total_pagu + `"/>` +
-                        `</div>` +
-                    '</div>' +
+                '<div class="col-md-2">' +
+                `<label for="rencana_pagu">Total RHK Level 4</label>` +
+                '</div>' +
+                '<div class="col-md-10">' +
+                `<div class="input-group">` +
+                `<input type="number" disabled class="form-control text-right" id="rencana_pagu_tk" value="` + total_pagu + `"/>` +
+                `</div>` +
+                '</div>' +
                 '</div>' +
                 `<div class="form-group row">` +
-                    '<div class="col-md-2">' +
-                        `<label for="total_rincian">Rencana Pagu</label>` +
-                    '</div>' +
-                    '<div class="col-md-5">' +
-                        `<div class="input-group">` +
-                            `<input type="number" class="form-control" id="total_rincian" max="100" value="100"/>` +
-                            `<span class="input-group-text">%</span>` +
-                        `</div>` +
-                    '</div>' +
-                    '<div class="col-md-5">' +
-                        `<div class="input-group">` +
-                            `<input type="number" disabled class="form-control text-right" id="rencana_pagu" value="` + total_pagu + `" />` +
-                        `</div>` +
-                    '</div>' +
+                '<div class="col-md-2">' +
+                `<label for="total_rincian">Rencana Pagu</label>` +
+                '</div>' +
+                '<div class="col-md-5">' +
+                `<div class="input-group">` +
+                `<input type="number" class="form-control" id="total_rincian" max="100" value="100"/>` +
+                `<span class="input-group-text">%</span>` +
+                `</div>` +
+                '</div>' +
+                '<div class="col-md-5">' +
+                `<div class="input-group">` +
+                `<input type="number" disabled class="form-control text-right" id="rencana_pagu" value="` + total_pagu + `" />` +
+                `</div>` +
+                '</div>' +
                 '</div>'
         } else if (tipe == 4) {
             title = 'Indikator Uraian Teknis Kegiatan | RHK Level 4';
             input_pagu = '' +
                 `<div class="form-group row">` +
-                    '<div class="col-md-2">' +
-                        `<label for="satuan_indikator">Rencana Pagu</label>` +
-                    '</div>' +
-                    '<div class="col-md-10">' +
-                        `<input type="number" class="form-control" id="rencana_pagu"/>` +
-                    '</div>' +
+                '<div class="col-md-2">' +
+                `<label for="rencana_pagu">Rencana Pagu</label>` +
+                '</div>' +
+                '<div class="col-md-10">' +
+                `<input type="number" class="form-control format-rupiah" id="rencana_pagu" disabled>` +
+                '</div>' +
                 `</div>`;
+
+            input_sumber_dana = '' +
+                `<div class="form-group">` +
+                `<label for="sumber_dana">Sumber Dana</label>` +
+                `<table id="sumber_dana" class="input_sumber_dana" style="margin: 0;">` +
+                `<tr data-id="1">` +
+                `<td style="width: 60%; max-width:100px;">` +
+                `<select class="form-control input_select_2 sumber_dana" id="sumber_dana_1" name="input_sumber_dana[1]">` +
+                `<option value="">Pilih Sumber Dana</option>` +
+                `</select>` +
+                `</td>` +
+                `<td>` +
+                `<input class="form-control input_number text-left" min="0" id="pagu_sumber_dana_1" type="number" name="input_pagu_sumber_dana[1]" onkeyup="set_anggaran(this);" onblur="set_anggaran(this);" onclick="set_anggaran(this);"/>` +
+                `</td>` +
+                `<td style="width: 70px" class="text-center detail_tambah">` +
+                `<button class="btn btn-warning btn-sm" onclick="tambahSumberDana(); return false;"><i class="dashicons dashicons-plus"></i></button>` +
+                `</td>` +
+                `</tr>` +
+                `</table>` +
+                `</div>`;
+
+            if (kode_sbl) {
+                get_sub_keg_rka_wpsipd(kode_sbl)
+            }
         }
         var tr = jQuery('#kegiatan_utama_' + id);
         var label_pokin = tr.find('.label_pokin').text();
@@ -1638,162 +1709,163 @@ foreach($get_pegawai as $pegawai){
             '<input type="hidden" value="" id="id_label_indikator">' +
             '<input type="hidden" value="' + id + '" id="id_label">' +
             `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                    `<label for="label_pokin_indikator">Label Pokin</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                    '<input class="form-control" type="text" disabled id="label_pokin_indikator" value="' + label_pokin + '"/>' +
-                '</div>' +
+            '<div class="col-md-2">' +
+            `<label for="label_pokin_indikator">Label Pokin</label>` +
+            '</div>' +
+            '<div class="col-md-10">' +
+            '<input class="form-control" type="text" disabled id="label_pokin_indikator" value="' + label_pokin + '"/>' +
+            '</div>' +
             `</div>` +
             `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                    `<label for="kegiatan_utama_indikator">Aspek</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                    '<select class="form-control" id="aspek_rhk">'+
-                        '<option value="1">Kuantitas (Jumlah yang bisa dihitung. Pcs, Dokumen, %, Kegiatan, Dst.)</option>'+
-                        '<option value="2">Kualitas (Nilai mutu produk atau layanan. %, Dst.)</option>'+
-                        '<option value="3">Waktu (Hari, Bulan, Tahun, Dst.)</option>'+
-                        '<option value="4">Biaya (Rp.)</option>'+
-                    '</select>'+
-                '</div>' +
+            '<div class="col-md-2">' +
+            `<label for="kegiatan_utama_indikator">Aspek</label>` +
+            '</div>' +
+            '<div class="col-md-10">' +
+            '<select class="form-control" id="aspek_rhk">' +
+            '<option value="1">Kuantitas (Jumlah yang bisa dihitung. Pcs, Dokumen, %, Kegiatan, Dst.)</option>' +
+            '<option value="2">Kualitas (Nilai mutu produk atau layanan. %, Dst.)</option>' +
+            '<option value="3">Waktu (Hari, Bulan, Tahun, Dst.)</option>' +
+            '<option value="4">Biaya (Rp.)</option>' +
+            '</select>' +
+            '</div>' +
             `</div>` +
             `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                    `<label for="kegiatan_utama_indikator">`+title.replace("Indikator", "")+`</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                    '<input type="text" disabled class="form-control" id="kegiatan_utama_indikator" value="' + label_renaksi + '"/>' +
-                '</div>' +
+            '<div class="col-md-2">' +
+            `<label for="kegiatan_utama_indikator">` + title.replace("Indikator", "") + `</label>` +
+            '</div>' +
+            '<div class="col-md-10">' +
+            '<input type="text" disabled class="form-control" id="kegiatan_utama_indikator" value="' + label_renaksi + '"/>' +
+            '</div>' +
             `</div>` +
             `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                    '<label for="indikator">Indikator</label>' +
-                '</div>' +
-                '<div class="col-md-10">' +
-                    `<textarea class="form-control" name="label" id="indikator" placeholder="Tuliskan Indikator..."></textarea>` +
-                '</div>' +
+            '<div class="col-md-2">' +
+            '<label for="indikator">Indikator</label>' +
+            '</div>' +
+            '<div class="col-md-10">' +
+            `<textarea class="form-control" name="label" id="indikator" placeholder="Tuliskan Indikator..."></textarea>` +
+            '</div>' +
             `</div>` +
             `<div class="form-group row">` +
-                `<div class="col-md-2">` +
-                    `<label for="rumus-indikator">Rumus Indikator</label>` +
-                `</div>` +
-                `<div class="col-md-10">` +
-                    `<textarea class="form-control" name="label" id="rumus-indikator" placeholder="Tuliskan Rumus Indikator...">(Realisasi Indikator / Target Indikator) * 100 = Capaian </textarea>` +
-                `</div>` +
+            `<div class="col-md-2">` +
+            `<label for="rumus-indikator">Rumus Indikator</label>` +
+            `</div>` +
+            `<div class="col-md-10">` +
+            `<textarea class="form-control" name="label" id="rumus-indikator" placeholder="Tuliskan Rumus Indikator...">(Realisasi Indikator / Target Indikator) * 100 = Capaian </textarea>` +
+            `</div>` +
             `</div>` +
             `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                    `<label for="satuan_indikator">Satuan</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                    `<input type="text" class="form-control" id="satuan_indikator"/>` +
-                '</div>' +
+            '<div class="col-md-2">' +
+            `<label for="satuan_indikator">Satuan</label>` +
+            '</div>' +
+            '<div class="col-md-10">' +
+            `<input type="text" class="form-control" id="satuan_indikator"/>` +
+            '</div>' +
             `</div>` +
+            `${input_sumber_dana}` +
             `${input_pagu}` +
             `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                   `<label for="target_awal">Target Teks</label>` +
-                '</div>' +
-                '<div class="col-md-10">' +
-                    `<div class="form-check" style="margin-top: 5px;">`+
-                        `<input class="form-check-input" type="checkbox" id="cek-target-teks">`+
-                        `<label class="form-check-label" for="cek-target-teks">Target Teks</label>`+
-                    `</div>`+
-                    `<small id="passwordHelpBlock" class="form-text text-muted">Untuk menampung target yang berupa teks!</small>`+
-                '</div>' +
+            '<div class="col-md-2">' +
+            `<label for="target_awal">Target Teks</label>` +
+            '</div>' +
+            '<div class="col-md-10">' +
+            `<div class="form-check" style="margin-top: 5px;">` +
+            `<input class="form-check-input" type="checkbox" id="cek-target-teks">` +
+            `<label class="form-check-label" for="cek-target-teks">Target Teks</label>` +
+            `</div>` +
+            `<small id="passwordHelpBlock" class="form-text text-muted">Untuk menampung target yang berupa teks!</small>` +
+            '</div>' +
             `</div>` +
             `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                   `<label for="target_awal">Target Awal</label>` +
-                '</div>' +
-                '<div class="col-md-4">' +
-                    `<input type="number" class="form-control" id="target_awal"/>` +
-                '</div>' +
-                '<div class="col-md-2">' +
-                    `<label for="target_akhir">Target Akhir</label>` +
-                '</div>' +
-                '<div class="col-md-4">' +
-                    `<input type="number" class="form-control" id="target_akhir"/>` +
-                '</div>' +
+            '<div class="col-md-2">' +
+            `<label for="target_awal">Target Awal</label>` +
+            '</div>' +
+            '<div class="col-md-4">' +
+            `<input type="number" class="form-control" id="target_awal"/>` +
+            '</div>' +
+            '<div class="col-md-2">' +
+            `<label for="target_akhir">Target Akhir</label>` +
+            '</div>' +
+            '<div class="col-md-4">' +
+            `<input type="number" class="form-control" id="target_akhir"/>` +
+            '</div>' +
             `</div>` +
             `<div class="form-group row target-teks" style="display: none; margin-bottom: 2rem;">` +
-                '<div class="col-md-2">' +
-                   `<label for="target_awal">Target Awal Teks</label>` +
-                '</div>' +
-                '<div class="col-md-4">' +
-                    `<input type="text" class="form-control" id="target_teks_awal"/>` +
-                '</div>' +
-                '<div class="col-md-2">' +
-                    `<label for="target_akhir">Target Akhir Teks</label>` +
-                '</div>' +
-                '<div class="col-md-4">' +
-                    `<input type="text" class="form-control" id="target_teks_akhir"/>` +
-                '</div>' +
+            '<div class="col-md-2">' +
+            `<label for="target_awal">Target Awal Teks</label>` +
+            '</div>' +
+            '<div class="col-md-4">' +
+            `<input type="text" class="form-control" id="target_teks_awal"/>` +
+            '</div>' +
+            '<div class="col-md-2">' +
+            `<label for="target_akhir">Target Akhir Teks</label>` +
+            '</div>' +
+            '<div class="col-md-4">' +
+            `<input type="text" class="form-control" id="target_teks_akhir"/>` +
+            '</div>' +
             `</div>` +
             `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                    `<label for="target_tw_1">TW 1</label>` +
-                '</div>' +
-                '<div class="col-md-4">' +
-                    `<input type="number" class="form-control" id="target_tw_1"/>` +
-                '</div>' +
-                '<div class="col-md-2">' +
-                    `<label for="target_tw_2">TW 2</label>` +
-                '</div>' +
-                '<div class="col-md-4">' +
-                    `<input type="number" class="form-control" id="target_tw_2"/>` +
-                '</div>' +
+            '<div class="col-md-2">' +
+            `<label for="target_tw_1">TW 1</label>` +
+            '</div>' +
+            '<div class="col-md-4">' +
+            `<input type="number" class="form-control" id="target_tw_1"/>` +
+            '</div>' +
+            '<div class="col-md-2">' +
+            `<label for="target_tw_2">TW 2</label>` +
+            '</div>' +
+            '<div class="col-md-4">' +
+            `<input type="number" class="form-control" id="target_tw_2"/>` +
+            '</div>' +
             `</div>` +
             `<div class="form-group row target-teks" style="display:none; margin-bottom: 2rem;">` +
-                '<div class="col-md-2">' +
-                    `<label for="target_tw_1">Target Teks TW 1</label>` +
-                '</div>' +
-                '<div class="col-md-4">' +
-                    `<input type="text" class="form-control" id="target_teks_tw_1"/>` +
-                '</div>' +
-                '<div class="col-md-2">' +
-                    `<label for="target_tw_2">Target Teks TW 2</label>` +
-                '</div>' +
-                '<div class="col-md-4">' +
-                    `<input type="text" class="form-control" id="target_teks_tw_2"/>` +
-                '</div>' +
+            '<div class="col-md-2">' +
+            `<label for="target_tw_1">Target Teks TW 1</label>` +
+            '</div>' +
+            '<div class="col-md-4">' +
+            `<input type="text" class="form-control" id="target_teks_tw_1"/>` +
+            '</div>' +
+            '<div class="col-md-2">' +
+            `<label for="target_tw_2">Target Teks TW 2</label>` +
+            '</div>' +
+            '<div class="col-md-4">' +
+            `<input type="text" class="form-control" id="target_teks_tw_2"/>` +
+            '</div>' +
             `</div>` +
             `<div class="form-group row">` +
-                '<div class="col-md-2">' +
-                    `<label for="target_tw_3">TW 3</label>` +
-                '</div>' +
-                '<div class="col-md-4">' +
-                    `<input type="text" class="form-control" id="target_tw_3"/>` +
-                '</div>' +
-                '<div class="col-md-2">' +
-                    `<label for="target_tw_4">TW 4</label>` +
-                '</div>' +
-                '<div class="col-md-4">' +
-                    `<input type="text" class="form-control" id="target_tw_4"/>` +
-                '</div>' +
+            '<div class="col-md-2">' +
+            `<label for="target_tw_3">TW 3</label>` +
+            '</div>' +
+            '<div class="col-md-4">' +
+            `<input type="text" class="form-control" id="target_tw_3"/>` +
+            '</div>' +
+            '<div class="col-md-2">' +
+            `<label for="target_tw_4">TW 4</label>` +
+            '</div>' +
+            '<div class="col-md-4">' +
+            `<input type="text" class="form-control" id="target_tw_4"/>` +
+            '</div>' +
             `</div>` +
             `<div class="form-group row target-teks" style="display: none; margin-bottom: 2rem;">` +
-                '<div class="col-md-2">' +
-                    `<label for="target_tw_3">Target Teks TW 3</label>` +
-                '</div>' +
-                '<div class="col-md-4">' +
-                    `<input type="text" class="form-control" id="target_teks_tw_3"/>` +
-                '</div>' +
-                '<div class="col-md-2">' +
-                    `<label for="target_tw_4">Terget Teks TW 4</label>` +
-                '</div>' +
-                '<div class="col-md-4">' +
-                    `<input type="text" class="form-control" id="target_teks_tw_4"/>` +
-                '</div>' +
+            '<div class="col-md-2">' +
+            `<label for="target_tw_3">Target Teks TW 3</label>` +
+            '</div>' +
+            '<div class="col-md-4">' +
+            `<input type="text" class="form-control" id="target_teks_tw_3"/>` +
+            '</div>' +
+            '<div class="col-md-2">' +
+            `<label for="target_tw_4">Terget Teks TW 4</label>` +
+            '</div>' +
+            '<div class="col-md-4">' +
+            `<input type="text" class="form-control" id="target_teks_tw_4"/>` +
+            '</div>' +
             `</div>` +
             `</form>`);
         jQuery("#modal-crud").find('.modal-footer').html('' +
             '<button type="button" class="btn btn-danger" data-dismiss="modal">' +
-                'Tutup' +
+            'Tutup' +
             '</button>' +
             '<button type="button" class="btn btn-success" onclick="simpan_indikator_renaksi(' + tipe + ')" data-view="kegiatanUtama">' +
-                'Simpan' +
+            'Simpan' +
             '</button>');
         jQuery("#modal-crud").find('.modal-dialog').css('maxWidth', '1000px');
         jQuery("#modal-crud").find('.modal-dialog').css('width', '');
@@ -1816,8 +1888,73 @@ foreach($get_pegawai as $pegawai){
         });
     }
 
+    function tambahSumberDana() {
+        return new Promise(function(resolve, reject) {
+            var lastRow = jQuery('.input_sumber_dana > tbody tr').last();
+            var id = +lastRow.attr('data-id');
+            var newId = id + 1;
 
-    function edit_indikator(id, tipe, total_pagu) {
+            var trNewUsulan = lastRow.clone();
+            trNewUsulan.attr('data-id', newId);
+
+            trNewUsulan.find('*').each(function() {
+                var oldId = '_' + id;
+                var newIdAttr = '_' + newId;
+
+                if (this.id) {
+                    this.id = this.id.replace(oldId, newIdAttr);
+                }
+                if (this.name) {
+                    this.name = this.name.replace('[' + id + ']', '[' + newId + ']');
+                }
+            });
+
+            trNewUsulan.find('.select2').remove();
+            trNewUsulan.find('select').removeClass('select2-hidden-accessible').removeAttr('data-select2-id').removeAttr('aria-hidden');
+
+            jQuery('.input_sumber_dana > tbody').append(trNewUsulan);
+
+            trNewUsulan.find('select').select2({
+                width: '100%'
+            });
+
+            var tr = jQuery('.input_sumber_dana > tbody > tr');
+            tr.each(function(i, row) {
+                var btnHtml = (i === 0) ?
+                    '<button class="btn btn-warning btn-sm" onclick="tambahSumberDana(); return false;"><i class="dashicons dashicons-plus"></i></button>' :
+                    '<button class="btn btn-danger btn-sm" onclick="hapusSumberDana(this); return false;"><i class="dashicons dashicons-trash"></i></button>';
+
+                jQuery(row).find('>td').last().html(btnHtml);
+            });
+
+            resolve();
+        });
+    }
+
+    function hapusSumberDana(that) {
+        var id = jQuery(that).closest('tr').attr('data-id');
+        jQuery('.input_sumber_dana > tbody').find('tr[data-id="' + id + '"]').remove();
+
+        // ubah pagu sub kegiatan setelah sumber dana dihapus
+        set_anggaran(jQuery('#pagu_sumber_dana_' + id));
+    }
+
+    function set_anggaran(that) {
+        let that_id = jQuery(that).attr('id');
+        var tbody = jQuery('.input_sumber_dana > tbody');
+        var tr = tbody.find('>tr');
+        let total = 0;
+        tr.map(function(i, b) {
+            let id = i + 1;
+            let dana = jQuery("#pagu_sumber_dana_" + id).val()
+            if (dana) {
+                total = total + parseInt(dana);
+            }
+        });
+        jQuery("#rencana_pagu").val(total);
+    }
+
+    function edit_indikator(id, tipe, total_pagu, kode_sbl = false) {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -1834,10 +1971,10 @@ foreach($get_pegawai as $pegawai){
                     response.status == 'success' &&
                     response.data != null
                 ) {
-
                     let rencana_pagu = response.data.rencana_pagu != null ? response.data.rencana_pagu : 0;
                     let persen = 0;
                     persen = (rencana_pagu / total_pagu) * 100;
+
                     tambah_indikator_rencana_aksi(response.data.id_renaksi, tipe, total_pagu);
                     jQuery("#modal-crud").find('.modal-title').text(jQuery("#modal-crud").find('.modal-title').text().replace('Tambah', 'Edit'));
                     jQuery('#id_label_indikator').val(id);
@@ -1856,14 +1993,38 @@ foreach($get_pegawai as $pegawai){
                     jQuery('#target_teks_tw_2').val(response.data.target_teks_2);
                     jQuery('#target_teks_tw_3').val(response.data.target_teks_3);
                     jQuery('#target_teks_tw_4').val(response.data.target_teks_4);
-                    jQuery('#rencana_pagu').val(rencana_pagu);
                     jQuery('#total_rincian').val(persen.toFixed(0));
                     jQuery('#rencana_pagu_tk').val(total_pagu);
                     jQuery('#rumus-indikator').val(response.data.rumus_indikator);
-                    if(response.data.set_target_teks == 1){
+
+
+                    /** Memunculkan data sumber dana */
+                    if (kode_sbl) {
+                        get_sub_keg_rka_wpsipd(kode_sbl).then(() => {
+                            response.data.sumber_dana.map(function(value, index) {
+                                let id = index + 1;
+                                new Promise(function(resolve, reject) {
+                                        if (id > 1) {
+                                            tambahSumberDana()
+                                                .then(function() {
+                                                    resolve(value);
+                                                })
+                                        } else {
+                                            resolve(value);
+                                        }
+                                    })
+                                    .then(function(value) {
+                                        jQuery("#sumber_dana_" + id).val(value.id_sumber_dana).trigger('change');
+                                        jQuery("#pagu_sumber_dana_" + id).val(value.rencana_pagu).trigger('keyup');
+                                    });
+                            })
+                        })
+                    }
+
+                    if (response.data.set_target_teks == 1) {
                         jQuery('#cek-target-teks').prop('checked', true);
                         jQuery(".target-teks").show();
-                    }else{
+                    } else {
                         jQuery('#cek-target-teks').prop('checked', false);
                         jQuery(".target-teks").hide();
                     }
@@ -2089,8 +2250,8 @@ foreach($get_pegawai as $pegawai){
                         `<thead>` +
                         `<tr class="table-secondary">` +
                         `<th class="text-center" style="width:40px;">No</th>` +
-                        `<th class="text-center" style="width:300px;">Label Pokin Level `+ label_pokin +`</th>` +
-                        `<th class="text-center">` + title + ` | RHK Level `+rhk_level+`</th>` +
+                        `<th class="text-center" style="width:300px;">Label Pokin Level ` + label_pokin + `</th>` +
+                        `<th class="text-center">` + title + ` | RHK Level ` + rhk_level + `</th>` +
                         `<th class="text-center">` + title_cascading + `</th>` +
                         `${header_dasar_pelaksanaan}` +
                         `<th class="text-center" style="width:300px;">Pegawai Pelaksana</th>` +
@@ -2159,7 +2320,7 @@ foreach($get_pegawai as $pegawai){
                         } else if (tipe == 2) {
                             id_parent_cascading = value['kode_cascading_program'];
                             id_parent_sub_skpd_cascading = value['id_sub_skpd_cascading'] != null ? value['id_sub_skpd_cascading'] : 0;
-                            label_cascading = value['label_cascading_program'] != null ? value['kode_cascading_program'] + ' ' + value['label_cascading_program'] + '</br>( ' + value['kode_sub_skpd'] + ' '+value['nama_sub_skpd']+' | Rp. ' + formatRupiah(value['pagu_cascading']) + ' )' : '-';
+                            label_cascading = value['label_cascading_program'] != null ? value['kode_cascading_program'] + ' ' + value['label_cascading_program'] + '</br>( ' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + ' )' : '-';
                             total_pagu = 0;
                             value.get_dasar_level_3.forEach(function(dasar_level_3) {
                                 dasar_level_3.get_dasar_level_4.forEach(function(dasar) {
@@ -2199,7 +2360,7 @@ foreach($get_pegawai as $pegawai){
                         } else if (tipe == 3) {
                             id_parent_cascading = value['kode_cascading_kegiatan'];
                             id_parent_sub_skpd_cascading = value['id_sub_skpd_cascading'] != null ? value['id_sub_skpd_cascading'] : 0;
-                            label_cascading = value['label_cascading_kegiatan'] != null ? value['kode_cascading_kegiatan'] + ' ' + value['label_cascading_kegiatan'] + '</br>( ' + value['kode_sub_skpd'] + ' '+value['nama_sub_skpd']+' | Rp. ' + formatRupiah(value['pagu_cascading']) + ' )' : '-';
+                            label_cascading = value['label_cascading_kegiatan'] != null ? value['kode_cascading_kegiatan'] + ' ' + value['label_cascading_kegiatan'] + '</br>( ' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + ' )' : '-';
                             // if(value['id_pokin_5'] != ''){
                             //     label_pokin = value['label_pokin_5'];
                             //     id_pokin = value['id_pokin_5'];
@@ -2238,7 +2399,7 @@ foreach($get_pegawai as $pegawai){
                                 `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, ${ (tipe + 1) }, ${ JSON.stringify(id_pokin) }, '${ id_parent_cascading }', ${id_parent_sub_skpd_cascading})" title="Lihat Uraian Teknis Kegiatan"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                         } else if (tipe == 4) {
                             id_pokin = value['id_pokin_5'];
-                            label_cascading = value['label_cascading_sub_kegiatan'] != null ? value['kode_cascading_sub_kegiatan'] + ' ' + value['label_cascading_sub_kegiatan'] + '</br>( ' + value['kode_sub_skpd'] + ' '+value['nama_sub_skpd']+' | Rp. ' + formatRupiah(value['pagu_cascading']) + ' )' : '-';
+                            label_cascading = value['label_cascading_sub_kegiatan'] != null ? value['kode_cascading_sub_kegiatan'] + ' ' + value['label_cascading_sub_kegiatan'] + '</br>( ' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + ' )' : '-';
                             data_tagging_rincian = '<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" title="Lihat Data Tagging Rincian Belanja"><i class="dashicons dashicons dashicons-arrow-down-alt2"></i></a> ';
 
                             if (value.mandatori_pusat == 1) get_data_dasar_pelaksanaan.push('Mandatori Pusat');
@@ -2267,7 +2428,7 @@ foreach($get_pegawai as $pegawai){
                             `<td class="label_renaksi">${label_dasar_pelaksanaan}</td>` +
                             `<td class="pegawai_pelaksana">${nama_pegawai}</td>` +
                             `<td class="text-center">` +
-                            `<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, ${tipe},${total_pagu})" title="Tambah Indikator (Total Pagu: ${total_pagu})"><i class="dashicons dashicons-plus"></i></a> ` +
+                            `<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, ${tipe},${total_pagu}, '${value.kode_sbl}')" title="Tambah Indikator (Total Pagu: ${total_pagu})"><i class="dashicons dashicons-plus"></i></a> ` +
                             tombol_detail +
                             `<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, ` + tipe + `)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;` +
                             `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_rencana_aksi(${value.id}, ${tipe})" title="Hapus"><i class="dashicons dashicons-trash"></i></a>` +
@@ -2282,7 +2443,7 @@ foreach($get_pegawai as $pegawai){
                                 `<thead>` +
                                 `<tr class="table-info">` +
                                 `<th class="text-center" style="width:20px">No</th>` +
-                                `<th class="text-center">Aspek</th>`+
+                                `<th class="text-center">Aspek</th>` +
                                 `<th class="text-center">Indikator</th>` +
                                 `<th class="text-center" style="width:120px;">Satuan</th>` +
                                 `<th class="text-center" style="width:50px;">Target Awal</th>` +
@@ -2304,15 +2465,15 @@ foreach($get_pegawai as $pegawai){
 
                                 let aspek_rhk = ["Kuantitas", "Kualitas", "Waktu", "Biaya"];
                                 let text_aspek_rhk = '';
-                                if(b.aspek_rhk != null || b.aspek_rhk != undefined){
-                                    text_aspek_rhk = aspek_rhk[b.aspek_rhk-1];
+                                if (b.aspek_rhk != null || b.aspek_rhk != undefined) {
+                                    text_aspek_rhk = aspek_rhk[b.aspek_rhk - 1];
                                 }
                                 let target_teks_awal = '';
-                                if(b.target_teks_awal != null || b.target_teks_awal != undefined){
+                                if (b.target_teks_awal != null || b.target_teks_awal != undefined) {
                                     target_teks_awal = `</br>(${b.target_teks_awal})`;
                                 }
                                 let target_teks_akhir = '';
-                                if(b.target_teks_akhir != null || b.target_teks_akhir != undefined){
+                                if (b.target_teks_akhir != null || b.target_teks_akhir != undefined) {
                                     target_teks_akhir = `</br>(${b.target_teks_akhir})`;
                                 }
 
@@ -2328,20 +2489,20 @@ foreach($get_pegawai as $pegawai){
                                     `<td class="text-center">` +
                                     `<input type="checkbox" title="Lihat Rencana Hasil Kerja Per Bulan" class="lihat_bulanan" data-id="${b.id}" onclick="lihat_bulanan(this);" style="margin: 0 6px;">` +
                                     data_tagging_rincian +
-                                    `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_indikator(${b.id}, ` + tipe + `,${total_pagu})" title="Edit"><i class="dashicons dashicons-edit"></i></a> ` +
+                                    `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_indikator(${b.id}, ` + tipe + `,${total_pagu}, '${value.kode_sbl}')" title="Edit"><i class="dashicons dashicons-edit"></i></a> ` +
                                     `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-danger" onclick="hapus_indikator(${b.id}, ` + tipe + `);" title="Hapus"><i class="dashicons dashicons-trash"></i></a>` +
                                     `</td>` +
                                     `</tr>`;
-                                
-                                renaksi +=``+
-                                `<tr style="display: none;" class="data_bulanan_${b.id}">` +
+
+                                renaksi += `` +
+                                    `<tr style="display: none;" class="data_bulanan_${b.id}">` +
                                     `<td colspan="8" style="padding: 10px;">` +
-                                        `<div style="display: none; margin: 1rem auto;" class="data_bulanan_${b.id}">`+
-                                            `<h4 class="text-center" style="margin: 10px;">Rumus Indikator</h4>` +
-                                            `<textarea class="form-control" id="show-rumus-indikator">${b.rumus_indikator}</textarea>` +
-                                        `</div>`+
-                                    `</td>`+
-                                `</tr>`;
+                                    `<div style="display: none; margin: 1rem auto;" class="data_bulanan_${b.id}">` +
+                                    `<h4 class="text-center" style="margin: 10px;">Rumus Indikator</h4>` +
+                                    `<textarea class="form-control" id="show-rumus-indikator">${b.rumus_indikator}</textarea>` +
+                                    `</div>` +
+                                    `</td>` +
+                                    `</tr>`;
 
                                 const get_bulan = [
                                     "Januari", "Februari", "Maret", "April", "Mei", "Juni",
@@ -2504,13 +2665,13 @@ foreach($get_pegawai as $pegawai){
                     var level_pokin = 3;
                     var title = 'Rencana Hasil Kerja | RHK Level 2';
                     var key = jenis + '-' + parent_cascading;
-                    if(id_sub_skpd_cascading != 0){
+                    if (id_sub_skpd_cascading != 0) {
                         key = jenis + '-' + parent_cascading + '-' + id_sub_skpd_cascading;
                     }
                     let data_cascading = data_program_cascading[key];
 
                     var key = jenis + '-' + parent_cascading;
-                    if(id_sub_skpd_cascading != 0){
+                    if (id_sub_skpd_cascading != 0) {
                         key = jenis + '-' + parent_cascading + '-' + id_sub_skpd_cascading;
                     }
                     let get_renaksi_pemda = <?php echo json_encode($renaksi_pemda); ?>;
@@ -2584,7 +2745,7 @@ foreach($get_pegawai as $pegawai){
                         "id_jadwal": id_jadwal,
                         "id_skpd": <?php echo $id_skpd; ?>
                     };
-                    parent_pokin.map(function(b, i){
+                    parent_pokin.map(function(b, i) {
                         option.parent.push(b);
                     })
                     jQuery('#wrap-loading').show();
@@ -2602,7 +2763,7 @@ foreach($get_pegawai as $pegawai){
                                 });
                             } else {
                                 alert("Data Pokin Kosong atau Tidak Sesuai!");
-                            }                        
+                            }
                             var get_pegawai = <?php echo json_encode($select_pegawai); ?>;
                             jQuery('#wrap-loading').hide();
                             jQuery("#modal-crud").find('.modal-title').html('Tambah ' + title);
@@ -2719,10 +2880,10 @@ foreach($get_pegawai as $pegawai){
     jQuery(document).on('change', '#cascading-renstra', function() {
         let nama_sub_skpd_cascading = jQuery('#cascading-renstra option:selected').data('nama-sub-skpd');
         let pagu_cascading = jQuery('#cascading-renstra option:selected').data('pagu-cascading');
-        if(nama_sub_skpd_cascading){
+        if (nama_sub_skpd_cascading) {
             jQuery('#sub-skpd-cascading').val(nama_sub_skpd_cascading)
         }
-        if(pagu_cascading){
+        if (pagu_cascading) {
             jQuery('#pagu-cascading').val(formatRupiah(pagu_cascading))
         }
     });
@@ -2763,57 +2924,57 @@ foreach($get_pegawai as $pegawai){
         var label_pokin_2 = jQuery('#pokin-level-2 option:selected').text();
         var label_renaksi = jQuery('#label_renaksi').val();
         var kode_cascading_renstra = '';
-        if(tipe == 2){
+        if (tipe == 2) {
             kode_cascading_renstra = jQuery('#cascading-renstra').val();
             kode_sementara = kode_cascading_renstra.split("_");
             kode_cascading_renstra = kode_sementara[0];
-        }else{
+        } else {
             kode_cascading_renstra = jQuery('#cascading-renstra').val();
         }
         var label_cascading_renstra = '';
-        if(kode_cascading_renstra !== ''){
-            label_cascading_renstra = jQuery('#cascading-renstra option:selected').text();  
+        if (kode_cascading_renstra !== '') {
+            label_cascading_renstra = jQuery('#cascading-renstra option:selected').text();
             let new_label = label_cascading_renstra.split('(');
             if (Array.isArray(new_label)) {
                 label_cascading_renstra = new_label[0].trim();
             }
-        } 
+        }
         var kode_sbl = '';
         var id_sub_skpd_cascading = 0;
         var pagu_cascading = 0;
-        if(tipe != 1){
+        if (tipe != 1) {
             id_sub_skpd_cascading = jQuery('#cascading-renstra option:selected').data('id-sub-skpd-cascading');
             pagu_cascading = jQuery('#cascading-renstra option:selected').data('pagu-cascading');
         }
         if (tipe == 4) {
             kode_sbl = jQuery('#cascading-renstra option:selected').data('kodesbl');
         }
-        if(tipe == 1){
+        if (tipe == 1) {
             if (label_renaksi == '') {
                 return alert('Kegiatan Utama tidak boleh kosong!');
             }
-        }else if(tipe == 2){
+        } else if (tipe == 2) {
             if (label_renaksi == '') {
                 return alert('Rencana Hasil Kerja tidak boleh kosong!');
             }
-        }else if(tipe == 3){
+        } else if (tipe == 3) {
             if (label_renaksi == '') {
                 return alert('Uraian Kegiatan tidak boleh kosong!');
             }
-        }else if(tipe == 4){
+        } else if (tipe == 4) {
             if (label_renaksi == '') {
                 return alert('Uraian Teknis Kegiatan tidak boleh kosong!');
             }
         }
         if (id_pokin_1 == '' && tipe == 1) {
             return alert('Level 1 pohon kinerja tidak boleh kosong!');
-        }else if (id_pokin_2 == '' && tipe == 1) {
+        } else if (id_pokin_2 == '' && tipe == 1) {
             return alert('Level 2 pohon kinerja tidak boleh kosong!');
-        }else if (id_pokin_1 == '' && tipe == 2) {
+        } else if (id_pokin_1 == '' && tipe == 2) {
             return alert('Level 3 pohon kinerja tidak boleh kosong!');
-        }else if (id_pokin_1 == '' && tipe == 3) {
+        } else if (id_pokin_1 == '' && tipe == 3) {
             return alert('Level 4 pohon kinerja tidak boleh kosong!');
-        }else if (id_pokin_1 == '' && tipe == 4) {
+        } else if (id_pokin_1 == '' && tipe == 4) {
             return alert('Level 5 pohon kinerja tidak boleh kosong!');
         }
 
@@ -3396,7 +3557,7 @@ foreach($get_pegawai as $pegawai){
                 jQuery("#wrap-loading").hide();
                 if (response.status) {
                     jQuery("#modal-detail-renaksi").modal('show');
-                    
+
                     var satker = response.get_satker && response.get_satker.satker_id && response.get_satker.nama ?
                         response.get_satker.satker_id + ' ' + response.get_satker.nama : '';
                     var pegawai = response.get_pegawai && response.get_pegawai.nip_baru && response.get_pegawai.nama_pegawai ?

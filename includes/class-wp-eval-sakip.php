@@ -633,6 +633,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_mapping_unit_sipd_simpeg',  $plugin_public, 'mapping_unit_sipd_simpeg');
 
 		$this->loader->add_action('wp_ajax_simpan_finalisasi_laporan_pk', $plugin_public, 'simpan_finalisasi_laporan_pk');
+		$this->loader->add_action('wp_ajax_get_laporan_pk_by_id', $plugin_public, 'get_laporan_pk_by_id');
 		$this->loader->add_action('wp_ajax_get_table_skpd_laporan_pk', $plugin_public, 'get_table_skpd_laporan_pk');
 		$this->loader->add_action('wp_ajax_get_table_skpd_laporan_pk_setting', $plugin_public, 'get_table_skpd_laporan_pk_setting');
 		$this->loader->add_action('wp_ajax_get_detail_setting_laporan_pk_by_id', $plugin_public, 'get_detail_setting_laporan_pk_by_id');
