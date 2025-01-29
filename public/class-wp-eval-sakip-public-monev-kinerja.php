@@ -1594,13 +1594,15 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$rencana_pagu_html = implode('<br>', $rencana_pagu_html);
 						$realisasi_pagu_html = implode('<br>', $realisasi_pagu_html);
 						$keterangan = '';
+						$satker_id_utama = substr($v['detail']['satker_id'], 0, 2);
+
 						$get_pegawai = $wpdb->get_var($wpdb->prepare("
 						    SELECT 
 						    	id
 						    FROM esakip_data_pegawai_simpeg
 						    WHERE nip_baru = %s
-						    	AND satker_id = %s
-						", $v['detail']['nip'], $v['detail']['satker_id']));
+						    	AND satker_id LIKE %s
+						", $v['detail']['nip'], $satker_id_utama .'%'));
 
 						if (empty($get_pegawai)) {
 							$wpdb->update(
