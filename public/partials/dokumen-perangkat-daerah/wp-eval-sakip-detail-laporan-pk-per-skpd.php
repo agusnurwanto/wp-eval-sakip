@@ -446,6 +446,7 @@ if (!empty($nip)) {
 $data_tahapan = $wpdb->get_results(
     $wpdb->prepare("
         SELECT 
+            id,
             nama_tahapan,
             tanggal_dokumen
         FROM esakip_finalisasi_tahap_laporan_pk
@@ -467,7 +468,7 @@ if ($data_tahapan) {
             <div class="cr-card">
                 <h3>' . htmlspecialchars($nama_tahapan) . '</h3>
                 <div class="year">' . htmlspecialchars($tanggal_dokumen) . '</div>
-                <div class="cr-view-btn" onclick="viewReport(\'' . htmlspecialchars($nama_tahapan) . '\')">
+                <div class="cr-view-btn" onclick="viewReport(\'' . htmlspecialchars($v['id']) . '\')">
                     <span class="dashicons dashicons-visibility"></span>
                 </div>
             </div>
@@ -901,10 +902,10 @@ if (empty($logo_pemda)) {
                 <table class="table_data_anggaran">
                     <thead>
                         <tr>
-                            <th class="esakip-text_tengah" style="width: 5px;">No</th>
-                            <th class="esakip-text_tengah" style="width: 50%;">Sasaran</th>
-                            <th class="esakip-text_tengah" style="width: 30%;">Indikator</th>
-                            <th class="esakip-text_tengah" style="width: 20%;">Target</th>
+                            <th class="esakip-text_tengah" style="width: 50px;">No</th>
+                            <th class="esakip-text_tengah" style="width: 450px;">Sasaran</th>
+                            <th class="esakip-text_tengah" style="width: 150px;">Indikator</th>
+                            <th class="esakip-text_tengah">Target</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -917,9 +918,9 @@ if (empty($logo_pemda)) {
                 <table class="table_data_anggaran">
                     <thead>
                         <tr>
-                            <th class="esakip-text_tengah" style="width: 5px;">No</th>
+                            <th class="esakip-text_tengah" style="width: 50px;">No</th>
                             <th class="esakip-text_tengah" style="width: 150px;">Kode</th>
-                            <th class="esakip-text_tengah" style="width: 50%;">Program</th>
+                            <th class="esakip-text_tengah" style="width: 450px;">Program</th>
                             <th class="esakip-text_tengah">Anggaran</th>
                             <th class="esakip-text_tengah">Ket</th>
                         </tr>
@@ -934,9 +935,9 @@ if (empty($logo_pemda)) {
                 <table class="table_data_anggaran">
                     <thead>
                         <tr>
-                            <th class="esakip-text_tengah" style="width: 5px;">No</th>
+                            <th class="esakip-text_tengah" style="width: 50px;">No</th>
                             <th class="esakip-text_tengah" style="width: 150px;">Kode</th>
-                            <th class="esakip-text_tengah" style="width: 50%;">Kegiatan</th>
+                            <th class="esakip-text_tengah" style="width: 450px;">Kegiatan</th>
                             <th class="esakip-text_tengah">Anggaran</th>
                             <th class="esakip-text_tengah">Ket</th>
                         </tr>
@@ -951,9 +952,9 @@ if (empty($logo_pemda)) {
                 <table class="table_data_anggaran">
                     <thead>
                         <tr>
-                            <th class="esakip-text_tengah" style="width: 5px;">No</th>
+                            <th class="esakip-text_tengah" style="width: 50px;">No</th>
                             <th class="esakip-text_tengah" style="width: 150px;">Kode</th>
-                            <th class="esakip-text_tengah" style="width: 50%;">Sub Kegiatan</th>
+                            <th class="esakip-text_tengah" style="width: 450px;">Sub Kegiatan</th>
                             <th class="esakip-text_tengah">Anggaran</th>
                             <th class="esakip-text_tengah">Ket</th>
                         </tr>
@@ -1112,10 +1113,10 @@ if (empty($logo_pemda)) {
                             <table class="table_data_anggaran" id="table_sasaran">
                                 <thead>
                                     <tr>
-                                        <th class="esakip-text_tengah" style="width: 5px;">No</th>
-                                        <th class="esakip-text_tengah" style="width: 50%;">Sasaran</th>
-                                        <th class="esakip-text_tengah" style="width: 30%;">Indikator</th>
-                                        <th class="esakip-text_tengah" style="width: 20%;">Target</th>
+                                        <th class="esakip-text_tengah" style="width: 50px;">No</th>
+                                        <th class="esakip-text_tengah" style="width: 450px;">Sasaran</th>
+                                        <th class="esakip-text_tengah" style="width: 150px;">Indikator</th>
+                                        <th class="esakip-text_tengah">Target</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1128,9 +1129,9 @@ if (empty($logo_pemda)) {
                             <table class="table_data_anggaran" id="table_program">
                                 <thead>
                                     <tr>
-                                        <th class="esakip-text_tengah" style="width: 5px;">No</th>
+                                        <th class="esakip-text_tengah" style="width: 50px;">No</th>
                                         <th class="esakip-text_tengah" style="width: 150px;">Kode</th>
-                                        <th class="esakip-text_tengah" style="width: 50%;">Program</th>
+                                        <th class="esakip-text_tengah" style="width: 450px;">Program</th>
                                         <th class="esakip-text_tengah">Anggaran</th>
                                         <th class="esakip-text_tengah">Ket</th>
                                     </tr>
@@ -1145,9 +1146,9 @@ if (empty($logo_pemda)) {
                             <table class="table_data_anggaran" id="table_kegiatan">
                                 <thead>
                                     <tr>
-                                        <th class="esakip-text_tengah" style="width: 5px;">No</th>
+                                        <th class="esakip-text_tengah" style="width: 50px;">No</th>
                                         <th class="esakip-text_tengah" style="width: 150px;">Kode</th>
-                                        <th class="esakip-text_tengah" style="width: 50%;">Kegiatan</th>
+                                        <th class="esakip-text_tengah" style="width: 450px;">Kegiatan</th>
                                         <th class="esakip-text_tengah">Anggaran</th>
                                         <th class="esakip-text_tengah">Ket</th>
                                     </tr>
@@ -1162,9 +1163,9 @@ if (empty($logo_pemda)) {
                             <table class="table_data_anggaran" id="table_subkegiatan">
                                 <thead>
                                     <tr>
-                                        <th class="esakip-text_tengah" style="width: 5px;">No</th>
+                                        <th class="esakip-text_tengah" style="width: 50px;">No</th>
                                         <th class="esakip-text_tengah" style="width: 150px;">Kode</th>
-                                        <th class="esakip-text_tengah" style="width: 50%;">Sub Kegiatan</th>
+                                        <th class="esakip-text_tengah" style="width: 450px;">Sub Kegiatan</th>
                                         <th class="esakip-text_tengah">Anggaran</th>
                                         <th class="esakip-text_tengah">Ket</th>
                                     </tr>
@@ -1257,34 +1258,31 @@ if (empty($logo_pemda)) {
     }
 
 
-    function viewReport(title) {
-        alert(`Viewing report: ${title}`);
-        // // jQuery('#wrap-loading').show()
-        // // jQuery.ajax({
-        // //     url: esakip.url,
-        // //     method: 'POST',
-        // //     data: {
-        // //         action: "simpan_finalisasi_laporan_pk",
-        // //         api_key: esakip.api_key,
-               
-        // //         tahun_anggaran: '<?php echo $input['tahun']; ?>',
-        // //         id_skpd: '<?php echo $id_skpd; ?>'
-        // //     },
-        // //     dataType: 'json',
-        // //     success: function(response) {
-        // //         jQuery('#wrap-loading').hide()
-        // //         if (response.status === 'success') {
-        // //             alert(response.message);
-        // //         } else {
-        // //             alert('Terjadi kesalahan: ' + response.message);
-        // //         }
-        // //     },
-        // //     error: function(xhr, status, error) {
-        // //         jQuery('#wrap-loading').hide()
-        // //         console.error('AJAX Error:', error);
-        // //         alert('Gagal menyimpan data. Silakan coba lagi.');
-        // //     },
-        // });
+    function viewReport(idTahap) {
+        jQuery('#wrap-loading').show()
+        jQuery.ajax({
+            url: esakip.url,
+            method: 'POST',
+            data: {
+                action: "get_laporan_pk_by_id",
+                api_key: esakip.api_key,
+                id_tahap: idTahap,
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide()
+                if (response.status === 'success') {
+                    alert(response.message);
+                } else {
+                    alert('Terjadi kesalahan: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide()
+                console.error('AJAX Error:', error);
+                alert('Gagal menyimpan data. Silakan coba lagi.');
+            },
+        });
     }
 
     function showModalFinalisasi() {
