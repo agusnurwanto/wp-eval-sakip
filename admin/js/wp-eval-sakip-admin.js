@@ -61,6 +61,36 @@ jQuery(document).ready(function () {
             });
         }
     });
+    
+    jQuery("#generate_user_esakip_pegawai_simpeg").on("click", function () {
+        alert("Masih dalam pengembangan!")
+        // if (confirm("Apakah anda yakin akan menggenerate user SIMPEG!")) {
+        //     jQuery("#wrap-loading").show();
+        //     jQuery.ajax({
+        //         url: ajaxurl,
+        //         type: "POST",
+        //         data: {
+        //             action: "generate_user_esakip_pegawai_simpeg",
+        //             api_key: esakip.api_key,
+        //             pass: prompt(
+        //                 "Masukan password default untuk User yang akan dibuat"
+        //             ),
+        //             update_pass: confirm(
+        //                 "Apakah anda mau mereset password user existing juga?"
+        //             ),
+        //         },
+        //         dataType: "json",
+        //         success: function (data) {
+        //             jQuery("#wrap-loading").hide();
+        //             return alert(data.message);
+        //         },
+        //         error: function (e) {
+        //             console.log(e);
+        //             return alert(data.message);
+        //         },
+        //     });
+        // }
+    });
 
     jQuery("body").on("click", ".esakip-header-tahun", function () {
         var tahun = jQuery(this).attr("tahun");

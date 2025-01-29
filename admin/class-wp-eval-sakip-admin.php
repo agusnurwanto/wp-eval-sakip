@@ -1440,8 +1440,11 @@ class Wp_Eval_Sakip_Admin
 					->set_html('<a href="#" class="button button-primary" onclick="get_data_unit_wpsipd(); return false;">Tarik Data Unit dari WP SIPD</a>')
 					->set_help_text('Tombol untuk menarik data Unit dari WP SIPD.'),
 				Field::make('html', 'crb_generate_user')
-					->set_html('<a id="generate_user_esakip" onclick="return false;" href="#" class="button button-primary button-large">Generate User By DB Lokal</a>')
+					->set_html('<a id="generate_user_esakip" onclick="return false;" href="#" class="button button-primary button-large">Generate User SIPD By DB Lokal</a>')
 					->set_help_text('Data user active yang ada di table data unit akan digenerate menjadi user wordpress.'),
+				Field::make('html', 'crb_generate_user_pegawai_simpeg')
+					->set_html('<a id="generate_user_esakip_pegawai_simpeg" onclick="return false;" href="#" class="button button-primary button-large">Generate User SIMPEG By DB Lokal</a>')
+					->set_help_text('Data user active yang ada di table data pegawai simpeg akan digenerate menjadi user wordpress.'),
 			));
 
 		Container::make('theme_options', __('Jadwal'))
@@ -2560,8 +2563,9 @@ class Wp_Eval_Sakip_Admin
 					$wpdb->prepare("
 						SELECT nama_skpd 
 						FROM esakip_data_unit 
-						WHERE id_skpd=" . $user['id_sub_skpd'] . " 
-						  AND active=1")
+						WHERE id_skpd=%d 
+						  AND active=%d
+						  ", $user['id_sub_skpd'], 1)
 				);
 				$meta['_crb_nama_skpd'] = $skpd;
 				$meta['_id_sub_skpd'] = $user['id_sub_skpd'];
@@ -2580,7 +2584,7 @@ class Wp_Eval_Sakip_Admin
 		global $wpdb;
 		$ret = array();
 		$ret['status'] = 'success';
-		$ret['message'] = 'Berhasil Generate User Wordpress dari DB Lokal';
+		$ret['message'] = 'Berhasil Generate User Wordpress dari DB Lokal SIPD';
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
 				$users_pa = $wpdb->get_results(
@@ -2689,6 +2693,103 @@ class Wp_Eval_Sakip_Admin
 		}
 		die(json_encode($ret));
 	}
+
+	
+	// function generate_user_esakip_pegawai_simpeg()
+	// {
+	// 	global $wpdb;
+	// 	$ret = array();
+	// 	$ret['status'] = 'success';
+	// 	$ret['message'] = 'Berhasil Generate User Wordpress dari DB Lokal SIMPEG';
+	// 	if (!empty($_POST)) {
+	// 		if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+	// 			$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
+	// 			$unit = $wpdb->get_results(
+	// 				$wpdb->prepare(
+	// 					"SELECT 
+	// 						*
+	// 					FROM 
+	// 						esakip_data_unit 
+	// 					WHERE 
+	// 						active=1 
+	// 				  	AND is_skpd=1 
+	// 				  	AND tahun_anggaran=%d
+	// 					ORDER BY kode_skpd ASC
+	// 				", $tahun_anggaran_sakip),
+	// 				ARRAY_A
+	// 			);
+
+	// 			if(!empty($unit)){
+	// 				foreach ($unit as $ku => $v_unit) {
+	// 					// Untuk mendapatkan mapping antara data id unit dan data simpeg
+	// 					$mapping_unit_simpeg = $wpdb->get_row(
+	// 						$wpdb->prepare(
+	// 							"SELECT 
+    //                                 a.*,
+    //                                 b.satker_id
+    //                             FROM 
+    //                                 esakip_data_mapping_unit_sipd_simpeg a 
+    //                             LEFT JOIN esakip_data_satker_simpeg b 
+    //                                 ON b.satker_id=a.id_satker_simpeg AND 
+    //                                 b.tahun_anggaran=a.tahun_anggaran AND b.active=1
+    //                             WHERE 
+    //                                 a.tahun_anggaran=%d and
+    //                                 a.id_skpd=%d
+	// 							", $tahun_anggaran_sakip, $v_unit['id_skpd']
+	// 							), ARRAY_A);
+
+	// 					if(!empty($mapping_unit_simpeg)){
+	// 						$data_pegawai = $wpdb->get_results(
+	// 							$wpdb->prepare(
+	// 								"SELECT
+	// 									*
+	// 								FROM
+	// 									esakip_data_pegawai_simpeg
+	// 								WHERE 
+	// 									satker_id LIKE %s AND
+	// 									active = %d
+	// 								", $mapping_unit_simpeg['satker_id'].'%', 1
+	// 								), ARRAY_A);
+
+	// 						$update_pass = false;
+	// 						if (
+	// 							!empty($_POST['update_pass'])
+	// 							&& $_POST['update_pass'] == 'true'
+	// 						) {
+	// 							$update_pass = true;
+	// 						}
+
+	// 						if(!empty($data_pegawai)){
+	// 							foreach ($data_pegawai as $kp => $v_pegawai) {
+	// 								$v_pegawai['pass'] = $_POST['pass'];
+	// 								$v_pegawai['loginname'] = $v_pegawai['nip_baru'];
+	// 								$v_pegawai['jabatan'] = 'pegawai';
+	// 								$v_pegawai['nama'] = $v_pegawai['nama_pegawai'];
+	// 								$v_pegawai['nip'] = $v_pegawai['nip_baru'];
+	// 								$v_pegawai['id_sub_skpd'] = $v_unit['id_skpd'];
+	// 								$this->gen_user_esakip($v_pegawai, $update_pass);
+	// 							}
+	// 						}else{
+	// 							$ret['status'] = 'error';
+	// 							$ret['message'] = 'Data Pegawai Kosong. Pastikan Sudah Sinkron Data Pegawai Simpeg!';	
+	// 						}
+	// 					}else{
+	// 						$ret['status'] = 'error';
+	// 						$ret['message'] = 'Pastikan Sudah Sinkron Data Unit Organisasi Simpeg!';
+	// 					}
+	// 				}
+	// 			}
+	// 		} else {
+	// 			$ret['status'] = 'error';
+	// 			$ret['message'] = 'APIKEY tidak sesuai!';
+	// 		}
+	// 	} else {
+	// 		$ret['status'] = 'error';
+	// 		$ret['message'] = 'Format Salah!';
+	// 	}
+	// 	die(json_encode($ret));
+	// }
 
 	function get_data_unit_wpsipd()
 	{
