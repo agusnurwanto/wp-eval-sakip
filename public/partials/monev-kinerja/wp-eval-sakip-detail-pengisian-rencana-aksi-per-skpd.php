@@ -1333,6 +1333,10 @@ foreach ($get_pegawai as $pegawai) {
                                 if (b.target_teks_akhir != null || b.target_teks_akhir != undefined) {
                                     target_teks_akhir = `</br>(${b.target_teks_akhir})`;
                                 }
+                                let val_rumus_indikator = '(Realisasi Indikator / Target Indikator) * 100 = Capaian';
+                                if(b.rumus_indikator){
+                                    val_rumus_indikator = b.rumus_indikator;
+                                }
                                 kegiatanUtama += `` +
                                     `<tr>` +
                                     `<td class="text-center">${index+1}.${i+1}</td>` +
@@ -1354,7 +1358,7 @@ foreach ($get_pegawai as $pegawai) {
                                     `<td colspan="8" style="padding: 10px;">` +
                                     `<div style="display: none; margin: 1rem auto;" class="data_bulanan_${b.id}">` +
                                     `<h4 class="text-center" style="margin: 10px;">Rumus Indikator</h4>` +
-                                    `<textarea class="form-control" id="show-rumus-indikator">${b.rumus_indikator}</textarea>` +
+                                    `<textarea class="form-control" id="show-rumus-indikator">${val_rumus_indikator}</textarea>` +
                                     `</div>` +
                                     `</td>` +
                                     `</tr>`;
@@ -1998,7 +2002,11 @@ foreach ($get_pegawai as $pegawai) {
                     jQuery('#target_teks_tw_4').val(response.data.target_teks_4);
                     jQuery('#total_rincian').val(persen.toFixed(0));
                     jQuery('#rencana_pagu_tk').val(total_pagu);
-                    jQuery('#rumus-indikator').val(response.data.rumus_indikator);
+                    if(response.data.rumus_indikator){
+                        jQuery('#rumus-indikator').val(response.data.rumus_indikator);
+                    }else{
+                        jQuery('#rumus-indikator').val('(Realisasi Indikator / Target Indikator) * 100 = Capaian');
+                    }
 
 
                     /** Memunculkan data sumber dana */
@@ -2479,6 +2487,10 @@ foreach ($get_pegawai as $pegawai) {
                                 if (b.target_teks_akhir != null || b.target_teks_akhir != undefined) {
                                     target_teks_akhir = `</br>(${b.target_teks_akhir})`;
                                 }
+                                let val_rumus_indikator = '(Realisasi Indikator / Target Indikator) * 100 = Capaian';
+                                if(b.rumus_indikator){
+                                    val_rumus_indikator = b.rumus_indikator;
+                                }
 
                                 renaksi += '' +
                                     `<tr>` +
@@ -2502,7 +2514,7 @@ foreach ($get_pegawai as $pegawai) {
                                     `<td colspan="8" style="padding: 10px;">` +
                                     `<div style="display: none; margin: 1rem auto;" class="data_bulanan_${b.id}">` +
                                     `<h4 class="text-center" style="margin: 10px;">Rumus Indikator</h4>` +
-                                    `<textarea class="form-control" id="show-rumus-indikator">${b.rumus_indikator}</textarea>` +
+                                    `<textarea class="form-control" id="show-rumus-indikator">${val_rumus_indikator}</textarea>` +
                                     `</div>` +
                                     `</td>` +
                                     `</tr>`;
