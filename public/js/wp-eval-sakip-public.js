@@ -334,6 +334,30 @@ function formatRupiah(angka, prefix) {
     }
 }
 
+function formatTanggalIndonesia(dateString) {
+    // Konversi string ke objek Date
+    let date = new Date(dateString);
+
+    // Pastikan tanggal valid
+    if (isNaN(date)) {
+        return "Tanggal tidak valid";
+    }
+
+    // Array nama bulan dalam bahasa Indonesia
+    const bulanIndonesia = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
+
+    // Ambil hari, bulan, dan tahun
+    let tanggal = date.getDate();
+    let bulan = bulanIndonesia[date.getMonth()];
+    let tahun = date.getFullYear();
+
+    // Format akhir: DD MMMM YYYY
+    return `${tanggal} ${bulan} ${tahun}`;
+}
+
 function getFormData($form) {
     let unindexed_array = $form.serializeArray();
     let indexed_array = {};
