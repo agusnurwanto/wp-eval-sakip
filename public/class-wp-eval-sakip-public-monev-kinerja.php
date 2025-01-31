@@ -1271,22 +1271,43 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				}
 				$child_level = $_POST['tipe'] + 1;
 				if ($ret['status'] != 'error') {
-					$cek_child = $wpdb->get_results($wpdb->prepare("
-						SELECT
-							*
-						FROM esakip_data_rencana_aksi_opd
-						WHERE level=%d
-							AND parent=%d
-							AND active=1
-					", $child_level, $_POST['id']), ARRAY_A);
+					$cek_child = $wpdb->get_results(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_data_rencana_aksi_opd
+							WHERE level = %d
+							  AND parent = %d
+							  AND active = 1
+						", $child_level, $_POST['id']),
+						ARRAY_A
+					);
+					$cek_indikator = $wpdb->get_results(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_data_rencana_aksi_indikator_opd
+							WHERE id_renaksi = %d
+							  AND tahun_anggaran = %d
+							  AND active = 1
+						", $_POST['id'], $_POST['tahun_anggaran']),
+						ARRAY_A
+					);
+					if (!empty($cek_indikator)) {
+						$ret['status'] = 'error';
+						$ret['message'] = 'Gagal menghapus, RHK memiliki indikator aktif, Mohon indikator dihapus terlebih dahulu!';
+						die(json_encode($ret));
+					}
 					if (empty($cek_child)) {
-						$wpdb->update('esakip_data_rencana_aksi_opd', array(
-							'active' => 0
-						), array('id' => $_POST['id']));
+						$wpdb->update(
+							'esakip_data_rencana_aksi_opd',
+							array('active' => 0),
+							array('id' => $_POST['id'])
+						);
 					} else {
 						$ret['status'] = 'error';
-						$ret['child'] = $cek_child;
 						$ret['message'] = 'Gagal menghapus, data di level data di level ' . $child_level . ' harus dihapus dahulu!';
+						$ret['child'] = $cek_child;
 					}
 				}
 			} else {

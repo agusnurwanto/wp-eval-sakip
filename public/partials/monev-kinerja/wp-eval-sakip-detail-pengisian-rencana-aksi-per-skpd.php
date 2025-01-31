@@ -696,17 +696,20 @@ foreach ($get_pegawai as $pegawai) {
                         var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
                         var parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
                         var parent_cascading = jQuery('#tabel_rencana_aksi').attr('parent_cascading');
-                        lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading);
+                        var parent_sub_skpd = jQuery('#tabel_rencana_aksi').attr('parent_sub_skpd');
+                        lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading, parent_sub_skpd);
                     } else if (tipe == 3) {
                         var parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
                         var parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
                         var parent_cascading = jQuery('#tabel_uraian_rencana_aksi').attr('parent_cascading');
-                        lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading);
+                        var parent_sub_skpd = jQuery('#tabel_uraian_rencana_aksi').attr('parent_sub_skpd');
+                        lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading, parent_sub_skpd);
                     } else if (tipe == 4) {
                         var parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
                         var parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
                         var parent_cascading = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_cascading');
-                        lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading);
+                        var parent_sub_skpd = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_sub_skpd');
+                        lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading, parent_sub_skpd);
                     }
                     getTablePengisianRencanaAksi(1);
                 }
@@ -1272,7 +1275,7 @@ foreach ($get_pegawai as $pegawai) {
                             nama_pegawai += value.detail_satker.nama + '<br>';
                         }
                         if (value.detail_pegawai && value.detail_pegawai.nip_baru) {
-                            nama_pegawai += value.detail_pegawai.nip_baru + ' ' + value.detail_pegawai.nama_pegawai;
+                            nama_pegawai += '<span class="badge badge-primary p-2 mt-2 text-center">' + value.detail_pegawai.nip_baru + ' ' + value.detail_pegawai.nama_pegawai + '</span>';
                         }
                         let label_pokin = '-';
                         let id_pokin_parent = [];
@@ -1290,11 +1293,11 @@ foreach ($get_pegawai as $pegawai) {
                             `<td class="text-center">${index+1}</td>` +
                             `<td class="label_pokin">${label_pokin}</td>` +
                             `<td class="label_renaksi">${value.label}</td>` +
-                            `<td class="label_cascading">${label_cascading}</td>` +
+                            `<td class="label_cascading font-weight-bold">${label_cascading}</td>` +
                             `<td class="label_renaksi">${label_dasar_pelaksanaan}</td>` +
-                            `<td class="detail_pegawai">${nama_pegawai}</td>` +
+                            `<td class="detail_pegawai font-weight-bold">${nama_pegawai}</td>` +
                             `<td class="text-center">` +
-                            `<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, 1, ${total_pagu})" title="Tambah Indikator (Total Pagu: ${total_pagu})"><i class="dashicons dashicons-plus"></i></a> ` +
+                            `<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, 1, ${total_pagu})" title="Tambah Indikator (Total Pagu: ${formatRupiah(total_pagu)})"><i class="dashicons dashicons-plus"></i></a> ` +
                             `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, 2, ${JSON.stringify(id_pokin_parent)}, '${value.kode_cascading_sasaran}')" title="Lihat Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> ` +
                             `<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, 1)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;` +
                             `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_rencana_aksi(${value.id}, 1)" title="Hapus"><i class="dashicons dashicons-trash"></i></a>` +
@@ -1334,7 +1337,7 @@ foreach ($get_pegawai as $pegawai) {
                                     target_teks_akhir = `</br>(${b.target_teks_akhir})`;
                                 }
                                 let val_rumus_indikator = '(Realisasi Indikator / Target Indikator) * 100 = Capaian';
-                                if(b.rumus_indikator){
+                                if (b.rumus_indikator) {
                                     val_rumus_indikator = b.rumus_indikator;
                                 }
                                 kegiatanUtama += `` +
@@ -1345,7 +1348,7 @@ foreach ($get_pegawai as $pegawai) {
                                     `<td class="text-center">${b.satuan}</td>` +
                                     `<td class="text-center">${b.target_awal} ${target_teks_awal}</td>` +
                                     `<td class="text-center">${b.target_akhir} ${target_teks_akhir}</td>` +
-                                    `<td class="text-right">${b.rencana_pagu || 0}</td>` +
+                                    `<td class="text-right">${formatRupiah(b.rencana_pagu) || 0}</td>` +
                                     `<td class="text-center">` +
                                     `<input type="checkbox" title="Lihat Rencana Hasil Kerja Per Bulan" class="lihat_bulanan" data-id="${b.id}" onclick="lihat_bulanan(this);" style="margin: 0 6px;">` +
                                     `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_indikator(${b.id}, 1, ${total_pagu})" title="Edit"><i class="dashicons dashicons-edit"></i></a> ` +
@@ -2002,9 +2005,9 @@ foreach ($get_pegawai as $pegawai) {
                     jQuery('#target_teks_tw_4').val(response.data.target_teks_4);
                     jQuery('#total_rincian').val(persen.toFixed(0));
                     jQuery('#rencana_pagu_tk').val(total_pagu);
-                    if(response.data.rumus_indikator){
+                    if (response.data.rumus_indikator) {
                         jQuery('#rumus-indikator').val(response.data.rumus_indikator);
-                    }else{
+                    } else {
                         jQuery('#rumus-indikator').val('(Realisasi Indikator / Target Indikator) * 100 = Capaian');
                     }
 
@@ -2052,6 +2055,7 @@ foreach ($get_pegawai as $pegawai) {
         var parent_renaksi = 0;
         var parent_pokin = 0;
         var parent_cascading = 0;
+        var parent_sub_skpd = 0;
         if (tipe == 1) {
             title = 'Kegiatan Utama';
         } else if (tipe == 2) {
@@ -2059,16 +2063,19 @@ foreach ($get_pegawai as $pegawai) {
             var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
             var parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
             var parent_cascading = jQuery('#tabel_rencana_aksi').attr('parent_cascading');
+            var parent_sub_skpd = jQuery('#tabel_rencana_aksi').attr('parent_sub_skpd');
         } else if (tipe == 3) {
             title = 'Uraian Kegiatan Rencana Hasil Kerja';
             var parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
             var parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
             var parent_cascading = jQuery('#tabel_uraian_rencana_aksi').attr('parent_cascading');
+            var parent_sub_skpd = jQuery('#tabel_rencana_aksi').attr('parent_sub_skpd');
         } else if (tipe == 4) {
             title = 'Uraian Teknis Kegiatan';
             var parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
             var parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
             var parent_cascading = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_cascading');
+            var parent_sub_skpd = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_sub_skpd');
         }
         if (confirm('Apakah kamu yakin untuk menghapus indikator ' + title + '?')) {
             jQuery('#wrap-loading').show();
@@ -2090,7 +2097,7 @@ foreach ($get_pegawai as $pegawai) {
                         if (tipe == 1) {
                             kegiatanUtama();
                         } else {
-                            lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading);
+                            lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading, parent_sub_skpd);
                         }
                     }
                 },
@@ -2108,6 +2115,7 @@ foreach ($get_pegawai as $pegawai) {
         var parent_pokin = 0;
         var parent_renaksi = 0;
         var parent_cascading = 0;
+        var parent_sub_skpd = 0;
         if (tipe == 1) {
             title = 'Kegiatan Utama';
         } else if (tipe == 2) {
@@ -2115,16 +2123,19 @@ foreach ($get_pegawai as $pegawai) {
             parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
             parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
             parent_cascading = jQuery('#tabel_rencana_aksi').attr('parent_cascading');
+            parent_sub_skpd = jQuery('#tabel_rencana_aksi').attr('parent_sub_skpd');
         } else if (tipe == 3) {
             title = 'Uraian Kegiatan Rencana Hasil Kerja';
             parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
             parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
             parent_cascading = jQuery('#tabel_uraian_rencana_aksi').attr('parent_cascading');
+            parent_sub_skpd = jQuery('#tabel_rencana_aksi').attr('parent_sub_skpd');
         } else if (tipe == 4) {
             title = 'Uraian Teknis Kegiatan';
-            parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
-            parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
-            parent_cascading = jQuery('#tabel_uraian_rencana_aksi').attr('parent_cascading');
+            parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
+            parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
+            parent_cascading = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_cascading');
+            parent_sub_skpd = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_sub_skpd');
         }
 
         if (confirm('Apakah kamu yakin untuk menghapus ' + title + '?')) {
@@ -2148,7 +2159,8 @@ foreach ($get_pegawai as $pegawai) {
                         if (tipe == 1) {
                             kegiatanUtama();
                         } else {
-                            lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading)
+                            console.log(parent_renaksi)
+                            lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading, parent_sub_skpd);
                         }
                     }
                 },
@@ -2202,7 +2214,6 @@ foreach ($get_pegawai as $pegawai) {
                 title_cascading = 'Sub Kegiatan Cascading';
                 label_pokin = '5';
                 rhk_level = '4';
-                // +`<th class="text-center" style="width:50px;">Realisasi Pagu</th>`;
             }
             jQuery.ajax({
                 url: esakip.url,
@@ -2287,7 +2298,7 @@ foreach ($get_pegawai as $pegawai) {
                             nama_pegawai += value.detail_satker.nama + '<br>';
                         }
                         if (value.detail_pegawai && value.detail_pegawai.nip_baru) {
-                            nama_pegawai += value.detail_pegawai.nip_baru + ' ' + value.detail_pegawai.nama_pegawai;
+                            nama_pegawai += '<span class="badge badge-primary p-2 mt-2 text-center">' + value.detail_pegawai.nip_baru + ' ' + value.detail_pegawai.nama_pegawai + '</span>';
                         }
                         if (tipe == 1) {
                             id_parent_cascading = value['kode_cascading_sasaran'];
@@ -2331,7 +2342,9 @@ foreach ($get_pegawai as $pegawai) {
                         } else if (tipe == 2) {
                             id_parent_cascading = value['kode_cascading_program'];
                             id_parent_sub_skpd_cascading = value['id_sub_skpd_cascading'] != null ? value['id_sub_skpd_cascading'] : 0;
-                            label_cascading = value['label_cascading_program'] != null ? value['kode_cascading_program'] + ' ' + value['label_cascading_program'] + '</br>( ' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + ' )' : '-';
+
+                            let nama_prog = value['label_cascading_program'].split(" ").slice(1).join(" ");
+                            label_cascading = value['label_cascading_program'] != null ? value['kode_cascading_program'] + ' ' + nama_prog + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>' : '-';
                             total_pagu = 0;
                             value.get_dasar_level_3.forEach(function(dasar_level_3) {
                                 dasar_level_3.get_dasar_level_4.forEach(function(dasar) {
@@ -2371,11 +2384,9 @@ foreach ($get_pegawai as $pegawai) {
                         } else if (tipe == 3) {
                             id_parent_cascading = value['kode_cascading_kegiatan'];
                             id_parent_sub_skpd_cascading = value['id_sub_skpd_cascading'] != null ? value['id_sub_skpd_cascading'] : 0;
-                            label_cascading = value['label_cascading_kegiatan'] != null ? value['kode_cascading_kegiatan'] + ' ' + value['label_cascading_kegiatan'] + '</br>( ' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + ' )' : '-';
-                            // if(value['id_pokin_5'] != ''){
-                            //     label_pokin = value['label_pokin_5'];
-                            //     id_pokin = value['id_pokin_5'];
-                            // }
+
+                            let nama_keg = value['label_cascading_kegiatan'].split(" ").slice(1).join(" ");
+                            label_cascading = value['label_cascading_kegiatan'] != null ? value['kode_cascading_kegiatan'] + ' ' + nama_keg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>' : '-';
                             total_pagu = value.total_pagu_4 || 0;
 
                             value.get_data_dasar_4.forEach(function(dasar_4) {
@@ -2410,7 +2421,9 @@ foreach ($get_pegawai as $pegawai) {
                                 `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, ${ (tipe + 1) }, ${ JSON.stringify(id_pokin) }, '${ id_parent_cascading }', ${id_parent_sub_skpd_cascading})" title="Lihat Uraian Teknis Kegiatan"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                         } else if (tipe == 4) {
                             id_pokin = value['id_pokin_5'];
-                            label_cascading = value['label_cascading_sub_kegiatan'] != null ? value['kode_cascading_sub_kegiatan'] + ' ' + value['label_cascading_sub_kegiatan'] + '</br>( ' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + ' )' : '-';
+                            let nama_subkeg = value['label_cascading_sub_kegiatan'].split(" ").slice(1).join(" ");
+
+                            label_cascading = value['label_cascading_sub_kegiatan'] != null ? value['kode_cascading_sub_kegiatan'] + ' ' + nama_subkeg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>' : '-';
                             data_tagging_rincian = '<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" title="Lihat Data Tagging Rincian Belanja"><i class="dashicons dashicons dashicons-arrow-down-alt2"></i></a> ';
 
                             if (value.mandatori_pusat == 1) get_data_dasar_pelaksanaan.push('Mandatori Pusat');
@@ -2435,11 +2448,11 @@ foreach ($get_pegawai as $pegawai) {
                             `<td class="text-center">${index + 1}</td>` +
                             `<td class="label_pokin">${label_pokin}</td>` +
                             `<td class="label_renaksi">${value.label}</td>` +
-                            `<td class="label_renaksi">${label_cascading}</td>` +
+                            `<td class="label_renaksi font-weight-bold">${label_cascading}</td>` +
                             `<td class="label_renaksi">${label_dasar_pelaksanaan}</td>` +
-                            `<td class="pegawai_pelaksana">${nama_pegawai}</td>` +
+                            `<td class="pegawai_pelaksana font-weight-bold">${nama_pegawai}</td>` +
                             `<td class="text-center">` +
-                            `<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, ${tipe},${total_pagu}, '${value.kode_sbl}')" title="Tambah Indikator (Total Pagu: ${total_pagu})"><i class="dashicons dashicons-plus"></i></a> ` +
+                            `<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, ${tipe},${total_pagu}, '${value.kode_sbl}')" title="Tambah Indikator (Total Pagu: ${formatRupiah(total_pagu)})"><i class="dashicons dashicons-plus"></i></a> ` +
                             tombol_detail +
                             `<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, ` + tipe + `)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;` +
                             `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_rencana_aksi(${value.id}, ${tipe})" title="Hapus"><i class="dashicons dashicons-trash"></i></a>` +
@@ -2488,7 +2501,7 @@ foreach ($get_pegawai as $pegawai) {
                                     target_teks_akhir = `</br>(${b.target_teks_akhir})`;
                                 }
                                 let val_rumus_indikator = '(Realisasi Indikator / Target Indikator) * 100 = Capaian';
-                                if(b.rumus_indikator){
+                                if (b.rumus_indikator) {
                                     val_rumus_indikator = b.rumus_indikator;
                                 }
 
@@ -2500,7 +2513,7 @@ foreach ($get_pegawai as $pegawai) {
                                     `<td class="text-center">${b.satuan}</td>` +
                                     `<td class="text-center">${b.target_awal} ${target_teks_awal}</td>` +
                                     `<td class="text-center">${b.target_akhir} ${target_teks_akhir}</td>` +
-                                    `<td class="text-right">${b.rencana_pagu || 0}</td>` +
+                                    `<td class="text-right">${formatRupiah(b.rencana_pagu) || 0}</td>` +
                                     `<td class="text-center">` +
                                     `<input type="checkbox" title="Lihat Rencana Hasil Kerja Per Bulan" class="lihat_bulanan" data-id="${b.id}" onclick="lihat_bulanan(this);" style="margin: 0 6px;">` +
                                     data_tagging_rincian +
