@@ -73,6 +73,7 @@ $nama_skpd = $wpdb->get_row(
 							<th class="text-center">NIP</th>
 							<th class="text-center">Nama Pegawai</th>
 							<th class="text-center">Jabatan</th>
+							<th class="text-center">Jumlah Dokumen Finalisasi</th>
 						</tr>
 					</thead>
 					<tbody>

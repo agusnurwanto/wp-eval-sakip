@@ -5742,35 +5742,117 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$ret['message'] = 'Nama tahapan dan tanggal dokumen wajib diisi!';
 					die(json_encode($ret));
 				}
-				if (empty($_POST['id_skpd']) || empty($_POST['tahun_anggaran'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'SKPD / Tahun Anggaran kosong!';
-					die(json_encode($ret));
-				}
 
 				$data_pk = $_POST['data_pk'];
-				$data_pegawai = $_POST['data_pegawai'];
+
+				$pihak_pertama = $wpdb->get_row(
+					$wpdb->prepare('
+						SELECT 
+							p.*,
+							ds.nama AS nama_bidang
+						FROM esakip_data_pegawai_simpeg p
+						LEFT JOIN esakip_data_satker_simpeg ds
+							   ON ds.satker_id = p.satker_id
+						WHERE p.nip_baru=%d
+						  AND p.active = 1
+					', $_POST['nip_pertama']),
+					ARRAY_A
+				);
+				$jabatan_pertama = (!empty($_POST['status_pertama']) ? $_POST['status_pertama'] . ' ' . $pihak_pertama['jabatan'] : $pihak_pertama['jabatan']);
+
+				$skpd = $wpdb->get_row(
+					$wpdb->prepare("
+						SELECT 
+							u.nama_skpd,
+							d.alamat_kantor
+						FROM esakip_data_unit u
+						LEFT JOIN esakip_detail_data_unit d
+							   ON d.id_skpd = u.id_skpd
+						WHERE u.id_skpd=%d
+						  AND u.tahun_anggaran=%d
+						  AND u.active = 1
+					", $_POST['id_skpd'], $_POST['tahun_anggaran']),
+					ARRAY_A
+				);
+
+				//jika nip kedua kosong berarti atasan langsung bupati
+				$data_atasan = array();
+				if (!empty($_POST['nip_kedua'])) {
+					$pihak_kedua = $wpdb->get_row(
+						$wpdb->prepare('
+							SELECT 
+								p.*,
+								ds.nama AS nama_bidang
+							FROM esakip_data_pegawai_simpeg p
+							LEFT JOIN esakip_data_satker_simpeg ds
+								   ON ds.satker_id = p.satker_id
+							WHERE p.nip_baru=%d
+							  AND p.active = 1
+						', $_POST['nip_kedua']),
+						ARRAY_A
+					);
+
+					$data_atasan = $pihak_kedua;
+
+					$data_atasan['nama_pegawai'] = trim(
+						($pihak_kedua['gelar_depan'] ?? '') . ' ' .
+						($pihak_kedua['nama'] ?? '') . 
+						(!empty($pihak_kedua['gelar_belakang']) ? ', ' . $pihak_kedua['gelar_belakang'] : '')
+					);
+					
+					$data_atasan['jabatan'] = (!empty($_POST['status_kedua']) ? $_POST['status_kedua'] . ' ' . $pihak_kedua['jabatan'] : $pihak_kedua['jabatan']);
+				} else {
+					$nama_kepala_daerah = get_option('_crb_kepala_daerah');
+					$status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah');
+
+					$nama_pemda = get_option(ESAKIP_NAMA_PEMDA);
+					$pemda = explode(" ", $nama_pemda);
+					array_shift($pemda);
+					$pemda = implode(" ", $pemda);
+
+					$data_atasan = [
+						'nama_pegawai'  => $nama_kepala_daerah,
+						'jabatan'       => $status_jabatan_kepala_daerah . ' ' . $pemda,
+						'status_kepala' => 'kepala_daerah'
+					];
+				}
+
+				$nama_pihak_pertama = trim(
+					($pihak_pertama['gelar_depan'] ?? '') . ' ' .
+					($pihak_pertama['nama'] ?? '') . 
+					(!empty($pihak_pertama['gelar_belakang']) ? ', ' . $pihak_pertama['gelar_belakang'] : '')
+				);				
+
 				$sasaran = $_POST['sasaran'];
 				$program = $_POST['program'];
 				$kegiatan = $_POST['kegiatan'];
 				$subkegiatan = $_POST['subkegiatan'];
 
 				$insert_tahap = array(
-					'nip' 					 => $data_pegawai['nip'],
-					'pangkat_pegawai' 		 => $data_pegawai['pangkat'],
 					'id_skpd' 				 => $_POST['id_skpd'],
-					'alamat_kantor' 		 => $data_pegawai['alamat_kantor'],
-					'nama_skpd' 			 => $data_pegawai['nama_skpd'],
-					'satuan_kerja' 			 => $data_pegawai['satuan_kerja'],
+					'alamat_kantor' 		 => $skpd['alamat_kantor'],
+					'nama_skpd' 			 => $skpd['nama_skpd'],
+					'satuan_kerja' 			 => $pihak_pertama['satuan_kerja'],
+
 					'nama_tahapan' 			 => $data_pk['nama_tahapan'],
 					'tanggal_dokumen' 		 => $data_pk['tanggal_dokumen'],
-					'nama_pegawai' 			 => $data_pegawai['nama'],
-					'jabatan_pegawai' 		 => $data_pegawai['jabatan'],
-					'nama_pegawai_atasan' 	 => $data_pegawai['nama_atasan'],
-					'nip_pegawai_atasan' 	 => $data_pegawai['nip_atasan'],
-					'pangkat_pegawai_atasan' => $data_pegawai['pangkat_atasan'],
+
+					'nip' 					 => $pihak_pertama['nip_baru'],
+					'pangkat_pegawai' 		 => '-',
+					'nama_pegawai' 			 => $nama_pihak_pertama,
+					'jabatan_pegawai' 		 => $jabatan_pertama,
+
+					'nama_pegawai_atasan' 	 => $data_atasan['nama_atasan'],
+					'jabatan_pegawai_atasan' => $data_atasan['jabatan'],
+
 					'tahun_anggaran' 		 => $_POST['tahun_anggaran']
 				);
+
+				//jika nip kedua tidak kosong, berarti atasan ASN
+				if (!empty($_POST['nip_kedua'])) {
+					$insert_tahap['nip_pegawai_atasan'] 	= $data_atasan['nip_atasan'];
+					$insert_tahap['pangkat_pegawai_atasan'] = $data_atasan['pangkat_atasan'];
+				}
 
 				$wpdb->insert('esakip_finalisasi_tahap_laporan_pk', $insert_tahap);
 				$id_tahap_pk = $wpdb->insert_id;
@@ -5786,7 +5868,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								'indikator' 	=> $indikator['nama'],
 								'target' 		=> $indikator['target'],
 								'anggaran' 		=> 0,
-								'keterangan'	=> ''
 							);
 							$wpdb->insert('esakip_finalisasi_rhk_laporan_pk', $insert_sasaran);
 						}
@@ -5796,16 +5877,15 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				// Program
 				if (!empty($program)) {
 					foreach ($program as $p) {
-						$program = $p['program'];
-						$parts = explode(' ', $program, 2);
-						$kode = $parts[0];
-						$nama = isset($parts[1]) ? $parts[1] : '';
+						$parts_prog = explode(' ', $p['program'], 2);
+						$kode_prog = $parts_prog[0];
+						$nama_prog = isset($parts_prog[1]) ? $parts_prog[1] : '';
 
 						$insert_program = array(
 							'id_tahap_pk' 	=> $id_tahap_pk,
 							'tipe' 			=> 2, // Program
-							'kode' 			=> $kode,
-							'label' 		=> $nama,
+							'kode' 			=> $kode_prog,
+							'label' 		=> $nama_prog,
 							'anggaran' 		=> $p['anggaran'],
 							'keterangan' 	=> $p['keterangan']
 						);
@@ -5816,16 +5896,15 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				// Kegiatan
 				if (!empty($kegiatan)) {
 					foreach ($kegiatan as $k) {
-						$kegiatan = $p['kegiatan'];
-						$parts = explode(' ', $kegiatan, 2);
-						$kode = $parts[0];
-						$nama = isset($parts[1]) ? $parts[1] : '';
+						$parts_keg = explode(' ', $k['kegiatan'], 2);
+						$kode_keg = $parts_keg[0];
+						$nama_keg = isset($parts_keg[1]) ? $parts_keg[1] : '';
 
 						$insert_kegiatan = array(
 							'id_tahap_pk' 	=> $id_tahap_pk,
 							'tipe' 			=> 3, // Kegiatan
-							'kode' 			=> $kode,
-							'label' 		=> $nama,
+							'kode' 			=> $kode_keg,
+							'label' 		=> $nama_keg,
 							'anggaran' 		=> $k['anggaran'],
 							'keterangan' 	=> $k['keterangan']
 						);
@@ -5836,16 +5915,15 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				// Subkegiatan
 				if (!empty($subkegiatan)) {
 					foreach ($subkegiatan as $sk) {
-						$subkegiatan = $p['subkegiatan'];
-						$parts = explode(' ', $subkegiatan, 2);
-						$kode = $parts[0];
-						$nama = isset($parts[1]) ? $parts[1] : '';
+						$parts_subkeg = explode(' ', $sk['subkegiatan'], 2);
+						$kode_subkeg = $parts_subkeg[0];
+						$nama_subkeg = isset($parts_subkeg[1]) ? $parts_subkeg[1] : '';
 
 						$insert_subkegiatan = array(
 							'id_tahap_pk' => $id_tahap_pk,
 							'tipe' 		  => 4, // Subkegiatan
-							'kode' 		  => $kode,
-							'label' 	  => $nama,
+							'kode' 		  => $kode_subkeg,
+							'label' 	  => $nama_subkeg,
 							'anggaran' 	  => $sk['anggaran'],
 							'keterangan'  => $sk['keterangan']
 						);

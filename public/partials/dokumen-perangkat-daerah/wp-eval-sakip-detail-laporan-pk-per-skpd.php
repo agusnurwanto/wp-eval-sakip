@@ -2,18 +2,48 @@
 if (!defined('WPINC')) {
     die;
 }
-global $wpdb;
-
 $input = shortcode_atts(array(
     'tahun' => '2022',
 ), $atts);
 
-$id_skpd = $nip = '';
-if (!empty($_GET) && !empty($_GET['id_skpd'])) {
-    $id_skpd = $_GET['id_skpd'];
+$id_skpd = $_GET['id_skpd'] ?? '';
+$nip = $_GET['nip'] ?? '';
+
+if (empty($id_skpd) || empty($nip) || empty($input['tahun'])) {
+    die('parameter tidak lengkap!.');
 }
-if (!empty($_GET) && !empty($_GET['nip'])) {
-    $nip = $_GET['nip'];
+global $wpdb;
+
+$skpd = $wpdb->get_row(
+    $wpdb->prepare("
+        SELECT 
+            u.nama_skpd,
+            d.alamat_kantor
+        FROM esakip_data_unit u
+        LEFT JOIN esakip_detail_data_unit d
+               ON d.id_skpd = u.id_skpd
+        WHERE u.id_skpd=%d
+          AND u.tahun_anggaran=%d
+          AND u.active = 1
+    ", $id_skpd, $input['tahun']),
+    ARRAY_A
+);
+
+$data_satker = $wpdb->get_row(
+    $wpdb->prepare("
+        SELECT 
+            p.*,
+            ds.nama AS nama_bidang
+        FROM esakip_data_pegawai_simpeg p
+        LEFT JOIN esakip_data_satker_simpeg ds
+               ON ds.satker_id = p.satker_id
+        WHERE p.nip_baru = %d
+          AND p.active = 1
+    ", $nip),
+    ARRAY_A
+);
+if (empty($data_satker) || empty($skpd)) {
+    die('data satker kosong!.');
 }
 
 function formatTanggalIndonesia($tanggal)
@@ -45,413 +75,362 @@ $nama_pemda = get_option(ESAKIP_NAMA_PEMDA);
 $pemda = explode(" ", $nama_pemda);
 array_shift($pemda);
 $pemda = implode(" ", $pemda);
+$logo_pemda = get_option('_crb_logo_dashboard');
+if (empty($logo_pemda)) {
+    $logo_pemda = '';
+}
+$text_tanggal_hari_ini = formatTanggalIndonesia(current_datetime()->format('Y-m-d'));
 
-$skpd = array();
-$skpd = $wpdb->get_row(
-    $wpdb->prepare("
-        SELECT 
-            u.nama_skpd,
-            d.alamat_kantor
-        FROM esakip_data_unit u
-        LEFT JOIN esakip_detail_data_unit d
-               ON d.id_skpd = u.id_skpd
-        WHERE u.id_skpd=%d
-          AND u.tahun_anggaran=%d
-          AND u.active = 1
-    ", $id_skpd, $input['tahun']),
-    ARRAY_A
+$pihak_pertama = array(
+    'nama_pegawai'         => $data_satker['nama_pegawai'] ?? '-',
+    'nip_pegawai'          => $data_satker['nip_baru'] ?? '-',
+    'bidang_pegawai'       => $data_satker['nama_bidang'] ?? '-',
+    'jabatan_pegawai'      => $data_satker['jabatan'] . ' ' . $data_satker['nama_bidang'] ?? '',
+    'nama_golruang'        => '-',
+    'gelar_depan'          => $data_satker['gelar_depan'] ?? '',
+    'gelar_belakang'       => $data_satker['gelar_belakang'] ?? '',
+    'status_jabatan'       => $data_satker['jabatan'] ?? ''
 );
-$nama_skpd = (!empty($skpd)) ? $skpd['nama_skpd'] : '';
-$alamat_kantor = (!empty($skpd)) ? $skpd['alamat_kantor'] : '';
 
-$error_api = array(
-    'status' => 0,
-    'message' => 'Berhasil Get API'
-);
-if (!empty($nip)) {
-    $data_satker = $wpdb->get_row(
-        $wpdb->prepare("
-            SELECT 
-                p.*,
-                ds.nama AS nama_bidang
-            FROM esakip_data_pegawai_simpeg p
-            LEFT JOIN esakip_data_satker_simpeg ds
-                   ON ds.satker_id = p.satker_id
-            WHERE p.nip_baru=%d
-              AND p.active = 1
-        ", $nip),
-        ARRAY_A
-    );
+$data_atasan = array();
+$date_hari_ini = current_datetime()->format('Y-m-d H:i:s');
 
-    $data_atasan = array();
-    $cek_kepala_skpd = 0;
-    $cek_nama_kepala_daerah = 0;
-    $cek_status_jabatan_kepala_daerah = 0;
-    $cek_status_jabatan_kepala_pihak_pertama = 0;
-    $cek_status_jabatan_kepala_pihak_kedua = 0;
-    $status_jabatan_kepala_daerah = '';
-    $dataPegawai = array();
-    $data_detail = array(
-        'nama_pegawai' => '',
-        'nip_pegawai' => '',
-        'bidang_pegawai' => '',
-        'jabatan_pegawai' => '',
-        'nama_golruang' => '',
-        'gelar_depan' => '',
-        'gelar_belakang' => '',
-        'status_jabatan' => '',
-        'nama_pegawai_lengkap' => ''
-    );
-    $data_detail_atasan = array(
-        'nama_pegawai_atasan' => '',
-        'jabatan_pegawai_atasan' => '',
-        'nip_pegawai_atasan' => '',
-        'nama_golruang_atasan' => '',
-        'gelar_depan' => '',
-        'gelar_belakang' => '',
-        'nama_pegawai_atasan_lengkap' => ''
-    );
-    if (!empty($data_satker)) {
-        $data_detail['nama_pegawai'] = $data_satker['nama_pegawai'];
-        $data_detail['nama_pegawai_lengkap'] = $data_satker['nama_pegawai'];
-        $data_detail['nip_pegawai'] = $data_satker['nip_baru'];
-        $data_detail['bidang_pegawai'] = $data_satker['nama_bidang'];
-        $data_detail['jabatan_pegawai'] = $data_satker['jabatan'] . ' ' . $data_satker['nama_bidang'];
+//CEK NAMA DAN STATUS JABATAN KEPALA DAERAH DI ESAKIP OPTIONS
+$cek_nama_kepala_daerah = 0;
+$cek_status_jabatan_kepala_daerah = 0;
 
-        $cek_kepala = strlen($data_satker['satker_id']);
-        $date_hari_ini = current_datetime()->format('Y-m-d H:i:s');
-        $status_kepala_skpd = 0;
-        if ($data_satker['plt_plh'] == 1 && ($data_satker['tmt_sk_plth'] < $date_hari_ini && $date_hari_ini < $data_satker['berakhir'])) {
-            $status_kepala_skpd = 1;
-            $cek_status_jabatan_kepala_pihak_pertama = 1;
-        }
+//CEK PIHAK PERTAMA ADALAH KEPALA
+$cek_kepala_skpd = 0;
 
-        /** cek pegawai kepala opd atau bukan */
-        if (($cek_kepala == 2 && $data_satker['tipe_pegawai_id'] == 11 && $status_kepala_skpd == 1) || ($cek_kepala == 2 && $data_satker['tipe_pegawai_id'] == 11 && $data_satker['plt_plh'] == 0)) {
-            $cek_kepala_skpd = 1;
-            $nama_kepala_daerah = get_option('_crb_kepala_daerah');
-            $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah');
-            if (!empty($nama_kepala_daerah)) {
-                $cek_nama_kepala_daerah = 1;
-            }
-            $jabatan_kepala = '';
-            if (!empty($status_jabatan_kepala_daerah)) {
-                $cek_status_jabatan_kepala_daerah = 1;
-                $jabatan_kepala = $status_jabatan_kepala_daerah;
-            }
-            $data_atasan = [
-                'nama_pegawai' => $nama_kepala_daerah,
-                'jabatan' => $jabatan_kepala . ' ' . $pemda,
-                'status_kepala' => 'kepala_daerah'
-            ];
-        }
-        if (empty($data_atasan)) {
-            if ($data_satker['tipe_pegawai_id'] == 11 && $data_satker['plt_plh'] == 1) {
-                /**Jika satker id sama dengan kepala || setelah menjadi PJ selesai */
-                $data_atasan = $wpdb->get_row(
-                    $wpdb->prepare("
-                        SELECT
-                            p.*,
-                            ds.nama AS nama_bidang
-                        FROM esakip_data_pegawai_simpeg p
-                        LEFT JOIN esakip_data_satker_simpeg ds
-                            ON ds.satker_id = p.satker_id
-                        WHERE p.satker_id=%s 
-                          AND p.tipe_pegawai_id=%d 
-                          AND p.active=1
-                        ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
-                    ", $data_satker['satker_id'], 11),
-                    ARRAY_A
-                );
-            } else if ($data_satker['tipe_pegawai_id'] == 11) {
-                /**Jika status jabatan kepala, berarti mengambil id satker atasannya */
-                $satker_id_atasan = substr($data_satker['satker_id'], 0, -2);
-                $data_atasan = $wpdb->get_row(
-                    $wpdb->prepare("
-                        SELECT
-                            p.*,
-                            ds.nama AS nama_bidang
-                        FROM esakip_data_pegawai_simpeg p
-                        LEFT JOIN esakip_data_satker_simpeg ds
-                               ON ds.satker_id = p.satker_id
-                        WHERE p.satker_id=%s 
-                          AND p.tipe_pegawai_id=%d 
-                          AND p.active=1
-                        ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
-                    ", $satker_id_atasan, 11),
-                    ARRAY_A
-                );
-            } else {
-                $data_atasan = $wpdb->get_row(
-                    $wpdb->prepare("
-                        SELECT
-                            p.*,
-                            ds.nama AS nama_bidang
-                        FROM esakip_data_pegawai_simpeg p
-                        LEFT JOIN esakip_data_satker_simpeg ds
-                               ON ds.satker_id = p.satker_id
-                        WHERE p.satker_id=%s 
-                          AND p.tipe_pegawai_id=%d 
-                          AND p.active=1
-                        ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
-                    ", $data_satker['satker_id'], 11),
-                    ARRAY_A
-                );
-            }
-        }
-        $data_detail_atasan['nama_pegawai_atasan'] = (!empty($data_atasan['nama_pegawai'])) ? $data_atasan['nama_pegawai'] : '';
-        $data_detail_atasan['nama_pegawai_atasan_lengkap'] = (!empty($data_atasan['nama_pegawai'])) ? $data_atasan['nama_pegawai'] : '';
-        $data_detail_atasan['nip_pegawai_atasan'] = (!empty($data_atasan['nip_baru'])) ? $data_atasan['nip_baru'] : '';
+//CEK PIHAK PERTAMA ADALAH KEPALA SKPD
+$cek_kepala = strlen($data_satker['satker_id']);
 
-        if (!empty($data_atasan['plt_plh'])) {
-            if ($data_atasan['plt_plh'] == 1 && ($data_atasan['tmt_sk_plth'] < $date_hari_ini && $date_hari_ini < $data_atasan['berakhir'])) {
-                $cek_status_jabatan_kepala_pihak_kedua = 1;
-            }
-        }
-        if (!empty($data_atasan['status_kepala']) && !empty($data_atasan['jabatan'])) {
-            $data_detail_atasan['jabatan_pegawai_atasan'] = $data_atasan['jabatan'];
-        } else if (!empty($data_atasan['jabatan'])) {
-            $data_detail_atasan['jabatan_pegawai_atasan'] = $data_atasan['jabatan'] . ' ' . $data_atasan['nama_bidang'];
-        }
 
-        if (empty($data_atasan['status_kepala'])) {
-            $path = 'api/pegawai/' . $data_detail_atasan['nip_pegawai_atasan'] . '/jabatan';
-            $option = array(
-                'url' => get_option('_crb_url_api_simpeg') . $path,
-                'type' => 'get',
-                'header' => array('Authorization: Basic ' . get_option('_crb_authorization_api_simpeg'))
-            );
+//CEK PIHAK PERTAMA ADALAH KEPALA SKPD
+$status_kepala_skpd = 0;
 
-            $response = $this->functions->curl_post($option);
+//CEK PIHAK PERTAMA / KEDUA KEPALA DAN PLT
+$cek_status_jabatan_kepala_pihak_pertama = 0;
+$cek_status_jabatan_kepala_pihak_kedua = 0;
 
-            if (empty($response)) {
-                $error_api = array(
-                    'status' => 1,
-                    'message' => 'Respon API kosong!'
-                );
-            } else if ($response == 'Unauthorized') {
-                $error_api = array(
-                    'status' => 1,
-                    'message' => $response . ' ' . json_encode($opsi)
-                );
-            }
 
-            $dataPegawaiAtasan = json_decode($response, true);
-            if (!empty($dataPegawaiAtasan[0]['nmgolruang'])) {
-                $data_detail_atasan['nama_golruang_atasan'] = $dataPegawaiAtasan[0]['nmgolruang'];
-                $data_detail_atasan['gelar_depan'] = $dataPegawaiAtasan[0]['gelar_depan'];
-                $data_detail_atasan['gelar_belakang'] = $dataPegawaiAtasan[0]['gelar_belakang'];
-                $data_detail_atasan['nama_pegawai_atasan_lengkap'] = $data_detail_atasan['gelar_depan'] . ' ' . $data_detail_atasan['nama_pegawai_atasan'] . ', ' . $data_detail_atasan['gelar_belakang'];
-            }
-        }
+//PIHAK PERTAMA PLT, PIHAK PERTAMA MASIH AKTIF PLT
+if (
+    $data_satker['plt_plh'] == 1
+    && (
+        $data_satker['tmt_sk_plth'] < $date_hari_ini
+        && $date_hari_ini < $data_satker['berakhir']
+    )
+) {
+    $status_kepala_skpd = 1;
+    $cek_status_jabatan_kepala_pihak_pertama = 1;
+}
 
-        // hasil ploting di halaman RHK
-        $data_ploting_rhk = $wpdb->get_results(
+//PIHAK PERTAMA KEPALA SKPD, ATASAN ADALAH KEPALA DAERAH
+if (
+    (
+        $cek_kepala == 2
+        && $data_satker['tipe_pegawai_id'] == 11
+        && $status_kepala_skpd == 1
+    )
+    || (
+        $cek_kepala == 2
+        && $data_satker['tipe_pegawai_id'] == 11
+        && $data_satker['plt_plh'] == 0
+    )
+) {
+    $cek_kepala_skpd = 1;
+
+    $nama_kepala_daerah = get_option('_crb_kepala_daerah');
+    $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah');
+
+    if (!empty($nama_kepala_daerah)) {
+        $cek_nama_kepala_daerah = 1;
+    }
+
+    $jabatan_kepala = '';
+    if (!empty($status_jabatan_kepala_daerah)) {
+        $cek_status_jabatan_kepala_daerah = 1;
+        $jabatan_kepala = $status_jabatan_kepala_daerah;
+    }
+
+    $data_atasan = [
+        'nama_pegawai'  => $nama_kepala_daerah,
+        'jabatan'       => $jabatan_kepala . ' ' . $pemda,
+        'status_kepala' => 'kepala_daerah'
+    ];
+}
+
+//JIKA PIHAK KEDUA BUKAN KEPALA DAERAH
+if (empty($data_atasan)) {
+    if (
+        $data_satker['tipe_pegawai_id'] == 11
+        && $data_satker['plt_plh'] == 1
+    ) {
+        // jika dia kepala dan dia plt
+        /**Jika satker id sama dengan kepala || setelah menjadi PJ selesai */
+        $data_atasan = $wpdb->get_row(
             $wpdb->prepare("
-                SELECT 
-                    id,
-                    label,
-                    level
-                FROM esakip_data_rencana_aksi_opd
-                WHERE id_skpd=%d 
-                  AND tahun_anggaran=%d 
-                  AND nip=%d 
-                  AND active=1
-            ", $id_skpd, $input['tahun'], $data_satker['nip_baru']),
+                SELECT
+                    p.*,
+                    ds.nama AS nama_bidang
+                FROM esakip_data_pegawai_simpeg p
+                LEFT JOIN esakip_data_satker_simpeg ds
+                       ON ds.satker_id = p.satker_id
+                WHERE p.satker_id=%s 
+                  AND p.tipe_pegawai_id=%d 
+                  AND p.active=1
+                ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
+            ", $data_satker['satker_id'], 11),
             ARRAY_A
         );
-        $data_anggaran = array(
-            'sasaran'       => array(),
-            'program'       => array(),
-            'kegiatan'      => array(),
-            'sub_kegiatan'  => array()
+    } else if ($data_satker['tipe_pegawai_id'] == 11) {
+        // jika kepala aja bukan plt
+        /**Jika status jabatan kepala, berarti mengambil id satker atasannya */
+        $satker_id_atasan = substr($data_satker['satker_id'], 0, -2);
+        $data_atasan = $wpdb->get_row(
+            $wpdb->prepare("
+                SELECT
+                    p.*,
+                    ds.nama AS nama_bidang
+                FROM esakip_data_pegawai_simpeg p
+                LEFT JOIN esakip_data_satker_simpeg ds
+                       ON ds.satker_id = p.satker_id
+                WHERE p.satker_id=%s 
+                  AND p.tipe_pegawai_id=%d 
+                  AND p.active=1
+                ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
+            ", $satker_id_atasan, 11),
+            ARRAY_A
         );
-        $html_sasaran = '';
-        $no_2 = 1;
-        if (!empty($data_ploting_rhk)) {
-            foreach ($data_ploting_rhk as $v_rhk) {
-                $data_indikator_ploting_rhk = $wpdb->get_results(
-                    $wpdb->prepare("
-                        SELECT
-                            indikator,
-                            satuan,
-                            target_awal,
-                            target_akhir
-                        FROM esakip_data_rencana_aksi_indikator_opd
-                        WHERE id_renaksi=%d 
-                          AND active=1
-                    ", $v_rhk['id']),
-                    ARRAY_A
-                );
-                $html_indikator = '';
-                $p_i = 1;
-                if (!empty($data_indikator_ploting_rhk)) {
-                    if (count($data_indikator_ploting_rhk) > 0) {
-                        $p_i = count($data_indikator_ploting_rhk) + 1;
-                    }
-                    foreach ($data_indikator_ploting_rhk as $v_indikator) {
-                        $html_indikator .= '<tr>
-                            <td class="text-left">' . $v_indikator['indikator'] . '</td>
-                            <td class="text-left" style="width: 5rem;">' . $v_indikator['target_akhir'] . ' ' . $v_indikator['satuan'] . '</td></tr>';
-                    }
+    } else {
+        // jika pegawai biasa
+        $data_atasan = $wpdb->get_row(
+            $wpdb->prepare("
+                SELECT
+                    p.*,
+                    ds.nama AS nama_bidang
+                FROM esakip_data_pegawai_simpeg p
+                LEFT JOIN esakip_data_satker_simpeg ds
+                       ON ds.satker_id = p.satker_id
+                WHERE p.satker_id=%s 
+                  AND p.tipe_pegawai_id=%d 
+                  AND p.active=1
+                ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
+            ", $data_satker['satker_id'], 11),
+            ARRAY_A
+        );
+    }
+}
+
+// PIHAK KEDUA BUKAN KEPALA DAERAH DAN DIA PLT
+if (!empty($data_atasan['plt_plh'])) {
+    if (
+        $data_atasan['plt_plh'] == 1
+        && (
+            $data_atasan['tmt_sk_plth'] < $date_hari_ini
+            && $date_hari_ini < $data_atasan['berakhir']
+        )
+    ) {
+        $cek_status_jabatan_kepala_pihak_kedua = 1;
+    }
+}
+
+$pihak_kedua = array(
+    'nama_pegawai'    => $data_atasan['nama_pegawai'] ?? '-',
+    'nip_pegawai'     => $data_atasan['nip_baru'] ?? '-',
+    'bidang_pegawai'  => $data_atasan['nama_bidang'] ?? '-',
+    'nama_golruang'   => '-',
+    'jabatan_pegawai' => '-',
+    'gelar_depan'     => $data_atasan['gelar_depan'] ?? '',
+    'gelar_belakang'  => $data_atasan['gelar_belakang'] ?? '',
+    'status_jabatan'  => $data_atasan['jabatan'] ?? ''
+);
+
+if (
+    !empty($data_atasan['status_kepala'])
+    && !empty($data_atasan['jabatan'])
+) {
+    //JIKA PIHAK KEDUA KEPALA DAERAH, TAMPILKAN JABATANNYA
+    $pihak_kedua['jabatan_pegawai'] = $data_atasan['jabatan'];
+} else if (!empty($data_atasan['jabatan'])) {
+    //JIKA PIHAK KEDUA BUKAN KEPALA DAERAH, TAMPILKAN BIDANGNYA
+    $pihak_kedua['jabatan_pegawai'] = $data_atasan['jabatan'] . ' ' . $data_atasan['nama_bidang'];
+}
+
+
+// hasil ploting di halaman RHK
+$data_ploting_rhk = $wpdb->get_results(
+    $wpdb->prepare("
+        SELECT 
+            id,
+            label,
+            level
+        FROM esakip_data_rencana_aksi_opd
+        WHERE id_skpd = %d 
+          AND tahun_anggaran = %d 
+          AND nip = %d 
+          AND active = 1
+    ", $id_skpd, $input['tahun'], $data_satker['nip_baru']),
+    ARRAY_A
+);
+$data_anggaran = array(
+    'sasaran'       => array(),
+    'program'       => array(),
+    'kegiatan'      => array(),
+    'sub_kegiatan'  => array()
+);
+$html_sasaran = '';
+$no_2 = 1;
+if (!empty($data_ploting_rhk)) {
+    foreach ($data_ploting_rhk as $v_rhk) {
+        $data_indikator_ploting_rhk = $wpdb->get_results(
+            $wpdb->prepare("
+                SELECT
+                    indikator,
+                    satuan,
+                    target_awal,
+                    target_akhir
+                FROM esakip_data_rencana_aksi_indikator_opd
+                WHERE id_renaksi = %d 
+                  AND active = 1
+            ", $v_rhk['id']),
+            ARRAY_A
+        );
+
+        $html_indikator = '';
+        $p_i = count($data_indikator_ploting_rhk);
+
+        if (!empty($data_indikator_ploting_rhk)) {
+            foreach ($data_indikator_ploting_rhk as $index => $v_indikator) {
+                $html_indikator .= '<tr>';
+
+                if ($index === 0) {
+                    $rowspan = $p_i > 1 ? 'rowspan="' . $p_i . '"' : '';
+                    $html_indikator .= '<td ' . $rowspan . ' class="text-center">' . $no_2++ . '</td>';
+                    $html_indikator .= '<td ' . $rowspan . ' class="text-left">' . $v_rhk['label'] . '</td>';
                 }
-                $html_indikator_if = !empty($html_indikator) ? '' : "<td></td><td></td>";
-                $html_sasaran .= '<tr>
-                    <td rowspan="' . $p_i . '" class="text-center" style="width: 3rem;">' . $no_2++ . '</td>
-                    <td rowspan="' . $p_i . '" class="text-left" style="width: 20rem;">' . $v_rhk['label'] . '</td>
-                    ' . $html_indikator_if . '
-                    </tr>';
 
-                $html_sasaran .= $html_indikator;
+                $html_indikator .= '<td class="text-left">' . $v_indikator['indikator'] . '</td>';
+                $html_indikator .= '<td class="text-left">' . $v_indikator['target_akhir'] . ' ' . $v_indikator['satuan'] . '</td>';
+                $html_indikator .= '</tr>';
+            }
+        } else {
+            $html_indikator .= '<tr>
+                <td class="text-center">' . $no_2++ . '</td>
+                <td class="text-left">' . $v_rhk['label'] . '</td>
+                <td></td>
+                <td></td>
+            </tr>';
+        }
 
-                $data_rhk_child = $wpdb->get_results(
-                    $wpdb->prepare("
-                        SELECT *
-                        FROM esakip_data_rencana_aksi_opd 
-                        WHERE parent=%d 
-                          AND level=%d 
-                          AND id_skpd=%d
-                          AND active=1
-                        ORDER BY id
-                    ", $v_rhk['id'], $v_rhk['level'] + 1, $id_skpd),
-                    ARRAY_A
-                );
+        $html_sasaran .= $html_indikator;
 
-                $jenis_level = array(
-                    '1' => 'sasaran',
-                    '2' => 'program',
-                    '3' => 'kegiatan',
-                    '4' => 'sub_kegiatan'
-                );
-                $no = 1;
-                if (!empty($data_rhk_child)) {
-                    foreach ($data_rhk_child as $v_rhk_child) {
-                        if (!empty($v_rhk_child['label_cascading_' . $jenis_level[$v_rhk_child['level']]])) {
-                            if (empty($data_anggaran[$jenis_level[$v_rhk_child['level']]][$v_rhk_child['kode_cascading_sub_kegiatan']])) {
-                                $nama_label = preg_replace('/^[A-Za-z0-9.]+ /', '', $v_rhk_child['label_cascading_' . $jenis_level[$v_rhk_child['level']]]);
+        $data_rhk_child = $wpdb->get_results(
+            $wpdb->prepare("
+                SELECT *
+                FROM esakip_data_rencana_aksi_opd 
+                WHERE parent = %d 
+                  AND level = %d 
+                  AND id_skpd = %d
+                  AND active = 1
+                ORDER BY id
+            ", $v_rhk['id'], $v_rhk['level'] + 1, $id_skpd),
+            ARRAY_A
+        );
 
-                                $data_anggaran[$jenis_level[$v_rhk_child['level']]][$v_rhk_child['kode_cascading_sub_kegiatan']] = array(
-                                    'nama' => $nama_label,
-                                    'kode' => $v_rhk_child['kode_cascading_' . $jenis_level[$v_rhk_child['level']]],
-                                    'sumber_dana' => '',
-                                    'total_anggaran' => 0,
-                                );
-                            }
+        $jenis_level = array(
+            '1' => 'sasaran',
+            '2' => 'program',
+            '3' => 'kegiatan',
+            '4' => 'sub_kegiatan'
+        );
+        $no = 1;
+        if (!empty($data_rhk_child)) {
+            foreach ($data_rhk_child as $v_rhk_child) {
+                if (!empty($v_rhk_child['label_cascading_' . $jenis_level[$v_rhk_child['level']]])) {
+                    if (empty($data_anggaran[$jenis_level[$v_rhk_child['level']]][$v_rhk_child['kode_cascading_sub_kegiatan']])) {
 
-                            $data_indikator_anggaran = $wpdb->get_results(
+                        $data_anggaran[$jenis_level[$v_rhk_child['level']]][$v_rhk_child['kode_cascading_sub_kegiatan']] = array(
+                            'nama'           => $v_rhk_child['label_cascading_' . $jenis_level[$v_rhk_child['level']]],
+                            'kode'           => $v_rhk_child['kode_cascading_' . $jenis_level[$v_rhk_child['level']]],
+                            'sumber_dana'    => '',
+                            'total_anggaran' => 0
+                        );
+                    }
+
+                    $data_indikator_anggaran = $wpdb->get_results(
+                        $wpdb->prepare("
+                            SELECT
+                                id,
+                                rencana_pagu
+                            FROM esakip_data_rencana_aksi_indikator_opd 
+                            WHERE id_renaksi=%d 
+                              AND active = 1
+                        ", $v_rhk_child['id']),
+                        ARRAY_A
+                    );
+                    if (!empty($data_indikator_anggaran)) {
+                        foreach ($data_indikator_anggaran as $v_indikator_anggaran) {
+                            $data_sumber_dana = $wpdb->get_results(
                                 $wpdb->prepare("
-                                    SELECT
-                                        id,
-                                        rencana_pagu
-                                    FROM esakip_data_rencana_aksi_indikator_opd 
-                                    WHERE id_renaksi=%d 
+                                    SELECT nama_dana
+                                    FROM esakip_sumber_dana_indikator 
+                                    WHERE id_indikator = %d 
                                       AND active = 1
-                                ", $v_rhk_child['id']),
+                                ", $v_indikator_anggaran['id']),
                                 ARRAY_A
                             );
-                            if (!empty($data_indikator_anggaran)) {
-                                foreach ($data_indikator_anggaran as $v_indikator_anggaran) {
-                                    $data_sumber_dana = $wpdb->get_results(
-                                        $wpdb->prepare("
-                                            SELECT nama_dana
-                                            FROM esakip_sumber_dana_indikator 
-                                            WHERE id_indikator = %d 
-                                              AND active = 1
-                                        ", $v_indikator_anggaran['id']),
-                                        ARRAY_A
-                                    );
-                                    $data_anggaran[$jenis_level[$v_rhk_child['level']]][$v_rhk_child['kode_cascading_sub_kegiatan']]['total_anggaran'] += $v_indikator_anggaran['rencana_pagu'];
-                                    $data_anggaran[$jenis_level[$v_rhk_child['level']]][$v_rhk_child['kode_cascading_sub_kegiatan']]['sumber_dana'] = !empty($data_sumber_dana)
-                                        ? implode(', ', array_column($data_sumber_dana, 'nama_dana'))
-                                        : '-';
-                                }
-                            }
+                            $data_anggaran[$jenis_level[$v_rhk_child['level']]][$v_rhk_child['kode_cascading_sub_kegiatan']]['total_anggaran'] += $v_indikator_anggaran['rencana_pagu'];
+                            $data_anggaran[$jenis_level[$v_rhk_child['level']]][$v_rhk_child['kode_cascading_sub_kegiatan']]['sumber_dana'] = !empty($data_sumber_dana)
+                                ? implode(', ', array_column($data_sumber_dana, 'nama_dana'))
+                                : '-';
                         }
                     }
                 }
-
-                $html_program = '';
-                if (!empty($data_anggaran['program'])) {
-                    $no = 1;
-                    foreach ($data_anggaran['program'] as $v_program) {
-                        $html_program .= '<tr>
-                            <td class="text-center">' . $no++ . '</td>
-                            <td class="text-left">' . $v_program['kode'] . ' ' . $v_program['nama'] . '</td>
-                            <td class="text-right">' . number_format($v_program['total_anggaran'], 0, ",", ".") . '</td>
-                            <td class="text-left">' . $v_program['sumber_dana'] . '</td>
-                        </tr>';
-                    }
-                }
-
-                $html_kegiatan = '';
-                if (!empty($data_anggaran['kegiatan'])) {
-                    $no = 1;
-                    foreach ($data_anggaran['kegiatan'] as $v_kegiatan) {
-                        $html_kegiatan .= '<tr>
-                            <td class="text-center">' . $no++ . '</td>
-                            <td class="text-left">' . $v_kegiatan['kode'] . ' ' . $v_kegiatan['nama'] . '</td>
-                            <td class="text-right">' . number_format($v_kegiatan['total_anggaran'], 0, ",", ".") . '</td>
-                            <td class="text-left">' . $v_kegiatan['sumber_dana'] . '</td>
-                        </tr>';
-                    }
-                }
-
-                $html_sub_kegiatan = '';
-                if (!empty($data_anggaran['sub_kegiatan'])) {
-                    $no = 1;
-                    foreach ($data_anggaran['sub_kegiatan'] as $v_sub_kegiatan) {
-                        $html_sub_kegiatan .= '<tr>
-                            <td class="text-center">' . $no++ . '</td>
-                            <td class="text-left">' . $v_sub_kegiatan['kode'] . ' ' . $v_sub_kegiatan['nama'] . '</td>
-                            <td class="text-right">' . number_format($v_sub_kegiatan['total_anggaran'], 0, ",", ".") . '</td>
-                            <td class="text-left">' . $v_sub_kegiatan['sumber_dana'] . '</td>
-                        </tr>';
-                    }
-                }
             }
         }
-    } else {
-        echo "Data Pegawai Tidak Ditemukan!";
-        die();
+
+        $html_program = '';
+        if (!empty($data_anggaran['program'])) {
+            $no = 1;
+            foreach ($data_anggaran['program'] as $v_program) {
+                $html_program .= '<tr>
+                    <td class="text-center">' . $no++ . '</td>
+                    <td class="text-left">' . $v_program['kode'] . ' ' . $v_program['nama'] . '</td>
+                    <td class="text-right">' . number_format($v_program['total_anggaran'], 0, ",", ".") . '</td>
+                    <td class="text-left">' . $v_program['sumber_dana'] . '</td>
+                </tr>';
+            }
+        }
+
+        $html_kegiatan = '';
+        if (!empty($data_anggaran['kegiatan'])) {
+            $no = 1;
+            foreach ($data_anggaran['kegiatan'] as $v_kegiatan) {
+                $html_kegiatan .= '<tr>
+                    <td class="text-center">' . $no++ . '</td>
+                    <td class="text-left">' . $v_kegiatan['kode'] . ' ' . $v_kegiatan['nama'] . '</td>
+                    <td class="text-right">' . number_format($v_kegiatan['total_anggaran'], 0, ",", ".") . '</td>
+                    <td class="text-left">' . $v_kegiatan['sumber_dana'] . '</td>
+                </tr>';
+            }
+        }
+
+        $html_sub_kegiatan = '';
+        if (!empty($data_anggaran['sub_kegiatan'])) {
+            $no = 1;
+            foreach ($data_anggaran['sub_kegiatan'] as $v_sub_kegiatan) {
+                $parts = explode(" ", $v_sub_kegiatan['nama'], 2);
+                $html_sub_kegiatan .= '<tr>
+                    <td class="text-center">' . $no++ . '</td>
+                    <td class="text-left">' . $v_sub_kegiatan['kode'] . ' ' . $parts[1] . '</td>
+                    <td class="text-right">' . number_format($v_sub_kegiatan['total_anggaran'], 0, ",", ".") . '</td>
+                    <td class="text-left">' . $v_sub_kegiatan['sumber_dana'] . '</td>
+                </tr>';
+            }
+        }
     }
-
-    $path = 'api/pegawai/' . $nip . '/jabatan';
-    $option = array(
-        'url'    => get_option('_crb_url_api_simpeg') . $path,
-        'type'   => 'get',
-        'header' => array('Authorization: Basic ' . get_option('_crb_authorization_api_simpeg'))
-    );
-
-    $response = $this->functions->curl_post($option);
-
-    if (empty($response)) {
-        $error_api = array(
-            'status'  => 1,
-            'message' => 'Respon API kosong!'
-        );
-    } else if ($response == 'Unauthorized') {
-        $error_api = array(
-            'status'  => 1,
-            'message' => $response . ' ' . json_encode($opsi)
-        );
-    }
-
-    $dataPegawai = json_decode($response, true);
-    if (!empty($dataPegawai[0]['nmgolruang'])) {
-        $data_detail['nama_golruang'] = $dataPegawai[0]['nmgolruang'];
-        $data_detail['gelar_depan'] = $dataPegawai[0]['gelar_depan'];
-        $data_detail['gelar_belakang'] = $dataPegawai[0]['gelar_belakang'];
-        $data_detail['nama_pegawai_lengkap'] = $data_detail['gelar_depan'] . ' ' . $data_detail['nama_pegawai'] . ', ' . $data_detail['gelar_belakang'];
-    }
-
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        $error_api = array(
-            'status'  => 1,
-            'message' => "Terjadi kesalahan ketika mengakses API, Error : " . json_last_error_msg()
-        );
-    }
-
-    $text_tanggal_hari_ini = formatTanggalIndonesia(current_datetime()->format('Y-m-d'));
 }
 
 $data_tahapan = $wpdb->get_results(
@@ -461,23 +440,23 @@ $data_tahapan = $wpdb->get_results(
             nama_tahapan,
             tanggal_dokumen
         FROM esakip_finalisasi_tahap_laporan_pk
-        WHERE id_skpd=%d 
-          AND nip=%d
-          AND tahun_anggaran=%d
-          AND active=1
-    ", $id_skpd, $data_detail['nip_pegawai'], $input['tahun']),
+        WHERE id_skpd = %d 
+          AND nip = %d
+          AND tahun_anggaran = %d
+          AND active = 1
+        ORDER BY tanggal_dokumen, updated_at DESC
+    ", $id_skpd, $pihak_pertama['nip_pegawai'], $input['tahun']),
     ARRAY_A
 );
 $card = '';
 if ($data_tahapan) {
     foreach ($data_tahapan as $v) {
         $tanggal_dokumen = formatTanggalIndonesia($v['tanggal_dokumen']);
-        $nama_tahapan = $v['nama_tahapan'];
 
         $card .= '
-        <div class="cr-item" id="card-tahap-' . htmlspecialchars($v['id']) . '" title="' . htmlspecialchars($nama_tahapan) . '">
+        <div class="cr-item" id="card-tahap-' . htmlspecialchars($v['id']) . '" title="' . htmlspecialchars($v['nama_tahapan']) . '">
             <div class="cr-card">
-                <h3 class="truncate-multiline" id="nama-tahapan-' . htmlspecialchars($v['id']) . '">' . htmlspecialchars($nama_tahapan) . '</h3>
+                <h3 class="truncate-multiline" id="nama-tahapan-' . htmlspecialchars($v['id']) . '">' . htmlspecialchars($v['nama_tahapan']) . '</h3>
                 <div class="year" id="tanggal-tahapan-' . htmlspecialchars($v['id']) . '">' . htmlspecialchars($tanggal_dokumen) . '</div>
                 <div class="cr-actions">
                     <div class="cr-view-btn" onclick="viewDokumen(\'' . htmlspecialchars($v['id']) . '\', this)">
@@ -496,13 +475,6 @@ if ($data_tahapan) {
         </div>';
     }
 }
-
-
-$logo_pemda = get_option('_crb_logo_dashboard');
-if (empty($logo_pemda)) {
-    $logo_pemda = '';
-}
-
 ?>
 
 <head>
@@ -864,8 +836,8 @@ if (empty($logo_pemda)) {
                 </div>
                 <div class="col my-auto">
                     <p class="title-pk-1">PEMERINTAH <?php echo strtoupper($nama_pemda); ?></p>
-                    <p class="title-pk-2 nama-skpd-view"><?php echo strtoupper($nama_skpd); ?></p>
-                    <p class="title-pk-1 alamat-kantor-view" id="alamat_kantor"><?php echo $alamat_kantor ?></p>
+                    <p class="title-pk-2 nama-skpd-view"><?php echo strtoupper($skpd['nama_skpd']); ?></p>
+                    <p class="title-pk-1 alamat-kantor-view" id="alamat_kantor"><?php echo $skpd['alamat_kantor'] ?></p>
                 </div>
                 <div class="col-1"></div>
             </div>
@@ -875,12 +847,12 @@ if (empty($logo_pemda)) {
                 <tr>
                     <td>Nama</td>
                     <td>:</td>
-                    <td class="nama-pegawai-view"><?php echo $data_detail['gelar_depan'] . ' ' . $data_detail['nama_pegawai'] . ', ' . $data_detail['gelar_belakang']; ?></td>
+                    <td class="nama-pegawai-view"><?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . ', ' . $pihak_pertama['gelar_belakang']; ?></td>
                 </tr>
                 <tr>
                     <td>Jabatan</td>
                     <td>:</td>
-                    <td class="status-jabatan-pegawai-1 jabatan-pegawai-view"><?php echo $data_detail['jabatan_pegawai']; ?></td>
+                    <td class="status-jabatan-pegawai-1 jabatan-pegawai-view"><?php echo $pihak_pertama['jabatan_pegawai']; ?></td>
                 </tr>
                 <tr>
                     <td colspan="3">Selanjutnya disebut pihak pertama</td>
@@ -888,12 +860,12 @@ if (empty($logo_pemda)) {
                 <tr>
                     <td>Nama</td>
                     <td>:</td>
-                    <td class="nama-pegawai-atasan-view"><?php echo $data_detail_atasan['gelar_depan'] . ' ' . $data_detail_atasan['nama_pegawai_atasan'] . ', ' . $data_detail_atasan['gelar_belakang']; ?></td>
+                    <td class="nama-pegawai-atasan-view"><?php echo $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] . ', ' . $pihak_kedua['gelar_belakang']; ?></td>
                 </tr>
                 <tr>
                     <td>Jabatan</td>
                     <td>:</td>
-                    <td class="status-jabatan-pegawai-2 jabatan-pegawai-atasan-view"><?php echo $data_detail_atasan['jabatan_pegawai_atasan']; ?></td>
+                    <td class="status-jabatan-pegawai-2 jabatan-pegawai-atasan-view" id="jabatan_pegawai_atasan"><?php echo $pihak_kedua['jabatan_pegawai']; ?></td>
                 </tr>
                 <tr>
                     <td colspan="3">Selaku atasan langsung pihak pertama, selanjutnya disebut pihak kedua</td>
@@ -923,30 +895,30 @@ if (empty($logo_pemda)) {
                     </tr>
                     <tr class="text-center">
                         <td class="ttd-pejabat nama-pegawai-atasan-view" id="nama_pegawai_atasan">
-                            <?php echo $data_detail_atasan['gelar_depan'] . ' ' . $data_detail_atasan['nama_pegawai_atasan'] . ', ' . $data_detail_atasan['gelar_belakang']; ?>
+                            <?php echo $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] . ', ' . $pihak_kedua['gelar_belakang']; ?>
                         </td>
                         <td class="ttd-pejabat nama-pegawai-view">
-                            <?php echo $data_detail['gelar_depan'] . ' ' . $data_detail['nama_pegawai'] . ', ' . $data_detail['gelar_belakang']; ?>
+                            <?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . ', ' . $pihak_pertama['gelar_belakang']; ?>
                         </td>
                     </tr>
                     <tr class="text-center">
                         <td style="padding: 0;" id="pangkat_pegawai_atasan" class="pangkat-pegawai-atasan-view">
                             <?php if (empty($data_atasan['status_kepala'])) : ?>
-                                <?php echo $data_detail_atasan['nama_golruang_atasan']; ?>
+                                <?php echo $pihak_kedua['nama_golruang']; ?>
                             <?php endif; ?>
                         </td>
                         <td style="padding: 0;" class="pangkat-pegawai-view">
-                            <?php echo $data_detail['nama_golruang']; ?>
+                            <?php echo $pihak_pertama['nama_golruang']; ?>
                         </td>
                     </tr>
                     <tr class="text-center">
                         <td style="padding: 0;" id="nip_pegawai_atasan">
                             <?php if (empty($data_atasan['status_kepala'])) : ?>
-                                NIP. <span class="nip-pegawai-atasan-view"><?php echo $data_detail_atasan['nip_pegawai_atasan']; ?></span>
+                                NIP. <span class="nip-pegawai-atasan-view"><?php echo $pihak_kedua['nip_pegawai']; ?></span>
                             <?php endif; ?>
                         </td>
                         <td style="padding: 0;">
-                            NIP. <span class="nip-pegawai-view"><?php echo $data_detail['nip_pegawai']; ?></span>
+                            NIP. <span class="nip-pegawai-view"><?php echo $pihak_pertama['nip_pegawai']; ?></span>
                         </td>
                     </tr>
                 </tbody>
@@ -955,13 +927,13 @@ if (empty($logo_pemda)) {
         <div class="break-print"></div>
         <div class="page-print mt-5 text-center">
             <p class="title-laporan mt-3">PERJANJIAN KINERJA TAHUN <?php echo $input['tahun']; ?></p>
-            <p class="title-laporan mb-5 nama-satker-view"><?php echo $data_detail['bidang_pegawai']; ?></p>
+            <p class="title-laporan mb-5 nama-satker-view"><?php echo $pihak_pertama['bidang_pegawai']; ?></p>
             <?php if (!empty($html_sasaran)) : ?>
                 <table class="table_data_anggaran" id="table-sasaran-view">
                     <thead>
                         <tr>
-                            <th class="esakip-text_tengah" style="width: 60px;">No</th>
-                            <th class="esakip-text_tengah" style="width: 400px;">Sasaran</th>
+                            <th class="esakip-text_tengah" style="width: 45px;">No</th>
+                            <th class="esakip-text_tengah" style="width: 470px;">Sasaran</th>
                             <th class="esakip-text_tengah" style="width: 180px;">Indikator</th>
                             <th class="esakip-text_tengah">Target</th>
                         </tr>
@@ -976,9 +948,9 @@ if (empty($logo_pemda)) {
                 <table class="table_data_anggaran" id="table-program-view">
                     <thead>
                         <tr>
-                            <th class="esakip-text_tengah" style="width: 70px;">No</th>
-                            <th class="esakip-text_tengah" style="width: 466px;">Program</th>
-                            <th class="esakip-text_tengah" style="width: 130px;">Anggaran</th>
+                            <th class="esakip-text_tengah" style="width: 45px;">No</th>
+                            <th class="esakip-text_tengah" style="width: 470px;">Program</th>
+                            <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
                             <th class="esakip-text_tengah">Ket</th>
                         </tr>
                     </thead>
@@ -992,9 +964,9 @@ if (empty($logo_pemda)) {
                 <table class="table_data_anggaran" id="table-kegiatan-view">
                     <thead>
                         <tr>
-                            <th class="esakip-text_tengah" style="width: 70px;">No</th>
-                            <th class="esakip-text_tengah" style="width: 466px;">Kegiatan</th>
-                            <th class="esakip-text_tengah" style="width: 130px;">Anggaran</th>
+                            <th class="esakip-text_tengah" style="width: 45px;">No</th>
+                            <th class="esakip-text_tengah" style="width: 470px;">Kegiatan</th>
+                            <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
                             <th class="esakip-text_tengah">Ket</th>
                         </tr>
                     </thead>
@@ -1008,9 +980,9 @@ if (empty($logo_pemda)) {
                 <table class="table_data_anggaran" id="table-subkegiatan-view">
                     <thead>
                         <tr>
-                            <th class="esakip-text_tengah" style="width: 70px;">No</th>
-                            <th class="esakip-text_tengah" style="width: 466px;">Sub Kegiatan</th>
-                            <th class="esakip-text_tengah" style="width: 130px;">Anggaran</th>
+                            <th class="esakip-text_tengah" style="width: 45px;">No</th>
+                            <th class="esakip-text_tengah" style="width: 470px;">Sub Kegiatan</th>
+                            <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
                             <th class="esakip-text_tengah">Ket</th>
                         </tr>
                     </thead>
@@ -1029,8 +1001,8 @@ if (empty($logo_pemda)) {
                         </td>
                     </tr>
                     <tr class="text-center">
-                        <td id="status-jabatan-ttd-1" class="jabatan-pegawai-atasan-view"><?php echo $data_detail_atasan['jabatan_pegawai_atasan']; ?></td>
-                        <td id="status-jabatan-ttd-2" class="jabatan-pegawai-view"><?php echo $data_detail['jabatan_pegawai']; ?>,</td>
+                        <td class="jabatan-pegawai-atasan-view status-jabatan-pegawai-2"><?php echo $pihak_kedua['jabatan_pegawai']; ?></td>
+                        <td class="jabatan-pegawai-view status-jabatan-pegawai-1"><?php echo $pihak_pertama['jabatan_pegawai']; ?>,</td>
                     </tr>
                 </thead>
                 <tbody>
@@ -1041,30 +1013,30 @@ if (empty($logo_pemda)) {
                     </tr>
                     <tr class="text-center">
                         <td class="ttd-pejabat nama-pegawai-atasan_view">
-                            <?php echo $data_detail_atasan['gelar_depan'] . ' ' . $data_detail_atasan['nama_pegawai_atasan'] . ', ' . $data_detail_atasan['gelar_belakang']; ?>
+                            <?php echo $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] . ', ' . $pihak_kedua['gelar_belakang']; ?>
                         </td>
                         <td class="ttd-pejabat nama-pegawai-view">
-                            <?php echo $data_detail['gelar_depan'] . ' ' . $data_detail['nama_pegawai'] . ', ' . $data_detail['gelar_belakang']; ?>
+                            <?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . ', ' . $pihak_pertama['gelar_belakang']; ?>
                         </td>
                     </tr>
                     <tr class="text-center">
                         <td style="padding: 0;" class="pangkat-pegawai-atasan-view">
                             <?php if (empty($data_atasan['status_kepala'])) : ?>
-                                <?php echo $data_detail_atasan['nama_golruang_atasan']; ?>
+                                <?php echo $pihak_kedua['nama_golruang']; ?>
                             <?php endif; ?>
                         </td>
                         <td style="padding: 0;" class="pangkat-pegawai-view">
-                            <?php echo $data_detail['nama_golruang']; ?>
+                            <?php echo $pihak_pertama['nama_golruang']; ?>
                         </td>
                     </tr>
                     <tr class="text-center">
                         <td style="padding: 0;">
                             <?php if (empty($data_atasan['status_kepala'])) : ?>
-                                NIP. <span class="nip-pegawai-atasan-view"><?php echo $data_detail_atasan['nip_pegawai_atasan']; ?></span>
+                                NIP. <span class="nip-pegawai-atasan-view"><?php echo $pihak_kedua['nip_pegawai']; ?></span>
                             <?php endif; ?>
                         </td>
                         <td style="padding: 0;">
-                            NIP. <span class="nip-pegawai-view"><?php echo $data_detail['nip_pegawai']; ?></span>
+                            NIP. <span class="nip-pegawai-view"><?php echo $pihak_pertama['nip_pegawai']; ?></span>
                         </td>
                     </tr>
                 </tbody>
@@ -1098,7 +1070,7 @@ if (empty($logo_pemda)) {
                                     <td class="text-left">
                                         <strong>:</strong>
                                     </td>
-                                    <td class="text-left" id="nama_pegawai"><?php echo $data_detail['gelar_depan'] . ' ' . $data_detail['nama_pegawai'] . ', ' . $data_detail['gelar_belakang']; ?>
+                                    <td class="text-left" id="nama_pegawai"><?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . ', ' . $pihak_pertama['gelar_belakang']; ?>
                                     </td>
                                 </tr>
                                 <tr>
@@ -1108,7 +1080,7 @@ if (empty($logo_pemda)) {
                                     <td class="text-left">
                                         <strong>:</strong>
                                     </td>
-                                    <td class="text-left" id="nip_pegawai"><?php echo $data_detail['nip_pegawai']; ?>
+                                    <td class="text-left" id="nip_pegawai"><?php echo $pihak_pertama['nip_pegawai']; ?>
                                     </td>
                                 </tr>
                                 <tr>
@@ -1118,7 +1090,7 @@ if (empty($logo_pemda)) {
                                     <td class="text-left">
                                         <strong>:</strong>
                                     </td>
-                                    <td class="text-left" id="pangkat_pegawai"><?php echo $data_detail['nama_golruang'] ?: '-'; ?>
+                                    <td class="text-left" id="pangkat_pegawai"><?php echo $pihak_pertama['nama_golruang'] ?: '-'; ?>
                                     </td>
                                 </tr>
                                 <tr>
@@ -1128,7 +1100,7 @@ if (empty($logo_pemda)) {
                                     <td class="text-left">
                                         <strong>:</strong>
                                     </td>
-                                    <td class="text-left" id="jabatan_pegawai"><?php echo $data_detail['jabatan_pegawai']; ?>
+                                    <td class="text-left" id="jabatan_pegawai"><?php echo $pihak_pertama['jabatan_pegawai']; ?>
                                     </td>
                                 </tr>
                                 <tr>
@@ -1138,7 +1110,7 @@ if (empty($logo_pemda)) {
                                     <td class="text-left">
                                         <strong>:</strong>
                                     </td>
-                                    <td class="text-left" id="bidang_pegawai"><?php echo strtoupper($data_detail['bidang_pegawai']); ?>
+                                    <td class="text-left" id="bidang_pegawai"><?php echo strtoupper($pihak_pertama['bidang_pegawai']); ?>
                                     </td>
                                 </tr>
                                 <tr>
@@ -1148,7 +1120,7 @@ if (empty($logo_pemda)) {
                                     <td class="text-left">
                                         <strong>:</strong>
                                     </td>
-                                    <td class="text-left" id="nama_skpd"><?php echo strtoupper($nama_skpd); ?>
+                                    <td class="text-left" id="nama_skpd"><?php echo strtoupper($skpd['nama_skpd']); ?>
                                     </td>
                                 </tr>
                             </tbody>
@@ -1167,7 +1139,7 @@ if (empty($logo_pemda)) {
                                 <thead class="bg-dark text-light">
                                     <tr>
                                         <th class="esakip-text_tengah" style="width: 46px;">No</th>
-                                        <th class="esakip-text_tengah" style="width: 500px;">Sasaran</th>
+                                        <th class="esakip-text_tengah" style="width: 470px;">Sasaran</th>
                                         <th class="esakip-text_tengah" style="width: 180px;">Indikator</th>
                                         <th class="esakip-text_tengah">Target</th>
                                     </tr>
@@ -1182,8 +1154,8 @@ if (empty($logo_pemda)) {
                             <table class="table_data_anggaran" id="table_program">
                                 <thead class="bg-dark text-light">
                                     <tr>
-                                        <th class="esakip-text_tengah" style="width: 60px;">No</th>
-                                        <th class="esakip-text_tengah" style="width: 500px;">Program</th>
+                                        <th class="esakip-text_tengah" style="width: 45px;">No</th>
+                                        <th class="esakip-text_tengah" style="width: 470px;">Program</th>
                                         <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
                                         <th class="esakip-text_tengah">Ket</th>
                                     </tr>
@@ -1198,8 +1170,8 @@ if (empty($logo_pemda)) {
                             <table class="table_data_anggaran" id="table_kegiatan">
                                 <thead class="bg-dark text-light">
                                     <tr>
-                                        <th class="esakip-text_tengah" style="width: 60px;">No</th>
-                                        <th class="esakip-text_tengah" style="width: 500px;">Kegiatan</th>
+                                        <th class="esakip-text_tengah" style="width: 45px;">No</th>
+                                        <th class="esakip-text_tengah" style="width: 470px;">Kegiatan</th>
                                         <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
                                         <th class="esakip-text_tengah">Ket</th>
                                     </tr>
@@ -1214,8 +1186,8 @@ if (empty($logo_pemda)) {
                             <table class="table_data_anggaran" id="table_subkegiatan">
                                 <thead class="bg-dark text-light">
                                     <tr>
-                                        <th class="esakip-text_tengah" style="width: 60px;">No</th>
-                                        <th class="esakip-text_tengah" style="width: 500px;">Sub Kegiatan</th>
+                                        <th class="esakip-text_tengah" style="width: 45px;">No</th>
+                                        <th class="esakip-text_tengah" style="width: 470px;">Sub Kegiatan</th>
                                         <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
                                         <th class="esakip-text_tengah">Ket</th>
                                     </tr>
@@ -1236,11 +1208,11 @@ if (empty($logo_pemda)) {
                         <div class="form-row">
                             <div class="form-group col-md-6">
                                 <label for="nama_dokumen">Nama Tahapan</label>
-                                <input type="text" class="form-control" id="nama_dokumen" name="nama_dokumen" placeholder="ex : Perjanjian Kinerja tahun <?php echo $input['tahun']; ?>" maxlength="48">
+                                <input type="text" class="form-control" id="nama_dokumen" name="nama_dokumen" placeholder="ex : Perjanjian Kinerja tahun <?php echo $input['tahun']; ?>" maxlength="48" required>
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="tanggal_dokumen">Tanggal Dokumen</label>
-                                <input type="date" class="form-control" id="tanggal_dokumen" name="tanggal_dokumen" value="<?php echo date('Y-m-d'); ?>">
+                                <input type="date" class="form-control" id="tanggal_dokumen" name="tanggal_dokumen" value="<?php echo date('Y-m-d'); ?>" required>
                             </div>
                         </div>
                         <small class="form-text text-muted">Pastikan data yang tertera benar, laporan yang sudah difinalisasi akan disimpan dan tidak dapat di edit kembali.</small>
@@ -1296,42 +1268,48 @@ if (empty($logo_pemda)) {
 <script>
     jQuery(document).ready(function() {
         let cek_kepala_skpd = <?php echo $cek_kepala_skpd; ?>;
+
+        //CEK NAMA DAN STATUS JABATAN KEPALA DAERAH DI ESAKIP OPTIONS
         let cek_nama_kepala_daerah = <?php echo $cek_nama_kepala_daerah; ?>;
         let cek_status_jabatan_kepala_daerah = <?php echo $cek_status_jabatan_kepala_daerah; ?>;
-        if (cek_kepala_skpd == 1 && (cek_nama_kepala_daerah == 0)) {
-            alert("Harap Isi Nama Kepala Daerah Di Esakip Options!");
-        }
-        if (cek_kepala_skpd == 1 && (cek_status_jabatan_kepala_daerah == 0)) {
-            alert("Harap Isi Status Jabatan Kepala Daerah Di Esakip Options!");
-        }
-        let status_error_api = <?php echo $error_api['status']; ?>;
-        if (status_error_api == 1) {
-            console.log("<?php echo $error_api['message']; ?>");
-        }
+
+        //CEK STATUS JABATAN PLT PIHAK PERTAMA / KEDUA 
         let cek_status_jabatan_kepala_pihak_pertama = <?php echo $cek_status_jabatan_kepala_pihak_pertama; ?>;
-        let nama_pejabat = "<?php echo $data_detail['nama_pegawai_lengkap']; ?>";
+        let cek_status_jabatan_kepala_pihak_kedua = <?php echo $cek_status_jabatan_kepala_pihak_kedua; ?>;
+
+        //NAMA PIHAK PERTAMA / KEDUA
+        let nama_pihak_pertama = "<?php echo $pihak_pertama['nama_pegawai']; ?>";
+        let nama_pihak_kedua = "<?php echo $pihak_kedua['nama_pegawai']; ?>";
+
+        //PIHAK PERTAMA KEPALA, PIHAK KEDUA KEPALA DAERAH, HARUS DIISI NAMA KEPALA DAERAHNYA
+        if (cek_kepala_skpd == 1 && (cek_nama_kepala_daerah == 0)) {
+            alert("Harap Isi Nama Kepala Daerah Di E-SAKIP Options!");
+        }
+
+        //PIHAK PERTAMA KEPALA, PIHAK KEDUA KEPALA DAERAH, HARUS DIISI JABATAN KEPALA DAERAHNYA
+        if (cek_kepala_skpd == 1 && (cek_status_jabatan_kepala_daerah == 0)) {
+            alert("Harap Isi Status Jabatan Kepala Daerah Di E-SAKIP Options!");
+        }
+
+        //Pihak Pertama Status (PJ/PLT/PLH)
         let input_status_jabatan_pertama = "";
         if (cek_status_jabatan_kepala_pihak_pertama == 1) {
-            input_status_jabatan_pertama = window.prompt("Harap isi status jabatan (PJ, PLT, PLH) atas nama " + nama_pejabat + " sebagai pihak pertama!");
+            input_status_jabatan_pertama = window.prompt("Harap isi status jabatan (PJ, PLT, PLH) atas nama " + nama_pihak_pertama + " sebagai pihak pertama!");
         }
 
         if (input_status_jabatan_pertama !== null && input_status_jabatan_pertama.trim() !== "") {
             jQuery(".status-jabatan-pegawai-1").prepend(input_status_jabatan_pertama + " ");
-            jQuery("#status-jabatan-ttd-1").prepend(input_status_jabatan_pertama + " ");
             window.status_jabatan_1 = input_status_jabatan_pertama;
         }
 
-        let cek_status_jabatan_kepala_pihak_kedua = <?php echo $cek_status_jabatan_kepala_pihak_kedua; ?>;
-        console.log(cek_status_jabatan_kepala_pihak_kedua);
-        let nama_pejabat_kedua = "<?php echo $data_detail_atasan['nama_pegawai_atasan_lengkap']; ?>";
+        //Pihak Kedua Status (PJ/PLT/PLH)
         let input_status_jabatan_kedua = "";
         if (cek_status_jabatan_kepala_pihak_kedua == 1) {
-            input_status_jabatan_kedua = window.prompt("Harap isi status jabatan (PJ, PLT, PLH) atas nama " + nama_pejabat_kedua + " sebagai pihak kedua!");
+            input_status_jabatan_kedua = window.prompt("Harap isi status jabatan (PJ, PLT, PLH) atas nama " + nama_pihak_kedua + " sebagai pihak kedua!");
         }
 
         if (input_status_jabatan_kedua !== null && input_status_jabatan_kedua.trim() !== "") {
             jQuery(".status-jabatan-pegawai-2").prepend(input_status_jabatan_kedua + " ");
-            jQuery("#status-jabatan-ttd-2").prepend(input_status_jabatan_kedua + " ");
             window.status_jabatan_2 = input_status_jabatan_kedua;
         }
     });
@@ -1478,6 +1456,11 @@ if (empty($logo_pemda)) {
                 if (response.status === 'success') {
                     alert(response.message);
                     jQuery(`#card-tahap-${idTahap}`).hide()
+
+                    //jika dokumen sedang dibuka, reload!
+                    if (idTahap == jQuery(`#id_data`).val()) {
+                        location.reload()
+                    }
                 } else {
                     alert('Terjadi kesalahan: ' + response.message);
                 }
@@ -1496,84 +1479,10 @@ if (empty($logo_pemda)) {
             return;
         }
 
-        let pegawaiData = {
-            nama: jQuery('#nama_pegawai').text(),
-            nip: jQuery('#nip_pegawai').text(),
-            pangkat: jQuery('#pangkat_pegawai').text(),
-            jabatan: jQuery('#jabatan_pegawai').text(),
-            nama_skpd: jQuery('#nama_skpd').text(),
-            alamat_kantor: jQuery('#alamat_kantor').text(),
-            satuan_kerja: jQuery('#bidang_pegawai').text(),
-            nama_atasan: jQuery('#nama_pegawai_atasan').text().trim(),
-            pangkat_atasan: jQuery('#pangkat_pegawai_atasan').text().trim(),
-            nip_atasan: jQuery('#nip_pegawai_atasan').text().trim().replace(/^NIP\.?\s?/, "")
-        };
-
         let dokumenPk = {
             nama_tahapan: jQuery('#nama_dokumen').val(),
             tanggal_dokumen: jQuery('#tanggal_dokumen').val()
         };
-
-        let sasarans = [];
-        let currentSasaran = null;
-
-        jQuery('#table_sasaran tbody tr').each(function() {
-            let sasaranCell = jQuery(this).find('td:nth-child(2)'); // Kolom Sasaran
-            let indikatorCell = jQuery(this).find('td:nth-child(3)').text().trim(); // Kolom Indikator
-            let targetCell = jQuery(this).find('td:nth-child(4)').text().trim(); // Kolom Target
-
-            if (sasaranCell.length && sasaranCell.attr('rowspan')) {
-                if (currentSasaran) {
-                    sasarans.push(currentSasaran);
-                }
-
-                currentSasaran = {
-                    sasaran: sasaranCell.text().trim(),
-                    indikator: []
-                };
-            }
-
-            if (currentSasaran) {
-                currentSasaran.indikator.push({
-                    nama: indikatorCell || "Tidak ada indikator",
-                    target: targetCell || "Tidak ada target"
-                });
-            }
-        });
-
-        if (currentSasaran) {
-            sasarans.push(currentSasaran);
-        }
-
-        let programs = [];
-        jQuery('#table_program tbody tr').each(function() {
-            let row = {
-                program: jQuery(this).find('td:nth-child(2)').text().trim(),
-                anggaran: jQuery(this).find('td:nth-child(3)').text().trim().replace(/\./g, ''),
-                keterangan: jQuery(this).find('td:nth-child(4)').text().trim(),
-            };
-            programs.push(row);
-        });
-
-        let kegiatans = [];
-        jQuery('#table_kegiatan tbody tr').each(function() {
-            let row = {
-                kegiatan: jQuery(this).find('td:nth-child(2)').text().trim(),
-                anggaran: jQuery(this).find('td:nth-child(3)').text().trim().replace(/\./g, ''),
-                keterangan: jQuery(this).find('td:nth-child(4)').text().trim(),
-            };
-            kegiatans.push(row);
-        });
-
-        let subkegiatans = [];
-        jQuery('#table_subkegiatan tbody tr').each(function() {
-            let row = {
-                subkegiatan: jQuery(this).find('td:nth-child(2)').text().trim(),
-                anggaran: jQuery(this).find('td:nth-child(3)').text().trim().replace(/\./g, ''),
-                keterangan: jQuery(this).find('td:nth-child(4)').text().trim(),
-            };
-            subkegiatans.push(row);
-        });
 
         jQuery('#wrap-loading').show()
         jQuery.ajax({
@@ -1582,14 +1491,13 @@ if (empty($logo_pemda)) {
             data: {
                 action: "simpan_finalisasi_laporan_pk",
                 api_key: esakip.api_key,
-                sasaran: sasarans,
-                program: programs,
-                kegiatan: kegiatans,
-                subkegiatan: subkegiatans,
-                data_pegawai: pegawaiData,
                 data_pk: dokumenPk,
-                tahun_anggaran: '<?php echo $input['tahun']; ?>',
-                id_skpd: '<?php echo $id_skpd; ?>'
+                nip_pertama: '<?php echo $nip; ?>',
+                nip_kedua: '<?php echo $pihak_kedua['nip_pegawai']; ?>',
+                status_pertama: status_jabatan_1,
+                status_kedua: status_jabatan_2,
+                id_skpd: '<?php echo $id_skpd; ?>',
+                tahun_anggaran: '<?php echo $input['tahun']; ?>'
             },
             dataType: 'json',
             success: function(response) {
@@ -1597,6 +1505,7 @@ if (empty($logo_pemda)) {
                 if (response.status === 'success') {
                     alert(response.message);
                     location.reload()
+                    jQuery('#modalFinalisasi').modal('hide')
                 } else {
                     alert('Terjadi kesalahan: ' + response.message);
                 }
