@@ -167,8 +167,19 @@ $cek_id_jadwal = empty($input['id_periode']) ? 0 : 1;
                     </div>
                     <div class="form-group">
                         <label for="formulasi">Definisi Operasional/Formulasi</label>
-                        <textarea name="" id="formulasi"></textarea>
+                        <?php 
+                            $content = ''; 
+                            $editor_id = 'formulasi';
+                            $settings = array(
+                                'textarea_name' => 'formulasi',
+                                'media_buttons' => true, 
+                                'teeny' => false, 
+                                'quicktags' => true
+                            );
+                            wp_editor($content, $editor_id, $settings);
+                        ?>
                     </div>
+
                     <div class="form-group">
                         <label for="sumber-data">Sumber Data</label>
                         <textarea name="" id="sumber-data"></textarea>
@@ -199,6 +210,7 @@ jQuery(document).ready(function() {
 
     getTableIKUPemda().then(function(){
         run_download_excel_sakip();
+        run_download_word_sakip(jQuery('#cetak').html(), jQuery('#cetak').attr('title'));
         jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-iku-pemda" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
 
         jQuery("#tambah-iku-pemda").on('click', function(){
@@ -288,7 +300,7 @@ function simpanDataIkuPemda(){
     let label_tujuan_sasaran = jQuery('#tujuan-sasaran option:selected').text();
     let id_indikator = jQuery('#indikator').val();
     let label_indikator = jQuery('#indikator option:selected').text();
-    let formulasi = jQuery('#formulasi').val();
+    let formulasi = tinymce.get('formulasi') ? tinymce.get('formulasi').getContent() : jQuery('#formulasi').val();
     let sumber_data = jQuery('#sumber-data').val();
     let penanggung_jawab = jQuery('#penanggung-jawab').val();
     if(id_sasaran == '' || id_indikator == '' || formulasi == '' || sumber_data == '' || penanggung_jawab == ''){
@@ -343,8 +355,8 @@ function edit_iku(id) {
                 if (response.status === 'success') {
                     let data = response.data;
                     jQuery('#id_iku').val(id);
-                    jQuery("#tujuan-sasaran").val(data.id_sasaran).trigger('change');
-                    jQuery("#formulasi").val(data.formulasi);
+                    jQuery("#tujuan-sasaran").val(data.id_sasaran).trigger('change');                    
+                    tinymce.get('formulasi').setContent(data.formulasi);
                     jQuery("#sumber-data").val(data.sumber_data);
                     jQuery("#penanggung-jawab").val(data.penanggung_jawab);
                     jQuery("#modal-iku").find('.modal-title').html('Edit IKU');

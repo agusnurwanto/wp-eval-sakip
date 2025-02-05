@@ -3102,12 +3102,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 					if (!empty($_POST['id_iku'])) {
 						$cek_id = $_POST['id_iku'];
-						$data_cek_iku = $wpdb->get_results($wpdb->prepare("
+						$data_cek_iku = $wpdb->get_var($wpdb->prepare("
 							SELECT
 								id
 							FROM esakip_data_iku_pemda
 							WHERE id=%d
-						", $cek_id), ARRAY_A);
+						", $cek_id));
 
 						$cek_id = !empty($data_cek_iku) ? $cek_id : null;
 					}
@@ -3119,6 +3119,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					} else {
 						$wpdb->update('esakip_data_iku_pemda', $data, array('id' => $cek_id));
 					}
+					$ret['data'] = $data;
+					$ret['sql'] = $wpdb->last_query;
 				}
 			} else {
 				$ret = array(
