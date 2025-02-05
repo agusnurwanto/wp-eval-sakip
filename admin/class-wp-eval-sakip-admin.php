@@ -2695,101 +2695,147 @@ class Wp_Eval_Sakip_Admin
 	}
 
 	
-	// function generate_user_esakip_pegawai_simpeg()
-	// {
-	// 	global $wpdb;
-	// 	$ret = array();
-	// 	$ret['status'] = 'success';
-	// 	$ret['message'] = 'Berhasil Generate User Wordpress dari DB Lokal SIMPEG';
-	// 	if (!empty($_POST)) {
-	// 		if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
-	// 			$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+	function generate_user_esakip_pegawai_simpeg()
+	{
+		global $wpdb;
+		$ret = array();
+		$ret['status'] = 'success';
+		$ret['message'] = 'Berhasil Generate User Wordpress dari DB Lokal SIMPEG';
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+				$pass = !empty($_POST['pass']) ? $_POST['pass'] : '';
+				$update_pass = !empty($_POST['update_pass']) ? $_POST['update_pass'] : '';
+				$mulai = !empty($_POST['mulai']) ? $_POST['mulai'] : 0;
+				$limit = !empty($_POST['limit']) ? $_POST['limit'] : 0;
 
-	// 			$unit = $wpdb->get_results(
-	// 				$wpdb->prepare(
-	// 					"SELECT 
-	// 						*
-	// 					FROM 
-	// 						esakip_data_unit 
-	// 					WHERE 
-	// 						active=1 
-	// 				  	AND is_skpd=1 
-	// 				  	AND tahun_anggaran=%d
-	// 					ORDER BY kode_skpd ASC
-	// 				", $tahun_anggaran_sakip),
-	// 				ARRAY_A
-	// 			);
+				$data_pegawai = $wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT
+							*
+						FROM
+							esakip_data_pegawai_simpeg
+						WHERE 
+							active = %d
+							LIMIT %d , %d
+						", 1 , $mulai , $limit
+						), ARRAY_A);
 
-	// 			if(!empty($unit)){
-	// 				foreach ($unit as $ku => $v_unit) {
-	// 					// Untuk mendapatkan mapping antara data id unit dan data simpeg
-	// 					$mapping_unit_simpeg = $wpdb->get_row(
-	// 						$wpdb->prepare(
-	// 							"SELECT 
-    //                                 a.*,
-    //                                 b.satker_id
-    //                             FROM 
-    //                                 esakip_data_mapping_unit_sipd_simpeg a 
-    //                             LEFT JOIN esakip_data_satker_simpeg b 
-    //                                 ON b.satker_id=a.id_satker_simpeg AND 
-    //                                 b.tahun_anggaran=a.tahun_anggaran AND b.active=1
-    //                             WHERE 
-    //                                 a.tahun_anggaran=%d and
-    //                                 a.id_skpd=%d
-	// 							", $tahun_anggaran_sakip, $v_unit['id_skpd']
-	// 							), ARRAY_A);
+				$status_update_pass = false;
+				if (
+					!empty($update_pass)
+					&& $update_pass == 'true'
+				) {
+					$status_update_pass = true;
+				}
 
-	// 					if(!empty($mapping_unit_simpeg)){
-	// 						$data_pegawai = $wpdb->get_results(
-	// 							$wpdb->prepare(
-	// 								"SELECT
-	// 									*
-	// 								FROM
-	// 									esakip_data_pegawai_simpeg
-	// 								WHERE 
-	// 									satker_id LIKE %s AND
-	// 									active = %d
-	// 								", $mapping_unit_simpeg['satker_id'].'%', 1
-	// 								), ARRAY_A);
+				if(!empty($data_pegawai)){
+					foreach ($data_pegawai as $kp => $v_pegawai) {
+						$satker_mapping = substr($v_pegawai['satker_id'], 0, 2);
 
-	// 						$update_pass = false;
-	// 						if (
-	// 							!empty($_POST['update_pass'])
-	// 							&& $_POST['update_pass'] == 'true'
-	// 						) {
-	// 							$update_pass = true;
-	// 						}
+						$id_skpd = $wpdb->get_var(
+							$wpdb->prepare(
+								"SELECT
+									id_skpd
+								FROM
+									esakip_data_mapping_unit_sipd_simpeg
+								WHERE
+									id_satker_simpeg = %d
+									AND active = %d
+									AND tahun_anggaran = %d
+								", $satker_mapping, 1 , $tahun_anggaran_sakip
+							));
 
-	// 						if(!empty($data_pegawai)){
-	// 							foreach ($data_pegawai as $kp => $v_pegawai) {
-	// 								$v_pegawai['pass'] = $_POST['pass'];
-	// 								$v_pegawai['loginname'] = $v_pegawai['nip_baru'];
-	// 								$v_pegawai['jabatan'] = 'pegawai';
-	// 								$v_pegawai['nama'] = $v_pegawai['nama_pegawai'];
-	// 								$v_pegawai['nip'] = $v_pegawai['nip_baru'];
-	// 								$v_pegawai['id_sub_skpd'] = $v_unit['id_skpd'];
-	// 								$this->gen_user_esakip($v_pegawai, $update_pass);
-	// 							}
-	// 						}else{
-	// 							$ret['status'] = 'error';
-	// 							$ret['message'] = 'Data Pegawai Kosong. Pastikan Sudah Sinkron Data Pegawai Simpeg!';	
-	// 						}
-	// 					}else{
-	// 						$ret['status'] = 'error';
-	// 						$ret['message'] = 'Pastikan Sudah Sinkron Data Unit Organisasi Simpeg!';
-	// 					}
-	// 				}
-	// 			}
-	// 		} else {
-	// 			$ret['status'] = 'error';
-	// 			$ret['message'] = 'APIKEY tidak sesuai!';
-	// 		}
-	// 	} else {
-	// 		$ret['status'] = 'error';
-	// 		$ret['message'] = 'Format Salah!';
-	// 	}
-	// 	die(json_encode($ret));
-	// }
+						$id_skpd = !empty($id_skpd) ? $id_skpd : 0;
+
+						$v_pegawai['pass'] = $pass;
+						$v_pegawai['loginname'] = $v_pegawai['nip_baru'];
+						$v_pegawai['jabatan'] = 'pegawai';
+						$v_pegawai['nama'] = $v_pegawai['nama_pegawai'];
+						$v_pegawai['nip'] = $v_pegawai['nip_baru'];
+						$v_pegawai['id_sub_skpd'] = $id_skpd;
+						$this->gen_user_esakip($v_pegawai, $status_update_pass);
+					}
+				}else{
+					$ret['status'] = 'error';
+					$ret['message'] = 'Data Pegawai Kosong. Pastikan Sudah Sinkron Data Pegawai Simpeg!';	
+				}
+			} else {
+				$ret['status'] = 'error';
+				$ret['message'] = 'APIKEY tidak sesuai!';
+			}
+		} else {
+			$ret['status'] = 'error';
+			$ret['message'] = 'Format Salah!';
+		}
+		die(json_encode($ret));
+	}
+
+	function get_data_total_pegawai_simpeg()
+	{
+		global $wpdb;
+			$ret = array();
+			$ret['status'] = 'success';
+			$ret['message'] = 'Berhasil Get Data Unit Mapping SIMPEG!';
+			$ret['total_pegawai_simpeg'] = 0;
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
+					$unit = $wpdb->get_results(
+						$wpdb->prepare(
+							"SELECT 
+								*
+							FROM 
+								esakip_data_unit 
+							WHERE 
+								active=1 
+							AND is_skpd=1 
+							AND tahun_anggaran=%d
+							ORDER BY kode_skpd ASC
+						", $tahun_anggaran_sakip),
+						ARRAY_A
+					);
+
+					if(!empty($unit)){
+						foreach ($unit as $ku => $v_unit) {
+							// Untuk mendapatkan data total pegawai yang skpdnya sudah termapping
+							$get_mapping = $wpdb->get_var($wpdb->prepare('
+								SELECT 
+									u.id_satker_simpeg
+								FROM esakip_data_mapping_unit_sipd_simpeg AS u
+								WHERE u.tahun_anggaran = %d
+									AND u.id_skpd = %d
+									AND u.active = 1
+							', $tahun_anggaran_sakip, $v_unit['id_skpd']));
+
+							if(!empty($get_mapping)){
+								$total_pegawai = $wpdb->get_var($wpdb->prepare(
+									'SELECT 
+										COUNT(*)
+									FROM 
+										esakip_data_pegawai_simpeg
+									WHERE 
+										satker_id LIKE %s
+										AND active = %d
+								', $get_mapping . '%', 1));
+
+								if(!empty($total_pegawai)){
+									$ret['total_pegawai_simpeg'] += $total_pegawai;
+								}
+							}
+						}
+					}
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'APIKEY tidak sesuai!';
+				}
+			} else {
+				$ret['status'] = 'error';
+				$ret['message'] = 'Format Salah!';
+			}
+			die(json_encode($ret));
+	}
 
 	function get_data_unit_wpsipd()
 	{

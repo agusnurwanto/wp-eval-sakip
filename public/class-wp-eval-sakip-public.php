@@ -27424,6 +27424,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$condition = '(';
 						$i = 1;
 						foreach ($lists as $key => $value) {
+							$value = $wpdb->prepare("%d", $value);
 							if ($i < $length) {
 								$condition .= $value . ',';
 							} else {
@@ -27462,6 +27463,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							break;
 					}
 
+					$ret_sql = $wpdb->last_query;
+					$ret_body = array();
 					foreach ($data_lokal as $key => $data) {
 						$response = wp_remote_post(get_option('_crb_url_api_esr') . 'insert_data', [
 							'headers' => array(
@@ -27477,10 +27480,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'keterangan' => $data['keterangan']
 							]),
 						]);
-
+						$ret_body[] = $response;
+						if ( is_wp_error( $response ) ) {
+							$error_message = $response->get_error_message();
+							throw new Exception("Something went wrong: $error_message", 1);
+						}
 						$body = json_decode(wp_remote_retrieve_body($response));
 						if (isset($body->error)) {
-							throw new Exception("Gagal kirim data dokumen: " . $data['dokumen'] . ", Coba lagi!", 1);
+							if(is_array($response)){
+								$response = json_encode($response);
+							}
+							throw new Exception("Gagal kirim data dokumen: " . $data['dokumen'] . ", Coba lagi! ".$response, 1);
 						}
 
 						if (!empty($body->data)) {
@@ -27509,7 +27519,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 					echo json_encode([
 						'status' => true,
-						'message' => 'Sukses kirim data!'
+						'message' => 'Sukses kirim data!',
+						'sql' => $ret_sql,
+						'data' => $data_lokal,
+						'response' => $ret_body
 					]);
 					exit;
 				} else {
