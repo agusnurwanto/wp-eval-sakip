@@ -46,31 +46,6 @@ if (empty($data_satker) || empty($skpd)) {
     die('data satker kosong!.');
 }
 
-function formatTanggalIndonesia($tanggal)
-{
-    // Array untuk nama bulan dalam bahasa Indonesia
-    $bulan = array(
-        1 => 'Januari',
-        2 => 'Februari',
-        3 => 'Maret',
-        4 => 'April',
-        5 => 'Mei',
-        6 => 'Juni',
-        7 => 'Juli',
-        8 => 'Agustus',
-        9 => 'September',
-        10 => 'Oktober',
-        11 => 'November',
-        12 => 'Desember'
-    );
-
-    $day = date('d', strtotime($tanggal));
-    $month = $bulan[date('n', strtotime($tanggal))];
-    $year = date('Y', strtotime($tanggal));
-
-    return "$day $month $year";
-}
-
 $nama_pemda = get_option(ESAKIP_NAMA_PEMDA);
 $pemda = explode(" ", $nama_pemda);
 array_shift($pemda);
@@ -79,16 +54,23 @@ $logo_pemda = get_option('_crb_logo_dashboard');
 if (empty($logo_pemda)) {
     $logo_pemda = '';
 }
-$text_tanggal_hari_ini = formatTanggalIndonesia(current_datetime()->format('Y-m-d'));
+$text_tanggal_hari_ini = $this->format_tanggal_indo(current_datetime()->format('Y-m-d'));
+$error_message = array();
+
+//get data simpeg pihak pertama
+$simpeg_pihak_pertama = $this->get_detail_pegawai_simpeg($data_satker['nip_baru']);
+if ($simpeg_pihak_pertama['status'] == 'error') {
+    array_push($error_message, $simpeg_pihak_pertama['message']);
+}
 
 $pihak_pertama = array(
     'nama_pegawai'         => $data_satker['nama_pegawai'] ?? '-',
     'nip_pegawai'          => $data_satker['nip_baru'] ?? '-',
     'bidang_pegawai'       => $data_satker['nama_bidang'] ?? '-',
     'jabatan_pegawai'      => $data_satker['jabatan'] . ' ' . $data_satker['nama_bidang'] ?? '',
-    'nama_golruang'        => '-',
-    'gelar_depan'          => $data_satker['gelar_depan'] ?? '',
-    'gelar_belakang'       => $data_satker['gelar_belakang'] ?? '',
+    'nama_golruang'        => $simpeg_pihak_pertama['data'][0]['nmgolruang'] ?? '-', //dari simpeg
+    'gelar_depan'          => $simpeg_pihak_pertama['data'][0]['gelar_depan'] ?? '', //dari simpeg
+    'gelar_belakang'       => $simpeg_pihak_pertama['data'][0]['gelar_belakang'] ?? '', //dari simpeg
     'status_jabatan'       => $data_satker['jabatan'] ?? ''
 );
 
@@ -239,11 +221,10 @@ if (!empty($data_atasan['plt_plh'])) {
 $pihak_kedua = array(
     'nama_pegawai'    => $data_atasan['nama_pegawai'] ?? '-',
     'nip_pegawai'     => $data_atasan['nip_baru'] ?? '-',
-    'bidang_pegawai'  => $data_atasan['nama_bidang'] ?? '-',
-    'nama_golruang'   => '-',
-    'jabatan_pegawai' => '-',
-    'gelar_depan'     => $data_atasan['gelar_depan'] ?? '',
-    'gelar_belakang'  => $data_atasan['gelar_belakang'] ?? '',
+    'jabatan_pegawai' => '-', //jika bukan kepala daerah
+    'nama_golruang'   => '-', //dari simpeg
+    'gelar_depan'     => '', //dari simpeg
+    'gelar_belakang'  => '', //dari simpeg
     'status_jabatan'  => $data_atasan['jabatan'] ?? ''
 );
 
@@ -254,10 +235,17 @@ if (
     //JIKA PIHAK KEDUA KEPALA DAERAH, TAMPILKAN JABATANNYA
     $pihak_kedua['jabatan_pegawai'] = $data_atasan['jabatan'];
 } else if (!empty($data_atasan['jabatan'])) {
-    //JIKA PIHAK KEDUA BUKAN KEPALA DAERAH, TAMPILKAN BIDANGNYA
-    $pihak_kedua['jabatan_pegawai'] = $data_atasan['jabatan'] . ' ' . $data_atasan['nama_bidang'];
-}
+    //JIKA PIHAK KEDUA BUKAN KEPALA DAERAH, TAMPILKAN PANGKAT NIP DLL
+    $simpeg_pihak_kedua = $this->get_detail_pegawai_simpeg($data_atasan['nip_baru']);
+    if ($simpeg_pihak_kedua['status'] == 'error') {
+        array_push($error_message, $simpeg_pihak_pertama['message']);
+    }
 
+    $pihak_kedua['nama_golruang'] = $simpeg_pihak_kedua['data'][0]['nmgolruang'] ?? '-';
+    $pihak_kedua['gelar_depan'] = $simpeg_pihak_kedua['data'][0]['gelar_depan'] ?? '';
+    $pihak_kedua['gelar_belakang'] = $simpeg_pihak_kedua['data'][0]['gelar_belakang'] ?? '';
+    $pihak_kedua['jabatan_pegawai'] = $data_atasan['jabatan'] . ' ' . $data_atasan['nama_bidang'] ?? '-';
+}
 
 // hasil ploting di halaman RHK
 $data_ploting_rhk = $wpdb->get_results(
@@ -451,7 +439,7 @@ $data_tahapan = $wpdb->get_results(
 $card = '';
 if ($data_tahapan) {
     foreach ($data_tahapan as $v) {
-        $tanggal_dokumen = formatTanggalIndonesia($v['tanggal_dokumen']);
+        $tanggal_dokumen = $this->format_tanggal_indo($v['tanggal_dokumen']);
 
         $card .= '
         <div class="cr-item" id="card-tahap-' . htmlspecialchars($v['id']) . '" title="' . htmlspecialchars($v['nama_tahapan']) . '">
@@ -791,6 +779,16 @@ if ($data_tahapan) {
         <div class="text-center" id="action-sakip">
             <button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button><br>
         </div>
+
+        <!-- Error Message -->
+        <?php if (!empty($error_message) && is_array($error_message)) : ?>
+            <div class="alert alert-danger mt-3">
+                <ul class="mb-0">
+                    <?php echo implode('', array_map(fn($msg) => "<li>{$msg}</li>", $error_message)); ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+
         <div class="cr-container m-4 hide-display-print">
             <h2 class="cr-title">Pilih Laporan Perjanjian Kinerja</h2>
             <div class="cr-carousel-wrapper">
