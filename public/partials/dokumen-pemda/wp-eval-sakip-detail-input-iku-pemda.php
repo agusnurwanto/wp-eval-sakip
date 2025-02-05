@@ -172,7 +172,7 @@ $cek_id_jadwal = empty($input['id_periode']) ? 0 : 1;
                             $editor_id = 'formulasi';
                             $settings = array(
                                 'textarea_name' => 'formulasi',
-                                'media_buttons' => true, 
+                                'media_buttons' => false, 
                                 'teeny' => false, 
                                 'quicktags' => true
                             );
