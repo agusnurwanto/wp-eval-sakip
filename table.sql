@@ -1541,7 +1541,7 @@ CREATE TABLE `esakip_data_iku_pemda` (
   `label_sasaran` text DEFAULT null,
   `id_unik_indikator` text DEFAULT null,
   `label_indikator` text DEFAULT null,
-  `formulasi` varchar(255) DEFAULT null,
+  `formulasi` text DEFAULT null,
   `sumber_data` varchar(255) DEFAULT null,
   `penanggung_jawab` varchar(255) DEFAULT null,
   `id_jadwal` int(11) DEFAULT NULL,
