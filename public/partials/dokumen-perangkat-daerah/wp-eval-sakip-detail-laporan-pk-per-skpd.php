@@ -259,9 +259,11 @@ $data_ploting_rhk = $wpdb->get_results(
           AND tahun_anggaran = %d 
           AND nip = %d 
           AND active = 1
+        ORDER BY level ASC
     ", $id_skpd, $input['tahun'], $data_satker['nip_baru']),
     ARRAY_A
 );
+
 $data_anggaran = array(
     'sasaran'       => array(),
     'program'       => array(),
@@ -362,7 +364,8 @@ if (!empty($data_ploting_rhk)) {
                         foreach ($data_indikator_anggaran as $v_indikator_anggaran) {
                             $data_sumber_dana = $wpdb->get_results(
                                 $wpdb->prepare("
-                                    SELECT nama_dana
+                                    SELECT 
+                                        nama_dana
                                     FROM esakip_sumber_dana_indikator 
                                     WHERE id_indikator = %d 
                                       AND active = 1
@@ -378,6 +381,7 @@ if (!empty($data_ploting_rhk)) {
                 }
             }
         }
+
 
         $html_program = '';
         if (!empty($data_anggaran['program'])) {

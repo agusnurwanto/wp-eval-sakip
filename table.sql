@@ -1427,7 +1427,7 @@ CREATE TABLE `esakip_data_rencana_aksi_opd` (
   `label` varchar(255) NOT NULL,
   `id_skpd` int(11) DEFAULT NULL,
   `parent` int(11) DEFAULT 0,
-  `level` int(11) NOT null COMMENT '1 = kegiatan, 1 = rencana aksi, 2 = uraian kegiatan',
+  `level` int(11) NOT null COMMENT '1 = kegiatan utama, 2 = rencana hasil kerja, 3 = uraian kegiatan rhk, 4 = uraian teknis kegiatan' ,
   `pagu` double(20, 0) DEFAULT NULL,
   `realisasi` double(20, 0) DEFAULT NULL,
   `tahun_anggaran` year(4) DEFAULT NULL,
