@@ -28437,7 +28437,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 					$date_hari_ini = date('Y-m-d H:i:s');
 
-					if(!empty($data['plt_plh'])){
+					if (!empty($data['plt_plh'])) {
 						$opsi_data_pegawai['plt_plh'] = $data['plt_plh'];
 
 						// Membuat objek DateTime dari string ISO 8601
@@ -28450,29 +28450,34 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$opsi_data_pegawai['tmt_sk_plth'] = !empty($data['tmt_sk_plth']) ? $format_baru_tmt : NULL;
 						$opsi_data_pegawai['berakhir'] = !empty($data['berakhir']) ? $format_baru_berakhir : NULL;
-					}else{
+					} else {
 						$opsi_data_pegawai['plt_plh'] = NULL;
 						$opsi_data_pegawai['tmt_sk_plth'] = NULL;
 						$opsi_data_pegawai['berakhir'] = NULL;
 					}
 
-					if(!empty($exists)){
+					if (!empty($exists)) {
 						$opsi_data_pegawai['update_at'] = current_time('mysql');
 
 						/**Jika masa PJ/PLT telah selesai,lewati karena inputan awal yang dipakai */
-						if(!empty($data['plt_plh']) && $date_hari_ini > $opsi_data_pegawai['berakhir']){
+						if (!empty($data['plt_plh']) && $date_hari_ini > $opsi_data_pegawai['berakhir']) {
 							continue;
 						}
 
-						$wpdb->update($table, 
-							$opsi_data_pegawai, [
-							'id' => $exists
-						]);
-					}else{
+						$wpdb->update(
+							$table,
+							$opsi_data_pegawai,
+							[
+								'id' => $exists
+							]
+						);
+					} else {
 						$opsi_data_pegawai['nip_baru'] = $data['nip_baru'];
 						$opsi_data_pegawai['created_at'] = current_time('mysql');
-						$wpdb->insert($table, 
-							$opsi_data_pegawai);
+						$wpdb->insert(
+							$table,
+							$opsi_data_pegawai
+						);
 					}
 				}
 
@@ -28844,4 +28849,69 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			exit;
 		}
 	}
+
+	function get_detail_pegawai_simpeg($nip_pegawai)
+	{
+		$ret = array(
+			'status'  => 'success',
+			'message' => 'berhasil get detail pegawai!',
+			'data'    => array()
+		);
+		if (get_option('_crb_url_api_simpeg') && get_option('_crb_authorization_api_simpeg')) {
+			if (!empty($nip_pegawai)) {
+				$path = 'api/pegawai/' . $nip_pegawai . '/jabatan';
+				$option = array(
+					'url'    => get_option('_crb_url_api_simpeg') . $path,
+					'type'   => 'get',
+					'header' => array('Authorization: Basic ' . get_option('_crb_authorization_api_simpeg'))
+				);
+
+				$response = $this->functions->curl_post($option);
+				$data = json_decode($response, true);
+
+				if (json_last_error() !== JSON_ERROR_NONE) {
+					$ret['status'] = 'error';
+					$ret['message'] = json_last_error_msg();
+				} else if (empty($data)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Response API kosong';
+				} else {
+					$ret['data'] = $data;
+				}
+			} else {
+				$ret['status'] = 'error';
+				$ret['message'] = 'NIP Kosong';
+			}
+		} else {
+			$ret['status'] = 'error';
+			$ret['message'] = 'URL SIMPEG tidak sesuai';
+		}
+
+		return $ret;
+	}
+
+	function format_tanggal_indo($tanggal)
+{
+    // Array untuk nama bulan dalam bahasa Indonesia
+    $bulan = array(
+        1 => 'Januari',
+        2 => 'Februari',
+        3 => 'Maret',
+        4 => 'April',
+        5 => 'Mei',
+        6 => 'Juni',
+        7 => 'Juli',
+        8 => 'Agustus',
+        9 => 'September',
+        10 => 'Oktober',
+        11 => 'November',
+        12 => 'Desember'
+    );
+
+    $day = date('d', strtotime($tanggal));
+    $month = $bulan[date('n', strtotime($tanggal))];
+    $year = date('Y', strtotime($tanggal));
+
+    return "$day $month $year";
+}
 }

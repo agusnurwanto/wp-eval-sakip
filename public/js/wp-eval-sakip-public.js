@@ -33,6 +33,50 @@ function pesan_loading(pesan, loading=false){
     console.log(pesan);
 }
 
+function Export2Word(element, filename = ''){
+    var preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>";
+    var postHtml = "</body></html>";
+    var html = preHtml+element+postHtml;
+
+    var blob = new Blob(['\ufeff', html], {
+        type: 'application/msword'
+    });
+    
+    // Specify link url
+    var url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
+    
+    // Specify file name
+    filename = filename?filename+'.doc':'document.doc';
+    
+    // Create download link element
+    var downloadLink = document.createElement("a");
+
+    document.body.appendChild(downloadLink);
+    
+    if(navigator.msSaveOrOpenBlob ){
+        navigator.msSaveOrOpenBlob(blob, filename);
+    }else{
+        // Create a link to the file
+        downloadLink.href = url;
+        
+        // Setting the file name
+        downloadLink.download = filename;
+        
+        //triggering the function
+        downloadLink.click();
+    }
+    
+    document.body.removeChild(downloadLink);
+}
+
+function run_download_word_sakip(element, judul) {
+	var download_word = '<a id="word_sakip" onclick="return false;" href="#" class="btn btn-primary" style="margin-left: 10px;" ><span class="dashicons dashicons-media-document"></span>Download Word</a>';
+    jQuery('#action-sakip').append(download_word);
+    jQuery("#word_sakip").on("click", function () {
+        Export2Word(element, judul);
+    });
+}
+
 function run_download_excel_sakip(type) {
     var body = '<a id="excel" onclick="return false;" href="#" class="btn btn-success"><span class="dashicons dashicons-media-spreadsheet"></span>Download Excel</a>';
     var download_excel = '<div id="action-sakip" class="hide-print text-white">' + body + "</div>";

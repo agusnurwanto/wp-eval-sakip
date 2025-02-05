@@ -2285,7 +2285,7 @@ foreach ($get_pegawai as $pegawai) {
                         var id_pokin = 0;
                         var tombol_detail = '';
                         var id_parent_cascading = 0;
-                        var label_cascading = '';
+                        var label_cascading = '-';
                         var data_tagging_rincian = '';
                         var label_dasar_pelaksanaan = '';
                         var total_pagu = 0;
@@ -2343,8 +2343,10 @@ foreach ($get_pegawai as $pegawai) {
                             id_parent_cascading = value['kode_cascading_program'];
                             id_parent_sub_skpd_cascading = value['id_sub_skpd_cascading'] != null ? value['id_sub_skpd_cascading'] : 0;
 
-                            let nama_prog = value['label_cascading_program'].split(" ").slice(1).join(" ");
-                            label_cascading = value['label_cascading_program'] != null ? value['kode_cascading_program'] + ' ' + nama_prog + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>' : '-';
+                            if (value['label_cascading_program']) {
+                                let nama_prog = value['label_cascading_program'];
+                                label_cascading = value['kode_cascading_program'] + ' ' + nama_prog + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
+                            }
                             total_pagu = 0;
                             value.get_dasar_level_3.forEach(function(dasar_level_3) {
                                 dasar_level_3.get_dasar_level_4.forEach(function(dasar) {
@@ -2385,8 +2387,10 @@ foreach ($get_pegawai as $pegawai) {
                             id_parent_cascading = value['kode_cascading_kegiatan'];
                             id_parent_sub_skpd_cascading = value['id_sub_skpd_cascading'] != null ? value['id_sub_skpd_cascading'] : 0;
 
-                            let nama_keg = value['label_cascading_kegiatan'].split(" ").slice(1).join(" ");
-                            label_cascading = value['label_cascading_kegiatan'] != null ? value['kode_cascading_kegiatan'] + ' ' + nama_keg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>' : '-';
+                            if (value['label_cascading_kegiatan']) {
+                                let nama_keg = value['label_cascading_kegiatan'];
+                                label_cascading = value['kode_cascading_kegiatan'] + ' ' + nama_keg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
+                            }
                             total_pagu = value.total_pagu_4 || 0;
 
                             value.get_data_dasar_4.forEach(function(dasar_4) {
@@ -2421,9 +2425,11 @@ foreach ($get_pegawai as $pegawai) {
                                 `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, ${ (tipe + 1) }, ${ JSON.stringify(id_pokin) }, '${ id_parent_cascading }', ${id_parent_sub_skpd_cascading})" title="Lihat Uraian Teknis Kegiatan"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                         } else if (tipe == 4) {
                             id_pokin = value['id_pokin_5'];
-                            let nama_subkeg = value['label_cascading_sub_kegiatan'].split(" ").slice(1).join(" ");
 
-                            label_cascading = value['label_cascading_sub_kegiatan'] != null ? value['kode_cascading_sub_kegiatan'] + ' ' + nama_subkeg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>' : '-';
+                            if (value['label_cascading_sub_kegiatan']) {
+                                let nama_subkeg = value['label_cascading_sub_kegiatan'].split(" ").slice(1).join(" ");
+                                label_cascading = value['kode_cascading_sub_kegiatan'] + ' ' + nama_subkeg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
+                            }
                             data_tagging_rincian = '<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" title="Lihat Data Tagging Rincian Belanja"><i class="dashicons dashicons dashicons-arrow-down-alt2"></i></a> ';
 
                             if (value.mandatori_pusat == 1) get_data_dasar_pelaksanaan.push('Mandatori Pusat');
@@ -2813,12 +2819,24 @@ foreach ($get_pegawai as $pegawai) {
                                         <select class="form-control" name="cascading-renstra" id="cascading-renstra"></select>
                                     </div>
                                     <div class="form-group">
-                                        <label for="sub-skpd-cascading">Satuan Kerja Cascading</label>
-                                        <input class="form-control" type="text" id="sub-skpd-cascading" readonly>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <label for="sub-skpd-cascading">OPD Cascading</label>
+                                            </div>
+                                            <div class="col-md-9">
+                                                <input class="form-control" type="text" id="sub-skpd-cascading" disabled>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="pagu-cascading">Pagu Cascading</label>
-                                        <input class="form-control text-right" type="text" id="pagu-cascading" readonly>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <label for="pagu-cascading">Pagu Cascading</label>
+                                            </div>
+                                            <div class="col-md-9">
+                                                <input class="form-control" type="text" id="pagu-cascading" disabled>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="form-group"> 
                                         <label for="satker_id">Pilih Satuan Kerja</label> 
@@ -2872,14 +2890,14 @@ foreach ($get_pegawai as $pegawai) {
                                     if (value.id_unik_indikator == null) {
                                         switch (tipe) {
                                             case 3:
-                                                html_cascading += `<option value="${value.kode_giat}" data-id-sub-skpd-cascading="${value.id_sub_skpd}" data-nama-sub-skpd="${value.nama_sub_skpd}" data-pagu-cascading="${value.pagu}">${value.kode_giat} ${value.nama_giat} ( ${value.kode_sub_skpd} ${value.nama_sub_skpd} | Rp. ${formatRupiah(value.pagu)} )</option>`;
+                                                html_cascading += `<option value="${value.kode_giat}" data-id-sub-skpd-cascading="${value.id_sub_skpd}" data-nama-sub-skpd="${value.kode_sub_skpd} ${value.nama_sub_skpd}" data-pagu-cascading="${value.pagu}">${value.kode_giat} ${value.nama_giat} ( ${value.kode_sub_skpd} ${value.nama_sub_skpd} | Rp. ${formatRupiah(value.pagu)} )</option>`;
                                                 break;
                                             case 4:
                                                 let nama_sub_giat = `${value.kode_sub_giat} ${value.nama_sub_giat.replace(value.kode_sub_giat, '')} ( ${value.kode_sub_skpd} ${value.nama_sub_skpd} | Rp. ${formatRupiah(value.pagu)} )`;
-                                                html_cascading += `<option data-kodesbl="${value.kode_sbl}" value="${value.kode_sub_giat}" data-id-sub-skpd-cascading="${value.id_sub_skpd}" data-nama-sub-skpd="${value.nama_sub_skpd}" data-pagu-cascading="${value.pagu}">${nama_sub_giat}</option>`;
+                                                html_cascading += `<option data-kodesbl="${value.kode_sbl}" value="${value.kode_sub_giat}" data-id-sub-skpd-cascading="${value.id_sub_skpd}" data-nama-sub-skpd="${value.kode_sub_skpd} ${value.nama_sub_skpd}" data-pagu-cascading="${value.pagu}">${nama_sub_giat}</option>`;
                                                 break;
                                             default:
-                                                html_cascading += `<option value="${value.kode_program}_${value.id_sub_skpd}" data-id-sub-skpd-cascading="${value.id_sub_skpd}" data-nama-sub-skpd="${value.nama_sub_skpd}" data-pagu-cascading="${value.pagu}">${value.kode_program} ${value.nama_program} ( ${value.kode_sub_skpd} ${value.nama_sub_skpd} | Rp. ${formatRupiah(value.pagu)} )</option>`;
+                                                html_cascading += `<option value="${value.kode_program}_${value.id_sub_skpd}" data-id-sub-skpd-cascading="${value.id_sub_skpd}" data-nama-sub-skpd="${value.kode_sub_skpd} ${value.nama_sub_skpd}" data-pagu-cascading="${value.pagu}">${value.kode_program} ${value.nama_program} ( ${value.kode_sub_skpd} ${value.nama_sub_skpd} | Rp. ${formatRupiah(value.pagu)} )</option>`;
                                                 break;
                                         }
                                     }
