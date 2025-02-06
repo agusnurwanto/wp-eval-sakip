@@ -222,7 +222,7 @@ $pihak_kedua = array(
     'nama_pegawai'    => $data_atasan['nama_pegawai'] ?? '-',
     'nip_pegawai'     => $data_atasan['nip_baru'] ?? '-',
     'jabatan_pegawai' => '-', //jika bukan kepala daerah
-    'nama_golruang'   => '-', //dari simpeg
+    'nama_golruang'   => '-', //dari simpeg pangkat_gol_ruang
     'gelar_depan'     => '', //dari simpeg
     'gelar_belakang'  => '', //dari simpeg
     'status_jabatan'  => $data_atasan['jabatan'] ?? ''
@@ -428,38 +428,49 @@ if (!empty($data_ploting_rhk)) {
 $data_tahapan = $wpdb->get_results(
     $wpdb->prepare("
         SELECT 
-            id,
-            nama_tahapan,
-            tanggal_dokumen
+            *
         FROM esakip_finalisasi_tahap_laporan_pk
-        WHERE id_skpd = %d 
-          AND nip = %d
+        WHERE nip = %d
           AND tahun_anggaran = %d
           AND active = 1
         ORDER BY tanggal_dokumen, updated_at DESC
-    ", $id_skpd, $pihak_pertama['nip_pegawai'], $input['tahun']),
+    ", $pihak_pertama['nip_pegawai'], $input['tahun']),
     ARRAY_A
 );
 $card = '';
+$jumlah_data = array();
 if ($data_tahapan) {
     foreach ($data_tahapan as $v) {
         $tanggal_dokumen = $this->format_tanggal_indo($v['tanggal_dokumen']);
+        $data_skpd = $this->get_data_skpd_by_id($v['id_skpd'], $v['tahun_anggaran']) ?? '-';
+
+        //count jumlah data per skpd
+        if (!isset($jumlah_data[$v['id_skpd']])) {
+            $jumlah_data[$v['id_skpd']] = [
+                'nama_skpd' => $data_skpd['nama_skpd'],
+                'jumlah' => 0
+            ];
+        }
+
+        $jumlah_data[$v['id_skpd']]['jumlah']++;
 
         $card .= '
-        <div class="cr-item" id="card-tahap-' . htmlspecialchars($v['id']) . '" title="' . htmlspecialchars($v['nama_tahapan']) . '">
+        <div class="cr-item" id="card-tahap-' . $v['id'] . '" title="' . $v['nama_tahapan'] . '">
             <div class="cr-card">
-                <h3 class="truncate-multiline" id="nama-tahapan-' . htmlspecialchars($v['id']) . '">' . htmlspecialchars($v['nama_tahapan']) . '</h3>
-                <div class="year" id="tanggal-tahapan-' . htmlspecialchars($v['id']) . '">' . htmlspecialchars($tanggal_dokumen) . '</div>
+                <h3 class="truncate-multiline" id="nama-tahapan-' . $v['id'] . '">' . $v['nama_tahapan'] . '</h3>
+                <div class="badge badge-sm badge-primary m-0 ml-2 mr-2 text-light text-wrap">' . $data_skpd['nama_skpd'] .
+            '</div>
+                <div class="year" id="tanggal-tahapan-' . $v['id'] . '">' . $tanggal_dokumen . '</div>
                 <div class="cr-actions">
-                    <div class="cr-view-btn" onclick="viewDokumen(\'' . htmlspecialchars($v['id']) . '\', this)">
+                    <div class="cr-view-btn" id="view-btn-' . $v['id'] . '" onclick="viewDokumen(\'' . $v['id'] . '\', this)" title="Lihat Dokumen">
                         <span class="dashicons dashicons-visibility"></span>
                     </div>
-                    <div class="cr-view-btn-danger" onclick="deleteDokumen(\'' . htmlspecialchars($v['id']) . '\')">
+                    <div class="cr-view-btn-danger" onclick="deleteDokumen(\'' . $v['id'] . '\')" title="Hapus Dokumen">
                         <span class="dashicons dashicons-trash"></span>
                     </div>
                 </div>
                 <div class="badge-container">
-                    <span class="badge badge-sm badge-primary" id="badge-sedang-dilihat-' . htmlspecialchars($v['id']) . '" style="display:none">
+                    <span class="badge badge-sm badge-secondary badge-sedang-dilihat" id="badge-sedang-dilihat-' . $v['id'] . '" style="display:none">
                         Sedang Dilihat
                     </span>
                 </div>
@@ -645,9 +656,9 @@ if ($data_tahapan) {
             border: 1px solid #dcdcde;
             border-radius: 8px;
             padding: 20px;
-            width: 240px;
+            width: 250px;
             /* Atur ukuran card */
-            height: 200px;
+            height: 220px;
             /* Atur tinggi card */
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             background-color: #fff;
@@ -679,8 +690,8 @@ if ($data_tahapan) {
             background-color: #fff;
             border: 1px solid #dcdcde;
             border-radius: 50%;
-            width: 36px;
-            height: 36px;
+            width: 28px;
+            height: 28px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -711,7 +722,6 @@ if ($data_tahapan) {
 
         .badge-container {
             text-align: center;
-            margin-top: 8px;
         }
 
 
@@ -793,19 +803,34 @@ if ($data_tahapan) {
             </div>
         <?php endif; ?>
 
+        <!-- Jumlah Data Per SKPD -->
+        <?php if (!empty($jumlah_data) && is_array($jumlah_data)) : ?>
+            <div class="cr-container m-4 hide-display-print">
+                <h2 class="cr-title">Jumlah Dokumen Finalisasi Per SKPD</h2>
+                <?php foreach ($jumlah_data as $id_skpd => $v) : ?>
+                    <span class="badge badge-info fw-bold d-inline-flex align-items-center p-2 m-1 rounded-pill" style="font-size: 14px;">
+                        <i class="dashicons dashicons-building me-1" style="font-size: 16px;"></i>
+                        <?php echo $v['nama_skpd']; ?> | <?php echo $v['jumlah']; ?>
+                    </span>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
         <div class="cr-container m-4 hide-display-print">
             <h2 class="cr-title">Pilih Laporan Perjanjian Kinerja</h2>
             <div class="cr-carousel-wrapper">
-                <div id="reportCarousel" class="cr-carousel">
+                <div id="card-carousel" class="cr-carousel">
                     <div class="cr-item" title="Perjanjian Kinerja Real Time">
                         <div class="cr-card">
                             <h3>Perjanjian Kinerja Sekarang</h3>
+                            <div class="badge badge-sm badge-primary m-2 text-light text-wrap"><?php echo $skpd['nama_skpd']; ?></div>
                             <div class="year"><?php echo $text_tanggal_hari_ini; ?></div>
                             <div class="cr-view-btn" style="display: none;" id="display-btn-first" onclick="location.reload()">
                                 <span class="dashicons dashicons-visibility"></span>
                             </div>
+                            <span class="badge badge-info">Real Time</span>
                             <div class="text-center badge-sedang-dilihat">
-                                <span class='badge badge-sm badge-primary m-2'>Sedang Dilihat</span>
+                                <span class='badge badge-sm badge-secondary m-2'>Sedang Dilihat</span>
                             </div>
                         </div>
                     </div>
@@ -819,6 +844,7 @@ if ($data_tahapan) {
                 </div>
             </div>
         </div>
+
         <div class="text-center page-print">
             <div class="text-right m-2">
                 <button class="btn btn-sm btn-success hide-display-print" id="finalisasi-btn" onclick="showModalFinalisasi()">
@@ -839,7 +865,7 @@ if ($data_tahapan) {
                 <div class="col my-auto">
                     <p class="title-pk-1">PEMERINTAH <?php echo strtoupper($nama_pemda); ?></p>
                     <p class="title-pk-2 nama-skpd-view"><?php echo strtoupper($skpd['nama_skpd']); ?></p>
-                    <p class="title-pk-1 alamat-kantor-view" id="alamat_kantor"><?php echo $skpd['alamat_kantor'] ?></p>
+                    <p class="title-pk-1 alamat-kantor-view" id="alamat_kantor"><?php echo $skpd['alamat_kantor']; ?></p>
                 </div>
                 <div class="col-1"></div>
             </div>
@@ -1317,7 +1343,7 @@ if ($data_tahapan) {
     });
 
     function scrollCarousel(direction) {
-        const carousel = jQuery('#reportCarousel');
+        const carousel = jQuery('#card-carousel');
         const scrollAmount = carousel[0].offsetWidth;
         const currentScroll = carousel.scrollLeft();
 
@@ -1342,6 +1368,8 @@ if ($data_tahapan) {
                 console.log(response.message);
                 if (response.status === 'success') {
                     jQuery(".editable-field").attr("title", "").attr("contenteditable", "false");
+                    jQuery(".cr-view-btn").show();
+                    jQuery(`#view-btn-${idTahap}`).hide();
 
                     jQuery('.nama-skpd-view').text(response.data.nama_skpd)
                     jQuery('.nama-satker-view').text(response.data.satuan_kerja)
@@ -1361,6 +1389,7 @@ if ($data_tahapan) {
                     jQuery('#id_data').val(response.data.id)
                     jQuery('#nama_tahap_finalisasi').val(response.data.nama_tahapan)
                     jQuery('#tanggal_tahap_finalisasi').val(response.data.tanggal_dokumen)
+
                     jQuery(`.badge-sedang-dilihat`).hide() //another badge
                     jQuery(`#badge-sedang-dilihat-${response.data.id}`).show() //current badge
 

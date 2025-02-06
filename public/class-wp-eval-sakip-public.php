@@ -27481,16 +27481,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							]),
 						]);
 						$ret_body[] = $response;
-						if ( is_wp_error( $response ) ) {
+						if (is_wp_error($response)) {
 							$error_message = $response->get_error_message();
 							throw new Exception("Something went wrong: $error_message", 1);
 						}
 						$body = json_decode(wp_remote_retrieve_body($response));
 						if (isset($body->error)) {
-							if(is_array($response)){
+							if (is_array($response)) {
 								$response = json_encode($response);
 							}
-							throw new Exception("Gagal kirim data dokumen: " . $data['dokumen'] . ", Coba lagi! ".$response, 1);
+							throw new Exception("Gagal kirim data dokumen: " . $data['dokumen'] . ", Coba lagi! " . $response, 1);
 						}
 
 						if (!empty($body->data)) {
@@ -28495,7 +28495,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			}
 		} else {
 			echo json_encode([
-				'status' => true,
+				'status'  => false,
 				'message' => 'Pengaturan Status API Kepegawaian ditutup!'
 			]);
 			exit;
@@ -28890,7 +28890,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		return $ret;
 	}
 
-	function format_tanggal_indo($tanggal)
+	function format_tanggal_indo($date)
 	{
 		// Array untuk nama bulan dalam bahasa Indonesia
 		$bulan = array(
@@ -28908,10 +28908,29 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			12 => 'Desember'
 		);
 
-		$day = date('d', strtotime($tanggal));
-		$month = $bulan[date('n', strtotime($tanggal))];
-		$year = date('Y', strtotime($tanggal));
+		$day = date('d', strtotime($date));
+		$month = $bulan[date('n', strtotime($date))];
+		$year = date('Y', strtotime($date));
 
 		return "$day $month $year";
+	}
+
+	function get_data_skpd_by_id($id_skpd, $tahun_anggaran)
+	{
+		global $wpdb;
+
+		$data_skpd = $wpdb->get_row(
+			$wpdb->prepare("
+				SELECT 
+					*
+				FROM esakip_data_unit
+				WHERE id_skpd=%d
+				  AND tahun_anggaran=%d
+				  AND active = 1
+			", $id_skpd, $tahun_anggaran),
+			ARRAY_A
+		);
+
+		return $data_skpd;
 	}
 }
