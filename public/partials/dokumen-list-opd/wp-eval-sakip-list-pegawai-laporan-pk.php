@@ -1,9 +1,8 @@
 <?php
-global $wpdb;
-
 if (!defined('WPINC')) {
 	die;
 }
+global $wpdb;
 
 $input = shortcode_atts(array(
 	'tahun_anggaran' => '2000'
@@ -11,21 +10,32 @@ $input = shortcode_atts(array(
 
 $id_skpd = '';
 if (!empty($_GET) && !empty($_GET['id_skpd'])) {
-    $id_skpd = $_GET['id_skpd'];
+	$id_skpd = $_GET['id_skpd'];
+} else {
+	die('Parameter tidak lengkap!');
 }
-$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-$nama_skpd = $wpdb->get_row(
-    $wpdb->prepare("
-    SELECT 
-        nama_skpd
-    FROM esakip_data_unit
-    WHERE id_skpd=%d
-      AND tahun_anggaran=%d
-      AND active = 1
-", $id_skpd, $tahun_anggaran_sakip),
-    ARRAY_A
+$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+$nama_skpd = $this->get_data_skpd_by_id($id_skpd, $tahun_anggaran_sakip);
+
+$id_satker = $wpdb->get_var(
+	$wpdb->prepare("
+		SELECT 
+			id_satker_simpeg
+		FROM esakip_data_mapping_unit_sipd_simpeg
+		WHERE id_skpd = %d
+		  AND tahun_anggaran = %d
+		  AND active = 1
+	", $id_skpd, $tahun_anggaran_sakip)
 );
+
+//get data simpeg unor
+$error_message = array();
+$simpeg_unor = $this->get_pegawai_simpeg('unor', $id_satker);
+$response = json_decode($simpeg_unor, true);
+if (!isset($response['status']) || $response['status'] === false) {
+	array_push($error_message, $response['message']);
+}
 ?>
 <style type="text/css">
 	.wrap-table {
@@ -43,21 +53,36 @@ $nama_skpd = $wpdb->get_row(
 	.btn-action-group .btn {
 		margin: 0 5px;
 	}
-	.table_list_skpd thead{
+
+	.table_list_skpd thead {
 		position: sticky;
-        top: -6px;
-	}.table_list_skpd thead th{
+		top: -6px;
+	}
+
+	.table_list_skpd thead th {
 		vertical-align: middle;
 	}
-	.table_list_skpd tfoot{
-        position: sticky;
-        bottom: 0;
-    }
 
-	.table_list_skpd tfoot th{
+	.table_list_skpd tfoot {
+		position: sticky;
+		bottom: 0;
+	}
+
+	.table_list_skpd tfoot th {
 		vertical-align: middle;
 	}
 </style>
+<!-- Error Message -->
+<?php if (!empty($error_message) && is_array($error_message)) : ?>
+	<div class="container-md mx-auto" style="width: 900px;">
+		<div class="alert alert-danger mt-3">
+			<ul class="mb-0">
+				<?php echo implode('', array_map(fn($msg) => "<li>{$msg}</li>", $error_message)); ?>
+			</ul>
+		</div>
+	</div>
+<?php endif; ?>
+
 <div class="container-md">
 	<div class="cetak">
 		<div style="padding: 10px;margin:0 0 3rem 0;">
@@ -105,16 +130,16 @@ $nama_skpd = $wpdb->get_row(
 				jQuery('#wrap-loading').hide();
 				console.log(response);
 				if (response.status === 'success') {
-					if(destroy == 1){
+					if (destroy == 1) {
 						laporan_pk_table.fnDestroy();
 					}
 					jQuery('.table_list_pegawai tbody').html(response.data);
 					window.laporan_pk_table = jQuery('.table_list_pegawai').dataTable({
-						 aLengthMenu: [
-					        [5, 10, 25, 100, -1],
-					        [5, 10, 25, 100, "All"]
-					    ],
-					    iDisplayLength: -1,
+						aLengthMenu: [
+							[5, 10, 25, 100, -1],
+							[5, 10, 25, 100, "All"]
+						],
+						iDisplayLength: -1,
 						order: []
 					});
 				} else {

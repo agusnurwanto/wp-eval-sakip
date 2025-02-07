@@ -58,9 +58,10 @@ $text_tanggal_hari_ini = $this->format_tanggal_indo(current_datetime()->format('
 $error_message = array();
 
 //get data simpeg pihak pertama
-$simpeg_pihak_pertama = $this->get_detail_pegawai_simpeg($data_satker['nip_baru']);
-if ($simpeg_pihak_pertama['status'] == 'error') {
-    array_push($error_message, $simpeg_pihak_pertama['message']);
+$simpeg_pihak_pertama = $this->get_pegawai_simpeg('asn', $data_satker['nip_baru']);
+$response_1 = json_decode($simpeg_pihak_pertama, true);
+if (!isset($response_1['status']) || $response_1['status'] === false) {
+    array_push($error_message, $response_1['message']);
 }
 
 $pihak_pertama = array(
@@ -68,9 +69,9 @@ $pihak_pertama = array(
     'nip_pegawai'          => $data_satker['nip_baru'] ?? '-',
     'bidang_pegawai'       => $data_satker['nama_bidang'] ?? '-',
     'jabatan_pegawai'      => $data_satker['jabatan'] . ' ' . $data_satker['nama_bidang'] ?? '',
-    'nama_golruang'        => $simpeg_pihak_pertama['data'][0]['nmgolruang'] ?? '-', //dari simpeg
-    'gelar_depan'          => $simpeg_pihak_pertama['data'][0]['gelar_depan'] ?? '', //dari simpeg
-    'gelar_belakang'       => $simpeg_pihak_pertama['data'][0]['gelar_belakang'] ?? '', //dari simpeg
+    'pangkat'        => $data_satker['pangkat'] ?? '-',
+    'gelar_depan'          => $data_satker['gelar_depan'] ?? '',
+    'gelar_belakang'       => $data_satker['gelar_belakang'] ?? '',
     'status_jabatan'       => $data_satker['jabatan'] ?? ''
 );
 
@@ -221,10 +222,10 @@ if (!empty($data_atasan['plt_plh'])) {
 $pihak_kedua = array(
     'nama_pegawai'    => $data_atasan['nama_pegawai'] ?? '-',
     'nip_pegawai'     => $data_atasan['nip_baru'] ?? '-',
-    'jabatan_pegawai' => '-', //jika bukan kepala daerah
-    'nama_golruang'   => '-', //dari simpeg pangkat_gol_ruang
-    'gelar_depan'     => '', //dari simpeg
-    'gelar_belakang'  => '', //dari simpeg
+    'jabatan_pegawai' => '', //default kosong jika atasan kepala daerah
+    'pangkat'         => '', //default kosong jika atasan kepala daerah
+    'gelar_depan'     => '', //default kosong jika atasan kepala daerah
+    'gelar_belakang'  => '', //default kosong jika atasan kepala daerah
     'status_jabatan'  => $data_atasan['jabatan'] ?? ''
 );
 
@@ -236,14 +237,15 @@ if (
     $pihak_kedua['jabatan_pegawai'] = $data_atasan['jabatan'];
 } else if (!empty($data_atasan['jabatan'])) {
     //JIKA PIHAK KEDUA BUKAN KEPALA DAERAH, TAMPILKAN PANGKAT NIP DLL
-    $simpeg_pihak_kedua = $this->get_detail_pegawai_simpeg($data_atasan['nip_baru']);
-    if ($simpeg_pihak_kedua['status'] == 'error') {
-        array_push($error_message, $simpeg_pihak_pertama['message']);
+    $simpeg_pihak_kedua = $this->get_pegawai_simpeg('asn', $data_atasan['nip_baru']);
+    $response_2 = json_decode($simpeg_pihak_kedua, true);
+    if (!isset($response_2['status']) || $response_2['status'] === false) {
+        array_push($error_message, $response_2['message']);
     }
 
-    $pihak_kedua['nama_golruang'] = $simpeg_pihak_kedua['data'][0]['nmgolruang'] ?? '-';
-    $pihak_kedua['gelar_depan'] = $simpeg_pihak_kedua['data'][0]['gelar_depan'] ?? '';
-    $pihak_kedua['gelar_belakang'] = $simpeg_pihak_kedua['data'][0]['gelar_belakang'] ?? '';
+    $pihak_kedua['pangkat'] = $data_atasan['pangkat'] ?? '-';
+    $pihak_kedua['gelar_depan'] = $data_atasan['gelar_depan'] ?? '';
+    $pihak_kedua['gelar_belakang'] = $data_atasan['gelar_belakang'] ?? '';
     $pihak_kedua['jabatan_pegawai'] = $data_atasan['jabatan'] . ' ' . $data_atasan['nama_bidang'] ?? '-';
 }
 
@@ -470,7 +472,7 @@ if ($data_tahapan) {
                     </div>
                 </div>
                 <div class="badge-container">
-                    <span class="badge badge-sm badge-secondary badge-sedang-dilihat" id="badge-sedang-dilihat-' . $v['id'] . '" style="display:none">
+                    <span class="badge badge-sm badge-warning badge-sedang-dilihat" id="badge-sedang-dilihat-' . $v['id'] . '" style="display:none">
                         Sedang Dilihat
                     </span>
                 </div>
@@ -807,12 +809,14 @@ if ($data_tahapan) {
         <?php if (!empty($jumlah_data) && is_array($jumlah_data)) : ?>
             <div class="cr-container m-4 hide-display-print">
                 <h2 class="cr-title">Jumlah Dokumen Finalisasi Per SKPD</h2>
-                <?php foreach ($jumlah_data as $id_skpd => $v) : ?>
-                    <span class="badge badge-info fw-bold d-inline-flex align-items-center p-2 m-1 rounded-pill" style="font-size: 14px;">
-                        <i class="dashicons dashicons-building me-1" style="font-size: 16px;"></i>
-                        <?php echo $v['nama_skpd']; ?> | <?php echo $v['jumlah']; ?>
-                    </span>
-                <?php endforeach; ?>
+                <div class="text-center">
+                    <?php foreach ($jumlah_data as $id_skpd => $v) : ?>
+                        <span class="badge badge-info fw-bold d-inline-flex align-items-center p-2 m-1 rounded-pill" style="font-size: 14px;">
+                            <i class="dashicons dashicons-building me-1" style="font-size: 16px;"></i>
+                            <?php echo $v['nama_skpd']; ?> | <?php echo $v['jumlah']; ?>
+                        </span>
+                    <?php endforeach; ?>
+                </div>
             </div>
         <?php endif; ?>
 
@@ -828,9 +832,11 @@ if ($data_tahapan) {
                             <div class="cr-view-btn" style="display: none;" id="display-btn-first" onclick="location.reload()">
                                 <span class="dashicons dashicons-visibility"></span>
                             </div>
-                            <span class="badge badge-info">Real Time</span>
+                            <span class="badge badge-info mt-2">
+                                <i class="dashicons dashicons-clock align-middle"></i> Real Time
+                            </span>
                             <div class="text-center badge-sedang-dilihat">
-                                <span class='badge badge-sm badge-secondary m-2'>Sedang Dilihat</span>
+                                <span class='badge badge-sm badge-warning m-2'>Sedang Dilihat</span>
                             </div>
                         </div>
                     </div>
@@ -932,11 +938,11 @@ if ($data_tahapan) {
                     <tr class="text-center">
                         <td style="padding: 0;" id="pangkat_pegawai_atasan" class="pangkat-pegawai-atasan-view">
                             <?php if (empty($data_atasan['status_kepala'])) : ?>
-                                <?php echo $pihak_kedua['nama_golruang']; ?>
+                                <?php echo $pihak_kedua['pangkat']; ?>
                             <?php endif; ?>
                         </td>
                         <td style="padding: 0;" class="pangkat-pegawai-view">
-                            <?php echo $pihak_pertama['nama_golruang']; ?>
+                            <?php echo $pihak_pertama['pangkat']; ?>
                         </td>
                     </tr>
                     <tr class="text-center">
@@ -1050,11 +1056,11 @@ if ($data_tahapan) {
                     <tr class="text-center">
                         <td style="padding: 0;" class="pangkat-pegawai-atasan-view">
                             <?php if (empty($data_atasan['status_kepala'])) : ?>
-                                <?php echo $pihak_kedua['nama_golruang']; ?>
+                                <?php echo $pihak_kedua['pangkat']; ?>
                             <?php endif; ?>
                         </td>
                         <td style="padding: 0;" class="pangkat-pegawai-view">
-                            <?php echo $pihak_pertama['nama_golruang']; ?>
+                            <?php echo $pihak_pertama['pangkat']; ?>
                         </td>
                     </tr>
                     <tr class="text-center">
@@ -1118,7 +1124,7 @@ if ($data_tahapan) {
                                     <td class="text-left">
                                         <strong>:</strong>
                                     </td>
-                                    <td class="text-left" id="pangkat_pegawai"><?php echo $pihak_pertama['nama_golruang'] ?: '-'; ?>
+                                    <td class="text-left" id="pangkat_pegawai"><?php echo $pihak_pertama['pangkat'] ?: '-'; ?>
                                     </td>
                                 </tr>
                                 <tr>
