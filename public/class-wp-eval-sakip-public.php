@@ -28515,7 +28515,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							id 
 						FROM $table 
 						WHERE nip_baru = %s
-					", trim($data['nip_baru']))
+							AND satker_id = %s
+							AND jabatan = %s
+					", trim($data['nip_baru']), trim($data['satker_id']), trim($data['jabatan']))
 				);
 
 				$opsi_data_pegawai = array(
