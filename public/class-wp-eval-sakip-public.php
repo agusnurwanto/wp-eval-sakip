@@ -28515,9 +28515,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							id 
 						FROM $table 
 						WHERE nip_baru = %s
-							AND satker_id = %s
-							AND jabatan = %s
-					", trim($data['nip_baru']), trim($data['satker_id']), trim($data['jabatan']))
+						  AND satker_id = %s
+						  AND jabatan = %s
+					", $data['nip_baru'], $data['satker_id'], $data['jabatan'])
 				);
 
 				$opsi_data_pegawai = array(
@@ -28528,8 +28528,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				);
 
 				if ($tipe == 'asn') {
-					$opsi_data_pegawai['gol_ruang'] = $data['gol_ruang'];
-					$opsi_data_pegawai['pangkat'] 	= $data['nmgolruang'];
+					$opsi_data_pegawai['gol_ruang'] 	 = $data['gol_ruang'];
+					$opsi_data_pegawai['pangkat'] 		 = $data['nmgolruang'];
+					$opsi_data_pegawai['gelar_depan'] 	 = $data['gelar_depan'];
+					$opsi_data_pegawai['gelar_belakang'] = $data['gelar_belakang'];
 				}
 
 				if ($tipe == 'unor') {
@@ -28549,7 +28551,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				if ($exists) {
 					$opsi_data_pegawai['update_at'] = current_time('mysql');
-					if (!empty($data['plt_plh']) && date('Y-m-d H:i:s') > $opsi_data_pegawai['berakhir']) {
+					if (
+						!empty($data['plt_plh'])
+						&& date('Y-m-d H:i:s') > $opsi_data_pegawai['berakhir']
+					) {
 						continue;
 					}
 					$wpdb->update($table, $opsi_data_pegawai, ['id' => $exists]);
@@ -28559,7 +28564,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$wpdb->insert($table, $opsi_data_pegawai);
 				}
 			}
-			
 		} catch (Exception $e) {
 			$ret = json_encode([
 				'status'  => false,

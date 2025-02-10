@@ -2028,7 +2028,7 @@ CREATE TABLE `esakip_finalisasi_tahap_laporan_pk` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `nip` VARCHAR(64) NOT NULL,
   `id_skpd` INT(11) NOT NULL,
-  `alamat_kantor` VARCHAR(255) NOT NULL,
+  `alamat_kantor` VARCHAR(255) DEFAULT NULL,
   `nama_skpd` VARCHAR(128) NOT NULL,
   `satuan_kerja` VARCHAR(256) NOT NULL,
   `nama_tahapan` VARCHAR(48) NOT NULL,
@@ -2040,6 +2040,10 @@ CREATE TABLE `esakip_finalisasi_tahap_laporan_pk` (
   `nip_pegawai_atasan` VARCHAR(64) DEFAULT NULL,
   `pangkat_pegawai_atasan` VARCHAR(128) DEFAULT NULL,
   `jabatan_pegawai_atasan` VARCHAR(128) NOT NULL,
+  `html_sasaran` TEXT DEFAULT NULL,
+  `html_program` TEXT DEFAULT NULL,
+  `html_kegiatan` TEXT DEFAULT NULL,
+  `html_subkegiatan` TEXT DEFAULT NULL,
   `active` TINYINT(1) NOT NULL DEFAULT 1,
   `tahun_anggaran` year(4) NOT NULL,
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -2067,27 +2071,6 @@ CREATE TABLE `esakip_data_pokin_rhk_pemda` (
   KEY `level_rhk_pemda` (`level_rhk_pemda`),
   KEY `id_pokin` (`id_pokin`),
   KEY `level_pokin` (`level_pokin`),
-  KEY `tahun_anggaran` (`tahun_anggaran`),
-  KEY `active` (`active`)
-);
-
-CREATE TABLE `esakip_finalisasi_rhk_laporan_pk` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `id_tahap_pk` INT(11) NOT NULL,
-  `tipe` INT(11) NOT NULL COMMENT '1 = Label Sasaran, 2 = Label Program, 3 = Label Kegiatan, 4 = Label Subkegiatan',
-  `kode` TEXT DEFAULT NULL,
-  `label` TEXT DEFAULT NULL,
-  `indikator` TEXT DEFAULT NULL,
-  `target` VARCHAR(64) DEFAULT NULL,
-  `anggaran` double(20, 0) DEFAULT NULL,
-  `keterangan` TEXT DEFAULT NULL COMMENT 'kolom keterangan berisi Sumber dana',
-  `tahun_anggaran` year(4) DEFAULT NULL,
-  `active` TINYINT(1) NOT NULL DEFAULT 1,
-  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `id_tahap_pk` (`id_tahap_pk`),
-  KEY `tipe` (`tipe`),
   KEY `tahun_anggaran` (`tahun_anggaran`),
   KEY `active` (`active`)
 );

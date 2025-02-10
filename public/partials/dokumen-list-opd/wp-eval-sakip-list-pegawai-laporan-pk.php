@@ -86,10 +86,35 @@ if (!isset($response['status']) || $response['status'] === false) {
 <div class="container-md">
 	<div class="cetak">
 		<div style="padding: 10px;margin:0 0 3rem 0;">
-			<h1 class="text-center table-title">Laporan Perjanjian Kinerja</br><?php echo $nama_skpd['nama_skpd'] ?></br>Tahun Anggaran <?php echo $input['tahun_anggaran']; ?></h1>
+			<h1 class="text-center">Laporan Perjanjian Kinerja</br><?php echo $nama_skpd['nama_skpd'] ?></br>Tahun Anggaran <?php echo $input['tahun_anggaran']; ?></h1>
 			<div id="action" class="action-section hide-excel"></div>
 			<div class="wrap-table mt-2">
 				<table id="cetak" title="List Pegawai Laporan Perjanjian Kinerja Perangkat Daerah" class="table table-bordered table_list_pegawai" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;">
+					<thead style="background: #ffc491;">
+						<tr>
+							<th class="text-center">Satker ID</th>
+							<th class="text-center">Satuan Kerja</th>
+							<th class="text-center">Tipe Pegawai</th>
+							<th class="text-center">NIP</th>
+							<th class="text-center">Nama Pegawai</th>
+							<th class="text-center">Jabatan</th>
+							<th class="text-center">Jumlah Dokumen Finalisasi</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container-md" id="pegawai_non_aktif" style="display: none;">
+	<div class="cetak">
+		<div style="padding: 10px;margin:0 0 3rem 0;">
+			<h1 class="text-center">Pegawai non aktif</h1>
+			<div class="wrap-table mt-2">
+				<table id="table_pegawai_non_aktif" class="table table-bordered" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;">
 					<thead style="background: #ffc491;">
 						<tr>
 							<th class="text-center">Satker ID</th>
@@ -132,6 +157,11 @@ if (!isset($response['status']) || $response['status'] === false) {
 				if (response.status === 'success') {
 					if (destroy == 1) {
 						laporan_pk_table.fnDestroy();
+					}
+					if (response.data_non_aktif) {
+						jQuery(`#pegawai_non_aktif`).show()
+						jQuery(`#table_pegawai_non_aktif tbody`).html(response.data_non_aktif)
+						jQuery(`#table_pegawai_non_aktif`).dataTable()
 					}
 					jQuery('.table_list_pegawai tbody').html(response.data);
 					window.laporan_pk_table = jQuery('.table_list_pegawai').dataTable({
