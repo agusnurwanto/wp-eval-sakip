@@ -286,7 +286,7 @@ $data_tahapan = $wpdb->get_results(
         WHERE nip = %d
           AND tahun_anggaran = %d
           AND active = 1
-        ORDER BY tanggal_dokumen, updated_at ASC
+        ORDER BY updated_at DESC
     ", $pihak_pertama['nip_pegawai'], $input['tahun']),
     ARRAY_A
 );
@@ -660,14 +660,32 @@ if ($data_tahapan) {
         <?php if (!empty($jumlah_data) && is_array($jumlah_data)) : ?>
             <div class="cr-container m-4 hide-display-print">
                 <h2 class="cr-title">Jumlah Dokumen Finalisasi Per SKPD</h2>
-                <?php foreach ($jumlah_data as $id_skpd => $v) : ?>
-                    <span class="badge badge-info fw-bold d-inline-flex align-items-center p-2 m-1 rounded-pill" style="font-size: 14px;">
-                        <i class="dashicons dashicons-building me-1" style="font-size: 16px;"></i>
-                        <?php echo $v['nama_skpd']; ?> | <?php echo $v['jumlah']; ?>
-                    </span>
-                <?php endforeach; ?>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered">
+                        <thead class="table-dark" style="pointer-events: none;">
+                            <tr>
+                                <th>No</th>
+                                <th>Nama SKPD</th>
+                                <th>Jumlah Dokumen</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $no = 1; // Mulai nomor urut dari 1
+                            foreach ($jumlah_data as $v) : ?>
+                                <tr>
+                                    <td><?php echo $no++; ?></td> <!-- Nomor urut otomatis -->
+                                    <td><?php echo $v['nama_skpd']; ?></td>
+                                    <td><?php echo $v['jumlah']; ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         <?php endif; ?>
+
+
 
         <div class="cr-container m-4 hide-display-print">
             <h2 class="cr-title">Pilih Laporan Perjanjian Kinerja</h2>
@@ -1224,10 +1242,6 @@ if ($data_tahapan) {
                 jQuery('#wrap-loading').hide()
                 console.log(response.message);
                 if (response.status === 'success') {
-                    jQuery(".editable-field").attr("title", "").attr("contenteditable", "false");
-                    jQuery(".cr-view-btn").show();
-                    jQuery(`#view-btn-${idTahap}`).hide();
-
                     jQuery('.nama-skpd-view').text(response.data.nama_skpd)
                     jQuery('.nama-satker-view').text(response.data.satuan_kerja)
                     jQuery('.alamat-kantor-view').text(response.data.alamat_kantor)
@@ -1247,63 +1261,42 @@ if ($data_tahapan) {
                     jQuery('#nama_tahap_finalisasi').val(response.data.nama_tahapan)
                     jQuery('#tanggal_tahap_finalisasi').val(response.data.tanggal_dokumen)
 
+                    // generate tbody untuk lembar kedua
+                    // Hapus isi tbody sebelum menambahkan data baru
+                    jQuery("#table-sasaran-view tbody, #table-program-view tbody, #table-kegiatan-view tbody, #table-subkegiatan-view tbody").empty();
+                    jQuery("#table-sasaran-view, #table-program-view, #table-kegiatan-view, #table-subkegiatan-view").hide();
+                    if (response.data.html_sasaran) {
+                        jQuery(`#table-sasaran-view tbody`).html(response.data.html_sasaran)
+                        jQuery(`#table-sasaran-view`).show()
+                    }
+                    if (response.data.html_program) {
+                        jQuery(`#table-program-view tbody`).html(response.data.html_program)
+                        jQuery(`#table-program-view`).show()
+                    }
+                    if (response.data.html_kegiatan) {
+                        jQuery(`#table-kegiatan-view tbody`).html(response.data.html_kegiatan)
+                        jQuery(`#table-kegiatan-view`).show()
+
+                    }
+                    if (response.data.html_subkegiatan) {
+                        jQuery(`#table-subkegiatan-view tbody`).html(response.data.html_subkegiatan)
+                        jQuery(`#table-subkegiatan-view`).show()
+                    }
+
+                    //disable contenteditable
+                    jQuery(".editable-field").attr("title", "").attr("contenteditable", "false");
+
+
+                    jQuery(".cr-view-btn").show(); // another view button
+                    jQuery(`#view-btn-${idTahap}`).hide(); //current view button
+
                     jQuery(`.badge-sedang-dilihat`).hide() //another badge
                     jQuery(`#badge-sedang-dilihat-${response.data.id}`).show() //current badge
 
                     jQuery('#finalisasi-btn').hide()
-                    jQuery('#display-btn-first').show() //view first card btn
                     jQuery('#edit-btn').show()
 
-                    // Hapus isi tbody sebelum menambahkan data baru
-                    jQuery("#table-sasaran-view tbody, #table-program-view tbody, #table-kegiatan-view tbody, #table-subkegiatan-view tbody").empty();
-
-                    let rhkData = response.data.rhk;
-
-                    // Inisialisasi counter untuk nomor urut dalam tabel
-                    let countSasaran = 1,
-                        countProgram = 1,
-                        countKegiatan = 1,
-                        countSubKegiatan = 1;
-
-                    // Looping data RHK dan masukkan ke tabel sesuai tipe
-                    rhkData.forEach((item) => {
-                        let row = "";
-
-                        if (item.tipe == "1") { // Sasaran
-                            row = `<tr>
-                                    <td class="esakip-text_tengah">${countSasaran++}</td>
-                                    <td class="esakip-text_kiri">${item.label}</td>
-                                    <td class="esakip-text_kiri">${item.indikator || '-'}</td>
-                                    <td class="esakip-text_kiri">${item.target || '-'}</td>
-                                </tr>`;
-                            jQuery("#table-sasaran-view tbody").append(row);
-                        } else if (item.tipe == "2") { // Program
-                            row = `<tr>
-                                        <td class="esakip-text_tengah">${countProgram++}</td>
-                                        <td class="esakip-text_kiri">${item.kode} ${item.label}</td>
-                                        <td class="esakip-text_kanan">${formatRupiah(parseInt(item.anggaran))}</td>
-                                        <td class="esakip-text_kiri">${item.keterangan || '-'}</td>
-                                    </tr>`;
-                            jQuery("#table-program-view tbody").append(row);
-                        } else if (item.tipe == "3") { // Kegiatan
-                            row = `<tr>
-                                        <td class="esakip-text_tengah">${countKegiatan++}</td>
-                                        <td class="esakip-text_kiri">${item.kode} ${item.label}</td>
-                                        <td class="esakip-text_kanan">${formatRupiah(parseInt(item.anggaran))}</td>
-                                        <td class="esakip-text_kiri">${item.keterangan || '-'}</td>
-                                    </tr>`;
-                            jQuery("#table-kegiatan-view tbody").append(row);
-                        } else if (item.tipe == "4") { // Subkegiatan
-                            row = `<tr>
-                                        <td class="esakip-text_tengah">${countSubKegiatan++}</td>
-                                        <td class="esakip-text_kiri">${item.kode} ${item.label}</td>
-                                        <td class="esakip-text_kanan">${formatRupiah(parseInt(item.anggaran))}</td>
-                                        <td class="esakip-text_kiri">${item.keterangan || '-'}</td>
-                                    </tr>`;
-                            jQuery("#table-subkegiatan-view tbody").append(row);
-                        }
-                    });
-
+                    jQuery('#display-btn-first').show() //view real time view btn
                 } else {
                     alert('Terjadi kesalahan: ' + response.message);
                 }
@@ -1340,7 +1333,6 @@ if ($data_tahapan) {
             },
             dataType: 'json',
             success: function(response) {
-                jQuery('#wrap-loading').hide()
                 if (response.status === 'success') {
                     alert(response.message);
                     jQuery(`#card-tahap-${idTahap}`).hide()
@@ -1348,8 +1340,14 @@ if ($data_tahapan) {
                     //jika dokumen sedang dibuka, reload!
                     if (idTahap == jQuery(`#id_data`).val()) {
                         location.reload()
+
+                        //disable btn
+                        jQuery(".cr-actions .cr-view-btn, .cr-actions .cr-view-btn-danger").prop("disabled", true).css("pointer-events", "none").css("opacity", "0.5");
+                    } else {
+                        jQuery('#wrap-loading').hide()
                     }
                 } else {
+                    jQuery('#wrap-loading').hide()
                     alert('Terjadi kesalahan: ' + response.message);
                 }
             },
@@ -1371,11 +1369,11 @@ if ($data_tahapan) {
             nama_tahapan: jQuery('#nama_dokumen').val(),
             tanggal_dokumen: jQuery('#tanggal_dokumen').val()
         };
-        
+
         let option_js = {
             id_skpd: '<?php echo $id_skpd; ?>',
             tahun: '<?php echo $input['tahun']; ?>',
-            nip_baru:'<?php echo $nip; ?>'
+            nip_baru: '<?php echo $nip; ?>'
         };
 
         jQuery('#wrap-loading').show()
@@ -1441,7 +1439,9 @@ if ($data_tahapan) {
                     alert(response.message);
                     jQuery(`#nama-tahapan-${id_data}`).text(namaTahapan)
                     jQuery(`#card-tahap-${id_data}`).attr("title", `${namaTahapan}`)
+
                     jQuery(`#tanggal-tahapan-${id_data}`).text(formatTanggalIndonesia(tanggalTahapan))
+                    jQuery('.tanggal-dokumen-view').text(formatTanggalIndonesia(tanggalTahapan))
                     jQuery('#modalEditFinalisasi').modal('hide')
                 } else {
                     alert('Terjadi kesalahan: ' + response.message);

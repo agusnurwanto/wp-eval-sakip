@@ -6087,7 +6087,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					", $_POST['id_skpd'], $_POST['tahun_anggaran']),
 					ARRAY_A
 				);
-
+				
 				//jika nip kedua kosong berarti atasan langsung bupati
 				$data_atasan = array();
 				if (!empty($_POST['nip_kedua'])) {
@@ -6108,8 +6108,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$data_atasan = $pihak_kedua;
 
 					//gelar depan atau belakang tambahkan
-					$data_atasan['nama_pegawai'] = $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama'] . ', ' . $pihak_kedua['gelar_belakang'];
-
+					$data_atasan['nama_pegawai'] = $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] . ', ' . $pihak_kedua['gelar_belakang'];
 
 					//jika ada status plt plh maka tambahkan
 					$data_atasan['jabatan'] = (!empty($_POST['status_kedua']) ? $_POST['status_kedua'] . ' ' . $pihak_kedua['jabatan'] : $pihak_kedua['jabatan']);
@@ -6131,8 +6130,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				}
 
 				//nama dan gelar pihak pertama
-				$nama_pihak_pertama = $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama'] . ', ' . $pihak_pertama['gelar_belakang'];
-				
+				$nama_pihak_pertama = $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . ', ' . $pihak_pertama['gelar_belakang'];
+
 				//data rhk (sasaran, program, kegiatan, subkegiatan)
 				$html_rhk = $this->get_pk_html($_POST['options']);
 
@@ -6198,16 +6197,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						WHERE id = %d
 						  AND active = 1
 					', $_POST['id_tahap']),
-					ARRAY_A
-				);
-				$ret['data']['rhk'] = $wpdb->get_results(
-					$wpdb->prepare('
-						SELECT
-							*
-						FROM esakip_finalisasi_rhk_laporan_pk
-						WHERE id_tahap_pk = %d
-						  AND active = 1
-					', $ret['data']['id']),
 					ARRAY_A
 				);
 			} else {
