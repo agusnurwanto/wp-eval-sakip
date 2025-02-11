@@ -1897,9 +1897,9 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
     {
         global $wpdb;
         $ret = array(
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Berhasil get data!',
-            'data' => array()
+            'data'    => array()
         );
 
         if (!empty($_POST)) {
@@ -1922,24 +1922,23 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                 if ($ret['status'] == 'success') {
                     $unit = $wpdb->get_row(
                         $wpdb->prepare("
-                        SELECT 
-                            nama_skpd, 
-                            id_skpd, 
-                            kode_skpd, 
-                            nipkepala 
-                        FROM esakip_data_unit 
-                        WHERE active=1 
-                          AND tahun_anggaran=%d
-                          AND is_skpd=1 
-                          AND id_unit=%d
-                        ORDER BY kode_skpd ASC
+                            SELECT 
+                                nama_skpd, 
+                                id_skpd, 
+                                kode_skpd, 
+                                nipkepala 
+                            FROM esakip_data_unit 
+                            WHERE active=1 
+                              AND tahun_anggaran=%d
+                              AND is_skpd=1 
+                              AND id_unit=%d
+                            ORDER BY kode_skpd ASC
                         ", $tahun_anggaran_sakip, $id_skpd),
                         ARRAY_A
                     );
 
                     if (!empty($unit)) {
                         $tbody = '';
-                        $tbody_non_aktif = '';
 
                         $mapping_unit_simpeg = $wpdb->get_row(
                             $wpdb->prepare("
@@ -1977,6 +1976,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                                     LEFT JOIN esakip_data_satker_simpeg s
                                            ON s.satker_id = p.satker_id
                                     WHERE p.satker_id LIKE %s 
+                                      AND p.active = 1
                                       AND s.tahun_anggaran = %d
                                     ORDER BY p.satker_id, p.tipe_pegawai_id, p.berakhir DESC, p.nama_pegawai
                                 ", $satker_id . '%', $tahun_anggaran),
@@ -1992,7 +1992,6 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                                     }
                                 }
                             }
-
 
                             if (!empty($data_pegawai_all)) {
                                 foreach ($data_pegawai_all as $key => $v_pgw) {
@@ -2012,30 +2011,17 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                                               AND nip = %d 
                                         ", $_POST['tahun_anggaran'], $id_skpd, $v_pgw['nip_baru'])
                                     );
-                                    if ($v_pgw['active'] == 1) {
-                                        $tbody .= "<tr>";
-                                        $tbody .= "<td class='text-left'>" . $v_pgw['satker_id'] . "</td>";
-                                        $tbody .= "<td class='text-left'>" . $v_pgw['nama_bidang'] . "</td>";
-                                        $tbody .= "<td class='text-left'>" . $v_pgw['tipe_pegawai'] . "</td>";
-                                        $tbody .= "<td class='text-left' title='Halaman Detail Perjanjian Kinerja'><a href='" . $detail_laporan_pk['url'] . "&id_skpd=" . $unit['id_skpd'] . "&nip=" . $v_pgw['nip_baru'] . "' target='_blank'>" . $v_pgw['nip_baru'] . "</a></td>";
-                                        $tbody .= "<td class='text-left'>" . $v_pgw['nama_pegawai'] . "</td>";
-                                        $tbody .= "<td class='text-left'>" . $v_pgw['jabatan'] . "</td>";
-                                        $tbody .= "<td class='text-center'>" . $count_finalisasi . "</td>";
-                                        $tbody .= "</tr>";
-                                    } else {
-                                        $tbody_non_aktif .= "<tr>";
-                                        $tbody_non_aktif .= "<td class='text-left'>" . $v_pgw['satker_id'] . "</td>";
-                                        $tbody_non_aktif .= "<td class='text-left'>" . $v_pgw['nama_bidang'] . "</td>";
-                                        $tbody_non_aktif .= "<td class='text-left'>" . $v_pgw['tipe_pegawai'] . "</td>";
-                                        $tbody_non_aktif .= "<td class='text-left' title='Halaman Detail Perjanjian Kinerja'><a href='" . $detail_laporan_pk['url'] . "&id_skpd=" . $unit['id_skpd'] . "&nip=" . $v_pgw['nip_baru'] . "' target='_blank'>" . $v_pgw['nip_baru'] . "</a></td>";
-                                        $tbody_non_aktif .= "<td class='text-left'>" . $v_pgw['nama_pegawai'] . "</td>";
-                                        $tbody_non_aktif .= "<td class='text-left'>" . $v_pgw['jabatan'] . "</td>";
-                                        $tbody_non_aktif .= "<td class='text-center'>" . $count_finalisasi . "</td>";
-                                        $tbody_non_aktif .= "</tr>";                  
-                                    }
+                                    $tbody .= "<tr>";
+                                    $tbody .= "<td class='text-left'>" . $v_pgw['satker_id'] . "</td>";
+                                    $tbody .= "<td class='text-left'>" . $v_pgw['nama_bidang'] . "</td>";
+                                    $tbody .= "<td class='text-left'>" . $v_pgw['tipe_pegawai'] . "</td>";
+                                    $tbody .= "<td class='text-left' title='Halaman Detail Perjanjian Kinerja'><a href='" . $detail_laporan_pk['url'] . "&id_skpd=" . $unit['id_skpd'] . "&nip=" . $v_pgw['nip_baru'] . "' target='_blank'>" . $v_pgw['nip_baru'] . "</a></td>";
+                                    $tbody .= "<td class='text-left'>" . $v_pgw['nama_pegawai'] . "</td>";
+                                    $tbody .= "<td class='text-left'>" . $v_pgw['jabatan'] . "</td>";
+                                    $tbody .= "<td class='text-center'>" . $count_finalisasi . "</td>";
+                                    $tbody .= "</tr>";
                                 }
                             }
-                            $ret['data_non_aktif'] = $tbody_non_aktif;
                             $ret['data'] = $tbody;
                         } else {
                             $ret['data'] = "<tr><td colspan='6' class='text-center'>Tidak ada data tersedia</td></tr>";

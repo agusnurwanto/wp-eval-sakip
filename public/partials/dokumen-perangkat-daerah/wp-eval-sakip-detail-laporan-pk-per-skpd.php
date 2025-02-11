@@ -629,13 +629,13 @@ if ($data_tahapan) {
 
         @media (max-width: 768px) {
             .cr-item {
-                flex: 0 0 calc(50% - 10px);
+                flex: 0 0 calc(33.333% - 10px);
             }
         }
 
         @media (max-width: 480px) {
             .cr-item {
-                flex: 0 0 100%;
+                flex: 0 0 33.333%;
             }
         }
     </style>
@@ -664,28 +664,35 @@ if ($data_tahapan) {
                     <table class="table table-hover table-bordered">
                         <thead class="table-dark" style="pointer-events: none;">
                             <tr>
-                                <th>No</th>
-                                <th>Nama SKPD</th>
-                                <th>Jumlah Dokumen</th>
+                                <th class="text-center">No</th>
+                                <th class="text-center">Nama SKPD</th>
+                                <th class="text-center">Jumlah Dokumen</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
-                            $no = 1; // Mulai nomor urut dari 1
-                            foreach ($jumlah_data as $v) : ?>
+                            $no = 1;
+                            $total_dokumen = 0;
+                            foreach ($jumlah_data as $v) :
+                                $total_dokumen += $v['jumlah'];
+                            ?>
                                 <tr>
-                                    <td><?php echo $no++; ?></td> <!-- Nomor urut otomatis -->
-                                    <td><?php echo $v['nama_skpd']; ?></td>
-                                    <td><?php echo $v['jumlah']; ?></td>
+                                    <td class="text-center"><?php echo $no++; ?></td>
+                                    <td class="text-left"><?php echo $v['nama_skpd']; ?></td>
+                                    <td class="text-right"><?php echo $v['jumlah']; ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
+                        <tfoot class="table font-weight-bold" style="pointer-events: none;">
+                            <tr>
+                                <td colspan="2" class="text-center">Total Keseluruhan</td>
+                                <td class="text-right"><?php echo $total_dokumen; ?></td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
         <?php endif; ?>
-
-
 
         <div class="cr-container m-4 hide-display-print">
             <h2 class="cr-title">Pilih Laporan Perjanjian Kinerja</h2>
@@ -825,6 +832,7 @@ if ($data_tahapan) {
                 </tbody>
             </table>
         </div>
+
         <div class="break-print"></div>
         <div class="page-print mt-5 text-center">
             <p class="title-laporan mt-3">PERJANJIAN KINERJA TAHUN <?php echo $input['tahun']; ?></p>
@@ -943,229 +951,260 @@ if ($data_tahapan) {
                 </tbody>
             </table>
         </div>
+
+        <div class="hide-display-print container mt-4 p-4 mb-4 border rounded bg-light">
+            <h4 class="font-weight-bold mb-3 text-dark">Catatan Finalisasi Dokumen PK:</h4>
+            <ul class="pl-3 text-muted">
+                <li class="text-danger font-weight-bold">⚠️ Dokumen PK yang sudah difinalisasi tidak dapat diedit kembali! <br> (Hanya nama tahapan dan tanggal dokumen yang masih bisa diubah.)</li>
+                <li>Dokumen PK saat ini dapat <strong>difinalisasikan per tahap</strong>.</li>
+                <li>Data pegawai dan Data atasan pegawai dalam dokumen PK diambil secara <strong>real-time</strong> dari aplikasi SIMPEG.</li>
+                <li>Pegawai Berstatus <strong>Plt./Plh./Pj.</strong> dapat mengisi form status jabatan yang muncul saat halaman pertama kali di muat.</li>
+                <li>Finalisasi dokumen akan menyimpan data pegawai dan Data atasan pegawai saat ini, termasuk:
+                    <ul>
+                        <li>NIP</li>
+                        <li>Pangkat dan Jabatan</li>
+                        <li>Nama (beserta gelar)</li>
+                        <li>Nama Perangkat Daerah saat ini</li>
+                        <li>Nama Satuan Kerja saat ini</li>
+                        <li>Status Jabatan (Plt./Plh./Pj.)</li>
+                    </ul>
+                    <strong>Pastikan data pegawai dan Data atasan pegawai sudah benar sebelum melakukan finalisasi.</strong>
+                </li>
+                <li>Finalisasi dokumen juga menyimpan data <strong>Plotting RHK (Rencana Hasil Kerja)</strong> per pegawai, meliputi:
+                    <ul>
+                        <li>Sasaran</li>
+                        <li>Program</li>
+                        <li>Kegiatan</li>
+                        <li>Subkegiatan</li>
+                    </ul>
+                    <strong>Pastikan data plotting RHK sudah sesuai sebelum finalisasi.</strong> Data ini dapat disesuaikan melalui halaman RHK.
+                </li>
+                <li><strong>Pegawai dapat memiliki dokumen PK di lebih dari satu Perangkat Daerah.</strong> Dokumen PK yang ditampilkan adalah berdasarkan data per pegawai dan per tahun.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="modal fade mt-4" id="modalFinalisasi" tabindex="-1" role="dialog" aria-labelledby="modalFinalisasi" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="title-label">Finalisasi Dokumen Perjanjian Kinerja <?php echo $input['tahun']; ?></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Informasi Pegawai -->
+                    <div class="card bg-light mb-3">
+                        <div class="card-header">
+                            <strong>Informasi Pegawai</strong>
+                        </div>
+                        <div class="card-body">
+                            <table class="borderless-table mb-4">
+                                <tbody>
+                                    <tr>
+                                        <td class="text-left" style="width: 20%;">
+                                            <strong>Nama Pegawai</strong>
+                                        </td>
+                                        <td class="text-left">
+                                            <strong>:</strong>
+                                        </td>
+                                        <td class="text-left" id="nama_pegawai"><?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . ', ' . $pihak_pertama['gelar_belakang']; ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left">
+                                            <strong>NIP</strong>
+                                        </td>
+                                        <td class="text-left">
+                                            <strong>:</strong>
+                                        </td>
+                                        <td class="text-left" id="nip_pegawai"><?php echo $pihak_pertama['nip_pegawai']; ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left">
+                                            <strong>Pangkat</strong>
+                                        </td>
+                                        <td class="text-left">
+                                            <strong>:</strong>
+                                        </td>
+                                        <td class="text-left" id="pangkat_pegawai"><?php echo $pihak_pertama['pangkat'] ?: '-'; ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left">
+                                            <strong>Jabatan</strong>
+                                        </td>
+                                        <td class="text-left">
+                                            <strong>:</strong>
+                                        </td>
+                                        <td class="text-left" id="jabatan_pegawai"><?php echo $pihak_pertama['jabatan_pegawai']; ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left">
+                                            <strong>Satuan Kerja</strong>
+                                        </td>
+                                        <td class="text-left">
+                                            <strong>:</strong>
+                                        </td>
+                                        <td class="text-left" id="bidang_pegawai"><?php echo strtoupper($pihak_pertama['bidang_pegawai']); ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left">
+                                            <strong>OPD</strong>
+                                        </td>
+                                        <td class="text-left">
+                                            <strong>:</strong>
+                                        </td>
+                                        <td class="text-left" id="nama_skpd"><?php echo strtoupper($skpd['nama_skpd']); ?>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Informasi RHK -->
+                    <div class="card bg-light mb-3">
+                        <div class="card-header">
+                            <strong>RHK</strong>
+                        </div>
+                        <div class="card-body">
+                            <?php if (!empty($html_pk['html_sasaran'])) : ?>
+                                <table class="table_data_anggaran" id="table_sasaran">
+                                    <thead class="bg-dark text-light">
+                                        <tr>
+                                            <th class="esakip-text_tengah" style="width: 46px;">No</th>
+                                            <th class="esakip-text_tengah" style="width: 470px;">Sasaran</th>
+                                            <th class="esakip-text_tengah" style="width: 180px;">Indikator</th>
+                                            <th class="esakip-text_tengah">Target</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php echo $html_pk['html_sasaran']; ?>
+                                    </tbody>
+                                </table>
+                            <?php endif; ?>
+
+                            <?php if (!empty($html_pk['html_program'])) : ?>
+                                <table class="table_data_anggaran" id="table_program">
+                                    <thead class="bg-dark text-light">
+                                        <tr>
+                                            <th class="esakip-text_tengah" style="width: 45px;">No</th>
+                                            <th class="esakip-text_tengah" style="width: 470px;">Program</th>
+                                            <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
+                                            <th class="esakip-text_tengah">Ket</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php echo $html_pk['html_program']; ?>
+                                    </tbody>
+                                </table>
+                            <?php endif; ?>
+
+                            <?php if (!empty($html_pk['html_kegiatan'])) : ?>
+                                <table class="table_data_anggaran" id="table_kegiatan">
+                                    <thead class="bg-dark text-light">
+                                        <tr>
+                                            <th class="esakip-text_tengah" style="width: 45px;">No</th>
+                                            <th class="esakip-text_tengah" style="width: 470px;">Kegiatan</th>
+                                            <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
+                                            <th class="esakip-text_tengah">Ket</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php echo $html_pk['html_kegiatan']; ?>
+                                    </tbody>
+                                </table>
+                            <?php endif; ?>
+
+                            <?php if (!empty($html_pk['html_sub_kegiatan'])) : ?>
+                                <table class="table_data_anggaran" id="table_subkegiatan">
+                                    <thead class="bg-dark text-light">
+                                        <tr>
+                                            <th class="esakip-text_tengah" style="width: 45px;">No</th>
+                                            <th class="esakip-text_tengah" style="width: 470px;">Sub Kegiatan</th>
+                                            <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
+                                            <th class="esakip-text_tengah">Ket</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php echo $html_pk['html_sub_kegiatan']; ?>
+                                    </tbody>
+                                </table>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <div class="card bg-light mb-3">
+                        <div class="card-header">
+                            <strong>Perjanjian Kinerja</strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="nama_dokumen">Nama Tahapan</label>
+                                    <input type="text" class="form-control" id="nama_dokumen" name="nama_dokumen" placeholder="ex : Perjanjian Kinerja tahun <?php echo $input['tahun']; ?>" maxlength="48" required>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="tanggal_dokumen">Tanggal Dokumen</label>
+                                    <input type="date" class="form-control" id="tanggal_dokumen" name="tanggal_dokumen" value="<?php echo date('Y-m-d'); ?>" required>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">Pastikan data yang tertera benar, laporan yang sudah difinalisasi akan disimpan dan tidak dapat di edit kembali.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" onclick="simpanFinalisasi()">Simpan</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade mt-4" id="modalEditFinalisasi" tabindex="-1" role="dialog" aria-labelledby="modalEditFinalisasi" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="title-label">Edit Finalisasi Dokumen Perjanjian Kinerja <?php echo $input['tahun']; ?></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="id_data" name="id_data" value="">
+
+                    <div class="card bg-light mb-3">
+                        <div class="card-header">
+                            <strong>Perjanjian Kinerja</strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="nama_tahap_finalisasi">Nama Tahapan</label>
+                                    <input type="text" class="form-control" id="nama_tahap_finalisasi" name="nama_tahap_finalisasi" placeholder="ex : Perjanjian Kinerja tahun <?php echo $input['tahun']; ?>" maxlength="48">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="tanggal_tahap_finalisasi">Tanggal Dokumen</label>
+                                    <input type="date" class="form-control" id="tanggal_tahap_finalisasi" name="tanggal_tahap_finalisasi">
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">Dokumen yang sudah difinalisasi hanya dapat diubah nama label nya.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" onclick="simpanEditFinalisasi()">Perbarui</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Tutup</button>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
-
-<div class="modal fade mt-4" id="modalFinalisasi" tabindex="-1" role="dialog" aria-labelledby="modalFinalisasi" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="title-label">Finalisasi Dokumen Perjanjian Kinerja <?php echo $input['tahun']; ?></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Informasi Pegawai -->
-                <div class="card bg-light mb-3">
-                    <div class="card-header">
-                        <strong>Informasi Pegawai</strong>
-                    </div>
-                    <div class="card-body">
-                        <table class="borderless-table mb-4">
-                            <tbody>
-                                <tr>
-                                    <td class="text-left" style="width: 20%;">
-                                        <strong>Nama Pegawai</strong>
-                                    </td>
-                                    <td class="text-left">
-                                        <strong>:</strong>
-                                    </td>
-                                    <td class="text-left" id="nama_pegawai"><?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . ', ' . $pihak_pertama['gelar_belakang']; ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="text-left">
-                                        <strong>NIP</strong>
-                                    </td>
-                                    <td class="text-left">
-                                        <strong>:</strong>
-                                    </td>
-                                    <td class="text-left" id="nip_pegawai"><?php echo $pihak_pertama['nip_pegawai']; ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="text-left">
-                                        <strong>Pangkat</strong>
-                                    </td>
-                                    <td class="text-left">
-                                        <strong>:</strong>
-                                    </td>
-                                    <td class="text-left" id="pangkat_pegawai"><?php echo $pihak_pertama['pangkat'] ?: '-'; ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="text-left">
-                                        <strong>Jabatan</strong>
-                                    </td>
-                                    <td class="text-left">
-                                        <strong>:</strong>
-                                    </td>
-                                    <td class="text-left" id="jabatan_pegawai"><?php echo $pihak_pertama['jabatan_pegawai']; ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="text-left">
-                                        <strong>Satuan Kerja</strong>
-                                    </td>
-                                    <td class="text-left">
-                                        <strong>:</strong>
-                                    </td>
-                                    <td class="text-left" id="bidang_pegawai"><?php echo strtoupper($pihak_pertama['bidang_pegawai']); ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="text-left">
-                                        <strong>OPD</strong>
-                                    </td>
-                                    <td class="text-left">
-                                        <strong>:</strong>
-                                    </td>
-                                    <td class="text-left" id="nama_skpd"><?php echo strtoupper($skpd['nama_skpd']); ?>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Informasi RHK -->
-                <div class="card bg-light mb-3">
-                    <div class="card-header">
-                        <strong>RHK</strong>
-                    </div>
-                    <div class="card-body">
-                        <?php if (!empty($html_pk['html_sasaran'])) : ?>
-                            <table class="table_data_anggaran" id="table_sasaran">
-                                <thead class="bg-dark text-light">
-                                    <tr>
-                                        <th class="esakip-text_tengah" style="width: 46px;">No</th>
-                                        <th class="esakip-text_tengah" style="width: 470px;">Sasaran</th>
-                                        <th class="esakip-text_tengah" style="width: 180px;">Indikator</th>
-                                        <th class="esakip-text_tengah">Target</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php echo $html_pk['html_sasaran']; ?>
-                                </tbody>
-                            </table>
-                        <?php endif; ?>
-
-                        <?php if (!empty($html_pk['html_program'])) : ?>
-                            <table class="table_data_anggaran" id="table_program">
-                                <thead class="bg-dark text-light">
-                                    <tr>
-                                        <th class="esakip-text_tengah" style="width: 45px;">No</th>
-                                        <th class="esakip-text_tengah" style="width: 470px;">Program</th>
-                                        <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
-                                        <th class="esakip-text_tengah">Ket</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php echo $html_pk['html_program']; ?>
-                                </tbody>
-                            </table>
-                        <?php endif; ?>
-
-                        <?php if (!empty($html_pk['html_kegiatan'])) : ?>
-                            <table class="table_data_anggaran" id="table_kegiatan">
-                                <thead class="bg-dark text-light">
-                                    <tr>
-                                        <th class="esakip-text_tengah" style="width: 45px;">No</th>
-                                        <th class="esakip-text_tengah" style="width: 470px;">Kegiatan</th>
-                                        <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
-                                        <th class="esakip-text_tengah">Ket</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php echo $html_pk['html_kegiatan']; ?>
-                                </tbody>
-                            </table>
-                        <?php endif; ?>
-
-                        <?php if (!empty($html_pk['html_sub_kegiatan'])) : ?>
-                            <table class="table_data_anggaran" id="table_subkegiatan">
-                                <thead class="bg-dark text-light">
-                                    <tr>
-                                        <th class="esakip-text_tengah" style="width: 45px;">No</th>
-                                        <th class="esakip-text_tengah" style="width: 470px;">Sub Kegiatan</th>
-                                        <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
-                                        <th class="esakip-text_tengah">Ket</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php echo $html_pk['html_sub_kegiatan']; ?>
-                                </tbody>
-                            </table>
-                        <?php endif; ?>
-                    </div>
-                </div>
-
-                <div class="card bg-light mb-3">
-                    <div class="card-header">
-                        <strong>Perjanjian Kinerja</strong>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="nama_dokumen">Nama Tahapan</label>
-                                <input type="text" class="form-control" id="nama_dokumen" name="nama_dokumen" placeholder="ex : Perjanjian Kinerja tahun <?php echo $input['tahun']; ?>" maxlength="48" required>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="tanggal_dokumen">Tanggal Dokumen</label>
-                                <input type="date" class="form-control" id="tanggal_dokumen" name="tanggal_dokumen" value="<?php echo date('Y-m-d'); ?>" required>
-                            </div>
-                        </div>
-                        <small class="form-text text-muted">Pastikan data yang tertera benar, laporan yang sudah difinalisasi akan disimpan dan tidak dapat di edit kembali.</small>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="submit" class="btn btn-primary" onclick="simpanFinalisasi()">Simpan</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Tutup</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade mt-4" id="modalEditFinalisasi" tabindex="-1" role="dialog" aria-labelledby="modalEditFinalisasi" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="title-label">Edit Finalisasi Dokumen Perjanjian Kinerja <?php echo $input['tahun']; ?></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" id="id_data" name="id_data" value="">
-
-                <div class="card bg-light mb-3">
-                    <div class="card-header">
-                        <strong>Perjanjian Kinerja</strong>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="nama_tahap_finalisasi">Nama Tahapan</label>
-                                <input type="text" class="form-control" id="nama_tahap_finalisasi" name="nama_tahap_finalisasi" placeholder="ex : Perjanjian Kinerja tahun <?php echo $input['tahun']; ?>" maxlength="48">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="tanggal_tahap_finalisasi">Tanggal Dokumen</label>
-                                <input type="date" class="form-control" id="tanggal_tahap_finalisasi" name="tanggal_tahap_finalisasi">
-                            </div>
-                        </div>
-                        <small class="form-text text-muted">Dokumen yang sudah difinalisasi hanya dapat diubah nama label nya.</small>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="submit" class="btn btn-primary" onclick="simpanEditFinalisasi()">Perbarui</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Tutup</button>
-            </div>
-        </div>
-    </div>
-</div>
 <script>
     jQuery(document).ready(function() {
         window.status_jabatan_1 = '';

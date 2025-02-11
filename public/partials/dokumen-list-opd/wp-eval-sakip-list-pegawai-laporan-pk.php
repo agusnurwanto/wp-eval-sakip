@@ -72,68 +72,86 @@ if (!isset($response['status']) || $response['status'] === false) {
 		vertical-align: middle;
 	}
 </style>
-<!-- Error Message -->
-<?php if (!empty($error_message) && is_array($error_message)) : ?>
-	<div class="container-md mx-auto" style="width: 900px;">
-		<div class="alert alert-danger mt-3">
-			<ul class="mb-0">
-				<?php echo implode('', array_map(fn($msg) => "<li>{$msg}</li>", $error_message)); ?>
-			</ul>
-		</div>
-	</div>
-<?php endif; ?>
 
-<div class="container-md">
-	<div class="cetak">
-		<div style="padding: 10px;margin:0 0 3rem 0;">
-			<h1 class="text-center">Laporan Perjanjian Kinerja</br><?php echo $nama_skpd['nama_skpd'] ?></br>Tahun Anggaran <?php echo $input['tahun_anggaran']; ?></h1>
-			<div id="action" class="action-section hide-excel"></div>
-			<div class="wrap-table mt-2">
-				<table id="cetak" title="List Pegawai Laporan Perjanjian Kinerja Perangkat Daerah" class="table table-bordered table_list_pegawai" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;">
-					<thead style="background: #ffc491;">
-						<tr>
-							<th class="text-center">Satker ID</th>
-							<th class="text-center">Satuan Kerja</th>
-							<th class="text-center">Tipe Pegawai</th>
-							<th class="text-center">NIP</th>
-							<th class="text-center">Nama Pegawai</th>
-							<th class="text-center">Jabatan</th>
-							<th class="text-center">Jumlah Dokumen Finalisasi</th>
-						</tr>
-					</thead>
-					<tbody>
-					</tbody>
-				</table>
+<body>
+	<!-- Error Message -->
+	<?php if (!empty($error_message) && is_array($error_message)) : ?>
+		<div class="container-md mx-auto" style="width: 900px;">
+			<div class="alert alert-danger mt-3">
+				<ul class="mb-0">
+					<?php echo implode('', array_map(fn($msg) => "<li>{$msg}</li>", $error_message)); ?>
+				</ul>
+			</div>
+		</div>
+	<?php endif; ?>
+
+	<div class="container-md">
+		<div class="cetak">
+			<div style="padding: 10px;margin:0 0 3rem 0;">
+				<h1 class="text-center">Laporan Perjanjian Kinerja</br><?php echo $nama_skpd['nama_skpd'] ?></br>Tahun Anggaran <?php echo $input['tahun_anggaran']; ?></h1>
+				<div id="action" class="action-section hide-excel"></div>
+				<div class="wrap-table mt-2">
+					<table id="cetak" title="List Pegawai Laporan Perjanjian Kinerja Perangkat Daerah" class="table table-bordered table_list_pegawai" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;">
+						<thead style="background: #ffc491;">
+							<tr>
+								<th class="text-center">Satker ID</th>
+								<th class="text-center">Satuan Kerja</th>
+								<th class="text-center">Tipe Pegawai</th>
+								<th class="text-center">NIP</th>
+								<th class="text-center">Nama Pegawai</th>
+								<th class="text-center">Jabatan</th>
+								<th class="text-center">Jumlah Dokumen Finalisasi</th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
 
-<div class="container-md" id="pegawai_non_aktif" style="display: none;">
-	<div class="cetak">
-		<div style="padding: 10px;margin:0 0 3rem 0;">
-			<h1 class="text-center">Pegawai non aktif</h1>
-			<div class="wrap-table mt-2">
-				<table id="table_pegawai_non_aktif" class="table table-bordered" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;">
-					<thead style="background: #ffc491;">
-						<tr>
-							<th class="text-center">Satker ID</th>
-							<th class="text-center">Satuan Kerja</th>
-							<th class="text-center">Tipe Pegawai</th>
-							<th class="text-center">NIP</th>
-							<th class="text-center">Nama Pegawai</th>
-							<th class="text-center">Jabatan</th>
-							<th class="text-center">Jumlah Dokumen Finalisasi</th>
-						</tr>
-					</thead>
-					<tbody>
-					</tbody>
-				</table>
+	<div class="container-md" id="pegawai_non_aktif" style="display: none;">
+		<div class="cetak">
+			<div style="padding: 10px;margin:0 0 3rem 0;">
+				<h1 class="text-center">PK Pegawai yang non aktif</h1>
+				<div class="wrap-table mt-2">
+					<table id="table_pegawai_non_aktif" class="table table-bordered" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;">
+						<thead style="background: #ffc491;">
+							<tr>
+								<th class="text-center">Satker ID</th>
+								<th class="text-center">Satuan Kerja</th>
+								<th class="text-center">Tipe Pegawai</th>
+								<th class="text-center">NIP</th>
+								<th class="text-center">Nama Pegawai</th>
+								<th class="text-center">Jabatan</th>
+								<th class="text-center">Jumlah Dokumen Finalisasi</th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
 
+	<div class="hide-print container mt-4 mb-4 p-4 border rounded bg-light">
+		<h4 class="font-weight-bold mb-3 text-dark">Catatan:</h4>
+		<ul class="pl-3 text-muted">
+			<li>Tabel <strong>"Pegawai Non-Aktif"</strong> menampilkan daftar pegawai yang sudah tidak bertugas di Perangkat Daerah terkait, baik karena pensiun, mutasi, atau alasan lainnya.</li>
+			<li>Jumlah dokumen finalisasi dihitung berdasarkan jumlah dokumen yang telah difinalisasi per Perangkat Daerah. Perlu diperhatikan bahwa satu pegawai dapat memiliki dokumen PK di lebih dari satu Perangkat Daerah.</li>
+			<li>Data pegawai dalam dokumen PK diambil secara <strong>real-time</strong> dari aplikasi SIMPEG.</li>
+			<li>Untuk melihat detail dokumen finalisasi, klik pada tautan NIP pegawai. Halaman detail memungkinkan pengguna untuk:
+				<ul>
+					<li>Melakukan finalisasi dokumen</li>
+					<li>Mencetak atau menyimpan dokumen</li>
+					<li>Melihat dokumen PK dalam secara real-time atau versi final yang tersimpan sesuai tahapan</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+</body>
 <script>
 	jQuery(document).ready(function() {
 		getTablePegawai();
