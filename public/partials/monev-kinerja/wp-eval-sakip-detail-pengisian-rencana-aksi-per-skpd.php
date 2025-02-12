@@ -53,6 +53,7 @@ $skpd = $wpdb->get_row(
 
 $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
+$user_nip = $current_user->data->user_login;
 $is_admin_panrb = in_array('admin_panrb', $user_roles);
 $is_administrator = in_array('administrator', $user_roles);
 
@@ -78,6 +79,67 @@ $cek_settingan_menu = $wpdb->get_var(
 );
 
 $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
+
+// hak akses user pegawai
+$data_user_pegawai = $wpdb->get_row(
+    $wpdb->prepare(
+        "SELECT
+            nip_baru,
+            nama_pegawai,
+            satker_id,
+            tipe_pegawai_id,
+            plt_plh,
+            tmt_sk_plth,
+            berakhir
+        FROM 
+            esakip_data_pegawai_simpeg
+        WHERE
+            nip_baru=%s
+            AND active=%d
+        ", $user_nip, 1), ARRAY_A);
+
+$skpd_user_pegawai = array();
+if(!empty($data_user_pegawai)){
+    $satker_pegawai_simpeg = substr($data_user_pegawai['satker_id'], 0, 2);
+
+    $skpd_user_pegawai = $wpdb->get_row(
+        $wpdb->prepare(
+            "SELECT 
+                simpeg.id_satker_simpeg,
+                unit.nama_skpd, 
+                unit.id_skpd, 
+                unit.kode_skpd,
+                unit.is_skpd
+            FROM 
+                esakip_data_mapping_unit_sipd_simpeg AS simpeg
+            JOIN 
+                esakip_data_unit AS unit
+            ON 
+                simpeg.id_skpd = unit.id_skpd
+            WHERE 
+                simpeg.id_satker_simpeg=%d 
+            AND simpeg.tahun_anggaran=%d
+            AND simpeg.active=%d
+            AND unit.tahun_anggaran=%d
+            AND unit.active=%d
+        GROUP BY unit.id_skpd", $satker_pegawai_simpeg, $input['tahun'], 1, $input['tahun'], 1), ARRAY_A);
+}
+
+// TIPE HAK AKSES USER PEGAWAI | 0 = TIDAK ADA | 1 = ALL | 2 = HANYA RHK TERKAIT
+$hak_akses_user_pegawai = 0;
+// if(!empty($skpd_user_pegawai)){
+//     if(($skpd_user_pegawai['id_skpd'] == $id_skpd && $data_user_pegawai['tipe_pegawai_id'] == 11 && strlen($data_user_pegawai['satker_id']) == 2) || $is_administrator){
+//         $hak_akses_user_pegawai = 1;
+//     }else if($skpd_user_pegawai['id_skpd'] == $id_skpd){
+//         $hak_akses_user_pegawai = 2;
+//     }
+// }else{
+//     if($is_administrator){
+//         $hak_akses_user_pegawai = 1;
+//     }
+// }
+
+////////////end////////////
 
 $renaksi_pemda = $wpdb->get_results(
     $wpdb->prepare("
@@ -468,7 +530,11 @@ foreach ($get_pegawai as $pegawai) {
 <script type="text/javascript">
     jQuery(document).ready(function() {
         run_download_excel_sakip();
-        jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-rencana-aksi" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
+        // window.hak_akses_pegawai = <?php echo $hak_akses_user_pegawai; ?>;
+
+        // if(hak_akses_pegawai != 0){
+        //     jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-rencana-aksi" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
+        // }
 
         window.id_jadwal = <?php echo $id_jadwal; ?>;
         window.id_jadwal_wpsipd = <?php echo $id_jadwal_wpsipd; ?>;

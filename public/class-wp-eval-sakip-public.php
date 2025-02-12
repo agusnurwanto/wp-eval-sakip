@@ -20357,6 +20357,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					</div>
 			</div>';
 
+		$menu_atas = array();
 		if (
 			in_array("administrator", $user_meta->roles)
 			|| in_array("admin_bappeda", $user_meta->roles)
@@ -20417,13 +20418,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					nama_skpd, 
 					id_skpd, 
 					kode_skpd,
-					is_skpd
+					is_skpd,
+					id_unit
 				from esakip_data_unit 
 				where nipkepala=%s 
 					and tahun_anggaran=%d
-				group by id_skpd", $nipkepala[0], $tahun_skpd), ARRAY_A);
+					and is_skpd=%d
+				group by id_skpd", $nipkepala[0], $tahun_skpd,1), ARRAY_A);
 
 			foreach ($skpd_db_datas as $skpd_db) {
+				$menu_atas[] = $skpd_db['id_skpd'];
 				$pengisian_lke_per_skpd_page = '';
 				$periode_input_pohon_kinerja_opd = '';
 				$periode_renstra_skpd = '';
@@ -20904,6 +20908,108 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						<li>' . $halaman_input_iku . '</li>
 						<li>' . $halaman_laporan_pk_skpd . '</li>
 					</ul>';
+			}
+		} 
+		if (
+			in_array("pegawai", $user_meta->roles)
+		) {
+			$nip_pegawai = get_user_meta($user_id, '_nip') ?: get_user_meta($user_id, 'nip');
+			$tahun_skpd = get_option('_crb_tahun_wpsipd');
+			$data_pegawai_simpeg = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT
+						id, nip_baru, nama_pegawai, satker_id
+					FROM
+						esakip_data_pegawai_simpeg
+					WHERE
+						nip_baru=%s
+						AND active=%d"
+					, $nip_pegawai[0], 1
+				), ARRAY_A
+			);
+
+			if(!empty($data_pegawai_simpeg)){
+				foreach ($data_pegawai_simpeg as $key => $data_pegawai) {
+					$satker_simpeg = substr($data_pegawai['satker_id'], 0, 2);
+
+					$skpd_db_datas = $wpdb->get_results(
+						$wpdb->prepare(
+							"SELECT 
+								simpeg.id_satker_simpeg,
+								unit.nama_skpd, 
+								unit.id_skpd, 
+								unit.kode_skpd,
+								unit.is_skpd
+							FROM 
+								esakip_data_mapping_unit_sipd_simpeg AS simpeg
+							JOIN 
+								esakip_data_unit AS unit
+							ON 
+								simpeg.id_skpd = unit.id_skpd
+							WHERE 
+								simpeg.id_satker_simpeg=%d 
+							AND simpeg.tahun_anggaran=%d
+							AND simpeg.active=%d
+							AND unit.tahun_anggaran=%d
+							AND unit.active=%d
+						GROUP BY unit.id_skpd", $satker_simpeg, $_GET['tahun'], 1, $tahun_skpd, 1), ARRAY_A);
+		
+					foreach ($skpd_db_datas as $skpd_db) {
+						if(in_array($skpd_db['id_skpd'], $menu_atas)){
+							continue;
+						}
+						$pengisian_rencana_aksi_skpd = $this->functions->generatePage(array(
+							'nama_page' => 'Halaman Pengisian Rencana Hasil Kerja ' . $_GET['tahun'],
+							'content' => '[detail_pengisian_rencana_aksi tahun=' . $_GET['tahun'] . ']',
+							'show_header' => 1,
+							'post_status' => 'private'
+						));
+						$title_pengisian_rencana_aksi_skpd = 'Pengisian Rencana Hasil Kerja';
+						$pengisian_rencana_aksi_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+						$pengisian_rencana_aksi_per_skpd_page = '<li><a href="#" target="_blank" class="btn btn-primary">' .  $title_pengisian_rencana_aksi_skpd . '</a></li>';
+						// ' . $pengisian_rencana_aksi_skpd['url'] . '
+			
+						$halaman_input_rhk_pegawai = '
+							<div class="accordion">
+								<h5 class="esakip-header-tahun" data-id="pengisian-rencana-aksi-' . $skpd_db['id_skpd'] . '" style="margin: 0;">Pengisian Rencana Hasil Kerja</h5>
+								<div class="esakip-body-tahun" data-id="pengisian-rencana-aksi-' . $skpd_db['id_skpd'] . '">
+									<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+										' . $pengisian_rencana_aksi_per_skpd_page . '
+									</ul>
+								</div>
+							</div>';
+
+						//Laporan PK Page (per tahun) for SKPD
+						if (!empty($_GET['tahun'])) {
+							$laporan_pk_page = $this->functions->generatePage(array(
+								'nama_page' 	=> 'Halaman List Pegawai Laporan PK ' . $_GET['tahun'],
+								'content' 		=> '[list_pegawai_laporan_pk]',
+								'show_header' 	=> 1,
+								'post_status' 	=> 'private'
+							));
+							$laporan_pk_btn = '<li><a target="_blank" href="#" class="btn btn-primary">Laporan PK (Perjanjian Kinerja)</a></li>';
+							// ' . $laporan_pk_page['url'] . '&id_skpd=' . $skpd_db['id_skpd'] . '
+						}
+
+						$halaman_laporan_pk_pegawai = '
+						<div class="accordion">
+							<h5 class="esakip-header-tahun" data-id="laporan-pk-' . $skpd_db['id_skpd'] . '" style="margin: 0;">Laporan PK (Perjanjian Kinerja)</h5>
+							<div class="esakip-body-tahun" data-id="laporan-pk-' . $skpd_db['id_skpd'] . '">
+								<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+									' . $laporan_pk_btn . '
+								</ul>
+							</div>
+						</div>';
+
+						echo '
+						<h2 class="text-center">' . $skpd_db['nama_skpd'] . '</h2>
+							<ul class="daftar-menu-sakip" style="margin-bottom: 3rem;">
+								<li>'. $halaman_input_rhk_pegawai .'</li>
+								<li>'. $halaman_laporan_pk_pegawai .'</li>
+								<li><p><small>*Menu User Sebagai Pegawai Perangkat Daerah</small></p></li>
+							</ul>';
+					}
+				}
 			}
 		}
 	}
@@ -28454,6 +28560,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$opsi_data_pegawai['plt_plh'] = NULL;
 						$opsi_data_pegawai['tmt_sk_plth'] = NULL;
 						$opsi_data_pegawai['berakhir'] = NULL;
+					}
+
+					if(!empty($data['gelar_belakang'])){
+						$opsi_data_pegawai['gelar_belakang'] = $data['gelar_belakang'];
+					}
+					if(!empty($data['gelar_depan'])){
+						$opsi_data_pegawai['gelar_depan'] = $data['gelar_depan'];
 					}
 
 					if (!empty($exists)) {
