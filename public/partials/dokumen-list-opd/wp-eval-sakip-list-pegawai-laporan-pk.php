@@ -139,7 +139,7 @@ if (!isset($response['status']) || $response['status'] === false) {
 	<div class="hide-print container mt-4 mb-4 p-4 border rounded bg-light">
 		<h4 class="font-weight-bold mb-3 text-dark">Catatan:</h4>
 		<ul class="pl-3 text-muted">
-			<li>Tabel <strong>"PK Pegawai yang non-aktif"</strong> menampilkan daftar pegawai yang sudah tidak bertugas di Perangkat Daerah terkait, baik karena pensiun, mutasi, atau alasan lainnya.</li>
+			<li>Tabel <strong>"PK Pegawai yang non-aktif"</strong> menampilkan daftar Dokumen PK yang sudah tidak bertugas di Perangkat Daerah terkait, baik karena pensiun, mutasi, atau alasan lainnya.</li>
 			<li>Jumlah dokumen finalisasi dihitung berdasarkan jumlah dokumen yang telah difinalisasi per Perangkat Daerah. Perlu diperhatikan bahwa satu pegawai dapat memiliki dokumen PK di lebih dari satu Perangkat Daerah.</li>
 			<li>Data pegawai dalam dokumen PK diambil secara <strong>real-time</strong> dari aplikasi SIMPEG.</li>
 			<li>Untuk melihat detail dokumen finalisasi, klik pada tautan NIP pegawai. Halaman detail memungkinkan pengguna untuk:
