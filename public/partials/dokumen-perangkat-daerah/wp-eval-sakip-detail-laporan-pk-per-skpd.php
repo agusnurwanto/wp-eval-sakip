@@ -184,13 +184,6 @@ if (empty($data_atasan)) {
             ", $satker_id_atasan, 11),
             ARRAY_A
         );
-
-        //SINKRON DATA PIHAK KEDUA (KEPALA)
-        $simpeg_pihak_kedua = $this->get_pegawai_simpeg('asn', $data_atasan['nip_baru']);
-        $response_2 = json_decode($simpeg_pihak_kedua, true);
-        if (!isset($response_2['status']) || $response_2['status'] === false) {
-            array_push($error_message, $response_2['message']);
-        }
     } else {
         // JIKA PEGAWAI BIASA
         $data_atasan = $wpdb->get_row(
@@ -208,13 +201,13 @@ if (empty($data_atasan)) {
             ", $data_satker['satker_id'], 11),
             ARRAY_A
         );
+    }
 
-        //SINKRON DATA PIHAK KEDUA (KEPALA)
-        $simpeg_pihak_kedua = $this->get_pegawai_simpeg('asn', $data_atasan['nip_baru']);
-        $response_2 = json_decode($simpeg_pihak_kedua, true);
-        if (!isset($response_2['status']) || $response_2['status'] === false) {
-            array_push($error_message, $response_2['message']);
-        }
+    //SINKRON DATA PIHAK KEDUA (KEPALA)
+    $simpeg_pihak_kedua = $this->get_pegawai_simpeg('asn', $data_atasan['nip_baru']);
+    $response_2 = json_decode($simpeg_pihak_kedua, true);
+    if (!isset($response_2['status']) || $response_2['status'] === false) {
+        array_push($error_message, $response_2['message']);
     }
 }
 
@@ -249,8 +242,7 @@ if (
     $pihak_kedua['jabatan_pegawai'] = $data_atasan['jabatan'];
 } else if (!empty($data_atasan['jabatan'])) {
     //JIKA PIHAK KEDUA BUKAN KEPALA DAERAH, TAMPILKAN PANGKAT NIP DLL
-
-    $data_atasan = $wpdb->get_row(
+    $data_pegawai = $wpdb->get_row(
         $wpdb->prepare("
             SELECT
                 p.*,
@@ -258,17 +250,16 @@ if (
             FROM esakip_data_pegawai_simpeg p
             LEFT JOIN esakip_data_satker_simpeg ds
                    ON ds.satker_id = p.satker_id
-            WHERE p.satker_id=%s 
-              AND p.tipe_pegawai_id=%d 
-              AND p.active=1
-            ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
-        ", $data_satker['satker_id'], 11),
+            WHERE p.nip_baru = %s
+              AND p.active = 1
+        ", $data_atasan['nip_baru']),
         ARRAY_A
     );
-    $pihak_kedua['pangkat']         = $data_atasan['pangkat'] ?? '-';
-    $pihak_kedua['gelar_depan']     = $data_atasan['gelar_depan'] ?? '';
-    $pihak_kedua['gelar_belakang']  = $data_atasan['gelar_belakang'] ?? '';
-    $pihak_kedua['jabatan_pegawai'] = $data_atasan['jabatan'] . ' ' . $data_atasan['nama_bidang'] ?? '-';
+
+    $pihak_kedua['pangkat']         = $data_pegawai['pangkat'] ?? '-';
+    $pihak_kedua['gelar_depan']     = $data_pegawai['gelar_depan'] ?? '';
+    $pihak_kedua['gelar_belakang']  = $data_pegawai['gelar_belakang'] ?? '';
+    $pihak_kedua['jabatan_pegawai'] = $data_pegawai['jabatan'] . ' ' . $data_pegawai['nama_bidang'] ?? '-';
 }
 
 $options = array(
@@ -921,7 +912,7 @@ if ($data_tahapan) {
                         <td></td>
                     </tr>
                     <tr class="text-center">
-                        <td class="ttd-pejabat nama-pegawai-atasan_view">
+                        <td class="ttd-pejabat nama-pegawai-atasan-view">
                             <?php echo $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] . ', ' . $pihak_kedua['gelar_belakang']; ?>
                         </td>
                         <td class="ttd-pejabat nama-pegawai-view">

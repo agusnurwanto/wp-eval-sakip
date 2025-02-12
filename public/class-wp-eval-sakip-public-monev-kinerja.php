@@ -6111,7 +6111,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$data_atasan['nama_pegawai'] = $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] . ', ' . $pihak_kedua['gelar_belakang'];
 
 					//jika ada status plt plh maka tambahkan
-					$data_atasan['jabatan'] = (!empty($_POST['status_kedua']) ? $_POST['status_kedua'] . ' ' . $pihak_kedua['jabatan'] : $pihak_kedua['jabatan']);
+					$data_atasan['jabatan'] = (!empty($_POST['status_kedua']) ? $_POST['status_kedua'] . ' ' . $pihak_kedua['jabatan'] . ' ' . $pihak_kedua['nama_bidang'] : $pihak_kedua['jabatan'] . ' ' . $pihak_kedua['nama_bidang']);
 				} else {
 					//atasan Kepala Daerah
 					$nama_kepala_daerah = get_option('_crb_kepala_daerah');

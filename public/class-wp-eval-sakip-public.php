@@ -29062,7 +29062,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		return "$day $month $year";
 	}
 
-	function get_data_skpd_by_id($id_skpd, $tahun_anggaran)
+	public function get_data_skpd_by_id($id_skpd, $tahun_anggaran)
 	{
 		global $wpdb;
 

@@ -1899,148 +1899,177 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
         $ret = array(
             'status'  => 'success',
             'message' => 'Berhasil get data!',
-            'data'    => array()
+            'data'    => '<tr><td colspan="6" class="text-center">Tidak ada data ditemukan</td></tr>'
         );
 
         if (!empty($_POST)) {
             if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-                if (!empty($_POST['tahun_anggaran'])) {
-                    $tahun_anggaran = $_POST['tahun_anggaran'];
-                } else {
+                if (empty($_POST['tahun_anggaran']) || empty($_POST['id_skpd'])) {
                     $ret['status'] = 'error';
-                    $ret['message'] = 'Tahun Anggaran kosong!';
-                }
-                if (!empty($_POST['id_skpd'])) {
-                    $id_skpd = $_POST['id_skpd'];
-                } else {
-                    $ret['status'] = 'error';
-                    $ret['message'] = 'ID SKPD kosong!';
+                    $ret['message'] = 'Parameter tidak valid!';
+                    die(json_encode($ret));
                 }
 
                 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+                $unit = $this->get_data_skpd_by_id($_POST['id_skpd'], $tahun_anggaran_sakip);
+                if (empty($unit)) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Unit aktif tidak ditemukan!';
+                    die(json_encode($ret));
+                }
 
-                if ($ret['status'] == 'success') {
-                    $unit = $wpdb->get_row(
-                        $wpdb->prepare("
-                            SELECT 
-                                nama_skpd, 
-                                id_skpd, 
-                                kode_skpd, 
-                                nipkepala 
-                            FROM esakip_data_unit 
-                            WHERE active=1 
-                              AND tahun_anggaran=%d
-                              AND is_skpd=1 
-                              AND id_unit=%d
-                            ORDER BY kode_skpd ASC
-                        ", $tahun_anggaran_sakip, $id_skpd),
-                        ARRAY_A
-                    );
+                $tbody = '';
+                $mapping_satker_id = $wpdb->get_var(
+                    $wpdb->prepare("
+                        SELECT
+                            b.satker_id
+                        FROM esakip_data_mapping_unit_sipd_simpeg a 
+                        LEFT JOIN esakip_data_satker_simpeg b 
+                               ON b.satker_id = a.id_satker_simpeg 
+                              AND b.tahun_anggaran = a.tahun_anggaran 
+                              AND b.active = 1
+                        WHERE a.tahun_anggaran = %d 
+                          AND a.id_skpd = %d;
+                    ", $_POST['tahun_anggaran'], $unit['id_skpd'])
+                );
 
-                    if (!empty($unit)) {
-                        $tbody = '';
+                if (empty($mapping_satker_id)) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Mapping unit tidak ditemukan!';
+                    die(json_encode($ret));
+                }
 
-                        $mapping_unit_simpeg = $wpdb->get_row(
-                            $wpdb->prepare("
-                                SELECT 
-                                    a.*,
-                                    b.satker_id
-                                FROM esakip_data_mapping_unit_sipd_simpeg a 
-                                LEFT JOIN esakip_data_satker_simpeg b 
-                                       ON b.satker_id = a.id_satker_simpeg 
-                                      AND b.tahun_anggaran = a.tahun_anggaran 
-                                      AND b.active=1
-                                WHERE a.tahun_anggaran = %d 
-                                  AND a.id_skpd=%d;
-                            ", $tahun_anggaran, $unit['id_skpd']),
-                            ARRAY_A
-                        );
+                $data_pegawai_all = array();
+                $satker_id = $mapping_satker_id;
+                $data_pegawai = $wpdb->get_results(
+                    $wpdb->prepare("
+                        SELECT 
+                            p.nip_baru,
+                            p.nama_pegawai,
+                            p.satker_id,
+                            p.jabatan,
+                            p.tipe_pegawai,
+                            p.tipe_pegawai_id,
+                            p.active,
+                            s.nama AS nama_bidang
+                        FROM esakip_data_pegawai_simpeg p
+                        LEFT JOIN esakip_data_satker_simpeg s
+                               ON s.satker_id = p.satker_id
+                        WHERE p.satker_id LIKE %s 
+                          AND p.active = 1
+                          AND s.tahun_anggaran = %d
+                        ORDER BY p.satker_id, p.tipe_pegawai_id, p.berakhir DESC, p.nama_pegawai
+                    ", $satker_id . '%', $_POST['tahun_anggaran']),
+                    ARRAY_A
+                );
 
-                        $satker_id = 0;
-                        if (!empty($mapping_unit_simpeg)) {
-                            $data_pegawai_all = array();
-                            $satker_id = $mapping_unit_simpeg['satker_id'];
-
-                            $data_pegawai = $wpdb->get_results(
-                                $wpdb->prepare("
-                                    SELECT 
-                                        p.nip_baru,
-                                        p.nama_pegawai,
-                                        p.satker_id,
-                                        p.jabatan,
-                                        p.tipe_pegawai,
-                                        p.tipe_pegawai_id,
-                                        p.active,
-                                        s.nama AS nama_bidang
-                                    FROM esakip_data_pegawai_simpeg p
-                                    LEFT JOIN esakip_data_satker_simpeg s
-                                           ON s.satker_id = p.satker_id
-                                    WHERE p.satker_id LIKE %s 
-                                      AND p.active = 1
-                                      AND s.tahun_anggaran = %d
-                                    ORDER BY p.satker_id, p.tipe_pegawai_id, p.berakhir DESC, p.nama_pegawai
-                                ", $satker_id . '%', $tahun_anggaran),
-                                ARRAY_A
-                            );
-
-                            if (!empty($data_pegawai)) {
-                                foreach ($data_pegawai as $v_1) {
-                                    if (strtoupper(trim($v_1['jabatan'])) == 'KEPALA' && $v_1['satker_id'] == $satker_id) {
-                                        array_unshift($data_pegawai_all, $v_1);
-                                    } else {
-                                        $data_pegawai_all[] = $v_1;
-                                    }
-                                }
-                            }
-
-                            if (!empty($data_pegawai_all)) {
-                                foreach ($data_pegawai_all as $key => $v_pgw) {
-                                    $detail_laporan_pk = $this->functions->generatePage(array(
-                                        'nama_page' => 'Halaman Detail Laporan PK ' . $tahun_anggaran,
-                                        'content' => '[detail_laporan_pk tahun=' . $tahun_anggaran . ']',
-                                        'show_header' => 1,
-                                        'post_status' => 'private'
-                                    ));
-                                    $count_finalisasi = $wpdb->get_var(
-                                        $wpdb->prepare("
-                                            SELECT COUNT(id)
-                                            FROM esakip_finalisasi_tahap_laporan_pk 
-                                            WHERE active = 1 
-                                              AND tahun_anggaran = %d
-                                              AND id_skpd = %d
-                                              AND nip = %d 
-                                        ", $_POST['tahun_anggaran'], $id_skpd, $v_pgw['nip_baru'])
-                                    );
-                                    $tbody .= "<tr>";
-                                    $tbody .= "<td class='text-left'>" . $v_pgw['satker_id'] . "</td>";
-                                    $tbody .= "<td class='text-left'>" . $v_pgw['nama_bidang'] . "</td>";
-                                    $tbody .= "<td class='text-left'>" . $v_pgw['tipe_pegawai'] . "</td>";
-                                    $tbody .= "<td class='text-left' title='Halaman Detail Perjanjian Kinerja'><a href='" . $detail_laporan_pk['url'] . "&id_skpd=" . $unit['id_skpd'] . "&nip=" . $v_pgw['nip_baru'] . "' target='_blank'>" . $v_pgw['nip_baru'] . "</a></td>";
-                                    $tbody .= "<td class='text-left'>" . $v_pgw['nama_pegawai'] . "</td>";
-                                    $tbody .= "<td class='text-left'>" . $v_pgw['jabatan'] . "</td>";
-                                    $tbody .= "<td class='text-center'>" . $count_finalisasi . "</td>";
-                                    $tbody .= "</tr>";
-                                }
-                            }
-                            $ret['data'] = $tbody;
+                if (!empty($data_pegawai)) {
+                    foreach ($data_pegawai as $v_1) {
+                        if (
+                            strtoupper(trim($v_1['jabatan'])) == 'KEPALA'
+                            && $v_1['satker_id'] == $satker_id
+                        ) {
+                            array_unshift($data_pegawai_all, $v_1);
                         } else {
-                            $ret['data'] = "<tr><td colspan='6' class='text-center'>Tidak ada data tersedia</td></tr>";
+                            $data_pegawai_all[] = $v_1;
                         }
-                    } else {
-                        $ret['data'] = "<tr><td colspan='6' class='text-center'>Tidak ada data tersedia</td></tr>";
                     }
                 }
-            } else {
-                $ret = array(
-                    'status' => 'error',
-                    'message'   => 'Api Key tidak sesuai!'
+
+                if (empty($data_pegawai_all)) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Pegawai tidak ditemukan!';
+                    die(json_encode($ret));
+                }
+
+                $detail_laporan_pk = $this->functions->generatePage(array(
+                    'nama_page'   => 'Halaman Detail Laporan PK ' . $_POST['tahun_anggaran'],
+                    'content'     => '[detail_laporan_pk tahun=' . $_POST['tahun_anggaran'] . ']',
+                    'show_header' => 1,
+                    'post_status' => 'private'
+                ));
+
+                foreach ($data_pegawai_all as $key => $v_pgw) {
+                    $count_finalisasi = $wpdb->get_var(
+                        $wpdb->prepare("
+                            SELECT 
+                                COUNT(id)
+                            FROM esakip_finalisasi_tahap_laporan_pk 
+                            WHERE active = 1 
+                              AND tahun_anggaran = %d
+                              AND id_skpd = %d
+                              AND nip = %d 
+                        ", $_POST['tahun_anggaran'], $_POST['id_skpd'], $v_pgw['nip_baru'])
+                    );
+                    $tbody .= "<tr>";
+                    $tbody .= "<td class='text-left'>" . $v_pgw['satker_id'] . "</td>";
+                    $tbody .= "<td class='text-left'>" . $v_pgw['nama_bidang'] . "</td>";
+                    $tbody .= "<td class='text-left'>" . $v_pgw['tipe_pegawai'] . "</td>";
+                    $tbody .= "<td class='text-left' title='Halaman Detail Perjanjian Kinerja'><a href='" . $detail_laporan_pk['url'] . "&id_skpd=" . $unit['id_skpd'] . "&nip=" . $v_pgw['nip_baru'] . "' target='_blank'>" . $v_pgw['nip_baru'] . "</a></td>";
+                    $tbody .= "<td class='text-left'>" . $v_pgw['nama_pegawai'] . "</td>";
+                    $tbody .= "<td class='text-left'>" . $v_pgw['jabatan'] . "</td>";
+                    $tbody .= "<td class='text-center'>" . $count_finalisasi . "</td>";
+                    $tbody .= "</tr>";
+                }
+                $ret['data'] = $tbody;
+
+                $data_finalisasi = $wpdb->get_results(
+                    $wpdb->prepare("
+                        SELECT 
+                            pk.nip, 
+                            pk.nama_pegawai, 
+                            pk.satuan_kerja, 
+                            pk.id_skpd, 
+                            pk.nama_skpd, 
+                            pk.jabatan_pegawai,
+                            p.satker_id,
+                            p.tipe_pegawai
+                        FROM esakip_finalisasi_tahap_laporan_pk pk
+                        LEFT JOIN esakip_data_pegawai_simpeg p 
+                               ON pk.nip = p.nip_baru 
+                        WHERE pk.tahun_anggaran = %d
+                          AND p.satker_id = %d
+                          AND pk.id_skpd != %d
+                          AND pk.active = 1
+                    ", $_POST['tahun_anggaran'], $mapping_satker_id, $_POST['id_skpd']),
+                    ARRAY_A
                 );
+
+                $tbody_nonaktif = '';
+                if (!empty($data_finalisasi)) {
+                    foreach ($data_finalisasi as $v) {
+                        $count_finalisasi_2 = $wpdb->get_var(
+                            $wpdb->prepare("
+                                SELECT 
+                                    COUNT(id)
+                                FROM esakip_finalisasi_tahap_laporan_pk 
+                                WHERE active = 1 
+                                  AND tahun_anggaran = %d
+                                  AND id_skpd != %d
+                                  AND nip = %d
+                            ", $_POST['tahun_anggaran'], $_POST['id_skpd'], $v['nip'])
+                        );
+
+                        $tbody_nonaktif .= "<tr>";
+                        $tbody_nonaktif .= "<td class='text-left'>" . $v['satker_id'] . "</td>";
+                        $tbody_nonaktif .= "<td class='text-left'>" . $v['nama_skpd'] . "</td>";
+                        $tbody_nonaktif .= "<td class='text-left'>" . $v['satuan_kerja'] . "</td>";
+                        $tbody_nonaktif .= "<td class='text-center' title='Halaman Detail Perjanjian Kinerja'><a href='" . $detail_laporan_pk['url'] . "&id_skpd=" . $unit['id_skpd'] . "&nip=" . $v['nip'] . "' target='_blank'>" . $v['nip'] . "</a></td>";
+                        $tbody_nonaktif .= "<td class='text-left'>" . $v['nama_pegawai'] . "</td>";
+                        $tbody_nonaktif .= "<td class='text-left'>" . $v['jabatan_pegawai'] . "</td>";
+                        $tbody_nonaktif .= "<td class='text-center'>" . $count_finalisasi_2 . "</td>";
+                        $tbody_nonaktif .= "</tr>";
+                    }
+
+                    $ret['data_non_aktif'] = $tbody_nonaktif;
+                }
+            } else {
+                $ret['status'] = 'error';
+                $ret['message'] = 'API Key tidak sesuai!';
             }
         } else {
-            $ret = array(
-                'status' => 'error',
-                'message'   => 'Format tidak sesuai!'
-            );
+            $ret['status'] = 'error';
+            $ret['message'] = 'Format tidak sesuai!';
         }
         die(json_encode($ret));
     }

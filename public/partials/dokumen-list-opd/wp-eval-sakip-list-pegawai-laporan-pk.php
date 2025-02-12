@@ -114,14 +114,14 @@ if (!isset($response['status']) || $response['status'] === false) {
 	<div class="container-md" id="pegawai_non_aktif" style="display: none;">
 		<div class="cetak">
 			<div style="padding: 10px;margin:0 0 3rem 0;">
-				<h1 class="text-center">PK Pegawai yang non aktif</h1>
+				<h1 class="text-center">PK Pegawai yang non-aktif</h1>
 				<div class="wrap-table mt-2">
 					<table id="table_pegawai_non_aktif" class="table table-bordered" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;">
 						<thead style="background: #ffc491;">
 							<tr>
 								<th class="text-center">Satker ID</th>
+								<th class="text-center">Perangkat Daerah</th>
 								<th class="text-center">Satuan Kerja</th>
-								<th class="text-center">Tipe Pegawai</th>
 								<th class="text-center">NIP</th>
 								<th class="text-center">Nama Pegawai</th>
 								<th class="text-center">Jabatan</th>
@@ -139,7 +139,7 @@ if (!isset($response['status']) || $response['status'] === false) {
 	<div class="hide-print container mt-4 mb-4 p-4 border rounded bg-light">
 		<h4 class="font-weight-bold mb-3 text-dark">Catatan:</h4>
 		<ul class="pl-3 text-muted">
-			<li>Tabel <strong>"Pegawai Non-Aktif"</strong> menampilkan daftar pegawai yang sudah tidak bertugas di Perangkat Daerah terkait, baik karena pensiun, mutasi, atau alasan lainnya.</li>
+			<li>Tabel <strong>"PK Pegawai yang non-aktif"</strong> menampilkan daftar pegawai yang sudah tidak bertugas di Perangkat Daerah terkait, baik karena pensiun, mutasi, atau alasan lainnya.</li>
 			<li>Jumlah dokumen finalisasi dihitung berdasarkan jumlah dokumen yang telah difinalisasi per Perangkat Daerah. Perlu diperhatikan bahwa satu pegawai dapat memiliki dokumen PK di lebih dari satu Perangkat Daerah.</li>
 			<li>Data pegawai dalam dokumen PK diambil secara <strong>real-time</strong> dari aplikasi SIMPEG.</li>
 			<li>Untuk melihat detail dokumen finalisasi, klik pada tautan NIP pegawai. Halaman detail memungkinkan pengguna untuk:
