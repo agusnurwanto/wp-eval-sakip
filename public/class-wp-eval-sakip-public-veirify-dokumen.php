@@ -1897,9 +1897,9 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
     {
         global $wpdb;
         $ret = array(
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Berhasil get data!',
-            'data' => array()
+            'data'    => array()
         );
 
         if (!empty($_POST)) {
@@ -1922,17 +1922,17 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                 if ($ret['status'] == 'success') {
                     $unit = $wpdb->get_row(
                         $wpdb->prepare("
-                        SELECT 
-                            nama_skpd, 
-                            id_skpd, 
-                            kode_skpd, 
-                            nipkepala 
-                        FROM esakip_data_unit 
-                        WHERE active=1 
-                          AND tahun_anggaran=%d
-                          AND is_skpd=1 
-                          AND id_unit=%d
-                        ORDER BY kode_skpd ASC
+                            SELECT 
+                                nama_skpd, 
+                                id_skpd, 
+                                kode_skpd, 
+                                nipkepala 
+                            FROM esakip_data_unit 
+                            WHERE active=1 
+                              AND tahun_anggaran=%d
+                              AND is_skpd=1 
+                              AND id_unit=%d
+                            ORDER BY kode_skpd ASC
                         ", $tahun_anggaran_sakip, $id_skpd),
                         ARRAY_A
                     );
@@ -1940,27 +1940,29 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                     if (!empty($unit)) {
                         $tbody = '';
 
-                        $mapping_unit_simpeg = $wpdb->get_row($wpdb->prepare("
-                            SELECT 
-                                a.*,
-                                b.satker_id
-                            FROM 
-                                esakip_data_mapping_unit_sipd_simpeg a 
-                            LEFT JOIN esakip_data_satker_simpeg b 
-                                ON b.satker_id=a.id_satker_simpeg AND 
-                                b.tahun_anggaran=a.tahun_anggaran AND b.active=1
-                            WHERE 
-                                a.tahun_anggaran=%d and
-                                a.id_skpd=%d;
-                        ", $tahun_anggaran, $unit['id_skpd']), ARRAY_A);
+                        $mapping_unit_simpeg = $wpdb->get_row(
+                            $wpdb->prepare("
+                                SELECT 
+                                    a.*,
+                                    b.satker_id
+                                FROM esakip_data_mapping_unit_sipd_simpeg a 
+                                LEFT JOIN esakip_data_satker_simpeg b 
+                                       ON b.satker_id = a.id_satker_simpeg 
+                                      AND b.tahun_anggaran = a.tahun_anggaran 
+                                      AND b.active=1
+                                WHERE a.tahun_anggaran = %d 
+                                  AND a.id_skpd=%d;
+                            ", $tahun_anggaran, $unit['id_skpd']),
+                            ARRAY_A
+                        );
 
                         $satker_id = 0;
                         if (!empty($mapping_unit_simpeg)) {
                             $data_pegawai_all = array();
                             $satker_id = $mapping_unit_simpeg['satker_id'];
 
-                            $data_pegawai = $wpdb->get_results($wpdb->prepare(
-                                "
+                            $data_pegawai = $wpdb->get_results(
+                                $wpdb->prepare("
                                     SELECT 
                                         p.nip_baru,
                                         p.nama_pegawai,
@@ -1968,21 +1970,18 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                                         p.jabatan,
                                         p.tipe_pegawai,
                                         p.tipe_pegawai_id,
+                                        p.active,
                                         s.nama AS nama_bidang
-                                    FROM 
-                                        esakip_data_pegawai_simpeg p
-                                    LEFT JOIN
-                                        esakip_data_satker_simpeg s
-                                    ON s.satker_id = p.satker_id
-                                    WHERE
-                                        p.satker_id LIKE %s AND
-                                        p.active=%d AND
-                                        s.tahun_anggaran=%d
-                                        ORDER BY p.satker_id, p.tipe_pegawai_id, p.berakhir DESC, p.nama_pegawai",
-                                $satker_id . '%',
-                                1,
-                                $tahun_anggaran
-                            ), ARRAY_A);
+                                    FROM esakip_data_pegawai_simpeg p
+                                    LEFT JOIN esakip_data_satker_simpeg s
+                                           ON s.satker_id = p.satker_id
+                                    WHERE p.satker_id LIKE %s 
+                                      AND p.active = 1
+                                      AND s.tahun_anggaran = %d
+                                    ORDER BY p.satker_id, p.tipe_pegawai_id, p.berakhir DESC, p.nama_pegawai
+                                ", $satker_id . '%', $tahun_anggaran),
+                                ARRAY_A
+                            );
 
                             if (!empty($data_pegawai)) {
                                 foreach ($data_pegawai as $v_1) {
@@ -1994,10 +1993,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                                 }
                             }
 
-
                             if (!empty($data_pegawai_all)) {
-                                $ret['cek'] = $data_pegawai_all;
-
                                 foreach ($data_pegawai_all as $key => $v_pgw) {
                                     $detail_laporan_pk = $this->functions->generatePage(array(
                                         'nama_page' => 'Halaman Detail Laporan PK ' . $tahun_anggaran,
@@ -2011,10 +2007,10 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                                             FROM esakip_finalisasi_tahap_laporan_pk 
                                             WHERE active = 1 
                                               AND tahun_anggaran = %d
+                                              AND id_skpd = %d
                                               AND nip = %d 
-                                        ", $_POST['tahun_anggaran'], $v_pgw['nip_baru'])
+                                        ", $_POST['tahun_anggaran'], $id_skpd, $v_pgw['nip_baru'])
                                     );
-
                                     $tbody .= "<tr>";
                                     $tbody .= "<td class='text-left'>" . $v_pgw['satker_id'] . "</td>";
                                     $tbody .= "<td class='text-left'>" . $v_pgw['nama_bidang'] . "</td>";

@@ -27587,16 +27587,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							]),
 						]);
 						$ret_body[] = $response;
-						if ( is_wp_error( $response ) ) {
+						if (is_wp_error($response)) {
 							$error_message = $response->get_error_message();
 							throw new Exception("Something went wrong: $error_message", 1);
 						}
 						$body = json_decode(wp_remote_retrieve_body($response));
 						if (isset($body->error)) {
-							if(is_array($response)){
+							if (is_array($response)) {
 								$response = json_encode($response);
 							}
-							throw new Exception("Gagal kirim data dokumen: " . $data['dokumen'] . ", Coba lagi! ".$response, 1);
+							throw new Exception("Gagal kirim data dokumen: " . $data['dokumen'] . ", Coba lagi! " . $response, 1);
 						}
 
 						if (!empty($body->data)) {
@@ -28470,150 +28470,224 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
-	public function get_pegawai_simpeg()
+	public function get_pegawai_simpeg($type = null, $value = null)
 	{
 		global $wpdb;
+		$ret = array(
+			'status'  => true,
+			'message' => 'Berhasil get data Kepegawaian!'
+		);
 
-		if (get_option('_crb_api_simpeg_status')) {
-			try {
+		if (!get_option('_crb_url_api_simpeg') || !get_option('_crb_authorization_api_simpeg')) {
+			$ret = json_encode([
+				'status'  => false,
+				'message' => 'Pengaturan URL API Kepegawaian belum diisi!'
+			]);
+			if (!$type) {
+				echo $ret;
+				exit;
+			}
+			return $ret;
+		}
+
+		if (!get_option('_crb_api_simpeg_status')) {
+			$ret = json_encode([
+				'status'  => false,
+				'message' => 'Pengaturan Status API Kepegawaian ditutup!'
+			]);
+			if (!$type) {
+				echo $ret;
+				exit;
+			}
+			return $ret;
+		}
+
+		try {
+			if ($type) {
+				$tipe = $type;
+				$val = $value;
+
+				switch ($type) {
+					case 'unor':
+						$path = 'api/satker/' . $val . '/pegawai';
+						break;
+					case 'asn':
+						$path = 'api/pegawai/' . $val . '/jabatan';
+						break;
+					default:
+						$ret = json_encode([
+							'status'  => false,
+							'message' => 'Parameter tidak valid!'
+						]);
+						if (!$type) {
+							echo $ret;
+							exit;
+						}
+						return $ret;
+				}
+			} else if ($_POST['type']) {
+				$tipe = $_POST['type'];
+				$val = $_POST['value'];
 
 				switch ($_POST['type']) {
 					case 'unor':
-						$path = 'api/satker/' . $_POST['value'] . '/pegawai';
+						$path = 'api/satker/' . $val . '/pegawai';
 						break;
-
 					case 'asn':
-						$path = 'api/pegawai/' . $_POST['value'] . '/jabatan';
+						$path = 'api/pegawai/' . $val . '/jabatan';
 						break;
+					default:
+						$ret = json_encode([
+							'status'  => false,
+							'message' => 'Parameter tidak valid!'
+						]);
+						if (!$type) {
+							echo $ret;
+							exit;
+						}
+						return $ret;
 				}
+			} else {
+				$ret = json_encode([
+					'status'  => false,
+					'message' => 'Parameter tidak valid!'
+				]);
+				if (!$type) {
+					echo $ret;
+					exit;
+				}
+				return $ret;
+			}
 
-				$option = array(
-					'url' => get_option('_crb_url_api_simpeg') . $path,
-					'type' => 'get',
-					'header' => array('Authorization: Basic ' . get_option('_crb_authorization_api_simpeg'))
+			$option = array(
+				'url'    => get_option('_crb_url_api_simpeg') . $path,
+				'type'   => 'get',
+				'header' => array('Authorization: Basic ' . get_option('_crb_authorization_api_simpeg'))
+			);
+
+			$response = $this->functions->curl_post($option);
+
+			if (empty($response)) {
+				$ret = json_encode([
+					'status'  => false,
+					'message' => 'Response API kosong!'
+				]);
+				if (!$type) {
+					echo $ret;
+					exit;
+				}
+				return $ret;
+			} else if ($response == 'Unauthorized') {
+				$ret = json_encode([
+					'status'  => false,
+					'message' => $response
+				]);
+				if (!$type) {
+					echo $ret;
+					exit;
+				}
+				return $ret;
+			}
+
+			$data_pegawai = json_decode($response, true);
+			if (json_last_error() !== JSON_ERROR_NONE) {
+				$ret = json_encode([
+					'status'  => false,
+					'message' => json_last_error_msg()
+				]);
+				if (!$type) {
+					echo $ret;
+					exit;
+				}
+				return $ret;
+			}
+
+			$table = 'esakip_data_pegawai_simpeg';
+
+			if ($tipe == 'unor') {
+				$wpdb->query(
+					$wpdb->prepare(
+						"UPDATE $table SET active = %d WHERE satker_id LIKE %s",
+						0,
+						$val . '%'
+					)
+				);
+			}
+
+			foreach ($data_pegawai as $data) {
+				$exists = $wpdb->get_var(
+					$wpdb->prepare("
+						SELECT 
+							id 
+						FROM $table 
+						WHERE nip_baru = %s
+						  AND satker_id = %s
+						  AND jabatan = %s
+					", $data['nip_baru'], $data['satker_id'], $data['jabatan'])
 				);
 
-				$response = $this->functions->curl_post($option);
+				$opsi_data_pegawai = array(
+					'nama_pegawai'     => $data['nama_pegawai'],
+					'satker_id'        => $data['satker_id'],
+					'jabatan'          => $data['jabatan'],
+					'active'           => 1
+				);
 
-				if (empty($response)) {
-					throw new Exception("Respon API kosong!", 1);
-				} else if ($response == 'Unauthorized') {
-					throw new Exception($response . ' ' . json_encode($opsi), 1);
+				if ($tipe == 'asn') {
+					$opsi_data_pegawai['gol_ruang'] 	 = $data['gol_ruang'];
+					$opsi_data_pegawai['pangkat'] 		 = $data['nmgolruang'];
+					$opsi_data_pegawai['gelar_depan'] 	 = $data['gelar_depan'];
+					$opsi_data_pegawai['gelar_belakang'] = $data['gelar_belakang'];
 				}
 
-				$dataPegawai = json_decode($response, true);
-
-				if (json_last_error() !== JSON_ERROR_NONE) {
-					throw new Exception("Terjadi kesalahan ketika mengakses API, Error : " . json_last_error_msg(), 1);
+				if ($tipe == 'unor') {
+					$opsi_data_pegawai['tipe_pegawai'] 		= $data['tipe_pegawai'];
+					$opsi_data_pegawai['tipe_pegawai_id'] 	= $data['tipe_pegawai_id'];
 				}
 
-				$table = 'esakip_data_pegawai_simpeg';
-
-				if ($_POST['type'] == 'unor') {
-					$wpdb->query(
-						$wpdb->prepare(
-							"UPDATE $table SET active = %d WHERE satker_id LIKE %s",
-							0,
-							$_POST['value'] . '%'
-						)
-					);
+				if (!empty($data['plt_plh'])) {
+					$opsi_data_pegawai['plt_plh'] 		= $data['plt_plh'];
+					$opsi_data_pegawai['tmt_sk_plth'] 	= !empty($data['tmt_sk_plth']) ? (new DateTime($data['tmt_sk_plth']))->format('Y-m-d H:i:s') : NULL;
+					$opsi_data_pegawai['berakhir'] 		= !empty($data['berakhir']) ? (new DateTime($data['berakhir']))->format('Y-m-d H:i:s') : NULL;
+				} else {
+					$opsi_data_pegawai['plt_plh'] 		= NULL;
+					$opsi_data_pegawai['tmt_sk_plth'] 	= NULL;
+					$opsi_data_pegawai['berakhir'] 		= NULL;
 				}
 
-				foreach ($dataPegawai as $key => $data) {
-					$exists = $wpdb->get_var(
-						$wpdb->prepare(
-							"SELECT 
-								id 
-							FROM 
-								" . $table . "
-							WHERE 
-								nip_baru=%s",
-							trim($data['nip_baru'])
-						)
-					);
-
-					$opsi_data_pegawai = array(
-						'nama_pegawai' => $data['nama_pegawai'],
-						'satker_id' => $data['satker_id'],
-						'jabatan' => $data['jabatan'],
-						'tipe_pegawai' => $data['tipe_pegawai'],
-						'tipe_pegawai_id' => $data['tipe_pegawai_id'],
-						'active' => 1,
-					);
-
-					$date_hari_ini = date('Y-m-d H:i:s');
-
-					if (!empty($data['plt_plh'])) {
-						$opsi_data_pegawai['plt_plh'] = $data['plt_plh'];
-
-						// Membuat objek DateTime dari string ISO 8601
-						$date_tmt = new DateTime($data['tmt_sk_plth']);
-						$date_berakhir = new DateTime($data['berakhir']);
-
-						// Mengubah format menjadi 'Y-m-d H:i:s'
-						$format_baru_tmt = $date_tmt->format('Y-m-d H:i:s');
-						$format_baru_berakhir = $date_berakhir->format('Y-m-d H:i:s');
-
-						$opsi_data_pegawai['tmt_sk_plth'] = !empty($data['tmt_sk_plth']) ? $format_baru_tmt : NULL;
-						$opsi_data_pegawai['berakhir'] = !empty($data['berakhir']) ? $format_baru_berakhir : NULL;
-					} else {
-						$opsi_data_pegawai['plt_plh'] = NULL;
-						$opsi_data_pegawai['tmt_sk_plth'] = NULL;
-						$opsi_data_pegawai['berakhir'] = NULL;
+				if ($exists) {
+					$opsi_data_pegawai['update_at'] = current_time('mysql');
+					if (
+						!empty($data['plt_plh'])
+						&& date('Y-m-d H:i:s') > $opsi_data_pegawai['berakhir']
+					) {
+						continue;
 					}
-
-					if(!empty($data['gelar_belakang'])){
-						$opsi_data_pegawai['gelar_belakang'] = $data['gelar_belakang'];
-					}
-					if(!empty($data['gelar_depan'])){
-						$opsi_data_pegawai['gelar_depan'] = $data['gelar_depan'];
-					}
-
-					if (!empty($exists)) {
-						$opsi_data_pegawai['update_at'] = current_time('mysql');
-
-						/**Jika masa PJ/PLT telah selesai,lewati karena inputan awal yang dipakai */
-						if (!empty($data['plt_plh']) && $date_hari_ini > $opsi_data_pegawai['berakhir']) {
-							continue;
-						}
-
-						$wpdb->update(
-							$table,
-							$opsi_data_pegawai,
-							[
-								'id' => $exists
-							]
-						);
-					} else {
-						$opsi_data_pegawai['nip_baru'] = $data['nip_baru'];
-						$opsi_data_pegawai['created_at'] = current_time('mysql');
-						$wpdb->insert(
-							$table,
-							$opsi_data_pegawai
-						);
-					}
+					$wpdb->update($table, $opsi_data_pegawai, ['id' => $exists]);
+				} else {
+					$opsi_data_pegawai['nip_baru'] = $data['nip_baru'];
+					$opsi_data_pegawai['created_at'] = current_time('mysql');
+					$wpdb->insert($table, $opsi_data_pegawai);
 				}
-
-				echo json_encode([
-					'status' => true,
-					'message' => 'Sukses ambil data pegawai!'
-				]);
-				exit;
-			} catch (Exception $e) {
-				echo json_encode([
-					'status' => false,
-					'message' => $e->getMessage()
-				]);
+			}
+		} catch (Exception $e) {
+			$ret = json_encode([
+				'status'  => false,
+				'message' => $e->getMessage()
+			]);
+			if (!$type) {
+				echo $ret;
 				exit;
 			}
-		} else {
-			echo json_encode([
-				'status' => true,
-				'message' => 'Pengaturan Status API Kepegawaian ditutup!'
-			]);
+			return $ret;
+		}
+		if (!$type) {
+			echo json_encode($ret);
 			exit;
 		}
+		return json_encode($ret);
 	}
+
 
 	public function get_list_satker_simpeg()
 	{
@@ -28963,47 +29037,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
-	function get_detail_pegawai_simpeg($nip_pegawai)
-	{
-		$ret = array(
-			'status'  => 'success',
-			'message' => 'berhasil get detail pegawai!',
-			'data'    => array()
-		);
-		if (get_option('_crb_url_api_simpeg') && get_option('_crb_authorization_api_simpeg')) {
-			if (!empty($nip_pegawai)) {
-				$path = 'api/pegawai/' . $nip_pegawai . '/jabatan';
-				$option = array(
-					'url'    => get_option('_crb_url_api_simpeg') . $path,
-					'type'   => 'get',
-					'header' => array('Authorization: Basic ' . get_option('_crb_authorization_api_simpeg'))
-				);
-
-				$response = $this->functions->curl_post($option);
-				$data = json_decode($response, true);
-
-				if (json_last_error() !== JSON_ERROR_NONE) {
-					$ret['status'] = 'error';
-					$ret['message'] = json_last_error_msg();
-				} else if (empty($data)) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Response API kosong';
-				} else {
-					$ret['data'] = $data;
-				}
-			} else {
-				$ret['status'] = 'error';
-				$ret['message'] = 'NIP Kosong';
-			}
-		} else {
-			$ret['status'] = 'error';
-			$ret['message'] = 'URL SIMPEG tidak sesuai';
-		}
-
-		return $ret;
-	}
-
-	function format_tanggal_indo($tanggal)
+	function format_tanggal_indo($date)
 	{
 		// Array untuk nama bulan dalam bahasa Indonesia
 		$bulan = array(
@@ -29021,10 +29055,29 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			12 => 'Desember'
 		);
 
-		$day = date('d', strtotime($tanggal));
-		$month = $bulan[date('n', strtotime($tanggal))];
-		$year = date('Y', strtotime($tanggal));
+		$day = date('d', strtotime($date));
+		$month = $bulan[date('n', strtotime($date))];
+		$year = date('Y', strtotime($date));
 
 		return "$day $month $year";
+	}
+
+	function get_data_skpd_by_id($id_skpd, $tahun_anggaran)
+	{
+		global $wpdb;
+
+		$data_skpd = $wpdb->get_row(
+			$wpdb->prepare("
+				SELECT 
+					*
+				FROM esakip_data_unit
+				WHERE id_skpd=%d
+				  AND tahun_anggaran=%d
+				  AND active = 1
+			", $id_skpd, $tahun_anggaran),
+			ARRAY_A
+		);
+
+		return $data_skpd;
 	}
 }
