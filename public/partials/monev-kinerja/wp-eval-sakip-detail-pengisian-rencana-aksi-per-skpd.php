@@ -533,7 +533,7 @@ foreach ($get_pegawai as $pegawai) {
         // window.hak_akses_pegawai = <?php echo $hak_akses_user_pegawai; ?>;
 
         // if(hak_akses_pegawai != 0){
-        //     jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-rencana-aksi" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
+            jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-rencana-aksi" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
         // }
 
         window.id_jadwal = <?php echo $id_jadwal; ?>;
