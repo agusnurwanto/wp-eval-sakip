@@ -92,6 +92,109 @@ $is_administrator = in_array('administrator', $user_roles);
 
 //     $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
 $hak_akses_user = ($nip_kepala == $skpd['nipkepala'] || $is_administrator || $this_jenis_role == 1) ? true : false;
+$iku = $wpdb->get_results(
+    $wpdb->prepare("
+        SELECT
+            *
+        FROM esakip_data_iku_opd 
+        WHERE id_skpd = %d
+            AND id_jadwal_wpsipd=%d
+            AND active = 1
+    ", $id_skpd, $id_periode),
+    ARRAY_A
+);
+// print_r($iku); die($wpdb->last_query);
+$html_iku = '';
+$no_iku = 1;
+$data_simpan = [];
+if (!empty($iku)) {
+    foreach ($iku as $k_iku => $v_iku) {
+        $data_simpan[] = [
+            'kode_sasaran'    => $v_iku['kode_sasaran'] ?? '-',
+            'label_sasaran'    => $v_iku['label_sasaran'] ?? '-',
+            'id_unik_indikator'  => $v_iku['id_unik_indikator'] ?? '-',
+            'label_indikator'  => $v_iku['label_indikator'] ?? '-',
+            'formulasi'        => $v_iku['formulasi'] ?? '-', 
+            'sumber_data'      => $v_iku['sumber_data'] ?? '-', 
+            'penanggung_jawab' => $v_iku['penanggung_jawab'] ?? '-', 
+            'id_jadwal_wpsipd' => $v_iku['id_jadwal_wpsipd'] ?? '-', 
+        ];
+        $html_iku .= '
+            <tr>
+                <td class="text-left atas kanan bawah kiri">' . $no_iku++ . '</td>
+                <td class="text-left atas kanan bawah kiri">' . $v_iku['label_sasaran'] . '</td>
+                <td class="text-left atas kanan bawah kiri">' . $v_iku['label_indikator'] . '</td>
+                <td class="text-left atas kanan bawah kiri">' . $v_iku['formulasi'] . '</td>
+                <td class="text-left atas kanan bawah kiri">' . $v_iku['sumber_data'] . '</td>
+                <td class="text-left atas kanan bawah kiri">' . $v_iku['penanggung_jawab'] . '</td>
+            </tr>';
+    }
+}
+$data_tahapan = $wpdb->get_results(
+    $wpdb->prepare(
+        "
+        SELECT 
+            *
+        FROM esakip_finalisasi_iku_opd
+        WHERE id_jadwal_wpsipd = %d
+          AND active = 1
+        ORDER BY tanggal_dokumen, updated_at DESC
+    ", $id_periode),
+    ARRAY_A
+);
+
+$card = '';
+$jumlah_data = array();
+$nama_tahapan = array();
+
+if ($data_tahapan) {
+    foreach ($data_tahapan as $v) {
+        $tanggal_dokumen = $this->format_tanggal_indo($v['tanggal_dokumen']);
+        $get_nama_tahapan = $v['nama_tahapan'] . '|' . $tanggal_dokumen . '|' . $v['id_skpd'];
+
+        // Simpan ID yang terkait dengan kombinasi unik
+        if (!isset($nama_tahapan[$get_nama_tahapan])) {
+            $nama_tahapan[$get_nama_tahapan] = [];
+        }
+        $nama_tahapan[$get_nama_tahapan][] = $v['id'];
+
+        if (!isset($jumlah_data[$v['id_skpd']])) {
+            $jumlah_data[$v['id_skpd']] = [
+                'nama_skpd' => $skpd['nama_skpd'],
+                'jumlah' => 0
+            ];
+        }
+        $jumlah_data[$v['id_skpd']]['jumlah']++;
+    }
+
+    foreach ($nama_tahapan as $key => $get_iku) {
+        list($nama_tahapan_item, $tanggal_dokumen, $id_skpd) = explode('|', $key);
+        $id = implode(',', $get_iku); 
+
+        $card .= '
+        <div class="cr-item" id="card-tahap-' . htmlspecialchars($id) . '" title="' . htmlspecialchars($nama_tahapan_item) . '">
+            <div class="cr-card">
+                <h3 class="truncate-multiline" id="nama-tahapan-' . htmlspecialchars($id) . '">' . htmlspecialchars($nama_tahapan_item) . '</h3>
+                <div class="badge badge-sm badge-primary m-0 ml-2 mr-2 text-light text-wrap">' . htmlspecialchars($skpd['nama_skpd']) . '</div>
+                <div class="year" id="tanggal-tahapan-' . htmlspecialchars($id) . '">' . htmlspecialchars($tanggal_dokumen) . '</div>
+                <div class="cr-actions">
+                    <div class="cr-view-btn" id="view-btn-' . htmlspecialchars($id) . '" onclick="viewDokumen(\'' . $id . '\', this)" title="Lihat Dokumen">
+                        <span class="dashicons dashicons-visibility"></span>
+                    </div>
+                    <div class="cr-view-btn-danger" onclick="deleteDokumen(\'' . $id . '\')" title="Hapus Dokumen">
+                        <span class="dashicons dashicons-trash"></span>
+                    </div>
+                </div>
+                <div class="badge-container">
+                    <span class="badge badge-sm badge-warning badge-sedang-dilihat" id="badge-sedang-dilihat-' . htmlspecialchars($id) . '" style="display:none">
+                        Sedang Dilihat
+                    </span>
+                </div>
+            </div>
+        </div>';
+    }
+}
+
 ?>
 <style type="text/css">
     .wrap-table {
@@ -135,16 +238,212 @@ $hak_akses_user = ($nip_kepala == $skpd['nipkepala'] || $is_administrator || $th
         white-space: normal;
         line-height: 1.3;
     }
+    /* carousel */
+    .cr-container {
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    }
+
+    .cr-title {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 24px;
+        color: #23282d;
+        padding-left: 10px;
+    }
+
+    .cr-carousel-wrapper {
+        position: relative;
+        padding: 0 10px;
+    }
+
+    .cr-carousel {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        gap: 20px;
+        padding: 10px 0;
+    }
+
+    .cr-carousel::-webkit-scrollbar {
+        display: none;
+    }
+
+    .cr-item {
+        flex: 0 0 calc(25% - 15px);
+        scroll-snap-align: start;
+    }
+
+    .cr-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid #dcdcde;
+        border-radius: 8px;
+        padding: 20px;
+        width: 250px;
+        /* Atur ukuran card */
+        height: 220px;
+        /* Atur tinggi card */
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+
+    .cr-card h3 {
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        margin: 0;
+        word-wrap: break-word;
+        /* Menghindari teks keluar dari batas */
+    }
+
+    .cr-card .year {
+        font-size: 14px;
+        color: #666;
+        margin: 4px 0;
+    }
+
+    .cr-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .cr-card .cr-view-btn,
+    .cr-card .cr-view-btn-danger {
+        background-color: #fff;
+        border: 1px solid #dcdcde;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .cr-card .cr-view-btn:hover {
+        border-color: #007cba;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .cr-card .cr-view-btn .dashicons {
+        font-size: 18px;
+        color: #007cba;
+    }
+
+    .cr-card .cr-view-btn-danger:hover {
+        border-color: #ff686b;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .cr-card .cr-view-btn-danger .dashicons {
+        font-size: 18px;
+        color: #ff686b;
+    }
+
+    .badge-container {
+        text-align: center;
+    }
+
+
+    .cr-card:hover {
+        border-color: #007cba;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .cr-scroll-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: #fff;
+        border: 1px solid #dcdcde;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .cr-scroll-btn:hover {
+        border-color: #007cba;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .cr-scroll-btn-left {
+        left: -8px;
+    }
+
+    .cr-scroll-btn-right {
+        right: -8px;
+    }
 </style>
 
 <!-- Table -->
 <div class="container-md">
-    <div id="cetak" title="Pengisian IKU <?php echo $skpd['nama_skpd'] ?> - <?php echo $nama_jadwal ?>">
+    <div title="Pengisian IKU <?php echo $skpd['nama_skpd'] ?> - <?php echo $nama_jadwal ?>">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 style="text-align: center; margin: 10px auto; min-width: 450px;">Pengisian IKU <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $nama_jadwal ?></h1> <!--  class="text-center" style="margin:3rem;" -->
+            <h1 style="text-align: center; margin: 10px auto; min-width: 450px;">Pengisian IKU <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $nama_jadwal ?></h1> 
+            <!-- <div class="cr-container hide-display-print">
+               <h2 class="cr-title">Pilih Pengisian Indikator Kegiatan Utama</h2>
+                <div class="cr-carousel-wrapper">
+                    <div id="card-carousel" class="cr-carousel">
+                        <div class="cr-item" title="Perjanjian Kinerja Real Time">
+                            <div class="cr-card">
+                                <h3>Indikator Kegiatan Utama Sekarang</h3>
+                                <div class="badge badge-sm badge-primary m-2 text-light text-wrap"><?php echo $skpd['nama_skpd']; ?></div>
+                                <div class="year"></div>
+                                <div class="cr-view-btn" style="display: none;" id="display-btn-first" onclick="location.reload()">
+                                    <span class="dashicons dashicons-visibility"></span>
+                                </div>
+                                <span class="badge badge-info mt-2">
+                                    <i class="dashicons dashicons-clock align-middle"></i> Real Time
+                                </span>
+                                <div class="text-center badge-sedang-dilihat">
+                                    <span class='badge badge-sm badge-warning m-2'>Sedang Dilihat</span>
+                                </div>
+                            </div>
+                        </div>
+                        <?php echo $card; ?>
+                    </div>
+                    <div class="cr-scroll-btn cr-scroll-btn-left" onclick="scrollCarousel(-1)">
+                        <span class="dashicons dashicons-arrow-left-alt2"></span>
+                    </div>
+                    <div class="cr-scroll-btn cr-scroll-btn-right" onclick="scrollCarousel(1)">
+                        <span class="dashicons dashicons-arrow-right-alt2"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-right m-2">
+                <button class="btn btn-sm btn-success hide-display-print" id="finalisasi-btn" onclick="showModalFinalisasi()">
+                    <span class="dashicons dashicons-saved" title="Finalisasikan dokumen (Menyimpan dokumen sesuai data terkini)"></span>
+                    Finalisasi Data
+                </button>
+                <button class="btn btn-sm btn-warning hide-display-print" id="edit-btn" onclick="showModalEditFinalisasi()" style="display: none;">
+                    <span class="dashicons dashicons-edit" title="Edit Label"></span>
+                    Edit Finalisasi Data
+                </button>
+            </div> -->
             <div id="action" class="action-section hide-excel"></div>
             <br>
-            <div class="wrap-table">
+            <div id="cetak" class="wrap-table">
                 <table cellpadding="2" cellspacing="0" class="table_dokumen_iku table table-bordered">
                     <thead style="background: #ffc491;">
                         <tr>
@@ -164,7 +463,78 @@ $hak_akses_user = ($nip_kepala == $skpd['nipkepala'] || $is_administrator || $th
         </div>
     </div>
 </div>
+<!-- <div class="container-md mx-auto"x>
+    <div class="text-center" id="action-sakip">
+        <button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button><br>
+    </div>
 
+    <?php if (!empty($error_message) && is_array($error_message)) : ?>
+        <div class="alert alert-danger mt-3">
+            <ul class="mb-0">
+                <?php echo implode('', array_map(fn($msg) => "<li>{$msg}</li>", $error_message)); ?>
+            </ul>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!empty($jumlah_data) && is_array($jumlah_data)) : ?>
+        <div class="cr-container m-4 hide-display-print">
+            <h2 class="cr-title">Jumlah Dokumen Finalisasi Per SKPD</h2>
+            <div class="text-center">
+                <?php foreach ($jumlah_data as $id_skpd => $v) : ?>
+                    <span class="badge badge-info fw-bold d-inline-flex align-items-center p-2 m-1 rounded-pill" style="font-size: 14px;">
+                        <i class="dashicons dashicons-building me-1" style="font-size: 16px;"></i>
+                        <?php echo $v['nama_skpd']; ?> | <?php echo $v['jumlah']; ?>
+                    </span>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <div class="cr-container m-4 hide-display-print">
+        <h2 class="cr-title">Pilih Laporan Perjanjian Kinerja</h2>
+        <div class="cr-carousel-wrapper">
+            <div id="card-carousel" class="cr-carousel">
+                <div class="cr-item" title="Perjanjian Kinerja Real Time">
+                    <div class="cr-card">
+                        <h3>Perjanjian Kinerja Sekarang</h3>
+                        <div class="badge badge-sm badge-primary m-2 text-light text-wrap"><?php echo $skpd['nama_skpd']; ?></div>
+                        <div class="year"><?php echo $text_tanggal_hari_ini; ?></div>
+                        <div class="cr-view-btn" style="display: none;" id="display-btn-first" onclick="location.reload()">
+                            <span class="dashicons dashicons-visibility"></span>
+                        </div>
+                        <span class="badge badge-info mt-2">
+                            <i class="dashicons dashicons-clock align-middle"></i> Real Time
+                        </span>
+                        <div class="text-center badge-sedang-dilihat">
+                            <span class='badge badge-sm badge-warning m-2'>Sedang Dilihat</span>
+                        </div>
+                    </div>
+                </div>
+                <?php echo $card; ?>
+            </div>
+            <div class="cr-scroll-btn cr-scroll-btn-left" onclick="scrollCarousel(-1)">
+                <span class="dashicons dashicons-arrow-left-alt2"></span>
+            </div>
+            <div class="cr-scroll-btn cr-scroll-btn-right" onclick="scrollCarousel(1)">
+                <span class="dashicons dashicons-arrow-right-alt2"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center page-print">
+        <div class="text-right m-2">
+            <button class="btn btn-sm btn-success hide-display-print" id="finalisasi-btn" onclick="showModalFinalisasi()">
+                <span class="dashicons dashicons-saved" title="Finalisasikan dokumen (Menyimpan dokumen sesuai data terkini)"></span>
+                Finalisasi Dokumen
+            </button>
+            <button class="btn btn-sm btn-warning hide-display-print" id="edit-btn" onclick="showModalEditFinalisasi()" style="display: none;">
+                <span class="dashicons dashicons-edit" title="Edit Label"></span>
+                Edit Finalisasi Dokumen
+            </button>
+        </div>
+        
+    </div>
+</div> -->
 <!-- Modal crud -->
 <div class="modal fade" id="modal-iku" data-backdrop="static"  role="dialog" aria-labelledby="modal-crud-label" aria-hidden="true">
   	<div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
@@ -186,9 +556,19 @@ $hak_akses_user = ($nip_kepala == $skpd['nipkepala'] || $is_administrator || $th
                         <label for="indikator">Indikator</label>
                         <textarea name="" id="indikator" disabled></textarea>
                     </div>
-                    <div class="form-group">
+                     <div class="form-group">
                         <label for="formulasi">Definisi Operasional/Formulasi</label>
-                        <textarea name="" id="formulasi"></textarea>
+                        <?php 
+                            $content = ''; 
+                            $editor_id = 'formulasi';
+                            $settings = array(
+                                'textarea_name' => 'formulasi',
+                                'media_buttons' => false, 
+                                'teeny' => false, 
+                                'quicktags' => true
+                            );
+                            wp_editor($content, $editor_id, $settings);
+                        ?>
                     </div>
                     <div class="form-group">
                         <label for="sumber-data">Sumber Data</label>
@@ -208,7 +588,104 @@ $hak_akses_user = ($nip_kepala == $skpd['nipkepala'] || $is_administrator || $th
   	</div>
 </div>
 
-
+<!-- Modal finalisasi -->
+<div class="modal fade mt-4" id="modalFinalisasi" tabindex="-1" role="dialog" aria-labelledby="modalFinalisasi" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="title-label">Finalisasi Indikator Kinerja Utama</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="id_data" value="">
+                <!-- Informasi IKU -->
+                <div class="card bg-light mb-3">
+                    <div class="card-header">
+                        <strong>Data Indikator Kinerja Utama</strong>
+                    </div>
+                    <div class="card-body">
+                        <?php if (!empty($html_iku)) : ?>
+                            <table class="table_data_anggaran" id="table_sasaran">
+                                <thead class="bg-dark text-light">
+                                    <tr>
+                                        <th class="text-center atas kanan bawah kiri">No</th>
+                                        <th class="text-center atas kanan bawah kiri">Tujuan/Sasaran</th>
+                                        <th class="text-center atas kanan bawah kiri">Indikator</th>
+                                        <th class="text-center atas kanan bawah kiri">Definisi Operasional/Formulasi</th>
+                                        <th class="text-center atas kanan bawah kiri">Sumber Data</th>
+                                        <th class="text-center atas kanan bawah kiri">Penanggung Jawab</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php echo $html_iku; ?>
+                                </tbody>
+                            </table>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <div class="card bg-light mb-3">
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="nama_tahapan">Nama Tahapan</label>
+                                <input type="text" class="form-control" id="nama_tahapan" name="nama_tahapan" placeholder="ex : Indikator Kinerja Utama" maxlength="48" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="tanggal_dokumen">Tanggal Finalisasi</label>
+                                <input type="date" class="form-control" id="tanggal_dokumen" name="tanggal_dokumen" value="<?php echo date('Y-m-d'); ?>" required>
+                            </div>
+                        </div>
+                        <small class="form-text text-muted">Pastikan data yang tertera benar, data yang sudah difinalisasi akan disimpan dan tidak dapat di edit kembali.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" onclick="simpanFinalisasi()">Simpan</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal edit finalisasi -->
+<div class="modal fade mt-4" id="modalEditFinalisasi" tabindex="-1" role="dialog" aria-labelledby="modalEditFinalisasi" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="title-label">Finalisasi Indikator Kinerja Utama</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="id_data" value="">
+                <div class="card bg-light mb-3">
+                    <div class="card-header">
+                        <strong>Indikator Kinerja Utama</strong>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="nama_tahapan">Nama Tahapan</label>
+                                <input type="text" class="form-control" id="nama_tahapan" name="nama_tahapan" placeholder="ex : Indikator Kinerja Utama" maxlength="48" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="tanggal_dokumen">Tanggal Finalisasi</label>
+                                <input type="date" class="form-control" id="tanggal_dokumen" name="tanggal_dokumen" value="<?php echo date('Y-m-d'); ?>" required>
+                            </div>
+                        </div>
+                        <small class="form-text text-muted">Pastikan data yang tertera benar, laporan yang sudah difinalisasi akan disimpan dan tidak dapat di edit kembali.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" onclick="simpanFinalisasi()">Simpan</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script type="text/javascript">
 jQuery(document).ready(function() {
     let id_jadwal_wpsipd = <?php echo $cek_id_jadwal_wpsipd; ?>;
@@ -231,7 +708,15 @@ jQuery(document).ready(function() {
     });
 
 });
+function scrollCarousel(direction) {
+    const carousel = jQuery('#card-carousel');
+    const scrollAmount = carousel[0].offsetWidth;
+    const currentScroll = carousel.scrollLeft();
 
+    carousel.animate({
+        scrollLeft: currentScroll + direction * scrollAmount
+    }, 500);
+}
 function getTableIKU() {
     jQuery('#wrap-loading').show();
     return new Promise(function(resolve, reject){
@@ -265,7 +750,13 @@ function getTableIKU() {
         });
     })
 }
+function showModalFinalisasi() {
+    jQuery('#modalFinalisasi').modal('show')
+}
 
+function showModalEditFinalisasi() {
+    jQuery('#modalEditFinalisasi').modal('show')
+}
 function tambahIku(){
     jQuery('#wrap-loading').show();
     return get_tujuan_sasaran()
@@ -311,7 +802,7 @@ function simpan_data_iku(){
     let kode_sasaran = jQuery('#tujuan-sasaran').val();
     let label_tujuan_sasaran = jQuery('#tujuan-sasaran option:selected').text();
     let label_indikator = jQuery('#indikator').val();
-    let formulasi = jQuery('#formulasi').val();
+    let formulasi = tinymce.get('formulasi') ? tinymce.get('formulasi').getContent() : jQuery('#formulasi').val();
     let sumber_data = jQuery('#sumber-data').val();
     let penanggung_jawab = jQuery('#penanggung-jawab').val();
     if(kode_sasaran == '' || label_indikator == '' || formulasi == '' || sumber_data == '' || penanggung_jawab == ''){
@@ -365,8 +856,8 @@ function edit_iku(id) {
                 if (response.status === 'success') {
                     let data = response.data;
                     jQuery('#id_iku').val(id);
-                    jQuery("#tujuan-sasaran").val(data.kode_sasaran).trigger('change');
-                    jQuery("#formulasi").val(data.formulasi);
+                    jQuery("#tujuan-sasaran").val(data.kode_sasaran).trigger('change');                   
+                    tinymce.get('formulasi').setContent(data.formulasi);
                     jQuery("#sumber-data").val(data.sumber_data);
                     jQuery("#penanggung-jawab").val(data.penanggung_jawab);
                     jQuery("#modal-iku").find('.modal-title').html('Edit IKU');
@@ -471,4 +962,207 @@ function get_tujuan_sasaran() {
     });
 }
 
+function finalisasi_iku(id) {
+    jQuery('#wrap-loading').show();
+    jQuery.ajax({
+        url: esakip.url,
+        type: 'POST',
+        data: {
+            action: 'finalisasi_iku',
+            api_key: esakip.api_key,
+            id: id
+        },
+        dataType: 'json',
+        success: function(response) {
+            jQuery('#wrap-loading').hide();
+            console.log(response);
+            if (response.status === 'success') {
+                let data = response.data;
+                jQuery("#id_data").val(data.id);
+                jQuery('#modalFinalisasi').modal('show')
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            jQuery('#wrap-loading').hide();
+            console.error(xhr.responseText);
+            alert('Terjadi kesalahan saat memuat data!');
+        }
+    });
+}
+function simpanFinalisasi() {
+    let confirmFinalisasi = confirm('Apakah anda yakin ingin menyimpan data ini?');
+    if (!confirmFinalisasi) {
+        return;
+    }
+
+    let dataiku = {
+        nama_tahapan: jQuery('#nama_tahapan').val(),
+        tanggal_dokumen: jQuery('#tanggal_dokumen').val()
+    };
+    let data_simpan = <?php echo json_encode($data_simpan); ?>;
+
+    if (!Array.isArray(data_simpan) || data_simpan.length === 0) {
+        alert('Tidak ada data yang dapat disimpan!');
+        return;
+    }
+
+    jQuery('#wrap-loading').show();
+    jQuery.ajax({
+        url: esakip.url,
+        method: 'POST',
+        data: {
+            action: "simpan_finalisasi_iku",
+            api_key: esakip.api_key,
+            data_iku: dataiku,
+            id_skpd: '<?php echo $id_skpd; ?>',
+            data_simpan: data_simpan
+        },
+        dataType: 'json',
+        success: function(response) {
+            jQuery('#wrap-loading').hide();
+            if (response.status === 'success') {
+                alert(response.message);
+                location.reload();
+                jQuery('#modalFinalisasi').modal('hide');
+            } else {
+                alert('Terjadi kesalahan: ' + response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            jQuery('#wrap-loading').hide();
+            console.error('AJAX Error:', error);
+            alert('Gagal menyimpan data. Silakan coba lagi.');
+        },
+    });
+}
+function deleteDokumen(getID) {
+    let confirmHapus = confirm('Apakah anda yakin ingin menghapus data ini?');
+    if (!confirmHapus) {
+        return;
+    }
+
+    jQuery('#wrap-loading').show();
+
+    jQuery.ajax({
+        url: esakip.url,
+        method: 'POST',
+        data: {
+            action: "hapus_finalisasi_iku_opd",
+            api_key: esakip.api_key,
+            getID: getID 
+        },
+        dataType: 'json',
+        success: function(response) {
+            jQuery('#wrap-loading').hide();
+            if (response.status === 'success') {
+                alert(response.message);
+                getID.split(',').forEach(id => jQuery(`#card-tahap-${id}`).hide());
+
+                if (getID.includes(jQuery(`#id_data`).val())) {
+                    location.reload();
+                }
+            } else {
+                alert('Terjadi kesalahan: ' + response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            jQuery('#wrap-loading').hide();
+            console.error('AJAX Error:', error);
+            alert('GAGAL: ' + (xhr.responseJSON?.message || 'Terjadi kesalahan.'));
+        }
+    });
+}
+function viewDokumen(getID) {
+        jQuery('#wrap-loading').show()
+        jQuery.ajax({
+            url: esakip.url,
+            method: 'POST',
+            data: {
+                action: "get_finalisasi_iku_by_id",
+                api_key: esakip.api_key,
+                getID: getID,
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide()
+                console.log(response.message);
+                if (response.status === 'success') {
+                    jQuery(".editable-field").attr("title", "").attr("contenteditable", "false");
+                    jQuery(".cr-view-btn").show();
+                    jQuery(`#view-btn-${getID}`).hide();
+
+                    jQuery('#id_data').val(response.data.id)
+                    jQuery('#nama_tahap_finalisasi').val(response.data.nama_tahapan)
+                    jQuery('#tanggal_tahap_finalisasi').val(response.data.tanggal_dokumen)
+
+                    jQuery(`.badge-sedang-dilihat`).hide() 
+                    jQuery(`#badge-sedang-dilihat-${response.data.id}`).show() 
+
+                    jQuery('#finalisasi-btn').hide()
+                    jQuery('#display-btn-first').show() 
+                    jQuery('#edit-btn').show()
+
+                    // Hapus isi tbody sebelum menambahkan data baru
+                    jQuery("#table-sasaran-view tbody, #table-program-view tbody, #table-kegiatan-view tbody, #table-subkegiatan-view tbody").empty();
+
+                    let rhkData = response.data.rhk;
+
+                    // Inisialisasi counter untuk nomor urut dalam tabel
+                    let countSasaran = 1,
+                        countProgram = 1,
+                        countKegiatan = 1,
+                        countSubKegiatan = 1;
+
+                    // Looping data RHK dan masukkan ke tabel sesuai tipe
+                    rhkData.forEach((item) => {
+                        let row = "";
+
+                        if (item.tipe == "1") { // Sasaran
+                            row = `<tr>
+                                    <td class="esakip-text_tengah">${countSasaran++}</td>
+                                    <td class="esakip-text_kiri">${item.label}</td>
+                                    <td class="esakip-text_kiri">${item.indikator || '-'}</td>
+                                    <td class="esakip-text_kiri">${item.target || '-'}</td>
+                                </tr>`;
+                            jQuery("#table-sasaran-view tbody").append(row);
+                        } else if (item.tipe == "2") { // Program
+                            row = `<tr>
+                                        <td class="esakip-text_tengah">${countProgram++}</td>
+                                        <td class="esakip-text_kiri">${item.kode} ${item.label}</td>
+                                        <td class="esakip-text_kanan">${formatRupiah(parseInt(item.anggaran))}</td>
+                                        <td class="esakip-text_kiri">${item.keterangan || '-'}</td>
+                                    </tr>`;
+                            jQuery("#table-program-view tbody").append(row);
+                        } else if (item.tipe == "3") { // Kegiatan
+                            row = `<tr>
+                                        <td class="esakip-text_tengah">${countKegiatan++}</td>
+                                        <td class="esakip-text_kiri">${item.kode} ${item.label}</td>
+                                        <td class="esakip-text_kanan">${formatRupiah(parseInt(item.anggaran))}</td>
+                                        <td class="esakip-text_kiri">${item.keterangan || '-'}</td>
+                                    </tr>`;
+                            jQuery("#table-kegiatan-view tbody").append(row);
+                        } else if (item.tipe == "4") { // Subkegiatan
+                            row = `<tr>
+                                        <td class="esakip-text_tengah">${countSubKegiatan++}</td>
+                                        <td class="esakip-text_kiri">${item.kode} ${item.label}</td>
+                                        <td class="esakip-text_kanan">${formatRupiah(parseInt(item.anggaran))}</td>
+                                        <td class="esakip-text_kiri">${item.keterangan || '-'}</td>
+                                    </tr>`;
+                            jQuery("#table-subkegiatan-view tbody").append(row);
+                        }
+                    });
+
+                } else {
+                    alert('Terjadi kesalahan: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide()
+                console.error('AJAX Error:', error);
+                alert('Gagal menyimpan data. Silakan coba lagi.');
+            },
+        });
+    }
 </script>

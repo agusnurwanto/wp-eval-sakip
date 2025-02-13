@@ -7304,15 +7304,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 									foreach ($data_esr as $key => $esr) {
 										if ($esr->dokumen_id == $mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']) {
-											$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM " . $nama_tabel . " WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+											// $esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM " . $nama_tabel . " WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
 
-											if (!empty($esr_lokal)) {
-												$wpdb->update($nama_tabel, [
-													'path_esr' => $esr->path
-												], [
-													'id' => $esr_lokal['id']
-												]);
-											}
+											// if (!empty($esr_lokal)) {
+											// 	$wpdb->update($nama_tabel, [
+											// 		'path_esr' => $esr->path
+											// 	], [
+											// 		'id' => $esr_lokal['id']
+											// 	]);
+											// }
 
 											$path = explode("/", $esr->path);
 											$nama_file = end($path);
@@ -7388,11 +7388,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										}
 									}
 								} else if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-									$status_integrasi_esr = true;
-									$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
+									$status_integrasi_esr = false;
+									$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada<a></td>";
 								} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
-									$status_integrasi_esr = true;
-									$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
+									$status_integrasi_esr = false;
+									$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Keterangan Ada<a></td>";
 								} else {
 									if ($data_verifikasi['status_verifikasi'] == 1) {
 										$tbody .= "<td class='text-center'><input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'></td>";
