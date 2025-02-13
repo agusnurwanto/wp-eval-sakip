@@ -2546,6 +2546,10 @@ class Wp_Eval_Sakip_Admin
 				if (!in_array($user['jabatan'], $user_meta->roles)) {
 					$user_meta->add_role($user['jabatan']);
 				}
+				// Untuk memastikan ada update gelar belakang dari api simpeg
+				if(!empty($user['gelar_belakang'])){
+					wp_update_user(array('ID' => $insert_user, 'first_name' => $user['nama'], 'display_name' => $user['nama']));
+				}
 			}
 
 			if (!empty($update_pass)) {
@@ -2694,7 +2698,6 @@ class Wp_Eval_Sakip_Admin
 		die(json_encode($ret));
 	}
 
-	
 	function generate_user_esakip_pegawai_simpeg()
 	{
 		global $wpdb;
@@ -2748,12 +2751,17 @@ class Wp_Eval_Sakip_Admin
 
 						$id_skpd = !empty($id_skpd) ? $id_skpd : 0;
 
+						$gelar_depan = !empty($v_pegawai['gelar_depan']) ? $v_pegawai['gelar_depan'].". " : '';
+						$gelar_belakang = !empty($v_pegawai['gelar_belakang']) ? ", ".$v_pegawai['gelar_belakang'] : '';
+
 						$v_pegawai['pass'] = $pass;
 						$v_pegawai['loginname'] = $v_pegawai['nip_baru'];
 						$v_pegawai['jabatan'] = 'pegawai';
-						$v_pegawai['nama'] = $v_pegawai['nama_pegawai'];
+						$v_pegawai['nama'] = $gelar_depan.''.$v_pegawai['nama_pegawai'].''.$gelar_belakang;
 						$v_pegawai['nip'] = $v_pegawai['nip_baru'];
 						$v_pegawai['id_sub_skpd'] = $id_skpd;
+						$v_pegawai['gelar_depan'] = $gelar_depan;
+						$v_pegawai['gelar_belakang'] = $gelar_belakang;
 						$this->gen_user_esakip($v_pegawai, $status_update_pass);
 					}
 				}else{
