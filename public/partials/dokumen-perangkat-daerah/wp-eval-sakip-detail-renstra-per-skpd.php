@@ -764,6 +764,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
                     list: list,
                     tahun_anggaran:tahun_anggaran_periode_dokumen,
                     nama_tabel_database:'esakip_renstra',
+                    id_periode: <?php echo $input['periode']; ?>,
                     id_skpd: <?php echo $id_skpd; ?>
                 },
                 dataType: 'json',
