@@ -23137,8 +23137,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
 				}
 
+				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
-					$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
 					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
 					$upload = $this->functions->uploadFile(
 						$_POST['api_key'],
@@ -23180,7 +23180,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							array('%s', '%s', '%s', '%s', '%d')
 						);
 						
-
 						if (!$wpdb->insert_id) {
 							$ret = array(
 								'status' => 'error',
@@ -23203,6 +23202,25 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							", $id_dokumen));
 							if (is_file($upload_dir . $dokumen_lama)) {
 								unlink($upload_dir . $dokumen_lama);
+							}
+						} else if (!empty($_POST['namaDokumen'])) {
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM $nama_tabel[$tipe_dokumen]
+								WHERE id=%d
+							", $id_dokumen));
+							if ($dokumen_lama != $_POST['namaDokumen']) {
+								$ret_rename = $this->functions->renameFile($upload_dir . $dokumen_lama, $upload_dir . $_POST['namaDokumen']);
+								if ($ret_rename['status'] != 'error') {
+									$wpdb->update(
+										$nama_tabel[$tipe_dokumen],
+										array('dokumen' => $_POST['namaDokumen']),
+										array('id' => $id_dokumen),
+									);
+								} else {
+									$ret = $ret_rename;
+								}
 							}
 						}
 						$wpdb->update(
