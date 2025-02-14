@@ -23147,7 +23147,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * $maksimal_upload
+						1048576 * $maksimal_upload,
+						$_POST['namaDokumen']
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -23165,7 +23166,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						"tl_lhe_akip_internal" => "esakip_tl_lhe_akip_internal",
 						"tl_lhe_akip_kemenpan" => "esakip_tl_lhe_akip_kemenpan"
 					);
-
+					
 					if (empty($id_dokumen)) {
 						$wpdb->insert(
 							$nama_tabel[$tipe_dokumen],
@@ -23180,6 +23181,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							),
 							array('%s', '%s', '%s', '%s', '%d')
 						);
+						
 
 						if (!$wpdb->insert_id) {
 							$ret = array(
