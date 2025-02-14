@@ -20424,7 +20424,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				where nipkepala=%s 
 					and tahun_anggaran=%d
 					and is_skpd=%d
-				group by id_skpd", $nipkepala[0], $tahun_skpd,1), ARRAY_A);
+				group by id_skpd", $nipkepala[0], $tahun_skpd, 1), ARRAY_A);
 
 			foreach ($skpd_db_datas as $skpd_db) {
 				$menu_atas[] = $skpd_db['id_skpd'];
@@ -20909,7 +20909,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						<li>' . $halaman_laporan_pk_skpd . '</li>
 					</ul>';
 			}
-		} 
+		}
 		if (
 			in_array("pegawai", $user_meta->roles)
 		) {
@@ -20923,12 +20923,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						esakip_data_pegawai_simpeg
 					WHERE
 						nip_baru=%s
-						AND active=%d"
-					, $nip_pegawai[0], 1
-				), ARRAY_A
+						AND active=%d",
+					$nip_pegawai[0],
+					1
+				),
+				ARRAY_A
 			);
 
-			if(!empty($data_pegawai_simpeg)){
+			if (!empty($data_pegawai_simpeg)) {
 				foreach ($data_pegawai_simpeg as $key => $data_pegawai) {
 					$satker_simpeg = substr($data_pegawai['satker_id'], 0, 2);
 
@@ -20952,10 +20954,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							AND simpeg.active=%d
 							AND unit.tahun_anggaran=%d
 							AND unit.active=%d
-						GROUP BY unit.id_skpd", $satker_simpeg, $_GET['tahun'], 1, $tahun_skpd, 1), ARRAY_A);
-		
+						GROUP BY unit.id_skpd",
+							$satker_simpeg,
+							$_GET['tahun'],
+							1,
+							$tahun_skpd,
+							1
+						),
+						ARRAY_A
+					);
+
 					foreach ($skpd_db_datas as $skpd_db) {
-						if(in_array($skpd_db['id_skpd'], $menu_atas)){
+						if (in_array($skpd_db['id_skpd'], $menu_atas)) {
 							continue;
 						}
 						$pengisian_rencana_aksi_skpd = $this->functions->generatePage(array(
@@ -21002,8 +21012,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						echo '
 						<h2 class="text-center">' . $skpd_db['nama_skpd'] . '</h2>
 							<ul class="daftar-menu-sakip" style="margin-bottom: 3rem;">
-								<li>'. $halaman_input_rhk_pegawai .'</li>
-								<li>'. $halaman_laporan_pk_pegawai .'</li>
+								<li>' . $halaman_input_rhk_pegawai . '</li>
+								<li>' . $halaman_laporan_pk_pegawai . '</li>
 								<li><p><small>*Menu User Sebagai Pegawai Perangkat Daerah</small></p></li>
 							</ul>';
 					}
@@ -23135,7 +23145,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$upload_dir,
 						$_FILES['fileUpload'],
 						array('pdf'),
-						1048576 * $maksimal_upload
+						1048576 * $maksimal_upload,
+						$_POST['namaDokumen']
 					);
 					if ($upload['status'] == false) {
 						$ret = array(
@@ -23153,7 +23164,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						"tl_lhe_akip_internal" => "esakip_tl_lhe_akip_internal",
 						"tl_lhe_akip_kemenpan" => "esakip_tl_lhe_akip_kemenpan"
 					);
-
+					
 					if (empty($id_dokumen)) {
 						$wpdb->insert(
 							$nama_tabel[$tipe_dokumen],
@@ -23168,6 +23179,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							),
 							array('%s', '%s', '%s', '%s', '%d')
 						);
+						
 
 						if (!$wpdb->insert_id) {
 							$ret = array(
@@ -27414,6 +27426,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			'esakip_perjanjian_kinerja_pemda' => 'esakip_perjanjian_kinerja_pemda',
 			'esakip_rencana_aksi_pemda' => 'esakip_rencana_aksi_pemda',
 			'esakip_rkpd_pemda' => 'esakip_rkpd_pemda',
+			'esakip_tl_lhe_akip_internal' => 'esakip_tl_lhe_akip_internal',
 			'esakip_tl_lhe_akip_internal_pemda' => 'esakip_tl_lhe_akip_internal_pemda',
 			'esakip_tl_lhe_akip_kemenpan_pemda' => 'esakip_tl_lhe_akip_kemenpan_pemda',
 			'esakip_renja_rkt' => 'esakip_renja_rkt',
@@ -28468,7 +28481,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
-	public function get_pegawai_simpeg($type = null, $value = null)
+	public function get_pegawai_simpeg($type = null, $value = null, $satker_id = null, $jabatan = null)
 	{
 		global $wpdb;
 		$ret = array(
@@ -28613,34 +28626,47 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			}
 
 			foreach ($data_pegawai as $data) {
-				$exists = $wpdb->get_var(
-					$wpdb->prepare("
-						SELECT 
-							id 
-						FROM $table 
-						WHERE nip_baru = %s
-						  AND satker_id = %s
-						  AND jabatan = %s
-					", $data['nip_baru'], $data['satker_id'], $data['jabatan'])
-				);
-
-				$opsi_data_pegawai = array(
-					'nama_pegawai'     => $data['nama_pegawai'],
-					'satker_id'        => $data['satker_id'],
-					'jabatan'          => $data['jabatan'],
-					'active'           => 1
-				);
+				//digunakan untuk get by nip di halaman pk
+				if ($type == 'asn') {
+					$exists = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT 
+								id 
+							FROM $table 
+							WHERE nip_baru = %s
+							  AND satker_id = %s
+							  AND jabatan = %s
+						", $data['nip_baru'], $satker_id, $jabatan)
+					);
+				} else {
+					$exists = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT 
+								id 
+							FROM $table 
+							WHERE nip_baru = %s
+							  AND satker_id = %s
+							  AND jabatan = %s
+						", $data['nip_baru'], $data['satker_id'], $data['jabatan'])
+					);
+				}
 
 				if ($tipe == 'asn') {
+					$opsi_data_pegawai['nama_pegawai'] 	 = $data['nama_pegawai'];
 					$opsi_data_pegawai['gol_ruang'] 	 = $data['gol_ruang'];
 					$opsi_data_pegawai['pangkat'] 		 = $data['nmgolruang'];
 					$opsi_data_pegawai['gelar_depan'] 	 = $data['gelar_depan'];
 					$opsi_data_pegawai['gelar_belakang'] = $data['gelar_belakang'];
+					$opsi_data_pegawai['active'] 		 = 1;
 				}
 
 				if ($tipe == 'unor') {
+					$opsi_data_pegawai['nama_pegawai'] 		= $data['nama_pegawai'];
+					$opsi_data_pegawai['satker_id'] 		= $data['satker_id'];
+					$opsi_data_pegawai['jabatan'] 			= $data['jabatan'];
 					$opsi_data_pegawai['tipe_pegawai'] 		= $data['tipe_pegawai'];
 					$opsi_data_pegawai['tipe_pegawai_id'] 	= $data['tipe_pegawai_id'];
+					$opsi_data_pegawai['active'] 		 	= 1;
 				}
 
 				if (!empty($data['plt_plh'])) {
@@ -28654,13 +28680,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 
 				if ($exists) {
-					$opsi_data_pegawai['update_at'] = current_time('mysql');
+					//JIKA PLT PLH MASIH AKTIF JANGAN UPDATE
 					if (
 						!empty($data['plt_plh'])
 						&& date('Y-m-d H:i:s') > $opsi_data_pegawai['berakhir']
 					) {
 						continue;
 					}
+					$opsi_data_pegawai['update_at'] = current_time('mysql');
 					$wpdb->update($table, $opsi_data_pegawai, ['id' => $exists]);
 				} else {
 					$opsi_data_pegawai['nip_baru'] = $data['nip_baru'];
