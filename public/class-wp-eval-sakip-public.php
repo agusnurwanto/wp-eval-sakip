@@ -27426,6 +27426,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			'esakip_perjanjian_kinerja_pemda' => 'esakip_perjanjian_kinerja_pemda',
 			'esakip_rencana_aksi_pemda' => 'esakip_rencana_aksi_pemda',
 			'esakip_rkpd_pemda' => 'esakip_rkpd_pemda',
+			'esakip_tl_lhe_akip_internal' => 'esakip_tl_lhe_akip_internal',
 			'esakip_tl_lhe_akip_internal_pemda' => 'esakip_tl_lhe_akip_internal_pemda',
 			'esakip_tl_lhe_akip_kemenpan_pemda' => 'esakip_tl_lhe_akip_kemenpan_pemda',
 			'esakip_renja_rkt' => 'esakip_renja_rkt',
