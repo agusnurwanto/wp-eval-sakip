@@ -7,9 +7,10 @@ $input = shortcode_atts(array(
 ), $atts);
 
 $id_skpd = $_GET['id_skpd'] ?? '';
+$id_satker_simpeg = $_GET['satker_id'] ?? '';
 $nip = $_GET['nip'] ?? '';
 
-if (empty($id_skpd) || empty($nip) || empty($input['tahun'])) {
+if (empty($id_skpd) || empty($nip) || empty($id_satker_simpeg) || empty($input['tahun'])) {
     die('parameter tidak lengkap!.');
 }
 global $wpdb;
@@ -38,13 +39,16 @@ $data_satker = $wpdb->get_row(
         LEFT JOIN esakip_data_satker_simpeg ds
                ON ds.satker_id = p.satker_id
         WHERE p.nip_baru = %d
+          AND p.satker_id = %s
           AND p.active = 1
-    ", $nip),
+    ", $nip, $id_satker_simpeg),
     ARRAY_A
 );
+
 if (empty($data_satker) || empty($skpd)) {
     die('data satker kosong!.');
 }
+
 
 $nama_pemda = get_option(ESAKIP_NAMA_PEMDA);
 $pemda = explode(" ", $nama_pemda);
@@ -58,7 +62,7 @@ $text_tanggal_hari_ini = $this->format_tanggal_indo(current_datetime()->format('
 $error_message = array();
 
 //get data simpeg pihak pertama
-$simpeg_pihak_pertama = $this->get_pegawai_simpeg('asn', $data_satker['nip_baru']);
+$simpeg_pihak_pertama = $this->get_pegawai_simpeg('asn', $data_satker['nip_baru'], $data_satker['satker_id'], $data_satker['jabatan']);
 $response_1 = json_decode($simpeg_pihak_pertama, true);
 if (!isset($response_1['status']) || $response_1['status'] === false) {
     array_push($error_message, $response_1['message']);
@@ -204,7 +208,7 @@ if (empty($data_atasan)) {
     }
 
     //SINKRON DATA PIHAK KEDUA (KEPALA)
-    $simpeg_pihak_kedua = $this->get_pegawai_simpeg('asn', $data_atasan['nip_baru']);
+    $simpeg_pihak_kedua = $this->get_pegawai_simpeg('asn', $data_atasan['nip_baru'], $data_atasan['satker_id'], $data_atasan['jabatan']);
     $response_2 = json_decode($simpeg_pihak_kedua, true);
     if (!isset($response_2['status']) || $response_2['status'] === false) {
         array_push($error_message, $response_2['message']);
@@ -251,8 +255,9 @@ if (
             LEFT JOIN esakip_data_satker_simpeg ds
                    ON ds.satker_id = p.satker_id
             WHERE p.nip_baru = %s
+              AND p.satker_id = %s
               AND p.active = 1
-        ", $data_atasan['nip_baru']),
+        ", $data_atasan['nip_baru'], $data_atasan['satker_id']),
         ARRAY_A
     );
 
