@@ -20966,8 +20966,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						));
 						$title_pengisian_rencana_aksi_skpd = 'Pengisian Rencana Hasil Kerja';
 						$pengisian_rencana_aksi_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-						$pengisian_rencana_aksi_per_skpd_page = '<li><a href="#" target="_blank" class="btn btn-primary">' .  $title_pengisian_rencana_aksi_skpd . '</a></li>';
-						// ' . $pengisian_rencana_aksi_skpd['url'] . '
+						$pengisian_rencana_aksi_per_skpd_page = '<li><a href="' . $pengisian_rencana_aksi_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $title_pengisian_rencana_aksi_skpd . '</a></li>';
 			
 						$halaman_input_rhk_pegawai = '
 							<div class="accordion">
@@ -20987,8 +20986,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'show_header' 	=> 1,
 								'post_status' 	=> 'private'
 							));
-							$laporan_pk_btn = '<li><a target="_blank" href="#" class="btn btn-primary">Laporan PK (Perjanjian Kinerja)</a></li>';
-							// ' . $laporan_pk_page['url'] . '&id_skpd=' . $skpd_db['id_skpd'] . '
+							$laporan_pk_btn = '<li><a target="_blank" href="' . $laporan_pk_page['url'] . '&id_skpd=' . $skpd_db['id_skpd'] . '" class="btn btn-primary">Laporan PK (Perjanjian Kinerja)</a></li>';
 						}
 
 						$halaman_laporan_pk_pegawai = '
