@@ -279,10 +279,14 @@ if (
 
 $options = array(
     'id_skpd'   => $id_skpd,
+    'satker_id' => $data_pegawai_1['satker_id'],
     'tahun'     => $input['tahun'],
     'nip_baru'  => $data_pegawai_1['nip_baru']
 );
 $html_pk = $this->get_pk_html($options);
+if (!empty($html_pk['error_msg'])) {
+    $error_message = array_merge($error_message, is_array($html_pk['error_msg']) ? $html_pk['error_msg'] : [$html_pk['error_msg']]);
+}
 
 $data_tahapan = $wpdb->get_results(
     $wpdb->prepare("
@@ -1417,6 +1421,7 @@ if ($data_tahapan) {
 
         let option_js = {
             id_skpd: '<?php echo $id_skpd; ?>',
+            satker_id: '<?php echo $data_pegawai_1['satker_id']; ?>',
             tahun: '<?php echo $input['tahun']; ?>',
             nip_baru: '<?php echo $nip; ?>'
         };
