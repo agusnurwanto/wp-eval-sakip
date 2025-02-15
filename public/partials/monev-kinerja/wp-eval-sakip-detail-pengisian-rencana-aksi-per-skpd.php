@@ -255,7 +255,7 @@ $get_pegawai = $wpdb->get_results(
 );
 $select_pegawai = '<option value="">Pilih Pegawai Pelaksana</option>';
 foreach ($get_pegawai as $pegawai) {
-    $select_pegawai .= '<option value="' . $pegawai['nip_baru'] . '">' . $pegawai['jabatan'] . ' | ' . $pegawai['nip_baru'] . ' | ' . $pegawai['nama_pegawai'] . '</option>';
+    $select_pegawai .= '<option value="' . $pegawai['nip_baru'] . '" satker-id="' . $pegawai['satker_id'] . '">' . $pegawai['jabatan'] . ' | ' . $pegawai['nip_baru'] . ' | ' . $pegawai['nama_pegawai'] . '</option>';
 }
 ?>
 <style type="text/css">
@@ -3223,7 +3223,8 @@ foreach ($get_pegawai as $pegawai) {
         // }
 
         let satker_id = jQuery('#satker_id').val();
-        let nip = jQuery('#pegawai').val();
+        let nip = jQuery('#pegawai').val(); 
+        let satker_id_pegawai = jQuery('#pegawai option:selected').attr('satker-id'); // Mengambil atribut satker-id dari option yang dipilih
 
         jQuery('#wrap-loading').show();
         jQuery.ajax({
@@ -3251,6 +3252,7 @@ foreach ($get_pegawai as $pegawai) {
                 "get_dasar_pelaksanaan": get_dasar_pelaksanaan,
                 "nip": nip,
                 "satker_id": satker_id,
+                "satker_id_pegawai": satker_id_pegawai,
                 "id_sub_skpd_cascading": id_sub_skpd_cascading,
                 "pagu_cascading": pagu_cascading
             },

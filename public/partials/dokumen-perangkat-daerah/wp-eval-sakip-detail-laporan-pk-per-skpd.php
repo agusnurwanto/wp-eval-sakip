@@ -284,9 +284,6 @@ $options = array(
     'nip_baru'  => $data_pegawai_1['nip_baru']
 );
 $html_pk = $this->get_pk_html($options);
-if (!empty($html_pk['error_msg'])) {
-    $error_message = array_merge($error_message, is_array($html_pk['error_msg']) ? $html_pk['error_msg'] : [$html_pk['error_msg']]);
-}
 
 $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;

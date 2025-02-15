@@ -566,6 +566,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'id_jadwal' => $_POST['id_jadwal'],
 						'level' => $_POST['level'],
 						'nip' => $_POST['nip'],
+						'id_jabatan' => $_POST['satker_id_pegawai'],
 						'satker_id' => $_POST['satker_id'],
 						'active' => 1,
 						'tahun_anggaran' => $_POST['tahun_anggaran'],
@@ -5754,9 +5755,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				WHERE id_skpd = %d 
 				  AND tahun_anggaran = %d 
 				  AND nip = %d 
+				  AND id_jabatan = %s 
 				  AND active = 1
 				ORDER BY level ASC
-			", $id_skpd, $options['tahun'], $options['nip_baru']),
+			", $id_skpd, $options['tahun'], $options['nip_baru'], $options['satker_id']),
 			ARRAY_A
 		);
 
@@ -5809,11 +5811,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						<td></td>
 						<td></td>
 					</tr>';
-				}
-
-				//error message, jika pegawai di data rhk tidak sesuai satkernya
-				if ($v_rhk['satker_id'] != $options['satker_id']) {
-					$ret['error_msg'][] =  'Level ' . $v_rhk['level'] . ' | ' . $v_rhk['label'] . ' | ' . 'satker dan pegawai tidak sesuai!';
 				}
 
 				$ret['html_sasaran'] .= $html_indikator;

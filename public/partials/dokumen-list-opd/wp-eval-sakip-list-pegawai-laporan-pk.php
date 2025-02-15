@@ -100,6 +100,7 @@ if (!isset($response['status']) || $response['status'] === false) {
 								<th class="text-center">NIP</th>
 								<th class="text-center">Nama Pegawai</th>
 								<th class="text-center">Jabatan</th>
+								<th class="text-center">Jumlah RHK</th>
 								<th class="text-center">Jumlah Dokumen Finalisasi</th>
 							</tr>
 						</thead>
