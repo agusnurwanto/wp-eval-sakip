@@ -1051,7 +1051,7 @@ if ($data_tahapan) {
             <h4 class="font-weight-bold mb-3 text-dark">Catatan Finalisasi Dokumen PK:</h4>
             <ul class="pl-3 text-muted">
                 <li class="text-danger font-weight-bold">⚠️ Dokumen PK yang sudah difinalisasi tidak dapat diedit kembali! <br> (Hanya nama tahapan dan tanggal dokumen yang masih bisa diubah.)</li>
-                <li>Dokumen PK saat ini dapat <strong>difinalisasikan per tahap</strong>.</li>
+                <li>Dokumen <strong>"Perjanjian Kinerja Sekarang"</strong> dapat difinalisasikan per tahap.</li>
                 <li>Data pegawai dan Data atasan pegawai dalam dokumen PK diambil secara <strong>real-time</strong> dari aplikasi SIMPEG.</li>
                 <li>Pegawai Berstatus <strong>Plt./Plh./Pj.</strong> dapat mengisi form status jabatan yang muncul saat halaman pertama kali di muat.</li>
                 <li>Finalisasi dokumen akan menyimpan data pegawai dan Data atasan pegawai saat ini, termasuk:

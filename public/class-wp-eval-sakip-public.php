@@ -28814,22 +28814,23 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$opsi_data_pegawai['tipe_pegawai'] 		= $data['tipe_pegawai'];
 					$opsi_data_pegawai['tipe_pegawai_id'] 	= $data['tipe_pegawai_id'];
 					$opsi_data_pegawai['active'] 		 	= 1;
-				}
 
-				if (!empty($data['plt_plh'])) {
-					$opsi_data_pegawai['plt_plh'] 		= $data['plt_plh'];
-					$opsi_data_pegawai['tmt_sk_plth'] 	= !empty($data['tmt_sk_plth']) ? (new DateTime($data['tmt_sk_plth']))->format('Y-m-d H:i:s') : NULL;
-					$opsi_data_pegawai['berakhir'] 		= !empty($data['berakhir']) ? (new DateTime($data['berakhir']))->format('Y-m-d H:i:s') : NULL;
-				} else {
-					$opsi_data_pegawai['plt_plh'] 		= NULL;
-					$opsi_data_pegawai['tmt_sk_plth'] 	= NULL;
-					$opsi_data_pegawai['berakhir'] 		= NULL;
+					if (!empty($data['plt_plh'])) {
+						$opsi_data_pegawai['plt_plh'] 		= $data['plt_plh'];
+						$opsi_data_pegawai['tmt_sk_plth'] 	= !empty($data['tmt_sk_plth']) ? (new DateTime($data['tmt_sk_plth']))->format('Y-m-d H:i:s') : NULL;
+						$opsi_data_pegawai['berakhir'] 		= !empty($data['berakhir']) ? (new DateTime($data['berakhir']))->format('Y-m-d H:i:s') : NULL;
+					} else {
+						$opsi_data_pegawai['plt_plh'] 		= NULL;
+						$opsi_data_pegawai['tmt_sk_plth'] 	= NULL;
+						$opsi_data_pegawai['berakhir'] 		= NULL;
+					}
 				}
 
 				if ($exists) {
 					//JIKA PLT PLH MASIH AKTIF JANGAN UPDATE
 					if (
-						!empty($data['plt_plh'])
+						$tipe == 'unor'
+						&& !empty($data['plt_plh'])
 						&& date('Y-m-d H:i:s') > $opsi_data_pegawai['berakhir']
 					) {
 						continue;
