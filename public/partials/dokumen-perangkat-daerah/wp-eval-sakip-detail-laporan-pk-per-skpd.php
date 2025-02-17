@@ -306,7 +306,7 @@ $data_user_pegawai = $wpdb->get_row(
         WHERE
             nip_baru=%s
             AND active=%d
-        ",
+        ORDER BY satker_id ASC, tipe_pegawai_id ASC",
         $user_nip,
         1
     ),
