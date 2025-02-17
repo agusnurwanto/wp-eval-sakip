@@ -2001,13 +2001,26 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                               AND nip = %d 
                         ", $_POST['tahun_anggaran'], $_POST['id_skpd'], $v_pgw['nip_baru'])
                     );
+                    $count_rhk = $wpdb->get_var(
+                        $wpdb->prepare("
+                            SELECT 
+                                COUNT(id)
+                            FROM esakip_data_rencana_aksi_opd 
+                            WHERE active = 1 
+                              AND tahun_anggaran = %d
+                              AND id_skpd = %d
+                              AND nip = %s 
+                              AND id_jabatan = %s 
+                        ", $_POST['tahun_anggaran'], $_POST['id_skpd'], $v_pgw['nip_baru'], $v_pgw['satker_id'])
+                    );
                     $tbody .= "<tr>";
                     $tbody .= "<td class='text-left'>" . $v_pgw['satker_id'] . "</td>";
                     $tbody .= "<td class='text-left'>" . $v_pgw['nama_bidang'] . "</td>";
                     $tbody .= "<td class='text-left'>" . $v_pgw['tipe_pegawai'] . "</td>";
-                    $tbody .= "<td class='text-left' title='Halaman Detail Perjanjian Kinerja'><a href='" . $detail_laporan_pk['url'] . "&id_skpd=" . $unit['id_skpd'] . "&nip=" . $v_pgw['nip_baru'] . "' target='_blank'>" . $v_pgw['nip_baru'] . "</a></td>";
+                    $tbody .= "<td class='text-left' title='Halaman Detail Perjanjian Kinerja'><a href='" . $detail_laporan_pk['url'] . "&id_skpd=" . $unit['id_skpd'] . "&nip=" . $v_pgw['nip_baru'] . "&satker_id=" . $v_pgw['satker_id'] . "' target='_blank'>" . $v_pgw['nip_baru'] . "</a></td>";
                     $tbody .= "<td class='text-left'>" . $v_pgw['nama_pegawai'] . "</td>";
                     $tbody .= "<td class='text-left'>" . $v_pgw['jabatan'] . "</td>";
+                    $tbody .= "<td class='text-center'>" . $count_rhk . "</td>";
                     $tbody .= "<td class='text-center'>" . $count_finalisasi . "</td>";
                     $tbody .= "</tr>";
                 }

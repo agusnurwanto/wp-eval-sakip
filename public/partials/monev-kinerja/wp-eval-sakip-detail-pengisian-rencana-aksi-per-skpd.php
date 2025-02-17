@@ -96,10 +96,15 @@ $data_user_pegawai = $wpdb->get_row(
         WHERE
             nip_baru=%s
             AND active=%d
-        ", $user_nip, 1), ARRAY_A);
+        ",
+        $user_nip,
+        1
+    ),
+    ARRAY_A
+);
 
 $skpd_user_pegawai = array();
-if(!empty($data_user_pegawai)){
+if (!empty($data_user_pegawai)) {
     $satker_pegawai_simpeg = substr($data_user_pegawai['satker_id'], 0, 2);
 
     $skpd_user_pegawai = $wpdb->get_row(
@@ -122,22 +127,33 @@ if(!empty($data_user_pegawai)){
             AND simpeg.active=%d
             AND unit.tahun_anggaran=%d
             AND unit.active=%d
-        GROUP BY unit.id_skpd", $satker_pegawai_simpeg, $input['tahun'], 1, $input['tahun'], 1), ARRAY_A);
+        GROUP BY unit.id_skpd",
+            $satker_pegawai_simpeg,
+            $input['tahun'],
+            1,
+            $input['tahun'],
+            1
+        ),
+        ARRAY_A
+    );
 }
 
 // TIPE HAK AKSES USER PEGAWAI | 0 = TIDAK ADA | 1 = ALL | 2 = HANYA RHK TERKAIT
 $hak_akses_user_pegawai = 0;
-// if(!empty($skpd_user_pegawai)){
-//     if(($skpd_user_pegawai['id_skpd'] == $id_skpd && $data_user_pegawai['tipe_pegawai_id'] == 11 && strlen($data_user_pegawai['satker_id']) == 2) || $is_administrator){
-//         $hak_akses_user_pegawai = 1;
-//     }else if($skpd_user_pegawai['id_skpd'] == $id_skpd){
-//         $hak_akses_user_pegawai = 2;
-//     }
-// }else{
-//     if($is_administrator){
-//         $hak_akses_user_pegawai = 1;
-//     }
-// }
+$nip_user_pegawai = 0;
+if (!empty($skpd_user_pegawai)) {
+    if (($skpd_user_pegawai['id_skpd'] == $id_skpd && $data_user_pegawai['tipe_pegawai_id'] == 11 && strlen($data_user_pegawai['satker_id']) == 2) || $is_administrator) {
+        $hak_akses_user_pegawai = 1;
+    } else if ($skpd_user_pegawai['id_skpd'] == $id_skpd) {
+        $hak_akses_user_pegawai = 2;
+    }
+    $nip_user_pegawai = $data_user_pegawai['nip_baru'];
+} else {
+    if ($is_administrator) {
+        $hak_akses_user_pegawai = 1;
+        $nip_user_pegawai = 0;
+    }
+}
 
 ////////////end////////////
 
@@ -226,16 +242,20 @@ $select_satker = '<option value="">Pilih Satuan Kerja</option>';
 foreach ($get_satker as $satker) {
     $select_satker .= '<option value="' . $satker['satker_id'] . '">' . $satker['satker_id'] . ' | ' . $satker['nama'] . '</option>';
 }
-$get_pegawai = $wpdb->get_results($wpdb->prepare('
-    SELECT 
-        p.*
-    FROM esakip_data_pegawai_simpeg AS p
-    WHERE p.satker_id like %s
-    ORDER BY satker_id ASC, tipe_pegawai_id ASC, nama_pegawai ASC
-', $get_mapping . '%'), ARRAY_A);
+$get_pegawai = $wpdb->get_results(
+    $wpdb->prepare('
+        SELECT 
+            *
+        FROM esakip_data_pegawai_simpeg
+        WHERE satker_id like %s
+          AND active = 1
+        ORDER BY satker_id ASC, tipe_pegawai_id ASC, nama_pegawai ASC
+    ', $get_mapping . '%'),
+    ARRAY_A
+);
 $select_pegawai = '<option value="">Pilih Pegawai Pelaksana</option>';
 foreach ($get_pegawai as $pegawai) {
-    $select_pegawai .= '<option value="' . $pegawai['nip_baru'] . '">' . $pegawai['nip_baru'] . ' | ' . $pegawai['nama_pegawai'] . '</option>';
+    $select_pegawai .= '<option value="' . $pegawai['nip_baru'] . '" satker-id="' . $pegawai['satker_id'] . '">' . $pegawai['jabatan'] . ' | ' . $pegawai['nip_baru'] . ' | ' . $pegawai['nama_pegawai'] . '</option>';
 }
 ?>
 <style type="text/css">
@@ -530,11 +550,12 @@ foreach ($get_pegawai as $pegawai) {
 <script type="text/javascript">
     jQuery(document).ready(function() {
         run_download_excel_sakip();
-        // window.hak_akses_pegawai = <?php echo $hak_akses_user_pegawai; ?>;
+        window.hak_akses_pegawai = <?php echo $hak_akses_user_pegawai; ?>;
+        window.nip_pegawai = <?php echo $nip_user_pegawai; ?>;
 
-        // if(hak_akses_pegawai != 0){
+        if (hak_akses_pegawai != 0) {
             jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-rencana-aksi" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
-        // }
+        }
 
         window.id_jadwal = <?php echo $id_jadwal; ?>;
         window.id_jadwal_wpsipd = <?php echo $id_jadwal_wpsipd; ?>;
@@ -1072,6 +1093,14 @@ foreach ($get_pegawai as $pegawai) {
                                 jQuery('#pegawai').val(response.data.pegawai.nip_baru).trigger('change');
                             }
 
+                            if (hak_akses_pegawai == 1) {
+                                jQuery('#satker_id').prop('disabled', false);
+                                jQuery('#pegawai').prop('disabled', false);
+                            } else {
+                                jQuery('#satker_id').prop('disabled', true);
+                                jQuery('#pegawai').prop('disabled', true);
+                            }
+
                         }
                     }
                 });
@@ -1220,6 +1249,14 @@ foreach ($get_pegawai as $pegawai) {
                             }
                             jQuery('#label_renaksi').val(response.data.label);
                         }
+
+                        if (hak_akses_pegawai == 1) {
+                            jQuery('#satker_id').prop('disabled', false);
+                            jQuery('#pegawai').prop('disabled', false);
+                        } else {
+                            jQuery('#satker_id').prop('disabled', true);
+                            jQuery('#pegawai').prop('disabled', true);
+                        }
                     }
                 });
             });
@@ -1289,10 +1326,19 @@ foreach ($get_pegawai as $pegawai) {
                 dataType: "json",
                 success: function(res) {
                     jQuery('#wrap-loading').hide();
+                    let button_tambah = ``;
+                    if (hak_akses_pegawai == 1) {
+                        button_tambah = `` +
+                            `<div style="margin-top:10px">` +
+                            `<button type="button" class="btn btn-success mb-2" onclick="tambah_rencana_aksi();"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data Kegiatan Utama</button>` +
+                            `</div>`;
+                    } else {
+                        button_tambah = `` +
+                            `<div style="margin-top:10px">` +
+                            `</div>`;
+                    }
                     let kegiatanUtama = `` +
-                        `<div style="margin-top:10px">` +
-                        `<button type="button" class="btn btn-success mb-2" onclick="tambah_rencana_aksi();"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data Kegiatan Utama</button>` +
-                        `</div>` +
+                        `${button_tambah}` +
                         `<table class="table" id="kegiatanUtama">` +
                         `<thead>` +
                         `<tr class="table-secondary">` +
@@ -1362,11 +1408,24 @@ foreach ($get_pegawai as $pegawai) {
                             `<td class="label_cascading font-weight-bold">${label_cascading}</td>` +
                             `<td class="label_renaksi">${label_dasar_pelaksanaan}</td>` +
                             `<td class="detail_pegawai font-weight-bold">${nama_pegawai}</td>` +
-                            `<td class="text-center">` +
-                            `<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, 1, ${total_pagu})" title="Tambah Indikator (Total Pagu: ${formatRupiah(total_pagu)})"><i class="dashicons dashicons-plus"></i></a> ` +
-                            `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, 2, ${JSON.stringify(id_pokin_parent)}, '${value.kode_cascading_sasaran}')" title="Lihat Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> ` +
-                            `<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, 1)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;` +
-                            `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_rencana_aksi(${value.id}, 1)" title="Hapus"><i class="dashicons dashicons-trash"></i></a>` +
+                            `<td class="text-center">`;
+                        // validasi akses tombol untuk admin dan pegawai
+                        if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
+                            kegiatanUtama += `` +
+                                `<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, 1, ${total_pagu})" title="Tambah Indikator (Total Pagu: ${formatRupiah(total_pagu)})"><i class="dashicons dashicons-plus"></i></a> `;
+                        }
+                        kegiatanUtama += `` +
+                            `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, 2, ${JSON.stringify(id_pokin_parent)}, '${value.kode_cascading_sasaran}')" title="Lihat Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
+
+                        if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
+                            kegiatanUtama += `` +
+                                `<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, 1)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`;
+                        }
+                        if (hak_akses_pegawai == 1) {
+                            kegiatanUtama += `` +
+                                `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_rencana_aksi(${value.id}, 1)" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`;
+                        }
+                        kegiatanUtama += `` +
                             `</td>` +
                             `</tr>`;
 
@@ -1416,9 +1475,14 @@ foreach ($get_pegawai as $pegawai) {
                                     `<td class="text-center">${b.target_akhir} ${target_teks_akhir}</td>` +
                                     `<td class="text-right">${formatRupiah(b.rencana_pagu) || 0}</td>` +
                                     `<td class="text-center">` +
-                                    `<input type="checkbox" title="Lihat Rencana Hasil Kerja Per Bulan" class="lihat_bulanan" data-id="${b.id}" onclick="lihat_bulanan(this);" style="margin: 0 6px;">` +
-                                    `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_indikator(${b.id}, 1, ${total_pagu})" title="Edit"><i class="dashicons dashicons-edit"></i></a> ` +
-                                    `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-danger" onclick="hapus_indikator(${b.id}, 1);" title="Hapus"><i class="dashicons dashicons-trash"></i></a>` +
+                                    `<input type="checkbox" title="Lihat Rencana Hasil Kerja Per Bulan" class="lihat_bulanan" data-id="${b.id}" onclick="lihat_bulanan(this);" style="margin: 0 6px;">`;
+
+                                if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
+                                    kegiatanUtama += `` +
+                                        `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_indikator(${b.id}, 1, ${total_pagu})" title="Edit"><i class="dashicons dashicons-edit"></i></a> ` +
+                                        `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-danger" onclick="hapus_indikator(${b.id}, 1);" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`;
+                                }
+                                kegiatanUtama += `` +
                                     `</td>` +
                                     `</tr>`;
 
@@ -1471,11 +1535,16 @@ foreach ($get_pegawai as $pegawai) {
                                         `<td class="text-center"><input type="number" class="form-control" name="realisasi_${b.id}_${bulan_index + 1}" id="realisasi_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.realisasi || ''}" ${isdisabled ? 'disabled' : ''}></td>` +
                                         `<td class="text-center" name="capaian_${b.id}_${bulan_index + 1}" id="capaian_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.capaian || ''}"></td>` +
                                         `<td class="text-center"><textarea class="form-control" name="keterangan_${b.id}_${bulan_index + 1}" id="keterangan_${b.id}_${bulan_index + 1}" ${isdisabled ? 'disabled' : ''}>${get_data_bulanan.keterangan || ''}</textarea></td>` +
-                                        `<td class="text-center">` +
-                                        (isdisabled ?
-                                            `-` :
-                                            `<a href="javascript:void(0)" data-id="${b.id}" data-bulan="${bulan_index + 1}" class="btn btn-sm btn-success" onclick="simpan_bulanan(${b.id}, ${bulan_index + 1})" title="Simpan"><i class="dashicons dashicons-yes"></i></a>`
-                                        ) +
+                                        `<td class="text-center">`;
+
+                                    if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
+                                        kegiatanUtama += `` +
+                                            (isdisabled ?
+                                                `-` :
+                                                `<a href="javascript:void(0)" data-id="${b.id}" data-bulan="${bulan_index + 1}" class="btn btn-sm btn-success" onclick="simpan_bulanan(${b.id}, ${bulan_index + 1})" title="Simpan"><i class="dashicons dashicons-yes"></i></a>`
+                                            );
+                                    }
+                                    kegiatanUtama += `` +
                                         `</td>` +
                                         `</tr>`;
 
@@ -1494,11 +1563,15 @@ foreach ($get_pegawai as $pegawai) {
                                             `<td class="text-center">` +
                                             `<textarea class="form-control" name="keterangan_${b.id}_tw_${triwulan}" id="keterangan_${b.id}_tw_${triwulan}" ${isdisabled ? 'disabled' : ''}>${b['ket_tw_' + triwulan] || ''}</textarea>` +
                                             `</td>` +
-                                            `<td class="text-center">` +
-                                            (isdisabled ?
-                                                `-` :
-                                                `<a href="javascript:void(0)" data-id="${b.id}" data-tw="${triwulan}" class="btn btn-sm btn-success" onclick="simpan_triwulan(${b.id}, ${triwulan})" title="Simpan"><i class="dashicons dashicons-yes"></i></a>`
-                                            ) +
+                                            `<td class="text-center">`;
+                                        if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
+                                            kegiatanUtama += `` +
+                                                (isdisabled ?
+                                                    `-` :
+                                                    `<a href="javascript:void(0)" data-id="${b.id}" data-tw="${triwulan}" class="btn btn-sm btn-success" onclick="simpan_triwulan(${b.id}, ${triwulan})" title="Simpan"><i class="dashicons dashicons-yes"></i></a>`
+                                                );
+                                        }
+                                        kegiatanUtama += `` +
                                             `</td>` +
                                             `</tr>`;
                                     }
@@ -1514,8 +1587,12 @@ foreach ($get_pegawai as $pegawai) {
                                     `<td class="text-center"><input type="number" class="form-control" name="realisasi_akhir_${b.id}" id="realisasi_akhir_${b.id}" value="${b['realisasi_akhir'] || ''}"></td>` +
                                     `<td class="text-center"></td>` +
                                     `<td class="text-center"><textarea class="form-control" name="ket_total_${b.id}" id="ket_total_${b.id}">${b['ket_total'] || ''}</textarea></td>` +
-                                    `<td class="text-center">` +
-                                    `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-success" onclick="simpan_total(${b.id})" title="Simpan Total"><i class="dashicons dashicons-yes"></i></a>` +
+                                    `<td class="text-center">`;
+                                if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
+                                    kegiatanUtama += `` +
+                                        `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-success" onclick="simpan_total(${b.id})" title="Simpan Total"><i class="dashicons dashicons-yes"></i></a>`;
+                                }
+                                kegiatanUtama += `` +
                                     `</td>` +
                                     `</tr>` +
                                     `</tbody>` +
@@ -2296,10 +2373,17 @@ foreach ($get_pegawai as $pegawai) {
                 dataType: "json",
                 success: function(res) {
                     jQuery('#wrap-loading').hide();
-                    let renaksi = `` +
-                        `<div style="margin-top:10px">` +
-                        `<button type="button" class="btn btn-success mb-2" onclick="` + fungsi_tambah + `(` + tipe + `);"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data ` + title + `</button>` +
-                        `</div>` +
+                    let renaksi = ``;
+
+                    if (hak_akses_pegawai == 1) {
+                        renaksi += `<div style="margin-top:10px">` +
+                            `<button type="button" class="btn btn-success mb-2" onclick="` + fungsi_tambah + `(` + tipe + `);"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data ` + title + `</button>` +
+                            `</div>`;
+                    } else {
+                        renaksi += `<div style="margin-top:10px">` +
+                            `</div>`;
+                    }
+                    renaksi += `` +
                         `<table class="table">` +
                         `<thead>`;
                     res.data_parent.map(function(value, index) {
@@ -2523,11 +2607,20 @@ foreach ($get_pegawai as $pegawai) {
                             `<td class="label_renaksi font-weight-bold">${label_cascading}</td>` +
                             `<td class="label_renaksi">${label_dasar_pelaksanaan}</td>` +
                             `<td class="pegawai_pelaksana font-weight-bold">${nama_pegawai}</td>` +
-                            `<td class="text-center">` +
-                            `<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, ${tipe},${total_pagu}, '${value.kode_sbl}')" title="Tambah Indikator (Total Pagu: ${formatRupiah(total_pagu)})"><i class="dashicons dashicons-plus"></i></a> ` +
-                            tombol_detail +
-                            `<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, ` + tipe + `)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;` +
-                            `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_rencana_aksi(${value.id}, ${tipe})" title="Hapus"><i class="dashicons dashicons-trash"></i></a>` +
+                            `<td class="text-center">`;
+                        // untuk validasi tombol user kepala dan pegawai
+                        if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
+                            renaksi += `<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, ${tipe},${total_pagu}, '${value.kode_sbl}')" title="Tambah Indikator (Total Pagu: ${formatRupiah(total_pagu)})"><i class="dashicons dashicons-plus"></i></a> `;
+                        }
+                        renaksi += `` +
+                            tombol_detail;
+                        if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
+                            renaksi += `<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, ` + tipe + `)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`;
+                        }
+                        if (hak_akses_pegawai == 1) {
+                            renaksi += `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_rencana_aksi(${value.id}, ${tipe})" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`;
+                        }
+                        renaksi += `` +
                             `</td>` +
                             `</tr>`;
 
@@ -2588,9 +2681,13 @@ foreach ($get_pegawai as $pegawai) {
                                     `<td class="text-right">${formatRupiah(b.rencana_pagu) || 0}</td>` +
                                     `<td class="text-center">` +
                                     `<input type="checkbox" title="Lihat Rencana Hasil Kerja Per Bulan" class="lihat_bulanan" data-id="${b.id}" onclick="lihat_bulanan(this);" style="margin: 0 6px;">` +
-                                    data_tagging_rincian +
-                                    `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_indikator(${b.id}, ` + tipe + `,${total_pagu}, '${value.kode_sbl}')" title="Edit"><i class="dashicons dashicons-edit"></i></a> ` +
-                                    `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-danger" onclick="hapus_indikator(${b.id}, ` + tipe + `);" title="Hapus"><i class="dashicons dashicons-trash"></i></a>` +
+                                    data_tagging_rincian;
+                                if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
+                                    renaksi += `` +
+                                        `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_indikator(${b.id}, ` + tipe + `,${total_pagu}, '${value.kode_sbl}')" title="Edit"><i class="dashicons dashicons-edit"></i></a> ` +
+                                        `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-danger" onclick="hapus_indikator(${b.id}, ` + tipe + `);" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`;
+                                }
+                                renaksi += `` +
                                     `</td>` +
                                     `</tr>`;
 
@@ -2643,11 +2740,15 @@ foreach ($get_pegawai as $pegawai) {
                                         `<td class="text-center"><input type="number" class="form-control" name="realisasi_${b.id}_${bulan_index + 1}" id="realisasi_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.realisasi || ''}" ${isdisabled ? 'disabled' : ''}></td>` +
                                         `<td class="text-center" name="capaian_${b.id}_${bulan_index + 1}" id="capaian_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.capaian || ''}"></td>` +
                                         `<td class="text-center"><textarea class="form-control" name="keterangan_${b.id}_${bulan_index + 1}" id="keterangan_${b.id}_${bulan_index + 1}" ${isdisabled ? 'disabled' : ''}>${get_data_bulanan.keterangan || ''}</textarea></td>` +
-                                        `<td class="text-center">` +
-                                        (isdisabled ?
-                                            `-` :
-                                            `<a href="javascript:void(0)" data-id="${b.id}" data-bulan="${bulan_index + 1}" class="btn btn-sm btn-success" onclick="simpan_bulanan(${b.id}, ${bulan_index + 1})" title="Simpan"><i class="dashicons dashicons-yes"></i></a>`
-                                        ) +
+                                        `<td class="text-center">`;
+                                    if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
+                                        renaksi += `` +
+                                            (isdisabled ?
+                                                `-` :
+                                                `<a href="javascript:void(0)" data-id="${b.id}" data-bulan="${bulan_index + 1}" class="btn btn-sm btn-success" onclick="simpan_bulanan(${b.id}, ${bulan_index + 1})" title="Simpan"><i class="dashicons dashicons-yes"></i></a>`
+                                            );
+                                    }
+                                    renaksi += `` +
                                         `</td>` +
                                         `</tr>`;
 
@@ -2666,11 +2767,15 @@ foreach ($get_pegawai as $pegawai) {
                                             `<td class="text-center">` +
                                             `<textarea class="form-control" name="keterangan_${b.id}_tw_${triwulan}" id="keterangan_${b.id}_tw_${triwulan}" ${isdisabled ? 'disabled' : ''}>${b['ket_tw_' + triwulan] || ''}</textarea>` +
                                             `</td>` +
-                                            `<td class="text-center">` +
-                                            (isdisabled ?
-                                                `-` :
-                                                `<a href="javascript:void(0)" data-id="${b.id}" data-tw="${triwulan}" class="btn btn-sm btn-success" onclick="simpan_triwulan(${b.id}, ${triwulan})" title="Simpan"><i class="dashicons dashicons-yes"></i></a>`
-                                            ) +
+                                            `<td class="text-center">`;
+                                        if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
+                                            renaksi += `` +
+                                                (isdisabled ?
+                                                    `-` :
+                                                    `<a href="javascript:void(0)" data-id="${b.id}" data-tw="${triwulan}" class="btn btn-sm btn-success" onclick="simpan_triwulan(${b.id}, ${triwulan})" title="Simpan"><i class="dashicons dashicons-yes"></i></a>`
+                                                );
+                                        }
+                                        renaksi += `` +
                                             `</td>` +
                                             `</tr>`;
                                     }
@@ -2686,8 +2791,12 @@ foreach ($get_pegawai as $pegawai) {
                                     `<td class="text-center"><input type="number" class="form-control" name="realisasi_akhir_${b.id}" id="realisasi_akhir_${b.id}" value="${b['realisasi_akhir'] || ''}"></td>` +
                                     `<td class="text-center"></td>` +
                                     `<td class="text-center"><textarea class="form-control" name="ket_total_${b.id}" id="ket_total_${b.id}">${b['ket_total'] || ''}</textarea></td>` +
-                                    `<td class="text-center">` +
-                                    `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-success" onclick="simpan_total(${b.id})" title="Simpan Total"><i class="dashicons dashicons-yes"></i></a>` +
+                                    `<td class="text-center">`;
+                                if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
+                                    renaksi += `` +
+                                        `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-success" onclick="simpan_total(${b.id})" title="Simpan Total"><i class="dashicons dashicons-yes"></i></a>`;
+                                }
+                                renaksi += `` +
                                     `</td>` +
                                     `</tr>` +
                                     `</tbody>` +
@@ -3114,7 +3223,8 @@ foreach ($get_pegawai as $pegawai) {
         // }
 
         let satker_id = jQuery('#satker_id').val();
-        let nip = jQuery('#pegawai').val();
+        let nip = jQuery('#pegawai').val(); 
+        let satker_id_pegawai = jQuery('#pegawai option:selected').attr('satker-id'); // Mengambil atribut satker-id dari option yang dipilih
 
         jQuery('#wrap-loading').show();
         jQuery.ajax({
@@ -3142,6 +3252,7 @@ foreach ($get_pegawai as $pegawai) {
                 "get_dasar_pelaksanaan": get_dasar_pelaksanaan,
                 "nip": nip,
                 "satker_id": satker_id,
+                "satker_id_pegawai": satker_id_pegawai,
                 "id_sub_skpd_cascading": id_sub_skpd_cascading,
                 "pagu_cascading": pagu_cascading
             },
