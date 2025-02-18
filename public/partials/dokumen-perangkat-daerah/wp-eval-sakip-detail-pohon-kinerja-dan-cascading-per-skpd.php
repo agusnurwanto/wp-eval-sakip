@@ -147,7 +147,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
                                     }
                                 endif;
                             ?>
-                            <th class="text-center">Perangkat Daerah</th>
                             <th class="text-center">Nama Dokumen</th>
                             <th class="text-center">Keterangan</th>
                             <th class="text-center">Waktu Upload</th>
@@ -584,11 +583,12 @@ $status_api_esr = get_option('_crb_api_esr_status');
                     api_key: esakip.api_key,
                     list: list,
                     tahun_anggaran:tahun_anggaran_periode_dokumen,
-                    nama_tabel_database:'esakip_pohon_kinerja_dan_cascading',
-                    id_skpd: <?php echo $id_skpd; ?>
+                    id_periode: <?php echo $input['periode']; ?>,
+                    nama_tabel_database:'esakip_pohon_kinerja_dan_cascading_pemda'
                 },
                 dataType: 'json',
                 success: function(response) {
+                    console.log(response);
                     jQuery('#wrap-loading').hide();
                     alert(response.message);
                     location.reload();

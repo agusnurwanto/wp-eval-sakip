@@ -1065,6 +1065,7 @@ $status_iku = $wpdb->get_row(
                     api_key: esakip.api_key,
                     list: list,
                     tahun_anggaran:tahun_anggaran_periode_dokumen,
+                    id_periode: <?php echo $input['periode']; ?>,
                     nama_tabel_database:'esakip_rpjmd'
                 },
                 dataType: 'json',
