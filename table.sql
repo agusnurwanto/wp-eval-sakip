@@ -2050,6 +2050,7 @@ CREATE TABLE `esakip_finalisasi_tahap_laporan_pk` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `nip` VARCHAR(64) NOT NULL,
   `id_skpd` INT(11) NOT NULL,
+  `id_satker` VARCHAR(128) NOT NULL,
   `alamat_kantor` VARCHAR(255) DEFAULT NULL,
   `nama_skpd` VARCHAR(128) NOT NULL,
   `satuan_kerja` VARCHAR(256) NOT NULL,
