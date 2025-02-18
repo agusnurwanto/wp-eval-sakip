@@ -125,6 +125,7 @@ $skpd = $wpdb->get_row(
 
 $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
+$user_nip = $current_user->data->user_login;
 $is_admin_panrb = in_array('admin_panrb', $user_roles);
 $is_administrator = in_array('administrator', $user_roles);
 
@@ -168,9 +169,12 @@ if (!empty($renaksi)) {
 	$nama_skpd_4 = null;
 }
 
-
-$subkeg = explode(' ', $renaksi['label_cascading_sub_kegiatan'], 2);
-$nama_sub_keg = $subkeg[1];
+$subkeg = array();
+$nama_sub_keg = '';
+if(!empty($renaksi['label_cascading_sub_kegiatan'])){
+	$subkeg = explode(' ', $renaksi['label_cascading_sub_kegiatan'], 2);
+	$nama_sub_keg = $subkeg[1];
+}
 
 $renaksi_parent1 = $wpdb->get_row(
 	$wpdb->prepare("
@@ -263,6 +267,79 @@ $renaksi_pemda1 = array(
 foreach ($renaksi_parent_pemda as $val) {
 	$renaksi_pemda4['label'][$val['id_renaksi']] = $val['label'] . ' ( ' . $val['indikator'] . ' ' . $val['target_akhir'] . ' ' . $val['satuan'] . ' )';
 }
+
+//------ hak akses user pegawai ------//
+$data_user_pegawai = $wpdb->get_row(
+    $wpdb->prepare(
+        "SELECT
+            nip_baru,
+            nama_pegawai,
+            satker_id,
+            tipe_pegawai_id,
+            plt_plh,
+            tmt_sk_plth,
+            berakhir
+        FROM 
+            esakip_data_pegawai_simpeg
+        WHERE
+            nip_baru=%s
+            AND active=%d
+        ORDER BY satker_id ASC, tipe_pegawai_id ASC",
+        $user_nip,
+        1
+    ),
+    ARRAY_A
+);
+
+$skpd_user_pegawai = array();
+if (!empty($data_user_pegawai)) {
+    $satker_pegawai_simpeg = substr($data_user_pegawai['satker_id'], 0, 2);
+
+    $skpd_user_pegawai = $wpdb->get_row(
+        $wpdb->prepare(
+            "SELECT 
+                simpeg.id_satker_simpeg,
+                unit.nama_skpd, 
+                unit.id_skpd, 
+                unit.kode_skpd,
+                unit.is_skpd
+            FROM 
+                esakip_data_mapping_unit_sipd_simpeg AS simpeg
+            JOIN 
+                esakip_data_unit AS unit
+            ON 
+                simpeg.id_skpd = unit.id_skpd
+            WHERE 
+                simpeg.id_satker_simpeg=%d 
+            AND simpeg.tahun_anggaran=%d
+            AND simpeg.active=%d
+            AND unit.tahun_anggaran=%d
+            AND unit.active=%d
+        GROUP BY unit.id_skpd",
+            $satker_pegawai_simpeg,
+            $tahun_anggaran_sakip,
+            1,
+            $tahun_anggaran_sakip,
+            1
+        ),
+        ARRAY_A
+    );
+}
+
+// TIPE HAK AKSES USER PEGAWAI | 0 = TIDAK ADA | 1 = ALL | 2 = HANYA RHK TERKAIT
+$hak_akses_user_pegawai = 0;
+if (!empty($skpd_user_pegawai)) {
+    if (($skpd_user_pegawai['id_skpd'] == $id_skpd && $data_user_pegawai['tipe_pegawai_id'] == 11 && strlen($data_user_pegawai['satker_id']) == 2) || $is_administrator) {
+        $hak_akses_user_pegawai = 1;
+    } else if ($skpd_user_pegawai['id_skpd'] == $id_skpd && $nama_pegawai_4['nip_baru'] == $user_nip) {
+        $hak_akses_user_pegawai = 2;
+    }
+} else {
+    if ($is_administrator) {
+        $hak_akses_user_pegawai = 1;
+    }
+}
+//------ end ------ //
 
 $data_tagging = $wpdb->get_results(
 	$wpdb->prepare("
@@ -427,8 +504,18 @@ if (!empty($grouped_data)) {
 					$btn_edit = "";
 					$val_satuan = $item['satuan'];
 					if ($item['tipe'] == 1) {
-						$btn_edit = "<span class='btn btn-sm btn-warning' onclick='editDataRincian({$item['id_rincian']});' title='Edit Rincian Belanja'><i class='dashicons dashicons-edit'></i></span>";
+						if($hak_akses_user_pegawai == 1 || $hak_akses_user_pegawai == 2){
+							$btn_edit = "<span class='btn btn-sm btn-warning' onclick='editDataRincian({$item['id_rincian']});' title='Edit Rincian Belanja'><i class='dashicons dashicons-edit'></i></span>";
+						}else{
+							$btn_edit = "";
+						}
 						$val_satuan = $data_satuan_key_value[$item['satuan']] ?? 'Tidak ditemukan';
+					}
+
+					if($hak_akses_user_pegawai == 1 || $hak_akses_user_pegawai == 2){
+						$btn_delete = "<span class='btn btn-sm btn-danger' onclick='deleteRincianById({$item['id_rincian']});' title='Hapus Rincian Belanja'><i class='dashicons dashicons-trash'></i></span>";
+					}else{
+						$btn_delete = "";
 					}
 
 					$tbody .= "
@@ -440,9 +527,7 @@ if (!empty($grouped_data)) {
 						</td>
 						<td class='esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah'>
 							<div class='align-middle'>
-								<span class='btn btn-sm btn-danger' onclick='deleteRincianById({$item['id_rincian']});' title='Hapus Rincian Belanja'>
-									<i class='dashicons dashicons-trash'></i>
-								</span>
+								{$btn_delete}
 								{$btn_edit}
 							</div>
 						</td>
@@ -480,12 +565,15 @@ $sisa_pagu_rhk = $ind_renaksi['rencana_pagu'] - $total_all;
 //disabled button jika ada parameter yg tidak lengkap
 $disabled = '';
 $disabled_manual = '';
+$text_pesan = '-';
 $wpsipd_status = get_option('_crb_url_server_sakip');
 if (empty($wpsipd_status)) {
 	$disabled = 'disabled';
+	$text_pesan = 'Kolom URL Server WP-SIPD Di Menu Pengaturan Perangkat Daerah Kosong!';
 } else if (empty($renaksi['kode_sbl'])) {
 	$disabled = 'disabled';
 	$disabled_manual = 'disabled';
+	$text_pesan = 'Kolom Cascading Sub Kegiatan Kosong!';
 }
 ?>
 <style type="text/css">
@@ -1054,12 +1142,14 @@ if (empty($wpsipd_status)) {
 
 		<h3 class="text-center">Rincian Belanja Teknis Kegiatan</h3>
 		<div class="m-2 text-center">
-			<button class="btn btn-primary m-2 text-center" onclick="handleModalTambahDataManual()" title="Tambah Data" <?php echo $disabled_manual; ?>>
-				<span class="dashicons dashicons-plus"></span> Tambah Rincian Belanja Manual
-			</button>
-			<button class="btn btn-success m-2 text-center" title="Tambah Data Dari WP-SIPD" onclick="handleModalTambahDataWpsipd()" <?php echo $disabled; ?>>
-				<span class="dashicons dashicons-insert"></span> Tambah Rincian Belanja dari RKA/DPA
-			</button>
+			<?php if($hak_akses_user_pegawai == 1 || $hak_akses_user_pegawai == 2): ?>
+				<button class="btn btn-primary m-2 text-center rincian_manual" onclick="handleModalTambahDataManual()" title="Tambah Data" <?php echo $disabled_manual; ?>>
+					<span class="dashicons dashicons-plus"></span> Tambah Rincian Belanja Manual
+				</button>
+				<button class="btn btn-success m-2 text-center rincian_rka" title="Tambah Data Dari WP-SIPD" onclick="handleModalTambahDataWpsipd()" <?php echo $disabled; ?>>
+					<span class="dashicons dashicons-insert"></span> Tambah Rincian Belanja dari RKA/DPA
+				</button>
+			<?php endif; ?>
 		</div>
 		<div class="wrap-table">
 			<table cellpadding="2" cellspacing="0" class="table_dokumen_rencana_aksi">
@@ -1338,6 +1428,8 @@ if (empty($wpsipd_status)) {
 		window.tahunAnggaran = '<?php echo esc_js($tahun); ?>';
 		window.kodeSbl = '<?php echo esc_js($renaksi['kode_sbl']); ?>';
 		window.idIndikator = '<?php echo esc_js($id_indikator); ?>';
+		window.hak_akses_user_pegawai = <?php echo $hak_akses_user_pegawai; ?>;
+		window.text_pesan = '<?php echo $text_pesan; ?>';
 		window.data_changed = false;
 
 		if (statusWpsipd) {
@@ -1394,6 +1486,12 @@ if (empty($wpsipd_status)) {
 			},
 			minimumInputLength: 3
 		});
+
+		if((hak_akses_user_pegawai == 1 || hak_akses_user_pegawai == 2) && text_pesan != '-'){
+			jQuery('.rincian_rka').attr('title', text_pesan);
+			jQuery('.rincian_manual').attr('title', text_pesan);
+			alert(text_pesan);
+		}
 
 	});
 
