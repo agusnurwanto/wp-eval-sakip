@@ -107,7 +107,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
                 <?php endif; ?>
             <?php endif; ?>
             <div class="wrap-table">
-                <table id="table_dokumen_iku" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                <table id="table_dokumen_iku" cellpadding="2" cellspacing="0" class="table table-bordered">
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
@@ -229,6 +229,10 @@ $status_api_esr = get_option('_crb_api_esr_status');
 
 <script>
     jQuery(document).ready(function() {
+        window.loading_ajax = {
+            'dok': false,
+            'tahun': false
+        };
         getTableIku();
         getTableTahun();
         jQuery("#fileUpload").on('change', function() {
@@ -241,6 +245,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
     });
 
     function getTableIku() {
+        loading_ajax.dok = true;
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -254,6 +259,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
             dataType: 'json',
             success: function(response) {
                 jQuery('#wrap-loading').hide();
+                loading_ajax.dok = false;
                 console.log(response);
                 if(
                     response.data_esr 

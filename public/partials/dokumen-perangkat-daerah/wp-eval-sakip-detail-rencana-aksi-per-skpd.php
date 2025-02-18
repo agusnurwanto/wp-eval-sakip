@@ -227,7 +227,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
 <script>
     jQuery(document).ready(function() {
         getTableRencanaAksi();
-        getTableTahun();
         jQuery("#fileUpload").on('change', function() {
             var id_dokumen = jQuery('#idDokumen').val();
             if (id_dokumen == '') {
@@ -320,7 +319,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
                 if (response.status === 'success') {
                     alert(response.message);
                     jQuery('#tahunModal').modal('hide');
-                    getTableTahun();
                     getTableRencanaAksi();
                 } else {
                     alert(response.message);
@@ -510,7 +508,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
                 if (response.status === 'success') {
                     alert(response.message);
                     getTableRencanaAksi();
-                    getTableTahun();
                 } else {
                     alert(response.message);
                 }

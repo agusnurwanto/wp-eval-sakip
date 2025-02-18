@@ -1990,6 +1990,35 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                 ));
 
                 foreach ($data_pegawai_all as $key => $v_pgw) {
+                    //update rhk where if id jabatan(satker_id for pk) is null
+                    $cek_null_value = $wpdb->get_var(
+                        $wpdb->prepare("
+                            SELECT COUNT(*) 
+                            FROM esakip_data_rencana_aksi_opd 
+                            WHERE active = 1 
+                              AND tahun_anggaran = %d 
+                              AND id_skpd = %s 
+                              AND nip = %s 
+                              AND id_jabatan IS NULL
+                        ", $_POST['tahun_anggaran'], $_POST['id_skpd'], $v_pgw['nip_baru'])
+                    );
+
+                    if ($cek_null_value > 0) {
+                        $wpdb->update(
+                            'esakip_data_rencana_aksi_opd',
+                            array('id_jabatan' => $v_pgw['satker_id']),
+                            array(
+                                'active'         => 1,
+                                'tahun_anggaran' => $_POST['tahun_anggaran'],
+                                'id_skpd'        => $_POST['id_skpd'],
+                                'nip'            => $v_pgw['nip_baru'],
+                                'id_jabatan'     => null
+                            ),
+                            array('%s'),
+                            array('%d', '%s', '%s')
+                        );
+                    }
+
                     $count_finalisasi = $wpdb->get_var(
                         $wpdb->prepare("
                             SELECT 
@@ -2001,6 +2030,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                               AND nip = %d 
                         ", $_POST['tahun_anggaran'], $_POST['id_skpd'], $v_pgw['nip_baru'])
                     );
+
                     $count_rhk = $wpdb->get_var(
                         $wpdb->prepare("
                             SELECT 
