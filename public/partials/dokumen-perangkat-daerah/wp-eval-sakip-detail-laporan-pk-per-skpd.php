@@ -159,28 +159,8 @@ if (
 
 //JIKA PIHAK KEDUA BUKAN KEPALA DAERAH
 if (empty($data_atasan)) {
-    if (
-        $data_pegawai_1['tipe_pegawai_id'] == 11
-        && $data_pegawai_1['plt_plh'] == 1
-    ) {
-        //JIKA PIHAK PERTAMA KEPALA, DAN PLT PLH
-        $data_atasan = $wpdb->get_row(
-            $wpdb->prepare("
-                SELECT
-                    p.*,
-                    ds.nama AS nama_bidang
-                FROM esakip_data_pegawai_simpeg p
-                LEFT JOIN esakip_data_satker_simpeg ds
-                       ON ds.satker_id = p.satker_id
-                WHERE p.satker_id=%s 
-                  AND p.tipe_pegawai_id=%d 
-                  AND p.active=1
-                ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
-            ", $data_pegawai_1['satker_id'], 11),
-            ARRAY_A
-        );
-    } else if ($data_pegawai_1['tipe_pegawai_id'] == 11) {
-        //JIKA PIHAK PERTAMA KEPALA
+    if ($data_pegawai_1['tipe_pegawai_id'] == 11) {
+        //JIKA PIHAK PERTAMA KEPALA (BUKAN KEPALA SKPD)
         $satker_id_atasan = substr($data_pegawai_1['satker_id'], 0, -2);
         $data_atasan = $wpdb->get_row(
             $wpdb->prepare("
@@ -217,64 +197,78 @@ if (empty($data_atasan)) {
     }
 
     //SINKRON DATA PIHAK KEDUA (KEPALA)
-    $simpeg_pihak_kedua = $this->get_pegawai_simpeg('asn', $data_atasan['nip_baru'], $data_atasan['satker_id'], $data_atasan['jabatan']);
-    $response_2 = json_decode($simpeg_pihak_kedua, true);
-    if (!isset($response_2['status']) || $response_2['status'] === false) {
-        array_push($error_message, $response_2['message']);
+    if (!empty($data_atasan)) {
+        $simpeg_pihak_kedua = $this->get_pegawai_simpeg('asn', $data_atasan['nip_baru'], $data_atasan['satker_id'], $data_atasan['jabatan']);
+        $response_2 = json_decode($simpeg_pihak_kedua, true);
+        if (!isset($response_2['status']) || $response_2['status'] === false) {
+            array_push($error_message, $response_2['message']);
+        }
     }
 }
 
 // PIHAK KEDUA BUKAN KEPALA DAERAH DAN DIA PLT
-if (!empty($data_atasan['plt_plh'])) {
-    if (
-        $data_atasan['plt_plh'] == 1
-        && (
-            $data_atasan['tmt_sk_plth'] < $date_hari_ini
-            && $date_hari_ini < $data_atasan['berakhir']
-        )
-    ) {
-        $cek_status_jabatan_kepala_pihak_kedua = 1;
+if (!empty($data_atasan)) {
+    if (!empty($data_atasan['plt_plh'])) {
+        if (
+            $data_atasan['plt_plh'] == 1
+            && (
+                $data_atasan['tmt_sk_plth'] < $date_hari_ini
+                && $date_hari_ini < $data_atasan['berakhir']
+            )
+        ) {
+            $cek_status_jabatan_kepala_pihak_kedua = 1;
+        }
     }
-}
-
-$pihak_kedua = array(
-    'nama_pegawai'    => $data_atasan['nama_pegawai'] ?? '-',
-    'nip_pegawai'     => $data_atasan['nip_baru'] ?? '-',
-    'jabatan_pegawai' => '', //default kosong jika atasan kepala daerah
-    'pangkat'         => '', //default kosong jika atasan kepala daerah
-    'gelar_depan'     => '', //default kosong jika atasan kepala daerah
-    'gelar_belakang'  => '', //default kosong jika atasan kepala daerah
-    'status_jabatan'  => $data_atasan['jabatan'] ?? ''
-);
-
-if (
-    !empty($data_atasan['status_kepala'])
-    && !empty($data_atasan['jabatan'])
-) {
-    //JIKA PIHAK KEDUA KEPALA DAERAH, TAMPILKAN JABATANNYA
-    $pihak_kedua['jabatan_pegawai'] = $data_atasan['jabatan'];
-} else if (!empty($data_atasan['jabatan'])) {
-    //JIKA PIHAK KEDUA BUKAN KEPALA DAERAH, TAMPILKAN PANGKAT NIP DLL
-    //GET LAGI UPDATED DATA PIHAK KEDUA
-    $data_pegawai_2 = $wpdb->get_row(
-        $wpdb->prepare("
-            SELECT
-                p.*,
-                ds.nama AS nama_bidang
-            FROM esakip_data_pegawai_simpeg p
-            LEFT JOIN esakip_data_satker_simpeg ds
-                   ON ds.satker_id = p.satker_id
-            WHERE p.nip_baru = %s
-              AND p.satker_id = %s
-              AND p.active = 1
-        ", $data_atasan['nip_baru'], $data_atasan['satker_id']),
-        ARRAY_A
+    
+    $pihak_kedua = array(
+        'nama_pegawai'    => $data_atasan['nama_pegawai'] ?? '-',
+        'nip_pegawai'     => $data_atasan['nip_baru'] ?? '-',
+        'jabatan_pegawai' => '', //default kosong jika atasan kepala daerah
+        'pangkat'         => '', //default kosong jika atasan kepala daerah
+        'gelar_depan'     => '', //default kosong jika atasan kepala daerah
+        'gelar_belakang'  => '', //default kosong jika atasan kepala daerah
+        'status_jabatan'  => $data_atasan['jabatan'] ?? ''
     );
-
-    $pihak_kedua['pangkat']         = $data_pegawai_2['pangkat'] ?? '-';
-    $pihak_kedua['gelar_depan']     = $data_pegawai_2['gelar_depan'] ?? '';
-    $pihak_kedua['gelar_belakang']  = $data_pegawai_2['gelar_belakang'] ?? '';
-    $pihak_kedua['jabatan_pegawai'] = $data_pegawai_2['jabatan'] . ' ' . $data_pegawai_2['nama_bidang'] ?? '-';
+    
+    if (
+        !empty($data_atasan['status_kepala'])
+        && !empty($data_atasan['jabatan'])
+    ) {
+        //JIKA PIHAK KEDUA KEPALA DAERAH, TAMPILKAN JABATANNYA
+        $pihak_kedua['jabatan_pegawai'] = $data_atasan['jabatan'];
+    } else if (!empty($data_atasan['jabatan'])) {
+        //JIKA PIHAK KEDUA BUKAN KEPALA DAERAH, TAMPILKAN PANGKAT NIP DLL
+        //GET LAGI UPDATED DATA PIHAK KEDUA
+        $data_pegawai_2 = $wpdb->get_row(
+            $wpdb->prepare("
+                SELECT
+                    p.*,
+                    ds.nama AS nama_bidang
+                FROM esakip_data_pegawai_simpeg p
+                LEFT JOIN esakip_data_satker_simpeg ds
+                       ON ds.satker_id = p.satker_id
+                WHERE p.nip_baru = %s
+                  AND p.satker_id = %s
+                  AND p.active = 1
+            ", $data_atasan['nip_baru'], $data_atasan['satker_id']),
+            ARRAY_A
+        );
+    
+        $pihak_kedua['pangkat']         = $data_pegawai_2['pangkat'] ?? '-';
+        $pihak_kedua['gelar_depan']     = $data_pegawai_2['gelar_depan'] ?? '';
+        $pihak_kedua['gelar_belakang']  = $data_pegawai_2['gelar_belakang'] ?? '';
+        $pihak_kedua['jabatan_pegawai'] = $data_pegawai_2['jabatan'] . ' ' . $data_pegawai_2['nama_bidang'] ?? '-';
+    }
+} else {
+    $pihak_kedua = array(
+        'nama_pegawai'    => '-',
+        'nip_pegawai'     => '-',
+        'jabatan_pegawai' => '-', //default kosong jika atasan kepala daerah
+        'pangkat'         => '', //default kosong jika atasan kepala daerah
+        'gelar_depan'     => '', //default kosong jika atasan kepala daerah
+        'gelar_belakang'  => '', //default kosong jika atasan kepala daerah
+        'status_jabatan'  => ''
+    );
 }
 
 $options = array(
@@ -292,8 +286,8 @@ $is_administrator = in_array('administrator', $user_roles);
 
 // hak akses user pegawai
 $data_user_pegawai = $wpdb->get_row(
-    $wpdb->prepare(
-        "SELECT
+    $wpdb->prepare("
+        SELECT
             nip_baru,
             nama_pegawai,
             satker_id,
@@ -301,15 +295,11 @@ $data_user_pegawai = $wpdb->get_row(
             plt_plh,
             tmt_sk_plth,
             berakhir
-        FROM 
-            esakip_data_pegawai_simpeg
-        WHERE
-            nip_baru=%s
-            AND active=%d
-        ORDER BY satker_id ASC, tipe_pegawai_id ASC",
-        $user_nip,
-        1
-    ),
+        FROM esakip_data_pegawai_simpeg
+        WHERE nip_baru=%s
+          AND active=%d
+        ORDER BY satker_id ASC, tipe_pegawai_id ASC
+    ", $user_nip, 1),
     ARRAY_A
 );
 
