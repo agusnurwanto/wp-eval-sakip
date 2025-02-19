@@ -400,7 +400,7 @@ if ($data_tahapan) {
     <div title="Pengisian IKU <?php echo $skpd['nama_skpd'] ?> - <?php echo $nama_jadwal ?>">
         <div style="padding: 10px;margin:0 0 3rem 0;">
             <h1 style="text-align: center; margin: 10px auto; min-width: 450px;">Pengisian IKU <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $nama_jadwal ?></h1> 
-            <!-- <div class="cr-container hide-display-print">
+            <div class="cr-container hide-display-print">
                <h2 class="cr-title">Pilih Pengisian Indikator Kegiatan Utama</h2>
                 <div class="cr-carousel-wrapper">
                     <div id="card-carousel" class="cr-carousel">
@@ -431,6 +431,7 @@ if ($data_tahapan) {
                 </div>
             </div>
 
+            <div id="action" class="action-section hide-excel"></div>
             <div class="text-right m-2">
                 <button class="btn btn-sm btn-success hide-display-print" id="finalisasi-btn" onclick="showModalFinalisasi()">
                     <span class="dashicons dashicons-saved" title="Finalisasikan dokumen (Menyimpan dokumen sesuai data terkini)"></span>
@@ -440,8 +441,7 @@ if ($data_tahapan) {
                     <span class="dashicons dashicons-edit" title="Edit Label"></span>
                     Edit Finalisasi Data
                 </button>
-            </div> -->
-            <div id="action" class="action-section hide-excel"></div>
+            </div>
             <br>
             <div id="cetak" class="wrap-table">
                 <table cellpadding="2" cellspacing="0" class="table_dokumen_iku table table-bordered">

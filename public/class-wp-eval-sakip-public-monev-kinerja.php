@@ -2670,6 +2670,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$ret['status'] = 'error';
 						$ret['message'] = 'ID jadwal tidak boleh kosong!';
 					}
+
 					if ($ret['status'] != 'error') {
 						$data_iku = $wpdb->get_results($wpdb->prepare("
 							SELECT
@@ -2681,6 +2682,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						", $_POST['id_jadwal']), ARRAY_A);
 
 						$html = '';
+						$html_2 = '';
 						$no = 0;
 						if (!empty($data_iku)) {
 							foreach ($data_iku as $v) {
@@ -2774,7 +2776,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_iku(\'' . $v['id'] . '\'); return false;" href="#" title="Edit IKU"><span class="dashicons dashicons-edit"></span></button>';
 								$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_iku(\'' . $v['id'] . '\'); return false;" href="#" title="Hapus IKU"><span class="dashicons dashicons-trash"></span></button>';
 								$btn .= '</div>';
-
 								$hak_akses_user = ($nip_kepala == $skpd['nipkepala'] || $is_administrator || $this_jenis_role == 1) ? true : false;
 
 								if (!$hak_akses_user) {
@@ -6464,9 +6465,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 				$query = $wpdb->prepare("
 	                SELECT 
-	                	id 
+	                	*
 	                FROM esakip_finalisasi_iku_opd 
-	                WHERE id IN ($placeholders) AND active = 1
+	                WHERE id IN ($placeholders) 
+	                	AND active = 1
 	            ", $getID);
 
 				$result = $wpdb->get_col($query);
@@ -6481,7 +6483,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	                UPDATE 
 	                	esakip_finalisasi_iku_opd 
 	                SET active = 0 
-	                WHERE id IN ($placeholders) AND active = 1
+	                WHERE id IN ($placeholders) 
+	                	AND active = 1
 	            ", $getID));
 			} else {
 				$ret = array(
@@ -6494,44 +6497,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				'status' => 'error',
 				'message'   => 'Format tidak sesuai!'
 			);
-		}
-		die(json_encode($ret));
-	}
-	function get_finalisasi_iku_by_id()
-	{
-		global $wpdb;
-		$ret = array(
-			'status'  => 'success',
-			'message' => 'Berhasil get laporan PK by id!',
-			'data' => array()
-		);
-
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$getID = isset($_POST['getID']) ? explode(',', $_POST['getID']) : [];
-
-				if (empty($getID)) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'ID tidak valid atau kosong!';
-					die(json_encode($ret));
-				}
-
-				$getID = array_map('intval', $getID);
-				$placeholders = implode(',', array_fill(0, count($getID), '%d'));
-
-				$ret['data'] = $wpdb->prepare("
-	                SELECT 
-	                	id 
-	                FROM esakip_finalisasi_iku_opd 
-	                WHERE id IN ($placeholders) AND active = 1
-	            ", $getID);
-			} else {
-				$ret['status'] = 'error';
-				$ret['message'] = 'API key tidak ditemukan!';
-			}
-		} else {
-			$ret['status'] = 'error';
-			$ret['message'] = 'Format salah!';
 		}
 		die(json_encode($ret));
 	}

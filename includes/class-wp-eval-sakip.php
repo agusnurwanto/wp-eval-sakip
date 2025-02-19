@@ -280,6 +280,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_simpan_finalisasi_iku', $plugin_public, 'simpan_finalisasi_iku');
 		$this->loader->add_action('wp_ajax_hapus_finalisasi_iku_opd', $plugin_public, 'hapus_finalisasi_iku_opd');
 		$this->loader->add_action('wp_ajax_get_finalisasi_iku_by_id', $plugin_public, 'get_finalisasi_iku_by_id');
+		$this->loader->add_action('wp_ajax_edit_finalisasi_iku', $plugin_public, 'edit_finalisasi_iku');
 		
 		$this->loader->add_action('wp_ajax_get_table_cascading_pd', $plugin_public, 'get_table_cascading_pd');
 		$this->loader->add_action('wp_ajax_get_kegiatan_by_program', $plugin_public, 'get_kegiatan_by_program');
@@ -657,6 +658,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_simpan_rinci_bl_tagging_manual',  $plugin_public, 'simpan_rinci_bl_tagging_manual');
 		$this->loader->add_action('wp_ajax_get_rinci_tagging_by_id',  $plugin_public, 'get_rinci_tagging_by_id');
 		$this->loader->add_action('wp_ajax_delete_rincian_tagging_by_id_rinci_bl',  $plugin_public, 'delete_rincian_tagging_by_id_rinci_bl');
+		$this->loader->add_action('wp_ajax_get_table_tl_lhe_akip_internal',  $plugin_public, 'get_table_tl_lhe_akip_internal');
 		
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
