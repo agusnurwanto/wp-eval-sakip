@@ -659,6 +659,9 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_rinci_tagging_by_id',  $plugin_public, 'get_rinci_tagging_by_id');
 		$this->loader->add_action('wp_ajax_delete_rincian_tagging_by_id_rinci_bl',  $plugin_public, 'delete_rincian_tagging_by_id_rinci_bl');
 		$this->loader->add_action('wp_ajax_get_table_tl_lhe_akip_internal',  $plugin_public, 'get_table_tl_lhe_akip_internal');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_tl_lhe_akip_internal',  $plugin_public, 'hapus_dokumen_tl_lhe_akip_internal');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_tl_lhe_akip_internal',  $plugin_public, 'tambah_dokumen_tl_lhe_akip_internal');
+		$this->loader->add_action('wp_ajax_get_detail_tl_lhe_akip_internal_by_id',  $plugin_public, 'get_detail_tl_lhe_akip_internal_by_id');
 		
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
