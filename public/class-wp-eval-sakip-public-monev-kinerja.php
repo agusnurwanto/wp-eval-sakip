@@ -1176,14 +1176,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'active' => 1
 					)
 				);
-				$wpdb->update(
-					'esakip_finalisasi_rhk_laporan_pk',
-					array('active' => 0),
-					array(
-						'id_tahap_pk' => $cek_id,
-						'active' => 1
-					)
-				);
 			} else {
 				$ret = array(
 					'status' => 'error',
@@ -6070,8 +6062,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						LEFT JOIN esakip_data_satker_simpeg ds
 							   ON ds.satker_id = p.satker_id
 						WHERE p.nip_baru=%d
+						  AND p.satker_id = %s
 						  AND p.active = 1
-					', $_POST['nip_pertama']),
+					', $_POST['nip_pertama'], $_POST['id_satker_pertama']),
 					ARRAY_A
 				);
 
@@ -6106,8 +6099,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							LEFT JOIN esakip_data_satker_simpeg ds
 								   ON ds.satker_id = p.satker_id
 							WHERE p.nip_baru=%d
+							  AND p.satker_id = %s
 							  AND p.active = 1
-						', $_POST['nip_kedua']),
+						', $_POST['nip_kedua'], $_POST['id_satker_kedua']),
 						ARRAY_A
 					);
 					$data_atasan = $pihak_kedua;
@@ -6144,6 +6138,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					'id_skpd' 				 => $_POST['id_skpd'],
 					'alamat_kantor' 		 => $skpd['alamat_kantor'],
 					'nama_skpd' 			 => $skpd['nama_skpd'],
+					'id_satker' 			 => $pihak_pertama['satker_id'],
 					'satuan_kerja' 			 => $pihak_pertama['nama_bidang'],
 
 					'nama_tahapan' 			 => $data_pk['nama_tahapan'],

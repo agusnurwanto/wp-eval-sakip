@@ -1805,16 +1805,16 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                 if ($ret['status'] == 'success') {
                     $unit = $wpdb->get_results(
                         $wpdb->prepare("
-                        SELECT 
-                            nama_skpd, 
-                            id_skpd, 
-                            kode_skpd, 
-                            nipkepala 
-                        FROM esakip_data_unit 
-                        WHERE active=1 
-                          AND tahun_anggaran=%d
-                          AND is_skpd=1 
-                        ORDER BY kode_skpd ASC
+                            SELECT 
+                                nama_skpd, 
+                                id_skpd, 
+                                kode_skpd, 
+                                nipkepala 
+                            FROM esakip_data_unit 
+                            WHERE active=1 
+                              AND tahun_anggaran=%d
+                              AND is_skpd=1 
+                            ORDER BY kode_skpd ASC
                         ", $tahun_anggaran_sakip),
                         ARRAY_A
                     );
@@ -1825,37 +1825,35 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                         foreach ($unit as $kk => $vv) {
                             $total_pegawai_all = 0;
 
-                            $mapping_unit_simpeg = $wpdb->get_row($wpdb->prepare("
-                                SELECT 
-                                    a.*,
-                                    b.satker_id
-                                FROM 
-                                    esakip_data_mapping_unit_sipd_simpeg a 
-                                LEFT JOIN esakip_data_satker_simpeg b 
-                                    ON b.satker_id=a.id_satker_simpeg AND 
-                                    b.tahun_anggaran=a.tahun_anggaran AND b.active=1
-                                WHERE 
-                                    a.tahun_anggaran=%d and
-                                    a.id_skpd=%d;
-                            ", $tahun_anggaran, $vv['id_skpd']), ARRAY_A);
+                            $mapping_unit_simpeg = $wpdb->get_row(
+                                $wpdb->prepare("
+                                    SELECT 
+                                        a.*,
+                                        b.satker_id
+                                    FROM esakip_data_mapping_unit_sipd_simpeg a 
+                                    LEFT JOIN esakip_data_satker_simpeg b 
+                                           ON b.satker_id = a.id_satker_simpeg 
+                                          AND b.tahun_anggaran = a.tahun_anggaran 
+                                          AND b.active = 1
+                                    WHERE a.tahun_anggaran = %d 
+                                      AND a.id_skpd = %d
+                                ", $tahun_anggaran, $vv['id_skpd']),
+                                ARRAY_A
+                            );
 
                             $satker_id = 0;
                             if (!empty($mapping_unit_simpeg)) {
                                 $satker_id = $mapping_unit_simpeg['satker_id'];
-
-                                $data_pegawai = $wpdb->get_row($wpdb->prepare(
-                                    "
+                                $data_pegawai = $wpdb->get_row(
+                                    $wpdb->prepare("
                                         SELECT 
-                                            COUNT(id) total_pegawai
-                                        FROM 
-                                            esakip_data_pegawai_simpeg
-                                        WHERE
-                                            satker_id LIKE %s AND
-                                            active=%d",
-                                    $satker_id . '%',
-                                    1
-                                ), ARRAY_A);
-                                $cek_q = $wpdb->last_query;
+                                            COUNT(id) AS total_pegawai
+                                        FROM esakip_data_pegawai_simpeg
+                                        WHERE satker_id LIKE %s 
+                                          AND active = %d
+                                    ", $satker_id . '%',1),
+                                    ARRAY_A
+                                );
                                 if (!empty($data_pegawai)) {
                                     $total_pegawai_all = $data_pegawai['total_pegawai'];
                                 }
@@ -1868,9 +1866,33 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                                 'post_status' => 'private'
                             ));
 
+                            $count_finalisasi = $wpdb->get_var(
+                                $wpdb->prepare("
+                                    SELECT 
+                                        COUNT(id)
+                                    FROM esakip_finalisasi_tahap_laporan_pk 
+                                    WHERE active = 1 
+                                      AND tahun_anggaran = %d
+                                      AND id_skpd = %d
+                                ", $tahun_anggaran, $vv['id_skpd'])
+                            );
+        
+                            $count_rhk = $wpdb->get_var(
+                                $wpdb->prepare("
+                                    SELECT 
+                                        COUNT(id)
+                                    FROM esakip_data_rencana_aksi_opd 
+                                    WHERE active = 1 
+                                      AND tahun_anggaran = %d
+                                      AND id_skpd = %d
+                                ", $tahun_anggaran, $vv['id_skpd'])
+                            );
+
                             $tbody .= "<tr>";
                             $tbody .= "<td style='text-transform: uppercase;'><a href='" . $halaman_pegawai_skpd['url'] . "&id_skpd=" . $vv['id_skpd'] . "' target='_blank'>" . $vv['kode_skpd'] . " " . $vv['nama_skpd'] . "</a></td>";
                             $tbody .= "<td class='text-center'>" . number_format($total_pegawai_all, 0, ",", ".") . "</td>";
+                            $tbody .= "<td class='text-center'>" . $count_rhk . "</td>";
+                            $tbody .= "<td class='text-center'>" . $count_finalisasi . "</td>";
                             $tbody .= "</tr>";
                         }
                         $ret['data'] = $tbody;
@@ -2028,7 +2050,8 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                               AND tahun_anggaran = %d
                               AND id_skpd = %d
                               AND nip = %d 
-                        ", $_POST['tahun_anggaran'], $_POST['id_skpd'], $v_pgw['nip_baru'])
+                              AND id_satker = %d 
+                        ", $_POST['tahun_anggaran'], $_POST['id_skpd'], $v_pgw['nip_baru'], $v_pgw['satker_id'])
                     );
 
                     $count_rhk = $wpdb->get_var(
@@ -2071,12 +2094,14 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                         LEFT JOIN esakip_data_pegawai_simpeg p 
                                ON pk.nip = p.nip_baru 
                         WHERE pk.tahun_anggaran = %d
-                          AND p.satker_id = %d
-                          AND pk.id_skpd != %d
+                          AND pk.id_skpd = %d
+                          AND p.satker_id LIKE %s
                           AND pk.active = 1
-                    ", $_POST['tahun_anggaran'], $mapping_satker_id, $_POST['id_skpd']),
+                          AND p.active = 0
+                    ", $_POST['tahun_anggaran'], $_POST['id_skpd'], $mapping_satker_id . '%'),
                     ARRAY_A
                 );
+                $ret['sql'] = $wpdb->last_query;                   
 
                 $tbody_nonaktif = '';
                 if (!empty($data_finalisasi)) {
@@ -2088,16 +2113,17 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                                 FROM esakip_finalisasi_tahap_laporan_pk 
                                 WHERE active = 1 
                                   AND tahun_anggaran = %d
-                                  AND id_skpd != %d
-                                  AND nip = %d
-                            ", $_POST['tahun_anggaran'], $_POST['id_skpd'], $v['nip'])
+                                  AND id_skpd = %d
+                                  AND nip = %s
+                                  AND id_satker = %s
+                            ", $_POST['tahun_anggaran'], $_POST['id_skpd'], $v['nip'], $v['satker_id'])
                         );
 
                         $tbody_nonaktif .= "<tr>";
                         $tbody_nonaktif .= "<td class='text-left'>" . $v['satker_id'] . "</td>";
                         $tbody_nonaktif .= "<td class='text-left'>" . $v['nama_skpd'] . "</td>";
                         $tbody_nonaktif .= "<td class='text-left'>" . $v['satuan_kerja'] . "</td>";
-                        $tbody_nonaktif .= "<td class='text-center' title='Halaman Detail Perjanjian Kinerja'><a href='" . $detail_laporan_pk['url'] . "&id_skpd=" . $unit['id_skpd'] . "&nip=" . $v['nip'] . "' target='_blank'>" . $v['nip'] . "</a></td>";
+                        $tbody_nonaktif .= "<td class='text-center' title='Halaman Detail Perjanjian Kinerja'><a href='" . $detail_laporan_pk['url'] . "&id_skpd=" . $unit['id_skpd'] . "&nip=" . $v['nip'] . "&satker_id=" . $v['satker_id'] . "' target='_blank'>" . $v['nip'] . "</a></td>";
                         $tbody_nonaktif .= "<td class='text-left'>" . $v['nama_pegawai'] . "</td>";
                         $tbody_nonaktif .= "<td class='text-left'>" . $v['jabatan_pegawai'] . "</td>";
                         $tbody_nonaktif .= "<td class='text-center'>" . $count_finalisasi_2 . "</td>";

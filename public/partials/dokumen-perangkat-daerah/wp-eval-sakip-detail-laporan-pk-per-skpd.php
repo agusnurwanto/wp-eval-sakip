@@ -1532,6 +1532,8 @@ if ($data_tahapan) {
                 status_pertama: status_jabatan_1,
                 status_kedua: status_jabatan_2,
                 id_skpd: '<?php echo $id_skpd; ?>',
+                id_satker_pertama: '<?php echo $data_pegawai_1['satker_id']; ?>',
+                id_satker_kedua: '<?php echo $data_pegawai_2['satker_id']; ?>',
                 tahun_anggaran: '<?php echo $input['tahun']; ?>',
                 options: option_js
             },
