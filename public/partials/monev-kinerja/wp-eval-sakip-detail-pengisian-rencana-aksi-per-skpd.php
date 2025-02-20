@@ -62,7 +62,7 @@ $admin_role_pemda = array(
     'admin_ortala'
 );
 
-$this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2;
+$this_jenis_role = (array_intersect($admin_role_pemda, $user_roles)) ? 1 : 2;
 
 $cek_settingan_menu = $wpdb->get_var(
     $wpdb->prepare(

@@ -2104,7 +2104,7 @@ $is_administrator = in_array('administrator', $user_roles);
         'admin_ortala'
     );
 
-    $this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? true : false ;
+    $this_jenis_role = (array_intersect($admin_role_pemda, $user_roles)) ? true : false ;
 
 $cek_settingan_menu = $wpdb->get_var(
 	$wpdb->prepare(

@@ -134,7 +134,7 @@ $admin_role_pemda = array(
 	'admin_ortala'
 );
 
-$this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2;
+$this_jenis_role = (array_intersect($admin_role_pemda, $user_roles)) ? 1 : 2;
 
 $cek_settingan_menu = $wpdb->get_var(
 	$wpdb->prepare("
@@ -575,6 +575,25 @@ if (empty($wpsipd_status)) {
 	$disabled_manual = 'disabled';
 	$text_pesan = 'Kolom Cascading Sub Kegiatan Kosong!';
 }
+
+
+$error_message = array(); 
+$satker_id_pegawai_indikator = ''; 
+if(!empty($renaksi) && !empty($renaksi['satker_id'])){
+	$satker_id_pegawai_indikator = $renaksi['satker_id'];
+}else{
+	array_push($error_message, 'Satker Id Kosong!');
+}
+
+// ----- get data e-kin perbulan ----- //
+if(!empty($tahun) && !empty($satker_id_pegawai_indikator)){
+	// $data_ekin = $this->get_data_perbulan_ekinerja($tahun, $satker_id_pegawai_indikator);
+	// $data_ekin_terbaru = json_decode($data_ekin, true);
+	// if (!isset($data_ekin_terbaru['status']) || $data_ekin_terbaru['status'] === false) {
+	// 	array_push($error_message, $data_ekin_terbaru['message']);
+	// }
+}
+
 ?>
 <style type="text/css">
 	.wrap-table {

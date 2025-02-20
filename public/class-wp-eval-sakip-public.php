@@ -726,7 +726,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			'admin_ortala'
 		);
 
-		$this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2;
+		$this_jenis_role = (array_intersect($admin_role_pemda, $user_roles)) ? 1 : 2;
 
 		if ($nama_dokumen == 'RENSTRA' || $nama_dokumen == 'Pohon Kinerja dan Cascading') {
 			// Khusus di Settingan RENSTRA dan pohon kinerja tahun anggaran diganti dengan id jadwal periode renstra
@@ -767,7 +767,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			'admin_ortala'
 		);
 
-		$this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2;
+		$this_jenis_role = (array_intersect($admin_role_pemda, $user_roles)) ? 1 : 2;
 
 		$cek_settingan_menu = $wpdb->get_var($wpdb->prepare("
 	    	SELECT 
@@ -2868,7 +2868,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					} else {
 						$current_user = wp_get_current_user();
 						$user_roles = $current_user->roles;
-						$edit_pa = (in_array($user_roles[0], ['pa'])) ? true : false;
+						$edit_pa = (array_intersect(['pa'], $user_roles)) ? true : false;
 
 						$opsi = array(
 							'keterangan' => $keterangan,
@@ -3062,7 +3062,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					} else {
 						$current_user = wp_get_current_user();
 						$user_roles = $current_user->roles;
-						$edit_pa = (in_array($user_roles[0], ['pa'])) ? true : false;
+						$edit_pa = (array_intersect(['pa'], $user_roles)) ? true : false;
 
 						$opsi = array(
 							'keterangan' => $keterangan,
@@ -3418,7 +3418,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					} else {
 						$current_user = wp_get_current_user();
 						$user_roles = $current_user->roles;
-						$edit_pa = (in_array($user_roles[0], ['pa'])) ? true : false;
+						$edit_pa = (array_intersect(['pa'], $user_roles)) ? true : false;
 						$opsi = array(
 							'keterangan' => $keterangan,
 							'created_at' => current_time('mysql'),
@@ -5082,7 +5082,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					} else {
 						$current_user = wp_get_current_user();
 						$user_roles = $current_user->roles;
-						$edit_pa = (in_array($user_roles[0], ['pa'])) ? true : false;
+						$edit_pa = (array_intersect(['pa'], $user_roles)) ? true : false;
 
 						$opsi = array(
 							'keterangan' => $keterangan,
@@ -25168,7 +25168,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					} else {
 						$current_user = wp_get_current_user();
 						$user_roles = $current_user->roles;
-						$edit_pa = (in_array($user_roles[0], ['pa'])) ? true : false;
+						$edit_pa = (array_intersect(['pa'], $user_roles)) ? true : false;
 
 						$opsi = array(
 							'keterangan' => $keterangan,
@@ -30549,7 +30549,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					} else {
 						$current_user = wp_get_current_user();
 						$user_roles = $current_user->roles;
-						$edit_pa = (in_array($user_roles[0], ['pa'])) ? true : false;
+						$edit_pa = (array_intersect(['pa'], $user_roles)) ? true : false;
 
 						$opsi = array(
 							'keterangan' => $keterangan,
