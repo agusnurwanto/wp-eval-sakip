@@ -7800,6 +7800,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								} else {
 									if ($data_verifikasi['status_verifikasi'] == 1) { 
 										$tbody .= "<td class='text-center'><input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'></td>";
+									} else {
+									    $tbody .= "<td class='text-center'></td>";
 									}
 								}
 							}
