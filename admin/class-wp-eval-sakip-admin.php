@@ -1411,7 +1411,18 @@ class Wp_Eval_Sakip_Admin
 					->set_help_text('Wajib diisi. Auth Type : Basic Auth dengan Password yang digunakan untuk integrasi dokumen ke API ESR'),
 				Field::make('text', 'crb_expired_time_esr_lokal', 'Waktu Expired Akses Data ESR Lokal (Minimal 1 Detik)')
 					->set_default_value('60')
-					->set_help_text('Wajib diisi. Waktu maksimal system menggunakan data ESR yang disimpan di lokal. Jika melebihi waktu maksimal maka data ESR lokal akan diupdate berdasarkan data ESR terbaru via API.')
+					->set_help_text('Wajib diisi. Waktu maksimal system menggunakan data ESR yang disimpan di lokal. Jika melebihi waktu maksimal maka data ESR lokal akan diupdate berdasarkan data ESR terbaru via API.'),
+				Field::make('radio', 'crb_api_ekinerja_status', 'Status API E-Kinerja')
+					->add_options(array(
+						'0' => __('Dikunci'),
+						'1' => __('Dibuka')
+					))
+					->set_default_value('1')
+					->set_help_text('Digunakan untuk mengunci atau membuka akses data E-Kinerja'),
+				Field::make('text', 'crb_url_api_ekinerja', 'Url API E-Kinerja')
+					->set_help_text('Wajib diisi. URL integrasi dokumen ke API E-Kinerja'),
+				Field::make('text', 'crb_api_key_ekinerja', 'API KEY E-Kinerja')
+					->set_help_text('Wajib diisi. API KEY digunakan untuk integrasi ke API E-Kinerja'),
 			));
 
 		Container::make('theme_options', __('Pengaturan Perangkat Daerah'))

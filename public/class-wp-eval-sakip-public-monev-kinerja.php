@@ -2736,7 +2736,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							'admin_ortala'
 						);
 
-						$this_jenis_role = (in_array($user_roles[0], $admin_role_pemda)) ? 1 : 2;
+						$this_jenis_role = (array_intersect($admin_role_pemda, $user_roles)) ? 1 : 2;
 
 						$data_iku = $wpdb->get_results($wpdb->prepare("
 							SELECT
@@ -6494,5 +6494,78 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			);
 		}
 		die(json_encode($ret));
+	}
+
+	
+	function get_data_perbulan_ekinerja($tahun = null, $satker_id = null)
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => true,
+			'message' => 'Berhasil get data E-Kinerja!',
+			'data' => array(),
+		);
+
+		try {
+			if (!get_option('_crb_url_api_ekinerja') || !get_option('_crb_api_key_ekinerja')) {
+				throw new Exception("Pengaturan URL API E-Kinerja belum diisi!", 1);
+			}
+
+			if (!get_option('_crb_api_ekinerja_status')) {
+				throw new Exception("Pengaturan Status API E-Kinerja ditutup!", 1);
+			}
+
+			if (empty($tahun)) {
+				throw new Exception("Tahun anggaran kosong!", 1);
+			}
+
+			if (empty($satker_id)) {
+				throw new Exception("Satker id kosong!", 1);
+			}
+
+			$response = wp_remote_post(get_option('_crb_url_api_ekinerja') . 'dev/api/kinerjarhk', [
+				'headers' => array(
+					'X-api-key' => get_option('_crb_api_key_ekinerja'),
+				),
+				'body' => array(
+					'tahun' => $tahun,
+					'satker_id' => $satker_id,
+				)
+			]);
+
+			if (is_wp_error($response)) {
+				$error_message = $response->get_error_message();
+				throw new Exception("Something went wrong: $error_message", 1);
+			}
+
+			$data_ekin = json_decode(wp_remote_retrieve_body($response));
+
+			if (isset($data_ekin->error)) {
+				if (is_array($response)) {
+					$response = json_encode($response);
+				}
+				throw new Exception("Gagal Mendapatkan Data E-Kinerja, Coba lagi! " . $response, 1);
+			}
+			if($data_ekin->status){
+				if(!empty($data_ekin->data)){
+					if(!empty($data_ekin->data)){
+						foreach($data_ekin->data as $k_ekin => $v_ekin){
+							
+						}
+						$ret['data'] = $data_ekin->data;
+					}
+				}else{
+					throw new Exception("Respone API Kosong!", 1);
+				}
+			}else{
+				throw new Exception("Message: ".$data_ekin->message, 1);
+			}
+		} catch (Exception $e) {
+			$ret = json_encode([
+				'status'  => false,
+				'message' => $e->getMessage()
+			]);
+		}
+		return json_encode($ret);
 	}
 }
