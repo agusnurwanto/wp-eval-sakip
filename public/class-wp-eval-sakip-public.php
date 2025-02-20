@@ -6500,7 +6500,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						}
 					}
 
-					$status_integrasi_esr = false;
 					foreach ($ikus as $kk => $vv) {
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
@@ -7330,6 +7329,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							if (!empty($mapping_jenis_dokumen_esr)) {
 								if (!empty($vv['upload_id'])) {
 									if (in_array($vv['upload_id'], array_column($array_data_esr, 'upload_id'))) {
+										$status_integrasi_esr = true;
 										$integrasi_status = [];
 										$tahun_sekarang = $get_tahun_sekarang; 
 										foreach($data_dokumen_jadwal as $dokumen_jadwal){								
@@ -7667,7 +7667,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$can_verify = true;
 					}
 
-					$status_integrasi_esr = false;
 					foreach ($renstras as $kk => $vv) {
 						$data_verifikasi = $wpdb->get_row($wpdb->prepare('
 											SELECT 
@@ -7714,6 +7713,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							if (!empty($mapping_jenis_dokumen_esr)) {
 								if (!empty($vv['upload_id'])) {
 									if (in_array($vv['upload_id'], array_column($array_data_esr, 'upload_id'))) {
+										$status_integrasi_esr = true;
 										$integrasi_status = [];
 										$tahun_sekarang = $get_tahun_sekarang; 
 										foreach($data_dokumen_jadwal as $dokumen_jadwal){								
@@ -8470,7 +8470,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							}
 						}
 
-						$status_integrasi_esr = false;
 						foreach ($datas as $kk => $vv) {
 							$tbody .= "<tr>";
 							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
@@ -23675,7 +23674,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						}
 					}
 
-					$status_integrasi_esr = false;
 					foreach ($rpjpds as $kk => $vv) {
 						$get_tahun_sekarang = date('Y');
 						$data_dokumen_jadwal = $wpdb->get_results(
@@ -23694,6 +23692,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							if (!empty($mapping_jenis_dokumen_esr)) {
 								if (!empty($vv['upload_id'])) {
 									if (in_array($vv['upload_id'], array_column($array_data_esr, 'upload_id'))) {
+										$status_integrasi_esr = true;
 										$integrasi_status = [];
 										$tahun_sekarang = $get_tahun_sekarang; 
 										foreach($data_dokumen_jadwal as $dokumen_jadwal){								
@@ -27516,7 +27515,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$can_verify = true;
 					}
 
-					$status_integrasi_esr = false;
 					foreach ($data_pohon_kinerja as $kk => $vv) {						
 						$get_tahun_sekarang = date('Y');
 						$data_dokumen_jadwal = $wpdb->get_results(
@@ -27536,6 +27534,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							if (!empty($mapping_jenis_dokumen_esr)) {
 								if (!empty($vv['upload_id'])) {
 									if (in_array($vv['upload_id'], array_column($array_data_esr, 'upload_id'))) {
+										$status_integrasi_esr = true;
 										$integrasi_status = [];
 										$tahun_sekarang = $get_tahun_sekarang; 
 										foreach($data_dokumen_jadwal as $dokumen_jadwal){								
@@ -27635,10 +27634,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						if ($_prefix_tipe == "_pemda") {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_pohon_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_pohon_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
-						} else if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Pohon Kinerja dan Cascading', $id_jadwal)) {
+						} else if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Pohon Kinerja dan Cascading', $tahun_anggaran)) {
 							if (!$status_integrasi_esr) {
-								$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_pohon_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
-								$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_pohon_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+								$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_iku(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
+								$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_iku(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 							}
 						}
 						$btn .= '</div>';
