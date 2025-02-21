@@ -404,6 +404,24 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/pohon-kinerja/wp-eval-sakip-detail_crosscutting_pemda.php';
 	}
 
+	public function pohon_kinerja_publish($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/homepage/wp-eval-sakip-homepage-pokin.php';
+	}
+
+	public function cascading_publish($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/homepage/wp-eval-sakip-homepage-cascading.php';
+	}
+
 	public function mapping_skpd()
 	{
 		global $wpdb;
@@ -30726,4 +30744,103 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 		die(json_encode($ret));
 	}
+
+	function menu_depan() 
+{
+	global $wpdb;
+
+	$tahun_values = $wpdb->get_col(
+		$wpdb->prepare("SELECT DISTINCT tahun_anggaran FROM esakip_data_unit WHERE active = %d ORDER BY tahun_anggaran DESC", 1)
+	);
+
+	if (empty($tahun_values)) {
+		return '<div class="alert alert-warning text-center" role="alert">Tidak ada data tahun anggaran tersedia.</div>';
+	}
+
+	$default_tahun = isset($_GET['tahun']) ? $_GET['tahun'] : (get_option(ESAKIP_TAHUN_ANGGARAN) ?? $tahun_values[0]);
+
+	$page_pohon_kinerja_publish = $this->functions->generatePage([
+		'nama_page'   => 'Daftar Pohon Kinerja',
+		'content'     => '[pohon_kinerja_publish]',
+		'show_header' => 1,
+		'post_status' => 'publish'
+	]);
+	$page_cascading_publish = $this->functions->generatePage([
+		'nama_page'   => 'Daftar Cascading',
+		'content'     => '[cascading_publish]',
+		'show_header' => 1,
+		'post_status' => 'publish'
+	]);
+
+	$data = [
+		'Pohon Kinerja' => [
+			'url' => $page_pohon_kinerja_publish['url'],
+			'icon' => get_option('_crb_icon_pohon_kinerja')
+		],
+		'Cascading' => [
+			'url' => $page_cascading_publish['url'], 
+			'icon' => get_option('_crb_icon_cascading')
+		]
+	];
+
+	$output = '<div class="container mt-3">
+				<div class="card shadow-sm">
+					<div class="card-header text-center font-weight-bold">Pilih Tahun Anggaran</div>
+					<div class="card-body text-center">
+						<p id="tahun-terpilih" class="font-weight-bold">Tahun Anggaran Terpilih: <span class="text-primary">' . $default_tahun . '</span></p>
+						<div class="row justify-content-center">';
+
+	foreach ($tahun_values as $tahun) {
+		$active_class = ($tahun == $default_tahun) ? 'btn-success' : 'btn-primary';
+		$output .= '<div class="col-md-3 mb-2">
+					<button class="btn '.$active_class.' btn-block year-button" data-year="'.$tahun.'">'.$tahun.'</button>
+				</div>';
+	}
+
+	$output .= '</div></div></div></div>';
+
+	$output .= '<div class="container mt-4">
+				<div class="card shadow-sm">
+					<div class="card-header text-center font-weight-bold">Navigasi</div>
+					<div class="card-body text-center">
+						<div class="row">';
+
+	foreach ($data as $nama => $item) {
+		$output .= '<div class="col-md-6">
+						<a href="'.$item['url'].'&tahun='.$default_tahun.'" class="d-block text-decoration-none nav-link-icon" data-base-url="'.$item['url'].'" target="_blank">
+							<img src="'.$item['icon'].'" alt="'.$nama.'" class="img-fluid" style="max-width: 60px;">
+							<p class="mt-2 font-weight-bold">'.$nama.'</p>
+						</a>
+					</div>';
+	}
+
+	$output .= '</div></div></div></div>';
+
+	$javascript = '<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			let buttons = document.querySelectorAll(".year-button");
+			let links = document.querySelectorAll(".nav-link-icon");
+
+			buttons.forEach(button => {
+				button.addEventListener("click", function() {
+					let selectedYear = this.getAttribute("data-year");
+					document.getElementById("tahun-terpilih").innerHTML = "Tahun Anggaran Terpilih: <span class=\"text-primary\">" + selectedYear + "</span>";
+
+					buttons.forEach(btn => btn.classList.remove("btn-success"));
+					this.classList.add("btn-success");
+					this.classList.remove("btn-primary");
+
+					links.forEach(link => {
+						let baseUrl = link.getAttribute("data-base-url");
+						link.href = baseUrl + "?tahun=" + selectedYear;
+					});
+				});
+			});
+		});
+	</script>';
+
+	return $output . $javascript;
+}
+
+	
 }
