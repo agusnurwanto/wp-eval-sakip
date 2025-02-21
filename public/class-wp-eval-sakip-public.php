@@ -8423,18 +8423,19 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 								SELECT 
 										a.*
-									FROM 
-										esakip_data_mapping_jenis_dokumen_esr a 
-											JOIN esakip_menu_dokumen b 
-												ON b.id=a.esakip_menu_dokumen_id AND 
-													a.tahun_anggaran=b.tahun_anggaran AND b.active=1
-		                                    JOIN esakip_data_jenis_dokumen_esr c 
-		                                    	ON c.jenis_dokumen_esr_id=a.jenis_dokumen_esr_id  AND 
-		                                    		c.tahun_anggaran=a.tahun_anggaran AND c.active=1
-		                                    where 
-		                            	a.tahun_anggaran=%d and
-		                                b.nama_tabel=%s;
-								", $tahun_anggaran, $nama_tabel), ARRAY_A);
+								FROM 
+									esakip_data_mapping_jenis_dokumen_esr a 
+								JOIN esakip_menu_dokumen b 
+									ON b.id=a.esakip_menu_dokumen_id AND 
+										a.tahun_anggaran=b.tahun_anggaran AND b.active=1
+			                    JOIN esakip_data_jenis_dokumen_esr c 
+			                       	ON c.jenis_dokumen_esr_id=a.jenis_dokumen_esr_id  AND 
+			                      		c.tahun_anggaran=a.tahun_anggaran AND c.active=1
+			                    where 
+			                      	a.tahun_anggaran=%d and
+			                        b.nama_tabel=%s;
+							", $tahun_anggaran, $nama_tabel), ARRAY_A);
+							// print_r($mapping_jenis_dokumen_esr); die($wpdb->last_query);
 							if (!empty($mapping_jenis_dokumen_esr)) {
 								$array_data_esr = [];
 								$data_esr = $this->data_esr();
@@ -8444,15 +8445,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 									foreach ($data_esr as $key => $esr) {
 										if ($esr->dokumen_id == $mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']) {
-											$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM " . $nama_tabel . " WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+											// $esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM " . $nama_tabel . " WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
 
-											if (!empty($esr_lokal)) {
-												$wpdb->update($nama_tabel, [
-													'path_esr' => $esr->path
-												], [
-													'id' => $esr_lokal['id']
-												]);
-											}
+											// if (!empty($esr_lokal)) {
+											// 	$wpdb->update($nama_tabel, [
+											// 		'path_esr' => $esr->path
+											// 	], [
+											// 		'id' => $esr_lokal['id']
+											// 	]);
+											// }
 
 											$path = explode("/", $esr->path);
 											$nama_file = end($path);
