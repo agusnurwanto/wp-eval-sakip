@@ -6497,7 +6497,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	}
 
 	
-	function get_data_perbulan_ekinerja($tahun = null, $satker_id = null)
+	function get_data_perbulan_ekinerja($tahun = null, $satker_id = null, $nip = null, $id_indikator = null)
 	{
 		global $wpdb;
 		$ret = array(
@@ -6523,6 +6523,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				throw new Exception("Satker id kosong!", 1);
 			}
 
+			if (empty($nip)) {
+				throw new Exception("NIP kosong!", 1);
+			}
+
+			if (empty($id_indikator)) {
+				throw new Exception("Id Indikator kosong!", 1);
+			}
+
 			$response = wp_remote_post(get_option('_crb_url_api_ekinerja') . 'dev/api/kinerjarhk', [
 				'headers' => array(
 					'X-api-key' => get_option('_crb_api_key_ekinerja'),
@@ -6538,27 +6546,33 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				throw new Exception("Something went wrong: $error_message", 1);
 			}
 
-			$data_ekin = json_decode(wp_remote_retrieve_body($response));
+			$data_ekin = json_decode(wp_remote_retrieve_body($response), true);
 
-			if (isset($data_ekin->error)) {
+			if (isset($data_ekin['error'])) {
 				if (is_array($response)) {
 					$response = json_encode($response);
 				}
 				throw new Exception("Gagal Mendapatkan Data E-Kinerja, Coba lagi! " . $response, 1);
 			}
-			if($data_ekin->status){
-				if(!empty($data_ekin->data)){
-					if(!empty($data_ekin->data)){
-						foreach($data_ekin->data as $k_ekin => $v_ekin){
-							
+			if($data_ekin['status']){
+				if(!empty($data_ekin['data'])){
+					foreach($data_ekin['data'] as $k_ekin => $v_ekin){
+						if($v_ekin['nip'] != $nip){
+							continue;
 						}
-						$ret['data'] = $data_ekin->data;
+
+						// if(!empty($v_ekin->rencana_hasil_kerja)){
+						// 	foreach ($v_ekin->rencana_hasil_kerja as $k_rhk => $v_rhk) {
+						// 		if($v_rhk->)
+						// 	}
+						// }
+						$ret['data'][] = $v_ekin;
 					}
 				}else{
 					throw new Exception("Respone API Kosong!", 1);
 				}
 			}else{
-				throw new Exception("Message: ".$data_ekin->message, 1);
+				throw new Exception("Message: ".$data_ekin['message'], 1);
 			}
 		} catch (Exception $e) {
 			$ret = json_encode([

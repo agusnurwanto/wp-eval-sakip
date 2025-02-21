@@ -19820,7 +19820,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		// cek hak akses user pegawai simpeg | cek apakah dia kepala atau bukan
 		$user_nip = get_user_meta($user_id, '_nip') ?: get_user_meta($user_id, 'nip');
-		$data_user_pegawai = $wpdb->get_row(
+		$data_user_pegawai = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT
 					nip_baru,
@@ -19844,50 +19844,52 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		$skpd_user_pegawai = array();
 		$tahun_skpd = get_option('_crb_tahun_wpsipd');
+		$hak_akses_user_pegawai_kepala = array();
+		$satker_id_pegawai_kepala = array();
 		if (!empty($data_user_pegawai)) {
-			$satker_pegawai_simpeg = substr($data_user_pegawai['satker_id'], 0, 2);
+			foreach ($data_user_pegawai as $k_user => $v_user) {
+				$satker_pegawai_simpeg = substr($v_user['satker_id'], 0, 2);
+	
+				$skpd_user_pegawai = $wpdb->get_row(
+					$wpdb->prepare(
+						"SELECT 
+							simpeg.id_satker_simpeg,
+							unit.nama_skpd, 
+							unit.id_skpd, 
+							unit.kode_skpd,
+							unit.is_skpd
+						FROM 
+							esakip_data_mapping_unit_sipd_simpeg AS simpeg
+						JOIN 
+							esakip_data_unit AS unit
+						ON 
+							simpeg.id_skpd = unit.id_skpd
+						WHERE 
+							simpeg.id_satker_simpeg=%d 
+						AND simpeg.tahun_anggaran=%d
+						AND simpeg.active=%d
+						AND unit.tahun_anggaran=%d
+						AND unit.active=%d
+					GROUP BY unit.id_skpd",
+						$satker_pegawai_simpeg,
+						$tahun_skpd,
+						1,
+						$tahun_skpd,
+						1
+					),
+					ARRAY_A
+				);
 
-			$skpd_user_pegawai = $wpdb->get_row(
-				$wpdb->prepare(
-					"SELECT 
-						simpeg.id_satker_simpeg,
-						unit.nama_skpd, 
-						unit.id_skpd, 
-						unit.kode_skpd,
-						unit.is_skpd
-					FROM 
-						esakip_data_mapping_unit_sipd_simpeg AS simpeg
-					JOIN 
-						esakip_data_unit AS unit
-					ON 
-						simpeg.id_skpd = unit.id_skpd
-					WHERE 
-						simpeg.id_satker_simpeg=%d 
-					AND simpeg.tahun_anggaran=%d
-					AND simpeg.active=%d
-					AND unit.tahun_anggaran=%d
-					AND unit.active=%d
-				GROUP BY unit.id_skpd",
-					$satker_pegawai_simpeg,
-					$tahun_skpd,
-					1,
-					$tahun_skpd,
-					1
-				),
-				ARRAY_A
-			);
-		}
-
-		//////////// TIPE HAK AKSES USER PEGAWAI | 0 = TIDAK ADA | 1 = kepala skpd
-		$hak_akses_user_pegawai_kepala = 0;
-		$satker_id_pegawai_kepala = 0;
-		if (!empty($skpd_user_pegawai)) {
-			$nipkepala = get_user_meta($user_id, '_nip') ?: get_user_meta($user_id, 'nip');
-			$tahun_skpd = get_option('_crb_tahun_wpsipd');
-
-			if($data_user_pegawai['tipe_pegawai_id'] == 11 && strlen($data_user_pegawai['satker_id']) == 2) {
-				$hak_akses_user_pegawai_kepala = 1;
-				$satker_id_pegawai_kepala = $data_user_pegawai['satker_id'];
+				//////////// TIPE HAK AKSES USER PEGAWAI | 0 = TIDAK ADA | 1 = kepala skpd
+				if (!empty($skpd_user_pegawai)) {
+					$nipkepala = get_user_meta($user_id, '_nip') ?: get_user_meta($user_id, 'nip');
+					$tahun_skpd = get_option('_crb_tahun_wpsipd');
+		
+					if($v_user['tipe_pegawai_id'] == 11 && strlen($v_user['satker_id']) == 2) {
+						$hak_akses_user_pegawai_kepala[$skpd_user_pegawai['id_skpd']] = 1;
+						$satker_id_pegawai_kepala[$skpd_user_pegawai['id_skpd']] = $v_user['satker_id'];
+					}
+				}
 			}
 		}
 		// end ef check user simpeg kepala //
@@ -21073,45 +21075,52 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			|| in_array("pa", $user_meta->roles) //problem
 			|| in_array("kpa", $user_meta->roles)
 			|| in_array("plt", $user_meta->roles)
-			|| $hak_akses_user_pegawai_kepala == 1
+			|| in_array("1", $hak_akses_user_pegawai_kepala)
 		) {
 			$nipkepala = get_user_meta($user_id, '_nip') ?: get_user_meta($user_id, 'nip');
 			$tahun_skpd = get_option('_crb_tahun_wpsipd');
 			// Untuk akses skpd by data user simpeg
 			$skpd_db_datas_by_simpeg = array();
-			if($hak_akses_user_pegawai_kepala == 1){
-				$satker_pegawai_simpeg = substr($satker_id_pegawai_kepala, 0, 2);
+			if(in_array("1", $hak_akses_user_pegawai_kepala)){
+				foreach ($satker_id_pegawai_kepala as $k_satker_kepala => $v_satker_kepala) {
+					$satker_pegawai_simpeg = substr($v_satker_kepala, 0, 2);
 
-				$skpd_db_datas_by_simpeg = $wpdb->get_results(
-					$wpdb->prepare(
-						"SELECT 
-							simpeg.id_satker_simpeg,
-							unit.nama_skpd, 
-							unit.id_skpd, 
-							unit.kode_skpd,
-							unit.is_skpd,
-							unit.id_unit
-						FROM 
-							esakip_data_mapping_unit_sipd_simpeg AS simpeg
-						JOIN 
-							esakip_data_unit AS unit
-						ON 
-							simpeg.id_skpd = unit.id_skpd
-						WHERE 
-							simpeg.id_satker_simpeg=%d 
-						AND simpeg.tahun_anggaran=%d
-						AND simpeg.active=%d
-						AND unit.tahun_anggaran=%d
-						AND unit.active=%d
-					GROUP BY unit.id_skpd",
-						$satker_pegawai_simpeg,
-						$tahun_skpd,
-						1,
-						$tahun_skpd,
-						1
-					),
-					ARRAY_A
-				);
+					$skpd_simpeg = $wpdb->get_row(
+						$wpdb->prepare(
+							"SELECT 
+								simpeg.id_satker_simpeg,
+								unit.nama_skpd, 
+								unit.id_skpd, 
+								unit.kode_skpd,
+								unit.is_skpd,
+								unit.id_unit
+							FROM 
+								esakip_data_mapping_unit_sipd_simpeg AS simpeg
+							JOIN 
+								esakip_data_unit AS unit
+							ON 
+								simpeg.id_skpd = unit.id_skpd
+							WHERE 
+								simpeg.id_satker_simpeg=%d 
+							AND simpeg.tahun_anggaran=%d
+							AND simpeg.active=%d
+							AND unit.tahun_anggaran=%d
+							AND unit.active=%d
+						GROUP BY unit.id_skpd",
+							$satker_pegawai_simpeg,
+							$tahun_skpd,
+							1,
+							$tahun_skpd,
+							1
+						),
+						ARRAY_A
+					);
+
+					// ----- cek jika hak akses user kepala ----- //
+					if(!empty($skpd_simpeg) && $hak_akses_user_pegawai_kepala[$skpd_simpeg['id_skpd']] == 1){
+						$skpd_db_datas_by_simpeg[] = $skpd_simpeg;
+					}
+				}
 			}
 
 			$skpd_db_datas = $wpdb->get_results($wpdb->prepare("

@@ -285,7 +285,7 @@ $user_nip = $current_user->data->user_login;
 $is_administrator = in_array('administrator', $user_roles);
 
 // hak akses user pegawai
-$data_user_pegawai = $wpdb->get_row(
+$data_user_pegawai = $wpdb->get_results(
     $wpdb->prepare("
         SELECT
             nip_baru,
@@ -304,56 +304,64 @@ $data_user_pegawai = $wpdb->get_row(
 );
 
 $skpd_user_pegawai = array();
+$hak_akses_user_pegawai_per_skpd = array();
 if (!empty($data_user_pegawai)) {
-    $satker_pegawai_simpeg = substr($data_user_pegawai['satker_id'], 0, 2);
-
-    $skpd_user_pegawai = $wpdb->get_row(
-        $wpdb->prepare(
-            "SELECT 
-                simpeg.id_satker_simpeg,
-                unit.nama_skpd, 
-                unit.id_skpd, 
-                unit.kode_skpd,
-                unit.is_skpd
-            FROM 
-                esakip_data_mapping_unit_sipd_simpeg AS simpeg
-            JOIN 
-                esakip_data_unit AS unit
-            ON 
-                simpeg.id_skpd = unit.id_skpd
-            WHERE 
-                simpeg.id_satker_simpeg=%d 
-            AND simpeg.tahun_anggaran=%d
-            AND simpeg.active=%d
-            AND unit.tahun_anggaran=%d
-            AND unit.active=%d
-        GROUP BY unit.id_skpd",
-            $satker_pegawai_simpeg,
-            $input['tahun'],
-            1,
-            $input['tahun'],
-            1
-        ),
-        ARRAY_A
-    );
-}
-
-// TIPE HAK AKSES USER PEGAWAI | 0 = TIDAK ADA | 1 = ALL | 2 = HANYA RHK TERKAIT
-$hak_akses_user_pegawai = 0;
-$nip_user_pegawai = 0;
-if (!empty($skpd_user_pegawai)) {
-    if (($skpd_user_pegawai['id_skpd'] == $id_skpd && $data_user_pegawai['tipe_pegawai_id'] == 11 && strlen($data_user_pegawai['satker_id']) == 2) || $is_administrator) {
-        $hak_akses_user_pegawai = 1;
-    } else if ($skpd_user_pegawai['id_skpd'] == $id_skpd) {
-        $hak_akses_user_pegawai = 2;
-    }
-    $nip_user_pegawai = $data_user_pegawai['nip_baru'];
-} else {
-    if ($is_administrator) {
-        $hak_akses_user_pegawai = 1;
+    foreach ($data_user_pegawai as $k_user => $v_user) {
+        $satker_pegawai_simpeg = substr($v_user['satker_id'], 0, 2);
+        $hak_akses_user_pegawai = 0;
         $nip_user_pegawai = 0;
+
+        $skpd_user_pegawai = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT 
+                    simpeg.id_satker_simpeg,
+                    unit.nama_skpd, 
+                    unit.id_skpd, 
+                    unit.kode_skpd,
+                    unit.is_skpd
+                FROM 
+                    esakip_data_mapping_unit_sipd_simpeg AS simpeg
+                JOIN 
+                    esakip_data_unit AS unit
+                ON 
+                    simpeg.id_skpd = unit.id_skpd
+                WHERE 
+                    simpeg.id_satker_simpeg=%d 
+                AND simpeg.tahun_anggaran=%d
+                AND simpeg.active=%d
+                AND unit.tahun_anggaran=%d
+                AND unit.active=%d
+            GROUP BY unit.id_skpd",
+                $satker_pegawai_simpeg,
+                $input['tahun'],
+                1,
+                $input['tahun'],
+                1
+            ),
+            ARRAY_A
+        );
+        
+        // TIPE HAK AKSES USER PEGAWAI | 0 = TIDAK ADA | 1 = ALL | 2 = HANYA RHK TERKAIT
+        if (!empty($skpd_user_pegawai)) {
+            if (($skpd_user_pegawai['id_skpd'] == $id_skpd && $v_user['tipe_pegawai_id'] == 11 && strlen($v_user['satker_id']) == 2) || $is_administrator) {
+                $hak_akses_user_pegawai = 1;
+            } else if ($skpd_user_pegawai['id_skpd'] == $id_skpd) {
+                $hak_akses_user_pegawai = 2;
+            }
+            $nip_user_pegawai = $v_user['nip_baru'];
+            $hak_akses_user_pegawai_per_skpd[$skpd_user_pegawai['id_skpd']] = $hak_akses_user_pegawai;
+        }
     }
 }
+
+if ($is_administrator) {
+    $hak_akses_user_pegawai = 1;
+    $nip_user_pegawai = 0;
+}else{
+    // ----- hak akses by skpd terkait ----- //
+    $hak_akses_user_pegawai = $hak_akses_user_pegawai_per_skpd[$id_skpd];
+}
+
 //////// end setting hak akses ////////
 
 $data_tahapan = $wpdb->get_results(
