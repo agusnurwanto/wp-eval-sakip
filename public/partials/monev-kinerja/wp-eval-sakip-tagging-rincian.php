@@ -336,7 +336,9 @@ if (!empty($data_user_pegawai)) {
 			} else if ($skpd_user_pegawai['id_skpd'] == $id_skpd && $nama_pegawai_4['nip_baru'] == $user_nip) {
 				$hak_akses_user_pegawai = 2;
 			}
-			$hak_akses_user_pegawai_per_skpd[$skpd_user_pegawai['id_skpd']] = $hak_akses_user_pegawai;
+			if(empty($hak_akses_user_pegawai_per_skpd[$skpd_user_pegawai['id_skpd']])){
+                $hak_akses_user_pegawai_per_skpd[$skpd_user_pegawai['id_skpd']] = $hak_akses_user_pegawai;
+            }
 		}
 	}
 }

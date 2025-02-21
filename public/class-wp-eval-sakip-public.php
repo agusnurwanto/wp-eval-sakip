@@ -19889,7 +19889,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		
 					if($v_user['tipe_pegawai_id'] == 11 && strlen($v_user['satker_id']) == 2) {
 						$hak_akses_user_pegawai_kepala[$skpd_user_pegawai['id_skpd']] = 1;
-						$satker_id_pegawai_kepala[$skpd_user_pegawai['id_skpd']] = $v_user['satker_id'];
+						if(empty($satker_id_pegawai_kepala[$skpd_user_pegawai['id_skpd']])){
+							$satker_id_pegawai_kepala[$skpd_user_pegawai['id_skpd']] = $v_user['satker_id'];
+						}
 					}
 				}
 			}
@@ -21119,7 +21121,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					);
 
 					// ----- cek jika hak akses user kepala ----- //
-					if(!empty($skpd_simpeg) && $hak_akses_user_pegawai_kepala[$skpd_simpeg['id_skpd']] == 1){
+					if(!empty($skpd_simpeg) && !empty($hak_akses_user_pegawai_kepala[$skpd_simpeg['id_skpd']]) && $hak_akses_user_pegawai_kepala[$skpd_simpeg['id_skpd']] == 1){
 						$skpd_db_datas_by_simpeg[] = $skpd_simpeg;
 					}
 				}
