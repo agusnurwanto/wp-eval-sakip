@@ -28679,8 +28679,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									"keterangan" => $data['keterangan'],
 									"tgl_upload" => date('Y-m-d H:i:s'),
 								], intval($user_id));
-}
-
+							}
 						}
 					}
 
@@ -30746,101 +30745,312 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	}
 
 	function menu_depan() 
-{
-	global $wpdb;
+	{
+		global $wpdb;
 
-	$tahun_values = $wpdb->get_col(
-		$wpdb->prepare("SELECT DISTINCT tahun_anggaran FROM esakip_data_unit WHERE active = %d ORDER BY tahun_anggaran DESC", 1)
-	);
+		$tahun_values = $wpdb->get_col(
+			$wpdb->prepare("
+				SELECT DISTINCT 
+					tahun_anggaran 
+				FROM esakip_data_unit 
+				WHERE active = %d 
+				ORDER BY tahun_anggaran DESC
+			", 1)
+		);
 
-	if (empty($tahun_values)) {
-		return '<div class="alert alert-warning text-center" role="alert">Tidak ada data tahun anggaran tersedia.</div>';
-	}
+		if (empty($tahun_values)) {
+			return '<div class="alert alert-warning text-center" role="alert">Tidak ada data tahun anggaran tersedia.</div>';
+		}
 
-	$default_tahun = isset($_GET['tahun']) ? $_GET['tahun'] : (get_option(ESAKIP_TAHUN_ANGGARAN) ?? $tahun_values[0]);
+		$default_tahun = isset($_GET['tahun']) ? $_GET['tahun'] : (get_option(ESAKIP_TAHUN_ANGGARAN) ?? $tahun_values[0]);
 
-	$page_pohon_kinerja_publish = $this->functions->generatePage([
-		'nama_page'   => 'Daftar Pohon Kinerja',
-		'content'     => '[pohon_kinerja_publish]',
-		'show_header' => 1,
-		'post_status' => 'publish'
-	]);
-	$page_cascading_publish = $this->functions->generatePage([
-		'nama_page'   => 'Daftar Cascading',
-		'content'     => '[cascading_publish]',
-		'show_header' => 1,
-		'post_status' => 'publish'
-	]);
+		$page_pohon_kinerja_publish = $this->functions->generatePage([
+			'nama_page'   => 'Daftar Pohon Kinerja',
+			'content'     => '[pohon_kinerja_publish]',
+			'show_header' => 1,
+			'post_status' => 'publish'
+		]);
+		$page_cascading_publish = $this->functions->generatePage([
+			'nama_page'   => 'Daftar Cascading',
+			'content'     => '[cascading_publish]',
+			'show_header' => 1,
+			'post_status' => 'publish'
+		]);
 
-	$data = [
-		'Pohon Kinerja' => [
-			'url' => $page_pohon_kinerja_publish['url'],
-			'icon' => get_option('_crb_icon_pohon_kinerja')
-		],
-		'Cascading' => [
-			'url' => $page_cascading_publish['url'], 
-			'icon' => get_option('_crb_icon_cascading')
-		]
-	];
+		$data = [
+			'Pohon Kinerja' => [
+				'url' 	=> $page_pohon_kinerja_publish['url'],
+				'icon' 	=> get_option('_crb_icon_pohon_kinerja')
+			],
+			'Cascading' => [
+				'url' 	=> $page_cascading_publish['url'], 
+				'icon' 	=> get_option('_crb_icon_cascading')
+			]
+		];
 
-	$output = '<div class="container mt-3">
-				<div class="card shadow-sm">
-					<div class="card-header text-center font-weight-bold">Pilih Tahun Anggaran</div>
-					<div class="card-body text-center">
-						<p id="tahun-terpilih" class="font-weight-bold">Tahun Anggaran Terpilih: <span class="text-primary">' . $default_tahun . '</span></p>
-						<div class="row justify-content-center">';
+		$output = '<div class="container mt-3">
+					<div class="card shadow-sm">
+						<div class="card-header text-center font-weight-bold">Menu Informasi</div>
+						<div class="card-body text-center">
+							<div class="mb-3">
+								<select id="tahun-select" class="form-control w-50 mx-auto">';
 
-	foreach ($tahun_values as $tahun) {
-		$active_class = ($tahun == $default_tahun) ? 'btn-success' : 'btn-primary';
-		$output .= '<div class="col-md-3 mb-2">
-					<button class="btn '.$active_class.' btn-block year-button" data-year="'.$tahun.'">'.$tahun.'</button>
-				</div>';
-	}
+		foreach ($tahun_values as $tahun) {
+			$selected = ($tahun == $default_tahun) ? 'selected' : '';
+			$output .= '<option value="'.$tahun.'" '.$selected.'>'.$tahun.'</option>';
+		}
 
-	$output .= '</div></div></div></div>';
+		$output .= '</select>
+							</div>
+							<h3 id="tahun-terpilih" class="font-weight-bold">Tahun Anggaran Terpilih: <span class="text-primary">' . $default_tahun . '</span></h3>
+							<div class="row">';
 
-	$output .= '<div class="container mt-4">
-				<div class="card shadow-sm">
-					<div class="card-header text-center font-weight-bold">Navigasi</div>
-					<div class="card-body text-center">
-						<div class="row">';
+		foreach ($data as $nama => $item) {
+			$output .= '<div class="col-md-6">
+							<a href="'.$item['url'].'&tahun='.$default_tahun.'" class="d-block text-decoration-none nav-link-icon" data-base-url="'.$item['url'].'" target="_blank">
+								<img src="'.$item['icon'].'" alt="'.$nama.'" class="img-fluid" style="max-width: 60px;">
+								<p class="mt-2 font-weight-bold">'.$nama.'</p>
+							</a>
+						</div>';
+		}
 
-	foreach ($data as $nama => $item) {
-		$output .= '<div class="col-md-6">
-						<a href="'.$item['url'].'&tahun='.$default_tahun.'" class="d-block text-decoration-none nav-link-icon" data-base-url="'.$item['url'].'" target="_blank">
-							<img src="'.$item['icon'].'" alt="'.$nama.'" class="img-fluid" style="max-width: 60px;">
-							<p class="mt-2 font-weight-bold">'.$nama.'</p>
-						</a>
-					</div>';
-	}
+		$output .= '</div></div></div></div>';
 
-	$output .= '</div></div></div></div>';
+		$javascript = '<script>
+			document.addEventListener("DOMContentLoaded", function() {
+				let select = document.getElementById("tahun-select");
+				let links = document.querySelectorAll(".nav-link-icon");
 
-	$javascript = '<script>
-		document.addEventListener("DOMContentLoaded", function() {
-			let buttons = document.querySelectorAll(".year-button");
-			let links = document.querySelectorAll(".nav-link-icon");
-
-			buttons.forEach(button => {
-				button.addEventListener("click", function() {
-					let selectedYear = this.getAttribute("data-year");
+				select.addEventListener("change", function() {
+					let selectedYear = this.value;
 					document.getElementById("tahun-terpilih").innerHTML = "Tahun Anggaran Terpilih: <span class=\"text-primary\">" + selectedYear + "</span>";
-
-					buttons.forEach(btn => btn.classList.remove("btn-success"));
-					this.classList.add("btn-success");
-					this.classList.remove("btn-primary");
 
 					links.forEach(link => {
 						let baseUrl = link.getAttribute("data-base-url");
-						link.href = baseUrl + "?tahun=" + selectedYear;
+						link.href = baseUrl + "&tahun=" + selectedYear;
 					});
 				});
 			});
-		});
-	</script>';
+		</script>';
 
-	return $output . $javascript;
-}
+		return $output . $javascript;
+	}
 
-	
+	function get_datatable_pokin_publish()
+	{
+		global $wpdb;
+		$ret = array(
+			'status'  => 'success',
+			'message' => 'Berhasil get data pokin publish!',
+			'data' 	  => array()
+		);
+		$pohon_kinerja_pemda_level_1 = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT 
+					id,
+					label
+				FROM esakip_pohon_kinerja 
+				WHERE parent = 0 
+					AND level = 1 
+					AND active = 1 
+					AND id_jadwal = %d 
+				ORDER BY nomor_urut
+			", $_POST['id_jadwal']),
+			ARRAY_A
+		);
+		
+		$tbody_pemda = '';
+		$no = 1;
+		foreach ($pohon_kinerja_pemda_level_1 as $v) {
+			$pohon_kinerja_pemda_page = $this->functions->generatePage(array(
+				'nama_page'   => 'Pohon Kinerja Pemerintah Daerah',
+				'content' 	  => '[view_pohon_kinerja]',
+				'show_header' => 1,
+				'post_status' => 'publish'
+			));
+
+			$tbody_pemda .= '<tr>';
+			$tbody_pemda .= '<td class="text-center">' . $no++ . '</td>';
+			$tbody_pemda .= '<td class="text-left"><a href="'.$pohon_kinerja_pemda_page['url'].'&id='.$v['id'].'&id_jadwal='.$_POST['id_jadwal'].'" target="_blank">'.$v['label'].'</a></td>';
+			$tbody_pemda .= '</tr>';
+		}
+
+		$all_skpd = $wpdb->get_results(
+			$wpdb->prepare('
+				SELECT 
+					id_skpd,
+					nama_skpd, 
+					kode_skpd 
+				FROM esakip_data_unit 
+				WHERE active = 1 
+					AND is_skpd = 1 
+					AND tahun_anggaran = %d
+				ORDER BY kode_skpd ASC
+			', $_POST['tahun_anggaran']),
+			ARRAY_A
+		);
+
+		$tbody = '';
+		$no_opd = 1;
+		foreach ($all_skpd as $vv) {
+			$tbody .= '<tr>';
+			$tbody .= '<td class="text-center">' . $no_opd++ . '</td>';
+			$tbody .= '<td class="text-left">' . $vv['nama_skpd'] . '</td>';
+			
+			$pohon_kinerja_level_1 = $wpdb->get_results(
+				$wpdb->prepare("
+					SELECT 
+						id,
+						label 
+					FROM esakip_pohon_kinerja_opd 
+					WHERE parent=0 
+						AND level=1 
+						AND active=1 
+						AND id_jadwal = %d 
+						AND id_skpd = %d
+					ORDER BY nomor_urut ASC
+				", $_POST['id_jadwal'], $vv['id_skpd']),
+				ARRAY_A
+			);
+		
+			if (!empty($pohon_kinerja_level_1)) {
+				$Pohon_kinerja_opd_page = $this->functions->generatePage(array(
+					'nama_page'    => 'Pohon Kinerja ' . $vv['nama_skpd'],
+					'content'      => '[view_pohon_kinerja_opd periode=' . $_POST['id_jadwal'] . ']',
+					'show_header'  => 1,
+					'post_status'  => 'publish'
+				));
+				$Pohon_kinerja_opd_page['url'] .= '&id_skpd=' . $vv['id_skpd'];
+			
+				$tbody .= '<td><ol>';
+				
+				foreach ($pohon_kinerja_level_1 as $pohon) {
+					$tbody .= '<li>
+									<a href="' . $Pohon_kinerja_opd_page['url'] . '&id=' . $pohon['id'] . '&id_jadwal=' . $_POST['id_jadwal'] . '" target="_blank">
+										' . $pohon['label'] . '
+									</a>
+								</li>';
+				}
+			
+				$tbody .= '</ol></td>';
+			} else {
+				$tbody .= '<td>-</td>';
+			}
+			
+		
+			$tbody .= '</tr>';
+		}				
+		$ret['data'] = $tbody;
+		$ret['data_pemda'] = $tbody_pemda;
+		die(json_encode($ret));
+	}
+
+	function get_datatable_cascading_publish()
+	{
+		global $wpdb;
+		$ret = array(
+			'status'  => 'success',
+			'message' => 'Berhasil get data cascading publish!',
+			'data' 	  => array()
+		);
+		$pohon_kinerja_pemda_level_1 = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT 
+					id,
+					label
+				FROM esakip_pohon_kinerja 
+				WHERE parent = 0 
+					AND level = 1 
+					AND active = 1 
+					AND id_jadwal = %d 
+				ORDER BY nomor_urut
+			", $_POST['id_jadwal']),
+			ARRAY_A
+		);
+		
+		$tbody_pemda = '';
+		$no = 1;
+		foreach ($pohon_kinerja_pemda_level_1 as $v) {
+			$pohon_kinerja_pemda_page = $this->functions->generatePage(array(
+				'nama_page'   => 'Pohon Kinerja Pemerintah Daerah',
+				'content' 	  => '[view_pohon_kinerja]',
+				'show_header' => 1,
+				'post_status' => 'publish'
+			));
+
+			$tbody_pemda .= '<tr>';
+			$tbody_pemda .= '<td class="text-center">' . $no++ . '</td>';
+			$tbody_pemda .= '<td class="text-left"><a href="'.$pohon_kinerja_pemda_page['url'].'&id='.$v['id'].'&id_jadwal='.$_POST['id_jadwal'].'" target="_blank">'.$v['label'].'</a></td>';
+			$tbody_pemda .= '</tr>';
+		}
+
+		$all_skpd = $wpdb->get_results(
+			$wpdb->prepare('
+				SELECT 
+					id_skpd,
+					nama_skpd, 
+					kode_skpd 
+				FROM esakip_data_unit 
+				WHERE active = 1 
+					AND is_skpd = 1 
+					AND tahun_anggaran = %d
+				ORDER BY kode_skpd ASC
+			', $_POST['tahun_anggaran']),
+			ARRAY_A
+		);
+
+		$tbody = '';
+		$no_opd = 1;
+		foreach ($all_skpd as $vv) {
+			$tbody .= '<tr>';
+			$tbody .= '<td class="text-center">' . $no_opd++ . '</td>';
+			$tbody .= '<td class="text-left">' . $vv['nama_skpd'] . '</td>';
+			
+			$pohon_kinerja_level_1 = $wpdb->get_results(
+				$wpdb->prepare("
+					SELECT 
+						id,
+						label 
+					FROM esakip_pohon_kinerja_opd 
+					WHERE parent=0 
+						AND level=1 
+						AND active=1 
+						AND id_jadwal = %d 
+						AND id_skpd = %d
+					ORDER BY nomor_urut ASC
+				", $_POST['id_jadwal'], $vv['id_skpd']),
+				ARRAY_A
+			);
+		
+			if (!empty($pohon_kinerja_level_1)) {
+				$Pohon_kinerja_opd_page = $this->functions->generatePage(array(
+					'nama_page'    => 'Pohon Kinerja ' . $vv['nama_skpd'],
+					'content'      => '[view_pohon_kinerja_opd periode=' . $_POST['id_jadwal'] . ']',
+					'show_header'  => 1,
+					'post_status'  => 'publish'
+				));
+				$Pohon_kinerja_opd_page['url'] .= '&id_skpd=' . $vv['id_skpd'];
+			
+				$tbody .= '<td><ol>';
+				
+				foreach ($pohon_kinerja_level_1 as $pohon) {
+					$tbody .= '<li>
+									<a href="' . $Pohon_kinerja_opd_page['url'] . '&id=' . $pohon['id'] . '&id_jadwal=' . $_POST['id_jadwal'] . '" target="_blank">
+										' . $pohon['label'] . '
+									</a>
+								</li>';
+				}
+			
+				$tbody .= '</ol></td>';
+			} else {
+				$tbody .= '<td>-</td>';
+			}
+			
+		
+			$tbody .= '</tr>';
+		}				
+		$ret['data'] = $tbody;
+		$ret['data_pemda'] = $tbody_pemda;
+		die(json_encode($ret));
+	}
 }
