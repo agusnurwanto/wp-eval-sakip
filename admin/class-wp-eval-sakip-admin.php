@@ -284,12 +284,12 @@ class Wp_Eval_Sakip_Admin
 					}
 					$body_pemda .= '</ol>';
 					$ret['message'] .= $body_pemda;
-				}else if(
+				} else if (
 					!empty($_POST['type'])
 					&&
 					$_POST['type'] == 'monev_rencana_aksi_pemda'
-				){
-					
+				) {
+
 					$jadwal_periode = $wpdb->get_results(
 						$wpdb->prepare(
 							"
@@ -348,7 +348,7 @@ class Wp_Eval_Sakip_Admin
 							$body_pemda .= '<li>' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' ( Periode belum diset di pengaturan menu )</li>';
 						}
 					}
-					
+
 					$body_pemda .= '</ol>';
 					$ret['message'] .= $body_pemda;
 				} else if (
@@ -1314,7 +1314,6 @@ class Wp_Eval_Sakip_Admin
 			'no_key' => 1,
 			'post_status' => 'private'
 		));
-
 		$list_skpd_laporan_pk_setting = $this->functions->generatePage(array(
 			'nama_page' => 'Laporan PK Setting',
 			'content' => '[halaman_laporan_pk_setting]',
@@ -1369,22 +1368,22 @@ class Wp_Eval_Sakip_Admin
 				Field::make('text', 'crb_kepala_daerah', 'Kepala Daerah')
 					->set_help_text('Wajib diisi.'),
 				Field::make('select', 'crb_status_jabatan_kepala_daerah', 'Status Jabatan Kepala Daerah')
-				->add_options(array(
-					'Gubernur' => 'Gubernur',
-					'Bupati' => 'Bupati',
-					'Walikota' => 'Walikota',
-					'Pj Gubernur' => 'Pj Gubernur',
-					'Plt Gubernur' => 'Plt Gubernur',
-					'Plh Gubernur' => 'Plh Gubernur',
-					'Pj Bupati' => 'Pj Bupati',
-					'Plt Bupati' => 'Plt Bupati',
-					'Plh Bupati' => 'Plh Bupati',
-					'Pj Walikota' => 'Pj Walikota',
-					'Plt Walikota' => 'Plt Walikota',
-					'Plh Walikota' => 'Plh Walikota'
-				))
-				->set_default_value('Bupati')
-				->set_help_text('Wajib diisi. Untuk kerpeluan status jabatan kepala daerah.'),
+					->add_options(array(
+						'Gubernur' => 'Gubernur',
+						'Bupati' => 'Bupati',
+						'Walikota' => 'Walikota',
+						'Pj Gubernur' => 'Pj Gubernur',
+						'Plt Gubernur' => 'Plt Gubernur',
+						'Plh Gubernur' => 'Plh Gubernur',
+						'Pj Bupati' => 'Pj Bupati',
+						'Plt Bupati' => 'Plt Bupati',
+						'Plh Bupati' => 'Plh Bupati',
+						'Pj Walikota' => 'Pj Walikota',
+						'Plt Walikota' => 'Plt Walikota',
+						'Plh Walikota' => 'Plh Walikota'
+					))
+					->set_default_value('Bupati')
+					->set_help_text('Wajib diisi. Untuk kerpeluan status jabatan kepala daerah.'),
 				Field::make('radio', 'crb_api_simpeg_status', 'Status API Kepegawaian')
 					->add_options(array(
 						'0' => __('Dikunci'),
@@ -1474,6 +1473,22 @@ class Wp_Eval_Sakip_Admin
 		Container::make('theme_options', __('Menu Setting'))
 			->set_page_parent($basic_options_container)
 			->add_fields($this->generate_menu());
+
+		Container::make('theme_options', __('Tampilan Beranda'))
+			->set_page_parent($basic_options_container)
+			->add_tab(__('Logo'), array(
+				Field::make('image', 'crb_menu_logo_dashboard', __('Gambar Logo'))
+					->set_value_type('url')
+					->set_default_value('https://via.placeholder.com/135x25'),
+				Field::make('textarea', 'crb_judul_header', __('Judul'))
+					->set_default_value('SI-KESATRIA<br>Sistem Informasi Kinerja, Evaluasi, Reviu dan Akuntabilitas'),
+			))
+			->add_tab(__('Icon & Menu'), array(
+				Field::make('image', 'crb_icon_pohon_kinerja', __('Icon Pohon Kinerja'))
+					->set_value_type('url'),
+				Field::make('image', 'crb_icon_cascading', __('Icon Cascading'))
+					->set_value_type('url')
+			));
 
 		$dokumen_pemda_menu = Container::make('theme_options', __('Dokumen Pemda'))
 			->set_page_menu_position(3.1)
@@ -2558,7 +2573,7 @@ class Wp_Eval_Sakip_Admin
 					$user_meta->add_role($user['jabatan']);
 				}
 				// Untuk memastikan ada update gelar belakang dari api simpeg
-				if(!empty($user['gelar_belakang'])){
+				if (!empty($user['gelar_belakang'])) {
 					wp_update_user(array('ID' => $insert_user, 'first_name' => $user['nama'], 'display_name' => $user['nama']));
 				}
 			}
@@ -2732,8 +2747,13 @@ class Wp_Eval_Sakip_Admin
 						WHERE 
 							active = %d
 							LIMIT %d , %d
-						", 1 , $mulai , $limit
-						), ARRAY_A);
+						",
+						1,
+						$mulai,
+						$limit
+					),
+					ARRAY_A
+				);
 
 				$status_update_pass = false;
 				if (
@@ -2743,7 +2763,7 @@ class Wp_Eval_Sakip_Admin
 					$status_update_pass = true;
 				}
 
-				if(!empty($data_pegawai)){
+				if (!empty($data_pegawai)) {
 					foreach ($data_pegawai as $kp => $v_pegawai) {
 						$satker_mapping = substr($v_pegawai['satker_id'], 0, 2);
 
@@ -2757,27 +2777,31 @@ class Wp_Eval_Sakip_Admin
 									id_satker_simpeg = %d
 									AND active = %d
 									AND tahun_anggaran = %d
-								", $satker_mapping, 1 , $tahun_anggaran_sakip
-							));
+								",
+								$satker_mapping,
+								1,
+								$tahun_anggaran_sakip
+							)
+						);
 
 						$id_skpd = !empty($id_skpd) ? $id_skpd : 0;
 
-						$gelar_depan = !empty($v_pegawai['gelar_depan']) ? $v_pegawai['gelar_depan'].". " : '';
-						$gelar_belakang = !empty($v_pegawai['gelar_belakang']) ? ", ".$v_pegawai['gelar_belakang'] : '';
+						$gelar_depan = !empty($v_pegawai['gelar_depan']) ? $v_pegawai['gelar_depan'] . ". " : '';
+						$gelar_belakang = !empty($v_pegawai['gelar_belakang']) ? ", " . $v_pegawai['gelar_belakang'] : '';
 
 						$v_pegawai['pass'] = $pass;
 						$v_pegawai['loginname'] = $v_pegawai['nip_baru'];
 						$v_pegawai['jabatan'] = 'pegawai';
-						$v_pegawai['nama'] = $gelar_depan.''.$v_pegawai['nama_pegawai'].''.$gelar_belakang;
+						$v_pegawai['nama'] = $gelar_depan . '' . $v_pegawai['nama_pegawai'] . '' . $gelar_belakang;
 						$v_pegawai['nip'] = $v_pegawai['nip_baru'];
 						$v_pegawai['id_sub_skpd'] = $id_skpd;
 						$v_pegawai['gelar_depan'] = $gelar_depan;
 						$v_pegawai['gelar_belakang'] = $gelar_belakang;
 						$this->gen_user_esakip($v_pegawai, $status_update_pass);
 					}
-				}else{
+				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Data Pegawai Kosong. Pastikan Sudah Sinkron Data Pegawai Simpeg!';	
+					$ret['message'] = 'Data Pegawai Kosong. Pastikan Sudah Sinkron Data Pegawai Simpeg!';
 				}
 			} else {
 				$ret['status'] = 'error';
@@ -2793,17 +2817,17 @@ class Wp_Eval_Sakip_Admin
 	function get_data_total_pegawai_simpeg()
 	{
 		global $wpdb;
-			$ret = array();
-			$ret['status'] = 'success';
-			$ret['message'] = 'Berhasil Get Data Unit Mapping SIMPEG!';
-			$ret['total_pegawai_simpeg'] = 0;
-			if (!empty($_POST)) {
-				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
-					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+		$ret = array();
+		$ret['status'] = 'success';
+		$ret['message'] = 'Berhasil Get Data Unit Mapping SIMPEG!';
+		$ret['total_pegawai_simpeg'] = 0;
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-					$unit = $wpdb->get_results(
-						$wpdb->prepare(
-							"SELECT 
+				$unit = $wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT 
 								*
 							FROM 
 								esakip_data_unit 
@@ -2812,14 +2836,16 @@ class Wp_Eval_Sakip_Admin
 							AND is_skpd=1 
 							AND tahun_anggaran=%d
 							ORDER BY kode_skpd ASC
-						", $tahun_anggaran_sakip),
-						ARRAY_A
-					);
+						",
+						$tahun_anggaran_sakip
+					),
+					ARRAY_A
+				);
 
-					if(!empty($unit)){
-						foreach ($unit as $ku => $v_unit) {
-							// Untuk mendapatkan data total pegawai yang skpdnya sudah termapping
-							$get_mapping = $wpdb->get_var($wpdb->prepare('
+				if (!empty($unit)) {
+					foreach ($unit as $ku => $v_unit) {
+						// Untuk mendapatkan data total pegawai yang skpdnya sudah termapping
+						$get_mapping = $wpdb->get_var($wpdb->prepare('
 								SELECT 
 									u.id_satker_simpeg
 								FROM esakip_data_mapping_unit_sipd_simpeg AS u
@@ -2828,32 +2854,35 @@ class Wp_Eval_Sakip_Admin
 									AND u.active = 1
 							', $tahun_anggaran_sakip, $v_unit['id_skpd']));
 
-							if(!empty($get_mapping)){
-								$total_pegawai = $wpdb->get_var($wpdb->prepare(
-									'SELECT 
+						if (!empty($get_mapping)) {
+							$total_pegawai = $wpdb->get_var($wpdb->prepare(
+								'SELECT 
 										COUNT(*)
 									FROM 
 										esakip_data_pegawai_simpeg
 									WHERE 
 										satker_id LIKE %s
 										AND active = %d
-								', $get_mapping . '%', 1));
+								',
+								$get_mapping . '%',
+								1
+							));
 
-								if(!empty($total_pegawai)){
-									$ret['total_pegawai_simpeg'] += $total_pegawai;
-								}
+							if (!empty($total_pegawai)) {
+								$ret['total_pegawai_simpeg'] += $total_pegawai;
 							}
 						}
 					}
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'APIKEY tidak sesuai!';
 				}
 			} else {
 				$ret['status'] = 'error';
-				$ret['message'] = 'Format Salah!';
+				$ret['message'] = 'APIKEY tidak sesuai!';
 			}
-			die(json_encode($ret));
+		} else {
+			$ret['status'] = 'error';
+			$ret['message'] = 'Format Salah!';
+		}
+		die(json_encode($ret));
 	}
 
 	function get_data_unit_wpsipd()

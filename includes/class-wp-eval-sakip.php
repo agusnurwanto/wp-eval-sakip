@@ -670,6 +670,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_tambah_dokumen_tl_lhe_akip_internal',  $plugin_public, 'tambah_dokumen_tl_lhe_akip_internal');
 		$this->loader->add_action('wp_ajax_get_detail_tl_lhe_akip_internal_by_id',  $plugin_public, 'get_detail_tl_lhe_akip_internal_by_id');
 		
+		$this->loader->add_action('wp_ajax_get_datatable_pokin_publish',  $plugin_public, 'get_datatable_pokin_publish');
+
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_evaluasi_sakip', array($plugin_public, 'jadwal_evaluasi_sakip'));
@@ -741,6 +743,10 @@ class Wp_Eval_Sakip {
 		add_shortcode('pengisian_lke_sakip', array($plugin_public, 'pengisian_lke_sakip'));
 		add_shortcode('pengisian_lke_sakip_per_skpd', array($plugin_public, 'pengisian_lke_sakip_per_skpd'));
 
+		add_shortcode('menu_depan', array($plugin_public, 'menu_depan'));
+		add_shortcode('pohon_kinerja_publish', array($plugin_public, 'pohon_kinerja_publish'));
+		add_shortcode('cascading_publish', array($plugin_public, 'cascading_publish'));
+		
 		add_shortcode('menu_eval_sakip', array($plugin_public, 'menu_eval_sakip'));
 		add_shortcode('penyusunan_pohon_kinerja',array($plugin_public,'penyusunan_pohon_kinerja'));
 		add_shortcode('view_pohon_kinerja',array($plugin_public,'view_pohon_kinerja'));
