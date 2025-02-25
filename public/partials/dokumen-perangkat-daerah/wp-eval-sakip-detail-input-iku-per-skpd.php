@@ -796,6 +796,7 @@ jQuery(document).ready(function() {
                 alert(res.message);
                 if(res.status=='success'){
                     jQuery("#modal-iku").modal('hide');
+                    location.reload();
                     getTableIKU();
                 }
             }

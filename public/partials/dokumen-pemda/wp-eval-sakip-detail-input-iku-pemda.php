@@ -367,6 +367,10 @@ if (!empty($data_tahapan)) {
     .cr-scroll-btn-right {
         right: -8px;
     }
+    .atas { border-top: 1px solid black; }
+    .kanan { border-right: 1px solid black; }
+    .bawah { border-bottom: 1px solid black; }
+    .kiri { border-left: 1px solid black; }
 </style>
 
 <!-- Table -->
@@ -472,7 +476,7 @@ if (!empty($data_tahapan)) {
                     </div>
                     <div class="form-group">
                         <label for="indikator">Indikator</label>
-                        <textarea name="" id="indikator" disabled></textarea>
+                        <select name="" id="indikator"></select>
                     </div>
                      <div class="form-group">
                         <label for="formulasi">Definisi Operasional/Formulasi</label>
@@ -735,6 +739,7 @@ function simpanDataIkuPemda(){
             alert(res.message);
             if(res.status=='success'){
                 jQuery("#modal-iku").modal('hide');
+                location.reload();
                 getTableIKUPemda();
             }
         }
@@ -1065,7 +1070,7 @@ function simpanEditFinalisasi() {
                     
                     jQuery('.table_edit_dokumen_iku').show();
                     jQuery('.table_dokumen_iku').hide();
-                    jQuery('#tambah-iku_pemda').hide();
+                    jQuery('#tambah-iku-pemda').hide();
 
                     jQuery('.table_edit_dokumen_iku tbody').html(response.html);
 

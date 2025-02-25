@@ -6887,15 +6887,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		                    foreach ($data_finalisasi_iku_pemda as $v) {
 		                        $no++;
 		                        $html .= '
-		                        <tr>
-		                            <td class="atas kanan bawah kiri">' . $no . '</td>
-		                            <td class="text-left tujuan-sasaran atas kanan bawah kiri">' . $v['label_sasaran'] . '</td>
-		                            <td class="text-left indikator_sasaran atas kanan bawah kiri">' . $v['label_indikator'] . '</td>
-		                            <td class="text-left formulasi atas kanan bawah kiri">' . $v['formulasi'] . '</td>
-		                            <td class="text-left sumber_data atas kanan bawah kiri">' . $v['sumber_data'] . '</td>
-		                            <td class="text-left penanggung_jawab atas kanan bawah kiri">' . $v['penanggung_jawab'] . '</td>
-		                        ';
-		                        $html .= '</tr>';
+						        <tr>
+						            <td style="border: 1px solid black; text-align: center;">' . $no . '</td>
+						            <td style="border: 1px solid black; text-align: left;">' . $v['label_sasaran'] . '</td>
+						            <td style="border: 1px solid black; text-align: left;">' . $v['label_indikator'] . '</td>
+						            <td style="border: 1px solid black; text-align: left;">' . $v['formulasi'] . '</td>
+						            <td style="border: 1px solid black; text-align: left;">' . $v['sumber_data'] . '</td>
+						            <td style="border: 1px solid black; text-align: left;">' . $v['penanggung_jawab'] . '</td>
+						        </tr>';
 		                    }
 		                }
 		                $ret['nama_tahapan'] = $tahapan['nama_tahapan'];
