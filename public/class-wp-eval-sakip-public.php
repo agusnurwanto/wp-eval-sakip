@@ -18949,7 +18949,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								)
 							);
 
-							if ($tipe_dokumen == 'dpa') {
+							if ($tipe_dokumen == 'tl_lhe_akip_internal' || $tipe_dokumen == 'dpa') {
 								$jumlah_status_disetujui = $wpdb->get_var(
 									$wpdb->prepare(
 										"
@@ -19038,7 +19038,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_dokumen['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 							$btn .= '</div>';
 
-							if ($tipe_dokumen == 'dpa') {
+							if ($tipe_dokumen == 'tl_lhe_akip_internal' || $tipe_dokumen == 'dpa') {
 								$tbody .= "<td class='text-center bg-info text-white'>" . $jumlah_draft . "</td>";
 								$tbody .= "<td class='text-center bg-secondary text-white'>" . $jumlah_menunggu . "</td>";
 								$tbody .= "<td class='text-center bg-success text-white'>" . $jumlah_disetujui . "</td>";
@@ -19054,7 +19054,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 							$tbody .= "</tr>";
 
-							if ($tipe_dokumen == 'dpa') {
+							if ($tipe_dokumen == 'tl_lhe_akip_internal' || $tipe_dokumen == 'dpa') {
 								$total_menunggu += $jumlah_menunggu;
 								$total_disetujui += $jumlah_disetujui;
 								$total_ditolak += $jumlah_ditolak;

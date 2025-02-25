@@ -21,10 +21,10 @@ $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
 //jadwal renstra wpsipd
 $api_params = array(
-	'action' => 'get_data_jadwal_wpsipd',
-	'api_key'	=> get_option('_crb_apikey_wpsipd'),
-	'tipe_perencanaan' => 'monev_renstra',
-	'id_jadwal' => $id_periode
+    'action' => 'get_data_jadwal_wpsipd',
+    'api_key'   => get_option('_crb_apikey_wpsipd'),
+    'tipe_perencanaan' => 'monev_renstra',
+    'id_jadwal' => $id_periode
 );
 
 $response = wp_remote_post(get_option('_crb_url_server_sakip'), array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
@@ -38,9 +38,9 @@ if(empty($data_jadwal_wpsipd['data'])){
     die();
 }
 if (!empty($data_jadwal_wpsipd['data'][0]['tahun_akhir_anggaran']) && $data_jadwal_wpsipd['data'][0]['tahun_akhir_anggaran'] > 1) {
-	$tahun_anggaran_selesai = $data_jadwal_wpsipd['data'][0]['tahun_akhir_anggaran'];
+    $tahun_anggaran_selesai = $data_jadwal_wpsipd['data'][0]['tahun_akhir_anggaran'];
 } else {
-	$tahun_anggaran_selesai = $data_jadwal_wpsipd['data'][0]['tahun_anggaran'] + $data_jadwal_wpsipd['data'][0]['lama_pelaksanaan'];
+    $tahun_anggaran_selesai = $data_jadwal_wpsipd['data'][0]['tahun_anggaran'] + $data_jadwal_wpsipd['data'][0]['lama_pelaksanaan'];
 }
 
 $nama_jadwal = $data_jadwal_wpsipd['data'][0]['nama'] . ' ' . '(' . $data_jadwal_wpsipd['data'][0]['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ')';
@@ -56,6 +56,7 @@ $skpd = $wpdb->get_row(
     $wpdb->prepare("
     SELECT 
         nama_skpd,
+        id_skpd,
         nipkepala
     FROM esakip_data_unit
     WHERE id_skpd=%d
@@ -100,7 +101,7 @@ $iku = $wpdb->get_results(
         WHERE id_skpd = %d
             AND id_jadwal_wpsipd=%d
             AND active = 1
-    ", $id_skpd, $id_periode),
+    ", $skpd['id_skpd'], $id_periode),
     ARRAY_A
 );
 // print_r($iku); die($wpdb->last_query);
@@ -131,28 +132,39 @@ if (!empty($iku)) {
     }
 }
 $data_tahapan = $wpdb->get_results(
-    $wpdb->prepare(
-        "
+    $wpdb->prepare("
         SELECT 
-            *
-        FROM esakip_finalisasi_iku_opd
-        WHERE id_jadwal_wpsipd = %d
-          AND active = 1
-        ORDER BY tanggal_dokumen, updated_at DESC
-    ", $id_periode),
+            t.*,
+            f.id_tahap,         
+            f.id_skpd,          
+            f.kode_sasaran,     
+            f.label_sasaran,    
+            f.id_unik_indikator,
+            f.label_indikator,  
+            f.formulasi,        
+            f.sumber_data,      
+            f.penanggung_jawab, 
+            f.id_jadwal_wpsipd
+        FROM esakip_finalisasi_tahap_iku_opd AS t
+        INNER JOIN esakip_finalisasi_iku_opd AS f ON f.id_tahap = t.id
+            AND f.id_skpd = t.id_skpd
+        WHERE t.id_jadwal_wpsipd = %d
+          AND t.active = 1
+          AND t.id_skpd = %d
+        ORDER BY t.tanggal_dokumen, t.updated_at DESC
+    ", $id_periode, $skpd['id_skpd']),
     ARRAY_A
 );
-
+// print_r($data_tahapan); die($wpdb->last_query);
 $card = '';
 $jumlah_data = array();
 $nama_tahapan = array();
 
-if ($data_tahapan) {
+if (!empty($data_tahapan)) {
     foreach ($data_tahapan as $v) {
         $tanggal_dokumen = $this->format_tanggal_indo($v['tanggal_dokumen']);
-        $get_nama_tahapan = $v['nama_tahapan'] . '|' . $tanggal_dokumen . '|' . $v['id_skpd'];
+        $get_nama_tahapan = $v['nama_tahapan'] . '|' . $tanggal_dokumen . '|' . $v['id_skpd'] .'|'. $v['id'];
 
-        // Simpan ID yang terkait dengan kombinasi unik
         if (!isset($nama_tahapan[$get_nama_tahapan])) {
             $nama_tahapan[$get_nama_tahapan] = [];
         }
@@ -168,32 +180,32 @@ if ($data_tahapan) {
     }
 
     foreach ($nama_tahapan as $key => $get_iku) {
-        list($nama_tahapan_item, $tanggal_dokumen, $id_skpd) = explode('|', $key);
-        $id = implode(',', $get_iku); 
+        list($nama_tahapan_item, $tanggal_dokumen, $id_skpd, $id_tahap) = explode('|', $key);
 
         $card .= '
-        <div class="cr-item" id="card-tahap-' . htmlspecialchars($id) . '" title="' . htmlspecialchars($nama_tahapan_item) . '">
+        <div class="cr-item" id="card-tahap-' . $id_tahap . '" title="' . $nama_tahapan_item . '">
             <div class="cr-card">
-                <h3 class="truncate-multiline" id="nama-tahapan-' . htmlspecialchars($id) . '">' . htmlspecialchars($nama_tahapan_item) . '</h3>
-                <div class="badge badge-sm badge-primary m-0 ml-2 mr-2 text-light text-wrap">' . htmlspecialchars($skpd['nama_skpd']) . '</div>
-                <div class="year" id="tanggal-tahapan-' . htmlspecialchars($id) . '">' . htmlspecialchars($tanggal_dokumen) . '</div>
+                <h3 class="truncate-multiline" id="nama-tahapan-' . $id_tahap . '">' . $nama_tahapan_item . '</h3>
+                <div class="badge badge-sm badge-primary m-0 ml-2 mr-2 text-light text-wrap">' . $skpd['nama_skpd'] . '</div>
+                <div class="year" id="tanggal-tahapan-' . $id_tahap . '">' . $tanggal_dokumen . '</div>
                 <div class="cr-actions">
-                    <div class="cr-view-btn" id="view-btn-' . htmlspecialchars($id) . '" onclick="viewDokumen(\'' . $id . '\', this)" title="Lihat Dokumen">
+                    <div class="cr-view-btn" id="view-btn-' . $id_tahap . '" onclick="viewDokumen(\'' . $id_tahap . '\', this)" title="Lihat Dokumen">
                         <span class="dashicons dashicons-visibility"></span>
                     </div>
-                    <div class="cr-view-btn-danger" onclick="deleteDokumen(\'' . $id . '\')" title="Hapus Dokumen">
+                    <div class="cr-view-btn-danger" onclick="deleteDokumen(\'' . $id_tahap . '\')" title="Hapus Dokumen">
                         <span class="dashicons dashicons-trash"></span>
                     </div>
                 </div>
                 <div class="badge-container">
-                    <span class="badge badge-sm badge-warning badge-sedang-dilihat" id="badge-sedang-dilihat-' . htmlspecialchars($id) . '" style="display:none">
+                    <span class="badge badge-sm badge-warning badge-sedang-dilihat" id="badge-sedang-dilihat-' . $id_tahap . '" style="display:none">
                         Sedang Dilihat
                     </span>
                 </div>
             </div>
         </div>';
     }
-}
+} 
+
 
 ?>
 <style type="text/css">
@@ -213,9 +225,9 @@ if ($data_tahapan) {
         margin: 0 5px;
     }
     
-	a.btn{
-		text-decoration: none !important;
-	}
+    a.btn{
+        text-decoration: none !important;
+    }
 
     thead th {
         vertical-align: middle !important;
@@ -393,6 +405,11 @@ if ($data_tahapan) {
     .cr-scroll-btn-right {
         right: -8px;
     }
+    .atas { border-top: 1px solid black; }
+    .kanan { border-right: 1px solid black; }
+    .bawah { border-bottom: 1px solid black; }
+    .kiri { border-left: 1px solid black; }
+
 </style>
 
 <!-- Table -->
@@ -460,92 +477,36 @@ if ($data_tahapan) {
                     </tbody>
                 </table>
             </div>
+            <div id="cetak" class="wrap-table">
+                <table cellpadding="2" cellspacing="0" class="table_edit_dokumen_iku table table-bordered" style="display: none;">
+                    <thead style="background: #ffc491;">
+                        <tr>
+                            <th class="text-center atas kanan bawah kiri">No</th>
+                            <th class="text-center atas kanan bawah kiri">Tujuan/Sasaran</th>
+                            <th class="text-center atas kanan bawah kiri">Indikator</th>
+                            <th class="text-center atas kanan bawah kiri">Definisi Operasional/Formulasi</th>
+                            <th class="text-center atas kanan bawah kiri">Sumber Data</th>
+                            <th class="text-center atas kanan bawah kiri">Penanggung Jawab</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
-<!-- <div class="container-md mx-auto"x>
-    <div class="text-center" id="action-sakip">
-        <button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button><br>
-    </div>
-
-    <?php if (!empty($error_message) && is_array($error_message)) : ?>
-        <div class="alert alert-danger mt-3">
-            <ul class="mb-0">
-                <?php echo implode('', array_map(fn($msg) => "<li>{$msg}</li>", $error_message)); ?>
-            </ul>
-        </div>
-    <?php endif; ?>
-
-    <?php if (!empty($jumlah_data) && is_array($jumlah_data)) : ?>
-        <div class="cr-container m-4 hide-display-print">
-            <h2 class="cr-title">Jumlah Dokumen Finalisasi Per SKPD</h2>
-            <div class="text-center">
-                <?php foreach ($jumlah_data as $id_skpd => $v) : ?>
-                    <span class="badge badge-info fw-bold d-inline-flex align-items-center p-2 m-1 rounded-pill" style="font-size: 14px;">
-                        <i class="dashicons dashicons-building me-1" style="font-size: 16px;"></i>
-                        <?php echo $v['nama_skpd']; ?> | <?php echo $v['jumlah']; ?>
-                    </span>
-                <?php endforeach; ?>
-            </div>
-        </div>
-    <?php endif; ?>
-
-    <div class="cr-container m-4 hide-display-print">
-        <h2 class="cr-title">Pilih Laporan Perjanjian Kinerja</h2>
-        <div class="cr-carousel-wrapper">
-            <div id="card-carousel" class="cr-carousel">
-                <div class="cr-item" title="Perjanjian Kinerja Real Time">
-                    <div class="cr-card">
-                        <h3>Perjanjian Kinerja Sekarang</h3>
-                        <div class="badge badge-sm badge-primary m-2 text-light text-wrap"><?php echo $skpd['nama_skpd']; ?></div>
-                        <div class="year"><?php echo $text_tanggal_hari_ini; ?></div>
-                        <div class="cr-view-btn" style="display: none;" id="display-btn-first" onclick="location.reload()">
-                            <span class="dashicons dashicons-visibility"></span>
-                        </div>
-                        <span class="badge badge-info mt-2">
-                            <i class="dashicons dashicons-clock align-middle"></i> Real Time
-                        </span>
-                        <div class="text-center badge-sedang-dilihat">
-                            <span class='badge badge-sm badge-warning m-2'>Sedang Dilihat</span>
-                        </div>
-                    </div>
-                </div>
-                <?php echo $card; ?>
-            </div>
-            <div class="cr-scroll-btn cr-scroll-btn-left" onclick="scrollCarousel(-1)">
-                <span class="dashicons dashicons-arrow-left-alt2"></span>
-            </div>
-            <div class="cr-scroll-btn cr-scroll-btn-right" onclick="scrollCarousel(1)">
-                <span class="dashicons dashicons-arrow-right-alt2"></span>
-            </div>
-        </div>
-    </div>
-
-    <div class="text-center page-print">
-        <div class="text-right m-2">
-            <button class="btn btn-sm btn-success hide-display-print" id="finalisasi-btn" onclick="showModalFinalisasi()">
-                <span class="dashicons dashicons-saved" title="Finalisasikan dokumen (Menyimpan dokumen sesuai data terkini)"></span>
-                Finalisasi Dokumen
-            </button>
-            <button class="btn btn-sm btn-warning hide-display-print" id="edit-btn" onclick="showModalEditFinalisasi()" style="display: none;">
-                <span class="dashicons dashicons-edit" title="Edit Label"></span>
-                Edit Finalisasi Dokumen
-            </button>
-        </div>
-        
-    </div>
-</div> -->
 <!-- Modal crud -->
 <div class="modal fade" id="modal-iku" data-backdrop="static"  role="dialog" aria-labelledby="modal-crud-label" aria-hidden="true">
-  	<div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    	<div class="modal-content">
-      		<div class="modal-header">
-		        <h5 class="modal-title">Tambah Data</h5>
-		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-		          	<span aria-hidden="true">&times;</span>
-		        </button>
-	      	</div>
-	      	<div class="modal-body">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tambah Data</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
                 <form name="input_iku">
                     <input type="hidden" id="id_iku" value="">
                     <div class="form-group">
@@ -579,13 +540,13 @@ if ($data_tahapan) {
                         <textarea name="" id="penanggung-jawab"></textarea>
                     </div>
                 </form>
-	      	</div>
-	      	<div class="modal-footer">
+            </div>
+            <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
                 <button type="button" class="btn btn-success" onclick="simpan_data_iku()">Simpan</button>
             </div>
-    	</div>
-  	</div>
+        </div>
+    </div>
 </div>
 
 <!-- Modal finalisasi -->
@@ -653,34 +614,35 @@ if ($data_tahapan) {
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="title-label">Finalisasi Indikator Kinerja Utama</h5>
+                <h5 class="modal-title" id="title-label">Edit Finalisasi Dokumen Perjanjian Kinerja</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <input type="hidden" id="id_data" value="">
+                <input type="hidden" id="id_data" name="id_data" value="">
+
                 <div class="card bg-light mb-3">
                     <div class="card-header">
-                        <strong>Indikator Kinerja Utama</strong>
+                        <strong>Perjanjian Kinerja</strong>
                     </div>
                     <div class="card-body">
                         <div class="form-row">
                             <div class="form-group col-md-6">
-                                <label for="nama_tahapan">Nama Tahapan</label>
-                                <input type="text" class="form-control" id="nama_tahapan" name="nama_tahapan" placeholder="ex : Indikator Kinerja Utama" maxlength="48" required>
+                                <label for="nama_tahap_finalisasi">Nama Tahapan</label>
+                                <input type="text" class="form-control" id="nama_tahap_finalisasi" name="nama_tahap_finalisasi" placeholder="ex : Perjanjian Kinerja" maxlength="48">
                             </div>
                             <div class="form-group col-md-6">
-                                <label for="tanggal_dokumen">Tanggal Finalisasi</label>
-                                <input type="date" class="form-control" id="tanggal_dokumen" name="tanggal_dokumen" value="<?php echo date('Y-m-d'); ?>" required>
+                                <label for="tanggal_tahap_finalisasi">Tanggal Dokumen</label>
+                                <input type="date" class="form-control" id="tanggal_tahap_finalisasi" name="tanggal_tahap_finalisasi">
                             </div>
                         </div>
-                        <small class="form-text text-muted">Pastikan data yang tertera benar, laporan yang sudah difinalisasi akan disimpan dan tidak dapat di edit kembali.</small>
+                        <small class="form-text text-muted">Dokumen yang sudah difinalisasi hanya dapat diubah nama label nya.</small>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="submit" class="btn btn-primary" onclick="simpanFinalisasi()">Simpan</button>
+                <button type="submit" class="btn btn-primary" onclick="simpanEditFinalisasi()">Perbarui</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Tutup</button>
             </div>
         </div>
@@ -697,7 +659,7 @@ jQuery(document).ready(function() {
 
     getTableIKU().then(function(){
         run_download_excel_sakip() 
-
+        run_download_word_sakip(jQuery('#cetak').html(), jQuery('#cetak').attr('title'));
         <?php if($hak_akses_user): ?>
             jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-iku" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
         <?php endif; ?>  
@@ -708,373 +670,394 @@ jQuery(document).ready(function() {
     });
 
 });
-function scrollCarousel(direction) {
-    const carousel = jQuery('#card-carousel');
-    const scrollAmount = carousel[0].offsetWidth;
-    const currentScroll = carousel.scrollLeft();
+    function scrollCarousel(direction) {
+        const carousel = jQuery('#card-carousel');
+        const scrollAmount = carousel[0].offsetWidth;
+        const currentScroll = carousel.scrollLeft();
 
-    carousel.animate({
-        scrollLeft: currentScroll + direction * scrollAmount
-    }, 500);
-}
-function getTableIKU() {
-    jQuery('#wrap-loading').show();
-    return new Promise(function(resolve, reject){
+        carousel.animate({
+            scrollLeft: currentScroll + direction * scrollAmount
+        }, 500);
+    }
+    function getTableIKU() {
+        jQuery('#wrap-loading').show();
+        return new Promise(function(resolve, reject) {
+            jQuery.ajax({
+                url: esakip.url,
+                type: 'POST',
+                data: {
+                    action: 'get_table_input_iku',
+                    api_key: esakip.api_key,
+                    id_skpd: <?php echo $skpd['id_skpd']; ?>,
+                    id_jadwal_wpsipd: id_jadwal_wpsipd
+                },
+                dataType: 'json',
+                success: function(response) {
+                    jQuery('#wrap-loading').hide();
+                    console.log(response);
+
+                    if (response.status === 'success') {
+                        jQuery('.table_dokumen_iku tbody').html(response.data);
+                        style_css_download_excel_sakip();
+                    } else {
+                        alert(response.message);
+                    }
+                    resolve();
+                },
+                error: function(xhr, status, error) {
+                    jQuery('#wrap-loading').hide();
+                    console.error(xhr.responseText);
+                    alert('Terjadi kesalahan saat memuat data IKU!');
+                    resolve();
+                }
+            });
+        });
+    }
+
+    function showModalFinalisasi() {
+        jQuery('#modalFinalisasi').modal('show')
+    }
+
+    function showModalEditFinalisasi() {
+        jQuery('#modalEditFinalisasi').modal('show')
+    }
+    function tambahIku(){
+        jQuery('#wrap-loading').show();
+        return get_tujuan_sasaran()
+        .then(function(){
+            return new Promise(function(resolve, reject){
+                jQuery('#wrap-loading').hide();
+                document.input_iku.reset();
+                jQuery('#id_iku').val("");
+                if(typeof data_sasaran_cascading != 'undefined'){
+                    jQuery('#wrap-loading').hide();
+                    jQuery("#modal-iku").modal('show');
+                    jQuery("#modal-iku").find('.modal-title').html('Tambah IKU');
+                    jQuery("#modal-iku").find('.modal-footer').html(''
+                        +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
+                            +'Tutup'
+                        +'</button>'
+                        +'<button type="button" class="btn btn-success" onclick="simpan_data_iku()">'
+                            +'Simpan'
+                        +'</button>');
+        
+                    if(data_sasaran_cascading != undefined){
+                        let html_cascading = '<option value="">Pilih Tujuan/Sasaran</option>';
+                        if(data_sasaran_cascading.data !== null){
+                            data_sasaran_cascading.data.map(function(value, index){
+                                if(value.id_unik_indikator == null){
+                                    html_cascading += '<option value="'+value.kode_bidang_urusan+'">'+value.sasaran_teks+'</option>';
+                                }
+                            });
+                        }
+                        jQuery("#tujuan-sasaran").html(html_cascading);
+                        jQuery('#tujuan-sasaran').select2({width: '100%'});
+                        jQuery('#tujuan-sasaran').attr("onchange","get_indikator(this.value)")
+                    }
+                 
+                    resolve();
+                }
+            })
+        })
+    }
+
+    function simpan_data_iku(){
+        let id_iku = jQuery('#id_iku').val();
+        let kode_sasaran = jQuery('#tujuan-sasaran').val();
+        let label_tujuan_sasaran = jQuery('#tujuan-sasaran option:selected').text();
+        let label_indikator = jQuery('#indikator').val();
+        let formulasi = tinymce.get('formulasi') ? tinymce.get('formulasi').getContent() : jQuery('#formulasi').val();
+        let sumber_data = jQuery('#sumber-data').val();
+        let penanggung_jawab = jQuery('#penanggung-jawab').val();
+        if(kode_sasaran == '' || label_indikator == '' || formulasi == '' || sumber_data == '' || penanggung_jawab == ''){
+            return alert('Ada Input Data Yang Kosong!')
+        }
+        jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
-            type: 'POST',
+            type: "post",
             data: {
-                action: 'get_table_input_iku',
-                api_key: esakip.api_key,
-                id_skpd: <?php echo $id_skpd; ?>,
-                id_jadwal_wpsipd: id_jadwal_wpsipd
+                "action": 'tambah_iku',
+                "api_key": esakip.api_key,
+                "tipe_iku": "opd",
+                "kode_sasaran": kode_sasaran,
+                "label_tujuan_sasaran": label_tujuan_sasaran,
+                "label_indikator": label_indikator,
+                "formulasi": formulasi,
+                "sumber_data": sumber_data,
+                "penanggung_jawab": penanggung_jawab,
+                "id_jadwal_wpsipd": id_jadwal_wpsipd,
+                "id_skpd": <?php echo $skpd['id_skpd']; ?>,
+                "id_iku" : id_iku
             },
-            dataType: 'json',
-            success: function(response) {
+            dataType: "json",
+            success: function(res){
                 jQuery('#wrap-loading').hide();
-                console.log(response);
-                if (response.status === 'success') {
-                    jQuery('.table_dokumen_iku tbody').html(response.data);
-                    style_css_download_excel_sakip();
-                } else {
-                    alert(response.message);
+                alert(res.message);
+                if(res.status=='success'){
+                    jQuery("#modal-iku").modal('hide');
+                    getTableIKU();
                 }
-                resolve();
-            },
-            error: function(xhr, status, error) {
-                jQuery('#wrap-loading').hide();
-                console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data IKU!');
-                resolve();
             }
         });
-    })
-}
-function showModalFinalisasi() {
-    jQuery('#modalFinalisasi').modal('show')
-}
-
-function showModalEditFinalisasi() {
-    jQuery('#modalEditFinalisasi').modal('show')
-}
-function tambahIku(){
-    jQuery('#wrap-loading').show();
-    return get_tujuan_sasaran()
-    .then(function(){
-        return new Promise(function(resolve, reject){
-            jQuery('#wrap-loading').hide();
-            document.input_iku.reset();
-            jQuery('#id_iku').val("");
-            if(typeof data_sasaran_cascading != 'undefined'){
-                jQuery('#wrap-loading').hide();
-                jQuery("#modal-iku").modal('show');
-                jQuery("#modal-iku").find('.modal-title').html('Tambah IKU');
-                jQuery("#modal-iku").find('.modal-footer').html(''
-                    +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
-                        +'Tutup'
-                    +'</button>'
-                    +'<button type="button" class="btn btn-success" onclick="simpan_data_iku()">'
-                        +'Simpan'
-                    +'</button>');
-    
-                if(data_sasaran_cascading != undefined){
-                    let html_cascading = '<option value="">Pilih Tujuan/Sasaran</option>';
-                    if(data_sasaran_cascading.data !== null){
-                        data_sasaran_cascading.data.map(function(value, index){
-                            if(value.id_unik_indikator == null){
-                                html_cascading += '<option value="'+value.kode_bidang_urusan+'">'+value.sasaran_teks+'</option>';
-                            }
-                        });
-                    }
-                    jQuery("#tujuan-sasaran").html(html_cascading);
-                    jQuery('#tujuan-sasaran').select2({width: '100%'});
-                    jQuery('#tujuan-sasaran').attr("onchange","get_indikator(this.value)")
-                }
-             
-                resolve();
-            }
-        })
-    })
-}
-
-function simpan_data_iku(){
-    let id_iku = jQuery('#id_iku').val();
-    let kode_sasaran = jQuery('#tujuan-sasaran').val();
-    let label_tujuan_sasaran = jQuery('#tujuan-sasaran option:selected').text();
-    let label_indikator = jQuery('#indikator').val();
-    let formulasi = tinymce.get('formulasi') ? tinymce.get('formulasi').getContent() : jQuery('#formulasi').val();
-    let sumber_data = jQuery('#sumber-data').val();
-    let penanggung_jawab = jQuery('#penanggung-jawab').val();
-    if(kode_sasaran == '' || label_indikator == '' || formulasi == '' || sumber_data == '' || penanggung_jawab == ''){
-        return alert('Ada Input Data Yang Kosong!')
     }
-    jQuery('#wrap-loading').show();
-    jQuery.ajax({
-        url: esakip.url,
-        type: "post",
-        data: {
-            "action": 'tambah_iku',
-            "api_key": esakip.api_key,
-            "tipe_iku": "opd",
-            "kode_sasaran": kode_sasaran,
-            "label_tujuan_sasaran": label_tujuan_sasaran,
-            "label_indikator": label_indikator,
-            "formulasi": formulasi,
-            "sumber_data": sumber_data,
-            "penanggung_jawab": penanggung_jawab,
-            "id_jadwal_wpsipd": id_jadwal_wpsipd,
-            "id_skpd": <?php echo $id_skpd; ?>,
-            "id_iku" : id_iku
-        },
-        dataType: "json",
-        success: function(res){
-            jQuery('#wrap-loading').hide();
-            alert(res.message);
-            if(res.status=='success'){
-                jQuery("#modal-iku").modal('hide');
-                getTableIKU();
-            }
-        }
-    });
-}
 
-function edit_iku(id) {
-    tambahIku().then(function(){
+    function edit_iku(id) {
+        tambahIku().then(function(){
+            jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                url: esakip.url,
+                type: 'POST',
+                data: {
+                    action: 'get_iku_by_id',
+                    api_key: esakip.api_key,
+                    id: id
+                },
+                dataType: 'json',
+                success: function(response) {
+                    jQuery('#wrap-loading').hide();
+                    console.log(response);
+                    if (response.status === 'success') {
+                        let data = response.data;
+                        jQuery('#id_iku').val(id);
+                        jQuery("#tujuan-sasaran").val(data.kode_sasaran).trigger('change');                   
+                        tinymce.get('formulasi').setContent(data.formulasi);
+                        jQuery("#sumber-data").val(data.sumber_data);
+                        jQuery("#penanggung-jawab").val(data.penanggung_jawab);
+                        jQuery("#modal-iku").find('.modal-title').html('Edit IKU');
+                        jQuery('#modal-iku').modal('show');
+                        get_indikator(data.kode_sasaran);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    jQuery('#wrap-loading').hide();
+                    console.error(xhr.responseText);
+                    alert('Terjadi kesalahan saat memuat data!');
+                }
+            });
+        })
+    }
+
+    function hapus_iku(id) {
+        if (!confirm('Apakah anda yakin ingin menghapus data ini?')) {
+            return;
+        }
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'get_iku_by_id',
+                action: 'hapus_iku',
                 api_key: esakip.api_key,
                 id: id
             },
             dataType: 'json',
             success: function(response) {
-                jQuery('#wrap-loading').hide();
                 console.log(response);
+                jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
-                    let data = response.data;
-                    jQuery('#id_iku').val(id);
-                    jQuery("#tujuan-sasaran").val(data.kode_sasaran).trigger('change');                   
-                    tinymce.get('formulasi').setContent(data.formulasi);
-                    jQuery("#sumber-data").val(data.sumber_data);
-                    jQuery("#penanggung-jawab").val(data.penanggung_jawab);
-                    jQuery("#modal-iku").find('.modal-title').html('Edit IKU');
-                    jQuery('#modal-iku').modal('show');
-                    get_indikator(data.kode_sasaran);
+                    alert(response.message);
+                    getTableIKU();
                 } else {
                     alert(response.message);
                 }
             },
             error: function(xhr, status, error) {
-                jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data!');
+                jQuery('#wrap-loading').hide();
+                alert('Terjadi kesalahan saat mengirim data!');
             }
         });
-    })
-}
-
-function hapus_iku(id) {
-    if (!confirm('Apakah anda yakin ingin menghapus data ini?')) {
-        return;
     }
-    jQuery('#wrap-loading').show();
-    jQuery.ajax({
-        url: esakip.url,
-        type: 'POST',
-        data: {
-            action: 'hapus_iku',
-            api_key: esakip.api_key,
-            id: id
-        },
-        dataType: 'json',
-        success: function(response) {
-            console.log(response);
-            jQuery('#wrap-loading').hide();
-            if (response.status === 'success') {
-                alert(response.message);
-                getTableIKU();
-            } else {
-                alert(response.message);
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error(xhr.responseText);
-            jQuery('#wrap-loading').hide();
-            alert('Terjadi kesalahan saat mengirim data!');
-        }
-    });
-}
 
-function get_indikator(that){
-    jQuery('#wrap-loading').show();
-    get_tujuan_sasaran()
-    .then(function(){
-        jQuery('#wrap-loading').hide();
-        if(typeof data_sasaran_cascading != 'undefined'){
-            if(data_sasaran_cascading != undefined){
-                let html_indikator = '';
-                if(data_sasaran_cascading.data !== null){
-                    data_sasaran_cascading.data.map(function(value, index){
-                        if(value.id_unik_indikator != null){
-                            if(value.kode_bidang_urusan == that){
-                                html_indikator += '- '+value.indikator_teks+'\n';
+    function get_indikator(that){
+        jQuery('#wrap-loading').show();
+        get_tujuan_sasaran()
+        .then(function(){
+            jQuery('#wrap-loading').hide();
+            if(typeof data_sasaran_cascading != 'undefined'){
+                if(data_sasaran_cascading != undefined){
+                    let html_indikator = '';
+                    if(data_sasaran_cascading.data !== null){
+                        data_sasaran_cascading.data.map(function(value, index){
+                            if(value.id_unik_indikator != null){
+                                if(value.kode_bidang_urusan == that){
+                                    html_indikator += '- '+value.indikator_teks+'\n';
+                                }
                             }
-                        }
-                    });
-                }
-                jQuery("#indikator").html(html_indikator);
-            }
-        }
-    })
-}
-
-function get_tujuan_sasaran() {
-    return new Promise(function(resolve, reject){
-        if(typeof data_sasaran_cascading == 'undefined'){
-            jQuery('#wrap-loading').show();
-            jQuery.ajax({
-                url: esakip.url,
-                type: "post",
-                data: {
-                    "action": 'get_tujuan_sasaran_cascading',
-                    "api_key": esakip.api_key,
-                    "id_skpd": <?php echo $id_skpd; ?>,
-                    "tahun_anggaran": <?php echo $input['tahun']; ?>,
-                    "jenis": 'sasaran',
-                    "id_jadwal_wpsipd": id_jadwal_wpsipd
-                },
-                dataType: "json",
-                success: function(response){
-                    if(response.status){
-                        window.data_sasaran_cascading = response;
-                    }else{
-                        alert("Data cascading tidak ditemukan")
+                        });
                     }
-                    resolve();
+                    jQuery("#indikator").html(html_indikator);
                 }
-            });
-        }else{
-            resolve();
-        }
-    });
-}
-
-function finalisasi_iku(id) {
-    jQuery('#wrap-loading').show();
-    jQuery.ajax({
-        url: esakip.url,
-        type: 'POST',
-        data: {
-            action: 'finalisasi_iku',
-            api_key: esakip.api_key,
-            id: id
-        },
-        dataType: 'json',
-        success: function(response) {
-            jQuery('#wrap-loading').hide();
-            console.log(response);
-            if (response.status === 'success') {
-                let data = response.data;
-                jQuery("#id_data").val(data.id);
-                jQuery('#modalFinalisasi').modal('show')
-            } else {
-                alert(response.message);
             }
-        },
-        error: function(xhr, status, error) {
-            jQuery('#wrap-loading').hide();
-            console.error(xhr.responseText);
-            alert('Terjadi kesalahan saat memuat data!');
-        }
-    });
-}
-function simpanFinalisasi() {
-    let confirmFinalisasi = confirm('Apakah anda yakin ingin menyimpan data ini?');
-    if (!confirmFinalisasi) {
-        return;
+        })
     }
 
-    let dataiku = {
-        nama_tahapan: jQuery('#nama_tahapan').val(),
-        tanggal_dokumen: jQuery('#tanggal_dokumen').val()
-    };
-    let data_simpan = <?php echo json_encode($data_simpan); ?>;
-
-    if (!Array.isArray(data_simpan) || data_simpan.length === 0) {
-        alert('Tidak ada data yang dapat disimpan!');
-        return;
-    }
-
-    jQuery('#wrap-loading').show();
-    jQuery.ajax({
-        url: esakip.url,
-        method: 'POST',
-        data: {
-            action: "simpan_finalisasi_iku",
-            api_key: esakip.api_key,
-            data_iku: dataiku,
-            id_skpd: '<?php echo $id_skpd; ?>',
-            data_simpan: data_simpan
-        },
-        dataType: 'json',
-        success: function(response) {
-            jQuery('#wrap-loading').hide();
-            if (response.status === 'success') {
-                alert(response.message);
-                location.reload();
-                jQuery('#modalFinalisasi').modal('hide');
-            } else {
-                alert('Terjadi kesalahan: ' + response.message);
+    function get_tujuan_sasaran() {
+        return new Promise(function(resolve, reject){
+            if(typeof data_sasaran_cascading == 'undefined'){
+                jQuery('#wrap-loading').show();
+                jQuery.ajax({
+                    url: esakip.url,
+                    type: "post",
+                    data: {
+                        "action": 'get_tujuan_sasaran_cascading',
+                        "api_key": esakip.api_key,
+                        "id_skpd": <?php echo $skpd['id_skpd']; ?>,
+                        "tahun_anggaran": <?php echo $input['tahun']; ?>,
+                        "jenis": 'sasaran',
+                        "id_jadwal_wpsipd": id_jadwal_wpsipd
+                    },
+                    dataType: "json",
+                    success: function(response){
+                        if(response.status){
+                            window.data_sasaran_cascading = response;
+                        }else{
+                            alert("Data cascading tidak ditemukan")
+                        }
+                        resolve();
+                    }
+                });
+            }else{
+                resolve();
             }
-        },
-        error: function(xhr, status, error) {
-            jQuery('#wrap-loading').hide();
-            console.error('AJAX Error:', error);
-            alert('Gagal menyimpan data. Silakan coba lagi.');
-        },
-    });
-}
-function deleteDokumen(getID) {
-    let confirmHapus = confirm('Apakah anda yakin ingin menghapus data ini?');
-    if (!confirmHapus) {
-        return;
+        });
     }
 
-    jQuery('#wrap-loading').show();
+    function simpanFinalisasi() {
+        let confirmFinalisasi = confirm('Apakah anda yakin ingin menyimpan data ini?');
+        if (!confirmFinalisasi) {
+            return;
+        }
 
-    jQuery.ajax({
-        url: esakip.url,
-        method: 'POST',
-        data: {
-            action: "hapus_finalisasi_iku_opd",
-            api_key: esakip.api_key,
-            getID: getID 
-        },
-        dataType: 'json',
-        success: function(response) {
-            jQuery('#wrap-loading').hide();
-            if (response.status === 'success') {
-                alert(response.message);
-                getID.split(',').forEach(id => jQuery(`#card-tahap-${id}`).hide());
+        let dataiku = {
+            nama_tahapan: jQuery('#nama_tahapan').val(),
+            tanggal_dokumen: jQuery('#tanggal_dokumen').val()
+        };
+        let data_simpan = <?php echo json_encode($data_simpan); ?>;
 
-                if (getID.includes(jQuery(`#id_data`).val())) {
+        if (!Array.isArray(data_simpan) || data_simpan.length === 0) {
+            alert('Tidak ada data yang dapat disimpan!');
+            return;
+        }
+
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            method: 'POST',
+            data: {
+                action: "simpan_finalisasi_iku",
+                api_key: esakip.api_key,
+                data_iku: dataiku,
+                id_skpd: '<?php echo $skpd['id_skpd']; ?>',
+                data_simpan: data_simpan
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
                     location.reload();
+                    jQuery('#modalFinalisasi').modal('hide');
+                } else {
+                    alert('Terjadi kesalahan: ' + response.message);
                 }
-            } else {
-                alert('Terjadi kesalahan: ' + response.message);
-            }
-        },
-        error: function(xhr, status, error) {
-            jQuery('#wrap-loading').hide();
-            console.error('AJAX Error:', error);
-            alert('GAGAL: ' + (xhr.responseJSON?.message || 'Terjadi kesalahan.'));
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error('AJAX Error:', error);
+                alert('Gagal menyimpan data. Silakan coba lagi.');
+            },
+        });
+    }
+    function simpanEditFinalisasi() {
+        let confirmFinalisasi = confirm('Apakah anda yakin ingin perbarui data ini?');
+        if (!confirmFinalisasi) {
+            return;
         }
-    });
-}
-function viewDokumen(getID) {
+
+        const id_data = jQuery('#id_data').val()
+        const namaTahapan = jQuery('#nama_tahap_finalisasi').val()
+        const tanggalTahapan = jQuery('#tanggal_tahap_finalisasi').val()
+
+        jQuery('#wrap-loading').show()
+        jQuery.ajax({
+            url: esakip.url,
+            method: 'POST',
+            data: {
+                action: "edit_finalisasi_iku",
+                api_key: esakip.api_key,
+                id_data: id_data,
+                nama_tahap: namaTahapan,
+                id_skpd: <?php echo $skpd['id_skpd']; ?>,
+                id_jadwal_wpsipd: id_jadwal_wpsipd,
+                tanggal_tahap: tanggalTahapan
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide()
+                if (response.status === 'success') {
+                    alert(response.message);
+                    id_data.split(',').forEach(id => {
+                        jQuery(`#nama-tahapan-${id}`).text(namaTahapan);
+                        jQuery(`#card-tahap-${id}`).attr("title", `${namaTahapan}`);
+                        jQuery(`#tanggal-tahapan-${id}`).text(formatTanggalIndonesia(tanggalTahapan));
+                    });
+                    jQuery('#modalEditFinalisasi').modal('hide')
+                } else {
+                    alert('Terjadi kesalahan: ' + response.message);
+                }
+                location.reload();
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide()
+                console.error('AJAX Error:', error);
+                alert('Gagal menyimpan data. Silakan coba lagi.');
+            },
+        });
+    }
+    function deleteDokumen(idTahap) {
+        let confirmHapus = confirm('Apakah anda yakin ingin menghapus data ini?');
+        if (!confirmHapus) {
+            return;
+        }
+        jQuery('#wrap-loading').show()
+        jQuery.ajax({
+            url: esakip.url,
+            method: 'POST',
+            data: {
+                action: "hapus_finalisasi_iku_opd",
+                api_key: esakip.api_key,
+                id_tahap: idTahap
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    alert(response.message);
+                    jQuery(`#card-tahap-${idTahap}`).hide()
+
+                    if (idTahap == jQuery(`#id_data`).val()) {
+                        location.reload()
+
+                        jQuery(".cr-actions .cr-view-btn, .cr-actions .cr-view-btn-danger").prop("disabled", true).css("pointer-events", "none").css("opacity", "0.5");
+                    } else {
+                        jQuery('#wrap-loading').hide()
+                    }
+                } else {
+                    jQuery('#wrap-loading').hide()
+                    alert('Terjadi kesalahan: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide()
+                console.error('AJAX Error:', error);
+                alert('GAGAL: ' + response.message);
+            },
+        });
+    }
+    function viewDokumen(idTahap) {
         jQuery('#wrap-loading').show()
         jQuery.ajax({
             url: esakip.url,
@@ -1082,7 +1065,9 @@ function viewDokumen(getID) {
             data: {
                 action: "get_finalisasi_iku_by_id",
                 api_key: esakip.api_key,
-                getID: getID,
+                id_skpd: <?php echo $skpd['id_skpd']; ?>,
+                id_jadwal_wpsipd: id_jadwal_wpsipd,
+                id_tahap: idTahap
             },
             dataType: 'json',
             success: function(response) {
@@ -1091,69 +1076,24 @@ function viewDokumen(getID) {
                 if (response.status === 'success') {
                     jQuery(".editable-field").attr("title", "").attr("contenteditable", "false");
                     jQuery(".cr-view-btn").show();
-                    jQuery(`#view-btn-${getID}`).hide();
+                    jQuery(`#view-btn-${idTahap}`).hide();
 
-                    jQuery('#id_data').val(response.data.id)
-                    jQuery('#nama_tahap_finalisasi').val(response.data.nama_tahapan)
-                    jQuery('#tanggal_tahap_finalisasi').val(response.data.tanggal_dokumen)
+                    
+                    jQuery('.table_edit_dokumen_iku').show();
+                    jQuery('.table_dokumen_iku').hide();
+                    jQuery('#tambah-iku').hide();
 
-                    jQuery(`.badge-sedang-dilihat`).hide() 
-                    jQuery(`#badge-sedang-dilihat-${response.data.id}`).show() 
+                    jQuery('.table_edit_dokumen_iku tbody').html(response.html);
 
-                    jQuery('#finalisasi-btn').hide()
-                    jQuery('#display-btn-first').show() 
-                    jQuery('#edit-btn').show()
+                    jQuery('#id_data').val(idTahap);
+                    jQuery('#nama_tahap_finalisasi').val(response.nama_tahapan);
+                    jQuery('#tanggal_tahap_finalisasi').val(response.tanggal_dokumen);
 
-                    // Hapus isi tbody sebelum menambahkan data baru
-                    jQuery("#table-sasaran-view tbody, #table-program-view tbody, #table-kegiatan-view tbody, #table-subkegiatan-view tbody").empty();
-
-                    let rhkData = response.data.rhk;
-
-                    // Inisialisasi counter untuk nomor urut dalam tabel
-                    let countSasaran = 1,
-                        countProgram = 1,
-                        countKegiatan = 1,
-                        countSubKegiatan = 1;
-
-                    // Looping data RHK dan masukkan ke tabel sesuai tipe
-                    rhkData.forEach((item) => {
-                        let row = "";
-
-                        if (item.tipe == "1") { // Sasaran
-                            row = `<tr>
-                                    <td class="esakip-text_tengah">${countSasaran++}</td>
-                                    <td class="esakip-text_kiri">${item.label}</td>
-                                    <td class="esakip-text_kiri">${item.indikator || '-'}</td>
-                                    <td class="esakip-text_kiri">${item.target || '-'}</td>
-                                </tr>`;
-                            jQuery("#table-sasaran-view tbody").append(row);
-                        } else if (item.tipe == "2") { // Program
-                            row = `<tr>
-                                        <td class="esakip-text_tengah">${countProgram++}</td>
-                                        <td class="esakip-text_kiri">${item.kode} ${item.label}</td>
-                                        <td class="esakip-text_kanan">${formatRupiah(parseInt(item.anggaran))}</td>
-                                        <td class="esakip-text_kiri">${item.keterangan || '-'}</td>
-                                    </tr>`;
-                            jQuery("#table-program-view tbody").append(row);
-                        } else if (item.tipe == "3") { // Kegiatan
-                            row = `<tr>
-                                        <td class="esakip-text_tengah">${countKegiatan++}</td>
-                                        <td class="esakip-text_kiri">${item.kode} ${item.label}</td>
-                                        <td class="esakip-text_kanan">${formatRupiah(parseInt(item.anggaran))}</td>
-                                        <td class="esakip-text_kiri">${item.keterangan || '-'}</td>
-                                    </tr>`;
-                            jQuery("#table-kegiatan-view tbody").append(row);
-                        } else if (item.tipe == "4") { // Subkegiatan
-                            row = `<tr>
-                                        <td class="esakip-text_tengah">${countSubKegiatan++}</td>
-                                        <td class="esakip-text_kiri">${item.kode} ${item.label}</td>
-                                        <td class="esakip-text_kanan">${formatRupiah(parseInt(item.anggaran))}</td>
-                                        <td class="esakip-text_kiri">${item.keterangan || '-'}</td>
-                                    </tr>`;
-                            jQuery("#table-subkegiatan-view tbody").append(row);
-                        }
-                    });
-
+                    jQuery(`.badge-sedang-dilihat`).hide(); 
+                    jQuery(`#badge-sedang-dilihat-${idTahap}`).show();
+                    jQuery('#finalisasi-btn').hide();
+                    jQuery('#display-btn-first').show(); 
+                    jQuery('#edit-btn').show();
                 } else {
                     alert('Terjadi kesalahan: ' + response.message);
                 }

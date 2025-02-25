@@ -2117,11 +2117,10 @@ CREATE TABLE `esakip_sumber_dana_indikator` (
 
 CREATE TABLE `esakip_finalisasi_iku_opd` (
   `id` int(11) NOT NULL auto_increment,
-  `nama_tahapan` text DEFAULT NULL,
-  `tanggal_dokumen` date DEFAULT NULL,
+  `id_tahap` varchar(255) DEFAULT null,
   `kode_sasaran` text NOT NULL,
   `label_sasaran` text DEFAULT null,
-  `id_unik_indikator` text DEFAULT null,
+  `id_unik_indikator` varchar(255) DEFAULT null,
   `label_indikator` text DEFAULT null,
   `formulasi` text DEFAULT null,
   `sumber_data` varchar(255) DEFAULT null,
@@ -2132,11 +2131,13 @@ CREATE TABLE `esakip_finalisasi_iku_opd` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id),
+  KEY `id_tahap` (`id_tahap`),
   KEY `id_jadwal_wpsipd` (`id_jadwal_wpsipd`),
   KEY `id_unik_indikator` (`id_unik_indikator`),
   KEY `active` (`active`),
   KEY `id_skpd` (`id_skpd`)
 );
+
 CREATE TABLE `esakip_dokumen_jadwal_esr` (
   `id` int(11) NOT NULL auto_increment,
   `id_skpd` int(11) DEFAULT NULL,
@@ -2146,11 +2147,58 @@ CREATE TABLE `esakip_dokumen_jadwal_esr` (
   `path_esr` text DEFAULT NULL,
   `tahun_anggaran` year(4) DEFAULT NULL,
   `id_dokumen` int(11) DEFAULT NULL,
-  `nama_tabel` text DEFAULT NULL,
+  `nama_tabel` varchar(255) DEFAULT NULL,
   PRIMARY KEY(id),
   KEY `id_skpd` (`id_skpd`),
   KEY `id_jadwal` (`id_jadwal`),
   KEY `tahun_anggaran` (`tahun_anggaran`),
   KEY `id_dokumen` (`id_dokumen`),
   KEY `nama_tabel` (`nama_tabel`)
+);
+
+CREATE TABLE `esakip_finalisasi_iku_pemda` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_tahap` varchar(255) DEFAULT null,
+  `kode_sasaran` text NOT NULL,
+  `label_sasaran` text DEFAULT null,
+  `id_unik_indikator` varchar(255) DEFAULT null,
+  `label_indikator` text DEFAULT null,
+  `formulasi` text DEFAULT null,
+  `sumber_data` varchar(255) DEFAULT null,
+  `penanggung_jawab` varchar(255) DEFAULT null,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id),
+  KEY `id_tahap` (`id_tahap`),
+  KEY `id_jadwal` (`id_jadwal`),
+  KEY `id_unik_indikator` (`id_unik_indikator`),
+  KEY `active` (`active`)
+);
+
+CREATE TABLE `esakip_finalisasi_tahap_iku_opd` (
+  `id` int(11) NOT NULL auto_increment,
+  `nama_tahapan` text DEFAULT NULL,
+  `tanggal_dokumen` date DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `id_jadwal_wpsipd` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id),
+  KEY `active` (`active`),
+  KEY `id_skpd` (`id_skpd`)
+);
+CREATE TABLE `esakip_finalisasi_tahap_iku_pemda` (
+  `id` int(11) NOT NULL auto_increment,
+  `nama_tahapan` text DEFAULT NULL,
+  `tanggal_dokumen` date DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id),
+  KEY `active` (`active`)
 );
