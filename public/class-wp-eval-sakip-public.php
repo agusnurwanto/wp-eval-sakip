@@ -773,33 +773,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		return $hak_akses_user;
 	}
 
-	public function hak_akses_upload_dokumen_renstra($nama_dokumen)
-	{
-		global $wpdb;
-		$current_user = wp_get_current_user();
-		$user_roles = $current_user->roles;
-		$is_administrator = in_array('administrator', $user_roles);
-
-		$admin_role_pemda = array(
-			'admin_bappeda',
-			'admin_ortala'
-		);
-
-		$this_jenis_role = (array_intersect($admin_role_pemda, $user_roles)) ? 1 : 2;
-
-		$cek_settingan_menu = $wpdb->get_var($wpdb->prepare("
-	    	SELECT 
-	        	jenis_role
-	      	FROM esakip_menu_dokumen 
-	      	WHERE nama_dokumen=%s
-	      		AND user_role='perangkat_daerah' 
-	      		AND active = 1
-	    ", $nama_dokumen));
-
-		$hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
-		return $hak_akses_user;
-	}
-
 	public function dokumen_detail_dpa_pemda($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
@@ -7854,7 +7827,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
 								}
 							}
-							// if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen_renstra('RENSTRA')) {
 							if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('RENSTRA', $id_jadwal)) {
 								if (!$status_integrasi_esr) {
 									if ($can_verify && $draft === true) {
@@ -27506,16 +27478,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 									foreach ($data_esr as $key => $esr) {
 										if ($esr->dokumen_id == $mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']) {
-											// $esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM " . $nama_tabel . " WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
-
-											// if (!empty($esr_lokal)) {
-											// 	$wpdb->update($nama_tabel, [
-											// 		'path_esr' => $esr->path
-											// 	], [
-											// 		'id' => $esr_lokal['id']
-											// 	]);
-											// }
-
 											$path = explode("/", $esr->path);
 											$nama_file = end($path);
 											$array_data_esr[] = [
@@ -27658,9 +27620,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						// if($can_verify){
-						// 	$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
-						// }
 						if ($_prefix_tipe == "_pemda") {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_pohon_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_pohon_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
