@@ -27664,7 +27664,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						if ($_prefix_tipe == "_pemda") {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_pohon_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_pohon_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
-						} else if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Pohon Kinerja dan Cascading', $tahun_anggaran)) {
+						} else if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Pohon Kinerja dan Cascading', $id_jadwal)) {
 							if (!$status_integrasi_esr) {
 								$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_iku(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 								$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_iku(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
