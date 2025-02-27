@@ -333,7 +333,7 @@ if (!empty($data_user_pegawai)) {
 		if (!empty($skpd_user_pegawai)) {
 			if (($skpd_user_pegawai['id_skpd'] == $id_skpd && $v_user['tipe_pegawai_id'] == 11 && strlen($v_user['satker_id']) == 2) || $is_administrator) {
 				$hak_akses_user_pegawai = 1;
-			} else if ($skpd_user_pegawai['id_skpd'] == $id_skpd && $nama_pegawai_4['nip_baru'] == $user_nip) {
+			} else if ($skpd_user_pegawai['id_skpd'] == $id_skpd && !empty($nama_pegawai_4['nip_baru']) && $nama_pegawai_4['nip_baru'] == $user_nip) {
 				$hak_akses_user_pegawai = 2;
 			}
 			if(empty($hak_akses_user_pegawai_per_skpd[$skpd_user_pegawai['id_skpd']])){
@@ -597,12 +597,42 @@ if(!empty($renaksi) && !empty($renaksi['satker_id'])){
 }
 
 // ----- get data e-kin perbulan ----- //
+$get_bulanan_message = "-";
 if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($renaksi['nip']) && !empty($ind_renaksi['id'])){
-	// $data_ekin = $this->get_data_perbulan_ekinerja($tahun, $satker_id_pegawai_indikator, $renaksi['nip'], $ind_renaksi['id']);
-	// $data_ekin_terbaru = json_decode($data_ekin, true);
-	// if (!isset($data_ekin_terbaru['status']) || $data_ekin_terbaru['status'] === false) {
-	// 	array_push($error_message, $data_ekin_terbaru['message']);
-	// }
+	$opsi_param = array(
+		'tahun' => $tahun,
+		'satker_id' => $satker_id_pegawai_indikator,
+		'nip' => $renaksi['nip'],
+		'id_indikator' => $ind_renaksi['id'],
+		'id_rhk' => $renaksi['id'],
+		'id_skpd' => $id_skpd,
+		'tipe' => 'indikator'
+	);
+
+	$data_ekin = $this->get_data_perbulan_ekinerja($opsi_param);
+	$data_ekin_terbaru = json_decode($data_ekin, true);
+	$get_bulanan_message = $data_ekin_terbaru['message'];
+}
+
+$data_target_realisasi_bulanan = array();
+$get_data_bulanan = $wpdb->get_results(
+						$wpdb->prepare(
+							"SELECT
+								*
+							FROM 
+								esakip_data_bulanan_rencana_aksi_opd 
+							WHERE 
+								id_indikator_renaksi_opd=%d
+								AND active = 1
+							ORDER BY bulan ASC
+						", $ind_renaksi['id']), ARRAY_A);
+
+if(!empty($get_data_bulanan)){
+	foreach ($get_data_bulanan as $k_bulanan => $v_bulanan) {
+		if(empty($data_target_realisasi_bulanan[$v_bulanan['bulan']])){
+			$data_target_realisasi_bulanan[$v_bulanan['bulan']] = $v_bulanan;
+		}
+	}
 }
 
 ?>
@@ -1006,27 +1036,27 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($renaksi['ni
 							<tbody>
 								<tr>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Januari</td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[1]['satuan_bulan']) ? $data_target_realisasi_bulanan[1]['satuan_bulan'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[1]['volume']) ? $data_target_realisasi_bulanan[1]['volume'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[1]['realisasi']) ? $data_target_realisasi_bulanan[1]['realisasi'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[1]['capaian']) ? $data_target_realisasi_bulanan[1]['capaian'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[1]['keterangan']) ? $data_target_realisasi_bulanan[1]['keterangan'] : '' ?></td>
 								</tr>
 								<tr>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Februari</td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[2]['satuan_bulan']) ? $data_target_realisasi_bulanan[2]['satuan_bulan'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[2]['volume']) ? $data_target_realisasi_bulanan[2]['volume'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[2]['realisasi']) ? $data_target_realisasi_bulanan[2]['realisasi'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[2]['capaian']) ? $data_target_realisasi_bulanan[2]['capaian'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[2]['keterangan']) ? $data_target_realisasi_bulanan[2]['keterangan'] : '' ?></td>
 								</tr>
 								<tr>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Maret</td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[3]['satuan_bulan']) ? $data_target_realisasi_bulanan[3]['satuan_bulan'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[3]['volume']) ? $data_target_realisasi_bulanan[3]['volume'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[3]['realisasi']) ? $data_target_realisasi_bulanan[3]['realisasi'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[3]['capaian']) ? $data_target_realisasi_bulanan[3]['capaian'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[3]['keterangan']) ? $data_target_realisasi_bulanan[3]['keterangan'] : '' ?></td>
 								</tr>
 								<tr style="background-color:#FDFFB6;">
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW 1</td>
@@ -1038,27 +1068,27 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($renaksi['ni
 								</tr>
 								<tr>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">April</td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[4]['satuan_bulan']) ? $data_target_realisasi_bulanan[4]['satuan_bulan'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[4]['volume']) ? $data_target_realisasi_bulanan[4]['volume'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[4]['realisasi']) ? $data_target_realisasi_bulanan[4]['realisasi'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[4]['capaian']) ? $data_target_realisasi_bulanan[4]['capaian'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[4]['keterangan']) ? $data_target_realisasi_bulanan[4]['keterangan'] : '' ?></td>
 								</tr>
 								<tr>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Mei</td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[5]['satuan_bulan']) ? $data_target_realisasi_bulanan[5]['satuan_bulan'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[5]['volume']) ? $data_target_realisasi_bulanan[5]['volume'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[5]['realisasi']) ? $data_target_realisasi_bulanan[5]['realisasi'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[5]['capaian']) ? $data_target_realisasi_bulanan[5]['capaian'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[5]['keterangan']) ? $data_target_realisasi_bulanan[5]['keterangan'] : '' ?></td>
 								</tr>
 								<tr>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Juni</td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[6]['satuan_bulan']) ? $data_target_realisasi_bulanan[6]['satuan_bulan'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[6]['volume']) ? $data_target_realisasi_bulanan[6]['volume'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[6]['realisasi']) ? $data_target_realisasi_bulanan[6]['realisasi'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[6]['capaian']) ? $data_target_realisasi_bulanan[6]['capaian'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[6]['keterangan']) ? $data_target_realisasi_bulanan[6]['keterangan'] : '' ?></td>
 								</tr>
 								<tr style="background-color:#FDFFB6;">
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW 2</td>
@@ -1070,27 +1100,27 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($renaksi['ni
 								</tr>
 								<tr>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Juli</td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[7]['satuan_bulan']) ? $data_target_realisasi_bulanan[7]['satuan_bulan'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[7]['volume']) ? $data_target_realisasi_bulanan[7]['volume'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[7]['realisasi']) ? $data_target_realisasi_bulanan[7]['realisasi'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[7]['capaian']) ? $data_target_realisasi_bulanan[7]['capaian'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[7]['keterangan']) ? $data_target_realisasi_bulanan[7]['keterangan'] : '' ?></td>
 								</tr>
 								<tr>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Agustus</td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[8]['satuan_bulan']) ? $data_target_realisasi_bulanan[8]['satuan_bulan'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[8]['volume']) ? $data_target_realisasi_bulanan[8]['volume'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[8]['realisasi']) ? $data_target_realisasi_bulanan[8]['realisasi'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[8]['capaian']) ? $data_target_realisasi_bulanan[8]['capaian'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[8]['keterangan']) ? $data_target_realisasi_bulanan[8]['keterangan'] : '' ?></td>
 								</tr>
 								<tr>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">September</td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[9]['satuan_bulan']) ? $data_target_realisasi_bulanan[9]['satuan_bulan'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[9]['volume']) ? $data_target_realisasi_bulanan[9]['volume'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[9]['realisasi']) ? $data_target_realisasi_bulanan[9]['realisasi'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[9]['capaian']) ? $data_target_realisasi_bulanan[9]['capaian'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[9]['keterangan']) ? $data_target_realisasi_bulanan[9]['keterangan'] : '' ?></td>
 								</tr>
 								<tr style="background-color:#FDFFB6;">
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW 3</td>
@@ -1102,27 +1132,27 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($renaksi['ni
 								</tr>
 								<tr>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Oktober</td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[10]['satuan_bulan']) ? $data_target_realisasi_bulanan[10]['satuan_bulan'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[10]['volume']) ? $data_target_realisasi_bulanan[10]['volume'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[10]['realisasi']) ? $data_target_realisasi_bulanan[10]['realisasi'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[10]['capaian']) ? $data_target_realisasi_bulanan[10]['capaian'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[10]['keterangan']) ? $data_target_realisasi_bulanan[10]['keterangan'] : '' ?></td>
 								</tr>
 								<tr>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">November</td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[11]['satuan_bulan']) ? $data_target_realisasi_bulanan[11]['satuan_bulan'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[11]['volume']) ? $data_target_realisasi_bulanan[11]['volume'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[11]['realisasi']) ? $data_target_realisasi_bulanan[11]['realisasi'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[11]['capaian']) ? $data_target_realisasi_bulanan[11]['capaian'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[11]['keterangan']) ? $data_target_realisasi_bulanan[11]['keterangan'] : '' ?></td>
 								</tr>
 								<tr>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Desember</td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[12]['satuan_bulan']) ? $data_target_realisasi_bulanan[12]['satuan_bulan'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[12]['volume']) ? $data_target_realisasi_bulanan[12]['volume'] : '' ?></td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[12]['realisasi']) ? $data_target_realisasi_bulanan[12]['realisasi'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[12]['capaian']) ? $data_target_realisasi_bulanan[12]['capaian'] : '' ?></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo !empty($data_target_realisasi_bulanan[12]['keterangan']) ? $data_target_realisasi_bulanan[12]['keterangan'] : '' ?></td>
 								</tr>
 								<tr style="background-color:#FDFFB6;">
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">TW 4</td>
@@ -1461,6 +1491,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($renaksi['ni
 		window.hak_akses_user_pegawai = <?php echo $hak_akses_user_pegawai; ?>;
 		window.text_pesan = '<?php echo $text_pesan; ?>';
 		window.data_changed = false;
+		window.get_data_bulanan_message = '<?php echo $get_bulanan_message; ?>';
 
 		if (statusWpsipd) {
 			loadRkaWpSipd(tahunAnggaran, kodeSbl, idIndikator);
@@ -1521,6 +1552,10 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($renaksi['ni
 			jQuery('.rincian_rka').attr('title', text_pesan);
 			jQuery('.rincian_manual').attr('title', text_pesan);
 			alert(text_pesan);
+		}
+
+		if(get_data_bulanan_message != '-'){
+			alert(get_data_bulanan_message);
 		}
 
 	});

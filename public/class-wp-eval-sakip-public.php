@@ -422,6 +422,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/homepage/wp-eval-sakip-homepage-cascading.php';
 	}
 
+	public function view_cascading_publish($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/homepage/wp-eval-sakip-homepage-view-cascading.php';
+	}
+
 	public function mapping_skpd()
 	{
 		global $wpdb;
@@ -768,33 +777,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					  AND tahun_anggaran=%d
 			", $nama_dokumen, $tahun_anggaran));
 		}
-
-		$hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
-		return $hak_akses_user;
-	}
-
-	public function hak_akses_upload_dokumen_renstra($nama_dokumen)
-	{
-		global $wpdb;
-		$current_user = wp_get_current_user();
-		$user_roles = $current_user->roles;
-		$is_administrator = in_array('administrator', $user_roles);
-
-		$admin_role_pemda = array(
-			'admin_bappeda',
-			'admin_ortala'
-		);
-
-		$this_jenis_role = (array_intersect($admin_role_pemda, $user_roles)) ? 1 : 2;
-
-		$cek_settingan_menu = $wpdb->get_var($wpdb->prepare("
-	    	SELECT 
-	        	jenis_role
-	      	FROM esakip_menu_dokumen 
-	      	WHERE nama_dokumen=%s
-	      		AND user_role='perangkat_daerah' 
-	      		AND active = 1
-	    ", $nama_dokumen));
 
 		$hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
 		return $hak_akses_user;
@@ -7857,7 +7839,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
 								}
 							}
-							// if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen_renstra('RENSTRA')) {
 							if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('RENSTRA', $id_jadwal)) {
 								if (!$status_integrasi_esr) {
 									if ($can_verify && $draft === true) {
@@ -27509,16 +27490,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 									foreach ($data_esr as $key => $esr) {
 										if ($esr->dokumen_id == $mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']) {
-											// $esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM " . $nama_tabel . " WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
-
-											// if (!empty($esr_lokal)) {
-											// 	$wpdb->update($nama_tabel, [
-											// 		'path_esr' => $esr->path
-											// 	], [
-											// 		'id' => $esr_lokal['id']
-											// 	]);
-											// }
-
 											$path = explode("/", $esr->path);
 											$nama_file = end($path);
 											$array_data_esr[] = [
@@ -27661,9 +27632,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$btn = '<div class="btn-action-group">';
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-						// if($can_verify){
-						// 	$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
-						// }
 						if ($_prefix_tipe == "_pemda") {
 							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_pohon_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_pohon_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
@@ -30796,7 +30764,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						<div class="card-header text-center font-weight-bold">Menu Informasi</div>
 						<div class="card-body text-center">
 							<div class="mb-3">
-								<select id="tahun-select" class="form-control w-50 mx-auto">';
+								<select id="tahun-select" class="form-control w-25 mx-auto text-center">';
 
 		foreach ($tahun_values as $tahun) {
 			$selected = ($tahun == $default_tahun) ? 'selected' : '';
@@ -30843,9 +30811,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	{
 		global $wpdb;
 		$ret = array(
-			'status'  => 'success',
-			'message' => 'Berhasil get data pokin publish!',
-			'data' 	  => array()
+			'status'  	  => 'success',
+			'message' 	  => 'Berhasil get data pokin publish!',
+			'data' 	  	  => array(),
+			'data_pemda'  => array()
 		);
 		$pohon_kinerja_pemda_level_1 = $wpdb->get_results(
 			$wpdb->prepare("
@@ -30948,112 +30917,130 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
-	function get_datatable_cascading_publish()
+	function get_datatable_cascading_publish() 
 	{
 		global $wpdb;
-		$ret = array(
-			'status'  => 'success',
-			'message' => 'Berhasil get data cascading publish!',
-			'data' 	  => array()
+		
+		$ret = [
+			'status'      => 'success',
+			'message'     => 'Berhasil mendapatkan data cascading publish!',
+			'data'        => '',
+			'data_pemda'  => ''
+		];
+	
+		// Ambil data tujuan tanpa id_unik_indikator
+		$get_tujuan = $wpdb->get_results("
+				SELECT * 
+				FROM esakip_rpd_tujuan 
+				WHERE id_unik_indikator IS NULL 
+				  AND active = 1
+			", ARRAY_A
 		);
-		$pohon_kinerja_pemda_level_1 = $wpdb->get_results(
+	
+		if (!empty($get_tujuan)) {
+			$tbody_pemda = '';
+			$counter = 1;
+			
+			foreach ($get_tujuan as $tujuan) {
+				$tbody_pemda .= "<tr>
+					<td class='text-center'>{$counter}</td>
+					<td>{$tujuan['nama_cascading']}</td>
+					<td>{$tujuan['tujuan_teks']}</td>
+					<td class='text-center'>
+						<button class='btn btn-sm btn-info' onclick='view_cascading(\"{$tujuan['id']}\"); return false;' title='View'>
+							<span class='dashicons dashicons-visibility'></span>
+						</button>
+					</td>
+				</tr>";
+				$counter++;
+			}
+			
+			$ret['data_pemda'] = $tbody_pemda;
+		}
+	
+		$tahun_anggaran = isset($_POST['tahun_anggaran']) ? intval($_POST['tahun_anggaran']) : 0;
+		//jadwal rpjmd
+		$id_jadwal = isset($_POST['id_jadwal']) ? intval($_POST['id_jadwal']) : 0;
+	
+		$all_skpd = $wpdb->get_results(
 			$wpdb->prepare("
 				SELECT 
-					id,
-					label
-				FROM esakip_pohon_kinerja 
-				WHERE parent = 0 
-					AND level = 1 
-					AND active = 1 
-					AND id_jadwal = %d 
-				ORDER BY nomor_urut
-			", $_POST['id_jadwal']),
-			ARRAY_A
-		);
-		
-		$tbody_pemda = '';
-		$no = 1;
-		foreach ($pohon_kinerja_pemda_level_1 as $v) {
-			$pohon_kinerja_pemda_page = $this->functions->generatePage(array(
-				'nama_page'   => 'Pohon Kinerja Pemerintah Daerah',
-				'content' 	  => '[view_pohon_kinerja]',
-				'show_header' => 1,
-				'post_status' => 'publish'
-			));
-
-			$tbody_pemda .= '<tr>';
-			$tbody_pemda .= '<td class="text-center">' . $no++ . '</td>';
-			$tbody_pemda .= '<td class="text-left"><a href="'.$pohon_kinerja_pemda_page['url'].'&id='.$v['id'].'&id_jadwal='.$_POST['id_jadwal'].'" target="_blank">'.$v['label'].'</a></td>';
-			$tbody_pemda .= '</tr>';
-		}
-
-		$all_skpd = $wpdb->get_results(
-			$wpdb->prepare('
-				SELECT 
-					id_skpd,
+					id_skpd, 
 					nama_skpd, 
 					kode_skpd 
 				FROM esakip_data_unit 
 				WHERE active = 1 
-					AND is_skpd = 1 
-					AND tahun_anggaran = %d
+				  AND is_skpd = 1 
+				  AND tahun_anggaran = %d 
 				ORDER BY kode_skpd ASC
-			', $_POST['tahun_anggaran']),
+			", $tahun_anggaran),
+			ARRAY_A
+		);
+				
+		if (!empty($_POST['id_jadwal_wp_sipd'])) {
+			$tbody = '';
+			$no_opd = 1;
+			foreach ($all_skpd as $skpd) {
+				$cascading_publish_page = $this->functions->generatePage([
+					'nama_page'   => 'Cascading ' . $skpd['nama_skpd'],
+					'content'     => '[view_cascading_publish]',
+					'show_header' => 1,
+					'post_status' => 'publish'
+				]);
+			
+				$url = $cascading_publish_page['url'] . '&id_skpd=' . $skpd['id_skpd'] . '&id_jadwal=' . $_POST['id_jadwal_wp_sipd'];
+			
+				$btn = "<button type='button' class='btn btn-info' title='Lihat Cascading " . htmlspecialchars($skpd['nama_skpd']) . "' onclick='window.open(\"{$url}\", \"_blank\");'>
+					<span class='dashicons dashicons-visibility'></span>
+				</button>";
+			
+				$tbody .= "<tr>
+					<td class='text-center'>{$no_opd}</td>
+					<td class='text-left'>{$skpd['nama_skpd']}</td>
+					<td class='text-center'>{$btn}</td>
+				</tr>";
+			
+				$no_opd++;
+			}
+			$ret['data'] = $tbody;
+		}
+				
+		die(json_encode($ret));
+	}
+	
+	function get_rpjmd_by_tahun($tahun_anggaran) 
+	{
+		global $wpdb;
+
+		$data = $wpdb->get_var(
+			$wpdb->prepare("
+				SELECT 
+					id_jadwal_rpjmd
+				FROM esakip_pengaturan_upload_dokumen
+				WHERE tahun_anggaran = %d
+				  AND active = 1
+			", $tahun_anggaran)
+		);
+
+		return $data;
+	}
+
+	function get_renstra_by_rpjmd_tahun($id_jadwal_rpjmd, $tahun_anggaran) 
+	{
+		global $wpdb;
+
+		$data = $wpdb->get_row(
+			$wpdb->prepare('
+				SELECT
+					*
+				FROM esakip_pengaturan_rencana_aksi
+				WHERE id_jadwal = %d
+				  AND tahun_anggaran = %d
+				  AND active = 1
+			', $id_jadwal_rpjmd, $tahun_anggaran),
 			ARRAY_A
 		);
 
-		$tbody = '';
-		$no_opd = 1;
-		foreach ($all_skpd as $vv) {
-			$tbody .= '<tr>';
-			$tbody .= '<td class="text-center">' . $no_opd++ . '</td>';
-			$tbody .= '<td class="text-left">' . $vv['nama_skpd'] . '</td>';
-			
-			$pohon_kinerja_level_1 = $wpdb->get_results(
-				$wpdb->prepare("
-					SELECT 
-						id,
-						label 
-					FROM esakip_pohon_kinerja_opd 
-					WHERE parent=0 
-						AND level=1 
-						AND active=1 
-						AND id_jadwal = %d 
-						AND id_skpd = %d
-					ORDER BY nomor_urut ASC
-				", $_POST['id_jadwal'], $vv['id_skpd']),
-				ARRAY_A
-			);
-		
-			if (!empty($pohon_kinerja_level_1)) {
-				$Pohon_kinerja_opd_page = $this->functions->generatePage(array(
-					'nama_page'    => 'Pohon Kinerja ' . $vv['nama_skpd'],
-					'content'      => '[view_pohon_kinerja_opd periode=' . $_POST['id_jadwal'] . ']',
-					'show_header'  => 1,
-					'post_status'  => 'publish'
-				));
-				$Pohon_kinerja_opd_page['url'] .= '&id_skpd=' . $vv['id_skpd'];
-			
-				$tbody .= '<td><ol>';
-				
-				foreach ($pohon_kinerja_level_1 as $pohon) {
-					$tbody .= '<li>
-									<a href="' . $Pohon_kinerja_opd_page['url'] . '&id=' . $pohon['id'] . '&id_jadwal=' . $_POST['id_jadwal'] . '" target="_blank">
-										' . $pohon['label'] . '
-									</a>
-								</li>';
-				}
-			
-				$tbody .= '</ol></td>';
-			} else {
-				$tbody .= '<td>-</td>';
-			}
-			
-		
-			$tbody .= '</tr>';
-		}				
-		$ret['data'] = $tbody;
-		$ret['data_pemda'] = $tbody_pemda;
-		die(json_encode($ret));
+		return $data;
 	}
 }

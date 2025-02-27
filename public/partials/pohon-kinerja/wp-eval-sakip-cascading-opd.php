@@ -484,7 +484,6 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
             type: 'POST',
             data: {
                 action: 'get_table_cascading_pd',
-                api_key: esakip.api_key,
                 id_jadwal: <?php echo $input['periode']; ?>,
                 id_skpd: <?php echo $id_skpd; ?>
             },
@@ -529,7 +528,6 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                 type: 'POST',
                 data: {
                     action: 'get_kegiatan_by_program',
-                    api_key: esakip.api_key,
                     id: id,
                     id_skpd: <?php echo $id_skpd; ?>,
                     tujuan: tujuan,

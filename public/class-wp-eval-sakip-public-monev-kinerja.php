@@ -6626,7 +6626,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
     }
 
 	
-	function get_data_perbulan_ekinerja($tahun = null, $satker_id = null, $nip = null, $id_indikator = null)
+	function get_data_perbulan_ekinerja($opsi_param = array())
 	{
 		global $wpdb;
 		$ret = array(
@@ -6644,20 +6644,28 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				throw new Exception("Pengaturan Status API E-Kinerja ditutup!", 1);
 			}
 
-			if (empty($tahun)) {
+			if(get_option('_crb_input_renaksi') != 1){
+				throw new Exception("Pengaturan Rencana Aksi Bulanan dan realisasi Triwulan Secara Manual!", 1);
+			}
+
+			if (empty($opsi_param['tahun'])) {
 				throw new Exception("Tahun anggaran kosong!", 1);
 			}
 
-			if (empty($satker_id)) {
+			if (empty($opsi_param['satker_id'])) {
 				throw new Exception("Satker id kosong!", 1);
 			}
 
-			if (empty($nip)) {
+			if (empty($opsi_param['nip'])) {
 				throw new Exception("NIP kosong!", 1);
 			}
 
-			if (empty($id_indikator)) {
+			if (empty($opsi_param['id_indikator'])) {
 				throw new Exception("Id Indikator kosong!", 1);
+			}
+
+			if (empty($opsi_param['id_skpd'])) {
+				throw new Exception("Id Perangkat Daerah kosong!", 1);
 			}
 
 			$response = wp_remote_post(get_option('_crb_url_api_ekinerja') . 'dev/api/kinerjarhk', [
@@ -6665,8 +6673,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					'X-api-key' => get_option('_crb_api_key_ekinerja'),
 				),
 				'body' => array(
-					'tahun' => $tahun,
-					'satker_id' => $satker_id,
+					'tahun' => $opsi_param['tahun'],
+					'satker_id' => $opsi_param['satker_id'],
+					'nip' => $opsi_param['nip']
 				)
 			]);
 
@@ -6686,16 +6695,87 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			if($data_ekin['status']){
 				if(!empty($data_ekin['data'])){
 					foreach($data_ekin['data'] as $k_ekin => $v_ekin){
-						if($v_ekin['nip'] != $nip){
-							continue;
-						}
+						if(!empty($v_ekin['rencana_hasil_kerja'])){
+							foreach ($v_ekin['rencana_hasil_kerja'] as $k_rhk => $v_rhk) {
+								if($opsi_param['tipe'] == 'indikator'){
+									if($v_rhk['rhk_id'] != $opsi_param['id_rhk']){
+										continue;
+									}
+								}
 
-						// if(!empty($v_ekin->rencana_hasil_kerja)){
-						// 	foreach ($v_ekin->rencana_hasil_kerja as $k_rhk => $v_rhk) {
-						// 		if($v_rhk->)
-						// 	}
-						// }
-						$ret['data'][] = $v_ekin;
+								if(!empty($v_rhk['indikator'])){
+									foreach ($v_rhk['indikator'] as $k_indikator => $v_indikator) {
+										if($opsi_param['tipe'] == 'indikator'){
+											if($v_indikator['indikator_rhk_id'] != $opsi_param['id_indikator']){
+												continue;
+											}
+										}
+
+										if(!empty($v_indikator['kinerja_bulan'])){
+											foreach ($v_indikator['kinerja_bulan'] as $k_k_bulan => $v_k_bulan) {
+												if(!empty($v_k_bulan['kinerja'])){
+													$data_option = array(
+														'id_indikator_renaksi_opd' => $v_indikator['indikator_rhk_id'],
+														'id_skpd' => $opsi_param['id_skpd'],
+														'bulan' => $v_k_bulan['bulan'],
+														'volume' => $v_k_bulan['kinerja'][0]['target_kuantitas'],
+														'rencana_aksi' => $v_k_bulan['kinerja'][0]['kegiatan'],
+														'satuan_bulan' => $v_k_bulan['kinerja'][0]['satuan'],
+														'realisasi' => $v_k_bulan['kinerja'][0]['realisasi_kuantitas'],
+														'keterangan' => $v_k_bulan['kinerja'][0]['catatan'],
+														'capaian' => $v_k_bulan['kinerja'][0]['capaian_kuantitas'],
+														'tahun_anggaran' => $opsi_param['tahun'],
+														'active' => 1,
+														'created_at' => current_time('mysql'),
+													);
+			
+													$cek_id_indikator = $wpdb->get_var($wpdb->prepare(
+														"SELECT
+															id
+														FROM
+															esakip_data_rencana_aksi_indikator_opd
+														WHERE
+															id=%d
+															AND id_renaksi=%d
+															AND tahun_anggaran=%d
+															AND id_skpd=%d
+															AND active=1",
+														$v_indikator['indikator_rhk_id'], $v_rhk['rhk_id'], $opsi_param['tahun'], $opsi_param['id_skpd']
+													));
+			
+													if(!empty($cek_id_indikator)){
+														// Cek apakah data sudah ada
+														$cek_id = $wpdb->get_var($wpdb->prepare("
+															SELECT id 
+															FROM esakip_data_bulanan_rencana_aksi_opd
+															WHERE active = 1
+																AND id_indikator_renaksi_opd = %d
+																AND tahun_anggaran = %d
+																AND id_skpd = %d
+																AND bulan = %d
+														", $v_indikator['indikator_rhk_id'], $opsi_param['tahun'], $opsi_param['id_skpd'], $v_k_bulan['bulan']));
+
+														if (empty($cek_id)) {
+															$wpdb->insert('esakip_data_bulanan_rencana_aksi_opd', $data_option);
+															$ret['message'] = "Berhasil simpan target dan realisasi bulanan dari data Aplikasi E-Kinerja!";
+														} else {
+															$wpdb->update(
+																'esakip_data_bulanan_rencana_aksi_opd',
+																$data_option,
+																array('id' => $cek_id)
+															);
+															$ret['message'] = "Berhasil update target dan realisasi bulanan dari data Aplikasi E-Kinerja!";
+														}
+													}else{
+														throw new Exception("Indikator Tidak Ditemukan!", 1);
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
 					}
 				}else{
 					throw new Exception("Respone API Kosong!", 1);
