@@ -5017,19 +5017,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'message' => 'Gagal menyimpan data ke database!'
 							);
 						} else {
-							$current_user = wp_get_current_user();
-							$wpdb->insert(
-							    'esakip_dokumen_jadwal_esr',
-							    array( 
-							        'id_skpd' => $idSkpd,  
-							        'id_jadwal' => $id_jadwal,  
-							        'nama_tabel' => 'esakip_renstra',  
-							        'tahun_anggaran' => date('Y'),   
-							        'id_dokumen' => $wpdb->insert_id,  
-							        'created_at' => current_time('mysql')
-							    ),
-							    array('%s', '%s', '%s', '%s', '%d')
-							);
+						    $current_user = wp_get_current_user();
+							$id_dokumen = $wpdb->insert_id; 
+
+						    $wpdb->insert(
+						        'esakip_dokumen_jadwal_esr',
+						        array( 
+						            'id_skpd' => $idSkpd,  
+						            'id_jadwal' => $id_jadwal,  
+						            'nama_tabel' => 'esakip_renstra',  
+						            'tahun_anggaran' => date('Y'),   
+						            'id_dokumen' => $id_dokumen,  
+						            'created_at' => current_time('mysql')
+						        ),
+						        array('%s', '%s', '%s', '%s', '%d')
+						    );
 
 							if (!$wpdb->insert_id) {
 							    error_log("Error inserting into esakip_dokumen_jadwal_esr: " . $wpdb->last_error);
@@ -5040,29 +5042,30 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							}
 
 							$cek_langsung_verifikasi = $wpdb->get_var($wpdb->prepare('
-								SELECT 
-									default_verifikasi_upload
-								FROM esakip_data_jadwal
-								WHERE id=%d
-									AND status != 0
-							', $id_jadwal));
+			                    SELECT 
+			                        default_verifikasi_upload
+			                    FROM esakip_data_jadwal
+			                    WHERE tipe="verifikasi_upload_dokumen"
+			                        AND tahun_anggaran=%d
+			                        AND status != 0
+			                ', date('Y')));
 
 							if (!empty($cek_langsung_verifikasi)) {
 								if ($cek_langsung_verifikasi == 1) {
 									$wpdb->insert(
-										'esakip_keterangan_verifikator',
-										array(
-											'id_dokumen' => $wpdb->insert_id,
-											'status_verifikasi' => 1,
-											'active' => 1,
-											'user_id' => $current_user->ID,
-											'id_skpd' => $idSkpd,
-											'id_jadwal' => $id_jadwal,
-											'created_at' => current_time('mysql'),
-											'nama_tabel_dokumen' => 'esakip_renstra'
-										),
-										array('%d', '%d', '%d', '%d', '%d', '%d', '%s', '%s')
-									);
+								        'esakip_keterangan_verifikator',
+								        array( 
+								            'id_skpd' => $idSkpd,  
+								            'id_jadwal' => $id_jadwal,  
+								            'nama_tabel_dokumen' => 'esakip_renstra',  
+								            'user_id' => $current_user->ID,
+								            'status_verifikasi' => 1,
+								            'active' => 1,
+								            'id_dokumen' => $id_dokumen,
+								            'created_at' => current_time('mysql')
+								        ),
+								        array('%s', '%s', '%s', '%s', '%s', '%s', '%d')
+								    );
 
 									if (!$wpdb->insert_id) {
 										error_log("Error inserting into esakip_keterangan_verifikator: " . $wpdb->last_error);
@@ -5074,19 +5077,19 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								}
 							} else {
 								$wpdb->insert(
-									'esakip_keterangan_verifikator',
-									array(
-										'id_dokumen' => $wpdb->insert_id,
-										'status_verifikasi' => 3,
-										'active' => 1,
-										'user_id' => $current_user->ID,
-										'id_skpd' => $idSkpd,
-										'id_jadwal' => $id_jadwal,
-										'created_at' => current_time('mysql'),
-										'nama_tabel_dokumen' => 'esakip_renstra'
-									),
-									array('%d', '%d', '%d', '%d', '%d', '%d', '%s', '%s')
-								);
+							        'esakip_keterangan_verifikator',
+							        array( 
+							            'id_skpd' => $idSkpd,  
+							            'id_jadwal' => $id_jadwal,  
+							            'nama_tabel_dokumen' => 'esakip_renstra',  
+							            'user_id' => $current_user->ID,
+							            'status_verifikasi' => 3,
+							            'active' => 1,
+							            'id_dokumen' => $id_dokumen,  
+							            'created_at' => current_time('mysql')
+							        ),
+							        array('%s', '%s', '%s', '%s', '%s', '%s', '%d')
+							    );
 
 								if (!$wpdb->insert_id) {
 									error_log("Error inserting into esakip_keterangan_verifikator: " . $wpdb->last_error);
@@ -5501,7 +5504,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -5513,7 +5516,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Keterangan Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -5751,7 +5754,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -5763,7 +5766,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Keterangan Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -6009,7 +6012,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -6021,7 +6024,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Keterangan Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -6318,7 +6321,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -6330,7 +6333,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Keterangan Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -6554,7 +6557,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -6566,7 +6569,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Keterangan Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -6770,7 +6773,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -6782,7 +6785,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Keterangan Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -7407,7 +7410,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -7419,7 +7422,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Keterangan Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -7795,7 +7798,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -7807,7 +7810,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Keterangan Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -8046,7 +8049,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -8058,7 +8061,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Keterangan Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -8284,7 +8287,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										$tbody .= "<td class='text-center'>
 										    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
 
-										if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+										if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 										    $tbody .= "
 										        <div style='margin-top: 5px;'>
 										            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -8296,7 +8299,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										$tbody .= "<td class='text-center'>
 										    <a href='#' class='btn btn-sm btn-warning'>Keterangan Ada</a>";
 
-										if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+										if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 										    $tbody .= "
 										        <div style='margin-top: 5px;'>
 										            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -8524,7 +8527,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										$tbody .= "<td class='text-center'>
 										    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
 
-										if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+										if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 										    $tbody .= "
 										        <div style='margin-top: 5px;'>
 										            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -8536,7 +8539,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										$tbody .= "<td class='text-center'>
 										    <a href='#' class='btn btn-sm btn-warning'>Keterangan Ada</a>";
 
-										if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+										if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 										    $tbody .= "
 										        <div style='margin-top: 5px;'>
 										            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -14520,7 +14523,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -14532,7 +14535,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Keterangan Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -16869,7 +16872,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -16881,7 +16884,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Keterangan Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -23782,7 +23785,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -23794,7 +23797,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Keterangan Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -24906,7 +24909,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -24918,7 +24921,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Keterangan Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -27624,7 +27627,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -27636,7 +27639,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Keterangan Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -27666,8 +27669,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_pohon_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 						} else if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Pohon Kinerja dan Cascading', $id_jadwal)) {
 							if (!$status_integrasi_esr) {
-								$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_iku(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
-								$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_iku(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+								$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_pohon_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
+								$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_pohon_kinerja(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 							}
 						}
 						$btn .= '</div>';
@@ -30327,7 +30330,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
@@ -30339,7 +30342,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "<td class='text-center'>
 									    <a href='#' class='btn btn-sm btn-warning'>Keterangan Ada</a>";
 
-									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3) { 
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
 									        <div style='margin-top: 5px;'>
 									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
