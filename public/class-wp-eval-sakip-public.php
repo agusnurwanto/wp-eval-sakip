@@ -30764,7 +30764,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						<div class="card-header text-center font-weight-bold">Menu Informasi</div>
 						<div class="card-body text-center">
 							<div class="mb-3">
-								<select id="tahun-select" class="form-control w-25 mx-auto text-center">';
+								Pilih Tahun :
+								<select id="tahun-select" class="text-center">';
 
 		foreach ($tahun_values as $tahun) {
 			$selected = ($tahun == $default_tahun) ? 'selected' : '';
@@ -30773,7 +30774,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		$output .= '</select>
 							</div>
-							<h3 id="tahun-terpilih" class="font-weight-bold">Tahun Anggaran Terpilih: <span class="text-primary">' . $default_tahun . '</span></h3>
+							<h1 id="tahun-terpilih" class="font-weight-bold">Tahun Anggaran : <span class="text-primary">' . $default_tahun . '</span></h1>
 							<div class="row">';
 
 		foreach ($data as $nama => $item) {
@@ -30794,7 +30795,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				select.addEventListener("change", function() {
 					let selectedYear = this.value;
-					document.getElementById("tahun-terpilih").innerHTML = "Tahun Anggaran Terpilih: <span class=\"text-primary\">" + selectedYear + "</span>";
+					document.getElementById("tahun-terpilih").innerHTML = "Tahun Anggaran : <span class=\"text-primary\">" + selectedYear + "</span>";
 
 					links.forEach(link => {
 						let baseUrl = link.getAttribute("data-base-url");

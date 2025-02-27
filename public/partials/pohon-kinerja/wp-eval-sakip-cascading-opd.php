@@ -212,6 +212,10 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
             height: auto !important;
         }
 
+        @page {
+            size: landscape;
+        }
+
         #action-sakip,
         .site-header,
         .site-footer,

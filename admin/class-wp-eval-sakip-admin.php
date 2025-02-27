@@ -1476,18 +1476,12 @@ class Wp_Eval_Sakip_Admin
 
 		Container::make('theme_options', __('Tampilan Beranda'))
 			->set_page_parent($basic_options_container)
-			->add_tab(__('Logo'), array(
-				Field::make('image', 'crb_menu_logo_dashboard', __('Gambar Logo'))
-					->set_value_type('url')
-					->set_default_value('https://via.placeholder.com/135x25'),
-				Field::make('textarea', 'crb_judul_header', __('Judul'))
-					->set_default_value('SI-KESATRIA<br>Sistem Informasi Kinerja, Evaluasi, Reviu dan Akuntabilitas'),
-			))
-			->add_tab(__('Icon & Menu'), array(
+			->add_tab(__('Ikon & Menu'), array(
 				Field::make('image', 'crb_icon_pohon_kinerja', __('Icon Pohon Kinerja'))
 					->set_value_type('url'),
 				Field::make('image', 'crb_icon_cascading', __('Icon Cascading'))
 					->set_value_type('url')
+					->set_help_text('Tampilan Beranda dapat diaktifkan melalui shortcode [menu_depan].')
 			));
 
 		$dokumen_pemda_menu = Container::make('theme_options', __('Dokumen Pemda'))

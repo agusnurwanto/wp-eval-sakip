@@ -86,7 +86,7 @@ if (empty($tahun_renstra_wp_sipd['id_jadwal_wp_sipd'])) {
         </h3>
     </div>
 
-    <div class="d-flex flex-column align-items-center">
+    <div>
         <!-- Error Message -->
         <?php if (!empty($error_message) && is_array($error_message)) : ?>
             <div class="alert alert-danger mt-3 hide_print">
@@ -96,8 +96,8 @@ if (empty($tahun_renstra_wp_sipd['id_jadwal_wp_sipd'])) {
             </div>
         <?php endif; ?>
 
-        <div class="card shadow-lg p-3 mb-4 w-90 hide_print">
-            <h5 class="text-center m-2">Pemerintah Daerah</h5>
+        <div class="hide_print">
+            <h2 class="text-center m-2">Pemerintah Daerah</h2>
             <table id="tableDataPemda" class="table table-bordered">
                 <thead>
                     <tr>
@@ -117,8 +117,8 @@ if (empty($tahun_renstra_wp_sipd['id_jadwal_wp_sipd'])) {
             </div>
         </div>
 
-        <div class="card shadow-lg p-3 mb-4 w-90 hide_print">
-            <h5 class="text-center m-2">Perangkat Daerah</h5>
+        <div class="hide_print">
+            <h2 class="text-center m-2">Perangkat Daerah</h2>
             <table id="tableDataOpd" class="table table-bordered">
                 <thead>
                     <tr>

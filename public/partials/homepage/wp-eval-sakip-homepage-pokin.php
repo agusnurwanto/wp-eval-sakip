@@ -22,13 +22,14 @@ $jadwal_rpjmd = $wpdb->get_row(
         FROM esakip_data_jadwal
         WHERE id = %d
           AND status != 0
-    ", $id_jadwal_rpjmd), //ganti
+    ", $id_jadwal_rpjmd),
     ARRAY_A
 );
 if (empty($jadwal_rpjmd)) {
     die('Jadwal RPJMD/RENSTRA terbuka tidak tersedia!');
 }
 ?>
+
 <body>
     <div class="mb-5 text-center hide_print">
         <h1 class="fw-bold my-4">Pohon Kinerja</h1>
@@ -39,37 +40,32 @@ if (empty($jadwal_rpjmd)) {
             ( <?php echo $jadwal_rpjmd['tahun_anggaran'] . ' - ' . $jadwal_rpjmd['tahun_selesai_anggaran']; ?> )
         </h3>
     </div>
-
-    <div class="d-flex flex-lg-column align-items-center card-container">
-        <div class="card shadow-lg p-3 mb-4 w-90">
-            <h5 class="text-center m-2">Pemerintah Daerah</h5>
-            <div class="table-container">
-                <table id="tableDataPemda" class="table table-bordered wrap-table">
-                    <thead>
-                        <tr>
-                            <th class="text-center" style="width: 30px;">No</th>
-                            <th class="text-center">Pokin Level 1</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+    <div>
+        <h2 class="text-center m-2">Pemerintah Daerah</h2>
+        <div class="table-container">
+            <table id="tableDataPemda" class="table table-bordered wrap-table">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width: 30px;">No</th>
+                        <th class="text-center">Pohon Kinerja Level 1</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
 
-        <div class="card shadow-lg p-3 mb-4 w-90">
-            <h5 class="text-center m-2">Perangkat Daerah</h5>
-            <div class="table-container">
-                <table id="tableDataOpd" class="table table-bordered wrap-table">
-                    <thead>
-                        <tr>
-                            <th class="text-center" style="width: 30px;">No</th>
-                            <th class="text-center">Perangkat Daerah</th>
-                            <th class="text-center">Pokin Level 1</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+        <h2 class="text-center m-2">Perangkat Daerah</h2>
+        <div class="table-container">
+            <table id="tableDataOpd" class="table table-bordered wrap-table">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width: 30px;">No</th>
+                        <th class="text-center">Perangkat Daerah</th>
+                        <th class="text-center">Pohon Kinerja Level 1</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
     </div>
 </body>

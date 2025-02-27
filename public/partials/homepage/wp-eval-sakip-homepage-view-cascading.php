@@ -225,7 +225,12 @@ $get_satker = $wpdb->get_results(
             height: auto !important;
         }
 
+        @page {
+            size: landscape;
+        }
+
         #action-sakip,
+        .hide_print,
         .site-header,
         .site-footer,
         #ast-scroll-top {
@@ -275,7 +280,7 @@ $get_satker = $wpdb->get_results(
 <!-- Table -->
 <div class="container-md" id="container-table-cascading">
     <div class="cetak">
-        <div class="mb-5 text-center hide_print">
+        <div class="mb-5 text-center">
             <h1 class="fw-bold my-4">Cascading</h1>
             <h2 class="fw-semibold text-uppercase mb-2">
                 <?php echo $skpd['nama_skpd']; ?>
