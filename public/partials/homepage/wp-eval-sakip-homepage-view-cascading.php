@@ -90,7 +90,7 @@ $get_satker = $wpdb->get_results(
         WHERE u.tahun_anggaran = %d
           AND u.id_skpd = %d
           AND u.active = 1
-    ', $tahun_anggaran_sakip, $id_skpd), 
+    ', $tahun_anggaran_sakip, $id_skpd),
     ARRAY_A
 );
 ?>
@@ -275,12 +275,22 @@ $get_satker = $wpdb->get_results(
 <!-- Table -->
 <div class="container-md" id="container-table-cascading">
     <div class="cetak">
-        <div style="padding: 10px; margin: 0 0 3rem 0;">
-            <h1 class="text-center">CASCADING <br><?php echo $skpd['nama_skpd']; ?><br><?php echo $nama_jadwal; ?></h1>
-            <div id="action-sakip" class="action-section text-center">
-                <a style="margin-right: 10px;" onclick="window.print();" href="#" class="btn btn-success"><i class="dashicons dashicons-printer"></i> CETAK / PRINT</a>
+        <div class="mb-5 text-center hide_print">
+            <h1 class="fw-bold my-4">Cascading</h1>
+            <h2 class="fw-semibold text-uppercase mb-2">
+                <?php echo $skpd['nama_skpd']; ?>
+            </h2>
+            <h3 class="fw-medium text-muted fst-italic">
+                <?php echo $nama_jadwal; ?>
+            </h3>
+
+            <div class="mt-3" id="action-sakip">
+                <a onclick="window.print();" href="#" class="btn btn-info">
+                    <span class="dashicons dashicons-printer"></span> Cetak
+                </a>
             </div>
         </div>
+
         <div style="overflow-x: auto; max-width: 100%;">
             <table id="tabel-cascading" style="min-width: 600px;">
                 <tbody>

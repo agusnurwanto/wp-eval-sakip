@@ -30956,6 +30956,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	
 		$tahun_anggaran = isset($_POST['tahun_anggaran']) ? intval($_POST['tahun_anggaran']) : 0;
+		//jadwal rpjmd
 		$id_jadwal = isset($_POST['id_jadwal']) ? intval($_POST['id_jadwal']) : 0;
 	
 		$all_skpd = $wpdb->get_results(
@@ -31004,8 +31005,24 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 	
+	function get_rpjmd_by_tahun($tahun_anggaran) 
+	{
+		global $wpdb;
 
-	function get_tahun_renstra_esakip($id_jadwal_rpjmd, $tahun_anggaran) 
+		$data = $wpdb->get_var(
+			$wpdb->prepare("
+				SELECT 
+					id_jadwal_rpjmd
+				FROM esakip_pengaturan_upload_dokumen
+				WHERE tahun_anggaran = %d
+				  AND active = 1
+			", $tahun_anggaran)
+		);
+
+		return $data;
+	}
+
+	function get_renstra_by_rpjmd_tahun($id_jadwal_rpjmd, $tahun_anggaran) 
 	{
 		global $wpdb;
 

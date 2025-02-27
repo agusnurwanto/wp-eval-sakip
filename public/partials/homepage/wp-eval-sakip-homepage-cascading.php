@@ -9,6 +9,7 @@ if (empty($_GET) && empty($_GET['tahun'])) {
 global $wpdb;
 $tahun_anggaran = intval($_GET['tahun']);
 
+$id_jadwal_rpjmd = $this->get_rpjmd_by_tahun($tahun_anggaran);
 $jadwal_rpjmd = $wpdb->get_row(
     $wpdb->prepare("
         SELECT 
@@ -19,18 +20,16 @@ $jadwal_rpjmd = $wpdb->get_row(
             lama_pelaksanaan,
             tahun_selesai_anggaran
         FROM esakip_data_jadwal
-        WHERE tipe = %s
-          AND status = %d
-          AND tahun_anggaran <= %d
-          AND tahun_selesai_anggaran >= %d
-    ", 'RPJMD', 1, $tahun_anggaran, $tahun_anggaran), //ganti
+        WHERE id = %d
+          AND status != 0
+    ", $id_jadwal_rpjmd), //ganti
     ARRAY_A
 );
 if (empty($jadwal_rpjmd)) {
     die('Jadwal RPJMD/RENSTRA terbuka tidak tersedia!');
 }
 $error_message = array();
-$tahun_renstra_wp_sipd = $this->get_tahun_renstra_esakip($jadwal_rpjmd['id'], $tahun_anggaran);
+$tahun_renstra_wp_sipd = $this->get_renstra_by_rpjmd_tahun($jadwal_rpjmd['id'], $tahun_anggaran);
 if (empty($tahun_renstra_wp_sipd['id_jadwal_wp_sipd'])) {
     $tahun_renstra_wp_sipd['id_jadwal_wp_sipd'] = 0;
     array_push($error_message, 'Jadwal RENSTRA belum diset, Mohon hubungi admin!');
