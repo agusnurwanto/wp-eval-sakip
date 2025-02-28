@@ -30754,19 +30754,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$data = [
 			'Pohon Kinerja' => [
 				'url' 	=> $page_pohon_kinerja_publish['url'],
-				'icon' 	=> get_option('_crb_icon_pohon_kinerja')
+				'icon' 	=> get_option('_crb_icon_pohon_kinerja'),
+				'size' => get_option('_crb_icon_size')
 			],
 			'Cascading' => [
 				'url' 	=> $page_cascading_publish['url'], 
-				'icon' 	=> get_option('_crb_icon_cascading')
+				'icon' 	=> get_option('_crb_icon_cascading'),
+				'size' => get_option('_crb_icon_size')
 			]
 		];
 
 		$output = '<div class="container mt-3">
-					<div class="card shadow-sm">
-						<div class="card-header text-center font-weight-bold">Menu Informasi</div>
+					<div class="card shadow-sm" style="background-color: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border-radius: 10px; padding: 20px; border: none;">
+    					<div class="card-header text-center text-white font-weight-bold" style="background: transparent; border-bottom: none;">Menu Informasi</div>
 						<div class="card-body text-center">
-							<div class="mb-3">
+							<div class="mb-3 font-weight-bold text-white">
 								Pilih Tahun :
 								<select id="tahun-select" class="text-center">';
 
@@ -30777,14 +30779,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		$output .= '</select>
 							</div>
-							<h1 id="tahun-terpilih" class="font-weight-bold">Tahun Anggaran : <span class="text-primary">' . $default_tahun . '</span></h1>
+							<h1 id="tahun-terpilih" class="font-weight-bold text-white">Tahun Anggaran : <span class="text-warning">' . $default_tahun . '</span></h1>
 							<div class="row">';
 
 		foreach ($data as $nama => $item) {
 			$output .= '<div class="col-md-6">
 							<a href="'.$item['url'].'&tahun='.$default_tahun.'" class="d-block text-decoration-none nav-link-icon" data-base-url="'.$item['url'].'" target="_blank">
-								<img src="'.$item['icon'].'" alt="'.$nama.'" class="img-fluid" style="width: 150px;">
-								<p class="mt-2 font-weight-bold">'.$nama.'</p>
+								<img src="'.$item['icon'].'" alt="'.$nama.'" class="img-fluid" style="width: ' . $item['size'] . 'px;">
+								<p class="mt-2 font-weight-bold text-white">'.$nama.'</p>
 							</a>
 						</div>';
 		}
@@ -30798,7 +30800,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				select.addEventListener("change", function() {
 					let selectedYear = this.value;
-					document.getElementById("tahun-terpilih").innerHTML = "Tahun Anggaran : <span class=\"text-primary\">" + selectedYear + "</span>";
+					document.getElementById("tahun-terpilih").innerHTML = "Tahun Anggaran : <span class=\"text-warning\">" + selectedYear + "</span>";
 
 					links.forEach(link => {
 						let baseUrl = link.getAttribute("data-base-url");

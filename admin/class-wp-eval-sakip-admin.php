@@ -1477,11 +1477,18 @@ class Wp_Eval_Sakip_Admin
 		Container::make('theme_options', __('Tampilan Beranda'))
 			->set_page_parent($basic_options_container)
 			->add_tab(__('Ikon & Menu'), array(
-				Field::make('image', 'crb_icon_pohon_kinerja', __('Icon Pohon Kinerja'))
-					->set_value_type('url'),
-				Field::make('image', 'crb_icon_cascading', __('Icon Cascading'))
+				Field::make('image', 'crb_icon_pohon_kinerja', __('Ikon Pohon Kinerja'))
 					->set_value_type('url')
-					->set_help_text('Tampilan Beranda dapat diaktifkan melalui shortcode [menu_depan].')
+					->set_help_text('Upload ikon untuk Pohon Kinerja.'),
+
+				Field::make('image', 'crb_icon_cascading', __('Ikon Cascading'))
+					->set_value_type('url')
+					->set_help_text('Upload ikon untuk Cascading.'),
+
+				Field::make('text', 'crb_icon_size', __('Ukuran Ikon (px)'))
+					->set_attribute('type', 'number')
+					->set_default_value(150)
+					->set_help_text('Tentukan ukuran ikon dalam pixel. Contoh: 150 (default). Pastikan nilai yang dimasukkan adalah angka.')
 			));
 
 		$dokumen_pemda_menu = Container::make('theme_options', __('Dokumen Pemda'))
