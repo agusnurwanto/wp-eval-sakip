@@ -1065,6 +1065,7 @@ if(!empty($get_data_bulanan)){
 								<tr style="background-color:#FDFFB6;">
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Triwulan 1</td>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
 									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['target_1']; ?></td>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
@@ -1099,6 +1100,7 @@ if(!empty($get_data_bulanan)){
 								</tr>
 								<tr style="background-color:#FDFFB6;">
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Triwulan 2</td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
 									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['target_2']; ?></td>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
@@ -1135,6 +1137,7 @@ if(!empty($get_data_bulanan)){
 								<tr style="background-color:#FDFFB6;">
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Triwulan 3</td>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
 									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['target_3']; ?></td>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
@@ -1170,6 +1173,7 @@ if(!empty($get_data_bulanan)){
 								<tr style="background-color:#FDFFB6;">
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Triwulan 4</td>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
 									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $ind_renaksi['target_4']; ?></td>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
@@ -1177,6 +1181,7 @@ if(!empty($get_data_bulanan)){
 								</tr>
 								<tr style="background-color:#FDFFB6;">
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">Total</td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
 									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
