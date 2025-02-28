@@ -19812,27 +19812,30 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		// cek hak akses user pegawai simpeg | cek apakah dia kepala atau bukan
 		$user_nip = get_user_meta($user_id, '_nip') ?: get_user_meta($user_id, 'nip');
-		$data_user_pegawai = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT
-					nip_baru,
-					nama_pegawai,
-					satker_id,
-					tipe_pegawai_id,
-					plt_plh,
-					tmt_sk_plth,
-					berakhir
-				FROM 
-					esakip_data_pegawai_simpeg
-				WHERE
-					nip_baru=%s
-					AND active=%d
-				ORDER BY satker_id ASC, tipe_pegawai_id ASC",
-				$user_nip[0],
-				1
-			),
-			ARRAY_A
-		);
+		$data_user_pegawai = array();
+		if(!empty($user_nip) && !empty($user_nip[0])){
+			$data_user_pegawai = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT
+						nip_baru,
+						nama_pegawai,
+						satker_id,
+						tipe_pegawai_id,
+						plt_plh,
+						tmt_sk_plth,
+						berakhir
+					FROM 
+						esakip_data_pegawai_simpeg
+					WHERE
+						nip_baru=%s
+						AND active=%d
+					ORDER BY satker_id ASC, tipe_pegawai_id ASC",
+					$user_nip[0],
+					1
+				),
+				ARRAY_A
+			);
+		}
 
 		$skpd_user_pegawai = array();
 		$tahun_skpd = get_option('_crb_tahun_wpsipd');

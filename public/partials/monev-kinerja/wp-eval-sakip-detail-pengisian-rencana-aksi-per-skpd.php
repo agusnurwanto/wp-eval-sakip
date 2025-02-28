@@ -62,23 +62,23 @@ $admin_role_pemda = array(
     'admin_ortala'
 );
 
-$this_jenis_role = (array_intersect($admin_role_pemda, $user_roles)) ? 1 : 2;
+$this_admin_pemda = (array_intersect($admin_role_pemda, $user_roles)) ? 1 : 2;
 
-$cek_settingan_menu = $wpdb->get_var(
-    $wpdb->prepare(
-        "SELECT 
-        jenis_role
-    FROM esakip_menu_dokumen 
-    WHERE nama_dokumen='Rencana Aksi'
-      AND user_role='perangkat_daerah' 
-      AND active = 1
-      AND tahun_anggaran=%d
-",
-        $input['tahun']
-    )
-);
+// $cek_settingan_menu = $wpdb->get_var(
+//     $wpdb->prepare(
+//         "SELECT 
+//         jenis_role
+//     FROM esakip_menu_dokumen 
+//     WHERE nama_dokumen='Rencana Aksi'
+//       AND user_role='perangkat_daerah' 
+//       AND active = 1
+//       AND tahun_anggaran=%d
+// ",
+//         $input['tahun']
+//     )
+// );
 
-$hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
+// $hak_akses_user = ($cek_settingan_menu == $this_admin_pemda || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
 
 // hak akses user pegawai
 $data_user_pegawai = $wpdb->get_results(
@@ -156,7 +156,7 @@ if (!empty($data_user_pegawai)) {
     }
 }
 
-if ($is_administrator) {
+if ($is_administrator || $this_admin_pemda == 1) {
     $hak_akses_user_pegawai = 1;
     $nip_user_pegawai = 0;
 }else{
@@ -355,7 +355,7 @@ foreach ($get_pegawai as $pegawai) {
                     </tbody>
                 </table>
             </div>
-            <?php if (!$is_admin_panrb && $hak_akses_user): ?>
+            <?php if (!$is_admin_panrb && $hak_akses_user_pegawai != 0): ?>
                 <div id="action" class="action-section hide-excel"></div>
             <?php endif; ?>
             <div class="wrap-table">
@@ -1520,7 +1520,7 @@ foreach ($get_pegawai as $pegawai) {
                                     `<thead>` +
                                     `<tr class="table-secondary">` +
                                     `<th class="text-center">Bulan/TW</th>` +
-                                    `<th class="text-center">Rencana Hasil Kerja</th>` +
+                                    `<th class="text-center">Rencana Aksi</th>` +
                                     `<th class="text-center" style="width:100px;">Target</th>` +
                                     `<th class="text-center" style="width:100px;">Satuan</th>` +
                                     `<th class="text-center" style="width:150px;">Realisasi</th>` +
@@ -1561,7 +1561,7 @@ foreach ($get_pegawai as $pegawai) {
                                         var triwulan = (bulan_index + 1) / 3;
                                         kegiatanUtama += '' +
                                             `<tr style="background: #FDFFB6;">` +
-                                            `<td class="text-center">triwulan ${triwulan}</td>` +
+                                            `<td class="text-center">Triwulan ${triwulan}</td>` +
                                             `<td class="text-center">${b.indikator}</td>` +
                                             `<td class="text-center">${b['target_' + triwulan]}</td>` +
                                             `<td class="text-center">${b.satuan}</td>` +
@@ -2725,7 +2725,7 @@ foreach ($get_pegawai as $pegawai) {
                                     `<thead>` +
                                     `<tr class="table-secondary">` +
                                     `<th class="text-center">Bulan/TW</th>` +
-                                    `<th class="text-center">Rencana Hasil Kerja</th>` +
+                                    `<th class="text-center">Rencana Aksi</th>` +
                                     `<th class="text-center" style="width:100px;">Target</th>` +
                                     `<th class="text-center" style="width:100px;">Satuan</th>` +
                                     `<th class="text-center" style="width:150px;">Realisasi</th>` +
@@ -2765,7 +2765,7 @@ foreach ($get_pegawai as $pegawai) {
                                         var triwulan = (bulan_index + 1) / 3;
                                         renaksi += '' +
                                             `<tr style="background: #FDFFB6;">` +
-                                            `<td class="text-center">triwulan ${triwulan}</td>` +
+                                            `<td class="text-center">Triwulan ${triwulan}</td>` +
                                             `<td class="text-center">${b.indikator}</td>` +
                                             `<td class="text-center">${b['target_' + triwulan]}</td>` +
                                             `<td class="text-center">${b.satuan}</td>` +
@@ -3973,6 +3973,35 @@ foreach ($get_pegawai as $pegawai) {
                 jQuery('#wrap-loading').hide();
                 console.error('Gagal mengambil data:', error);
                 alert('Terjadi kesalahan saat mengambil data pegawai.');
+            }
+        });
+    }
+    
+    function get_data_target_bulanan(id_indikator) {
+        jQuery('#wrap-loading').show();
+
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'get_data_target_bulanan_ekinerja',
+                api_key: esakip.api_key,
+                id_indikator: id_indikator,
+                tahun_anggaran: <?php echo $input['tahun']; ?>,
+                id_skpd: <?php echo $id_skpd; ?>,
+            },
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+
+                if (response.status === 'success') {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error('Gagal mengambil data:', error);
+                alert('Terjadi kesalahan saat mengambil data target bulanan E-Kinerja.');
             }
         });
     }

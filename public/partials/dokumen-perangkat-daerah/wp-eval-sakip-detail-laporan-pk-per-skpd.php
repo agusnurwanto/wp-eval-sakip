@@ -283,6 +283,14 @@ $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
 $user_nip = $current_user->data->user_login;
 $is_administrator = in_array('administrator', $user_roles);
+$is_admin_panrb = in_array('admin_panrb', $user_roles);
+
+$admin_role_pemda = array(
+    'admin_bappeda',
+    'admin_ortala'
+);
+
+$this_admin_pemda = (array_intersect($admin_role_pemda, $user_roles)) ? 1 : 2;
 
 // hak akses user pegawai
 $data_user_pegawai = $wpdb->get_results(
@@ -349,12 +357,14 @@ if (!empty($data_user_pegawai)) {
                 $hak_akses_user_pegawai = 2;
             }
             $nip_user_pegawai = $v_user['nip_baru'];
-            $hak_akses_user_pegawai_per_skpd[$skpd_user_pegawai['id_skpd']] = $hak_akses_user_pegawai;
+            if(empty($hak_akses_user_pegawai_per_skpd[$skpd_user_pegawai['id_skpd']])){
+                $hak_akses_user_pegawai_per_skpd[$skpd_user_pegawai['id_skpd']] = $hak_akses_user_pegawai;
+            }
         }
     }
 }
 
-if ($is_administrator) {
+if ($is_administrator || $this_admin_pemda == 1) {
     $hak_akses_user_pegawai = 1;
     $nip_user_pegawai = 0;
 }else{

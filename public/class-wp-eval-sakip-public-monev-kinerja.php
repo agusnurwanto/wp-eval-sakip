@@ -6631,7 +6631,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		global $wpdb;
 		$ret = array(
 			'status' => true,
-			'message' => 'Berhasil get data E-Kinerja!',
+			'message' => 'Tidak Ada Update Data Dari Aplikasi E-Kinerja!',
 			'data' => array(),
 		);
 
@@ -6656,12 +6656,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				throw new Exception("Satker id kosong!", 1);
 			}
 
-			if (empty($opsi_param['nip'])) {
-				throw new Exception("NIP kosong!", 1);
-			}
-
-			if (empty($opsi_param['id_indikator'])) {
-				throw new Exception("Id Indikator kosong!", 1);
+			if($opsi_param['tipe'] == 'indikator'){
+				if (empty($opsi_param['nip'])) {
+					throw new Exception("NIP kosong!", 1);
+				}
+				
+				if (empty($opsi_param['id_indikator'])) {
+					throw new Exception("Id Indikator kosong!", 1);
+				}
 			}
 
 			if (empty($opsi_param['id_skpd'])) {
@@ -6766,8 +6768,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 															);
 															$ret['message'] = "Berhasil update target dan realisasi bulanan dari data Aplikasi E-Kinerja!";
 														}
-													}else{
-														throw new Exception("Indikator Tidak Ditemukan!", 1);
 													}
 												}
 											}
@@ -6784,12 +6784,104 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				throw new Exception("Message: ".$data_ekin['message'], 1);
 			}
 		} catch (Exception $e) {
-			$ret = json_encode([
+			$ret = array(
 				'status'  => false,
 				'message' => $e->getMessage()
-			]);
+			);
 		}
 		return json_encode($ret);
+	}
+
+	function get_data_target_bulanan_ekinerja(){
+		global $wpdb;
+		
+	    $ret = array(
+	        'status'  => 'success',
+	        'message' => 'Berhasil Mengambil Data Target Bulanan Dari Aplikasi E-Kinerja!'
+	    );
+
+	    if (!empty($_POST)) {
+	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+	            if (empty($_POST['id_indikator'])) {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Id Indikator Kosong!';
+	            }else if (empty($_POST['tahun_anggaran'])) {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Tahun Anggaran Kosong!';
+	            }else if (empty($_POST['id_skpd'])) {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Id Skpd Kosong!';
+	            }
+
+				$id_indikator = $_POST['id_indikator'];
+				$tahun_anggaran = $_POST['tahun_anggaran'];
+				$id_skpd = $_POST['id_skpd'];
+
+				if($ret['status'] == 'success'){
+					$data_indikator = $wpdb->get_row(
+						$wpdb->prepare(
+							"SELECT 
+								* 
+							FROM 
+								esakip_data_rencana_aksi_indikator_opd 
+							WHERE 
+								id = %d 
+								 AND tahun_anggaran = %d 
+								 AND id_skpd = %d
+								 AND active = 1
+							", $id_indikator, $tahun_anggaran, $id_skpd
+						), ARRAY_A
+					);
+
+					if(!empty($data_indikator)){
+						$data_rhk = $wpdb->get_row(
+							$wpdb->prepare(
+								"SELECT
+									*
+								FROM
+									esakip_data_rencana_aksi_opd
+								WHERE
+									id=%d
+									AND tahun_anggaran=%d
+									AND id_skpd=%d
+									AND active=1
+								", $data_indikator['id_renaksi'], $data_indikator['tahun_anggaran'], $data_indikator['id_skpd']
+							), ARRAY_A
+						);
+
+						if(!empty($data_rhk) && !empty($data_rhk['satker_id']) && !empty($data_rhk['nip'])){
+							$opsi_param = array(
+								'tahun' => $data_indikator['tahun_anggaran'],
+								'satker_id' => $data_rhk['satker_id'],
+								'nip' => $data_rhk['nip'],
+								'id_indikator' => $data_indikator['id'],
+								'id_rhk' => $data_indikator['id_renaksi'],
+								'id_skpd' => $data_indikator['id_skpd'],
+								'tipe' => 'indikator'
+							);
+	
+							$data_ekin = $this->get_data_perbulan_ekinerja($opsi_param);
+							$data_ekin_terbaru = json_decode($data_ekin, true);
+							$ret['message'] = $data_ekin_terbaru['message'];
+						}else{
+							$ret['status'] = 'error';
+							$ret['message'] = 'Data Rencana Hasil Kerja Belum Tertagging Dengan Pegawai!';
+						}
+					}else{
+						$ret['status'] = 'error';
+	                	$ret['message'] = 'Data Indikator Tidak Ditemukan!';
+					}
+				}
+	        } else {
+	            $ret['status'] = 'error';
+	            $ret['message'] = 'API key tidak ditemukan!';
+	        }
+	    } else {
+	        $ret['status'] = 'error';
+	        $ret['message'] = 'Format salah!';
+	    }
+	    die(json_encode($ret));
+
 	}
 
 	function simpan_finalisasi_iku_pemda()
