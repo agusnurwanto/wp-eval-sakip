@@ -113,8 +113,8 @@ $data_temp = [''];
     </div>
 </div>
 
-<div id="view_cascading">
-    <div id="cetak" title="Laporan Pohon Kinerja" style="padding: 5px; overflow: auto; height: 100vh;">
+<div>
+    <div id="cetak" title="Laporan Cascading" style="padding: 5px; overflow: auto;">
         <div id="chart_div"></div>
     </div>
 </div>
@@ -154,34 +154,6 @@ $data_temp = [''];
 
     });
 
-    function getDataChart() {
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: 'POST',
-            data: {
-                action: 'get_chart_cascading',
-                api_key: esakip.api_key,
-                id_jadwal: <?php echo $input['periode']; ?>,
-            },
-            dataType: 'json',
-            success: function(response) {
-                jQuery('#wrap-loading').hide();
-                console.log(response);
-                if (response.status === 'success') {
-                    jQuery('#table_dokumen_cascading tbody').html(response.data);
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                jQuery('#wrap-loading').hide();
-                console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data!');
-            }
-        });
-    }
-
     function getTableCascading() {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
@@ -189,7 +161,6 @@ $data_temp = [''];
             type: 'POST',
             data: {
                 action: 'get_table_cascading',
-                api_key: esakip.api_key,
                 id_jadwal: <?php echo $input['periode']; ?>,
             },
             dataType: 'json',

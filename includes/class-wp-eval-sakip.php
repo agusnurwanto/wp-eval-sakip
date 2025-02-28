@@ -283,7 +283,9 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_edit_finalisasi_iku', $plugin_public, 'edit_finalisasi_iku');
 		
 		$this->loader->add_action('wp_ajax_get_table_cascading_pd', $plugin_public, 'get_table_cascading_pd');
+		$this->loader->add_action('wp_ajax_nopriv_get_table_cascading_pd', $plugin_public, 'get_table_cascading_pd');
 		$this->loader->add_action('wp_ajax_get_kegiatan_by_program', $plugin_public, 'get_kegiatan_by_program');
+		$this->loader->add_action('wp_ajax_nopriv_get_kegiatan_by_program', $plugin_public, 'get_kegiatan_by_program');
 		$this->loader->add_action('wp_ajax_get_tujuan_cascading', $plugin_public, 'get_tujuan_cascading');
 		$this->loader->add_action('wp_ajax_get_sasaran_cascading', $plugin_public, 'get_sasaran_cascading');
 		$this->loader->add_action('wp_ajax_get_program_cascading', $plugin_public, 'get_program_cascading');
@@ -551,6 +553,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_edit_cascading_pemda',  $plugin_public, 'edit_cascading_pemda');
 		$this->loader->add_action('wp_ajax_submit_edit_cascading',  $plugin_public, 'submit_edit_cascading');
 		$this->loader->add_action('wp_ajax_view_cascading_pemda',  $plugin_public, 'view_cascading_pemda');
+		$this->loader->add_action('wp_ajax_nopriv_view_cascading_pemda',  $plugin_public, 'view_cascading_pemda');
 
 		$this->loader->add_action('wp_ajax_get_table_crosscutting_pemda',  $plugin_public, 'get_table_crosscutting_pemda');
 		$this->loader->add_action('wp_ajax_edit_crosscutting_pemda_tujuan',  $plugin_public, 'edit_crosscutting_pemda_tujuan');
@@ -671,7 +674,10 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_tambah_dokumen_tl_lhe_akip_internal',  $plugin_public, 'tambah_dokumen_tl_lhe_akip_internal');
 		$this->loader->add_action('wp_ajax_get_detail_tl_lhe_akip_internal_by_id',  $plugin_public, 'get_detail_tl_lhe_akip_internal_by_id');
 		
+		$this->loader->add_action('wp_ajax_get_datatable_cascading_publish',  $plugin_public, 'get_datatable_cascading_publish');
+		$this->loader->add_action('wp_ajax_nopriv_get_datatable_cascading_publish',  $plugin_public, 'get_datatable_cascading_publish');
 		$this->loader->add_action('wp_ajax_get_datatable_pokin_publish',  $plugin_public, 'get_datatable_pokin_publish');
+		$this->loader->add_action('wp_ajax_nopriv_get_datatable_pokin_publish',  $plugin_public, 'get_datatable_pokin_publish');
 
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
@@ -747,6 +753,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('menu_depan', array($plugin_public, 'menu_depan'));
 		add_shortcode('pohon_kinerja_publish', array($plugin_public, 'pohon_kinerja_publish'));
 		add_shortcode('cascading_publish', array($plugin_public, 'cascading_publish'));
+		add_shortcode('view_cascading_publish', array($plugin_public, 'view_cascading_publish'));
 		
 		add_shortcode('menu_eval_sakip', array($plugin_public, 'menu_eval_sakip'));
 		add_shortcode('penyusunan_pohon_kinerja',array($plugin_public,'penyusunan_pohon_kinerja'));
