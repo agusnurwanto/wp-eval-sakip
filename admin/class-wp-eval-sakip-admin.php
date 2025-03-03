@@ -1343,6 +1343,12 @@ class Wp_Eval_Sakip_Admin
 			$halaman_monitor_upload_dokumen .= '<li><a target="_blank" href="' . $monitor_upload_dokumen['url'] . '" class="btn btn-primary">Laporan Monitor Upload Dokumen Tahun ' . $v['tahun_anggaran'] . ' </a></li>';
 		}
 
+		$url_api = get_option('_crb_url_api_esr');
+		$url_testing_esr = "";
+		if(!empty($url_api)){
+			$url_testing_esr = '(<b> '. $url_api . 'get_user_id | Content-Type: application/json; charset=utf-8 | Authorization: Basic ' . base64_encode(get_option('_crb_username_api_esr') . ':' . get_option('_crb_password_api_esr')).' </b>)';
+		}
+
 		$basic_options_container = Container::make('theme_options', __('E-SAKIP Options'))
 			->set_page_menu_position(3)
 			->add_fields(array(
@@ -1403,7 +1409,7 @@ class Wp_Eval_Sakip_Admin
 					->set_default_value('1')
 					->set_help_text('Digunakan untuk mengunci atau membuka akses untuk kirim dokumen ke aplikasi ESR Menpan RB'),
 				Field::make('text', 'crb_url_api_esr', 'Url API ESR')
-					->set_help_text('Wajib diisi. URL integrasi dokumen ke API ESR'),
+					->set_help_text('Wajib diisi. URL integrasi dokumen ke API ESR. '.$url_testing_esr),
 				Field::make('text', 'crb_username_api_esr', 'Username API ESR')
 					->set_help_text('Wajib diisi. Auth Type : Basic Auth dengan Username yang digunakan untuk integrasi dokumen ke API ESR'),
 				Field::make('text', 'crb_password_api_esr', 'Password API ESR')
@@ -1477,11 +1483,18 @@ class Wp_Eval_Sakip_Admin
 		Container::make('theme_options', __('Tampilan Beranda'))
 			->set_page_parent($basic_options_container)
 			->add_tab(__('Ikon & Menu'), array(
-				Field::make('image', 'crb_icon_pohon_kinerja', __('Icon Pohon Kinerja'))
-					->set_value_type('url'),
-				Field::make('image', 'crb_icon_cascading', __('Icon Cascading'))
+				Field::make('image', 'crb_icon_pohon_kinerja', __('Ikon Pohon Kinerja'))
 					->set_value_type('url')
-					->set_help_text('Tampilan Beranda dapat diaktifkan melalui shortcode [menu_depan].')
+					->set_help_text('Upload ikon untuk Pohon Kinerja.'),
+
+				Field::make('image', 'crb_icon_cascading', __('Ikon Cascading'))
+					->set_value_type('url')
+					->set_help_text('Upload ikon untuk Cascading.'),
+
+				Field::make('text', 'crb_icon_size', __('Ukuran Ikon (px)'))
+					->set_attribute('type', 'number')
+					->set_default_value(150)
+					->set_help_text('Tentukan ukuran ikon dalam pixel. Contoh: 150 (default). Pastikan nilai yang dimasukkan adalah angka.')
 			));
 
 		$dokumen_pemda_menu = Container::make('theme_options', __('Dokumen Pemda'))
