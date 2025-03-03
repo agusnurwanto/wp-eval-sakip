@@ -266,6 +266,28 @@ $select_pegawai = '<option value="">Pilih Pegawai Pelaksana</option>';
 foreach ($get_pegawai as $pegawai) {
     $select_pegawai .= '<option value="' . $pegawai['nip_baru'] . '" satker-id="' . $pegawai['satker_id'] . '">' . $pegawai['jabatan'] . ' | ' . $pegawai['nip_baru'] . ' | ' . $pegawai['nama_pegawai'] . '</option>';
 }
+
+// ----- get data e-kin perbulan ----- //
+$satker_id_pegawai_indikator = $get_mapping;
+$satker_id_pegawai_indikator_string = "'". $get_mapping ."'";
+$tahun = $input['tahun'];
+$show_alert_bulanan = 0;
+$get_bulanan_message = "-";
+if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
+	$opsi_param = array(
+		'tahun' => $tahun,
+        'satker_id' => $satker_id_pegawai_indikator,
+		'id_skpd' => $id_skpd,
+		'tipe' => 'satker'
+	);
+
+	$data_ekin = $this->get_data_perbulan_ekinerja($opsi_param);
+	$data_ekin_terbaru = json_decode($data_ekin, true);
+	$get_bulanan_message = $data_ekin_terbaru['message'];
+	if(!empty($data_ekin_terbaru['is_error']) && $data_ekin_terbaru['is_error']){
+		$show_alert_bulanan = 1;
+	}
+}
 ?>
 <style type="text/css">
     .wrap-table {
@@ -561,6 +583,8 @@ foreach ($get_pegawai as $pegawai) {
         run_download_excel_sakip();
         window.hak_akses_pegawai = <?php echo $hak_akses_user_pegawai; ?>;
         window.nip_pegawai = <?php echo $nip_user_pegawai; ?>;
+        window.get_data_bulanan_message = '<?php echo $get_bulanan_message; ?>';
+		window.show_alert_bulanan = '<?php echo $show_alert_bulanan; ?>';
 
         if (hak_akses_pegawai != 0) {
             jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-rencana-aksi" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
@@ -586,7 +610,13 @@ foreach ($get_pegawai as $pegawai) {
 
         jQuery("#tambah-rencana-aksi").on('click', function() {
             kegiatanUtama();
+            get_data_target_realisasi_bulanan();
         });
+
+        if(get_data_bulanan_message != '-' && show_alert_bulanan == 1){
+			alert(get_data_bulanan_message);
+		}
+		console.log(get_data_bulanan_message)
 
     });
     jQuery(document).on('click', '.verifikasi-renaksi-pemda', function() {
@@ -3976,10 +4006,8 @@ foreach ($get_pegawai as $pegawai) {
             }
         });
     }
-    
-    function get_data_target_bulanan(id_indikator) {
-        jQuery('#wrap-loading').show();
 
+    function get_data_target_realisasi_bulanan() {
         jQuery.ajax({
             url: esakip.url,
             type: 'POST',
@@ -3987,21 +4015,23 @@ foreach ($get_pegawai as $pegawai) {
             data: {
                 action: 'get_data_target_bulanan_ekinerja',
                 api_key: esakip.api_key,
-                id_indikator: id_indikator,
-                tahun_anggaran: <?php echo $input['tahun']; ?>,
-                id_skpd: <?php echo $id_skpd; ?>,
+                tahun: <?php echo $tahun; ?>,
+                satker_id: <?php echo $satker_id_pegawai_indikator_string; ?>,
+		        id_skpd: <?php echo $id_skpd; ?>,
+		        tipe: 'satker'
             },
             success: function(response) {
-                jQuery('#wrap-loading').hide();
-
-                if (response.status === 'success') {
-                    alert(response.message);
+                if (response.status == 'success') {
+                    if(response.show_alert_bulanan == 1 && response.message != '-'){
+                        alert(response.message);
+                    }
+                    console.log(response.message);
                 }
             },
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error('Gagal mengambil data:', error);
-                alert('Terjadi kesalahan saat mengambil data target bulanan E-Kinerja.');
+                alert('Terjadi kesalahan saat mengambil data target realisasi bulanan!.');
             }
         });
     }

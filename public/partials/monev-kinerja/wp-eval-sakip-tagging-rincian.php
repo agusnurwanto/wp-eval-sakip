@@ -597,7 +597,8 @@ if(!empty($renaksi) && !empty($renaksi['satker_id'])){
 }
 
 // ----- get data e-kin perbulan ----- //
-$get_bulanan_message = "-";
+$get_bulanan_message = "Parameter Data Get Data Target Bulanan Ada Yang Kosong!";
+$show_alert_bulanan = 0;
 if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($renaksi['nip']) && !empty($ind_renaksi['id'])){
 	$opsi_param = array(
 		'tahun' => $tahun,
@@ -612,6 +613,9 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($renaksi['ni
 	$data_ekin = $this->get_data_perbulan_ekinerja($opsi_param);
 	$data_ekin_terbaru = json_decode($data_ekin, true);
 	$get_bulanan_message = $data_ekin_terbaru['message'];
+	if(!empty($data_ekin_terbaru['is_error']) && $data_ekin_terbaru['is_error']){
+		$show_alert_bulanan = 1;
+	}
 }
 
 $data_target_realisasi_bulanan = array();
@@ -1025,13 +1029,13 @@ if(!empty($get_data_bulanan)){
 						<table>
 							<thead style="background-color: #bde0fe; color: #212529;">
 								<tr>
-									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Bulan/TW</th>
+									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 130px;">Bulan/TW</th>
 									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Rencana Aksi</th>
-									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Target</th>
-									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Satuan</th>
-									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Realisasi</th>
-									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Capaian</th>
-									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Tanggapan Atasan</th>
+									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 120px;">Target</th>
+									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 120px;">Satuan</th>
+									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 120px;">Realisasi</th>
+									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 140px;">Capaian</th>
+									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 240px;">Tanggapan Atasan</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -1510,6 +1514,7 @@ if(!empty($get_data_bulanan)){
 		window.text_pesan = '<?php echo $text_pesan; ?>';
 		window.data_changed = false;
 		window.get_data_bulanan_message = '<?php echo $get_bulanan_message; ?>';
+		window.show_alert_bulanan = '<?php echo $show_alert_bulanan; ?>';
 
 		if (statusWpsipd) {
 			loadRkaWpSipd(tahunAnggaran, kodeSbl, idIndikator);
@@ -1572,10 +1577,11 @@ if(!empty($get_data_bulanan)){
 			alert(text_pesan);
 		}
 
-		if(get_data_bulanan_message != '-'){
+		if(get_data_bulanan_message != '-' && show_alert_bulanan == 1){
 			alert(get_data_bulanan_message);
 		}
-
+		console.log(get_data_bulanan_message)
+;
 	});
 
 	function loadRkaWpSipd(tahunAnggaran, kodeSbl, idIndikator) {
