@@ -30780,7 +30780,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		$output .= '</select>
 							</div>
-							<h1 id="tahun-terpilih" class="font-weight-bold text-white">Tahun Anggaran : <span class="text-warning">' . $default_tahun . '</span></h1>
+							<h1 id="tahun-terpilih" class="font-weight-bold text-white mb-5">Tahun Anggaran : <span class="text-warning">' . $default_tahun . '</span></h1>
 							<div class="row">';
 
 		foreach ($data as $nama => $item) {
