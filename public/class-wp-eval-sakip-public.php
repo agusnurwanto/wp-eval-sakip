@@ -30768,11 +30768,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		$output = '<div class="container mt-3">
 					<div class="card shadow-sm" style="background-color: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border-radius: 10px; padding: 20px; border: none;">
-    					<div class="card-header text-center text-white font-weight-bold" style="background: transparent; border-bottom: none;">Menu Informasi</div>
 						<div class="card-body text-center">
 							<div class="mb-3 font-weight-bold text-white">
 								Pilih Tahun :
-								<select id="tahun-select" class="text-center">';
+								<select id="tahun-select" class="text-center" style="width : 100px">';
 
 		foreach ($tahun_values as $tahun) {
 			$selected = ($tahun == $default_tahun) ? 'selected' : '';

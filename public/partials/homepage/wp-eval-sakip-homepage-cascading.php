@@ -77,16 +77,13 @@ if (empty($tahun_renstra_wp_sipd['id_jadwal_wp_sipd'])) {
 
 <body>
     <div class="mb-5 text-center hide_print">
-        <h1 class="fw-bold my-4">Cascading</h1>
-        <h2 class="fw-semibold text-uppercase mb-2">
+        <h1 class="fw-bold my-4">Cascading <br>
             <?php echo $jadwal_rpjmd['nama_jadwal']; ?>
-        </h2>
-        <h3 class="text-muted fst-italic">
             ( <?php echo $jadwal_rpjmd['tahun_anggaran'] . ' - ' . $jadwal_rpjmd['tahun_selesai_anggaran']; ?> )
-        </h3>
+        </h1>
     </div>
 
-    <div>
+    <div class="p-4">
         <!-- Error Message -->
         <?php if (!empty($error_message) && is_array($error_message)) : ?>
             <div class="alert alert-danger mt-3 hide_print">
@@ -96,8 +93,8 @@ if (empty($tahun_renstra_wp_sipd['id_jadwal_wp_sipd'])) {
             </div>
         <?php endif; ?>
 
-        <div class="hide_print">
-            <h2 class="text-center m-2">Pemerintah Daerah</h2>
+        <div class="hide_print mb-5">
+            <h2 class="text-center m-2">Cascading Pemerintah Daerah</h2>
             <table id="tableDataPemda" class="table table-bordered">
                 <thead>
                     <tr>
@@ -111,14 +108,14 @@ if (empty($tahun_renstra_wp_sipd['id_jadwal_wp_sipd'])) {
             </table>
         </div>
 
-        <div id="display_chart" class="card shadow-sm p-3 mb-4 w-90" style="display: none;">
+        <div id="display_chart" class="p-3 mb-4" style="display: none;">
             <div id="cetak" title="Laporan Cascading" style="overflow: auto;">
                 <div id="chart_div"></div>
             </div>
         </div>
 
         <div class="hide_print">
-            <h2 class="text-center m-2">Perangkat Daerah</h2>
+            <h2 class="text-center m-2">Cascading Perangkat Daerah</h2>
             <table id="tableDataOpd" class="table table-bordered">
                 <thead>
                     <tr>
