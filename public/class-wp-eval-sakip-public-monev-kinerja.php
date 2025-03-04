@@ -1686,6 +1686,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$target_4_html = array();
 						$rencana_pagu_html = array();
 						$realisasi_pagu_html = array();
+						$realisasi_1_html = array();
+						$realisasi_2_html = array();
+						$realisasi_3_html = array();
+						$realisasi_4_html = array();
 
 						$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 						foreach ($v['indikator'] as $key => $ind) {
@@ -1699,6 +1703,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$target_4_html[$key] = $ind['target_4'];
 							$rencana_pagu_html[$key] = ($set_pagu_renaksi == 1) ? 0 : (!empty($ind['rencana_pagu']) ? $ind['rencana_pagu'] : 0);
 							$realisasi_pagu_html[$key] = !empty($ind['realisasi_pagu']) ? $ind['realisasi_pagu'] : 0;
+							$realisasi_1_html[$key] = !empty($ind['realisasi_tw_1']) ? $ind['realisasi_tw_1'] : 0;
+							$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
+							$realisasi_3_html[$key] = !empty($ind['realisasi_tw_3']) ? $ind['realisasi_tw_3'] : 0;
+							$realisasi_4_html[$key] = !empty($ind['realisasi_tw_4']) ? $ind['realisasi_tw_4'] : 0;
 						}
 						$indikator_html = implode('<br>', $indikator_html);
 						$satuan_html = implode('<br>', $satuan_html);
@@ -1711,6 +1719,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$rencana_pagu_html = implode('<br>', $rencana_pagu_html);
 						$realisasi_pagu_html = implode('<br>', $realisasi_pagu_html);
 						$keterangan = '';
+						$realisasi_1_html = implode('<br>', $realisasi_1_html);
+						$realisasi_2_html = implode('<br>', $realisasi_2_html);
+						$realisasi_3_html = implode('<br>', $realisasi_3_html);
+						$realisasi_4_html = implode('<br>', $realisasi_4_html);
 
 						//UPDATE PEGAWAI YANG TIDAK SESUAI SATKER UTAMA NYA
 						$satker_id_utama = substr($v['detail']['satker_id'], 0, 2);
@@ -1765,10 +1777,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							<td class="text-center target_tw3_urian_renaksi">' . $target_3_html . '</td>
 							<td class="text-center target_tw4_urian_renaksi">' . $target_4_html . '</td>
 							<td class="text-center target_akhir_urian_renaksi">' . $target_akhir_html . '</td>
-							<td class=""></td>
-							<td class=""></td>
-							<td class=""></td>
-							<td class=""></td>
+							<td class="text-center">' . $realisasi_1_html . '</td>
+							<td class="text-center">' . $realisasi_2_html . '</td>
+							<td class="text-center">' . $realisasi_3_html . '</td>
+							<td class="text-center">' . $realisasi_4_html . '</td>
 							<td class=""></td>
 							<td class="text-right">' . number_format((float)$rencana_pagu_html, 0, ",", ".") . '</td>
 							<td class=""></td>
@@ -1793,6 +1805,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$target_4_html = array();
 							$rencana_pagu_html = array();
 							$realisasi_pagu_html = array();
+							$realisasi_1_html = array();
+							$realisasi_2_html = array();
+							$realisasi_3_html = array();
+							$realisasi_4_html = array();
 							$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 							foreach ($renaksi['indikator'] as $key => $ind) {
 								$indikator_html[$key] = $ind['indikator'];
@@ -1805,6 +1821,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$target_4_html[$key] = $ind['target_4'];
 								$rencana_pagu_html[$key] = ($set_pagu_renaksi == 1) ? 0 : (!empty($ind['rencana_pagu']) ? $ind['rencana_pagu'] : 0);
 								$realisasi_pagu_html[$key] = !empty($ind['realisasi_pagu']) ? $ind['realisasi_pagu'] : 0;
+								$realisasi_1_html[$key] = !empty($ind['realisasi_tw_1']) ? $ind['realisasi_tw_1'] : 0;
+								$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
+								$realisasi_3_html[$key] = !empty($ind['realisasi_tw_3']) ? $ind['realisasi_tw_3'] : 0;
+								$realisasi_4_html[$key] = !empty($ind['realisasi_tw_4']) ? $ind['realisasi_tw_4'] : 0;
 							}
 							$indikator_html = implode('<br>', $indikator_html);
 							$satuan_html = implode('<br>', $satuan_html);
@@ -1817,6 +1837,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$rencana_pagu_html = implode('<br>', $rencana_pagu_html);
 							$realisasi_pagu_html = implode('<br>', $realisasi_pagu_html);
 							$keterangan = '';
+							$realisasi_1_html = implode('<br>', $realisasi_1_html);
+							$realisasi_2_html = implode('<br>', $realisasi_2_html);
+							$realisasi_3_html = implode('<br>', $realisasi_3_html);
+							$realisasi_4_html = implode('<br>', $realisasi_4_html);
 
 							//UPDATE PEGAWAI YANG TIDAK SESUAI SATKER UTAMA NYA
 							$satker_id_utama = substr($renaksi['detail']['satker_id'], 0, 2);
@@ -1963,10 +1987,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							        <td class="text-center target_tw3_urian_renaksi">' . $target_3_renaksi_html . '' . $target_3_html . '</td>
 							        <td class="text-center target_tw4_urian_renaksi">' . $target_4_renaksi_html . '' . $target_4_html . '</td>
 							        <td class="text-center target_akhir_urian_renaksi">' . $target_renaksi_html . '' . $target_akhir_html . '</td>
-							        <td class=""></td>
-							        <td class=""></td>
-							        <td class=""></td>
-							        <td class=""></td>
+							        <td class="text-center">' . $realisasi_1_html . '</td>
+							        <td class="text-center">' . $realisasi_2_html . '</td>
+							        <td class="text-center">' . $realisasi_3_html . '</td>
+							        <td class="text-center">' . $realisasi_4_html . '</td>
 							        <td class=""></td>
 									<td class="text-right">' . number_format((float)$rencana_pagu_html, 0, ",", ".") . '</td>
 							        <td class=""></td>
@@ -1992,6 +2016,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$target_4_html = array();
 								$rencana_pagu_html = array();
 								$realisasi_pagu_html = array();
+								$realisasi_1_html = array();
+								$realisasi_2_html = array();
+								$realisasi_3_html = array();
+								$realisasi_4_html = array();
 								$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 								foreach ($uraian_renaksi['indikator'] as $key => $ind) {
 									$indikator_html[$key] = $ind['indikator'];
@@ -2004,6 +2032,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$target_4_html[$key] = $ind['target_4'];
 									$rencana_pagu_html[$key] = ($set_pagu_renaksi == 1) ? 0 : (!empty($ind['rencana_pagu']) ? $ind['rencana_pagu'] : 0);
 									$realisasi_pagu_html[$key] = !empty($ind['realisasi_pagu']) ? $ind['realisasi_pagu'] : 0;
+									$realisasi_1_html[$key] = !empty($ind['realisasi_tw_1']) ? $ind['realisasi_tw_1'] : 0;
+									$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
+									$realisasi_3_html[$key] = !empty($ind['realisasi_tw_3']) ? $ind['realisasi_tw_3'] : 0;
+									$realisasi_4_html[$key] = !empty($ind['realisasi_tw_4']) ? $ind['realisasi_tw_4'] : 0;
 								}
 								$indikator_html = implode('<br>', $indikator_html);
 								$satuan_html = implode('<br>', $satuan_html);
@@ -2015,6 +2047,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$target_4_html = implode('<br>', $target_4_html);
 								$rencana_pagu_html = implode('<br>', $rencana_pagu_html);
 								$realisasi_pagu_html = implode('<br>', $realisasi_pagu_html);
+								$realisasi_1_html = implode('<br>', $realisasi_1_html);
+								$realisasi_2_html = implode('<br>', $realisasi_2_html);
+								$realisasi_3_html = implode('<br>', $realisasi_3_html);
+								$realisasi_4_html = implode('<br>', $realisasi_4_html);
 
 								$label_pokin = $uraian_renaksi['detail']['label_pokin_5'];
 								if (empty($label_pokin)) {
@@ -2075,10 +2111,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									<td class="text-center target_tw3_urian_renaksi">' . $target_3_html . '</td>
 									<td class="text-center target_tw4_urian_renaksi">' . $target_4_html . '</td>
 									<td class="text-center target_akhir_urian_renaksi">' . $target_akhir_html . '</td>
-									<td class=""></td>
-									<td class=""></td>
-									<td class=""></td>
-									<td class=""></td>
+									<td class="text-center">' . $realisasi_1_html . '</td>
+									<td class="text-center">' . $realisasi_2_html . '</td>
+									<td class="text-center">' . $realisasi_3_html . '</td>
+									<td class="text-center">' . $realisasi_4_html . '</td>
 									<td class=""></td>	
 									<td class="text-right">' . number_format((float)$rencana_pagu_html, 0, ",", ".") . '</td>
 									<td class=""></td>
@@ -2098,6 +2134,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$target_2_html = array();
 									$target_3_html = array();
 									$target_4_html = array();
+									$realisasi_1_html = array();
+									$realisasi_2_html = array();
+									$realisasi_3_html = array();
+									$realisasi_4_html = array();
 									$rencana_pagu_html = array();
 									$realisasi_pagu_html = array();
 									$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
@@ -2112,6 +2152,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										$target_4_html[$key] = $ind['target_4'];
 										$rencana_pagu_html[$key] = ($set_pagu_renaksi == 1) ? 0 : (!empty($ind['rencana_pagu']) ? $ind['rencana_pagu'] : 0);;
 										$realisasi_pagu_html[$key] = !empty($ind['realisasi_pagu']) ? $ind['realisasi_pagu'] : 0;
+										$realisasi_1_html[$key] = !empty($ind['realisasi_tw_1']) ? $ind['realisasi_tw_1'] : 0;
+										$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
+										$realisasi_3_html[$key] = !empty($ind['realisasi_tw_3']) ? $ind['realisasi_tw_3'] : 0;
+										$realisasi_4_html[$key] = !empty($ind['realisasi_tw_4']) ? $ind['realisasi_tw_4'] : 0;
 									}
 									$indikator_html = implode('<br>', $indikator_html);
 									$satuan_html = implode('<br>', $satuan_html);
@@ -2123,6 +2167,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$target_4_html = implode('<br>', $target_4_html);
 									$rencana_pagu_html = implode('<br>', $rencana_pagu_html);
 									$realisasi_pagu_html = implode('<br>', $realisasi_pagu_html);
+									$realisasi_1_html = implode('<br>', $realisasi_1_html);
+									$realisasi_2_html = implode('<br>', $realisasi_2_html);
+									$realisasi_3_html = implode('<br>', $realisasi_3_html);
+									$realisasi_4_html = implode('<br>', $realisasi_4_html);
 
 									$label_pokin = $uraian_teknis_kegiatan['detail']['label_pokin_5'];
 									if (empty($label_pokin)) {
@@ -2183,10 +2231,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										<td class="text-center target_tw3_urian_renaksi">' . $target_3_html . '</td>
 										<td class="text-center target_tw4_urian_renaksi">' . $target_4_html . '</td>
 										<td class="text-center target_akhir_urian_renaksi">' . $target_akhir_html . '</td>
-										<td class=""></td>
-										<td class=""></td>
-										<td class=""></td>
-										<td class=""></td>
+										<td class="text-center">' . $realisasi_1_html . '</td>
+										<td class="text-center">' . $realisasi_2_html . '</td>
+										<td class="text-center">' . $realisasi_3_html . '</td>
+										<td class="text-center">' . $realisasi_4_html . '</td>
 										<td class=""></td>
 										<td class="text-right">' . number_format((float)$rencana_pagu_html, 0, ",", ".") . '</td>
 										<td class=""></td>

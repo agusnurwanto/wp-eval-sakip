@@ -29459,12 +29459,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				$table = 'esakip_data_satker_simpeg';
 				foreach ($dataSatker as $key => $data) {
+					$nama_satker = !empty($data['nama_ortala']) ? $data['nama_ortala'] : $data['nama'];
+
 					$exists = $wpdb->get_row($wpdb->prepare("SELECT id FROM " . $table . " WHERE satker_id=%s AND active=%d AND tahun_anggaran=%d", trim($data['satker_id']), 1, $_POST['tahun_anggaran']), ARRAY_A);
 					if (!empty($exists)) {
 						$wpdb->update($table, [
 							'satker_id' => trim($data['satker_id']),
 							'satker_id_parent' => trim($data['satker_id_parent']),
-							'nama' => $data['nama'],
+							'nama' => $nama_satker,
 							'update_at' => current_time('mysql')
 						], [
 							'satker_id' => trim($data['satker_id']),
@@ -29474,7 +29476,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$wpdb->insert($table, [
 							'satker_id' => trim($data['satker_id']),
 							'satker_id_parent' => trim($data['satker_id_parent']),
-							'nama' => $data['nama'],
+							'nama' => $nama_satker,
 							'active' => 1,
 							'created_at' => current_time('mysql'),
 							'tahun_anggaran' => $_POST['tahun_anggaran'],
