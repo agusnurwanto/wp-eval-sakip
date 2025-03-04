@@ -386,3 +386,11 @@ thead {
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
+.nav-link-icon img {
+    transition: transform 0.3s ease-in-out;
+}
+
+.nav-link-icon:hover img {
+    transform: scale(1.2);
+}

@@ -30784,7 +30784,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							<div class="row">';
 
 		foreach ($data as $nama => $item) {
-			$output .= '<div class="col-md-6">
+			$output .= '<div class="col-md-6 nav-link-icon">
 							<a href="'.$item['url'].'&tahun='.$default_tahun.'" class="d-block text-decoration-none nav-link-icon" data-base-url="'.$item['url'].'" target="_blank">
 								<img src="'.$item['icon'].'" alt="'.$nama.'" class="img-fluid" style="width: ' . $item['size'] . 'px;">
 								<p class="mt-2 font-weight-bold text-white">'.$nama.'</p>
