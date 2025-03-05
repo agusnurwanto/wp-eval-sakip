@@ -394,16 +394,3 @@ thead {
 .nav-link-icon:hover img {
     transform: scale(1.2);
 }
-
-.custom-blur {
-    background: rgba(255, 255, 255, 0.2); /* Warna putih transparan */
-    backdrop-filter: blur(10px); /* Efek blur */
-    -webkit-backdrop-filter: blur(10px); /* Blur untuk Safari */
-    border-radius: 15px; /* Membuat sudut lebih lembut */
-    padding: 20px; /* Padding dalam */
-    max-width: 700px; /* Batas lebar */
-    margin: 20px auto; /* Tengah di halaman */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Bayangan lembut */
-    border: 1px solid rgba(255, 255, 255, 0.3); /* Garis transparan */
-}
-
