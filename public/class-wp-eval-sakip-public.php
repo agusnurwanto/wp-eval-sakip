@@ -19815,6 +19815,49 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$user_id = um_user('ID');
 		$user_meta = get_userdata($user_id);
 		$html = '';
+
+		//css for background
+		if (get_option('_crb_bg_menu_user')) {
+			echo '
+			<style>
+				body {
+					background-image: url("'. get_option('_crb_bg_menu_user') .'");
+					background-size: cover; 
+					background-position: center;
+					background-repeat: no-repeat;
+					background-attachment: fixed;
+					position: relative;
+					min-height: 100vh;
+				}
+		
+				/* Overlay */
+				body::before {
+					content: "";
+					position: fixed;
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+					background-color: rgba(0, 0, 0, 0.2); /* Warna hitam transparan */
+					z-index: 1; /* Pastikan overlay ada di atas background */
+				}
+		
+				/* Blur pada card */
+				.custom-blur {
+					background: rgba(255, 255, 255, 0.3); 
+					backdrop-filter: blur(10px); 
+					-webkit-backdrop-filter: blur(10px);
+					border-radius: 15px;
+					padding: 20px; 
+					max-width: 700px; 
+					margin: 20px auto; 
+					border: 1px solid rgba(255, 255, 255, 0.3); 
+					position: relative; /* Agar berada di atas overlay */
+					z-index: 2; /* Pastikan card di atas overlay */
+				}
+			</style>';
+		}		
+		
 		if (!empty($_GET) && !empty($_GET['tahun'])) {
 			echo '<h1 class="text-center">TAHUN ANGGARAN TERPILIH<br>' . $_GET['tahun'] . '</h1>';
 		}
@@ -21628,15 +21671,20 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					</div>';
 	
 					echo '
-						<h2 class="text-center">' . $skpd_db['nama_skpd'] . '</h2>
-						<ul class="daftar-menu-sakip" style="margin-bottom: 3rem;">
-							<li>' . $halaman_sakip_skpd . '</li>
-							<li>' . $halaman_lke_per_skpd . '</li>
-							<li>' . $halaman_sakip_pokin_opd . '</li>
-							<li>' . $halaman_input_renaksi . '</li>
-							<li>' . $halaman_input_iku . '</li>
-							<li>' . $halaman_laporan_pk_skpd . '</li>
-						</ul>';
+						<div class="card bg-transparent custom-blur shadow-lg shadow-lg">
+							<div class="card-body">
+								<h2 class="text-center">' . $skpd_db['nama_skpd'] . '</h2>
+								<ul class="daftar-menu-sakip mb-3">
+									<li>' . $halaman_sakip_skpd . '</li>
+									<li>' . $halaman_lke_per_skpd . '</li>
+									<li>' . $halaman_sakip_pokin_opd . '</li>
+									<li>' . $halaman_input_renaksi . '</li>
+									<li>' . $halaman_input_iku . '</li>
+									<li>' . $halaman_laporan_pk_skpd . '</li>
+								</ul>
+							</div>
+						</div>';
+
 				}
 			}
 		}
@@ -21786,13 +21834,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						</div>';
 
 						echo '
-						<h2 class="text-center" style="margin-bottom: 0;">' . $skpd_db['nama_skpd'] . '</h2>
-						<h4 class="text-center text-secondary">' . $data_pegawai['jabatan']. ' ' . $data_pegawai['nama_bidang'] . '</h4>
-						<ul class="daftar-menu-sakip" style="margin-bottom: 3rem;">
-							<li>' . $halaman_input_rhk_pegawai . '</li>
-							<li>' . $halaman_laporan_pk_pegawai . '</li>
-							<li><p><small>*Menu User Sebagai Pegawai Perangkat Daerah</small></p></li>
-						</ul>';
+							<div class="card bg-transparent custom-blur shadow-lg">
+								<div class="card-body">
+									<h2 class="text-center" style="margin-bottom: 0;">' . $skpd_db['nama_skpd'] . '</h2>
+									<h4 class="text-center text-secondary">' . $data_pegawai['jabatan']. ' ' . $data_pegawai['nama_bidang'] . '</h4>
+									<ul class="daftar-menu-sakip" style="margin-bottom: 3rem;">
+										<li>' . $halaman_input_rhk_pegawai . '</li>
+										<li>' . $halaman_laporan_pk_pegawai . '</li>
+										<li><p><small>*Menu User Sebagai Pegawai Perangkat Daerah</small></p></li>
+									</ul>
+								</div>
+							</div>
+						';
 					}
 				}
 			}
