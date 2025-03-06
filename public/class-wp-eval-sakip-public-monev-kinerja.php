@@ -6792,16 +6792,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										}
 
 										if(!empty($v_indikator['kinerja_bulan'])){
-											$wpdb->update(
-												'esakip_data_bulanan_rencana_aksi_opd',
-												array('active' => 0),
-												array(
-													'id_indikator_renaksi_opd' => $v_indikator['indikator_rhk_id'],
-													'tahun_anggaran' =>  $tahun,
-													'id_skpd' => $id_skpd
-												)
-											);
-
 											foreach ($v_indikator['kinerja_bulan'] as $k_k_bulan => $v_k_bulan) {
 												if(!empty($v_k_bulan['kinerja'])){
 													$nama_aspek = array('kuantitas','kualitas','waktu','biaya');
@@ -6848,7 +6838,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 																AND tahun_anggaran = %d
 																AND id_skpd = %d
 																AND bulan = %d
-														", $v_indikator['indikator_rhk_id'], $tahun, $id_skpd, $v_k_bulan['bulan']));
+																AND active = %d
+														", $v_indikator['indikator_rhk_id'], $tahun, $id_skpd, $v_k_bulan['bulan'], 1));
 
 														if (empty($cek_id)) {
 															$wpdb->insert('esakip_data_bulanan_rencana_aksi_opd', $data_option);
