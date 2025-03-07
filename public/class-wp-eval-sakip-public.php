@@ -30779,7 +30779,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		];
 
 		$output = '<div class="container mt-3">
-					<div class="card shadow-sm" style="background-color: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border-radius: 10px; padding: 20px; border: none;">
+					<div class="card shadow-sm" style="background-color: rgba(255, 255, 255, 0.2); border-radius: 10px; padding: 20px; border: none;">
 						<div class="card-body text-center">
 							<div class="mb-3 font-weight-bold text-white">
 								Pilih Tahun :
@@ -30792,7 +30792,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		$output .= '</select>
 							</div>
-							<h1 id="tahun-terpilih" class="font-weight-bold text-white">Tahun Anggaran : <span class="text-warning">' . $default_tahun . '</span></h1>
+							<h1 id="tahun-terpilih" class="font-weight-bold text-white mb-5">Tahun Anggaran : <span class="text-warning">' . $default_tahun . '</span></h1>
 							<div class="row">';
 
 		foreach ($data as $nama => $item) {
