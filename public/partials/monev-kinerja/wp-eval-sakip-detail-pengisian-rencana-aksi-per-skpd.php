@@ -1561,9 +1561,23 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                                     `</thead>` +
                                     `<tbody>`;
 
+                                let isdisabled = <?php echo $set_renaksi == 1 ? 'true' : 'false'; ?>;
                                 get_bulan.forEach((bulan, bulan_index) => {
                                     let get_data_bulanan = b.bulanan.find(bulanan => bulanan.bulan == (bulan_index + 1)) || {};
-                                    let isdisabled = <?php echo $set_renaksi == 1 ? 'true' : 'false'; ?>;
+
+                                    let data_capaian_bulanan = ''
+                                    if(get_data_bulanan.capaian){
+                                        data_capaian_bulanan = get_data_bulanan.capaian;
+                                    }else{
+                                        // ----- capaian bulanan -----
+                                        if(get_data_bulanan.realisasi && get_data_bulanan.volume){
+                                            data_capaian_bulanan = ((get_data_bulanan.realisasi / get_data_bulanan.volume)*100).toFixed(0)+'%';
+                                        }else if(get_data_bulanan.volume){
+                                            data_capaian_bulanan = "0%";
+                                        }else{
+                                            data_capaian_bulanan = "";
+                                        }
+                                    }
 
                                     kegiatanUtama += '' +
                                         `<tr>` +
@@ -1572,7 +1586,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                                         `<td class="text-center"><input type="text" class="form-control" name="volume_${b.id}_${bulan_index + 1}" id="volume_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.volume || ''}" ${isdisabled ? 'disabled' : ''}></td>` +
                                         `<td class="text-center"><input type="text" class="form-control" name="satuan_bulan_${b.id}_${bulan_index + 1}" id="satuan_bulan_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.satuan || ''}" ${isdisabled ? 'disabled' : ''}></td>` +
                                         `<td class="text-center"><input type="number" class="form-control" name="realisasi_${b.id}_${bulan_index + 1}" id="realisasi_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.realisasi || ''}" ${isdisabled ? 'disabled' : ''}></td>` +
-                                        `<td class="text-center" name="capaian_${b.id}_${bulan_index + 1}" id="capaian_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.capaian || ''}"></td>` +
+                                        `<td class="text-center" name="capaian_${b.id}_${bulan_index + 1}" id="capaian_${b.id}_${bulan_index + 1}" value="${data_capaian_bulanan}">${data_capaian_bulanan}</td>` +
                                         `<td class="text-center"><textarea class="form-control" name="keterangan_${b.id}_${bulan_index + 1}" id="keterangan_${b.id}_${bulan_index + 1}" ${isdisabled ? 'disabled' : ''}>${get_data_bulanan.keterangan || ''}</textarea></td>` +
                                         `<td class="text-center">`;
 
@@ -1589,6 +1603,17 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
 
                                     if ((bulan_index + 1) % 3 == 0) {
                                         var triwulan = (bulan_index + 1) / 3;
+
+                                        // ----- capaian triwulan -----
+                                        let data_capaian_target_realisasi_triwulan = '';
+                                        if(b['realisasi_tw_' + triwulan] && b['target_' + triwulan]){
+                                            data_capaian_target_realisasi_triwulan = ((b['realisasi_tw_' + triwulan] / b['target_' + triwulan]) * 100).toFixed(0)+'%';
+                                        }else if(b['target_' + triwulan]){
+                                            data_capaian_target_realisasi_triwulan = "0%";
+                                        }else{
+                                            data_capaian_target_realisasi_triwulan = "";
+                                        }
+
                                         kegiatanUtama += '' +
                                             `<tr style="background: #FDFFB6;">` +
                                             `<td class="text-center">Triwulan ${triwulan}</td>` +
@@ -1598,7 +1623,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                                             `<td class="text-center">` +
                                             `<input type="number" class="form-control" name="realisasi_${b.id}_tw_${triwulan}" id="realisasi_${b.id}_tw_${triwulan}" ${isdisabled ? 'disabled' : ''} value="${b['realisasi_tw_' + triwulan] || ''}">` +
                                             `</td>` +
-                                            `<td class="text-center"></td>` +
+                                            `<td class="text-center">${data_capaian_target_realisasi_triwulan}</td>` +
                                             `<td class="text-center">` +
                                             `<textarea class="form-control" name="keterangan_${b.id}_tw_${triwulan}" id="keterangan_${b.id}_tw_${triwulan}" ${isdisabled ? 'disabled' : ''}>${b['ket_tw_' + triwulan] || ''}</textarea>` +
                                             `</td>` +
@@ -1617,19 +1642,32 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
 
                                 });
 
+                                // ----- capaian total -----
+                                let data_capaian_target_realisasi_total = '';
+                                if(b['realisasi_akhir'] && b.target_akhir){
+                                    data_capaian_target_realisasi_total = ((b['realisasi_akhir'] / b.target_akhir) * 100).toFixed(0)+'%';
+                                }else if(b.target_akhir){
+                                    data_capaian_target_realisasi_total = "0%";
+                                }else{
+                                    data_capaian_target_realisasi_total = "";
+                                }
+
                                 kegiatanUtama += '' +
                                     `<tr class="table-secondary">` +
                                     `<th class="text-center">Total</th>` +
                                     `<td class="text-center">${b.indikator}</td>` +
                                     `<td class="text-center">${b.target_akhir}</td>` +
                                     `<td class="text-center">${b.satuan}</td>` +
-                                    `<td class="text-center"><input type="number" class="form-control" name="realisasi_akhir_${b.id}" id="realisasi_akhir_${b.id}" value="${b['realisasi_akhir'] || ''}"></td>` +
-                                    `<td class="text-center"></td>` +
-                                    `<td class="text-center"><textarea class="form-control" name="ket_total_${b.id}" id="ket_total_${b.id}">${b['ket_total'] || ''}</textarea></td>` +
+                                    `<td class="text-center"><input type="number" class="form-control" name="realisasi_akhir_${b.id}" id="realisasi_akhir_${b.id}" value="${b['realisasi_akhir'] || ''}" ${isdisabled ? 'disabled' : ''}></td>` +
+                                    `<td class="text-center">${data_capaian_target_realisasi_total}</td>` +
+                                    `<td class="text-center"><textarea class="form-control" name="ket_total_${b.id}" id="ket_total_${b.id}" ${isdisabled ? 'disabled' : ''}>${b['ket_total'] || ''}</textarea></td>` +
                                     `<td class="text-center">`;
                                 if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
                                     kegiatanUtama += `` +
-                                        `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-success" onclick="simpan_total(${b.id})" title="Simpan Total"><i class="dashicons dashicons-yes"></i></a>`;
+                                            (isdisabled ?
+                                                `-` :
+                                               `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-success" onclick="simpan_total(${b.id})" title="Simpan Total"><i class="dashicons dashicons-yes"></i></a>`
+                                            );
                                 }
                                 kegiatanUtama += `` +
                                     `</td>` +
@@ -2766,9 +2804,23 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                                     `</thead>` +
                                     `<tbody>`;
 
+                                let isdisabled = <?php echo $set_renaksi == 1 ? 'true' : 'false'; ?>;
                                 get_bulan.forEach((bulan, bulan_index) => {
                                     let get_data_bulanan = b.bulanan.find(bulanan => bulanan.bulan == (bulan_index + 1)) || {};
-                                    let isdisabled = <?php echo $set_renaksi == 1 ? 'true' : 'false'; ?>;
+
+                                    let data_capaian_bulanan = ''
+                                    if(get_data_bulanan.capaian){
+                                        data_capaian_bulanan = get_data_bulanan.capaian;
+                                    }else{
+                                        // ----- capaian bulanan -----
+                                        if(get_data_bulanan.realisasi && get_data_bulanan.volume){
+                                            data_capaian_bulanan = ((get_data_bulanan.realisasi / get_data_bulanan.volume)*100).toFixed(0)+'%';
+                                        }else if(get_data_bulanan.volume){
+                                            data_capaian_bulanan = "0%";
+                                        }else{
+                                            data_capaian_bulanan = "";
+                                        }
+                                    }
 
                                     renaksi += '' +
                                         `<tr>` +
@@ -2777,7 +2829,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                                         `<td class="text-center"><input type="text" class="form-control" name="volume_${b.id}_${bulan_index + 1}" id="volume_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.volume || ''}" ${isdisabled ? 'disabled' : ''}></td>` +
                                         `<td class="text-center"><input type="text" class="form-control" name="satuan_bulan_${b.id}_${bulan_index + 1}" id="satuan_bulan_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.satuan || ''}" ${isdisabled ? 'disabled' : ''}></td>` +
                                         `<td class="text-center"><input type="number" class="form-control" name="realisasi_${b.id}_${bulan_index + 1}" id="realisasi_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.realisasi || ''}" ${isdisabled ? 'disabled' : ''}></td>` +
-                                        `<td class="text-center" name="capaian_${b.id}_${bulan_index + 1}" id="capaian_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.capaian || ''}"></td>` +
+                                        `<td class="text-center" name="capaian_${b.id}_${bulan_index + 1}" id="capaian_${b.id}_${bulan_index + 1}" value="${data_capaian_bulanan}">${data_capaian_bulanan}</td>` +
                                         `<td class="text-center"><textarea class="form-control" name="keterangan_${b.id}_${bulan_index + 1}" id="keterangan_${b.id}_${bulan_index + 1}" ${isdisabled ? 'disabled' : ''}>${get_data_bulanan.keterangan || ''}</textarea></td>` +
                                         `<td class="text-center">`;
                                     if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
@@ -2793,6 +2845,17 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
 
                                     if ((bulan_index + 1) % 3 == 0) {
                                         var triwulan = (bulan_index + 1) / 3;
+
+                                        // ----- capaian triwulan -----
+                                        let data_capaian_target_realisasi_triwulan = '';
+                                        if(b['realisasi_tw_' + triwulan] && b['target_' + triwulan]){
+                                             data_capaian_target_realisasi_triwulan = ((b['realisasi_tw_' + triwulan] / b['target_' + triwulan]) * 100).toFixed(0)+'%';
+                                        }else if(b['target_' + triwulan]){
+                                            data_capaian_target_realisasi_triwulan = "0%";
+                                        }else{
+                                            data_capaian_target_realisasi_triwulan = "";
+                                        }
+                                        
                                         renaksi += '' +
                                             `<tr style="background: #FDFFB6;">` +
                                             `<td class="text-center">Triwulan ${triwulan}</td>` +
@@ -2802,7 +2865,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                                             `<td class="text-center">` +
                                             `<input type="number" class="form-control" name="realisasi_${b.id}_tw_${triwulan}" id="realisasi_${b.id}_tw_${triwulan}" ${isdisabled ? 'disabled' : ''} value="${b['realisasi_tw_' + triwulan] || ''}">` +
                                             `</td>` +
-                                            `<td class="text-center"></td>` +
+                                            `<td class="text-center">${data_capaian_target_realisasi_triwulan}</td>` +
                                             `<td class="text-center">` +
                                             `<textarea class="form-control" name="keterangan_${b.id}_tw_${triwulan}" id="keterangan_${b.id}_tw_${triwulan}" ${isdisabled ? 'disabled' : ''}>${b['ket_tw_' + triwulan] || ''}</textarea>` +
                                             `</td>` +
@@ -2821,19 +2884,32 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
 
                                 });
 
+                                // ----- capaian total -----
+                                let data_capaian_target_realisasi_total = '';
+                                if(b['realisasi_akhir'] && b.target_akhir){
+                                    data_capaian_target_realisasi_total = ((b['realisasi_akhir'] / b.target_akhir) * 100).toFixed(0)+'%';
+                                }else if(b.target_akhir){
+                                    data_capaian_target_realisasi_total = "0%";
+                                }else{
+                                    data_capaian_target_realisasi_total = "";
+                                }
+
                                 renaksi += '' +
                                     `<tr class="table-secondary">` +
                                     `<th class="text-center">Total</th>` +
                                     `<td class="text-center">${b.indikator}</td>` +
                                     `<td class="text-center">${b.target_akhir}</td>` +
                                     `<td class="text-center">${b.satuan}</td>` +
-                                    `<td class="text-center"><input type="number" class="form-control" name="realisasi_akhir_${b.id}" id="realisasi_akhir_${b.id}" value="${b['realisasi_akhir'] || ''}"></td>` +
-                                    `<td class="text-center"></td>` +
-                                    `<td class="text-center"><textarea class="form-control" name="ket_total_${b.id}" id="ket_total_${b.id}">${b['ket_total'] || ''}</textarea></td>` +
+                                    `<td class="text-center"><input type="number" class="form-control" name="realisasi_akhir_${b.id}" id="realisasi_akhir_${b.id}" value="${b['realisasi_akhir'] || ''}" ${isdisabled ? 'disabled' : ''}></td>` +
+                                    `<td class="text-center">${data_capaian_target_realisasi_total}</td>` +
+                                    `<td class="text-center"><textarea class="form-control" name="ket_total_${b.id}" id="ket_total_${b.id}" ${isdisabled ? 'disabled' : ''}>${b['ket_total'] || ''}</textarea></td>` +
                                     `<td class="text-center">`;
                                 if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
                                     renaksi += `` +
-                                        `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-success" onclick="simpan_total(${b.id})" title="Simpan Total"><i class="dashicons dashicons-yes"></i></a>`;
+                                            (isdisabled ?
+                                                `-` :
+                                                `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-success" onclick="simpan_total(${b.id})" title="Simpan Total"><i class="dashicons dashicons-yes"></i></a>`
+                                            );
                                 }
                                 renaksi += `` +
                                     `</td>` +

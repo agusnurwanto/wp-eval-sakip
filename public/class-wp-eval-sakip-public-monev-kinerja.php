@@ -1690,6 +1690,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$realisasi_2_html = array();
 						$realisasi_3_html = array();
 						$realisasi_4_html = array();
+						$capaian_realisasi = array();
 
 						$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 						foreach ($v['indikator'] as $key => $ind) {
@@ -1707,6 +1708,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
 							$realisasi_3_html[$key] = !empty($ind['realisasi_tw_3']) ? $ind['realisasi_tw_3'] : 0;
 							$realisasi_4_html[$key] = !empty($ind['realisasi_tw_4']) ? $ind['realisasi_tw_4'] : 0;
+							$total_realisasi_tw = $ind['realisasi_tw_1'] + $ind['realisasi_tw_2'] + $ind['realisasi_tw_3'] + $ind['realisasi_tw_4'];
+							if(!empty($total_realisasi_tw) && !empty($ind['target_akhir'])){
+								$capaian_realisasi[$key] = number_format(($total_realisasi_tw / $ind['target_akhir']) * 100, 0 ) . "%";
+							}else{
+								$capaian_realisasi[$key] = "0%";
+							}
 						}
 						$indikator_html = implode('<br>', $indikator_html);
 						$satuan_html = implode('<br>', $satuan_html);
@@ -1723,6 +1730,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$realisasi_2_html = implode('<br>', $realisasi_2_html);
 						$realisasi_3_html = implode('<br>', $realisasi_3_html);
 						$realisasi_4_html = implode('<br>', $realisasi_4_html);
+						$capaian_realisasi = implode('<br>', $capaian_realisasi);
 
 						//UPDATE PEGAWAI YANG TIDAK SESUAI SATKER UTAMA NYA
 						$satker_id_utama = substr($v['detail']['satker_id'], 0, 2);
@@ -1781,7 +1789,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							<td class="text-center">' . $realisasi_2_html . '</td>
 							<td class="text-center">' . $realisasi_3_html . '</td>
 							<td class="text-center">' . $realisasi_4_html . '</td>
-							<td class=""></td>
+							<td class="text-center">' . $capaian_realisasi . '</td>
 							<td class="text-right">' . number_format((float)$rencana_pagu_html, 0, ",", ".") . '</td>
 							<td class=""></td>
 							<td class=""></td>
@@ -1809,6 +1817,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$realisasi_2_html = array();
 							$realisasi_3_html = array();
 							$realisasi_4_html = array();
+							$capaian_realisasi = array();
 							$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 							foreach ($renaksi['indikator'] as $key => $ind) {
 								$indikator_html[$key] = $ind['indikator'];
@@ -1825,6 +1834,13 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
 								$realisasi_3_html[$key] = !empty($ind['realisasi_tw_3']) ? $ind['realisasi_tw_3'] : 0;
 								$realisasi_4_html[$key] = !empty($ind['realisasi_tw_4']) ? $ind['realisasi_tw_4'] : 0;
+								$total_realisasi_tw = $ind['realisasi_tw_1'] + $ind['realisasi_tw_2'] + $ind['realisasi_tw_3'] + $ind['realisasi_tw_4'];
+								if(!empty($total_realisasi_tw) && !empty($ind['target_akhir'])){
+									$capaian_realisasi[$key] = number_format(($total_realisasi_tw / $ind['target_akhir']) * 100, 0 ) . "%";
+								}else{
+									$capaian_realisasi[$key] = "0%";
+								}
+								
 							}
 							$indikator_html = implode('<br>', $indikator_html);
 							$satuan_html = implode('<br>', $satuan_html);
@@ -1841,6 +1857,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$realisasi_2_html = implode('<br>', $realisasi_2_html);
 							$realisasi_3_html = implode('<br>', $realisasi_3_html);
 							$realisasi_4_html = implode('<br>', $realisasi_4_html);
+							$capaian_realisasi = implode('<br>', $capaian_realisasi);
 
 							//UPDATE PEGAWAI YANG TIDAK SESUAI SATKER UTAMA NYA
 							$satker_id_utama = substr($renaksi['detail']['satker_id'], 0, 2);
@@ -1991,7 +2008,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							        <td class="text-center">' . $realisasi_2_html . '</td>
 							        <td class="text-center">' . $realisasi_3_html . '</td>
 							        <td class="text-center">' . $realisasi_4_html . '</td>
-							        <td class=""></td>
+							        <td class="text-center">' . $capaian_realisasi . '</td>
 									<td class="text-right">' . number_format((float)$rencana_pagu_html, 0, ",", ".") . '</td>
 							        <td class=""></td>
 							        <td class=""></td>
@@ -2020,6 +2037,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$realisasi_2_html = array();
 								$realisasi_3_html = array();
 								$realisasi_4_html = array();
+								$capaian_realisasi = array();
 								$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 								foreach ($uraian_renaksi['indikator'] as $key => $ind) {
 									$indikator_html[$key] = $ind['indikator'];
@@ -2036,6 +2054,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
 									$realisasi_3_html[$key] = !empty($ind['realisasi_tw_3']) ? $ind['realisasi_tw_3'] : 0;
 									$realisasi_4_html[$key] = !empty($ind['realisasi_tw_4']) ? $ind['realisasi_tw_4'] : 0;
+									$total_realisasi_tw = $ind['realisasi_tw_1'] + $ind['realisasi_tw_2'] + $ind['realisasi_tw_3'] + $ind['realisasi_tw_4'];
+									if(!empty($total_realisasi_tw) && !empty($ind['target_akhir'])){
+										$capaian_realisasi[$key] = number_format(($total_realisasi_tw / $ind['target_akhir']) * 100, 0 ) . "%";
+									}else{
+										$capaian_realisasi[$key] = "0%";
+									}
 								}
 								$indikator_html = implode('<br>', $indikator_html);
 								$satuan_html = implode('<br>', $satuan_html);
@@ -2051,6 +2075,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$realisasi_2_html = implode('<br>', $realisasi_2_html);
 								$realisasi_3_html = implode('<br>', $realisasi_3_html);
 								$realisasi_4_html = implode('<br>', $realisasi_4_html);
+								$capaian_realisasi = implode('<br>', $capaian_realisasi);
 
 								$label_pokin = $uraian_renaksi['detail']['label_pokin_5'];
 								if (empty($label_pokin)) {
@@ -2115,7 +2140,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									<td class="text-center">' . $realisasi_2_html . '</td>
 									<td class="text-center">' . $realisasi_3_html . '</td>
 									<td class="text-center">' . $realisasi_4_html . '</td>
-									<td class=""></td>	
+									<td class="text-center">' . $capaian_realisasi . '</td>	
 									<td class="text-right">' . number_format((float)$rencana_pagu_html, 0, ",", ".") . '</td>
 									<td class=""></td>
 									<td class=""></td>
@@ -2138,6 +2163,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$realisasi_2_html = array();
 									$realisasi_3_html = array();
 									$realisasi_4_html = array();
+									$capaian_realisasi = array();
 									$rencana_pagu_html = array();
 									$realisasi_pagu_html = array();
 									$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
@@ -2156,6 +2182,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
 										$realisasi_3_html[$key] = !empty($ind['realisasi_tw_3']) ? $ind['realisasi_tw_3'] : 0;
 										$realisasi_4_html[$key] = !empty($ind['realisasi_tw_4']) ? $ind['realisasi_tw_4'] : 0;
+										$total_realisasi_tw = $ind['realisasi_tw_1'] + $ind['realisasi_tw_2'] + $ind['realisasi_tw_3'] + $ind['realisasi_tw_4'];
+										if(!empty($total_realisasi_tw) && !empty($ind['target_akhir'])){
+											$capaian_realisasi[$key] = number_format(($total_realisasi_tw / $ind['target_akhir']) * 100, 0) . "%";
+										}else{
+											$capaian_realisasi[$key] = "0%";
+										}
 									}
 									$indikator_html = implode('<br>', $indikator_html);
 									$satuan_html = implode('<br>', $satuan_html);
@@ -2171,6 +2203,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$realisasi_2_html = implode('<br>', $realisasi_2_html);
 									$realisasi_3_html = implode('<br>', $realisasi_3_html);
 									$realisasi_4_html = implode('<br>', $realisasi_4_html);
+									$capaian_realisasi = implode('<br>', $capaian_realisasi);
 
 									$label_pokin = $uraian_teknis_kegiatan['detail']['label_pokin_5'];
 									if (empty($label_pokin)) {
@@ -2235,7 +2268,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										<td class="text-center">' . $realisasi_2_html . '</td>
 										<td class="text-center">' . $realisasi_3_html . '</td>
 										<td class="text-center">' . $realisasi_4_html . '</td>
-										<td class=""></td>
+										<td class="text-center">' . $capaian_realisasi . '</td>
 										<td class="text-right">' . number_format((float)$rencana_pagu_html, 0, ",", ".") . '</td>
 										<td class=""></td>
 										<td class="text-right" style="visibility: hidden;">' . $realisasi_pagu_html . '</td>
