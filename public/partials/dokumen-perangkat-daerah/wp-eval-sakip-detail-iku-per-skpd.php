@@ -229,11 +229,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
 
 <script>
     jQuery(document).ready(function() {
-        window.loading_ajax = {
-            'dok': false,
-            'tahun': false
-        };
-        getTableIku();
         getTableTahun();
         jQuery("#fileUpload").on('change', function() {
             var id_dokumen = jQuery('#idDokumen').val();
@@ -245,7 +240,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
     });
 
     function getTableIku() {
-        loading_ajax.dok = true;
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -259,7 +253,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
             dataType: 'json',
             success: function(response) {
                 jQuery('#wrap-loading').hide();
-                loading_ajax.dok = false;
                 console.log(response);
                 if(
                     response.data_esr 
@@ -315,6 +308,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 console.log(response);
+                getTableIku();
                 if (response.status === 'success') {
                     jQuery('#tahunContainer').html(response.data);
                 } else {

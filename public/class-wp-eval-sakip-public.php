@@ -5456,17 +5456,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								if (!empty($vv['upload_id'])) {
 									if (in_array($vv['upload_id'], array_column($array_data_esr, 'upload_id'))) {
 										$status_integrasi_esr = true;
-										$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
+										$tbody .= "<td class='text-center'><span class='badge badge-success' style='padding: .5em 1.4em;' data-upload-id='".$vv['upload_id']."'>Integrasi<span></td>";
 									} else {
 										if ($data_verifikasi['status_verifikasi'] == 1) {
 										    if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-												$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+												$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 													    <div style='margin-top: 5px;'>
 													        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 													    </div>
 													</td>";
 											} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
-												$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+												$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 													    <div style='margin-top: 5px;'>
 													        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 													    </div>
@@ -5483,8 +5483,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										}
 									}
 								} else if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-									$tbody .= "<td class='text-center'>
-									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
+									$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</a>";
 
 									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
@@ -5709,17 +5708,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								if (!empty($vv['upload_id'])) {
 									if (in_array($vv['upload_id'], array_column($array_data_esr, 'upload_id'))) {
 										$status_integrasi_esr = true;
-										$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
+										$tbody .= "<td class='text-center'><span class='badge badge-success' style='padding: .5em 1.4em;' data-upload-id='".$vv['upload_id']."'>Integrasi<span></td>";
 									} else {
 									
 									    if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-											$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 												    <div style='margin-top: 5px;'>
 												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 												    </div>
 												</td>";
 										} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
-											$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 												    <div style='margin-top: 5px;'>
 												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 												    </div>
@@ -5733,8 +5732,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									    $tbody .= "</ul></td>";
 									}
 								} else if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-									$tbody .= "<td class='text-center'>
-									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
+									$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</a>";
 
 									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
@@ -5964,17 +5962,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								if (!empty($vv['upload_id'])) {
 									if (in_array($vv['upload_id'], array_column($array_data_esr, 'upload_id'))) {
 										$status_integrasi_esr = true;
-										$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
+										$tbody .= "<td class='text-center'><span class='badge badge-success' style='padding: .5em 1.4em;' data-upload-id='".$vv['upload_id']."'>Integrasi<span></td>";
 									} else {
 										if ($data_verifikasi['status_verifikasi'] == 1) {
 										    if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-												$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+												$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 													    <div style='margin-top: 5px;'>
 													        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 													    </div>
 													</td>";
 											} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
-												$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+												$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 													    <div style='margin-top: 5px;'>
 													        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 													    </div>
@@ -5991,8 +5989,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										}
 									}
 								} else if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-									$tbody .= "<td class='text-center'>
-									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
+									$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</a>";
 
 									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
@@ -6273,17 +6270,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								if (!empty($vv['upload_id'])) {
 									if (in_array($vv['upload_id'], array_column($array_data_esr, 'upload_id'))) {
 										$status_integrasi_esr = true;
-										$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
+										$tbody .= "<td class='text-center'><span class='badge badge-success' style='padding: .5em 1.4em;' data-upload-id='".$vv['upload_id']."'>Integrasi<span></td>";
 									} else {
 										if ($data_verifikasi['status_verifikasi'] == 1) {
 										    if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-												$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+												$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 													    <div style='margin-top: 5px;'>
 													        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 													    </div>
 													</td>";
 											} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
-												$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+												$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 													    <div style='margin-top: 5px;'>
 													        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 													    </div>
@@ -6300,8 +6297,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										}
 									}
 								} else if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-									$tbody .= "<td class='text-center'>
-									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
+									$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</a>";
 
 									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
@@ -6512,17 +6508,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								if (!empty($vv['upload_id'])) {
 									if (in_array($vv['upload_id'], array_column($array_data_esr, 'upload_id'))) {
 										$status_integrasi_esr = true;
-										$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
+										$tbody .= "<td class='text-center'><span class='badge badge-success' style='padding: .5em 1.4em;' data-upload-id='".$vv['upload_id']."'>Integrasi<span></td>";
 									} else {
 									
 									    if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-											$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 												    <div style='margin-top: 5px;'>
 												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 												    </div>
 												</td>";
 										} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
-											$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 												    <div style='margin-top: 5px;'>
 												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 												    </div>
@@ -6536,8 +6532,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									    $tbody .= "</ul></td>";
 									}
 								} else if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-									$tbody .= "<td class='text-center'>
-									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
+									$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</a>";
 
 									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
@@ -6728,17 +6723,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								if (!empty($vv['upload_id'])) {
 									if (in_array($vv['upload_id'], array_column($array_data_esr, 'upload_id'))) {
 										$status_integrasi_esr = true;
-										$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
+										$tbody .= "<td class='text-center'><span class='badge badge-success' style='padding: .5em 1.4em;' data-upload-id='".$vv['upload_id']."'>Integrasi<span></td>";
 									} else {
 									
 									    if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-											$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 												    <div style='margin-top: 5px;'>
 												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 												    </div>
 												</td>";
 										} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
-											$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 												    <div style='margin-top: 5px;'>
 												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 												    </div>
@@ -6752,8 +6747,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									    $tbody .= "</ul></td>";
 									}
 								} else if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-									$tbody .= "<td class='text-center'>
-									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
+									$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</a>";
 
 									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
@@ -7304,9 +7298,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											];
 										}
 									}
-								} else {
-									$ret['data_esr'] = $data_esr;
 								}
+								$ret['data_esr'] = $data_esr;
 								$ret['status_mapping_esr'] = true;
 							}
 						}
@@ -7369,13 +7362,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									        }
 									    }
 									    if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-											$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 												    <div style='margin-top: 5px;'>
 												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 												    </div>
 												</td>";
 										} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
-											$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 												    <div style='margin-top: 5px;'>
 												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 												    </div>
@@ -7389,8 +7382,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									    $tbody .= "</ul></td>";
 									}
 								} else if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-									$tbody .= "<td class='text-center'>
-									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
+									$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</a>";
 
 									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
@@ -7651,9 +7643,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											];
 										}
 									}
-								} else {
-									$ret['data_esr'] = $data_esr;
 								}
+								$ret['data_esr'] = $data_esr;
 							}
 						}
 					}
@@ -7754,13 +7745,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										        }
 										    }
 										    if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-												$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+												$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 													    <div style='margin-top: 5px;'>
 													        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 													    </div>
 													</td>";
 											} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
-												$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+												$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 													    <div style='margin-top: 5px;'>
 													        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 													    </div>
@@ -7777,8 +7768,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										}
 									}
 								} else if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-									$tbody .= "<td class='text-center'>
-									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
+									$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</a>";
 
 									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
@@ -8003,17 +7993,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								if (!empty($vv['upload_id'])) {
 									if (in_array($vv['upload_id'], array_column($array_data_esr, 'upload_id'))) {
 										$status_integrasi_esr = true;
-										$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
+										$tbody .= "<td class='text-center'><span class='badge badge-success' style='padding: .5em 1.4em;' data-upload-id='".$vv['upload_id']."'>Integrasi<span></td>";
 									} else {
 									
 									    if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-											$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 												    <div style='margin-top: 5px;'>
 												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 												    </div>
 												</td>";
 										} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
-											$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 												    <div style='margin-top: 5px;'>
 												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 												    </div>
@@ -8027,8 +8017,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									    $tbody .= "</ul></td>";
 									}
 								} else if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-									$tbody .= "<td class='text-center'>
-									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
+									$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</a>";
 
 									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
@@ -8227,9 +8216,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											];
 										}
 									}
-								} else {
-									$ret['data_esr'] = $data_esr;
 								}
+								$ret['data_esr'] = $data_esr;
 							}
 						}
 
@@ -8245,13 +8233,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
 										} else {
 										    if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-												$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+												$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 													    <div style='margin-top: 5px;'>
 													        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 													    </div>
 													</td>";
 											} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
-												$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+												$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 													    <div style='margin-top: 5px;'>
 													        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 													    </div>
@@ -8467,9 +8455,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											];
 										}
 									}
-								} else {
-									$ret['data_esr'] = $data_esr;
 								}
+								$ret['data_esr'] = $data_esr;
 							}
 						}
 
@@ -8485,13 +8472,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
 										} else {
 										    if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-												$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+												$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 													    <div style='margin-top: 5px;'>
 													        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 													    </div>
 													</td>";
 											} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
-												$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+												$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 													    <div style='margin-top: 5px;'>
 													        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 													    </div>
@@ -14477,17 +14464,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								if (!empty($vv['upload_id'])) {
 									if (in_array($vv['upload_id'], array_column($array_data_esr, 'upload_id'))) {
 										$status_integrasi_esr = true;
-										$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
+										$tbody .= "<td class='text-center'><span class='badge badge-success' style='padding: .5em 1.4em;' data-upload-id='".$vv['upload_id']."'>Integrasi<span></td>";
 									} else {
 									
 									    if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-											$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 												    <div style='margin-top: 5px;'>
 												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 												    </div>
 												</td>";
 										} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
-											$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 												    <div style='margin-top: 5px;'>
 												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 												    </div>
@@ -14501,8 +14488,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									    $tbody .= "</ul></td>";
 									}
 								} else if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-									$tbody .= "<td class='text-center'>
-									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
+									$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</a>";
 
 									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
@@ -16826,17 +16812,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								if (!empty($vv['upload_id'])) {
 									if (in_array($vv['upload_id'], array_column($array_data_esr, 'upload_id'))) {
 										$status_integrasi_esr = true;
-										$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
+										$tbody .= "<td class='text-center'><span class='badge badge-success' style='padding: .5em 1.4em;' data-upload-id='".$vv['upload_id']."'>Integrasi<span></td>";
 									} else {
 									
 									    if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-											$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 												    <div style='margin-top: 5px;'>
 												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 												    </div>
 												</td>";
 										} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
-											$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 												    <div style='margin-top: 5px;'>
 												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 												    </div>
@@ -16850,8 +16836,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									    $tbody .= "</ul></td>";
 									}
 								} else if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-									$tbody .= "<td class='text-center'>
-									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
+									$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</a>";
 
 									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
@@ -23737,9 +23722,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											];
 										}
 									}
-								} else {
-									$ret['data_esr'] = $data_esr;
 								}
+								$ret['data_esr'] = $data_esr;
 							}
 						}
 					}
@@ -23799,13 +23783,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									        }
 									    }
 									    if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-											$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 												    <div style='margin-top: 5px;'>
 												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 												    </div>
 												</td>";
 										} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
-											$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 												    <div style='margin-top: 5px;'>
 												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 												    </div>
@@ -23819,8 +23803,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									    $tbody .= "</ul></td>";
 									}
 								} else if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-									$tbody .= "<td class='text-center'>
-									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
+									$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</a>";
 
 									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
@@ -24916,17 +24899,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								if (!empty($vv['upload_id'])) {
 									if (in_array($vv['upload_id'], array_column($array_data_esr, 'upload_id'))) {
 										$status_integrasi_esr = true;
-										$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
+										$tbody .= "<td class='text-center'><span class='badge badge-success' style='padding: .5em 1.4em;' data-upload-id='".$vv['upload_id']."'>Integrasi<span></td>";
 									} else {
 										if ($data_verifikasi['status_verifikasi'] == 1) {
 										    if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-												$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+												$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 													    <div style='margin-top: 5px;'>
 													        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 													    </div>
 													</td>";
 											} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
-												$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+												$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 													    <div style='margin-top: 5px;'>
 													        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 													    </div>
@@ -24943,8 +24926,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										}
 									}
 								} else if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-									$tbody .= "<td class='text-center'>
-									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
+									$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</a>";
 
 									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
@@ -27556,9 +27538,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											];
 										}
 									}
-								} else {
-									$ret['data_esr'] = $data_esr;
 								}
+								$ret['data_esr'] = $data_esr;
 							}
 						}
 					}
@@ -27631,13 +27612,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									        }
 									    }
 									    if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-											$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 												    <div style='margin-top: 5px;'>
 												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 												    </div>
 												</td>";
 										} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
-											$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 												    <div style='margin-top: 5px;'>
 												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 												    </div>
@@ -27651,8 +27632,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									    $tbody .= "</ul></td>";
 									}
 								} else if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-									$tbody .= "<td class='text-center'>
-									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
+									$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</a>";
 
 									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
@@ -30221,9 +30201,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										];
 									}
 								}
-							} else {
-								$ret['data_esr'] = $data_esr;
 							}
+							$ret['data_esr'] = $data_esr;
 						}
 					}
 
@@ -30275,17 +30254,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								if (!empty($vv['upload_id'])) {
 									if (in_array($vv['upload_id'], array_column($array_data_esr, 'upload_id'))) {
 										$status_integrasi_esr = true;
-										$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-success'>Integrasi<a></td>";
+										$tbody .= "<td class='text-center'><span class='badge badge-success' style='padding: .5em 1.4em;' data-upload-id='".$vv['upload_id']."'>Integrasi<span></td>";
 									} else {
 										if ($data_verifikasi['status_verifikasi'] == 1) {
 										    if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
-												$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>
+												$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 													    <div style='margin-top: 5px;'>
 													        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 													    </div>
 													</td>";
 											} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
-												$tbody .= "<td class='text-center'><a href='#' class='btn btn-sm btn-warning'>Dokumen Adaa</a>
+												$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Adaa</span>
 													    <div style='margin-top: 5px;'>
 													        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
 													    </div>
@@ -30303,7 +30282,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									}
 								} else if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
 									$tbody .= "<td class='text-center'>
-									    <a href='#' class='btn btn-sm btn-warning'>Dokumen Ada</a>";
+									    <span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>";
 
 									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "
@@ -30315,7 +30294,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									$tbody .= "</td>";
 								} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
 									$tbody .= "<td class='text-center'>
-									    <a href='#' class='btn btn-sm btn-warning'>Keterangan Ada</a>";
+									    <span class='badge badge-warning' style='padding: .5em 1.4em;'>Keterangan Ada</span>";
 
 									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
 									    $tbody .= "

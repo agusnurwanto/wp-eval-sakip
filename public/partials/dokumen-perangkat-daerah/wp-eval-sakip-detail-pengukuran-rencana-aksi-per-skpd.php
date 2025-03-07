@@ -192,7 +192,6 @@ $is_administrator = in_array('administrator', $user_roles);
 </div>
 <script>
     jQuery(document).ready(function() {
-        getTablePengukuranRencanaAksi();
         getTableTahun();
         jQuery("#fileUpload").on('change', function() {
             var id_dokumen = jQuery('#idDokumen').val();
@@ -246,6 +245,7 @@ $is_administrator = in_array('administrator', $user_roles);
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 console.log(response);
+                getTablePengukuranRencanaAksi();
                 if (response.status === 'success') {
                     jQuery('#tahunContainer').html(response.data);
                 } else {

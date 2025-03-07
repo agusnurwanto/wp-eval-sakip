@@ -278,7 +278,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
 
 <script>
     jQuery(document).ready(function() {
-        getTabletl_lhe_akip_internal();
         getTableTahun();
         jQuery("#fileUpload").on('change', function() {
             var id_dokumen = jQuery('#idDokumen').val();
@@ -459,6 +458,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
             dataType: 'json',
             success: function(response) {
                 jQuery('#wrap-loading').hide();
+                getTabletl_lhe_akip_internal();
                 console.log(response);
                 if (response.status === 'success') {
                     jQuery('#tahunContainer').html(response.data);

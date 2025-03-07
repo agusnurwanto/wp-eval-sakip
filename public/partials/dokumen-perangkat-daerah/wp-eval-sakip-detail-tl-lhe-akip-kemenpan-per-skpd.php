@@ -196,7 +196,6 @@ $is_administrator = in_array('administrator', $user_roles);
 
 <script>
     jQuery(document).ready(function() {
-        getTableSkpd();
         getTableTahun();
         jQuery("#fileUpload").on('change', function() {
             var id_dokumen = jQuery('#idDokumen').val();
@@ -252,6 +251,7 @@ $is_administrator = in_array('administrator', $user_roles);
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 console.log(response);
+                getTableSkpd();
                 if (response.status === 'success') {
                     jQuery('#tahunContainer').html(response.data);
                 } else {
