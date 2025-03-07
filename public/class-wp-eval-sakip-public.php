@@ -19842,24 +19842,30 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					z-index: 1; /* Pastikan overlay ada di atas background */
 				}
 		
-				/* Blur pada card */
 				.custom-blur {
-					background: rgba(255, 255, 255, 0.3); 
-					backdrop-filter: blur(10px); 
-					-webkit-backdrop-filter: blur(10px);
-					border-radius: 15px;
-					padding: 20px; 
-					max-width: 700px; 
-					margin: 20px auto; 
+					background: rgba(255, 255, 255, 0.3); /* Warna putih transparan */
+					backdrop-filter: blur(10px); /* Blur efek transparan */
+					-webkit-backdrop-filter: blur(10px); /* Untuk Safari */
 					border: 1px solid rgba(255, 255, 255, 0.3); 
 					position: relative; /* Agar berada di atas overlay */
 					z-index: 2; /* Pastikan card di atas overlay */
 				}
 			</style>';
-		}		
+		}
+		echo '
+			<style>
+				.custom-blur {
+					border-radius: 15px;
+					padding: 20px; 
+					max-width: 700px; 
+					margin: 20px auto; 
+				}
+			</style>';
 		
 		if (!empty($_GET) && !empty($_GET['tahun'])) {
-			echo '<h1 class="text-center">TAHUN ANGGARAN TERPILIH<br>' . $_GET['tahun'] . '</h1>';
+			echo '<div class="card custom-blur shadow-lg">
+					<div class="card-body">
+					<h1 class="text-center">TAHUN ANGGARAN TERPILIH<br>' . $_GET['tahun'] . '</h1>';
 		}
 		if (empty($user_meta->roles)) {
 			return 'User ini tidak dapat akses sama sekali :)';
@@ -19947,6 +19953,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		// end ef check user simpeg kepala //
 
 		$this->pilih_tahun_anggaran();
+		echo '</div></div>';
+
 		if (empty($_GET) || empty($_GET['tahun'])) {
 			return;
 		}
@@ -21671,7 +21679,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					</div>';
 	
 					echo '
-						<div class="card bg-transparent custom-blur shadow-lg shadow-lg">
+						<div class="card custom-blur shadow-lg">
 							<div class="card-body">
 								<h2 class="text-center">' . $skpd_db['nama_skpd'] . '</h2>
 								<ul class="daftar-menu-sakip mb-3">
@@ -21834,7 +21842,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						</div>';
 
 						echo '
-							<div class="card bg-transparent custom-blur shadow-lg">
+							<div class="card custom-blur shadow-lg">
 								<div class="card-body">
 									<h2 class="text-center" style="margin-bottom: 0;">' . $skpd_db['nama_skpd'] . '</h2>
 									<h4 class="text-center text-secondary">' . $data_pegawai['jabatan']. ' ' . $data_pegawai['nama_bidang'] . '</h4>
