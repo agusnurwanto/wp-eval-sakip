@@ -19821,13 +19821,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			echo '
 			<style>
 				body {
-					background-image: url("'. get_option('_crb_bg_menu_user') .'");
-					background-size: cover; 
-					background-position: center;
-					background-repeat: no-repeat;
-					background-attachment: fixed;
-					position: relative;
-					min-height: 100vh;
+					background-image: url("'. get_option('_crb_bg_menu_user') .'") !important;
+					background-size: cover !important; 
+					background-position: center !important;
+					background-repeat: no-repeat !important;
+					background-attachment: fixed !important;
+					position: relative !important;
+					min-height: 100vh !important;
 				}
 		
 				/* Overlay */
@@ -19843,9 +19843,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 		
 				.custom-blur {
-					background: rgba(255, 255, 255, 0.3); /* Warna putih transparan */
-					backdrop-filter: blur(10px); /* Blur efek transparan */
-					-webkit-backdrop-filter: blur(10px); /* Untuk Safari */
+					background: rgba(255, 255, 255, 0.9); /* Warna putih transparan */
 					border: 1px solid rgba(255, 255, 255, 0.3); 
 					position: relative; /* Agar berada di atas overlay */
 					z-index: 2; /* Pastikan card di atas overlay */
@@ -21111,12 +21109,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			</div>';
 
 			echo '
-				<div class="text-center" style="margin: 0 0 10px 0;">' . $halaman_monitor_upload_dokumen . '</div>
-        		<ul class="daftar-menu-sakip">
-            		<li>' . $halaman_sakip . '</li>
-           			<li>' . $halaman_sakip_opd . '</li>
-           			<li>' . $halaman_lke . '</li>
-            		<li>' . $halaman_laporan_pk_admin . '</li>';
+				<div class="card custom-blur shadow-lg">
+					<div class="card-body">
+						<div class="text-center" style="margin: 0 0 10px 0;">' . $halaman_monitor_upload_dokumen . '</div>
+        					<ul class="daftar-menu-sakip">
+								<li>' . $halaman_sakip . '</li>
+								<li>' . $halaman_sakip_opd . '</li>
+								<li>' . $halaman_lke . '</li>
+								<li>' . $halaman_laporan_pk_admin . '</li>';
 			if (
 				in_array("admin_panrb", $user_meta->roles)
 				|| in_array("admin_bappeda", $user_meta->roles)
@@ -21128,6 +21128,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			echo '<li>' . $halaman_pengisian_rencana_aksi . '</li>';
 			echo '<li>' . $halaman_menu_jadwal_admin . '</li>';
 			echo '</ul>';
+			echo '</div></div>';
+
 		} else if (
 			in_array("PA", $user_meta->roles)
 			|| in_array("KPA", $user_meta->roles)
