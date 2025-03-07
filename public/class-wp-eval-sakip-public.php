@@ -5541,7 +5541,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if ($show_button || $can_verify) {
 							if ($can_verify) {
-								if ($draft === false) {
+								if ($draft === false && $text_badge == 'Menunggu') {
 									$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
 								}
 							}
@@ -6049,7 +6049,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if ($show_button || $can_verify) {
 							if ($can_verify) {
-								if ($draft === false) {
+								if ($draft === false && $text_badge == 'Menunggu') {
 									$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
 								}
 							}
@@ -6343,7 +6343,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if ($show_button || $can_verify) {
 							if ($can_verify) {
-								if ($draft === false) {
+								if ($draft === false && $text_badge == 'Menunggu') {
 									$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
 								}
 							}
@@ -7835,7 +7835,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if ($show_button || $can_verify) {
 							if ($can_verify) {
-								if ($draft === false) {
+								if ($draft === false && $text_badge == 'Menunggu') {
 									$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
 								}
 							}
@@ -25001,7 +25001,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if ($show_button || $can_verify) {
 							if ($can_verify) {
-								if ($draft === false) {
+								if ($draft === false && $text_badge == 'Menunggu') {
 									$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
 								}
 							}
@@ -29850,7 +29850,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				if ($option_expired_time < 1) {
 					throw new Exception("Waktu expired data ESR lokal minimal 1 Detik!", 1);
 				}
-
 				$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 					SELECT
 						a.*
@@ -30361,7 +30360,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
 						if ($show_button || $can_verify) {
 							if ($can_verify) {
-								if ($draft === false) {
+								if ($draft === false && $text_badge == 'Menunggu') {
 									$btn .= '<button class="btn btn-sm btn-success" onclick="verifikasi_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Verifikasi Dokumen"><span class="dashicons dashicons-yes"></span></button>';
 								}
 							}
