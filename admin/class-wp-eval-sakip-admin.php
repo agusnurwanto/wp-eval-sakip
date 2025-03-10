@@ -1501,7 +1501,8 @@ class Wp_Eval_Sakip_Admin
 			))
 			->add_tab(__('Menu Profile User'), array(
 				Field::make('html', 'crb_menu_user_note')
-					->set_html('<p style="font-weight: bold;">Tampilan <i>Menu User Profile</i> dapat diaktifkan melalui shortcode <code>[menu_eval_sakip]</code>.</p>'),
+					->set_html('<ol><li style="font-weight: bold;">Tampilan <i>Menu User Profile</i> dapat diaktifkan melalui shortcode <code>[menu_eval_sakip]</code>.</li>
+					<li style="font-weight: bold;">Tampilan <i>Background (Latar Belakang)</i> dapat diaktifkan melalui shortcode <code>[background_menu]</code>. Khusus shortcode ini disesuaikan hanya untuk halaman <code>Login dan Account (Ultimate Member)</code></li></ol>'),
 					
 					Field::make('image', 'crb_bg_menu_user', __('Background Menu (Latar Belakang)'))
 					->set_value_type('url')
