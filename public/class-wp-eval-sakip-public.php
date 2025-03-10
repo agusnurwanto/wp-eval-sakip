@@ -2868,7 +2868,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					} else {
 						$current_user = wp_get_current_user();
 						$user_roles = $current_user->roles;
-						$edit_pa = (array_intersect(['pa'], $user_roles)) ? true : false;
+						$edit_pa = (!array_intersect(['administrator', 'admin_bappeda', 'admin_ortala'], $user_roles)) ? true : false;
 
 						$opsi = array(
 							'keterangan' => $keterangan,
@@ -3062,7 +3062,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					} else {
 						$current_user = wp_get_current_user();
 						$user_roles = $current_user->roles;
-						$edit_pa = (array_intersect(['pa'], $user_roles)) ? true : false;
+						$edit_pa = (!array_intersect(['administrator', 'admin_bappeda', 'admin_ortala'], $user_roles)) ? true : false;
 
 						$opsi = array(
 							'keterangan' => $keterangan,
@@ -3418,7 +3418,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					} else {
 						$current_user = wp_get_current_user();
 						$user_roles = $current_user->roles;
-						$edit_pa = (array_intersect(['pa'], $user_roles)) ? true : false;
+						$edit_pa = (!array_intersect(['administrator', 'admin_bappeda', 'admin_ortala'], $user_roles)) ? true : false;
 						$opsi = array(
 							'keterangan' => $keterangan,
 							'created_at' => current_time('mysql'),
@@ -5085,7 +5085,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					} else {
 						$current_user = wp_get_current_user();
 						$user_roles = $current_user->roles;
-						$edit_pa = (array_intersect(['pa'], $user_roles)) ? true : false;
+						$edit_pa = (!array_intersect(['administrator', 'admin_bappeda', 'admin_ortala'], $user_roles)) ? true : false;
 
 						$opsi = array(
 							'keterangan' => $keterangan,
@@ -25245,7 +25245,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					} else {
 						$current_user = wp_get_current_user();
 						$user_roles = $current_user->roles;
-						$edit_pa = (array_intersect(['pa'], $user_roles)) ? true : false;
+						$edit_pa = (!array_intersect(['administrator', 'admin_bappeda', 'admin_ortala'], $user_roles)) ? true : false;
 
 						$opsi = array(
 							'keterangan' => $keterangan,
@@ -30563,7 +30563,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					} else {
 						$current_user = wp_get_current_user();
 						$user_roles = $current_user->roles;
-						$edit_pa = (array_intersect(['pa'], $user_roles)) ? true : false;
+						$edit_pa = (!array_intersect(['administrator', 'admin_bappeda', 'admin_ortala'], $user_roles)) ? true : false;
 
 						$opsi = array(
 							'keterangan' => $keterangan,
