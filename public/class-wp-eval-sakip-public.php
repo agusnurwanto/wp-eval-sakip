@@ -2868,7 +2868,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					} else {
 						$current_user = wp_get_current_user();
 						$user_roles = $current_user->roles;
-						$edit_pa = (array_intersect(['pa'], $user_roles)) ? true : false;
+						$edit_pa = (!array_intersect(['administrator', 'admin_bappeda', 'admin_ortala'], $user_roles)) ? true : false;
 
 						$opsi = array(
 							'keterangan' => $keterangan,
@@ -3062,7 +3062,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					} else {
 						$current_user = wp_get_current_user();
 						$user_roles = $current_user->roles;
-						$edit_pa = (array_intersect(['pa'], $user_roles)) ? true : false;
+						$edit_pa = (!array_intersect(['administrator', 'admin_bappeda', 'admin_ortala'], $user_roles)) ? true : false;
 
 						$opsi = array(
 							'keterangan' => $keterangan,
@@ -3418,7 +3418,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					} else {
 						$current_user = wp_get_current_user();
 						$user_roles = $current_user->roles;
-						$edit_pa = (array_intersect(['pa'], $user_roles)) ? true : false;
+						$edit_pa = (!array_intersect(['administrator', 'admin_bappeda', 'admin_ortala'], $user_roles)) ? true : false;
 						$opsi = array(
 							'keterangan' => $keterangan,
 							'created_at' => current_time('mysql'),
@@ -5085,7 +5085,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					} else {
 						$current_user = wp_get_current_user();
 						$user_roles = $current_user->roles;
-						$edit_pa = (array_intersect(['pa'], $user_roles)) ? true : false;
+						$edit_pa = (!array_intersect(['administrator', 'admin_bappeda', 'admin_ortala'], $user_roles)) ? true : false;
 
 						$opsi = array(
 							'keterangan' => $keterangan,
@@ -18599,12 +18599,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Jadwal kosong!';
 				}
-				if (!empty($_POST['tahun_anggaran'])) {
-					$tahun_anggaran = $_POST['tahun_anggaran'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun Anggaran kosong!';
-				}
 
 				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
@@ -18625,6 +18619,23 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						ARRAY_A
 					);
 
+					$periode = $wpdb->get_row(
+						$wpdb->prepare("
+						SELECT 
+							*
+						FROM esakip_data_jadwal
+						WHERE id=%d
+						AND status = 1
+					", $id_jadwal),
+						ARRAY_A
+					);
+
+					if (!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggaran'] > 1) {
+						$tahun_periode_selesai = $periode['tahun_selesai_anggaran'];
+					} else {
+						$tahun_periode_selesai = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
+					}
+
 					if (!empty($unit)) {
 						$tbody = '';
 						$counter = 1;
@@ -18634,7 +18645,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$total_draft = 0;
 						$total_dokumen = 0;
 						$total_integrasi = 0;
+						$mapping_jenis_dokumen_esr = [];
 
+						
 						/** get data esr */
 						$data_dokumen_terintegrasi = array();
 						$status_api_esr = get_option('_crb_api_esr_status');
@@ -18651,19 +18664,48 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								$id_jadwal,
 								1
 							), ARRAY_A);
-
-							if (!empty($pengaturan_periode_dokumen)) {
-								$data_dokumen_terintegrasi = $this->get_total_integrasi_esr('esakip_renstra', $pengaturan_periode_dokumen['tahun_anggaran']);
-							}
-						}
-
-						if ($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']) {
-							$ret['status_mapping'] = 1;
-						} else {
-							$ret['status_mapping'] = 0;
-							$ret['message_get_total_integrasi_dokumen_esr'] = $data_dokumen_terintegrasi['message'];
 						}
 						foreach ($unit as $kk => $vv) {
+							$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
+								SELECT 
+										a.*
+								FROM 
+									esakip_data_mapping_jenis_dokumen_esr a 
+								JOIN esakip_menu_dokumen b 
+									ON b.id=a.esakip_menu_dokumen_id AND 
+										a.tahun_anggaran=b.tahun_anggaran AND b.active=1
+			                    JOIN esakip_data_jenis_dokumen_esr c 
+			                       	ON c.jenis_dokumen_esr_id=a.jenis_dokumen_esr_id  AND 
+			                      		c.tahun_anggaran=a.tahun_anggaran AND c.active=1
+			                    where 
+			                      	a.tahun_anggaran=%d and
+			                        b.nama_tabel=%s;
+							", $pengaturan_periode_dokumen['tahun_anggaran'], 'esakip_renstra'), ARRAY_A);
+							// print_r($mapping_jenis_dokumen_esr); die($wpdb->last_query);
+							if (!empty($mapping_jenis_dokumen_esr)) {
+								$tahun_anggaran = $pengaturan_periode_dokumen['tahun_anggaran'];
+								$array_data_esr = [];
+								$data_esr = $this->data_esr($vv['id_skpd']);
+								if ($data_esr['status'] == 'success') {
+									$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+									$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
+
+									foreach ($data_esr as $key => $esr) {
+										if ($esr->dokumen_id == $mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']) {
+											$path = explode("/", $esr->path);
+											$nama_file = end($path);
+											$array_data_esr[] = [
+												'upload_id' => $esr->upload_id,
+												'nama_file' => $nama_file,
+												'keterangan' => $esr->keterangan,
+												'path' => $esr->path
+											];
+										}
+									}
+								} else {
+									$ret['data_esr'] = $data_esr;
+								}
+							}
 							$detail_renstra = $this->functions->generatePage(array(
 								'nama_page' => 'Halaman Detail Dokumen RENSTRA ' . $id_jadwal,
 								'content' => '[upload_dokumen_renstra periode=' . $id_jadwal . ']',
@@ -18685,6 +18727,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									AND active = 1
 								", $vv['id_skpd'], $id_jadwal)
 							);
+
 
 							$jumlah_status_disetujui = $wpdb->get_var(
 								$wpdb->prepare(
@@ -18754,8 +18797,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									'esakip_renstra'
 								)
 							);
-
-
 							$jumlah_disetujui = !empty($jumlah_status_disetujui) ? $jumlah_status_disetujui : 0;
 							$jumlah_ditolak = !empty($jumlah_status_ditolak) ? $jumlah_status_ditolak : 0;
 							$jumlah_draft = !empty($jumlah_status_draft) ? $jumlah_status_draft : 0;
@@ -18763,11 +18804,28 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							if (!empty($jumlah_dokumen)) {
 								$jumlah_menunggu = $jumlah_dokumen - ($jumlah_disetujui + $jumlah_ditolak + $jumlah_draft);
 							}
+							$jumlah_upload_id = $wpdb->get_results(
+					            $wpdb->prepare("
+					            	SELECT 
+					            		upload_id 
+					            	FROM esakip_renstra 
+					            	WHERE id_skpd = %d 
+						            	AND id_jadwal = %d 
+						            	AND active = 1",
+					                $vv['id_skpd'], $id_jadwal)
+					            , ARRAY_A
+					        );
 
-							$jumlah_dokumen_terintegrasi = 0;
-							if ($data_dokumen_terintegrasi['status'] == 'success') {
-								$jumlah_dokumen_terintegrasi = !empty($data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']]) ? $data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']] : 0;
-							}
+					        $jumlah_dokumen_terintegrasi = 0;
+					        if (!empty($jumlah_upload_id)) {
+					            foreach ($jumlah_upload_id as $dokumen) {
+					            	if(!empty($array_data_esr)){
+						                if (in_array($dokumen['upload_id'], array_column($array_data_esr, 'upload_id'))) {
+						                    $jumlah_dokumen_terintegrasi++;
+					                	}
+					            	}
+					            }
+					        }
 
 							$btn = '<div class="btn-action-group">';
 							$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_renstra['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
@@ -18778,9 +18836,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$tbody .= "<td class='text-center bg-success text-white'>" . $jumlah_disetujui . "</td>";
 							$tbody .= "<td class='text-center bg-danger text-white'>" . $jumlah_ditolak . "</td>";
 							$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
-							if ($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']) {
-								$tbody .= "<td class='text-center'>" . $jumlah_dokumen_terintegrasi . "</td>";
-							}
+							$tbody .= "<td class='text-center'>" . $jumlah_dokumen_terintegrasi . "</td>";
 							$tbody .= "<td>" . $btn . "</td>";
 
 							$tbody .= "</tr>";
@@ -18791,6 +18847,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$total_draft += $jumlah_draft;
 							$total_dokumen += $jumlah_dokumen;
 							$total_integrasi += $jumlah_dokumen_terintegrasi;
+							
 						}
 						$ret['data'] = $tbody;
 						$ret['total_menunggu'] = $total_menunggu;
@@ -19806,11 +19863,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			echo '
 			<style>
 				body {
-					background-image: url("'. get_option('_crb_bg_menu_user') .'");
-					background-size: cover; 
-					background-position: center;
-					background-repeat: no-repeat;
-					background-attachment: fixed;
+					background-image: url("'. get_option('_crb_bg_menu_user') .'") !important;
+					background-size: cover !important; 
+					background-position: center !important;
+					background-repeat: no-repeat !important;
+					background-attachment: fixed !important;
 					position: relative;
 					min-height: 100vh;
 				}
@@ -19823,29 +19880,64 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					left: 0;
 					width: 100%;
 					height: 100%;
-					background-color: rgba(0, 0, 0, 0.2); /* Warna hitam transparan */
-					z-index: 1; /* Pastikan overlay ada di atas background */
+					background-color: rgba(0, 0, 0, 0.3); /* Overlay gelap */
+					z-index: 0;
 				}
 		
-				.custom-blur {
-					background: rgba(255, 255, 255, 0.3); /* Warna putih transparan */
-					backdrop-filter: blur(10px); /* Blur efek transparan */
-					-webkit-backdrop-filter: blur(10px); /* Untuk Safari */
-					border: 1px solid rgba(255, 255, 255, 0.3); 
-					position: relative; /* Agar berada di atas overlay */
-					z-index: 2; /* Pastikan card di atas overlay */
-				}
-			</style>';
-		}
-		echo '
-			<style>
-				.custom-blur {
+				/* Card Styling */
+				.custom-blur, .um-header {
+					background: rgba(255, 255, 255, 0.8);
 					border-radius: 15px;
 					padding: 20px; 
 					max-width: 700px; 
-					margin: 20px auto; 
+					margin: 20px auto;
+					border: 1px solid rgba(255, 255, 255, 0.3);
+					box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+					backdrop-filter: blur(12px);
+					-webkit-backdrop-filter: blur(12px);
+					position: relative;
+					z-index: 2;
+				}
+
+				/* Form */
+				.um-form {
+					background: rgba(255, 255, 255, 0.2);
+					padding: 40px;
+					border-radius: 10px;
+				}
+				
+				.entry-title {
+					display : none;
 				}
 			</style>';
+		} else {
+			echo '
+				<style>
+					body {
+						background-color: #f4f4f4;
+						min-height: 100vh;
+					}
+
+					.custom-blur,
+					.um-header {
+						border-radius: 15px;
+						padding: 20px; 
+						max-width: 700px; 
+						margin: 20px auto; 
+					}
+					
+					.um-form,
+					.um-header {
+						background-color: rgba(255, 255, 255, 0.2);
+						box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+						padding: 20px;
+					}
+
+					.entry-title {
+						display : none;
+					}
+				</style>';
+		}
 		
 		if (!empty($_GET) && !empty($_GET['tahun'])) {
 			echo '<div class="card custom-blur shadow-lg">
@@ -21096,12 +21188,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			</div>';
 
 			echo '
-				<div class="text-center" style="margin: 0 0 10px 0;">' . $halaman_monitor_upload_dokumen . '</div>
-        		<ul class="daftar-menu-sakip">
-            		<li>' . $halaman_sakip . '</li>
-           			<li>' . $halaman_sakip_opd . '</li>
-           			<li>' . $halaman_lke . '</li>
-            		<li>' . $halaman_laporan_pk_admin . '</li>';
+				<div class="card custom-blur shadow-lg">
+					<div class="card-body">
+						<div class="text-center" style="margin: 0 0 10px 0;">' . $halaman_monitor_upload_dokumen . '</div>
+        					<ul class="daftar-menu-sakip">
+								<li>' . $halaman_sakip . '</li>
+								<li>' . $halaman_sakip_opd . '</li>
+								<li>' . $halaman_lke . '</li>
+								<li>' . $halaman_laporan_pk_admin . '</li>';
 			if (
 				in_array("admin_panrb", $user_meta->roles)
 				|| in_array("admin_bappeda", $user_meta->roles)
@@ -21113,6 +21207,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			echo '<li>' . $halaman_pengisian_rencana_aksi . '</li>';
 			echo '<li>' . $halaman_menu_jadwal_admin . '</li>';
 			echo '</ul>';
+			echo '</div></div>';
+
 		} else if (
 			in_array("PA", $user_meta->roles)
 			|| in_array("KPA", $user_meta->roles)
@@ -25227,7 +25323,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					} else {
 						$current_user = wp_get_current_user();
 						$user_roles = $current_user->roles;
-						$edit_pa = (array_intersect(['pa'], $user_roles)) ? true : false;
+						$edit_pa = (!array_intersect(['administrator', 'admin_bappeda', 'admin_ortala'], $user_roles)) ? true : false;
 
 						$opsi = array(
 							'keterangan' => $keterangan,
@@ -30542,7 +30638,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					} else {
 						$current_user = wp_get_current_user();
 						$user_roles = $current_user->roles;
-						$edit_pa = (array_intersect(['pa'], $user_roles)) ? true : false;
+						$edit_pa = (!array_intersect(['administrator', 'admin_bappeda', 'admin_ortala'], $user_roles)) ? true : false;
 
 						$opsi = array(
 							'keterangan' => $keterangan,
@@ -30746,17 +30842,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			'Pohon Kinerja' => [
 				'url' 	=> $page_pohon_kinerja_publish['url'],
 				'icon' 	=> get_option('_crb_icon_pohon_kinerja'),
-				'size' => get_option('_crb_icon_size')
+				'size' 	=> get_option('_crb_icon_size')
 			],
 			'Cascading' => [
 				'url' 	=> $page_cascading_publish['url'], 
 				'icon' 	=> get_option('_crb_icon_cascading'),
-				'size' => get_option('_crb_icon_size')
+				'size' 	=> get_option('_crb_icon_size')
 			]
 		];
 
 		$output = '<div class="container mt-3">
-					<div class="card shadow-sm" style="background-color: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border-radius: 10px; padding: 20px; border: none;">
+					<div class="card shadow-sm" style="background-color: rgba(255, 255, 255, 0.2); border-radius: 10px; padding: 20px; border: none;">
 						<div class="card-body text-center">
 							<div class="mb-3 font-weight-bold text-white">
 								Pilih Tahun :
@@ -30768,8 +30864,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 
 		$output .= '</select>
-							</div>
-							<h1 id="tahun-terpilih" class="font-weight-bold text-white">Tahun Anggaran : <span class="text-warning">' . $default_tahun . '</span></h1>
+						</div>
+							<h1 id="tahun-terpilih" class="font-weight-bold text-white mb-5">Tahun Anggaran : <span class="text-warning">' . $default_tahun . '</span></h1>
 							<div class="row">';
 
 		foreach ($data as $nama => $item) {
@@ -30801,6 +30897,77 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		</script>';
 
 		return $output . $javascript;
+	}
+
+	function background_menu() 
+	{
+		//css for background
+		if (get_option('_crb_bg_menu_user')) {
+			echo '
+				<style>
+					body {
+						background-image: url("'. get_option('_crb_bg_menu_user') .'") !important;
+						background-size: cover !important; 
+						background-position: center !important;
+						background-repeat: no-repeat !important;
+					}
+			
+					/* Overlay */
+					body::before {
+						content: "";
+						position: fixed;
+						top: 0;
+						left: 0;
+						width: 100%;
+						height: 100%;
+						background-color: rgba(0, 0, 0, 0.2); /* Warna hitam transparan */
+					}
+					
+					.um-account-tab,
+					.um-account-side {
+						background: rgba(255, 255, 255, 1); /* Warna putih solid */
+						border-radius: 15px;
+						padding: 20px;
+						box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+						position: relative;
+						z-index: 3; /* Pastikan di atas overlay */
+					}
+
+					.um-form {
+						background: rgba(255, 255, 255, 1); /* Warna putih solid */
+						border-radius: 15px;
+						padding: 30px;
+						margin: 20px;
+						box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+						position: relative;
+						z-index: 3; /* Pastikan di atas overlay */
+					}
+
+					.entry-title {
+						display : none;
+					}
+
+				</style>';
+		} else {
+			echo '
+				<style>
+					.um-account-tab,
+					.um-account-side,
+					.um-form {
+						background: rgba(255, 255, 255, 1); /* Warna putih solid */
+						border-radius: 15px;
+						padding: 25px;
+						box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+						position: relative;
+						z-index: 3; /* Pastikan di atas overlay */
+					}
+
+					.entry-title {
+						display : none;
+					}
+
+				</style>';
+		}
 	}
 
 	function get_datatable_pokin_publish()

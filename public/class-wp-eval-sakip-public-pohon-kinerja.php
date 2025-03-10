@@ -1992,6 +1992,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						$total_crosscutting_usulan_vertikal = 0;
 						$total_crosscutting_tujuan = 0;
 						$total_integrasi = 0;
+						$mapping_jenis_dokumen_esr = [];
 
 						if ($penyusunan_pohon_kinerja_opd == false) {
 							/** get data esr */
@@ -2015,18 +2016,50 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									$data_dokumen_terintegrasi = $this->get_total_integrasi_esr('esakip_pohon_kinerja_dan_cascading', $pengaturan_periode_dokumen['tahun_anggaran']);
 								}
 							}
-
-							if ($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']) {
-								$ret['status_mapping'] = 1;
-							} else {
-								$ret['status_mapping'] = 0;
-								$ret['message_get_total_integrasi_dokumen_esr'] = $data_dokumen_terintegrasi['message'];
-							}
 						}
-
 						foreach ($unit as $kk => $vv) {
 
 							if ($penyusunan_pohon_kinerja_opd == false) {
+								$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
+										SELECT 
+												a.*
+										FROM 
+											esakip_data_mapping_jenis_dokumen_esr a 
+										JOIN esakip_menu_dokumen b 
+											ON b.id=a.esakip_menu_dokumen_id AND 
+												a.tahun_anggaran=b.tahun_anggaran AND b.active=1
+					                    JOIN esakip_data_jenis_dokumen_esr c 
+					                       	ON c.jenis_dokumen_esr_id=a.jenis_dokumen_esr_id  AND 
+					                      		c.tahun_anggaran=a.tahun_anggaran AND c.active=1
+					                    where 
+					                      	a.tahun_anggaran=%d and
+					                        b.nama_tabel=%s;
+									", $pengaturan_periode_dokumen['tahun_anggaran'], 'esakip_pohon_kinerja_dan_cascading'), ARRAY_A);
+									// print_r($mapping_jenis_dokumen_esr); die($wpdb->last_query);
+									if (!empty($mapping_jenis_dokumen_esr)) {
+										$tahun_anggaran = $pengaturan_periode_dokumen['tahun_anggaran'];
+										$array_data_esr = [];
+										$data_esr = $this->data_esr($vv['id_skpd']);
+										if ($data_esr['status'] == 'success') {
+											$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+											$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
+
+											foreach ($data_esr as $key => $esr) {
+												if ($esr->dokumen_id == $mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']) {
+													$path = explode("/", $esr->path);
+													$nama_file = end($path);
+													$array_data_esr[] = [
+														'upload_id' => $esr->upload_id,
+														'nama_file' => $nama_file,
+														'keterangan' => $esr->keterangan,
+														'path' => $esr->path
+													];
+												}
+											}
+										} else {
+											$ret['data_esr'] = $data_esr;
+										}
+									}
 								$detail_pohon_kinerja = $this->functions->generatePage(array(
 									'nama_page' => 'Halaman Detail Dokumen Pohon Kinerja dan Cascading | ' . $periode['nama_jadwal'] . ' ' . 'Periode ' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode_selesai  . ' Perangkat Daerah',
 									'content' => '[dokumen_detail_pohon_kinerja_dan_cascading periode=' . $id_jadwal . ']',
@@ -2048,20 +2081,34 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 										AND active = 1
 									", $vv['id_skpd'], $id_jadwal)
 								);
+								$jumlah_upload_id = $wpdb->get_results(
+						            $wpdb->prepare("
+						            	SELECT 
+						            		upload_id 
+						            	FROM esakip_pohon_kinerja_dan_cascading 
+						            	WHERE id_skpd = %d 
+							            	AND id_jadwal = %d 
+							            	AND active = 1",
+						                $vv['id_skpd'], $id_jadwal)
+						            , ARRAY_A
+						        );
 
-								$jumlah_dokumen_terintegrasi = 0;
-								if ($data_dokumen_terintegrasi['status'] == 'success') {
-									$jumlah_dokumen_terintegrasi = !empty($data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']]) ? $data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']] : 0;
-								}
-
+						        $jumlah_dokumen_terintegrasi = 0;
+						        if (!empty($jumlah_upload_id)) {
+						            foreach ($jumlah_upload_id as $dokumen) {
+						            	if(!empty($array_data_esr)){
+							                if (in_array($dokumen['upload_id'], array_column($array_data_esr, 'upload_id'))) {
+							                    $jumlah_dokumen_terintegrasi++;
+						                	}
+						            	}
+						            }
+						        }
 								$btn = '<div class="btn-action-group">';
 								$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_pohon_kinerja['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 								$btn .= '</div>';
 
 								$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
-								if ($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']) {
-									$tbody .= "<td class='text-center'>" . $jumlah_dokumen_terintegrasi . "</td>";
-								}
+								$tbody .= "<td class='text-center'>" . $jumlah_dokumen_terintegrasi . "</td>";
 								$tbody .= "<td>" . $btn . "</td>";
 
 								$tbody .= "</tr>";

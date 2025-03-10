@@ -1691,6 +1691,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$realisasi_3_html = array();
 						$realisasi_4_html = array();
 						$capaian_realisasi = array();
+						$total_harga_tagging_rincian = 0;
 
 						$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 						foreach ($v['indikator'] as $key => $ind) {
@@ -1713,6 +1714,26 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$capaian_realisasi[$key] = number_format(($total_realisasi_tw / $ind['target_akhir']) * 100, 0 ) . "%";
 							}else{
 								$capaian_realisasi[$key] = "0%";
+							}
+							
+							$data_tagging = $wpdb->get_results(
+								$wpdb->prepare("
+									SELECT * 
+									FROM esakip_tagging_rincian_belanja 
+									WHERE active = 1 
+									  AND id_skpd = %d
+									  AND id_indikator = %d
+									  AND kode_sbl = %s
+								", $v['detail']['id_skpd'], $ind['id'], $v['detail']['kode_sbl']),
+								ARRAY_A
+							);
+
+							if(!empty($data_tagging)){
+								foreach ($data_tagging as $value) {
+									$harga_satuan = $value['harga_satuan'];
+									$volume = $value['volume'];
+									$total_harga_tagging_rincian += $volume * $harga_satuan;
+								}
 							}
 						}
 						$indikator_html = implode('<br>', $indikator_html);
@@ -1761,6 +1782,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						if (empty($v['detail']['kode_cascading_sasaran'])) {
 							$keterangan .= '<li>Cascading Sasaran Belum dipilih</li>';
 						}
+
+						$label_cascading = '';
+						if ($v['detail']['label_cascading_sasaran']) {
+							$label_cascading = $v['detail']['kode_cascading_sasaran'] .' '. $v['detail']['label_cascading_sasaran'];
+						}
 						$html .= '
 						<tr class="keg-utama">
 							<td>' . $no . '</td>
@@ -1791,12 +1817,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							<td class="text-center">' . $realisasi_4_html . '</td>
 							<td class="text-center">' . $capaian_realisasi . '</td>
 							<td class="text-right">' . number_format((float)$rencana_pagu_html, 0, ",", ".") . '</td>
+							<td class="text-right">' . number_format((float)$total_harga_tagging_rincian, 0, ",", ".") . '</td>
 							<td class=""></td>
 							<td class=""></td>
-							<td class=""></td>
-							<td class=""></td>
-							<td class=""></td>
-							<td class="anggaran_urian_renaksi"></td>
+							<td class="text-right">' . number_format((float)$v['detail']['pagu_cascading'], 0, ",", ".") . '</td>
+							<td class="text-left">' . $label_cascading . '</td>
 						</tr>
 						';
 
@@ -1819,6 +1844,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$realisasi_4_html = array();
 							$capaian_realisasi = array();
 							$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
+							$total_harga_tagging_rincian = 0;
 							foreach ($renaksi['indikator'] as $key => $ind) {
 								$indikator_html[$key] = $ind['indikator'];
 								$satuan_html[$key] = $ind['satuan'];
@@ -1841,6 +1867,25 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$capaian_realisasi[$key] = "0%";
 								}
 								
+								$data_tagging = $wpdb->get_results(
+									$wpdb->prepare("
+										SELECT * 
+										FROM esakip_tagging_rincian_belanja 
+										WHERE active = 1 
+										  AND id_skpd = %d
+										  AND id_indikator = %d
+										  AND kode_sbl = %s
+									", $renaksi['detail']['id_skpd'], $ind['id'], $renaksi['detail']['kode_sbl']),
+									ARRAY_A
+								);
+
+								if(!empty($data_tagging)){
+									foreach ($data_tagging as $value) {
+										$harga_satuan = $value['harga_satuan'];
+										$volume = $value['volume'];
+										$total_harga_tagging_rincian += $volume * $harga_satuan;
+									}
+								}
 							}
 							$indikator_html = implode('<br>', $indikator_html);
 							$satuan_html = implode('<br>', $satuan_html);
@@ -1980,6 +2025,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								}
 							}
 
+							$label_cascading = '';
+							if ($renaksi['detail']['label_cascading_program']) {
+								$label_cascading = $renaksi['detail']['kode_cascading_program'] .' '. $renaksi['detail']['label_cascading_program'];
+							}
+
 							$html .= '
 							    <tr class="re-naksi">
 							        <td>' . $no . '.' . $no_renaksi . '</td>
@@ -2010,12 +2060,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							        <td class="text-center">' . $realisasi_4_html . '</td>
 							        <td class="text-center">' . $capaian_realisasi . '</td>
 									<td class="text-right">' . number_format((float)$rencana_pagu_html, 0, ",", ".") . '</td>
+							        <td class="text-right">' . number_format((float)$total_harga_tagging_rincian, 0, ",", ".") . '</td>
 							        <td class=""></td>
 							        <td class=""></td>
-							        <td class=""></td>
-							        <td class=""></td>
-							        <td class=""></td>
-							        <td class="anggaran_urian_renaksi"></td>
+									<td class="text-right">' . number_format((float)$renaksi['detail']['pagu_cascading'], 0, ",", ".") . '</td>
+							        <td class="text-left">' . $label_cascading . '</td>
 							    </tr>
 							';
 
@@ -2039,6 +2088,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$realisasi_4_html = array();
 								$capaian_realisasi = array();
 								$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
+								$total_harga_tagging_rincian = 0;
 								foreach ($uraian_renaksi['indikator'] as $key => $ind) {
 									$indikator_html[$key] = $ind['indikator'];
 									$satuan_html[$key] = $ind['satuan'];
@@ -2059,6 +2109,26 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										$capaian_realisasi[$key] = number_format(($total_realisasi_tw / $ind['target_akhir']) * 100, 0 ) . "%";
 									}else{
 										$capaian_realisasi[$key] = "0%";
+									}
+									
+									$data_tagging = $wpdb->get_results(
+										$wpdb->prepare("
+											SELECT * 
+											FROM esakip_tagging_rincian_belanja 
+											WHERE active = 1 
+											  AND id_skpd = %d
+											  AND id_indikator = %d
+											  AND kode_sbl = %s
+										", $uraian_renaksi['detail']['id_skpd'], $ind['id'], $uraian_renaksi['detail']['kode_sbl']),
+										ARRAY_A
+									);
+
+									if(!empty($data_tagging)){
+										foreach ($data_tagging as $value) {
+											$harga_satuan = $value['harga_satuan'];
+											$volume = $value['volume'];
+											$total_harga_tagging_rincian += $volume * $harga_satuan;
+										}
 									}
 								}
 								$indikator_html = implode('<br>', $indikator_html);
@@ -2112,6 +2182,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								if (empty($uraian_renaksi['detail']['kode_cascading_kegiatan'])) {
 									$keterangan .= '<li>Cascading Kegiatan Belum dipilih</li>';
 								}
+								$label_cascading = '';
+								if ($uraian_renaksi['detail']['label_cascading_kegiatan']) {
+									$label_cascading = $uraian_renaksi['detail']['kode_cascading_kegiatan'] .' '. $uraian_renaksi['detail']['label_cascading_kegiatan'];
+								}
 								$html .= '
 								<tr class="ur-kegiatan">
 									<td>' . $no . '.' . $no_renaksi . '.' . $no_uraian_renaksi . '</td>
@@ -2142,10 +2216,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									<td class="text-center">' . $realisasi_4_html . '</td>
 									<td class="text-center">' . $capaian_realisasi . '</td>	
 									<td class="text-right">' . number_format((float)$rencana_pagu_html, 0, ",", ".") . '</td>
+									<td class="text-right">' . number_format((float)$total_harga_tagging_rincian, 0, ",", ".") . '</td>
 									<td class=""></td>
 									<td class=""></td>
-									<td class=""></td>
-									<td class="anggaran_urian_renaksi"></td>
+									<td class="text-right">' . number_format((float)$uraian_renaksi['detail']['pagu_cascading'], 0, ",", ".") . '</td>
+									<td class="text-left">' . $label_cascading . '</td>
 								</tr>
 								';
 
@@ -2167,6 +2242,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$rencana_pagu_html = array();
 									$realisasi_pagu_html = array();
 									$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
+									$total_harga_tagging_rincian = 0;
 									foreach ($uraian_teknis_kegiatan['indikator'] as $key => $ind) {
 										$indikator_html[$key] = '<a href="' . $this->functions->add_param_get($rincian_tagging['url'], '&tahun=' . $_POST['tahun_anggaran'] . '&id_skpd=' . $_POST['id_skpd'] . '&id_indikator=' . $ind['id']) . '" target="_blank">' . $ind['indikator'] . '</a>';
 										$satuan_html[$key] = $ind['satuan'];
@@ -2187,6 +2263,26 @@ class Wp_Eval_Sakip_Monev_Kinerja
 											$capaian_realisasi[$key] = number_format(($total_realisasi_tw / $ind['target_akhir']) * 100, 0) . "%";
 										}else{
 											$capaian_realisasi[$key] = "0%";
+										}
+
+										$data_tagging = $wpdb->get_results(
+											$wpdb->prepare("
+												SELECT * 
+												FROM esakip_tagging_rincian_belanja 
+												WHERE active = 1 
+												  AND id_skpd = %d
+												  AND id_indikator = %d
+												  AND kode_sbl = %s
+											", $uraian_teknis_kegiatan['detail']['id_skpd'], $ind['id'], $uraian_teknis_kegiatan['detail']['kode_sbl']),
+											ARRAY_A
+										);
+
+										if(!empty($data_tagging)){
+											foreach ($data_tagging as $value) {
+												$harga_satuan = $value['harga_satuan'];
+												$volume = $value['volume'];
+												$total_harga_tagging_rincian += $volume * $harga_satuan;
+											}
 										}
 									}
 									$indikator_html = implode('<br>', $indikator_html);
@@ -2240,6 +2336,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									if (empty($uraian_teknis_kegiatan['detail']['kode_cascading_sub_kegiatan'])) {
 										$keterangan .= '<li>Cascading Sub Kegiatan Belum dipilih</li>';
 									}
+									$label_cascading = '';
+									if ($uraian_teknis_kegiatan['detail']['label_cascading_sub_kegiatan']) {
+										$nama_subkeg = implode(" ", array_slice(explode(" ", $uraian_teknis_kegiatan['detail']['label_cascading_sub_kegiatan']), 1));
+										$label_cascading = $uraian_teknis_kegiatan['detail']['kode_cascading_sub_kegiatan'] .' '. $nama_subkeg;
+									}
 									$html .= '
 									<tr>
 										<td>' . $no . '.' . $no_renaksi . '.' . $no_uraian_renaksi . '.' . $no_uraian_teknis . '</td>
@@ -2270,10 +2371,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										<td class="text-center">' . $realisasi_4_html . '</td>
 										<td class="text-center">' . $capaian_realisasi . '</td>
 										<td class="text-right">' . number_format((float)$rencana_pagu_html, 0, ",", ".") . '</td>
-										<td class=""></td>
+										<td class="text-right">' . number_format((float)$total_harga_tagging_rincian, 0, ",", ".") . '</td>
 										<td class="text-right" style="visibility: hidden;">' . $realisasi_pagu_html . '</td>
 										<td class=""></td>
-										<td class="anggaran_urian_renaksi"></td>
+										<td class="text-right">' . number_format((float)$uraian_teknis_kegiatan['detail']['pagu_cascading'], 0, ",", ".") . '</td>
+										<td class="text-left">' . $label_cascading . '</td>
 									</tr>
 									';
 								}
