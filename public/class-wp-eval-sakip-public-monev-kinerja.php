@@ -1695,7 +1695,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 						$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 						foreach ($v['indikator'] as $key => $ind) {
-							$indikator_html[$key] = $ind['indikator'];
+							$indikator_html[$key] = '<a href="' . $this->functions->add_param_get($rincian_tagging['url'], '&tahun=' . $_POST['tahun_anggaran'] . '&id_skpd=' . $_POST['id_skpd'] . '&id_indikator=' . $ind['id']) . '" target="_blank">' . $ind['indikator'] . '</a>';
 							$satuan_html[$key] = $ind['satuan'];
 							$target_awal_html[$key] = $ind['target_awal'];
 							$target_akhir_html[$key] = $ind['target_akhir'];
@@ -1703,7 +1703,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$target_2_html[$key] = $ind['target_2'];
 							$target_3_html[$key] = $ind['target_3'];
 							$target_4_html[$key] = $ind['target_4'];
-							$rencana_pagu_html[$key] = ($set_pagu_renaksi == 1) ? 0 : (!empty($ind['rencana_pagu']) ? $ind['rencana_pagu'] : 0);
+							$rencana_pagu_html[$key] = ($set_pagu_renaksi == 1) ? 0 : (!empty($ind['rencana_pagu']) ? number_format((float)$ind['rencana_pagu'], 0, ",", ".") : 0);
 							$realisasi_pagu_html[$key] = !empty($ind['realisasi_pagu']) ? $ind['realisasi_pagu'] : 0;
 							$realisasi_1_html[$key] = !empty($ind['realisasi_tw_1']) ? $ind['realisasi_tw_1'] : 0;
 							$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
@@ -1816,11 +1816,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							<td class="text-center">' . $realisasi_3_html . '</td>
 							<td class="text-center">' . $realisasi_4_html . '</td>
 							<td class="text-center">' . $capaian_realisasi . '</td>
-							<td class="text-right">' . number_format((float)$rencana_pagu_html, 0, ",", ".") . '</td>
+							<td class="text-right">' . $rencana_pagu_html . '</td>
 							<td class="text-right">' . number_format((float)$total_harga_tagging_rincian, 0, ",", ".") . '</td>
 							<td class=""></td>
 							<td class=""></td>
-							<td class="text-right">' . number_format((float)$v['detail']['pagu_cascading'], 0, ",", ".") . '</td>
+							<td class="text-right"></td>
 							<td class="text-left">' . $label_cascading . '</td>
 						</tr>
 						';
@@ -1846,7 +1846,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 							$total_harga_tagging_rincian = 0;
 							foreach ($renaksi['indikator'] as $key => $ind) {
-								$indikator_html[$key] = $ind['indikator'];
+								$indikator_html[$key] = '<a href="' . $this->functions->add_param_get($rincian_tagging['url'], '&tahun=' . $_POST['tahun_anggaran'] . '&id_skpd=' . $_POST['id_skpd'] . '&id_indikator=' . $ind['id']) . '" target="_blank">' . $ind['indikator'] . '</a>';
 								$satuan_html[$key] = $ind['satuan'];
 								$target_awal_html[$key] = $ind['target_awal'];
 								$target_akhir_html[$key] = $ind['target_akhir'];
@@ -1854,7 +1854,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$target_2_html[$key] = $ind['target_2'];
 								$target_3_html[$key] = $ind['target_3'];
 								$target_4_html[$key] = $ind['target_4'];
-								$rencana_pagu_html[$key] = ($set_pagu_renaksi == 1) ? 0 : (!empty($ind['rencana_pagu']) ? $ind['rencana_pagu'] : 0);
+								$rencana_pagu_html[$key] = ($set_pagu_renaksi == 1) ? 0 : (!empty($ind['rencana_pagu']) ? number_format((float)$ind['rencana_pagu'], 0, ",", ".") : 0);
 								$realisasi_pagu_html[$key] = !empty($ind['realisasi_pagu']) ? $ind['realisasi_pagu'] : 0;
 								$realisasi_1_html[$key] = !empty($ind['realisasi_tw_1']) ? $ind['realisasi_tw_1'] : 0;
 								$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
@@ -2059,7 +2059,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							        <td class="text-center">' . $realisasi_3_html . '</td>
 							        <td class="text-center">' . $realisasi_4_html . '</td>
 							        <td class="text-center">' . $capaian_realisasi . '</td>
-									<td class="text-right">' . number_format((float)$rencana_pagu_html, 0, ",", ".") . '</td>
+									<td class="text-right">' . $rencana_pagu_html . '</td>
 							        <td class="text-right">' . number_format((float)$total_harga_tagging_rincian, 0, ",", ".") . '</td>
 							        <td class=""></td>
 							        <td class=""></td>
@@ -2090,7 +2090,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 								$total_harga_tagging_rincian = 0;
 								foreach ($uraian_renaksi['indikator'] as $key => $ind) {
-									$indikator_html[$key] = $ind['indikator'];
+									$indikator_html[$key] = '<a href="' . $this->functions->add_param_get($rincian_tagging['url'], '&tahun=' . $_POST['tahun_anggaran'] . '&id_skpd=' . $_POST['id_skpd'] . '&id_indikator=' . $ind['id']) . '" target="_blank">' . $ind['indikator'] . '</a>';
 									$satuan_html[$key] = $ind['satuan'];
 									$target_awal_html[$key] = $ind['target_awal'];
 									$target_akhir_html[$key] = $ind['target_akhir'];
@@ -2098,7 +2098,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$target_2_html[$key] = $ind['target_2'];
 									$target_3_html[$key] = $ind['target_3'];
 									$target_4_html[$key] = $ind['target_4'];
-									$rencana_pagu_html[$key] = ($set_pagu_renaksi == 1) ? 0 : (!empty($ind['rencana_pagu']) ? $ind['rencana_pagu'] : 0);
+									$rencana_pagu_html[$key] = ($set_pagu_renaksi == 1) ? 0 : (!empty($ind['rencana_pagu']) ? number_format((float)$ind['rencana_pagu'], 0, ",", ".") : 0);
 									$realisasi_pagu_html[$key] = !empty($ind['realisasi_pagu']) ? $ind['realisasi_pagu'] : 0;
 									$realisasi_1_html[$key] = !empty($ind['realisasi_tw_1']) ? $ind['realisasi_tw_1'] : 0;
 									$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
@@ -2215,7 +2215,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									<td class="text-center">' . $realisasi_3_html . '</td>
 									<td class="text-center">' . $realisasi_4_html . '</td>
 									<td class="text-center">' . $capaian_realisasi . '</td>	
-									<td class="text-right">' . number_format((float)$rencana_pagu_html, 0, ",", ".") . '</td>
+									<td class="text-right">' . $rencana_pagu_html . '</td>
 									<td class="text-right">' . number_format((float)$total_harga_tagging_rincian, 0, ",", ".") . '</td>
 									<td class=""></td>
 									<td class=""></td>
@@ -2252,7 +2252,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										$target_2_html[$key] = $ind['target_2'];
 										$target_3_html[$key] = $ind['target_3'];
 										$target_4_html[$key] = $ind['target_4'];
-										$rencana_pagu_html[$key] = ($set_pagu_renaksi == 1) ? 0 : (!empty($ind['rencana_pagu']) ? $ind['rencana_pagu'] : 0);;
+										$rencana_pagu_html[$key] = ($set_pagu_renaksi == 1) ? 0 : (!empty($ind['rencana_pagu']) ? number_format((float)$ind['rencana_pagu'], 0, ",", ".") : 0);;
 										$realisasi_pagu_html[$key] = !empty($ind['realisasi_pagu']) ? $ind['realisasi_pagu'] : 0;
 										$realisasi_1_html[$key] = !empty($ind['realisasi_tw_1']) ? $ind['realisasi_tw_1'] : 0;
 										$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
@@ -2370,7 +2370,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										<td class="text-center">' . $realisasi_3_html . '</td>
 										<td class="text-center">' . $realisasi_4_html . '</td>
 										<td class="text-center">' . $capaian_realisasi . '</td>
-										<td class="text-right">' . number_format((float)$rencana_pagu_html, 0, ",", ".") . '</td>
+										<td class="text-right">' . $rencana_pagu_html . '</td>
 										<td class="text-right">' . number_format((float)$total_harga_tagging_rincian, 0, ",", ".") . '</td>
 										<td class="text-right" style="visibility: hidden;">' . $realisasi_pagu_html . '</td>
 										<td class=""></td>

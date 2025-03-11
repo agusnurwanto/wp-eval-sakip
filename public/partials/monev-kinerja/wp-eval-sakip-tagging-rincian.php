@@ -150,6 +150,27 @@ $this_admin_pemda = (array_intersect($admin_role_pemda, $user_roles)) ? 1 : 2;
 
 // $hak_akses_user = ($cek_settingan_menu == $this_admin_pemda || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
 
+$data_rhk = array(
+	1 => array(),
+	2 => array(),
+	3 => array(),
+	4 => array(),
+);
+
+$data_pegawai = array(
+	1 => null,
+	2 => null,
+	3 => null,
+	4 => null,
+);
+
+$data_skpd = array(
+	1 => null,
+	2 => null,
+	3 => null,
+	4 => null,
+);
+
 $renaksi = $wpdb->get_row(
 	$wpdb->prepare("
         SELECT *
@@ -161,12 +182,13 @@ $renaksi = $wpdb->get_row(
 
 if (!empty($renaksi)) {
 	$data = get_pegawai_skpd_rhk($renaksi, $wpdb);
+	$data_rhk[$renaksi['level']] = $renaksi;
 
-	$nama_pegawai_4 = $data['pegawai'] ?? null;
-	$nama_skpd_4 = $data['skpd'] ?? null;
+	$data_pegawai[$renaksi['level']] = $data_this_pegawai = $nama_pegawai_4 = $data['pegawai'] ?? null;
+	$data_skpd[$renaksi['level']] = $data_this_skpd = $nama_skpd_4 = $data['skpd'] ?? null;
 } else {
-	$nama_pegawai_4 = null;
-	$nama_skpd_4 = null;
+	$data_this_pegawai = $nama_pegawai_4 = null;
+	$data_this_skpd = $nama_skpd_4 = null;
 }
 
 $subkeg = array();
@@ -176,81 +198,96 @@ if(!empty($renaksi['label_cascading_sub_kegiatan'])){
 	$nama_sub_keg = $subkeg[1];
 }
 
-$renaksi_parent1 = $wpdb->get_row(
-	$wpdb->prepare("
-		SELECT *
-		FROM esakip_data_rencana_aksi_opd
-		WHERE id=%d
-	", $renaksi['parent']),
-	ARRAY_A
-);
+$renaksi_parent1 = array();
+if(!empty($renaksi['parent'])){
+	$renaksi_parent1 = $wpdb->get_row(
+		$wpdb->prepare("
+			SELECT *
+			FROM esakip_data_rencana_aksi_opd
+			WHERE id=%d
+		", $renaksi['parent']),
+		ARRAY_A
+	);
+}
 
 if (!empty($renaksi_parent1)) {
 	$data = get_pegawai_skpd_rhk($renaksi_parent1, $wpdb);
+	$data_rhk[$renaksi_parent1['level']] = $renaksi_parent1;
 
-	$nama_pegawai_1 = $data['pegawai'] ?? null;
-	$nama_skpd_1 = $data['skpd'] ?? null;
+	$data_pegawai[$renaksi_parent1['level']] = $nama_pegawai_1 = $data['pegawai'] ?? null;
+	$data_skpd[$renaksi_parent1['level']] = $nama_skpd_1 = $data['skpd'] ?? null;
 } else {
 	$nama_pegawai_1 = null;
 	$nama_skpd_1 = null;
 }
 
-$renaksi_parent2 = $wpdb->get_row(
-	$wpdb->prepare("
-		SELECT *
-		FROM esakip_data_rencana_aksi_opd
-		WHERE id=%d
-	", $renaksi_parent1['parent']),
-	ARRAY_A
-);
+$renaksi_parent2 = array();
+if(!empty($renaksi_parent1['parent'])){
+	$renaksi_parent2 = $wpdb->get_row(
+		$wpdb->prepare("
+			SELECT *
+			FROM esakip_data_rencana_aksi_opd
+			WHERE id=%d
+		", $renaksi_parent1['parent']),
+		ARRAY_A
+	);
+}
 
 if (!empty($renaksi_parent2)) {
 	$data = get_pegawai_skpd_rhk($renaksi_parent2, $wpdb);
+	$data_rhk[$renaksi_parent2['level']] = $renaksi_parent2;
 
-	$nama_pegawai_2 = $data['pegawai'] ?? null;
-	$nama_skpd_2 = $data['skpd'] ?? null;
+	$data_pegawai[$renaksi_parent2['level']] = $nama_pegawai_2 = $data['pegawai'] ?? null;
+	$data_skpd[$renaksi_parent2['level']] = $nama_skpd_2 = $data['skpd'] ?? null;
 } else {
 	$nama_pegawai_2 = null;
 	$nama_skpd_2 = null;
 }
 
-$renaksi_parent3 = $wpdb->get_row(
-	$wpdb->prepare("
-		SELECT *
-		FROM esakip_data_rencana_aksi_opd
-		WHERE id=%d
-	", $renaksi_parent2['parent']),
-	ARRAY_A
-);
+$renaksi_parent3 = array();
+if(!empty($renaksi_parent2['parent'])){
+	$renaksi_parent3 = $wpdb->get_row(
+		$wpdb->prepare("
+			SELECT *
+			FROM esakip_data_rencana_aksi_opd
+			WHERE id=%d
+		", $renaksi_parent2['parent']),
+		ARRAY_A
+	);
+}
 
 if (!empty($renaksi_parent3)) {
 	$data = get_pegawai_skpd_rhk($renaksi_parent3, $wpdb);
+	$data_rhk[$renaksi_parent3['level']] = $renaksi_parent3;
 
-	$nama_pegawai_3 = $data['pegawai'] ?? null;
-	$nama_skpd_3 = $data['skpd'] ?? null;
+	$data_pegawai[$renaksi_parent3['level']] = $nama_pegawai_3 = $data['pegawai'] ?? null;
+	$data_skpd[$renaksi_parent3['level']] = $nama_skpd_3 = $data['skpd'] ?? null;
 } else {
 	$nama_pegawai_3 = null;
 	$nama_skpd_3 = null;
 }
 
-$renaksi_parent_pemda = $wpdb->get_results(
-	$wpdb->prepare("
-		SELECT 
-			i.*,
-			r.label,
-			r.id as id_renaksi,
-			r.parent
-		FROM `esakip_data_label_rencana_aksi` l
-		INNER JOIN esakip_data_rencana_aksi_indikator_pemda i 
-				ON l.parent_indikator_renaksi_pemda=i.id
-		INNER JOIN esakip_data_rencana_aksi_pemda r 
-				ON l.parent_renaksi_pemda=r.id
-		WHERE l.parent_renaksi_opd=%d
-		  AND i.active=1
-		  AND i.tahun_anggaran=%d
-	", $renaksi_parent1['parent'], $tahun),
-	ARRAY_A
-);
+$renaksi_parent_pemda = array();
+if(!empty($renaksi_parent1['parent'])){
+	$renaksi_parent_pemda = $wpdb->get_results(
+		$wpdb->prepare("
+			SELECT 
+				i.*,
+				r.label,
+				r.id as id_renaksi,
+				r.parent
+			FROM `esakip_data_label_rencana_aksi` l
+			INNER JOIN esakip_data_rencana_aksi_indikator_pemda i 
+					ON l.parent_indikator_renaksi_pemda=i.id
+			INNER JOIN esakip_data_rencana_aksi_pemda r 
+					ON l.parent_renaksi_pemda=r.id
+			WHERE l.parent_renaksi_opd=%d
+			  AND i.active=1
+			  AND i.tahun_anggaran=%d
+		", $renaksi_parent1['parent'], $tahun),
+		ARRAY_A
+	);
+}
 
 $renaksi_pemda4 = array(
 	'label' => array()
@@ -333,7 +370,7 @@ if (!empty($data_user_pegawai)) {
 		if (!empty($skpd_user_pegawai)) {
 			if (($skpd_user_pegawai['id_skpd'] == $id_skpd && $v_user['tipe_pegawai_id'] == 11 && strlen($v_user['satker_id']) == 2) || $is_administrator) {
 				$hak_akses_user_pegawai = 1;
-			} else if ($skpd_user_pegawai['id_skpd'] == $id_skpd && !empty($nama_pegawai_4['nip_baru']) && $nama_pegawai_4['nip_baru'] == $user_nip) {
+			} else if ($skpd_user_pegawai['id_skpd'] == $id_skpd && !empty($data_this_pegawai['nip_baru']) && $data_this_pegawai['nip_baru'] == $user_nip) {
 				$hak_akses_user_pegawai = 2;
 			}
 			if(empty($hak_akses_user_pegawai_per_skpd[$skpd_user_pegawai['id_skpd']])){
@@ -581,7 +618,7 @@ $wpsipd_status = get_option('_crb_url_server_sakip');
 if (empty($wpsipd_status)) {
 	$disabled = 'disabled';
 	$text_pesan = 'Kolom URL Server WP-SIPD Di Menu Pengaturan Perangkat Daerah Kosong!';
-} else if (empty($renaksi['kode_sbl'])) {
+} else if (empty($renaksi['kode_sbl']) && !empty($data_rhk[4])) {
 	$disabled = 'disabled';
 	$disabled_manual = 'disabled';
 	$text_pesan = 'Kolom Cascading Sub Kegiatan Kosong!';
@@ -912,169 +949,177 @@ if(!empty($ind_renaksi['target_akhir']) && !empty($ind_renaksi['realisasi_akhir'
 			</tbody>
 		</table>
 		<h3 class="text-center">Data Organisasi Perangkat Daerah</h3>
-		<table class="borderless-table">
-			<tbody>
-				<tr>
-					<td style="width: 270px;">Pohon Kinerja Level 1</td>
-					<td style="width: 20px;" class="text-center">:</td>
-					<td><?php echo $renaksi_parent3['label_pokin_1']; ?></td>
-				</tr>
-				<tr>
-					<td style="width: 270px;">Pohon Kinerja Level 2</td>
-					<td style="width: 20px;" class="text-center">:</td>
-					<td><?php echo $renaksi_parent3['label_pokin_2']; ?></td>
-				</tr>
-				<tr>
-					<td>Kegiatan Utama | RHK Level 1</td>
-					<td class="text-center">:</td>
-					<td><?php echo $renaksi_parent3['label']; ?></td>
-				</tr>
-				<tr>
-					<td>Sasaran RENSTRA</td>
-					<td class="text-center">:</td>
-					<td><?php echo $renaksi_parent3['kode_cascading_sasaran'] . ' ' . $renaksi_parent3['label_cascading_sasaran']; ?></td>
-				</tr>
-				<tr>
-					<td style="width: 270px;">Satuan Kerja</td>
-					<td>:</td>
-					<td><?php echo $nama_skpd_3; ?></td>
-				</tr>
-				<tr>
-					<td style="width: 270px;">Nama Pegawai</td>
-					<td>:</td>
-					<td>
-						<?php
-						if (!empty($nama_pegawai_3)) {
-							echo $nama_pegawai_3['nip_baru'] . ' - ' . $nama_pegawai_3['nama_pegawai'];
-						} else {
-							echo '-';
-						}
-						?>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-		<table class="borderless-table">
-			<tbody>
-				<tr>
-					<td style="width: 270px;">Pohon Kinerja Level 3</td>
-					<td style="width: 20px;" class="text-center">:</td>
-					<td><?php echo $renaksi_parent2['label_pokin_3']; ?></td>
-				</tr>
-				<tr>
-					<td>Rencana Hasil Kerja | RHK Level 2</td>
-					<td class="text-center">:</td>
-					<td><?php echo $renaksi_parent2['label']; ?></td>
-				</tr>
-				<tr>
-					<td>Program</td>
-					<td class="text-center">:</td>
-					<td><?php echo $renaksi_parent2['kode_cascading_program'] . ' ' . $renaksi_parent2['label_cascading_program']; ?></td>
-				</tr>
-				<tr>
-					<td style="width: 270px;">Satuan Kerja</td>
-					<td>:</td>
-					<td><?php echo $nama_skpd_2; ?></td>
-				</tr>
-				<tr>
-					<td style="width: 270px;">Nama Pegawai</td>
-					<td>:</td>
-					<td>
-						<?php
-						if (!empty($nama_pegawai_2)) {
-							echo $nama_pegawai_2['nip_baru'] . ' - ' . $nama_pegawai_2['nama_pegawai'];
-						} else {
-							echo '-';
-						}
-						?>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-		<table class="borderless-table">
-			<tbody>
-				<tr>
-					<td style="width: 270px;">Pohon Kinerja Level 4</td>
-					<td style="width: 20px;" class="text-center">:</td>
-					<td><?php echo $renaksi_parent1['label_pokin_4']; ?></td>
-				</tr>
-				<tr>
-					<td>Uraian Kegiatan RHK | RHK Level 3</td>
-					<td class="text-center">:</td>
-					<td><?php echo $renaksi_parent1['label']; ?></td>
-				</tr>
-				<tr>
-					<td>Kegiatan</td>
-					<td class="text-center">:</td>
-					<td><?php echo $renaksi_parent1['kode_cascading_kegiatan'] . ' ' . $renaksi_parent1['label_cascading_kegiatan']; ?></td>
-				</tr>
-				<tr>
-					<td style="width: 270px;">Satuan Kerja</td>
-					<td>:</td>
-					<td><?php echo $nama_skpd_1; ?></td>
-				</tr>
-				<tr>
-					<td style="width: 270px;">Nama Pegawai</td>
-					<td>:</td>
-					<td>
-						<?php
-						if (!empty($nama_pegawai_1)) {
-							echo $nama_pegawai_1['nip_baru'] . ' - ' . $nama_pegawai_1['nama_pegawai'];
-						} else {
-							echo '-';
-						}
-						?>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-		<table class="borderless-table">
-			<tbody>
-				<tr>
-					<td style="width: 270px;">Pohon Kinerja Level 5</td>
-					<td style="width: 20px;" class="text-center">:</td>
-					<td><?php echo $renaksi['label_pokin_5']; ?></td>
-				</tr>
-				<tr>
-					<td>Uraian Teknis Kegiatan | RHK Level 4</td>
-					<td class="text-center">:</td>
-					<td><?php echo $renaksi['label']; ?></td>
-				</tr>
-				<tr>
-					<td>Dasar Kegiatan</td>
-					<td class="text-center">:</td>
-					<td>Mandatory Pusat, Kebijakan Kepala Daerah, POKIR, MUSRENBANG</td>
-				</tr>
-				<tr>
-					<td>Sub Kegiatan</td>
-					<td class="text-center">:</td>
-					<td><?php echo $renaksi['kode_cascading_sub_kegiatan'] . ' ' . $nama_sub_keg; ?></td>
-				</tr>
-				<tr>
-					<td>Pagu RENJA</td>
-					<td class="text-center">:</td>
-					<td>Rp 0</td>
-				</tr>
-				<tr>
-					<td style="width: 270px;">Satuan Kerja</td>
-					<td>:</td>
-					<td><?php echo $nama_skpd_4; ?></td>
-				</tr>
-				<tr>
-					<td style="width: 270px;">Nama Pegawai</td>
-					<td>:</td>
-					<td>
-						<?php
-						if (!empty($nama_pegawai_4)) {
-							echo $nama_pegawai_4['nip_baru'] . ' - ' . $nama_pegawai_4['nama_pegawai'];
-						} else {
-							echo '-';
-						}
-						?>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+		<?php if(!empty($data_rhk[1])): ?>
+			<table class="borderless-table">
+				<tbody>
+					<tr>
+						<td style="width: 270px;">Pohon Kinerja Level 1</td>
+						<td style="width: 20px;" class="text-center">:</td>
+						<td><?php echo $data_rhk[1]['label_pokin_1']; ?></td>
+					</tr>
+					<tr>
+						<td style="width: 270px;">Pohon Kinerja Level 2</td>
+						<td style="width: 20px;" class="text-center">:</td>
+						<td><?php echo $data_rhk[1]['label_pokin_2']; ?></td>
+					</tr>
+					<tr>
+						<td>Kegiatan Utama | RHK Level 1</td>
+						<td class="text-center">:</td>
+						<td><?php echo $data_rhk[1]['label']; ?></td>
+					</tr>
+					<tr>
+						<td>Sasaran RENSTRA</td>
+						<td class="text-center">:</td>
+						<td><?php echo $data_rhk[1]['kode_cascading_sasaran'] . ' ' . $data_rhk[1]['label_cascading_sasaran']; ?></td>
+					</tr>
+					<tr>
+						<td style="width: 270px;">Satuan Kerja</td>
+						<td>:</td>
+						<td><?php echo $data_skpd[1]; ?></td>
+					</tr>
+					<tr>
+						<td style="width: 270px;">Nama Pegawai</td>
+						<td>:</td>
+						<td>
+							<?php
+							if (!empty($data_pegawai[1])) {
+								echo $data_pegawai[1]['nip_baru'] . ' - ' . $data_pegawai[1]['nama_pegawai'];
+							} else {
+								echo '-';
+							}
+							?>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		<?php endif; ?>
+		<?php if(!empty($data_rhk[2])): ?>
+			<table class="borderless-table">
+				<tbody>
+					<tr>
+						<td style="width: 270px;">Pohon Kinerja Level 3</td>
+						<td style="width: 20px;" class="text-center">:</td>
+						<td><?php echo $data_rhk[2]['label_pokin_3']; ?></td>
+					</tr>
+					<tr>
+						<td>Rencana Hasil Kerja | RHK Level 2</td>
+						<td class="text-center">:</td>
+						<td><?php echo $data_rhk[2]['label']; ?></td>
+					</tr>
+					<tr>
+						<td>Program</td>
+						<td class="text-center">:</td>
+						<td><?php echo $data_rhk[2]['kode_cascading_program'] . ' ' . $data_rhk[2]['label_cascading_program']; ?></td>
+					</tr>
+					<tr>
+						<td style="width: 270px;">Satuan Kerja</td>
+						<td>:</td>
+						<td><?php echo $data_skpd[2]; ?></td>
+					</tr>
+					<tr>
+						<td style="width: 270px;">Nama Pegawai</td>
+						<td>:</td>
+						<td>
+							<?php
+							if (!empty($data_pegawai[2])) {
+								echo $data_pegawai[2]['nip_baru'] . ' - ' . $data_pegawai[2]['nama_pegawai'];
+							} else {
+								echo '-';
+							}
+							?>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		<?php endif; ?>
+		<?php if(!empty($data_rhk[3])): ?>
+			<table class="borderless-table">
+				<tbody>
+					<tr>
+						<td style="width: 270px;">Pohon Kinerja Level 4</td>
+						<td style="width: 20px;" class="text-center">:</td>
+						<td><?php echo $data_rhk[3]['label_pokin_4']; ?></td>
+					</tr>
+					<tr>
+						<td>Uraian Kegiatan RHK | RHK Level 3</td>
+						<td class="text-center">:</td>
+						<td><?php echo $data_rhk[3]['label']; ?></td>
+					</tr>
+					<tr>
+						<td>Kegiatan</td>
+						<td class="text-center">:</td>
+						<td><?php echo $data_rhk[3]['kode_cascading_kegiatan'] . ' ' . $data_rhk[3]['label_cascading_kegiatan']; ?></td>
+					</tr>
+					<tr>
+						<td style="width: 270px;">Satuan Kerja</td>
+						<td>:</td>
+						<td><?php echo $data_skpd[3]; ?></td>
+					</tr>
+					<tr>
+						<td style="width: 270px;">Nama Pegawai</td>
+						<td>:</td>
+						<td>
+							<?php
+							if (!empty($data_pegawai[3])) {
+								echo $data_pegawai[3]['nip_baru'] . ' - ' . $data_pegawai[3]['nama_pegawai'];
+							} else {
+								echo '-';
+							}
+							?>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		<?php endif; ?>
+		<?php if(!empty($data_rhk[4])): ?>
+			<table class="borderless-table">
+				<tbody>
+					<tr>
+						<td style="width: 270px;">Pohon Kinerja Level 5</td>
+						<td style="width: 20px;" class="text-center">:</td>
+						<td><?php echo $data_rhk[4]['label_pokin_5']; ?></td>
+					</tr>
+					<tr>
+						<td>Uraian Teknis Kegiatan | RHK Level 4</td>
+						<td class="text-center">:</td>
+						<td><?php echo $data_rhk[4]['label']; ?></td>
+					</tr>
+					<tr>
+						<td>Dasar Kegiatan</td>
+						<td class="text-center">:</td>
+						<td>Mandatory Pusat, Kebijakan Kepala Daerah, POKIR, MUSRENBANG</td>
+					</tr>
+					<tr>
+						<td>Sub Kegiatan</td>
+						<td class="text-center">:</td>
+						<td><?php echo $data_rhk[4]['kode_cascading_sub_kegiatan'] . ' ' . $nama_sub_keg; ?></td>
+					</tr>
+					<tr>
+						<td>Pagu RENJA</td>
+						<td class="text-center">:</td>
+						<td>Rp 0</td>
+					</tr>
+					<tr>
+						<td style="width: 270px;">Satuan Kerja</td>
+						<td>:</td>
+						<td><?php echo $data_skpd[4]; ?></td>
+					</tr>
+					<tr>
+						<td style="width: 270px;">Nama Pegawai</td>
+						<td>:</td>
+						<td>
+							<?php
+							if (!empty($data_pegawai[4])) {
+								echo $data_pegawai[4]['nip_baru'] . ' - ' . $data_pegawai[4]['nama_pegawai'];
+							} else {
+								echo '-';
+							}
+							?>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		<?php endif; ?>
 
 
 		<h3 class="text-center">Target dan Realisasi Per Bulan</h3>
@@ -1137,7 +1182,7 @@ if(!empty($ind_renaksi['target_akhir']) && !empty($ind_renaksi['realisasi_akhir'
 			</thead>
 			<tbody>
 				<tr>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Rp. <?php echo number_format($ind_renaksi['rencana_pagu'], 2, ',', '.'); ?></td>
+					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Rp. <?php echo number_format((!empty($ind_renaksi['rencana_pagu']) ? $ind_renaksi['rencana_pagu'] : 0), 2, ',', '.'); ?></td>
 					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Rp. <?php echo number_format($total_all, 2, ',', '.'); ?></td>
 					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Rp. <?php echo number_format($total_all_realisasi, 2, ',', '.'); ?></td>
 					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">
@@ -1149,37 +1194,39 @@ if(!empty($ind_renaksi['target_akhir']) && !empty($ind_renaksi['realisasi_akhir'
 			</tbody>
 		</table>
 
-		<h3 class="text-center">Rincian Belanja Teknis Kegiatan</h3>
-		<div class="m-2 text-center">
-			<?php if($hak_akses_user_pegawai == 1 || $hak_akses_user_pegawai == 2): ?>
-				<button class="btn btn-primary m-2 text-center rincian_manual" onclick="handleModalTambahDataManual()" title="Tambah Data" <?php echo $disabled_manual; ?>>
-					<span class="dashicons dashicons-plus"></span> Tambah Rincian Belanja Manual
-				</button>
-				<button class="btn btn-success m-2 text-center rincian_rka" title="Tambah Data Dari WP-SIPD" onclick="handleModalTambahDataWpsipd()" <?php echo $disabled; ?>>
-					<span class="dashicons dashicons-insert"></span> Tambah Rincian Belanja dari RKA/DPA
-				</button>
-			<?php endif; ?>
-		</div>
-		<div class="wrap-table">
-			<table cellpadding="2" cellspacing="0" class="table_dokumen_rencana_aksi">
-				<thead style="background-color: #dee2e6; text-align: center;">
-					<tr>
-						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 150px;">KODE REKENING</th>
-						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2">URAIAN</th>
-						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 120px;">AKSI</th>
-						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">HARGA SATUAN</th>
-						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 90px;">JUMLAH</th>
-						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 100px;">SATUAN</th>
-						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">TOTAL</th>
-						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">REALISASI</th>
-						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 160px;">CATATAN</th>
-					</tr>
-				</thead>
-				<tbody>
-					<?php echo $tbody; ?>
-				</tbody>
-			</table>
-		</div>
+		<?php if(!empty($data_rhk[4])): ?>
+			<h3 class="text-center">Rincian Belanja Teknis Kegiatan</h3>
+			<div class="m-2 text-center">
+				<?php if($hak_akses_user_pegawai == 1 || $hak_akses_user_pegawai == 2): ?>
+					<button class="btn btn-primary m-2 text-center rincian_manual" onclick="handleModalTambahDataManual()" title="Tambah Data" <?php echo $disabled_manual; ?>>
+						<span class="dashicons dashicons-plus"></span> Tambah Rincian Belanja Manual
+					</button>
+					<button class="btn btn-success m-2 text-center rincian_rka" title="Tambah Data Dari WP-SIPD" onclick="handleModalTambahDataWpsipd()" <?php echo $disabled; ?>>
+						<span class="dashicons dashicons-insert"></span> Tambah Rincian Belanja dari RKA/DPA
+					</button>
+				<?php endif; ?>
+			</div>
+			<div class="wrap-table">
+				<table cellpadding="2" cellspacing="0" class="table_dokumen_rencana_aksi">
+					<thead style="background-color: #dee2e6; text-align: center;">
+						<tr>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 150px;">KODE REKENING</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2">URAIAN</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 120px;">AKSI</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">HARGA SATUAN</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 90px;">JUMLAH</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 100px;">SATUAN</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">TOTAL</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">REALISASI</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 160px;">CATATAN</th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php echo $tbody; ?>
+					</tbody>
+				</table>
+			</div>
+		<?php endif; ?>
 	</div>
 </div>
 
