@@ -403,7 +403,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                             <th class="text-center" rowspan="2" style="width: 140px;">REALISASI PAGU</th>
                             <th class="text-center" rowspan="2" style="width: 140px;">CAPAIAN REALISASI PAGU</th>
                             <th class="text-center" rowspan="2" style="width: 140px;">PAGU RENJA</th>
-                            <th class="text-center" rowspan="2" style="width: 140px;">NOMENKLATUR RENJA</th>
+                            <th class="text-center" rowspan="2" style="width: 300px;">NOMENKLATUR RENJA</th>
                         </tr>
                         <tr>
                             <th>AWAL</th>
