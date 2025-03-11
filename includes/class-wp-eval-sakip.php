@@ -751,6 +751,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('pengisian_lke_sakip_per_skpd', array($plugin_public, 'pengisian_lke_sakip_per_skpd'));
 
 		add_shortcode('menu_depan', array($plugin_public, 'menu_depan'));
+		add_shortcode('background_menu', array($plugin_public, 'background_menu'));
 		add_shortcode('pohon_kinerja_publish', array($plugin_public, 'pohon_kinerja_publish'));
 		add_shortcode('cascading_publish', array($plugin_public, 'cascading_publish'));
 		add_shortcode('view_cascading_publish', array($plugin_public, 'view_cascading_publish'));

@@ -84,7 +84,7 @@ $tipe_dokumen = "pohon_kinerja_dan_cascading";
 							<th class="text-center">No</th>
 							<th class="text-center">Nama Perangkat Daerah</th>
 							<th class="text-center">Jumlah Dokumen</th>
-							<th class="text-center kolom-integrasi-esr" style="width: 10rem;">Jumlah Dokumen Integrasi ESR</th>
+							<th class="text-center" style="width: 10rem;">Jumlah Dokumen Integrasi ESR</th>
 							<th class="text-center">Aksi</th>
 						</tr>
 					</thead>
