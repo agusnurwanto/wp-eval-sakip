@@ -4649,11 +4649,16 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						} else {
 							$get_pagu = $wpdb->get_var($wpdb->prepare("
 						        SELECT 
-						            IFNULL(SUM(rencana_pagu), 0)
-						        FROM esakip_data_rencana_aksi_indikator_opd
-						        WHERE id_skpd = %d 
-						            AND tahun_anggaran = %d 
-						            AND active = 1
+						            IFNULL(SUM(i.rencana_pagu), 0)
+						        FROM esakip_data_rencana_aksi_indikator_opd i
+						        INNER JOIN esakip_data_rencana_aksi_opd r on r.id=i.id_renaksi
+						        	AND r.level=1
+						        	AND r.active=i.active
+						        	AND r.id_skpd=i.id_skpd
+						        	AND r.tahun_anggaran=i.tahun_anggaran
+						        WHERE i.id_skpd = %d 
+						            AND i.tahun_anggaran = %d 
+						            AND i.active = 1
 						    ", $vv['id_skpd'], $tahun_anggaran));
 						}
 

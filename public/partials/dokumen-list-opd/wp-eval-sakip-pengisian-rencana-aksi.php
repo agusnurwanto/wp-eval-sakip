@@ -76,7 +76,7 @@ foreach ($idtahun as $val) {
 							<th class="text-center" width="100px">Uraian Kegiatan Rencana Hasil Kerja</th>
 							<th class="text-center" width="100px">Uraian Teknis Kegiatan</th>
 							<th class="text-center" width="100px">Rencana Pagu</th>
-							<th class="text-center" width="100px">Alokasi Pagu</th>
+							<th class="text-center" width="100px">Pagu Rincin</th>
 							<th class="text-center" width="100px">Realisasi Pagu</th>
 						</tr>
 					</thead>
