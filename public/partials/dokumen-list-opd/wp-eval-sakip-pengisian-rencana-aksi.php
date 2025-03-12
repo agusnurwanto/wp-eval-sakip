@@ -76,7 +76,7 @@ foreach ($idtahun as $val) {
 							<th class="text-center" width="100px">Uraian Kegiatan Rencana Hasil Kerja</th>
 							<th class="text-center" width="100px">Uraian Teknis Kegiatan</th>
 							<th class="text-center" width="100px">Rencana Pagu</th>
-							<th class="text-center" width="100px">Pagu Rincin</th>
+							<th class="text-center" width="100px">Pagu Rincian</th>
 							<th class="text-center" width="100px">Realisasi Pagu</th>
 						</tr>
 					</thead>
@@ -274,6 +274,8 @@ foreach ($idtahun as $val) {
 					jQuery('#total_uraian_kegiatan_rencana_aksi').html(response.total_level_3);
 					jQuery('#total_uraian_teknis_kegiatan').html(response.total_level_4);
 					jQuery('#total_rencana_pagu').html(response.total_pagu);
+					jQuery('#total_alokasi_pagu').html(response.total_all_pagu_rincian);
+					jQuery('#total_realisasi_pagu').html(response.total_all_realisasi);
 					jQuery('.table_dokumen_skpd tbody').html(response.data);
 					jQuery('.table_dokumen_skpd').dataTable({
 						 aLengthMenu: [
