@@ -194,7 +194,6 @@ $is_administrator = in_array('administrator', $user_roles);
 
 <script>
     jQuery(document).ready(function() {
-        getTablepedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja();
         getTableTahun();
         jQuery("#fileUpload").on('change', function() {
             var id_dokumen = jQuery('#idDokumen').val();
@@ -249,6 +248,7 @@ $is_administrator = in_array('administrator', $user_roles);
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 console.log(response);
+                getTablepedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja();
                 if (response.status === 'success') {
                     jQuery('#tahunContainer').html(response.data);
                 } else {

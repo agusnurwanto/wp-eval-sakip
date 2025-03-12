@@ -229,7 +229,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
 
 <script>
     jQuery(document).ready(function() {
-        getTableDokumenLain();
         getTableTahun();
         jQuery("#fileUpload").on('change', function() {
             var id_dokumen = jQuery('#idDokumen').val();
@@ -309,6 +308,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 console.log(response);
+                getTableDokumenLain();
                 if (response.status === 'success') {
                     jQuery('#tahunContainer').html(response.data);
                 } else {

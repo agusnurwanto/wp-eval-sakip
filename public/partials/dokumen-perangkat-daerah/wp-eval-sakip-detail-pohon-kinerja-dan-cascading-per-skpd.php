@@ -261,7 +261,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
 <script>
     var tahun_anggaran_periode_dokumen = null;
     jQuery(document).ready(function() {
-        getTableSkpd();
         getTableTahun();
         jQuery("#fileUpload").on('change', function() {
             var id_dokumen = jQuery('#idDokumen').val();
@@ -344,6 +343,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 console.log(response);
+                getTableSkpd();
                 if (response.status === 'success') {
                     jQuery('#tahunContainer').html(response.data);
                 } else {
