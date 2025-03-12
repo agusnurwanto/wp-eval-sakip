@@ -5516,18 +5516,55 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							}
 						}
 
-						$data_keterangan = json_decode($data_verifikasi['keterangan_verifikasi'], true);
-						if (json_last_error() === JSON_ERROR_NONE) {
-							$keterangan_verifikasi = $data_keterangan['keterangan_baru'];
-							if (!empty($data_keterangan['keterangan_lama'])) {
-								$keterangan_verifikasi .= "<br><br><small class='text-muted'>Riwayat Catatan:</small><ul style='margin: 0 auto;'>";
-								foreach ($data_keterangan['keterangan_lama'] as $key => $v_ket_lama) {
-									$keterangan_verifikasi .= "<li class='text-muted'><small class='text-muted'>$v_ket_lama</small></li>";
-								}
-								$keterangan_verifikasi .= "</ul>";
-							}
-						} else {
-							$keterangan_verifikasi = $data_verifikasi['keterangan_verifikasi'];
+						$keterangan_verifikasi = '';
+						if (!empty($data_verifikasi['keterangan_verifikasi'])) {
+						    $data_keterangan = json_decode($data_verifikasi['keterangan_verifikasi'], true);
+
+						    if (is_array($data_keterangan)) {
+						        $keterangan_baru = isset($data_keterangan['keterangan_baru']) ? $data_keterangan['keterangan_baru'] : [];
+						        $keterangan_lama = isset($data_keterangan['keterangan_lama']) ? $data_keterangan['keterangan_lama'] : [];
+
+						        $keterangan = ['tanggal' => '', 'pesan' => ''];
+						        if (!empty($keterangan_baru)) {
+						            if (is_array($keterangan_baru)) {
+						                $keterangan['pesan'] = $keterangan_baru['pesan'] ?? '';
+						                $keterangan['tanggal'] = $keterangan_baru['tanggal'] ?? '';
+						            } else {
+						                $keterangan['pesan'] = $keterangan_baru;
+						            }
+						        }
+						        
+						        if (!empty($keterangan_lama) && is_array($keterangan_lama)) {
+						            $keterangan_lama = array_map(function ($ket_lama) {
+						                return is_array($ket_lama) ? $ket_lama : ['tanggal' => '', 'pesan' => $ket_lama];
+						            }, $keterangan_lama);
+						        }
+						        
+						        $update_keterangan = json_encode([
+						            'keterangan_baru' => $keterangan,
+						            'keterangan_lama' => array_values($keterangan_lama) 
+						        ]);
+						        
+						        // Update keterangan jika tidak sesuai
+						        $wpdb->update(
+						        	'esakip_keterangan_verifikator', 
+						            ['keterangan_verifikasi' => $update_keterangan], 
+						            ['id_dokumen' => $vv['id'], 'active' => 1, 'nama_tabel_dokumen' => 'esakip_dpa']
+						        );
+
+						        $keterangan_verifikasi = $keterangan['tanggal'] . '  ' . $keterangan['pesan'];
+						        if (!empty($keterangan_lama)) {
+						            $keterangan_verifikasi .= "<br><br><small class='text-muted'>Riwayat Catatan:</small><ul>";
+						            foreach ($keterangan_lama as $ket_lama) {
+						                $tanggal = htmlspecialchars($ket_lama['tanggal'] ?? '');
+						                $pesan = htmlspecialchars($ket_lama['pesan'] ?? '');
+						                $keterangan_verifikasi .= "<li class='text-muted'><small class='text-muted'>{$tanggal}  {$pesan}</small></li>";
+						            }
+						            $keterangan_verifikasi .= "</ul>";
+						        }
+						    } else {
+						        $keterangan_verifikasi = htmlspecialchars($data_verifikasi['keterangan_verifikasi']);
+						    }
 						}
 
 						$tbody .= "<td>" . $vv['opd'] . "</td>";
@@ -6024,18 +6061,55 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							}
 						}
 
-						$data_keterangan = json_decode($data_verifikasi['keterangan_verifikasi'], true);
-						if (json_last_error() === JSON_ERROR_NONE) {
-							$keterangan_verifikasi = $data_keterangan['keterangan_baru'];
-							if (!empty($data_keterangan['keterangan_lama'])) {
-								$keterangan_verifikasi .= "<br><br><small class='text-muted'>Riwayat Catatan:</small><ul style='margin: 0 auto;'>";
-								foreach ($data_keterangan['keterangan_lama'] as $key => $v_ket_lama) {
-									$keterangan_verifikasi .= "<li class='text-muted'><small class='text-muted'>$v_ket_lama</small></li>";
-								}
-								$keterangan_verifikasi .= "</ul>";
-							}
-						} else {
-							$keterangan_verifikasi = $data_verifikasi['keterangan_verifikasi'];
+						$keterangan_verifikasi = '';
+						if (!empty($data_verifikasi['keterangan_verifikasi'])) {
+						    $data_keterangan = json_decode($data_verifikasi['keterangan_verifikasi'], true);
+
+						    if (is_array($data_keterangan)) {
+						        $keterangan_baru = isset($data_keterangan['keterangan_baru']) ? $data_keterangan['keterangan_baru'] : [];
+						        $keterangan_lama = isset($data_keterangan['keterangan_lama']) ? $data_keterangan['keterangan_lama'] : [];
+
+						        $keterangan = ['tanggal' => '', 'pesan' => ''];
+						        if (!empty($keterangan_baru)) {
+						            if (is_array($keterangan_baru)) {
+						                $keterangan['pesan'] = $keterangan_baru['pesan'] ?? '';
+						                $keterangan['tanggal'] = $keterangan_baru['tanggal'] ?? '';
+						            } else {
+						                $keterangan['pesan'] = $keterangan_baru;
+						            }
+						        }
+						        
+						        if (!empty($keterangan_lama) && is_array($keterangan_lama)) {
+						            $keterangan_lama = array_map(function ($ket_lama) {
+						                return is_array($ket_lama) ? $ket_lama : ['tanggal' => '', 'pesan' => $ket_lama];
+						            }, $keterangan_lama);
+						        }
+						        
+						        $update_keterangan = json_encode([
+						            'keterangan_baru' => $keterangan,
+						            'keterangan_lama' => array_values($keterangan_lama) 
+						        ]);
+						        
+						        // Update keterangan jika tidak sesuai
+						        $wpdb->update(
+						        	'esakip_keterangan_verifikator', 
+						            ['keterangan_verifikasi' => $update_keterangan], 
+						            ['id_dokumen' => $vv['id'], 'active' => 1, 'nama_tabel_dokumen' => 'esakip_dpa']
+						        );
+
+						        $keterangan_verifikasi = $keterangan['tanggal'] . '  ' . $keterangan['pesan'];
+						        if (!empty($keterangan_lama)) {
+						            $keterangan_verifikasi .= "<br><br><small class='text-muted'>Riwayat Catatan:</small><ul>";
+						            foreach ($keterangan_lama as $ket_lama) {
+						                $tanggal = htmlspecialchars($ket_lama['tanggal'] ?? '');
+						                $pesan = htmlspecialchars($ket_lama['pesan'] ?? '');
+						                $keterangan_verifikasi .= "<li class='text-muted'><small class='text-muted'>{$tanggal}  {$pesan}</small></li>";
+						            }
+						            $keterangan_verifikasi .= "</ul>";
+						        }
+						    } else {
+						        $keterangan_verifikasi = htmlspecialchars($data_verifikasi['keterangan_verifikasi']);
+						    }
 						}
 
 						$tbody .= "<td>" . $vv['opd'] . "</td>";
@@ -6251,18 +6325,55 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								$draft = true;
 							}
 
-							$data_keterangan = json_decode($data_verifikasi['keterangan_verifikasi'], true);
-							if (json_last_error() === JSON_ERROR_NONE) {
-								$keterangan = $data_keterangan['keterangan_baru'];
-								if (!empty($data_keterangan['keterangan_lama'])) {
-									$keterangan .= "<br><br><small class='text-muted'>Riwayat Catatan:</small><ul style='margin: 0 auto;'>";
-									foreach ($data_keterangan['keterangan_lama'] as $key => $v_ket_lama) {
-										$keterangan .= "<li class='text-muted'><small class='text-muted'>$v_ket_lama</small></li>";
-									}
-									$keterangan .= "</ul>";
-								}
-							} else {
-								$keterangan = $data_verifikasi['keterangan_verifikasi'];
+							$keterangan_verifikasi = '';
+							if (!empty($data_verifikasi['keterangan_verifikasi'])) {
+							    $data_keterangan = json_decode($data_verifikasi['keterangan_verifikasi'], true);
+
+							    if (is_array($data_keterangan)) {
+							        $keterangan_baru = isset($data_keterangan['keterangan_baru']) ? $data_keterangan['keterangan_baru'] : [];
+							        $keterangan_lama = isset($data_keterangan['keterangan_lama']) ? $data_keterangan['keterangan_lama'] : [];
+
+							        $keterangan = ['tanggal' => '', 'pesan' => ''];
+							        if (!empty($keterangan_baru)) {
+							            if (is_array($keterangan_baru)) {
+							                $keterangan['pesan'] = $keterangan_baru['pesan'] ?? '';
+							                $keterangan['tanggal'] = $keterangan_baru['tanggal'] ?? '';
+							            } else {
+							                $keterangan['pesan'] = $keterangan_baru;
+							            }
+							        }
+							        
+							        if (!empty($keterangan_lama) && is_array($keterangan_lama)) {
+							            $keterangan_lama = array_map(function ($ket_lama) {
+							                return is_array($ket_lama) ? $ket_lama : ['tanggal' => '', 'pesan' => $ket_lama];
+							            }, $keterangan_lama);
+							        }
+							        
+							        $update_keterangan = json_encode([
+							            'keterangan_baru' => $keterangan,
+							            'keterangan_lama' => array_values($keterangan_lama) 
+							        ]);
+							        
+							        // Update keterangan jika tidak sesuai
+							        $wpdb->update(
+							        	'esakip_keterangan_verifikator', 
+							            ['keterangan_verifikasi' => $update_keterangan], 
+							            ['id_dokumen' => $vv['id'], 'active' => 1, 'nama_tabel_dokumen' => 'esakip_dpa']
+							        );
+
+							        $keterangan_verifikasi = $keterangan['tanggal'] . '  ' . $keterangan['pesan'];
+							        if (!empty($keterangan_lama)) {
+							            $keterangan_verifikasi .= "<br><br><small class='text-muted'>Riwayat Catatan:</small><ul>";
+							            foreach ($keterangan_lama as $ket_lama) {
+							                $tanggal = htmlspecialchars($ket_lama['tanggal'] ?? '');
+							                $pesan = htmlspecialchars($ket_lama['pesan'] ?? '');
+							                $keterangan_verifikasi .= "<li class='text-muted'><small class='text-muted'>{$tanggal}  {$pesan}</small></li>";
+							            }
+							            $keterangan_verifikasi .= "</ul>";
+							        }
+							    } else {
+							        $keterangan_verifikasi = htmlspecialchars($data_verifikasi['keterangan_verifikasi']);
+							    }
 							}
 						}
 						$tbody .= "<tr>";
@@ -7810,18 +7921,55 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							}
 						}
 
-						$data_keterangan = json_decode($data_verifikasi['keterangan_verifikasi'], true);
-						if (json_last_error() === JSON_ERROR_NONE) {
-							$keterangan_verifikasi = $data_keterangan['keterangan_baru'];
-							if (!empty($data_keterangan['keterangan_lama'])) {
-								$keterangan_verifikasi .= "<br><br><small class='text-muted'>Riwayat Catatan:</small><ul style='margin: 0 auto;'>";
-								foreach ($data_keterangan['keterangan_lama'] as $key => $v_ket_lama) {
-									$keterangan_verifikasi .= "<li class='text-muted'><small class='text-muted'>$v_ket_lama</small></li>";
-								}
-								$keterangan_verifikasi .= "</ul>";
-							}
-						} else {
-							$keterangan_verifikasi = $data_verifikasi['keterangan_verifikasi'];
+						$keterangan_verifikasi = '';
+						if (!empty($data_verifikasi['keterangan_verifikasi'])) {
+						    $data_keterangan = json_decode($data_verifikasi['keterangan_verifikasi'], true);
+
+						    if (is_array($data_keterangan)) {
+						        $keterangan_baru = isset($data_keterangan['keterangan_baru']) ? $data_keterangan['keterangan_baru'] : [];
+						        $keterangan_lama = isset($data_keterangan['keterangan_lama']) ? $data_keterangan['keterangan_lama'] : [];
+
+						        $keterangan = ['tanggal' => '', 'pesan' => ''];
+						        if (!empty($keterangan_baru)) {
+						            if (is_array($keterangan_baru)) {
+						                $keterangan['pesan'] = $keterangan_baru['pesan'] ?? '';
+						                $keterangan['tanggal'] = $keterangan_baru['tanggal'] ?? '';
+						            } else {
+						                $keterangan['pesan'] = $keterangan_baru;
+						            }
+						        }
+						        
+						        if (!empty($keterangan_lama) && is_array($keterangan_lama)) {
+						            $keterangan_lama = array_map(function ($ket_lama) {
+						                return is_array($ket_lama) ? $ket_lama : ['tanggal' => '', 'pesan' => $ket_lama];
+						            }, $keterangan_lama);
+						        }
+						        
+						        $update_keterangan = json_encode([
+						            'keterangan_baru' => $keterangan,
+						            'keterangan_lama' => array_values($keterangan_lama) 
+						        ]);
+						        
+						        // Update keterangan jika tidak sesuai
+						        $wpdb->update(
+						        	'esakip_keterangan_verifikator', 
+						            ['keterangan_verifikasi' => $update_keterangan], 
+						            ['id_dokumen' => $vv['id'], 'active' => 1, 'nama_tabel_dokumen' => 'esakip_dpa']
+						        );
+
+						        $keterangan_verifikasi = $keterangan['tanggal'] . '  ' . $keterangan['pesan'];
+						        if (!empty($keterangan_lama)) {
+						            $keterangan_verifikasi .= "<br><br><small class='text-muted'>Riwayat Catatan:</small><ul>";
+						            foreach ($keterangan_lama as $ket_lama) {
+						                $tanggal = htmlspecialchars($ket_lama['tanggal'] ?? '');
+						                $pesan = htmlspecialchars($ket_lama['pesan'] ?? '');
+						                $keterangan_verifikasi .= "<li class='text-muted'><small class='text-muted'>{$tanggal}  {$pesan}</small></li>";
+						            }
+						            $keterangan_verifikasi .= "</ul>";
+						        }
+						    } else {
+						        $keterangan_verifikasi = htmlspecialchars($data_verifikasi['keterangan_verifikasi']);
+						    }
 						}
 
 						$tbody .= "<td>" . $vv['opd'] . "</td>";
@@ -24655,7 +24803,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					}
 					if (empty($data_terverifikasi)) {
 						$keterangan_verifikasi = array(
-							"keterangan_baru" => $keterangan,
+							"keterangan_baru" => array("tanggal" => current_time('mysql'),
+								"pesan" => $keterangan),
 							"keterangan_lama" => array()
 						);
 						$insert_data = array(
@@ -24696,16 +24845,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							array_unshift($data_keterangan['keterangan_lama'], $data_keterangan['keterangan_baru']);
 							$keterangan_lama = $data_keterangan['keterangan_lama'];
 						} else {
-							if (!empty($data_terverifikasi['keterangan_verifikasi'])) {
-								$keterangan_lama = array($data_terverifikasi['keterangan_verifikasi']);
-							} else {
-								$keterangan_lama = array();
-							}
+							$keterangan_lama = !empty($data_terverifikasi['keterangan_verifikasi']) ? array($data_terverifikasi['keterangan_verifikasi']) : array();
 						}
 
 						$keterangan_verifikasi = array(
-							'keterangan_baru' => $keterangan,
-							'keterangan_lama' => $keterangan_lama
+							"keterangan_baru" => array("tanggal" => current_time('mysql'),
+								"pesan" => $keterangan),
+							"keterangan_lama" => $keterangan_lama
 						);
 
 						$opsi = array(
@@ -24744,7 +24890,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 		die(json_encode($ret));
 	}
-
 
 	public function get_verifikasi_dokumen_by_id()
 	{
@@ -25043,19 +25188,57 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							}
 						}
 
-						$data_keterangan = json_decode($data_verifikasi['keterangan_verifikasi'], true);
-						if (json_last_error() === JSON_ERROR_NONE) {
-							$keterangan_verifikasi = $data_keterangan['keterangan_baru'];
-							if (!empty($data_keterangan['keterangan_lama'])) {
-								$keterangan_verifikasi .= "<br><br><small class='text-muted'>Riwayat Catatan:</small><ul style='margin: 0 auto;'>";
-								foreach ($data_keterangan['keterangan_lama'] as $key => $v_ket_lama) {
-									$keterangan_verifikasi .= "<li class='text-muted'><small class='text-muted'>$v_ket_lama</small></li>";
-								}
-								$keterangan_verifikasi .= "</ul>";
-							}
-						} else {
-							$keterangan_verifikasi = $data_verifikasi['keterangan_verifikasi'];
+					    $keterangan_verifikasi = '';
+						if (!empty($data_verifikasi['keterangan_verifikasi'])) {
+						    $data_keterangan = json_decode($data_verifikasi['keterangan_verifikasi'], true);
+
+						    if (is_array($data_keterangan)) {
+						        $keterangan_baru = isset($data_keterangan['keterangan_baru']) ? $data_keterangan['keterangan_baru'] : [];
+						        $keterangan_lama = isset($data_keterangan['keterangan_lama']) ? $data_keterangan['keterangan_lama'] : [];
+
+						        $keterangan = ['tanggal' => '', 'pesan' => ''];
+						        if (!empty($keterangan_baru)) {
+						            if (is_array($keterangan_baru)) {
+						                $keterangan['pesan'] = $keterangan_baru['pesan'] ?? '';
+						                $keterangan['tanggal'] = $keterangan_baru['tanggal'] ?? '';
+						            } else {
+						                $keterangan['pesan'] = $keterangan_baru;
+						            }
+						        }
+						        
+						        if (!empty($keterangan_lama) && is_array($keterangan_lama)) {
+						            $keterangan_lama = array_map(function ($ket_lama) {
+						                return is_array($ket_lama) ? $ket_lama : ['tanggal' => '', 'pesan' => $ket_lama];
+						            }, $keterangan_lama);
+						        }
+						        
+						        $update_keterangan = json_encode([
+						            'keterangan_baru' => $keterangan,
+						            'keterangan_lama' => array_values($keterangan_lama) 
+						        ]);
+						        
+						        // Update keterangan jika tidak sesuai
+						        $wpdb->update(
+						        	'esakip_keterangan_verifikator', 
+						            ['keterangan_verifikasi' => $update_keterangan], 
+						            ['id_dokumen' => $vv['id'], 'active' => 1, 'nama_tabel_dokumen' => 'esakip_dpa']
+						        );
+
+						        $keterangan_verifikasi = $keterangan['tanggal'] . '  ' . $keterangan['pesan'];
+						        if (!empty($keterangan_lama)) {
+						            $keterangan_verifikasi .= "<br><br><small class='text-muted'>Riwayat Catatan:</small><ul>";
+						            foreach ($keterangan_lama as $ket_lama) {
+						                $tanggal = htmlspecialchars($ket_lama['tanggal'] ?? '');
+						                $pesan = htmlspecialchars($ket_lama['pesan'] ?? '');
+						                $keterangan_verifikasi .= "<li class='text-muted'><small class='text-muted'>{$tanggal}  {$pesan}</small></li>";
+						            }
+						            $keterangan_verifikasi .= "</ul>";
+						        }
+						    } else {
+						        $keterangan_verifikasi = htmlspecialchars($data_verifikasi['keterangan_verifikasi']);
+						    }
 						}
+
 
 						$tbody .= "<td>" . $vv['opd'] . "</td>";
 						$tbody .= "<td>" . $vv['dokumen'] . "</td>";
@@ -30402,18 +30585,55 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							}
 						}
 
-						$data_keterangan = json_decode($data_verifikasi['keterangan_verifikasi'], true);
-						if (json_last_error() === JSON_ERROR_NONE) {
-							$keterangan_verifikasi = $data_keterangan['keterangan_baru'];
-							if (!empty($data_keterangan['keterangan_lama'])) {
-								$keterangan_verifikasi .= "<br><br><small class='text-muted'>Riwayat Catatan:</small><ul style='margin: 0 auto;'>";
-								foreach ($data_keterangan['keterangan_lama'] as $key => $v_ket_lama) {
-									$keterangan_verifikasi .= "<li class='text-muted'><small class='text-muted'>$v_ket_lama</small></li>";
-								}
-								$keterangan_verifikasi .= "</ul>";
-							}
-						} else {
-							$keterangan_verifikasi = $data_verifikasi['keterangan_verifikasi'];
+						$keterangan_verifikasi = '';
+						if (!empty($data_verifikasi['keterangan_verifikasi'])) {
+						    $data_keterangan = json_decode($data_verifikasi['keterangan_verifikasi'], true);
+
+						    if (is_array($data_keterangan)) {
+						        $keterangan_baru = isset($data_keterangan['keterangan_baru']) ? $data_keterangan['keterangan_baru'] : [];
+						        $keterangan_lama = isset($data_keterangan['keterangan_lama']) ? $data_keterangan['keterangan_lama'] : [];
+
+						        $keterangan = ['tanggal' => '', 'pesan' => ''];
+						        if (!empty($keterangan_baru)) {
+						            if (is_array($keterangan_baru)) {
+						                $keterangan['pesan'] = $keterangan_baru['pesan'] ?? '';
+						                $keterangan['tanggal'] = $keterangan_baru['tanggal'] ?? '';
+						            } else {
+						                $keterangan['pesan'] = $keterangan_baru;
+						            }
+						        }
+						        
+						        if (!empty($keterangan_lama) && is_array($keterangan_lama)) {
+						            $keterangan_lama = array_map(function ($ket_lama) {
+						                return is_array($ket_lama) ? $ket_lama : ['tanggal' => '', 'pesan' => $ket_lama];
+						            }, $keterangan_lama);
+						        }
+						        
+						        $update_keterangan = json_encode([
+						            'keterangan_baru' => $keterangan,
+						            'keterangan_lama' => array_values($keterangan_lama) 
+						        ]);
+						        
+						        // Update keterangan jika tidak sesuai
+						        $wpdb->update(
+						        	'esakip_keterangan_verifikator', 
+						            ['keterangan_verifikasi' => $update_keterangan], 
+						            ['id_dokumen' => $vv['id'], 'active' => 1, 'nama_tabel_dokumen' => 'esakip_dpa']
+						        );
+
+						        $keterangan_verifikasi = $keterangan['tanggal'] . '  ' . $keterangan['pesan'];
+						        if (!empty($keterangan_lama)) {
+						            $keterangan_verifikasi .= "<br><br><small class='text-muted'>Riwayat Catatan:</small><ul>";
+						            foreach ($keterangan_lama as $ket_lama) {
+						                $tanggal = htmlspecialchars($ket_lama['tanggal'] ?? '');
+						                $pesan = htmlspecialchars($ket_lama['pesan'] ?? '');
+						                $keterangan_verifikasi .= "<li class='text-muted'><small class='text-muted'>{$tanggal}  {$pesan}</small></li>";
+						            }
+						            $keterangan_verifikasi .= "</ul>";
+						        }
+						    } else {
+						        $keterangan_verifikasi = htmlspecialchars($data_verifikasi['keterangan_verifikasi']);
+						    }
 						}
 
 						$tbody .= "<td>" . $vv['opd'] . "</td>";
