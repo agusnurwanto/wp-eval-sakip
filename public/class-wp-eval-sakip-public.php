@@ -10132,25 +10132,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$arr_jadwal = ['usulan', 'penetapan'];
 					$jenis_jadwal = in_array($jenis_jadwal, $arr_jadwal) ? $jenis_jadwal : 'usulan';
 
-					$id_jadwal_sebelumnya = $wpdb->get_var(
-						$wpdb->prepare("
-                        SELECT MAX(id)
-                        FROM esakip_data_jadwal
-                        WHERE tipe='LKE'
-                          AND tahun_anggaran=%d
-                          AND status !=0
-                    ", $tahun_anggaran)
-					);
-
 					$get_jadwal = $wpdb->get_results(
 						$wpdb->prepare("
-                        SELECT 
-                            * 
-                        FROM esakip_data_jadwal
-                        WHERE tipe='LKE'
-                          AND tahun_anggaran=%d
-                          AND status != 0
-                    ", $tahun_anggaran),
+							SELECT 
+								* 
+							FROM esakip_data_jadwal
+							WHERE tipe='LKE'
+							  AND tahun_anggaran=%d
+							  AND status != 0
+						", $tahun_anggaran),
 						ARRAY_A
 					);
 
@@ -10174,15 +10164,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 					// Insert data jadwal
 					$data_jadwal = array(
-						'nama_jadwal' => $nama_jadwal,
-						'started_at' => $jadwal_mulai,
-						'end_at' => $jadwal_selesai,
-						'tahun_anggaran' => $tahun_anggaran,
-						'status' => 1,
-						'jenis_jadwal' => $jenis_jadwal,
-						'tipe' => 'LKE',
+						'nama_jadwal' 	 		 => $nama_jadwal,
+						'started_at' 	 		 => $jadwal_mulai,
+						'end_at' 		 		 => $jadwal_selesai,
+						'tahun_anggaran' 		 => $tahun_anggaran,
+						'status' 		 		 => 1,
+						'jenis_jadwal' 	 		 => $jenis_jadwal,
+						'tipe' 			 		 => 'LKE',
 						'tampil_nilai_penetapan' => $tampil_nilai_penetapan,
-						'lama_pelaksanaan' => 1,
+						'lama_pelaksanaan' 		 => 1,
 					);
 
 					$wpdb->insert('esakip_data_jadwal', $data_jadwal);
@@ -10194,25 +10184,25 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$komponen_penilaian_id_mapping = [];
 
 					// Add data komponen if there is a previous schedule ID
-					if (!empty($id_jadwal_sebelumnya)) {
+					if (!empty($_POST['template_desain'])) {
 						$data_komponen = $wpdb->get_results(
 							$wpdb->prepare("
-                            SELECT * 
-                            FROM esakip_komponen 
-                            WHERE id_jadwal = %d
-                              AND active = 1
-                        ", $id_jadwal_sebelumnya),
+								SELECT * 
+								FROM esakip_komponen 
+								WHERE id_jadwal = %d
+								  AND active = 1
+							", $_POST['template_desain']),
 							ARRAY_A
 						);
 
 						if (!empty($data_komponen)) {
 							foreach ($data_komponen as $komponen) {
 								$data_komponen_baru = array(
-									'id_jadwal' => $id_jadwal_baru,
-									'nomor_urut' => $komponen['nomor_urut'],
-									'id_user_penilai' => $komponen['id_user_penilai'],
-									'nama' => $komponen['nama'],
-									'bobot' => $komponen['bobot'],
+									'id_jadwal' 		=> $id_jadwal_baru,
+									'nomor_urut' 		=> $komponen['nomor_urut'],
+									'id_user_penilai' 	=> $komponen['id_user_penilai'],
+									'nama' 				=> $komponen['nama'],
+									'bobot' 			=> $komponen['bobot'],
 								);
 								$wpdb->insert('esakip_komponen', $data_komponen_baru);
 								$id_komponen_baru = $wpdb->insert_id;
@@ -10220,22 +10210,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 								$data_subkomponen = $wpdb->get_results(
 									$wpdb->prepare("
-                                    SELECT * 
-                                    FROM esakip_subkomponen 
-                                    WHERE id_komponen = %d
-                                      AND active = 1
-                                ", $komponen['id']),
+										SELECT * 
+										FROM esakip_subkomponen 
+										WHERE id_komponen = %d
+										  AND active = 1
+                                	", $komponen['id']),
 									ARRAY_A
 								);
 
 								foreach ($data_subkomponen as $subkomponen) {
 									$data_subkomponen_baru = array(
-										'id_komponen' => $id_komponen_baru,
-										'nomor_urut' => $subkomponen['nomor_urut'],
-										'id_user_penilai' => $subkomponen['id_user_penilai'],
-										'nama' => $subkomponen['nama'],
-										'metode_penilaian' => $subkomponen['metode_penilaian'],
-										'bobot' => $subkomponen['bobot'],
+										'id_komponen' 		=> $id_komponen_baru,
+										'nomor_urut' 		=> $subkomponen['nomor_urut'],
+										'id_user_penilai' 	=> $subkomponen['id_user_penilai'],
+										'nama' 				=> $subkomponen['nama'],
+										'metode_penilaian' 	=> $subkomponen['metode_penilaian'],
+										'bobot' 			=> $subkomponen['bobot'],
 									);
 									$wpdb->insert('esakip_subkomponen', $data_subkomponen_baru);
 									$id_subkomponen_baru = $wpdb->insert_id;
@@ -10243,24 +10233,24 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 									$data_komponen_penilaian = $wpdb->get_results(
 										$wpdb->prepare("
-                                        SELECT * 
-                                        FROM esakip_komponen_penilaian 
-                                        WHERE id_subkomponen = %d
-                                          AND active = 1
-                                    ", $subkomponen['id']),
+											SELECT * 
+											FROM esakip_komponen_penilaian 
+											WHERE id_subkomponen = %d
+											  AND active = 1
+										", $subkomponen['id']),
 										ARRAY_A
 									);
 
 									foreach ($data_komponen_penilaian as $penilaian) {
 										$data_komponen_penilaian_baru = array(
-											'id_subkomponen' => $id_subkomponen_baru,
-											'nomor_urut' => $penilaian['nomor_urut'],
-											'nama' => $penilaian['nama'],
-											'tipe' => $penilaian['tipe'],
-											'bobot' => $penilaian['bobot'],
-											'keterangan' => $penilaian['keterangan'],
-											'penjelasan' => $penilaian['penjelasan'],
-											'langkah_kerja' => $penilaian['langkah_kerja'],
+											'id_subkomponen' 	 => $id_subkomponen_baru,
+											'nomor_urut' 	 	 => $penilaian['nomor_urut'],
+											'nama' 			 	 => $penilaian['nama'],
+											'tipe' 			 	 => $penilaian['tipe'],
+											'bobot' 		 	 => $penilaian['bobot'],
+											'keterangan' 	 	 => $penilaian['keterangan'],
+											'penjelasan' 	 	 => $penilaian['penjelasan'],
+											'langkah_kerja'  	 => $penilaian['langkah_kerja'],
 											'jenis_bukti_dukung' => $penilaian['jenis_bukti_dukung']
 										);
 										$wpdb->insert('esakip_komponen_penilaian', $data_komponen_penilaian_baru);
@@ -10270,16 +10260,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										$update_penilaian_lke = $wpdb->update(
 											'esakip_pengisian_lke',
 											array(
-												'id_komponen' => $id_komponen_baru,
-												'id_subkomponen' => $id_subkomponen_baru,
+												'id_komponen' 			=> $id_komponen_baru,
+												'id_subkomponen' 		=> $id_subkomponen_baru,
 												'id_komponen_penilaian' => $id_komponen_penilaian_baru
 											),
 											array(
-												'id_komponen' => $komponen['id'],
-												'id_subkomponen' => $subkomponen['id'],
+												'id_komponen' 			=> $komponen['id'],
+												'id_subkomponen' 		=> $subkomponen['id'],
 												'id_komponen_penilaian' => $penilaian['id'],
-												'tahun_anggaran' => $tahun_anggaran,
-												'active' => 1
+												'tahun_anggaran' 		=> $tahun_anggaran,
+												'active' 				=> 1
 											)
 										);
 
@@ -10287,45 +10277,45 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										if (!$update_penilaian_lke) {
 											$data_penilaian_lke_terbaru_history = $wpdb->get_row(
 												$wpdb->prepare("
-                                                SELECT *
-                                                FROM esakip_pengisian_lke_history
-                                                WHERE id_komponen = %d
-                                                  AND id_subkomponen = %d 
-                                                  AND id_komponen_penilaian = %d
-                                                  AND tahun_anggaran = %d
-                                                  AND id_jadwal = %d
-                                            ", $komponen['id'], $subkomponen['id'], $penilaian['id'], $tahun_anggaran, $id_jadwal_sebelumnya),
+													SELECT *
+													FROM esakip_pengisian_lke_history
+													WHERE id_komponen = %d
+													  AND id_subkomponen = %d 
+													  AND id_komponen_penilaian = %d
+													  AND tahun_anggaran = %d
+													  AND id_jadwal = %d
+												", $komponen['id'], $subkomponen['id'], $penilaian['id'], $tahun_anggaran, $_POST['template_desain']),
 												ARRAY_A
 											);
 
 											if (!empty($data_penilaian_lke_terbaru_history)) {
 												$wpdb->insert('esakip_pengisian_lke', array(
-													'id_user' => $data_penilaian_lke_terbaru_history['id_user'],
-													'id_skpd' => $data_penilaian_lke_terbaru_history['id_skpd'],
-													'id_user_penilai' => $data_penilaian_lke_terbaru_history['id_user_penilai'],
-													'id_komponen' => $id_komponen_baru,
-													'id_subkomponen' => $id_subkomponen_baru,
+													'id_user' 				=> $data_penilaian_lke_terbaru_history['id_user'],
+													'id_skpd' 				=> $data_penilaian_lke_terbaru_history['id_skpd'],
+													'id_user_penilai' 		=> $data_penilaian_lke_terbaru_history['id_user_penilai'],
+													'id_komponen' 			=> $id_komponen_baru,
+													'id_subkomponen' 		=> $id_subkomponen_baru,
 													'id_komponen_penilaian' => $id_komponen_penilaian_baru,
-													'nilai_usulan' => $data_penilaian_lke_terbaru_history['nilai_usulan'],
-													'nilai_penetapan' => $data_penilaian_lke_terbaru_history['nilai_penetapan'],
-													'keterangan' => $data_penilaian_lke_terbaru_history['keterangan'],
-													'keterangan_penilai' => $data_penilaian_lke_terbaru_history['keterangan_penilai'],
-													'bukti_dukung' => $data_penilaian_lke_terbaru_history['bukti_dukung'],
-													'create_at' => $data_penilaian_lke_terbaru_history['create_at'],
-													'update_at' => $data_penilaian_lke_terbaru_history['update_at'],
-													'tahun_anggaran' => $data_penilaian_lke_terbaru_history['tahun_anggaran'],
-													'active' => 1
+													'nilai_usulan' 			=> $data_penilaian_lke_terbaru_history['nilai_usulan'],
+													'nilai_penetapan' 		=> $data_penilaian_lke_terbaru_history['nilai_penetapan'],
+													'keterangan' 			=> $data_penilaian_lke_terbaru_history['keterangan'],
+													'keterangan_penilai' 	=> $data_penilaian_lke_terbaru_history['keterangan_penilai'],
+													'bukti_dukung' 			=> $data_penilaian_lke_terbaru_history['bukti_dukung'],
+													'create_at' 			=> $data_penilaian_lke_terbaru_history['create_at'],
+													'update_at' 			=> $data_penilaian_lke_terbaru_history['update_at'],
+													'tahun_anggaran' 		=> $data_penilaian_lke_terbaru_history['tahun_anggaran'],
+													'active' 				=> 1
 												));
 											}
 										}
 
 										$data_kerangka_logis = $wpdb->get_results(
 											$wpdb->prepare("
-                                            SELECT * 
-                                            FROM esakip_kontrol_kerangka_logis
-                                            WHERE id_komponen_penilaian = %d
-											  AND active = 1
-                                        ", $penilaian['id']),
+												SELECT * 
+												FROM esakip_kontrol_kerangka_logis
+												WHERE id_komponen_penilaian = %d
+												  AND active = 1
+											", $penilaian['id']),
 											ARRAY_A
 										);
 
@@ -10335,30 +10325,30 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 												: $subkomponen_id_mapping[$kerangka_logis['id_komponen_pembanding']];
 
 											$data_kerangka_logis_baru = array(
-												'id_komponen_penilaian' => $id_komponen_penilaian_baru,
-												'jenis_kerangka_logis' => $kerangka_logis['jenis_kerangka_logis'],
+												'id_komponen_penilaian'  => $id_komponen_penilaian_baru,
+												'jenis_kerangka_logis' 	 => $kerangka_logis['jenis_kerangka_logis'],
 												'id_komponen_pembanding' => $id_komponen_pembanding_baru,
-												'pesan_kesalahan' => $kerangka_logis['pesan_kesalahan'],
+												'pesan_kesalahan' 		 => $kerangka_logis['pesan_kesalahan'],
 											);
 											$wpdb->insert('esakip_kontrol_kerangka_logis', $data_kerangka_logis_baru);
 										}
 
 										$data_penilaian_custom = $wpdb->get_results(
 											$wpdb->prepare("
-                                            SELECT * 
-                                            FROM esakip_penilaian_custom
-                                            WHERE id_komponen_penilaian = %d
-											  AND active = 1
-                                        ", $penilaian['id']),
+												SELECT * 
+												FROM esakip_penilaian_custom
+												WHERE id_komponen_penilaian = %d
+												  AND active = 1
+                                        	", $penilaian['id']),
 											ARRAY_A
 										);
 
 										foreach ($data_penilaian_custom as $custom) {
 											$data_penilaian_custom_baru = array(
 												'id_komponen_penilaian' => $id_komponen_penilaian_baru,
-												'nama' => $custom['nama'],
-												'nilai' => $custom['nilai'],
-												'nomor_urut' => $custom['nomor_urut'],
+												'nama' 					=> $custom['nama'],
+												'nilai' 				=> $custom['nilai'],
+												'nomor_urut' 			=> $custom['nomor_urut'],
 											);
 											$wpdb->insert('esakip_penilaian_custom', $data_penilaian_custom_baru);
 										}

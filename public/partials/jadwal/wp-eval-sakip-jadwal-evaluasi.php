@@ -16,13 +16,50 @@ $tahun_anggaran = $input['tahun_anggaran'];
 
 $url_cek_dokumen = '';
 $cek_dokumen = $this->functions->generatePage(array(
-	'nama_page' => 'Laporan Monitor Upload Dokumen | '. $tahun_anggaran,
-	'content' => '[halaman_cek_dokumen tahun_anggaran="' . $tahun_anggaran . '"]',
+	'nama_page'   => 'Laporan Monitor Upload Dokumen | ' . $tahun_anggaran,
+	'content'	  => '[halaman_cek_dokumen tahun_anggaran="' . $tahun_anggaran . '"]',
 	'show_header' => 1,
-	'no_key' => 1,
+	'no_key' 	  => 1,
 	'post_status' => 'private'
 ));
 $url_cek_dokumen .= $cek_dokumen['url'];
+
+$data_jadwal = $wpdb->get_results(
+	$wpdb->prepare('
+		SELECT
+			id, 
+			nama_jadwal,
+			started_at,
+			end_at,
+			status,
+			tahun_anggaran
+		FROM esakip_data_jadwal
+		WHERE tipe = %s
+		  AND status != 0 
+		ORDER BY started_at ASC
+	', 'LKE'),
+	ARRAY_A
+);
+
+$option_jadwal = '';
+if (!empty($data_jadwal)) {
+	foreach ($data_jadwal as $v) {
+		// Menentukan status jadwal
+		$status_text = '';
+		if ($v['status'] == 1) {
+			$status_text = ' - [AKTIF]';
+		} elseif ($v['status'] == 2) {
+			$status_text = ' - [DIKUNCI]';
+		}
+
+		$option_jadwal .= '<option value="' . htmlspecialchars($v['id']) . '">'
+			. htmlspecialchars($v['nama_jadwal']) . ' | ' . htmlspecialchars($v['tahun_anggaran'])
+			. ' (' . date("d M Y", strtotime($v['started_at'])) . ' - ' . date("d M Y", strtotime($v['end_at'])) . ')'
+			. $status_text
+			. '</option>';
+	}
+}
+
 ?>
 <style>
 	.bulk-action {
@@ -42,7 +79,9 @@ $url_cek_dokumen .= $cek_dokumen['url'];
 	<div style="padding: 10px;margin:0 0 3rem 0;">
 		<h1 class="text-center" style="margin:3rem;">Halaman Penjadwalan Lembar Kerja Evaluasi SAKIP <br>Tahun <?php echo $input['tahun_anggaran']; ?></h1>
 		<div style="margin-bottom: 25px;">
-			<button class="btn btn-primary tambah_jadwal" onclick="tambah_jadwal();">Tambah Jadwal</button>
+			<button class="btn btn-primary tambah_jadwal" onclick="tambah_jadwal();">
+				<span class="dashicons dashicons-plus"></span> Tambah Jadwal
+			</button>
 		</div>
 		<table id="data_penjadwalan_table" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
 			<thead id="data_header">
@@ -62,8 +101,19 @@ $url_cek_dokumen .= $cek_dokumen['url'];
 	</div>
 </div>
 
-<div class="modal fade mt-4" id="modalTambahJadwal" tabindex="-1" role="dialog" aria-labelledby="modalTambahJadwalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-lg" role="document">
+<div class="hide-display-print container mt-4 p-4 mb-4 border rounded bg-light">
+	<h4 class="font-weight-bold mb-3 text-dark">Catatan Jadwal LKE:</h4>
+	<ul class="pl-3 text-muted">
+		<li class="text-danger font-weight-bold">⚠️ Hanya <strong>satu jadwal</strong> yang dapat aktif dalam satu waktu!</li>
+		<li>Jenis jadwal secara default adalah <strong>"Usulan"</strong>. Untuk mengubahnya menjadi <strong>"Penetapan"</strong>, gunakan tombol <strong>Edit</strong>, ubah jenis jadwal, lalu simpan.</li>
+		<li>Setelah jadwal dibuat, desain pertanyaan LKE akan otomatis diset berdasarkan <strong>template yang dipilih</strong> (template dari jadwal sebelumnya di tahun yang sama atau jadwal sebelumnya yang pernah dibuat).</li>
+		<li>Jika tidak ada template yang dipilih, maka sistem akan menggunakan <strong>template default</strong> untuk desain pertanyaan.</li>
+	</ul>
+</div>
+
+
+<div class="modal fade" id="modalTambahJadwal" tabindex="-1" aria-labelledby="modalTambahJadwalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
 				<h5 class="modal-title" id="modalTambahJadwalLabel">Tambah Penjadwalan</h5>
@@ -72,36 +122,51 @@ $url_cek_dokumen .= $cek_dokumen['url'];
 				</button>
 			</div>
 			<div class="modal-body">
-				<div>
-					<label for='nama_jadwal' style='display:inline-block'>Nama Jadwal</label>
-					<input type='text' id='nama_jadwal' style='display:block;width:100%;' placeholder='Nama Jadwal'>
-				</div>
-				<div>
-					<label for='jadwal_tanggal' style='display:inline-block'>Jadwal Pelaksanaan</label>
-					<input type="text" id='jadwal_tanggal' name="datetimes" style='display:block;width:100%;' />
-				</div>
-				<div>
-					<label for="jenis_jadwal" style='display:inline-block'>Pilih Jenis Jadwal</label>
-					<select id="jenis_jadwal" style='display:block;width: 100%;'>
-						<option value="usulan" selected>Usulan</option>
-						<option value="penetapan">Penetapan</option>
-					</select>
-				</div>
-				<div class="form-check">
-					<input class="form-check-input" type="checkbox" value="1" id="tampilNilaiPenetapan">
-					<label class="form-check-label" for="tampilNilaiPenetapan">
-						Tampilkan Nilai Penetapan
-					</label>
-				</div>
+				<form id="tambahJadwalForm">
+					<div class="form-group">
+						<label for="nama_jadwal">Nama Jadwal</label>
+						<input type="text" id="nama_jadwal" class="form-control" placeholder="Masukkan Nama Jadwal">
+					</div>
+					<div class="form-group">
+						<label for="jadwal_tanggal">Jadwal Pelaksanaan</label>
+						<input type="text" id="jadwal_tanggal" name="datetimes" class="form-control">
+					</div>
+					<div class="form-group">
+						<label for="jenis_jadwal">Pilih Jenis Jadwal</label>
+						<select class="form-control" id="jenis_jadwal">
+							<option value="usulan" selected>Usulan</option>
+							<option value="penetapan">Penetapan</option>
+						</select>
+						<small class="text-muted">Untuk mengisi nilai penetapan, ubah jenis jadwal dari <strong>Usulan</strong> ke <strong>Penetapan</strong></small>
+					</div>
+					<div class="form-group template_desain">
+						<label for="template_desain">Pilih template Desain LKE</label>
+						<select class="form-control" id="template_desain">
+							<option value="" selected>Default</option>
+							<?php echo $option_jadwal; ?>
+						</select>
+						<small class="text-muted">Default atau template desain LKE dalam jadwal yang pernah dibuat sebelumnya.</small>
+					</div>
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" value="1" id="tampilNilaiPenetapan">
+						<label class="form-check-label" for="tampilNilaiPenetapan">
+							Tampilkan Nilai Penetapan
+						</label>
+					</div>
+					<small class="text-muted">Hapus ceklis untuk menyembunyikan nilai penetapan ke user SKPD.</small>
+				</form>
 			</div>
 			<div class="modal-footer">
-				<button class="btn btn-primary submitBtn" onclick="submitTambahJadwalForm()">Simpan</button>
-				<button type="submit" class="components-button btn btn-secondary" data-dismiss="modal">Tutup</button>
+				<button type="button" class="btn btn-primary" onclick="submitTambahJadwalForm()">Simpan</button>
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
 			</div>
 		</div>
 	</div>
 </div>
-<div class="report"></div>
+
+<div class="report">
+</div>
+
 <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <script>
@@ -200,6 +265,10 @@ $url_cek_dokumen .= $cek_dokumen['url'];
 	function tambah_jadwal() {
 		jQuery("#modalTambahJadwal .modal-title").html("Tambah Penjadwalan");
 		jQuery('#nama_jadwal').val('').prop('disabled', false);
+		jQuery('#jadwal_tanggal').val('')
+		jQuery('#jenis_jadwal').val('usulan')
+		jQuery('.template_desain').show()
+		jQuery('#template_desain').val('')
 		jQuery("#modalTambahJadwal .submitBtn")
 			.attr("onclick", 'submitTambahJadwalForm()')
 			.attr("disabled", false)
@@ -208,11 +277,13 @@ $url_cek_dokumen .= $cek_dokumen['url'];
 	}
 
 	function submitTambahJadwalForm() {
-		jQuery("#wrap-loading").show()
 		let this_tahun_anggaran = tahun_anggaran;
+
 		let nama_jadwal = jQuery('#nama_jadwal').val()
+
+		let template_desain = jQuery('#template_desain').val()
 		let tampilNilaiPenetapan = jQuery('input[id="tampilNilaiPenetapan"]:checked').val();
-		if (tampilNilaiPenetapan != 1){
+		if (tampilNilaiPenetapan != 1) {
 			tampilNilaiPenetapan = 0
 		}
 		let jadwalMulai = jQuery("#jadwal_tanggal").data('daterangepicker').startDate.format('YYYY-MM-DD HH:mm:ss')
@@ -220,10 +291,10 @@ $url_cek_dokumen .= $cek_dokumen['url'];
 		let jenis_jadwal = 1;
 		jenis_jadwal = jQuery("#jenis_jadwal").val();
 		if (nama_jadwal.trim() == '' || jadwalMulai == '' || jadwalSelesai == '' || jenis_jadwal == '') {
-			jQuery("#wrap-loading").hide()
 			alert("Ada yang kosong, Harap diisi semua")
 			return false
 		} else {
+			jQuery("#wrap-loading").show()
 			jQuery.ajax({
 				url: esakip.url,
 				type: 'post',
@@ -236,6 +307,7 @@ $url_cek_dokumen .= $cek_dokumen['url'];
 					'jadwal_selesai': jadwalSelesai,
 					'jenis_jadwal': jenis_jadwal,
 					'tipe': tipe,
+					'template_desain': template_desain,
 					'tampil_nilai_penetapan': tampilNilaiPenetapan,
 					'tahun_anggaran': this_tahun_anggaran
 				},
@@ -259,7 +331,6 @@ $url_cek_dokumen .= $cek_dokumen['url'];
 	}
 
 	function edit_data_penjadwalan(id) {
-		jQuery('#modalTambahJadwal').modal('show');
 		jQuery("#modalTambahJadwal .modal-title").html("Edit Penjadwalan");
 		jQuery("#modalTambahJadwal .submitBtn")
 			.attr("onclick", 'submitEditJadwalForm(' + id + ')')
@@ -276,18 +347,23 @@ $url_cek_dokumen .= $cek_dokumen['url'];
 			},
 			dataType: "json",
 			success: function(response) {
-				jQuery('input[type=checkbox]').prop('checked', false);
 				jQuery("#wrap-loading").hide()
+				jQuery('input[type=checkbox]').prop('checked', false);
+
 				jQuery("#nama_jadwal").val(response.data.nama_jadwal);
-				if (response.data.tampil_nilai_penetapan == 1){
+				jQuery("#jenis_jadwal").val(response.data.jenis_jadwal).change();
+
+				jQuery('#jadwal_tanggal').data('daterangepicker').setStartDate(moment(response.data.started_at).format('DD-MM-YYYY HH:mm'));
+				jQuery('#jadwal_tanggal').data('daterangepicker').setEndDate(moment(response.data.end_at).format('DD-MM-YYYY HH:mm'));
+
+				if (response.data.tampil_nilai_penetapan == 1) {
 					jQuery('#tampilNilaiPenetapan').prop('checked', true)
 				} else {
 					jQuery('#tampilNilaiPenetapan').prop('checked', false)
-
 				}
-				jQuery("#jenis_jadwal").val(response.data.jenis_jadwal).change();
-				jQuery('#jadwal_tanggal').data('daterangepicker').setStartDate(moment(response.data.started_at).format('DD-MM-YYYY HH:mm'));
-				jQuery('#jadwal_tanggal').data('daterangepicker').setEndDate(moment(response.data.end_at).format('DD-MM-YYYY HH:mm'));
+
+				jQuery('.template_desain').hide()
+				jQuery('#modalTambahJadwal').modal('show');
 			}
 		})
 	}
@@ -299,7 +375,7 @@ $url_cek_dokumen .= $cek_dokumen['url'];
 		let jadwalMulai = jQuery("#jadwal_tanggal").data('daterangepicker').startDate.format('YYYY-MM-DD HH:mm:ss')
 		let jadwalSelesai = jQuery("#jadwal_tanggal").data('daterangepicker').endDate.format('YYYY-MM-DD HH:mm:ss')
 		let tampilNilaiPenetapan = jQuery('input[id="tampilNilaiPenetapan"]:checked').val();
-		if (tampilNilaiPenetapan != 1){
+		if (tampilNilaiPenetapan != 1) {
 			tampilNilaiPenetapan = 0
 		}
 		let jenis_jadwal = jQuery("#jenis_jadwal").val();
@@ -521,7 +597,7 @@ $url_cek_dokumen .= $cek_dokumen['url'];
 		}
 		switch (jenis) {
 			case 'halaman_cek_dokumen':
-				window.open('<?php echo $url_cek_dokumen; ?>','_blank');
+				window.open('<?php echo $url_cek_dokumen; ?>', '_blank');
 				break;
 
 			case '-':
