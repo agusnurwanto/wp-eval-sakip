@@ -4582,6 +4582,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					$total_level_4 = 0;
 					$total_pagu = 0;
 					$list_skpd = array();
+					$total_all_pagu_rincian = 0;
+					$total_all_realisasi = 0;
 
 					foreach ($unit as $kk => $vv) {
 						$list_skpd[$kk] = array(
@@ -4649,14 +4651,34 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						} else {
 							$get_pagu = $wpdb->get_var($wpdb->prepare("
 						        SELECT 
-						            IFNULL(SUM(rencana_pagu), 0)
-						        FROM esakip_data_rencana_aksi_indikator_opd
-						        WHERE id_skpd = %d 
-						            AND tahun_anggaran = %d 
-						            AND active = 1
+						            IFNULL(SUM(i.rencana_pagu), 0)
+						        FROM esakip_data_rencana_aksi_indikator_opd i
+						        INNER JOIN esakip_data_rencana_aksi_opd r on r.id=i.id_renaksi
+						        	AND r.level=1
+						        	AND r.active=i.active
+						        	AND r.id_skpd=i.id_skpd
+						        	AND r.tahun_anggaran=i.tahun_anggaran
+						        WHERE i.id_skpd = %d 
+						            AND i.tahun_anggaran = %d 
+						            AND i.active = 1
 						    ", $vv['id_skpd'], $tahun_anggaran));
 						}
-
+						$total_pagu_rincian = 0;
+						$total_realisasi = 0;
+						$get_data_tagging = $wpdb->get_results(
+							$wpdb->prepare("
+								SELECT 
+									* 
+								FROM esakip_tagging_rincian_belanja 
+								WHERE active = 1 
+								  AND id_skpd = %d
+							", $vv['id_skpd']),
+							ARRAY_A
+						);
+						foreach ($get_data_tagging as $data_tagging) {
+							$total_pagu_rincian += $data_tagging['volume'] * $data_tagging['harga_satuan'];
+							$total_realisasi += $data_tagging['realisasi'];
+						}
 						$tbody .= "<tr>";
 						$tbody .= "<td style='text-transform: uppercase;'><a href='" . $detail_pengisian_rencana_aksi['url'] . "&id_skpd=" . $vv['id_skpd'] . "' target='_blank'>" . $vv['kode_skpd'] . " " . $vv['nama_skpd'] . "</a></td>";
 						$tbody .= "<td class='text-center' style='text-transform: uppercase;'>" . $jumlah_kegiatan_utama . "</td>";
@@ -4664,8 +4686,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						$tbody .= "<td class='text-center' style='text-transform: uppercase;'>" . $jumlah_uraian_kegiatan_rencana_aksi . "</td>";
 						$tbody .= "<td class='text-center' style='text-transform: uppercase;'>" . $jumlah_uraian_teknis_kegiatan . "</td>";
 						$tbody .= "<td class='text-right' style='text-transform: uppercase;'>" . number_format((float)$get_pagu, 0, ",", ".") . "</td>";
-						$tbody .= "<td class='text-right' style='text-transform: uppercase;'>0</td>";
-						$tbody .= "<td class='text-right' style='text-transform: uppercase;'>0</td>";
+						$tbody .= "<td class='text-right' style='text-transform: uppercase;'>" . number_format((float)$total_pagu_rincian, 0, ",", ".") . "</td>";
+						$tbody .= "<td class='text-right' style='text-transform: uppercase;'>" . number_format((float)$total_realisasi, 0, ",", ".") . "</td>";
 						$tbody .= "</tr>";
 
 						$total_level_1 += $jumlah_kegiatan_utama;
@@ -4673,6 +4695,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						$total_level_3 += $jumlah_uraian_kegiatan_rencana_aksi;
 						$total_level_4 += $jumlah_uraian_teknis_kegiatan;
 						$total_pagu += $get_pagu;
+						$total_all_pagu_rincian += $total_pagu_rincian;
+						$total_all_realisasi += $total_realisasi;
 					}
 					$ret['data'] = $tbody;
 					$ret['total_level_1'] = $total_level_1;
@@ -4680,6 +4704,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					$ret['total_level_3'] = $total_level_3;
 					$ret['total_level_4'] = $total_level_4;
 					$ret['total_pagu'] = number_format((float)$total_pagu, 0, ",", ".");
+					$ret['total_all_pagu_rincian'] = number_format((float)$total_all_pagu_rincian, 0, ",", ".");
+					$ret['total_all_realisasi'] = number_format((float)$total_all_realisasi, 0, ",", ".");
 					$ret['list_skpd'] = $list_skpd;
 				} else {
 					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";

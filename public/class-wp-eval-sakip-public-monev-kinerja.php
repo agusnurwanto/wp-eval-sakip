@@ -1692,6 +1692,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$realisasi_4_html = array();
 						$capaian_realisasi = array();
 						$total_harga_tagging_rincian = 0;
+						$total_realisasi_tagging_rincian = 0;
 
 						$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 						foreach ($v['indikator'] as $key => $ind) {
@@ -1733,6 +1734,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$harga_satuan = $value['harga_satuan'];
 									$volume = $value['volume'];
 									$total_harga_tagging_rincian += $volume * $harga_satuan;
+									$total_realisasi_tagging_rincian += $value['realisasi'];
 								}
 							}
 						}
@@ -1818,7 +1820,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							<td class="text-center">' . $capaian_realisasi . '</td>
 							<td class="text-right">' . $rencana_pagu_html . '</td>
 							<td class="text-right">' . number_format((float)$total_harga_tagging_rincian, 0, ",", ".") . '</td>
-							<td class=""></td>
+							<td class="text-right">' . number_format((float)$total_realisasi_tagging_rincian, 0, ",", ".") . '</td>
 							<td class=""></td>
 							<td class="text-right"></td>
 							<td class="text-left">' . $label_cascading . '</td>
@@ -1845,6 +1847,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$capaian_realisasi = array();
 							$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 							$total_harga_tagging_rincian = 0;
+							$total_realisasi_tagging_rincian = 0;
 							foreach ($renaksi['indikator'] as $key => $ind) {
 								$indikator_html[$key] = '<a href="' . $this->functions->add_param_get($rincian_tagging['url'], '&tahun=' . $_POST['tahun_anggaran'] . '&id_skpd=' . $_POST['id_skpd'] . '&id_indikator=' . $ind['id']) . '" target="_blank">' . $ind['indikator'] . '</a>';
 								$satuan_html[$key] = $ind['satuan'];
@@ -1884,6 +1887,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										$harga_satuan = $value['harga_satuan'];
 										$volume = $value['volume'];
 										$total_harga_tagging_rincian += $volume * $harga_satuan;
+										$total_realisasi_tagging_rincian += $value['realisasi'];
 									}
 								}
 							}
@@ -2061,7 +2065,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							        <td class="text-center">' . $capaian_realisasi . '</td>
 									<td class="text-right">' . $rencana_pagu_html . '</td>
 							        <td class="text-right">' . number_format((float)$total_harga_tagging_rincian, 0, ",", ".") . '</td>
-							        <td class=""></td>
+							        <td class="text-right">' . number_format((float)$total_realisasi_tagging_rincian, 0, ",", ".") . '</td>
 							        <td class=""></td>
 									<td class="text-right">' . number_format((float)$renaksi['detail']['pagu_cascading'], 0, ",", ".") . '</td>
 							        <td class="text-left">' . $label_cascading . '</td>
@@ -2089,6 +2093,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$capaian_realisasi = array();
 								$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 								$total_harga_tagging_rincian = 0;
+								$total_realisasi_tagging_rincian = 0;
 								foreach ($uraian_renaksi['indikator'] as $key => $ind) {
 									$indikator_html[$key] = '<a href="' . $this->functions->add_param_get($rincian_tagging['url'], '&tahun=' . $_POST['tahun_anggaran'] . '&id_skpd=' . $_POST['id_skpd'] . '&id_indikator=' . $ind['id']) . '" target="_blank">' . $ind['indikator'] . '</a>';
 									$satuan_html[$key] = $ind['satuan'];
@@ -2128,6 +2133,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 											$harga_satuan = $value['harga_satuan'];
 											$volume = $value['volume'];
 											$total_harga_tagging_rincian += $volume * $harga_satuan;
+											$total_realisasi_tagging_rincian += $value['realisasi'];
 										}
 									}
 								}
@@ -2217,7 +2223,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									<td class="text-center">' . $capaian_realisasi . '</td>	
 									<td class="text-right">' . $rencana_pagu_html . '</td>
 									<td class="text-right">' . number_format((float)$total_harga_tagging_rincian, 0, ",", ".") . '</td>
-									<td class=""></td>
+									<td class="text-right">' . number_format((float)$total_realisasi_tagging_rincian, 0, ",", ".") . '</td>
 									<td class=""></td>
 									<td class="text-right">' . number_format((float)$uraian_renaksi['detail']['pagu_cascading'], 0, ",", ".") . '</td>
 									<td class="text-left">' . $label_cascading . '</td>
@@ -2243,6 +2249,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$realisasi_pagu_html = array();
 									$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 									$total_harga_tagging_rincian = 0;
+									$total_realisasi_tagging_rincian = 0;
 									foreach ($uraian_teknis_kegiatan['indikator'] as $key => $ind) {
 										$indikator_html[$key] = '<a href="' . $this->functions->add_param_get($rincian_tagging['url'], '&tahun=' . $_POST['tahun_anggaran'] . '&id_skpd=' . $_POST['id_skpd'] . '&id_indikator=' . $ind['id']) . '" target="_blank">' . $ind['indikator'] . '</a>';
 										$satuan_html[$key] = $ind['satuan'];
@@ -2282,6 +2289,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 												$harga_satuan = $value['harga_satuan'];
 												$volume = $value['volume'];
 												$total_harga_tagging_rincian += $volume * $harga_satuan;
+												$total_realisasi_tagging_rincian += $value['realisasi'];
 											}
 										}
 									}
@@ -2372,7 +2380,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										<td class="text-center">' . $capaian_realisasi . '</td>
 										<td class="text-right">' . $rencana_pagu_html . '</td>
 										<td class="text-right">' . number_format((float)$total_harga_tagging_rincian, 0, ",", ".") . '</td>
-										<td class="text-right" style="visibility: hidden;">' . $realisasi_pagu_html . '</td>
+										<td class="text-right">' . number_format((float)$total_realisasi_tagging_rincian, 0, ",", ".") . '</td>
 										<td class=""></td>
 										<td class="text-right">' . number_format((float)$uraian_teknis_kegiatan['detail']['pagu_cascading'], 0, ",", ".") . '</td>
 										<td class="text-left">' . $label_cascading . '</td>
