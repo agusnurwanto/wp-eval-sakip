@@ -6935,16 +6935,34 @@ class Wp_Eval_Sakip_Monev_Kinerja
 													}else{
 														$nama_aspek = $nama_aspek[0];
 													}
+
+													$volume_api_string = $rencana_aksi_api_string = $satuan_bulan_api_string = $realisasi_api_string = $keterangan_api_string = $capaian_api_string = '';
+													$volume_api = $rencana_aksi_api = $satuan_bulan_api = $realisasi_api = $keterangan_api = $capaian_api = array();
+													foreach ($v_k_bulan['kinerja'] as $k_kinerja => $v_kinerja) {
+														array_push($volume_api,$v_kinerja['target_'.$nama_aspek]);
+														array_push($rencana_aksi_api,$v_kinerja['kegiatan']);
+														array_push($satuan_bulan_api,$v_kinerja['satuan']);
+														array_push($realisasi_api,$v_kinerja['realisasi_'.$nama_aspek]);
+														array_push($keterangan_api,$v_kinerja['catatan']);
+														array_push($capaian_api,$v_kinerja['capaian_'.$nama_aspek]);
+													}
+													$volume_api_string = serialize($volume_api);
+													$rencana_aksi_api_string = serialize($rencana_aksi_api);
+													$satuan_bulan_api_string = serialize($satuan_bulan_api);
+													$realisasi_api_string = serialize($realisasi_api);
+													$keterangan_api_string = serialize($keterangan_api);
+													$capaian_api_string = serialize($capaian_api);
+
 													$data_option = array(
 														'id_indikator_renaksi_opd' => $v_indikator['indikator_rhk_id'],
 														'id_skpd' => $id_skpd,
 														'bulan' => $v_k_bulan['bulan'],
-														'volume' => $v_k_bulan['kinerja'][0]['target_'.$nama_aspek],
-														'rencana_aksi' => $v_k_bulan['kinerja'][0]['kegiatan'],
-														'satuan_bulan' => $v_k_bulan['kinerja'][0]['satuan'],
-														'realisasi' => $v_k_bulan['kinerja'][0]['realisasi_'.$nama_aspek],
-														'keterangan' => $v_k_bulan['kinerja'][0]['catatan'],
-														'capaian' => $v_k_bulan['kinerja'][0]['capaian_'.$nama_aspek],
+														'volume' => $volume_api_string,
+														'rencana_aksi' => $rencana_aksi_api_string,
+														'satuan_bulan' => $satuan_bulan_api_string,
+														'realisasi' => $realisasi_api_string,
+														'keterangan' => $keterangan_api_string,
+														'capaian' => $capaian_api_string,
 														'tahun_anggaran' => $tahun,
 														'active' => 1,
 														'created_at' => current_time('mysql'),
@@ -7341,5 +7359,51 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	        $ret['message'] = 'Format salah!';
 	    }
 	    die(json_encode($ret));
+	}
+
+	function get_data_pokin_rhk($id_rhk, $level_rhk, $type_rhk = 'opd', $pokin_level_1 = false){
+		global $wpdb;
+		$html_label_pokin = $table_rhk_prefix = $table_pokin_prefix = '';
+
+		if(!empty($id_rhk) && !empty($level_rhk)){
+			if($type_rhk == 'opd'){
+				$table_rhk_prefix = '_opd';
+				$table_pokin_prefix = '_opd';
+			}elseif ($type_rhk == 'pemda') {
+				$table_rhk_prefix = '_pemda';
+				$table_pokin_prefix = '';
+			}
+
+			// ----- untuk mendapatkan pokin level 1 ----- //
+			$level_pokin = $pokin_level_1 ? $level_rhk : $level_rhk+1;
+			
+			$data_pokin = $wpdb->get_results(
+				$wpdb->prepare("
+					SELECT
+						o.id_pokin,
+						p.label AS pokin_label
+					FROM esakip_data_pokin_rhk$table_rhk_prefix AS o
+					INNER JOIN esakip_pohon_kinerja$table_pokin_prefix AS p 
+						ON o.id_pokin = p.id
+							AND o.level_pokin = p.level
+					WHERE o.id_rhk$table_rhk_prefix = %d
+						AND o.level_rhk$table_rhk_prefix = %d
+						AND o.level_pokin = %d
+						AND o.active=1
+						AND p.active=1
+				", $id_rhk, $level_rhk, $level_pokin),
+				ARRAY_A
+			);
+			
+			if(!empty($data_pokin)){
+				$html_label_pokin = '<ul style="margin: 0; list-style-type: circle;">';
+					foreach ($data_pokin as $k_label_pokin => $v_label_pokin) {
+						$html_label_pokin .= '<li>' . $v_label_pokin['pokin_label'] . '</li>';
+					}
+					$html_label_pokin .= '</ul>';
+			}
+		}
+		
+		return $html_label_pokin;
 	}
 }

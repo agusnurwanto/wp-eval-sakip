@@ -171,6 +171,14 @@ $data_skpd = array(
 	4 => null,
 );
 
+$html_label_pokin = array(
+	1 => array(),
+	2 => array(),
+	3 => array(),
+	4 => array(),
+	5 => array(),
+);
+
 $renaksi = $wpdb->get_row(
 	$wpdb->prepare("
         SELECT *
@@ -183,6 +191,11 @@ $renaksi = $wpdb->get_row(
 if (!empty($renaksi)) {
 	$data = get_pegawai_skpd_rhk($renaksi, $wpdb);
 	$data_rhk[$renaksi['level']] = $renaksi;
+
+	$html_label_pokin[$renaksi['level']] = $this->get_data_pokin_rhk($renaksi['id'], $renaksi['level'], 'opd');
+	if($renaksi['level'] == 1){
+		$html_label_pokin[5] = $this->get_data_pokin_rhk($renaksi['id'], $renaksi['level'], 'opd', true);
+	}
 
 	$data_pegawai[$renaksi['level']] = $data_this_pegawai = $nama_pegawai_4 = $data['pegawai'] ?? null;
 	$data_skpd[$renaksi['level']] = $data_this_skpd = $nama_skpd_4 = $data['skpd'] ?? null;
@@ -214,6 +227,11 @@ if (!empty($renaksi_parent1)) {
 	$data = get_pegawai_skpd_rhk($renaksi_parent1, $wpdb);
 	$data_rhk[$renaksi_parent1['level']] = $renaksi_parent1;
 
+	$html_label_pokin[$renaksi_parent1['level']] = $this->get_data_pokin_rhk($renaksi_parent1['id'], $renaksi_parent1['level'], 'opd');
+	if($renaksi_parent1['level'] == 1){
+		$html_label_pokin[5] = $this->get_data_pokin_rhk($renaksi_parent1['id'], $renaksi_parent1['level'], 'opd', true);
+	}
+
 	$data_pegawai[$renaksi_parent1['level']] = $nama_pegawai_1 = $data['pegawai'] ?? null;
 	$data_skpd[$renaksi_parent1['level']] = $nama_skpd_1 = $data['skpd'] ?? null;
 } else {
@@ -236,6 +254,11 @@ if(!empty($renaksi_parent1['parent'])){
 if (!empty($renaksi_parent2)) {
 	$data = get_pegawai_skpd_rhk($renaksi_parent2, $wpdb);
 	$data_rhk[$renaksi_parent2['level']] = $renaksi_parent2;
+	
+	$html_label_pokin[$renaksi_parent2['level']] = $this->get_data_pokin_rhk($renaksi_parent2['id'], $renaksi_parent2['level'], 'opd');
+	if($renaksi_parent2['level'] == 1){
+		$html_label_pokin[5] = $this->get_data_pokin_rhk($renaksi_parent2['id'], $renaksi_parent2['level'], 'opd', true);
+	}
 
 	$data_pegawai[$renaksi_parent2['level']] = $nama_pegawai_2 = $data['pegawai'] ?? null;
 	$data_skpd[$renaksi_parent2['level']] = $nama_skpd_2 = $data['skpd'] ?? null;
@@ -259,6 +282,11 @@ if(!empty($renaksi_parent2['parent'])){
 if (!empty($renaksi_parent3)) {
 	$data = get_pegawai_skpd_rhk($renaksi_parent3, $wpdb);
 	$data_rhk[$renaksi_parent3['level']] = $renaksi_parent3;
+	
+	$html_label_pokin[$renaksi_parent3['level']] = $this->get_data_pokin_rhk($renaksi_parent3['id'], $renaksi_parent3['level'], 'opd');
+	if($renaksi_parent3['level'] == 1){
+		$html_label_pokin[5] = $this->get_data_pokin_rhk($renaksi_parent3['id'], $renaksi_parent3['level'], 'opd', true);
+	}
 
 	$data_pegawai[$renaksi_parent3['level']] = $nama_pegawai_3 = $data['pegawai'] ?? null;
 	$data_skpd[$renaksi_parent3['level']] = $nama_skpd_3 = $data['skpd'] ?? null;
@@ -275,7 +303,8 @@ if(!empty($renaksi_parent1['parent'])){
 				i.*,
 				r.label,
 				r.id as id_renaksi,
-				r.parent
+				r.parent,
+				r.level as level
 			FROM `esakip_data_label_rencana_aksi` l
 			INNER JOIN esakip_data_rencana_aksi_indikator_pemda i 
 					ON l.parent_indikator_renaksi_pemda=i.id
@@ -283,26 +312,68 @@ if(!empty($renaksi_parent1['parent'])){
 					ON l.parent_renaksi_pemda=r.id
 			WHERE l.parent_renaksi_opd=%d
 			  AND i.active=1
-			  AND i.tahun_anggaran=%d
-		", $renaksi_parent1['parent'], $tahun),
+		", $renaksi_parent1['parent']),
 		ARRAY_A
 	);
 }
 
-$renaksi_pemda4 = array(
-	'label' => array()
-);
+$status_collapse = !empty($renaksi_parent_pemda) ? 'show' : 'hide';
+
 $renaksi_pemda3 = array(
 	'label' => array()
 );
 $renaksi_pemda2 = array(
-	'label' => array()
+	'label' => ''
 );
 $renaksi_pemda1 = array(
-	'label' => array()
+	'label' => ''
 );
+$html_label_pokin_pemda = array(
+	1 => '',
+	2 => '',
+	3 => array(),
+	4 => ''
+);
+
 foreach ($renaksi_parent_pemda as $val) {
-	$renaksi_pemda4['label'][$val['id_renaksi']] = $val['label'] . ' ( ' . $val['indikator'] . ' ' . $val['target_akhir'] . ' ' . $val['satuan'] . ' )';
+	$renaksi_pemda3['label'][$val['id_renaksi']] = $val['label'] . ' ( ' . $val['indikator'] . ' ' . $val['target_akhir'] . ' ' . $val['satuan'] . ' )';
+	$html_label_pokin_pemda[$val['level']][$val['id_renaksi']] = $this->get_data_pokin_rhk($val['id_renaksi'], $val['level'], 'pemda');
+}
+
+$renaksi_pemda_parent1 = array();
+if(!empty($renaksi_parent_pemda[0]['parent'])){
+	$renaksi_pemda_parent1 = $wpdb->get_row(
+		$wpdb->prepare("
+			SELECT *
+			FROM esakip_data_rencana_aksi_pemda
+			WHERE id=%d
+		", $renaksi_parent_pemda[0]['parent']),
+		ARRAY_A
+	);
+}
+
+if (!empty($renaksi_pemda_parent1)) {
+	$renaksi_pemda2['label'] = $renaksi_pemda_parent1['label'];
+	$html_label_pokin_pemda[$renaksi_pemda_parent1['level']] = $this->get_data_pokin_rhk($renaksi_pemda_parent1['id'], $renaksi_pemda_parent1['level'], 'pemda');
+}
+
+$renaksi_pemda_parent2 = array();
+if(!empty($renaksi_pemda_parent1['parent'])){
+	$renaksi_pemda_parent2 = $wpdb->get_row(
+		$wpdb->prepare("
+			SELECT *
+			FROM esakip_data_rencana_aksi_pemda
+			WHERE id=%d
+		", $renaksi_pemda_parent1['parent']),
+		ARRAY_A
+	);
+}
+
+if (!empty($renaksi_pemda_parent2)) {
+	$renaksi_pemda1['label'] = $renaksi_pemda_parent2['label'];
+	$html_label_pokin_pemda[$renaksi_pemda_parent2['level']] = $this->get_data_pokin_rhk($renaksi_pemda_parent2['id'], $renaksi_pemda_parent2['level'], 'pemda');
+	// level 1
+	$html_label_pokin_pemda[4] = $this->get_data_pokin_rhk($renaksi_pemda_parent2['id'], $renaksi_pemda_parent2['level'], 'pemda', true);
 }
 
 //------ hak akses user pegawai ------//
@@ -652,11 +723,14 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($renaksi['ni
 	$get_bulanan_message = $data_ekin_terbaru['message'];
 	if(!empty($data_ekin_terbaru['is_error']) && $data_ekin_terbaru['is_error']){
 		$show_alert_bulanan = 1;
+		$get_bulanan_message = "Ada Error Saat Mengakses Api E-Kinerja | Pesan: ".$data_ekin_terbaru['message'];
 	}
 }
 
 $data_target_realisasi_bulanan = array();
 $data_capaian_target_realisasi_bulanan = array();
+$data_jadi_volume = $data_jadi_rencana_aksi = $data_jadi_satuan_bulan = $data_jadi_realisasi = $data_jadi_keterangan = array();
+
 $get_data_bulanan = $wpdb->get_results(
 						$wpdb->prepare(
 							"SELECT
@@ -673,15 +747,58 @@ if(!empty($get_data_bulanan)){
 	foreach ($get_data_bulanan as $k_bulanan => $v_bulanan) {
 		if(empty($data_target_realisasi_bulanan[$v_bulanan['bulan']])){
 			$data_target_realisasi_bulanan[$v_bulanan['bulan']] = $v_bulanan;
+			
+			$unser_volume_target = unserialize($v_bulanan['volume']);
+			$unser_rencana_aksi = unserialize($v_bulanan['rencana_aksi']);
+			$unser_satuan_bulan = unserialize($v_bulanan['satuan_bulan']);
+			$unser_realisasi = unserialize($v_bulanan['realisasi']);
+			$unser_capaian = unserialize($v_bulanan['capaian']);
+			$unser_keterangan = unserialize($v_bulanan['keterangan']);
 
-			// ----- cek capaian jika kolom capaian kosong -----
-			if(!empty($v_bulanan['realisasi']) && !empty($v_bulanan['volume'])){
-				$data_capaian_target_realisasi_bulanan[$v_bulanan['bulan']] = number_format(($v_bulanan['realisasi'] / $v_bulanan['volume']) * 100, 0)."%";
-			}elseif(!empty($v_bulanan['volume'])){
-				$data_capaian_target_realisasi_bulanan[$v_bulanan['bulan']] = "0%";
-			}else{
-				$data_capaian_target_realisasi_bulanan[$v_bulanan['bulan']] = "";
+			$data_capaian_all = $sementara_volume = $sementara_rencana_aksi = $sementara_satuan_bulan = $sementara_realisasi = $sementara_keterangan= array();
+			foreach ($unser_rencana_aksi as $k_c_rencana_aksi => $v_c_rencana_aksi) {
+				if(!empty($unser_volume_target[$k_c_rencana_aksi])){
+					array_push($sementara_volume, $unser_volume_target[$k_c_rencana_aksi]);
+				}else{
+					array_push($sementara_volume, "0");
+				}
+				if(!empty($unser_rencana_aksi[$k_c_rencana_aksi])){
+					array_push($sementara_rencana_aksi, $unser_rencana_aksi[$k_c_rencana_aksi]);
+				}else{
+					array_push($sementara_rencana_aksi, "-");
+				}
+				if(!empty($unser_satuan_bulan[$k_c_rencana_aksi])){
+					array_push($sementara_satuan_bulan, $unser_satuan_bulan[$k_c_rencana_aksi]);
+				}else{
+					array_push($sementara_satuan_bulan, "-");
+				}
+				if(!empty($unser_realisasi[$k_c_rencana_aksi])){
+					array_push($sementara_realisasi, $unser_realisasi[$k_c_rencana_aksi]);
+				}else{
+					array_push($sementara_realisasi, "0");
+				}
+				if(!empty($unser_keterangan[$k_c_rencana_aksi])){
+					array_push($sementara_keterangan, $unser_keterangan[$k_c_rencana_aksi]);
+				}else{
+					array_push($sementara_keterangan, "");
+				}
+				// ----- cek capaian jika kolom capaian kosong -----
+				if(!empty($unser_capaian[$k_c_rencana_aksi])){
+					array_push($data_capaian_all, $unser_capaian[$k_c_rencana_aksi]);
+				}elseif(!empty($unser_realisasi[$k_c_rencana_aksi]) && !empty($unser_volume_target[$k_c_rencana_aksi])){
+					$persen_capaian = number_format(($unser_realisasi[$k_c_rencana_aksi] / $unser_volume_target[$k_c_rencana_aksi]) * 100, 0)."%";
+					array_push($data_capaian_all, $persen_capaian);
+				}elseif(!empty($unser_volume_target[$k_c_rencana_aksi])){
+					array_push($data_capaian_all, "0%");
+				}
 			}
+
+			$data_capaian_target_realisasi_bulanan[$v_bulanan['bulan']] = !empty($data_capaian_all) ? implode("<br>", $data_capaian_all) : "";
+			$data_jadi_volume[$v_bulanan['bulan']] = !empty($sementara_volume) ? implode("<br>", $sementara_volume) : "";
+			$data_jadi_rencana_aksi[$v_bulanan['bulan']] = !empty($sementara_rencana_aksi) ? implode("<br>", $sementara_rencana_aksi) : "";
+			$data_jadi_satuan_bulan[$v_bulanan['bulan']] = !empty($sementara_satuan_bulan) ? implode("<br>", $sementara_satuan_bulan) : "";
+			$data_jadi_realisasi[$v_bulanan['bulan']] = !empty($sementara_realisasi) ? implode("<br>", $sementara_realisasi) : "";
+			$data_jadi_keterangan[$v_bulanan['bulan']] = !empty($sementara_keterangan) ? implode("<br>", $sementara_keterangan) : "";
 		}
 	}
 }
@@ -706,12 +823,12 @@ $triwulan = 1;
 foreach ($bulan as $k_bulan => $v_bulan) {
 	$tbody_target_realisasi_bulanan .= '<tr>
 									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . $v_bulan . '</td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . (!empty($data_target_realisasi_bulanan[$k_bulan]['rencana_aksi']) ? $data_target_realisasi_bulanan[$k_bulan]['rencana_aksi'] : '') . '</td>
-									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . (!empty($data_target_realisasi_bulanan[$k_bulan]['volume']) ? $data_target_realisasi_bulanan[$k_bulan]['volume'] : '') . '</td>
-									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . (!empty($data_target_realisasi_bulanan[$k_bulan]['satuan_bulan']) ? $data_target_realisasi_bulanan[$k_bulan]['satuan_bulan'] : '') . '</td>
-									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . (!empty($data_target_realisasi_bulanan[$k_bulan]['realisasi']) ? $data_target_realisasi_bulanan[$k_bulan]['realisasi'] : '') . '</td>
-									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . (!empty($data_target_realisasi_bulanan[$k_bulan]['capaian']) ? $data_target_realisasi_bulanan[$k_bulan]['capaian'] : (!empty($data_capaian_target_realisasi_bulanan[$k_bulan]) ? $data_capaian_target_realisasi_bulanan[$k_bulan] : '')) . '</td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . (!empty($data_target_realisasi_bulanan[$k_bulan]['keterangan']) ? $data_target_realisasi_bulanan[$k_bulan]['keterangan'] : '') . '</td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . ( !empty($data_jadi_rencana_aksi[$k_bulan]) ? $data_jadi_rencana_aksi[$k_bulan] : "" ) . '</td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . ( !empty($data_jadi_volume[$k_bulan]) ? $data_jadi_volume[$k_bulan] : "" ) . '</td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . ( !empty($data_jadi_satuan_bulan[$k_bulan]) ? $data_jadi_satuan_bulan[$k_bulan] : "" ) . '</td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . ( !empty($data_jadi_realisasi[$k_bulan]) ? $data_jadi_realisasi[$k_bulan] : "" ) . '</td>
+									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . ( !empty($data_capaian_target_realisasi_bulanan[$k_bulan]) ? $data_capaian_target_realisasi_bulanan[$k_bulan] : "" ) . '</td>
+									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . ( !empty($data_jadi_keterangan[$k_bulan]) ? $data_jadi_keterangan[$k_bulan] : "" ) . '</td>
 								</tr>';
 	
 	if ($k_bulan % 3 == 0) {
@@ -858,6 +975,15 @@ if(!empty($ind_renaksi['target_akhir']) && !empty($ind_renaksi['realisasi_akhir'
 	.amount {
 		font-size: 1.1rem;
 	}
+
+	.data-organisasi {
+		margin-bottom: 2.5em;
+	}
+
+	.data-organisasi td {
+		padding: 0.5em 1em;
+		vertical-align: top;
+	}
 </style>
 <!-- Table -->
 <div id="cetak">
@@ -871,96 +997,90 @@ if(!empty($ind_renaksi['target_akhir']) && !empty($ind_renaksi['realisasi_akhir'
 		<?php if (!$is_admin_panrb && $hak_akses_user_pegawai != 0): ?>
 			<div id="action" class="action-section hide-excel"></div>
 		<?php endif; ?>
-		<h3 class="text-center">Data Pemerintah Daerah</h3>
-		<table class="borderless-table">
-			<tbody>
-				<tr>
-					<td style="width: 270px;">Pohon Kinerja Level 1</td>
-					<td style="width: 20px;" class="text-center">:</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td style="width: 270px;">RHK Level 1</td>
-					<td>:</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td style="width: 270px;">Tujuan RPJMD</td>
-					<td>:</td>
-					<td></td>
-				</tr>
-			</tbody>
-		</table>
-		<table class="borderless-table">
-			<tbody>
-				<tr>
-					<td style="width: 270px;">Pohon Kinerja Level 2</td>
-					<td style="width: 20px;" class="text-center">:</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td>RHK Level 2</td>
-					<td class="text-center">:</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td>Sasaran RPJMD</td>
-					<td class="text-center">:</td>
-					<td></td>
-				</tr>
-			</tbody>
-		</table>
-		<table class="borderless-table">
-			<tbody>
-				<tr>
-					<td style="width: 270px;">Pohon Kinerja Level 3</td>
-					<td style="width: 20px;" class="text-center">:</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td>RHK Level 3</td>
-					<td class="text-center">:</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td>Strategi RPJMD</td>
-					<td class="text-center">:</td>
-					<td></td>
-				</tr>
-			</tbody>
-		</table>
-		<table class="borderless-table">
-			<tbody>
-				<tr>
-					<td style="width: 270px;">Pohon Kinerja Level 4</td>
-					<td style="width: 20px;" class="text-center">:</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td>RHK Level 4</td>
-					<td class="text-center">:</td>
-					<td><?php echo implode('<br>', $renaksi_pemda4['label']); ?></td>
-				</tr>
-				<tr>
-					<td>Arah Kebijakan</td>
-					<td class="text-center">:</td>
-					<td></td>
-				</tr>
-			</tbody>
-		</table>
-		<h3 class="text-center">Data Organisasi Perangkat Daerah</h3>
-		<?php if(!empty($data_rhk[1])): ?>
-			<table class="borderless-table">
+		<a href="#data-pemerintah" data-toggle="collapse" aria-expanded="false" aria-controls="data-pemerintah" style="text-decoration: none;">
+			<h3 class="text-center d-flex align-items-center justify-content-center">Data Pemerintah Daerah 
+			<button type="button" class="btn btn-sm btn-info ml-2" style="padding: 0 !important;">
+				<span title="buka tutup detail data pemerintahan" class='toggle-icon dashicons dashicons-arrow-right-alt2' style="font-size: 1em; font-weight: 600; position: relative; top: 4px;"></span>
+			</button>
+			</h3>
+		</a>
+		<div class="collapse" id="data-pemerintah">
+			<table class="borderless-table data-organisasi">
 				<tbody>
 					<tr>
 						<td style="width: 270px;">Pohon Kinerja Level 1</td>
 						<td style="width: 20px;" class="text-center">:</td>
-						<td><?php echo $data_rhk[1]['label_pokin_1']; ?></td>
+						<td><?php echo $html_label_pokin_pemda[4]; ?></td>
 					</tr>
 					<tr>
 						<td style="width: 270px;">Pohon Kinerja Level 2</td>
 						<td style="width: 20px;" class="text-center">:</td>
-						<td><?php echo $data_rhk[1]['label_pokin_2']; ?></td>
+						<td><?php echo $html_label_pokin_pemda[1]; ?></td>
+					</tr>
+					<tr>
+						<td>RHK Level 1</td>
+						<td class="text-center">:</td>
+						<td><?php echo $renaksi_pemda1['label']; ?></td>
+					</tr>
+					<tr>
+						<td>Sasaran RPJMD</td>
+						<td class="text-center">:</td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+			<table class="borderless-table data-organisasi">
+				<tbody>
+					<tr>
+						<td style="width: 270px;">Pohon Kinerja Level 3</td>
+						<td style="width: 20px;" class="text-center">:</td>
+						<td><?php echo $html_label_pokin_pemda[2]; ?></td>
+					</tr>
+					<tr>
+						<td>RHK Level 2</td>
+						<td class="text-center">:</td>
+						<td><?php echo $renaksi_pemda2['label']; ?></td>
+					</tr>
+					<tr>
+						<td>Strategi RPJMD</td>
+						<td class="text-center">:</td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+			<table class="borderless-table data-organisasi">
+				<tbody>
+					<tr>
+						<td style="width: 270px;">Pohon Kinerja Level 4</td>
+						<td style="width: 20px;" class="text-center">:</td>
+						<td><?php echo implode('<br>', $html_label_pokin_pemda[3]); ?></td>
+					</tr>
+					<tr>
+						<td>RHK Level 3</td>
+						<td class="text-center">:</td>
+						<td><?php echo implode('<br>', $renaksi_pemda3['label']); ?></td>
+					</tr>
+					<tr>
+						<td>Arah Kebijakan</td>
+						<td class="text-center">:</td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<h3 class="text-center">Data Organisasi Perangkat Daerah</h3>
+		<?php if(!empty($data_rhk[1])): ?>
+			<table class="borderless-table data-organisasi">
+				<tbody>
+					<tr>
+						<td style="width: 270px;">Pohon Kinerja Level 1</td>
+						<td style="width: 20px;" class="text-center">:</td>
+						<td><?php echo $html_label_pokin[5]; ?></td>
+					</tr>
+					<tr>
+						<td style="width: 270px;">Pohon Kinerja Level 2</td>
+						<td style="width: 20px;" class="text-center">:</td>
+						<td><?php echo $html_label_pokin[1]; ?></td>
 					</tr>
 					<tr>
 						<td>Kegiatan Utama | RHK Level 1</td>
@@ -994,12 +1114,12 @@ if(!empty($ind_renaksi['target_akhir']) && !empty($ind_renaksi['realisasi_akhir'
 			</table>
 		<?php endif; ?>
 		<?php if(!empty($data_rhk[2])): ?>
-			<table class="borderless-table">
+			<table class="borderless-table data-organisasi">
 				<tbody>
 					<tr>
 						<td style="width: 270px;">Pohon Kinerja Level 3</td>
 						<td style="width: 20px;" class="text-center">:</td>
-						<td><?php echo $data_rhk[2]['label_pokin_3']; ?></td>
+						<td><?php echo $html_label_pokin[2]; ?></td>
 					</tr>
 					<tr>
 						<td>Rencana Hasil Kerja | RHK Level 2</td>
@@ -1033,12 +1153,12 @@ if(!empty($ind_renaksi['target_akhir']) && !empty($ind_renaksi['realisasi_akhir'
 			</table>
 		<?php endif; ?>
 		<?php if(!empty($data_rhk[3])): ?>
-			<table class="borderless-table">
+			<table class="borderless-table data-organisasi">
 				<tbody>
 					<tr>
 						<td style="width: 270px;">Pohon Kinerja Level 4</td>
 						<td style="width: 20px;" class="text-center">:</td>
-						<td><?php echo $data_rhk[3]['label_pokin_4']; ?></td>
+						<td><?php echo $html_label_pokin[3]; ?></td>
 					</tr>
 					<tr>
 						<td>Uraian Kegiatan RHK | RHK Level 3</td>
@@ -1072,12 +1192,12 @@ if(!empty($ind_renaksi['target_akhir']) && !empty($ind_renaksi['realisasi_akhir'
 			</table>
 		<?php endif; ?>
 		<?php if(!empty($data_rhk[4])): ?>
-			<table class="borderless-table">
+			<table class="borderless-table data-organisasi">
 				<tbody>
 					<tr>
 						<td style="width: 270px;">Pohon Kinerja Level 5</td>
 						<td style="width: 20px;" class="text-center">:</td>
-						<td><?php echo $data_rhk[4]['label_pokin_5']; ?></td>
+						<td><?php echo $html_label_pokin[4]; ?></td>
 					</tr>
 					<tr>
 						<td>Uraian Teknis Kegiatan | RHK Level 4</td>
@@ -1554,8 +1674,24 @@ if(!empty($ind_renaksi['target_akhir']) && !empty($ind_renaksi['realisasi_akhir'
 		if(get_data_bulanan_message != '-' && show_alert_bulanan == 1){
 			alert(get_data_bulanan_message);
 		}
-		console.log(get_data_bulanan_message)
-;
+		console.log(get_data_bulanan_message);
+
+		// status_collapse
+		let status_collapse = '<?php echo $status_collapse; ?>';
+		if(status_collapse == 'show'){
+			jQuery('#data-pemerintah').collapse('show');
+			jQuery('.toggle-icon').removeClass('dashicons-arrow-right-alt2').addClass('dashicons-arrow-down-alt2');
+		}else{
+			jQuery('#data-pemerintah').collapse('hide');
+			jQuery('.toggle-icon').removeClass('dashicons-arrow-down-alt2').addClass('dashicons-arrow-right-alt2');
+		}
+		jQuery('#data-pemerintah').on('show.bs.collapse', function () {
+            jQuery('.toggle-icon').removeClass('dashicons-arrow-right-alt2').addClass('dashicons-arrow-down-alt2');
+        });
+
+        jQuery('#data-pemerintah').on('hide.bs.collapse', function () {
+            jQuery('.toggle-icon').removeClass('dashicons-arrow-down-alt2').addClass('dashicons-arrow-right-alt2');
+        });
 	});
 
 	function loadRkaWpSipd(tahunAnggaran, kodeSbl, idIndikator) {
