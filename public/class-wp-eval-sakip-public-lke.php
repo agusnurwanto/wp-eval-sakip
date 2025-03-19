@@ -402,7 +402,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							foreach ($data_subkomponen as $subkomponen) {
 								$disabled = 'disabled';
 								// Jika jadwal masih buka
-								if ($dateTime > $started_at_dt && $dateTime < $end_at_dt) {
+								if ($dateTime > $started_at_dt && $dateTime < $end_at_dt && $data_jadwal['status'] == 1) {
 									// Jika jadwal penetapan
 									if ($jenis_jadwal == 'penetapan') {
 										// dan user adalah evaluator
@@ -1040,7 +1040,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 													|| $_POST['excel'] == 'usulan_penetapan'
 												) {
 													if ($tampil_nilai_penetapan == 1 || $can_verify == true) {
-														$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' disabled>" . $opsi_penetapan . "</select></td>";
+														$tbody2 .= "<td class='text-center' ><select id='opsiPenetapan" . $penilaian['kp_id'] . "' disabled>" . $opsi_penetapan . "</select></td>";
 														$tbody2 .= "<td class='text-center'>" . $nilai_penetapan . "</td>";
 													} else {
 														$tbody2 .= "<td class='text-center'><select id='opsiPenetapan" . $penilaian['kp_id'] . "' disabled><option selected> - </option></select></td>";
@@ -1262,6 +1262,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						SELECT *
 						FROM esakip_data_jadwal
 						WHERE id=%d
+							and status = 1
 					", $id_jadwal),
 					ARRAY_A
 				);
@@ -1272,7 +1273,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					$started_at_dt = new DateTime($started_at);
 					$end_at_dt = new DateTime($end_at);
 				} else {
-					error_log('Data jadwal tidak ditemukan.');
+					error_log('Data jadwal active tidak ditemukan.');
 				}
 				if ($dateTime > $started_at_dt && $dateTime > $end_at_dt) {
 					$ret['status'] = 'error';
@@ -1464,6 +1465,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						SELECT *
 						FROM esakip_data_jadwal
 						WHERE id=%d
+							AND status = 1
 					", $id_jadwal),
 					ARRAY_A
 				);
@@ -1474,7 +1476,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					$started_at_dt = new DateTime($started_at);
 					$end_at_dt = new DateTime($end_at);
 				} else {
-					error_log('Data jadwal tidak ditemukan.');
+					error_log('Data jadwal active tidak ditemukan.');
 				}
 				if ($dateTime > $started_at_dt && $dateTime > $end_at_dt) {
 					$ret['status'] = 'error';

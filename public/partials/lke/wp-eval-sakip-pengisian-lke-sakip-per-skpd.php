@@ -46,8 +46,7 @@ $skpd = $wpdb->get_row(
 ", $id_skpd, $tahun_anggaran_sakip),
     ARRAY_A
 );
-
-if (!empty($jadwal)) {
+if (!empty($jadwal) && $jadwal['status'] == 1) {
     $tahun_anggaran = $jadwal['tahun_anggaran'];
     $jenis_jadwal = $jadwal['jenis_jadwal'];
     $nama_jadwal = $jadwal['nama_jadwal'];

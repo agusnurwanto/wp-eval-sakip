@@ -362,11 +362,12 @@ class Wp_Eval_Sakip_Admin
 								id,
 								nama_jadwal,
 								tahun_anggaran,
-								lama_pelaksanaan
+								lama_pelaksanaan,
+								status
 							FROM esakip_data_jadwal
 							WHERE tipe = %s
-							  	AND status =1
-							ORDER BY tahun_anggaran DESC",
+							  	AND status !=0
+							ORDER BY tahun_anggaran DESC, status ASC",
 							'LKE'
 						),
 						ARRAY_A
@@ -381,9 +382,15 @@ class Wp_Eval_Sakip_Admin
 								'show_header' => 1,
 								'post_status' => 'private'
 							));
+
 							$pengisian_lke_sakip['url'] .= '&id_jadwal=' . $jadwal_evaluasi_item['id'];
+							if($jadwal_evaluasi_item['status'] == 1){
+								$status = 'AKTIF';
+							} else if($jadwal_evaluasi_item['status'] == 2){
+								$status = 'DIKUNCI';
+							}
 							$body_pemda .= '
-								<li><a target="_blank" href="' . $pengisian_lke_sakip['url'] . '">' . $pengisian_lke_sakip['title'] . '</a></li>';
+								<li><a target="_blank" href="' . $pengisian_lke_sakip['url'] . '">' . $jadwal_evaluasi_item['nama_jadwal'] . ' | '.$jadwal_evaluasi_item['tahun_anggaran'].' ['.$status.']</a></li>';
 						}
 					}
 					$body_pemda .= '</ol>';

@@ -20897,12 +20897,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					id,
 					nama_jadwal,
 					tahun_anggaran,
-					lama_pelaksanaan
+					lama_pelaksanaan,
+					status
 				FROM esakip_data_jadwal
 				WHERE tipe = 'LKE'
-				  AND status = 1
+				  AND status != 0
 				  AND tahun_anggaran=%d
-				ORDER BY started_at DESC LIMIT 1",
+				ORDER BY tahun_anggaran DESC, status ASC",
 				$_GET['tahun']
 			),
 			ARRAY_A
@@ -20918,8 +20919,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
+			$status = '';
+			if($get_jadwal_lke_sakip['status'] == 1){
+				$status = 'AKTIF';
+			} else if($get_jadwal_lke_sakip['status'] == 2){
+				$status = 'DIKUNCI';
+			}
 			$lke['url'] .= '&id_jadwal=' . $get_jadwal_lke_sakip['id'];
-			$pengisian_lke .= '<li><a target="_blank" href="' . $lke['url'] . '" class="btn btn-primary">' . $lke['title'] . '</a></li>';
+			$pengisian_lke .= '<li><a target="_blank" href="' . $lke['url'] . '" class="btn btn-primary text-left">' . $get_jadwal_lke_sakip['nama_jadwal'] . ' ['.$status.']</a></li>';
 		}
 
 		$list_skpd_pengisian_rencana_aksi = $this->functions->generatePage(array(
@@ -21466,7 +21473,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'show_header' => 1,
 							'post_status' => 'private'
 						));
-						$pengisian_lke_per_skpd_page .= '<li><a target="_blank" href="' . $pengisian_lke_per_skpd['url'] . '&id_skpd=' . $skpd_db['id_skpd'] . '&id_jadwal=' . $get_jadwal_lke_sakip['id'] . '" class="btn btn-primary">Pengisian LKE | ' . $get_jadwal_lke_sakip['nama_jadwal'] . '</a></li>';
+						$status = '';
+						if($get_jadwal_lke_sakip['status'] == 1){
+							$status = 'AKTIF';
+						} else if($get_jadwal_lke_sakip['status'] == 2){
+							$status = 'DIKUNCI';
+						}
+						$pengisian_lke_per_skpd_page .= '<li><a target="_blank" href="' . $pengisian_lke_per_skpd['url'] . '&id_skpd=' . $skpd_db['id_skpd'] . '&id_jadwal=' . $get_jadwal_lke_sakip['id'] . '" class="btn btn-primary text-left">' . $get_jadwal_lke_sakip['nama_jadwal'] . ' ['.$status.']</a></li>';
 					}
 	
 					$jadwal_periode_rpjmd_renstra = $wpdb->get_results(
