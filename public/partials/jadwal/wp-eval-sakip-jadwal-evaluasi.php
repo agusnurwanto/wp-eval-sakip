@@ -157,7 +157,7 @@ if (!empty($data_jadwal)) {
 				</form>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-primary" onclick="submitTambahJadwalForm()">Simpan</button>
+				<button type="button" class="btn btn-primary submitBtn" onclick="submitTambahJadwalForm()">Simpan</button>
 				<button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
 			</div>
 		</div>
