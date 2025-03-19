@@ -30,7 +30,7 @@ if (empty($jadwal)) {
     die("jadwal tidak tersedia");
 }
 
-if (!empty($jadwal)) {
+if (!empty($jadwal) && $jadwal['status'] == 1) {
     $tahun_anggaran = $jadwal['tahun_anggaran'];
     $jenis_jadwal = $jadwal['jenis_jadwal'];
     $nama_jadwal = $jadwal['nama_jadwal'];

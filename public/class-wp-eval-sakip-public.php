@@ -10017,6 +10017,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				$checkOpenedSchedule = 0;
 				$report = '';
+				$report = '';
 				if (!empty($queryRecords)) {
 					foreach ($queryRecords as $recKey => $recVal) {
 						$desain_lke_page = $this->functions->generatePage(array(
@@ -10026,9 +10027,19 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'no_key' => 1,
 							'post_status' => 'private'
 						));
+						$lke = $this->functions->generatePage(array(
+						    'nama_page' => 'Pengisian LKE | ' . $recVal['nama_jadwal'],
+						    'content' => '[pengisian_lke_sakip id_jadwal=' . $recVal['id'] . ']',
+						    'show_header' => 1,
+						    'post_status' => 'private'
+						));
+						$lke['url'] .= '&id_jadwal=' . $recVal['id'];
+
+						$pengisian_lke .= '<li><a target="_blank" href="' . $lke['url']. '" class="btn btn-primary text-left">' . $recVal['nama_jadwal']. ' ['.$status.']</a></li>';
 
 						$report = '<div class="btn-group mr-2" role="group">';
-						$report .= '<a class="btn btn-sm btn-primary" style="text-decoration: none;" onclick="report(\'' . $recVal['id'] . '\'); return false;" href="#" title="Cetak Laporan"><i class="dashicons dashicons-printer"></i></a>';
+						$report .= '<a class="btn btn-sm btn-primary" style="text-decoration: none;" href="' . $lke['url']. '" title="Cetak Laporan" target="_blank">';
+						$report .= '<i class="dashicons dashicons-printer"></i></a>';
 						$report .= '</div>';
 
 						$edit	= '';

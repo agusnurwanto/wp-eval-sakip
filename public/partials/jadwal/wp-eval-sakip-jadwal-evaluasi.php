@@ -493,61 +493,61 @@ if (!empty($data_jadwal)) {
 	}
 
 
-	function report(id) {
-		let modal = `
-			<div class="modal fade" id="modal-report" tab-index="-1" role="dialog" aria-hidden="true">
-			  <div class="modal-dialog modal-lg" role="document" style="min-width:1450px">
-			    <div class="modal-content">
-			      <div class="modal-header">
-			        <h5 class="modal-title">Laporan</h5>
-			        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-			          <span aria-hidden="true">&times;</span>
-			        </button>
-			      </div>
+	// function report(id) {
+	// 	let modal = `
+	// 		<div class="modal fade" id="modal-report" tab-index="-1" role="dialog" aria-hidden="true">
+	// 		  <div class="modal-dialog modal-lg" role="document" style="min-width:1450px">
+	// 		    <div class="modal-content">
+	// 		      <div class="modal-header">
+	// 		        <h5 class="modal-title">Laporan</h5>
+	// 		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	// 		          <span aria-hidden="true">&times;</span>
+	// 		        </button>
+	// 		      </div>
 			      
-			      <div class="modal-body">
-				    <div class="container-fluid">
-					    <div class="row">
-						    <div class="col-md-2">Unit Kerja</div>
-						    <div class="col-md-6">
-						    	<select class="form-control list_perangkat_daerah" id="list_perangkat_daerah"></select>
-						    </div>
-					    </div>
-					    <br/>
-					    <div class="row">
-					    	<div class="col-md-2">Jenis Laporan</div>
-					    	<div class="col-md-6">
-					      		<select class="form-control jenis" id="jenis">
-					      			<option value="-">Pilih Jenis</option>
-									<option value="halaman_cek_dokumen">Monitor Upload Dokumen</option>
-				      			</select>
-					    	</div>
-					    </div>
-					    <br/>
-					    <div class="row">
-					    	<div class="col-md-2"></div>
-					    	<div class="col-md-6 action-footer">
-					      		<button type="button" class="btn btn-success btn-preview" onclick="cek('${id}')">Proses</button>
-					    	</div>
-					    </div>
-					</div>
-			      </div>
-			      <div class="modal-cek" style="padding:10px"></div>
-			    </div>
-			  </div>
-			</div>`;
-		jQuery("body .report").html(modal);
-		get_jadwal_lke(id)
-			.then(function(response) {
-				list_perangkat_daerah()
-					.then(function() {
-						jQuery("#modal-report").modal('show');
-						jQuery('.jenis').select2({
-							width: '100%'
-						});
-					})
-			});
-	}
+	// 		      <div class="modal-body">
+	// 			    <div class="container-fluid">
+	// 				    <div class="row">
+	// 					    <div class="col-md-2">Unit Kerja</div>
+	// 					    <div class="col-md-6">
+	// 					    	<select class="form-control list_perangkat_daerah" id="list_perangkat_daerah"></select>
+	// 					    </div>
+	// 				    </div>
+	// 				    <br/>
+	// 				    <div class="row">
+	// 				    	<div class="col-md-2">Jenis Laporan</div>
+	// 				    	<div class="col-md-6">
+	// 				      		<select class="form-control jenis" id="jenis">
+	// 				      			<option value="-">Pilih Jenis</option>
+	// 								<option value="halaman_cek_dokumen">Monitor Upload Dokumen</option>
+	// 			      			</select>
+	// 				    	</div>
+	// 				    </div>
+	// 				    <br/>
+	// 				    <div class="row">
+	// 				    	<div class="col-md-2"></div>
+	// 				    	<div class="col-md-6 action-footer">
+	// 				      		<button type="button" class="btn btn-success btn-preview" onclick="cek('${id}')">Proses</button>
+	// 				    	</div>
+	// 				    </div>
+	// 				</div>
+	// 		      </div>
+	// 		      <div class="modal-cek" style="padding:10px"></div>
+	// 		    </div>
+	// 		  </div>
+	// 		</div>`;
+	// 	jQuery("body .report").html(modal);
+	// 	get_jadwal_lke(id)
+	// 		.then(function(response) {
+	// 			list_perangkat_daerah()
+	// 				.then(function() {
+	// 					jQuery("#modal-report").modal('show');
+	// 					jQuery('.jenis').select2({
+	// 						width: '100%'
+	// 					});
+	// 				})
+	// 		});
+	// }
 
 	function list_perangkat_daerah() {
 		return new Promise(function(resolve, reject) {
