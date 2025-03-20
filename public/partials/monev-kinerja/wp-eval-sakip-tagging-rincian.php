@@ -334,6 +334,8 @@ $html_label_pokin_pemda = array(
 	3 => array(),
 	4 => ''
 );
+$html_label_pokin_1_pemda = '';
+$periode_rpjmd_rpd = 'RPJMD';
 
 foreach ($renaksi_parent_pemda as $val) {
 	$renaksi_pemda3['label'][$val['id_renaksi']] = $val['label'] . ' ( ' . $val['indikator'] . ' ' . $val['target_akhir'] . ' ' . $val['satuan'] . ' )';
@@ -372,7 +374,73 @@ if(!empty($renaksi_pemda_parent1['parent'])){
 if (!empty($renaksi_pemda_parent2)) {
 	$renaksi_pemda1['label'] = $renaksi_pemda_parent2['label'];
 	$html_label_pokin_pemda[$renaksi_pemda_parent2['level']] = $this->get_data_pokin_rhk($renaksi_pemda_parent2['id'], $renaksi_pemda_parent2['level'], 'pemda');
-	// level 1
+	//--- pokin level 1 pemda ---//
+	$rhk_level_1_pemda = $wpdb->get_row(
+		$wpdb->prepare(
+			"SELECT 
+				id,
+				label,
+				level,
+				id_tujuan,
+				id_jadwal
+			FROM 
+				esakip_data_rencana_aksi_pemda
+			WHERE 
+				id=%d
+		", $renaksi_pemda_parent2['id']),
+		ARRAY_A
+	);
+
+	if(!empty($rhk_level_1_pemda)){
+		//----- get data pokin level 1 pemda -----//
+		$pokin_level_1_pemda = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT
+					pr.id_pokin,
+					pk.label as pokin_label
+				FROM
+					esakip_data_pokin_rhk_pemda pr
+				JOIN
+					esakip_pohon_kinerja pk
+				ON
+					pr.id_pokin=pk.id
+					AND pr.level_pokin = pk.level
+				WHERE
+					pr.id_tujuan=%d
+					AND pr.level_rhk_pemda=%d
+					AND pr.level_pokin=%d
+					AND pr.active=1
+					AND pk.active=1
+				", $rhk_level_1_pemda['id_tujuan'], $rhk_level_1_pemda['level'], 1 
+			), 
+		ARRAY_A);
+
+		if(!empty($pokin_level_1_pemda)){
+			$html_label_pokin_1_pemda = '<ul style="margin: 0; list-style-type: circle;">';
+				foreach ($pokin_level_1_pemda as $k_label_pokin_1_pemda => $v_label_pokin_1_pemda) {
+					$html_label_pokin_1_pemda .= '<li>' . $v_label_pokin_1_pemda['pokin_label'] . '</li>';
+				}
+				$html_label_pokin_1_pemda .= '</ul>';
+		}
+
+		$periode_jadwal = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT 
+					*
+				FROM 
+					esakip_data_jadwal
+				WHERE 
+					id=%d
+			  		AND status = 1
+			", $rhk_level_1_pemda['id_jadwal']
+			),
+		ARRAY_A);
+
+		if(!empty($periode_jadwal)){
+			$periode_rpjmd_rpd = $periode_jadwal['nama_jadwal'];
+		}
+	}
+
 	$html_label_pokin_pemda[4] = $this->get_data_pokin_rhk($renaksi_pemda_parent2['id'], $renaksi_pemda_parent2['level'], 'pemda', true);
 }
 
@@ -1010,7 +1078,7 @@ if(!empty($ind_renaksi['target_akhir']) && !empty($ind_renaksi['realisasi_akhir'
 					<tr>
 						<td style="width: 270px;">Pohon Kinerja Level 1</td>
 						<td style="width: 20px;" class="text-center">:</td>
-						<td><?php echo $html_label_pokin_pemda[4]; ?></td>
+						<td><?php echo $html_label_pokin_1_pemda; ?></td>
 					</tr>
 					<tr>
 						<td style="width: 270px;">Pohon Kinerja Level 2</td>
@@ -1023,7 +1091,7 @@ if(!empty($ind_renaksi['target_akhir']) && !empty($ind_renaksi['realisasi_akhir'
 						<td><?php echo $renaksi_pemda1['label']; ?></td>
 					</tr>
 					<tr>
-						<td>Sasaran RPJMD</td>
+						<td>Sasaran <?php echo $periode_rpjmd_rpd; ?></td>
 						<td class="text-center">:</td>
 						<td></td>
 					</tr>
@@ -1042,7 +1110,7 @@ if(!empty($ind_renaksi['target_akhir']) && !empty($ind_renaksi['realisasi_akhir'
 						<td><?php echo $renaksi_pemda2['label']; ?></td>
 					</tr>
 					<tr>
-						<td>Strategi RPJMD</td>
+						<td>Strategi <?php echo $periode_rpjmd_rpd; ?></td>
 						<td class="text-center">:</td>
 						<td></td>
 					</tr>
@@ -1124,7 +1192,7 @@ if(!empty($ind_renaksi['target_akhir']) && !empty($ind_renaksi['realisasi_akhir'
 					<tr>
 						<td>Rencana Hasil Kerja | RHK Level 2</td>
 						<td class="text-center">:</td>
-						<td><?php echo $data_rhk[2]['label']; ?></td>
+						<td><?php echo $data_rhk[2]['label']; ?>&nbsp;&nbsp;<?php echo (!empty($renaksi_parent_pemda) ? "<span class='badge badge-primary p-2 mt-2 text-center'>Mendukung RHK Pemerintah Daerah</span>" : ""); ?></td>
 					</tr>
 					<tr>
 						<td>Program</td>
