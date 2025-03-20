@@ -5098,14 +5098,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						", $v['id']), ARRAY_A);
 						$rhk_parent = array();
 						if (!empty($v['parent'])) {
-							$rhk_parent = $wpdb->get_row($wpdb->prepare("
-								SELECT
-									*
-								FROM esakip_data_rencana_aksi_opd
-								WHERE tahun_anggaran=%d
-									AND active=1
-									AND id=%d
-							", $tahun_anggaran, $v['parent']), ARRAY_A);
+							$rhk_parent = $this->get_rhk_parent($v['parent'], $tahun_anggaran);
 						}
 						$data_all['data'][$v['id']] = array(
 							'detail' => $v,
@@ -5128,6 +5121,27 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				'message' => $e->getMessage()
 			]);
 			exit;
+		}
+	}
+
+	function get_rhk_parent($parent, $tahun_anggaran, $all_data = array()){
+		global $wpdb;
+		$rhk_parent = $wpdb->get_row($wpdb->prepare("
+			SELECT
+				*
+			FROM esakip_data_rencana_aksi_opd
+			WHERE tahun_anggaran=%d
+				AND active=1
+				AND id=%d
+		", $tahun_anggaran, $parent), ARRAY_A);
+		if(!empty($rhk_parent)){
+			$all_data[$rhk_parent['level']] = $rhk_parent;
+			if(empty($rhk_parent['parent'])){
+				return $all_data;
+			}
+			return $this->get_rhk_parent($rhk_parent['parent'], $tahun_anggaran, $all_data);
+		}else{
+			return $all_data;
 		}
 	}
 
