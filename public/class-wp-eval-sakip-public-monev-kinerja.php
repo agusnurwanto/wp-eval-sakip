@@ -5075,6 +5075,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 					$data_all = array(
 						'total' => 0,
+						'action' => $_POST['action'],
 						'data' => array(),
 						'status' => true,
 						'message' => 'Berhasil get data rencana hasil kerja!',
@@ -5125,6 +5126,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		} catch (Exception $e) {
 			echo json_encode([
 				'status' => false,
+				'action' => $_POST['action'],
+				'data' => array(),
 				'message' => $e->getMessage()
 			]);
 			exit;
