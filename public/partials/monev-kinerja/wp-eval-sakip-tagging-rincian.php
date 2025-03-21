@@ -800,16 +800,17 @@ $data_capaian_target_realisasi_bulanan = array();
 $data_jadi_volume = $data_jadi_rencana_aksi = $data_jadi_satuan_bulan = $data_jadi_realisasi = $data_jadi_keterangan = array();
 
 $get_data_bulanan = $wpdb->get_results(
-						$wpdb->prepare(
-							"SELECT
-								*
-							FROM 
-								esakip_data_bulanan_rencana_aksi_opd 
-							WHERE 
-								id_indikator_renaksi_opd=%d
-								AND active = 1
-							ORDER BY bulan ASC
-						", $ind_renaksi['id']), ARRAY_A);
+	$wpdb->prepare(
+		"SELECT
+			*
+		FROM 
+			esakip_data_bulanan_rencana_aksi_opd 
+		WHERE 
+			id_indikator_renaksi_opd=%d
+			AND active = 1
+		ORDER BY bulan ASC
+	", $ind_renaksi['id'])
+, ARRAY_A);
 
 if(!empty($get_data_bulanan)){
 	foreach ($get_data_bulanan as $k_bulanan => $v_bulanan) {
@@ -861,12 +862,12 @@ if(!empty($get_data_bulanan)){
 				}
 			}
 
-			$data_capaian_target_realisasi_bulanan[$v_bulanan['bulan']] = !empty($data_capaian_all) ? implode("<br>", $data_capaian_all) : "";
-			$data_jadi_volume[$v_bulanan['bulan']] = !empty($sementara_volume) ? implode("<br>", $sementara_volume) : "";
-			$data_jadi_rencana_aksi[$v_bulanan['bulan']] = !empty($sementara_rencana_aksi) ? implode("<br>", $sementara_rencana_aksi) : "";
-			$data_jadi_satuan_bulan[$v_bulanan['bulan']] = !empty($sementara_satuan_bulan) ? implode("<br>", $sementara_satuan_bulan) : "";
-			$data_jadi_realisasi[$v_bulanan['bulan']] = !empty($sementara_realisasi) ? implode("<br>", $sementara_realisasi) : "";
-			$data_jadi_keterangan[$v_bulanan['bulan']] = !empty($sementara_keterangan) ? implode("<br>", $sementara_keterangan) : "";
+			$data_capaian_target_realisasi_bulanan[$v_bulanan['bulan']] = !empty($data_capaian_all) ? implode("<br><br>", $data_capaian_all) : "";
+			$data_jadi_volume[$v_bulanan['bulan']] = !empty($sementara_volume) ? implode("<br><br>", $sementara_volume) : "";
+			$data_jadi_rencana_aksi[$v_bulanan['bulan']] = !empty($sementara_rencana_aksi) ? implode("<br><br>", $sementara_rencana_aksi) : "";
+			$data_jadi_satuan_bulan[$v_bulanan['bulan']] = !empty($sementara_satuan_bulan) ? implode("<br><br>", $sementara_satuan_bulan) : "";
+			$data_jadi_realisasi[$v_bulanan['bulan']] = !empty($sementara_realisasi) ? implode("<br><br>", $sementara_realisasi) : "";
+			$data_jadi_keterangan[$v_bulanan['bulan']] = !empty($sementara_keterangan) ? implode("<br><br>", $sementara_keterangan) : "";
 		}
 	}
 }
@@ -889,15 +890,40 @@ $bulan = array(
 $tbody_target_realisasi_bulanan = '';
 $triwulan = 1;
 foreach ($bulan as $k_bulan => $v_bulan) {
-	$tbody_target_realisasi_bulanan .= '<tr>
-									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . $v_bulan . '</td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . ( !empty($data_jadi_rencana_aksi[$k_bulan]) ? $data_jadi_rencana_aksi[$k_bulan] : "" ) . '</td>
-									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . ( !empty($data_jadi_volume[$k_bulan]) ? $data_jadi_volume[$k_bulan] : "" ) . '</td>
-									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . ( !empty($data_jadi_satuan_bulan[$k_bulan]) ? $data_jadi_satuan_bulan[$k_bulan] : "" ) . '</td>
-									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . ( !empty($data_jadi_realisasi[$k_bulan]) ? $data_jadi_realisasi[$k_bulan] : "" ) . '</td>
-									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . ( !empty($data_capaian_target_realisasi_bulanan[$k_bulan]) ? $data_capaian_target_realisasi_bulanan[$k_bulan] : "" ) . '</td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . ( !empty($data_jadi_keterangan[$k_bulan]) ? $data_jadi_keterangan[$k_bulan] : "" ) . '</td>
-								</tr>';
+	if (!isset($data_target_realisasi_bulanan[$k_bulan])) {
+	    $tbody_target_realisasi_bulanan .= "<tr>
+	        <td class='esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah'>$v_bulan</td>
+	        <td colspan='6' class='esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah'></td>
+	    </tr>";
+	    continue;
+	}
+
+	$get_rencana_aksi = explode("<br><br>", $data_jadi_rencana_aksi[$k_bulan] ?? '');
+	$get_volume = explode("<br><br>", $data_jadi_volume[$k_bulan] ?? '');
+	$get_satuan_bulan = explode("<br><br>", $data_jadi_satuan_bulan[$k_bulan] ?? '');
+	$get_realisasi = explode("<br><br>", $data_jadi_realisasi[$k_bulan] ?? '');
+	$get_capaian = explode("<br><br>", $data_capaian_target_realisasi_bulanan[$k_bulan] ?? '');
+	$get_keterangan = explode("<br><br>", $data_jadi_keterangan[$k_bulan] ?? '');
+
+
+	$rowspan = count($get_rencana_aksi);
+
+	foreach ($get_rencana_aksi as $i => $rencana_aksi) {
+	    $tbody_target_realisasi_bulanan .= '<tr>';
+
+	    if ($i === 0) {
+	        $tbody_target_realisasi_bulanan .= '<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="' . $rowspan . '">' . $v_bulan . '</td>';
+	    }
+	    
+	    $tbody_target_realisasi_bulanan .= '<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . $rencana_aksi . '</td>';
+	    $tbody_target_realisasi_bulanan .= '<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-bawah">' . ($get_volume[$i] ?? '') . '</td>';
+	    $tbody_target_realisasi_bulanan .= '<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-bawah">' . ($get_satuan_bulan[$i] ?? '') . '</td>';
+	    $tbody_target_realisasi_bulanan .= '<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-bawah">' . ($get_realisasi[$i] ?? '') . '</td>';
+	    $tbody_target_realisasi_bulanan .= '<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-bawah">' . ($get_capaian[$i] ?? '') . '</td>';
+	    $tbody_target_realisasi_bulanan .= '<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-bawah">' . ($get_keterangan[$i] ?? '') . '</td>';
+	    
+	    $tbody_target_realisasi_bulanan .= '</tr>';
+	}
 	
 	if ($k_bulan % 3 == 0) {
 		// ----- capaian triwulan -----
@@ -910,14 +936,14 @@ foreach ($bulan as $k_bulan => $v_bulan) {
 		}
 
 		$tbody_target_realisasi_bulanan .= '<tr style="background-color:#FDFFB6;">
-									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Triwulan ' . $triwulan . '</td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $ind_renaksi['indikator'] . '</td>
-									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $ind_renaksi['target_'.$triwulan] . '</td>
-									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $ind_renaksi['satuan'] . '</td>
-									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $ind_renaksi['realisasi_tw_'.$triwulan] . '</td>
-									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . $capaian_triwulan . '</td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . $ind_renaksi['ket_tw_'.$triwulan] . '</td>
-								</tr>';
+			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Triwulan ' . $triwulan . '</td>
+			<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $ind_renaksi['indikator'] . '</td>
+			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $ind_renaksi['target_'.$triwulan] . '</td>
+			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $ind_renaksi['satuan'] . '</td>
+			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $ind_renaksi['realisasi_tw_'.$triwulan] . '</td>
+			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . $capaian_triwulan . '</td>
+			<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . $ind_renaksi['ket_tw_'.$triwulan] . '</td>
+		</tr>';
 		$triwulan++;
 	}
 }
