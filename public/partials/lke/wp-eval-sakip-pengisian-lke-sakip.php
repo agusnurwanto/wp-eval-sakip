@@ -56,10 +56,9 @@ $get_nama_komponen = $wpdb->get_results(
         WHERE id_jadwal = %d
           AND active = 1
         ORDER BY nomor_urut ASC
-    ", $input['id_jadwal']),
+    ", $jadwal['id']),
     ARRAY_A
 );
-
 ?>
 <style type="text/css">
     .wrap-table {
