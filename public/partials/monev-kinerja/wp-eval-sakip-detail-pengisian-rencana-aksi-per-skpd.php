@@ -2839,40 +2839,67 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                                 get_bulan.forEach((bulan, bulan_index) => {
                                     let get_data_bulanan = b.bulanan.find(bulanan => bulanan.bulan == (bulan_index + 1)) || {};
 
-                                    let data_capaian_bulanan = ''
-                                    if(get_data_bulanan.capaian){
-                                        data_capaian_bulanan = get_data_bulanan.capaian;
-                                    }else{
-                                        // ----- capaian bulanan -----
-                                        if(get_data_bulanan.realisasi && get_data_bulanan.volume){
-                                            data_capaian_bulanan = ((get_data_bulanan.realisasi / get_data_bulanan.volume)*100).toFixed(0)+'%';
-                                        }else if(get_data_bulanan.volume){
-                                            data_capaian_bulanan = "0%";
-                                        }else{
-                                            data_capaian_bulanan = "";
+                                    let unserialize = (data) => {
+                                        try {
+                                            return data ? JSON.parse(data) : "";
+                                        } catch (e) {
+                                            return data || "";
                                         }
-                                    }
+                                    };
 
-                                    renaksi += '' +
-                                        `<tr>` +
-                                        `<td class="text-center">${bulan}</td>` +
-                                        `<td class="text-center"><textarea class="form-control" name="rencana_aksi_${b.id}_${bulan_index + 1}" id="rencana_aksi_${b.id}_${bulan_index + 1}" ${isdisabled ? 'disabled' : ''}>${get_data_bulanan.rencana_aksi || ''}</textarea></td>` +
-                                        `<td class="text-center"><input type="text" class="form-control" name="volume_${b.id}_${bulan_index + 1}" id="volume_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.volume || ''}" ${isdisabled ? 'disabled' : ''}></td>` +
-                                        `<td class="text-center"><input type="text" class="form-control" name="satuan_bulan_${b.id}_${bulan_index + 1}" id="satuan_bulan_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.satuan || ''}" ${isdisabled ? 'disabled' : ''}></td>` +
-                                        `<td class="text-center"><input type="number" class="form-control" name="realisasi_${b.id}_${bulan_index + 1}" id="realisasi_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.realisasi || ''}" ${isdisabled ? 'disabled' : ''}></td>` +
-                                        `<td class="text-center" name="capaian_${b.id}_${bulan_index + 1}" id="capaian_${b.id}_${bulan_index + 1}" value="${data_capaian_bulanan}">${data_capaian_bulanan}</td>` +
-                                        `<td class="text-center"><textarea class="form-control" name="keterangan_${b.id}_${bulan_index + 1}" id="keterangan_${b.id}_${bulan_index + 1}" ${isdisabled ? 'disabled' : ''}>${get_data_bulanan.keterangan || ''}</textarea></td>` +
-                                        `<td class="text-center">`;
+                                    let parseSerializedData = (data) => {
+                                        if (!data) return [];
+                                        try {
+                                            let matches = data.match(/s:\d+:"(.*?)";/g);
+                                            return matches ? matches.map(m => m.match(/s:\d+:"(.*?)";/)[1]) : [];
+                                        } catch (e) {
+                                            return [data];
+                                        }
+                                    };
+
+                                    let rencana_aksi = parseSerializedData(get_data_bulanan.rencana_aksi);
+                                    let volume = parseSerializedData(get_data_bulanan.volume);
+                                    let satuan = parseSerializedData(get_data_bulanan.satuan);
+                                    let realisasi = parseSerializedData(get_data_bulanan.realisasi);
+                                    let capaian = parseSerializedData(get_data_bulanan.capaian);
+                                    let keterangan = parseSerializedData(get_data_bulanan.keterangan);
+
+                                    renaksi += `<tr><td class="text-center">${bulan}</td><td class="text-center">`;
+
+                                    rencana_aksi.forEach((aksi, index) => {
+                                        renaksi += `<textarea class="form-control" name="rencana_aksi_${b.id}_${bulan_index + 1}_${index}" id="rencana_aksi_${b.id}_${bulan_index + 1}_${index}" ${isdisabled ? 'disabled' : ''}>${aksi}</textarea>`;
+                                    });
+                                    renaksi += `</td><td class="text-center">`;
+
+                                    volume.forEach((vol, index) => {
+                                        renaksi += `<input type="text" class="form-control" name="volume_${b.id}_${bulan_index + 1}_${index}" id="volume_${b.id}_${bulan_index + 1}_${index}" value="${vol}" ${isdisabled ? 'disabled' : ''}>`;
+                                    });
+                                    renaksi += `</td><td class="text-center">`;
+
+                                    satuan.forEach((sat, index) => {
+                                        renaksi += `<input type="text" class="form-control" name="satuan_bulan_${b.id}_${bulan_index + 1}_${index}" id="satuan_bulan_${b.id}_${bulan_index + 1}_${index}" value="${sat}" ${isdisabled ? 'disabled' : ''}>`;
+                                    });
+                                    renaksi += `</td><td class="text-center">`;
+
+                                    realisasi.forEach((real, index) => {
+                                        renaksi += `<input type="number" class="form-control" name="realisasi_${b.id}_${bulan_index + 1}_${index}" id="realisasi_${b.id}_${bulan_index + 1}_${index}" value="${real}" ${isdisabled ? 'disabled' : ''}>`;
+                                    });
+                                    renaksi += `</td><td class="text-center">`;
+
+                                    capaian.forEach((cap, index) => {
+                                        renaksi += `<input type="text" class="form-control" name="capaian_${b.id}_${bulan_index + 1}_${index}" id="capaian_${b.id}_${bulan_index + 1}_${index}" value="${cap}" ${isdisabled ? 'disabled' : ''}>`;
+                                    });
+                                    renaksi += `</td><td class="text-center">`;
+
+                                    keterangan.forEach((ket, index) => {
+                                        renaksi += `<textarea class="form-control" name="keterangan_${b.id}_${bulan_index + 1}_${index}" id="keterangan_${b.id}_${bulan_index + 1}_${index}" ${isdisabled ? 'disabled' : ''}>${ket}</textarea>`;
+                                    });
+                                    renaksi += `</td><td class="text-center">`;
+
                                     if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
-                                        renaksi += `` +
-                                            (isdisabled ?
-                                                `-` :
-                                                `<a href="javascript:void(0)" data-id="${b.id}" data-bulan="${bulan_index + 1}" class="btn btn-sm btn-success" onclick="simpan_bulanan(${b.id}, ${bulan_index + 1})" title="Simpan"><i class="dashicons dashicons-yes"></i></a>`
-                                            );
+                                        renaksi += isdisabled ? `-` : `<a href="javascript:void(0)" data-id="${b.id}" data-bulan="${bulan_index + 1}" class="btn btn-sm btn-success" onclick="simpan_bulanan(${b.id}, ${bulan_index + 1})" title="Simpan"><i class="dashicons dashicons-yes"></i></a>`;
                                     }
-                                    renaksi += `` +
-                                        `</td>` +
-                                        `</tr>`;
+                                    renaksi += `</td></tr>`;
 
                                     if ((bulan_index + 1) % 3 == 0) {
                                         var triwulan = (bulan_index + 1) / 3;
