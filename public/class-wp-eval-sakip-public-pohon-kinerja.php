@@ -3150,14 +3150,16 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 											tahun_anggaran
 										FROM esakip_data_lembaga_lainnya 
 										WHERE active=1 
-										AND id=%d
-										AND tahun_anggaran=%d
+											AND id=%d
+											AND tahun_anggaran=%d
 										GROUP BY id
 										ORDER BY nama_lembaga ASC
 									", $croscutting_level['id_skpd_croscutting'], $tahun_anggaran_sakip),
 									ARRAY_A
 								);
-								$nama_perangkat = $nama_lembaga['nama_lembaga'];
+								if(!empty($nama_lembaga)){
+									$nama_perangkat = $nama_lembaga['nama_lembaga'];
+								}
 							} else {
 								if (!empty($croscutting_level['id_skpd_parent'])) {
 									$this_data_id_skpd = $croscutting_level['id_skpd_parent'];
@@ -3250,16 +3252,16 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							$id_level_1_parent = 0;
 							if ($koneksi_pokin['status_koneksi'] == 1) {
 
-								$data_parent_tujuan = array('data' => $this->get_parent_1_koneksi_pokin_pemda_opd(array(
+								$data_parent_tujuan = $this->get_parent_1_koneksi_pokin_pemda_opd(array(
 									'id' => $koneksi_pokin['id'],
 									'level' => $koneksi_pokin['level_parent'],
 									'periode' => $opsi['periode'],
 									'id_parent' => $koneksi_pokin['id_parent']
-								)));
+								));
 							}
 
 							if (!empty($data_parent_tujuan)) {
-								$id_level_1_parent = $data_parent_tujuan['data'];
+								$id_level_1_parent = $data_parent_tujuan['id'];
 							}
 
 							if (empty($data_ret[$level['id']]['koneksi_pokin'][$key_koneksi])) {
@@ -3313,23 +3315,25 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							$data_parent_tujuan = array();
 							$id_level_1_parent = 0;
 							if ($koneksi_pokin['status_koneksi'] == 1) {
-								$data_parent_tujuan = array('data' => $this->get_parent_1_koneksi_pokin_pemda_opd(array(
+								$data_parent_tujuan = $this->get_parent_1_koneksi_pokin_pemda_opd(array(
 									'id' => $koneksi_pokin['id'],
 									'level' => $koneksi_pokin['level_parent'],
 									'periode' => $opsi['periode'],
 									'id_parent' => $koneksi_pokin['id_parent'],
 									'tipe' => 'opd',
 									'id_skpd' => $opsi['id_skpd']
-								)));
+								));
 							}
 
 							if (!empty($data_parent_tujuan)) {
-								$id_level_1_parent = $data_parent_tujuan['data'];
+								$id_level_1_parent = $data_parent_tujuan['id'];
 							}
 
 							if (empty($data_ret[$level['id']]['koneksi_pokin'][$key_koneksi])) {
 								$data_ret[$level['id']]['koneksi_pokin'][$key_koneksi] = [
 									'id' => $koneksi_pokin['id'],
+									'id_parent' => $koneksi_pokin['id_parent'],
+									'level_parent' => $koneksi_pokin['level_parent'],
 									'parent_pohon_kinerja' => $koneksi_pokin['parent_pohon_kinerja'],
 									'label_parent' => $koneksi_pokin['label_parent'],
 									'id_level_1_parent' => $id_level_1_parent,
@@ -7920,7 +7924,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		$table_koneksi_pokin = 'esakip_koneksi_pokin_pemda_opd';
 		$where_skpd = '';
 		$parent_level_1 = 0;
-		if ($opsi['tipe'] == 'opd') {
+		if (!empty($opsi['tipe']) && $opsi['tipe'] == 'opd') {
 			$table = 'esakip_pohon_kinerja_opd';
 		}
 
@@ -8015,7 +8019,10 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 				$id = $v['id'];
 			}
 		}
-		return $id;
+		return array(
+			'id' => $id, 
+			'data' => $data_ret
+		);
 	}
 
 	public function edit_verify_koneksi_pokin_pemda()

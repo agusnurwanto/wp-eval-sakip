@@ -19,6 +19,7 @@ if (!empty($_GET) && !empty($_GET['satker_id'])) {
     $satker_id = $_GET['satker_id'];
 }
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+$nama_skpd = $this->get_data_skpd_by_id($id_skpd, $input['tahun']);
 
 $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
@@ -64,7 +65,6 @@ $get_renaksi_opd = $wpdb->get_results($wpdb->prepare("
         AND satker_id=%s
         AND active=1
 ", $id_skpd, $input['tahun'], $nip_baru, $satker_id), ARRAY_A);
-
 $set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 $no = 1;
 $body = '';
@@ -129,6 +129,13 @@ foreach ($get_renaksi_opd as $renaksi_opd) {
         ", $id_level_2), ARRAY_A);
     }
 
+
+    $rincian_tagging = $this->functions->generatePage(array(
+        'nama_page' => 'Halaman Tagging Rincian Belanja',
+        'content' => '[tagging_rincian_sakip]',
+        'show_header' => 1,
+        'post_status' => 'private'
+    ));
     foreach (array_reverse($parents) as $parent) {
         $nama_pokin_pemda = '';
         $level_pokin_pemda = '';
@@ -195,13 +202,6 @@ foreach ($get_renaksi_opd as $renaksi_opd) {
         $label_cascading = '';
         $nama_pokin = '';
         $level_pokin = '';
-
-        $rincian_tagging = $this->functions->generatePage(array(
-            'nama_page' => 'Halaman Tagging Rincian Belanja',
-            'content' => '[tagging_rincian_sakip]',
-            'show_header' => 1,
-            'post_status' => 'private'
-        ));
         if ($get_indikator) {
             foreach ($get_indikator as $key => $ind) {
                 $indikator       .= '<a href="' . $this->functions->add_param_get($rincian_tagging['url'], '&tahun=' . $input['tahun'] . '&id_skpd=' . $id_skpd . '&id_indikator=' . $ind['id']) . '" target="_blank">' . $ind['indikator'] . '</a>' . '<br>';   
@@ -280,6 +280,7 @@ foreach ($get_renaksi_opd as $renaksi_opd) {
         $body .= '
             <tr>
                 <td class="text_tengah">' . $no++ . '</td>
+                <td class="text_kiri">' . $nama_skpd['nama_skpd'] . '</td>
                 <td class="text_tengah">' . $parent['level'] . '</td>
                 <td class="text_kiri">' . $parent['label'] . '</td>
                 <td class="text_kiri">' . $indikator . '</td>
@@ -328,6 +329,8 @@ foreach ($get_renaksi_opd as $renaksi_opd) {
     $total_realisasi_tagging_rincian = 0;
     $nama_pokin = '';
     $level_pokin = '';
+    $nama_pokin_pemda = '';
+    $level_pokin_pemda = '';
 
     $get_indikator = $wpdb->get_results($wpdb->prepare("
         SELECT 
@@ -338,7 +341,7 @@ foreach ($get_renaksi_opd as $renaksi_opd) {
     ", $renaksi_opd['id']), ARRAY_A);
     if ($get_indikator) {
         foreach ($get_indikator as $key => $ind) {
-            $indikator       .= $indikator       .= '<a href="' . $this->functions->add_param_get($rincian_tagging['url'], '&tahun=' . $input['tahun'] . '&id_skpd=' . $id_skpd . '&id_indikator=' . $ind['id']) . '" target="_blank">' . $ind['indikator'] . '</a>' . '<br>';  
+            $indikator       .= '<a href="' . $this->functions->add_param_get($rincian_tagging['url'], '&tahun=' . $input['tahun'] . '&id_skpd=' . $id_skpd . '&id_indikator=' . $ind['id']) . '" target="_blank">' . $ind['indikator'] . '</a>' . '<br>'; 
             $satuan          .= $ind['satuan'] . '<br>';  
             $target_awal     .= $ind['target_awal'] . '<br>';  
             $target_1        .= $ind['target_1'] . '<br>';  
@@ -361,9 +364,6 @@ foreach ($get_renaksi_opd as $renaksi_opd) {
 
             $capaian_realisasi .= $capaian . '<br>';
             $rencana_pagu .= ($set_pagu_renaksi == 1) ? '0<br>' : (!empty($ind['rencana_pagu']) ? number_format((float)$ind['rencana_pagu'], 0, ",", ".") . '<br>' : '0<br>');
-
-
-            $capaian_realisasi .= $capaian . '<br>';
 
             $data_tagging = $wpdb->get_results($wpdb->prepare("
                     SELECT 
@@ -449,6 +449,7 @@ foreach ($get_renaksi_opd as $renaksi_opd) {
     $body .= '
         <tr>
             <td class="text_tengah">' . $no++ . '</td>
+            <td class="text_kiri">' . $nama_skpd['nama_skpd'] . '</td>
             <td class="text_tengah">' . $renaksi_opd['level'] . '</td>
             <td class="text_kiri">' . $renaksi_opd['label'] . '</td>
             <td class="text_kiri">' . $indikator . '</td>            
@@ -531,14 +532,15 @@ foreach ($get_renaksi_opd as $renaksi_opd) {
 <!-- Table -->
 <div class="container-md">
     <div id="cetak" title="Laporan Rencana Hasil Kerja">
-        <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Laporan Rencana Hasil Kerja <br><?php echo $gelar_depan . ' ' . $nama_pegawai . ', ' . $gelar_belakang; ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
+        <div style="padding: 5px;margin:0 0 3rem 0;">
+            <h1 class="text-center" style="margin:3rem;">Laporan Rencana Hasil Kerja <br><?php echo $gelar_depan . ' ' . $nama_pegawai . ', ' . $gelar_belakang; ?><br><?php echo $nip_baru; ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
             <div id="action" class="action-section hide-excel"></div>
             <div class="wrap-table">
                 <table cellpadding="2" cellspacing="0" class="table_laporan_rhk table table-bordered">
                     <thead style="background: #ffc491;">
                         <tr>
                             <th class="text-center" rowspan="2" style="width: 85px;">No</th>
+                            <th class="text-center" rowspan="2" style="width: 300px;">PERANGKAT DAERAH</th>
                             <th class="text-center" rowspan="2" style="width: 85px;">LEVEL</th>
                             <th class="text-center" rowspan="2" style="width: 300px;">RHK</th>
                             <th class="text-center" rowspan="2" style="width: 300px;">INDIKATOR</th>
@@ -586,18 +588,19 @@ foreach ($get_renaksi_opd as $renaksi_opd) {
                             <th>13</th>
                             <th>14</th>
                             <th>15</th>
-                            <th>16<br>= ((12 + 13 + 14 + 15 / 11) * 100)</th>
-                            <th>17</th>
+                            <th>16</th>
+                            <th>17<br>= ((13 + 14 + 15 + 16 / 12) * 100)</th>
                             <th>18</th>
                             <th>19</th>
-                            <th>20<br>= (19 / 18) * 100</th>
-                            <th>21</th>
+                            <th>20</th>
+                            <th>21<br>= (20 / 19) * 100</th>
                             <th>22</th>
                             <th>23</th>
                             <th>24</th>
                             <th>25</th>
                             <th>26</th>
                             <th>27</th>
+                            <th>28</th>
                         </tr>
                     </thead>
                     <tbody>

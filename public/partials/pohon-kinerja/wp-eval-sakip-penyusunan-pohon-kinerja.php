@@ -278,7 +278,8 @@ if(!empty($pohon_kinerja_level_1)){
 										koneksi.* ,
 										pk.id as id_parent,
 										pk.level as level_parent,
-										pk.label as label_parent
+										pk.label as label_parent,
+										pk.label_indikator_kinerja
 									FROM esakip_koneksi_pokin_pemda_opd koneksi
 									LEFT JOIN esakip_pohon_kinerja_opd as pk ON koneksi.parent_pohon_kinerja_koneksi = pk.id
 									WHERE koneksi.parent_pohon_kinerja=%d 
@@ -299,9 +300,9 @@ if(!empty($pohon_kinerja_level_1)){
 													tahun_anggaran
 												FROM esakip_data_unit 
 												WHERE active=1 
-												AND is_skpd=1 
-												AND id_skpd=%d
-												AND tahun_anggaran=%d
+													AND is_skpd=1 
+													AND id_skpd=%d
+													AND tahun_anggaran=%d
 												GROUP BY id_skpd
 												ORDER BY kode_skpd ASC
 											", $this_data_id_skpd, $tahun_anggaran_sakip),
@@ -312,22 +313,45 @@ if(!empty($pohon_kinerja_level_1)){
 										$id_skpd_view_pokin = $koneksi_pokin_level_4['id_skpd_koneksi'];
 
 										$data_parent_tujuan = array();
+										$data_pokin_opd = array();
 										$id_level_1_parent = 0;
+										$indikator_opd = array();
 										if($koneksi_pokin_level_4['status_koneksi'] == 1){
 											// untuk mendapatkan id parent level 1 suatu opd
-											$data_parent_tujuan = array('data' => $this->get_parent_1_koneksi_pokin_pemda_opd(array(
-												'id' => $koneksi_pokin_level_4['id'],
-												'level' => $koneksi_pokin_level_4['level_parent'],
+											$data_parent_tujuan = $this->get_parent_1_koneksi_pokin_pemda_opd(
+												array(
+													'id' => $koneksi_pokin_level_4['id'],
+													'level' => $koneksi_pokin_level_4['level_parent'],
+													'periode' => $input['periode'],
+													'tipe' => 'opd',
+													'id_parent' => $koneksi_pokin_level_4['id_parent'],
+													'id_skpd' => $id_skpd_view_pokin,
+													'keterangan_tolak' => $koneksi_pokin_level_4['keterangan_tolak']
+												)
+											);
+											$data_pokin_opd = $this->get_pokin(array(
+												'id' => $koneksi_pokin_level_4['id_parent'],
+												'level' => $koneksi_pokin_level_4['level_parent']+1,
 												'periode' => $input['periode'],
 												'tipe' => 'opd',
-												'id_parent' => $koneksi_pokin_level_4['id_parent'],
-												'id_skpd' => $id_skpd_view_pokin,
-												'keterangan_tolak' => $koneksi_pokin_level_4['keterangan_tolak']
-											)));
+												'id_skpd' => $id_skpd_view_pokin
+											));
+
+											$indikator_opd_db = $wpdb->get_results($wpdb->prepare("
+												SELECT 
+													label_indikator_kinerja
+												FROM esakip_pohon_kinerja_opd koneksi
+												WHERE parent = %d
+													AND level = %d
+													AND active = 1
+											", $koneksi_pokin_level_4['id_parent'], $koneksi_pokin_level_4['level_parent']), ARRAY_A);
+
+											$indikator_opd = array_column($indikator_opd_db, 'label_indikator_kinerja');
+											// print_r($indikator_opd); die();
 										}
 
 										if(!empty($data_parent_tujuan)){
-											$id_level_1_parent = $data_parent_tujuan['data'];
+											$id_level_1_parent = $data_parent_tujuan['id'];
 										}	
 
 										if(empty($data_all['data'][$level_1['id']]['data'][$level_2['id']]['data'][$level_3['id']]['data'][$level_4['id']]['koneksi_pokin'][$key_koneksi_pokin])){
@@ -339,7 +363,10 @@ if(!empty($pohon_kinerja_level_1)){
 												'keterangan_tolak' => $koneksi_pokin_level_4['keterangan_tolak'],
 												'nama_skpd' => $nama_perangkat_koneksi,
 												'id_skpd_view_pokin' => $id_skpd_view_pokin,
-												'id_level_1_parent' => $id_level_1_parent
+												'id_level_1_parent' => $id_level_1_parent,
+												'id_level_2_parent' => $koneksi_pokin_level_4['id_parent'],
+												'pokin_opd_turunan' => $data_pokin_opd,
+												'label_indikator_kinerja' => $indikator_opd
 											];
 										}
 									}
@@ -385,6 +412,15 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 		<td></td>
 		<td></td>
 		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
 	</tr>';
 	foreach (array_values($level_1['data']) as $key2 => $level_2) {
 		$indikator=array();
@@ -397,6 +433,15 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 			<td></td>
 			<td class="level2" style="background: #fe7373;">'.$level_2['label'].'</td>
 			<td class="indikator" style="background: #b5d9ea;">'.implode("<hr/>", $indikator).'</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
 			<td></td>
 			<td></td>
 			<td></td>
@@ -417,14 +462,28 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 				<td class="indikator" style="background: #b5d9ea;">'.implode("<hr/>", $indikator).'</td>
 				<td></td>
 				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
 			</tr>';
 			foreach (array_values($level_3['data']) as $key4 => $level_4) {
 				$indikator=array();
 				foreach ($level_4['indikator'] as $indikatorlevel4) {
 					$indikator[]=$indikatorlevel4['label_indikator_kinerja'];
 				}
+				if (!isset($level_4['koneksi_pokin']) || !is_array($level_4['koneksi_pokin'])) {
+				    $level_4['koneksi_pokin'] = array();
+				}
+				$show_skpd = array();
 				$koneksi_pokin = array();
-
+				$koneksi_indikator_pokin = array();
+				$koneksi_pokin_turunan = array();
 				foreach ($level_4['koneksi_pokin'] as $koneksi_pokin_level_4) {
 					$class_pengusul = "";
 		
@@ -457,14 +516,12 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 
 					$keterangan_tolak_koneksi = !empty($koneksi_pokin_level_4['keterangan_tolak']) ? "( ket: ". $koneksi_pokin_level_4['keterangan_tolak'] ." )" : '';
 
-					$koneksi_pokin[]= '<div class="koneksi-pokin-isi '. $class_pengusul .' '. $class_koneksi_pokin_vertikal .'"><div>'. ucfirst($koneksi_pokin_level_4['label_parent']) .'</div><div style="margin-top: 10px;font-weight: 500;">'. $show_nama_skpd .'</div>' . $keterangan_tolak_koneksi . '</div>';
+					$show_skpd[]= '<div class="koneksi-pokin-isi '. $class_pengusul .' '. $class_koneksi_pokin_vertikal .'"><div style="font-weight: 500;">'. $show_nama_skpd .'</div></div>';
+					$koneksi_pokin[]= '<div class="koneksi-pokin-isi '. $class_pengusul .' '. $class_koneksi_pokin_vertikal .'"><div>'. $koneksi_pokin_level_4['label_parent'] .'</div><div style="font-weight: 500;"></div>' . $keterangan_tolak_koneksi . '</div>';
+					$koneksi_indikator_pokin[]= '<div>'. implode("<hr/>", $koneksi_pokin_level_4['label_indikator_kinerja']).'</div><div style="font-weight: 500;"></div>' . $keterangan_tolak_koneksi . '</div>';
+					$koneksi_pokin_turunan[] = $koneksi_pokin_level_4['pokin_opd_turunan'];
 				}
 		
-				$show_koneksi_pokin = '';
-				if(!empty($koneksi_pokin)){
-					$show_koneksi_pokin .='<div class="text-center label-koneksi-pokin">KONEKSI POHON KINERJA</div>';
-					$show_koneksi_pokin .=implode("", $koneksi_pokin);
-				}
 				$html.='
 				<tr>
 					<td></td>
@@ -475,19 +532,108 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 					<td></td>
 					<td class="level4" style="background: #c979e3;">'.$level_4['label'].'</td>
 					<td class="indikator" style="background: #b5d9ea;">'.implode("<hr/>", $indikator).'</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
 				</tr>';
+				if (!empty($show_skpd)) {
+					$rowspan = count($show_skpd);
+					foreach ($show_skpd as $i => $koneksi_skpd) {
+						$html .= '<tr>';
+							$html .= '<td></td>';
+							$html .= '<td></td>';
+							$html .= '<td></td>';
+							$html .= '<td></td>';
+							$html .= '<td></td>';
+							$html .= '<td></td>';
+							$html .= '<td></td>';
+							$html .= '<td></td>';
+							$html .= '<td>' . $koneksi_skpd . '</td>';
+							$html .= '<td>' . ($koneksi_pokin[$i] ?? '') . '</td>';
+							$html .= '<td style="background: #b5d9ea;">' . ($koneksi_indikator_pokin[$i] ?? '') . '</td>';
+							$html .= '<td></td>';
+							$html .= '<td></td>';
+							$html .= '<td></td>';
+							$html .= '<td></td>';
+							$html .= '<td></td>';
+							$html .= '<td></td>';
+						$html .= '</tr>';
+						foreach ($koneksi_pokin_turunan[$i] as $turunan3) {
+						    $indikator_label_3 = array_column($turunan3['indikator'], 'label_indikator_kinerja');
+						    $html .= '<tr class="detail-rhk">';
+						        $html .= '<td></td>';
+						        $html .= '<td></td>';
+						        $html .= '<td></td>';
+						        $html .= '<td></td>';
+						        $html .= '<td></td>';
+						        $html .= '<td></td>';
+						        $html .= '<td></td>';
+						        $html .= '<td></td>';
+						        $html .= '<td></td>';
+						        $html .= '<td></td>';
+						        $html .= '<td></td>';
+						        $html .= '<td>' . $turunan3['label'] . '</td>';
+						        $html .= '<td style="background: #b5d9ea;">' . implode('<hr>', $indikator_label_3) . '</td>';
+						        $html .= '<td></td>';
+						        $html .= '<td></td>';
+						        $html .= '<td></td>';
+						        $html .= '<td></td>';
+						    $html .= '</tr>';
 
-				if(!empty($show_koneksi_pokin)){
-					$html.='
-					<tr>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td class="koneksi-pokin" style="background-color: #FDFFB6;" colspan="2">' . $show_koneksi_pokin . '</td>
-					</tr>';
+						    foreach ($turunan3['data'] as $turunan4) {
+						        $indikator_label_4 = array_column($turunan4['indikator'], 'label_indikator_kinerja');
+						        $html .= '<tr class="detail-rhk">';
+						            $html .= '<td></td>';
+						            $html .= '<td></td>';
+						            $html .= '<td></td>';
+						            $html .= '<td></td>';
+						            $html .= '<td></td>';
+						            $html .= '<td></td>';
+						            $html .= '<td></td>';
+						            $html .= '<td></td>';
+						            $html .= '<td></td>';
+						            $html .= '<td></td>';
+						            $html .= '<td></td>';
+						            $html .= '<td></td>';
+						            $html .= '<td></td>';
+						            $html .= '<td>' . $turunan4['label'] . '</td>';
+						            $html .= '<td style="background: #b5d9ea;">' . implode('<hr>', $indikator_label_4) . '</td>';
+						            $html .= '<td></td>';
+						            $html .= '<td></td>';
+						        $html .= '</tr>';
+
+						        foreach ($turunan4['data'] as $turunan5) {
+						            $indikator_label_5 = array_column($turunan5['indikator'], 'label_indikator_kinerja');
+						            $html .= '<tr class="detail-rhk">';
+						                $html .= '<td></td>';
+						                $html .= '<td></td>';
+						                $html .= '<td></td>';
+						                $html .= '<td></td>';
+						                $html .= '<td></td>';
+						                $html .= '<td></td>';
+						                $html .= '<td></td>';
+						                $html .= '<td></td>';
+						                $html .= '<td></td>';
+						                $html .= '<td></td>';
+						                $html .= '<td></td>';
+						                $html .= '<td></td>';
+						                $html .= '<td></td>';
+						                $html .= '<td></td>';
+						                $html .= '<td></td>';
+						                $html .= '<td>' . $turunan5['label'] . '</td>';
+						                $html .= '<td style="background: #b5d9ea;">' . implode('<hr>', $indikator_label_5) . '</td>';
+						            $html .= '</tr>';
+						        }
+						    }
+						}
+
+					}
 				}
 			}
 		}
@@ -575,13 +721,6 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 		border-style: solid;
 		border-color: gray;
 	}
-	.koneksi-pokin-isi {
-		margin: 0px -16px;
-		padding: .7em .9em;
-		border-width: 1px 0 0;
-		border-style: solid;
-		border-color: gray;
-	}
 	
 	.detail-koneksi-pokin .dashicons{
 		text-decoration: none;
@@ -590,6 +729,12 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 	}
 </style>
 <h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Pohon Kinerja<br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h3><br>
+<div style="text-align: center;">
+  <label>
+    <input type="checkbox" onclick="detail_rhk(this);">
+    Tampilkan Detail Pokin Perangkat Daerah
+  </label>
+</div>
 <?php if (!$is_admin_panrb): ?>
 <div id="action" class="action-section"></div>
 <?php endif; ?>
@@ -597,14 +742,23 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 	<table id="cetak" title="Penyusunan Pohon Kinerja Pemerintah Daerah" class="table table-bordered penyusunan_pohon_kinerja">
 		<thead style="background: #ffc491;">
 			<tr>
-				<th>Level 1</th>
-				<th>Indikator Kinerja</th>
-				<th>Level 2</th>
-				<th>Indikator Kinerja</th>
-				<th>Level 3</th>
-				<th>Indikator Kinerja</th>
-				<th>Level 4</th>
-				<th>Indikator Kinerja</th>
+				<th style="min-width: 200px;">Level 1</th>
+				<th style="min-width: 200px;">Indikator Kinerja</th>
+				<th style="min-width: 200px;">Level 2</th>
+				<th style="min-width: 200px;">Indikator Kinerja</th>
+				<th style="min-width: 200px;">Level 3</th>
+				<th style="min-width: 200px;">Indikator Kinerja</th>
+				<th style="min-width: 200px;">Level 4</th>
+				<th style="min-width: 200px;">Indikator Kinerja</th>
+				<th style="min-width: 200px;">Perangkat Daerah</th>
+				<th style="min-width: 200px;">Pokin OPD</th>
+				<th style="min-width: 200px;">Indikator Kinerja</th>
+				<th style="min-width: 200px;">Pokin OPD</th>
+				<th style="min-width: 200px;">Indikator Kinerja</th>
+				<th style="min-width: 200px;">Pokin OPD</th>
+				<th style="min-width: 200px;">Indikator Kinerja</th>
+				<th style="min-width: 200px;">Pokin OPD</th>
+				<th style="min-width: 200px;">Indikator Kinerja</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -2045,5 +2199,15 @@ function getFormData($form) {
 
     return indexed_array;
 }
+function detail_rhk(checkbox) {
+    var detailRows = document.querySelectorAll('.detail-rhk');
+    detailRows.forEach(function(row) {
+        row.style.display = checkbox.checked ? '' : 'none';
+    });
+}
 
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelector('input[type="checkbox"][onclick="detail_rhk(this);"]').checked = true;
+    detail_rhk(document.querySelector('input[type="checkbox"][onclick="detail_rhk(this);"]'));
+});
 </script>

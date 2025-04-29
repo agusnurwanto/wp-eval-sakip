@@ -192,16 +192,16 @@ if(!empty($pohon_kinerja_level_1)){
 					$id_level_1_parent = 0;
 					if($koneksi_pokin_level_1['status_koneksi'] == 1){
 						// untuk mendapatkan id parent ke 1 pemda
-						$data_parent_tujuan = array('data' => $this->get_parent_1_koneksi_pokin_pemda_opd(array(
+						$data_parent_tujuan = $this->get_parent_1_koneksi_pokin_pemda_opd(array(
 							'id' => $koneksi_pokin_level_1['id'],
 							'level' => $koneksi_pokin_level_1['level_parent'],
 							'periode' => $input['periode'],
 							'id_parent' => $koneksi_pokin_level_1['id_parent']
-						)));
+						));
 					}
 
 					if(!empty($data_parent_tujuan)){
-						$id_level_1_parent = $data_parent_tujuan['data'];
+						$id_level_1_parent = $data_parent_tujuan['id'];
 					}
 
 					// get indikator pokin this koneksi pokin
@@ -440,16 +440,16 @@ if(!empty($pohon_kinerja_level_1)){
 						$id_level_1_parent = 0;
 						if($koneksi_pokin_level_2['status_koneksi'] == 1){
 							// untuk mendapatkan id parent ke 1 pemda
-							$data_parent_tujuan = array('data' => $this->get_parent_1_koneksi_pokin_pemda_opd(array(
+							$data_parent_tujuan = $this->get_parent_1_koneksi_pokin_pemda_opd(array(
 								'id' => $koneksi_pokin_level_2['id'],
 								'level' => $koneksi_pokin_level_2['level_parent'],
 								'periode' => $input['periode'],
 								'id_parent' => $koneksi_pokin_level_2['id_parent']
-							)));
+							));
 						}
 
 						if(!empty($data_parent_tujuan)){
-							$id_level_1_parent = $data_parent_tujuan['data'];
+							$id_level_1_parent = $data_parent_tujuan['id'];
 						}	
 
 						// get indikator pokin this koneksi pokin
@@ -687,16 +687,16 @@ if(!empty($pohon_kinerja_level_1)){
 								$id_level_1_parent = 0;
 								if($koneksi_pokin_level_3['status_koneksi'] == 1){
 									// untuk mendapatkan id parent ke 1 pemda
-									$data_parent_tujuan = array('data' => $this->get_parent_1_koneksi_pokin_pemda_opd(array(
+									$data_parent_tujuan = $this->get_parent_1_koneksi_pokin_pemda_opd(array(
 										'id' => $koneksi_pokin_level_3['id'],
 										'level' => $koneksi_pokin_level_3['level_parent'],
 										'periode' => $input['periode'],
 										'id_parent' => $koneksi_pokin_level_3['id_parent']
-									)));
+									));
 								}
 
 								if(!empty($data_parent_tujuan)){
-									$id_level_1_parent = $data_parent_tujuan['data'];
+									$id_level_1_parent = $data_parent_tujuan['id'];
 								}	
 
 								// get indikator pokin this koneksi pokin
@@ -935,16 +935,16 @@ if(!empty($pohon_kinerja_level_1)){
 										$id_level_1_parent = 0;
 										if($koneksi_pokin_level_4['status_koneksi'] == 1){
 											// untuk mendapatkan id parent ke 1 pemda
-											$data_parent_tujuan = array('data' => $this->get_parent_1_koneksi_pokin_pemda_opd(array(
+											$data_parent_tujuan = $this->get_parent_1_koneksi_pokin_pemda_opd(array(
 												'id' => $koneksi_pokin_level_4['id'],
 												'level' => $koneksi_pokin_level_4['level_parent'],
 												'periode' => $input['periode'],
 												'id_parent' => $koneksi_pokin_level_4['id_parent']
-											)));
+											));
 										}
 
 										if(!empty($data_parent_tujuan)){
-											$id_level_1_parent = $data_parent_tujuan['data'];
+											$id_level_1_parent = $data_parent_tujuan['id'];
 										}	
 
 										// get indikator pokin this koneksi pokin
@@ -1086,7 +1086,9 @@ if(!empty($pohon_kinerja_level_1)){
 														", $croscutting_level_5['id_skpd_croscutting'], $tahun_anggaran_sakip),
 														ARRAY_A
 													);
-													$nama_perangkat = $nama_lembaga['nama_lembaga'];
+													if(!empty($nama_lembaga)) {
+														$nama_perangkat = $nama_lembaga['nama_lembaga'];
+													}
 												}else{
 													if(!empty($croscutting_level_5['id_skpd_parent'])){
 														$this_data_id_skpd = $croscutting_level_5['id_skpd_parent'];
@@ -1182,16 +1184,16 @@ if(!empty($pohon_kinerja_level_1)){
 												$id_level_1_parent = 0;
 												if($koneksi_pokin_level_5['status_koneksi'] == 1){
 													// untuk mendapatkan id parent ke 1 pemda
-													$data_parent_tujuan = array('data' => $this->get_parent_1_koneksi_pokin_pemda_opd(array(
+													$data_parent_tujuan = $this->get_parent_1_koneksi_pokin_pemda_opd(array(
 														'id' => $koneksi_pokin_level_5['id'],
 														'level' => $koneksi_pokin_level_5['level_parent'],
 														'periode' => $input['periode'],
 														'id_parent' => $koneksi_pokin_level_5['id_parent']
-													)));
+													));
 												}
 
 												if(!empty($data_parent_tujuan)){
-													$id_level_1_parent = $data_parent_tujuan['data'];
+													$id_level_1_parent = $data_parent_tujuan['id'];
 												}	
 												
 												// get indikator pokin this koneksi pokin
