@@ -91,7 +91,7 @@ if (!isset($response['status']) || $response['status'] === false) {
 				<h1 class="text-center">Laporan Perjanjian Kinerja</br><?php echo $nama_skpd['nama_skpd'] ?></br>Tahun Anggaran <?php echo $input['tahun_anggaran']; ?></h1>
 				<div id="action" class="action-section hide-excel"></div>
 				<div class="wrap-table mt-2">
-					<table id="cetak" title="List Pegawai Laporan Perjanjian Kinerja Perangkat Daerah" class="table table-bordered table_list_pegawai" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;">
+					<table id="cetak" title="List Pegawai Laporan Perjanjian Kinerja Perangkat Daerah" class="table table-bordered table_list_pegawai" cellpadding="2" cellspacing="0">
 						<thead style="background: #ffc491;">
 							<tr>
 								<th class="text-center">Satker ID</th>
@@ -117,7 +117,7 @@ if (!isset($response['status']) || $response['status'] === false) {
 			<div style="padding: 10px;margin:0 0 3rem 0;">
 				<h1 class="text-center">Laporan Perjanjian Kinerja</br><?php echo $nama_skpd['nama_skpd'] ?></br>Pegawai yang tidak aktif</h1>
 				<div class="wrap-table mt-2">
-					<table id="table_pegawai_non_aktif" class="table table-bordered" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;">
+					<table id="table_pegawai_non_aktif" class="table table-bordered">
 						<thead style="background: #ffc491;">
 							<tr>
 								<th class="text-center">Satker ID</th>

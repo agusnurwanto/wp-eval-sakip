@@ -52,15 +52,20 @@ $gelar_belakang = $get_pegawai['gelar_belakang'];
 $get_renaksi_opd = $wpdb->get_results($wpdb->prepare("
     SELECT
         r.*,
-        s.nama as jabatan
+        s.nama as nama_satker,
+        p.jabatan as jabatan
     FROM esakip_data_rencana_aksi_opd r
     LEFT JOIN esakip_data_satker_simpeg s ON s.active=r.active
         AND s.tahun_anggaran=r.tahun_anggaran
         AND s.satker_id=r.satker_id
+    LEFT JOIN esakip_data_pegawai_simpeg p ON p.active=r.active
+        AND p.satker_id=r.id_jabatan
+        AND p.nip_baru=r.nip
     WHERE r.tahun_anggaran=%d
         AND r.nip=%d
         AND r.active=1
 ", $input['tahun'], $nip_baru), ARRAY_A);
+
 $set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 $no = 1;
 $body = '';
@@ -73,6 +78,9 @@ $rincian_tagging = $this->functions->generatePage(array(
 ));
 
 foreach ($get_renaksi_opd as $renaksi_opd) {
+    $rhk_parent = $this->get_rhk_parent($renaksi_opd['parent'], $input['tahun']);
+    print_r($rhk_parent); die();
+
     $indikator = '';
     $satuan = '';
     $target_awal = '';
@@ -235,7 +243,7 @@ foreach ($get_renaksi_opd as $renaksi_opd) {
         <tr>
             <td class="text_tengah">' . $no++ . '</td>
             <td class="text_kiri">' . $nama_skpd['nama_skpd'] . '</td>
-            <td class="text_kiri">' . $renaksi_opd['jabatan'] . '</td>
+            <td class="text_kiri">' . $renaksi_opd['jabatan'] . ' ' . $renaksi_opd['nama_satker'] . '</td>
             <td class="text_kiri"></td>
             <td class="text_tengah">' . $renaksi_opd['level'] . '</td>
             <td class="text_kiri">' . $renaksi_opd['label'] . '</td>
@@ -329,7 +337,7 @@ foreach ($get_renaksi_opd as $renaksi_opd) {
                         <tr>
                             <th class="text-center" rowspan="2" style="width: 85px;">No</th>
                             <th class="text-center" rowspan="2" style="width: 300px;">PERANGKAT DAERAH</th>
-                            <th class="text-center" rowspan="2" style="width: 85px;">JABATAN</th>
+                            <th class="text-center" rowspan="2" style="width: 300px;">JABATAN</th>
                             <th class="text-center" rowspan="2" style="width: 300px;">RHK ATASAN YANG DIINTERVENSI</th>
                             <th class="text-center" rowspan="2" style="width: 85px;">LEVEL RHK</th>
                             <th class="text-center" rowspan="2" style="width: 300px;">RENCANA HASIL KERJA</th>
