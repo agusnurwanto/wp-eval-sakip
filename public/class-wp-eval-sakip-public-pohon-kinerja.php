@@ -358,9 +358,9 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							if (is_array($_POST['parent'])) {
 								$in_parent = implode(", ", $_POST['parent']);
 								// $_where_parent = $wpdb->prepare(' AND a.parent IN (%s) ', $in_parent);
-								$_where_parent = ' AND a.parent IN (' . $in_parent . ') ';
+								$_where_parent = ' AND a.id IN (' . $in_parent . ') ';
 							} else {
-								$_where_parent = $wpdb->prepare(' AND a.parent=%d ', $_POST['parent']);
+								$_where_parent = $wpdb->prepare(' AND a.id=%d ', $_POST['parent']);
 							}
 
 							$dataParent = $wpdb->get_results($wpdb->prepare(
