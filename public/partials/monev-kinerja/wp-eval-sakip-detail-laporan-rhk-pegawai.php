@@ -79,7 +79,11 @@ $rincian_tagging = $this->functions->generatePage(array(
 
 foreach ($get_renaksi_opd as $renaksi_opd) {
     $rhk_parent = $this->get_rhk_parent($renaksi_opd['parent'], $input['tahun']);
-    print_r($rhk_parent); die();
+    $rhk_parent_html = '';
+    if(!empty($rhk_parent)){
+        $rhk_parent_html = reset($rhk_parent);
+        $rhk_parent_html = $rhk_parent_html['label'];
+    }
 
     $indikator = '';
     $satuan = '';
@@ -244,9 +248,9 @@ foreach ($get_renaksi_opd as $renaksi_opd) {
             <td class="text_tengah">' . $no++ . '</td>
             <td class="text_kiri">' . $nama_skpd['nama_skpd'] . '</td>
             <td class="text_kiri">' . $renaksi_opd['jabatan'] . ' ' . $renaksi_opd['nama_satker'] . '</td>
-            <td class="text_kiri"></td>
-            <td class="text_tengah">' . $renaksi_opd['level'] . '</td>
+            <td class="text_kiri">'. $rhk_parent_html .'</td>
             <td class="text_kiri">' . $renaksi_opd['label'] . '</td>
+            <td class="text_tengah">' . $renaksi_opd['level'] . '</td>
             <td class="text_kiri">' . $indikator . '</td>            
             <td class="text_tengah">' . $satuan . '</td>
             <td class="text_tengah">' . $target_awal . '</td>
@@ -339,8 +343,8 @@ foreach ($get_renaksi_opd as $renaksi_opd) {
                             <th class="text-center" rowspan="2" style="width: 300px;">PERANGKAT DAERAH</th>
                             <th class="text-center" rowspan="2" style="width: 300px;">JABATAN</th>
                             <th class="text-center" rowspan="2" style="width: 300px;">RHK ATASAN YANG DIINTERVENSI</th>
-                            <th class="text-center" rowspan="2" style="width: 85px;">LEVEL RHK</th>
                             <th class="text-center" rowspan="2" style="width: 300px;">RENCANA HASIL KERJA</th>
+                            <th class="text-center" rowspan="2" style="width: 85px;">LEVEL RHK</th>
                             <th class="text-center" rowspan="2" style="width: 300px;">INDIKATOR</th>
                             <th class="text-center" rowspan="2" style="width: 100px;">SATUAN</th>
                             <th class="text-center" colspan="6" style="width: 400px;">TARGET KEGIATAN PER TRIWULAN</th>

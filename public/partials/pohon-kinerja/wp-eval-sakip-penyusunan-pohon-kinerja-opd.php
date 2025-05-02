@@ -2009,15 +2009,14 @@ $data_notifikasi_koneksi_pokin_pemda = $wpdb->get_results($wpdb->prepare("
 		koneksi.*,
 		pk.id as id_parent_pemda,
 		pk.label as label_parent_pemda
-	FROM 
-		esakip_koneksi_pokin_pemda_opd as koneksi
-	LEFT JOIN esakip_pohon_kinerja as pk
-		ON koneksi.parent_pohon_kinerja = pk.id
+	FROM esakip_koneksi_pokin_pemda_opd as koneksi
+	INNER JOIN esakip_pohon_kinerja as pk ON koneksi.parent_pohon_kinerja = pk.id
+		AND pk.active=koneksi.active
 	WHERE koneksi.active=1 
-	AND koneksi.status_koneksi=0
-	AND koneksi.id_skpd_koneksi=%d
-	AND pk.active=1
-", $id_skpd)
+		AND koneksi.status_koneksi=0
+		AND koneksi.id_skpd_koneksi=%d
+		AND pk.id_jadwal=%d
+", $id_skpd, $input['periode'])
 ,ARRAY_A);
 
 $html_notifikasi_koneksi_pokin = '';
