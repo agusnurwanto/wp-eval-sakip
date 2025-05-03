@@ -5963,6 +5963,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			'html_program' => '',
 			'html_kegiatan' => '',
 			'html_sub_kegiatan' => '',
+			'rhk_unik' => array(),
 			'error_msg' => array()
 		);
 		$id_skpd = $options['id_skpd'];
@@ -5994,7 +5995,19 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		);
 		$no_2 = 0;
 		if (!empty($data_ploting_rhk)) {
+			// cek apakah ada RHK yang double
 			foreach ($data_ploting_rhk as $v_rhk) {
+				$id_unik = strtolower(trim($v_rhk['label']));
+				if(empty($ret['rhk_unik'][$id_unik])){
+					$ret['rhk_unik'][$id_unik] = array(
+						'ids' => array(),
+						'indikator' => array(),
+						'data' => array()
+					);
+				}
+				$ret['rhk_unik'][$id_unik]['ids'][] = $v_rhk['id'];
+				$ret['rhk_unik'][$id_unik]['data'][] = $v_rhk;
+
 				$data_indikator_ploting_rhk = $wpdb->get_results(
 					$wpdb->prepare("
 						SELECT
@@ -6009,6 +6022,31 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					", $v_rhk['id']),
 					ARRAY_A
 				);
+				if (!empty($data_indikator_ploting_rhk)) {
+					foreach ($data_indikator_ploting_rhk as $index => $v_indikator) {
+						$id_unik_indikator = strtolower(trim($v_indikator['indikator']).trim($v_indikator['target_akhir']).trim($v_indikator['satuan']));
+						if(empty($ret['rhk_unik'][$id_unik]['indikator'][$id_unik_indikator])){
+							$ret['rhk_unik'][$id_unik]['indikator'][$id_unik_indikator] = array(
+								'ids' => array(),
+								'data' => array()
+							);
+						}
+						$ret['rhk_unik'][$id_unik]['indikator'][$id_unik_indikator]['ids'][] = $v_indikator['id'];
+						$ret['rhk_unik'][$id_unik]['indikator'][$id_unik_indikator]['data'][] = $v_indikator;
+					}
+				}
+			}
+			// print_r($ret['rhk_unik']); die();
+
+			foreach ($ret['rhk_unik'] as $v) {
+				$v_rhk = $v['data'][0];
+				$v_rhk['id'] = implode('|', $v['ids']);
+				$data_indikator_ploting_rhk = array();
+				foreach($v['indikator'] as $vv){
+					$indikator = $vv['data'][0];
+					$indikator['id'] = implode('|', $vv['ids']);
+					$data_indikator_ploting_rhk[] = $indikator;
+				}
 
 				$html_indikator = '';
 				$p_i = count($data_indikator_ploting_rhk);
@@ -6016,7 +6054,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 				if (!empty($data_indikator_ploting_rhk)) {
 					foreach ($data_indikator_ploting_rhk as $index => $v_indikator) {
-						$html_indikator .= '<tr id-indikator="' . $v_indikator['id'] . '">';
+						$html_indikator .= '<tr id-rhk="'.$v_rhk['id'].'" id-indikator="' . $v_indikator['id'] . '">';
 
 						if ($index === 0) {
 							$rowspan = $p_i > 1 ? 'rowspan="' . $p_i . '"' : '';
@@ -6029,7 +6067,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$html_indikator .= '</tr>';
 					}
 				} else {
-					$html_indikator .= '<tr>
+					$html_indikator .= '<tr id-rhk="'.$v_rhk['id'].'">
 						<td class="text-center">' . $no_2 . '</td>
 						<td class="text-left">' . $v_rhk['label'] . '</td>
 						<td></td>
@@ -6039,16 +6077,20 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 				$ret['html_sasaran'] .= $html_indikator;
 
+				$ids = implode(',', $v['ids']);
 				$data_rhk_child = $wpdb->get_results(
 					$wpdb->prepare("
-						SELECT *
+						SELECT 
+							*
 						FROM esakip_data_rencana_aksi_opd 
-						WHERE parent = %d 
-						  AND level = %d 
-						  AND id_skpd = %d
-						  AND active = 1
-						ORDER BY kode_cascading_sub_kegiatan
-					", $v_rhk['id'], $v_rhk['level'] + 1, $id_skpd),
+						WHERE parent IN ($ids) 
+						  	AND level = %d 
+						  	AND id_skpd = %d
+						  	AND active = 1
+						ORDER BY kode_cascading_program, 
+							kode_cascading_kegiatan, 
+							kode_cascading_sub_kegiatan
+					", $v_rhk['level'] + 1, $id_skpd),
 					ARRAY_A
 				);
 
@@ -6061,8 +6103,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				$no = 1;
 				if (!empty($data_rhk_child)) {
 					foreach ($data_rhk_child as $v_rhk_child) {
-						if (empty($data_anggaran[$jenis_level[$v_rhk_child['level']]][$v_rhk_child['kode_cascading_sub_kegiatan']])) {
-							$data_anggaran[$jenis_level[$v_rhk_child['level']]][$v_rhk_child['kode_cascading_sub_kegiatan']] = array();
+						$index = $v_rhk_child['kode_cascading_program'].$v_rhk_child['kode_cascading_kegiatan'].$v_rhk_child['kode_cascading_sub_kegiatan'];
+						if (empty($data_anggaran[$jenis_level[$v_rhk_child['level']]][$index])) {
+							$data_anggaran[$jenis_level[$v_rhk_child['level']]][$index] = array(
+								'ids' => array(),
+								'sumber_dana' => array(),
+								'total' => 0,
+								'data' => array()
+							);
 						}
 
 						$rencana_pagu = 0;
@@ -6215,7 +6263,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								}
 							}
 						}
-						$data_anggaran[$jenis_level[$v_rhk_child['level']]][$v_rhk_child['kode_cascading_sub_kegiatan']][] = array(
+						$data_anggaran[$jenis_level[$v_rhk_child['level']]][$index]['data'][] = array(
 							'nama'           => $v_rhk_child['label_cascading_' . $jenis_level[$v_rhk_child['level']]],
 							'kode'           => $v_rhk_child['kode_cascading_' . $jenis_level[$v_rhk_child['level']]],
 							'sumber_dana'    => implode(', ', $sumber_dana),
@@ -6223,6 +6271,15 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							'urut' 			 => $no_2,
 							'id' 			 => $v_rhk_child['id']
 						);
+
+						$data_anggaran[$jenis_level[$v_rhk_child['level']]][$index]['ids'][] = $v_rhk_child['id'];
+						$data_anggaran[$jenis_level[$v_rhk_child['level']]][$index]['total'] += $rencana_pagu;
+
+						foreach($sumber_dana as $sd){
+							if(!in_array($sd, $data_anggaran[$jenis_level[$v_rhk_child['level']]][$index]['sumber_dana'])){
+								$data_anggaran[$jenis_level[$v_rhk_child['level']]][$index]['sumber_dana'][$sd] = $sd;
+							}
+						}
 					}
 				}
 			}
@@ -6230,35 +6287,34 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			$cek_urut = 0;
 			foreach ($data_anggaran as $jenis => $cascading) {
 				foreach ($cascading as $multi_cascading) {
-					foreach ($multi_cascading as $v) {
-						if ($cek_urut != $v['urut']) {
-							$cek_urut = $v['urut'];
-							$no_cascading = 0;
-						}
-						$no_cascading++;
-						if ($jenis == 'program') {
-							$ret['html_program'] .= '<tr data-id="' . $v['id'] . '">
-								<td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
-								<td class="text-left">' . $v['kode'] . ' ' . $v['nama'] . '</td>
-								<td class="text-right">' . number_format($v['total_anggaran'], 0, ",", ".") . '</td>
-								<td class="text-left">' . $v['sumber_dana'] . '</td>
-							</tr>';
-						} else if ($jenis == 'kegiatan') {
-							$ret['html_kegiatan'] .= '<tr data-id="' . $v['id'] . '">
-								<td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
-								<td class="text-left">' . $v['kode'] . ' ' . $v['nama'] . '</td>
-								<td class="text-right">' . number_format($v['total_anggaran'], 0, ",", ".") . '</td>
-								<td class="text-left">' . $v['sumber_dana'] . '</td>
-							</tr>';
-						} else if ($jenis == 'sub_kegiatan') {
-							$parts = explode(" ", $v['nama'], 2);
-							$ret['html_sub_kegiatan'] .= '<tr data-id="' . $v['id'] . '">
-								<td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
-								<td class="text-left">' . $v['kode'] . ' ' . $parts[1] . '</td>
-								<td class="text-right">' . number_format($v['total_anggaran'], 0, ",", ".") . '</td>
-								<td class="text-left">' . $v['sumber_dana'] . '</td>
-							</tr>';
-						}
+					$v = $multi_cascading['data'][0];
+					if ($cek_urut != $v['urut']) {
+						$cek_urut = $v['urut'];
+						$no_cascading = 0;
+					}
+					$no_cascading++;
+					if ($jenis == 'program') {
+						$ret['html_program'] .= '<tr data-id="' . implode('|', $multi_cascading['ids']) . '">
+							<td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
+							<td class="text-left">' . $v['kode'] . ' ' . $v['nama'] . '</td>
+							<td class="text-right">' . number_format($multi_cascading['total'], 0, ",", ".") . '</td>
+							<td class="text-left">' . implode(', ', $multi_cascading['sumber_dana']) . '</td>
+						</tr>';
+					} else if ($jenis == 'kegiatan') {
+						$ret['html_kegiatan'] .= '<tr data-id="' . implode('|', $multi_cascading['ids']) . '">
+							<td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
+							<td class="text-left">' . $v['kode'] . ' ' . $v['nama'] . '</td>
+							<td class="text-right">' . number_format($multi_cascading['total'], 0, ",", ".") . '</td>
+							<td class="text-left">' . implode(', ', $multi_cascading['sumber_dana']) . '</td>
+						</tr>';
+					} else if ($jenis == 'sub_kegiatan') {
+						$parts = explode(" ", $v['nama'], 2);
+						$ret['html_sub_kegiatan'] .= '<tr data-id="' . implode('|', $multi_cascading['ids']) . '">
+							<td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
+							<td class="text-left">' . $v['kode'] . ' ' . $parts[1] . '</td>
+							<td class="text-right">' . number_format($multi_cascading['total'], 0, ",", ".") . '</td>
+							<td class="text-left">' . implode(', ', $multi_cascading['sumber_dana']) . '</td>
+						</tr>';
 					}
 				}
 			}
