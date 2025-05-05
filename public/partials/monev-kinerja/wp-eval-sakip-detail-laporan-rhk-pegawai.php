@@ -77,7 +77,59 @@ $rincian_tagging = $this->functions->generatePage(array(
     'post_status' => 'private'
 ));
 
-foreach ($get_renaksi_opd as $renaksi_opd) {
+// cek apakah ada RHK yang double
+$ret = array(
+    'rhk_unik' => array()
+);
+foreach ($get_renaksi_opd as $v_rhk) {
+    $id_unik = strtolower(trim($v_rhk['label']));
+    if(empty($ret['rhk_unik'][$id_unik])){
+        $ret['rhk_unik'][$id_unik] = array(
+            'ids' => array(),
+            'indikator' => array(),
+            'pagu_cascading' => 0,
+            'data' => array()
+        );
+    }
+    $ret['rhk_unik'][$id_unik]['ids'][] = $v_rhk['id'];
+    $ret['rhk_unik'][$id_unik]['data'][] = $v_rhk;
+    $ret['rhk_unik'][$id_unik]['pagu_cascading'] += $v_rhk['pagu_cascading'];
+
+    $data_indikator_ploting_rhk = $wpdb->get_results(
+        $wpdb->prepare("
+            SELECT
+                *
+            FROM esakip_data_rencana_aksi_indikator_opd
+            WHERE id_renaksi = %d 
+              AND active = 1
+        ", $v_rhk['id']),
+        ARRAY_A
+    );
+    if (!empty($data_indikator_ploting_rhk)) {
+        foreach ($data_indikator_ploting_rhk as $index => $v_indikator) {
+            $id_unik_indikator = strtolower(trim($v_indikator['indikator']).trim($v_indikator['target_akhir']).trim($v_indikator['satuan']));
+            if(empty($ret['rhk_unik'][$id_unik]['indikator'][$id_unik_indikator])){
+                $ret['rhk_unik'][$id_unik]['indikator'][$id_unik_indikator] = array(
+                    'ids' => array(),
+                    'total' => 0,
+                    'data' => array()
+                );
+            }
+            $ret['rhk_unik'][$id_unik]['indikator'][$id_unik_indikator]['total'] += $v_indikator['rencana_pagu'];
+            $ret['rhk_unik'][$id_unik]['indikator'][$id_unik_indikator]['ids'][] = $v_indikator['id'];
+            $ret['rhk_unik'][$id_unik]['indikator'][$id_unik_indikator]['data'][] = $v_indikator;
+        }
+    }
+}
+
+$data_anggaran = array(
+    'sasaran'       => array(),
+    'program'       => array(),
+    'kegiatan'      => array(),
+    'sub_kegiatan'  => array()
+);
+foreach ($ret['rhk_unik'] as $v) {
+    $renaksi_opd = $v['data'][0];
     $rhk_parent = $this->get_rhk_parent($renaksi_opd['parent'], $input['tahun']);
     $rhk_parent_html = '';
     if(!empty($rhk_parent)){
@@ -109,58 +161,63 @@ foreach ($get_renaksi_opd as $renaksi_opd) {
     $nama_pokin_pemda = array();
     $level_pokin_pemda = array();
 
-    $get_indikator = $wpdb->get_results($wpdb->prepare("
-        SELECT 
-            * 
-        FROM esakip_data_rencana_aksi_indikator_opd 
-        WHERE id_renaksi = %d 
-          AND active = 1
-    ", $renaksi_opd['id']), ARRAY_A);
-    if (!empty($get_indikator)) {
-        foreach ($get_indikator as $key => $ind) {
-            $indikator       .= '<a href="' . $this->functions->add_param_get($rincian_tagging['url'], '&tahun=' . $input['tahun'] . '&id_skpd=' . $id_skpd . '&id_indikator=' . $ind['id']) . '" target="_blank">' . $ind['indikator'] . '</a>' . '<br>'; 
-            $satuan          .= $ind['satuan'] . '<br>';  
-            $target_awal     .= $ind['target_awal'] . '<br>';  
-            $target_1        .= $ind['target_1'] . '<br>';  
-            $target_2        .= $ind['target_2'] . '<br>';  
-            $target_3        .= $ind['target_3'] . '<br>';  
-            $target_4        .= $ind['target_4'] . '<br>';  
-            $target_akhir    .= $ind['target_akhir'] . '<br>';
-            $realisasi_tw_1  .= $ind['realisasi_tw_1'] . '<br>';  
-            $realisasi_tw_2  .= $ind['realisasi_tw_2'] . '<br>';  
-            $realisasi_tw_3  .= $ind['realisasi_tw_3'] . '<br>';  
-            $realisasi_tw_4  .= $ind['realisasi_tw_4'] . '<br>';
+    $anggaran = $this->get_rencana_pagu_rhk(array(
+        'ids' => $v['ids'],
+        'level' => $renaksi_opd['level'],
+        'id_skpd' => $renaksi_opd['id_skpd'],
+        'anggaran' => $data_anggaran,
+        'no_urut_rhk' => $no
+    ));
+    $total = $anggaran['total'];
 
-            // Hitung capaian realisasi
-            $total_realisasi_tw = $ind['realisasi_tw_1'] + $ind['realisasi_tw_2'] + $ind['realisasi_tw_3'] + $ind['realisasi_tw_4'];
-            if (!empty($total_realisasi_tw) && !empty($ind['target_akhir'])) {
-                $capaian = number_format(($total_realisasi_tw / $ind['target_akhir']) * 100, 0 ) . "%";
-            } else {
-                $capaian = "0%";
-            }
+    foreach ($v['indikator'] as $key => $vv) {
+        $ind = $vv['data'][0];
+        $ind['id'] = implode('|', $vv['ids']);
+        // $ind['rencana_pagu'] = $vv['total'];
+        $ind['rencana_pagu'] = $total;
 
-            $capaian_realisasi .= $capaian . '<br>';
-            $rencana_pagu .= ($set_pagu_renaksi == 1) ? '0<br>' : (!empty($ind['rencana_pagu']) ? number_format((float)$ind['rencana_pagu'], 0, ",", ".") . '<br>' : '0<br>');
+        $indikator       .= '<a href="' . $this->functions->add_param_get($rincian_tagging['url'], '&tahun=' . $input['tahun'] . '&id_skpd=' . $id_skpd . '&id_indikator=' . $ind['id']) . '" target="_blank">' . $ind['indikator'] . '</a>' . '<br>'; 
+        $satuan          .= $ind['satuan'] . '<br>';  
+        $target_awal     .= $ind['target_awal'] . '<br>';  
+        $target_1        .= $ind['target_1'] . '<br>';
+        $target_2        .= $ind['target_2'] . '<br>';
+        $target_3        .= $ind['target_3'] . '<br>';
+        $target_4        .= $ind['target_4'] . '<br>';
+        $target_akhir    .= $ind['target_akhir'] . '<br>';
+        $realisasi_tw_1  .= $ind['realisasi_tw_1'] . '<br>';  
+        $realisasi_tw_2  .= $ind['realisasi_tw_2'] . '<br>';  
+        $realisasi_tw_3  .= $ind['realisasi_tw_3'] . '<br>';  
+        $realisasi_tw_4  .= $ind['realisasi_tw_4'] . '<br>';
 
-            $data_tagging = $wpdb->get_results($wpdb->prepare("
-                    SELECT 
-                        * 
-                    FROM esakip_tagging_rincian_belanja 
-                    WHERE active = 1 
-                      AND id_skpd = %d
-                      AND id_indikator = %d
-                      AND kode_sbl = %s
-                ", $renaksi_opd['id_skpd'], $ind['id'], $renaksi_opd['kode_sbl']),
-                ARRAY_A
-            );
+        // Hitung capaian realisasi
+        $total_realisasi_tw = $ind['realisasi_tw_1'] + $ind['realisasi_tw_2'] + $ind['realisasi_tw_3'] + $ind['realisasi_tw_4'];
+        if (!empty($total_realisasi_tw) && !empty($ind['target_akhir'])) {
+            $capaian = number_format(($total_realisasi_tw / $ind['target_akhir']) * 100, 0 ) . "%";
+        } else {
+            $capaian = "0%";
+        }
 
-            if(!empty($data_tagging)){
-                foreach ($data_tagging as $value) {
-                    $harga_satuan = $value['harga_satuan'];
-                    $volume = $value['volume'];
-                    $total_harga_tagging_rincian += $volume * $harga_satuan;
-                    $total_realisasi_tagging_rincian += $value['realisasi'];
-                }
+        $capaian_realisasi .= $capaian . '<br>';
+        $rencana_pagu .= ($set_pagu_renaksi == 1) ? '0<br>' : (!empty($ind['rencana_pagu']) ? number_format((float)$ind['rencana_pagu'], 0, ",", ".") . '<br>' : '0<br>');
+
+        $data_tagging = $wpdb->get_results($wpdb->prepare("
+                SELECT 
+                    * 
+                FROM esakip_tagging_rincian_belanja 
+                WHERE active = 1 
+                  AND id_skpd = %d
+                  AND id_indikator IN ".implode(',', $vv['ids'])."
+                  AND kode_sbl = %s
+            ", $renaksi_opd['id_skpd'], $renaksi_opd['kode_sbl']),
+            ARRAY_A
+        );
+
+        if(!empty($data_tagging)){
+            foreach ($data_tagging as $value) {
+                $harga_satuan = $value['harga_satuan'];
+                $volume = $value['volume'];
+                $total_harga_tagging_rincian += $volume * $harga_satuan;
+                $total_realisasi_tagging_rincian += $value['realisasi'];
             }
         }
     }
@@ -268,7 +325,7 @@ foreach ($get_renaksi_opd as $renaksi_opd) {
             <td class="text_kanan">' . number_format((float)$total_harga_tagging_rincian, 0, ",", ".") . '</td>
             <td class="text_kanan">' . number_format((float)$total_realisasi_tagging_rincian, 0, ",", ".") . '</td>
             <td class="text_tengah">' . $capaian_realisasi_pagu . '</td>
-            <td class="text_kanan">' . number_format((float)$renaksi_opd['pagu_cascading'], 0, ",", ".") . '</td>
+            <td class="text_kanan">' . number_format((float)$v['pagu_cascading'], 0, ",", ".") . '</td>
             <td class="text_kiri">' . $label_cascading . '</td>
             <td class="text_kiri">' . implode('<br>', $nama_pokin) . '</td>
             <td class="text_tengah">' . implode('<br>', $level_pokin) . '</td>
