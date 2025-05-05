@@ -733,7 +733,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
         jQuery.ajax({
             type: 'POST',
             url: esakip.url,
-            data: formData + '&action=simpan_renaksi_pemda' + '&api_key=' + esakip.api_key + '&id_skpd=' + <?php echo $id_skpd; ?>,
+            data: formData + '&action=simpan_renaksi_pemda' + '&api_key=' + esakip.api_key + '&id_skpd=' + <?php echo $id_skpd; ?> + '&tahun=' + <?php echo $input['tahun']; ?>,
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 if (response.success) {
