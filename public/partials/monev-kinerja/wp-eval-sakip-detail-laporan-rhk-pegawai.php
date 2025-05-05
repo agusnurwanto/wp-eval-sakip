@@ -87,11 +87,13 @@ foreach ($get_renaksi_opd as $v_rhk) {
         $ret['rhk_unik'][$id_unik] = array(
             'ids' => array(),
             'indikator' => array(),
+            'pagu_cascading' => 0,
             'data' => array()
         );
     }
     $ret['rhk_unik'][$id_unik]['ids'][] = $v_rhk['id'];
     $ret['rhk_unik'][$id_unik]['data'][] = $v_rhk;
+    $ret['rhk_unik'][$id_unik]['pagu_cascading'] += $v_rhk['pagu_cascading'];
 
     $data_indikator_ploting_rhk = $wpdb->get_results(
         $wpdb->prepare("
@@ -120,6 +122,12 @@ foreach ($get_renaksi_opd as $v_rhk) {
     }
 }
 
+$data_anggaran = array(
+    'sasaran'       => array(),
+    'program'       => array(),
+    'kegiatan'      => array(),
+    'sub_kegiatan'  => array()
+);
 foreach ($ret['rhk_unik'] as $v) {
     $renaksi_opd = $v['data'][0];
     $rhk_parent = $this->get_rhk_parent($renaksi_opd['parent'], $input['tahun']);
@@ -153,10 +161,21 @@ foreach ($ret['rhk_unik'] as $v) {
     $nama_pokin_pemda = array();
     $level_pokin_pemda = array();
 
+    $anggaran = $this->get_rencana_pagu_rhk(array(
+        'ids' => $v['ids'],
+        'level' => $renaksi_opd['level'],
+        'id_skpd' => $renaksi_opd['id_skpd'],
+        'anggaran' => $data_anggaran,
+        'no_urut_rhk' => $no
+    ));
+    $total = $anggaran['total'];
+
     foreach ($v['indikator'] as $key => $vv) {
         $ind = $vv['data'][0];
         $ind['id'] = implode('|', $vv['ids']);
-        $ind['rencana_pagu'] = $vv['total'];
+        // $ind['rencana_pagu'] = $vv['total'];
+        $ind['rencana_pagu'] = $total;
+
         $indikator       .= '<a href="' . $this->functions->add_param_get($rincian_tagging['url'], '&tahun=' . $input['tahun'] . '&id_skpd=' . $id_skpd . '&id_indikator=' . $ind['id']) . '" target="_blank">' . $ind['indikator'] . '</a>' . '<br>'; 
         $satuan          .= $ind['satuan'] . '<br>';  
         $target_awal     .= $ind['target_awal'] . '<br>';  
@@ -306,7 +325,7 @@ foreach ($ret['rhk_unik'] as $v) {
             <td class="text_kanan">' . number_format((float)$total_harga_tagging_rincian, 0, ",", ".") . '</td>
             <td class="text_kanan">' . number_format((float)$total_realisasi_tagging_rincian, 0, ",", ".") . '</td>
             <td class="text_tengah">' . $capaian_realisasi_pagu . '</td>
-            <td class="text_kanan">' . number_format((float)$renaksi_opd['pagu_cascading'], 0, ",", ".") . '</td>
+            <td class="text_kanan">' . number_format((float)$v['pagu_cascading'], 0, ",", ".") . '</td>
             <td class="text_kiri">' . $label_cascading . '</td>
             <td class="text_kiri">' . implode('<br>', $nama_pokin) . '</td>
             <td class="text_tengah">' . implode('<br>', $level_pokin) . '</td>
