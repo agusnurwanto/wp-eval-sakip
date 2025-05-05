@@ -8,11 +8,12 @@ if (!defined('WPINC')) {
 $id_tujuan = isset($_GET['id_tujuan']) ? intval($_GET['id_tujuan']) : 0;
 $id_pokin = isset($_GET['id_pokin']) ? explode(',', sanitize_text_field($_GET['id_pokin'])) : array();
 $id_pokin = array_map('intval', $id_pokin);
+$tahun_anggaran = isset($_GET['tahun']) ? intval($_GET['tahun']) : 0;
 
 $input = shortcode_atts(array(
-    'tahun' => '2024',
+    'tahun' => $tahun_anggaran,
     'id_skpd' => 0,
-    'periode' => '',
+    'periode' => 0,
     'id_tujuan' => $id_tujuan,
     'id_pokin' => $id_pokin
 ), $atts);
@@ -94,12 +95,11 @@ $pokin_level_1 = $wpdb->get_results($wpdb->prepare("
     SELECT 
         *
     FROM esakip_pohon_kinerja
-    WHERE tahun_anggaran = %d
-        AND id_jadwal = %d
+    WHERE id_jadwal = %d
         AND id IN (" . implode(',', array_fill(0, count($id_pokin), '%d')) . ")
         AND parent = 0
         AND level = 1
-", array_merge([$input['tahun'], $input['periode']], $id_pokin)), ARRAY_A);
+", array_merge([$input['periode']], $id_pokin)), ARRAY_A);
 
 $label_pokin_1 = '-';
 
@@ -112,12 +112,11 @@ if (!empty($pokin_level_1)) {
             SELECT 
                 *
             FROM esakip_pohon_kinerja
-            WHERE tahun_anggaran = %d
-                AND id_jadwal = %d
+            WHERE id_jadwal = %d
                 AND parent = %d
                 AND level = 1
                 AND active = 1
-        ", $input['tahun'], $input['periode'], $pokin['id']), ARRAY_A);
+        ", $input['periode'], $pokin['id']), ARRAY_A);
         
         foreach ($ind_pokin_level_1 as $ind) {
             $indikator[] = $ind['label_indikator_kinerja'];
@@ -388,6 +387,7 @@ if (!empty($pokin_level_1)) {
 jQuery(document).ready(function() {
     run_download_excel_sakip();
     jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-rencana-aksi" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
+    jQuery('#action-sakip').prepend('<button style="margin-right: 10px;" class="btn btn-danger" onclick="generatePokin();"><i class="dashicons dashicons-admin-page"></i>Generate Pokin</button>');
 
     let id_jadwal = <?php echo $cek_id_jadwal_rpjmd; ?>;
     if(id_jadwal == 0){
@@ -1624,4 +1624,42 @@ function help_rhk_pemda(id, tipe) {
         }
     });
 };
+
+function generatePokin() {
+    if (!confirm('Apakah anda yakin akan copy data Pohon Kinerja ke Rencana Hasil Kerja Pemerintah Daerah?')) {
+        return;
+    }
+
+    const parent_lv_1 = <?php echo json_encode($id_pokin); ?>;
+
+    jQuery('#wrap-loading').show()
+    jQuery.ajax({
+        url: esakip.url,
+        method: 'POST',
+        data: {
+            action: "generatePokin",
+            api_key: esakip.api_key,
+            id_pokin_lv_1: parent_lv_1,
+            id_periode: <?php echo $input['periode']; ?>,
+            tahun_anggaran: <?php echo $input['tahun']; ?>,
+            id_tujuan: <?php echo $input['id_tujuan']; ?>
+
+        },
+        dataType: 'json',
+        success: function(response) {
+            jQuery('#wrap-loading').hide()
+            if (response.status === 'success') {
+                alert(response.message);
+            } else {
+                alert('Terjadi kesalahan: ' + response.message);
+            }
+            location.reload();
+        },
+        error: function(xhr, status, error) {
+            jQuery('#wrap-loading').hide()
+            console.error('AJAX Error:', error);
+            alert('Gagal menyimpan data. Silakan coba lagi.');
+        },
+    });
+}
 </script>

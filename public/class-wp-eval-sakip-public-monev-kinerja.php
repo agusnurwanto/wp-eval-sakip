@@ -3810,116 +3810,101 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					        ';
 
 							foreach ($renaksi['data'] as $uraian_renaksi) {
-								$no_uraian_renaksi++;
-								$indikator_html = array();
-								$satuan_html = array();
-								$target_awal_html = array();
-								$target_akhir_html = array();
-								$target_1_html = array();
-								$target_2_html = array();
-								$target_3_html = array();
-								$target_4_html = array();
-								$rencana_pagu_html = array();
-								$mitra_bidang_html = array();
-								$nama_skpd_html = array();
+							    $no_uraian_renaksi++;
+							    $indikator_html = array();
+							    $satuan_html = array();
+							    $target_awal_html = array();
+							    $target_akhir_html = array();
+							    $target_1_html = array();
+							    $target_2_html = array();
+							    $target_3_html = array();
+							    $target_4_html = array();
+							    $rencana_pagu_html = array();
+							    $mitra_bidang_html = array();
+							    $nama_skpd_html = array();
 
-								$label_pokin = false;
+							    foreach ($uraian_renaksi['indikator'] as $key => $ind) {
+							        $indikator_html[$key] = $ind['indikator'];
+							        $satuan_html[$key] = $ind['satuan'];
+							        $target_awal_html[$key] = $ind['target_awal'];
+							        $target_akhir_html[$key] = $ind['target_akhir'];
+							        $target_1_html[$key] = $ind['target_1'];
+							        $target_2_html[$key] = $ind['target_2'];
+							        $target_3_html[$key] = $ind['target_3'];
+							        $target_4_html[$key] = $ind['target_4'];
+							        $rencana_pagu_html[$key] = $ind['rencana_pagu'];
+							        $mitra_bidang_html[$key] = $ind['mitra_bidang'];
+							        $nama_skpd_html[$key] = $ind['nama_skpd'];
+							    }
 
-								foreach ($uraian_renaksi['indikator'] as $key => $ind) {
-									$indikator_html[$key] = $ind['indikator'];
-									$satuan_html[$key] = $ind['satuan'];
-									$target_awal_html[$key] = $ind['target_awal'];
-									$target_akhir_html[$key] = $ind['target_akhir'];
-									$target_1_html[$key] = $ind['target_1'];
-									$target_2_html[$key] = $ind['target_2'];
-									$target_3_html[$key] = $ind['target_3'];
-									$target_4_html[$key] = $ind['target_4'];
-									$rencana_pagu_html[$key] = $ind['rencana_pagu'];
-									$mitra_bidang_html[$key] = $ind['mitra_bidang'];
-									$nama_skpd_html[$key] = $ind['nama_skpd'];
-								}
+							    $indikator_html = implode('<br>', $indikator_html);
+							    $satuan_html = implode('<br>', $satuan_html);
+							    $target_awal_html = implode('<br>', $target_awal_html);
+							    $target_akhir_html = implode('<br>', $target_akhir_html);
+							    $target_1_html = implode('<br>', $target_1_html);
+							    $target_2_html = implode('<br>', $target_2_html);
+							    $target_3_html = implode('<br>', $target_3_html);
+							    $target_4_html = implode('<br>', $target_4_html);
+							    $rencana_pagu = !empty($rencana_pagu_html) ? implode('<br>', array_map(function ($item) {
+							        return number_format((float)$item, 0, ",", ".");
+							    }, $rencana_pagu_html)) : 0;
+							    $mitra_bidang_html = implode('<br>', $mitra_bidang_html);
+							    $nama_skpd_html = implode('<br>', $nama_skpd_html);
 
-								$indikator_html = implode('<br>', $indikator_html);
-								$satuan_html = implode('<br>', $satuan_html);
-								$target_awal_html = implode('<br>', $target_awal_html);
-								$target_akhir_html = implode('<br>', $target_akhir_html);
-								$target_1_html = implode('<br>', $target_1_html);
-								$target_2_html = implode('<br>', $target_2_html);
-								$target_3_html = implode('<br>', $target_3_html);
-								$target_4_html = implode('<br>', $target_4_html);
-								$rencana_pagu = !empty($rencana_pagu_html) ? implode('<br>', array_map(function ($item) {
-									return number_format((float) $item, 0, ",", ".");
-								}, $rencana_pagu_html)) : 0;
-								$mitra_bidang_html = implode('<br>', $mitra_bidang_html);
-								$nama_skpd_html = implode('<br>', $nama_skpd_html);
+							    $label_pokin = $uraian_renaksi['detail']['label_pokin_5'] ?: $uraian_renaksi['detail']['label_pokin_4'];
+							    $cek = $wpdb->get_var(
+									$wpdb->prepare("
+										SELECT 
+											id
+										FROM esakip_data_label_rencana_aksi
+										WHERE parent_indikator_renaksi_pemda = %d 
+											AND active=1
+											AND tahun_anggaran=%d
+									", $ind['id'], $_POST['tahun_anggaran'])
+								);
 
-								$label_pokin = $uraian_renaksi['detail']['label_pokin_5'];
-								if (empty($label_pokin)) {
-									$label_pokin = $uraian_renaksi['detail']['label_pokin_4'];
-								}
+								// print_r($cek); die($wpdb->last_query);
 
-								foreach ($uraian_renaksi['indikator'] as $i => $ind) {
-									$label_html = '';
-									$label_html =  $uraian_renaksi['detail']['label'];
-									if (!$label_pokin_shown) {
-										$label_pokin_shown = true;
-									}
+								$detail_pengisian_rencana_aksi = $this->functions->generatePage(array(
+									'nama_page' => 'Halaman Detail Pengisian Rencana Aksi ' . $_POST['tahun_anggaran'],
+									'content' => '[detail_pengisian_rencana_aksi tahun=' . $_POST['tahun_anggaran'] . ']',
+									'show_header' => 1,
+									'post_status' => 'private'
+								));
 
-									$cek = $wpdb->get_var(
-										$wpdb->prepare("
-											SELECT 
-												id
-											FROM esakip_data_label_rencana_aksi
-											WHERE parent_indikator_renaksi_pemda = %d 
-												AND active=1
-												AND tahun_anggaran=%d
-										", $ind['id'], $_POST['tahun_anggaran'])
-									);
-
-									// print_r($cek); die($wpdb->last_query);
-
-									$detail_pengisian_rencana_aksi = $this->functions->generatePage(array(
-										'nama_page' => 'Halaman Detail Pengisian Rencana Aksi ' . $_POST['tahun_anggaran'],
-										'content' => '[detail_pengisian_rencana_aksi tahun=' . $_POST['tahun_anggaran'] . ']',
-										'show_header' => 1,
-										'post_status' => 'private'
-									));
+								if (!empty($cek)) {
+									$link = "<a href='" . $detail_pengisian_rencana_aksi['url'] . "&id_skpd=" . $ind['id_skpd'] . "' target='_blank'>" . $ind['nama_skpd'] . "</a>";
 									$bg = '';
-									$link = '';
+								} else {
+									$bg = 'background-color: #ff00002e;';
+									$link = $ind['nama_skpd'];
+								}
 
-									if ($cek) {
-										$link = "<a href='" . $detail_pengisian_rencana_aksi['url'] . "&id_skpd=" . $ind['id_skpd'] . "' target='_blank'>" . $ind['nama_skpd'] . "</a>";
-										$bg = '';
-									} else {
-										$bg = 'background-color: #ff00002e;';
-										$link = $ind['nama_skpd'];
-									}
-									$html .= '
+							    $html .= '
 							        <tr>
-							            <td>' . $no . '.' . $no_uraian_renaksi . '.' . ($i + 1) . '</td>
+							            <td>' . $no . '.' . $no_uraian_renaksi . '</td>
 							            <td class="kegiatan_utama"></td>
 							            <td class="indikator_kegiatan_utama"></td>
 							            <td class="recana_aksi"></td>
 							            <td class="kiri kanan bawah text_blok urian_renaksi">' . $uraian_renaksi['detail']['label'] . '
-										    <a href="javascript:void(0)" data-id="' . $uraian_renaksi['detail']['id'] . '" data-tipe="3" 
-											   class="help-rhk-pemda" onclick="help_rhk_pemda(' . $uraian_renaksi['detail']['id'] . ', 3); return false;" title="Detail">
-											   <i class="dashicons dashicons-editor-help"></i>
-											</a>
-										</td>
-							            <td class="text-center">' . $ind['satuan'] . '</td>
-							            <td>' . $ind['indikator'] . '</td>
-							            <td class="text-center">' . $ind['target_akhir'] . '</td>
-							            <td class="text-center">' . $ind['target_awal'] . '</td>
-							            <td class="text-center">' . $ind['target_1'] . '</td>
-							            <td class="text-center">' . $ind['target_2'] . '</td>
-							            <td class="text-center">' . $ind['target_3'] . '</td>
-							            <td class="text-center">' . $ind['target_4'] . '</td>
-							            <td class="text-center">' . $ind['target_akhir'] . '</td>
-									    <td class="text-right">' . number_format((float)$ind['rencana_pagu'], 0, ",", ".") . '</td>
+							                <a href="javascript:void(0)" data-id="' . $uraian_renaksi['detail']['id'] . '" data-tipe="3" 
+							                   class="help-rhk-pemda" onclick="help_rhk_pemda(' . $uraian_renaksi['detail']['id'] . ', 3); return false;" title="Detail">
+							                   <i class="dashicons dashicons-editor-help"></i>
+							                </a>
+							            </td>
+							            <td class="text-center">' . $satuan_html . '</td>
+							            <td>' . $indikator_html . '</td>
+							            <td class="text-center">' . $target_akhir_html . '</td>
+							            <td class="text-center">' . $target_awal_html . '</td>
+							            <td class="text-center">' . $target_1_html . '</td>
+							            <td class="text-center">' . $target_2_html . '</td>
+							            <td class="text-center">' . $target_3_html . '</td>
+							            <td class="text-center">' . $target_4_html . '</td>
+							            <td class="text-center">' . $target_akhir_html . '</td>
+							            <td class="text-right">' . $rencana_pagu . '</td>
 									    <td class="text-center" style="' . $bg . '">' . $link . '</td>
-									    <td class="text-left mitra_bidang">' . $ind['mitra_bidang'] . '</td>
+							            <td class="text-left mitra_bidang">' . $mitra_bidang_html . '</td>
 							        </tr>';
-								}
 							}
 						}
 					}
@@ -5014,6 +4999,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				$id_skpd = isset($_POST['id_skpd']) ? intval($_POST['id_skpd']) : 0;
 				$id_label_renaksi_opd = isset($_POST['id_label_renaksi_opd']) ? $_POST['id_label_renaksi_opd'] : [];
 				$id_indikator = isset($_POST['id_indikator']) ? $_POST['id_indikator'] : [];
+				$tahun = isset($_POST['tahun']) ? intval($_POST['tahun']) : 0;
 
 				if (!empty($checklist_renaksi_opd) && !empty($id_label_renaksi_opd)) {
 					foreach ($checklist_renaksi_opd as $index => $label_renaksi_opd) {
@@ -5024,6 +5010,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							'parent_renaksi_pemda' => $id_renaksi_pemda,
 							'parent_indikator_renaksi_pemda' => $id_indikator_renaksi_pemda,
 							'id_skpd' => $id_skpd,
+							'tahun_anggaran' => $tahun,
 							'active' => 1
 						);
 

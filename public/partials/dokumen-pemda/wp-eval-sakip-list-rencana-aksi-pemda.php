@@ -33,12 +33,10 @@ $pokin = $wpdb->get_results($wpdb->prepare('
     SELECT 
         *
     FROM esakip_pohon_kinerja
-    WHERE tahun_anggaran=%d
-        AND id_jadwal=%d
+    WHERE id_jadwal=%d
         AND level=1
         AND parent=0
-', $input['tahun'], $input['periode']), ARRAY_A);
-
+', $input['periode']), ARRAY_A);
 $select_pokin = '<option value="">Pilih Pohon Kinerja</option>';
 foreach($pokin as $get_pokin){
     $select_pokin .= '<option value="'.$get_pokin['id'].'">'.$get_pokin['label'].'</option>';
@@ -161,6 +159,7 @@ foreach($pokin as $get_pokin){
                 action: 'get_table_renaksi_pemda',
                 api_key: esakip.api_key,
                 id_jadwal: <?php echo $input['periode']; ?>,
+                tahun_anggaran: <?php echo $input['tahun']; ?>
             },
             dataType: 'json',
             success: function(response) {
@@ -192,7 +191,8 @@ foreach($pokin as $get_pokin){
             data: {
                 action: 'get_pokin_renaksi_by_id',
                 api_key: esakip.api_key,
-                id: id
+                id: id,
+                tahun_anggaran: <?php echo $input['tahun']; ?>
             },
             dataType: 'json',
             success: function(response) {
@@ -245,7 +245,8 @@ foreach($pokin as $get_pokin){
                 "api_key": esakip.api_key,
                 "id": id,
                 "id_pokin": id_pokin,
-                "level": 1
+                "level": 1,
+                "tahun_anggaran": <?php echo $input['tahun']; ?>,
             },
             dataType: "json",
             success: function(res) {
