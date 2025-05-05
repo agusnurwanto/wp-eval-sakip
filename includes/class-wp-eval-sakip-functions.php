@@ -170,7 +170,7 @@ class Esakip_Functions
 
     public function get_link_post($custom_post)
     {
-        $link = get_permalink($custom_post);
+        $link = get_permalink($custom_post->ID);
         $options = array();
         if (!empty($custom_post->custom_url)) {
             $options['custom_url'] = $custom_post->custom_url;
@@ -183,29 +183,34 @@ class Esakip_Functions
         return $link;
     }
 
-    public function get_page_by_title($page_title, $output = OBJECT, $post_type = 'page')
+    function get_page_by_title($page_title, $output = OBJECT, $post_type = 'page')
     {
         global $wpdb;
         if (is_array($post_type)) {
             $post_type = esc_sql($post_type);
             $post_type_in_string = "'" . implode("','", $post_type) . "'";
             $sql = $wpdb->prepare("
-				SELECT ID
-				FROM $wpdb->posts
-				WHERE post_title = %s
-					AND post_type IN ($post_type_in_string)
-			", $page_title);
+                SELECT 
+                    ID,
+                    post_status
+                FROM $wpdb->posts
+                WHERE post_title = %s
+                    AND post_type IN ($post_type_in_string)
+            ", $page_title);
         } else {
             $sql = $wpdb->prepare("
-				SELECT ID
-				FROM $wpdb->posts
-				WHERE post_title = %s
-					AND post_type = %s
-			", $page_title, $post_type);
+                SELECT 
+                    ID,
+                    post_status
+                FROM $wpdb->posts
+                WHERE post_title = %s
+                    AND post_type = %s
+            ", $page_title, $post_type);
         }
-        $page = $wpdb->get_var($sql);
+        $page = $wpdb->get_row($sql);
         if ($page) {
-            return get_post($page, $output);
+            // return get_post($page, $output);
+            return $page;
         }
         return null;
     }
@@ -258,7 +263,7 @@ class Esakip_Functions
             $custom_post->custom_url = $options['custom_url'];
         }
         if (!empty($options['no_key'])) {
-            $link = get_permalink($custom_post);
+            $link = get_permalink($custom_post->ID);
         } else {
             $link = $this->get_link_post($custom_post);
         }

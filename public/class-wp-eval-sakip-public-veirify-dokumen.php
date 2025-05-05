@@ -57,6 +57,15 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-list-pegawai-laporan-pk.php';
     }
 
+    public function detail_laporan_rhk($atts)
+    {
+        // untuk disable render shortcode di halaman edit page/post
+        if (!empty($_GET) && !empty($_GET['POST'])) {
+            return '';
+        }
+        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/monev-kinerja/wp-eval-sakip-detail-laporan-rhk-pegawai.php';
+    }
+
     public function get_data_pengaturan_menu()
     {
         global $wpdb;
@@ -1984,7 +1993,6 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                     ", $satker_id . '%', $_POST['tahun_anggaran']),
                     ARRAY_A
                 );
-
                 if (!empty($data_pegawai)) {
                     foreach ($data_pegawai as $v_1) {
                         if (
@@ -2007,6 +2015,13 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                 $detail_laporan_pk = $this->functions->generatePage(array(
                     'nama_page'   => 'Halaman Detail Laporan PK ' . $_POST['tahun_anggaran'],
                     'content'     => '[detail_laporan_pk tahun=' . $_POST['tahun_anggaran'] . ']',
+                    'show_header' => 1,
+                    'post_status' => 'private'
+                ));
+
+                $detail_laporan_rhk = $this->functions->generatePage(array(
+                    'nama_page'   => 'Halaman Detail Laporan RHK ' . $_POST['tahun_anggaran'],
+                    'content'     => '[detail_laporan_rhk tahun=' . $_POST['tahun_anggaran'] . ']',
                     'show_header' => 1,
                     'post_status' => 'private'
                 ));
@@ -2073,7 +2088,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                     $tbody .= "<td class='text-left' title='Halaman Detail Perjanjian Kinerja'><a href='" . $detail_laporan_pk['url'] . "&id_skpd=" . $unit['id_skpd'] . "&nip=" . $v_pgw['nip_baru'] . "&satker_id=" . $v_pgw['satker_id'] . "' target='_blank'>" . $v_pgw['nip_baru'] . "</a></td>";
                     $tbody .= "<td class='text-left'>" . $v_pgw['nama_pegawai'] . "</td>";
                     $tbody .= "<td class='text-left'>" . $v_pgw['jabatan'] . "</td>";
-                    $tbody .= "<td class='text-center'>" . $count_rhk . "</td>";
+                    $tbody .= "<td class='text-center' title='Halaman Detail Rencana Hasil Kerja'><a href='" . $detail_laporan_rhk['url'] . "&id_skpd=" . $unit['id_skpd'] . "&nip=" . $v_pgw['nip_baru'] . "&satker_id=" . $v_pgw['satker_id'] . "' target='_blank'>" . $count_rhk . "</a></td>";
                     $tbody .= "<td class='text-center'>" . $count_finalisasi . "</td>";
                     $tbody .= "</tr>";
                 }

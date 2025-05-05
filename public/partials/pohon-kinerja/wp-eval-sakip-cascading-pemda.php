@@ -161,6 +161,7 @@ $data_temp = [''];
             type: 'POST',
             data: {
                 action: 'get_table_cascading',
+                api_key: esakip.api_key,
                 id_jadwal: <?php echo $input['periode']; ?>,
             },
             dataType: 'json',

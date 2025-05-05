@@ -87,7 +87,7 @@ $pihak_pertama = array(
     'nama_pegawai'         => $data_pegawai_1['nama_pegawai'] ?? '-',
     'nip_pegawai'          => $data_pegawai_1['nip_baru'] ?? '-',
     'bidang_pegawai'       => $data_pegawai_1['nama_bidang'] ?? '-',
-    'jabatan_pegawai'      => $data_pegawai_1['jabatan'] . ' ' . $data_pegawai_1['nama_bidang'] ?? '',
+    'jabatan_pegawai'      => $data_pegawai_1['jabatan'] . '<br>' . $data_pegawai_1['nama_bidang'] ?? '',
     'pangkat'              => $data_pegawai_1['pangkat'] ?? '-',
     'gelar_depan'          => $data_pegawai_1['gelar_depan'] ?? '',
     'gelar_belakang'       => $data_pegawai_1['gelar_belakang'] ?? '',
@@ -152,7 +152,7 @@ if (
 
     $data_atasan = [
         'nama_pegawai'  => $nama_kepala_daerah,
-        'jabatan'       => $jabatan_kepala . ' ' . $pemda,
+        'jabatan'       => $jabatan_kepala . '<br>' . $pemda,
         'status_kepala' => 'kepala_daerah'
     ];
 }
@@ -257,7 +257,7 @@ if (!empty($data_atasan)) {
         $pihak_kedua['pangkat']         = $data_pegawai_2['pangkat'] ?? '-';
         $pihak_kedua['gelar_depan']     = $data_pegawai_2['gelar_depan'] ?? '';
         $pihak_kedua['gelar_belakang']  = $data_pegawai_2['gelar_belakang'] ?? '';
-        $pihak_kedua['jabatan_pegawai'] = $data_pegawai_2['jabatan'] . ' ' . $data_pegawai_2['nama_bidang'] ?? '-';
+        $pihak_kedua['jabatan_pegawai'] = $data_pegawai_2['jabatan'] . '<br>' . $data_pegawai_2['nama_bidang'] ?? '-';
     }
 } else {
     $pihak_kedua = array(
@@ -1358,7 +1358,7 @@ if ($data_tahapan) {
         //Pihak Kedua Status (PJ/PLT/PLH)
         let input_status_jabatan_kedua = "";
         if (cek_status_jabatan_kepala_pihak_kedua == 1) {
-            input_status_jabatan_kedua = window.prompt("Harap isi status jabatan (PJ, PLT, PLH) atas nama " + nama_pihak_kedua + " sebagai pihak kedua!");
+            input_status_jabatan_kedua = window.prompt("Harap isi status jabatan (PJ, PLT, PLH) atas nama " + nama_pihak_kedua + " sebagai pihak kedua!", 'PLT');
         }
 
         if (input_status_jabatan_kedua !== null && input_status_jabatan_kedua.trim() !== "") {

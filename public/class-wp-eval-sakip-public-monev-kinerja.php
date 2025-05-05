@@ -6193,6 +6193,223 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		die(json_encode($ret));
 	}
 
+	function get_rencana_pagu_rhk($opsi){
+		global $wpdb;
+		$ids = implode(',', $opsi['ids']);
+		$opsi['data_ind'] = array();
+		$opsi['total'] = 0;
+		$data_rhk_child = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT 
+					*
+				FROM esakip_data_rencana_aksi_opd 
+				WHERE parent IN ($ids) 
+				  	AND level = %d 
+				  	AND id_skpd = %d
+				  	AND active = 1
+				ORDER BY kode_cascading_program, 
+					kode_cascading_kegiatan, 
+					kode_cascading_sub_kegiatan
+			", $opsi['level'] + 1, $opsi['id_skpd']),
+			ARRAY_A
+		);
+
+		$jenis_level = array(
+			'1' => 'sasaran',
+			'2' => 'program',
+			'3' => 'kegiatan',
+			'4' => 'sub_kegiatan'
+		);
+		$no = 1;
+		if (!empty($data_rhk_child)) {
+			foreach ($data_rhk_child as $v_rhk_child) {
+				$index = $v_rhk_child['kode_cascading_program'].$v_rhk_child['kode_cascading_kegiatan'].$v_rhk_child['kode_cascading_sub_kegiatan'];
+				$opsi['data_ind'][$v_rhk_child['id']] = array();
+				if (empty($opsi['data_anggaran'][$jenis_level[$v_rhk_child['level']]][$index])) {
+					$opsi['data_anggaran'][$jenis_level[$v_rhk_child['level']]][$index] = array(
+						'ids' => array(),
+						'sumber_dana' => array(),
+						'total' => 0,
+						'data' => array()
+					);
+				}
+
+				$rencana_pagu = 0;
+				$sumber_dana = array();
+				if ($v_rhk_child['level'] == '4') {
+					$data_indikator_anggaran = $wpdb->get_results(
+						$wpdb->prepare("
+							SELECT
+								id,
+								rencana_pagu
+							FROM esakip_data_rencana_aksi_indikator_opd 
+							WHERE id_renaksi=%d 
+								AND active = 1
+						", $v_rhk_child['id']),
+						ARRAY_A
+					);
+					if (!empty($data_indikator_anggaran)) {
+						foreach ($data_indikator_anggaran as $v_indikator_anggaran) {
+							$rencana_pagu += $v_indikator_anggaran['rencana_pagu'];
+							$opsi['data_ind'][$v_rhk_child['id']][$v_indikator_anggaran['id']] = $v_indikator_anggaran;
+							$data_sumber_dana = $wpdb->get_results(
+								$wpdb->prepare("
+									SELECT 
+										nama_dana
+									FROM esakip_sumber_dana_indikator 
+									WHERE id_indikator = %d 
+										AND active = 1
+								", $v_indikator_anggaran['id']),
+								ARRAY_A
+							);
+							if (!empty($data_sumber_dana)) {
+								foreach ($data_sumber_dana as $sd) {
+									$sumber_dana[$sd['nama_dana']] = $sd['nama_dana'];
+								}
+							}
+						}
+					}
+				} else if ($v_rhk_child['level'] == '3') {
+					$rhk_lv_4 = $wpdb->get_results(
+						$wpdb->prepare("
+							SELECT 
+								id
+							FROM esakip_data_rencana_aksi_opd 
+							WHERE parent = %d 
+							  AND level = %d 
+							  AND id_skpd = %d
+							  AND active = 1
+							ORDER BY kode_cascading_sub_kegiatan
+						", $v_rhk_child['id'], 4, $opsi['id_skpd']),
+						ARRAY_A
+					);
+					if (!empty($rhk_lv_4)) {
+						foreach ($rhk_lv_4 as $v_rhk_child_4) {
+							$data_indikator_anggaran = $wpdb->get_results(
+								$wpdb->prepare("
+									SELECT
+										id,
+										rencana_pagu
+									FROM esakip_data_rencana_aksi_indikator_opd 
+									WHERE id_renaksi=%d 
+										AND active = 1
+								", $v_rhk_child_4['id']),
+								ARRAY_A
+							);
+							if (!empty($data_indikator_anggaran)) {
+								foreach ($data_indikator_anggaran as $v_indikator_anggaran) {
+									$rencana_pagu += $v_indikator_anggaran['rencana_pagu'];
+									$opsi['data_ind'][$v_rhk_child['id']][$v_indikator_anggaran['id']] = $v_indikator_anggaran;
+									$data_sumber_dana = $wpdb->get_results(
+										$wpdb->prepare("
+											SELECT 
+												nama_dana
+											FROM esakip_sumber_dana_indikator 
+											WHERE id_indikator = %d 
+												AND active = 1
+										", $v_indikator_anggaran['id']),
+										ARRAY_A
+									);
+									if (!empty($data_sumber_dana)) {
+										foreach ($data_sumber_dana as $sd) {
+											$sumber_dana[$sd['nama_dana']] = $sd['nama_dana'];
+										}
+									}
+								}
+							}
+						}
+					}
+				} else if ($v_rhk_child['level'] == '2') {
+					$rhk_lv_3 = $wpdb->get_results(
+						$wpdb->prepare("
+							SELECT 
+								id
+							FROM esakip_data_rencana_aksi_opd 
+							WHERE parent = %d 
+							  AND level = %d 
+							  AND id_skpd = %d
+							  AND active = 1
+							ORDER BY kode_cascading_sub_kegiatan
+						", $v_rhk_child['id'], 3, $opsi['id_skpd']),
+						ARRAY_A
+					);
+					if (!empty($rhk_lv_3)) {
+						foreach ($rhk_lv_3 as $v_rhk_child_3) {
+							$rhk_lv_4 = $wpdb->get_results(
+								$wpdb->prepare("
+									SELECT 
+										id
+									FROM esakip_data_rencana_aksi_opd 
+									WHERE parent = %d 
+									AND level = %d 
+									AND id_skpd = %d
+									AND active = 1
+									ORDER BY kode_cascading_sub_kegiatan
+								", $v_rhk_child_3['id'], 4, $opsi['id_skpd']),
+								ARRAY_A
+							);
+							if (!empty($rhk_lv_4)) {
+								foreach ($rhk_lv_4 as $v_rhk_child_4) {
+									$data_indikator_anggaran = $wpdb->get_results(
+										$wpdb->prepare("
+											SELECT
+												id,
+												rencana_pagu
+											FROM esakip_data_rencana_aksi_indikator_opd 
+											WHERE id_renaksi=%d 
+												AND active = 1
+										", $v_rhk_child_4['id']),
+										ARRAY_A
+									);
+									if (!empty($data_indikator_anggaran)) {
+										foreach ($data_indikator_anggaran as $v_indikator_anggaran) {
+											$rencana_pagu += $v_indikator_anggaran['rencana_pagu'];
+											$opsi['data_ind'][$v_rhk_child['id']][$v_indikator_anggaran['id']] = $v_indikator_anggaran;
+											$data_sumber_dana = $wpdb->get_results(
+												$wpdb->prepare("
+													SELECT 
+														nama_dana
+													FROM esakip_sumber_dana_indikator 
+													WHERE id_indikator = %d 
+														AND active = 1
+												", $v_indikator_anggaran['id']),
+												ARRAY_A
+											);
+											if (!empty($data_sumber_dana)) {
+												foreach ($data_sumber_dana as $sd) {
+													$sumber_dana[$sd['nama_dana']] = $sd['nama_dana'];
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				$opsi['data_anggaran'][$jenis_level[$v_rhk_child['level']]][$index]['data'][] = array(
+					'nama'           => $v_rhk_child['label_cascading_' . $jenis_level[$v_rhk_child['level']]],
+					'kode'           => $v_rhk_child['kode_cascading_' . $jenis_level[$v_rhk_child['level']]],
+					'sumber_dana'    => implode(', ', $sumber_dana),
+					'total_anggaran' => $rencana_pagu,
+					'urut' 			 => $opsi['no_urut_rhk'],
+					'id' 			 => $v_rhk_child['id']
+				);
+
+				$opsi['data_anggaran'][$jenis_level[$v_rhk_child['level']]][$index]['ids'][] = $v_rhk_child['id'];
+				$opsi['data_anggaran'][$jenis_level[$v_rhk_child['level']]][$index]['total'] += $rencana_pagu;
+				$opsi['total'] += $rencana_pagu;
+
+				foreach($sumber_dana as $sd){
+					if(!in_array($sd, $opsi['data_anggaran'][$jenis_level[$v_rhk_child['level']]][$index]['sumber_dana'])){
+						$opsi['data_anggaran'][$jenis_level[$v_rhk_child['level']]][$index]['sumber_dana'][$sd] = $sd;
+					}
+				}
+			}
+		}
+		return $opsi;
+	}
+
 	function get_pk_html($options)
 	{
 		global $wpdb;
@@ -6202,6 +6419,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			'html_program' => '',
 			'html_kegiatan' => '',
 			'html_sub_kegiatan' => '',
+			'rhk_unik' => array(),
 			'error_msg' => array()
 		);
 		$id_skpd = $options['id_skpd'];
@@ -6233,7 +6451,19 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		);
 		$no_2 = 0;
 		if (!empty($data_ploting_rhk)) {
+			// cek apakah ada RHK yang double
 			foreach ($data_ploting_rhk as $v_rhk) {
+				$id_unik = strtolower(trim($v_rhk['label']));
+				if(empty($ret['rhk_unik'][$id_unik])){
+					$ret['rhk_unik'][$id_unik] = array(
+						'ids' => array(),
+						'indikator' => array(),
+						'data' => array()
+					);
+				}
+				$ret['rhk_unik'][$id_unik]['ids'][] = $v_rhk['id'];
+				$ret['rhk_unik'][$id_unik]['data'][] = $v_rhk;
+
 				$data_indikator_ploting_rhk = $wpdb->get_results(
 					$wpdb->prepare("
 						SELECT
@@ -6248,6 +6478,31 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					", $v_rhk['id']),
 					ARRAY_A
 				);
+				if (!empty($data_indikator_ploting_rhk)) {
+					foreach ($data_indikator_ploting_rhk as $index => $v_indikator) {
+						$id_unik_indikator = strtolower(trim($v_indikator['indikator']).trim($v_indikator['target_akhir']).trim($v_indikator['satuan']));
+						if(empty($ret['rhk_unik'][$id_unik]['indikator'][$id_unik_indikator])){
+							$ret['rhk_unik'][$id_unik]['indikator'][$id_unik_indikator] = array(
+								'ids' => array(),
+								'data' => array()
+							);
+						}
+						$ret['rhk_unik'][$id_unik]['indikator'][$id_unik_indikator]['ids'][] = $v_indikator['id'];
+						$ret['rhk_unik'][$id_unik]['indikator'][$id_unik_indikator]['data'][] = $v_indikator;
+					}
+				}
+			}
+			// print_r($ret['rhk_unik']); die();
+
+			foreach ($ret['rhk_unik'] as $v) {
+				$v_rhk = $v['data'][0];
+				$v_rhk['id'] = implode('|', $v['ids']);
+				$data_indikator_ploting_rhk = array();
+				foreach($v['indikator'] as $vv){
+					$indikator = $vv['data'][0];
+					$indikator['id'] = implode('|', $vv['ids']);
+					$data_indikator_ploting_rhk[] = $indikator;
+				}
 
 				$html_indikator = '';
 				$p_i = count($data_indikator_ploting_rhk);
@@ -6255,7 +6510,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 				if (!empty($data_indikator_ploting_rhk)) {
 					foreach ($data_indikator_ploting_rhk as $index => $v_indikator) {
-						$html_indikator .= '<tr id-indikator="' . $v_indikator['id'] . '">';
+						$html_indikator .= '<tr id-rhk="'.$v_rhk['id'].'" id-indikator="' . $v_indikator['id'] . '">';
 
 						if ($index === 0) {
 							$rowspan = $p_i > 1 ? 'rowspan="' . $p_i . '"' : '';
@@ -6268,7 +6523,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$html_indikator .= '</tr>';
 					}
 				} else {
-					$html_indikator .= '<tr>
+					$html_indikator .= '<tr id-rhk="'.$v_rhk['id'].'">
 						<td class="text-center">' . $no_2 . '</td>
 						<td class="text-left">' . $v_rhk['label'] . '</td>
 						<td></td>
@@ -6278,226 +6533,47 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 				$ret['html_sasaran'] .= $html_indikator;
 
-				$data_rhk_child = $wpdb->get_results(
-					$wpdb->prepare("
-						SELECT *
-						FROM esakip_data_rencana_aksi_opd 
-						WHERE parent = %d 
-						  AND level = %d 
-						  AND id_skpd = %d
-						  AND active = 1
-						ORDER BY kode_cascading_sub_kegiatan
-					", $v_rhk['id'], $v_rhk['level'] + 1, $id_skpd),
-					ARRAY_A
-				);
-
-				$jenis_level = array(
-					'1' => 'sasaran',
-					'2' => 'program',
-					'3' => 'kegiatan',
-					'4' => 'sub_kegiatan'
-				);
-				$no = 1;
-				if (!empty($data_rhk_child)) {
-					foreach ($data_rhk_child as $v_rhk_child) {
-						if (empty($data_anggaran[$jenis_level[$v_rhk_child['level']]][$v_rhk_child['kode_cascading_sub_kegiatan']])) {
-							$data_anggaran[$jenis_level[$v_rhk_child['level']]][$v_rhk_child['kode_cascading_sub_kegiatan']] = array();
-						}
-
-						$rencana_pagu = 0;
-						$sumber_dana = array();
-						if ($v_rhk_child['level'] == '4') {
-							$data_indikator_anggaran = $wpdb->get_results(
-								$wpdb->prepare("
-									SELECT
-										id,
-										rencana_pagu
-									FROM esakip_data_rencana_aksi_indikator_opd 
-									WHERE id_renaksi=%d 
-										AND active = 1
-								", $v_rhk_child['id']),
-								ARRAY_A
-							);
-							if (!empty($data_indikator_anggaran)) {
-								foreach ($data_indikator_anggaran as $v_indikator_anggaran) {
-									$rencana_pagu += $v_indikator_anggaran['rencana_pagu'];
-									$data_sumber_dana = $wpdb->get_results(
-										$wpdb->prepare("
-											SELECT 
-												nama_dana
-											FROM esakip_sumber_dana_indikator 
-											WHERE id_indikator = %d 
-												AND active = 1
-										", $v_indikator_anggaran['id']),
-										ARRAY_A
-									);
-									if (!empty($data_sumber_dana)) {
-										foreach ($data_sumber_dana as $sd) {
-											$sumber_dana[$sd['nama_dana']] = $sd['nama_dana'];
-										}
-									}
-								}
-							}
-						} else if ($v_rhk_child['level'] == '3') {
-							$rhk_lv_4 = $wpdb->get_results(
-								$wpdb->prepare("
-									SELECT 
-										id
-									FROM esakip_data_rencana_aksi_opd 
-									WHERE parent = %d 
-									  AND level = %d 
-									  AND id_skpd = %d
-									  AND active = 1
-									ORDER BY kode_cascading_sub_kegiatan
-								", $v_rhk_child['id'], 4, $id_skpd),
-								ARRAY_A
-							);
-							if (!empty($rhk_lv_4)) {
-								foreach ($rhk_lv_4 as $v_rhk_child_4) {
-									$data_indikator_anggaran = $wpdb->get_results(
-										$wpdb->prepare("
-											SELECT
-												id,
-												rencana_pagu
-											FROM esakip_data_rencana_aksi_indikator_opd 
-											WHERE id_renaksi=%d 
-												AND active = 1
-										", $v_rhk_child_4['id']),
-										ARRAY_A
-									);
-									if (!empty($data_indikator_anggaran)) {
-										foreach ($data_indikator_anggaran as $v_indikator_anggaran) {
-											$rencana_pagu += $v_indikator_anggaran['rencana_pagu'];
-											$data_sumber_dana = $wpdb->get_results(
-												$wpdb->prepare("
-													SELECT 
-														nama_dana
-													FROM esakip_sumber_dana_indikator 
-													WHERE id_indikator = %d 
-														AND active = 1
-												", $v_indikator_anggaran['id']),
-												ARRAY_A
-											);
-											if (!empty($data_sumber_dana)) {
-												foreach ($data_sumber_dana as $sd) {
-													$sumber_dana[$sd['nama_dana']] = $sd['nama_dana'];
-												}
-											}
-										}
-									}
-								}
-							}
-						} else if ($v_rhk_child['level'] == '2') {
-							$rhk_lv_3 = $wpdb->get_results(
-								$wpdb->prepare("
-									SELECT 
-										id
-									FROM esakip_data_rencana_aksi_opd 
-									WHERE parent = %d 
-									  AND level = %d 
-									  AND id_skpd = %d
-									  AND active = 1
-									ORDER BY kode_cascading_sub_kegiatan
-								", $v_rhk_child['id'], 3, $id_skpd),
-								ARRAY_A
-							);
-							if (!empty($rhk_lv_3)) {
-								foreach ($rhk_lv_3 as $v_rhk_child_3) {
-									$rhk_lv_4 = $wpdb->get_results(
-										$wpdb->prepare("
-											SELECT 
-												id
-											FROM esakip_data_rencana_aksi_opd 
-											WHERE parent = %d 
-											AND level = %d 
-											AND id_skpd = %d
-											AND active = 1
-											ORDER BY kode_cascading_sub_kegiatan
-										", $v_rhk_child_3['id'], 4, $id_skpd),
-										ARRAY_A
-									);
-									if (!empty($rhk_lv_4)) {
-										foreach ($rhk_lv_4 as $v_rhk_child_4) {
-											$data_indikator_anggaran = $wpdb->get_results(
-												$wpdb->prepare("
-													SELECT
-														id,
-														rencana_pagu
-													FROM esakip_data_rencana_aksi_indikator_opd 
-													WHERE id_renaksi=%d 
-														AND active = 1
-												", $v_rhk_child_4['id']),
-												ARRAY_A
-											);
-											if (!empty($data_indikator_anggaran)) {
-												foreach ($data_indikator_anggaran as $v_indikator_anggaran) {
-													$rencana_pagu += $v_indikator_anggaran['rencana_pagu'];
-													$data_sumber_dana = $wpdb->get_results(
-														$wpdb->prepare("
-															SELECT 
-																nama_dana
-															FROM esakip_sumber_dana_indikator 
-															WHERE id_indikator = %d 
-																AND active = 1
-														", $v_indikator_anggaran['id']),
-														ARRAY_A
-													);
-													if (!empty($data_sumber_dana)) {
-														foreach ($data_sumber_dana as $sd) {
-															$sumber_dana[$sd['nama_dana']] = $sd['nama_dana'];
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-						$data_anggaran[$jenis_level[$v_rhk_child['level']]][$v_rhk_child['kode_cascading_sub_kegiatan']][] = array(
-							'nama'           => $v_rhk_child['label_cascading_' . $jenis_level[$v_rhk_child['level']]],
-							'kode'           => $v_rhk_child['kode_cascading_' . $jenis_level[$v_rhk_child['level']]],
-							'sumber_dana'    => implode(', ', $sumber_dana),
-							'total_anggaran' => $rencana_pagu,
-							'urut' 			 => $no_2,
-							'id' 			 => $v_rhk_child['id']
-						);
-					}
-				}
+				$anggaran = $this->get_rencana_pagu_rhk(array(
+					'ids' => $v['ids'],
+					'level' => $v_rhk['level'],
+					'id_skpd' => $id_skpd,
+					'data_anggaran' => $data_anggaran,
+					'no_urut_rhk' => $no_2
+				));
+				$data_anggaran = $anggaran['data_anggaran'];
 			}
 
 			$cek_urut = 0;
 			foreach ($data_anggaran as $jenis => $cascading) {
 				foreach ($cascading as $multi_cascading) {
-					foreach ($multi_cascading as $v) {
-						if ($cek_urut != $v['urut']) {
-							$cek_urut = $v['urut'];
-							$no_cascading = 0;
-						}
-						$no_cascading++;
-						if ($jenis == 'program') {
-							$ret['html_program'] .= '<tr data-id="' . $v['id'] . '">
-								<td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
-								<td class="text-left">' . $v['kode'] . ' ' . $v['nama'] . '</td>
-								<td class="text-right">' . number_format($v['total_anggaran'], 0, ",", ".") . '</td>
-								<td class="text-left">' . $v['sumber_dana'] . '</td>
-							</tr>';
-						} else if ($jenis == 'kegiatan') {
-							$ret['html_kegiatan'] .= '<tr data-id="' . $v['id'] . '">
-								<td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
-								<td class="text-left">' . $v['kode'] . ' ' . $v['nama'] . '</td>
-								<td class="text-right">' . number_format($v['total_anggaran'], 0, ",", ".") . '</td>
-								<td class="text-left">' . $v['sumber_dana'] . '</td>
-							</tr>';
-						} else if ($jenis == 'sub_kegiatan') {
-							$parts = explode(" ", $v['nama'], 2);
-							$ret['html_sub_kegiatan'] .= '<tr data-id="' . $v['id'] . '">
-								<td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
-								<td class="text-left">' . $v['kode'] . ' ' . $parts[1] . '</td>
-								<td class="text-right">' . number_format($v['total_anggaran'], 0, ",", ".") . '</td>
-								<td class="text-left">' . $v['sumber_dana'] . '</td>
-							</tr>';
-						}
+					$v = $multi_cascading['data'][0];
+					if ($cek_urut != $v['urut']) {
+						$cek_urut = $v['urut'];
+						$no_cascading = 0;
+					}
+					$no_cascading++;
+					if ($jenis == 'program') {
+						$ret['html_program'] .= '<tr data-id="' . implode('|', $multi_cascading['ids']) . '">
+							<td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
+							<td class="text-left">' . $v['kode'] . ' ' . $v['nama'] . '</td>
+							<td class="text-right">' . number_format($multi_cascading['total'], 0, ",", ".") . '</td>
+							<td class="text-left">' . implode(', ', $multi_cascading['sumber_dana']) . '</td>
+						</tr>';
+					} else if ($jenis == 'kegiatan') {
+						$ret['html_kegiatan'] .= '<tr data-id="' . implode('|', $multi_cascading['ids']) . '">
+							<td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
+							<td class="text-left">' . $v['kode'] . ' ' . $v['nama'] . '</td>
+							<td class="text-right">' . number_format($multi_cascading['total'], 0, ",", ".") . '</td>
+							<td class="text-left">' . implode(', ', $multi_cascading['sumber_dana']) . '</td>
+						</tr>';
+					} else if ($jenis == 'sub_kegiatan') {
+						$parts = explode(" ", $v['nama'], 2);
+						$ret['html_sub_kegiatan'] .= '<tr data-id="' . implode('|', $multi_cascading['ids']) . '">
+							<td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
+							<td class="text-left">' . $v['kode'] . ' ' . $parts[1] . '</td>
+							<td class="text-right">' . number_format($multi_cascading['total'], 0, ",", ".") . '</td>
+							<td class="text-left">' . implode(', ', $multi_cascading['sumber_dana']) . '</td>
+						</tr>';
 					}
 				}
 			}
@@ -7670,4 +7746,267 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		
 		return $html_label_pokin;
 	}
+
+	function get_table_laporan_rencana_aksi() {
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data rencana aksi!',
+			'data'  => ''
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (empty($_POST['id_skpd'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID OPD tidak boleh kosong!';
+				} elseif (empty($_POST['tahun_anggaran'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
+				} elseif (empty($_POST['nip'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'NIP kosong!';
+				} elseif (empty($_POST['satker_id'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Satker ID kosong!';
+				} elseif (empty($_POST['level'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Level kosong!';
+				}
+
+				if ($ret['status'] != 'error') {
+					$data = $wpdb->get_results($wpdb->prepare("
+						SELECT 
+							* 
+						FROM esakip_data_rencana_aksi_opd
+						WHERE id_skpd = %d
+						  AND tahun_anggaran = %d
+						  AND nip = %s
+						  AND satker_id = %s
+						  AND level = %d
+						  AND active = 1
+					", $_POST['id_skpd'], $_POST['tahun_anggaran'], $_POST['nip'], $_POST['satker_id'], $_POST['level'])
+					, ARRAY_A);
+
+					foreach ($data as $key => $val) {
+						$id = $val['id'];
+						$level = $val['level'];
+
+						$data[$key]['indikator'] = $wpdb->get_results($wpdb->prepare("
+							SELECT 
+								* 
+							FROM esakip_data_rencana_aksi_indikator_opd
+							WHERE id_renaksi = %d 
+								AND active = 1
+						", $id));
+
+						// Ambil level 3 jika level 4
+						if ($level >= 4) {
+							$parent_id_3 = $wpdb->get_var($wpdb->prepare("
+								SELECT 
+									parent 
+								FROM esakip_data_rencana_aksi_opd
+								WHERE id = %d
+							", $id));
+
+							if ($parent_id_3) {
+								$parent_3 = $wpdb->get_row($wpdb->prepare("
+										SELECT 
+											* 
+										FROM esakip_data_rencana_aksi_opd
+										WHERE id = %d AND level = 3 
+											AND active = 1
+								", $parent_id_3));
+								if ($parent_3) {
+									$data[$key]['parent_level_3'] = $parent_3;
+									$data[$key]['parent_level_3_indikator'] = $wpdb->get_results($wpdb->prepare("
+										SELECT 
+											* 
+										FROM esakip_data_rencana_aksi_indikator_opd
+										WHERE id_renaksi = %d 
+											AND active = 1
+									", $parent_3->id));
+									$id = $parent_3->id;
+								}
+							}
+						}
+
+						// Ambil level 2 jika level 3
+						if ($level >= 3 && $id) {
+							$parent_id_2 = $wpdb->get_var($wpdb->prepare("
+								SELECT 
+									parent 
+								FROM esakip_data_rencana_aksi_opd
+								WHERE id = %d
+							", $id));
+
+							if ($parent_id_2) {
+								$parent_2 = $wpdb->get_row($wpdb->prepare("
+									SELECT 
+										* 
+									FROM esakip_data_rencana_aksi_opd
+									WHERE id = %d 
+										AND level = 2 
+										AND active = 1
+								", $parent_id_2));
+								if ($parent_2) {
+									$data[$key]['parent_level_2'] = $parent_2;
+									$data[$key]['parent_level_2_indikator'] = $wpdb->get_results($wpdb->prepare("
+										SELECT 
+											* 
+										FROM esakip_data_rencana_aksi_indikator_opd
+										WHERE id_renaksi = %d 
+											AND active = 1
+									", $parent_2->id));
+									$id = $parent_2->id;
+								}
+							}
+						}
+
+						// Ambil level 1 jika level 2
+						if ($level >= 2 && $id) {
+							$parent_id_1 = $wpdb->get_var($wpdb->prepare("
+								SELECT 
+									parent 
+								FROM esakip_data_rencana_aksi_opd
+								WHERE id = %d
+							", $id));
+
+							if ($parent_id_1) {
+								$parent_1 = $wpdb->get_row($wpdb->prepare("
+									SELECT 
+										* 
+									FROM esakip_data_rencana_aksi_opd
+									WHERE id = %d 
+										AND level = 1 
+										AND active = 1
+								", $parent_id_1));
+								if ($parent_1) {
+									$data[$key]['parent_level_1'] = $parent_1;
+									$data[$key]['parent_level_1_indikator'] = $wpdb->get_results($wpdb->prepare("
+										SELECT 
+											* 
+										FROM esakip_data_rencana_aksi_indikator_opd
+										WHERE id_renaksi = %d 
+											AND active = 1
+									", $parent_1->id));
+									$id = $parent_1->id;
+								}
+							}
+						}
+					}
+					$html = '';
+					$no = 0;
+
+					foreach ($data_all['data'] as $level1) {
+					    $no++;
+					    $no_renaksi = 0;
+
+					    $indikator_html = [];
+					    if (!empty($level1['indikator'])) {
+					        foreach ($level1['indikator'] as $ind) {
+					            $indikator_html[] = $ind['label'] ?? '';
+					        }
+					    }
+					    $indikator_html = implode('<br>', $indikator_html);
+
+					    $html .= '
+					    <tr class="keg-utama">
+					        <td>' . $no . '</td>
+					        <td class="kiri kanan bawah text_blok kegiatan_utama">' . ($level1['detail']['label'] ?? '') . '<br>' . $indikator_html . '</td>
+					    </tr>
+					    ';
+
+					    if (!empty($level1['data'])) {
+					        foreach ($level1['data'] as $level2) {
+					            $no_renaksi++;
+					            $no_uraian_renaksi = 0;
+
+					            $indikator_html = [];
+					            if (!empty($level2['indikator'])) {
+					                foreach ($level2['indikator'] as $ind) {
+					                    $indikator_html[] = $ind['label'] ?? '';
+					                }
+					            }
+					            $indikator_html = implode('<br>', $indikator_html);
+
+					            $html .= '
+					            <tr class="re-naksi">
+					                <td>' . $no . '.' . $no_renaksi . '</td>
+					                <td class="kiri kanan bawah text_blok recana_aksi">' . ($level2['detail']['label'] ?? '') . '<br>' . $indikator_html . '</td>
+					            </tr>
+					            ';
+
+					            if (!empty($level2['data'])) {
+					                foreach ($level2['data'] as $level3) {
+					                    $no_uraian_renaksi++;
+					                    $no_uraian_teknis = 0;
+
+					                    $indikator_html = [];
+					                    if (!empty($level3['indikator'])) {
+					                        foreach ($level3['indikator'] as $ind) {
+					                            $indikator_html[] = $ind['label'] ?? '';
+					                        }
+					                    }
+					                    $indikator_html = implode('<br>', $indikator_html);
+
+					                    $html .= '
+					                    <tr class="ur-kegiatan">
+					                        <td>' . $no . '.' . $no_renaksi . '.' . $no_uraian_renaksi . '</td>
+					                        <td class="urian_renaksi">' . ($level3['detail']['label'] ?? '') . '<br>' . $indikator_html . '</td>
+					                    </tr>
+					                    ';
+
+					                    if (!empty($level3['data'])) {
+					                        foreach ($level3['data'] as $level4) {
+					                            $no_uraian_teknis++;
+
+					                            $indikator_html = [];
+					                            if (!empty($level4['indikator'])) {
+					                                foreach ($level4['indikator'] as $ind) {
+					                                    $indikator_html[] = $ind['label'] ?? '';
+					                                }
+					                            }
+					                            $indikator_html = implode('<br>', $indikator_html);
+
+					                            $html .= '
+					                            <tr class="urt-kegiatan">
+					                                <td>' . $no . '.' . $no_renaksi . '.' . $no_uraian_renaksi . '.' . $no_uraian_teknis . '</td>
+					                                <td class="uraian_teknis_kegiatan">' . ($level4['detail']['label'] ?? '') . '<br>' . $indikator_html . '</td>
+					                                <td></td>
+					                            </tr>
+					                            ';
+					                        }
+					                    }
+					                }
+					            }
+					        }
+					    }
+					}
+
+					if (empty($html)) {
+						$html = '<tr><td class="text-center" colspan="18">Data masih kosong!</td></tr>';
+					}
+					$ret['data'] = $html;
+					die(json_encode([
+						'status' => true,
+						'data' => $data,
+						'message' => 'Berhasil ambil data rencana aksi!'
+					]));
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
 }

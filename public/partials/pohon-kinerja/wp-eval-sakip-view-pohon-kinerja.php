@@ -237,11 +237,10 @@ if(!empty($data_all['data'])){
 						}
 
 			            if(!empty($level_3['data'])){
-
 		            		foreach ($level_3['data'] as $keylevel4 => $level_4) {
 			            		$data_temp[$keylevel4][0] = (object)[
 					              'v' => $level_4['id'],
-					              'f' => "<div class=\"".$style0." label4\">".trim($level_4['label'])."</div>",
+					              'f' => "<div class=\"".$style0." label4\">".trim($level_4['label'])."</div>"
 					            ];
 
 					            if(!empty($level_4['indikator'])){
@@ -277,20 +276,105 @@ if(!empty($data_all['data'])){
 
 								// data koneksi pokin
 								if(!empty($level_4['koneksi_pokin'])){
-									$data_temp[$keylevel4][0]->f.="<div class='koneksi-pokin-2 tampil_koneksi_pokin'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
 									foreach ($level_4['koneksi_pokin'] as $key_koneksi => $val_koneksi) {
+										$label_parent = $val_koneksi['label_parent'];
+										if(!empty($val_koneksi['id_level_1_parent'])){
+											if($tipe == 'opd'){
+												$data_temp[$keylevel4][0]->f.="<div class='koneksi-pokin-2 tampil_koneksi_pokin'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
+												$show_nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". ucfirst($val_koneksi['label_parent']) ."</a>";
+												$data_temp[$keylevel4][0]->f.="<div class='koneksi-pokin tampil_koneksi_pokin'><div>". $label_parent ."</div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
+											}else{
+												// sebagai tanda untuk mengexpand/collapse pokin OPD
+												$data_temp[$keylevel4][0]->f .= "<span class=\"show-hide-pokin-opd\"></span>";
+												
+												$show_nama_skpd = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank' class='btn btn-primary'>" . $val_koneksi['nama_skpd'] . "</a>";
 
-											$label_parent = $val_koneksi['label_parent'];
-											if(!empty($val_koneksi['id_level_1_parent'])){
-												if($tipe == 'opd'){
-													$show_nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>". ucfirst($val_koneksi['label_parent']) ."</a>";
-												}else{
-													$show_nama_skpd = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "</a>";
+												// tampilkan pokin OPD parent yang terkoneksi ke pemda
+												$data_temp[$val_koneksi['id_parent']][0] = (object)[
+									              'v' => $val_koneksi['id_parent'],
+									              'f' => "<div class=\"".$style0." label5 koneksi-pokin-pemda tampil_koneksi_pokin\"><div class='cros-opd'>".$show_nama_skpd."</div><div>".trim($label_parent)."</div></div>",
+									            ];
+
+									            $indikator_pohon_kinerja_opd = $wpdb->get_results($wpdb->prepare("
+													SELECT 
+														* 
+													FROM esakip_pohon_kinerja_opd 
+													WHERE parent=%d 
+														AND level=%d 
+														AND active=1 
+														AND id_jadwal=%d
+														$where_skpd
+													ORDER BY nomor_urut
+												", $val_koneksi['id_parent'], $val_koneksi['level_parent'], $input['periode']), ARRAY_A);
+									            if(!empty($indikator_pohon_kinerja_opd)){
+								            		foreach ($indikator_pohon_kinerja_opd as $indikator_opd) {
+										                $data_temp[$val_koneksi['id_parent']][0]->f.="<div ".$style5.">IK: ".$indikator_opd['label_indikator_kinerja']."</div>";
+										            }
+									            }
+												$data_temp[$val_koneksi['id_parent']][1] = $level_4['id'];
+												$data_temp[$val_koneksi['id_parent']][2] = $val_koneksi['id_parent'];
+
+												// tampilkan pokin OPD child yang terkoneksi ke pemda
+												$data_all_koneksi = array('data' => $this->get_pokin(array(
+													'id' => $val_koneksi['id_parent'],
+													'level' => $val_koneksi['level_parent']+1,
+													'periode' => $input['periode'],
+													'tipe' => 'opd',
+													'id_skpd' => $val_koneksi['id_skpd_view_pokin']
+												)));
+												if(!empty($data_all_koneksi['data'])){
+
+													foreach ($data_all_koneksi['data'] as $keylevel2opd => $level_3_opd) {
+														$data_temp[$keylevel2opd][0] = (object)[
+														  'v' => $level_3_opd['id'],
+														  'f' => "<div class=\"{$style0} label5 koneksi-pokin-pemda tampil_koneksi_pokin\">".trim($level_3_opd['label'])."</div>",
+														];
+						
+														if(!empty($level_3_opd['indikator'])){
+															foreach ($level_3_opd['indikator'] as $keyindikatorlevel5 => $indikator) {
+																$data_temp[$keylevel2opd][0]->f.="<div ".$style5." class='koneksi-pokin-pemda tampil_koneksi_pokin'>IK: ".$indikator['label_indikator_kinerja']."</div>";
+															}
+														}
+														$data_temp[$keylevel2opd][1] = $val_koneksi['id_parent'];
+														$data_temp[$keylevel2opd][2] = $level_3_opd['id'];
+
+														if(!empty($level_3_opd['data'])){
+															foreach ($level_3_opd['data'] as $keylevel3opd => $level_4_opd) {
+																$data_temp[$keylevel3opd][0] = (object)[
+																  'v' => $level_4_opd['id'],
+																  'f' => "<div class=\"{$style0} label5 koneksi-pokin-pemda tampil_koneksi_pokin\">".trim($level_4_opd['label'])."</div>",
+																];
+								
+																if(!empty($level_4_opd['indikator'])){
+																	foreach ($level_4_opd['indikator'] as $keyindikatorlevel5 => $indikator) {
+																		$data_temp[$keylevel3opd][0]->f.="<div ".$style5." class='koneksi-pokin-pemda tampil_koneksi_pokin'>IK: ".$indikator['label_indikator_kinerja']."</div>";
+																	}
+																}
+																$data_temp[$keylevel3opd][1] = $level_3_opd['id'];
+																$data_temp[$keylevel3opd][2] = $level_4_opd['id'];
+
+																if(!empty($level_4_opd['data'])){
+																	foreach ($level_4_opd['data'] as $keylevel4opd => $level_5_opd) {
+																		$data_temp[$keylevel4opd][0] = (object)[
+																		  'v' => $level_5_opd['id'],
+																		  'f' => "<div class=\"{$style0} label5 koneksi-pokin-pemda tampil_koneksi_pokin\">".trim($level_5_opd['label'])."</div>",
+																		];
+										
+																		if(!empty($level_5_opd['indikator'])){
+																			foreach ($level_5_opd['indikator'] as $keyindikatorlevel5 => $indikator) {
+																				$data_temp[$keylevel4opd][0]->f.="<div ".$style5." class='koneksi-pokin-pemda tampil_koneksi_pokin'>IK: ".$indikator['label_indikator_kinerja']."</div>";
+																			}
+																		}
+																		$data_temp[$keylevel4opd][1] = $level_4_opd['id'];
+																		$data_temp[$keylevel4opd][2] = $level_5_opd['id'];
+																	}
+																}
+															}
+														}
+													}
 												}
 											}
-											
-											// <a href='javascript:void(0)' data-id='". $val_koneksi['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>
-											$data_temp[$keylevel4][0]->f.="<div class='koneksi-pokin tampil_koneksi_pokin'><div>". $label_parent ."</div><div class='cros-opd'>".$show_nama_skpd."</div></div>";
+										}
 									}
 								}
 
@@ -559,12 +643,23 @@ if(!empty($data_all['data'])){
 		background: #FDFFB6;
 	}
 
+
 	.koneksi-pokin-2 {
 		color: #0d0909; 
   		font-size:13px; 
   		font-weight:600; 
   		padding:10px; 
 		background: #FDFFB6;
+	}
+	
+	.koneksi-pokin-pemda {
+		color: #0d0909; 
+  		font-size:12px; 
+  		font-weight:600;
+  		font-style:italic; 
+  		padding:10px; 
+  		min-height:70px;
+		background: #28a745;
 	}
 
 	.tampil_koneksi_pokin {
@@ -661,11 +756,15 @@ if(!empty($data_all['data'])){
 		<li>Background warna <span class="badge" style="background: #fe7373; padding: 5px;">merah tua</span> adalah baris level ke 2</li>
 		<li>Background warna <span class="badge" style="background: #57b2ec; padding: 5px;">biru tua</span> adalah baris level ke 3</li>
 		<li>Background warna <span class="badge" style="background: #c979e3; padding: 5px;">ungu tua</span> adalah baris level ke 4</li>
+	<?php if($tipe == 'opd'): ?>
 		<li>Background warna <span class="badge" style="background: #28a745; padding: 5px;">hijau</span> adalah baris level ke 5</li>
 		<li>Background warna <span class="badge" style="background: #b5d9ea; padding: 5px;">abu-abu</span> adalah baris indikator</li>
 		<li>Background warna <span class="badge" style="background: #FDFFB6; padding: 5px;">kuning</span> adalah baris koneksi pokin dengan pemda</li>
 		<li>Background warna <span class="badge" style="background: #FFC6FF; padding: 5px;">ungu</span> adalah baris croscutting</li>
 		<li>Background warna <span class="badge" style="background: #9BF6FF; padding: 5px;">hijau tosca</span> adalah baris croscutting dari perangkat daerah lain</li>
+	<?php else: ?>
+		<li>Background warna <span class="badge" style="background: #28a745; padding: 5px;">hijau</span> adalah baris POKIN perangkat daerah yang terkoneksi ke POKIN Pemda</li>
+	<?php endif; ?>
 	</ul>
 </div>
 
@@ -717,12 +816,22 @@ jQuery("#show_croscutting").on('click', function(){
 <?php endif; ?>
 
 jQuery("#show_koneksi_pokin_pemda").on('click', function(){
+	var collapse = false;
+	if(this.checked) {
+		console.log("muncul");
+	}else{
+		console.log("tutup");
+		collapse = true;
+	}
+	data_all.map(function(b, i){
+    	if(b[0].f.indexOf('show-hide-pokin-opd') != -1){
+    		chart.collapse(i, collapse);
+    	}
+    });
 	if(this.checked) {
 		jQuery(".tampil_koneksi_pokin").show();
-		console.log("harusnya muncul");
 	}else{
 		jQuery(".tampil_koneksi_pokin").hide();
-		console.log("harusnya tutup");
 	}
 });
 
@@ -742,6 +851,12 @@ function drawChart() {
     chart.draw(data, {
       'allowHtml':true,
       'allowCollapse': true
+    });
+
+    data_all.map(function(b, i){
+    	if(b[0].f.indexOf('show-hide-pokin-opd') != -1){
+    		chart.collapse(i, true);
+    	}
     });
 }
 

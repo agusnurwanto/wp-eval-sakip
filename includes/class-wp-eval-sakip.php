@@ -678,6 +678,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_nopriv_get_datatable_cascading_publish',  $plugin_public, 'get_datatable_cascading_publish');
 		$this->loader->add_action('wp_ajax_get_datatable_pokin_publish',  $plugin_public, 'get_datatable_pokin_publish');
 		$this->loader->add_action('wp_ajax_nopriv_get_datatable_pokin_publish',  $plugin_public, 'get_datatable_pokin_publish');
+		
+		$this->loader->add_action('wp_ajax_get_table_laporan_rencana_aksi',  $plugin_public, 'get_table_laporan_rencana_aksi');
 
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
@@ -804,6 +806,8 @@ class Wp_Eval_Sakip {
 		add_shortcode('detail_laporan_pk', array($plugin_public, 'detail_laporan_pk'));
 		add_shortcode('halaman_laporan_pk_setting', array($plugin_public, 'halaman_laporan_pk_setting'));
 		add_shortcode('list_pegawai_laporan_pk', array($plugin_public, 'list_pegawai_laporan_pk'));
+
+		add_shortcode('detail_laporan_rhk', array($plugin_public, 'detail_laporan_rhk'));
 	}
 
 	/**
