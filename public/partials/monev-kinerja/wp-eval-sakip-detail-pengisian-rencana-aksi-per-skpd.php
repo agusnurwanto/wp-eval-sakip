@@ -1572,6 +1572,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                             } else if (tipe == 3) {
                                 jQuery("#modal-crud").find('.modal-title').html('Edit Uraian Rencana Hasil Kerja');
                                 
+                                let in_setting_dasar = '';
                                 if(response.data.input_rencana_pagu_level == 1){
                                     jQuery(".in_setting_input_rencana_pagu").show();
 
@@ -1608,7 +1609,6 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                                     jQuery('#pokin-level-1').attr('onchange', 'get_data_pokin_2(this.value, 5, "pokin-level-2", true)');
                                 }else{
                                     let selected_pokin_4 = [];
-                                    let in_setting_dasar = '';
                                     response.data.pokin_4.map(function(b) {
                                         selected_pokin_4.push(b.id);
                                     });
@@ -2150,7 +2150,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
         });
     }
 
-    function get_sub_keg_rka_wpsipd(kode_sbl) {
+    function get_sub_keg_rka_wpsipd(kode_sbl, sumber_dana) {
         return new Promise(function(resolve, reject) {
             jQuery('#wrap-loading').show();
             jQuery.ajax({
@@ -2175,6 +2175,25 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                                 width: '100%'
                             });
                         });
+                        if(sumber_dana){
+                            sumber_dana.map(function(value, index) {
+                                let id = index + 1;
+                                new Promise(function(resolve, reject) {
+                                    if (id > 1) {
+                                        tambahSumberDana()
+                                        .then(function() {
+                                            resolve(value);
+                                        });
+                                    } else {
+                                        resolve(value);
+                                    }
+                                })
+                                .then(function(value) {
+                                    jQuery("#sumber_dana_" + id).val(value.id_sumber_dana).trigger('change');
+                                    jQuery("#pagu_sumber_dana_" + id).val(value.rencana_pagu).trigger('keyup');
+                                });
+                            });
+                        }
                     } else {
                         alert("Error get data sumber dana, " + response.message);
                     }
@@ -2190,7 +2209,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
         });
     }
 
-    function tambah_indikator_rencana_aksi(id, tipe, total_pagu, set_input_rencana_pagu, kode_sbl = false) {
+    function tambah_indikator_rencana_aksi(id, tipe, total_pagu, set_input_rencana_pagu, kode_sbl = false, sumber_dana = false) {
         var title = '';
         let input_pagu = '';
         let input_sumber_dana = '';
@@ -2258,7 +2277,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                     `</div>`;
 
                 if (kode_sbl) {
-                    get_sub_keg_rka_wpsipd(kode_sbl)
+                    get_sub_keg_rka_wpsipd(kode_sbl, sumber_dana)
                 }
             }else{
                 input_pagu = '' +
@@ -2324,7 +2343,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                     `</div>`;
 
                 if (kode_sbl) {
-                    get_sub_keg_rka_wpsipd(kode_sbl)
+                    get_sub_keg_rka_wpsipd(kode_sbl, sumber_dana)
                 }
             }else{
                 input_pagu = '' +
@@ -2388,7 +2407,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                 `</div>`;
 
             if (kode_sbl) {
-                get_sub_keg_rka_wpsipd(kode_sbl)
+                get_sub_keg_rka_wpsipd(kode_sbl, sumber_dana)
             }
         }
         var tr = jQuery('#kegiatan_utama_' + id);
@@ -2581,6 +2600,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
 
     function tambahSumberDana() {
         return new Promise(function(resolve, reject) {
+            jQuery('.input_sumber_dana > tbody tr select').select2("destroy");
             var lastRow = jQuery('.input_sumber_dana > tbody tr').last();
             var id = +lastRow.attr('data-id');
             var newId = id + 1;
@@ -2600,14 +2620,11 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                 }
             });
 
-            trNewUsulan.find('.select2').remove();
-            trNewUsulan.find('select').removeClass('select2-hidden-accessible').removeAttr('data-select2-id').removeAttr('aria-hidden');
-
             jQuery('.input_sumber_dana > tbody').append(trNewUsulan);
-
-            trNewUsulan.find('select').select2({
+            jQuery('.input_sumber_dana > tbody > tr select').select2({
                 width: '100%'
             });
+            jQuery('#pagu_sumber_dana_'+newId).val(0);
 
             var tr = jQuery('.input_sumber_dana > tbody > tr');
             tr.each(function(i, row) {
@@ -2667,7 +2684,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                     persen = (rencana_pagu / total_pagu) * 100;
                     let setting_input_rencana_pagu = response.data.data_rhk_khusus.input_rencana_pagu_level != undefined ? response.data.data_rhk_khusus.input_rencana_pagu_level : 0;
 
-                    tambah_indikator_rencana_aksi(response.data.id_renaksi, tipe, total_pagu, setting_input_rencana_pagu);
+                    tambah_indikator_rencana_aksi(response.data.id_renaksi, tipe, total_pagu, setting_input_rencana_pagu, kode_sbl, response.data.sumber_dana);
                     jQuery("#modal-crud").find('.modal-title').text(jQuery("#modal-crud").find('.modal-title').text().replace('Tambah', 'Edit'));
                     jQuery('#id_label_indikator').val(id);
                     jQuery('#indikator').val(response.data.indikator);
@@ -2691,30 +2708,6 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                         jQuery('#rumus-indikator').val(response.data.rumus_indikator);
                     } else {
                         jQuery('#rumus-indikator').val('(Realisasi Indikator / Target Indikator) * 100 = Capaian');
-                    }
-
-
-                    /** Memunculkan data sumber dana */
-                    if (kode_sbl) {
-                        get_sub_keg_rka_wpsipd(kode_sbl).then(() => {
-                            response.data.sumber_dana.map(function(value, index) {
-                                let id = index + 1;
-                                new Promise(function(resolve, reject) {
-                                        if (id > 1) {
-                                            tambahSumberDana()
-                                                .then(function() {
-                                                    resolve(value);
-                                                })
-                                        } else {
-                                            resolve(value);
-                                        }
-                                    })
-                                    .then(function(value) {
-                                        jQuery("#sumber_dana_" + id).val(value.id_sumber_dana).trigger('change');
-                                        jQuery("#pagu_sumber_dana_" + id).val(value.rencana_pagu).trigger('keyup');
-                                    });
-                            })
-                        })
                     }
 
                     if (response.data.set_target_teks == 1) {

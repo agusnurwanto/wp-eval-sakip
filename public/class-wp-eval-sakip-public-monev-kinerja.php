@@ -2028,14 +2028,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						<tr class="keg-utama">
 							<td>' . $no . '</td>
 							<td class="ket_rhk">' . $keterangan . '</td>
-							<td class="kiri kanan bawah text_blok kegiatan_utama">' . $v['detail']['label'] . '
+							<td class="kegiatan_utama">' . $v['detail']['label'] . '
 							    <a href="javascript:void(0)" data-id="' . $v['detail']['id'] . '" data-tipe="1" 
 								   class="help-rhk" onclick="help_rhk(' . $v['detail']['id'] . ', 1); return false;" title="Detail">
 								   <i class="dashicons dashicons-editor-help"></i>
 								</a>
 							</td>
-							<td class="kiri kanan bawah text_blok indikator_kegiatan_utama">' . $indikator_html . '</td>
-							<td class="kiri kanan bawah text_blok recana_aksi"></td>
+							<td class="indikator_kegiatan_utama">' . $indikator_html . '</td>
+							<td class="recana_aksi"></td>
 							<td class="indikator_renaksi"></td>
 							<td class="urian_renaksi"></td>
 							<td class="indikator_uraian_renaksi"></td>
@@ -2273,9 +2273,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							    <tr class="re-naksi">
 							        <td>' . $no . '.' . $no_renaksi . '</td>
 							        <td class="ket">' . $keterangan . '</td>
-							        <td class="kiri kanan bawah text_blok kegiatan_utama"></td>
-							        <td class="kiri kanan bawah text_blok indikator_kegiatan_utama"></td>
-							        <td class="kiri kanan bawah text_blok recana_aksi">' . $renaksi_html . '' . $renaksi['detail']['label'] . '
+							        <td class="kegiatan_utama"></td>
+							        <td class="indikator_kegiatan_utama"></td>
+							        <td class="recana_aksi">' . $renaksi_html . '' . $renaksi['detail']['label'] . '
 							        	<a href="javascript:void(0)" data-id="' . $renaksi['detail']['id'] . '" data-tipe="2" 
 										   class="help-rhk" onclick="help_rhk(' . $renaksi['detail']['id'] . ', 2); return false;" title="Detail">
 										   <i class="dashicons dashicons-editor-help"></i>
@@ -2431,10 +2431,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								<tr class="ur-kegiatan">
 									<td>' . $no . '.' . $no_renaksi . '.' . $no_uraian_renaksi . '</td>
 									<td class="">' . $keterangan . '</td>
-									<td class="kiri kanan bawah text_blok kegiatan_utama"></td>
-									<td class="kiri kanan bawah text_blok indikator_kegiatan_utama"></td>
-									<td class="kiri kanan bawah text_blok recana_aksi"></td>
-									<td class="kiri kanan bawah text_blok indikator_renaksi"></td>
+									<td class="kegiatan_utama"></td>
+									<td class="indikator_kegiatan_utama"></td>
+									<td class="recana_aksi"></td>
+									<td class="indikator_renaksi"></td>
 									<td class="urian_renaksi">' . $uraian_renaksi['detail']['label'] . '
 										<a href="javascript:void(0)" data-id="' . $uraian_renaksi['detail']['id'] . '" data-tipe="3" 
 										   class="help-rhk" onclick="help_rhk(' . $uraian_renaksi['detail']['id'] . ', 3); return false;" title="Detail">
