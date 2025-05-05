@@ -1475,6 +1475,7 @@ CREATE TABLE `esakip_data_rencana_aksi_opd` (
   `satker_id` VARCHAR(50) NOT NULL, 
   `id_sub_skpd_cascading` int(11) DEFAULT NULL,
   `pagu_cascading` double(20, 0) DEFAULT NULL,
+  `input_rencana_pagu_level` tinyint(4) DEFAULT NULL,
   PRIMARY key (id),
   KEY `parent` (`parent`),
   KEY `level` (`level`),

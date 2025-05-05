@@ -174,28 +174,33 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						), ARRAY_A);
 						// print_r($get_pegawai); die($wpdb->last_query);
 						// mengambil data dari level 4 untuk menampilkan di level / tipe 3
-						$data_renaksi[$key]['get_data_dasar_4'] = $wpdb->get_results($wpdb->prepare("
-					        SELECT
-					            *
-					        FROM esakip_data_rencana_aksi_opd
-					        WHERE parent=%d
-					          AND level=4
-					          AND active=1
-					    ", $val['id']));
-						if (!empty($data_renaksi[$key]['get_data_dasar_4'])) {
-							foreach ($data_renaksi[$key]['get_data_dasar_4'] as $key4 => $val4) {
-								$data_renaksi[$key]['get_data_dasar_4'][$key4]->get_pagu_4 = $wpdb->get_results($wpdb->prepare("
-						            SELECT
-						                SUM(rencana_pagu) as total_pagu
-						            FROM esakip_data_rencana_aksi_indikator_opd 
-						            WHERE id_renaksi=%d
-						                AND active = 1
-						        ", $val4->id));
+						$data_renaksi[$key]['get_data_dasar_4'] = array();
+						$data_renaksi[$key]['total_pagu_4'] = 0;
+						if($_POST['level'] == 3){
+							$data_renaksi[$key]['get_data_dasar_4'] = $wpdb->get_results($wpdb->prepare("
+								SELECT
+									*
+								FROM esakip_data_rencana_aksi_opd
+								WHERE parent=%d
+								  AND level=4
+								  AND active=1
+							", $val['id']));
+							if (!empty($data_renaksi[$key]['get_data_dasar_4'])) {
+								foreach ($data_renaksi[$key]['get_data_dasar_4'] as $key4 => $val4) {
+									$data_renaksi[$key]['get_data_dasar_4'][$key4]->get_pagu_4 = $wpdb->get_results($wpdb->prepare("
+										SELECT
+											SUM(rencana_pagu) as total_pagu
+										FROM esakip_data_rencana_aksi_indikator_opd 
+										WHERE id_renaksi=%d
+											AND active = 1
+									", $val4->id));
+								}
+								$data_renaksi[$key]['total_pagu_4'] = array_sum(array_map(function ($item) {
+									return isset($item->get_pagu_4[0]->total_pagu) ? $item->get_pagu_4[0]->total_pagu : 0;
+								}, $data_renaksi[$key]['get_data_dasar_4']));
 							}
-							$data_renaksi[$key]['total_pagu_4'] = array_sum(array_map(function ($item) {
-								return isset($item->get_pagu_4[0]->total_pagu) ? $item->get_pagu_4[0]->total_pagu : 0;
-							}, $data_renaksi[$key]['get_data_dasar_4']));
 						}
+
 						// mengambil data dari level 3 untuk menampilkan di level / tipe 2
 						$data_renaksi[$key]['get_dasar_level_3'] = $wpdb->get_results($wpdb->prepare("
 						    SELECT
@@ -518,6 +523,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				$kode_cascading_renstra = !empty($_POST['kode_cascading_renstra']) || $_POST['kode_cascading_renstra'] != NULL ? $_POST['kode_cascading_renstra'] : NULL;
 				$label_cascading_renstra = !empty($_POST['label_cascading_renstra']) || $_POST['label_cascading_renstra'] != NULL ? $_POST['label_cascading_renstra'] : NULL;
 
+				$kode_cascading_renstra_program = !empty($_POST['kode_cascading_renstra_program']) || $_POST['kode_cascading_renstra_program'] != NULL ? $_POST['kode_cascading_renstra_program'] : NULL;
+				$label_cascading_renstra_program = !empty($_POST['label_cascading_renstra_program']) || $_POST['label_cascading_renstra_program'] != NULL ? $_POST['label_cascading_renstra_program'] : NULL;
+
+				$kode_cascading_renstra_kegiatan = !empty($_POST['kode_cascading_renstra_kegiatan']) || $_POST['kode_cascading_renstra_kegiatan'] != NULL ? $_POST['kode_cascading_renstra_kegiatan'] : NULL;
+				$label_cascading_renstra_kegiatan = !empty($_POST['label_cascading_renstra_kegiatan']) || $_POST['label_cascading_renstra_kegiatan'] != NULL ? $_POST['label_cascading_renstra_kegiatan'] : NULL;
+
+				$kode_cascading_renstra_sub_kegiatan = !empty($_POST['kode_cascading_renstra_sub_kegiatan']) || $_POST['kode_cascading_renstra_sub_kegiatan'] != NULL ? $_POST['kode_cascading_renstra_sub_kegiatan'] : NULL;
+				$label_cascading_renstra_sub_kegiatan = !empty($_POST['label_cascading_renstra_sub_kegiatan']) || $_POST['label_cascading_renstra_sub_kegiatan'] != NULL ? $_POST['label_cascading_renstra_sub_kegiatan'] : NULL;
 
 				$kode_cascading_renstra = !empty($_POST['kode_cascading_renstra']) ? $_POST['kode_cascading_renstra'] : NULL;
 				$label_cascading_renstra = !empty($_POST['label_cascading_renstra']) ? $_POST['label_cascading_renstra'] : NULL;
@@ -529,6 +542,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				$id_indikator = isset($_POST['id_indikator']) ? $_POST['id_indikator'] : [];
 				$id_sub_skpd_cascading = !empty($_POST['id_sub_skpd_cascading']) ? $_POST['id_sub_skpd_cascading'] : null;
 				$pagu_cascading = !empty($_POST['pagu_cascading']) ? $_POST['pagu_cascading'] : null;
+				if($_POST['level'] == 4){
+					$setting_input_rencana_pagu = 1;
+				}else{
+					$setting_input_rencana_pagu = !empty($_POST['setting_input_rencana_pagu']) ? 1 : 0;
+				}
 
 
 				$get_dasar_pelaksanaan = $_POST['get_dasar_pelaksanaan'];
@@ -538,6 +556,27 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 					$label_cascading_renstra = implode(' ', $label);
 				}
+
+				// --- untuk input cascading saat ada input rencana pagu di rhk --- //
+				if (!empty($label_cascading_renstra_program)) {
+					$label = explode(' ', $label_cascading_renstra_program);
+					unset($label[0]);
+
+					$label_cascading_renstra_program = implode(' ', $label);
+				}
+				if (!empty($label_cascading_renstra_kegiatan)) {
+					$label = explode(' ', $label_cascading_renstra_kegiatan);
+					unset($label[0]);
+
+					$label_cascading_renstra_kegiatan = implode(' ', $label);
+				}
+				if (!empty($label_cascading_renstra_sub_kegiatan)) {
+					$label = explode(' ', $label_cascading_renstra_sub_kegiatan);
+					unset($label[0]);
+
+					$label_cascading_renstra_sub_kegiatan = implode(' ', $label);
+				}
+
 				if (
 					$_POST['level'] == 1
 					&& $ret['status'] != 'error'
@@ -576,7 +615,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'musrembang' => isset($get_dasar_pelaksanaan['musrembang']) ? $get_dasar_pelaksanaan['musrembang'] : 0,
 						'pokir' => isset($get_dasar_pelaksanaan['pokir']) ? $get_dasar_pelaksanaan['pokir'] : 0,
 						'id_sub_skpd_cascading' => $id_sub_skpd_cascading,
-						'pagu_cascading' => $pagu_cascading
+						'pagu_cascading' => $pagu_cascading,
+						'input_rencana_pagu_level' => $setting_input_rencana_pagu
 					);
 					if ($_POST['level'] == 1) {
 						$data['kode_cascading_sasaran'] = $kode_cascading_renstra;
@@ -602,6 +642,22 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$data['kode_sbl'] = $_POST['kode_sbl'];
 						$data['nip'] = $_POST['nip'];
 						$data['satker_id'] = $_POST['satker_id'];
+					}
+
+					if($setting_input_rencana_pagu == 1){
+						if(!empty($kode_cascading_renstra_program)){
+							$data['kode_cascading_program'] = $kode_cascading_renstra_program;
+							$data['label_cascading_program'] = $label_cascading_renstra_program;
+						}
+						if(!empty($kode_cascading_renstra_kegiatan)){
+							$data['kode_cascading_kegiatan'] = $kode_cascading_renstra_kegiatan;
+							$data['label_cascading_kegiatan'] = $label_cascading_renstra_kegiatan;
+						}
+						if(!empty($kode_cascading_renstra_sub_kegiatan)){
+							$data['kode_cascading_sub_kegiatan'] = $kode_cascading_renstra_sub_kegiatan;
+							$data['label_cascading_sub_kegiatan'] = $label_cascading_renstra_sub_kegiatan;
+							$data['kode_sbl'] = $_POST['kode_sbl'];
+						}
 					}
 					if (!empty($_POST['id'])) {
 						$cek_id = $_POST['id'];
@@ -672,6 +728,31 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$status_update = true;
 							}
 						}
+						if ($_POST['level'] != 4 && $setting_input_rencana_pagu == 1) {
+							$level_turunan = $_POST['level']+1;
+							$cek_rhk_level_turunan = $wpdb->get_results(
+								$wpdb->prepare(
+									"SELECT
+										id
+									FROM 
+										esakip_data_rencana_aksi_opd
+									WHERE 
+										level = %d AND 
+										parent = %d AND 
+										active = 1
+								", $level_turunan, $cek_id),
+								ARRAY_A
+							);
+
+							if(!empty($cek_rhk_level_turunan)){
+								// Untuk validasi agar setting input rencana pagu tetap di level RHK paling akhir
+								$ret = array(
+									'status' => 'error',
+									'message'   => "Pengaturan Input Rencana Pagu Tidak Dapat Diubah! Input Rencana Pagu Harus Berada Di RHK Level Terakhir.\nHarap Hapus Data RHK Level Turunannya!."
+								);
+								die(json_encode($ret));
+							}
+						}
 
 
 						if ($status_update) {
@@ -736,6 +817,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					// die($wpdb->last_query);
 					$get_id_pokin_1 = $_POST['id_pokin_1'];
 					$get_id_pokin_2 = $_POST['id_pokin_2'];
+					$get_id_pokin_3 = $_POST['id_pokin_3'];
+					$get_id_pokin_4 = $_POST['id_pokin_4'];
+					$get_id_pokin_5 = $_POST['id_pokin_5'];
 
 					$wpdb->update(
 						'esakip_data_pokin_rhk_opd',
@@ -810,10 +894,152 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		                        ", $_POST['tahun_anggaran'], $_POST['id_skpd'], $_POST['level'], $cek_id, $id_pokin_lvl_2)
 							);
 
+							if($setting_input_rencana_pagu == 1){
+								if($_POST['level'] == 3){
+									$level_pokin_2 = 5;
+								}elseif ($_POST['level'] == 2) {
+									$level_pokin_2 = 4;
+								}else{
+									$level_pokin_2 = 2;	
+								}
+							}else {
+								$level_pokin_2 = 2;
+							}
 							$data = array(
 								'id_rhk_opd' => $cek_id,
 								'id_pokin' => $id_pokin_lvl_2,
-								'level_pokin' => 2,
+								'level_pokin' => $level_pokin_2,
+								'level_rhk_opd' => $_POST['level'],
+								'tahun_anggaran' => $_POST['tahun_anggaran'],
+								'id_skpd' => $_POST['id_skpd'],
+								'active' => 1,
+								'update_at' => current_time('mysql')
+							);
+
+							if (!empty($cek_id_pokin)) {
+								$wpdb->update(
+									'esakip_data_pokin_rhk_opd',
+									$data,
+									array('id' => $cek_id_pokin)
+								);
+								$ret['message'] = "Berhasil update data.";
+							} else {
+								$data['created_at'] = current_time('mysql');
+								$wpdb->insert('esakip_data_pokin_rhk_opd', $data);
+								$ret['message'] = "Berhasil menyimpan data.";
+							}
+						}
+					}
+					if (!empty($get_id_pokin_3)) {
+						foreach ($get_id_pokin_3 as $id_pokin_lvl_3) {
+							$cek_id_pokin = $wpdb->get_var(
+								$wpdb->prepare("
+		                            SELECT 
+		                                id 
+		                            FROM esakip_data_pokin_rhk_opd 
+		                            WHERE tahun_anggaran = %d 
+		                                AND id_skpd = %s 
+		                                AND level_rhk_opd = %s 
+		                                AND id_rhk_opd = %s 
+										AND id_pokin = %d
+		                        ", $_POST['tahun_anggaran'], $_POST['id_skpd'], $_POST['level'], $cek_id, $id_pokin_lvl_3)
+							);
+
+							if($setting_input_rencana_pagu == 1){
+								if ($_POST['level'] == 2) {
+									$level_pokin_3 = 5;
+								}else{
+									$level_pokin_3 = 3;	
+								}
+							}else {
+								$level_pokin_3 = 3;
+							}
+							$data = array(
+								'id_rhk_opd' => $cek_id,
+								'id_pokin' => $id_pokin_lvl_3,
+								'level_pokin' => $level_pokin_3,
+								'level_rhk_opd' => $_POST['level'],
+								'tahun_anggaran' => $_POST['tahun_anggaran'],
+								'id_skpd' => $_POST['id_skpd'],
+								'active' => 1,
+								'update_at' => current_time('mysql')
+							);
+
+							if (!empty($cek_id_pokin)) {
+								$wpdb->update(
+									'esakip_data_pokin_rhk_opd',
+									$data,
+									array('id' => $cek_id_pokin)
+								);
+								$ret['message'] = "Berhasil update data.";
+							} else {
+								$data['created_at'] = current_time('mysql');
+								$wpdb->insert('esakip_data_pokin_rhk_opd', $data);
+								$ret['message'] = "Berhasil menyimpan data.";
+							}
+						}
+					}
+					if (!empty($get_id_pokin_4)) {
+						foreach ($get_id_pokin_4 as $id_pokin_lvl_4) {
+							$cek_id_pokin = $wpdb->get_var(
+								$wpdb->prepare("
+		                            SELECT 
+		                                id 
+		                            FROM esakip_data_pokin_rhk_opd 
+		                            WHERE tahun_anggaran = %d 
+		                                AND id_skpd = %s 
+		                                AND level_rhk_opd = %s 
+		                                AND id_rhk_opd = %s 
+										AND id_pokin = %d
+		                        ", $_POST['tahun_anggaran'], $_POST['id_skpd'], $_POST['level'], $cek_id, $id_pokin_lvl_4)
+							);
+
+							$level_pokin_4 = 4;
+							$data = array(
+								'id_rhk_opd' => $cek_id,
+								'id_pokin' => $id_pokin_lvl_4,
+								'level_pokin' => $level_pokin_4,
+								'level_rhk_opd' => $_POST['level'],
+								'tahun_anggaran' => $_POST['tahun_anggaran'],
+								'id_skpd' => $_POST['id_skpd'],
+								'active' => 1,
+								'update_at' => current_time('mysql')
+							);
+
+							if (!empty($cek_id_pokin)) {
+								$wpdb->update(
+									'esakip_data_pokin_rhk_opd',
+									$data,
+									array('id' => $cek_id_pokin)
+								);
+								$ret['message'] = "Berhasil update data.";
+							} else {
+								$data['created_at'] = current_time('mysql');
+								$wpdb->insert('esakip_data_pokin_rhk_opd', $data);
+								$ret['message'] = "Berhasil menyimpan data.";
+							}
+						}
+					}
+					if (!empty($get_id_pokin_5)) {
+						foreach ($get_id_pokin_5 as $id_pokin_lvl_5) {
+							$cek_id_pokin = $wpdb->get_var(
+								$wpdb->prepare("
+		                            SELECT 
+		                                id 
+		                            FROM esakip_data_pokin_rhk_opd 
+		                            WHERE tahun_anggaran = %d 
+		                                AND id_skpd = %s 
+		                                AND level_rhk_opd = %s 
+		                                AND id_rhk_opd = %s 
+										AND id_pokin = %d
+		                        ", $_POST['tahun_anggaran'], $_POST['id_skpd'], $_POST['level'], $cek_id, $id_pokin_lvl_5)
+							);
+
+							$level_pokin_5 = 5;
+							$data = array(
+								'id_rhk_opd' => $cek_id,
+								'id_pokin' => $id_pokin_lvl_5,
+								'level_pokin' => $level_pokin_5,
 								'level_rhk_opd' => $_POST['level'],
 								'tahun_anggaran' => $_POST['tahun_anggaran'],
 								'id_skpd' => $_POST['id_skpd'],
@@ -1090,6 +1316,19 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						', $_POST['id']),
 						ARRAY_A
 					);
+					if(!empty($ret['data'])){
+						$ret['data']['data_rhk_khusus'] = $wpdb->get_row(
+							$wpdb->prepare('
+								SELECT
+									id,
+									input_rencana_pagu_level
+								FROM esakip_data_rencana_aksi_opd
+								WHERE id=%d
+								  AND tahun_anggaran=%d
+							', $ret['data']['id_renaksi'], $_POST['tahun_anggaran']),
+							ARRAY_A
+						);
+					}
 				}
 			} else {
 				$ret = array(
@@ -1451,31 +1690,29 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$id_indikator_baru = $wpdb->insert_id;
 
 							// Input sumber dana dan rencana pagu (jika subkeg)
-							if ($_POST['tipe'] == 4) {
-								if (isset($_POST['sumber_danas'])) {
-									foreach ($_POST['sumber_danas'] as $v) {
-										$nama_dana = $v['nama_dana'];
-										$parts = explode(' ', $nama_dana, 2);
-										$kode = $parts[0];
-										$nama = isset($parts[1]) ? $parts[1] : '';
+							if (!empty($_POST['sumber_danas'])) {
+								foreach ($_POST['sumber_danas'] as $v) {
+									$nama_dana = $v['nama_dana'];
+									$parts = explode(' ', $nama_dana, 2);
+									$kode = $parts[0];
+									$nama = isset($parts[1]) ? $parts[1] : '';
 
-										$data_sumber_dana = [
-											'id_indikator'   => $id_indikator_baru,
-											'id_sumber_dana' => $v['id_dana'],
-											'kode_dana'      => $kode,
-											'nama_dana'      => $nama,
-											'rencana_pagu'   => $v['pagu'],
-											'tahun_anggaran' => $_POST['tahun_anggaran']
-										];
-										$total_rencana_pagu += $v['pagu'];
-										$wpdb->insert('esakip_sumber_dana_indikator', $data_sumber_dana);
-									}
-									$wpdb->update(
-										'esakip_data_rencana_aksi_indikator_opd',
-										['rencana_pagu' => $total_rencana_pagu],
-										['id' => $id_indikator_baru]
-									);
+									$data_sumber_dana = [
+										'id_indikator'   => $id_indikator_baru,
+										'id_sumber_dana' => $v['id_dana'],
+										'kode_dana'      => $kode,
+										'nama_dana'      => $nama,
+										'rencana_pagu'   => $v['pagu'],
+										'tahun_anggaran' => $_POST['tahun_anggaran']
+									];
+									$total_rencana_pagu += $v['pagu'];
+									$wpdb->insert('esakip_sumber_dana_indikator', $data_sumber_dana);
 								}
+								$wpdb->update(
+									'esakip_data_rencana_aksi_indikator_opd',
+									['rencana_pagu' => $total_rencana_pagu],
+									['id' => $id_indikator_baru]
+								);
 							}
 						} else {
 							$wpdb->update(
@@ -1484,39 +1721,37 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								['id' => $cek_id]
 							);
 
-							if ($_POST['tipe'] == 4) {
-								$wpdb->update(
-									'esakip_sumber_dana_indikator',
-									['active' => 0],
-									['id_indikator' => $cek_id]
-								);
+							$wpdb->update(
+								'esakip_sumber_dana_indikator',
+								['active' => 0],
+								['id_indikator' => $cek_id]
+							);
 
-								// Input sumber dana dan rencana pagu yang baru
-								if (!empty($_POST['sumber_danas'])) {
-									foreach ($_POST['sumber_danas'] as $v) {
-										$nama_dana = $v['nama_dana'];
-										$parts = explode(' ', $nama_dana, 2);
-										$kode = $parts[0];
-										$nama = isset($parts[1]) ? $parts[1] : '';
+							// Input sumber dana dan rencana pagu yang baru
+							if (!empty($_POST['sumber_danas'])) {
+								foreach ($_POST['sumber_danas'] as $v) {
+									$nama_dana = $v['nama_dana'];
+									$parts = explode(' ', $nama_dana, 2);
+									$kode = $parts[0];
+									$nama = isset($parts[1]) ? $parts[1] : '';
 
-										$data_sumber_dana = [
-											'id_indikator'   => $cek_id,
-											'id_sumber_dana' => $v['id_dana'],
-											'kode_dana'      => $kode,
-											'nama_dana'      => $nama,
-											'rencana_pagu'   => $v['pagu'],
-											'tahun_anggaran' => $_POST['tahun_anggaran']
-										];
-										$total_rencana_pagu += $v['pagu'];
+									$data_sumber_dana = [
+										'id_indikator'   => $cek_id,
+										'id_sumber_dana' => $v['id_dana'],
+										'kode_dana'      => $kode,
+										'nama_dana'      => $nama,
+										'rencana_pagu'   => $v['pagu'],
+										'tahun_anggaran' => $_POST['tahun_anggaran']
+									];
+									$total_rencana_pagu += $v['pagu'];
 
-										$wpdb->insert('esakip_sumber_dana_indikator', $data_sumber_dana);
-									}
-									$wpdb->update(
-										'esakip_data_rencana_aksi_indikator_opd',
-										['rencana_pagu' => $total_rencana_pagu],
-										['id' => $cek_id]
-									);
+									$wpdb->insert('esakip_sumber_dana_indikator', $data_sumber_dana);
 								}
+								$wpdb->update(
+									'esakip_data_rencana_aksi_indikator_opd',
+									['rencana_pagu' => $total_rencana_pagu],
+									['id' => $cek_id]
+								);
 							}
 						}
 					}
@@ -5129,6 +5364,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 	function get_rhk_parent($parent, $tahun_anggaran, $all_data = array()){
 		global $wpdb;
+		/**
+		 * Fungsi ini digunakan di beberapa tempat,
+		 * get_rencana_hasil_kerja(), get_data_renaksi()
+		 */
 		$rhk_parent = $wpdb->get_row($wpdb->prepare("
 			SELECT
 				*
