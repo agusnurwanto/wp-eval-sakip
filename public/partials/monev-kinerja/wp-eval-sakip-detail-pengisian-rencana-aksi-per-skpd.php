@@ -654,15 +654,19 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
     jQuery(document).on('change', '#set_input_rencana_pagu', function() {
         if (jQuery(this).is(":checked")) {
             jQuery(".in_setting_input_rencana_pagu").show();
-            jQuery('#cascading-renstra').val(null).trigger('change');
-            jQuery('#cascading-renstra-program').val(null).trigger('change');
-            jQuery('#cascading-renstra-kegiatan').val(null).trigger('change');
-            jQuery('#cascading-renstra-sub-kegiatan').val(null).trigger('change');
-            jQuery('#pokin-level-1').val(null).trigger('change');
-            jQuery('#pokin-level-2').val(null).trigger('change');
-            jQuery('#pokin-level-3').val(null).trigger('change');
-            jQuery('#pokin-level-4').val(null).trigger('change');
-            jQuery('#pokin-level-5').val(null).trigger('change');
+
+            // trigger pilihan nomenklatur renja
+            jQuery('#cascading-renstra').trigger('change');
+            jQuery('#cascading-renstra-program').trigger('change');
+            jQuery('#cascading-renstra-kegiatan').trigger('change');
+            jQuery('#cascading-renstra-sub-kegiatan').trigger('change');
+
+            // trigger pilihan history pokin
+            jQuery('#pokin-level-1').trigger('change');
+            jQuery('#pokin-level-2').trigger('change');
+            jQuery('#pokin-level-3').trigger('change');
+            jQuery('#pokin-level-4').trigger('change');
+            jQuery('#pokin-level-5').trigger('change');
         } else {
             jQuery(".in_setting_input_rencana_pagu").hide();
         }
@@ -1006,7 +1010,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                                         `<label for="pegawai">Pilih Pegawai Pelaksana</label>` +
                                         `<select class="form-control select2" id="pegawai" name="pegawai">${get_pegawai}</select>` +
                                     `</div>` +
-                                    `<div class="form-group form-check">` +
+                                    `<div class="form-group form-check" style="display: none;">` +
                                         `<label class="form-check-label" for="set_input_rencana_pagu">`+
                                             `<input class="form-check-input" type="checkbox" id="set_input_rencana_pagu" name="set_input_rencana_pagu">`+
                                             `Pengaturan Input Rencana Pagu</label>`+
@@ -1826,7 +1830,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                         }
 
                         kegiatanUtama += `` +
-                            `<tr id="kegiatan_utama_${value.id}">` +
+                            `<tr id="kegiatan_utama_${value.id}" class="table-warning">` +
                             `<td class="text-center">${index+1}</td>` +
                             `<td class="label_pokin">${label_pokin}</td>` +
                             `<td class="label_renaksi">${value.label}</td>` +
@@ -1861,7 +1865,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                                 '<td colspan="7" style="padding: 0;">' +
                                 `<table class="table" id="indikatorKegiatanUtama" style="margin: .5rem 0 2rem;">` +
                                 `<thead>` +
-                                `<tr class="table-secondary">` +
+                                `<tr class="table-info">` +
                                 `<th class="text-center" style="width:20px">No</th>` +
                                 `<th class="text-center">Aspek</th>` +
                                 `<th class="text-center">Indikator</th>` +
@@ -3142,7 +3146,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                         }
 
                         renaksi += `` +
-                            `<tr id="kegiatan_utama_${value.id}">` +
+                            `<tr id="kegiatan_utama_${value.id}" class="table-warning">` +
                             `<td class="text-center">${index + 1}</td>` +
                             `<td class="label_pokin">${label_pokin}</td>` +
                             `<td class="label_renaksi">${value.label}</td>` +
@@ -3173,14 +3177,14 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                                 `<table class="table" style="margin: 0;">` +
                                 `<thead>` +
                                 `<tr class="table-info">` +
-                                `<th class="text-center" style="width:20px">No</th>` +
-                                `<th class="text-center">Aspek</th>` +
-                                `<th class="text-center">Indikator</th>` +
-                                `<th class="text-center" style="width:120px;">Satuan</th>` +
-                                `<th class="text-center" style="width:50px;">Target Awal</th>` +
-                                `<th class="text-center" style="width:50px;">Target Akhir</th>` +
-                                `${header_pagu}` +
-                                `<th class="text-center" style="width:200px">Aksi</th>` +
+                                    `<th class="text-center" style="width:20px">No</th>` +
+                                    `<th class="text-center">Aspek</th>` +
+                                    `<th class="text-center">Indikator</th>` +
+                                    `<th class="text-center" style="width:120px;">Satuan</th>` +
+                                    `<th class="text-center" style="width:50px;">Target Awal</th>` +
+                                    `<th class="text-center" style="width:50px;">Target Akhir</th>` +
+                                    `${header_pagu}` +
+                                    `<th class="text-center" style="width:200px">Aksi</th>` +
                                 `</tr>` +
                                 `</thead>` +
                                 `<tbody>`;
@@ -3474,334 +3478,333 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
         }
 
         return get_tujuan_sasaran_cascading(jenis, parent_cascading, id_sub_skpd_cascading)
-            .then(function() {
-                return new Promise(function(resolve, reject) {
-                    var parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
-                    var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
-                    var level_pokin = 3;
-                    var title = 'Rencana Hasil Kerja | RHK Level 2';
-                    var key = jenis + '-' + parent_cascading;
-                    if (id_sub_skpd_cascading != 0) {
-                        key = jenis + '-' + parent_cascading + '-' + id_sub_skpd_cascading;
-                    }
-                    let data_cascading = data_program_cascading[key];
+        .then(function() {
+            return new Promise(function(resolve, reject) {
+                var parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
+                var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
+                var level_pokin = 3;
+                var title = 'Rencana Hasil Kerja | RHK Level 2';
+                var key = jenis + '-' + parent_cascading;
+                if (id_sub_skpd_cascading != 0) {
+                    key = jenis + '-' + parent_cascading + '-' + id_sub_skpd_cascading;
+                }
+                let data_cascading = data_program_cascading[key];
 
-                    var key = jenis + '-' + parent_cascading;
-                    if (id_sub_skpd_cascading != 0) {
-                        key = jenis + '-' + parent_cascading + '-' + id_sub_skpd_cascading;
-                    }
-                    let get_renaksi_pemda = <?php echo json_encode($renaksi_pemda); ?>;
-                    let checklist_renaksi_pemda = '';
-                    let checklist_dasar_pelaksanaan = '';
-                    let html_input_sub_keg_cascading = '';
-                    let html_pokin_input_rencana_pagu = '';
-                    let trigger_pokin_input_rencana_pagu = '';
-                    let html_input_dasar_pelaksanaan = '';
-                    let html_cascading_turunan = '';
+                var key = jenis + '-' + parent_cascading;
+                if (id_sub_skpd_cascading != 0) {
+                    key = jenis + '-' + parent_cascading + '-' + id_sub_skpd_cascading;
+                }
+                let get_renaksi_pemda = <?php echo json_encode($renaksi_pemda); ?>;
+                let checklist_renaksi_pemda = '';
+                let checklist_dasar_pelaksanaan = '';
+                let html_input_sub_keg_cascading = '';
+                let html_pokin_input_rencana_pagu = '';
+                let trigger_pokin_input_rencana_pagu = '';
+                let html_input_dasar_pelaksanaan = '';
+                let html_cascading_turunan = '';
 
-                    // menambahakan form input di saat input rencana pagu di level 2 RHK
+                // menambahakan form input di saat input rencana pagu di level 2 RHK
 
-                    html_pokin_input_rencana_pagu = `
-                            <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                                <label for="pokin-level-2">Pilih Pokin Level 4</label>
-                                <select class="form-control" multiple name="pokin-level-2" id="pokin-level-2" onchange="get_data_pokin_2(this.value, 5, 'pokin-level-3', true)">
-                                </select>
+                html_pokin_input_rencana_pagu = `
+                        <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
+                            <label for="pokin-level-2">Pilih Pokin Level 4</label>
+                            <select class="form-control" multiple name="pokin-level-2" id="pokin-level-2" onchange="get_data_pokin_2(this.value, 5, 'pokin-level-3', true)">
+                            </select>
+                        </div>
+                        <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
+                            <label for="pokin-level-3">Pilih Pokin Level 5</label>
+                            <select class="form-control" multiple name="pokin-level-3" id="pokin-level-3">
+                            </select>
+                        </div>`;
+
+                trigger_pokin_input_rencana_pagu = `
+                            onchange="get_data_pokin_2(this.value, ${ level_pokin+1 }, 'pokin-level-2', true)"`;
+
+                html_input_sub_keg_cascading = `
+                    <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
+                        <label for="cascading-renstra-kegiatan">Pilih Kegiatan Cascading</label>
+                        <select class="form-control" name="cascading-renstra-kegiatan" id="cascading-renstra-kegiatan" onchange="get_cascading_input_rencana_pagu(this, ${ tipe }, 'sub_kegiatan')"></select>
+                    </div>
+                    <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
+                        <label for="cascading-renstra-sub-kegiatan">Pilih Sub Kegiatan Cascading</label>
+                        <select class="form-control" name="cascading-renstra-sub-kegiatan" id="cascading-renstra-sub-kegiatan"></select>
+                    </div>`;
+
+                    html_cascading_turunan = `
+                        onchange="get_cascading_input_rencana_pagu(this, ${ tipe }, 'kegiatan')"`;
+
+                if (!isEdit) {
+                    html_input_dasar_pelaksanaan = `
+                        <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
+                            <label>Pilih Dasar Pelaksanaan</label>
+                            <div>
+                                <label><input type="checkbox" name="dasar_pelaksanaan[]" value="0" id="mandatori_pusat"> Mandatori Pusat</label><br>
+                                <label><input type="checkbox" name="dasar_pelaksanaan[]" value="0" id="inisiatif_kd"> Inisiatif Kepala Daerah</label><br>
+                                <label><input type="checkbox" name="dasar_pelaksanaan[]" value="0" id="musrembang"> MUSREMBANG (Musyawarh Rencana Pembangunan)</label><br>
+                                <label><input type="checkbox" name="dasar_pelaksanaan[]" value="0" id="pokir"> Pokir (Pokok Pikiran)</label>
                             </div>
-                            <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                                <label for="pokin-level-3">Pilih Pokin Level 5</label>
-                                <select class="form-control" multiple name="pokin-level-3" id="pokin-level-3">
-                                </select>
-                            </div>`;
+                        </div>
+                    `;
+                }
 
+                if (tipe == 3) {
+                    level_pokin = 4;
+                    title = 'Uraian Rencana Hasil Kerja | RHK Level 3';
+                    parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
+                    parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
+                    data_cascading = data_kegiatan_cascading[key];
+                    
+                    html_pokin_input_rencana_pagu = `
+                        <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
+                            <label for="pokin-level-2">Pilih Pokin Level 5</label>
+                            <select class="form-control" multiple name="pokin-level-2" id="pokin-level-2">
+                            </select>
+                        </div>`;
+        
                     trigger_pokin_input_rencana_pagu = `
-                                onchange="get_data_pokin_2(this.value, ${ level_pokin+1 }, 'pokin-level-2', true)"`;
+                                    onchange="get_data_pokin_2(this.value, ${ level_pokin+1 }, 'pokin-level-2', true)"`;
 
                     html_input_sub_keg_cascading = `
-                        <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                            <label for="cascading-renstra-kegiatan">Pilih Kegiatan Cascading</label>
-                            <select class="form-control" name="cascading-renstra-kegiatan" id="cascading-renstra-kegiatan" onchange="get_cascading_input_rencana_pagu(this, ${ tipe }, 'sub_kegiatan')"></select>
-                        </div>
-                        <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                            <label for="cascading-renstra-sub-kegiatan">Pilih Sub Kegiatan Cascading</label>
-                            <select class="form-control" name="cascading-renstra-sub-kegiatan" id="cascading-renstra-sub-kegiatan"></select>
-                        </div>`;
+                    <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
+                    <label for="cascading-renstra">Pilih Sub Kegiatan Cascading</label>
+                    <select class="form-control" name="cascading-renstra-sub-kegiatan" id="cascading-renstra-sub-kegiatan"></select>
+                    </div>`;
 
-                        html_cascading_turunan = `
-                            onchange="get_cascading_input_rencana_pagu(this, ${ tipe }, 'kegiatan')"`;
+                    html_cascading_turunan = `
+                        onchange="get_cascading_input_rencana_pagu(this, ${ tipe }, 'sub_kegiatan')"`;
+                    
+                } else if (tipe == 4) {
+                    level_pokin = 5;
+                    title = 'Uraian Teknis Kegiatan | RHK Level 4';
+                    parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
+                    parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
+                    data_cascading = data_sub_kegiatan_cascading[key];
+                    html_pokin_input_rencana_pagu = '';
+                    html_input_sub_keg_cascading = '';
+                    html_input_dasar_pelaksanaan = '';
+                }
 
-                    if (!isEdit) {
-                        html_input_dasar_pelaksanaan = `
-                            <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                                <label>Pilih Dasar Pelaksanaan</label>
-                                <div>
-                                    <label><input type="checkbox" name="dasar_pelaksanaan[]" value="0" id="mandatori_pusat"> Mandatori Pusat</label><br>
-                                    <label><input type="checkbox" name="dasar_pelaksanaan[]" value="0" id="inisiatif_kd"> Inisiatif Kepala Daerah</label><br>
-                                    <label><input type="checkbox" name="dasar_pelaksanaan[]" value="0" id="musrembang"> MUSREMBANG (Musyawarh Rencana Pembangunan)</label><br>
-                                    <label><input type="checkbox" name="dasar_pelaksanaan[]" value="0" id="pokir"> Pokir (Pokok Pikiran)</label>
-                                </div>
+                parent_pokin = parent_pokin.split(",");
+                if (!isEdit && tipe === 4) {
+                    checklist_dasar_pelaksanaan = `
+                        <div class="form-group in_setting_input_rencana_pagu">
+                            <label>Pilih Dasar Pelaksanaan</label>
+                            <div>
+                                <label><input type="checkbox" name="dasar_pelaksanaan[]" value="0" id="mandatori_pusat"> Mandatori Pusat</label><br>
+                                <label><input type="checkbox" name="dasar_pelaksanaan[]" value="0" id="inisiatif_kd"> Inisiatif Kepala Daerah</label><br>
+                                <label><input type="checkbox" name="dasar_pelaksanaan[]" value="0" id="musrembang"> MUSREMBANG (Musyawarh Rencana Pembangunan)</label><br>
+                                <label><input type="checkbox" name="dasar_pelaksanaan[]" value="0" id="pokir"> Pokir (Pokok Pikiran)</label>
                             </div>
-                        `;
-                    }
-
-                    if (tipe == 3) {
-                        level_pokin = 4;
-                        title = 'Uraian Rencana Hasil Kerja | RHK Level 3';
-                        parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
-                        parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
-                        data_cascading = data_kegiatan_cascading[key];
-                        
-                        html_pokin_input_rencana_pagu = `
-                            <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                                <label for="pokin-level-2">Pilih Pokin Level 5</label>
-                                <select class="form-control" multiple name="pokin-level-2" id="pokin-level-2">
-                                </select>
-                            </div>`;
-            
-                        trigger_pokin_input_rencana_pagu = `
-                                        onchange="get_data_pokin_2(this.value, ${ level_pokin+1 }, 'pokin-level-2', true)"`;
-    
-                        html_input_sub_keg_cascading = `
-                        <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                        <label for="cascading-renstra">Pilih Sub Kegiatan Cascading</label>
-                        <select class="form-control" name="cascading-renstra-sub-kegiatan" id="cascading-renstra-sub-kegiatan"></select>
-                        </div>`;
-
-                        html_cascading_turunan = `
-                            onchange="get_cascading_input_rencana_pagu(this, ${ tipe }, 'sub_kegiatan')"`;
-                        
-                    } else if (tipe == 4) {
-                        level_pokin = 5;
-                        title = 'Uraian Teknis Kegiatan | RHK Level 4';
-                        parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
-                        parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
-                        data_cascading = data_sub_kegiatan_cascading[key];
-                        html_pokin_input_rencana_pagu = '';
-                        html_input_sub_keg_cascading = '';
-                        html_input_dasar_pelaksanaan = '';
-                    }
-
-                    parent_pokin = parent_pokin.split(",");
-                    if (!isEdit && tipe === 4) {
-                        checklist_dasar_pelaksanaan = `
-                    <div class="form-group in_setting_input_rencana_pagu">
-                        <label>Pilih Dasar Pelaksanaan</label>
-                        <div>
-                            <label><input type="checkbox" name="dasar_pelaksanaan[]" value="0" id="mandatori_pusat"> Mandatori Pusat</label><br>
-                            <label><input type="checkbox" name="dasar_pelaksanaan[]" value="0" id="inisiatif_kd"> Inisiatif Kepala Daerah</label><br>
-                            <label><input type="checkbox" name="dasar_pelaksanaan[]" value="0" id="musrembang"> MUSREMBANG (Musyawarh Rencana Pembangunan)</label><br>
-                            <label><input type="checkbox" name="dasar_pelaksanaan[]" value="0" id="pokir"> Pokir (Pokok Pikiran)</label>
                         </div>
-                    </div>
-                `;
-                    }
-
-                    if (!isEdit && tipe === 2) {
-                        checklist_renaksi_pemda += `
-
-                    <label>Rencana Hasil Kerja Pemerintah Daerah | Level 4</label>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th class="text-center"><input type="checkbox" id="select_all"></th>
-                                <th>Rencana Hasil Kerja</th>
-                                <th>Indikator Rencana Hasil Kerja</th>
-                                <th>Satuan</th>
-                                <th>Target Akhir</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-                        get_renaksi_pemda.forEach(function(item, index) {
-                            checklist_renaksi_pemda += `
-                        <tr>
-                            <td><input class="text-right" type="checkbox" class="form-check-input" id="label_renaksi_pemda${index}"name="checklist_renaksi_pemda[]" value="${item.label}" id_label_renaksi_pemda="${item.id_data_renaksi_pemda}"id_label_indikator_renaksi_pemda="${item.id_data_indikator}"></td>
-                            <td for="label_renaksi_pemda${index}">${item.label}</td>
-                            <td for="label_renaksi_pemda${index}">${item.indikator}</td>
-                            <td class="text-center" for="label_renaksi_pemda${index}">${item.satuan}</td>
-                            <td class="text-center" for="label_renaksi_pemda${index}">${item.target_akhir}</td>
-                        </tr>
                     `;
-                        });
-                        checklist_renaksi_pemda += '</tbody></table>';
-                    }
+                }
 
-                    let html_setting_input_rencana_pagu = '';
-                    if(tipe != 4){
-                        html_setting_input_rencana_pagu = `
-                            <div class="form-group form-check">
-                                <label class="form-check-label" for="set_input_rencana_pagu">
-                                    <input class="form-check-input" type="checkbox" id="set_input_rencana_pagu" name="set_input_rencana_pagu">
-                                    Pengaturan Input Rencana Pagu
-                                </label>
-                                <small class="form-text text-muted">
-                                    Pengaturan Input Rencana Pagu Menjadikan Level Ini Menjadi Level RHK Terakhir.
-                                </small>
-                            </div>`;
-                    }
-
-                    var option = {
-                        "action": "get_data_pokin",
-                        "level": level_pokin,
-                        "parent": [],
-                        "api_key": esakip.api_key,
-                        "tipe_pokin": "opd",
-                        "id_jadwal": id_jadwal,
-                        "id_skpd": <?php echo $id_skpd; ?>
-                    };
-                    parent_pokin.map(function(b, i) {
-                        option.parent.push(b);
-                    })
-                    jQuery('#wrap-loading').show();
-                    jQuery.ajax({
-                        url: esakip.url,
-                        type: "post",
-                        data: option,
-                        dataType: "json",
-                        success: function(res) {
-                            let html = '';
-
-                            if (Array.isArray(res.data)) {
-                                res.data.map(value => {
-                                    html += '<option value="' + value.id + '">' + value.label + '</option>';
-                                });
-                            } else {
-                                alert("Data Pokin Kosong atau Tidak Sesuai!");
-                            }
-                            var get_pegawai = <?php echo json_encode($select_pegawai); ?>;
-                            jQuery('#wrap-loading').hide();
-                            jQuery("#modal-crud").find('.modal-title').html('Tambah ' + title);
-
-                            jQuery("#modal-crud").find('.modal-body').html(`
-                                <form>
-                                    <input type="hidden" id="id_renaksi" value=""/>
-                                    <div class="form-group">
-                                        <label for="pokin-level-1">Pilih Pokin Level ${level_pokin}</label>
-                                        <select class="form-control" multiple name="pokin-level-1" id="pokin-level-1" ${trigger_pokin_input_rencana_pagu}>
-                                            ${html}
-                                        </select>
-                                    </div>
-                                    ${html_pokin_input_rencana_pagu}
-                                    <div class="form-group">
-                                        <textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan ${title}..."></textarea>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="cascading-renstra">Pilih ${jenis_cascading} Cascading</label>
-                                        <select class="form-control" name="cascading-renstra" id="cascading-renstra" ${html_cascading_turunan}></select>
-                                    </div>
-                                    ${ html_input_sub_keg_cascading }
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-md-3">
-                                                <label for="sub-skpd-cascading">OPD Cascading</label>
-                                            </div>
-                                            <div class="col-md-9">
-                                                <input class="form-control" type="text" id="sub-skpd-cascading" disabled>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-md-3">
-                                                <label for="pagu-cascading">Pagu Cascading</label>
-                                            </div>
-                                            <div class="col-md-9">
-                                                <input class="form-control" type="text" id="pagu-cascading" disabled>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group"> 
-                                        <label for="satker_id">Pilih Satuan Kerja</label> 
-                                            <select class="form-control select2" id="satker_id" name="satker_id"><?php echo $select_satker; ?> 
-                                            </select> 
-                                    </div> 
-                                    <div class="form-group"> 
-                                        <label for="pegawai">Pilih Pegawai Pelaksana</label> 
-                                            <select class="form-control select2" id="pegawai" name="pegawai"> ${get_pegawai}
-                                            </select> 
-                                    </div> 
-                                    ${html_setting_input_rencana_pagu}
-                                    <?php if (!empty($renaksi_pemda)): ?>
-                                        ${checklist_renaksi_pemda}  
-                                    <?php endif; ?>
-                                    ${checklist_dasar_pelaksanaan}  
-                                    ${html_input_dasar_pelaksanaan} 
-                                </form>
-                            `);
-
-                            jQuery("#modal-crud").find('.modal-footer').html(`
-                                <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
-                                <button type="button" class="btn btn-success" onclick="simpan_data_renaksi(${tipe})">Simpan</button>
-                            `);
-
-                            jQuery('#select_all').on('click', function() {
-                                var isChecked = this.checked;
-                                jQuery('input[name="checklist_renaksi_pemda[]"]').prop('checked', isChecked);
-                            });
-
-                            jQuery('input[name="checklist_renaksi_pemda[]"]').on('change', function() {
-                                var allChecked = jQuery('input[name="checklist_renaksi_pemda[]"]').length === jQuery('input[name="checklist_renaksi_pemda[]"]:checked').length;
-                                jQuery('#select_all').prop('checked', allChecked);
-                            });
-                            jQuery("#modal-crud").modal('show');
-                            jQuery('#pokin-level-1').select2({
-                                width: '100%'
-                            });
-                            if (tipe === 3) {
-                                jQuery('#pokin-level-2').select2({
-                                    width: '100%'
-                                });
-                            }
-                            if (tipe === 2) {
-                                jQuery('#pokin-level-2').select2({
-                                    width: '100%'
-                                });
-                                jQuery('#pokin-level-3').select2({
-                                    width: '100%'
-                                });
-                            }
-                            jQuery('#satker_id').select2({
-                                width: '100%'
-                            });
-                            jQuery('#pegawai').select2({
-                                width: '100%'
-                            });
-                            if (data_cascading && Array.isArray(data_cascading.data)) {
-                                let html_cascading = '<option value="">Pilih ' + jenis_cascading + ' Cascading</option>';
-                                data_cascading.data.map(value => {
-                                    if (value.id_unik_indikator == null) {
-                                        switch (tipe) {
-                                            case 3:
-                                                html_cascading += `<option value="${value.kode_giat}" data-id-sub-skpd-cascading="${value.id_sub_skpd}" data-nama-sub-skpd="${value.kode_sub_skpd} ${value.nama_sub_skpd}" data-pagu-cascading="${value.pagu}">${value.kode_giat} ${value.nama_giat} ( ${value.kode_sub_skpd} ${value.nama_sub_skpd} | Rp. ${formatRupiah(value.pagu)} )</option>`;
-                                                break;
-                                            case 4:
-                                                let nama_sub_giat = `${value.kode_sub_giat} ${value.nama_sub_giat.replace(value.kode_sub_giat, '')} ( ${value.kode_sub_skpd} ${value.nama_sub_skpd} | Rp. ${formatRupiah(value.pagu)} )`;
-                                                html_cascading += `<option data-kodesbl="${value.kode_sbl}" value="${value.kode_sub_giat}" data-id-sub-skpd-cascading="${value.id_sub_skpd}" data-nama-sub-skpd="${value.kode_sub_skpd} ${value.nama_sub_skpd}" data-pagu-cascading="${value.pagu}">${nama_sub_giat}</option>`;
-                                                break;
-                                            default:
-                                                html_cascading += `<option value="${value.kode_program}_${value.id_sub_skpd}" data-id-sub-skpd-cascading="${value.id_sub_skpd}" data-nama-sub-skpd="${value.kode_sub_skpd} ${value.nama_sub_skpd}" data-pagu-cascading="${value.pagu}">${value.kode_program} ${value.nama_program} ( ${value.kode_sub_skpd} ${value.nama_sub_skpd} | Rp. ${formatRupiah(value.pagu)} )</option>`;
-                                                break;
-                                        }
-                                    }
-                                });
-                                jQuery("#cascading-renstra").html(html_cascading);
-                                jQuery('#cascading-renstra').select2({
-                                    width: '100%'
-                                });
-                            } else {
-                                alert("Data Cascading Kosong!");
-                            }
-
-
-                            resolve();
-                        },
-                        error: function() {
-                            jQuery('#wrap-loading').hide();
-                            alert("Gagal memuat data Pokin.");
-                            reject();
-                        }
+                if (!isEdit && tipe === 2) {
+                    checklist_renaksi_pemda += `
+                        <label>Rencana Hasil Kerja Pemerintah Daerah | Level 4</label>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"><input type="checkbox" id="select_all"></th>
+                                    <th>Rencana Hasil Kerja</th>
+                                    <th>Indikator Rencana Hasil Kerja</th>
+                                    <th>Satuan</th>
+                                    <th>Target Akhir</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    get_renaksi_pemda.forEach(function(item, index) {
+                        checklist_renaksi_pemda += `
+                            <tr>
+                                <td><input class="text-right" type="checkbox" class="form-check-input" id="label_renaksi_pemda${index}"name="checklist_renaksi_pemda[]" value="${item.label}" id_label_renaksi_pemda="${item.id_data_renaksi_pemda}"id_label_indikator_renaksi_pemda="${item.id_data_indikator}"></td>
+                                <td for="label_renaksi_pemda${index}">${item.label}</td>
+                                <td for="label_renaksi_pemda${index}">${item.indikator}</td>
+                                <td class="text-center" for="label_renaksi_pemda${index}">${item.satuan}</td>
+                                <td class="text-center" for="label_renaksi_pemda${index}">${item.target_akhir}</td>
+                            </tr>
+                        `;
                     });
+                    checklist_renaksi_pemda += '</tbody></table>';
+                }
+
+                let html_setting_input_rencana_pagu = '';
+                if(tipe != 4){
+                    html_setting_input_rencana_pagu = `
+                        <div class="form-group form-check" style="display:none">
+                            <label class="form-check-label" for="set_input_rencana_pagu">
+                                <input class="form-check-input" type="checkbox" id="set_input_rencana_pagu" name="set_input_rencana_pagu">
+                                Pengaturan Input Rencana Pagu
+                            </label>
+                            <small class="form-text text-muted">
+                                Pengaturan Input Rencana Pagu Menjadikan Level Ini Menjadi Level RHK Terakhir.
+                            </small>
+                        </div>`;
+                }
+
+                var option = {
+                    "action": "get_data_pokin",
+                    "level": level_pokin,
+                    "parent": [],
+                    "api_key": esakip.api_key,
+                    "tipe_pokin": "opd",
+                    "id_jadwal": id_jadwal,
+                    "id_skpd": <?php echo $id_skpd; ?>
+                };
+                parent_pokin.map(function(b, i) {
+                    option.parent.push(b);
+                })
+                jQuery('#wrap-loading').show();
+                jQuery.ajax({
+                    url: esakip.url,
+                    type: "post",
+                    data: option,
+                    dataType: "json",
+                    success: function(res) {
+                        let html = '';
+
+                        if (Array.isArray(res.data)) {
+                            res.data.map(value => {
+                                html += '<option value="' + value.id + '">' + value.label + '</option>';
+                            });
+                        } else {
+                            alert("Data Pokin Kosong atau Tidak Sesuai!");
+                        }
+                        var get_pegawai = <?php echo json_encode($select_pegawai); ?>;
+                        jQuery('#wrap-loading').hide();
+                        jQuery("#modal-crud").find('.modal-title').html('Tambah ' + title);
+
+                        jQuery("#modal-crud").find('.modal-body').html(`
+                            <form>
+                                <input type="hidden" id="id_renaksi" value=""/>
+                                <div class="form-group">
+                                    <label for="pokin-level-1">Pilih Pokin Level ${level_pokin}</label>
+                                    <select class="form-control" multiple name="pokin-level-1" id="pokin-level-1" ${trigger_pokin_input_rencana_pagu}>
+                                        ${html}
+                                    </select>
+                                </div>
+                                ${html_pokin_input_rencana_pagu}
+                                <div class="form-group">
+                                    <textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan ${title}..."></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cascading-renstra">Pilih ${jenis_cascading} Cascading</label>
+                                    <select class="form-control" name="cascading-renstra" id="cascading-renstra" ${html_cascading_turunan}></select>
+                                </div>
+                                ${ html_input_sub_keg_cascading }
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label for="sub-skpd-cascading">OPD Cascading</label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <input class="form-control" type="text" id="sub-skpd-cascading" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label for="pagu-cascading">Pagu Cascading</label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <input class="form-control" type="text" id="pagu-cascading" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group"> 
+                                    <label for="satker_id">Pilih Satuan Kerja</label> 
+                                        <select class="form-control select2" id="satker_id" name="satker_id"><?php echo $select_satker; ?> 
+                                        </select> 
+                                </div> 
+                                <div class="form-group"> 
+                                    <label for="pegawai">Pilih Pegawai Pelaksana</label> 
+                                        <select class="form-control select2" id="pegawai" name="pegawai"> ${get_pegawai}
+                                        </select> 
+                                </div> 
+                                ${html_setting_input_rencana_pagu}
+                                <?php if (!empty($renaksi_pemda)): ?>
+                                    ${checklist_renaksi_pemda}  
+                                <?php endif; ?>
+                                ${checklist_dasar_pelaksanaan}  
+                                ${html_input_dasar_pelaksanaan} 
+                            </form>
+                        `);
+
+                        jQuery("#modal-crud").find('.modal-footer').html(`
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
+                            <button type="button" class="btn btn-success" onclick="simpan_data_renaksi(${tipe})">Simpan</button>
+                        `);
+
+                        jQuery('#select_all').on('click', function() {
+                            var isChecked = this.checked;
+                            jQuery('input[name="checklist_renaksi_pemda[]"]').prop('checked', isChecked);
+                        });
+
+                        jQuery('input[name="checklist_renaksi_pemda[]"]').on('change', function() {
+                            var allChecked = jQuery('input[name="checklist_renaksi_pemda[]"]').length === jQuery('input[name="checklist_renaksi_pemda[]"]:checked').length;
+                            jQuery('#select_all').prop('checked', allChecked);
+                        });
+                        jQuery("#modal-crud").modal('show');
+                        jQuery('#pokin-level-1').select2({
+                            width: '100%'
+                        });
+                        if (tipe === 3) {
+                            jQuery('#pokin-level-2').select2({
+                                width: '100%'
+                            });
+                        }
+                        if (tipe === 2) {
+                            jQuery('#pokin-level-2').select2({
+                                width: '100%'
+                            });
+                            jQuery('#pokin-level-3').select2({
+                                width: '100%'
+                            });
+                        }
+                        jQuery('#satker_id').select2({
+                            width: '100%'
+                        });
+                        jQuery('#pegawai').select2({
+                            width: '100%'
+                        });
+                        if (data_cascading && Array.isArray(data_cascading.data)) {
+                            let html_cascading = '<option value="">Pilih ' + jenis_cascading + ' Cascading</option>';
+                            data_cascading.data.map(value => {
+                                if (value.id_unik_indikator == null) {
+                                    switch (tipe) {
+                                        case 3:
+                                            html_cascading += `<option value="${value.kode_giat}" data-id-sub-skpd-cascading="${value.id_sub_skpd}" data-nama-sub-skpd="${value.kode_sub_skpd} ${value.nama_sub_skpd}" data-pagu-cascading="${value.pagu}">${value.kode_giat} ${value.nama_giat} ( ${value.kode_sub_skpd} ${value.nama_sub_skpd} | Rp. ${formatRupiah(value.pagu)} )</option>`;
+                                            break;
+                                        case 4:
+                                            let nama_sub_giat = `${value.kode_sub_giat} ${value.nama_sub_giat.replace(value.kode_sub_giat, '')} ( ${value.kode_sub_skpd} ${value.nama_sub_skpd} | Rp. ${formatRupiah(value.pagu)} )`;
+                                            html_cascading += `<option data-kodesbl="${value.kode_sbl}" value="${value.kode_sub_giat}" data-id-sub-skpd-cascading="${value.id_sub_skpd}" data-nama-sub-skpd="${value.kode_sub_skpd} ${value.nama_sub_skpd}" data-pagu-cascading="${value.pagu}">${nama_sub_giat}</option>`;
+                                            break;
+                                        default:
+                                            html_cascading += `<option value="${value.kode_program}_${value.id_sub_skpd}" data-id-sub-skpd-cascading="${value.id_sub_skpd}" data-nama-sub-skpd="${value.kode_sub_skpd} ${value.nama_sub_skpd}" data-pagu-cascading="${value.pagu}">${value.kode_program} ${value.nama_program} ( ${value.kode_sub_skpd} ${value.nama_sub_skpd} | Rp. ${formatRupiah(value.pagu)} )</option>`;
+                                            break;
+                                    }
+                                }
+                            });
+                            jQuery("#cascading-renstra").html(html_cascading);
+                            jQuery('#cascading-renstra').select2({
+                                width: '100%'
+                            });
+                        } else {
+                            alert("Data Cascading Kosong!");
+                        }
+
+
+                        resolve();
+                    },
+                    error: function() {
+                        jQuery('#wrap-loading').hide();
+                        alert("Gagal memuat data Pokin.");
+                        reject();
+                    }
                 });
             });
+        });
     }
 
     function get_cascading_input_rencana_pagu(selected, tipe, jenis_cascading = 'sub_kegiatan') {
