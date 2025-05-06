@@ -29840,7 +29840,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
-	public function get_pegawai_simpeg($type = null, $value = null, $satker_id = null, $jabatan = null)
+	public function get_pegawai_simpeg($type = null, $value = null, $satker_id = null, $jabatan = null, $no_get_child = null)
 	{
 		global $wpdb;
 		$ret = array(
@@ -29974,7 +29974,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 			$table = 'esakip_data_pegawai_simpeg';
 
-			if ($tipe == 'unor') {
+			if ($tipe == 'unor' && empty($no_get_child)) {
 				$wpdb->query(
 					$wpdb->prepare(
 						"UPDATE $table SET active = %d WHERE satker_id LIKE %s",
@@ -30032,6 +30032,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$opsi_data_pegawai['tmt_sk_plth'] 	= !empty($data['tmt_sk_plth']) ? (new DateTime($data['tmt_sk_plth']))->format('Y-m-d H:i:s') : NULL;
 						$opsi_data_pegawai['berakhir'] 		= !empty($data['berakhir']) ? (new DateTime($data['berakhir']))->format('Y-m-d H:i:s') : NULL;
 					} else {
+						// Jika get_child satker tidak perlu update pegawai karena pegawai definitive sudah dipanggil di request pertama 
+						if(!empty($no_get_child)) {
+							continue;
+						}
 						$opsi_data_pegawai['plt_plh'] 		= NULL;
 						$opsi_data_pegawai['tmt_sk_plth'] 	= NULL;
 						$opsi_data_pegawai['berakhir'] 		= NULL;
@@ -30055,6 +30059,41 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$wpdb->insert($table, $opsi_data_pegawai);
 				}
 			}
+
+			// Get pegawai plt semua sub satker
+			if ($tipe == 'unor' && empty($no_get_child)) {
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+				$get_all_satker = $wpdb->get_results($wpdb->prepare("
+					SELECT 
+						*
+					FROM esakip_data_satker_simpeg 
+					WHERE active=1 
+					  AND tahun_anggaran=%d
+					  AND satker_id_parent=%s
+					", $tahun_anggaran_sakip, $val),
+					ARRAY_A
+				);
+				foreach ($get_all_satker as $satker) {
+					$this->get_pegawai_simpeg('unor', $satker['satker_id'], NULL, NULL, 1);
+					$get_parent_satker_2 = $wpdb->get_results($wpdb->prepare("
+						SELECT 
+							*
+						FROM esakip_data_satker_simpeg 
+						WHERE active=1 
+						  AND tahun_anggaran=%d
+						  AND satker_id_parent=%s
+						", $tahun_anggaran_sakip, $satker['id']),
+						ARRAY_A
+					);
+					foreach($get_parent_satker_2 as $parent_satker_2) {
+						$this->get_pegawai_simpeg('unor', $parent_satker_2['satker_id'], NULL, NULL, 1);
+					}
+				}
+			}
+
+			// Select semua satker where parent 5001
+			// Get pegawai
+
 		} catch (Exception $e) {
 			$ret = json_encode([
 				'status'  => false,
