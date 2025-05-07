@@ -2030,12 +2030,13 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						", $v['detail']['nip'], $satker_id_utama . '%'));
 
 						if (empty($get_pegawai)) {
-							$wpdb->update(
+							/*$wpdb->update(
 								'esakip_data_rencana_aksi_opd',
 								array('nip' => ''),
 								array('id' => $v['detail']['id'])
 							);
-							$v['detail']['nip'] = '';
+							$v['detail']['nip'] = '';*/
+							$keterangan .= '<li>Pegawai pelaksana dengan NIP = '.$v['detail']['nip'].' dan satker_id = '.$v['detail']['satker_id'].' tidak ditemukan</li>';
 						}
 
 						if (empty($v['detail']['satker_id'])) {

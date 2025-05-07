@@ -29998,6 +29998,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						", $data['nip_baru'], $satker_id, $jabatan)
 					);
 				} else {
+					/*
+						11 = pejabat
+						21 = pendidikan
+						22 = kesehatan
+						23 = fungsional penyetaraan
+						24 = fungsional
+						25 = fungsional belum diangkat
+
+						guru dan nakes dilewati
+					*/
+					if(
+						$data['tipe_pegawai_id'] == 21
+						|| $data['tipe_pegawai_id'] == 22
+					){
+						continue;
+					}
 					$exists = $wpdb->get_var(
 						$wpdb->prepare("
 							SELECT 
