@@ -264,7 +264,7 @@ $get_pegawai = $wpdb->get_results(
 );
 $select_pegawai = '<option value="">Pilih Pegawai Pelaksana</option>';
 foreach ($get_pegawai as $pegawai) {
-    $select_pegawai .= '<option value="' . $pegawai['nip_baru'] . '" satker-id="' . $pegawai['satker_id'] . '">' . $pegawai['jabatan'] . ' | ' . $pegawai['nip_baru'] . ' | ' . $pegawai['nama_pegawai'] . '</option>';
+    $select_pegawai .= '<option value="' . $pegawai['satker_id'] . '-' . $pegawai['nip_baru'] . '" satker-id="' . $pegawai['satker_id'] . '">' . $pegawai['jabatan'] . ' | ' . $pegawai['nip_baru'] . ' | ' . $pegawai['nama_pegawai'] . '</option>';
 }
 
 // ----- get data e-kin perbulan ----- //
@@ -1416,7 +1416,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                             }
 
                             if (response.data && response.data.pegawai && response.data.pegawai.nip_baru) {
-                                jQuery('#pegawai').val(response.data.pegawai.nip_baru).trigger('change');
+                                jQuery('#pegawai').val(response.data.pegawai.nip_baru + '-'+response.data.pegawai.nip_baru).trigger('change');
                             }
 
                             if (hak_akses_pegawai == 1) {
@@ -1481,7 +1481,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                                 }
 
                                 if (response.data && response.data.pegawai && response.data.pegawai.nip_baru) {
-                                    jQuery('#pegawai').val(response.data.pegawai.nip_baru).trigger('change');
+                                    jQuery('#pegawai').val(response.data.pegawai.nip_baru + '-'+response.data.pegawai.nip_baru).trigger('change');
                                 }
                                 var renaksi_pemda = "";
                                 response.data.renaksi_pemda.map(function(b, i) {
@@ -1685,7 +1685,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                                 }
 
                                 if (response.data && response.data.pegawai && response.data.pegawai.nip_baru) {
-                                    jQuery('#pegawai').val(response.data.pegawai.nip_baru).trigger('change');
+                                    jQuery('#pegawai').val(response.data.pegawai.nip_baru + '-'+response.data.pegawai.nip_baru).trigger('change');
                                 }
                             } else if (tipe == 4) {
                                 jQuery("#modal-crud").find('.modal-title').html('Edit Uraian Teknis Kegiatan');
@@ -1701,7 +1701,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                                 }
 
                                 if (response.data && response.data.pegawai && response.data.pegawai.nip_baru) {
-                                    jQuery('#pegawai').val(response.data.pegawai.nip_baru).trigger('change');
+                                    jQuery('#pegawai').val(response.data.pegawai.nip_baru + '-'+response.data.pegawai.nip_baru).trigger('change');
                                 }
                                 var checklist_dasar_pelaksanaan = `
                                 <div class="form-group in_setting_input_rencana_pagu">
@@ -4233,6 +4233,9 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
 
         let satker_id = jQuery('#satker_id').val();
         let nip = jQuery('#pegawai').val(); 
+        let parts = nip.split("-");
+
+        nip = $parts[0]
         let satker_id_pegawai = jQuery('#pegawai option:selected').attr('satker-id'); // Mengambil atribut satker-id dari option yang dipilih
 
         jQuery('#wrap-loading').show();
