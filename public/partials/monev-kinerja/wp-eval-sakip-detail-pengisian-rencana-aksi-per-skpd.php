@@ -653,20 +653,64 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
 
     jQuery(document).on('change', '#set_input_rencana_pagu', function() {
         if (jQuery(this).is(":checked")) {
-            jQuery(".in_setting_input_rencana_pagu").show();
+            var id_rhk = jQuery('#id_renaksi').val();
+            // jika tambah baru
+            if(!id_rhk){
+                jQuery(".in_setting_input_rencana_pagu").show();
 
-            // trigger pilihan nomenklatur renja
-            jQuery('#cascading-renstra').trigger('change');
-            jQuery('#cascading-renstra-program').trigger('change');
-            jQuery('#cascading-renstra-kegiatan').trigger('change');
-            jQuery('#cascading-renstra-sub-kegiatan').trigger('change');
+                // trigger pilihan nomenklatur renja
+                jQuery('#cascading-renstra').trigger('change');
+                jQuery('#cascading-renstra-program').trigger('change');
+                jQuery('#cascading-renstra-kegiatan').trigger('change');
+                jQuery('#cascading-renstra-sub-kegiatan').trigger('change');
 
-            // trigger pilihan history pokin
-            jQuery('#pokin-level-1').trigger('change');
-            jQuery('#pokin-level-2').trigger('change');
-            jQuery('#pokin-level-3').trigger('change');
-            jQuery('#pokin-level-4').trigger('change');
-            jQuery('#pokin-level-5').trigger('change');
+                // trigger pilihan history pokin
+                jQuery('#pokin-level-1').trigger('change');
+                jQuery('#pokin-level-2').trigger('change');
+                jQuery('#pokin-level-3').trigger('change');
+                jQuery('#pokin-level-4').trigger('change');
+                jQuery('#pokin-level-5').trigger('change');
+            // jika edit data existing
+            }else{
+                jQuery('#wrap-loading').show();
+                jQuery.ajax({
+                    type: 'POST',
+                    url: esakip.url,
+                    data: {
+                        "action": 'cek_validasi_input_rencana_pagu',
+                        "api_key": esakip.api_key,
+                        "id": id_rhk
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        jQuery('#wrap-loading').hide();
+                        console.log('response', response);
+                        if (response.status == 'error') {
+                            if(confirm(response.message)){
+                                jQuery(".in_setting_input_rencana_pagu").show();
+
+                                // trigger pilihan nomenklatur renja
+                                jQuery('#cascading-renstra').trigger('change');
+                                jQuery('#cascading-renstra-program').trigger('change');
+                                jQuery('#cascading-renstra-kegiatan').trigger('change');
+                                jQuery('#cascading-renstra-sub-kegiatan').trigger('change');
+
+                                // trigger pilihan history pokin
+                                jQuery('#pokin-level-1').trigger('change');
+                                jQuery('#pokin-level-2').trigger('change');
+                                jQuery('#pokin-level-3').trigger('change');
+                                jQuery('#pokin-level-4').trigger('change');
+                                jQuery('#pokin-level-5').trigger('change');
+                            }else{
+                                jQuery('#set_input_rencana_pagu').prop('checked', false);
+                            }
+                        }
+                    },
+                    error: function() {
+                        alert('Gagal menyimpan data.');
+                    }
+                });
+            }
         } else {
             jQuery(".in_setting_input_rencana_pagu").hide();
         }
@@ -3630,8 +3674,12 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
 
                 let html_setting_input_rencana_pagu = '';
                 if(tipe != 4){
+                    var hide = 'style="display:none"';
+                    if(tipe == 3){
+                        hide = '';
+                    }
                     html_setting_input_rencana_pagu = `
-                        <div class="form-group form-check" style="display:none">
+                        <div class="form-group form-check" ${hide}>
                             <label class="form-check-label" for="set_input_rencana_pagu">
                                 <input class="form-check-input" type="checkbox" id="set_input_rencana_pagu" name="set_input_rencana_pagu">
                                 Pengaturan Input Rencana Pagu
@@ -4081,25 +4129,30 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
         let label_pokin_4 = '';
         let id_pokin_5 = '';
         let label_pokin_5 = '';
+
+        // --- Jika input rencana pagu ada --- //
         if(setting_input_rencana_pagu == 1) {
-            // --- Jika input rencana pagu ada --- //
-            kode_cascading_renstra_program = jQuery('#cascading-renstra-program').val();
-            kode_cascading_renstra_program_1 = kode_cascading_renstra_program.split("_");
-            kode_cascading_renstra_program = kode_cascading_renstra_program_1[0];
-            if (kode_cascading_renstra_program !== '') {
-                label_cascading_renstra_program = jQuery('#cascading-renstra-program option:selected').text();
-                let new_label = label_cascading_renstra_program.split('(');
-                if (Array.isArray(new_label)) {
-                    label_cascading_renstra_program = new_label[0].trim();
+            if (tipe == 1 || tipe == 2){
+                kode_cascading_renstra_program = jQuery('#cascading-renstra-program').val();
+                kode_cascading_renstra_program_1 = kode_cascading_renstra_program.split("_");
+                kode_cascading_renstra_program = kode_cascading_renstra_program_1[0];
+                if (kode_cascading_renstra_program !== '') {
+                    label_cascading_renstra_program = jQuery('#cascading-renstra-program option:selected').text();
+                    let new_label = label_cascading_renstra_program.split('(');
+                    if (Array.isArray(new_label)) {
+                        label_cascading_renstra_program = new_label[0].trim();
+                    }
                 }
             }
             
-            kode_cascading_renstra_kegiatan = jQuery('#cascading-renstra-kegiatan').val();
-            if (kode_cascading_renstra_kegiatan !== '') {
-                label_cascading_renstra_kegiatan = jQuery('#cascading-renstra-kegiatan option:selected').text();
-                let new_label = label_cascading_renstra_kegiatan.split('(');
-                if (Array.isArray(new_label)) {
-                    label_cascading_renstra_kegiatan = new_label[0].trim();
+            if (tipe == 1 || tipe == 2 || tipe == 3){
+                kode_cascading_renstra_kegiatan = jQuery('#cascading-renstra-kegiatan').val();
+                if (kode_cascading_renstra_kegiatan !== '') {
+                    label_cascading_renstra_kegiatan = jQuery('#cascading-renstra-kegiatan option:selected').text();
+                    let new_label = label_cascading_renstra_kegiatan.split('(');
+                    if (Array.isArray(new_label)) {
+                        label_cascading_renstra_kegiatan = new_label[0].trim();
+                    }
                 }
             }
 
@@ -4115,11 +4168,14 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                 }
             }
 
-            
-            id_pokin_3 = jQuery('#pokin-level-3').val();
-            label_pokin_3 = jQuery('#pokin-level-3 option:selected').text();
-            id_pokin_4 = jQuery('#pokin-level-4').val();
-            label_pokin_4 = jQuery('#pokin-level-4 option:selected').text();
+            if (tipe == 2){
+                id_pokin_3 = jQuery('#pokin-level-3').val();
+                label_pokin_3 = jQuery('#pokin-level-3 option:selected').text();
+            }
+            if (tipe == 2 || tipe == 3){
+                id_pokin_4 = jQuery('#pokin-level-4').val();
+                label_pokin_4 = jQuery('#pokin-level-4 option:selected').text();
+            }
             id_pokin_5 = jQuery('#pokin-level-5').val();
             label_pokin_5 = jQuery('#pokin-level-5 option:selected').text();
         }
