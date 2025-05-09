@@ -30047,6 +30047,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$opsi_data_pegawai['plt_plh'] 		= $data['plt_plh'];
 						$opsi_data_pegawai['tmt_sk_plth'] 	= !empty($data['tmt_sk_plth']) ? (new DateTime($data['tmt_sk_plth']))->format('Y-m-d H:i:s') : NULL;
 						$opsi_data_pegawai['berakhir'] 		= !empty($data['berakhir']) ? (new DateTime($data['berakhir']))->format('Y-m-d H:i:s') : NULL;
+
+						// Jika masa PLT PLH sudah tidak aktif maka tidak perlu diupdate
+						if (date('Y-m-d H:i:s') > $opsi_data_pegawai['berakhir']) {
+							continue;
+						}
 					} else {
 						// Jika get_child satker tidak perlu update pegawai karena pegawai definitive sudah dipanggil di request pertama 
 						if(!empty($no_get_child)) {
@@ -30071,6 +30076,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			// Get pegawai plt semua sub satker
 			if ($tipe == 'unor' && empty($no_get_child)) {
 				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+				
+				// xxxx get plt satker 4 digit
 				$get_all_satker = $wpdb->get_results($wpdb->prepare("
 					SELECT 
 						*
@@ -30083,6 +30090,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				);
 				foreach ($get_all_satker as $satker) {
 					$this->get_pegawai_simpeg('unor', $satker['satker_id'], NULL, NULL, 1);
+					
+					// xxxxxx get plt satker 6 digit
 					$get_parent_satker_2 = $wpdb->get_results($wpdb->prepare("
 						SELECT 
 							*
@@ -30095,6 +30104,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					);
 					foreach($get_parent_satker_2 as $parent_satker_2) {
 						$this->get_pegawai_simpeg('unor', $parent_satker_2['satker_id'], NULL, NULL, 1);
+						
+						// xxxxxxxx get plt satker 8 digit
+						$get_parent_satker_3 = $wpdb->get_results($wpdb->prepare("
+							SELECT 
+								*
+							FROM esakip_data_satker_simpeg 
+							WHERE active=1 
+							  AND tahun_anggaran=%d
+							  AND satker_id_parent=%s
+							", $tahun_anggaran_sakip, $parent_satker_2['satker_id']),
+							ARRAY_A
+						);
+						foreach($get_parent_satker_3 as $parent_satker_3) {
+							$this->get_pegawai_simpeg('unor', $parent_satker_3['satker_id'], NULL, NULL, 1);
+						}
 					}
 				}
 			}

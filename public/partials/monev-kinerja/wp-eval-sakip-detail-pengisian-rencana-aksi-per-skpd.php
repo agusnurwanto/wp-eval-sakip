@@ -640,7 +640,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
         });
 
         jQuery("#tambah-rencana-aksi").on('click', function() {
-            kegiatanUtama();
+            lihat_rencana_aksi(0, 1, 0, 0, 0);
             get_data_target_realisasi_bulanan();
         });
 
@@ -914,7 +914,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                 if (res.status == 'success') {
                     jQuery("#modal-crud").modal('hide');
                     if (tipe == 1) {
-                        kegiatanUtama();
+                        lihat_rencana_aksi(0, 1, 0, 0, 0);
                     } else if (tipe == 2) {
                         var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
                         var parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
@@ -1781,358 +1781,6 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
         });
     }
 
-    function kegiatanUtama() {
-        jQuery("#wrap-loading").show();
-        return new Promise(function(resolve, reject) {
-            jQuery.ajax({
-                url: esakip.url,
-                type: "post",
-                data: {
-                    "action": "get_data_renaksi",
-                    "level": 1,
-                    "parent": 0,
-                    "api_key": esakip.api_key,
-                    "tipe_pokin": "opd",
-                    "id_skpd": <?php echo $id_skpd; ?>,
-                    "tahun_anggaran": '<?php echo $input['tahun'] ?>'
-                },
-                dataType: "json",
-                success: function(res) {
-                    jQuery('#wrap-loading').hide();
-                    let button_tambah = ``;
-                    if (hak_akses_pegawai == 1) {
-                        button_tambah = `` +
-                            `<div style="margin-top:10px">` +
-                            `<button type="button" class="btn btn-success mb-2" onclick="tambah_rencana_aksi();"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data Kegiatan Utama</button>` +
-                            `</div>`;
-                    } else {
-                        button_tambah = `` +
-                            `<div style="margin-top:10px">` +
-                            `</div>`;
-                    }
-                    let kegiatanUtama = `` +
-                        `${button_tambah}` +
-                        `<table class="table" id="kegiatanUtama">` +
-                        `<thead>` +
-                        `<tr class="table-secondary">` +
-                        `<th class="text-center" style="width:40px;">No</th>` +
-                        `<th class="text-center" style="width:300px;">Label Pokin Level 2</th>` +
-                        `<th class="text-center">Kegiatan Utama | RHK Level 1</th>` +
-                        `<th class="text-center">Sasaran Cascading</th>` +
-                        `<th class="text-center">Dasar Pelaksanaan</th>` +
-                        `<th class="text-center">Pegawai Pelaksana</th>` +
-                        `<th class="text-center" style="width:200px;">Aksi</th>` +
-                        `</tr>` +
-                        `</thead>` +
-                        `<tbody>`;
-                    res.data.map(function(value, index) {
-                        var label_dasar_pelaksanaan = '';
-                        let get_data_dasar_pelaksanaan = [];
-                        total_pagu = 0;
-                        value.get_dasar_2.forEach(function(dasar_level_2) {
-                            dasar_level_2.get_dasar_to_level_3.forEach(function(dasar_to_level_3) {
-                                dasar_to_level_3.get_dasar_to_level_4.forEach(function(dasar_to_level_4) {
-                                    if (dasar_to_level_4.get_pagu_2 && dasar_to_level_4.get_pagu_2.length > 0) {
-                                        total_pagu += parseFloat(dasar_to_level_4.get_pagu_2[0].total_pagu) || 0;
-                                    }
-                                    if (dasar_to_level_4.mandatori_pusat == 1 && !get_data_dasar_pelaksanaan.includes('Mandatori Pusat')) {
-                                        get_data_dasar_pelaksanaan.push('Mandatori Pusat');
-                                    }
-                                    if (dasar_to_level_4.inisiatif_kd == 1 && !get_data_dasar_pelaksanaan.includes('Inisiatif Kepala Daerah')) {
-                                        get_data_dasar_pelaksanaan.push('Inisiatif Kepala Daerah');
-                                    }
-                                    if (dasar_to_level_4.musrembang == 1 && !get_data_dasar_pelaksanaan.includes('MUSREMBANG (Musyawarah Rencana Pembangunan)')) {
-                                        get_data_dasar_pelaksanaan.push('MUSREMBANG (Musyawarah Rencana Pembangunan)');
-                                    }
-                                    if (dasar_to_level_4.pokir == 1 && !get_data_dasar_pelaksanaan.includes('POKIR (Pokok Pikiran)')) {
-                                        get_data_dasar_pelaksanaan.push('POKIR (Pokok Pikiran)');
-                                    }
-                                });
-                            });
-                        });
-
-                        if (get_data_dasar_pelaksanaan.length > 0) {
-                            label_dasar_pelaksanaan = `<ul><li>${get_data_dasar_pelaksanaan.join('</li><li>')}</li></ul>`;
-                        }
-                        let label_cascading = value.label_cascading_sasaran != null ? value.label_cascading_sasaran : '-';
-                        var nama_pegawai = '';
-                        if (value.detail_satker && value.detail_satker.nama) {
-                            nama_pegawai += value.detail_satker.nama + '<br>';
-                        }
-                        if (value.detail_pegawai && value.detail_pegawai.nip_baru) {
-                            nama_pegawai += '<span class="badge badge-primary p-2 mt-2 text-center">' + value.detail_pegawai.nip_baru + ' ' + value.detail_pegawai.nama_pegawai + '</span>';
-                        }
-                        let label_pokin = '-';
-                        let id_pokin_parent = [];
-                        if (value.pokin && value.pokin.length > 0) {
-                            label_pokin = `<ul style="margin: 0;">`;
-                            value.pokin.forEach(function(get_pokin) {
-                                label_pokin += `<li>${get_pokin.pokin_label}</li>`;
-                                id_pokin_parent.push(+get_pokin.id_pokin);
-                            });
-                            label_pokin += `</ul>`;
-                        }
-
-                        kegiatanUtama += `` +
-                            `<tr id="kegiatan_utama_${value.id}" class="table-warning">` +
-                            `<td class="text-center">${index+1}</td>` +
-                            `<td class="label_pokin">${label_pokin}</td>` +
-                            `<td class="label_renaksi">${value.label}</td>` +
-                            `<td class="label_cascading font-weight-bold">${label_cascading}</td>` +
-                            `<td class="label_renaksi">${label_dasar_pelaksanaan}</td>` +
-                            `<td class="detail_pegawai font-weight-bold">${nama_pegawai}</td>` +
-                            `<td class="text-center">`;
-                        // validasi akses tombol untuk admin dan pegawai
-                        if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
-                            kegiatanUtama += `` +
-                                `<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, 1, ${total_pagu}, 0)" title="Tambah Indikator (Total Pagu: ${formatRupiah(total_pagu)})"><i class="dashicons dashicons-plus"></i></a> `;
-                        }
-                        if(value.input_rencana_pagu_level != 1){
-                            kegiatanUtama += `` +
-                                `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, 2, ${JSON.stringify(id_pokin_parent)}, '${value.kode_cascading_sasaran}')" title="Lihat Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
-                        }
-                        if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
-                            kegiatanUtama += `` +
-                                `<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, 1)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`;
-                        }
-                        if (hak_akses_pegawai == 1) {
-                            kegiatanUtama += `` +
-                                `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_rencana_aksi(${value.id}, 1)" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`;
-                        }
-                        kegiatanUtama += `` +
-                            `</td>` +
-                            `</tr>`;
-
-                        let indikator = value.indikator;
-                        if (indikator.length > 0) {
-                            kegiatanUtama += `` +
-                                '<td colspan="7" style="padding: 0;">' +
-                                `<table class="table" id="indikatorKegiatanUtama" style="margin: .5rem 0 2rem;">` +
-                                `<thead>` +
-                                `<tr class="table-info">` +
-                                `<th class="text-center" style="width:20px">No</th>` +
-                                `<th class="text-center">Aspek</th>` +
-                                `<th class="text-center">Indikator</th>` +
-                                `<th class="text-center" style="width:120px;">Satuan</th>` +
-                                `<th class="text-center" style="width:50px;">Target Awal</th>` +
-                                `<th class="text-center" style="width:50px;">Target Akhir</th>` +
-                                `<th class="text-center" style="width:120px;">Rencana Pagu</th>` +
-                                `<th class="text-center" style="width:135px">Aksi</th>` +
-                                `</tr>` +
-                                `</thead>` +
-                                `<tbody>`;
-                            indikator.map(function(b, i) {
-                                let aspek_rhk = ["Kuantitas", "Kualitas", "Waktu", "Biaya"];
-                                let text_aspek_rhk = '';
-                                if (b.aspek_rhk != null || b.aspek_rhk != undefined) {
-                                    text_aspek_rhk = aspek_rhk[b.aspek_rhk - 1];
-                                }
-                                let target_teks_awal = '';
-                                if (b.target_teks_awal != null || b.target_teks_awal != undefined) {
-                                    target_teks_awal = `</br>(${b.target_teks_awal})`;
-                                }
-                                let target_teks_akhir = '';
-                                if (b.target_teks_akhir != null || b.target_teks_akhir != undefined) {
-                                    target_teks_akhir = `</br>(${b.target_teks_akhir})`;
-                                }
-                                let val_rumus_indikator = '(Realisasi Indikator / Target Indikator) * 100 = Capaian';
-                                if (b.rumus_indikator) {
-                                    val_rumus_indikator = b.rumus_indikator;
-                                }
-                                kegiatanUtama += `` +
-                                    `<tr>` +
-                                    `<td class="text-center">${index+1}.${i+1}</td>` +
-                                    `<td>${text_aspek_rhk}</td>` +
-                                    `<td>${b.indikator}</td>` +
-                                    `<td class="text-center">${b.satuan}</td>` +
-                                    `<td class="text-center">${b.target_awal} ${target_teks_awal}</td>` +
-                                    `<td class="text-center">${b.target_akhir} ${target_teks_akhir}</td>` +
-                                    `<td class="text-right">${formatRupiah(b.rencana_pagu) || 0}</td>` +
-                                    `<td class="text-center">` +
-                                    `<input type="checkbox" title="Lihat Rencana Hasil Kerja Per Bulan" class="lihat_bulanan" data-id="${b.id}" onclick="lihat_bulanan(this);" style="margin: 0 6px;">`;
-
-                                if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
-                                    kegiatanUtama += `` +
-                                        `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_indikator(${b.id}, 1, ${total_pagu})" title="Edit"><i class="dashicons dashicons-edit"></i></a> ` +
-                                        `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-danger" onclick="hapus_indikator(${b.id}, 1);" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`;
-                                }
-                                kegiatanUtama += `` +
-                                    `</td>` +
-                                    `</tr>`;
-
-                                kegiatanUtama += `` +
-                                    `<tr style="display: none;" class="data_bulanan_${b.id}">` +
-                                    `<td colspan="8" style="padding: 10px;">` +
-                                    `<div style="display: none; margin: 1rem auto;" class="data_bulanan_${b.id}">` +
-                                    `<h4 class="text-center" style="margin: 10px;">Rumus Indikator</h4>` +
-                                    `<textarea class="form-control" id="show-rumus-indikator">${val_rumus_indikator}</textarea>` +
-                                    `</div>` +
-                                    `</td>` +
-                                    `</tr>`;
-
-                                const get_bulan = [
-                                    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-                                    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-                                ];
-
-                                let bulanan = b.bulanan || [];
-
-                                kegiatanUtama += '' +
-                                    `<tr style="display: none;" class="data_bulanan_${b.id}">` +
-                                    `<td colspan="11" style="padding: 10px;">` +
-                                    `<h3 class="text-center" style="margin: 10px;">Rencana Aksi Per Bulan</h3>` +
-                                    `<table class="table" style="margin: 0;">` +
-                                    `<thead>` +
-                                    `<tr class="table-secondary">` +
-                                    `<th class="text-center">Bulan/TW</th>` +
-                                    `<th class="text-center">Rencana Aksi</th>` +
-                                    `<th class="text-center" style="width:100px;">Target</th>` +
-                                    `<th class="text-center" style="width:100px;">Satuan</th>` +
-                                    `<th class="text-center" style="width:150px;">Realisasi</th>` +
-                                    `<th class="text-center" style="width:60px">Capaian</th>` +
-                                    `<th class="text-center">Tanggapan Atasan</th>` +
-                                    `<th class="text-center" style="width:60px">Aksi</th>` +
-                                    `</tr>` +
-                                    `</thead>` +
-                                    `<tbody>`;
-
-                                let isdisabled = <?php echo $set_renaksi == 1 ? 'true' : 'false'; ?>;
-                                get_bulan.forEach((bulan, bulan_index) => {
-                                    let get_data_bulanan = b.bulanan.find(bulanan => bulanan.bulan == (bulan_index + 1)) || {};
-
-                                    let data_capaian_bulanan = ''
-                                    if(get_data_bulanan.capaian){
-                                        data_capaian_bulanan = get_data_bulanan.capaian;
-                                    }else{
-                                        // ----- capaian bulanan -----
-                                        if(get_data_bulanan.realisasi && get_data_bulanan.volume){
-                                            data_capaian_bulanan = ((get_data_bulanan.realisasi / get_data_bulanan.volume)*100).toFixed(0)+'%';
-                                        }else if(get_data_bulanan.volume){
-                                            data_capaian_bulanan = "0%";
-                                        }else{
-                                            data_capaian_bulanan = "";
-                                        }
-                                    }
-
-                                    kegiatanUtama += '' +
-                                        `<tr>` +
-                                        `<td class="text-center">${bulan}</td>` +
-                                        `<td class="text-center"><textarea class="form-control" name="rencana_aksi_${b.id}_${bulan_index + 1}" id="rencana_aksi_${b.id}_${bulan_index + 1}" ${isdisabled ? 'disabled' : ''}>${get_data_bulanan.rencana_aksi || ''}</textarea></td>` +
-                                        `<td class="text-center"><input type="text" class="form-control" name="volume_${b.id}_${bulan_index + 1}" id="volume_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.volume || ''}" ${isdisabled ? 'disabled' : ''}></td>` +
-                                        `<td class="text-center"><input type="text" class="form-control" name="satuan_bulan_${b.id}_${bulan_index + 1}" id="satuan_bulan_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.satuan || ''}" ${isdisabled ? 'disabled' : ''}></td>` +
-                                        `<td class="text-center"><input type="number" class="form-control" name="realisasi_${b.id}_${bulan_index + 1}" id="realisasi_${b.id}_${bulan_index + 1}" value="${get_data_bulanan.realisasi || ''}" ${isdisabled ? 'disabled' : ''}></td>` +
-                                        `<td class="text-center" name="capaian_${b.id}_${bulan_index + 1}" id="capaian_${b.id}_${bulan_index + 1}" value="${data_capaian_bulanan}">${data_capaian_bulanan}</td>` +
-                                        `<td class="text-center"><textarea class="form-control" name="keterangan_${b.id}_${bulan_index + 1}" id="keterangan_${b.id}_${bulan_index + 1}" ${isdisabled ? 'disabled' : ''}>${get_data_bulanan.keterangan || ''}</textarea></td>` +
-                                        `<td class="text-center">`;
-
-                                    if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
-                                        kegiatanUtama += `` +
-                                            (isdisabled ?
-                                                `-` :
-                                                `<a href="javascript:void(0)" data-id="${b.id}" data-bulan="${bulan_index + 1}" class="btn btn-sm btn-success" onclick="simpan_bulanan(${b.id}, ${bulan_index + 1})" title="Simpan"><i class="dashicons dashicons-yes"></i></a>`
-                                            );
-                                    }
-                                    kegiatanUtama += `` +
-                                        `</td>` +
-                                        `</tr>`;
-
-                                    if ((bulan_index + 1) % 3 == 0) {
-                                        var triwulan = (bulan_index + 1) / 3;
-
-                                        // ----- capaian triwulan -----
-                                        let data_capaian_target_realisasi_triwulan = '';
-                                        if(b['realisasi_tw_' + triwulan] && b['target_' + triwulan]){
-                                            data_capaian_target_realisasi_triwulan = ((b['realisasi_tw_' + triwulan] / b['target_' + triwulan]) * 100).toFixed(0)+'%';
-                                        }else if(b['target_' + triwulan]){
-                                            data_capaian_target_realisasi_triwulan = "0%";
-                                        }else{
-                                            data_capaian_target_realisasi_triwulan = "";
-                                        }
-
-                                        kegiatanUtama += '' +
-                                            `<tr style="background: #FDFFB6;">` +
-                                            `<td class="text-center">Triwulan ${triwulan}</td>` +
-                                            `<td class="text-center">${b.indikator}</td>` +
-                                            `<td class="text-center">${b['target_' + triwulan]}</td>` +
-                                            `<td class="text-center">${b.satuan}</td>` +
-                                            `<td class="text-center">` +
-                                            `<input type="number" class="form-control" name="realisasi_${b.id}_tw_${triwulan}" id="realisasi_${b.id}_tw_${triwulan}" ${isdisabled ? 'disabled' : ''} value="${b['realisasi_tw_' + triwulan] || ''}">` +
-                                            `</td>` +
-                                            `<td class="text-center">${data_capaian_target_realisasi_triwulan}</td>` +
-                                            `<td class="text-center">` +
-                                            `<textarea class="form-control" name="keterangan_${b.id}_tw_${triwulan}" id="keterangan_${b.id}_tw_${triwulan}" ${isdisabled ? 'disabled' : ''}>${b['ket_tw_' + triwulan] || ''}</textarea>` +
-                                            `</td>` +
-                                            `<td class="text-center">`;
-                                        if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
-                                            kegiatanUtama += `` +
-                                                (isdisabled ?
-                                                    `-` :
-                                                    `<a href="javascript:void(0)" data-id="${b.id}" data-tw="${triwulan}" class="btn btn-sm btn-success" onclick="simpan_triwulan(${b.id}, ${triwulan})" title="Simpan"><i class="dashicons dashicons-yes"></i></a>`
-                                                );
-                                        }
-                                        kegiatanUtama += `` +
-                                            `</td>` +
-                                            `</tr>`;
-                                    }
-
-                                });
-
-                                // ----- capaian total -----
-                                let data_capaian_target_realisasi_total = '';
-                                if(b['realisasi_akhir'] && b.target_akhir){
-                                    data_capaian_target_realisasi_total = ((b['realisasi_akhir'] / b.target_akhir) * 100).toFixed(0)+'%';
-                                }else if(b.target_akhir){
-                                    data_capaian_target_realisasi_total = "0%";
-                                }else{
-                                    data_capaian_target_realisasi_total = "";
-                                }
-
-                                kegiatanUtama += '' +
-                                    `<tr class="table-secondary">` +
-                                    `<th class="text-center">Total</th>` +
-                                    `<td class="text-center">${b.indikator}</td>` +
-                                    `<td class="text-center">${b.target_akhir}</td>` +
-                                    `<td class="text-center">${b.satuan}</td>` +
-                                    `<td class="text-center"><input type="number" class="form-control" name="realisasi_akhir_${b.id}" id="realisasi_akhir_${b.id}" value="${b['realisasi_akhir'] || ''}" ${isdisabled ? 'disabled' : ''}></td>` +
-                                    `<td class="text-center">${data_capaian_target_realisasi_total}</td>` +
-                                    `<td class="text-center"><textarea class="form-control" name="ket_total_${b.id}" id="ket_total_${b.id}" ${isdisabled ? 'disabled' : ''}>${b['ket_total'] || ''}</textarea></td>` +
-                                    `<td class="text-center">`;
-                                if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
-                                    kegiatanUtama += `` +
-                                            (isdisabled ?
-                                                `-` :
-                                               `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-success" onclick="simpan_total(${b.id})" title="Simpan Total"><i class="dashicons dashicons-yes"></i></a>`
-                                            );
-                                }
-                                kegiatanUtama += `` +
-                                    `</td>` +
-                                    `</tr>` +
-                                    `</tbody>` +
-                                    `</table>` +
-                                    `</td>` +
-                                    `</tr>`;
-
-
-                            });
-                            kegiatanUtama += `` +
-                                '</tbody>' +
-                                '</table>' +
-                                '</td>';
-                        }
-                    });
-                    kegiatanUtama += '' +
-                        `<tbody>` +
-                        `</table>`;
-
-                    jQuery("#nav-level-1").html(kegiatanUtama);
-                    jQuery('.nav-tabs a[href="#nav-level-1"]').tab('show');
-                    jQuery('#modal-renaksi').modal('show');
-                    resolve();
-                }
-            });
-        });
-    }
-
     function getTablePengisianRencanaAksi(no_loading = false) {
         if (!no_loading) {
             jQuery('#wrap-loading').show();
@@ -2818,7 +2466,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                     alert(response.message);
                     if (response.status === 'success') {
                         if (tipe == 1) {
-                            kegiatanUtama();
+                            lihat_rencana_aksi(0, 1, 0, 0, 0);
                         } else {
                             lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading, parent_sub_skpd);
                         }
@@ -2880,7 +2528,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                     alert(response.message);
                     if (response.status === 'success') {
                         if (tipe == 1) {
-                            kegiatanUtama();
+                            lihat_rencana_aksi(0, 1, 0, 0, 0);
                         } else {
                             console.log(parent_renaksi)
                             lihat_rencana_aksi(parent_renaksi, tipe, parent_pokin, parent_cascading, parent_sub_skpd);
@@ -2963,54 +2611,59 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                         renaksi += `<div style="margin-top:10px">` +
                             `</div>`;
                     }
-                    renaksi += `` +
-                        `<table class="table">` +
-                        `<thead>`;
-                    res.data_parent.map(function(value, index) {
-                        if (value != null) {
-                            let label_parent = '';
-                            switch (index + 1) {
-                                case 1:
-                                    label_parent = "Kegiatan Utama"
-                                    break;
 
-                                case 2:
-                                    label_parent = "Rencana Hasil Kerja"
-                                    break;
+                    if(res.data_parent.length >= 1){
+                        renaksi += `` +
+                            `<table class="table">` +
+                            `<thead>`;
+                        res.data_parent.map(function(value, index) {
+                            if (value != null) {
+                                let label_parent = '';
+                                switch (index + 1) {
+                                    case 1:
+                                        label_parent = "Kegiatan Utama"
+                                        break;
 
-                                case 3:
-                                    label_parent = "Uraian Kegiatan Rencana Hasil Kerja"
-                                    break;
+                                    case 2:
+                                        label_parent = "Rencana Hasil Kerja"
+                                        break;
 
-                                default:
-                                    label_parent = "-";
-                                    break;
+                                    case 3:
+                                        label_parent = "Uraian Kegiatan Rencana Hasil Kerja"
+                                        break;
+
+                                    default:
+                                        label_parent = "-";
+                                        break;
+                                }
+
+                                let tipe_parent = tipe - 1;
+                                let detail_parent = "<a href='javascript:void(0)' onclick='detail_parent(" + tipe_parent + "); return false;' title='Detail Parent'><i class='dashicons dashicons-info'></i></a>";
+                                renaksi += `` +
+                                    `<tr>` +
+                                    `<th class="text-center" style="width: 160px;">${label_parent}</th>` +
+                                    `<th class="text-left">${value} ${detail_parent}</th>` +
+                                    `</tr>`;
                             }
+                        });
+                        renaksi += `</thead>` +
+                            `</table>` ;
+                    }
 
-                            let tipe_parent = tipe - 1;
-                            let detail_parent = "<a href='javascript:void(0)' onclick='detail_parent(" + tipe_parent + "); return false;' title='Detail Parent'><i class='dashicons dashicons-info'></i></a>";
-                            renaksi += `` +
-                                `<tr>` +
-                                `<th class="text-center" style="width: 160px;">${label_parent}</th>` +
-                                `<th class="text-left">${value} ${detail_parent}</th>` +
-                                `</tr>`;
-                        }
-                    });
-                    renaksi += `</thead>` +
-                        `</table>` +
+                    renaksi += ''+
                         '<table class="table" id="' + id_tabel + '" parent_renaksi="' + parent_renaksi + '" parent_pokin="' + parent_pokin + '" parent_cascading="' + parent_cascading + '" parent_sub_skpd="' + parent_sub_skpd + '">' +
-                        `<thead>` +
-                        `<tr class="table-secondary">` +
-                        `<th class="text-center" style="width:40px;">No</th>` +
-                        `<th class="text-center" style="width:300px;">Label Pokin Level ` + label_pokin + `</th>` +
-                        `<th class="text-center">` + title + ` | RHK Level ` + rhk_level + `</th>` +
-                        `<th class="text-center">` + title_cascading + `</th>` +
-                        `${header_dasar_pelaksanaan}` +
-                        `<th class="text-center" style="width:300px;">Pegawai Pelaksana</th>` +
-                        `<th class="text-center" style="width:200px;">Aksi</th>` +
-                        `</tr>` +
-                        `</thead>` +
-                        `<tbody>`;
+                            `<thead>` +
+                                `<tr class="table-secondary">` +
+                                    `<th class="text-center" style="width:40px;">No</th>` +
+                                    `<th class="text-center" style="width:300px;">Label Pokin Level ` + label_pokin + `</th>` +
+                                    `<th class="text-center">` + title + ` | RHK Level ` + rhk_level + `</th>` +
+                                    `<th class="text-center">` + title_cascading + `</th>` +
+                                    `${header_dasar_pelaksanaan}` +
+                                    `<th class="text-center" style="width:300px;">Pegawai Pelaksana</th>` +
+                                    `<th class="text-center" style="width:200px;">Aksi</th>` +
+                                `</tr>` +
+                            `</thead>` +
+                            `<tbody>`;
                     res.data.map(function(value, index) {
                         var id_pokin = 0;
                         var tombol_detail = '';
@@ -3034,47 +2687,41 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                         if(value.input_rencana_pagu_level){
                             set_input_rencana_pagu = value.input_rencana_pagu_level;
                         }
+
+                        total_pagu = value.total_pagu;
+                        value.get_data_dasar.forEach(function(dasar) {
+                            if (dasar.mandatori_pusat == 1 && !get_data_dasar_pelaksanaan.includes('Mandatori Pusat')) {
+                                get_data_dasar_pelaksanaan.push('Mandatori Pusat');
+                            }
+                            if (dasar.inisiatif_kd == 1 && !get_data_dasar_pelaksanaan.includes('Inisiatif Kepala Daerah')) {
+                                get_data_dasar_pelaksanaan.push('Inisiatif Kepala Daerah');
+                            }
+                            if (dasar.musrembang == 1 && !get_data_dasar_pelaksanaan.includes('MUSREMBANG (Musyawarah Rencana Pembangunan)')) {
+                                get_data_dasar_pelaksanaan.push('MUSREMBANG (Musyawarah Rencana Pembangunan)');
+                            }
+                            if (dasar.pokir == 1 && !get_data_dasar_pelaksanaan.includes('POKIR (Pokok Pikiran)')) {
+                                get_data_dasar_pelaksanaan.push('POKIR (Pokok Pikiran)');
+                            }
+                        });
+
+                        if (get_data_dasar_pelaksanaan.length > 0) {
+                            label_dasar_pelaksanaan = `<ul><li>${get_data_dasar_pelaksanaan.join('</li><li>')}</li></ul>`;
+                        }
+
+                        id_pokin = [];
+                        if (value.pokin && value.pokin.length > 0) {
+                            label_pokin = `<ul style="margin: 0;">`;
+                            value.pokin.forEach(function(get_pokin) {
+                                label_pokin += `<li>${get_pokin.pokin_label}</li>`;
+                                id_pokin.push(+get_pokin.id_pokin);
+                            });
+                            label_pokin += `</ul>`;
+                        }
+
                         if (tipe == 1) {
                             id_parent_cascading = value['kode_cascading_sasaran'];
                             label_cascading = value['label_cascading_sasaran'] != null ? value['label_cascading_sasaran'] : '-';
-                            value.get_dasar_2.forEach(function(dasar_level_2) {
-                                dasar_level_2.get_dasar_to_level_3.forEach(function(dasar_to_level_3) {
-                                    dasar_to_level_3.get_dasar_to_level_4.forEach(function(dasar_to_level_4) {
-                                        if (dasar_to_level_4.get_pagu_2 && dasar_to_level_4.get_pagu_2.length > 0) {
-                                            total_pagu += parseFloat(dasar_to_level_4.get_pagu_2[0].total_pagu) || 0;
-                                        }
-                                        if (dasar_to_level_4.mandatori_pusat == 1 && !get_data_dasar_pelaksanaan.includes('Mandatori Pusat')) {
-                                            get_data_dasar_pelaksanaan.push('Mandatori Pusat');
-                                        }
-                                        if (dasar_to_level_4.inisiatif_kd == 1 && !get_data_dasar_pelaksanaan.includes('Inisiatif Kepala Daerah')) {
-                                            get_data_dasar_pelaksanaan.push('Inisiatif Kepala Daerah');
-                                        }
-                                        if (dasar_to_level_4.musrembang == 1 && !get_data_dasar_pelaksanaan.includes('MUSREMBANG (Musyawarah Rencana Pembangunan)')) {
-                                            get_data_dasar_pelaksanaan.push('MUSREMBANG (Musyawarah Rencana Pembangunan)');
-                                        }
-                                        if (dasar_to_level_4.pokir == 1 && !get_data_dasar_pelaksanaan.includes('POKIR (Pokok Pikiran)')) {
-                                            get_data_dasar_pelaksanaan.push('POKIR (Pokok Pikiran)');
-                                        }
-                                    });
-                                });
-                            });
-
-                            if (get_data_dasar_pelaksanaan.length > 0) {
-                                label_dasar_pelaksanaan = `<ul><li>${get_data_dasar_pelaksanaan.join('</li><li>')}</li></ul>`;
-                            }
-                            id_pokin = [];
-                            if (value.pokin && value.pokin.length > 0) {
-                                label_pokin = `<ul style="margin: 0;">`;
-                                value.pokin.forEach(function(get_pokin) {
-                                    label_pokin += `<li>${get_pokin.pokin_label}</li>`;
-                                    id_pokin.push(+get_pokin.id_pokin);
-                                });
-                                label_pokin += `</ul>`;
-                            }
-                            if(set_input_rencana_pagu != 1){
-                                tombol_detail = '' +
-                                    `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, ` + (tipe + 1) + `, ` + JSON.stringify(id_pokin) + `, '` + id_parent_cascading + `')" title="Lihat Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
-                            }
+                            tombol_detail = `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, ` + (tipe + 1) + `, ` + JSON.stringify(id_pokin) + `, '` + id_parent_cascading + `')" title="Lihat Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                         } else if (tipe == 2) {
                             id_parent_cascading = value['kode_cascading_program'];
                             id_parent_sub_skpd_cascading = value['id_sub_skpd_cascading'] != null ? value['id_sub_skpd_cascading'] : 0;
@@ -3083,44 +2730,8 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                                 let nama_prog = value['label_cascading_program'];
                                 label_cascading = value['kode_cascading_program'] + ' ' + nama_prog + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
                             }
-                            total_pagu = 0;
-                            value.get_dasar_level_3.forEach(function(dasar_level_3) {
-                                dasar_level_3.get_dasar_level_4.forEach(function(dasar) {
-                                    if (dasar.get_pagu_3 && dasar.get_pagu_3.length > 0) {
-                                        total_pagu += parseFloat(dasar.get_pagu_3[0].total_pagu) || 0;
-                                    }
-                                    if (dasar.mandatori_pusat == 1 && !get_data_dasar_pelaksanaan.includes('Mandatori Pusat')) {
-                                        get_data_dasar_pelaksanaan.push('Mandatori Pusat');
-                                    }
-                                    if (dasar.inisiatif_kd == 1 && !get_data_dasar_pelaksanaan.includes('Inisiatif Kepala Daerah')) {
-                                        get_data_dasar_pelaksanaan.push('Inisiatif Kepala Daerah');
-                                    }
-                                    if (dasar.musrembang == 1 && !get_data_dasar_pelaksanaan.includes('MUSREMBANG (Musyawarah Rencana Pembangunan)')) {
-                                        get_data_dasar_pelaksanaan.push('MUSREMBANG (Musyawarah Rencana Pembangunan)');
-                                    }
-                                    if (dasar.pokir == 1 && !get_data_dasar_pelaksanaan.includes('POKIR (Pokok Pikiran)')) {
-                                        get_data_dasar_pelaksanaan.push('POKIR (Pokok Pikiran)');
-                                    }
-                                });
-                            });
 
-                            if (get_data_dasar_pelaksanaan.length > 0) {
-                                label_dasar_pelaksanaan = `<ul><li>${get_data_dasar_pelaksanaan.join('</li><li>')}</li></ul>`;
-                            }
-                            id_pokin = [];
-                            if (value.pokin_3 && value.pokin_3.length > 0) {
-                                label_pokin = `<ul style="margin: 0;">`;
-                                value.pokin_3.forEach(function(get_pokin_2) {
-                                    label_pokin += `<li>${get_pokin_2.pokin_label}</li>`;
-                                    id_pokin.push(+get_pokin_2.id_pokin);
-                                });
-                                label_pokin += `</ul>`;
-                            }
-
-                            if(set_input_rencana_pagu != 1){
-                                tombol_detail = '' +
-                                    `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, ${ (tipe + 1) }, ${ JSON.stringify(id_pokin) }, '${ id_parent_cascading }', ${ id_parent_sub_skpd_cascading })" title="Lihat Uraian Kegiatan Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
-                            }
+                            tombol_detail = `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, ${ (tipe + 1) }, ${ JSON.stringify(id_pokin) }, '${ id_parent_cascading }', ${ id_parent_sub_skpd_cascading })" title="Lihat Uraian Kegiatan Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                         } else if (tipe == 3) {
                             id_parent_cascading = value['kode_cascading_kegiatan'];
                             id_parent_sub_skpd_cascading = value['id_sub_skpd_cascading'] != null ? value['id_sub_skpd_cascading'] : 0;
@@ -3129,40 +2740,8 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                                 let nama_keg = value['label_cascading_kegiatan'];
                                 label_cascading = value['kode_cascading_kegiatan'] + ' ' + nama_keg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
                             }
-                            total_pagu = value.total_pagu_4 || 0;
 
-                            value.get_data_dasar_4.forEach(function(dasar_4) {
-                                if (dasar_4.mandatori_pusat == 1 && !get_data_dasar_pelaksanaan.includes('Mandatori Pusat')) {
-                                    get_data_dasar_pelaksanaan.push('Mandatori Pusat');
-                                }
-                                if (dasar_4.inisiatif_kd == 1 && !get_data_dasar_pelaksanaan.includes('Inisiatif Kepala Daerah')) {
-                                    get_data_dasar_pelaksanaan.push('Inisiatif Kepala Daerah');
-                                }
-                                if (dasar_4.musrembang == 1 && !get_data_dasar_pelaksanaan.includes('MUSREMBANG (Musyawarah Rencana Pembangunan)')) {
-                                    get_data_dasar_pelaksanaan.push('MUSREMBANG (Musyawarah Rencana Pembangunan)');
-                                }
-                                if (dasar_4.pokir == 1 && !get_data_dasar_pelaksanaan.includes('POKIR (Pokok Pikiran)')) {
-                                    get_data_dasar_pelaksanaan.push('POKIR (Pokok Pikiran)');
-                                }
-                            });
-
-                            if (get_data_dasar_pelaksanaan.length > 0) {
-                                label_dasar_pelaksanaan = `<ul><li>${get_data_dasar_pelaksanaan.join('</li><li>')}</li></ul>`;
-                            }
-                            id_pokin = [];
-                            if (value.pokin_4 && value.pokin_4.length > 0) {
-                                label_pokin = `<ul style="margin: 0;">`;
-                                value.pokin_4.forEach(function(get_pokin_4) {
-                                    label_pokin += `<li>${get_pokin_4.pokin_label}</li>`;
-                                    id_pokin.push(+get_pokin_4.id_pokin);
-                                });
-                                label_pokin += `</ul>`;
-                            }
-
-                            if(set_input_rencana_pagu != 1){
-                                tombol_detail = '' +
-                                    `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, ${ (tipe + 1) }, ${ JSON.stringify(id_pokin) }, '${ id_parent_cascading }', ${id_parent_sub_skpd_cascading})" title="Lihat Uraian Teknis Kegiatan"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
-                            }
+                            tombol_detail = `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, ${ (tipe + 1) }, ${ JSON.stringify(id_pokin) }, '${ id_parent_cascading }', ${id_parent_sub_skpd_cascading})" title="Lihat Uraian Teknis Kegiatan"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                         } else if (tipe == 4) {
                             id_pokin = value['id_pokin_5'];
 
@@ -3171,77 +2750,65 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                                 label_cascading = value['kode_cascading_sub_kegiatan'] + ' ' + nama_subkeg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
                             }
                             data_tagging_rincian = '<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" title="Lihat Data Tagging Rincian Belanja"><i class="dashicons dashicons dashicons-arrow-down-alt2"></i></a> ';
-
-                            if (value.mandatori_pusat == 1) get_data_dasar_pelaksanaan.push('Mandatori Pusat');
-                            if (value.inisiatif_kd == 1) get_data_dasar_pelaksanaan.push('Inisiatif Kepala Daerah');
-                            if (value.musrembang == 1) get_data_dasar_pelaksanaan.push('MUSREMBANG (Musyawarah Rencana Pembangunan)');
-                            if (value.pokir == 1) get_data_dasar_pelaksanaan.push('POKIR (Pokok Pikiran)');
-
-                            if (get_data_dasar_pelaksanaan.length > 0) {
-                                label_dasar_pelaksanaan = `<ul><li>${get_data_dasar_pelaksanaan.join('</li><li>')}</li></ul>`;
-                            }
-                            if (value.pokin_5 && value.pokin_5.length > 0) {
-                                label_pokin = `<ul style="margin: 0;">`;
-                                value.pokin_5.forEach(function(get_pokin_5) {
-                                    label_pokin += `<li>${get_pokin_5.pokin_label}</li>`;
-                                });
-                                label_pokin += `</ul>`;
-                            }
                         }
 
                         renaksi += `` +
                             `<tr id="kegiatan_utama_${value.id}" class="table-warning">` +
-                            `<td class="text-center">${index + 1}</td>` +
-                            `<td class="label_pokin">${label_pokin}</td>` +
-                            `<td class="label_renaksi">${value.label}</td>` +
-                            `<td class="label_renaksi font-weight-bold">${label_cascading}</td>` +
-                            `<td class="label_renaksi">${label_dasar_pelaksanaan}</td>` +
-                            `<td class="pegawai_pelaksana font-weight-bold">${nama_pegawai}</td>` +
-                            `<td class="text-center">`;
+                                `<td class="text-center">${index + 1}</td>` +
+                                `<td class="label_pokin">${label_pokin}</td>` +
+                                `<td class="label_renaksi">${value.label}</td>` +
+                                `<td class="label_renaksi font-weight-bold">${label_cascading}</td>` +
+                                `<td class="label_renaksi">${label_dasar_pelaksanaan}</td>` +
+                                `<td class="pegawai_pelaksana font-weight-bold">${nama_pegawai}</td>` +
+                                `<td class="text-center">`;
+
                         // untuk validasi tombol user kepala dan pegawai
-                        if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
+                        if (
+                            hak_akses_pegawai == 1 
+                            || (
+                                hak_akses_pegawai == 2 
+                                && value.detail_pegawai 
+                                && value.detail_pegawai.nip_baru 
+                                && nip_pegawai == value.detail_pegawai.nip_baru
+                            )
+                        ) {
                             renaksi += `<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi(${value.id}, ${tipe},${total_pagu}, ${ set_input_rencana_pagu }, '${value.kode_sbl}')" title="Tambah Indikator (Total Pagu: ${formatRupiah(total_pagu)})"><i class="dashicons dashicons-plus"></i></a> `;
-                        }
-                        renaksi += `` +
-                            tombol_detail;
-                        if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
+                            renaksi += tombol_detail;
                             renaksi += `<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, ` + tipe + `)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`;
+                        }else{
+                            renaksi += tombol_detail;
                         }
+
                         if (hak_akses_pegawai == 1) {
                             renaksi += `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_rencana_aksi(${value.id}, ${tipe})" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`;
                         }
                         renaksi += `` +
-                            `</td>` +
+                                `</td>` +
                             `</tr>`;
 
                         let indikator = value.indikator;
                         if (indikator.length > 0) {
                             renaksi += '' +
                                 '<td colspan="7" style="padding: 10px;">' +
-                                `<table class="table" style="margin: 0;">` +
-                                `<thead>` +
-                                `<tr class="table-info">` +
-                                    `<th class="text-center" style="width:20px">No</th>` +
-                                    `<th class="text-center">Aspek</th>` +
-                                    `<th class="text-center">Indikator</th>` +
-                                    `<th class="text-center" style="width:120px;">Satuan</th>` +
-                                    `<th class="text-center" style="width:50px;">Target Awal</th>` +
-                                    `<th class="text-center" style="width:50px;">Target Akhir</th>` +
-                                    `${header_pagu}` +
-                                    `<th class="text-center" style="width:200px">Aksi</th>` +
-                                `</tr>` +
-                                `</thead>` +
-                                `<tbody>`;
+                                    `<table class="table" style="margin: 0;">` +
+                                        `<thead>` +
+                                            `<tr class="table-info">` +
+                                                `<th class="text-center" style="width:20px">No</th>` +
+                                                `<th class="text-center">Aspek</th>` +
+                                                `<th class="text-center">Indikator</th>` +
+                                                `<th class="text-center" style="width:120px;">Satuan</th>` +
+                                                `<th class="text-center" style="width:50px;">Target Awal</th>` +
+                                                `<th class="text-center" style="width:50px;">Target Akhir</th>` +
+                                                `${header_pagu}` +
+                                                `<th class="text-center" style="width:200px">Aksi</th>` +
+                                            `</tr>` +
+                                        `</thead>` +
+                                    `<tbody>`;
 
                             indikator.map(function(b, i) {
                                 let rencana_pagu = b.rencana_pagu != null ? b.rencana_pagu : 0;
                                 let realisasi_pagu = b.realisasi_pagu != null ? b.realisasi_pagu : 0;
                                 let val_pagu = '';
-                                let html_akun = '';
-                                if (tipe == 4) {
-                                    html_akun = `<a href="javascript:void(0)" class="btn btn-sm btn-info" onclick="tambah_rincian_belanja_rencana_aksi(${b.id},${value.id},'${value.kode_sbl}')" title="Tambah Rincian Belanja"><i class="dashicons dashicons-plus"></i></a> `;
-                                }
-
                                 let aspek_rhk = ["Kuantitas", "Kualitas", "Waktu", "Biaya"];
                                 let text_aspek_rhk = '';
                                 if (b.aspek_rhk != null || b.aspek_rhk != undefined) {
@@ -3262,60 +2829,78 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
 
                                 renaksi += '' +
                                     `<tr>` +
-                                    `<td class="text-center">${index + 1}.${i + 1}</td>` +
-                                    `<td>${text_aspek_rhk}</td>` +
-                                    `<td>${b.indikator}</td>` +
-                                    `<td class="text-center">${b.satuan}</td>` +
-                                    `<td class="text-center">${b.target_awal} ${target_teks_awal}</td>` +
-                                    `<td class="text-center">${b.target_akhir} ${target_teks_akhir}</td>` +
-                                    `<td class="text-right">${formatRupiah(b.rencana_pagu) || 0}</td>` +
-                                    `<td class="text-center">` +
-                                    `<input type="checkbox" title="Lihat Rencana Hasil Kerja Per Bulan" class="lihat_bulanan" data-id="${b.id}" onclick="lihat_bulanan(this);" style="margin: 0 6px;">` +
+                                        `<td class="text-center">${index + 1}.${i + 1}</td>` +
+                                        `<td>${text_aspek_rhk}</td>` +
+                                        `<td><a href="javascript:void(0)" class="btn btn-sm btn-info" onclick="tambah_rincian_belanja_rencana_aksi(${b.id},${value.id},'${value.kode_sbl}')" title="Rincian Belanja">${b.indikator}</a></td>` +
+                                        `<td class="text-center">${b.satuan}</td>` +
+                                        `<td class="text-center">${b.target_awal} ${target_teks_awal}</td>` +
+                                        `<td class="text-center">${b.target_akhir} ${target_teks_akhir}</td>` +
+                                        `<td class="text-right">${formatRupiah(b.rencana_pagu) || 0}</td>` +
+                                        `<td class="text-center">` +
+                                            `<input type="checkbox" title="Lihat Rencana Hasil Kerja Per Bulan" class="lihat_bulanan" data-id="${b.id}" onclick="lihat_bulanan(this);" style="margin: 0 6px;">` +
                                     data_tagging_rincian;
-                                if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
+                                if (
+                                    hak_akses_pegawai == 1 
+                                    || (
+                                        hak_akses_pegawai == 2 
+                                        && value.detail_pegawai 
+                                        && value.detail_pegawai.nip_baru 
+                                        && nip_pegawai == value.detail_pegawai.nip_baru
+                                    )
+                                ) {
                                     renaksi += `` +
                                         `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_indikator(${b.id}, ` + tipe + `,${total_pagu}, '${value.kode_sbl}')" title="Edit"><i class="dashicons dashicons-edit"></i></a> ` +
                                         `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-danger" onclick="hapus_indikator(${b.id}, ` + tipe + `);" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`;
                                 }
                                 renaksi += `` +
-                                    `</td>` +
+                                        `</td>` +
                                     `</tr>`;
 
                                 renaksi += `` +
                                     `<tr style="display: none;" class="data_bulanan_${b.id}">` +
-                                    `<td colspan="8" style="padding: 10px;">` +
-                                    `<div style="display: none; margin: 1rem auto;" class="data_bulanan_${b.id}">` +
-                                    `<h4 class="text-center" style="margin: 10px;">Rumus Indikator</h4>` +
-                                    `<textarea class="form-control" id="show-rumus-indikator">${val_rumus_indikator}</textarea>` +
-                                    `</div>` +
-                                    `</td>` +
+                                        `<td colspan="8" style="padding: 10px;">` +
+                                        `<div style="display: none; margin: 1rem auto;" class="data_bulanan_${b.id}">` +
+                                        `<h4 class="text-center" style="margin: 10px;">Rumus Indikator</h4>` +
+                                        `<textarea class="form-control" id="show-rumus-indikator">${val_rumus_indikator}</textarea>` +
+                                        `</div>` +
+                                        `</td>` +
                                     `</tr>`;
 
                                 const get_bulan = [
-                                    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-                                    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                                    "Januari", 
+                                    "Februari", 
+                                    "Maret", 
+                                    "April", 
+                                    "Mei", 
+                                    "Juni",
+                                    "Juli", 
+                                    "Agustus", 
+                                    "September", 
+                                    "Oktober", 
+                                    "November", 
+                                    "Desember"
                                 ];
 
                                 let bulanan = b.bulanan || [];
 
                                 renaksi += '' +
                                     `<tr style="display: none;" class="data_bulanan_${b.id}">` +
-                                    `<td colspan="8" style="padding: 10px;">` +
-                                    `<h3 class="text-center" style="margin: 10px;">Rencana Aksi Per Bulan</h3>` +
-                                    `<table class="table" style="margin: 0;">` +
-                                    `<thead>` +
-                                    `<tr class="table-secondary">` +
-                                    `<th class="text-center">Bulan/TW</th>` +
-                                    `<th class="text-center">Rencana Aksi</th>` +
-                                    `<th class="text-center" style="width:100px;">Target</th>` +
-                                    `<th class="text-center" style="width:100px;">Satuan</th>` +
-                                    `<th class="text-center" style="width:150px;">Realisasi</th>` +
-                                    `<th class="text-center" style="width:60px">Capaian</th>` +
-                                    `<th class="text-center">Tanggapan Atasan</th>` +
-                                    `<th class="text-center" style="width:60px">Aksi</th>` +
-                                    `</tr>` +
-                                    `</thead>` +
-                                    `<tbody>`;
+                                        `<td colspan="8" style="padding: 10px;">` +
+                                            `<h3 class="text-center" style="margin: 10px;">Rencana Aksi Per Bulan</h3>` +
+                                            `<table class="table" style="margin: 0;">` +
+                                                `<thead>` +
+                                                    `<tr class="table-secondary">` +
+                                                        `<th class="text-center">Bulan/TW</th>` +
+                                                        `<th class="text-center">Rencana Aksi</th>` +
+                                                        `<th class="text-center" style="width:100px;">Target</th>` +
+                                                        `<th class="text-center" style="width:100px;">Satuan</th>` +
+                                                        `<th class="text-center" style="width:150px;">Realisasi</th>` +
+                                                        `<th class="text-center" style="width:60px">Capaian</th>` +
+                                                        `<th class="text-center">Tanggapan Atasan</th>` +
+                                                        `<th class="text-center" style="width:60px">Aksi</th>` +
+                                                    `</tr>` +
+                                                `</thead>` +
+                                            `<tbody>`;
 
                                 let isdisabled = <?php echo $set_renaksi == 1 ? 'true' : 'false'; ?>;
                                 get_bulan.forEach((bulan, bulan_index) => {
@@ -3346,50 +2931,69 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                                     let capaian = parseSerializedData(get_data_bulanan.capaian);
                                     let keterangan = parseSerializedData(get_data_bulanan.keterangan);
 
-                                    renaksi += `<tr><td class="text-center">${bulan}</td><td class="text-center">`;
+                                    renaksi += `
+                                        <tr>
+                                            <td class="text-center">${bulan}</td>
+                                            <td class="text-center">`;
 
                                     rencana_aksi.forEach((aksi, index) => {
                                         renaksi += `<textarea class="form-control" name="rencana_aksi_${b.id}_${bulan_index + 1}_${index}" id="rencana_aksi_${b.id}_${bulan_index + 1}_${index}" ${isdisabled ? 'disabled' : ''}>${aksi}</textarea>`;
                                     });
-                                    renaksi += `</td><td class="text-center">`;
-
+                                    renaksi += `
+                                            </td>
+                                            <td class="text-center">`;
                                     volume.forEach((vol, index) => {
                                         renaksi += `<input type="text" class="form-control" name="volume_${b.id}_${bulan_index + 1}_${index}" id="volume_${b.id}_${bulan_index + 1}_${index}" value="${vol}" ${isdisabled ? 'disabled' : ''}>`;
                                     });
-                                    renaksi += `</td><td class="text-center">`;
+                                    renaksi += `
+                                            </td>
+                                            <td class="text-center">`;
 
                                     satuan.forEach((sat, index) => {
                                         renaksi += `<input type="text" class="form-control" name="satuan_bulan_${b.id}_${bulan_index + 1}_${index}" id="satuan_bulan_${b.id}_${bulan_index + 1}_${index}" value="${sat}" ${isdisabled ? 'disabled' : ''}>`;
                                     });
-                                    renaksi += `</td><td class="text-center">`;
+                                    renaksi += `
+                                            </td>
+                                            <td class="text-center">`;
 
                                     realisasi.forEach((real, index) => {
                                         renaksi += `<input type="number" class="form-control" name="realisasi_${b.id}_${bulan_index + 1}_${index}" id="realisasi_${b.id}_${bulan_index + 1}_${index}" value="${real}" ${isdisabled ? 'disabled' : ''}>`;
                                     });
-                                    renaksi += `</td><td class="text-center">`;
+                                    renaksi += `
+                                            </td>
+                                            <td class="text-center">`;
 
                                     capaian.forEach((cap, index) => {
                                         renaksi += `<input type="text" class="form-control" name="capaian_${b.id}_${bulan_index + 1}_${index}" id="capaian_${b.id}_${bulan_index + 1}_${index}" value="${cap}" ${isdisabled ? 'disabled' : ''}>`;
                                     });
-                                    renaksi += `</td><td class="text-center">`;
+                                    renaksi += `
+                                            </td>
+                                            <td class="text-center">`;
 
                                     keterangan.forEach((ket, index) => {
                                         renaksi += `<textarea class="form-control" name="keterangan_${b.id}_${bulan_index + 1}_${index}" id="keterangan_${b.id}_${bulan_index + 1}_${index}" ${isdisabled ? 'disabled' : ''}>${ket}</textarea>`;
                                     });
-                                    renaksi += `</td><td class="text-center">`;
+                                    renaksi += `
+                                            </td>
+                                            <td class="text-center">`;
 
                                     if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
                                         renaksi += isdisabled ? `-` : `<a href="javascript:void(0)" data-id="${b.id}" data-bulan="${bulan_index + 1}" class="btn btn-sm btn-success" onclick="simpan_bulanan(${b.id}, ${bulan_index + 1})" title="Simpan"><i class="dashicons dashicons-yes"></i></a>`;
                                     }
-                                    renaksi += `</td></tr>`;
+                                    renaksi += `
+                                            </td>
+                                        </tr>`;
 
                                     if ((bulan_index + 1) % 3 == 0) {
                                         var triwulan = (bulan_index + 1) / 3;
 
                                         // ----- capaian triwulan -----
                                         let data_capaian_target_realisasi_triwulan = '';
-                                        if(b['realisasi_tw_' + triwulan] && b['target_' + triwulan]){
-                                             data_capaian_target_realisasi_triwulan = ((b['realisasi_tw_' + triwulan] / b['target_' + triwulan]) * 100).toFixed(0)+'%';
+                                        if(
+                                            b['realisasi_tw_' + triwulan] 
+                                            && b['target_' + triwulan]
+                                        ){
+                                            data_capaian_target_realisasi_triwulan = ((b['realisasi_tw_' + triwulan] / b['target_' + triwulan]) * 100).toFixed(0)+'%';
                                         }else if(b['target_' + triwulan]){
                                             data_capaian_target_realisasi_triwulan = "0%";
                                         }else{
@@ -3398,18 +3002,18 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                                         
                                         renaksi += '' +
                                             `<tr style="background: #FDFFB6;">` +
-                                            `<td class="text-center">Triwulan ${triwulan}</td>` +
-                                            `<td class="text-center">${b.indikator}</td>` +
-                                            `<td class="text-center">${b['target_' + triwulan]}</td>` +
-                                            `<td class="text-center">${b.satuan}</td>` +
-                                            `<td class="text-center">` +
-                                            `<input type="number" class="form-control" name="realisasi_${b.id}_tw_${triwulan}" id="realisasi_${b.id}_tw_${triwulan}" ${isdisabled ? 'disabled' : ''} value="${b['realisasi_tw_' + triwulan] || ''}">` +
-                                            `</td>` +
-                                            `<td class="text-center">${data_capaian_target_realisasi_triwulan}</td>` +
-                                            `<td class="text-center">` +
-                                            `<textarea class="form-control" name="keterangan_${b.id}_tw_${triwulan}" id="keterangan_${b.id}_tw_${triwulan}" ${isdisabled ? 'disabled' : ''}>${b['ket_tw_' + triwulan] || ''}</textarea>` +
-                                            `</td>` +
-                                            `<td class="text-center">`;
+                                                `<td class="text-center">Triwulan ${triwulan}</td>` +
+                                                `<td class="text-center">${b.indikator}</td>` +
+                                                `<td class="text-center">${b['target_' + triwulan]}</td>` +
+                                                `<td class="text-center">${b.satuan}</td>` +
+                                                `<td class="text-center">` +
+                                                    `<input type="number" class="form-control" name="realisasi_${b.id}_tw_${triwulan}" id="realisasi_${b.id}_tw_${triwulan}" ${isdisabled ? 'disabled' : ''} value="${b['realisasi_tw_' + triwulan] || ''}">` +
+                                                `</td>` +
+                                                `<td class="text-center">${data_capaian_target_realisasi_triwulan}</td>` +
+                                                `<td class="text-center">` +
+                                                    `<textarea class="form-control" name="keterangan_${b.id}_tw_${triwulan}" id="keterangan_${b.id}_tw_${triwulan}" ${isdisabled ? 'disabled' : ''}>${b['ket_tw_' + triwulan] || ''}</textarea>` +
+                                                `</td>` +
+                                                `<td class="text-center">`;
                                         if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
                                             renaksi += `` +
                                                 (isdisabled ?
@@ -3418,7 +3022,7 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
                                                 );
                                         }
                                         renaksi += `` +
-                                            `</td>` +
+                                                `</td>` +
                                             `</tr>`;
                                     }
 
@@ -3436,43 +3040,54 @@ if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
 
                                 renaksi += '' +
                                     `<tr class="table-secondary">` +
-                                    `<th class="text-center">Total</th>` +
-                                    `<td class="text-center">${b.indikator}</td>` +
-                                    `<td class="text-center">${b.target_akhir}</td>` +
-                                    `<td class="text-center">${b.satuan}</td>` +
-                                    `<td class="text-center"><input type="number" class="form-control" name="realisasi_akhir_${b.id}" id="realisasi_akhir_${b.id}" value="${b['realisasi_akhir'] || ''}" ${isdisabled ? 'disabled' : ''}></td>` +
-                                    `<td class="text-center">${data_capaian_target_realisasi_total}</td>` +
-                                    `<td class="text-center"><textarea class="form-control" name="ket_total_${b.id}" id="ket_total_${b.id}" ${isdisabled ? 'disabled' : ''}>${b['ket_total'] || ''}</textarea></td>` +
-                                    `<td class="text-center">`;
-                                if (hak_akses_pegawai == 1 || (hak_akses_pegawai == 2 && value.detail_pegawai && value.detail_pegawai.nip_baru && nip_pegawai == value.detail_pegawai.nip_baru)) {
+                                        `<th class="text-center">Total</th>` +
+                                        `<td class="text-center">${b.indikator}</td>` +
+                                        `<td class="text-center">${b.target_akhir}</td>` +
+                                        `<td class="text-center">${b.satuan}</td>` +
+                                        `<td class="text-center"><input type="number" class="form-control" name="realisasi_akhir_${b.id}" id="realisasi_akhir_${b.id}" value="${b['realisasi_akhir'] || ''}" ${isdisabled ? 'disabled' : ''}></td>` +
+                                        `<td class="text-center">${data_capaian_target_realisasi_total}</td>` +
+                                        `<td class="text-center"><textarea class="form-control" name="ket_total_${b.id}" id="ket_total_${b.id}" ${isdisabled ? 'disabled' : ''}>${b['ket_total'] || ''}</textarea></td>` +
+                                        `<td class="text-center">`;
+                                if (
+                                    hak_akses_pegawai == 1 
+                                    || (
+                                        hak_akses_pegawai == 2 
+                                        && value.detail_pegawai 
+                                        && value.detail_pegawai.nip_baru 
+                                        && nip_pegawai == value.detail_pegawai.nip_baru
+                                    )
+                                ) {
                                     renaksi += `` +
-                                            (isdisabled ?
-                                                `-` :
-                                                `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-success" onclick="simpan_total(${b.id})" title="Simpan Total"><i class="dashicons dashicons-yes"></i></a>`
-                                            );
+                                        (isdisabled ?
+                                            `-` :
+                                            `<a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-success" onclick="simpan_total(${b.id})" title="Simpan Total"><i class="dashicons dashicons-yes"></i></a>`
+                                        );
                                 }
                                 renaksi += `` +
+                                                    `</td>` +
+                                                `</tr>` +
+                                            `</tbody>` +
+                                        `</table>` +
                                     `</td>` +
-                                    `</tr>` +
-                                    `</tbody>` +
-                                    `</table>` +
-                                    `</td>` +
-                                    `</tr>`;
+                                `</tr>`;
                             });
 
                             renaksi += '' +
-                                `</tbody>` +
-                                `</table>` +
+                                        `</tbody>` +
+                                    `</table>` +
                                 `</td>`;
                         }
 
                     });
                     renaksi += '' +
-                        `<tbody>` +
+                            `<tbody>` +
                         `</table>`;
 
                     jQuery("#nav-level-" + tipe).html(renaksi);
                     jQuery('.nav-tabs a[href="#nav-level-' + tipe + '"]').tab('show');
+                    if(tipe == 1){
+                        jQuery('#modal-renaksi').modal('show');
+                    }
                     resolve();
                 }
             });
