@@ -202,7 +202,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									FROM esakip_data_rencana_aksi_indikator_opd 
 									WHERE id_renaksi=%d
 										AND active = 1
-								", $val4->id));
+								", $val4['id']));
 							}
 						}
 
