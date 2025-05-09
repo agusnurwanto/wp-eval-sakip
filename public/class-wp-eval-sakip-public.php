@@ -29998,6 +29998,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						", $data['nip_baru'], $satker_id, $jabatan)
 					);
 				} else {
+					/*
+						11 = pejabat
+						21 = pendidikan
+						22 = kesehatan
+						23 = fungsional penyetaraan
+						24 = fungsional
+						25 = fungsional belum diangkat
+
+						guru dan nakes dilewati
+					*/
+					if(
+						$data['tipe_pegawai_id'] == 21
+						|| $data['tipe_pegawai_id'] == 22
+					){
+						continue;
+					}
 					$exists = $wpdb->get_var(
 						$wpdb->prepare("
 							SELECT 
@@ -30043,14 +30059,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 
 				if ($exists) {
-					//JIKA PLT PLH MASIH AKTIF JANGAN UPDATE
-					if (
-						$tipe == 'unor'
-						&& !empty($data['plt_plh'])
-						&& date('Y-m-d H:i:s') > $opsi_data_pegawai['berakhir']
-					) {
-						continue;
-					}
 					$opsi_data_pegawai['update_at'] = current_time('mysql');
 					$wpdb->update($table, $opsi_data_pegawai, ['id' => $exists]);
 				} else {
@@ -30082,7 +30090,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						WHERE active=1 
 						  AND tahun_anggaran=%d
 						  AND satker_id_parent=%s
-						", $tahun_anggaran_sakip, $satker['id']),
+						", $tahun_anggaran_sakip, $satker['satker_id']),
 						ARRAY_A
 					);
 					foreach($get_parent_satker_2 as $parent_satker_2) {

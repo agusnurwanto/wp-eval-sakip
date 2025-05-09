@@ -1894,7 +1894,7 @@ CREATE TABLE `esakip_data_satker_simpeg` (
 
 CREATE TABLE `esakip_data_pegawai_simpeg` (
   `id` int(11) NOT NULL auto_increment,
-  `nip_baru` text NOT NULL,
+  `nip_baru` VARCHAR(50) NOT NULL,
   `nama_pegawai` text NOT NULL, 
   `pangkat` VARCHAR(64) NOT NULL, 
   `gol_ruang` VARCHAR(64) NOT NULL, 
