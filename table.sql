@@ -1516,6 +1516,7 @@ CREATE TABLE `esakip_data_rencana_aksi_indikator_opd` (
   `created_at` datetime DEFAULT current_timestamp(),
   `update_at` datetime DEFAULT current_timestamp(),
   `rencana_pagu` double(20, 0) DEFAULT NULL,
+  `rencana_pagu_rhk` double(20, 0) DEFAULT NULL,
   `realisasi_pagu` double(20, 0) DEFAULT NULL,
   `aspek_rhk` tinyint(4) NULL COMMENT '1 = kuantitas, 2 kualitas, 3 = waktu, 4 = biaya',
   `set_target_teks` tinyint(4) DEFAULT NULL,

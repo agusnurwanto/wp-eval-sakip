@@ -166,9 +166,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									    WHERE parent=%d
 									      AND level=3
 									      AND active=1
-									", $val['id']), ARRAY_A);
+									", $val2['id']), ARRAY_A);
 
-									foreach ($data_renaksi[$key]['get_dasar_level_3'] as $key3 => $val3) {
+									foreach ($data_renaksi[$key]['get_dasar_level_3'][$key2] as $key3 => $val3) {
 										if($val3['input_rencana_pagu_level'] == 1){
 											$data_renaksi[$key]['rhk_input_pagu'][] = $val3;
 											continue;
@@ -205,16 +205,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								", $val4['id']));
 							}
 						}
-
-						// mengambil data dari level 3 untuk menampilkan di level / tipe 2
-						$data_renaksi[$key]['get_dasar_level_3'] = $wpdb->get_results($wpdb->prepare("
-						    SELECT
-						        *
-						    FROM esakip_data_rencana_aksi_opd
-						    WHERE parent=%d
-						      AND level=3
-						      AND active=1
-						", $val['id']));
 
 						$data_renaksi[$key]['indikator'] = $wpdb->get_results($wpdb->prepare("
 						    SELECT
@@ -1544,6 +1534,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'indikator' => $_POST['indikator'],
 						'satuan' => $_POST['satuan'],
 						'rencana_pagu' => $_POST['rencana_pagu'],
+						'rencana_pagu_rhk' => $_POST['rencana_pagu_tk'],
 						'realisasi_pagu' => $_POST['realisasi_pagu'],
 						'target_awal' => $_POST['target_awal'],
 						'target_akhir' => $_POST['target_akhir'],
@@ -1594,7 +1585,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$ret['total_pagu_setelah_perubahan'] = $total_pagu_renaksi;
 						$ret['total_all_pagu'] = $ret['total_pagu_sebelum_perubahan'] - $ret['total_pagu'];
 
-						if (!empty($_POST['rencana_pagu_tk']) && ($total_pagu_renaksi > $_POST['rencana_pagu_tk'])) {
+						if (
+							!empty($_POST['rencana_pagu_tk']) 
+							&& (
+								$total_pagu_renaksi > $_POST['rencana_pagu_tk']
+							)
+						) {
 							$ret['status'] = 'error';
 							$ret['message'] = 'Total rencana pagu tidak boleh melebihi 100% atau total pagu tersisa setelah diinput adalah  ' . $ret['total_all_pagu'] . '';
 						}
@@ -1751,9 +1747,15 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						", $v['id']), ARRAY_A);
 						$data_all['data'][$v['id']] = array(
 							'detail' => $v,
+							'total' => 0,
 							'data' => array(),
 							'indikator' => $indikator
 						);
+						if($v['input_rencana_pagu_level'] == 1 && !empty($indikator)){
+							foreach($indikator as $ind){
+								$data_all['data'][$v['id']]['total'] += $ind['rencana_pagu'];
+							}
+						}
 						$data2 = $wpdb->get_results($wpdb->prepare("
 							SELECT
 								*
@@ -1776,9 +1778,20 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							", $v2['id']), ARRAY_A);
 							$data_all['data'][$v['id']]['data'][$v2['id']] = array(
 								'detail' => $v2,
+								'total' => 0,
 								'data' => array(),
 								'indikator' => $indikator
 							);
+							if(
+								empty($v1['input_rencana_pagu_level'])
+								&& $v2['input_rencana_pagu_level'] == 1 
+								&& !empty($indikator)
+							){
+								foreach($indikator as $ind2){
+									$data_all['data'][$v['id']]['total'] += $ind2['rencana_pagu'];
+									$data_all['data'][$v['id']]['data'][$v2['id']]['total'] += $ind2['rencana_pagu'];
+								}
+							}
 							$data3 = $wpdb->get_results($wpdb->prepare("
 								SELECT
 									*
@@ -1801,9 +1814,22 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								", $v3['id']), ARRAY_A);
 								$data_all['data'][$v['id']]['data'][$v2['id']]['data'][$v3['id']] = array(
 									'detail' => $v3,
+									'total' => 0,
 									'data' => array(),
 									'indikator' => $indikator
 								);
+								if(
+									empty($v1['input_rencana_pagu_level'])
+									&& empty($v2['input_rencana_pagu_level'])
+									&& $v3['input_rencana_pagu_level'] == 1 
+									&& !empty($indikator)
+								){
+									foreach($indikator as $ind3){
+										$data_all['data'][$v['id']]['total'] += $ind3['rencana_pagu'];
+										$data_all['data'][$v['id']]['data'][$v2['id']]['total'] += $ind3['rencana_pagu'];
+										$data_all['data'][$v['id']]['data'][$v2['id']]['data'][$v3['id']]['total'] += $ind3['rencana_pagu'];
+									}
+								}
 								$data4 = $wpdb->get_results($wpdb->prepare("
 									SELECT
 										*
@@ -1829,6 +1855,19 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										'data' => array(),
 										'indikator' => $indikator
 									);
+
+									if(
+										empty($v['input_rencana_pagu_level'])
+										&& empty($v2['input_rencana_pagu_level'])
+										&& empty($v3['input_rencana_pagu_level'])
+										&& !empty($indikator)
+									){
+										foreach($indikator as $ind4){
+											$data_all['data'][$v['id']]['total'] += $ind4['rencana_pagu'];
+											$data_all['data'][$v['id']]['data'][$v2['id']]['total'] += $ind4['rencana_pagu'];
+											$data_all['data'][$v['id']]['data'][$v2['id']]['data'][$v3['id']]['total'] += $ind4['rencana_pagu'];
+										}
+									}
 								}
 							}
 						}
@@ -1840,6 +1879,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'show_header' => 1,
 						'post_status' => 'private'
 					));
+					$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 					$no = 0;
 					$no_renaksi = 0;
 					$no_uraian_renaksi = 0;
@@ -1865,7 +1905,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$total_harga_tagging_rincian = 0;
 						$total_realisasi_tagging_rincian = 0;
 
-						$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 						foreach ($v['indikator'] as $key => $ind) {
 							$indikator_html[$key] = '<a href="' . $this->functions->add_param_get($rincian_tagging['url'], '&tahun=' . $_POST['tahun_anggaran'] . '&id_skpd=' . $_POST['id_skpd'] . '&id_indikator=' . $ind['id']) . '" target="_blank">' . $ind['indikator'] . '</a>';
 							$satuan_html[$key] = $ind['satuan'];
@@ -1875,7 +1914,25 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$target_2_html[$key] = $ind['target_2'];
 							$target_3_html[$key] = $ind['target_3'];
 							$target_4_html[$key] = $ind['target_4'];
-							$rencana_pagu_html[$key] = ($set_pagu_renaksi == 1) ? 0 : (!empty($ind['rencana_pagu']) ? number_format((float)$ind['rencana_pagu'], 0, ",", ".") : 0);
+							$rencana_pagu_html[$key] = 0;
+							if(
+								$set_pagu_renaksi != 1
+								&& !empty($ind['rencana_pagu'])
+							){
+								$total_rhk_existing = $v['total'];
+
+								// cek jika total rencana pagu rhk tidak sama dengan akumulasi hitungan terbaru
+								if($ind['rencana_pagu_rhk'] != $total_rhk_existing){
+									$persen = ($ind['rencana_pagu']/$ind['rencana_pagu_rhk']) * 100;
+									$ind['rencana_pagu'] = ($persen/100) * $total_rhk_existing;
+
+									$wpdb->update('esakip_data_rencana_aksi_indikator_opd', array(
+										'rencana_pagu' => $ind['rencana_pagu'],
+										'rencana_pagu_rhk' => $total_rhk_existing
+									), array('id' => $ind['id']));
+								}
+								$rencana_pagu_html[$key] = number_format((float)$ind['rencana_pagu'], 0, ",", ".");
+							}
 							$realisasi_pagu_html[$key] = !empty($ind['realisasi_pagu']) ? $ind['realisasi_pagu'] : 0;
 							$realisasi_1_html[$key] = !empty($ind['realisasi_tw_1']) ? $ind['realisasi_tw_1'] : 0;
 							$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
@@ -2017,7 +2074,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$realisasi_3_html = array();
 							$realisasi_4_html = array();
 							$capaian_realisasi = array();
-							$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 							$total_harga_tagging_rincian = 0;
 							$total_realisasi_tagging_rincian = 0;
 							foreach ($renaksi['indikator'] as $key => $ind) {
@@ -2029,7 +2085,25 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$target_2_html[$key] = $ind['target_2'];
 								$target_3_html[$key] = $ind['target_3'];
 								$target_4_html[$key] = $ind['target_4'];
-								$rencana_pagu_html[$key] = ($set_pagu_renaksi == 1) ? 0 : (!empty($ind['rencana_pagu']) ? number_format((float)$ind['rencana_pagu'], 0, ",", ".") : 0);
+								$rencana_pagu_html[$key] = 0;
+								if(
+									$set_pagu_renaksi != 1
+									&& !empty($ind['rencana_pagu'])
+								){
+									$total_rhk_existing = $renaksi['total'];
+
+									// cek jika total rencana pagu rhk tidak sama dengan akumulasi hitungan terbaru
+									if($ind['rencana_pagu_rhk'] != $total_rhk_existing){
+										$persen = ($ind['rencana_pagu']/$ind['rencana_pagu_rhk']) * 100;
+										$ind['rencana_pagu'] = ($persen/100) * $total_rhk_existing;
+
+										$wpdb->update('esakip_data_rencana_aksi_indikator_opd', array(
+											'rencana_pagu' => $ind['rencana_pagu'],
+											'rencana_pagu_rhk' => $total_rhk_existing
+										), array('id' => $ind['id']));
+									}
+									$rencana_pagu_html[$key] = number_format((float)$ind['rencana_pagu'], 0, ",", ".");
+								}
 								$realisasi_pagu_html[$key] = !empty($ind['realisasi_pagu']) ? $ind['realisasi_pagu'] : 0;
 								$realisasi_1_html[$key] = !empty($ind['realisasi_tw_1']) ? $ind['realisasi_tw_1'] : 0;
 								$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
@@ -2093,12 +2167,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							);
 
 							if (empty($get_pegawai)) {
-								$wpdb->update(
-									'esakip_data_rencana_aksi_opd',
-									array('nip' => ''),
-									array('id' => $renaksi['detail']['id'])
-								);
-								$renaksi['detail']['nip'] = '';
+								// $wpdb->update(
+								// 	'esakip_data_rencana_aksi_opd',
+								// 	array('nip' => ''),
+								// 	array('id' => $renaksi['detail']['id'])
+								// );
+								// $renaksi['detail']['nip'] = '';
+
+								$keterangan .= '<li>Pegawai pelaksana dengan NIP = '.$renaksi['detail']['nip'].' dan satker_id = '.$renaksi['detail']['satker_id'].' tidak ditemukan</li>';
 							}
 
 							if (empty($renaksi['detail']['satker_id'])) {
@@ -2263,7 +2339,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$realisasi_3_html = array();
 								$realisasi_4_html = array();
 								$capaian_realisasi = array();
-								$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 								$total_harga_tagging_rincian = 0;
 								$total_realisasi_tagging_rincian = 0;
 								foreach ($uraian_renaksi['indikator'] as $key => $ind) {
@@ -2275,7 +2350,25 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$target_2_html[$key] = $ind['target_2'];
 									$target_3_html[$key] = $ind['target_3'];
 									$target_4_html[$key] = $ind['target_4'];
-									$rencana_pagu_html[$key] = ($set_pagu_renaksi == 1) ? 0 : (!empty($ind['rencana_pagu']) ? number_format((float)$ind['rencana_pagu'], 0, ",", ".") : 0);
+									$rencana_pagu_html[$key] = 0;
+									if(
+										$set_pagu_renaksi != 1
+										&& !empty($ind['rencana_pagu'])
+									){
+										$total_rhk_existing = $uraian_renaksi['total'];
+
+										// cek jika total rencana pagu rhk tidak sama dengan akumulasi hitungan terbaru
+										if($ind['rencana_pagu_rhk'] != $total_rhk_existing){
+											$persen = ($ind['rencana_pagu']/$ind['rencana_pagu_rhk']) * 100;
+											$ind['rencana_pagu'] = ($persen/100) * $total_rhk_existing;
+
+											$wpdb->update('esakip_data_rencana_aksi_indikator_opd', array(
+												'rencana_pagu' => $ind['rencana_pagu'],
+												'rencana_pagu_rhk' => $total_rhk_existing
+											), array('id' => $ind['id']));
+										}
+										$rencana_pagu_html[$key] = number_format((float)$ind['rencana_pagu'], 0, ",", ".");
+									}
 									$realisasi_pagu_html[$key] = !empty($ind['realisasi_pagu']) ? $ind['realisasi_pagu'] : 0;
 									$realisasi_1_html[$key] = !empty($ind['realisasi_tw_1']) ? $ind['realisasi_tw_1'] : 0;
 									$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
@@ -2344,12 +2437,13 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								);
 
 								if (empty($get_pegawai)) {
-									$wpdb->update(
-										'esakip_data_rencana_aksi_opd',
-										array('nip' => ''),
-										array('id' => $uraian_renaksi['detail']['id'])
-									);
-									$uraian_renaksi['detail']['nip'] = '';
+									// $wpdb->update(
+									// 	'esakip_data_rencana_aksi_opd',
+									// 	array('nip' => ''),
+									// 	array('id' => $uraian_renaksi['detail']['id'])
+									// );
+									// $uraian_renaksi['detail']['nip'] = '';
+									$keterangan .= '<li>Pegawai pelaksana dengan NIP = '.$uraian_renaksi['detail']['nip'].' dan satker_id = '.$uraian_renaksi['detail']['satker_id'].' tidak ditemukan</li>';
 								}
 								if (empty($uraian_renaksi['detail']['satker_id'])) {
 									$keterangan .= '<li>Satuan Kerja Belum Dipilih</li>';
@@ -2419,7 +2513,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$capaian_realisasi = array();
 									$rencana_pagu_html = array();
 									$realisasi_pagu_html = array();
-									$set_pagu_renaksi = get_option('_crb_set_pagu_renaksi');
 									$total_harga_tagging_rincian = 0;
 									$total_realisasi_tagging_rincian = 0;
 									foreach ($uraian_teknis_kegiatan['indikator'] as $key => $ind) {
@@ -2431,7 +2524,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										$target_2_html[$key] = $ind['target_2'];
 										$target_3_html[$key] = $ind['target_3'];
 										$target_4_html[$key] = $ind['target_4'];
-										$rencana_pagu_html[$key] = ($set_pagu_renaksi == 1) ? 0 : (!empty($ind['rencana_pagu']) ? number_format((float)$ind['rencana_pagu'], 0, ",", ".") : 0);;
+										$rencana_pagu_html[$key] = 0;
+										if(!empty($ind['rencana_pagu'])){
+											$rencana_pagu_html[$key] = number_format((float)$ind['rencana_pagu'], 0, ",", ".");
+										}
 										$realisasi_pagu_html[$key] = !empty($ind['realisasi_pagu']) ? $ind['realisasi_pagu'] : 0;
 										$realisasi_1_html[$key] = !empty($ind['realisasi_tw_1']) ? $ind['realisasi_tw_1'] : 0;
 										$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
@@ -2500,12 +2596,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									);
 
 									if (empty($get_pegawai)) {
-										$wpdb->update(
-											'esakip_data_rencana_aksi_opd',
-											array('nip' => ''),
-											array('id' => $uraian_teknis_kegiatan['detail']['id'])
-										);
-										$uraian_teknis_kegiatan['detail']['nip'] = '';
+										// $wpdb->update(
+										// 	'esakip_data_rencana_aksi_opd',
+										// 	array('nip' => ''),
+										// 	array('id' => $uraian_teknis_kegiatan['detail']['id'])
+										// );
+										// $uraian_teknis_kegiatan['detail']['nip'] = '';
+										
+										$keterangan .= '<li>Pegawai pelaksana dengan NIP = '.$uraian_teknis_kegiatan['detail']['nip'].' dan satker_id = '.$uraian_teknis_kegiatan['detail']['satker_id'].' tidak ditemukan</li>';
 									}
 									if (empty($uraian_teknis_kegiatan['detail']['satker_id'])) {
 										$keterangan .= '<li>Satuan Kerja Belum Dipilih</li>';
