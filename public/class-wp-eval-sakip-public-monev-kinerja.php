@@ -368,13 +368,15 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		}
 	}
 
-	function cek_validasi_input_rencana_pagu()
+	function cek_validasi_input_rencana_pagu($return)
 	{
 		global $wpdb;
 		$ret = array(
 			'status' => 'success',
 			'message' => 'Berhasil cek rencana pagu RHK!',
-			'rencana_pagu'  => 0
+			'rencana_pagu'  => 0,
+			'ids' => array(),
+			'ids_indikator' => array()
 		);
 
 		if (!empty($_POST)) {
@@ -389,24 +391,31 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				$rencana_pagu = 0;
 				foreach($cek_rhk_level_turunan as $level => $rhk_all){
 					foreach($rhk_all as $rhk){
-						$ret['rencana_pagu'] += $wpdb->get_var($wpdb->prepare("
+						$pagu_all = $wpdb->get_results($wpdb->prepare("
 							SELECT
-								sum(rencana_pagu)
-							FROM esakip_data_rencana_aksi_indikator_opd
-							WHERE id_renaksi=%d
-								AND active=1
-								AND tahun_anggaran=%d
-						", $rhk['id'], $rhk['tahun_anggaran']));
+								i.id as id_indikator,
+								s.id,
+								s.rencana_pagu
+							FROM esakip_data_rencana_aksi_indikator_opd as i
+							INNER JOIN esakip_sumber_dana_indikator as s on i.id=s.id_indikator
+								AND s.active=i.active
+								AND s.tahun_anggaran=i.tahun_anggaran
+							WHERE i.id_renaksi=%d
+								AND i.active=1
+								AND i.tahun_anggaran=%d
+						", $rhk['id'], $rhk['tahun_anggaran']), ARRAY_A);
+						foreach($pagu_all as $pagu){
+							$ret['rencana_pagu'] += $pagu['rencana_pagu'];
+							$ret['ids'][] = $pagu['id'];
+							$ret['ids_indikator'][$pagu['id_indikator']] = $pagu['id_indikator'];
+						}
 					}
 				}
 
 				if(!empty($ret['rencana_pagu'])){
 					// Untuk validasi agar setting input rencana pagu tetap di level RHK paling akhir
-					$ret = array(
-						'status' => 'error',
-						'message'   => "Rencana pagu RHK sebesar Rp ".number_format($ret['rencana_pagu'], 0, ",", ".")." sudah diinput di level bawahnya. Nilai pagu RHK level dibawah RHK ini akan di 0 kan atau dipindah ke RHK yang saat ini. Untuk rincian belanja perlu dipindahkan manual. Apakah kamu yakin untuk melanjutkan proses ini?",
-						'rencana_pagu' => $ret['rencana_pagu']
-					);
+					$ret['status'] = 'error';
+					$ret['message'] = "Rencana pagu RHK sebesar Rp ".number_format($ret['rencana_pagu'], 0, ",", ".")." sudah diinput di level bawahnya. Nilai pagu RHK level dibawah RHK ini akan di 0 kan atau dipindah ke RHK yang saat ini. Untuk rincian belanja perlu dipindahkan manual. Apakah kamu yakin untuk melanjutkan proses ini?";
 				}
 			} else {
 				$ret = array(
@@ -419,6 +428,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				'status' => 'error',
 				'message'   => 'Format tidak sesuai!'
 			);
+		}
+		if(!empty($return)){
+			return $ret;
 		}
 		die(json_encode($ret));
 	}
@@ -1529,6 +1541,26 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$ret['message'] = 'ID SKPD tidak boleh kosong!';
 				}
 				if ($ret['status'] != 'error') {
+					$_POST['id'] = $_POST['id_label'];
+					$cek_pagu = $this->cek_validasi_input_rencana_pagu(1);
+					if(
+						$cek_pagu['status'] == 'error'
+						&& !empty($cek_pagu['rencana_pagu'])
+					){
+						// update pagu indikator
+						$wpdb->query('
+							UPDATE esakip_data_rencana_aksi_indikator_opd 
+							set rencana_pagu=0 
+							WHERE id IN ('.implode(',', $cek_pagu['ids_indikator']).')
+						');
+
+						// UPDATE pagu di tabel sumber dana
+						$wpdb->query('
+							UPDATE esakip_sumber_dana_indikator 
+							set rencana_pagu=0 
+							WHERE id IN ('.implode(',', $cek_pagu['ids']).')
+						');
+					}
 					$data = array(
 						'id_renaksi' => $_POST['id_label'],
 						'indikator' => $_POST['indikator'],
@@ -1873,6 +1905,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						}
 					}
 
+					$ret['data_all'] = $data_all;
 					$rincian_tagging = $this->functions->generatePage(array(
 						'nama_page' => 'Halaman Tagging Rincian Belanja',
 						'content' => '[tagging_rincian_sakip]',
