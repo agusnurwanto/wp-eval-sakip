@@ -524,6 +524,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_verify_croscutting',  $plugin_public, 'verify_croscutting');
 		$this->loader->add_action('wp_ajax_edit_verify_croscutting',  $plugin_public, 'edit_verify_croscutting');
 		$this->loader->add_action('wp_ajax_detail_croscutting_by_id',  $plugin_public, 'detail_croscutting_by_id');
+		$this->loader->add_action('wp_ajax_nopriv_detail_croscutting_by_id',  $plugin_public, 'detail_croscutting_by_id');
 
 		$this->loader->add_action('wp_ajax_get_data_koneksi_pokin',  $plugin_public, 'get_data_koneksi_pokin');
 		$this->loader->add_action('wp_ajax_create_koneksi_pokin',  $plugin_public, 'create_koneksi_pokin');

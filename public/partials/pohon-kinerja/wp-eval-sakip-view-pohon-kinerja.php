@@ -735,7 +735,7 @@ if(!empty($data_all['data'])){
 				<div class="col-md-12 d-flex justify-content-center">
 					<div class="form-group text-center">
 						<label for="">Status</label>
-						<button type="button" class="btn btn-success d-block"">Disetujui</button>
+						<button type="button" class="btn btn-success d-block">Disetujui</button>
 					</div>
 				</div>
 			</div>
