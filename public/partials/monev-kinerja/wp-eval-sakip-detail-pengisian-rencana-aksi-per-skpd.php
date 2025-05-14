@@ -3174,7 +3174,13 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                 let html_setting_input_rencana_pagu = '';
                 if(tipe != 4){
                     var hide = 'style="display:none"';
-                    if(tipe == 3){
+                    
+                    // semua tipe sudah bisa input rencana pagu
+                    if(
+                        tipe == 3
+                        || tipe == 2
+                        || tipe == 1
+                    ){
                         hide = '';
                     }
                     html_setting_input_rencana_pagu = `

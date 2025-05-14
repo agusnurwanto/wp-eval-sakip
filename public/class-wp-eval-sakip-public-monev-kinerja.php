@@ -1956,8 +1956,13 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 								// cek jika total rencana pagu rhk tidak sama dengan akumulasi hitungan terbaru
 								if($ind['rencana_pagu_rhk'] != $total_rhk_existing){
-									$persen = ($ind['rencana_pagu']/$ind['rencana_pagu_rhk']) * 100;
-									$ind['rencana_pagu'] = ($persen/100) * $total_rhk_existing;
+									if(!empty($ind['rencana_pagu_rhk'])){
+										$ind['rencana_pagu_rhk'] = 0;
+										$persen = ($ind['rencana_pagu']/$ind['rencana_pagu_rhk']) * 100;
+										$ind['rencana_pagu'] = ($persen/100) * $total_rhk_existing;
+									}else if($total_rhk_existing == 0){
+										$ind['rencana_pagu'] = 0;
+									}
 
 									$wpdb->update('esakip_data_rencana_aksi_indikator_opd', array(
 										'rencana_pagu' => $ind['rencana_pagu'],
@@ -2127,8 +2132,13 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 									// cek jika total rencana pagu rhk tidak sama dengan akumulasi hitungan terbaru
 									if($ind['rencana_pagu_rhk'] != $total_rhk_existing){
-										$persen = ($ind['rencana_pagu']/$ind['rencana_pagu_rhk']) * 100;
-										$ind['rencana_pagu'] = ($persen/100) * $total_rhk_existing;
+										if(!empty($ind['rencana_pagu_rhk'])){
+											$ind['rencana_pagu_rhk'] = 0;
+											$persen = ($ind['rencana_pagu']/$ind['rencana_pagu_rhk']) * 100;
+											$ind['rencana_pagu'] = ($persen/100) * $total_rhk_existing;
+										}else if($total_rhk_existing == 0){
+											$ind['rencana_pagu'] = 0;
+										}
 
 										$wpdb->update('esakip_data_rencana_aksi_indikator_opd', array(
 											'rencana_pagu' => $ind['rencana_pagu'],
@@ -2392,8 +2402,13 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 										// cek jika total rencana pagu rhk tidak sama dengan akumulasi hitungan terbaru
 										if($ind['rencana_pagu_rhk'] != $total_rhk_existing){
-											$persen = ($ind['rencana_pagu']/$ind['rencana_pagu_rhk']) * 100;
-											$ind['rencana_pagu'] = ($persen/100) * $total_rhk_existing;
+											if(!empty($ind['rencana_pagu_rhk'])){
+												$ind['rencana_pagu_rhk'] = 0;
+												$persen = ($ind['rencana_pagu']/$ind['rencana_pagu_rhk']) * 100;
+												$ind['rencana_pagu'] = ($persen/100) * $total_rhk_existing;
+											}else if($total_rhk_existing == 0){
+												$ind['rencana_pagu'] = 0;
+											}
 
 											$wpdb->update('esakip_data_rencana_aksi_indikator_opd', array(
 												'rencana_pagu' => $ind['rencana_pagu'],
