@@ -684,6 +684,9 @@ class Wp_Eval_Sakip {
 		
 		$this->loader->add_action('wp_ajax_get_table_laporan_rencana_aksi',  $plugin_public, 'get_table_laporan_rencana_aksi');
 
+		$this->loader->add_action('wp_ajax_get_table_skpd_kuesioner_mendagri',  $plugin_public, 'get_table_skpd_kuesioner_mendagri');
+		$this->loader->add_action('wp_ajax_get_table_skpd_kuesioner_menpan',  $plugin_public, 'get_table_skpd_kuesioner_menpan');
+
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_evaluasi_sakip', array($plugin_public, 'jadwal_evaluasi_sakip'));
@@ -811,6 +814,11 @@ class Wp_Eval_Sakip {
 		add_shortcode('list_pegawai_laporan_pk', array($plugin_public, 'list_pegawai_laporan_pk'));
 
 		add_shortcode('detail_laporan_rhk', array($plugin_public, 'detail_laporan_rhk'));
+
+		add_shortcode('list_kuesioner_menpan', array($plugin_public, 'list_kuesioner_menpan'));
+		add_shortcode('list_kuesioner_mendagri', array($plugin_public, 'list_kuesioner_mendagri'));
+		add_shortcode('kuesioner_menpan', array($plugin_public, 'kuesioner_menpan'));
+		add_shortcode('kuesioner_mendagri', array($plugin_public, 'kuesioner_mendagri'));
 	}
 
 	/**

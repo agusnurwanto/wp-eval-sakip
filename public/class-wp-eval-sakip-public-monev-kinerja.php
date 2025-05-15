@@ -104,7 +104,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							FROM esakip_data_pegawai_simpeg
 							WHERE nip_baru = %d
 								AND satker_id = %d
-								AND active=1
+							ORDER BY active DESC
 						",
 							$val['nip'], $val['id_jabatan']
 						), ARRAY_A);
