@@ -31,6 +31,42 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/wp-eval-sakip-pengisian-lke-sakip-per-skpd.php';
 	}
 
+	public function list_kuesioner_menpan($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/wp-eval-sakip-list-kuesioner-menpan.php';
+	}
+
+	public function list_kuesioner_mendagri($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/wp-eval-sakip-list-kuesioner-mendagri.php';
+	}
+
+	public function kuesioner_menpan($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/wp-eval-sakip-kuesioner-menpan.php';
+	}
+
+	public function kuesioner_mendagri($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/wp-eval-sakip-kuesioner-mendagri.php';
+	}
+
 	public function get_table_skpd_pengisian_lke()
 	{
 		global $wpdb;
@@ -2084,4 +2120,154 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 		}
 		die(json_encode($ret));
 	}
+
+	public function get_table_skpd_kuesioner_menpan()
+    {
+        global $wpdb;
+        $ret = array(
+            'status' => 'success',
+            'message' => 'Berhasil get data!',
+            'data' => array()
+        );
+
+        if (!empty($_POST)) {
+            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+                if (!empty($_POST['tahun_anggaran'])) {
+                    $tahun_anggaran = $_POST['tahun_anggaran'];
+                } else {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Tahun Anggaran kosong!';
+                }
+
+                $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
+                if ($ret['status'] == 'success') {
+                    $unit = $wpdb->get_results(
+                        $wpdb->prepare("
+                            SELECT 
+                                nama_skpd, 
+                                id_skpd, 
+                                kode_skpd, 
+                                nipkepala 
+                            FROM esakip_data_unit 
+                            WHERE active=1 
+                              AND tahun_anggaran=%d
+                              AND is_skpd=1 
+                            ORDER BY kode_skpd ASC
+                        ", $tahun_anggaran_sakip),
+                        ARRAY_A
+                    );
+
+                    if (!empty($unit)) {
+                        $tbody = '';
+
+                        foreach ($unit as $kk => $vv) {
+							$halaman_kuesioner_menpan = $this->functions->generatePage(array(
+                                'nama_page' => 'Halaman Kuesioner Menpan ' . $tahun_anggaran,
+                                'content' => '[kuesioner_menpan tahun_anggaran=' . $tahun_anggaran . ']',
+                                'show_header' => 1,
+                                'post_status' => 'private'
+                            ));
+
+                            $tbody .= "<tr>";
+                            $tbody .= "<td style='text-transform: uppercase;'><a href='" . $halaman_kuesioner_menpan['url'] . "&id_skpd=" . $vv['id_skpd'] . "' target='_blank'>" . $vv['kode_skpd'] . " " . $vv['nama_skpd'] . "</a></td>";
+                            $tbody .= "<td style='text-transform: uppercase;'></td>";
+                            $tbody .= "<td style='text-transform: uppercase;'></td>";
+                            $tbody .= "<td style='text-transform: uppercase;'></td>";
+                            $tbody .= "<td style='text-transform: uppercase;'></td>";	
+                            $tbody .= "</tr>";
+                        }
+                        $ret['data'] = $tbody;
+                    } else {
+                        $ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+                    }
+                }
+            } else {
+                $ret = array(
+                    'status' => 'error',
+                    'message'   => 'Api Key tidak sesuai!'
+                );
+            }
+        } else {
+            $ret = array(
+                'status' => 'error',
+                'message'   => 'Format tidak sesuai!'
+            );
+        }
+        die(json_encode($ret));
+    }
+
+	public function get_table_skpd_kuesioner_mendagri()
+    {
+        global $wpdb;
+        $ret = array(
+            'status' => 'success',
+            'message' => 'Berhasil get data!',
+            'data' => array()
+        );
+
+        if (!empty($_POST)) {
+            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+                if (!empty($_POST['tahun_anggaran'])) {
+                    $tahun_anggaran = $_POST['tahun_anggaran'];
+                } else {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Tahun Anggaran kosong!';
+                }
+
+                $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
+                if ($ret['status'] == 'success') {
+                    $unit = $wpdb->get_results(
+                        $wpdb->prepare("
+                            SELECT 
+                                nama_skpd, 
+                                id_skpd, 
+                                kode_skpd, 
+                                nipkepala 
+                            FROM esakip_data_unit 
+                            WHERE active=1 
+                              AND tahun_anggaran=%d
+                              AND is_skpd=1 
+                            ORDER BY kode_skpd ASC
+                        ", $tahun_anggaran_sakip),
+                        ARRAY_A
+                    );
+
+                    if (!empty($unit)) {
+                        $tbody = '';
+
+                        foreach ($unit as $kk => $vv) {
+							$halaman_kuesioner_mendagri = $this->functions->generatePage(array(
+                                'nama_page' => 'Halaman Kuesioner Menpan ' . $tahun_anggaran,
+                                'content' => '[kuesioner_mendagri tahun_anggaran=' . $tahun_anggaran . ']',
+                                'show_header' => 1,
+                                'post_status' => 'private'
+                            ));
+
+                            $tbody .= "<tr>";
+                            $tbody .= "<td style='text-transform: uppercase;'><a href='" . $halaman_kuesioner_mendagri['url'] . "&id_skpd=" . $vv['id_skpd'] . "' target='_blank'>" . $vv['kode_skpd'] . " " . $vv['nama_skpd'] . "</a></td>";
+                            $tbody .= "<td style='text-transform: uppercase;'></td>";
+                            $tbody .= "<td style='text-transform: uppercase;'></td>";
+                            $tbody .= "</tr>";
+                        }
+                        $ret['data'] = $tbody;
+                    } else {
+                        $ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+                    }
+                }
+            } else {
+                $ret = array(
+                    'status' => 'error',
+                    'message'   => 'Api Key tidak sesuai!'
+                );
+            }
+        } else {
+            $ret = array(
+                'status' => 'error',
+                'message'   => 'Format tidak sesuai!'
+            );
+        }
+        die(json_encode($ret));
+    }
 }

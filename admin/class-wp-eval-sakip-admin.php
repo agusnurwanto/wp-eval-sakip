@@ -1286,6 +1286,38 @@ class Wp_Eval_Sakip_Admin
 									</ul>
 								</div>
 							</div>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'kuesioner_menpan') {
+							$list_skpd_laporan_pk = $this->functions->generatePage(array(
+								'nama_page' => 'Kuesioner Menpan tahun ' . $tahun_item['tahun_anggaran'],
+								'content' => '[list_kuesioner_menpan tahun=' . $tahun_item['tahun_anggaran'] . ']',
+								'show_header' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+							<div class="accordion">
+								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+									<ul style="margin-left: 20px;">
+										<li><a target="_blank" href="' . $list_skpd_laporan_pk['url'] . '">' . $list_skpd_laporan_pk['title'] . '</a></li>
+									</ul>
+								</div>
+							</div>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'kuesioner_mendagri') {
+							$list_skpd_laporan_pk = $this->functions->generatePage(array(
+								'nama_page' => 'Kuesioner Mendagri tahun ' . $tahun_item['tahun_anggaran'],
+								'content' => '[list_kuesioner_mendagri tahun=' . $tahun_item['tahun_anggaran'] . ']',
+								'show_header' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+							<div class="accordion">
+								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+									<ul style="margin-left: 20px;">
+										<li><a target="_blank" href="' . $list_skpd_laporan_pk['url'] . '">' . $list_skpd_laporan_pk['title'] . '</a></li>
+									</ul>
+								</div>
+							</div>';
 						}
 						$ret['message'] .= $body_pemda;
 					}
@@ -2386,6 +2418,46 @@ class Wp_Eval_Sakip_Admin
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'laporan_pk_opd')));
 
+		$kuesioner = Container::make('theme_options', __('Kuesioner'))
+			->set_page_menu_position(3.10)
+			->set_icon('dashicons-media-default')
+			->add_fields($this->get_ajax_field(array('type' => 'kuesioner')));
+		
+		Container::make('theme_options', __('MENPAN'))
+			->set_page_parent($kuesioner)
+			->add_fields(array(
+				Field::make('html', 'crb_kuesioner_menpan_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+					<h3>Halaman Kuesioner Menpan</h3>
+					<table class="form-table">
+						<tbody>
+						</tbody>
+					</table>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'kuesioner_menpan')));
+
+			Container::make('theme_options', __('MENDAGRI'))
+			->set_page_parent($kuesioner)
+			->add_fields(array(
+				Field::make('html', 'crb_kuesioner_mendagri_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+					<h3>Halaman Kuesioner Mendagri</h3>
+					<table class="form-table">
+						<tbody>
+						</tbody>
+					</table>
+				')
+			))
+			->add_fields($this->get_ajax_field(array('type' => 'kuesioner_mendagri')));
 		// Container::make('theme_options', __('RKPD'))
 		// 	->set_page_parent($dokumen_pemda_menu)
 		// 	->add_fields(array(

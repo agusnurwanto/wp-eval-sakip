@@ -27,10 +27,11 @@ function get_pegawai_skpd_rhk($rhk, $wpdb)
                 nama_pegawai
             FROM esakip_data_pegawai_simpeg
             WHERE nip_baru = %s
-        ", $rhk['nip']),
+            	AND satker_id = %d
+            ORDER BY active DESC
+        ", $rhk['nip'], $rhk['id_jabatan']),
 		ARRAY_A
 	);
-
 	// Mengambil nama SKPD berdasarkan tahun anggaran dan ID SKPD
 	$nama_skpd = $wpdb->get_var(
 		$wpdb->prepare("
