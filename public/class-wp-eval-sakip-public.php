@@ -30053,8 +30053,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						// Jika masa PLT PLH sudah tidak aktif maka tidak perlu diupdate. Ada beberapa PLT yang tidak ada masa berakhirnya
 						if (
-							!empty($opsi_data_pegawai['berakhir'])
-							&& date('Y-m-d H:i:s') > $opsi_data_pegawai['berakhir']
+							empty($opsi_data_pegawai['berakhir'])
+							|| date('Y-m-d H:i:s') > $opsi_data_pegawai['berakhir']
 						){
 							continue;
 						}
