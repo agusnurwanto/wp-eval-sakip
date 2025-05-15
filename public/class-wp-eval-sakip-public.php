@@ -30012,7 +30012,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$data['tipe_pegawai_id'] == 21
 						|| $data['tipe_pegawai_id'] == 22
 					){
-						continue;
+						// continue;
 					}
 					$exists = $wpdb->get_var(
 						$wpdb->prepare("
@@ -30026,30 +30026,36 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					);
 				}
 
+				$opsi_data_pegawai = array(
+					'nama_pegawai' => $data['nama_pegawai'],
+					'nip_baru' => $data['nip_baru'],
+					'update_at' => current_time('mysql'),
+					'active' => 1
+				);
+				
 				if ($tipe == 'asn') {
-					$opsi_data_pegawai['nama_pegawai'] 	 = $data['nama_pegawai'];
 					$opsi_data_pegawai['gol_ruang'] 	 = $data['gol_ruang'];
 					$opsi_data_pegawai['pangkat'] 		 = $data['nmgolruang'];
 					$opsi_data_pegawai['gelar_depan'] 	 = $data['gelar_depan'];
 					$opsi_data_pegawai['gelar_belakang'] = $data['gelar_belakang'];
-					$opsi_data_pegawai['active'] 		 = 1;
 				}
 
 				if ($tipe == 'unor') {
-					$opsi_data_pegawai['nama_pegawai'] 		= $data['nama_pegawai'];
 					$opsi_data_pegawai['satker_id'] 		= $data['satker_id'];
 					$opsi_data_pegawai['jabatan'] 			= $data['jabatan'];
 					$opsi_data_pegawai['tipe_pegawai'] 		= $data['tipe_pegawai'];
 					$opsi_data_pegawai['tipe_pegawai_id'] 	= $data['tipe_pegawai_id'];
-					$opsi_data_pegawai['active'] 		 	= 1;
 
 					if (!empty($data['plt_plh'])) {
 						$opsi_data_pegawai['plt_plh'] 		= $data['plt_plh'];
 						$opsi_data_pegawai['tmt_sk_plth'] 	= !empty($data['tmt_sk_plth']) ? (new DateTime($data['tmt_sk_plth']))->format('Y-m-d H:i:s') : NULL;
 						$opsi_data_pegawai['berakhir'] 		= !empty($data['berakhir']) ? (new DateTime($data['berakhir']))->format('Y-m-d H:i:s') : NULL;
 
-						// Jika masa PLT PLH sudah tidak aktif maka tidak perlu diupdate
-						if (date('Y-m-d H:i:s') > $opsi_data_pegawai['berakhir']) {
+						// Jika masa PLT PLH sudah tidak aktif maka tidak perlu diupdate. Ada beberapa PLT yang tidak ada masa berakhirnya
+						if (
+							!empty($opsi_data_pegawai['berakhir'])
+							&& date('Y-m-d H:i:s') > $opsi_data_pegawai['berakhir']
+						){
 							continue;
 						}
 					} else {
@@ -30064,11 +30070,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 
 				if ($exists) {
-					$opsi_data_pegawai['update_at'] = current_time('mysql');
-					$wpdb->update($table, $opsi_data_pegawai, ['id' => $exists]);
+					$wpdb->update($table, $opsi_data_pegawai, array('id' => $exists));
 				} else {
-					$opsi_data_pegawai['nip_baru'] = $data['nip_baru'];
-					$opsi_data_pegawai['created_at'] = current_time('mysql');
 					$wpdb->insert($table, $opsi_data_pegawai);
 				}
 			}

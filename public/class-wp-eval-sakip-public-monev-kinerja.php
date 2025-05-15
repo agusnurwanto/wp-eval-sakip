@@ -2014,38 +2014,37 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$target_4_html = implode('<br>', $target_4_html);
 						$rencana_pagu_html = implode('<br>', $rencana_pagu_html);
 						$realisasi_pagu_html = implode('<br>', $realisasi_pagu_html);
-						$keterangan = '';
 						$realisasi_1_html = implode('<br>', $realisasi_1_html);
 						$realisasi_2_html = implode('<br>', $realisasi_2_html);
 						$realisasi_3_html = implode('<br>', $realisasi_3_html);
 						$realisasi_4_html = implode('<br>', $realisasi_4_html);
 						$capaian_realisasi = implode('<br>', $capaian_realisasi);
 
-						//UPDATE PEGAWAI YANG TIDAK SESUAI SATKER UTAMA NYA
-						$satker_id_utama = substr($v['detail']['satker_id'], 0, 2);
-						$get_pegawai = $wpdb->get_var($wpdb->prepare("
-						    SELECT 
-						    	id
-						    FROM esakip_data_pegawai_simpeg
-						    WHERE nip_baru = %s
-						    	AND satker_id LIKE %s
-						", $v['detail']['nip'], $satker_id_utama . '%'));
-
-						if (empty($get_pegawai)) {
-							/*$wpdb->update(
-								'esakip_data_rencana_aksi_opd',
-								array('nip' => ''),
-								array('id' => $v['detail']['id'])
-							);
-							$v['detail']['nip'] = '';*/
-							$keterangan .= '<li>Pegawai pelaksana dengan NIP = '.$v['detail']['nip'].' dan satker_id = '.$v['detail']['satker_id'].' tidak ditemukan</li>';
-						}
-
+						$keterangan = '';
 						if (empty($v['detail']['satker_id'])) {
 							$keterangan .= '<li>Satuan Kerja Belum Dipilih</li>';
 						}
 						if (empty($v['detail']['nip'])) {
 							$keterangan .= '<li>Pegawai Pelaksana Belum Dipilih</li>';
+						}else{
+							// Cek NIP apakah existing sesuai satker
+							$satker_id_utama = substr($v['detail']['satker_id'], 0, 2);
+							$get_pegawai = $wpdb->get_row(
+								$wpdb->prepare("
+									SELECT 
+										*
+									FROM esakip_data_pegawai_simpeg
+									WHERE nip_baru = %s
+									  	AND satker_id LIKE %s
+									ORDER by active DESC
+								", $v['detail']['nip'], $satker_id_utama . '%'), ARRAY_A
+							);
+
+							if (empty($get_pegawai)) {
+								$keterangan .= '<li>Pegawai pelaksana dengan NIP = '.$v['detail']['nip'].' dan satker_id = '.$v['detail']['satker_id'].' tidak ditemukan</li>';
+							}else if($get_pegawai['active'] == 0){
+								$keterangan .= '<li>Pegawai atas nama '.$get_pegawai['nama_pegawai'].', jabatan '.$get_pegawai['jabatan'].', satker_id '.$get_pegawai['satker_id'].' sudah tidak aktif!</li>';
+							}
 						}
 
 						if (empty($v['detail']['kode_cascading_sasaran'])) {
@@ -2197,34 +2196,30 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$realisasi_4_html = implode('<br>', $realisasi_4_html);
 							$capaian_realisasi = implode('<br>', $capaian_realisasi);
 
-							//UPDATE PEGAWAI YANG TIDAK SESUAI SATKER UTAMA NYA
-							$satker_id_utama = substr($renaksi['detail']['satker_id'], 0, 2);
-							$get_pegawai = $wpdb->get_var(
-								$wpdb->prepare("
-									SELECT 
-										id
-									FROM esakip_data_pegawai_simpeg
-									WHERE nip_baru = %s
-									  AND satker_id LIKE %s
-								", $renaksi['detail']['nip'], $satker_id_utama . '%')
-							);
-
-							if (empty($get_pegawai)) {
-								// $wpdb->update(
-								// 	'esakip_data_rencana_aksi_opd',
-								// 	array('nip' => ''),
-								// 	array('id' => $renaksi['detail']['id'])
-								// );
-								// $renaksi['detail']['nip'] = '';
-
-								$keterangan .= '<li>Pegawai pelaksana dengan NIP = '.$renaksi['detail']['nip'].' dan satker_id = '.$renaksi['detail']['satker_id'].' tidak ditemukan</li>';
-							}
-
 							if (empty($renaksi['detail']['satker_id'])) {
 								$keterangan .= '<li>Satuan Kerja Belum Dipilih</li>';
 							}
 							if (empty($renaksi['detail']['nip'])) {
 								$keterangan .= '<li>Pegawai Pelaksana Belum Dipilih</li>';
+							}else{
+								// Cek NIP apakah existing sesuai satker
+								$satker_id_utama = substr($renaksi['detail']['satker_id'], 0, 2);
+								$get_pegawai = $wpdb->get_row(
+									$wpdb->prepare("
+										SELECT 
+											*
+										FROM esakip_data_pegawai_simpeg
+										WHERE nip_baru = %s
+										  	AND satker_id LIKE %s
+										ORDER by active DESC
+									", $renaksi['detail']['nip'], $satker_id_utama . '%'), ARRAY_A
+								);
+
+								if (empty($get_pegawai)) {
+									$keterangan .= '<li>Pegawai pelaksana dengan NIP = '.$renaksi['detail']['nip'].' dan satker_id = '.$renaksi['detail']['satker_id'].' tidak ditemukan</li>';
+								}else if($get_pegawai['active'] == 0){
+									$keterangan .= '<li>Pegawai atas nama '.$get_pegawai['nama_pegawai'].', jabatan '.$get_pegawai['jabatan'].', satker_id '.$get_pegawai['satker_id'].' sudah tidak aktif!</li>';
+								}
 							}
 							if (empty($renaksi['detail']['kode_cascading_program'])) {
 								$keterangan .= '<li>Cascading Program Belum dipilih</li>';
@@ -2471,33 +2466,30 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$label_pokin = $uraian_renaksi['detail']['label_pokin_4'];
 								}
 								$keterangan = '';
-
-								//UPDATE PEGAWAI YANG TIDAK SESUAI SATKER UTAMA NYA
-								$satker_id_utama = substr($uraian_renaksi['detail']['satker_id'], 0, 2);
-								$get_pegawai = $wpdb->get_var(
-									$wpdb->prepare("
-										SELECT 
-											id
-										FROM esakip_data_pegawai_simpeg
-										WHERE nip_baru = %s
-										  AND satker_id LIKE %s
-									", $uraian_renaksi['detail']['nip'], $satker_id_utama . '%')
-								);
-
-								if (empty($get_pegawai)) {
-									// $wpdb->update(
-									// 	'esakip_data_rencana_aksi_opd',
-									// 	array('nip' => ''),
-									// 	array('id' => $uraian_renaksi['detail']['id'])
-									// );
-									// $uraian_renaksi['detail']['nip'] = '';
-									$keterangan .= '<li>Pegawai pelaksana dengan NIP = '.$uraian_renaksi['detail']['nip'].' dan satker_id = '.$uraian_renaksi['detail']['satker_id'].' tidak ditemukan</li>';
-								}
 								if (empty($uraian_renaksi['detail']['satker_id'])) {
 									$keterangan .= '<li>Satuan Kerja Belum Dipilih</li>';
 								}
 								if (empty($uraian_renaksi['detail']['nip'])) {
 									$keterangan .= '<li>Pegawai Pelaksana Belum Dipilih</li>';
+								}else{
+									// Cek NIP apakah existing sesuai satker
+									$satker_id_utama = substr($uraian_renaksi['detail']['satker_id'], 0, 2);
+									$get_pegawai = $wpdb->get_row(
+										$wpdb->prepare("
+											SELECT 
+												*
+											FROM esakip_data_pegawai_simpeg
+											WHERE nip_baru = %s
+											  	AND satker_id LIKE %s
+											ORDER by active DESC
+										", $uraian_renaksi['detail']['nip'], $satker_id_utama . '%'), ARRAY_A
+									);
+
+									if (empty($get_pegawai)) {
+										$keterangan .= '<li>Pegawai pelaksana dengan NIP = '.$uraian_renaksi['detail']['nip'].' dan satker_id = '.$uraian_renaksi['detail']['satker_id'].' tidak ditemukan</li>';
+									}else if($get_pegawai['active'] == 0){
+										$keterangan .= '<li>Pegawai atas nama '.$get_pegawai['nama_pegawai'].', jabatan '.$get_pegawai['jabatan'].', satker_id '.$get_pegawai['satker_id'].' sudah tidak aktif!</li>';
+									}
 								}
 								if (empty($uraian_renaksi['detail']['kode_cascading_kegiatan'])) {
 									$keterangan .= '<li>Cascading Kegiatan Belum dipilih</li>';
@@ -2630,34 +2622,30 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										$label_pokin = $uraian_teknis_kegiatan['detail']['label_pokin_4'];
 									}
 									$keterangan = '';
-
-									//UPDATE PEGAWAI YANG TIDAK SESUAI SATKER UTAMA NYA
-									$satker_id_utama = substr($uraian_teknis_kegiatan['detail']['satker_id'], 0, 2);
-									$get_pegawai = $wpdb->get_var(
-										$wpdb->prepare("
-											SELECT 
-												id
-											FROM esakip_data_pegawai_simpeg
-											WHERE nip_baru = %s
-											  AND satker_id LIKE %s
-										", $uraian_teknis_kegiatan['detail']['nip'], $satker_id_utama . '%')
-									);
-
-									if (empty($get_pegawai)) {
-										// $wpdb->update(
-										// 	'esakip_data_rencana_aksi_opd',
-										// 	array('nip' => ''),
-										// 	array('id' => $uraian_teknis_kegiatan['detail']['id'])
-										// );
-										// $uraian_teknis_kegiatan['detail']['nip'] = '';
-										
-										$keterangan .= '<li>Pegawai pelaksana dengan NIP = '.$uraian_teknis_kegiatan['detail']['nip'].' dan satker_id = '.$uraian_teknis_kegiatan['detail']['satker_id'].' tidak ditemukan</li>';
-									}
 									if (empty($uraian_teknis_kegiatan['detail']['satker_id'])) {
 										$keterangan .= '<li>Satuan Kerja Belum Dipilih</li>';
 									}
 									if (empty($uraian_teknis_kegiatan['detail']['nip'])) {
 										$keterangan .= '<li>Pegawai Pelaksana Belum Dipilih</li>';
+									}else{
+										// Cek NIP apakah existing sesuai satker
+										$satker_id_utama = substr($uraian_teknis_kegiatan['detail']['satker_id'], 0, 2);
+										$get_pegawai = $wpdb->get_row(
+											$wpdb->prepare("
+												SELECT 
+													*
+												FROM esakip_data_pegawai_simpeg
+												WHERE nip_baru = %s
+												  	AND satker_id LIKE %s
+												ORDER by active DESC
+											", $uraian_teknis_kegiatan['detail']['nip'], $satker_id_utama . '%'), ARRAY_A
+										);
+
+										if (empty($get_pegawai)) {
+											$keterangan .= '<li>Pegawai pelaksana dengan NIP = '.$uraian_teknis_kegiatan['detail']['nip'].' dan satker_id = '.$uraian_teknis_kegiatan['detail']['satker_id'].' tidak ditemukan</li>';
+										}else if($get_pegawai['active'] == 0){
+											$keterangan .= '<li>Pegawai atas nama '.$get_pegawai['nama_pegawai'].', jabatan '.$get_pegawai['jabatan'].', satker_id '.$get_pegawai['satker_id'].' sudah tidak aktif!</li>';
+										}
 									}
 									if (empty($uraian_teknis_kegiatan['detail']['kode_cascading_sub_kegiatan'])) {
 										$keterangan .= '<li>Cascading Sub Kegiatan Belum dipilih</li>';

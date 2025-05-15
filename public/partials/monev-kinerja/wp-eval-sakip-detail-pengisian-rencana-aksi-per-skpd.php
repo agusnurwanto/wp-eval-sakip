@@ -103,14 +103,13 @@ $data_user_pegawai = $wpdb->get_results(
     ARRAY_A
 );
 
+$hak_akses_user_pegawai = 0;
+$nip_user_pegawai = 0;
 $skpd_user_pegawai = array();
 $hak_akses_user_pegawai_per_skpd = array();
 if (!empty($data_user_pegawai)) {
     foreach ($data_user_pegawai as $k_user => $v_user) {
         $satker_pegawai_simpeg = substr($v_user['satker_id'], 0, 2);
-        $hak_akses_user_pegawai = 0;
-        $nip_user_pegawai = 0;
-        
         $skpd_user_pegawai = $wpdb->get_row(
             $wpdb->prepare(
                 "SELECT 
