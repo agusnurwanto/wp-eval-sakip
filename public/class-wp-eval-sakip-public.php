@@ -18731,6 +18731,27 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
+	function count_renstra_document($status_verifikasi, $id_skpd, $id_jadwal) {
+		global $wpdb;
+		return $wpdb->get_var(
+			$wpdb->prepare("
+				SELECT COUNT(d.id)
+				FROM esakip_renstra d
+				INNER JOIN esakip_keterangan_verifikator kv 
+				   ON kv.id_dokumen = d.id
+				  AND kv.id_jadwal = d.id_jadwal
+				  AND kv.id_skpd = d.id_skpd
+				  AND kv.active = d.active
+				WHERE d.id_skpd = %d
+				  AND d.id_jadwal = %d
+				  AND d.active = 1
+				  AND kv.active = 1
+				  AND kv.status_verifikasi = %d
+				  AND kv.nama_tabel_dokumen = 'esakip_renstra'
+			", $id_skpd, $id_jadwal, $status_verifikasi)
+		);
+	}	
+
 	public function get_table_skpd_renstra()
 	{
 		global $wpdb;
@@ -18872,83 +18893,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										COUNT(id)
 									FROM esakip_renstra
 									WHERE id_skpd = %d
-									AND id_jadwal = %d
-									AND active = 1
+									  AND id_jadwal = %d
+									  AND active = 1
 								", $vv['id_skpd'], $id_jadwal)
 							);
 
+							$jumlah_disetujui = $this->count_renstra_document(1, $vv['id_skpd'], $id_jadwal);
+							$jumlah_ditolak   = $this->count_renstra_document(2, $vv['id_skpd'], $id_jadwal);
+							$jumlah_draft     = $this->count_renstra_document(3, $vv['id_skpd'], $id_jadwal);
 
-							$jumlah_status_disetujui = $wpdb->get_var(
-								$wpdb->prepare(
-									"
-									SELECT 
-										COUNT(kv.id)
-									FROM 
-										esakip_renstra pk 
-									JOIN 
-										esakip_keterangan_verifikator kv 
-										ON pk.id=kv.id_dokumen
-									WHERE pk.id_skpd = %d
-									AND pk.id_jadwal = %d
-									AND pk.active = 1
-									AND kv.active = 1
-									AND kv.status_verifikasi=1
-									AND kv.nama_tabel_dokumen = %s
-									",
-									$vv['id_skpd'],
-									$id_jadwal,
-									'esakip_renstra'
-								)
-							);
-
-							$jumlah_status_ditolak = $wpdb->get_var(
-								$wpdb->prepare(
-									"
-									SELECT 
-										COUNT(kv.id)
-									FROM 
-										esakip_renstra pk 
-									JOIN 
-										esakip_keterangan_verifikator kv 
-										ON pk.id=kv.id_dokumen
-									WHERE pk.id_skpd = %d
-									AND pk.id_jadwal = %d
-									AND pk.active = 1
-									AND kv.active = 1
-									AND kv.status_verifikasi=2
-									AND kv.nama_tabel_dokumen = %s
-									",
-									$vv['id_skpd'],
-									$id_jadwal,
-									'esakip_renstra'
-								)
-							);
-
-							$jumlah_status_draft = $wpdb->get_var(
-								$wpdb->prepare(
-									"
-									SELECT 
-										COUNT(kv.id)
-									FROM 
-										esakip_renstra pk 
-									JOIN 
-										esakip_keterangan_verifikator kv 
-										ON pk.id=kv.id_dokumen
-									WHERE pk.id_skpd = %d
-									AND pk.id_jadwal = %d
-									AND pk.active = 1
-									AND kv.active = 1
-									AND kv.status_verifikasi=3
-									AND kv.nama_tabel_dokumen = %s
-									",
-									$vv['id_skpd'],
-									$id_jadwal,
-									'esakip_renstra'
-								)
-							);
-							$jumlah_disetujui = !empty($jumlah_status_disetujui) ? $jumlah_status_disetujui : 0;
-							$jumlah_ditolak = !empty($jumlah_status_ditolak) ? $jumlah_status_ditolak : 0;
-							$jumlah_draft = !empty($jumlah_status_draft) ? $jumlah_status_draft : 0;
+							// Hitung status "menunggu"
 							$jumlah_menunggu = 0;
 							if (!empty($jumlah_dokumen)) {
 								$jumlah_menunggu = $jumlah_dokumen - ($jumlah_disetujui + $jumlah_ditolak + $jumlah_draft);
