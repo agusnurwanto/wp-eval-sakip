@@ -3443,11 +3443,14 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                         alert("Data Cascading Kosong!");
                     }
                     jQuery('#wrap-loading').hide();
+
+                    // kosongkan cascading turuannya dan pagu cascading
                     set_view_cascading(id_cascading);
                     return resolve();
                 });
-            }{
-                set_view_cascading(id_cascading);
+            }else{
+                // update pagu cascading sesuai cascading yang dipilih
+                set_view_cascading(id_parent);
                 return resolve();
             }
         });
