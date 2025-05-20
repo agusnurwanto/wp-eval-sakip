@@ -643,7 +643,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$cek_id = $wpdb->insert_id;
 					} else {
 						$status_update = true;
-						if ($_POST['level'] == 2 || $_POST['level'] == 3) {
+						if (
+							$_POST['level'] == 2 
+							|| $_POST['level'] == 3
+						) {
 							/** Untuk validasi agar cascading parent tetap sama dengan cascading child yang telah dipilih */
 							$status_update = false;
 							$level_child = $_POST['level'] + 1;
@@ -654,8 +657,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$nama_kolom = $nama_kolom[$level_child];
 
 							$cek_cascading_child = $wpdb->get_results(
-								$wpdb->prepare(
-									"SELECT
+								$wpdb->prepare("
+									SELECT
 										id,
 										id_sub_skpd_cascading,
 										$nama_kolom
@@ -668,7 +671,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										AND level=%d
 										AND active=1
 									GROUP BY $nama_kolom
-							",
+								",
 									$_POST['id'],
 									$_POST['tahun_anggaran'],
 									$_POST['id_skpd'],
@@ -678,11 +681,17 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							);
 
 							if (!empty($cek_cascading_child)) {
-								if (count($cek_cascading_child) == 1 && $cek_cascading_child[0][$nama_kolom] == NULL) {
+								if (
+									count($cek_cascading_child) == 1 
+									&& $cek_cascading_child[0][$nama_kolom] == NULL
+								) {
 									$status_update = true;
 								} else {
 									foreach ($cek_cascading_child as $cek_cas) {
-										if (strpos($cek_cas[$nama_kolom], $kode_cascading_renstra) === 0 && $cek_cas['id_sub_skpd_cascading'] === $id_sub_skpd_cascading) {
+										if (
+											strpos($cek_cas[$nama_kolom], $kode_cascading_renstra) === 0 
+											&& $cek_cas['id_sub_skpd_cascading'] === $id_sub_skpd_cascading
+										) {
 											$status_update = true; // Jika ada yang cocok, set menjadi true
 											break;
 										}

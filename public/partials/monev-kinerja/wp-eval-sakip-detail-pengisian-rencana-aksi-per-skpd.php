@@ -996,11 +996,11 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                             html_input_sub_keg_cascading = `
                                 <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
                                     <label for="cascading-renstra-program">Pilih Program Cascading</label>
-                                    <select class="form-control" name="cascading-renstra-program" id="cascading-renstra-program" onchange="get_cascading_input_rencana_pagu(this, ${ 1 }, 'kegiatan')"></select>
+                                    <select class="form-control" name="cascading-renstra-program" id="cascading-renstra-program" onchange="get_cascading_input_rencana_pagu('kegiatan')"></select>
                                 </div>    
                                 <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
                                     <label for="cascading-renstra-kegiatan">Pilih Kegiatan Cascading</label>
-                                    <select class="form-control" name="cascading-renstra-kegiatan" id="cascading-renstra-kegiatan" onchange="get_cascading_input_rencana_pagu(this, ${ 1 }, 'sub_kegiatan')"></select>
+                                    <select class="form-control" name="cascading-renstra-kegiatan" id="cascading-renstra-kegiatan" onchange="get_cascading_input_rencana_pagu('sub_kegiatan')"></select>
                                 </div>
                                 <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
                                     <label for="cascading-renstra-sub-kegiatan">Pilih Sub Kegiatan Cascading</label>
@@ -1008,7 +1008,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                 </div>`;
 
                             html_cascading_turunan = `
-                                onchange="get_cascading_input_rencana_pagu(this, ${ 1 }, 'program')"`;
+                                onchange="get_cascading_input_rencana_pagu('program')"`;
 
                             if (!isEdit) {
                                 html_input_dasar_pelaksanaan = `
@@ -1292,7 +1292,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                 jQuery('#cascading-renstra').val(response.data.kode_cascading_sasaran).trigger('change');
 
                                 jQuery("#cascading-renstra-program").empty();
-                                get_cascading_input_rencana_pagu(response.data.kode_cascading_sasaran, 1, 'program').then(function() {
+                                get_cascading_input_rencana_pagu('program').then(function() {
                                     let kode_cascading_renstra_program = `${response.data.kode_cascading_program}_${response.data.id_skpd}`;
                                     if (response.data.id_sub_skpd_cascading) {
                                         kode_cascading_renstra_program = `${response.data.kode_cascading_program}_${response.data.id_sub_skpd_cascading}`;
@@ -1300,18 +1300,18 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                     jQuery('#cascading-renstra-program').removeAttr('onchange');
                                     jQuery('#cascading-renstra-program').val(kode_cascading_renstra_program).trigger('change');
                                     jQuery("#cascading-renstra-kegiatan").empty();
-                                    get_cascading_input_rencana_pagu(kode_cascading_renstra_program, 1, 'kegiatan').then(function() {
+                                    get_cascading_input_rencana_pagu('kegiatan').then(function() {
                                         jQuery('#cascading-renstra-kegiatan').removeAttr('onchange');
                                         jQuery('#cascading-renstra-kegiatan').val(response.data.kode_cascading_kegiatan).trigger('change');
 
                                         jQuery("#cascading-renstra-sub-kegiatan").empty();
-                                        get_cascading_input_rencana_pagu(response.data.kode_cascading_kegiatan, 1, 'sub_kegiatan').then(function() {
+                                        get_cascading_input_rencana_pagu('sub_kegiatan').then(function() {
                                             jQuery('#cascading-renstra-sub-kegiatan').val(response.data.kode_cascading_sub_kegiatan).trigger('change');
                                             
                                             /** kembalikan attr onchange */
-                                            jQuery('#cascading-renstra').attr('onchange', 'get_cascading_input_rencana_pagu(this, 1, "program")');
-                                            jQuery('#cascading-renstra-program').attr('onchange', 'get_cascading_input_rencana_pagu(this, 1, "kegiatan")');
-                                            jQuery('#cascading-renstra-kegiatan').attr('onchange', 'get_cascading_input_rencana_pagu(this, 1, "sub_kegiatan")');
+                                            jQuery('#cascading-renstra').attr('onchange', 'get_cascading_input_rencana_pagu("program")');
+                                            jQuery('#cascading-renstra-program').attr('onchange', 'get_cascading_input_rencana_pagu("kegiatan")');
+                                            jQuery('#cascading-renstra-kegiatan').attr('onchange', 'get_cascading_input_rencana_pagu("sub_kegiatan")');
                                         })
                                     })
                                 })
@@ -1546,18 +1546,18 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                     jQuery('#cascading-renstra-program').val(kode_cascading_renstra).trigger('change');
 
                                     jQuery("#cascading-renstra-kegiatan").empty();
-                                    get_cascading_input_rencana_pagu(kode_cascading_renstra, 2, 'kegiatan').then(function() {
+                                    get_cascading_input_rencana_pagu('kegiatan').then(function() {
                                         jQuery('#cascading-renstra-kegiatan').removeAttr('onchange');
                                         jQuery('#cascading-renstra-kegiatan').val(response.data.kode_cascading_kegiatan).trigger('change');
 
                                         jQuery("#cascading-renstra-sub-kegiatan").empty();
-                                        get_cascading_input_rencana_pagu(response.data.kode_cascading_kegiatan, 2, 'sub_kegiatan').then(function() {
+                                        get_cascading_input_rencana_pagu('sub_kegiatan').then(function() {
                                             jQuery('#cascading-renstra-sub-kegiatan').val(response.data.kode_cascading_sub_kegiatan).trigger('change');
 
                                             
                                             /** kembalikan attr onchange */
-                                            jQuery('#cascading-renstra-program').attr('onchange', 'get_cascading_input_rencana_pagu(this, 2, "kegiatan")');
-                                            jQuery('#cascading-renstra-kegiatan').attr('onchange', 'get_cascading_input_rencana_pagu(this, 2, "sub_kegiatan")');
+                                            jQuery('#cascading-renstra-program').attr('onchange', 'get_cascading_input_rencana_pagu("kegiatan")');
+                                            jQuery('#cascading-renstra-kegiatan').attr('onchange', 'get_cascading_input_rencana_pagu("sub_kegiatan")');
                                         })
                                     })
 
@@ -1632,12 +1632,12 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                     jQuery('#cascading-renstra-kegiatan').val(response.data.kode_cascading_kegiatan).trigger('change');
 
                                     jQuery("#cascading-renstra-sub-kegiatan").empty();
-                                    get_cascading_input_rencana_pagu(response.data.kode_cascading_kegiatan, 3, 'sub_kegiatan').then(function() {
+                                    get_cascading_input_rencana_pagu('sub_kegiatan').then(function() {
                                         jQuery('#cascading-renstra-sub-kegiatan').val(response.data.kode_cascading_sub_kegiatan).trigger('change');
                                     })
 
                                     /** kembalikan attr onchange */
-                                    jQuery('#cascading-renstra-kegiatan').attr('onchange', 'get_cascading_input_rencana_pagu(this, 3, "sub_kegiatan")');
+                                    jQuery('#cascading-renstra-kegiatan').attr('onchange', 'get_cascading_input_rencana_pagu("sub_kegiatan")');
 
                                     /** menghapus attr onchange sementara agar tiak bentrok dengan fungsi dibawah ini */
                                     jQuery('#pokin-level-1').removeAttr('onchange');
@@ -3060,7 +3060,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
 
                 if(tipe == 1) {
                     html_cascading_turunan_id = 'cascading-renstra';
-                    html_cascading_turunan = `onchange="get_cascading_input_rencana_pagu(this, ${ tipe }, 'program')"`;
+                    html_cascading_turunan = `onchange="get_cascading_input_rencana_pagu('program')"`;
                 }else if(tipe == 2) {
                     // menambahakan form input saat input rencana pagu di level 2 RHK
                     html_pokin_input_rencana_pagu = `
@@ -3080,7 +3080,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     html_input_sub_keg_cascading = `
                         <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
                             <label for="cascading-renstra-kegiatan">Pilih Kegiatan Cascading</label>
-                            <select class="form-control" name="cascading-renstra-kegiatan" id="cascading-renstra-kegiatan" onchange="get_cascading_input_rencana_pagu(this, ${ tipe }, 'sub_kegiatan')"></select>
+                            <select class="form-control" name="cascading-renstra-kegiatan" id="cascading-renstra-kegiatan" onchange="get_cascading_input_rencana_pagu('sub_kegiatan')"></select>
                         </div>
                         <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
                             <label for="cascading-renstra-sub-kegiatan">Pilih Sub Kegiatan Cascading</label>
@@ -3088,7 +3088,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                         </div>`;
 
                     html_cascading_turunan_id = 'cascading-renstra-program';
-                    html_cascading_turunan = `onchange="get_cascading_input_rencana_pagu(this, ${ tipe }, 'kegiatan')"`;
+                    html_cascading_turunan = `onchange="get_cascading_input_rencana_pagu('kegiatan')"`;
                 }else if(tipe == 3) {
                     level_pokin = 4;
                     title = 'Uraian Rencana Hasil Kerja | RHK Level 3';
@@ -3112,7 +3112,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     </div>`;
 
                     html_cascading_turunan_id = 'cascading-renstra-kegiatan';
-                    html_cascading_turunan = `onchange="get_cascading_input_rencana_pagu(this, ${ tipe }, 'sub_kegiatan')"`;
+                    html_cascading_turunan = `onchange="get_cascading_input_rencana_pagu('sub_kegiatan')"`;
                     
                 } else if(tipe == 4) {
                     level_pokin = 5;
@@ -3360,156 +3360,45 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         });
     }
 
-    function get_cascading_input_rencana_pagu(selected, tipe, jenis_cascading = 'sub_kegiatan') {
+    function get_cascading_input_rencana_pagu(jenis_cascading = 'sub_kegiatan') {
         return new Promise(function(resolve, reject) {
-            let selectedData = jQuery(selected).find('option:selected');
-            let jenis = jenis_cascading;
-            let set_input_rencana_pagu = jQuery("#set_input_rencana_pagu").is(":checked");
-
-            if(
-                tipe == 2 
-                && set_input_rencana_pagu == 1
-            ){
-                if(jenis_cascading == 'kegiatan'){
-                    jenis = 'kegiatan';
-                }else if(jenis_cascading == 'sub_kegiatan'){
-                    selectedData = jQuery('#cascading-renstra-kegiatan option:selected');
-                    jenis = 'sub_kegiatan';
-                }
+            var id_parent = '';
+            var id_cascading = '';
+            if(jenis_cascading == 'program'){
+                id_parent = 'cascading-renstra';
+                id_cascading = 'cascading-renstra-program';
+            }else if(jenis_cascading == 'kegiatan'){
+                id_parent = 'cascading-renstra-program';
+                id_cascading = 'cascading-renstra-kegiatan';
+            }else if(jenis_cascading == 'sub_kegiatan'){
+                id_parent = 'cascading-renstra-kegiatan';
+                id_cascading = 'cascading-renstra-sub-kegiatan';
+            }else{
+                return resolve();
             }
-
-            if(
-                tipe == 1 
-                && set_input_rencana_pagu == 1
-            ){ 
-                if(jenis_cascading == 'program'){
-                    jenis = 'program';
-                }else if(jenis_cascading == 'kegiatan'){
-                    jenis = 'kegiatan';
-                    selectedData = jQuery('#cascading-renstra-program option:selected');
-                }else if(jenis_cascading == 'sub_kegiatan'){
-                    selectedData = jQuery('#cascading-renstra-kegiatan option:selected');
-                    jenis = 'sub_kegiatan';
-                }
+            var selectedData = jQuery('#'+id_parent+' option:selected');
+            if(selectedData.length == 0){
+                return resolve();
             }
 
             let parent_cascading = selectedData.val();
             let id_sub_skpd_cascading = selectedData.data('id-sub-skpd-cascading');
 
+            let set_input_rencana_pagu = jQuery("#set_input_rencana_pagu").is(":checked");
             if(
-                tipe == 3 
-                && set_input_rencana_pagu == 1 
-                && parent_cascading != undefined 
-                && parent_cascading != ''
+                parent_cascading != ''
+                && set_input_rencana_pagu == true
             ){
-                return get_tujuan_sasaran_cascading(jenis, parent_cascading, id_sub_skpd_cascading)
-                    .then(function() {
-                        let key = jenis + '-' + parent_cascading;
-                        if (id_sub_skpd_cascading != 0) {
-                            key = jenis + '-' + parent_cascading + '-' + id_sub_skpd_cascading;
-                        }
-                        data_cascading = data_sub_kegiatan_cascading[key];
-
-                        if (
-                            data_cascading 
-                            && Array.isArray(data_cascading.data)
-                        ) {
-                            let html_cascading = '<option value="">Pilih Sub Kegiatan Cascading</option>';
-                            data_cascading.data.map(value => {
-                                if (value.id_unik_indikator == null) {
-                                    let nama_sub_giat = `${value.kode_sub_giat} ${value.nama_sub_giat.replace(value.kode_sub_giat, '')} ( ${value.kode_sub_skpd} ${value.nama_sub_skpd} | Rp. ${formatRupiah(value.pagu)} )`;
-                                    html_cascading += `<option data-kodesbl="${value.kode_sbl}" value="${value.kode_sub_giat}" data-id-sub-skpd-cascading="${value.id_sub_skpd}" data-nama-sub-skpd="${value.kode_sub_skpd} ${value.nama_sub_skpd}" data-pagu-cascading="${value.pagu}">${nama_sub_giat}</option>`;
-                                }
-                            });
-                            jQuery("#cascading-renstra-sub-kegiatan").html(html_cascading);
-                            jQuery('#cascading-renstra-sub-kegiatan').select2({
-                                width: '100%'
-                            });
-                        } else {
-                            alert("Data Cascading Kosong!");
-                        }
-                        jQuery('#wrap-loading').hide();
-                        resolve()
-                    });
-            }else if(
-                tipe == 2 
-                && set_input_rencana_pagu == 1 
-                && parent_cascading != undefined 
-                && parent_cascading != ''
-            ){
-                if(jenis_cascading == 'kegiatan'){
-                    parent_cascading = parent_cascading.split("_")[0];
-                    return get_tujuan_sasaran_cascading(jenis, parent_cascading, id_sub_skpd_cascading)
-                        .then(function() {
-                            let key = jenis + '-' + parent_cascading;
-                            if (id_sub_skpd_cascading != 0) {
-                                key = jenis + '-' + parent_cascading + '-' + id_sub_skpd_cascading;
-                            }
-                            data_cascading = data_kegiatan_cascading[key];
-
-                            if (
-                                data_cascading 
-                                && Array.isArray(data_cascading.data)
-                            ){
-                                let html_cascading = '<option value="">Pilih Kegiatan Cascading</option>';
-                                data_cascading.data.map(value => {
-                                    if (value.id_unik_indikator == null) {
-                                        let nama_giat = `${value.kode_giat} ${value.nama_giat.replace(value.kode_giat, '')} ( ${value.kode_sub_skpd} ${value.nama_sub_skpd} | Rp. ${formatRupiah(value.pagu)} )`;
-                                        html_cascading += `<option value="${value.kode_giat}" data-id-sub-skpd-cascading="${value.id_sub_skpd}" data-nama-sub-skpd="${value.kode_sub_skpd} ${value.nama_sub_skpd}" data-pagu-cascading="${value.pagu}">${nama_giat}</option>`;
-                                    }
-                                });
-                                jQuery("#cascading-renstra-kegiatan").html(html_cascading);
-                                jQuery('#cascading-renstra-kegiatan').select2({
-                                    width: '100%'
-                                });
-                            } else {
-                                alert("Data Cascading Kosong!");
-                            }
-                            jQuery('#wrap-loading').hide();
-                            resolve()
-                        });
-                }else{
-                    return get_tujuan_sasaran_cascading(jenis, parent_cascading, id_sub_skpd_cascading)
-                    .then(function() {
-                        let key = jenis + '-' + parent_cascading;
-                        if (id_sub_skpd_cascading != 0) {
-                            key = jenis + '-' + parent_cascading + '-' + id_sub_skpd_cascading;
-                        }
-                        data_cascading = data_sub_kegiatan_cascading[key];
-
-                        if (data_cascading && Array.isArray(data_cascading.data)) {
-                            let html_cascading = '<option value="">Pilih Sub Kegiatan Cascading</option>';
-                            data_cascading.data.map(value => {
-                                if (value.id_unik_indikator == null) {
-                                    let nama_sub_giat = `${value.kode_sub_giat} ${value.nama_sub_giat.replace(value.kode_sub_giat, '')} ( ${value.kode_sub_skpd} ${value.nama_sub_skpd} | Rp. ${formatRupiah(value.pagu)} )`;
-                                    html_cascading += `<option data-kodesbl="${value.kode_sbl}" value="${value.kode_sub_giat}" data-id-sub-skpd-cascading="${value.id_sub_skpd}" data-nama-sub-skpd="${value.kode_sub_skpd} ${value.nama_sub_skpd}" data-pagu-cascading="${value.pagu}">${nama_sub_giat}</option>`;
-                                }
-                            });
-                            jQuery("#cascading-renstra-sub-kegiatan").html(html_cascading);
-                            jQuery('#cascading-renstra-sub-kegiatan').select2({
-                                width: '100%'
-                            });
-                        } else {
-                            alert("Data Cascading Kosong!");
-                        }
-                        jQuery('#wrap-loading').hide();
-                        resolve()
-                    });
-                }
-            }else if(
-                tipe == 1 
-                && set_input_rencana_pagu == 1 
-                && parent_cascading != undefined 
-                && parent_cascading != ''
-            ){
-                if(jenis_cascading == 'kegiatan'){
-                    parent_cascading = parent_cascading.split("_")[0];
-                }
-                return get_tujuan_sasaran_cascading(jenis, parent_cascading, id_sub_skpd_cascading)
+                parent_cascading = parent_cascading.split("_")[0];
+                return get_tujuan_sasaran_cascading(jenis_cascading, parent_cascading, id_sub_skpd_cascading)
                 .then(function() {
-                    let key = jenis + '-' + parent_cascading;
-                    if (id_sub_skpd_cascading != 0 && id_sub_skpd_cascading != undefined) {
-                        key = jenis + '-' + parent_cascading + '-' + id_sub_skpd_cascading;
+                    let key = jenis_cascading + '-' + parent_cascading;
+                    if (
+                        id_sub_skpd_cascading != 0 
+                        && id_sub_skpd_cascading != undefined
+                        && id_sub_skpd_cascading != ''
+                    ) {
+                        key = jenis_cascading + '-' + parent_cascading + '-' + id_sub_skpd_cascading;
                     }
 
                     let data_cascading = [];
@@ -3525,11 +3414,11 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                         nama_jenis = 'Sub Kegiatan';
                     }
 
+                    let html_cascading = `<option value="">Pilih ${nama_jenis} Cascading</option>`;
                     if (
                         data_cascading 
                         && Array.isArray(data_cascading.data)
                     ) {
-                        let html_cascading = `<option value="">Pilih ${nama_jenis} Cascading</option>`;
                         data_cascading.data.map(value => {
                             if (value.id_unik_indikator == null) {
                                 switch (jenis_cascading) {
@@ -3546,48 +3435,57 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                 }
                             }
                         });
-                        switch (jenis_cascading) {
-                            case 'program':
-                                jQuery("#cascading-renstra-program").html(html_cascading);
-                                jQuery('#cascading-renstra-program').select2({
-                                    width: '100%'
-                                });
-                                break;
-                            case 'kegiatan':
-                                jQuery("#cascading-renstra-kegiatan").html(html_cascading);
-                                jQuery('#cascading-renstra-kegiatan').select2({
-                                    width: '100%'
-                                });
-                                break;
-                            default:
-                                jQuery("#cascading-renstra-sub-kegiatan").html(html_cascading);
-                                jQuery('#cascading-renstra-sub-kegiatan').select2({
-                                    width: '100%'
-                                });
-                                break;
-                        }
+                        jQuery("#"+id_cascading).html(html_cascading)
+                            .select2({
+                                width: '100%'
+                            });
                     } else {
                         alert("Data Cascading Kosong!");
                     }
                     jQuery('#wrap-loading').hide();
-                    resolve()
+                    set_view_cascading(id_cascading);
+                    return resolve();
                 });
             }{
-                resolve()
+                set_view_cascading(id_cascading);
+                return resolve();
             }
         });
     }
 
-    jQuery(document).on('change', '#cascading-renstra', function() {
-        let nama_sub_skpd_cascading = jQuery('#cascading-renstra option:selected').data('nama-sub-skpd');
-        let pagu_cascading = jQuery('#cascading-renstra option:selected').data('pagu-cascading');
+    jQuery(document).on('change', '#cascading-renstra-sub-kegiatan', function(){
+        set_view_cascading(jQuery(this).attr('id'));
+    });
+
+    function set_view_cascading(id) {
+        if(jQuery('#set_input_rencana_pagu').is(':checked')){
+            switch (id) {
+                case 'cascading-renstra-program':
+                    jQuery('#cascading-renstra-kegiatan').html('').trigger('change');
+                    break;
+                case 'cascading-renstra-kegiatan':
+                    jQuery('#cascading-renstra-sub-kegiatan').html('').trigger('change');
+                    break;
+            }
+
+            var nama_sub_skpd_cascading = jQuery('#cascading-renstra-sub-kegiatan option:selected').data('nama-sub-skpd');
+            var pagu_cascading = jQuery('#cascading-renstra-sub-kegiatan option:selected').data('pagu-cascading');
+        }else{
+            var nama_sub_skpd_cascading = jQuery('#'+id).find('option:selected').data('nama-sub-skpd');
+            var pagu_cascading = jQuery('#'+id).find('option:selected').data('pagu-cascading');
+        }
+
         if (nama_sub_skpd_cascading) {
             jQuery('#sub-skpd-cascading').val(nama_sub_skpd_cascading)
+        }else{
+            jQuery('#sub-skpd-cascading').val('');
         }
         if (pagu_cascading) {
             jQuery('#pagu-cascading').val(formatRupiah(pagu_cascading))
+        }else{
+            jQuery('#pagu-cascading').val('');
         }
-    });
+    };
 
     function simpan_data_renaksi(tipe) {
         var parent_pokin = 0;
@@ -3600,6 +3498,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
             case 1:
                 kode_cascading_renstra = jQuery('#cascading-renstra').val();
                 label_cascading_renstra = jQuery('#cascading-renstra option:selected').text();
+                break;
             case 2:
                 kode_cascading_renstra = jQuery('#cascading-renstra-program').val();
                 if (kode_cascading_renstra != '') {
@@ -3664,9 +3563,15 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         
         var id_sub_skpd_cascading = 0;
         var pagu_cascading = 0;
-        if (tipe != 1) {
-            id_sub_skpd_cascading = jQuery('#cascading-renstra option:selected').data('id-sub-skpd-cascading');
-            pagu_cascading = jQuery('#cascading-renstra option:selected').data('pagu-cascading');
+        if (tipe == 2) {
+            id_sub_skpd_cascading = jQuery('#cascading-renstra-program option:selected').data('id-sub-skpd-cascading');
+            pagu_cascading = jQuery('#cascading-renstra-program option:selected').data('pagu-cascading');
+        }else if (tipe == 3) {
+            id_sub_skpd_cascading = jQuery('#cascading-renstra-kegiatan option:selected').data('id-sub-skpd-cascading');
+            pagu_cascading = jQuery('#cascading-renstra-kegiatan option:selected').data('pagu-cascading');
+        }else if (tipe == 4) {
+            id_sub_skpd_cascading = jQuery('#cascading-renstra-sub-kegiatan option:selected').data('id-sub-skpd-cascading');
+            pagu_cascading = jQuery('#cascading-renstra-sub-kegiatan option:selected').data('pagu-cascading');
         }
         var kode_sbl = jQuery('#cascading-renstra-sub-kegiatan option:selected').data('kodesbl');
 
