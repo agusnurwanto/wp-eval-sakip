@@ -681,20 +681,13 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							);
 
 							if (!empty($cek_cascading_child)) {
-								if (
-									count($cek_cascading_child) == 1 
-									&& $cek_cascading_child[0][$nama_kolom] == NULL
-								) {
-									$status_update = true;
-								} else {
-									foreach ($cek_cascading_child as $cek_cas) {
-										if (
-											strpos($cek_cas[$nama_kolom], $kode_cascading_renstra) === 0 
-											&& $cek_cas['id_sub_skpd_cascading'] === $id_sub_skpd_cascading
-										) {
-											$status_update = true; // Jika ada yang cocok, set menjadi true
-											break;
-										}
+								foreach ($cek_cascading_child as $cek_cas) {
+									if (
+										strpos($cek_cas[$nama_kolom], $kode_cascading_renstra) === 0 
+										&& $cek_cas['id_sub_skpd_cascading'] === $id_sub_skpd_cascading
+									) {
+										$status_update = true; // Jika ada yang cocok, set menjadi true
+										break;
 									}
 								}
 							} else {
@@ -1966,7 +1959,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								// cek jika total rencana pagu rhk tidak sama dengan akumulasi hitungan terbaru
 								if($ind['rencana_pagu_rhk'] != $total_rhk_existing){
 									if(!empty($ind['rencana_pagu_rhk'])){
-										$ind['rencana_pagu_rhk'] = 0;
 										$persen = ($ind['rencana_pagu']/$ind['rencana_pagu_rhk']) * 100;
 										$ind['rencana_pagu'] = ($persen/100) * $total_rhk_existing;
 									}else if($total_rhk_existing == 0){
@@ -2141,7 +2133,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									// cek jika total rencana pagu rhk tidak sama dengan akumulasi hitungan terbaru
 									if($ind['rencana_pagu_rhk'] != $total_rhk_existing){
 										if(!empty($ind['rencana_pagu_rhk'])){
-											$ind['rencana_pagu_rhk'] = 0;
 											$persen = ($ind['rencana_pagu']/$ind['rencana_pagu_rhk']) * 100;
 											$ind['rencana_pagu'] = ($persen/100) * $total_rhk_existing;
 										}else if($total_rhk_existing == 0){
@@ -2407,7 +2398,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										// cek jika total rencana pagu rhk tidak sama dengan akumulasi hitungan terbaru
 										if($ind['rencana_pagu_rhk'] != $total_rhk_existing){
 											if(!empty($ind['rencana_pagu_rhk'])){
-												$ind['rencana_pagu_rhk'] = 0;
 												$persen = ($ind['rencana_pagu']/$ind['rencana_pagu_rhk']) * 100;
 												$ind['rencana_pagu'] = ($persen/100) * $total_rhk_existing;
 											}else if($total_rhk_existing == 0){
