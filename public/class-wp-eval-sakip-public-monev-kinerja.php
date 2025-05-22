@@ -1272,6 +1272,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							ARRAY_A
 						);
 					}
+
+					// get total pagu rhk
+					$_POST['id'] = $ret['data']['id_renaksi'];
+					$cek_pagu = $this->cek_validasi_input_rencana_pagu(1);
+					$ret['data']['total_pagu'] = $cek_pagu['rencana_pagu'];
 				}
 			} else {
 				$ret = array(
