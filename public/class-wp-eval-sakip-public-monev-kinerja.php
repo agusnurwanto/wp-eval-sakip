@@ -1547,24 +1547,36 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				}
 				if ($ret['status'] != 'error') {
 					$_POST['id'] = $_POST['id_label'];
-					$cek_pagu = $this->cek_validasi_input_rencana_pagu(1);
-					if (
-						$cek_pagu['status'] == 'error'
-						&& !empty($cek_pagu['rencana_pagu'])
-					) {
-						// update pagu indikator
-						$wpdb->query('
-							UPDATE esakip_data_rencana_aksi_indikator_opd 
-							set rencana_pagu=0 
-							WHERE id IN (' . implode(',', $cek_pagu['ids_indikator']) . ')
-						');
 
-						// UPDATE pagu di tabel sumber dana
-						$wpdb->query('
-							UPDATE esakip_sumber_dana_indikator 
-							set rencana_pagu=0 
-							WHERE id IN (' . implode(',', $cek_pagu['ids']) . ')
-						');
+					$cek_input_pagu = $wpdb->get_var($wpdb->prepare("
+				        SELECT 
+				        	input_rencana_pagu_level
+				        FROM esakip_data_rencana_aksi_opd
+				        WHERE id_renaksi = %d 
+				        	AND tahun_anggaran = %d 
+				        	AND id_skpd = %d 
+				        	AND active = 1
+				    ", $_POST['id_label'], $_POST['tahun_anggaran'], $_POST['id_skpd']));
+					if($cek_input_pagu == 1){
+						$cek_pagu = $this->cek_validasi_input_rencana_pagu(1);
+						if (
+							$cek_pagu['status'] == 'error'
+							&& !empty($cek_pagu['rencana_pagu'])
+						) {
+							// update pagu indikator
+							$wpdb->query('
+								UPDATE esakip_data_rencana_aksi_indikator_opd 
+								set rencana_pagu=0 
+								WHERE id IN (' . implode(',', $cek_pagu['ids_indikator']) . ')
+							');
+
+							// UPDATE pagu di tabel sumber dana
+							$wpdb->query('
+								UPDATE esakip_sumber_dana_indikator 
+								set rencana_pagu=0 
+								WHERE id IN (' . implode(',', $cek_pagu['ids']) . ')
+							');
+						}
 					}
 					$data = array(
 						'id_renaksi' => $_POST['id_label'],
