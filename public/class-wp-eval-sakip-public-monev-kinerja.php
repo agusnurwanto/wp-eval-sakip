@@ -1552,7 +1552,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				        SELECT 
 				        	input_rencana_pagu_level
 				        FROM esakip_data_rencana_aksi_opd
-				        WHERE id_renaksi = %d 
+				        WHERE id = %d 
 				        	AND tahun_anggaran = %d 
 				        	AND id_skpd = %d 
 				        	AND active = 1
@@ -1627,6 +1627,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					        	AND active = 1
 					    ", $_POST['id_label'], $_POST['tahun_anggaran'], $_POST['id_skpd']));
 
+						if(empty($_POST['rencana_pagu_tk'])){
+							$_POST['rencana_pagu_tk'] = 0;
+						}
 						$ret['total_pagu'] = $_POST['rencana_pagu_tk'];
 						$ret['total_pagu_sebelum_perubahan'] = $total_pagu_renaksi;
 						$total_pagu_renaksi += $_POST['rencana_pagu'];
@@ -1634,12 +1637,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$ret['total_pagu_setelah_perubahan'] = $total_pagu_renaksi;
 						$ret['total_all_pagu'] = $ret['total_pagu_sebelum_perubahan'] - $ret['total_pagu'];
 
-						if (
-							!empty($_POST['rencana_pagu_tk'])
-							&& (
-								$total_pagu_renaksi > $_POST['rencana_pagu_tk']
-							)
-						) {
+						if ($total_pagu_renaksi > $_POST['rencana_pagu_tk']) {
 							$ret['status'] = 'error';
 							$ret['message'] = 'Total rencana pagu tidak boleh melebihi 100% atau total pagu tersisa setelah diinput adalah  ' . $ret['total_all_pagu'] . '';
 						}

@@ -2166,7 +2166,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
             }
 
             var get_total_pagu = (persen_rencana_pagu * persen) / 100;
-            jQuery("#rencana_pagu").val(get_total_pagu.toFixed(0));
+            jQuery("#rencana_pagu").val(setToFixed(get_total_pagu));
         });
     }
 
@@ -2252,8 +2252,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     response.data != null
                 ) {
                     let rencana_pagu = response.data.rencana_pagu != null ? response.data.rencana_pagu : 0;
-                    let persen = 0;
-                    persen = (rencana_pagu / total_pagu) * 100;
+                    let persen = setToFixed((rencana_pagu / total_pagu) * 100);
                     let setting_input_rencana_pagu = response.data.data_rhk_khusus.input_rencana_pagu_level != undefined ? response.data.data_rhk_khusus.input_rencana_pagu_level : 0;
 
                     tambah_indikator_rencana_aksi(response.data.id_renaksi, tipe, total_pagu, setting_input_rencana_pagu, kode_sbl, response.data.sumber_dana);
@@ -2274,7 +2273,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     jQuery('#target_teks_tw_2').val(response.data.target_teks_2);
                     jQuery('#target_teks_tw_3').val(response.data.target_teks_3);
                     jQuery('#target_teks_tw_4').val(response.data.target_teks_4);
-                    jQuery('#total_rincian').val(persen.toFixed(0));
+                    jQuery('#total_rincian').val(persen).trigger('input');
                     jQuery('#rencana_pagu_tk').val(total_pagu);
                     if (response.data.rumus_indikator) {
                         jQuery('#rumus-indikator').val(response.data.rumus_indikator);
@@ -2869,7 +2868,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                             b['realisasi_tw_' + triwulan] 
                                             && b['target_' + triwulan]
                                         ){
-                                            data_capaian_target_realisasi_triwulan = ((b['realisasi_tw_' + triwulan] / b['target_' + triwulan]) * 100).toFixed(0)+'%';
+                                            data_capaian_target_realisasi_triwulan = setToFixed((b['realisasi_tw_' + triwulan] / b['target_' + triwulan]) * 100)+'%';
                                         }else if(b['target_' + triwulan]){
                                             data_capaian_target_realisasi_triwulan = "0%";
                                         }else{
@@ -2907,7 +2906,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                 // ----- capaian total -----
                                 let data_capaian_target_realisasi_total = '';
                                 if(b['realisasi_akhir'] && b.target_akhir){
-                                    data_capaian_target_realisasi_total = ((b['realisasi_akhir'] / b.target_akhir) * 100).toFixed(0)+'%';
+                                    data_capaian_target_realisasi_total = setToFixed((b['realisasi_akhir'] / b.target_akhir) * 100)+'%';
                                 }else if(b.target_akhir){
                                     data_capaian_target_realisasi_total = "0%";
                                 }else{
