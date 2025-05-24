@@ -736,15 +736,15 @@ $sisa_pagu_rhk = $indikator_rhk['rencana_pagu'] - $total_all;
 //disabled button jika ada parameter yg tidak lengkap
 $disabled = '';
 $disabled_manual = '';
-$text_pesan = '-';
+$text_pesan = '';
 $wpsipd_status = get_option('_crb_url_server_sakip');
 if (empty($wpsipd_status)) {
 	$disabled = 'disabled';
-	$text_pesan = 'Kolom URL Server WP-SIPD Di Menu Pengaturan Perangkat Daerah Kosong!';
+	$text_pesan .= 'URL Server WP-SIPD di Menu Pengaturan Perangkat Daerah belum diset!<br>';
 } else if (empty($selected_rhk['kode_sbl']) && !empty($data_rhk[4])) {
 	$disabled = 'disabled';
 	$disabled_manual = 'disabled';
-	$text_pesan = 'Kolom Cascading Sub Kegiatan Kosong!';
+	$text_pesan .= 'Cascading Sub Kegiatan belum diset!';
 }
 
 
@@ -1159,25 +1159,23 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 				<div class="card-body">
 					<table class="borderless-table data-organisasi">
 						<tbody>
-							<?php
-							if (!empty($html_label_pokin[1])) {
-								foreach ($html_label_pokin[1] as $level => $labels) {
-									echo '
+							<?php if (!empty($html_label_pokin[1]) && is_array($html_label_pokin[1])): ?>
+								<?php foreach ($html_label_pokin[1] as $level => $labels): ?>
 									<tr>
-										<td style="width: 270px;">Pohon Kinerja Level ' . $level . '</td>
+										<td style="width: 270px;">Pohon Kinerja Level <?= $level ?></td>
 										<td style="width: 20px;" class="text-center">:</td>
 										<td>
-											<ul>';
-									foreach ($labels as $value) {
-										echo '<li>' . htmlspecialchars($value) . '</li>';
-									}
-									echo '
+											<ul>
+												<?php if (is_array($labels)): ?>
+													<?php foreach ($labels as $value): ?>
+														<li><?= htmlspecialchars($value) ?></li>
+													<?php endforeach; ?>
+												<?php endif; ?>
 											</ul>
 										</td>
-									</tr>';
-								}
-							}
-							?>
+									</tr>
+								<?php endforeach; ?>
+							<?php endif; ?>
 							<tr>
 								<td>Kegiatan Utama | RHK Level 1</td>
 								<td class="text-center">:</td>
@@ -1221,25 +1219,23 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 				<div class="card-body">
 					<table class="borderless-table data-organisasi">
 						<tbody>
-							<?php
-							if (!empty($html_label_pokin[2])) {
-								foreach ($html_label_pokin[2] as $level => $labels) {
-									echo '
+							<?php if (!empty($html_label_pokin[2]) && is_array($html_label_pokin[2])): ?>
+								<?php foreach ($html_label_pokin[2] as $level => $labels): ?>
 									<tr>
-										<td style="width: 270px;">Pohon Kinerja Level ' . $level . '</td>
+										<td style="width: 270px;">Pohon Kinerja Level <?= $level ?></td>
 										<td style="width: 20px;" class="text-center">:</td>
 										<td>
-											<ul>';
-									foreach ($labels as $value) {
-										echo '<li>' . htmlspecialchars($value) . '</li>';
-									}
-									echo '
+											<ul>
+												<?php if (is_array($labels)): ?>
+													<?php foreach ($labels as $value): ?>
+														<li><?= htmlspecialchars($value) ?></li>
+													<?php endforeach; ?>
+												<?php endif; ?>
 											</ul>
 										</td>
-									</tr>';
-								}
-							}
-							?>
+									</tr>
+								<?php endforeach; ?>
+							<?php endif; ?>
 							<tr>
 								<td>Rencana Hasil Kerja | RHK Level 2</td>
 								<td class="text-center">:</td>
@@ -1255,16 +1251,16 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 								$subkeg = explode(' ', $data_rhk[2]['label_cascading_sub_kegiatan'], 2);
 								$label_subkeg = $subkeg[1];
 								echo '
-							<tr>
-								<td style="width: 270px;">Kegiatan</td>
-								<td>:</td>
-								<td>' . $data_rhk[2]['kode_cascading_kegiatan'] . ' ' . $data_rhk[2]['label_cascading_kegiatan'] . '</td>
-							</tr>
-							<tr>
-								<td style="width: 270px;">Sub Kegiatan</td>
-								<td>:</td>
-								<td>' . $data_rhk[2]['kode_cascading_sub_kegiatan'] . ' ' . $label_subkeg . '</td>
-							</tr>';
+									<tr>
+										<td style="width: 270px;">Kegiatan</td>
+										<td>:</td>
+										<td>' . $data_rhk[2]['kode_cascading_kegiatan'] . ' ' . $data_rhk[2]['label_cascading_kegiatan'] . '</td>
+									</tr>
+									<tr>
+										<td style="width: 270px;">Sub Kegiatan</td>
+										<td>:</td>
+										<td>' . $data_rhk[2]['kode_cascading_sub_kegiatan'] . ' ' . $label_subkeg . '</td>
+									</tr>';
 							}
 							?>
 							<tr>
@@ -1300,25 +1296,23 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 				<div class="card-body">
 					<table class="borderless-table data-organisasi">
 						<tbody>
-							<?php
-							if (!empty($html_label_pokin[3])) {
-								foreach ($html_label_pokin[3] as $level => $labels) {
-									echo '
+							<?php if (!empty($html_label_pokin[3]) && is_array($html_label_pokin[3])): ?>
+								<?php foreach ($html_label_pokin[3] as $level => $labels): ?>
 									<tr>
-										<td style="width: 270px;">Pohon Kinerja Level ' . $level . '</td>
+										<td style="width: 270px;">Pohon Kinerja Level <?= $level ?></td>
 										<td style="width: 20px;" class="text-center">:</td>
 										<td>
-											<ul>';
-									foreach ($labels as $value) {
-										echo '<li>' . htmlspecialchars($value) . '</li>';
-									}
-									echo '
+											<ul>
+												<?php if (is_array($labels)): ?>
+													<?php foreach ($labels as $value): ?>
+														<li><?= htmlspecialchars($value) ?></li>
+													<?php endforeach; ?>
+												<?php endif; ?>
 											</ul>
 										</td>
-									</tr>';
-								}
-							}
-							?>
+									</tr>
+								<?php endforeach; ?>
+							<?php endif; ?>
 							<tr>
 								<td>Uraian Kegiatan RHK | RHK Level 3</td>
 								<td class="text-center">:</td>
@@ -1374,25 +1368,23 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 				<div class="card-body">
 					<table class="borderless-table data-organisasi">
 						<tbody>
-							<?php
-							if (!empty($html_label_pokin[4])) {
-								foreach ($html_label_pokin[4] as $level => $labels) {
-									echo '
+							<?php if (!empty($html_label_pokin[4]) && is_array($html_label_pokin[4])): ?>
+								<?php foreach ($html_label_pokin[4] as $level => $labels): ?>
 									<tr>
-										<td style="width: 270px;">Pohon Kinerja Level ' . $level . '</td>
+										<td style="width: 270px;">Pohon Kinerja Level <?= $level ?></td>
 										<td style="width: 20px;" class="text-center">:</td>
 										<td>
-											<ul>';
-									foreach ($labels as $value) {
-										echo '<li>' . htmlspecialchars($value) . '</li>';
-									}
-									echo '
+											<ul>
+												<?php if (is_array($labels)): ?>
+													<?php foreach ($labels as $value): ?>
+														<li><?= htmlspecialchars($value) ?></li>
+													<?php endforeach; ?>
+												<?php endif; ?>
 											</ul>
 										</td>
-									</tr>';
-								}
-							}
-							?>
+									</tr>
+								<?php endforeach; ?>
+							<?php endif; ?>
 							<tr>
 								<td>Uraian Teknis Kegiatan | RHK Level 4</td>
 								<td class="text-center">:</td>
@@ -1437,109 +1429,116 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 			</div>
 		<?php endif; ?>
 
-
-		<h3 class="text-center">Target dan Realisasi Per Bulan</h3>
-		<table>
-			<thead style="background-color: #bde0fe; color: #212529;">
-				<tr>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="3">INDIKATOR</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">SATUAN</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TARGET AWAL</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TARGET AKHIR</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="3"><?php echo $indikator_rhk['indikator']; ?></td>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['satuan']; ?></td>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['target_awal']; ?></td>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['target_akhir']; ?></td>
-				</tr>
-				<tr>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="6">
-						<table>
-							<thead style="background-color: #bde0fe; color: #212529;">
-								<tr>
-									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 130px;">Bulan/TW</th>
-									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Rencana Aksi</th>
-									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 120px;">Target</th>
-									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 120px;">Satuan</th>
-									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 120px;">Realisasi</th>
-									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 140px;">Capaian</th>
-									<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 240px;">Tanggapan Atasan</th>
-								</tr>
-							</thead>
-							<tbody>
-								<?php echo $tbody_target_realisasi_bulanan; ?>
-								<tr style="background-color:#FDFFB6;">
-									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Total</td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['indikator']; ?></td>
-									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['target_akhir']; ?></td>
-									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['satuan']; ?></td>
-									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['realisasi_akhir']; ?></td>
-									<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $capaian_total; ?></td>
-									<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['ket_total']; ?></td>
-								</tr>
-							</tbody>
-						</table>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-
-		<table>
-			<thead style="background-color: #bde0fe; color: #212529;">
-				<tr>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 25%;">PAGU RENCANA HASIL KERJA</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 25%;">PAGU RINCIAN RENCANA HASIL KERJA</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 25%;">REALISASI</th>
-					<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 25%;">CAPAIAN REALIASI TERHADAP RENCANA PAGU</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Rp. <?php echo number_format((!empty($indikator_rhk['rencana_pagu']) ? $indikator_rhk['rencana_pagu'] : 0), 2, ',', '.'); ?></td>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Rp. <?php echo number_format($total_all, 2, ',', '.'); ?></td>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Rp. <?php echo number_format($total_all_realisasi, 2, ',', '.'); ?></td>
-					<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">
-						<?php echo $indikator_rhk['rencana_pagu'] > 0
-							? round(($total_all_realisasi / $indikator_rhk['rencana_pagu']) * 100, 2) . '%'
-							: '-'; ?>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-
-		<h3 class="text-center">Rincian Belanja Teknis Kegiatan</h3>
-		<div class="m-2 text-center">
-			<?php if ($hak_akses_user_pegawai == 1 || $hak_akses_user_pegawai == 2): ?>
-				<button class="btn btn-primary m-2 text-center rincian_manual" onclick="handleTambahDataManual()" title="Tambah Data" <?php echo $disabled_manual; ?>>
-					<span class="dashicons dashicons-plus"></span> Tambah Rincian Belanja Manual
-				</button>
-				<button class="btn btn-success m-2 text-center rincian_rka" title="Tambah Data Dari WP-SIPD" onclick="handleTambahDataWpSipd()" <?php echo $disabled; ?>>
-					<span class="dashicons dashicons-insert"></span> Tambah Rincian Belanja dari RKA/DPA
-				</button>
-			<?php endif; ?>
+		<div class="card bg-light shadow-lg m-3 p-3">
+			<div class="wrap-table">
+				<h3 class="text-center">Target dan Realisasi Per Bulan</h3>
+				<table>
+					<thead style="background-color: #bde0fe; color: #212529;">
+						<tr>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="3">INDIKATOR</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">SATUAN</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TARGET AWAL</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TARGET AKHIR</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="3"><?php echo $indikator_rhk['indikator']; ?></td>
+							<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['satuan']; ?></td>
+							<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['target_awal']; ?></td>
+							<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['target_akhir']; ?></td>
+						</tr>
+						<tr>
+							<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="6">
+								<table>
+									<thead style="background-color: #bde0fe; color: #212529;">
+										<tr>
+											<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 130px;">Bulan/TW</th>
+											<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Rencana Aksi</th>
+											<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 120px;">Target</th>
+											<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 120px;">Satuan</th>
+											<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 120px;">Realisasi</th>
+											<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 140px;">Capaian</th>
+											<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 240px;">Tanggapan Atasan</th>
+										</tr>
+									</thead>
+									<tbody>
+										<?php echo $tbody_target_realisasi_bulanan; ?>
+										<tr style="background-color:#FDFFB6;">
+											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Total</td>
+											<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['indikator']; ?></td>
+											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['target_akhir']; ?></td>
+											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['satuan']; ?></td>
+											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['realisasi_akhir']; ?></td>
+											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $capaian_total; ?></td>
+											<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['ket_total']; ?></td>
+										</tr>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 		</div>
-		<div class="wrap-table">
-			<table cellpadding="2" cellspacing="0" class="table_dokumen_rencana_aksi">
-				<thead style="background-color: #dee2e6; text-align: center;">
-					<tr>
-						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 150px;">KODE REKENING</th>
-						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2">URAIAN</th>
-						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 120px;">AKSI</th>
-						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">HARGA SATUAN</th>
-						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 90px;">JUMLAH</th>
-						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 100px;">SATUAN</th>
-						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">TOTAL</th>
-						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">REALISASI</th>
-						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 160px;">CATATAN</th>
-					</tr>
-				</thead>
-				<tbody>
-					<?php echo $tbody; ?>
-				</tbody>
-			</table>
+
+		<div class="card bg-light shadow-lg m-3 p-3">
+			<h3 class="text-center">Rincian Belanja Teknis Kegiatan</h3>
+			<div class="m-2 text-center">
+				<?php if ($hak_akses_user_pegawai == 1 || $hak_akses_user_pegawai == 2): ?>
+					<button class="btn btn-primary m-2 text-center rincian_manual" onclick="handleTambahDataManual()" title="Tambah Data" <?php echo $disabled_manual; ?>>
+						<span class="dashicons dashicons-plus"></span> Tambah Rincian Belanja Manual
+					</button>
+					<button class="btn btn-success m-2 text-center rincian_rka" title="Tambah Data Dari WP-SIPD" onclick="handleTambahDataWpSipd()" <?php echo $disabled; ?>>
+						<span class="dashicons dashicons-insert"></span> Tambah Rincian Belanja dari RKA/DPA
+					</button>
+					<br><small class="text-muted"><?php echo $text_pesan; ?></small>
+				<?php endif; ?>
+			</div>
+			<div class="wrap-table">
+				<table>
+					<thead style="background-color: #bde0fe; color: #212529;">
+						<tr>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 25%;">PAGU RENCANA HASIL KERJA</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 25%;">PAGU RINCIAN RENCANA HASIL KERJA</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 25%;">REALISASI</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 25%;">CAPAIAN REALIASI TERHADAP RENCANA PAGU</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Rp. <?php echo number_format((!empty($indikator_rhk['rencana_pagu']) ? $indikator_rhk['rencana_pagu'] : 0), 2, ',', '.'); ?></td>
+							<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Rp. <?php echo number_format($total_all, 2, ',', '.'); ?></td>
+							<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Rp. <?php echo number_format($total_all_realisasi, 2, ',', '.'); ?></td>
+							<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">
+								<?php echo $indikator_rhk['rencana_pagu'] > 0
+									? round(($total_all_realisasi / $indikator_rhk['rencana_pagu']) * 100, 2) . '%'
+									: '-'; ?>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="wrap-table">
+				<table cellpadding="2" cellspacing="0" class="table_dokumen_rencana_aksi">
+					<thead style="background-color: #dee2e6; text-align: center;">
+						<tr>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 150px;">KODE REKENING</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 150px;">URAIAN</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 120px;">AKSI</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">HARGA SATUAN</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 90px;">JUMLAH</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 100px;">SATUAN</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">TOTAL</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">REALISASI</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 160px;">CATATAN</th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php echo $tbody; ?>
+					</tbody>
+				</table>
+			</div>
 		</div>
 	</div>
 </div>
@@ -1799,7 +1798,6 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 		window.kodeSbl = '<?php echo esc_js($selected_rhk['kode_sbl']); ?>';
 		window.idIndikator = '<?php echo esc_js($id_indikator); ?>';
 		window.hak_akses_user_pegawai = <?php echo $hak_akses_user_pegawai; ?>;
-		window.text_pesan = '<?php echo $text_pesan; ?>';
 		window.data_changed = false;
 		window.get_data_bulanan_message = '<?php echo $get_bulanan_message; ?>';
 		window.show_alert_bulanan = '<?php echo $show_alert_bulanan; ?>';
@@ -1858,12 +1856,6 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 			},
 			minimumInputLength: 3
 		});
-
-		if ((hak_akses_user_pegawai == 1 || hak_akses_user_pegawai == 2) && text_pesan != '-') {
-			jQuery('.rincian_rka').attr('title', text_pesan);
-			jQuery('.rincian_manual').attr('title', text_pesan);
-			alert(text_pesan);
-		}
 
 		if (get_data_bulanan_message != '-' && show_alert_bulanan == 1) {
 			alert(get_data_bulanan_message);
