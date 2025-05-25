@@ -2204,3 +2204,82 @@ CREATE TABLE `esakip_finalisasi_tahap_iku_pemda` (
   PRIMARY key (id),
   KEY `active` (`active`)
 );
+
+CREATE TABLE esakip_kuesioner_menpan (
+  `id` int(11) NOT NULL auto_increment,
+  `nama_kuesioner` text DEFAULT NULL,
+  `bobot` float DEFAULT NULL,
+  `nomor_urut` DECIMAL(10,2) NOT NULL,
+  `create_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  `tahun_anggaran` year(4) DEFAULT null,
+  `active` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY  (`id`),
+  KEY `tahun_anggaran` (`tahun_anggaran`),
+  KEY `active` (`active`)
+);
+
+CREATE TABLE esakip_kuesioner_menpan_detail (
+  `id` int(11) NOT NULL auto_increment,
+  `id_kuesioner` int(11) DEFAULT NULL,
+  `nomor_urut` DECIMAL(10,2) NOT NULL,
+  `pertanyaan` text DEFAULT NULL,
+  `jawaban` text DEFAULT NULL,
+  `bobot` float DEFAULT NULL,
+  `tipe_soal` varchar(255) DEFAULT NULL COMMENT '0 Esai, 1 pilihan ganda',
+  `tipe_jawaban` varchar(255) DEFAULT NULL COMMENT '1 STS, 2 TS, 3 S, 4 SS, 5 Esai',
+  `penjelasan` text DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT null,
+  `active` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY  (`id`),
+  KEY `id_kuesioner` (`id_kuesioner`),
+  KEY `tahun_anggaran` (`tahun_anggaran`),
+  KEY `active` (`active`)
+);
+
+CREATE TABLE esakip_penilaian_kuesioner_menpan (
+  `id` int(11) NOT NULL auto_increment,
+  `id_kuesioner` int(11) DEFAULT NULL,
+  `jawaban` text DEFAULT NULL,
+  `tipe` varchar(255) DEFAULT NULL COMMENT '1 STS, 2 TS, 3 S, 4 SS, 5 Esai',
+  `id_skpd` int(11) DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT null,
+  `active` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY  (`id`),
+  KEY `id_kuesioner` (`id_kuesioner`),
+  KEY `id_skpd` (`id_skpd`),
+  KEY `tahun_anggaran` (`tahun_anggaran`),
+  KEY `active` (`active`)
+);
+
+CREATE TABLE esakip_kuesioner_mendagri (
+  `id` int(11) NOT NULL auto_increment,
+  `nama_kuesioner` text DEFAULT NULL,
+  `deskripsi` text DEFAULT NULL,
+  `bobot` float DEFAULT NULL,
+  `nomor_urut` DECIMAL(10,2) NOT NULL,
+  `create_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  `tahun_anggaran` year(4) DEFAULT null,
+  `active` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY  (`id`),
+  KEY `tahun_anggaran` (`tahun_anggaran`),
+  KEY `active` (`active`)
+);
+
+CREATE TABLE esakip_kuesioner_mendagri_detail (
+  `id` int(11) NOT NULL auto_increment,
+  `id_kuesioner` int(11) DEFAULT NULL,
+  `indikator` text DEFAULT NULL,
+  `level` text DEFAULT NULL,
+  `nomor_urut` DECIMAL(10,2) NOT NULL,
+  `bobot` float DEFAULT NULL,
+  `jenis_bukti_dukung` text DEFAULT NULL,
+  `penjelasan` text DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT null,
+  `active` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY  (`id`),
+  KEY `id_kuesioner` (`id_kuesioner`),
+  KEY `tahun_anggaran` (`tahun_anggaran`),
+  KEY `active` (`active`)
+);

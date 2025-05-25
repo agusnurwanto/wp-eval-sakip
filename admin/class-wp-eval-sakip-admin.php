@@ -1286,8 +1286,31 @@ class Wp_Eval_Sakip_Admin
 									</ul>
 								</div>
 							</div>';
+						} else if (!empty($_POST['type']) && $_POST['type'] == 'kuesioner') {
+							$input_kuesioner_menpan = $this->functions->generatePage(array(
+								'nama_page' => 'Input Kuesioner Menpan tahun ' . $tahun_item['tahun_anggaran'],
+								'content' => '[input_kuesioner_menpan tahun=' . $tahun_item['tahun_anggaran'] . ']',
+								'show_header' => 1,
+								'post_status' => 'private'
+							));
+							$input_kuesioner_mendagri = $this->functions->generatePage(array(
+								'nama_page' => 'Input Kuesioner Mendagri tahun ' . $tahun_item['tahun_anggaran'],
+								'content' => '[input_kuesioner_mendagri tahun=' . $tahun_item['tahun_anggaran'] . ']',
+								'show_header' => 1,
+								'post_status' => 'private'
+							));
+							$body_pemda = '
+							<div class="accordion">
+								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
+								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
+									<ul style="margin-left: 20px;">
+										<li><a target="_blank" href="' . $input_kuesioner_menpan['url'] . '">' . $input_kuesioner_menpan['title'] . '</a></li>
+										<li><a target="_blank" href="' . $input_kuesioner_mendagri['url'] . '">' . $input_kuesioner_mendagri['title'] . '</a></li>
+									</ul>
+								</div>
+							</div>';
 						} else if (!empty($_POST['type']) && $_POST['type'] == 'kuesioner_menpan') {
-							$list_skpd_laporan_pk = $this->functions->generatePage(array(
+							$list_skpd_kuesioner_menpan = $this->functions->generatePage(array(
 								'nama_page' => 'Kuesioner Menpan tahun ' . $tahun_item['tahun_anggaran'],
 								'content' => '[list_kuesioner_menpan tahun=' . $tahun_item['tahun_anggaran'] . ']',
 								'show_header' => 1,
@@ -1298,12 +1321,12 @@ class Wp_Eval_Sakip_Admin
 								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
 								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
 									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $list_skpd_laporan_pk['url'] . '">' . $list_skpd_laporan_pk['title'] . '</a></li>
+										<li><a target="_blank" href="' . $list_skpd_kuesioner_menpan['url'] . '">' . $list_skpd_kuesioner_menpan['title'] . '</a></li>
 									</ul>
 								</div>
 							</div>';
 						} else if (!empty($_POST['type']) && $_POST['type'] == 'kuesioner_mendagri') {
-							$list_skpd_laporan_pk = $this->functions->generatePage(array(
+							$list_skpd_kuesioner_mendagri = $this->functions->generatePage(array(
 								'nama_page' => 'Kuesioner Mendagri tahun ' . $tahun_item['tahun_anggaran'],
 								'content' => '[list_kuesioner_mendagri tahun=' . $tahun_item['tahun_anggaran'] . ']',
 								'show_header' => 1,
@@ -1314,7 +1337,7 @@ class Wp_Eval_Sakip_Admin
 								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
 								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
 									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $list_skpd_laporan_pk['url'] . '">' . $list_skpd_laporan_pk['title'] . '</a></li>
+										<li><a target="_blank" href="' . $list_skpd_kuesioner_mendagri['url'] . '">' . $list_skpd_kuesioner_mendagri['title'] . '</a></li>
 									</ul>
 								</div>
 							</div>';
@@ -2421,6 +2444,20 @@ class Wp_Eval_Sakip_Admin
 		$kuesioner = Container::make('theme_options', __('Kuesioner'))
 			->set_page_menu_position(3.10)
 			->set_icon('dashicons-media-default')
+			->add_fields(array(
+				Field::make('html', 'crb_kuesioner_hide_sidebar')
+					->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+					<h3>Halaman Input Kuesioner</h3>
+					<table class="form-table">
+						<tbody>
+						</tbody>
+					</table>
+				')
+			))
 			->add_fields($this->get_ajax_field(array('type' => 'kuesioner')));
 		
 		Container::make('theme_options', __('MENPAN'))
