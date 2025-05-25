@@ -18731,6 +18731,27 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
+	function count_renstra_document($status_verifikasi, $id_skpd, $id_jadwal) {
+		global $wpdb;
+		return $wpdb->get_var(
+			$wpdb->prepare("
+				SELECT COUNT(d.id)
+				FROM esakip_renstra d
+				INNER JOIN esakip_keterangan_verifikator kv 
+				   ON kv.id_dokumen = d.id
+				  AND kv.id_jadwal = d.id_jadwal
+				  AND kv.id_skpd = d.id_skpd
+				  AND kv.active = d.active
+				WHERE d.id_skpd = %d
+				  AND d.id_jadwal = %d
+				  AND d.active = 1
+				  AND kv.active = 1
+				  AND kv.status_verifikasi = %d
+				  AND kv.nama_tabel_dokumen = 'esakip_renstra'
+			", $id_skpd, $id_jadwal, $status_verifikasi)
+		);
+	}	
+
 	public function get_table_skpd_renstra()
 	{
 		global $wpdb;
@@ -18872,83 +18893,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										COUNT(id)
 									FROM esakip_renstra
 									WHERE id_skpd = %d
-									AND id_jadwal = %d
-									AND active = 1
+									  AND id_jadwal = %d
+									  AND active = 1
 								", $vv['id_skpd'], $id_jadwal)
 							);
 
+							$jumlah_disetujui = $this->count_renstra_document(1, $vv['id_skpd'], $id_jadwal);
+							$jumlah_ditolak   = $this->count_renstra_document(2, $vv['id_skpd'], $id_jadwal);
+							$jumlah_draft     = $this->count_renstra_document(3, $vv['id_skpd'], $id_jadwal);
 
-							$jumlah_status_disetujui = $wpdb->get_var(
-								$wpdb->prepare(
-									"
-									SELECT 
-										COUNT(kv.id)
-									FROM 
-										esakip_renstra pk 
-									JOIN 
-										esakip_keterangan_verifikator kv 
-										ON pk.id=kv.id_dokumen
-									WHERE pk.id_skpd = %d
-									AND pk.id_jadwal = %d
-									AND pk.active = 1
-									AND kv.active = 1
-									AND kv.status_verifikasi=1
-									AND kv.nama_tabel_dokumen = %s
-									",
-									$vv['id_skpd'],
-									$id_jadwal,
-									'esakip_renstra'
-								)
-							);
-
-							$jumlah_status_ditolak = $wpdb->get_var(
-								$wpdb->prepare(
-									"
-									SELECT 
-										COUNT(kv.id)
-									FROM 
-										esakip_renstra pk 
-									JOIN 
-										esakip_keterangan_verifikator kv 
-										ON pk.id=kv.id_dokumen
-									WHERE pk.id_skpd = %d
-									AND pk.id_jadwal = %d
-									AND pk.active = 1
-									AND kv.active = 1
-									AND kv.status_verifikasi=2
-									AND kv.nama_tabel_dokumen = %s
-									",
-									$vv['id_skpd'],
-									$id_jadwal,
-									'esakip_renstra'
-								)
-							);
-
-							$jumlah_status_draft = $wpdb->get_var(
-								$wpdb->prepare(
-									"
-									SELECT 
-										COUNT(kv.id)
-									FROM 
-										esakip_renstra pk 
-									JOIN 
-										esakip_keterangan_verifikator kv 
-										ON pk.id=kv.id_dokumen
-									WHERE pk.id_skpd = %d
-									AND pk.id_jadwal = %d
-									AND pk.active = 1
-									AND kv.active = 1
-									AND kv.status_verifikasi=3
-									AND kv.nama_tabel_dokumen = %s
-									",
-									$vv['id_skpd'],
-									$id_jadwal,
-									'esakip_renstra'
-								)
-							);
-							$jumlah_disetujui = !empty($jumlah_status_disetujui) ? $jumlah_status_disetujui : 0;
-							$jumlah_ditolak = !empty($jumlah_status_ditolak) ? $jumlah_status_ditolak : 0;
-							$jumlah_draft = !empty($jumlah_status_draft) ? $jumlah_status_draft : 0;
+							// Hitung status "menunggu"
 							$jumlah_menunggu = 0;
 							if (!empty($jumlah_dokumen)) {
 								$jumlah_menunggu = $jumlah_dokumen - ($jumlah_disetujui + $jumlah_ditolak + $jumlah_draft);
@@ -30012,7 +29966,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$data['tipe_pegawai_id'] == 21
 						|| $data['tipe_pegawai_id'] == 22
 					){
-						continue;
+						// continue;
 					}
 					$exists = $wpdb->get_var(
 						$wpdb->prepare("
@@ -30026,30 +29980,36 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					);
 				}
 
+				$opsi_data_pegawai = array(
+					'nama_pegawai' => $data['nama_pegawai'],
+					'nip_baru' => $data['nip_baru'],
+					'update_at' => current_time('mysql'),
+					'active' => 1
+				);
+				
 				if ($tipe == 'asn') {
-					$opsi_data_pegawai['nama_pegawai'] 	 = $data['nama_pegawai'];
 					$opsi_data_pegawai['gol_ruang'] 	 = $data['gol_ruang'];
 					$opsi_data_pegawai['pangkat'] 		 = $data['nmgolruang'];
 					$opsi_data_pegawai['gelar_depan'] 	 = $data['gelar_depan'];
 					$opsi_data_pegawai['gelar_belakang'] = $data['gelar_belakang'];
-					$opsi_data_pegawai['active'] 		 = 1;
 				}
 
 				if ($tipe == 'unor') {
-					$opsi_data_pegawai['nama_pegawai'] 		= $data['nama_pegawai'];
 					$opsi_data_pegawai['satker_id'] 		= $data['satker_id'];
 					$opsi_data_pegawai['jabatan'] 			= $data['jabatan'];
 					$opsi_data_pegawai['tipe_pegawai'] 		= $data['tipe_pegawai'];
 					$opsi_data_pegawai['tipe_pegawai_id'] 	= $data['tipe_pegawai_id'];
-					$opsi_data_pegawai['active'] 		 	= 1;
 
 					if (!empty($data['plt_plh'])) {
 						$opsi_data_pegawai['plt_plh'] 		= $data['plt_plh'];
 						$opsi_data_pegawai['tmt_sk_plth'] 	= !empty($data['tmt_sk_plth']) ? (new DateTime($data['tmt_sk_plth']))->format('Y-m-d H:i:s') : NULL;
 						$opsi_data_pegawai['berakhir'] 		= !empty($data['berakhir']) ? (new DateTime($data['berakhir']))->format('Y-m-d H:i:s') : NULL;
 
-						// Jika masa PLT PLH sudah tidak aktif maka tidak perlu diupdate
-						if (date('Y-m-d H:i:s') > $opsi_data_pegawai['berakhir']) {
+						// Jika masa PLT PLH sudah tidak aktif maka tidak perlu diupdate. Ada beberapa PLT yang tidak ada masa berakhirnya
+						if (
+							empty($opsi_data_pegawai['berakhir'])
+							|| date('Y-m-d 00:00:00') > $opsi_data_pegawai['berakhir']
+						){
 							continue;
 						}
 					} else {
@@ -30064,11 +30024,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 
 				if ($exists) {
-					$opsi_data_pegawai['update_at'] = current_time('mysql');
-					$wpdb->update($table, $opsi_data_pegawai, ['id' => $exists]);
+					$wpdb->update($table, $opsi_data_pegawai, array('id' => $exists));
 				} else {
-					$opsi_data_pegawai['nip_baru'] = $data['nip_baru'];
-					$opsi_data_pegawai['created_at'] = current_time('mysql');
 					$wpdb->insert($table, $opsi_data_pegawai);
 				}
 			}

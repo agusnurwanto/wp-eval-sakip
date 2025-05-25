@@ -25,6 +25,10 @@ jQuery(document).ready(function () {
     });
 });
 
+function setToFixed(v) {
+    return (v % 1 ? v.toFixed(2) : v);
+}
+
 function pesan_loading(pesan, loading=false){
     if(loading){
         pesan = '<div style="padding: 20px;">LOADING...</div>'+pesan;
