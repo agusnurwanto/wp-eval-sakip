@@ -437,6 +437,62 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		die(json_encode($ret));
 	}
 
+	function cek_input_pagu_parent($return)
+	{
+		global $wpdb;
+		if(empty($return)){
+			$return = array(
+				'status' => 'success',
+				'message' => 'Berhasil cek input pagu parent RHK!',
+				'data' => array(),
+				'input_pagu' => 0
+			);
+		}
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$rhk = $wpdb->get_row($wpdb->prepare("
+					SELECT
+						*
+					FROM esakip_data_rencana_aksi_opd
+					WHERE id=%d
+				", $_POST['id_parent']), ARRAY_A);
+				if(!empty($rhk)){
+					if(
+						$rhk['input_rencana_pagu_level'] == 0
+						&& !empty($rhk['parent'])
+					){
+						$return['data'][$rhk['level']] = $rhk;
+						$_POST['id_parent'] = $rhk['parent'];
+						$return = $this->cek_input_pagu_parent($return);
+					}else{
+						if($rhk['input_rencana_pagu_level'] == 1){
+							$return['input_pagu'] = 1;
+							$return['level'] = $rhk['level'];
+						}
+
+						// jika ini reverse function terkahir
+						if(!empty($return['data'])){
+							return $return;
+						}
+
+						$return['data'][$rhk['level']] = $rhk;
+					}
+
+				// jika hasil select kosong dan ini reverse function terkahir
+				}else if(!empty($return['data'])){
+					return $return;
+				}
+			} else {
+				$return['status'] = 'error';
+				$return['message'] = 'Api Key tidak sesuai!';
+			}
+		} else {
+			$return['status'] = 'error';
+			$return['message'] = 'Format tidak sesuai!';
+		}
+		die(json_encode($return));
+	}
+
 	function create_renaksi()
 	{
 		global $wpdb;

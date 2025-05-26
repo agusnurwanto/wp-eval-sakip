@@ -364,7 +364,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
 <div class="container-md">
     <div id="cetak" title="Rencana Hasil Kerja Perangkat Daerah">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Rencana Hasil Kerja <br><?php echo !empty($skpd['nama_skpd']) ? $skpd['nama_skpd'] : '' ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
+            <h1 class="text-center" style="margin:3rem;">RENCANA AKSI <br><?php echo !empty($skpd['nama_skpd']) ? $skpd['nama_skpd'] : '' ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
             <h4 id="notifikasi-title" style="text-align: center; margin-top: 10px; font-weight: bold;margin-bottom: .5em;">Notifikasi Rencana Hasil Kerja Pemda</h4>
             <div title="Notifikasi Rencana Hasil Kerja Pemda" style="padding: 5px; overflow: auto; display:flex; justify-content:center;">
                 <table class="table_notifikasi_pemda" style="width: 50em;text-align: center;">
@@ -944,6 +944,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
     };
 
     function tambah_rencana_aksi(isEdit = false) {
+        window.cek_parent_global = {};
         return get_tujuan_sasaran_cascading('sasaran')
             .then(function() {
                 return new Promise(function(resolve, reject) {
@@ -1459,7 +1460,11 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                         } else if (response.data != null) {
                             jQuery('#id_renaksi').val(id);
                             if(tipe != 4){
-                                if(response.data.input_rencana_pagu_level == 1){
+                                // jika cek_parent input pagu terchecklist maka harus diuncheck
+                                if(
+                                    response.data.input_rencana_pagu_level == 1
+                                    && cek_parent_global.input_pagu == 0
+                                ){
                                     jQuery('#set_input_rencana_pagu').prop('checked', true);
                                 }else{
                                     jQuery('#set_input_rencana_pagu').prop('checked', false);
@@ -1479,13 +1484,6 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                 let pagu_cascading = response.data.pagu_cascading != null ? formatRupiah(response.data.pagu_cascading) : '0'
                                 jQuery('#pagu-cascading').val(pagu_cascading);
 
-                                if (response.data && response.data.jabatan && response.data.jabatan.satker_id) {
-                                    jQuery('#satker_id').val(response.data.jabatan.satker_id).trigger('change');
-                                }
-
-                                if (response.data && response.data.pegawai && response.data.pegawai.nip_baru) {
-                                    jQuery('#pegawai').val(response.data.pegawai.nip_baru+'-'+response.data.id_jabatan).trigger('change');
-                                }
                                 var renaksi_pemda = "";
                                 response.data.renaksi_pemda.map(function(b, i) {
                                     renaksi_pemda += `
@@ -1543,16 +1541,29 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
 
                                     /** menghapus attr onchange sementara agar tiak bentrok dengan fungsi onchange-nya dibawah ini */
                                     jQuery('#cascading-renstra-program').removeAttr('onchange');
-                                    jQuery('#cascading-renstra-program').val(kode_cascading_renstra).trigger('change');
+
+                                    if(cek_parent_global.input_pagu == 1){
+                                        jQuery('#cascading-renstra-program').val(cek_parent_global.data[cek_parent_global.level].kode_cascading_program).trigger('change').attr('disabled', true);
+                                    }else{
+                                        jQuery('#cascading-renstra-program').val(kode_cascading_renstra).trigger('change');
+                                    }
 
                                     jQuery("#cascading-renstra-kegiatan").empty();
                                     get_cascading_input_rencana_pagu('kegiatan').then(function() {
                                         jQuery('#cascading-renstra-kegiatan').removeAttr('onchange');
-                                        jQuery('#cascading-renstra-kegiatan').val(response.data.kode_cascading_kegiatan).trigger('change');
+                                        if(cek_parent_global.input_pagu == 1){
+                                            jQuery('#cascading-renstra-kegiatan').val(cek_parent_global.data[cek_parent_global.level].kode_cascading_kegiatan).trigger('change').attr('disabled', true);
+                                        }else{
+                                            jQuery('#cascading-renstra-kegiatan').val(response.data.kode_cascading_kegiatan).trigger('change');
+                                        }
 
                                         jQuery("#cascading-renstra-sub-kegiatan").empty();
                                         get_cascading_input_rencana_pagu('sub_kegiatan').then(function() {
-                                            jQuery('#cascading-renstra-sub-kegiatan').val(response.data.kode_cascading_sub_kegiatan).trigger('change');
+                                            if(cek_parent_global.input_pagu == 1){
+                                                jQuery('#cascading-renstra-sub-kegiatan').val(cek_parent_global.data[cek_parent_global.level].kode_cascading_sub_kegiatan).trigger('change').attr('disabled', true);
+                                            }else{
+                                                jQuery('#cascading-renstra-sub-kegiatan').val(response.data.kode_cascading_sub_kegiatan).trigger('change');
+                                            }
 
                                             
                                             /** kembalikan attr onchange */
@@ -1604,21 +1615,13 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                     jQuery("#pokin-level-1").trigger('change');
                                     
                                     jQuery(".in_setting_input_rencana_pagu").hide();
-                                    jQuery('#cascading-renstra-program').val(kode_cascading_renstra).trigger('change');
+                                    if(cek_parent_global.input_pagu == 1){
+                                        jQuery('#cascading-renstra-program').val(cek_parent_global.data[cek_parent_global.level].kode_cascading_program).trigger('change').attr('disabled', true);
+                                    }else{
+                                        jQuery('#cascading-renstra-program').val(kode_cascading_renstra).trigger('change');
+                                    }
                                     in_setting_dasar = 'display: none;';
                                 }
-                                
-                                var checklist_dasar_pelaksanaan = `
-                                    <div class="form-group in_setting_input_rencana_pagu" style="${in_setting_dasar}">
-                                        <label>Pilih Dasar Pelaksanaan</label>
-                                        <div>
-                                            <label><input type="checkbox" name="dasar_pelaksanaan[]" id="mandatori_pusat" ${response.data.mandatori_pusat == 1 ? 'checked' : ''}> Mandatori Pusat</label><br>
-                                            <label><input type="checkbox" name="dasar_pelaksanaan[]" id="inisiatif_kd" ${response.data.inisiatif_kd == 1 ? 'checked' : ''}> Inisiatif Kepala Daerah</label><br>
-                                            <label><input type="checkbox" name="dasar_pelaksanaan[]" id="musrembang" ${response.data.musrembang == 1 ? 'checked' : ''}> MUSREMBANG (Musyawarah Rencana Pembangunan)</label><br>
-                                            <label><input type="checkbox" name="dasar_pelaksanaan[]" id="pokir" ${response.data.pokir == 1 ? 'checked' : ''}> Pokir (Pokok Pikiran)</label>
-                                        </div>
-                                    </div>`;
-                                jQuery("#modal-crud").find('.modal-body').append(checklist_dasar_pelaksanaan);
 
                             } else if (tipe == 3) {
                                 jQuery("#modal-crud").find('.modal-title').html('Edit Uraian Rencana Hasil Kerja');
@@ -1629,11 +1632,20 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
 
                                     /** menghapus attr onchange sementara agar tiak bentrok dengan fungsi onchange-nya dibawah ini */
                                     jQuery('#cascading-renstra-kegiatan').removeAttr('onchange');
-                                    jQuery('#cascading-renstra-kegiatan').val(response.data.kode_cascading_kegiatan).trigger('change');
+
+                                    if(cek_parent_global.input_pagu == 1){
+                                        jQuery('#cascading-renstra-sub-kegiatan').val(cek_parent_global.data[cek_parent_global.level].kode_cascading_kegiatan).trigger('change').attr('disabled', true);
+                                    }else{
+                                        jQuery('#cascading-renstra-kegiatan').val(response.data.kode_cascading_kegiatan).trigger('change');
+                                    }
 
                                     jQuery("#cascading-renstra-sub-kegiatan").empty();
                                     get_cascading_input_rencana_pagu('sub_kegiatan').then(function() {
-                                        jQuery('#cascading-renstra-sub-kegiatan').val(response.data.kode_cascading_sub_kegiatan).trigger('change');
+                                        if(cek_parent_global.input_pagu == 1){
+                                            jQuery('#cascading-renstra-sub-kegiatan').val(cek_parent_global.data[cek_parent_global.level].kode_cascading_sub_kegiatan).trigger('change').attr('disabled', true);
+                                        }else{
+                                            jQuery('#cascading-renstra-sub-kegiatan').val(response.data.kode_cascading_sub_kegiatan).trigger('change');
+                                        }
                                     })
 
                                     /** kembalikan attr onchange */
@@ -1667,28 +1679,12 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                     jQuery("#pokin-level-1").trigger('change');
 
                                     jQuery(".in_setting_input_rencana_pagu").hide();
-                                    jQuery('#cascading-renstra-kegiatan').val(response.data.kode_cascading_kegiatan).trigger('change');
+                                    if(cek_parent_global.input_pagu == 1){
+                                        jQuery('#cascading-renstra-kegiatan').val(cek_parent_global.data[cek_parent_global.level].kode_cascading_kegiatan).trigger('change').attr('disabled', true);
+                                    }else{
+                                        jQuery('#cascading-renstra-kegiatan').val(response.data.kode_cascading_kegiatan).trigger('change');
+                                    }
                                     in_setting_dasar = 'display: none;';
-                                }
-
-                                var checklist_dasar_pelaksanaan = `
-                                    <div class="form-group in_setting_input_rencana_pagu" style="${in_setting_dasar}">
-                                        <label>Pilih Dasar Pelaksanaan</label>
-                                        <div>
-                                            <label><input type="checkbox" name="dasar_pelaksanaan[]" id="mandatori_pusat" ${response.data.mandatori_pusat == 1 ? 'checked' : ''}> Mandatori Pusat</label><br>
-                                            <label><input type="checkbox" name="dasar_pelaksanaan[]" id="inisiatif_kd" ${response.data.inisiatif_kd == 1 ? 'checked' : ''}> Inisiatif Kepala Daerah</label><br>
-                                            <label><input type="checkbox" name="dasar_pelaksanaan[]" id="musrembang" ${response.data.musrembang == 1 ? 'checked' : ''}> MUSREMBANG (Musyawarah Rencana Pembangunan)</label><br>
-                                            <label><input type="checkbox" name="dasar_pelaksanaan[]" id="pokir" ${response.data.pokir == 1 ? 'checked' : ''}> Pokir (Pokok Pikiran)</label>
-                                        </div>
-                                    </div>`;
-                                jQuery("#modal-crud").find('.modal-body').append(checklist_dasar_pelaksanaan);
-
-                                if (response.data && response.data.jabatan && response.data.jabatan.satker_id) {
-                                    jQuery('#satker_id').val(response.data.jabatan.satker_id).trigger('change');
-                                }
-
-                                if (response.data && response.data.pegawai && response.data.pegawai.nip_baru) {
-                                    jQuery('#pegawai').val(response.data.pegawai.nip_baru+'-'+response.data.id_jabatan).trigger('change');
                                 }
                             } else if (tipe == 4) {
                                 jQuery("#modal-crud").find('.modal-title').html('Edit Uraian Teknis Kegiatan');
@@ -1698,28 +1694,43 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                 });
                                 jQuery('#pokin-level-1').val(selected_pokin_5);
                                 jQuery("#pokin-level-1").trigger('change');
-                                jQuery('#cascading-renstra-sub-kegiatan').val(response.data.kode_cascading_sub_kegiatan).trigger('change');
-                                if (response.data && response.data.jabatan && response.data.jabatan.satker_id) {
-                                    jQuery('#satker_id').val(response.data.jabatan.satker_id).trigger('change');
+                                if(cek_parent_global.input_pagu == 1){
+                                    jQuery('#cascading-renstra-sub-kegiatan').val(cek_parent_global.data[cek_parent_global.level].kode_cascading_sub_kegiatan).trigger('change').attr('disabled', true);
+                                }else{
+                                    jQuery('#cascading-renstra-sub-kegiatan').val(response.data.kode_cascading_sub_kegiatan).trigger('change');
                                 }
+                            }
 
-                                if (response.data && response.data.pegawai && response.data.pegawai.nip_baru) {
-                                    jQuery('#pegawai').val(response.data.pegawai.nip_baru+'-'+response.data.id_jabatan).trigger('change');
-                                }
+                            if (
+                                response.data 
+                                && response.data.jabatan 
+                                && response.data.jabatan.satker_id
+                            ) {
+                                jQuery('#satker_id').val(response.data.jabatan.satker_id).trigger('change');
+                            }
+                            if (
+                                response.data 
+                                && response.data.pegawai 
+                                && response.data.pegawai.nip_baru
+                            ) {
+                                jQuery('#pegawai').val(response.data.pegawai.nip_baru+'-'+response.data.id_jabatan).trigger('change');
+                            }
+
+                            jQuery('#label_renaksi').val(response.data.label);
+                            if(cek_parent_global.input_pagu == 0){
                                 var checklist_dasar_pelaksanaan = `
-                                <div class="form-group in_setting_input_rencana_pagu">
-                                    <label>Pilih Dasar Pelaksanaan</label>
-                                    <div>
-                                        <label><input type="checkbox" name="dasar_pelaksanaan[]" id="mandatori_pusat" ${response.data.mandatori_pusat == 1 ? 'checked' : ''}> Mandatori Pusat</label><br>
-                                        <label><input type="checkbox" name="dasar_pelaksanaan[]" id="inisiatif_kd" ${response.data.inisiatif_kd == 1 ? 'checked' : ''}> Inisiatif Kepala Daerah</label><br>
-                                        <label><input type="checkbox" name="dasar_pelaksanaan[]" id="musrembang" ${response.data.musrembang == 1 ? 'checked' : ''}> MUSREMBANG (Musyawarah Rencana Pembangunan)</label><br>
-                                        <label><input type="checkbox" name="dasar_pelaksanaan[]" id="pokir" ${response.data.pokir == 1 ? 'checked' : ''}> Pokir (Pokok Pikiran)</label>
+                                    <div class="form-group in_setting_input_rencana_pagu">
+                                        <label>Pilih Dasar Pelaksanaan</label>
+                                        <div>
+                                            <label><input type="checkbox" name="dasar_pelaksanaan[]" id="mandatori_pusat" ${response.data.mandatori_pusat == 1 ? 'checked' : ''}> Mandatori Pusat</label><br>
+                                            <label><input type="checkbox" name="dasar_pelaksanaan[]" id="inisiatif_kd" ${response.data.inisiatif_kd == 1 ? 'checked' : ''}> Inisiatif Kepala Daerah</label><br>
+                                            <label><input type="checkbox" name="dasar_pelaksanaan[]" id="musrembang" ${response.data.musrembang == 1 ? 'checked' : ''}> MUSREMBANG (Musyawarah Rencana Pembangunan)</label><br>
+                                            <label><input type="checkbox" name="dasar_pelaksanaan[]" id="pokir" ${response.data.pokir == 1 ? 'checked' : ''}> Pokir (Pokok Pikiran)</label>
+                                        </div>
                                     </div>
-                                </div>
-                            `;
+                                `;
                                 jQuery("#modal-crud").find('.modal-body').append(checklist_dasar_pelaksanaan);
                             }
-                            jQuery('#label_renaksi').val(response.data.label);
                         }
 
                         if (hak_akses_pegawai == 1) {
@@ -3012,6 +3023,54 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
     }
 
     function tambah_renaksi_2(tipe, isEdit = false) {
+        window.cek_parent_global = {};
+        return new Promise(function(resolve, reject){
+            new Promise(function(resolve2, reject2){
+                if(tipe == 1){
+                    resolve2(false);
+                }else{
+                    var parent_renaksi = 0;
+                    switch (tipe) {
+                        case 2:
+                            parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
+                            break;
+
+                        case 3:
+                            parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
+                            break;
+
+                        case 4:
+                            parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
+                            break;
+                    }
+                    jQuery('#wrap-loading').show();
+                    jQuery.ajax({
+                        url: esakip.url,
+                        type: "post",
+                        data: {
+                            "action": 'cek_input_pagu_parent',
+                            "api_key": esakip.api_key,
+                            "id_parent": parent_renaksi
+                        },
+                        dataType: "json",
+                        success: function(res) {
+                            window.cek_parent_global = res;
+                            jQuery('#wrap-loading').hide();
+                            resolve2(res);
+                        }
+                    })
+                }
+            })
+            .then(function(response){
+                tambah_renaksi_2_final(tipe, isEdit, response)
+                .then(function(){
+                    resolve();
+                });
+            });
+        });
+    }
+
+    function tambah_renaksi_2_final(tipe, isEdit = false, cek_parent) {
         let jenis = '';
         let parent_cascading = '';
         let jenis_cascading = '';
@@ -3150,23 +3209,10 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     data_cascading = data_sub_kegiatan_cascading[key];
                     html_pokin_input_rencana_pagu = '';
                     html_input_sub_keg_cascading = '';
-                    html_input_dasar_pelaksanaan = '';
+                    if(cek_parent.input_pagu == 1){
+                        html_input_dasar_pelaksanaan = '';
+                    }
                     html_cascading_turunan_id = 'cascading-renstra-sub-kegiatan';
-                }
-
-                parent_pokin = parent_pokin.split(",");
-                if (!isEdit && tipe === 4) {
-                    checklist_dasar_pelaksanaan = `
-                        <div class="form-group in_setting_input_rencana_pagu">
-                            <label>Pilih Dasar Pelaksanaan</label>
-                            <div>
-                                <label><input type="checkbox" name="dasar_pelaksanaan[]" value="0" id="mandatori_pusat"> Mandatori Pusat</label><br>
-                                <label><input type="checkbox" name="dasar_pelaksanaan[]" value="0" id="inisiatif_kd"> Inisiatif Kepala Daerah</label><br>
-                                <label><input type="checkbox" name="dasar_pelaksanaan[]" value="0" id="musrembang"> MUSREMBANG (Musyawarh Rencana Pembangunan)</label><br>
-                                <label><input type="checkbox" name="dasar_pelaksanaan[]" value="0" id="pokir"> Pokir (Pokok Pikiran)</label>
-                            </div>
-                        </div>
-                    `;
                 }
 
                 // menampilkan rhk pemda hanya di level 2 rhk opd
@@ -3202,13 +3248,9 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                 let html_setting_input_rencana_pagu = '';
                 if(tipe != 4){
                     var hide = 'style="display:none"';
-                    
-                    // semua tipe sudah bisa input rencana pagu
-                    if(
-                        tipe == 3
-                        || tipe == 2
-                        || tipe == 1
-                    ){
+
+                    // jika parent rhk tidak ada yang input pagu maka checklist input pagu ditampilkan
+                    if(cek_parent.input_pagu == 0){
                         hide = '';
                     }
                     html_setting_input_rencana_pagu = `
@@ -3232,6 +3274,8 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     "id_jadwal": id_jadwal,
                     "id_skpd": <?php echo $id_skpd; ?>
                 };
+
+                parent_pokin = parent_pokin.split(",");
                 parent_pokin.map(function(b, i) {
                     option.parent.push(b);
                 })
