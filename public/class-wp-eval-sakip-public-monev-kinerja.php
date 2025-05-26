@@ -84,6 +84,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$data_renaksi[$key]['pokin'] = $wpdb->get_results(
 							$wpdb->prepare("
 						        SELECT
+									p.level,
 									o.id_pokin,
 						            p.label AS pokin_label
 						        FROM esakip_data_pokin_rhk_opd AS o
