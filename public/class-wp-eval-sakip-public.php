@@ -22028,7 +22028,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							<h5 class="esakip-header-tahun" data-id="halaman-sakip-pengukuran-kinerja-skpd-' . $skpd_db['id_skpd'] . '" style="margin: 0;">PENGUKURAN KINERJA</h5>
 							<div class="esakip-body-tahun" data-id="halaman-sakip-pengukuran-kinerja-skpd-' . $skpd_db['id_skpd'] . '">
 								<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
-								$halaman_pengukuran_kinerja_skpd .= $halaman_iku_wpsipd;
 								$set_html_opd_pengukuran_kinerja = get_option('sakip_menu_khusus_set_html_opd_PENGUKURAN_KINERJA_' . $_GET['tahun']);
 								if (!empty($set_html_opd_pengukuran_kinerja)) {
 								  $halaman_pengukuran_kinerja_skpd .= stripslashes(htmlspecialchars_decode($set_html_opd_pengukuran_kinerja));
