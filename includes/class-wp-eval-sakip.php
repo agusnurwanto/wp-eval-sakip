@@ -538,6 +538,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_submit_edit_pengaturan_menu_dokumen',  $plugin_public, 'submit_edit_pengaturan_menu_dokumen');
 		$this->loader->add_action('wp_ajax_get_data_pengaturan_menu_khusus',  $plugin_public, 'get_data_pengaturan_menu_khusus');
 		$this->loader->add_action('wp_ajax_simpan_perubahan_menu_khusus',  $plugin_public, 'simpan_perubahan_menu_khusus');
+		$this->loader->add_action('wp_ajax_get_html_menu_khusus_opd_by_menu',  $plugin_public, 'get_html_menu_khusus_opd_by_menu');
 		
 		$this->loader->add_action('wp_ajax_esakip_simpan_rpjpd',  $plugin_public, 'esakip_simpan_rpjpd');
 		$this->loader->add_action('wp_ajax_esakip_get_rpjpd',  $plugin_public, 'esakip_get_rpjpd');

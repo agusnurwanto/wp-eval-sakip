@@ -2209,7 +2209,7 @@ class Wp_Eval_Sakip_Admin
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'croscutting_pd')));
 
-		$monev_ren_aksi_menu = Container::make('theme_options', __('Rencana Hasil Kerja'))
+		$monev_ren_aksi_menu = Container::make('theme_options', __('Rencana Aksi'))
 			->set_page_menu_position(3.5)
 			->set_icon('dashicons-analytics')
 			->add_fields(array(
@@ -2223,7 +2223,7 @@ class Wp_Eval_Sakip_Admin
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'monev_rencana_aksi_pemda')));
 
-		Container::make('theme_options', __('Rencana Hasil Kerja Pemerintah Daerah'))
+		Container::make('theme_options', __('Rencana Aksi Pemerintah Daerah'))
 			->set_page_parent($monev_ren_aksi_menu)
 			->add_fields(array(
 				Field::make('html', 'crb_pengisian_monev_pemda_hide_sidebar')
@@ -2236,7 +2236,7 @@ class Wp_Eval_Sakip_Admin
 			))
 			->add_fields($this->get_ajax_field(array('type' => 'monev_rencana_aksi_pemda')));
 
-		Container::make('theme_options', __('Rencana Hasil Kerja Perangkat Daerah'))
+		Container::make('theme_options', __('Rencana Aksi Perangkat Daerah'))
 			->set_page_parent($monev_ren_aksi_menu)
 			->add_fields(array(
 				Field::make('html', 'crb_pengisian_monev_pd_hide_sidebar')
@@ -2252,7 +2252,7 @@ class Wp_Eval_Sakip_Admin
 		$api_key_wpspd = get_option('_crb_apikey_wpsipd');
 		$url_server_wpspd = get_option('_crb_url_server_sakip');
 
-		Container::make('theme_options', __('Rencana Hasil Kerja Setting'))
+		Container::make('theme_options', __('Rencana Aksi Setting'))
 			->set_page_parent($monev_ren_aksi_menu)
 			->add_fields(array(
 				Field::make('html', 'crb_esakip_halaman_terkait')
