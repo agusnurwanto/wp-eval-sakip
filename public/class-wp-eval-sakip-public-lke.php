@@ -2418,7 +2418,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						} elseif ($total_bobot_kuesioner_detail < 100) {
 						    $total_bobot_kuesioner_detail = round($total_bobot_kuesioner_detail * 2) / 2; 
 						} else {
-						    $total_bobot_kuesioner_detail = round($total_bobot_kuesioner_detail); 
+						    $total_bobot_kuesioner_detail = 50; 
 						}
 
 						
@@ -3098,6 +3098,140 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	        $ret['message'] = 'Format salah!';
 	    }
 
+		die(json_encode($ret));
+	}
+
+	function copy_data_kuesioner_menpan()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil copy data kuesioner menpan!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran_sumber_kuesioner'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran Sumber Kuesioner Tidak Boleh Kosong!';
+				} else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran_tujuan'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran Halaman Ini Tidak Boleh Kosong!';
+				}
+
+				if ($ret['status'] != 'error') {
+					$this_tahun_anggaran = $_POST['tahun_anggaran_tujuan'];
+					$tahun_anggaran_sumber_kuesioner = $_POST['tahun_anggaran_sumber_kuesioner'];
+
+					/** Kosongkan tabel data yang akan disii data baru hasil copy */
+					$wpdb->update(
+						'esakip_kuesioner_menpan',
+						array(
+							'active' => 0
+						),
+						array(
+							'tahun_anggaran' => $this_tahun_anggaran
+						)
+					);
+
+					$wpdb->update(
+						'esakip_kuesioner_menpan_detail',
+						array(
+							'active' => 0
+						),
+						array(
+							'tahun_anggaran' => $this_tahun_anggaran
+						)
+					);
+
+					$data_sumber = $wpdb->get_results(
+						$wpdb->prepare(
+							'SELECT
+								*
+							FROM
+								esakip_kuesioner_menpan
+							WHERE tahun_anggaran=%d
+								AND active=%d
+							',
+							$tahun_anggaran_sumber_kuesioner,
+							1
+						),
+						ARRAY_A
+					);
+
+					// copy data kuesioner menpan
+					$id_kuesioner = array();
+					if (!empty($data_sumber)) {
+						foreach ($data_sumber as $k => $kuesioner) {
+							$data_kuesioner = array(
+								'nama_kuesioner' => $kuesioner['nama_kuesioner'],
+								'nomor_urut' => $kuesioner['nomor_urut'],
+								'bobot' => $kuesioner['bobot'],
+								'active' => 1,
+								'tahun_anggaran' => $this_tahun_anggaran
+							);
+
+							$wpdb->insert(
+								'esakip_kuesioner_menpan',
+								$data_kuesioner
+							);
+
+							$id_kuesioner_baru = $wpdb->insert_id;
+							$id_kuesioner[$kuesioner['id']] = $id_kuesioner_baru;
+
+							// copy data kuesioner menpan
+							$data_kuesioner_sumber_detail = $wpdb->get_results(
+								$wpdb->prepare(
+									"SELECT
+										*
+									FROM
+										esakip_kuesioner_menpan_detail
+									WHERE
+										id_kuesioner=%d
+										AND tahun_anggaran=%d
+										AND active=%d
+									",
+									$kuesioner['id'],
+									$tahun_anggaran_sumber_kuesioner,
+									1
+								),
+								ARRAY_A
+							);
+							// print_r($data_kuesioner_sumber_detail); die($wpdb->last_query);
+							if (!empty($data_kuesioner_sumber_detail)) {
+								foreach ($data_kuesioner_sumber_detail as $kk => $kuesioner_detail) {
+									$data_kuesioner_detail = array(
+										'id_kuesioner' => $id_kuesioner_baru,
+					                    'nomor_urut' => $kuesioner_detail['nomor_urut'],
+					                    'jawaban' => $kuesioner_detail['jawaban'],
+					                    'pertanyaan' => $kuesioner_detail['pertanyaan'],
+					                    'penjelasan' => $kuesioner_detail['penjelasan'],
+					                    'tipe_soal' => $kuesioner_detail['tipe_soal'],
+					                    'tipe_jawaban' => $kuesioner_detail['tipe_jawaban'],
+					                    'bobot' => $kuesioner_detail['bobot'],
+										'active' => 1,
+										'tahun_anggaran' => $this_tahun_anggaran
+									);
+
+									$wpdb->insert('esakip_kuesioner_menpan_detail', $data_kuesioner_detail);
+								}
+							}
+						}
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
 		die(json_encode($ret));
 	}
 }

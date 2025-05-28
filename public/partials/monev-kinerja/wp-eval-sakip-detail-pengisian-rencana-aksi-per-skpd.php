@@ -1438,7 +1438,10 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
             if (getParentManual) {
 
                 // kondisi jika input pagu dibuat false maka tidak perlu get pokin child nya
-                if(jQuery('#set_input_rencana_pagu').is(':checked') == false){
+                if(
+                    jQuery('#set_input_rencana_pagu').is(':checked') == false
+                    && tag != 'pokin-level-2'
+                ){
                     console.log('input pagu false get_data_pokin_2 level', level, 'id', tag);
                     return resolve();
                 }
@@ -2856,7 +2859,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                             </select>
                         </div>`;
 
-                    trigger_pokin_input_rencana_pagu = `onchange="get_data_pokin_2(this.value, ${ level_pokin }, 'pokin-level-2', true)"`;
+                    trigger_pokin_input_rencana_pagu = `onchange="get_data_pokin_2(this.value, 2, 'pokin-level-2', true)"`;
 
                     html_input_sub_keg_cascading = `
                         <div class="form-group in_setting_input_rencana_pagu" style="display: none;">

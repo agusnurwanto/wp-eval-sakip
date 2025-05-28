@@ -9,6 +9,26 @@ $input = shortcode_atts(array(
     'tahun' => '',
 ), $atts);
 
+$idtahun = $wpdb->get_results(
+    "
+        SELECT DISTINCT 
+            tahun_anggaran 
+        FROM esakip_data_unit        
+        ORDER BY tahun_anggaran DESC",
+    ARRAY_A
+);
+$tahun = '<option value="0">Pilih Tahun</option>';
+
+foreach ($idtahun as $val) {
+    if($val['tahun_anggaran'] == $input['tahun']){
+        continue;
+    }
+    $selected = '';
+    if($val['tahun_anggaran'] == $input['tahun']-1){
+        $selected = 'selected';
+    }
+    $tahun .= '<option value="'. $val['tahun_anggaran']. '" '. $selected .'>'. $val['tahun_anggaran'] .'</option>';
+}
 ?>
 <style>
     .wrap-table {
@@ -187,7 +207,21 @@ $input = shortcode_atts(array(
         </div>
     </div>
 </div>
-
+<div class="modal fade" id="modal" data-backdrop="static"  role="dialog" aria-labelledby="modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
 <script>
     jQuery(document).ready(function() {
         get_table_kuesioner();
@@ -204,7 +238,77 @@ $input = shortcode_atts(array(
             }
         });
     })
+    function copy_data(){
+            let tbody = '';
+            let tahun = '<?php echo $tahun; ?>';
+        jQuery("#modal").find('.modal-title').html('Copy Data Kuesioner Menpan');
+        jQuery("#modal").find('.modal-body').html(`
+            <div class="form-group row">
+                <label for="staticEmail" class="col-sm-3 col-form-label">Tahun Anggaran Sumber Kuesioner</label>
+                <div class="col-sm-9 d-flex align-items-center justify-content-center">
+                    <select id="tahunAnggaranCopy" class="form-control">
+                        ${tahun}
+                    </select>
+                </div>
+            </div>
+        `);
+        jQuery("#modal").find('.modal-footer').html(`
+            <button type="button" class="btn btn-warning" data-dismiss="modal">
+                Tutup
+            </button>
+            <button type="button" class="btn btn-danger" onclick="submitCopyData()">
+                Copy Data
+            </button>`);
+        jQuery("#modal").find('.modal-dialog').css('maxWidth','700');
+        jQuery("#modal").modal('show');
+    }
+    function submitCopyData() {
+        if (!confirm('Apakah anda yakin akan copy data Kuesioner Menpan? \nData yang sudah ada akan ditimpa oleh data baru hasil copy data!')) {
+            return;
+        }
 
+        var tahun_anggaran = jQuery("#tahunAnggaranCopy").val();
+
+        jQuery('#wrap-loading').show();
+
+        ajax_copy_data({
+            tahun_anggaran: tahun_anggaran
+        })
+        .then(function() {
+            alert('Berhasil Copy Data Kuesioner Menpan.');
+            jQuery("#modal").modal('hide');
+            jQuery('#wrap-loading').hide();
+            get_table_kuesioner();
+        })
+        .catch(function(err) {
+            console.log('err', err);
+            alert('Ada kesalahan sistem!');
+            jQuery('#wrap-loading').hide();
+        });
+    }
+
+    function ajax_copy_data(options){
+        return new Promise(function(resolve, reject){
+            jQuery.ajax({
+                url: esakip.url,
+                type: 'POST',
+                data: {
+                    action: 'copy_data_kuesioner_menpan',
+                    api_key: esakip.api_key,
+                    tahun_anggaran_sumber_kuesioner: options.tahun_anggaran,
+                    tahun_anggaran_tujuan: <?php echo $input['tahun']; ?>
+                },
+                dataType: 'json',
+                success: function(response) {
+                    resolve();
+                },
+                error: function(xhr, status, error) {
+                    console.log('error', error);
+                    resolve();
+                }
+            });
+        });
+    }
     function generate_data() {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
