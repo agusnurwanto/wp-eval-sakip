@@ -1906,7 +1906,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             }
 
                             $halaman_pegawai_skpd = $this->functions->generatePage(array(
-                                'nama_page' => 'Halaman List Pegawai Laporan PK ' . $tahun_anggaran,
+                                'nama_page' => 'List Pegawai Laporan PK ' . $tahun_anggaran,
                                 'content' => '[list_pegawai_laporan_pk tahun_anggaran=' . $tahun_anggaran . ']',
                                 'show_header' => 1,
                                 'post_status' => 'private'

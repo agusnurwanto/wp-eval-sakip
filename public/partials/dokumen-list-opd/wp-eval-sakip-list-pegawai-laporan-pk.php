@@ -3,7 +3,7 @@ if (!defined('WPINC')) {
 	die;
 }
 global $wpdb;
-
+	
 $input = shortcode_atts(array(
 	'tahun_anggaran' => '2000'
 ), $atts);
@@ -172,7 +172,6 @@ if (!isset($response['status']) || $response['status'] === false) {
 			dataType: 'json',
 			success: function(response) {
 				jQuery('#wrap-loading').hide();
-				console.log(response);
 				if (response.status === 'success') {
 					if (destroy == 1) {
 						laporan_pk_table.fnDestroy();

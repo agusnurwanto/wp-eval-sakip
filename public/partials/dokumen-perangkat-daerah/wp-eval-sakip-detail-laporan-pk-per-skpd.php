@@ -278,7 +278,10 @@ $options = array(
     'nip_baru'  => $data_pegawai_1['nip_baru']
 );
 $html_pk = $this->get_pk_html($options);
-
+// echo '<pre>';
+// print_r($html_pk);
+// echo '/<pre>';
+// die();
 $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
 $user_nip = $current_user->data->user_login;
@@ -1384,7 +1387,7 @@ if ($data_tahapan) {
             method: 'POST',
             data: {
                 action: "get_laporan_pk_by_id",
-                api_key: esakip.api_key,
+                api_key: esakip.api_key, 
                 id_tahap: idTahap,
             },
             dataType: 'json',
