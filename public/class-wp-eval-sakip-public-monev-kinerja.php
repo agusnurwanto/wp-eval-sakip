@@ -701,13 +701,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$wpdb->insert('esakip_data_rencana_aksi_opd', $data);
 						$cek_id = $wpdb->insert_id;
 					} else {
-						$status_update = true;
+						$status_update = false;
 						if (
 							$_POST['level'] == 2
 							|| $_POST['level'] == 3
 						) {
 							/** Untuk validasi agar cascading parent tetap sama dengan cascading child yang telah dipilih */
-							$status_update = false;
 							$level_child = $_POST['level'] + 1;
 							$nama_kolom = array(
 								'3' => 'kode_cascading_kegiatan',
@@ -743,19 +742,24 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							if (!empty($cek_cascading_child)) {
 								foreach ($cek_cascading_child as $cek_cas) {
 									if (
-										strpos($cek_cas[$nama_kolom], $kode_cascading_renstra) === 0 
-										&& $cek_cas['id_sub_skpd_cascading'] === $id_sub_skpd_cascading
-									) {
-										$status_update = true; // Jika ada yang cocok, set menjadi true
-										break;
+										!empty($cek_cas[$nama_kolom])
+										&& (
+											strpos($cek_cas[$nama_kolom], $kode_cascading_renstra) !== 0 
+											|| $cek_cas['id_sub_skpd_cascading'] != $id_sub_skpd_cascading
+										)
+									){
+										if(empty($status_update)){
+											$status_update = array();
+										}
+										$status_update[] = $nama_kolom.' '.$cek_cas[$nama_kolom].' dengan Id SKPD '.$id_sub_skpd_cascading.' tidak ditemukan!';
 									}
 								}
 							} else {
-								$status_update = true;
+								$status_update = false;
 							}
 						}
 
-						if ($status_update) {
+						if (empty($status_update)) {
 							$wpdb->update('esakip_data_rencana_aksi_opd', $data, array('id' => $cek_id));
 						} else {
 							$nama_kolom = array(
@@ -764,7 +768,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							);
 							$ret = array(
 								'status' => 'error',
-								'message'   => 'Data ' . $nama_kolom[$_POST['level']] . ' Cascading Tidak Dapat Diubah! Harap Hapus / Kosongkan / Perbarui Data Cascading Di RHK Level Bawahnya!.'
+								'message'   => 'Data ' . $nama_kolom[$_POST['level']] . ' Cascading tidak dapat dirubah menjadi '.$kode_cascading_renstra.' dengan ID SKPD '.$id_sub_skpd_cascading.'! Harap hapus/kosongkan/perbarui data Cascading di RHK level bawahnya! '.implode(' | ', $status_update)
 							);
 							die(json_encode($ret));
 						}

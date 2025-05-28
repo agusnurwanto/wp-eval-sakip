@@ -1082,7 +1082,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         });
     }
 
-    function setting_cascading(rhk){
+    function setting_cascading(rhk, isEdit=false){
         var tipe = rhk.level;
         open_input_rencana_pagu(false);
 
@@ -1177,7 +1177,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         });
     }
 
-    function setting_pokin(rhk){
+    function setting_edit_pokin(rhk){
         var tipe = rhk.level;
 
         /** menghapus attr onchange sementara agar tidak bentrok dengan fungsi dibawah ini */
@@ -1190,23 +1190,29 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         let selected_pokin_2 = [];
         let selected_pokin_3 = [];
         let selected_pokin_4 = [];
+        rhk.pokin.map(function(b) {
+            selected_pokin_1.push(b.id);
+        });
+        rhk.pokin_2.map(function(b) {
+            selected_pokin_2.push(b.id);
+        });
+        rhk.pokin_3.map(function(b) {
+            selected_pokin_3.push(b.id);
+        });
+        rhk.pokin_4.map(function(b) {
+            selected_pokin_4.push(b.id);
+        });
+        rhk.pokin_5.map(function(b) {
+            selected_pokin_5.push(b.id);
+        });
         new Promise(function(resolve, reject){
             if(
                 tipe == 1
                 || rhk.input_rencana_pagu_level == 1
                 || cek_parent_global.input_pagu == 1
             ){
-                rhk.pokin.map(function(b) {
-                    selected_pokin_1.push(b.id);
-                });
-                jQuery('#pokin-level-1').val(selected_pokin_1).trigger('change');
                 jQuery("#pokin-level-2").empty();
-                console.log('selected_pokin_1', selected_pokin_1);
                 get_data_pokin_2(selected_pokin_1, 2, "pokin-level-2", false).then(function() {
-                    rhk.pokin_2.map(function(b) {
-                        selected_pokin_2.push(b.id);
-                    });
-                    jQuery('#pokin-level-2').val(selected_pokin_2).trigger('change');
                     resolve();
                 });
             }else{
@@ -1215,19 +1221,13 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         }).then(function(){
             return new Promise(function(resolve, reject){
                 if(
-                    tipe == 2
-                    || rhk.input_rencana_pagu_level == 1
+                    rhk.input_rencana_pagu_level == 1
                     || cek_parent_global.input_pagu == 1
                 ){
                     jQuery("#pokin-level-3").empty();
-                    console.log('selected_pokin_2', selected_pokin_2);
                     get_data_pokin_2(selected_pokin_2, 3, "pokin-level-3", false).then(function() {
-                        rhk.pokin_3.map(function(b) {
-                            selected_pokin_3.push(b.id);
-                        });
-                        jQuery('#pokin-level-3').val(selected_pokin_3).trigger('change');
                         resolve();
-                    })
+                    });
                 }else{
                     resolve();
                 }
@@ -1235,19 +1235,13 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         }).then(function(){
             return new Promise(function(resolve, reject){
                 if(
-                    tipe == 3
-                    || rhk.input_rencana_pagu_level == 1
+                    rhk.input_rencana_pagu_level == 1
                     || cek_parent_global.input_pagu == 1
                 ){
                     jQuery("#pokin-level-4").empty();
-                    console.log('selected_pokin_3', selected_pokin_3);
                     get_data_pokin_2(selected_pokin_3, 4, "pokin-level-4", false).then(function() {
-                        rhk.pokin_4.map(function(b) {
-                            selected_pokin_4.push(b.id);
-                        });
-                        jQuery('#pokin-level-4').val(selected_pokin_4).trigger('change');
                         resolve();
-                    })
+                    });
                 }else{
                     resolve();
                 }
@@ -1255,25 +1249,28 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         }).then(function(){
             return new Promise(function(resolve, reject){
                 if(
-                    tipe == 4
-                    || rhk.input_rencana_pagu_level == 1
+                    rhk.input_rencana_pagu_level == 1
                     || cek_parent_global.input_pagu == 1
                 ){
                     jQuery("#pokin-level-5").empty();
-                    let selected_pokin_5 = [];
-                    console.log('selected_pokin_4', selected_pokin_4);
                     get_data_pokin_2(selected_pokin_4, 5, "pokin-level-5", false).then(function() {
-                        rhk.pokin_5.map(function(b) {
-                            selected_pokin_5.push(b.id);
-                        });
-                        jQuery('#pokin-level-5').val(selected_pokin_5).trigger('change');
                         resolve();
-                    })
+                    });
                 }else{
                     resolve();
                 }
             });
         }).then(function(){
+            console.log('selected_pokin_1', selected_pokin_1);
+            console.log('selected_pokin_2', selected_pokin_2);
+            console.log('selected_pokin_3', selected_pokin_3);
+            console.log('selected_pokin_4', selected_pokin_4);
+
+            jQuery('#pokin-level-1').val(selected_pokin_1).trigger('change');
+            jQuery('#pokin-level-2').val(selected_pokin_2).trigger('change');
+            jQuery('#pokin-level-3').val(selected_pokin_3).trigger('change');
+            jQuery('#pokin-level-4').val(selected_pokin_4).trigger('change');
+
             /** kembalikan attr onchange */
             jQuery('#pokin-level-1').attr('onchange', 'get_data_pokin_2(this.value, 2, "pokin-level-2", true)');
             jQuery('#pokin-level-2').attr('onchange', 'get_data_pokin_2(this.value, 3, "pokin-level-3", true)');
@@ -1301,7 +1298,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                         alert(response.message);
                     } else if (response.data != null) {
                         jQuery('#id_renaksi').val(id);
-                        setting_pokin(response.data);
+                        setting_edit_pokin(response.data);
                         setting_cascading(response.data);                            
                         if (tipe == 1) {
                             jQuery("#modal-crud").find('.modal-title').html('Edit Kegiatan Utama');
@@ -1435,18 +1432,30 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
     }
 
     function get_data_pokin_2(parent, level, tag, getParentManual = false) {
-        if (getParentManual) {
-            if(tag == 'pokin-level-2'){
-                parent = jQuery("#pokin-level-1").val();
-            }else if(tag == 'pokin-level-3'){
-                parent = jQuery("#pokin-level-2").val();
-            }
-        }
-        if (typeof parent === 'string') {
-            /**memastikan input pokin itu dalam bentuk array */
-            parent = parent.split(',');
-        }
         return new Promise(function(resolve, reject) {
+            
+            // kondisi ketika select pokin onchange maka getParentManual = true
+            if (getParentManual) {
+
+                // kondisi jika input pagu dibuat false maka tidak perlu get pokin child nya
+                if(jQuery('#set_input_rencana_pagu').is(':checked') == false){
+                    console.log('input pagu false get_data_pokin_2 level', level, 'id', tag);
+                    return resolve();
+                }
+                if(tag == 'pokin-level-2'){
+                    parent = jQuery("#pokin-level-1").val();
+                }else if(tag == 'pokin-level-3'){
+                    parent = jQuery("#pokin-level-2").val();
+                }else if(tag == 'pokin-level-4'){
+                    parent = jQuery("#pokin-level-3").val();
+                }else if(tag == 'pokin-level-5'){
+                    parent = jQuery("#pokin-level-4").val();
+                }
+            }
+            if (typeof parent === 'string') {
+                /**memastikan input pokin itu dalam bentuk array */
+                parent = parent.split(',');
+            }
             if(parent == ''){
                 console.log('parent pokin kosong level', level, 'id', tag);
                 return resolve();
@@ -1478,6 +1487,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                         // reset default value
                         jQuery('#' + tag).attr('val-id', '');
 
+                        console.log('get_data_pokin_2 id setting pokin', tag, 'level', level);
                         jQuery('#' + tag).html(html).trigger('change');
                         jQuery('#wrap-loading').hide();
                         resolve();
@@ -2794,8 +2804,8 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         return get_tujuan_sasaran_cascading(jenis, parent_cascading, id_sub_skpd_cascading)
         .then(function() {
             return new Promise(function(resolve, reject) {
-                var parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
-                var parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
+                var parent_pokin = '';
+                var parent_renaksi = '';
                 var level_pokin = 0;
                 var title = '';
                 var key = jenis + '-' + parent_cascading;
@@ -2846,7 +2856,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                             </select>
                         </div>`;
 
-                    trigger_pokin_input_rencana_pagu = `onchange="get_data_pokin_2(this.value, 2, 'pokin-level-2', true)"`;
+                    trigger_pokin_input_rencana_pagu = `onchange="get_data_pokin_2(this.value, ${ level_pokin }, 'pokin-level-2', true)"`;
 
                     html_input_sub_keg_cascading = `
                         <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
@@ -2864,21 +2874,23 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                 }else if(tipe == 2) {
                     title = 'Rencana Hasil Kerja | RHK Level 2';
                     data_cascading = data_program_cascading[key];
+                    parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
+                    parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
                     level_pokin = 3;
                     // menambahakan form input saat input rencana pagu di level 2 RHK
                     html_pokin_input_rencana_pagu = `
                             <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                                <label for="pokin-level-2">Pilih Pokin Level 4</label>
-                                <select class="form-control" multiple name="pokin-level-2" id="pokin-level-2" onchange="get_data_pokin_2(this.value, 5, 'pokin-level-3', true)">
+                                <label for="pokin-level-4">Pilih Pokin Level 4</label>
+                                <select class="form-control" multiple name="pokin-level-4" id="pokin-level-4" onchange="get_data_pokin_2(this.value, 5, 'pokin-level-4', true)">
                                 </select>
                             </div>
                             <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                                <label for="pokin-level-3">Pilih Pokin Level 5</label>
-                                <select class="form-control" multiple name="pokin-level-3" id="pokin-level-3">
+                                <label for="pokin-level-5">Pilih Pokin Level 5</label>
+                                <select class="form-control" multiple name="pokin-level-5" id="pokin-level-5">
                                 </select>
                             </div>`;
 
-                    trigger_pokin_input_rencana_pagu = `onchange="get_data_pokin_2(this.value, ${ level_pokin }, 'pokin-level-2', true)"`;
+                    trigger_pokin_input_rencana_pagu = `onchange="get_data_pokin_2(this.value, ${ level_pokin }, 'pokin-level-4', true)"`;
 
                     html_input_sub_keg_cascading = `
                         <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
@@ -2901,12 +2913,12 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     
                     html_pokin_input_rencana_pagu = `
                         <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                            <label for="pokin-level-2">Pilih Pokin Level 5</label>
-                            <select class="form-control" multiple name="pokin-level-2" id="pokin-level-2">
+                            <label for="pokin-level-5">Pilih Pokin Level 5</label>
+                            <select class="form-control" multiple name="pokin-level-5" id="pokin-level-5">
                             </select>
                         </div>`;
         
-                    trigger_pokin_input_rencana_pagu = `onchange="get_data_pokin_2(this.value, ${ level_pokin+1 }, 'pokin-level-2', true)"`;
+                    trigger_pokin_input_rencana_pagu = `onchange="get_data_pokin_2(this.value, ${ level_pokin }, 'pokin-level-5', true)"`;
 
                     html_input_sub_keg_cascading = `
                     <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
@@ -3003,11 +3015,10 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     data: option,
                     dataType: "json",
                     success: function(res) {
-                        let html = '';
-
+                        let html_pokin = '';
                         if (Array.isArray(res.data)) {
                             res.data.map(value => {
-                                html += '<option value="' + value.id + '">' + value.label + '</option>';
+                                html_pokin += '<option value="' + value.id + '">' + value.label + '</option>';
                             });
                         } else {
                             alert("Data Pokin Kosong atau Tidak Sesuai!");
@@ -3020,9 +3031,9 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                             <form>
                                 <input type="hidden" id="id_renaksi" value=""/>
                                 <div class="form-group">
-                                    <label for="pokin-level-1">Pilih Pokin Level ${level_pokin}</label>
-                                    <select class="form-control" multiple name="pokin-level-1" id="pokin-level-1" ${trigger_pokin_input_rencana_pagu}>
-                                        ${html}
+                                    <label for="pokin-level-${level_pokin}">Pilih Pokin Level ${level_pokin}</label>
+                                    <select class="form-control" multiple name="pokin-level-${level_pokin}" id="pokin-level-${level_pokin}" ${trigger_pokin_input_rencana_pagu}>
+                                        ${html_pokin}
                                     </select>
                                 </div>
                                 ${html_pokin_input_rencana_pagu}
@@ -3361,76 +3372,59 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         var id_sub_skpd_cascading = 0;
         var pagu_cascading = 0;
         if (tipe == 2) {
+            id_pokin_1 = jQuery('#pokin-level-3').val();
+            label_pokin_1 = jQuery('#pokin-level-3 option:selected').text();
             id_sub_skpd_cascading = jQuery('#cascading-renstra-program option:selected').data('id-sub-skpd-cascading');
             pagu_cascading = jQuery('#cascading-renstra-program option:selected').data('pagu-cascading');
         }else if (tipe == 3) {
+            id_pokin_1 = jQuery('#pokin-level-4').val();
+            label_pokin_1 = jQuery('#pokin-level-4 option:selected').text();
             id_sub_skpd_cascading = jQuery('#cascading-renstra-kegiatan option:selected').data('id-sub-skpd-cascading');
             pagu_cascading = jQuery('#cascading-renstra-kegiatan option:selected').data('pagu-cascading');
         }else if (tipe == 4) {
+            id_pokin_1 = jQuery('#pokin-level-5').val();
+            label_pokin_1 = jQuery('#pokin-level-5 option:selected').text();
             id_sub_skpd_cascading = jQuery('#cascading-renstra-sub-kegiatan option:selected').data('id-sub-skpd-cascading');
             pagu_cascading = jQuery('#cascading-renstra-sub-kegiatan option:selected').data('pagu-cascading');
         }
         var kode_sbl = jQuery('#cascading-renstra-sub-kegiatan option:selected').data('kodesbl');
 
-        let kode_cascading_renstra_program = '';
-        let label_cascading_renstra_program = '';
-        let kode_cascading_renstra_kegiatan = '';
-        let label_cascading_renstra_kegiatan = '';
-        let kode_cascading_renstra_sub_kegiatan = '';
-        let label_cascading_renstra_sub_kegiatan = '';
-        let id_pokin_3 = '';
-        let label_pokin_3 = '';
-        let id_pokin_4 = '';
-        let label_pokin_4 = '';
-        let id_pokin_5 = '';
-        let label_pokin_5 = '';
+        var id_pokin_3 = jQuery('#pokin-level-3').val();
+        var label_pokin_3 = jQuery('#pokin-level-3 option:selected').text();
+        var id_pokin_4 = jQuery('#pokin-level-4').val();
+        var label_pokin_4 = jQuery('#pokin-level-4 option:selected').text();
+        var id_pokin_5 = jQuery('#pokin-level-5').val();
+        var label_pokin_5 = jQuery('#pokin-level-5 option:selected').text();
 
-        // --- Jika input rencana pagu ada --- //
-        if(setting_input_rencana_pagu == 1) {
-            if (tipe == 1 || tipe == 2){
-                kode_cascading_renstra_program = jQuery('#cascading-renstra-program').val();
-                kode_cascading_renstra_program_1 = kode_cascading_renstra_program.split("_");
-                kode_cascading_renstra_program = kode_cascading_renstra_program_1[0];
-                if (kode_cascading_renstra_program !== '') {
-                    label_cascading_renstra_program = jQuery('#cascading-renstra-program option:selected').text();
-                    let new_label = label_cascading_renstra_program.split('(');
-                    if (Array.isArray(new_label)) {
-                        label_cascading_renstra_program = new_label[0].trim();
-                    }
-                }
+        var kode_cascading_renstra_program = jQuery('#cascading-renstra-program').val();
+        if (kode_cascading_renstra_program !== '') {
+            var kode_cascading_renstra_program_1 = kode_cascading_renstra_program.split("_");
+            kode_cascading_renstra_program = kode_cascading_renstra_program_1[0];
+            label_cascading_renstra_program = jQuery('#cascading-renstra-program option:selected').text();
+            let new_label = label_cascading_renstra_program.split('(');
+            if (Array.isArray(new_label)) {
+                label_cascading_renstra_program = new_label[0].trim();
             }
-            
-            if (tipe == 1 || tipe == 2 || tipe == 3){
-                kode_cascading_renstra_kegiatan = jQuery('#cascading-renstra-kegiatan').val();
-                if (kode_cascading_renstra_kegiatan !== '') {
-                    label_cascading_renstra_kegiatan = jQuery('#cascading-renstra-kegiatan option:selected').text();
-                    let new_label = label_cascading_renstra_kegiatan.split('(');
-                    if (Array.isArray(new_label)) {
-                        label_cascading_renstra_kegiatan = new_label[0].trim();
-                    }
-                }
-            }
-
-            kode_cascading_renstra_sub_kegiatan = jQuery('#cascading-renstra-sub-kegiatan').val();
-            if (kode_cascading_renstra_sub_kegiatan !== '') {
-                label_cascading_renstra_sub_kegiatan = jQuery('#cascading-renstra-sub-kegiatan option:selected').text();
-                let new_label = label_cascading_renstra_sub_kegiatan.split('(');
-                if (Array.isArray(new_label)) {
-                    label_cascading_renstra_sub_kegiatan = new_label[0].trim();
-                }
-            }
-
-            if (tipe == 2){
-                id_pokin_3 = jQuery('#pokin-level-3').val();
-                label_pokin_3 = jQuery('#pokin-level-3 option:selected').text();
-            }
-            if (tipe == 2 || tipe == 3){
-                id_pokin_4 = jQuery('#pokin-level-4').val();
-                label_pokin_4 = jQuery('#pokin-level-4 option:selected').text();
-            }
-            id_pokin_5 = jQuery('#pokin-level-5').val();
-            label_pokin_5 = jQuery('#pokin-level-5 option:selected').text();
         }
+
+        var kode_cascading_renstra_kegiatan = jQuery('#cascading-renstra-kegiatan').val();
+        if (kode_cascading_renstra_kegiatan !== '') {
+            label_cascading_renstra_kegiatan = jQuery('#cascading-renstra-kegiatan option:selected').text();
+            let new_label = label_cascading_renstra_kegiatan.split('(');
+            if (Array.isArray(new_label)) {
+                label_cascading_renstra_kegiatan = new_label[0].trim();
+            }
+        }
+
+        var kode_cascading_renstra_sub_kegiatan = jQuery('#cascading-renstra-sub-kegiatan').val();
+        if (kode_cascading_renstra_sub_kegiatan !== '') {
+            label_cascading_renstra_sub_kegiatan = jQuery('#cascading-renstra-sub-kegiatan option:selected').text();
+            let new_label = label_cascading_renstra_sub_kegiatan.split('(');
+            if (Array.isArray(new_label)) {
+                label_cascading_renstra_sub_kegiatan = new_label[0].trim();
+            }
+        }
+
         if (tipe == 1) {
             if (label_renaksi == '') {
                 return alert('Kegiatan Utama tidak boleh kosong!');
@@ -3500,8 +3494,8 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                 "tipe_pokin": "opd",
                 "id": jQuery('#id_renaksi').val(),
                 "id_pokin_1": id_pokin_1,
-                "id_pokin_2": id_pokin_2,
                 "label_pokin_1": label_pokin_1,
+                "id_pokin_2": id_pokin_2,
                 "label_pokin_2": label_pokin_2,
                 "label_renaksi": label_renaksi,
                 "level": tipe,
