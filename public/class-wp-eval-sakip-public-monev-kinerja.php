@@ -1679,30 +1679,33 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$data['target_teks_4'] = NULL;
 					}
 					if (empty($_POST['id_label_indikator'])) {
-						$total_pagu_renaksi = $wpdb->get_var($wpdb->prepare("
-					        SELECT 
-					        	SUM(rencana_pagu)
-					        FROM esakip_data_rencana_aksi_indikator_opd
-					        WHERE id_renaksi = %d 
-					        	AND tahun_anggaran = %d 
-					        	AND id_skpd = %d 
-					        	AND active = 1
-					    ", $_POST['id_label'], $_POST['tahun_anggaran'], $_POST['id_skpd']));
-
 						if(empty($_POST['rencana_pagu_tk'])){
 							$_POST['rencana_pagu_tk'] = 0;
 						}
 						$ret['total_pagu'] = $_POST['rencana_pagu_tk'];
-						$ret['total_pagu_sebelum_perubahan'] = $total_pagu_renaksi;
-						$total_pagu_renaksi += $_POST['rencana_pagu'];
 
-						$ret['total_pagu_setelah_perubahan'] = $total_pagu_renaksi;
-						$ret['total_all_pagu'] = $ret['total_pagu_sebelum_perubahan'] - $ret['total_pagu'];
+						// jika input pagu rencana aksi tidak dicheklist maka cek validasi pagu
+						if ($cek_input_pagu != 1) {
+							$total_pagu_renaksi = $wpdb->get_var($wpdb->prepare("
+						        SELECT 
+						        	SUM(rencana_pagu)
+						        FROM esakip_data_rencana_aksi_indikator_opd
+						        WHERE id_renaksi = %d 
+						        	AND tahun_anggaran = %d 
+						        	AND id_skpd = %d 
+						        	AND active = 1
+						    ", $_POST['id_label'], $_POST['tahun_anggaran'], $_POST['id_skpd']));
+							$ret['total_pagu_sebelum_perubahan'] = $total_pagu_renaksi;
+							$total_pagu_renaksi += $_POST['rencana_pagu'];
 
-						if ($total_pagu_renaksi > $_POST['rencana_pagu_tk']) {
-							$ret['status'] = 'error';
-							$ret['message'] = 'Total rencana pagu tidak boleh melebihi 100% atau total pagu tersisa setelah diinput adalah  ' . $ret['total_all_pagu'] . '';
+							$ret['total_pagu_setelah_perubahan'] = $total_pagu_renaksi;
+							$ret['total_all_pagu'] = $ret['total_pagu_sebelum_perubahan'] - $ret['total_pagu'];
+							if ($total_pagu_renaksi > $_POST['rencana_pagu_tk']) {
+								$ret['status'] = 'error';
+								$ret['message'] = 'Total rencana pagu tidak boleh melebihi 100% atau total pagu tersisa setelah diinput adalah  ' . $ret['total_all_pagu'] . '';
+							}
 						}
+
 						if ($ret['status'] == 'success') {
 							$cek_id = $wpdb->get_var($wpdb->prepare("
 								SELECT
