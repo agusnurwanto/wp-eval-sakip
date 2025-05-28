@@ -2418,7 +2418,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						} elseif ($total_bobot_kuesioner_detail < 100) {
 						    $total_bobot_kuesioner_detail = round($total_bobot_kuesioner_detail * 2) / 2; 
 						} else {
-						    $total_bobot_kuesioner_detail = 50; 
+						    $total_bobot_kuesioner_detail = round($total_bobot_kuesioner_detail); 
 						}
 
 						

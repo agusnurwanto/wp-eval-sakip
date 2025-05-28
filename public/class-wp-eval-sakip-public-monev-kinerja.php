@@ -742,7 +742,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							if (!empty($cek_cascading_child)) {
 								foreach ($cek_cascading_child as $cek_cas) {
 									if (
-<<<<<<< HEAD
 										!empty($cek_cas[$nama_kolom])
 										&& (
 											strpos($cek_cas[$nama_kolom], $kode_cascading_renstra) !== 0 
@@ -753,13 +752,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 											$status_update = array();
 										}
 										$status_update[] = $nama_kolom.' '.$cek_cas[$nama_kolom].' dengan Id SKPD '.$id_sub_skpd_cascading.' tidak ditemukan!';
-=======
-										strpos($cek_cas[$nama_kolom], $kode_cascading_renstra) === 0
-										&& $cek_cas['id_sub_skpd_cascading'] === $id_sub_skpd_cascading
-									) {
-										$status_update = true; // Jika ada yang cocok, set menjadi true
-										break;
->>>>>>> 4fddc90 (fix table cascading renaksi di halaman pk)
 									}
 								}
 							} else {
@@ -1691,21 +1683,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$data['target_teks_4'] = NULL;
 					}
 					if (empty($_POST['id_label_indikator'])) {
-<<<<<<< HEAD
-						if(empty($_POST['rencana_pagu_tk'])){
-=======
-						$total_pagu_renaksi = $wpdb->get_var($wpdb->prepare("
-					        SELECT 
-					        	SUM(rencana_pagu)
-					        FROM esakip_data_rencana_aksi_indikator_opd
-					        WHERE id_renaksi = %d 
-					        	AND tahun_anggaran = %d 
-					        	AND id_skpd = %d 
-					        	AND active = 1
-					    ", $_POST['id_label'], $_POST['tahun_anggaran'], $_POST['id_skpd']));
-
 						if (empty($_POST['rencana_pagu_tk'])) {
->>>>>>> 4fddc90 (fix table cascading renaksi di halaman pk)
 							$_POST['rencana_pagu_tk'] = 0;
 						}
 						$ret['total_pagu'] = $_POST['rencana_pagu_tk'];
