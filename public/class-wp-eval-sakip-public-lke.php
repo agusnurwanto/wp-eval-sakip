@@ -2317,12 +2317,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					$ret['status'] = 'error';
 					$ret['message'] = 'Nama Komponen kosong!';
 				}
-				if (!empty($_POST['bobot_kuesioner'])) {
-					$bobot_kuesioner = $_POST['bobot_kuesioner'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Bobot Komponen kosong!';
-				}
 				if (!empty($_POST['nomor_urut'])) {
 					$nomor_urut = $_POST['nomor_urut'];
 				} else {
@@ -2331,53 +2325,29 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				}
 
 				if ($ret['status'] === 'success') {
-					$bobot_kuesioner_detail = $wpdb->get_var(
-						$wpdb->prepare("
-							SELECT SUM(bobot) 
-							FROM esakip_kuesioner_menpan_detail 
-							WHERE id_kuesioner = %d 
-							  AND active = 1
-						", $id_kuesioner)
-					);
 
-					if ($bobot_kuesioner > 100) {
-						$ret = array(
-							'status' => 'error',
-							'message' => 'Total bobot kuesioner melebihi 100!'
+					if (!empty($id_kuesioner)) {
+						$wpdb->update(
+							'esakip_kuesioner_menpan',
+							array(
+								'nama_kuesioner' => $nama_kuesioner,
+								'nomor_urut' => $nomor_urut,
+							),
+							array('id' => $id_kuesioner),
+							array('%s', '%f', '%f'),
+							array('%d')
 						);
-						die(json_encode($ret));
-					} else if ($bobot_kuesioner_detail > $bobot_kuesioner) {
-						$ret = array(
-							'status' => 'error',
-							'message' => 'Bobot Pertanyaan Kuesioner melebihi bobot Kuesioner!'
-						);
-						die(json_encode($ret));
 					} else {
-						if (!empty($id_kuesioner)) {
-							$wpdb->update(
-								'esakip_kuesioner_menpan',
-								array(
-									'nama_kuesioner' => $nama_kuesioner,
-									'bobot' => $bobot_kuesioner,
-									'nomor_urut' => $nomor_urut,
-								),
-								array('id' => $id_kuesioner),
-								array('%s', '%f', '%f'),
-								array('%d')
-							);
-						} else {
-							$wpdb->insert(
-								'esakip_kuesioner_menpan',
-								array(
-									'tahun_anggaran' => $tahun_anggaran,
-									'nama_kuesioner' => $nama_kuesioner,
-									'bobot' => $bobot_kuesioner,
-									'nomor_urut' => $nomor_urut,
-									'active' => 1,
-								),
-								array('%d', '%s', '%f', '%f', '%d')
-							);
-						}
+						$wpdb->insert(
+							'esakip_kuesioner_menpan',
+							array(
+								'tahun_anggaran' => $tahun_anggaran,
+								'nama_kuesioner' => $nama_kuesioner,
+								'nomor_urut' => $nomor_urut,
+								'active' => 1,
+							),
+							array('%d', '%s', '%f', '%f', '%d')
+						);
 					}
 				}
 			} else {

@@ -73,11 +73,6 @@ $input = shortcode_atts(array(
              <div class="modal-body">
                 <form id="formTambahKuesioner">
                     <input type="hidden" value="" id="idKuesioner">
-                    <div class="form-group">
-                        <div class="alert alert-info text-sm-left" role="alert">
-                            Bobot Maksimal 100
-                        </div>
-                    </div>
                     <div class="form-row">
                         <div class="form-group col-md-12">
                             <label for="namaKuesioner">Nama Kuesioner</label>
@@ -85,11 +80,7 @@ $input = shortcode_atts(array(
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="bobotKuesioner">Bobot</label>
-                            <input type="number" class="form-control" id="bobotKuesioner" name="bobotKuesioner" required>
-                        </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-12">
                             <label for="nomorUrutKuesioner">Nomor Urut</label>
                             <input type="number" class="form-control" id="nomorUrutKuesioner" name="nomorUrutKuesioner">
                         </div>
@@ -271,7 +262,6 @@ $input = shortcode_atts(array(
         jQuery('#defaultTextInfoKuesioner').hide();
         jQuery("#idKuesioner").val('');
         jQuery("#namaKuesioner").val('');
-        jQuery("#bobotKuesioner").val('');
         jQuery('#nomorUrutKuesioner').val('');
         jQuery('#nomorUrutKuesioner').val(parseFloat(0.00 + 1.00).toFixed(2));
         jQuery('#tambahKuesionerModal').modal('show');
@@ -281,11 +271,6 @@ $input = shortcode_atts(array(
         let namaKuesioner = jQuery("#namaKuesioner").val();
         if (namaKuesioner == '') {
             return alert('Nama Kuesioner tidak boleh kosong');
-        }
-
-        let bobotKuesioner = jQuery("#bobotKuesioner").val();
-        if (bobotKuesioner == '') {
-            return alert('Bobot Kuesioner tidak boleh kosong');
         }
 
         let nomorUrutKuesioner = jQuery("#nomorUrutKuesioner").val();
@@ -302,7 +287,6 @@ $input = shortcode_atts(array(
                 id: id_kuesioner,
                 tahun_anggaran: <?php echo $input['tahun']; ?>, 
                 nama_kuesioner: namaKuesioner,
-                bobot_kuesioner: bobotKuesioner,
                 nomor_urut: nomorUrutKuesioner
             },
             dataType: 'json',
@@ -415,14 +399,14 @@ $input = shortcode_atts(array(
                     jQuery('#penjelasan').val('');
                     jQuery('#nomorUrutPertanyaan').val(parseFloat(data.default_urutan) + 1.00);
                     jQuery('#tipeJawaban').val('').trigger('change'); 
-                    jQuery('#jawaban_sts').val(''); 
-                    jQuery('#jawaban_ss').val(''); 
-                    jQuery('#jawaban_ts').val(''); 
-                    jQuery('#jawaban_s').val('');
-                    jQuery('#bobot_sts').val(''); 
-                    jQuery('#bobot_ss').val(''); 
-                    jQuery('#bobot_ts').val(''); 
-                    jQuery('#bobot_s').val(''); 
+                    jQuery('input[name="jawaban_sts"]').val('');
+                    jQuery('input[name="bobot_sts"]').val('');
+                    jQuery('input[name="jawaban_ts"]').val('');
+                    jQuery('input[name="bobot_ts"]').val('');
+                    jQuery('input[name="jawaban_s"]').val('');
+                    jQuery('input[name="bobot_s"]').val('');
+                    jQuery('input[name="jawaban_ss"]').val('');
+                    jQuery('input[name="bobot_ss"]').val('');
                     jQuery('#bobot_esai').val(''); 
                 } else {
                     console.error('Error:', response.message);
