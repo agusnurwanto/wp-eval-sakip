@@ -3397,10 +3397,10 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         var label_pokin_5 = jQuery('#pokin-level-5 option:selected').text();
 
         var kode_cascading_renstra_program = jQuery('#cascading-renstra-program').val();
-        if (kode_cascading_renstra_program !== '') {
+        var label_cascading_renstra_program = jQuery('#cascading-renstra-program option:selected').text();
+        if (kode_cascading_renstra_program) {
             var kode_cascading_renstra_program_1 = kode_cascading_renstra_program.split("_");
             kode_cascading_renstra_program = kode_cascading_renstra_program_1[0];
-            label_cascading_renstra_program = jQuery('#cascading-renstra-program option:selected').text();
             let new_label = label_cascading_renstra_program.split('(');
             if (Array.isArray(new_label)) {
                 label_cascading_renstra_program = new_label[0].trim();
@@ -3408,8 +3408,8 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         }
 
         var kode_cascading_renstra_kegiatan = jQuery('#cascading-renstra-kegiatan').val();
-        if (kode_cascading_renstra_kegiatan !== '') {
-            label_cascading_renstra_kegiatan = jQuery('#cascading-renstra-kegiatan option:selected').text();
+        var label_cascading_renstra_kegiatan = jQuery('#cascading-renstra-kegiatan option:selected').text();
+        if (kode_cascading_renstra_kegiatan) {
             let new_label = label_cascading_renstra_kegiatan.split('(');
             if (Array.isArray(new_label)) {
                 label_cascading_renstra_kegiatan = new_label[0].trim();
@@ -3417,8 +3417,8 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         }
 
         var kode_cascading_renstra_sub_kegiatan = jQuery('#cascading-renstra-sub-kegiatan').val();
-        if (kode_cascading_renstra_sub_kegiatan !== '') {
-            label_cascading_renstra_sub_kegiatan = jQuery('#cascading-renstra-sub-kegiatan option:selected').text();
+        var label_cascading_renstra_sub_kegiatan = jQuery('#cascading-renstra-sub-kegiatan option:selected').text();
+        if (kode_cascading_renstra_sub_kegiatan) {
             let new_label = label_cascading_renstra_sub_kegiatan.split('(');
             if (Array.isArray(new_label)) {
                 label_cascading_renstra_sub_kegiatan = new_label[0].trim();
