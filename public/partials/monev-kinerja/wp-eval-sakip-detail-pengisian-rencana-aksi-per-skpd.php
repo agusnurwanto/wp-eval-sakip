@@ -1190,6 +1190,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         let selected_pokin_2 = [];
         let selected_pokin_3 = [];
         let selected_pokin_4 = [];
+        let selected_pokin_5 = [];
         rhk.pokin.map(function(b) {
             selected_pokin_1.push(b.id);
         });
@@ -1265,11 +1266,13 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
             console.log('selected_pokin_2', selected_pokin_2);
             console.log('selected_pokin_3', selected_pokin_3);
             console.log('selected_pokin_4', selected_pokin_4);
+            console.log('selected_pokin_5', selected_pokin_5);
 
             jQuery('#pokin-level-1').val(selected_pokin_1).trigger('change');
             jQuery('#pokin-level-2').val(selected_pokin_2).trigger('change');
             jQuery('#pokin-level-3').val(selected_pokin_3).trigger('change');
             jQuery('#pokin-level-4').val(selected_pokin_4).trigger('change');
+            jQuery('#pokin-level-5').val(selected_pokin_5).trigger('change');
 
             /** kembalikan attr onchange */
             jQuery('#pokin-level-1').attr('onchange', 'get_data_pokin_2(this.value, 2, "pokin-level-2", true)');
