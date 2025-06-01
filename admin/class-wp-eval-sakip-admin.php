@@ -1571,6 +1571,46 @@ class Wp_Eval_Sakip_Admin
 					->set_help_text('Upload background untuk menu user.'),
 			));
 
+		$this->functions->generatePage(array(
+				'nama_page' => 'SSO Login',
+				'content' => '[sso_login]',
+				'show_header' => 1,
+				'no_key' => 1,
+				'post_status' => 'public'
+			), false, '[sso_login]');
+		Container::make('theme_options', __('Auto Login'))
+			->set_page_parent($basic_options_container)
+			->add_fields(array(
+				Field::make( 'complex', 'crb_auto_login', __( 'Setting Auto Login' ) )
+				    ->add_fields(array(
+				    	Field::make( 'text', 'id_login', __( 'Nama / ID unik' ) )
+	        				->set_default_value('xxxxx')
+	        				->set_help_text('Harus diisi unik, tidak boleh kosong dan sama.')
+	        				->set_required( true ),
+				    	Field::make( 'text', 'app_url', __( 'Domain / URL wordpress tujuan' ) )
+	        				->set_default_value('http://localhost')
+	        				->set_help_text('Alamat situs tujuan yang akan dibuat login otomatis.')
+	        				->set_required( true ),
+					    Field::make( 'text', 'api_key', __( 'API Key' ) )
+	        				->set_default_value('xxxxxxxxxxxxxxxxxx')
+	        				->set_help_text('Kode unik untuk validasi user login dari website tujuan.')
+	        				->set_required( true ),
+					    Field::make('html', 'crb_halaman_terkait_bkk_infrastruktur')
+							->set_html('
+								<a onclick="coba_auto_login(this); return false;" href="#" class="button button-primary">Coba login</a>
+								<br>
+								<h4 style="display: inline-block;">Shortcode untuk menampilkan tombol login dimana saja:</h4> <h3 style="display: inline-block;" class="set_id_sso">[sso_login id="" url=""]</h3>
+								<br>
+								Catatan:
+								<ol>
+									<li>Hati-hati dalam menambahkan shortcode ini, karena bisa diakses oleh siapa saja</li>
+									<li>id berisi nama atau id unik settingan auto login</li>
+									<li>url berisi link yang diakses setelah berhasil login</li>
+								</ol>
+							')
+	    			))
+			));
+
 
 		$dokumen_pemda_menu = Container::make('theme_options', __('Dokumen Pemda'))
 			->set_page_menu_position(3.1)
@@ -3257,4 +3297,37 @@ class Wp_Eval_Sakip_Admin
 	{
 		$this->functions->allow_access_private_post();
 	}
+
+    function coba_auto_login(){
+        global $wpdb;
+        $ret = array(
+            'status'    => 'success',
+            'message'   => 'Berhasil cek lisensi aktif!'
+        );
+        if (!empty($_POST)) {
+            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+                if(empty($_POST['domain'])){
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Domain tidak boleh kosong!';
+                }elseif(empty($_POST['api_key_tujuan'])){
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'API KEY tujuan tidak boleh kosong!';
+                }else{
+                    $user = wp_get_current_user();
+                    $ret['url_login'] = $this->functions->login_to_other_site(array(
+                        'user' => $user,
+                        'domain' => $_POST['domain'],
+                        'api_key' => $_POST['api_key_tujuan']
+                    ));
+                }
+            } else {
+                $ret['status'] = 'error';
+                $ret['message'] = 'APIKEY tidak sesuai!';
+            }
+        } else {
+            $ret['status'] = 'error';
+            $ret['message'] = 'Format Salah!';
+        }
+        die(json_encode($ret));
+    }
 }

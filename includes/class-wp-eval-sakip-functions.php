@@ -313,31 +313,30 @@ class Esakip_Functions
         }
     }
 
-    function get_option_complex($key, $type)
-    {
+    function get_option_complex($key, $type=0){
         global $wpdb;
-        $ret = $wpdb->get_results('select option_name, option_value from ' . $wpdb->prefix . 'options where option_name like \'' . $key . '|%\'', ARRAY_A);
+        $ret = $wpdb->get_results('select option_name, option_value from '.$wpdb->prefix.'options where option_name like \''.$key.'|%\'', ARRAY_A);
         $res = array();
         $types = array();
-        foreach ($ret as $v) {
+        foreach($ret as $v){
             $k = explode('|', $v['option_name']);
             $column = $k[1];
             $group = $k[3];
-            if ($column == '') {
+            if($column == ''){
                 $types[$group] = $v['option_value'];
             }
         }
-        foreach ($ret as $v) {
+        foreach($ret as $v){
             $k = explode('|', $v['option_name']);
             $column = $k[1];
             $loop = $k[2];
             $group = $k[3];
-            if ($column != '') {
-                if (
+            if($column != ''){
+                if(
                     isset($types[$loop])
                     && $type == $types[$loop]
-                ) {
-                    if (empty($res[$loop])) {
+                ){
+                    if(empty($res[$loop])){
                         $res[$loop] = array();
                     }
                     $res[$loop][$column] = $v['option_value'];
@@ -552,6 +551,7 @@ class Esakip_Functions
         
         return $newUrl;
     }
+
     function add_param_get($url, $param){
         $data = explode('?', $url);
         if(count($data) > 1){
@@ -560,5 +560,100 @@ class Esakip_Functions
             $url .= '?'.$param;
         }
         return $url;
+    }
+    
+    function login_to_other_site($opsi = array()){
+        $user_data = array(
+            'login' => $opsi['user']->user_login,
+            'time'  => time()
+        );
+
+        $payload = base64_encode(json_encode($user_data));
+        $url_asli = '';
+        if(!empty($opsi['url_asli'])){
+            $url_asli = $opsi['url_asli'];
+        }
+
+        $url = '';
+        if(!empty($opsi['domain'])){
+            $signature = hash_hmac('sha256', $payload, $opsi['api_key']);
+            $token = $payload . '.' . $signature;
+            if (substr($opsi['domain'], -1) !== '/') {
+                $opsi['domain'] .= '/';
+            }
+            $url = $opsi['domain'].'sso-login?token=' . urlencode($token).'&redirect='.$url_asli;
+        }else if(!empty($opsi['id_login'])){
+            $data = $this->get_option_complex('_crb_auto_login');
+            $url = $url_asli;
+            foreach($data as $v){
+                if(
+                    !empty($v['app_url'])
+                    && !empty($v['api_key'])
+                    && $v['id_login'] == $opsi['id_login']
+                ){
+                    $signature = hash_hmac('sha256', $payload, $v['api_key']);
+                    $token = $payload . '.' . $signature;
+                    if (substr($v['app_url'], -1) !== '/') {
+                        $v['app_url'] .= '/';
+                    }
+                    $url = $v['app_url'].'sso-login?token=' . urlencode($token).'&redirect='.$url_asli;
+                }
+            }
+        }
+        return $url;
+    }
+
+    function handle_sso_login(){
+        if (!is_page('sso-login') || !isset($_GET['token'])) return;
+
+        $token = sanitize_text_field($_GET['token']);
+        list($payload, $signature) = explode('.', $token);
+
+        $expected_signature = hash_hmac('sha256', $payload, get_option(ESAKIP_APIKEY));
+
+        $pesan_error = '';
+        if (!hash_equals($expected_signature, $signature)) {
+            $pesan_error = 'SSO token tidak valid.';
+        }
+
+        if(empty($pesan_error)){
+            $data = json_decode(base64_decode($payload), true);
+            if (!$data || !isset($data['login'])) {
+                $pesan_error = 'Data SSO tidak lengkap.';
+            }
+        }
+
+        if(empty($pesan_error)){
+            // Cek kadaluwarsa token (misal 60 detik)
+            if (time() - $data['time'] > 60) {
+                $pesan_error = 'Token kadaluarsa.';
+            }
+        }
+
+        if(empty($pesan_error)){
+            $user = get_user_by('login', $data['login']);
+            if (!$user) {
+                $pesan_error = 'Pengguna '.$data['login'].' tidak ditemukan di '.site_url();
+            }
+        }
+
+        if(!empty($pesan_error)){
+            update_option('wp_sso_login', $pesan_error);
+            wp_die($pesan_error);
+        }
+
+        // Login otomatis
+        wp_set_current_user($user->ID);
+        wp_set_auth_cookie($user->ID, true);
+        do_action('wp_login', $user->user_login, $user);
+
+        update_option('wp_sso_login', 'Berhasil login '. $data['login'].' '.date('Y-m-d H:i:s'));
+
+        if(!empty($_GET['redirect'])){
+            wp_redirect($_GET['redirect']);
+        }else{
+            wp_redirect(site_url());
+        }
+        exit;
     }
 }

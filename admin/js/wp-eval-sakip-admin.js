@@ -218,6 +218,44 @@ jQuery(document).ready(function () {
     });
 });
 
+function coba_auto_login(that){
+    window.input = jQuery(that).closest('.cf-complex__group-body').find('input[type="text"]');
+    if(input[0].value == ''){
+        return alert('Nama / ID unik tidak boleh kosong!');
+    }else if(input[1].value == ''){
+        return alert('Domain / URL wordpress tujuan tidak boleh kosong!');
+    }else if(input[2].value == ''){
+        return alert('API Key tidak boleh kosong!');
+    }
+
+    jQuery("#wrap-loading").show();
+    jQuery(that).closest('.cf-complex__group-body').find('.set_id_sso').html('[sso_login id="'+input[0].value+'" url="'+input[1].value+'"]');
+    var domain = input[1].value;
+    var api_key_tujuan = input[2].value;
+    jQuery.ajax({
+        url: ajaxurl,
+        type: "post",
+        data: {
+            "action": "coba_auto_login",
+            "api_key": esakip.api_key,
+            "domain": domain,
+            "api_key_tujuan": api_key_tujuan
+        },
+        dataType: "json",
+        success: function (data) {
+            jQuery("#wrap-loading").hide();
+            if(data.status == 'success'){
+                window.open(data.url_login, '_blank');
+            }else{
+                alert(data.message);
+            }
+        },
+        error: function (e) {
+            console.log(e);
+        }
+    });
+}
+
 function sql_migrate_esakip() {
     jQuery("#wrap-loading").show();
     jQuery.ajax({
