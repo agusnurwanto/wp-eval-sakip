@@ -22014,7 +22014,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								$halaman_sakip_perencanaan_skpd .= $dokumen_perencanaan;
 								$set_html_opd_perencanaan = get_option('sakip_menu_khusus_set_html_opd_PERENCANAAN_' . $_GET['tahun']);
 								if (!empty($set_html_opd_perencanaan)) {
-								  $halaman_sakip_perencanaan_skpd .= stripslashes(htmlspecialchars_decode($set_html_opd_perencanaan));
+								  $halaman_sakip_perencanaan_skpd .= do_shortcode(htmlspecialchars_decode($set_html_opd_perencanaan));
 								}
 
 	
@@ -22030,7 +22030,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
 								$set_html_opd_pengukuran_kinerja = get_option('sakip_menu_khusus_set_html_opd_PENGUKURAN_KINERJA_' . $_GET['tahun']);
 								if (!empty($set_html_opd_pengukuran_kinerja)) {
-								  $halaman_pengukuran_kinerja_skpd .= stripslashes(htmlspecialchars_decode($set_html_opd_pengukuran_kinerja));
+								  $halaman_pengukuran_kinerja_skpd .= do_shortcode(stripslashes(htmlspecialchars_decode($set_html_opd_pengukuran_kinerja)));
 								}
 								$halaman_pengukuran_kinerja_skpd .= $laporan_pk_renaksi_btn;
 					$halaman_pengukuran_kinerja_skpd .= '
@@ -22062,7 +22062,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$halaman_pelaporan_skpd .= $dokumen_pelaporan;
 							$set_html_opd_pelaporan = get_option('sakip_menu_khusus_set_html_opd_PELAPORAN_' . $_GET['tahun']);
 							if (!empty($set_html_opd_pelaporan)) {
-							  $halaman_pelaporan_skpd .= stripslashes(htmlspecialchars_decode($set_html_opd_pelaporan));
+							  $halaman_pelaporan_skpd .= do_shortcode(htmlspecialchars_decode($set_html_opd_pelaporan));
 							}
 						
 					$halaman_pelaporan_skpd .= '
@@ -22094,7 +22094,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$halaman_evaluasi_skpd .= $dokumen_evaluasi;
 							$set_html_opd_evaluasi = get_option('sakip_menu_khusus_set_html_opd_EVALUASI_' . $_GET['tahun']);
 							if (!empty($set_html_opd_evaluasi)) {
-							  $halaman_evaluasi_skpd .= stripslashes(htmlspecialchars_decode($set_html_opd_evaluasi));
+							  $halaman_evaluasi_skpd .= do_shortcode(htmlspecialchars_decode($set_html_opd_evaluasi));
 							}
 					$halaman_evaluasi_skpd .= '
 								</ul>
