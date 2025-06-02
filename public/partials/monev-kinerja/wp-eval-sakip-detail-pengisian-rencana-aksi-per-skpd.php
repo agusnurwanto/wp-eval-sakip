@@ -1117,11 +1117,15 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                 tipe == 1
                 || rhk.input_rencana_pagu_level == 1
             ){
-                jQuery('#cascading-renstra').val(rhk.kode_cascading_sasaran).trigger('change');
-                jQuery("#cascading-renstra-program").empty();
-                get_cascading_input_rencana_pagu('program').then(function() {
+                if(tipe <= 1){
+                    jQuery('#cascading-renstra').val(rhk.kode_cascading_sasaran).trigger('change');
+                    jQuery("#cascading-renstra-program").empty();
+                    get_cascading_input_rencana_pagu('program').then(function() {
+                        resolve();
+                    });
+                }else{
                     resolve();
-                });
+                }
             }else{
                 resolve();
             }
@@ -1132,15 +1136,19 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     || rhk.input_rencana_pagu_level == 1
                     || cek_parent_global.input_pagu == 1
                 ){
-                    var kode_cascading_renstra_program = rhk.kode_cascading_program+'_'+rhk.id_skpd;
-                    if (rhk.id_sub_skpd_cascading) {
-                        kode_cascading_renstra_program = rhk.kode_cascading_program+'_'+rhk.id_sub_skpd_cascading;
-                    }
-                    jQuery('#cascading-renstra-program').val(kode_cascading_renstra_program).trigger('change');
-                    jQuery("#cascading-renstra-kegiatan").empty();
-                    get_cascading_input_rencana_pagu('kegiatan').then(function() {
+                    if(tipe <= 2){
+                        var kode_cascading_renstra_program = rhk.kode_cascading_program+'_'+rhk.id_skpd;
+                        if (rhk.id_sub_skpd_cascading) {
+                            kode_cascading_renstra_program = rhk.kode_cascading_program+'_'+rhk.id_sub_skpd_cascading;
+                        }
+                        jQuery('#cascading-renstra-program').val(kode_cascading_renstra_program).trigger('change');
+                        jQuery("#cascading-renstra-kegiatan").empty();
+                        get_cascading_input_rencana_pagu('kegiatan').then(function() {
+                            resolve();
+                        });
+                    }else{
                         resolve();
-                    });
+                    }
                 }else{
                     resolve();
                 }
@@ -1152,11 +1160,15 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     || rhk.input_rencana_pagu_level == 1
                     || cek_parent_global.input_pagu == 1
                 ){
-                    jQuery('#cascading-renstra-kegiatan').val(rhk.kode_cascading_kegiatan).trigger('change');
-                    jQuery("#cascading-renstra-sub-kegiatan").empty();
-                    get_cascading_input_rencana_pagu('sub_kegiatan').then(function() {
+                    if(tipe <= 3){
+                        jQuery('#cascading-renstra-kegiatan').val(rhk.kode_cascading_kegiatan).trigger('change');
+                        jQuery("#cascading-renstra-sub-kegiatan").empty();
+                        get_cascading_input_rencana_pagu('sub_kegiatan').then(function() {
+                            resolve();
+                        });
+                    }else{
                         resolve();
-                    });
+                    }
                 }else{
                     resolve();
                 }
@@ -1253,10 +1265,15 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     rhk.input_rencana_pagu_level == 1
                     || cek_parent_global.input_pagu == 1
                 ){
-                    jQuery("#pokin-level-5").empty();
-                    get_data_pokin_2(selected_pokin_4, 5, "pokin-level-5", false).then(function() {
+                    // karena level 4 pasti input_pagu jika level atasnya tidak input pagu
+                    if(tipe != 4){
+                        jQuery("#pokin-level-5").empty();
+                        get_data_pokin_2(selected_pokin_4, 5, "pokin-level-5", false).then(function() {
+                            resolve();
+                        });
+                    }else{
                         resolve();
-                    });
+                    }
                 }else{
                     resolve();
                 }
