@@ -58,11 +58,12 @@ foreach ($idtahun as $val) {
 </style>
 <div class="container-md">
     <div style="padding: 10px;margin:0 0 3rem 0;">
-        <h1 class="text-center" style="margin:3rem;">Input Kuesioner Menpan<br><?php echo $input['tahun']; ?></h1><div style="margin-bottom: 25px;">
-                <button class="btn btn-primary" onclick="tambah_kuesioner();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
-                <button class="btn btn-success" onclick="generate_data();">Generate Data Awal</button>
-                <button class="btn btn-danger" onclick="copy_data();"><i class="dashicons dashicons-admin-page"></i> Copy Data</button>
-            </div>
+        <h1 class="text-center" style="margin:3rem;">Input Kuesioner Menpan<br><?php echo $input['tahun']; ?></h1>
+        <div style="margin-bottom: 25px;">
+            <button class="btn btn-primary" onclick="tambah_kuesioner();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
+            <button class="btn btn-success" onclick="generate_data();">Generate Data Awal</button>
+            <button class="btn btn-danger" onclick="copy_data();"><i class="dashicons dashicons-admin-page"></i> Copy Data</button>
+        </div>
         <div class="wrap-table">
             <table id="table_kuesioner_menpan" cellpadding="2" cellspacing="0" style="collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                 <thead>

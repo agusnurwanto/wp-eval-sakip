@@ -328,19 +328,13 @@ class Esakip_Functions
         }
         foreach($ret as $v){
             $k = explode('|', $v['option_name']);
-            $column = $k[1];
-            $loop = $k[2];
-            $group = $k[3];
+            $column = $k[1]; // nama kolom atau field
+            $loop = $k[2]; // index nomor urut sesuai group
             if($column != ''){
-                if(
-                    isset($types[$loop])
-                    && $type == $types[$loop]
-                ){
-                    if(empty($res[$loop])){
-                        $res[$loop] = array();
-                    }
-                    $res[$loop][$column] = $v['option_value'];
+                if(empty($res[$loop])){
+                    $res[$loop] = array();
                 }
+                $res[$loop][$column] = $v['option_value'];
             }
         }
         return $res;
@@ -563,6 +557,7 @@ class Esakip_Functions
     }
     
     function login_to_other_site($opsi = array()){
+        global $wpdb;
         $user_data = array(
             'login' => $opsi['user']->user_login,
             'time'  => time()

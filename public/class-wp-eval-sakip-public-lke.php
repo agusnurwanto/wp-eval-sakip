@@ -2401,7 +2401,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						$btn = '';
 						$counter2 = 1;
 
-						$total_bobot_kuesioner_detail = $wpdb->get_var(
+						$get_total_bobot_kuesioner_detail = $wpdb->get_var(
 							$wpdb->prepare("
 								SELECT 
 									SUM(bobot)
@@ -2413,12 +2413,12 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							", $kuesioner['id'])
 						);
 
-						if ($total_bobot_kuesioner_detail >= 500 && $total_bobot_kuesioner_detail < 600) {
+						if ($get_total_bobot_kuesioner_detail >= 500 && $get_total_bobot_kuesioner_detail < 600) {
 						    $total_bobot_kuesioner_detail = 500;
 						} elseif ($total_bobot_kuesioner_detail < 100) {
-						    $total_bobot_kuesioner_detail = round($total_bobot_kuesioner_detail * 2) / 2; 
+						    $total_bobot_kuesioner_detail = round($get_total_bobot_kuesioner_detail * 2) / 2; 
 						} else {
-						    $total_bobot_kuesioner_detail = round($total_bobot_kuesioner_detail); 
+						    $total_bobot_kuesioner_detail = round($get_total_bobot_kuesioner_detail); 
 						}
 
 						

@@ -564,7 +564,7 @@ function get_link_login(that){
     }
     jQuery("#wrap-loading").show();
     jQuery.ajax({
-        url: ajaxurl,
+        url: esakip.url,
         type: "post",
         data: {
             "action": "coba_auto_login",
