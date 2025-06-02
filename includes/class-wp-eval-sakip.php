@@ -829,6 +829,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('list_pegawai_laporan_pk', array($plugin_public, 'list_pegawai_laporan_pk'));
 
 		add_shortcode('detail_laporan_rhk', array($plugin_public, 'detail_laporan_rhk'));
+		add_shortcode('sso_login', array($plugin_public, 'sso_login'));
 
 		add_shortcode('list_kuesioner_menpan', array($plugin_public, 'list_kuesioner_menpan'));
 		add_shortcode('kuesioner_menpan', array($plugin_public, 'kuesioner_menpan'));

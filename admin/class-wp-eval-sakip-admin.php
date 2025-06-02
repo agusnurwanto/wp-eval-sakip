@@ -3306,20 +3306,34 @@ class Wp_Eval_Sakip_Admin
         );
         if (!empty($_POST)) {
             if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-                if(empty($_POST['domain'])){
-                    $ret['status'] = 'error';
-                    $ret['message'] = 'Domain tidak boleh kosong!';
-                }elseif(empty($_POST['api_key_tujuan'])){
-                    $ret['status'] = 'error';
-                    $ret['message'] = 'API KEY tujuan tidak boleh kosong!';
-                }else{
-                    $user = wp_get_current_user();
-                    $ret['url_login'] = $this->functions->login_to_other_site(array(
-                        'user' => $user,
-                        'domain' => $_POST['domain'],
-                        'api_key' => $_POST['api_key_tujuan']
-                    ));
-                }
+            	if(is_user_logged_in() == false){
+            		$ret['status'] = 'error';
+                    $ret['message'] = 'Anda tidak dapat akses ke halaman ini!';
+            	}else{
+	            	if(!empty($_POST['id'])){
+	            		$user = wp_get_current_user();
+	                    $ret['url_login'] = $this->functions->login_to_other_site(array(
+	                        'user' => $user,
+	                        'id_login' => $_POST['id'],
+	                        'url_asli' => $_POST['url']
+	                    ));
+	            	}else{
+		                if(empty($_POST['domain'])){
+		                    $ret['status'] = 'error';
+		                    $ret['message'] = 'Domain tidak boleh kosong!';
+		                }elseif(empty($_POST['api_key_tujuan'])){
+		                    $ret['status'] = 'error';
+		                    $ret['message'] = 'API KEY tujuan tidak boleh kosong!';
+		                }else{
+		                    $user = wp_get_current_user();
+		                    $ret['url_login'] = $this->functions->login_to_other_site(array(
+		                        'user' => $user,
+		                        'domain' => $_POST['domain'],
+		                        'api_key' => $_POST['api_key_tujuan']
+		                    ));
+		                }
+	            	}
+	            }
             } else {
                 $ret['status'] = 'error';
                 $ret['message'] = 'APIKEY tidak sesuai!';
@@ -3329,5 +3343,9 @@ class Wp_Eval_Sakip_Admin
             $ret['message'] = 'Format Salah!';
         }
         die(json_encode($ret));
+    }
+
+    function handle_sso_login(){
+    	return $this->functions->handle_sso_login();
     }
 }

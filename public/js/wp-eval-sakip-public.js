@@ -555,3 +555,34 @@ function validateForm(fields) {
 
 	return { error: null, data: formData };
 }
+
+function get_link_login(that){
+    var id = jQuery(that).attr('id');
+    var url = jQuery(that).attr('title');
+    if(id == ''){
+        return alert('Nama atau ID unik auto login tidak boleh kosong!');
+    }
+    jQuery("#wrap-loading").show();
+    jQuery.ajax({
+        url: ajaxurl,
+        type: "post",
+        data: {
+            "action": "coba_auto_login",
+            "api_key": esakip.api_key,
+            "id": id,
+            "url": url
+        },
+        dataType: "json",
+        success: function (data) {
+            jQuery("#wrap-loading").hide();
+            if(data.status == 'success'){
+                window.open(data.url_login, '_blank');
+            }else{
+                alert(data.message);
+            }
+        },
+        error: function (e) {
+            console.log(e);
+        }
+    });
+}

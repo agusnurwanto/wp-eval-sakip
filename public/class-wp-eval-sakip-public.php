@@ -31692,4 +31692,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		return $data;
 	}
+
+    public function sso_login($atts)
+    {
+        // untuk disable render shortcode di halaman edit page/post
+        if (!empty($_GET) && !empty($_GET['POST'])) {
+            return '';
+        }
+        $input = shortcode_atts(array(
+		    'id' => '',
+		    'url' => '',
+		), $atts);
+		if(is_user_logged_in()){
+       		return 'onclick="get_link_login(this); return false;" id="'.$input['id'].'" title="'.$input['url'].'"';
+		}else{
+			return 'title="Anda tidak dapat akses untuk melihat halaman ini!"';
+		}
+    }
 }
