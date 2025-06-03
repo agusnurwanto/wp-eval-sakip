@@ -1210,6 +1210,15 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         jQuery('#pokin-level-3').removeAttr('onchange');
         jQuery('#pokin-level-4').removeAttr('onchange');
 
+        if(cek_parent_global.input_pagu == 1){
+            // rhk = cek_parent_global.data[cek_parent_global.level];
+            jQuery('#pokin-level-1').attr('disabled', true);
+            jQuery('#pokin-level-2').attr('disabled', true);
+            jQuery('#pokin-level-3').attr('disabled', true);
+            jQuery('#pokin-level-4').attr('disabled', true);
+            jQuery('#pokin-level-5').attr('disabled', true);
+        }
+
         let selected_pokin_1 = [];
         let selected_pokin_2 = [];
         let selected_pokin_3 = [];
