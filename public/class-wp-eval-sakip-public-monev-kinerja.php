@@ -1143,6 +1143,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		                	FROM esakip_data_pegawai_simpeg
 		                	WHERE nip_baru = %d		                		
 		                ', $ret['data']['nip']), ARRAY_A);
+
+						// kondisi jika parent RHK ada yang input pagu, maka yang ditampilkan adalah pokin milik parent
+		                $id_renaksi = $ret['data']['id'];
+		                $id_level = $ret['data']['level'];
+		                if(!empty($_POST['parent_id_input_pagu'])){
+		                	$id_renaksi = $_POST['parent_id_input_pagu'];
+		                	$id_level = $_POST['parent_level_input_pagu'];
+		                }
 						$ret['data']['pokin'] = $wpdb->get_results(
 							$wpdb->prepare("
 						        SELECT
@@ -1157,7 +1165,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						            AND o.level_pokin = 1
 									AND o.active=1
 									AND p.active=1
-						    ", $ret['data']['id'], $ret['data']['level']),
+						    ", $id_renaksi, $id_level),
 							ARRAY_A
 						);
 						$ret['data']['pokin_2'] = $wpdb->get_results(
@@ -1174,7 +1182,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						            AND o.level_pokin = 2
 									AND o.active=1
 									AND p.active=1
-						    ", $ret['data']['id'], $ret['data']['level']),
+						    ", $id_renaksi, $id_level),
 							ARRAY_A
 						);
 						$ret['data']['pokin_3'] = $wpdb->get_results(
@@ -1191,7 +1199,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						            AND o.level_pokin = 3
 									AND o.active=1
 									AND p.active=1
-						    ", $ret['data']['id'], $ret['data']['level']),
+						    ", $id_renaksi, $id_level),
 							ARRAY_A
 						);
 						$ret['data']['pokin_4'] = $wpdb->get_results(
@@ -1208,7 +1216,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						            AND o.level_pokin = 4
 									AND o.active=1
 									AND p.active=1
-						    ", $ret['data']['id'], $ret['data']['level']),
+						    ", $id_renaksi, $id_level),
 							ARRAY_A
 						);
 						$ret['data']['pokin_5'] = $wpdb->get_results(
@@ -1225,7 +1233,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						            AND o.level_pokin = 5
 									AND o.active=1
 									AND p.active=1
-						    ", $ret['data']['id'], $ret['data']['level']),
+						    ", $id_renaksi, $id_level),
 							ARRAY_A
 						);
 						$data_skpd_cascading = $wpdb->get_row(

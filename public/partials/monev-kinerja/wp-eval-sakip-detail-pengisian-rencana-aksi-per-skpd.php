@@ -1335,6 +1335,12 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
 
     function edit_rencana_aksi(id, tipe) {
         tambah_renaksi_2(tipe, true).then(function() {
+            var parent_id_input_pagu = '';
+            var parent_level_input_pagu = '';
+            if(cek_parent_global.input_pagu == 1){
+                parent_id_input_pagu = cek_parent_global.data[cek_parent_global.level].id;
+                parent_level_input_pagu = cek_parent_global.level;
+            }
             jQuery('#wrap-loading').show();
             jQuery.ajax({
                 url: esakip.url,
@@ -1343,6 +1349,8 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     action: 'get_rencana_aksi',
                     api_key: esakip.api_key,
                     id: id,
+                    parent_id_input_pagu: parent_id_input_pagu,
+                    parent_level_input_pagu: parent_level_input_pagu,
                     tahun_anggaran: '<?php echo $input['tahun'] ?>'
                 },
                 dataType: 'json',
@@ -1434,13 +1442,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                         }
 
                         jQuery('#label_renaksi').val(response.data.label);
-                        if(
-                            cek_parent_global.input_pagu == 0
-                            || response.data.input_rencana_pagu_level == 1
-                            || tipe == 4
-                        ){
-                            set_dasar_pelaksanaan(response.data);
-                        }
+                        set_dasar_pelaksanaan(response.data);
                     }
 
                     if (hak_akses_pegawai == 1) {
@@ -1461,7 +1463,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         if(rhk){
             if(cek_parent_global.input_pagu == 1){
                 disable = 'disabled="true"';
-                rhk = cek_parent_global;
+                rhk = cek_parent_global.data[cek_parent_global.level];
                 display = '';
             }else if(rhk.input_rencana_pagu_level == 1){
                 display = '';
@@ -2822,6 +2824,58 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         });
     }
 
+    function tampil_pokin(id, tampil=false){
+        var display = 'display: none;';
+        var _class = 'in_setting_input_rencana_pagu';
+        if(tampil){
+            display = '';
+            _class = '';
+        }
+        return `
+            <div class="form-group ${_class}" style="${display}"> 
+                <label for="pokin-level-${id}">Pilih Pokin Level ${id}</label> 
+                <select class="form-control" multiple name="pokin-level-${id}" id="pokin-level-${id}" onchange="get_data_pokin_2(this.value, ${id+1}, 'pokin-level-${id+1}', true)"> 
+                </select> 
+            </div>
+        `;
+    }
+
+    function tampil_cascading(id, tampil=false){
+        var display = 'display: none;';
+        var _class = 'in_setting_input_rencana_pagu';
+        if(tampil){
+            display = '';
+            _class = '';
+        }
+
+        var id_html = '';
+        var label = '';
+        var onchange = '';
+        if(id == 'sasaran'){
+            id_html = 'cascading-renstra';
+            label = 'Sasaran';
+            onchange = "get_cascading_input_rencana_pagu('program')";
+        }else if(id == 'program'){
+            id_html = 'cascading-renstra-program';
+            label = 'Program';
+            onchange = "get_cascading_input_rencana_pagu('kegiatan')";
+        }else if(id == 'kegiatan'){
+            id_html = 'cascading-renstra-kegiatan';
+            label = 'Kegiatan';
+            onchange = "get_cascading_input_rencana_pagu('sub-kegiatan')";
+        }else if(id == 'sub-kegiatan'){
+            id_html = 'cascading-renstra-sub-kegiatan';
+            label = 'Sub Kegiatan';
+            onchange = "get_cascading_input_rencana_pagu()";
+        }
+        return `
+            <div class="form-group ${_class}" style="${display}"> 
+                <label for="${id_html}">Pilih ${label} Cascading</label>
+                <select class="form-control" name="${id_html}" id="${id_html}" onchange="${onchange}"></select>
+            </div>    
+        `;
+    }
+
     function tambah_renaksi_2_final(tipe, isEdit = false, cek_parent) {
         let jenis = '';
         let parent_cascading = '';
@@ -2889,73 +2943,29 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     level_pokin = 1;
                     html_cascading_turunan_id = 'cascading-renstra';
                     html_cascading_turunan = `onchange="get_cascading_input_rencana_pagu('program')"`;
-                    html_pokin_input_rencana_pagu = `
-                        <div class="form-group"> 
-                            <label for="pokin-level-2">Pilih Pokin Level 2</label> 
-                            <select class="form-control" multiple name="pokin-level-2" id="pokin-level-2" onchange="get_data_pokin_2(this.value, 3, 'pokin-level-3', true)"> 
-                            </select> 
-                        </div> 
-                        <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                            <label for="pokin-level-3">Pilih Pokin Level 3</label>
-                            <select class="form-control" multiple name="pokin-level-3" id="pokin-level-3" onchange="get_data_pokin_2(this.value, 4, 'pokin-level-4', true)">
-                            </select>
-                        </div>
-                        <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                            <label for="pokin-level-4">Pilih Pokin Level 4</label>
-                            <select class="form-control" multiple name="pokin-level-4" id="pokin-level-4" onchange="get_data_pokin_2(this.value, 5, 'pokin-level-5', true)">
-                            </select>
-                        </div>
-                        <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                            <label for="pokin-level-5">Pilih Pokin Level 5</label>
-                            <select class="form-control" multiple name="pokin-level-5" id="pokin-level-5">
-                            </select>
-                        </div>`;
+                    html_pokin_input_rencana_pagu += tampil_pokin(2, true);
+                    html_pokin_input_rencana_pagu += tampil_pokin(3, false);
+                    html_pokin_input_rencana_pagu += tampil_pokin(4, false);
+                    html_pokin_input_rencana_pagu += tampil_pokin(5, false);
 
                     trigger_pokin_input_rencana_pagu = `onchange="get_data_pokin_2(this.value, 2, 'pokin-level-2', true)"`;
 
-                    html_input_sub_keg_cascading = `
-                        <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                            <label for="cascading-renstra-program">Pilih Program Cascading</label>
-                            <select class="form-control" name="cascading-renstra-program" id="cascading-renstra-program" onchange="get_cascading_input_rencana_pagu('kegiatan')"></select>
-                        </div>    
-                        <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                            <label for="cascading-renstra-kegiatan">Pilih Kegiatan Cascading</label>
-                            <select class="form-control" name="cascading-renstra-kegiatan" id="cascading-renstra-kegiatan" onchange="get_cascading_input_rencana_pagu('sub_kegiatan')"></select>
-                        </div>
-                        <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                            <label for="cascading-renstra-sub-kegiatan">Pilih Sub Kegiatan Cascading</label>
-                            <select class="form-control" name="cascading-renstra-sub-kegiatan" id="cascading-renstra-sub-kegiatan" onchange="get_cascading_input_rencana_pagu()"></select>
-                        </div>`;
+                    html_input_sub_keg_cascading += tampil_cascading('program', false);
+                    html_input_sub_keg_cascading += tampil_cascading('kegiatan', false);
+                    html_input_sub_keg_cascading += tampil_cascading('sub-kegiatan', false);
                 }else if(tipe == 2) {
                     title = 'Rencana Hasil Kerja | RHK Level 2';
                     data_cascading = data_program_cascading[key];
                     parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
                     parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
                     level_pokin = 3;
-                    // menambahakan form input saat input rencana pagu di level 2 RHK
-                    html_pokin_input_rencana_pagu = `
-                            <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                                <label for="pokin-level-4">Pilih Pokin Level 4</label>
-                                <select class="form-control" multiple name="pokin-level-4" id="pokin-level-4" onchange="get_data_pokin_2(this.value, 5, 'pokin-level-4', true)">
-                                </select>
-                            </div>
-                            <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                                <label for="pokin-level-5">Pilih Pokin Level 5</label>
-                                <select class="form-control" multiple name="pokin-level-5" id="pokin-level-5">
-                                </select>
-                            </div>`;
+                    html_pokin_input_rencana_pagu += tampil_pokin(4, false);
+                    html_pokin_input_rencana_pagu += tampil_pokin(5, false);
 
                     trigger_pokin_input_rencana_pagu = `onchange="get_data_pokin_2(this.value, ${ level_pokin }, 'pokin-level-4', true)"`;
 
-                    html_input_sub_keg_cascading = `
-                        <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                            <label for="cascading-renstra-kegiatan">Pilih Kegiatan Cascading</label>
-                            <select class="form-control" name="cascading-renstra-kegiatan" id="cascading-renstra-kegiatan" onchange="get_cascading_input_rencana_pagu('sub_kegiatan')"></select>
-                        </div>
-                        <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                            <label for="cascading-renstra-sub-kegiatan">Pilih Sub Kegiatan Cascading</label>
-                            <select class="form-control" name="cascading-renstra-sub-kegiatan" id="cascading-renstra-sub-kegiatan" onchange="get_cascading_input_rencana_pagu()"></select>
-                        </div>`;
+                    html_input_sub_keg_cascading += tampil_cascading('kegiatan', false);
+                    html_input_sub_keg_cascading += tampil_cascading('sub-kegiatan', false);
 
                     html_cascading_turunan_id = 'cascading-renstra-program';
                     html_cascading_turunan = `onchange="get_cascading_input_rencana_pagu('kegiatan')"`;
@@ -2966,20 +2976,11 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
                     data_cascading = data_kegiatan_cascading[key];
                     
-                    html_pokin_input_rencana_pagu = `
-                        <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                            <label for="pokin-level-5">Pilih Pokin Level 5</label>
-                            <select class="form-control" multiple name="pokin-level-5" id="pokin-level-5">
-                            </select>
-                        </div>`;
+                    html_pokin_input_rencana_pagu += tampil_pokin(5, false);
         
                     trigger_pokin_input_rencana_pagu = `onchange="get_data_pokin_2(this.value, ${ level_pokin }, 'pokin-level-5', true)"`;
 
-                    html_input_sub_keg_cascading = `
-                    <div class="form-group in_setting_input_rencana_pagu" style="display: none;">
-                    <label for="cascading-renstra">Pilih Sub Kegiatan Cascading</label>
-                    <select class="form-control" name="cascading-renstra-sub-kegiatan" id="cascading-renstra-sub-kegiatan" onchange="get_cascading_input_rencana_pagu()"></select>
-                    </div>`;
+                    html_input_sub_keg_cascading += tampil_cascading('sub-kegiatan', false);
 
                     html_cascading_turunan_id = 'cascading-renstra-kegiatan';
                     html_cascading_turunan = `onchange="get_cascading_input_rencana_pagu('sub_kegiatan')"`;
