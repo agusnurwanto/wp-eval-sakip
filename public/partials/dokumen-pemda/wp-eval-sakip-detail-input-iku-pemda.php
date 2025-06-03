@@ -34,6 +34,17 @@ if(!empty($data_jadwal)){
     $tahun_anggaran = $data_jadwal['tahun_anggaran'];
     $tahun_awal = $data_jadwal['tahun_anggaran'];
     $tahun_akhir = $tahun_awal + $data_jadwal['lama_pelaksanaan'] - 1;
+    $tahun_periode = $data_jadwal['tahun_selesai_anggaran'];
+    $tahun_mulai_anggaran = ($data_jadwal['tahun_selesai_anggaran'] - $data_jadwal['lama_pelaksanaan']) + 1;
+
+    $colspan = $data_jadwal['lama_pelaksanaan'];
+    $header_tahun = '<tr>';
+    for($i=$tahun_mulai_anggaran; $i<=$tahun_periode; $i++){
+        $header_tahun .= '
+            <th class="text-center atas kiri kanan bawah">'.$i.'</th>
+        ';
+    }
+    $header_tahun .= '</tr>';
 }
 
 $nama_jadwal = strtoupper($data_jadwal['jenis_jadwal_khusus']) . ' ' . $data_jadwal['nama_jadwal'] . ' ' . '(' . $tahun_awal . ' - ' . $tahun_akhir . ')';
@@ -76,14 +87,20 @@ $data_simpan = [];
 if (!empty($iku)) {
     foreach ($iku as $k_iku => $v_iku) {
         $data_simpan[] = [
-            'kode_sasaran'    => $v_iku['kode_sasaran'] ?? '-',
-            'label_sasaran'    => $v_iku['label_sasaran'] ?? '-',
-            'id_unik_indikator'  => $v_iku['id_unik_indikator'] ?? '-',
-            'label_indikator'  => $v_iku['label_indikator'] ?? '-',
-            'formulasi'        => $v_iku['formulasi'] ?? '-', 
-            'sumber_data'      => $v_iku['sumber_data'] ?? '-', 
-            'penanggung_jawab' => $v_iku['penanggung_jawab'] ?? '-', 
-            'id_jadwal' => $v_iku['id_jadwal'] ?? '-', 
+            'kode_sasaran'    => $v_iku['id_sasaran'] ?? '',
+            'label_sasaran'    => $v_iku['label_sasaran'] ?? '',
+            'id_unik_indikator'  => $v_iku['id_unik_indikator'] ?? '',
+            'label_indikator'  => $v_iku['label_indikator'] ?? '',
+            'formulasi'        => $v_iku['formulasi'] ?? '', 
+            'sumber_data'      => $v_iku['sumber_data'] ?? '', 
+            'penanggung_jawab' => $v_iku['penanggung_jawab'] ?? '', 
+            'satuan' => $v_iku['satuan'] ?? '', 
+            'target_1' => $v_iku['target_1'] ?? '', 
+            'target_2' => $v_iku['target_2'] ?? '', 
+            'target_3' => $v_iku['target_3'] ?? '', 
+            'target_4' => $v_iku['target_4'] ?? '', 
+            'target_5' => $v_iku['target_5'] ?? '', 
+            'id_jadwal' => $v_iku['id_jadwal'] ?? '', 
         ];
         $html_iku .= '
             <tr>
@@ -93,7 +110,17 @@ if (!empty($iku)) {
                 <td class="text-left atas kanan bawah kiri">' . $v_iku['formulasi'] . '</td>
                 <td class="text-left atas kanan bawah kiri">' . $v_iku['sumber_data'] . '</td>
                 <td class="text-left atas kanan bawah kiri">' . $v_iku['penanggung_jawab'] . '</td>
-            </tr>';
+                <td class="text-left atas kanan bawah kiri">' . $v_iku['satuan'] . '</td>';
+
+        $tahun_index = 1;
+        for ($tahun = $tahun_mulai_anggaran; $tahun <= $tahun_periode; $tahun++) {
+            $target_field = 'target_' . $tahun_index;
+            $html_iku .= '
+                <td class="text-left atas kanan bawah kiri">' . ($v_iku[$target_field] ?? '') . '</td>';
+            $tahun_index++;
+        }
+
+        $html_iku .= '</tr>';
     }
 }
 
@@ -371,6 +398,11 @@ if (!empty($data_tahapan)) {
     .kanan { border-right: 1px solid black; }
     .bawah { border-bottom: 1px solid black; }
     .kiri { border-left: 1px solid black; }
+    td.formulasi img {
+        max-width: 100%;
+        height: auto;
+    }
+
 </style>
 
 <!-- Table -->
@@ -382,7 +414,7 @@ if (!empty($data_tahapan)) {
                <h2 class="cr-title">Pilih Pengisian Indikator Kegiatan Utama</h2>
                 <div class="cr-carousel-wrapper">
                     <div id="card-carousel" class="cr-carousel">
-                        <div class="cr-item" title="Perjanjian Kinerja Real Time">
+                        <div class="cr-item" title="Indikator Kegiatan Utama Real Time">
                             <div class="cr-card">
                                 <h3>Indikator Kegiatan Utama Sekarang</h3>
                                 <div class="badge badge-sm badge-primary m-2 text-light text-wrap">Pemerintah Daerah </div>
@@ -425,14 +457,17 @@ if (!empty($data_tahapan)) {
                 <table cellpadding="2" cellspacing="0" class="table_dokumen_iku table table-bordered">
                     <thead style="background: #ffc491;">
                         <tr>
-                            <th class="text-center atas kanan bawah kiri">No</th>
-                            <th class="text-center atas kanan bawah kiri">Tujuan/Sasaran</th>
-                            <th class="text-center atas kanan bawah kiri">Indikator</th>
-                            <th class="text-center atas kanan bawah kiri">Definisi Operasional/Formulasi</th>
-                            <th class="text-center atas kanan bawah kiri">Sumber Data</th>
-                            <th class="text-center atas kanan bawah kiri">Penanggung Jawab</th>
-                            <th class="text-center atas kanan bawah kiri hide-excel" style="width: 150px;">Aksi</th>
+                            <th rowspan="2" class="text-center atas kanan bawah kiri">No</th>
+                            <th rowspan="2" class="text-center atas kanan bawah kiri">Tujuan/Sasaran</th>
+                            <th rowspan="2" class="text-center atas kanan bawah kiri">Indikator</th>
+                            <th rowspan="2" class="text-center atas kanan bawah kiri">Definisi Operasional/Formulasi</th>
+                            <th rowspan="2" class="text-center atas kanan bawah kiri">Sumber Data</th>
+                            <th rowspan="2" class="text-center atas kanan bawah kiri">Penanggung Jawab</th>
+                            <th rowspan="2" class="text-center atas kanan bawah kiri">Satuan</th>
+                            <th colspan="<?php echo $colspan; ?>" class="text-center atas kanan bawah kiri">Target</th>
+                            <th rowspan="2" class="text-center atas kanan bawah kiri hide-excel" style="width: 150px;">Aksi</th>
                         </tr>
+                        <?php echo $header_tahun; ?>
                     </thead>
                     <tbody>
                     </tbody>
@@ -442,13 +477,16 @@ if (!empty($data_tahapan)) {
                 <table cellpadding="2" cellspacing="0" class="table_edit_dokumen_iku table table-bordered" style="display: none;">
                     <thead style="background: #ffc491;">
                         <tr>
-                            <th class="text-center atas kanan bawah kiri">No</th>
-                            <th class="text-center atas kanan bawah kiri">Tujuan/Sasaran</th>
-                            <th class="text-center atas kanan bawah kiri">Indikator</th>
-                            <th class="text-center atas kanan bawah kiri">Definisi Operasional/Formulasi</th>
-                            <th class="text-center atas kanan bawah kiri">Sumber Data</th>
-                            <th class="text-center atas kanan bawah kiri">Penanggung Jawab</th>
+                            <th rowspan="2" class="text-center atas kanan bawah kiri">No</th>
+                            <th rowspan="2" class="text-center atas kanan bawah kiri">Tujuan/Sasaran</th>
+                            <th rowspan="2" class="text-center atas kanan bawah kiri">Indikator</th>
+                            <th rowspan="2" class="text-center atas kanan bawah kiri">Definisi Operasional/Formulasi</th>
+                            <th rowspan="2" class="text-center atas kanan bawah kiri">Sumber Data</th>
+                            <th rowspan="2" class="text-center atas kanan bawah kiri">Penanggung Jawab</th>
+                            <th rowspan="2" class="text-center atas kanan bawah kiri">Satuan</th>
+                            <th colspan="<?php echo $colspan; ?>" class="text-center atas kanan bawah kiri">Target</th>
                         </tr>
+                        <?php echo $header_tahun; ?>
                     </thead>
                     <tbody>
                     </tbody>
@@ -472,11 +510,11 @@ if (!empty($data_tahapan)) {
                     <input type="hidden" id="id_iku" value="">
                     <div class="form-group">
                         <label for="tujuan-sasaran">Tujuan/Sasaran</label>
-                        <select name="" id="tujuan-sasaran"></select>
+                        <select name="tujuan-sasaran" id="tujuan-sasaran"></select>
                     </div>
                     <div class="form-group">
                         <label for="indikator">Indikator</label>
-                        <select name="" id="indikator"></select>
+                        <select name="indikator" id="indikator"></select>
                     </div>
                      <div class="form-group">
                         <label for="formulasi">Definisi Operasional/Formulasi</label>
@@ -485,7 +523,7 @@ if (!empty($data_tahapan)) {
                             $editor_id = 'formulasi';
                             $settings = array(
                                 'textarea_name' => 'formulasi',
-                                'media_buttons' => false, 
+                                'media_buttons' => true, 
                                 'teeny' => false, 
                                 'quicktags' => true
                             );
@@ -494,12 +532,39 @@ if (!empty($data_tahapan)) {
                     </div>
                     <div class="form-group">
                         <label for="sumber-data">Sumber Data</label>
-                        <textarea name="" id="sumber-data"></textarea>
+                        <textarea name="sumber-data" id="sumber-data"></textarea>
                     </div>
                     <div class="form-group">
                         <label for="penanggung-jawab">Penanggung Jawab</label>
-                        <textarea name="" id="penanggung-jawab"></textarea>
+                        <textarea name="penanggung-jawab" id="penanggung-jawab"></textarea>
                     </div>
+                    <div class="form-group">
+                        <label for="satuan">Satuan</label>
+                        <input type="number" class="form-control" id="satuan" name="satuan"/>
+                    </div>
+                    
+                    <?php 
+                    $lama = $data_jadwal['lama_pelaksanaan'];
+                    for ($i = 0; $i < $lama; $i += 2) : 
+                    ?>
+                        <div class="form-group row">
+                            <div class="col-md-2">
+                                <label for="target_<?php echo $i + 1; ?>">Target <?php echo $i + 1; ?></label>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="number" class="form-control" id="target_<?php echo $i + 1; ?>" name="target_<?php echo $i + 1; ?>"/>
+                            </div>
+                            <?php if ($i + 2 <= $lama): ?>
+                                <div class="col-md-2">
+                                    <label for="target_<?php echo $i + 2; ?>">Target <?php echo $i + 2; ?></label>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="number" class="form-control" id="target_<?php echo $i + 2; ?>" name="target_<?php echo $i + 2; ?>"/>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endfor; ?>
+
                 </form>
             </div>
             <div class="modal-footer">
@@ -512,7 +577,7 @@ if (!empty($data_tahapan)) {
 
 <!-- Modal finalisasi -->
 <div class="modal fade mt-4" id="modalFinalisasi" tabindex="-1" role="dialog" aria-labelledby="modalFinalisasi" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-dialog" style="max-width: 100%;" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="title-label">Finalisasi Indikator Kinerja Utama</h5>
@@ -532,13 +597,16 @@ if (!empty($data_tahapan)) {
                             <table class="table_data_anggaran" id="table_sasaran">
                                 <thead class="bg-dark text-light">
                                     <tr>
-                                        <th class="text-center atas kanan bawah kiri">No</th>
-                                        <th class="text-center atas kanan bawah kiri">Tujuan/Sasaran</th>
-                                        <th class="text-center atas kanan bawah kiri">Indikator</th>
-                                        <th class="text-center atas kanan bawah kiri">Definisi Operasional/Formulasi</th>
-                                        <th class="text-center atas kanan bawah kiri">Sumber Data</th>
-                                        <th class="text-center atas kanan bawah kiri">Penanggung Jawab</th>
+                                        <th rowspan="2" class="text-center atas kanan bawah kiri">No</th>
+                                        <th rowspan="2" class="text-center atas kanan bawah kiri">Tujuan/Sasaran</th>
+                                        <th rowspan="2" class="text-center atas kanan bawah kiri">Indikator</th>
+                                        <th rowspan="2" class="text-center atas kanan bawah kiri">Definisi Operasional/Formulasi</th>
+                                        <th rowspan="2" class="text-center atas kanan bawah kiri">Sumber Data</th>
+                                        <th rowspan="2" class="text-center atas kanan bawah kiri">Penanggung Jawab</th>
+                                        <th rowspan="2" class="text-center atas kanan bawah kiri">Satuan</th>
+                                        <th colspan="<?php echo $colspan; ?>" class="text-center atas kanan bawah kiri">Target</th>
                                     </tr>
+                                    <?php echo $header_tahun; ?>
                                 </thead>
                                 <tbody>
                                     <?php echo $html_iku; ?>
@@ -705,16 +773,26 @@ function tambahIkuPemda(){
 
 function simpanDataIkuPemda(){
     let id_iku = jQuery('#id_iku').val();
-    let id_sasaran = jQuery('#tujuan-sasaran').val();
+    let id_unik = jQuery('#tujuan-sasaran').val();
     let label_tujuan_sasaran = jQuery('#tujuan-sasaran option:selected').text();
     let id_indikator = jQuery('#indikator').val();
     let label_indikator = jQuery('#indikator option:selected').text();
     let formulasi = tinymce.get('formulasi') ? tinymce.get('formulasi').getContent() : jQuery('#formulasi').val();
     let sumber_data = jQuery('#sumber-data').val();
     let penanggung_jawab = jQuery('#penanggung-jawab').val();
-    if(id_sasaran == '' || id_indikator == '' || formulasi == '' || sumber_data == '' || penanggung_jawab == ''){
-        return alert('Ada Input Data Yang Kosong!')
+    let satuan = jQuery('#satuan').val();
+
+    let target_1 = jQuery("#target_1").val();
+    let target_2 = jQuery("#target_2").val();    
+    let target_3 = jQuery("#target_3").val();    
+    let target_4 = jQuery("#target_4").val();    
+    let target_5 = jQuery("#target_5").val();
+
+
+    if(id_unik == '' || id_indikator == '' || formulasi == '' || sumber_data == '' || penanggung_jawab == '' || satuan == ''){
+        return alert('Ada Input Data Yang Kosong!');
     }
+
     jQuery('#wrap-loading').show();
     jQuery.ajax({
         url: esakip.url,
@@ -723,7 +801,7 @@ function simpanDataIkuPemda(){
             "action": 'tambah_iku_pemda',
             "api_key": esakip.api_key,
             "tipe_iku": "opd",
-            "id_sasaran": id_sasaran,
+            "id_unik": id_unik,
             "label_tujuan_sasaran": label_tujuan_sasaran,
             "id_indikator": id_indikator,
             "label_indikator": label_indikator,
@@ -731,7 +809,13 @@ function simpanDataIkuPemda(){
             "sumber_data": sumber_data,
             "penanggung_jawab": penanggung_jawab,
             "id_jadwal": id_jadwal,
-            "id_iku" : id_iku
+            "id_iku": id_iku,
+            "satuan": satuan,
+            "target_1": target_1,
+            "target_2": target_2,
+            "target_3": target_3,
+            "target_4": target_4,
+            "target_5": target_5
         },
         dataType: "json",
         success: function(res){
@@ -747,8 +831,9 @@ function simpanDataIkuPemda(){
 }
 
 function edit_iku(id) {
-    tambahIkuPemda().then(function(){
+    tambahIkuPemda().then(function () {
         jQuery('#wrap-loading').show();
+
         jQuery.ajax({
             url: esakip.url,
             type: 'POST',
@@ -759,33 +844,46 @@ function edit_iku(id) {
                 tipe: 'pemda'
             },
             dataType: 'json',
-            success: function(response) {
+            success: function (response) {
                 jQuery('#wrap-loading').hide();
                 console.log(response);
+
                 if (response.status === 'success') {
                     let data = response.data;
                     jQuery('#id_iku').val(id);
-                    jQuery("#tujuan-sasaran").val(data.id_sasaran).trigger('change');                    
-                    tinymce.get('formulasi').setContent(data.formulasi);
+                    jQuery("#tujuan-sasaran").val(data.id_sasaran).trigger('change');
+                    getIndikator(data.id_sasaran).then(function () {
+                        jQuery("#indikator").val(data.id_unik_indikator).trigger('change');
+                    });
+                    if (tinymce.get('formulasi')) {
+                        tinymce.get('formulasi').setContent(data.formulasi);
+                    } else {
+                        jQuery('#formulasi').val(data.formulasi); 
+                    }
                     jQuery("#sumber-data").val(data.sumber_data);
                     jQuery("#penanggung-jawab").val(data.penanggung_jawab);
+                    jQuery("#satuan").val(data.satuan);
+                    jQuery("#target_1").val(data.target_1);
+                    jQuery("#target_2").val(data.target_2);
+                    jQuery("#target_3").val(data.target_3);
+                    jQuery("#target_4").val(data.target_4);
+                    jQuery("#target_5").val(data.target_5);
                     jQuery("#modal-iku").find('.modal-title').html('Edit IKU');
                     jQuery('#modal-iku').modal('show');
-                    getIndikator(data.id_sasaran).then(function(){
-                        jQuery("#indikator").val(data.id_unik_indikator).trigger('change');
-                    })
+
                 } else {
-                    alert(response.message);
+                    alert(response.message || 'Data tidak ditemukan!');
                 }
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
                 alert('Terjadi kesalahan saat memuat data!');
             }
         });
-    })
+    });
 }
+
 
 function hapus_iku(id) {
     if (!confirm('Apakah anda yakin ingin menghapus data ini?')) {
@@ -1013,85 +1111,85 @@ function simpanEditFinalisasi() {
     });
 }
 
-    function deleteDokumen(idTahap) {
-        let confirmHapus = confirm('Apakah anda yakin ingin menghapus data ini?');
-        if (!confirmHapus) {
-            return;
-        }
-        jQuery('#wrap-loading').show()
-        jQuery.ajax({
-            url: esakip.url,
-            method: 'POST',
-            data: {
-                action: "hapus_finalisasi_iku_pemda",
-                api_key: esakip.api_key,
-                id_tahap: idTahap
-            },
-            dataType: 'json',
-            success: function(response) {
-                if (response.status === 'success') {
-                    alert(response.message);
-                    jQuery(`#card-tahap-${idTahap}`).hide()
+function deleteDokumen(idTahap) {
+    let confirmHapus = confirm('Apakah anda yakin ingin menghapus data ini?');
+    if (!confirmHapus) {
+        return;
+    }
+    jQuery('#wrap-loading').show()
+    jQuery.ajax({
+        url: esakip.url,
+        method: 'POST',
+        data: {
+            action: "hapus_finalisasi_iku_pemda",
+            api_key: esakip.api_key,
+            id_tahap: idTahap
+        },
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'success') {
+                alert(response.message);
+                jQuery(`#card-tahap-${idTahap}`).hide()
 
-                    if (idTahap == jQuery(`#id_data`).val()) {
-                        location.reload()
+                if (idTahap == jQuery(`#id_data`).val()) {
+                    location.reload()
 
-                        jQuery(".cr-actions .cr-view-btn, .cr-actions .cr-view-btn-danger").prop("disabled", true).css("pointer-events", "none").css("opacity", "0.5");
-                    } else {
-                        jQuery('#wrap-loading').hide()
-                    }
+                    jQuery(".cr-actions .cr-view-btn, .cr-actions .cr-view-btn-danger").prop("disabled", true).css("pointer-events", "none").css("opacity", "0.5");
                 } else {
                     jQuery('#wrap-loading').hide()
-                    alert('Terjadi kesalahan: ' + response.message);
                 }
-            },
-        });
-    }
-    function viewDokumen(idTahap) {
-        jQuery('#wrap-loading').show()
-        jQuery.ajax({
-            url: esakip.url,
-            method: 'POST',
-            data: {
-                action: "get_finalisasi_iku_pemda_by_id",
-                api_key: esakip.api_key,
-                id_jadwal: id_jadwal,
-                id_tahap: idTahap
-            },
-            dataType: 'json',
-            success: function(response) {
+            } else {
                 jQuery('#wrap-loading').hide()
-                console.log(response.message);
-                if (response.status === 'success') {
-                    jQuery(".editable-field").attr("title", "").attr("contenteditable", "false");
-                    jQuery(".cr-view-btn").show();
-                    jQuery(`#view-btn-${idTahap}`).hide();
+                alert('Terjadi kesalahan: ' + response.message);
+            }
+        },
+    });
+}
+function viewDokumen(idTahap) {
+    jQuery('#wrap-loading').show()
+    jQuery.ajax({
+        url: esakip.url,
+        method: 'POST',
+        data: {
+            action: "get_finalisasi_iku_pemda_by_id",
+            api_key: esakip.api_key,
+            id_jadwal: id_jadwal,
+            id_tahap: idTahap
+        },
+        dataType: 'json',
+        success: function(response) {
+            jQuery('#wrap-loading').hide()
+            console.log(response.message);
+            if (response.status === 'success') {
+                jQuery(".editable-field").attr("title", "").attr("contenteditable", "false");
+                jQuery(".cr-view-btn").show();
+                jQuery(`#view-btn-${idTahap}`).hide();
 
-                    
-                    jQuery('.table_edit_dokumen_iku').show();
-                    jQuery('.table_dokumen_iku').hide();
-                    jQuery('#tambah-iku-pemda').hide();
+                
+                jQuery('.table_edit_dokumen_iku').show();
+                jQuery('.table_dokumen_iku').hide();
+                jQuery('#tambah-iku-pemda').hide();
 
-                    jQuery('.table_edit_dokumen_iku tbody').html(response.html);
+                jQuery('.table_edit_dokumen_iku tbody').html(response.data);
 
-                    jQuery('#id_data').val(idTahap);
-                    jQuery('#nama_tahap_finalisasi').val(response.nama_tahapan);
-                    jQuery('#tanggal_tahap_finalisasi').val(response.tanggal_dokumen);
+                jQuery('#id_data').val(idTahap);
+                jQuery('#nama_tahap_finalisasi').val(response.nama_tahapan);
+                jQuery('#tanggal_tahap_finalisasi').val(response.tanggal_dokumen);
 
-                    jQuery(`.badge-sedang-dilihat`).hide(); 
-                    jQuery(`#badge-sedang-dilihat-${idTahap}`).show();
-                    jQuery('#finalisasi-btn').hide();
-                    jQuery('#display-btn-first').show(); 
-                    jQuery('#edit-btn').show();
-                } else {
-                    alert('Terjadi kesalahan: ' + response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                jQuery('#wrap-loading').hide()
-                console.error('AJAX Error:', error);
-                alert('Gagal menyimpan data. Silakan coba lagi.');
-            },
-        });
-    }
+                jQuery(`.badge-sedang-dilihat`).hide(); 
+                jQuery(`#badge-sedang-dilihat-${idTahap}`).show();
+                jQuery('#finalisasi-btn').hide();
+                jQuery('#display-btn-first').show(); 
+                jQuery('#edit-btn').show();
+            } else {
+                alert('Terjadi kesalahan: ' + response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            jQuery('#wrap-loading').hide()
+            console.error('AJAX Error:', error);
+            alert('Gagal menyimpan data. Silakan coba lagi.');
+        },
+    });
+}
 </script>
