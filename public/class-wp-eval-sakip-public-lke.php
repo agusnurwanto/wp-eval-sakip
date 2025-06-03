@@ -3234,4 +3234,147 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 		}
 		die(json_encode($ret));
 	}
+
+	public function get_table_kuesioner_mendagri()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+				$data_kuesioner = $wpdb->get_results(
+					$wpdb->prepare("
+						SELECT 
+							* 
+						FROM esakip_kuesioner_mendagri
+						WHERE tahun_anggaran = %d
+						  AND active = 1
+						ORDER BY nomor_urut ASC
+						", $tahun_anggaran),
+					ARRAY_A
+				);
+
+				$tbody = '';
+				if (!empty($data_kuesioner)) {
+					$counter = 1;
+					foreach ($data_kuesioner as $kuesioner) {
+						$btn = '';
+						$counter2 = 1;
+
+						$get_total_bobot_kuesioner_detail = $wpdb->get_var(
+							$wpdb->prepare("
+								SELECT 
+									SUM(bobot)
+								FROM esakip_kuesioner_mendagri_detail
+								WHERE id_kuesioner = %d
+								AND active = 1
+								AND tipe_jawaban = 1
+									OR tipe_jawaban = 5
+							", $kuesioner['id'])
+						);
+
+						if ($get_total_bobot_kuesioner_detail >= 500 && $get_total_bobot_kuesioner_detail < 600) {
+						    $total_bobot_kuesioner_detail = 500;
+						} elseif ($total_bobot_kuesioner_detail < 100) {
+						    $total_bobot_kuesioner_detail = round($get_total_bobot_kuesioner_detail * 2) / 2; 
+						} else {
+						    $total_bobot_kuesioner_detail = round($get_total_bobot_kuesioner_detail); 
+						}
+
+						
+						$btn .= '<div class="btn-action-group">';
+						$btn .= "<button class='btn btn-primary' onclick='tambah_pertanyaan_kuesioner_mendagri(\"" . $kuesioner['id'] . "\");' title='Tambah Pertanyaan'><span class='dashicons dashicons-plus'></span></button>";
+						$btn .= "<button class='btn btn-warning' onclick='edit_data_kuesioner_mendagri(\"" . $kuesioner['id'] . "\");' title='Edit Data Kuesioner'><span class='dashicons dashicons-edit'></span></button>";
+						$btn .= "<button class='btn btn-danger' onclick='hapus_data_kuesioner_mendagri(\"" . $kuesioner['id'] . "\");' title='Hapus Data Kuesioner'><span class='dashicons dashicons-trash'></span>";
+						$btn .= '</div>';
+
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-left'><b>" . $counter++ . "</b></td>";
+						$tbody .= "<td class='text-left' colspan='3'><b>" . $kuesioner['nama_kuesioner'] . "</b></td>";
+						$tbody .= "<td class='text-center'>".$kuesioner['deskripsi']."</td>";
+						$tbody .= "<td class='text-center'></td>";
+						$tbody .= "<td class='text-center'></td>";
+						$tbody .= "<td class='text-center'>" . $btn . "</td>";
+						$tbody .= "</tr>";
+
+						$data_kuesioner_detail = $wpdb->get_results(
+						    $wpdb->prepare("
+						        SELECT 
+						            * 
+						        FROM esakip_kuesioner_mendagri_detail
+						        WHERE id_kuesioner = %d
+						          AND active = 1
+						        ORDER BY nomor_urut ASC
+						    ", $kuesioner['id']),
+						    ARRAY_A
+						);
+
+						if (!empty($data_kuesioner_detail)) {
+						    $group = [];
+						    foreach ($data_kuesioner_detail as $kuesioner_detail) {
+						        $group[$kuesioner_detail['pertanyaan']][] = $kuesioner_detail;
+						    }
+
+						    foreach ($group as $pertanyaan => $rows) {
+						        $rowspan = count($rows);
+						        $get_id = array_column($rows, 'id');
+						        $id = implode(',', $get_id);
+
+						        foreach ($rows as $index => $row) {
+						            $tbody .= "<tr>";
+
+						            if ($index === 0) {
+						                $btn = '<div class="btn-action-group">';
+						                $btn .= "<button class='btn btn-warning' onclick='edit_data_kuesioner_mendagri_detail([{$id}]);' title='Edit Data Pertanyaan'><span class='dashicons dashicons-edit'></span></button>";
+						                $btn .= "<button class='btn btn-danger' onclick='hapus_data_kuesioner_mendagri_detail([{$id}]);' title='Hapus Data Pertanyaan'><span class='dashicons dashicons-trash'></span></button>";
+						                $btn .= '</div>';
+
+						                $tbody .= "<td class='text-left' rowspan='{$rowspan}' style='vertical-align: middle;'></td>";
+						                $tbody .= "<td class='text-left' rowspan='{$rowspan}' style='vertical-align: middle;'><b>" . $counter2++ . "</b></td>";
+						                $tbody .= "<td class='text-left' colspan='2' rowspan='{$rowspan}' style='vertical-align: middle;'><b>" . $pertanyaan . "</b></td>";
+						            }
+
+						            $tbody .= "<td class='text-center'>" . $row['bobot'] . "</td>";
+						            $tbody .= "<td class='text-left'>" . $row['jawaban'] . "</td>";
+
+						            if ($index === 0) {
+						                $tbody .= "<td class='text-left' rowspan='{$rowspan}' style='vertical-align: middle;'>" . $row['penjelasan'] . "</td>";
+						                $tbody .= "<td class='text-center' rowspan='{$rowspan}' style='vertical-align: middle;'>" . $btn . "</td>";
+						            }
+
+						            $tbody .= "</tr>";
+						        }
+						    }
+						}
+
+					}
+				} else {
+					$tbody = "<tr><td colspan='8' class='text-center'>Tidak ada data tersedia</td></tr>";
+				}
+
+				$ret['data'] = $tbody;
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
 }
