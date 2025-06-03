@@ -778,6 +778,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('pohon_kinerja_publish', array($plugin_public, 'pohon_kinerja_publish'));
 		add_shortcode('cascading_publish', array($plugin_public, 'cascading_publish'));
 		add_shortcode('view_cascading_publish', array($plugin_public, 'view_cascading_publish'));
+		add_shortcode('capaian_kinerja_publish', array($plugin_public, 'capaian_kinerja_publish'));
 		
 		add_shortcode('menu_eval_sakip', array($plugin_public, 'menu_eval_sakip'));
 		add_shortcode('penyusunan_pohon_kinerja',array($plugin_public,'penyusunan_pohon_kinerja'));

@@ -3,6 +3,7 @@
 if (! defined('WPINC')) {
     die;
 }
+die('<h1>Coming Soon</h1>');
 if (empty($_GET) && empty($_GET['tahun'])) {
     die('Parameter tidak valid!');
 }
@@ -18,32 +19,32 @@ if (empty($jadwal_rpjmd)) {
 
 <body>
     <div class="mb-5 text-center hide_print">
-        <h1 class="fw-bold my-4">Pohon Kinerja<br> <?php echo $jadwal_rpjmd['nama_jadwal']; ?>
+        <h1 class="fw-bold my-4">Capaian Kinerja<br> <?php echo $jadwal_rpjmd['nama_jadwal']; ?>
             ( <?php echo $jadwal_rpjmd['tahun_anggaran'] . ' - ' . $jadwal_rpjmd['tahun_selesai_anggaran']; ?> )
         </h1>
     </div>
     <div class="p-4">
-        <h2 class="text-center m-2">Pohon Kinerja Pemerintah Daerah</h2>
+        <h2 class="text-center m-2">Capaian Kinerja Pemerintah Daerah</h2>
         <div class="mb-5">
             <table id="tableDataPemda" class="table table-bordered wrap-table">
                 <thead>
                     <tr>
                         <th class="text-center" style="width: 30px;">No</th>
-                        <th class="text-center">Pohon Kinerja Level 1</th>
+                        <th class="text-center">Capaian Kinerja</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
         </div>
 
-        <h2 class="text-center m-2">Pohon Kinerja Perangkat Daerah</h2>
+        <h2 class="text-center m-2">Capaian Kinerja Perangkat Daerah</h2>
         <div>
             <table id="tableDataOpd" class="table table-bordered wrap-table">
                 <thead>
                     <tr>
                         <th class="text-center" style="width: 30px;">No</th>
                         <th class="text-center">Perangkat Daerah</th>
-                        <th class="text-center">Pohon Kinerja Level 1</th>
+                        <th class="text-center">Capaian Kinerja</th>
                     </tr>
                 </thead>
                 <tbody></tbody>

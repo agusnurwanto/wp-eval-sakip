@@ -431,6 +431,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/homepage/wp-eval-sakip-homepage-view-cascading.php';
 	}
 
+	public function capaian_kinerja_publish($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/homepage/wp-eval-sakip-homepage-capaian-kinerja.php';
+	}
+
 	public function mapping_skpd()
 	{
 		global $wpdb;
@@ -31312,14 +31321,20 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$default_tahun = isset($_GET['tahun']) ? $_GET['tahun'] : (get_option(ESAKIP_TAHUN_ANGGARAN) ?? $tahun_values[0]);
 
 		$page_pohon_kinerja_publish = $this->functions->generatePage([
-			'nama_page'   => 'Daftar Pohon Kinerja',
+			'nama_page'   => 'Pohon Kinerja',
 			'content'     => '[pohon_kinerja_publish]',
 			'show_header' => 1,
 			'post_status' => 'publish'
 		]);
 		$page_cascading_publish = $this->functions->generatePage([
-			'nama_page'   => 'Daftar Cascading',
+			'nama_page'   => 'Cascading',
 			'content'     => '[cascading_publish]',
+			'show_header' => 1,
+			'post_status' => 'publish'
+		]);
+		$page_capaian_kinerja_publish = $this->functions->generatePage([
+			'nama_page'   => 'Capaian Kinerja',
+			'content'     => '[capaian_kinerja_publish]',
 			'show_header' => 1,
 			'post_status' => 'publish'
 		]);
@@ -31333,6 +31348,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			'Cascading' => [
 				'url' 	=> $page_cascading_publish['url'], 
 				'icon' 	=> get_option('_crb_icon_cascading'),
+				'size' 	=> get_option('_crb_icon_size')
+			],
+			'Capaian Kinerja' => [
+				'url' 	=> $page_capaian_kinerja_publish['url'], 
+				'icon' 	=> get_option('_crb_icon_capaian_kinerja'),
 				'size' 	=> get_option('_crb_icon_size')
 			]
 		];
@@ -31355,7 +31375,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							<div class="row">';
 
 		foreach ($data as $nama => $item) {
-			$output .= '<div class="col-md-6">
+			$output .= '<div class="col-md-4">
 							<a href="'.$item['url'].'&tahun='.$default_tahun.'" class="d-block text-decoration-none nav-link-icon" data-base-url="'.$item['url'].'" target="_blank">
 								<img src="'.$item['icon'].'" alt="'.$nama.'" class="img-fluid" style="width: ' . $item['size'] . 'px;">
 								<p class="mt-2 font-weight-bold text-white">'.$nama.'</p>
@@ -31661,7 +31681,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	{
 		global $wpdb;
 
-		$data = $wpdb->get_var(
+		$id_jadwal_rpjmd = $wpdb->get_var(
 			$wpdb->prepare("
 				SELECT 
 					id_jadwal_rpjmd
@@ -31671,7 +31691,23 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			", $tahun_anggaran)
 		);
 
-		return $data;
+		$jadwal_rpjmd = $wpdb->get_row(
+			$wpdb->prepare("
+				SELECT 
+					id,
+					nama_jadwal,
+					nama_jadwal_renstra,
+					tahun_anggaran,
+					lama_pelaksanaan,
+					tahun_selesai_anggaran
+				FROM esakip_data_jadwal
+				WHERE id = %d
+				AND status != 0
+			", $id_jadwal_rpjmd),
+			ARRAY_A
+		);
+
+		return $jadwal_rpjmd;
 	}
 
 	function get_renstra_by_rpjmd_tahun($id_jadwal_rpjmd, $tahun_anggaran) 
