@@ -744,7 +744,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									if (
 										!empty($cek_cas[$nama_kolom])
 										&& (
-											strpos($cek_cas[$nama_kolom], $kode_cascading_renstra) !== 0 
+											strpos(trim($cek_cas[$nama_kolom]), trim($kode_cascading_renstra)) !== 0 
 											|| $cek_cas['id_sub_skpd_cascading'] != $id_sub_skpd_cascading
 										)
 									){
