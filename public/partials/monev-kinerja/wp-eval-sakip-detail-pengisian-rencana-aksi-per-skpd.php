@@ -2112,11 +2112,12 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                             jQuery('#cek-target-teks').prop('checked', false);
                             jQuery(".target-teks").hide();
                         }
+                        jQuery('#wrap-loading').hide();
                     });
                 } else if (response.status == 'error') {
                     alert(response.message);
+                    jQuery('#wrap-loading').hide();
                 }
-                jQuery('#wrap-loading').hide();
             }
         });
     }
