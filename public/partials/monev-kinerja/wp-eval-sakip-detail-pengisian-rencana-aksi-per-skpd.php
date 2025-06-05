@@ -2844,7 +2844,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     resolve2(false);
                 }else{
                     cek_input_pagu_parent(tipe).then(function(){
-                        resolve2(res);
+                        resolve2();
                     });
                 }
             })
