@@ -74,6 +74,7 @@ $sql = "
 	from esakip_rpd_tujuan t
 	left join esakip_rpjpd_isu i on t.id_isu = i.id
 	where t.active=1
+        AND t.id_jadwal=%d
 	order by t.no_urut asc
 ";
 if (!empty($id_jadwal_rpjpd)) {
@@ -84,10 +85,11 @@ if (!empty($id_jadwal_rpjpd)) {
 		from esakip_rpd_tujuan t
 		left join esakip_rpjpd_isu_history i on t.id_isu = i.id_asli
 		where t.active=1
+            AND t.id_jadwal=%d
 		order by t.no_urut asc
 	";
 }
-$tujuan_all = $wpdb->get_results($sql, ARRAY_A);
+$tujuan_all = $wpdb->get_results($wpdb->prepare($sql, $input['periode']), ARRAY_A);
 foreach ($tujuan_all as $tujuan) {
     if (empty($data_all['data'][$tujuan['id_unik']])) {
         $data_all['data'][$tujuan['id_unik']] = array(
@@ -107,8 +109,9 @@ foreach ($tujuan_all as $tujuan) {
 			from esakip_rpd_sasaran
 			where kode_tujuan=%s
 				and active=1
+                and id_jadwal=%d
 				order by sasaran_no_urut asc
-		", $tujuan['id_unik']);
+		", $tujuan['id_unik'], $input['periode']);
         $sasaran_all = $wpdb->get_results($sql, ARRAY_A);
         foreach ($sasaran_all as $sasaran) {
             if (empty($data_all['data'][$tujuan['id_unik']]['data'][$sasaran['id_unik']])) {
@@ -129,8 +132,9 @@ foreach ($tujuan_all as $tujuan) {
 					from esakip_rpd_program
 					where kode_sasaran=%s
 						and active=1
+                        and id_jadwal=%d
 						order by nama_program ASC
-				", $sasaran['id_unik']);
+				", $sasaran['id_unik'], $input['periode']);
                 $program_all = $wpdb->get_results($sql, ARRAY_A);
                 foreach ($program_all as $program) {
                     $program_ids[$program['id_unik']] = "'" . $program['id_unik'] . "'";
@@ -245,6 +249,7 @@ if (!empty($tujuan_ids)) {
 		left join esakip_rpjpd_isu i on t.id_isu = i.id
 		where t.id_unik not in (" . implode(',', $tujuan_ids) . ")
 			and t.active=1
+            and t.id_jadwal=%d
 		order by t.no_urut
 	";
     if (!empty($id_jadwal_rpjpd)) {
@@ -256,6 +261,7 @@ if (!empty($tujuan_ids)) {
 			left join esakip_rpjpd_isu_history i on t.id_isu = i.id_asli
 			where t.id_unik not in (" . implode(',', $tujuan_ids) . ")
 				and t.active=1
+                and t.id_jadwal=%d
 			order by t.no_urut
 		";
     }
@@ -267,6 +273,7 @@ if (!empty($tujuan_ids)) {
 		from esakip_rpd_tujuan t
 		left join esakip_rpjpd_isu i on t.id_isu = i.id
 		where t.active=1
+            and t.id_jadwal=%d
 		order by t.no_urut
 	";
     if (!empty($id_jadwal_rpjpd)) {
@@ -277,11 +284,12 @@ if (!empty($tujuan_ids)) {
 			from esakip_rpd_tujuan t
 			left join esakip_rpjpd_isu_history i on t.id_isu = i.id_asli
 			where t.active=1
+                and t.id_jadwal=%d
 			order by t.no_urut
 		";
     }
 }
-$tujuan_all_kosong = $wpdb->get_results($sql, ARRAY_A);
+$tujuan_all_kosong = $wpdb->get_results($wpdb->prepare($sql, $input['periode']), ARRAY_A);
 foreach ($tujuan_all_kosong as $tujuan) {
     if (empty($data_all['data'][$tujuan['id_unik']])) {
         $data_all['data'][$tujuan['id_unik']] = array(
@@ -302,8 +310,9 @@ foreach ($tujuan_all_kosong as $tujuan) {
 		from esakip_rpd_sasaran
 		where kode_tujuan=%s
 			and active=1
+            and id_jadwal=%d
 		order by sasaran_no_urut
-	", $tujuan['id_unik']);
+	", $tujuan['id_unik'], $input['periode']);
     $sasaran_all = $wpdb->get_results($sql, ARRAY_A);
     foreach ($sasaran_all as $sasaran) {
         $sasaran_ids[$sasaran['id_unik']] = "'" . $sasaran['id_unik'] . "'";
@@ -326,7 +335,8 @@ foreach ($tujuan_all_kosong as $tujuan) {
 			from esakip_rpd_program
 			where kode_sasaran=%s
 				and active=1
-		", $sasaran['id_unik']);
+                and id_jadwal=%d
+		", $sasaran['id_unik'], $input['periode']);
         $program_all = $wpdb->get_results($sql, ARRAY_A);
         foreach ($program_all as $program) {
             $program_ids[$program['id_unik']] = "'" . $program['id_unik'] . "'";
@@ -381,6 +391,7 @@ if (!empty($sasaran_ids)) {
 		from esakip_rpd_sasaran
 		where id_unik not in (" . implode(',', $sasaran_ids) . ")
 			and active=1
+            and id_jadwal=%d
 		order by sasaran_no_urut
 	";
 } else {
@@ -389,10 +400,11 @@ if (!empty($sasaran_ids)) {
 			* 
 		from esakip_rpd_sasaran
 		where active=1
+            and id_jadwal=%d
 		order by sasaran_no_urut
 	";
 }
-$sasaran_all_kosong = $wpdb->get_results($sql, ARRAY_A);
+$sasaran_all_kosong = $wpdb->get_results($wpdb->prepare($sql, $input['periode']), ARRAY_A);
 foreach ($sasaran_all_kosong as $sasaran) {
     if (empty($data_all['data']['tujuan_kosong']['data'][$sasaran['id_unik']])) {
         $data_all['data']['tujuan_kosong']['data'][$sasaran['id_unik']] = array(
@@ -413,7 +425,8 @@ foreach ($sasaran_all_kosong as $sasaran) {
 		from esakip_rpd_program
 		where kode_sasaran=%s
 			and active=1
-	", $sasaran['id_unik']);
+            and id_jadwal=%d
+	", $sasaran['id_unik'], $input['periode']);
     $program_all = $wpdb->get_results($sql, ARRAY_A);
     foreach ($program_all as $program) {
         $program_ids[$program['id_unik']] = "'" . $program['id_unik'] . "'";
@@ -467,6 +480,7 @@ if (!empty($program_ids)) {
 		from esakip_rpd_program
 		where id_unik not in (" . implode(',', $program_ids) . ")
 			and active=1
+            and id_jadwal=%d
 	";
 } else {
     $sql = "
@@ -474,9 +488,10 @@ if (!empty($program_ids)) {
 			* 
 		from esakip_rpd_program
 		where active=1
+            and id_jadwal=%d
 	";
 }
-$program_all = $wpdb->get_results($sql, ARRAY_A);
+$program_all = $wpdb->get_results($wpdb->prepare($sql, $input['periode']), ARRAY_A);
 foreach ($program_all as $program) {
     if (empty($data_all['data']['tujuan_kosong']['data']['sasaran_kosong']['data'][$program['id_unik']])) {
         $data_all['data']['tujuan_kosong']['data']['sasaran_kosong']['data'][$program['id_unik']] = array(
@@ -710,19 +725,18 @@ foreach ($data_all['data'] as $tujuan) {
                 $catatan_program = $program['detail'][0]['catatan'];
             }
 
-            // $isMutakhir = '';
+            $isMutakhir = '';
             // if ($program['statusMutakhirProgram']) {
             //     $isMutakhir = '<button class="btn-sm btn-warning" onclick="tampilProgram(\'' . $program['id_unik'] . '\')" style="margin: 1px;"><i class="dashicons dashicons-update" title="Mutakhirkan"></i></button>';
             // }
 
-
-            // <td class="esakip-atas esakip-kanan esakip-bawah">' . parsing_nama_kode($program['nama']) . button_edit_monev($tujuan['detail'][0]['id_unik'] . '||' . $sasaran['detail'][0]['id_unik'] . '||' . $program['detail'][0]['id_unik']) . " " . $isMutakhir . '</td>
             $body .= '
 				<tr class="tr-program" data-kode-skpd="' . $program['kode_skpd'] . '" ' . $warning . '>
 					<td class="esakip-kiri esakip-atas esakip-kanan esakip-bawah">' . $no_tujuan . '.' . $no_sasaran . '.' . $no_program . '</td>
 					<td class="esakip-atas esakip-kanan esakip-bawah"><span class="debug-tujuan">' . $tujuan['detail'][0]['isu_teks'] . '</span></td>
 					<td class="esakip-atas esakip-kanan esakip-bawah"><span class="debug-tujuan">' . $tujuan['nama'] . '</span></td>
 					<td class="esakip-atas esakip-kanan esakip-bawah"><span class="debug-sasaran">' . $sasaran['nama'] . '</span></td>
+                    <td class="esakip-atas esakip-kanan esakip-bawah">' . parsing_nama_kode($program['nama']) . button_edit_monev($tujuan['detail'][0]['id_unik'] . '||' . $sasaran['detail'][0]['id_unik'] . '||' . $program['detail'][0]['id_unik']) . " " . $isMutakhir . '</td>
 					<td class="esakip-atas esakip-kanan esakip-bawah">' . $text_indikator . '</td>
 					<td class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah">' . $target_awal . '</td>
 					' . $target_html . '
@@ -1445,6 +1459,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 "action": "esakip_get_rpd",
                 "api_key": "<?php echo $api_key; ?>",
                 "table": "esakip_rpd_tujuan",
+                "id_jadwal": "<?php echo $input['periode']; ?>",
                 "type": 1
             },
             dataType: "json",
@@ -1569,6 +1584,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 "api_key": "<?php echo $api_key; ?>",
                 "table": "esakip_rpd_sasaran",
                 "id_unik_tujuan": id_unik_tujuan,
+                "id_jadwal": "<?php echo $input['periode']; ?>",
                 "type": 1
             },
             dataType: "json",
@@ -1701,6 +1717,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 "api_key": "<?php echo $api_key; ?>",
                 "table": "esakip_rpd_program",
                 "id_unik_sasaran": id_unik_sasaran,
+                "id_jadwal": "<?php echo $input['periode']; ?>",
                 "type": 1
             },
             dataType: "json",
@@ -1846,6 +1863,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 "api_key": "<?php echo $api_key; ?>",
                 "table": "esakip_rpd_tujuan",
                 "id_unik_tujuan": id_tujuan,
+                "id_jadwal": "<?php echo $input['periode']; ?>",
                 "type": 1
             },
             dataType: "json",
@@ -1928,6 +1946,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 "api_key": "<?php echo $api_key; ?>",
                 "table": "esakip_rpd_sasaran",
                 "id_unik_sasaran": id_sasaran,
+                "id_jadwal": "<?php echo $input['periode']; ?>",
                 "type": 1
             },
             dataType: "json",
@@ -1959,6 +1978,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 "api_key": "<?php echo $api_key; ?>",
                 "table": "esakip_rpd_program",
                 "id_unik_program": id_program,
+                "id_jadwal": "<?php echo $input['periode']; ?>",
                 "type": 1
             },
             dataType: "json",
@@ -2049,70 +2069,72 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
     function tambah_program(id_unik_sasaran) {
         jQuery('#wrap-loading').show();
         get_bidang_urusan().then(function() {
+            window.val_program = '';
             jQuery('#tujuan-program-teks').html(jQuery('tr[id-tujuan="' + jQuery('#tambah-data-sasaran').attr('id-tujuan') + '"] td').eq(1).html());
             jQuery('#sasaran-program-teks').html(jQuery('tr[id-sasaran="' + id_unik_sasaran + '"] td').eq(1).html());
             jQuery('#modal-program').attr('id-sasaran', id_unik_sasaran);
             jQuery('#modal-program').attr('data-id', '');
-            get_urusan()
-            get_bidang();
-            get_program();
+            get_urusan();
             jQuery('#catatan-teks-program').val('');
             jQuery('#modal-program').modal('show');
             jQuery('#wrap-loading').hide();
         });
     }
 
-    jQuery('#urusan-teks').on('change', function() {
-        get_bidang(jQuery(this).val());
-        get_program();
-    });
-
-    jQuery('#bidang-teks').on('change', function() {
-        get_program(jQuery(this).val());
-    });
-
     function get_urusan(tag = 'urusan-teks') {
-        var html = '<option value="">Pilih Urusan</option>';
-        for (var nm_urusan in all_program) {
-            html += '<option>' + nm_urusan + '</option>';
-        }
-        jQuery('#' + tag).html(html).select2({
-            width: '100%'
+        return new Promise(function(resolve, reject){
+            jQuery('#' + tag).removeAttr('onchange');
+            var html = '<option value="">Pilih Urusan</option>';
+            for (var nm_urusan in all_program) {
+                html += '<option>' + nm_urusan + '</option>';
+            }
+            jQuery('#' + tag).html(html).select2({
+                dropdownParent: jQuery('#' + tag).closest('.modal-body'),
+                width: '100%'
+            });
+            jQuery('#' + tag).attr('onchange="get_bidang(this.value)"');
+            get_bidang().then(function(){
+                resolve();
+            })
         });
     }
 
     function get_bidang(nm_urusan, tag = 'bidang-teks') {
-        var html = '<option value="">Pilih Bidang</option>';
-        if (nm_urusan) {
-            for (var nm_bidang in all_program[nm_urusan.trim()]) {
-                html += '<option>' + nm_bidang + '</option>';
-            }
-        } else {
-            for (var nm_urusan in all_program) {
+        return new Promise(function(resolve, reject){
+            jQuery('#' + tag).removeAttr('onchange');
+            var html = '<option value="">Pilih Bidang</option>';
+            if (nm_urusan) {
                 for (var nm_bidang in all_program[nm_urusan.trim()]) {
                     html += '<option>' + nm_bidang + '</option>';
                 }
+            } else {
+                for (var nm_urusan in all_program) {
+                    for (var nm_bidang in all_program[nm_urusan.trim()]) {
+                        html += '<option>' + nm_bidang + '</option>';
+                    }
+                }
             }
-        }
-        jQuery('#' + tag).html(html).select2({
-            width: '100%'
+            jQuery('#' + tag).html(html).select2({
+                dropdownParent: jQuery('#' + tag).closest('.modal-body'),
+                width: '100%'
+            });
+            jQuery('#' + tag).attr('onchange="get_program(this.value)"');
+            get_program().then(function(){
+                resolve();
+            })
         });
     }
 
     function get_program(nm_bidang, val, tag = 'program-teks', tag2 = 'urusan-teks') {
-        var html = '<option value="">Pilih Program</option>';
-        var current_nm_urusan = jQuery('#' + tag2).val().trim();
-        if (current_nm_urusan) {
-            if (nm_bidang) {
-                for (var nm_program in all_program[current_nm_urusan][nm_bidang]) {
-                    var selected = '';
-                    if (val && val == all_program[current_nm_urusan][nm_bidang][nm_program].id_program) {
-                        selected = 'selected';
-                    }
-                    html += '<option ' + selected + ' value="' + all_program[current_nm_urusan][nm_bidang][nm_program].id_program + '">' + nm_program + '</option>';
-                }
-            } else {
-                for (var nm_bidang in all_program[current_nm_urusan]) {
+        return new Promise(function(resolve, reject){
+            var html = '<option value="">Pilih Program</option>';
+            if(window.val_program){
+                val = val_program;
+            }
+            var current_nm_urusan = jQuery('#' + tag2).val();
+            if (current_nm_urusan) {
+                current_nm_urusan = current_nm_urusan.trim();
+                if (nm_bidang) {
                     for (var nm_program in all_program[current_nm_urusan][nm_bidang]) {
                         var selected = '';
                         if (val && val == all_program[current_nm_urusan][nm_bidang][nm_program].id_program) {
@@ -2120,38 +2142,80 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                         }
                         html += '<option ' + selected + ' value="' + all_program[current_nm_urusan][nm_bidang][nm_program].id_program + '">' + nm_program + '</option>';
                     }
-                }
-            }
-        } else {
-            if (nm_bidang) {
-                for (var nm_urusan in all_program) {
-                    if (all_program[nm_urusan][nm_bidang]) {
-                        for (var nm_program in all_program[nm_urusan][nm_bidang]) {
+                } else {
+                    for (var nm_bidang in all_program[current_nm_urusan]) {
+                        for (var nm_program in all_program[current_nm_urusan][nm_bidang]) {
                             var selected = '';
-                            if (val && val == all_program[nm_urusan][nm_bidang][nm_program].id_program) {
+                            if (val && val == all_program[current_nm_urusan][nm_bidang][nm_program].id_program) {
                                 selected = 'selected';
                             }
-                            html += '<option ' + selected + ' value="' + all_program[nm_urusan][nm_bidang][nm_program].id_program + '">' + nm_program + '</option>';
+                            html += '<option ' + selected + ' value="' + all_program[current_nm_urusan][nm_bidang][nm_program].id_program + '">' + nm_program + '</option>';
                         }
                     }
                 }
             } else {
-                for (var nm_urusan in all_program) {
-                    for (var nm_bidang in all_program[nm_urusan]) {
-                        for (var nm_program in all_program[nm_urusan][nm_bidang]) {
-                            var selected = '';
-                            if (val && val == all_program[nm_urusan][nm_bidang][nm_program].id_program) {
-                                selected = 'selected';
+                if (nm_bidang) {
+                    for (var nm_urusan in all_program) {
+                        if (all_program[nm_urusan][nm_bidang]) {
+                            for (var nm_program in all_program[nm_urusan][nm_bidang]) {
+                                var selected = '';
+                                if (val && val == all_program[nm_urusan][nm_bidang][nm_program].id_program) {
+                                    selected = 'selected';
+                                }
+                                html += '<option ' + selected + ' value="' + all_program[nm_urusan][nm_bidang][nm_program].id_program + '">' + nm_program + '</option>';
                             }
-                            html += '<option ' + selected + ' value="' + all_program[nm_urusan][nm_bidang][nm_program].id_program + '">' + nm_program + '</option>';
+                        }
+                    }
+                } else {
+                    for (var nm_urusan in all_program) {
+                        for (var nm_bidang in all_program[nm_urusan]) {
+                            for (var nm_program in all_program[nm_urusan][nm_bidang]) {
+                                var selected = '';
+                                if (val && val == all_program[nm_urusan][nm_bidang][nm_program].id_program) {
+                                    selected = 'selected';
+                                }
+                                html += '<option ' + selected + ' value="' + all_program[nm_urusan][nm_bidang][nm_program].id_program + '">' + nm_program + '</option>';
+                            }
                         }
                     }
                 }
             }
-        }
-        jQuery('#' + tag).html(html).select2({
-            width: '100%'
+            jQuery('#program-teks').removeAttr('onchange');
+            jQuery('#' + tag).html(html).select2({
+                dropdownParent: jQuery('#' + tag).closest('.modal-body'),
+                width: '100%'
+            });
+            if(val){
+                set_urusan_bidang();
+            }
+            jQuery('#program-teks').attr('onchange', "set_urusan_bidang(this.value)");
+            resolve();
         });
+    }
+
+    function set_urusan_bidang(val){
+        var val_urusan_selected = false;
+        var val_bidang_selected = false;
+        for (var nm_urusan in all_program) {
+            for (var nm_bidang in all_program[nm_urusan]) {
+                for (var nm_program in all_program[nm_urusan][nm_bidang]) {
+                    if (val && val == all_program[nm_urusan][nm_bidang][nm_program].id_program) {
+                        val_urusan_selected = nm_urusan;
+                        val_bidang_selected = nm_bidang;
+                    }
+                }
+            }
+        }
+        if(val_urusan_selected){
+            jQuery('#urusan-teks').removeAttr('onchange');
+            jQuery('#urusan-teks').val(val_urusan_selected).trigger('change');
+            jQuery('#urusan-teks').attr('onchange', 'get_bidang(this.value)');
+        }
+        if(val_bidang_selected){
+            jQuery('#bidang-teks').removeAttr('onchange');
+            jQuery('#bidang-teks').val(val_bidang_selected).trigger('change');
+            jQuery('#bidang-teks').attr('onchange', 'get_program(this.value)');
+        }
     }
 
     function edit_tujuan(id_unik_tujuan) {
@@ -2164,6 +2228,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 "api_key": "<?php echo $api_key; ?>",
                 "table": "esakip_rpd_tujuan",
                 "id_unik_tujuan": id_unik_tujuan,
+                "id_jadwal": "<?php echo $input['periode']; ?>",
                 "type": 1
             },
             dataType: "json",
@@ -2250,6 +2315,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 "api_key": "<?php echo $api_key; ?>",
                 "table": "esakip_rpd_sasaran",
                 "id_unik_sasaran": id_unik_sasaran,
+                "id_jadwal": "<?php echo $input['periode']; ?>",
                 "type": 1
             },
             dataType: "json",
@@ -2372,19 +2438,21 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 "api_key": "<?php echo $api_key; ?>",
                 "table": "esakip_rpd_program",
                 "id_unik_program": id_unik_program,
+                "id_jadwal": "<?php echo $input['periode']; ?>",
                 "type": 1
             },
             dataType: "json",
             success: function(res) {
                 get_bidang_urusan().then(function() {
-                    jQuery('#tujuan-program-teks').html(jQuery('tr[id-tujuan="' + jQuery('#tambah-data-sasaran').attr('id-tujuan') + '"] td').eq(1).html());
-                    jQuery('#sasaran-program-teks').html(jQuery('tr[id-sasaran="' + jQuery('#tambah-data-program').attr('id-sasaran') + '"] td').eq(1).html());
+                    var id_tujuan = jQuery('#tambah-data-sasaran').attr('id-tujuan');
+                    var id_sasaran = jQuery('#tambah-data-program').attr('id-sasaran');
+                    jQuery('#tujuan-program-teks').html(jQuery('tr[id-tujuan="' + id_tujuan + '"] td').eq(1).html());
+                    jQuery('#sasaran-program-teks').html(jQuery('tr[id-sasaran="' + id_sasaran + '"] td').eq(1).html());
                     jQuery('#modal-program').attr('id-sasaran', jQuery('#tambah-data-program').attr('id-sasaran'));
                     jQuery('#modal-program').attr('data-id', id_unik_program);
                     var id_program_master = jQuery('tr[id-program="' + id_unik_program + '"]').attr('id-program-master');
+                    window.val_program = id_program_master;
                     get_urusan();
-                    get_bidang();
-                    get_program(false, id_program_master);
                     jQuery('#catatan-teks-program').val(res.data[0].catatan);
                     jQuery('#modal-program').modal('show');
                     jQuery('#wrap-loading').hide();
@@ -2403,6 +2471,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 "api_key": "<?php echo $api_key; ?>",
                 "table": "esakip_rpd_tujuan",
                 "id_unik_tujuan_indikator": id_unik_tujuan_indikator,
+                "id_jadwal": "<?php echo $input['periode']; ?>",
                 "type": 1
             },
             dataType: "json",
@@ -2484,6 +2553,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 "api_key": "<?php echo $api_key; ?>",
                 "table": "esakip_rpd_sasaran",
                 "id_unik_sasaran_indikator": id_unik_sasaran_indikator,
+                "id_jadwal": "<?php echo $input['periode']; ?>",
                 "type": 1
             },
             dataType: "json",
@@ -2521,6 +2591,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 "api_key": "<?php echo $api_key; ?>",
                 "table": "esakip_rpd_program",
                 "id_unik_program_indikator": id_unik_program_indikator,
+                "id_jadwal": "<?php echo $input['periode']; ?>",
                 "type": 1
             },
             dataType: "json",
@@ -2608,6 +2679,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     "id_isu": id_isu,
                     "id": id_tujuan,
                     "no_urut": no_urut,
+                    "id_jadwal": "<?php echo $input['periode']; ?>",
                     "catatan_teks_tujuan": catatan_teks_tujuan
                 },
                 dataType: "json",
@@ -2655,6 +2727,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     "data": sasaran_teks,
                     "id_tujuan": id_unik_tujuan,
                     "id": id_sasaran,
+                    "id_jadwal": "<?php echo $input['periode']; ?>",
                     "sasaran_no_urut": sasaran_no_urut,
                     "sasaran_catatan": sasaran_catatan
                 },
@@ -2699,6 +2772,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     "nama_program": program_teks,
                     "catatan": jQuery('#catatan-teks-program').val(),
                     "id_sasaran": id_unik_sasaran,
+                    "id_jadwal": "<?php echo $input['periode']; ?>",
                     "id": id_program
                 },
                 dataType: "json",
@@ -2725,6 +2799,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     "action": "esakip_hapus_rpd",
                     "api_key": "<?php echo $api_key; ?>",
                     "table": 'esakip_rpd_tujuan',
+                    "id_jadwal": "<?php echo $input['periode']; ?>",
                     "id": id_tujuan_unik
                 },
                 dataType: "json",
@@ -2751,6 +2826,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     "action": "esakip_hapus_rpd",
                     "api_key": "<?php echo $api_key; ?>",
                     "table": 'esakip_rpd_sasaran',
+                    "id_jadwal": "<?php echo $input['periode']; ?>",
                     "id": id_sasaran_unik
                 },
                 dataType: "json",
@@ -2777,6 +2853,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     "action": "esakip_hapus_rpd",
                     "api_key": "<?php echo $api_key; ?>",
                     "table": 'esakip_rpd_program',
+                    "id_jadwal": "<?php echo $input['periode']; ?>",
                     "id": id_program_unik
                 },
                 dataType: "json",
@@ -2803,6 +2880,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     "action": "esakip_hapus_rpd",
                     "api_key": "<?php echo $api_key; ?>",
                     "table": 'esakip_rpd_tujuan',
+                    "id_jadwal": "<?php echo $input['periode']; ?>",
                     "id_unik_tujuan_indikator": id_unik_tujuan_indikator
                 },
                 dataType: "json",
@@ -2829,6 +2907,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     "action": "esakip_hapus_rpd",
                     "api_key": "<?php echo $api_key; ?>",
                     "table": 'esakip_rpd_sasaran',
+                    "id_jadwal": "<?php echo $input['periode']; ?>",
                     "id_unik_sasaran_indikator": id_unik_sasaran_indikator
                 },
                 dataType: "json",
@@ -2855,6 +2934,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     "action": "esakip_hapus_rpd",
                     "api_key": "<?php echo $api_key; ?>",
                     "table": 'esakip_rpd_program',
+                    "id_jadwal": "<?php echo $input['periode']; ?>",
                     "id_unik_program_indikator": id_unik_program_indikator
                 },
                 dataType: "json",
@@ -2917,6 +2997,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?> "vol_<?php echo $i; ?>": vol_<?php echo $i; ?>,
                     <?php }; ?> "vol_akhir": vol_akhir,
                     "id": id_indikator,
+                    "id_jadwal": "<?php echo $input['periode']; ?>",
                     "indikator_catatan_teks": indikator_catatan_teks
                 },
                 dataType: "json",
@@ -2979,6 +3060,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?> "vol_<?php echo $i; ?>": vol_<?php echo $i; ?>,
                     <?php }; ?> "vol_akhir": vol_akhir,
                     "id": id_indikator,
+                    "id_jadwal": "<?php echo $input['periode']; ?>",
                     'indikator_catatan_teks': indikator_catatan_teks
                 },
                 dataType: "json",
@@ -3055,6 +3137,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                         "pagu_<?php echo $i; ?>": pagu_<?php echo $i; ?>,
                     <?php }; ?> "vol_akhir": vol_akhir,
                     "catatan": jQuery('#indikator-catatan-teks-program').val(),
+                    "id_jadwal": "<?php echo $input['periode']; ?>",
                     "id": id_indikator
                 },
                 dataType: "json",
@@ -3101,6 +3184,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 data: {
                     "action": "get_indikator_sasaran",
                     "api_key": "<?php echo $api_key; ?>",
+                    "id_jadwal": "<?php echo $input['periode']; ?>",
                     "id_sasaran": id_sasaran
                 },
                 dataType: "json",
@@ -3114,26 +3198,6 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     reject(error);
                 }
             });
-        });
-    }
-
-    function generate_data_program_renstra() {
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: "post",
-            data: {
-                "action": "get_data_program_renstra",
-                "api_key": "<?php echo $api_key; ?>"
-            },
-            dataType: "json",
-            success: function(res) {
-                jQuery('#wrap-loading').hide();
-                if (res.data.length != 0) {
-                    edit_val = true;
-                    refresh_page();
-                }
-            }
         });
     }
 
@@ -3155,6 +3219,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 "table": "esakip_rpd_program",
                 "api_key": "<?php echo $api_key; ?>",
                 'id_unik_program': id_unik,
+                "id_jadwal": "<?php echo $input['periode']; ?>",
                 'type': 1
             },
             dataType: "json",

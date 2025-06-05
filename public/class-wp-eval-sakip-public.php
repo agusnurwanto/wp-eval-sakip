@@ -27163,7 +27163,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					}
 				}
 				$table = '';
-				$where = 'where 1=1 and active=1';
+				$where = $wpdb->prepare('where 1=1 and id_jadwal=%d and active=1', $_POST['id_jadwal']);
 				$type = $_POST['type'];
 				if ($type != 1) {
 					$where .= 'and active=1';
@@ -27221,7 +27221,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                     where id_unik_indikator IS NULL
                                         AND active=1
                                         AND kode_tujuan=%s
-                                ", $tujuan['id_unik']), ARRAY_A);
+                                        AND id_jadwal=%d
+                                ", $tujuan['id_unik'], $_POST['id_jadwal']), ARRAY_A);
 								$kd_all_sasaran = array();
 								foreach ($sasaran as $sas) {
 									$kd_all_sasaran[] = "'" . $sas['id_unik'] . "'";
@@ -27237,8 +27238,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                     from esakip_rpd_program 
                                     where id_unik_indikator IS NULL
                                         AND active=1
+                                        AND id_jadwal=%d
                                         AND kode_sasaran in ($kd_all_sasaran)
-                                ", $sasaran['id_unik']), ARRAY_A);
+                                ", $_POST['id_jadwal']), ARRAY_A);
 								$kd_all_prog = array();
 								foreach ($program as $prog) {
 									$kd_all_prog[] = "'" . $prog['id_unik'] . "'";
@@ -27258,8 +27260,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                     from esakip_rpd_program 
                                     where id_unik_indikator IS NOT NULL
                                         AND active=1
+                                        AND id_jadwal=%d
                                         AND id_unik in ($kd_all_prog)
-                                "), ARRAY_A);
+                                ", $_POST['id_jadwal']), ARRAY_A);
 								$data_all[$tujuan['id_unik']] = array(
 									'id' => $tujuan['id'],
 									'id_unik' => $tujuan['id_unik'],
@@ -27327,7 +27330,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                     where id_unik_indikator IS NULL
                                         AND active=1
                                         AND kode_sasaran=%s
-                                ", $sasaran['id_unik']), ARRAY_A);
+                                        AND id_jadwal=%d
+                                ", $sasaran['id_unik'], $_POST['id_jadwal']), ARRAY_A);
 								$kd_all_prog = array();
 								foreach ($program as $prog) {
 									$kd_all_prog[] = "'" . $prog['id_unik'] . "'";
@@ -27346,8 +27350,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                     from esakip_rpd_program 
                                     where id_unik_indikator IS NOT NULL
                                         AND active=1
+                                        AND id_jadwal=%d
                                         AND id_unik in ($kd_all_prog)
-                                "), ARRAY_A);
+                                ", $_POST['id_jadwal']), ARRAY_A);
 								$data_all[$sasaran['id_unik']] = array(
 									'id' => $sasaran['id'],
 									'id_unik' => $sasaran['id_unik'],
@@ -27381,7 +27386,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                     where id_unik_indikator IS NOT NULL
                                         AND active=1
                                         AND id_unik=%s
-                                ", $program['id_unik']), ARRAY_A);
+                                        AND id_jadwal=%d
+                                ", $program['id_unik'], $_POST['id_jadwal']), ARRAY_A);
 								$data_all[$program['id_unik']] = array(
 									'id' => $program['id'],
 									'id_unik' => $program['id_unik'],
@@ -27447,9 +27453,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                     no_urut
                                 from $table
                                 where id_unik=%s
-                            ", $_POST['id_tujuan']), ARRAY_A);
+                                	AND id_jadwal=%d
+                            ", $_POST['id_tujuan'], $_POST['id_jadwal']), ARRAY_A);
 						for ($i = 1; $i <= 5; $i++) {
-							if (empty($_POST['vol_' . $i]) && empty($_POST['satuan_' . $i])) {
+							if(
+								empty($_POST['vol_' . $i]) 
+								&& empty($_POST['satuan_' . $i])
+							){
 								$_POST['vol_' . $i] = '';
 								$_POST['satuan_' . $i] = '';
 							}
@@ -27470,11 +27480,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'no_urut' => $tujuan[0]['no_urut'],
 							'indikator_catatan_teks' => $_POST['indikator_catatan_teks'],
 							'satuan' => $_POST['satuan'],
+							'id_jadwal' => $_POST['id_jadwal'],
 							'active' => 1
 						);
 						if (!empty($_POST['id'])) {
 							$data['id_unik_indikator'] = $_POST['id'];
-							$wpdb->update($table, $data, array("id_unik_indikator" => $_POST['id']));
+							$wpdb->update($table, $data, array(
+								"id_unik_indikator" => $_POST['id'],
+								"id_jadwal" => $_POST['id_jadwal']
+							));
 							$ret['message'] = 'Berhasil update data RPD!';
 						} else {
 							$data['id_unik_indikator'] = $this->generateRandomString(5);
@@ -27484,7 +27498,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                     from $table
                                     where indikator_teks=%s
                                         and id_unik=%s
-                                ", $_POST['data'], $_POST['id_tujuan']));
+                                        and id_jadwal=%d
+                                ", $_POST['data'], $_POST['id_tujuan'], $_POST['id_jadwal']));
 							if (!empty($cek_id)) {
 								$ret['status'] = 'error';
 								$ret['message'] = 'Indikator tujuan teks sudah ada!';
@@ -27500,11 +27515,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'update_at' => date('Y-m-d H:i:s'),
 							'no_urut'   => $_POST['no_urut'],
 							'catatan_teks_tujuan'   => $_POST['catatan_teks_tujuan'],
+							'id_jadwal'   => $_POST['id_jadwal'],
 							'active' => 1
 						);
 						if (!empty($_POST['id'])) {
 							$data['id_unik'] = $_POST['id'];
-							$wpdb->update($table, $data, array("id_unik" => $_POST['id']));
+							$wpdb->update($table, $data, array(
+								"id_unik" => $_POST['id'],
+								"id_jadwal" => $_POST['id_jadwal']
+							));
 							$ret['message'] = 'Berhasil update data RPD!';
 						} else {
 							$data['id_unik'] = $this->generateRandomString(5);
@@ -27513,7 +27532,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                         id 
                                     from $table
                                     where tujuan_teks=%s
-                                ", $_POST['data']));
+                                    	AND id_jadwal=%d
+                                ", $_POST['data'], $_POST['id_jadwal']));
 							if (!empty($cek_id)) {
 								$ret['status'] = 'error';
 								$ret['message'] = 'Tujuan teks sudah ada!';
@@ -27534,9 +27554,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                     sasaran_no_urut
                                 from $table
                                 where id_unik=%s
-                            ", $_POST['id_sasaran']), ARRAY_A);
+                                	and id_jadwal=%d
+                            ", $_POST['id_sasaran'], $_POST['id_jadwal']), ARRAY_A);
 						for ($i = 1; $i <= 5; $i++) {
-							if (empty($_POST['vol_' . $i]) && empty($_POST['satuan_' . $i])) {
+							if(
+								empty($_POST['vol_' . $i]) 
+								&& empty($_POST['satuan_' . $i])
+							){
 								$_POST['vol_' . $i] = '';
 								$_POST['satuan_' . $i] = '';
 							}
@@ -27557,11 +27581,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'sasaran_no_urut' => $sasaran[0]['sasaran_no_urut'],
 							'indikator_catatan_teks' => $_POST['indikator_catatan_teks'],
 							'satuan' => $_POST['satuan'],
+							'id_jadwal' => $_POST['id_jadwal'],
 							'active' => 1
 						);
 						if (!empty($_POST['id'])) {
 							$data['id_unik_indikator'] = $_POST['id'];
-							$wpdb->update($table, $data, array("id_unik_indikator" => $_POST['id']));
+							$wpdb->update($table, $data, array(
+								"id_unik_indikator" => $_POST['id'],
+								"id_jadwal" => $_POST['id_jadwal']
+							));
 							$ret['message'] = 'Berhasil update data RPD!';
 						} else {
 							$data['id_unik_indikator'] = $this->generateRandomString(5);
@@ -27571,7 +27599,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                     from $table
                                     where indikator_teks=%s
                                         and id_unik=%s
-                                ", $_POST['data'], $_POST['id_sasaran']));
+                                        and id_jadwal=%d
+                                ", $_POST['data'], $_POST['id_sasaran'], $_POST['id_jadwal']));
 							if (!empty($cek_id)) {
 								$ret['status'] = 'error';
 								$ret['message'] = 'Indikator sasaran teks sudah ada!';
@@ -27587,11 +27616,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'update_at' => date('Y-m-d H:i:s'),
 							'sasaran_no_urut' => $_POST['sasaran_no_urut'],
 							'sasaran_catatan' => $_POST['sasaran_catatan'],
+							'id_jadwal' => $_POST['id_jadwal'],
 							'active' => 1
 						);
 						if (!empty($_POST['id'])) {
 							$data['id_unik'] = $_POST['id'];
-							$wpdb->update($table, $data, array("id_unik" => $_POST['id']));
+							$wpdb->update($table, $data, array(
+								"id_unik" => $_POST['id'],
+								"id_jadwal" => $_POST['id_jadwal']
+							));
 							$ret['message'] = 'Berhasil update data RPD!';
 						} else {
 							$data['id_unik'] = $this->generateRandomString(5);
@@ -27600,7 +27633,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                         id 
                                     from $table
                                     where sasaran_teks=%s
-                                ", $_POST['data']));
+                                    	and id_jadwal=%d
+                                ", $_POST['data'], $_POST['id_jadwal']));
 							if (!empty($cek_id)) {
 								$ret['status'] = 'error';
 								$ret['message'] = 'Sasaran teks sudah ada!';
@@ -27621,9 +27655,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                     id_unik
                                 from $table
                                 where id_unik=%s
-                            ", $_POST['id_program']), ARRAY_A);
+                                	and id_jadwal=%d
+                            ", $_POST['id_program'], $_POST['id_jadwal']), ARRAY_A);
 						for ($i = 1; $i <= 5; $i++) {
-							if (empty($_POST['vol_' . $i]) && empty($_POST['satuan_' . $i])) {
+							if (
+								empty($_POST['vol_' . $i]) 
+								&& empty($_POST['satuan_' . $i])
+							){
 								$_POST['vol_' . $i] = '';
 								$_POST['satuan_' . $i] = '';
 								$_POST['pagu_' . $i] = '';
@@ -27654,11 +27692,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'catatan' => $_POST['catatan'],
 							'satuan' => $_POST['satuan'],
 							'update_at' => date('Y-m-d H:i:s'),
+							'id_jadwal' => $_POST['id_jadwal'],
 							'active' => 1
 						);
 						if (!empty($_POST['id'])) {
 							$data['id_unik_indikator'] = $_POST['id'];
-							$wpdb->update($table, $data, array("id_unik_indikator" => $_POST['id']));
+							$wpdb->update($table, $data, array(
+								"id_unik_indikator" => $_POST['id'],
+								"id_jadwal" => $_POST['id_jadwal']
+							));
 							$ret['message'] = 'Berhasil update data RPD!';
 						} else {
 							$data['id_unik_indikator'] = $this->generateRandomString(5);
@@ -27668,7 +27710,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                     from $table
                                     where indikator=%s
                                         and id_unik=%s
-                                ", $_POST['data'], $_POST['id_program']));
+                                        and id_jadwal=%d
+                                ", $_POST['data'], $_POST['id_program'], $_POST['id_jadwal']));
 							if (!empty($cek_id)) {
 								$ret['status'] = 'error';
 								$ret['message'] = 'Indikator program sudah ada!';
@@ -27684,11 +27727,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'catatan' => $_POST['catatan'],
 							'id_program' => $_POST['data'],
 							'update_at' => date('Y-m-d H:i:s'),
+							'id_jadwal' => $_POST['id_jadwal'],
 							'active' => 1
 						);
 						if (!empty($_POST['id'])) {
 							$data['id_unik'] = $_POST['id'];
-							$wpdb->update($table, $data, array("id_unik" => $_POST['id']));
+							$wpdb->update($table, $data, array(
+								"id_unik" => $_POST['id'],
+								"id_jadwal" => $_POST['id_jadwal']
+							));
 							$ret['message'] = 'Berhasil update data RPD!';
 						} else {
 							$data['id_unik'] = $this->generateRandomString(5);
@@ -27697,7 +27744,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                         id 
                                     from $table
                                     where nama_program=%s
-                                ", $_POST['nama_program']));
+                                    	and id_jadwal=%d
+                                ", $_POST['nama_program'], $_POST['id_jadwal']));
 							if (!empty($cek_id)) {
 								$ret['status'] = 'error';
 								$ret['message'] = 'Program teks sudah ada!';
@@ -27743,10 +27791,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									SELECT kode_tujuan
 									FROM esakip_rpd_sasaran
 									WHERE kode_tujuan = %d
-								", $_POST['id'])
+										AND id_jadwal=%d
+								", $_POST['id'], $_POST['id_jadwal'])
 							);
 							if (empty($cek_id)) {
-								$wpdb->delete($table, ['id_unik' => $_POST['id']]);
+								$wpdb->delete($table, [
+									'id_unik' => $_POST['id'],
+									'id_jadwal' => $_POST['id_jadwal']
+								]);
 							} else {
 								$ret['status'] = 'error';
 								$ret['message'] = 'Tujuan memiliki Sasaran aktif! Mohon hapus Sasaran turunannya terlebih dahulu!';
@@ -27764,10 +27816,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									SELECT kode_sasaran
 									FROM esakip_rpd_program
 									WHERE kode_sasaran = %d
-								", $_POST['id'])
+										AND id_jadwal=%s
+								", $_POST['id'], $_POST['id_jadwal'])
 							);
 							if (empty($cek_id)) {
-								$wpdb->delete($table, ['id_unik' => $_POST['id']]);
+								$wpdb->delete($table, [
+									'id_unik' => $_POST['id'],
+									'id_jadwal' => $_POST['id_jadwal']
+								]);
 							} else {
 								$ret['status'] = 'error';
 								$ret['message'] = 'Sasaran memiliki Program aktif! Mohon hapus Program turunannya terlebih dahulu!';
@@ -27778,9 +27834,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					case 'esakip_rpd_program':
 						$table = $_POST['table'];
 						if (!empty($_POST['id_unik_program_indikator'])) {
-							$wpdb->delete($table, ['id_unik_indikator' => $_POST['id_unik_program_indikator']]);
+							$wpdb->delete($table, [
+								'id_unik_indikator' => $_POST['id_unik_program_indikator'],
+								'id_jadwal' => $_POST['id_jadwal']
+							]);
 						} else {
-							$wpdb->delete($table, ['id_unik' => $_POST['id']]);
+							$wpdb->delete($table, [
+								'id_unik' => $_POST['id'],
+								'id_jadwal' => $_POST['id_jadwal']
+							]);
 						}
 						break;
 					default:
@@ -27878,8 +27940,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						FROM esakip_rpd_sasaran 
 						WHERE id_unik =%d 
 						  AND id_unik_indikator IS NOT NULL 
-						  AND id_unik_indikator != '';
-					", $id_sasaran),
+						  AND id_unik_indikator != ''
+						  AND id_jadwal = %d
+					", $id_sasaran, $_POST['id_jadwal']),
 					ARRAY_A
 				);
 
