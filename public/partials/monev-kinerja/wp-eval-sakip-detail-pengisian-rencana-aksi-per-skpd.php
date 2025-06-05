@@ -3065,7 +3065,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     var hide = 'style="display:none"';
 
                     // jika parent rhk tidak ada yang input pagu maka checklist input pagu ditampilkan
-                    if(cek_parent.input_pagu == 0){
+                    if(cek_parent_global.input_pagu == 0){
                         hide = '';
                     }
                     html_setting_input_rencana_pagu = `
