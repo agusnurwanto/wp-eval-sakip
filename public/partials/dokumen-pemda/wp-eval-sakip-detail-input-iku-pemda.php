@@ -402,10 +402,6 @@ if (!empty($data_tahapan)) {
         max-width: 100%;
         height: auto;
     }
-    .setting-perubahan {
-        transition: all 0.3s ease;
-    }
-
 </style>
 
 <!-- Table -->
@@ -512,11 +508,19 @@ if (!empty($data_tahapan)) {
                 <form name="input_iku">
                     <input type="hidden" id="id_iku" value="">
                     <div class="form-group">
-                        <label for="tujuan-sasaran">Tujuan/Sasaran</label>
+                        <label for="tujuan-iku">Tujuan</label>
+                        <select name="tujuan-iku" id="tujuan-iku"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="indikator-tujuan">Indikator Tujuan</label>
+                        <select name="indikator-tujuan" id="indikator-tujuan"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tujuan-sasaran">Sasaran</label>
                         <select name="tujuan-sasaran" id="tujuan-sasaran"></select>
                     </div>
                     <div class="form-group">
-                        <label for="indikator">Indikator</label>
+                        <label for="indikator">Indikator Sasaran</label>
                         <select name="indikator" id="indikator"></select>
                     </div>
                      <div class="form-group">
@@ -567,29 +571,6 @@ if (!empty($data_tahapan)) {
                             <?php endif; ?>
                         </div>
                     <?php endfor; ?>
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="settingPerubahan">
-                        <label class="custom-control-label" for="settingPerubahan">Perubahan</label>
-                    </div>
-                    <div class="setting-perubahan" style="margin-top:10px">
-                        <button class="btn btn-primary" onclick="tambah_perubahan();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
-                    </div>
-                    <div class="wrap-table setting-perubahan">
-                        <table id="table_perubahan" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th class="text-center">No</th>
-                                    <th class="text-center">Nama Jadwal</th>
-                                    <th class="text-center">Tujuan / Sasaran</th>
-                                    <th class="text-center">Indikator</th>
-                                    <th class="text-center">Satuan</th>
-                                    <th class="text-center">Target</th>
-                                    <th class="text-center" style="width: 150px;">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -785,8 +766,26 @@ function tambahIkuPemda(){
                         });
                     }
                     jQuery("#tujuan-sasaran").html(html_sasaran);
-                    jQuery('#tujuan-sasaran').select2({width: '100%'});
-                    jQuery('#tujuan-sasaran').attr("onchange","getIndikator(this.value)")
+                    jQuery('#tujuan-sasaran').select2({
+                        dropdownParent: jQuery('#tujuan-sasaran').closest('.modal-body'),
+                        width: '100%'
+                    });
+                    jQuery('#tujuan-sasaran').attr("onchange","getIndikator(this.value)");
+
+                    let html_tujuan = '<option value="">Pilih Tujuan</option>';
+                    if(data_sasaran_rpjmd.data_tujuan !== null){
+                        data_sasaran_rpjmd.data_tujuan.map(function(value, index){
+                            if(value.id_unik_indikator == null){
+                                html_tujuan += '<option value="'+value.id_unik+'">'+value.tujuan_teks+'</option>';
+                            }
+                        });
+                    }
+                    jQuery("#tujuan-iku").html(html_tujuan);
+                    jQuery('#tujuan-iku').select2({
+                        dropdownParent: jQuery('#tujuan-iku').closest('.modal-body'),
+                        width: '100%'
+                    });
+                    jQuery('#tujuan-iku').attr("onchange","getIndikatorTujuan(this.value)");
                 }
              
                 resolve();
@@ -799,23 +798,49 @@ function simpanDataIkuPemda(){
     let id_iku = jQuery('#id_iku').val();
     let id_unik = jQuery('#tujuan-sasaran').val();
     let label_tujuan_sasaran = jQuery('#tujuan-sasaran option:selected').text();
+    if(!id_unik){
+        id_unik = jQuery('#tujuan-iku').val();
+        label_tujuan_sasaran = jQuery('#tujuan-iku option:selected').text();
+    }
+    if(!id_unik){
+        return alert('Tujuan atau Sasaran tidak boleh kosong!');
+    }
+
     let id_indikator = jQuery('#indikator').val();
     let label_indikator = jQuery('#indikator option:selected').text();
+    if(!id_indikator){
+        id_indikator = jQuery('#indikator-tujuan').val();
+        label_indikator = jQuery('#indikator-tujuan option:selected').text();
+    }
+    if(!id_indikator){
+        return alert('ID indikator tidak boleh kosong!');
+    }
+
     let formulasi = tinymce.get('formulasi') ? tinymce.get('formulasi').getContent() : jQuery('#formulasi').val();
+    if(!formulasi){
+        return alert('Formulasi tidak boleh kosong!');
+    }
+
     let sumber_data = jQuery('#sumber-data').val();
+    if(!sumber_data){
+        return alert('Sumber data tidak boleh kosong!');
+    }
+
     let penanggung_jawab = jQuery('#penanggung-jawab').val();
+    if(!penanggung_jawab){
+        return alert('Penanggungjawab tidak boleh kosong!');
+    }
+
     let satuan = jQuery('#satuan').val();
+    if(!satuan){
+        return alert('Satuan tidak boleh kosong!');
+    }
 
     let target_1 = jQuery("#target_1").val();
     let target_2 = jQuery("#target_2").val();    
     let target_3 = jQuery("#target_3").val();    
     let target_4 = jQuery("#target_4").val();    
     let target_5 = jQuery("#target_5").val();
-
-
-    if(id_unik == '' || id_indikator == '' || formulasi == '' || sumber_data == '' || penanggung_jawab == '' || satuan == ''){
-        return alert('Ada Input Data Yang Kosong!');
-    }
 
     jQuery('#wrap-loading').show();
     jQuery.ajax({
@@ -847,7 +872,6 @@ function simpanDataIkuPemda(){
             alert(res.message);
             if(res.status=='success'){
                 jQuery("#modal-iku").modal('hide');
-                location.reload();
                 getTableIKUPemda();
             }
         }
@@ -875,10 +899,17 @@ function edit_iku(id) {
                 if (response.status === 'success') {
                     let data = response.data;
                     jQuery('#id_iku').val(id);
+
                     jQuery("#tujuan-sasaran").val(data.id_sasaran).trigger('change');
                     getIndikator(data.id_sasaran).then(function () {
                         jQuery("#indikator").val(data.id_unik_indikator).trigger('change');
                     });
+                    
+                    jQuery("#tujuan-iku").val(data.id_sasaran).trigger('change');
+                    getIndikatorTujuan(data.id_sasaran).then(function () {
+                        jQuery("#indikator-tujuan").val(data.id_unik_indikator).trigger('change');
+                    });
+
                     if (tinymce.get('formulasi')) {
                         tinymce.get('formulasi').setContent(data.formulasi);
                     } else {
@@ -960,7 +991,40 @@ function getIndikator(that){
                         });
                     }
                     jQuery("#indikator").html(html_indikator);
-                    jQuery('#indikator').select2({width: '100%'});
+                    jQuery('#indikator').select2({
+                        dropdownParent: jQuery('#indikator').closest('.modal-body'),
+                        width: '100%'
+                    });
+
+                    resolve();
+                }
+            }
+        })
+    })
+}
+
+function getIndikatorTujuan(that){
+    jQuery('#wrap-loading').show();
+    return getSasaran()
+    .then(function(){
+        return new Promise(function(resolve, reject){
+            jQuery('#wrap-loading').hide();
+            if(typeof data_sasaran_rpjmd != 'undefined'){
+                if(data_sasaran_rpjmd != undefined){
+                    let html_indikator = '';
+                    if(data_sasaran_rpjmd.data_tujuan !== null){
+                        html_indikator = '<option value="">Pilih Indikator Tujuan</option>';
+                        data_sasaran_rpjmd.data_tujuan.map(function(value, index){
+                            if(value.id_unik_indikator != null && value.id_unik == that){
+                                html_indikator += '<option value="'+value.id_unik_indikator+'">'+value.indikator_teks+'</option>';
+                            }
+                        });
+                    }
+                    jQuery("#indikator-tujuan").html(html_indikator);
+                    jQuery('#indikator-tujuan').select2({
+                        dropdownParent: jQuery('#indikator-tujuan').closest('.modal-body'),
+                        width: '100%'
+                    });
 
                     resolve();
                 }
@@ -1216,16 +1280,4 @@ function viewDokumen(idTahap) {
         },
     });
 }
-
-document.addEventListener("DOMContentLoaded", function () {
-const checkbox = document.getElementById("settingPerubahan");
-    const perubahanSections = document.querySelectorAll(".setting-perubahan");
-    function togglePerubahan() {
-        perubahanSections.forEach(section => {
-            section.style.display = checkbox.checked ? "block" : "none";
-        });
-    }
-    togglePerubahan();
-    checkbox.addEventListener("change", togglePerubahan);
-});
 </script>

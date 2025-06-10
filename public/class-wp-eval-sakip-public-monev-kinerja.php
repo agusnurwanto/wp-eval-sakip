@@ -3565,25 +3565,41 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		$ret = array(
 			'status' => 'success',
 			'message' => 'Berhasil get data!',
-			'data'  => array()
+			'data'  => array(),
+			'data_tujuan'  => array()
 		);
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$data_tujuan = $wpdb->get_results(
+					$wpdb->prepare("
+							SELECT 
+								*
+							FROM 
+								esakip_rpd_tujuan
+							WHERE active=1
+								AND id_jadwal=%d
+							order by no_urut
+						", $_POST['id_jadwal']),
+					ARRAY_A
+				);
 				$data = $wpdb->get_results(
 					$wpdb->prepare("
 							SELECT 
 								*
 							FROM 
 								esakip_rpd_sasaran
-							WHERE 
-								active=1
+							WHERE active=1
+								AND id_jadwal=%d
 							order by sasaran_no_urut
-						"),
+						", $_POST['id_jadwal']),
 					ARRAY_A
 				);
 				if (!empty($data)) {
 					$ret['data'] = $data;
+				}
+				if (!empty($data_tujuan)) {
+					$ret['data_tujuan'] = $data_tujuan;
 				}
 			} else {
 				$ret = array(
