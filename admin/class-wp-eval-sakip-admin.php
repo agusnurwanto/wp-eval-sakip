@@ -2717,11 +2717,12 @@ class Wp_Eval_Sakip_Admin
 
 				$pengisian_lke_sakip['url'] .= '&id_jadwal=' . $v['id'];
 
-				$status_text = match ((int)$v['status']) {
-					1 => 'AKTIF',
-					2 => 'DIKUNCI',
-					default => 'TIDAK DIKETAHUI',
-				};
+				$status_text = 'TIDAK DIKETAHUI';
+				if ($v['status'] == 1) {
+					$status_text = 'AKTIF';
+				} elseif ($v['status'] == 2) {
+					$status_text = 'DIKUNCI';
+				}
 
 				$html .= '
 				<li>
@@ -2798,7 +2799,7 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<li>
-					<a target="_blank" href="' . esc_url($input_rpjpd_page['url']) . '">'. esc_html($input_rpjpd_page['title']) . '</a>
+					<a target="_blank" href="' . esc_url($input_rpjpd_page['url']) . '">' . esc_html($input_rpjpd_page['title']) . '</a>
 				</li>';
 			}
 		} else {
@@ -2865,7 +2866,7 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<li>
-					<a target="_blank" href="' . esc_url($input_rpjmd_page['url']) . '">'. esc_html($input_rpjmd_page['title']) . '</a>
+					<a target="_blank" href="' . esc_url($input_rpjmd_page['url']) . '">' . esc_html($input_rpjmd_page['title']) . '</a>
 				</li>';
 			}
 		} else {
