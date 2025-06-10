@@ -87,20 +87,20 @@ $data_simpan = [];
 if (!empty($iku)) {
     foreach ($iku as $k_iku => $v_iku) {
         $data_simpan[] = [
-            'kode_sasaran'    => $v_iku['id_sasaran'] ?? '',
-            'label_sasaran'    => $v_iku['label_sasaran'] ?? '',
-            'id_unik_indikator'  => $v_iku['id_unik_indikator'] ?? '',
-            'label_indikator'  => $v_iku['label_indikator'] ?? '',
-            'formulasi'        => $v_iku['formulasi'] ?? '', 
-            'sumber_data'      => $v_iku['sumber_data'] ?? '', 
-            'penanggung_jawab' => $v_iku['penanggung_jawab'] ?? '', 
-            'satuan' => $v_iku['satuan'] ?? '', 
-            'target_1' => $v_iku['target_1'] ?? '', 
-            'target_2' => $v_iku['target_2'] ?? '', 
-            'target_3' => $v_iku['target_3'] ?? '', 
-            'target_4' => $v_iku['target_4'] ?? '', 
-            'target_5' => $v_iku['target_5'] ?? '', 
-            'id_jadwal' => $v_iku['id_jadwal'] ?? '', 
+            'kode_sasaran'    => $v_iku['id_sasaran'] ?? '-',
+            'label_sasaran'    => $v_iku['label_sasaran'] ?? '-',
+            'id_unik_indikator'  => $v_iku['id_unik_indikator'] ?? '-',
+            'label_indikator'  => $v_iku['label_indikator'] ?? '-',
+            'formulasi'        => $v_iku['formulasi'] ?? '-', 
+            'sumber_data'      => $v_iku['sumber_data'] ?? '-', 
+            'penanggung_jawab' => $v_iku['penanggung_jawab'] ?? '-', 
+            'satuan' => $v_iku['satuan'] ?? '-', 
+            'target_1' => $v_iku['target_1'] ?? '-', 
+            'target_2' => $v_iku['target_2'] ?? '-', 
+            'target_3' => $v_iku['target_3'] ?? '-', 
+            'target_4' => $v_iku['target_4'] ?? '-', 
+            'target_5' => $v_iku['target_5'] ?? '-', 
+            'id_jadwal' => $v_iku['id_jadwal'] ?? '-', 
         ];
         $html_iku .= '
             <tr>
@@ -496,7 +496,7 @@ if (!empty($data_tahapan)) {
 </div>
 <!-- Modal crud -->
 <div class="modal fade" id="modal-iku" data-backdrop="static"  role="dialog" aria-labelledby="modal-crud-label" aria-hidden="true">
-    <div class="modal-dialog" style="max-width: 50%;" role="document">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Tambah Data</h5>
@@ -547,7 +547,7 @@ if (!empty($data_tahapan)) {
                     </div>
                     <div class="form-group">
                         <label for="satuan">Satuan</label>
-                        <input type="text" class="form-control" id="satuan" name="satuan"/>
+                        <input type="number" class="form-control" id="satuan" name="satuan"/>
                     </div>
                     
                     <?php 
@@ -703,6 +703,7 @@ jQuery(document).ready(function() {
     });
 
 });
+
 function getTableIKUPemda() {
     jQuery('#wrap-loading').show();
     return new Promise(function(resolve, reject){
