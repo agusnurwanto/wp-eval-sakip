@@ -701,6 +701,16 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_copy_data_kuesioner_menpan',  $plugin_public, 'copy_data_kuesioner_menpan');
 
 		$this->loader->add_action('wp_ajax_get_table_skpd_kuesioner_mendagri',  $plugin_public, 'get_table_skpd_kuesioner_mendagri');
+		$this->loader->add_action('wp_ajax_get_table_kuesioner_mendagri',  $plugin_public, 'get_table_kuesioner_mendagri');
+		$this->loader->add_action('wp_ajax_tambah_kuesioner_mendagri',  $plugin_public, 'tambah_kuesioner_mendagri');
+		$this->loader->add_action('wp_ajax_get_kuesioner_mendagri_by_id',  $plugin_public, 'get_kuesioner_mendagri_by_id');
+		$this->loader->add_action('wp_ajax_hapus_data_kuesioner_mendagri',  $plugin_public, 'hapus_data_kuesioner_mendagri');
+		$this->loader->add_action('wp_ajax_get_detail_pertanyaan_mendagri',  $plugin_public, 'get_detail_pertanyaan_mendagri');
+		$this->loader->add_action('wp_ajax_generate_data_mendagri',  $plugin_public, 'generate_data_mendagri');
+		$this->loader->add_action('wp_ajax_submit_kuesioner_pertanyaan_mendagri',  $plugin_public, 'submit_kuesioner_pertanyaan_mendagri');
+		$this->loader->add_action('wp_ajax_get_kuesioner_mendagri_detail_by_id',  $plugin_public, 'get_kuesioner_mendagri_detail_by_id');
+		$this->loader->add_action('wp_ajax_hapus_data_kuesioner_mendagri_detail',  $plugin_public, 'hapus_data_kuesioner_mendagri_detail');
+		$this->loader->add_action('wp_ajax_copy_data_kuesioner_mendagri',  $plugin_public, 'copy_data_kuesioner_mendagri');
 
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
