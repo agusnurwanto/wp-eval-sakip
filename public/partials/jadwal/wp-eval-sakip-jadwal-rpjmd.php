@@ -24,6 +24,29 @@ if (!empty($data_rpjpd)) {
 		$select_rpjpd .= '<option value="' . $val_rpjpd['id'] . '">' . $val_rpjpd['nama_jadwal'] . '</option>';
 	}
 }
+$select_rpjmd = '';
+$data_rpjmd = $wpdb->get_results(
+	"
+		SELECT
+			*
+		FROM
+			esakip_data_jadwal
+		WHERE
+			tipe='RPJMD'
+			and status!=0",
+	ARRAY_A
+);
+
+if (!empty($data_rpjmd)) {
+	foreach ($data_rpjmd as $val_rpjmd) {
+		if (!empty($val_rpjmd['tahun_selesai_anggaran']) && $val_rpjmd['tahun_selesai_anggaran'] > 1) {
+			$tahun_anggaran_selesai = $val_rpjmd['tahun_selesai_anggaran'];
+		} else {
+			$tahun_anggaran_selesai = $val_rpjmd['tahun_anggaran'] + $val_rpjmd['lama_pelaksanaan'];
+		}
+		$select_rpjmd .= '<option value="' . $val_rpjmd['id'] . '">' . $val_rpjmd['nama_jadwal'] . ' '.$val_rpjmd['tahun_anggaran'].' - '.$tahun_anggaran_selesai.'</option>';
+	}
+}
 
 $body = '';
 ?>
@@ -33,6 +56,9 @@ $body = '';
 		border-color: #eaeaea;
 		vertical-align: middle;
 	}
+    .setting-perubahan {
+        transition: all 0.3s ease;
+    }
 </style>
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 <div class="cetak">
@@ -112,6 +138,18 @@ $body = '';
 					</tr>
 					<small class="d-block form-text text-muted">Catatan: Jenis RPD tidak ada kolom visi dan misi. Jenis RPJMD ada kolom visi dan misi.</small>
 				</div>
+				
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="settingPerubahan">
+                    <label class="custom-control-label" for="settingPerubahan">Perubahan</label>
+                </div>
+                <div class="wrap-table setting-perubahan">
+					<label for="jadwal_murni" style='display:inline-block'>Pilih Jadwal Murni</label>
+					<select id="jadwal_murni" style='display:block;width: 100%;'>
+						<option value="0">Pilih Jadwal</option>
+						<?php echo $select_rpjmd; ?>
+					</select>
+                </div>
 				<div class="form-group">
 					<label for="relasi_rpjpd" style='display:inline-block'>Pilih Jadwal RPJPD</label>
 					<select id="relasi_rpjpd" style='display:block;width: 100%;'>
@@ -335,6 +373,18 @@ $body = '';
 
 		globalThis.tipe = 'RPJMD'
 		get_data_penjadwalan_rpjmd();
+		let $checkbox = jQuery("#settingPerubahan");
+		let $SettingPerubahan = jQuery(".setting-perubahan");
+
+		function togglePerubahan() {
+			if ($checkbox.is(":checked")) {
+				$SettingPerubahan.show();
+			} else {
+				$SettingPerubahan.hide();
+			}
+		}
+		togglePerubahan();
+		$checkbox.on("change", togglePerubahan);
 
 	});
 
@@ -392,6 +442,7 @@ $body = '';
 	function tambah_jadwal_rpmd() {
 		jQuery("#modalTambahJadwal .modal-title").html("Tambah Penjadwalan");
 		jQuery('#lama_pelaksanaan').val(jQuery('#lama_pelaksanaan'));
+		jQuery('#jadwal_murni').val('');
 		jQuery('#relasi_rpjpd').val('');
 		jQuery('#nama_jadwal').val('').prop('disabled', false);
 		jQuery('#nama_jadwal_renstra').val('').prop('disabled', false);
@@ -423,6 +474,7 @@ $body = '';
 		let nama_jadwal = jQuery('#nama_jadwal').val()
 		let nama_jadwal_renstra = jQuery('#nama_jadwal_renstra').val()
 		let keterangan = jQuery("#keterangan").val()
+		let jadwal_murni = jQuery("#jadwal_murni").val()
 		let relasi_rpjpd = jQuery("#relasi_rpjpd").val()
 		let tahun_anggaran = jQuery("#tahun_anggaran").val()
 		let lama_pelaksanaan = jQuery("#lama_pelaksanaan").val()
@@ -452,6 +504,7 @@ $body = '';
 					'nama_jadwal_renstra': nama_jadwal_renstra,
 					'tahun_anggaran': tahun_anggaran,
 					'relasi_rpjpd': relasi_rpjpd,
+					'jadwal_murni': jadwal_murni,
 					'keterangan': keterangan,
 					'tipe': tipe,
 					'lama_pelaksanaan': lama_pelaksanaan,
@@ -550,6 +603,14 @@ $body = '';
 				jQuery("input[name=langsung_verifikasi][value='"+langsung_verifikasi+"']").prop("checked",true);
 
 				jQuery("input[name=setting_input_pokin][value='"+response.data.hak_input_pohon_kinerja+"']").prop("checked",true);
+
+				if (response.data.id_jadwal_murni && parseInt(response.data.id_jadwal_murni) > 0) {
+					jQuery("#settingPerubahan").prop("checked", true).trigger("change");
+					jQuery("#jadwal_murni").val(response.data.id_jadwal_murni).change();
+				} else {
+					jQuery("#settingPerubahan").prop("checked", false).trigger("change");
+					jQuery("#jadwal_murni").val("0").change();
+				}
 			}
 		})
 	}

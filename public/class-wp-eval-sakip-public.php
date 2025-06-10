@@ -12983,6 +12983,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$keterangan		= trim(htmlspecialchars($_POST['keterangan']));
 					$lama_pelaksanaan 	= trim(htmlspecialchars($_POST['lama_pelaksanaan']));
 					$relasi_rpjpd 	= $_POST['relasi_rpjpd'];
+					$jadwal_murni 	= $_POST['jadwal_murni'];
 					$tipe 	= trim(htmlspecialchars($_POST['tipe']));
 					$tahun_selesai_anggaran	= trim(htmlspecialchars($_POST['tahun_selesai_anggaran']));
 					$jenis_jadwal_khusus	= trim(htmlspecialchars($_POST['jenis_khusus_rpjmd']));
@@ -13020,6 +13021,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						'nama_jadwal' 			=> $nama_jadwal,
 						'nama_jadwal_renstra' 	=> $nama_jadwal_renstra,
 						'tahun_anggaran'		=> $tahun_anggaran,
+						'id_jadwal_murni'		=> $jadwal_murni,
 						'relasi_perencanaan'	=> $relasi_rpjpd,
 						'keterangan'			=> $keterangan,
 						'tipe'					=> 'RPJMD',

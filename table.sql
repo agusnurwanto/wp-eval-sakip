@@ -340,6 +340,7 @@ CREATE TABLE `esakip_data_unit` (
 
 CREATE TABLE `esakip_data_jadwal` (
   `id` int(11) NOT NULL auto_increment,
+  `id_jadwal_murni` int(11) DEFAULT NULL,
   `nama_jadwal` varchar(64) DEFAULT NULL,
   `nama_jadwal_renstra` varchar(64) DEFAULT NULL,
   `keterangan` varchar(255) DEFAULT NULL,
