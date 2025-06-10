@@ -402,6 +402,9 @@ if (!empty($data_tahapan)) {
         max-width: 100%;
         height: auto;
     }
+    .setting-perubahan {
+        transition: all 0.3s ease;
+    }
 
 </style>
 
@@ -497,7 +500,7 @@ if (!empty($data_tahapan)) {
 </div>
 <!-- Modal crud -->
 <div class="modal fade" id="modal-iku" data-backdrop="static"  role="dialog" aria-labelledby="modal-crud-label" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-dialog" style="max-width: 50%;" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Tambah Data</h5>
@@ -540,7 +543,7 @@ if (!empty($data_tahapan)) {
                     </div>
                     <div class="form-group">
                         <label for="satuan">Satuan</label>
-                        <input type="number" class="form-control" id="satuan" name="satuan"/>
+                        <input type="text" class="form-control" id="satuan" name="satuan"/>
                     </div>
                     
                     <?php 
@@ -564,7 +567,29 @@ if (!empty($data_tahapan)) {
                             <?php endif; ?>
                         </div>
                     <?php endfor; ?>
-
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="settingPerubahan">
+                        <label class="custom-control-label" for="settingPerubahan">Perubahan</label>
+                    </div>
+                    <div class="setting-perubahan" style="margin-top:10px">
+                        <button class="btn btn-primary" onclick="tambah_perubahan();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
+                    </div>
+                    <div class="wrap-table setting-perubahan">
+                        <table id="table_perubahan" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">No</th>
+                                    <th class="text-center">Nama Jadwal</th>
+                                    <th class="text-center">Tujuan / Sasaran</th>
+                                    <th class="text-center">Indikator</th>
+                                    <th class="text-center">Satuan</th>
+                                    <th class="text-center">Target</th>
+                                    <th class="text-center" style="width: 150px;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -697,7 +722,6 @@ jQuery(document).ready(function() {
     });
 
 });
-
 function getTableIKUPemda() {
     jQuery('#wrap-loading').show();
     return new Promise(function(resolve, reject){
@@ -1192,4 +1216,16 @@ function viewDokumen(idTahap) {
         },
     });
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+const checkbox = document.getElementById("settingPerubahan");
+    const perubahanSections = document.querySelectorAll(".setting-perubahan");
+    function togglePerubahan() {
+        perubahanSections.forEach(section => {
+            section.style.display = checkbox.checked ? "block" : "none";
+        });
+    }
+    togglePerubahan();
+    checkbox.addEventListener("change", togglePerubahan);
+});
 </script>
