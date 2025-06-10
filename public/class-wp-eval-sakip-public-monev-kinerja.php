@@ -836,6 +836,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						)
 					);
 					foreach ($get_id_pokin_1 as $id_pokin_lvl_1) {
+
+						// karena jika input pagu tidak diceklist maka, semua pokin dimasukan ke pokin level 1
 						if ($_POST['level'] == 2) {
 							$level = 3;
 						} else if ($_POST['level'] == 3) {
@@ -897,18 +899,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										AND id_pokin = %d
 		                        ", $_POST['tahun_anggaran'], $_POST['id_skpd'], $_POST['level'], $cek_id, $id_pokin_lvl_2)
 							);
-
-							if ($setting_input_rencana_pagu == 1) {
-								if ($_POST['level'] == 3) {
-									$level_pokin_2 = 5;
-								} elseif ($_POST['level'] == 2) {
-									$level_pokin_2 = 4;
-								} else {
-									$level_pokin_2 = 2;
-								}
-							} else {
-								$level_pokin_2 = 2;
-							}
+							$level_pokin_2 = 2;
 							$data = array(
 								'id_rhk_opd' => $cek_id,
 								'id_pokin' => $id_pokin_lvl_2,
@@ -948,16 +939,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										AND id_pokin = %d
 		                        ", $_POST['tahun_anggaran'], $_POST['id_skpd'], $_POST['level'], $cek_id, $id_pokin_lvl_3)
 							);
-
-							if ($setting_input_rencana_pagu == 1) {
-								if ($_POST['level'] == 2) {
-									$level_pokin_3 = 5;
-								} else {
-									$level_pokin_3 = 3;
-								}
-							} else {
-								$level_pokin_3 = 3;
-							}
+							$level_pokin_3 = 3;
 							$data = array(
 								'id_rhk_opd' => $cek_id,
 								'id_pokin' => $id_pokin_lvl_3,
