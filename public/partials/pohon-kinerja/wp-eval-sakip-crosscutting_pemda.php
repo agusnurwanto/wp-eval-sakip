@@ -71,7 +71,7 @@ if (!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggar
         <div style="padding: 10px;margin:0 0 3rem 0;">
             <h1 class="text-center" style="margin:3rem;">Crosscutting <?php echo $periode['nama_jadwal'] . ' ' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ''; ?></h1>
             <div class="wrap-table">
-                <table id="table_dokumen_crosscutting" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                <table id="table_dokumen_crosscutting" cellpadding="2" cellspacing="0" class="table table-bordered">
                     <thead>
                         <tr>
                             <th class="text-center" style="width: 100px;">No</th>

@@ -1553,13 +1553,14 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					", $id_jadwal),
 					ARRAY_A
 				);
-				$get_tujuan = $wpdb->get_results("
+				$get_tujuan = $wpdb->get_results($wpdb->prepare("
                     SELECT 
                     	* 
                     FROM esakip_rpd_tujuan
                     WHERE id_unik_indikator IS NULL
                       AND active = 1
-                ", ARRAY_A);
+                      AND id_jadwal=%d
+                ", $id_jadwal), ARRAY_A);
 
 				if (!empty($get_tujuan)) {
 					$counter = 1;
