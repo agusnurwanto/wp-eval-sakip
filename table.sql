@@ -1164,6 +1164,7 @@ CREATE TABLE `esakip_rpd_tujuan` (
   `head_teks` text DEFAULT NULL,
   `id_misi_old` int(11) DEFAULT NULL,
   `id_tujuan` int(11) DEFAULT NULL,
+  `id_tujuan_murni` int(11) DEFAULT NULL,
   `id_unik` text DEFAULT NULL,
   `id_unik_indikator` text DEFAULT NULL,
   `indikator_teks` text DEFAULT NULL,
@@ -1209,6 +1210,7 @@ CREATE TABLE `esakip_rpd_sasaran` (
   `head_teks` text DEFAULT NULL,
   `id_misi_old` int(11) DEFAULT NULL,
   `id_sasaran` int(11) DEFAULT NULL,
+  `id_sasaran_murni` int(11) DEFAULT NULL,
   `id_unik` text DEFAULT NULL,
   `id_unik_indikator` text DEFAULT NULL,
   `indikator_teks` text DEFAULT NULL,
@@ -1567,6 +1569,7 @@ CREATE TABLE `esakip_data_iku_opd` (
 CREATE TABLE `esakip_data_iku_pemda` (
   `id` int(11) NOT NULL auto_increment,
   `id_sasaran` text NOT NULL,
+  `id_sasaran_murni` int(11) DEFAULT NULL,
   `label_sasaran` text DEFAULT null,
   `id_unik_indikator` text DEFAULT null,
   `label_indikator` text DEFAULT null,
@@ -1587,6 +1590,7 @@ CREATE TABLE `esakip_data_iku_pemda` (
   KEY `id_jadwal` (`id_jadwal`),
   KEY `id_unik` (`id_unik`),
   KEY `id_unik_indikator` (`id_unik_indikator`),
+  KEY `id_sasaran_murni` (`id_sasaran_murni`),
   KEY `active` (`active`)
 );
 
@@ -2172,6 +2176,7 @@ CREATE TABLE `esakip_dokumen_jadwal_esr` (
 
 CREATE TABLE `esakip_finalisasi_iku_pemda` (
   `id` int(11) NOT NULL auto_increment,
+  `id_sasaran_murni` int(11) DEFAULT NULL,
   `id_tahap` varchar(255) DEFAULT null,
   `kode_sasaran` text NOT NULL,
   `label_sasaran` text DEFAULT null,
