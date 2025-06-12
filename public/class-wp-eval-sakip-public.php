@@ -27265,10 +27265,19 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                         AND id_jadwal=%d
                                         AND id_unik in ($kd_all_prog)
                                 ", $_POST['id_jadwal']), ARRAY_A);
+                                $data_tujuan_existing = $wpdb->get_results($wpdb->prepare("
+                                    SELECT 
+                                        *
+                                    from esakip_rpd_tujuan 
+                                    where id=%d
+                                        AND active=1
+                                ", $tujuan['id_tujuan_murni']), ARRAY_A);
 								$data_all[$tujuan['id_unik']] = array(
 									'id' => $tujuan['id'],
 									'id_unik' => $tujuan['id_unik'],
-									'nama' => $tujuan['tujuan_teks'],
+									'tujuan_sebelum' => !empty($data_tujuan_existing) ? $data_tujuan_existing[0]['tujuan_teks'] : '',
+    								'nama' => $tujuan['tujuan_teks'],
+									'id_tujuan_murni' => $tujuan['id_tujuan_murni'],
 									'id_jadwal_rpjpd' => $id_jadwal_rpjpd,
 									'pagu_akumulasi_1' => $pagu['pagu_akumulasi_1'],
 									'pagu_akumulasi_2' => $pagu['pagu_akumulasi_2'],
@@ -27355,10 +27364,20 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                         AND id_jadwal=%d
                                         AND id_unik in ($kd_all_prog)
                                 ", $_POST['id_jadwal']), ARRAY_A);
+
+                                $data_sasaran_existing = $wpdb->get_results($wpdb->prepare("
+                                    SELECT 
+                                        *
+                                    from esakip_rpd_sasaran 
+                                    where id=%d
+                                        AND active=1
+                                ", $sasaran['id_sasaran_murni']), ARRAY_A);
 								$data_all[$sasaran['id_unik']] = array(
 									'id' => $sasaran['id'],
 									'id_unik' => $sasaran['id_unik'],
 									'nama' => $sasaran['sasaran_teks'],
+									'id_sasaran_murni' => $sasaran['id_sasaran_murni'],
+									'sasaran_sebelum' => !empty($data_sasaran_existing) ? $data_sasaran_existing[0]['sasaran_teks'] : '',
 									'pagu_akumulasi_1' => $pagu['pagu_akumulasi_1'],
 									'pagu_akumulasi_2' => $pagu['pagu_akumulasi_2'],
 									'pagu_akumulasi_3' => $pagu['pagu_akumulasi_3'],
@@ -27452,7 +27471,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                     id_isu,
                                     tujuan_teks,
                                     id_unik,
-                                    no_urut
+                                    no_urut,
+                                    id_tujuan_murni
                                 from $table
                                 where id_unik=%s
                                 	AND id_jadwal=%d
@@ -27470,6 +27490,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'id_isu' => $tujuan[0]['id_isu'],
 							'tujuan_teks' => $tujuan[0]['tujuan_teks'],
 							'id_unik' => $tujuan[0]['id_unik'],
+							'id_tujuan_murni' => $tujuan[0]['id_tujuan_murni'],
 							'indikator_teks' => $_POST['data'],
 							'target_awal' => $_POST['vol_awal'],
 							'target_1' => $_POST['vol_1'],
@@ -27518,6 +27539,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'no_urut'   => $_POST['no_urut'],
 							'catatan_teks_tujuan'   => $_POST['catatan_teks_tujuan'],
 							'id_jadwal'   => $_POST['id_jadwal'],
+							'id_tujuan_murni'   => $_POST['id_tujuan_sebelum'],
 							'active' => 1
 						);
 						if (!empty($_POST['id'])) {
@@ -27571,6 +27593,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'kode_tujuan' => $sasaran[0]['kode_tujuan'],
 							'sasaran_teks' => $sasaran[0]['sasaran_teks'],
 							'id_unik' => $sasaran[0]['id_unik'],
+							'id_sasaran_murni' => $sasaran[0]['id_sasaran_murni'],
 							'indikator_teks' => $_POST['data'],
 							'target_awal' => $_POST['vol_awal'],
 							'target_1' => $_POST['vol_1'],
@@ -27615,6 +27638,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$data = array(
 							'kode_tujuan' => $_POST['id_tujuan'],
 							'sasaran_teks' => $_POST['data'],
+							'id_sasaran_murni'   => $_POST['id_sasaran_sebelum'],
 							'update_at' => date('Y-m-d H:i:s'),
 							'sasaran_no_urut' => $_POST['sasaran_no_urut'],
 							'sasaran_catatan' => $_POST['sasaran_catatan'],
