@@ -683,6 +683,34 @@ if(!empty($lembaga)){
 	}
 }
 
+$api_params = array(
+	'action' => 'get_pemdes_alamat_all',
+	'api_key'	=> get_option('_crb_apikey_wpsipd'),
+	'tahun_anggaran' => $tahun_anggaran_sakip
+);
+$response = wp_remote_post(get_option('_crb_url_server_sakip'), array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
+$response = wp_remote_retrieve_body($response);
+$data_desa = json_decode($response, true);
+
+$desa_opsi = '';
+if($data_desa['status'] == 'success'){
+	if($data_desa['tipe'] == 1){
+		foreach($data_desa['data'] as $kab){
+			foreach($kab['data'] as $kec){
+				foreach($kec['desa'] as $desa){
+					$desa .= "<option value='" . $kab['id_kab']."-".$kec['id_kec']."-".$desa['id_kel'] . "'>".$desa['desa'] .' Kecamatan '.$kec['kecamatan'] .' '. $kab['kabkot'] .'</option>';
+				}
+			}
+		}
+	}else if($data_desa['tipe'] == 2){
+		foreach($data_desa['data'] as $kec){
+			foreach($kec['desa'] as $desa){
+				$desa_opsi .= "<option value='" . $kec['id_kec']."-".$desa['id_kel'] . "'>". $desa['desa'] .' Kecamatan '.$kec['kecamatan'] .'</option>';
+			}
+		}
+	}
+}
+
 $uptd = $wpdb->get_results(
 	$wpdb->prepare("
 		SELECT 
@@ -706,6 +734,7 @@ if(!empty($uptd)){
 		$option_uptd .="<option value='" . $v['id_skpd'] . "'>" . $v['nama_skpd'] . "</option>";
 	}
 }
+$option_uptd .= $desa_opsi;
 
 $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
@@ -1648,15 +1677,15 @@ jQuery(document).ready(function(){
 		jQuery("#modal-koneksi").find('.modal-dialog').css('maxWidth','');
 		jQuery("#modal-koneksi").find('.modal-dialog').css('width','');
 		jQuery('#skpdKoneksi').select2({
-            dropdownParent: jQuery('#skpdKoneksi').closest('.modal-body'),
+            dropdownParent: jQuery('#skpdKoneksi').closest('.modal'),
             width: '100%'
         });
 		jQuery('#skpdKoneksiLainnya').select2({
-            dropdownParent: jQuery('#skpdKoneksiLainnya').closest('.modal-body'),
+            dropdownParent: jQuery('#skpdKoneksiLainnya').closest('.modal'),
             width: '100%'
         });
 		jQuery('#skpdKoneksiUptd').select2({
-            dropdownParent: jQuery('#skpdKoneksiUptd').closest('.modal-body'),
+            dropdownParent: jQuery('#skpdKoneksiUptd').closest('.modal'),
             width: '100%'
         });
 		getSkpdById(parent_koneksi).then(function(){

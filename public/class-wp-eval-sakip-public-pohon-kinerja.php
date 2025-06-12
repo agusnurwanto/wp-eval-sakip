@@ -391,7 +391,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								'id' => $pokin['id'],
 								'label' => $pokin['label'],
 								'parent' => $pokin['parent'],
-								'label_parent_1' => $pokin['label_parent_1'],
 								'nomor_urut' => $pokin['nomor_urut'],
 								'indikator' => []
 							];
@@ -408,22 +407,24 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						}
 					}
 
-					foreach ($dataParent as $v_parent) {
+					if(!empty($dataParent)){
+						foreach ($dataParent as $v_parent) {
 
-						if (empty($data['parent'][$v_parent['label_parent_1']])) {
-							$data['parent'][$v_parent['label_parent_1']] = $v_parent['label_parent_1'];
-						}
+							if (empty($data['parent'][$v_parent['label_parent_1']])) {
+								$data['parent'][$v_parent['label_parent_1']] = $v_parent['label_parent_1'];
+							}
 
-						if (empty($data['parent'][$v_parent['label_parent_2']])) {
-							$data['parent'][$v_parent['label_parent_2']] = $v_parent['label_parent_2'];
-						}
+							if (empty($data['parent'][$v_parent['label_parent_2']])) {
+								$data['parent'][$v_parent['label_parent_2']] = $v_parent['label_parent_2'];
+							}
 
-						if (empty($data['parent'][$v_parent['label_parent_3']])) {
-							$data['parent'][$v_parent['label_parent_3']] = $v_parent['label_parent_3'];
-						}
+							if (empty($data['parent'][$v_parent['label_parent_3']])) {
+								$data['parent'][$v_parent['label_parent_3']] = $v_parent['label_parent_3'];
+							}
 
-						if (empty($data['parent'][$v_parent['label_parent_4']])) {
-							$data['parent'][$v_parent['label_parent_4']] = $v_parent['label_parent_4'];
+							if (empty($data['parent'][$v_parent['label_parent_4']])) {
+								$data['parent'][$v_parent['label_parent_4']] = $v_parent['label_parent_4'];
+							}
 						}
 					}
 
