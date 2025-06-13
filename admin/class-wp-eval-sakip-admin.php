@@ -113,1170 +113,6 @@ class Wp_Eval_Sakip_Admin
 		));
 	}
 
-	public function get_ajax_field($options = array('type' => null))
-	{
-		$ret = array();
-		$load_ajax_field = Field::make('html', 'crb_load_ajax_field')
-			->set_html('
-        		<div id="esakip_load_ajax_carbon" data-type="' . $options['type'] . '"></div>
-        	');
-		$ret[] = $load_ajax_field;
-		return $ret;
-	}
-
-	public function esakip_load_ajax_carbon()
-	{
-		global $wpdb;
-		$ret = array(
-			'status'    => 'success',
-			'message'   => ''
-		);
-
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
-				if (
-					!empty($_POST['type'])
-					&& (
-						$_POST['type'] == 'renstra'
-						|| $_POST['type'] == 'rpjmd'
-						|| $_POST['type'] == 'input_pohon_kinerja_pemda'
-						|| $_POST['type'] == 'input_pohon_kinerja_opd'
-						|| $_POST['type'] == 'cascading_pemda'
-						|| $_POST['type'] == 'croscutting_pemda'
-						|| $_POST['type'] == 'croscutting_pd'
-						|| $_POST['type'] == 'pohon_kinerja_dan_cascading'
-						|| $_POST['type'] == 'pohon_kinerja_dan_cascading_pemda'
-					)
-				) {
-					$jadwal_periode = $wpdb->get_results(
-						$wpdb->prepare(
-							"
-							SELECT 
-						        j.id,
-						        j.nama_jadwal,
-						        j.nama_jadwal_renstra,
-						        j.tahun_anggaran,
-						        j.lama_pelaksanaan,
-						        j.tahun_selesai_anggaran
-						    FROM esakip_data_jadwal j
-						    WHERE j.tipe = %s
-						      AND j.status = 1
-						    ORDER BY j.tahun_anggaran DESC",
-							'RPJMD'
-						),
-						ARRAY_A
-					);
-
-					$body_pemda = '<ol>';
-					foreach ($jadwal_periode as $jadwal_periode_item) {
-						// Cek setting tahun anggaran selesai
-						if (!empty($jadwal_periode_item['tahun_selesai_anggaran']) && $jadwal_periode_item['tahun_selesai_anggaran'] > 1) {
-							$tahun_anggaran_selesai = $jadwal_periode_item['tahun_selesai_anggaran'];
-						} else {
-							$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
-						}
-
-						if (!empty($_POST['type']) && $_POST['type'] == 'input_pohon_kinerja_pemda') {
-							$input_pokin = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Input Pohon Kinerja ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-								'content' => '[penyusunan_pohon_kinerja periode=' . $jadwal_periode_item['id'] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda .= '
-								<li><a target="_blank" href="' . $input_pokin['url'] . '">' . $input_pokin['title'] . '</a></li>
-									</ul>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'input_pohon_kinerja_opd') {
-							$input_pokin = $this->functions->generatePage(array(
-								'nama_page' => 'List Halaman Input Pohon Kinerja Perangkat Daerah ' . $jadwal_periode_item['nama_jadwal_renstra'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-								'content' => '[list_penyusunan_pohon_kinerja_opd periode=' . $jadwal_periode_item['id'] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$title = 'Halaman Input Pohon Kinerja Perangkat Daerah ' . $jadwal_periode_item['nama_jadwal_renstra'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
-							$body_pemda .= '
-								<li><a target="_blank" href="' . $input_pokin['url'] . '">' . $title . '</a></li>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'cascading_pemda') {
-							$cascading = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Input Cascading Pemerintah Daerah ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-								'content' => '[cascading_pemda periode=' . $jadwal_periode_item['id'] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda .= '
-								<li><a target="_blank" href="' . $cascading['url'] . '">' . $cascading['title'] . '</a></li>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'croscutting_pemda') {
-							$croscutting = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Input Croscutting Pemerintah Daerah ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-								'content' => '[croscutting_pemda periode=' . $jadwal_periode_item['id'] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda .= '
-								<li><a target="_blank" href="' . $croscutting['url'] . '">' . $croscutting['title'] . '</a></li>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'croscutting_pd') {
-							$croscutting = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Input Croscutting Perangkat Daerah ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-								'content' => '[croscutting_pd periode=' . $jadwal_periode_item['id'] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda .= '
-								<li><a target="_blank" href="' . $croscutting['url'] . '">' . $croscutting['title'] . '</a></li>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'renstra') {
-							$renstra = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen RENSTRA ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-								'content' => '[renstra periode=' . $jadwal_periode_item['id'] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda .= '
-							<li><a target="_blank" href="' . $renstra['url'] . '">' . $renstra['title'] . '</a></li>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'rpjmd') {
-							$rpjmd = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Upload Dokumen RPJMD ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-								'content' => '[upload_dokumen_rpjmd periode=' . $jadwal_periode_item['id'] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda .= '
-							<li><a target="_blank" href="' . $rpjmd['url'] . '">' . $rpjmd['title'] . '</a></li>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'pohon_kinerja_dan_cascading') {
-							$pohon_kinerja_cascading = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pohon Kinerja dan Cascading Tahun ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-								'content' => '[pohon_kinerja_dan_cascading periode=' . $jadwal_periode_item['id'] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda .= '
-							<li><a target="_blank" href="' . $pohon_kinerja_cascading['url'] . '">' . $pohon_kinerja_cascading['title'] . '</a></li>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'pohon_kinerja_dan_cascading_pemda') {
-							$pohon_kinerja_cascading = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pemda Pohon Kinerja dan Cascading ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-								'content' => '[dokumen_detail_pohon_kinerja_dan_cascading_pemda periode=' . $jadwal_periode_item['id'] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda .= '
-							<li><a target="_blank" href="' . $pohon_kinerja_cascading['url'] . '">Halaman Dokumen Pohon Kinerja dan Cascading ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . '</a></li>';
-						}
-					}
-					$body_pemda .= '</ol>';
-					$ret['message'] .= $body_pemda;
-				} else if (
-					!empty($_POST['type'])
-					&&
-					$_POST['type'] == 'monev_rencana_aksi_pemda'
-				) {
-
-					$jadwal_periode = $wpdb->get_results(
-						$wpdb->prepare(
-							"
-							SELECT 
-						        j.id,
-						        j.nama_jadwal,
-						        j.nama_jadwal_renstra,
-						        j.tahun_anggaran,
-						        j.lama_pelaksanaan,
-						        j.tahun_selesai_anggaran,
-						        r.id_jadwal_rpjmd,
-						        r.tahun_anggaran as tahun_anggaran_menu
-						    FROM esakip_data_jadwal j
-						    LEFT JOIN esakip_pengaturan_upload_dokumen r
-						        ON r.id_jadwal_rpjmd = j.id
-						    WHERE j.tipe = %s
-						      AND j.status = 1
-						    ORDER BY j.tahun_anggaran DESC",
-							'RPJMD'
-						),
-						ARRAY_A
-					);
-
-					$body_pemda = '<ol>';
-					foreach ($jadwal_periode as $jadwal_periode_item) {
-						// Cek setting tahun anggaran selesai
-						if (!empty($jadwal_periode_item['tahun_selesai_anggaran']) && $jadwal_periode_item['tahun_selesai_anggaran'] > 1) {
-							$tahun_anggaran_selesai = $jadwal_periode_item['tahun_selesai_anggaran'];
-						} else {
-							$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
-						}
-
-						$tahun = $wpdb->get_results("
-							SELECT 
-								u.tahun_anggaran
-							FROM esakip_data_unit u
-							GROUP BY u.tahun_anggaran
-							ORDER BY u.tahun_anggaran DESC
-						", ARRAY_A);
-						foreach ($tahun as $tahun_item) {
-							if (
-								!empty($jadwal_periode_item['id_jadwal_rpjmd'])
-								&& $jadwal_periode_item['tahun_anggaran_menu'] == $tahun_item['tahun_anggaran']
-							) {
-								$list_pemda_pengisian_rencana_aksi = $this->functions->generatePage(array(
-									'nama_page' => 'Input Rencana Hasil Kerja Pemda Tahun ' . $tahun_item['tahun_anggaran'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-									'content' => '[list_pengisian_rencana_aksi_pemda tahun=' . $tahun_item['tahun_anggaran'] . ' periode=' . $jadwal_periode_item['id'] . ' ]',
-									'show_header' => 1,
-									'no_key' => 1,
-									'post_status' => 'private'
-								));
-								$body_pemda .= '<li><a target="_blank" href="' . $list_pemda_pengisian_rencana_aksi['url'] . '" class="btn btn-primary">' .  $list_pemda_pengisian_rencana_aksi['title'] . '</a></li>';
-							}
-						}
-						if (empty($jadwal_periode_item['id_jadwal_rpjmd'])) {
-							$body_pemda .= '<li>' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' ( Periode belum diset di pengaturan menu )</li>';
-						}
-					}
-
-					$body_pemda .= '</ol>';
-					$ret['message'] .= $body_pemda;
-				} else if (!empty($_POST['type']) && $_POST['type'] == 'rpjpd') {
-					$jadwal_periode = $wpdb->get_results(
-						$wpdb->prepare(
-							"
-							SELECT 
-						        j.id,
-						        j.nama_jadwal,
-						        j.nama_jadwal_renstra,
-						        j.tahun_anggaran,
-						        j.lama_pelaksanaan,
-						        j.tahun_selesai_anggaran,
-						        r.id_jadwal_rpjpd
-						    FROM esakip_data_jadwal j
-						    LEFT JOIN esakip_pengaturan_upload_dokumen r
-						        ON r.id_jadwal_rpjpd = j.id
-						    WHERE j.tipe = %s
-						      AND j.status = 1
-						    ORDER BY j.tahun_anggaran DESC",
-							'RPJPD'
-						),
-						ARRAY_A
-					);
-
-					$body_pemda = '<ol>';
-					foreach ($jadwal_periode as $jadwal_periode_item) {
-						$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
-						if (!empty($_POST['type']) && $_POST['type'] == 'rpjpd') {
-							$rpjpd = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Upload Dokumen RPJPD ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-								'content' => '[upload_dokumen_rpjpd periode=' . $jadwal_periode_item['id'] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda .= '<li><a target="_blank" href="' . $rpjpd['url'] . '">' . $rpjpd['title'] . '</a></li>';
-						}
-					}
-					$body_pemda .= '</ol>';
-					$ret['message'] .= $body_pemda;
-				} else if (
-					!empty($_POST['type'])
-					&& (
-						$_POST['type'] == 'input_iku_opd'
-						|| $_POST['type'] == 'cascading_pd'
-					)
-				) {
-					//jadwal renstra wpsipd
-					$api_params = array(
-						'action' => 'get_data_jadwal_wpsipd',
-						'api_key'	=> get_option('_crb_apikey_wpsipd'),
-						'tipe_perencanaan' => 'monev_renstra'
-					);
-
-					$response = wp_remote_post(get_option('_crb_url_server_sakip'), array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
-
-					$response = wp_remote_retrieve_body($response);
-
-					$data_jadwal_wpsipd = json_decode($response);
-
-					$body_pemda = '';
-					if (!empty($_POST['type']) && $_POST['type'] == 'cascading_pd') {
-						$body_pemda = '<h3>Halaman Input Cascading Perangkat Daerah</h3>';
-					} else if (!empty($_POST['type']) && $_POST['type'] == 'input_iku_opd') {
-						$body_pemda = '<h3>Halaman Input IKU</h3>';
-					}
-					$body_pemda .= '<ol>';
-					if (!empty($data_jadwal_wpsipd->data)) {
-						foreach ($data_jadwal_wpsipd->data as $jadwal_periode_item_wpsipd) {
-							if (!empty($jadwal_periode_item_wpsipd->tahun_akhir_anggaran) && $jadwal_periode_item_wpsipd->tahun_akhir_anggaran > 1) {
-								$tahun_anggaran_selesai = $jadwal_periode_item_wpsipd->tahun_akhir_anggaran;
-							} else {
-								$tahun_anggaran_selesai = $jadwal_periode_item_wpsipd->tahun_anggaran + $jadwal_periode_item_wpsipd->lama_pelaksanaan;
-							}
-							if (!empty($_POST['type']) && $_POST['type'] == 'cascading_pd') {
-								$input_cascading_opd = $this->functions->generatePage(array(
-									'nama_page' => 'Halaman Input Cascading Perangkat Daerah ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai,
-									'content' => '[cascading_pd periode=' . $jadwal_periode_item_wpsipd->id_jadwal_lokal . ']',
-									'show_header' => 1,
-									'post_status' => 'private'
-								));
-								$title = 'Input Cascading OPD | ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai;
-								$body_pemda .= '<li><a target="_blank" href="' . $input_cascading_opd['url'] . '">' . $title . '</a></li>';
-							} else if (!empty($_POST['type']) && $_POST['type'] == 'input_iku_opd') {
-								$input_iku = $this->functions->generatePage(array(
-									'nama_page' => 'List Perangkat Daerah Halaman Pengisian IKU ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai,
-									'content' => '[list_input_iku periode=' . $jadwal_periode_item_wpsipd->id_jadwal_lokal . ']',
-									'show_header' => 1,
-									'no_key' => 1,
-									'post_status' => 'private'
-								));
-								$body_pemda .= '
-								<li><a target="_blank" href="' . $input_iku['url'] . '">Halaman Input IKU Perangkat Daerah ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai . '</a></li>';
-							}
-						}
-					}
-					$body_pemda .= '</ol>';
-					$ret['message'] .= $body_pemda;
-				} else if (
-					!empty($_POST['type'])
-					&& $_POST['type'] == 'input_iku_pemda'
-				) {
-					//jadwal rpjmd/rpd sakip
-					$data_jadwal = $wpdb->get_results(
-						$wpdb->prepare("
-						SELECT
-							*
-						FROM
-							esakip_data_jadwal
-						WHERE
-							tipe='RPJMD'
-							AND status!=0"),
-						ARRAY_A
-					);
-
-					if (empty($data_jadwal)) {
-						die("JADWAL KOSONG");
-					}
-
-					$body_pemda = '<h3>Halaman Input IKU</h3>';
-					$body_pemda .= '<ol>';
-					if (!empty($data_jadwal)) {
-						foreach ($data_jadwal as $jadwal_periode) {
-							$lama_pelaksanaan = $jadwal_periode['lama_pelaksanaan'] ?? 4;
-							$tahun_anggaran = $jadwal_periode['tahun_anggaran'];
-							$tahun_awal = $jadwal_periode['tahun_anggaran'];
-							$tahun_akhir = $tahun_awal + $jadwal_periode['lama_pelaksanaan'] - 1;
-
-							$input_iku_pemda = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Pengisian IKU Pemerintah Daerah ' . $jadwal_periode['jenis_jadwal_khusus'] . ' ' . $jadwal_periode['nama_jadwal'] . ' ' . 'Periode ' . $tahun_awal . ' - ' . $tahun_akhir,
-								'content' => '[input_iku_pemda id_periode=' . $jadwal_periode['id'] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda .= '
-							<li><a target="_blank" href="' . $input_iku_pemda['url'] . '">Halaman Input IKU Pemerintah Daerah ' . $jadwal_periode['jenis_jadwal_khusus'] . ' ' . $jadwal_periode['nama_jadwal'] . ' ' . 'Periode ' . $tahun_awal . ' - ' . $tahun_akhir . '</a></li>';
-						}
-					}
-					$body_pemda .= '</ol>';
-					$ret['message'] .= $body_pemda;
-				} else {
-					$tahun = $wpdb->get_results(
-						$wpdb->prepare("
-							SELECT 
-								tahun_anggaran 
-							FROM esakip_data_unit 
-							GROUP BY tahun_anggaran
-							ORDER BY tahun_anggaran DESC
-						"),
-						ARRAY_A
-					);
-					foreach ($tahun as $tahun_item) {
-						if (!empty($_POST['type']) && $_POST['type'] == 'renja_rkt') {
-							$renja_rkt = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen RENJA/RKT Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[renja_rkt tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $renja_rkt['url'] . '">' . $renja_rkt['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'skp') {
-							$skp = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen SKP Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[skp tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $skp['url'] . '">' . $skp['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'rencana_aksi') {
-							$rencana_aksi = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Rencana Aksi Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[rencana_aksi tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $rencana_aksi['url'] . '">' . $rencana_aksi['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'iku') {
-							$iku = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen IKU Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[iku tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $iku['url'] . '">' . $iku['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'pengukuran_kinerja') {
-							$pengukuran_kinerja = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pengukuran Kinerja Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[pengukuran_kinerja tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $pengukuran_kinerja['url'] . '">' . $pengukuran_kinerja['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'pengukuran_rencana_aksi') {
-							$pengukuran_rencana_aksi = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pengukuran Rencana Aksi Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[pengukuran_rencana_aksi tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $pengukuran_rencana_aksi['url'] . '">' . $pengukuran_rencana_aksi['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'laporan_kinerja') {
-							$laporan_kinerja = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Laporan Kinerja Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[laporan_kinerja tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $laporan_kinerja['url'] . '">' . $laporan_kinerja['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'dpa') {
-							$dpa = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen DPA Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dpa tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $dpa['url'] . '">' . $dpa['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'evaluasi_internal') {
-							$evaluasi_internal = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Evaluasi Internal Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[evaluasi_internal tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $evaluasi_internal['url'] . '">' . $evaluasi_internal['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'dokumen_lainnya') {
-							$dokumen_lainnya = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Lain Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dokumen_lainnya tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $dokumen_lainnya['url'] . '">' . $dokumen_lainnya['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'perjanjian_kinerja') {
-							$perjanjian_kinerja = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Perjanjian Kinerja Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[perjanjian_kinerja tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $perjanjian_kinerja['url'] . '">' . $perjanjian_kinerja['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'rkpd') {
-							$rkpd = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman RKPD Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[rkpd tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $rkpd['url'] . '">' . $rkpd['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'dokumen_lainnya_pemda') {
-							$dokumen_lainnya_pemda = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Lainnya Pemda Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dokumen_detail_dokumen_lainnya_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $dokumen_lainnya_pemda['url'] . '">' . $dokumen_lainnya_pemda['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'lkjip') {
-							$lkjip_lppd = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman LKJIP/LPPD  ' . $tahun_item['tahun_anggaran'],
-								'content' => '[lkjip_lppd tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $lkjip_lppd['url'] . '">' . $lkjip_lppd['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'lhe_akip_internal') {
-							$lhe_akip_internal = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen LHE AKIP Internal Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[lhe_akip_internal tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $lhe_akip_internal['url'] . '">' . $lhe_akip_internal['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'tl_lhe_akip_internal') {
-							$tl_lhe_akip_internal = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen TL LHE AKIP Internal Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[tl_lhe_akip_internal tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $tl_lhe_akip_internal['url'] . '">' . $tl_lhe_akip_internal['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'tl_lhe_akip_kemenpan') {
-							$tl_lhe_akip_kemenpan = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen TL LHE AKIP Kemenpan Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[tl_lhe_akip_kemenpan tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $tl_lhe_akip_kemenpan['url'] . '">' . $tl_lhe_akip_kemenpan['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'laporan_monev_renaksi') {
-							$laporan_monev_renaksi = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Monev Renaksi Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[laporan_monev_renaksi tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $laporan_monev_renaksi['url'] . '">' . $laporan_monev_renaksi['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'pedoman_teknis_perencanaan') {
-							$pedoman_teknis_perencanaan = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Pedoman Teknis Perencanaan Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[pedoman_teknis_perencanaan tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $pedoman_teknis_perencanaan['url'] . '">' . $pedoman_teknis_perencanaan['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja') {
-							$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['url'] . '">' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'pedoman_teknis_evaluasi_internal') {
-							$pedoman_teknis_evaluasi_internal = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Pedoman Teknis Evaluasi Internal Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[pedoman_teknis_evaluasi_internal tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $pedoman_teknis_evaluasi_internal['url'] . '">' . $pedoman_teknis_evaluasi_internal['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'skp_pemda') {
-							$skp_pemda = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pemda SKP Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dokumen_detail_skp_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $skp_pemda['url'] . '">' . $skp_pemda['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'rencana_aksi_pemda') {
-							$rencana_aksi_pemda = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pemda Rencana Aksi Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dokumen_detail_rencana_aksi_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $rencana_aksi_pemda['url'] . '">' . $rencana_aksi_pemda['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'iku_pemda') {
-							$iku_pemda = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pemda IKU Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dokumen_detail_iku_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $iku_pemda['url'] . '">' . $iku_pemda['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'laporan_kinerja_pemda') {
-							$laporan_kinerja_pemda = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pemda Laporan Kinerja Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dokumen_detail_laporan_kinerja_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $laporan_kinerja_pemda['url'] . '">' . $laporan_kinerja_pemda['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'dpa_pemda') {
-							$dpa_pemda = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pemda DPA Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dokumen_detail_dpa_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $dpa_pemda['url'] . '">' . $dpa_pemda['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'evaluasi_internal_pemda') {
-							$evaluasi_internal_pemda = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pemda Evaluasi Internal Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dokumen_detail_evaluasi_internal_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $evaluasi_internal_pemda['url'] . '">' . $evaluasi_internal_pemda['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'dokumen_lainnya_pemda') {
-							$dokumen_lainnya_pemda = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pemda Lain Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dokumen_detail_dokumen_lainnya_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $dokumen_lainnya_pemda['url'] . '">' . $dokumen_lainnya_pemda['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'perjanjian_kinerja_pemda') {
-							$perjanjian_kinerja_pemda = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pemda Perjanjian Kinerja Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dokumen_detail_perjanjian_kinerja_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $perjanjian_kinerja_pemda['url'] . '">' . $perjanjian_kinerja_pemda['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'rkpd_pemda') {
-							$rkpd_pemda = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pemda RKPD Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dokumen_detail_rkpd_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $rkpd_pemda['url'] . '">' . $rkpd_pemda['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'lkjip_pemda') {
-							$lkjip_lppd_pemda = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pemda LKJIP/LPPD  ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dokumen_detail_lkjip_lppd_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $lkjip_lppd_pemda['url'] . '">' . $lkjip_lppd_pemda['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'lhe_akip_internal_pemda') {
-							$lhe_akip_internal_pemda = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pemda LHE AKIP Internal Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dokumen_detail_lhe_akip_internal_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $lhe_akip_internal_pemda['url'] . '">' . $lhe_akip_internal_pemda['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'tl_lhe_akip_internal_pemda') {
-							$tl_lhe_akip_internal_pemda = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pemda TL LHE AKIP Internal Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dokumen_detail_tl_lhe_akip_internal_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $tl_lhe_akip_internal_pemda['url'] . '">' . $tl_lhe_akip_internal_pemda['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'tl_lhe_akip_kemenpan_pemda') {
-							$tl_lhe_akip_kemenpan_pemda = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pemda TL LHE AKIP Kemenpan Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dokumen_detail_tl_lhe_akip_kemenpan_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $tl_lhe_akip_kemenpan_pemda['url'] . '">' . $tl_lhe_akip_kemenpan_pemda['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'laporan_monev_renaksi_pemda') {
-							$laporan_monev_renaksi_pemda = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pemda Monev Renaksi Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dokumen_detail_laporan_monev_renaksi_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $laporan_monev_renaksi_pemda['url'] . '">' . $laporan_monev_renaksi_pemda['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'pedoman_teknis_perencanaan_pemda') {
-							$pedoman_teknis_perencanaan_pemda = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pemda Pedoman Teknis Perencanaan Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dokumen_detail_pedoman_teknis_perencanaan_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $pedoman_teknis_perencanaan_pemda['url'] . '">' . $pedoman_teknis_perencanaan_pemda['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda') {
-							$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pemda Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dokumen_detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda['url'] . '">' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'pedoman_teknis_evaluasi_internal_pemda') {
-							$pedoman_teknis_evaluasi_internal_pemda = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Dokumen Pemda Pedoman Teknis Evaluasi Internal Tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[dokumen_detail_pedoman_teknis_evaluasi_internal_pemda tahun=' . $tahun_item["tahun_anggaran"] . ']',
-								'show_header' => 1,
-								'no_key' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $pedoman_teknis_evaluasi_internal_pemda['url'] . '">' . $pedoman_teknis_evaluasi_internal_pemda['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'monev_rencana_aksi_opd') {
-							$list_skpd_pengisian_rencana_aksi = $this->functions->generatePage(array(
-								'nama_page' => 'Input Rencana Hasil Kerja - ' . $tahun_item['tahun_anggaran'],
-								'content' => '[list_pengisian_rencana_aksi tahun=' . $tahun_item['tahun_anggaran'] . ']',
-								'show_header' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $list_skpd_pengisian_rencana_aksi['url'] . '">' . $list_skpd_pengisian_rencana_aksi['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'monev_rencana_aksi_setting') {
-							$jadwal_renstra = $wpdb->get_results(
-								"
-								SELECT 
-									id,
-									nama_jadwal,
-									nama_jadwal_renstra,
-									tahun_anggaran,
-									lama_pelaksanaan,
-									tahun_selesai_anggaran
-								FROM esakip_data_jadwal
-								WHERE tipe = 'RPJMD'
-								  AND status = 1
-									ORDER BY tahun_anggaran DESC",
-								ARRAY_A
-							);
-							$opsion_jadwal_renstra = "<option value=''>Pilih Periode</option>";
-
-							foreach ($jadwal_renstra as $v_renstra) {
-								if (!empty($v_renstra['tahun_selesai_anggaran']) && $v_renstra['tahun_selesai_anggaran'] > 1) {
-									$tahun_anggaran_selesai = $v_renstra['tahun_selesai_anggaran'];
-								} else {
-									$tahun_anggaran_selesai = $v_renstra['tahun_anggaran'] + $v_renstra['lama_pelaksanaan'];
-								}
-
-								$opsion_jadwal_renstra .= "<option value='" . $v_renstra['id'] . "'>" . $v_renstra['nama_jadwal_renstra'] . " Periode " . $v_renstra['tahun_anggaran'] . " - " . $tahun_anggaran_selesai . "</option>";
-							}
-							$pengisian_rencana_aksi_setting = $this->functions->generatePage(array(
-								'nama_page' => 'Input Rencana Hasil Kerja Setting ',
-								'content' => '[pengisian_rencana_aksi_setting]',
-								'show_header' => 1,
-								'post_status' => 'private'
-							));
-							$title = 'Rencana Aksi Setting';
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $pengisian_rencana_aksi_setting['url'] . '&tahun_anggaran=' . $tahun_item['tahun_anggaran'] . '">' . $title . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'laporan_pk_opd') {
-							$list_skpd_laporan_pk = $this->functions->generatePage(array(
-								'nama_page' => 'Laporan PK Perangkat Daerah - ' . $tahun_item['tahun_anggaran'],
-								'content' => '[list_halaman_laporan_pk tahun=' . $tahun_item['tahun_anggaran'] . ']',
-								'show_header' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $list_skpd_laporan_pk['url'] . '">' . $list_skpd_laporan_pk['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'kuesioner') {
-							$input_kuesioner_menpan = $this->functions->generatePage(array(
-								'nama_page' => 'Input Kuesioner Menpan tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[input_kuesioner_menpan tahun=' . $tahun_item['tahun_anggaran'] . ']',
-								'show_header' => 1,
-								'post_status' => 'private'
-							));
-							$input_kuesioner_mendagri = $this->functions->generatePage(array(
-								'nama_page' => 'Input Kuesioner Mendagri tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[input_kuesioner_mendagri tahun=' . $tahun_item['tahun_anggaran'] . ']',
-								'show_header' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $input_kuesioner_menpan['url'] . '">' . $input_kuesioner_menpan['title'] . '</a></li>
-										<li><a target="_blank" href="' . $input_kuesioner_mendagri['url'] . '">' . $input_kuesioner_mendagri['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'kuesioner_menpan') {
-							$list_skpd_kuesioner_menpan = $this->functions->generatePage(array(
-								'nama_page' => 'Kuesioner Menpan tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[list_kuesioner_menpan tahun=' . $tahun_item['tahun_anggaran'] . ']',
-								'show_header' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $list_skpd_kuesioner_menpan['url'] . '">' . $list_skpd_kuesioner_menpan['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						} else if (!empty($_POST['type']) && $_POST['type'] == 'kuesioner_mendagri') {
-							$list_skpd_kuesioner_mendagri = $this->functions->generatePage(array(
-								'nama_page' => 'Kuesioner Mendagri tahun ' . $tahun_item['tahun_anggaran'],
-								'content' => '[list_kuesioner_mendagri tahun=' . $tahun_item['tahun_anggaran'] . ']',
-								'show_header' => 1,
-								'post_status' => 'private'
-							));
-							$body_pemda = '
-							<div class="accordion">
-								<h3 class="esakip-header-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">Tahun Anggaran ' . $tahun_item['tahun_anggaran'] . '</h3>
-								<div class="esakip-body-tahun" tahun="' . $tahun_item['tahun_anggaran'] . '">
-									<ul style="margin-left: 20px;">
-										<li><a target="_blank" href="' . $list_skpd_kuesioner_mendagri['url'] . '">' . $list_skpd_kuesioner_mendagri['title'] . '</a></li>
-									</ul>
-								</div>
-							</div>';
-						}
-						$ret['message'] .= $body_pemda;
-					}
-				}
-			}
-		}
-		die(json_encode($ret));
-	}
-
-
 	public function crb_attach_esakip_options()
 	{
 		$basic_options_container = Container::make('theme_options', 'E-SAKIP Options')
@@ -1325,237 +161,75 @@ class Wp_Eval_Sakip_Admin
 
 		Container::make('theme_options', __('RPJPD'))
 			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_rpjpd_hide_sidebar')
-					->set_html('
-						<style>
-							.postbox-container { display: none; }
-							#poststuff #post-body.columns-2 { margin: 0 !important; }
-						</style>
-					')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'rpjpd')));
+			->add_fields($this->generate_fields_dokumen_rpjpd_pemda());
 
 		Container::make('theme_options', __('RPJMD'))
 			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_rpjmd_hide_sidebar')
-					->set_html('
-						<style>
-							.postbox-container { display: none; }
-							#poststuff #post-body.columns-2 { margin: 0 !important; }
-						</style>
-					')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'rpjmd')));
+			->add_fields($this->generate_fields_dokumen_rpjmd_pemda());
 
 		Container::make('theme_options', __('IKU'))
 			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_iku_hide_sidebar')
-					->set_html('
-						<style>
-							.postbox-container { display: none; }
-							#poststuff #post-body.columns-2 { margin: 0 !important; }
-						</style>
-					')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'iku_pemda')));
+			->add_fields($this->generate_fields_dokumen_iku_pemda());
 
 		Container::make('theme_options', __('RKPD'))
 			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_rkpd_hide_sidebar')
-					->set_html('
-						<style>
-							.postbox-container { display: none; }
-							#poststuff #post-body.columns-2 { margin: 0 !important; }
-						</style>
-					')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'rkpd_pemda')));
+			->add_fields($this->generate_fields_dokumen_rkpd_pemda());
 
 		Container::make('theme_options', __('Perjanjian Kinerja'))
 			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_perjanjian_kinerja_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'perjanjian_kinerja_pemda')));
+			->add_fields($this->generate_fields_dokumen_pk_pemda());
 
 		Container::make('theme_options', __('Laporan Kinerja'))
 			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_laporan_kinerja_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'laporan_kinerja_pemda')));
+			->add_fields($this->generate_fields_dokumen_laporan_kinerja_pemda());
 
 		Container::make('theme_options', __('DPA'))
 			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_renja_hide_sidebar')
-					->set_html('
-						<style>
-							.postbox-container { display: none; }
-							#poststuff #post-body.columns-2 { margin: 0 !important; }
-						</style>
-					')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'dpa_pemda')));
+			->add_fields($this->generate_fields_dokumen_dpa_pemda());
 
 		Container::make('theme_options', __('Pohon Kinerja dan Cascading'))
 			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_pohon_kinerja_dan_cascading_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'pohon_kinerja_dan_cascading_pemda')));
+			->add_fields($this->generate_fields_dokumen_pokin_cascading_pemda());
 
 		Container::make('theme_options', __('LHE AKIP Internal'))
 			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_lhe_akip_internal_hide_sidebar')
-					->set_html('
-						<style>
-							.postbox-container { display: none; }
-							#poststuff #post-body.columns-2 { margin: 0 !important; }
-						</style>
-					')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'lhe_akip_internal_pemda')));
+			->add_fields($this->generate_fields_dokumen_lhe_internal_pemda());
 
 		Container::make('theme_options', __('TL LHE AKIP Internal'))
 			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_tl_lhe_akip_internal_hide_sidebar')
-					->set_html('
-						<style>
-							.postbox-container { display: none; }
-							#poststuff #post-body.columns-2 { margin: 0 !important; }
-						</style>
-					')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'tl_lhe_akip_internal_pemda')));
+			->add_fields($this->generate_fields_dokumen_tl_lhe_internal_pemda());
 
 		Container::make('theme_options', __('TL LHE AKIP Kemenpan'))
 			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_tl_lhe_akip_kemenpan_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'tl_lhe_akip_kemenpan_pemda')));
+			->add_fields($this->generate_fields_dokumen_tl_lhe_kemenpan_pemda());
 
 		Container::make('theme_options', __('Laporan Monev Renaksi'))
 			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_laporan_monev_renaksi_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'laporan_monev_renaksi_pemda')));
+			->add_fields($this->generate_fields_dokumen_monev_renaksi_pemda());
 
 		Container::make('theme_options', __('Pedoman Teknis Perencanaan'))
 			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_pedoman_teknis_perencanaan_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'pedoman_teknis_perencanaan_pemda')));
+			->add_fields($this->generate_fields_dokumen_pedoman_teknis_perencanaan_pemda());
 
 		Container::make('theme_options', __('Pedoman Teknis Pengukuran dan Pengumpulan Data Kinerja'))
 			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda')));
+			->add_fields($this->generate_fields_dokumen_pedoman_teknis_pengukuran_pengumpulan_kinerja_pemda());
 
 		Container::make('theme_options', __('Pedoman Teknis Evaluasi Internal'))
 			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_pedoman_teknis_evaluasi_internal_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'pedoman_teknis_evaluasi_internal_pemda')));
+			->add_fields($this->generate_fields_dokumen_pedoman_teknis_evaluasi_internal_pemda());
 
 		Container::make('theme_options', __('Rencana Aksi'))
 			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_rencana_aksi_hide_sidebar')
-					->set_html('
-						<style>
-							.postbox-container { display: none; }
-							#poststuff #post-body.columns-2 { margin: 0 !important; }
-						</style>
-					')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'rencana_aksi_pemda')));
+			->add_fields($this->generate_fields_dokumen_renaksi_pemda());
 
 		Container::make('theme_options', __('LKJIP/LPPD'))
 			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_lkjip_lppd_hide_sidebar')
-					->set_html('
-						<style>
-							.postbox-container { display: none; }
-							#poststuff #post-body.columns-2 { margin: 0 !important; }
-						</style>
-					')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'lkjip_pemda')));
+			->add_fields($this->generate_fields_dokumen_lkjip_pemda());
 
 		Container::make('theme_options', __('Dokumen Lainnya'))
 			->set_page_parent($dokumen_pemda_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_dokumen_lainnya_pemda_hide_sidebar')
-					->set_html('
-						<style>
-							.postbox-container { display: none; }
-							#poststuff #post-body.columns-2 { margin: 0 !important; }
-						</style>
-					')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'dokumen_lainnya_pemda')));
+			->add_fields($this->generate_fields_dokumen_lain_pemda());
 
 		$dokumen_menu = Container::make('theme_options', __('Dokumen Perangkat Daerah'))
 			->set_page_menu_position(3.2)
@@ -1572,274 +246,59 @@ class Wp_Eval_Sakip_Admin
 
 		Container::make('theme_options', __('RENSTRA'))
 			->set_page_parent($dokumen_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_renstra_hide_sidebar')
-					->set_html('
-						<style>
-							.postbox-container { display: none; }
-							#poststuff #post-body.columns-2 { margin: 0 !important; }
-						</style>
-					')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'renstra')));
+			->add_fields($this->generate_fields_dokumen_renstra_opd());
 
 		Container::make('theme_options', __('IKU'))
 			->set_page_parent($dokumen_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_iku_hide_sidebar')
-					->set_html('
-						<style>
-							.postbox-container { display: none; }
-							#poststuff #post-body.columns-2 { margin: 0 !important; }
-						</style>
-					')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'iku')));
+			->add_fields($this->generate_fields_dokumen_iku_opd());
 
 		Container::make('theme_options', __('RENJA/RKT'))
 			->set_page_parent($dokumen_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_renja_hide_sidebar')
-					->set_html('
-						<style>
-							.postbox-container { display: none; }
-							#poststuff #post-body.columns-2 { margin: 0 !important; }
-						</style>
-					')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'renja_rkt')));
+			->add_fields($this->generate_fields_dokumen_renja_opd());
 
 		Container::make('theme_options', __('Perjanjian Kinerja'))
 			->set_page_parent($dokumen_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_perjanjian_kinerja_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'perjanjian_kinerja')));
+			->add_fields($this->generate_fields_dokumen_pk_opd());
 
 		Container::make('theme_options', __('Laporan Kinerja'))
 			->set_page_parent($dokumen_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_laporan_kinerja_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'laporan_kinerja')));
+			->add_fields($this->generate_fields_dokumen_laporan_kinerja_opd());
 
 		Container::make('theme_options', __('DPA'))
 			->set_page_parent($dokumen_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_renja_hide_sidebar')
-					->set_html('
-						<style>
-							.postbox-container { display: none; }
-							#poststuff #post-body.columns-2 { margin: 0 !important; }
-						</style>
-					')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'dpa')));
+			->add_fields($this->generate_fields_dokumen_dpa_opd());
 
 		Container::make('theme_options', __('Pohon Kinerja dan Cascading'))
 			->set_page_parent($dokumen_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_pohon_kinerja_dan_cascading_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'pohon_kinerja_dan_cascading')));
+			->add_fields($this->generate_fields_dokumen_pokin_cascading_opd());
 
 		Container::make('theme_options', __('LHE AKIP Internal'))
 			->set_page_parent($dokumen_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_lhe_akip_internal_hide_sidebar')
-					->set_html('
-						<style>
-							.postbox-container { display: none; }
-							#poststuff #post-body.columns-2 { margin: 0 !important; }
-						</style>
-					')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'lhe_akip_internal')));
+			->add_fields($this->generate_fields_dokumen_lhe_internal_opd());
 
 		Container::make('theme_options', __('TL LHE AKIP Internal'))
 			->set_page_parent($dokumen_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_tl_lhe_akip_internal_hide_sidebar')
-					->set_html('
-						<style>
-							.postbox-container { display: none; }
-							#poststuff #post-body.columns-2 { margin: 0 !important; }
-						</style>
-					')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'tl_lhe_akip_internal')));
+			->add_fields($this->generate_fields_dokumen_tl_lhe_internal_opd());
 
 		Container::make('theme_options', __('Laporan Monev Renaksi'))
 			->set_page_parent($dokumen_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_laporan_monev_renaksi_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'laporan_monev_renaksi')));
+			->add_fields($this->generate_fields_dokumen_laporan_monev_renaksi_opd());
 
 		Container::make('theme_options', __('Rencana Aksi'))
 			->set_page_parent($dokumen_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_rencana_aksi_hide_sidebar')
-					->set_html('
-						<style>
-							.postbox-container { display: none; }
-							#poststuff #post-body.columns-2 { margin: 0 !important; }
-						</style>
-					')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'rencana_aksi')));
+			->add_fields($this->generate_fields_dokumen_renaksi_opd());
 
 		Container::make('theme_options', __('SKP'))
 			->set_page_parent($dokumen_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_skp_hide_sidebar')
-					->set_html('
-						<style>
-							.postbox-container { display: none; }
-							#poststuff #post-body.columns-2 { margin: 0 !important; }
-						</style>
-					')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'skp')));
-		// Container::make('theme_options', __('Pengukuran Kinerja'))
-		// 	->set_page_parent($dokumen_menu)
-		// 	->add_fields(array(
-		// 		Field::make('html', 'crb_pengukuran_kinerja_hide_sidebar')
-		// 			->set_html('
-		// 				<style>
-		// 					.postbox-container { display: none; }
-		// 					#poststuff #post-body.columns-2 { margin: 0 !important; }
-		// 				</style>
-		// 			')
-		// 	))
-		// 	->add_fields($this->get_ajax_field(array('type' => 'pengukuran_kinerja')));
-		// Container::make('theme_options', __('Pengukuran Rencana Aksi'))
-		// 	->set_page_parent($dokumen_menu)
-		// 	->add_fields(array(
-		// 		Field::make('html', 'crb_pengukuran_rencana_aksi_hide_sidebar')
-		// 			->set_html('
-		// 			<style>
-		// 				.postbox-container { display: none; }
-		// 				#poststuff #post-body.columns-2 { margin: 0 !important; }
-		// 			</style>
-		// 		')
-		// 	))
-		// 	->add_fields($this->get_ajax_field(array('type' => 'pengukuran_rencana_aksi')));
+			->add_fields($this->generate_fields_dokumen_skp_opd());
 
 		Container::make('theme_options', __('Evaluasi Internal'))
 			->set_page_parent($dokumen_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_evaluasi_internal_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'evaluasi_internal')));
-
-		// Container::make('theme_options', __('TL LHE AKIP Kemenpan'))
-		// ->set_page_parent($dokumen_menu)
-		// ->add_fields(array(
-		// 	Field::make('html', 'crb_tl_lhe_akip_kemenpan_hide_sidebar')
-		// 		->set_html('
-		// 			<style>
-		// 				.postbox-container { display: none; }
-		// 				#poststuff #post-body.columns-2 { margin: 0 !important; }
-		// 			</style>
-		// 		')
-		// ))
-		// ->add_fields($this->get_ajax_field(array('type' => 'tl_lhe_akip_kemenpan')));
-
-		// Container::make('theme_options', __('Laporan Monev Renaksi'))
-		// ->set_page_parent($dokumen_menu)
-		// ->add_fields(array(
-		// 	Field::make('html', 'crb_laporan_monev_renaksi_hide_sidebar')
-		// 		->set_html('
-		// 			<style>
-		// 				.postbox-container { display: none; }
-		// 				#poststuff #post-body.columns-2 { margin: 0 !important; }
-		// 			</style>
-		// 		')
-		// ))
-		// ->add_fields($this->get_ajax_field(array('type' => 'laporan_monev_renaksi')));
-
-		// Container::make('theme_options', __('Pedoman Teknis Perencanaan'))
-		// ->set_page_parent($dokumen_menu)
-		// ->add_fields(array(
-		// 	Field::make('html', 'crb_pedoman_teknis_perencanaan_hide_sidebar')
-		// 		->set_html('
-		// 			<style>
-		// 				.postbox-container { display: none; }
-		// 				#poststuff #post-body.columns-2 { margin: 0 !important; }
-		// 			</style>
-		// 		')
-		// ))
-		// ->add_fields($this->get_ajax_field(array('type' => 'pedoman_teknis_perencanaan')));
-
-		// Container::make('theme_options', __('Pedoman Teknis Pengukuran dan Pengumpulan Data Kinerja'))
-		// ->set_page_parent($dokumen_menu)
-		// ->add_fields(array(
-		// 	Field::make('html', 'crb_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_hide_sidebar')
-		// 		->set_html('
-		// 			<style>
-		// 				.postbox-container { display: none; }
-		// 				#poststuff #post-body.columns-2 { margin: 0 !important; }
-		// 			</style>
-		// 		')
-		// ))
-		// ->add_fields($this->get_ajax_field(array('type' => 'pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja')));
-
-		// Container::make('theme_options', __('Pedoman Teknis Evaluasi Internal'))
-		// ->set_page_parent($dokumen_menu)
-		// ->add_fields(array(
-		// 	Field::make('html', 'crb_pedoman_teknis_evaluasi_internal_hide_sidebar')
-		// 		->set_html('
-		// 			<style>
-		// 				.postbox-container { display: none; }
-		// 				#poststuff #post-body.columns-2 { margin: 0 !important; }
-		// 			</style>
-		// 		')
-		// ))
-		// ->add_fields($this->get_ajax_field(array('type' => 'pedoman_teknis_evaluasi_internal')));
+			->add_fields($this->generate_fields_dokumen_evaluasi_internal_opd());
 
 		Container::make('theme_options', __('Dokumen Lainnya'))
 			->set_page_parent($dokumen_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_dokumen_lainnya_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'dokumen_lainnya')));
+			->add_fields($this->generate_fields_dokumen_dokumen_lain_opd());
 
 		Container::make('theme_options', __('Pengisian LKE SAKIP'))
 			->set_page_menu_position(3.3)
@@ -1848,249 +307,55 @@ class Wp_Eval_Sakip_Admin
 
 		$pengisian_pokin_menu = Container::make('theme_options', __('Pohon Kinerja'))
 			->set_page_menu_position(3.4)
-			->set_icon('dashicons-networking')
-			->add_fields(array(
-				Field::make('html', 'crb_pengisian_pokin_hide_sidebar')
-					->set_html('
-		        		<style>
-		        			.postbox-container { display: none; }
-		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
-		        		</style>
-		        	')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'input_pohon_kinerja_pemda')));
+			->set_icon('dashicons-networking');
 
 		Container::make('theme_options', __('Pohon Kinerja Pemerintah Daerah'))
 			->set_page_parent($pengisian_pokin_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_pengisian_pokin_pemda_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'input_pohon_kinerja_pemda')));
+			->add_fields($this->generate_fields_pokin_pemda());
 
 		Container::make('theme_options', __('Cascading Pemerintah Daerah'))
 			->set_page_parent($pengisian_pokin_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_pengisian_cascading_pemda_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'cascading_pemda')));
+			->add_fields($this->generate_fields_cascading_pemda());
 
-		Container::make('theme_options', __('Croscutting Pemerintah Daerah'))
+		Container::make('theme_options', __('Crosscutting Pemerintah Daerah'))
 			->set_page_parent($pengisian_pokin_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_pengisian_croscutting_pemda_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'croscutting_pemda')));
+			->add_fields($this->generate_fields_crosscutting_pemda());
 
 		Container::make('theme_options', __('Pohon Kinerja Perangkat Daerah'))
 			->set_page_parent($pengisian_pokin_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_pengisian_pokin_pd_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'input_pohon_kinerja_opd')));
+			->add_fields($this->generate_fields_pokin_opd());
 
 		Container::make('theme_options', __('Cascading Perangkat Daerah'))
 			->set_page_parent($pengisian_pokin_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_pengisian_cascading_pd_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'cascading_pd')));
+			->add_fields($this->generate_fields_cascading_opd());
 
-		Container::make('theme_options', __('Croscutting Perangkat Daerah'))
-			->set_page_parent($pengisian_pokin_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_pengisian_croscutting_pd_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'croscutting_pd')));
-
-		$monev_ren_aksi_menu = Container::make('theme_options', __('Rencana Aksi'))
+		$monev_renaksi_menu = Container::make('theme_options', __('Rencana Aksi'))
 			->set_page_menu_position(3.5)
-			->set_icon('dashicons-analytics')
-			->add_fields(array(
-				Field::make('html', 'crb_monev_pokin_hide_sidebar')
-					->set_html('
-		        		<style>
-		        			.postbox-container { display: none; }
-		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
-		        		</style>
-		        	')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'monev_rencana_aksi_pemda')));
+			->set_icon('dashicons-analytics');
 
 		Container::make('theme_options', __('Rencana Aksi Pemerintah Daerah'))
-			->set_page_parent($monev_ren_aksi_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_pengisian_monev_pemda_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'monev_rencana_aksi_pemda')));
+			->set_page_parent($monev_renaksi_menu)
+			->add_fields($this->generate_fields_renaksi_pemda());
 
 		Container::make('theme_options', __('Rencana Aksi Perangkat Daerah'))
-			->set_page_parent($monev_ren_aksi_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_pengisian_monev_pd_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'monev_rencana_aksi_opd')));
-
-		$api_key_wpspd = get_option('_crb_apikey_wpsipd');
-		$url_server_wpspd = get_option('_crb_url_server_sakip');
+			->set_page_parent($monev_renaksi_menu)
+			->add_fields($this->generate_fields_renaksi_opd());
 
 		Container::make('theme_options', __('Rencana Aksi Setting'))
-			->set_page_parent($monev_ren_aksi_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_esakip_halaman_terkait')
-					->set_html('
-				<table class="form-table">
-					<tbody>
-						<tr>
-							<th scope="row">
-								<label>URL Server WP-SIPD</label>
-							</th>
-							<td>
-								<input type="text" style="width: 30em;" value="' . $url_server_wpspd . '" disabled>
-							</td>
-						</tr>
-						<tr>
-							<th scope="row">
-								<label>API KEY WP-SIPD</label>
-							</th>
-							<td>
-								<input type="text" style="width: 30em;" value="' . $api_key_wpspd . '" disabled>
-								<p>Setting Url Server dan Api Key ada di menu pengaturan perangkat daerah</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'monev_rencana_aksi_setting')));
+			->set_page_parent($monev_renaksi_menu)
+			->add_fields($this->generate_fields_renaksi_settings());
 
 		$input_iku_menu = Container::make('theme_options', __('Input IKU'))
 			->set_page_menu_position(3.6)
-			->set_icon('dashicons-edit-page')
-			->add_fields(array(
-				Field::make('html', 'crb_input_iku_pd_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-					<table class="form-table">
-						<tbody>
-							<tr>
-								<th scope="row">
-									<label>URL Server WP-SIPD</label>
-								</th>
-								<td>
-									<input type="text" style="width: 30em;" value="' . $url_server_wpspd . '" disabled>
-								</td>
-							</tr>
-							<tr>
-								<th scope="row">
-									<label>API KEY WP-SIPD</label>
-								</th>
-								<td>
-									<input type="text" style="width: 30em;" value="' . $api_key_wpspd . '" disabled>
-									<p>Setting Url Server dan Api Key ada di menu pengaturan perangkat daerah</p>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'input_iku_opd')));
+			->set_icon('dashicons-edit-page');
 
 		Container::make('theme_options', __('Input IKU Pemerintah Daerah'))
 			->set_page_parent($input_iku_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_input_iku_pemda_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'input_iku_pemda')));
+			->add_fields($this->generate_fields_input_iku_pemda());
 
 		Container::make('theme_options', __('Input IKU Perangkat Daerah'))
 			->set_page_parent($input_iku_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_input_iku_pd_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-					<table class="form-table">
-						<tbody>
-							<tr>
-								<th scope="row">
-									<label>URL Server WP-SIPD</label>
-								</th>
-								<td>
-									<input type="text" style="width: 30em;" value="' . $url_server_wpspd . '" disabled>
-								</td>
-							</tr>
-							<tr>
-								<th scope="row">
-									<label>API KEY WP-SIPD</label>
-								</th>
-								<td>
-									<input type="text" style="width: 30em;" value="' . $api_key_wpspd . '" disabled>
-									<p>Setting Url Server dan Api Key ada di menu pengaturan perangkat daerah</p>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'input_iku_opd')));
+			->add_fields($this->generate_fields_input_iku_opd());
 
 		Container::make('theme_options', __('Input RPJPD'))
 			->set_page_menu_position(3.7)
@@ -2104,134 +369,1749 @@ class Wp_Eval_Sakip_Admin
 
 		$laporan_pk_menu = Container::make('theme_options', __('Laporan PK'))
 			->set_page_menu_position(3.9)
-			->set_icon('dashicons-media-default')
-			->add_fields(array(
-				Field::make('html', 'crb_laporan_pk_pd_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-					<h3>Halaman Laporan PK Perangkat Daerah</h3>
-					<table class="form-table">
-						<tbody>
-						</tbody>
-					</table>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'laporan_pk_opd')));
+			->set_icon('dashicons-media-default');
 
 		Container::make('theme_options', __('Laporan PK Pemerintah Daerah'))
 			->set_page_parent($laporan_pk_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_laporan_pk_pemda_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'laporan_pk_pemda')));
+			->add_fields($this->generate_fields_laporan_pk_pemda());
 
 		Container::make('theme_options', __('Laporan PK Perangkat Daerah'))
 			->set_page_parent($laporan_pk_menu)
-			->add_fields(array(
-				Field::make('html', 'crb_laporan_pk_pd_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-					<h3>Halaman Laporan PK Perangkat Daerah</h3>
-					<table class="form-table">
-						<tbody>
-						</tbody>
-					</table>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'laporan_pk_opd')));
+			->add_fields($this->generate_fields_laporan_pk_opd());
 
 		$kuesioner = Container::make('theme_options', __('Kuesioner'))
 			->set_page_menu_position(3.10)
 			->set_icon('dashicons-media-default')
-			->add_fields(array(
-				Field::make('html', 'crb_kuesioner_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-					<h3>Halaman Input Kuesioner</h3>
-					<table class="form-table">
-						<tbody>
-						</tbody>
-					</table>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'kuesioner')));
+			->add_fields($this->generate_fields_kuesioner());
 
-		Container::make('theme_options', __('MENPAN'))
+		Container::make('theme_options', __('Kuesioner Menpan'))
 			->set_page_parent($kuesioner)
-			->add_fields(array(
-				Field::make('html', 'crb_kuesioner_menpan_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-					<h3>Halaman Kuesioner Menpan</h3>
-					<table class="form-table">
-						<tbody>
-						</tbody>
-					</table>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'kuesioner_menpan')));
+			->add_fields($this->generate_fields_kuesioner_menpan());
 
-		Container::make('theme_options', __('MENDAGRI'))
+		Container::make('theme_options', __('Kuesioner Mendagri'))
 			->set_page_parent($kuesioner)
-			->add_fields(array(
-				Field::make('html', 'crb_kuesioner_mendagri_hide_sidebar')
-					->set_html('
-					<style>
-						.postbox-container { display: none; }
-						#poststuff #post-body.columns-2 { margin: 0 !important; }
-					</style>
-					<h3>Halaman Kuesioner Mendagri</h3>
-					<table class="form-table">
-						<tbody>
-						</tbody>
-					</table>
-				')
-			))
-			->add_fields($this->get_ajax_field(array('type' => 'kuesioner_mendagri')));
-		// Container::make('theme_options', __('RKPD'))
-		// 	->set_page_parent($dokumen_pemda_menu)
-		// 	->add_fields(array(
-		// 		Field::make('html', 'crb_rkpd_hide_sidebar')
-		// 			->set_html('
-		// 				<style>
-		// 					.postbox-container { display: none; }
-		// 					#poststuff #post-body.columns-2 { margin: 0 !important; }
-		// 				</style>
-		// 			')
-		// 	))
-		// 	->add_fields($this->get_ajax_field(array('type' => 'rkpd')));
-
-		// Container::make('theme_options', __('LKJIP/LPPD'))
-		// 	->set_page_parent($dokumen_pemda_menu)
-		// 	->add_fields(array(
-		// 		Field::make('html', 'crb_lkjip_lppd_hide_sidebar')
-		// 			->set_html('
-		// 				<style>
-		// 					.postbox-container { display: none; }
-		// 					#poststuff #post-body.columns-2 { margin: 0 !important; }
-		// 				</style>
-		// 			')
-		// 	))
-		// 	->add_fields($this->get_ajax_field(array('type' => 'lkjip')));
+			->add_fields($this->generate_fields_kuesioner_mendagri());
 	}
+
+	function get_jadwal_renstra_wp_sipd()
+	{
+		if (empty(get_option(ESAKIP_APIKEY_WPSIPD)) && empty(get_option(ESAKIP_URL_WPSIPD))) {
+			return [];
+		}
+
+		$api_params = array(
+			'action' 	=> 'get_data_jadwal_wpsipd',
+			'api_key'	=> get_option(ESAKIP_APIKEY_WPSIPD),
+			'tipe_perencanaan' => 'monev_renstra'
+		);
+
+		$response = wp_remote_post(
+			get_option(ESAKIP_URL_WPSIPD),
+			array(
+				'timeout' 	=> 1000,
+				'sslverify' => false,
+				'body' 		=> $api_params
+			)
+		);
+
+		$response = wp_remote_retrieve_body($response);
+
+		return json_decode($response);
+	}
+
+	function get_rpjpd_settings()
+	{
+		global $wpdb;
+
+		$data = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT 
+					j.id,
+					j.nama_jadwal,
+					j.nama_jadwal_renstra,
+					j.tahun_anggaran,
+					j.lama_pelaksanaan,
+					j.tahun_selesai_anggaran,
+					j.status
+				FROM esakip_data_jadwal j
+				INNER JOIN esakip_pengaturan_upload_dokumen r 
+				   		ON r.id_jadwal_rpjpd = j.id
+				WHERE j.tipe = %s
+				  AND j.status != 0
+				GROUP BY j.id
+				ORDER BY j.tahun_anggaran DESC
+			", 'RPJPD'),
+			ARRAY_A
+		);
+
+		return $data;
+	}
+
+	function get_rpjmd_settings()
+	{
+		global $wpdb;
+
+		$data = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT 
+					j.id,
+					j.nama_jadwal,
+					j.nama_jadwal_renstra,
+					j.tahun_anggaran,
+					j.lama_pelaksanaan,
+					j.tahun_selesai_anggaran,
+					j.status,
+					r.id_jadwal_rpjmd,
+					r.tahun_anggaran as tahun_anggaran_setting
+				FROM esakip_data_jadwal j
+				LEFT JOIN esakip_pengaturan_upload_dokumen r
+					   ON r.id_jadwal_rpjmd = j.id
+				WHERE j.tipe = %s
+				  AND j.status != 0
+				ORDER BY j.tahun_anggaran DESC
+			", 'RPJMD'),
+			ARRAY_A
+		);
+
+		return $data;
+	}
+
+	function get_rpjmd()
+	{
+		global $wpdb;
+
+		$data = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT 
+					id,
+					nama_jadwal,
+					nama_jadwal_renstra,
+					tahun_anggaran,
+					status,
+					lama_pelaksanaan,
+					jenis_jadwal_khusus,
+					tahun_selesai_anggaran
+				FROM esakip_data_jadwal
+				WHERE tipe = %s
+				  AND status != 0
+				ORDER BY tahun_anggaran DESC
+			", 'RPJMD'),
+			ARRAY_A
+		);
+
+		return $data;
+	}
+
+	function get_tahun()
+	{
+
+		global $wpdb;
+		$data = $wpdb->get_results('
+			SELECT 
+				tahun_anggaran 
+			FROM esakip_data_unit 
+			GROUP BY tahun_anggaran 
+			ORDER BY tahun_anggaran DESC', ARRAY_A);
+
+		return $data;
+	}
+
+	function get_jadwal_evaluasi()
+	{
+		global $wpdb;
+		$data = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT 
+					id,
+					nama_jadwal,
+					tahun_anggaran,
+					lama_pelaksanaan,
+					status
+				FROM esakip_data_jadwal
+				WHERE tipe = %s
+				  AND status != 0
+				ORDER BY tahun_anggaran DESC, status ASC
+			", 'LKE'),
+			ARRAY_A
+		);
+
+		return $data;
+	}
+
+	//GENERATE FIELDS MENU DOKUMEN PEMDA
+	public function generate_fields_dokumen_rpjpd_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_rpjpd.php') {
+			return array();
+		}
+
+		$rpjpd_settings = $this->get_rpjpd_settings();
+
+		$html = '';
+		if (!empty($rpjpd_settings)) {
+			foreach ($rpjpd_settings as $v) {
+				$tahun_anggaran_selesai = $v['tahun_anggaran'] + $v['lama_pelaksanaan'];
+				$dokumen_rpjpd_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Dokumen RPJPD | ' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )',
+					'content' 		=> '[upload_dokumen_rpjpd periode=' . $v['id'] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $dokumen_rpjpd_page['url'] . '">' . $dokumen_rpjpd_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Jadwal RPJPD Settings tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_dokumen_rpjpd_pemda_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_rpjpd_pemda_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_rpjmd_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_rpjmd.php') {
+			return array();
+		}
+
+		$jadwal_rpjmd = $this->get_rpjmd();
+
+		$html = '';
+		if (!empty($jadwal_rpjmd)) {
+			foreach ($jadwal_rpjmd as $index => $v) {
+				$dokumen_rpjmd_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Dokumen RPJMD | ' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )',
+					'content' 		=> '[upload_dokumen_rpjmd periode=' . $v['id'] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $dokumen_rpjmd_page['url'] . '">' . $dokumen_rpjmd_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+			<li>
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Jadwal RPJMD tidak tersedia
+				</span>
+			</li>';
+		}
+
+		return [
+			Field::make('html', 'crb_dokumen_rpjmd_pemda_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_rpjmd_pemda_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_iku_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_iku.php') {
+			return array();
+		}
+
+		$jadwal_rpjmd = $this->get_rpjmd();
+
+		$html = '';
+		if (!empty($jadwal_rpjmd)) {
+			foreach ($jadwal_rpjmd as $index => $v) {
+				$dokumen_iku_pemda_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'IKU Pemerintah Daerah | ' . $v['nama_jadwal'] . ' (' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ')',
+					'content' 		=> '[dokumen_detail_iku_pemda id_jadwal=' . $v['id'] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $dokumen_iku_pemda_page['url'] . '">' . $dokumen_iku_pemda_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+			<li>
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Jadwal RPJMD tidak tersedia
+				</span>
+			</li>';
+		}
+
+		return [
+			Field::make('html', 'crb_pengisian_lke_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_pengisian_lke_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_rkpd_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_rkpd.php') {
+			return array();
+		}
+
+		$tahun_all = $this->get_tahun();
+
+		$html = '';
+		if (!empty($tahun_all)) {
+			foreach ($tahun_all as $v) {
+				$dokumen_rkpd_page = $this->functions->generatePage(array(
+					'nama_page'    => 'Halaman RKPD Tahun ' . $v['tahun_anggaran'],
+					'content' 	   => '[rkpd tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header'  => 1,
+					'no_key' 	   => 1,
+					'post_status'  => 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $dokumen_rkpd_page['url'] . '">' . $dokumen_rkpd_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_dokumen_rkpd_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_rkpd_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_pk_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_perjanjian_kinerja.php') {
+			return array();
+		}
+
+		$tahun_all = $this->get_tahun();
+
+		$html = '';
+		if (!empty($tahun_all)) {
+			foreach ($tahun_all as $v) {
+				$dokumen_perjanjian_kinerja_pemda_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Halaman Dokumen Pemda Perjanjian Kinerja Tahun ' . $v['tahun_anggaran'],
+					'content' 		=> '[dokumen_detail_perjanjian_kinerja_pemda tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $dokumen_perjanjian_kinerja_pemda_page['url'] . '">' . $dokumen_perjanjian_kinerja_pemda_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_dokumen_pk_pemda_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_pk_pemda_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_laporan_kinerja_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_laporan_kinerja.php') {
+			return array();
+		}
+
+		$tahun_all = $this->get_tahun();
+
+		$html = '';
+		if (!empty($tahun_all)) {
+			foreach ($tahun_all as $v) {
+				$laporan_kinerja_pemda_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Halaman Dokumen Pemda Laporan Kinerja Tahun ' . $v['tahun_anggaran'],
+					'content' 		=> '[dokumen_detail_laporan_kinerja_pemda tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $laporan_kinerja_pemda_page['url'] . '">' . $laporan_kinerja_pemda_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_dokumen_laporan_kinerja_pemda_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_laporan_kinerja_pemda_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_dpa_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_dpa.php') {
+			return array();
+		}
+
+		$tahun_all = $this->get_tahun();
+
+		$html = '';
+		if (!empty($tahun_all)) {
+			foreach ($tahun_all as $v) {
+				$dokumen_dpa_pemda_page = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Dokumen Pemda DPA Tahun ' . $v['tahun_anggaran'],
+					'content' => '[dokumen_detail_dpa_pemda tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' => 1,
+					'no_key' => 1,
+					'post_status' => 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $dokumen_dpa_pemda_page['url'] . '">' . $dokumen_dpa_pemda_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_dpa_pemda_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dpa_pemda_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_pokin_cascading_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_pohon_kinerja_dan_cascading.php') {
+			return array();
+		}
+
+		$jadwal_rpjmd = $this->get_rpjmd();
+
+		$html = '';
+		if (!empty($jadwal_rpjmd)) {
+			foreach ($jadwal_rpjmd as $index => $v) {
+				$dokumen_pohon_kinerja_cascading_pemda_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Dokumen Pemda Pohon Kinerja dan Cascading | ' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )',
+					'content' 		=> '[dokumen_detail_pohon_kinerja_dan_cascading_pemda periode=' . $v['id'] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $dokumen_pohon_kinerja_cascading_pemda_page['url'] . '">' . $dokumen_pohon_kinerja_cascading_pemda_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Jadwal RPJMD tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_pokin_cascading_pemda_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_pokin_cascading_pemda_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_lhe_internal_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_lhe_akip_internal.php') {
+			return array();
+		}
+
+		$tahun_all = $this->get_tahun();
+
+		$html = '';
+		if (!empty($tahun_all)) {
+			foreach ($tahun_all as $v) {
+				$dokumen_lhe_akip_internal_pemda_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Halaman Dokumen Pemda LHE AKIP Internal Tahun ' . $v['tahun_anggaran'],
+					'content' 		=> '[dokumen_detail_lhe_akip_internal_pemda tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $dokumen_lhe_akip_internal_pemda_page['url'] . '">' . $dokumen_lhe_akip_internal_pemda_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_lhe_internal_pemda_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_lhe_internal_pemda_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_tl_lhe_internal_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_tl_lhe_akip_internal.php') {
+			return array();
+		}
+
+		$tahun_all = $this->get_tahun();
+
+		$html = '';
+		if (!empty($tahun_all)) {
+			foreach ($tahun_all as $v) {
+				$tl_lhe_akip_internal_pemda = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Halaman Dokumen Pemda TL LHE AKIP Internal Tahun ' . $v['tahun_anggaran'],
+					'content' 		=> '[dokumen_detail_tl_lhe_akip_internal_pemda tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $tl_lhe_akip_internal_pemda['url'] . '">' . $tl_lhe_akip_internal_pemda['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_tl_lhe_internal_pemda_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_tl_lhe_internal_pemda_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_tl_lhe_kemenpan_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_tl_lhe_akip_kemenpan.php') {
+			return array();
+		}
+
+		$tahun_all = $this->get_tahun();
+
+		$html = '';
+		if (!empty($tahun_all)) {
+			foreach ($tahun_all as $v) {
+				$tl_lhe_akip_kemenpan_pemda = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Halaman Dokumen Pemda TL LHE AKIP Kemenpan Tahun ' . $v['tahun_anggaran'],
+					'content' 		=> '[dokumen_detail_tl_lhe_akip_kemenpan_pemda tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $tl_lhe_akip_kemenpan_pemda['url'] . '">' . $tl_lhe_akip_kemenpan_pemda['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_tl_lhe_kemenpan_pemda_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_tl_lhe_kemenpan_pemda_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_monev_renaksi_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_laporan_monev_renaksi.php') {
+			return array();
+		}
+
+		$tahun_all = $this->get_tahun();
+
+		$html = '';
+		if (!empty($tahun_all)) {
+			foreach ($tahun_all as $v) {
+				$laporan_monev_renaksi_pemda = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Halaman Dokumen Pemda Monev Renaksi Tahun ' . $v['tahun_anggaran'],
+					'content' 		=> '[dokumen_detail_laporan_monev_renaksi_pemda tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $laporan_monev_renaksi_pemda['url'] . '">' . $laporan_monev_renaksi_pemda['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_monev_renaksi_pemda_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_monev_renaksi_pemda_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_pedoman_teknis_perencanaan_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_pedoman_teknis_perencanaan.php') {
+			return array();
+		}
+
+		$tahun_all = $this->get_tahun();
+
+		$html = '';
+		if (!empty($tahun_all)) {
+			foreach ($tahun_all as $v) {
+				$pedoman_teknis_perencanaan_pemda = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Halaman Dokumen Pemda Pedoman Teknis Perencanaan Tahun ' . $v['tahun_anggaran'],
+					'content' 		=> '[dokumen_detail_pedoman_teknis_perencanaan_pemda tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $pedoman_teknis_perencanaan_pemda['url'] . '">' . $pedoman_teknis_perencanaan_pemda['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_pedoman_teknis_perencanaan_pemda_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_pedoman_teknis_perencanaan_pemda_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_pedoman_teknis_pengukuran_pengumpulan_kinerja_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja.php') {
+			return array();
+		}
+
+		$tahun_all = $this->get_tahun();
+
+		$html = '';
+		if (!empty($tahun_all)) {
+			foreach ($tahun_all as $v) {
+				$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Halaman Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja Tahun ' . $v['tahun_anggaran'],
+					'content' 		=> '[pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['url'] . '">' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_pengisian_lke_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_pengisian_lke_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_pedoman_teknis_evaluasi_internal_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_pedoman_teknis_evaluasi_internal.php') {
+			return array();
+		}
+
+		$tahun_all = $this->get_tahun();
+
+		$html = '';
+		if (!empty($tahun_all)) {
+			foreach ($tahun_all as $v) {
+				$pedoman_teknis_evaluasi_internal_pemda = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Halaman Dokumen Pemda Pedoman Teknis Evaluasi Internal Tahun ' . $v['tahun_anggaran'],
+					'content' 		=> '[dokumen_detail_pedoman_teknis_evaluasi_internal_pemda tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $pedoman_teknis_evaluasi_internal_pemda['url'] . '">' . $pedoman_teknis_evaluasi_internal_pemda['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_pedoman_teknis_evaluasi_internal_pemda_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_pedoman_teknis_evaluasi_internal_pemda_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_renaksi_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_rencana_aksi.php') {
+			return array();
+		}
+
+		$tahun_all = $this->get_tahun();
+
+		$html = '';
+		if (!empty($tahun_all)) {
+			foreach ($tahun_all as $v) {
+				$rencana_aksi_pemda = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Halaman Dokumen Pemda Rencana Aksi Tahun ' . $v['tahun_anggaran'],
+					'content' 		=> '[dokumen_detail_rencana_aksi_pemda tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $rencana_aksi_pemda['url'] . '">' . $rencana_aksi_pemda['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_rencana_aksi_pemda_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_rencana_aksi_pemda_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_lkjip_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_lkjiplppd.php') {
+			return array();
+		}
+
+		$tahun_all = $this->get_tahun();
+
+		$html = '';
+		if (!empty($tahun_all)) {
+			foreach ($tahun_all as $v) {
+				$lkjip_lppd_pemda = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Halaman Dokumen Pemda LKJIP/LPPD  ' . $v['tahun_anggaran'],
+					'content' 		=> '[dokumen_detail_lkjip_lppd_pemda tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $lkjip_lppd_pemda['url'] . '">' . $lkjip_lppd_pemda['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_lkjip_lppd_pemda_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_lkjip_lppd_pemda_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_lain_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_dokumen_lainnya.php') {
+			return array();
+		}
+
+		$tahun_all = $this->get_tahun();
+
+		$html = '';
+		if (!empty($tahun_all)) {
+			foreach ($tahun_all as $v) {
+				$dokumen_lainnya_pemda = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Halaman Dokumen Lainnya Pemda Tahun ' . $v['tahun_anggaran'],
+					'content' 		=> '[dokumen_detail_dokumen_lainnya_pemda tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $dokumen_lainnya_pemda['url'] . '">' . $dokumen_lainnya_pemda['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_dokumen_lainnya_pemda_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_lainnya_pemda_menu')
+				->set_html($html)
+		];
+	}
+	//- END - GENERATE FIELDS MENU DOKUMEN PEMDA
+
+	//- START - GENERATE FIELDS MENU DOKUMEN PERANGKAT DAERAH
+	public function generate_fields_dokumen_renstra_opd()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_renstra.php') {
+			return array();
+		}
+		$jadwal_rpjmd = $this->get_rpjmd();
+
+		$html = '';
+		if (!empty($jadwal_rpjmd)) {
+			foreach ($jadwal_rpjmd as $index => $v) {
+				$renstra_opd_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'RENSTRA | ' . $v['nama_jadwal_renstra'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )',
+					'content' 		=> '[renstra periode=' . $v['id'] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal_renstra'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $renstra_opd_page['url'] . '">' . $renstra_opd_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Jadwal RPJMD tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_dokumen_renstra_opd_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_renstra_opd_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_iku_opd()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_iku1.php') {
+			return array();
+		}
+		$jadwal_rpjmd = $this->get_rpjmd();
+
+		$html = '';
+		if (!empty($jadwal_rpjmd)) {
+			foreach ($jadwal_rpjmd as $index => $v) {
+				$iku_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'IKU Perangkat Daerah | ' . $v['nama_jadwal_renstra'] . ' (' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ')',
+					'content' 		=> '[iku id_jadwal=' . $v['id'] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal_renstra'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $iku_page['url'] . '">' . $iku_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Jadwal RENSTRA tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_dokumen_iku_opd_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_iku_opd_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_renja_opd()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_renjarkt.php') {
+			return array();
+		}
+
+		$get_tahun = $this->get_tahun();
+
+		$html = '';
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $index => $v) {
+				$renja_rkt_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'RENJA/RKT Tahun ' . $v['tahun_anggaran'],
+					'content' 		=> '[renja_rkt tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $renja_rkt_page['url'] . '">' . $renja_rkt_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_dokumen_renja_opd_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_renja_opd_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_pk_opd()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_perjanjian_kinerja1.php') {
+			return array();
+		}
+
+		$get_tahun = $this->get_tahun();
+
+		$html = '';
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $index => $v) {
+				$perjanjian_kinerja_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Perjanjian Kinerja Tahun ' . $v['tahun_anggaran'],
+					'content' 		=> '[perjanjian_kinerja tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $perjanjian_kinerja_page['url'] . '">' . $perjanjian_kinerja_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_dokumen_pk_opd_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_pk_opd_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_laporan_kinerja_opd()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_laporan_kinerja1.php') {
+			return array();
+		}
+
+		$get_tahun = $this->get_tahun();
+
+		$html = '';
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $index => $v) {
+				$laporan_kinerja_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Laporan Kinerja Tahun ' . $v['tahun_anggaran'],
+					'content' 		=> '[laporan_kinerja tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $laporan_kinerja_page['url'] . '">' . $laporan_kinerja_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_dokumen_laporan_kinerja_opd_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_laporan_kinerja_opd_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_dpa_opd()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_dpa1.php') {
+			return array();
+		}
+
+		$get_tahun = $this->get_tahun();
+
+		$html = '';
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $index => $v) {
+				$dpa_opd_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'DPA Tahun ' . $v['tahun_anggaran'],
+					'content' 		=> '[dpa tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $dpa_opd_page['url'] . '">' . $dpa_opd_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_dokumen_dpa_opd_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_dpa_opd_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_pokin_cascading_opd()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_pohon_kinerja_dan_cascading1.php') {
+			return array();
+		}
+
+		$jadwal_rpjmd = $this->get_rpjmd();
+
+		$html = '';
+		if (!empty($jadwal_rpjmd)) {
+			foreach ($jadwal_rpjmd as $index => $v) {
+				$pohon_kinerja_cascading_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Pohon Kinerja dan Cascading | ' . $v['nama_jadwal_renstra'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )',
+					'content' 		=> '[pohon_kinerja_dan_cascading periode=' . $v['id'] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal_renstra'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $pohon_kinerja_cascading_page['url'] . '">' . $pohon_kinerja_cascading_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Jadwal RENSTRA tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_dokumen_pokin_cascading_opd_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_pokin_cascading_opd_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_lhe_internal_opd()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_lhe_akip_internal1.php') {
+			return array();
+		}
+
+		$get_tahun = $this->get_tahun();
+
+		$html = '';
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $index => $v) {
+				$lhe_akip_internal_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'LHE AKIP Internal Tahun ' . $v['tahun_anggaran'],
+					'content' 		=> '[lhe_akip_internal tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $lhe_akip_internal_page['url'] . '">' . $lhe_akip_internal_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_dokumen_lhe_internal_opd_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_lhe_internal_opd_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_tl_lhe_internal_opd()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_tl_lhe_akip_internal1.php') {
+			return array();
+		}
+
+		$get_tahun = $this->get_tahun();
+
+		$html = '';
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $index => $v) {
+				$tl_lhe_akip_internal_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Halaman Dokumen TL LHE AKIP Internal Tahun ' . $v['tahun_anggaran'],
+					'content' 		=> '[tl_lhe_akip_internal tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $tl_lhe_akip_internal_page['url'] . '">' . $tl_lhe_akip_internal_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_dokumen_tl_lhe_internal_opd_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_tl_lhe_internal_opd_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_laporan_monev_renaksi_opd()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_laporan_monev_renaksi1.php') {
+			return array();
+		}
+
+		$get_tahun = $this->get_tahun();
+
+		$html = '';
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $index => $v) {
+				$laporan_monev_renaksi_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Halaman Monev Renaksi Tahun ' . $v['tahun_anggaran'],
+					'content' 		=> '[laporan_monev_renaksi tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $laporan_monev_renaksi_page['url'] . '">' . $laporan_monev_renaksi_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_dokumen_laporan_monev_renaksi_opd_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_laporan_monev_renaksi_opd_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_renaksi_opd()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_rencana_aksi1.php') {
+			return array();
+		}
+
+		$get_tahun = $this->get_tahun();
+
+		$html = '';
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $index => $v) {
+				$rencana_aksi_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Rencana Aksi Tahun ' . $v['tahun_anggaran'],
+					'content' 		=> '[rencana_aksi tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $rencana_aksi_page['url'] . '">' . $rencana_aksi_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_dokumen_renaksi_opd_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_renaksi_opd_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_skp_opd()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_skp.php') {
+			return array();
+		}
+
+		$get_tahun = $this->get_tahun();
+
+		$html = '';
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $index => $v) {
+				$skp_page = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Dokumen SKP Tahun ' . $v['tahun_anggaran'],
+					'content' => '[skp tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' => 1,
+					'no_key' => 1,
+					'post_status' => 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $skp_page['url'] . '">' . $skp_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_dokumen_skp_opd_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_skp_opd_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_evaluasi_internal_opd()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_evaluasi_internal.php') {
+			return array();
+		}
+
+		$get_tahun = $this->get_tahun();
+
+		$html = '';
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $index => $v) {
+				$evaluasi_internal_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Evaluasi Internal Tahun ' . $v['tahun_anggaran'],
+					'content' 		=> '[evaluasi_internal tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $evaluasi_internal_page['url'] . '">' . $evaluasi_internal_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_dokumen_evaluasi_internal_opd_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_evaluasi_internal_opd_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_dokumen_lain_opd()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_dokumen_lainnya1.php') {
+			return array();
+		}
+
+		$get_tahun = $this->get_tahun();
+
+		$html = '';
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $index => $v) {
+				$dokumen_lainnya_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Halaman Dokumen Lain Tahun ' . $v['tahun_anggaran'],
+					'content' 		=> '[dokumen_lainnya tahun=' . $v["tahun_anggaran"] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $dokumen_lainnya_page['url'] . '">' . $dokumen_lainnya_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_dokumen_lainnya_opd_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_lainnya_opd_menu')
+				->set_html($html)
+		];
+	}
+	//- END - GENERATE FIELDS MENU DOKUMEN PERANGKAT DAERAH
+
 
 	public function generate_fields_options_menu_settings()
 	{
@@ -2239,16 +2119,16 @@ class Wp_Eval_Sakip_Admin
 			return array();
 		}
 		global $wpdb;
-		$get_tahun = $wpdb->get_results('SELECT tahun_anggaran FROM esakip_data_unit GROUP BY tahun_anggaran ORDER BY tahun_anggaran ASC', ARRAY_A);
+		$get_tahun = $this->get_tahun();
 		$list_data = '';
 
-		foreach ($get_tahun as $k => $v) {
+		foreach ($get_tahun as $v) {
 			$jadwal_evaluasi = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Pengaturan Menu Tahun Anggaran | ' . $v['tahun_anggaran'],
-				'content' => '[pengaturan_menu tahun_anggaran="' . $v["tahun_anggaran"] . '"]',
-				'show_header' => 1,
-				'no_key' => 1,
-				'post_status' => 'private'
+				'nama_page' 	=> 'Halaman Pengaturan Menu Tahun Anggaran | ' . $v['tahun_anggaran'],
+				'content' 		=> '[pengaturan_menu tahun_anggaran="' . $v["tahun_anggaran"] . '"]',
+				'show_header' 	=> 1,
+				'no_key' 		=> 1,
+				'post_status' 	=> 'private'
 			));
 			$list_data .= '<li><a target="_blank" href="' . $jadwal_evaluasi['url'] . '">' . $jadwal_evaluasi['title'] . '</a></li>';
 		}
@@ -2276,11 +2156,11 @@ class Wp_Eval_Sakip_Admin
 		}
 
 		$this->functions->generatePage(array(
-			'nama_page' => 'SSO Login',
-			'content' => '[sso_login]',
-			'show_header' => 1,
-			'no_key' => 1,
-			'post_status' => 'public'
+			'nama_page' 	=> 'SSO Login',
+			'content' 		=> '[sso_login]',
+			'show_header' 	=> 1,
+			'no_key' 		=> 1,
+			'post_status' 	=> 'public'
 		), false, '[sso_login]');
 
 		$fields = [
@@ -2321,10 +2201,9 @@ class Wp_Eval_Sakip_Admin
 		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_e-sakip_options.php') {
 			return array();
 		}
-		global $wpdb;
-		$tahun_all = $wpdb->get_results('SELECT tahun_anggaran FROM esakip_data_unit GROUP BY tahun_anggaran ORDER BY tahun_anggaran DESC', ARRAY_A);
+		$tahun_all = $this->get_tahun();
 
-		$halaman_monitor_upload_dokumen = '';
+		$html = '';
 		if (!empty($tahun_all)) {
 			foreach ($tahun_all as $v) {
 				$monitor_upload_dokumen = $this->functions->generatePage(array(
@@ -2333,13 +2212,13 @@ class Wp_Eval_Sakip_Admin
 					'show_header' => 1,
 					'post_status' => 'private'
 				));
-				$halaman_monitor_upload_dokumen .= '<li><a target="_blank" href="' . $monitor_upload_dokumen['url'] . '" class="btn btn-primary">Laporan Monitor Upload Dokumen Tahun ' . $v['tahun_anggaran'] . ' </a></li>';
+				$html .= '<li><a target="_blank" href="' . $monitor_upload_dokumen['url'] . '">Laporan Monitor Upload Dokumen Tahun ' . $v['tahun_anggaran'] . ' </a></li>';
 			}
 		}
 
 		$fields = [
 			Field::make('html', 'crb_esakip_halaman_terkait')
-				->set_html('<h4>HALAMAN TERKAIT</h4><ol>' . $halaman_monitor_upload_dokumen . '</ol>'),
+				->set_html('<h4>HALAMAN TERKAIT</h4><ol>' . $html . '</ol>'),
 			Field::make('html', 'crb_sql_migrate')
 				->set_html('<a onclick="sql_migrate_esakip(); return false;" href="#" class="button button-primary button-large">SQL Migrate</a>')
 				->set_help_text('Tombol untuk memperbaiki struktur database E-SAKIP.'),
@@ -2474,9 +2353,7 @@ class Wp_Eval_Sakip_Admin
 			return array();
 		}
 
-		global $wpdb;
-
-		$tahun_all = $wpdb->get_results('SELECT tahun_anggaran FROM esakip_data_unit GROUP BY tahun_anggaran ORDER BY tahun_anggaran DESC', ARRAY_A);
+		$tahun_all = $this->get_tahun();
 
 		$halaman_mapping_skpd = $this->functions->generatePage(array(
 			'nama_page' => 'Halaman Mapping Perangkat Daerah',
@@ -2609,36 +2486,35 @@ class Wp_Eval_Sakip_Admin
 		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_jadwal.php') {
 			return array();
 		}
-		global $wpdb;
-		$get_tahun = $wpdb->get_results('SELECT tahun_anggaran FROM esakip_data_unit GROUP BY tahun_anggaran ORDER BY tahun_anggaran DESC', ARRAY_A);
+		$get_tahun = $this->get_tahun();
 		$list_data = '';
 
 		// jadwal rpjpd
 		$jadwal_rpjpd = $this->functions->generatePage(array(
-			'nama_page' => 'Halaman Jadwal RPJPD',
-			'content' => '[jadwal_rpjpd_sakip]',
-			'show_header' => 1,
-			'no_key' => 1,
-			'post_status' => 'private'
+			'nama_page' 	=> 'Halaman Jadwal RPJPD',
+			'content' 		=> '[jadwal_rpjpd_sakip]',
+			'show_header' 	=> 1,
+			'no_key' 		=> 1,
+			'post_status' 	=> 'private'
 		));
 		$list_data .= '<li><a target="_blank" href="' . $jadwal_rpjpd['url'] . '">' . $jadwal_rpjpd['title'] . '</a></li>';
 
 		$jadwal_rpjmd = $this->functions->generatePage(array(
-			'nama_page' => 'Halaman Jadwal RPJMD / RPD ',
-			'content' => '[jadwal_rpjmd]',
-			'show_header' => 1,
-			'no_key' => 1,
-			'post_status' => 'private'
+			'nama_page' 	=> 'Halaman Jadwal RPJMD / RPD ',
+			'content' 		=> '[jadwal_rpjmd]',
+			'show_header' 	=> 1,
+			'no_key' 		=> 1,
+			'post_status' 	=> 'private'
 		));
 		$list_data .= '<li><a target="_blank" href="' . $jadwal_rpjmd['url'] . '">' . $jadwal_rpjmd['title'] . '</a></li>';
 
 		foreach ($get_tahun as $k => $v) {
 			$jadwal_evaluasi = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Jadwal LKE Tahun Anggaran | ' . $v['tahun_anggaran'],
-				'content' => '[jadwal_evaluasi_sakip tahun_anggaran="' . $v["tahun_anggaran"] . '"]',
-				'show_header' => 1,
-				'no_key' => 1,
-				'post_status' => 'private'
+				'nama_page' 	=> 'Halaman Jadwal LKE Tahun Anggaran | ' . $v['tahun_anggaran'],
+				'content' 		=> '[jadwal_evaluasi_sakip tahun_anggaran="' . $v["tahun_anggaran"] . '"]',
+				'show_header' 	=> 1,
+				'no_key' 		=> 1,
+				'post_status' 	=> 'private'
 			));
 			$list_data .= '<li><a target="_blank" href="' . $jadwal_evaluasi['url'] . '">' . $jadwal_evaluasi['title'] . '</a></li>';
 		}
@@ -2646,24 +2522,14 @@ class Wp_Eval_Sakip_Admin
 		// jadwal verifikasi upload dokumen
 		foreach ($get_tahun as $k => $v) {
 			$jadwal_verifikasi = $this->functions->generatePage(array(
-				'nama_page' => 'Halaman Jadwal Verifikasi Upload Dokumen Tahun Anggaran | ' . $v['tahun_anggaran'],
-				'content' => '[jadwal_verifikasi_upload_dokumen tahun_anggaran="' . $v["tahun_anggaran"] . '"]',
-				'show_header' => 1,
-				'no_key' => 1,
-				'post_status' => 'private'
+				'nama_page' 	=> 'Halaman Jadwal Verifikasi Upload Dokumen Tahun Anggaran | ' . $v['tahun_anggaran'],
+				'content' 		=> '[jadwal_verifikasi_upload_dokumen tahun_anggaran="' . $v["tahun_anggaran"] . '"]',
+				'show_header' 	=> 1,
+				'no_key' 		=> 1,
+				'post_status' 	=> 'private'
 			));
 			$list_data .= '<li><a target="_blank" href="' . $jadwal_verifikasi['url'] . '">' . $jadwal_verifikasi['title'] . '</a></li>';
 		}
-
-		//sementara dipending dahulu 
-		// $jadwal_verifikasi_renstra = $this->functions->generatePage(array(
-		// 	'nama_page' => 'Halaman Jadwal Verifikasi Upload Dokumen | RENSTRA',
-		// 	'content' => '[jadwal_verifikasi_upload_dokumen_renstra]',
-		// 	'show_header' => 1,
-		// 	'no_key' => 1,
-		// 	'post_status' => 'private'
-		// ));
-		// $list_data .= '<li><a target="_blank" href="' . $jadwal_verifikasi_renstra['url'] . '">' . $jadwal_verifikasi_renstra['title'] . '</a></li>';
 
 		$label = array(
 			Field::make('html', 'crb_jadwal_hide_sidebar')
@@ -2687,29 +2553,13 @@ class Wp_Eval_Sakip_Admin
 			return array();
 		}
 
-		global $wpdb;
-		$jadwal_evaluasi = $wpdb->get_results(
-			$wpdb->prepare("
-				SELECT 
-					id,
-					nama_jadwal,
-					tahun_anggaran,
-					lama_pelaksanaan,
-					status
-				FROM esakip_data_jadwal
-				WHERE tipe = %s
-				  AND status != 0
-				ORDER BY tahun_anggaran DESC, status ASC
-			", 'LKE'),
-			ARRAY_A
-		);
+		$jadwal_evaluasi = $this->get_jadwal_evaluasi();
 
-		$html = '<ol>';
-
+		$html = '';
 		if (!empty($jadwal_evaluasi)) {
-			foreach ($jadwal_evaluasi as $v) {
+			foreach ($jadwal_evaluasi as $index => $v) {
 				$pengisian_lke_sakip = $this->functions->generatePage(array(
-					'nama_page'   => 'Halaman Pengisian LKE | ' . $v['tahun_anggaran'],
+					'nama_page'   => 'Pengisian LKE | ' . $v['nama_jadwal'] . ' - ' . $v['tahun_anggaran'],
 					'content'     => '[pengisian_lke_sakip id_jadwal=' . $v['id'] . ']',
 					'show_header' => 1,
 					'post_status' => 'private'
@@ -2717,30 +2567,30 @@ class Wp_Eval_Sakip_Admin
 
 				$pengisian_lke_sakip['url'] .= '&id_jadwal=' . $v['id'];
 
-				$status_text = 'TIDAK DIKETAHUI';
+				$status_text = '[TIDAK DIKETAHUI]';
 				if ($v['status'] == 1) {
-					$status_text = 'AKTIF';
+					$status_text = '[AKTIF]';
 				} elseif ($v['status'] == 2) {
-					$status_text = 'DIKUNCI';
+					$status_text = '[DIKUNCI]';
 				}
 
 				$html .= '
-				<li>
-					<a target="_blank" href="' . esc_url($pengisian_lke_sakip['url']) . '">
-						' . esc_html($v['nama_jadwal']) . ' | ' . esc_html($v['tahun_anggaran']) . ' [' . $status_text . ']
-					</a>
-				</li>';
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' - ' . $v['tahun_anggaran'] . ' '  . $status_text . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $pengisian_lke_sakip['url'] . '">' . $pengisian_lke_sakip['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
 			}
 		} else {
-			$html .= '
-			<li>
+			$html = '
 				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
 					Jadwal Evaluasi tidak tersedia
 				</span>
-			</li>';
+				';
 		}
-
-		$html .= '</ol>';
 
 		return [
 			Field::make('html', 'crb_pengisian_lke_hide_sidebar')
@@ -2755,38 +2605,351 @@ class Wp_Eval_Sakip_Admin
 		];
 	}
 
+	public function generate_fields_input_iku_opd()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_input_iku_perangkat_daerah.php') {
+			return array();
+		}
+
+		$html_info = '
+		<table class="form-table">
+			<tbody>
+				<tr>
+					<th scope="row">
+						<label>URL Server WP-SIPD</label>
+					</th>
+					<td>
+						<input type="text" style="width: 30em;" value="' . get_option(ESAKIP_URL_WPSIPD) . '" disabled>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label>API KEY WP-SIPD</label>
+					</th>
+					<td>
+						<input type="text" style="width: 30em;" value="' . get_option(ESAKIP_APIKEY_WPSIPD) . '" disabled>
+						<p>Setting Url Server dan Api Key ada di menu pengaturan perangkat daerah</p>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		';
+
+		$jadwal_renstra_wp_sipd = $this->get_jadwal_renstra_wp_sipd();
+
+		$html = '';
+		if (!empty($jadwal_renstra_wp_sipd->data)) {
+			foreach ($jadwal_renstra_wp_sipd->data as $index => $v) {
+
+				if (!empty($v->tahun_akhir_anggaran) && $v->tahun_akhir_anggaran > 1) {
+					$tahun_anggaran_selesai = $v->tahun_akhir_anggaran;
+				} else {
+					$tahun_anggaran_selesai = $v->tahun_anggaran + $v->lama_pelaksanaan;
+				}
+
+				$input_iku_opd_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Pengisian IKU | ' . $v->nama . ' ( ' . $v->tahun_anggaran . ' - ' . $tahun_anggaran_selesai . ' )',
+					'content' 		=> '[list_input_iku periode=' . $v->id_jadwal_lokal . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v->tahun_anggaran . '">' . $v->nama . ' ( ' . $v->tahun_anggaran . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v->tahun_anggaran . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $input_iku_opd_page['url'] . '">' . $input_iku_opd_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Jadwal Renstra WP-SIPD tidak tersedia
+				</span>
+				';
+		}
+
+		return [
+			Field::make('html', 'crb_input_iku_opd_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_input_iku_opd_info_menu')
+				->set_html($html_info),
+			Field::make('html', 'crb_input_iku_opd_menu')
+				->set_html($html),
+			Field::make('html', 'crb_input_iku_opd_note')
+				->set_html('<p style="font-weight: bold;"><p>Data Jadwal diambil dari aplikasi <b>WP-SIPD</b>.</p>'),
+		];
+	}
+
+	public function generate_fields_renaksi_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_rencana_aksi_pemerintah_daerah.php') {
+			return array();
+		}
+
+		$jadwal_rpjmd_settings = $this->get_rpjmd_settings();
+		$get_tahun = $this->get_tahun();
+
+		$html = '';
+		if (!empty($jadwal_rpjmd_settings) && !empty($get_tahun)) {
+			foreach ($jadwal_rpjmd_settings as $index => $v) {
+				// Cek setting tahun anggaran selesai
+				if (!empty($v['tahun_selesai_anggaran']) && $v['tahun_selesai_anggaran'] > 1) {
+					$tahun_anggaran_selesai = $v['tahun_selesai_anggaran'];
+				} else {
+					$tahun_anggaran_selesai = $v['tahun_anggaran'] + $v['lama_pelaksanaan'];
+				}
+
+				foreach ($get_tahun as $vv) {
+					if (
+						!empty($v['id_jadwal_rpjmd'])
+						&& $v['tahun_anggaran_setting'] == $vv['tahun_anggaran']
+					) {
+						$list_pemda_pengisian_rencana_aksi = $this->functions->generatePage(array(
+							'nama_page' 	=> 'Rencana Aksi Pemerintah Daerah Tahun ' . $vv['tahun_anggaran'] . ' | ' . $v['nama_jadwal'] . ' ' . 'Periode ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+							'content' 		=> '[list_pengisian_rencana_aksi_pemda tahun=' . $vv['tahun_anggaran'] . ' periode=' . $v['id'] . ' ]',
+							'show_header' 	=> 1,
+							'no_key' 		=> 1,
+							'post_status' 	=> 'private'
+						));
+						$html .= '
+						<div class="accordion">
+							<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $list_pemda_pengisian_rencana_aksi['title'] . '</h3>
+							<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+								<ul style="margin-left: 20px;">
+									<li><a target="_blank" href="' . $list_pemda_pengisian_rencana_aksi['url'] . '">' . $list_pemda_pengisian_rencana_aksi['title'] . '</a></li>
+								</ul>
+							</div>
+						</div>';
+					}
+				}
+				if (empty($v['id_jadwal_rpjmd'])) {
+					$html .= '
+						<div class="accordion">
+							<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ' . 'Periode ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' ( Periode belum diset di pengaturan menu )</h3>
+							<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+								<ul style="margin-left: 20px;">
+									<li><a target="_blank">' . $v['nama_jadwal'] . ' ' . 'Periode ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' ( Periode belum diset di pengaturan menu )</a></li>
+								</ul>
+							</div>
+						</div>';
+				}
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Jadwal RPJMD / Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_renaksi_pemda_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_renaksi_pemda_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_renaksi_opd()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_rencana_aksi_perangkat_daerah.php') {
+			return array();
+		}
+
+		$get_tahun = $this->get_tahun();
+
+		$html = '';
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $v) {
+				$list_skpd_pengisian_rencana_aksi_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Rencana Aksi Perangkat Daerah | ' . $v['tahun_anggaran'],
+					'content' 		=> '[list_pengisian_rencana_aksi tahun=' . $v['tahun_anggaran'] . ']',
+					'show_header' 	=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $list_skpd_pengisian_rencana_aksi_page['url'] . '">' . $list_skpd_pengisian_rencana_aksi_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_renaksi_opd_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_renaksi_opd_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_renaksi_settings()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_rencana_aksi_setting.php') {
+			return array();
+		}
+
+		global $wpdb;
+
+		$html_info = '
+			<table class="form-table">
+				<tbody>
+					<tr>
+						<th scope="row">
+							<label>URL Server WP-SIPD</label>
+						</th>
+						<td>
+							<input type="text" style="width: 30em;" value="' . get_option(ESAKIP_URL_WPSIPD) . '" disabled>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">
+							<label>API KEY WP-SIPD</label>
+						</th>
+						<td>
+							<input type="text" style="width: 30em;" value="' . get_option(ESAKIP_APIKEY_WPSIPD) . '" disabled>
+							<p>Setting Url Server dan Api Key ada di menu pengaturan perangkat daerah</p>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		';
+
+		$get_tahun = $this->get_tahun();
+		$html = '';
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $v) {
+				$rencana_aksi_setting_page = $this->functions->generatePage(array(
+					'nama_page'   => 'Rencana Aksi Setting | ' . $v['tahun_anggaran'],
+					'content' 	  => '[pengisian_rencana_aksi_setting]',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+
+				$url = $rencana_aksi_setting_page['url'] . '&tahun_anggaran="' . $v['tahun_anggaran'] . '"';
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $url . '">' . $rencana_aksi_setting_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_renaksi_settings_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_renaksi_settings_info_menu')
+				->set_html($html_info),
+			Field::make('html', 'crb_renaksi_settings_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_input_iku_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_input_iku_pemerintah_daerah.php') {
+			return array();
+		}
+
+		$jadwal_rpjmd = $this->get_rpjmd();
+
+		$html = '';
+		if (!empty($jadwal_rpjmd)) {
+			foreach ($jadwal_rpjmd as $index => $v) {
+				$tahun_awal = $v['tahun_anggaran'];
+				$tahun_akhir = $tahun_awal + $v['lama_pelaksanaan'] - 1;
+
+				$input_iku_pemda_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Pengisian IKU Pemerintah Daerah | ' . $v['nama_jadwal'] . ' ( ' . $tahun_awal . ' - ' . $tahun_akhir . ' )',
+					'content' 		=> '[input_iku_pemda id_periode=' . $v['id'] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $tahun_awal . ' - ' . $tahun_akhir . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $input_iku_pemda_page['url'] . '">' . $input_iku_pemda_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Jadwal RPJMD tidak tersedia
+				</span>
+			';
+		}
+
+		return [
+			Field::make('html', 'crb_input_iku_pemda_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_input_iku_pemda_menu')
+				->set_html($html)
+		];
+	}
+
 	public function generate_fields_input_rpjpd()
 	{
 		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_input_rpjpd.php') {
 			return array();
 		}
 
-		global $wpdb;
+		$jadwal_rpjpd_settings = $this->get_rpjpd_settings();
 
-		$jadwal_rpjpd = $wpdb->get_results(
-			$wpdb->prepare("
-				SELECT 
-					j.id,
-					j.nama_jadwal,
-					j.nama_jadwal_renstra,
-					j.tahun_anggaran,
-					j.lama_pelaksanaan,
-					j.tahun_selesai_anggaran
-				FROM esakip_data_jadwal j
-				INNER JOIN esakip_pengaturan_upload_dokumen r 
-				   		ON r.id_jadwal_rpjpd = j.id
-				WHERE j.tipe = %s
-				  AND j.status = 1
-				GROUP BY j.id
-				ORDER BY j.tahun_anggaran DESC
-			", 'RPJPD'),
-			ARRAY_A
-		);
-
-		$html = '<ol>';
-
-		if (!empty($jadwal_rpjpd)) {
-			foreach ($jadwal_rpjpd as $v) {
+		$html = '';
+		if (!empty($jadwal_rpjpd_settings)) {
+			foreach ($jadwal_rpjpd_settings as $index => $v) {
 				$tahun_anggaran_selesai = $v['tahun_selesai_anggaran'] ?? ($v['tahun_anggaran'] + $v['lama_pelaksanaan'] - 1);
 
 				$input_rpjpd_page = $this->functions->generatePage(array(
@@ -2798,20 +2961,22 @@ class Wp_Eval_Sakip_Admin
 				));
 
 				$html .= '
-				<li>
-					<a target="_blank" href="' . esc_url($input_rpjpd_page['url']) . '">' . esc_html($input_rpjpd_page['title']) . '</a>
-				</li>';
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $input_rpjpd_page['title'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $input_rpjpd_page['url'] . '">' . $input_rpjpd_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
 			}
 		} else {
-			$html .= '
-			<li>
+			$html = '
 				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
 					Jadwal Input RPJPD tidak tersedia
 				</span>
-			</li>';
+				';
 		}
-
-		$html .= '</ol>';
 
 		return [
 			Field::make('html', 'crb_input_rpjpd_hide_sidebar')
@@ -2832,53 +2997,38 @@ class Wp_Eval_Sakip_Admin
 			return array();
 		}
 
-		global $wpdb;
+		$jadwal_rpjmd = $this->get_rpjmd();
 
-		$jadwal_rpjmd = $wpdb->get_results(
-			$wpdb->prepare("
-				SELECT 
-					id,
-					nama_jadwal,
-					nama_jadwal_renstra,
-					tahun_anggaran,
-					lama_pelaksanaan,
-					tahun_selesai_anggaran
-				FROM esakip_data_jadwal
-				WHERE tipe = %s
-				  AND status = 1
-				ORDER BY tahun_anggaran DESC
-			", 'RPJMD'),
-			ARRAY_A
-		);
-		$html = '<ol>';
-
+		$html = '';
 		if (!empty($jadwal_rpjmd)) {
-			foreach ($jadwal_rpjmd as $v) {
+			foreach ($jadwal_rpjmd as $index => $v) {
 				$tahun_anggaran_selesai = $v['tahun_selesai_anggaran'] ?? ($v['tahun_anggaran'] + $v['lama_pelaksanaan'] - 1);
 
 				$input_rpjmd_page = $this->functions->generatePage(array(
-					'nama_page' => 'Input RPJMD | ' . $v['nama_jadwal'] . ' ' . 'Periode ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-					'content' => '[input_rpjmd periode=' . $v['id'] . ']',
-					'show_header' => 1,
-					'no_key' => 1,
-					'post_status' => 'private'
+					'nama_page' 	=> 'Input RPJMD | ' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )',
+					'content' 		=> '[input_rpjmd periode=' . $v['id'] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
 				));
 
 				$html .= '
-				<li>
-					<a target="_blank" href="' . esc_url($input_rpjmd_page['url']) . '">' . esc_html($input_rpjmd_page['title']) . '</a>
-				</li>';
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $input_rpjmd_page['url'] . '">' . $input_rpjmd_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
 			}
 		} else {
-			$html .= '
-			<li>
+			$html = '
 				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
 					Jadwal RPJMD tidak tersedia
 				</span>
-			</li>';
+			';
 		}
-
-		$html .= '</ol>';
 
 		return [
 			Field::make('html', 'crb_input_rpjmd_hide_sidebar')
@@ -2889,6 +3039,510 @@ class Wp_Eval_Sakip_Admin
 				</style>
 			'),
 			Field::make('html', 'crb_pengisian_lke_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_cascading_opd()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_cascading_perangkat_daerah.php') {
+			return array();
+		}
+
+		$html_info = '
+		<table class="form-table">
+			<tbody>
+				<tr>
+					<th scope="row">
+						<label>URL Server WP-SIPD</label>
+					</th>
+					<td>
+						<input type="text" style="width: 30em;" value="' . get_option(ESAKIP_URL_WPSIPD) . '" disabled>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label>API KEY WP-SIPD</label>
+					</th>
+					<td>
+						<input type="text" style="width: 30em;" value="' . get_option(ESAKIP_APIKEY_WPSIPD) . '" disabled>
+						<p>Setting Url Server dan Api Key ada di menu pengaturan perangkat daerah</p>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		';
+
+		$jadwal_renstra_wp_sipd = $this->get_jadwal_renstra_wp_sipd();
+
+		$html = '';
+		if (!empty($jadwal_renstra_wp_sipd->data)) {
+			foreach ($jadwal_renstra_wp_sipd->data as $index => $v) {
+
+				if (!empty($v->tahun_akhir_anggaran) && $v->tahun_akhir_anggaran > 1) {
+					$tahun_anggaran_selesai = $v->tahun_akhir_anggaran;
+				} else {
+					$tahun_anggaran_selesai = $v->tahun_anggaran + $v->lama_pelaksanaan;
+				}
+
+				$cascading_opd_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Cascading Perangkat Daerah | ' . $v->nama . ' ( ' . $v->tahun_anggaran . ' - ' . $tahun_anggaran_selesai . ' )',
+					'content' 		=> '[cascading_pd periode=' . $v->id_jadwal_lokal . ']',
+					'show_header' 	=> 1,
+					'post_status' 	=> 'private'
+				));
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v->tahun_anggaran . '">' . $v->nama . ' ( ' . $v->tahun_anggaran . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v->tahun_anggaran . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $cascading_opd_page['url'] . '">' . $cascading_opd_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Jadwal Renstra WP-SIPD tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_cascading_opd_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_cascading_opd_info_menu')
+				->set_html($html_info),
+			Field::make('html', 'crb_cascading_opd_menu')
+				->set_html($html),
+			Field::make('html', 'crb_cascading_opd_note')
+				->set_html('<p style="font-weight: bold;"><p>Data Jadwal diambil dari aplikasi <b>WP-SIPD</b>.</p>'),
+		];
+	}
+
+	public function generate_fields_pokin_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_pohon_kinerja_pemerintah_daerah.php') {
+			return array();
+		}
+
+		$jadwal_rpjmd = $this->get_rpjmd();
+
+		$html = '';
+		if (!empty($jadwal_rpjmd)) {
+			foreach ($jadwal_rpjmd as $index => $v) {
+				$tahun_anggaran_selesai = $v['tahun_selesai_anggaran'] ?? ($v['tahun_anggaran'] + $v['lama_pelaksanaan'] - 1);
+
+				$pokin_pemda_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Pohon Kinerja Pemerintah Daerah | ' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )',
+					'content' 		=> '[penyusunan_pohon_kinerja periode=' . $v['id'] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $pokin_pemda_page['url'] . '">' . $pokin_pemda_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Jadwal RPJMD tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_pokin_pemda_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_pokin_pemda_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_cascading_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_cascading_pemerintah_daerah.php') {
+			return array();
+		}
+
+		$jadwal_rpjmd = $this->get_rpjmd();
+
+		$html = '';
+		if (!empty($jadwal_rpjmd)) {
+			foreach ($jadwal_rpjmd as $index => $v) {
+				$tahun_anggaran_selesai = $v['tahun_selesai_anggaran'] ?? ($v['tahun_anggaran'] + $v['lama_pelaksanaan'] - 1);
+
+				$cascading_pemda_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Cascading Pemerintah Daerah | ' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )',
+					'content' 		=> '[cascading_pemda periode=' . $v['id'] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $cascading_pemda_page['url'] . '">' . $cascading_pemda_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Jadwal RPJMD tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_cascading_pemda_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_cascading_pemda_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_pokin_opd()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_pohon_kinerja_perangkat_daerah.php') {
+			return array();
+		}
+
+		$jadwal_rpjmd = $this->get_rpjmd();
+
+		$html = '';
+		if (!empty($jadwal_rpjmd)) {
+			foreach ($jadwal_rpjmd as $index => $v) {
+				$tahun_anggaran_selesai = $v['tahun_selesai_anggaran'] ?? ($v['tahun_anggaran'] + $v['lama_pelaksanaan'] - 1);
+
+				$pohon_kinerja_opd_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Pohon Kinerja Perangkat Daerah | ' . $v['nama_jadwal_renstra'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )',
+					'content' 		=> '[list_penyusunan_pohon_kinerja_opd periode=' . $v['id'] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal_renstra'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $pohon_kinerja_opd_page['url'] . '">' . $pohon_kinerja_opd_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Jadwal RENSTRA tidak tersedia
+				</span>
+			';
+		}
+
+		return [
+			Field::make('html', 'crb_crosscutting_opd_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_crosscutting_opd_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_crosscutting_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_crosscutting_pemerintah_daerah.php') {
+			return array();
+		}
+
+		$jadwal_rpjmd = $this->get_rpjmd();
+
+		$html = '';
+		if (!empty($jadwal_rpjmd)) {
+			foreach ($jadwal_rpjmd as $index => $v) {
+				$tahun_anggaran_selesai = $v['tahun_selesai_anggaran'] ?? ($v['tahun_anggaran'] + $v['lama_pelaksanaan'] - 1);
+
+				$crosscutting_pemda_page = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Croscutting Pemerintah Daerah | ' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )',
+					'content' 		=> '[croscutting_pemda periode=' . $v['id'] . ']',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $crosscutting_pemda_page['url'] . '">' . $crosscutting_pemda_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html .= '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Jadwal RPJMD tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_crosscutting_pemda_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_crosscutting_pemda_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_laporan_pk_pemda()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_laporan_pk_pemerintah_daerah.php') {
+			return array();
+		}
+
+		return [
+			Field::make('html', 'crb_laporan_pk_pemda_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_laporan_pk_pemda_menu')
+				->set_html('<h3>Coming Soon</h3>')
+		];
+	}
+
+	public function generate_fields_laporan_pk_opd()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_laporan_pk_perangkat_daerah.php') {
+			return array();
+		}
+
+		$get_tahun = $this->get_tahun();
+
+		$html = '';
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $v) {
+				$list_skpd_laporan_pk_page = $this->functions->generatePage(array(
+					'nama_page'   => 'Laporan PK Perangkat Daerah - ' . $v['tahun_anggaran'],
+					'content' 	  => '[list_halaman_laporan_pk tahun=' . $v['tahun_anggaran'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $list_skpd_laporan_pk_page['url'] . '">' . $list_skpd_laporan_pk_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_laporan_pk_opd_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+			'),
+			Field::make('html', 'crb_laporan_pk_opd_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_kuesioner()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_kuesioner.php') {
+			return array();
+		}
+
+		$get_tahun = $this->get_tahun();
+
+		$html = '';
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $v) {
+				$input_kuesioner_menpan_page = $this->functions->generatePage(array(
+					'nama_page' => 'Input Kuesioner Menpan tahun ' . $v['tahun_anggaran'],
+					'content' => '[input_kuesioner_menpan tahun=' . $v['tahun_anggaran'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$input_kuesioner_mendagri_page = $this->functions->generatePage(array(
+					'nama_page' => 'Input Kuesioner Mendagri tahun ' . $v['tahun_anggaran'],
+					'content' => '[input_kuesioner_mendagri tahun=' . $v['tahun_anggaran'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $input_kuesioner_menpan_page['url'] . '">' . $input_kuesioner_menpan_page['title'] . '</a></li>
+							<li><a target="_blank" href="' . $input_kuesioner_mendagri_page['url'] . '">' . $input_kuesioner_mendagri_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+
+		return [
+			Field::make('html', 'crb_kuesioner_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+			'),
+			Field::make('html', 'crb_kuesioner_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_kuesioner_menpan()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_kuesioner_menpan.php') {
+			return array();
+		}
+
+		$get_tahun = $this->get_tahun();
+
+		$html = '';
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $v) {
+				$list_skpd_kuesioner_menpan_page = $this->functions->generatePage(array(
+					'nama_page'   => 'Kuesioner Menpan tahun ' . $v['tahun_anggaran'],
+					'content' 	  => '[list_kuesioner_menpan tahun=' . $v['tahun_anggaran'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $list_skpd_kuesioner_menpan_page['url'] . '">' . $list_skpd_kuesioner_menpan_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+
+		return [
+			Field::make('html', 'crb_kuesioner_menpan_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_kuesioner_menpan_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_kuesioner_mendagri()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_kuesioner_mendagri.php') {
+			return array();
+		}
+
+		$get_tahun = $this->get_tahun();
+
+		$html = '';
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $v) {
+				$list_skpd_kuesioner_mendagri_page = $this->functions->generatePage(array(
+					'nama_page' => 'Kuesioner Mendagri tahun ' . $v['tahun_anggaran'],
+					'content' => '[list_kuesioner_mendagri tahun=' . $v['tahun_anggaran'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $list_skpd_kuesioner_mendagri_page['url'] . '">' . $list_skpd_kuesioner_mendagri_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+
+		return [
+			Field::make('html', 'crb_kuesioner_mendagri_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_kuesioner_mendagri_menu')
 				->set_html($html)
 		];
 	}
