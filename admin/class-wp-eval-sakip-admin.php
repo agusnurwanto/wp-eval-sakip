@@ -2722,8 +2722,8 @@ class Wp_Eval_Sakip_Admin
 						));
 						$html .= '
 						<div class="accordion">
-							<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . 'Tahun Anggaran ' . $vv['tahun_anggaran'] . ' | ' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )</h3>
-							<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+							<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">' . 'Tahun Anggaran ' . $vv['tahun_anggaran'] . ' | ' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )</h3>
+							<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 								<ul style="margin-left: 20px; margin-bottom: 20px">
 									<li><a target="_blank" href="' . $list_pemda_pengisian_rencana_aksi['url'] . '">' . $list_pemda_pengisian_rencana_aksi['title'] . '</a></li>
 								</ul>
