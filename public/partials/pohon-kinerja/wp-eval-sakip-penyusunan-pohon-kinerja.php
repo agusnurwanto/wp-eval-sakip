@@ -1885,16 +1885,16 @@ function tambah_crosscutting(id_pokin, data_koneksi, response){
             +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
         +`</div>`
         +`<div class="form-group">`
-            +'<label for="pelaku">Dilakukan Oleh</label>'
-            +`<input type="text" class="form-control" name="pelaku" id="pelaku">`
+            +'<label for="pelaku">Pelaksana</label>'
+            +`<input type="text" class="form-control" name="pelaku" id="pelaku" value="${response.data.pelaksana}">`
         +`</div>`
         +`<div class="form-group">`
             +'<label for="bentuk_kegiatan">Bentuk Kegiatan</label>'
-            +`<textarea class="form-control" name="bentuk_kegiatan" id="bentuk_kegiatan"></textarea>`
+            +`<textarea class="form-control" name="bentuk_kegiatan" id="bentuk_kegiatan">${response.data.bentuk_kegiatan}</textarea>`
         +`</div>`
         +`<div class="form-group">`
             +'<label for="outcome">Outcome</label>'
-            +`<textarea class="form-control" name="outcome" id="outcome"></textarea>`
+            +`<textarea class="form-control" name="outcome" id="outcome">${response.data.outcome}</textarea>`
         +`</div>`
 		+`<div class="setting-koneksi" style="margin-top:10px">`
 			+`<button type="button" data-setting-koneksi="false" data-parent-koneksi="${id_pokin}" class="btn btn-success mb-2" id="tambah-koneksi"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Crosscutting / Pelaksana Kegiatan</button>`
@@ -1907,7 +1907,7 @@ function tambah_crosscutting(id_pokin, data_koneksi, response){
 						+`<th class="text-center">Pohon Kinerja Perangkat Daerah</th>`
 						+`<th class="text-center">Status</th>`
 						+`<th class="text-center">Keterangan</th>`
-						+`<th class="text-center" style="width: 150px;">Aksi</th>`
+						+`<th class="text-center" style="width: 100px;">Aksi</th>`
 					+`</tr>`
 				+`</thead>`
 				+`<tbody>${data_koneksi}</tbody>`
@@ -1968,8 +1968,10 @@ function pokinLevel1(){
 	          			+`<thead>`
 	          				+`<tr>`
 	          					+`<th class="text-center" style="width:50px">No</th>`
-	          					+`<th class="text-center">Label Pohon Kinerja</th>`
-	          					+`<th class="text-center" style="width:250px">Aksi</th>`
+	          					+`<th class="text-center">Uraian Pohon Kinerja</th>`
+	          					+`<th class="text-center" style="width: 200px">Pelaksana</th>`
+	          					+`<th class="text-center" style="width: 300px">Crosscutting</th>`
+	          					+`<th class="text-center" style="width:190px">Aksi</th>`
 	          				+`</tr>`
 	          			+`</thead>`
 	          			+`<tbody>`;
@@ -1983,6 +1985,8 @@ function pokinLevel1(){
 				          			+`<tr id="pokinLevel1_${value.id}">`
 					          			+`<td class="text-center">${index+1}.</td>`
 					          			+`<td class="label-level1">${value.label}</td>`
+					          			+`<td>${value.pelaksana}</td>`
+					          			+`<td rowspan="${indikator.length+1}">${value.crosscutting.join(', ')}</td>`
 					          			+`<td class="text-center">`
 					          				+`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-success tambah-indikator-pokin-level1" title="Tambah Indikator" last-urutan="${last_urutan}"><i class="dashicons dashicons-plus"></i></a> `
 					          				+`<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning view-pokin-level2" title="Lihat pohon kinerja level 2"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `
@@ -1996,7 +2000,7 @@ function pokinLevel1(){
 										level1 += ``
 								     	+`<tr>`
 								      		+`<td><span style="display:none">${index+1}</span></td>`
-								      		+`<td>${index+1}.${indikator_index+1} ${indikator_value.label}</td>`
+								      		+`<td colspan="2">${index+1}.${indikator_index+1} ${indikator_value.label}</td>`
 								      		+`<td class="text-center">`
 							      				+`<a href="javascript:void(0)" data-id="${indikator_value.id}" class="btn btn-sm btn-primary edit-indikator-pokin-level1" title="Edit"><i class="dashicons dashicons-edit"></i></a> `
 							      				+`<a href="javascript:void(0)" data-id="${indikator_value.id}" class="btn btn-sm btn-danger hapus-indikator-pokin-level1" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`
@@ -2059,7 +2063,7 @@ function pokinLevel2(params){
 	          			+`<thead>`
 	          				+`<tr>`
 	          					+`<th class="text-center" style="width:50px">No</th>`
-	          					+`<th class="text-center">Label Pohon Kinerja</th>`
+	          					+`<th class="text-center">Uraian Pohon Kinerja</th>`
 	          					+`<th class="text-center" style="width:250px">Aksi</th>`
 	          				+`</tr>`
 	          			+`</thead>`
@@ -2150,7 +2154,7 @@ function pokinLevel3(params){
 	          			+`<thead>`
 	          				+`<tr>`
 	          					+`<th class="text-center" style="width:50px">No</th>`
-	          					+`<th class="text-center">Label Pohon Kinerja</th>`
+	          					+`<th class="text-center">Uraian Pohon Kinerja</th>`
 	          					+`<th class="text-center" style="width:250px">Aksi</th>`
 	          				+`</tr>`
 	          			+`</thead>`
@@ -2241,7 +2245,7 @@ function pokinLevel4(params){
 	          			+`<thead>`
 	          				+`<tr>`
 	          					+`<th class="text-center" style="width:50px">No</th>`
-	          					+`<th class="text-center">Label Pohon Kinerja</th>`
+	          					+`<th class="text-center">Uraian Pohon Kinerja</th>`
 	          					+`<th class="text-center" style="width:250px">Aksi</th>`
 	          				+`</tr>`
 	          			+`</thead>`
