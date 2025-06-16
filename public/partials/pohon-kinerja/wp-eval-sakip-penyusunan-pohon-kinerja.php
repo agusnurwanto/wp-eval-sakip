@@ -658,7 +658,7 @@ $unit_koneksi = $wpdb->get_results(
 	ARRAY_A
 );
 
-$option_skpd = "<option value=''>Pilih Perangkat Daerah</option>";
+$option_skpd = "";
 if(!empty($unit_koneksi)){
 	foreach ($unit_koneksi as $v_unit) {
 		$option_skpd .="<option value='" . $v_unit['id_skpd'] . "'>" . $v_unit['nama_skpd'] . "</option>";
@@ -676,10 +676,38 @@ $lembaga = $wpdb->get_results(
 	", $tahun_anggaran_sakip),
 	ARRAY_A
 );
-$option_lembaga = "<option value=''>Pilih Lembaga</option>";
+$option_lembaga = "";
 if(!empty($lembaga)){
 	foreach ($lembaga as $v) {
 		$option_lembaga .="<option value='" . $v['id'] . "'>" . $v['nama_lembaga'] . "</option>";
+	}
+}
+
+$api_params = array(
+	'action' => 'get_pemdes_alamat_all',
+	'api_key'	=> get_option('_crb_apikey_wpsipd'),
+	'tahun_anggaran' => $tahun_anggaran_sakip
+);
+$response = wp_remote_post(get_option('_crb_url_server_sakip'), array('timeout' => 1000, 'sslverify' => false, 'body' => $api_params));
+$response = wp_remote_retrieve_body($response);
+$data_desa = json_decode($response, true);
+
+$desa_opsi = '';
+if($data_desa['status'] == 'success'){
+	if($data_desa['tipe'] == 1){
+		foreach($data_desa['data'] as $kab){
+			foreach($kab['data'] as $kec){
+				foreach($kec['desa'] as $desa){
+					$desa .= "<option value='" . $kab['id_kab']."-".$kec['id_kec']."-".$desa['id_kel'] . "'>".$desa['desa'] .' Kecamatan '.$kec['kecamatan'] .' '. $kab['kabkot'] .'</option>';
+				}
+			}
+		}
+	}else if($data_desa['tipe'] == 2){
+		foreach($data_desa['data'] as $kec){
+			foreach($kec['desa'] as $desa){
+				$desa_opsi .= "<option value='" . $kec['id_kec']."-".$desa['id_kel'] . "'>". $desa['desa'] .' Kecamatan '.$kec['kecamatan'] .'</option>';
+			}
+		}
 	}
 }
 
@@ -700,7 +728,7 @@ $uptd = $wpdb->get_results(
 	", $tahun_anggaran_sakip),
 	ARRAY_A
 );
-$option_uptd = "<option value=''>Pilih Desa / Kelurahan / UPTD</option>";
+$option_uptd = "";
 if(!empty($uptd)){
 	foreach ($uptd as $v) {
 		$option_uptd .="<option value='" . $v['id_skpd'] . "'>" . $v['nama_skpd'] . "</option>";
@@ -940,18 +968,7 @@ jQuery(document).ready(function(){
 				jQuery("#modal-crud").find('.modal-title').html('Edit Pohon Kinerja');
 				jQuery("#modal-crud").find('.modal-body').html(``
 					+`<form id="form-pokin">`
-						+`<input type="hidden" name="id" value="${response.data.id}">`
-						+`<input type="hidden" name="parent" value="${response.data.parent}">`
-						+`<input type="hidden" name="level" value="${response.data.level}">`
-						+`<div class="form-group">`
-                            +'<label for="label-pokin">Label POKIN</label>'
-							+`<textarea class="form-control" id="label-pokin" name="label">${response.data.label}</textarea>`
-						+`</div>`
-                        +`<div class="form-group">`
-                            +'<label>Nomor Urut</label>'
-                            +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
-                        +`</div>`
-                        +tambah_crosscutting(response.data.id, table_data_koneksi_pokin)
+                        +tambah_crosscutting(response.data.id, table_data_koneksi_pokin, response)
 					+`</form>`);
 				jQuery("#modal-crud").find(`.modal-footer`).html(``
 					+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
@@ -1150,18 +1167,7 @@ jQuery(document).ready(function(){
 				jQuery("#modal-crud").find('.modal-title').html('Edit Pohon Kinerja');
 				jQuery("#modal-crud").find('.modal-body').html(``
 					+`<form id="form-pokin">`
-						+`<input type="hidden" name="id" value="${response.data.id}">`
-						+`<input type="hidden" name="parent" value="${response.data.parent}">`
-						+`<input type="hidden" name="level" value="${response.data.level}">`
-						+`<div class="form-group">`
-                            +'<label for="label-pokin">Label POKIN</label>'
-							+`<textarea class="form-control" id="label-pokin" name="label">${response.data.label}</textarea>`
-						+`</div>`
-                        +`<div class="form-group">`
-                            +'<label>Nomor Urut</label>'
-                            +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
-                        +`</div>`
-                        +tambah_crosscutting(response.data.id, table_data_koneksi_pokin)
+                        +tambah_crosscutting(response.data.id, table_data_koneksi_pokin, response)
 					+`</form>`);
 				jQuery("#modal-crud").find(`.modal-footer`).html(``
 					+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
@@ -1368,18 +1374,7 @@ jQuery(document).ready(function(){
 				jQuery("#modal-crud").find('.modal-title').html('Edit Pohon Kinerja');
 				jQuery("#modal-crud").find('.modal-body').html(``
 					+`<form id="form-pokin">`
-						+`<input type="hidden" name="id" value="${response.data.id}">`
-						+`<input type="hidden" name="parent" value="${response.data.parent}">`
-						+`<input type="hidden" name="level" value="${response.data.level}">`
-						+`<div class="form-group">`
-                            +'<label for="label-pokin">Label POKIN</label>'
-							+`<textarea class="form-control" id="label-pokin" name="label">${response.data.label}</textarea>`
-						+`</div>`
-                        +`<div class="form-group">`
-                            +'<label>Nomor Urut</label>'
-                            +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
-                        +`</div>`
-                        +tambah_crosscutting(response.data.id, table_data_koneksi_pokin)
+                        +tambah_crosscutting(response.data.id, table_data_koneksi_pokin, response)
 					+`</form>`);
 				jQuery("#modal-crud").find(`.modal-footer`).html(``
 					+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
@@ -1586,18 +1581,7 @@ jQuery(document).ready(function(){
 				}
 				jQuery("#modal-crud").find('.modal-body').html(``
 					+`<form id="form-pokin">`
-						+`<input type="hidden" name="id" value="${response.data.id}">`
-						+`<input type="hidden" name="parent" value="${response.data.parent}">`
-						+`<input type="hidden" name="level" value="${response.data.level}">`
-						+`<div class="form-group">`
-                            +'<label for="label-pokin">Label POKIN</label>'
-							+`<textarea class="form-control" id="label-pokin" name="label">${response.data.label}</textarea>`
-						+`</div>`
-                        +`<div class="form-group">`
-                            +'<label>Nomor Urut</label>'
-                            +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
-                        +`</div>`
-                        +tambah_crosscutting(response.data.id, table_data_koneksi_pokin)
+                        +tambah_crosscutting(response.data.id, table_data_koneksi_pokin, response)
 					+`</form>`);
 				jQuery("#modal-crud").find(`.modal-footer`).html(``
 					+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
@@ -1632,10 +1616,20 @@ jQuery(document).ready(function(){
 					+`</select>`
 				+`</div>`
 				+`<div class="form-group">`
-					+`<label for="skpdKoneksiUptd">Pilih Desa / Kelurahan / UPTD</label>`
+					+`<label for="skpdKoneksiUptd">Pilih UPTD / Sub Unit</label>`
 					+`<select class="form-control" name="skpdKoneksiUptd[]" multiple="multiple" id="skpdKoneksiUptd">`
 					+`<?php echo $option_uptd; ?>`
 					+`</select>`
+				+`</div>`
+				+`<div class="form-group">`
+					+`<label for="skpdKoneksiDesa">Pilih Desa / Kelurahan</label>`
+					+`<select class="form-control" name="skpdKoneksiDesa[]" multiple="multiple" id="skpdKoneksiDesa">`
+					+`<?php echo $desa_opsi; ?>`
+					+`</select>`
+				+`</div>`
+				+`<div class="form-group">`
+					+`<label for="keterangan_koneksi">Informasi kegiatan</label>`
+					+`<textarea class="form-control" name="keterangan_koneksi"></textarea>`
 				+`</div>`
 			+`</form>`);
 			jQuery("#modal-koneksi").find('.modal-footer').html(''
@@ -1648,15 +1642,19 @@ jQuery(document).ready(function(){
 		jQuery("#modal-koneksi").find('.modal-dialog').css('maxWidth','');
 		jQuery("#modal-koneksi").find('.modal-dialog').css('width','');
 		jQuery('#skpdKoneksi').select2({
-            dropdownParent: jQuery('#skpdKoneksi').closest('.modal-body'),
+            dropdownParent: jQuery('#skpdKoneksi').closest('.modal'),
             width: '100%'
         });
 		jQuery('#skpdKoneksiLainnya').select2({
-            dropdownParent: jQuery('#skpdKoneksiLainnya').closest('.modal-body'),
+            dropdownParent: jQuery('#skpdKoneksiLainnya').closest('.modal'),
             width: '100%'
         });
 		jQuery('#skpdKoneksiUptd').select2({
-            dropdownParent: jQuery('#skpdKoneksiUptd').closest('.modal-body'),
+            dropdownParent: jQuery('#skpdKoneksiUptd').closest('.modal'),
+            width: '100%'
+        });
+		jQuery('#skpdKoneksiDesa').select2({
+            dropdownParent: jQuery('#skpdKoneksiDesa').closest('.modal'),
             width: '100%'
         });
 		getSkpdById(parent_koneksi).then(function(){
@@ -1670,6 +1668,7 @@ jQuery(document).ready(function(){
 		let action = jQuery(this).data('action');
 		let view = jQuery(this).data('view');
 		let form = getFormData(jQuery("#form-koneksi"));
+		form.nama_desa = jQuery('#skpdKoneksiDesa option:selected').toArray().map(item => item.text);
 
 		jQuery.ajax({
 			method:'POST',
@@ -1872,8 +1871,31 @@ jQuery(document).ready(function(){
 	});
 });
 
-function tambah_crosscutting(id_pokin, data_koneksi){
+function tambah_crosscutting(id_pokin, data_koneksi, response){
 	return ''
+		+`<input type="hidden" name="id" value="${response.data.id}">`
+		+`<input type="hidden" name="parent" value="${response.data.parent}">`
+		+`<input type="hidden" name="level" value="${response.data.level}">`
+		+`<div class="form-group">`
+            +'<label for="label-pokin">Label POKIN</label>'
+			+`<textarea class="form-control" id="label-pokin" name="label">${response.data.label}</textarea>`
+		+`</div>`
+        +`<div class="form-group">`
+            +'<label>Nomor Urut</label>'
+            +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
+        +`</div>`
+        +`<div class="form-group">`
+            +'<label for="pelaku">Dilakukan Oleh</label>'
+            +`<input type="text" class="form-control" name="pelaku" id="pelaku">`
+        +`</div>`
+        +`<div class="form-group">`
+            +'<label for="bentuk_kegiatan">Bentuk Kegiatan</label>'
+            +`<textarea class="form-control" name="bentuk_kegiatan" id="bentuk_kegiatan"></textarea>`
+        +`</div>`
+        +`<div class="form-group">`
+            +'<label for="outcome">Outcome</label>'
+            +`<textarea class="form-control" name="outcome" id="outcome"></textarea>`
+        +`</div>`
 		+`<div class="setting-koneksi" style="margin-top:10px">`
 			+`<button type="button" data-setting-koneksi="false" data-parent-koneksi="${id_pokin}" class="btn btn-success mb-2" id="tambah-koneksi"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Crosscutting / Pelaksana Kegiatan</button>`
 		+`</div>`

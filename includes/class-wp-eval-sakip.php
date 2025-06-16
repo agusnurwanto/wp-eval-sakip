@@ -716,6 +716,9 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_hapus_data_kuesioner_mendagri_detail',  $plugin_public, 'hapus_data_kuesioner_mendagri_detail');
 		$this->loader->add_action('wp_ajax_copy_data_kuesioner_mendagri',  $plugin_public, 'copy_data_kuesioner_mendagri');
 
+		$this->loader->add_action('wp_ajax_get_table_iku_pemda',  $plugin_public, 'get_table_iku_pemda');
+		$this->loader->add_action('wp_ajax_get_table_iku_opd',  $plugin_public, 'get_table_iku_opd');
+
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_evaluasi_sakip', array($plugin_public, 'jadwal_evaluasi_sakip'));
