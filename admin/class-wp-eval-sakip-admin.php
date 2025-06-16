@@ -2714,7 +2714,7 @@ class Wp_Eval_Sakip_Admin
 						&& $v['tahun_anggaran_setting'] == $vv['tahun_anggaran']
 					) {
 						$list_pemda_pengisian_rencana_aksi = $this->functions->generatePage(array(
-							'nama_page' 	=> 'Rencana Aksi Pemerintah Daerah Tahun ' . $vv['tahun_anggaran'] . ' | ' . $v['nama_jadwal'] . ' ' . 'Periode ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+							'nama_page' 	=> 'Rencana Aksi Pemerintah Daerah Tahun ' . $vv['tahun_anggaran'] . ' | ' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )',
 							'content' 		=> '[list_pengisian_rencana_aksi_pemda tahun=' . $vv['tahun_anggaran'] . ' periode=' . $v['id'] . ' ]',
 							'show_header' 	=> 1,
 							'no_key' 		=> 1,
@@ -2722,9 +2722,9 @@ class Wp_Eval_Sakip_Admin
 						));
 						$html .= '
 						<div class="accordion">
-							<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">' . $list_pemda_pengisian_rencana_aksi['title'] . '</h3>
-							<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
-								<ul style="margin-left: 20px;">
+							<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . 'Tahun Anggaran ' . $vv['tahun_anggaran'] . ' | ' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )</h3>
+							<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+								<ul style="margin-left: 20px; margin-bottom: 20px">
 									<li><a target="_blank" href="' . $list_pemda_pengisian_rencana_aksi['url'] . '">' . $list_pemda_pengisian_rencana_aksi['title'] . '</a></li>
 								</ul>
 							</div>
@@ -2732,15 +2732,7 @@ class Wp_Eval_Sakip_Admin
 					}
 				}
 				if (empty($v['id_jadwal_rpjmd'])) {
-					$html .= '
-						<div class="accordion">
-							<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ' . 'Periode ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' ( Periode belum diset di pengaturan menu )</h3>
-							<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
-								<ul style="margin-left: 20px;">
-									<li><a target="_blank">' . $v['nama_jadwal'] . ' ' . 'Periode ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' ( Periode belum diset di pengaturan menu )</a></li>
-								</ul>
-							</div>
-						</div>';
+					$html .= '<p style="margin-left : 10px">' . $v['nama_jadwal'] . ' ' . 'Periode ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' ( Periode belum diset di pengaturan menu )</p>';
 				}
 			}
 		} else {
