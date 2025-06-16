@@ -609,8 +609,8 @@ class Wp_Eval_Sakip_Admin
 				));
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )' . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $dokumen_rpjmd_page['url'] . '">' . $dokumen_rpjmd_page['title'] . '</a></li>
 						</ul>
@@ -660,8 +660,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )' . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $dokumen_iku_pemda_page['url'] . '">' . $dokumen_iku_pemda_page['title'] . '</a></li>
 						</ul>
@@ -907,8 +907,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )' . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $dokumen_pohon_kinerja_cascading_pemda_page['url'] . '">' . $dokumen_pohon_kinerja_cascading_pemda_page['title'] . '</a></li>
 						</ul>
@@ -1447,8 +1447,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal_renstra'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )' . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">' . $v['nama_jadwal_renstra'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $renstra_opd_page['url'] . '">' . $renstra_opd_page['title'] . '</a></li>
 						</ul>
@@ -1495,8 +1495,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal_renstra'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )' . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">' . $v['nama_jadwal_renstra'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $iku_page['url'] . '">' . $iku_page['title'] . '</a></li>
 						</ul>
@@ -1544,8 +1544,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $renja_rkt_page['url'] . '">' . $renja_rkt_page['title'] . '</a></li>
 						</ul>
@@ -1593,8 +1593,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $perjanjian_kinerja_page['url'] . '">' . $perjanjian_kinerja_page['title'] . '</a></li>
 						</ul>
@@ -1642,8 +1642,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $laporan_kinerja_page['url'] . '">' . $laporan_kinerja_page['title'] . '</a></li>
 						</ul>
@@ -1691,8 +1691,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $dpa_opd_page['url'] . '">' . $dpa_opd_page['title'] . '</a></li>
 						</ul>
@@ -1740,8 +1740,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal_renstra'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )' . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">' . $v['nama_jadwal_renstra'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $pohon_kinerja_cascading_page['url'] . '">' . $pohon_kinerja_cascading_page['title'] . '</a></li>
 						</ul>
@@ -1789,8 +1789,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $lhe_akip_internal_page['url'] . '">' . $lhe_akip_internal_page['title'] . '</a></li>
 						</ul>
@@ -1838,8 +1838,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $tl_lhe_akip_internal_page['url'] . '">' . $tl_lhe_akip_internal_page['title'] . '</a></li>
 						</ul>
@@ -1887,8 +1887,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $laporan_monev_renaksi_page['url'] . '">' . $laporan_monev_renaksi_page['title'] . '</a></li>
 						</ul>
@@ -1936,8 +1936,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $rencana_aksi_page['url'] . '">' . $rencana_aksi_page['title'] . '</a></li>
 						</ul>
@@ -1985,8 +1985,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $skp_page['url'] . '">' . $skp_page['title'] . '</a></li>
 						</ul>
@@ -2034,8 +2034,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $evaluasi_internal_page['url'] . '">' . $evaluasi_internal_page['title'] . '</a></li>
 						</ul>
@@ -2083,8 +2083,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $dokumen_lainnya_page['url'] . '">' . $dokumen_lainnya_page['title'] . '</a></li>
 						</ul>
@@ -2576,8 +2576,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' - ' . $v['tahun_anggaran'] . ' '  . $status_text . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' - ' . $v['tahun_anggaran'] . ' '  . $status_text . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $pengisian_lke_sakip['url'] . '">' . $pengisian_lke_sakip['title'] . '</a></li>
 						</ul>
@@ -2656,8 +2656,8 @@ class Wp_Eval_Sakip_Admin
 				));
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v->tahun_anggaran . '">' . $v->nama . ' ( ' . $v->tahun_anggaran . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v->tahun_anggaran . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v->tahun_anggaran . '">' . $v->nama . ' ( ' . $v->tahun_anggaran . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v->tahun_anggaran . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $input_iku_opd_page['url'] . '">' . $input_iku_opd_page['title'] . '</a></li>
 						</ul>
@@ -2722,8 +2722,8 @@ class Wp_Eval_Sakip_Admin
 						));
 						$html .= '
 						<div class="accordion">
-							<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $list_pemda_pengisian_rencana_aksi['title'] . '</h3>
-							<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+							<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">' . $list_pemda_pengisian_rencana_aksi['title'] . '</h3>
+							<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 								<ul style="margin-left: 20px;">
 									<li><a target="_blank" href="' . $list_pemda_pengisian_rencana_aksi['url'] . '">' . $list_pemda_pengisian_rencana_aksi['title'] . '</a></li>
 								</ul>
@@ -2734,8 +2734,8 @@ class Wp_Eval_Sakip_Admin
 				if (empty($v['id_jadwal_rpjmd'])) {
 					$html .= '
 						<div class="accordion">
-							<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ' . 'Periode ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' ( Periode belum diset di pengaturan menu )</h3>
-							<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+							<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ' . 'Periode ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' ( Periode belum diset di pengaturan menu )</h3>
+							<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 								<ul style="margin-left: 20px;">
 									<li><a target="_blank">' . $v['nama_jadwal'] . ' ' . 'Periode ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' ( Periode belum diset di pengaturan menu )</a></li>
 								</ul>
@@ -2910,8 +2910,8 @@ class Wp_Eval_Sakip_Admin
 				));
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $tahun_awal . ' - ' . $tahun_akhir . ' )' . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $tahun_awal . ' - ' . $tahun_akhir . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $input_iku_pemda_page['url'] . '">' . $input_iku_pemda_page['title'] . '</a></li>
 						</ul>
@@ -2962,8 +2962,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $input_rpjpd_page['title'] . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">' . $input_rpjpd_page['title'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $input_rpjpd_page['url'] . '">' . $input_rpjpd_page['title'] . '</a></li>
 						</ul>
@@ -3014,8 +3014,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $input_rpjmd_page['url'] . '">' . $input_rpjmd_page['title'] . '</a></li>
 						</ul>
@@ -3093,8 +3093,8 @@ class Wp_Eval_Sakip_Admin
 				));
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v->tahun_anggaran . '">' . $v->nama . ' ( ' . $v->tahun_anggaran . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v->tahun_anggaran . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v->tahun_anggaran . '">' . $v->nama . ' ( ' . $v->tahun_anggaran . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v->tahun_anggaran . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $cascading_opd_page['url'] . '">' . $cascading_opd_page['title'] . '</a></li>
 						</ul>
@@ -3148,8 +3148,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $pokin_pemda_page['url'] . '">' . $pokin_pemda_page['title'] . '</a></li>
 						</ul>
@@ -3199,8 +3199,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $cascading_pemda_page['url'] . '">' . $cascading_pemda_page['title'] . '</a></li>
 						</ul>
@@ -3250,8 +3250,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal_renstra'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">' . $v['nama_jadwal_renstra'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $pohon_kinerja_opd_page['url'] . '">' . $pohon_kinerja_opd_page['title'] . '</a></li>
 						</ul>
@@ -3302,8 +3302,8 @@ class Wp_Eval_Sakip_Admin
 
 				$html .= '
 				<div class="accordion">
-					<h3 class="esakip-header-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
-					<div class="esakip-body-tahun" tahun="' . $index + 1 . $v['tahun_anggaran'] . '">
+					<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )' . '</h3>
+					<div class="esakip-body-tahun" tahun="' . ($index + 1) . $v['tahun_anggaran'] . '">
 						<ul style="margin-left: 20px;">
 							<li><a target="_blank" href="' . $crosscutting_pemda_page['url'] . '">' . $crosscutting_pemda_page['title'] . '</a></li>
 						</ul>
