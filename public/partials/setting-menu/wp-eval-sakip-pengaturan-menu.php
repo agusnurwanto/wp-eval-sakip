@@ -257,8 +257,11 @@ $body = '';
 		});
 	}
 
-	function ganti_menu_opd() {
-	    let menu = jQuery('#menu_opd').val();
+	function ganti_menu_opd(menu = null) {
+	    if (!menu) {
+	        menu = jQuery("input[name='menu_opd']:checked").val();
+	    }
+
 	    let tahun = tahun_anggaran;
 
 	    jQuery('#wrap-loading').show();
@@ -287,9 +290,48 @@ $body = '';
 	    });
 	}
 
+	function ganti_menu_pemda(menu = null) {
+	    if (!menu) {
+	        menu = jQuery("input[name='menu_pemda']:checked").val();
+	    }
+
+	    let tahun = tahun_anggaran;
+
+	    jQuery('#wrap-loading').show();
+	    jQuery.ajax({
+	        url: esakip.url,
+	        type: 'POST',
+	        data: {
+	            action: 'get_html_menu_khusus_pemda_by_menu',
+	            api_key: esakip.api_key,
+	            tahun_anggaran: tahun,
+	            menu: menu
+	        },
+	        dataType: 'json',
+	        success: function(response) {
+	            jQuery('#wrap-loading').hide();
+	            if (response.status === 'success') {
+	                jQuery('#set_html_menu_khusus_pemda').val(response.data);
+	            } else {
+	                alert(response.message);
+	            }
+	        },
+	        error: function() {
+	            jQuery('#wrap-loading').hide();
+	            alert('Gagal memuat data menu!');
+	        }
+	    });
+	}
+
 	function simpan_menu_khusus(tipe) {
 	    let set_html = jQuery('#set_html_menu_khusus_' + tipe).val();
-	    let menu = (tipe === 'opd') ? jQuery('#menu_opd').val() : '';
+	    let menu = '';
+
+	    if (tipe === 'opd') {
+	        menu = jQuery("input[name='menu_opd']:checked").val();
+	    } else if (tipe === 'pemda') {
+	        menu = jQuery("input[name='menu_pemda']:checked").val();
+	    }
 
 	    jQuery('#wrap-loading').show();
 	    jQuery.ajax({

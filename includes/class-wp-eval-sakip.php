@@ -541,6 +541,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_data_pengaturan_menu_khusus',  $plugin_public, 'get_data_pengaturan_menu_khusus');
 		$this->loader->add_action('wp_ajax_simpan_perubahan_menu_khusus',  $plugin_public, 'simpan_perubahan_menu_khusus');
 		$this->loader->add_action('wp_ajax_get_html_menu_khusus_opd_by_menu',  $plugin_public, 'get_html_menu_khusus_opd_by_menu');
+		$this->loader->add_action('wp_ajax_get_html_menu_khusus_pemda_by_menu',  $plugin_public, 'get_html_menu_khusus_pemda_by_menu');
 		
 		$this->loader->add_action('wp_ajax_esakip_simpan_rpjpd',  $plugin_public, 'esakip_simpan_rpjpd');
 		$this->loader->add_action('wp_ajax_esakip_get_rpjpd',  $plugin_public, 'esakip_get_rpjpd');
@@ -666,6 +667,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_submit_edit_laporan_pk_setting', $plugin_public, 'submit_edit_laporan_pk_setting');
 		$this->loader->add_action('wp_ajax_tambah_logo_pemda_laporan_pk', $plugin_public, 'tambah_logo_pemda_laporan_pk');
 		$this->loader->add_action('wp_ajax_get_table_pegawai_simpeg_pk', $plugin_public, 'get_table_pegawai_simpeg_pk');
+		$this->loader->add_action('wp_ajax_get_alamat_kantor', $plugin_public, 'get_alamat_kantor');
+		$this->loader->add_action('wp_ajax_submit_alamat_kantor', $plugin_public, 'submit_alamat_kantor');
 		
 		$this->loader->add_action('wp_ajax_nopriv_get_serapan_anggaran_capaian_kinerja',  $plugin_public, 'get_serapan_anggaran_capaian_kinerja');
 
