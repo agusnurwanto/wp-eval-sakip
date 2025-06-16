@@ -206,6 +206,7 @@ if (empty($data_atasan)) {
     }
 }
 
+$data_pegawai_2 = null;
 // PIHAK KEDUA BUKAN KEPALA DAERAH DAN DIA PLT
 if (!empty($data_atasan)) {
     if (!empty($data_atasan['plt_plh'])) {
@@ -253,7 +254,7 @@ if (!empty($data_atasan)) {
             ", $data_atasan['nip_baru'], $data_atasan['satker_id']),
             ARRAY_A
         );
-    
+        // print_r($data_pegawai_2); die($wpdb->last_query);
         $pihak_kedua['pangkat']         = $data_pegawai_2['pangkat'] ?? '-';
         $pihak_kedua['gelar_depan']     = $data_pegawai_2['gelar_depan'] ?? '';
         $pihak_kedua['gelar_belakang']  = $data_pegawai_2['gelar_belakang'] ?? '';
@@ -748,7 +749,10 @@ if ($data_tahapan) {
 <body>
     <div class="container-md mx-auto" style="width: 900px;">
         <div class="text-center" id="action-sakip">
-            <button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button><br>
+            <button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button>
+            <?php if($hak_akses_user_pegawai == 1 || ($hak_akses_user_pegawai == 2 && $pihak_pertama && $pihak_pertama['nip_pegawai'] == $nip_user_pegawai)): ?>
+                <button class="btn btn-warning" onclick="get_alamat();"><i class="dashicons dashicons-edit"></i>Edit Alamat</button><br>
+            <?php endif; ?>
         </div>
 
         <!-- Error Message -->
@@ -1311,6 +1315,31 @@ if ($data_tahapan) {
         </div>
     </div>
 </body>
+<!-- modal alamat -->
+<div class="modal fade" id="modalAlamat" data-backdrop="static"  role="dialog" aria-labelledby="modalAlamat" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadModalLabel">Edit Perangkat Daerah</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" value="" id="id_skpd">
+                    <div class="form-group">
+                        <label for="alamat">Alamat Kantor</label>
+                        <textarea type="text" class="form-control" id="alamat" name="alamat" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary d-flex text-right" onclick="submit_edit_alamat(this); return false">Unggah</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     jQuery(document).ready(function() {
         window.status_jabatan_1 = '';
@@ -1369,6 +1398,73 @@ if ($data_tahapan) {
             status_jabatan_2 = input_status_jabatan_kedua;
         }
     });
+
+    function get_alamat(id_skpd) {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_alamat_kantor',
+                api_key: esakip.api_key,
+                id_skpd: <?php echo $id_skpd; ?>
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                console.log(response);
+                if (response.status === 'success') {
+                    if(response.data != null || response.data != undefined){
+                        let data = response.data;
+                        jQuery("#alamat").val(data.alamat_kantor);
+                    }
+                    jQuery('#modalAlamat').modal('show');
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data!');
+            }
+        });
+    }
+
+    function submit_edit_alamat() {
+        let alamat = jQuery("#alamat").val();
+        if (alamat == '') {
+            return alert('Alamat kantor tidak boleh kosong');
+        }
+
+        jQuery('#wrap-loading').show()
+        jQuery.ajax({
+            url: esakip.url,
+            method: 'POST',
+            data: {
+                action: "submit_alamat_kantor",
+                api_key: esakip.api_key,
+                alamat: alamat,
+                id_skpd: <?php echo $id_skpd; ?>
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide()
+                if (response.status === 'success') {
+                    alert(response.message);
+                    location.reload()
+                    jQuery('#modalAlamat').modal('hide')
+                } else {
+                    alert('Terjadi kesalahan: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide()
+                console.error('AJAX Error:', error);
+                alert('Gagal menyimpan data. Silakan coba lagi.');
+            },
+        });
+    }
 
     function scrollCarousel(direction) {
         const carousel = jQuery('#card-carousel');
@@ -1544,7 +1640,7 @@ if ($data_tahapan) {
                 status_kedua: status_jabatan_2,
                 id_skpd: '<?php echo $id_skpd; ?>',
                 id_satker_pertama: '<?php echo $data_pegawai_1['satker_id']; ?>',
-                id_satker_kedua: '<?php echo $data_pegawai_2['satker_id']; ?>',
+                id_satker_kedua: '<?php echo (!empty($data_pegawai_2) && isset($data_pegawai_2['satker_id'])) ? $data_pegawai_2['satker_id'] : ($data_atasan['satker_id'] ?? ""); ?>',
                 tahun_anggaran: '<?php echo $input['tahun']; ?>',
                 options: option_js
             },
