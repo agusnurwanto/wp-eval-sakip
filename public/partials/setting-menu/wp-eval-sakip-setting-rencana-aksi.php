@@ -29,7 +29,7 @@ $body = '';
 <div class="cetak">
 	<div style="padding: 10px;margin:0 0 3rem 0;">
 		<input type="hidden" value="<?php echo get_option('_crb_apikey_esakip'); ?>" id="api_key">
-		<h1 class="text-center" style="margin:3rem;">Halaman Pengaturan Rencana Hasil Kerja<br>Tahun Anggaran <?php echo $tahun_anggaran; ?></h1>
+		<h1 class="text-center" style="margin:3rem;">Halaman Pengaturan Rencana Aksi<br>Tahun Anggaran <?php echo $tahun_anggaran; ?></h1>
 		<div class="d-flex justify-content-center">
 			<div class="card" style="width: 50%;">
 				<div class="card-body">

@@ -1793,24 +1793,31 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 			}
 
 			if ($ret['status'] != 'error') {
-				$tujuan = $wpdb->get_row(
+				$jenis_jadwal = $wpdb->get_var(
 					$wpdb->prepare("
 						SELECT 
-							*
+							jenis_jadwal_khusus
+						FROM esakip_data_jadwal
+						WHERE id = %d
+						  AND status != 0
+					", $_POST['id_jadwal'])
+				);
+				$tujuan = $wpdb->get_row(
+					$wpdb->prepare("
+						SELECT *
 						FROM esakip_rpd_tujuan
 						WHERE id = %d
-							AND active=1
+						  AND active=1
 					", $_POST['id']),
 					ARRAY_A
 				);
 				$indikator_tujuan = $wpdb->get_results(
 					$wpdb->prepare("
-						SELECT 
-							*
+						SELECT *
 						FROM esakip_rpd_tujuan
 						WHERE id_unik = %s
-							AND active=1
-							AND id_unik_indikator IS NOT NULL
+						  AND active = 1
+						  AND id_unik_indikator IS NOT NULL
 					", $tujuan['id_unik']),
 					ARRAY_A
 				);
@@ -1860,13 +1867,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 				// sasaran rpd
 				$sasaran = $wpdb->get_results(
 					$wpdb->prepare("
-						SELECT 
-							*
+						SELECT *
 						FROM esakip_rpd_sasaran
 						WHERE kode_tujuan = %s
-							AND active=1
-							AND id_unik_indikator IS NULL
-						", $tujuan['id_unik']),
+						  AND active=1
+						  AND id_unik_indikator IS NULL
+					", $tujuan['id_unik']),
 					ARRAY_A
 				);
 				$jml_sasaran = count($sasaran);
@@ -1888,13 +1894,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					// indikator sasaran sasaran rpd
 					$indikator_sasaran = $wpdb->get_results(
 						$wpdb->prepare("
-								SELECT 
-									*
-								FROM esakip_rpd_sasaran
-								WHERE id_unik = %s
-								  AND id_unik_indikator IS NOT NULL
-								  AND active=1
-							", $sas['id_unik']),
+							SELECT *
+							FROM esakip_rpd_sasaran
+							WHERE id_unik = %s
+							  AND id_unik_indikator IS NOT NULL
+							  AND active=1
+						", $sas['id_unik']),
 						ARRAY_A
 					);
 					$width_ind_sasaran = $width_sasaran / count($indikator_sasaran);
@@ -1905,13 +1910,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						// indikator sasaran sasaran rpd
 						$skpd_program = $wpdb->get_results(
 							$wpdb->prepare("
-								SELECT 
-									*
+								SELECT *
 								FROM esakip_rpd_program
 								WHERE kode_sasaran = %s
-									AND id_unik_indikator_sasaran =%s
-									AND id_unik_indikator IS NOT NULL
-									AND active=1
+								  AND id_unik_indikator_sasaran =%s
+								  AND id_unik_indikator IS NOT NULL
+								  AND active = 1
 							", $ind['id_unik'], $ind['id_unik_indikator']),
 							ARRAY_A
 						);
@@ -1978,19 +1982,19 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									<td class="text-center" colspan="' . $colspan_tujuan . '"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . $misi_rpjpd_html . '</button></td>
 								</tr>
 								<tr>
-									<td class="text-center"><button class="btn btn-lg btn-info">TUJUAN RPD</button></td>
+									<td class="text-center"><button class="btn btn-lg btn-info">TUJUAN ' . strtoupper($jenis_jadwal) . '</button></td>
 									<td class="text-center" colspan="' . $colspan_tujuan . '"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . $tujuan['tujuan_teks'] . '</button></td>
 								</tr>
 								<tr>
-									<td class="text-center"><button class="btn btn-lg btn-info">INDIKATOR TUJUAN RPD</button></td>
+									<td class="text-center"><button class="btn btn-lg btn-info">INDIKATOR TUJUAN ' . strtoupper($jenis_jadwal) . '</button></td>
 									' . $indikator_tujuan_html . '
 								</tr>
 								<tr>
-									<td class="text-center"><button class="btn btn-lg btn-info">SASARAN RPD</button></td>
+									<td class="text-center"><button class="btn btn-lg btn-info">SASARAN ' . strtoupper($jenis_jadwal) . '</button></td>
 									<td class="text-center" colspan=' . $colspan_tujuan . '>' . $sasaran_html . '</td>
 								</tr>
 								<tr>
-									<td class="text-center"><button class="btn btn-lg btn-info">INDIKATOR SASARAN RPD</button></td>
+									<td class="text-center"><button class="btn btn-lg btn-info">INDIKATOR SASARAN ' . strtoupper($jenis_jadwal) . '</button></td>
 									<td class="text-center" colspan=' . $colspan_tujuan . '>' . $indikator_sasaran_html . '</td>
 								</tr>
 								<tr>
