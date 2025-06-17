@@ -160,6 +160,7 @@ foreach ($idtahun as $val) {
 				alert('Terjadi kesalahan saat memuat tabel!');
 			}
 		});
+		
 	}
 
 	function lihatDokumen(dokumen) {
