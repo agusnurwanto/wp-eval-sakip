@@ -32449,12 +32449,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		];
 	
 		// Ambil data tujuan tanpa id_unik_indikator
-		$get_tujuan = $wpdb->get_results("
+		$get_tujuan = $wpdb->get_results(
+			$wpdb->prepare("
 				SELECT * 
 				FROM esakip_rpd_tujuan 
-				WHERE id_unik_indikator IS NULL 
+				WHERE id_unik_indikator IS NULL
+				  AND id_jadwal = %d
 				  AND active = 1
-			", ARRAY_A
+			", $_POST['id_jadwal']), ARRAY_A
 		);
 	
 		if (!empty($get_tujuan)) {
@@ -32528,52 +32530,29 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 	
-	function get_rpjmd_by_tahun($tahun_anggaran) 
-	{
-		global $wpdb;
-
-		$id_jadwal_rpjmd = $wpdb->get_var(
-			$wpdb->prepare("
-				SELECT 
-					id_jadwal_rpjmd
-				FROM esakip_pengaturan_upload_dokumen
-				WHERE tahun_anggaran = %d
-				  AND active = 1
-			", $tahun_anggaran)
-		);
-
-		$jadwal_rpjmd = $wpdb->get_row(
-			$wpdb->prepare("
-				SELECT 
-					id,
-					nama_jadwal,
-					nama_jadwal_renstra,
-					tahun_anggaran,
-					lama_pelaksanaan,
-					tahun_selesai_anggaran
-				FROM esakip_data_jadwal
-				WHERE id = %d
-				AND status != 0
-			", $id_jadwal_rpjmd),
-			ARRAY_A
-		);
-
-		return $jadwal_rpjmd;
-	}
-
-	function get_renstra_by_rpjmd_tahun($id_jadwal_rpjmd, $tahun_anggaran) 
+	function get_rpjmd_setting_by_tahun_anggaran($tahun_anggaran) 
 	{
 		global $wpdb;
 
 		$data = $wpdb->get_row(
-			$wpdb->prepare('
-				SELECT
-					*
-				FROM esakip_pengaturan_rencana_aksi
-				WHERE id_jadwal = %d
-				  AND tahun_anggaran = %d
-				  AND active = 1
-			', $id_jadwal_rpjmd, $tahun_anggaran),
+			$wpdb->prepare("
+				SELECT 
+					j.id,
+					j.nama_jadwal,
+					j.nama_jadwal_renstra,
+					j.tahun_anggaran,
+					j.lama_pelaksanaan,
+					j.tahun_selesai_anggaran,
+					j.jenis_jadwal_khusus,
+					u.id_jadwal_wp_sipd
+				FROM esakip_pengaturan_upload_dokumen u
+				INNER JOIN esakip_data_jadwal j
+						ON u.id_jadwal_rpjmd = j.id
+				WHERE u.tahun_anggaran = %d
+				  AND u.active = 1
+				  AND j.status != 0
+				LIMIT 1
+			", $tahun_anggaran),
 			ARRAY_A
 		);
 

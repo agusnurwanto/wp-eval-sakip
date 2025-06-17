@@ -9,16 +9,15 @@ if (empty($_GET) && empty($_GET['tahun'])) {
 global $wpdb;
 $tahun_anggaran = intval($_GET['tahun']);
 
-$jadwal_rpjmd = $this->get_rpjmd_by_tahun($tahun_anggaran);
-
+$jadwal_rpjmd = $this->get_rpjmd_setting_by_tahun_anggaran($tahun_anggaran);
+ 
 if (empty($jadwal_rpjmd)) {
     die('Jadwal RPJMD/RENSTRA terbuka tidak tersedia!');
 }
 $error_message = array();
-$tahun_renstra_wp_sipd = $this->get_renstra_by_rpjmd_tahun($jadwal_rpjmd['id'], $tahun_anggaran);
-if (empty($tahun_renstra_wp_sipd['id_jadwal_wp_sipd'])) {
-    $tahun_renstra_wp_sipd['id_jadwal_wp_sipd'] = 0;
-    array_push($error_message, 'Jadwal RENSTRA belum diset, Mohon hubungi admin!');
+if (empty($jadwal_rpjmd['id_jadwal_wp_sipd'])) {
+    $jadwal_rpjmd['id_jadwal_wp_sipd'] = 0;
+    array_push($error_message, 'Jadwal WP-SIPD belum diset, Mohon hubungi admin!');
 }
 ?>
 <style>
@@ -86,7 +85,7 @@ if (empty($tahun_renstra_wp_sipd['id_jadwal_wp_sipd'])) {
                     <tr>
                         <th class="text-center" style="width: 30px;">No</th>
                         <th class="text-center">Judul</th>
-                        <th class="text-center">Tujuan RPJMD/RPD</th>
+                        <th class="text-center">Tujuan <?php echo strtoupper($jadwal_rpjmd['jenis_jadwal_khusus']); ?></th>
                         <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -132,7 +131,7 @@ if (empty($tahun_renstra_wp_sipd['id_jadwal_wp_sipd'])) {
                 action: 'get_datatable_cascading_publish',
                 tahun_anggaran: <?php echo $tahun_anggaran; ?>,
                 id_jadwal: <?php echo $jadwal_rpjmd['id']; ?>,
-                id_jadwal_wp_sipd: <?php echo $tahun_renstra_wp_sipd['id_jadwal_wp_sipd']; ?>
+                id_jadwal_wp_sipd: <?php echo $jadwal_rpjmd['id_jadwal_wp_sipd']; ?>
             },
             dataType: 'json',
             success: function(response) {

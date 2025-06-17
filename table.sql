@@ -762,6 +762,9 @@ CREATE TABLE `esakip_dpa` (
 CREATE TABLE `esakip_pohon_kinerja` (
   `id` int(11) NOT NULL auto_increment,
   `label` varchar(255) NOT NULL,
+  `pelaksana` text DEFAULT NULL,
+  `bentuk_kegiatan` text DEFAULT NULL,
+  `outcome` text DEFAULT NULL,
   `parent` int(11) DEFAULT 0,
   `label_indikator_kinerja` varchar(255) DEFAULT null,
   `level` int(11) NOT null,
@@ -782,6 +785,9 @@ CREATE TABLE `esakip_pohon_kinerja` (
 CREATE TABLE `esakip_pohon_kinerja_opd` (
   `id` int(11) NOT NULL auto_increment,
   `label` varchar(255) NOT NULL,
+  `pelaksana` text DEFAULT NULL,
+  `bentuk_kegiatan` text DEFAULT NULL,
+  `outcome` text DEFAULT NULL,
   `id_skpd` int(11) DEFAULT NULL,
   `parent` int(11) DEFAULT 0,
   `label_indikator_kinerja` varchar(255) DEFAULT null,
