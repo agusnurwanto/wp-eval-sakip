@@ -620,6 +620,7 @@ $body = '';
 		let nama_jadwal = jQuery('#nama_jadwal').val()
 		let nama_jadwal_renstra = jQuery('#nama_jadwal_renstra').val()
 		let keterangan = jQuery("#keterangan").val()
+		let jadwal_murni = jQuery("#jadwal_murni").val()
 		let tahun_anggaran = jQuery("#tahun_anggaran").val()
 		let lama_pelaksanaan = jQuery("#lama_pelaksanaan").val()
 		let tahun_selesai_anggaran = jQuery("#tahun_selesai_anggaran").val()
@@ -648,6 +649,7 @@ $body = '';
 					'api_key': jQuery("#api_key").val(),
 					'nama_jadwal': nama_jadwal,
 					'nama_jadwal_renstra': nama_jadwal_renstra,
+					'jadwal_murni': jadwal_murni,
 					'id': id,
 					'keterangan': keterangan,
 					'tahun_anggaran': tahun_anggaran,

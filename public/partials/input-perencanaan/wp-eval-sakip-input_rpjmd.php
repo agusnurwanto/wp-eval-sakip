@@ -764,6 +764,8 @@ $data_tujuan_existing = $wpdb->get_results($wpdb->prepare('
         *
     FROM esakip_rpd_tujuan
     WHERE id_jadwal=%d
+        AND id_unik_indikator IS NULL
+        AND indikator_teks IS NULL
         AND active=1
 ', $id_jadwal_murni), ARRAY_A);
 // print_r($data_tujuan_existing); die($wpdb->last_query);

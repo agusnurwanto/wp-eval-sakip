@@ -13550,6 +13550,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$menu_iku	= trim(htmlspecialchars($_POST['menu_iku']));
 					$langsung_verifikasi	= trim(htmlspecialchars($_POST['langsung_verifikasi']));
 					$setting_input_pokin	= trim(htmlspecialchars($_POST['setting_input_pokin']));
+					$jadwal_murni 	= $_POST['jadwal_murni'];
 					// $menu_penyusunan_pohon_kinerja_pemda	= trim(htmlspecialchars($_POST['menu_penyusunan_pohon_kinerja_pemda']));
 					// $menu_penyusunan_pohon_kinerja_opd	= trim(htmlspecialchars($_POST['menu_penyusunan_pohon_kinerja_opd']));
 
@@ -13605,6 +13606,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					//update data penjadwalan
 					$data_jadwal = array(
 						'nama_jadwal' 			=> $nama_jadwal,
+						'id_jadwal_murni'		=> $jadwal_murni,
 						'nama_jadwal_renstra' 	=> $nama_jadwal_renstra,
 						'tahun_anggaran'		=> $tahun_anggaran,
 						'keterangan'			=> $keterangan,
