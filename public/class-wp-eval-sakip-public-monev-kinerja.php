@@ -6546,8 +6546,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 				$rencana_pagu = 0;
 				$sumber_dana = array();
-				//LEVEL 4 MUST SET LAST LEVEL
-				if ($v_rhk_child['level'] == '4' && $v_rhk_child['input_rencana_pagu_level'] == 1) {
+				// di level 4 tidak perlu check input rencana pagu karena level terakhir
+				if ($v_rhk_child['level'] == '4') {
 					$data_indikator_anggaran = $wpdb->get_results(
 						$wpdb->prepare("
 							SELECT
