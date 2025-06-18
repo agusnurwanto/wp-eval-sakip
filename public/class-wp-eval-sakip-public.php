@@ -23340,6 +23340,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
+
+
 	public function get_subkomponen_lke_by_id()
 	{
 		global $wpdb;
@@ -23398,6 +23400,42 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						'message' => 'Id Kosong!'
 					);
 				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_tahun_anggaran_data_unit()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$ret['data'] = $wpdb->get_results(
+					$wpdb->prepare('
+						SELECT 
+							DISTINCT(tahun_anggaran)
+						FROM esakip_data_unit
+						WHERE active = %d
+						ORDER BY tahun_anggaran DESC
+					', 1), 
+					ARRAY_A
+				);
 			} else {
 				$ret = array(
 					'status' => 'error',

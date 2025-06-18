@@ -340,7 +340,13 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_table_pohon_kinerja', $plugin_public, 'get_table_pohon_kinerja');
 		$this->loader->add_action('wp_ajax_get_table_tahun_pohon_kinerja', $plugin_public, 'get_table_tahun_pohon_kinerja');
 		$this->loader->add_action('wp_ajax_get_table_skpd_pohon_kinerja', $plugin_public, 'get_table_skpd_pohon_kinerja');
- 
+
+		$this->loader->add_action('wp_ajax_upsert_lembaga_lainnya', $plugin_public, 'upsert_lembaga_lainnya');
+		$this->loader->add_action('wp_ajax_hapus_lembaga_lainnya_by_id', $plugin_public, 'hapus_lembaga_lainnya_by_id');
+		$this->loader->add_action('wp_ajax_get_lembaga_lainnya_by_id', $plugin_public, 'get_lembaga_lainnya_by_id');
+		$this->loader->add_action('wp_ajax_copy_data_lembaga_lainnya', $plugin_public, 'copy_data_lembaga_lainnya');
+		$this->loader->add_action('wp_ajax_get_tahun_anggaran_data_unit', $plugin_public, 'get_tahun_anggaran_data_unit');
+
 		$this->loader->add_action('wp_ajax_get_detail_rkpd_by_id', $plugin_public, 'get_detail_rkpd_by_id');
 		$this->loader->add_action('wp_ajax_tambah_dokumen_rkpd', $plugin_public, 'tambah_dokumen_rkpd');
 		$this->loader->add_action('wp_ajax_hapus_dokumen_rkpd', $plugin_public, 'hapus_dokumen_rkpd');
@@ -841,6 +847,7 @@ class Wp_Eval_Sakip {
 
 		add_shortcode('detail_laporan_rhk', array($plugin_public, 'detail_laporan_rhk'));
 		add_shortcode('sso_login', array($plugin_public, 'sso_login'));
+		add_shortcode('halaman_lembaga_lainnya', array($plugin_public, 'halaman_lembaga_lainnya'));
 
 		add_shortcode('list_kuesioner_menpan', array($plugin_public, 'list_kuesioner_menpan'));
 		add_shortcode('kuesioner_menpan', array($plugin_public, 'kuesioner_menpan'));

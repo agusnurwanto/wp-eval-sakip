@@ -2507,6 +2507,7 @@ class Wp_Eval_Sakip_Admin
 		));
 
 		$list_mapping_jenis_dokumen = '';
+		$list_lembaga_lainnya = '';
 		if (!empty($tahun_all)) {
 			foreach ($tahun_all as $v) {
 				$halaman_mapping_jenis_dokumen = $this->functions->generatePage(array(
@@ -2517,6 +2518,15 @@ class Wp_Eval_Sakip_Admin
 					'post_status' => 'private'
 				));
 				$list_mapping_jenis_dokumen .= '<li><a target="_blank" href="' . $halaman_mapping_jenis_dokumen['url'] . '">' . $halaman_mapping_jenis_dokumen['title'] . '</a></li>';
+
+				$halaman_lembaga_lainnya = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Lembaga Lainnya Tahun Anggaran | ' . $v['tahun_anggaran'],
+					'content' => '[halaman_lembaga_lainnya tahun_anggaran="' . $v['tahun_anggaran'] . '"]',
+					'show_header' => 1,
+					'no_key' => 1,
+					'post_status' => 'private'
+				));
+				$list_lembaga_lainnya .= '<li><a target="_blank" href="' . $halaman_lembaga_lainnya['url'] . '">' . $halaman_lembaga_lainnya['title'] . '</a></li>';
 			}
 		}
 
@@ -2529,7 +2539,14 @@ class Wp_Eval_Sakip_Admin
 					<li><a href="' . $halaman_mapping_sipd_simpeg['url'] . '" target="_blank">' . $halaman_mapping_sipd_simpeg['title'] . '</a></li>
 					<li><a href="' . $halaman_mapping_user_esr['url'] . '" target="_blank">' . $halaman_mapping_user_esr['title'] . '</a></li>
 					<li><a href="' . $list_skpd_laporan_pk_setting['url'] . '" target="_blank">Halaman Profile Perangkat Daerah</a></li>
+				</ol>
+				<h4>HALAMAN MAPPING JENIS DOKUMEN</h4>
+				<ol>	
 					' . $list_mapping_jenis_dokumen . '
+				</ol>
+				<h4>HALAMAN LEMBAGA LAINNYA</h4>
+				<ol>	
+					' . $list_lembaga_lainnya . '
 				</ol>'),
 			Field::make('text', 'crb_url_server_sakip', 'URL Server WP-SIPD')
 				->set_default_value(admin_url('admin-ajax.php'))
