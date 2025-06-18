@@ -28055,39 +28055,59 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									'indikator_catatan_teks' => $tujuan['indikator_catatan_teks']
 								);
 								if (!empty($_POST['id_unik_tujuan'])) {
-									$_POST['table'] = 'data_rpjpd_isu';
+									// get isu
+									$_POST['table'] = 'esakip_rpjpd_isu';
 									$_POST['id_isu'] = $tujuan['id_isu'];
+									$kebijakan = $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd);
+
+									$_POST['id_isu'] = false;
+									$_POST['id'] = $kebijakan['data'][0]['id_kebijakan'];
 									$data_all[$tujuan['id_unik']]['rpjpd']['isu'] = array(
 										'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
 										'id' => $tujuan['id_isu']
 									);
 
-									$_POST['table'] = 'data_rpjpd_kebijakan';
-									$_POST['id_kebijakan'] = $data_all[$tujuan['id_unik']]['rpjpd']['isu']['data']['data'][0]['id_kebijakan'];
+									// get kebijakan
+									$_POST['table'] = 'esakip_rpjpd_kebijakan';
+									$_POST['id_kebijakan'] = $kebijakan['data'][0]['id_kebijakan'];
+									$saspok = $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd);
+
+									$_POST['id_kebijakan'] = false;
+									$_POST['id'] = $saspok['data'][0]['id_saspok'];
 									$data_all[$tujuan['id_unik']]['rpjpd']['kebijakan'] = array(
 										'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
-										'id' => $_POST['id_kebijakan']
+										'id' => $kebijakan['data'][0]['id_kebijakan']
 									);
 
-									$_POST['table'] = 'data_rpjpd_sasaran';
-									$_POST['id_saspok'] = $data_all[$tujuan['id_unik']]['rpjpd']['kebijakan']['data']['data'][0]['id_saspok'];
+									// get sasaran
+									$_POST['table'] = 'esakip_rpjpd_sasaran';
+									$_POST['id_saspok'] = $saspok['data'][0]['id_saspok'];
+									$sasaran = $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd);
+
+									$_POST['id_saspok'] = false;
+									$_POST['id'] = $sasaran['data'][0]['id_misi'];
 									$data_all[$tujuan['id_unik']]['rpjpd']['sasaran'] = array(
 										'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
-										'id' => $_POST['id_saspok']
+										'id' => $saspok['data'][0]['id_saspok']
 									);
 
-									$_POST['table'] = 'data_rpjpd_misi';
-									$_POST['id_misi'] = $data_all[$tujuan['id_unik']]['rpjpd']['sasaran']['data']['data'][0]['id_misi'];
+									// get misi
+									$_POST['table'] = 'esakip_rpjpd_misi';
+									$_POST['id_misi'] = $sasaran['data'][0]['id_misi'];
+									$misi = $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd);
+
+									$_POST['id_misi'] = false;
+									$_POST['id'] = $misi['data'][0]['id_visi'];
 									$data_all[$tujuan['id_unik']]['rpjpd']['misi'] = array(
 										'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
-										'id' => $_POST['id_misi']
+										'id' => $sasaran['data'][0]['id_misi']
 									);
 
-									$_POST['table'] = 'data_rpjpd_visi';
-									$_POST['id_visi'] = $data_all[$tujuan['id_unik']]['rpjpd']['misi']['data']['data'][0]['id_visi'];
+									// get visi
+									$_POST['table'] = 'esakip_rpjpd_visi';
 									$data_all[$tujuan['id_unik']]['rpjpd']['visi'] = array(
 										'data' => $this->esakip_get_rpjpd(true, $id_jadwal_rpjpd),
-										'id' => $_POST['id_visi']
+										'id' => $misi['data'][0]['id_visi']
 									);
 								}
 							}
