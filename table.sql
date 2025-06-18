@@ -59,6 +59,7 @@ CREATE TABLE `esakip_iku` (
   `active` tinyint(4) DEFAULT 1,
   `upload_id` int(11) DEFAULT NULL,
   `path_esr` text DEFAULT NULL,
+  `id_jadwal` int(11) DEFAULT NULL,
   PRIMARY KEY(id),
   KEY `id_skpd` (`id_skpd`),
   KEY `tahun_anggaran` (`tahun_anggaran`),
@@ -761,6 +762,9 @@ CREATE TABLE `esakip_dpa` (
 CREATE TABLE `esakip_pohon_kinerja` (
   `id` int(11) NOT NULL auto_increment,
   `label` varchar(255) NOT NULL,
+  `pelaksana` text DEFAULT NULL,
+  `bentuk_kegiatan` text DEFAULT NULL,
+  `outcome` text DEFAULT NULL,
   `parent` int(11) DEFAULT 0,
   `label_indikator_kinerja` varchar(255) DEFAULT null,
   `level` int(11) NOT null,
@@ -781,6 +785,9 @@ CREATE TABLE `esakip_pohon_kinerja` (
 CREATE TABLE `esakip_pohon_kinerja_opd` (
   `id` int(11) NOT NULL auto_increment,
   `label` varchar(255) NOT NULL,
+  `pelaksana` text DEFAULT NULL,
+  `bentuk_kegiatan` text DEFAULT NULL,
+  `outcome` text DEFAULT NULL,
   `id_skpd` int(11) DEFAULT NULL,
   `parent` int(11) DEFAULT 0,
   `label_indikator_kinerja` varchar(255) DEFAULT null,
@@ -852,6 +859,7 @@ CREATE TABLE `esakip_iku_pemda` (
   `active` tinyint(4) DEFAULT 1,
   `upload_id` int(11) DEFAULT NULL,
   `path_esr` text DEFAULT NULL,
+  `id_jadwal` int(11) DEFAULT NULL,
   PRIMARY KEY(id),
   KEY `id_skpd` (`id_skpd`),
   KEY `tahun_anggaran` (`tahun_anggaran`),
@@ -1164,6 +1172,7 @@ CREATE TABLE `esakip_rpd_tujuan` (
   `head_teks` text DEFAULT NULL,
   `id_misi_old` int(11) DEFAULT NULL,
   `id_tujuan` int(11) DEFAULT NULL,
+  `id_tujuan_murni` int(11) DEFAULT NULL,
   `id_unik` text DEFAULT NULL,
   `id_unik_indikator` text DEFAULT NULL,
   `indikator_teks` text DEFAULT NULL,
@@ -1209,6 +1218,7 @@ CREATE TABLE `esakip_rpd_sasaran` (
   `head_teks` text DEFAULT NULL,
   `id_misi_old` int(11) DEFAULT NULL,
   `id_sasaran` int(11) DEFAULT NULL,
+  `id_sasaran_murni` int(11) DEFAULT NULL,
   `id_unik` text DEFAULT NULL,
   `id_unik_indikator` text DEFAULT NULL,
   `indikator_teks` text DEFAULT NULL,
@@ -1567,6 +1577,7 @@ CREATE TABLE `esakip_data_iku_opd` (
 CREATE TABLE `esakip_data_iku_pemda` (
   `id` int(11) NOT NULL auto_increment,
   `id_sasaran` text NOT NULL,
+  `id_sasaran_murni` int(11) DEFAULT NULL,
   `label_sasaran` text DEFAULT null,
   `id_unik_indikator` text DEFAULT null,
   `label_indikator` text DEFAULT null,
@@ -1587,6 +1598,7 @@ CREATE TABLE `esakip_data_iku_pemda` (
   KEY `id_jadwal` (`id_jadwal`),
   KEY `id_unik` (`id_unik`),
   KEY `id_unik_indikator` (`id_unik_indikator`),
+  KEY `id_sasaran_murni` (`id_sasaran_murni`),
   KEY `active` (`active`)
 );
 
@@ -1832,14 +1844,18 @@ CREATE TABLE `esakip_pengaturan_upload_dokumen` (
 CREATE TABLE `esakip_koneksi_pokin_pemda_opd` (
   `id` int(11) NOT NULL auto_increment,
   `parent_pohon_kinerja` int(11) NOT NULL,
-  `id_skpd_koneksi` int(11) DEFAULT NULL,
+  `id_skpd_koneksi` varchar(200) DEFAULT NULL,
+  `tipe` tinyint(4) DEFAULT NULL COMMENT '1 = SKPD, 2 = Lembaga Lainya, 3 = Sub SKPD, 4 = Desa/Kelurahan',
+  `nama_desa` text DEFAULT NULL,
+  `keterangan_koneksi` text DEFAULT NULL,
   `parent_pohon_kinerja_koneksi` int(11) NOT NULL,
   `status_koneksi` tinyint(4) NOT NULL COMMENT '0 = MENUNGGU, 1 = DISETUJUI, 2 = DITOLAK',
   `active` tinyint(4) NOT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp(),
-  `keterangan_tolak` varchar(255) DEFAULT null,
+  `keterangan_tolak` text DEFAULT null,
   PRIMARY key (id),
+  KEY `tipe` (`tipe`),
   KEY `id_skpd_koneksi` (`id_skpd_koneksi`),
   KEY `parent_pohon_kinerja` (`parent_pohon_kinerja`),
   KEY `parent_pohon_kinerja_koneksi` (`parent_pohon_kinerja_koneksi`),
@@ -2172,6 +2188,7 @@ CREATE TABLE `esakip_dokumen_jadwal_esr` (
 
 CREATE TABLE `esakip_finalisasi_iku_pemda` (
   `id` int(11) NOT NULL auto_increment,
+  `id_sasaran_murni` int(11) DEFAULT NULL,
   `id_tahap` varchar(255) DEFAULT null,
   `kode_sasaran` text NOT NULL,
   `label_sasaran` text DEFAULT null,

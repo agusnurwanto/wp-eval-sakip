@@ -6,28 +6,14 @@ if (!defined('WPINC')) {
 }
 
 $input = shortcode_atts(array(
-    'tahun' => '2022',
+    'id_jadwal' => '',
 ), $atts);
+
+$data_jadwal = $this->get_data_jadwal_by_id($input['id_jadwal']);
+$title = $data_jadwal['nama_jadwal'] . ' ( ' . $data_jadwal['tahun_anggaran'] . ' - ' . $data_jadwal['tahun_selesai_anggaran'] . ' )';
 
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-$idtahun = $wpdb->get_results(
-    "
-		SELECT DISTINCT 
-			tahun_anggaran 
-		FROM esakip_data_unit        
-        ORDER BY tahun_anggaran DESC",
-    ARRAY_A
-);
-$tahun = "<option value='-1'>Pilih Tahun</option>";
-
-foreach ($idtahun as $val) {
-    $selected = '';
-    if (!empty($input['tahun_anggaran']) && $val['tahun_anggaran'] == $input['tahun_anggaran']) {
-        $selected = 'selected';
-    }
-    $tahun .= "<option value='$val[tahun_anggaran]' $selected>$val[tahun_anggaran]</option>";
-}
 $tipe_dokumen = "iku";
 
 $current_user = wp_get_current_user();
@@ -57,16 +43,16 @@ $status_api_esr = get_option('_crb_api_esr_status');
 <div class="container-md">
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Dokumen IKU <br>Pemerintah Daerah<br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
+            <h1 class="text-center" style="margin:3rem;">Dokumen IKU <br>Pemerintah Daerah<br><?php echo $title; ?></h1>
             <?php if (!$is_admin_panrb): ?>
-            <div style="margin-bottom: 25px;">
-                <button class="btn btn-primary" onclick="tambah_dokumen();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
-                <?php
-                if($status_api_esr){
-                    echo '<button class="btn btn-warning" onclick="sync_to_esr();" id="btn-sync-to-esr" style="display:none"><i class="dashicons dashicons-arrow-up-alt"></i> Kirim Data ke ESR</button>';
-                }
-                ?>
-            </div>
+                <div style="margin-bottom: 25px;">
+                    <button class="btn btn-primary" onclick="tambah_dokumen();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
+                    <?php
+                    if ($status_api_esr) {
+                        echo '<button class="btn btn-warning" onclick="sync_to_esr();" id="btn-sync-to-esr" style="display:none"><i class="dashicons dashicons-arrow-up-alt"></i> Kirim Data ke ESR</button>';
+                    }
+                    ?>
+                </div>
             <?php endif; ?>
             <div class="wrap-table">
                 <table id="table_dokumen" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
@@ -75,7 +61,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
                             <th class="text-center">No</th>
                             <?php
                             if (!$is_admin_panrb):
-                                if($status_api_esr){
+                                if ($status_api_esr) {
                                     echo '<th class="text-center" id="check-list-esr" style="display:none">Checklist ESR</th>';
                                 }
                             endif;
@@ -128,7 +114,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
             </div>
             <div class="modal-body">
                 <form enctype="multipart/form-data">
-                    <input type="hidden" value="<?php echo $input['tahun']; ?>" id="tahunAnggaran">
                     <input type="hidden" value="" id="idDokumen">
                     <div class="form-group">
                         <label for="fileUpload">Pilih File</label>
@@ -152,41 +137,9 @@ $status_api_esr = get_option('_crb_api_esr_status');
         </div>
     </div>
 </div>
-
-<!-- Modal Tahun -->
-<!-- <div class="modal fade" id="tahunModal" tabindex="-1" role="dialog" aria-labelledby="tahunModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="tahunModalLabel">Pilih Tahun Anggaran</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="tahunForm">
-                    <div class="form-group">
-                        <label for="tahunAnggaran">Tahun Anggaran:</label>
-                        <select class="form-control" id="tahunAnggaran" name="tahunAnggaran">
-                            <?php echo $tahun; ?>
-                        </select>
-                        <input type="hidden" id="idDokumen" value="">
-                    </div>
-                    <button type="submit" class="btn btn-primary" onclick="submit_tahun_dokumen(); return false">Simpan</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div> -->
-
-<!-- Tahun Tabel -->
-<div id="tahunContainer" class="container-md">
-</div>
-
 <script>
     jQuery(document).ready(function() {
         getTableDokumen();
-        // getTableTahun();
         jQuery("#fileUpload").on('change', function() {
             var id_dokumen = jQuery('#idDokumen').val();
             if (id_dokumen == '') {
@@ -202,26 +155,20 @@ $status_api_esr = get_option('_crb_api_esr_status');
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'get_table_dokumen_pemerintah_daerah',
+                action: 'get_table_iku_pemda',
                 api_key: esakip.api_key,
-                tahun_anggaran: '<?php echo $input['tahun'] ?>',
-                tipe_dokumen: '<?php echo $tipe_dokumen; ?>'
+                id_periode: <?php echo $input['id_jadwal']; ?>,
             },
             dataType: 'json',
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 console.log(response);
-                if(
-                    response.data_esr 
-                    && response.data_esr.status == 'error'
-                ){
-                    alert(response.data_esr.message);
-                }
-                if(response.status_mapping_esr){
-                    let body_non_esr_lokal=``;
-                    if(response.non_esr_lokal.length > 0){
+                if (response.status_mapping_esr) {
+                    tahun_anggaran_periode_dokumen = response.tahun_anggaran_periode_dokumen;
+                    let body_non_esr_lokal = ``;
+                    if (response.non_esr_lokal.length > 0) {
                         response.non_esr_lokal.forEach((value, index) => {
-                            body_non_esr_lokal+=`
+                            body_non_esr_lokal += `
                                 <tr>
                                     <td class="text-center" data-upload-id="${value.upload_id}">${index+1}.</td>
                                     <td>${value.nama_file}</td>
@@ -246,38 +193,10 @@ $status_api_esr = get_option('_crb_api_esr_status');
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data!');
+                alert('Terjadi kesalahan saat memuat data Rpjmd!');
             }
         });
     }
-
-    // function getTableTahun() {
-    //     jQuery('#wrap-loading').show();
-    //     jQuery.ajax({
-    //         url: esakip.url,
-    //         type: 'POST',
-    //         data: {
-    //             action: 'get_table_tahun_dokumen',
-    //             api_key: esakip.api_key,
-    //             tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
-    //         },
-    //         dataType: 'json',
-    //         success: function(response) {
-    //             jQuery('#wrap-loading').hide();
-    //             console.log(response);
-    //             if (response.status === 'success') {
-    //                 jQuery('#tahunContainer').html(response.data);
-    //             } else {
-    //                 alert(response.message);
-    //             }
-    //         },
-    //         error: function(xhr, status, error) {
-    //             jQuery('#wrap-loading').hide();
-    //             console.error(xhr.responseText);
-    //             alert('Terjadi kesalahan saat memuat tabel!');
-    //         }
-    //     });
-    // }
 
     function tambah_dokumen() {
         jQuery("#editModalLabel").hide();
@@ -290,54 +209,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
         jQuery("#uploadModal").modal('show');
     }
 
-    // function set_tahun_dokumen(id) {
-    //     jQuery('#tahunModal').modal('show');
-    //     jQuery('#idDokumen').val(id);
-    // }
-
-    // function submit_tahun_dokumen() {
-    //     let id = jQuery("#idDokumen").val();
-    //     if (id == '') {
-    //         return alert('id tidak boleh kosong');
-    //     }
-
-    //     let tahunAnggaran = jQuery("#tahunAnggaran").val();
-    //     if (tahunAnggaran == '') {
-    //         return alert('Tahun Anggaran tidak boleh kosong');
-    //     }
-
-    //     jQuery('#wrap-loading').show();
-    //     jQuery.ajax({
-    //         url: esakip.url,
-    //         type: 'POST',
-    //         data: {
-    //             action: 'submit_tahun_dokumen',
-    //             id: id,
-    //             tahunAnggaran: tahunAnggaran,
-    //             api_key: esakip.api_key,
-	// 			tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
-    //         },
-    //         dataType: 'json',
-    //         success: function(response) {
-    //             console.log(response);
-    //             jQuery('#wrap-loading').hide();
-    //             if (response.status === 'success') {
-    //                 alert(response.message);
-    //                 jQuery('#tahunModal').modal('hide');
-    //                 getTableTahun();
-    //                 getTableDokumen();
-    //             } else {
-    //                 alert(response.message);
-    //             }
-    //         },
-    //         error: function(xhr, status, error) {
-    //             jQuery('#wrap-loading').hide();
-    //             console.error(xhr.responseText);
-    //             alert('Terjadi kesalahan saat mengirim data!');
-    //         }
-    //     });
-    // }
-
     function edit_dokumen(id) {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
@@ -347,7 +218,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
                 action: 'get_detail_dokumen_by_id_pemerintah_daerah',
                 api_key: esakip.api_key,
                 id: id,
-				tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
+                tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
             },
             dataType: 'json',
             success: function(response) {
@@ -384,10 +255,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
         if (keterangan == '') {
             return alert('Keterangan tidak boleh kosong');
         }
-        let tahunAnggaran = jQuery("#tahunAnggaran").val();
-        if (tahunAnggaran == '') {
-            return alert('Tahun Anggaran tidak boleh kosong');
-        }
         let fileDokumen = jQuery("#fileUpload").prop('files')[0];
         if (fileDokumen == '') {
             return alert('File Upload tidak boleh kosong');
@@ -402,8 +269,8 @@ $status_api_esr = get_option('_crb_api_esr_status');
         form_data.append('action', 'submit_tambah_dokumen_pemerintah_daerah');
         form_data.append('api_key', esakip.api_key);
         form_data.append('id_dokumen', id_dokumen);
+        form_data.append('id_jadwal', <?php echo $input['id_jadwal']; ?>);
         form_data.append('keterangan', keterangan);
-        form_data.append('tahunAnggaran', tahunAnggaran);
         form_data.append('fileUpload', fileDokumen);
         form_data.append('tipe_dokumen', tipe_dokumen);
         form_data.append('namaDokumen', namaDokumen);
@@ -454,7 +321,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
                 api_key: esakip.api_key,
                 id: id,
                 tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
-                
+
             },
             dataType: 'json',
             success: function(response) {
@@ -475,13 +342,13 @@ $status_api_esr = get_option('_crb_api_esr_status');
         });
     }
 
-    function sync_to_esr(){
+    function sync_to_esr() {
         let list = jQuery("input:checkbox[name=checklist_esr]:checked")
-                .map(function (){
+            .map(function() {
                 return jQuery(this).val();
-        }).toArray();            
-            
-        if(list.length){
+            }).toArray();
+
+        if (list.length) {
             if (!confirm('Apakah Anda ingin melakukan singkronisasi dokumen ke ESR?')) {
                 return;
             }
@@ -493,8 +360,9 @@ $status_api_esr = get_option('_crb_api_esr_status');
                     action: 'sync_to_esr',
                     api_key: esakip.api_key,
                     list: list,
-                    tahun_anggaran:'<?php echo $input['tahun']; ?>',
-                    nama_tabel_database:'esakip_iku_pemda'
+                    tahun_anggaran:tahun_anggaran_periode_dokumen,
+                    id_periode: '<?php echo $input['id_jadwal']; ?>',
+                    nama_tabel_database: 'esakip_iku_pemda'
                 },
                 dataType: 'json',
                 success: function(response) {
@@ -508,8 +376,8 @@ $status_api_esr = get_option('_crb_api_esr_status');
                     location.reload();
                 }
             });
-        }else{
-            alert('Checklist ESR belum dipilih!'); 
+        } else {
+            alert('Checklist ESR belum dipilih!');
         }
     }
 </script>

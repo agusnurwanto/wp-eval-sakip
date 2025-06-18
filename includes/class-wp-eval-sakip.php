@@ -547,6 +547,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_data_pengaturan_menu_khusus',  $plugin_public, 'get_data_pengaturan_menu_khusus');
 		$this->loader->add_action('wp_ajax_simpan_perubahan_menu_khusus',  $plugin_public, 'simpan_perubahan_menu_khusus');
 		$this->loader->add_action('wp_ajax_get_html_menu_khusus_opd_by_menu',  $plugin_public, 'get_html_menu_khusus_opd_by_menu');
+		$this->loader->add_action('wp_ajax_get_html_menu_khusus_pemda_by_menu',  $plugin_public, 'get_html_menu_khusus_pemda_by_menu');
 		
 		$this->loader->add_action('wp_ajax_esakip_simpan_rpjpd',  $plugin_public, 'esakip_simpan_rpjpd');
 		$this->loader->add_action('wp_ajax_esakip_get_rpjpd',  $plugin_public, 'esakip_get_rpjpd');
@@ -558,6 +559,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_esakip_get_rpd',  $plugin_public, 'esakip_get_rpd');
 		$this->loader->add_action('wp_ajax_esakip_get_bidang_urusan',  $plugin_public, 'esakip_get_bidang_urusan');
 		$this->loader->add_action('wp_ajax_get_indikator_sasaran',  $plugin_public, 'get_indikator_sasaran');
+		$this->loader->add_action('wp_ajax_get_sasaran_sebelum',  $plugin_public, 'get_sasaran_sebelum');
 
 		$this->loader->add_action('wp_ajax_get_table_cascading',  $plugin_public, 'get_table_cascading');
 		$this->loader->add_action('wp_ajax_edit_cascading_pemda',  $plugin_public, 'edit_cascading_pemda');
@@ -671,6 +673,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_submit_edit_laporan_pk_setting', $plugin_public, 'submit_edit_laporan_pk_setting');
 		$this->loader->add_action('wp_ajax_tambah_logo_pemda_laporan_pk', $plugin_public, 'tambah_logo_pemda_laporan_pk');
 		$this->loader->add_action('wp_ajax_get_table_pegawai_simpeg_pk', $plugin_public, 'get_table_pegawai_simpeg_pk');
+		$this->loader->add_action('wp_ajax_get_alamat_kantor', $plugin_public, 'get_alamat_kantor');
+		$this->loader->add_action('wp_ajax_submit_alamat_kantor', $plugin_public, 'submit_alamat_kantor');
 		
 		$this->loader->add_action('wp_ajax_nopriv_get_serapan_anggaran_capaian_kinerja',  $plugin_public, 'get_serapan_anggaran_capaian_kinerja');
 
@@ -717,6 +721,9 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_kuesioner_mendagri_detail_by_id',  $plugin_public, 'get_kuesioner_mendagri_detail_by_id');
 		$this->loader->add_action('wp_ajax_hapus_data_kuesioner_mendagri_detail',  $plugin_public, 'hapus_data_kuesioner_mendagri_detail');
 		$this->loader->add_action('wp_ajax_copy_data_kuesioner_mendagri',  $plugin_public, 'copy_data_kuesioner_mendagri');
+
+		$this->loader->add_action('wp_ajax_get_table_iku_pemda',  $plugin_public, 'get_table_iku_pemda');
+		$this->loader->add_action('wp_ajax_get_table_iku_opd',  $plugin_public, 'get_table_iku_opd');
 
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));

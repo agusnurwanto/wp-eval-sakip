@@ -9,7 +9,7 @@ if (empty($_GET) && empty($_GET['tahun'])) {
 global $wpdb;
 $tahun_anggaran = intval($_GET['tahun']);
 
-$jadwal_rpjmd = $this->get_rpjmd_by_tahun($tahun_anggaran);
+$jadwal_rpjmd = $this->get_rpjmd_setting_by_tahun_anggaran($tahun_anggaran);
 
 if (empty($jadwal_rpjmd)) {
     die('Jadwal RPJMD/RENSTRA terbuka tidak tersedia!');

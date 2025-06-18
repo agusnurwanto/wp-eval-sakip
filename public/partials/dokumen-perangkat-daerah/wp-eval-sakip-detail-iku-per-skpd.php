@@ -6,13 +6,16 @@ if (!defined('WPINC')) {
 }
 
 $input = shortcode_atts(array(
-    'tahun' => '2022',
+    'id_jadwal' => '',
 ), $atts);
 
 if (!empty($_GET) && !empty($_GET['id_skpd'])) {
     $id_skpd = $_GET['id_skpd'];
 }
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
+$data_jadwal = $this->get_data_jadwal_by_id($input['id_jadwal']);
+$title = $data_jadwal['nama_jadwal_renstra'] . ' ( ' . $data_jadwal['tahun_anggaran'] . ' - ' . $data_jadwal['tahun_selesai_anggaran'] . ' )';
 
 $skpd = $wpdb->get_row(
     $wpdb->prepare("
@@ -66,7 +69,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
           AND user_role='perangkat_daerah' 
           AND active = 1
           AND tahun_anggaran=%d
-    ", $input['tahun'])
+    ", $tahun_anggaran_sakip)
     );
 
     $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
@@ -93,7 +96,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
 <div class="container-md">
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Dokumen IKU <br><?php echo $skpd['nama_skpd'] ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
+            <h1 class="text-center" style="margin:3rem;">Dokumen IKU <br><?php echo $skpd['nama_skpd'] ?><br> <?php echo $title;?></h1>
             <?php if ($hak_akses_user): ?>
                 <?php if (!$is_admin_panrb): ?>
                     <div style="margin-bottom: 25px;">
@@ -168,7 +171,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
             <div class="modal-body">
                 <form enctype="multipart/form-data">
                     <input type="hidden" value="<?php echo $id_skpd; ?>" id="idSkpd">
-                    <input type="hidden" value="<?php echo $input['tahun']; ?>" id="tahunAnggaran">
                     <input type="hidden" value="" id="idDokumen">
                     <div class="form-group">
                         <label for="perangkatDaerah">Perangkat Daerah</label>
@@ -197,39 +199,9 @@ $status_api_esr = get_option('_crb_api_esr_status');
     </div>
 </div>
 
-<!-- Modal Tahun -->
-<div class="modal fade" id="tahunModal" tabindex="-1" role="dialog" aria-labelledby="tahunModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="tahunModalLabel">Pilih Tahun Anggaran</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="tahunForm">
-                    <div class="form-group">
-                        <label for="tahunAnggaran">Tahun Anggaran:</label>
-                        <select class="form-control" id="tahunAnggaran" name="tahunAnggaran">
-                            <?php echo $tahun; ?>
-                        </select>
-                        <input type="hidden" id="idDokumen" value="">
-                    </div>
-                    <button type="submit" class="btn btn-primary" onclick="submit_tahun_iku(); return false">Simpan</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Tahun Tabel -->
-<div id="tahunContainer" class="container-md">
-</div>
-
 <script>
     jQuery(document).ready(function() {
-        getTableTahun();
+        getTableIku()
         jQuery("#fileUpload").on('change', function() {
             var id_dokumen = jQuery('#idDokumen').val();
             if (id_dokumen == '') {
@@ -248,7 +220,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
                 action: 'get_table_iku',
                 api_key: esakip.api_key,
                 id_skpd: <?php echo $id_skpd; ?>,
-                tahun_anggaran: '<?php echo $input['tahun'] ?>'
+                id_jadwal: '<?php echo $input['id_jadwal'] ?>'
             },
             dataType: 'json',
             success: function(response) {
@@ -294,35 +266,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
         });
     }
 
-    function getTableTahun() {
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: 'POST',
-            data: {
-                action: 'get_table_tahun_iku',
-                api_key: esakip.api_key,
-                id_skpd: <?php echo $id_skpd; ?>,
-            },
-            dataType: 'json',
-            success: function(response) {
-                jQuery('#wrap-loading').hide();
-                console.log(response);
-                getTableIku();
-                if (response.status === 'success') {
-                    jQuery('#tahunContainer').html(response.data);
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                jQuery('#wrap-loading').hide();
-                console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat tabel!');
-            }
-        });
-    }
-
     function tambah_dokumen_iku() {
         jQuery("#editModalLabel").hide();
         jQuery("#uploadModalLabel").show();
@@ -337,48 +280,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
     function set_tahun_dokumen(id) {
         jQuery('#tahunModal').modal('show');
         jQuery('#idDokumen').val(id);
-    }
-
-    function submit_tahun_iku() {
-        let id = jQuery("#idDokumen").val();
-        if (id == '') {
-            return alert('id tidak boleh kosong');
-        }
-
-        let tahunAnggaran = jQuery("#tahunAnggaran").val();
-        if (tahunAnggaran == '') {
-            return alert('Tahun Anggaran tidak boleh kosong');
-        }
-
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: 'POST',
-            data: {
-                action: 'submit_tahun_iku',
-                id: id,
-                tahunAnggaran: tahunAnggaran,
-                api_key: esakip.api_key
-            },
-            dataType: 'json',
-            success: function(response) {
-                console.log(response);
-                jQuery('#wrap-loading').hide();
-                if (response.status === 'success') {
-                    alert(response.message);
-                    jQuery('#tahunModal').modal('hide');
-                    getTableTahun();
-                    getTableIku();
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                jQuery('#wrap-loading').hide();
-                console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat mengirim data!');
-            }
-        });
     }
 
     function edit_dokumen_iku(id) {
@@ -434,10 +335,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
         if (keterangan == '') {
             return alert('Keterangan tidak boleh kosong');
         }
-        let tahunAnggaran = jQuery("#tahunAnggaran").val();
-        if (tahunAnggaran == '') {
-            return alert('Tahun Anggaran tidak boleh kosong');
-        }
         let fileDokumen = jQuery("#fileUpload").prop('files')[0];
         if (fileDokumen == '') {
             return alert('File Upload tidak boleh kosong');
@@ -454,7 +351,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
         form_data.append('skpd', skpd);
         form_data.append('idSkpd', idSkpd);
         form_data.append('keterangan', keterangan);
-        form_data.append('tahunAnggaran', tahunAnggaran);
+        form_data.append('id_jadwal', <?php echo $input['id_jadwal']; ?>);
         form_data.append('fileUpload', fileDokumen);
         form_data.append('namaDokumen', namaDokumen);
 
@@ -490,7 +387,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
         window.open(url, '_blank');
     }
 
-
     function hapus_dokumen_iku(id) {
         if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
             return;
@@ -523,39 +419,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
         });
     }
 
-    function hapus_tahun_dokumen_iku(id) {
-        if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
-            return;
-        }
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: 'POST',
-            data: {
-                action: 'hapus_tahun_dokumen_iku',
-                api_key: esakip.api_key,
-                id: id
-            },
-            dataType: 'json',
-            success: function(response) {
-                console.log(response);
-                jQuery('#wrap-loading').hide();
-                if (response.status === 'success') {
-                    alert(response.message);
-                    getTableIku();
-                    getTableTahun();
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText);
-                jQuery('#wrap-loading').hide();
-                alert('Terjadi kesalahan saat mengirim data!');
-            }
-        });
-    }
-
     function sync_to_esr(){
         let list = jQuery("input:checkbox[name=checklist_esr]:checked")
                 .map(function (){
@@ -574,7 +437,8 @@ $status_api_esr = get_option('_crb_api_esr_status');
                     action: 'sync_to_esr',
                     api_key: esakip.api_key,
                     list: list,
-                    tahun_anggaran:'<?php echo $input['tahun'] ?>',
+                    tahun_anggaran:tahun_anggaran_periode_dokumen,
+                    id_periode: '<?php echo $input['id_jadwal']; ?>',                    
                     nama_tabel_database:'esakip_iku',
                     id_skpd: <?php echo $id_skpd; ?>
                 },

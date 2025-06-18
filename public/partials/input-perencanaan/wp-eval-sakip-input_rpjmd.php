@@ -51,6 +51,7 @@ $lama_pelaksanaan = $jadwal['lama_pelaksanaan'] ?? 4;
 $tahun_anggaran = $jadwal['tahun_anggaran'];
 $tahun_awal = $jadwal['tahun_anggaran'];
 $tahun_akhir = $tahun_awal + $jadwal['lama_pelaksanaan'] - 1;
+$id_jadwal_murni = $jadwal['id_jadwal_murni'];
 $api_key = get_option(ESAKIP_APIKEY);
 $nama_pemda = get_option(ESAKIP_NAMA_PEMDA);
 $current_user = wp_get_current_user();
@@ -757,6 +758,36 @@ $skpd_filter_html = '<option value="">Pilih SKPD</option>';
 foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
     $skpd_filter_html .= '<option value="' . $kode_skpd . '">' . $kode_skpd . ' ' . $nama_skpd . '</option>';
 }
+$select_tujuan = '';
+$data_tujuan_existing = $wpdb->get_results($wpdb->prepare('
+    SELECT 
+        *
+    FROM esakip_rpd_tujuan
+    WHERE id_jadwal=%d
+        AND id_unik_indikator IS NULL
+        AND indikator_teks IS NULL
+        AND active=1
+', $id_jadwal_murni), ARRAY_A);
+// print_r($data_tujuan_existing); die($wpdb->last_query);
+if (!empty($data_tujuan_existing)) {
+    foreach ($data_tujuan_existing as $val_tujuan) {
+        $select_tujuan .= '<option value="' . $val_tujuan['id'] . '">' . $val_tujuan['tujuan_teks'] . '</option>';
+    }
+}
+$select_sasaran = '';
+$data_sasaran_existing = $wpdb->get_results($wpdb->prepare('
+    SELECT 
+        *
+    FROM esakip_rpd_sasaran
+    WHERE id_jadwal=%d
+        AND active=1
+', $id_jadwal_murni), ARRAY_A);
+// print_r($data_sasaran_existing); die($wpdb->last_query);
+if (!empty($data_sasaran_existing)) {
+    foreach ($data_sasaran_existing as $val_sasaran) {
+        $select_sasaran .= '<option value="' . $val_sasaran['id'] . '">' . $val_sasaran['sasaran_teks'] . '</option>';
+    }
+}
 ?>
 <style type="text/css">
     .debug-visi,
@@ -795,7 +826,13 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
             <tr>
                 <th style="width: 85px;" class="esakip-atas esakip-kiri esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">No</th>
                 <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Isu RPJPD</th>
+                <?php if (!empty($id_jadwal_murni)): ?>
+                    <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Tujuan Sebelum</th>
+                <?php endif; ?>
                 <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Tujuan</th>
+                <?php if (!empty($id_jadwal_murni)): ?>
+                    <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Sasaran Sebelum</th>
+                <?php endif; ?>
                 <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Sasaran</th>
                 <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Program</th>
                 <th style="width: 400px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Indikator</th>
@@ -897,6 +934,15 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                         <label>Isu RPJPD</label>
                         <select class="form-control" id="isu-teks"></select>
                     </div>
+                    <?php if (!empty($id_jadwal_murni)): ?>
+                        <div class="form-group">
+                            <label>Tujuan Sebelum</label>
+                            <select class="form-control" id="tujuan_sebelum">
+                                <option value="0">Pilih Tujuan Sebelum</option>
+                                <?php echo $select_tujuan; ?>
+                            </select>
+                        </div>
+                     <?php endif; ?>
                     <div class="form-group">
                         <label>Tujuan Teks</label>
                         <textarea class="form-control" id="tujuan-teks"></textarea>
@@ -1016,6 +1062,15 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     </tbody>
                 </table>
                 <form>
+                    <?php if (!empty($id_jadwal_murni)): ?>
+                        <div class="form-group">
+                            <label>Sasaran Sebelum</label>
+                            <select class="form-control" id="sasaran_sebelum">
+                                <option value="0">Pilih Sasaran Sebelum</option>
+                                <?php echo $select_sasaran; ?>
+                            </select>
+                        </div>
+                     <?php endif; ?>
                     <div class="form-group">
                         <label>Sasaran Teks</label>
                         <textarea class="form-control" id="sasaran-teks"></textarea>
@@ -1472,6 +1527,9 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     "<thead>" +
                     "<tr>" +
                     "<th class='text-center' style='width: 45px;'>No</th>" +
+                    <?php if (!empty($id_jadwal_murni)): ?>
+                        "<th class='text-center'>Tujuan Sebelum</th>"+
+                    <?php endif; ?>
                     "<th class='text-center'>Tujuan</th>"
                 <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
                         +
@@ -1489,12 +1547,16 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     data_html += '' +
                         '<tr id-tujuan="' + res.data_all[b].id_unik + '">' +
                         '<td class="text-center">' + (no) + '</td>' +
+                        <?php if (!empty($id_jadwal_murni)): ?>
+                            '<td>' + res.data_all[b].tujuan_sebelum + '</td>'+
+                        <?php endif; ?>
                         '<td>' + res.data_all[b].nama + '</td>'
-                    <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
+
+                        <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
+                                +
+                                "<td class='text-right'>" + formatRupiah(res.data_all[b].pagu_akumulasi_<?php echo $i; ?>) + "</td>"
+                        <?php }; ?>
                             +
-                            "<td class='text-right'>" + formatRupiah(res.data_all[b].pagu_akumulasi_<?php echo $i; ?>) + "</td>"
-                    <?php }; ?>
-                        +
                         '<td>' + res.data_all[b].catatan_teks_tujuan + '</td>' +
                         '<td class="text-center aksi">' +
                         '<button class="btn-sm btn-primary" onclick="detail_tujuan(\'' + res.data_all[b].id_unik + '\');" title="Lihat Sasaran"><i class="dashicons dashicons-search"></i></button>' +
@@ -1507,12 +1569,16 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     if (res.data_all[b].detail.length > 0) {
                         data_html += '' +
                             '<tr style="background: #80000014;">' +
-                            '<td colspan="<?php echo $lama_pelaksanaan + 4; ?>" style="padding: 0;">' +
+                            '<td colspan="<?php echo $lama_pelaksanaan + 5; ?>" style="padding: 0;">' +
                             "<table class='table table-bordered'>" +
                             "<thead>" +
                             "<tr>" +
                             "<th class='text-center' style='width: 45px;'></th>" +
-                            "<th class='text-center'>Indikator</th>" +
+                            <?php if (!empty($id_jadwal_murni)): ?>
+                                "<th class='text-center' colspan='2'>Indikator</th>" +
+                            <?php else: ?>
+                                "<th class='text-center'>Indikator</th>" +
+                            <?php endif; ?>
                             "<th class='text-center'>Awal</th>"
                         <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
                                 +
@@ -1538,7 +1604,11 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                             data_html += '' +
                                 '<tr id-tujuan-indikator="' + bb.id_unik_indikator + '">' +
                                 '<td class="text-center">' + no + '.' + (i + 1) + '</td>' +
+                            <?php if (!empty($id_jadwal_murni)): ?>
+                                '<td colspan="2">' + bb.indikator_teks + '</td>' +
+                            <?php else: ?>
                                 '<td>' + bb.indikator_teks + '</td>' +
+                            <?php endif; ?>
                                 '<td class="text-center">' + bb.target_awal + '</td>'
                             <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
                                     +
@@ -1605,6 +1675,10 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     "<thead>" +
                     "<tr>" +
                     "<th class='text-center' style='width: 45px;'>No</th>" +
+
+                    <?php if (!empty($id_jadwal_murni)): ?>
+                        "<th class='text-center'>Sasaran Sebelum</th>"+
+                    <?php endif; ?>
                     "<th class='text-center'>Sasaran</th>"
                 <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
                         +
@@ -1622,6 +1696,9 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     data_html += '' +
                         '<tr id-sasaran="' + res.data_all[b].id_unik + '">' +
                         '<td class="text-center">' + (no) + '</td>' +
+                        <?php if (!empty($id_jadwal_murni)): ?>
+                            '<td>' + res.data_all[b].sasaran_sebelum + '</td>'+
+                        <?php endif; ?>
                         '<td>' + res.data_all[b].nama + '</td>'
                     <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
                             +
@@ -1640,12 +1717,16 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     if (res.data_all[b].detail.length > 0) {
                         data_html += '' +
                             '<tr style="background: #80000014;">' +
-                            '<td colspan="<?php echo $lama_pelaksanaan + 4; ?>" style="padding: 0;">' +
+                            '<td colspan="<?php echo $lama_pelaksanaan + 5; ?>" style="padding: 0;">' +
                             "<table class='table table-bordered'>" +
                             "<thead>" +
                             "<tr>" +
                             "<th class='text-center' style='width: 45px;'></th>" +
-                            "<th class='text-center'>Indikator</th>" +
+                            <?php if (!empty($id_jadwal_murni)): ?>
+                                "<th class='text-center' colspan='2'>Indikator</th>" +
+                            <?php else: ?>
+                                "<th class='text-center'>Indikator</th>" +
+                            <?php endif; ?>
                             "<th class='text-center'>Awal</th>"
                         <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
                                 +
@@ -1671,7 +1752,11 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                             data_html += '' +
                                 '<tr id-sasaran-indikator="' + bb.id_unik_indikator + '">' +
                                 '<td class="text-center">' + no + '.' + (i + 1) + '</td>' +
-                                '<td>' + bb.indikator_teks + '</td>' +
+                                <?php if (!empty($id_jadwal_murni)): ?>
+                                    '<td colspan="2">' + bb.indikator_teks + '</td>' +
+                                <?php else: ?>
+                                    '<td>' + bb.indikator_teks + '</td>' +
+                                <?php endif; ?>
                                 '<td class="text-center">' + bb.target_awal + '</td>'
                             <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
                                     +
@@ -2052,6 +2137,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                 jQuery('#isu-teks').html('');
                 jQuery('#modal-tujuan').attr('data-id', '');
                 jQuery('#modal-tujuan').modal('show');
+                jQuery('#tujuan_sebelum').val('');
                 jQuery('#tujuan-teks').val('');
                 jQuery('#no-urut-teks-tujuan').val('');
                 jQuery('#catatan-teks-tujuan').val('');
@@ -2063,6 +2149,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
         jQuery('#modal-sasaran').attr('id-tujuan', id_unik_tujuan);
         jQuery('#modal-sasaran').attr('data-id', '');
         jQuery('#sasaran-teks').val('');
+        jQuery('#sasaran_sebelum').val('');
         jQuery('#modal-sasaran').modal('show');
     }
 
@@ -2298,6 +2385,11 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     jQuery('#tujuan-teks').val(res.data_all[b].nama);
                     jQuery('#no-urut-teks-tujuan').val(res.data_all[b].no_urut);
                     jQuery('#catatan-teks-tujuan').val(res.data_all[b].catatan_teks_tujuan);
+                    if (res.data_all[b].id_tujuan_murni && parseInt(res.data_all[b].id_tujuan_murni) > 0) {
+                        jQuery("#tujuan_sebelum").val(res.data_all[b].id_tujuan_murni).change();
+                    } else {
+                        jQuery("#tujuan_sebelum").val("0").change();
+                    }
                 }
                 jQuery('#modal-tujuan').attr('data-id', id_unik_tujuan);
                 jQuery('#modal-tujuan').modal('show');
@@ -2329,6 +2421,11 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                         jQuery('#sasaran-teks').val(res.data_all[b].nama);
                         jQuery('#sasaran-no-urut').val(res.data_all[b].sasaran_no_urut);
                         jQuery('#sasaran-catatan-teks').val(res.data_all[b].sasaran_catatan);
+                        if (res.data_all[b].id_sasaran_murni && parseInt(res.data_all[b].id_sasaran_murni) > 0) {
+                            jQuery("#sasaran_sebelum").val(res.data_all[b].id_sasaran_murni).change();
+                        } else {
+                            jQuery("#sasaran_sebelum").val("0").change();
+                        }
                     }
                 }
                 if (res.data && res.data[0]) {
@@ -2665,6 +2762,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
             console.log('hei');
             return alert('No urut tidak boleh kosong!');
         }
+        var id_tujuan_sebelum = jQuery('#tujuan_sebelum').val();
         if (confirm('Apakah anda yakin untuk menyimpan data ini?')) {
             jQuery('#wrap-loading').show();
             var catatan_teks_tujuan = jQuery('#catatan-teks-tujuan').val();
@@ -2675,6 +2773,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     "action": "esakip_simpan_rpd",
                     "api_key": "<?php echo $api_key; ?>",
                     "table": 'esakip_rpd_tujuan',
+                    "id_tujuan_sebelum": id_tujuan_sebelum,
                     "data": tujuan_teks,
                     "id_isu": id_isu,
                     "id": id_tujuan,
@@ -2709,6 +2808,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
         }
         var id_sasaran = jQuery('#modal-sasaran').attr('data-id');
         var sasaran_no_urut = jQuery('#sasaran-no-urut').val();
+        var id_sasaran_sebelum = jQuery('#sasaran_sebelum').val();
         if (sasaran_no_urut == '') {
             return alert('No urut sasaran tidak boleh kosong!');
             // jQuery('#wrap-loading').hide();
@@ -2728,6 +2828,7 @@ foreach ($skpd_filter as $kode_skpd => $nama_skpd) {
                     "id_tujuan": id_unik_tujuan,
                     "id": id_sasaran,
                     "id_jadwal": "<?php echo $input['periode']; ?>",
+                    "id_sasaran_sebelum": id_sasaran_sebelum,
                     "sasaran_no_urut": sasaran_no_urut,
                     "sasaran_catatan": sasaran_catatan
                 },

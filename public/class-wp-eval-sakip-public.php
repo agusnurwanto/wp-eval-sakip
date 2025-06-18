@@ -3526,11 +3526,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Keterangan kosong!';
 				}
-				if (!empty($_POST['tahunAnggaran'])) {
-					$tahunAnggaran = $_POST['tahunAnggaran'];
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun Anggaran kosong!';
+					$ret['message'] = 'Jadwal kosong!';
 				}
 				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
 					$ret['status'] = 'error';
@@ -3593,11 +3593,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'id_skpd' => $idSkpd,
 								'dokumen' => $upload['filename'],
 								'keterangan' => $keterangan,
-								'tahun_anggaran' => $tahunAnggaran,
+								'id_jadwal' => $id_jadwal,
 								'created_at' => current_time('mysql'),
 								'tanggal_upload' => current_time('mysql')
-							),
-							array('%s', '%s', '%s', '%s', '%d')
+							)
 						);
 
 						if (!$wpdb->insert_id) {
@@ -6543,11 +6542,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$ret['status'] = 'error';
 					$ret['message'] = 'Id Perangkat Daerah kosong!';
 				}
-				if (!empty($_POST['tahun_anggaran'])) {
-					$tahun_anggaran = $_POST['tahun_anggaran'];
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
 				} else {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun Anggaran kosong!';
+					$ret['message'] = 'Id Jadwal kosong!';
 				}
 				$nama_tabel = 'esakip_iku';
 				$ikus = $wpdb->get_results(
@@ -6555,9 +6554,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                     SELECT * 
                     FROM $nama_tabel
                     WHERE id_skpd = %d 
-                      AND tahun_anggaran = %d 
+                      AND id_jadwal = %d 
                       AND active = 1
-                ", $id_skpd, $tahun_anggaran),
+                ", $id_skpd, $id_jadwal),
 					ARRAY_A
 				);
 
@@ -6568,58 +6567,83 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$status_api_esr = get_option('_crb_api_esr_status');
 
 					if ($status_api_esr) {
-						$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
-								SELECT 
-										a.*
-								FROM 
-									esakip_data_mapping_jenis_dokumen_esr a 
-								JOIN esakip_menu_dokumen b 
-									ON b.id=a.esakip_menu_dokumen_id AND 
-										a.tahun_anggaran=b.tahun_anggaran AND b.active=1
-			                    JOIN esakip_data_jenis_dokumen_esr c 
-			                       	ON c.jenis_dokumen_esr_id=a.jenis_dokumen_esr_id  AND 
-			                      		c.tahun_anggaran=a.tahun_anggaran AND c.active=1
-			                    where 
-			                      	a.tahun_anggaran=%d and
-			                        b.nama_tabel=%s;
-						", $tahun_anggaran, $nama_tabel), ARRAY_A);
+						$pengaturan_periode_dokumen = $wpdb->get_row(
+							$wpdb->prepare("
+								SELECT * 
+								FROM esakip_pengaturan_upload_dokumen 
+								WHERE id_jadwal_rpjmd = %d
+								  AND active = %d
+							", $id_jadwal, 1),
+							ARRAY_A
+						);
 
-						if (!empty($mapping_jenis_dokumen_esr)) {
-							$array_data_esr = [];
-							$data_esr = $this->data_esr($id_skpd);
-							if ($data_esr['status'] == 'success') {
-								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
-								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
+						if (!empty($pengaturan_periode_dokumen)) {
+							$ret['tahun_anggaran_periode_dokumen'] = $pengaturan_periode_dokumen['tahun_anggaran'];
+							$mapping_jenis_dokumen_esr = $wpdb->get_row(
+								$wpdb->prepare("
+									SELECT a.*
+									FROM esakip_data_mapping_jenis_dokumen_esr a 
+									JOIN esakip_menu_dokumen b 
+									  ON b.id=a.esakip_menu_dokumen_id 
+									 AND a.tahun_anggaran = b.tahun_anggaran 
+									 AND b.active=1
+									JOIN esakip_data_jenis_dokumen_esr c 
+									  ON c.jenis_dokumen_esr_id = a.jenis_dokumen_esr_id 
+									 AND c.tahun_anggaran=a.tahun_anggaran 
+									 AND c.active=1
+									WHERE a.tahun_anggaran = %d 
+									  AND b.nama_tabel = %s;
+								", $pengaturan_periode_dokumen['tahun_anggaran'], $nama_tabel),
+								ARRAY_A
+							);
 
-								foreach ($data_esr as $key => $esr) {
-									if ($esr->dokumen_id == $mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']) {
-										$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM " . $nama_tabel . " WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+							if (!empty($mapping_jenis_dokumen_esr)) {
+								$array_data_esr = [];
+								$data_esr = $this->data_esr($id_skpd);
+								if ($data_esr['status'] == 'success') {
+									$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+									$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
 
-										if (!empty($esr_lokal)) {
-											$wpdb->update($nama_tabel, [
-												'path_esr' => $esr->path
-											], [
-												'id' => $esr_lokal['id']
-											]);
+									foreach ($data_esr as $key => $esr) {
+										if ($esr->dokumen_id == $mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']) {
+											// $esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM " . $nama_tabel . " WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+
+											// if (!empty($esr_lokal)) {
+											// 	$wpdb->update($nama_tabel, [
+											// 		'path_esr' => $esr->path
+											// 	], [
+											// 		'id' => $esr_lokal['id']
+											// 	]);
+											// }
+
+											$path = explode("/", $esr->path);
+											$nama_file = end($path);
+											$array_data_esr[] = [
+												'upload_id' => $esr->upload_id,
+												'nama_file' => $nama_file,
+												'keterangan' => $esr->keterangan,
+												'path' => $esr->path
+											];
 										}
-
-										$path = explode("/", $esr->path);
-										$nama_file = end($path);
-										$array_data_esr[] = [
-											'upload_id' => $esr->upload_id,
-											'nama_file' => $nama_file,
-											'keterangan' => $esr->keterangan,
-											'path' => $esr->path
-										];
 									}
 								}
-							} else {
-								$ret['data_esr'] = $data_esr;
 							}
 						}
 					}
 
 					foreach ($ikus as $kk => $vv) {
+						$get_tahun_sekarang = date('Y');
+						$data_dokumen_jadwal = $wpdb->get_results(
+							$wpdb->prepare('
+								SELECT *
+								FROM esakip_dokumen_jadwal_esr
+								WHERE id_dokumen=%d
+								  AND id_skpd=%s
+								  AND nama_tabel=%s
+							', $vv['id'], $vv['id_skpd'], 'esakip_iku'),
+							ARRAY_A
+						);
+
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
 						$status_integrasi_esr = false;
@@ -6628,9 +6652,23 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								if (!empty($vv['upload_id'])) {
 									if (in_array($vv['upload_id'], array_column($array_data_esr, 'upload_id'))) {
 										$status_integrasi_esr = true;
-										$tbody .= "<td class='text-center'><span class='badge badge-success' style='padding: .5em 1.4em;' data-upload-id='".$vv['upload_id']."'>Integrasi<span></td>";
+										$integrasi_status = [];
+										$tahun_sekarang = $get_tahun_sekarang; 
+										foreach($data_dokumen_jadwal as $dokumen_jadwal){								
+											for ($tahun = $dokumen_jadwal['tahun_anggaran']; $tahun <= $tahun_sekarang; $tahun++) {
+											    if (!empty($dokumen_jadwal['upload_id']) && $dokumen_jadwal['tahun_anggaran'] == $tahun) {
+											        $integrasi_status[$tahun] = 'sudah terintegrasi';
+											    } else {
+											        $integrasi_status[$tahun] = 'belum terintegrasi';
+											    }
+											}
+										} 
+										$tbody .= "<td class='text-center'><span class='badge badge-success' style='padding: .5em 1.4em;' data-upload-id='".$vv['upload_id']."'>Integrasi<span></td><ul>";
+										foreach ($integrasi_status as $tahun => $status) {
+										    $tbody .= "<li class='text-left'>$tahun $status</li>";
+										}
+										$tbody .= "</ul></td>";
 									} else {
-									
 									    if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
 											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
 												    <div style='margin-top: 5px;'>
@@ -7539,6 +7577,260 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							if (!$status_integrasi_esr) {
 								$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_rpjmd(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
 								$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_rpjmd(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+							}
+						}
+						$btn .= '</div>';
+
+						$tbody .= "<td class='text-center'>" . $btn . "</td>";
+						$tbody .= "</tr>";
+					}
+
+					$non_esr_lokal = [];
+					if ($status_api_esr && !empty($mapping_jenis_dokumen_esr)) {
+						foreach ($array_data_esr as $data_esr) {
+							foreach ($rpjmds as $esr_lokal) {
+								if (!empty($esr_lokal['upload_id']) && $data_esr['upload_id'] != $esr_lokal['upload_id']) {
+									if (empty($non_esr_lokal[$data_esr['nama_file']])) {
+										$non_esr_lokal[$data_esr['nama_file']] = $data_esr;
+									}
+								} else if (trim($data_esr['nama_file']) != trim($esr_lokal['dokumen'])) {
+									if (empty($non_esr_lokal[$data_esr['nama_file']])) {
+										$non_esr_lokal[$data_esr['nama_file']] = $data_esr;
+									}
+								} else if (trim($data_esr['keterangan']) != trim($esr_lokal['keterangan'])) {
+									if (empty($non_esr_lokal[$data_esr['nama_file']])) {
+										$non_esr_lokal[$data_esr['nama_file']] = $data_esr;
+									}
+								}
+							}
+						}
+						$ret['non_esr_lokal'] = array_values($non_esr_lokal);
+					}
+
+					$ret['data'] = $tbody;
+				} else {
+					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_table_iku_pemda()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'tahun_anggaran_periode_dokumen' => null,
+			'status_mapping_esr' => false,
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_periode'])) {
+					$id_jadwal = $_POST['id_periode'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
+					die(json_encode($ret));
+				}
+				$table_name = 'esakip_iku_pemda';
+				$data_iku_pemda = $wpdb->get_results(
+					$wpdb->prepare("
+						SELECT * 
+						FROM $table_name
+						WHERE id_jadwal = %d 
+						  AND active = 1
+					", $id_jadwal),
+					ARRAY_A
+				);
+
+				if (!empty($data_iku_pemda)) {
+					$status_api_esr = get_option('_crb_api_esr_status');
+					if ($status_api_esr) {
+						$pengaturan_periode_dokumen = $wpdb->get_row(
+							$wpdb->prepare("
+								SELECT * 
+								FROM esakip_pengaturan_upload_dokumen 
+								WHERE id_jadwal_rpjmd = %d
+								  AND active = %d
+							", $id_jadwal, 1),
+							ARRAY_A
+						);
+
+						if (!empty($pengaturan_periode_dokumen)) {
+							$ret['tahun_anggaran_periode_dokumen'] = $pengaturan_periode_dokumen['tahun_anggaran'];
+							$mapping_jenis_dokumen_esr = $wpdb->get_row(
+								$wpdb->prepare("
+									SELECT a.*
+									FROM esakip_data_mapping_jenis_dokumen_esr a 
+									JOIN esakip_menu_dokumen b 
+									  ON b.id = a.esakip_menu_dokumen_id 
+									 AND a.tahun_anggaran = b.tahun_anggaran 
+									 AND b.active = 1
+									JOIN esakip_data_jenis_dokumen_esr c 
+									  ON c.jenis_dokumen_esr_id = a.jenis_dokumen_esr_id 
+									 AND c.tahun_anggaran = a.tahun_anggaran 
+									 AND c.active = 1
+									WHERE a.tahun_anggaran = %d 
+									  AND b.nama_tabel = %s;
+								", $pengaturan_periode_dokumen['tahun_anggaran'], $table_name),
+								ARRAY_A
+							);
+
+							if (!empty($mapping_jenis_dokumen_esr)) {
+								$tahun_anggaran = $pengaturan_periode_dokumen['tahun_anggaran'];
+								$array_data_esr = [];
+								$data_esr = $this->data_esr();
+								if ($data_esr['status'] == 'success') {
+									$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+									$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
+									foreach ($data_esr as $key => $esr) {
+										if ($esr->dokumen_id == $mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']) {
+											$path = explode("/", $esr->path);
+											$nama_file = end($path);
+											$array_data_esr[] = [
+												'upload_id' => $esr->upload_id,
+												'nama_file' => $nama_file,
+												'keterangan' => $esr->keterangan,
+												'path' => $esr->path
+											];
+										}
+									}
+								}
+								$ret['data_esr'] = $data_esr;
+								$ret['status_mapping_esr'] = true;
+							}
+						}
+					}
+
+					$counter = 1;
+					$tbody = '';
+					foreach ($data_iku_pemda as $kk => $vv) {
+						$get_tahun_sekarang = date('Y');
+						$data_dokumen_jadwal = $wpdb->get_results(
+							$wpdb->prepare('
+								SELECT *
+								FROM esakip_dokumen_jadwal_esr
+								WHERE id_dokumen=%d
+								  AND nama_tabel=%s
+							', $vv['id'], $table_name),
+							ARRAY_A
+						);
+
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+						$status_integrasi_esr = false;
+						if ($status_api_esr) {
+							if (!empty($mapping_jenis_dokumen_esr)) {
+								if (!empty($vv['upload_id'])) {
+									if (in_array($vv['upload_id'], array_column($array_data_esr, 'upload_id'))) {
+										$status_integrasi_esr = true;
+										$integrasi_status = [];
+										$tahun_sekarang = $get_tahun_sekarang; 
+										foreach($data_dokumen_jadwal as $dokumen_jadwal){								
+											for ($tahun = $dokumen_jadwal['tahun_anggaran']; $tahun <= $tahun_sekarang; $tahun++) {
+											    if (!empty($dokumen_jadwal['upload_id']) && $dokumen_jadwal['tahun_anggaran'] == $tahun) {
+											        $integrasi_status[$tahun] = 'sudah terintegrasi';
+											    } else {
+											        $integrasi_status[$tahun] = 'belum terintegrasi';
+											    }
+											}
+										} 
+										$tbody .= "<td class='text-center'>
+										            <div class='btn btn-sm btn-success'>Integrasi</div>
+										            <ul>";
+
+										foreach ($integrasi_status as $tahun => $status) {
+										    $tbody .= "<li class='text-left'>$tahun $status</li>";
+										}
+
+										$tbody .= "</ul></td>";
+									} else {
+									    $integrasi_status = [];
+									    $tahun_sekarang = $get_tahun_sekarang;
+									    $belum_integrasi = array();
+
+									    foreach ($data_dokumen_jadwal as $dokumen_jadwal) {
+									        for ($tahun = $dokumen_jadwal['tahun_anggaran']; $tahun <= $tahun_sekarang; $tahun++) {
+									            if (!empty($dokumen_jadwal['upload_id']) && $dokumen_jadwal['tahun_anggaran'] == $tahun) {
+									                $integrasi_status[$tahun] = 'sudah terintegrasi tetapi dihapus di ESR';
+									            } else {
+									                $integrasi_status[$tahun] = 'belum terintegrasi';
+									                array_push($belum_integrasi, $tahun);
+									            }
+									        }
+									    }
+									    if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
+												    <div style='margin-top: 5px;'>
+												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
+												    </div>
+												</td>";
+										} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
+												    <div style='margin-top: 5px;'>
+												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
+												    </div>
+												</td>";
+										} else{
+										    $tbody .= "<td class = 'text-center'>";
+											$tbody .= "<div><input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'></div>";
+										}
+									    $tbody .= "<ul>";
+
+									    $tbody .= "</ul></td>";
+									}
+								} else if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
+									$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</a>";
+
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
+									    $tbody .= "
+									        <div style='margin-top: 5px;'>
+									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
+									        </div>";
+									}
+
+									$tbody .= "</td>";
+								} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
+									$tbody .= "<td class='text-center'>
+									    <a href='#' class='btn btn-sm btn-warning'>Keterangan Ada</a>";
+
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
+									    $tbody .= "
+									        <div style='margin-top: 5px;'>
+									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
+									        </div>";
+									}
+
+									$tbody .= "</td>";
+								} else {
+									$tbody .= "<td class='text-center'><input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'></td>";
+								}
+							}
+						}
+						$tbody .= "<td>" . $vv['dokumen'] . "</td>";
+						$tbody .= "<td>" . $vv['keterangan'] . "</td>";
+						$tbody .= "<td>" . $vv['created_at'] . "</td>";
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
+						if (!$this->is_admin_panrb()) {
+							if (!$status_integrasi_esr) {
+								$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
+								$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
 							}
 						}
 						$btn .= '</div>';
@@ -8512,19 +8804,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if (!empty($_POST['tahun_anggaran'])) {
-					$tahun_anggaran = $_POST['tahun_anggaran'];
-				} else {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun Anggaran kosong!';
-				}
-
-				if (!empty($_POST['tipe_dokumen'])) {
-					$tipe_dokumen = $_POST['tipe_dokumen'];
-				} else {
+				if (empty($_POST['tahun_anggaran']) && empty($_POST['id_jadwal'])) {
+				    $ret['status'] = 'error';
+				    $ret['message'] = 'Tahun Anggaran atau Jadwal harus diisi!';
+				} elseif (empty($_POST['tipe_dokumen'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tipe Dokumen kosong!';
 				}
+
+				$tipe_dokumen = $_POST['tipe_dokumen'];
 
 				if ($ret['status'] == 'success') {
 					// untuk mengatur tabel sesuai tipe dokumen
@@ -8549,15 +8837,27 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					);
 
 					$nama_tabel = $nama_tabel_admin[$tipe_dokumen];
-					$datas = $wpdb->get_results(
-						$wpdb->prepare("
-						SELECT * 
-						FROM $nama_tabel_admin[$tipe_dokumen]
-						WHERE tahun_anggaran = %d 
-						  AND active = 1
-					", $tahun_anggaran),
-						ARRAY_A
-					);
+					if (!empty($_POST['id_jadwal'])) {
+						$datas = $wpdb->get_results(
+							$wpdb->prepare("
+								SELECT * 
+								FROM $nama_tabel_admin[$tipe_dokumen]
+								WHERE id_jadwal = %d 
+								  AND active = 1
+							", $_POST['id_jadwal']),
+							ARRAY_A
+						);
+					} else {
+						$datas = $wpdb->get_results(
+							$wpdb->prepare("
+								SELECT * 
+								FROM $nama_tabel_admin[$tipe_dokumen]
+								WHERE tahun_anggaran = %d 
+								  AND active = 1
+							", $tahun_anggaran),
+							ARRAY_A
+						);
+					}
 
 					if (!empty($datas)) {
 						$counter = 1;
@@ -8592,16 +8892,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 									foreach ($data_esr as $key => $esr) {
 										if ($esr->dokumen_id == $mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']) {
-											// $esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM " . $nama_tabel . " WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
-
-											// if (!empty($esr_lokal)) {
-											// 	$wpdb->update($nama_tabel, [
-											// 		'path_esr' => $esr->path
-											// 	], [
-											// 		'id' => $esr_lokal['id']
-											// 	]);
-											// }
-
 											$path = explode("/", $esr->path);
 											$nama_file = end($path);
 											$array_data_esr[] = [
@@ -8757,9 +9047,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				if ($ret['status'] != 'error' && empty($_POST['keterangan'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Keterangan kosong!';
-				} else if ($ret['status'] != 'error' && empty($_POST['tahunAnggaran'])) {
+				} else if ($ret['status'] != 'error' && empty($_POST['tahunAnggaran']) && empty($_POST['id_jadwal'])) {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun Anggaran kosong!';
+					$ret['message'] = 'Tahun Anggaran atau Jadwal harus diisi!';
 				} else if ($ret['status'] != 'error' && empty($_FILES['fileUpload']) && empty($id_dokumen)) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'File Dokumen kosong!';
@@ -8841,17 +9131,30 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$user_id = um_user('ID');
 
 						if (empty($id_dokumen)) {
-							$wpdb->insert(
-								$nama_tabel[$tipe_dokumen],
-								array(
-									'dokumen' => $upload['filename'],
-									'keterangan' => $keterangan,
-									'tahun_anggaran' => $tahunAnggaran,
-									'created_at' => current_time('mysql'),
-									'tanggal_upload' => current_time('mysql')
-								)
-							);
-
+							if (!empty($_POST['id_jadwal'])) {
+								$wpdb->insert(
+									$nama_tabel[$tipe_dokumen],
+									array(
+										'dokumen' => $upload['filename'],
+										'keterangan' => $keterangan,
+										'id_jadwal' => $_POST['id_jadwal'],
+										'created_at' => current_time('mysql'),
+										'tanggal_upload' => current_time('mysql')
+									)
+								);
+							} else {
+								$wpdb->insert(
+									$nama_tabel[$tipe_dokumen],
+									array(
+										'dokumen' => $upload['filename'],
+										'keterangan' => $keterangan,
+										'tahun_anggaran' => $tahunAnggaran,
+										'created_at' => current_time('mysql'),
+										'tanggal_upload' => current_time('mysql')
+									)
+								);
+							}
+						
 							if (!$wpdb->insert_id) {
 								$ret = array(
 									'status' => 'error',
@@ -12811,7 +13114,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($return));
 	}
 
-	public function get_data_jadwal_by_id_rpjmd()
+	public function get_data_jadwal_by_id_rpjmd($id_jadwal) 
 	{
 		global $wpdb;
 		$ret = array(
@@ -12865,6 +13168,20 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 
 		die(json_encode($ret));
+	}
+
+	public function get_data_jadwal_by_id($id_jadwal) {
+		global $wpdb;
+		$data = $wpdb->get_row(
+			$wpdb->prepare('
+				SELECT *
+				FROM esakip_data_jadwal
+				WHERE id = %d
+			', $id_jadwal),
+			ARRAY_A
+		);
+
+		return $data;
 	}
 
 	/** Ambil data penjadwalan RPJPD */
@@ -13233,6 +13550,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$menu_iku	= trim(htmlspecialchars($_POST['menu_iku']));
 					$langsung_verifikasi	= trim(htmlspecialchars($_POST['langsung_verifikasi']));
 					$setting_input_pokin	= trim(htmlspecialchars($_POST['setting_input_pokin']));
+					$jadwal_murni 	= $_POST['jadwal_murni'];
 					// $menu_penyusunan_pohon_kinerja_pemda	= trim(htmlspecialchars($_POST['menu_penyusunan_pohon_kinerja_pemda']));
 					// $menu_penyusunan_pohon_kinerja_opd	= trim(htmlspecialchars($_POST['menu_penyusunan_pohon_kinerja_opd']));
 
@@ -13288,6 +13606,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					//update data penjadwalan
 					$data_jadwal = array(
 						'nama_jadwal' 			=> $nama_jadwal,
+						'id_jadwal_murni'		=> $jadwal_murni,
 						'nama_jadwal_renstra' 	=> $nama_jadwal_renstra,
 						'tahun_anggaran'		=> $tahun_anggaran,
 						'keterangan'			=> $keterangan,
@@ -16523,6 +16842,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 		die(json_encode($ret));
 	}
+
 	public function get_table_skpd_iku()
 	{
 		global $wpdb;
@@ -16534,28 +16854,29 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if (!empty($_POST['tahun_anggaran'])) {
-					$tahun_anggaran = $_POST['tahun_anggaran'];
-				} else {
+				if (empty($_POST['id_jadwal'])) {
 					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun Anggaran kosong!';
+					$ret['message'] = 'Id Jadwal kosong!';
+					die(json_encode($ret));
 				}
+				$id_jadwal = $_POST['id_jadwal'];
+				$data_jadwal = $this->get_data_jadwal_by_id($id_jadwal);
 
 				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
 				if ($ret['status'] != 'error') {
 					$unit = $wpdb->get_results(
 						$wpdb->prepare("
-						SELECT 
-							nama_skpd, 
-							id_skpd, 
-							kode_skpd, 
-							nipkepala 
-						FROM esakip_data_unit 
-						WHERE active=1 
-						AND tahun_anggaran=%d
-						AND is_skpd=1 
-						ORDER BY kode_skpd ASC
+							SELECT 
+								nama_skpd, 
+								id_skpd, 
+								kode_skpd, 
+								nipkepala 
+							FROM esakip_data_unit 
+							WHERE active=1 
+							  AND tahun_anggaran=%d
+							  AND is_skpd=1 
+							ORDER BY kode_skpd ASC
 						", $tahun_anggaran_sakip),
 						ARRAY_A
 					);
@@ -16564,27 +16885,88 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$tbody = '';
 						$counter = 1;
 						$total_integrasi = 0;
+						$mapping_jenis_dokumen_esr = [];
 
 						/** get data esr */
 						$data_dokumen_terintegrasi = array();
 						$status_api_esr = get_option('_crb_api_esr_status');
 						if ($status_api_esr) {
-							$data_dokumen_terintegrasi = $this->get_total_integrasi_esr('esakip_iku', $tahun_anggaran);
-						}
+							$pengaturan_periode_dokumen = $wpdb->get_row(
+								$wpdb->prepare("
+									SELECT * 
+									FROM esakip_pengaturan_upload_dokumen 
+									WHERE id_jadwal_rpjmd = %d 
+									  AND active = %d
+								", $id_jadwal, 1),
+								ARRAY_A
+							);
+							$jumlah_upload_per_skpd = $wpdb->get_results(
+								$wpdb->prepare("
+									SELECT 
+										id_skpd,
+										COUNT(upload_id) AS jumlah_upload
+									FROM esakip_renstra
+									WHERE upload_id IS NOT NULL 
+									  AND upload_id != ''
+									  AND id_jadwal = %d 
+									  AND active = 1
+									GROUP BY id_skpd
+								", $id_jadwal),
+								ARRAY_A
+							);
+	
+							$data_terintegrasi = [];
+							foreach ($jumlah_upload_per_skpd as $row) {
+								$data_terintegrasi[$row['id_skpd']] = $row['jumlah_upload'];
+							}
 
-						if ($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']) {
-							$ret['status_mapping'] = 1;
-						} else {
-							$ret['status_mapping'] = 0;
-							$ret['message_get_total_integrasi_dokumen_esr'] = $data_dokumen_terintegrasi['message'];
+							$mapping_jenis_dokumen_esr = $wpdb->get_row(
+								$wpdb->prepare("
+									SELECT a.*
+									FROM esakip_data_mapping_jenis_dokumen_esr a 
+									JOIN esakip_menu_dokumen b 
+									  ON b.id=a.esakip_menu_dokumen_id 
+									 AND a.tahun_anggaran = b.tahun_anggaran 
+									 AND b.active = 1
+									JOIN esakip_data_jenis_dokumen_esr c 
+									  ON c.jenis_dokumen_esr_id = a.jenis_dokumen_esr_id 
+									 AND c.tahun_anggaran = a.tahun_anggaran 
+									 AND c.active=1
+									WHERE a.tahun_anggaran = %d 
+									  AND b.nama_tabel = %s;
+								", $pengaturan_periode_dokumen['tahun_anggaran'], 'esakip_iku'),
+								ARRAY_A
+							);
 						}
-
+						
 						foreach ($unit as $kk => $vv) {
+							if (!empty($mapping_jenis_dokumen_esr)) {
+								$tahun_anggaran = $pengaturan_periode_dokumen['tahun_anggaran'];
+								$array_data_esr = [];
+								$data_esr = $this->data_esr($vv['id_skpd']);
+								if ($data_esr['status'] == 'success') {
+									$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+									$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
+
+									foreach ($data_esr as $key => $esr) {
+										if ($esr->dokumen_id == $mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']) {
+											$path = explode("/", $esr->path);
+											$nama_file = end($path);
+											$array_data_esr[] = [
+												'upload_id' 	=> $esr->upload_id,
+												'nama_file' 	=> $nama_file,
+												'keterangan' 	=> $esr->keterangan,
+												'path' 			=> $esr->path
+											];
+										}
+									}
+								}
+							}
 							$detail_iku = $this->functions->generatePage(array(
-								'nama_page' => 'Halaman Detail Dokumen IKU ' . $tahun_anggaran,
-								'content' => '[dokumen_detail_iku tahun=' . $tahun_anggaran . ']',
-								'show_header' => 1,
-								'post_status' => 'private'
+								'nama_page' 	=> 'Dokumen IKU per SKPD | ' . $data_jadwal['id'] . '-' . $data_jadwal['nama_jadwal_renstra'],
+								'content' 		=> '[dokumen_detail_iku id_jadwal=' . $data_jadwal['id'] . ']',
+								'show_header' 	=> 1,
+								'post_status' 	=> 'private'
 							));
 
 							$tbody .= "<tr>";
@@ -16592,41 +16974,31 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
 
 							$jumlah_dokumen = $wpdb->get_var(
-								$wpdb->prepare(
-									"
-									SELECT 
-										COUNT(id)
+								$wpdb->prepare("
+									SELECT COUNT(id)
 									FROM esakip_iku 
 									WHERE id_skpd = %d
-									AND tahun_anggaran = %d
-									AND active = 1
-									",
-									$vv['id_skpd'],
-									$tahun_anggaran
-								)
+									  AND id_jadwal = %d
+									  AND active = 1
+								", $vv['id_skpd'], $id_jadwal)
 							);
-
-
-							$jumlah_dokumen_terintegrasi = 0;
-							if ($data_dokumen_terintegrasi['status'] == 'success') {
-								$jumlah_dokumen_terintegrasi = !empty($data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']]) ? $data_dokumen_terintegrasi['data_total_integrasi_esr'][$vv['id_skpd']] : 0;
-							}
-
+							
 							$btn = '<div class="btn-action-group">';
 							$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_iku['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
 							$btn .= '</div>';
 
 							$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
-							if ($data_dokumen_terintegrasi['status'] == 'success' && $data_dokumen_terintegrasi['mapping_jenis_dokumen']) {
-								$tbody .= "<td class='text-center'>" . $jumlah_dokumen_terintegrasi . "</td>";
+							if ($status_api_esr) {
+								$tbody .= "<td class='text-center'>" . $data_terintegrasi[$vv['id_skpd']] . "</td>";
 							}
 							$tbody .= "<td>" . $btn . "</td>";
-
 							$tbody .= "</tr>";
 						}
 						$ret['data'] = $tbody;
+						$colspan = 4;
 					} else {
-						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+						$colspan = 5;
+						$ret['data'] = "<tr><td colspan='" . $colspan . "' class='text-center'>Tidak ada data tersedia</td></tr>";
 					}
 				}
 			} else {
@@ -20198,6 +20570,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		);
 		$periode_rpjpd = '';
 		$periode_input_rpjpd = '';
+		$title_rpjpd = '';
 		foreach ($jadwal_periode_rpjpd as $jadwal_periode_item_rpjpd) {
 			$tahun_anggaran_selesai = $jadwal_periode_item_rpjpd['tahun_anggaran'] + $jadwal_periode_item_rpjpd['lama_pelaksanaan'];
 
@@ -20215,7 +20588,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$periode_input_rpjpd .= '<li><a target="_blank" href="' . $input_rpjpd['url'] . '" class="btn btn-primary">' . $input_rpjpd['title'] . '</a></li>';
+			$title_rpjpd .= 'RPJPD | ' . $jadwal_periode_item_rpjpd['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item_rpjpd['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+			$periode_input_rpjpd .= '<li><a target="_blank" href="' . $input_rpjpd['url'] . '" class="btn btn-primary">' . $title_rpjpd . '</a></li>';
 		}
 
 		$jadwal_periode = $wpdb->get_results(
@@ -20271,6 +20645,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$periode_input_croscutting_pemda = '';
 		$periode_dokumen_pohon_kinerja_pemda = '';
 		$periode_input_iku_pemda = '';
+		$periode_iku_pemda = '';
+		$halaman_iku_pemda = '';
 
 		// SAKIP Perangkat Daerah
 		$periode_renstra = '';
@@ -20301,6 +20677,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$periode_input_croscutting_opd = '';
 		$halaman_input_perangkat_daerah = '';
 		$periode_input_iku_opd = '';
+		$periode_iku_opd = '';
+		$halaman_iku_opd = '';
 
 		foreach ($jadwal_periode as $jadwal_periode_item) {
 			if (!empty($jadwal_periode_item['tahun_selesai_anggaran']) && $jadwal_periode_item['tahun_selesai_anggaran'] > 1) {
@@ -20327,7 +20705,64 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$cek_data_periode[$menu['nama_tabel']] = $menu;
 				}
 			}
+			$cek_menu_aktif_perencanaan = $wpdb->get_results($wpdb->prepare("
+				SELECT 
+					*
+				FROM esakip_menu_dokumen 
+				WHERE tahun_anggaran =%d
+				ORDER BY nomor_urut ASC
+			", $_GET['tahun']), ARRAY_A);
 
+			$cek_data_perencanaan = array();
+			if (!empty($cek_menu_aktif_perencanaan)) {
+				foreach ($cek_menu_aktif_perencanaan as $menu_perencanaan) {
+					$cek_data_perencanaan[$menu_perencanaan['user_role']][$menu_perencanaan['nama_dokumen']] = $menu_perencanaan;
+				}
+			}
+			$cek_menu_aktif_cek_data_pengukuran_kinerja = $wpdb->get_results($wpdb->prepare("
+				SELECT 
+					*
+				FROM esakip_menu_dokumen 
+				WHERE tahun_anggaran =%d
+				ORDER BY nomor_urut ASC
+			", $_GET['tahun']), ARRAY_A);
+
+			$cek_data_pengukuran_kinerja = array();
+			if (!empty($cek_menu_aktif_cek_data_pengukuran_kinerja)) {
+				foreach ($cek_menu_aktif_cek_data_pengukuran_kinerja as $menu_cek_data_pengukuran_kinerja) {
+					$cek_data_pengukuran_kinerja[$menu_cek_data_pengukuran_kinerja['user_role']][$menu_cek_data_pengukuran_kinerja['nama_dokumen']] = $menu_cek_data_pengukuran_kinerja;
+				}
+			}
+			
+			$cek_menu_aktif_pelaporan = $wpdb->get_results($wpdb->prepare("
+				SELECT 
+					*
+				FROM esakip_menu_dokumen 
+				WHERE tahun_anggaran =%d
+				ORDER BY nomor_urut ASC
+			", $_GET['tahun']), ARRAY_A);
+
+			$cek_data_pelaporan = array();
+			if (!empty($cek_menu_aktif_pelaporan)) {
+				foreach ($cek_menu_aktif_pelaporan as $menu_pelaporan) {
+					$cek_data_pelaporan[$menu_pelaporan['user_role']][$menu_pelaporan['nama_dokumen']] = $menu_pelaporan;
+				}
+			}
+			
+			$cek_menu_aktif_evaluasi = $wpdb->get_results($wpdb->prepare("
+				SELECT 
+					*
+				FROM esakip_menu_dokumen 
+				WHERE tahun_anggaran =%d
+				ORDER BY nomor_urut ASC
+			", $_GET['tahun']), ARRAY_A);
+
+			$cek_data_evaluasi = array();
+			if (!empty($cek_menu_aktif_evaluasi)) {
+				foreach ($cek_menu_aktif_evaluasi as $menu_evaluasi) {
+					$cek_data_evaluasi[$menu_evaluasi['user_role']][$menu_evaluasi['nama_dokumen']] = $menu_evaluasi;
+				}
+			}
 			$rpjmd = $this->functions->generatePage(array(
 				'nama_page' => 'RPJMD | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
 				'content' => '[upload_dokumen_rpjmd periode=' . $jadwal_periode_item['id'] . ']',
@@ -20335,6 +20770,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$periode_rpjmd .= '<li><a target="_blank" href="' . $rpjmd['url'] . '" class="btn btn-primary">' . $rpjmd['title'] . '</a></li>';
+			
+			$iku_pemda = $this->functions->generatePage(array(
+				'nama_page' => 'IKU Pemda | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[dokumen_detail_iku_pemda id_jadwal=' . $jadwal_periode_item['id'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$periode_iku_pemda .= '<li><a target="_blank" href="' . $iku_pemda['url'] . '" class="btn btn-primary">' . $iku_pemda['title'] . '</a></li>';
 
 			$input_rpjmd = $this->functions->generatePage(array(
 				'nama_page' => 'Input RPJMD | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
@@ -20342,7 +20785,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$periode_input_rpjmd .= '<li><a target="_blank" href="' . $input_rpjmd['url'] . '" class="btn btn-primary">' . $input_rpjmd['title'] . '</a></li>';
+			$title = 'RPJMD | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+			$periode_input_rpjmd .= '<li><a target="_blank" href="' . $input_rpjmd['url'] . '" class="btn btn-primary">' . $title . '</a></li>';
 
 			$input_pohon_kinerja_pemda = $this->functions->generatePage(array(
 				'nama_page' => 'Halaman Input Pohon Kinerja ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
@@ -20350,7 +20794,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$title = 'Input Pohon Kinerja | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+			$title = 'Pohon Kinerja | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
 			$periode_input_pohon_kinerja_pemda .= '<li><a target="_blank" href="' . $input_pohon_kinerja_pemda['url'] . '" class="btn btn-primary">' . $title . '</a></li>';
 
 			$input_cascading_pemda = $this->functions->generatePage(array(
@@ -20359,7 +20803,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$title = 'Input Cascading Pemda | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+			$title = 'Cascading | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
 			$periode_input_cascading_pemda .= '<li><a target="_blank" href="' . $input_cascading_pemda['url'] . '" class="btn btn-primary">' . $title . '</a></li>';
 
 			$input_croscutting_pemda = $this->functions->generatePage(array(
@@ -20386,7 +20830,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$title = 'Input Pohon Kinerja | ' . $jadwal_periode_item['nama_jadwal_renstra'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+			$title = 'Pohon Kinerja | ' . $jadwal_periode_item['nama_jadwal_renstra'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
 			$list_periode_input_pohon_kinerja_opd .= '<li><a target="_blank" href="' . $list_input_pohon_kinerja_opd['url'] . '" class="btn btn-primary">' . $title . '</a></li>';
 
 			$renstra = $this->functions->generatePage(array(
@@ -20400,6 +20844,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$periode_renstra .= '<li><a target="_blank" href="' . $renstra['url'] . '" class="btn btn-primary">' . $renstra['title'] . '</a></li>';
 			}
 
+			$iku_opd = $this->functions->generatePage(array(
+				'nama_page' => 'IKU | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[iku id_jadwal=' . $jadwal_periode_item['id'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+
+			$periode_iku_opd .= '<li><a target="_blank" href="' . $iku_opd['url'] . '" class="btn btn-primary">' . $iku_opd['title'] . '</a></li>';
+			
 			$pohon_kinerja = $this->functions->generatePage(array(
 				'nama_page' => 'Pohon Kinerja dan Cascading | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
 				'content' => '[pohon_kinerja_dan_cascading periode=' . $jadwal_periode_item['id'] . ']',
@@ -20417,7 +20870,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$periode_dokumen_pohon_kinerja_pemda .= '<li><a target="_blank" href="' . $dokumen_pohon_kinerja_pemda['url'] . '" class="btn btn-primary">' . $dokumen_pohon_kinerja_pemda['title'] . '</a></li>';
+			$title = 'Pohon Kinerja dan Cascading | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+			$periode_dokumen_pohon_kinerja_pemda .= '<li><a target="_blank" href="' . $dokumen_pohon_kinerja_pemda['url'] . '" class="btn btn-primary">' . $title . '</a></li>';
 
 			$input_iku_pemda = $this->functions->generatePage(array(
 				'nama_page' => 'Input IKU Pemerintah Daerah | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
@@ -20425,7 +20879,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$periode_input_iku_pemda .= '<li><a target="_blank" href="' . $input_iku_pemda['url'] . '" class="btn btn-primary">' . $input_iku_pemda['title'] . '</a></li>';
+			$title = 'IKU | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+			$periode_input_iku_pemda .= '<li><a target="_blank" href="' . $input_iku_pemda['url'] . '" class="btn btn-primary">' . $title . '</a></li>';
 
 			$list_pemda_pengisian_rencana_aksi = $this->functions->generatePage(array(
 				'nama_page' => 'Pengisian Rencana Aksi Pemda Tahun ' . $_GET['tahun'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
@@ -20433,7 +20888,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$pengisian_rencana_aksi_pemda = '<li><a target="_blank" href="' . $list_pemda_pengisian_rencana_aksi['url'] . '" class="btn btn-primary">' .  $list_pemda_pengisian_rencana_aksi['title'] . '</a></li>';
+			$title = 'Rencana Aksi Tahun ' . $_GET['tahun'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+			$pengisian_rencana_aksi_pemda = '<li><a target="_blank" href="' . $list_pemda_pengisian_rencana_aksi['url'] . '" class="btn btn-primary">' .  $title . '</a></li>';
 		}
 		// PEMDA
 
@@ -20445,29 +20901,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		));
 		$halaman_monitor_upload_dokumen .= '<a target="_blank" href="' . $monitor_upload_dokumen['url'] . '" class="btn btn-primary"> Laporan Monitor Upload Dokumen </a>';
 
-		if (!empty($cek_data['pemerintah_daerah']['IKU']) && $cek_data['pemerintah_daerah']['IKU']['active'] == 1) {
-			$iku_pemda = $this->functions->generatePage(array(
-				'nama_page' => 'IKU Pemda' . $_GET['tahun'],
-				'content' => '[dokumen_detail_iku_pemda tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_iku = 'IKU';
-			$cek_data['pemerintah_daerah']['IKU']['link'] = '<li><a target="_blank" href="' . $iku_pemda['url'] . '"   class="btn btn-info">' .  $title_iku . '</a></li>';
-		}
-
-		if (!empty($cek_data['pemerintah_daerah']['SKP']) && $cek_data['pemerintah_daerah']['SKP']['active'] == 1) {
+		if (!empty($cek_data_perencanaan['pemerintah_daerah']['SKP']) && $cek_data_perencanaan['pemerintah_daerah']['SKP']['active'] == 1) {
 			$skp_pemda = $this->functions->generatePage(array(
 				'nama_page' => 'SKP Pemda' . $_GET['tahun'],
 				'content' => '[dokumen_detail_skp_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$title_skp = 'SKP';
-			$cek_data['pemerintah_daerah']['SKP']['link'] = '<li><a target="_blank" href="' . $skp_pemda['url'] . '"  class="btn btn-info">' .  $title_skp . '</a></li>';
+			$title_skp = 'SKP (Sasaran Kinerja Pegawai)';
+			$cek_data_perencanaan['pemerintah_daerah']['SKP']['link'] = '<li><a target="_blank" href="' . $skp_pemda['url'] . '"  class="btn btn-info">' .  $title_skp . '</a></li>';
 		}
 
-		if (!empty($cek_data['pemerintah_daerah']['Rencana Aksi']) && $cek_data['pemerintah_daerah']['Rencana Aksi']['active'] == 1) {
+		if (!empty($cek_data_perencanaan['pemerintah_daerah']['Rencana Aksi']) && $cek_data_perencanaan['pemerintah_daerah']['Rencana Aksi']['active'] == 1) {
 			$rencana_aksi_pemda = $this->functions->generatePage(array(
 				'nama_page' => 'Rencana Aksi Pemda' . $_GET['tahun'],
 				'content' => '[dokumen_detail_rencana_aksi_pemda tahun=' . $_GET['tahun'] . ']',
@@ -20475,7 +20920,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_rencana_aksi = 'Rencana Aksi';
-			$cek_data['pemerintah_daerah']['Rencana Aksi']['link'] = '<li><a target="_blank" href="' . $rencana_aksi_pemda['url'] . '"  class="btn btn-info">' .  $title_rencana_aksi . '</a></li>';
+			$cek_data_perencanaan['pemerintah_daerah']['Rencana Aksi']['link'] = '<li><a target="_blank" href="' . $rencana_aksi_pemda['url'] . '"  class="btn btn-info">' .  $title_rencana_aksi . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['Pengukuran Kinerja']) && $cek_data['pemerintah_daerah']['Pengukuran Kinerja']['active'] == 1) {
@@ -20500,7 +20945,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$cek_data['pemerintah_daerah']['Pengukuran Rencana Aksi']['link'] = '<li><a target="_blank" href="' . $pengukuran_rencana_aksi_pemda['url'] . '"  class="btn btn-info">' .  $title_pengukuran_rencana_aksi . '</a></li>';
 		}
 
-		if (!empty($cek_data['pemerintah_daerah']['Laporan Kinerja']) && $cek_data['pemerintah_daerah']['Laporan Kinerja']['active'] == 1) {
+		if (!empty($cek_data_pelaporan['pemerintah_daerah']['Laporan Kinerja']) && $cek_data_pelaporan['pemerintah_daerah']['Laporan Kinerja']['active'] == 1) {
 			$laporan_kinerja_pemda = $this->functions->generatePage(array(
 				'nama_page' => 'Laporan Kinerja Pemda' . $_GET['tahun'],
 				'content' => '[dokumen_detail_laporan_kinerja_pemda tahun=' . $_GET['tahun'] . ']',
@@ -20508,10 +20953,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_laporan_kinerja = 'Laporan Kinerja';
-			$cek_data['pemerintah_daerah']['Laporan Kinerja']['link'] = '<li><a target="_blank" href="' . $laporan_kinerja_pemda['url'] . '"  class="btn btn-info">' .  $title_laporan_kinerja . '</a></li>';
+			$cek_data_pelaporan['pemerintah_daerah']['Laporan Kinerja']['link'] = '<li><a target="_blank" href="' . $laporan_kinerja_pemda['url'] . '"  class="btn btn-info">' .  $title_laporan_kinerja . '</a></li>';
 		}
 
-		if (!empty($cek_data['pemerintah_daerah']['Evaluasi Internal']) && $cek_data['pemerintah_daerah']['Evaluasi Internal']['active'] == 1) {
+		if (!empty($cek_data_evaluasi['pemerintah_daerah']['Evaluasi Internal']) && $cek_data_evaluasi['pemerintah_daerah']['Evaluasi Internal']['active'] == 1) {
 			$evaluasi_internal_pemda = $this->functions->generatePage(array(
 				'nama_page' => 'Evaluasi Internal Pemda' . $_GET['tahun'],
 				'content' => '[dokumen_detail_evaluasi_internal_pemda tahun=' . $_GET['tahun'] . ']',
@@ -20519,10 +20964,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_evaluasi_internal = 'Evaluasi Internal';
-			$cek_data['pemerintah_daerah']['Evaluasi Internal']['link'] = '<li><a target="_blank" href="' . $evaluasi_internal_pemda['url'] . '"  class="btn btn-info">' .  $title_evaluasi_internal . '</a></li>';
+			$cek_data_evaluasi['pemerintah_daerah']['Evaluasi Internal']['link'] = '<li><a target="_blank" href="' . $evaluasi_internal_pemda['url'] . '"  class="btn btn-info">' .  $title_evaluasi_internal . '</a></li>';
 		}
 
-		if (!empty($cek_data['pemerintah_daerah']['Dokumen Lainnya']) && $cek_data['pemerintah_daerah']['Dokumen Lainnya']['active'] == 1) {
+		if (!empty($cek_data_pelaporan['pemerintah_daerah']['Dokumen Lainnya']) && $cek_data_pelaporan['pemerintah_daerah']['Dokumen Lainnya']['active'] == 1) {
 			$dokumen_lainnya_pemda = $this->functions->generatePage(array(
 				'nama_page' => 'Lainnya Pemda' . $_GET['tahun'],
 				'content' => '[dokumen_detail_dokumen_lainnya_pemda tahun=' . $_GET['tahun'] . ']',
@@ -20530,10 +20975,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_dokumen_lainnya = 'Lainnya';
-			$cek_data['pemerintah_daerah']['Dokumen Lainnya']['link'] = '<li><a target="_blank" href="' . $dokumen_lainnya_pemda['url'] . '"  class="btn btn-info">' .  $title_dokumen_lainnya . '</a></li>';
+			$cek_data_pelaporan['pemerintah_daerah']['Dokumen Lainnya']['link'] = '<li><a target="_blank" href="' . $dokumen_lainnya_pemda['url'] . '"  class="btn btn-info">' .  $title_dokumen_lainnya . '</a></li>';
 		}
 
-		if (!empty($cek_data['pemerintah_daerah']['Perjanjian Kinerja']) && $cek_data['pemerintah_daerah']['Perjanjian Kinerja']['active'] == 1) {
+		if (!empty($cek_data_perencanaan['pemerintah_daerah']['Perjanjian Kinerja']) && $cek_data_perencanaan['pemerintah_daerah']['Perjanjian Kinerja']['active'] == 1) {
 			$perjanjian_kinerja_pemda = $this->functions->generatePage(array(
 				'nama_page' => 'Perjanjian Kinerja Pemda' . $_GET['tahun'],
 				'content' => '[dokumen_detail_perjanjian_kinerja_pemda tahun=' . $_GET['tahun'] . ']',
@@ -20541,18 +20986,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_perjanjian_kinerja = 'Perjanjian Kinerja';
-			$cek_data['pemerintah_daerah']['Perjanjian Kinerja']['link'] = '<li><a target="_blank" href="' . $perjanjian_kinerja_pemda['url'] . '"  class="btn btn-info">' .  $title_perjanjian_kinerja . '</a></li>';
+			$cek_data_perencanaan['pemerintah_daerah']['Perjanjian Kinerja']['link'] = '<li><a target="_blank" href="' . $perjanjian_kinerja_pemda['url'] . '"  class="btn btn-info">' .  $title_perjanjian_kinerja . '</a></li>';
 		}
 
-		if (!empty($cek_data['pemerintah_daerah']['RKPD']) && $cek_data['pemerintah_daerah']['RKPD']['active'] == 1) {
+		if (!empty($cek_data_perencanaan['pemerintah_daerah']['RKPD']) && $cek_data_perencanaan['pemerintah_daerah']['RKPD']['active'] == 1) {
 			$rkpd_pemda = $this->functions->generatePage(array(
 				'nama_page' => 'RKPD Pemda' . $_GET['tahun'],
 				'content' => '[dokumen_detail_rkpd_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$title_rkpd = 'RKPD';
-			$cek_data['pemerintah_daerah']['RKPD']['link'] = '<li><a target="_blank" href="' . $rkpd_pemda['url'] . '"  class="btn btn-info">' .  $title_rkpd . '</a></li>';
+			$title_rkpd = 'RKPD (Rencana Kerja Pemerintah Daerah )';
+			$cek_data_perencanaan['pemerintah_daerah']['RKPD']['link'] = '<li><a target="_blank" href="' . $rkpd_pemda['url'] . '"  class="btn btn-info">' .  $title_rkpd . '</a></li>';
 		}
 
 		if (!empty($cek_data['pemerintah_daerah']['LKJIP/LPPD']) && $cek_data['pemerintah_daerah']['LKJIP/LPPD']['active'] == 1) {
@@ -20566,15 +21011,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$cek_data['pemerintah_daerah']['LKJIP/LPPD']['link'] = '<li><a target="_blank" href="' . $lkjip_lppd_pemda['url'] . '"  class="btn btn-info">' .  $title_lkjip_lppd . '</a></li>';
 		}
 
-		if (!empty($cek_data['pemerintah_daerah']['DPA']) && $cek_data['pemerintah_daerah']['DPA']['active'] == 1) {
+		if (!empty($cek_data_perencanaan['pemerintah_daerah']['DPA']) && $cek_data_perencanaan['pemerintah_daerah']['DPA']['active'] == 1) {
 			$dpa_pemda = $this->functions->generatePage(array(
 				'nama_page' => 'DPA Pemda' . $_GET['tahun'],
 				'content' => '[dokumen_detail_dpa_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$title_dpa = 'DPA';
-			$cek_data['pemerintah_daerah']['DPA']['link'] = '<li><a target="_blank" href="' . $dpa_pemda['url'] . '"  class="btn btn-info">' .  $title_dpa . '</a></li>';
+			$title_dpa = 'DPA (Dokumen Pelaksanaan Anggaran)';
+			$cek_data_perencanaan['pemerintah_daerah']['DPA']['link'] = '<li><a target="_blank" href="' . $dpa_pemda['url'] . '"  class="btn btn-info">' .  $title_dpa . '</a></li>';
 		}
 
 		// if (!empty($cek_data['pemerintah_daerah']['Pohon Kinerja dan Cascading']) && $cek_data['pemerintah_daerah']['Pohon Kinerja dan Cascading']['active'] == 1) {
@@ -20588,40 +21033,40 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		// 	$cek_data['pemerintah_daerah']['Pohon Kinerja dan Cascading']['link'] = '<li><a target="_blank" href="' . $pohon_kinerja_dan_cascading_pemda['url'] . '"  class="btn btn-info">' .  $title_pohon_kinerja_dan_cascading . '</a></li>';
 		// }
 
-		if (!empty($cek_data['pemerintah_daerah']['LHE AKIP Internal']) && $cek_data['pemerintah_daerah']['LHE AKIP Internal']['active'] == 1) {
+		if (!empty($cek_data_evaluasi['pemerintah_daerah']['LHE AKIP Internal']) && $cek_data_evaluasi['pemerintah_daerah']['LHE AKIP Internal']['active'] == 1) {
 			$lhe_akip_internal_pemda = $this->functions->generatePage(array(
 				'nama_page' => 'LHE AKIP Internal Pemda' . $_GET['tahun'],
 				'content' => '[dokumen_detail_lhe_akip_internal_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$title_lhe_akip_internal = 'LHE AKIP Internal';
-			$cek_data['pemerintah_daerah']['LHE AKIP Internal']['link'] = '<li><a target="_blank" href="' . $lhe_akip_internal_pemda['url'] . '"  class="btn btn-info">' .  $title_lhe_akip_internal . '</a></li>';
+			$title_lhe_akip_internal = 'LHE AKIP (Laporan Hasil Evaluasi Kinerja Instansi Pemerintah) Internal';
+			$cek_data_evaluasi['pemerintah_daerah']['LHE AKIP Internal']['link'] = '<li><a target="_blank" href="' . $lhe_akip_internal_pemda['url'] . '"  class="btn btn-info">' .  $title_lhe_akip_internal . '</a></li>';
 		}
 
-		if (!empty($cek_data['pemerintah_daerah']['TL LHE AKIP Internal']) && $cek_data['pemerintah_daerah']['TL LHE AKIP Internal']['active'] == 1) {
+		if (!empty($cek_data_evaluasi['pemerintah_daerah']['TL LHE AKIP Internal']) && $cek_data_evaluasi['pemerintah_daerah']['TL LHE AKIP Internal']['active'] == 1) {
 			$tl_lhe_akip_internal_pemda = $this->functions->generatePage(array(
 				'nama_page' => 'TL LHE AKIP Internal Pemda' . $_GET['tahun'],
 				'content' => '[dokumen_detail_tl_lhe_akip_internal_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$title_tl_lhe_akip_internal = 'TL LHE AKIP Internal';
-			$cek_data['pemerintah_daerah']['TL LHE AKIP Internal']['link'] = '<li><a target="_blank" href="' . $tl_lhe_akip_internal_pemda['url'] . '"  class="btn btn-info">' .  $title_tl_lhe_akip_internal . '</a></li>';
+			$title_tl_lhe_akip_internal = 'TL LHE AKIP (Tindak Lanjut Laporan Hasil Evaluasi Kinerja Instansi Pemerintah) Internal';
+			$cek_data_evaluasi['pemerintah_daerah']['TL LHE AKIP Internal']['link'] = '<li><a target="_blank" href="' . $tl_lhe_akip_internal_pemda['url'] . '"  class="btn btn-info">' .  $title_tl_lhe_akip_internal . '</a></li>';
 		}
 
-		if (!empty($cek_data['pemerintah_daerah']['TL LHE AKIP Kemenpan']) && $cek_data['pemerintah_daerah']['TL LHE AKIP Kemenpan']['active'] == 1) {
+		if (!empty($cek_data_evaluasi['pemerintah_daerah']['TL LHE AKIP Kemenpan']) && $cek_data_evaluasi['pemerintah_daerah']['TL LHE AKIP Kemenpan']['active'] == 1) {
 			$tl_lhe_akip_kemenpan_pemda = $this->functions->generatePage(array(
 				'nama_page' => 'TL LHE AKIP Kemenpan Pemda' . $_GET['tahun'],
 				'content' => '[dokumen_detail_tl_lhe_akip_kemenpan_pemda tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$title_tl_lhe_akip_kemenpan = 'TL LHE AKIP Kemenpan';
-			$cek_data['pemerintah_daerah']['TL LHE AKIP Kemenpan']['link'] = '<li><a target="_blank" href="' . $tl_lhe_akip_kemenpan_pemda['url'] . '"  class="btn btn-info">' .  $title_tl_lhe_akip_kemenpan . '</a></li>';
+			$title_tl_lhe_akip_kemenpan = 'TL LHE AKIP (Tindak Lanjut Laporan Hasil Evaluasi Kinerja Instansi Pemerintah) Kemenpan';
+			$cek_data_evaluasi['pemerintah_daerah']['TL LHE AKIP Kemenpan']['link'] = '<li><a target="_blank" href="' . $tl_lhe_akip_kemenpan_pemda['url'] . '"  class="btn btn-info">' .  $title_tl_lhe_akip_kemenpan . '</a></li>';
 		}
 
-		if (!empty($cek_data['pemerintah_daerah']['Laporan Monev Renaksi']) && $cek_data['pemerintah_daerah']['Laporan Monev Renaksi']['active'] == 1) {
+		if (!empty($cek_data_pelaporan['pemerintah_daerah']['Laporan Monev Renaksi']) && $cek_data_pelaporan['pemerintah_daerah']['Laporan Monev Renaksi']['active'] == 1) {
 			$laporan_monev_renaksi_pemda = $this->functions->generatePage(array(
 				'nama_page' => 'Laporan Monev Renaksi Pemda' . $_GET['tahun'],
 				'content' => '[dokumen_detail_laporan_monev_renaksi_pemda tahun=' . $_GET['tahun'] . ']',
@@ -20629,10 +21074,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_laporan_monev_renaksi = 'Laporan Monev Renaksi';
-			$cek_data['pemerintah_daerah']['Laporan Monev Renaksi']['link'] = '<li><a target="_blank" href="' . $laporan_monev_renaksi_pemda['url'] . '"  class="btn btn-info">' .  $title_laporan_monev_renaksi . '</a></li>';
+			$cek_data_pelaporan['pemerintah_daerah']['Laporan Monev Renaksi']['link'] = '<li><a target="_blank" href="' . $laporan_monev_renaksi_pemda['url'] . '"  class="btn btn-info">' .  $title_laporan_monev_renaksi . '</a></li>';
 		}
 
-		if (!empty($cek_data['pemerintah_daerah']['Pedoman Teknis Perencanaan']) && $cek_data['pemerintah_daerah']['Pedoman Teknis Perencanaan']['active'] == 1) {
+		if (!empty($cek_data_perencanaan['pemerintah_daerah']['Pedoman Teknis Perencanaan']) && $cek_data_perencanaan['pemerintah_daerah']['Pedoman Teknis Perencanaan']['active'] == 1) {
 			$pedoman_teknis_perencanaan_pemda = $this->functions->generatePage(array(
 				'nama_page' => 'Pedoman Teknis Perencanaan Pemda' . $_GET['tahun'],
 				'content' => '[dokumen_detail_pedoman_teknis_perencanaan_pemda tahun=' . $_GET['tahun'] . ']',
@@ -20640,10 +21085,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_pedoman_teknis_perencanaan = 'Pedoman Teknis Perencanaan';
-			$cek_data['pemerintah_daerah']['Pedoman Teknis Perencanaan']['link'] = '<li><a target="_blank" href="' . $pedoman_teknis_perencanaan_pemda['url'] . '"  class="btn btn-info">' .  $title_pedoman_teknis_perencanaan . '</a></li>';
+			$cek_data_perencanaan['pemerintah_daerah']['Pedoman Teknis Perencanaan']['link'] = '<li><a target="_blank" href="' . $pedoman_teknis_perencanaan_pemda['url'] . '"  class="btn btn-info">' .  $title_pedoman_teknis_perencanaan . '</a></li>';
 		}
 
-		if (!empty($cek_data['pemerintah_daerah']['Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja']) && $cek_data['pemerintah_daerah']['Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja']['active'] == 1) {
+		if (!empty($cek_data_pengukuran_kinerja['pemerintah_daerah']['Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja']) && $cek_data_pengukuran_kinerja['pemerintah_daerah']['Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja']['active'] == 1) {
 			$pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda = $this->functions->generatePage(array(
 				'nama_page' => 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja Pemda' . $_GET['tahun'],
 				'content' => '[dokumen_detail_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda tahun=' . $_GET['tahun'] . ']',
@@ -20651,10 +21096,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja = 'Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja';
-			$cek_data['pemerintah_daerah']['Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja']['link'] = '<li><a target="_blank" href="' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda['url'] . '"  class="btn btn-info">' .  $title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja . '</a></li>';
+			$cek_data_pengukuran_kinerja['pemerintah_daerah']['Pedoman Teknis Pengukuran Dan Pengumpulan Data Kinerja']['link'] = '<li><a target="_blank" href="' . $pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja_pemda['url'] . '"  class="btn btn-info">' .  $title_pedoman_teknis_pengukuran_dan_pengumpulan_data_kinerja . '</a></li>';
 		}
 
-		if (!empty($cek_data['pemerintah_daerah']['Pedoman Teknis Evaluasi Internal']) && $cek_data['pemerintah_daerah']['Pedoman Teknis Evaluasi Internal']['active'] == 1) {
+		if (!empty($cek_data_evaluasi['pemerintah_daerah']['Pedoman Teknis Evaluasi Internal']) && $cek_data_evaluasi['pemerintah_daerah']['Pedoman Teknis Evaluasi Internal']['active'] == 1) {
 			$pedoman_teknis_evaluasi_internal_pemda = $this->functions->generatePage(array(
 				'nama_page' => 'Pedoman Teknis Evaluasi Internal Pemda' . $_GET['tahun'],
 				'content' => '[dokumen_detail_pedoman_teknis_evaluasi_internal_pemda tahun=' . $_GET['tahun'] . ']',
@@ -20662,32 +21107,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_pedoman_teknis_evaluasi_internal = 'Pedoman Teknis Evaluasi Internal';
-			$cek_data['pemerintah_daerah']['Pedoman Teknis Evaluasi Internal']['link'] = '<li><a target="_blank" href="' . $pedoman_teknis_evaluasi_internal_pemda['url'] . '"  class="btn btn-info">' .  $title_pedoman_teknis_evaluasi_internal . '</a></li>';
+			$cek_data_evaluasi['pemerintah_daerah']['Pedoman Teknis Evaluasi Internal']['link'] = '<li><a target="_blank" href="' . $pedoman_teknis_evaluasi_internal_pemda['url'] . '"  class="btn btn-info">' .  $title_pedoman_teknis_evaluasi_internal . '</a></li>';
 		}
 
 		//DOKUMEN Perangkat Daerah
-		if (!empty($cek_data['perangkat_daerah']['RENJA/RKT']) && $cek_data['perangkat_daerah']['RENJA/RKT']['active'] == 1) {
+		if (!empty($cek_data_perencanaan['perangkat_daerah']['RENJA/RKT']) && $cek_data_perencanaan['perangkat_daerah']['RENJA/RKT']['active'] == 1) {
 			$renja_rkt = $this->functions->generatePage(array(
 				'nama_page' => 'RENJA / RKT ' . $_GET['tahun'],
 				'content' => '[renja_rkt tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$cek_data['perangkat_daerah']['RENJA/RKT']['link'] = '<li><a target="_blank" href="' . $renja_rkt['url'] . '" class="btn btn-primary"> RENJA / RKT </a></li>';
+			$cek_data_perencanaan['perangkat_daerah']['RENJA/RKT']['link'] = '<li><a target="_blank" href="' . $renja_rkt['url'] . '" class="btn btn-primary"> RENJA / RKT (Rencana Kerja Tahunan)</a></li>';
 		}
 
-		if (!empty($cek_data['perangkat_daerah']['IKU']) && $cek_data['perangkat_daerah']['IKU']['active'] == 1) {
-			$iku = $this->functions->generatePage(array(
-				'nama_page' => 'IKU -' . $_GET['tahun'],
-				'content' => '[iku tahun=' . $_GET['tahun'] . ']',
-				'show_header' => 1,
-				'post_status' => 'private'
-			));
-			$title_iku = 'IKU ';
-			$cek_data['perangkat_daerah']['IKU']['link'] = '<li><a target="_blank" href="' . $iku['url'] . '" class="btn btn-primary">' .  $title_iku . '</a></li>';
-		}
-
-		if (!empty($cek_data['perangkat_daerah']['Perjanjian Kinerja']) && $cek_data['perangkat_daerah']['Perjanjian Kinerja']['active'] == 1) {
+		if (!empty($cek_data_perencanaan['perangkat_daerah']['Perjanjian Kinerja']) && $cek_data_perencanaan['perangkat_daerah']['Perjanjian Kinerja']['active'] == 1) {
 			$perjanjian_kinerja = $this->functions->generatePage(array(
 				'nama_page' => 'Perjanjian Kinerja -' . $_GET['tahun'],
 				'content' => '[perjanjian_kinerja tahun=' . $_GET['tahun'] . ']',
@@ -20695,10 +21129,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_perjanjian_kinerja = 'Perjanjian Kinerja';
-			$cek_data['perangkat_daerah']['Perjanjian Kinerja']['link'] = '<li><a target="_blank" href="' . $perjanjian_kinerja['url'] . '" class="btn btn-primary">' .  $title_perjanjian_kinerja . '</a></li>';
+			$cek_data_perencanaan['perangkat_daerah']['Perjanjian Kinerja']['link'] = '<li><a target="_blank" href="' . $perjanjian_kinerja['url'] . '" class="btn btn-primary">' .  $title_perjanjian_kinerja . '</a></li>';
 		}
 
-		if (!empty($cek_data['perangkat_daerah']['Laporan Kinerja']) && $cek_data['perangkat_daerah']['Laporan Kinerja']['active'] == 1) {
+		if (!empty($cek_data_pelaporan['perangkat_daerah']['Laporan Kinerja']) && $cek_data_pelaporan['perangkat_daerah']['Laporan Kinerja']['active'] == 1) {
 			$laporan_kinerja = $this->functions->generatePage(array(
 				'nama_page' => 'Laporan Kinerja -' . $_GET['tahun'],
 				'content' => '[laporan_kinerja tahun=' . $_GET['tahun'] . ']',
@@ -20706,18 +21140,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_laporan_kinerja = 'Laporan Kinerja';
-			$cek_data['perangkat_daerah']['Laporan Kinerja']['link'] = '<li><a target="_blank" href="' . $laporan_kinerja['url'] . '" class="btn btn-primary">' .  $title_laporan_kinerja . '</a></li>';
+			$cek_data_pelaporan['perangkat_daerah']['Laporan Kinerja']['link'] = '<li><a target="_blank" href="' . $laporan_kinerja['url'] . '" class="btn btn-primary">' .  $title_laporan_kinerja . '</a></li>';
 		}
 
-		if (!empty($cek_data['perangkat_daerah']['DPA']) && $cek_data['perangkat_daerah']['DPA']['active'] == 1) {
+		if (!empty($cek_data_perencanaan['perangkat_daerah']['DPA']) && $cek_data_perencanaan['perangkat_daerah']['DPA']['active'] == 1) {
 			$dpa = $this->functions->generatePage(array(
 				'nama_page' => 'DPA -' . $_GET['tahun'],
 				'content' => '[dpa tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$title_dpa = 'DPA';
-			$cek_data['perangkat_daerah']['DPA']['link'] = '<li><a target="_blank" href="' . $dpa['url'] . '" class="btn btn-primary">' .  $title_dpa . '</a></li>';
+			$title_dpa = 'DPA (Dokumen Pelaksanaan Anggaran)';
+			$cek_data_perencanaan['perangkat_daerah']['DPA']['link'] = '<li><a target="_blank" href="' . $dpa['url'] . '" class="btn btn-primary">' .  $title_dpa . '</a></li>';
 		}
 
 		// if (!empty($cek_data['perangkat_daerah']['Pohon Kinerja dan Cascading']) && $cek_data['perangkat_daerah']['Pohon Kinerja dan Cascading']['active'] == 1) {
@@ -20731,29 +21165,29 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		// 	$cek_data['perangkat_daerah']['Pohon Kinerja dan Cascading']['link'] = '<li><a target="_blank" href="' . $pohon_kinerja_dan_cascading['url'] . '" class="btn btn-primary">' .  $title_pohon_kinerja_dan_cascading . '</a></li>';
 		// }
 
-		if (!empty($cek_data['perangkat_daerah']['LHE AKIP Internal']) && $cek_data['perangkat_daerah']['LHE AKIP Internal']['active'] == 1) {
+		if (!empty($cek_data_evaluasi['perangkat_daerah']['LHE AKIP Internal']) && $cek_data_evaluasi['perangkat_daerah']['LHE AKIP Internal']['active'] == 1) {
 			$lhe_akip_internal = $this->functions->generatePage(array(
 				'nama_page' => 'LHE AKIP Internal -' . $_GET['tahun'],
 				'content' => '[lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$title_lhe_akip_internal = 'LHE AKIP Internal';
-			$cek_data['perangkat_daerah']['LHE AKIP Internal']['link'] = '<li><a target="_blank" href="' . $lhe_akip_internal['url'] . '" class="btn btn-primary">' .  $title_lhe_akip_internal . '</a></li>';
+			$title_lhe_akip_internal = 'LHE AKIP (Laporan Hasil Evaluasi Kinerja Instansi Pemerintah) Internal';
+			$cek_data_evaluasi['perangkat_daerah']['LHE AKIP Internal']['link'] = '<li><a target="_blank" href="' . $lhe_akip_internal['url'] . '" class="btn btn-primary">' .  $title_lhe_akip_internal . '</a></li>';
 		}
 
-		if (!empty($cek_data['perangkat_daerah']['TL LHE AKIP Internal']) && $cek_data['perangkat_daerah']['TL LHE AKIP Internal']['active'] == 1) {
+		if (!empty($cek_data_evaluasi['perangkat_daerah']['TL LHE AKIP Internal']) && $cek_data_evaluasi['perangkat_daerah']['TL LHE AKIP Internal']['active'] == 1) {
 			$tl_lhe_akip_internal = $this->functions->generatePage(array(
 				'nama_page' => 'TL LHE AKIP Internal -' . $_GET['tahun'],
 				'content' => '[tl_lhe_akip_internal tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$title_tl_lhe_akip_internal = 'TL LHE AKIP Internal';
-			$cek_data['perangkat_daerah']['TL LHE AKIP Internal']['link'] = '<li><a target="_blank" href="' . $tl_lhe_akip_internal['url'] . '" class="btn btn-primary">' .  $title_tl_lhe_akip_internal . '</a></li>';
+			$title_tl_lhe_akip_internal = 'TL LHE AKIP (Tindak Lanjut Laporan Hasil Evaluasi Kinerja Instansi Pemerintah) Internal';
+			$cek_data_evaluasi['perangkat_daerah']['TL LHE AKIP Internal']['link'] = '<li><a target="_blank" href="' . $tl_lhe_akip_internal['url'] . '" class="btn btn-primary">' .  $title_tl_lhe_akip_internal . '</a></li>';
 		}
 
-		if (!empty($cek_data['perangkat_daerah']['Laporan Monev Renaksi']) && $cek_data['perangkat_daerah']['Laporan Monev Renaksi']['active'] == 1) {
+		if (!empty($cek_data_pelaporan['perangkat_daerah']['Laporan Monev Renaksi']) && $cek_data_pelaporan['perangkat_daerah']['Laporan Monev Renaksi']['active'] == 1) {
 			$laporan_monev_renaksi = $this->functions->generatePage(array(
 				'nama_page' => 'Laporan Monev Renaksi -' . $_GET['tahun'],
 				'content' => '[laporan_monev_renaksi tahun=' . $_GET['tahun'] . ']',
@@ -20761,10 +21195,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_laporan_monev_renaksi = 'Laporan Monev Renaksi';
-			$cek_data['perangkat_daerah']['Laporan Monev Renaksi']['link'] = '<li><a target="_blank" href="' . $laporan_monev_renaksi['url'] . '" class="btn btn-primary">' .  $title_laporan_monev_renaksi . '</a></li>';
+			$cek_data_pelaporan['perangkat_daerah']['Laporan Monev Renaksi']['link'] = '<li><a target="_blank" href="' . $laporan_monev_renaksi['url'] . '" class="btn btn-primary">' .  $title_laporan_monev_renaksi . '</a></li>';
 		}
 
-		if (!empty($cek_data['perangkat_daerah']['Dokumen Lainnya']) && $cek_data['perangkat_daerah']['Dokumen Lainnya']['active'] == 1) {
+		if (!empty($cek_data_pelaporan['perangkat_daerah']['Dokumen Lainnya']) && $cek_data_pelaporan['perangkat_daerah']['Dokumen Lainnya']['active'] == 1) {
 			$dokumen_lainnya = $this->functions->generatePage(array(
 				'nama_page' => 'Lainnya -' . $_GET['tahun'],
 				'content' => '[dokumen_lainnya tahun=' . $_GET['tahun'] . ']',
@@ -20772,22 +21206,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_dokumen_lainnya = 'Lainnya';
-			$cek_data['perangkat_daerah']['Dokumen Lainnya']['link'] = '<li><a target="_blank" href="' . $dokumen_lainnya['url'] . '" class="btn btn-primary">' .  $title_dokumen_lainnya . '</a></li>';
+			$cek_data_pelaporan['perangkat_daerah']['Dokumen Lainnya']['link'] = '<li><a target="_blank" href="' . $dokumen_lainnya['url'] . '" class="btn btn-primary">' .  $title_dokumen_lainnya . '</a></li>';
 		}
 
 		//DOKUMEN Perangkat Daerah JIKA DIPAKAI
-		if (!empty($cek_data['perangkat_daerah']['SKP']) && $cek_data['perangkat_daerah']['SKP']['active'] == 1) {
+		if (!empty($cek_data_perencanaan['perangkat_daerah']['SKP']) && $cek_data_perencanaan['perangkat_daerah']['SKP']['active'] == 1) {
 			$skp = $this->functions->generatePage(array(
 				'nama_page' => 'SKP -' . $_GET['tahun'],
 				'content' => '[skp tahun=' . $_GET['tahun'] . ']',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
-			$title_skp = 'SKP';
-			$cek_data['perangkat_daerah']['SKP']['link'] = '<li><a target="_blank" href="' . $skp['url'] . '" class="btn btn-primary">' .  $title_skp . '</a></li>';
+			$title_skp = 'SKP (Sasaran Kinerja Pegawai)';
+			$cek_data_perencanaan['perangkat_daerah']['SKP']['link'] = '<li><a target="_blank" href="' . $skp['url'] . '" class="btn btn-primary">' .  $title_skp . '</a></li>';
 		}
 
-		if (!empty($cek_data['perangkat_daerah']['Rencana Aksi']) && $cek_data['perangkat_daerah']['Rencana Aksi']['active'] == 1) {
+		if (!empty($cek_data_perencanaan['perangkat_daerah']['Rencana Aksi']) && $cek_data_perencanaan['perangkat_daerah']['Rencana Aksi']['active'] == 1) {
 			$rencana_aksi = $this->functions->generatePage(array(
 				'nama_page' => 'Rencana Aksi -' . $_GET['tahun'],
 				'content' => '[rencana_aksi tahun=' . $_GET['tahun'] . ']',
@@ -20795,7 +21229,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_rencana_aksi = 'Rencana Aksi';
-			$cek_data['perangkat_daerah']['Rencana Aksi']['link'] = '<li><a target="_blank" href="' . $rencana_aksi['url'] . '" class="btn btn-primary">' .  $title_rencana_aksi . '</a></li>';
+			$cek_data_perencanaan['perangkat_daerah']['Rencana Aksi']['link'] = '<li><a target="_blank" href="' . $rencana_aksi['url'] . '" class="btn btn-primary">' .  $title_rencana_aksi . '</a></li>';
 		}
 
 		if (!empty($cek_data['perangkat_daerah']['Pengukuran Kinerja']) && $cek_data['perangkat_daerah']['Pengukuran Kinerja']['active'] == 1) {
@@ -20817,7 +21251,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		// $title_pengukuran_rencana_aksi = 'Pengukuran Rencana Aksi';
 		// $pengukuran_rencana_aksi_detail .= '<li><a target="_blank" href="' . $pengukuran_rencana_aksi['url'] . '" class="btn btn-primary">' .  $title_pengukuran_rencana_aksi . '</a></li>';
 
-		if (!empty($cek_data['perangkat_daerah']['Evaluasi Internal']) && $cek_data['perangkat_daerah']['Evaluasi Internal']['active'] == 1) {
+		if (!empty($cek_data_evaluasi['perangkat_daerah']['Evaluasi Internal']) && $cek_data_evaluasi['perangkat_daerah']['Evaluasi Internal']['active'] == 1) {
 			$evaluasi_internal = $this->functions->generatePage(array(
 				'nama_page' => 'Evaluasi Internal -' . $_GET['tahun'],
 				'content' => '[evaluasi_internal tahun=' . $_GET['tahun'] . ']',
@@ -20825,7 +21259,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title_evaluasi_internal = 'Evaluasi Internal';
-			$cek_data['perangkat_daerah']['Evaluasi Internal']['link'] = '<li><a target="_blank" href="' . $evaluasi_internal['url'] . '" class="btn btn-primary">' .  $title_evaluasi_internal . '</a></li>';
+			$cek_data_evaluasi['perangkat_daerah']['Evaluasi Internal']['link'] = '<li><a target="_blank" href="' . $evaluasi_internal['url'] . '" class="btn btn-primary">' .  $title_evaluasi_internal . '</a></li>';
 		}
 		$api_params = array(
 			'action' => 'get_data_jadwal_wpsipd',
@@ -20852,7 +21286,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					'show_header' => 1,
 					'post_status' => 'private'
 				));
-				$title = 'Input Cascading OPD | ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai;
+				$title = 'Cascading | ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai;
 				$periode_input_cascading_opd .= '<li><a target="_blank" href="' . $input_cascading_opd['url'] . '" class="btn btn-primary">' . $title . '</a></li>';
 
 				$input_iku_wpsipd = $this->functions->generatePage(array(
@@ -20861,7 +21295,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					'show_header' => 1,
 					'post_status' => 'private'
 				));
-				$title = 'Input IKU | ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai;
+				$title = 'IKU | ' . $jadwal_periode_item_wpsipd->nama . ' ' . 'Periode ' . $jadwal_periode_item_wpsipd->tahun_anggaran . ' - ' . $tahun_anggaran_selesai;
 				$periode_input_iku_opd .= '<li><a target="_blank" href="' . $input_iku_wpsipd['url'] . '" class="btn btn-primary">' . $title . '</a></li>';
 			}
 		}
@@ -20911,7 +21345,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			'show_header' => 1,
 			'post_status' => 'private'
 		));
-		$title_pengisian_rencana_aksi = 'Pengisian Rencana Aksi';
+		$title_pengisian_rencana_aksi = 'Rencana Aksi';
 		$pengisian_rencana_aksi = '<li><a target="_blank" href="' . $list_skpd_pengisian_rencana_aksi['url'] . '" class="btn btn-primary">' .  $title_pengisian_rencana_aksi . '</a></li>';
 
 		$list_setting_jadwal = '';
@@ -20955,6 +21389,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (empty($periode_rpjmd)) {
 			$periode_rpjmd = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
 		}
+		if (empty($periode_iku_pemda)) {
+			$periode_iku_pemda = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
+		}
 		if (empty($periode_dokumen_pohon_kinerja_pemda)) {
 			$periode_dokumen_pohon_kinerja_pemda = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
 		}
@@ -20970,6 +21407,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		if (empty($periode_renstra)) {
 			$periode_renstra = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
+		}
+
+		if (empty($periode_iku_opd)) {
+			$periode_iku_opd = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
 		}
 		if (empty($periode_pohon_kinerja)) {
 			$periode_pohon_kinerja = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
@@ -21020,69 +21461,95 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					</ul>
 				</div>
 			</div>';
-		if (!empty($cek_data['pemerintah_daerah']['RPJPD']) && $cek_data['pemerintah_daerah']['RPJPD']['active'] == 1) {
+		if (!empty($cek_data_perencanaan['pemerintah_daerah']['RPJPD']) && $cek_data_perencanaan['pemerintah_daerah']['RPJPD']['active'] == 1) {
 			$halaman_rpjpd = '
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="rpjpd" style="margin: 0;">Periode Upload Dokumen RPJPD</h5>
+					<h5 class="esakip-header-tahun" data-id="rpjpd" style="margin: 0;">RPJPD (Rencana Pembangunan Jangka Panjang Daerah)</h5>
 					<div class="esakip-body-tahun" data-id="rpjpd">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $periode_rpjpd . '
 						</ul>
 					</div>
 				</div>';
-			$cek_data['pemerintah_daerah']['RPJPD']['link'] = $halaman_rpjpd;
+			$cek_data_perencanaan['pemerintah_daerah']['RPJPD']['link'] = $halaman_rpjpd;
 		}
 
-		if (!empty($cek_data['pemerintah_daerah']['RPJMD']) && $cek_data['pemerintah_daerah']['RPJMD']['active'] == 1) {
+		if (!empty($cek_data_perencanaan['pemerintah_daerah']['RPJMD']) && $cek_data_perencanaan['pemerintah_daerah']['RPJMD']['active'] == 1) {
 			$halaman_rpjmd = '
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="rpjmd" style="margin: 0;">Periode Upload Dokumen RPJMD</h5>
+					<h5 class="esakip-header-tahun" data-id="rpjmd" style="margin: 0;">RPJMD (Rencana Pembangunan Jangka Menengah Daerah)</h5>
 					<div class="esakip-body-tahun" data-id="rpjmd">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $periode_rpjmd . '
 						</ul>
 					</div>
 				</div>';
-			$cek_data['pemerintah_daerah']['RPJMD']['link'] = $halaman_rpjmd;
+			$cek_data_perencanaan['pemerintah_daerah']['RPJMD']['link'] = $halaman_rpjmd;
 		}
 
-		if (!empty($cek_data['pemerintah_daerah']['Pohon Kinerja dan Cascading']) && $cek_data['pemerintah_daerah']['Pohon Kinerja dan Cascading']['active'] == 1) {
+		if (!empty($cek_data_perencanaan['pemerintah_daerah']['IKU']) && $cek_data_perencanaan['pemerintah_daerah']['IKU']['active'] == 1) {
+			$halaman_iku_pemda = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="iku-pemda" style="margin: 0;">IKU (Indikator Kinerja Utama)</h5>
+					<div class="esakip-body-tahun" data-id="iku-pemda">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+							' . $periode_iku_pemda . '
+						</ul>
+					</div>
+				</div>';
+			$cek_data_perencanaan['pemerintah_daerah']['IKU']['link'] = $halaman_iku_pemda;
+		}
+
+		if (!empty($cek_data_perencanaan['pemerintah_daerah']['Pohon Kinerja dan Cascading']) && $cek_data_perencanaan['pemerintah_daerah']['Pohon Kinerja dan Cascading']['active'] == 1) {
 			$halaman_pohon_kinerja_pemda = '
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="pohon-kinerja-opd" style="margin: 0;">Periode Upload Dokumen Pohon Kinerja Dan Cascading</h5>
+					<h5 class="esakip-header-tahun" data-id="pohon-kinerja-opd" style="margin: 0;">Pohon Kinerja Dan Cascading</h5>
 					<div class="esakip-body-tahun" data-id="pohon-kinerja-opd">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $periode_dokumen_pohon_kinerja_pemda . '
 						</ul>
 					</div>
 				</div>';
-			$cek_data['pemerintah_daerah']['Pohon Kinerja dan Cascading']['link'] = $halaman_pohon_kinerja_pemda;
+			$cek_data_perencanaan['pemerintah_daerah']['Pohon Kinerja dan Cascading']['link'] = $halaman_pohon_kinerja_pemda;
 		}
 
-		if (!empty($cek_data['perangkat_daerah']['RENSTRA']) && $cek_data['perangkat_daerah']['RENSTRA']['active'] == 1) {
+		if (!empty($cek_data_perencanaan['perangkat_daerah']['RENSTRA']) && $cek_data_perencanaan['perangkat_daerah']['RENSTRA']['active'] == 1) {
 			$halaman_renstra_opd = '
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="renstra-opd" style="margin: 0;">Periode Upload Dokumen RENSTRA</h5>
+					<h5 class="esakip-header-tahun" data-id="renstra-opd" style="margin: 0;">RENSTRA (Rencana Strategis)</h5>
 					<div class="esakip-body-tahun" data-id="renstra-opd">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $periode_renstra . '
 						</ul>
 					</div>
 				</div>';
-			$cek_data['perangkat_daerah']['RENSTRA']['link'] = $halaman_renstra_opd;
+			$cek_data_perencanaan['perangkat_daerah']['RENSTRA']['link'] = $halaman_renstra_opd;
 		}
 
-		if (!empty($cek_data['perangkat_daerah']['Pohon Kinerja dan Cascading']) && $cek_data['perangkat_daerah']['Pohon Kinerja dan Cascading']['active'] == 1) {
+		if (!empty($cek_data_perencanaan['perangkat_daerah']['IKU']) && $cek_data_perencanaan['perangkat_daerah']['IKU']['active'] == 1) {
+			$halaman_iku_opd = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="iku-opd" style="margin: 0;">IKU (Indikator Kinerja Utama)</h5>
+					<div class="esakip-body-tahun" data-id="iku-opd">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+							' . $periode_iku_opd . '
+						</ul>
+					</div>
+				</div>';
+			$cek_data_perencanaan['perangkat_daerah']['IKU']['link'] = $halaman_iku_opd;
+		}
+
+		if (!empty($cek_data_perencanaan['perangkat_daerah']['Pohon Kinerja dan Cascading']) && $cek_data_perencanaan['perangkat_daerah']['Pohon Kinerja dan Cascading']['active'] == 1) {
 			$halaman_pohon_kinerja_opd = '
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="pohon-kinerja-opd" style="margin: 0;">Periode Upload Dokumen Pohon Kinerja Dan Cascading</h5>
+					<h5 class="esakip-header-tahun" data-id="pohon-kinerja-opd" style="margin: 0;">Pohon Kinerja Dan Cascading</h5>
 					<div class="esakip-body-tahun" data-id="pohon-kinerja-opd">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $periode_pohon_kinerja . '
 						</ul>
 					</div>
 				</div>';
-			$cek_data['perangkat_daerah']['Pohon Kinerja dan Cascading']['link'] = $halaman_pohon_kinerja_opd;
+			$cek_data_perencanaan['perangkat_daerah']['Pohon Kinerja dan Cascading']['link'] = $halaman_pohon_kinerja_opd;
 		}
 
 		//halaman cascading dan croscutting
@@ -21155,20 +21622,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$halaman_input_rpjpd_rpjmd = '
 			<li>
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="halaman-input-rpjpd" style="margin: 0;">Input RPJPD</h5>
+					<h5 class="esakip-header-tahun" data-id="halaman-input-rpjpd" style="margin: 0;">Buat RPJPD (Rencana Pembangunan Jangka Panjang Daerah)</h5>
 					<div class="esakip-body-tahun" data-id="halaman-input-rpjpd">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $halaman_input_rpjpd . '
-						</ul>
-					</div>
-				</div>
-			</li>
-			<li>
-				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="halaman-input-rpjmd" style="margin: 0;">Input RPJMD / RPD</h5>
-					<div class="esakip-body-tahun" data-id="halaman-input-rpjmd">
-						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-							' . $halaman_input_rpjmd . '
 						</ul>
 					</div>
 				</div>
@@ -21177,7 +21634,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$halaman_input_rpjpd_rpjmd .= '
 				<li>
 					<div class="accordion">
-						<h5 class="esakip-header-tahun" data-id="halaman-input-pokin" style="margin: 0;">Input Pohon Kinerja Pemerintah Daerah</h5>
+						<h5 class="esakip-header-tahun" data-id="halaman-input-pokin" style="margin: 0;">Buat Pohon Kinerja & Croscutting</h5>
 						<div class="esakip-body-tahun" data-id="halaman-input-pokin">
 							<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 								' . $halaman_input_pohon_kinerja_pemda . '
@@ -21186,11 +21643,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					</div>
 				</li>';
 		}
+		$halaman_input_rpjpd_rpjmd .= '
+			<li>
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="halaman-input-rpjmd" style="margin: 0;">Buat RPJMD / RPD (Rencana Pembangunan Jangka Menengah Daerah)</h5>
+					<div class="esakip-body-tahun" data-id="halaman-input-rpjmd">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+							' . $halaman_input_rpjmd . '
+						</ul>
+					</div>
+				</div>
+			</li>';
 
 		$halaman_input_rpjpd_rpjmd .= '
 			<li>
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="halaman-input-cascading" style="margin: 0;">Input Cascading Pemerintah Daerah</h5>
+					<h5 class="esakip-header-tahun" data-id="halaman-input-cascading" style="margin: 0;">Buat Cascading</h5>
 					<div class="esakip-body-tahun" data-id="halaman-input-cascading">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $halaman_input_cascading_pemda . '
@@ -21200,30 +21668,20 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			</li>
 			<li>
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="halaman-input-croscutting" style="margin: 0;">Input Croscutting Pemerintah Daerah</h5>
-					<div class="esakip-body-tahun" data-id="halaman-input-croscutting">
-						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-							' . $halaman_input_croscutting_pemda . '
-						</ul>
-					</div>
-				</div>
-			</li>
-			<li>
-				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="pengisian-rencana-pemda" style="margin: 0;">Input Rencana Aksi Pemerintah Daerah</h5>
-					<div class="esakip-body-tahun" data-id="pengisian-rencana-pemda">
-						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-							' . $pengisian_rencana_aksi_pemda . '
-						</ul>
-					</div>
-				</div>
-			</li>
-			<li>
-				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="halaman-input-iku-pemda" style="margin: 0;">Input IKU Pemerintah Daerah</h5>
+					<h5 class="esakip-header-tahun" data-id="halaman-input-iku-pemda" style="margin: 0;">Buat IKU (Indikator Kinerja Utama)</h5>
 					<div class="esakip-body-tahun" data-id="halaman-input-iku-pemda">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $halaman_input_iku_pemda . '
+						</ul>
+					</div>
+				</div>
+			</li>
+			<li>
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="pengisian-rencana-pemda" style="margin: 0;">Buat Rencana Aksi</h5>
+					<div class="esakip-body-tahun" data-id="pengisian-rencana-pemda">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+							' . $pengisian_rencana_aksi_pemda . '
 						</ul>
 					</div>
 				</div>
@@ -21234,7 +21692,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$halaman_input_perangkat_daerah .= '
 				<li>
 					<div class="accordion">
-						<h5 class="esakip-header-tahun" data-id="halaman-input-pokin-opd" style="margin: 0;">Input Pohon Kinerja Perangkat Daerah</h5>
+						<h5 class="esakip-header-tahun" data-id="halaman-input-pokin-opd" style="margin: 0;">Buat Pohon Kinerja & Croscutting</h5>
 						<div class="esakip-body-tahun" data-id="halaman-input-pokin-opd">
 							<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 								' . $list_periode_input_pohon_kinerja_opd . '
@@ -21246,7 +21704,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$halaman_pengisian_rencana_aksi = '
 			<li>
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="halaman-input-cascading-opd" style="margin: 0;">Input Cascading Perangkat Daerah</h5>
+					<h5 class="esakip-header-tahun" data-id="halaman-input-cascading-opd" style="margin: 0;">Buat Cascading</h5>
 					<div class="esakip-body-tahun" data-id="halaman-input-cascading-opd">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $halaman_input_cascading_opd . '
@@ -21256,17 +21714,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			</li>
 			<li>
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="pengisian-rencana_aksi" style="margin: 0;">Input Rencana Aksi Perangkat Daerah</h5>
-					<div class="esakip-body-tahun" data-id="pengisian-rencana_aksi">
-						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-							' . $pengisian_rencana_aksi . '
-						</ul>
-					</div>
-				</div>
-			</li>
-			<li>
-				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="halaman-input-iku-wpsipd" style="margin: 0;">Input IKU Perangkat Daerah</h5>
+					<h5 class="esakip-header-tahun" data-id="halaman-input-iku-wpsipd" style="margin: 0;">Buat IKU (Indikator Kinerja Utama)</h5>
 					<div class="esakip-body-tahun" data-id="halaman-input-iku-wpsipd">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $halaman_input_iku_opd . '
@@ -21295,38 +21743,349 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					'show_header' => 1,
 					'post_status' => 'private'
 				));
-				$laporan_pk_btn = '<li><a target="_blank" href="' . $laporan_pk_page['url'] . '" class="btn btn-primary">Laporan PK (Perjanjian Kinerja)</a></li>';
+				$laporan_pk_btn = '<li><a target="_blank" href="' . $laporan_pk_page['url'] . '" class="btn btn-primary">PK (Perjanjian Kinerja)</a></li>';
 			}
 
-			$halaman_laporan_pk_admin = '
-			<div class="accordion">
-				<h5 class="esakip-header-tahun" data-id="laporan-pk-' . $_GET['tahun'] . '" style="margin: 0;">Laporan PK (Perjanjian Kinerja)</h5>
-				<div class="esakip-body-tahun" data-id="laporan-pk-' . $_GET['tahun'] . '">
-					<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
-						' . $laporan_pk_btn . '
-					</ul>
-				</div>
-			</div>';
+			$dokumen_perencanaan_opd = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="dokumen-perencanaan-opd-' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
+					<div class="esakip-body-tahun" data-id="dokumen-perencanaan-opd-' . $_GET['tahun'] . '">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							foreach ($cek_data_perencanaan['perangkat_daerah'] as $data_perencanaan_opd) {
+								if (!empty($data_perencanaan_opd['link'])) {
+									$dokumen_perencanaan_opd .= $data_perencanaan_opd['link'];
+								}
+							}
 
+			$dokumen_perencanaan_opd .= '
+						</ul>
+					</div>
+				</div>';
+
+			$halaman_perencanaan_opd = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="halaman-perencanaan-opd" style="margin: 0;">Perangkat Daerah</h5>
+					<div class="esakip-body-tahun" data-id="halaman-perencanaan-opd">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							$halaman_perencanaan_opd .= $halaman_input_perangkat_daerah;
+							$halaman_perencanaan_opd .= $halaman_pengisian_rencana_aksi;
+							$halaman_perencanaan_opd .= $pengisian_rencana_aksi;
+							$halaman_perencanaan_opd .= $dokumen_perencanaan_opd;
+
+							$set_html_opd_perencanaan = get_option('sakip_menu_khusus_set_html_opd_PERENCANAAN_' . $_GET['tahun']);
+							if (!empty($set_html_opd_perencanaan)) {
+								$halaman_perencanaan_opd .= do_shortcode(htmlspecialchars_decode($set_html_opd_perencanaan));
+							}
+			$halaman_perencanaan_opd .= '
+						</ul>
+					</div>
+				</div>';
+
+			$dokumen_perencanaan_pemda = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="dokumen-perencanaan-pemda' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
+					<div class="esakip-body-tahun" data-id="dokumen-perencanaan-pemda' . $_GET['tahun'] . '">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+						foreach ($cek_data_perencanaan['pemerintah_daerah'] as $data_perencanaan_pemda) {
+							if (!empty($data_perencanaan_pemda['link'])) {
+								$dokumen_perencanaan_pemda .= $data_perencanaan_pemda['link'];
+							}
+						}
+
+			$dokumen_perencanaan_pemda .= '
+						</ul>
+					</div>
+				</div>';
+
+			$halaman_perencanaan_pemda = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="halaman-perencanaan-pemda" style="margin: 0;">Pemerintah Daerah</h5>
+					<div class="esakip-body-tahun" data-id="halaman-perencanaan-pemda">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							$halaman_perencanaan_pemda .= $halaman_input_rpjpd_rpjmd;
+							$halaman_perencanaan_pemda .= $dokumen_perencanaan_pemda;
+
+							$set_html_pemda_perencanaan = get_option('sakip_menu_khusus_set_html_pemda_PERENCANAAN_' . $_GET['tahun']);
+							if (!empty($set_html_pemda_perencanaan)) {
+								$halaman_perencanaan_pemda .= do_shortcode(htmlspecialchars_decode($set_html_pemda_perencanaan));
+							}
+			$halaman_perencanaan_pemda .= '
+						</ul>
+					</div>
+				</div>';
+
+			$halaman_sakip_perencanaan_pemda = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="halaman-sakip-perencanaan-pemda" style="margin: 0;">PERENCANAAN</h5>
+					<div class="esakip-body-tahun" data-id="halaman-sakip-perencanaan-pemda">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							// if (
+							// 	in_array("admin_panrb", $user_meta->roles)
+							// 	|| in_array("admin_bappeda", $user_meta->roles)
+							// 	|| in_array("administrator", $user_meta->roles)
+							// ) {
+								$halaman_sakip_perencanaan_pemda .= $halaman_perencanaan_pemda;
+								$halaman_sakip_perencanaan_pemda .= $halaman_perencanaan_opd;
+								$halaman_sakip_perencanaan_pemda .= $laporan_pk_btn;
+							// }
+			$halaman_sakip_perencanaan_pemda .= '
+						</ul>
+					</div>
+				</div>';
+				
+			$dokumen_pengukuran_kinerja_opd = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="dokumen-pengukuran_kinerja-opd-' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
+					<div class="esakip-body-tahun" data-id="dokumen-pengukuran_kinerja-opd-' . $_GET['tahun'] . '">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							foreach ($cek_data_pengukuran_kinerja['perangkat_daerah'] as $data_pengukuran_kinerja_opd) {
+								if (!empty($data_pengukuran_kinerja_opd['link'])) {
+									$dokumen_pengukuran_kinerja_opd .= $data_pengukuran_kinerja_opd['link'];
+								}
+							}
+			$dokumen_pengukuran_kinerja_opd .= '
+						</ul>
+					</div>
+				</div>';
+
+			$halaman_pengukuran_kinerja_opd = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="halaman-pengukuran_kinerja-opd" style="margin: 0;">Perangkat Daerah</h5>
+					<div class="esakip-body-tahun" data-id="halaman-pengukuran_kinerja-opd">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							$halaman_pengukuran_kinerja_opd .= $dokumen_pengukuran_kinerja_opd;
+							$set_html_opd_pengukuran_kinerja = get_option('sakip_menu_khusus_set_html_opd_PENGUKURAN_KINERJA_' . $_GET['tahun']);
+							if (!empty($set_html_opd_pengukuran_kinerja)) {
+								$halaman_pengukuran_kinerja_opd .= do_shortcode(htmlspecialchars_decode($set_html_opd_pengukuran_kinerja));
+							}
+			$halaman_pengukuran_kinerja_opd .= '
+						</ul>
+					</div>
+				</div>';
+
+			$dokumen_pengukuran_kinerja_pemda = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="dokumen-pengukuran-kinerja-pemda' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
+					<div class="esakip-body-tahun" data-id="dokumen-pengukuran-kinerja-pemda' . $_GET['tahun'] . '">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							foreach ($cek_data_pengukuran_kinerja['pemerintah_daerah'] as $data_pengukuran_kinerja_pemda) {
+							if (!empty($data_pengukuran_kinerja_pemda['link'])) {
+								$dokumen_pengukuran_kinerja_pemda .= $data_pengukuran_kinerja_pemda['link'];
+							}
+						}
+			$dokumen_pengukuran_kinerja_pemda .= '
+						</ul>
+					</div>
+				</div>';
+
+			$halaman_pengukuran_kinerja_pemda = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="halaman-pengukuran-kinerja-pemda" style="margin: 0;">Pemerintah Daerah</h5>
+					<div class="esakip-body-tahun" data-id="halaman-pengukuran-kinerja-pemda">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							$halaman_pengukuran_kinerja_pemda .= $dokumen_pengukuran_kinerja_pemda;
+							$set_html_pemda_pengukuran_kinerja = get_option('sakip_menu_khusus_set_html_pemda_PENGUKURAN_KINERJA_' . $_GET['tahun']);
+							if (!empty($set_html_pemda_pengukuran_kinerja)) {
+								$halaman_pengukuran_kinerja_pemda .= do_shortcode(htmlspecialchars_decode($set_html_pemda_pengukuran_kinerja));
+							}
+			$halaman_pengukuran_kinerja_pemda .= '
+						</ul>
+					</div>
+				</div>';
+
+			$halaman_sakip_pengukuran_kinerja_pemda = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="halaman-sakip-pengukuran-kinerja-pemda" style="margin: 0;">PENGUKURAN KINERJA</h5>
+					<div class="esakip-body-tahun" data-id="halaman-sakip-pengukuran-kinerja-pemda">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							// if (
+							// 	in_array("admin_panrb", $user_meta->roles)
+							// 	|| in_array("admin_bappeda", $user_meta->roles)
+							// 	|| in_array("administrator", $user_meta->roles)
+							// ) {
+								$halaman_sakip_pengukuran_kinerja_pemda .= $halaman_pengukuran_kinerja_pemda;
+								$halaman_sakip_pengukuran_kinerja_pemda .= $halaman_pengukuran_kinerja_opd;
+							// }
+			$halaman_sakip_pengukuran_kinerja_pemda .= '
+						</ul>
+					</div>
+				</div>';
+
+			$dokumen_pelaporan_opd = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="dokumen-pelaporan-opd-' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
+					<div class="esakip-body-tahun" data-id="dokumen-pelaporan-opd-' . $_GET['tahun'] . '">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							foreach ($cek_data_pelaporan['perangkat_daerah'] as $data_pelaporan_opd) {
+								if (!empty($data_pelaporan_opd['link'])) {
+									$dokumen_pelaporan_opd .= $data_pelaporan_opd['link'];
+								}
+							}
+
+			$dokumen_pelaporan_opd .= '
+						</ul>
+					</div>
+				</div>';
+
+			$halaman_pelaporan_opd = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="halaman-pelaporan-opd" style="margin: 0;">Perangkat Daerah</h5>
+					<div class="esakip-body-tahun" data-id="halaman-pelaporan-opd">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							$halaman_pelaporan_opd .= $dokumen_pelaporan_opd;
+							$set_html_opd_pelaporan = get_option('sakip_menu_khusus_set_html_opd_PERENCANAAN_' . $_GET['tahun']);
+							if (!empty($set_html_opd_pelaporan)) {
+								$halaman_pelaporan_opd .= do_shortcode(htmlspecialchars_decode($set_html_opd_pelaporan));
+							}
+			$halaman_pelaporan_opd .= '
+						</ul>
+					</div>
+				</div>';
+
+			$dokumen_pelaporan_pemda = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="dokumen-pelaporan-pemda' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
+					<div class="esakip-body-tahun" data-id="dokumen-pelaporan-pemda' . $_GET['tahun'] . '">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+						foreach ($cek_data_pelaporan['pemerintah_daerah'] as $data_pelaporan_pemda) {
+							if (!empty($data_pelaporan_pemda['link'])) {
+								$dokumen_pelaporan_pemda .= $data_pelaporan_pemda['link'];
+							}
+						}
+
+			$dokumen_pelaporan_pemda .= '
+						</ul>
+					</div>
+				</div>';
+
+			$halaman_pelaporan_pemda = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="halaman-pelaporan-pemda" style="margin: 0;">Pemerintah Daerah</h5>
+					<div class="esakip-body-tahun" data-id="halaman-pelaporan-pemda">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							$halaman_pelaporan_pemda .= $dokumen_pelaporan_pemda;
+							$set_html_pemda_pelaporan = get_option('sakip_menu_khusus_set_html_pemda_PERENCANAAN_' . $_GET['tahun']);
+							if (!empty($set_html_pemda_pelaporan)) {
+								$halaman_pelaporan_pemda .= do_shortcode(htmlspecialchars_decode($set_html_pemda_pelaporan));
+							}
+			$halaman_pelaporan_pemda .= '
+						</ul>
+					</div>
+				</div>';
+
+			$halaman_sakip_pelaporan_pemda = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="halaman-sakip-pelaporan-pemda" style="margin: 0;">PELAPORAN</h5>
+					<div class="esakip-body-tahun" data-id="halaman-sakip-pelaporan-pemda">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							// if (
+							// 	in_array("admin_panrb", $user_meta->roles)
+							// 	|| in_array("admin_bappeda", $user_meta->roles)
+							// 	|| in_array("administrator", $user_meta->roles)
+							// ) {
+								$halaman_sakip_pelaporan_pemda .= $halaman_pelaporan_pemda;
+								$halaman_sakip_pelaporan_pemda .= $halaman_pelaporan_opd;
+							// }
+			$halaman_sakip_pelaporan_pemda .= '
+						</ul>
+					</div>
+				</div>';
+
+						$dokumen_evaluasi_opd = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="dokumen-evaluasi-opd-' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
+					<div class="esakip-body-tahun" data-id="dokumen-evaluasi-opd-' . $_GET['tahun'] . '">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							foreach ($cek_data_evaluasi['perangkat_daerah'] as $data_evaluasi_opd) {
+								if (!empty($data_evaluasi_opd['link'])) {
+									$dokumen_evaluasi_opd .= $data_evaluasi_opd['link'];
+								}
+							}
+
+			$dokumen_evaluasi_opd .= '
+						</ul>
+					</div>
+				</div>';
+
+			$halaman_evaluasi_opd = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="halaman-evaluasi-opd" style="margin: 0;">Perangkat Daerah</h5>
+					<div class="esakip-body-tahun" data-id="halaman-evaluasi-opd">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							$halaman_evaluasi_opd .= $dokumen_evaluasi_opd;
+							$set_html_opd_evaluasi = get_option('sakip_menu_khusus_set_html_opd_EVALUASI_' . $_GET['tahun']);
+							if (!empty($set_html_opd_evaluasi)) {
+								$halaman_evaluasi_opd .= do_shortcode(htmlspecialchars_decode($set_html_opd_evaluasi));
+							}
+			$halaman_evaluasi_opd .= '
+						</ul>
+					</div>
+				</div>';
+
+			$dokumen_evaluasi_pemda = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="dokumen-evaluasi-pemda' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
+					<div class="esakip-body-tahun" data-id="dokumen-evaluasi-pemda' . $_GET['tahun'] . '">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+						foreach ($cek_data_evaluasi['pemerintah_daerah'] as $data_evaluasi_pemda) {
+							if (!empty($data_evaluasi_pemda['link'])) {
+								$dokumen_evaluasi_pemda .= $data_evaluasi_pemda['link'];
+							}
+						}
+
+			$dokumen_evaluasi_pemda .= '
+						</ul>
+					</div>
+				</div>';
+
+			$halaman_evaluasi_pemda = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="halaman-evaluasi-pemda" style="margin: 0;">Pemerintah Daerah</h5>
+					<div class="esakip-body-tahun" data-id="halaman-evaluasi-pemda">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							$halaman_evaluasi_pemda .= $dokumen_evaluasi_pemda;
+							$set_html_pemda_evaluasi = get_option('sakip_menu_khusus_set_html_pemda_EVALUASI_' . $_GET['tahun']);
+							if (!empty($set_html_pemda_evaluasi)) {
+								$halaman_evaluasi_pemda .= do_shortcode(htmlspecialchars_decode($set_html_pemda_evaluasi));
+							}
+			$halaman_evaluasi_pemda .= '
+						</ul>
+					</div>
+				</div>';
+
+			$halaman_sakip_evaluasi_pemda = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="halaman-sakip-evaluasi-pemda" style="margin: 0;">EVALUASI</h5>
+					<div class="esakip-body-tahun" data-id="halaman-sakip-evaluasi-pemda">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							// if (
+							// 	in_array("admin_panrb", $user_meta->roles)
+							// 	|| in_array("admin_bappeda", $user_meta->roles)
+							// 	|| in_array("administrator", $user_meta->roles)
+							// ) {
+								$halaman_sakip_evaluasi_pemda .= $halaman_evaluasi_pemda;
+								$halaman_sakip_evaluasi_pemda .= $halaman_evaluasi_opd;
+							// }
+							$halaman_sakip_evaluasi_pemda .= $halaman_lke;
+			$halaman_sakip_evaluasi_pemda .= '
+						</ul>
+					</div>
+				</div>';
+
+			// <li>' . $halaman_sakip . '</li>
+			// <li>' . $halaman_sakip_opd . '</li>
+			// <li>' . $halaman_lke . '</li>
+			// <li>' . $halaman_laporan_pk_admin . '</li>
 			echo '
 				<div class="card custom-blur shadow-lg">
 					<div class="card-body">
 						<div class="text-center" style="margin: 0 0 10px 0;">' . $halaman_monitor_upload_dokumen . '</div>
         					<ul class="daftar-menu-sakip">
-								<li>' . $halaman_sakip . '</li>
-								<li>' . $halaman_sakip_opd . '</li>
-								<li>' . $halaman_lke . '</li>
-								<li>' . $halaman_laporan_pk_admin . '</li>';
-			if (
-				in_array("admin_panrb", $user_meta->roles)
-				|| in_array("admin_bappeda", $user_meta->roles)
-				|| in_array("administrator", $user_meta->roles)
-			) {
-				echo '<li>' . $halaman_input_rpjpd_rpjmd . '</li>';
-				echo '<li>' . $halaman_input_perangkat_daerah . '</li>';
-			}
-			echo '<li>' . $halaman_pengisian_rencana_aksi . '</li>';
-			echo '<li>' . $halaman_menu_jadwal_admin . '</li>';
+								<li>' . $halaman_sakip_perencanaan_pemda . '</li>
+								<li>' . $halaman_sakip_pengukuran_kinerja_pemda . '</li>
+								<li>' . $halaman_sakip_pelaporan_pemda . '</li>
+								<li>' . $halaman_sakip_evaluasi_pemda . '</li>
+								<li>' . $halaman_menu_jadwal_admin . '</li>';
 			echo '</ul>';
 			echo '</div></div>';
 
@@ -21431,6 +22190,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$lhe_akip_internal_skpd_detail = '';
 					$tl_lhe_akip_internal_skpd_detail = '';
 					$laporan_monev_renaksi_skpd_detail = '';
+					$periode_iku_skpd = '';
 	
 					$cek_menu_aktif = $wpdb->get_results($wpdb->prepare("
 						SELECT 
@@ -21562,6 +22322,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						if (!empty($cek_data_periode['esakip_renstra']) && $cek_data_periode['esakip_renstra']['active'] == 1) {
 							$periode_renstra_skpd .= '<li><a target="_blank" href="' . $renstra_skpd['url'] . '" class="btn btn-primary">' . $title_renstra . '</a></li>';
 						}
+
+						$iku_skpd = $this->functions->generatePage(array(
+							'nama_page' => 'IKU | ' . $jadwal_periode_item['id'],
+							'content' => '[dokumen_detail_iku id_jadwal=' . $jadwal_periode_item['id'] . ']',
+							'show_header' => 1,
+							'post_status' => 'private'
+						));
+						$title_iku = 'IKU | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+						$iku_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+	
+						$periode_iku_skpd .= '<li><a target="_blank" href="' . $iku_skpd['url'] . '" class="btn btn-primary">' . $title_iku . '</a></li>';
 	
 						$pohon_kinerja_skpd = $this->functions->generatePage(array(
 							'nama_page' => 'Pohon Kinerja dan Cascading | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai  . ' Perangkat Daerah',
@@ -21668,16 +22439,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$title_renja_wpsipd = 'RENJA / RKT (Rencana Kerja Tahunan)';
 
 					$periode_renja_wpsipd_opd .= '<li><a target="_blank" href="#" class="btn btn-primary">' . $title_renja_wpsipd . '</a></li>';
-					
-					$rfk_pengukuran_kinerja_wpsipd = $this->functions->generatePage(array(
-						'nama_page' => 'RFK-' . $_GET['tahun'],
-						'content' => '[ tahun=' . $_GET['tahun'] . ']',
-						'show_header' => 1,
-						'post_status' => 'private'
-					));
-
-					$title_rfk_wpsipd = 'RFK (Realisasi Fisik dan Keuangan)';
-					$periode_rfk_wpsipd_opd .= '<li><a target="_blank" href="#" class="btn btn-primary">' . $title_rfk_wpsipd . '</a></li>';
 
 					$halaman_input_iku = '
 					<div class="accordion">
@@ -21752,6 +22513,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$periode_renstra_skpd = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
 					}
 	
+					if (empty($periode_iku_skpd)) {
+						$periode_iku_skpd = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
+					}
+	
 					if (!empty($cek_data_perencanaan['perangkat_daerah']['RENSTRA']) && $cek_data_perencanaan['perangkat_daerah']['RENSTRA']['active'] == 1) {
 						$halaman_renstra_skpd = '
 							<div class="accordion">
@@ -21763,6 +22528,19 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								</div>
 							</div>';
 						$cek_data_perencanaan['perangkat_daerah']['RENSTRA']['link'] = $halaman_renstra_skpd;
+					}
+	
+					if (!empty($cek_data_perencanaan['perangkat_daerah']['IKU']) && $cek_data_perencanaan['perangkat_daerah']['IKU']['active'] == 1) {
+						$halaman_iku_skpd = '
+							<div class="accordion">
+								<h5 class="esakip-header-tahun" data-id="iku-skpd" style="margin: 0;">IKU (Indikator Kinerja Utama)</h5>
+								<div class="esakip-body-tahun" data-id="iku-skpd">
+									<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+										' . $periode_iku_skpd . '
+									</ul>
+								</div>
+							</div>';
+						$cek_data_perencanaan['perangkat_daerah']['IKU']['link'] = $halaman_iku_skpd;
 					}
 	
 					if (empty($periode_pohon_kinerja_skpd)) {
@@ -21794,20 +22572,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$renja_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 						$renja_skpd_detail .= '<li><a target="_blank" href="' . $renja_skpd['url'] . '" class="btn btn-primary">' . $title_renja . '</a></li>';
 						$cek_data_perencanaan['perangkat_daerah']['RENJA/RKT']['link'] = $renja_skpd_detail;
-					}
-	
-					if (!empty($cek_data_perencanaan['perangkat_daerah']['IKU']) && $cek_data_perencanaan['perangkat_daerah']['IKU']['active'] == 1) {
-						$iku_skpd = $this->functions->generatePage(array(
-							'nama_page' => 'IKU ' . $_GET['tahun'],
-							'content' => '[dokumen_detail_iku tahun=' . $_GET['tahun'] . ']',
-							'show_header' => 1,
-							'post_status' => 'private'
-						));
-	
-						$title_iku = 'IKU (Indikator Kinerja Utama)';
-						$iku_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-						$iku_skpd_detail .= '<li><a target="_blank" href="' . $iku_skpd['url'] . '" class="btn btn-primary">' . $title_iku . '</a></li>';
-						$cek_data_perencanaan['perangkat_daerah']['IKU']['link'] = $iku_skpd_detail;
 					}
 	
 					if (!empty($cek_data_perencanaan['perangkat_daerah']['SKP']) && $cek_data_perencanaan['perangkat_daerah']['SKP']['active'] == 1) {
@@ -21862,7 +22626,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$cek_data_pelaporan['perangkat_daerah']['Laporan Kinerja']['link'] = $laporan_kinerja_skpd_detail;
 					}
 	
-					if (!empty($cek_data['perangkat_daerah']['Evaluasi Internal']) && $cek_data['perangkat_daerah']['Evaluasi Internal']['active'] == 1) {
+					if (!empty($cek_data_evaluasi['perangkat_daerah']['Evaluasi Internal']) && $cek_data_evaluasi['perangkat_daerah']['Evaluasi Internal']['active'] == 1) {
 						$evaluasi_internal_skpd = $this->functions->generatePage(array(
 							'nama_page' => 'Evaluasi Internal ' . $_GET['tahun'],
 							'content' => '[dokumen_detail_evaluasi_internal tahun=' . $_GET['tahun'] . ']',
@@ -21872,7 +22636,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$title_evaluasi_internal_skpd = 'Evaluasi Internal';
 						$evaluasi_internal_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 						$evaluasi_internal_skpd_detail .= '<li><a href="' . $evaluasi_internal_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $title_evaluasi_internal_skpd . '</a></li>';
-						$cek_data['perangkat_daerah']['Evaluasi Internal']['link'] = $evaluasi_internal_skpd_detail;
+						$cek_data_evaluasi['perangkat_daerah']['Evaluasi Internal']['link'] = $evaluasi_internal_skpd_detail;
 					}
 	
 					if (!empty($cek_data_pelaporan['perangkat_daerah']['Dokumen Lainnya']) && $cek_data_pelaporan['perangkat_daerah']['Dokumen Lainnya']['active'] == 1) {
@@ -27303,10 +28067,19 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                         AND id_jadwal=%d
                                         AND id_unik in ($kd_all_prog)
                                 ", $_POST['id_jadwal']), ARRAY_A);
+                                $data_tujuan_existing = $wpdb->get_results($wpdb->prepare("
+                                    SELECT 
+                                        *
+                                    from esakip_rpd_tujuan 
+                                    where id=%d
+                                        AND active=1
+                                ", $tujuan['id_tujuan_murni']), ARRAY_A);
 								$data_all[$tujuan['id_unik']] = array(
 									'id' => $tujuan['id'],
 									'id_unik' => $tujuan['id_unik'],
-									'nama' => $tujuan['tujuan_teks'],
+									'tujuan_sebelum' => !empty($data_tujuan_existing) ? $data_tujuan_existing[0]['tujuan_teks'] : '',
+    								'nama' => $tujuan['tujuan_teks'],
+									'id_tujuan_murni' => $tujuan['id_tujuan_murni'],
 									'id_jadwal_rpjpd' => $id_jadwal_rpjpd,
 									'pagu_akumulasi_1' => $pagu['pagu_akumulasi_1'],
 									'pagu_akumulasi_2' => $pagu['pagu_akumulasi_2'],
@@ -27393,10 +28166,20 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                         AND id_jadwal=%d
                                         AND id_unik in ($kd_all_prog)
                                 ", $_POST['id_jadwal']), ARRAY_A);
+
+                                $data_sasaran_existing = $wpdb->get_results($wpdb->prepare("
+                                    SELECT 
+                                        *
+                                    from esakip_rpd_sasaran 
+                                    where id=%d
+                                        AND active=1
+                                ", $sasaran['id_sasaran_murni']), ARRAY_A);
 								$data_all[$sasaran['id_unik']] = array(
 									'id' => $sasaran['id'],
 									'id_unik' => $sasaran['id_unik'],
 									'nama' => $sasaran['sasaran_teks'],
+									'id_sasaran_murni' => $sasaran['id_sasaran_murni'],
+									'sasaran_sebelum' => !empty($data_sasaran_existing) ? $data_sasaran_existing[0]['sasaran_teks'] : '',
 									'pagu_akumulasi_1' => $pagu['pagu_akumulasi_1'],
 									'pagu_akumulasi_2' => $pagu['pagu_akumulasi_2'],
 									'pagu_akumulasi_3' => $pagu['pagu_akumulasi_3'],
@@ -27490,7 +28273,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                     id_isu,
                                     tujuan_teks,
                                     id_unik,
-                                    no_urut
+                                    no_urut,
+                                    id_tujuan_murni
                                 from $table
                                 where id_unik=%s
                                 	AND id_jadwal=%d
@@ -27508,6 +28292,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'id_isu' => $tujuan[0]['id_isu'],
 							'tujuan_teks' => $tujuan[0]['tujuan_teks'],
 							'id_unik' => $tujuan[0]['id_unik'],
+							'id_tujuan_murni' => $tujuan[0]['id_tujuan_murni'],
 							'indikator_teks' => $_POST['data'],
 							'target_awal' => $_POST['vol_awal'],
 							'target_1' => $_POST['vol_1'],
@@ -27556,6 +28341,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'no_urut'   => $_POST['no_urut'],
 							'catatan_teks_tujuan'   => $_POST['catatan_teks_tujuan'],
 							'id_jadwal'   => $_POST['id_jadwal'],
+							'id_tujuan_murni'   => $_POST['id_tujuan_sebelum'],
 							'active' => 1
 						);
 						if (!empty($_POST['id'])) {
@@ -27609,6 +28395,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'kode_tujuan' => $sasaran[0]['kode_tujuan'],
 							'sasaran_teks' => $sasaran[0]['sasaran_teks'],
 							'id_unik' => $sasaran[0]['id_unik'],
+							'id_sasaran_murni' => $sasaran[0]['id_sasaran_murni'],
 							'indikator_teks' => $_POST['data'],
 							'target_awal' => $_POST['vol_awal'],
 							'target_1' => $_POST['vol_1'],
@@ -27653,6 +28440,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$data = array(
 							'kode_tujuan' => $_POST['id_tujuan'],
 							'sasaran_teks' => $_POST['data'],
+							'id_sasaran_murni'   => $_POST['id_sasaran_sebelum'],
 							'update_at' => date('Y-m-d H:i:s'),
 							'sasaran_no_urut' => $_POST['sasaran_no_urut'],
 							'sasaran_catatan' => $_POST['sasaran_catatan'],
@@ -31701,12 +32489,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		];
 	
 		// Ambil data tujuan tanpa id_unik_indikator
-		$get_tujuan = $wpdb->get_results("
+		$get_tujuan = $wpdb->get_results(
+			$wpdb->prepare("
 				SELECT * 
 				FROM esakip_rpd_tujuan 
-				WHERE id_unik_indikator IS NULL 
+				WHERE id_unik_indikator IS NULL
+				  AND id_jadwal = %d
 				  AND active = 1
-			", ARRAY_A
+			", $_POST['id_jadwal']), ARRAY_A
 		);
 	
 		if (!empty($get_tujuan)) {
@@ -31780,52 +32570,29 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 	
-	function get_rpjmd_by_tahun($tahun_anggaran) 
-	{
-		global $wpdb;
-
-		$id_jadwal_rpjmd = $wpdb->get_var(
-			$wpdb->prepare("
-				SELECT 
-					id_jadwal_rpjmd
-				FROM esakip_pengaturan_upload_dokumen
-				WHERE tahun_anggaran = %d
-				  AND active = 1
-			", $tahun_anggaran)
-		);
-
-		$jadwal_rpjmd = $wpdb->get_row(
-			$wpdb->prepare("
-				SELECT 
-					id,
-					nama_jadwal,
-					nama_jadwal_renstra,
-					tahun_anggaran,
-					lama_pelaksanaan,
-					tahun_selesai_anggaran
-				FROM esakip_data_jadwal
-				WHERE id = %d
-				AND status != 0
-			", $id_jadwal_rpjmd),
-			ARRAY_A
-		);
-
-		return $jadwal_rpjmd;
-	}
-
-	function get_renstra_by_rpjmd_tahun($id_jadwal_rpjmd, $tahun_anggaran) 
+	function get_rpjmd_setting_by_tahun_anggaran($tahun_anggaran) 
 	{
 		global $wpdb;
 
 		$data = $wpdb->get_row(
-			$wpdb->prepare('
-				SELECT
-					*
-				FROM esakip_pengaturan_rencana_aksi
-				WHERE id_jadwal = %d
-				  AND tahun_anggaran = %d
-				  AND active = 1
-			', $id_jadwal_rpjmd, $tahun_anggaran),
+			$wpdb->prepare("
+				SELECT 
+					j.id,
+					j.nama_jadwal,
+					j.nama_jadwal_renstra,
+					j.tahun_anggaran,
+					j.lama_pelaksanaan,
+					j.tahun_selesai_anggaran,
+					j.jenis_jadwal_khusus,
+					u.id_jadwal_wp_sipd
+				FROM esakip_pengaturan_upload_dokumen u
+				INNER JOIN esakip_data_jadwal j
+						ON u.id_jadwal_rpjmd = j.id
+				WHERE u.tahun_anggaran = %d
+				  AND u.active = 1
+				  AND j.status != 0
+				LIMIT 1
+			", $tahun_anggaran),
 			ARRAY_A
 		);
 

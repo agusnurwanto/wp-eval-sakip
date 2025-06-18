@@ -205,40 +205,9 @@ $status_api_esr = get_option('_crb_api_esr_status');
     </div>
 </div>
 
-<!-- Modal Tahun -->
-<!-- <div class="modal fade" id="tahunModal" tabindex="-1" role="dialog" aria-labelledby="tahunModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="tahunModalLabel">Pilih Tahun Anggaran</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="tahunForm">
-                    <div class="form-group">
-                        <label for="tahunAnggaran">Tahun Anggaran:</label>
-                        <select class="form-control" id="tahunAnggaran" name="tahunAnggaran">
-                            <?php echo $tahun; ?>
-                        </select>
-                        <input type="hidden" id="idDokumen" value="">
-                    </div>
-                    <button type="submit" class="btn btn-primary" onclick="submit_tahun_dokumen(); return false">Simpan</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div> -->
-
-<!-- Tahun Tabel -->
-<div id="tahunContainer" class="container-md">
-</div>
-
 <script>
     jQuery(document).ready(function() {
         getTableDokumen();
-        // getTableTahun();
         jQuery("#fileUpload").on('change', function() {
             var id_dokumen = jQuery('#idDokumen').val();
             if (id_dokumen == '') {
@@ -298,34 +267,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
         });
     }
 
-    // function getTableTahun() {
-    //     jQuery('#wrap-loading').show();
-    //     jQuery.ajax({
-    //         url: esakip.url,
-    //         type: 'POST',
-    //         data: {
-    //             action: 'get_table_tahun_dokumen',
-    //             api_key: esakip.api_key,
-    //             tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
-    //         },
-    //         dataType: 'json',
-    //         success: function(response) {
-    //             jQuery('#wrap-loading').hide();
-    //             console.log(response);
-    //             if (response.status === 'success') {
-    //                 jQuery('#tahunContainer').html(response.data);
-    //             } else {
-    //                 alert(response.message);
-    //             }
-    //         },
-    //         error: function(xhr, status, error) {
-    //             jQuery('#wrap-loading').hide();
-    //             console.error(xhr.responseText);
-    //             alert('Terjadi kesalahan saat memuat tabel!');
-    //         }
-    //     });
-    // }
-
     function tambah_dokumen() {
         jQuery("#editModalLabel").hide();
         jQuery("#uploadModalLabel").show();
@@ -336,54 +277,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
         jQuery('#fileUploadExisting').removeAttr('href').empty();
         jQuery("#uploadModal").modal('show');
     }
-
-    // function set_tahun_dokumen(id) {
-    //     jQuery('#tahunModal').modal('show');
-    //     jQuery('#idDokumen').val(id);
-    // }
-
-    // function submit_tahun_dokumen() {
-    //     let id = jQuery("#idDokumen").val();
-    //     if (id == '') {
-    //         return alert('id tidak boleh kosong');
-    //     }
-
-    //     let tahunAnggaran = jQuery("#tahunAnggaran").val();
-    //     if (tahunAnggaran == '') {
-    //         return alert('Tahun Anggaran tidak boleh kosong');
-    //     }
-
-    //     jQuery('#wrap-loading').show();
-    //     jQuery.ajax({
-    //         url: esakip.url,
-    //         type: 'POST',
-    //         data: {
-    //             action: 'submit_tahun_dokumen',
-    //             id: id,
-    //             tahunAnggaran: tahunAnggaran,
-    //             api_key: esakip.api_key,
-	// 			tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
-    //         },
-    //         dataType: 'json',
-    //         success: function(response) {
-    //             console.log(response);
-    //             jQuery('#wrap-loading').hide();
-    //             if (response.status === 'success') {
-    //                 alert(response.message);
-    //                 jQuery('#tahunModal').modal('hide');
-    //                 getTableTahun();
-    //                 getTableDokumen();
-    //             } else {
-    //                 alert(response.message);
-    //             }
-    //         },
-    //         error: function(xhr, status, error) {
-    //             jQuery('#wrap-loading').hide();
-    //             console.error(xhr.responseText);
-    //             alert('Terjadi kesalahan saat mengirim data!');
-    //         }
-    //     });
-    // }
 
     function edit_dokumen_pohon_kinerja(id) {
         jQuery('#wrap-loading').show();
@@ -422,7 +315,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
             }
         });
     }
-
 
     function submit_dokumen(that) {
         let id_dokumen = jQuery("#idDokumen").val();
@@ -483,7 +375,6 @@ $status_api_esr = get_option('_crb_api_esr_status');
         let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/'; ?>' + dokumen;
         window.open(url, '_blank');
     }
-
 
     function hapus_dokumen_pohon_kinerja(id) {
         if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
@@ -556,37 +447,5 @@ $status_api_esr = get_option('_crb_api_esr_status');
             alert('Checklist ESR belum dipilih!'); 
         }
     }
-    // function hapus_tahun_dokumen_tipe(id) {
-    //     if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
-    //         return;
-    //     }
-    //     jQuery('#wrap-loading').show();
-    //     jQuery.ajax({
-    //         url: esakip.url,
-    //         type: 'POST',
-    //         data: {
-    //             action: 'hapus_tahun_dokumen_tipe',
-    //             api_key: esakip.api_key,
-    //             tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
-    //             id: id
-    //         },
-    //         dataType: 'json',
-    //         success: function(response) {
-    //             console.log(response);
-    //             jQuery('#wrap-loading').hide();
-    //             if (response.status === 'success') {
-    //                 alert(response.message);
-    //                 getTableDokumen();
-    //                 getTableTahun();
-    //             } else {
-    //                 alert(response.message);
-    //             }
-    //         },
-    //         error: function(xhr, status, error) {
-    //             console.error(xhr.responseText);
-    //             jQuery('#wrap-loading').hide();
-    //             alert('Terjadi kesalahan saat mengirim data!');
-    //         }
-    //     });
-    // }
+
 </script>
