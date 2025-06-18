@@ -125,6 +125,7 @@ class Wp_Eval_Sakip_Admin
 		Container::make('theme_options', __('Pengaturan Perangkat Daerah'))
 			->set_page_parent($basic_options_container)
 			->add_tab('🏢 Perangkat Daerah', $this->generate_fields_perangkat_daerah_options())
+			->add_tab('🏦 Lembaga Lainnya', $this->generate_fields_lembaga_lainnya_options())
 			->add_tab('🗃️ Mapping Jenis Dokumen', $this->generate_fields_mapping_jenis_dokumen_options());
 
 		Container::make('theme_options', __('Jadwal'))
@@ -2457,6 +2458,47 @@ class Wp_Eval_Sakip_Admin
 
 		return [
 			Field::make('html', 'crb_mapping_jenis_dokumen_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_lembaga_lainnya_options()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_pengaturan_perangkat_daerah.php') {
+			return array();
+		}
+
+		$get_tahun = $this->get_tahun();
+		$html = '';
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $index => $v) {
+				$halaman_lembaga_lainnya = $this->functions->generatePage(array(
+					'nama_page' 	=> 'Halaman Lembaga Lainnya Tahun Anggaran | ' . $v['tahun_anggaran'],
+					'content' 		=> '[halaman_lembaga_lainnya tahun_anggaran="' . $v['tahun_anggaran'] . '"]',
+					'show_header' 	=> 1,
+					'no_key' 		=> 1,
+					'post_status' 	=> 'private'
+				));
+
+				$html .= '
+					<div class="accordion">
+						<h3 class="esakip-header-tahun" tahun="' . ($index + 1) . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+						<div class="esakip-body-tahun" tahun="' . ($index + 1) . '">
+							<ul style="margin-left: 20px;">
+								<li><a target="_blank" href="' . $halaman_lembaga_lainnya['url'] . '">' . $halaman_lembaga_lainnya['title'] . '</a></li>
+							</ul>
+						</div>
+					</div>';
+			}
+		} else {
+			$html = '
+					<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+						Tahun Anggaran tidak tersedia
+					</span>';
+		}
+
+		return [
+			Field::make('html', 'crb_lembaga_lainnya_menu')
 				->set_html($html)
 		];
 	}

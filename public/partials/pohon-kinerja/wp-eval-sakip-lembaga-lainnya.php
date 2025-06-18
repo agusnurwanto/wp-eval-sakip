@@ -21,11 +21,6 @@ $all_lembaga = $wpdb->get_results(
     ARRAY_A
 );
 
-
-if (empty($all_lembaga)) {
-    return "<p><strong>Tidak ada data lembaga</strong> untuk tahun anggaran {$input['tahun_anggaran']}.</p>";
-}
-
 $html = '
         <div style="text-align: center; margin-bottom: 20px;" >
             <h2 style="
@@ -64,16 +59,20 @@ $html .= '<th style="width: 150px; padding: 8px; text-align: center;">Aksi</th>'
 $html .= '</tr></thead><tbody>';
 
 $no = 1;
-foreach ($all_lembaga as $baris) {
-    $btn = '';
-    $btn .= '<button class="btn btn-warning m-1" onclick="handleEdit(' . $baris['id'] . ')"><span class="dashicons dashicons-edit"></span></button>';
-    $btn .= '<button class="btn btn-danger m-1" onclick="handleDelete(' . $baris['id'] . ')"><span class="dashicons dashicons-trash"></span></button>';
-
-    $html .= '<tr>';
-    $html .= '<td style="padding: 8px 12px 8px 16px; text-align: center;">' . $no++ . '</td>';
-    $html .= '<td style="width: 800px; padding: 8px;">' . esc_html($baris['nama_lembaga']) . '</td>';
-    $html .= '<td class="text-center">' . $btn . '</td>'; //untuk aksi
-    $html .= '</tr>';
+if (!empty($all_lembaga)) {
+    foreach ($all_lembaga as $baris) {
+        $btn = '';
+        $btn .= '<button class="btn btn-warning m-1" onclick="handleEdit(' . $baris['id'] . ')"><span class="dashicons dashicons-edit"></span></button>';
+        $btn .= '<button class="btn btn-danger m-1" onclick="handleDelete(' . $baris['id'] . ')"><span class="dashicons dashicons-trash"></span></button>';
+    
+        $html .= '<tr>';
+        $html .= '<td style="padding: 8px 12px 8px 16px; text-align: center;">' . $no++ . '</td>';
+        $html .= '<td style="width: 800px; padding: 8px;">' . esc_html($baris['nama_lembaga']) . '</td>';
+        $html .= '<td class="text-center">' . $btn . '</td>'; //untuk aksi
+        $html .= '</tr>';
+    }
+} else {
+    $html .= '<tr><td colspan="3" class="text-center">tidak ada data tersedia. </td></tr>';
 }
 
 $html .= '</tbody></table>';
