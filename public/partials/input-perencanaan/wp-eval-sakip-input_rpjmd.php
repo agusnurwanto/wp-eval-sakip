@@ -780,6 +780,8 @@ $data_sasaran_existing = $wpdb->get_results($wpdb->prepare('
         *
     FROM esakip_rpd_sasaran
     WHERE id_jadwal=%d
+        AND id_unik_indikator IS NULL
+        AND indikator_teks IS NULL
         AND active=1
 ', $id_jadwal_murni), ARRAY_A);
 // print_r($data_sasaran_existing); die($wpdb->last_query);
