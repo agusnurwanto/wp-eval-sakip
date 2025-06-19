@@ -3726,17 +3726,17 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							}
 						}
 
-						$html .= '<td class="text-left atas kanan bawah kiri">' . $v['label_sasaran'] . '</td>';
-						$html .= '<td class="text-left atas kanan bawah kiri">' . $indikator . '</td>';
-						$html .= '<td class="text-left atas kanan bawah kiri">' . wp_kses_post($v['formulasi']) . '</td>';
-						$html .= '<td class="text-left atas kanan bawah kiri">' . $v['sumber_data'] . '</td>';
-						$html .= '<td class="text-left atas kanan bawah kiri">' . $v['penanggung_jawab'] . '</td>';
-						$html .= '<td class="text-left atas kanan bawah kiri">' . $v['satuan'] . '</td>';
+						$html .= '<td class="text-left atas kanan bawah kiri" style="vertical-align: middle;">' . $v['label_sasaran'] . '</td>';
+						$html .= '<td class="text-left atas kanan bawah kiri" style="vertical-align: middle;">' . $indikator . '</td>';
+						$html .= '<td class="text-left atas kanan bawah kiri" style="vertical-align: middle;">' . wp_kses_post($v['formulasi']) . '</td>';
+						$html .= '<td class="text-left atas kanan bawah kiri" style="vertical-align: middle;">' . $v['sumber_data'] . '</td>';
+						$html .= '<td class="text-left atas kanan bawah kiri" style="vertical-align: middle;">' . $v['penanggung_jawab'] . '</td>';
+						$html .= '<td class="text-left atas kanan bawah kiri" style="vertical-align: middle;">' . $v['satuan'] . '</td>';
 
 						for ($i = 1; $i <= $lama_pelaksanaan; $i++) {
 							$key = 'target_' . $i;
 							$target = !empty($v[$key]) ? $v[$key] : 0;
-							$html .= '<td class="text-center atas kanan bawah kiri">' . $target . '</td>';
+							$html .= '<td class="text-center atas kanan bawah kiri" style="vertical-align: middle;">' . $target . '</td>';
 						}
 
 						$btn = '<div class="btn-action-group">';
@@ -3744,7 +3744,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_iku(\'' . $v['id'] . '\'); return false;" title="Hapus IKU"><span class="dashicons dashicons-trash"></span></button>';
 						$btn .= '</div>';
 
-						$html .= "<td class='text-center atas kanan bawah kiri hide-excel'>" . $btn . "</td>";
+						$html .= "<td class='text-center atas kanan bawah kiri hide-excel' style='vertical-align: middle;'>" . $btn . "</td>";
 						$html .= '</tr>';
 					}
 				}

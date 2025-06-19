@@ -3319,7 +3319,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 	                    $tbody .= "<tr>";
 	                    $tbody .= "<td class='text-left'><b>" . $counter++ . "</b></td>";
-	                    $tbody .= "<td class='text-left' colspan='2'><b>" . $kuesioner['nama_kuesioner'] . "</b></td>";
+	                    $tbody .= "<td class='text-left' colspan='2' style='vertical-align: middle;'><b>" . $kuesioner['nama_kuesioner'] . "</b></td>";
 	                    $tbody .= "<td class='text-left'>".$kuesioner['deskripsi']."</td>";
 	                    $tbody .= "<td class='text-center'></td>";
 	                    $tbody .= "<td class='text-center'></td>";
@@ -3350,7 +3350,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 	                            $tbody .= "<td class='text-left' style='vertical-align: middle;'></td>";
 	                            $tbody .= "<td class='text-left' style='vertical-align: middle;'><b>" . $counter2++ . "</b></td>";
-	                            $tbody .= "<td class='text-left'>" . $kuesioner_detail['indikator'] . "</td>";
+	                            $tbody .= "<td class='text-left' style='vertical-align: middle;'>" . $kuesioner_detail['indikator'] . "</td>";
 	                            $tbody .= "<td></td>";
 
 	                            if ($kuesioner_detail['level'] == 1) {
@@ -3368,7 +3368,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						        }
 						        $tbody .= "<td class='text-center'>" . $level . "</td>";
 
-	                            $tbody .= "<td class='text-left'>" . nl2br($kuesioner_detail['penjelasan']) . "</td>";
+	                            $tbody .= "<td class='text-left' style='vertical-align: middle;'>" . nl2br($kuesioner_detail['penjelasan']) . "</td>";
 	                            $tbody .= "<td class='text-left'>" . nl2br($kuesioner_detail['jenis_bukti_dukung']) . "</td>";
 	                            $tbody .= "<td class='text-center' style='vertical-align: middle;'>" . $btn . "</td>";
 
@@ -3897,6 +3897,129 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						}
 					}
 				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+	public function generate_data_mendagri()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil generate data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+
+				$json_path = ESAKIP_PLUGIN_URL . 'public/media/input_kuesioner_mendagri.json';
+				if (empty($json_path)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Json tidak ditemukan!';
+				}
+
+				$json_data = file_get_contents($json_path);
+				$json_kuesioner = json_decode($json_data, true);
+				if (!is_array($json_kuesioner)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Format Json tidak valid!';
+				}
+
+				$table_kuesioner = 'esakip_kuesioner_mendagri';
+				$table_kuesioner_detail = 'esakip_kuesioner_mendagri_detail';
+
+				foreach ($json_kuesioner as $data_kuesioner) {
+					$k = $data_kuesioner['kuesioner'];
+
+					$get_data_kuesioner = $wpdb->get_row($wpdb->prepare("
+						SELECT 
+							id 
+						FROM $table_kuesioner 
+						WHERE nama_kuesioner = %s 
+								AND tahun_anggaran = %d
+						", $k['nama'], $tahun_anggaran
+					));
+
+					$data = array(
+						'nama_kuesioner' => $k['nama'],
+						'nomor_urut' => $k['nomor_urut'],
+						'deskripsi' => $k['deskripsi'],
+						'tahun_anggaran' => $tahun_anggaran,
+						'active' => 1,
+						'update_at' => current_time('mysql')
+					);
+
+					if ($get_data_kuesioner) {
+						$wpdb->update(
+							$table_kuesioner,
+							$data,
+							array('id' => $get_data_kuesioner->id)
+						);
+						$id_kuesioner = $get_data_kuesioner->id;
+					} else {
+						$data['create_at'] = current_time('mysql');
+						
+						$wpdb->insert($table_kuesioner, $data);
+						$id_kuesioner = $wpdb->insert_id;
+					}
+
+					if (!$id_kuesioner) {
+						continue;
+					}
+
+
+					foreach ($k['soal'] as $soal) {
+						$get_data_kuesioner_detail = $wpdb->get_row($wpdb->prepare("
+							SELECT 
+								id 
+							FROM $table_kuesioner_detail 
+							WHERE id_kuesioner = %d 
+								AND indikator = %s 
+								AND level = %s
+							",$id_kuesioner, $soal['indikator'], $soal['level']
+						));
+
+
+						$data = array(
+							'id_kuesioner' => $id_kuesioner,
+							'indikator' => $soal['indikator'],
+							'level' => $soal['level'],
+							'penjelasan' => $soal['penjelasan'],
+							'jenis_bukti_dukung' => str_replace("\\n", "\n", $soal['bukti_dukung']),
+							'tahun_anggaran' => $tahun_anggaran,
+							'active' => 1
+						);
+
+						if ($get_data_kuesioner_detail) {
+							$wpdb->update(
+								$table_kuesioner_detail,
+								$data,
+								array('id' => $get_data_kuesioner_detail->id)
+							);
+						} else {
+							$wpdb->insert($table_kuesioner_detail, $data);
+						}
+					}
+
+				}
+
 			} else {
 				$ret = array(
 					'status' => 'error',
