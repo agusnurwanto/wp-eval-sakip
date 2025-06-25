@@ -65,11 +65,12 @@ if (!empty($all_lembaga)) {
         $btn .= '<button class="btn btn-warning m-1" onclick="handleEdit(' . $baris['id'] . ')"><span class="dashicons dashicons-edit"></span></button>';
         $btn .= '<button class="btn btn-danger m-1" onclick="handleDelete(' . $baris['id'] . ')"><span class="dashicons dashicons-trash"></span></button>';
     
-        $html .= '<tr>';
-        $html .= '<td style="padding: 8px 12px 8px 16px; text-align: center;">' . $no++ . '</td>';
-        $html .= '<td style="width: 800px; padding: 8px;">' . esc_html($baris['nama_lembaga']) . '</td>';
-        $html .= '<td class="text-center">' . $btn . '</td>'; //untuk aksi
-        $html .= '</tr>';
+        $html .= '
+            <tr>
+                <td style="padding: 8px 12px 8px 16px; text-align: center;">' . $no++ . '</td>
+                <td style="width: 800px; padding: 8px;">' . esc_html($baris['nama_lembaga']) . '</td>
+                <td class="text-center">' . $btn . '</td>
+            </tr>';
     }
 } else {
     $html .= '<tr><td colspan="3" class="text-center">tidak ada data tersedia. </td></tr>';
