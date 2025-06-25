@@ -2896,7 +2896,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         }else if(id == 'kegiatan'){
             id_html = 'cascading-renstra-kegiatan';
             label = 'Kegiatan';
-            onchange = "get_cascading_input_rencana_pagu('sub-kegiatan')";
+            onchange = "get_cascading_input_rencana_pagu('sub_kegiatan')";
         }else if(id == 'sub-kegiatan'){
             id_html = 'cascading-renstra-sub-kegiatan';
             label = 'Sub Kegiatan';
@@ -3064,6 +3064,13 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                 let html_setting_input_rencana_pagu = '';
                 if(tipe != 4){
                     var hide = 'style="display:none"';
+
+                    // ketika tipe 1, masih undefined
+                    if(typeof cek_parent_global == 'undefined'){
+                        window.cek_parent_global = {
+                            input_pagu: 0
+                        };
+                    }
 
                     // jika parent rhk tidak ada yang input pagu maka checklist input pagu ditampilkan
                     if(cek_parent_global.input_pagu == 0){
