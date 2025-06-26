@@ -1328,6 +1328,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$_POST['id'] = $ret['data']['id_renaksi'];
 					$cek_pagu = $this->cek_validasi_input_rencana_pagu(1);
 					$ret['data']['total_pagu'] = $cek_pagu['rencana_pagu'];
+					$ret['data']['cek_pagu'] = $cek_pagu;
 				}
 			} else {
 				$ret = array(
@@ -6492,6 +6493,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 	function get_rencana_pagu_rhk($opsi)
 	{
+		// jika level rhk adalah yang terkahir maka tidak perlu cek rhk child
+		if($opsi['level'] == 4){
+			return $opsi;
+		}
+
 		global $wpdb;
 		$ids = implode(',', $opsi['ids']);
 		$opsi['data_ind'] = array();
@@ -6852,7 +6858,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				}
 			}
 		}
-		
+
 		// echo '<pre>'; print_r($data_rhk_child); print_r($opsi); echo '</pre>'; die();
 		return $opsi;
 	}
