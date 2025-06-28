@@ -99,6 +99,7 @@ $view_kinerja_pokin_pemda = $this->functions->generatePage(array(
 ));
 
 $data_temp= [];
+$show_nama_skpd = '';
 if(!empty($data_all['data'])){
 
 	foreach ($data_all['data'] as $keylevel1 => $level_1) {
