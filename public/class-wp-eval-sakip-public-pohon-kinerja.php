@@ -1307,7 +1307,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							'label_indikator_kinerja' => trim($input['indikator_label']),
 							'parent' 				  => $input['parent'],
 							'level' 				  => $input['level'],
-							'id_jadwal' 			  => $input['id_jadwal'],
+							'id_jadwal' 			  => $_POST['id_jadwal'],
 							'nomor_urut' 			  => $input['nomor_urut'],
 							'active' 				  => 1
 						]);
@@ -1316,7 +1316,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							'label_indikator_kinerja' => trim($input['indikator_label']),
 							'parent' 				  => $input['parent'],
 							'level' 				  => $input['level'],
-							'id_jadwal' 			  => $input['id_jadwal'],
+							'id_jadwal' 			  => $_POST['id_jadwal'],
 							'nomor_urut' 			  => $input['nomor_urut'],
 							'active' 				  => 1,
 							'id_skpd' 				  => $id_skpd
