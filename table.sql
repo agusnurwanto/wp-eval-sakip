@@ -2316,3 +2316,20 @@ CREATE TABLE esakip_kuesioner_mendagri_detail (
   KEY `tahun_anggaran` (`tahun_anggaran`),
   KEY `active` (`active`)
 );
+
+CREATE TABLE esakip_dokumen_kuesioner (
+  `id` int(11) NOT NULL auto_increment,
+  `opd` varchar(255) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `dokumen` varchar(255) DEFAULT NULL,
+  `keterangan` longtext DEFAULT NULL,
+  `tanggal_upload` varchar(50) DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp,
+  `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  PRIMARY KEY(id),
+  KEY `id_skpd` (`id_skpd`),
+  KEY `tahun_anggaran` (`tahun_anggaran`),
+  KEY `active` (`active`)
+);

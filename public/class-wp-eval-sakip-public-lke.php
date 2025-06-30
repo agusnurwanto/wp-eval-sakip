@@ -85,6 +85,15 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/wp-eval-sakip-input-kuesioner-mendagri.php';
 	}
 
+	public function list_kuesioner_dokumen($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-list_dokumen_kuesioner.php';
+	}
+
 	public function get_table_skpd_pengisian_lke()
 	{
 		global $wpdb;
