@@ -159,8 +159,14 @@ if (
 
 //JIKA PIHAK KEDUA BUKAN KEPALA DAERAH
 if (empty($data_atasan)) {
-    if ($data_pegawai_1['tipe_pegawai_id'] == 11) {
-        //JIKA PIHAK PERTAMA KEPALA (BUKAN KEPALA SKPD)
+    //JIKA PIHAK PERTAMA KEPALA (BUKAN KEPALA SKPD)
+    if (
+        $data_pegawai_1['tipe_pegawai_id'] == 11
+        || (
+            trim($data_pegawai_1['jabatan']) == 'KEPALA'
+            && $data_pegawai_1['plt_plh'] == 1
+        )
+    ) {
         $satker_id_atasan = substr($data_pegawai_1['satker_id'], 0, -2);
         $data_atasan = $wpdb->get_row(
             $wpdb->prepare("
@@ -177,6 +183,25 @@ if (empty($data_atasan)) {
             ", $satker_id_atasan, 11),
             ARRAY_A
         );
+
+        // cek ulang data atasan jika kosong where jabatan=KEPALA untuk jenis kepala yang PLT
+        if(empty($data_atasan)){
+            $data_atasan = $wpdb->get_row(
+                $wpdb->prepare("
+                    SELECT
+                        p.*,
+                        ds.nama AS nama_bidang
+                    FROM esakip_data_pegawai_simpeg p
+                    LEFT JOIN esakip_data_satker_simpeg ds
+                           ON ds.satker_id = p.satker_id
+                    WHERE p.satker_id=%s 
+                      AND p.jabatan like %s 
+                      AND p.active=1
+                    ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
+                ", $satker_id_atasan, 'KEPALA%'),
+                ARRAY_A
+            );
+        }
     } else {
         // JIKA PEGAWAI BIASA
         $data_atasan = $wpdb->get_row(
@@ -194,6 +219,25 @@ if (empty($data_atasan)) {
             ", $data_pegawai_1['satker_id'], 11),
             ARRAY_A
         );
+
+        // cek ulang data atasan jika kosong where jabatan=KEPALA untuk jenis kepala yang PLT
+        if(empty($data_atasan)){
+            $data_atasan = $wpdb->get_row(
+                $wpdb->prepare("
+                    SELECT
+                        p.*,
+                        ds.nama AS nama_bidang
+                    FROM esakip_data_pegawai_simpeg p
+                    LEFT JOIN esakip_data_satker_simpeg ds
+                           ON ds.satker_id = p.satker_id
+                    WHERE p.satker_id=%s 
+                      AND p.jabatan like %s 
+                      AND p.active=1
+                    ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
+                ", $data_pegawai_1['satker_id'], 'KEPALA%'),
+                ARRAY_A
+            );
+        }
     }
 
     //SINKRON DATA PIHAK KEDUA (KEPALA)
@@ -205,6 +249,8 @@ if (empty($data_atasan)) {
         }
     }
 }
+
+// print_r($data_atasan); die($wpdb->last_query);
 
 $data_pegawai_2 = null;
 // PIHAK KEDUA BUKAN KEPALA DAERAH DAN DIA PLT
@@ -436,6 +482,9 @@ if ($data_tahapan) {
         </div>';
     }
 }
+
+$ttd_orientasi = 'text-left';
+// $ttd_orientasi = 'text-center';
 ?>
 
 <head>
@@ -893,25 +942,23 @@ if ($data_tahapan) {
             </br>
             <p class="text-left f-12">Pihak kedua akan memberikan supervisi yang diperlukan serta akan melakukan evaluasi terhadap capaian kinerja dari perjanjian ini dan mengambil tindakan yang diperlukan dalam rangka memberikan penghargaan dan sanksi.</p>
             <table id="table_data_pejabat" style="margin-top: 3rem;" class="f-12">
-                <thead>
-                    <tr class="text-center">
+                <tbody>
+                    <tr class="<?php echo $ttd_orientasi; ?>">
                         <td></td>
-                        <td contenteditable="true" title="Klik untuk ganti teks!" class="editable-field">
+                        <td style="padding: 0;" contenteditable="true" title="Klik untuk ganti teks!" class="editable-field">
                             <?php echo $pemda; ?>, <span class="tanggal-dokumen-view"><?php echo $text_tanggal_hari_ini; ?></span>
                         </td>
                     </tr>
-                    <tr class="text-center">
-                        <td>Pihak Kedua,</td>
-                        <td>Pihak Pertama,</td>
+                    <tr class="<?php echo $ttd_orientasi; ?>">
+                        <td style="padding: 0;">Pihak Kedua,</td>
+                        <td style="padding: 0;">Pihak Pertama,</td>
                     </tr>
-                </thead>
-                <tbody>
                     <tr style="height: 7em;">
                         <td></td>
                         <td></td>
                         <td></td>
                     </tr>
-                    <tr class="text-center">
+                    <tr class="<?php echo $ttd_orientasi; ?>">
                         <td class="ttd-pejabat nama-pegawai-atasan-view" id="nama_pegawai_atasan">
                             <?php echo $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] . ', ' . $pihak_kedua['gelar_belakang']; ?>
                         </td>
@@ -919,7 +966,7 @@ if ($data_tahapan) {
                             <?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . ', ' . $pihak_pertama['gelar_belakang']; ?>
                         </td>
                     </tr>
-                    <tr class="text-center">
+                    <tr class="<?php echo $ttd_orientasi; ?>">
                         <td style="padding: 0;" id="pangkat_pegawai_atasan" class="pangkat-pegawai-atasan-view">
                             <?php if (empty($data_atasan['status_kepala'])) : ?>
                                 <?php echo $pihak_kedua['pangkat']; ?>
@@ -929,7 +976,7 @@ if ($data_tahapan) {
                             <?php echo $pihak_pertama['pangkat']; ?>
                         </td>
                     </tr>
-                    <tr class="text-center">
+                    <tr class="<?php echo $ttd_orientasi; ?>">
                         <td style="padding: 0;" id="nip_pegawai_atasan">
                             <?php if (empty($data_atasan['status_kepala'])) : ?>
                                 NIP. <span class="nip-pegawai-atasan-view"><?php echo $pihak_kedua['nip_pegawai']; ?></span>
@@ -1012,25 +1059,23 @@ if ($data_tahapan) {
             <?php endif; ?>
 
             <table id="table_data_pejabat" class="f-12 mt-5">
-                <thead>
-                    <tr class="text-center">
-                        <td></td>
-                        <td contenteditable="true" title="Klik untuk ganti teks!" class="editable-field">
+                <tbody>
+                    <tr class="<?php echo $ttd_orientasi; ?>">
+                        <td style="padding: 0;"></td>
+                        <td style="padding: 0;" contenteditable="true" title="Klik untuk ganti teks!" class="editable-field">
                             <?php echo $pemda; ?>, <span class="tanggal-dokumen-view"><?php echo $text_tanggal_hari_ini; ?></span>
                         </td>
                     </tr>
-                    <tr class="text-center">
-                        <td class="jabatan-pegawai-atasan-view status-jabatan-pegawai-2"><?php echo $pihak_kedua['jabatan_pegawai']; ?></td>
-                        <td class="jabatan-pegawai-view status-jabatan-pegawai-1"><?php echo $pihak_pertama['jabatan_pegawai']; ?>,</td>
+                    <tr class="<?php echo $ttd_orientasi; ?>">
+                        <td style="padding: 0;" class="jabatan-pegawai-atasan-view status-jabatan-pegawai-2"><?php echo $pihak_kedua['jabatan_pegawai']; ?></td>
+                        <td style="padding: 0;" class="jabatan-pegawai-view status-jabatan-pegawai-1"><?php echo $pihak_pertama['jabatan_pegawai']; ?>,</td>
                     </tr>
-                </thead>
-                <tbody>
                     <tr style="height: 7em;">
                         <td></td>
                         <td></td>
                         <td></td>
                     </tr>
-                    <tr class="text-center">
+                    <tr class="<?php echo $ttd_orientasi; ?>">
                         <td class="ttd-pejabat nama-pegawai-atasan-view">
                             <?php echo $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] . ', ' . $pihak_kedua['gelar_belakang']; ?>
                         </td>
@@ -1038,7 +1083,7 @@ if ($data_tahapan) {
                             <?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . ', ' . $pihak_pertama['gelar_belakang']; ?>
                         </td>
                     </tr>
-                    <tr class="text-center">
+                    <tr class="<?php echo $ttd_orientasi; ?>">
                         <td style="padding: 0;" class="pangkat-pegawai-atasan-view">
                             <?php if (empty($data_atasan['status_kepala'])) : ?>
                                 <?php echo $pihak_kedua['pangkat']; ?>
@@ -1048,7 +1093,7 @@ if ($data_tahapan) {
                             <?php echo $pihak_pertama['pangkat']; ?>
                         </td>
                     </tr>
-                    <tr class="text-center">
+                    <tr class="<?php echo $ttd_orientasi; ?>">
                         <td style="padding: 0;">
                             <?php if (empty($data_atasan['status_kepala'])) : ?>
                                 NIP. <span class="nip-pegawai-atasan-view"><?php echo $pihak_kedua['nip_pegawai']; ?></span>

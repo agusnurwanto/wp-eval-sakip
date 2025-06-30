@@ -75,10 +75,8 @@ $data_user_pegawai = $wpdb->get_results(
             plt_plh,
             tmt_sk_plth,
             berakhir
-        FROM 
-            esakip_data_pegawai_simpeg
-        WHERE
-            nip_baru=%s
+        FROM esakip_data_pegawai_simpeg
+        WHERE nip_baru=%s
             AND active=%d
         ORDER BY satker_id ASC, tipe_pegawai_id ASC",
         $user_nip,
@@ -101,15 +99,11 @@ if (!empty($data_user_pegawai)) {
                     unit.nama_skpd, 
                     unit.id_skpd, 
                     unit.kode_skpd,
+                    unit.nipkepala,
                     unit.is_skpd
-                FROM 
-                    esakip_data_mapping_unit_sipd_simpeg AS simpeg
-                JOIN 
-                    esakip_data_unit AS unit
-                ON 
-                    simpeg.id_skpd = unit.id_skpd
-                WHERE 
-                    simpeg.id_satker_simpeg=%d 
+                FROM esakip_data_mapping_unit_sipd_simpeg AS simpeg
+                JOIN esakip_data_unit AS unit ON simpeg.id_skpd = unit.id_skpd
+                WHERE simpeg.id_satker_simpeg=%d 
                     AND simpeg.tahun_anggaran=%d
                     AND simpeg.active=%d
                     AND unit.tahun_anggaran=%d
@@ -127,9 +121,18 @@ if (!empty($data_user_pegawai)) {
         // TIPE HAK AKSES USER PEGAWAI | 0 = TIDAK ADA | 1 = ALL | 2 = HANYA RHK TERKAIT
         if (!empty($skpd_user_pegawai)) {
             if (
-                $skpd_user_pegawai['id_skpd'] == $id_skpd 
-                && $v_user['tipe_pegawai_id'] == 11 
-                && strlen($v_user['satker_id']) == 2
+                // jika pegawai adalah kepala dinas di data simpeg
+                (
+                    $skpd_user_pegawai['id_skpd'] == $id_skpd 
+                    && $v_user['tipe_pegawai_id'] == 11 
+                    && strlen($v_user['satker_id']) == 2
+                )
+                // jika pegawai adalah kepala di data sipd dan satker id pegawainya berjumlah 2
+                || (
+                    $skpd_user_pegawai['id_skpd'] == $id_skpd 
+                    && $v_user['nip_baru'] == $skpd_user_pegawai['nipkepala']
+                    && strlen($v_user['satker_id']) == 2
+                )
             ){
                 $hak_akses_user_pegawai = 1;
             } else if ($skpd_user_pegawai['id_skpd'] == $id_skpd) {
@@ -142,6 +145,8 @@ if (!empty($data_user_pegawai)) {
         }
     }
 }
+
+// print_r($data_user_pegawai); print_r($skpd_user_pegawai); print_r($hak_akses_user_pegawai_per_skpd); die($wpdb->last_query);
 
 if (
     $is_administrator 
@@ -1972,9 +1977,11 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     if (persen > 100) {
                         jQuery(this).val(100);
                         persen = 100;
+                        alert('tidak boleh lebih dari 100%');
                     } else if (persen < 0) {
                         jQuery(this).val(0);
                         persen = 0;
+                        alert('tidak boleh kurang dari 0%');
                     }
 
                     var get_total_pagu = (persen_rencana_pagu * persen) / 100;
@@ -2072,7 +2079,13 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     total_pagu = +response.data.total_pagu;
 
                     let rencana_pagu = response.data.rencana_pagu != null ? response.data.rencana_pagu : 0;
-                    let persen = setToFixed((rencana_pagu / total_pagu) * 100);
+
+                    var persen = 0;
+                    if(total_pagu <= 0){
+                        persen = 100;
+                    }else{
+                        persen = setToFixed((rencana_pagu / total_pagu) * 100);
+                    }
 
                     var setting_input_rencana_pagu = 0;
                     if(response.data.data_rhk_khusus.input_rencana_pagu_level != undefined){
@@ -2097,6 +2110,10 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                         jQuery('#target_teks_tw_2').val(response.data.target_teks_2);
                         jQuery('#target_teks_tw_3').val(response.data.target_teks_3);
                         jQuery('#target_teks_tw_4').val(response.data.target_teks_4);
+
+                        if(persen < 0){
+                            persen = 100;
+                        }
                         jQuery('#total_rincian').val(persen).trigger('input');
                         jQuery('#rencana_pagu_tk').val(total_pagu);
                         if (response.data.rumus_indikator) {
@@ -2896,7 +2913,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         }else if(id == 'kegiatan'){
             id_html = 'cascading-renstra-kegiatan';
             label = 'Kegiatan';
-            onchange = "get_cascading_input_rencana_pagu('sub-kegiatan')";
+            onchange = "get_cascading_input_rencana_pagu('sub_kegiatan')";
         }else if(id == 'sub-kegiatan'){
             id_html = 'cascading-renstra-sub-kegiatan';
             label = 'Sub Kegiatan';
@@ -3064,6 +3081,13 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                 let html_setting_input_rencana_pagu = '';
                 if(tipe != 4){
                     var hide = 'style="display:none"';
+
+                    // ketika tipe 1, masih undefined
+                    if(typeof cek_parent_global == 'undefined'){
+                        window.cek_parent_global = {
+                            input_pagu: 0
+                        };
+                    }
 
                     // jika parent rhk tidak ada yang input pagu maka checklist input pagu ditampilkan
                     if(cek_parent_global.input_pagu == 0){

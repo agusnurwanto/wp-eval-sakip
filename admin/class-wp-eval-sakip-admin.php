@@ -3957,6 +3957,10 @@ class Wp_Eval_Sakip_Admin
 		$ret['message'] = 'Berhasil Generate User Wordpress dari DB Lokal SIMPEG';
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+
+				// dimatikan dulu karena ada kasus keamanan. agus 24-06-2025
+				die(json_encode($ret));
+
 				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 				$pass = !empty($_POST['pass']) ? $_POST['pass'] : '';
 				$update_pass = !empty($_POST['update_pass']) ? $_POST['update_pass'] : '';

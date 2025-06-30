@@ -537,6 +537,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_data_koneksi_pokin',  $plugin_public, 'get_data_koneksi_pokin');
 		$this->loader->add_action('wp_ajax_create_koneksi_pokin',  $plugin_public, 'create_koneksi_pokin');
 		$this->loader->add_action('wp_ajax_delete_koneksi_pokin',  $plugin_public, 'delete_koneksi_pokin');
+		$this->loader->add_action('wp_ajax_update_koneksi_pokin',  $plugin_public, 'update_koneksi_pokin');
 		$this->loader->add_action('wp_ajax_get_skpd_koneksi_pokin_by_id',  $plugin_public, 'get_skpd_koneksi_pokin_by_id');
 		$this->loader->add_action('wp_ajax_verify_koneksi_pokin_pemda_opd',  $plugin_public, 'verify_koneksi_pokin_pemda_opd');
 		$this->loader->add_action('wp_ajax_edit_verify_koneksi_pokin_pemda',  $plugin_public, 'edit_verify_koneksi_pokin_pemda');
