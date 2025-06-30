@@ -722,6 +722,14 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_hapus_data_kuesioner_mendagri_detail',  $plugin_public, 'hapus_data_kuesioner_mendagri_detail');
 		$this->loader->add_action('wp_ajax_copy_data_kuesioner_mendagri',  $plugin_public, 'copy_data_kuesioner_mendagri');
 
+		$this->loader->add_action('wp_ajax_generate_fields_dokumen_kuesioner',  $plugin_public, 'generate_fields_dokumen_kuesioner');
+		$this->loader->add_action('wp_ajax_get_table_skpd_dokumen_kuesioner',  $plugin_public, 'get_table_skpd_dokumen_kuesioner');
+		$this->loader->add_action('wp_ajax_get_table_dokumen_kuesioner',  $plugin_public, 'get_table_dokumen_kuesioner');
+		$this->loader->add_action('wp_ajax_tambah_dokumen_kuesioner',  $plugin_public, 'tambah_dokumen_kuesioner');
+		$this->loader->add_action('wp_ajax_get_detail_kuesioner_by_id',  $plugin_public, 'get_detail_kuesioner_by_id');
+		$this->loader->add_action('wp_ajax_hapus_dokumen_kuesioner',  $plugin_public, 'hapus_dokumen_kuesioner');
+		
+
 		$this->loader->add_action('wp_ajax_get_table_iku_pemda',  $plugin_public, 'get_table_iku_pemda');
 		$this->loader->add_action('wp_ajax_get_table_iku_opd',  $plugin_public, 'get_table_iku_opd');
 
@@ -863,6 +871,9 @@ class Wp_Eval_Sakip {
 		add_shortcode('list_kuesioner_mendagri', array($plugin_public, 'list_kuesioner_mendagri'));
 		add_shortcode('kuesioner_mendagri', array($plugin_public, 'kuesioner_mendagri'));
 		add_shortcode('input_kuesioner_mendagri', array($plugin_public, 'input_kuesioner_mendagri'));
+
+		add_shortcode('list_kuesioner_dokumen', array($plugin_public, 'list_kuesioner_dokumen'));
+		add_shortcode('dokumen_detail_kuesioner', array($plugin_public, 'dokumen_detail_kuesioner'));
 	}
 
 	/**
