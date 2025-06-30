@@ -676,6 +676,9 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_alamat_kantor', $plugin_public, 'get_alamat_kantor');
 		$this->loader->add_action('wp_ajax_submit_alamat_kantor', $plugin_public, 'submit_alamat_kantor');
 		
+		$this->loader->add_action('wp_ajax_get_table_pegawai_simpeg', $plugin_public, 'get_table_pegawai_simpeg');
+		$this->loader->add_action('wp_ajax_simpan_pegawai_simpeg', $plugin_public, 'simpan_pegawai_simpeg');
+		
 		$this->loader->add_action('wp_ajax_nopriv_get_serapan_anggaran_capaian_kinerja',  $plugin_public, 'get_serapan_anggaran_capaian_kinerja');
 
 		$this->loader->add_action('wp_ajax_get_sub_keg_rka_wpsipd',  $plugin_public, 'get_sub_keg_rka_wpsipd');
@@ -851,6 +854,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('detail_laporan_pk', array($plugin_public, 'detail_laporan_pk'));
 		add_shortcode('halaman_laporan_pk_setting', array($plugin_public, 'halaman_laporan_pk_setting'));
 		add_shortcode('list_pegawai_laporan_pk', array($plugin_public, 'list_pegawai_laporan_pk'));
+		add_shortcode('list_perjanjian_kinerja', array($plugin_public, 'list_perjanjian_kinerja'));
 
 		add_shortcode('detail_laporan_rhk', array($plugin_public, 'detail_laporan_rhk'));
 		add_shortcode('sso_login', array($plugin_public, 'sso_login'));

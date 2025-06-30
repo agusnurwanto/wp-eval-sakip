@@ -1937,6 +1937,7 @@ CREATE TABLE `esakip_data_pegawai_simpeg` (
   `tmt_sk_plth` datetime DEFAULT current_timestamp(),
   `berakhir` datetime DEFAULT current_timestamp(),
   `active` tinyint(4) NOT NULL,
+  `active_rhk` tinyint(4) DEFAULT 1,
   `eselon_id` text DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `update_at` datetime DEFAULT current_timestamp(),
