@@ -45,7 +45,7 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
             <table id="cetak" title="List Pegawai Laporan Perjanjian Kinerja Perangkat Daerah" class="table table-bordered table_list_pegawai" cellpadding="2" cellspacing="0">
                 <thead style="background: #ffc491;">
                     <tr>
-                        <th class="text-center">Aktif Input Rencana Hasil Kerja (RHK) / Rencana Aksi<br><input type="checkbox" id="cek_all"></th>
+                        <th class="text-center" style="width: 150px;">Aktif Input Rencana Hasil Kerja (RHK) / Rencana Aksi<br><input type="checkbox" id="cek_all"></th>
                         <th class="text-center">Satker ID</th>
                         <th class="text-center">Satuan Kerja</th>
                         <th class="text-center">Tipe Pegawai</th>
@@ -89,7 +89,7 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
                 action: 'get_pegawai_simpeg',
                 api_key: esakip.api_key,
                 type: 'unor',
-                value: <?php echo $id_satker; ?>,
+                value: '<?php echo $id_satker; ?>',
             },
             dataType: 'json',
             success: function(response) {

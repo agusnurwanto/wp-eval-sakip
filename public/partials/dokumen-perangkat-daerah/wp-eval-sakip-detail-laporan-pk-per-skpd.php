@@ -945,13 +945,13 @@ $ttd_orientasi = 'text-left';
                 <tbody>
                     <tr class="<?php echo $ttd_orientasi; ?>">
                         <td></td>
-                        <td style="padding: 0;" contenteditable="true" title="Klik untuk ganti teks!" class="editable-field">
+                        <td style="padding: 0 20px 0 0;" contenteditable="true" title="Klik untuk ganti teks!" class="editable-field">
                             <?php echo $pemda; ?>, <span class="tanggal-dokumen-view"><?php echo $text_tanggal_hari_ini; ?></span>
                         </td>
                     </tr>
                     <tr class="<?php echo $ttd_orientasi; ?>">
-                        <td style="padding: 0;">Pihak Kedua,</td>
-                        <td style="padding: 0;">Pihak Pertama,</td>
+                        <td style="padding: 0 20px 0 0;">Pihak Kedua,</td>
+                        <td style="padding: 0 20px 0 0;">Pihak Pertama,</td>
                     </tr>
                     <tr style="height: 7em;">
                         <td></td>
@@ -967,22 +967,22 @@ $ttd_orientasi = 'text-left';
                         </td>
                     </tr>
                     <tr class="<?php echo $ttd_orientasi; ?>">
-                        <td style="padding: 0;" id="pangkat_pegawai_atasan" class="pangkat-pegawai-atasan-view">
+                        <td style="padding: 0 20px 0 0;" id="pangkat_pegawai_atasan" class="pangkat-pegawai-atasan-view">
                             <?php if (empty($data_atasan['status_kepala'])) : ?>
                                 <?php echo $pihak_kedua['pangkat']; ?>
                             <?php endif; ?>
                         </td>
-                        <td style="padding: 0;" class="pangkat-pegawai-view">
+                        <td style="padding: 0 20px 0 0;" class="pangkat-pegawai-view">
                             <?php echo $pihak_pertama['pangkat']; ?>
                         </td>
                     </tr>
                     <tr class="<?php echo $ttd_orientasi; ?>">
-                        <td style="padding: 0;" id="nip_pegawai_atasan">
+                        <td style="padding: 0 20px 0 0;" id="nip_pegawai_atasan">
                             <?php if (empty($data_atasan['status_kepala'])) : ?>
                                 NIP. <span class="nip-pegawai-atasan-view"><?php echo $pihak_kedua['nip_pegawai']; ?></span>
                             <?php endif; ?>
                         </td>
-                        <td style="padding: 0;">
+                        <td style="padding: 0 20px 0 0;">
                             NIP. <span class="nip-pegawai-view"><?php echo $pihak_pertama['nip_pegawai']; ?></span>
                         </td>
                     </tr>
@@ -1061,14 +1061,14 @@ $ttd_orientasi = 'text-left';
             <table id="table_data_pejabat" class="f-12 mt-5">
                 <tbody>
                     <tr class="<?php echo $ttd_orientasi; ?>">
-                        <td style="padding: 0;"></td>
-                        <td style="padding: 0;" contenteditable="true" title="Klik untuk ganti teks!" class="editable-field">
+                        <td style="padding: 0 20px 0 0;"></td>
+                        <td style="padding: 0 20px 0 0;" contenteditable="true" title="Klik untuk ganti teks!" class="editable-field">
                             <?php echo $pemda; ?>, <span class="tanggal-dokumen-view"><?php echo $text_tanggal_hari_ini; ?></span>
                         </td>
                     </tr>
                     <tr class="<?php echo $ttd_orientasi; ?>">
-                        <td style="padding: 0;" class="jabatan-pegawai-atasan-view status-jabatan-pegawai-2"><?php echo $pihak_kedua['jabatan_pegawai']; ?></td>
-                        <td style="padding: 0;" class="jabatan-pegawai-view status-jabatan-pegawai-1"><?php echo $pihak_pertama['jabatan_pegawai']; ?>,</td>
+                        <td style="padding: 0 20px 0 0;" class="jabatan-pegawai-atasan-view status-jabatan-pegawai-2"><?php echo $pihak_kedua['jabatan_pegawai']; ?></td>
+                        <td style="padding: 0 20px 0 0;" class="jabatan-pegawai-view status-jabatan-pegawai-1"><?php echo $pihak_pertama['jabatan_pegawai']; ?>,</td>
                     </tr>
                     <tr style="height: 7em;">
                         <td></td>
@@ -1084,22 +1084,22 @@ $ttd_orientasi = 'text-left';
                         </td>
                     </tr>
                     <tr class="<?php echo $ttd_orientasi; ?>">
-                        <td style="padding: 0;" class="pangkat-pegawai-atasan-view">
+                        <td style="padding: 0 20px 0 0;" class="pangkat-pegawai-atasan-view">
                             <?php if (empty($data_atasan['status_kepala'])) : ?>
                                 <?php echo $pihak_kedua['pangkat']; ?>
                             <?php endif; ?>
                         </td>
-                        <td style="padding: 0;" class="pangkat-pegawai-view">
+                        <td style="padding: 0 20px 0 0;" class="pangkat-pegawai-view">
                             <?php echo $pihak_pertama['pangkat']; ?>
                         </td>
                     </tr>
                     <tr class="<?php echo $ttd_orientasi; ?>">
-                        <td style="padding: 0;">
+                        <td style="padding: 0 20px 0 0;">
                             <?php if (empty($data_atasan['status_kepala'])) : ?>
                                 NIP. <span class="nip-pegawai-atasan-view"><?php echo $pihak_kedua['nip_pegawai']; ?></span>
                             <?php endif; ?>
                         </td>
-                        <td style="padding: 0;">
+                        <td style="padding: 0 20px 0 0;">
                             NIP. <span class="nip-pegawai-view"><?php echo $pihak_pertama['nip_pegawai']; ?></span>
                         </td>
                     </tr>
