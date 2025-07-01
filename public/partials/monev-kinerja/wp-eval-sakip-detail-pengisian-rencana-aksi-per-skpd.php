@@ -1349,19 +1349,13 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                             response.data.renaksi_pemda.map(function(b, i) {
                                 renaksi_pemda += `
                                 <tr>
-                                    <td><input class="text-right" type="checkbox" class="form-check-input" id="label_renaksi_pemda"name="checklist_renaksi_pemda[]" value="${b.label_sasaran_strategis}" id_label_renaksi_pemda="${b.id_pemda}"id_label_indikator_renaksi_pemda="${b.id_indikator}" ${b.id_label != null ? 'checked' : ''}>
+                                    <td><input class="text-right" type="checkbox" class="form-check-input" id="label_renaksi_pemda"name="checklist_renaksi_pemda[]" value="${b.label_sasaran}" id_label_renaksi_pemda="${b.id}" ${b.id_label != null ? 'checked' : ''}>
                                     </td>
                                     <td>
-                                        <label class="form-check-label" id="label_sasaran_strategis" for="label_sasaran_strategis">${b.label_sasaran_strategis}</label>
+                                        <label class="form-check-label" id="label_sasaran_strategis" for="label_sasaran_strategis">${b.label_sasaran}</label>
                                     </td>
                                     <td>
-                                        <label class="form-check-label" id="label_indikator_uraian_kegiatan" for="label_indikator_uraian_kegiatan">${b.label_indikator_uraian_kegiatan}</label>
-                                    </td>
-                                    <td  class="text-center">
-                                        <label class="form-check-label" id="satuan" for="satuan">${b.satuan_pemda}</label>
-                                    </td>
-                                    <td  class="text-center">
-                                        <label class="form-check-label" id="target_akhir" for="target_akhir">${b.target_akhir_pemda}</label>
+                                        <label class="form-check-label" id="label_indikator_uraian_kegiatan" for="label_indikator_uraian_kegiatan">${b.label_indikator}</label>
                                     </td>
                                 </tr>
                             `;
@@ -1374,12 +1368,10 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                         <thead>
                                             <tr>
                                                 <th>
-                                                    <input class="text-right" type="checkbox" id="check_all" class="form-check-input">
+                                                    <input class="text-center" type="checkbox" id="check_all" class="form-check-input">
                                                 </th>
-                                                <th>Rencana Hasil Kerja</th>
-                                                <th>Indikator Rencana Hasil Kerja</th>
-                                                <th>Satuan</th>
-                                                <th>Target Akhir</th>
+                                                <th>Sasaran Strategis</th>
+                                                <th>Indikator Kinerja</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -3026,10 +3018,8 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                             <thead>
                                 <tr>
                                     <th class="text-center"><input type="checkbox" id="select_all"></th>
-                                    <th>Rencana Hasil Kerja</th>
-                                    <th>Indikator Rencana Hasil Kerja</th>
-                                    <th>Satuan</th>
-                                    <th>Target Akhir</th>
+                                    <th>Sasaran Strategis</th>
+                                    <th>Indikator Kinerja</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -3038,10 +3028,8 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                         checklist_renaksi_pemda += `
                             <tr>
                                 <td><input class="text-right" type="checkbox" class="form-check-input" id="label_renaksi_pemda${index}"name="checklist_renaksi_pemda[]" value="${item.label}" id_label_renaksi_pemda="${item.id_data_renaksi_pemda}"id_label_indikator_renaksi_pemda="${item.id_data_indikator}"></td>
-                                <td for="label_renaksi_pemda${index}">${item.label}</td>
-                                <td for="label_renaksi_pemda${index}">${item.indikator}</td>
-                                <td class="text-center" for="label_renaksi_pemda${index}">${item.satuan}</td>
-                                <td class="text-center" for="label_renaksi_pemda${index}">${item.target_akhir}</td>
+                                <td for="label_renaksi_pemda${index}">${item.label_sasaran}</td>
+                                <td for="label_renaksi_pemda${index}">${item.label_indikator}</td>
                             </tr>
                         `;
                     });

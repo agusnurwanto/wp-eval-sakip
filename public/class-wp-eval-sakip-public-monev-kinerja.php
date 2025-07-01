@@ -2802,8 +2802,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 					$get_data_pemda = array();
 
-					$get_data_pemda = array();
-
 					if (!empty($renaksi_pemda)) {
 					    $id_renaksi = 0;
 					    $id_pk = array();
