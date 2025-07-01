@@ -155,30 +155,34 @@ if (
 }
 
 ////////////end////////////
+$renaksi_pemda = $wpdb->get_results($wpdb->prepare("
+    SELECT *
+    FROM esakip_data_label_rencana_aksi 
+    WHERE active = 1
+        AND id_skpd = %d
+        AND tahun_anggaran = %d
+", $id_skpd, $input['tahun']), ARRAY_A);
 
-$renaksi_pemda = $wpdb->get_results(
-    $wpdb->prepare("
-        SELECT
-            p.*,
-            p.id AS id_data_renaksi_pemda,
-            i.*,
-            i.id AS id_data_indikator,
-            u.*,
-            u.id AS id_data_unit
-        FROM esakip_data_rencana_aksi_pemda AS p
-        INNER JOIN esakip_data_rencana_aksi_indikator_pemda AS i
-            ON p.id = i.id_renaksi
-            AND p.tahun_anggaran = i.tahun_anggaran
-            AND p.active = i.active
-        INNER JOIN esakip_data_unit AS u
-            ON i.id_skpd = u.id_skpd
-            AND i.tahun_anggaran = u.tahun_anggaran
-            AND i.active = u.active
-        WHERE i.id_skpd = %d
-    ", $id_skpd),
-    ARRAY_A
-);
-// print_r($renaksi_pemda); die($wpdb->last_query);
+$get_data_pemda = array();
+
+if (!empty($renaksi_pemda)) {
+    $id_pk = $renaksi_pemda[0]['id_pk'];
+    if (!empty($get_id_pk)) {
+        $get_data_pemda = $wpdb->get_results($wpdb->prepare("
+            SELECT 
+                pk.*,
+                ik.label_sasaran,
+                ik.label_indikator
+            FROM esakip_laporan_pk_pemda pk
+            LEFT JOIN esakip_data_iku_pemda ik
+                ON pk.id_iku = ik.id 
+                AND pk.id_jadwal = ik.id_jadwal
+            WHERE pk.active = 1
+                AND pk.id = %d
+        ", $id_pk), ARRAY_A);
+    }
+}
+
 $renaksi_opd = $wpdb->get_results(
     $wpdb->prepare("
         SELECT
@@ -192,27 +196,6 @@ $renaksi_opd = $wpdb->get_results(
     ARRAY_A
 );
 
-$html_renaksi_pemda = '';
-$no_renaksi_pemda = 1;
-
-if (!empty($renaksi_pemda)) {
-    foreach ($renaksi_pemda as $k_renaksi_pemda => $v_renaksi_pemda) {
-        $renaksi_opd_label = !empty($renaksi_opd) ? esc_attr($renaksi_opd[0]['label']) : '';
-        $renaksi_opd_id = !empty($renaksi_opd) ? esc_attr($renaksi_opd[0]['id']) : '';
-
-        $aksi = '<a href="javascript:void(0)" class="btn btn-sm btn-success verifikasi-renaksi-pemda" data-id="' . $renaksi_opd_id . '" data-label="' . esc_attr($v_renaksi_pemda['label']) . '" data-id_renaksi_pemda="' . esc_attr($v_renaksi_pemda['id_data_renaksi_pemda']) . '" data-id_indikator="' . esc_attr($v_renaksi_pemda['id_data_indikator']) . '" data-indikator="' . esc_attr($v_renaksi_pemda['indikator']) . '"data-satuan="' . esc_attr($v_renaksi_pemda['satuan']) . '" data-target_akhir="' . esc_attr($v_renaksi_pemda['target_akhir']) . '" data-renaksi-opd="' . $renaksi_opd_label . '" title="Verifikasi Rencana Hasil Kerja"><span class="dashicons dashicons-yes"></span></a>';
-
-        $html_renaksi_pemda .= '
-            <tr>
-                <td>' . $no_renaksi_pemda++ . '</td>
-                <td class="text-left">' . esc_html($v_renaksi_pemda['label']) . '</td>
-                <td class="text-left">' . esc_html($v_renaksi_pemda['indikator']) . '</td>
-                <td class="text-center">' . esc_html($v_renaksi_pemda['satuan']) . '</td>
-                <td class="text-center">' . esc_html($v_renaksi_pemda['target_akhir']) . '</td>
-                <td>' . $aksi . '</td>
-            </tr>';
-    }
-}
 $set_renaksi = get_option('_crb_input_renaksi');
 $get_mapping = $wpdb->get_var($wpdb->prepare('
     SELECT 
@@ -370,10 +353,8 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                 <table class="table_notifikasi_pemda" style="width: 50em;text-align: center;">
                     <thead>
                         <tr>
-                            <th>Rencana Hasil Kerja</th>
-                            <th>Indikator Rencana Hasil Kerja</th>
-                            <th>Satuan</th>
-                            <th>Target Akhir</th>
+                            <th>Sasaran Strategis</th>
+                            <th>Indikator Kinerja</th>
                             <th style="min-width: 10em;">Aksi</th>
                         </tr>
                     </thead>
@@ -721,7 +702,6 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
     }
 
     jQuery(document).on('click', '.verifikasi-renaksi-pemda', function() {
-        let id = jQuery(this).data('id');
         let get_renaksi_opd = <?php echo json_encode($renaksi_opd); ?>;
         let checklist_renaksi_opd = '';
 
@@ -741,24 +721,14 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         jQuery("#modal-renaksi-pemda").find('.modal-title').html('Verifikasi Rencana Hasil Kerja Pemda');
         jQuery("#modal-renaksi-pemda").find('.modal-body').html(`
         <form id="form-renaksi-pemda">
-            <input type="hidden" name="id" value="${id}">
-            <input type="hidden" name="id_indikator_renaksi_pemda" value="${jQuery(this).data('id_indikator')}"> 
             <input type="hidden" name="id_renaksi_pemda" value="${jQuery(this).data('id_renaksi_pemda')}"> 
             <div class="form-group">
                 <label>Rencana Hasil Kerja Pemda</label>
-                <input type="text" id="label_uraian_kegiatan" name="label_uraian_kegiatan" value="${jQuery(this).data('label')}" disabled>
+                <input type="text" id="label_uraian_kegiatan" name="label_uraian_kegiatan" value="${jQuery(this).data('label-sasaran')}" disabled>
             </div>
             <div class="form-group">
                 <label>Indikator Rencana Hasil Kerja Pemda</label>
-                <input type="text" id="label_indikator" name="label_indikator" value="${jQuery(this).data('indikator')}" class="mt-1" disabled>
-            </div>
-            <div class="form-group">
-                <label>Satuan</label>
-                <input type="text" id="satuan" name="satuan" value="${jQuery(this).data('satuan')}" disabled>
-            </div>
-            <div class="form-group">
-                <label>Target Akhir</label>
-                <input type="text" id="target_akhir" name="target_akhir" value="${jQuery(this).data('target_akhir')}" class="mt-1" disabled>
+                <input type="text" id="label_indikator" name="label_indikator" value="${jQuery(this).data('label-indikator')}" class="mt-1" disabled>
             </div>
             ${checklist_renaksi_opd}
         </form>
@@ -773,7 +743,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
     jQuery(document).on('click', '#simpan-data-renaksi-pemda', function() {
         let formData = jQuery('#form-renaksi-pemda').serialize();
 
-        let label_uraian_kegiatan = jQuery('#label_uraian_kegiatan').val();
+        let label_sasaran_strategis = jQuery('#label_sasaran_strategis').val();
         let label_indikator = jQuery('#label_indikator').val();
 
         jQuery('input[name="checklist_renaksi_opd[]"]:checked').each(function() {
@@ -1367,17 +1337,17 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                         }else if (tipe == 2) {
                             jQuery("#modal-crud").find('.modal-title').html('Edit Rencana Hasil Kerja');
                             jQuery('#label_renaksi_opd_').val(response.data.label_renaksi_opd_);
-                            jQuery('#label_uraian_kegiatan').val(response.data.label_uraian_kegiatan);
+                            jQuery('#label_sasaran_strategis').val(response.data.label_sasaran_strategis);
                             jQuery('#label_indikator_uraian_kegiatan').val(response.data.label_indikator_uraian_kegiatan);
 
                             var renaksi_pemda = "";
                             response.data.renaksi_pemda.map(function(b, i) {
                                 renaksi_pemda += `
                                 <tr>
-                                    <td><input class="text-right" type="checkbox" class="form-check-input" id="label_renaksi_pemda"name="checklist_renaksi_pemda[]" value="${b.label_uraian_kegiatan}" id_label_renaksi_pemda="${b.id_pemda}"id_label_indikator_renaksi_pemda="${b.id_indikator}" ${b.id_label != null ? 'checked' : ''}>
+                                    <td><input class="text-right" type="checkbox" class="form-check-input" id="label_renaksi_pemda"name="checklist_renaksi_pemda[]" value="${b.label_sasaran_strategis}" id_label_renaksi_pemda="${b.id_pemda}"id_label_indikator_renaksi_pemda="${b.id_indikator}" ${b.id_label != null ? 'checked' : ''}>
                                     </td>
                                     <td>
-                                        <label class="form-check-label" id="label_uraian_kegiatan" for="label_uraian_kegiatan">${b.label_uraian_kegiatan}</label>
+                                        <label class="form-check-label" id="label_sasaran_strategis" for="label_sasaran_strategis">${b.label_sasaran_strategis}</label>
                                     </td>
                                     <td>
                                         <label class="form-check-label" id="label_indikator_uraian_kegiatan" for="label_indikator_uraian_kegiatan">${b.label_indikator_uraian_kegiatan}</label>

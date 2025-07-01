@@ -633,6 +633,10 @@ class Wp_Eval_Sakip {
 
 		$this->loader->add_action('wp_ajax_get_table_renaksi_pemda',  $plugin_public, 'get_table_renaksi_pemda');
 		$this->loader->add_action('wp_ajax_get_table_input_rencana_aksi_pemda', $plugin_public, 'get_table_input_rencana_aksi_pemda');
+		$this->loader->add_action('wp_ajax_get_table_rencana_aksi_pemda_baru', $plugin_public, 'get_table_rencana_aksi_pemda_baru');
+		$this->loader->add_action('wp_ajax_get_data_renaksi_pemda_baru', $plugin_public, 'get_data_renaksi_pemda_baru');
+		$this->loader->add_action('wp_ajax_get_edit_data_renaksi_pemda_baru', $plugin_public, 'get_edit_data_renaksi_pemda_baru');
+		$this->loader->add_action('wp_ajax_submit_edit_renaksi_pemda', $plugin_public, 'submit_edit_renaksi_pemda');
 		$this->loader->add_action('wp_ajax_get_data_renaksi_pemda', $plugin_public, 'get_data_renaksi_pemda');
 		$this->loader->add_action('wp_ajax_get_tujuan_sasaran_cascading_pemda', $plugin_public, 'get_tujuan_sasaran_cascading_pemda');
 		$this->loader->add_action('wp_ajax_get_data_pokin_pemda', $plugin_public, 'get_data_pokin_pemda');
@@ -673,8 +677,14 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_submit_edit_laporan_pk_setting', $plugin_public, 'submit_edit_laporan_pk_setting');
 		$this->loader->add_action('wp_ajax_tambah_logo_pemda_laporan_pk', $plugin_public, 'tambah_logo_pemda_laporan_pk');
 		$this->loader->add_action('wp_ajax_get_table_pegawai_simpeg_pk', $plugin_public, 'get_table_pegawai_simpeg_pk');
+		$this->loader->add_action('wp_ajax_get_table_pk_pemda', $plugin_public, 'get_table_pk_pemda');
 		$this->loader->add_action('wp_ajax_get_alamat_kantor', $plugin_public, 'get_alamat_kantor');
 		$this->loader->add_action('wp_ajax_submit_alamat_kantor', $plugin_public, 'submit_alamat_kantor');
+		$this->loader->add_action('wp_ajax_simpan_finalisasi_pk_pemda', $plugin_public, 'simpan_finalisasi_pk_pemda');
+		$this->loader->add_action('wp_ajax_hapus_finalisasi_pk_pemda', $plugin_public, 'hapus_finalisasi_pk_pemda');
+		$this->loader->add_action('wp_ajax_get_finalisasi_pk_pemda_by_id', $plugin_public, 'get_finalisasi_pk_pemda_by_id');
+		$this->loader->add_action('wp_ajax_edit_finalisasi_pk_pemda', $plugin_public, 'edit_finalisasi_pk_pemda');
+		$this->loader->add_action('wp_ajax_submit_target_pk_pemda', $plugin_public, 'submit_target_pk_pemda');
 		
 		$this->loader->add_action('wp_ajax_nopriv_get_serapan_anggaran_capaian_kinerja',  $plugin_public, 'get_serapan_anggaran_capaian_kinerja');
 
@@ -740,6 +750,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('perjanjian_kinerja', array($plugin_public, 'perjanjian_kinerja'));
 		add_shortcode('rencana_aksi', array($plugin_public, 'rencana_aksi'));
 		add_shortcode('list_pengisian_rencana_aksi_pemda', array($plugin_public, 'list_pengisian_rencana_aksi_pemda'));
+		add_shortcode('list_pengisian_rencana_aksi_pemda_baru', array($plugin_public, 'list_pengisian_rencana_aksi_pemda_baru'));
 		add_shortcode('iku', array($plugin_public, 'iku'));
 		add_shortcode('skp', array($plugin_public, 'skp'));
 		add_shortcode('pengukuran_kinerja', array($plugin_public, 'pengukuran_kinerja'));
@@ -823,6 +834,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('dokumen_detail_pedoman_teknis_evaluasi_internal_pemda', array($plugin_public, 'dokumen_detail_pedoman_teknis_evaluasi_internal_pemda'));
 		add_shortcode('dokumen_detail_lkjip_lppd_pemda', array($plugin_public, 'dokumen_detail_lkjip_lppd_pemda'));
 		add_shortcode('dokumen_detail_rkpd_pemda', array($plugin_public, 'dokumen_detail_rkpd_pemda'));
+		add_shortcode('halaman_laporan_pk_pemda', array($plugin_public, 'halaman_laporan_pk_pemda'));
 		add_shortcode('penyusunan_pohon_kinerja_opd', array($plugin_public, 'penyusunan_pohon_kinerja_opd'));
 		add_shortcode('view_pohon_kinerja_opd',array($plugin_public,'view_pohon_kinerja_opd'));
 		add_shortcode('list_penyusunan_pohon_kinerja_opd', array($plugin_public, 'list_penyusunan_pohon_kinerja_opd'));
