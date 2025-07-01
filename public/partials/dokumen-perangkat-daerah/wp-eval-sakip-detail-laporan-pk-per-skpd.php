@@ -800,30 +800,28 @@ $ttd_orientasi = 'text-left';
 <body>
     <div class="container-md mx-auto" style="width: 900px;">
        <div class="text-center" id="action-sakip">
-            <button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button>
-
+            <div class="d-inline-flex align-items-center ml-2">
+                <button class="btn btn-primary btn-large mr-3" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button>
             <?php if($hak_akses_user_pegawai == 1 || ($hak_akses_user_pegawai == 2 && $pihak_pertama && $pihak_pertama['nip_pegawai'] == $nip_user_pegawai)): ?>
-                <div class="d-inline-flex align-items-center ml-2">
-                    <button class="btn btn-warning mr-3" onclick="get_alamat();"><i class="dashicons dashicons-edit"></i> Edit Alamat</button>
-
-                    <div class="form-inline">
-                        <label for="font-select" class="mr-2">Jenis Font:</label>
-                        <select id="font-select" class="form-control form-control-sm mr-3" onchange="updateFont()">
-                            <option value="Arial" selected>Arial</option>
-                            <option value="Times New Roman">Times New Roman</option>
-                            <option value="Calibri">Calibri</option>
-                            <option value="inherit">Inherit</option>
-                            <option value="Courier">Courier</option>
-                            <option value="Georgia">Georgia</option>
-                            <option value="Helvetica">Helvetica</option>
-                            <option value="Trebuchet">Trebuchet</option>
-                            <option value="Verdana">Verdana</option>
-                        </select>
-                        <label for="font-size" class="mr-2">Ukuran Font:</label>
-                        <input type="number" id="font-size" class="form-control form-control-sm mr-3" value="16" min="1" max="48" onkeyup ="updateFont()" style="width: 80px;">
-                    </div>
-                </div>
+                <button class="btn btn-warning mr-3" onclick="get_alamat();"><i class="dashicons dashicons-edit"></i> Edit Alamat</button>
             <?php endif; ?>
+                <div class="form-inline">
+                    <label for="font-select" class="mr-2">Jenis Font:</label>
+                    <select id="font-select" class="form-control form-control-sm mr-3" onchange="updateFont()">
+                        <option value="Arial" selected>Arial</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Calibri">Calibri</option>
+                        <option value="inherit">Inherit</option>
+                        <option value="Courier">Courier</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Helvetica">Helvetica</option>
+                        <option value="Trebuchet">Trebuchet</option>
+                        <option value="Verdana">Verdana</option>
+                    </select>
+                    <label for="font-size" class="mr-2">Ukuran Font:</label>
+                    <input type="number" id="font-size" class="form-control form-control-sm mr-3" value="16" min="1" max="48" onkeyup ="updateFont()" style="width: 80px;">
+                </div>
+            </div>
         </div>
 
         <!-- Error Message -->
