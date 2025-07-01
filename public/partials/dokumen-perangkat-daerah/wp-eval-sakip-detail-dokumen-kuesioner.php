@@ -6,12 +6,12 @@ if (!defined('WPINC')) {
 }
 
 $input = shortcode_atts(array(
-    'tahun' => '2022',
+    'tahun' => '2025',
 ), $atts);
 
 if (!empty($_GET) && !empty($_GET['id_skpd'])) {
     $id_skpd = $_GET['id_skpd'];
-} 
+}
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
 $skpd = $wpdb->get_row(
@@ -32,6 +32,7 @@ $idtahun = $wpdb->get_results(
 			tahun_anggaran 
 		FROM esakip_data_unit        
         ORDER BY tahun_anggaran DESC",
+
     ARRAY_A
 );
 $tahun = "<option value='-1'>Pilih Tahun</option>";
@@ -48,6 +49,7 @@ $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
 $is_admin_panrb = in_array('admin_panrb', $user_roles);
 $is_administrator = in_array('administrator', $user_roles);
+$status_api_esr = get_option('_crb_api_esr_status');
 
     $admin_role_pemda = array(
         'admin_bappeda',
@@ -61,7 +63,7 @@ $is_administrator = in_array('administrator', $user_roles);
         "SELECT 
             jenis_role
         FROM esakip_menu_dokumen 
-        WHERE nama_dokumen='Pengukuran Rencana Aksi'
+        WHERE nama_dokumen='Dokumen Kuesioner'
           AND user_role='perangkat_daerah' 
           AND active = 1
           AND tahun_anggaran=%d
@@ -69,6 +71,7 @@ $is_administrator = in_array('administrator', $user_roles);
     );
 
     $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
+
 ?>
 <style type="text/css">
     .wrap-table {
@@ -92,17 +95,29 @@ $is_administrator = in_array('administrator', $user_roles);
 <div class="container-md">
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Dokumen Pengukuran Rencana Aksi <br><?php echo $skpd['nama_skpd'] ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
+            <h1 class="text-center" style="margin:3rem;">Dokumen Kuesioner <br><?php echo $skpd['nama_skpd'] ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
             <?php if (!$is_admin_panrb && $hak_akses_user): ?>
             <div style="margin-bottom: 25px;">
-                <button class="btn btn-primary" onclick="tambah_dokumen_pengukuran_rencana_aksi();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
+                <button class="btn btn-primary" onclick="tambah_dokumen_pedoman_teknis_kuesioner();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
+                <?php
+                if($status_api_esr){
+                    echo '<button class="btn btn-warning" onclick="sync_to_esr();" id="btn-sync-to-esr" style="display:none"><i class="dashicons dashicons-arrow-up-alt"></i> Kirim Data ke ESR</button>';
+                }
+                ?>
             </div>
             <?php endif; ?>
             <div class="wrap-table">
-                <table id="table_dokumen_pengukuran_rencana_aksi" cellpadding="2" cellspacing="0">
+                <table id="table_dokumen_kuesioner" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
+                            <?php
+                                if (!$is_admin_panrb && $hak_akses_user):
+                                    if($status_api_esr){
+                                        echo '<th class="text-center" rowspan="2" id="check-list-esr" style="display:none">Checklist ESR</th>';
+                                    }
+                                endif;
+                            ?>
                             <th class="text-center">Perangkat Daerah</th>
                             <th class="text-center">Nama Dokumen</th>
                             <th class="text-center">Keterangan</th>
@@ -114,9 +129,6 @@ $is_administrator = in_array('administrator', $user_roles);
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
-</div>
 
 <!-- Modal Upload -->
 <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
@@ -161,54 +173,19 @@ $is_administrator = in_array('administrator', $user_roles);
     </div>
 </div>
 
-<!-- Tahun Tabel -->
-<div id="tahunContainer" class="container-md">
-</div>
-
-<!-- Modal Tahun -->
-<div class="modal fade" id="tahunModal" tabindex="-1" role="dialog" aria-labelledby="tahunModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="tahunModalLabel">Pilih Tahun Anggaran</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="tahunForm">
-                    <div class="form-group">
-                        <label for="tahunAnggaran">Tahun Anggaran:</label>
-                        <select class="form-control" id="tahunAnggaran" name="tahunAnggaran">
-                            <?php echo $tahun; ?>
-                        </select>
-                        <input type="hidden" id="idDokumen" value="">
-                    </div>
-                    <button type="submit" class="btn btn-primary" onclick="submit_tahun_renja_rkt(); return false">Simpan</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 <script>
     jQuery(document).ready(function() {
-        getTableTahun();
-        jQuery("#fileUpload").on('change', function() {
-            var id_dokumen = jQuery('#idDokumen').val();
-            if (id_dokumen == '') {
-                var name = jQuery("#fileUpload").prop('files')[0].name;
-                jQuery('#nama_file').val(name);
-            }
-        });
+    getTableKuesioner();
+        
     });
 
-    function getTablePengukuranRencanaAksi() {
+    function getTableKuesioner() {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'get_table_pengukuran_rencana_aksi',
+                action: 'get_table_dokumen_kuesioner',
                 api_key: esakip.api_key,
                 id_skpd: <?php echo $id_skpd; ?>,
                 tahun_anggaran: '<?php echo $input['tahun'] ?>'
@@ -218,7 +195,7 @@ $is_administrator = in_array('administrator', $user_roles);
                 jQuery('#wrap-loading').hide();
                 console.log(response);
                 if (response.status === 'success') {
-                    jQuery('#table_dokumen_pengukuran_rencana_aksi tbody').html(response.data);
+                    jQuery('#table_dokumen_kuesioner tbody').html(response.data);
                 } else {
                     alert(response.message);
                 }
@@ -226,41 +203,12 @@ $is_administrator = in_array('administrator', $user_roles);
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data Pengukuran Rencana Aksi!');
+                alert('Terjadi kesalahan saat memuat data Dokumen Kuesioner!');
             }
         });
     }
 
-    function getTableTahun() {
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: 'POST',
-            data: {
-                action: 'get_table_tahun_pengukuran_rencana_aksi',
-                api_key: esakip.api_key,
-                id_skpd: <?php echo $id_skpd; ?>,
-            },
-            dataType: 'json',
-            success: function(response) {
-                jQuery('#wrap-loading').hide();
-                console.log(response);
-                getTablePengukuranRencanaAksi();
-                if (response.status === 'success') {
-                    jQuery('#tahunContainer').html(response.data);
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                jQuery('#wrap-loading').hide();
-                console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat tabel!');
-            }
-        });
-    }
-
-    function tambah_dokumen_pengukuran_rencana_aksi() {
+    function tambah_dokumen_pedoman_teknis_kuesioner() {
         jQuery("#editModalLabel").hide();
         jQuery("#uploadModalLabel").show();
         jQuery("#idDokumen").val('');
@@ -271,13 +219,13 @@ $is_administrator = in_array('administrator', $user_roles);
         jQuery("#uploadModal").modal('show');
     }
 
-    function edit_dokumen_pengukuran_rencana_aksi(id) {
+    function edit_dokumen_kuesioner(id) {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'get_detail_pengukuran_rencana_aksi_by_id',
+                action: 'get_detail_kuesioner_by_id',
                 api_key: esakip.api_key,
                 id: id
             },
@@ -290,10 +238,10 @@ $is_administrator = in_array('administrator', $user_roles);
                     let url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>' + data.dokumen;
                     jQuery("#idDokumen").val(data.id);
                     jQuery("#fileUpload").val('');
-                    jQuery("#nama_file").val(data.dokumen);
                     jQuery('#fileUploadExisting').attr('href', url).html(data.dokumen);
                     jQuery("#keterangan").val(data.keterangan);
                     jQuery("#uploadModalLabel").hide();
+                    jQuery("#nama_file").val(data.dokumen);
                     jQuery("#editModalLabel").show();
                     jQuery('#uploadModal').modal('show');
                 } else {
@@ -338,7 +286,7 @@ $is_administrator = in_array('administrator', $user_roles);
         }
 
         let form_data = new FormData();
-        form_data.append('action', 'tambah_dokumen_pengukuran_rencana_aksi');
+        form_data.append('action', 'tambah_dokumen_kuesioner');
         form_data.append('api_key', esakip.api_key);
         form_data.append('id_dokumen', id_dokumen);
         form_data.append('skpd', skpd);
@@ -362,7 +310,7 @@ $is_administrator = in_array('administrator', $user_roles);
                 if (response.status === 'success') {
                     jQuery('#uploadModal').modal('hide');
                     alert(response.message);
-                    getTablePengukuranRencanaAksi();
+                    getTableKuesioner();
                 } else {
                     alert(response.message);
                 }
@@ -381,7 +329,7 @@ $is_administrator = in_array('administrator', $user_roles);
     }
 
 
-    function hapus_dokumen_pengukuran_rencana_aksi(id) {
+    function hapus_dokumen_kuesioner(id) {
         if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini?')) {
             return;
         }
@@ -390,7 +338,7 @@ $is_administrator = in_array('administrator', $user_roles);
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'hapus_dokumen_pengukuran_rencana_aksi',
+                action: 'hapus_dokumen_kuesioner',
                 api_key: esakip.api_key,
                 id: id
             },
@@ -400,7 +348,7 @@ $is_administrator = in_array('administrator', $user_roles);
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
                     alert(response.message);
-                    getTablePengukuranRencanaAksi();
+                    getTableKuesioner();
                 } else {
                     alert(response.message);
                 }
@@ -408,53 +356,6 @@ $is_administrator = in_array('administrator', $user_roles);
             error: function(xhr, status, error) {
                 console.error(xhr.responseText);
                 jQuery('#wrap-loading').hide();
-                alert('Terjadi kesalahan saat mengirim data!');
-            }
-        });
-    }
-
-    function set_tahun_dokumen(id) {
-        jQuery('#tahunModal').modal('show');
-        jQuery('#idDokumen').val(id);
-    }
-
-    function submit_tahun_pengukuran_rencana_aksi() {
-        let id = jQuery("#idDokumen").val();
-        if (id == '') {
-            return alert('id tidak boleh kosong');
-        }
-
-        let tahunAnggaran = jQuery("#tahunAnggaran").val();
-        if (tahunAnggaran == '') {
-            return alert('Tahun Anggaran tidak boleh kosong');
-        }
-
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            url: esakip.url,
-            type: 'POST',
-            data: {
-                action: 'submit_tahun_pengukuran_rencana_aksi',
-                id: id,
-                tahunAnggaran: tahunAnggaran,
-                api_key: esakip.api_key
-            },
-            dataType: 'json',
-            success: function(response) {
-                console.log(response);
-                jQuery('#wrap-loading').hide();
-                if (response.status === 'success') {
-                    alert(response.message);
-                    jQuery('#tahunModal').modal('hide');
-                    getTableTahun();
-                    getTablePengukuranRencanaAksi();
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                jQuery('#wrap-loading').hide();
-                console.error(xhr.responseText);
                 alert('Terjadi kesalahan saat mengirim data!');
             }
         });

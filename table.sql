@@ -1937,6 +1937,7 @@ CREATE TABLE `esakip_data_pegawai_simpeg` (
   `tmt_sk_plth` datetime DEFAULT current_timestamp(),
   `berakhir` datetime DEFAULT current_timestamp(),
   `active` tinyint(4) NOT NULL,
+  `active_rhk` tinyint(4) DEFAULT 1,
   `eselon_id` text DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `update_at` datetime DEFAULT current_timestamp(),
@@ -2316,6 +2317,7 @@ CREATE TABLE esakip_kuesioner_mendagri_detail (
   KEY `active` (`active`)
 );
 
+<<<<<<< HEAD
 CREATE TABLE esakip_laporan_pk_pemda (
   `id` int(11) NOT NULL auto_increment,
   `id_iku` int(11) DEFAULT NULL,
@@ -2379,6 +2381,21 @@ CREATE TABLE `esakip_detail_rencana_aksi_pemda` (
   KEY `id_pk` (`id_pk`),
   KEY `id_skpd` (`id_skpd`),
   KEY `id_jadwal` (`id_jadwal`),
+=======
+CREATE TABLE esakip_dokumen_kuesioner (
+  `id` int(11) NOT NULL auto_increment,
+  `opd` varchar(255) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `dokumen` varchar(255) DEFAULT NULL,
+  `keterangan` longtext DEFAULT NULL,
+  `tanggal_upload` varchar(50) DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp,
+  `active` tinyint(4) DEFAULT 1,
+  `upload_id` int(11) DEFAULT NULL,
+  PRIMARY KEY(id),
+  KEY `id_skpd` (`id_skpd`),
+>>>>>>> d77c140efe3a01c8b789a15cd76df566ce2888a0
   KEY `tahun_anggaran` (`tahun_anggaran`),
   KEY `active` (`active`)
 );

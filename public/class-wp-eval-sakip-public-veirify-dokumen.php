@@ -57,6 +57,15 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-list-pegawai-laporan-pk.php';
     }
 
+    public function list_perjanjian_kinerja($atts)
+    {
+        // untuk disable render shortcode di halaman edit page/post
+        if (!empty($_GET) && !empty($_GET['POST'])) {
+            return '';
+        }
+        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/monev-kinerja/wp-eval-sakip-list-pegawai-perjanjian-kinerja.php';
+    }
+
     public function detail_laporan_rhk($atts)
     {
         // untuk disable render shortcode di halaman edit page/post
@@ -64,6 +73,15 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
             return '';
         }
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/monev-kinerja/wp-eval-sakip-detail-laporan-rhk-pegawai.php';
+    }
+
+    public function dokumen_detail_kuesioner($atts)
+    {
+        // untuk disable render shortcode di halaman edit page/post
+        if (!empty($_GET) && !empty($_GET['POST'])) {
+            return '';
+        }
+        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-dokumen-kuesioner.php';
     }
 
     public function get_data_pengaturan_menu()
@@ -1933,6 +1951,13 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                     if (!empty($unit)) {
                         $tbody = '';
 
+                        $halaman_pegawai_skpd = $this->functions->generatePage(array(
+                            'nama_page' => 'List Pegawai Laporan PK ' . $tahun_anggaran,
+                            'content' => '[list_pegawai_laporan_pk tahun_anggaran=' . $tahun_anggaran . ']',
+                            'show_header' => 1,
+                            'post_status' => 'private'
+                        ));
+
                         foreach ($unit as $kk => $vv) {
                             $total_pegawai_all = 0;
 
@@ -1969,13 +1994,6 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                                     $total_pegawai_all = $data_pegawai['total_pegawai'];
                                 }
                             }
-
-                            $halaman_pegawai_skpd = $this->functions->generatePage(array(
-                                'nama_page' => 'List Pegawai Laporan PK ' . $tahun_anggaran,
-                                'content' => '[list_pegawai_laporan_pk tahun_anggaran=' . $tahun_anggaran . ']',
-                                'show_header' => 1,
-                                'post_status' => 'private'
-                            ));
 
                             $count_finalisasi = $wpdb->get_var(
                                 $wpdb->prepare("
@@ -2022,6 +2040,228 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                 'status' => 'error',
                 'message'   => 'Format tidak sesuai!'
             );
+        }
+        die(json_encode($ret));
+    }
+
+    public function simpan_pegawai_simpeg()
+    {
+        global $wpdb;
+        $ret = array(
+            'status'  => 'success',
+            'message' => 'Berhasil ubah data!'
+        );
+
+        if (!empty($_POST)) {
+            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+                if (empty($_POST['tahun_anggaran'])){
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Tahun anggaran tidak boleh kosong!';
+                    die(json_encode($ret));
+                }else if (empty($_POST['id_skpd'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'ID SKPD tidak boleh kosong!';
+                    die(json_encode($ret));
+                }else if (empty($_POST['ids'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data pegawai tidak boleh kosong!';
+                    die(json_encode($ret));
+                }
+
+                $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+                $unit = $this->get_data_skpd_by_id($_POST['id_skpd'], $tahun_anggaran_sakip);
+                if (empty($unit)) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Unit aktif tidak ditemukan!';
+                    die(json_encode($ret));
+                }
+
+                $mapping_satker_id = $wpdb->get_var(
+                    $wpdb->prepare("
+                        SELECT
+                            b.satker_id
+                        FROM esakip_data_mapping_unit_sipd_simpeg a 
+                        LEFT JOIN esakip_data_satker_simpeg b 
+                               ON b.satker_id = a.id_satker_simpeg 
+                              AND b.tahun_anggaran = a.tahun_anggaran 
+                              AND b.active = 1
+                        WHERE a.tahun_anggaran = %d 
+                          AND a.id_skpd = %d;
+                    ", $_POST['tahun_anggaran'], $unit['id_skpd'])
+                );
+
+                if (empty($mapping_satker_id)) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Mapping unit tidak ditemukan!';
+                    die(json_encode($ret));
+                }
+                $satker_id = $mapping_satker_id;
+
+                $pegawai_aktif = array();
+                $pegawai_non_aktif = array();
+                foreach($_POST['ids'] as $id => $val){
+                    $id = $wpdb->prepare('%d', $id);
+                    if($val == 1){
+                        $pegawai_aktif[] = $id;
+                    }else{
+                        $pegawai_non_aktif[] = $id;
+                    }
+                }
+
+                if(!empty($pegawai_aktif)){
+                    $pegawai_aktif = implode(',', $pegawai_aktif);
+                    $sql = '
+                        UPDATE esakip_data_pegawai_simpeg
+                        SET active_rhk=1
+                        WHERE id IN ('.$pegawai_aktif.')
+                            AND satker_id like \''.$satker_id . '%\'
+                    ';
+                    $ret['sql_aktif'] = $sql;
+                    $wpdb->query($sql);
+                }
+
+                if(!empty($pegawai_non_aktif)){
+                    $pegawai_non_aktif = implode(',', $pegawai_non_aktif);
+                    $sql = '
+                        UPDATE esakip_data_pegawai_simpeg
+                        SET active_rhk=0
+                        WHERE id IN ('.$pegawai_non_aktif.')
+                            AND satker_id like \''.$satker_id . '%\'
+                    ';
+                    $ret['sql_non_aktif'] = $sql;
+                    $wpdb->query($sql);
+                }
+                
+            } else {
+                $ret['status'] = 'error';
+                $ret['message'] = 'API Key tidak sesuai!';
+            }
+        } else {
+            $ret['status'] = 'error';
+            $ret['message'] = 'Format tidak sesuai!';
+        }
+        die(json_encode($ret));
+    }
+
+    public function get_table_pegawai_simpeg()
+    {
+        global $wpdb;
+        $ret = array(
+            'status'  => 'success',
+            'message' => 'Berhasil get data!',
+            'data'    => '<tr><td colspan="6" class="text-center">Tidak ada data ditemukan</td></tr>',
+            'aktif'   => 0,
+            'non_aktif'   => 0
+        );
+
+        if (!empty($_POST)) {
+            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+                if (empty($_POST['tahun_anggaran']) || empty($_POST['id_skpd'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Parameter tidak valid!';
+                    die(json_encode($ret));
+                }
+
+                $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+                $unit = $this->get_data_skpd_by_id($_POST['id_skpd'], $tahun_anggaran_sakip);
+                if (empty($unit)) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Unit aktif tidak ditemukan!';
+                    die(json_encode($ret));
+                }
+
+                $tbody = '';
+                $mapping_satker_id = $wpdb->get_var(
+                    $wpdb->prepare("
+                        SELECT
+                            b.satker_id
+                        FROM esakip_data_mapping_unit_sipd_simpeg a 
+                        LEFT JOIN esakip_data_satker_simpeg b 
+                               ON b.satker_id = a.id_satker_simpeg 
+                              AND b.tahun_anggaran = a.tahun_anggaran 
+                              AND b.active = 1
+                        WHERE a.tahun_anggaran = %d 
+                          AND a.id_skpd = %d;
+                    ", $_POST['tahun_anggaran'], $unit['id_skpd'])
+                );
+
+                if (empty($mapping_satker_id)) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Mapping unit tidak ditemukan!';
+                    die(json_encode($ret));
+                }
+
+                $data_pegawai_all = array();
+                $satker_id = $mapping_satker_id;
+                $data_pegawai = $wpdb->get_results(
+                    $wpdb->prepare("
+                        SELECT 
+                            p.id,
+                            p.active_rhk,
+                            p.nip_baru,
+                            p.nama_pegawai,
+                            p.satker_id,
+                            p.jabatan,
+                            p.tipe_pegawai,
+                            p.tipe_pegawai_id,
+                            p.active,
+                            s.nama AS nama_bidang
+                        FROM esakip_data_pegawai_simpeg p
+                        LEFT JOIN esakip_data_satker_simpeg s
+                               ON s.satker_id = p.satker_id
+                        WHERE p.satker_id LIKE %s 
+                          AND p.active = 1
+                          AND s.tahun_anggaran = %d
+                        ORDER BY p.satker_id, p.tipe_pegawai_id, p.berakhir DESC, p.nama_pegawai
+                    ", $satker_id . '%', $_POST['tahun_anggaran']),
+                    ARRAY_A
+                );
+                if (!empty($data_pegawai)) {
+                    foreach ($data_pegawai as $v_1) {
+                        if (
+                            strtoupper(trim($v_1['jabatan'])) == 'KEPALA'
+                            && $v_1['satker_id'] == $satker_id
+                        ) {
+                            array_unshift($data_pegawai_all, $v_1);
+                        } else {
+                            $data_pegawai_all[] = $v_1;
+                        }
+                    }
+                }
+
+                if (empty($data_pegawai_all)) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Pegawai tidak ditemukan!';
+                    die(json_encode($ret));
+                }
+
+                $tbody = '';
+                foreach ($data_pegawai_all as $key => $v_pgw) {
+                    $checked = '';
+                    if($v_pgw['active_rhk'] == 1){
+                        $checked = 'checked';
+                        $ret['aktif']++;
+                    }else{
+                        $ret['non_aktif']++;
+                    }
+                    $tbody .= "<tr>";
+                    $tbody .= "<td class='text-center'><input type='checkbox' class='input_rhk' value='" . $v_pgw['id'] . "' ".$checked."></td>";
+                    $tbody .= "<td class='text-left'>" . $v_pgw['satker_id'] . "</td>";
+                    $tbody .= "<td class='text-left'>" . $v_pgw['nama_bidang'] . "</td>";
+                    $tbody .= "<td class='text-left'>" . $v_pgw['tipe_pegawai'] . "</td>";
+                    $tbody .= "<td class='text-left'>" . $v_pgw['nip_baru'] . "</td>";
+                    $tbody .= "<td class='text-left'>" . $v_pgw['nama_pegawai'] . "</td>";
+                    $tbody .= "<td class='text-left'>" . $v_pgw['jabatan'] . "</td>";
+                    $tbody .= "</tr>";
+                }
+                $ret['data'] = $tbody;
+            } else {
+                $ret['status'] = 'error';
+                $ret['message'] = 'API Key tidak sesuai!';
+            }
+        } else {
+            $ret['status'] = 'error';
+            $ret['message'] = 'Format tidak sesuai!';
         }
         die(json_encode($ret));
     }
@@ -2090,6 +2330,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                                ON s.satker_id = p.satker_id
                         WHERE p.satker_id LIKE %s 
                           AND p.active = 1
+                          AND p.active_rhk = 1
                           AND s.tahun_anggaran = %d
                         ORDER BY p.satker_id, p.tipe_pegawai_id, p.berakhir DESC, p.nama_pegawai
                     ", $satker_id . '%', $_POST['tahun_anggaran']),
@@ -2728,6 +2969,428 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
             $ret = array(
                 'status' => 'error',
                 'message'   => 'Format tidak sesuai!'
+            );
+        }
+        die(json_encode($ret));
+    }
+    public function get_table_skpd_dokumen_kuesioner()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+
+				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+
+				if ($ret['status'] != 'error') {
+					$unit = $wpdb->get_results(
+						$wpdb->prepare("
+						SELECT 
+							nama_skpd, 
+							id_skpd, 
+							kode_skpd, 
+							nipkepala 
+						FROM esakip_data_unit 
+						WHERE active=1 
+						AND tahun_anggaran=%d
+						AND is_skpd=1 
+						ORDER BY kode_skpd ASC
+						", $tahun_anggaran_sakip),
+						ARRAY_A
+					);
+
+					if (!empty($unit)) {
+						$tbody = '';
+						$counter = 1;
+
+						foreach ($unit as $kk => $vv) {
+							$detail_dokumen_kuesioner = $this->functions->generatePage(array(
+								'nama_page' => 'Halaman Detail Dokumen Kuesioner ' . $tahun_anggaran,
+								'content' => '[dokumen_detail_kuesioner tahun=' . $tahun_anggaran . ']',
+								'show_header' => 1,
+								'post_status' => 'private'
+							));
+
+							$tbody .= "<tr>";
+							$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+							$tbody .= "<td style='text-transform: uppercase;'>" . $vv['nama_skpd'] . "</a></td>";
+
+							$jumlah_dokumen = $wpdb->get_var(
+								$wpdb->prepare(
+									"
+									SELECT 
+										COUNT(id)
+									FROM esakip_dokumen_kuesioner 
+									WHERE id_skpd = %d
+									AND tahun_anggaran = %d
+									AND active = 1
+									",
+									$vv['id_skpd'],
+									$tahun_anggaran
+								)
+							);
+
+							$btn = '<div class="btn-action-group">';
+							$btn .= "<button class='btn btn-secondary' onclick='toDetailUrl(\"" . $detail_dokumen_kuesioner['url'] . '&id_skpd=' . $vv['id_skpd'] . "\");' title='Detail'><span class='dashicons dashicons-controls-forward'></span></button>";
+							$btn .= '</div>';
+
+							$tbody .= "<td class='text-center'>" . $jumlah_dokumen . "</td>";
+							$tbody .= "<td>" . $btn . "</td>";
+
+							$tbody .= "</tr>";
+						}
+						$ret['data'] = $tbody;
+					} else {
+						$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+    public function get_table_dokumen_kuesioner()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id_skpd'])) {
+					$id_skpd = $_POST['id_skpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
+				}
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+				$dokumen_kuesioner = $wpdb->get_results(
+					$wpdb->prepare("
+                    SELECT * 
+                    FROM esakip_dokumen_kuesioner
+                    WHERE id_skpd = %d 
+                      AND tahun_anggaran = %d 
+                      AND active = 1
+                ", $id_skpd, $tahun_anggaran),
+					ARRAY_A
+				);
+
+				if (!empty($dokumen_kuesioner)) {
+					$counter = 1;
+					$tbody = '';
+
+					foreach ($dokumen_kuesioner as $kk => $vv) {
+						$tbody .= "<tr>";
+						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+						$tbody .= "<td>" . $vv['opd'] . "</td>";
+						$tbody .= "<td>" . $vv['dokumen'] . "</td>";
+						$tbody .= "<td>" . $vv['keterangan'] . "</td>";
+						$tbody .= "<td>" . $vv['created_at'] . "</td>";
+
+						$btn = '<div class="btn-action-group">';
+						$btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
+						if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Dokumen Kuesioner', $tahun_anggaran)) {
+							$btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_kuesioner(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
+							$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_kuesioner(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
+						}
+						$btn .= '</div>';
+
+						$tbody .= "<td class='text-center'>" . $btn . "</td>";
+						$tbody .= "</tr>";
+					}
+
+					$ret['data'] = $tbody;
+				} else {
+					$ret['data'] = "<tr><td colspan='6' class='text-center'>Tidak ada data tersedia</td></tr>";
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+    public function tambah_dokumen_kuesioner()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$id_dokumen = null;
+
+				if (!empty($_POST['id_dokumen'])) {
+					$id_dokumen = $_POST['id_dokumen'];
+					$ret['message'] = 'Berhasil edit data!';
+				}
+				if (!empty($_POST['skpd'])) {
+					$skpd = $_POST['skpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Perangkat Daerah kosong!';
+				}
+				if (!empty($_POST['idSkpd'])) {
+					$idSkpd = $_POST['idSkpd'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Perangkat Daerah kosong!';
+				}
+				if (!empty($_POST['keterangan'])) {
+					$keterangan = $_POST['keterangan'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Keterangan kosong!';
+				}
+				if (!empty($_POST['tahunAnggaran'])) {
+					$tahunAnggaran = $_POST['tahunAnggaran'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+				}
+				if (empty($_FILES['fileUpload']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if (empty($_POST['namaDokumen']) && empty($id_dokumen)) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'File Dokumen kosong!';
+				}
+				if (empty(get_option('_crb_maksimal_upload_dokumen_esakip'))) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Batas Upload Dokumen Belum Disetting!';
+				}
+
+				$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/';
+				if ($ret['status'] == 'success' && !empty($_FILES['fileUpload'])) {
+					$maksimal_upload = get_option('_crb_maksimal_upload_dokumen_esakip');
+					$upload = $this->functions->uploadFile(
+						$_POST['api_key'],
+						$upload_dir,
+						$_FILES['fileUpload'],
+						array('pdf'),
+						1048576 * $maksimal_upload,
+						$_POST['namaDokumen']
+					);
+					if ($upload['status'] == false) {
+						$ret = array(
+							'status' => 'error',
+							'message' => $upload['message']
+						);
+					}
+				} else if ($ret['status'] != 'error' && !empty($_POST['namaDokumen'])) {
+					$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+						SELECT
+							dokumen
+						FROM esakip_dokumen_kuesioner
+						WHERE id=%d
+					", $id_dokumen));
+					if ($dokumen_lama != $_POST['namaDokumen']) {
+						$ret_rename = $this->functions->renameFile($upload_dir . $dokumen_lama, $upload_dir . $_POST['namaDokumen']);
+						if ($ret_rename['status'] != 'error') {
+							$wpdb->update(
+								'esakip_dokumen_kuesioner',
+								array('dokumen' => $_POST['namaDokumen']),
+								array('id' => $id_dokumen),
+							);
+						} else {
+							$ret = $ret_rename;
+						}
+					}
+				}
+
+				if ($ret['status'] == 'success') {
+					if (empty($id_dokumen)) {
+						$wpdb->insert(
+							'esakip_dokumen_kuesioner',
+							array(
+								'opd' => $skpd,
+								'id_skpd' => $idSkpd,
+								'dokumen' => $upload['filename'],
+								'keterangan' => $keterangan,
+								'tahun_anggaran' => $tahunAnggaran,
+								'created_at' => current_time('mysql'),
+								'tanggal_upload' => current_time('mysql')
+							),
+							array('%s', '%s', '%s', '%s', '%d')
+						);
+
+						if (!$wpdb->insert_id) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal menyimpan data ke database!'
+							);
+						}
+					} else {
+						$opsi = array(
+							'keterangan' => $keterangan,
+							'created_at' => current_time('mysql'),
+							'tanggal_upload' => current_time('mysql')
+						);
+						if (!empty($_FILES['fileUpload'])) {
+							$opsi['dokumen'] = $upload['filename'];
+							$dokumen_lama = $wpdb->get_var($wpdb->prepare("
+								SELECT
+									dokumen
+								FROM esakip_dokumen_kuesioner
+								WHERE id=%d
+							", $id_dokumen));
+							if (is_file($upload_dir . $dokumen_lama)) {
+								unlink($upload_dir . $dokumen_lama);
+							}
+						}
+						$wpdb->update(
+							'esakip_dokumen_kuesioner',
+							$opsi,
+							array('id' => $id_dokumen),
+							array('%s', '%s'),
+							array('%d')
+						);
+
+						if ($wpdb->rows_affected == 0) {
+							$ret = array(
+								'status' => 'error',
+								'message' => 'Gagal memperbarui data ke database!'
+							);
+						}
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+    public function hapus_dokumen_kuesioner()
+    {
+        global $wpdb;
+        $ret = array(
+            'status' => 'success',
+            'message' => 'Berhasil hapus data!',
+            'data' => array()
+        );
+        
+        if(!empty($_POST)) {
+            if(!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+                if(!empty($_POST['id'])) {
+                    $get_data = $wpdb ->get_var(
+                        $wpdb->prepare("
+                            SELECT
+                                *
+                            FROM esakip_dokumen_kuesioner
+                            WHERE id= %d
+                        ", $_POST['id'])
+                    );
+
+                    if ($get_data) {
+                        $ret['data'] = $wpdb->update('esakip_dokumen_kuesioner', 
+                        array('active' => 0),
+                        array('id' => $_POST['id']));
+                    }
+                } else {
+                    $ret = array(
+                        'status' => 'error',
+                        'message' => 'Id Kosong!'
+                    );
+                }
+            } else {
+                  $ret = array(
+                    'status' => 'error',
+                    'massage'  => 'Api Key tidak sesuai!'
+                  );
+                }
+            } else {
+                $ret = array(
+                    'status' => 'error',
+                    'massage' => 'Format tidak sesuai!'
+            );
+        }
+        die(json_encode($ret));
+    }
+    
+    public function get_detail_kuesioner_by_id()
+    {
+        global $wpdb;
+        $ret = array(
+            'status' => 'success',
+            'message' => 'berhasil get data!',
+            'data' => array()
+        );
+
+        if (!empty($_POST)) {
+            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+                if (!empty($_POST['id'])) {
+                    $data = $wpdb->get_row(
+                        $wpdb->prepare("
+                            SELECT *
+                            FROM esakip_dokumen_kuesioner
+                            WHERE id = %d
+                            ",$_POST['id']),
+                            ARRAY_A
+                    );
+                    $ret['data'] = $data;
+                } else {
+                    $ret = array(
+                        'status' => 'error',
+                        'massage' => 'Id Kosong!'
+                    );
+                }
+            } else {
+                $ret = array(
+                   'status' => 'error',
+                 'masage'  => 'Api Key tidak sesuai!'
+                );
+            }
+        } else {
+            $ret = array(
+                'status'=> 'error',
+                'massage'  => 'Format tidak sesuai!'
             );
         }
         die(json_encode($ret));

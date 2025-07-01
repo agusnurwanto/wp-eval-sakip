@@ -392,6 +392,10 @@ class Wp_Eval_Sakip_Admin
 		Container::make('theme_options', __('Kuesioner Mendagri'))
 			->set_page_parent($kuesioner)
 			->add_fields($this->generate_fields_kuesioner_mendagri());
+
+		Container::make('theme_options', __('Dokumen Kuesioner'))
+			->set_page_parent($kuesioner)
+			->add_fields($this->generate_fields_dokumen_kuesioner());
 	}
 
 	function get_jadwal_renstra_wp_sipd()
@@ -3791,6 +3795,54 @@ class Wp_Eval_Sakip_Admin
 		];
 	}
 
+	public function generate_fields_dokumen_kuesioner()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_dokumen_kuesioner.php') {
+			return array();
+		}
+
+		$get_tahun = $this->get_tahun();
+
+		$html = '';
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $v) {
+				$list_skpd_dokumen_kuesioner_page = $this->functions->generatePage(array(
+					'nama_page' => 'Kuesioner dokumen tahun ' . $v['tahun_anggaran'],
+					'content' => '[list_kuesioner_dokumen tahun=' . $v['tahun_anggaran'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $list_skpd_dokumen_kuesioner_page['url'] . '">' . $list_skpd_dokumen_kuesioner_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+
+		return [
+			Field::make('html', 'crb_dokumen_kuesioner_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_kuesioner_menu')
+				->set_html($html)
+		];
+	}
+
 	function sql_migrate_esakip()
 	{
 		global $wpdb;
@@ -4035,6 +4087,10 @@ class Wp_Eval_Sakip_Admin
 		$ret['message'] = 'Berhasil Generate User Wordpress dari DB Lokal SIMPEG';
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
+
+				// dimatikan dulu karena ada kasus keamanan. agus 24-06-2025
+				die(json_encode($ret));
+
 				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 				$pass = !empty($_POST['pass']) ? $_POST['pass'] : '';
 				$update_pass = !empty($_POST['update_pass']) ? $_POST['update_pass'] : '';

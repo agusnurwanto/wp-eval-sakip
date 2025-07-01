@@ -154,8 +154,103 @@ foreach ($idtahun as $val) {
                     </div>
 
                     <div class="form-group">
-                        <label for="jenis_bukti_dukung">Data Dukung</label>
-                        <textarea class="form-control" id="jenis_bukti_dukung" name="jenis_bukti_dukung" required></textarea>
+                        <label>Pilih Jenis Bukti Dukung <small class="text-secondary">( minimal 1 atau bisa lebih dari 1 )</small></label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_renstra" id="renstra">
+                                    <label class="form-check-label" for="renstra">
+                                        RENSTRA
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_renja_rkt" id="renja-rkt">
+                                    <label class="form-check-label" for="renja-rkt">
+                                        RENJA/RKT
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_rencana_aksi" id="rencana-aksi">
+                                    <label class="form-check-label" for="rencana-aksi">
+                                        Rencana Aksi
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_dpa" id="dpa">
+                                    <label class="form-check-label" for="dpa">
+                                        DPA
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_lhe_akip_internal" id="lhe-akip-internal">
+                                    <label class="form-check-label" for="lhe-akip-internal">
+                                        LHE AKIP Internal
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_laporan_monev_renaksi" id="laporan-monev-renaksi">
+                                    <label class="form-check-label" for="laporan-monev-renaksi">
+                                        Laporan Monev Renaksi
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_evaluasi_internal" id="evaluasi-internal">
+                                    <label class="form-check-label" for="evaluasi-internal">
+                                        Evaluasi Internal
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_dokumen_lainnya" id="dokumen-lainnya">
+                                    <label class="form-check-label" for="dokumen-lainnya">
+                                        Dokumen Lainnya
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_iku" id="iku">
+                                    <label class="form-check-label" for="iku">
+                                        IKU
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_perjanjian_kinerja" id="perjanjian-kinerja">
+                                    <label class="form-check-label" for="perjanjian-kinerja">
+                                        Perjanjian Kinerja
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_laporan_kinerja" id="laporan-kinerja">
+                                    <label class="form-check-label" for="laporan-kinerja">
+                                        Laporan Kinerja
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_pohon_kinerja_dan_cascading" id="pohon-kinerja-dan-cascading">
+                                    <label class="form-check-label" for="pohon-kinerja-dan-cascading">
+                                        Pohon Kinerja dan Cascading
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_tl_lhe_akip_internal" id="tl-lhe-akip-internal">
+                                    <label class="form-check-label" for="tl-lhe-akip-internal">
+                                        TL LHE AKIP Internal
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_skp" id="skp">
+                                    <label class="form-check-label" for="skp">
+                                        SKP
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="esakip_pengukuran_kinerja" id="pengukuran-kinerja">
+                                    <label class="form-check-label" for="pengukuran-kinerja">
+                                        Pengukuran Kinerja
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -521,7 +616,15 @@ foreach ($idtahun as $val) {
         const penjelasan = jQuery('#penjelasan').val().trim();
         const id_detail = jQuery('#idKuesionerPertanyaanDetail').val();
         const id_pertanyaan = jQuery('#idKuesionerPertanyaan').val();
-        const jenis_bukti_dukung = jQuery('#jenis_bukti_dukung').val().trim();
+        
+        let selectedBuktiDukung = [];
+        jQuery('input[type=checkbox]:checked').each(function() {
+            selectedBuktiDukung.push(jQuery(this).val());
+        });
+
+        if (selectedBuktiDukung.length === 0) {
+            return alert('Minimal satu bukti dukung harus dipilih');
+        }
         
         let level = jQuery('#alertKuesionerLevel').data('level');
 
@@ -538,7 +641,7 @@ foreach ($idtahun as $val) {
                     id_pertanyaan,
                     indikator,
                     penjelasan,
-                    jenis_bukti_dukung,
+                    jenis_bukti_dukung: JSON.stringify(selectedBuktiDukung),
                     level 
                 },
                 dataType: "json",

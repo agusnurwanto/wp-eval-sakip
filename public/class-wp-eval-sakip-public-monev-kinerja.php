@@ -1337,6 +1337,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$_POST['id'] = $ret['data']['id_renaksi'];
 					$cek_pagu = $this->cek_validasi_input_rencana_pagu(1);
 					$ret['data']['total_pagu'] = $cek_pagu['rencana_pagu'];
+					$ret['data']['cek_pagu'] = $cek_pagu;
 				}
 			} else {
 				$ret = array(
@@ -6523,24 +6524,48 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 	function get_rencana_pagu_rhk($opsi)
 	{
+		// jika level rhk adalah yang terkahir maka tidak perlu cek rhk child
+		if($opsi['level'] == 4){
+			return $opsi;
+		}
+
 		global $wpdb;
 		$ids = implode(',', $opsi['ids']);
 		$opsi['data_ind'] = array();
 		$opsi['total'] = 0;
-		$data_rhk_child = $wpdb->get_results(
+		$data_rhk_existing = $wpdb->get_row(
 			$wpdb->prepare("
 				SELECT *
 				FROM esakip_data_rencana_aksi_opd 
-				WHERE parent IN ($ids) 
+				WHERE id IN ($ids) 
 				  AND level = %d 
 				  AND id_skpd = %d
 				  AND active = 1
 				ORDER BY kode_cascading_program, 
 					kode_cascading_kegiatan, 
 					kode_cascading_sub_kegiatan
-			", $opsi['level'] + 1, $opsi['id_skpd']),
+			", $opsi['level'], $opsi['id_skpd']),
 			ARRAY_A
 		);
+
+		if($data_rhk_existing['input_rencana_pagu_level'] == 1){
+			$data_rhk_child = array($data_rhk_existing);
+		}else{
+			$data_rhk_child = $wpdb->get_results(
+				$wpdb->prepare("
+					SELECT *
+					FROM esakip_data_rencana_aksi_opd 
+					WHERE parent IN ($ids) 
+					  AND level = %d 
+					  AND id_skpd = %d
+					  AND active = 1
+					ORDER BY kode_cascading_program, 
+						kode_cascading_kegiatan, 
+						kode_cascading_sub_kegiatan
+				", $opsi['level'] + 1, $opsi['id_skpd']),
+				ARRAY_A
+			);
+		}
 
 		$jenis_level = array(
 			'1' => 'sasaran',
@@ -6551,8 +6576,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		if (!empty($data_rhk_child)) {
 			foreach ($data_rhk_child as $v_rhk_child) {
 				// die(print_r($data_rhk_child));
+
+				$index_level = $jenis_level[$v_rhk_child['level']];
 				if ($v_rhk_child['input_rencana_pagu_level'] == 1) {
 					$index = $v_rhk_child['kode_cascading_sub_kegiatan'];
+					$index_level = 'sub_kegiatan';
 				} elseif ($v_rhk_child['level'] == 2) {
 					$index = $v_rhk_child['kode_cascading_program'];
 				} elseif ($v_rhk_child['level'] == 3) {
@@ -6566,8 +6594,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				}
 				
 				$opsi['data_ind'][$v_rhk_child['id']] = array();
-				if (empty($opsi['data_anggaran'][$jenis_level[$v_rhk_child['level']]][$index])) {
-					$opsi['data_anggaran'][$jenis_level[$v_rhk_child['level']]][$index] = array(
+				if (empty($opsi['data_anggaran'][$index_level][$index])) {
+					$opsi['data_anggaran'][$index_level][$index] = array(
 						'ids' 			=> array(),
 						'sumber_dana' 	=> array(),
 						'total' 		=> 0,
@@ -6841,30 +6869,28 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						}
 					}
 				}
-				$opsi['data_anggaran'][$jenis_level[$v_rhk_child['level']]][$index]['data'][] = array(
-					'nama'           => $v_rhk_child['label_cascading_' . $jenis_level[$v_rhk_child['level']]],
-					'kode'           => $v_rhk_child['kode_cascading_' . $jenis_level[$v_rhk_child['level']]],
+				$opsi['data_anggaran'][$index_level][$index]['data'][] = array(
+					'nama'           => $v_rhk_child['label_cascading_' . $index_level],
+					'kode'           => $v_rhk_child['kode_cascading_' . $index_level],
 					'sumber_dana'    => implode(', ', $sumber_dana),
 					'total_anggaran' => $rencana_pagu,
 					'urut' 			 => $opsi['no_urut_rhk'],
 					'id' 			 => $v_rhk_child['id']
 				);
 
-				$opsi['data_anggaran'][$jenis_level[$v_rhk_child['level']]][$index]['ids'][] = $v_rhk_child['id'];
-				$opsi['data_anggaran'][$jenis_level[$v_rhk_child['level']]][$index]['total'] += $rencana_pagu;
+				$opsi['data_anggaran'][$index_level][$index]['ids'][] = $v_rhk_child['id'];
+				$opsi['data_anggaran'][$index_level][$index]['total'] += $rencana_pagu;
 				$opsi['total'] += $rencana_pagu;
 
 				foreach ($sumber_dana as $sd) {
-					if (!in_array($sd, $opsi['data_anggaran'][$jenis_level[$v_rhk_child['level']]][$index]['sumber_dana'])) {
-						$opsi['data_anggaran'][$jenis_level[$v_rhk_child['level']]][$index]['sumber_dana'][$sd] = $sd;
+					if (!in_array($sd, $opsi['data_anggaran'][$index_level][$index]['sumber_dana'])) {
+						$opsi['data_anggaran'][$index_level][$index]['sumber_dana'][$sd] = $sd;
 					}
 				}
 			}
 		}
-		// echo '<pre>';
-		// print_r($opsi); 
-		// echo '</pre>';
-		// die();
+
+		// echo '<pre>'; print_r($data_rhk_child); print_r($opsi); echo '</pre>'; die();
 		return $opsi;
 	}
 
