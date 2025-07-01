@@ -754,12 +754,14 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 	if (!isset($level_1['koneksi_pokin']) || !is_array($level_1['koneksi_pokin'])) {
 		$level_1['koneksi_pokin'] = array();
 	}
-	$show_skpd = array();
+	$data_koneksi = array(
+		'status' => '',
+		'data' => []
+	);
 	$koneksi_pokin = array();
 	$koneksi_indikator_pokin = array();
 	$koneksi_pokin_turunan = array();
 	foreach ($level_1['koneksi_pokin'] as $koneksi_pokin_level_1) {
-		$class_pengusul = "";
 
 		$nama_skpd = $koneksi_pokin_level_1['nama_skpd'];
 		if ($koneksi_pokin_level_1['id_level_1_parent'] !== 0) {
@@ -781,34 +783,53 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 				$label_color = 'secondary text-white';
 				break;
 		}
+		$data_koneksi['status'] = $status_koneksi;
 
-		$show_nama_skpd = $nama_skpd . ' <span class="badge bg-' . $label_color . '" style="padding: .5em;">' . $status_koneksi . '</span> ';
-
-		$class_koneksi_pokin_vertikal = '';
-
-		$detail = "<a href='javascript:void(0)' data-id='" . $koneksi_pokin_level_1['id'] . "' class='detail-koneksi-pokin text-primary' onclick='detail_koneksi_pokin(" . $koneksi_pokin_level_1['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>";
+		$nama_skpd_koneksi = '
+			<span class="font-weight-bold">' . $nama_skpd . '</span>
+			<span class="badge bg-' . $label_color . '">' . $status_koneksi . '</span>
+		';
 
 		$keterangan_tolak_koneksi = !empty($koneksi_pokin_level_1['keterangan_tolak']) ? "( ket: " . $koneksi_pokin_level_1['keterangan_tolak'] . " )" : '';
 
-		$show_skpd[] = '<div class="koneksi-pokin-isi ' . $class_pengusul . ' ' . $class_koneksi_pokin_vertikal . '"><div class="font-weight-bold">' . $show_nama_skpd . '</div></div>';
-		$koneksi_pokin[] = '<div class="koneksi-pokin-isi ' . $class_pengusul . ' ' . $class_koneksi_pokin_vertikal . '"><div>' . $koneksi_pokin_level_1['label_parent'] . '</div><div class="text-muted"></div>' . $keterangan_tolak_koneksi . '</div>';
-		$koneksi_indikator_pokin[] = '<div>' . implode("<hr/>", $koneksi_pokin_level_1['label_indikator_kinerja']) . '</div><div class="text-muted"></div>' . $keterangan_tolak_koneksi . '</div>';
+		$data_koneksi['data'][] = $nama_skpd_koneksi;
+		$koneksi_pokin[] = '
+			<div>' . $koneksi_pokin_level_1['label_parent'] . '</div>
+			<div class="text-muted">' . $keterangan_tolak_koneksi . '</div>
+		';
+		$koneksi_indikator_pokin[] = '<div>' . implode("<hr/>", $koneksi_pokin_level_1['label_indikator_kinerja']) . '</div>';
 		$koneksi_pokin_turunan[] = $koneksi_pokin_level_1['pokin_opd_turunan'];
 	}
+
+	$indikator_html = '<div>' . implode('</div><div class="mt-1 pt-1 border-top">', array_map('htmlspecialchars', $indikator)) . '</div>';
 	$html .= '
 		<tr>
-			<td class="level1 font-weight-bold"><a href="' . $view_kinerja['url'] . '&id=' . $level_1['id'] . '&id_jadwal=' . $input['periode'] . '" target="_blank">' . $level_1['label'] . '</a></td>
-			<td class="indikator text-muted">' . implode("<hr/>", $indikator) . '</td>
+			<td class="level1 align-middle d-flex justify-content-between align-items-center">
+				<span class="font-weight-bold">
+					<a href="' . $view_kinerja['url'] . '&id=' . $level_1['id'] . '&id_jadwal=' . $input['periode'] . '" target="_blank">' . htmlspecialchars($level_1['label']) . '</a>
+				</span>
+				<button class="btn btn-sm btn-primary ml-2" onclick="handleDetailPokin(' . $level_1['id'] . '); return false;" title="Detail Pohon Kinerja">
+					<span class="dashicons dashicons-info"></span>
+				</button>
+			</td>
+			<td class="indikator text-muted align-middle">' . $indikator_html . '</td>
 			<td colspan="15" class="hide-crosscutting"></td>
 		</tr>';
-	if (!empty($show_skpd)) {
-		foreach ($show_skpd as $i => $koneksi_skpd) {
+	if (!empty($data_koneksi['data'])) {
+		foreach ($data_koneksi['data'] as $i => $koneksi_skpd) {
+			if ($data_koneksi['status'] == 'Menunggu') {
+				$class = '';
+				$class_indikator = '';
+			} else {
+				$class = 'koneksi font-weight-bold';
+				$class_indikator = 'indikator-koneksi text-muted';
+			}
 			$html .= '
 				<tr class="hide-crosscutting">
 					<td colspan="8"></td>
-					<td class="koneksi font-weight-bold">' . $koneksi_skpd . '</td>
-					<td class="koneksi font-weight-bold">' . ($koneksi_pokin[$i] ? $koneksi_pokin[$i] : '-') . '</td>
-					<td class="indikator-koneksi text-muted">' . ($koneksi_indikator_pokin[$i] ? $koneksi_indikator_pokin[$i] : '-') . '</td>
+					<td class="koneksi align-middle d-flex justify-content-between align-items-center">' . $koneksi_skpd . '</td>
+					<td class="' . $class . '">' . ($koneksi_pokin[$i] ? $koneksi_pokin[$i] : '-') . '</td>
+					<td class="' . $class_indikator . '">' . ($koneksi_indikator_pokin[$i] ? $koneksi_indikator_pokin[$i] : '-') . '</td>
 					<td colspan="6" class="detail-pokin hide-crosscutting"></td>
 				</tr>';
 
@@ -853,12 +874,14 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 		if (!isset($level_2['koneksi_pokin']) || !is_array($level_2['koneksi_pokin'])) {
 			$level_2['koneksi_pokin'] = array();
 		}
-		$show_skpd = array();
+		$data_koneksi = array(
+			'status' => '',
+			'data' => []
+		);
 		$koneksi_pokin = array();
 		$koneksi_indikator_pokin = array();
 		$koneksi_pokin_turunan = array();
 		foreach ($level_2['koneksi_pokin'] as $koneksi_pokin_level_2) {
-			$class_pengusul = "";
 
 			$nama_skpd = $koneksi_pokin_level_2['nama_skpd'];
 			if ($koneksi_pokin_level_2['id_level_1_parent'] !== 0) {
@@ -880,36 +903,53 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 					$label_color = 'secondary text-white';
 					break;
 			}
+			$data_koneksi['status'] = $status_koneksi;
 
-			$show_nama_skpd = $nama_skpd . ' <span class="badge bg-' . $label_color . '" style="padding: .5em;">' . $status_koneksi . '</span> ';
-
-			$class_koneksi_pokin_vertikal = '';
-
-			$detail = "<a href='javascript:void(0)' data-id='" . $koneksi_pokin_level_2['id'] . "' class='detail-koneksi-pokin text-primary' onclick='detail_koneksi_pokin(" . $koneksi_pokin_level_2['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>";
+			$nama_skpd_koneksi = '
+				<span class="font-weight-bold">' . $nama_skpd . '</span>
+				<span class="badge bg-' . $label_color . '">' . $status_koneksi . '</span>
+			';
 
 			$keterangan_tolak_koneksi = !empty($koneksi_pokin_level_2['keterangan_tolak']) ? "( ket: " . $koneksi_pokin_level_2['keterangan_tolak'] . " )" : '';
 
-			$show_skpd[] = '<div class="koneksi-pokin-isi ' . $class_pengusul . ' ' . $class_koneksi_pokin_vertikal . '"><div class="font-weight-bold">' . $show_nama_skpd . '</div></div>';
-			$koneksi_pokin[] = '<div class="koneksi-pokin-isi ' . $class_pengusul . ' ' . $class_koneksi_pokin_vertikal . '"><div>' . $koneksi_pokin_level_2['label_parent'] . '</div><div class="text-muted"></div>' . $keterangan_tolak_koneksi . '</div>';
-			$koneksi_indikator_pokin[] = '<div>' . implode("<hr/>", $koneksi_pokin_level_2['label_indikator_kinerja']) . '</div><div class="text-muted"></div>' . $keterangan_tolak_koneksi . '</div>';
+			$data_koneksi['data'][] = $nama_skpd_koneksi;
+			$koneksi_pokin[] = '
+				<div>' . $koneksi_pokin_level_2['label_parent'] . '</div>
+				<div class="text-muted">' . $keterangan_tolak_koneksi . '</div>
+			';
+			$koneksi_indikator_pokin[] = '<div>' . implode("<hr/>", $koneksi_pokin_level_2['label_indikator_kinerja']) . '</div>';
 			$koneksi_pokin_turunan[] = $koneksi_pokin_level_2['pokin_opd_turunan'];
 		}
+
+		$indikator_html = '<div>' . implode('</div><div class="mt-1 pt-1 border-top">', array_map('htmlspecialchars', $indikator)) . '</div>';
 		$html .= '
 			<tr>
 				<td colspan="2"></td>
-				<td class="level2 font-weight-bold">' . $level_2['label'] . '</td>
-				<td class="indikator text-muted">' . implode("<hr/>", $indikator) . '</td>
+				<td class="level2 align-middle d-flex justify-content-between align-items-center">
+					<span class="font-weight-bold">' . htmlspecialchars($level_2['label']) . '</span>
+					<button class="btn btn-sm btn-primary ml-2" onclick="handleDetailPokin(' . $level_2['id'] . '); return false;" title="Detail Pohon Kinerja">
+						<span class="dashicons dashicons-info"></span>
+					</button>
+				</td>
+				<td class="indikator text-muted align-middle">' . $indikator_html . '</td>
 				<td colspan="13" class="hide-crosscutting"></td>
 			</tr>';
-		if (!empty($show_skpd)) {
-			foreach ($show_skpd as $i => $koneksi_skpd) {
+		if (!empty($data_koneksi['data'])) {
+			foreach ($data_koneksi['data'] as $i => $koneksi_skpd) {
+				if ($data_koneksi['status'] == 'Menunggu') {
+					$class = '';
+					$class_indikator = '';
+				} else {
+					$class = 'koneksi font-weight-bold';
+					$class_indikator = 'indikator-koneksi text-muted';
+				}
 				$html .= '
 					<tr class="hide-crosscutting">
 						<td colspan="8"></td>
-						<td class="koneksi font-weight-bold">' . $koneksi_skpd . '</td>
-						<td class="koneksi font-weight-bold">' . ($koneksi_pokin[$i] ? $koneksi_pokin[$i] : '-') . '</td>
-						<td class="indikator-koneksi text-muted">' . ($koneksi_indikator_pokin[$i] ? $koneksi_indikator_pokin[$i] : '-') . '</td>
-						<td colspan="6" class="detail-pokin hide-crosscutting"></td>>
+						<td class="koneksi align-middle d-flex justify-content-between align-items-center">' . $koneksi_skpd . '</td>
+						<td class="' . $class . '">' . ($koneksi_pokin[$i] ? $koneksi_pokin[$i] : '-') . '</td>
+						<td class="' . $class_indikator . '">' . ($koneksi_indikator_pokin[$i] ? $koneksi_indikator_pokin[$i] : '-') . '</td>
+						<td colspan="6" class="detail-pokin hide-crosscutting"></td>
 					</tr>';
 
 				foreach ($koneksi_pokin_turunan[$i] as $turunan3) {
@@ -954,12 +994,14 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 			if (!isset($level_3['koneksi_pokin']) || !is_array($level_3['koneksi_pokin'])) {
 				$level_3['koneksi_pokin'] = array();
 			}
-			$show_skpd = array();
+			$data_koneksi = array(
+				'status' => '',
+				'data' => []
+			);
 			$koneksi_pokin = array();
 			$koneksi_indikator_pokin = array();
 			$koneksi_pokin_turunan = array();
 			foreach ($level_3['koneksi_pokin'] as $koneksi_pokin_level_3) {
-				$class_pengusul = "";
 
 				$nama_skpd = $koneksi_pokin_level_3['nama_skpd'];
 				if ($koneksi_pokin_level_3['id_level_1_parent'] !== 0) {
@@ -981,36 +1023,53 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 						$label_color = 'secondary text-white';
 						break;
 				}
+				$data_koneksi['status'] = $status_koneksi;
 
-				$show_nama_skpd = $nama_skpd . ' <span class="badge bg-' . $label_color . '" style="padding: .5em;">' . $status_koneksi . '</span> ';
+				$nama_skpd_koneksi = '
+					<span class="font-weight-bold">' . $nama_skpd . '</span>
+					<span class="badge bg-' . $label_color . '">' . $status_koneksi . '</span>';
 
-				$class_koneksi_pokin_vertikal = '';
-
-				$detail = "<a href='javascript:void(0)' data-id='" . $koneksi_pokin_level_3['id'] . "' class='detail-koneksi-pokin text-primary' onclick='detail_koneksi_pokin(" . $koneksi_pokin_level_3['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>";
 
 				$keterangan_tolak_koneksi = !empty($koneksi_pokin_level_3['keterangan_tolak']) ? "( ket: " . $koneksi_pokin_level_3['keterangan_tolak'] . " )" : '';
 
-				$show_skpd[] = '<div class="koneksi-pokin-isi ' . $class_pengusul . ' ' . $class_koneksi_pokin_vertikal . '"><div class="font-weight-bold">' . $show_nama_skpd . '</div></div>';
-				$koneksi_pokin[] = '<div class="koneksi-pokin-isi ' . $class_pengusul . ' ' . $class_koneksi_pokin_vertikal . '"><div>' . $koneksi_pokin_level_3['label_parent'] . '</div><div class="text-muted"></div>' . $keterangan_tolak_koneksi . '</div>';
-				$koneksi_indikator_pokin[] = '<div>' . implode("<hr/>", $koneksi_pokin_level_3['label_indikator_kinerja']) . '</div><div class="text-muted"></div>' . $keterangan_tolak_koneksi . '</div>';
+				$data_koneksi['data'][] = $nama_skpd_koneksi;
+				$koneksi_pokin[] = '
+					<div>' . $koneksi_pokin_level_3['label_parent'] . '</div>
+					<div class="text-muted">' . $keterangan_tolak_koneksi . '</div>';
+				$koneksi_indikator_pokin[] = '
+					<div>' . implode("<hr/>", $koneksi_pokin_level_3['label_indikator_kinerja']) . '</div>';
 				$koneksi_pokin_turunan[] = $koneksi_pokin_level_3['pokin_opd_turunan'];
 			}
 
+			$indikator_html = '<div>' . implode('</div><div class="mt-1 pt-1 border-top">', array_map('htmlspecialchars', $indikator)) . '</div>';
 			$html .= '
 				<tr>
 					<td colspan="4"></td>
-					<td class="level3 font-weight-bold">' . $level_3['label'] . '</td>
-					<td class="indikator text-muted">' . implode("<hr/>", $indikator) . '</td>
+					<td class="level3 align-middle d-flex justify-content-between align-items-center">
+						<span class="font-weight-bold">' . htmlspecialchars($level_3['label']) . '</span>
+						<button class="btn btn-sm btn-primary ml-2" onclick="handleDetailPokin(' . $level_3['id'] . '); return false;" title="Detail Pohon Kinerja">
+							<span class="dashicons dashicons-info"></span>
+						</button>
+					</td>
+					<td class="indikator text-muted align-middle">' . $indikator_html . '</td>
 					<td colspan="11" class="hide-crosscutting"></td>
 				</tr>';
-			if (!empty($show_skpd)) {
-				foreach ($show_skpd as $i => $koneksi_skpd) {
+
+			if (!empty($data_koneksi['data'])) {
+				foreach ($data_koneksi['data'] as $i => $koneksi_skpd) {
+					if ($data_koneksi['status'] == 'Menunggu') {
+						$class = '';
+						$class_indikator = '';
+					} else {
+						$class = 'koneksi font-weight-bold';
+						$class_indikator = 'indikator-koneksi text-muted';
+					}
 					$html .= '
 						<tr class="hide-crosscutting">
 							<td colspan="8"></td>
-							<td class="koneksi font-weight-bold">' . $koneksi_skpd . '</td>
-							<td class="koneksi font-weight-bold">' . ($koneksi_pokin[$i] ? $koneksi_pokin[$i] : '-') . '</td>
-							<td class="indikator-koneksi text-muted">' . ($koneksi_indikator_pokin[$i] ? $koneksi_indikator_pokin[$i] : '-') . '</td>
+							<td class="koneksi align-middle d-flex justify-content-between align-items-center">' . $koneksi_skpd . '</td>
+							<td class="' . $class . '">' . ($koneksi_pokin[$i] ? $koneksi_pokin[$i] : '-') . '</td>
+							<td class="' . $class_indikator . '">' . ($koneksi_indikator_pokin[$i] ? $koneksi_indikator_pokin[$i] : '-') . '</td>
 							<td colspan="6" class="detail-pokin hide-crosscutting"></td>
 						</tr>';
 
@@ -1057,12 +1116,14 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 				if (!isset($level_4['koneksi_pokin']) || !is_array($level_4['koneksi_pokin'])) {
 					$level_4['koneksi_pokin'] = array();
 				}
-				$show_skpd = array();
+				$data_koneksi = array(
+					'status' => '',
+					'data' => []
+				);
 				$koneksi_pokin = array();
 				$koneksi_indikator_pokin = array();
 				$koneksi_pokin_turunan = array();
 				foreach ($level_4['koneksi_pokin'] as $koneksi_pokin_level_4) {
-					$class_pengusul = "";
 
 					$nama_skpd = $koneksi_pokin_level_4['nama_skpd'];
 					if ($koneksi_pokin_level_4['id_level_1_parent'] !== 0) {
@@ -1084,36 +1145,51 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 							$label_color = 'secondary text-white';
 							break;
 					}
+					$data_koneksi['status'] = $status_koneksi;
 
-					$show_nama_skpd = $nama_skpd . ' <span class="badge bg-' . $label_color . '" style="padding: .5em;">' . $status_koneksi . '</span> ';
-
-					$class_koneksi_pokin_vertikal = '';
-
-					$detail = "<a href='javascript:void(0)' data-id='" . $koneksi_pokin_level_4['id'] . "' class='detail-koneksi-pokin text-primary' onclick='detail_koneksi_pokin(" . $koneksi_pokin_level_4['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>";
+					$nama_skpd_koneksi = '
+						<span class="font-weight-bold">' . $nama_skpd . '</span>
+						<span class="badge bg-' . $label_color . '">' . $status_koneksi . '</span>
+					';
 
 					$keterangan_tolak_koneksi = !empty($koneksi_pokin_level_4['keterangan_tolak']) ? "( ket: " . $koneksi_pokin_level_4['keterangan_tolak'] . " )" : '';
 
-					$show_skpd[] = '<div class="koneksi-pokin-isi ' . $class_pengusul . ' ' . $class_koneksi_pokin_vertikal . '"><div class="font-weight-bold">' . $show_nama_skpd . '</div></div>';
-					$koneksi_pokin[] = '<div class="koneksi-pokin-isi ' . $class_pengusul . ' ' . $class_koneksi_pokin_vertikal . '"><div>' . $koneksi_pokin_level_4['label_parent'] . '</div><div class="text-muted"></div>' . $keterangan_tolak_koneksi . '</div>';
-					$koneksi_indikator_pokin[] = '<div>' . implode("<hr/>", $koneksi_pokin_level_4['label_indikator_kinerja']) . '</div><div class="text-muted"></div>' . $keterangan_tolak_koneksi . '</div>';
+					$data_koneksi['data'][] = $nama_skpd_koneksi;
+					$koneksi_pokin[] = '
+						<div>' . $koneksi_pokin_level_4['label_parent'] . '</div>
+						<div class="text-muted">' . $keterangan_tolak_koneksi . '</div>
+					';
+					$koneksi_indikator_pokin[] = '<div>' . implode("<hr/>", $koneksi_pokin_level_4['label_indikator_kinerja']) . '</div>';
 					$koneksi_pokin_turunan[] = $koneksi_pokin_level_4['pokin_opd_turunan'];
 				}
-
+				$indikator_html = '<div>' . implode('</div><div class="mt-1 pt-1 border-top">', array_map('htmlspecialchars', $indikator)) . '</div>';
 				$html .= '
 					<tr>
 						<td colspan="6"></td>
-						<td class="level4 font-weight-bold">' . $level_4['label'] . '</td>
-						<td class="indikator text-muted">' . implode("<hr/>", $indikator) . '</td>
+						<td class="level4 align-middle d-flex justify-content-between align-items-center">
+							<span class="font-weight-bold">' . htmlspecialchars($level_4['label']) . '</span>
+							<button class="btn btn-sm btn-primary ml-2" onclick="handleDetailPokin(' . $level_4['id'] . '); return false;" title="Detail Pohon Kinerja">
+								<span class="dashicons dashicons-info"></span>
+							</button>
+						</td>
+						<td class="indikator text-muted align-middle">' . $indikator_html . '</td>
 						<td colspan="9" class="hide-crosscutting"></td>
 					</tr>';
-				if (!empty($show_skpd)) {
-					foreach ($show_skpd as $i => $koneksi_skpd) {
+				if (!empty($data_koneksi['data'])) {
+					foreach ($data_koneksi['data'] as $i => $koneksi_skpd) {
+						if ($data_koneksi['status'] == 'Menunggu') {
+							$class = '';
+							$class_indikator = '';
+						} else {
+							$class = 'koneksi font-weight-bold';
+							$class_indikator = 'indikator-koneksi text-muted';
+						}
 						$html .= '
 							<tr class="hide-crosscutting">
 								<td colspan="8"></td>
-								<td class="koneksi font-weight-bold">' . $koneksi_skpd . '</td>
-								<td class="koneksi font-weight-bold">' . ($koneksi_pokin[$i] ? $koneksi_pokin[$i] : '-') . '</td>
-								<td class="indikator-koneksi text-muted">' . ($koneksi_indikator_pokin[$i] ? $koneksi_indikator_pokin[$i] : '-') . '</td>
+								<td class="koneksi align-middle d-flex justify-content-between align-items-center">' . $koneksi_skpd . '</td>
+								<td class="' . $class . '">' . ($koneksi_pokin[$i] ? $koneksi_pokin[$i] : '-') . '</td>
+								<td class="' . $class_indikator . '">' . ($koneksi_indikator_pokin[$i] ? $koneksi_indikator_pokin[$i] : '-') . '</td>
 								<td colspan="6" class="detail-pokin hide-crosscutting"></td>
 							</tr>';
 
@@ -1329,6 +1405,93 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 		vertical-align: text-bottom !important;
 		font-size: 23px !important;
 	}
+
+	/* sidebar */
+	.sidebar-modal {
+		position: fixed;
+		top: 0;
+		right: 0;
+		width: 380px;
+		height: 100%;
+		z-index: 1050;
+		background-color: #fff;
+		box-shadow: -5px 0px 15px rgba(0, 0, 0, 0.15);
+		transform: translateX(100%);
+		transition: transform 0.3s ease-in-out;
+	}
+
+	.sidebar-modal.show {
+		transform: translateX(0);
+	}
+
+	.sidebar-backdrop {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0, 0, 0, 0.4);
+		z-index: 1040;
+		opacity: 0;
+		visibility: hidden;
+		transition: opacity 0.3s ease-in-out, visibility 0.3s;
+	}
+
+	.sidebar-backdrop.show {
+		opacity: 1;
+		visibility: visible;
+	}
+
+	/* ================================ */
+
+	.sidebar-header {
+		background-color: #57b2ec;
+		color: white;
+		padding: 1rem 1.25rem;
+	}
+
+	.sidebar-header .close-btn {
+		color: white;
+		opacity: 0.9;
+		font-size: 1.5rem;
+		background: none;
+		border: none;
+	}
+
+	.sidebar-header .close-btn:hover {
+		opacity: 1;
+	}
+
+	.sidebar-body {
+		padding: 1.5rem;
+		overflow-y: auto;
+		height: calc(100% - 62px);
+	}
+
+	.info-section {
+		margin-bottom: 1.75rem;
+	}
+
+	.info-section h6 {
+		font-weight: 600;
+		font-size: 0.9rem;
+		color: #555;
+		margin-bottom: 0.5rem;
+	}
+
+	.info-section h6 i {
+		margin-right: 10px;
+		color: #6c757d;
+		width: 20px;
+		text-align: center;
+	}
+
+	.info-section p {
+		font-size: 1rem;
+		color: #333;
+		margin-left: 30px;
+		margin-bottom: 0;
+	}
 </style>
 <h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Pohon Kinerja<br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h3><br>
 <div style="text-align: center;">
@@ -1344,6 +1507,40 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 <?php if (!$is_admin_panrb): ?>
 	<div id="action" class="action-section"></div>
 <?php endif; ?>
+
+<div class="sidebar-modal" id="rincianSidebar">
+	<div class="sidebar-header d-flex justify-content-between align-items-center">
+		<h5 class="mb-0 text-light">Rincian</h5>
+		<button type="button" class="close-btn" onclick="toggleSidebar()">
+			<span>&times;</span>
+		</button>
+	</div>
+
+	<div class="sidebar-body">
+		<div class="info-section">
+			<h6><i class="dashicons dashicons-admin-users"></i> Pelaksana</h6>
+			<p id="pelaksana"></p>
+		</div>
+
+		<div class="info-section">
+			<h6><i class="dashicons dashicons-clipboard"></i> Bentuk Kegiatan</h6>
+			<p id="bentuk_kegiatan"></p>
+		</div>
+
+		<div class="info-section">
+			<h6><i class="dashicons dashicons-chart-line"></i> Outcome</h6>
+			<p id="outcome"></p>
+		</div>
+
+		<div class="info-section">
+			<h6><i class="dashicons dashicons-groups"></i> Crosscutting Dengan</h6>
+			<p id="crosscutting"></p>
+		</div>
+	</div>
+</div>
+
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
 <div style="padding: 5px; overflow: auto; height: 100vh;">
 	<table id="cetak" title="Penyusunan Pohon Kinerja Pemerintah Daerah" class="table table-bordered penyusunan_pohon_kinerja">
 		<thead style="background: #ffc491;">
@@ -1372,6 +1569,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 		</tbody>
 	</table>
 </div>
+
 <div class="hide-print container mt-4 p-4 mb-4 border rounded bg-light">
 	<h4 class="font-weight-bold mb-3 text-dark">💡 Petunjuk Penggunaan Modul Pohon Kinerja</h4>
 	<p class="text-muted">Berikut adalah panduan dan beberapa catatan penting dalam penggunaan modul Pohon Kinerja (Pokin):</p>
@@ -1405,7 +1603,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 	</ul>
 </div>
 
-<div class="modal fade" id="modal-pokin" role="dialog" data-backdrop="static" aria-hidden="true">'
+<div class="modal fade" id="modal-pokin" role="dialog" data-backdrop="static" aria-hidden="true">
 	<div class="modal-dialog modal-xl" role="document">
 		<div class="modal-content">
 			<div class="modal-header bgpanel-theme">
@@ -1508,6 +1706,48 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 		jQuery('#check-tampilkan-cc').trigger('change');
 		jQuery('#check-tampilkan-detail').trigger('change');
 	});
+
+	function toggleSidebar() {
+		jQuery('#rincianSidebar').toggleClass('show');
+		jQuery('#sidebarBackdrop').toggleClass('show');
+	}
+
+	function handleDetailPokin(idPokin) {
+		jQuery('#wrap-loading').show();
+		jQuery.ajax({
+			method: 'POST',
+			url: esakip.url,
+			data: {
+				"action": "edit_pokin",
+				"api_key": esakip.api_key,
+				'id': idPokin
+			},
+			dataType: 'json',
+			success: function(response) {
+				jQuery("#wrap-loading").hide();
+				if (!response.status) {
+					alert(response.message);
+					return;
+				}
+				jQuery("#pelaksana").text(response.data.pelaksana || '-');
+				jQuery("#bentuk_kegiatan").text(response.data.bentuk_kegiatan || '-');
+				jQuery("#outcome").text(response.data.outcome || '-');
+
+				if (response.list_pd_koneksi_pokin && response.list_pd_koneksi_pokin.length > 0) {
+					jQuery("#crosscutting").html(
+						response.list_pd_koneksi_pokin.map(item => item).join(', '));
+				} else {
+					jQuery("#crosscutting").text('-');
+				}
+
+				toggleSidebar();
+			},
+			error: function(e) {
+				jQuery("#wrap-loading").hide();
+				alert(e.responseJSON.message || 'Terjadi kesalahan saat mengambil data Pohon Kinerja.');
+			}
+		});
+	}
 
 	function handleDeletePokin(id, parentId, level) {
 		if (confirm(`Data Pohon Kinerja akan dihapus?`)) {

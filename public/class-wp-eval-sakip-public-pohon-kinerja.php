@@ -794,6 +794,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					}
 
 					$table_koneksi_pokin = '';
+					$list_pd_koneksi_pokin = [];
 					$no = 1;
 					if (!empty($data_koneksi_pokin)) {
 						$nama_cross = $this->get_nama_crosscuttin();
@@ -884,6 +885,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								$table_koneksi_pokin .= '
 									<td class="text-center">' . $aksi_koneksi . '</td>
 								</tr>';
+								
+								$list_pd_koneksi_pokin[] = $nama_perangkat;
 							}
 						}
 					}
@@ -898,7 +901,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						'status' => true,
 						'data' => $data,
 						'data_croscutting' => $table_croscutting,
-						'data_koneksi_pokin' => $table_koneksi_pokin
+						'data_koneksi_pokin' => $table_koneksi_pokin,
+						'list_pd_koneksi_pokin' => $list_pd_koneksi_pokin
 					]);
 					exit();
 				} else {
