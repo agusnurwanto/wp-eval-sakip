@@ -953,6 +953,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-list-rencana-aksi-pemda.php';
 	}
 
+	public function list_pengisian_rencana_aksi_pemda_baru($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-rencana-aksi-pemda-baru.php';
+	}
+
 	public function get_detail_renja_rkt_by_id()
 	{
 		global $wpdb;

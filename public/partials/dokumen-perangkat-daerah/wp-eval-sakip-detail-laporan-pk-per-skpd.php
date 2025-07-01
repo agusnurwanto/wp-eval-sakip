@@ -87,7 +87,7 @@ $pihak_pertama = array(
     'nama_pegawai'         => $data_pegawai_1['nama_pegawai'] ?? '-',
     'nip_pegawai'          => $data_pegawai_1['nip_baru'] ?? '-',
     'bidang_pegawai'       => $data_pegawai_1['nama_bidang'] ?? '-',
-    'jabatan_pegawai'      => $data_pegawai_1['jabatan'] . '<br>' . $data_pegawai_1['nama_bidang'] ?? '',
+    'jabatan_pegawai'      => '<span class = "jabatan-pihak-pertama">' . ($data_pegawai_1['jabatan'] ?? '') . '</span> ' .'<span class = "nama-satker">' . ($data_pegawai_1['nama_bidang'] ?? '') . '</span>',
     'pangkat'              => $data_pegawai_1['pangkat'] ?? '-',
     'gelar_depan'          => $data_pegawai_1['gelar_depan'] ?? '',
     'gelar_belakang'       => $data_pegawai_1['gelar_belakang'] ?? '',
@@ -271,6 +271,7 @@ if (!empty($data_atasan)) {
         'nama_pegawai'    => $data_atasan['nama_pegawai'] ?? '-',
         'nip_pegawai'     => $data_atasan['nip_baru'] ?? '-',
         'jabatan_pegawai' => '', //default kosong jika atasan kepala daerah
+        'nama_bidang' => '', //default kosong jika atasan kepala daerah
         'pangkat'         => '', //default kosong jika atasan kepala daerah
         'gelar_depan'     => '', //default kosong jika atasan kepala daerah
         'gelar_belakang'  => '', //default kosong jika atasan kepala daerah
@@ -304,13 +305,14 @@ if (!empty($data_atasan)) {
         $pihak_kedua['pangkat']         = $data_pegawai_2['pangkat'] ?? '-';
         $pihak_kedua['gelar_depan']     = $data_pegawai_2['gelar_depan'] ?? '';
         $pihak_kedua['gelar_belakang']  = $data_pegawai_2['gelar_belakang'] ?? '';
-        $pihak_kedua['jabatan_pegawai'] = $data_pegawai_2['jabatan'] . '<br>' . $data_pegawai_2['nama_bidang'] ?? '-';
+        $pihak_kedua['jabatan_pegawai'] = '<span class = "jabatan-pihak-kedua">' . ($data_pegawai_2['jabatan'] ?? '') . '</span>' .'<span class = "nama-satker">' . ($data_pegawai_2['nama_bidang'] ?? '-') . '</span>';
     }
 } else {
     $pihak_kedua = array(
         'nama_pegawai'    => '-',
         'nip_pegawai'     => '-',
         'jabatan_pegawai' => '-', //default kosong jika atasan kepala daerah
+        'nama_bidang' => '-', //default kosong jika atasan kepala daerah
         'pangkat'         => '', //default kosong jika atasan kepala daerah
         'gelar_depan'     => '', //default kosong jika atasan kepala daerah
         'gelar_belakang'  => '', //default kosong jika atasan kepala daerah
@@ -797,10 +799,30 @@ $ttd_orientasi = 'text-left';
 
 <body>
     <div class="container-md mx-auto" style="width: 900px;">
-        <div class="text-center" id="action-sakip">
+       <div class="text-center" id="action-sakip">
             <button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button>
+
             <?php if($hak_akses_user_pegawai == 1 || ($hak_akses_user_pegawai == 2 && $pihak_pertama && $pihak_pertama['nip_pegawai'] == $nip_user_pegawai)): ?>
-                <button class="btn btn-warning" onclick="get_alamat();"><i class="dashicons dashicons-edit"></i>Edit Alamat</button><br>
+                <div class="d-inline-flex align-items-center ml-2">
+                    <button class="btn btn-warning mr-3" onclick="get_alamat();"><i class="dashicons dashicons-edit"></i> Edit Alamat</button>
+
+                    <div class="form-inline">
+                        <label for="font-select" class="mr-2">Jenis Font:</label>
+                        <select id="font-select" class="form-control form-control-sm mr-3" onchange="updateFont()">
+                            <option value="Arial" selected>Arial</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                            <option value="Calibri">Calibri</option>
+                            <option value="inherit">Inherit</option>
+                            <option value="Courier">Courier</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Helvetica">Helvetica</option>
+                            <option value="Trebuchet">Trebuchet</option>
+                            <option value="Verdana">Verdana</option>
+                        </select>
+                        <label for="font-size" class="mr-2">Ukuran Font:</label>
+                        <input type="number" id="font-size" class="form-control form-control-sm mr-3" value="16" min="1" max="48" onkeyup ="updateFont()" style="width: 80px;">
+                    </div>
+                </div>
             <?php endif; ?>
         </div>
 
@@ -904,7 +926,7 @@ $ttd_orientasi = 'text-left';
                 <div class="col my-auto">
                     <p class="title-pk-1">PEMERINTAH <?php echo strtoupper($nama_pemda); ?></p>
                     <p class="title-pk-2 nama-skpd-view"><?php echo strtoupper($skpd['nama_skpd']); ?></p>
-                    <p class="title-pk-1 alamat-kantor-view" id="alamat_kantor"><?php echo $skpd['alamat_kantor']; ?></p>
+                    <p class="title-pk-3 alamat-kantor-view" id="alamat_kantor"><?php echo $skpd['alamat_kantor']; ?></p>
                 </div>
                 <div class="col-1"></div>
             </div>
@@ -945,13 +967,13 @@ $ttd_orientasi = 'text-left';
                 <tbody>
                     <tr class="<?php echo $ttd_orientasi; ?>">
                         <td></td>
-                        <td style="padding: 0 20px 0 0;" contenteditable="true" title="Klik untuk ganti teks!" class="editable-field">
+                        <td style="padding: 0 0 0 20px;" contenteditable="true" title="Klik untuk ganti teks!" class="editable-field">
                             <?php echo $pemda; ?>, <span class="tanggal-dokumen-view"><?php echo $text_tanggal_hari_ini; ?></span>
                         </td>
                     </tr>
                     <tr class="<?php echo $ttd_orientasi; ?>">
                         <td style="padding: 0 20px 0 0;">Pihak Kedua,</td>
-                        <td style="padding: 0 20px 0 0;">Pihak Pertama,</td>
+                        <td style="padding: 0 0 0 20px;">Pihak Pertama,</td>
                     </tr>
                     <tr style="height: 7em;">
                         <td></td>
@@ -962,7 +984,7 @@ $ttd_orientasi = 'text-left';
                         <td class="ttd-pejabat nama-pegawai-atasan-view" id="nama_pegawai_atasan">
                             <?php echo $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] . ', ' . $pihak_kedua['gelar_belakang']; ?>
                         </td>
-                        <td class="ttd-pejabat nama-pegawai-view">
+                        <td style="padding: 0 0 0 20px;" class="ttd-pejabat nama-pegawai-view">
                             <?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . ', ' . $pihak_pertama['gelar_belakang']; ?>
                         </td>
                     </tr>
@@ -972,7 +994,7 @@ $ttd_orientasi = 'text-left';
                                 <?php echo $pihak_kedua['pangkat']; ?>
                             <?php endif; ?>
                         </td>
-                        <td style="padding: 0 20px 0 0;" class="pangkat-pegawai-view">
+                        <td style="padding: 0 0 0 20px;" class="pangkat-pegawai-view">
                             <?php echo $pihak_pertama['pangkat']; ?>
                         </td>
                     </tr>
@@ -982,7 +1004,7 @@ $ttd_orientasi = 'text-left';
                                 NIP. <span class="nip-pegawai-atasan-view"><?php echo $pihak_kedua['nip_pegawai']; ?></span>
                             <?php endif; ?>
                         </td>
-                        <td style="padding: 0 20px 0 0;">
+                        <td style="padding: 0 0 0 20px;">
                             NIP. <span class="nip-pegawai-view"><?php echo $pihak_pertama['nip_pegawai']; ?></span>
                         </td>
                     </tr>
@@ -1062,13 +1084,13 @@ $ttd_orientasi = 'text-left';
                 <tbody>
                     <tr class="<?php echo $ttd_orientasi; ?>">
                         <td style="padding: 0 20px 0 0;"></td>
-                        <td style="padding: 0 20px 0 0;" contenteditable="true" title="Klik untuk ganti teks!" class="editable-field">
+                        <td style="padding: 0 0 0 20px;" contenteditable="true" title="Klik untuk ganti teks!" class="editable-field">
                             <?php echo $pemda; ?>, <span class="tanggal-dokumen-view"><?php echo $text_tanggal_hari_ini; ?></span>
                         </td>
                     </tr>
                     <tr class="<?php echo $ttd_orientasi; ?>">
                         <td style="padding: 0 20px 0 0;" class="jabatan-pegawai-atasan-view status-jabatan-pegawai-2"><?php echo $pihak_kedua['jabatan_pegawai']; ?></td>
-                        <td style="padding: 0 20px 0 0;" class="jabatan-pegawai-view status-jabatan-pegawai-1"><?php echo $pihak_pertama['jabatan_pegawai']; ?>,</td>
+                        <td style="padding: 0 0 0 20px;" class="jabatan-pegawai-view status-jabatan-pegawai-1"><?php echo $pihak_pertama['jabatan_pegawai']; ?>,</td>
                     </tr>
                     <tr style="height: 7em;">
                         <td></td>
@@ -1079,7 +1101,7 @@ $ttd_orientasi = 'text-left';
                         <td class="ttd-pejabat nama-pegawai-atasan-view">
                             <?php echo $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] . ', ' . $pihak_kedua['gelar_belakang']; ?>
                         </td>
-                        <td class="ttd-pejabat nama-pegawai-view">
+                        <td style="padding: 0 0 0 20px;" class="ttd-pejabat nama-pegawai-view">
                             <?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . ', ' . $pihak_pertama['gelar_belakang']; ?>
                         </td>
                     </tr>
@@ -1089,7 +1111,7 @@ $ttd_orientasi = 'text-left';
                                 <?php echo $pihak_kedua['pangkat']; ?>
                             <?php endif; ?>
                         </td>
-                        <td style="padding: 0 20px 0 0;" class="pangkat-pegawai-view">
+                        <td style="padding: 0 0 0 20px;" class="pangkat-pegawai-view">
                             <?php echo $pihak_pertama['pangkat']; ?>
                         </td>
                     </tr>
@@ -1099,7 +1121,7 @@ $ttd_orientasi = 'text-left';
                                 NIP. <span class="nip-pegawai-atasan-view"><?php echo $pihak_kedua['nip_pegawai']; ?></span>
                             <?php endif; ?>
                         </td>
-                        <td style="padding: 0 20px 0 0;">
+                        <td style="padding: 0 0 0 20px;">
                             NIP. <span class="nip-pegawai-view"><?php echo $pihak_pertama['nip_pegawai']; ?></span>
                         </td>
                     </tr>
@@ -1365,7 +1387,7 @@ $ttd_orientasi = 'text-left';
     <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="uploadModalLabel">Edit Perangkat Daerah</h5>
+                <h5 class="modal-title" id="uploadModalLabel">Edit Alamat Kantor</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -1375,12 +1397,22 @@ $ttd_orientasi = 'text-left';
                     <input type="hidden" value="" id="id_skpd">
                     <div class="form-group">
                         <label for="alamat">Alamat Kantor</label>
-                        <textarea type="text" class="form-control" id="alamat" name="alamat" required></textarea>
+                        <?php 
+                            $content = ''; 
+                            $editor_id = 'alamat';
+                            $settings = array(
+                                'textarea_name' => 'alamat',
+                                'media_buttons' => false, 
+                                'teeny' => false, 
+                                'quicktags' => true
+                            );
+                            wp_editor($content, $editor_id, $settings);
+                        ?>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="submit" class="btn btn-primary d-flex text-right" onclick="submit_edit_alamat(this); return false">Unggah</button>
+                <button type="submit" class="btn btn-primary d-flex text-right" onclick="submit_edit_alamat(this); return false">Simpan</button>
             </div>
         </div>
     </div>
@@ -1461,7 +1493,11 @@ $ttd_orientasi = 'text-left';
                 if (response.status === 'success') {
                     if(response.data != null || response.data != undefined){
                         let data = response.data;
-                        jQuery("#alamat").val(data.alamat_kantor);
+                        if (tinymce.get('alamat')) {
+                            tinymce.get('alamat').setContent(data.alamat_kantor);
+                        } else {
+                            jQuery('#alamat').val(data.alamat_kantor); 
+                        }
                     }
                     jQuery('#modalAlamat').modal('show');
                 } else {
@@ -1476,8 +1512,8 @@ $ttd_orientasi = 'text-left';
         });
     }
 
-    function submit_edit_alamat() {
-        let alamat = jQuery("#alamat").val();
+    function submit_edit_alamat() {     
+        let alamat = tinymce.get('alamat') ? tinymce.get('alamat').getContent() : jQuery('#alamat').val();
         if (alamat == '') {
             return alert('Alamat kantor tidak boleh kosong');
         }
@@ -1749,6 +1785,16 @@ $ttd_orientasi = 'text-left';
                 console.error('AJAX Error:', error);
                 alert('Gagal menyimpan data. Silakan coba lagi.');
             },
+        });
+    }
+    
+    function updateFont() {
+        const fontFamily = document.getElementById('font-select').value;
+        const fontSize = document.getElementById('font-size').value + 'px';
+
+        document.querySelectorAll('.page-print').forEach(el => {
+            el.style.fontFamily = fontFamily;
+            el.style.fontSize = fontSize;
         });
     }
 </script>

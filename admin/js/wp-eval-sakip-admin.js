@@ -202,20 +202,18 @@ jQuery(document).ready(function () {
         console.log(pesan);
     }
 
-    jQuery("body").on("click", ".esakip-header-tahun", function () {
-        var tahun = jQuery(this).attr("tahun");
-        if (jQuery(this).hasClass("active")) {
-            jQuery(this).removeClass("active");
-            jQuery('.esakip-body-tahun[tahun="' + tahun + '"]').removeClass(
-                "active"
-            );
-        } else {
-            jQuery(this).addClass("active");
-            jQuery('.esakip-body-tahun[tahun="' + tahun + '"]').addClass(
-                "active"
-            );
-        }
+    jQuery("body").on("click", ".esakip-header-jadwal", function () {
+        const jadwal = jQuery(this).attr("jadwal");
+        jQuery(this).toggleClass("active");
+        jQuery('.accordion-body-jadwal[jadwal="' + jadwal + '"]').toggleClass("active");
     });
+
+    jQuery("body").on("click", ".esakip-header-tahun", function () {
+        const tahun = jQuery(this).attr("tahun");
+        jQuery(this).toggleClass("active");
+        jQuery('.esakip-body-tahun[tahun="' + tahun + '"]').toggleClass("active");
+    });
+
 });
 
 function coba_auto_login(that){

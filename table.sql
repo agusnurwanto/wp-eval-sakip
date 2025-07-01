@@ -2317,6 +2317,70 @@ CREATE TABLE esakip_kuesioner_mendagri_detail (
   KEY `active` (`active`)
 );
 
+CREATE TABLE esakip_laporan_pk_pemda (
+  `id` int(11) NOT NULL auto_increment,
+  `id_iku` int(11) DEFAULT NULL,
+  `target` text DEFAULT NULL,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `pagu` double(20, 0) DEFAULT NULL,
+  `id_renaksi_opd` int(11) DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT null,
+  `active` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY  (`id`),
+  KEY `id_iku` (`id_iku`),
+  KEY `id_skpd` (`id_skpd`),
+  KEY `id_renaksi_opd` (`id_renaksi_opd`),
+  KEY `tahun_anggaran` (`tahun_anggaran`),
+  KEY `active` (`active`)
+);
+
+CREATE TABLE `esakip_finalisasi_tahap_pk_pemda` (
+  `id` int(11) NOT NULL auto_increment,
+  `nama_tahapan` text DEFAULT NULL,
+  `tanggal_dokumen` date DEFAULT NULL,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT null,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id),
+  KEY `tahun_anggaran` (`tahun_anggaran`),
+  KEY `active` (`active`)
+);
+
+CREATE TABLE `esakip_finalisasi_pk_pemda` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_tahap` varchar(255) DEFAULT null,
+  `label_sasaran` text DEFAULT null,
+  `label_indikator` text DEFAULT null,
+  `target` text DEFAULT null,
+  `pagu` double(20, 0) DEFAULT NULL,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT null,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id),
+  KEY `id_tahap` (`id_tahap`),
+  KEY `id_jadwal` (`id_jadwal`),
+  KEY `tahun_anggaran` (`tahun_anggaran`),
+  KEY `active` (`active`)
+);
+
+CREATE TABLE `esakip_detail_rencana_aksi_pemda` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_pk` varchar(255) DEFAULT null,
+  `id_skpd` int(11) DEFAULT NULL,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT null,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp(),
+  PRIMARY key (id),
+  KEY `id_pk` (`id_pk`),
+  KEY `id_skpd` (`id_skpd`),
+  KEY `id_jadwal` (`id_jadwal`),
+
 CREATE TABLE esakip_dokumen_kuesioner (
   `id` int(11) NOT NULL auto_increment,
   `opd` varchar(255) DEFAULT NULL,
