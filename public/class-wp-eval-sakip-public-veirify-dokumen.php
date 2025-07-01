@@ -2876,7 +2876,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
         global $wpdb;
         $ret = array(
             'status' => 'success',
-            'message' => 'Berhasil Edit laporan PK Setting!'
+            'message' => 'Berhasil Edit Alamat!'
         );
 
         if (!empty($_POST)) {

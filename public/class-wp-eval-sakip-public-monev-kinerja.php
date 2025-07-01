@@ -2788,11 +2788,16 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 					$renaksi_pemda = $wpdb->get_results($wpdb->prepare("
 					    SELECT 
-					    	*
-					    FROM esakip_detail_rencana_aksi_pemda 
-					    WHERE active = 1
-					        AND id_skpd = %d
-					        AND tahun_anggaran = %d
+					    	r.*,
+					    	l.id AS id_label
+					    FROM esakip_detail_rencana_aksi_pemda AS r
+				        LEFT JOIN esakip_data_label_rencana_aksi AS l
+				            ON l.parent_renaksi_pemda = r.id 
+				            AND l.active = r.active 
+					    WHERE l.id IS NULL
+					        AND r.active = 1
+					        AND r.id_skpd = %d
+					        AND r.tahun_anggaran = %d
 					", $_POST['id_skpd'], $_POST['tahun_anggaran']), ARRAY_A);
 
 					$get_data_pemda = array();
