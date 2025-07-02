@@ -2198,68 +2198,77 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 							</thead>
 							<tbody>`;
 
-					res.data.map(function(value, index) {
-						let indikator = Object.values(value.indikator);
-						var last_urutan = 0;
-						if (indikator.length > 0) {
-							last_urutan = Math.floor(indikator[indikator.length - 1].nomor_urut);
-						}
+					if (res.data.length != 0) {
+						res.data.map(function(value, index) {
+							let indikator = Object.values(value.indikator);
+							var last_urutan = 0;
+							if (indikator.length > 0) {
+								last_urutan = Math.floor(indikator[indikator.length - 1].nomor_urut);
+							}
 
-						html += `
-						<tr class="bg-light">
-							<td class="text-center align-middle font-weight-bold">${index + 1}.</td>
-							<td class="align-middle font-weight-bold">${value.label}</td>
-							<td class="align-middle">${value.pelaksana}</td>
-							<td class="align-top" rowspan="${indikator.length + 1}">
-								<ul class="mb-0 pl-3">
-									${value.crosscutting.map(item => `<li>${item}</li>`).join('')}
-								</ul>
-							</td>
-							<td class="text-center align-middle">
-								<div class="btn-group d-flex flex-wrap justify-content-center">
-									<button class="btn btn-sm btn-success mr-1 mb-1" title="Tambah Indikator" onclick="handleFormCreateIndikatorPokin('${value.label}', ${value.id}, ${level}, ${last_urutan}, ${idParent})">
-										<i class="dashicons dashicons-plus"></i>
-									</button>`;
-
-						if (level != 4) {
 							html += `
-									<button class="btn btn-sm btn-warning mr-1 mb-1" title="Lihat pohon kinerja level ${level + 1}" onclick="getDataPokinByLevelAndParent(${level + 1}, ${value.id})">
-										<i class="dashicons dashicons-menu-alt"></i>
-									</button>`;
-						}
+							<tr class="bg-light">
+								<td class="text-center align-middle font-weight-bold">${index + 1}.</td>
+								<td class="align-middle font-weight-bold">${value.label}</td>
+								<td class="align-middle">${value.pelaksana}</td>
+								<td class="align-top" rowspan="${indikator.length + 1}">
+									<ul class="mb-0 pl-3">
+										${value.crosscutting.map(item => `<li>${item}</li>`).join('')}
+									</ul>
+								</td>
+								<td class="text-center align-middle">
+									<div class="btn-group d-flex flex-wrap justify-content-center">
+										<button class="btn btn-sm btn-success mr-1 mb-1" title="Tambah Indikator" onclick="handleFormCreateIndikatorPokin('${value.label}', ${value.id}, ${level}, ${last_urutan}, ${idParent})">
+											<i class="dashicons dashicons-plus"></i>
+										</button>`;
+
+							if (level != 4) {
+								html += `
+										<button class="btn btn-sm btn-warning mr-1 mb-1" title="Lihat pohon kinerja level ${level + 1}" onclick="getDataPokinByLevelAndParent(${level + 1}, ${value.id})">
+											<i class="dashicons dashicons-menu-alt"></i>
+										</button>`;
+							}
+							html += `
+										<button class="btn btn-sm btn-primary mr-1 mb-1" title="Edit" onclick="handleFormEditPokin(${value.id})">
+											<i class="dashicons dashicons-edit"></i>
+										</button>
+										<button class="btn btn-sm btn-danger mb-1" title="Hapus" onclick="handleDeletePokin(${value.id}, ${idParent}, ${level})">
+											<i class="dashicons dashicons-trash"></i>
+										</button>
+									</div>
+								</td>
+							</tr>`;
+
+							if (indikator.length > 0) {
+								indikator.map(function(indikator_value, indikator_index) {
+									html += `
+									<tr>
+										<td></td>
+										<td colspan="2" class="text-left text-muted">
+											${index + 1}.${indikator_index + 1} ${indikator_value.label}
+										</td>
+										<td class="text-center">
+											<div class="btn-group justify-content-center">
+												<button class="btn btn-sm btn-primary mr-1" title="Edit Indikator" onclick="handleFormEditIndikatorPokin(${indikator_value.id}, ${idParent})">
+													<i class="dashicons dashicons-edit"></i>
+												</button>
+												<button class="btn btn-sm btn-danger" title="Hapus Indikator" onclick="handleDeleteIndikatorPokin(${indikator_value.id}, ${level}, ${idParent})">
+													<i class="dashicons dashicons-trash"></i>
+												</button>
+											</div>
+										</td>
+									</tr>`;
+								});
+							}
+						});
+					} else {
 						html += `
-									<button class="btn btn-sm btn-primary mr-1 mb-1" title="Edit" onclick="handleFormEditPokin(${value.id})">
-										<i class="dashicons dashicons-edit"></i>
-									</button>
-									<button class="btn btn-sm btn-danger mb-1" title="Hapus" onclick="handleDeletePokin(${value.id}, ${idParent}, ${level})">
-										<i class="dashicons dashicons-trash"></i>
-									</button>
-								</div>
+						<tr>
+							<td colspan="5" class="text-center text-muted">
+								Belum ada data Pohon Kinerja pada level ${level} ini.
 							</td>
 						</tr>`;
-
-						if (indikator.length > 0) {
-							indikator.map(function(indikator_value, indikator_index) {
-								html += `
-								<tr>
-									<td></td>
-									<td colspan="2" class="text-left text-muted">
-										${index + 1}.${indikator_index + 1} ${indikator_value.label}
-									</td>
-									<td class="text-center">
-										<div class="btn-group justify-content-center">
-											<button class="btn btn-sm btn-primary mr-1" title="Edit Indikator" onclick="handleFormEditIndikatorPokin(${indikator_value.id}, ${idParent})">
-												<i class="dashicons dashicons-edit"></i>
-											</button>
-											<button class="btn btn-sm btn-danger" title="Hapus Indikator" onclick="handleDeleteIndikatorPokin(${indikator_value.id}, ${level}, ${value.id})">
-												<i class="dashicons dashicons-trash"></i>
-											</button>
-										</div>
-									</td>
-								</tr>`;
-							});
-						}
-					});
+					}
 
 					html += `
 							</tbody>

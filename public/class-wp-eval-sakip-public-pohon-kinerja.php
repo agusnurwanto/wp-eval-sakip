@@ -1073,7 +1073,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 
 					$column_parent = 'cc.parent';
-					$where_clause = '';
+					$where_clause = $wpdb->prepare(' AND pk.id = %d', $_POST['id']);
 					$_prefix_opd = $_where_opd = $id_skpd = '';
 					if (!empty($_POST['tipe_pokin'])) {
 						if (!empty($_POST['id_skpd'])) {
@@ -1103,39 +1103,25 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						throw new Exception("Indikator harus dihapus dulu!", 1);
 					}
 
-					// cek croscutting
-					$croscutting = $wpdb->get_row(
+					// cek koneksi croscutting
+					$cek_crosscutting = $wpdb->get_row(
 						$wpdb->prepare("
-							SELECT 
+							SELECT
 								pk.id as id_pokin,
-								cc.id as id_croscutting
-							FROM esakip_pohon_kinerja$_prefix_opd as pk
-							JOIN esakip_croscutting$_prefix_opd as cc
-							  ON pk.id = $column_parent 
-							WHERE pk.id = %d
-							  AND cc.active = %d
-							  AND pk.active = %d
-							  $_where_opd
-						", $_POST['id'], 1, 1),
+								pk.label as label_pokin,
+								cc.id as id_croscutting,
+								cc.parent_pohon_kinerja as parent_croscutting
+							FROM esakip_pohon_kinerja$_prefix_opd pk
+							JOIN esakip_koneksi_pokin_pemda_opd cc
+							  ON cc.parent_pohon_kinerja = pk.id
+							WHERE cc.active = 1
+							  AND parent_pohon_kinerja = %d
+						", $_POST['id']),
 						ARRAY_A
 					);
 
-					$croscutting_pengusul = $wpdb->get_row(
-						$wpdb->prepare("
-							SELECT 
-								pk.id as id_pokin,
-								cc.id as id_croscutting
-							FROM esakip_croscutting$_prefix_opd as cc
-							JOIN esakip_pohon_kinerja$_prefix_opd as pk
-							  ON $column_parent = pk.id
-							WHERE cc.active = %d
-							$where_clause
-						", 1),
-						ARRAY_A
-					);
-
-					if (!empty($croscutting) || !empty($croscutting_pengusul)) {
-						throw new Exception("Croscutting harus dihapus/ditolak dahulu!", 1);
+					if (!empty($cek_crosscutting)) {
+						throw new Exception("Data pohon kinerja memiliki crosscutting aktif!\nMohon hapus data crosscutting terlebih dahulu!", 1);
 					}
 
 					$child = $wpdb->get_results(
