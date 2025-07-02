@@ -45,13 +45,15 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
             <table id="cetak" title="List Pegawai Laporan Perjanjian Kinerja Perangkat Daerah" class="table table-bordered table_list_pegawai" cellpadding="2" cellspacing="0">
                 <thead style="background: #ffc491;">
                     <tr>
-                        <th class="text-center" style="width: 150px;">Aktif Input Rencana Hasil Kerja (RHK) / Rencana Aksi<br><input type="checkbox" id="cek_all"></th>
+                        <th class="text-center" style="width: 30px;" title="Input Rencana Hasil Kerja (RHK) / Rencana Aksi">Aktif<br><input type="checkbox" id="cek_all"></th>
                         <th class="text-center">Satker ID</th>
                         <th class="text-center">Satuan Kerja</th>
                         <th class="text-center">Tipe Pegawai</th>
                         <th class="text-center">NIP</th>
                         <th class="text-center">Nama Pegawai</th>
                         <th class="text-center">Jabatan</th>
+                        <th class="text-center">Atasan</th>
+                        <th class="text-center" style="width: 70px;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -176,7 +178,11 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
                             [5, 10, 25, 50, 100, "All"]
                         ],
                         iDisplayLength: 50,
-                        order: []
+                        order: [],
+                        aoColumnDefs: [
+                            { bSortable: false, aTargets: [ 0, 8 ] }, 
+                            { bSearchable: false, aTargets: [ 0, 8 ] }
+                        ] 
                     });
                 } else {
                     alert(response.message);

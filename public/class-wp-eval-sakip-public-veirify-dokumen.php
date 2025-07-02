@@ -2205,10 +2205,11 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             p.tipe_pegawai,
                             p.tipe_pegawai_id,
                             p.active,
+                            p.id_atasan,
                             s.nama AS nama_bidang
                         FROM esakip_data_pegawai_simpeg p
                         LEFT JOIN esakip_data_satker_simpeg s
-                               ON s.satker_id = p.satker_id
+                            ON s.satker_id = p.satker_id
                         WHERE p.satker_id LIKE %s 
                           AND p.active = 1
                           AND s.tahun_anggaran = %d
@@ -2216,6 +2217,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                     ", $satker_id . '%', $_POST['tahun_anggaran']),
                     ARRAY_A
                 );
+                $all_atasan = array();
                 if (!empty($data_pegawai)) {
                     foreach ($data_pegawai as $v_1) {
                         if (
@@ -2226,6 +2228,9 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                         } else {
                             $data_pegawai_all[] = $v_1;
                         }
+                        if(!empty($v_1['id_atasan'])){
+                            $all_atasan[$v_1['id_atasan']] = $v_1['id_atasan'];
+                        }
                     }
                 }
 
@@ -2233,6 +2238,35 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                     $ret['status'] = 'error';
                     $ret['message'] = 'Pegawai tidak ditemukan!';
                     die(json_encode($ret));
+                }
+
+                if(!empty($all_atasan)){
+                    $q_atasan = implode(',', $all_atasan);
+                    $data_atasan = $wpdb->get_results($wpdb->prepare("
+                        SELECT 
+                            p.id,
+                            p.active_rhk,
+                            p.nip_baru,
+                            p.nama_pegawai,
+                            p.satker_id,
+                            p.jabatan,
+                            p.tipe_pegawai,
+                            p.tipe_pegawai_id,
+                            p.active,
+                            p.id_atasan,
+                            s.nama AS nama_bidang
+                        FROM esakip_data_pegawai_simpeg p
+                        LEFT JOIN esakip_data_satker_simpeg s
+                            ON s.satker_id = p.satker_id
+                        WHERE p.id IN (".$q_atasan.") 
+                          AND p.active = 1
+                          AND s.tahun_anggaran = %d
+                        ORDER BY p.satker_id, p.tipe_pegawai_id, p.berakhir DESC, p.nama_pegawai
+                    ", $_POST['tahun_anggaran']),
+                    ARRAY_A);
+                    foreach($data_atasan as $atasan){
+                        $all_atasan[$atasan['id']] = $atasan['nip_baru'].' '.$atasan['nama_pegawai'].' | '.$atasan['jabatan'].' '.$atasan['nama_bidang'];
+                    }
                 }
 
                 $tbody = '';
@@ -2244,15 +2278,27 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                     }else{
                         $ret['non_aktif']++;
                     }
-                    $tbody .= "<tr>";
-                    $tbody .= "<td class='text-center'><input type='checkbox' class='input_rhk' value='" . $v_pgw['id'] . "' ".$checked."></td>";
-                    $tbody .= "<td class='text-left'>" . $v_pgw['satker_id'] . "</td>";
-                    $tbody .= "<td class='text-left'>" . $v_pgw['nama_bidang'] . "</td>";
-                    $tbody .= "<td class='text-left'>" . $v_pgw['tipe_pegawai'] . "</td>";
-                    $tbody .= "<td class='text-left'>" . $v_pgw['nip_baru'] . "</td>";
-                    $tbody .= "<td class='text-left'>" . $v_pgw['nama_pegawai'] . "</td>";
-                    $tbody .= "<td class='text-left'>" . $v_pgw['jabatan'] . "</td>";
-                    $tbody .= "</tr>";
+                    $atasan = 'Definitif';
+                    if(
+                        !empty($v_pgw['id_atasan'])
+                        && !empty($all_atasan[$v_pgw['id_atasan']])
+                    ){
+                        $atasan = $all_atasan[$v_pgw['id_atasan']];
+                    }
+                    $tbody .= "
+                    <tr>
+                        <td class='text-center'><input type='checkbox' class='input_rhk' value='" . $v_pgw['id'] . "' ".$checked."></td>
+                        <td class='text-left'>" . $v_pgw['satker_id'] . "</td>
+                        <td class='text-left'>" . $v_pgw['nama_bidang'] . "</td>
+                        <td class='text-left'>" . $v_pgw['tipe_pegawai'] . "</td>
+                        <td class='text-left'>" . $v_pgw['nip_baru'] . "</td>
+                        <td class='text-left'>" . $v_pgw['nama_pegawai'] . "</td>
+                        <td class='text-left'>" . $v_pgw['jabatan'] . "</td>
+                        <td class='text-left'>".$atasan."</td>
+                        <td class='text-center'>
+                            <button class='btn-sm btn-primary'><i class='dashicons dashicons-edit'></i></button>
+                        </td>
+                    </tr>";
                 }
                 $ret['data'] = $tbody;
             } else {
