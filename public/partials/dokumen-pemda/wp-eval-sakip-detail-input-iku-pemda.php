@@ -574,7 +574,14 @@ $generate_page = $this->functions->generatePage(array(
                         </div>
                      <?php endif; ?>
                     <div class="form-group">
-                        <label for="tujuan-sasaran">Tujuan/Sasaran</label>
+                        <label for="sumber-data-iku">Pilih Sumber Data</label>
+                        <select name="sumber-data-iku" id="sumber-data-iku" onchange="setDataIku();">
+                            <option value="1">Tujuan</option>
+                            <option value="2" selected>Sasaran</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tujuan-sasaran" id="label-tujuan-sasaran">Tujuan/Sasaran</label>
                         <select name="tujuan-sasaran" id="tujuan-sasaran"></select>
                     </div>
                     <div class="form-group">
@@ -817,26 +824,40 @@ function tambahIkuPemda(){
                         +'Simpan'
                     +'</button>');
 
-                if(data_sasaran_rpjmd.data !== null){
-                    let html_sasaran = '<option value="">Pilih Sasaran Strategis</option>';
-                    data_sasaran_rpjmd.data.map(function(value){
-                        if(value.id_unik_indikator == null){
-                            html_sasaran += '<option value="'+value.id_unik+'">'+value.sasaran_teks+'</option>';
-                        }
-                    });
-
-                    jQuery("#tujuan-sasaran").html(html_sasaran);
-                    jQuery('#tujuan-sasaran').select2({width: '100%'});
-
-                    jQuery('#tujuan-sasaran').on("change", function(){
-                        getIndikator(this.value);
-                    });
-                }
-
+               jQuery('#sumber-data-iku').val(2).trigger('onchange');
                 resolve();
             }
         })
     })
+}
+
+function setDataIku(){
+    var sumber_data = jQuery('#sumber-data-iku').val();
+    var html_iku = '';
+    if(sumber_data == 1){
+        html_iku = '<option value="">Pilih Tujuan</option>';
+        data_sasaran_rpjmd.data_tujuan.map(function(value){
+            if(value.id_unik_indikator == null){
+                html_iku += '<option value="'+value.id_unik+'">'+value.tujuan_teks+'</option>';
+            }
+        });
+
+        jQuery("#label-tujuan-sasaran").text('Tujuan');
+        jQuery('#tujuan-sasaran').attr("onchange", 'getIndikatorTujuan(this.value)');
+    }else{
+        html_iku = '<option value="">Pilih Sasaran Strategis</option>';
+        data_sasaran_rpjmd.data.map(function(value){
+            if(value.id_unik_indikator == null){
+                html_iku += '<option value="'+value.id_unik+'">'+value.sasaran_teks+'</option>';
+            }
+        });
+
+        jQuery("#label-tujuan-sasaran").text('Sasaran');
+        jQuery('#tujuan-sasaran').attr("onchange", 'getIndikator(this.value)');
+    }
+
+    jQuery("#tujuan-sasaran").html(html_iku);
+    jQuery('#tujuan-sasaran').select2({width: '100%'});
 }
 
 function simpanDataIkuPemda(){
@@ -920,10 +941,29 @@ function edit_iku(id) {
                 if (response.status === 'success') {
                     let data = response.data;
                     jQuery('#id_iku').val(id);
-                    jQuery("#tujuan-sasaran").val(data.id_sasaran).trigger('change');
-                    getIndikator(data.id_sasaran).then(function () {
-                        jQuery("#indikator").val(data.id_unik_indikator).trigger('change');
+
+                    // cek sumber iku dari tujuan atau sasaran
+                    var cek_sumber = false;
+                    data_sasaran_rpjmd.data.map(function(b, i){
+                        if(b.id_unik == data.id_sasaran){
+                            cek_sumber = 2;
+                        }
                     });
+                    if(cek_sumber == false){
+                        data_sasaran_rpjmd.data_tujuan.map(function(b, i){
+                            if(b.id_unik == data.id_sasaran){
+                                cek_sumber = 1;
+                            }
+                        });
+                    }
+                    jQuery('#sumber-data-iku').val(cek_sumber).trigger('change');
+                    setTimeout(function(){
+                        jQuery("#tujuan-sasaran").val(data.id_sasaran).trigger('change');
+                        setTimeout(function(){
+                            jQuery("#indikator").val(data.id_unik_indikator).trigger('change');
+                        }, 500);
+                    }, 500);
+
                     if (tinymce.get('formulasi')) {
                         tinymce.get('formulasi').setContent(data.formulasi);
                     } else {
@@ -1011,22 +1051,22 @@ function SasaranSebelum(id_sasaran) {
     });
 }
 
-function getIndikator(that){
+function getIndikatorTujuan(current_val){
     jQuery('#wrap-loading').show();
     return getSasaran()
     .then(function(){
         return new Promise(function(resolve, reject){
             jQuery('#wrap-loading').hide();
             if(typeof data_sasaran_rpjmd != 'undefined' && data_sasaran_rpjmd !== undefined){
-                let html_indikator = '<option value="">Pilih Indikator Sasaran</option>';
+                let html_indikator = '<option value="">Pilih Indikator Tujuan</option>';
                 let id_sasaran = null;
 
                 if (data_sasaran_rpjmd.data !== null) {
-                    data_sasaran_rpjmd.data.map(function(value){
-                        if(value.id_unik_indikator != null && value.id_unik == that){
+                    data_sasaran_rpjmd.data_tujuan.map(function(value){
+                        if(value.id_unik_indikator != null && value.id_unik == current_val){
                             html_indikator += '<option value="'+value.id_unik_indikator+'">'+value.indikator_teks+'</option>';
                         }
-                        if (value.id_unik_indikator == null && value.id_unik == that) {
+                        if (value.id_unik_indikator == null && value.id_unik == current_val) {
                             id_sasaran = value.id_sasaran_murni;  
                         }
                     });
@@ -1045,7 +1085,39 @@ function getIndikator(that){
     });
 }
 
+function getIndikator(current_val){
+    jQuery('#wrap-loading').show();
+    return getSasaran()
+    .then(function(){
+        return new Promise(function(resolve, reject){
+            jQuery('#wrap-loading').hide();
+            if(typeof data_sasaran_rpjmd != 'undefined' && data_sasaran_rpjmd !== undefined){
+                let html_indikator = '<option value="">Pilih Indikator Sasaran</option>';
+                let id_sasaran = null;
 
+                if (data_sasaran_rpjmd.data !== null) {
+                    data_sasaran_rpjmd.data.map(function(value){
+                        if(value.id_unik_indikator != null && value.id_unik == current_val){
+                            html_indikator += '<option value="'+value.id_unik_indikator+'">'+value.indikator_teks+'</option>';
+                        }
+                        if (value.id_unik_indikator == null && value.id_unik == current_val) {
+                            id_sasaran = value.id_sasaran_murni;  
+                        }
+                    });
+                }
+
+                jQuery("#indikator").html(html_indikator);
+                jQuery("#indikator").select2({width: '100%'});
+
+                if (id_sasaran !== null) {
+                    SasaranSebelum(id_sasaran);
+                }
+
+                resolve();
+            }
+        });
+    });
+}
 
 function getSasaran() {
     return new Promise(function(resolve, reject){
