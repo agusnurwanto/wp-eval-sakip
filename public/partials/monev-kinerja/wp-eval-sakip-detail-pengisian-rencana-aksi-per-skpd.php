@@ -161,8 +161,9 @@ if (
 
 ////////////end////////////
 $renaksi_pemda = $wpdb->get_results($wpdb->prepare("
-    SELECT *
-    FROM esakip_data_label_rencana_aksi 
+    SELECT 
+        *
+    FROM esakip_detail_rencana_aksi_pemda 
     WHERE active = 1
         AND id_skpd = %d
         AND tahun_anggaran = %d
@@ -171,9 +172,18 @@ $renaksi_pemda = $wpdb->get_results($wpdb->prepare("
 $get_data_pemda = array();
 
 if (!empty($renaksi_pemda)) {
-    $id_pk = $renaksi_pemda[0]['id_pk'];
+    $id_pk = array();
+    $id_detail_renaksi_pemda = [];
+
+    foreach ($renaksi_pemda as $item) {
+        $id_pk[] = $item['id_pk'];
+        $id_detail_renaksi_pemda[$item['id_pk']] = $item['id']; 
+    }
+
+    $get_id_pk = implode(',', $id_pk);
+
     if (!empty($get_id_pk)) {
-        $get_data_pemda = $wpdb->get_results($wpdb->prepare("
+        $get_data_pemda = $wpdb->get_results("
             SELECT 
                 pk.*,
                 ik.label_sasaran,
@@ -183,8 +193,12 @@ if (!empty($renaksi_pemda)) {
                 ON pk.id_iku = ik.id 
                 AND pk.id_jadwal = ik.id_jadwal
             WHERE pk.active = 1
-                AND pk.id = %d
-        ", $id_pk), ARRAY_A);
+                AND pk.id IN ($get_id_pk)
+        ", ARRAY_A);
+
+        foreach ($get_data_pemda as &$row) {
+            $row['id_detail'] = $id_detail_renaksi_pemda[$row['id']] ?? null;
+        }
     }
 }
 
@@ -1349,7 +1363,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                             response.data.renaksi_pemda.map(function(b, i) {
                                 renaksi_pemda += `
                                 <tr>
-                                    <td><input class="text-right" type="checkbox" class="form-check-input" id="label_renaksi_pemda"name="checklist_renaksi_pemda[]" value="${b.label_sasaran}" id_label_renaksi_pemda="${b.id}" ${b.id_label != null ? 'checked' : ''}>
+                                    <td><input class="text-right" type="checkbox" class="form-check-input" id="label_renaksi_pemda" name="checklist_renaksi_pemda[]" value="${b.label_sasaran}" id_label_renaksi_pemda="${b.id_renaksi}" ${b.id_label != null ? 'checked' : ''}>
                                     </td>
                                     <td>
                                         <label class="form-check-label" id="label_sasaran_strategis" for="label_sasaran_strategis">${b.label_sasaran}</label>
@@ -1363,7 +1377,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                             if (renaksi_pemda.length > 0) {
                                 let checklist_renaksi_pemda = `
                                 <div class="form-group">
-                                    <label>Rencana Hasil Kerja Pemerintah Daerah | Level 4</label>
+                                    <label>Rencana Hasil Kerja Pemerintah Daerah</label>
                                     <table class="table table-bordered">
                                         <thead>
                                             <tr>
@@ -2940,7 +2954,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                 if (id_sub_skpd_cascading != 0) {
                     key = jenis + '-' + parent_cascading + '-' + id_sub_skpd_cascading;
                 }
-                let get_renaksi_pemda = <?php echo json_encode($renaksi_pemda); ?>;
+                let get_renaksi_pemda = <?php echo json_encode($get_data_pemda); ?>;
                 let checklist_renaksi_pemda = '';
                 let html_input_sub_keg_cascading = '';
                 let html_pokin_input_rencana_pagu = '';
@@ -3013,7 +3027,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                 // menampilkan rhk pemda hanya di level 2 rhk opd
                 if (!isEdit && tipe === 2) {
                     checklist_renaksi_pemda += `
-                        <label>Rencana Hasil Kerja Pemerintah Daerah | Level 4</label>
+                        <label>Rencana Hasil Kerja Pemerintah Daerah</label>
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
@@ -3027,12 +3041,14 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     get_renaksi_pemda.forEach(function(item, index) {
                         checklist_renaksi_pemda += `
                             <tr>
-                                <td><input class="text-right" type="checkbox" class="form-check-input" id="label_renaksi_pemda${index}"name="checklist_renaksi_pemda[]" value="${item.label}" id_label_renaksi_pemda="${item.id_data_renaksi_pemda}"id_label_indikator_renaksi_pemda="${item.id_data_indikator}"></td>
-                                <td for="label_renaksi_pemda${index}">${item.label_sasaran}</td>
-                                <td for="label_renaksi_pemda${index}">${item.label_indikator}</td>
+                                <td><input class="text-right" type="checkbox" class="form-check-input" id="label_renaksi_pemda${index}" name="checklist_renaksi_pemda[]" value="${item.label_sasaran}" id_label_renaksi_pemda="${item.id_detail}">
+                                    </td>
+                                <td>${item.label_sasaran}</td>
+                                <td>${item.label_indikator}</td>
                             </tr>
                         `;
                     });
+
                     checklist_renaksi_pemda += '</tbody></table>';
                 }
 
@@ -3149,7 +3165,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                         </select> 
                                 </div> 
                                 ${html_setting_input_rencana_pagu}
-                                <?php if (!empty($renaksi_pemda)): ?>
+                                <?php if (!empty($get_data_pemda)): ?>
                                     ${checklist_renaksi_pemda}  
                                 <?php endif; ?>
                             </form>
@@ -3533,12 +3549,16 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         var selectedChecklistPemda = jQuery('input[name="checklist_renaksi_pemda[]"]:checked');
         var checklistDataPemda = [];
         selectedChecklistPemda.each(function() {
-            var row = jQuery(this).closest('tr');
+            var id = jQuery(this).attr('id_label_renaksi_pemda');
             checklistDataPemda.push({
-                id_data_renaksi_pemda: jQuery(this).attr('id_label_renaksi_pemda'),
-                id_data_indikator: jQuery(this).attr('id_label_indikator_renaksi_pemda')
+                id_data_renaksi_pemda: id
             });
         });
+        console.log(checklistDataPemda); // Debug untuk melihat isinya
+        if (checklistDataPemda.length > 0) {
+            console.log('First ID:', checklistDataPemda[0].id_data_renaksi_pemda); // Bukan [id_data_renaksi_pemda]
+        }
+
 
         // if (tipe === 2 && selectedChecklistPemda.length === 0) {
         //     return alert("Pilih salah satu label Rencana Hasil Kerja Pemerintah Daerah!");

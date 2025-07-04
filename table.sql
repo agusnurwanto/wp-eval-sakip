@@ -2323,13 +2323,10 @@ CREATE TABLE esakip_laporan_pk_pemda (
   `target` text DEFAULT NULL,
   `id_jadwal` int(11) DEFAULT NULL,
   `pagu` double(20, 0) DEFAULT NULL,
-  `id_renaksi_opd` int(11) DEFAULT NULL,
   `tahun_anggaran` year(4) DEFAULT null,
   `active` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY  (`id`),
   KEY `id_iku` (`id_iku`),
-  KEY `id_skpd` (`id_skpd`),
-  KEY `id_renaksi_opd` (`id_renaksi_opd`),
   KEY `tahun_anggaran` (`tahun_anggaran`),
   KEY `active` (`active`)
 );
@@ -2379,7 +2376,8 @@ CREATE TABLE `esakip_detail_rencana_aksi_pemda` (
   PRIMARY key (id),
   KEY `id_pk` (`id_pk`),
   KEY `id_skpd` (`id_skpd`),
-  KEY `id_jadwal` (`id_jadwal`),
+  KEY `id_jadwal` (`id_jadwal`)
+);
 
 CREATE TABLE esakip_dokumen_kuesioner (
   `id` int(11) NOT NULL auto_increment,
