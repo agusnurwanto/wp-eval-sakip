@@ -2022,8 +2022,8 @@ CREATE TABLE `esakip_tagging_rincian_belanja` (
 CREATE TABLE `esakip_detail_data_unit` (
   `id` int NOT NULL auto_increment,
   `id_skpd` int(11) DEFAULT NULL,
-  `nama_skpd` varchar(64) DEFAULT NULL,
-  `alamat_kantor` varchar(255) DEFAULT NULL,
+  `nama_skpd` text DEFAULT NULL,
+  `alamat_kantor` text DEFAULT NULL,
   `active` tinyint DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp(),
