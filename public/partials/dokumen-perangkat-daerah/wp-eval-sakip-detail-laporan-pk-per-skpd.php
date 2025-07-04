@@ -843,7 +843,7 @@ $ttd_orientasi = 'text-left';
 
         <!-- Error Message -->
         <?php if (!empty($error_message) && is_array($error_message)) : ?>
-            <div class="alert alert-danger mt-3">
+            <div class="alert alert-danger mt-3 hide-display-print">
                 <ul class="mb-0">
                     <?php echo implode('', array_map(fn($msg) => "<li>{$msg}</li>", $error_message)); ?>
                 </ul>

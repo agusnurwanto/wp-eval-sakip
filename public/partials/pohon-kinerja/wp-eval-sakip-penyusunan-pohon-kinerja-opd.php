@@ -2516,7 +2516,8 @@ jQuery(document).ready(function(){
 		  		"api_key": esakip.api_key,
 		  		'id':jQuery(this).data('id'),
 				'tipe_pokin': "opd",
-				'id_skpd': <?php echo $id_skpd; ?>
+				'id_skpd': <?php echo $id_skpd; ?>,
+				'id_jadwal': <?php echo $input['periode']; ?>
 			},
 			dataType:'json',
 			success:function(response){
@@ -2747,7 +2748,8 @@ jQuery(document).ready(function(){
 		  		"api_key": esakip.api_key,
 		  		'id':jQuery(this).data('id'),
 				'tipe_pokin': "opd",
-				'id_skpd': <?php echo $id_skpd; ?>
+				'id_skpd': <?php echo $id_skpd; ?>,
+				'id_jadwal': <?php echo $input['periode']; ?>
 			},
 			dataType:'json',
 			success:function(response){
@@ -3017,7 +3019,8 @@ jQuery(document).ready(function(){
 		  		"api_key": esakip.api_key,
 		  		'id':jQuery(this).data('id'),
 				'tipe_pokin': "opd",
-				'id_skpd': <?php echo $id_skpd; ?>
+				'id_skpd': <?php echo $id_skpd; ?>,
+				'id_jadwal': <?php echo $input['periode']; ?>
 			},
 			dataType:'json',
 			success:function(response){
@@ -3288,7 +3291,8 @@ jQuery(document).ready(function(){
 		  		"api_key": esakip.api_key,
 		  		'id':jQuery(this).data('id'),
 				'tipe_pokin': "opd",
-				'id_skpd': <?php echo $id_skpd; ?>
+				'id_skpd': <?php echo $id_skpd; ?>,
+				'id_jadwal': <?php echo $input['periode']; ?>
 			},
 			dataType:'json',
 			success:function(response){
@@ -3566,7 +3570,8 @@ jQuery(document).ready(function(){
 		  		"api_key": esakip.api_key,
 		  		'id':jQuery(this).data('id'),
 				'tipe_pokin': "opd",
-				'id_skpd': <?php echo $id_skpd; ?>
+				'id_skpd': <?php echo $id_skpd; ?>,
+				'id_jadwal': <?php echo $input['periode']; ?>
 			},
 			dataType:'json',
 			success:function(response){
@@ -3807,7 +3812,8 @@ jQuery(document).ready(function(){
         		'api_key': esakip.api_key,
 				'data': JSON.stringify(form),
 				'tipe_pokin': "opd",
-				'id_skpd': <?php echo $id_skpd; ?>
+				'id_skpd': <?php echo $id_skpd; ?>,
+				'id_jadwal': <?php echo $input['periode']; ?>
 			},
 			success:function(response){
 				jQuery('#wrap-loading').hide();
