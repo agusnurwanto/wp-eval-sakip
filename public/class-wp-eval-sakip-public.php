@@ -30969,40 +30969,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
-	// --------------------------------------------------------
-	// --- METHOD HANDLER PEGAWAI SIMPEG (esakip_data_pegawai_simpeg) ---
-	// --------------------------------------------------------
-	public function get_pegawai_simpeg_by_id($id)
-	{
-		global $wpdb;
-
-		$data = $wpdb->get_row(
-			$wpdb->prepare("
-				SELECT * 
-				FROM esakip_data_pegawai_simpeg 
-				WHERE id=%d
-			", $id),
-			ARRAY_A
-		);
-		
-		return $data;
-	}
-
-	public function update_pegawai_simpeg_by_id($id, $data)
-	{
-		global $wpdb;
-
-		$update = $wpdb->update(
-			'esakip_data_pegawai_simpeg',
-			$data,
-			array('id' => $id),
-			array('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d'),
-			array('%d')
-		);
-
-		return $update;
-	}
-
 	public function get_pegawai_simpeg($type = null, $value = null, $satker_id = null, $jabatan = null, $no_get_child = null)
 	{
 		global $wpdb;
@@ -32729,5 +32695,243 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}else{
 			return 'title="Anda tidak dapat akses untuk melihat halaman ini!"';
 		}
+    }
+
+	// --------------------------------------------------------
+	// --------------------------------------------------------
+    // --- METHOD HANDLER PEGAWAI SIMPEG ---
+    // --------------------------------------------------------
+    // --------------------------------------------------------
+
+    /**
+     * The name of the database table for pegawai simpeg.
+     * @var string
+     */
+    private $table_data_pegawai_simpeg = 'esakip_data_pegawai_simpeg';
+
+    /**
+     * Defines the data format for each column in the table.
+     * This helps in dynamically creating the format array for wpdb->update.
+     * %s for string, %d for integer, %f for float.
+     *
+     * @var array
+     */
+    private $column_data_pegawai_simpeg = [
+        'nip_baru'          => '%s',
+        'nama_pegawai'      => '%s',
+        'pangkat'           => '%s',
+        'gol_ruang'         => '%s',
+        'satker_id'         => '%s',
+        'jabatan'           => '%s',
+        'tipe_pegawai'      => '%s',
+        'tipe_pegawai_id'   => '%s',
+        'gelar_depan'       => '%s',
+        'gelar_belakang'    => '%s',
+        'plt_plh'           => '%s',
+        'tmt_sk_plth'       => '%s',
+        'berakhir'          => '%s',
+        'active'            => '%d',
+        'active_rhk'        => '%d',
+        'eselon_id'         => '%s',
+        'id_atasan'         => '%d',
+        'id_jabatan'        => '%s',
+        'custom_jabatan'    => '%s',
+        'update_at'         => '%s',
+    ];
+
+    /**
+     * Dynamically updates a record in the esakip_data_pegawai_simpeg table.
+     *
+     * This method is designed to handle partial updates securely and efficiently.
+     * It automatically generates the correct data formats for the columns being updated
+     * and sets the 'update_at' field to the current time.
+     *
+     * @param int   $id   The primary key (id) of the record to update.
+     * @param array $data An associative array where keys are column names and values
+     * are the new data for those columns.
+     *
+     * @return int|false The number of rows updated, or false on error.
+     */
+    public function update_data_pegawai_simpeg_by_id($id, $data)
+    {
+        global $wpdb;
+
+        // This prevents unnecessary database calls.
+        if (empty($data) || !is_array($data)) {
+            return false;
+        }
+
+        // This guarantees the 'update_at' field is always current on every update.
+        $data['update_at'] = current_time('mysql');
+
+        // Create the format array based on the keys in the final $data array.
+        $data_formats = [];
+        foreach ($data as $column => $value) {
+            $data_formats[] = $this->column_data_pegawai_simpeg[$column] ?? '%s';
+        }
+
+        // Define the WHERE clause for the update.
+        $where = ['id' => $id];
+
+        // Define the format for the WHERE clause. The 'id' is an integer (%d).
+        $where_format = ['%d'];
+
+        $updated = $wpdb->update(
+            $this->table_data_pegawai_simpeg,
+            $data,
+            $where,
+            $data_formats,
+            $where_format
+        );
+
+        return $updated;
+    }
+
+	 /**
+     * Retrieves a single record from the esakip_data_pegawai_simpeg table by its primary key.
+     *
+     * @param int $id The primary key (id) of the record to retrieve.
+     * @return object|null The record as an object, or null if not found or on error.
+     */
+    public function get_data_pegawai_simpeg_by_id($id)
+    {
+        global $wpdb;
+
+        // Prepare the SQL query to prevent SQL injection.
+        $sql = $wpdb->prepare(
+            "SELECT * FROM {$this->table_data_pegawai_simpeg} WHERE id = %d",
+            $id
+        );
+
+        // The second parameter, OBJECT, ensures the result is an object.
+        $pegawai = $wpdb->get_row($sql, OBJECT);
+
+        return $pegawai;
+    }
+	
+	 /**
+     * AJAX handler to get pegawai data by ID.
+     */
+    public function get_data_pegawai_simpeg_by_id_ajax()
+    {
+        try {
+            $this->functions->validate($_POST, [
+                'api_key' => 'required|string',
+                'id'      => 'required|numeric'
+            ]);
+
+            if ($_POST['api_key'] !== get_option(ESAKIP_APIKEY)) {
+                 throw new Exception("API key tidak valid atau tidak ditemukan!", 401);
+            }
+
+            $pegawai_id = intval($_POST['id']);
+            $data_pegawai = $this->get_data_pegawai_simpeg_by_id($pegawai_id);
+
+            if ($data_pegawai) {
+                echo json_encode([
+                    'status'  => true,
+                    'message' => 'Data berhasil ditemukan.',
+                    'data'    => $data_pegawai
+                ]);
+            } else {
+                 throw new Exception("Data pegawai dengan ID {$pegawai_id} tidak ditemukan.", 404);
+            }
+
+        } catch (Exception $e) {
+            $code = is_int($e->getCode()) && $e->getCode() !== 0 ? $e->getCode() : 500;
+            http_response_code($code);
+            echo json_encode([
+				'status'  => false,
+				'message' => $e->getMessage()
+			]);
+        }
+        wp_die();
+    }
+
+	 /**
+     * AJAX handler to update atasan for one or more employees.
+     */
+    public function update_atasan_pegawai_ajax()
+    {
+        global $wpdb;
+
+        try {
+            // Validate Request using the new helper method
+            $this->functions->validate($_POST, [
+                'api_key'    => 'required|string',
+                'id_pegawai' => 'required|numeric',
+                'id_atasan'  => 'required|numeric',
+            ]);
+            
+            if ($_POST['api_key'] !== get_option(ESAKIP_APIKEY)) {
+                throw new Exception("API key tidak valid atau tidak ditemukan!", 401);
+            }
+
+            // Sanitize Inputs
+            $id_pegawai = intval($_POST['id_pegawai']);
+            $id_atasan = intval($_POST['id_atasan']);
+            $jabatan_custom = isset($_POST['jabatan_custom']) ? sanitize_text_field($_POST['jabatan_custom']) : null;
+            $terapkan_all_satker = isset($_POST['terapkan_all_satker']) && $_POST['terapkan_all_satker'] == 1;
+
+            // Fetch Employee Data
+            $data_pegawai = $this->get_data_pegawai_simpeg_by_id($id_pegawai);
+            if (!$data_pegawai) {
+                throw new Exception("Pegawai dengan ID {$id_pegawai} tidak ditemukan atau tidak aktif.", 404);
+            }
+
+            // Cek Atasan Aktif
+            $cek_atasan_sql = $wpdb->prepare("
+				SELECT 
+					nama_pegawai,
+					nip_baru 
+				FROM {$this->table_data_pegawai_simpeg} 
+				WHERE active = 1 
+				  AND satker_id = %s 
+				  AND tipe_pegawai_id = 11
+				", $data_pegawai->satker_id
+            );
+            $atasan_aktif = $wpdb->get_row($cek_atasan_sql);
+
+            if ($atasan_aktif) {
+                throw new Exception("Pegawai yang dipilih memiliki atasan aktif!\nNama Atasan: {$atasan_aktif->nama_pegawai} | NIP: {$atasan_aktif->nip_baru}", 409);
+            }
+
+            // Perform The Update
+            if ($terapkan_all_satker) {
+                $result = $wpdb->update(
+                    $this->table_data_pegawai_simpeg,
+                    ['id_atasan' => $id_atasan,'update_at' => current_time('mysql')],
+                    ['satker_id' => $data_pegawai->satker_id],
+                    ['%d', '%s'],
+                    ['%s']
+                );
+            } else {
+                $result = $this->update_data_pegawai_simpeg_by_id($id_pegawai, ['id_atasan' => $id_atasan]);
+            }
+
+            // Update Custom Jabatan if provided
+            if ($jabatan_custom) {
+                $this->update_data_pegawai_simpeg_by_id($id_pegawai, ['custom_jabatan' => $jabatan_custom]);
+            }
+
+            if ($result === false) {
+                throw new Exception("Gagal memperbarui data atasan di database.", 500);
+            }
+
+            // Success Response
+            echo json_encode([
+				'status'  => true,
+				'message' => 'Berhasil memperbarui atasan pegawai!'
+			]);
+
+        } catch (Exception $e) {
+            $code = is_int($e->getCode()) && $e->getCode() !== 0 ? $e->getCode() : 500;
+            http_response_code($code);
+            echo json_encode([
+				'status'  => false, 
+				'message' => $e->getMessage()
+			]);
+        }
+        wp_die();
     }
 }

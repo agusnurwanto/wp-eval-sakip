@@ -2205,7 +2205,8 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             p.tipe_pegawai_id,
                             p.active,
                             p.id_atasan,
-                            s.nama AS nama_bidang
+                            s.nama AS nama_bidang,
+                            p.custom_jabatan
                         FROM esakip_data_pegawai_simpeg p
                         LEFT JOIN esakip_data_satker_simpeg s
                             ON s.satker_id = p.satker_id
@@ -2287,6 +2288,10 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                     ) {
                         $atasan = $all_atasan[$v_pgw['id_atasan']];
                     }
+                    $custom_nama_jabatan = '';
+                    if (!empty($v_pgw['custom_jabatan'])) {
+                        $custom_nama_jabatan = '<hr><span class="text-muted">' . $v_pgw['custom_jabatan'] . '</span>';
+                    }
                     $tbody .= "
                     <tr data-id='" . $v_pgw['id'] . "'>
                         <td class='text-center'><input type='checkbox' class='input_rhk' value='" . $v_pgw['id'] . "' " . $checked . "></td>
@@ -2295,7 +2300,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                         <td class='text-left'>" . $v_pgw['tipe_pegawai'] . "</td>
                         <td class='text-left'>" . $v_pgw['nip_baru'] . "</td>
                         <td class='text-left'>" . $v_pgw['nama_pegawai'] . "</td>
-                        <td class='text-left'>" . $v_pgw['jabatan'] . "</td>
+                        <td class='text-left'>" . $v_pgw['jabatan'] . $custom_nama_jabatan . "</td>
                         <td class='text-left'>" . $atasan . "</td>
                         <td class='text-center'>
                             <button class='btn-sm btn-warning' title='Edit Pegawai'><i class='dashicons dashicons-edit' onclick='editPegawai(" . $v_pgw['id'] . ")'></i></button>
@@ -2308,98 +2313,6 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                 }
                 $ret['data'] = $tbody;
                 $ret['option_pegawai'] = $option_pegawai;
-            } else {
-                $ret['status'] = 'error';
-                $ret['message'] = 'API Key tidak sesuai!';
-            }
-        } else {
-            $ret['status'] = 'error';
-            $ret['message'] = 'Format tidak sesuai!';
-        }
-        die(json_encode($ret));
-    }
-
-    public function update_atasan_pegawai_simpeg()
-    {
-        global $wpdb;
-        $ret = array(
-            'status'  => 'success',
-            'message' => 'Berhasil update atasan pegawai!',
-        );
-
-        if (!empty($_POST)) {
-            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-                if (empty($_POST['id_pegawai']) || empty($_POST['id_atasan'])) {
-                    $ret['status'] = 'error';
-                    $ret['message'] = 'Parameter tidak valid!';
-                } else {
-                    $id_pegawai = intval($_POST['id_pegawai']);
-                    $id_atasan = $_POST['id_atasan'];
-                    $jabatan_custom = $_POST['jabatan_custom'];
-
-                    $data_pegawai = $wpdb->get_row(
-                        $wpdb->prepare("
-                            SELECT *
-                            FROM esakip_data_pegawai_simpeg
-                            WHERE id = %d
-                              AND active = 1
-                        ", $id_pegawai),
-                        ARRAY_A
-                    );
-
-                    if (!empty($data_pegawai)) {
-                        $cek_atasan = $wpdb->get_row(
-                            $wpdb->prepare("
-                                SELECT *
-                                FROM esakip_data_pegawai_simpeg
-                                WHERE active = 1
-                                  AND satker_id = %d
-                                  AND tipe_pegawai_id = %d
-                            ", $data_pegawai['satker_id'], 11),
-                            ARRAY_A
-                        );
-
-                        if (!empty($cek_atasan)) {
-                            $ret['status'] = "error";
-                            $ret['message'] = "Pegawai yang dipilih memiliki atasan aktif!\nNama Atasan: " . $cek_atasan['nama_pegawai'] . " | NIP: " . $cek_atasan['nip_baru'];
-                            die(json_encode($ret));
-                        }
-                    } else {
-                        $ret['status'] = "error";
-                        $ret['message'] = "Pegawai tidak ditemukan!";
-                        die(json_encode($ret));
-                    }
-
-                    if ($_POST['terapkan_all_satker'] == 1) {
-                        // Update untuk semua pegawai di satker_id yang sama
-                        $result = $wpdb->update(
-                            'esakip_data_pegawai_simpeg',
-                            array('id_atasan' => $id_atasan),
-                            array('satker_id' => $data_pegawai['satker_id'])
-                        );
-                    } else if ($_POST['terapkan_all_satker'] == 0) {
-                        // Update hanya untuk pegawai yang dipilih
-                        $result = $wpdb->update(
-                            'esakip_data_pegawai_simpeg',
-                            array('id_atasan' => $id_atasan),
-                            array('id' => $id_pegawai)
-                        );
-                    }
-
-                    if ($jabatan_custom) {
-                        // Update jabatan custom jika ada
-                        $wpdb->update(
-                            'esakip_data_pegawai_simpeg',
-                            array('custom_jabatan' => $jabatan_custom),
-                            array('id' => $id_pegawai)
-                        );
-                    }
-
-                    if ($result === false) {
-                        $ret['status'] = 'error';
-                        $ret['message'] = 'Gagal update data!';
-                    }
-                }
             } else {
                 $ret['status'] = 'error';
                 $ret['message'] = 'API Key tidak sesuai!';
