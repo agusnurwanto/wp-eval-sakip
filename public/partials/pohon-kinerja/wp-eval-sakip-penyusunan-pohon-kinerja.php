@@ -1879,7 +1879,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 				</div>
 			</form>`);
 		jQuery("#modal-koneksi").find(`.modal-footer`).html(`
-			<button type="button" class="btn btn-danger" data-dismiss="modal">
+			<button type="button" class="btn btn-secondary" data-dismiss="modal">
 				Tutup
 			</button>
 			<button type="button" class="btn btn-success" onclick="handleUpdateKoneksiPokin(${idPokin})">
@@ -1957,7 +1957,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 </div>
 			</form>`);
 		jQuery("#modal-crud").find('.modal-footer').html(`
-			<button type="button" class="btn btn-danger" data-dismiss="modal">
+			<button type="button" class="btn btn-secondary" data-dismiss="modal">
 				Tutup
 			</button>
 			<button type="button" class="btn btn-success" onclick="handleCreateIndikatorPokin(${level}, ${idParentPokin})">
@@ -1996,7 +1996,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                         </div>
 					</form>`);
 				jQuery("#modal-crud").find(`.modal-footer`).html(`
-					<button type="button" class="btn btn-danger" data-dismiss="modal">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">">
 						Tutup
 					</button>
 					<button type="button" class="btn btn-success" onclick="handleUpdateIndikatorPokin(${response.data.level}, ${idParentPokin})">
@@ -2042,7 +2042,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 				</div>
 			</form>`);
 		jQuery("#modal-koneksi").find('.modal-footer').html(`
-			<button type="button" class="btn btn-danger" data-dismiss="modal">
+			<button type="button" class="btn btn-secondary" data-dismiss="modal">
 				Tutup
 			</button>
 			<button type="button" class="btn btn-success" onclick="handleCreateKoneksiPokin(${idPokin}, ${level}, ${idParentPokin})">
@@ -2302,7 +2302,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                 </div>
 			</form>`);
 		jQuery("#modal-crud").find('.modal-footer').html(`
-			<button type="button" class="btn btn-danger" data-dismiss="modal">
+			<button type="button" class="btn btn-secondary" data-dismiss="modal">
 				Tutup
 			</button>
 			<button type="button" class="btn btn-success" onclick="handleCreatePokin(${level}, ${idParent})">
@@ -2341,7 +2341,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 						</form>`
 					);
 					jQuery("#modal-crud").find(`.modal-footer`).html(`
-						<button type="button" class="btn btn-danger" data-dismiss="modal">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">
 							Tutup
 						</button>
 						<button type="button" class="btn btn-success" onclick="handleUpdatePokin(${response.data.level},${response.data.parent})">

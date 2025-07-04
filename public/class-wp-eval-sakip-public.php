@@ -30947,6 +30947,40 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
+	// --------------------------------------------------------
+	// --- METHOD HANDLER PEGAWAI SIMPEG (esakip_data_pegawai_simpeg) ---
+	// --------------------------------------------------------
+	public function get_pegawai_simpeg_by_id($id)
+	{
+		global $wpdb;
+
+		$data = $wpdb->get_row(
+			$wpdb->prepare("
+				SELECT * 
+				FROM esakip_data_pegawai_simpeg 
+				WHERE id=%d
+			", $id),
+			ARRAY_A
+		);
+		
+		return $data;
+	}
+
+	public function update_pegawai_simpeg_by_id($id, $data)
+	{
+		global $wpdb;
+
+		$update = $wpdb->update(
+			'esakip_data_pegawai_simpeg',
+			$data,
+			array('id' => $id),
+			array('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d'),
+			array('%d')
+		);
+
+		return $update;
+	}
+
 	public function get_pegawai_simpeg($type = null, $value = null, $satker_id = null, $jabatan = null, $no_get_child = null)
 	{
 		global $wpdb;
@@ -31214,7 +31248,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			}
 
 			// Get pegawai plt semua sub satker
-			if ($tipe == 'unor' && empty($no_get_child)) {
+			if ($tipe == 'unor' && empty($no_get_child) && false) {
 				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 				
 				// xxxx get plt satker 4 digit

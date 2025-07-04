@@ -1941,6 +1941,7 @@ CREATE TABLE `esakip_data_pegawai_simpeg` (
   `eselon_id` text DEFAULT NULL,
   `id_atasan` int(11) DEFAULT NULL,
   `id_jabatan` VARCHAR(50) DEFAULT NULL,
+  `custom_jabatan` TEXT DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `update_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id),

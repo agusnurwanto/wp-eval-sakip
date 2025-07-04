@@ -667,6 +667,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_list_satker_simpeg',  $plugin_public, 'get_list_satker_simpeg');
 		$this->loader->add_action('wp_ajax_get_pegawai_simpeg',  $plugin_public, 'get_pegawai_simpeg');
 		$this->loader->add_action('wp_ajax_mapping_unit_sipd_simpeg',  $plugin_public, 'mapping_unit_sipd_simpeg');
+		$this->loader->add_action('wp_ajax_update_atasan_pegawai_simpeg',  $plugin_public, 'update_atasan_pegawai_simpeg');
 
 		$this->loader->add_action('wp_ajax_simpan_finalisasi_laporan_pk', $plugin_public, 'simpan_finalisasi_laporan_pk');
 		$this->loader->add_action('wp_ajax_hapus_finalisasi_laporan_pk', $plugin_public, 'hapus_finalisasi_laporan_pk');
