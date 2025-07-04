@@ -64,7 +64,7 @@ $error_message = array();
 $simpeg_pihak_pertama = $this->get_pegawai_simpeg('asn', $data_satker['nip_baru'], $data_satker['satker_id'], $data_satker['jabatan']);
 $response_1 = json_decode($simpeg_pihak_pertama, true);
 if (!isset($response_1['status']) || $response_1['status'] === false) {
-    array_push($error_message, $response_1['message']);
+    array_push($error_message, 'Pihak Pertama : ' . $response_1['message']);
 }
 
 //GET LAGI UPDATED DATA PIHAK PERTAMA
@@ -87,12 +87,16 @@ $pihak_pertama = array(
     'nama_pegawai'         => $data_pegawai_1['nama_pegawai'] ?? '-',
     'nip_pegawai'          => $data_pegawai_1['nip_baru'] ?? '-',
     'bidang_pegawai'       => $data_pegawai_1['nama_bidang'] ?? '-',
-    'jabatan_pegawai'      => '<span class = "jabatan-pihak-pertama">' . ($data_pegawai_1['jabatan'] ?? '') . '</span> ' .'<span class = "nama-satker">' . ($data_pegawai_1['nama_bidang'] ?? '') . '</span>',
     'pangkat'              => $data_pegawai_1['pangkat'] ?? '-',
+    'jabatan_pegawai'      => $data_pegawai_1['jabatan'] . ' ' . $data_pegawai_1['nama_bidang'] ?? '-',
     'gelar_depan'          => $data_pegawai_1['gelar_depan'] ?? '',
-    'gelar_belakang'       => $data_pegawai_1['gelar_belakang'] ?? '',
+    'gelar_belakang'       => ', ' . $data_pegawai_1['gelar_belakang'] ?? '',
     'status_jabatan'       => $data_pegawai_1['jabatan'] ?? ''
 );
+//jika custom jabatan ada, gunakan itu
+if (!empty($data_pegawai_1['custom_jabatan'])) {
+    $pihak_pertama['jabatan_pegawai'] = $data_pegawai_1['custom_jabatan'];
+}
 
 $data_atasan = array();
 $date_hari_ini = current_datetime()->format('Y-m-d H:i:s');
@@ -152,7 +156,7 @@ if (
 
     $data_atasan = [
         'nama_pegawai'  => $nama_kepala_daerah,
-        'jabatan'       => $jabatan_kepala . '<br>' . $pemda,
+        'jabatan'       => $jabatan_kepala . ' ' . $pemda,
         'status_kepala' => 'kepala_daerah'
     ];
 }
@@ -183,25 +187,6 @@ if (empty($data_atasan)) {
             ", $satker_id_atasan, 11),
             ARRAY_A
         );
-
-        // cek ulang data atasan jika kosong where jabatan=KEPALA untuk jenis kepala yang PLT
-        if(empty($data_atasan)){
-            $data_atasan = $wpdb->get_row(
-                $wpdb->prepare("
-                    SELECT
-                        p.*,
-                        ds.nama AS nama_bidang
-                    FROM esakip_data_pegawai_simpeg p
-                    LEFT JOIN esakip_data_satker_simpeg ds
-                           ON ds.satker_id = p.satker_id
-                    WHERE p.satker_id=%s 
-                      AND p.jabatan like %s 
-                      AND p.active=1
-                    ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
-                ", $satker_id_atasan, 'KEPALA%'),
-                ARRAY_A
-            );
-        }
     } else {
         // JIKA PEGAWAI BIASA
         $data_atasan = $wpdb->get_row(
@@ -215,29 +200,26 @@ if (empty($data_atasan)) {
                 WHERE p.satker_id=%s 
                   AND p.tipe_pegawai_id=%d 
                   AND p.active=1
-                ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
             ", $data_pegawai_1['satker_id'], 11),
             ARRAY_A
         );
+    }
 
-        // cek ulang data atasan jika kosong where jabatan=KEPALA untuk jenis kepala yang PLT
-        if(empty($data_atasan)){
-            $data_atasan = $wpdb->get_row(
-                $wpdb->prepare("
-                    SELECT
-                        p.*,
-                        ds.nama AS nama_bidang
-                    FROM esakip_data_pegawai_simpeg p
-                    LEFT JOIN esakip_data_satker_simpeg ds
-                           ON ds.satker_id = p.satker_id
-                    WHERE p.satker_id=%s 
-                      AND p.jabatan like %s 
-                      AND p.active=1
-                    ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
-                ", $data_pegawai_1['satker_id'], 'KEPALA%'),
-                ARRAY_A
-            );
-        }
+    // cek custom atasan
+    if (empty($data_atasan) && !empty($data_pegawai_1['id_atasan'])) {
+        $data_atasan = $wpdb->get_row(
+            $wpdb->prepare("
+                SELECT
+                    p.*,
+                    ds.nama AS nama_bidang
+                FROM esakip_data_pegawai_simpeg p
+                LEFT JOIN esakip_data_satker_simpeg ds
+                       ON ds.satker_id = p.satker_id
+                WHERE p.id = %d
+                  AND p.active = 1
+                ", $data_pegawai_1['id_atasan']),
+            ARRAY_A
+        );
     }
 
     //SINKRON DATA PIHAK KEDUA (KEPALA)
@@ -245,12 +227,10 @@ if (empty($data_atasan)) {
         $simpeg_pihak_kedua = $this->get_pegawai_simpeg('asn', $data_atasan['nip_baru'], $data_atasan['satker_id'], $data_atasan['jabatan']);
         $response_2 = json_decode($simpeg_pihak_kedua, true);
         if (!isset($response_2['status']) || $response_2['status'] === false) {
-            array_push($error_message, $response_2['message']);
+            array_push($error_message, 'Pihak Kedua : ' . $response_2['message']);
         }
     }
 }
-
-// print_r($data_atasan); die($wpdb->last_query);
 
 $data_pegawai_2 = null;
 // PIHAK KEDUA BUKAN KEPALA DAERAH DAN DIA PLT
@@ -266,7 +246,7 @@ if (!empty($data_atasan)) {
             $cek_status_jabatan_kepala_pihak_kedua = 1;
         }
     }
-    
+
     $pihak_kedua = array(
         'nama_pegawai'    => $data_atasan['nama_pegawai'] ?? '-',
         'nip_pegawai'     => $data_atasan['nip_baru'] ?? '-',
@@ -277,7 +257,7 @@ if (!empty($data_atasan)) {
         'gelar_belakang'  => '', //default kosong jika atasan kepala daerah
         'status_jabatan'  => $data_atasan['jabatan'] ?? ''
     );
-    
+
     if (
         !empty($data_atasan['status_kepala'])
         && !empty($data_atasan['jabatan'])
@@ -301,18 +281,22 @@ if (!empty($data_atasan)) {
             ", $data_atasan['nip_baru'], $data_atasan['satker_id']),
             ARRAY_A
         );
-        // print_r($data_pegawai_2); die($wpdb->last_query);
+
         $pihak_kedua['pangkat']         = $data_pegawai_2['pangkat'] ?? '-';
         $pihak_kedua['gelar_depan']     = $data_pegawai_2['gelar_depan'] ?? '';
-        $pihak_kedua['gelar_belakang']  = $data_pegawai_2['gelar_belakang'] ?? '';
-        $pihak_kedua['jabatan_pegawai'] = '<span class = "jabatan-pihak-kedua">' . ($data_pegawai_2['jabatan'] ?? '') . '</span>' .'<span class = "nama-satker">' . ($data_pegawai_2['nama_bidang'] ?? '-') . '</span>';
+        $pihak_kedua['gelar_belakang']  = ', ' . ($data_pegawai_2['gelar_belakang'] ?? '');
+        $pihak_kedua['jabatan_pegawai'] = $data_pegawai_2['jabatan'] . ' ' . ($pihak_kedua['nama_bidang'] ?? '-');
+        //jika custom jabatan ada, gunakan itu
+        if (!empty($data_pegawai_2['custom_jabatan'])) {
+            $pihak_kedua['jabatan_pegawai'] = $data_pegawai_2['custom_jabatan'];
+        }
     }
 } else {
     $pihak_kedua = array(
         'nama_pegawai'    => '-',
         'nip_pegawai'     => '-',
         'jabatan_pegawai' => '-', //default kosong jika atasan kepala daerah
-        'nama_bidang' => '-', //default kosong jika atasan kepala daerah
+        'nama_bidang'     => '-', //default kosong jika atasan kepala daerah
         'pangkat'         => '', //default kosong jika atasan kepala daerah
         'gelar_depan'     => '', //default kosong jika atasan kepala daerah
         'gelar_belakang'  => '', //default kosong jika atasan kepala daerah
@@ -400,7 +384,7 @@ if (!empty($data_user_pegawai)) {
             ),
             ARRAY_A
         );
-        
+
         // TIPE HAK AKSES USER PEGAWAI | 0 = TIDAK ADA | 1 = ALL | 2 = HANYA RHK TERKAIT
         if (!empty($skpd_user_pegawai)) {
             if (($skpd_user_pegawai['id_skpd'] == $id_skpd && $v_user['tipe_pegawai_id'] == 11 && strlen($v_user['satker_id']) == 2) || $is_administrator) {
@@ -409,7 +393,7 @@ if (!empty($data_user_pegawai)) {
                 $hak_akses_user_pegawai = 2;
             }
             $nip_user_pegawai = $v_user['nip_baru'];
-            if(empty($hak_akses_user_pegawai_per_skpd[$skpd_user_pegawai['id_skpd']])){
+            if (empty($hak_akses_user_pegawai_per_skpd[$skpd_user_pegawai['id_skpd']])) {
                 $hak_akses_user_pegawai_per_skpd[$skpd_user_pegawai['id_skpd']] = $hak_akses_user_pegawai;
             }
         }
@@ -419,7 +403,7 @@ if (!empty($data_user_pegawai)) {
 if ($is_administrator || $this_admin_pemda == 1) {
     $hak_akses_user_pegawai = 1;
     $nip_user_pegawai = 0;
-}else{
+} else {
     // ----- hak akses by skpd terkait ----- //
     $hak_akses_user_pegawai = $hak_akses_user_pegawai_per_skpd[$id_skpd];
 }
@@ -466,14 +450,14 @@ if ($data_tahapan) {
                     <div class="cr-view-btn" id="view-btn-' . $v['id'] . '" onclick="viewDokumen(\'' . $v['id'] . '\', this)" title="Lihat Dokumen">
                         <span class="dashicons dashicons-visibility"></span>
                     </div>';
-                    if($hak_akses_user_pegawai == 1 || ($hak_akses_user_pegawai == 2 && $pihak_pertama && $pihak_pertama['nip_pegawai'] == $nip_user_pegawai)){
-                        $card .='
+        if ($hak_akses_user_pegawai == 1 || ($hak_akses_user_pegawai == 2 && $pihak_pertama && $pihak_pertama['nip_pegawai'] == $nip_user_pegawai)) {
+            $card .= '
                         <div class="cr-view-btn-danger" onclick="deleteDokumen(\'' . $v['id'] . '\')" title="Hapus Dokumen">
                             <span class="dashicons dashicons-trash"></span>
                         </div>';
-                    }
+        }
 
-                    $card .='
+        $card .= '
                 </div>
                 <div class="badge-container">
                     <span class="badge badge-sm badge-warning badge-sedang-dilihat" id="badge-sedang-dilihat-' . $v['id'] . '" style="display:none">
@@ -799,12 +783,12 @@ $ttd_orientasi = 'text-left';
 
 <body>
     <div class="container-md mx-auto" style="width: 900px;">
-       <div class="text-center" id="action-sakip">
+        <div class="text-center" id="action-sakip">
             <div class="d-inline-flex align-items-center">
                 <button class="btn btn-primary btn-large mr-3" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button>
-            <?php if($hak_akses_user_pegawai == 1 || ($hak_akses_user_pegawai == 2 && $pihak_pertama && $pihak_pertama['nip_pegawai'] == $nip_user_pegawai)): ?>
-                <button class="btn btn-warning mr-3" onclick="get_alamat();"><i class="dashicons dashicons-edit"></i> Edit Alamat</button>
-            <?php endif; ?>
+                <?php if ($hak_akses_user_pegawai == 1 || ($hak_akses_user_pegawai == 2 && $pihak_pertama && $pihak_pertama['nip_pegawai'] == $nip_user_pegawai)): ?>
+                    <button class="btn btn-warning mr-3" onclick="get_alamat();"><i class="dashicons dashicons-edit"></i> Edit Alamat</button>
+                <?php endif; ?>
                 <div class="form-inline">
                     <label for="font-select" class="mr-2">Jenis Font:</label>
                     <select id="font-select" class="form-control mr-3" onchange="updateFont()" style="width: 300px;">
@@ -822,14 +806,14 @@ $ttd_orientasi = 'text-left';
             </div>
             <div class="d-inline-flex align-items-center mt-3">
                 <div class="form-inline">
-                    <label for="font-size" class="mr-3">Ukuran Font Konten: 
-                        <input type="number" id="font-size" class="form-control form-control-sm text-right ml-1 mr-1" value="16" min="1" max="100" onkeyup ="updateFont()" onchange ="updateFont()" style="width: 80px;"> px
+                    <label for="font-size" class="mr-3">Ukuran Font Konten:
+                        <input type="number" id="font-size" class="form-control form-control-sm text-right ml-1 mr-1" value="16" min="1" max="100" onkeyup="updateFont()" onchange="updateFont()" style="width: 80px;"> px
                     </label>
-                    <label for="font-size" class="mr-3">Ukuran Font Judul 1: 
-                        <input type="number" id="font-size-1" class="form-control form-control-sm text-right ml-1 mr-1" value="19" min="1" max="100" onkeyup ="updateFont()" onchange ="updateFont()" style="width: 80px;"> px
+                    <label for="font-size" class="mr-3">Ukuran Font Judul 1:
+                        <input type="number" id="font-size-1" class="form-control form-control-sm text-right ml-1 mr-1" value="19" min="1" max="100" onkeyup="updateFont()" onchange="updateFont()" style="width: 80px;"> px
                     </label>
-                    <label for="font-size" class="mr-3">Ukuran Font Judul 2: 
-                        <input type="number" id="font-size-2" class="form-control form-control-sm text-right ml-1 mr-1" value="21" min="1" max="100" onkeyup ="updateFont()" onchange ="updateFont()" style="width: 80px;"> px
+                    <label for="font-size" class="mr-3">Ukuran Font Judul 2:
+                        <input type="number" id="font-size-2" class="form-control form-control-sm text-right ml-1 mr-1" value="21" min="1" max="100" onkeyup="updateFont()" onchange="updateFont()" style="width: 80px;"> px
                     </label>
                 </div>
             </div>
@@ -844,6 +828,7 @@ $ttd_orientasi = 'text-left';
         <!-- Error Message -->
         <?php if (!empty($error_message) && is_array($error_message)) : ?>
             <div class="alert alert-danger mt-3 hide-display-print">
+                <p>Terjadi Kesalahan mendapatkan data pegawai SIMPEG!</p>
                 <ul class="mb-0">
                     <?php echo implode('', array_map(fn($msg) => "<li>{$msg}</li>", $error_message)); ?>
                 </ul>
@@ -921,15 +906,15 @@ $ttd_orientasi = 'text-left';
 
         <div class="text-center page-print">
             <div class="text-right m-2">
-                <?php if($hak_akses_user_pegawai == 1 || ($hak_akses_user_pegawai == 2 && $pihak_pertama && $pihak_pertama['nip_pegawai'] == $nip_user_pegawai)): ?>
-                <button class="btn btn-sm btn-success hide-display-print" id="finalisasi-btn" onclick="showModalFinalisasi()">
-                    <span class="dashicons dashicons-saved" title="Finalisasikan dokumen (Menyimpan dokumen sesuai data terkini)"></span>
-                    Finalisasi Dokumen
-                </button>
-                <button class="btn btn-sm btn-warning hide-display-print" id="edit-btn" onclick="showModalEditFinalisasi()" style="display: none;">
-                    <span class="dashicons dashicons-edit" title="Edit Label"></span>
-                    Edit Finalisasi Dokumen
-                </button>
+                <?php if ($hak_akses_user_pegawai == 1 || ($hak_akses_user_pegawai == 2 && $pihak_pertama && $pihak_pertama['nip_pegawai'] == $nip_user_pegawai)): ?>
+                    <button class="btn btn-sm btn-success hide-display-print" id="finalisasi-btn" onclick="showModalFinalisasi()">
+                        <span class="dashicons dashicons-saved" title="Finalisasikan dokumen (Menyimpan dokumen sesuai data terkini)"></span>
+                        Finalisasi Dokumen
+                    </button>
+                    <button class="btn btn-sm btn-warning hide-display-print" id="edit-btn" onclick="showModalEditFinalisasi()" style="display: none;">
+                        <span class="dashicons dashicons-edit" title="Edit Label"></span>
+                        Edit Finalisasi Dokumen
+                    </button>
                 <?php endif; ?>
             </div>
             <div class="row" style="border-bottom: 7px solid;">
@@ -951,7 +936,7 @@ $ttd_orientasi = 'text-left';
                 <tr>
                     <td>Nama</td>
                     <td>:</td>
-                    <td class="nama-pegawai-view"><?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . ', ' . $pihak_pertama['gelar_belakang']; ?></td>
+                    <td class="nama-pegawai-view"><?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] .  $pihak_pertama['gelar_belakang']; ?></td>
                 </tr>
                 <tr>
                     <td>Jabatan</td>
@@ -964,7 +949,7 @@ $ttd_orientasi = 'text-left';
                 <tr>
                     <td>Nama</td>
                     <td>:</td>
-                    <td class="nama-pegawai-atasan-view"><?php echo $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] . ', ' . $pihak_kedua['gelar_belakang']; ?></td>
+                    <td class="nama-pegawai-atasan-view"><?php echo $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] .  $pihak_kedua['gelar_belakang']; ?></td>
                 </tr>
                 <tr>
                     <td>Jabatan</td>
@@ -997,10 +982,10 @@ $ttd_orientasi = 'text-left';
                     </tr>
                     <tr class="<?php echo $ttd_orientasi; ?>">
                         <td class="ttd-pejabat nama-pegawai-atasan-view" id="nama_pegawai_atasan">
-                            <?php echo $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] . ', ' . $pihak_kedua['gelar_belakang']; ?>
+                            <?php echo $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] . $pihak_kedua['gelar_belakang']; ?>
                         </td>
                         <td style="padding: 0 0 0 20px;" class="ttd-pejabat nama-pegawai-view">
-                            <?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . ', ' . $pihak_pertama['gelar_belakang']; ?>
+                            <?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . $pihak_pertama['gelar_belakang']; ?>
                         </td>
                     </tr>
                     <tr class="<?php echo $ttd_orientasi; ?>">
@@ -1114,10 +1099,10 @@ $ttd_orientasi = 'text-left';
                     </tr>
                     <tr class="<?php echo $ttd_orientasi; ?>">
                         <td class="ttd-pejabat nama-pegawai-atasan-view">
-                            <?php echo $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] . ', ' . $pihak_kedua['gelar_belakang']; ?>
+                            <?php echo $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] .  $pihak_kedua['gelar_belakang']; ?>
                         </td>
                         <td style="padding: 0 0 0 20px;" class="ttd-pejabat nama-pegawai-view">
-                            <?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . ', ' . $pihak_pertama['gelar_belakang']; ?>
+                            <?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] .  $pihak_pertama['gelar_belakang']; ?>
                         </td>
                     </tr>
                     <tr class="<?php echo $ttd_orientasi; ?>">
@@ -1201,7 +1186,7 @@ $ttd_orientasi = 'text-left';
                                         <td class="text-left">
                                             <strong>:</strong>
                                         </td>
-                                        <td class="text-left" id="nama_pegawai"><?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . ', ' . $pihak_pertama['gelar_belakang']; ?>
+                                        <td class="text-left" id="nama_pegawai"><?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] .  $pihak_pertama['gelar_belakang']; ?>
                                         </td>
                                     </tr>
                                     <tr>
@@ -1398,7 +1383,7 @@ $ttd_orientasi = 'text-left';
     </div>
 </body>
 <!-- modal alamat -->
-<div class="modal fade" id="modalAlamat" data-backdrop="static"  role="dialog" aria-labelledby="modalAlamat" aria-hidden="true">
+<div class="modal fade" id="modalAlamat" data-backdrop="static" role="dialog" aria-labelledby="modalAlamat" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -1412,16 +1397,16 @@ $ttd_orientasi = 'text-left';
                     <input type="hidden" value="" id="id_skpd">
                     <div class="form-group">
                         <label for="alamat">Alamat Kantor</label>
-                        <?php 
-                            $content = ''; 
-                            $editor_id = 'alamat';
-                            $settings = array(
-                                'textarea_name' => 'alamat',
-                                'media_buttons' => false, 
-                                'teeny' => false, 
-                                'quicktags' => true
-                            );
-                            wp_editor($content, $editor_id, $settings);
+                        <?php
+                        $content = '';
+                        $editor_id = 'alamat';
+                        $settings = array(
+                            'textarea_name' => 'alamat',
+                            'media_buttons' => false,
+                            'teeny' => false,
+                            'quicktags' => true
+                        );
+                        wp_editor($content, $editor_id, $settings);
                         ?>
                     </div>
                 </form>
@@ -1443,7 +1428,7 @@ $ttd_orientasi = 'text-left';
 
         let cek_kepala_skpd = <?php echo $cek_kepala_skpd; ?>;
 
-        if(hak_akses_user_pegawai == 2 && nip_pihak_pertama != nip_akses_user_pegawai){
+        if (hak_akses_user_pegawai == 2 && nip_pihak_pertama != nip_akses_user_pegawai) {
             jQuery(".editable-field").attr("title", "").attr("contenteditable", "false");
         }
 
@@ -1507,12 +1492,12 @@ $ttd_orientasi = 'text-left';
                 jQuery('#wrap-loading').hide();
                 console.log(response);
                 if (response.status === 'success') {
-                    if(response.data != null || response.data != undefined){
+                    if (response.data != null || response.data != undefined) {
                         let data = response.data;
                         if (tinymce.get('alamat')) {
                             tinymce.get('alamat').setContent(data.alamat_kantor);
                         } else {
-                            jQuery('#alamat').val(data.alamat_kantor); 
+                            jQuery('#alamat').val(data.alamat_kantor);
                         }
                     }
                     jQuery('#modalAlamat').modal('show');
@@ -1528,7 +1513,7 @@ $ttd_orientasi = 'text-left';
         });
     }
 
-    function submit_edit_alamat() {     
+    function submit_edit_alamat() {
         let alamat = tinymce.get('alamat') ? tinymce.get('alamat').getContent() : jQuery('#alamat').val();
         if (alamat == '') {
             return alert('Alamat kantor tidak boleh kosong');
@@ -1580,7 +1565,7 @@ $ttd_orientasi = 'text-left';
             method: 'POST',
             data: {
                 action: "get_laporan_pk_by_id",
-                api_key: esakip.api_key, 
+                api_key: esakip.api_key,
                 id_tahap: idTahap,
             },
             dataType: 'json',
@@ -1590,7 +1575,7 @@ $ttd_orientasi = 'text-left';
                 if (response.status === 'success') {
                     jQuery('.nama-skpd-view').text(response.data.nama_skpd)
                     jQuery('.nama-satker-view').text(response.data.satuan_kerja)
-                    jQuery('.alamat-kantor-view').text(response.data.alamat_kantor)
+                    // jQuery('.alamat-kantor-view').html(response.data.alamat_kantor)
                     jQuery('.tanggal-dokumen-view').text(formatTanggalIndonesia(response.data.tanggal_dokumen))
 
                     jQuery('.nama-pegawai-view').text(response.data.nama_pegawai)
@@ -1803,7 +1788,7 @@ $ttd_orientasi = 'text-left';
             },
         });
     }
-    
+
     function updateFont() {
         const fontFamily = document.getElementById('font-select').value;
         const fontSize = document.getElementById('font-size').value + 'px';
@@ -1826,9 +1811,9 @@ $ttd_orientasi = 'text-left';
         });
 
         var jenis_pk = jQuery('input[name="jenis_pk"]:checked').val();
-        if(jenis_pk == 1){
+        if (jenis_pk == 1) {
             jQuery('.jenis_pk_text').text('PERJANJIAN KINERJA');
-        }else{
+        } else {
             jQuery('.jenis_pk_text').text('PERJANJIAN KINERJA PERUBAHAN');
         }
     }

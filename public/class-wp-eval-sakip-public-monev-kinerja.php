@@ -7119,7 +7119,13 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				);
 
 				//jika ada status plt plh maka tambahkan
-				$jabatan_pertama = (!empty($_POST['status_pertama']) ? $_POST['status_pertama'] . ' ' . $pihak_pertama['jabatan'] : $pihak_pertama['jabatan']);
+				if (!empty($_POST['status_pertama'])) {
+					$jabatan_pertama = $_POST['status_pertama'] . ' ' . $pihak_pertama['jabatan']  . ' ' . $pihak_pertama['nama_bidang'];
+				} elseif (!empty($pihak_pertama['custom_jabatan'])) {
+					$jabatan_pertama = $pihak_pertama['custom_jabatan'];
+				} else {
+					$jabatan_pertama = $pihak_pertama['jabatan'] . ' ' . $pihak_pertama['nama_bidang'];
+				}
 
 				$skpd = $wpdb->get_row(
 					$wpdb->prepare("
@@ -7138,7 +7144,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 				//jika nip kedua kosong berarti atasan langsung bupati
 				$data_atasan = array();
-				if (!empty($_POST['nip_kedua'])) {
+				if (!empty($_POST['id_satker_kedua'])) {
 					//atasan ASN
 					$pihak_kedua = $wpdb->get_row(
 						$wpdb->prepare('
@@ -7160,7 +7166,13 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$data_atasan['nama_pegawai'] = $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] . ', ' . $pihak_kedua['gelar_belakang'];
 
 					//jika ada status plt plh maka tambahkan
-					$data_atasan['jabatan'] = (!empty($_POST['status_kedua']) ? $_POST['status_kedua'] . ' ' . $pihak_kedua['jabatan'] . ' ' . $pihak_kedua['nama_bidang'] : $pihak_kedua['jabatan'] . ' ' . $pihak_kedua['nama_bidang']);
+					if (!empty($_POST['status_kedua'])) {
+						$data_atasan['jabatan'] = $_POST['status_kedua'] . ' ' . $pihak_kedua['jabatan'] . ' ' . $pihak_kedua['nama_bidang'];
+					} elseif (!empty($pihak_kedua['custom_jabatan'])) {
+						$data_atasan['jabatan'] = $pihak_kedua['custom_jabatan'];
+					} else {
+						$data_atasan['jabatan'] = $pihak_kedua['jabatan'] . ' ' . $pihak_kedua['nama_bidang'];
+					}
 				} else {
 					//atasan Kepala Daerah
 					$nama_kepala_daerah = get_option('_crb_kepala_daerah');
