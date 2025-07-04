@@ -504,11 +504,11 @@ $ttd_orientasi = 'text-left';
                 /* font-size: 12pt; */
             }
 
-            .f-12 {
+            /*.f-12 {
                 font-size: 16px;
                 line-height: 24px;
                 color: #555;
-            }
+            }*/
 
             @page {
                 size: portrait;
@@ -592,11 +592,11 @@ $ttd_orientasi = 'text-left';
         }
 
         .title-pk-1 {
-            font-size: 14pt;
+            font-size: 19px;
         }
 
         .title-pk-2 {
-            font-size: 16pt;
+            font-size: 21px;
             font-weight: 700;
         }
 
@@ -800,30 +800,45 @@ $ttd_orientasi = 'text-left';
 <body>
     <div class="container-md mx-auto" style="width: 900px;">
        <div class="text-center" id="action-sakip">
-            <button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button>
-
+            <div class="d-inline-flex align-items-center">
+                <button class="btn btn-primary btn-large mr-3" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button>
             <?php if($hak_akses_user_pegawai == 1 || ($hak_akses_user_pegawai == 2 && $pihak_pertama && $pihak_pertama['nip_pegawai'] == $nip_user_pegawai)): ?>
-                <div class="d-inline-flex align-items-center ml-2">
-                    <button class="btn btn-warning mr-3" onclick="get_alamat();"><i class="dashicons dashicons-edit"></i> Edit Alamat</button>
-
-                    <div class="form-inline">
-                        <label for="font-select" class="mr-2">Jenis Font:</label>
-                        <select id="font-select" class="form-control form-control-sm mr-3" onchange="updateFont()">
-                            <option value="Arial" selected>Arial</option>
-                            <option value="Times New Roman">Times New Roman</option>
-                            <option value="Calibri">Calibri</option>
-                            <option value="inherit">Inherit</option>
-                            <option value="Courier">Courier</option>
-                            <option value="Georgia">Georgia</option>
-                            <option value="Helvetica">Helvetica</option>
-                            <option value="Trebuchet">Trebuchet</option>
-                            <option value="Verdana">Verdana</option>
-                        </select>
-                        <label for="font-size" class="mr-2">Ukuran Font:</label>
-                        <input type="number" id="font-size" class="form-control form-control-sm mr-3" value="16" min="1" max="48" onkeyup ="updateFont()" style="width: 80px;">
-                    </div>
-                </div>
+                <button class="btn btn-warning mr-3" onclick="get_alamat();"><i class="dashicons dashicons-edit"></i> Edit Alamat</button>
             <?php endif; ?>
+                <div class="form-inline">
+                    <label for="font-select" class="mr-2">Jenis Font:</label>
+                    <select id="font-select" class="form-control mr-3" onchange="updateFont()" style="width: 300px;">
+                        <option value="Arial" selected>Arial</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Calibri">Calibri</option>
+                        <option value="inherit">Inherit</option>
+                        <option value="Courier">Courier</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Helvetica">Helvetica</option>
+                        <option value="Trebuchet">Trebuchet</option>
+                        <option value="Verdana">Verdana</option>
+                    </select>
+                </div>
+            </div>
+            <div class="d-inline-flex align-items-center mt-3">
+                <div class="form-inline">
+                    <label for="font-size" class="mr-3">Ukuran Font Konten: 
+                        <input type="number" id="font-size" class="form-control form-control-sm text-right ml-1 mr-1" value="16" min="1" max="100" onkeyup ="updateFont()" onchange ="updateFont()" style="width: 80px;"> px
+                    </label>
+                    <label for="font-size" class="mr-3">Ukuran Font Judul 1: 
+                        <input type="number" id="font-size-1" class="form-control form-control-sm text-right ml-1 mr-1" value="19" min="1" max="100" onkeyup ="updateFont()" onchange ="updateFont()" style="width: 80px;"> px
+                    </label>
+                    <label for="font-size" class="mr-3">Ukuran Font Judul 2: 
+                        <input type="number" id="font-size-2" class="form-control form-control-sm text-right ml-1 mr-1" value="21" min="1" max="100" onkeyup ="updateFont()" onchange ="updateFont()" style="width: 80px;"> px
+                    </label>
+                </div>
+            </div>
+            <div class="d-inline-flex align-items-center mt-3">
+                <div class="form-inline">
+                    <label class="mr-3"><input class="mr-1" type="radio" name="jenis_pk" onchange="updateFont()" value="1" checked> PK Murni</label>
+                    <label class="mr-3"><input class="mr-1" type="radio" name="jenis_pk" onchange="updateFont()" value="2"> PK Perubahan</label>
+                </div>
+            </div>
         </div>
 
         <!-- Error Message -->
@@ -930,7 +945,7 @@ $ttd_orientasi = 'text-left';
                 </div>
                 <div class="col-1"></div>
             </div>
-            <p class="title-laporan mt-3 mb-2">PERJANJIAN KINERJA TAHUN <?php echo $input['tahun']; ?></p>
+            <p class="title-laporan mt-3 mb-2"><span class="jenis_pk_text">PERJANJIAN KINERJA</span> TAHUN <?php echo $input['tahun']; ?></p>
             <p class="text-left f-12 mt-5">Dalam rangka mewujudkan manajemen pemerintahan yang efektif, transparan dan akuntabel serta berorientasi pada hasil, kami yang bertanda tangan dibawah ini :</p>
             <table id="table-1" class="text-left f-12">
                 <tr>
@@ -1014,7 +1029,7 @@ $ttd_orientasi = 'text-left';
 
         <div class="break-print"></div>
         <div class="page-print mt-5 text-center">
-            <p class="title-laporan mt-3">PERJANJIAN KINERJA TAHUN <?php echo $input['tahun']; ?></p>
+            <p class="title-laporan mt-3"><span class="jenis_pk_text">PERJANJIAN KINERJA</span> TAHUN <?php echo $input['tahun']; ?></p>
             <p class="title-laporan mb-5 nama-satker-view"><?php echo $pihak_pertama['bidang_pegawai']; ?></p>
             <?php if (!empty($html_pk['html_sasaran'])) : ?>
                 <table class="table_data_anggaran" id="table-sasaran-view">
@@ -1424,6 +1439,7 @@ $ttd_orientasi = 'text-left';
         window.hak_akses_user_pegawai = <?php echo $hak_akses_user_pegawai ?>;
         window.nip_akses_user_pegawai = <?php echo $nip_user_pegawai ?>;
         window.nip_pihak_pertama = <?php echo $pihak_pertama['nip_pegawai'] ?>;
+        updateFont();
 
         let cek_kepala_skpd = <?php echo $cek_kepala_skpd; ?>;
 
@@ -1791,10 +1807,29 @@ $ttd_orientasi = 'text-left';
     function updateFont() {
         const fontFamily = document.getElementById('font-select').value;
         const fontSize = document.getElementById('font-size').value + 'px';
+        const fontSize1 = document.getElementById('font-size-1').value + 'px';
+        const fontSize2 = document.getElementById('font-size-2').value + 'px';
 
         document.querySelectorAll('.page-print').forEach(el => {
             el.style.fontFamily = fontFamily;
             el.style.fontSize = fontSize;
         });
+
+        document.querySelectorAll('.title-pk-1').forEach(el => {
+            el.style.fontFamily = fontFamily;
+            el.style.fontSize = fontSize1;
+        });
+
+        document.querySelectorAll('.title-pk-2').forEach(el => {
+            el.style.fontFamily = fontFamily;
+            el.style.fontSize = fontSize2;
+        });
+
+        var jenis_pk = jQuery('input[name="jenis_pk"]:checked').val();
+        if(jenis_pk == 1){
+            jQuery('.jenis_pk_text').text('PERJANJIAN KINERJA');
+        }else{
+            jQuery('.jenis_pk_text').text('PERJANJIAN KINERJA PERUBAHAN');
+        }
     }
 </script>

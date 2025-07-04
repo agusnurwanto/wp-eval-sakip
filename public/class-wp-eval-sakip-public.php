@@ -30947,6 +30947,40 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
+	// --------------------------------------------------------
+	// --- METHOD HANDLER PEGAWAI SIMPEG (esakip_data_pegawai_simpeg) ---
+	// --------------------------------------------------------
+	public function get_pegawai_simpeg_by_id($id)
+	{
+		global $wpdb;
+
+		$data = $wpdb->get_row(
+			$wpdb->prepare("
+				SELECT * 
+				FROM esakip_data_pegawai_simpeg 
+				WHERE id=%d
+			", $id),
+			ARRAY_A
+		);
+		
+		return $data;
+	}
+
+	public function update_pegawai_simpeg_by_id($id, $data)
+	{
+		global $wpdb;
+
+		$update = $wpdb->update(
+			'esakip_data_pegawai_simpeg',
+			$data,
+			array('id' => $id),
+			array('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d'),
+			array('%d')
+		);
+
+		return $update;
+	}
+
 	public function get_pegawai_simpeg($type = null, $value = null, $satker_id = null, $jabatan = null, $no_get_child = null)
 	{
 		global $wpdb;
@@ -30954,6 +30988,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			'status'  => true,
 			'message' => 'Berhasil get data Kepegawaian!'
 		);
+
+		if(!empty($_POST['debug'])){
+			$startTimeOp1 = microtime(true);
+		}
 
 		if (!get_option('_crb_url_api_simpeg') || !get_option('_crb_authorization_api_simpeg')) {
 			$ret = json_encode([
@@ -30977,6 +31015,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				exit;
 			}
 			return $ret;
+		}
+
+		if(!empty($_POST['debug'])){
+			$endTimeOp1 = microtime(true);
+			$durationOp1 = $endTimeOp1 - $startTimeOp1;
+			echo "Operasi 1 (cek get_option cek DB) selesai dalam " . number_format($durationOp1, 4) . " detik<br>";
 		}
 
 		try {
@@ -31042,7 +31086,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'header' => array('Authorization: Basic ' . get_option('_crb_authorization_api_simpeg'))
 			);
 
+			if(!empty($_POST['debug'])){
+				$startTimeOp1 = microtime(true);
+			}
+
 			$response = $this->functions->curl_post($option);
+
+			if(!empty($_POST['debug'])){
+				$endTimeOp1 = microtime(true);
+				$durationOp1 = $endTimeOp1 - $startTimeOp1;
+				echo "Operasi 2 (cek curl post ke server simpeg) selesai dalam " . number_format($durationOp1, 4) . " detik<br>";
+			}
 
 			if (empty($response)) {
 				$ret = json_encode([
@@ -31080,6 +31134,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			}
 
 			$table = 'esakip_data_pegawai_simpeg';
+
+			if(!empty($_POST['debug'])){
+				$startTimeOp1 = microtime(true);
+			}
 
 			if ($tipe == 'unor' && empty($no_get_child)) {
 				$wpdb->query(
@@ -31183,8 +31241,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 			}
 
+			if(!empty($_POST['debug'])){
+				$endTimeOp1 = microtime(true);
+				$durationOp1 = $endTimeOp1 - $startTimeOp1;
+				echo "Operasi 3 (update pegawai ke db) selesai dalam " . number_format($durationOp1, 4) . " detik<br>";
+			}
+
 			// Get pegawai plt semua sub satker
-			if ($tipe == 'unor' && empty($no_get_child)) {
+			if ($tipe == 'unor' && empty($no_get_child) && false) {
 				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 				
 				// xxxx get plt satker 4 digit

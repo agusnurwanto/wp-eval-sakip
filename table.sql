@@ -1939,13 +1939,18 @@ CREATE TABLE `esakip_data_pegawai_simpeg` (
   `active` tinyint(4) NOT NULL,
   `active_rhk` tinyint(4) DEFAULT 1,
   `eselon_id` text DEFAULT NULL,
+  `id_atasan` int(11) DEFAULT NULL,
+  `id_jabatan` VARCHAR(50) DEFAULT NULL,
+  `custom_jabatan` TEXT DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `update_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id),
   KEY `nip_baru` (`nip_baru`),
   KEY `satker_id` (`satker_id`),
   KEY `active` (`active`),
-  KEY `tipe_pegawai_id` (`tipe_pegawai_id`)
+  KEY `tipe_pegawai_id` (`tipe_pegawai_id`),
+  KEY `id_atasan` (`id_atasan`),
+  KEY `id_jabatan` (`id_jabatan`)
 );
 
 CREATE TABLE `esakip_data_mapping_unit_sipd_simpeg` (
