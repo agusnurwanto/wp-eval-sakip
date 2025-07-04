@@ -20892,13 +20892,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$periode_input_iku_pemda .= '<li><a target="_blank" href="' . $input_iku_pemda['url'] . '" class="btn btn-primary">' . $title . '</a></li>';
 
 			$list_pemda_pengisian_rencana_aksi = $this->functions->generatePage(array(
-				'nama_page' => 'Pengisian Rencana Aksi Pemda Tahun ' . $_GET['tahun'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-				'content' => '[list_pengisian_rencana_aksi_pemda tahun=' . $_GET['tahun'] . ' periode=' . $jadwal_periode_item['id'] . ' ]',
+				'nama_page' => 'Pengisian Rencana Aksi Pemda Baru Tahun ' . $_GET['tahun'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[list_pengisian_rencana_aksi_pemda_baru tahun=' . $_GET['tahun'] . ' periode=' . $jadwal_periode_item['id'] . ' ]',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title = 'Rencana Aksi Tahun ' . $_GET['tahun'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
 			$pengisian_rencana_aksi_pemda = '<li><a target="_blank" href="' . $list_pemda_pengisian_rencana_aksi['url'] . '" class="btn btn-primary">' .  $title . '</a></li>';
+
+			$list_pemda_pk = $this->functions->generatePage(array(
+				'nama_page' => 'Laporan PK Pemerintah Daerah Tahun ' . $_GET['tahun'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[halaman_laporan_pk_pemda tahun=' . $_GET['tahun'] . ' periode=' . $jadwal_periode_item['id'] . ' ]',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title = 'PK (Perjanjian Kinerja) Tahun ' . $_GET['tahun'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+			$pk_pemda = '<li><a target="_blank" href="' . $list_pemda_pk['url'] . '" class="btn btn-primary">' .  $title . '</a></li>';
 		}
 		// PEMDA
 
@@ -21410,6 +21419,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (empty($pengisian_rencana_aksi_pemda)) {
 			$pengisian_rencana_aksi_pemda = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
 		}
+		if (empty($pk_pemda)) {
+			$pk_pemda = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
+		}
 		if (empty($periode_dokumen_pohon_kinerja_pemda)) {
 			$periode_dokumen_pohon_kinerja_pemda = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
 		}
@@ -21486,7 +21498,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($cek_data_perencanaan['pemerintah_daerah']['RPJMD']) && $cek_data_perencanaan['pemerintah_daerah']['RPJMD']['active'] == 1) {
 			$halaman_rpjmd = '
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="rpjmd" style="margin: 0;">RPJMD (Rencana Pembangunan Jangka Menengah Daerah)</h5>
+					<h5 class="esakip-header-tahun" data-id="rpjmd" style="margin: 0;">RPJMD (Rencana Pembangunan Daerah)</h5>
 					<div class="esakip-body-tahun" data-id="rpjmd">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $periode_rpjmd . '
@@ -21655,7 +21667,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$halaman_input_rpjpd_rpjmd .= '
 			<li>
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="halaman-input-rpjmd" style="margin: 0;">Buat RPJMD / RPD (Rencana Pembangunan Jangka Menengah Daerah)</h5>
+					<h5 class="esakip-header-tahun" data-id="halaman-input-rpjmd" style="margin: 0;">Buat RPJMD / RPD (Rencana Pembangunan Daerah)</h5>
 					<div class="esakip-body-tahun" data-id="halaman-input-rpjmd">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $halaman_input_rpjmd . '
@@ -21691,6 +21703,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					<div class="esakip-body-tahun" data-id="pengisian-rencana-pemda">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $pengisian_rencana_aksi_pemda . '
+						</ul>
+					</div>
+				</div>
+			</li>
+			<li>
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="laporan-pk-pemda" style="margin: 0;">Buat PK (Perjanjian Kinerja)</h5>
+					<div class="esakip-body-tahun" data-id="laporan-pk-pemda">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+							' . $pk_pemda . '
 						</ul>
 					</div>
 				</div>
@@ -21779,6 +21801,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$halaman_perencanaan_opd .= $halaman_input_perangkat_daerah;
 							$halaman_perencanaan_opd .= $halaman_pengisian_rencana_aksi;
 							$halaman_perencanaan_opd .= $pengisian_rencana_aksi;
+							$halaman_perencanaan_opd .= $laporan_pk_btn;
 							$halaman_perencanaan_opd .= $dokumen_perencanaan_opd;
 
 							$set_html_opd_perencanaan = get_option('sakip_menu_khusus_set_html_opd_PERENCANAAN_' . $_GET['tahun']);
@@ -21835,7 +21858,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							// ) {
 								$halaman_sakip_perencanaan_pemda .= $halaman_perencanaan_pemda;
 								$halaman_sakip_perencanaan_pemda .= $halaman_perencanaan_opd;
-								$halaman_sakip_perencanaan_pemda .= $laporan_pk_btn;
 							// }
 			$halaman_sakip_perencanaan_pemda .= '
 						</ul>
