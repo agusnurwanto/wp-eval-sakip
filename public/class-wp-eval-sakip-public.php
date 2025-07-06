@@ -31146,6 +31146,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			if (json_last_error() !== JSON_ERROR_NONE) {
 				$ret = json_encode([
 					'status'  => false,
+					'response'  => $response,
 					'message' => json_last_error_msg()
 				]);
 				if (!$type) {
@@ -31216,6 +31217,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$opsi_data_pegawai = array(
 					'nama_pegawai' => $data['nama_pegawai'],
 					'nip_baru' => $data['nip_baru'],
+					'id_jabatan' => $data['id_jabatan'],
 					'update_at' => current_time('mysql'),
 					'active' => 1
 				);

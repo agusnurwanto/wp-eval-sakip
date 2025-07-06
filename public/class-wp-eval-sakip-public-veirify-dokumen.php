@@ -2466,6 +2466,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             p.nama_pegawai,
                             p.satker_id,
                             p.jabatan,
+                            p.id_jabatan,
                             p.tipe_pegawai,
                             p.tipe_pegawai_id,
                             p.active,
@@ -2567,7 +2568,8 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                               AND id_skpd = %d
                               AND nip = %s 
                               AND id_jabatan = %s 
-                        ", $_POST['tahun_anggaran'], $_POST['id_skpd'], $v_pgw['nip_baru'], $v_pgw['satker_id'])
+                              AND id_jabatan_asli = %s 
+                        ", $_POST['tahun_anggaran'], $_POST['id_skpd'], $v_pgw['nip_baru'], $v_pgw['satker_id'], $v_pgw['id_jabatan'])
                     );
                     $tbody .= "<tr>";
                     $tbody .= "<td class='text-left'>" . $v_pgw['satker_id'] . "</td>";
