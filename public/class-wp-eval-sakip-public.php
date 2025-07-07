@@ -28183,15 +28183,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								$data_all[$tujuan['id_unik']]['detail'][] = $tujuan;
 							}
 							$all_misi = $wpdb->get_results($wpdb->prepare("
-							    SELECT id, misi
+							    SELECT 
+							    	id, 
+							    	misi
 							    FROM esakip_rpjmd_misi
-							    WHERE id_jadwal = %d AND active = 1
+							    WHERE id_jadwal = %d 
+							    	AND active = 1
 							", $_POST['id_jadwal']), ARRAY_A);
 
 							$all_misi_detail = $wpdb->get_results($wpdb->prepare("
-							    SELECT id_misi, id_tujuan
+							    SELECT 
+							    	id_misi, 
+							    	id_tujuan
 							    FROM esakip_rpjmd_misi_detail
-							    WHERE id_jadwal = %d AND active = 1
+							    WHERE id_jadwal = %d 
+							    	AND active = 1
 							", $_POST['id_jadwal']), ARRAY_A);
 
 							$tujuan_misi_map = [];
@@ -33200,21 +33206,26 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$table = $_POST['table'];
 
 			if ($table == 'esakip_rpjpd_visi') {
-				$ret['data'] = $wpdb->get_results("
+				$ret['data'] = $wpdb->get_results($wpdb->prepare("
 					SELECT 
-						* 
-					FROM esakip_rpjpd_visi 
-					WHERE active = 1
-				", ARRAY_A);
+						*
+					FROM esakip_rpjmd_visi 
+					WHERE active=1 AND
+						id_jadwal=%d
+					ORDER BY id
+				", $_POST['id_jadwal']), 
+				ARRAY_A);
 			} 
 			elseif ($table == 'esakip_rpjmd_misi') {
-				$ret['data'] = $wpdb->get_results("
+				$ret['data'] = $wpdb->get_results($wpdb->prepare("
 					SELECT 
-						id, 
-						misi 
+						*
 					FROM esakip_rpjmd_misi 
-					WHERE active = 1
-				", ARRAY_A);
+					WHERE active=1 AND
+						id_jadwal=%d
+					ORDER BY id
+				", $_POST['id_jadwal']), 
+				ARRAY_A);
 			}
 		} else {
 			$ret = array(

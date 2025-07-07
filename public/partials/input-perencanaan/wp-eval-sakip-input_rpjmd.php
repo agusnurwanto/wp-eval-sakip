@@ -149,7 +149,7 @@ foreach ($tujuan_all as $tujuan) {
 
                         //check program
                         $kode_program = explode(" ", $program['nama_program']);
-                        $checkProgram = $wpdb->get_row($wpdb->prepare("SELECT kode_program FROM data_prog_keg WHERE kode_program=%s AND tahun_anggaran=%d AND active=%d", $kode_program[0], $tahun_anggaran, 1), ARRAY_A);
+                        // $checkProgram = $wpdb->get_row($wpdb->prepare("SELECT kode_program FROM data_prog_keg WHERE kode_program=%s AND tahun_anggaran=%d AND active=%d", $kode_program[0], $tahun_anggaran, 1), ARRAY_A);
 
                         // $statusMutakhirProgram = 0;
                         // if (empty($checkProgram['kode_program'])) {
@@ -545,6 +545,33 @@ if (empty($data_all['data']['tujuan_kosong']['data'])) {
 
 $body = '';
 $no_tujuan = 0;
+$all_misi = $wpdb->get_results($wpdb->prepare("
+    SELECT 
+        id, 
+        misi
+    FROM esakip_rpjmd_misi
+    WHERE id_jadwal = %d 
+        AND active = 1
+", $input['periode']), ARRAY_A);
+
+$all_misi_detail = $wpdb->get_results($wpdb->prepare("
+    SELECT 
+        id_misi, 
+        id_tujuan
+    FROM esakip_rpjmd_misi_detail
+    WHERE id_jadwal = %d 
+        AND active = 1
+", $input['periode']), ARRAY_A);
+
+$tujuan_misi_map = [];
+foreach ($all_misi_detail as $row) {
+    $tujuan_misi_map[$row['id_tujuan']][] = $row['id_misi'];
+}
+
+$misi_teks_map = [];
+foreach ($all_misi as $misi) {
+    $misi_teks_map[$misi['id']] = $misi['misi'];
+}
 foreach ($data_all['data'] as $tujuan) {
     $no_tujuan++;
     $indikator_tujuan = '';
@@ -557,6 +584,22 @@ foreach ($data_all['data'] as $tujuan) {
     $target_akhir = '';
     $satuan = '';
     $indikator_catatan_tujuan = '';
+    $nama_tujuan_existing = '';
+
+    $data_tujuan_existing = $wpdb->get_results($wpdb->prepare("
+        SELECT 
+            tujuan_teks 
+        FROM esakip_rpd_tujuan 
+        WHERE id = %d 
+            AND active = 1
+    ", $tujuan['detail'][0]['id_tujuan_murni']), ARRAY_A);
+
+    if (!empty($data_tujuan_existing[0]['tujuan_teks'])) {
+        $nama_tujuan_existing = $data_tujuan_existing[0]['tujuan_teks'];
+    }
+
+
+
     foreach ($tujuan['detail'] as $k => $v) {
         if (!empty($v['indikator_teks'])) {
             $indikator_tujuan .= '<div class="indikator_program">' . $v['indikator_teks'] . button_edit_monev($v['id_unik'] . '|' . $v['id_unik_indikator']) . '</div>';
@@ -588,24 +631,43 @@ foreach ($data_all['data'] as $tujuan) {
     if (!empty($tujuan['detail'][0]['catatan_teks_tujuan'])) {
         $catatan_teks_tujuan = $tujuan['detail'][0]['catatan_teks_tujuan'];
     }
+
+    $misi_terkait = isset($tujuan_misi_map[$tujuan['detail'][0]['id_unik']]) ? $tujuan_misi_map[$tujuan['detail'][0]['id_unik']] : [];
+    $misi_label = '';
+    foreach ($misi_terkait as $id_misi) {
+        if (!empty($misi_teks_map[$id_misi])) {
+            $misi_label .= '<div class="indikator_program">' . $misi_teks_map[$id_misi] . '</div>';
+        }
+    }
+
     $body .= '
-		<tr class="tr-tujuan" ' . $warning . '>
-			<td class="esakip-kiri esakip-atas esakip-kanan esakip-bawah">' . $no_tujuan . '</td>
-			<td class="esakip-atas esakip-kanan esakip-bawah">' . $tujuan['detail'][0]['isu_teks'] . '</td>
-			<td class="esakip-atas esakip-kanan esakip-bawah">' . parsing_nama_kode($tujuan['nama']) . button_edit_monev($tujuan['detail'][0]['id_unik']) . '</td>
-			<td class="esakip-atas esakip-kanan esakip-bawah"></td>
-			<td class="esakip-atas esakip-kanan esakip-bawah"></td>
-			<td class="esakip-atas esakip-kanan esakip-bawah">' . $indikator_tujuan . '</td>
-			<td class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah">' . $target_awal . '</td>
-			' . $target_html . '
-			<td class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah">' . $target_akhir . '</td>
-			<td class="esakip-atas esakip-kanan esakip-bawah">' . $satuan . '</td>
-			<td class="esakip-atas esakip-kanan esakip-bawah"></td>
-			<td class="esakip-atas esakip-kanan esakip-bawah">' . $no_urut . '</td>
-			<td class="esakip-atas esakip-kanan esakip-bawah">' . $catatan_teks_tujuan . '</td>
-			<td class="esakip-atas esakip-kanan esakip-bawah">' . $indikator_catatan_tujuan . '</td>
-		</tr>
-	';
+        <tr class="tr-tujuan" ' . $warning . '>
+            <td class="esakip-kiri esakip-atas esakip-kanan esakip-bawah">' . $no_tujuan . '</td>
+            <td class="esakip-atas esakip-kanan esakip-bawah">' . ($jadwal_rpjmd ? $misi_label : ($tujuan['detail'][0]['isu_teks'] ?? '')) . '</td>';
+    if (!empty($id_jadwal_murni)) {
+        $body .= '
+            <td class="esakip-atas esakip-kanan esakip-bawah">' . $nama_tujuan_existing . '</td>';
+    }
+    $body .= '
+            <td class="esakip-atas esakip-kanan esakip-bawah">' . parsing_nama_kode($tujuan['nama']) . button_edit_monev($tujuan['detail'][0]['id_unik']) . '</td>';
+    if (!empty($id_jadwal_murni)) {
+        $body .= '
+            <td class="esakip-atas esakip-kanan esakip-bawah"></td>';
+    }
+    $body .= '
+            <td class="esakip-atas esakip-kanan esakip-bawah"></td>
+            <td class="esakip-atas esakip-kanan esakip-bawah"></td>
+            <td class="esakip-atas esakip-kanan esakip-bawah">' . $indikator_tujuan . '</td>
+            <td class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah">' . $target_awal . '</td>
+            ' . $target_html . '
+            <td class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah">' . $target_akhir . '</td>
+            <td class="esakip-atas esakip-kanan esakip-bawah">' . $satuan . '</td>
+            <td class="esakip-atas esakip-kanan esakip-bawah"></td>
+            <td class="esakip-atas esakip-kanan esakip-bawah">' . $no_urut . '</td>
+            <td class="esakip-atas esakip-kanan esakip-bawah">' . $catatan_teks_tujuan . '</td>
+            <td class="esakip-atas esakip-kanan esakip-bawah">' . $indikator_catatan_tujuan . '</td>
+        </tr>
+    ';
     $no_sasaran = 0;
     foreach ($tujuan['data'] as $sasaran) {
         $no_sasaran++;
@@ -619,6 +681,19 @@ foreach ($data_all['data'] as $tujuan) {
         $target_akhir = '';
         $satuan = '';
         $indikator_catatan_sasaran = '';
+        $nama_sasaran_existing = '';
+
+        $data_sasaran_existing = $wpdb->get_results($wpdb->prepare("
+            SELECT 
+                sasaran_teks 
+            FROM esakip_rpd_sasaran 
+            WHERE id = %d 
+                AND active = 1
+        ", $sasaran['detail'][0]['id_sasaran_murni']), ARRAY_A);
+
+        if (!empty($data_sasaran_existing[0]['sasaran_teks'])) {
+            $nama_sasaran_existing = $data_sasaran_existing[0]['sasaran_teks'];
+        }
         foreach ($sasaran['detail'] as $k => $v) {
             if (!empty($v['indikator_teks'])) {
                 $indikator_sasaran .= '<div class="indikator_program">' . $v['indikator_teks'] . button_edit_monev($tujuan['detail'][0]['id_unik'] . '||' . $v['id_unik'] . '|' . $v['id_unik_indikator']) . '</div>';
@@ -649,9 +724,21 @@ foreach ($data_all['data'] as $tujuan) {
         $body .= '
 			<tr class="tr-sasaran" ' . $warning . '>
 				<td class="esakip-kiri esakip-atas esakip-kanan esakip-bawah">' . $no_tujuan . '.' . $no_sasaran . '</td>
-				<td class="esakip-atas esakip-kanan esakip-bawah"><span class="debug-tujuan">' . $tujuan['detail'][0]['isu_teks'] . '</span></td>
-				<td class="esakip-atas esakip-kanan esakip-bawah"><span class="debug-tujuan">' . $tujuan['nama'] . '</span></td>
-				<td class="esakip-atas esakip-kanan esakip-bawah">' . parsing_nama_kode($sasaran['nama']) . button_edit_monev($tujuan['detail'][0]['id_unik'] . '||' . $sasaran['detail'][0]['id_unik']) . '</td>
+				<td class="esakip-atas esakip-kanan esakip-bawah"><span class="debug-tujuan">' . $tujuan['detail'][0]['isu_teks'] . '</span></td>';
+        if (!empty($id_jadwal_murni)) {
+            $body .= '
+                <td class="esakip-atas esakip-kanan esakip-bawah"></td>';
+        }
+        $body .= '
+				<td class="esakip-atas esakip-kanan esakip-bawah"><span class="debug-tujuan">' . $tujuan['nama'] . '</span></td>';
+        $body .= '
+				<td class="esakip-atas esakip-kanan esakip-bawah">' . parsing_nama_kode($sasaran['nama']) . button_edit_monev($tujuan['detail'][0]['id_unik'] . '||' . $sasaran['detail'][0]['id_unik']) . '</td>';
+
+        if (!empty($id_jadwal_murni)) {
+            $body .= '
+                <td class="esakip-atas esakip-kanan esakip-bawah">' . (!empty($id_jadwal_murni) ? $nama_sasaran_existing : '') . '</td>';
+        }
+        $body .= '
 				<td class="esakip-atas esakip-kanan esakip-bawah"></td>
 				<td class="esakip-atas esakip-kanan esakip-bawah">' . $indikator_sasaran . '</td>
 				<td class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah">' . $target_awal . '</td>
@@ -736,8 +823,21 @@ foreach ($data_all['data'] as $tujuan) {
 				<tr class="tr-program" data-kode-skpd="' . $program['kode_skpd'] . '" ' . $warning . '>
 					<td class="esakip-kiri esakip-atas esakip-kanan esakip-bawah">' . $no_tujuan . '.' . $no_sasaran . '.' . $no_program . '</td>
 					<td class="esakip-atas esakip-kanan esakip-bawah"><span class="debug-tujuan">' . $tujuan['detail'][0]['isu_teks'] . '</span></td>
-					<td class="esakip-atas esakip-kanan esakip-bawah"><span class="debug-tujuan">' . $tujuan['nama'] . '</span></td>
-					<td class="esakip-atas esakip-kanan esakip-bawah"><span class="debug-sasaran">' . $sasaran['nama'] . '</span></td>
+                    ';
+        if (!empty($id_jadwal_murni)) {
+            $body .= '
+                <td class="esakip-atas esakip-kanan esakip-bawah"></td>';
+        }
+        $body .= '
+                    <td class="esakip-atas esakip-kanan esakip-bawah"><span class="debug-tujuan">' . $tujuan['nama'] . '</span></td>';
+        $body .= '
+                    <td class="esakip-atas esakip-kanan esakip-bawah"><span class="debug-sasaran">' . $sasaran['nama'] . '</span></td>';
+
+        if (!empty($id_jadwal_murni)) {
+            $body .= '
+                    <td class="esakip-atas esakip-kanan esakip-bawah"></td>';
+        }
+        $body .= '
                     <td class="esakip-atas esakip-kanan esakip-bawah">' . parsing_nama_kode($program['nama']) . button_edit_monev($tujuan['detail'][0]['id_unik'] . '||' . $sasaran['detail'][0]['id_unik'] . '||' . $program['detail'][0]['id_unik']) . " " . $isMutakhir . '</td>
 					<td class="esakip-atas esakip-kanan esakip-bawah">' . $text_indikator . '</td>
 					<td class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah">' . $target_awal . '</td>
@@ -846,7 +946,7 @@ if (!empty($data_sasaran_existing)) {
                 <th style="width: 100px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Target Awal</th>
                 <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
                     <th style="width: 300px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok" colspan="2">Tahun <?php echo $i; ?></th>
-                <?php }; ?>
+                <?php } ?>
                 <th style="width: 100px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Target Akhir</th>
                 <th style="width: 100px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Satuan</th>
                 <th style="width: 150px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Keterangan</th>
@@ -857,26 +957,33 @@ if (!empty($data_sasaran_existing)) {
             <tr>
                 <th rowspan="2" class='esakip-atas esakip-kiri esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'>1</th>
                 <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'>2</th>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'>3</th>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'>4</th>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'>5</th>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'>6</th>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'>7</th>
+                <?php $no = 3; ?>
+                <?php if (!empty($id_jadwal_murni)): ?>
+                    <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                <?php endif; ?>
+                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                <?php if (!empty($id_jadwal_murni)): ?>
+                    <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                <?php endif; ?>
+                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
                 <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
-                    <th class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok" colspan="2"><?php echo 7 + $i; ?></th>
-                <?php }; ?>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $i + 7; ?></th>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $i + 8; ?></th>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $i + 9; ?></th>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $i + 10; ?></th>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $i + 11; ?></th>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $i + 12; ?></th>
+                    <th class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok" colspan="2"><?php echo $no++; ?></th>
+                <?php } ?>
+                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
             </tr>
             <tr>
                 <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
                     <th class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Target</th>
                     <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Pagu</th>
-                <?php }; ?>
+                <?php } ?>
             </tr>
         </thead>
         <tbody>
@@ -991,32 +1098,41 @@ if (!empty($data_sasaran_existing)) {
             <div class="modal-body">
                 <table class="table table-bordered">
                     <tbody>
+
+                        <?php if ($jadwal_rpjmd): ?>
+                            <tr>
+                                <th style="width: 175px;">Misi RPJMD</th>
+                                <td class="text-center">:</td>
+                                <td id="misi-rpjmd-indikator"></td>
+                            </tr>
+                        <?php else: ?>
+                            <tr>
+                                <th style="width: 175px;">Visi RPJPD</th>
+                                <td class="text-center">:</td>
+                                <td id="visi-teks-indikator"></td>
+                            </tr>
+                            <tr>
+                                <th>Misi RPJPD</th>
+                                <td class="text-center">:</td>
+                                <td id="misi-teks-indikator"></td>
+                            </tr>
+                            <tr>
+                                <th>Sasaran Pokok RPJPD</th>
+                                <td class="text-center">:</td>
+                                <td id="saspok-teks-indikator"></td>
+                            </tr>
+                            <tr>
+                                <th>Kebijakan RPJPD</th>
+                                <td class="text-center">:</td>
+                                <td id="kebijakan-teks-indikator"></td>
+                            </tr>
+                            <tr>
+                                <th>Isu RPJPD</th>
+                                <td class="text-center">:</td>
+                                <td id="isu-teks-indikator"></td>
+                            </tr>
                         <tr>
-                            <th style="width: 175px;">Visi RPJPD</th>
-                            <td class="text-center">:</td>
-                            <td id="visi-teks-indikator"></td>
-                        </tr>
-                        <tr>
-                            <th>Misi RPJPD</th>
-                            <td class="text-center">:</td>
-                            <td id="misi-teks-indikator"></td>
-                        </tr>
-                        <tr>
-                            <th>Sasaran Pokok RPJPD</th>
-                            <td class="text-center">:</td>
-                            <td id="saspok-teks-indikator"></td>
-                        </tr>
-                        <tr>
-                            <th>Kebijakan RPJPD</th>
-                            <td class="text-center">:</td>
-                            <td id="kebijakan-teks-indikator"></td>
-                        </tr>
-                        <tr>
-                            <th>Isu RPJPD</th>
-                            <td class="text-center">:</td>
-                            <td id="isu-teks-indikator"></td>
-                        </tr>
-                        <tr>
+                        <?php endif; ?>
                             <th style="text-transform:uppercase;">Tujuan <?php echo $jadwal['jenis_jadwal_khusus']; ?></th>
                             <td class="text-center">:</td>
                             <td id="tujuan-teks-indikator"></td>
@@ -2020,6 +2136,7 @@ if (!empty($data_sasaran_existing)) {
             dataType: "json",
             success: function(res) {
                 jQuery('#visi-teks-indikator').html('');
+                jQuery('#misi-rpjmd-indikator').html('');
                 jQuery('#misi-teks-indikator').html('');
                 jQuery('#saspok-teks-indikator').html('');
                 jQuery('#kebijakan-teks-indikator').html('');
@@ -2075,7 +2192,15 @@ if (!empty($data_sasaran_existing)) {
                                     jQuery('#isu-teks-indikator').html(bb.isu_teks);
                                 }
                             });
+                        }                        
+
+                        if (res.data_all[b].misi && Array.isArray(res.data_all[b].misi)) {
+                            let misi_labels = res.data_all[b].misi.map(function(bb) {
+                                return bb.misi;
+                            });
+                            jQuery('#misi-rpjmd-indikator').html(misi_labels.join('<br> '));
                         }
+
                     }
 
                     jQuery('#tujuan-teks-indikator').html(res.data_all[b].nama);
@@ -2670,6 +2795,7 @@ if (!empty($data_sasaran_existing)) {
             success: function(res) {
                 jQuery('#visi-teks-indikator').html('');
                 jQuery('#misi-teks-indikator').html('');
+                jQuery('#misi-rpjmd-indikator').html('');
                 jQuery('#saspok-teks-indikator').html('');
                 jQuery('#kebijakan-teks-indikator').html('');
                 jQuery('#isu-teks-indikator').html('');
@@ -2715,6 +2841,20 @@ if (!empty($data_sasaran_existing)) {
                         });
                     }
 
+                    if (res.data_all[b].misi && res.data_all[b].misi && Array.isArray(res.data_all[b].misi)) {
+                        res.data_all[b].misi.map(function(bb, ii) {
+                            if (bb.id == res.data_all[b].misi.id) {
+                                jQuery('#misi-rpjmd-indikator').html(bb.misi);
+                            }
+                        });
+                    }                       
+
+                    if (res.data_all[b].misi && Array.isArray(res.data_all[b].misi)) {
+                        let misi_labels = res.data_all[b].misi.map(function(bb) {
+                            return bb.misi;
+                        });
+                        jQuery('#misi-rpjmd-indikator').html(misi_labels.join('<br> '));
+                    }
                     jQuery('#tujuan-teks-indikator').html(res.data_all[b].nama);
                     jQuery('#modal-tujuan-indikator').attr('id-tujuan', res.data_all[b].id_unik);
                     if (res.data_all[b].detail && res.data_all[b].detail[0]) {
@@ -3855,7 +3995,8 @@ if (!empty($data_sasaran_existing)) {
                     "action": "esakip_get_rpjmd",
                     "api_key": "<?php echo $api_key; ?>",
                     "table": table,
-                    "id": id
+                    "id": id,
+                    "id_jadwal": "<?php echo $input['periode']; ?>"
                 },
                 dataType: "json",
                 success: function(res) {
