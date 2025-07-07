@@ -104,27 +104,27 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="nama-pegawai-atasan">Kustomisasi nama Jabatan Pegawai</label>
-                                <input type="text" class="form-control" id="nama-jabatan-pegawai" placeholder="Jabatan + Nama PD">
-                                <small class="form-text text-muted">
-                                    nama jabatan ini akan digunakan untuk menampilkan nama jabatan pada laporan Perjanjian Kinerja. Jika tidak diisi, akan menggunakan nama jabatan dari data SIMPEG.
-                                </small>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="terapkan-all-satker">
+                                    <label class="form-check-label" for="terapkan-all-satker">
+                                        Terapkan Perubahan ke Seluruh Pegawai di Satuan Kerja Ini
+                                    </label>
+                                    <small class="form-text text-muted">
+                                        Centang jika ingin menerapkan perubahan ini ke seluruh pegawai di satuan kerja ini. Jangan dicentang jika hanya ingin menerapkan perubahan ke pegawai ini saja.
+                                    </small>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="card mb-3 shadow-md bg-light">
                         <div class="card-body">
-                            <div class="form-group">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="terapkan-all-satker">
-                                    <label class="form-check-label" for="terapkan-all-satker">
-                                        Terapkan Perubahan Ke Seluruh Pegawai di Satuan Kerja Ini
-                                    </label>
-                                    <small class="form-text text-muted">
-                                        Centang jika ingin menerapkan perubahan ini ke seluruh pegawai di satuan kerja ini. Jangan dicentang jika hanya ingin menerapkan perubahan ke pegawai ini saja.
-                                    </small>
-                                </div>
+                             <div class="form-group">
+                                <label for="nama-pegawai-atasan">Kustomisasi nama Jabatan Pegawai</label>
+                                <input type="text" class="form-control" id="nama-jabatan-pegawai-custom" placeholder="contoh : jabatan + nama perangkat daerah">
+                                <small class="form-text text-muted">
+                                    nama jabatan ini akan digunakan untuk menampilkan nama jabatan pada laporan Perjanjian Kinerja. Jika tidak diisi, akan menggunakan nama jabatan dari data SIMPEG.
+                                </small>
                             </div>
                         </div>
                     </div>
@@ -284,46 +284,44 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
         });
     }
 
-    function editPegawai(idPegawai) {
-        return alert('Fitur ini belum tersedia!');
-        
-        // jQuery('#wrap-loading').show();
-        // jQuery.ajax({
-        //     url: esakip.url,
-        //     type: 'POST',
-        //     data: {
-        //         action: 'get_pegawai_by_id',
-        //         api_key: esakip.api_key,
-        //         id_pegawai: idPegawai
-        //     },
-        //     dataType: 'json',
-        //     success: function(response) {
-        //         jQuery('#wrap-loading').hide();
-        //         if (response.status === 'success') {
-        //             let namaPegawai = jQuery('.table_list_pegawai tbody tr[data-id="' + idPegawai + '"] td:nth-child(6)').text();
-        //             let namaSatuanKerja = jQuery('.table_list_pegawai tbody tr[data-id="' + idPegawai + '"] td:nth-child(3)').text();
-        //             jQuery('#id-pegawai').val(idPegawai);
-        //             jQuery('#nama-pegawai').val(namaPegawai);
-        //             jQuery('#nama-satker').val(namaSatuanKerja);
-        //             jQuery('#nama-pegawai-atasan').val('').trigger('change');
-        //             jQuery('#terapkan-all-satker').prop('checked', false);
-        //             jQuery('#modal-edit-pegawai').modal('show');
-        //         } else {
-        //             alert('Gagal memuat data pegawai: ' + response.message);
-        //         }
-        //     },
-        //     error: function(xhr, status, error) {
-        //         jQuery('#wrap-loading').hide();
-        //         console.error(xhr.responseText);
-        //         alert('Terjadi kesalahan saat memuat data pegawai!');
-        //     }
-        // });
+    function editPegawai(idPegawai) {        
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_data_pegawai_simpeg_by_id_ajax',
+                api_key: esakip.api_key,
+                id: idPegawai
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                if (response.status) {
+                    let namaSatuanKerja = jQuery('.table_list_pegawai tbody tr[data-id="' + idPegawai + '"] td:nth-child(3)').text();
+                    jQuery('#id-pegawai').val(response.data.id);
+                    jQuery('#nama-pegawai').val(response.data.nama_pegawai);
+                    jQuery('#nama-jabatan-pegawai-custom').val(response.data.custom_jabatan || '');
+                    jQuery('#nama-satker').val(namaSatuanKerja);
+                    jQuery('#nama-pegawai-atasan').val(response.data.id_atasan).trigger('change');
+                    jQuery('#terapkan-all-satker').prop('checked', false);
+                    jQuery('#modal-edit-pegawai').modal('show');
+                } else {
+                    alert('Gagal memuat data pegawai: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data pegawai!');
+            }
+        });
     }
 
     function handleUpdatePegawai() {
         let idPegawai = jQuery('#id-pegawai').val();
         let idPegawaiAtasan = jQuery('#nama-pegawai-atasan').val();
-        let namaJabatanCustom = jQuery('#nama-jabatan-pegawai').val();
+        let namaJabatanCustom = jQuery('#nama-jabatan-pegawai-custom').val();
         let terapkanAllSatker = jQuery('#terapkan-all-satker').is(':checked') ? 1 : 0;
 
         if (!idPegawai) {
@@ -336,7 +334,7 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'update_atasan_pegawai_simpeg',
+                action: 'update_atasan_pegawai_ajax',
                 api_key: esakip.api_key,
                 id_pegawai: idPegawai,
                 id_atasan: idPegawaiAtasan,
@@ -346,8 +344,8 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
             dataType: 'json',
             success: function(response) {
                 jQuery('#wrap-loading').hide();
-                if (response.status === 'success') {
-                    alert('Data pegawai berhasil diperbarui!');
+                if (response.status) {
+                    alert(response.message);
                     getTablePegawai(1); // Refresh the table after update
                     jQuery('#modal-edit-pegawai').modal('hide');
                 } else {

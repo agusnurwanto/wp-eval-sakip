@@ -262,7 +262,7 @@ foreach ($get_pegawai as $pegawai) {
     if(!empty($all_sakter[$pegawai['satker_id']])){
         $satker = $all_sakter[$pegawai['satker_id']];
     }
-    $select_pegawai .= '<option value="' . $pegawai['nip_baru'].'-'.$pegawai['satker_id']. '" satker-id="' . $pegawai['satker_id'] . '">' . $pegawai['jabatan'] . ' | ' . $satker . ' | ' . $pegawai['nip_baru'] . ' | ' . $pegawai['nama_pegawai'] . '</option>';
+    $select_pegawai .= '<option value="' . $pegawai['nip_baru'].'-'.$pegawai['satker_id']. '-'.$pegawai['id_jabatan']. '" satker-id="' . $pegawai['satker_id'] . '" jabatan-id="' . $pegawai['id_jabatan'] . '">' . $pegawai['jabatan'] . ' | ' . $satker . ' | ' . $pegawai['nip_baru'] . ' | ' . $pegawai['nama_pegawai'] . '</option>';
 }
 
 // ----- get data e-kin perbulan ----- //
@@ -1419,7 +1419,13 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                             && response.data.pegawai 
                             && response.data.pegawai.nip_baru
                         ) {
-                            jQuery('#pegawai').val(response.data.pegawai.nip_baru+'-'+response.data.id_jabatan).trigger('change');
+                            var id_jabatan_asli = '';
+                            if(response.data.id_jabatan_asli != null){
+                                id_jabatan_asli = response.data.id_jabatan_asli;
+                            }
+                            var id = response.data.pegawai.nip_baru+'-'+response.data.id_jabatan+'-'+id_jabatan_asli;
+                            console.log('id_pegawai', id);
+                            jQuery('#pegawai').val(id).trigger('change');
                         }
 
                         jQuery('#label_renaksi').val(response.data.label);
@@ -3574,9 +3580,11 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         // }
 
         let satker_id = jQuery('#satker_id').val();
+        var id_jabatan_asli = '';
         let nip = jQuery('#pegawai').val();
         if(nip){
             nip = nip.split('-')[0];
+            id_jabatan_asli = nip.split('-')[2];
         } 
         let satker_id_pegawai = jQuery('#pegawai option:selected').attr('satker-id'); // Mengambil atribut satker-id dari option yang dipilih
 
@@ -3607,6 +3615,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                 "nip": nip,
                 "satker_id": satker_id,
                 "satker_id_pegawai": satker_id_pegawai,
+                "id_jabatan_asli": id_jabatan_asli,
                 "id_sub_skpd_cascading": id_sub_skpd_cascading,
                 "pagu_cascading": pagu_cascading,
                 "setting_input_rencana_pagu": setting_input_rencana_pagu,

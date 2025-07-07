@@ -83,6 +83,7 @@ $iku = $wpdb->get_results(
 
 $html_iku = '';
 $no_iku = 1;
+$data_simpan = array();
 
 if (!empty($iku)) {
     $jadwal = $wpdb->get_row($wpdb->prepare("
