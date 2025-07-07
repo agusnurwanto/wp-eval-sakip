@@ -108,18 +108,35 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							ARRAY_A
 						);
 
-						$data_renaksi[$key]['detail_pegawai'] = $wpdb->get_row($wpdb->prepare(
-							"
-							SELECT
-								*
-							FROM esakip_data_pegawai_simpeg
-							WHERE nip_baru = %d
-								AND satker_id = %d
-							ORDER BY active DESC
-						",
-							$val['nip'],
-							$val['id_jabatan']
-						), ARRAY_A);
+						if (empty($val['id_jabatan_asli'])){
+							$data_renaksi[$key]['detail_pegawai'] = $wpdb->get_row($wpdb->prepare(
+								"
+								SELECT
+									*
+								FROM esakip_data_pegawai_simpeg
+								WHERE nip_baru = %d
+									AND satker_id = %d
+								ORDER BY active DESC
+							",
+								$val['nip'],
+								$val['id_jabatan']
+							), ARRAY_A);
+						} else {
+							$data_renaksi[$key]['detail_pegawai'] = $wpdb->get_row($wpdb->prepare(
+								"
+								SELECT
+									*
+								FROM esakip_data_pegawai_simpeg
+								WHERE nip_baru = %d
+									AND satker_id = %d
+									AND id_jabatan = %d
+								ORDER BY active DESC
+							",
+								$val['nip'],
+								$val['id_jabatan'],
+								$val['id_jabatan_asli']
+							), ARRAY_A);
+						}
 						$data_renaksi[$key]['detail_satker'] = $wpdb->get_row($wpdb->prepare(
 							"
 							SELECT

@@ -1348,9 +1348,11 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     if (response.status == 'error') {
                         alert(response.message);
                     } else if (response.data != null) {
-                        jQuery('#id_renaksi').val(id);
+                        jQuery('#id_renaksi').val(response.data.id);
+                        console.log('id_renaksi', id, jQuery('#id_renaksi').val());
                         setting_edit_pokin(response.data);
                         setting_cascading(response.data);                            
+                        console.log('id_renaksi 2', id, jQuery('#id_renaksi').val());
                         if (tipe == 1) {
                             jQuery("#modal-crud").find('.modal-title').html('Edit Kegiatan Utama');
                         }else if (tipe == 2) {
@@ -3583,8 +3585,8 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         var id_jabatan_asli = '';
         let nip = jQuery('#pegawai').val();
         if(nip){
-            nip = nip.split('-')[0];
             id_jabatan_asli = nip.split('-')[2];
+            nip = nip.split('-')[0];
         } 
         let satker_id_pegawai = jQuery('#pegawai option:selected').attr('satker-id'); // Mengambil atribut satker-id dari option yang dipilih
 
