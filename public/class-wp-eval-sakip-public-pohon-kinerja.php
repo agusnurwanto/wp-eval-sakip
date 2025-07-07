@@ -1851,12 +1851,29 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						", $sasaran_rpjpd),
 						ARRAY_A
 					);
-				}
 
-				// misi rpjpd
-				$misi_rpjpd_html = '';
-				foreach ($misi_rpjpd as $misi) {
-					$misi_rpjpd_html .= $misi['misi_teks'];
+				}
+				$misi_html = '';
+				if ($jenis_jadwal == 'rpjmd') {
+				    $misi_rpjmd = $wpdb->get_results(
+				        $wpdb->prepare("
+				            SELECT 
+				            	m.misi
+				            FROM esakip_rpjmd_misi_detail d
+				            JOIN esakip_rpjmd_misi m ON d.id_misi = m.id
+				            	AND d.active = m.active
+				            WHERE d.id_tujuan = %s
+				              AND d.active = 1
+				        ", $tujuan['id_unik']),
+				        ARRAY_A
+				    );
+				    foreach ($misi_rpjmd as $misi) {
+				        $misi_html .= $misi['misi'] . '<br>';
+				    }
+				} else {
+				    foreach ($misi_rpjpd as $misi) {
+				        $misi_html .= $misi['misi_teks'] . '<br>';
+				    }
 				}
 
 				// sasaran rpd
@@ -1973,8 +1990,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						<table id="tabel-cascading">
 							<tbody>
 								<tr>
-									<td class="text-center" style="width: 200px;"><button class="btn btn-lg btn-info">MISI RPJPD</button></td>
-									<td class="text-center" colspan="' . $colspan_tujuan . '"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . $misi_rpjpd_html . '</button></td>
+									<td class="text-center" style="width: 200px;"><button class="btn btn-lg btn-info">MISI ' . strtoupper($jenis_jadwal) . '</button></td>
+									<td class="text-center" colspan="' . $colspan_tujuan . '"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . $misi_html . '</button></td>
 								</tr>
 								<tr>
 									<td class="text-center"><button class="btn btn-lg btn-info">TUJUAN ' . strtoupper($jenis_jadwal) . '</button></td>

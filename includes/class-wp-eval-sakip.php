@@ -208,6 +208,14 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_delete_jadwal_rpjmd',  $plugin_public, 'delete_jadwal_rpjmd');
 		$this->loader->add_action('wp_ajax_submit_edit_jadwal_rpjmd',  $plugin_public, 'submit_edit_jadwal_rpjmd');
 		$this->loader->add_action('wp_ajax_get_data_jadwal_by_id_rpjmd', $plugin_public, 'get_data_jadwal_by_id_rpjmd');
+		$this->loader->add_action('wp_ajax_get_data_visi_misi', $plugin_public, 'get_data_visi_misi');
+		$this->loader->add_action('wp_ajax_tambah_visi_rpjmd', $plugin_public, 'tambah_visi_rpjmd');
+		$this->loader->add_action('wp_ajax_get_visi_rpjmd', $plugin_public, 'get_visi_rpjmd');
+		$this->loader->add_action('wp_ajax_hapus_visi_rpjmd', $plugin_public, 'hapus_visi_rpjmd');
+		$this->loader->add_action('wp_ajax_get_misi_rpjmd', $plugin_public, 'get_misi_rpjmd');
+		$this->loader->add_action('wp_ajax_tambah_misi_rpjmd', $plugin_public, 'tambah_misi_rpjmd');
+		$this->loader->add_action('wp_ajax_hapus_misi_rpjmd', $plugin_public, 'hapus_misi_rpjmd');
+		$this->loader->add_action('wp_ajax_esakip_get_rpjmd', $plugin_public, 'esakip_get_rpjmd');
 
 		$this->loader->add_action('wp_ajax_get_data_penjadwalan_rpjpd', $plugin_public, 'get_data_penjadwalan_rpjpd');
 		$this->loader->add_action('wp_ajax_submit_jadwal_rpjpd',  $plugin_public, 'submit_jadwal_rpjpd');

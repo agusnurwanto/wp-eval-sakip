@@ -27708,7 +27708,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
-
 	public function esakip_simpan_rpjpd()
 	{
 		global $wpdb;
@@ -28183,6 +28182,41 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							if (!empty($tujuan['id_unik_indikator'])) {
 								$data_all[$tujuan['id_unik']]['detail'][] = $tujuan;
 							}
+							$all_misi = $wpdb->get_results($wpdb->prepare("
+							    SELECT id, misi
+							    FROM esakip_rpjmd_misi
+							    WHERE id_jadwal = %d AND active = 1
+							", $_POST['id_jadwal']), ARRAY_A);
+
+							$all_misi_detail = $wpdb->get_results($wpdb->prepare("
+							    SELECT id_misi, id_tujuan
+							    FROM esakip_rpjmd_misi_detail
+							    WHERE id_jadwal = %d AND active = 1
+							", $_POST['id_jadwal']), ARRAY_A);
+
+							$tujuan_misi_map = [];
+							foreach ($all_misi_detail as $row) {
+							    $tujuan_misi_map[$row['id_tujuan']][] = $row['id_misi'];
+							}
+						    $misi_data = [];
+						    $selected_misi = [];
+
+						    foreach ($all_misi as $misi) {
+						        $misi_data[] = array(
+						            'id' => $misi['id'],
+						            'misi' => $misi['misi'],
+						            'id_tujuan' => $tujuan['id_unik'] 
+						        );
+						        if (!empty($tujuan_misi_map[$tujuan['id_unik']]) && in_array($misi['id'], $tujuan_misi_map[$tujuan['id_unik']])) {
+						            $selected_misi[] = $misi['id'];
+						        }
+						    }
+
+						    $data_all[$tujuan['id_unik']]['misi'] = $misi_data;
+						    $data_all[$tujuan['id_unik']]['selected_misi'] = $selected_misi;
+
+
+
 						}
 					} else if ($_POST['table'] == 'esakip_rpd_sasaran') {
 						foreach ($ret['data'] as $sasaran) {
@@ -28401,6 +28435,43 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								"id_unik" => $_POST['id'],
 								"id_jadwal" => $_POST['id_jadwal']
 							));
+							if (isset($_POST['selected_misi']) && is_array($_POST['selected_misi'])) {
+						        $selected_misi = array_map('intval', $_POST['selected_misi']);
+
+						        $wpdb->update('esakip_rpjmd_misi_detail', 
+						            ['active' => 0, 'updated_at' => current_time('mysql')],
+						            ['id_tujuan' => $_POST['id'], 
+						            	'id_jadwal' => $_POST['id_jadwal']
+						            ]
+						        );
+
+						        foreach ($selected_misi as $id_misi) {
+						            $id_misi_detail = $wpdb->get_var($wpdb->prepare("
+						                SELECT 
+						                	id 
+						                FROM esakip_rpjmd_misi_detail 
+						                WHERE id_misi = %d 
+						                	AND id_tujuan = %s 
+						                	AND id_jadwal = %d
+						            ", $id_misi, $_POST['id'], $_POST['id_jadwal']));
+
+						            if ($id_misi_detail) {
+						                $wpdb->update('esakip_rpjmd_misi_detail', 
+						                    ['active' => 1, 'updated_at' => current_time('mysql')],
+						                    ['id' => $id_misi_detail]
+						                );
+						            } else {
+						                $wpdb->insert('esakip_rpjmd_misi_detail', array(
+						                    'id_misi'    => $id_misi,
+						                    'id_tujuan'  => $_POST['id'],
+						                    'id_jadwal'  => $_POST['id_jadwal'],
+						                    'active'     => 1,
+						                    'created_at' => current_time('mysql'),
+						                    'updated_at' => current_time('mysql')
+						                ));
+						            }
+						        }
+						    }
 							$ret['message'] = 'Berhasil update data RPD!';
 						} else {
 							$data['id_unik'] = $this->generateRandomString(5);
@@ -28416,6 +28487,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								$ret['message'] = 'Tujuan teks sudah ada!';
 							} else {
 								$wpdb->insert($table, $data);
+								if (!empty($_POST['selected_misi']) && is_array($_POST['selected_misi'])) {
+		                            foreach ($_POST['selected_misi'] as $id_misi) {
+		                                $wpdb->insert('esakip_rpjmd_misi_detail', [
+		                                    'id_misi' => $id_misi,
+		                                    'id_tujuan' => $data['id_unik'],
+		                                    'id_jadwal' => $_POST['id_jadwal'],
+		                                    'active' => 1,
+		                                    'created_at' => current_time('mysql'),
+		                                    'updated_at' => current_time('mysql')
+		                                ]);
+		                            }
+		                        }
 							}
 						}
 					}
@@ -32730,4 +32813,453 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			return 'title="Anda tidak dapat akses untuk melihat halaman ini!"';
 		}
     }
+
+    public function get_data_visi_misi()
+	{
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+					$visi_misi = $wpdb->get_results($wpdb->prepare("
+						SELECT 
+							*
+						FROM esakip_rpjmd_visi 
+						WHERE active=1 AND
+							id_jadwal=%d
+						ORDER BY id
+					", $_POST['id_jadwal']), 
+					ARRAY_A);
+
+					foreach ($visi_misi as $key => $val) {
+						$visi_misi[$key]['misi'] = $wpdb->get_results($wpdb->prepare("
+						    SELECT
+						        *
+						    FROM esakip_rpjmd_misi 
+						    WHERE id_visi=%d
+						        AND active = 1
+						", $val['id']));
+					}
+
+					die(json_encode([
+						'status' => true,
+						'data' => $visi_misi,
+						'last_sql' => $wpdb->last_query
+					]));
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
+	}
+	
+	public function tambah_visi_rpjmd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$id = null;
+
+				if (!empty($_POST['id'])) {
+					$id = $_POST['id'];
+				}
+
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID jadwal kosong!';
+				}
+				if (!empty($_POST['visi'])) {
+					$visi = $_POST['visi'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Visi kosong!';
+				}
+
+				if ($ret['status'] === 'success') {
+				    if (!empty($id)) {
+				        $wpdb->update(
+				            'esakip_rpjmd_visi',
+				            array(
+				                'visi' => $visi,
+				            ),
+				            array('id' => $id),
+				            array('%s'),
+				            array('%d')
+				        );
+				        $ret['message'] = 'Berhasil update data';
+				    } else {
+				        $wpdb->insert(
+				            'esakip_rpjmd_visi',
+				            array(
+				                'id_jadwal' => $id_jadwal,
+				                'visi' => $visi,
+				                'active' => 1,
+				            ),
+				            array('%d', '%s', '%d')
+				        );
+				        $ret['message'] = 'Berhasil tambah data';
+				    }
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_visi_rpjmd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT 
+								*
+							FROM esakip_rpjmd_visi
+							WHERE id = %d
+						", $_POST['id']),
+						ARRAY_A
+					);
+					if ($data) {
+						$ret['data'] = $data;
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message'   => 'Data Tidak Ditemukan!'
+						);
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_visi_rpjmd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$cek_id = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT 
+								id_visi
+							FROM esakip_rpjmd_misi
+							WHERE id_visi=%d
+							  AND active = 1
+						", $_POST['id'])
+					);
+					if (empty($cek_id)) {
+						$ret['data'] = $wpdb->update(
+							'esakip_rpjmd_visi',
+							array('active' => 0),
+							array('id' => $_POST['id'])
+						);
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message'   => 'Hapus misi terlebih dahulu!'
+						);
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_misi_rpjmd()
+	{
+	    global $wpdb;
+
+	    $ret = array(
+	        'status' => 'success',
+	        'message' => 'Berhasil get data!',
+	        'data'  => array()
+	    );
+
+	    if (!empty($_POST)) {
+	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+	            if (!empty($_POST['id'])) {
+	                $data_misi = $wpdb->get_row(
+	                    $wpdb->prepare("
+	                        SELECT 
+	                        	* 
+	                        FROM esakip_rpjmd_misi
+	                        WHERE id = %d 
+	                        	AND active = 1
+	                    ", $_POST['id']),
+	                    ARRAY_A
+	                );
+
+	                if (!empty($data_misi)) {
+	                    $data_visi = $wpdb->get_row(
+	                        $wpdb->prepare("
+	                            SELECT 
+	                            	* 
+	                            FROM esakip_rpjmd_visi
+	                            WHERE id = %d
+	                        ", $data_misi['id_visi']),
+	                        ARRAY_A
+	                    );
+
+	                    $ret['data'] = array(
+	                        'misi' => $data_misi,
+	                        'visi' => $data_visi
+	                    );
+	                } else {
+	                    $ret = array(
+	                        'status' => 'error',
+	                        'message' => 'Data Misi tidak ditemukan!'
+	                    );
+	                }
+	            } else {
+	                $ret = array(
+	                    'status' => 'error',
+	                    'message' => 'Id Kosong!'
+	                );
+	            }
+	        } else {
+	            $ret = array(
+	                'status' => 'error',
+	                'message' => 'Api Key tidak sesuai!'
+	            );
+	        }
+	    } else {
+	        $ret = array(
+	            'status' => 'error',
+	            'message' => 'Format tidak sesuai!'
+	        );
+	    }
+
+	    wp_send_json($ret);
+	}
+
+	
+	public function tambah_misi_rpjmd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$id_misi = null;
+
+				if (!empty($_POST['id_misi'])) {
+					$id_misi = $_POST['id_misi'];
+				}
+
+				if (!empty($_POST['id_visi'])) {
+					$id_visi = $_POST['id_visi'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID visi kosong!';
+				}
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID jadwal kosong!';
+				}
+				if (!empty($_POST['misi'])) {
+					$misi = $_POST['misi'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Misi kosong!';
+				}
+
+				if ($ret['status'] === 'success') {
+				    if (!empty($id_misi)) {
+				        $wpdb->update(
+				            'esakip_rpjmd_misi',
+				            array(
+				                'misi' => $misi,
+				                'id_visi' => $id_visi,
+				            ),
+				            array('id' => $id_misi),
+				            array('%s'),
+				            array('%d')
+				        );
+				        $ret['message'] = 'Berhasil update data';
+				    } else {
+				        $wpdb->insert(
+				            'esakip_rpjmd_misi',
+				            array(
+				                'id_jadwal' => $id_jadwal,
+				                'misi' => $misi,
+				                'id_visi' => $id_visi,
+				                'active' => 1,
+				            ),
+				            array('%d', '%s', '%d', '%d')
+				        );
+				        $ret['message'] = 'Berhasil tambah data';
+				    }
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_misi_rpjmd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					if (empty($_POST['id'])) {
+		                $ret['status'] = 'error';
+		                $ret['message'] = 'ID rpjmd kosong!';
+		            }
+	                $wpdb->update(
+	                    'esakip_rpjmd_misi',
+	                    array('active' => 0),
+	                    array('id' => $_POST['id']),
+	                    array('%d')
+	                );
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function esakip_get_rpjmd($res = false, $id_jadwal_rpjmd = false)
+	{
+		global $wpdb;
+		$ret = array(
+			'status'    => 'success',
+			'message'   => 'Berhasil mengambil data RPJPD!',
+			'data'      => []
+		);
+
+		if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+			$table = $_POST['table'];
+
+			if ($table == 'esakip_rpjpd_visi') {
+				$ret['data'] = $wpdb->get_results("
+					SELECT 
+						* 
+					FROM esakip_rpjpd_visi 
+					WHERE active = 1
+				", ARRAY_A);
+			} 
+			elseif ($table == 'esakip_rpjmd_misi') {
+				$ret['data'] = $wpdb->get_results("
+					SELECT 
+						id, 
+						misi 
+					FROM esakip_rpjmd_misi 
+					WHERE active = 1
+				", ARRAY_A);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Api Key tidak sesuai!'
+			);
+		}
+
+		if (!$res) {
+			die(json_encode($ret));
+		} else {
+			return $ret;
+		}
+	}
+
 }

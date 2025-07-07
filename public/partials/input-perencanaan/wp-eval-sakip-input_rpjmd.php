@@ -52,6 +52,7 @@ $tahun_anggaran = $jadwal['tahun_anggaran'];
 $tahun_awal = $jadwal['tahun_anggaran'];
 $tahun_akhir = $tahun_awal + $jadwal['lama_pelaksanaan'] - 1;
 $id_jadwal_murni = $jadwal['id_jadwal_murni'];
+$jadwal_rpjmd = ($jadwal['jenis_jadwal_khusus'] ?? '') === 'rpjmd';
 $api_key = get_option(ESAKIP_APIKEY);
 $nama_pemda = get_option(ESAKIP_NAMA_PEMDA);
 $current_user = wp_get_current_user();
@@ -827,7 +828,11 @@ if (!empty($data_sasaran_existing)) {
         <thead>
             <tr>
                 <th style="width: 85px;" class="esakip-atas esakip-kiri esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">No</th>
-                <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Isu RPJPD</th>
+                <?php if ($jadwal_rpjmd): ?>
+                    <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Misi RPJMD</th>
+                <?php else: ?>
+                    <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Isu RPJPD</th>
+                <?php endif; ?>
                 <?php if (!empty($id_jadwal_murni)): ?>
                     <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Tujuan Sebelum</th>
                 <?php endif; ?>
@@ -916,26 +921,34 @@ if (!empty($data_sasaran_existing)) {
             </div>
             <div class="modal-body">
                 <form>
-                    <div class="form-group">
-                        <label>Visi RPJPD</label>
-                        <select class="form-control" id="visi-teks"></select>
-                    </div>
-                    <div class="form-group">
-                        <label>Misi RPJPD</label>
-                        <select class="form-control" id="misi-teks"></select>
-                    </div>
-                    <div class="form-group">
-                        <label>Sasaran Pokok RPJPD</label>
-                        <select class="form-control" id="saspok-teks"></select>
-                    </div>
-                    <div class="form-group">
-                        <label>Kebijakan RPJPD</label>
-                        <select class="form-control" id="kebijakan-teks"></select>
-                    </div>
-                    <div class="form-group">
-                        <label>Isu RPJPD</label>
-                        <select class="form-control" id="isu-teks"></select>
-                    </div>
+                    <?php if ($jadwal_rpjmd): ?>
+                        <div class="form-group">
+                            <label>Misi RPJMD</label>
+                            <select class="form-control" multiple id="misi-rpjmd-teks"></select>
+                        </div>
+                    <?php else: ?>
+                        <div class="form-group">
+                            <label>Visi RPJPD</label>
+                            <select class="form-control" id="visi-teks"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Misi RPJPD</label>
+                            <select class="form-control" id="misi-teks"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Sasaran Pokok RPJPD</label>
+                            <select class="form-control" id="saspok-teks"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Kebijakan RPJPD</label>
+                            <select class="form-control" id="kebijakan-teks"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Isu RPJPD</label>
+                            <select class="form-control" id="isu-teks"></select>
+                        </div>
+                    <?php endif; ?>
+
                     <?php if (!empty($id_jadwal_murni)): ?>
                         <div class="form-group">
                             <label>Tujuan Sebelum</label>
@@ -1288,6 +1301,51 @@ if (!empty($data_sasaran_existing)) {
         </div>
     </div>
 </div>
+<!-- Modal visi misi -->
+<div class="modal fade" id="modal-visi-misi" role="dialog" data-backdrop="static" aria-hidden="true">'
+    <div class="modal-dialog" style="max-width: 900px;" role="document">
+        <div class="modal-content">
+            <div class="modal-header bgpanel-theme">
+                <h4 style="margin: 0;" class="modal-title">Data Visi Misi</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span><i class="dashicons dashicons-dismiss"></i></span></button>
+            </div>
+            <div class="modal-body">
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade show active" id="nav-level" role="tabpanel" aria-labelledby="nav-level-tab"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal tambah visi -->
+<div class="modal fade" id="tambahvisiModal" tabindex="-1" role="dialog" aria-labelledby="tambahvisiModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 700px;" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tambahvisiModalLabel">Tambah visi</h5>
+                <h5 class="modal-title" id="editvisiModalLabel">Edit visi</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+             <div class="modal-body">
+                <form id="form-tambah-visi">
+                    <input type="hidden" value="" id="id_visi">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="input_visi">Input Visi</label>
+                            <input type="text" class="form-control" id="input_visi" name="input_visi" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" onclick="submit_visi(); return false">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
 <style>
     #modal-monev .modal-body {
         max-height: 70vh;
@@ -1315,6 +1373,9 @@ if (!empty($data_sasaran_existing)) {
         window.edit_val = false;
 
         var aksi = '' +
+            <?php if ($jadwal_rpjmd): ?>
+                '<a style="margin-left: 10px; text-transform:uppercase;" id="tambah-visi-misi" onclick="return false;" href="#" class="btn btn-primary">Tambah Visi Misi</a>' +
+            <?php endif; ?>
             '<a style="margin-left: 10px; text-transform:uppercase;" id="tambah-data" onclick="return false;" href="#" class="btn btn-success">Tambah Data <?php echo $jadwal['jenis_jadwal_khusus']; ?></a><br><br>' +
             '<h3 style="margin-top: 20px;">SETTING</h3>' +
             '<label style="text-transform:uppercase;"><input type="checkbox" onclick="tampilkan_edit(this);"> Edit Data <?php echo $jadwal['jenis_jadwal_khusus']; ?></label>' +
@@ -1339,6 +1400,9 @@ if (!empty($data_sasaran_existing)) {
             tampil_detail_popup();
         });
 
+        jQuery("#tambah-visi-misi").on('click', function() {
+            table_visi_misi();
+        });
 
         jQuery('#visi-teks').on('change', function() {
             var id_visi = jQuery(this).val();
@@ -2126,25 +2190,40 @@ if (!empty($data_sasaran_existing)) {
     }
 
     function tambah_tujuan() {
-        get_rpjpd('esakip_rpjpd_visi')
-            .then(function(visi) {
+        <?php if ($jadwal_rpjmd): ?>
+            get_rpjmd('esakip_rpjmd_misi').then(function(misi) {
+                var misi_html = '<option value="">Pilih Misi RPJMD</option>';
+                misi.map(function(m) {
+                    misi_html += '<option value="' + m.id + '">' + m.misi + '</option>';
+                });
+                jQuery('#misi-rpjmd-teks').html(misi_html).select2({
+                    width: '100%',
+                    placeholder: 'Pilih Misi',
+                    allowClear: true
+                });
+            });
+        <?php else: ?>
+            get_rpjpd('esakip_rpjpd_visi').then(function(visi) {
                 var visi_html = '<option value="">Pilih visi RPJPD</option>';
-                visi.map(function(b, i) {
+                visi.map(function(b) {
                     visi_html += '<option value="' + b.id + '">' + b.visi_teks + '</option>';
                 });
                 jQuery('#visi-teks').html(visi_html);
-                jQuery('#misi-teks').html('');
-                jQuery('#saspok-teks').html('');
-                jQuery('#kebijakan-teks').html('');
-                jQuery('#isu-teks').html('');
-                jQuery('#modal-tujuan').attr('data-id', '');
-                jQuery('#modal-tujuan').modal('show');
-                jQuery('#tujuan_sebelum').val('');
-                jQuery('#tujuan-teks').val('');
-                jQuery('#no-urut-teks-tujuan').val('');
-                jQuery('#catatan-teks-tujuan').val('');
             });
+        <?php endif; ?>
+
+        jQuery('#saspok-teks').html('');
+        jQuery('#kebijakan-teks').html('');
+        jQuery('#isu-teks').html('');
+        jQuery('#modal-tujuan').attr('data-id', '');
+        jQuery('#modal-tujuan').modal('show');
+        jQuery('#tujuan_sebelum').val('');
+        jQuery('#tujuan-teks').val('');
+        jQuery('#no-urut-teks-tujuan').val('');
+        jQuery('#catatan-teks-tujuan').val('');
+        jQuery('#misi-rpjmd-teks').val('');
     }
+
 
     function tambah_sasaran(id_unik_tujuan) {
         jQuery('#tujuan-sasaran-teks').html(jQuery('tr[id-tujuan="' + id_unik_tujuan + '"] td').eq(1).html());
@@ -2382,6 +2461,20 @@ if (!empty($data_sasaran_existing)) {
                             isu_html += '<option ' + selected + ' value="' + bb.id + '">' + bb.isu_teks + '</option>';
                         });
                         jQuery('#isu-teks').html(isu_html);
+                    }
+
+
+                    if (res.data_all[b].misi) {
+                        var misi_html = '<option value="">Pilih Misi RPJMD</option>';
+                        res.data_all[b].misi.map(function(bb) {
+                            var selected = res.data_all[b].selected_misi.includes(bb.id) ? 'selected' : '';
+                            misi_html += `<option ${selected} value="${bb.id}">${bb.misi}</option>`;
+                        });
+                        jQuery('#misi-rpjmd-teks').html(misi_html).select2({
+                            width: '100%',
+                            placeholder: 'Pilih Misi',
+                            allowClear: true
+                        });
                     }
 
                     jQuery('#tujuan-teks').val(res.data_all[b].nama);
@@ -2765,6 +2858,7 @@ if (!empty($data_sasaran_existing)) {
             return alert('No urut tidak boleh kosong!');
         }
         var id_tujuan_sebelum = jQuery('#tujuan_sebelum').val();
+        var selected_misi = jQuery('#misi-rpjmd-teks').val();
         if (confirm('Apakah anda yakin untuk menyimpan data ini?')) {
             jQuery('#wrap-loading').show();
             var catatan_teks_tujuan = jQuery('#catatan-teks-tujuan').val();
@@ -2781,7 +2875,8 @@ if (!empty($data_sasaran_existing)) {
                     "id": id_tujuan,
                     "no_urut": no_urut,
                     "id_jadwal": "<?php echo $input['periode']; ?>",
-                    "catatan_teks_tujuan": catatan_teks_tujuan
+                    "catatan_teks_tujuan": catatan_teks_tujuan,
+                    "selected_misi": selected_misi
                 },
                 dataType: "json",
                 success: function(res) {
@@ -3405,4 +3500,370 @@ if (!empty($data_sasaran_existing)) {
     //         });
     //     }
     // }
+
+    function table_visi_misi() {
+        jQuery("#wrap-loading").show();
+        return new Promise(function(resolve, reject) {
+            jQuery.ajax({
+                url: esakip.url,
+                type: "post",
+                data: {
+                    "action": "get_data_visi_misi",
+                    "api_key": esakip.api_key,
+                    "id_jadwal": "<?php echo $input['periode']; ?>"
+                },
+                dataType: "json",
+                success: function(res) {
+                    jQuery('#wrap-loading').hide();
+                    let visi_misi = ``;
+
+                    visi_misi += `
+                        <div style="margin-top:10px"><button type="button" class="btn btn-success mb-2" onclick="tambah_visi()"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i> Tambah Data Visi</button>
+                        </div>
+                    `;
+                    
+                    visi_misi += `` +
+                        `<table class="table">` +
+                        `<thead>`;
+                    visi_misi += `</thead>` +
+                        `</table>` ;
+                    
+
+                    visi_misi += ''+
+                        '<table class="table">' +
+                            `<thead>` +
+                                `<tr class="table-secondary">` +
+                                    `<th class="text-center" style="width:40px;">No</th>` +
+                                    `<th class="text-center" style="width:300px;">Nama Visi</th>` +
+                                    `<th class="text-center" style="width:100px;">Aksi</th>` +
+                                `</tr>` +
+                            `</thead>` +
+                            `<tbody>`;
+                    res.data.map(function(value, index) {
+                        visi_misi += `
+                            <tr class="table-warning">
+                                <td class="text-center">${index + 1}</td>
+                                <td class="label_visi">${value.visi}</td>
+                                <td class="text-center">
+                                    <a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_misi(${value.id})" title="Tambah Misi"><i class="dashicons dashicons-plus"></i></a>
+                                    <a href="javascript:void(0)" onclick="edit_visi(${value.id})" data-id="${value.id}" class="btn btn-sm btn-primary" title="Edit"><i class="dashicons dashicons-edit"></i></a>
+                                    <a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_visi(${value.id})" title="Hapus"><i class="dashicons dashicons-trash"></i></a>
+                                </td>
+                            </tr>`;
+                        let misi = value.misi;
+                        if (misi.length > 0) {
+                            visi_misi += `
+                            <tr>
+                                <td colspan="3" style="padding: 10px;">
+                                    <table class="table" style="margin: 0;">
+                                        <thead>
+                                            <tr class="table-info">
+                                                <th class="text-center" style="width:20px">No</th>
+                                                <th class="text-center">Nama Misi</th>
+                                                <th class="text-center" style="width:200px">Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>`;
+                            misi.map(function(b, i) {
+                                visi_misi += `
+                                            <tr>
+                                                <td class="text-center">${index + 1}.${i + 1}</td>
+                                                <td>${b.misi}</td>
+                                                <td class="text-center">
+                                                    <a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-primary" onclick="edit_misi(${b.id})" title="Edit"><i class="dashicons dashicons-edit"></i></a>
+                                                    <a href="javascript:void(0)" data-id="${b.id}" class="btn btn-sm btn-danger" onclick="hapus_misi(${b.id});" title="Hapus"><i class="dashicons dashicons-trash"></i></a>
+                                                </td>
+                                            </tr>`;
+                            });
+                            visi_misi += `
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>`;
+                        }
+                    });
+                    visi_misi += '' +
+                            `<tbody>` +
+                        `</table>`;
+
+                    jQuery("#nav-level").html(visi_misi);
+                    jQuery('.nav-tabs a[href="#nav-level' + '"]').tab('show');
+                    jQuery('#modal-visi-misi').modal('show');
+                    
+                    resolve();
+                }
+            });
+        });
+    }
+
+    function tambah_visi() {
+        jQuery('#tambahvisiModalLabel').show();
+        jQuery('#editvisiModalLabel').hide();
+        jQuery("#id_visi").val('');
+        jQuery("#input_visi").val('');
+        jQuery('#tambahvisiModal').modal('show');
+    }  
+
+    function submit_visi() {
+        let id_visi = jQuery("#id_visi").val();
+        let input_visi = jQuery("#input_visi").val();
+        if (input_visi == '') {
+            return alert('Visi tidak boleh kosong');
+        }
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'tambah_visi_rpjmd',
+                api_key: esakip.api_key,
+                id: id_visi,
+                id_jadwal: <?php echo $input['periode']; ?>, 
+                visi: input_visi
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    jQuery('#tambahvisiModal').modal('hide');
+                    table_visi_misi();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }  
+
+    function edit_visi(id) {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_visi_rpjmd',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                if (response.status == 'error') {
+                    alert(response.message);
+                } else if (response.data != null) {
+                    jQuery('#id_visi').val(id); 
+                    jQuery('#tambahvisiModalLabel').show();
+                    jQuery('#editvisiModalLabel').hide();  
+                    jQuery('#input_visi').val(response.data.visi);
+                    jQuery('#tambahvisiModal').modal('show');
+                }
+            }
+        });
+    }
+
+    function hapus_visi(id) {
+        if (!confirm('Apakah Anda yakin ingin menghapus Visi ini?')) {
+            return;
+        }
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'hapus_visi_rpjmd',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    table_visi_misi();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                jQuery('#wrap-loading').hide();
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }
+
+    function tambah_misi(id) {
+        var label_visi = jQuery(`a[onclick="tambah_misi(${id})"]`).closest('tr').find('.label_visi').text().trim();
+
+        jQuery("#modal-raw").find('.modal-title').html('Tambah Misi');
+        jQuery("#modal-raw").find('.modal-body').html('' +
+            '<input type="hidden" value="" id="id_misi">' +
+            `<input type="hidden" id="id_visi_misi" value="${id}">` +
+            `<div class="form-group row">` +
+                '<div class="col-md-2">' +
+                    `<label for="label_visi">Visi</label>` +
+                '</div>' +
+                '<div class="col-md-10">' +
+                    '<input type="text" disabled class="form-control" id="label_visi" value="' + label_visi + '"/>' +
+                '</div>' +
+            `</div>` +
+            `<div class="form-group row">` +
+                '<div class="col-md-2">' +
+                    '<label for="input_misi">Misi</label>' +
+                '</div>' +
+                '<div class="col-md-10">' +
+                    `<textarea class="form-control" name="label" id="input_misi" placeholder="Tuliskan Misi..."></textarea>` +
+                '</div>' +
+            `</div>`
+        );
+        jQuery("#modal-raw").find('.modal-footer').html('' +
+            '<button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>' +
+            '<button type="button" class="btn btn-success" onclick="simpan_misi()">Simpan</button>'
+        );
+
+        jQuery("#modal-raw").find('.modal-dialog').css('maxWidth', '1000px');
+        jQuery("#modal-raw").find('.modal-dialog').css('width', '');
+        jQuery("#modal-raw").modal('show');
+        setTimeout(function () {
+            jQuery("#modal-raw").css("z-index", "1060");
+            jQuery(".modal-backdrop").last().css("z-index", "1055");
+        }, 300);
+    }
+
+
+    function simpan_misi() {
+        let id_visi = jQuery("#id_visi_misi").val();
+        let id_misi = jQuery("#id_misi").val();
+        let input_misi = jQuery("#input_misi").val();
+        if (input_misi == '') {
+            return alert('Misi tidak boleh kosong');
+        }
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'tambah_misi_rpjmd',
+                api_key: esakip.api_key,
+                id_visi: id_visi,
+                id_misi: id_misi,
+                id_jadwal: <?php echo $input['periode']; ?>, 
+                misi: input_misi
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    jQuery('#modal-raw').modal('hide');
+                    table_visi_misi();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }  
+
+    function edit_misi(id) {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_misi_rpjmd',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+
+                if (response.status === 'success' && response.data) {
+                    const misi = response.data.misi;
+                    const visi = response.data.visi;
+
+                    tambah_misi(visi.id);
+
+                    jQuery("#modal-raw").find('.modal-title').text('Edit Misi');
+                    jQuery("#id_misi").val(misi.id);
+                    jQuery("#label_visi").val(visi.visi);
+                    jQuery("#input_misi").val(misi.misi);
+                } else {
+                    alert(response.message || 'Gagal mengambil data misi.');
+                }
+            },
+            error: function(xhr) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengambil data!');
+            }
+        });
+    }
+
+    function hapus_misi(id) {
+        if (!confirm('Apakah Anda yakin ingin menghapus misi ini?')) {
+            return;
+        }
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'hapus_misi_rpjmd',
+                api_key: esakip.api_key,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    table_visi_misi();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                jQuery('#wrap-loading').hide();
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }    
+
+    function get_rpjmd(table, id) {
+        jQuery('#wrap-loading').show();
+        return new Promise(function(resolve, reject) {
+            jQuery.ajax({
+                url: esakip.url,
+                type: "post",
+                data: {
+                    "action": "esakip_get_rpjmd",
+                    "api_key": "<?php echo $api_key; ?>",
+                    "table": table,
+                    "id": id
+                },
+                dataType: "json",
+                success: function(res) {
+                    jQuery('#wrap-loading').hide();
+                    resolve(res.data);
+                }
+            });
+        });
+    }
+             
 </script>
