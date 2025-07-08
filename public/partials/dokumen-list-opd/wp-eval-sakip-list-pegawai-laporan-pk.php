@@ -110,7 +110,7 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
                                         Terapkan Perubahan ke Seluruh Pegawai di Satuan Kerja Ini
                                     </label>
                                     <small class="form-text text-muted">
-                                        Centang jika ingin menerapkan perubahan ini ke seluruh pegawai di satuan kerja ini. Jangan dicentang jika hanya ingin menerapkan perubahan ke pegawai ini saja.
+                                        Centang jika ingin menerapkan perubahan ini ke seluruh pegawai di satuan kerja ini (<i class="font-weight-bold" id="nama-satker-info"></i>). Jangan dicentang jika hanya ingin menerapkan perubahan ke pegawai ini saja <strong>(pegawai bertipe kepala dikecualikan)</strong>.
                                     </small>
                                 </div>
                             </div>
@@ -121,7 +121,7 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
                         <div class="card-body">
                              <div class="form-group">
                                 <label for="nama-pegawai-atasan">Kustomisasi nama Jabatan Pegawai</label>
-                                <input type="text" class="form-control" id="nama-jabatan-pegawai-custom" placeholder="contoh : jabatan + nama perangkat daerah">
+                                <input type="text" class="form-control" id="nama-jabatan-pegawai-custom" placeholder="Masukkan nama jabatan pegawai (opsional)">
                                 <small class="form-text text-muted">
                                     nama jabatan ini akan digunakan untuk menampilkan nama jabatan pada laporan Perjanjian Kinerja. Jika tidak diisi, akan menggunakan nama jabatan dari data SIMPEG.
                                 </small>
@@ -285,6 +285,7 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
     }
 
     function editPegawai(idPegawai) {        
+        return alert('Fitur belum tersedia');
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -303,6 +304,7 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
                     jQuery('#nama-pegawai').val(response.data.nama_pegawai);
                     jQuery('#nama-jabatan-pegawai-custom').val(response.data.custom_jabatan || '');
                     jQuery('#nama-satker').val(namaSatuanKerja);
+                    jQuery('#nama-satker-info').text(namaSatuanKerja);
                     jQuery('#nama-pegawai-atasan').val(response.data.id_atasan).trigger('change');
                     jQuery('#terapkan-all-satker').prop('checked', false);
                     jQuery('#modal-edit-pegawai').modal('show');

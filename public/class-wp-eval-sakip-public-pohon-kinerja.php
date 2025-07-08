@@ -1856,6 +1856,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 				}
 				$misi_html = '';
+				$jenis_misi_teks = '';
 				if ($jenis_jadwal == 'rpjmd') {
 				    $misi_rpjmd = $wpdb->get_results(
 				        $wpdb->prepare("
@@ -1872,10 +1873,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 				    foreach ($misi_rpjmd as $misi) {
 				        $misi_html .= $misi['misi'] . '<br>';
 				    }
+					$jenis_misi_teks = 'MISI RPJMD';
 				} else {
 				    foreach ($misi_rpjpd as $misi) {
 				        $misi_html .= $misi['misi_teks'] . '<br>';
 				    }
+					$jenis_misi_teks = 'ISU RPJPD';
 				}
 
 				// sasaran rpd
@@ -2015,7 +2018,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						<table id="tabel-cascading">
 							<tbody>
 								<tr>
-									<td class="text-center" style="width: 200px;"><button class="btn btn-lg btn-info">MISI ' . strtoupper($jenis_jadwal) . '</button></td>
+									<td class="text-center" style="width: 200px;"><button class="btn btn-lg btn-info">' . $jenis_misi_teks . '</button></td>
 									<td class="text-center" colspan="' . $colspan_tujuan . '"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . $misi_html . '</button></td>
 								</tr>
 								<tr>

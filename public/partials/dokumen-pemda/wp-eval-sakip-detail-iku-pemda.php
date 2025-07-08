@@ -193,7 +193,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data Rpjmd!');
+                alert('Terjadi kesalahan saat memuat data!');
             }
         });
     }

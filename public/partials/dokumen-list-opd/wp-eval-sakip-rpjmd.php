@@ -500,7 +500,7 @@ $status_iku = $wpdb->get_row(
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data Rpjmd!');
+                alert('Terjadi kesalahan saat memuat data!');
             }
         });
     }
@@ -549,7 +549,7 @@ $status_iku = $wpdb->get_row(
             error: function(xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data Rpjmd!');
+                alert('Terjadi kesalahan saat memuat data!');
             }
         });
     }
