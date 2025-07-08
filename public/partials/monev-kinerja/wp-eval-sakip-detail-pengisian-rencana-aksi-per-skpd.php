@@ -1349,10 +1349,8 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                         alert(response.message);
                     } else if (response.data != null) {
                         jQuery('#id_renaksi').val(response.data.id);
-                        console.log('id_renaksi', id, jQuery('#id_renaksi').val());
                         setting_edit_pokin(response.data);
-                        setting_cascading(response.data);                            
-                        console.log('id_renaksi 2', id, jQuery('#id_renaksi').val());
+                        setting_cascading(response.data);
                         if (tipe == 1) {
                             jQuery("#modal-crud").find('.modal-title').html('Edit Kegiatan Utama');
                         }else if (tipe == 2) {
@@ -2362,7 +2360,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                             `</thead>` +
                             `<tbody>`;
                     res.data.map(function(value, index) {
-                        var id_pokin = 0;
+                        var id_pokin = [];
                         var tombol_detail = '';
                         var id_parent_cascading = 0;
                         var label_cascading = '-';
@@ -2405,14 +2403,38 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                             label_dasar_pelaksanaan = `<ul style="margin: 0;"><li>${get_data_dasar_pelaksanaan.join('</li><li>')}</li></ul>`;
                         }
 
-                        id_pokin = [];
-                        if (value.pokin && value.pokin.length > 0) {
-                            label_pokin = `<ul style="margin: 0;">`;
-                            value.pokin.forEach(function(get_pokin) {
-                                label_pokin += `<li>lv.${get_pokin.level} ${get_pokin.pokin_label}</li>`;
-                                id_pokin.push(+get_pokin.id_pokin);
-                            });
-                            label_pokin += `</ul>`;
+                        // jika input pagu maka ditampilkan semua pokin
+                        if(set_input_rencana_pagu == 1){
+                            if (value.pokin && value.pokin.length > 0) {
+                                label_pokin = `<ul style="margin: 0;">`;
+                                value.pokin.forEach(function(get_pokin) {
+                                    label_pokin += `<li>lv.${get_pokin.level} ${get_pokin.pokin_label}</li>`;
+                                    id_pokin.push(+get_pokin.id_pokin);
+                                });
+                                label_pokin += `</ul>`;
+                            }
+                        }else{
+                            if (value.pokin && value.pokin.length > 0) {
+                                label_pokin = `<ul style="margin: 0;">`;
+                                value.pokin.forEach(function(get_pokin) {
+                                    if(
+                                        (
+                                            tipe == 1
+                                            && (
+                                                get_pokin.level == 1
+                                                || get_pokin.level == 2
+                                            )
+                                        )
+                                        || (
+                                            (tipe+1) == get_pokin.level
+                                        )
+                                    ){
+                                        label_pokin += `<li>lv.${get_pokin.level} ${get_pokin.pokin_label}</li>`;
+                                        id_pokin.push(+get_pokin.id_pokin);
+                                    }
+                                });
+                                label_pokin += `</ul>`;
+                            }
                         }
 
                         if (tipe == 1) {
@@ -2447,6 +2469,28 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                 label_cascading = value['kode_cascading_sub_kegiatan'] + ' ' + nama_subkeg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
                             }
                             data_tagging_rincian = '<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" title="Lihat Data Tagging Rincian Belanja"><i class="dashicons dashicons dashicons-arrow-down-alt2"></i></a> ';
+                        }
+
+                        // jika input pagu maka ditampilkan sampai sub kegiatan
+                        if(set_input_rencana_pagu == 1){
+                            if(tipe == 1) {
+                                if (value['label_cascading_program']) {
+                                    let nama_prog = value['label_cascading_program'];
+                                    label_cascading += '</br>'+value['kode_cascading_program'] + ' ' + nama_prog + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
+                                }
+                            }
+                            if(tipe == 2) {
+                                if (value['label_cascading_kegiatan']) {
+                                    let nama_keg = value['label_cascading_kegiatan'];
+                                    label_cascading += '</br>'+value['kode_cascading_kegiatan'] + ' ' + nama_keg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
+                                }
+                            }
+                            if(tipe == 3) {
+                                if (value['label_cascading_sub_kegiatan']) {
+                                    let nama_subkeg = value['label_cascading_sub_kegiatan'].split(" ").slice(1).join(" ");
+                                    label_cascading += '</br>'+value['kode_cascading_sub_kegiatan'] + ' ' + nama_subkeg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
+                                }
+                            }
                         }
 
                         renaksi += `` +
