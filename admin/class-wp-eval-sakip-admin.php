@@ -348,7 +348,7 @@ class Wp_Eval_Sakip_Admin
 
 		$input_iku_menu = Container::make('theme_options', __('Input IKU'))
 			->set_page_menu_position(3.6)
-			->set_icon('dashicons-edit-page');
+			->set_icon('dashicons-performance');
 
 		Container::make('theme_options', __('Input IKU Pemerintah Daerah'))
 			->set_page_parent($input_iku_menu)
@@ -360,29 +360,29 @@ class Wp_Eval_Sakip_Admin
 
 		Container::make('theme_options', __('Input RPJPD'))
 			->set_page_menu_position(3.7)
-			->set_icon('dashicons-welcome-write-blog')
+			->set_icon('dashicons-flag')
 			->add_fields($this->generate_fields_input_rpjpd());
 
 		Container::make('theme_options', __('Input RPJMD'))
 			->set_page_menu_position(3.8)
-			->set_icon('dashicons-welcome-write-blog')
+			->set_icon('dashicons-calendar-alt')
 			->add_fields($this->generate_fields_input_rpjmd());
 
-		$laporan_pk_menu = Container::make('theme_options', __('Laporan PK'))
+		$laporan_pk_menu = Container::make('theme_options', __('Perjanjian Kinerja'))
 			->set_page_menu_position(3.9)
-			->set_icon('dashicons-media-default');
+			->set_icon('dashicons-businessman');
 
-		Container::make('theme_options', __('Laporan PK Pemerintah Daerah'))
+		Container::make('theme_options', __('Perjanjian Kinerja Pemerintah Daerah'))
 			->set_page_parent($laporan_pk_menu)
 			->add_fields($this->generate_fields_laporan_pk_pemda());
 
-		Container::make('theme_options', __('Laporan PK Perangkat Daerah'))
+		Container::make('theme_options', __('Perjanjian Kinerja Perangkat Daerah'))
 			->set_page_parent($laporan_pk_menu)
 			->add_fields($this->generate_fields_laporan_pk_opd());
 
 		$kuesioner = Container::make('theme_options', __('Kuesioner'))
 			->set_page_menu_position(3.10)
-			->set_icon('dashicons-media-default')
+			->set_icon('dashicons-clipboard')
 			->add_fields($this->generate_fields_kuesioner());
 
 		Container::make('theme_options', __('Kuesioner Menpan'))
@@ -3500,7 +3500,7 @@ class Wp_Eval_Sakip_Admin
 
 	public function generate_fields_laporan_pk_pemda()
 	{
-	    if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_laporan_pk_pemerintah_daerah.php') {
+	    if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_perjanjian_kinerja_pemerintah_daerah.php') {
 	        return array();
 	    }
 
@@ -3599,7 +3599,7 @@ class Wp_Eval_Sakip_Admin
 
 	public function generate_fields_laporan_pk_opd()
 	{
-		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_laporan_pk_perangkat_daerah.php') {
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_perjanjian_kinerja_perangkat_daerah.php') {
 			return array();
 		}
 

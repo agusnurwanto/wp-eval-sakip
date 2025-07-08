@@ -1816,6 +1816,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					", $tujuan['id_unik']),
 					ARRAY_A
 				);
+				$jumlah_indikator_tujuan = count($indikator_tujuan);
+
 				if ($tujuan['id_isu'] != 0) {
 					//cari misi berdasarkan isu
 					$id_isu_rpjpd = $wpdb->get_var(
@@ -1919,6 +1921,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						$data_sasaran .= '<td class="text-center" width="' . $width_ind_sasaran . '%"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . $ind['indikator_teks'] . '</button></td>';
 						$data_program .= '<td class="text-center" width="' . $width_ind_sasaran . '%"><ul class="list-skpd" style="list-style-type: none; margin: 0; padding: 0;">';
 
+						$mapping_skpd_program = [];
+
 						// indikator sasaran sasaran rpd
 						$skpd_program = $wpdb->get_results(
 							$wpdb->prepare("
@@ -1931,17 +1935,37 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							", $ind['id_unik'], $ind['id_unik_indikator']),
 							ARRAY_A
 						);
+						
+						//urusan pengampu skpds views once
 						foreach ($skpd_program as $prog) {
-							$data_program .= '<li style="margin-bottom:14px;"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . $prog['nama_skpd'] . '</button></li>';
+							$mapping_skpd_program[$prog['id_unit']] = $prog;	
 						}
+						if (!empty($mapping_skpd_program)) {
+							foreach ($mapping_skpd_program as $prog) {
+								$data_program .= '
+									<li style="margin-bottom:14px;">
+										<button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . $prog['nama_skpd'] . '</button>
+									</li>';
+							}
+						}
+
 						if (empty($skpd_program)) {
-							$data_program .= '<li style="margin-bottom:14px;"><button class="btn btn-lg btn-warning"></button></li>';
+							$data_program .= '
+								<li style="margin-bottom:14px;">
+									<button class="btn btn-lg btn-warning"></button>
+								</li>';
 						}
 						$data_program .= '</ul></td>';
 					}
 					if (empty($data_sasaran)) {
-						$data_sasaran = '<td class="text-center" width="' . $width_ind_sasaran . '%"><button class="btn btn-lg btn-warning"></button></td>';
-						$data_program = '<td class="text-center" width="' . $width_ind_sasaran . '%"><button class="btn btn-lg btn-warning"></button></td>';
+						$data_sasaran = '
+							<td class="text-center" width="' . $width_ind_sasaran . '%">
+								<button class="btn btn-lg btn-warning"></button>
+							</td>';
+						$data_program = '
+							<td class="text-center" width="' . $width_ind_sasaran . '%">
+								<button class="btn btn-lg btn-warning"></button>
+							</td>';
 					}
 					$indikator_sasarans = array_merge($indikator_sasarans, $indikator_sasaran);
 				}
@@ -1959,8 +1983,9 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 				// indikator tujuan rpd
 				$indikator_tujuan_html = '';
 				$data = '';
+				$colspan_ind_tujuan = $jumlah_indikator_tujuan ? $colspan_tujuan / $jumlah_indikator_tujuan : $colspan_tujuan;
 				foreach ($indikator_tujuan as $ind) {
-					$data .= '<td class="text-center" colspan="' . $colspan_tujuan . '"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . $ind['indikator_teks'] . '</button></td>';
+					$data .= '<td class="text-center" colspan="' . $colspan_ind_tujuan . '"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . $ind['indikator_teks'] . '</button></td>';
 				}
 				if (empty($data)) {
 					$data = '<td class="text-center" colspan="' . $colspan_tujuan . '"><button class="btn btn-lg btn-warning"></button></td>';
