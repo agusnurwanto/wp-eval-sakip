@@ -2272,7 +2272,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                 }
 
                 $tbody = '';
-                $option_pegawai = '<option value="" selected>-- Pilih Pegawai Atasan--</option>';
+                $option_pegawai = '<option value="">-- Pilih Pegawai Atasan--</option>';
                 foreach ($data_pegawai_all as $key => $v_pgw) {
                     $checked = '';
                     if ($v_pgw['active_rhk'] == 1) {

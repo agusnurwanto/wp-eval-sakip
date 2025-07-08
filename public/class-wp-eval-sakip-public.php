@@ -27984,7 +27984,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		global $wpdb;
 		$ret = array(
 			'status'  => 'success',
-			'message' => 'Berhasil get data RPD!'
+			'message' => 'Berhasil get data!'
 		);
 
 		if (!empty($_POST)) {
@@ -28350,7 +28350,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		global $wpdb;
 		$ret = array(
 			'status'    => 'success',
-			'message'   => 'Berhasil simpan data RPD!'
+			'message'   => 'Berhasil simpan data!'
 		);
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
@@ -28405,7 +28405,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								"id_unik_indikator" => $_POST['id'],
 								"id_jadwal" => $_POST['id_jadwal']
 							));
-							$ret['message'] = 'Berhasil update data RPD!';
+							$ret['message'] = 'Berhasil update data!';
 						} else {
 							$data['id_unik_indikator'] = $this->generateRandomString(5);
 							$cek_id = $wpdb->get_var($wpdb->prepare("
@@ -28478,7 +28478,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						            }
 						        }
 						    }
-							$ret['message'] = 'Berhasil update data RPD!';
+							$ret['message'] = 'Berhasil update data!';
 						} else {
 							$data['id_unik'] = $this->generateRandomString(5);
 							$cek_id = $wpdb->get_var($wpdb->prepare("
@@ -28557,7 +28557,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								"id_unik_indikator" => $_POST['id'],
 								"id_jadwal" => $_POST['id_jadwal']
 							));
-							$ret['message'] = 'Berhasil update data RPD!';
+							$ret['message'] = 'Berhasil update data!';
 						} else {
 							$data['id_unik_indikator'] = $this->generateRandomString(5);
 							$cek_id = $wpdb->get_var($wpdb->prepare("
@@ -28593,7 +28593,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								"id_unik" => $_POST['id'],
 								"id_jadwal" => $_POST['id_jadwal']
 							));
-							$ret['message'] = 'Berhasil update data RPD!';
+							$ret['message'] = 'Berhasil update data!';
 						} else {
 							$data['id_unik'] = $this->generateRandomString(5);
 							$cek_id = $wpdb->get_var($wpdb->prepare("
@@ -28669,7 +28669,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								"id_unik_indikator" => $_POST['id'],
 								"id_jadwal" => $_POST['id_jadwal']
 							));
-							$ret['message'] = 'Berhasil update data RPD!';
+							$ret['message'] = 'Berhasil update data!';
 						} else {
 							$data['id_unik_indikator'] = $this->generateRandomString(5);
 							$cek_id = $wpdb->get_var($wpdb->prepare("
@@ -28704,7 +28704,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								"id_unik" => $_POST['id'],
 								"id_jadwal" => $_POST['id_jadwal']
 							));
-							$ret['message'] = 'Berhasil update data RPD!';
+							$ret['message'] = 'Berhasil update data!';
 						} else {
 							$data['id_unik'] = $this->generateRandomString(5);
 							$cek_id = $wpdb->get_var($wpdb->prepare("
@@ -28743,7 +28743,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		global $wpdb;
 		$ret = array(
 			'status' => 'success',
-			'message' => 'Berhasil hapus data RPD!',
+			'message' => 'Berhasil hapus data!',
 		);
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] === get_option(ESAKIP_APIKEY)) {
@@ -33352,6 +33352,20 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
         return $pegawai;
     }
+
+    public function get_data_pegawai_simpeg_by_satker_id($satker_id)
+    {
+        global $wpdb;
+
+        $sql = $wpdb->prepare(
+            "SELECT * FROM {$this->table_data_pegawai_simpeg} WHERE satker_id LIKE %s",
+            $satker_id . '%'
+        );
+
+        $pegawai = $wpdb->get_row($sql, OBJECT);
+
+        return $pegawai;
+    }
 	
 	 /**
      * AJAX handler to get pegawai data by ID.
@@ -33393,6 +33407,45 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
     }
 
 	 /**
+     * AJAX handler to get pegawai data by satker id.
+     */
+    // public function get_data_pegawai_simpeg_by_id_ajax()
+    // {
+    //     try {
+    //         $this->functions->validate($_POST, [
+    //             'api_key'   => 'required|string',
+    //             'satker_id' => 'required|numeric'
+    //         ]);
+
+    //         if ($_POST['api_key'] !== get_option(ESAKIP_APIKEY)) {
+    //              throw new Exception("API key tidak valid atau tidak ditemukan!", 401);
+    //         }
+
+    //         $pegawai_id = intval($_POST['id']);
+    //         $data_pegawai = $this->get_data_pegawai_simpeg_by_id($pegawai_id);
+
+    //         if ($data_pegawai) {
+    //             echo json_encode([
+    //                 'status'  => true,
+    //                 'message' => 'Data berhasil ditemukan.',
+    //                 'data'    => $data_pegawai
+    //             ]);
+    //         } else {
+    //              throw new Exception("Data pegawai dengan ID {$pegawai_id} tidak ditemukan.", 404);
+    //         }
+
+    //     } catch (Exception $e) {
+    //         $code = is_int($e->getCode()) && $e->getCode() !== 0 ? $e->getCode() : 500;
+    //         http_response_code($code);
+    //         echo json_encode([
+	// 			'status'  => false,
+	// 			'message' => $e->getMessage()
+	// 		]);
+    //     }
+    //     wp_die();
+    // }
+
+	 /**
      * AJAX handler to update atasan for one or more employees.
      */
     public function update_atasan_pegawai_ajax()
@@ -33423,32 +33476,57 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                 throw new Exception("Pegawai dengan ID {$id_pegawai} tidak ditemukan atau tidak aktif.", 404);
             }
 
-            // Cek Atasan Aktif
-            $cek_atasan_sql = $wpdb->prepare("
-				SELECT 
-					nama_pegawai,
-					nip_baru 
-				FROM {$this->table_data_pegawai_simpeg} 
-				WHERE active = 1 
-				  AND satker_id = %s 
-				  AND tipe_pegawai_id = 11
-				", $data_pegawai->satker_id
-            );
-            $atasan_aktif = $wpdb->get_row($cek_atasan_sql);
+			// hanya validasi jika masih dalam status PLT/PLH/PJ
+			$date_hari_ini = current_datetime()->format('Y-m-d H:i:s');
+			if (!$data_pegawai->plt_plh == 1 && $date_hari_ini > $data_pegawai->berakhir) {
+				if ($data_pegawai->tipe_pegawai == 11) {
+					// Cek Atasan Aktif
+					$satker_id_atasan = substr($data_pegawai['satker_id'], 0, -2);
+					$cek_atasan_sql = $wpdb->prepare("
+						SELECT 
+							nama_pegawai,
+							nip_baru,
+							jabatan
+						FROM {$this->table_data_pegawai_simpeg} 
+						WHERE active = 1 
+						  AND satker_id = %s 
+						  AND tipe_pegawai_id = 11
+						", $satker_id_atasan
+					);
+					$atasan_aktif = $wpdb->get_row($cek_atasan_sql);
+				} else {
+					// Cek Atasan Aktif
+					$cek_atasan_sql = $wpdb->prepare("
+						SELECT 
+							nama_pegawai,
+							nip_baru,
+							jabatan
+						FROM {$this->table_data_pegawai_simpeg} 
+						WHERE active = 1 
+						  AND satker_id = %s 
+						  AND tipe_pegawai_id = 11
+						", $data_pegawai->satker_id
+					);
+					$atasan_aktif = $wpdb->get_row($cek_atasan_sql);
+				}
 
-            if ($atasan_aktif) {
-                throw new Exception("Pegawai yang dipilih memiliki atasan aktif!\nNama Atasan: {$atasan_aktif->nama_pegawai} | NIP: {$atasan_aktif->nip_baru}", 409);
-            }
-
+				if ($atasan_aktif) {
+					throw new Exception("Pegawai yang dipilih memiliki atasan aktif!\nNama Atasan: {$atasan_aktif->nama_pegawai} | NIP: {$atasan_aktif->nip_baru} | Jabatan: {$atasan_aktif->jabatan}", 409);
+				}
+			}
+			
             // Perform The Update
             if ($terapkan_all_satker) {
-                $result = $wpdb->update(
-                    $this->table_data_pegawai_simpeg,
-                    ['id_atasan' => $id_atasan,'update_at' => current_time('mysql')],
-                    ['satker_id' => $data_pegawai->satker_id],
-                    ['%d', '%s'],
-                    ['%s']
-                );
+                $result = $wpdb->query(
+					$wpdb->prepare("
+						UPDATE {$this->table_data_pegawai_simpeg}
+						   SET id_atasan = %d,
+							   update_at = %s
+						WHERE satker_id = %d 
+						  AND tipe_pegawai_id != 11
+						  AND active = 1
+					", $id_atasan, current_time('mysql'), $data_pegawai->satker_id)
+				);
             } else {
                 $result = $this->update_data_pegawai_simpeg_by_id($id_pegawai, ['id_atasan' => $id_atasan]);
             }
