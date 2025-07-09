@@ -41,7 +41,7 @@ if (empty($data_id_jadwal['id_jadwal_wp_sipd'])) {
 $skpd = $wpdb->get_row(
     $wpdb->prepare("
     SELECT 
-        nama_skpd
+        *
     FROM esakip_data_unit
     WHERE id_skpd=%d
       AND tahun_anggaran=%d
@@ -49,7 +49,9 @@ $skpd = $wpdb->get_row(
 ", $id_skpd, $input['tahun']),
     ARRAY_A
 );
-// print_r($skpd); die($wpdb->last_query);
+if(empty($skpd)){
+    die('<h1 class="text-center">Perangkat Daerah dengan ID = '.$id_skpd.', tahun = '.$input['tahun'].' tidak ditemukan!</h1>');
+}
 
 $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
@@ -148,14 +150,21 @@ if (!empty($data_user_pegawai)) {
 
 // print_r($data_user_pegawai); print_r($skpd_user_pegawai); print_r($hak_akses_user_pegawai_per_skpd); die($wpdb->last_query);
 
+// jika user admin
 if (
     $is_administrator 
     || $this_admin_pemda == 1
 ){
     $hak_akses_user_pegawai = 1;
     $nip_user_pegawai = 0;
+
+// jika user PA SIPD
+}else if($skpd['nipkepala'] == $user_nip){
+    $hak_akses_user_pegawai = 1;
+    $nip_user_pegawai = $user_nip;
+
+// ----- hak akses by skpd terkait ----- //
 }else if(!empty($hak_akses_user_pegawai_per_skpd[$id_skpd])){
-    // ----- hak akses by skpd terkait ----- //
     $hak_akses_user_pegawai = $hak_akses_user_pegawai_per_skpd[$id_skpd];
 }
 
