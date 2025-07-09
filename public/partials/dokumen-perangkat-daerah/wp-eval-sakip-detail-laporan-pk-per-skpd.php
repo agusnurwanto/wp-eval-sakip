@@ -9,6 +9,7 @@ $input = shortcode_atts(array(
 $id_skpd = $_GET['id_skpd'] ?? '';
 $id_satker_simpeg = $_GET['satker_id'] ?? '';
 $nip = $_GET['nip'] ?? '';
+$id_jabatan = $_GET['id_jabatan'] ?? '';
 
 if (empty($id_skpd) || empty($nip) || empty($id_satker_simpeg) || empty($input['tahun'])) {
     die('parameter tidak lengkap!.');
@@ -40,11 +41,11 @@ $data_satker = $wpdb->get_row(
                ON ds.satker_id = p.satker_id
         WHERE p.nip_baru = %d
           AND p.satker_id = %s
+          AND p.id_jabatan = %d
           AND p.active = 1
-    ", $nip, $id_satker_simpeg),
+    ", $nip, $id_satker_simpeg, $id_jabatan),
     ARRAY_A
 );
-
 if (empty($data_satker) || empty($skpd)) {
     die('data satker kosong!.');
 }
@@ -78,11 +79,11 @@ $data_pegawai_1 = $wpdb->get_row(
                ON ds.satker_id = p.satker_id
         WHERE p.nip_baru = %s
           AND p.satker_id = %s
+          AND p.id_jabatan = %d
           AND p.active = 1
-    ", $data_satker['nip_baru'], $data_satker['satker_id']),
+    ", $data_satker['nip_baru'], $data_satker['satker_id'], $data_satker['id_jabatan']),
     ARRAY_A
 );
-
 $pihak_pertama = array(
     'nama_pegawai'         => $data_pegawai_1['nama_pegawai'] ?: '-',
     'nip_pegawai'          => $data_pegawai_1['nip_baru'] ?: '-',
@@ -182,10 +183,11 @@ if (empty($data_atasan)) {
                 LEFT JOIN esakip_data_satker_simpeg ds
                        ON ds.satker_id = p.satker_id
                 WHERE p.satker_id=%s 
+                  AND p.id_jabatan=%d 
                   AND p.tipe_pegawai_id=%d 
                   AND p.active=1
                 ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
-            ", $satker_id_atasan, 11),
+            ", $satker_id_atasan, $id_jabatan, 11),
             ARRAY_A
         );
     } else {
@@ -199,9 +201,10 @@ if (empty($data_atasan)) {
                 LEFT JOIN esakip_data_satker_simpeg ds
                        ON ds.satker_id = p.satker_id
                 WHERE p.satker_id=%s 
+                  AND p.id_jabatan=%d 
                   AND p.tipe_pegawai_id=%d 
                   AND p.active=1
-            ", $data_pegawai_1['satker_id'], 11),
+            ", $data_pegawai_1['satker_id'], $data_pegawai_1['id_jabatan'], 11),
             ARRAY_A
         );
     }
@@ -217,8 +220,9 @@ if (empty($data_atasan)) {
                 LEFT JOIN esakip_data_satker_simpeg ds
                        ON ds.satker_id = p.satker_id
                 WHERE p.id = %d
+                  AND p.id_jabatan = %d
                   AND p.active = 1
-                ", $data_pegawai_1['id_atasan']),
+                ", $data_pegawai_1['id_atasan'], $data_pegawai_1['id_jabatan']),
             ARRAY_A
         );
     }
@@ -278,8 +282,9 @@ if (!empty($data_atasan)) {
                        ON ds.satker_id = p.satker_id
                 WHERE p.nip_baru = %s
                   AND p.satker_id = %s
+                  AND p.id_jabatan = %d
                   AND p.active = 1
-            ", $data_atasan['nip_baru'], $data_atasan['satker_id']),
+            ", $data_atasan['nip_baru'], $data_atasan['satker_id'], $data_atasan['id_jabatan']),
             ARRAY_A
         );
 

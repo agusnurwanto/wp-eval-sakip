@@ -103,10 +103,17 @@ $show_nama_skpd = '';
 if (!empty($data_all['data'])) {
 
 	foreach ($data_all['data'] as $keylevel1 => $level_1) {
-		$data_temp[$keylevel1][0] = (object)[
-			'v' => $level_1['id'],
-			'f' => "<div class=\"" . $style0 . " label1 label\" data-id=\"" . $level_1['id'] . "\">" . trim($level_1['label']) . "</div>",
-		];
+		if ($tipe == 'opd') {
+			$data_temp[$keylevel1][0] = (object)[
+				'v' => $level_1['id'],
+				'f' => "<div class=\"" . $style0 . " label1 label\" data-id=\"" . $level_1['id'] . "\">" . trim($level_1['label']) . "</div>",
+			];
+		} else {
+			$data_temp[$keylevel1][0] = (object)[
+				'v' => $level_1['id'],
+				'f' => "<div class=\"" . $style0 . " label1 label item-rincian\" data-id=\"" . $level_1['id'] . "\">" . trim($level_1['label']) . "</div>",
+			];
+		}
 
 		if (!empty($level_1['indikator'])) {
 			foreach ($level_1['indikator'] as $keyindikatorlevel1 => $indikator) {
@@ -134,7 +141,7 @@ if (!empty($data_all['data'])) {
 			foreach ($level_1['data'] as $keylevel2 => $level_2) {
 				$data_temp[$keylevel2][0] = (object)[
 					'v' => $level_2['id'],
-					'f' => "<div class=\"" . $style0 . " label2 label\" data-id=\"" . $level_2['id'] . "\">" . trim($level_2['label']) . "</div>",
+					'f' => "<div class=\"" . $style0 . " label2 label item-rincian\" data-id=\"" . $level_2['id'] . "\">" . trim($level_2['label']) . "</div>",
 				];
 
 				if (!empty($level_2['indikator'])) {
@@ -188,7 +195,7 @@ if (!empty($data_all['data'])) {
 					foreach ($level_2['data'] as $keylevel3 => $level_3) {
 						$data_temp[$keylevel3][0] = (object)[
 							'v' => $level_3['id'],
-							'f' => "<div class=\"" . $style0 . " label3 label\" data-id=\"" . $level_3['id'] . "\">" . trim($level_3['label']) . "</div>",
+							'f' => "<div class=\"" . $style0 . " label3 label item-rincian\" data-id=\"" . $level_3['id'] . "\">" . trim($level_3['label']) . "</div>",
 						];
 
 						if (!empty($level_3['indikator'])) {
@@ -241,7 +248,7 @@ if (!empty($data_all['data'])) {
 							foreach ($level_3['data'] as $keylevel4 => $level_4) {
 								$data_temp[$keylevel4][0] = (object)[
 									'v' => $level_4['id'],
-									'f' => "<div class=\"" . $style0 . " label4 label\" data-id=\"" . $level_4['id'] . "\">" . trim($level_4['label']) . "</div>"
+									'f' => "<div class=\"" . $style0 . " label4 label item-rincian\" data-id=\"" . $level_4['id'] . "\">" . trim($level_4['label']) . "</div>"
 								];
 
 								if (!empty($level_4['indikator'])) {
@@ -384,7 +391,7 @@ if (!empty($data_all['data'])) {
 									foreach ($level_4['data'] as $keylevel5 => $level_5) {
 										$data_temp[$keylevel5][0] = (object)[
 											'v' => $level_5['id'],
-											'f' => "<div class=\"" . $style0 . " label5 label\" data-id=\"" . $level_5['id'] . "\">" . trim($level_5['label']) . "</div>",
+											'f' => "<div class=\"" . $style0 . " label5 label item-rincian\" data-id=\"" . $level_5['id'] . "\">" . trim($level_5['label']) . "</div>",
 										];
 
 										if (!empty($level_5['indikator'])) {
@@ -785,11 +792,11 @@ if (!empty($data_all['data'])) {
 				<input type="checkbox" class="custom-control-input" id="show_croscutting">
 				<label class="custom-control-label" for="show_croscutting">Tampilkan Croscutting</label>
 			</div>
+			<div class="custom-control custom-checkbox custom-control-inline mt-4">
+				<input type="checkbox" class="custom-control-input" id="show_koneksi_pokin_pemda">
+				<label class="custom-control-label" for="show_koneksi_pokin_pemda">Tampilkan Koneksi Pokin <?php echo $nama_pemda; ?></label>
+			</div>
 		<?php endif; ?>
-		<div class="custom-control custom-checkbox custom-control-inline mt-4">
-			<input type="checkbox" class="custom-control-input" id="show_koneksi_pokin_pemda">
-			<label class="custom-control-label" for="show_koneksi_pokin_pemda">Tampilkan Koneksi Pokin <?php echo $nama_pemda; ?></label>
-		</div>
 	</div>
 	Perkecil (-) <input title="Perbesar/Perkecil Layar" id="test" min="1" max="15" value='10' step="1" onchange="showVal(this.value)" type="range" style="max-width: 400px; margin-top: 40px;" /> (+) Perbesar
 	<br>
@@ -915,7 +922,7 @@ if (!empty($data_all['data'])) {
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
 	jQuery(document).ready(function() {
-		jQuery('.label').on('click', function() {
+		jQuery(document).on('click', '.item-rincian', function () {
 			var idPokin = jQuery(this).data('id');
 			if (idPokin == undefined) {
 				alert("Id tidak ditemukan");
