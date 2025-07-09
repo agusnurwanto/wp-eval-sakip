@@ -31272,7 +31272,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$opsi_data_pegawai = array(
 					'nama_pegawai' => $data['nama_pegawai'],
 					'nip_baru' => $data['nip_baru'],
-					'id_jabatan' => $data['id_jabatan'],
 					'update_at' => current_time('mysql'),
 					'active' => 1
 				);
@@ -31289,6 +31288,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$opsi_data_pegawai['jabatan'] 			= $data['jabatan'];
 					$opsi_data_pegawai['tipe_pegawai'] 		= $data['tipe_pegawai'];
 					$opsi_data_pegawai['tipe_pegawai_id'] 	= $data['tipe_pegawai_id'];
+					$opsi_data_pegawai['id_jabatan'] 		= $data['id_jabatan'];
 
 					if (!empty($data['plt_plh'])) {
 						$opsi_data_pegawai['plt_plh'] 		= $data['plt_plh'];
