@@ -125,7 +125,7 @@ $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') 
                     <div class="card mb-3 shadow-md bg-light">
                         <div class="card-body">
                             <div class="form-group">
-                                <label for="nama-pegawai-atasan">Kustomisasi nama Jabatan Pegawai</label>
+                                <label for="nama-pegawai-atasan">Ubah nama Jabatan Pegawai</label>
                                 <input type="text" class="form-control" id="nama-jabatan-pegawai-custom" placeholder="Masukkan nama jabatan pegawai (opsional)">
                                 <small class="form-text text-muted">
                                     nama jabatan ini akan digunakan untuk menampilkan nama jabatan pada laporan Perjanjian Kinerja. Jika tidak diisi, akan menggunakan nama jabatan dari data SIMPEG.
@@ -133,9 +133,9 @@ $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') 
                             </div>
                             <div class="form-group" id="plt-plh-teks-container">
                                 <label for="plt-plh-teks">Status Jabatan</label>
-                                <input type="text" class="form-control" id="plt-plh-teks" placeholder="Masukkan status jabatan untuk pegawai non definitif (contoh : Plt. Pj. Plh.)">
+                                <input type="text" class="form-control" id="plt-plh-teks">
                                 <small class="form-text text-muted">
-                                    Diperlukan, untuk ditampilkan di halaman cetak Laporan Perjanjian Kinerja.
+                                    Wajib diisi karena jabatan non definitif. (Contoh PJ, PLT, PLH dll.)
                                 </small>
                             </div>
                         </div>
@@ -382,7 +382,7 @@ $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') 
 
                 jQuery('#id-pegawai').val(data.id);
                 jQuery('#nama-pegawai').val(data.nama_pegawai);
-                jQuery('#nama-jabatan-pegawai-custom').val(data.custom_jabatan || '');
+                jQuery('#nama-jabatan-pegawai-custom').val(data.custom_jabatan || data.jabatan + ' ' + namaSatuanKerja);
                 jQuery('#nama-satker').val(namaSatuanKerja);
                 jQuery('#nama-satker-info').text(namaSatuanKerja);
                 jQuery('#info-atasan-pegawai').text(message);

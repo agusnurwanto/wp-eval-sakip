@@ -33252,6 +33252,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
      * @var string
      */
     private $table_data_pegawai_simpeg = 'esakip_data_pegawai_simpeg';
+    private $table_data_satker_simpeg = 'esakip_data_satker_simpeg';
 
     /**
      * Defines the data format for each column in the table.
@@ -33343,9 +33344,46 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
         global $wpdb;
 
         // Prepare the SQL query to prevent SQL injection.
-        $sql = $wpdb->prepare(
-            "SELECT * FROM {$this->table_data_pegawai_simpeg} WHERE id = %d AND active = 1",
-            $id
+        $sql = $wpdb->prepare("
+			SELECT 
+				p.*,
+				s.nama AS nama_bidang 
+			FROM {$this->table_data_pegawai_simpeg} p
+			JOIN {$this->table_data_satker_simpeg} s
+			  ON p.satker_id = s.satker_id
+			WHERE p.id = %d 
+			  AND p.active = 1
+			", $id
+        );
+
+        // The second parameter, OBJECT, ensures the result is an object.
+        $pegawai = $wpdb->get_row($sql, OBJECT);
+
+        return $pegawai;
+    }
+
+	 /**
+     * Retrieves a single record from the esakip_data_pegawai_simpeg table by its primary key.
+	 * where pegawai is inactive
+     *
+     * @param int $id The primary key (id) of the record to retrieve.
+     * @return object|null The record as an object, or null if not found or on error.
+     */
+    public function get_data_pegawai_simpeg_inactive_by_id($id)
+    {
+        global $wpdb;
+
+        // Prepare the SQL query to prevent SQL injection.
+        $sql = $wpdb->prepare("
+			SELECT 
+				p.*,
+				s.nama AS nama_bidang 
+			FROM {$this->table_data_pegawai_simpeg} p
+			JOIN {$this->table_data_satker_simpeg} s
+			  ON p.satker_id = s.satker_id
+			WHERE p.id = %d 
+			  AND p.active = 0
+			", $id
         );
 
         // The second parameter, OBJECT, ensures the result is an object.
@@ -33387,13 +33425,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
         global $wpdb; 
 
 		$sql = $wpdb->prepare(
-            "SELECT * FROM {$this->table_data_pegawai_simpeg} WHERE active = 1 AND satker_id = %s AND tipe_pegawai_id = 11",
+            "SELECT id FROM {$this->table_data_pegawai_simpeg} WHERE active = 1 AND satker_id = %s AND tipe_pegawai_id = 11",
             $satker_id
         );
 
-		$pegawai_atasan = $wpdb->get_row($sql, OBJECT);
+		$id_pegawai_atasan = $wpdb->get_var($sql);
 
-        return $pegawai_atasan;
+		if (!empty($id_pegawai_atasan)) {
+			$data_atasan = $this->get_data_pegawai_simpeg_by_id($id_pegawai_atasan);
+			return $data_atasan;
+		}
+
+        return null;
     }
 	
 	/**
@@ -33526,7 +33569,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	 * @param object $pegawai The employee data object.
 	 * @return object|null The superior's data object, a virtual object for Kepala Daerah, or null if no definitive superior is found.
 	 */
-	private function _get_atasan_definitif($pegawai)
+	public function _get_atasan_definitif($pegawai)
 	{
 		global $wpdb;
 
