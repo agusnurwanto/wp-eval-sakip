@@ -301,7 +301,7 @@ foreach ($ret['rhk_unik'] as $v) {
         }
     }
     $body .= '
-        <tr>
+        <tr id-indikator="'.$ind['id'].'" id-rhk="'.$renaksi_opd['id'].'">
             <td class="text_tengah">' . $no++ . '</td>
             <td class="text_kiri">' . $nama_skpd['nama_skpd'] . '</td>
             <td class="text_kiri">' . $renaksi_opd['jabatan'] . ' ' . $renaksi_opd['nama_satker'] . '</td>

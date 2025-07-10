@@ -1125,6 +1125,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						        AND tahun_anggaran = %d
 						", $ret['data']['id_skpd'], $ret['data']['tahun_anggaran']), ARRAY_A);
 
+						$ret['data']['renaksi_pemda'] = array();
 						if (!empty($data_renaksi)) {
 						    $id_pk = array();
 						    foreach ($data_renaksi as $item) {
@@ -6656,15 +6657,16 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 	function get_rencana_pagu_rhk($opsi)
 	{
+		global $wpdb;
+		$opsi['data_ind'] = array();
+		$opsi['total'] = 0;
+
 		// jika level rhk adalah yang terkahir maka tidak perlu cek rhk child
 		if($opsi['level'] == 4){
 			return $opsi;
 		}
 
-		global $wpdb;
 		$ids = implode(',', $opsi['ids']);
-		$opsi['data_ind'] = array();
-		$opsi['total'] = 0;
 		$data_rhk_existing = $wpdb->get_row(
 			$wpdb->prepare("
 				SELECT *
