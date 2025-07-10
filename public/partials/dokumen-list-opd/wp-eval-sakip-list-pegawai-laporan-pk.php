@@ -115,7 +115,7 @@ $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') 
                                         Terapkan Perubahan ke Seluruh Pegawai di Satuan Kerja Ini
                                     </label>
                                     <small class="form-text text-muted">
-                                        Centang jika ingin menerapkan perubahan ini ke seluruh pegawai di satuan kerja ini (<i class="font-weight-bold" id="nama-satker-info"></i>). Jangan dicentang jika hanya ingin menerapkan perubahan ke pegawai ini saja <strong>(pegawai bertipe kepala dikecualikan)</strong>.
+                                        Centang jika ingin menerapkan perubahan ini ke seluruh pegawai di satuan kerja <i class="font-weight-bold" id="nama-satker-info"></i> <strong>(pegawai definitif dikecualikan)</strong>. Jangan dicentang jika hanya ingin menerapkan perubahan ke pegawai ini saja.
                                     </small>
                                 </div>
                             </div>
@@ -320,7 +320,7 @@ $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') 
                     jQuery('#nama-pegawai-atasan-container').hide();
                     jQuery('#nama-pegawai-atasan-teks-container').show();
 
-                    jQuery('#nama-pegawai-atasan').val('');
+                    jQuery('#nama-pegawai-atasan').val('').trigger('change');
                     jQuery('#nama-pegawai-atasan-teks').val(`${data.atasan.nama_pegawai} (${data.atasan.nip_baru}) | ${data.atasan.jabatan}`);
 
                     // Jika tidak ada atasan definitif, izinkan pemilihan manual
