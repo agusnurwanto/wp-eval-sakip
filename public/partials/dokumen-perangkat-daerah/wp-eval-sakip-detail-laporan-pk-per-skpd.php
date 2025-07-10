@@ -945,7 +945,7 @@ $ttd_orientasi = 'text-left';
     <div class="break-print"></div>
     <div class="page-print mt-5 text-center">
         <p class="title-laporan mt-3"><span class="jenis_pk_text">PERJANJIAN KINERJA</span> TAHUN <?php echo $input['tahun']; ?></p>
-        <p class="title-laporan mb-5 nama-satker-view"><?php echo $pihak_pertama['bidang_pegawai']; ?></p>
+        <p class="title-laporan mb-5 nama-satker-view"><?php echo $pihak_pertama['nama_bidang']; ?></p>
         <?php if (!empty($html_pk['html_sasaran'])) : ?>
             <table class="table_data_anggaran" id="table-sasaran-view">
                 <thead>
@@ -1157,7 +1157,7 @@ $ttd_orientasi = 'text-left';
                                     <td class="text-left">
                                         <strong>:</strong>
                                     </td>
-                                    <td class="text-left" id="bidang_pegawai"><?php echo strtoupper($pihak_pertama['bidang_pegawai']); ?>
+                                    <td class="text-left" id="bidang_pegawai"><?php echo strtoupper($pihak_pertama['nama_bidang']); ?>
                                     </td>
                                 </tr>
                                 <tr>

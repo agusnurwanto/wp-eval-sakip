@@ -7205,7 +7205,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				  AND nip = %d 
 				  AND id_jabatan = %s 
 				  AND active = 1
-				ORDER BY level, id ASC
+				ORDER BY kode_cascading_sasaran, kode_cascading_program, id_sub_skpd_cascading, kode_cascading_kegiatan, kode_cascading_sub_kegiatan, level, id ASC
 			", $id_skpd, $options['tahun'], $options['nip_baru'], $options['satker_id']),
 			ARRAY_A
 		);
