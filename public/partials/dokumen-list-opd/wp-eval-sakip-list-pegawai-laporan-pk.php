@@ -35,6 +35,10 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
     'show_header' => 1,
     'post_status' => 'private'
 ));
+
+// Get kepala daerah and status jabatan for option atasan
+$nama_kepala_daerah = get_option('_crb_kepala_daerah') ?: 'Kepala Daerah (set di halaman Pengaturan)';
+$status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') ?: 'Kepala Daerah (set di halaman Pengaturan)';
 ?>
 <div class="container-md">
     <div class="cetak">
@@ -94,17 +98,18 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
 
                     <div class="card mb-3 shadow-md bg-light">
                         <div class="card-body">
-                            <div class="form-group">
+                            <div class="form-group" id="nama-pegawai-atasan-teks-container">
+                                <label for="nama-pegawai-atasan-teks">Nama Pegawai Atasan</label>
+                                <input type="text" class="form-control" id="nama-pegawai-atasan-teks" disabled>
+                            </div>
+                            <div class="form-group" id="nama-pegawai-atasan-container">
                                 <label for="nama-pegawai-atasan">Pilih Atasan Pegawai</label>
                                 <select class="form-control" id="nama-pegawai-atasan">
                                 </select>
-                                <div class="alert alert-primary mt-2" role="alert">
-                                    Pastikan pegawai atasan tidak ada (sedang kosong). Jika pegawai ini sudah punya atasan aktif, proses update tidak dapat dilakukan (gagal).
-                                    Kosongkan kolom input ini jika pegawai atasan adalah definitif.
-                                </div>
                             </div>
+                            <div class="alert alert-primary mt-2" role="alert" id="info-atasan-pegawai"></div>
                             <div class="form-group">
-                                <div class="form-check">
+                                <div class="form-check" id="terapkan-all-satker-container">
                                     <input type="checkbox" class="form-check-input" id="terapkan-all-satker">
                                     <label class="form-check-label" for="terapkan-all-satker">
                                         Terapkan Perubahan ke Seluruh Pegawai di Satuan Kerja Ini
@@ -119,11 +124,18 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
 
                     <div class="card mb-3 shadow-md bg-light">
                         <div class="card-body">
-                             <div class="form-group">
+                            <div class="form-group">
                                 <label for="nama-pegawai-atasan">Kustomisasi nama Jabatan Pegawai</label>
                                 <input type="text" class="form-control" id="nama-jabatan-pegawai-custom" placeholder="Masukkan nama jabatan pegawai (opsional)">
                                 <small class="form-text text-muted">
                                     nama jabatan ini akan digunakan untuk menampilkan nama jabatan pada laporan Perjanjian Kinerja. Jika tidak diisi, akan menggunakan nama jabatan dari data SIMPEG.
+                                </small>
+                            </div>
+                            <div class="form-group" id="plt-plh-teks-container">
+                                <label for="plt-plh-teks">Status Jabatan</label>
+                                <input type="text" class="form-control" id="plt-plh-teks" placeholder="Masukkan status jabatan untuk pegawai non definitif (contoh : Plt. Pj. Plh.)">
+                                <small class="form-text text-muted">
+                                    Diperlukan, untuk ditampilkan di halaman cetak Laporan Perjanjian Kinerja.
                                 </small>
                             </div>
                         </div>
@@ -198,7 +210,7 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
                 data[id] = 0;
             }
         });
-        if (Object.keys(data).length === 0) {
+        if (Object.keys(data).length == 0) {
             return alert('Data pegawai tidak boleh kosong!');
         }
         jQuery('#wrap-loading').show();
@@ -242,15 +254,9 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
             dataType: 'json',
             success: function(response) {
                 jQuery('#wrap-loading').hide();
-                if (response.status === 'success') {
+                if (response.status == 'success') {
                     jQuery('#p_aktif').text(response.aktif);
                     jQuery('#p_non_aktif').text(response.non_aktif);
-                    jQuery('#nama-pegawai-atasan').html(response.option_pegawai);
-                    jQuery('#nama-pegawai-atasan').select2({
-                        placeholder: '-- Pilih Pegawai Atasan --',
-                        dropdownParent: jQuery('#modal-edit-pegawai .modal-body'),
-                        width: '100%'
-                    });
                     if (destroy == 1) {
                         laporan_pk_table.fnDestroy();
                     }
@@ -284,8 +290,7 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
         });
     }
 
-    function editPegawai(idPegawai) {        
-        return alert('Fitur belum tersedia');
+    function handleEditPegawai(idPegawai) {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -297,26 +302,122 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
             },
             dataType: 'json',
             success: function(response) {
-                jQuery('#wrap-loading').hide();
-                if (response.status) {
-                    let namaSatuanKerja = jQuery('.table_list_pegawai tbody tr[data-id="' + idPegawai + '"] td:nth-child(3)').text();
-                    jQuery('#id-pegawai').val(response.data.id);
-                    jQuery('#nama-pegawai').val(response.data.nama_pegawai);
-                    jQuery('#nama-jabatan-pegawai-custom').val(response.data.custom_jabatan || '');
-                    jQuery('#nama-satker').val(namaSatuanKerja);
-                    jQuery('#nama-satker-info').text(namaSatuanKerja);
-                    jQuery('#nama-pegawai-atasan').val(response.data.id_atasan).trigger('change');
-                    jQuery('#terapkan-all-satker').prop('checked', false);
-                    jQuery('#modal-edit-pegawai').modal('show');
-                } else {
+                if (!response.status) {
                     alert('Gagal memuat data pegawai: ' + response.message);
+                    jQuery('#wrap-loading').hide();
+                    return;
                 }
+
+                const data = response.data;
+                let message = '';
+                let namaSatuanKerja = jQuery('.table_list_pegawai tbody tr[data-id="' + idPegawai + '"] td:nth-child(3)').text();
+
+                // Cek jika ada atasan definitif
+                if (data.atasan) {
+                    message = 'Pegawai memiliki atasan definitif, tidak bisa diubah!';
+
+                    jQuery('#terapkan-all-satker-container').hide();
+                    jQuery('#nama-pegawai-atasan-container').hide();
+                    jQuery('#nama-pegawai-atasan-teks-container').show();
+
+                    jQuery('#nama-pegawai-atasan').val('');
+                    jQuery('#nama-pegawai-atasan-teks').val(`${data.atasan.nama_pegawai} (${data.atasan.nip_baru}) | ${data.atasan.jabatan}`);
+
+                    // Jika tidak ada atasan definitif, izinkan pemilihan manual
+                } else {
+                    message = 'Atasan definitif tidak ditemukan. Silakan pilih atasan pengganti.';
+                    jQuery('#terapkan-all-satker-container').show();
+                    jQuery('#nama-pegawai-atasan-container').show();
+                    jQuery('#nama-pegawai-atasan-teks-container').hide();
+
+                    jQuery('#nama-pegawai-atasan-teks').val('');
+
+                    let pegawaiOptions = '<option value="">-- Pilih Atasan --</option>';
+
+                    // Cek flag dari PHP untuk memunculkan opsi Kepala Daerah
+                    if (data.show_kepala_daerah_option) {
+                        pegawaiOptions += `<option value="0"><?php echo $nama_kepala_daerah; ?> (Kepala Daerah) | <?php echo $status_jabatan_kepala_daerah; ?></option>`;
+                    }
+
+                    // Tentukan satker_id untuk dropdown
+                    let satkerIdDropDown;
+                    const is_kepala_atau_plt = (data.tipe_pegawai_id == "11" || data.plt_plh == "1");
+
+                    if (is_kepala_atau_plt && data.satker_id.length > 2) {
+                        satkerIdDropDown = data.satker_id.slice(0, -2);
+                    } else {
+                        satkerIdDropDown = data.satker_id;
+                    }
+
+                    getPegawaiBySatkerId(satkerIdDropDown)
+                        .done(function(pegawaiResponse) {
+                            if (pegawaiResponse.status && pegawaiResponse.data.length > 0) {
+                                pegawaiResponse.data.forEach(function(pegawai) {
+                                    // Hindari menampilkan diri sendiri di list atasan
+                                    if (pegawai.id != data.id) {
+                                        pegawaiOptions += `<option value="${pegawai.id}">${pegawai.nama_pegawai} (${pegawai.nip_baru}) | ${pegawai.jabatan}</option>`;
+                                    }
+                                });
+                            }
+                            jQuery('#nama-pegawai-atasan').html(pegawaiOptions).select2({
+                                placeholder: '-- Pilih Pegawai Atasan --',
+                                dropdownParent: jQuery('#modal-edit-pegawai .modal-body'),
+                                width: '100%'
+                            });
+
+                            // Set value berdasarkan atasan custom yang sudah tersimpan
+                            if (data.atasan_custom) {
+                                jQuery('#nama-pegawai-atasan').val(data.atasan_custom.id).trigger('change');
+                            } else if (data.is_kepala_daerah_atasan) {
+                                // Jika tidak ada atasan custom tapi seharusnya Kepala Daerah
+                                jQuery('#nama-pegawai-atasan').val('0').trigger('change');
+                            }
+
+                        })
+                        .fail(function(xhr) {
+                            console.error(xhr.responseText);
+                            alert('Terjadi kesalahan saat memuat daftar calon atasan!');
+                        });
+                }
+
+                jQuery('#id-pegawai').val(data.id);
+                jQuery('#nama-pegawai').val(data.nama_pegawai);
+                jQuery('#nama-jabatan-pegawai-custom').val(data.custom_jabatan || '');
+                jQuery('#nama-satker').val(namaSatuanKerja);
+                jQuery('#nama-satker-info').text(namaSatuanKerja);
+                jQuery('#info-atasan-pegawai').text(message);
+                jQuery('#terapkan-all-satker').prop('checked', false);
+
+                jQuery('#plt-plh-teks-container').hide();
+                jQuery('#plt-plh-teks').val('');
+                jQuery('#plt-plh-teks').prop('required', false);
+                if (data.plt_plh == "1") {
+                    jQuery('#plt-plh-teks-container').show();
+                    jQuery('#plt-plh-teks').prop('required', true);
+                    jQuery('#plt-plh-teks').val(data.plt_plh_teks);
+                }
+
+                jQuery('#wrap-loading').hide();
+                jQuery('#modal-edit-pegawai').modal('show');
             },
-            error: function(xhr, status, error) {
+            error: function(xhr) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data pegawai!');
+                alert('Terjadi kesalahan fatal saat memuat data pegawai!');
             }
+        });
+    }
+
+    function getPegawaiBySatkerId(satkerId) {
+        return jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_data_pegawai_simpeg_by_satker_id_ajax',
+                api_key: esakip.api_key,
+                satker_id: satkerId
+            },
+            dataType: 'json'
         });
     }
 
@@ -324,6 +425,7 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
         let idPegawai = jQuery('#id-pegawai').val();
         let idPegawaiAtasan = jQuery('#nama-pegawai-atasan').val();
         let namaJabatanCustom = jQuery('#nama-jabatan-pegawai-custom').val();
+        let plt_plh_teks = jQuery('#plt-plh-teks').val();
         let terapkanAllSatker = jQuery('#terapkan-all-satker').is(':checked') ? 1 : 0;
 
         if (!idPegawai) {
@@ -341,7 +443,8 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
                 id_pegawai: idPegawai,
                 id_atasan: idPegawaiAtasan,
                 jabatan_custom: namaJabatanCustom,
-                terapkan_all_satker: terapkanAllSatker
+                terapkan_all_satker: terapkanAllSatker,
+                plt_plh_teks: plt_plh_teks
             },
             dataType: 'json',
             success: function(response) {

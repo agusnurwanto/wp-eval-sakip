@@ -99,6 +99,9 @@ $pihak_pertama = array(
 if (!empty($data_pegawai_1['custom_jabatan'])) {
     $pihak_pertama['jabatan_pegawai'] = $data_pegawai_1['custom_jabatan'];
 }
+if ($data_pegawai_1['plt_plh'] == 1 && !empty($data_pegawai_1['plt_plh_teks'])) {
+    $pihak_pertama['jabatan_pegawai'] = $data_pegawai_1['plt_plh_teks'] . ' ' . $pihak_pertama['jabatan_pegawai'];
+}
 
 $data_atasan = array();
 $date_hari_ini = current_datetime()->format('Y-m-d H:i:s');
@@ -296,6 +299,9 @@ if (!empty($data_atasan)) {
         if (!empty($data_pegawai_2['custom_jabatan'])) {
             $pihak_kedua['jabatan_pegawai'] = $data_pegawai_2['custom_jabatan'];
         }
+        if ($data_pegawai_2['plt_plh'] == 1 && !empty($data_pegawai_2['plt_plh_teks'])) {
+            $pihak_kedua['jabatan_pegawai'] = $data_pegawai_2['plt_plh_teks'] . ' ' . $pihak_kedua['jabatan_pegawai'];
+        }
     }
 } else {
     $pihak_kedua = array(
@@ -317,10 +323,7 @@ $options = array(
     'nip_baru'  => $data_pegawai_1['nip_baru']
 );
 $html_pk = $this->get_pk_html($options);
-// echo '<pre>';
-// print_r($html_pk);
-// echo '/<pre>';
-// die();
+
 $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
 $user_nip = $current_user->data->user_login;
@@ -1301,7 +1304,7 @@ $ttd_orientasi = 'text-left';
                                     <td class="text-left">
                                         <strong>:</strong>
                                     </td>
-                                    <td class="text-left" id="nama_pegawai"><?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . ', ' . $pihak_pertama['gelar_belakang']; ?>
+                                    <td class="text-left" id="nama_pegawai"><?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . $pihak_pertama['gelar_belakang']; ?>
                                     </td>
                                 </tr>
                                 <tr>
@@ -1533,8 +1536,6 @@ $ttd_orientasi = 'text-left';
 </div>
 <script>
     jQuery(document).ready(function() {
-        window.status_jabatan_1 = '';
-        window.status_jabatan_2 = '';
         window.hak_akses_user_pegawai = <?php echo $hak_akses_user_pegawai ?>;
         window.nip_akses_user_pegawai = <?php echo $nip_user_pegawai ?>;
         window.nip_pihak_pertama = <?php echo $pihak_pertama['nip_pegawai'] ?>;
@@ -1550,10 +1551,6 @@ $ttd_orientasi = 'text-left';
         let cek_nama_kepala_daerah = <?php echo $cek_nama_kepala_daerah; ?>;
         let cek_status_jabatan_kepala_daerah = <?php echo $cek_status_jabatan_kepala_daerah; ?>;
 
-        //CEK STATUS JABATAN PLT PIHAK PERTAMA / KEDUA 
-        let cek_status_jabatan_kepala_pihak_pertama = <?php echo $cek_status_jabatan_kepala_pihak_pertama; ?>;
-        let cek_status_jabatan_kepala_pihak_kedua = <?php echo $cek_status_jabatan_kepala_pihak_kedua; ?>;
-
         //NAMA PIHAK PERTAMA / KEDUA
         let nama_pihak_pertama = "<?php echo $pihak_pertama['nama_pegawai']; ?>";
         let nama_pihak_kedua = "<?php echo $pihak_kedua['nama_pegawai']; ?>";
@@ -1566,28 +1563,6 @@ $ttd_orientasi = 'text-left';
         //PIHAK PERTAMA KEPALA, PIHAK KEDUA KEPALA DAERAH, HARUS DIISI JABATAN KEPALA DAERAHNYA
         if (cek_kepala_skpd == 1 && (cek_status_jabatan_kepala_daerah == 0)) {
             alert("Harap Isi Status Jabatan Kepala Daerah Di E-SAKIP Options!");
-        }
-
-        //Pihak Pertama Status (PJ/PLT/PLH)
-        let input_status_jabatan_pertama = "";
-        if (cek_status_jabatan_kepala_pihak_pertama == 1) {
-            input_status_jabatan_pertama = window.prompt("Harap isi status jabatan (PJ, PLT, PLH) atas nama " + nama_pihak_pertama + " sebagai pihak pertama!");
-        }
-
-        if (input_status_jabatan_pertama !== null && input_status_jabatan_pertama.trim() !== "") {
-            jQuery(".status-jabatan-pegawai-1").prepend(input_status_jabatan_pertama + " ");
-            status_jabatan_1 = input_status_jabatan_pertama;
-        }
-
-        //Pihak Kedua Status (PJ/PLT/PLH)
-        let input_status_jabatan_kedua = "";
-        if (cek_status_jabatan_kepala_pihak_kedua == 1) {
-            input_status_jabatan_kedua = window.prompt("Harap isi status jabatan (PJ, PLT, PLH) atas nama " + nama_pihak_kedua + " sebagai pihak kedua!", 'PLT');
-        }
-
-        if (input_status_jabatan_kedua !== null && input_status_jabatan_kedua.trim() !== "") {
-            jQuery(".status-jabatan-pegawai-2").prepend(input_status_jabatan_kedua + " ");
-            status_jabatan_2 = input_status_jabatan_kedua;
         }
     });
 
@@ -1831,10 +1806,8 @@ $ttd_orientasi = 'text-left';
                 action: "simpan_finalisasi_laporan_pk",
                 api_key: esakip.api_key,
                 data_pk: dokumenPk,
-                nip_pertama: '<?php echo $nip; ?>',
-                nip_kedua: '<?php echo $pihak_kedua['nip_pegawai']; ?>',
-                status_pertama: status_jabatan_1,
-                status_kedua: status_jabatan_2,
+                id_pertama: '<?php echo $data_pegawai_1['id']; ?>',
+                id_kedua: '<?php echo $data_pegawai_2['id'] ?? 0; ?>',
                 id_skpd: '<?php echo $id_skpd; ?>',
                 id_satker_pertama: '<?php echo $data_pegawai_1['satker_id']; ?>',
                 id_satker_kedua: '<?php echo (!empty($data_pegawai_2) && isset($data_pegawai_2['satker_id'])) ? $data_pegawai_2['satker_id'] : ($data_atasan['satker_id'] ?? ""); ?>',

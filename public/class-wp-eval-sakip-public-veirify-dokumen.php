@@ -2303,7 +2303,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                         <td class='text-left'>" . $v_pgw['jabatan'] . $custom_nama_jabatan . "</td>
                         <td class='text-left'>" . $atasan . "</td>
                         <td class='text-center'>
-                            <button class='btn-sm btn-warning' title='Edit Pegawai'><i class='dashicons dashicons-edit' onclick='editPegawai(" . $v_pgw['id'] . ")'></i></button>
+                            <button class='btn-sm btn-warning' title='Edit Pegawai'><i class='dashicons dashicons-edit' onclick='handleEditPegawai(" . $v_pgw['id'] . ")'></i></button>
                         </td>
                     </tr>";
 
