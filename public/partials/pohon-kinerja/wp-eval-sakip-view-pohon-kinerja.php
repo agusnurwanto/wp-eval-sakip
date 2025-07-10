@@ -103,21 +103,18 @@ $show_nama_skpd = '';
 if (!empty($data_all['data'])) {
 
 	foreach ($data_all['data'] as $keylevel1 => $level_1) {
-		if ($tipe == 'opd') {
-			$data_temp[$keylevel1][0] = (object)[
-				'v' => $level_1['id'],
-				'f' => "<div class=\"" . $style0 . " label1 label\" data-id=\"" . $level_1['id'] . "\">" . trim($level_1['label']) . "</div>",
-			];
-		} else {
-			$data_temp[$keylevel1][0] = (object)[
-				'v' => $level_1['id'],
-				'f' => "<div class=\"" . $style0 . " label1 label item-rincian\" data-id=\"" . $level_1['id'] . "\">" . trim($level_1['label']) . "</div>",
-			];
-		}
+		$data_temp[$keylevel1][0] = (object)[
+			'v' => $level_1['id'],
+			'f' => "<div class=\"" . $style0 . " label1\" data-id=\"" . $level_1['id'] . "\">" . trim($level_1['label']) . "</div>",
+		];
 
 		if (!empty($level_1['indikator'])) {
 			foreach ($level_1['indikator'] as $keyindikatorlevel1 => $indikator) {
-				$data_temp[$keylevel1][0]->f .= "<div " . $style1 . ">IK: " . $indikator['label_indikator_kinerja'] . "</div>";
+                if ($tipe === 'opd') {
+                    $data_temp[$keylevel1][0]->f .= '<div class="level1">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
+                } else {
+                    $data_temp[$keylevel1][0]->f .= '<div class="level1 item-rincian" data-id="' . $level_1['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
+                }
 			}
 		}
 
@@ -141,12 +138,16 @@ if (!empty($data_all['data'])) {
 			foreach ($level_1['data'] as $keylevel2 => $level_2) {
 				$data_temp[$keylevel2][0] = (object)[
 					'v' => $level_2['id'],
-					'f' => "<div class=\"" . $style0 . " label2 label item-rincian\" data-id=\"" . $level_2['id'] . "\">" . trim($level_2['label']) . "</div>",
+					'f' => "<div class=\"" . $style0 . " label2 item-rincian\" data-id=\"" . $level_2['id'] . "\">" . trim($level_2['label']) . "</div>",
 				];
 
 				if (!empty($level_2['indikator'])) {
 					foreach ($level_2['indikator'] as $keyindikatorlevel2 => $indikator) {
-						$data_temp[$keylevel2][0]->f .= "<div " . $style2 . ">IK: " . $indikator['label_indikator_kinerja'] . "</div>";
+		                if ($tipe === 'opd') {
+		                    $data_temp[$keylevel2][0]->f .= '<div class="level2">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
+		                } else {
+		                    $data_temp[$keylevel2][0]->f .= '<div class="level2 item-rincian" data-id="' . $level_2['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
+		                }
 					}
 				}
 
@@ -195,12 +196,16 @@ if (!empty($data_all['data'])) {
 					foreach ($level_2['data'] as $keylevel3 => $level_3) {
 						$data_temp[$keylevel3][0] = (object)[
 							'v' => $level_3['id'],
-							'f' => "<div class=\"" . $style0 . " label3 label item-rincian\" data-id=\"" . $level_3['id'] . "\">" . trim($level_3['label']) . "</div>",
+							'f' => "<div class=\"" . $style0 . " label3\" data-id=\"" . $level_3['id'] . "\">" . trim($level_3['label']) . "</div>",
 						];
 
 						if (!empty($level_3['indikator'])) {
 							foreach ($level_3['indikator'] as $keyindikatorlevel3 => $indikator) {
-								$data_temp[$keylevel3][0]->f .= "<div " . $style3 . ">IK: " . $indikator['label_indikator_kinerja'] . "</div>";
+				                if ($tipe === 'opd') {
+				                    $data_temp[$keylevel3][0]->f .= '<div class="level3">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
+				                } else {
+				                    $data_temp[$keylevel3][0]->f .= '<div class="level3 item-rincian" data-id="' . $level_3['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
+				                }
 							}
 						}
 
@@ -248,12 +253,16 @@ if (!empty($data_all['data'])) {
 							foreach ($level_3['data'] as $keylevel4 => $level_4) {
 								$data_temp[$keylevel4][0] = (object)[
 									'v' => $level_4['id'],
-									'f' => "<div class=\"" . $style0 . " label4 label item-rincian\" data-id=\"" . $level_4['id'] . "\">" . trim($level_4['label']) . "</div>"
+									'f' => "<div class=\"" . $style0 . " label4\" data-id=\"" . $level_4['id'] . "\">" . trim($level_4['label']) . "</div>"
 								];
 
 								if (!empty($level_4['indikator'])) {
 									foreach ($level_4['indikator'] as $keyindikatorlevel4 => $indikator) {
-										$data_temp[$keylevel4][0]->f .= "<div " . $style4 . ">IK: " . $indikator['label_indikator_kinerja'] . "</div>";
+						                if ($tipe === 'opd') {
+						                    $data_temp[$keylevel4][0]->f .= '<div class="level4">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
+						                } else {
+						                    $data_temp[$keylevel4][0]->f .= '<div class="level4 item-rincian" data-id="' . $level_4['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
+						                }
 									}
 								}
 
@@ -391,11 +400,16 @@ if (!empty($data_all['data'])) {
 									foreach ($level_4['data'] as $keylevel5 => $level_5) {
 										$data_temp[$keylevel5][0] = (object)[
 											'v' => $level_5['id'],
-											'f' => "<div class=\"" . $style0 . " label5 label item-rincian\" data-id=\"" . $level_5['id'] . "\">" . trim($level_5['label']) . "</div>",
+											'f' => "<div class=\"" . $style0 . " label5\" data-id=\"" . $level_5['id'] . "\">" . trim($level_5['label']) . "</div>",
 										];
 
 										if (!empty($level_5['indikator'])) {
 											foreach ($level_5['indikator'] as $keyindikatorlevel5 => $indikator) {
+								                if ($tipe === 'opd') {
+								                    $data_temp[$keylevel5][0]->f .= '<div class="level5">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
+								                } else {
+								                    $data_temp[$keylevel5][0]->f .= '<div class="level5 item-rincian" data-id="' . $level_5['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
+								                }
 												$data_temp[$keylevel5][0]->f .= "<div " . $style5 . ">IK: " . $indikator['label_indikator_kinerja'] . "</div>";
 											}
 										}
@@ -702,7 +716,7 @@ if (!empty($data_all['data'])) {
 		position: fixed;
 		top: 0;
 		right: 0;
-		width: 380px;
+		width: 600px;
 		height: 100%;
 		z-index: 1050;
 		background-color: #fff;
@@ -783,6 +797,14 @@ if (!empty($data_all['data'])) {
 		margin-left: 30px;
 		margin-bottom: 0;
 	}
+
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+    td {
+        padding: 5px;
+    }
 </style>
 <div class="text-center" id="action-sakip">
 	<button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button><br>
@@ -875,22 +897,32 @@ if (!empty($data_all['data'])) {
 	</div>
 
 	<div class="sidebar-body">
-		<div class="info-section">
+		<div class="info-section text-left">
+			<h6><i class="dashicons dashicons-tag"></i> Kinerja</h6>
+			<p id="label"></p>
+		</div>
+
+		<div class="info-section text-left">
+			<h6><i class="dashicons dashicons-chart-bar"></i> Indikator Kinerja</h6>
+			<p id="indikator"></p>
+		</div>
+
+		<div class="info-section text-left">
 			<h6><i class="dashicons dashicons-admin-users"></i> Pelaksana</h6>
 			<p id="pelaksana"></p>
 		</div>
 
-		<div class="info-section">
+		<div class="info-section text-left">
 			<h6><i class="dashicons dashicons-clipboard"></i> Bentuk Kegiatan</h6>
 			<p id="bentuk_kegiatan"></p>
 		</div>
 
-		<div class="info-section">
+		<div class="info-section text-left">
 			<h6><i class="dashicons dashicons-chart-line"></i> Outcome</h6>
 			<p id="outcome"></p>
 		</div>
 
-		<div class="info-section">
+		<div class="info-section text-left">
 			<h6><i class="dashicons dashicons-groups"></i> Crosscutting Dengan</h6>
 			<p id="crosscutting"></p>
 		</div>
@@ -923,20 +955,28 @@ if (!empty($data_all['data'])) {
 <script type="text/javascript">
 	jQuery(document).ready(function() {
 		jQuery(document).on('click', '.item-rincian', function () {
+			var tipe = "<?php echo $tipe; ?>";
+			var id_skpd = "<?php echo $id_skpd; ?>";
 			var idPokin = jQuery(this).data('id');
 			if (idPokin == undefined) {
 				alert("Id tidak ditemukan");
 				return;
 			}
-			jQuery('#wrap-loading').show();
+			let ajaxData = {
+				"action": "edit_pokin",
+				"api_key": esakip.api_key,
+				"id": idPokin,
+				"tipe_pokin": tipe
+			};
+			if (tipe === 'opd') {
+				ajaxData["id_skpd"] = id_skpd;
+			}
+
+			jQuery("#wrap-loading").show();
 			jQuery.ajax({
 				method: 'POST',
 				url: esakip.url,
-				data: {
-					"action": "edit_pokin",
-					"api_key": esakip.api_key,
-					'id': idPokin
-				},
+				data: ajaxData,
 				dataType: 'json',
 				success: function(response) {
 					jQuery("#wrap-loading").hide();
@@ -944,15 +984,23 @@ if (!empty($data_all['data'])) {
 						alert(response.message);
 						return;
 					}
+					jQuery("#label").text(response.data.label || '-');
+
+					if (response.indikator && response.indikator.length > 0) {
+						jQuery("#indikator").html(
+							response.indikator.join(', <br> '));
+					} else {
+						jQuery("#indikator").text('-');
+					}
+
 					jQuery("#pelaksana").text(response.data.pelaksana || '-');
 					jQuery("#bentuk_kegiatan").text(response.data.bentuk_kegiatan || '-');
 					jQuery("#outcome").text(response.data.outcome || '-');
-
-					if (response.list_pd_koneksi_pokin && response.list_pd_koneksi_pokin.length > 0) {
-						jQuery("#crosscutting").html(
-							response.list_pd_koneksi_pokin.join(', '));
-					} else {
+				
+					if (!response.data_koneksi_pokin_pemda || response.data_koneksi_pokin_pemda.length === 0) {
 						jQuery("#crosscutting").text('-');
+					} else {
+						jQuery("#crosscutting").html(response.data_koneksi_pokin_pemda);
 					}
 
 					toggleSidebar();

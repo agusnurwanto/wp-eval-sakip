@@ -575,7 +575,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 
 					$_prefix_opd = $_where_opd = $id_skpd = '';
-					if (!empty($_POST['tipe_pokin'])) {
+					if (!empty($_POST['tipe_pokin'] == "opd")) {
 						if (!empty($_POST['id_skpd'])) {
 							$id_skpd = $_POST['id_skpd'];
 							$_prefix_opd = $_POST['tipe_pokin'] == "opd" ? "_opd" : "";
@@ -793,6 +793,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					}
 
 					$table_koneksi_pokin = '';
+					$table_koneksi_pokin_pemda = '';
 					$list_pd_koneksi_pokin = [];
 					$no = 1;
 					if (!empty($data_koneksi_pokin)) {
@@ -884,8 +885,14 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								$table_koneksi_pokin .= '
 									<td class="text-center">' . $aksi_koneksi . '</td>
 								</tr>';
-
-								$list_pd_koneksi_pokin[] = $nama_perangkat;
+								if (!empty($v_koneksi_pokin) && $v_koneksi_pokin['status_koneksi'] == 1) {
+									$table_koneksi_pokin_pemda .= '
+										<tr>
+											<td class="text-left" style="width: 270px; border: 1px solid black;">' . $nama_perangkat . '</td>
+											<td class="text-left" style="width: 230px; border: 1px solid black;">' . $v_koneksi_pokin['keterangan_koneksi'] . '</td>
+										</tr>';
+									$list_pd_koneksi_pokin[] = $nama_perangkat;
+								}
 							}
 						}
 					}
@@ -895,13 +902,28 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					} else if (empty($data['nomor_urut'])) {
 						$data['nomor_urut'] = $data['id'];
 					}
-
+					$indikator = $wpdb->get_results($wpdb->prepare("
+						SELECT 
+							label_indikator_kinerja
+						FROM esakip_pohon_kinerja$_prefix_opd 
+						WHERE parent=%d 
+							AND active=%d
+							AND label_indikator_kinerja IS NOT NULL$_where_opd
+					", $_POST['id'], 1),  ARRAY_A);
+					$list_indikator = [];
+					if (!empty($indikator)) {
+					    foreach ($indikator as $row) {
+					        $list_indikator[] = $row['label_indikator_kinerja'];
+					    }
+					}
 					echo json_encode([
-						'status' => true,
-						'data' => $data,
-						'data_croscutting' => $table_croscutting,
-						'data_koneksi_pokin' => $table_koneksi_pokin,
-						'list_pd_koneksi_pokin' => $list_pd_koneksi_pokin
+					    'status' => true,
+					    'data' => $data,
+					    'indikator' => $list_indikator,
+					    'data_croscutting' => $table_croscutting,
+					    'data_koneksi_pokin' => $table_koneksi_pokin,
+					    'data_koneksi_pokin_pemda' => $table_koneksi_pokin_pemda,
+					    'list_pd_koneksi_pokin' => $list_pd_koneksi_pokin
 					]);
 					exit();
 				} else {

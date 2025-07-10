@@ -1943,6 +1943,7 @@ CREATE TABLE `esakip_data_pegawai_simpeg` (
   `id_atasan` int(11) DEFAULT NULL,
   `id_jabatan` VARCHAR(50) DEFAULT NULL,
   `custom_jabatan` TEXT DEFAULT NULL,
+  `plt_plh_teks` TEXT DEFAULT NULL COMMENT 'teks status jabatan (Plt., Plh., Pj. dll..)',
   `created_at` datetime DEFAULT current_timestamp(),
   `update_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id),

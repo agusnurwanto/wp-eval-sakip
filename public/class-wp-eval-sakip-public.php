@@ -33252,6 +33252,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
      * @var string
      */
     private $table_data_pegawai_simpeg = 'esakip_data_pegawai_simpeg';
+    private $table_data_satker_simpeg = 'esakip_data_satker_simpeg';
 
     /**
      * Defines the data format for each column in the table.
@@ -33280,6 +33281,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
         'id_atasan'         => '%d',
         'id_jabatan'        => '%s',
         'custom_jabatan'    => '%s',
+        'plt_plh_teks'    	=> '%s',
         'update_at'         => '%s',
     ];
 
@@ -33342,9 +33344,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
         global $wpdb;
 
         // Prepare the SQL query to prevent SQL injection.
-        $sql = $wpdb->prepare(
-            "SELECT * FROM {$this->table_data_pegawai_simpeg} WHERE id = %d",
-            $id
+        $sql = $wpdb->prepare("
+			SELECT 
+				p.*,
+				s.nama AS nama_bidang 
+			FROM {$this->table_data_pegawai_simpeg} p
+			JOIN {$this->table_data_satker_simpeg} s
+			  ON p.satker_id = s.satker_id
+			WHERE p.id = %d 
+			  AND p.active = 1
+			", $id
         );
 
         // The second parameter, OBJECT, ensures the result is an object.
@@ -33353,37 +33362,184 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
         return $pegawai;
     }
 
-    public function get_data_pegawai_simpeg_by_satker_id($satker_id)
+	 /**
+     * Retrieves a single record from the esakip_data_pegawai_simpeg table by its primary key.
+	 * where pegawai is inactive
+     *
+     * @param int $id The primary key (id) of the record to retrieve.
+     * @return object|null The record as an object, or null if not found or on error.
+     */
+    public function get_data_pegawai_simpeg_inactive_by_id($id)
     {
         global $wpdb;
 
-        $sql = $wpdb->prepare(
-            "SELECT * FROM {$this->table_data_pegawai_simpeg} WHERE satker_id LIKE %s",
-            $satker_id . '%'
+        // Prepare the SQL query to prevent SQL injection.
+        $sql = $wpdb->prepare("
+			SELECT 
+				p.*,
+				s.nama AS nama_bidang 
+			FROM {$this->table_data_pegawai_simpeg} p
+			JOIN {$this->table_data_satker_simpeg} s
+			  ON p.satker_id = s.satker_id
+			WHERE p.id = %d 
+			  AND p.active = 0
+			", $id
         );
 
+        // The second parameter, OBJECT, ensures the result is an object.
         $pegawai = $wpdb->get_row($sql, OBJECT);
 
         return $pegawai;
     }
+
+	/**
+	 * Retrieves all records from the esakip_data_pegawai_simpeg table where satker_id matches the given pattern.
+	 *
+	 * @param string $satker_id The satker_id pattern to match.
+	 * @param bool $all If true, matches all records starting with the satker_id; if false, matches exactly.
+	 * @return array An array of objects representing the matching records.
+	 */
+    public function get_data_pegawai_simpeg_by_satker_id($satker_id)
+    {
+        global $wpdb; 
+
+		$sql = $wpdb->prepare(
+			"SELECT * FROM {$this->table_data_pegawai_simpeg} WHERE satker_id = %s AND active = 1",
+			$satker_id
+		);
+        
+        $pegawai = $wpdb->get_results($sql, OBJECT);
+
+        return $pegawai;
+    }
+
+	/**
+	 * Retrieves a single record from the esakip_data_pegawai_simpeg table where satker_id matches the given satker_id
+	 * and tipe_pegawai_id is 11 (indicating a specific type of employee (KEPALA)).
+	 *
+	 * @param string $satker_id The satker_id to match.
+	 * @return object|null The record as an object, or null if not found or on error.
+	 */
+    public function get_data_pegawai_simpeg_atasan_by_satker_id($satker_id)
+    {
+        global $wpdb; 
+
+		$sql = $wpdb->prepare(
+            "SELECT id FROM {$this->table_data_pegawai_simpeg} WHERE active = 1 AND satker_id = %s AND tipe_pegawai_id = 11",
+            $satker_id
+        );
+
+		$id_pegawai_atasan = $wpdb->get_var($sql);
+
+		if (!empty($id_pegawai_atasan)) {
+			$data_atasan = $this->get_data_pegawai_simpeg_by_id($id_pegawai_atasan);
+			return $data_atasan;
+		}
+
+        return null;
+    }
 	
+	/**
+	 * AJAX handler to get pegawai data by ID.
+	 */
+	public function get_data_pegawai_simpeg_by_id_ajax()
+	{
+		try {
+			$this->functions->validate($_POST, [
+				'api_key' => 'required|string',
+				'id'      => 'required|numeric'
+			]);
+			if ($_POST['api_key'] !== get_option(ESAKIP_APIKEY)) {
+				throw new Exception("API key tidak valid atau tidak ditemukan!", 401);
+			}
+			$pegawai_id = intval($_POST['id']);
+			$data_pegawai = $this->get_data_pegawai_simpeg_by_id($pegawai_id);
+
+			if (!$data_pegawai) {
+				throw new Exception("Data pegawai dengan ID {$pegawai_id} tidak ditemukan.", 404);
+			}
+
+			$satker_id_atasan = null;
+			$data_pegawai->atasan = null;
+
+			$data_pegawai->show_kepala_daerah_option = false; //flag untuk JS
+
+			$is_kepala_definitif = ($data_pegawai->tipe_pegawai_id == 11);
+			$is_plt_plh = ($data_pegawai->plt_plh == 1);
+			$is_di_satker_induk = (strlen($data_pegawai->satker_id) == 2);
+
+			// Kasus 1: Kepala Definitif di Satker Induk. Atasan adalah Kepala Daerah (Definitif).
+			if ($is_di_satker_induk && $is_kepala_definitif) {
+				$nama_kepala_daerah = get_option('_crb_kepala_daerah') ?: 'Kepala Daerah (set di halaman Pengaturan)';
+				$status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') ?: 'Kepala Daerah (set di halaman Pengaturan)';
+				$data_pegawai->atasan = (object) [
+					'id'           => 0, // ID khusus untuk Kepala Daerah
+					'nama_pegawai' => $nama_kepala_daerah,
+					'nip_baru'     => 'Kepala Daerah',
+					'jabatan'      => $status_jabatan_kepala_daerah
+				];
+				$satker_id_atasan = null; // Tidak perlu mencari lagi di DB.
+
+			// Kasus 2: Plt/Plh di Satker Induk. Atasan harus dipilih, opsi Kepala Daerah muncul.
+			} elseif ($is_di_satker_induk && $is_plt_plh) {
+				$data_pegawai->show_kepala_daerah_option = true;
+				$satker_id_atasan = null;
+
+			// Kasus 3: Kepala/Plt di Sub-Satker. Cari atasan di satker induknya.
+			} elseif (!$is_di_satker_induk && ($is_kepala_definitif || $is_plt_plh)) {
+				$satker_id_atasan = substr($data_pegawai->satker_id, 0, -2);
+
+			// Kasus 4: Staf biasa. Cari atasan di satkernya sendiri.
+			} else {
+				$satker_id_atasan = $data_pegawai->satker_id;
+			}
+
+			// Jika $satker_id_atasan ada, cari atasannya di database.
+			if ($satker_id_atasan) {
+				$data_pegawai->atasan = $this->get_data_pegawai_simpeg_atasan_by_satker_id($satker_id_atasan);
+			}
+
+			// Jika data atasan tidak ketemu dan punya riwayat custom atasan
+			if (empty($data_pegawai->atasan) && !empty($data_pegawai->id_atasan)) {
+				$data_pegawai->atasan_custom = $this->get_data_pegawai_simpeg_by_id($data_pegawai->id_atasan);
+			} else {
+				$data_pegawai->atasan_custom = null;
+			}
+
+			echo json_encode([
+				'status'  => true,
+				'message' => 'Data berhasil ditemukan.',
+				'data'    => $data_pegawai
+			]);
+
+		} catch (Exception $e) {
+			$code = is_int($e->getCode()) && $e->getCode() !== 0 ? $e->getCode() : 500;
+            http_response_code($code);
+            echo json_encode([
+				'status'  => false,
+				'message' => $e->getMessage()
+			]);
+		}
+		wp_die();
+	}
+
 	 /**
-     * AJAX handler to get pegawai data by ID.
+     * AJAX handler to get pegawai data by satker id.
      */
-    public function get_data_pegawai_simpeg_by_id_ajax()
+    public function get_data_pegawai_simpeg_by_satker_id_ajax()
     {
         try {
             $this->functions->validate($_POST, [
-                'api_key' => 'required|string',
-                'id'      => 'required|numeric'
+                'api_key'   => 'required|string',
+                'satker_id' => 'required|numeric'
             ]);
 
             if ($_POST['api_key'] !== get_option(ESAKIP_APIKEY)) {
                  throw new Exception("API key tidak valid atau tidak ditemukan!", 401);
             }
 
-            $pegawai_id = intval($_POST['id']);
-            $data_pegawai = $this->get_data_pegawai_simpeg_by_id($pegawai_id);
+            $satker_id = intval($_POST['satker_id']);
+            $data_pegawai = $this->get_data_pegawai_simpeg_by_satker_id($satker_id);
 
             if ($data_pegawai) {
                 echo json_encode([
@@ -33392,7 +33548,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                     'data'    => $data_pegawai
                 ]);
             } else {
-                 throw new Exception("Data pegawai dengan ID {$pegawai_id} tidak ditemukan.", 404);
+                 throw new Exception("Data pegawai dengan satker id = {$satker_id} tidak ditemukan.", 404);
             }
 
         } catch (Exception $e) {
@@ -33406,154 +33562,145 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
         wp_die();
     }
 
-	 /**
-     * AJAX handler to get pegawai data by satker id.
-     */
-    // public function get_data_pegawai_simpeg_by_id_ajax()
-    // {
-    //     try {
-    //         $this->functions->validate($_POST, [
-    //             'api_key'   => 'required|string',
-    //             'satker_id' => 'required|numeric'
-    //         ]);
+	/**
+	 * Retrieves the definitive superior for a given employee.
+	 * This is the central logic for determining superiors.
+	 *
+	 * @param object $pegawai The employee data object.
+	 * @return object|null The superior's data object, a virtual object for Kepala Daerah, or null if no definitive superior is found.
+	 */
+	public function _get_atasan_definitif($pegawai)
+	{
+		global $wpdb;
 
-    //         if ($_POST['api_key'] !== get_option(ESAKIP_APIKEY)) {
-    //              throw new Exception("API key tidak valid atau tidak ditemukan!", 401);
-    //         }
+		$is_kepala_definitif = ($pegawai->tipe_pegawai_id == 11);
+		$is_plt_plh = ($pegawai->plt_plh == 1);
+		$is_di_satker_induk = (strlen($pegawai->satker_id) == 2);
+		$satker_id_atasan = null;
 
-    //         $pegawai_id = intval($_POST['id']);
-    //         $data_pegawai = $this->get_data_pegawai_simpeg_by_id($pegawai_id);
+		// Kasus 1: Kepala Definitif di Satker Induk -> Atasan adalah Kepala Daerah
+		if ($is_di_satker_induk && $is_kepala_definitif) {
+			$nama_kepala_daerah = get_option('_crb_kepala_daerah') ?: 'Kepala Daerah (set di halaman Pengaturan)';
+			$status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') ?: 'Kepala Daerah (set di halaman Pengaturan)';
+				
+			return (object) [
+				'id'           => 0,
+				'nama_pegawai' => $nama_kepala_daerah,
+				'nip_baru'     => 'Kepala Daerah',
+				'jabatan'      => $status_jabatan_kepala_daerah
+			];
+		}
 
-    //         if ($data_pegawai) {
-    //             echo json_encode([
-    //                 'status'  => true,
-    //                 'message' => 'Data berhasil ditemukan.',
-    //                 'data'    => $data_pegawai
-    //             ]);
-    //         } else {
-    //              throw new Exception("Data pegawai dengan ID {$pegawai_id} tidak ditemukan.", 404);
-    //         }
+		// Kasus 2: Plt/Plh di Satker Induk -> Tidak ada atasan definitif
+		if ($is_di_satker_induk && $is_plt_plh) {
+			return null;
+		}
 
-    //     } catch (Exception $e) {
-    //         $code = is_int($e->getCode()) && $e->getCode() !== 0 ? $e->getCode() : 500;
-    //         http_response_code($code);
-    //         echo json_encode([
-	// 			'status'  => false,
-	// 			'message' => $e->getMessage()
-	// 		]);
-    //     }
-    //     wp_die();
-    // }
+		// Kasus 3: Kepala/Plt di Sub-Satker -> Atasan di satker induk
+		if (!$is_di_satker_induk && ($is_kepala_definitif || $is_plt_plh)) {
+			$satker_id_atasan = substr($pegawai->satker_id, 0, -2);
+		}
 
-	 /**
-     * AJAX handler to update atasan for one or more employees.
-     */
-    public function update_atasan_pegawai_ajax()
-    {
-        global $wpdb;
+		// Kasus 4: Staf biasa -> Atasan di satker sendiri
+		if (!$is_kepala_definitif && !$is_plt_plh) {
+			$satker_id_atasan = $pegawai->satker_id;
+		}
 
-        try {
-            // Validate Request using the new helper method
-            $this->functions->validate($_POST, [
-                'api_key'    => 'required|string',
-                'id_pegawai' => 'required|numeric',
-                'id_atasan'  => 'required|numeric',
-            ]);
-            
-            if ($_POST['api_key'] !== get_option(ESAKIP_APIKEY)) {
-                throw new Exception("API key tidak valid atau tidak ditemukan!", 401);
-            }
+		// Jika satker_id_atasan telah ditentukan
+		if ($satker_id_atasan) {
+			return $this->get_data_pegawai_simpeg_atasan_by_satker_id($satker_id_atasan);
+		}
 
-            // Sanitize Inputs
-            $id_pegawai = intval($_POST['id_pegawai']);
-            $id_atasan = intval($_POST['id_atasan']);
-            $jabatan_custom = isset($_POST['jabatan_custom']) ? sanitize_text_field($_POST['jabatan_custom']) : null;
-            $terapkan_all_satker = isset($_POST['terapkan_all_satker']) && $_POST['terapkan_all_satker'] == 1;
+		// Jika tidak ada kasus yang cocok return null
+		return null;
+	}
 
-            // Fetch Employee Data
-            $data_pegawai = $this->get_data_pegawai_simpeg_by_id($id_pegawai);
-            if (!$data_pegawai) {
-                throw new Exception("Pegawai dengan ID {$id_pegawai} tidak ditemukan atau tidak aktif.", 404);
-            }
+	/**
+	 * AJAX handler to update atasan for one or more employees.
+	 */
+	public function update_atasan_pegawai_ajax()
+	{
+		global $wpdb;
 
-			// hanya validasi jika masih dalam status PLT/PLH/PJ
-			$date_hari_ini = current_datetime()->format('Y-m-d H:i:s');
-			if (!$data_pegawai->plt_plh == 1 && $date_hari_ini > $data_pegawai->berakhir) {
-				if ($data_pegawai->tipe_pegawai == 11) {
-					// Cek Atasan Aktif
-					$satker_id_atasan = substr($data_pegawai['satker_id'], 0, -2);
-					$cek_atasan_sql = $wpdb->prepare("
-						SELECT 
-							nama_pegawai,
-							nip_baru,
-							jabatan
-						FROM {$this->table_data_pegawai_simpeg} 
-						WHERE active = 1 
-						  AND satker_id = %s 
-						  AND tipe_pegawai_id = 11
-						", $satker_id_atasan
+		try {
+			$this->functions->validate($_POST, [
+				'api_key'    => 'required|string',
+				'id_pegawai' => 'required|numeric'
+			]);
+
+			if ($_POST['api_key'] !== get_option(ESAKIP_APIKEY)) {
+				throw new Exception("API key tidak valid atau tidak ditemukan!", 401);
+			}
+
+			$id_pegawai = intval($_POST['id_pegawai']);
+			$id_atasan = !empty($_POST['id_atasan']) ? intval($_POST['id_atasan']) : null;
+			$jabatan_custom = isset($_POST['jabatan_custom']) ? sanitize_text_field($_POST['jabatan_custom']) : null;
+			$plt_plh_teks = isset($_POST['plt_plh_teks']) ? sanitize_text_field($_POST['plt_plh_teks']) : null;
+			$terapkan_all_satker = isset($_POST['terapkan_all_satker']) && $_POST['terapkan_all_satker'] == 1;
+
+			// Ambil data pegawai yang akan diedit
+			$data_pegawai = $this->get_data_pegawai_simpeg_by_id($id_pegawai);
+			if (!$data_pegawai) {
+				throw new Exception("Pegawai dengan ID {$id_pegawai} tidak ditemukan.", 404);
+			}
+
+			$message = 'Berhasil Update Data';
+			if ($id_atasan !== null) {
+				// Validasi Atasan Definitif
+				$atasan_definitif = $this->_get_atasan_definitif($data_pegawai);
+				if ($atasan_definitif) {
+					throw new Exception(
+						"Gagal: Pegawai ini sudah memiliki atasan definitif ({$atasan_definitif->nama_pegawai} - {$atasan_definitif->jabatan}). Atasan kustom tidak dapat diterapkan.",
+						409
 					);
-					$atasan_aktif = $wpdb->get_row($cek_atasan_sql);
-				} else {
-					// Cek Atasan Aktif
-					$cek_atasan_sql = $wpdb->prepare("
-						SELECT 
-							nama_pegawai,
-							nip_baru,
-							jabatan
-						FROM {$this->table_data_pegawai_simpeg} 
-						WHERE active = 1 
-						  AND satker_id = %s 
-						  AND tipe_pegawai_id = 11
-						", $data_pegawai->satker_id
-					);
-					$atasan_aktif = $wpdb->get_row($cek_atasan_sql);
 				}
+				
+				// Lakukan Proses Update
+				$date_hari_ini = current_datetime()->format('Y-m-d H:i:s');
 
-				if ($atasan_aktif) {
-					throw new Exception("Pegawai yang dipilih memiliki atasan aktif!\nNama Atasan: {$atasan_aktif->nama_pegawai} | NIP: {$atasan_aktif->nip_baru} | Jabatan: {$atasan_aktif->jabatan}", 409);
+				// Jika terapkan ke seluruh satker
+				if ($terapkan_all_satker) {
+					$pegawai_satu_satker = $this->get_data_pegawai_simpeg_by_satker_id($data_pegawai->satker_id);
+
+					$pegawai_diupdate_count = 0;
+					foreach ($pegawai_satu_satker as $v) {
+						$atasan_definitif = $this->_get_atasan_definitif($v);
+						
+						// HANYA UPDATE jika pegawai tersebut TIDAK punya atasan definitif
+						if (!$atasan_definitif) {
+							$this->update_data_pegawai_simpeg_by_id($v->id, ['id_atasan' => $id_atasan, 'update_at' => $date_hari_ini]);
+							$pegawai_diupdate_count++;
+						}
+					}
+					$message = "Berhasil menerapkan atasan baru kepada {$pegawai_diupdate_count} pegawai di satker ini.";
+				} else {
+					// Jika hanya update satu pegawai
+					$this->update_data_pegawai_simpeg_by_id($id_pegawai, ['id_atasan' => $id_atasan, 'update_at' => $date_hari_ini]);
+					$message = 'Berhasil memperbarui atasan pegawai!';
 				}
 			}
-			
-            // Perform The Update
-            if ($terapkan_all_satker) {
-                $result = $wpdb->query(
-					$wpdb->prepare("
-						UPDATE {$this->table_data_pegawai_simpeg}
-						   SET id_atasan = %d,
-							   update_at = %s
-						WHERE satker_id = %d 
-						  AND tipe_pegawai_id != 11
-						  AND active = 1
-					", $id_atasan, current_time('mysql'), $data_pegawai->satker_id)
-				);
-            } else {
-                $result = $this->update_data_pegawai_simpeg_by_id($id_pegawai, ['id_atasan' => $id_atasan]);
-            }
 
-            // Update Custom Jabatan if provided
-            if ($jabatan_custom) {
-                $this->update_data_pegawai_simpeg_by_id($id_pegawai, ['custom_jabatan' => $jabatan_custom]);
-            }
+			// Update Custom Jabatan jika ada
+			if ($jabatan_custom !== null) {
+				$this->update_data_pegawai_simpeg_by_id($id_pegawai, ['custom_jabatan' => $jabatan_custom, 'update_at' => $date_hari_ini]);
+			}
+			// Update status Jabatan plt plh jika ada dan jika memang plth plh
+			if ($plt_plh_teks !== null && $data_pegawai->plt_plh == 1) {
+				$this->update_data_pegawai_simpeg_by_id($id_pegawai, ['plt_plh_teks' => $plt_plh_teks, 'update_at' => $date_hari_ini]);
+			}
 
-            if ($result === false) {
-                throw new Exception("Gagal memperbarui data atasan di database.", 500);
-            }
-
-            // Success Response
-            echo json_encode([
+			echo json_encode([
 				'status'  => true,
-				'message' => 'Berhasil memperbarui atasan pegawai!'
+				'message' => $message
 			]);
-
-        } catch (Exception $e) {
-            $code = is_int($e->getCode()) && $e->getCode() !== 0 ? $e->getCode() : 500;
-            http_response_code($code);
-            echo json_encode([
-				'status'  => false, 
+		} catch (Exception $e) {
+			$code = is_int($e->getCode()) && $e->getCode() !== 0 ? $e->getCode() : 500;
+			http_response_code($code);
+			echo json_encode([
+				'status' => false,
 				'message' => $e->getMessage()
 			]);
-        }
-        wp_die();
-    }
+		}
+		wp_die();
+	}
 }

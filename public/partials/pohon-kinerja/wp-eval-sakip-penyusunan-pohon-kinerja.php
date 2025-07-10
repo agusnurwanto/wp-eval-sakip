@@ -1411,7 +1411,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 		position: fixed;
 		top: 0;
 		right: 0;
-		width: 380px;
+		width: 600px;
 		height: 100%;
 		z-index: 1050;
 		background-color: #fff;
@@ -1517,22 +1517,32 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 	</div>
 
 	<div class="sidebar-body">
-		<div class="info-section">
+		<div class="info-section text-left">
+			<h6><i class="dashicons dashicons-tag"></i> Kinerja</h6>
+			<p id="label"></p>
+		</div>
+
+		<div class="info-section text-left">
+			<h6><i class="dashicons dashicons-chart-bar"></i> Indikator Kinerja</h6>
+			<p id="indikator"></p>
+		</div>
+
+		<div class="info-section text-left">
 			<h6><i class="dashicons dashicons-admin-users"></i> Pelaksana</h6>
 			<p id="pelaksana"></p>
 		</div>
 
-		<div class="info-section">
+		<div class="info-section text-left">
 			<h6><i class="dashicons dashicons-clipboard"></i> Bentuk Kegiatan</h6>
 			<p id="bentuk_kegiatan"></p>
 		</div>
 
-		<div class="info-section">
+		<div class="info-section text-left">
 			<h6><i class="dashicons dashicons-chart-line"></i> Outcome</h6>
 			<p id="outcome"></p>
 		</div>
 
-		<div class="info-section">
+		<div class="info-section text-left">
 			<h6><i class="dashicons dashicons-groups"></i> Crosscutting Dengan</h6>
 			<p id="crosscutting"></p>
 		</div>
@@ -1713,7 +1723,6 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 	}
 
 	function handleDetailPokin(idPokin) {
-		jQuery('#wrap-loading').show();
 		jQuery.ajax({
 			method: 'POST',
 			url: esakip.url,
@@ -1724,20 +1733,27 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 			},
 			dataType: 'json',
 			success: function(response) {
-				jQuery("#wrap-loading").hide();
 				if (!response.status) {
 					alert(response.message);
 					return;
 				}
+				jQuery("#label").text(response.data.label || '-');
+
+				if (response.indikator && response.indikator.length > 0) {
+					jQuery("#indikator").html(
+						response.indikator.join(', <br> '));
+				} else {
+					jQuery("#indikator").text('-');
+				}
+
 				jQuery("#pelaksana").text(response.data.pelaksana || '-');
 				jQuery("#bentuk_kegiatan").text(response.data.bentuk_kegiatan || '-');
 				jQuery("#outcome").text(response.data.outcome || '-');
-
-				if (response.list_pd_koneksi_pokin && response.list_pd_koneksi_pokin.length > 0) {
-					jQuery("#crosscutting").html(
-						response.list_pd_koneksi_pokin.map(item => item).join(', '));
-				} else {
+				
+				if (!response.data_koneksi_pokin_pemda || response.data_koneksi_pokin_pemda.length === 0) {
 					jQuery("#crosscutting").text('-');
+				} else {
+					jQuery("#crosscutting").html(response.data_koneksi_pokin_pemda);
 				}
 
 				toggleSidebar();
