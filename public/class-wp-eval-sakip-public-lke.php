@@ -3332,7 +3332,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	                    $tbody .= "<td class='text-left'>".$kuesioner['deskripsi']."</td>";
 	                    $tbody .= "<td class='text-center'></td>";
 	                    $tbody .= "<td class='text-center'></td>";
-	                    $tbody .= "<td class='text-center'></td>";
 	                    $tbody .= "<td class='text-center'>" . $btn . "</td>";
 	                    $tbody .= "</tr>";
 
@@ -3352,7 +3351,8 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	                        foreach ($data_kuesioner_detail as $kuesioner_detail) {
 	                            $tbody .= "<tr>";
 
-	                            $btn = '<div class="btn-action-group">';
+	                            $btn  = '<div class="btn-action-group">';
+								$btn .= "<button class='btn btn-success' onclick='handleTambahBuktiDukung(\"" . $kuesioner_detail['id'] . "\");' title='Tambah Bukti Dukung'><span class='dashicons dashicons-insert'></span></button>";
 	                            $btn .= "<button class='btn btn-warning' onclick='edit_data_kuesioner_mendagri_detail(\"" . $kuesioner_detail['id'] . "\");' title='Edit Data Pertanyaan'><span class='dashicons dashicons-edit'></span></button>";
 	                            $btn .= "<button class='btn btn-danger' onclick='hapus_data_kuesioner_mendagri_detail(\"" . $kuesioner_detail['id'] . "\");' title='Hapus Data'><span class='dashicons dashicons-trash'></span></button>";
 	                            $btn .= '</div>';
@@ -3378,10 +3378,41 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						        $tbody .= "<td class='text-center'>" . $level . "</td>";
 
 	                            $tbody .= "<td class='text-left' style='vertical-align: middle;'>" . nl2br($kuesioner_detail['penjelasan']) . "</td>";
-	                            $tbody .= "<td class='text-left'>" . nl2br($kuesioner_detail['jenis_bukti_dukung']) . "</td>";
 	                            $tbody .= "<td class='text-center' style='vertical-align: middle;'>" . $btn . "</td>";
-
 	                            $tbody .= "</tr>";
+
+								$data_dukung = $wpdb->get_results(
+									$wpdb->prepare("
+									SELECT
+										*
+									FROM esakip_data_dukung_kuesioner_mendagri
+									WHERE id_kuesioner_mendagri_detail = %d
+										AND tahun_anggaran = %d
+										AND active = 1
+									", $kuesioner_detail['id'], $tahun_anggaran),
+									ARRAY_A
+								);	
+						
+								if(!empty($data_dukung)) {
+									$no_bukti = 1;
+									foreach ($data_dukung as $bukti) {
+										
+										//Tombol Aksi Bukti Dukung
+										$btn  = '<div class="btn-action-group">';								
+										$btn .= "<button class='btn btn-warning' onclick='handleEditBuktiDukung(\"" . $bukti['id'] . "\");' title='Edit Data Dukung'><span class='dashicons dashicons-edit'></span></button>";
+										$btn .= "<button class='btn btn-danger' onclick='handleHapusBuktiDukung(\"" . $bukti['id'] . "\");' title='Hapus Data'><span class='dashicons dashicons-trash'></span></button>";
+										$btn .= '</div>';
+										
+										//Kolom Tabel Bukti Dukung
+										$tbody .= "<tr class='bukti-dukung'>";
+										$tbody .= "<td></td>"; //no urut utama
+										$tbody .= "<td></td>"; //no urut indikator
+										$tbody .= "<td colspan='3'>" . $no_bukti++ .". " . esc_html($bukti['jenis_bukti_dukung']) . "</td>";
+										$tbody .= "<td>" . esc_html($bukti['dokumen_upload']) . "</td>"; //dokumen upload
+										$tbody .= "<td class='text-center'>{$btn}</td>";
+										$tbody .= "</tr>";
+									}
+								}
 	                        }
 	                    }
 	                }
@@ -3631,9 +3662,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	            } else if (!isset($_POST['penjelasan'])) {
 	                $ret['status'] = 'error';
 	                $ret['message'] = 'Penjelasan tidak boleh kosong!';
-	            } else if (!isset($_POST['jenis_bukti_dukung'])) {
-	                $ret['status'] = 'error';
-	                $ret['message'] = 'Bukti Dukung harus tidak boleh kosong!';
 	            } else if (empty($_POST['tahun_anggaran'])) {
 	                $ret['status'] = 'error';
 	                $ret['message'] = 'Tahun anggaran tidak boleh kosong!';
@@ -3643,7 +3671,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	            $id_pertanyaan = isset($_POST['id_pertanyaan']) && $_POST['id_pertanyaan'] !== '' ? intval($_POST['id_pertanyaan']) : 0;
 	            $indikator = sanitize_text_field($_POST['indikator']);
 	            $penjelasan = sanitize_textarea_field($_POST['penjelasan']);
-	            $jenis_bukti_dukung = sanitize_textarea_field($_POST['jenis_bukti_dukung']);
 	            $tahun_anggaran = sanitize_text_field($_POST['tahun_anggaran']);
 	            $level = intval($_POST['level']);
 
@@ -3653,7 +3680,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	                    'level' => $level,
 	                    'indikator' => $indikator,
 	                    'penjelasan' => $penjelasan,
-	                    'jenis_bukti_dukung' => $jenis_bukti_dukung,
 	                    'tahun_anggaran' => $tahun_anggaran,
 	                    'active' => 1
 	                ));
@@ -3662,7 +3688,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	                    'level' => $level,
 	                    'indikator' => $indikator,
 	                    'penjelasan' => $penjelasan,
-	                    'jenis_bukti_dukung' => $jenis_bukti_dukung,
 	                    'tahun_anggaran' => $tahun_anggaran,
 	                    'active' => 1
 	                ), array('id' => $id_pertanyaan));
@@ -4012,6 +4037,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							'level' => $soal['level'],
 							'penjelasan' => $soal['penjelasan'],
 							'jenis_bukti_dukung' => str_replace("\\n", "\n", $soal['bukti_dukung']),
+							'dokumen_upload' => json_encode([]),
 							'tahun_anggaran' => $tahun_anggaran,
 							'active' => 1
 						);
@@ -4022,10 +4048,31 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								$data,
 								array('id' => $get_data_kuesioner_detail->id)
 							);
+							$id_detail = $get_data_kuesioner_detail->id;
 						} else {
 							$wpdb->insert($table_kuesioner_detail, $data);
+							$id_detail = $wpdb->insert_id;
 						}
-					}
+						$wpdb->delete('esakip_data_dukung_kuesioner_mendagri', array(
+							'id_kuesioner_mendagri_detail' => $id_detail,
+							'tahun_anggaran' => $tahun_anggaran
+						));
+
+						$bukti_list = explode("\n", str_replace("\\n", "\n", $soal['bukti_dukung']));
+						foreach($bukti_list as $bukti) {
+							$bukti = trim($bukti);
+							if (!$bukti) continue;
+
+							$wpdb->insert('esakip_data_dukung_kuesioner_mendagri', array(
+								'id_kuesioner_mendagri_detail' => $id_detail,
+								'jenis_bukti_dukung' => $bukti,
+								'tahun_anggaran' => $tahun_anggaran,
+								'created_at' => current_time('mysql'),
+								'updated_at' => current_time('mysql'),
+								'active' => 1
+							));
+						}
+					}	
 
 				}
 
@@ -4041,6 +4088,180 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				'message'   => 'Format tidak sesuai!'
 			);
 		}
+		die(json_encode($ret));
+	}
+	public function tambah_bukti_dukung_mendagri() 
+	{
+    	global $wpdb;
+	    $ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil menyimpan data bukti dukung!',
+		);	
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$id_bukti = null;
+
+				if (!empty($_POST['id_bukti'])) {
+					$id_bukti = $_POST['id_bukti'];
+					$ret['message'] = 'Berhasil edit bukti dukung!';
+				}
+
+				if (!empty($_POST['id_detail'])) {
+					$id_detail = $_POST['id_detail'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID detail kosong!';
+				}
+
+				if (!empty($_POST['jenis_bukti_dukung'])) {
+					$jenis_bukti_dukung = sanitize_text_field($_POST['jenis_bukti_dukung']);
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Jenis bukti dukung tidak boleh kosong!';
+				}
+
+				$dokumen_upload = !empty($_POST['dokumen_upload']) ? json_encode($_POST['dokumen_upload']) : '';
+
+				if ($ret['status'] === 'success') {
+					$tahun_anggaran = date('Y');
+
+					if (!empty($id_bukti)) {
+						$wpdb->update(
+							'esakip_data_dukung_kuesioner_mendagri',
+							array(
+								'jenis_bukti_dukung' => $jenis_bukti_dukung,
+								'dokumen_upload' => $dokumen_upload,
+								'updated_at' => current_time('mysql'),
+							),
+							array('id' => $id_bukti),
+							array('%s', '%s', '%s'),
+							array('%d')
+						);
+					} else {
+						$wpdb->insert(
+							'esakip_data_dukung_kuesioner_mendagri',
+							array(
+								'id_kuesioner_mendagri_detail' => $id_detail,
+								'jenis_bukti_dukung' => $jenis_bukti_dukung,
+								'dokumen_upload' => $dokumen_upload,	
+								'tahun_anggaran' => $tahun_anggaran,
+								'created_at' => current_time('mysql'),
+								'updated_at' => current_time('mysql'),
+								'active' => 1
+							),
+							array('%d', '%s', '%s', '%d', '%s', '%s', '%d')
+						);
+					}
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'API key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
+		
+		die(json_encode($ret));
+	}
+	public function hapus_bukti_dukung_mendagri()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus bukti dukung!'
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (empty($_POST['id'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID bukti dukung kosong';
+				} else {
+					$wpdb->update(
+						'esakip_data_dukung_kuesioner_mendagri',
+						array('active' => 0),
+						array('id' => intval($_POST['id'])),
+						array('%d'),
+						array('%d')
+					);
+
+				}
+			} else {
+				$ret['status'] = 'error';
+				$ret['message'] = 'API key tidak ditemukan!';
+			}
+		} else {
+			$ret['status'] = 'error';
+			$ret['message'] = 'Format salah!';
+		}
+
+		die(json_encode($ret));
+	}
+	public function get_bukti_dukung_kuesioner_by_id()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil mengambil data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (empty($_POST['id'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID bukti kosong!';
+					die(json_encode($ret));
+				} else if (empty($_POST['tahun_anggaran'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
+					die(json_encode($ret));
+				}
+
+				$get_kuesioner = $wpdb->get_row(
+					$wpdb->prepare("
+					SELECT
+						*
+					FROM esakip_data_dukung_kuesioner_mendagri
+					WHERE id = %d
+						AND	active = 1
+					", $_POST['id']),
+					ARRAY_A
+				);
+
+				if ($get_kuesioner) {
+					$get_data = array(
+						'id_bukti' => $get_kuesioner['id'],
+						'id_detail' => $get_kuesioner['id_kuesioner_mendagri_detail'],
+						'jenis_bukti_dukung' => $get_kuesioner['jenis_bukti_dukung'],
+						'tahun_anggaran' => $get_kuesioner['tahun_anggaran'],
+						'dokumen_upload' => json_decode($get_kuesioner['dokumen_upload'], true),
+					);
+
+					$ret['data']= $get_data;
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Data tidak ditemukan.';
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'API key tida sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
+
 		die(json_encode($ret));
 	}
 }

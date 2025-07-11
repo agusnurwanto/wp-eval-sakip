@@ -46,7 +46,7 @@ $skpd = $wpdb->get_row(
     WHERE id_skpd=%d
       AND tahun_anggaran=%d
       AND active = 1
-", $id_skpd, $input['tahun']),
+", $id_skpd, $tahun_anggaran_sakip),
     ARRAY_A
 );
 if(empty($skpd)){
@@ -114,7 +114,7 @@ if (!empty($data_user_pegawai)) {
                 $satker_pegawai_simpeg,
                 $input['tahun'],
                 1,
-                $input['tahun'],
+                $tahun_anggaran_sakip,
                 1
             ),
             ARRAY_A
@@ -1768,7 +1768,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                         input_pagu = '' +
                             `<div class="form-group row">` +
                                 '<div class="col-md-2">' +
-                                    `<label for="rencana_pagu">Total RHK Level ${pagu_level}</label>` +
+                                    `<label for="rencana_pagu">Akumulasi Pagu</label>` +
                                 '</div>' +
                                 '<div class="col-md-10">' +
                                     `<div class="input-group">` +
@@ -1778,17 +1778,22 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                             '</div>' +
                             `<div class="form-group row">` +
                                 '<div class="col-md-2">' +
-                                    `<label for="total_rincian">Rencana Pagu</label>` +
+                                    `<label for="total_rincian">Jumlah Persen</label>` +
                                 '</div>' +
-                                '<div class="col-md-5">' +
+                                '<div class="col-md-2">' +
                                     `<div class="input-group">` +
                                         `<input type="number" class="form-control" id="total_rincian" max="100" value="100"/>` +
                                     `<span class="input-group-text">%</span>` +
                                     `</div>` +
                                 '</div>' +
+                                '<div class="col-md-1">' +
+                                '</div>' +
+                                '<div class="col-md-2">' +
+                                    `<label for="total_rincian">Rencana Pagu</label>` +
+                                '</div>' +
                                 '<div class="col-md-5">' +
                                     `<div class="input-group">` +
-                                        `<input type="number" disabled class="form-control text-right" id="rencana_pagu" value="` + total_pagu + `" />` +
+                                        `<input type="number" class="form-control text-right" id="rencana_pagu" value="` + total_pagu + `" />` +
                                     `</div>` +
                                 '</div>' +
                             '</div>';
@@ -1962,7 +1967,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                 jQuery("#modal-crud").modal('show');
 
                 jQuery("#total_rincian").on('input', function() {
-                    var persen = parseFloat(jQuery(this).val());
+                    var persen = parseFloat(+jQuery(this).val());
                     var persen_rencana_pagu = parseFloat(jQuery("#rencana_pagu_tk").val());
 
                     if (persen > 100) {
@@ -1977,6 +1982,17 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
 
                     var get_total_pagu = (persen_rencana_pagu * persen) / 100;
                     jQuery("#rencana_pagu").val(setToFixed(get_total_pagu));
+                });
+                jQuery("#rencana_pagu").on('input', function(){
+                    var total_pagu = parseFloat(jQuery("#rencana_pagu_tk").val());
+                    var rencana_pagu = jQuery(this).val();
+                    if(total_pagu == 0){
+                        jQuery("#total_rincian").val(100).trigger('input');
+                    }else if(rencana_pagu == 0){
+                        jQuery("#total_rincian").val(0).trigger('input');
+                    }else{
+                        jQuery("#total_rincian").val((rencana_pagu/total_pagu)*100).trigger('input');
+                    }
                 });
                 resolve();
             });
@@ -2260,7 +2276,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
             var fungsi_tambah = '';
             var id_tabel = '';
             var header_dasar_pelaksanaan = `<th class="text-center" style="width:50px;">Dasar Pelaksanaan</th>`;
-            var header_pagu = `<th class="text-center" style="width:50px;">Rencana Pagu</th>`;
+            var header_pagu = `<th class="text-center" style="width:170px;">Rencana Pagu</th>`;
             let title_cascading = '';
             let rhk_level = '';
 
@@ -2361,10 +2377,10 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                     `<th class="text-center" style="width:40px;">No</th>` +
                                     `<th class="text-center" style="width:300px;">Pohon Kinerja Perangkat Daerah</th>` +
                                     `<th class="text-center">` + title + ` | RHK Level ` + rhk_level + `</th>` +
-                                    `<th class="text-center">` + title_cascading + `</th>` +
+                                    `<th class="text-center" style="width:300px;">` + title_cascading + `</th>` +
                                     `${header_dasar_pelaksanaan}` +
                                     `<th class="text-center" style="width:300px;">Pegawai Pelaksana</th>` +
-                                    `<th class="text-center" style="width:200px;">Aksi</th>` +
+                                    `<th class="text-center" style="width:60px;">Aksi</th>` +
                                 `</tr>` +
                             `</thead>` +
                             `<tbody>`;
@@ -2373,7 +2389,6 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                         var tombol_detail = '';
                         var id_parent_cascading = 0;
                         var label_cascading = '-';
-                        var data_tagging_rincian = '';
                         var label_dasar_pelaksanaan = '';
                         var total_pagu = 0;
                         let get_data_dasar_pelaksanaan = [];
@@ -2386,7 +2401,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                             nama_pegawai += value.detail_satker.nama + '<br>';
                         }
                         if (value.detail_pegawai && value.detail_pegawai.nip_baru) {
-                            nama_pegawai += '<span class="badge badge-primary p-2 mt-2 text-center">' + value.detail_pegawai.nip_baru + ' ' + value.detail_pegawai.nama_pegawai + '</span>';
+                            nama_pegawai += '<span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value.detail_pegawai.nip_baru + ' ' + value.detail_pegawai.nama_pegawai + '</span>';
                         }
                         if(value.input_rencana_pagu_level){
                             set_input_rencana_pagu = value.input_rencana_pagu_level;
@@ -2449,7 +2464,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                         if (tipe == 1) {
                             id_parent_cascading = value['kode_cascading_sasaran'];
                             label_cascading = value['label_cascading_sasaran'] != null ? value['label_cascading_sasaran'] : '-';
-                            tombol_detail = `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, ` + (tipe + 1) + `, ` + JSON.stringify(id_pokin) + `, '` + id_parent_cascading + `')" title="Lihat Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
+                            tombol_detail = `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm mb-1 btn-warning" onclick="lihat_rencana_aksi(${value.id}, ` + (tipe + 1) + `, ` + JSON.stringify(id_pokin) + `, '` + id_parent_cascading + `')" title="Lihat Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                         } else if (tipe == 2) {
                             id_parent_cascading = value['kode_cascading_program'];
                             id_parent_sub_skpd_cascading = value['id_sub_skpd_cascading'] != null ? value['id_sub_skpd_cascading'] : 0;
@@ -2459,7 +2474,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                 label_cascading = value['kode_cascading_program'] + ' ' + nama_prog + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
                             }
 
-                            tombol_detail = `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, ${ (tipe + 1) }, ${ JSON.stringify(id_pokin) }, '${ id_parent_cascading }', ${ id_parent_sub_skpd_cascading })" title="Lihat Uraian Kegiatan Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
+                            tombol_detail = `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm mb-1 btn-warning" onclick="lihat_rencana_aksi(${value.id}, ${ (tipe + 1) }, ${ JSON.stringify(id_pokin) }, '${ id_parent_cascading }', ${ id_parent_sub_skpd_cascading })" title="Lihat Uraian Kegiatan Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                         } else if (tipe == 3) {
                             id_parent_cascading = value['kode_cascading_kegiatan'];
                             id_parent_sub_skpd_cascading = value['id_sub_skpd_cascading'] != null ? value['id_sub_skpd_cascading'] : 0;
@@ -2469,7 +2484,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                 label_cascading = value['kode_cascading_kegiatan'] + ' ' + nama_keg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
                             }
 
-                            tombol_detail = `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" onclick="lihat_rencana_aksi(${value.id}, ${ (tipe + 1) }, ${ JSON.stringify(id_pokin) }, '${ id_parent_cascading }', ${id_parent_sub_skpd_cascading})" title="Lihat Uraian Teknis Kegiatan"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
+                            tombol_detail = `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm mb-1 btn-warning" onclick="lihat_rencana_aksi(${value.id}, ${ (tipe + 1) }, ${ JSON.stringify(id_pokin) }, '${ id_parent_cascading }', ${id_parent_sub_skpd_cascading})" title="Lihat Uraian Teknis Kegiatan"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                         } else if (tipe == 4) {
                             id_pokin = value['id_pokin_5'];
 
@@ -2477,29 +2492,30 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                 let nama_subkeg = value['label_cascading_sub_kegiatan'].split(" ").slice(1).join(" ");
                                 label_cascading = value['kode_cascading_sub_kegiatan'] + ' ' + nama_subkeg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
                             }
-                            data_tagging_rincian = '<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-warning" title="Lihat Data Tagging Rincian Belanja"><i class="dashicons dashicons dashicons-arrow-down-alt2"></i></a> ';
                         }
 
                         // jika input pagu maka ditampilkan sampai sub kegiatan
+                        var bg_input_pagu = '';
                         if(set_input_rencana_pagu == 1){
-                            if(tipe == 1) {
+                            if(tipe <= 1) {
                                 if (value['label_cascading_program']) {
                                     let nama_prog = value['label_cascading_program'];
                                     label_cascading += '</br>'+value['kode_cascading_program'] + ' ' + nama_prog + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
                                 }
                             }
-                            if(tipe == 2) {
+                            if(tipe <= 2) {
                                 if (value['label_cascading_kegiatan']) {
                                     let nama_keg = value['label_cascading_kegiatan'];
                                     label_cascading += '</br>'+value['kode_cascading_kegiatan'] + ' ' + nama_keg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
                                 }
                             }
-                            if(tipe == 3) {
+                            if(tipe <= 3) {
                                 if (value['label_cascading_sub_kegiatan']) {
                                     let nama_subkeg = value['label_cascading_sub_kegiatan'].split(" ").slice(1).join(" ");
                                     label_cascading += '</br>'+value['kode_cascading_sub_kegiatan'] + ' ' + nama_subkeg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
                                 }
                             }
+                            bg_input_pagu = 'style="background: #a1fe86;" title="Checklist Input Pagu RHK"';
                         }
 
                         renaksi += `` +
@@ -2510,7 +2526,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                 `<td class="label_renaksi">${label_cascading}</td>` +
                                 `<td class="label_renaksi">${label_dasar_pelaksanaan}</td>` +
                                 `<td class="pegawai_pelaksana">${nama_pegawai}</td>` +
-                                `<td class="text-center">`;
+                                `<td class="text-center" ${bg_input_pagu}>`;
 
                         // untuk validasi tombol user kepala dan pegawai
                         if (
@@ -2522,15 +2538,15 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                 && nip_pegawai == value.detail_pegawai.nip_baru
                             )
                         ) {
-                            renaksi += `<a href="javascript:void(0)" class="btn btn-sm btn-success" onclick="tambah_indikator_rencana_aksi_baru(${value.id}, ${tipe},${total_pagu}, ${ set_input_rencana_pagu }, '${value.kode_sbl}')" title="Tambah Indikator (Total Pagu: ${formatRupiah(total_pagu)})"><i class="dashicons dashicons-plus"></i></a> `;
+                            renaksi += `<a href="javascript:void(0)" class="btn btn-sm mb-1 btn-success" onclick="tambah_indikator_rencana_aksi_baru(${value.id}, ${tipe},${total_pagu}, ${ set_input_rencana_pagu }, '${value.kode_sbl}')" title="Tambah Indikator (Total Pagu: ${formatRupiah(total_pagu)})"><i class="dashicons dashicons-plus"></i></a> `;
                             renaksi += tombol_detail;
-                            renaksi += `<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, ` + tipe + `)" data-id="${value.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>&nbsp;`;
+                            renaksi += `<a href="javascript:void(0)" onclick="edit_rencana_aksi(${value.id}, ` + tipe + `)" data-id="${value.id}" class="btn btn-sm mb-1 btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i></a>`;
                         }else{
                             renaksi += tombol_detail;
                         }
 
                         if (hak_akses_pegawai == 1) {
-                            renaksi += `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm btn-danger" onclick="hapus_rencana_aksi(${value.id}, ${tipe})" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`;
+                            renaksi += `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm mb-1 btn-danger" onclick="hapus_rencana_aksi(${value.id}, ${tipe})" title="Hapus"><i class="dashicons dashicons-trash"></i></a>`;
                         }
                         renaksi += `` +
                                 `</td>` +
@@ -2550,7 +2566,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                                 `<th class="text-center" style="width:50px;">Target Awal</th>` +
                                                 `<th class="text-center" style="width:50px;">Target Akhir</th>` +
                                                 `${header_pagu}` +
-                                                `<th class="text-center" style="width:200px">Aksi</th>` +
+                                                `<th class="text-center" style="width:125px">Aksi</th>` +
                                             `</tr>` +
                                         `</thead>` +
                                     `<tbody>`;
@@ -2587,8 +2603,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                         `<td class="text-center">${b.target_akhir} ${target_teks_akhir}</td>` +
                                         `<td class="text-right">${formatRupiah(b.rencana_pagu) || 0}</td>` +
                                         `<td class="text-center">` +
-                                            `<input type="checkbox" title="Lihat Rencana Hasil Kerja Per Bulan" class="lihat_bulanan" data-id="${b.id}" onclick="lihat_bulanan(this);" style="margin: 0 6px;">` +
-                                    data_tagging_rincian;
+                                            `<input type="checkbox" title="Lihat Rencana Hasil Kerja Per Bulan" class="lihat_bulanan" data-id="${b.id}" onclick="lihat_bulanan(this);" style="margin: 0 6px 0 0;">`;
                                 if (
                                     hak_akses_pegawai == 1 
                                     || (

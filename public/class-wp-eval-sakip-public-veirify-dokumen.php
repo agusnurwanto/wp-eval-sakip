@@ -2303,7 +2303,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                         <td class='text-left'>" . $v_pgw['jabatan'] . $custom_nama_jabatan . "</td>
                         <td class='text-left'>" . $atasan . "</td>
                         <td class='text-center'>
-                            <button class='btn-sm btn-warning' title='Edit Pegawai'><i class='dashicons dashicons-edit' onclick='editPegawai(" . $v_pgw['id'] . ")'></i></button>
+                            <button class='btn-sm btn-warning' title='Edit Pegawai'><i class='dashicons dashicons-edit' onclick='handleEditPegawai(" . $v_pgw['id'] . ")'></i></button>
                         </td>
                     </tr>";
 
@@ -2375,6 +2375,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                 $data_pegawai = $wpdb->get_results(
                     $wpdb->prepare("
                         SELECT 
+                            p.id,
                             p.nip_baru,
                             p.nama_pegawai,
                             p.satker_id,
@@ -2504,7 +2505,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                     $tbody .= "<td class='text-left'>" . $v_pgw['satker_id'] . "</td>";
                     $tbody .= "<td class='text-left'>" . $v_pgw['nama_bidang'] . "</td>";
                     $tbody .= "<td class='text-left'>" . $v_pgw['tipe_pegawai'] . "</td>";
-                    $tbody .= "<td class='text-left' title='Halaman Detail Perjanjian Kinerja'><a href='" . $detail_laporan_pk['url'] . "&id_skpd=" . $unit['id_skpd'] . "&nip=" . $v_pgw['nip_baru'] . "&satker_id=" . $v_pgw['satker_id'] . "&id_jabatan=" . $v_pgw['id_jabatan'] . "' target='_blank'>" . $v_pgw['nip_baru'] . "</a></td>";
+                    $tbody .= "<td class='text-left' title='Halaman Detail Perjanjian Kinerja'><a href='" . $detail_laporan_pk['url'] . "&id_skpd=" . $unit['id_skpd'] . "&nip=" . $v_pgw['nip_baru'] . "&satker_id=" . $v_pgw['satker_id'] . "&id_jabatan=" . $v_pgw['id_jabatan'] . "&id_pegawai=" . $v_pgw['id'] . "' target='_blank'>" . $v_pgw['nip_baru'] . "</a></td>";
                     $tbody .= "<td class='text-left'>" . $v_pgw['nama_pegawai'] . "</td>";
                     $tbody .= "<td class='text-left'>" . $v_pgw['jabatan'] . "</td>";
                     $tbody .= "<td class='text-center' title='Halaman Detail Rencana Hasil Kerja'><a href='" . $detail_laporan_rhk['url'] . "&id_skpd=" . $unit['id_skpd'] . "&nip=" . $v_pgw['nip_baru'] . "&satker_id=" . $v_pgw['satker_id'] . "' target='_blank'>" . $count_rhk . "</a></td>";
@@ -2516,6 +2517,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                 $data_finalisasi = $wpdb->get_results(
                     $wpdb->prepare("
                         SELECT 
+                            p.id, 
                             pk.nip, 
                             pk.nama_pegawai, 
                             pk.satuan_kerja, 
@@ -2557,7 +2559,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                         $tbody_nonaktif .= "<td class='text-left'>" . $v['satker_id'] . "</td>";
                         $tbody_nonaktif .= "<td class='text-left'>" . $v['nama_skpd'] . "</td>";
                         $tbody_nonaktif .= "<td class='text-left'>" . $v['satuan_kerja'] . "</td>";
-                        $tbody_nonaktif .= "<td class='text-center' title='Halaman Detail Perjanjian Kinerja'><a href='" . $detail_laporan_pk['url'] . "&id_skpd=" . $unit['id_skpd'] . "&nip=" . $v['nip'] . "&satker_id=" . $v['satker_id'] . "' target='_blank'>" . $v['nip'] . "</a></td>";
+                        $tbody_nonaktif .= "<td class='text-center' title='Halaman Detail Perjanjian Kinerja'><a href='" . $detail_laporan_pk['url'] . "&id_skpd=" . $unit['id_skpd'] . "&nip=" . $v['nip'] . "&satker_id=" . $v['satker_id'] . "&id_pegawai=" . $v['id'] . "&inactive=1' target='_blank'>" . $v['nip'] . "</a></td>";
                         $tbody_nonaktif .= "<td class='text-left'>" . $v['nama_pegawai'] . "</td>";
                         $tbody_nonaktif .= "<td class='text-left'>" . $v['jabatan_pegawai'] . "</td>";
                         $tbody_nonaktif .= "<td class='text-center'>" . $count_finalisasi_2 . "</td>";

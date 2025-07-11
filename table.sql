@@ -1943,6 +1943,7 @@ CREATE TABLE `esakip_data_pegawai_simpeg` (
   `id_atasan` int(11) DEFAULT NULL,
   `id_jabatan` VARCHAR(50) DEFAULT NULL,
   `custom_jabatan` TEXT DEFAULT NULL,
+  `plt_plh_teks` TEXT DEFAULT NULL COMMENT 'teks status jabatan (Plt., Plh., Pj. dll..)',
   `created_at` datetime DEFAULT current_timestamp(),
   `update_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id),
@@ -2402,39 +2403,17 @@ CREATE TABLE esakip_dokumen_kuesioner (
   KEY `active` (`active`)
 );
 
-CREATE TABLE `esakip_rpjmd_visi` (
+CREATE TABLE esakip_data_dukung_kuesioner_mendagri (
   `id` int(11) NOT NULL auto_increment,
-  `visi` text DEFAULT null,
-  `id_jadwal` int(11) DEFAULT NULL,
-  `active` tinyint(4) NOT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp(),
-  PRIMARY key (id),
-  KEY `id_jadwal` (`id_jadwal`)
-);
-
-CREATE TABLE `esakip_rpjmd_misi` (
-  `id` int(11) NOT NULL auto_increment,
-  `misi` text DEFAULT null,
-  `id_visi` int(11) DEFAULT NULL,
-  `id_jadwal` int(11) DEFAULT NULL,
-  `active` tinyint(4) NOT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp(),
-  PRIMARY key (id),
-  KEY `id_visi` (`id_visi`),
-  KEY `id_jadwal` (`id_jadwal`)
-);
-
-CREATE TABLE `esakip_rpjmd_misi_detail` (
-  `id` int(11) NOT NULL auto_increment,
-  `id_misi` int(11) DEFAULT null,
-  `id_tujuan` text DEFAULT NULL,
-  `id_jadwal` int(11) DEFAULT NULL,
-  `active` tinyint(4) NOT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp(),
-  PRIMARY key (id),
-  KEY `id_misi` (`id_misi`),
-  KEY `id_jadwal` (`id_jadwal`)
+  `id_kuesioner_mendagri_detail` int(11) DEFAULT NULL,
+  `jenis_bukti_dukung` text DEFAULT NULL,
+  `dokumen_upload` text DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp,
+  `updated_at` datetime DEFAULT current_timestamp,
+  `active` tinyint(4) DEFAULT 1,
+  PRIMARY KEY(id),
+  KEY `id_kuesioner_mendagri_detail` (`id_kuesioner_mendagri_detail`),
+  KEY `tahun_anggaran` (`tahun_anggaran`),
+  KEY `active` (`active`)
 );
