@@ -26,6 +26,8 @@ if (!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggar
 } else {
     $tahun_periode = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
 }
+$jadwal_rpjmd = ($periode['jenis_jadwal_khusus'] ?? '') === 'rpjmd';
+$label_jadwal = $jadwal_rpjmd ? 'RPJMD' : 'RPD';
 
 $data_temp = [''];
 
@@ -94,14 +96,18 @@ $data_temp = [''];
 <div class="container-md" id="container-table-cascading">
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 class="text-center" style="margin:3rem;">Cascading <?php echo $periode['nama_jadwal'] . ' ' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ''; ?></h1>
+            <h1 class="text-center" style="margin:3rem;">Cascading <?php echo $label_jadwal . ' ' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ''; ?></h1>
             <div class="wrap-table">
                 <table id="table_dokumen_cascading" cellpadding="2" cellspacing="0" class="table table-bordered">
                     <thead>
                         <tr>
                             <th class="text-center" style="width: 100px;">No</th>
                             <th class="text-center">Judul Cascading</th>
-                            <th class="text-center" style="width: 50%;">Tujuan RPJMD/RPD</th>
+                            <?php if ($jadwal_rpjmd): ?>
+                            <th class="text-center" style="width: 50%;">Tujuan RPJMD</th>
+                            <?php else: ?>
+                            <th class="text-center" style="width: 50%;">Tujuan RPD</th>
+                            <?php endif; ?>
                             <th class="text-center" style="width: 150px;">Aksi</th>
                         </tr>
                     </thead>

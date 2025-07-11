@@ -1,204 +1,466 @@
 <?php
 if (!defined('WPINC')) {
-	die;
+    die;
 }
 global $wpdb;
-	
+
 $input = shortcode_atts(array(
-	'tahun_anggaran' => '2000'
+    'tahun_anggaran' => '2000'
 ), $atts);
 
 $id_skpd = '';
 if (!empty($_GET) && !empty($_GET['id_skpd'])) {
-	$id_skpd = $_GET['id_skpd'];
+    $id_skpd = $_GET['id_skpd'];
 } else {
-	die('Parameter tidak lengkap!');
+    die('Parameter tidak lengkap!');
 }
 
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 $nama_skpd = $this->get_data_skpd_by_id($id_skpd, $tahun_anggaran_sakip);
 
 $id_satker = $wpdb->get_var(
-	$wpdb->prepare("
-		SELECT 
-			id_satker_simpeg
-		FROM esakip_data_mapping_unit_sipd_simpeg
-		WHERE id_skpd = %d
-		  AND tahun_anggaran = %d
-		  AND active = 1
-	", $id_skpd, $tahun_anggaran_sakip)
+    $wpdb->prepare("
+        SELECT 
+            id_satker_simpeg
+        FROM esakip_data_mapping_unit_sipd_simpeg
+        WHERE id_skpd = %d
+          AND tahun_anggaran = %d
+          AND active = 1
+    ", $id_skpd, $tahun_anggaran_sakip)
 );
 
-//get data simpeg unor
-$error_message = array();
-$simpeg_unor = $this->get_pegawai_simpeg('unor', $id_satker);
-$response = json_decode($simpeg_unor, true);
-if (!isset($response['status']) || $response['status'] === false) {
-	array_push($error_message, $response['message']);
-}
+$halaman_pegawai_skpd = $this->functions->generatePage(array(
+    'nama_page' => 'List Perjanjian Kinerja ' . $input['tahun_anggaran'],
+    'content' => '[list_perjanjian_kinerja tahun_anggaran=' . $input['tahun_anggaran'] . ']',
+    'show_header' => 1,
+    'post_status' => 'private'
+));
+
+// Get kepala daerah and status jabatan for option atasan
+$nama_kepala_daerah = get_option('_crb_kepala_daerah') ?: 'Kepala Daerah (set di halaman Pengaturan)';
+$status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') ?: 'Kepala Daerah (set di halaman Pengaturan)';
 ?>
-<style type="text/css">
-	.wrap-table {
-		overflow: auto;
-		max-height: 100vh;
-		width: 100%;
-	}
+<div class="container-md">
+    <div class="cetak">
+        <div style="padding: 10px;margin:0 0 3rem 0;">
+            <h1 class="text-center">Daftar Pegawai</br><?php echo $nama_skpd['nama_skpd'] ?></br>Tahun Anggaran <?php echo $input['tahun_anggaran']; ?></h1>
+            <h3 class="text-center">Aktif = <span id="p_aktif">0</span> Pegawai || Tidak Aktif = <span id="p_non_aktif">0</span> Pegawai</h3>
+            <div id="action" class="action-section hide-excel"></div>
+            <table id="cetak" title="List Pegawai Laporan Perjanjian Kinerja Perangkat Daerah" class="table table-bordered table_list_pegawai" cellpadding="2" cellspacing="0">
+                <thead style="background: #ffc491;">
+                    <tr>
+                        <th class="text-center" style="width: 30px;" title="Input Rencana Hasil Kerja (RHK) / Rencana Aksi">Aktif<br><input type="checkbox" id="cek_all"></th>
+                        <th class="text-center">Satker ID</th>
+                        <th class="text-center">Satuan Kerja</th>
+                        <th class="text-center">Tipe Pegawai</th>
+                        <th class="text-center">NIP</th>
+                        <th class="text-center">Nama Pegawai</th>
+                        <th class="text-center">Jabatan</th>
+                        <th class="text-center">Atasan</th>
+                        <th class="text-center" style="width: 70px;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-	.btn-action-group {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
+<div class="modal fade" id="modal-edit-pegawai" data-backdrop="static" role="dialog" aria-labelledby="modal-edit-pegawai" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadModalLabel">Edit Pegawai</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" id="id-pegawai">
 
-	.btn-action-group .btn {
-		margin: 0 5px;
-	}
+                    <div class="card mb-3 shadow-lg bg-light">
+                        <div class="card-header font-weight-bold">
+                            Informasi Pegawai
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="nama-pegawai">Nama Pegawai</label>
+                                <input type="text" class="form-control" id="nama-pegawai" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label for="nama-satker">Nama Satuan Kerja</label>
+                                <input type="text" class="form-control" id="nama-satker" disabled>
+                            </div>
+                        </div>
+                    </div>
 
-	.table_list_skpd thead {
-		position: sticky;
-		top: -6px;
-	}
+                    <div class="card mb-3 shadow-md bg-light">
+                        <div class="card-body">
+                            <div class="form-group" id="nama-pegawai-atasan-teks-container">
+                                <label for="nama-pegawai-atasan-teks">Nama Pegawai Atasan</label>
+                                <input type="text" class="form-control" id="nama-pegawai-atasan-teks" disabled>
+                            </div>
+                            <div class="form-group" id="nama-pegawai-atasan-container">
+                                <label for="nama-pegawai-atasan">Pilih Atasan Pegawai</label>
+                                <select class="form-control" id="nama-pegawai-atasan">
+                                </select>
+                            </div>
+                            <div class="alert alert-primary mt-2" role="alert" id="info-atasan-pegawai"></div>
+                            <div class="form-group">
+                                <div class="form-check" id="terapkan-all-satker-container">
+                                    <input type="checkbox" class="form-check-input" id="terapkan-all-satker">
+                                    <label class="form-check-label" for="terapkan-all-satker">
+                                        Terapkan Perubahan ke Seluruh Pegawai di Satuan Kerja Ini
+                                    </label>
+                                    <small class="form-text text-muted">
+                                        Centang jika ingin menerapkan perubahan ini ke seluruh pegawai di satuan kerja <i class="font-weight-bold" id="nama-satker-info"></i> <strong>(pegawai definitif dikecualikan)</strong>. Jangan dicentang jika hanya ingin menerapkan perubahan ke pegawai ini saja.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-	.table_list_skpd thead th {
-		vertical-align: middle;
-	}
+                    <div class="card mb-3 shadow-md bg-light">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="nama-pegawai-atasan">Ubah nama Jabatan Pegawai</label>
+                                <input type="text" class="form-control" id="nama-jabatan-pegawai-custom" placeholder="Masukkan nama jabatan pegawai (opsional)">
+                                <small class="form-text text-muted">
+                                    nama jabatan ini akan digunakan untuk menampilkan nama jabatan pada laporan Perjanjian Kinerja. Jika tidak diisi, akan menggunakan nama jabatan dari data SIMPEG.
+                                </small>
+                            </div>
+                            <div class="form-group" id="plt-plh-teks-container">
+                                <label for="plt-plh-teks">Status Jabatan</label>
+                                <input type="text" class="form-control" id="plt-plh-teks">
+                                <small class="form-text text-muted">
+                                    Wajib diisi karena jabatan non definitif. (Contoh PJ, PLT, PLH dll.)
+                                </small>
+                            </div>
+                        </div>
+                    </div>
 
-	.table_list_skpd tfoot {
-		position: sticky;
-		bottom: 0;
-	}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" onclick="handleUpdatePegawai()">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-	.table_list_skpd tfoot th {
-		vertical-align: middle;
-	}
-</style>
-
-<body>
-	<!-- Error Message -->
-	<?php if (!empty($error_message) && is_array($error_message)) : ?>
-		<div class="container-md mx-auto" style="width: 900px;">
-			<div class="alert alert-danger mt-3">
-				<ul class="mb-0">
-					<?php echo implode('', array_map(fn($msg) => "<li>{$msg}</li>", $error_message)); ?>
-				</ul>
-			</div>
-		</div>
-	<?php endif; ?>
-
-	<div class="container-md">
-		<div class="cetak">
-			<div style="padding: 10px;margin:0 0 3rem 0;">
-				<h1 class="text-center">Laporan Perjanjian Kinerja</br><?php echo $nama_skpd['nama_skpd'] ?></br>Tahun Anggaran <?php echo $input['tahun_anggaran']; ?></h1>
-				<div id="action" class="action-section hide-excel"></div>
-				<div class="wrap-table mt-2">
-					<table id="cetak" title="List Pegawai Laporan Perjanjian Kinerja Perangkat Daerah" class="table table-bordered table_list_pegawai" cellpadding="2" cellspacing="0">
-						<thead style="background: #ffc491;">
-							<tr>
-								<th class="text-center">Satker ID</th>
-								<th class="text-center">Satuan Kerja</th>
-								<th class="text-center">Tipe Pegawai</th>
-								<th class="text-center">NIP</th>
-								<th class="text-center">Nama Pegawai</th>
-								<th class="text-center">Jabatan</th>
-								<th class="text-center">Jumlah RHK</th>
-								<th class="text-center">Jumlah Dokumen Finalisasi</th>
-							</tr>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="container-md" id="pegawai_non_aktif" style="display: none;">
-		<div class="cetak">
-			<div style="padding: 10px;margin:0 0 3rem 0;">
-				<h1 class="text-center">Laporan Perjanjian Kinerja</br><?php echo $nama_skpd['nama_skpd'] ?></br>Pegawai yang tidak aktif</h1>
-				<div class="wrap-table mt-2">
-					<table id="table_pegawai_non_aktif" class="table table-bordered">
-						<thead style="background: #ffc491;">
-							<tr>
-								<th class="text-center">Satker ID</th>
-								<th class="text-center">Perangkat Daerah</th>
-								<th class="text-center">Satuan Kerja</th>
-								<th class="text-center">NIP</th>
-								<th class="text-center">Nama Pegawai</th>
-								<th class="text-center">Jabatan</th>
-								<th class="text-center">Jumlah Dokumen Finalisasi</th>
-							</tr>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="hide-print container mt-4 mb-4 p-4 border rounded bg-light">
-		<h4 class="font-weight-bold mb-3 text-dark">Catatan:</h4>
-		<ul class="pl-3 text-muted">
-			<li>Tabel <strong>"PK Pegawai yang Tidak Aktif"</strong> menampilkan daftar Dokumen PK yang sudah tidak bertugas di Perangkat Daerah terkait, baik karena pensiun, mutasi, atau alasan lainnya.</li>
-			<li>Jumlah dokumen finalisasi dihitung berdasarkan jumlah dokumen yang telah difinalisasi per Perangkat Daerah. Perlu diperhatikan bahwa satu pegawai dapat memiliki dokumen PK di lebih dari satu Perangkat Daerah.</li>
-			<li>Data pegawai dalam dokumen PK diambil secara <strong>real-time</strong> dari aplikasi SIMPEG.</li>
-			<li>Untuk melihat detail dokumen finalisasi, klik pada tautan NIP pegawai. Halaman detail memungkinkan pengguna untuk:
-				<ul>
-					<li>Melakukan finalisasi dokumen</li>
-					<li>Mencetak atau menyimpan dokumen</li>
-					<li>Melihat dokumen PK dalam secara real-time atau versi final yang tersimpan sesuai tahapan</li>
-				</ul>
-			</li>
-		</ul>
-	</div>
-</body>
 <script>
-	jQuery(document).ready(function() {
-		getTablePegawai();
-	});
+    jQuery(document).ready(function() {
+        run_download_excel_sakip();
+        var tombol_aksi = `
+            <a id="singkron-pegawai" onclick="ajax_get_pegawai(); return false;" href="#" class="btn btn-danger"><span class="dashicons dashicons-update-alt"></span>Singkron Pegawai Dengan Data SIMPEG</a>
+            <a target="_blank" href="<?php echo $halaman_pegawai_skpd['url'] . "&id_skpd=" . $id_skpd; ?>" class="btn btn-warning"><span class="dashicons dashicons-groups"></span>Daftar Perjanjian Kinerja Pegawai</a>
+            <br><a onclick="simpan_pegawai(); return false;" href="#" class="btn btn-primary" style="margin-top: 5px;"><span class="dashicons dashicons-saved"></span>Simpan Pegawai Aktif</a>
+        `;
+        jQuery('#action-sakip').append(tombol_aksi);
+        getTablePegawai();
 
-	function getTablePegawai(destroy) {
-		jQuery('#wrap-loading').show();
-		jQuery.ajax({
-			url: esakip.url,
-			type: 'POST',
-			data: {
-				action: 'get_table_pegawai_simpeg_pk',
-				api_key: esakip.api_key,
-				tahun_anggaran: <?php echo $input['tahun_anggaran']; ?>,
-				id_skpd: <?php echo $id_skpd; ?>
-			},
-			dataType: 'json',
-			success: function(response) {
-				jQuery('#wrap-loading').hide();
-				if (response.status === 'success') {
-					if (destroy == 1) {
-						laporan_pk_table.fnDestroy();
-					}
-					if (response.data_non_aktif) {
-						jQuery(`#pegawai_non_aktif`).show()
-						jQuery(`#table_pegawai_non_aktif tbody`).html(response.data_non_aktif)
-						jQuery(`#table_pegawai_non_aktif`).dataTable()
-					}
-					jQuery('.table_list_pegawai tbody').html(response.data);
-					window.laporan_pk_table = jQuery('.table_list_pegawai').dataTable({
-						aLengthMenu: [
-							[5, 10, 25, 50, 100, -1], 
-							[5, 10, 25, 50, 100, "All"]
-						],
-						iDisplayLength: 50,
-						order: []
-					});
-				} else {
-					alert(response.message);
-				}
-			},
-			error: function(xhr, status, error) {
-				jQuery('#wrap-loading').hide();
-				console.error(xhr.responseText);
-				alert('Terjadi kesalahan saat memuat tabel!');
-			}
-		});
-	}
+        jQuery('#cek_all').on('change', function() {
+            if (jQuery(this).is(':checked')) {
+                jQuery('.input_rhk').prop('checked', true);
+            } else {
+                jQuery('.input_rhk').prop('checked', false);
+            }
+        });
+    });
+
+    function ajax_get_pegawai() {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_pegawai_simpeg',
+                api_key: esakip.api_key,
+                type: 'unor',
+                value: '<?php echo $id_satker; ?>',
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                if (response.status == true) {
+                    alert('Berhasil singkron data pegawai SIMPEG!');
+                    getTablePegawai(1);
+                } else {
+                    alert('Gagal singkron data pegawai SIMPEG!');
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan ajax!');
+            }
+        });
+    }
+
+    function simpan_pegawai() {
+        var data = {};
+        jQuery('.input_rhk').map(function(i, b) {
+            var id = jQuery(b).val();
+            if (jQuery(b).is(':checked')) {
+                data[id] = 1;
+            } else {
+                data[id] = 0;
+            }
+        });
+        if (Object.keys(data).length == 0) {
+            return alert('Data pegawai tidak boleh kosong!');
+        }
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'simpan_pegawai_simpeg',
+                api_key: esakip.api_key,
+                tahun_anggaran: <?php echo $input['tahun_anggaran']; ?>,
+                id_skpd: <?php echo $id_skpd; ?>,
+                ids: data
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                alert(response.message);
+                if (response.status == 'success') {
+                    getTablePegawai(1);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan!');
+            }
+        });
+    }
+
+    function getTablePegawai(destroy) {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_table_pegawai_simpeg',
+                api_key: esakip.api_key,
+                tahun_anggaran: <?php echo $input['tahun_anggaran']; ?>,
+                id_skpd: <?php echo $id_skpd; ?>
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                if (response.status == 'success') {
+                    jQuery('#p_aktif').text(response.aktif);
+                    jQuery('#p_non_aktif').text(response.non_aktif);
+                    if (destroy == 1) {
+                        laporan_pk_table.fnDestroy();
+                    }
+                    jQuery('.table_list_pegawai tbody').html(response.data);
+                    window.laporan_pk_table = jQuery('.table_list_pegawai').dataTable({
+                        aLengthMenu: [
+                            [5, 10, 25, 50, 100, -1],
+                            [5, 10, 25, 50, 100, "All"]
+                        ],
+                        iDisplayLength: 50,
+                        order: [],
+                        aoColumnDefs: [{
+                                bSortable: false,
+                                aTargets: [0, 8]
+                            },
+                            {
+                                bSearchable: false,
+                                aTargets: [0, 8]
+                            }
+                        ]
+                    });
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat tabel!');
+            }
+        });
+    }
+
+    function handleEditPegawai(idPegawai) {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_data_pegawai_simpeg_by_id_ajax',
+                api_key: esakip.api_key,
+                id: idPegawai
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (!response.status) {
+                    alert('Gagal memuat data pegawai: ' + response.message);
+                    jQuery('#wrap-loading').hide();
+                    return;
+                }
+
+                const data = response.data;
+                let message = '';
+                let namaSatuanKerja = jQuery('.table_list_pegawai tbody tr[data-id="' + idPegawai + '"] td:nth-child(3)').text();
+
+                // Cek jika ada atasan definitif
+                if (data.atasan) {
+                    message = 'Pegawai memiliki atasan definitif, tidak bisa diubah!';
+
+                    jQuery('#terapkan-all-satker-container').hide();
+                    jQuery('#nama-pegawai-atasan-container').hide();
+                    jQuery('#nama-pegawai-atasan-teks-container').show();
+
+                    jQuery('#nama-pegawai-atasan').val('').trigger('change');
+                    jQuery('#nama-pegawai-atasan-teks').val(`${data.atasan.nama_pegawai} (${data.atasan.nip_baru}) | ${data.atasan.jabatan}`);
+
+                    // Jika tidak ada atasan definitif, izinkan pemilihan manual
+                } else {
+                    message = 'Atasan definitif tidak ditemukan. Silakan pilih atasan pengganti.';
+                    jQuery('#terapkan-all-satker-container').show();
+                    jQuery('#nama-pegawai-atasan-container').show();
+                    jQuery('#nama-pegawai-atasan-teks-container').hide();
+
+                    jQuery('#nama-pegawai-atasan-teks').val('');
+
+                    let pegawaiOptions = '<option value="">-- Pilih Atasan --</option>';
+
+                    // Cek flag dari PHP untuk memunculkan opsi Kepala Daerah
+                    if (data.show_kepala_daerah_option) {
+                        pegawaiOptions += `<option value="0"><?php echo $nama_kepala_daerah; ?> (Kepala Daerah) | <?php echo $status_jabatan_kepala_daerah; ?></option>`;
+                    }
+
+                    // Tentukan satker_id untuk dropdown
+                    let satkerIdDropDown;
+                    const is_kepala_atau_plt = (data.tipe_pegawai_id == "11" || data.plt_plh == "1");
+
+                    if (is_kepala_atau_plt && data.satker_id.length > 2) {
+                        satkerIdDropDown = data.satker_id.slice(0, -2);
+                    } else {
+                        satkerIdDropDown = data.satker_id;
+                    }
+
+                    getPegawaiBySatkerId(satkerIdDropDown)
+                        .done(function(pegawaiResponse) {
+                            if (pegawaiResponse.status && pegawaiResponse.data.length > 0) {
+                                pegawaiResponse.data.forEach(function(pegawai) {
+                                    // Hindari menampilkan diri sendiri di list atasan
+                                    if (pegawai.id != data.id) {
+                                        pegawaiOptions += `<option value="${pegawai.id}">${pegawai.nama_pegawai} (${pegawai.nip_baru}) | ${pegawai.jabatan}</option>`;
+                                    }
+                                });
+                            }
+                            jQuery('#nama-pegawai-atasan').html(pegawaiOptions).select2({
+                                placeholder: '-- Pilih Pegawai Atasan --',
+                                dropdownParent: jQuery('#modal-edit-pegawai .modal-body'),
+                                width: '100%'
+                            });
+
+                            // Set value berdasarkan atasan custom yang sudah tersimpan
+                            if (data.atasan_custom) {
+                                jQuery('#nama-pegawai-atasan').val(data.atasan_custom.id).trigger('change');
+                            } else if (data.is_kepala_daerah_atasan) {
+                                // Jika tidak ada atasan custom tapi seharusnya Kepala Daerah
+                                jQuery('#nama-pegawai-atasan').val('0').trigger('change');
+                            }
+
+                        })
+                        .fail(function(xhr) {
+                            console.error(xhr.responseText);
+                            alert('Terjadi kesalahan saat memuat daftar calon atasan!');
+                        });
+                }
+
+                jQuery('#id-pegawai').val(data.id);
+                jQuery('#nama-pegawai').val(data.nama_pegawai);
+                jQuery('#nama-jabatan-pegawai-custom').val(data.custom_jabatan || data.jabatan + ' ' + namaSatuanKerja);
+                jQuery('#nama-satker').val(namaSatuanKerja);
+                jQuery('#nama-satker-info').text(namaSatuanKerja);
+                jQuery('#info-atasan-pegawai').text(message);
+                jQuery('#terapkan-all-satker').prop('checked', false);
+
+                jQuery('#plt-plh-teks-container').hide();
+                jQuery('#plt-plh-teks').val('');
+                jQuery('#plt-plh-teks').prop('required', false);
+                if (data.plt_plh == "1") {
+                    jQuery('#plt-plh-teks-container').show();
+                    jQuery('#plt-plh-teks').prop('required', true);
+                    jQuery('#plt-plh-teks').val(data.plt_plh_teks);
+                }
+
+                jQuery('#wrap-loading').hide();
+                jQuery('#modal-edit-pegawai').modal('show');
+            },
+            error: function(xhr) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan fatal saat memuat data pegawai!');
+            }
+        });
+    }
+
+    function getPegawaiBySatkerId(satkerId) {
+        return jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_data_pegawai_simpeg_by_satker_id_ajax',
+                api_key: esakip.api_key,
+                satker_id: satkerId
+            },
+            dataType: 'json'
+        });
+    }
+
+    function handleUpdatePegawai() {
+        let idPegawai = jQuery('#id-pegawai').val();
+        let idPegawaiAtasan = jQuery('#nama-pegawai-atasan').val();
+        let namaJabatanCustom = jQuery('#nama-jabatan-pegawai-custom').val();
+        let plt_plh_teks = jQuery('#plt-plh-teks').val();
+        let terapkanAllSatker = jQuery('#terapkan-all-satker').is(':checked') ? 1 : 0;
+
+        if (!idPegawai) {
+            alert('Pegawai harus dipilih!');
+            return;
+        }
+
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'update_atasan_pegawai_ajax',
+                api_key: esakip.api_key,
+                id_pegawai: idPegawai,
+                id_atasan: idPegawaiAtasan,
+                jabatan_custom: namaJabatanCustom,
+                terapkan_all_satker: terapkanAllSatker,
+                plt_plh_teks: plt_plh_teks
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                if (response.status) {
+                    alert(response.message);
+                    getTablePegawai(1); // Refresh the table after update
+                    jQuery('#modal-edit-pegawai').modal('hide');
+                } else {
+                    alert('Gagal memperbarui data pegawai: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memperbarui data pegawai!');
+            }
+        });
+    }
 </script>

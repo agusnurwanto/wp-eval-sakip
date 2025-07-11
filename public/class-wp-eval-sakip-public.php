@@ -953,6 +953,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-list-rencana-aksi-pemda.php';
 	}
 
+	public function list_pengisian_rencana_aksi_pemda_baru($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-rencana-aksi-pemda-baru.php';
+	}
+
 	public function get_detail_renja_rkt_by_id()
 	{
 		global $wpdb;
@@ -20883,13 +20892,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$periode_input_iku_pemda .= '<li><a target="_blank" href="' . $input_iku_pemda['url'] . '" class="btn btn-primary">' . $title . '</a></li>';
 
 			$list_pemda_pengisian_rencana_aksi = $this->functions->generatePage(array(
-				'nama_page' => 'Pengisian Rencana Aksi Pemda Tahun ' . $_GET['tahun'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-				'content' => '[list_pengisian_rencana_aksi_pemda tahun=' . $_GET['tahun'] . ' periode=' . $jadwal_periode_item['id'] . ' ]',
+				'nama_page' => 'Pengisian Rencana Aksi Pemda Baru Tahun ' . $_GET['tahun'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[list_pengisian_rencana_aksi_pemda_baru tahun=' . $_GET['tahun'] . ' periode=' . $jadwal_periode_item['id'] . ' ]',
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
 			$title = 'Rencana Aksi Tahun ' . $_GET['tahun'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
 			$pengisian_rencana_aksi_pemda = '<li><a target="_blank" href="' . $list_pemda_pengisian_rencana_aksi['url'] . '" class="btn btn-primary">' .  $title . '</a></li>';
+
+			$list_pemda_pk = $this->functions->generatePage(array(
+				'nama_page' => 'Laporan PK Pemerintah Daerah Tahun ' . $_GET['tahun'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+				'content' => '[halaman_laporan_pk_pemda tahun=' . $_GET['tahun'] . ' periode=' . $jadwal_periode_item['id'] . ' ]',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title = 'PK (Perjanjian Kinerja) Tahun ' . $_GET['tahun'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+			$pk_pemda = '<li><a target="_blank" href="' . $list_pemda_pk['url'] . '" class="btn btn-primary">' .  $title . '</a></li>';
 		}
 		// PEMDA
 
@@ -21401,6 +21419,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (empty($pengisian_rencana_aksi_pemda)) {
 			$pengisian_rencana_aksi_pemda = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
 		}
+		if (empty($pk_pemda)) {
+			$pk_pemda = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
+		}
 		if (empty($periode_dokumen_pohon_kinerja_pemda)) {
 			$periode_dokumen_pohon_kinerja_pemda = '<li><a return="false" href="#" class="btn btn-secondary">Periode RPJMD kosong atau belum dibuat</a></li>';
 		}
@@ -21477,7 +21498,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($cek_data_perencanaan['pemerintah_daerah']['RPJMD']) && $cek_data_perencanaan['pemerintah_daerah']['RPJMD']['active'] == 1) {
 			$halaman_rpjmd = '
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="rpjmd" style="margin: 0;">RPJMD (Rencana Pembangunan Jangka Menengah Daerah)</h5>
+					<h5 class="esakip-header-tahun" data-id="rpjmd" style="margin: 0;">RPJMD (Rencana Pembangunan Daerah)</h5>
 					<div class="esakip-body-tahun" data-id="rpjmd">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $periode_rpjmd . '
@@ -21646,7 +21667,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$halaman_input_rpjpd_rpjmd .= '
 			<li>
 				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="halaman-input-rpjmd" style="margin: 0;">Buat RPJMD / RPD (Rencana Pembangunan Jangka Menengah Daerah)</h5>
+					<h5 class="esakip-header-tahun" data-id="halaman-input-rpjmd" style="margin: 0;">Buat RPJMD / RPD (Rencana Pembangunan Daerah)</h5>
 					<div class="esakip-body-tahun" data-id="halaman-input-rpjmd">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $halaman_input_rpjmd . '
@@ -21682,6 +21703,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					<div class="esakip-body-tahun" data-id="pengisian-rencana-pemda">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
 							' . $pengisian_rencana_aksi_pemda . '
+						</ul>
+					</div>
+				</div>
+			</li>
+			<li>
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="laporan-pk-pemda" style="margin: 0;">Buat PK (Perjanjian Kinerja)</h5>
+					<div class="esakip-body-tahun" data-id="laporan-pk-pemda">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+							' . $pk_pemda . '
 						</ul>
 					</div>
 				</div>
@@ -21770,6 +21801,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$halaman_perencanaan_opd .= $halaman_input_perangkat_daerah;
 							$halaman_perencanaan_opd .= $halaman_pengisian_rencana_aksi;
 							$halaman_perencanaan_opd .= $pengisian_rencana_aksi;
+							$halaman_perencanaan_opd .= $laporan_pk_btn;
 							$halaman_perencanaan_opd .= $dokumen_perencanaan_opd;
 
 							$set_html_opd_perencanaan = get_option('sakip_menu_khusus_set_html_opd_PERENCANAAN_' . $_GET['tahun']);
@@ -21826,7 +21858,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							// ) {
 								$halaman_sakip_perencanaan_pemda .= $halaman_perencanaan_pemda;
 								$halaman_sakip_perencanaan_pemda .= $halaman_perencanaan_opd;
-								$halaman_sakip_perencanaan_pemda .= $laporan_pk_btn;
 							// }
 			$halaman_sakip_perencanaan_pemda .= '
 						</ul>
@@ -27677,7 +27708,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
-
 	public function esakip_simpan_rpjpd()
 	{
 		global $wpdb;
@@ -27954,7 +27984,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		global $wpdb;
 		$ret = array(
 			'status'  => 'success',
-			'message' => 'Berhasil get data RPD!'
+			'message' => 'Berhasil get data!'
 		);
 
 		if (!empty($_POST)) {
@@ -28152,6 +28182,47 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							if (!empty($tujuan['id_unik_indikator'])) {
 								$data_all[$tujuan['id_unik']]['detail'][] = $tujuan;
 							}
+							$all_misi = $wpdb->get_results($wpdb->prepare("
+							    SELECT 
+							    	id, 
+							    	misi
+							    FROM esakip_rpjmd_misi
+							    WHERE id_jadwal = %d 
+							    	AND active = 1
+							", $_POST['id_jadwal']), ARRAY_A);
+
+							$all_misi_detail = $wpdb->get_results($wpdb->prepare("
+							    SELECT 
+							    	id_misi, 
+							    	id_tujuan
+							    FROM esakip_rpjmd_misi_detail
+							    WHERE id_jadwal = %d 
+							    	AND active = 1
+							", $_POST['id_jadwal']), ARRAY_A);
+
+							$tujuan_misi_map = [];
+							foreach ($all_misi_detail as $row) {
+							    $tujuan_misi_map[$row['id_tujuan']][] = $row['id_misi'];
+							}
+						    $misi_data = [];
+						    $selected_misi = [];
+
+						    foreach ($all_misi as $misi) {
+						        $misi_data[] = array(
+						            'id' => $misi['id'],
+						            'misi' => $misi['misi'],
+						            'id_tujuan' => $tujuan['id_unik'] 
+						        );
+						        if (!empty($tujuan_misi_map[$tujuan['id_unik']]) && in_array($misi['id'], $tujuan_misi_map[$tujuan['id_unik']])) {
+						            $selected_misi[] = $misi['id'];
+						        }
+						    }
+
+						    $data_all[$tujuan['id_unik']]['misi'] = $misi_data;
+						    $data_all[$tujuan['id_unik']]['selected_misi'] = $selected_misi;
+
+
+
 						}
 					} else if ($_POST['table'] == 'esakip_rpd_sasaran') {
 						foreach ($ret['data'] as $sasaran) {
@@ -28279,7 +28350,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		global $wpdb;
 		$ret = array(
 			'status'    => 'success',
-			'message'   => 'Berhasil simpan data RPD!'
+			'message'   => 'Berhasil simpan data!'
 		);
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
@@ -28334,7 +28405,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								"id_unik_indikator" => $_POST['id'],
 								"id_jadwal" => $_POST['id_jadwal']
 							));
-							$ret['message'] = 'Berhasil update data RPD!';
+							$ret['message'] = 'Berhasil update data!';
 						} else {
 							$data['id_unik_indikator'] = $this->generateRandomString(5);
 							$cek_id = $wpdb->get_var($wpdb->prepare("
@@ -28370,7 +28441,44 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								"id_unik" => $_POST['id'],
 								"id_jadwal" => $_POST['id_jadwal']
 							));
-							$ret['message'] = 'Berhasil update data RPD!';
+							if (isset($_POST['selected_misi']) && is_array($_POST['selected_misi'])) {
+						        $selected_misi = array_map('intval', $_POST['selected_misi']);
+
+						        $wpdb->update('esakip_rpjmd_misi_detail', 
+						            ['active' => 0, 'updated_at' => current_time('mysql')],
+						            ['id_tujuan' => $_POST['id'], 
+						            	'id_jadwal' => $_POST['id_jadwal']
+						            ]
+						        );
+
+						        foreach ($selected_misi as $id_misi) {
+						            $id_misi_detail = $wpdb->get_var($wpdb->prepare("
+						                SELECT 
+						                	id 
+						                FROM esakip_rpjmd_misi_detail 
+						                WHERE id_misi = %d 
+						                	AND id_tujuan = %s 
+						                	AND id_jadwal = %d
+						            ", $id_misi, $_POST['id'], $_POST['id_jadwal']));
+
+						            if ($id_misi_detail) {
+						                $wpdb->update('esakip_rpjmd_misi_detail', 
+						                    ['active' => 1, 'updated_at' => current_time('mysql')],
+						                    ['id' => $id_misi_detail]
+						                );
+						            } else {
+						                $wpdb->insert('esakip_rpjmd_misi_detail', array(
+						                    'id_misi'    => $id_misi,
+						                    'id_tujuan'  => $_POST['id'],
+						                    'id_jadwal'  => $_POST['id_jadwal'],
+						                    'active'     => 1,
+						                    'created_at' => current_time('mysql'),
+						                    'updated_at' => current_time('mysql')
+						                ));
+						            }
+						        }
+						    }
+							$ret['message'] = 'Berhasil update data!';
 						} else {
 							$data['id_unik'] = $this->generateRandomString(5);
 							$cek_id = $wpdb->get_var($wpdb->prepare("
@@ -28385,6 +28493,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								$ret['message'] = 'Tujuan teks sudah ada!';
 							} else {
 								$wpdb->insert($table, $data);
+								if (!empty($_POST['selected_misi']) && is_array($_POST['selected_misi'])) {
+		                            foreach ($_POST['selected_misi'] as $id_misi) {
+		                                $wpdb->insert('esakip_rpjmd_misi_detail', [
+		                                    'id_misi' => $id_misi,
+		                                    'id_tujuan' => $data['id_unik'],
+		                                    'id_jadwal' => $_POST['id_jadwal'],
+		                                    'active' => 1,
+		                                    'created_at' => current_time('mysql'),
+		                                    'updated_at' => current_time('mysql')
+		                                ]);
+		                            }
+		                        }
 							}
 						}
 					}
@@ -28437,7 +28557,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								"id_unik_indikator" => $_POST['id'],
 								"id_jadwal" => $_POST['id_jadwal']
 							));
-							$ret['message'] = 'Berhasil update data RPD!';
+							$ret['message'] = 'Berhasil update data!';
 						} else {
 							$data['id_unik_indikator'] = $this->generateRandomString(5);
 							$cek_id = $wpdb->get_var($wpdb->prepare("
@@ -28473,7 +28593,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								"id_unik" => $_POST['id'],
 								"id_jadwal" => $_POST['id_jadwal']
 							));
-							$ret['message'] = 'Berhasil update data RPD!';
+							$ret['message'] = 'Berhasil update data!';
 						} else {
 							$data['id_unik'] = $this->generateRandomString(5);
 							$cek_id = $wpdb->get_var($wpdb->prepare("
@@ -28549,7 +28669,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								"id_unik_indikator" => $_POST['id'],
 								"id_jadwal" => $_POST['id_jadwal']
 							));
-							$ret['message'] = 'Berhasil update data RPD!';
+							$ret['message'] = 'Berhasil update data!';
 						} else {
 							$data['id_unik_indikator'] = $this->generateRandomString(5);
 							$cek_id = $wpdb->get_var($wpdb->prepare("
@@ -28584,7 +28704,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								"id_unik" => $_POST['id'],
 								"id_jadwal" => $_POST['id_jadwal']
 							));
-							$ret['message'] = 'Berhasil update data RPD!';
+							$ret['message'] = 'Berhasil update data!';
 						} else {
 							$data['id_unik'] = $this->generateRandomString(5);
 							$cek_id = $wpdb->get_var($wpdb->prepare("
@@ -28623,7 +28743,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		global $wpdb;
 		$ret = array(
 			'status' => 'success',
-			'message' => 'Berhasil hapus data RPD!',
+			'message' => 'Berhasil hapus data!',
 		);
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] === get_option(ESAKIP_APIKEY)) {
@@ -30946,6 +31066,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			'message' => 'Berhasil get data Kepegawaian!'
 		);
 
+		if(!empty($_POST['debug'])){
+			$startTimeOp1 = microtime(true);
+		}
+
 		if (!get_option('_crb_url_api_simpeg') || !get_option('_crb_authorization_api_simpeg')) {
 			$ret = json_encode([
 				'status'  => false,
@@ -30968,6 +31092,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				exit;
 			}
 			return $ret;
+		}
+
+		if(!empty($_POST['debug'])){
+			$endTimeOp1 = microtime(true);
+			$durationOp1 = $endTimeOp1 - $startTimeOp1;
+			echo "Operasi 1 (cek get_option cek DB) selesai dalam " . number_format($durationOp1, 4) . " detik<br>";
 		}
 
 		try {
@@ -31033,7 +31163,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'header' => array('Authorization: Basic ' . get_option('_crb_authorization_api_simpeg'))
 			);
 
+			if(!empty($_POST['debug'])){
+				$startTimeOp1 = microtime(true);
+			}
+
 			$response = $this->functions->curl_post($option);
+
+			if(!empty($_POST['debug'])){
+				$endTimeOp1 = microtime(true);
+				$durationOp1 = $endTimeOp1 - $startTimeOp1;
+				echo "Operasi 2 (cek curl post ke server simpeg) selesai dalam " . number_format($durationOp1, 4) . " detik<br>";
+			}
 
 			if (empty($response)) {
 				$ret = json_encode([
@@ -31061,6 +31201,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			if (json_last_error() !== JSON_ERROR_NONE) {
 				$ret = json_encode([
 					'status'  => false,
+					'response'  => $response,
 					'message' => json_last_error_msg()
 				]);
 				if (!$type) {
@@ -31071,6 +31212,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			}
 
 			$table = 'esakip_data_pegawai_simpeg';
+
+			if(!empty($_POST['debug'])){
+				$startTimeOp1 = microtime(true);
+			}
 
 			if ($tipe == 'unor' && empty($no_get_child)) {
 				$wpdb->query(
@@ -31143,6 +31288,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$opsi_data_pegawai['jabatan'] 			= $data['jabatan'];
 					$opsi_data_pegawai['tipe_pegawai'] 		= $data['tipe_pegawai'];
 					$opsi_data_pegawai['tipe_pegawai_id'] 	= $data['tipe_pegawai_id'];
+					$opsi_data_pegawai['id_jabatan'] 		= $data['id_jabatan'];
 
 					if (!empty($data['plt_plh'])) {
 						$opsi_data_pegawai['plt_plh'] 		= $data['plt_plh'];
@@ -31174,8 +31320,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 			}
 
+			if(!empty($_POST['debug'])){
+				$endTimeOp1 = microtime(true);
+				$durationOp1 = $endTimeOp1 - $startTimeOp1;
+				echo "Operasi 3 (update pegawai ke db) selesai dalam " . number_format($durationOp1, 4) . " detik<br>";
+			}
+
 			// Get pegawai plt semua sub satker
-			if ($tipe == 'unor' && empty($no_get_child)) {
+			if ($tipe == 'unor' && empty($no_get_child) && false) {
 				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 				
 				// xxxx get plt satker 4 digit
@@ -32635,4 +32787,920 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			return 'title="Anda tidak dapat akses untuk melihat halaman ini!"';
 		}
     }
+
+    public function get_data_visi_misi()
+	{
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+					$visi_misi = $wpdb->get_results($wpdb->prepare("
+						SELECT 
+							*
+						FROM esakip_rpjmd_visi 
+						WHERE active=1 AND
+							id_jadwal=%d
+						ORDER BY id
+					", $_POST['id_jadwal']), 
+					ARRAY_A);
+
+					foreach ($visi_misi as $key => $val) {
+						$visi_misi[$key]['misi'] = $wpdb->get_results($wpdb->prepare("
+						    SELECT
+						        *
+						    FROM esakip_rpjmd_misi 
+						    WHERE id_visi=%d
+						        AND active = 1
+						", $val['id']));
+					}
+
+					die(json_encode([
+						'status' => true,
+						'data' => $visi_misi,
+						'last_sql' => $wpdb->last_query
+					]));
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
+	}
+	
+	public function tambah_visi_rpjmd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$id = null;
+
+				if (!empty($_POST['id'])) {
+					$id = $_POST['id'];
+				}
+
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID jadwal kosong!';
+				}
+				if (!empty($_POST['visi'])) {
+					$visi = $_POST['visi'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Visi kosong!';
+				}
+
+				if ($ret['status'] === 'success') {
+				    if (!empty($id)) {
+				        $wpdb->update(
+				            'esakip_rpjmd_visi',
+				            array(
+				                'visi' => $visi,
+				            ),
+				            array('id' => $id),
+				            array('%s'),
+				            array('%d')
+				        );
+				        $ret['message'] = 'Berhasil update data';
+				    } else {
+				        $wpdb->insert(
+				            'esakip_rpjmd_visi',
+				            array(
+				                'id_jadwal' => $id_jadwal,
+				                'visi' => $visi,
+				                'active' => 1,
+				            ),
+				            array('%d', '%s', '%d')
+				        );
+				        $ret['message'] = 'Berhasil tambah data';
+				    }
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_visi_rpjmd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data'  => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$data = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT 
+								*
+							FROM esakip_rpjmd_visi
+							WHERE id = %d
+						", $_POST['id']),
+						ARRAY_A
+					);
+					if ($data) {
+						$ret['data'] = $data;
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message'   => 'Data Tidak Ditemukan!'
+						);
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_visi_rpjmd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					$cek_id = $wpdb->get_var(
+						$wpdb->prepare("
+							SELECT 
+								id_visi
+							FROM esakip_rpjmd_misi
+							WHERE id_visi=%d
+							  AND active = 1
+						", $_POST['id'])
+					);
+					if (empty($cek_id)) {
+						$ret['data'] = $wpdb->update(
+							'esakip_rpjmd_visi',
+							array('active' => 0),
+							array('id' => $_POST['id'])
+						);
+					} else {
+						$ret = array(
+							'status' => 'error',
+							'message'   => 'Hapus misi terlebih dahulu!'
+						);
+					}
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_misi_rpjmd()
+	{
+	    global $wpdb;
+
+	    $ret = array(
+	        'status' => 'success',
+	        'message' => 'Berhasil get data!',
+	        'data'  => array()
+	    );
+
+	    if (!empty($_POST)) {
+	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+	            if (!empty($_POST['id'])) {
+	                $data_misi = $wpdb->get_row(
+	                    $wpdb->prepare("
+	                        SELECT 
+	                        	* 
+	                        FROM esakip_rpjmd_misi
+	                        WHERE id = %d 
+	                        	AND active = 1
+	                    ", $_POST['id']),
+	                    ARRAY_A
+	                );
+
+	                if (!empty($data_misi)) {
+	                    $data_visi = $wpdb->get_row(
+	                        $wpdb->prepare("
+	                            SELECT 
+	                            	* 
+	                            FROM esakip_rpjmd_visi
+	                            WHERE id = %d
+	                        ", $data_misi['id_visi']),
+	                        ARRAY_A
+	                    );
+
+	                    $ret['data'] = array(
+	                        'misi' => $data_misi,
+	                        'visi' => $data_visi
+	                    );
+	                } else {
+	                    $ret = array(
+	                        'status' => 'error',
+	                        'message' => 'Data Misi tidak ditemukan!'
+	                    );
+	                }
+	            } else {
+	                $ret = array(
+	                    'status' => 'error',
+	                    'message' => 'Id Kosong!'
+	                );
+	            }
+	        } else {
+	            $ret = array(
+	                'status' => 'error',
+	                'message' => 'Api Key tidak sesuai!'
+	            );
+	        }
+	    } else {
+	        $ret = array(
+	            'status' => 'error',
+	            'message' => 'Format tidak sesuai!'
+	        );
+	    }
+
+	    wp_send_json($ret);
+	}
+
+	
+	public function tambah_misi_rpjmd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil tambah data!',
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				$id_misi = null;
+
+				if (!empty($_POST['id_misi'])) {
+					$id_misi = $_POST['id_misi'];
+				}
+
+				if (!empty($_POST['id_visi'])) {
+					$id_visi = $_POST['id_visi'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID visi kosong!';
+				}
+				if (!empty($_POST['id_jadwal'])) {
+					$id_jadwal = $_POST['id_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID jadwal kosong!';
+				}
+				if (!empty($_POST['misi'])) {
+					$misi = $_POST['misi'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Misi kosong!';
+				}
+
+				if ($ret['status'] === 'success') {
+				    if (!empty($id_misi)) {
+				        $wpdb->update(
+				            'esakip_rpjmd_misi',
+				            array(
+				                'misi' => $misi,
+				                'id_visi' => $id_visi,
+				            ),
+				            array('id' => $id_misi),
+				            array('%s'),
+				            array('%d')
+				        );
+				        $ret['message'] = 'Berhasil update data';
+				    } else {
+				        $wpdb->insert(
+				            'esakip_rpjmd_misi',
+				            array(
+				                'id_jadwal' => $id_jadwal,
+				                'misi' => $misi,
+				                'id_visi' => $id_visi,
+				                'active' => 1,
+				            ),
+				            array('%d', '%s', '%d', '%d')
+				        );
+				        $ret['message'] = 'Berhasil tambah data';
+				    }
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function hapus_misi_rpjmd()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil hapus data!',
+			'data' => array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (!empty($_POST['id'])) {
+					if (empty($_POST['id'])) {
+		                $ret['status'] = 'error';
+		                $ret['message'] = 'ID rpjmd kosong!';
+		            }
+	                $wpdb->update(
+	                    'esakip_rpjmd_misi',
+	                    array('active' => 0),
+	                    array('id' => $_POST['id']),
+	                    array('%d')
+	                );
+				} else {
+					$ret = array(
+						'status' => 'error',
+						'message'   => 'Id Kosong!'
+					);
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function esakip_get_rpjmd($res = false, $id_jadwal_rpjmd = false)
+	{
+		global $wpdb;
+		$ret = array(
+			'status'    => 'success',
+			'message'   => 'Berhasil mengambil data RPJPD!',
+			'data'      => []
+		);
+
+		if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+			$table = $_POST['table'];
+
+			if ($table == 'esakip_rpjpd_visi') {
+				$ret['data'] = $wpdb->get_results($wpdb->prepare("
+					SELECT 
+						*
+					FROM esakip_rpjmd_visi 
+					WHERE active=1 AND
+						id_jadwal=%d
+					ORDER BY id
+				", $_POST['id_jadwal']), 
+				ARRAY_A);
+			} 
+			elseif ($table == 'esakip_rpjmd_misi') {
+				$ret['data'] = $wpdb->get_results($wpdb->prepare("
+					SELECT 
+						*
+					FROM esakip_rpjmd_misi 
+					WHERE active=1 AND
+						id_jadwal=%d
+					ORDER BY id
+				", $_POST['id_jadwal']), 
+				ARRAY_A);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message' => 'Api Key tidak sesuai!'
+			);
+		}
+
+		if (!$res) {
+			die(json_encode($ret));
+		} else {
+			return $ret;
+		}
+	}
+
+	// --------------------------------------------------------
+	// --------------------------------------------------------
+    // --- METHOD HANDLER PEGAWAI SIMPEG ---
+    // --------------------------------------------------------
+    // --------------------------------------------------------
+
+    /**
+     * The name of the database table for pegawai simpeg.
+     * @var string
+     */
+    private $table_data_pegawai_simpeg = 'esakip_data_pegawai_simpeg';
+    private $table_data_satker_simpeg = 'esakip_data_satker_simpeg';
+
+    /**
+     * Defines the data format for each column in the table.
+     * This helps in dynamically creating the format array for wpdb->update.
+     * %s for string, %d for integer, %f for float.
+     *
+     * @var array
+     */
+    private $column_data_pegawai_simpeg = [
+        'nip_baru'          => '%s',
+        'nama_pegawai'      => '%s',
+        'pangkat'           => '%s',
+        'gol_ruang'         => '%s',
+        'satker_id'         => '%s',
+        'jabatan'           => '%s',
+        'tipe_pegawai'      => '%s',
+        'tipe_pegawai_id'   => '%s',
+        'gelar_depan'       => '%s',
+        'gelar_belakang'    => '%s',
+        'plt_plh'           => '%s',
+        'tmt_sk_plth'       => '%s',
+        'berakhir'          => '%s',
+        'active'            => '%d',
+        'active_rhk'        => '%d',
+        'eselon_id'         => '%s',
+        'id_atasan'         => '%d',
+        'id_jabatan'        => '%s',
+        'custom_jabatan'    => '%s',
+        'plt_plh_teks'    	=> '%s',
+        'update_at'         => '%s',
+    ];
+
+    /**
+     * Dynamically updates a record in the esakip_data_pegawai_simpeg table.
+     *
+     * This method is designed to handle partial updates securely and efficiently.
+     * It automatically generates the correct data formats for the columns being updated
+     * and sets the 'update_at' field to the current time.
+     *
+     * @param int   $id   The primary key (id) of the record to update.
+     * @param array $data An associative array where keys are column names and values
+     * are the new data for those columns.
+     *
+     * @return int|false The number of rows updated, or false on error.
+     */
+    public function update_data_pegawai_simpeg_by_id($id, $data)
+    {
+        global $wpdb;
+
+        // This prevents unnecessary database calls.
+        if (empty($data) || !is_array($data)) {
+            return false;
+        }
+
+        // This guarantees the 'update_at' field is always current on every update.
+        $data['update_at'] = current_time('mysql');
+
+        // Create the format array based on the keys in the final $data array.
+        $data_formats = [];
+        foreach ($data as $column => $value) {
+            $data_formats[] = $this->column_data_pegawai_simpeg[$column] ?? '%s';
+        }
+
+        // Define the WHERE clause for the update.
+        $where = ['id' => $id];
+
+        // Define the format for the WHERE clause. The 'id' is an integer (%d).
+        $where_format = ['%d'];
+
+        $updated = $wpdb->update(
+            $this->table_data_pegawai_simpeg,
+            $data,
+            $where,
+            $data_formats,
+            $where_format
+        );
+
+        return $updated;
+    }
+
+	 /**
+     * Retrieves a single record from the esakip_data_pegawai_simpeg table by its primary key.
+     *
+     * @param int $id The primary key (id) of the record to retrieve.
+     * @return object|null The record as an object, or null if not found or on error.
+     */
+    public function get_data_pegawai_simpeg_by_id($id)
+    {
+        global $wpdb;
+
+        // Prepare the SQL query to prevent SQL injection.
+        $sql = $wpdb->prepare("
+			SELECT 
+				p.*,
+				s.nama AS nama_bidang 
+			FROM {$this->table_data_pegawai_simpeg} p
+			JOIN {$this->table_data_satker_simpeg} s
+			  ON p.satker_id = s.satker_id
+			WHERE p.id = %d 
+			  AND p.active = 1
+			", $id
+        );
+
+        // The second parameter, OBJECT, ensures the result is an object.
+        $pegawai = $wpdb->get_row($sql, OBJECT);
+
+        return $pegawai;
+    }
+
+	 /**
+     * Retrieves a single record from the esakip_data_pegawai_simpeg table by its primary key.
+	 * where pegawai is inactive
+     *
+     * @param int $id The primary key (id) of the record to retrieve.
+     * @return object|null The record as an object, or null if not found or on error.
+     */
+    public function get_data_pegawai_simpeg_inactive_by_id($id)
+    {
+        global $wpdb;
+
+        // Prepare the SQL query to prevent SQL injection.
+        $sql = $wpdb->prepare("
+			SELECT 
+				p.*,
+				s.nama AS nama_bidang 
+			FROM {$this->table_data_pegawai_simpeg} p
+			JOIN {$this->table_data_satker_simpeg} s
+			  ON p.satker_id = s.satker_id
+			WHERE p.id = %d 
+			  AND p.active = 0
+			", $id
+        );
+
+        // The second parameter, OBJECT, ensures the result is an object.
+        $pegawai = $wpdb->get_row($sql, OBJECT);
+
+        return $pegawai;
+    }
+
+	/**
+	 * Retrieves all records from the esakip_data_pegawai_simpeg table where satker_id matches the given pattern.
+	 *
+	 * @param string $satker_id The satker_id pattern to match.
+	 * @param bool $all If true, matches all records starting with the satker_id; if false, matches exactly.
+	 * @return array An array of objects representing the matching records.
+	 */
+    public function get_data_pegawai_simpeg_by_satker_id($satker_id)
+    {
+        global $wpdb; 
+
+		$sql = $wpdb->prepare(
+			"SELECT * FROM {$this->table_data_pegawai_simpeg} WHERE satker_id = %s AND active = 1",
+			$satker_id
+		);
+        
+        $pegawai = $wpdb->get_results($sql, OBJECT);
+
+        return $pegawai;
+    }
+
+	/**
+	 * Retrieves a single record from the esakip_data_pegawai_simpeg table where satker_id matches the given satker_id
+	 * and tipe_pegawai_id is 11 (indicating a specific type of employee (KEPALA)).
+	 *
+	 * @param string $satker_id The satker_id to match.
+	 * @return object|null The record as an object, or null if not found or on error.
+	 */
+    public function get_data_pegawai_simpeg_atasan_by_satker_id($satker_id)
+    {
+        global $wpdb; 
+
+		$sql = $wpdb->prepare(
+            "SELECT id FROM {$this->table_data_pegawai_simpeg} WHERE active = 1 AND satker_id = %s AND tipe_pegawai_id = 11",
+            $satker_id
+        );
+
+		$id_pegawai_atasan = $wpdb->get_var($sql);
+
+		if (!empty($id_pegawai_atasan)) {
+			$data_atasan = $this->get_data_pegawai_simpeg_by_id($id_pegawai_atasan);
+			return $data_atasan;
+		}
+
+        return null;
+    }
+	
+	/**
+	 * AJAX handler to get pegawai data by ID.
+	 */
+	public function get_data_pegawai_simpeg_by_id_ajax()
+	{
+		try {
+			$this->functions->validate($_POST, [
+				'api_key' => 'required|string',
+				'id'      => 'required|numeric'
+			]);
+			if ($_POST['api_key'] !== get_option(ESAKIP_APIKEY)) {
+				throw new Exception("API key tidak valid atau tidak ditemukan!", 401);
+			}
+			$pegawai_id = intval($_POST['id']);
+			$data_pegawai = $this->get_data_pegawai_simpeg_by_id($pegawai_id);
+
+			if (!$data_pegawai) {
+				throw new Exception("Data pegawai dengan ID {$pegawai_id} tidak ditemukan.", 404);
+			}
+
+			$satker_id_atasan = null;
+			$data_pegawai->atasan = null;
+
+			$data_pegawai->show_kepala_daerah_option = false; //flag untuk JS
+
+			$is_kepala_definitif = ($data_pegawai->tipe_pegawai_id == 11);
+			$is_plt_plh = ($data_pegawai->plt_plh == 1);
+			$is_di_satker_induk = (strlen($data_pegawai->satker_id) == 2);
+
+			// Kasus 1: Kepala Definitif di Satker Induk. Atasan adalah Kepala Daerah (Definitif).
+			if ($is_di_satker_induk && $is_kepala_definitif) {
+				$nama_kepala_daerah = get_option('_crb_kepala_daerah') ?: 'Kepala Daerah (set di halaman Pengaturan)';
+				$status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') ?: 'Kepala Daerah (set di halaman Pengaturan)';
+				$data_pegawai->atasan = (object) [
+					'id'           => 0, // ID khusus untuk Kepala Daerah
+					'nama_pegawai' => $nama_kepala_daerah,
+					'nip_baru'     => 'Kepala Daerah',
+					'jabatan'      => $status_jabatan_kepala_daerah
+				];
+				$satker_id_atasan = null; // Tidak perlu mencari lagi di DB.
+
+			// Kasus 2: Plt/Plh di Satker Induk. Atasan harus dipilih, opsi Kepala Daerah muncul.
+			} elseif ($is_di_satker_induk && $is_plt_plh) {
+				$data_pegawai->show_kepala_daerah_option = true;
+				$satker_id_atasan = null;
+
+			// Kasus 3: Kepala/Plt di Sub-Satker. Cari atasan di satker induknya.
+			} elseif (!$is_di_satker_induk && ($is_kepala_definitif || $is_plt_plh)) {
+				$satker_id_atasan = substr($data_pegawai->satker_id, 0, -2);
+
+			// Kasus 4: Staf biasa. Cari atasan di satkernya sendiri.
+			} else {
+				$satker_id_atasan = $data_pegawai->satker_id;
+			}
+
+			// Jika $satker_id_atasan ada, cari atasannya di database.
+			if ($satker_id_atasan) {
+				$data_pegawai->atasan = $this->get_data_pegawai_simpeg_atasan_by_satker_id($satker_id_atasan);
+			}
+
+			// Jika data atasan tidak ketemu dan punya riwayat custom atasan
+			if (empty($data_pegawai->atasan) && !empty($data_pegawai->id_atasan)) {
+				$data_pegawai->atasan_custom = $this->get_data_pegawai_simpeg_by_id($data_pegawai->id_atasan);
+			} else {
+				$data_pegawai->atasan_custom = null;
+			}
+
+			echo json_encode([
+				'status'  => true,
+				'message' => 'Data berhasil ditemukan.',
+				'data'    => $data_pegawai
+			]);
+
+		} catch (Exception $e) {
+			$code = is_int($e->getCode()) && $e->getCode() !== 0 ? $e->getCode() : 500;
+            http_response_code($code);
+            echo json_encode([
+				'status'  => false,
+				'message' => $e->getMessage()
+			]);
+		}
+		wp_die();
+	}
+
+	 /**
+     * AJAX handler to get pegawai data by satker id.
+     */
+    public function get_data_pegawai_simpeg_by_satker_id_ajax()
+    {
+        try {
+            $this->functions->validate($_POST, [
+                'api_key'   => 'required|string',
+                'satker_id' => 'required|numeric'
+            ]);
+
+            if ($_POST['api_key'] !== get_option(ESAKIP_APIKEY)) {
+                 throw new Exception("API key tidak valid atau tidak ditemukan!", 401);
+            }
+
+            $satker_id = intval($_POST['satker_id']);
+            $data_pegawai = $this->get_data_pegawai_simpeg_by_satker_id($satker_id);
+
+            if ($data_pegawai) {
+                echo json_encode([
+                    'status'  => true,
+                    'message' => 'Data berhasil ditemukan.',
+                    'data'    => $data_pegawai
+                ]);
+            } else {
+                 throw new Exception("Data pegawai dengan satker id = {$satker_id} tidak ditemukan.", 404);
+            }
+
+        } catch (Exception $e) {
+            $code = is_int($e->getCode()) && $e->getCode() !== 0 ? $e->getCode() : 500;
+            http_response_code($code);
+            echo json_encode([
+				'status'  => false,
+				'message' => $e->getMessage()
+			]);
+        }
+        wp_die();
+    }
+
+	/**
+	 * Retrieves the definitive superior for a given employee.
+	 * This is the central logic for determining superiors.
+	 *
+	 * @param object $pegawai The employee data object.
+	 * @return object|null The superior's data object, a virtual object for Kepala Daerah, or null if no definitive superior is found.
+	 */
+	public function _get_atasan_definitif($pegawai)
+	{
+		global $wpdb;
+
+		$is_kepala_definitif = ($pegawai->tipe_pegawai_id == 11);
+		$is_plt_plh = ($pegawai->plt_plh == 1);
+		$is_di_satker_induk = (strlen($pegawai->satker_id) == 2);
+		$satker_id_atasan = null;
+
+		// Kasus 1: Kepala Definitif di Satker Induk -> Atasan adalah Kepala Daerah
+		if ($is_di_satker_induk && $is_kepala_definitif) {
+			$nama_kepala_daerah = get_option('_crb_kepala_daerah') ?: 'Kepala Daerah (set di halaman Pengaturan)';
+			$status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') ?: 'Kepala Daerah (set di halaman Pengaturan)';
+				
+			return (object) [
+				'id'           => 0,
+				'nama_pegawai' => $nama_kepala_daerah,
+				'nip_baru'     => 'Kepala Daerah',
+				'jabatan'      => $status_jabatan_kepala_daerah
+			];
+		}
+
+		// Kasus 2: Plt/Plh di Satker Induk -> Tidak ada atasan definitif
+		if ($is_di_satker_induk && $is_plt_plh) {
+			return null;
+		}
+
+		// Kasus 3: Kepala/Plt di Sub-Satker -> Atasan di satker induk
+		if (!$is_di_satker_induk && ($is_kepala_definitif || $is_plt_plh)) {
+			$satker_id_atasan = substr($pegawai->satker_id, 0, -2);
+		}
+
+		// Kasus 4: Staf biasa -> Atasan di satker sendiri
+		if (!$is_kepala_definitif && !$is_plt_plh) {
+			$satker_id_atasan = $pegawai->satker_id;
+		}
+
+		// Jika satker_id_atasan telah ditentukan
+		if ($satker_id_atasan) {
+			return $this->get_data_pegawai_simpeg_atasan_by_satker_id($satker_id_atasan);
+		}
+
+		// Jika tidak ada kasus yang cocok return null
+		return null;
+	}
+
+	/**
+	 * AJAX handler to update atasan for one or more employees.
+	 */
+	public function update_atasan_pegawai_ajax()
+	{
+		global $wpdb;
+
+		try {
+			$this->functions->validate($_POST, [
+				'api_key'    => 'required|string',
+				'id_pegawai' => 'required|numeric'
+			]);
+
+			if ($_POST['api_key'] !== get_option(ESAKIP_APIKEY)) {
+				throw new Exception("API key tidak valid atau tidak ditemukan!", 401);
+			}
+
+			$id_pegawai = intval($_POST['id_pegawai']);
+			$id_atasan = !empty($_POST['id_atasan']) ? intval($_POST['id_atasan']) : null;
+			$jabatan_custom = isset($_POST['jabatan_custom']) ? sanitize_text_field($_POST['jabatan_custom']) : null;
+			$plt_plh_teks = isset($_POST['plt_plh_teks']) ? sanitize_text_field($_POST['plt_plh_teks']) : null;
+			$terapkan_all_satker = isset($_POST['terapkan_all_satker']) && $_POST['terapkan_all_satker'] == 1;
+
+			// Ambil data pegawai yang akan diedit
+			$data_pegawai = $this->get_data_pegawai_simpeg_by_id($id_pegawai);
+			if (!$data_pegawai) {
+				throw new Exception("Pegawai dengan ID {$id_pegawai} tidak ditemukan.", 404);
+			}
+
+			$message = 'Berhasil Update Data';
+			if ($id_atasan !== null) {
+				// Validasi Atasan Definitif
+				$atasan_definitif = $this->_get_atasan_definitif($data_pegawai);
+				if ($atasan_definitif) {
+					throw new Exception(
+						"Gagal: Pegawai ini sudah memiliki atasan definitif ({$atasan_definitif->nama_pegawai} - {$atasan_definitif->jabatan}). Atasan kustom tidak dapat diterapkan.",
+						409
+					);
+				}
+				
+				// Lakukan Proses Update
+				$date_hari_ini = current_datetime()->format('Y-m-d H:i:s');
+
+				// Jika terapkan ke seluruh satker
+				if ($terapkan_all_satker) {
+					$pegawai_satu_satker = $this->get_data_pegawai_simpeg_by_satker_id($data_pegawai->satker_id);
+
+					$pegawai_diupdate_count = 0;
+					foreach ($pegawai_satu_satker as $v) {
+						$atasan_definitif = $this->_get_atasan_definitif($v);
+						
+						// HANYA UPDATE jika pegawai tersebut TIDAK punya atasan definitif
+						if (!$atasan_definitif) {
+							$this->update_data_pegawai_simpeg_by_id($v->id, ['id_atasan' => $id_atasan, 'update_at' => $date_hari_ini]);
+							$pegawai_diupdate_count++;
+						}
+					}
+					$message = "Berhasil menerapkan atasan baru kepada {$pegawai_diupdate_count} pegawai di satker ini.";
+				} else {
+					// Jika hanya update satu pegawai
+					$this->update_data_pegawai_simpeg_by_id($id_pegawai, ['id_atasan' => $id_atasan, 'update_at' => $date_hari_ini]);
+					$message = 'Berhasil memperbarui atasan pegawai!';
+				}
+			}
+
+			// Update Custom Jabatan jika ada
+			if ($jabatan_custom !== null) {
+				$this->update_data_pegawai_simpeg_by_id($id_pegawai, ['custom_jabatan' => $jabatan_custom, 'update_at' => $date_hari_ini]);
+			}
+			// Update status Jabatan plt plh jika ada dan jika memang plth plh
+			if ($plt_plh_teks !== null && $data_pegawai->plt_plh == 1) {
+				$this->update_data_pegawai_simpeg_by_id($id_pegawai, ['plt_plh_teks' => $plt_plh_teks, 'update_at' => $date_hari_ini]);
+			}
+
+			echo json_encode([
+				'status'  => true,
+				'message' => $message
+			]);
+		} catch (Exception $e) {
+			$code = is_int($e->getCode()) && $e->getCode() !== 0 ? $e->getCode() : 500;
+			http_response_code($code);
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+		}
+		wp_die();
+	}
 }

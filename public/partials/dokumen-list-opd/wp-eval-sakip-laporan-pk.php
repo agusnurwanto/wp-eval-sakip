@@ -70,7 +70,7 @@ foreach ($idtahun as $val) {
 				<h1 class="text-center table-title">Laporan Perjanjian Kinerja </br>Tahun Anggaran <?php echo $input['tahun']; ?></h1>
 				<div id="action" class="action-section hide-excel"></div>
 				<div class="wrap-table">
-					<table id="cetak" title="Laporan Perjanjian Kinerja Perangkat Daerah" class="table table-bordered table_dokumen_skpd" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;">
+					<table id="cetak" title="Laporan Perjanjian Kinerja Perangkat Daerah" class="table table-bordered table_dokumen_skpd" cellpadding="2" cellspacing="0">
 						<thead style="background: #ffc491;">
 							<tr>
 								<th class="text-center">Nama Perangkat Daerah</th>

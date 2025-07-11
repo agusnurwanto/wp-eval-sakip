@@ -409,26 +409,25 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								FROM esakip_koneksi_pokin_pemda_opd
 								WHERE parent_pohon_kinerja=%d
 								  AND active = 1
-								  AND status_koneksi = 1
 							", $pokin['id']), ARRAY_A);
-							if(!empty($crosscutting)){
-								foreach($crosscutting as $v){
+							if (!empty($crosscutting)) {
+								foreach ($crosscutting as $v) {
 									// skpd dan uptd
-									if($v['tipe'] == 1 || $v['tipe'] == 3){
-										if(!empty($nama_cross['skpd'][$v['id_skpd_koneksi']])){
+									if ($v['tipe'] == 1 || $v['tipe'] == 3) {
+										if (!empty($nama_cross['skpd'][$v['id_skpd_koneksi']])) {
 											$data['data'][$pokin['id']]['crosscutting'][] = $nama_cross['skpd'][$v['id_skpd_koneksi']]['nama_skpd'];
-										}else{
-											$data['data'][$pokin['id']]['crosscutting'][] = 'ID SKPD '.$v['id_skpd_koneksi'].' tidak ditemukan';
+										} else {
+											$data['data'][$pokin['id']]['crosscutting'][] = 'ID SKPD ' . $v['id_skpd_koneksi'] . ' tidak ditemukan';
 										}
-									// lembaga lainnya
-									}else if($v['tipe'] == 2){
-										if(!empty($nama_cross['lembaga'][$v['id_skpd_koneksi']])){
+										// lembaga lainnya
+									} else if ($v['tipe'] == 2) {
+										if (!empty($nama_cross['lembaga'][$v['id_skpd_koneksi']])) {
 											$data['data'][$pokin['id']]['crosscutting'][] = $nama_cross['lembaga'][$v['id_skpd_koneksi']]['nama_lembaga'];
-										}else{
-											$data['data'][$pokin['id']]['crosscutting'][] = 'ID Lembaga '.$v['id_skpd_koneksi'].' tidak ditemukan';
+										} else {
+											$data['data'][$pokin['id']]['crosscutting'][] = 'ID Lembaga ' . $v['id_skpd_koneksi'] . ' tidak ditemukan';
 										}
-									// desa
-									}else if($v['tipe'] == 4){
+										// desa
+									} else if ($v['tipe'] == 4) {
 										$data['data'][$pokin['id']]['crosscutting'][] = $v['nama_desa'];
 									}
 								}
@@ -446,7 +445,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						}
 					}
 
-					if(!empty($dataParent)){
+					if (!empty($dataParent)) {
 						foreach ($dataParent as $v_parent) {
 
 							if (empty($data['parent'][$v_parent['label_parent_1']])) {
@@ -500,7 +499,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					if (empty($_POST['id_jadwal'])) {
 						throw new Exception("Id Jadwal Kosong!", 1);
 					}
-					
+
 					$_prefix_opd = $_where_opd = $id_skpd = '';
 					if (!empty($_POST['tipe_pokin'])) {
 						if (!empty($_POST['id_skpd'])) {
@@ -576,7 +575,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 
 					$_prefix_opd = $_where_opd = $id_skpd = '';
-					if (!empty($_POST['tipe_pokin'])) {
+					if (!empty($_POST['tipe_pokin'] == "opd")) {
 						if (!empty($_POST['id_skpd'])) {
 							$id_skpd = $_POST['id_skpd'];
 							$_prefix_opd = $_POST['tipe_pokin'] == "opd" ? "_opd" : "";
@@ -794,6 +793,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					}
 
 					$table_koneksi_pokin = '';
+					$table_koneksi_pokin_pemda = '';
+					$list_pd_koneksi_pokin = [];
 					$no = 1;
 					if (!empty($data_koneksi_pokin)) {
 						$nama_cross = $this->get_nama_crosscuttin();
@@ -828,31 +829,31 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							} else {
 								$nama_perangkat = '';
 								// skpd dan uptd
-								if($v_koneksi_pokin['tipe'] == 1 || $v_koneksi_pokin['tipe'] == 3){
-									if(!empty($nama_cross['skpd'][$v_koneksi_pokin['id_skpd_koneksi']])){
+								if ($v_koneksi_pokin['tipe'] == 1 || $v_koneksi_pokin['tipe'] == 3) {
+									if (!empty($nama_cross['skpd'][$v_koneksi_pokin['id_skpd_koneksi']])) {
 										$nama_perangkat = $nama_cross['skpd'][$v_koneksi_pokin['id_skpd_koneksi']]['nama_skpd'];
-									}else{
-										$nama_perangkat = 'ID SKPD '.$v_koneksi_pokin['id_skpd_koneksi'].' tidak ditemukan';
+									} else {
+										$nama_perangkat = 'ID SKPD ' . $v_koneksi_pokin['id_skpd_koneksi'] . ' tidak ditemukan';
 									}
-								// lembaga lainnya
-								}else if($v_koneksi_pokin['tipe'] == 2){
-									if(!empty($nama_cross['lembaga'][$v_koneksi_pokin['id_skpd_koneksi']])){
+									// lembaga lainnya
+								} else if ($v_koneksi_pokin['tipe'] == 2) {
+									if (!empty($nama_cross['lembaga'][$v_koneksi_pokin['id_skpd_koneksi']])) {
 										$nama_perangkat = $nama_cross['lembaga'][$v_koneksi_pokin['id_skpd_koneksi']]['nama_lembaga'];
-									}else{
-										$nama_perangkat = 'ID Lembaga '.$v_koneksi_pokin['id_skpd_koneksi'].' tidak ditemukan';
+									} else {
+										$nama_perangkat = 'ID Lembaga ' . $v_koneksi_pokin['id_skpd_koneksi'] . ' tidak ditemukan';
 									}
-								// desa
-								}else if($v_koneksi_pokin['tipe'] == 4){
+									// desa
+								} else if ($v_koneksi_pokin['tipe'] == 4) {
 									$nama_perangkat = $v_koneksi_pokin['nama_desa'];
 								}
 
-								$keterangan_tolak = (!empty($v_koneksi_pokin['keterangan_tolak'])) ? ' | '.$v_koneksi_pokin['keterangan_tolak'] : '';
+								$keterangan_tolak = (!empty($v_koneksi_pokin['keterangan_tolak'])) ? '<hr><small class="text-muted">Keterangan ditolak : <br>' . $v_koneksi_pokin['keterangan_tolak'] . '</small>' : '';
 								$table_koneksi_pokin .= '
 									<tr>
 										<td class="text-center">' . $no++ . '</td>
 										<td class="text-left">' . $nama_perangkat . '</td>
 										<td class="text-center font-weight-bold ' . $text_color . '">' . $status_koneksi . '</td>
-										<td>' . $v_koneksi_pokin['keterangan_koneksi'].$keterangan_tolak . '</td>';
+										<td>' . $v_koneksi_pokin['keterangan_koneksi'] . $keterangan_tolak . '</td>';
 
 								$aksi_koneksi = '';
 								if ($v_koneksi_pokin['tipe'] != 1) {
@@ -861,12 +862,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 											<div class="btn btn-sm m-2 btn-warning" title="Edit Koneksi" onclick="handleFormEditKoneksiPokin(' . $v_koneksi_pokin['id'] . ', ' . $data['id'] . ', this)">
 												<span class="dashicons dashicons-edit"></span>
 											</div>
-											<div class="btn btn-sm m-2 btn-danger" title="Hapus Koneksi" onclick="handleDeleteKoneksiPokin(' . $v_koneksi_pokin['id'] . ', '. $data['id'] .', ' . $data['parent'] . ', ' . $data['level'] . ')">
+											<div class="btn btn-sm m-2 btn-danger" title="Hapus Koneksi" onclick="handleDeleteKoneksiPokin(' . $v_koneksi_pokin['id'] . ', ' . $data['id'] . ', ' . $data['parent'] . ', ' . $data['level'] . ')">
 												<span class="dashicons dashicons-trash"></span>
 											</div>';
 									} else {
 										$aksi_koneksi .= '
-											<div class="btn btn-sm m-2 btn-danger" title="Hapus Koneksi" onclick="handleDeleteKoneksiPokin(' . $v_koneksi_pokin['id'] . ', '. $data['id'] .', ' . $data['parent'] . ', ' . $data['level'] . ')">
+											<div class="btn btn-sm m-2 btn-danger" title="Hapus Koneksi" onclick="handleDeleteKoneksiPokin(' . $v_koneksi_pokin['id'] . ', ' . $data['id'] . ', ' . $data['parent'] . ', ' . $data['level'] . ')">
 												<span class="dashicons dashicons-trash"></span>
 											</div>';
 									}
@@ -875,7 +876,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 										$aksi_koneksi .= '<div> - </div>';
 									} else {
 										$aksi_koneksi .= '
-											<div class="btn btn-sm m-2 btn-danger" title="Hapus Koneksi" onclick="handleDeleteKoneksiPokin(' . $v_koneksi_pokin['id'] . ', '. $data['id'] .', ' . $data['parent'] . ', ' . $data['level'] . ')">
+											<div class="btn btn-sm m-2 btn-danger" title="Hapus Koneksi" onclick="handleDeleteKoneksiPokin(' . $v_koneksi_pokin['id'] . ', ' . $data['id'] . ', ' . $data['parent'] . ', ' . $data['level'] . ')">
 												<span class="dashicons dashicons-trash"></span>
 											</div>';
 									}
@@ -884,6 +885,14 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								$table_koneksi_pokin .= '
 									<td class="text-center">' . $aksi_koneksi . '</td>
 								</tr>';
+								if (!empty($v_koneksi_pokin) && $v_koneksi_pokin['status_koneksi'] == 1) {
+									$table_koneksi_pokin_pemda .= '
+										<tr>
+											<td class="text-left" style="width: 270px; border: 1px solid black;">' . $nama_perangkat . '</td>
+											<td class="text-left" style="width: 230px; border: 1px solid black;">' . $v_koneksi_pokin['keterangan_koneksi'] . '</td>
+										</tr>';
+									$list_pd_koneksi_pokin[] = $nama_perangkat;
+								}
 							}
 						}
 					}
@@ -893,12 +902,28 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					} else if (empty($data['nomor_urut'])) {
 						$data['nomor_urut'] = $data['id'];
 					}
-
+					$indikator = $wpdb->get_results($wpdb->prepare("
+						SELECT 
+							label_indikator_kinerja
+						FROM esakip_pohon_kinerja$_prefix_opd 
+						WHERE parent=%d 
+							AND active=%d
+							AND label_indikator_kinerja IS NOT NULL$_where_opd
+					", $_POST['id'], 1),  ARRAY_A);
+					$list_indikator = [];
+					if (!empty($indikator)) {
+					    foreach ($indikator as $row) {
+					        $list_indikator[] = $row['label_indikator_kinerja'];
+					    }
+					}
 					echo json_encode([
-						'status' => true,
-						'data' => $data,
-						'data_croscutting' => $table_croscutting,
-						'data_koneksi_pokin' => $table_koneksi_pokin
+					    'status' => true,
+					    'data' => $data,
+					    'indikator' => $list_indikator,
+					    'data_croscutting' => $table_croscutting,
+					    'data_koneksi_pokin' => $table_koneksi_pokin,
+					    'data_koneksi_pokin_pemda' => $table_koneksi_pokin_pemda,
+					    'list_pd_koneksi_pokin' => $list_pd_koneksi_pokin
 					]);
 					exit();
 				} else {
@@ -916,9 +941,11 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		}
 	}
 
-	public function get_nama_crosscuttin(){
+	public function get_nama_crosscuttin()
+	{
 		global $wpdb;
-		$unit_koneksi = $wpdb->get_results("
+		$unit_koneksi = $wpdb->get_results(
+			"
 				SELECT 
 					nama_skpd, 
 					id_skpd, 
@@ -929,16 +956,18 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 				WHERE active=1 
 				GROUP BY id_skpd
 				ORDER BY kode_skpd ASC
-			", ARRAY_A
+			",
+			ARRAY_A
 		);
 		$all_skpd = array();
-		if(!empty($unit_koneksi)){
+		if (!empty($unit_koneksi)) {
 			foreach ($unit_koneksi as $v_unit) {
 				$all_skpd[$v_unit['id_skpd']] = $v_unit;
 			}
 		}
 
-		$lembaga = $wpdb->get_results("
+		$lembaga = $wpdb->get_results(
+			"
 				SELECT 
 					*
 				FROM esakip_data_lembaga_lainnya 
@@ -947,9 +976,9 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 			ARRAY_A
 		);
 		$all_lembaga = array();
-		if(!empty($lembaga)){
+		if (!empty($lembaga)) {
 			foreach ($lembaga as $v) {
-				$all_lembaga[$v['id']] =$v;
+				$all_lembaga[$v['id']] = $v;
 			}
 		}
 		return array(
@@ -996,13 +1025,13 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					if (empty($input['no_urut'])) {
 						$input['no_urut'] = $input['id'];
 					}
-					if(empty($input['pelaku'])){
+					if (empty($input['pelaku'])) {
 						$input['pelaku'] = '';
 					}
-					if(empty($input['bentuk_kegiatan'])){
+					if (empty($input['bentuk_kegiatan'])) {
 						$input['bentuk_kegiatan'] = '';
 					}
-					if(empty($input['outcome'])){
+					if (empty($input['outcome'])) {
 						$input['outcome'] = '';
 					}
 					$data = array(
@@ -1068,16 +1097,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 			if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 
-					$column_parent = 'cc.parent';
-					$where_clause = '';
 					$_prefix_opd = $_where_opd = $id_skpd = '';
 					if (!empty($_POST['tipe_pokin'])) {
 						if (!empty($_POST['id_skpd'])) {
 							$id_skpd = $_POST['id_skpd'];
 							$_prefix_opd = $_POST['tipe_pokin'] == "opd" ? "_opd" : "";
 							$_where_opd = $_POST['tipe_pokin'] == "opd" ? $wpdb->prepare(' AND id_skpd = %d', $id_skpd) : '';
-							$column_parent = 'cc.parent_pohon_kinerja';
-							$where_clause = $wpdb->prepare(' AND cc.id_skpd_croscutting=%d AND cc.parent_croscutting=%d AND cc.status_croscutting=1', $id_skpd, $_POST['id']);
 						} else {
 							throw new Exception("Id SKPD tidak ditemukan!", 1);
 						}
@@ -1091,47 +1116,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							  AND label_indikator_kinerja IS NOT NULL
 							  AND active=%d
 							$_where_opd
-						", $_POST['id'], 1), 
+						", $_POST['id'], 1),
 						ARRAY_A
 					);
 
 					if (!empty($indikator)) {
 						throw new Exception("Indikator harus dihapus dulu!", 1);
-					}
-
-					// cek croscutting
-					$croscutting = $wpdb->get_row(
-						$wpdb->prepare("
-							SELECT 
-								pk.id as id_pokin,
-								cc.id as id_croscutting
-							FROM esakip_pohon_kinerja$_prefix_opd as pk
-							JOIN esakip_croscutting$_prefix_opd as cc
-							  ON pk.id = $column_parent 
-							WHERE pk.id = %d
-							  AND cc.active = %d
-							  AND pk.active = %d
-							  $_where_opd
-						", $_POST['id'], 1, 1),
-						ARRAY_A
-					);
-
-					$croscutting_pengusul = $wpdb->get_row(
-						$wpdb->prepare("
-							SELECT 
-								pk.id as id_pokin,
-								cc.id as id_croscutting
-							FROM esakip_croscutting$_prefix_opd as cc
-							JOIN esakip_pohon_kinerja$_prefix_opd as pk
-							  ON $column_parent = pk.id
-							WHERE cc.active = %d
-							$where_clause
-						", 1),
-						ARRAY_A
-					);
-
-					if (!empty($croscutting) || !empty($croscutting_pengusul)) {
-						throw new Exception("Croscutting harus dihapus/ditolak dahulu!", 1);
 					}
 
 					$child = $wpdb->get_results(
@@ -1151,82 +1141,49 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						throw new Exception("Pohon kinerja level " . $child[0]['level'] . " harus dihapus dulu!", 1);
 					}
 
-					// cek koneksi pokin pemda
+					// cek koneksi croscutting
+					$cek_crosscutting = [];
 					if ($_prefix_opd == '') {
-						// cek delete pokin pemda
-						$data_koneksi_pokin = $wpdb->get_results(
+						$cek_crosscutting = $wpdb->get_row(
 							$wpdb->prepare("
-								SELECT 
-									koneksi.id as id_koneksi,
-									pk.id as id_pokin
-								FROM esakip_koneksi_pokin_pemda_opd koneksi
-								LEFT JOIN esakip_pohon_kinerja as pk 
-									   ON koneksi.parent_pohon_kinerja  = pk.id
-								WHERE koneksi.parent_pohon_kinerja=%d 
-								  AND koneksi.active=1 
-								  AND koneksi.status_koneksi=1
-								  AND pk.active=1
-								ORDER BY koneksi.id
+								SELECT
+									pk.id as id_pokin,
+									pk.label as label_pokin,
+									cc.id as id_croscutting,
+									cc.parent_pohon_kinerja as parent_croscutting
+								FROM esakip_pohon_kinerja pk
+								JOIN esakip_koneksi_pokin_pemda_opd cc
+								  ON cc.parent_pohon_kinerja = pk.id
+								WHERE cc.active = 1
+								  AND pk.active = 1
+								  AND parent_pohon_kinerja = %d
 							", $_POST['id']),
 							ARRAY_A
 						);
-
-						if (!empty($data_koneksi_pokin)) {
-							throw new Exception("Koneksi Pohon Kinerja Pemda dan Perangkat Daerah harus ditolak dahulu!\nTolak/Batal dilakukan Perangkat Daerah terkait!", 1);
-						}
 					} else {
-						// cek delete pokin opd
-						$data_koneksi_pokin = $wpdb->get_results(
+						$cek_crosscutting = $wpdb->get_results(
 							$wpdb->prepare("
 								SELECT 
-									koneksi.id AS id_koneksi,
-									pk.id AS id_pokin
-								FROM esakip_koneksi_pokin_pemda_opd koneksi
+									pk.id AS id_pokin,
+									cc.id AS id_koneksi
+								FROM esakip_koneksi_pokin_pemda_opd cc
 								LEFT JOIN esakip_pohon_kinerja_opd AS pk 
-									   ON koneksi.parent_pohon_kinerja_koneksi = pk.id
-								WHERE koneksi.parent_pohon_kinerja_koneksi = %d 
-								  AND koneksi.active = 1 
-								  AND koneksi.status_koneksi = 1
-								  AND pk.id_skpd = %d
+									   ON cc.parent_pohon_kinerja_koneksi = pk.id
+								WHERE cc.parent_pohon_kinerja_koneksi = %d 
+								  AND cc.active = 1 
 								  AND pk.active = 1
-								ORDER BY koneksi.id
+								  AND pk.id_skpd = %d
 							", $_POST['id'], $id_skpd),
 							ARRAY_A
 						);
+					}
 
-						if (!empty($data_koneksi_pokin)) {
-							throw new Exception("Koneksi Pohon Kinerja Pemda dan Perangkat Daerah harus dipindah level/ditolak dahulu!", 1);
-						}
+					if (!empty($cek_crosscutting)) {
+						throw new Exception("Data pohon kinerja memiliki crosscutting aktif!\nMohon hapus data crosscutting terlebih dahulu!", 1);
 					}
 
 					if ($_prefix_opd == '') {
 						// untuk pemda
-						// delete data koneksi yang tidak terkoneksi dengan opd
-						$delete_koneksi_pokin = $wpdb->get_results(
-							$wpdb->prepare("
-								SELECT 
-									koneksi.id as id_koneksi,
-									pk.id as id_pokin
-								FROM esakip_koneksi_pokin_pemda_opd koneksi
-								LEFT JOIN esakip_pohon_kinerja as pk ON koneksi.parent_pohon_kinerja  = pk.id
-								WHERE koneksi.parent_pohon_kinerja = %d 
-								  AND pk.active = 1
-								  AND koneksi.active = 1
-								ORDER BY koneksi.id
-							", $_POST['id']),
-							ARRAY_A
-						);	
-
-						if (!empty($delete_koneksi_pokin)) {
-							foreach ($delete_koneksi_pokin as $v_d_koneksi) {
-								$wpdb->update(
-									'esakip_koneksi_pokin_pemda_opd',
-									['active' => 0],
-									['id' => $v_d_koneksi['id_koneksi']]
-								);
-							}
-						}
-
 						$wpdb->update(
 							'esakip_pohon_kinerja',
 							['active' => 0],
@@ -1238,8 +1195,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							'esakip_pohon_kinerja_opd',
 							['active' => 0],
 							[
-							'id' => $_POST['id'],
-							'id_skpd' => $id_skpd
+								'id' => $_POST['id'],
+								'id_skpd' => $id_skpd
 							]
 						);
 					}
@@ -1270,7 +1227,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		try {
 			if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-					
+
 					$input = json_decode(stripslashes($_POST['data']), true);
 
 					if (empty($_POST['id_jadwal'])) {
@@ -1881,6 +1838,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					", $tujuan['id_unik']),
 					ARRAY_A
 				);
+				$jumlah_indikator_tujuan = count($indikator_tujuan);
+
 				if ($tujuan['id_isu'] != 0) {
 					//cari misi berdasarkan isu
 					$id_isu_rpjpd = $wpdb->get_var(
@@ -1916,12 +1875,32 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						", $sasaran_rpjpd),
 						ARRAY_A
 					);
-				}
 
-				// misi rpjpd
-				$misi_rpjpd_html = '';
-				foreach ($misi_rpjpd as $misi) {
-					$misi_rpjpd_html .= $misi['misi_teks'];
+				}
+				$misi_html = '';
+				$jenis_misi_teks = '';
+				if ($jenis_jadwal == 'rpjmd') {
+				    $misi_rpjmd = $wpdb->get_results(
+				        $wpdb->prepare("
+				            SELECT 
+				            	m.misi
+				            FROM esakip_rpjmd_misi_detail d
+				            JOIN esakip_rpjmd_misi m ON d.id_misi = m.id
+				            	AND d.active = m.active
+				            WHERE d.id_tujuan = %s
+				              AND d.active = 1
+				        ", $tujuan['id_unik']),
+				        ARRAY_A
+				    );
+				    foreach ($misi_rpjmd as $misi) {
+				        $misi_html .= $misi['misi'] . '<br>';
+				    }
+					$jenis_misi_teks = 'MISI RPJMD';
+				} else {
+				    foreach ($misi_rpjpd as $misi) {
+				        $misi_html .= $misi['misi_teks'] . '<br>';
+				    }
+					$jenis_misi_teks = 'ISU RPJPD';
 				}
 
 				// sasaran rpd
@@ -1967,6 +1946,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						$data_sasaran .= '<td class="text-center" width="' . $width_ind_sasaran . '%"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . $ind['indikator_teks'] . '</button></td>';
 						$data_program .= '<td class="text-center" width="' . $width_ind_sasaran . '%"><ul class="list-skpd" style="list-style-type: none; margin: 0; padding: 0;">';
 
+						$mapping_skpd_program = [];
+
 						// indikator sasaran sasaran rpd
 						$skpd_program = $wpdb->get_results(
 							$wpdb->prepare("
@@ -1979,17 +1960,37 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							", $ind['id_unik'], $ind['id_unik_indikator']),
 							ARRAY_A
 						);
+						
+						//urusan pengampu skpds views once
 						foreach ($skpd_program as $prog) {
-							$data_program .= '<li style="margin-bottom:14px;"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . $prog['nama_skpd'] . '</button></li>';
+							$mapping_skpd_program[$prog['id_unit']] = $prog;	
 						}
+						if (!empty($mapping_skpd_program)) {
+							foreach ($mapping_skpd_program as $prog) {
+								$data_program .= '
+									<li style="margin-bottom:14px;">
+										<button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . $prog['nama_skpd'] . '</button>
+									</li>';
+							}
+						}
+
 						if (empty($skpd_program)) {
-							$data_program .= '<li style="margin-bottom:14px;"><button class="btn btn-lg btn-warning"></button></li>';
+							$data_program .= '
+								<li style="margin-bottom:14px;">
+									<button class="btn btn-lg btn-warning"></button>
+								</li>';
 						}
 						$data_program .= '</ul></td>';
 					}
 					if (empty($data_sasaran)) {
-						$data_sasaran = '<td class="text-center" width="' . $width_ind_sasaran . '%"><button class="btn btn-lg btn-warning"></button></td>';
-						$data_program = '<td class="text-center" width="' . $width_ind_sasaran . '%"><button class="btn btn-lg btn-warning"></button></td>';
+						$data_sasaran = '
+							<td class="text-center" width="' . $width_ind_sasaran . '%">
+								<button class="btn btn-lg btn-warning"></button>
+							</td>';
+						$data_program = '
+							<td class="text-center" width="' . $width_ind_sasaran . '%">
+								<button class="btn btn-lg btn-warning"></button>
+							</td>';
 					}
 					$indikator_sasarans = array_merge($indikator_sasarans, $indikator_sasaran);
 				}
@@ -2007,8 +2008,9 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 				// indikator tujuan rpd
 				$indikator_tujuan_html = '';
 				$data = '';
+				$colspan_ind_tujuan = $jumlah_indikator_tujuan ? $colspan_tujuan / $jumlah_indikator_tujuan : $colspan_tujuan;
 				foreach ($indikator_tujuan as $ind) {
-					$data .= '<td class="text-center" colspan="' . $colspan_tujuan . '"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . $ind['indikator_teks'] . '</button></td>';
+					$data .= '<td class="text-center" colspan="' . $colspan_ind_tujuan . '"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . $ind['indikator_teks'] . '</button></td>';
 				}
 				if (empty($data)) {
 					$data = '<td class="text-center" colspan="' . $colspan_tujuan . '"><button class="btn btn-lg btn-warning"></button></td>';
@@ -2038,8 +2040,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						<table id="tabel-cascading">
 							<tbody>
 								<tr>
-									<td class="text-center" style="width: 200px;"><button class="btn btn-lg btn-info">MISI RPJPD</button></td>
-									<td class="text-center" colspan="' . $colspan_tujuan . '"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . $misi_rpjpd_html . '</button></td>
+									<td class="text-center" style="width: 200px;"><button class="btn btn-lg btn-info">' . $jenis_misi_teks . '</button></td>
+									<td class="text-center" colspan="' . $colspan_tujuan . '"><button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . $misi_html . '</button></td>
 								</tr>
 								<tr>
 									<td class="text-center"><button class="btn btn-lg btn-info">TUJUAN ' . strtoupper($jenis_jadwal) . '</button></td>
@@ -3413,7 +3415,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									'periode' => $opsi['periode'],
 									'id_parent' => $koneksi_pokin['id_parent']
 								));
-							} 
+							}
 
 							if (!empty($data_parent_tujuan)) {
 								$id_level_1_parent = $data_parent_tujuan['id'];
@@ -7861,24 +7863,24 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						throw new Exception("Data Crosscutting / Pelaksana Kegiatan tidak boleh kosong!", 1);
 					}
 					$id_skpd_koneksi = 0;
-					if(!empty($input['skpdKoneksi'])){
+					if (!empty($input['skpdKoneksi'])) {
 						$id_skpd_koneksi = $input['skpdKoneksi'];
 					}
 					$id_lembaga_lainnya_koneksi = 0;
-					if(!empty($input['skpdKoneksiLainnya'])){
+					if (!empty($input['skpdKoneksiLainnya'])) {
 						$id_lembaga_lainnya_koneksi = $input['skpdKoneksiLainnya'];
 					}
 					$id_uptd_koneksi = 0;
-					if(!empty($input['skpdKoneksiUptd'])){
+					if (!empty($input['skpdKoneksiUptd'])) {
 						$id_uptd_koneksi = $input['skpdKoneksiUptd'];
 					}
 					$id_desa_koneksi = 0;
-					if(!empty($input['skpdKoneksiDesa'])){
+					if (!empty($input['skpdKoneksiDesa'])) {
 						$id_desa_koneksi = $input['skpdKoneksiDesa'];
 					}
 
 					$keterangan_koneksi = '';
-					if(!empty($input['keterangan_koneksi'])){
+					if (!empty($input['keterangan_koneksi'])) {
 						$keterangan_koneksi = $input['keterangan_koneksi'];
 					}
 					$parent_pokin_id = $input['parentKoneksi'];
@@ -9021,11 +9023,11 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 				}
 
 				$wpdb->update(
-					'esakip_data_lembaga_lainnya', 
+					'esakip_data_lembaga_lainnya',
 					[
 						'active' => 0,
 						'updated_at' => current_time('mysql'),
-					], 
+					],
 					['tahun_anggaran' => $tahun_tujuan]
 				);
 

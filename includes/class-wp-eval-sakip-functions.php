@@ -651,4 +651,31 @@ class Esakip_Functions
         }
         exit;
     }
+
+    function validate(array $data, array $rules)
+    {
+        foreach ($rules as $field => $ruleString) {
+            $rulesArray = explode('|', $ruleString);
+            foreach ($rulesArray as $rule) {
+                $value = isset($data[$field]) ? $data[$field] : null;
+
+                if ($rule === 'required' && (is_null($value) || $value === '')) {
+                    throw new Exception("Parameter '{$field}' dibutuhkan.", 422);
+                }
+
+                // Skip other rules if value is not present
+                if (is_null($value)) {
+                    continue;
+                }
+
+                if ($rule === 'numeric' && !is_numeric($value)) {
+                    throw new Exception("Parameter '{$field}' harus berupa angka.", 422);
+                }
+                
+                if ($rule === 'string' && !is_string($value)) {
+                    throw new Exception("Parameter '{$field}' harus berupa teks (string).", 422);
+                }
+            }
+        }
+    }
 }

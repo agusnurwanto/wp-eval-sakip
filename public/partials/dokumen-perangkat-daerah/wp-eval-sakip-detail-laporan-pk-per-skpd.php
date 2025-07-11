@@ -9,8 +9,10 @@ $input = shortcode_atts(array(
 $id_skpd = $_GET['id_skpd'] ?? '';
 $id_satker_simpeg = $_GET['satker_id'] ?? '';
 $nip = $_GET['nip'] ?? '';
+$id_jabatan = $_GET['id_jabatan'] ?? '';
+$id_pegawai = $_GET['id_pegawai'] ?? '';
 
-if (empty($id_skpd) || empty($nip) || empty($id_satker_simpeg) || empty($input['tahun'])) {
+if (empty($id_skpd) || empty($nip) || empty($id_satker_simpeg) || empty($input['tahun']) || empty($id_pegawai)) {
     die('parameter tidak lengkap!.');
 }
 global $wpdb;
@@ -30,25 +32,6 @@ $skpd = $wpdb->get_row(
     ARRAY_A
 );
 
-$data_satker = $wpdb->get_row(
-    $wpdb->prepare("
-        SELECT 
-            p.*,
-            ds.nama AS nama_bidang
-        FROM esakip_data_pegawai_simpeg p
-        LEFT JOIN esakip_data_satker_simpeg ds
-               ON ds.satker_id = p.satker_id
-        WHERE p.nip_baru = %d
-          AND p.satker_id = %s
-          AND p.active = 1
-    ", $nip, $id_satker_simpeg),
-    ARRAY_A
-);
-
-if (empty($data_satker) || empty($skpd)) {
-    die('data satker kosong!.');
-}
-
 $nama_pemda = get_option(ESAKIP_NAMA_PEMDA);
 $pemda = explode(" ", $nama_pemda);
 array_shift($pemda);
@@ -57,278 +40,103 @@ $logo_pemda = get_option('_crb_logo_dashboard');
 if (empty($logo_pemda)) {
     $logo_pemda = '';
 }
+
 $text_tanggal_hari_ini = $this->format_tanggal_indo(current_datetime()->format('Y-m-d'));
-$error_message = array();
 
+// $error_message = array();
 //get data simpeg pihak pertama
-$simpeg_pihak_pertama = $this->get_pegawai_simpeg('asn', $data_satker['nip_baru'], $data_satker['satker_id'], $data_satker['jabatan']);
-$response_1 = json_decode($simpeg_pihak_pertama, true);
-if (!isset($response_1['status']) || $response_1['status'] === false) {
-    array_push($error_message, $response_1['message']);
-}
-
-//GET LAGI UPDATED DATA PIHAK PERTAMA
-$data_pegawai_1 = $wpdb->get_row(
-    $wpdb->prepare("
-        SELECT
-            p.*,
-            ds.nama AS nama_bidang
-        FROM esakip_data_pegawai_simpeg p
-        LEFT JOIN esakip_data_satker_simpeg ds
-               ON ds.satker_id = p.satker_id
-        WHERE p.nip_baru = %s
-          AND p.satker_id = %s
-          AND p.active = 1
-    ", $data_satker['nip_baru'], $data_satker['satker_id']),
-    ARRAY_A
-);
+// $simpeg_pihak_pertama = $this->get_pegawai_simpeg('asn', $data_satker['nip_baru'], $data_satker['satker_id'], $data_satker['jabatan']);
+// $response_1 = json_decode($simpeg_pihak_pertama, true);
+// if (!isset($response_1['status']) || $response_1['status'] === false) {
+//     array_push($error_message, 'Pihak Pertama : ' . $response_1['message']);
+// }
 
 $pihak_pertama = array(
-    'nama_pegawai'         => $data_pegawai_1['nama_pegawai'] ?? '-',
-    'nip_pegawai'          => $data_pegawai_1['nip_baru'] ?? '-',
-    'bidang_pegawai'       => $data_pegawai_1['nama_bidang'] ?? '-',
-    'jabatan_pegawai'      => $data_pegawai_1['jabatan'] . '<br>' . $data_pegawai_1['nama_bidang'] ?? '',
-    'pangkat'              => $data_pegawai_1['pangkat'] ?? '-',
-    'gelar_depan'          => $data_pegawai_1['gelar_depan'] ?? '',
-    'gelar_belakang'       => $data_pegawai_1['gelar_belakang'] ?? '',
-    'status_jabatan'       => $data_pegawai_1['jabatan'] ?? ''
+    'nama_pegawai'    => '-',
+    'nip_pegawai'     => '-',
+    'jabatan_pegawai' => '-',
+    'nama_bidang'     => '-',
+    'pangkat'         => '',
+    'gelar_depan'     => '',
+    'gelar_belakang'  => '',
+    'status_jabatan'  => ''
+);
+if (!empty($_GET['inactive']) && $_GET['inactive'] == 1) {
+    $data_pegawai_1 = $this->get_data_pegawai_simpeg_inactive_by_id($id_pegawai);
+} else {
+    $data_pegawai_1 = $this->get_data_pegawai_simpeg_by_id($id_pegawai);
+}
+if (!empty($data_pegawai_1)) {
+    $pihak_pertama['nama_pegawai']    = $data_pegawai_1->nama_pegawai;
+    $pihak_pertama['nip_pegawai']     = $data_pegawai_1->nip_baru;
+    $pihak_pertama['jabatan_pegawai'] = $data_pegawai_1->jabatan . ' ' . $data_pegawai_1->nama_bidang ?: '-';
+    $pihak_pertama['nama_bidang']     = $data_pegawai_1->nama_bidang;
+    $pihak_pertama['pangkat']         = $data_pegawai_1->pangkat;
+    $pihak_pertama['gelar_depan']     = $data_pegawai_1->gelar_depan;
+    $pihak_pertama['gelar_belakang']  = ', ' . $data_pegawai_1->gelar_belakang;
+    $pihak_pertama['status_jabatan']  = $data_pegawai_1->jabatan;
+
+    //jika custom jabatan ada, gunakan itu
+    if (!empty($data_pegawai_1->custom_jabatan)) {
+        $pihak_pertama['jabatan_pegawai'] = $data_pegawai_1->custom_jabatan;
+    }
+    if ($data_pegawai_1->plt_plh == 1 && !empty($data_pegawai_1->plt_plh_teks)) {
+        $pihak_pertama['jabatan_pegawai'] = $data_pegawai_1->plt_plh_teks . ' ' . $pihak_pertama['jabatan_pegawai'];
+    }
+
+    $data_atasan = $this->_get_atasan_definitif($data_pegawai_1);
+    if (empty($data_atasan) && !empty($data_pegawai_1->id_atasan)) {
+        $data_atasan = $this->get_data_pegawai_simpeg_by_id($data_pegawai_1->id_atasan);
+    }
+
+    $options = array(
+        'id_skpd'   => $id_skpd,
+        'satker_id' => $data_pegawai_1->satker_id,
+        'tahun'     => $input['tahun'],
+        'nip_baru'  => $data_pegawai_1->nip_baru
+    );
+    $html_pk = $this->get_pk_html($options);
+}
+
+$pihak_kedua = array(
+    'nama_pegawai'    => '-',
+    'nip_pegawai'     => '-',
+    'jabatan_pegawai' => '-',
+    'nama_bidang'     => '-',
+    'pangkat'         => '',
+    'gelar_depan'     => '',
+    'gelar_belakang'  => '',
+    'status_jabatan'  => ''
 );
 
-$data_atasan = array();
+if (!empty($data_atasan) && $data_atasan->id != 0) {
+    $pihak_kedua['nama_pegawai']    = $data_atasan->nama_pegawai;
+    $pihak_kedua['nip_pegawai']     = $data_atasan->nip_baru;
+    $pihak_kedua['jabatan_pegawai'] = $data_atasan->jabatan . ' ' . $data_atasan->nama_bidang ?: '-';
+    $pihak_kedua['nama_bidang']     = $data_atasan->nama_bidang;
+    $pihak_kedua['pangkat']         = $data_atasan->pangkat;
+    $pihak_kedua['gelar_depan']     = $data_atasan->gelar_depan;
+    $pihak_kedua['gelar_belakang']  = ', ' . $data_atasan->gelar_belakang;
+    $pihak_kedua['status_jabatan']  = $data_atasan->jabatan;
+
+    //jika custom jabatan ada, gunakan itu
+    if (!empty($data_atasan->custom_jabatan)) {
+        $pihak_kedua['jabatan_pegawai'] = $data_atasan->custom_jabatan;
+    }
+    if ($data_atasan->plt_plh == 1 && !empty($data_atasan->plt_plh_teks)) {
+        $pihak_kedua['jabatan_pegawai'] = $data_atasan->plt_plh_teks . ' ' . $pihak_kedua['jabatan_pegawai'];
+    }
+} elseif (!empty($data_atasan) && $data_atasan->id == 0) {
+    $pihak_kedua['nama_pegawai']    = $data_atasan->nama_pegawai;
+    $pihak_kedua['nip_pegawai']     = $data_atasan->nip_baru;
+    $pihak_kedua['jabatan_pegawai'] = $data_atasan->jabatan;
+}
+
+if (empty($data_atasan)) {
+    die('Pihak Kedua tidak ditemukan, mohon sinkron data / atur atasan di halaman Pengaturan Perjanjian Kinerja');
+}
 $date_hari_ini = current_datetime()->format('Y-m-d H:i:s');
 
-//CEK NAMA DAN STATUS JABATAN KEPALA DAERAH DI ESAKIP OPTIONS
-$cek_nama_kepala_daerah = 0;
-$cek_status_jabatan_kepala_daerah = 0;
-//CEK PIHAK PERTAMA ADALAH KEPALA
-$cek_kepala_skpd = 0;
-//CEK PIHAK PERTAMA ADALAH KEPALA SKPD
-$status_kepala_skpd = 0;
-//CEK PIHAK PERTAMA / KEDUA KEPALA DAN PLT
-$cek_status_jabatan_kepala_pihak_pertama = 0;
-$cek_status_jabatan_kepala_pihak_kedua = 0;
-
-// CEK PIHAK PERTAMA ADALAH KEPALA SKPD
-// PIHAK PERTAMA PLT, PIHAK PERTAMA MASIH AKTIF PLT
-$cek_kepala = strlen($data_pegawai_1['satker_id']);
-if (
-    $data_pegawai_1['plt_plh'] == 1
-    && (
-        $data_pegawai_1['tmt_sk_plth'] < $date_hari_ini
-        && $date_hari_ini < $data_pegawai_1['berakhir']
-    )
-) {
-    $status_kepala_skpd = 1;
-    $cek_status_jabatan_kepala_pihak_pertama = 1;
-}
-
-//PIHAK PERTAMA KEPALA SKPD, ATASAN ADALAH KEPALA DAERAH
-if (
-    (
-        $cek_kepala == 2
-        && $data_pegawai_1['tipe_pegawai_id'] == 11
-        && $status_kepala_skpd == 1
-    )
-    || (
-        $cek_kepala == 2
-        && $data_pegawai_1['tipe_pegawai_id'] == 11
-        && $data_pegawai_1['plt_plh'] == 0
-    )
-) {
-    $cek_kepala_skpd = 1;
-
-    $nama_kepala_daerah = get_option('_crb_kepala_daerah');
-    $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah');
-
-    if (!empty($nama_kepala_daerah)) {
-        $cek_nama_kepala_daerah = 1;
-    }
-
-    $jabatan_kepala = '';
-    if (!empty($status_jabatan_kepala_daerah)) {
-        $cek_status_jabatan_kepala_daerah = 1;
-        $jabatan_kepala = $status_jabatan_kepala_daerah;
-    }
-
-    $data_atasan = [
-        'nama_pegawai'  => $nama_kepala_daerah,
-        'jabatan'       => $jabatan_kepala . '<br>' . $pemda,
-        'status_kepala' => 'kepala_daerah'
-    ];
-}
-
-//JIKA PIHAK KEDUA BUKAN KEPALA DAERAH
-if (empty($data_atasan)) {
-    //JIKA PIHAK PERTAMA KEPALA (BUKAN KEPALA SKPD)
-    if (
-        $data_pegawai_1['tipe_pegawai_id'] == 11
-        || (
-            trim($data_pegawai_1['jabatan']) == 'KEPALA'
-            && $data_pegawai_1['plt_plh'] == 1
-        )
-    ) {
-        $satker_id_atasan = substr($data_pegawai_1['satker_id'], 0, -2);
-        $data_atasan = $wpdb->get_row(
-            $wpdb->prepare("
-                SELECT
-                    p.*,
-                    ds.nama AS nama_bidang
-                FROM esakip_data_pegawai_simpeg p
-                LEFT JOIN esakip_data_satker_simpeg ds
-                       ON ds.satker_id = p.satker_id
-                WHERE p.satker_id=%s 
-                  AND p.tipe_pegawai_id=%d 
-                  AND p.active=1
-                ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
-            ", $satker_id_atasan, 11),
-            ARRAY_A
-        );
-
-        // cek ulang data atasan jika kosong where jabatan=KEPALA untuk jenis kepala yang PLT
-        if(empty($data_atasan)){
-            $data_atasan = $wpdb->get_row(
-                $wpdb->prepare("
-                    SELECT
-                        p.*,
-                        ds.nama AS nama_bidang
-                    FROM esakip_data_pegawai_simpeg p
-                    LEFT JOIN esakip_data_satker_simpeg ds
-                           ON ds.satker_id = p.satker_id
-                    WHERE p.satker_id=%s 
-                      AND p.jabatan like %s 
-                      AND p.active=1
-                    ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
-                ", $satker_id_atasan, 'KEPALA%'),
-                ARRAY_A
-            );
-        }
-    } else {
-        // JIKA PEGAWAI BIASA
-        $data_atasan = $wpdb->get_row(
-            $wpdb->prepare("
-                SELECT
-                    p.*,
-                    ds.nama AS nama_bidang
-                FROM esakip_data_pegawai_simpeg p
-                LEFT JOIN esakip_data_satker_simpeg ds
-                       ON ds.satker_id = p.satker_id
-                WHERE p.satker_id=%s 
-                  AND p.tipe_pegawai_id=%d 
-                  AND p.active=1
-                ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
-            ", $data_pegawai_1['satker_id'], 11),
-            ARRAY_A
-        );
-
-        // cek ulang data atasan jika kosong where jabatan=KEPALA untuk jenis kepala yang PLT
-        if(empty($data_atasan)){
-            $data_atasan = $wpdb->get_row(
-                $wpdb->prepare("
-                    SELECT
-                        p.*,
-                        ds.nama AS nama_bidang
-                    FROM esakip_data_pegawai_simpeg p
-                    LEFT JOIN esakip_data_satker_simpeg ds
-                           ON ds.satker_id = p.satker_id
-                    WHERE p.satker_id=%s 
-                      AND p.jabatan like %s 
-                      AND p.active=1
-                    ORDER BY p.tipe_pegawai_id, p.berakhir DESC 
-                ", $data_pegawai_1['satker_id'], 'KEPALA%'),
-                ARRAY_A
-            );
-        }
-    }
-
-    //SINKRON DATA PIHAK KEDUA (KEPALA)
-    if (!empty($data_atasan)) {
-        $simpeg_pihak_kedua = $this->get_pegawai_simpeg('asn', $data_atasan['nip_baru'], $data_atasan['satker_id'], $data_atasan['jabatan']);
-        $response_2 = json_decode($simpeg_pihak_kedua, true);
-        if (!isset($response_2['status']) || $response_2['status'] === false) {
-            array_push($error_message, $response_2['message']);
-        }
-    }
-}
-
-// print_r($data_atasan); die($wpdb->last_query);
-
-$data_pegawai_2 = null;
-// PIHAK KEDUA BUKAN KEPALA DAERAH DAN DIA PLT
-if (!empty($data_atasan)) {
-    if (!empty($data_atasan['plt_plh'])) {
-        if (
-            $data_atasan['plt_plh'] == 1
-            && (
-                $data_atasan['tmt_sk_plth'] < $date_hari_ini
-                && $date_hari_ini < $data_atasan['berakhir']
-            )
-        ) {
-            $cek_status_jabatan_kepala_pihak_kedua = 1;
-        }
-    }
-    
-    $pihak_kedua = array(
-        'nama_pegawai'    => $data_atasan['nama_pegawai'] ?? '-',
-        'nip_pegawai'     => $data_atasan['nip_baru'] ?? '-',
-        'jabatan_pegawai' => '', //default kosong jika atasan kepala daerah
-        'pangkat'         => '', //default kosong jika atasan kepala daerah
-        'gelar_depan'     => '', //default kosong jika atasan kepala daerah
-        'gelar_belakang'  => '', //default kosong jika atasan kepala daerah
-        'status_jabatan'  => $data_atasan['jabatan'] ?? ''
-    );
-    
-    if (
-        !empty($data_atasan['status_kepala'])
-        && !empty($data_atasan['jabatan'])
-    ) {
-        //JIKA PIHAK KEDUA KEPALA DAERAH, TAMPILKAN JABATANNYA
-        $pihak_kedua['jabatan_pegawai'] = $data_atasan['jabatan'];
-    } else if (!empty($data_atasan['jabatan'])) {
-        //JIKA PIHAK KEDUA BUKAN KEPALA DAERAH, TAMPILKAN PANGKAT NIP DLL
-        //GET LAGI UPDATED DATA PIHAK KEDUA
-        $data_pegawai_2 = $wpdb->get_row(
-            $wpdb->prepare("
-                SELECT
-                    p.*,
-                    ds.nama AS nama_bidang
-                FROM esakip_data_pegawai_simpeg p
-                LEFT JOIN esakip_data_satker_simpeg ds
-                       ON ds.satker_id = p.satker_id
-                WHERE p.nip_baru = %s
-                  AND p.satker_id = %s
-                  AND p.active = 1
-            ", $data_atasan['nip_baru'], $data_atasan['satker_id']),
-            ARRAY_A
-        );
-        // print_r($data_pegawai_2); die($wpdb->last_query);
-        $pihak_kedua['pangkat']         = $data_pegawai_2['pangkat'] ?? '-';
-        $pihak_kedua['gelar_depan']     = $data_pegawai_2['gelar_depan'] ?? '';
-        $pihak_kedua['gelar_belakang']  = $data_pegawai_2['gelar_belakang'] ?? '';
-        $pihak_kedua['jabatan_pegawai'] = $data_pegawai_2['jabatan'] . '<br>' . $data_pegawai_2['nama_bidang'] ?? '-';
-    }
-} else {
-    $pihak_kedua = array(
-        'nama_pegawai'    => '-',
-        'nip_pegawai'     => '-',
-        'jabatan_pegawai' => '-', //default kosong jika atasan kepala daerah
-        'pangkat'         => '', //default kosong jika atasan kepala daerah
-        'gelar_depan'     => '', //default kosong jika atasan kepala daerah
-        'gelar_belakang'  => '', //default kosong jika atasan kepala daerah
-        'status_jabatan'  => ''
-    );
-}
-
-$options = array(
-    'id_skpd'   => $id_skpd,
-    'satker_id' => $data_pegawai_1['satker_id'],
-    'tahun'     => $input['tahun'],
-    'nip_baru'  => $data_pegawai_1['nip_baru']
-);
-$html_pk = $this->get_pk_html($options);
-// echo '<pre>';
-// print_r($html_pk);
-// echo '/<pre>';
-// die();
 $current_user = wp_get_current_user();
 $user_roles = $current_user->roles;
 $user_nip = $current_user->data->user_login;
@@ -398,7 +206,7 @@ if (!empty($data_user_pegawai)) {
             ),
             ARRAY_A
         );
-        
+
         // TIPE HAK AKSES USER PEGAWAI | 0 = TIDAK ADA | 1 = ALL | 2 = HANYA RHK TERKAIT
         if (!empty($skpd_user_pegawai)) {
             if (($skpd_user_pegawai['id_skpd'] == $id_skpd && $v_user['tipe_pegawai_id'] == 11 && strlen($v_user['satker_id']) == 2) || $is_administrator) {
@@ -407,7 +215,7 @@ if (!empty($data_user_pegawai)) {
                 $hak_akses_user_pegawai = 2;
             }
             $nip_user_pegawai = $v_user['nip_baru'];
-            if(empty($hak_akses_user_pegawai_per_skpd[$skpd_user_pegawai['id_skpd']])){
+            if (empty($hak_akses_user_pegawai_per_skpd[$skpd_user_pegawai['id_skpd']])) {
                 $hak_akses_user_pegawai_per_skpd[$skpd_user_pegawai['id_skpd']] = $hak_akses_user_pegawai;
             }
         }
@@ -417,7 +225,7 @@ if (!empty($data_user_pegawai)) {
 if ($is_administrator || $this_admin_pemda == 1) {
     $hak_akses_user_pegawai = 1;
     $nip_user_pegawai = 0;
-}else{
+} else {
     // ----- hak akses by skpd terkait ----- //
     $hak_akses_user_pegawai = $hak_akses_user_pegawai_per_skpd[$id_skpd];
 }
@@ -464,14 +272,14 @@ if ($data_tahapan) {
                     <div class="cr-view-btn" id="view-btn-' . $v['id'] . '" onclick="viewDokumen(\'' . $v['id'] . '\', this)" title="Lihat Dokumen">
                         <span class="dashicons dashicons-visibility"></span>
                     </div>';
-                    if($hak_akses_user_pegawai == 1 || ($hak_akses_user_pegawai == 2 && $pihak_pertama && $pihak_pertama['nip_pegawai'] == $nip_user_pegawai)){
-                        $card .='
+        if ($hak_akses_user_pegawai == 1 || ($hak_akses_user_pegawai == 2 && $pihak_pertama && $pihak_pertama['nip_pegawai'] == $nip_user_pegawai)) {
+            $card .= '
                         <div class="cr-view-btn-danger" onclick="deleteDokumen(\'' . $v['id'] . '\')" title="Hapus Dokumen">
                             <span class="dashicons dashicons-trash"></span>
                         </div>';
-                    }
+        }
 
-                    $card .='
+        $card .= '
                 </div>
                 <div class="badge-container">
                     <span class="badge badge-sm badge-warning badge-sedang-dilihat" id="badge-sedang-dilihat-' . $v['id'] . '" style="display:none">
@@ -487,404 +295,548 @@ $ttd_orientasi = 'text-left';
 // $ttd_orientasi = 'text-center';
 ?>
 
-<head>
-    <style>
-        body {
+<style>
+    body {
+        font-size: 16px;
+        line-height: 24px;
+    }
+
+    @media print {
+        .page-print {
+            max-width: 900px !important;
+            height: auto !important;
+            margin: 0 auto;
+            /* font-size: 12pt; */
+        }
+
+        /*.f-12 {
             font-size: 16px;
             line-height: 24px;
+            color: #555;
+        }*/
+
+        @page {
+            size: portrait;
         }
 
-        @media print {
-            .page-print {
-                max-width: 900px !important;
-                height: auto !important;
-                margin: 0 auto;
-                /* font-size: 12pt; */
-            }
-
-            .f-12 {
-                font-size: 16px;
-                line-height: 24px;
-                color: #555;
-            }
-
-            @page {
-                size: portrait;
-            }
-
-            #action-sakip,
-            .site-header,
-            .site-footer,
-            .hide-display-print {
-                display: none;
-            }
-
-            .break-print {
-                break-after: page;
-            }
-
-            td[contenteditable="true"] {
-                background: none !important;
-            }
-        }
-
-        #action-sakip {
-            padding-top: 20px;
-        }
-
-        .wrap-table {
-            overflow: auto;
-            max-height: 100vh;
-            width: 100%;
-        }
-
-        #table_dokumen_perjanjian_kinerja th {
-            vertical-align: middle;
-        }
-
-        .page-print {
-            font-family: Arial, Helvetica, sans-serif;
-            margin-right: auto;
-            margin-left: auto;
-            background-color: var(--white-color);
-            padding: 30px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15)
-        }
-
-        .page-print p {
-            margin: 0pt;
-        }
-
-        .page-print table,
-        td {
-            border: none;
-        }
-
-        #table-1 tr td:first-child {
-            padding-left: 0;
-        }
-
-        #table-1 td:nth-child(1) {
-            width: 130px;
-        }
-
-        #table-1 td:nth-child(2) {
-            width: 0%;
-        }
-
-        tr,
-        td {
-            vertical-align: top;
-        }
-
-        .ttd-pejabat {
-            padding: 0;
-            font-weight: 700;
-            text-decoration: underline;
-            width: 50%;
-        }
-
-        .title-laporan {
-            font-weight: 700;
-            font-size: 16pt;
-        }
-
-        .title-pk-1 {
-            font-size: 14pt;
-        }
-
-        .title-pk-2 {
-            font-size: 16pt;
-            font-weight: 700;
-        }
-
-        .table_data_anggaran tr,
-        .table_data_anggaran td,
-        .table_data_anggaran th {
-            border: solid 1px #000;
-        }
-
-        .table_data_anggaran tr td:first-child {
-            width: 3rem;
-        }
-
-        td[contenteditable="true"] {
-            background: #ff00002e;
-        }
-
-        /* carousel */
-        .cr-container {
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-        }
-
-        .cr-title {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 24px;
-            color: #23282d;
-            padding-left: 10px;
-        }
-
-        .cr-carousel-wrapper {
-            position: relative;
-            padding: 0 10px;
-        }
-
-        .cr-carousel {
-            display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            gap: 20px;
-            padding: 10px 0;
-        }
-
-        .cr-carousel::-webkit-scrollbar {
+        #action-sakip,
+        .site-header,
+        .site-footer,
+        .hide-display-print {
             display: none;
         }
 
+        .break-print {
+            break-after: page;
+        }
+
+        td[contenteditable="true"] {
+            background: none !important;
+        }
+    }
+
+    #action-sakip {
+        padding-top: 20px;
+    }
+
+    .wrap-table {
+        overflow: auto;
+        max-height: 100vh;
+        width: 100%;
+    }
+
+    #table_dokumen_perjanjian_kinerja th {
+        vertical-align: middle;
+    }
+
+    .page-print {
+        font-family: Arial, Helvetica, sans-serif;
+        margin-right: auto;
+        margin-left: auto;
+        background-color: var(--white-color);
+        padding: 30px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15)
+    }
+
+    .page-print p {
+        margin: 0pt;
+    }
+
+    .page-print table,
+    td {
+        border: none;
+    }
+
+    #table-1 tr td:first-child {
+        padding-left: 0;
+    }
+
+    #table-1 td:nth-child(1) {
+        width: 130px;
+    }
+
+    #table-1 td:nth-child(2) {
+        width: 0%;
+    }
+
+    tr,
+    td {
+        vertical-align: top;
+    }
+
+    .ttd-pejabat {
+        padding: 0;
+        font-weight: 700;
+        text-decoration: underline;
+        width: 50%;
+    }
+
+    .title-laporan {
+        font-weight: 700;
+        font-size: 16pt;
+    }
+
+    .title-pk-1 {
+        font-size: 19px;
+    }
+
+    .title-pk-2 {
+        font-size: 21px;
+        font-weight: 700;
+    }
+
+    .table_data_anggaran tr,
+    .table_data_anggaran td,
+    .table_data_anggaran th {
+        border: solid 1px #000;
+    }
+
+    .table_data_anggaran tr td:first-child {
+        width: 3rem;
+    }
+
+    td[contenteditable="true"] {
+        background: #ff00002e;
+    }
+
+    /* carousel */
+    .cr-container {
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    }
+
+    .cr-title {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 24px;
+        color: #23282d;
+        padding-left: 10px;
+    }
+
+    .cr-carousel-wrapper {
+        position: relative;
+        padding: 0 10px;
+    }
+
+    .cr-carousel {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        gap: 20px;
+        padding: 10px 0;
+    }
+
+    .cr-carousel::-webkit-scrollbar {
+        display: none;
+    }
+
+    .cr-item {
+        flex: 0 0 calc(25% - 15px);
+        scroll-snap-align: start;
+    }
+
+    .cr-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid #dcdcde;
+        border-radius: 8px;
+        padding: 20px;
+        width: 250px;
+        /* Atur ukuran card */
+        height: 220px;
+        /* Atur tinggi card */
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+
+    .cr-card h3 {
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        margin: 0;
+        word-wrap: break-word;
+        /* Menghindari teks keluar dari batas */
+    }
+
+    .cr-card .year {
+        font-size: 14px;
+        color: #666;
+        margin: 4px 0;
+    }
+
+    .cr-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .cr-card .cr-view-btn,
+    .cr-card .cr-view-btn-danger {
+        background-color: #fff;
+        border: 1px solid #dcdcde;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .cr-card .cr-view-btn:hover {
+        border-color: #007cba;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .cr-card .cr-view-btn .dashicons {
+        font-size: 18px;
+        color: #007cba;
+    }
+
+    .cr-card .cr-view-btn-danger:hover {
+        border-color: #ff686b;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .cr-card .cr-view-btn-danger .dashicons {
+        font-size: 18px;
+        color: #ff686b;
+    }
+
+    .badge-container {
+        text-align: center;
+    }
+
+
+    .cr-card:hover {
+        border-color: #007cba;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .cr-scroll-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: #fff;
+        border: 1px solid #dcdcde;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .cr-scroll-btn:hover {
+        border-color: #007cba;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .cr-scroll-btn-left {
+        left: -8px;
+    }
+
+    .cr-scroll-btn-right {
+        right: -8px;
+    }
+
+    .truncate-multiline {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    @media (max-width: 1024px) {
         .cr-item {
-            flex: 0 0 calc(25% - 15px);
-            scroll-snap-align: start;
+            flex: 0 0 calc(33.333% - 14px);
         }
+    }
 
-        .cr-card {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid #dcdcde;
-            border-radius: 8px;
-            padding: 20px;
-            width: 250px;
-            /* Atur ukuran card */
-            height: 220px;
-            /* Atur tinggi card */
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            background-color: #fff;
+    @media (max-width: 768px) {
+        .cr-item {
+            flex: 0 0 calc(33.333% - 10px);
         }
+    }
 
-        .cr-card h3 {
-            font-size: 16px;
-            font-weight: bold;
-            text-align: center;
-            margin: 0;
-            word-wrap: break-word;
-            /* Menghindari teks keluar dari batas */
+    @media (max-width: 480px) {
+        .cr-item {
+            flex: 0 0 33.333%;
         }
+    }
 
-        .cr-card .year {
-            font-size: 14px;
-            color: #666;
-            margin: 4px 0;
+    .cr-card .year {
+        font-size: 14px;
+        color: #666;
+        margin: 4px 0;
+    }
+
+    .cr-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .cr-card .cr-view-btn,
+    .cr-card .cr-view-btn-danger {
+        background-color: #fff;
+        border: 1px solid #dcdcde;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .cr-card .cr-view-btn:hover {
+        border-color: #007cba;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .cr-card .cr-view-btn .dashicons {
+        font-size: 18px;
+        color: #007cba;
+    }
+
+    .cr-card .cr-view-btn-danger:hover {
+        border-color: #ff686b;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .cr-card .cr-view-btn-danger .dashicons {
+        font-size: 18px;
+        color: #ff686b;
+    }
+
+    .badge-container {
+        text-align: center;
+    }
+
+
+    .cr-card:hover {
+        border-color: #007cba;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .cr-scroll-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: #fff;
+        border: 1px solid #dcdcde;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .cr-scroll-btn:hover {
+        border-color: #007cba;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .cr-scroll-btn-left {
+        left: -8px;
+    }
+
+    .cr-scroll-btn-right {
+        right: -8px;
+    }
+
+    .truncate-multiline {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    @media (max-width: 1024px) {
+        .cr-item {
+            flex: 0 0 calc(33.333% - 14px);
         }
+    }
 
-        .cr-actions {
-            display: flex;
-            justify-content: space-between;
-            gap: 8px;
+    @media (max-width: 768px) {
+        .cr-item {
+            flex: 0 0 calc(33.333% - 10px);
         }
+    }
 
-        .cr-card .cr-view-btn,
-        .cr-card .cr-view-btn-danger {
-            background-color: #fff;
-            border: 1px solid #dcdcde;
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    @media (max-width: 480px) {
+        .cr-item {
+            flex: 0 0 33.333%;
         }
-
-        .cr-card .cr-view-btn:hover {
-            border-color: #007cba;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .cr-card .cr-view-btn .dashicons {
-            font-size: 18px;
-            color: #007cba;
-        }
-
-        .cr-card .cr-view-btn-danger:hover {
-            border-color: #ff686b;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .cr-card .cr-view-btn-danger .dashicons {
-            font-size: 18px;
-            color: #ff686b;
-        }
-
-        .badge-container {
-            text-align: center;
-        }
-
-
-        .cr-card:hover {
-            border-color: #007cba;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .cr-scroll-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background-color: #fff;
-            border: 1px solid #dcdcde;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            z-index: 10;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
-
-        .cr-scroll-btn:hover {
-            border-color: #007cba;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .cr-scroll-btn-left {
-            left: -8px;
-        }
-
-        .cr-scroll-btn-right {
-            right: -8px;
-        }
-
-        .truncate-multiline {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        @media (max-width: 1024px) {
-            .cr-item {
-                flex: 0 0 calc(33.333% - 14px);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .cr-item {
-                flex: 0 0 calc(33.333% - 10px);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .cr-item {
-                flex: 0 0 33.333%;
-            }
-        }
-    </style>
-</head>
-
-<body>
-    <div class="container-md mx-auto" style="width: 900px;">
-        <div class="text-center" id="action-sakip">
-            <button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button>
-            <?php if($hak_akses_user_pegawai == 1 || ($hak_akses_user_pegawai == 2 && $pihak_pertama && $pihak_pertama['nip_pegawai'] == $nip_user_pegawai)): ?>
-                <button class="btn btn-warning" onclick="get_alamat();"><i class="dashicons dashicons-edit"></i>Edit Alamat</button><br>
+    }
+</style>
+<div class="container-md mx-auto" style="width: 900px;">
+    <div class="text-center" id="action-sakip">
+        <div class="d-inline-flex align-items-center">
+            <button class="btn btn-primary btn-large mr-3" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button>
+            <?php if ($hak_akses_user_pegawai == 1 || ($hak_akses_user_pegawai == 2 && $pihak_pertama && $pihak_pertama['nip_pegawai'] == $nip_user_pegawai)): ?>
+                <button class="btn btn-warning mr-3" onclick="get_alamat();"><i class="dashicons dashicons-edit"></i> Edit Alamat</button>
             <?php endif; ?>
+            <div class="form-inline">
+                <label for="font-select" class="mr-2">Jenis Font:</label>
+                <select id="font-select" class="form-control mr-3" onchange="updateFont()" style="width: 300px;">
+                    <option value="Arial" selected>Arial</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Calibri">Calibri</option>
+                    <option value="inherit">Inherit</option>
+                    <option value="Courier">Courier</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Helvetica">Helvetica</option>
+                    <option value="Trebuchet">Trebuchet</option>
+                    <option value="Verdana">Verdana</option>
+                </select>
+            </div>
         </div>
-
+        <div class="d-inline-flex align-items-center mt-3">
+            <div class="form-inline">
+                <label for="font-size" class="mr-3">Ukuran Font Konten:
+                    <input type="number" id="font-size" class="form-control form-control-sm text-right ml-1 mr-1" value="16" min="1" max="100" onkeyup="updateFont()" onchange="updateFont()" style="width: 80px;"> px
+                </label>
+                <label for="font-size" class="mr-3">Ukuran Font Judul 1:
+                    <input type="number" id="font-size-1" class="form-control form-control-sm text-right ml-1 mr-1" value="19" min="1" max="100" onkeyup="updateFont()" onchange="updateFont()" style="width: 80px;"> px
+                </label>
+                <label for="font-size" class="mr-3">Ukuran Font Judul 2:
+                    <input type="number" id="font-size-2" class="form-control form-control-sm text-right ml-1 mr-1" value="21" min="1" max="100" onkeyup="updateFont()" onchange="updateFont()" style="width: 80px;"> px
+                </label>
+            </div>
+        </div>
+        <div class="d-inline-flex align-items-center mt-3">
+            <div class="form-inline">
+                <label class="mr-3"><input class="mr-1" type="radio" name="jenis_pk" onchange="updateFont()" value="1" checked> PK Murni</label>
+                <label class="mr-3"><input class="mr-1" type="radio" name="jenis_pk" onchange="updateFont()" value="2"> PK Perubahan</label>
+            </div>
+        </div>
         <!-- Error Message -->
         <?php if (!empty($error_message) && is_array($error_message)) : ?>
-            <div class="alert alert-danger mt-3">
+            <div class="alert alert-danger mt-3 hide-display-print">
+                <p>Terjadi Kesalahan mendapatkan data pegawai SIMPEG!</p>
                 <ul class="mb-0">
                     <?php echo implode('', array_map(fn($msg) => "<li>{$msg}</li>", $error_message)); ?>
                 </ul>
             </div>
         <?php endif; ?>
+    </div>
 
-        <!-- Jumlah Data Per SKPD -->
-        <?php if (!empty($jumlah_data) && is_array($jumlah_data)) : ?>
-            <div class="cr-container m-4 hide-display-print">
-                <h2 class="cr-title">Jumlah Dokumen Finalisasi Per SKPD</h2>
-                <div class="table-responsive">
-                    <table class="table table-hover table-bordered">
-                        <thead class="table-dark" style="pointer-events: none;">
-                            <tr>
-                                <th class="text-center">No</th>
-                                <th class="text-center">Nama SKPD</th>
-                                <th class="text-center">Jumlah Dokumen</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $no = 1;
-                            $total_dokumen = 0;
-                            foreach ($jumlah_data as $v) :
-                                $total_dokumen += $v['jumlah'];
-                            ?>
-                                <tr>
-                                    <td class="text-center"><?php echo $no++; ?></td>
-                                    <td class="text-left"><?php echo $v['nama_skpd']; ?></td>
-                                    <td class="text-right"><?php echo $v['jumlah']; ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                        <tfoot class="table font-weight-bold" style="pointer-events: none;">
-                            <tr>
-                                <td colspan="2" class="text-center">Total Keseluruhan</td>
-                                <td class="text-right"><?php echo $total_dokumen; ?></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-        <?php endif; ?>
-
+    <!-- Jumlah Data Per SKPD -->
+    <?php if (!empty($jumlah_data) && is_array($jumlah_data)) : ?>
         <div class="cr-container m-4 hide-display-print">
-            <h2 class="cr-title">Pilih Laporan Perjanjian Kinerja</h2>
-            <div class="cr-carousel-wrapper">
-                <div id="card-carousel" class="cr-carousel">
-                    <div class="cr-item" title="Perjanjian Kinerja Real Time">
-                        <div class="cr-card">
-                            <h3>Perjanjian Kinerja Sekarang</h3>
-                            <div class="badge badge-sm badge-primary m-2 text-light text-wrap"><?php echo $skpd['nama_skpd']; ?></div>
-                            <div class="year"><?php echo $text_tanggal_hari_ini; ?></div>
-                            <div class="cr-view-btn" style="display: none;" id="display-btn-first" onclick="location.reload()">
-                                <span class="dashicons dashicons-visibility"></span>
-                            </div>
-                            <span class="badge badge-info mt-2">
-                                <i class="dashicons dashicons-clock align-middle"></i> Real Time
-                            </span>
-                            <div class="text-center badge-sedang-dilihat">
-                                <span class='badge badge-sm badge-warning m-2'>Sedang Dilihat</span>
-                            </div>
-                        </div>
-                    </div>
-                    <?php echo $card; ?>
-                </div>
-                <div class="cr-scroll-btn cr-scroll-btn-left" onclick="scrollCarousel(-1)">
-                    <span class="dashicons dashicons-arrow-left-alt2"></span>
-                </div>
-                <div class="cr-scroll-btn cr-scroll-btn-right" onclick="scrollCarousel(1)">
-                    <span class="dashicons dashicons-arrow-right-alt2"></span>
-                </div>
+            <h2 class="cr-title">Jumlah Dokumen Finalisasi Per SKPD</h2>
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered">
+                    <thead class="table-dark" style="pointer-events: none;">
+                        <tr>
+                            <th class="text-center">No</th>
+                            <th class="text-center">Nama SKPD</th>
+                            <th class="text-center">Jumlah Dokumen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $no = 1;
+                        $total_dokumen = 0;
+                        foreach ($jumlah_data as $v) :
+                            $total_dokumen += $v['jumlah'];
+                        ?>
+                            <tr>
+                                <td class="text-center"><?php echo $no++; ?></td>
+                                <td class="text-left"><?php echo $v['nama_skpd']; ?></td>
+                                <td class="text-right"><?php echo $v['jumlah']; ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                    <tfoot class="table font-weight-bold" style="pointer-events: none;">
+                        <tr>
+                            <td colspan="2" class="text-center">Total Keseluruhan</td>
+                            <td class="text-right"><?php echo $total_dokumen; ?></td>
+                        </tr>
+                    </tfoot>
+                </table>
             </div>
         </div>
+    <?php endif; ?>
 
-        <div class="text-center page-print">
-            <div class="text-right m-2">
-                <?php if($hak_akses_user_pegawai == 1 || ($hak_akses_user_pegawai == 2 && $pihak_pertama && $pihak_pertama['nip_pegawai'] == $nip_user_pegawai)): ?>
+    <div class="cr-container m-4 hide-display-print">
+        <h2 class="cr-title">Pilih Laporan Perjanjian Kinerja</h2>
+        <div class="cr-carousel-wrapper">
+            <div id="card-carousel" class="cr-carousel">
+                <div class="cr-item" title="Perjanjian Kinerja Real Time">
+                    <div class="cr-card">
+                        <h3>Perjanjian Kinerja Sekarang</h3>
+                        <div class="badge badge-sm badge-primary m-2 text-light text-wrap"><?php echo $skpd['nama_skpd']; ?></div>
+                        <div class="year"><?php echo $text_tanggal_hari_ini; ?></div>
+                        <div class="cr-view-btn" style="display: none;" id="display-btn-first" onclick="location.reload()">
+                            <span class="dashicons dashicons-visibility"></span>
+                        </div>
+                        <span class="badge badge-info mt-2">
+                            <i class="dashicons dashicons-clock align-middle"></i> Real Time
+                        </span>
+                        <div class="text-center badge-sedang-dilihat">
+                            <span class='badge badge-sm badge-warning m-2'>Sedang Dilihat</span>
+                        </div>
+                    </div>
+                </div>
+                <?php echo $card; ?>
+            </div>
+            <div class="cr-scroll-btn cr-scroll-btn-left" onclick="scrollCarousel(-1)">
+                <span class="dashicons dashicons-arrow-left-alt2"></span>
+            </div>
+            <div class="cr-scroll-btn cr-scroll-btn-right" onclick="scrollCarousel(1)">
+                <span class="dashicons dashicons-arrow-right-alt2"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center page-print">
+        <div class="text-right m-2">
+            <?php if ($hak_akses_user_pegawai == 1 || ($hak_akses_user_pegawai == 2 && $pihak_pertama && $pihak_pertama['nip_pegawai'] == $nip_user_pegawai)): ?>
                 <button class="btn btn-sm btn-success hide-display-print" id="finalisasi-btn" onclick="showModalFinalisasi()">
                     <span class="dashicons dashicons-saved" title="Finalisasikan dokumen (Menyimpan dokumen sesuai data terkini)"></span>
                     Finalisasi Dokumen
@@ -893,479 +845,479 @@ $ttd_orientasi = 'text-left';
                     <span class="dashicons dashicons-edit" title="Edit Label"></span>
                     Edit Finalisasi Dokumen
                 </button>
+            <?php endif; ?>
+        </div>
+        <div class="row" style="border-bottom: 7px solid;">
+            <div class="col-2" style="display: flex; align-items: center; height: 200px;">
+                <?php if (!empty($logo_pemda)) : ?>
+                    <img style="max-width: 100%; height: auto;" src="<?php echo $logo_pemda; ?>" alt="Logo Pemda">
                 <?php endif; ?>
             </div>
-            <div class="row" style="border-bottom: 7px solid;">
-                <div class="col-2" style="display: flex; align-items: center; height: 200px;">
-                    <?php if (!empty($logo_pemda)) : ?>
-                        <img style="max-width: 100%; height: auto;" src="<?php echo $logo_pemda; ?>" alt="Logo Pemda">
-                    <?php endif; ?>
-                </div>
-                <div class="col my-auto">
-                    <p class="title-pk-1">PEMERINTAH <?php echo strtoupper($nama_pemda); ?></p>
-                    <p class="title-pk-2 nama-skpd-view"><?php echo strtoupper($skpd['nama_skpd']); ?></p>
-                    <p class="title-pk-1 alamat-kantor-view" id="alamat_kantor"><?php echo $skpd['alamat_kantor']; ?></p>
-                </div>
-                <div class="col-1"></div>
+            <div class="col my-auto">
+                <p class="title-pk-1">PEMERINTAH <?php echo strtoupper($nama_pemda); ?></p>
+                <p class="title-pk-2 m-2 nama-skpd-view"><?php echo strtoupper($skpd['nama_skpd']); ?></p>
+                <div class="title-pk-3 alamat-kantor-view" id="alamat_kantor"><?php echo $skpd['alamat_kantor']; ?></div>
             </div>
-            <p class="title-laporan mt-3 mb-2">PERJANJIAN KINERJA TAHUN <?php echo $input['tahun']; ?></p>
-            <p class="text-left f-12 mt-5">Dalam rangka mewujudkan manajemen pemerintahan yang efektif, transparan dan akuntabel serta berorientasi pada hasil, kami yang bertanda tangan dibawah ini :</p>
-            <table id="table-1" class="text-left f-12">
-                <tr>
-                    <td>Nama</td>
-                    <td>:</td>
-                    <td class="nama-pegawai-view"><?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . ', ' . $pihak_pertama['gelar_belakang']; ?></td>
-                </tr>
-                <tr>
-                    <td>Jabatan</td>
-                    <td>:</td>
-                    <td class="status-jabatan-pegawai-1 jabatan-pegawai-view"><?php echo $pihak_pertama['jabatan_pegawai']; ?></td>
-                </tr>
-                <tr>
-                    <td colspan="3">Selanjutnya disebut pihak pertama</td>
-                </tr>
-                <tr>
-                    <td>Nama</td>
-                    <td>:</td>
-                    <td class="nama-pegawai-atasan-view"><?php echo $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] . ', ' . $pihak_kedua['gelar_belakang']; ?></td>
-                </tr>
-                <tr>
-                    <td>Jabatan</td>
-                    <td>:</td>
-                    <td class="status-jabatan-pegawai-2 jabatan-pegawai-atasan-view" id="jabatan_pegawai_atasan"><?php echo $pihak_kedua['jabatan_pegawai']; ?></td>
-                </tr>
-                <tr>
-                    <td colspan="3">Selaku atasan langsung pihak pertama, selanjutnya disebut pihak kedua</td>
-                </tr>
-            </table>
-            <p class="text-left f-12">Pihak pertama berjanji akan mewujudkan target kinerja yang seharusnya sesuai lampiran perjanjian ini, dalam rangka mencapai target kinerja jangka menengah seperti yang telah ditetapkan dalam dokumen perencanaan. Keberhasilan dan kegagalan pencapaian target tersebut menjadi tanggung jawab kami.</p>
-            </br>
-            <p class="text-left f-12">Pihak kedua akan memberikan supervisi yang diperlukan serta akan melakukan evaluasi terhadap capaian kinerja dari perjanjian ini dan mengambil tindakan yang diperlukan dalam rangka memberikan penghargaan dan sanksi.</p>
-            <table id="table_data_pejabat" style="margin-top: 3rem;" class="f-12">
-                <tbody>
-                    <tr class="<?php echo $ttd_orientasi; ?>">
-                        <td></td>
-                        <td style="padding: 0;" contenteditable="true" title="Klik untuk ganti teks!" class="editable-field">
-                            <?php echo $pemda; ?>, <span class="tanggal-dokumen-view"><?php echo $text_tanggal_hari_ini; ?></span>
-                        </td>
-                    </tr>
-                    <tr class="<?php echo $ttd_orientasi; ?>">
-                        <td style="padding: 0;">Pihak Kedua,</td>
-                        <td style="padding: 0;">Pihak Pertama,</td>
-                    </tr>
-                    <tr style="height: 7em;">
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr class="<?php echo $ttd_orientasi; ?>">
-                        <td class="ttd-pejabat nama-pegawai-atasan-view" id="nama_pegawai_atasan">
-                            <?php echo $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] . ', ' . $pihak_kedua['gelar_belakang']; ?>
-                        </td>
-                        <td class="ttd-pejabat nama-pegawai-view">
-                            <?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . ', ' . $pihak_pertama['gelar_belakang']; ?>
-                        </td>
-                    </tr>
-                    <tr class="<?php echo $ttd_orientasi; ?>">
-                        <td style="padding: 0;" id="pangkat_pegawai_atasan" class="pangkat-pegawai-atasan-view">
-                            <?php if (empty($data_atasan['status_kepala'])) : ?>
-                                <?php echo $pihak_kedua['pangkat']; ?>
-                            <?php endif; ?>
-                        </td>
-                        <td style="padding: 0;" class="pangkat-pegawai-view">
-                            <?php echo $pihak_pertama['pangkat']; ?>
-                        </td>
-                    </tr>
-                    <tr class="<?php echo $ttd_orientasi; ?>">
-                        <td style="padding: 0;" id="nip_pegawai_atasan">
-                            <?php if (empty($data_atasan['status_kepala'])) : ?>
-                                NIP. <span class="nip-pegawai-atasan-view"><?php echo $pihak_kedua['nip_pegawai']; ?></span>
-                            <?php endif; ?>
-                        </td>
-                        <td style="padding: 0;">
-                            NIP. <span class="nip-pegawai-view"><?php echo $pihak_pertama['nip_pegawai']; ?></span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="col-1"></div>
         </div>
-
-        <div class="break-print"></div>
-        <div class="page-print mt-5 text-center">
-            <p class="title-laporan mt-3">PERJANJIAN KINERJA TAHUN <?php echo $input['tahun']; ?></p>
-            <p class="title-laporan mb-5 nama-satker-view"><?php echo $pihak_pertama['bidang_pegawai']; ?></p>
-            <?php if (!empty($html_pk['html_sasaran'])) : ?>
-                <table class="table_data_anggaran" id="table-sasaran-view">
-                    <thead>
-                        <tr>
-                            <th class="esakip-text_tengah" style="width: 45px;">No</th>
-                            <th class="esakip-text_tengah" style="width: 470px;">Sasaran</th>
-                            <th class="esakip-text_tengah" style="width: 180px;">Indikator</th>
-                            <th class="esakip-text_tengah">Target</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php echo $html_pk['html_sasaran']; ?>
-                    </tbody>
-                </table>
-            <?php endif; ?>
-
-            <?php if (!empty($html_pk['html_program'])) : ?>
-                <table class="table_data_anggaran" id="table-program-view">
-                    <thead>
-                        <tr>
-                            <th class="esakip-text_tengah" style="width: 45px;">No</th>
-                            <th class="esakip-text_tengah" style="width: 470px;">Program</th>
-                            <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
-                            <th class="esakip-text_tengah">Ket</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php echo $html_pk['html_program']; ?>
-                    </tbody>
-                </table>
-            <?php endif; ?>
-
-            <?php if (!empty($html_pk['html_kegiatan'])) : ?>
-                <table class="table_data_anggaran" id="table-kegiatan-view">
-                    <thead>
-                        <tr>
-                            <th class="esakip-text_tengah" style="width: 45px;">No</th>
-                            <th class="esakip-text_tengah" style="width: 470px;">Kegiatan</th>
-                            <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
-                            <th class="esakip-text_tengah">Ket</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php echo $html_pk['html_kegiatan']; ?>
-                    </tbody>
-                </table>
-            <?php endif; ?>
-
-            <?php if (!empty($html_pk['html_sub_kegiatan'])) : ?>
-                <table class="table_data_anggaran" id="table-subkegiatan-view">
-                    <thead>
-                        <tr>
-                            <th class="esakip-text_tengah" style="width: 45px;">No</th>
-                            <th class="esakip-text_tengah" style="width: 470px;">Sub Kegiatan</th>
-                            <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
-                            <th class="esakip-text_tengah">Ket</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php echo $html_pk['html_sub_kegiatan']; ?>
-                    </tbody>
-                </table>
-            <?php endif; ?>
-
-            <table id="table_data_pejabat" class="f-12 mt-5">
-                <tbody>
-                    <tr class="<?php echo $ttd_orientasi; ?>">
-                        <td style="padding: 0;"></td>
-                        <td style="padding: 0;" contenteditable="true" title="Klik untuk ganti teks!" class="editable-field">
-                            <?php echo $pemda; ?>, <span class="tanggal-dokumen-view"><?php echo $text_tanggal_hari_ini; ?></span>
-                        </td>
-                    </tr>
-                    <tr class="<?php echo $ttd_orientasi; ?>">
-                        <td style="padding: 0;" class="jabatan-pegawai-atasan-view status-jabatan-pegawai-2"><?php echo $pihak_kedua['jabatan_pegawai']; ?></td>
-                        <td style="padding: 0;" class="jabatan-pegawai-view status-jabatan-pegawai-1"><?php echo $pihak_pertama['jabatan_pegawai']; ?>,</td>
-                    </tr>
-                    <tr style="height: 7em;">
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr class="<?php echo $ttd_orientasi; ?>">
-                        <td class="ttd-pejabat nama-pegawai-atasan-view">
-                            <?php echo $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] . ', ' . $pihak_kedua['gelar_belakang']; ?>
-                        </td>
-                        <td class="ttd-pejabat nama-pegawai-view">
-                            <?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . ', ' . $pihak_pertama['gelar_belakang']; ?>
-                        </td>
-                    </tr>
-                    <tr class="<?php echo $ttd_orientasi; ?>">
-                        <td style="padding: 0;" class="pangkat-pegawai-atasan-view">
-                            <?php if (empty($data_atasan['status_kepala'])) : ?>
-                                <?php echo $pihak_kedua['pangkat']; ?>
-                            <?php endif; ?>
-                        </td>
-                        <td style="padding: 0;" class="pangkat-pegawai-view">
-                            <?php echo $pihak_pertama['pangkat']; ?>
-                        </td>
-                    </tr>
-                    <tr class="<?php echo $ttd_orientasi; ?>">
-                        <td style="padding: 0;">
-                            <?php if (empty($data_atasan['status_kepala'])) : ?>
-                                NIP. <span class="nip-pegawai-atasan-view"><?php echo $pihak_kedua['nip_pegawai']; ?></span>
-                            <?php endif; ?>
-                        </td>
-                        <td style="padding: 0;">
-                            NIP. <span class="nip-pegawai-view"><?php echo $pihak_pertama['nip_pegawai']; ?></span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="hide-display-print container mt-4 p-4 mb-4 border rounded bg-light">
-            <h4 class="font-weight-bold mb-3 text-dark">Catatan Finalisasi Dokumen PK:</h4>
-            <ul class="pl-3 text-muted">
-                <li class="text-danger font-weight-bold">⚠️ Dokumen PK yang sudah difinalisasi tidak dapat diedit kembali! <br> (Hanya nama tahapan dan tanggal dokumen yang masih bisa diubah.)</li>
-                <li>Dokumen <strong>"Perjanjian Kinerja Sekarang"</strong> dapat difinalisasikan per tahap.</li>
-                <li>Data pegawai dan Data atasan pegawai dalam dokumen PK diambil secara <strong>real-time</strong> dari aplikasi SIMPEG.</li>
-                <li>Pegawai Berstatus <strong>Plt./Plh./Pj.</strong> dapat mengisi form status jabatan yang muncul saat halaman pertama kali di muat.</li>
-                <li>Finalisasi dokumen akan menyimpan data pegawai dan Data atasan pegawai saat ini, termasuk:
-                    <ul>
-                        <li>NIP</li>
-                        <li>Pangkat dan Jabatan</li>
-                        <li>Nama (beserta gelar)</li>
-                        <li>Nama Perangkat Daerah saat ini</li>
-                        <li>Nama Satuan Kerja saat ini</li>
-                        <li>Status Jabatan (Plt./Plh./Pj.)</li>
-                    </ul>
-                    <strong>Pastikan data pegawai dan Data atasan pegawai sudah benar sebelum melakukan finalisasi.</strong>
-                </li>
-                <li>Finalisasi dokumen juga menyimpan data <strong>Plotting RHK (Rencana Hasil Kerja)</strong> per pegawai, meliputi:
-                    <ul>
-                        <li>Sasaran</li>
-                        <li>Program</li>
-                        <li>Kegiatan</li>
-                        <li>Subkegiatan</li>
-                    </ul>
-                    <strong>Pastikan data plotting RHK sudah sesuai sebelum finalisasi.</strong> Data ini dapat disesuaikan melalui halaman RHK.
-                </li>
-                <li><strong>Pegawai dapat memiliki dokumen PK di lebih dari satu Perangkat Daerah.</strong> Dokumen PK yang ditampilkan adalah berdasarkan data per pegawai dan per tahun.</li>
-            </ul>
-        </div>
+        <p class="title-laporan mt-3 mb-2"><span class="jenis_pk_text">PERJANJIAN KINERJA</span> TAHUN <?php echo $input['tahun']; ?></p>
+        <p class="text-left f-12 mt-5">Dalam rangka mewujudkan manajemen pemerintahan yang efektif, transparan dan akuntabel serta berorientasi pada hasil, kami yang bertanda tangan dibawah ini :</p>
+        <table id="table-1" class="text-left f-12">
+            <tr>
+                <td>Nama</td>
+                <td>:</td>
+                <td class="nama-pegawai-view"><?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] .  $pihak_pertama['gelar_belakang']; ?></td>
+            </tr>
+            <tr>
+                <td>Jabatan</td>
+                <td>:</td>
+                <td class="status-jabatan-pegawai-1 jabatan-pegawai-view"><?php echo $pihak_pertama['jabatan_pegawai']; ?></td>
+            </tr>
+            <tr>
+                <td colspan="3">Selanjutnya disebut pihak pertama</td>
+            </tr>
+            <tr>
+                <td>Nama</td>
+                <td>:</td>
+                <td class="nama-pegawai-atasan-view"><?php echo $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] .  $pihak_kedua['gelar_belakang']; ?></td>
+            </tr>
+            <tr>
+                <td>Jabatan</td>
+                <td>:</td>
+                <td class="status-jabatan-pegawai-2 jabatan-pegawai-atasan-view" id="jabatan_pegawai_atasan"><?php echo $pihak_kedua['jabatan_pegawai']; ?></td>
+            </tr>
+            <tr>
+                <td colspan="3">Selaku atasan langsung pihak pertama, selanjutnya disebut pihak kedua</td>
+            </tr>
+        </table>
+        <p class="text-left f-12">Pihak pertama berjanji akan mewujudkan target kinerja yang seharusnya sesuai lampiran perjanjian ini, dalam rangka mencapai target kinerja jangka menengah seperti yang telah ditetapkan dalam dokumen perencanaan. Keberhasilan dan kegagalan pencapaian target tersebut menjadi tanggung jawab kami.</p>
+        </br>
+        <p class="text-left f-12">Pihak kedua akan memberikan supervisi yang diperlukan serta akan melakukan evaluasi terhadap capaian kinerja dari perjanjian ini dan mengambil tindakan yang diperlukan dalam rangka memberikan penghargaan dan sanksi.</p>
+        <table id="table_data_pejabat" style="margin-top: 3rem;" class="f-12">
+            <tbody>
+                <tr class="<?php echo $ttd_orientasi; ?>">
+                    <td></td>
+                    <td style="padding: 0 0 0 20px;" contenteditable="true" title="Klik untuk ganti teks!" class="editable-field">
+                        <?php echo $pemda; ?>, <span class="tanggal-dokumen-view"><?php echo $text_tanggal_hari_ini; ?></span>
+                    </td>
+                </tr>
+                <tr class="<?php echo $ttd_orientasi; ?>">
+                    <td style="padding: 0 20px 0 0;">Pihak Kedua,</td>
+                    <td style="padding: 0 0 0 20px;">Pihak Pertama,</td>
+                </tr>
+                <tr style="height: 7em;">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr class="<?php echo $ttd_orientasi; ?>">
+                    <td style="padding: 0 20px 0 0;" class="ttd-pejabat nama-pegawai-atasan-view" id="nama_pegawai_atasan">
+                        <?php echo $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] . $pihak_kedua['gelar_belakang']; ?>
+                    </td>
+                    <td style="padding: 0 0 0 20px;" class="ttd-pejabat nama-pegawai-view">
+                        <?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . $pihak_pertama['gelar_belakang']; ?>
+                    </td>
+                </tr>
+                <tr class="<?php echo $ttd_orientasi; ?>">
+                    <td style="padding: 0 20px 0 0;" id="pangkat_pegawai_atasan" class="pangkat-pegawai-atasan-view">
+                        <?php if ($data_atasan->id != 0) : ?>
+                            <?php echo $pihak_kedua['pangkat']; ?>
+                        <?php endif; ?>
+                    </td>
+                    <td style="padding: 0 0 0 20px;" class="pangkat-pegawai-view">
+                        <?php echo $pihak_pertama['pangkat']; ?>
+                    </td>
+                </tr>
+                <tr class="<?php echo $ttd_orientasi; ?>">
+                    <td style="padding: 0 20px 0 0;" id="nip_pegawai_atasan">
+                        <?php if ($data_atasan->id != 0) : ?>
+                            NIP. <span class="nip-pegawai-atasan-view"><?php echo $pihak_kedua['nip_pegawai']; ?></span>
+                        <?php endif; ?>
+                    </td>
+                    <td style="padding: 0 0 0 20px;">
+                        NIP. <span class="nip-pegawai-view"><?php echo $pihak_pertama['nip_pegawai']; ?></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
-    <div class="modal fade mt-4" id="modalFinalisasi" tabindex="-1" role="dialog" aria-labelledby="modalFinalisasi" aria-hidden="true">
-        <div class="modal-dialog modal-xl" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="title-label">Finalisasi Dokumen Perjanjian Kinerja <?php echo $input['tahun']; ?></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+    <div class="break-print"></div>
+    <div class="page-print mt-5 text-center">
+        <p class="title-laporan mt-3"><span class="jenis_pk_text">PERJANJIAN KINERJA</span> TAHUN <?php echo $input['tahun']; ?></p>
+        <p class="title-laporan mb-5 nama-satker-view"><?php echo $pihak_pertama['nama_bidang']; ?></p>
+        <?php if (!empty($html_pk['html_sasaran'])) : ?>
+            <table class="table_data_anggaran" id="table-sasaran-view">
+                <thead>
+                    <tr>
+                        <th class="esakip-text_tengah" style="width: 45px;">No</th>
+                        <th class="esakip-text_tengah" style="width: 470px;">Sasaran</th>
+                        <th class="esakip-text_tengah" style="width: 180px;">Indikator</th>
+                        <th class="esakip-text_tengah">Target</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php echo $html_pk['html_sasaran']; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+
+        <?php if (!empty($html_pk['html_program'])) : ?>
+            <table class="table_data_anggaran" id="table-program-view">
+                <thead>
+                    <tr>
+                        <th class="esakip-text_tengah" style="width: 45px;">No</th>
+                        <th class="esakip-text_tengah" style="width: 470px;">Program</th>
+                        <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
+                        <th class="esakip-text_tengah">Ket</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php echo $html_pk['html_program']; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+
+        <?php if (!empty($html_pk['html_kegiatan'])) : ?>
+            <table class="table_data_anggaran" id="table-kegiatan-view">
+                <thead>
+                    <tr>
+                        <th class="esakip-text_tengah" style="width: 45px;">No</th>
+                        <th class="esakip-text_tengah" style="width: 470px;">Kegiatan</th>
+                        <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
+                        <th class="esakip-text_tengah">Ket</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php echo $html_pk['html_kegiatan']; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+
+        <?php if (!empty($html_pk['html_sub_kegiatan'])) : ?>
+            <table class="table_data_anggaran" id="table-subkegiatan-view">
+                <thead>
+                    <tr>
+                        <th class="esakip-text_tengah" style="width: 45px;">No</th>
+                        <th class="esakip-text_tengah" style="width: 470px;">Sub Kegiatan</th>
+                        <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
+                        <th class="esakip-text_tengah">Ket</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php echo $html_pk['html_sub_kegiatan']; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+
+        <table id="table_data_pejabat" class="f-12 mt-5">
+            <tbody>
+                <tr class="<?php echo $ttd_orientasi; ?>">
+                    <td style="padding: 0 20px 0 0;"></td>
+                    <td style="padding: 0 0 0 20px;" contenteditable="true" title="Klik untuk ganti teks!" class="editable-field">
+                        <?php echo $pemda; ?>, <span class="tanggal-dokumen-view"><?php echo $text_tanggal_hari_ini; ?></span>
+                    </td>
+                </tr>
+                <tr class="<?php echo $ttd_orientasi; ?>">
+                    <td style="padding: 0 20px 0 0;" class="jabatan-pegawai-atasan-view status-jabatan-pegawai-2"><?php echo $pihak_kedua['jabatan_pegawai']; ?></td>
+                    <td style="padding: 0 0 0 20px;" class="jabatan-pegawai-view status-jabatan-pegawai-1"><?php echo $pihak_pertama['jabatan_pegawai']; ?>,</td>
+                </tr>
+                <tr style="height: 7em;">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr class="<?php echo $ttd_orientasi; ?>">
+                    <td style="padding: 0 20px 0 0;" class="ttd-pejabat nama-pegawai-atasan-view">
+                        <?php echo $pihak_kedua['gelar_depan'] . ' ' . $pihak_kedua['nama_pegawai'] .  $pihak_kedua['gelar_belakang']; ?>
+                    </td>
+                    <td style="padding: 0 0 0 20px;" class="ttd-pejabat nama-pegawai-view">
+                        <?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] .  $pihak_pertama['gelar_belakang']; ?>
+                    </td>
+                </tr>
+                <tr class="<?php echo $ttd_orientasi; ?>">
+                    <td style="padding: 0 20px 0 0;" class="pangkat-pegawai-atasan-view">
+                        <?php if ($data_atasan->id != 0) : ?>
+                            <?php echo $pihak_kedua['pangkat']; ?>
+                        <?php endif; ?>
+                    </td>
+                    <td style="padding: 0 0 0 20px;" class="pangkat-pegawai-view">
+                        <?php echo $pihak_pertama['pangkat']; ?>
+                    </td>
+                </tr>
+                <tr class="<?php echo $ttd_orientasi; ?>">
+                    <td style="padding: 0 20px 0 0;">
+                        <?php if ($data_atasan->id != 0) : ?>
+                            NIP. <span class="nip-pegawai-atasan-view"><?php echo $pihak_kedua['nip_pegawai']; ?></span>
+                        <?php endif; ?>
+                    </td>
+                    <td style="padding: 0 0 0 20px;">
+                        NIP. <span class="nip-pegawai-view"><?php echo $pihak_pertama['nip_pegawai']; ?></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="hide-display-print container mt-4 p-4 mb-4 border rounded bg-light">
+        <h4 class="font-weight-bold mb-3 text-dark">Catatan Finalisasi Dokumen PK:</h4>
+        <ul class="pl-3 text-muted">
+            <li class="text-danger font-weight-bold">⚠️ Dokumen PK yang sudah difinalisasi tidak dapat diedit, tapi bisa dihapus jika ada kesalahan! <br> (Hanya nama tahapan dan tanggal dokumen yang masih bisa diubah.)</li>
+            <li>Dokumen <strong>"Perjanjian Kinerja Sekarang"</strong> dapat difinalisasikan per tahap.</li>
+            <li>Data pegawai dan Data atasan pegawai dalam dokumen PK diambil secara <strong>real-time</strong> dari aplikasi SIMPEG.</li>
+            <li>Pegawai Berstatus <strong>Plt./Plh./Pj.</strong> dapat mengisi form status jabatan yang muncul saat halaman pertama kali di muat.</li>
+            <li>Finalisasi dokumen akan menyimpan data pegawai dan Data atasan pegawai saat ini, termasuk:
+                <ul>
+                    <li>NIP</li>
+                    <li>Pangkat dan Jabatan</li>
+                    <li>Nama (beserta gelar)</li>
+                    <li>Nama Perangkat Daerah saat ini</li>
+                    <li>Nama Satuan Kerja saat ini</li>
+                    <li>Status Jabatan (Plt./Plh./Pj.)</li>
+                </ul>
+                <strong>Pastikan data pegawai dan Data atasan pegawai sudah benar sebelum melakukan finalisasi.</strong>
+            </li>
+            <li>Finalisasi dokumen juga menyimpan data <strong>Plotting RHK (Rencana Hasil Kerja)</strong> per pegawai, meliputi:
+                <ul>
+                    <li>Sasaran</li>
+                    <li>Program</li>
+                    <li>Kegiatan</li>
+                    <li>Subkegiatan</li>
+                </ul>
+                <strong>Pastikan data plotting RHK sudah sesuai sebelum finalisasi.</strong> Data ini dapat disesuaikan melalui halaman RHK.
+            </li>
+            <li><strong>Pegawai dapat memiliki dokumen PK di lebih dari satu Perangkat Daerah.</strong> Dokumen PK yang ditampilkan adalah berdasarkan data per pegawai dan per tahun.</li>
+        </ul>
+    </div>
+</div>
+</div>
+
+<div class="modal fade mt-4" id="modalFinalisasi" tabindex="-1" role="dialog" aria-labelledby="modalFinalisasi" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="title-label">Finalisasi Dokumen Perjanjian Kinerja <?php echo $input['tahun']; ?></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Informasi Pegawai -->
+                <div class="card bg-light mb-3">
+                    <div class="card-header">
+                        <strong>Informasi Pegawai</strong>
+                    </div>
+                    <div class="card-body">
+                        <table class="borderless-table mb-4">
+                            <tbody>
+                                <tr>
+                                    <td class="text-left" style="width: 20%;">
+                                        <strong>Nama Pegawai</strong>
+                                    </td>
+                                    <td class="text-left">
+                                        <strong>:</strong>
+                                    </td>
+                                    <td class="text-left" id="nama_pegawai"><?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . $pihak_pertama['gelar_belakang']; ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left">
+                                        <strong>NIP</strong>
+                                    </td>
+                                    <td class="text-left">
+                                        <strong>:</strong>
+                                    </td>
+                                    <td class="text-left" id="nip_pegawai"><?php echo $pihak_pertama['nip_pegawai']; ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left">
+                                        <strong>Pangkat</strong>
+                                    </td>
+                                    <td class="text-left">
+                                        <strong>:</strong>
+                                    </td>
+                                    <td class="text-left" id="pangkat_pegawai"><?php echo $pihak_pertama['pangkat'] ?: '-'; ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left">
+                                        <strong>Jabatan</strong>
+                                    </td>
+                                    <td class="text-left">
+                                        <strong>:</strong>
+                                    </td>
+                                    <td class="text-left" id="jabatan_pegawai"><?php echo $pihak_pertama['jabatan_pegawai']; ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left">
+                                        <strong>Satuan Kerja</strong>
+                                    </td>
+                                    <td class="text-left">
+                                        <strong>:</strong>
+                                    </td>
+                                    <td class="text-left" id="bidang_pegawai"><?php echo strtoupper($pihak_pertama['nama_bidang']); ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left">
+                                        <strong>OPD</strong>
+                                    </td>
+                                    <td class="text-left">
+                                        <strong>:</strong>
+                                    </td>
+                                    <td class="text-left" id="nama_skpd"><?php echo strtoupper($skpd['nama_skpd']); ?>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <!-- Informasi Pegawai -->
-                    <div class="card bg-light mb-3">
-                        <div class="card-header">
-                            <strong>Informasi Pegawai</strong>
-                        </div>
-                        <div class="card-body">
-                            <table class="borderless-table mb-4">
+
+                <!-- Informasi RHK -->
+                <div class="card bg-light mb-3">
+                    <div class="card-header">
+                        <strong>RHK</strong>
+                    </div>
+                    <div class="card-body">
+                        <?php if (!empty($html_pk['html_sasaran'])) : ?>
+                            <table class="table_data_anggaran" id="table_sasaran">
+                                <thead class="bg-dark text-light">
+                                    <tr>
+                                        <th class="esakip-text_tengah" style="width: 46px;">No</th>
+                                        <th class="esakip-text_tengah" style="width: 470px;">Sasaran</th>
+                                        <th class="esakip-text_tengah" style="width: 180px;">Indikator</th>
+                                        <th class="esakip-text_tengah">Target</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
-                                    <tr>
-                                        <td class="text-left" style="width: 20%;">
-                                            <strong>Nama Pegawai</strong>
-                                        </td>
-                                        <td class="text-left">
-                                            <strong>:</strong>
-                                        </td>
-                                        <td class="text-left" id="nama_pegawai"><?php echo $pihak_pertama['gelar_depan'] . ' ' . $pihak_pertama['nama_pegawai'] . ', ' . $pihak_pertama['gelar_belakang']; ?>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-left">
-                                            <strong>NIP</strong>
-                                        </td>
-                                        <td class="text-left">
-                                            <strong>:</strong>
-                                        </td>
-                                        <td class="text-left" id="nip_pegawai"><?php echo $pihak_pertama['nip_pegawai']; ?>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-left">
-                                            <strong>Pangkat</strong>
-                                        </td>
-                                        <td class="text-left">
-                                            <strong>:</strong>
-                                        </td>
-                                        <td class="text-left" id="pangkat_pegawai"><?php echo $pihak_pertama['pangkat'] ?: '-'; ?>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-left">
-                                            <strong>Jabatan</strong>
-                                        </td>
-                                        <td class="text-left">
-                                            <strong>:</strong>
-                                        </td>
-                                        <td class="text-left" id="jabatan_pegawai"><?php echo $pihak_pertama['jabatan_pegawai']; ?>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-left">
-                                            <strong>Satuan Kerja</strong>
-                                        </td>
-                                        <td class="text-left">
-                                            <strong>:</strong>
-                                        </td>
-                                        <td class="text-left" id="bidang_pegawai"><?php echo strtoupper($pihak_pertama['bidang_pegawai']); ?>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-left">
-                                            <strong>OPD</strong>
-                                        </td>
-                                        <td class="text-left">
-                                            <strong>:</strong>
-                                        </td>
-                                        <td class="text-left" id="nama_skpd"><?php echo strtoupper($skpd['nama_skpd']); ?>
-                                        </td>
-                                    </tr>
+                                    <?php echo $html_pk['html_sasaran']; ?>
                                 </tbody>
                             </table>
-                        </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($html_pk['html_program'])) : ?>
+                            <table class="table_data_anggaran" id="table_program">
+                                <thead class="bg-dark text-light">
+                                    <tr>
+                                        <th class="esakip-text_tengah" style="width: 45px;">No</th>
+                                        <th class="esakip-text_tengah" style="width: 470px;">Program</th>
+                                        <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
+                                        <th class="esakip-text_tengah">Ket</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php echo $html_pk['html_program']; ?>
+                                </tbody>
+                            </table>
+                        <?php endif; ?>
+
+                        <?php if (!empty($html_pk['html_kegiatan'])) : ?>
+                            <table class="table_data_anggaran" id="table_kegiatan">
+                                <thead class="bg-dark text-light">
+                                    <tr>
+                                        <th class="esakip-text_tengah" style="width: 45px;">No</th>
+                                        <th class="esakip-text_tengah" style="width: 470px;">Kegiatan</th>
+                                        <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
+                                        <th class="esakip-text_tengah">Ket</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php echo $html_pk['html_kegiatan']; ?>
+                                </tbody>
+                            </table>
+                        <?php endif; ?>
+
+                        <?php if (!empty($html_pk['html_sub_kegiatan'])) : ?>
+                            <table class="table_data_anggaran" id="table_subkegiatan">
+                                <thead class="bg-dark text-light">
+                                    <tr>
+                                        <th class="esakip-text_tengah" style="width: 45px;">No</th>
+                                        <th class="esakip-text_tengah" style="width: 470px;">Sub Kegiatan</th>
+                                        <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
+                                        <th class="esakip-text_tengah">Ket</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php echo $html_pk['html_sub_kegiatan']; ?>
+                                </tbody>
+                            </table>
+                        <?php endif; ?>
                     </div>
+                </div>
 
-                    <!-- Informasi RHK -->
-                    <div class="card bg-light mb-3">
-                        <div class="card-header">
-                            <strong>RHK</strong>
-                        </div>
-                        <div class="card-body">
-                            <?php if (!empty($html_pk['html_sasaran'])) : ?>
-                                <table class="table_data_anggaran" id="table_sasaran">
-                                    <thead class="bg-dark text-light">
-                                        <tr>
-                                            <th class="esakip-text_tengah" style="width: 46px;">No</th>
-                                            <th class="esakip-text_tengah" style="width: 470px;">Sasaran</th>
-                                            <th class="esakip-text_tengah" style="width: 180px;">Indikator</th>
-                                            <th class="esakip-text_tengah">Target</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php echo $html_pk['html_sasaran']; ?>
-                                    </tbody>
-                                </table>
-                            <?php endif; ?>
-
-                            <?php if (!empty($html_pk['html_program'])) : ?>
-                                <table class="table_data_anggaran" id="table_program">
-                                    <thead class="bg-dark text-light">
-                                        <tr>
-                                            <th class="esakip-text_tengah" style="width: 45px;">No</th>
-                                            <th class="esakip-text_tengah" style="width: 470px;">Program</th>
-                                            <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
-                                            <th class="esakip-text_tengah">Ket</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php echo $html_pk['html_program']; ?>
-                                    </tbody>
-                                </table>
-                            <?php endif; ?>
-
-                            <?php if (!empty($html_pk['html_kegiatan'])) : ?>
-                                <table class="table_data_anggaran" id="table_kegiatan">
-                                    <thead class="bg-dark text-light">
-                                        <tr>
-                                            <th class="esakip-text_tengah" style="width: 45px;">No</th>
-                                            <th class="esakip-text_tengah" style="width: 470px;">Kegiatan</th>
-                                            <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
-                                            <th class="esakip-text_tengah">Ket</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php echo $html_pk['html_kegiatan']; ?>
-                                    </tbody>
-                                </table>
-                            <?php endif; ?>
-
-                            <?php if (!empty($html_pk['html_sub_kegiatan'])) : ?>
-                                <table class="table_data_anggaran" id="table_subkegiatan">
-                                    <thead class="bg-dark text-light">
-                                        <tr>
-                                            <th class="esakip-text_tengah" style="width: 45px;">No</th>
-                                            <th class="esakip-text_tengah" style="width: 470px;">Sub Kegiatan</th>
-                                            <th class="esakip-text_tengah" style="width: 180px;">Anggaran</th>
-                                            <th class="esakip-text_tengah">Ket</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php echo $html_pk['html_sub_kegiatan']; ?>
-                                    </tbody>
-                                </table>
-                            <?php endif; ?>
-                        </div>
+                <div class="card bg-light mb-3">
+                    <div class="card-header">
+                        <strong>Perjanjian Kinerja</strong>
                     </div>
-
-                    <div class="card bg-light mb-3">
-                        <div class="card-header">
-                            <strong>Perjanjian Kinerja</strong>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="nama_dokumen">Nama Tahapan</label>
-                                    <input type="text" class="form-control" id="nama_dokumen" name="nama_dokumen" placeholder="ex : Perjanjian Kinerja tahun <?php echo $input['tahun']; ?>" maxlength="48" required>
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <label for="tanggal_dokumen">Tanggal Dokumen</label>
-                                    <input type="date" class="form-control" id="tanggal_dokumen" name="tanggal_dokumen" value="<?php echo date('Y-m-d'); ?>" required>
-                                </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="nama_dokumen">Nama Tahapan</label>
+                                <input type="text" class="form-control" id="nama_dokumen" name="nama_dokumen" placeholder="ex : Perjanjian Kinerja tahun <?php echo $input['tahun']; ?>" maxlength="48" required>
                             </div>
-                            <small class="form-text text-muted">Pastikan data yang tertera benar, laporan yang sudah difinalisasi akan disimpan dan tidak dapat di edit kembali.</small>
+                            <div class="form-group col-md-6">
+                                <label for="tanggal_dokumen">Tanggal Dokumen</label>
+                                <input type="date" class="form-control" id="tanggal_dokumen" name="tanggal_dokumen" value="<?php echo date('Y-m-d'); ?>" required>
+                            </div>
                         </div>
+                        <small class="form-text text-muted">Pastikan data yang tertera benar, laporan yang sudah difinalisasi akan disimpan dan tidak dapat di edit kembali.</small>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary" onclick="simpanFinalisasi()">Simpan</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Tutup</button>
-                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" onclick="simpanFinalisasi()">Simpan</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Tutup</button>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="modal fade mt-4" id="modalEditFinalisasi" tabindex="-1" role="dialog" aria-labelledby="modalEditFinalisasi" aria-hidden="true">
-        <div class="modal-dialog modal-xl" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="title-label">Edit Finalisasi Dokumen Perjanjian Kinerja <?php echo $input['tahun']; ?></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="id_data" name="id_data" value="">
+<div class="modal fade mt-4" id="modalEditFinalisasi" tabindex="-1" role="dialog" aria-labelledby="modalEditFinalisasi" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="title-label">Edit Finalisasi Dokumen Perjanjian Kinerja <?php echo $input['tahun']; ?></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="id_data" name="id_data" value="">
 
-                    <div class="card bg-light mb-3">
-                        <div class="card-header">
-                            <strong>Perjanjian Kinerja</strong>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="nama_tahap_finalisasi">Nama Tahapan</label>
-                                    <input type="text" class="form-control" id="nama_tahap_finalisasi" name="nama_tahap_finalisasi" placeholder="ex : Perjanjian Kinerja tahun <?php echo $input['tahun']; ?>" maxlength="48">
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <label for="tanggal_tahap_finalisasi">Tanggal Dokumen</label>
-                                    <input type="date" class="form-control" id="tanggal_tahap_finalisasi" name="tanggal_tahap_finalisasi">
-                                </div>
+                <div class="card bg-light mb-3">
+                    <div class="card-header">
+                        <strong>Perjanjian Kinerja</strong>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="nama_tahap_finalisasi">Nama Tahapan</label>
+                                <input type="text" class="form-control" id="nama_tahap_finalisasi" name="nama_tahap_finalisasi" placeholder="ex : Perjanjian Kinerja tahun <?php echo $input['tahun']; ?>" maxlength="48">
                             </div>
-                            <small class="form-text text-muted">Dokumen yang sudah difinalisasi hanya dapat diubah nama label nya.</small>
+                            <div class="form-group col-md-6">
+                                <label for="tanggal_tahap_finalisasi">Tanggal Dokumen</label>
+                                <input type="date" class="form-control" id="tanggal_tahap_finalisasi" name="tanggal_tahap_finalisasi">
+                            </div>
                         </div>
+                        <small class="form-text text-muted">Dokumen yang sudah difinalisasi hanya dapat diubah nama label nya.</small>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary" onclick="simpanEditFinalisasi()">Perbarui</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Tutup</button>
-                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" onclick="simpanEditFinalisasi()">Perbarui</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Tutup</button>
             </div>
         </div>
     </div>
-</body>
+</div>
 <!-- modal alamat -->
-<div class="modal fade" id="modalAlamat" data-backdrop="static"  role="dialog" aria-labelledby="modalAlamat" aria-hidden="true">
+<div class="modal fade" id="modalAlamat" data-backdrop="static" role="dialog" aria-labelledby="modalAlamat" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="uploadModalLabel">Edit Perangkat Daerah</h5>
+                <h5 class="modal-title" id="uploadModalLabel">Edit Alamat Kantor</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -1375,72 +1327,35 @@ $ttd_orientasi = 'text-left';
                     <input type="hidden" value="" id="id_skpd">
                     <div class="form-group">
                         <label for="alamat">Alamat Kantor</label>
-                        <textarea type="text" class="form-control" id="alamat" name="alamat" required></textarea>
+                        <?php
+                        $content = '';
+                        $editor_id = 'alamat';
+                        $settings = array(
+                            'textarea_name' => 'alamat',
+                            'media_buttons' => false,
+                            'teeny' => false,
+                            'quicktags' => true
+                        );
+                        wp_editor($content, $editor_id, $settings);
+                        ?>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="submit" class="btn btn-primary d-flex text-right" onclick="submit_edit_alamat(this); return false">Unggah</button>
+                <button type="submit" class="btn btn-primary d-flex text-right" onclick="submit_edit_alamat(this); return false">Simpan</button>
             </div>
         </div>
     </div>
 </div>
 <script>
     jQuery(document).ready(function() {
-        window.status_jabatan_1 = '';
-        window.status_jabatan_2 = '';
         window.hak_akses_user_pegawai = <?php echo $hak_akses_user_pegawai ?>;
         window.nip_akses_user_pegawai = <?php echo $nip_user_pegawai ?>;
         window.nip_pihak_pertama = <?php echo $pihak_pertama['nip_pegawai'] ?>;
+        updateFont();
 
-        let cek_kepala_skpd = <?php echo $cek_kepala_skpd; ?>;
-
-        if(hak_akses_user_pegawai == 2 && nip_pihak_pertama != nip_akses_user_pegawai){
+        if (hak_akses_user_pegawai == 2 && nip_pihak_pertama != nip_akses_user_pegawai) {
             jQuery(".editable-field").attr("title", "").attr("contenteditable", "false");
-        }
-
-        //CEK NAMA DAN STATUS JABATAN KEPALA DAERAH DI ESAKIP OPTIONS
-        let cek_nama_kepala_daerah = <?php echo $cek_nama_kepala_daerah; ?>;
-        let cek_status_jabatan_kepala_daerah = <?php echo $cek_status_jabatan_kepala_daerah; ?>;
-
-        //CEK STATUS JABATAN PLT PIHAK PERTAMA / KEDUA 
-        let cek_status_jabatan_kepala_pihak_pertama = <?php echo $cek_status_jabatan_kepala_pihak_pertama; ?>;
-        let cek_status_jabatan_kepala_pihak_kedua = <?php echo $cek_status_jabatan_kepala_pihak_kedua; ?>;
-
-        //NAMA PIHAK PERTAMA / KEDUA
-        let nama_pihak_pertama = "<?php echo $pihak_pertama['nama_pegawai']; ?>";
-        let nama_pihak_kedua = "<?php echo $pihak_kedua['nama_pegawai']; ?>";
-
-        //PIHAK PERTAMA KEPALA, PIHAK KEDUA KEPALA DAERAH, HARUS DIISI NAMA KEPALA DAERAHNYA
-        if (cek_kepala_skpd == 1 && (cek_nama_kepala_daerah == 0)) {
-            alert("Harap Isi Nama Kepala Daerah Di E-SAKIP Options!");
-        }
-
-        //PIHAK PERTAMA KEPALA, PIHAK KEDUA KEPALA DAERAH, HARUS DIISI JABATAN KEPALA DAERAHNYA
-        if (cek_kepala_skpd == 1 && (cek_status_jabatan_kepala_daerah == 0)) {
-            alert("Harap Isi Status Jabatan Kepala Daerah Di E-SAKIP Options!");
-        }
-
-        //Pihak Pertama Status (PJ/PLT/PLH)
-        let input_status_jabatan_pertama = "";
-        if (cek_status_jabatan_kepala_pihak_pertama == 1) {
-            input_status_jabatan_pertama = window.prompt("Harap isi status jabatan (PJ, PLT, PLH) atas nama " + nama_pihak_pertama + " sebagai pihak pertama!");
-        }
-
-        if (input_status_jabatan_pertama !== null && input_status_jabatan_pertama.trim() !== "") {
-            jQuery(".status-jabatan-pegawai-1").prepend(input_status_jabatan_pertama + " ");
-            status_jabatan_1 = input_status_jabatan_pertama;
-        }
-
-        //Pihak Kedua Status (PJ/PLT/PLH)
-        let input_status_jabatan_kedua = "";
-        if (cek_status_jabatan_kepala_pihak_kedua == 1) {
-            input_status_jabatan_kedua = window.prompt("Harap isi status jabatan (PJ, PLT, PLH) atas nama " + nama_pihak_kedua + " sebagai pihak kedua!", 'PLT');
-        }
-
-        if (input_status_jabatan_kedua !== null && input_status_jabatan_kedua.trim() !== "") {
-            jQuery(".status-jabatan-pegawai-2").prepend(input_status_jabatan_kedua + " ");
-            status_jabatan_2 = input_status_jabatan_kedua;
         }
     });
 
@@ -1459,9 +1374,13 @@ $ttd_orientasi = 'text-left';
                 jQuery('#wrap-loading').hide();
                 console.log(response);
                 if (response.status === 'success') {
-                    if(response.data != null || response.data != undefined){
+                    if (response.data != null || response.data != undefined) {
                         let data = response.data;
-                        jQuery("#alamat").val(data.alamat_kantor);
+                        if (tinymce.get('alamat')) {
+                            tinymce.get('alamat').setContent(data.alamat_kantor);
+                        } else {
+                            jQuery('#alamat').val(data.alamat_kantor);
+                        }
                     }
                     jQuery('#modalAlamat').modal('show');
                 } else {
@@ -1477,7 +1396,7 @@ $ttd_orientasi = 'text-left';
     }
 
     function submit_edit_alamat() {
-        let alamat = jQuery("#alamat").val();
+        let alamat = tinymce.get('alamat') ? tinymce.get('alamat').getContent() : jQuery('#alamat').val();
         if (alamat == '') {
             return alert('Alamat kantor tidak boleh kosong');
         }
@@ -1528,7 +1447,7 @@ $ttd_orientasi = 'text-left';
             method: 'POST',
             data: {
                 action: "get_laporan_pk_by_id",
-                api_key: esakip.api_key, 
+                api_key: esakip.api_key,
                 id_tahap: idTahap,
             },
             dataType: 'json',
@@ -1538,7 +1457,8 @@ $ttd_orientasi = 'text-left';
                 if (response.status === 'success') {
                     jQuery('.nama-skpd-view').text(response.data.nama_skpd)
                     jQuery('.nama-satker-view').text(response.data.satuan_kerja)
-                    jQuery('.alamat-kantor-view').text(response.data.alamat_kantor)
+                    jQuery('.alamat-kantor-view').empty() // clear previous content
+                    jQuery('.alamat-kantor-view').append(response.data.alamat_kantor)
                     jQuery('.tanggal-dokumen-view').text(formatTanggalIndonesia(response.data.tanggal_dokumen))
 
                     jQuery('.nama-pegawai-view').text(response.data.nama_pegawai)
@@ -1666,7 +1586,7 @@ $ttd_orientasi = 'text-left';
 
         let option_js = {
             id_skpd: '<?php echo $id_skpd; ?>',
-            satker_id: '<?php echo $data_pegawai_1['satker_id']; ?>',
+            satker_id: '<?php echo $data_pegawai_1->satker_id; ?>',
             tahun: '<?php echo $input['tahun']; ?>',
             nip_baru: '<?php echo $nip; ?>'
         };
@@ -1679,13 +1599,11 @@ $ttd_orientasi = 'text-left';
                 action: "simpan_finalisasi_laporan_pk",
                 api_key: esakip.api_key,
                 data_pk: dokumenPk,
-                nip_pertama: '<?php echo $nip; ?>',
-                nip_kedua: '<?php echo $pihak_kedua['nip_pegawai']; ?>',
-                status_pertama: status_jabatan_1,
-                status_kedua: status_jabatan_2,
+                id_pertama: '<?php echo $data_pegawai_1->id; ?>',
+                id_kedua: '<?php echo $data_atasan->id ?? 0; ?>',
                 id_skpd: '<?php echo $id_skpd; ?>',
-                id_satker_pertama: '<?php echo $data_pegawai_1['satker_id']; ?>',
-                id_satker_kedua: '<?php echo (!empty($data_pegawai_2) && isset($data_pegawai_2['satker_id'])) ? $data_pegawai_2['satker_id'] : ($data_atasan['satker_id'] ?? ""); ?>',
+                id_satker_pertama: '<?php echo $data_pegawai_1->satker_id; ?>',
+                id_satker_kedua: '<?php echo (!empty($data_atasan) && isset($data_atasan->satker_id)) ? $data_atasan->satker_id : ($data_atasan->satker_id ?? ""); ?>',
                 tahun_anggaran: '<?php echo $input['tahun']; ?>',
                 options: option_js
             },
@@ -1750,5 +1668,34 @@ $ttd_orientasi = 'text-left';
                 alert('Gagal menyimpan data. Silakan coba lagi.');
             },
         });
+    }
+
+    function updateFont() {
+        const fontFamily = document.getElementById('font-select').value;
+        const fontSize = document.getElementById('font-size').value + 'px';
+        const fontSize1 = document.getElementById('font-size-1').value + 'px';
+        const fontSize2 = document.getElementById('font-size-2').value + 'px';
+
+        document.querySelectorAll('.page-print').forEach(el => {
+            el.style.fontFamily = fontFamily;
+            el.style.fontSize = fontSize;
+        });
+
+        document.querySelectorAll('.title-pk-1').forEach(el => {
+            el.style.fontFamily = fontFamily;
+            el.style.fontSize = fontSize1;
+        });
+
+        document.querySelectorAll('.title-pk-2').forEach(el => {
+            el.style.fontFamily = fontFamily;
+            el.style.fontSize = fontSize2;
+        });
+
+        var jenis_pk = jQuery('input[name="jenis_pk"]:checked').val();
+        if (jenis_pk == 1) {
+            jQuery('.jenis_pk_text').text('PERJANJIAN KINERJA');
+        } else {
+            jQuery('.jenis_pk_text').text('PERJANJIAN KINERJA PERUBAHAN');
+        }
     }
 </script>
