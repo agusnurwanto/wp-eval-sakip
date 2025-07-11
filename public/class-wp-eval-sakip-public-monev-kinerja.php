@@ -5878,6 +5878,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						WHERE tahun_anggaran=%d
 							AND active=1
 							AND nip=%s
+						ORDER BY kode_cascading_sasaran, kode_cascading_program, id_sub_skpd_cascading, kode_cascading_kegiatan, kode_cascading_sub_kegiatan, level, id ASC
 					", $tahun_anggaran, $nip), ARRAY_A);
 
 					$data_all = array(
@@ -5887,36 +5888,29 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'status' => true,
 						'message' => 'Berhasil get data rencana hasil kerja!',
 					);
-					// kegiatan utama
-					foreach ($data as $v) {
+					$rhk_unik = $this->get_rhk_unik($data);
+					foreach ($rhk_unik as $v) {
 						$data_all['total']++;
-						$indikator = $wpdb->get_results($wpdb->prepare("
-							SELECT
-								*,
-								CASE 
-									WHEN aspek_rhk = 1 THEN 'Kuantitas'
-									WHEN aspek_rhk = 2 THEN 'Kualitas'
-									WHEN aspek_rhk = 3 THEN 'Waktu'
-									WHEN aspek_rhk = 4 THEN 'Biaya'
-										ELSE 'Kuntitas'
-									END AS aspek_rhk_teks
-							FROM esakip_data_rencana_aksi_indikator_opd
-							WHERE id_renaksi=%d
-								AND active=1
-						", $v['id']), ARRAY_A);
+						$v['id'] = implode('|', $v['ids']);
+						$indikator = array();
+						foreach ($v['indikator'] as $vv) {
+							$vv['id'] = implode('|', $vv['ids']);
+							$vv['data'][0]['id'] = $vv['id'];
+							$indikator[] = $vv['data'][0];
+						}
 						$rhk_parent = array();
 						if (!empty($v['parent'])) {
 							$rhk_parent = $this->get_rhk_parent($v['parent'], $tahun_anggaran);
 						}
+						$v['data'][0]['id'] = $v['id'];
 						$data_all['data'][$v['id']] = array(
-							'detail' => $v,
+							'detail' => $v['data'][0],
 							'indikator' => $indikator,
 							'detail_atasan' => $rhk_parent
 						);
 					}
-
-					echo json_encode($data_all);
-					exit;
+					// $data_all['sql'] = $wpdb->last_query;
+					die(json_encode($data_all));
 				} else {
 					throw new Exception('Api key tidak sesuai');
 				}
@@ -7178,6 +7172,55 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		return $opsi;
 	}
 
+	function get_rhk_unik($data_ploting_rhk){
+		global $wpdb;
+		$rhk_unik = array();
+		foreach ($data_ploting_rhk as $v_rhk) {
+			$id_unik = strtolower(trim($v_rhk['label']));
+			if (empty($rhk_unik[$id_unik])) {
+				$rhk_unik[$id_unik] = array(
+					'ids' 		=> array(),
+					'indikator' => array(),
+					'data' 		=> array()
+				);
+			}
+			$rhk_unik[$id_unik]['ids'][] = $v_rhk['id'];
+			$rhk_unik[$id_unik]['data'][] = $v_rhk;
+
+			$data_indikator_ploting_rhk = $wpdb->get_results(
+				$wpdb->prepare("
+					SELECT
+						*,
+						CASE 
+							WHEN aspek_rhk = 1 THEN 'Kuantitas'
+							WHEN aspek_rhk = 2 THEN 'Kualitas'
+							WHEN aspek_rhk = 3 THEN 'Waktu'
+							WHEN aspek_rhk = 4 THEN 'Biaya'
+								ELSE 'Kuntitas'
+							END AS aspek_rhk_teks
+					FROM esakip_data_rencana_aksi_indikator_opd
+					WHERE id_renaksi = %d 
+					  AND active = 1
+				", $v_rhk['id']),
+				ARRAY_A
+			);
+			if (!empty($data_indikator_ploting_rhk)) {
+				foreach ($data_indikator_ploting_rhk as $index => $v_indikator) {
+					$id_unik_indikator = strtolower(trim($v_indikator['indikator']) . trim($v_indikator['target_akhir']) . trim($v_indikator['satuan']));
+					if (empty($rhk_unik[$id_unik]['indikator'][$id_unik_indikator])) {
+						$rhk_unik[$id_unik]['indikator'][$id_unik_indikator] = array(
+							'ids' => array(),
+							'data' => array()
+						);
+					}
+					$rhk_unik[$id_unik]['indikator'][$id_unik_indikator]['ids'][] = $v_indikator['id'];
+					$rhk_unik[$id_unik]['indikator'][$id_unik_indikator]['data'][] = $v_indikator;
+				}
+			}
+		}
+		return $rhk_unik;
+	}
+
 	function get_pk_html($options)
 	{
 		global $wpdb;
@@ -7218,47 +7261,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		);
 		$no_2 = 0;
 		if (!empty($data_ploting_rhk)) {
-			// cek apakah ada RHK yang double
-			foreach ($data_ploting_rhk as $v_rhk) {
-				$id_unik = strtolower(trim($v_rhk['label']));
-				if (empty($ret['rhk_unik'][$id_unik])) {
-					$ret['rhk_unik'][$id_unik] = array(
-						'ids' 		=> array(),
-						'indikator' => array(),
-						'data' 		=> array()
-					);
-				}
-				$ret['rhk_unik'][$id_unik]['ids'][] = $v_rhk['id'];
-				$ret['rhk_unik'][$id_unik]['data'][] = $v_rhk;
-
-				$data_indikator_ploting_rhk = $wpdb->get_results(
-					$wpdb->prepare("
-						SELECT
-							id,
-							indikator,
-							satuan,
-							target_awal,
-							target_akhir
-						FROM esakip_data_rencana_aksi_indikator_opd
-						WHERE id_renaksi = %d 
-						  AND active = 1
-					", $v_rhk['id']),
-					ARRAY_A
-				);
-				if (!empty($data_indikator_ploting_rhk)) {
-					foreach ($data_indikator_ploting_rhk as $index => $v_indikator) {
-						$id_unik_indikator = strtolower(trim($v_indikator['indikator']) . trim($v_indikator['target_akhir']) . trim($v_indikator['satuan']));
-						if (empty($ret['rhk_unik'][$id_unik]['indikator'][$id_unik_indikator])) {
-							$ret['rhk_unik'][$id_unik]['indikator'][$id_unik_indikator] = array(
-								'ids' => array(),
-								'data' => array()
-							);
-						}
-						$ret['rhk_unik'][$id_unik]['indikator'][$id_unik_indikator]['ids'][] = $v_indikator['id'];
-						$ret['rhk_unik'][$id_unik]['indikator'][$id_unik_indikator]['data'][] = $v_indikator;
-					}
-				}
-			}
+			$ret['rhk_unik'] = $this->get_rhk_unik($data_ploting_rhk);
 
 			foreach ($ret['rhk_unik'] as $v) {
 				$v_rhk = $v['data'][0];
