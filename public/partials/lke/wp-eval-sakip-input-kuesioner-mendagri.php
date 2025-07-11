@@ -72,7 +72,6 @@ foreach ($idtahun as $val) {
                         <th class="text-center" style="vertical-align: middle;">Deskripsi</th>
                         <th class="text-center" style="vertical-align: middle;">Level</th>
                         <th class="text-center" style="vertical-align: middle;">Penjelasan</th>
-                        <th class="text-center" style="vertical-align: middle;">Data Dukung</th>
                         <th class="text-center" style="vertical-align: middle;">Aksi</th>
                     </tr>
                 </thead>
@@ -151,56 +150,87 @@ foreach ($idtahun as $val) {
                     <div class="form-group">
                         <label for="penjelasan">Penjelasan</label>
                         <textarea class="form-control" id="penjelasan" name="penjelasan" required></textarea>
-                    </div>
+                    </div>                  
+                    
+                </form>
+            </div>
 
-                    <div class="form-group">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" onclick="submit_kuesioner_pertanyaan_mendagri(); return false">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Bukti Dukung kuesioner -->
+<div class="modal fade" id="tambahBuktiModal" tabindex="-1" role="dialog" aria-labelledby="tambahBuktiModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tambahBuktiModalLabel">Tambah Bukti Dukung Kuesioner</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+             <div class="modal-body">
+                <form id="formTambahBukti">
+                    <input type="hidden" value="" id="idKuesionerPertanyaan">
+                    <input type="hidden" value="" id="idKuesionerPertanyaanDetail">
+                    <input type="hidden" value="" id="idBuktiDukung">
+
+                        <div class="form-group col-md-12">
+                            <label for="namaBukti">Nama Bukti Dukung Kuesioner</label>
+                            <input type="text" class="form-control" id="namaBukti" name="namaBukti" required>                            
+                        </div>                
+                        
+                        <div class="form-group col-md-12">
                         <label>Pilih Jenis Bukti Dukung <small class="text-secondary">( minimal 1 atau bisa lebih dari 1 )</small></label>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_renstra" id="renstra">
+                                    <input class="form-check-input" type="checkbox" name="checkbox_bukti" value="esakip_renstra" id="renstra">
                                     <label class="form-check-label" for="renstra">
                                         RENSTRA
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_renja_rkt" id="renja-rkt">
+                                    <input class="form-check-input" type="checkbox" name="checkbox_bukti" value="esakip_renja_rkt" id="renja-rkt">
                                     <label class="form-check-label" for="renja-rkt">
                                         RENJA/RKT
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_rencana_aksi" id="rencana-aksi">
+                                    <input class="form-check-input" type="checkbox" name="checkbox_bukti" value="esakip_rencana_aksi" id="rencana-aksi">
                                     <label class="form-check-label" for="rencana-aksi">
                                         Rencana Aksi
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_dpa" id="dpa">
+                                    <input class="form-check-input" type="checkbox" name="checkbox_bukti" value="esakip_dpa" id="dpa">
                                     <label class="form-check-label" for="dpa">
                                         DPA
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_lhe_akip_internal" id="lhe-akip-internal">
+                                    <input class="form-check-input" type="checkbox" name="checkbox_bukti" value="esakip_lhe_akip_internal" id="lhe-akip-internal">
                                     <label class="form-check-label" for="lhe-akip-internal">
                                         LHE AKIP Internal
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_laporan_monev_renaksi" id="laporan-monev-renaksi">
+                                    <input class="form-check-input" type="checkbox" name="checkbox_bukti" value="esakip_laporan_monev_renaksi" id="laporan-monev-renaksi">
                                     <label class="form-check-label" for="laporan-monev-renaksi">
                                         Laporan Monev Renaksi
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_evaluasi_internal" id="evaluasi-internal">
+                                    <input class="form-check-input" type="checkbox" name="checkbox_bukti" value="esakip_evaluasi_internal" id="evaluasi-internal">
                                     <label class="form-check-label" for="evaluasi-internal">
                                         Evaluasi Internal
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_dokumen_lainnya" id="dokumen-lainnya">
+                                    <input class="form-check-input" type="checkbox" name="checkbox_bukti" value="esakip_dokumen_lainnya" id="dokumen-lainnya">
                                     <label class="form-check-label" for="dokumen-lainnya">
                                         Dokumen Lainnya
                                     </label>
@@ -208,43 +238,43 @@ foreach ($idtahun as $val) {
                             </div>
                             <div class="col-md-6">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_iku" id="iku">
+                                    <input class="form-check-input" type="checkbox" name="checkbox_bukti" value="esakip_iku" id="iku">
                                     <label class="form-check-label" for="iku">
                                         IKU
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_perjanjian_kinerja" id="perjanjian-kinerja">
+                                    <input class="form-check-input" type="checkbox" name="checkbox_bukti" value="esakip_perjanjian_kinerja" id="perjanjian-kinerja">
                                     <label class="form-check-label" for="perjanjian-kinerja">
                                         Perjanjian Kinerja
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_laporan_kinerja" id="laporan-kinerja">
+                                    <input class="form-check-input" type="checkbox" name="checkbox_bukti" value="esakip_laporan_kinerja" id="laporan-kinerja">
                                     <label class="form-check-label" for="laporan-kinerja">
                                         Laporan Kinerja
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_pohon_kinerja_dan_cascading" id="pohon-kinerja-dan-cascading">
+                                    <input class="form-check-input" type="checkbox" name="checkbox_bukti" value="esakip_pohon_kinerja_dan_cascading" id="pohon-kinerja-dan-cascading">
                                     <label class="form-check-label" for="pohon-kinerja-dan-cascading">
                                         Pohon Kinerja dan Cascading
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_tl_lhe_akip_internal" id="tl-lhe-akip-internal">
+                                    <input class="form-check-input" type="checkbox" name="checkbox_bukti" value="esakip_tl_lhe_akip_internal" id="tl-lhe-akip-internal">
                                     <label class="form-check-label" for="tl-lhe-akip-internal">
                                         TL LHE AKIP Internal
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_skp" id="skp">
+                                    <input class="form-check-input" type="checkbox" name="checkbox_bukti" value="esakip_skp" id="skp">
                                     <label class="form-check-label" for="skp">
                                         SKP
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_pengukuran_kinerja" id="pengukuran-kinerja">
+                                    <input class="form-check-input" type="checkbox" name="checkbox_bukti" value="esakip_pengukuran_kinerja" id="pengukuran-kinerja">
                                     <label class="form-check-label" for="pengukuran-kinerja">
                                         Pengukuran Kinerja
                                     </label>
@@ -252,12 +282,12 @@ foreach ($idtahun as $val) {
                             </div>
                         </div>
                     </div>
+
                 </form>
             </div>
-
             <div class="modal-footer">
-                <button type="button" class="btn btn-info" data-dismiss="modal">Tutup</button>
-                <button type="button" class="btn btn-primary" onclick="submit_kuesioner_pertanyaan_mendagri(); return false">Simpan</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" onclick="submit_bukti(); return false">Simpan</button>
             </div>
         </div>
     </div>
@@ -282,7 +312,7 @@ foreach ($idtahun as $val) {
         get_table_kuesioner();
 
         jQuery('#tipeJawaban').on('change', function () {
-            const val = jQuery(this).val();
+            let val = jQuery(this).val();
             jQuery('#tabel_daftar_jawaban').hide();
             jQuery('#tabel_bobot_esai').show();
             jQuery('#daftar_jawaban tbody').empty();
@@ -617,15 +647,6 @@ foreach ($idtahun as $val) {
         const id_detail = jQuery('#idKuesionerPertanyaanDetail').val();
         const id_pertanyaan = jQuery('#idKuesionerPertanyaan').val();
         
-        let selectedBuktiDukung = [];
-        jQuery('input[type=checkbox]:checked').each(function() {
-            selectedBuktiDukung.push(jQuery(this).val());
-        });
-
-        if (selectedBuktiDukung.length === 0) {
-            return alert('Minimal satu bukti dukung harus dipilih');
-        }
-        
         let level = jQuery('#alertKuesionerLevel').data('level');
 
         if (confirm('Apakah anda yakin untuk menyimpan data ini?')) {
@@ -641,7 +662,6 @@ foreach ($idtahun as $val) {
                     id_pertanyaan,
                     indikator,
                     penjelasan,
-                    jenis_bukti_dukung: JSON.stringify(selectedBuktiDukung),
                     level 
                 },
                 dataType: "json",
@@ -740,5 +760,157 @@ foreach ($idtahun as $val) {
                 alert('Terjadi kesalahan saat mengirim data!');
             }
         });
+    }
+
+    function handleHapusBuktiDukung(id) {
+        if (!confirm('Apakah Anda yakin ingin menghapus bukti dukung ini?')) {
+            return;
+        }
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'hapus_bukti_dukung_mendagri',
+                api_key: esakip.api_key,
+                id: id
+
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    get_table_kuesioner();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                jQuery('#wrap-loading').hide();
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }
+
+    function handleTambahBuktiDukung(id) {
+        jQuery('#idBuktiDukung').val('');
+        jQuery('#idKuesionerPertanyaanDetail').val(id);
+        jQuery('#idKuesionerPertanyaan').val('');
+        jQuery('#namaBukti').val('');
+        jQuery('#tambahBuktiModalLabel').text('Tambah Bukti Dukung');
+
+        jQuery('#formTambahBukti input[type="checkbox"]').prop('checked', false);
+
+        jQuery('#tambahBuktiModal').modal('show');
+    }
+
+    function submit_bukti() {
+        let id_bukti = jQuery('#idBuktiDukung').val();
+        let id_detail = jQuery('#idKuesionerPertanyaanDetail').val();
+        let jenis_bukti_dukung = jQuery('#namaBukti').val().trim();
+        let selectedBuktiDukung = [];
+        jQuery('input[name="checkbox_bukti"]:checked').each(function() {
+            selectedBuktiDukung.push(jQuery(this).val());
+        });
+
+        if (selectedBuktiDukung.length === 0) {
+            return alert('Minimal satu bukti dukung harus dipilih');
+        }
+
+        if (jenis_bukti_dukung === '') {
+            return alert('Nama bukti dukung tidak boleh kosong!');
+        }
+
+        jQuery('#wrap-loading').show();
+
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'tambah_bukti_dukung_mendagri',
+                api_key: esakip.api_key,
+                id_bukti: id_bukti,
+                id_detail: id_detail,
+                jenis_bukti_dukung: jenis_bukti_dukung,
+                dokumen_upload: (selectedBuktiDukung)
+            },
+            success: function(response) {
+                    jQuery('#wrap-loading').hide();
+
+                    if (response.status === 'success') {
+                        alert(response.message);
+                        jQuery('#tambahBuktiModal').modal('hide');
+                        jQuery('#formTambahBukti')[0].reset();
+                        jQuery('#formTambahBukti input[type="checkbox"]').prop('checked', false);
+                        
+                        get_table_kuesioner();
+                } else {
+                    alert('Gagal:' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }
+    function handleEditBuktiDukung(id) {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_bukti_dukung_kuesioner_by_id',
+                api_key: esakip.api_key,
+                id: id,
+                tahun_anggaran: <?php echo $input['tahun']; ?>
+            },
+            dataType: 'json',
+            success: function(response) {
+                let data = response.data;
+                jQuery('#wrap-loading').hide();
+                console.log(response);
+                if (response.status === 'success') {
+                    jQuery('#idKuesionerPertanyaan').val(data.id_kuesioner_mendagri_detail);
+                    jQuery('#idKuesionerPertanyaanDetail').val(data.id_detail);
+                    jQuery('#namaBukti').val(data.jenis_bukti_dukung);
+                    jQuery('#idBuktiDukung').val(data.id_bukti);
+                    jQuery('#tambahBuktiModalLabel').text('Edit Bukti Dukung');
+                    
+                    jQuery('#tambahBuktiModal').modal('show');
+                    
+                    checkboxBuktiDukung(
+                        typeof data.dokumen_upload === 'string'
+                        ? JSON.parse(data.dokumen_upload)
+                        : data.dokumen_upload
+                    );                   
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data!')
+            }
+        });
+    }
+    function checkboxBuktiDukung(selectedBuktiDukung) {
+        // clear checkedbox //
+        jQuery('input[type=checkbox]').prop('checked', false);
+
+        // isi kembali sesuai input//
+        if (Array.isArray(selectedBuktiDukung)) {
+            selectedBuktiDukung.forEach(function(bukti) {
+                jQuery('input[value="' + bukti + '"]').prop('checked', true);
+            });
+        } else {
+        console.warn('dokumen_upload bukan array:', selectedBuktiDukung);
+        }
     }
 </script>

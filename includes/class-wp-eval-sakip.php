@@ -722,6 +722,9 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_kuesioner_mendagri_detail_by_id',  $plugin_public, 'get_kuesioner_mendagri_detail_by_id');
 		$this->loader->add_action('wp_ajax_hapus_data_kuesioner_mendagri_detail',  $plugin_public, 'hapus_data_kuesioner_mendagri_detail');
 		$this->loader->add_action('wp_ajax_copy_data_kuesioner_mendagri',  $plugin_public, 'copy_data_kuesioner_mendagri');
+		$this->loader->add_action('wp_ajax_tambah_bukti_dukung_mendagri',  $plugin_public, 'tambah_bukti_dukung_mendagri');
+		$this->loader->add_action('wp_ajax_get_bukti_dukung_kuesioner_by_id',  $plugin_public, 'get_bukti_dukung_kuesioner_by_id');
+		$this->loader->add_action('wp_ajax_hapus_bukti_dukung_mendagri',  $plugin_public, 'hapus_bukti_dukung_mendagri');
 
 		$this->loader->add_action('wp_ajax_generate_fields_dokumen_kuesioner',  $plugin_public, 'generate_fields_dokumen_kuesioner');
 		$this->loader->add_action('wp_ajax_get_table_skpd_dokumen_kuesioner',  $plugin_public, 'get_table_skpd_dokumen_kuesioner');
