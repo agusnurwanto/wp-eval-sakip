@@ -110,17 +110,38 @@ if (!empty($data_all['data'])) {
 
 		if (!empty($level_1['indikator'])) {
 			foreach ($level_1['indikator'] as $keyindikatorlevel1 => $indikator) {
-                if ($tipe === 'opd') {
-                    $data_temp[$keylevel1][0]->f .= '<div class="level1">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
-                } else {
-                    $data_temp[$keylevel1][0]->f .= '<div class="level1 item-rincian" data-id="' . $level_1['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
-                }
+                $data_temp[$keylevel1][0]->f .= '<div class="level1 item-rincian" data-id="' . $level_1['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
+			}
+		}
+
+		// croscutting level 1
+		if (!empty($level_1['croscutting'])) {
+			$data_temp[$keylevel1][0]->f .= "<div class='croscutting-2 tampil_croscutting item-rincian' data-id='" . $level_1["id"] . "'>CROSCUTTING</div>";
+			foreach ($level_1['croscutting'] as $keyCross => $valCross) {
+				$nama_skpd_all = array();
+				$class_cc_opd_lain = '';
+				if ($valCross['croscutting_opd_lain'] == 1) {
+					$class_cc_opd_lain = 'cc-opd-lain';
+				}
+
+				$show_nama_skpd = $valCross['nama_skpd'];
+				$label_parent = $valCross['label_parent'];
+				if (!empty($valCross['id_level_1_parent']) && $valCross['is_lembaga_lainnya'] != 1) {
+					$show_nama_skpd = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $valCross['id_skpd_view_pokin']  . "&id=" . $valCross['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
+				}
+
+				$class_cc_vertikal = '';
+				if ($valCross['is_lembaga_lainnya'] == 1) {
+					$label_parent = "?";
+					$class_cc_vertikal = "croscutting-lembaga-vertikal";
+				}
+				$data_temp[$keylevel1][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_1["id"] . "'><div>" . $label_parent . " <a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
 			}
 		}
 
 		// data koneksi pokin
 		if (!empty($level_1['koneksi_pokin'])) {
-			$data_temp[$keylevel1][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
+			$data_temp[$keylevel1][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin item-rincian' data-id='" . $level_1["id"] . "'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
 			foreach ($level_1['koneksi_pokin'] as $key_koneksi => $val_koneksi) {
 
 				$label_parent = $val_koneksi['label_parent'];
@@ -129,7 +150,7 @@ if (!empty($data_all['data'])) {
 				}
 
 				//  <a href='javascript:void(0)' data-id='". $val_koneksi['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>
-				$data_temp[$keylevel1][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin'><div>" . $label_parent . "</div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
+				$data_temp[$keylevel1][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_1["id"] . "'><div>" . $label_parent . "</div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
 			}
 		}
 
@@ -138,22 +159,18 @@ if (!empty($data_all['data'])) {
 			foreach ($level_1['data'] as $keylevel2 => $level_2) {
 				$data_temp[$keylevel2][0] = (object)[
 					'v' => $level_2['id'],
-					'f' => "<div class=\"" . $style0 . " label2 item-rincian\" data-id=\"" . $level_2['id'] . "\">" . trim($level_2['label']) . "</div>",
+					'f' => "<div class=\"" . $style0 . " label2\" data-id=\"" . $level_2['id'] . "\">" . trim($level_2['label']) . "</div>",
 				];
 
 				if (!empty($level_2['indikator'])) {
 					foreach ($level_2['indikator'] as $keyindikatorlevel2 => $indikator) {
-		                if ($tipe === 'opd') {
-		                    $data_temp[$keylevel2][0]->f .= '<div class="level2">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
-		                } else {
-		                    $data_temp[$keylevel2][0]->f .= '<div class="level2 item-rincian" data-id="' . $level_2['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
-		                }
+	                    $data_temp[$keylevel2][0]->f .= '<div class="level2 item-rincian" data-id="' . $level_2['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
 					}
 				}
 
 				// croscutting level 2
 				if (!empty($level_2['croscutting'])) {
-					$data_temp[$keylevel2][0]->f .= "<div class='croscutting-2 tampil_croscutting'>CROSCUTTING</div>";
+					$data_temp[$keylevel2][0]->f .= "<div class='croscutting-2 tampil_croscutting item-rincian' data-id='" . $level_2["id"] . "'>CROSCUTTING</div>";
 					foreach ($level_2['croscutting'] as $keyCross => $valCross) {
 						$nama_skpd_all = array();
 						$class_cc_opd_lain = '';
@@ -172,13 +189,13 @@ if (!empty($data_all['data'])) {
 							$label_parent = "?";
 							$class_cc_vertikal = "croscutting-lembaga-vertikal";
 						}
-						$data_temp[$keylevel2][0]->f .= "<div class='croscutting tampil_croscutting " . $class_cc_opd_lain . " " . $class_cc_vertikal . "'><div>" . $label_parent . " <a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
+						$data_temp[$keylevel2][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_2["id"] . "'><div>" . $label_parent . " <a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
 					}
 				}
 
 				// data koneksi pokin
 				if (!empty($level_2['koneksi_pokin'])) {
-					$data_temp[$keylevel2][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
+					$data_temp[$keylevel2][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin item-rincian' data-id='" . $level_2["id"] . "'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
 					foreach ($level_2['koneksi_pokin'] as $key_koneksi => $val_koneksi) {
 
 						$label_parent = $val_koneksi['label_parent'];
@@ -187,7 +204,7 @@ if (!empty($data_all['data'])) {
 						}
 
 						//  <a href='javascript:void(0)' data-id='". $val_koneksi['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>
-						$data_temp[$keylevel2][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin'><div>" . $label_parent . "</div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
+						$data_temp[$keylevel2][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_2["id"] . "'><div>" . $label_parent . "</div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
 					}
 				}
 
@@ -201,17 +218,13 @@ if (!empty($data_all['data'])) {
 
 						if (!empty($level_3['indikator'])) {
 							foreach ($level_3['indikator'] as $keyindikatorlevel3 => $indikator) {
-				                if ($tipe === 'opd') {
-				                    $data_temp[$keylevel3][0]->f .= '<div class="level3">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
-				                } else {
-				                    $data_temp[$keylevel3][0]->f .= '<div class="level3 item-rincian" data-id="' . $level_3['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
-				                }
+			                    $data_temp[$keylevel3][0]->f .= '<div class="level3 item-rincian" data-id="' . $level_3['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
 							}
 						}
 
 						// croscutting level 3
 						if (!empty($level_3['croscutting'])) {
-							$data_temp[$keylevel3][0]->f .= "<div class='croscutting-2 tampil_croscutting'>CROSCUTTING</div>";
+							$data_temp[$keylevel3][0]->f .= "<div class='croscutting-2 tampil_croscutting item-rincian' data-id='" . $level_3["id"] . "'>CROSCUTTING</div>";
 							foreach ($level_3['croscutting'] as $keyCross => $valCross) {
 								$nama_skpd_all = array();
 								$class_cc_opd_lain = '';
@@ -230,13 +243,13 @@ if (!empty($data_all['data'])) {
 									$label_parent = "?";
 									$class_cc_vertikal = "croscutting-lembaga-vertikal";
 								}
-								$data_temp[$keylevel3][0]->f .= "<div class='croscutting tampil_croscutting " . $class_cc_opd_lain . " " . $class_cc_vertikal . "'><div>" . $label_parent . " <a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
+								$data_temp[$keylevel3][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_3["id"] . "'><div>" . $label_parent . " <a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
 							}
 						}
 
 						// data koneksi pokin
 						if (!empty($level_3['koneksi_pokin'])) {
-							$data_temp[$keylevel3][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
+							$data_temp[$keylevel3][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin item-rincian' data-id='" . $level_3["id"] . "'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
 							foreach ($level_3['koneksi_pokin'] as $key_koneksi => $val_koneksi) {
 
 								$label_parent = $val_koneksi['label_parent'];
@@ -245,7 +258,7 @@ if (!empty($data_all['data'])) {
 								}
 
 								//  <a href='javascript:void(0)' data-id='". $val_koneksi['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>
-								$data_temp[$keylevel3][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin'><div>" . $label_parent . "</div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
+								$data_temp[$keylevel3][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_3["id"] . "'><div>" . $label_parent . "</div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
 							}
 						}
 
@@ -258,17 +271,13 @@ if (!empty($data_all['data'])) {
 
 								if (!empty($level_4['indikator'])) {
 									foreach ($level_4['indikator'] as $keyindikatorlevel4 => $indikator) {
-						                if ($tipe === 'opd') {
-						                    $data_temp[$keylevel4][0]->f .= '<div class="level4">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
-						                } else {
-						                    $data_temp[$keylevel4][0]->f .= '<div class="level4 item-rincian" data-id="' . $level_4['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
-						                }
+						                $data_temp[$keylevel4][0]->f .= '<div class="level4 item-rincian" data-id="' . $level_4['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
 									}
 								}
 
 								// croscutting level 4
 								if (!empty($level_4['croscutting'])) {
-									$data_temp[$keylevel4][0]->f .= "<div class='croscutting-2 tampil_croscutting'>CROSCUTTING</div>";
+									$data_temp[$keylevel4][0]->f .= "<div class='croscutting-2 tampil_croscutting item-rincian' data-id='" . $level_4["id"] . "'>CROSCUTTING</div>";
 									foreach ($level_4['croscutting'] as $keyCross => $valCross) {
 										$nama_skpd_all = array();
 										$class_cc_opd_lain = '';
@@ -287,7 +296,7 @@ if (!empty($data_all['data'])) {
 											$label_parent = "?";
 											$class_cc_vertikal = "croscutting-lembaga-vertikal";
 										}
-										$data_temp[$keylevel4][0]->f .= "<div class='croscutting tampil_croscutting " . $class_cc_opd_lain . " " . $class_cc_vertikal . "'><div>" . $label_parent . " <a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
+										$data_temp[$keylevel4][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_4["id"] . "'><div>" . $label_parent . " <a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
 									}
 								}
 
@@ -297,9 +306,9 @@ if (!empty($data_all['data'])) {
 										$label_parent = $val_koneksi['label_parent'];
 										if (!empty($val_koneksi['id_level_1_parent'])) {
 											if ($tipe == 'opd') {
-												$data_temp[$keylevel4][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
+												$data_temp[$keylevel4][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin item-rincian' data-id='" . $level_4["id"] . "'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
 												$show_nama_skpd = "<a href='" . $view_kinerja_pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . ucfirst($val_koneksi['label_parent']) . "</a>";
-												$data_temp[$keylevel4][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin'><div>" . $label_parent . "</div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
+												$data_temp[$keylevel4][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_4["id"] . "'><div>" . $label_parent . "</div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
 											} else {
 												// sebagai tanda untuk mengexpand/collapse pokin OPD
 												$data_temp[$keylevel4][0]->f .= "<span class=\"show-hide-pokin-opd\"></span>";
@@ -405,18 +414,13 @@ if (!empty($data_all['data'])) {
 
 										if (!empty($level_5['indikator'])) {
 											foreach ($level_5['indikator'] as $keyindikatorlevel5 => $indikator) {
-								                if ($tipe === 'opd') {
-								                    $data_temp[$keylevel5][0]->f .= '<div class="level5">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
-								                } else {
-								                    $data_temp[$keylevel5][0]->f .= '<div class="level5 item-rincian" data-id="' . $level_5['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
-								                }
-												$data_temp[$keylevel5][0]->f .= "<div " . $style5 . ">IK: " . $indikator['label_indikator_kinerja'] . "</div>";
+							                    $data_temp[$keylevel5][0]->f .= '<div class="level5 item-rincian" data-id="' . $level_5['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
 											}
 										}
 
 										// croscutting level 5
 										if (!empty($level_5['croscutting'])) {
-											$data_temp[$keylevel5][0]->f .= "<div class='croscutting-2 tampil_croscutting'>CROSCUTTING</div>";
+											$data_temp[$keylevel5][0]->f .= "<div class='croscutting-2 tampil_croscutting item-rincian' data-id='" . $level_5["id"] . "'>CROSCUTTING</div>";
 											foreach ($level_5['croscutting'] as $keyCross => $valCross) {
 												$nama_skpd_all = array();
 												$class_cc_opd_lain = '';
@@ -435,13 +439,13 @@ if (!empty($data_all['data'])) {
 													$label_parent = "?";
 													$class_cc_vertikal = "croscutting-lembaga-vertikal";
 												}
-												$data_temp[$keylevel5][0]->f .= "<div class='croscutting tampil_croscutting " . $class_cc_opd_lain . " " . $class_cc_vertikal . "'><div>" . $label_parent . " <a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
+												$data_temp[$keylevel5][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_5["id"] . "'><div>" . $label_parent . " <a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
 											}
 										}
 
 										// data koneksi pokin
 										if (!empty($level_5['koneksi_pokin'])) {
-											$data_temp[$keylevel5][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
+											$data_temp[$keylevel5][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin item-rincian' data-id='" . $level_5["id"] . "'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
 											foreach ($level_5['koneksi_pokin'] as $key_koneksi => $val_koneksi) {
 
 												$label_parent = $val_koneksi['label_parent'];
@@ -450,7 +454,7 @@ if (!empty($data_all['data'])) {
 												}
 
 												//  <a href='javascript:void(0)' data-id='". $val_koneksi['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>
-												$data_temp[$keylevel5][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin'><div>" . $label_parent . "</div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
+												$data_temp[$keylevel5][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_5["id"] . "'><div>" . $label_parent . "</div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
 											}
 										}
 

@@ -638,8 +638,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 										WHERE active=1
 										AND id=%d
 										AND tahun_anggaran=%d
-										GROUP BY id
-										ORDER BY nama_lembaga ASC
 									", $v_cross['id_skpd_croscutting'], $tahun_anggaran_sakip),
 									ARRAY_A
 								);
@@ -2663,14 +2661,60 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									AND active=%d
 							", $_POST['id'], 1),  ARRAY_A);
 					}
+					if (!empty($data_croscutting)) {
+						$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+						$nama_perangkat = array();
+						if ($data_croscutting['is_lembaga_lainnya'] == 1) {
+							$nama_perangkat = $wpdb->get_row(
+								$wpdb->prepare("
+									SELECT 
+										nama_lembaga,
+										id,
+										tahun_anggaran
+									FROM esakip_data_lembaga_lainnya 
+									WHERE active=1 
+										AND id=%d
+										AND tahun_anggaran=%d
+									GROUP BY id
+									ORDER BY nama_lembaga ASC
+								", $data_croscutting['id_skpd_croscutting'], $tahun_anggaran_sakip),
+								ARRAY_A
+							);
+						} else {
+							if (!empty($data_croscutting['id_skpd_parent'])) {
+								$this_data_id_skpd = $data_croscutting['id_skpd_parent'];
+							} else {
+								$this_data_id_skpd = $data_croscutting['id_skpd_croscutting'];
+							}
 
+							$nama_perangkat = $wpdb->get_row(
+								$wpdb->prepare("
+									SELECT 
+										nama_skpd,
+										id_skpd,
+										tahun_anggaran
+									FROM esakip_data_unit 
+									WHERE active=1 
+									AND is_skpd=1 
+									AND id_skpd=%d
+									AND tahun_anggaran=%d
+									GROUP BY id_skpd
+									ORDER BY kode_skpd ASC
+								", $this_data_id_skpd, $tahun_anggaran_sakip),
+								ARRAY_A
+							);
+						}
+					} else {
+						throw new Exception("Data tidak ditemukan!", 1);
+					}
 					if (empty($data_croscutting)) {
 						throw new Exception("Data tidak ditemukan!", 1);
 					}
 
 					echo json_encode([
 						'status' => true,
-						'data_croscutting' => $data_croscutting
+						'data_croscutting' => $data_croscutting,
+					    'nama_perangkat' => $nama_perangkat
 					]);
 					exit();
 				} else {
