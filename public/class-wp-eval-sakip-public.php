@@ -33265,27 +33265,28 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
      * @var array
      */
     private $column_data_pegawai_simpeg = [
-        'nip_baru'          => '%s',
-        'nama_pegawai'      => '%s',
-        'pangkat'           => '%s',
-        'gol_ruang'         => '%s',
-        'satker_id'         => '%s',
-        'jabatan'           => '%s',
-        'tipe_pegawai'      => '%s',
-        'tipe_pegawai_id'   => '%s',
-        'gelar_depan'       => '%s',
-        'gelar_belakang'    => '%s',
-        'plt_plh'           => '%s',
-        'tmt_sk_plth'       => '%s',
-        'berakhir'          => '%s',
-        'active'            => '%d',
-        'active_rhk'        => '%d',
-        'eselon_id'         => '%s',
-        'id_atasan'         => '%d',
-        'id_jabatan'        => '%s',
-        'custom_jabatan'    => '%s',
-        'plt_plh_teks'    	=> '%s',
-        'update_at'         => '%s',
+        'nip_baru'             => '%s',
+        'nama_pegawai'         => '%s',
+        'pangkat'              => '%s',
+        'gol_ruang'            => '%s',
+        'satker_id'            => '%s',
+        'jabatan'              => '%s',
+        'tipe_pegawai'         => '%s',
+        'tipe_pegawai_id'      => '%s',
+        'gelar_depan'          => '%s',
+        'gelar_belakang'       => '%s',
+        'plt_plh'              => '%s',
+        'tmt_sk_plth'          => '%s',
+        'berakhir'             => '%s',
+        'active'               => '%d',
+        'active_rhk'           => '%d',
+        'eselon_id'            => '%s',
+        'id_atasan'            => '%d',
+        'id_jabatan'           => '%s',
+        'custom_jabatan'       => '%s',
+        'plt_plh_teks'    	   => '%s',
+        'format_halaman_kedua' => '%s',
+        'update_at'            => '%s',
     ];
 
     /**
@@ -33566,11 +33567,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
     }
 
 	/**
-	 * Retrieves the definitive superior for a given employee.
-	 * This is the central logic for determining superiors.
+	 * Retrieves the definitive atasan for a given employee.
+	 * This is the central logic for determining atasans.
 	 *
 	 * @param object $pegawai The employee data object.
-	 * @return object|null The superior's data object, a virtual object for Kepala Daerah, or null if no definitive superior is found.
+	 * @return object|null The atasan's data object, a virtual object for Kepala Daerah, or null if no definitive atasan is found.
 	 */
 	public function _get_atasan_definitif($pegawai)
 	{
@@ -33627,8 +33628,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		try {
 			$this->functions->validate($_POST, [
-				'api_key'    => 'required|string',
-				'id_pegawai' => 'required|numeric'
+				'api_key'    			=> 'required|string',
+				'format_halaman_kedua'  => 'required|in:gabungan,program,kegiatan,subkegiatan',
+				'id_pegawai' 			=> 'required|numeric'
 			]);
 
 			if ($_POST['api_key'] !== get_option(ESAKIP_APIKEY)) {
@@ -33648,6 +33650,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			}
 
 			$message = 'Berhasil Update Data';
+			$date_hari_ini = current_datetime()->format('Y-m-d H:i:s');
+			// update atasan custom
 			if ($id_atasan !== null) {
 				// Validasi Atasan Definitif
 				$atasan_definitif = $this->_get_atasan_definitif($data_pegawai);
@@ -33658,8 +33662,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					);
 				}
 				
-				// Lakukan Proses Update
-				$date_hari_ini = current_datetime()->format('Y-m-d H:i:s');
+				$data = [
+					'id_atasan' 			=> $id_atasan,
+					'format_halaman_kedua' 	=> $_POST['format_halaman_kedua']
+				];
 
 				// Jika terapkan ke seluruh satker
 				if ($terapkan_all_satker) {
@@ -33671,25 +33677,33 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						
 						// HANYA UPDATE jika pegawai tersebut TIDAK punya atasan definitif
 						if (!$atasan_definitif) {
-							$this->update_data_pegawai_simpeg_by_id($v->id, ['id_atasan' => $id_atasan, 'update_at' => $date_hari_ini]);
+							$this->update_data_pegawai_simpeg_by_id($v->id, $data);
 							$pegawai_diupdate_count++;
 						}
 					}
 					$message = "Berhasil menerapkan atasan baru kepada {$pegawai_diupdate_count} pegawai di satker ini.";
 				} else {
 					// Jika hanya update satu pegawai
-					$this->update_data_pegawai_simpeg_by_id($id_pegawai, ['id_atasan' => $id_atasan, 'update_at' => $date_hari_ini]);
+					$this->update_data_pegawai_simpeg_by_id($id_pegawai, $data);
 					$message = 'Berhasil memperbarui atasan pegawai!';
 				}
 			}
 
 			// Update Custom Jabatan jika ada
 			if ($jabatan_custom !== null) {
-				$this->update_data_pegawai_simpeg_by_id($id_pegawai, ['custom_jabatan' => $jabatan_custom, 'update_at' => $date_hari_ini]);
+				$data = [
+					'custom_jabatan' 		=> $jabatan_custom,
+					'format_halaman_kedua' 	=> $_POST['format_halaman_kedua']
+				];
+				$this->update_data_pegawai_simpeg_by_id($id_pegawai, $data);
 			}
 			// Update status Jabatan plt plh jika ada dan jika memang plth plh
 			if ($plt_plh_teks !== null && $data_pegawai->plt_plh == 1) {
-				$this->update_data_pegawai_simpeg_by_id($id_pegawai, ['plt_plh_teks' => $plt_plh_teks, 'update_at' => $date_hari_ini]);
+				$data = [
+					'plt_plh_teks' 			=> $plt_plh_teks,
+					'format_halaman_kedua' 	=> $_POST['format_halaman_kedua']
+				];
+				$this->update_data_pegawai_simpeg_by_id($id_pegawai, $data);
 			}
 
 			echo json_encode([

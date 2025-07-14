@@ -43,13 +43,7 @@ if (empty($logo_pemda)) {
 
 $text_tanggal_hari_ini = $this->format_tanggal_indo(current_datetime()->format('Y-m-d'));
 
-// $error_message = array();
-//get data simpeg pihak pertama
-// $simpeg_pihak_pertama = $this->get_pegawai_simpeg('asn', $data_satker['nip_baru'], $data_satker['satker_id'], $data_satker['jabatan']);
-// $response_1 = json_decode($simpeg_pihak_pertama, true);
-// if (!isset($response_1['status']) || $response_1['status'] === false) {
-//     array_push($error_message, 'Pihak Pertama : ' . $response_1['message']);
-// }
+$error_message = array();
 
 $pihak_pertama = array(
     'nama_pegawai'    => '-',
@@ -76,6 +70,12 @@ if (!empty($data_pegawai_1)) {
     $pihak_pertama['gelar_belakang']  = ', ' . $data_pegawai_1->gelar_belakang;
     $pihak_pertama['status_jabatan']  = $data_pegawai_1->jabatan;
 
+    $simpeg_pihak_pertama = $this->get_pegawai_simpeg('asn', $data_pegawai_1->nip_baru, $data_pegawai_1->satker_id, $data_pegawai_1->jabatan);
+    $response_1 = json_decode($simpeg_pihak_pertama, true);
+    if (!isset($response_1['status']) || $response_1['status'] === false) {
+        array_push($error_message, 'Pihak Pertama : ' . $response_1['message']);
+    }
+
     //jika custom jabatan ada, gunakan itu
     if (!empty($data_pegawai_1->custom_jabatan)) {
         $pihak_pertama['jabatan_pegawai'] = $data_pegawai_1->custom_jabatan;
@@ -90,10 +90,11 @@ if (!empty($data_pegawai_1)) {
     }
 
     $options = array(
-        'id_skpd'   => $id_skpd,
-        'satker_id' => $data_pegawai_1->satker_id,
-        'tahun'     => $input['tahun'],
-        'nip_baru'  => $data_pegawai_1->nip_baru
+        'id_skpd'               => $id_skpd,
+        'satker_id'             => $data_pegawai_1->satker_id,
+        'tahun'                 => $input['tahun'],
+        'nip_baru'              => $data_pegawai_1->nip_baru,
+        'format_halaman_kedua'  => $data_pegawai_1->format_halaman_kedua
     );
     $html_pk = $this->get_pk_html($options);
 }
@@ -118,6 +119,12 @@ if (!empty($data_atasan) && $data_atasan->id != 0) {
     $pihak_kedua['gelar_depan']     = $data_atasan->gelar_depan;
     $pihak_kedua['gelar_belakang']  = ', ' . $data_atasan->gelar_belakang;
     $pihak_kedua['status_jabatan']  = $data_atasan->jabatan;
+
+    $simpeg_pihak_kedua = $this->get_pegawai_simpeg('asn', $data_atasan->nip_baru, $data_atasan->satker_id, $data_atasan->jabatan);
+    $response_2 = json_decode($simpeg_pihak_kedua, true);
+    if (!isset($response_2['status']) || $response_2['status'] === false) {
+        array_push($error_message, 'Pihak Kedua : ' . $response_2['message']);
+    }
 
     //jika custom jabatan ada, gunakan itu
     if (!empty($data_atasan->custom_jabatan)) {
@@ -759,7 +766,7 @@ $ttd_orientasi = 'text-left';
             <div class="alert alert-danger mt-3 hide-display-print">
                 <p>Terjadi Kesalahan mendapatkan data pegawai SIMPEG!</p>
                 <ul class="mb-0">
-                    <?php echo implode('', array_map(fn($msg) => "<li>{$msg}</li>", $error_message)); ?>
+                    <?php echo implode('', array_map(fn($msg) => "<li class='text-left'>{$msg}</li>", $error_message)); ?>
                 </ul>
             </div>
         <?php endif; ?>
