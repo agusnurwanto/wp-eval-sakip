@@ -3092,6 +3092,9 @@ if (!empty($data_sasaran_existing)) {
         var program_teks = jQuery('#program-teks option:selected').text().split(' ');
         program_teks.shift();
         program_teks = program_teks.join(' ');
+        var bidang_teks = jQuery('#bidang-teks option:selected').text().split(' ');
+        bidang_teks.shift();
+        bidang_teks = bidang_teks.join(' ');
         var id_unik_sasaran = jQuery('#modal-program').attr('id-sasaran');
         if (id_unik_sasaran == '') {
             return alert('Id sasaran tidak boleh kosong!');
@@ -3108,6 +3111,7 @@ if (!empty($data_sasaran_existing)) {
                     "table": 'esakip_rpd_program',
                     "data": id_program_master,
                     "nama_program": program_teks,
+                    "nama_bidang_urusan": bidang_teks,
                     "catatan": jQuery('#catatan-teks-program').val(),
                     "id_sasaran": id_unik_sasaran,
                     "id_jadwal": "<?php echo $input['periode']; ?>",

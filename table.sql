@@ -1281,6 +1281,7 @@ CREATE TABLE `esakip_rpd_program` (
   `misi_lock` text DEFAULT NULL,
   `misi_teks` tinyint(4) DEFAULT NULL,
   `nama_program` text DEFAULT NULL,
+  `nama_bidang_urusan` text DEFAULT NULL,
   `nama_skpd` text DEFAULT NULL,
   `pagu_1` double(20, 0) DEFAULT NULL,
   `pagu_2` double(20, 0) DEFAULT NULL,

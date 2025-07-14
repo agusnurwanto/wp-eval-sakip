@@ -28619,6 +28619,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                 select
                                     kode_sasaran,
                                     nama_program,
+                                    nama_bidang_urusan,
                                     id_program,
                                     id_unik
                                 from $table
@@ -28638,6 +28639,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$data = array(
 							'kode_sasaran' => $program[0]['kode_sasaran'],
 							'nama_program' => $program[0]['nama_program'],
+							'nama_bidang_urusan' => $program[0]['nama_bidang_urusan'],
 							'id_program' => $program[0]['id_program'],
 							'id_unik_indikator_sasaran' => $_POST['indikator_sasaran_program'],
 							'id_unik' => $program[0]['id_unik'],
@@ -28691,6 +28693,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					} else {
 						$data = array(
 							'kode_sasaran' => $_POST['id_sasaran'],
+							'nama_bidang_urusan' => $_POST['nama_bidang_urusan'],
 							'nama_program' => $_POST['nama_program'],
 							'catatan' => $_POST['catatan'],
 							'id_program' => $_POST['data'],

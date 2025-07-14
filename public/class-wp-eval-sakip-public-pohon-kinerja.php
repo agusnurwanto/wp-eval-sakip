@@ -1945,40 +1945,48 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						$data_program .= '<td class="text-center" width="' . $width_ind_sasaran . '%"><ul class="list-skpd" style="list-style-type: none; margin: 0; padding: 0;">';
 
 						$mapping_skpd_program = [];
+						$nama_bidang_urusan = [];
 
-						// indikator sasaran sasaran rpd
+						//urusan pengampu skpds views once
 						$skpd_program = $wpdb->get_results(
 							$wpdb->prepare("
 								SELECT *
 								FROM esakip_rpd_program
 								WHERE kode_sasaran = %s
-								  AND id_unik_indikator_sasaran =%s
-								  AND id_unik_indikator IS NOT NULL
+								  AND id_unik_indikator_sasaran IS NULL
+								  AND id_unik_indikator IS NULL
 								  AND active = 1
-							", $ind['id_unik'], $ind['id_unik_indikator']),
+							", $ind['id_unik']),
 							ARRAY_A
 						);
-						
-						//urusan pengampu skpds views once
+
+						// indikator sasaran sasaran rpd
 						foreach ($skpd_program as $prog) {
-							$mapping_skpd_program[$prog['id_unit']] = $prog;	
-						}
-						if (!empty($mapping_skpd_program)) {
-							foreach ($mapping_skpd_program as $prog) {
-								$data_program .= '
-									<li style="margin-bottom:14px;">
-										<button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . $prog['nama_skpd'] . '</button>
-									</li>';
+							if (!empty($prog['nama_bidang_urusan'])) {
+								$nama_bidang = trim($prog['nama_bidang_urusan']);
+								if (!isset($nama_bidang_urusan[$nama_bidang])) {
+									$nama_bidang_urusan[$nama_bidang] = $prog;
+								}
 							}
 						}
 
-						if (empty($skpd_program)) {
+						// Bangun tampilan HTML
+						if (!empty($nama_bidang_urusan)) {
+							foreach ($nama_bidang_urusan as $bidang) {
+								$data_program .= '
+									<li style="margin-bottom:14px;">
+										<button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . esc_html($bidang['nama_bidang_urusan']) . '</button>
+									</li>';
+							}
+						} else {
 							$data_program .= '
 								<li style="margin-bottom:14px;">
 									<button class="btn btn-lg btn-warning"></button>
 								</li>';
 						}
+
 						$data_program .= '</ul></td>';
+
 					}
 					if (empty($data_sasaran)) {
 						$data_sasaran = '
