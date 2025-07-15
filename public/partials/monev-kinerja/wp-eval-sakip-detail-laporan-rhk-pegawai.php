@@ -128,6 +128,12 @@ $data_anggaran = array(
     'kegiatan'      => array(),
     'sub_kegiatan'  => array()
 );
+
+$data_anggaran_all = array(
+    'program'       => array(),
+    'kegiatan'      => array(),
+    'sub_kegiatan'  => array()
+);
 foreach ($ret['rhk_unik'] as $v) {
     $renaksi_opd = $v['data'][0];
     $rhk_parent = $this->get_rhk_parent($renaksi_opd['parent'], $input['tahun']);
