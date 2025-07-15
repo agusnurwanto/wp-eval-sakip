@@ -135,7 +135,15 @@ if (!empty($data_all['data'])) {
 					$label_parent = "?";
 					$class_cc_vertikal = "croscutting-lembaga-vertikal";
 				}
-				$data_temp[$keylevel1][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_1["id"] . "'><div>" . $label_parent . " <a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
+				$data_temp[$keylevel1][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_1["id"] . "'>
+						<div>" . $label_parent . " 
+							<a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='event.stopPropagation(); detail_cc(" . $valCross['id'] . "); return false;' title='Detail'>
+								<i class='dashicons dashicons-info'></i>
+							</a>
+						</div>
+						<div class='cros-opd'>" . $show_nama_skpd . "</div>
+					</div>
+				";
 			}
 		}
 
@@ -189,7 +197,15 @@ if (!empty($data_all['data'])) {
 							$label_parent = "?";
 							$class_cc_vertikal = "croscutting-lembaga-vertikal";
 						}
-						$data_temp[$keylevel2][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_2["id"] . "'><div>" . $label_parent . " <a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
+						$data_temp[$keylevel2][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_2["id"] . "'>
+								<div>" . $label_parent . " 
+									<a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='event.stopPropagation(); detail_cc(" . $valCross['id'] . "); return false;' title='Detail'>
+										<i class='dashicons dashicons-info'></i>
+									</a>
+								</div>
+								<div class='cros-opd'>" . $show_nama_skpd . "</div>
+							</div>
+						";
 					}
 				}
 
@@ -243,7 +259,15 @@ if (!empty($data_all['data'])) {
 									$label_parent = "?";
 									$class_cc_vertikal = "croscutting-lembaga-vertikal";
 								}
-								$data_temp[$keylevel3][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_3["id"] . "'><div>" . $label_parent . " <a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
+								$data_temp[$keylevel3][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_3["id"] . "'>
+										<div>" . $label_parent . " 
+											<a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='event.stopPropagation(); detail_cc(" . $valCross['id'] . "); return false;' title='Detail'>
+												<i class='dashicons dashicons-info'></i>
+											</a>
+										</div>
+										<div class='cros-opd'>" . $show_nama_skpd . "</div>
+									</div>
+								";
 							}
 						}
 
@@ -296,7 +320,15 @@ if (!empty($data_all['data'])) {
 											$label_parent = "?";
 											$class_cc_vertikal = "croscutting-lembaga-vertikal";
 										}
-										$data_temp[$keylevel4][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_4["id"] . "'><div>" . $label_parent . " <a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
+										$data_temp[$keylevel4][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_4["id"] . "'>
+												<div>" . $label_parent . " 
+													<a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='event.stopPropagation(); detail_cc(" . $valCross['id'] . "); return false;' title='Detail'>
+														<i class='dashicons dashicons-info'></i>
+													</a>
+												</div>
+												<div class='cros-opd'>" . $show_nama_skpd . "</div>
+											</div>
+										";
 									}
 								}
 
@@ -439,7 +471,16 @@ if (!empty($data_all['data'])) {
 													$label_parent = "?";
 													$class_cc_vertikal = "croscutting-lembaga-vertikal";
 												}
-												$data_temp[$keylevel5][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_5["id"] . "'><div>" . $label_parent . " <a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a></div><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
+												$data_temp[$keylevel5][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_5["id"] . "'>
+														<div>" . $label_parent . " 
+															<a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='event.stopPropagation(); detail_cc(" . $valCross['id'] . "); return false;' title='Detail'>
+																<i class='dashicons dashicons-info'></i>
+															</a>
+														</div>
+														<div class='cros-opd'>" . $show_nama_skpd . "</div>
+													</div>
+												";
+
 											}
 										}
 
@@ -928,7 +969,24 @@ if (!empty($data_all['data'])) {
 
 		<div class="info-section text-left">
 			<h6><i class="dashicons dashicons-groups"></i> Crosscutting Dengan</h6>
-			<p id="crosscutting"></p>
+			<?php if ($tipe == 'opd'): ?>
+				<div class="wrap-table">
+	                <table id="croscutting" cellpadding="2" cellspacing="0" class="table table-bordered">
+	                    <thead>
+							<tr>
+								<th class="text-center" style="border: 1px solid black;">Perangkat Pengusul</th>
+								<th class="text-center" style="border: 1px solid black;">Keterangan Pengusul</th>
+								<th class="text-center" style="border: 1px solid black;">Keterangan Tujuan</th>
+								<th class="text-center" style="border: 1px solid black;">Perangkat Daerah Tujuan</th>
+							</tr>	
+	                    </thead>
+	                    <tbody>
+	                    </tbody>
+	                </table>
+	            </div>
+            <?php else: ?>
+				<p id="croscutting"></p>
+			<?php endif; ?>
 		</div>
 	</div>
 </div>
@@ -1000,12 +1058,23 @@ if (!empty($data_all['data'])) {
 					jQuery("#pelaksana").text(response.data.pelaksana || '-');
 					jQuery("#bentuk_kegiatan").text(response.data.bentuk_kegiatan || '-');
 					jQuery("#outcome").text(response.data.outcome || '-');
-				
-					if (!response.data_koneksi_pokin_pemda || response.data_koneksi_pokin_pemda.length === 0) {
-						jQuery("#crosscutting").text('-');
-					} else {
-						jQuery("#crosscutting").html(response.data_koneksi_pokin_pemda);
-					}
+					<?php if ($tipe == 'opd'): ?>
+
+						if (!response.data_koneksi_croscutting_opd || response.data_koneksi_croscutting_opd.length === 0) {
+							jQuery("#croscutting tbody").text('-');
+						} else {
+							jQuery("#croscutting tbody").html(response.data_koneksi_croscutting_opd);
+						}
+
+                    <?php else: ?>
+
+						if (!response.data_koneksi_croscutting_pemda || response.data_koneksi_croscutting_pemda.length === 0) {
+							jQuery("#croscutting").text('-');
+						} else {
+							jQuery("#croscutting").html(response.data_koneksi_croscutting_pemda);
+						}
+
+					<?php endif; ?>
 
 					toggleSidebar();
 				},

@@ -623,6 +623,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					}
 
 					$table_croscutting = '';
+					$table_koneksi_croscutting_opd = '';
 					$no = 1;
 					if (!empty($data_croscutting)) {
 						$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
@@ -721,6 +722,17 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							$table_croscutting .= '<td class="text-center">' . $aksi . '</td>';
 
 							$table_croscutting .= '</tr>';
+
+							if (!empty($v_cross) && $v_cross['status_croscutting'] == 1 && $v_cross['is_lembaga_lainnya'] != 1) {
+								$table_koneksi_croscutting_opd .= '
+									<tr>
+										<td class="text-left" style="width: 270px; border: 1px solid black;">' . $this_data_perangkat['nama_perangkat'] . '</td>
+										<td class="text-left" style="width: 230px; border: 1px solid black;">' . $v_cross['keterangan'] . '</td>
+										<td class="text-left" style="width: 230px; border: 1px solid black;">' . $v_cross['keterangan_croscutting'] . '</td>
+										<td class="text-left" style="width: 230px; border: 1px solid black;">' . $data_perangkat['nama_perangkat'] . '</td>
+									</tr>
+								';
+							}
 						}
 					}
 
@@ -791,7 +803,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					}
 
 					$table_koneksi_pokin = '';
-					$table_koneksi_pokin_pemda = '';
+					$table_koneksi_croscutting_pemda = '';
 					$list_pd_koneksi_pokin = [];
 					$no = 1;
 					if (!empty($data_koneksi_pokin)) {
@@ -883,8 +895,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								$table_koneksi_pokin .= '
 									<td class="text-center">' . $aksi_koneksi . '</td>
 								</tr>';
-								if (!empty($v_koneksi_pokin) && $v_koneksi_pokin['status_koneksi'] == 1) {
-									$table_koneksi_pokin_pemda .= '
+								if (!empty($v_koneksi_pokin) && $v_koneksi_pokin['status_koneksi'] == 1 && $v_koneksi_pokin['tipe'] != 1) {
+									$table_koneksi_croscutting_pemda .= '
 										<tr>
 											<td class="text-left" style="width: 270px; border: 1px solid black;">' . $nama_perangkat . '</td>
 											<td class="text-left" style="width: 230px; border: 1px solid black;">' . $v_koneksi_pokin['keterangan_koneksi'] . '</td>
@@ -920,7 +932,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					    'indikator' => $list_indikator,
 					    'data_croscutting' => $table_croscutting,
 					    'data_koneksi_pokin' => $table_koneksi_pokin,
-					    'data_koneksi_pokin_pemda' => $table_koneksi_pokin_pemda,
+					    'data_koneksi_croscutting_pemda' => $table_koneksi_croscutting_pemda,
+					    'data_koneksi_croscutting_opd' => $table_koneksi_croscutting_opd,
 					    'list_pd_koneksi_pokin' => $list_pd_koneksi_pokin
 					]);
 					exit();
