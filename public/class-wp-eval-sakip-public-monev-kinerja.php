@@ -7422,7 +7422,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 			// die(json_encode($data_anggaran_all));
 
-			if($options['format_halaman_kedua'] == 'gabungan'){
+			if(
+				empty($options['format_halaman_kedua'])
+				|| $options['format_halaman_kedua'] == 'gabungan'
+			){
 				$cek_urut = 0;
 				foreach ($data_anggaran as $jenis => $cascading) {
 					foreach ($cascading as $multi_cascading) {
