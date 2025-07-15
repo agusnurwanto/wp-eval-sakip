@@ -114,7 +114,7 @@ $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') 
                                     <label class="form-check-label" for="terapkan-all-satker">
                                         Terapkan Perubahan ke Seluruh Pegawai di Satuan Kerja Ini
                                     </label>
-                                    <small class="form-text text-muted">
+                                    <small class="text-muted">
                                         Centang jika ingin menerapkan perubahan ini ke seluruh pegawai di satuan kerja <i class="font-weight-bold" id="nama-satker-info"></i> <strong>(pegawai definitif dikecualikan)</strong>. Jangan dicentang jika hanya ingin menerapkan perubahan ke pegawai ini saja.
                                     </small>
                                 </div>
@@ -127,20 +127,36 @@ $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') 
                             <div class="form-group">
                                 <label for="nama-pegawai-atasan">Ubah nama Jabatan Pegawai</label>
                                 <input type="text" class="form-control" id="nama-jabatan-pegawai-custom" placeholder="Masukkan nama jabatan pegawai (opsional)">
-                                <small class="form-text text-muted">
+                                <small class="text-muted">
                                     nama jabatan ini akan digunakan untuk menampilkan nama jabatan pada laporan Perjanjian Kinerja. Jika tidak diisi, akan menggunakan nama jabatan dari data SIMPEG.
                                 </small>
                             </div>
                             <div class="form-group" id="plt-plh-teks-container">
                                 <label for="plt-plh-teks">Status Jabatan</label>
                                 <input type="text" class="form-control" id="plt-plh-teks">
-                                <small class="form-text text-muted">
+                                <small class="text-muted">
                                     Wajib diisi karena jabatan non definitif. (Contoh PJ, PLT, PLH dll.)
                                 </small>
                             </div>
                         </div>
                     </div>
 
+                    <div class="card mb-3 shadow-md bg-light">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="format_halaman_kedua">Format halaman ke-2 Laporan Perjanjian Kinerja</label>
+                                <select class="form-control" id="format_halaman_kedua">
+                                    <option value="gabungan">Gabungan (Program, Kegiatan, Sub Kegiatan)</option>
+                                    <option value="program">Program</option>
+                                    <option value="kegiatan">Kegiatan</option>
+                                    <option value="sub_kegiatan">Sub Kegiatan</option>
+                                </select>
+                                <small class="text-muted">
+                                    Opsi bawaan adalah Gabungan
+                                </small>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -386,6 +402,7 @@ $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') 
                 jQuery('#nama-satker').val(namaSatuanKerja);
                 jQuery('#nama-satker-info').text(namaSatuanKerja);
                 jQuery('#info-atasan-pegawai').text(message);
+                jQuery('#format_halaman_kedua').val(data.format_halaman_kedua);
                 jQuery('#terapkan-all-satker').prop('checked', false);
 
                 jQuery('#plt-plh-teks-container').hide();
@@ -426,6 +443,7 @@ $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') 
         let idPegawaiAtasan = jQuery('#nama-pegawai-atasan').val();
         let namaJabatanCustom = jQuery('#nama-jabatan-pegawai-custom').val();
         let plt_plh_teks = jQuery('#plt-plh-teks').val();
+        let format_halaman_kedua = jQuery('#format_halaman_kedua').val();
         let terapkanAllSatker = jQuery('#terapkan-all-satker').is(':checked') ? 1 : 0;
 
         if (!idPegawai) {
@@ -444,6 +462,7 @@ $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') 
                 id_atasan: idPegawaiAtasan,
                 jabatan_custom: namaJabatanCustom,
                 terapkan_all_satker: terapkanAllSatker,
+                format_halaman_kedua: format_halaman_kedua,
                 plt_plh_teks: plt_plh_teks
             },
             dataType: 'json',
