@@ -5901,6 +5901,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						foreach ($v['indikator'] as $vv) {
 							$vv['id'] = implode('|', $vv['ids']);
 							$vv['data'][0]['id'] = $vv['id'];
+							$vv['data'][0]['id_renaksi'] = $v['id'];
 							$indikator[] = $vv['data'][0];
 						}
 						$rhk_parent = array();
