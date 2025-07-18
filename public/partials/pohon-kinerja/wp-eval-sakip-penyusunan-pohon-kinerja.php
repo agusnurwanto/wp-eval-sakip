@@ -808,7 +808,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 				<span class="font-weight-bold">
 					<a href="' . $view_kinerja['url'] . '&id=' . $level_1['id'] . '&id_jadwal=' . $input['periode'] . '" target="_blank">' . htmlspecialchars($level_1['label']) . '</a>
 				</span>
-				<button class="btn btn-sm btn-primary ml-2" onclick="handleDetailPokin(' . $level_1['id'] . '); return false;" title="Detail Pohon Kinerja">
+				<button class="btn btn-sm btn-primary ml-2 hide-print" onclick="handleDetailPokin(' . $level_1['id'] . '); return false;" title="Detail Pohon Kinerja">
 					<span class="dashicons dashicons-info"></span>
 				</button>
 			</td>
@@ -1692,10 +1692,10 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 			jQuery('.hide-crosscutting').toggle(isMasterChecked);
 
 			if (!isMasterChecked) {
-				if (jQuery('#check-tampilkan-detail').prop('checked')) {
-					jQuery('#check-tampilkan-detail').prop('checked', false).trigger('change');
+				if (jQuery('#check-tampilkan-cc').prop('checked')) {
+					jQuery('#check-tampilkan-cc').prop('checked', false).trigger('change');
 				}
-			} else if (!jQuery('#check-tampilkan-detail').prop('checked') && isMasterChecked) {
+			} else if (!jQuery('#check-tampilkan-cc').prop('checked') && isMasterChecked) {
 				jQuery('.detail-pokin').hide();
 			}
 		});
@@ -1707,8 +1707,8 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 			jQuery('.detail-pokin').toggle(isDetailChecked);
 
 			if (isDetailChecked) {
-				if (!jQuery('#check-tampilkan-cc').prop('checked')) {
-					jQuery('#check-tampilkan-cc').prop('checked', true).trigger('change');
+				if (!jQuery('#check-tampilkan-detail').prop('checked')) {
+					jQuery('#check-tampilkan-detail').prop('checked', true).trigger('change');
 				}
 			}
 		});
@@ -1750,10 +1750,10 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 				jQuery("#bentuk_kegiatan").text(response.data.bentuk_kegiatan || '-');
 				jQuery("#outcome").text(response.data.outcome || '-');
 				
-				if (!response.data_koneksi_pokin_pemda || response.data_koneksi_pokin_pemda.length === 0) {
+				if (!response.data_koneksi_croscutting_pemda || response.data_koneksi_croscutting_pemda.length === 0) {
 					jQuery("#crosscutting").text('-');
 				} else {
-					jQuery("#crosscutting").html(response.data_koneksi_pokin_pemda);
+					jQuery("#crosscutting").html(response.data_koneksi_croscutting_pemda);
 				}
 
 				toggleSidebar();

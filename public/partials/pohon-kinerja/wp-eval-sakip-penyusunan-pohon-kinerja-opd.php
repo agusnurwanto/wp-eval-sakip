@@ -89,16 +89,17 @@ if(!empty($unit_croscutting)){
 	}
 }
 
-$lembaga_lainnya_croscutting = $wpdb->get_results("
+$lembaga_lainnya_croscutting = $wpdb->get_results($wpdb->prepare("
 	SELECT 
 		nama_lembaga, 
 		id,
 		tahun_anggaran 
 	FROM esakip_data_lembaga_lainnya 
 	WHERE active=1 
+		AND tahun_anggaran=%d
 	GROUP BY id
 	ORDER BY nama_lembaga ASC
-", ARRAY_A);
+", $tahun_anggaran_sakip),ARRAY_A);
 
 $option_lainnya = "<option value=''>Pilih Lembaga Vertikal</option>";
 if(!empty($lembaga_lainnya_croscutting)){
@@ -127,6 +128,7 @@ if(!empty($pohon_kinerja_level_1)){
 				'label' => $level_1['label'],
 				'level' => $level_1['level'],
 				'indikator' => array(),
+				'croscutting' => array(),
 				'koneksi_pokin' => array(),
 				'data' => array()
 			];
@@ -168,11 +170,137 @@ if(!empty($pohon_kinerja_level_1)){
 				}
 			}
 		}
+		// croscutting pokin level 1
+		// untuk mendapatkan croscutting pengusul
+		$croscutting_pohon_kinerja_level_1 = $wpdb->get_results($wpdb->prepare("
+			SELECT 
+				cc.* ,
+				pk.id as id_parent,
+				pk.level as level_parent,
+				pk.label as label_parent
+			FROM esakip_croscutting_opd cc
+			LEFT JOIN esakip_pohon_kinerja_opd as pk ON cc.parent_croscutting = pk.id
+			WHERE cc.parent_pohon_kinerja=%d 
+				AND cc.active=1 
+			ORDER BY cc.id
+		", $level_1['id']), ARRAY_A);
+		
+		// untuk mendapatkan croscutting yang diusulkan
+		$croscutting_pohon_kinerja_level_1_pengusul = $wpdb->get_results($wpdb->prepare("
+			SELECT 
+				cc.*,
+				pk.id_skpd as id_skpd_parent,
+				pk.id as id_parent,
+				pk.level as level_parent,
+				pk.label as label_parent
+			FROM esakip_croscutting_opd as cc
+			JOIN esakip_pohon_kinerja_opd as pk ON cc.parent_pohon_kinerja = pk.id
+			WHERE cc.id_skpd_croscutting=%d
+				AND cc.status_croscutting=1 
+				AND cc.active=1
+				AND cc.parent_croscutting=%d
+		", $id_skpd, $level_1['id']),  ARRAY_A);
+		if(!empty($croscutting_pohon_kinerja_level_1) && !empty($croscutting_pohon_kinerja_level_1_pengusul)){
+			$croscutting_pohon_kinerja_level_1 = array_merge($croscutting_pohon_kinerja_level_1,$croscutting_pohon_kinerja_level_1_pengusul);
+		}else if(empty($croscutting_pohon_kinerja_level_1) && !empty($croscutting_pohon_kinerja_level_1_pengusul)){
+			$croscutting_pohon_kinerja_level_1 = $croscutting_pohon_kinerja_level_1_pengusul;
+		}
+
+		if(!empty($croscutting_pohon_kinerja_level_1)){
+			foreach ($croscutting_pohon_kinerja_level_1 as $key_croscutting_level_1 => $croscutting_level_1) {
+				$nama_perangkat = '';
+				if($croscutting_level_1['is_lembaga_lainnya'] == 1){
+					$nama_lembaga = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT 
+								nama_lembaga,
+								id,
+								tahun_anggaran
+							FROM esakip_data_lembaga_lainnya 
+							WHERE active=1 
+							AND id=%d
+							AND tahun_anggaran=%d
+							GROUP BY id
+							ORDER BY nama_lembaga ASC
+						", $croscutting_level_1['id_skpd_croscutting'], $tahun_anggaran_sakip),
+						ARRAY_A
+					);
+					$nama_perangkat = $nama_lembaga['nama_lembaga'];
+				}else{
+					if(!empty($croscutting_level_1['id_skpd_parent'])){
+						$this_data_id_skpd = $croscutting_level_1['id_skpd_parent'];
+					}else{
+						$this_data_id_skpd = $croscutting_level_1['id_skpd_croscutting'];
+					}
+
+					$nama_skpd = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT 
+								nama_skpd,
+								id_skpd,
+								tahun_anggaran
+							FROM esakip_data_unit 
+							WHERE active=1 
+							AND is_skpd=1 
+							AND id_skpd=%d
+							AND tahun_anggaran=%d
+							GROUP BY id_skpd
+							ORDER BY kode_skpd ASC
+						", $this_data_id_skpd, $tahun_anggaran_sakip),
+						ARRAY_A
+					);
+					$nama_perangkat = $nama_skpd['nama_skpd'];
+				}
+
+				if(!empty($croscutting_level_1['keterangan'])){
+					if(!empty($croscutting_level_1['id_skpd_parent'])){
+						$croscutting_opd_lain = 1;
+						$id_skpd_view_pokin = $croscutting_level_1['id_skpd_parent'];
+					}else{
+						$croscutting_opd_lain = 0;
+						$id_skpd_view_pokin = $croscutting_level_1['id_skpd_croscutting'];
+					}
+
+					$data_parent_tujuan = array();
+					$id_level_1_parent = 0;
+					if($croscutting_level_1['status_croscutting'] == 1){
+						// untuk mendapatkan id parent level 1 suatu opd
+						$data_parent_tujuan = array('data' => $this->get_parent_1(array(
+							'id' => $croscutting_level_1['id'],
+							'level' => $croscutting_level_1['level_parent'],
+							'periode' => $input['periode'],
+							'tipe' => 'opd',
+							'id_parent' => $croscutting_level_1['id_parent']
+						)));
+					}
+
+					if(!empty($data_parent_tujuan)){
+						$id_level_1_parent = $data_parent_tujuan['data'];
+					}	
+
+					if(empty($data_all['data'][$level_1['id']]['croscutting'][$key_croscutting_level_1])){
+						$data_all['data'][$level_1['id']]['croscutting'][$key_croscutting_level_1] = [
+							'id' => $croscutting_level_1['id'],
+							'parent_pohon_kinerja' => $croscutting_level_1['parent_pohon_kinerja'],
+							'keterangan' => $croscutting_level_1['keterangan'],
+							'is_lembaga_lainnya' => $croscutting_level_1['is_lembaga_lainnya'],
+							'status_croscutting' => $croscutting_level_1['status_croscutting'],
+							'label_parent' => $croscutting_level_1['label_parent'],
+							'croscutting_opd_lain' => $croscutting_opd_lain,
+							'nama_skpd' => $nama_perangkat,
+							'id_skpd_view_pokin' => $id_skpd_view_pokin,
+							'id_level_1_parent' => $id_level_1_parent
+						];
+					}
+					// print_r($data_all['data'][$level_1['id']]['croscutting'][$key_croscutting_level_1]); die();
+				}
+			}
+		}
 
 		/**
 		 * koneksi pokin pemda dan opd
 		 */
-		$koneksi_pohon_kinerja_pemda_level_1 = $wpdb->get_results($wpdb->prepare("
+		$koneksi_pohon_kinerja_pemda_['level_1'] = $wpdb->get_results($wpdb->prepare("
 			SELECT 
 				koneksi.* ,
 				pk.id as id_parent,
@@ -1255,6 +1383,55 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 	foreach ($level_1['indikator'] as $indikatorlevel1) {
 		$indikator[]=$indikatorlevel1['label_indikator_kinerja'];
 	}
+	$croscutting = array();
+	foreach ($level_1['croscutting'] as $croscuttinglevel1) {
+		$class_pengusul = "";
+		// $link_pengusul = $croscuttinglevel1['nama_skpd'];
+		if($croscuttinglevel1['croscutting_opd_lain'] == 1){
+			$class_pengusul = "croscutting-pengusul";
+		}	
+
+		$nama_skpd = $croscuttinglevel1['nama_skpd'];
+		if($croscuttinglevel1['id_level_1_parent'] !== 0 && $croscuttinglevel1['is_lembaga_lainnya'] != 1){
+			$nama_skpd = "<a href='" . $view_kinerja_asal['url'] . "&id_skpd=" . $croscuttinglevel1['id_skpd_view_pokin']  . "&id=" . $croscuttinglevel1['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $croscuttinglevel1['nama_skpd'] . "</a>";
+		}
+		
+		switch ($croscuttinglevel1['status_croscutting']) {
+			case '1':
+				$status_croscutting = 'Disetujui';
+				$label_color = 'success text-white';
+				break;
+			case '2':
+				$status_croscutting = 'Ditolak';
+				$label_color = 'danger text-white';
+				break;
+			
+			default:
+				$status_croscutting = 'Menunggu';
+				$label_color = 'secondary text-white';
+				break;
+		}
+
+		$show_nama_skpd = $nama_skpd . ' <span class="badge bg-'. $label_color .'" style="padding: .5em;">'. $status_croscutting.'</span> ';
+		
+		$class_cc_vertikal = '';
+		if($croscuttinglevel1['is_lembaga_lainnya'] == 1){
+			// $label_parent = "?";
+			$class_cc_vertikal = "croscutting-lembaga-vertikal";
+		}
+
+		$detail = "<a href='javascript:void(0)' data-id='". $croscuttinglevel1['id'] ."' class='detail-cc text-primary' onclick='detail_cc(" . $croscuttinglevel1['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>";
+
+		$label_parent_croscutting_1 = !empty($croscuttinglevel1['label_parent']) ? ucfirst($croscuttinglevel1['label_parent']) : '';
+		$croscutting[]= '<div class="croscutting-isi '. $class_pengusul .' '. $class_cc_vertikal .'"><div>'. $label_parent_croscutting_1 ."</div><div style='margin-top: 10px;font-weight: 500;'>". $show_nama_skpd .' '. $detail .'</div></div>';
+	}
+
+	$show_croscutting = '';
+	if(!empty($croscutting)){
+		$show_croscutting .='<div class="text-center label-croscutting tampil_croscutting">CROSCUTTING</div>';
+		$show_croscutting .=implode("", $croscutting);
+	}
+
 	$koneksi_pokin_pemda = array();
 
 	foreach ($level_1['koneksi_pokin'] as $koneksi_pokin_level_1) {
@@ -1310,7 +1487,11 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 	}
 	$html.='
 	<tr>
-		<td class="level1" style="background: #efd655;"><a href="'.$view_kinerja['url'].'&id='.$level_1['id'].'&id_jadwal='.$input['periode'].'" target="_blank">'.$level_1['label'].'</a></td>
+		<td class="level1" style="background: #efd655;"><a href="'.$view_kinerja['url'].'&id='.$level_1['id'].'&id_jadwal='.$input['periode'].'" target="_blank">'.$level_1['label'].'</a>
+			<button class="btn btn-sm btn-primary ml-2" onclick="handleDetailPokin(' . $level_1['id'] . '); return false;" title="Detail Pohon Kinerja">
+				<span class="dashicons dashicons-info"></span>
+			</button>
+		</td>
 		<td class="indikator" style="background: #b5d9ea;">'.implode("<hr/>", $indikator).'</td>
 		<td></td>
 		<td></td>
@@ -1321,6 +1502,21 @@ foreach ($data_all['data'] as $key1 => $level_1) {
     <td></td>
     <td></td>
 	</tr>';
+
+	if(!empty($show_croscutting)){
+		$html.='
+		<tr class="tampil_croscutting">
+			<td class="croscutting" style="background-color: #FFC6FF;" colspan="2">' . $show_croscutting . '</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>';
+	}
 
 	if(!empty($show_koneksi_pokin)){
 		$html.='
@@ -1386,7 +1582,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 
 		$show_croscutting = '';
 		if(!empty($croscutting)){
-			$show_croscutting .='<div class="text-center label-croscutting">CROSCUTTING</div>';
+			$show_croscutting .='<div class="text-center label-croscutting tampil_croscutting">CROSCUTTING</div>';
 			$show_croscutting .=implode("", $croscutting);
 		}
 
@@ -1448,7 +1644,11 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 		<tr>
 			<td></td>
 			<td></td>
-			<td class="level2" style="background: #fe7373;">'.$level_2['label'].'</td>
+			<td class="level2" style="background: #fe7373;">'.$level_2['label'].'
+				<button class="btn btn-sm btn-primary ml-2" onclick="handleDetailPokin(' . $level_2['id'] . '); return false;" title="Detail Pohon Kinerja">
+					<span class="dashicons dashicons-info"></span>
+				</button>
+			</td>
 			<td class="indikator" style="background: #b5d9ea;">'.implode("<hr/>", $indikator).'</td>
 			<td></td>
 			<td></td>
@@ -1460,10 +1660,10 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 
 		if(!empty($show_croscutting)){
 			$html.='
-			<tr>
+			<tr class="tampil_croscutting">
 				<td></td>
 				<td></td>
-				<td class="croscutting" style="background-color: #FFC6FF;" colspan="2">' . $show_croscutting . '</td>
+				<td class="croscutting tampil_croscutting" style="background-color: #FFC6FF;" colspan="2">' . $show_croscutting . '</td>
 				<td></td>
 				<td></td>
 				<td></td>
@@ -1532,7 +1732,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 			
 			$show_croscutting = '';
 			if(!empty($croscutting)){
-				$show_croscutting .='<div class="text-center label-croscutting">CROSCUTTING</div>';
+				$show_croscutting .='<div class="text-center label-croscutting tampil_croscutting">CROSCUTTING</div>';
 				$show_croscutting .=implode("", $croscutting);
 			}
 
@@ -1595,7 +1795,11 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 				<td></td>
 				<td></td>
 				<td></td>
-				<td class="level3" style="background: #57b2ec;">'.$level_3['label'].'</td>
+				<td class="level3" style="background: #57b2ec;">'.$level_3['label'].'
+					<button class="btn btn-sm btn-primary ml-2" onclick="handleDetailPokin(' . $level_3['id'] . '); return false;" title="Detail Pohon Kinerja">
+						<span class="dashicons dashicons-info"></span>
+					</button>
+				</td>
 				<td class="indikator" style="background: #b5d9ea;">'.implode("<hr/>", $indikator).'</td>
 				<td></td>
 				<td></td>
@@ -1605,7 +1809,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 
 			if(!empty($show_croscutting)){
 				$html.='
-				<tr>
+				<tr class="tampil_croscutting">
 					<td></td>
 					<td></td>
 					<td></td>
@@ -1677,7 +1881,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 				
 				$show_croscutting = '';
 				if(!empty($croscutting)){
-					$show_croscutting .='<div class="text-center label-croscutting">CROSCUTTING</div>';
+					$show_croscutting .='<div class="text-center label-croscutting tampil_croscutting">CROSCUTTING</div>';
 					$show_croscutting .=implode("", $croscutting);
 				}
 
@@ -1742,7 +1946,11 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 					<td></td>
 					<td></td>
 					<td></td>
-					<td class="level4" style="background: #c979e3;">' . $level_4['label'] . '</td>
+					<td class="level4" style="background: #c979e3;">' . $level_4['label'] . '
+						<button class="btn btn-sm btn-primary ml-2" onclick="handleDetailPokin(' . $level_4['id'] . '); return false;" title="Detail Pohon Kinerja">
+							<span class="dashicons dashicons-info"></span>
+						</button>
+					</td>
 					<td class="indikator" style="background: #b5d9ea;">'.implode("<hr/>", $indikator).'</td>
 					<td></td>
 					<td></td>
@@ -1750,7 +1958,7 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 				
 				if(!empty($show_croscutting)){
 					$html.='
-					<tr>
+					<tr class="tampil_croscutting">
 						<td></td>
 						<td></td>
 						<td></td>
@@ -1792,7 +2000,11 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 						<td></td>
 						<td></td>
 						<td></td>
-						<td class="level5" style="background: #CAFFBF;">'.$level_5['label'].'</td>
+						<td class="level5" style="background: #CAFFBF;">'.$level_5['label'].'
+							<button class="btn btn-sm btn-primary ml-2" onclick="handleDetailPokin(' . $level_5['id'] . '); return false;" title="Detail Pohon Kinerja">
+								<span class="dashicons dashicons-info"></span>
+							</button>
+						</td>
 						<td class="indikator" style="background: #b5d9ea;">'.implode("<hr/>", $indikator).'</td>
 					</tr>';
 
@@ -1839,13 +2051,13 @@ foreach ($data_all['data'] as $key1 => $level_1) {
 
 					$show_croscutting5 = '';
 					if(!empty($croscutting5)){
-						$show_croscutting5 .='<div class="text-center label-croscutting">CROSCUTTING</div>';
+						$show_croscutting5 .='<div class="text-center label-croscutting tampil_croscutting">CROSCUTTING</div>';
 						$show_croscutting5 .=implode('', $croscutting5);
 					}
 
 					if(!empty($show_croscutting5)){
 						$html.='
-						<tr>
+						<tr class="tampil_croscutting">
 							<td></td>
 							<td></td>
 							<td></td>
@@ -2243,9 +2455,81 @@ $hak_akses_user = ($this_jenis_role || $cek_settingan_menu == 3 || $is_administr
 		border-style: solid;
 		border-color: gray;
 	}
-</style>
-<h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Pohon Kinerja <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $periode['nama_jadwal_renstra'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h3><br>
+	/* sidebar */
+	.sidebar-modal {
+		position: fixed;
+		top: 0;
+		right: 0;
+		width: 600px;
+		height: 100%;
+		z-index: 1050;
+		background-color: #fff;
+		box-shadow: -5px 0px 15px rgba(0, 0, 0, 0.15);
+		transform: translateX(100%);
+		transition: transform 0.3s ease-in-out;
+	}
 
+	.sidebar-modal.show {
+		transform: translateX(0);
+	}
+
+	.sidebar-backdrop {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0, 0, 0, 0.4);
+		z-index: 1040;
+		opacity: 0;
+		visibility: hidden;
+		transition: opacity 0.3s ease-in-out, visibility 0.3s;
+	}
+
+	.sidebar-backdrop.show {
+		opacity: 1;
+		visibility: visible;
+	}
+
+	/* ================================ */
+
+	.sidebar-header {
+		background-color: #57b2ec;
+		color: white;
+		padding: 1rem 1.25rem;
+	}
+
+	.sidebar-header .close-btn {
+		color: white;
+		opacity: 0.9;
+		font-size: 1.5rem;
+		background: none;
+		border: none;
+	}
+
+	.sidebar-header .close-btn:hover {
+		opacity: 1;
+	}
+
+	.sidebar-body {
+		padding: 1.5rem;
+		overflow-y: auto;
+		height: calc(100% - 62px);
+	}
+
+	.tampil_croscutting {
+		display: none;
+	}
+</style>
+<h3 style="text-align: center; margin-top: 10px; font-weight: bold;">Penyusunan Pohon Kinerja <br><?php echo $skpd['nama_skpd'] ?><br><?php echo $periode['nama_jadwal_renstra'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h3>
+<div class="text-center">
+	<div style="display: block;">
+		<div class="custom-control custom-checkbox custom-control-inline mt-4">
+			<input type="checkbox" class="custom-control-input" id="show_croscutting">
+			<label class="custom-control-label" for="show_croscutting">Tampilkan Croscutting</label>
+		</div>
+	</div>
+</div>
 <?php if(!empty($data_notifikasi_croscutting)): ?>
 <h4 style="text-align: center; margin-top: 10px; font-weight: bold;margin-bottom: .5em;">Notifikasi Croscutting</h4>
 <div title="Notifikasi Croscutting" style="padding: 5px; overflow: auto; display:flex; justify-content:center;">
@@ -2433,7 +2717,7 @@ $hak_akses_user = ($this_jenis_role || $cek_settingan_menu == 3 || $is_administr
 				<div class="col-md-12 d-flex justify-content-center">
 					<div class="form-group text-center">
 						<label for="">Status</label>
-						<button type="button" id="status-croscutting" class="btn btn-success d-block"">Disetujui</button>
+						<button type="button" id="status-croscutting" class="btn btn-success d-block">Disetujui</button>
 					</div>
 				</div>
 			</div>
@@ -2453,7 +2737,60 @@ $hak_akses_user = ($this_jenis_role || $cek_settingan_menu == 3 || $is_administr
     </div>
   </div>
 </div>
+<div class="sidebar-modal" id="rincianSidebar">
+	<div class="sidebar-header d-flex justify-content-between align-items-center">
+		<h5 class="mb-0 text-light">Rincian</h5>
+		<button type="button" class="close-btn" onclick="toggleSidebar()">
+			<span>&times;</span>
+		</button>
+	</div>
 
+	<div class="sidebar-body">
+		<div class="info-section text-left">
+			<h6><i class="dashicons dashicons-tag"></i> Kinerja</h6>
+			<p id="label"></p>
+		</div>
+
+		<div class="info-section text-left">
+			<h6><i class="dashicons dashicons-chart-bar"></i> Indikator Kinerja</h6>
+			<p id="indikator"></p>
+		</div>
+
+		<div class="info-section text-left">
+			<h6><i class="dashicons dashicons-admin-users"></i> Pelaksana</h6>
+			<p id="pelaksana"></p>
+		</div>
+
+		<div class="info-section text-left">
+			<h6><i class="dashicons dashicons-clipboard"></i> Bentuk Kegiatan</h6>
+			<p id="bentuk_kegiatan"></p>
+		</div>
+
+		<div class="info-section text-left">
+			<h6><i class="dashicons dashicons-chart-line"></i> Outcome</h6>
+			<p id="outcome"></p>
+		</div>
+
+		<div class="info-section text-left">
+			<h6><i class="dashicons dashicons-groups"></i> Crosscutting Dengan</h6>
+			<div class="wrap-table">
+                <table id="croscutting" cellpadding="2" cellspacing="0" class="table table-bordered">
+                    <thead>
+						<tr>
+							<th class="text-center kiri" style="border: 1px solid black;">Perangkat Pengusul</th>
+							<th class="text-center kiri" style="border: 1px solid black;">Keterangan Pengusul</th>
+							<th class="text-center kiri" style="border: 1px solid black;">Keterangan Tujuan</th>
+							<th class="text-center kiri" style="border: 1px solid black;">Perangkat Daerah Tujuan</th>
+						</tr>	
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+		</div>
+	</div>
+</div>
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
 <script type="text/javascript">
 jQuery(document).ready(function(){
     run_download_excel_sakip();
@@ -2536,8 +2873,43 @@ jQuery(document).ready(function(){
                             +'<label>Nomor Urut</label>'
                             +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
                         +`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="pelaku">Pelaksana</label>'
+                            +`<input type="text" class="form-control" name="pelaku" id="pelaku" value="${response.data.pelaksana ?? ''}">`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="bentuk_kegiatan">Bentuk Kegiatan</label>'
+                            +`<textarea class="form-control" name="bentuk_kegiatan" id="bentuk_kegiatan">${response.data.bentuk_kegiatan ?? ''}</textarea>`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="outcome">Outcome</label>'
+                            +`<textarea class="form-control" name="outcome" id="outcome">${response.data.outcome ?? ''}</textarea>`
+                        +`</div>`
+						+`<div class="custom-control custom-checkbox">`
+							+`<input type="checkbox" class="custom-control-input" name="settingCroscutting" value="false" id="settingCroscutting">`
+							+`<label class="custom-control-label" for="settingCroscutting">Setting Croscutting</label>`
+						+`</div>`
+						+`<div class="setting-croscutting" style="margin-top:10px">`
+							+`<button type="button" data-setting-croscutting="false" data-parent-croscutting="${response.data.id}" class="btn btn-success mb-2" id="tambah-croscuting-level"><i class="dashicons dashicons-plus" style="margin-top: 2px;"></i>Tambah Data</button>`
+						+`</div>`
+						+`<div class="wrap-table setting-croscutting">`
+							+`<table id="table_croscutting" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">`
+								+`<thead>`
+									+`<tr>`
+										+`<th class="text-center">No</th>`
+										+`<th class="text-center">Perangkat Pengusul</th>`
+										+`<th class="text-center">Keterangan Pengusul</th>`
+										+`<th class="text-center">Keterangan Tujuan</th>`
+										+`<th class="text-center">Perangkat Daerah Tujuan</th>`
+										+`<th class="text-center">Status</th>`
+										+`<th class="text-center" style="width: 150px;">Aksi</th>`
+									+`</tr>`
+								+`</thead>`
+								+`<tbody>${response.data_croscutting}</tbody>`
+							+`</table>`
+						+`</div>`
 						+`<div class="setting-koneksi-pokin">`
-							+`<h5 style="margin: 30px 0 5px 0;">Setting Koneksi Pohon Kinerja <?php echo $nama_pemda ?></h5>`
+							+`<h5 style="margin: 30px 0 5px 0;">Setting Koneksi Pohon Kinerja <?php echo $nama_pemda; ?></h5>`
 							+`<table id="table_koneksi_pokin" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">`
 								+`<thead>`
 									+`<tr>`
@@ -2556,19 +2928,27 @@ jQuery(document).ready(function(){
 					+`<button type="button" class="btn btn-danger" data-dismiss="modal">`
 						+`Tutup`
 					+`</button>`
-					+`<button type="button" class="btn btn-success" id="simpan-data-pokin" data-action="update_pokin" data-view="pokinLevel1">`
+					+`<button type="button" class="btn btn-success" id="simpan-data-pokin" data-action="update_pokin" data-view="pokinLevel2">`
 						+`Update`
 					+`</button>`);
-				
+				jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','1100px');
 				jQuery("#modal-crud").find('.modal-dialog').css('width','');
 				jQuery("#modal-crud").modal('show');
+				
+				if(response.data_croscutting == "" || response.data_croscutting == undefined){
+					jQuery('#settingCroscutting').prop('checked', false);
+					jQuery('#tambah-croscuting-level').attr('data-setting-croscutting', 'false');
+					jQuery(".setting-croscutting").hide()
+				}else{
+					jQuery('#settingCroscutting').prop('checked', true);
+					jQuery(".setting-croscutting").show()
+					jQuery('#tambah-croscuting-level').attr('data-setting-croscutting', 'true');
+				}
 
 				if(response.data_koneksi_pokin == "" || response.data_koneksi_pokin == undefined){
 					jQuery(".setting-koneksi-pokin").hide()
-					jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','');
 				}else{
 					jQuery(".setting-koneksi-pokin").show()
-					jQuery("#modal-crud").find('.modal-dialog').css('maxWidth','1100px');
 				}
 			}
 		});
@@ -2767,6 +3147,18 @@ jQuery(document).ready(function(){
                         +`<div class="form-group">`
                             +'<label>Nomor Urut</label>'
                             +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="pelaku">Pelaksana</label>'
+                            +`<input type="text" class="form-control" name="pelaku" id="pelaku" value="${response.data.pelaksana ?? ''}">`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="bentuk_kegiatan">Bentuk Kegiatan</label>'
+                            +`<textarea class="form-control" name="bentuk_kegiatan" id="bentuk_kegiatan">${response.data.bentuk_kegiatan ?? ''}</textarea>`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="outcome">Outcome</label>'
+                            +`<textarea class="form-control" name="outcome" id="outcome">${response.data.outcome ?? ''}</textarea>`
                         +`</div>`
 						+`<div class="custom-control custom-checkbox">`
 							+`<input type="checkbox" class="custom-control-input" name="settingCroscutting" value="false" id="settingCroscutting">`
@@ -3039,6 +3431,18 @@ jQuery(document).ready(function(){
                             +'<label>Nomor Urut</label>'
                             +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
                         +`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="pelaku">Pelaksana</label>'
+                            +`<input type="text" class="form-control" name="pelaku" id="pelaku" value="${response.data.pelaksana ?? ''}">`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="bentuk_kegiatan">Bentuk Kegiatan</label>'
+                            +`<textarea class="form-control" name="bentuk_kegiatan" id="bentuk_kegiatan">${response.data.bentuk_kegiatan ?? ''}</textarea>`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="outcome">Outcome</label>'
+                            +`<textarea class="form-control" name="outcome" id="outcome">${response.data.outcome ?? ''}</textarea>`
+                        +`</div>`
 						+`<div class="custom-control custom-checkbox">`
 							+`<input type="checkbox" class="custom-control-input" name="settingCroscutting" value="false" id="settingCroscutting">`
 							+`<label class="custom-control-label" for="settingCroscutting">Setting Croscutting</label>`
@@ -3310,6 +3714,18 @@ jQuery(document).ready(function(){
                         +`<div class="form-group">`
                             +'<label>Nomor Urut</label>'
                             +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="pelaku">Pelaksana</label>'
+                            +`<input type="text" class="form-control" name="pelaku" id="pelaku" value="${response.data.pelaksana ?? ''}">`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="bentuk_kegiatan">Bentuk Kegiatan</label>'
+                            +`<textarea class="form-control" name="bentuk_kegiatan" id="bentuk_kegiatan">${response.data.bentuk_kegiatan ?? ''}</textarea>`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="outcome">Outcome</label>'
+                            +`<textarea class="form-control" name="outcome" id="outcome">${response.data.outcome ?? ''}</textarea>`
                         +`</div>`
 						+`<div class="custom-control custom-checkbox">`
 							+`<input type="checkbox" class="custom-control-input" name="settingCroscutting" value="false" id="settingCroscutting">`
@@ -3589,6 +4005,18 @@ jQuery(document).ready(function(){
                         +`<div class="form-group">`
                             +'<label>Nomor Urut</label>'
                             +`<input type="number" class="form-control" name="nomor_urut" value="${response.data.nomor_urut}">`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="pelaku">Pelaksana</label>'
+                            +`<input type="text" class="form-control" name="pelaku" id="pelaku" value="${response.data.pelaksana ?? ''}">`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="bentuk_kegiatan">Bentuk Kegiatan</label>'
+                            +`<textarea class="form-control" name="bentuk_kegiatan" id="bentuk_kegiatan">${response.data.bentuk_kegiatan ?? ''}</textarea>`
+                        +`</div>`
+                        +`<div class="form-group">`
+                            +'<label for="outcome">Outcome</label>'
+                            +`<textarea class="form-control" name="outcome" id="outcome">${response.data.outcome ?? ''}</textarea>`
                         +`</div>`
 						+`<div class="custom-control custom-checkbox">`
 							+`<input type="checkbox" class="custom-control-input" name="settingCroscutting" value="false" id="settingCroscutting">`
@@ -3977,15 +4405,11 @@ jQuery(document).on('click', '.edit-croscutting', function(){
 					+`<input type="hidden" name="idParentCroscutting" value="${response.data_croscutting.parent_pohon_kinerja}">`
 					+`<div class="form-group" id="showSkpdCroscutting">`
 						+`<label for="skpdCroscutting">Pilih Perangkat Daerah</label>`
-						+`<select class="form-control" name="skpdCroscutting" id="skpdCroscutting">`
-						+`<?php echo $option_skpd; ?>`
-						+`</select>`
+						+`<input type="text" class="form-control" name="skpdCroscutting" id="skpdCroscutting" value="${response.nama_perangkat.nama_skpd}" disabled>`
 					+`</div>`
 					+`<div class="form-group" id="showLembagaLainnyaCroscutting">`
 						+`<label for="lembagaLainnyaCroscutting">Pilih Lembaga Vertikal</label>`
-						+`<select class="form-control" name="lembagaLainnyaCroscutting" id="lembagaLainnyaCroscutting">`
-						+`<?php echo $option_lainnya; ?>`
-						+`</select>`
+						+`<input type="text" class="form-control" name="skpdCroscutting" id="skpdCroscutting" value="${response.nama_perangkat.nama_lembaga}" disabled>`
 					+`</div>`
 					+`<div class="form-group" id="showKeteranganCroscutting">`
 						+`<label for="keteranganCroscutting">Keterangan Croscutting</label>`
@@ -4004,9 +4428,6 @@ jQuery(document).on('click', '.edit-croscutting', function(){
 			jQuery("#modal-croscutting").find('.modal-dialog').css('maxWidth','');
 			jQuery("#modal-croscutting").find('.modal-dialog').css('width','');
 			jQuery("#modal-croscutting").modal('show');
-			jQuery('#skpdCroscutting').select2({
-							width: '100%'
-						});
 			jQuery('#lembagaLainnyaCroscutting').select2({
 							width: '100%'
 						});
@@ -4018,7 +4439,6 @@ jQuery(document).on('click', '.edit-croscutting', function(){
 				jQuery('#lembagaLainnyaCroscutting').val(id_skpd_croscutting).trigger('change');
 				jQuery('#showSkpdCroscutting').hide();
 			}else{
-				jQuery('#skpdCroscutting').val(id_skpd_croscutting).trigger('change');
 				jQuery('#showLembagaLainnyaCroscutting').hide();
 			}
 		}
@@ -4859,10 +5279,69 @@ jQuery(document).on('change', 'input[type=radio][name=verify_koneksi_pokin]', fu
 			jQuery(".showKoneksiPokinTolak").show();
 		}
 });
-
+jQuery("#show_croscutting").on('click', function() {
+	if (this.checked) {
+		jQuery(".tampil_croscutting").show();
+	} else {
+		jQuery(".tampil_croscutting").hide();
+	}
+});
 function refresh_page() {
 	if (confirm('Ada data yang berubah, apakah mau merefresh halaman ini?')) {
 		window.location = "";
 	}
-    }
+}
+
+
+function handleDetailPokin(idPokin) {
+	jQuery.ajax({
+		method: 'POST',
+		url: esakip.url,
+		data: {
+			"action": "edit_pokin",
+			"api_key": esakip.api_key,
+			'id': idPokin,
+			'tipe_pokin': "opd",
+			'id_skpd': <?php echo $id_skpd; ?>,
+			'id_jadwal': <?php echo $input['periode']; ?>
+		},
+		dataType: 'json',
+		success: function(response) {
+			if (!response.status) {
+				alert(response.message);
+				return;
+			}
+			jQuery("#label").text(response.data.label || '-');
+
+			if (response.indikator && response.indikator.length > 0) {
+				jQuery("#indikator").html(
+					response.indikator.join(', <br> '));
+			} else {
+				jQuery("#indikator").text('-');
+			}
+
+			jQuery("#pelaksana").text(response.data.pelaksana || '-');
+			jQuery("#bentuk_kegiatan").text(response.data.bentuk_kegiatan || '-');
+			jQuery("#outcome").text(response.data.outcome || '-');
+		
+			if (!response.data_koneksi_croscutting_opd || response.data_koneksi_croscutting_opd.length === 0) {
+				jQuery("#croscutting tbody").text('-');
+			} else {
+				jQuery("#croscutting tbody").html(response.data_koneksi_croscutting_opd);
+			}
+
+			toggleSidebar();
+		},
+		error: function(e) {
+			jQuery("#wrap-loading").hide();
+			alert(e.responseJSON.message || 'Terjadi kesalahan saat mengambil data Pohon Kinerja.');
+		}
+	});
+}
+
+
+function toggleSidebar() {
+	jQuery('#rincianSidebar').toggleClass('show');
+	jQuery('#sidebarBackdrop').toggleClass('show');
+}
 </script>

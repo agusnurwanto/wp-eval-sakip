@@ -116,9 +116,9 @@ class Esakip_Functions
                 }
             }
         }
-        if(is_404()){
+        if (is_404()) {
             header("HTTP/1.1 301 Moved Permanently");
-            header("Location: ".get_bloginfo('url'));
+            header("Location: " . get_bloginfo('url'));
             exit();
         }
     }
@@ -134,20 +134,20 @@ class Esakip_Functions
         if (!empty($options['custom_url'])) {
             $custom_url = array();
             foreach ($options['custom_url'] as $k => $v) {
-                if(
-                    !empty($v['key']) 
+                if (
+                    !empty($v['key'])
                     && !empty($v['value'])
-                ){
+                ) {
                     $custom_url[] = $v['key'] . '=' . $v['value'];
-                }else{
+                } else {
                     $cek_param_get[] = $k . '=' . $v;
                 }
             }
             $tambahan_url = $key_db . implode('&', $custom_url);
         }
         $key = base64_encode($now . $key_db . $now . $tambahan_url);
-        if(!empty($cek_param_get)){
-            $key .= '&'.implode('&', $cek_param_get);
+        if (!empty($cek_param_get)) {
+            $key .= '&' . implode('&', $cek_param_get);
         }
         return $key;
     }
@@ -313,25 +313,26 @@ class Esakip_Functions
         }
     }
 
-    function get_option_complex($key, $type=0){
+    function get_option_complex($key, $type = 0)
+    {
         global $wpdb;
-        $ret = $wpdb->get_results('select option_name, option_value from '.$wpdb->prefix.'options where option_name like \''.$key.'|%\'', ARRAY_A);
+        $ret = $wpdb->get_results('select option_name, option_value from ' . $wpdb->prefix . 'options where option_name like \'' . $key . '|%\'', ARRAY_A);
         $res = array();
         $types = array();
-        foreach($ret as $v){
+        foreach ($ret as $v) {
             $k = explode('|', $v['option_name']);
             $column = $k[1];
             $group = $k[3];
-            if($column == ''){
+            if ($column == '') {
                 $types[$group] = $v['option_value'];
             }
         }
-        foreach($ret as $v){
+        foreach ($ret as $v) {
             $k = explode('|', $v['option_name']);
             $column = $k[1]; // nama kolom atau field
             $loop = $k[2]; // index nomor urut sesuai group
-            if($column != ''){
-                if(empty($res[$loop])){
+            if ($column != '') {
+                if (empty($res[$loop])) {
                     $res[$loop] = array();
                 }
                 $res[$loop][$column] = $v['option_value'];
@@ -376,16 +377,16 @@ class Esakip_Functions
             CURLOPT_CONNECTTIMEOUT => 0,
             CURLOPT_TIMEOUT => 10000
         );
-        if(!empty($options['type']) && strtolower($options['type']) != 'get'){
+        if (!empty($options['type']) && strtolower($options['type']) != 'get') {
             $opsi_curl[CURLOPT_CUSTOMREQUEST] = 'POST';
             $req = http_build_query($options['data']);
             $opsi_curl[CURLOPT_POSTFIELDS] = $req;
-        }else{
+        } else {
             $opsi_curl[CURLOPT_CUSTOMREQUEST] = 'GET';
         }
 
         if (!empty($options['header'])) {
-            if(gettype($options['header']) == 'string'){
+            if (gettype($options['header']) == 'string') {
                 $options['header'] = array($options['header']);
             }
             $opsi_curl[CURLOPT_HTTPHEADER] = $options['header'];
@@ -428,7 +429,7 @@ class Esakip_Functions
                     if (empty($path)) {
                         throw new Exception('Lokasi folder belum ditentukan ' . json_encode($file));
                     }
-                    
+
                     $imageFileType = strtolower(pathinfo($path . basename($file["name"]), PATHINFO_EXTENSION));
                     if (!in_array($imageFileType, $ext)) {
                         throw new Exception('Lampiran wajib ber-type ' . implode(", ", $ext) . ' ' . json_encode($file));
@@ -442,8 +443,8 @@ class Esakip_Functions
                         // hapus extension file
                         $nama_file = explode('.', $nama_file);
                         $cek_jml = count($nama_file);
-                        if($cek_jml >= 2){
-                            unset($nama_file[$cek_jml-1]);
+                        if ($cek_jml >= 2) {
+                            unset($nama_file[$cek_jml - 1]);
                         }
                         $nama_file = implode('.', $nama_file);
 
@@ -454,7 +455,7 @@ class Esakip_Functions
                     }
                     $target = $path .  $file['name'];
 
-                    if(file_exists($target)) {
+                    if (file_exists($target)) {
                         throw new Exception("File dengan nama $target sudah ada!");
                     }
 
@@ -479,7 +480,8 @@ class Esakip_Functions
         }
     }
 
-    function renameFile($oldName, $newName, $ext=array('pdf')) {
+    function renameFile($oldName, $newName, $ext = array('pdf'))
+    {
         if (empty($newName)) {
             return array(
                 'status' => 'error',
@@ -491,21 +493,21 @@ class Esakip_Functions
         if (!in_array($ext_file, $ext)) {
             return array(
                 'status' => 'error',
-                'message' => "Nama file harus berextension ".implode(', ', $ext)
+                'message' => "Nama file harus berextension " . implode(', ', $ext)
             );
         }
-        if(!file_exists($oldName)) {
+        if (!file_exists($oldName)) {
             return array(
                 'status' => 'error',
                 'message' => "File tidak ditemukan: $oldName"
             );
-        }else if(file_exists($newName)) {
+        } else if (file_exists($newName)) {
             return array(
                 'status' => 'error',
                 'message' => "File dengan nama $newName sudah ada!"
             );
         }
-        if(rename($oldName, $newName)) {
+        if (rename($oldName, $newName)) {
             return array(
                 'status' => 'success',
                 'message' => "File berhasil di-rename dari $oldName ke $newName"
@@ -518,45 +520,49 @@ class Esakip_Functions
         }
     }
 
-    function getFullUrl() {
+    function getFullUrl()
+    {
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
         $fullUrl = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         return $fullUrl;
     }
 
-    function modifyGetParameter($url, $paramName, $paramValue) {
-        if(empty($url)){
+    function modifyGetParameter($url, $paramName, $paramValue)
+    {
+        if (empty($url)) {
             $url = $this->getFullUrl();
         }
         $parsedUrl = parse_url($url);
         parse_str($parsedUrl['query'], $queryParams);
         $queryParams[$paramName] = $paramValue;
         $newQuery = http_build_query($queryParams);
-        
+
         $newUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'];
         if (isset($parsedUrl['port'])) {
             $newUrl .= ':' . $parsedUrl['port'];
         }
         $newUrl .= $parsedUrl['path'] . '?' . $newQuery;
-        
+
         if (isset($parsedUrl['fragment'])) {
             $newUrl .= '#' . $parsedUrl['fragment'];
         }
-        
+
         return $newUrl;
     }
 
-    function add_param_get($url, $param){
+    function add_param_get($url, $param)
+    {
         $data = explode('?', $url);
-        if(count($data) > 1){
+        if (count($data) > 1) {
             $url .= $param;
-        }else{
-            $url .= '?'.$param;
+        } else {
+            $url .= '?' . $param;
         }
         return $url;
     }
-    
-    function login_to_other_site($opsi = array()){
+
+    function login_to_other_site($opsi = array())
+    {
         global $wpdb;
         $user_data = array(
             'login' => $opsi['user']->user_login,
@@ -565,40 +571,41 @@ class Esakip_Functions
 
         $payload = base64_encode(json_encode($user_data));
         $url_asli = '';
-        if(!empty($opsi['url_asli'])){
+        if (!empty($opsi['url_asli'])) {
             $url_asli = $opsi['url_asli'];
         }
 
         $url = '';
-        if(!empty($opsi['domain'])){
+        if (!empty($opsi['domain'])) {
             $signature = hash_hmac('sha256', $payload, $opsi['api_key']);
             $token = $payload . '.' . $signature;
             if (substr($opsi['domain'], -1) !== '/') {
                 $opsi['domain'] .= '/';
             }
-            $url = $opsi['domain'].'sso-login?token=' . urlencode($token).'&redirect='.$url_asli;
-        }else if(!empty($opsi['id_login'])){
+            $url = $opsi['domain'] . 'sso-login?token=' . urlencode($token) . '&redirect=' . $url_asli;
+        } else if (!empty($opsi['id_login'])) {
             $data = $this->get_option_complex('_crb_auto_login');
             $url = $url_asli;
-            foreach($data as $v){
-                if(
+            foreach ($data as $v) {
+                if (
                     !empty($v['app_url'])
                     && !empty($v['api_key'])
                     && $v['id_login'] == $opsi['id_login']
-                ){
+                ) {
                     $signature = hash_hmac('sha256', $payload, $v['api_key']);
                     $token = $payload . '.' . $signature;
                     if (substr($v['app_url'], -1) !== '/') {
                         $v['app_url'] .= '/';
                     }
-                    $url = $v['app_url'].'sso-login?token=' . urlencode($token).'&redirect='.$url_asli;
+                    $url = $v['app_url'] . 'sso-login?token=' . urlencode($token) . '&redirect=' . $url_asli;
                 }
             }
         }
         return $url;
     }
 
-    function handle_sso_login(){
+    function handle_sso_login()
+    {
         if (!is_page('sso-login') || !isset($_GET['token'])) return;
 
         $token = sanitize_text_field($_GET['token']);
@@ -611,28 +618,28 @@ class Esakip_Functions
             $pesan_error = 'SSO token tidak valid.';
         }
 
-        if(empty($pesan_error)){
+        if (empty($pesan_error)) {
             $data = json_decode(base64_decode($payload), true);
             if (!$data || !isset($data['login'])) {
                 $pesan_error = 'Data SSO tidak lengkap.';
             }
         }
 
-        if(empty($pesan_error)){
+        if (empty($pesan_error)) {
             // Cek kadaluwarsa token (misal 60 detik)
             if (time() - $data['time'] > 60) {
                 $pesan_error = 'Token kadaluarsa.';
             }
         }
 
-        if(empty($pesan_error)){
+        if (empty($pesan_error)) {
             $user = get_user_by('login', $data['login']);
             if (!$user) {
-                $pesan_error = 'Pengguna '.$data['login'].' tidak ditemukan di '.site_url();
+                $pesan_error = 'Pengguna ' . $data['login'] . ' tidak ditemukan di ' . site_url();
             }
         }
 
-        if(!empty($pesan_error)){
+        if (!empty($pesan_error)) {
             update_option('wp_sso_login', $pesan_error);
             wp_die($pesan_error);
         }
@@ -642,38 +649,101 @@ class Esakip_Functions
         wp_set_auth_cookie($user->ID, true);
         do_action('wp_login', $user->user_login, $user);
 
-        update_option('wp_sso_login', 'Berhasil login '. $data['login'].' '.date('Y-m-d H:i:s'));
+        update_option('wp_sso_login', 'Berhasil login ' . $data['login'] . ' ' . date('Y-m-d H:i:s'));
 
-        if(!empty($_GET['redirect'])){
+        if (!empty($_GET['redirect'])) {
             wp_redirect($_GET['redirect']);
-        }else{
+        } else {
             wp_redirect(site_url());
         }
         exit;
     }
 
+    /**
+     * validate an array $field => $rules.
+     *
+     * example :
+     * $rules = [
+     *  'username' => 'required|string|min:3|max:20',
+     *  'age'      => 'required|numeric|min:18',
+     *  'status'   => 'required|in:active,inactive,pending',
+     *  'role'     => 'required'
+     * ];
+     * 
+     * @param array $data field data to validate ($_GET or $_POST, ...).
+     * @param array $rules rules for validate the field ['field' => 'rule1|rule2:param|...'].
+     * @throws Exception if err throw exception code 422.
+     */
     function validate(array $data, array $rules)
     {
         foreach ($rules as $field => $ruleString) {
             $rulesArray = explode('|', $ruleString);
+            $value = isset($data[$field]) ? $data[$field] : null;
+
+            if (in_array('required', $rulesArray) && (is_null($value) || $value === '')) {
+                throw new Exception("Parameter '{$field}' dibutuhkan.", 422);
+            }
+
+            if (is_null($value)) {
+                continue;
+            }
+
             foreach ($rulesArray as $rule) {
-                $value = isset($data[$field]) ? $data[$field] : null;
-
-                if ($rule === 'required' && (is_null($value) || $value === '')) {
-                    throw new Exception("Parameter '{$field}' dibutuhkan.", 422);
-                }
-
-                // Skip other rules if value is not present
-                if (is_null($value)) {
+                if ($rule === 'required') {
                     continue;
                 }
 
-                if ($rule === 'numeric' && !is_numeric($value)) {
-                    throw new Exception("Parameter '{$field}' harus berupa angka.", 422);
-                }
-                
-                if ($rule === 'string' && !is_string($value)) {
-                    throw new Exception("Parameter '{$field}' harus berupa teks (string).", 422);
+                // Memisahkan aturan dan parameternya (jika ada), contoh: 'max:255'
+                $ruleParts = explode(':', $rule, 2);
+                $ruleName = $ruleParts[0];
+                $ruleParam = isset($ruleParts[1]) ? $ruleParts[1] : null;
+
+                switch ($ruleName) {
+                    case 'numeric':
+                        if (!is_numeric($value)) {
+                            throw new Exception("Parameter '{$field}' harus berupa angka.", 422);
+                        }
+                        break;
+
+                    case 'string':
+                        if (!is_string($value)) {
+                            throw new Exception("Parameter '{$field}' harus berupa teks (string).", 422);
+                        }
+                        break;
+
+                    case 'in':
+                        if (is_null($ruleParam)) {
+                            throw new Exception("Aturan validasi 'in' untuk '{$field}' tidak memiliki parameter.", 500);
+                        }
+                        $allowedValues = explode(',', $ruleParam);
+                        if (!in_array($value, $allowedValues)) {
+                            throw new Exception("Parameter '{$field}' harus salah satu dari: {$ruleParam}.", 422);
+                        }
+                        break;
+
+                    case 'min':
+                        if (is_null($ruleParam)) {
+                            throw new Exception("Aturan validasi 'min' untuk '{$field}' tidak memiliki parameter.", 500);
+                        }
+                        if (is_numeric($value) && $value < $ruleParam) {
+                            throw new Exception("Parameter '{$field}' harus memiliki nilai minimal {$ruleParam}.", 422);
+                        }
+                        if (is_string($value) && mb_strlen($value) < $ruleParam) {
+                            throw new Exception("Parameter '{$field}' harus memiliki panjang minimal {$ruleParam} karakter.", 422);
+                        }
+                        break;
+
+                    case 'max':
+                        if (is_null($ruleParam)) {
+                            throw new Exception("Aturan validasi 'max' untuk '{$field}' tidak memiliki parameter.", 500);
+                        }
+                        if (is_numeric($value) && $value > $ruleParam) {
+                            throw new Exception("Parameter '{$field}' harus memiliki nilai maksimal {$ruleParam}.", 422);
+                        }
+                        if (is_string($value) && mb_strlen($value) > $ruleParam) {
+                            throw new Exception("Parameter '{$field}' harus memiliki panjang maksimal {$ruleParam} karakter.", 422);
+                        }
+                        break;
                 }
             }
         }

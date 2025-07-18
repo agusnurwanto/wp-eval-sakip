@@ -623,6 +623,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					}
 
 					$table_croscutting = '';
+					$table_koneksi_croscutting_opd = '';
 					$no = 1;
 					if (!empty($data_croscutting)) {
 						$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
@@ -638,8 +639,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 										WHERE active=1
 										AND id=%d
 										AND tahun_anggaran=%d
-										GROUP BY id
-										ORDER BY nama_lembaga ASC
 									", $v_cross['id_skpd_croscutting'], $tahun_anggaran_sakip),
 									ARRAY_A
 								);
@@ -723,6 +722,17 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							$table_croscutting .= '<td class="text-center">' . $aksi . '</td>';
 
 							$table_croscutting .= '</tr>';
+
+							if (!empty($v_cross) && $v_cross['status_croscutting'] == 1 && $v_cross['is_lembaga_lainnya'] != 1) {
+								$table_koneksi_croscutting_opd .= '
+									<tr>
+										<td class="text-left" style="width: 270px; border: 1px solid black;">' . $this_data_perangkat['nama_perangkat'] . '</td>
+										<td class="text-left" style="width: 230px; border: 1px solid black;">' . $v_cross['keterangan'] . '</td>
+										<td class="text-left" style="width: 230px; border: 1px solid black;">' . $v_cross['keterangan_croscutting'] . '</td>
+										<td class="text-left" style="width: 230px; border: 1px solid black;">' . $data_perangkat['nama_perangkat'] . '</td>
+									</tr>
+								';
+							}
 						}
 					}
 
@@ -793,7 +803,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					}
 
 					$table_koneksi_pokin = '';
-					$table_koneksi_pokin_pemda = '';
+					$table_koneksi_croscutting_pemda = '';
 					$list_pd_koneksi_pokin = [];
 					$no = 1;
 					if (!empty($data_koneksi_pokin)) {
@@ -885,8 +895,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								$table_koneksi_pokin .= '
 									<td class="text-center">' . $aksi_koneksi . '</td>
 								</tr>';
-								if (!empty($v_koneksi_pokin) && $v_koneksi_pokin['status_koneksi'] == 1) {
-									$table_koneksi_pokin_pemda .= '
+								if (!empty($v_koneksi_pokin) && $v_koneksi_pokin['status_koneksi'] == 1 && $v_koneksi_pokin['tipe'] != 1) {
+									$table_koneksi_croscutting_pemda .= '
 										<tr>
 											<td class="text-left" style="width: 270px; border: 1px solid black;">' . $nama_perangkat . '</td>
 											<td class="text-left" style="width: 230px; border: 1px solid black;">' . $v_koneksi_pokin['keterangan_koneksi'] . '</td>
@@ -922,7 +932,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					    'indikator' => $list_indikator,
 					    'data_croscutting' => $table_croscutting,
 					    'data_koneksi_pokin' => $table_koneksi_pokin,
-					    'data_koneksi_pokin_pemda' => $table_koneksi_pokin_pemda,
+					    'data_koneksi_croscutting_pemda' => $table_koneksi_croscutting_pemda,
+					    'data_koneksi_croscutting_opd' => $table_koneksi_croscutting_opd,
 					    'list_pd_koneksi_pokin' => $list_pd_koneksi_pokin
 					]);
 					exit();
@@ -1947,40 +1958,48 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						$data_program .= '<td class="text-center" width="' . $width_ind_sasaran . '%"><ul class="list-skpd" style="list-style-type: none; margin: 0; padding: 0;">';
 
 						$mapping_skpd_program = [];
+						$nama_bidang_urusan = [];
 
-						// indikator sasaran sasaran rpd
+						//urusan pengampu skpds views once
 						$skpd_program = $wpdb->get_results(
 							$wpdb->prepare("
 								SELECT *
 								FROM esakip_rpd_program
 								WHERE kode_sasaran = %s
-								  AND id_unik_indikator_sasaran =%s
-								  AND id_unik_indikator IS NOT NULL
+								  AND id_unik_indikator_sasaran IS NULL
+								  AND id_unik_indikator IS NULL
 								  AND active = 1
-							", $ind['id_unik'], $ind['id_unik_indikator']),
+							", $ind['id_unik']),
 							ARRAY_A
 						);
-						
-						//urusan pengampu skpds views once
+
+						// indikator sasaran sasaran rpd
 						foreach ($skpd_program as $prog) {
-							$mapping_skpd_program[$prog['id_unit']] = $prog;	
-						}
-						if (!empty($mapping_skpd_program)) {
-							foreach ($mapping_skpd_program as $prog) {
-								$data_program .= '
-									<li style="margin-bottom:14px;">
-										<button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . $prog['nama_skpd'] . '</button>
-									</li>';
+							if (!empty($prog['nama_bidang_urusan'])) {
+								$nama_bidang = trim($prog['nama_bidang_urusan']);
+								if (!isset($nama_bidang_urusan[$nama_bidang])) {
+									$nama_bidang_urusan[$nama_bidang] = $prog;
+								}
 							}
 						}
 
-						if (empty($skpd_program)) {
+						// Bangun tampilan HTML
+						if (!empty($nama_bidang_urusan)) {
+							foreach ($nama_bidang_urusan as $bidang) {
+								$data_program .= '
+									<li style="margin-bottom:14px;">
+										<button class="btn btn-lg btn-warning" style="text-transform:uppercase;">' . esc_html($bidang['nama_bidang_urusan']) . '</button>
+									</li>';
+							}
+						} else {
 							$data_program .= '
 								<li style="margin-bottom:14px;">
 									<button class="btn btn-lg btn-warning"></button>
 								</li>';
 						}
+
 						$data_program .= '</ul></td>';
+
 					}
 					if (empty($data_sasaran)) {
 						$data_sasaran = '
@@ -2663,14 +2682,60 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									AND active=%d
 							", $_POST['id'], 1),  ARRAY_A);
 					}
+					if (!empty($data_croscutting)) {
+						$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+						$nama_perangkat = array();
+						if ($data_croscutting['is_lembaga_lainnya'] == 1) {
+							$nama_perangkat = $wpdb->get_row(
+								$wpdb->prepare("
+									SELECT 
+										nama_lembaga,
+										id,
+										tahun_anggaran
+									FROM esakip_data_lembaga_lainnya 
+									WHERE active=1 
+										AND id=%d
+										AND tahun_anggaran=%d
+									GROUP BY id
+									ORDER BY nama_lembaga ASC
+								", $data_croscutting['id_skpd_croscutting'], $tahun_anggaran_sakip),
+								ARRAY_A
+							);
+						} else {
+							if (!empty($data_croscutting['id_skpd_parent'])) {
+								$this_data_id_skpd = $data_croscutting['id_skpd_parent'];
+							} else {
+								$this_data_id_skpd = $data_croscutting['id_skpd_croscutting'];
+							}
 
+							$nama_perangkat = $wpdb->get_row(
+								$wpdb->prepare("
+									SELECT 
+										nama_skpd,
+										id_skpd,
+										tahun_anggaran
+									FROM esakip_data_unit 
+									WHERE active=1 
+									AND is_skpd=1 
+									AND id_skpd=%d
+									AND tahun_anggaran=%d
+									GROUP BY id_skpd
+									ORDER BY kode_skpd ASC
+								", $this_data_id_skpd, $tahun_anggaran_sakip),
+								ARRAY_A
+							);
+						}
+					} else {
+						throw new Exception("Data tidak ditemukan!", 1);
+					}
 					if (empty($data_croscutting)) {
 						throw new Exception("Data tidak ditemukan!", 1);
 					}
 
 					echo json_encode([
 						'status' => true,
-						'data_croscutting' => $data_croscutting
+						'data_croscutting' => $data_croscutting,
+					    'nama_perangkat' => $nama_perangkat
 					]);
 					exit();
 				} else {

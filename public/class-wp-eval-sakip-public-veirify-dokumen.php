@@ -2290,7 +2290,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                     }
                     $custom_nama_jabatan = '';
                     if (!empty($v_pgw['custom_jabatan'])) {
-                        $custom_nama_jabatan = '<hr><span class="text-muted">' . $v_pgw['custom_jabatan'] . '</span>';
+                        $custom_nama_jabatan = '<hr class="mt-1 mb-1"><span class="text-muted">' . $v_pgw['custom_jabatan'] . '</span>';
                     }
                     $tbody .= "
                     <tr data-id='" . $v_pgw['id'] . "'>
@@ -2384,6 +2384,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             p.tipe_pegawai,
                             p.tipe_pegawai_id,
                             p.active,
+                            p.custom_jabatan,
                             s.nama AS nama_bidang
                         FROM esakip_data_pegawai_simpeg p
                         LEFT JOIN esakip_data_satker_simpeg s
@@ -2501,13 +2502,17 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                         );
 
                     }
+                    $custom_nama_jabatan = '';
+                    if (!empty($v_pgw['custom_jabatan'])) {
+                        $custom_nama_jabatan = '<hr class="mt-1 mb-1"><span class="text-muted">' . $v_pgw['custom_jabatan'] . '</span>';
+                    }
                     $tbody .= "<tr>";
                     $tbody .= "<td class='text-left'>" . $v_pgw['satker_id'] . "</td>";
                     $tbody .= "<td class='text-left'>" . $v_pgw['nama_bidang'] . "</td>";
                     $tbody .= "<td class='text-left'>" . $v_pgw['tipe_pegawai'] . "</td>";
                     $tbody .= "<td class='text-left' title='Halaman Detail Perjanjian Kinerja'><a href='" . $detail_laporan_pk['url'] . "&id_skpd=" . $unit['id_skpd'] . "&nip=" . $v_pgw['nip_baru'] . "&satker_id=" . $v_pgw['satker_id'] . "&id_jabatan=" . $v_pgw['id_jabatan'] . "&id_pegawai=" . $v_pgw['id'] . "' target='_blank'>" . $v_pgw['nip_baru'] . "</a></td>";
                     $tbody .= "<td class='text-left'>" . $v_pgw['nama_pegawai'] . "</td>";
-                    $tbody .= "<td class='text-left'>" . $v_pgw['jabatan'] . "</td>";
+                    $tbody .= "<td class='text-left'>" . $v_pgw['jabatan'].$custom_nama_jabatan. "</td>";
                     $tbody .= "<td class='text-center' title='Halaman Detail Rencana Hasil Kerja'><a href='" . $detail_laporan_rhk['url'] . "&id_skpd=" . $unit['id_skpd'] . "&nip=" . $v_pgw['nip_baru'] . "&satker_id=" . $v_pgw['satker_id'] . "' target='_blank'>" . $count_rhk . "</a></td>";
                     $tbody .= "<td class='text-center'>" . $count_finalisasi . "</td>";
                     $tbody .= "</tr>";
