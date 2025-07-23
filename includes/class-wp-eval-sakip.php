@@ -174,6 +174,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_generate_user_esakip_pegawai_simpeg', $plugin_admin, 'generate_user_esakip_pegawai_simpeg');
 		$this->loader->add_action('wp_ajax_get_data_total_pegawai_simpeg', $plugin_admin, 'get_data_total_pegawai_simpeg');
 		$this->loader->add_action('wp_ajax_coba_auto_login',  $plugin_admin, 'coba_auto_login');
+		$this->loader->add_action('wp_ajax_handle_sql_migrate_ajax',  $plugin_admin, 'handle_sql_migrate_ajax');
 		
 		$this->loader->add_action('carbon_fields_register_fields', $plugin_admin, 'crb_attach_esakip_options');
 		$this->loader->add_action('template_redirect', $plugin_admin, 'allow_access_private_post', 0);
@@ -483,6 +484,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_submit_tahun_laporan_monev_renaksi', $plugin_public, 'submit_tahun_laporan_monev_renaksi');
 		$this->loader->add_action('wp_ajax_submit_bukti_dukung', $plugin_public, 'submit_bukti_dukung');
 		$this->loader->add_action('wp_ajax_get_penjelasan_lke', $plugin_public, 'get_penjelasan_lke');
+		
+		$this->loader->add_action('wp_ajax_get_all_kke_ajax', $plugin_public, 'get_all_kke_ajax');
  
 		$this->loader->add_action('wp_ajax_get_detail_pedoman_teknis_perencanaan_by_id', $plugin_public, 'get_detail_pedoman_teknis_perencanaan_by_id');
 		$this->loader->add_action('wp_ajax_tambah_dokumen_pedoman_teknis_perencanaan', $plugin_public, 'tambah_dokumen_pedoman_teknis_perencanaan');
@@ -837,6 +840,13 @@ class Wp_Eval_Sakip {
 		add_shortcode('desain_lke_sakip', array($plugin_public, 'desain_lke_sakip'));
 		add_shortcode('pengisian_lke_sakip', array($plugin_public, 'pengisian_lke_sakip'));
 		add_shortcode('pengisian_lke_sakip_per_skpd', array($plugin_public, 'pengisian_lke_sakip_per_skpd'));
+
+		add_shortcode('format_kke_1', array($plugin_public, 'format_kke_1'));
+		add_shortcode('format_kke_2', array($plugin_public, 'format_kke_2'));
+		add_shortcode('format_kke_3', array($plugin_public, 'format_kke_3'));
+		add_shortcode('format_kke_4', array($plugin_public, 'format_kke_4'));
+		add_shortcode('format_kke_5', array($plugin_public, 'format_kke_5'));
+		add_shortcode('format_kke_6', array($plugin_public, 'format_kke_6'));
 
 		add_shortcode('menu_depan', array($plugin_public, 'menu_depan'));
 		add_shortcode('background_menu', array($plugin_public, 'background_menu'));

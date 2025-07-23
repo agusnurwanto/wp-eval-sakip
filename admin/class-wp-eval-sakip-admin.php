@@ -2260,11 +2260,27 @@ class Wp_Eval_Sakip_Admin
 			Field::make('text', 'crb_maksimal_upload_dokumen_esakip', 'Maksimal Upload Dokumen')
 				->set_default_value(10)
 				->set_help_text('Wajib diisi. Ukuran dalam MB'),
-			Field::make('html', 'crb_sql_migrate')
-				->set_html('<a onclick="sql_migrate_esakip(); return false;" href="#" class="button button-primary button-large">SQL Migrate</a>')
-				->set_help_text('Tombol untuk memperbaiki struktur database E-SAKIP.'),
+
+			// Tombol-tombol Aksi
+			Field::make('html', 'crb_sql_migrate_esakip_buttons')
+				->set_html('
+                <div>
+                    <a onclick="sql_migrate_esakip(); return false;" href="#" class="button button-secondary button-large">SQL Migrate</a>
+                </div>
+            ')
+			->set_width(33.33)
+			->set_help_text('Tombol untuk menjalankan database migration.'),
+			Field::make('html', 'crb_generate_master_data_buttons')
+				->set_html('
+                <div>
+                    <a id="btn-generate-master" onclick="generate_master_data(this); return false;" href="#" class="button button-primary button-large">Generate Master Data</a>
+                </div>
+            ')				
+			->set_width(33.33)
+			->set_help_text('Tombol untuk generate data master.'),
 		];
 	}
+
 
 	public function generate_fields_options_identitas_pemda()
 	{
@@ -2284,8 +2300,10 @@ class Wp_Eval_Sakip_Admin
 			Field::make('text', 'crb_kode_pos', 'Kode Pos')
 				->set_width(33.33),
 			Field::make('image', 'crb_logo_garuda', 'Logo Garuda')
+				->set_width(33.33)
 				->set_value_type('url'),
 			Field::make('image', 'crb_logo_dashboard', 'Logo Pemerintah Daerah')
+				->set_width(33.33)
 				->set_value_type('url'),
 			Field::make('text', 'crb_kepala_daerah', 'Kepala Daerah')
 				->set_help_text('Wajib diisi.'),
@@ -2827,39 +2845,39 @@ class Wp_Eval_Sakip_Admin
 
 	public function generate_fields_renaksi_pemda()
 	{
-	    if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_rencana_aksi_pemerintah_daerah.php') {
-	        return array();
-	    }
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_rencana_aksi_pemerintah_daerah.php') {
+			return array();
+		}
 
-	    $jadwal_rpjmd_settings = $this->get_rpjmd_settings();
+		$jadwal_rpjmd_settings = $this->get_rpjmd_settings();
 
-	    $html = '';
+		$html = '';
 
-	    if (!empty($jadwal_rpjmd_settings)) {
-	        $group_by_jadwal = [];
-	        foreach ($jadwal_rpjmd_settings as $item) {
-	            if (!empty($item['id_jadwal_rpjmd'])) {
-	                $id = $item['id_jadwal_rpjmd'];
-	                if (!isset($group_by_jadwal[$id])) {
-	                    $group_by_jadwal[$id] = [
-	                        'jadwal_info' => $item,
-	                        'tahun_list' => [],
-	                    ];
-	                }
-	                if (!in_array($item['tahun_anggaran_setting'], $group_by_jadwal[$id]['tahun_list'])) {
-	                    $group_by_jadwal[$id]['tahun_list'][] = $item['tahun_anggaran_setting'];
-	                }
-	            }
-	        }
+		if (!empty($jadwal_rpjmd_settings)) {
+			$group_by_jadwal = [];
+			foreach ($jadwal_rpjmd_settings as $item) {
+				if (!empty($item['id_jadwal_rpjmd'])) {
+					$id = $item['id_jadwal_rpjmd'];
+					if (!isset($group_by_jadwal[$id])) {
+						$group_by_jadwal[$id] = [
+							'jadwal_info' => $item,
+							'tahun_list' => [],
+						];
+					}
+					if (!in_array($item['tahun_anggaran_setting'], $group_by_jadwal[$id]['tahun_list'])) {
+						$group_by_jadwal[$id]['tahun_list'][] = $item['tahun_anggaran_setting'];
+					}
+				}
+			}
 
-	        foreach ($group_by_jadwal as $id_jadwal => $group) {
-	            $v = $group['jadwal_info'];
+			foreach ($group_by_jadwal as $id_jadwal => $group) {
+				$v = $group['jadwal_info'];
 
-	            $tahun_anggaran_selesai = (!empty($v['tahun_selesai_anggaran']) && $v['tahun_selesai_anggaran'] > 1)
-	                ? $v['tahun_selesai_anggaran']
-	                : $v['tahun_anggaran'] + $v['lama_pelaksanaan'];
+				$tahun_anggaran_selesai = (!empty($v['tahun_selesai_anggaran']) && $v['tahun_selesai_anggaran'] > 1)
+					? $v['tahun_selesai_anggaran']
+					: $v['tahun_anggaran'] + $v['lama_pelaksanaan'];
 
-	            $html .= '
+				$html .= '
 	                <div class="accordion">
 	                    <h3 class="esakip-header-jadwal" jadwal="' . $id_jadwal . '">
 	                        ' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )
@@ -2867,26 +2885,26 @@ class Wp_Eval_Sakip_Admin
 	                    <div class="accordion-body-jadwal" jadwal="' . $id_jadwal . '">
 	            ';
 
-	            foreach ($group['tahun_list'] as $tahun_setting) {
-	                $tahun_key = $id_jadwal . '_' . $tahun_setting;
+				foreach ($group['tahun_list'] as $tahun_setting) {
+					$tahun_key = $id_jadwal . '_' . $tahun_setting;
 
-	                $rencana_aksi_pemda = $this->functions->generatePage([
-	                    'nama_page'     => 'Rencana Aksi Pemerintah Daerah Tahun ' . $tahun_setting . ' | ' . $v['nama_jadwal'] .' ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-	                    'content'       => '[list_pengisian_rencana_aksi_pemda tahun=' . $tahun_setting . ' periode=' . $v['id'] . ' ]',
-	                    'show_header'   => 1,
-	                    'no_key'        => 1,
-	                    'post_status'   => 'private'
-	                ]);
+					$rencana_aksi_pemda = $this->functions->generatePage([
+						'nama_page'     => 'Rencana Aksi Pemerintah Daerah Tahun ' . $tahun_setting . ' | ' . $v['nama_jadwal'] . ' ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+						'content'       => '[list_pengisian_rencana_aksi_pemda tahun=' . $tahun_setting . ' periode=' . $v['id'] . ' ]',
+						'show_header'   => 1,
+						'no_key'        => 1,
+						'post_status'   => 'private'
+					]);
 
-	                $rencana_aksi_pemda_baru = $this->functions->generatePage([
-	                    'nama_page'     => 'Rencana Aksi Pemerintah Daerah Baru Tahun ' . $tahun_setting . ' | ' . $v['nama_jadwal'] .' ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-	                    'content'       => '[list_pengisian_rencana_aksi_pemda_baru tahun=' . $tahun_setting . ' periode=' . $v['id'] . ' ]',
-	                    'show_header'   => 1,
-	                    'no_key'        => 1,
-	                    'post_status'   => 'private'
-	                ]);
+					$rencana_aksi_pemda_baru = $this->functions->generatePage([
+						'nama_page'     => 'Rencana Aksi Pemerintah Daerah Baru Tahun ' . $tahun_setting . ' | ' . $v['nama_jadwal'] . ' ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+						'content'       => '[list_pengisian_rencana_aksi_pemda_baru tahun=' . $tahun_setting . ' periode=' . $v['id'] . ' ]',
+						'show_header'   => 1,
+						'no_key'        => 1,
+						'post_status'   => 'private'
+					]);
 
-	                $html .= '
+					$html .= '
 	                    <div class="accordion">
 	                        <h4 class="esakip-header-tahun" tahun="' . $tahun_key . '">
 	                            Tahun Anggaran ' . $tahun_setting . '
@@ -2899,36 +2917,36 @@ class Wp_Eval_Sakip_Admin
 	                        </div>
 	                    </div>
 	                ';
-	            }
+				}
 
-	            $html .= '</div></div>';
-	        }
+				$html .= '</div></div>';
+			}
 
-	        foreach ($jadwal_rpjmd_settings as $v) {
-	            if (empty($v['id_jadwal_rpjmd'])) {
-	                $tahun_anggaran_selesai = (!empty($v['tahun_selesai_anggaran']) && $v['tahun_selesai_anggaran'] > 1)
-	                    ? $v['tahun_selesai_anggaran']
-	                    : $v['tahun_anggaran'] + $v['lama_pelaksanaan'];
+			foreach ($jadwal_rpjmd_settings as $v) {
+				if (empty($v['id_jadwal_rpjmd'])) {
+					$tahun_anggaran_selesai = (!empty($v['tahun_selesai_anggaran']) && $v['tahun_selesai_anggaran'] > 1)
+						? $v['tahun_selesai_anggaran']
+						: $v['tahun_anggaran'] + $v['lama_pelaksanaan'];
 
-	                $html .= '<p style="margin-left: 10px">' . $v['nama_jadwal'] . ' Periode ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' (Periode belum diset di pengaturan menu)</p>';
-	            }
-	        }
-	    } else {
-	        $html = '
+					$html .= '<p style="margin-left: 10px">' . $v['nama_jadwal'] . ' Periode ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' (Periode belum diset di pengaturan menu)</p>';
+				}
+			}
+		} else {
+			$html = '
 	            <span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
 	                Jadwal RPJMD / Tahun Anggaran tidak tersedia
 	            </span>';
-	    }
+		}
 
-	    return [
-	        Field::make('html', 'crb_renaksi_pemda_hide_sidebar')->set_html('
+		return [
+			Field::make('html', 'crb_renaksi_pemda_hide_sidebar')->set_html('
 	            <style>
 	                .postbox-container { display: none; }
 	                #poststuff #post-body.columns-2 { margin: 0 !important; }
 	            </style>
 	        '),
-	        Field::make('html', 'crb_renaksi_pemda_menu')->set_html($html)
-	    ];
+			Field::make('html', 'crb_renaksi_pemda_menu')->set_html($html)
+		];
 	}
 
 	public function generate_fields_renaksi_opd()
@@ -2984,8 +3002,6 @@ class Wp_Eval_Sakip_Admin
 		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_rencana_aksi_setting.php') {
 			return array();
 		}
-
-		global $wpdb;
 
 		$html_info = '
 			<table class="form-table">
@@ -3500,39 +3516,39 @@ class Wp_Eval_Sakip_Admin
 
 	public function generate_fields_laporan_pk_pemda()
 	{
-	    if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_perjanjian_kinerja_pemerintah_daerah.php') {
-	        return array();
-	    }
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_perjanjian_kinerja_pemerintah_daerah.php') {
+			return array();
+		}
 
-	    $jadwal_rpjmd_settings = $this->get_rpjmd_settings();
+		$jadwal_rpjmd_settings = $this->get_rpjmd_settings();
 
-	    $html = '';
+		$html = '';
 
-	    if (!empty($jadwal_rpjmd_settings)) {
-	        $group_by_jadwal = [];
-	        foreach ($jadwal_rpjmd_settings as $item) {
-	            if (!empty($item['id_jadwal_rpjmd'])) {
-	                $id = $item['id_jadwal_rpjmd'];
-	                if (!isset($group_by_jadwal[$id])) {
-	                    $group_by_jadwal[$id] = [
-	                        'jadwal_info' => $item,
-	                        'tahun_list' => [],
-	                    ];
-	                }
-	                if (!in_array($item['tahun_anggaran_setting'], $group_by_jadwal[$id]['tahun_list'])) {
-	                    $group_by_jadwal[$id]['tahun_list'][] = $item['tahun_anggaran_setting'];
-	                }
-	            }
-	        }
+		if (!empty($jadwal_rpjmd_settings)) {
+			$group_by_jadwal = [];
+			foreach ($jadwal_rpjmd_settings as $item) {
+				if (!empty($item['id_jadwal_rpjmd'])) {
+					$id = $item['id_jadwal_rpjmd'];
+					if (!isset($group_by_jadwal[$id])) {
+						$group_by_jadwal[$id] = [
+							'jadwal_info' => $item,
+							'tahun_list' => [],
+						];
+					}
+					if (!in_array($item['tahun_anggaran_setting'], $group_by_jadwal[$id]['tahun_list'])) {
+						$group_by_jadwal[$id]['tahun_list'][] = $item['tahun_anggaran_setting'];
+					}
+				}
+			}
 
-	        foreach ($group_by_jadwal as $id_jadwal => $group) {
-	            $v = $group['jadwal_info'];
+			foreach ($group_by_jadwal as $id_jadwal => $group) {
+				$v = $group['jadwal_info'];
 
-	            $tahun_anggaran_selesai = (!empty($v['tahun_selesai_anggaran']) && $v['tahun_selesai_anggaran'] > 1)
-	                ? $v['tahun_selesai_anggaran']
-	                : $v['tahun_anggaran'] + $v['lama_pelaksanaan'];
+				$tahun_anggaran_selesai = (!empty($v['tahun_selesai_anggaran']) && $v['tahun_selesai_anggaran'] > 1)
+					? $v['tahun_selesai_anggaran']
+					: $v['tahun_anggaran'] + $v['lama_pelaksanaan'];
 
-	            $html .= '
+				$html .= '
 	                <div class="accordion">
 	                    <h3 class="esakip-header-jadwal" jadwal="' . $id_jadwal . '">
 	                        ' . $v['nama_jadwal'] . ' ( ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' )
@@ -3540,18 +3556,18 @@ class Wp_Eval_Sakip_Admin
 	                    <div class="accordion-body-jadwal" jadwal="' . $id_jadwal . '">
 	            ';
 
-	            foreach ($group['tahun_list'] as $tahun_setting) {
-	                $tahun_key = $id_jadwal . '_' . $tahun_setting;
+				foreach ($group['tahun_list'] as $tahun_setting) {
+					$tahun_key = $id_jadwal . '_' . $tahun_setting;
 
-	                $list_page = $this->functions->generatePage([
-	                    'nama_page'     => 'Laporan PK Pemerintah Daerah Tahun ' . $tahun_setting . ' | ' . $v['nama_jadwal'] .' ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-	                    'content'       => '[halaman_laporan_pk_pemda tahun=' . $tahun_setting . ' periode=' . $v['id'] . ' ]',
-	                    'show_header'   => 1,
-	                    'no_key'        => 1,
-	                    'post_status'   => 'private'
-	                ]);
+					$list_page = $this->functions->generatePage([
+						'nama_page'     => 'Laporan PK Pemerintah Daerah Tahun ' . $tahun_setting . ' | ' . $v['nama_jadwal'] . ' ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+						'content'       => '[halaman_laporan_pk_pemda tahun=' . $tahun_setting . ' periode=' . $v['id'] . ' ]',
+						'show_header'   => 1,
+						'no_key'        => 1,
+						'post_status'   => 'private'
+					]);
 
-	                $html .= '
+					$html .= '
 	                    <div class="accordion">
 	                        <h4 class="esakip-header-tahun" tahun="' . $tahun_key . '">
 	                            Tahun Anggaran ' . $tahun_setting . '
@@ -3563,26 +3579,26 @@ class Wp_Eval_Sakip_Admin
 	                        </div>
 	                    </div>
 	                ';
-	            }
+				}
 
-	            $html .= '</div></div>';
-	        }
+				$html .= '</div></div>';
+			}
 
-	        foreach ($jadwal_rpjmd_settings as $v) {
-	            if (empty($v['id_jadwal_rpjmd'])) {
-	                $tahun_anggaran_selesai = (!empty($v['tahun_selesai_anggaran']) && $v['tahun_selesai_anggaran'] > 1)
-	                    ? $v['tahun_selesai_anggaran']
-	                    : $v['tahun_anggaran'] + $v['lama_pelaksanaan'];
+			foreach ($jadwal_rpjmd_settings as $v) {
+				if (empty($v['id_jadwal_rpjmd'])) {
+					$tahun_anggaran_selesai = (!empty($v['tahun_selesai_anggaran']) && $v['tahun_selesai_anggaran'] > 1)
+						? $v['tahun_selesai_anggaran']
+						: $v['tahun_anggaran'] + $v['lama_pelaksanaan'];
 
-	                $html .= '<p style="margin-left: 10px">' . $v['nama_jadwal'] . ' Periode ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' (Periode belum diset di pengaturan menu)</p>';
-	            }
-	        }
-	    } else {
-	        $html = '
+					$html .= '<p style="margin-left: 10px">' . $v['nama_jadwal'] . ' Periode ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' (Periode belum diset di pengaturan menu)</p>';
+				}
+			}
+		} else {
+			$html = '
 	            <span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
 	                Jadwal RPJMD / Tahun Anggaran tidak tersedia
 	            </span>';
-	    }
+		}
 
 		return [
 			Field::make('html', 'crb_laporan_pk_pemda_hide_sidebar')
@@ -3888,6 +3904,74 @@ class Wp_Eval_Sakip_Admin
 		die(json_encode($ret));
 	}
 
+	function handle_sql_migrate_ajax()
+	{
+		try {
+			$this->functions->validate($_POST, [
+				'api_key' => 'required|string'
+			]);
+			if ($_POST['api_key'] !== get_option(ESAKIP_APIKEY)) {
+				throw new Exception("API key tidak valid atau tidak ditemukan!", 401);
+			}
+
+			if (!current_user_can('manage_options')) {
+				wp_send_json_error(['message' => 'Anda tidak memiliki izin untuk melakukan tindakan ini.']);
+				return;
+			}
+
+			$result = $this->seed_master_data();
+
+			if ($result['success']) {
+				wp_send_json_success([
+					'message' => $result['message']
+				]);
+			} else {
+				wp_send_json_error([
+					'message' => 'Terjadi kesalahan saat proses.'
+				]);
+			}
+		} catch (Exception $e) {
+			$code = is_int($e->getCode()) && $e->getCode() !== 0 ? $e->getCode() : 500;
+			http_response_code($code);
+			echo json_encode([
+				'status'  => false,
+				'message' => $e->getMessage()
+			]);
+		}
+		wp_die();
+	}
+
+	function seed_master_data()
+	{
+		global $wpdb;
+		$message = "";
+
+		// DEFINISIKAN SEMUA TABEL
+		$table_lke = 'esakip_kke_format';
+
+		// PROSES UNTUK TABEL LKE
+		$wpdb->query("TRUNCATE TABLE $table_lke");
+
+		// Seeding data untuk tabel LKE
+		$lke_data = [
+			['id' => 1,'nama' => 'KKE EVALUASI PERENCANAAN KINERJA - 12 dan 17', 'keterangan' => 'Ukuran Keberhasilan (Indikator Kinerja) Tujuan, Sasaran dan Kegiatan telah SMART'],
+			['id' => 2,'nama' => 'KKE EVALUASI PERENCANAAN KINERJA - 18', 'keterangan' => 'Setiap Dokumen Perencanaan Kinerja Menggambarkan Hubungan Kausal Kinerja'],
+			['id' => 3,'nama' => 'KKE EVALUASI PERENCANAAN KINERJA - 21', 'keterangan' => 'Anggaran yang Ditetapkan Telah Mengacu Pada Kinerja'],
+			['id' => 4,'nama' => 'KKE EVALUASI PENGUKURAN KINERJA - 4', 'keterangan' => 'Pimpinan Selalu Terlibat Sebagai Pengambil Keputusan Atas Pengukuran Kinerja'],
+			['id' => 5,'nama' => 'KKE EVALUASI PENGUKURAN KINERJA - 5,6', 'keterangan' => 'Data Kinerja yang Dikumpulkan Telah Relevan Untuk Mengukur Kinerja dan Telah Dimanfaatkan Dalam Pengambilan Keputusan'],
+			['id' => 6,'nama' => 'KKE EVALUASI AKUNTABILITAS KINERJA INTERNAL - NO 6', 'keterangan' => 'Seluruh rekomendasi atas hasil evaluasi akuntabilitas kinerja internal telah ditindaklanjuti']
+		];
+		foreach ($lke_data as $data) {
+			$wpdb->insert($table_lke, $data);
+		}
+		$message .= "- Seeding Format KKE " . count($lke_data) . " baris data berhasil.<br>";
+
+		return [
+			'success' => true,
+			'message' => $message
+		];
+	}
+
 	function gen_user_esakip($user = array(), $update_pass = false)
 	{
 		global $wpdb;
@@ -3972,14 +4056,11 @@ class Wp_Eval_Sakip_Admin
 		$ret['message'] = 'Berhasil Generate User Wordpress dari DB Lokal SIPD';
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
-				$users_pa = $wpdb->get_results(
-					$wpdb->prepare("
-						SELECT 
-						* 
+				$users_pa = $wpdb->get_results("
+						SELECT * 
 						FROM esakip_data_unit 
-						WHERE active=1
-						"),
-					ARRAY_A
+						WHERE active = 1
+					", ARRAY_A
 				);
 				$update_pass = false;
 				if (

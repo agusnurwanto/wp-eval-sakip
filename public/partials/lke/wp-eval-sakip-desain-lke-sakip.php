@@ -109,27 +109,31 @@ foreach ($user_penilai as $key => $val) {
                             Bobot Maksimal 100
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-12">
-                            <label for="namaKomponen">Nama Komponen</label>
-                            <input type="text" class="form-control" id="namaKomponen" name="namaKomponen" required>
-                        </div>
-                        <div class="form-group col-md-6" style="display: none;">
-                            <label for="userPenilai">User Penilai</label>
-                            <select class="form-control" id="userPenilai" name="userPenilai" required>
-                                <?php echo $user_penilai_html; ?>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="bobotKomponen">Bobot</label>
-                            <input type="number" class="form-control" id="bobotKomponen" name="bobotKomponen" required>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="nomorUrutKomponen">Nomor Urut</label>
-                            <input type="number" class="form-control" id="nomorUrutKomponen" name="nomorUrutKomponen">
-                            <small class="text-muted text-sm-left" id="defaultTextInfoKomponen"> Default Nomor Urut</small>
+                    <div class="card mb-3 shadow-lg bg-light">
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group col-md-12">
+                                    <label for="namaKomponen">Nama Komponen</label>
+                                    <input type="text" class="form-control" id="namaKomponen" name="namaKomponen" required>
+                                </div>
+                                <div class="form-group col-md-6" style="display: none;">
+                                    <label for="userPenilai">User Penilai</label>
+                                    <select class="form-control" id="userPenilai" name="userPenilai" required>
+                                        <?php echo $user_penilai_html; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="bobotKomponen">Bobot</label>
+                                    <input type="number" class="form-control" id="bobotKomponen" name="bobotKomponen" required>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="nomorUrutKomponen">Nomor Urut</label>
+                                    <input type="number" class="form-control" id="nomorUrutKomponen" name="nomorUrutKomponen">
+                                    <small class="text-muted text-sm-left" id="defaultTextInfoKomponen"> Default Nomor Urut</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -165,37 +169,41 @@ foreach ($user_penilai as $key => $val) {
                             </div>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-12">
-                            <label for="namaSubKomponen">Nama Subkomponen</label>
-                            <input type="text" class="form-control" id="namaSubKomponen" name="namaSubKomponen" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-3">
-                            <label for="bobotSubKomponen">Bobot</label>
-                            <input type="number" class="form-control" id="bobotSubKomponen" name="bobotSubKomponen" required>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="nomorUrutSubkomponen">Nomor Urut</label>
-                            <input type="number" class="form-control" id="nomorUrutSubkomponen" name="nomorUrutSubkomponen" required>
-                            <small class="text-muted text-sm-left" id="defaultTextInfoSub"> Default Nomor Urut</small>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="userPenilai_sub">User Penilai</label>
-                            <select class="form-control" id="userPenilai_sub" name="userPenilai_sub" required>
-                                <?php echo $user_penilai_html; ?>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-12">
-                            <label for="metode_penilaian">Pilih Metode Penilaian</label>
-                            <select class="form-control" id="metode_penilaian" name="metode_penilaian" required>
-                                <option value="">Pilih Metode</option>
-                                <option value="1">Rata - Rata</option>
-                                <option value="2">Nilai Dinamis</option>
-                            </select>
+                    <div class="card mb-3 shadow-lg bg-light">
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group col-md-12">
+                                    <label for="namaSubKomponen">Nama Subkomponen</label>
+                                    <input type="text" class="form-control" id="namaSubKomponen" name="namaSubKomponen" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    <label for="bobotSubKomponen">Bobot</label>
+                                    <input type="number" class="form-control" id="bobotSubKomponen" name="bobotSubKomponen" required>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="nomorUrutSubkomponen">Nomor Urut</label>
+                                    <input type="number" class="form-control" id="nomorUrutSubkomponen" name="nomorUrutSubkomponen" required>
+                                    <small class="text-muted text-sm-left" id="defaultTextInfoSub"> Default Nomor Urut</small>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="userPenilai_sub">User Penilai</label>
+                                    <select class="form-control" id="userPenilai_sub" name="userPenilai_sub" required>
+                                        <?php echo $user_penilai_html; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-12">
+                                    <label for="metode_penilaian">Pilih Metode Penilaian</label>
+                                    <select class="form-control" id="metode_penilaian" name="metode_penilaian" required>
+                                        <option value="">Pilih Metode</option>
+                                        <option value="1">Rata - Rata</option>
+                                        <option value="2">Nilai Dinamis</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -227,134 +235,169 @@ foreach ($user_penilai as $key => $val) {
                         <div class="alert alert-info text-sm-left" role="alert" id="alertKomponen_penilaian"></div>
                         <div class="alert alert-info text-sm-left" role="alert" id="alertSub_penilaian"></div>
                     </div>
-                    <div class="form-group">
-                        <label for="namaPenilaian">Nama Komponen Penilaian</label>
-                        <input type="text" class="form-control" id="namaPenilaian" name="namaPenilaian" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="keterangan">Keterangan</label>
-                        <textarea class="form-control" id="keterangan" name="keterangan" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="penjelasan">Penjelasan</label>
-                        <textarea class="form-control" id="penjelasan" name="penjelasan" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="langkahKerja">Langkah Kerja</label>
-                        <textarea class="form-control" id="langkahKerja" name="langkahKerja" required></textarea>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <label for="tipeJawaban">Tipe Jawaban</label>
-                            <select class="form-control" id="tipeJawaban" name="tipeJawaban" required>
-
-                            </select>
+                    <div class="card mb-3 shadow-lg bg-light">
+                        <div class="card-header font-weight-bold">
+                            Komponen Penilaian
                         </div>
-                        <div class="form-group col-md-4" id="bobotPenilaianLabel">
-                            <label for="bobotPenilaian">Bobot</label>
-                            <input type="number" class="form-control" id="bobotPenilaian" name="bobotPenilaian" required>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="nomorUrutPenilaian">Nomor Urut</label>
-                            <input type="number" class="form-control" id="nomorUrutPenilaian" name="nomorUrutPenilaian">
-                            <small class="text-muted text-sm-left" id="defaultTextInfoCustom"> Default Nomor Urut</small>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Pilih Jenis Bukti Dukung <small class="text-secondary">( minimal 1 atau bisa lebih dari 1 )</small></label>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_renstra" id="renstra">
-                                    <label class="form-check-label" for="renstra">
-                                        RENSTRA
-                                    </label>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="namaPenilaian">Nama Komponen Penilaian</label>
+                                <input type="text" class="form-control" id="namaPenilaian" name="namaPenilaian" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="keterangan">Keterangan</label>
+                                <textarea class="form-control" id="keterangan" name="keterangan" required></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label for="tipeJawaban">Tipe Jawaban</label>
+                                    <select class="form-control" id="tipeJawaban" name="tipeJawaban" required>
+                                    </select>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_renja_rkt" id="renja-rkt">
-                                    <label class="form-check-label" for="renja-rkt">
-                                        RENJA/RKT
-                                    </label>
+                                <div class="form-group col-md-4" id="bobotPenilaianLabel">
+                                    <label for="bobotPenilaian">Bobot</label>
+                                    <input type="number" class="form-control" id="bobotPenilaian" name="bobotPenilaian" required>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_rencana_aksi" id="rencana-aksi">
-                                    <label class="form-check-label" for="rencana-aksi">
-                                        Rencana Aksi
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_dpa" id="dpa">
-                                    <label class="form-check-label" for="dpa">
-                                        DPA
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_lhe_akip_internal" id="lhe-akip-internal">
-                                    <label class="form-check-label" for="lhe-akip-internal">
-                                        LHE AKIP Internal
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_laporan_monev_renaksi" id="laporan-monev-renaksi">
-                                    <label class="form-check-label" for="laporan-monev-renaksi">
-                                        Laporan Monev Renaksi
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_evaluasi_internal" id="evaluasi-internal">
-                                    <label class="form-check-label" for="evaluasi-internal">
-                                        Evaluasi Internal
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_dokumen_lainnya" id="dokumen-lainnya">
-                                    <label class="form-check-label" for="dokumen-lainnya">
-                                        Dokumen Lainnya
-                                    </label>
+                                <div class="form-group col-md-4">
+                                    <label for="nomorUrutPenilaian">Nomor Urut</label>
+                                    <input type="number" class="form-control" id="nomorUrutPenilaian" name="nomorUrutPenilaian">
+                                    <small class="text-muted text-sm-left" id="defaultTextInfoCustom"> Default Nomor Urut</small>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_iku" id="iku">
-                                    <label class="form-check-label" for="iku">
-                                        IKU
-                                    </label>
+                        </div>
+                    </div>
+                    <div class="card mb-3 shadow-md bg-light">
+                        <div class="card-header font-weight-bold">
+                            Penjelasan dan Langkah Kerja
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="penjelasan">Penjelasan</label>
+                                    <textarea class="form-control" id="penjelasan" name="penjelasan" required></textarea>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_perjanjian_kinerja" id="perjanjian-kinerja">
-                                    <label class="form-check-label" for="perjanjian-kinerja">
-                                        Perjanjian Kinerja
-                                    </label>
+                                <div class="form-group col-md-6">
+                                    <label for="langkahKerja">Langkah Kerja</label>
+                                    <textarea class="form-control" id="langkahKerja" name="langkahKerja" required></textarea>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_laporan_kinerja" id="laporan-kinerja">
-                                    <label class="form-check-label" for="laporan-kinerja">
-                                        Laporan Kinerja
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_pohon_kinerja_dan_cascading" id="pohon-kinerja-dan-cascading">
-                                    <label class="form-check-label" for="pohon-kinerja-dan-cascading">
-                                        Pohon Kinerja dan Cascading
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_tl_lhe_akip_internal" id="tl-lhe-akip-internal">
-                                    <label class="form-check-label" for="tl-lhe-akip-internal">
-                                        TL LHE AKIP Internal
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_skp" id="skp">
-                                    <label class="form-check-label" for="skp">
-                                        SKP
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="esakip_pengukuran_kinerja" id="pengukuran-kinerja">
-                                    <label class="form-check-label" for="pengukuran-kinerja">
-                                        Pengukuran Kinerja
-                                    </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-3 shadow-md bg-light">
+                        <div class="card-header font-weight-bold">
+                            KKE (Kertas Kerja Evaluasi)
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="id-kke">Format KKE</label>
+                                <select class="form-control" id="id-kke" name="id-kke" required>
+                                </select>
+                            </div>
+                            <small class="text-muted text-sm-left">Pilih format KKE (opsional)</small>
+                        </div>
+                    </div>
+                    <div class="card mb-3 shadow-md bg-light">
+                        <div class="card-header font-weight-bold">
+                            Bukti Dukung
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Pilih Jenis Bukti Dukung <small class="text-secondary">( minimal 1 atau bisa lebih dari 1 )</ small></label>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="esakip_renstra" id="renstra">
+                                            <label class="form-check-label" for="renstra">
+                                                RENSTRA
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="esakip_renja_rkt" id="renja-rkt">
+                                            <label class="form-check-label" for="renja-rkt">
+                                                RENJA/RKT
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="esakip_rencana_aksi" id="rencana-aksi">
+                                            <label class="form-check-label" for="rencana-aksi">
+                                                Rencana Aksi
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="esakip_dpa" id="dpa">
+                                            <label class="form-check-label" for="dpa">
+                                                DPA
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="esakip_lhe_akip_internal" id="lhe-akip-internal">
+                                            <label class="form-check-label" for="lhe-akip-internal">
+                                                LHE AKIP Internal
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="esakip_laporan_monev_renaksi" id="laporan-monev-renaksi">
+                                            <label class="form-check-label" for="laporan-monev-renaksi">
+                                                Laporan Monev Renaksi
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="esakip_evaluasi_internal" id="evaluasi-internal">
+                                            <label class="form-check-label" for="evaluasi-internal">
+                                                Evaluasi Internal
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="esakip_dokumen_lainnya" id="dokumen-lainnya">
+                                            <label class="form-check-label" for="dokumen-lainnya">
+                                                Dokumen Lainnya
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="esakip_iku" id="iku">
+                                            <label class="form-check-label" for="iku">
+                                                IKU
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="esakip_perjanjian_kinerja" id="perjanjian-kinerja">
+                                            <label class="form-check-label" for="perjanjian-kinerja">
+                                                Perjanjian Kinerja
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="esakip_laporan_kinerja" id="laporan-kinerja">
+                                            <label class="form-check-label" for="laporan-kinerja">
+                                                Laporan Kinerja
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="esakip_pohon_kinerja_dan_cascading" id="pohon-kinerja-dan-cascading">
+                                            <label class="form-check-label" for="pohon-kinerja-dan-cascading">
+                                                Pohon Kinerja dan Cascading
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="esakip_tl_lhe_akip_internal" id="tl-lhe-akip-internal">
+                                            <label class="form-check-label" for="tl-lhe-akip-internal">
+                                                TL LHE AKIP Internal
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="esakip_skp" id="skp">
+                                            <label class="form-check-label" for="skp">
+                                                SKP
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="esakip_pengukuran_kinerja" id="pengukuran-kinerja">
+                                            <label class="form-check-label" for="pengukuran-kinerja">
+                                                Pengukuran Kinerja
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -506,6 +549,24 @@ foreach ($user_penilai as $key => $val) {
     jQuery(document).ready(function() {
         get_table_desain_sakip();
 
+        getFormatKke()
+            .done(function(res) {
+                let options = '<option value="">-- Tidak Ada --</option>';
+                if (res.status && res.data.length > 0) {
+                    res.data.forEach(function(val) {
+                        options += `<option value="${val.id}">${val.nama} | ${val.keterangan}</option>`;
+                    });
+                }
+                jQuery('#id-kke').html(options).select2({
+                    dropdownParent: jQuery('#tambahPenilaianModal .modal-body'),
+                    width: '100%'
+                });
+            })
+            .fail(function(xhr) {
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat data!');
+            });
+
         jQuery('#subkomponenPembandingContainer').hide();
         jQuery('#komponenPenilaianPembandingContainer').hide();
         jQuery('#bobotPenilaian').hide();
@@ -594,6 +655,18 @@ foreach ($user_penilai as $key => $val) {
             jQuery('#idKomponenPenilaian').val(id);
             jQuery('#OpsiCustomModal').modal('show');
         })
+    }
+
+    function getFormatKke() {
+        return jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'get_all_kke_ajax',
+                api_key: esakip.api_key
+            },
+            dataType: 'json'
+        });
     }
 
     function get_table_kerangka_logis(id) {
@@ -796,6 +869,7 @@ foreach ($user_penilai as $key => $val) {
                     jQuery('#alertSub_penilaian').text('Nama Sub Komponen = ' + data.subkomponen.nama);
                     jQuery('#namaPenilaian').val('');
                     jQuery('#penjelasan').val('');
+                    jQuery("#id-kke").val('').trigger('change');
                     jQuery('#bobotPenilaianLabel').hide();
                     jQuery('#bobotPenilaian').val('');
                     jQuery('#bobotPenilaian').hide();
@@ -941,13 +1015,14 @@ foreach ($user_penilai as $key => $val) {
                     jQuery('#tambahPenilaianModalLabel').hide();
                     jQuery('#editPenilaianModalLabel').show();
                     jQuery('#defaultTextInfoPenilaian').hide();
-                    jQuery('#alertKomponen_penilaian').text('Nama Komponen = ' + data.komponen.nama + ' (' + data.komponen.bobot + ')');
-                    jQuery('#alertSub_penilaian').text('Nama Sub Komponen = ' + data.subkomponen.nama + ' (' + data.subkomponen.bobot + ')');
+                    jQuery('#alertKomponen_penilaian').text('Nama Komponen = ' + data.komponen.nama + ' (' + 'Max Bobot = ' + data.komponen.bobot + ')');
+                    jQuery('#alertSub_penilaian').text('Nama Sub Komponen = ' + data.subkomponen.nama + ' (' + 'Max Bobot = ' + data.subkomponen.bobot + ')');
                     jQuery("#idKomponenPenilaian").val(data.data.id);
                     jQuery("#idSubKomponen_penilaian").val(data.data.id_subkomponen);
                     jQuery("#namaPenilaian").val(data.data.nama);
                     jQuery('#tipeJawaban').html(data.opsi_tipe);
                     jQuery("#tipeJawaban").val(data.data.tipe);
+                    jQuery("#id-kke").val(data.data.id_kke).trigger('change');
                     if (data.data.tipe == 3) {
                         jQuery('#bobotPenilaian').show();
                         jQuery('#bobotPenilaianLabel').show();
@@ -1238,6 +1313,7 @@ foreach ($user_penilai as $key => $val) {
                 return alert('Bobot Penilaian tidak boleh kosong');
             }
         }
+        let id_kke = jQuery("#id-kke").val();
 
         let selectedBuktiDukung = [];
         jQuery('input[type=checkbox]:checked').each(function() {
@@ -1260,6 +1336,7 @@ foreach ($user_penilai as $key => $val) {
                 tipe_komponen_penilaian: tipeJawaban,
                 keterangan: keterangan,
                 penjelasan: penjelasan,
+                id_kke: id_kke,
                 bobot_penilaian: bobotPenilaian,
                 langkah_kerja: langkahKerja,
                 bukti_dukung: JSON.stringify(selectedBuktiDukung),

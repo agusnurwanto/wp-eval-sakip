@@ -403,6 +403,7 @@ CREATE TABLE esakip_komponen_penilaian (
   `jenis_bukti_dukung` text DEFAULT NULL,
   `penjelasan` text DEFAULT NULL,
   `langkah_kerja` text DEFAULT NULL,
+  `id_kke` INT(11) DEFAULT NULL,
   `active` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY  (`id`),
   KEY `id_subkomponen` (`id_subkomponen`),
@@ -501,6 +502,7 @@ CREATE TABLE esakip_komponen_penilaian_history (
   `bobot` float DEFAULT NULL,
   `penjelasan` text DEFAULT NULL,
   `langkah_kerja` text DEFAULT NULL,
+  `id_kke` INT(11) DEFAULT NULL,
   `id_asli` int(11) DEFAULT NULL,
   `id_jadwal` int(11) NOT NULL,
   PRIMARY KEY  (`id`),
@@ -2453,4 +2455,14 @@ CREATE TABLE esakip_pengisian_kuesioner_mendagri_detail (
   KEY `id_jenis_bukti_dukung` (`id_jenis_bukti_dukung`),
   KEY `tahun_anggaran` (`tahun_anggaran`),
   KEY `active` (`active`)
+);
+
+CREATE TABLE esakip_kke_format (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `nama` TEXT DEFAULT NULL,
+  `keterangan` TEXT DEFAULT NULL,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `active` TINYINT(4) DEFAULT 1,
+  PRIMARY KEY(id)
 );

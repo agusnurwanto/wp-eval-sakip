@@ -20228,12 +20228,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						}
 					}
 				} else {
-					$tbody = "<tr><td colspan='8' class='text-center'>Tidak ada data tersedia</td></tr>";
+					$tbody = "<tr><td colspan='11' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 
 				if ($total_bobot_komponen != 100) {
 					$tbody .= "<tr>";
-					$tbody .= "<td colspan='9' class='text-center'>";
+					$tbody .= "<td colspan='11' class='text-center'>";
 					$tbody .= "<button class='btn btn-primary btn-lg btn-block' onclick='tambah_komponen_utama(\"" . $id_jadwal . "\")'><span class='dashicons dashicons-plus'></span> Tambah Komponen Utama</button>";
 					$tbody .= "</td>";
 					$tbody .= "</tr>";
@@ -23578,10 +23578,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									'penjelasan' => $penjelasan,
 									'langkah_kerja' => $langkah_kerja,
 									'jenis_bukti_dukung' => $bukti_dukung,
+									'id_kke' => $_POST['id_kke'],
 									'bobot' => $bobot_penilaian,
 								),
 								array('id' => $id_komponen_penilaian),
-								array('%d', '%s', '%s', '%f', '%s', '%s', '%s', '%s', '%f'),
+								array('%d', '%s', '%s', '%f', '%s', '%s', '%s', '%s', '%d', '%f'),
 								array('%d')
 							);
 						} else {
@@ -23596,9 +23597,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									'penjelasan' => $penjelasan,
 									'langkah_kerja' => $langkah_kerja,
 									'jenis_bukti_dukung' => $bukti_dukung,
+									'id_kke' => $_POST['id_kke'],
 									'bobot' => $bobot_penilaian,
 								),
-								array('%d', '%s', '%s', '%f', '%s', '%s', '%s', '%s', '%f'),
+								array('%d', '%s', '%s', '%f', '%s', '%s', '%s', '%s', '%d', '%f'),
 							);
 						}
 					}
@@ -33244,11 +33246,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
-	// --------------------------------------------------------
-	// --------------------------------------------------------
-    // --- METHOD HANDLER PEGAWAI SIMPEG ---
-    // --------------------------------------------------------
-    // --------------------------------------------------------
+    /**
+	 * 
+	 * METHOD HANDLER PEGAWAI SIMPEG
+	 * 
+     */
 
     /**
      * The name of the database table for pegawai simpeg.

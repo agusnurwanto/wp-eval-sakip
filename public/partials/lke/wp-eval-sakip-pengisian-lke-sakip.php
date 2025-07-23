@@ -86,7 +86,7 @@ $get_nama_komponen = $wpdb->get_results(
     <table id="table_dokumen_skpd" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
         <thead>
             <tr>
-                <th class="text-center">N0</th>
+                <th class="text-center">NO</th>
                 <th class="text-center">NAMA PERANGKAT DAERAH</th>
                 <th class="text-center">NILAI USULAN</th>
                 <?php
