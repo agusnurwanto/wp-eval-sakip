@@ -3988,6 +3988,7 @@ class Wp_Eval_Sakip_Admin
 				add_role($user['jabatan'], $user['jabatan'], array(
 					'read' => true,
 					'edit_posts' => false,
+					'edit_published_pages' => true,
 					'delete_posts' => false
 				));
 			}
