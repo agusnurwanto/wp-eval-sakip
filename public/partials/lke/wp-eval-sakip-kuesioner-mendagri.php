@@ -38,7 +38,7 @@ $tahun = "<option value='-1'>Pilih Tahun</option>";
 
 foreach ($idtahun as $val) {
     $selected = '';
-    if (!empty($input['tahun_anggaran']) && $val['tahun_anggaran'] == $input['tahun_anggaran']) {
+    if (!empty($input['tahun_anggaran']) && $val['tahun_anggaran'] == $input['tahun']) {
         $selected = 'selected';
     }
     $tahun .= "<option value='$val[tahun_anggaran]' $selected>$val[tahun_anggaran]</option>";
@@ -92,27 +92,66 @@ foreach ($idtahun as $val) {
     </div>
 </div>
 
-<!-- Modal Pilih Bukti Dukung -->
-<div class="modal fade" id="tambahBuktiDukungModal" tabindex="-1" role="dialog" aria-labelledby="tambahBuktiDukungModalLabel" aria-hidden="true">
+<!-- Modal tambah bukti dukung -->
+<div class="modal fade bd-example-modal-xl" id="tambahBuktiDukung" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tambahBuktiDukungLabel">Pilih Bukti Dukung</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h5 class="text-center">Upload Bukti Dukung</h5>
+                <div id="uploadBuktiDukung" class="text-center" style="margin-bottom: 20px;"></div>
+                <table id="tableBuktiDukung" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center" colspan="2">Jenis Bukti Dukung</th>
+                            <th class="text-center">Nama Dokumen</th>
+                            <th class="text-center">Keterangan</th>
+                            <th class="text-center">Tanggal Upload</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>                             
+                <input type="hidden" id="id_detail">          
+                <input type="hidden" id="idKuesionerPertanyaanDetail">
+                <input type="hidden" id="jenis_bukti_dukung_json">                
+                <input type="hidden" id="idKuesioner">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="submit_bukti_dukung(); return false">Simpan</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Pilih Tingkat kematangan -->
+<div class="modal fade" id="tambahKuesionerDetailModal" tabindex="-1" role="dialog" aria-labelledby="tambahKuesionerDetailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
 
             <div class="modal-header">
-                <h5 class="modal-title" id="tambahBuktiDukungModalLabel">Pilih Bukti Dukung</h5>
+                <h5 class="modal-title" id="tambahKuesionerDetailModalLabel">Pilih Bukti Dukung</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
 
             <div class="modal-body">
-                <input type="hidden" id="idKuesionerPertanyaan">                
-                <input type="hidden" id="idKuesionerPertanyaanDetail">             
+                <input type="hidden" id="idKuesionerPertanyaan">
                 <input type="hidden" id="id_detail_level">
                 <input type="hidden" id="id_skpd" value="<?php echo (int) $id_skpd; ?>">
 
                 <div class="form-group col-md-12">
                      <label for="level">Tingkat Kematangan</label>
                      <select class="form-control" id="level" name="level" required>
+                        <option value="">Pilih Tingkat</option>
                         <option value="1">Tingkat I</option>
                         <option value="2">Tingkat II</option>
                         <option value="3">Tingkat III</option>
@@ -137,7 +176,7 @@ foreach ($idtahun as $val) {
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
-                <button type="button" class="btn btn-primary" onclick="submit_bukti(); return false">Simpan</button>
+                <button type="button" class="btn btn-primary" onclick="submit_tingkat(); return false">Simpan</button>
             </div>
 
         </div>
@@ -181,28 +220,31 @@ foreach ($idtahun as $val) {
         });
     }
     function getIndikatorDanBuktiDukung() {
-        const id_detail = jQuery('#idKuesionerPertanyaanDetail').val();
+        const id_kuesioner = jQuery('#idKuesionerPertanyaan').val();
         const level = jQuery('#level').val();
-
-        if (id_detail && level) {
+        console.log('getIndikatorDanBuktiDukung => id_kuesioner:', id_kuesioner, 'level:', level);
+        if (id_kuesioner && level) {
+            jQuery('#wrap-loading').show();
             jQuery.ajax({
                 url: esakip.url,
                 type: 'POST',
                 data: {
                     action: 'get_indikator_bukti_by_level',
                     api_key: esakip.api_key,
-                    id_detail: id_detail,
+                    id_kuesioner: id_kuesioner,
                     level: level
                 },
                 dataType: 'json',
                 success: function(response) {
                     if (response.status === 'success') {
+                        jQuery('#wrap-loading').hide();
                         jQuery('#indikator').val(response.data.indikator);
                         jQuery('#jenis_bukti_dukung').val(response.data.jenis_bukti_dukung);
                         jQuery('#penjelasan').val(response.data.penjelasan);
                         jQuery('#id_detail_level').val(response.data.id_detail_level);
                     } else {
                         alert(response.message);
+                        jQuery('#wrap-loading').hide();
                         jQuery('#indikator').val('');
                         jQuery('#jenis_bukti_dukung').val('');  
                         jQuery('#penjelasan').val('');
@@ -219,27 +261,29 @@ foreach ($idtahun as $val) {
             jQuery('#jenis_bukti_dukung').val('');
         }
     }
-    function tambahBuktiDukung(id_detail, id_pertanyaan) {
-        const level = 1;    
-        jQuery('#idKuesionerPertanyaanDetail').val(id_detail);
-        jQuery('#idKuesionerPertanyaan').val(id_pertanyaan);
-        jQuery('#level').val('');
+    function tambahKuesionerDetail(id_kuesioner, id_level = '') {
+        jQuery('#idKuesionerPertanyaan').val(id_kuesioner);
+        jQuery('#level').val(id_level);
+        
         jQuery('#indikator').val('');
         jQuery('#jenis_bukti_dukung').val('');
         jQuery('#penjelasan').val('');
         jQuery('#id_detail_level').val('');
-
+        if (id_level !== '') {
+            getIndikatorDanBuktiDukung();
+        }
         jQuery('#wrap-indikator-bukti-dukung').show();
-        jQuery('#tambahBuktiDukungModal').modal('show');
+        jQuery('#tambahKuesionerDetailModal').modal('show');
     }
-    function submit_bukti() {
-        const id_pertanyaan = jQuery('#idKuesionerPertanyaan').val();
-        const id_kuesioner_mendagri_detail = jQuery('#idKuesionerPertanyaanDetail').val();
-        const id_kuesioner_mendagri = jQuery('#idKuesioner').val();
+    function submit_tingkat() {
+        const id_kuesioner = jQuery('#idKuesionerPertanyaan').val();
         const level = jQuery('#level').val();
         const indikator = jQuery('#indikator').val();
         const penjelasan = jQuery('#penjelasan').val();
         const id_skpd = jQuery('#id_skpd').val();
+        if(level == ''){
+            return alert('Tingkat kematangan harus dipilih!');
+        }
 
         if (confirm('Apakah anda yakin untuk menyimpan data ini?')) {
             jQuery('#wrap-loading').show();
@@ -250,22 +294,20 @@ foreach ($idtahun as $val) {
                     action: "submit_detail_kuesioner",
                     api_key: esakip.api_key,
                     tahun_anggaran: <?php echo $input['tahun']; ?>,
-                    id_kuesioner_mendagri_detail,
-                    id_pertanyaan,
-                    id_skpd,
-                    level,
-                    indikator,
-                    penjelasan,
+                    id_kuesioner: id_kuesioner,
+                    id_skpd: id_skpd,
+                    level: level,
+                    indikator: indikator,
+                    penjelasan: penjelasan,
                 },
                 dataType: "json",
                 success: function(response) {
                     jQuery('#wrap-loading').hide();
                     if(response.status === 'success') {
                         alert('Berhasil disimpan!');
-                        jQuery('#tambahBuktiDukungModal').modal('hide');
+                        jQuery('#tambahKuesionerDetailModal').modal('hide');
                         jQuery('#wrap-indikator-bukti-dukung input, #wrap-indikator-bukti-dukung textarea').val('');
-                        console.log('ID DETAIL:', id_kuesioner_mendagri_detail);
-                        afterSimpan(id_kuesioner_mendagri, id_kuesioner_mendagri_detail);
+                        get_table_variabel_pengisian_mendagri();
                     } else {
                         alert('Gagal: ' + response.message);
                     }
@@ -278,27 +320,122 @@ foreach ($idtahun as $val) {
             });
         }
     }
-    function afterSimpan(id_kuesioner, id_detail) {
+    function tambahDokumenBuktiDukung(id, id_kuesioner) {
+        var id_skpd = jQuery('#id_skpd').val();
+        var id_kuesioner_mendagri_detail = jQuery('#idKuesionerPertanyaanDetail').val();
+        var jenis_bukti_dukung = JSON.parse(jQuery('#jenis_bukti_dukung_json').val() || '[]');
+        jQuery('#idKuesioner').val(id_kuesioner);
+        jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
             type: 'POST',
-            dataType: 'json',
             data: {
-                action: 'get_detail_by_id',
+                action: 'get_dokumen_bukti_dukung_kuesioner',
                 api_key: esakip.api_key,
-                id_kuesioner: id_kuesioner,
-                id_kuesioner_mendagri_detail: id_detail
+                tahun_anggaran: <?php echo $input['tahun']; ?>,
+                id: id,
+                id_kuesioner: id_kuesioner_mendagri_detail,
+                id_skpd: id_skpd,
+                jenis_bukti_dukung: jenis_bukti_dukung,
             },
+            dataType: 'json',
             success: function(response) {
-                 console.log(response); 
-                if (response.status === 'success') {
-                    get_table_variabel_pengisian_mendagri()
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+
+                if (response.status == 'success') {
+                    var html = '';
+                    var url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>';
+                    var list_bukti_dukung = {};
+                    response.data_existing.map(function(b, i) {
+                        list_bukti_dukung[b] = b;
+                    });
+                    for (var i in response.data) {
+                        response.data[i].map(function(data, ii)  {
+                            var checked = '';
+                            var namaFile = data.dokumen;
+                            console.log('Dokumen:', data.dokumen); 
+                            console.log('Nama file:', namaFile);
+                            console.log('data_existing =', response.data_existing);
+
+                            if (response.data_existing.includes(data.dokumen)) {
+                                checked = 'checked';
+                            }
+
+
+                            html += '' +
+                                '<tr>' +
+                                '<td class="text-center"><input type="checkbox" '+ checked +' class="list-dokumen" value="' + data.dokumen +'"/></td>' +
+                                '<td>' + i + '</td>' +
+                                '<td><a href="' + url + data.dokumen + '" target="_blank">' + data.dokumen + '</a></td>' +
+                                '<td>' + data.keterangan + '</td>' +
+                                '<td class="text-center">' + data.created_at + '</td>' +
+                                '</tr>';
+                        });
+                    };
+                    jQuery('#tableBuktiDukung tbody').html(html); 
+                    jQuery('#uploadBuktiDukung').html(response.upload_bukti_dukung); 
+                    jQuery('#jenis_bukti_dukung_json').val(id);
+                    jQuery('#tambahBuktiDukung').modal('show'); 
+
                 } else {
-                    alert('gagal mengambil data detail.');
+                    alert(response.message);
+                }
+            }, 
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat mengambil data!');
+            }
+        });
+    }
+    function submit_bukti_dukung() {        
+        var jenis_bukti_dukung = jQuery('#jenis_bukti_dukung_json').val();
+        console.log('jenis_bukti_dukung:', jenis_bukti_dukung);
+        var id_skpd = jQuery('#id_skpd').val();
+        var id_kuesioner_mendagri_detail = jQuery('#idKuesionerPertanyaanDetail').val();
+        var bukti_dukung = [];
+
+        jQuery('#tableBuktiDukung tbody .list-dokumen').map(function(i, b) {
+            if (jQuery(b).is(':checked')) {
+                bukti_dukung.push(jQuery(b).val());
+            }
+        });
+
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'submit_bukti_dukung_kuesioner',
+                api_key: esakip.api_key,
+                id_jenis_bukti_dukung: jenis_bukti_dukung,
+                id_skpd: id_skpd,
+                tahun_anggaran: <?php echo $input['tahun']; ?>,
+                id_kuesioner: jQuery('#idKuesionerPertanyaanDetail').val(),
+                dokumen_upload: bukti_dukung
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                if (response.status == 'error') {
+                    alert(response.message);
+                } else {
+                    var url = esakip.plugin_url + 'public/media/dokumen/';
+                    var html = '';
+                    if (Array.isArray(response.data)) {
+                        response.data.map(function(b, i) {
+                            html += '<a href="' + url + b + '" target="_blank">' + b + '</a>';
+                        });
+                    }
+                    alert(response.message);
+                    jQuery('#tambahBuktiDukung').modal('hide');
+                    get_table_variabel_pengisian_mendagri();
                 }
             },
-            error: function(xhr, status, error) {
-                alert('Terjadi kesalahan saat mengambil data.');
+             error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                alert("An error occurred: " + xhr.status + " " + xhr.statusText);
             }
         });
     }
