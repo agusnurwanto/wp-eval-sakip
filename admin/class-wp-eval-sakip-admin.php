@@ -3985,12 +3985,24 @@ class Wp_Eval_Sakip_Admin
 			$user['jabatan'] = strtolower($user['jabatan']);
 			$role = get_role($user['jabatan']);
 			if (empty($role)) {
-				add_role($user['jabatan'], $user['jabatan'], array(
+				$capability = array(
 					'read' => true,
 					'edit_posts' => false,
-					'edit_published_pages' => true,
 					'delete_posts' => false
-				));
+				);
+				if(
+					$user['jabatan'] == 'admin_bappeda'
+					|| $user['jabatan'] == 'admin_ortala'
+					|| $user['jabatan'] == 'kpa'
+					|| $user['jabatan'] == 'pa'
+					|| $user['jabatan'] == 'pj'
+					|| $user['jabatan'] == 'plh'
+					|| $user['jabatan'] == 'plt'
+				){
+					$capability['upload_files'] = true;
+					$capability['edit_published_pages'] = true;
+				}
+				add_role($user['jabatan'], $user['jabatan'], $capability);
 			}
 			$insert_user = username_exists($username);
 			if (!$insert_user) {
