@@ -47,6 +47,15 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-laporan-pk-pemda.php';
 	}
 
+	public function capaian_iku_opd($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/monev-kinerja/wp-eval-sakip-iku-opd.php';
+	}
+
 	public function get_data_renaksi()
 	{
 		global $wpdb;

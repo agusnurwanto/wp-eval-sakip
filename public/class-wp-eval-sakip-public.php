@@ -32624,7 +32624,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		
 			if (!empty($pohon_kinerja_level_1)) {
 				$Pohon_kinerja_opd_page = $this->functions->generatePage(array(
-					'nama_page'    => 'Pohon Kinerja ' . $vv['nama_skpd'],
+					'nama_page'    => 'Pohon Kinerja' . $vv['nama_skpd'],
 					'content'      => '[view_pohon_kinerja_opd periode=' . $_POST['id_jadwal'] . ']',
 					'show_header'  => 1,
 					'post_status'  => 'publish'
@@ -32721,7 +32721,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$no_opd = 1;
 			foreach ($all_skpd as $skpd) {
 				$cascading_publish_page = $this->functions->generatePage([
-					'nama_page'   => 'Cascading ' . $skpd['nama_skpd'],
+					'nama_page'   => 'Cascading',
 					'content'     => '[view_cascading_publish]',
 					'show_header' => 1,
 					'post_status' => 'publish'
@@ -32736,6 +32736,104 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$tbody .= "<tr>
 					<td class='text-center'>{$no_opd}</td>
 					<td class='text-left'>{$skpd['nama_skpd']}</td>
+					<td class='text-center'>{$btn}</td>
+				</tr>";
+			
+				$no_opd++;
+			}
+			$ret['data'] = $tbody;
+		}
+				
+		die(json_encode($ret));
+	}
+
+	function get_datatable_iku_publish() 
+	{
+		global $wpdb;
+		
+		$ret = [
+			'status'      => 'success',
+			'message'     => 'Berhasil mendapatkan data IKU publish!',
+			'data'        => '',
+			'data_pemda'  => ''
+		];
+	
+		// Ambil data tujuan tanpa id_unik_indikator
+		$get_iku = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT * 
+				FROM esakip_data_iku_pemda 
+				WHERE id_jadwal = %d
+				  AND active = 1
+			", $_POST['id_jadwal']), ARRAY_A
+		);
+		$ret['sql'] = $wpdb->last_query;
+	
+		if (!empty($get_iku)) {
+			$tbody_pemda = '';
+			$counter = 1;
+			
+			foreach ($get_iku as $iku) {
+				$target = '';
+				for($i=1; $i<=$_POST['lama_pelaksanaan']; $i++){
+					$target .= "
+						<td class='text-center'>{$iku['target_'.$i]}</td>
+						<td class='text-center'></td>
+					";
+				}
+				$tbody_pemda .= "
+				<tr>
+					<td class='text-center'>{$counter}</td>
+					<td>{$iku['label_sasaran']}</td>
+					<td>{$iku['label_indikator']}</td>
+					<td>{$iku['satuan']}</td>
+					{$target}
+				</tr>";
+				$counter++;
+			}
+			
+			$ret['data_pemda'] = $tbody_pemda;
+		}
+	
+		$tahun_anggaran = isset($_POST['tahun_anggaran']) ? intval($_POST['tahun_anggaran']) : 0;
+		//jadwal rpjmd
+		$id_jadwal = isset($_POST['id_jadwal']) ? intval($_POST['id_jadwal']) : 0;
+	
+		$all_skpd = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT 
+					id_skpd, 
+					nama_skpd, 
+					kode_skpd 
+				FROM esakip_data_unit 
+				WHERE active = 1 
+				  AND is_skpd = 1 
+				  AND tahun_anggaran = %d 
+				ORDER BY kode_skpd ASC
+			", $tahun_anggaran),
+			ARRAY_A
+		);
+				
+		if (!empty($_POST['id_jadwal_wp_sipd'])) {
+			$tbody = '';
+			$no_opd = 1;
+			foreach ($all_skpd as $skpd) {
+				$cascading_publish_page = $this->functions->generatePage([
+					'nama_page'   => 'Capaian Kinerja Perangkat Daerah',
+					'content'     => '[capaian_iku_opd]',
+					'show_header' => 1,
+					'post_status' => 'publish'
+				]);
+			
+				$url = $cascading_publish_page['url'] . '&id_skpd=' . $skpd['id_skpd'] . '&id_jadwal=' . $_POST['id_jadwal_wp_sipd'];
+			
+				$btn = "<button type='button' class='btn btn-info' title='Lihat IKU " . htmlspecialchars($skpd['nama_skpd']) . "' onclick='window.open(\"{$url}\", \"_blank\");'>
+					<span class='dashicons dashicons-visibility'></span>
+				</button>";
+			
+				$tbody .= "<tr>
+					<td class='text-center'>{$no_opd}</td>
+					<td class='text-left'>{$skpd['kode_skpd']} {$skpd['nama_skpd']}</td>
 					<td class='text-center'>{$btn}</td>
 				</tr>";
 			
@@ -32764,10 +32862,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					u.id_jadwal_wp_sipd
 				FROM esakip_pengaturan_upload_dokumen u
 				INNER JOIN esakip_data_jadwal j
-						ON u.id_jadwal_rpjmd = j.id
+					ON u.id_jadwal_rpjmd = j.id
 				WHERE u.tahun_anggaran = %d
-				  AND u.active = 1
-				  AND j.status != 0
+				  	AND u.active = 1
+				  	AND j.status != 0
 				LIMIT 1
 			", $tahun_anggaran),
 			ARRAY_A
