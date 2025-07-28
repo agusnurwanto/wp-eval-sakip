@@ -6593,15 +6593,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									SELECT a.*
 									FROM esakip_data_mapping_jenis_dokumen_esr a 
 									JOIN esakip_menu_dokumen b 
-									  ON b.id=a.esakip_menu_dokumen_id 
-									 AND a.tahun_anggaran = b.tahun_anggaran 
-									 AND b.active=1
+									  	ON b.id=a.esakip_menu_dokumen_id 
+									 	AND a.tahun_anggaran = b.tahun_anggaran 
+									 	AND b.active=1
 									JOIN esakip_data_jenis_dokumen_esr c 
-									  ON c.jenis_dokumen_esr_id = a.jenis_dokumen_esr_id 
-									 AND c.tahun_anggaran=a.tahun_anggaran 
-									 AND c.active=1
+									  	ON c.jenis_dokumen_esr_id = a.jenis_dokumen_esr_id 
+									 	AND c.tahun_anggaran=a.tahun_anggaran 
+									 	AND c.active=1
 									WHERE a.tahun_anggaran = %d 
-									  AND b.nama_tabel = %s;
+									  	AND b.nama_tabel = %s;
 								", $pengaturan_periode_dokumen['tahun_anggaran'], $nama_tabel),
 								ARRAY_A
 							);
@@ -7424,12 +7424,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											a.*
 										FROM 
 											esakip_data_mapping_jenis_dokumen_esr a 
-												JOIN esakip_menu_dokumen b 
-													ON b.id=a.esakip_menu_dokumen_id AND 
-														a.tahun_anggaran=b.tahun_anggaran AND b.active=1
-				                                JOIN esakip_data_jenis_dokumen_esr c 
-				                                  	ON c.jenis_dokumen_esr_id=a.jenis_dokumen_esr_id  AND 
-				                                   		c.tahun_anggaran=a.tahun_anggaran AND c.active=1
+										JOIN esakip_menu_dokumen b 
+											ON b.id=a.esakip_menu_dokumen_id AND 
+												a.tahun_anggaran=b.tahun_anggaran AND b.active=1
+		                                JOIN esakip_data_jenis_dokumen_esr c 
+		                                  	ON c.jenis_dokumen_esr_id=a.jenis_dokumen_esr_id  AND 
+		                                   		c.tahun_anggaran=a.tahun_anggaran AND c.active=1
 				                        WHERE 
 				                            a.tahun_anggaran=%d AND
 				                            b.nama_tabel=%s;
@@ -7686,15 +7686,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									SELECT a.*
 									FROM esakip_data_mapping_jenis_dokumen_esr a 
 									JOIN esakip_menu_dokumen b 
-									  ON b.id = a.esakip_menu_dokumen_id 
-									 AND a.tahun_anggaran = b.tahun_anggaran 
-									 AND b.active = 1
+									  	ON b.id = a.esakip_menu_dokumen_id 
+									 	AND a.tahun_anggaran = b.tahun_anggaran 
+									 	AND b.active = 1
 									JOIN esakip_data_jenis_dokumen_esr c 
-									  ON c.jenis_dokumen_esr_id = a.jenis_dokumen_esr_id 
-									 AND c.tahun_anggaran = a.tahun_anggaran 
-									 AND c.active = 1
+									  	ON c.jenis_dokumen_esr_id = a.jenis_dokumen_esr_id 
+									 	AND c.tahun_anggaran = a.tahun_anggaran 
+									 	AND c.active = 1
 									WHERE a.tahun_anggaran = %d 
-									  AND b.nama_tabel = %s;
+									  	AND b.nama_tabel = %s;
 								", $pengaturan_periode_dokumen['tahun_anggaran'], $table_name),
 								ARRAY_A
 							);
@@ -16947,15 +16947,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									SELECT a.*
 									FROM esakip_data_mapping_jenis_dokumen_esr a 
 									JOIN esakip_menu_dokumen b 
-									  ON b.id=a.esakip_menu_dokumen_id 
-									 AND a.tahun_anggaran = b.tahun_anggaran 
-									 AND b.active = 1
+									  	ON b.id=a.esakip_menu_dokumen_id 
+									 	AND a.tahun_anggaran = b.tahun_anggaran 
+									 	AND b.active = 1
 									JOIN esakip_data_jenis_dokumen_esr c 
-									  ON c.jenis_dokumen_esr_id = a.jenis_dokumen_esr_id 
-									 AND c.tahun_anggaran = a.tahun_anggaran 
-									 AND c.active=1
+									  	ON c.jenis_dokumen_esr_id = a.jenis_dokumen_esr_id 
+									 	AND c.tahun_anggaran = a.tahun_anggaran 
+									 	AND c.active=1
 									WHERE a.tahun_anggaran = %d 
-									  AND b.nama_tabel = %s;
+									  	AND b.nama_tabel = %s;
 								", $pengaturan_periode_dokumen['tahun_anggaran'], 'esakip_iku'),
 								ARRAY_A
 							);
@@ -25000,14 +25000,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 										SELECT 
 											a.*
-										FROM 
-											esakip_data_mapping_jenis_dokumen_esr a 
-												JOIN esakip_menu_dokumen b 
-													ON b.id=a.esakip_menu_dokumen_id AND 
-														a.tahun_anggaran=b.tahun_anggaran AND b.active=1
-				                                JOIN esakip_data_jenis_dokumen_esr c 
-				                                  	ON c.jenis_dokumen_esr_id=a.jenis_dokumen_esr_id  AND 
-				                                   		c.tahun_anggaran=a.tahun_anggaran AND c.active=1
+										FROM esakip_data_mapping_jenis_dokumen_esr a 
+										JOIN esakip_menu_dokumen b 
+											ON b.id=a.esakip_menu_dokumen_id AND 
+												a.tahun_anggaran=b.tahun_anggaran AND b.active=1
+		                                JOIN esakip_data_jenis_dokumen_esr c 
+		                                  	ON c.jenis_dokumen_esr_id=a.jenis_dokumen_esr_id  AND 
+		                                   		c.tahun_anggaran=a.tahun_anggaran AND c.active=1
 				                        WHERE 
 				                            a.tahun_anggaran=%d AND
 				                            b.nama_tabel=%s;
@@ -30079,13 +30078,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										a.*
 									FROM 
 										esakip_data_mapping_jenis_dokumen_esr a 
-											JOIN esakip_menu_dokumen b 
-												ON b.id=a.esakip_menu_dokumen_id AND 
-													a.tahun_anggaran=b.tahun_anggaran AND b.active=1
-		                                    JOIN esakip_data_jenis_dokumen_esr c 
-		                                    	ON c.jenis_dokumen_esr_id=a.jenis_dokumen_esr_id  AND 
-		                                    		c.tahun_anggaran=a.tahun_anggaran AND c.active=1
-		                                    where 
+									JOIN esakip_menu_dokumen b 
+										ON b.id=a.esakip_menu_dokumen_id AND 
+											a.tahun_anggaran=b.tahun_anggaran AND b.active=1
+                                    JOIN esakip_data_jenis_dokumen_esr c 
+                                    	ON c.jenis_dokumen_esr_id=a.jenis_dokumen_esr_id  AND 
+                                    		c.tahun_anggaran=a.tahun_anggaran AND c.active=1
+                                    where 
 		                            	a.tahun_anggaran=%d and
 		                                b.nama_tabel=%s;
 								", $tahun_anggaran, $nama_tabel), ARRAY_A);
