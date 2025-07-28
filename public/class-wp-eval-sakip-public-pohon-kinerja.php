@@ -5646,14 +5646,13 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if (!empty($_POST['periode'])) {
-					$periode = $_POST['periode'];
-				} else {
+				if (empty($_POST['periode'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Jadwal RENSTRA kosong!';
 				}
 
 				if ($ret['status'] == 'success') {
+					$periode = $_POST['periode'];
 					$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
 					$unit = $wpdb->get_results(
@@ -5688,40 +5687,45 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								FROM esakip_cascading_opd_tujuan
 								WHERE active=1
 									AND id_skpd=%d
+									AND id_jadwal=%d
 									AND id_tujuan is NULL
-							", $vv['id_skpd']));
+							", $vv['id_skpd'], $periode));
 							$jumlah_sasaran = $wpdb->get_var($wpdb->prepare("
 								SELECT
 									COUNT(id)
 								FROM esakip_cascading_opd_sasaran
 								WHERE active=1
 									AND id_skpd=%d
+									AND id_jadwal=%d
 									AND id_sasaran is NULL
-							", $vv['id_skpd']));
+							", $vv['id_skpd'], $periode));
 							$jumlah_program = $wpdb->get_var($wpdb->prepare("
 								SELECT
 									COUNT(id)
 								FROM esakip_cascading_opd_program
 								WHERE active=1
 									AND id_skpd=%d
+									AND id_jadwal=%d
 									AND id_program is NULL
-							", $vv['id_skpd']));
+							", $vv['id_skpd'], $periode));
 							$jumlah_kegiatan = $wpdb->get_var($wpdb->prepare("
 								SELECT
 									COUNT(id)
 								FROM esakip_cascading_opd_kegiatan
 								WHERE active=1
 									AND id_skpd=%d
+									AND id_jadwal=%d
 									AND id_giat is NULL
-							", $vv['id_skpd']));
+							", $vv['id_skpd'], $periode));
 							$jumlah_sub_giat = $wpdb->get_var($wpdb->prepare("
 								SELECT
 									COUNT(id)
 								FROM esakip_cascading_opd_sub_giat
 								WHERE active=1
 									AND id_skpd=%d
+									AND id_jadwal=%d
 									AND id_sub_giat is NULL
-							", $vv['id_skpd']));
+							", $vv['id_skpd'], $periode));
 							$tbody .= "
 							<tr>
 								<td class='text-center'><input class='nama-opd' type='checkbox' value='" . $vv['id_skpd'] . "'></td>

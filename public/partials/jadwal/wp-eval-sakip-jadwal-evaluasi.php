@@ -104,7 +104,7 @@ if (!empty($data_jadwal)) {
 <div class="hide-display-print container mt-4 p-4 mb-4 border rounded bg-light">
 	<h4 class="font-weight-bold mb-3 text-dark">Catatan Jadwal LKE:</h4>
 	<ul class="pl-3 text-muted">
-		<li class="text-danger font-weight-bold">⚠️ Hanya <strong>satu jadwal</strong> yang dapat aktif dalam satu waktu!</li>
+		<li class="text-danger font-weight-bold">⚠️ Hanya <strong>satu jadwal</strong> yang dapat aktif dalam satu Tahun Anggaran!</li>
 		<li>Jenis jadwal secara default adalah <strong>"Usulan"</strong>. Untuk mengubahnya menjadi <strong>"Penetapan"</strong>, gunakan tombol <strong>Edit</strong>, ubah jenis jadwal, lalu simpan.</li>
 		<li>Setelah jadwal dibuat, desain pertanyaan LKE akan otomatis diset berdasarkan <strong>template yang dipilih</strong> (template dari jadwal sebelumnya di tahun yang sama atau jadwal sebelumnya yang pernah dibuat).</li>
 		<li>Jika tidak ada template yang dipilih, maka sistem akan menggunakan <strong>template default</strong> untuk desain pertanyaan.</li>

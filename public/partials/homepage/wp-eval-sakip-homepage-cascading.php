@@ -60,60 +60,58 @@ if (empty($jadwal_rpjmd['id_jadwal_wp_sipd'])) {
     }
 </style>
 
-<body>
-    <div class="mb-5 text-center hide_print">
-        <h1 class="fw-bold my-4">Cascading <br>
-            <?php echo $jadwal_rpjmd['nama_jadwal']; ?>
-            ( <?php echo $jadwal_rpjmd['tahun_anggaran'] . ' - ' . $jadwal_rpjmd['tahun_selesai_anggaran']; ?> )
-        </h1>
+<div class="mb-5 text-center hide_print">
+    <h1 class="fw-bold my-4">Cascading <br>
+        <?php echo $jadwal_rpjmd['nama_jadwal']; ?>
+        ( <?php echo $jadwal_rpjmd['tahun_anggaran'] . ' - ' . $jadwal_rpjmd['tahun_selesai_anggaran']; ?> )
+    </h1>
+</div>
+
+<div class="p-4">
+    <!-- Error Message -->
+    <?php if (!empty($error_message) && is_array($error_message)) : ?>
+        <div class="alert alert-danger mt-3 hide_print">
+            <ul class="mb-0">
+                <?php echo implode('', array_map(fn($msg) => "<li>{$msg}</li>", $error_message)); ?>
+            </ul>
+        </div>
+    <?php endif; ?>
+
+    <div class="hide_print mb-5">
+        <h2 class="text-center m-2">Cascading Pemerintah Daerah</h2>
+        <table id="tableDataPemda" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 30px;">No</th>
+                    <th class="text-center">Judul</th>
+                    <th class="text-center">Tujuan <?php echo strtoupper($jadwal_rpjmd['jenis_jadwal_khusus']); ?></th>
+                    <th class="text-center">Aksi</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
 
-    <div class="p-4">
-        <!-- Error Message -->
-        <?php if (!empty($error_message) && is_array($error_message)) : ?>
-            <div class="alert alert-danger mt-3 hide_print">
-                <ul class="mb-0">
-                    <?php echo implode('', array_map(fn($msg) => "<li>{$msg}</li>", $error_message)); ?>
-                </ul>
-            </div>
-        <?php endif; ?>
-
-        <div class="hide_print mb-5">
-            <h2 class="text-center m-2">Cascading Pemerintah Daerah</h2>
-            <table id="tableDataPemda" class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th class="text-center" style="width: 30px;">No</th>
-                        <th class="text-center">Judul</th>
-                        <th class="text-center">Tujuan <?php echo strtoupper($jadwal_rpjmd['jenis_jadwal_khusus']); ?></th>
-                        <th class="text-center">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-
-        <div id="display_chart" class="p-3 mb-4" style="display: none;">
-            <div id="cetak" title="Laporan Cascading" style="overflow: auto;">
-                <div id="chart_div"></div>
-            </div>
-        </div>
-
-        <div class="hide_print">
-            <h2 class="text-center m-2">Cascading Perangkat Daerah</h2>
-            <table id="tableDataOpd" class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th class="text-center" style="width: 30px;">No</th>
-                        <th class="text-center">Perangkat Daerah</th>
-                        <th class="text-center">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+    <div id="display_chart" class="p-3 mb-4" style="display: none;">
+        <div id="cetak" title="Laporan Cascading" style="overflow: auto;">
+            <div id="chart_div"></div>
         </div>
     </div>
-</body>
+
+    <div class="hide_print">
+        <h2 class="text-center m-2">Cascading Perangkat Daerah</h2>
+        <table id="tableDataOpd" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 30px;">No</th>
+                    <th class="text-center">Perangkat Daerah</th>
+                    <th class="text-center">Aksi</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
 
 <script>
     jQuery(document).ready(() => {
