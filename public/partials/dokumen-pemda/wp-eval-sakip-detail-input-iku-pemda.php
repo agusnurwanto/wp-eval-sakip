@@ -40,12 +40,16 @@ if(!empty($data_jadwal)){
 
     $colspan = $data_jadwal['lama_pelaksanaan'];
     $header_tahun = '<tr>';
-    for($i=$tahun_mulai_anggaran; $i<=$tahun_periode; $i++){
-        $header_tahun .= '
-            <th class="text-center atas kiri kanan bawah">'.$i.'</th>
-        ';
+    for ($i = $tahun_mulai_anggaran; $i <= $tahun_periode; $i++) {
+        $header_tahun .= '<th class="text-center atas kanan bawah kiri" colspan="2">'.$i.'</th>';
+    }
+    $header_tahun .= '</tr><tr>';
+    for ($i = $tahun_mulai_anggaran; $i <= $tahun_periode; $i++) {
+        $header_tahun .= '<th class="text-center atas kanan bawah kiri">Target</th>';
+        $header_tahun .= '<th class="text-center atas kanan bawah kiri">Realisasi</th>';
     }
     $header_tahun .= '</tr>';
+
 }
 
 $nama_jadwal = strtoupper($data_jadwal['jenis_jadwal_khusus']) . ' ' . $data_jadwal['nama_jadwal'] . ' ' . '(' . $tahun_awal . ' - ' . $tahun_akhir . ')';
@@ -520,11 +524,23 @@ $generate_page = $this->functions->generatePage(array(
                             <th rowspan="2" class="text-center atas kanan bawah kiri">Sumber Data</th>
                             <th rowspan="2" class="text-center atas kanan bawah kiri">Penanggung Jawab</th>
                             <th rowspan="2" class="text-center atas kanan bawah kiri">Satuan</th>
-                            <th colspan="<?php echo $colspan; ?>" class="text-center atas kanan bawah kiri">Target</th>
-                            <th colspan="<?php echo $colspan; ?>" class="text-center atas kanan bawah kiri">Realisasi</th>
+                            <?php
+                            // Baris tahun
+                            for ($i = $tahun_mulai_anggaran; $i <= $tahun_periode; $i++) {
+                                echo '<th class="text-center atas kanan bawah kiri" colspan="2">'.$i.'</th>';
+                            }
+                            ?>
                             <th rowspan="2" class="text-center atas kanan bawah kiri hide-excel" style="width: 150px;">Aksi</th>
                         </tr>
-                        <?php echo $header_tahun; ?>
+                        <tr>
+                            <?php
+                            // Baris Target & Realisasi
+                            for ($i = $tahun_mulai_anggaran; $i <= $tahun_periode; $i++) {
+                                echo '<th class="text-center atas kanan bawah kiri">Target</th>';
+                                echo '<th class="text-center atas kanan bawah kiri">Realisasi</th>';
+                            }
+                            ?>
+                        </tr>
                     </thead>
                     <tbody>
                     </tbody>
@@ -532,7 +548,7 @@ $generate_page = $this->functions->generatePage(array(
             </div>
             <div id="cetak" class="wrap-table">
                 <table cellpadding="2" cellspacing="0" class="table_edit_dokumen_iku table table-bordered" style="display: none;">
-                    <thead style="background: #ffc491;">
+                   <thead style="background: #ffc491;">
                         <tr>
                             <th rowspan="2" class="text-center atas kanan bawah kiri">No</th>
                             <?php if (!empty($id_jadwal_murni)): ?>
@@ -544,10 +560,22 @@ $generate_page = $this->functions->generatePage(array(
                             <th rowspan="2" class="text-center atas kanan bawah kiri">Sumber Data</th>
                             <th rowspan="2" class="text-center atas kanan bawah kiri">Penanggung Jawab</th>
                             <th rowspan="2" class="text-center atas kanan bawah kiri">Satuan</th>
-                            <th colspan="<?php echo $colspan; ?>" class="text-center atas kanan bawah kiri">Target</th>
-                            <th colspan="<?php echo $colspan; ?>" class="text-center atas kanan bawah kiri">Realisasi</th>
+                            <?php
+                            // Baris tahun
+                            for ($i = $tahun_mulai_anggaran; $i <= $tahun_periode; $i++) {
+                                echo '<th class="text-center atas kanan bawah kiri" colspan="2">'.$i.'</th>';
+                            }
+                            ?>
                         </tr>
-                        <?php echo $header_tahun; ?>
+                        <tr>
+                            <?php
+                            // Baris Target & Realisasi
+                            for ($i = $tahun_mulai_anggaran; $i <= $tahun_periode; $i++) {
+                                echo '<th class="text-center atas kanan bawah kiri">Target</th>';
+                                echo '<th class="text-center atas kanan bawah kiri">Realisasi</th>';
+                            }
+                            ?>
+                        </tr>
                     </thead>
                     <tbody>
                     </tbody>

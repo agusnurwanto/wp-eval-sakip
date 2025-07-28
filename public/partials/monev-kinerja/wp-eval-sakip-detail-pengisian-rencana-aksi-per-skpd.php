@@ -217,10 +217,11 @@ $renaksi_opd = $wpdb->get_results(
             *
         FROM esakip_data_rencana_aksi_opd
         WHERE id_skpd = %d
+          AND tahun_anggaran = %d
           AND active = 1
           AND level = 2
           AND parent IS NOT NULL
-    ", $id_skpd),
+    ", $id_skpd, $input['tahun']),
     ARRAY_A
 );
 
