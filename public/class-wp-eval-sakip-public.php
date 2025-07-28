@@ -8891,7 +8891,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							}
 							$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 								SELECT 
-										a.*
+									a.*
 								FROM 
 									esakip_data_mapping_jenis_dokumen_esr a 
 								JOIN esakip_menu_dokumen b 
@@ -32873,6 +32873,27 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 				
 		die(json_encode($ret));
+	}
+
+	function get_datatable_iku_publish_opd() 
+	{
+		// data to send in API request
+		$api_params_get_skpd = array(
+			'action' 		 => 'monitor_monev_iku',
+			'api_key'		 => get_option('_crb_apikey_wpsipd'),
+			'id_skpd'		 => $_POST['id_skpd'],
+			'id_jadwal' => $_POST['id_jadwal']
+		);
+
+		$res = wp_remote_post(
+			get_option('_crb_url_server_sakip'),
+			array(
+				'timeout' 	=> 1000,
+				'sslverify' => false,
+				'body' 		=> $api_params_get_skpd
+			)
+		);
+		die($res['body']);
 	}
 	
 	function get_rpjmd_setting_by_tahun_anggaran($tahun_anggaran) 

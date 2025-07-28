@@ -726,6 +726,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_nopriv_get_datatable_pokin_publish',  $plugin_public, 'get_datatable_pokin_publish');
 		$this->loader->add_action('wp_ajax_get_datatable_iku_publish',  $plugin_public, 'get_datatable_iku_publish');
 		$this->loader->add_action('wp_ajax_nopriv_get_datatable_iku_publish',  $plugin_public, 'get_datatable_iku_publish');
+		$this->loader->add_action('wp_ajax_get_datatable_iku_publish_opd',  $plugin_public, 'get_datatable_iku_publish_opd');
+		$this->loader->add_action('wp_ajax_nopriv_get_datatable_iku_publish_opd',  $plugin_public, 'get_datatable_iku_publish_opd');
 		
 		$this->loader->add_action('wp_ajax_get_table_laporan_rencana_aksi',  $plugin_public, 'get_table_laporan_rencana_aksi');
 		$this->loader->add_action('wp_ajax_cek_input_pagu_parent',  $plugin_public, 'cek_input_pagu_parent');

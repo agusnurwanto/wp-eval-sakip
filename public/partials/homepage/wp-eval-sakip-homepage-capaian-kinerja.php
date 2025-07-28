@@ -33,8 +33,12 @@ for($i=1; $i<=$jadwal_rpjmd['lama_pelaksanaan']; $i++){
     }
 </style>
 <div class="mb-5 text-center hide_print">
-    <h1 class="fw-bold my-4">Capaian Indikator Kinerja Utama (IKU)<br> <?php echo $jadwal_rpjmd['nama_jadwal']; ?>
-        ( <?php echo $jadwal_rpjmd['tahun_anggaran'] . ' - ' . $jadwal_rpjmd['tahun_selesai_anggaran']; ?> )
+    <h1 class="fw-bold my-4">
+        Capaian Indikator Kinerja Utama (IKU)
+        <br>
+        <?php echo $jadwal_rpjmd['nama_jadwal']; ?> ( <?php echo $jadwal_rpjmd['tahun_anggaran'] . ' - ' . $jadwal_rpjmd['tahun_selesai_anggaran']; ?> )
+        <br>
+        <?php echo get_option('_crb_nama_pemda'); ?>
     </h1>
 </div>
 <div class="p-4">
