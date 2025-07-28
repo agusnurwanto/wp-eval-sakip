@@ -4026,17 +4026,20 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							}
 						}
 
-						$html .= '<td class="text-left atas kanan bawah kiri" style="vertical-align: middle;">' . $v['label_sasaran'] . '</td>';
-						$html .= '<td class="text-left atas kanan bawah kiri" style="vertical-align: middle;">' . $indikator . '</td>';
-						$html .= '<td class="text-left atas kanan bawah kiri" style="vertical-align: middle;">' . wp_kses_post($v['formulasi']) . '</td>';
-						$html .= '<td class="text-left atas kanan bawah kiri" style="vertical-align: middle;">' . $v['sumber_data'] . '</td>';
-						$html .= '<td class="text-left atas kanan bawah kiri" style="vertical-align: middle;">' . $v['penanggung_jawab'] . '</td>';
-						$html .= '<td class="text-left atas kanan bawah kiri" style="vertical-align: middle;">' . $v['satuan'] . '</td>';
+						$html .= '<td class="text-left atas kanan bawah kiri">' . $v['label_sasaran'] . '</td>';
+						$html .= '<td class="text-left atas kanan bawah kiri">' . $indikator . '</td>';
+						$html .= '<td class="text-left atas kanan bawah kiri">' . wp_kses_post($v['formulasi']) . '</td>';
+						$html .= '<td class="text-left atas kanan bawah kiri">' . $v['sumber_data'] . '</td>';
+						$html .= '<td class="text-left atas kanan bawah kiri">' . $v['penanggung_jawab'] . '</td>';
+						$html .= '<td class="text-left atas kanan bawah kiri">' . $v['satuan'] . '</td>';
 
 						for ($i = 1; $i <= $lama_pelaksanaan; $i++) {
-							$key = 'target_' . $i;
-							$target = !empty($v[$key]) ? $v[$key] : 0;
-							$html .= '<td class="text-center atas kanan bawah kiri" style="vertical-align: middle;">' . $target . '</td>';
+							$key_target = 'target_' . $i;
+							$key_realisasi = 'realisasi_' . $i;
+							$target = !empty($v[$key_target]) ? $v[$key_target] : 0;
+							$realisasi = !empty($v[$key_realisasi]) ? $v[$key_realisasi] : 0;
+							$html .= '<td class="text-center atas kanan bawah kiri">' . $target . '</td>';
+							$html .= '<td class="text-center atas kanan bawah kiri">' . $realisasi . '</td>';
 						}
 
 						$btn = '<div class="btn-action-group">';
@@ -4044,7 +4047,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_iku(\'' . $v['id'] . '\'); return false;" title="Hapus IKU"><span class="dashicons dashicons-trash"></span></button>';
 						$btn .= '</div>';
 
-						$html .= "<td class='text-center atas kanan bawah kiri hide-excel' style='vertical-align: middle;'>" . $btn . "</td>";
+						$html .= "<td class='text-center atas kanan bawah kiri hide-excel'>" . $btn . "</td>";
 						$html .= '</tr>';
 					}
 				}
@@ -4122,6 +4125,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'target_3' => $_POST['target_3'],
 						'target_4' => $_POST['target_4'],
 						'target_5' => $_POST['target_5'],
+						'realisasi_1' => $_POST['realisasi_1'],
+						'realisasi_2' => $_POST['realisasi_2'],
+						'realisasi_3' => $_POST['realisasi_3'],
+						'realisasi_4' => $_POST['realisasi_4'],
+						'realisasi_5' => $_POST['realisasi_5'],
 						'id_sasaran_murni' => $_POST['id_sasaran_murni'],
 						'active' => 1,
 						'updated_at' => current_time('mysql'),
@@ -8401,6 +8409,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							'target_3' => $data['target_3'],
 							'target_4' => $data['target_4'],
 							'target_5' => $data['target_5'],
+							'realisasi_1' => $data['realisasi_1'],
+							'realisasi_2' => $data['realisasi_2'],
+							'realisasi_3' => $data['realisasi_3'],
+							'realisasi_4' => $data['realisasi_4'],
+							'realisasi_5' => $data['realisasi_5'],
 							'active'           => 1,
 						));
 					}
@@ -8542,7 +8555,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						foreach ($data_finalisasi_iku_pemda as $v) {
 							$no++;
 							$html .= '<tr>';
-							$html .= '<td class="atas kanan bawah kiri">' . $no . '</td>';
+							$html .= '<td style="border:1px solid black;">' . $no . '</td>';
 
 							if (!empty($id_jadwal_murni)) {
 								$id_sasaran = $v['id_sasaran_murni'];
@@ -8556,25 +8569,28 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 									$sasaran_teks = $sasaran_existing ? $sasaran_existing['sasaran_teks'] : '-';
 									$rowspan = $group[$id_sasaran];
-									$html .= '<td class="text-left atas kanan bawah kiri" rowspan="' . $rowspan . '" style="vertical-align: middle;">' . $sasaran_teks . '</td>';
+									$html .= '<td style="border:1px solid black;" rowspan="' . $rowspan . '">' . $sasaran_teks . '</td>';
 
 									$id_sasaran_murni[] = $id_sasaran;
 								} elseif ($id_sasaran == 0) {
-									$html .= '<td class="text-left atas kanan bawah kiri">-</td>';
+									$html .= '<td style="border:1px solid black;">-</td>';
 								}
 							}
 
-							$html .= '<td class="text-left atas kanan bawah kiri" style="vertical-align: middle;">' . $v['label_sasaran'] . '</td>';
-							$html .= '<td class="text-left atas kanan bawah kiri" style="vertical-align: middle;">' . $v['label_indikator'] . '</td>';
-							$html .= '<td class="text-left atas kanan bawah kiri" style="vertical-align: middle;">' . wp_kses_post($v['formulasi']) . '</td>';
-							$html .= '<td class="text-left atas kanan bawah kiri" style="vertical-align: middle;">' . $v['sumber_data'] . '</td>';
-							$html .= '<td class="text-left atas kanan bawah kiri" style="vertical-align: middle;">' . $v['penanggung_jawab'] . '</td>';
-							$html .= '<td class="text-left atas kanan bawah kiri" style="vertical-align: middle;">' . $v['satuan'] . '</td>';
+							$html .= '<td style="border:1px solid black;">' . $v['label_sasaran'] . '</td>';
+							$html .= '<td style="border:1px solid black;">' . $v['label_indikator'] . '</td>';
+							$html .= '<td style="border:1px solid black;">' . wp_kses_post($v['formulasi']) . '</td>';
+							$html .= '<td style="border:1px solid black;">' . $v['sumber_data'] . '</td>';
+							$html .= '<td style="border:1px solid black;">' . $v['penanggung_jawab'] . '</td>';
+							$html .= '<td style="border:1px solid black;">' . $v['satuan'] . '</td>';
 
 							for ($i = 1; $i <= $lama_pelaksanaan; $i++) {
-								$key = 'target_' . $i;
-								$target = !empty($v[$key]) ? $v[$key] : 0;
-								$html .= '<td class="text-center atas kanan bawah kiri" style="vertical-align: middle;">' . $target . '</td>';
+								$key_target = 'target_' . $i;
+								$target = !empty($v[$key_target]) ? $v[$key_target] : 0;
+								$key_realisasi = 'realisasi_' . $i;
+								$realisasi = !empty($v[$key_realisasi]) ? $v[$key_realisasi] : 0;
+								$html .= '<td style="border:1px solid black;">' . $target . '</td>';
+								$html .= '<td style="border:1px solid black;">' . $realisasi . '</td>';
 							}
 
 							$html .= '</tr>';
