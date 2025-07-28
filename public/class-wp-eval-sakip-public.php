@@ -33851,4 +33851,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 		wp_die();
 	}
+
+	function batasi_upload_gambar($mimes){
+		$current_user = wp_get_current_user();
+		if (
+			in_array('administrator', $current_user->roles)
+			|| in_array('admin_bappeda', $current_user->roles)
+			|| in_array('admin_ortala', $current_user->roles)
+			|| in_array('admin_inspektor', $current_user->roles)
+		) {
+		    return $mimes;
+		} else {
+		    return [
+		        'jpg|jpe|jpeg' => 'image/jpeg',
+		        'png'      => 'image/png',
+		    ];
+		}
+	}
 }
