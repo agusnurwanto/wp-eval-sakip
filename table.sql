@@ -2254,6 +2254,7 @@ CREATE TABLE esakip_kuesioner_menpan (
   `id` int(11) NOT NULL auto_increment,
   `nama_kuesioner` text DEFAULT NULL,
   `bobot` float DEFAULT NULL,
+  `tipe_soal` tinyint(4) DEFAULT NULL COMMENT '0 Esai, 1 pilihan ganda',
   `nomor_urut` DECIMAL(10,2) NOT NULL,
   `create_at` datetime DEFAULT current_timestamp(),
   `update_at` datetime DEFAULT current_timestamp(),
@@ -2267,32 +2268,34 @@ CREATE TABLE esakip_kuesioner_menpan (
 CREATE TABLE esakip_kuesioner_menpan_detail (
   `id` int(11) NOT NULL auto_increment,
   `id_kuesioner` int(11) DEFAULT NULL,
+  `id_unik` varchar(255) DEFAULT NULL,
   `nomor_urut` DECIMAL(10,2) NOT NULL,
   `pertanyaan` text DEFAULT NULL,
   `jawaban` text DEFAULT NULL,
   `bobot` float DEFAULT NULL,
-  `tipe_soal` varchar(255) DEFAULT NULL COMMENT '0 Esai, 1 pilihan ganda',
   `tipe_jawaban` varchar(255) DEFAULT NULL COMMENT '1 STS, 2 TS, 3 S, 4 SS, 5 Esai',
   `penjelasan` text DEFAULT NULL,
   `tahun_anggaran` year(4) DEFAULT null,
   `active` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY  (`id`),
-  KEY `id_kuesioner` (`id_kuesioner`),
+  KEY `id_kuesioner` (`id_kuesioner`)
   KEY `tahun_anggaran` (`tahun_anggaran`),
   KEY `active` (`active`)
 );
 
 CREATE TABLE esakip_penilaian_kuesioner_menpan (
   `id` int(11) NOT NULL auto_increment,
-  `id_kuesioner` int(11) DEFAULT NULL,
-  `jawaban` text DEFAULT NULL,
-  `tipe` varchar(255) DEFAULT NULL COMMENT '1 STS, 2 TS, 3 S, 4 SS, 5 Esai',
+  `id_detail` int(11) DEFAULT NULL,
   `id_skpd` int(11) DEFAULT NULL,
-  `tahun_anggaran` year(4) DEFAULT null,
-  `active` tinyint(4) NOT NULL DEFAULT '1',
-  PRIMARY KEY  (`id`),
-  KEY `id_kuesioner` (`id_kuesioner`),
-  KEY `id_skpd` (`id_skpd`),
+  `nilai` float DEFAULT NULL,
+  `jawaban` text DEFAULT NULL,
+  `tipe_jawaban` int(11) DEFAULT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp,
+  `updated_at` datetime DEFAULT current_timestamp,
+  `active` tinyint(4) DEFAULT 1,
+  PRIMARY KEY(id),
+  KEY `id_detail` (`id_detail`),
   KEY `tahun_anggaran` (`tahun_anggaran`),
   KEY `active` (`active`)
 );

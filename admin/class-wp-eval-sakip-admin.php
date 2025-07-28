@@ -3904,7 +3904,8 @@ class Wp_Eval_Sakip_Admin
 				add_role($user['jabatan'], $user['jabatan'], array(
 					'read' => true,
 					'edit_posts' => false,
-					'delete_posts' => false
+					'delete_posts' => false,
+					'upload_files' => true
 				));
 			}
 			$insert_user = username_exists($username);

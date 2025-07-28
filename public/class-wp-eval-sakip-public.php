@@ -22221,6 +22221,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$lhe_akip_internal_skpd_detail = '';
 					$tl_lhe_akip_internal_skpd_detail = '';
 					$laporan_monev_renaksi_skpd_detail = '';
+					$pengisian_kuesioner_menpan_detail = '';
 					$periode_iku_skpd = '';
 	
 					$cek_menu_aktif = $wpdb->get_results($wpdb->prepare("
@@ -22757,7 +22758,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$laporan_monev_renaksi_skpd_detail .= '<li><a href="' . $laporan_monev_renaksi_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $title_laporan_monev_renaksi_skpd . '</a></li>';
 						$cek_data_pelaporan['perangkat_daerah']['Laporan Monev Renaksi']['link'] = $laporan_monev_renaksi_skpd_detail;
 					}
-	
+					
+					$pengisian_kuesioner_menpan = $this->functions->generatePage(array(
+						'nama_page' => 'Halaman Kuesioner Menpan OPD' . $_GET['tahun'],
+						'content' => '[kuesioner_menpan id_jadwal tahun=' . $_GET['tahun'] . ']',
+						'show_header' => 1,
+						'post_status' => 'private'
+					));
+
+					$title_pengisian_kuesioner_menpan = 'Kuesioner Menpan';
+					$pengisian_kuesioner_menpan['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+					$pengisian_kuesioner_menpan_detail .= '<li><a href="' . $pengisian_kuesioner_menpan['url'] . '" target="_blank" class="btn btn-primary">' .  $title_pengisian_kuesioner_menpan . '</a></li>';
+
 					if (!empty($cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']) && $cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']['active'] == 1) {
 						$halaman_sakip_pokin_opd = '
 								<div class="accordion">
@@ -22897,6 +22909,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						<div class="esakip-body-tahun" data-id="halaman-sakip-evaluasi-skpd-' . $skpd_db['id_skpd'] . '">
 							<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
 							$halaman_evaluasi_skpd .= $halaman_lke_per_skpd;
+							if (
+								in_array("PA", $user_meta->roles) ||
+								in_array("pa", $user_meta->roles)
+							) {
+								$halaman_evaluasi_skpd .= $pengisian_kuesioner_menpan_detail;
+							}
 							$halaman_evaluasi_skpd .= $dokumen_evaluasi;
 							$set_html_opd_evaluasi = get_option('sakip_menu_khusus_set_html_opd_EVALUASI_' . $_GET['tahun']);
 							if (!empty($set_html_opd_evaluasi)) {

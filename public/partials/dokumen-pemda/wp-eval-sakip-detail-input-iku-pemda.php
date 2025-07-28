@@ -521,6 +521,7 @@ $generate_page = $this->functions->generatePage(array(
                             <th rowspan="2" class="text-center atas kanan bawah kiri">Penanggung Jawab</th>
                             <th rowspan="2" class="text-center atas kanan bawah kiri">Satuan</th>
                             <th colspan="<?php echo $colspan; ?>" class="text-center atas kanan bawah kiri">Target</th>
+                            <th colspan="<?php echo $colspan; ?>" class="text-center atas kanan bawah kiri">Realisasi</th>
                             <th rowspan="2" class="text-center atas kanan bawah kiri hide-excel" style="width: 150px;">Aksi</th>
                         </tr>
                         <?php echo $header_tahun; ?>
@@ -544,6 +545,7 @@ $generate_page = $this->functions->generatePage(array(
                             <th rowspan="2" class="text-center atas kanan bawah kiri">Penanggung Jawab</th>
                             <th rowspan="2" class="text-center atas kanan bawah kiri">Satuan</th>
                             <th colspan="<?php echo $colspan; ?>" class="text-center atas kanan bawah kiri">Target</th>
+                            <th colspan="<?php echo $colspan; ?>" class="text-center atas kanan bawah kiri">Realisasi</th>
                         </tr>
                         <?php echo $header_tahun; ?>
                     </thead>

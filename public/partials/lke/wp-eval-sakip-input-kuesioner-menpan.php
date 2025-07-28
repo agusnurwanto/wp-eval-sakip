@@ -100,11 +100,24 @@ foreach ($idtahun as $val) {
                             <input type="text" class="form-control" id="namaKuesioner" name="namaKuesioner" required>
                         </div>
                     </div>
+
                     <div class="form-row">
-                        <div class="form-group col-md-12">
+                        <div class="form-group col-md-6">
+                            <label for="tipeJawaban">Tipe Jawaban</label>
+                            <select class="form-control" id="tipeJawaban" name="tipeJawaban" required>
+                                <option value="">-- Pilih Tipe Jawaban --</option>
+                                <option value="0">Esai</option>
+                                <option value="1">Pilihan Ganda</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
                             <label for="nomorUrutKuesioner">Nomor Urut</label>
                             <input type="number" class="form-control" id="nomorUrutKuesioner" name="nomorUrutKuesioner">
                         </div>
+                    </div>
+                    <div class="form-group" id="tabel_bobot_esai" style="display: none;">
+                        <label for="bobot_esai">Bobot</label>
+                        <input type="number" class="form-control" id="bobot_esai" name="bobot_esai">
                     </div>
                 </form>
             </div>
@@ -130,6 +143,7 @@ foreach ($idtahun as $val) {
                 <form id="formTambahPertanyaan">
                     <input type="hidden" value="" id="idKuesionerPertanyaan">
                     <input type="hidden" value="" id="idKuesionerPertanyaanDetail">
+                    <input type="hidden" value="" id="id_unik">
 
                     <div class="form-group">
                         <div class="alert alert-info text-sm-left" role="alert" id="alertKuesionerPertanyaan"></div>
@@ -137,24 +151,13 @@ foreach ($idtahun as $val) {
 
                     <div class="form-group">
                         <label for="namaPertanyaan">Nama Kuesioner Pertanyaan</label>
-                        <input type="text" class="form-control" id="namaPertanyaan" name="namaPertanyaan" required>
+                        <textarea class="form-control" id="namaPertanyaan" name="namaPertanyaan" required></textarea>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="tipeJawaban">Tipe Jawaban</label>
-                            <select class="form-control" id="tipeJawaban" name="tipeJawaban" required>
-                                <option value="">-- Pilih Tipe Jawaban --</option>
-                                <option value="0">Esai</option>
-                                <option value="1">Pilihan Ganda</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="nomorUrutPertanyaan">Nomor Urut</label>
-                            <input type="number" class="form-control" id="nomorUrutPertanyaan" name="nomorUrutPertanyaan">
-                        </div>
+                    <div class="form-group">
+                        <label for="nomorUrutPertanyaan">Nomor Urut</label>
+                        <input type="number" class="form-control" id="nomorUrutPertanyaan" name="nomorUrutPertanyaan">
                     </div>
-
                    <div class="form-group" id="tabel_daftar_jawaban" style="display: none;">
                         <label>Daftar Jawaban</label>
                         <table class="table table-bordered">
@@ -187,11 +190,6 @@ foreach ($idtahun as $val) {
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
-
-                    <div class="form-group" id="tabel_bobot_esai">
-                        <label for="bobot_esai">Bobot</label>
-                        <textarea class="form-control" id="bobot_esai" name="bobot_esai" required></textarea>
                     </div>
 
                     <div class="form-group">
@@ -229,13 +227,13 @@ foreach ($idtahun as $val) {
 
         jQuery('#tipeJawaban').on('change', function () {
             const val = jQuery(this).val();
-            jQuery('#tabel_daftar_jawaban').hide();
             jQuery('#tabel_bobot_esai').show();
             jQuery('#daftar_jawaban tbody').empty();
+            jQuery('#tabel_daftar_jawaban').show();
 
             if (val === '1') {
                 jQuery('#tabel_bobot_esai').hide();
-                jQuery('#tabel_daftar_jawaban').show();
+                jQuery('#tabel_daftar_jawaban').hide();
             }
         });
     })
@@ -263,6 +261,7 @@ foreach ($idtahun as $val) {
         jQuery("#modal").find('.modal-dialog').css('maxWidth','700');
         jQuery("#modal").modal('show');
     }
+
     function submitCopyData() {
         if (!confirm('Apakah anda yakin akan copy data Kuesioner Menpan? \nData yang sudah ada akan ditimpa oleh data baru hasil copy data!')) {
             return;
@@ -310,6 +309,7 @@ foreach ($idtahun as $val) {
             });
         });
     }
+
     function generate_data() {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
@@ -361,23 +361,34 @@ foreach ($idtahun as $val) {
             }
         });
     }
+
     function tambah_kuesioner() {
         jQuery('#tambahKuesionerModalLabel').hide();
         jQuery('#editKuesionerModalLabel').show();
         jQuery('#defaultTextInfoKuesioner').hide();
         jQuery("#idKuesioner").val('');
         jQuery("#namaKuesioner").val('');
+        jQuery("#tipeJawaban").val('');
+        jQuery("#bobot_esai").val('');
         jQuery('#nomorUrutKuesioner').val('');
         jQuery('#nomorUrutKuesioner').val(parseFloat(0.00 + 1.00).toFixed(2));
         jQuery('#tambahKuesionerModal').modal('show');
     }
+
     function submit_kuesioner() {
         let id_kuesioner = jQuery("#idKuesioner").val();
         let namaKuesioner = jQuery("#namaKuesioner").val();
         if (namaKuesioner == '') {
             return alert('Nama Kuesioner tidak boleh kosong');
         }
-
+        let tipe = jQuery("#tipeJawaban").val();
+        if (tipe == '') {
+            return alert('Tipe jawaban harus dipilih');
+        }
+        let bobot_esai = jQuery("#bobot_esai").val();
+        if (tipe === '0' && bobot_esai.trim() === '') {
+            return alert('Bobot Esai tidak boleh kosong');
+        }
         let nomorUrutKuesioner = jQuery("#nomorUrutKuesioner").val();
         if (nomorUrutKuesioner == '') {
             return alert('Nomor Urut Kuesioner tidak boleh kosong');
@@ -392,6 +403,8 @@ foreach ($idtahun as $val) {
                 id: id_kuesioner,
                 tahun_anggaran: <?php echo $input['tahun']; ?>, 
                 nama_kuesioner: namaKuesioner,
+                tipe_jawaban: tipe,
+                bobot: bobot_esai,
                 nomor_urut: nomorUrutKuesioner
             },
             dataType: 'json',
@@ -413,6 +426,7 @@ foreach ($idtahun as $val) {
             }
         });
     }
+
     function edit_data_kuesioner_menpan(id) {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
@@ -435,7 +449,8 @@ foreach ($idtahun as $val) {
                     jQuery('#defaultTextInfoKuesioner').hide();
                     jQuery("#idKuesioner").val(data.id);
                     jQuery("#namaKuesioner").val(data.nama_kuesioner);
-                    jQuery("#bobotKuesioner").val(data.bobot);
+                    jQuery('#tipeJawaban').val(data.tipe_soal).trigger('change');
+                    jQuery("#bobot_esai").val(data.bobot);
                     jQuery('#nomorUrutKuesioner').val(data.nomor_urut);
                     jQuery('#tambahKuesionerModal').modal('show');
                 } else {
@@ -449,6 +464,7 @@ foreach ($idtahun as $val) {
             }
         });
     }
+
     function hapus_data_kuesioner_menpan(id) {
         if (!confirm('Apakah Anda yakin ingin menghapus Kuesioner ini?')) {
             return;
@@ -480,6 +496,7 @@ foreach ($idtahun as $val) {
             }
         });
     }
+
     function tambah_pertanyaan_kuesioner_menpan(id) {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
@@ -493,26 +510,35 @@ foreach ($idtahun as $val) {
             dataType: "json",
             success: function(response) {
                 let data = response.data;
+                let data_kuesioner = response.data_kuesioner;
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
                     jQuery('#idKuesionerPertanyaanDetail').val(id);
                     jQuery('#idKuesionerPertanyaan').val('');
+                    jQuery('#id_unik').val('');
                     jQuery('#tambahPertanyaanModalLabel').show();
                     jQuery('#editPertanyaanModalLabel').hide();
-                    jQuery('#alertKuesionerPertanyaan').text('Nama Kuesioner = ' + data.kuesioner.nama_kuesioner);
+                    jQuery('#alertKuesionerPertanyaan').text('Nama Kuesioner = ' + data_kuesioner.nama_kuesioner);
                     jQuery('#namaPertanyaan').val('');
                     jQuery('#penjelasan').val('');
-                    jQuery('#nomorUrutPertanyaan').val(parseFloat(data.default_urutan) + 1.00);
-                    jQuery('#tipeJawaban').val('').trigger('change'); 
-                    jQuery('input[name="jawaban_sts"]').val('');
-                    jQuery('input[name="bobot_sts"]').val('');
-                    jQuery('input[name="jawaban_ts"]').val('');
-                    jQuery('input[name="bobot_ts"]').val('');
-                    jQuery('input[name="jawaban_s"]').val('');
-                    jQuery('input[name="bobot_s"]').val('');
-                    jQuery('input[name="jawaban_ss"]').val('');
-                    jQuery('input[name="bobot_ss"]').val('');
-                    jQuery('#bobot_esai').val(''); 
+                    jQuery('#tipeJawaban').val(data_kuesioner.tipe_soal);
+                    jQuery('#nomorUrutPertanyaan').val('');
+                    if (data_kuesioner.tipe_soal == 0) {
+                        jQuery('#tabel_daftar_jawaban').hide();
+                        jQuery('#tabel_bobot_esai').show();
+                        jQuery('#bobot_esai').val('');
+                    } else {
+                        jQuery('#tabel_daftar_jawaban').show();
+                        jQuery('#tabel_bobot_esai').hide();
+                        jQuery('input[name="jawaban_sts"]').val('');
+                        jQuery('input[name="bobot_sts"]').val('');
+                        jQuery('input[name="jawaban_ts"]').val('');
+                        jQuery('input[name="bobot_ts"]').val('');
+                        jQuery('input[name="jawaban_s"]').val('');
+                        jQuery('input[name="bobot_s"]').val('');
+                        jQuery('input[name="jawaban_ss"]').val('');
+                        jQuery('input[name="bobot_ss"]').val('');
+                    }
                 } else {
                     console.error('Error:', response.message);
                 }
@@ -526,17 +552,13 @@ foreach ($idtahun as $val) {
     }
 
     function submit_kuesioner_pertanyaan_menpan() {
+        var id_unik = jQuery('#id_unik').val();
         var tipe = jQuery('#tipeJawaban').val();
         var nama = jQuery('#namaPertanyaan').val().trim();
         var penjelasan = jQuery('#penjelasan').val().trim();
         var nomor_urut = jQuery('#nomorUrutPertanyaan').val().trim();
         var id_detail = jQuery('#idKuesionerPertanyaanDetail').val();
         var id_pertanyaan = jQuery('#idKuesionerPertanyaan').val();
-        var bobot_esai = jQuery('#bobot_esai').val();
-
-        if (tipe == '') {
-            return alert('Tipe jawaban harus diisi');
-        }
         if (nama == '') {
             return alert('Nama pertanyaan harus diisi');
         }
@@ -548,9 +570,6 @@ foreach ($idtahun as $val) {
             // Esai
             if (penjelasan == '') {
                 return alert('Penjelasan harus diisi untuk esai');
-            }
-            if (bobot_esai == '') {
-                return alert('Bobot harus diisi untuk esai');
             }
         }
 
@@ -569,25 +588,31 @@ foreach ($idtahun as $val) {
                 let jawaban = jQuery(`input[name="jawaban_${item.label.toLowerCase()}"]`).val().trim();
                 let bobot = jQuery(`input[name="bobot_${item.label.toLowerCase()}"]`).val().trim();
 
-                if (!jawaban || !bobot) {
+                if (!jawaban) {
                     valid = false;
-                } else {
-                    daftar_jawaban.push({
-                        jawaban: `${jawaban}`,
-                        bobot: parseFloat(bobot),
-                        tipe_jawaban: item.tipe_jawaban
-                    });
+                    return alert(`Label ${item.label} kosong`);
                 }
+                if (!bobot) {
+                    valid = false;
+                    return alert(`Bobot label ${item.label} kosong`);
+                }
+
+                daftar_jawaban.push({
+                    jawaban: `${jawaban}`,
+                    bobot: parseFloat(bobot),
+                    tipe_jawaban: item.tipe_jawaban
+                });
             });
 
             if (penjelasan == '') {
                 return alert('Penjelasan harus diisi untuk pilihan ganda');
             }
 
-            if (valid == '') {
-                return alert('Semua input jawaban dan bobot untuk pilihan ganda harus diisi');
+            if (!valid) {
+                return; 
             }
         }
+
 
         if (confirm('Apakah anda yakin untuk menyimpan data ini?')) {
             jQuery('#wrap-loading').show();
@@ -600,11 +625,11 @@ foreach ($idtahun as $val) {
                     tahun_anggaran: <?php echo $input['tahun']; ?>,
                     id_detail,
                     id_pertanyaan,
+                    id_unik: id_unik,
                     tipe_jawaban: tipe,
                     nama_pertanyaan: nama,
                     penjelasan,
                     nomor_urut,
-                    bobot_esai,
                     daftar_jawaban
                 },
                 dataType: "json",
@@ -655,9 +680,10 @@ foreach ($idtahun as $val) {
                     jQuery('#nomorUrutPertanyaan').val(data.nomor_urut);
                     jQuery('#penjelasan').val(data.penjelasan);
                     jQuery('#bobot_esai').val(data.bobot);
-                    jQuery('#tipeJawaban').val(data.tipe_soal).trigger('change');
+                    jQuery('#id_unik').val(data.id_unik);
+                    jQuery('#tipeJawaban').val(kuesioner.tipe_soal).trigger('change');
 
-                    if (data.tipe_soal == '1') {
+                    if (kuesioner.tipe_soal == '1') {
                         jQuery('#tabel_daftar_jawaban').show();
 
                         let map = res.jawaban_map || {};
