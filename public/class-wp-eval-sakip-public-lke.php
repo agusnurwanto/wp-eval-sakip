@@ -3727,7 +3727,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 		}
 		die(json_encode($ret));
 	}
-	
+
 	public function get_kuesioner_mendagri_by_id()
 	{
 		global $wpdb;
@@ -4775,16 +4775,17 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				        SELECT 
 				        	id 
 				        FROM esakip_penilaian_kuesioner_menpan 
-				        WHERE id_detail = %d 
+				        WHERE id_unik = %d 
 				        	AND id_skpd = %d 
 				        	AND tahun_anggaran = %d
-				    ", $id_detail, $id_skpd, $tahun));
+				    ", $id_unik, $id_skpd, $tahun));
 
 				    if ($cek_id) {
 				        $wpdb->update('esakip_penilaian_kuesioner_menpan', [
 				            'jawaban' => $isi_jawaban,
 				            'nilai' => $nilai,
-				            'id_unik' => $id_unik
+				            'id_unik' => $id_unik,
+				            'id_detail' => $id_detail
 				        ], [
 				            'id' => $cek_id
 				        ]);

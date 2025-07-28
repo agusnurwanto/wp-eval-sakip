@@ -48,9 +48,11 @@ $nama_pemda = get_option(ESAKIP_NAMA_PEMDA);
 
 $data_kuesioner = $wpdb->get_results(
     $wpdb->prepare("
-        SELECT * 
+        SELECT 
+            * 
         FROM esakip_kuesioner_menpan
-        WHERE tahun_anggaran = %d AND active = 1
+        WHERE tahun_anggaran = %d 
+            AND active = 1
         ORDER BY nomor_urut ASC
     ", $input['tahun']),
     ARRAY_A
@@ -76,14 +78,11 @@ foreach ($data_kuesioner as $kuesioner) {
     $html .= '<h3><strong>' . $kuesioner['nama_kuesioner'] . '</strong></h3>';
 
     $detail_all = $wpdb->get_results($wpdb->prepare("
-        SELECT 
-            * 
+        SELECT * 
         FROM esakip_kuesioner_menpan_detail
-        WHERE id_kuesioner = %d 
-            AND active = 1
+        WHERE id_kuesioner = %d AND active = 1
         ORDER BY nomor_urut ASC, tipe_jawaban ASC
-        ", $kuesioner['id']),
-    ARRAY_A);
+    ", $kuesioner['id']), ARRAY_A);
 
     $pertanyaan_group = [];
     foreach ($detail_all as $detail) {
@@ -102,20 +101,16 @@ foreach ($data_kuesioner as $kuesioner) {
                 <th colspan="2" class="text-center">Hasil Akhir</th>
             </tr>
             <tr>
-                <th></th>
-                <th></th>
+                <th></th><th></th>
                 <th style="width:80px;">Jawaban</th>
                 <th style="width:60px;">Skor</th>
                 <th style="width:100px;">Jawaban</th>
                 <th style="width:60px;">Skor</th>';
     } else {
-        $html .= '<th class="text-center">Hasil Awal</th>';
-        $html .= '<th class="text-center">Hasil Akhir</th>';
+        $html .= '<th class="text-center">Hasil Awal</th><th class="text-center">Hasil Akhir</th>';
     }
 
-    $html .= '</tr>
-        </thead>
-        <tbody>';
+    $html .= '</tr></thead><tbody>';
 
     $total_nilai_awal = 0;
     $no = 1;
@@ -128,10 +123,7 @@ foreach ($data_kuesioner as $kuesioner) {
         foreach ($group as $detail) {
             $data_penilaian = $wpdb->get_row(
                 $wpdb->prepare("
-                    SELECT 
-                        id_detail,
-                        jawaban, 
-                        nilai
+                    SELECT id_detail, jawaban, nilai
                     FROM esakip_penilaian_kuesioner_menpan
                     WHERE tahun_anggaran = %d
                       AND id_skpd = %d
@@ -174,32 +166,66 @@ foreach ($data_kuesioner as $kuesioner) {
             <td class="text-center">BELUM DINILAI</td>
             <td class="text-center">0</td>';
         } else {
-            $html .= '<td>' . $jawaban_dipilih . '</td>';
-            $html .= '<td></td>';
+            $html .= '<td>' . $jawaban_dipilih . '</td><td></td>';
         }
 
         $html .= '</tr>';
     }
 
     if ($kuesioner['tipe_soal'] == 1) {
+        $nilai_format = number_format($total_nilai_awal, 3);
+        $explode = explode('.', $nilai_format);
+        $desimal = isset($explode[1]) ? $explode[1] : '000';
+
+        $nilai_bulat = $nilai_format;
+        if (isset($desimal[2]) && $desimal[2] == '0') {
+            $nilai_bulat = number_format(round($total_nilai_awal), 3);
+        }
+
+        // Dapatkan total bobot
+        $get_total_bobot_kuesioner_detail = $wpdb->get_var(
+            $wpdb->prepare("
+                SELECT 
+                    SUM(bobot)
+                FROM esakip_kuesioner_menpan_detail
+                WHERE id_kuesioner = %d
+                  AND active = 1
+                  AND tipe_jawaban = 1
+            ", $kuesioner['id'])
+        );
+
+        if ($get_total_bobot_kuesioner_detail !== null) {
+            if ($get_total_bobot_kuesioner_detail >= 500 && $get_total_bobot_kuesioner_detail < 600) {
+                $total_bobot_kuesioner_detail = 500;
+            } elseif ($get_total_bobot_kuesioner_detail < 100) {
+                $total_bobot_kuesioner_detail = round($get_total_bobot_kuesioner_detail * 2) / 2;
+            } else {
+                $total_bobot_kuesioner_detail = round($get_total_bobot_kuesioner_detail);
+            }
+        } else {
+            $total_bobot_kuesioner_detail = 1; // fallback untuk hindari div 0
+        }
+
+        // Hitung nilai untuk chart
+        $persentase = ($total_bobot_kuesioner_detail != 0) 
+            ? round(($nilai_bulat / $total_bobot_kuesioner_detail) * 100, 2)
+            : 0;
+
         $html .= '<tr>
             <td class="text-center" colspan="6"><strong>
-                Nilai ' . $kuesioner['nama_kuesioner'] . ' ' . number_format($total_nilai_awal, 3) . '<br> 
+                Nilai ' . $kuesioner['nama_kuesioner'] . ' ' . $nilai_bulat . '<br>
                 Nilai Akhir ' . $kuesioner['nama_kuesioner'] . ' 0.000</strong>
             </td>
         </tr>';
+
+        $chart_labels[] = $kuesioner['nama_kuesioner'] . ' ' . $persentase;
+        $chart_values[] = $persentase;
     }
 
     $html .= '</tbody></table>';
-
-    if ($kuesioner['tipe_soal'] == 1) {
-        $chart_labels[] = $kuesioner['nama_kuesioner'] . ' ' . round($total_nilai_awal, 2);
-        $chart_values[] = round($total_nilai_awal, 2);
-    }
 }
 
 $html .= '</div></form></div>';
-
 
 $html .= '
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -465,6 +491,7 @@ if(!empty($_GET['laporan'])){
                 success: function (response) {
                     jQuery('#wrap-loading').hide();
                     alert(response.message);
+                    location.reload();
                 },
                 error: function (xhr) {
                     jQuery('#wrap-loading').hide();

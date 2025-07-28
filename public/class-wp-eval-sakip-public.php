@@ -266,7 +266,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-rkpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-rkpd-pemda.php';
 	}
 
 	public function lkjip_lppd($atts)
@@ -7909,7 +7909,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$rkpds = $wpdb->get_results(
 					$wpdb->prepare("
 						SELECT * 
-						FROM esakip_rkpd
+						FROM esakip_rkpd_pemda
 						WHERE tahun_anggaran = %d 
 						  AND active = 1
 					", $tahun_anggaran),
@@ -8822,7 +8822,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 
 				$tipe_dokumen = $_POST['tipe_dokumen'];
-
+				$tahun_anggaran = $_POST['tahun_anggaran'];
 				if ($ret['status'] == 'success') {
 					// untuk mengatur tabel sesuai tipe dokumen
 					$nama_tabel_admin = array(
@@ -8867,7 +8867,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							ARRAY_A
 						);
 					}
-
 					if (!empty($datas)) {
 						$counter = 1;
 						$tbody = '';
@@ -8875,7 +8874,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$mapping_jenis_dokumen_esr = [];
 						$status_api_esr = get_option('_crb_api_esr_status');
 						if ($status_api_esr) {
+							if (!empty($_POST['id_jadwal'])) {
+								$pengaturan_periode_dokumen = $wpdb->get_row(
+									$wpdb->prepare("
+										SELECT * 
+										FROM esakip_pengaturan_upload_dokumen 
+										WHERE id_jadwal_rpjmd = %d
+										  AND active = %d
+									", $_POST['id_jadwal'], 1),
+									ARRAY_A
+								);
 
+								if (!empty($pengaturan_periode_dokumen)) {
+									$tahun_anggaran = $pengaturan_periode_dokumen['tahun_anggaran'];
+								}
+							}
 							$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 								SELECT 
 										a.*
