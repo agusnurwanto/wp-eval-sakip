@@ -922,19 +922,19 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					", $_POST['id'], 1),  ARRAY_A);
 					$list_indikator = [];
 					if (!empty($indikator)) {
-					    foreach ($indikator as $row) {
-					        $list_indikator[] = $row['label_indikator_kinerja'];
-					    }
+						foreach ($indikator as $row) {
+							$list_indikator[] = $row['label_indikator_kinerja'];
+						}
 					}
 					echo json_encode([
-					    'status' => true,
-					    'data' => $data,
-					    'indikator' => $list_indikator,
-					    'data_croscutting' => $table_croscutting,
-					    'data_koneksi_pokin' => $table_koneksi_pokin,
-					    'data_koneksi_croscutting_pemda' => $table_koneksi_croscutting_pemda,
-					    'data_koneksi_croscutting_opd' => $table_koneksi_croscutting_opd,
-					    'list_pd_koneksi_pokin' => $list_pd_koneksi_pokin
+						'status' => true,
+						'data' => $data,
+						'indikator' => $list_indikator,
+						'data_croscutting' => $table_croscutting,
+						'data_koneksi_pokin' => $table_koneksi_pokin,
+						'data_koneksi_croscutting_pemda' => $table_koneksi_croscutting_pemda,
+						'data_koneksi_croscutting_opd' => $table_koneksi_croscutting_opd,
+						'list_pd_koneksi_pokin' => $list_pd_koneksi_pokin
 					]);
 					exit();
 				} else {
@@ -1886,13 +1886,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						", $sasaran_rpjpd),
 						ARRAY_A
 					);
-
 				}
 				$misi_html = '';
 				$jenis_misi_teks = '';
 				if ($jenis_jadwal == 'rpjmd') {
-				    $misi_rpjmd = $wpdb->get_results(
-				        $wpdb->prepare("
+					$misi_rpjmd = $wpdb->get_results(
+						$wpdb->prepare("
 				            SELECT 
 				            	m.misi
 				            FROM esakip_rpjmd_misi_detail d
@@ -1901,16 +1900,16 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 				            WHERE d.id_tujuan = %s
 				              AND d.active = 1
 				        ", $tujuan['id_unik']),
-				        ARRAY_A
-				    );
-				    foreach ($misi_rpjmd as $misi) {
-				        $misi_html .= $misi['misi'] . '<br>';
-				    }
+						ARRAY_A
+					);
+					foreach ($misi_rpjmd as $misi) {
+						$misi_html .= $misi['misi'] . '<br>';
+					}
 					$jenis_misi_teks = 'MISI RPJMD';
 				} else {
-				    foreach ($misi_rpjpd as $misi) {
-				        $misi_html .= $misi['misi_teks'] . '<br>';
-				    }
+					foreach ($misi_rpjpd as $misi) {
+						$misi_html .= $misi['misi_teks'] . '<br>';
+					}
 					$jenis_misi_teks = 'ISU RPJPD';
 				}
 
@@ -1999,7 +1998,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						}
 
 						$data_program .= '</ul></td>';
-
 					}
 					if (empty($data_sasaran)) {
 						$data_sasaran = '
@@ -2735,7 +2733,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					echo json_encode([
 						'status' => true,
 						'data_croscutting' => $data_croscutting,
-					    'nama_perangkat' => $nama_perangkat
+						'nama_perangkat' => $nama_perangkat
 					]);
 					exit();
 				} else {
@@ -9127,5 +9125,494 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 			);
 		}
 		die(json_encode($ret));
+	}
+
+	// =========================================================================
+	// METHOD HANDLER RPJMD
+	// =========================================================================
+
+	/**
+	 * The name of the database table for RPJMD.
+	 * RPD (isu rpjpd, tujuan, sasaran, program).
+	 * RPJMD (visi, misi, misi detail, tujuan, sasaran, program).
+	 * @var string
+	 */
+	private $table_rpjmd_visi = 'esakip_rpjmd_visi';
+	private $table_rpjmd_misi = 'esakip_rpjmd_misi';
+	private $table_rpjmd_misi_detail = 'esakip_rpjmd_misi_detail';
+
+	private $table_rpjpd_isu = 'esakip_rpjpd_isu';
+	private $table_rpd_tujuan = 'esakip_rpd_tujuan';
+	private $table_rpd_sasaran = 'esakip_rpd_sasaran';
+	private $table_rpd_program = 'esakip_rpd_program';
+
+	public function get_all_rpd_by_id_jadwal($id)
+	{
+		global $wpdb;
+
+		$sql = $wpdb->prepare("
+			SELECT
+				-- Kolom Tabel Isu RPJPD (esakip_rpjpd_isu)
+				i.id AS i_id, i.id_kebijakan AS i_id_kebijakan, i.isu_teks AS i_isu_teks, i.urut_isu AS i_urut_isu,
+
+				-- Kolom Tabel Tujuan (esakip_rpd_tujuan)
+            	t.id AS t_id, t.head_teks AS t_head_teks, t.id_misi_old AS t_id_misi_old, t.id_tujuan AS t_id_tujuan, t.id_tujuan_murni AS t_id_tujuan_murni, t.id_unik AS t_id_unik, t.id_unik_indikator AS t_id_unik_indikator, t.indikator_teks AS t_indikator_teks, t.is_locked AS t_is_locked, t.is_locked_indikator AS t_is_locked_indikator, t.isu_teks AS t_isu_teks, t.kebijakan_teks AS t_kebijakan_teks, t.misi_lock AS t_misi_lock, t.misi_teks AS t_misi_teks, t.saspok_teks AS t_saspok_teks, t.satuan AS t_satuan, t.status AS t_status, t.target_1 AS t_target_1, t.target_2 AS t_target_2, t.target_3 AS t_target_3, t.target_4 AS t_target_4, t.target_5 AS t_target_5, t.target_akhir AS t_target_akhir, t.target_awal AS t_target_awal, t.tujuan_teks AS t_tujuan_teks, t.urut_misi AS t_urut_misi, t.urut_saspok AS t_urut_saspok, t.urut_tujuan AS t_urut_tujuan, t.visi_teks AS t_visi_teks, t.id_pokin AS t_id_pokin, t.id_isu AS t_id_isu, t.no_urut AS t_no_urut, t.catatan_teks_tujuan AS t_catatan_teks_tujuan, t.indikator_catatan_teks AS t_indikator_catatan_teks, t.nama_cascading AS t_nama_cascading, t.nama_crosscutting AS t_nama_crosscutting, t.update_at AS t_update_at, t.active AS t_active, t.id_jadwal AS t_id_jadwal,
+
+            	-- Kolom Tabel Sasaran (esakip_rpd_sasaran)
+            	s.id AS s_id, s.head_teks AS s_head_teks, s.id_misi_old AS s_id_misi_old, s.id_sasaran AS s_id_sasaran, s.id_sasaran_murni AS s_id_sasaran_murni, s.id_unik AS s_id_unik, s.id_unik_indikator AS s_id_unik_indikator, s.indikator_teks AS s_indikator_teks, s.is_locked AS s_is_locked, s.is_locked_indikator AS s_is_locked_indikator, s.isu_teks AS s_isu_teks, s.kebijakan_teks AS s_kebijakan_teks, s.kode_tujuan AS s_kode_tujuan, s.misi_lock AS s_misi_lock, s.misi_teks AS s_misi_teks, s.sasaran_teks AS s_sasaran_teks, s.saspok_teks AS s_saspok_teks, s.satuan AS s_satuan, s.status AS s_status, s.target_1 AS s_target_1, s.target_2 AS s_target_2, s.target_3 AS s_target_3, s.target_4 AS s_target_4, s.target_5 AS s_target_5, s.target_akhir AS s_target_akhir, s.target_awal AS s_target_awal, s.tujuan_lock AS s_tujuan_lock, s.tujuan_teks AS s_tujuan_teks, s.urut_misi AS s_urut_misi, s.urut_sasaran AS s_urut_sasaran, s.urut_saspok AS s_urut_saspok, s.urut_tujuan AS s_urut_tujuan, s.visi_teks AS s_visi_teks, s.sasaran_no_urut AS s_sasaran_no_urut, s.sasaran_catatan AS s_sasaran_catatan, s.indikator_catatan_teks AS s_indikator_catatan_teks, s.update_at AS s_update_at, s.active AS s_active, s.id_jadwal AS s_id_jadwal,
+
+            	-- Kolom Tabel Program (esakip_rpd_program)
+            	p.id AS p_id, p.head_teks AS p_head_teks, p.id_bidur_mth AS p_id_bidur_mth, p.id_misi_old AS p_id_misi_old, p.id_program AS p_id_program, p.id_program_mth AS p_id_program_mth, p.id_unik AS p_id_unik, p.id_unik_indikator AS p_id_unik_indikator, p.id_unit AS p_id_unit, p.id_unik_indikator_sasaran AS p_id_unik_indikator_sasaran, p.indikator AS p_indikator, p.is_locked AS p_is_locked, p.is_locked_indikator AS p_is_locked_indikator, p.isu_teks AS p_isu_teks, p.kebijakan_teks AS p_kebijakan_teks, p.kode_sasaran AS p_kode_sasaran, p.kode_skpd AS p_kode_skpd, p.kode_tujuan AS p_kode_tujuan, p.misi_lock AS p_misi_lock, p.misi_teks AS p_misi_teks, p.nama_program AS p_nama_program, p.nama_bidang_urusan AS p_nama_bidang_urusan, p.nama_skpd AS p_nama_skpd, p.pagu_1 AS p_pagu_1, p.pagu_2 AS p_pagu_2, p.pagu_3 AS p_pagu_3, p.pagu_4 AS p_pagu_4, p.pagu_5 AS p_pagu_5, p.program_lock AS p_program_lock, p.sasaran_lock AS p_sasaran_lock, p.sasaran_teks AS p_sasaran_teks, p.saspok_teks AS p_saspok_teks, p.satuan AS p_satuan, p.status AS p_status, p.target_1 AS p_target_1, p.target_2 AS p_target_2, p.target_3 AS p_target_3, p.target_4 AS p_target_4, p.target_5 AS p_target_5, p.target_akhir AS p_target_akhir, p.target_awal AS p_target_awal, p.tujuan_lock AS p_tujuan_lock, p.tujuan_teks AS p_tujuan_teks, p.urut_misi AS p_urut_misi, p.urut_sasaran AS p_urut_sasaran, p.urut_saspok AS p_urut_saspok, p.urut_tujuan AS p_urut_tujuan, p.visi_teks AS p_visi_teks, p.catatan AS p_catatan, p.update_at AS p_update_at, p.active AS p_active, p.id_program_lama AS p_id_program_lama, p.id_jadwal AS p_id_jadwal
+			FROM {$this->table_rpd_tujuan} AS t
+			LEFT JOIN {$this->table_rpjpd_isu} AS i
+				   ON i.id = t.id_isu
+			LEFT JOIN {$this->table_rpd_sasaran} AS s 
+				   ON t.id_unik = s.kode_tujuan 
+				  AND s.id_jadwal = %d 
+				  AND s.active = 1
+			LEFT JOIN {$this->table_rpd_program} AS p 
+				   ON s.id_unik = p.kode_sasaran 
+				  AND p.id_jadwal = %d 
+				  AND p.active = 1
+			WHERE t.id_jadwal = %d 
+			  AND t.active = 1
+			ORDER BY t.no_urut, s.sasaran_no_urut, p.id
+    	", $id, $id, $id);
+
+		$results = $wpdb->get_results($sql, ARRAY_A);
+
+		if (empty($results)) {
+			return null;
+		}
+
+		$structured_datas = [];
+		foreach ($results as $row) {
+			$tujuan_id = $row['t_id'];
+			$sasaran_id = $row['s_id'];
+			$program_id = $row['p_id'];
+
+			// Tujuan
+			if ($tujuan_id && !isset($structured_datas[$tujuan_id])) {
+				$tujuan_data = [];
+				foreach ($row as $key => $value) {
+					if (strpos($key, 't_') === 0) {
+						$tujuan_data[substr($key, 2)] = $value;
+					}
+				}
+
+				// Isu RPJPD
+				if ($row['i_id']) {
+					$isu_data = [];
+					foreach ($row as $key => $value) {
+						if (strpos($key, 'i_') === 0) {
+							$isu_data[substr($key, 2)] = $value;
+						}
+					}
+					$tujuan_data['isu_strategis'] = $isu_data;
+				} else {
+					$tujuan_data['isu_strategis'] = null;
+				}
+
+				$tujuan_data['sasaran'] = [];
+				$structured_datas[$tujuan_id] = $tujuan_data;
+			}
+
+			// Sasaran 
+			if ($sasaran_id && isset($structured_datas[$tujuan_id]) && !isset($structured_datas[$tujuan_id]['sasaran'][$sasaran_id])) {
+				$sasaran_data = [];
+				foreach ($row as $key => $value) {
+					if (strpos($key, 's_') === 0) {
+						$sasaran_data[substr($key, 2)] = $value;
+					}
+				}
+				$sasaran_data['program'] = [];
+				$structured_datas[$tujuan_id]['sasaran'][$sasaran_id] = $sasaran_data;
+			}
+
+			// Program
+			if ($program_id && isset($structured_datas[$tujuan_id]['sasaran'][$sasaran_id]) && !isset($structured_datas[$tujuan_id]['sasaran'][$sasaran_id]['program'][$program_id])) {
+				$program_data = [];
+				foreach ($row as $key => $value) {
+					if (strpos($key, 'p_') === 0) {
+						$program_data[substr($key, 2)] = $value;
+					}
+				}
+				$structured_datas[$tujuan_id]['sasaran'][$sasaran_id]['program'][$program_id] = $program_data;
+			}
+		}
+
+		$final_response = array_values($structured_datas);
+		foreach ($final_response as &$tujuan) {
+			if (isset($tujuan['sasaran'])) {
+				$tujuan['sasaran'] = array_values($tujuan['sasaran']);
+				foreach ($tujuan['sasaran'] as &$sasaran) {
+					if (isset($sasaran['program'])) {
+						$sasaran['program'] = array_values($sasaran['program']);
+					}
+				}
+			}
+		}
+
+		return $final_response;
+	}
+
+	public function get_all_rpjmd_by_id_jadwal($id)
+	{
+		global $wpdb;
+
+		$sql = $wpdb->prepare("
+			SELECT
+				-- Kolom Tabel Visi RPJMD (v)
+				v.id AS v_id,
+				v.visi AS v_visi,
+				v.id_jadwal AS v_id_jadwal,
+
+				-- Kolom Tabel Misi RPJMD (m)
+				m.id AS m_id,
+				m.misi AS m_misi,
+				m.id_visi AS m_id_visi,
+				m.id_jadwal AS m_id_jadwal,
+				
+				-- Kolom Tabel Misi Detail RPJMD (md)
+				md.id AS md_id,
+				md.id_misi AS md_id_misi,
+				md.id_tujuan AS md_id_tujuan,
+				md.id_jadwal AS md_id_jadwal,
+
+				-- Kolom Tabel Tujuan (t)
+				t.id AS t_id,
+				t.head_teks AS t_head_teks,
+				t.id_misi_old AS t_id_misi_old,
+				t.id_tujuan AS t_id_tujuan,
+				t.id_tujuan_murni AS t_id_tujuan_murni,
+				t.id_unik AS t_id_unik,
+				t.id_unik_indikator AS t_id_unik_indikator,
+				t.indikator_teks AS t_indikator_teks,
+				t.is_locked AS t_is_locked,
+				t.is_locked_indikator AS t_is_locked_indikator,
+				t.isu_teks AS t_isu_teks,
+				t.kebijakan_teks AS t_kebijakan_teks,
+				t.misi_lock AS t_misi_lock,
+				t.misi_teks AS t_misi_teks,
+				t.saspok_teks AS t_saspok_teks,
+				t.satuan AS t_satuan,
+				t.status AS t_status,
+				t.target_1 AS t_target_1,
+				t.target_2 AS t_target_2,
+				t.target_3 AS t_target_3,
+				t.target_4 AS t_target_4,
+				t.target_5 AS t_target_5,
+				t.target_akhir AS t_target_akhir,
+				t.target_awal AS t_target_awal,
+				t.tujuan_teks AS t_tujuan_teks,
+				t.urut_misi AS t_urut_misi,
+				t.urut_saspok AS t_urut_saspok,
+				t.urut_tujuan AS t_urut_tujuan,
+				t.visi_teks AS t_visi_teks,
+				t.id_pokin AS t_id_pokin,
+				t.id_isu AS t_id_isu,
+				t.no_urut AS t_no_urut,
+				t.catatan_teks_tujuan AS t_catatan_teks_tujuan,
+				t.indikator_catatan_teks AS t_indikator_catatan_teks,
+				t.nama_cascading AS t_nama_cascading,
+				t.nama_crosscutting AS t_nama_crosscutting,
+				t.update_at AS t_update_at,
+				t.active AS t_active,
+				t.id_jadwal AS t_id_jadwal,
+
+				-- Kolom Tabel Sasaran (s)
+				s.id AS s_id,
+				s.head_teks AS s_head_teks,
+				s.id_misi_old AS s_id_misi_old,
+				s.id_sasaran AS s_id_sasaran,
+				s.id_sasaran_murni AS s_id_sasaran_murni,
+				s.id_unik AS s_id_unik,
+				s.id_unik_indikator AS s_id_unik_indikator,
+				s.indikator_teks AS s_indikator_teks,
+				s.is_locked AS s_is_locked,
+				s.is_locked_indikator AS s_is_locked_indikator,
+				s.isu_teks AS s_isu_teks,
+				s.kebijakan_teks AS s_kebijakan_teks,
+				s.kode_tujuan AS s_kode_tujuan,
+				s.misi_lock AS s_misi_lock,
+				s.misi_teks AS s_misi_teks,
+				s.sasaran_teks AS s_sasaran_teks,
+				s.saspok_teks AS s_saspok_teks,
+				s.satuan AS s_satuan,
+				s.status AS s_status,
+				s.target_1 AS s_target_1,
+				s.target_2 AS s_target_2,
+				s.target_3 AS s_target_3,
+				s.target_4 AS s_target_4,
+				s.target_5 AS s_target_5,
+				s.target_akhir AS s_target_akhir,
+				s.target_awal AS s_target_awal,
+				s.tujuan_lock AS s_tujuan_lock,
+				s.tujuan_teks AS s_tujuan_teks,
+				s.urut_misi AS s_urut_misi,
+				s.urut_sasaran AS s_urut_sasaran,
+				s.urut_saspok AS s_urut_saspok,
+				s.urut_tujuan AS s_urut_tujuan,
+				s.visi_teks AS s_visi_teks,
+				s.sasaran_no_urut AS s_sasaran_no_urut,
+				s.sasaran_catatan AS s_sasaran_catatan,
+				s.indikator_catatan_teks AS s_indikator_catatan_teks,
+				s.update_at AS s_update_at,
+				s.active AS s_active,
+				s.id_jadwal AS s_id_jadwal,
+
+				-- Kolom Tabel Program (p)
+				p.id AS p_id,
+				p.head_teks AS p_head_teks,
+				p.id_bidur_mth AS p_id_bidur_mth,
+				p.id_misi_old AS p_id_misi_old,
+				p.id_program AS p_id_program,
+				p.id_program_mth AS p_id_program_mth,
+				p.id_unik AS p_id_unik,
+				p.id_unik_indikator AS p_id_unik_indikator,
+				p.id_unit AS p_id_unit,
+				p.id_unik_indikator_sasaran AS p_id_unik_indikator_sasaran,
+				p.indikator AS p_indikator,
+				p.is_locked AS p_is_locked,
+				p.is_locked_indikator AS p_is_locked_indikator,
+				p.isu_teks AS p_isu_teks,
+				p.kebijakan_teks AS p_kebijakan_teks,
+				p.kode_sasaran AS p_kode_sasaran,
+				p.kode_skpd AS p_kode_skpd,
+				p.kode_tujuan AS p_kode_tujuan,
+				p.misi_lock AS p_misi_lock,
+				p.misi_teks AS p_misi_teks,
+				p.nama_program AS p_nama_program,
+				p.nama_bidang_urusan AS p_nama_bidang_urusan,
+				p.nama_skpd AS p_nama_skpd,
+				p.pagu_1 AS p_pagu_1,
+				p.pagu_2 AS p_pagu_2,
+				p.pagu_3 AS p_pagu_3,
+				p.pagu_4 AS p_pagu_4,
+				p.pagu_5 AS p_pagu_5,
+				p.program_lock AS p_program_lock,
+				p.sasaran_lock AS p_sasaran_lock,
+				p.sasaran_teks AS p_sasaran_teks,
+				p.saspok_teks AS p_saspok_teks,
+				p.satuan AS p_satuan,
+				p.status AS p_status,
+				p.target_1 AS p_target_1,
+				p.target_2 AS p_target_2,
+				p.target_3 AS p_target_3,
+				p.target_4 AS p_target_4,
+				p.target_5 AS p_target_5,
+				p.target_akhir AS p_target_akhir,
+				p.target_awal AS p_target_awal,
+				p.tujuan_lock AS p_tujuan_lock,
+				p.tujuan_teks AS p_tujuan_teks,
+				p.urut_misi AS p_urut_misi,
+				p.urut_sasaran AS p_urut_sasaran,
+				p.urut_saspok AS p_urut_saspok,
+				p.urut_tujuan AS p_urut_tujuan,
+				p.visi_teks AS p_visi_teks,
+				p.catatan AS p_catatan,
+				p.update_at AS p_update_at,
+				p.active AS p_active,
+				p.id_program_lama AS p_id_program_lama,
+				p.id_jadwal AS p_id_jadwal
+			FROM {$this->table_rpd_tujuan} AS t
+			LEFT JOIN {$this->table_rpjmd_misi_detail} AS md 
+				ON t.id_unik = md.id_tujuan AND md.id_jadwal = %d AND md.active = 1
+			LEFT JOIN {$this->table_rpjmd_misi} AS m 
+				ON md.id_misi = m.id AND m.id_jadwal = %d AND m.active = 1
+			LEFT JOIN {$this->table_rpjmd_visi} AS v 
+				ON m.id_visi = v.id AND v.id_jadwal = %d AND v.active = 1
+			LEFT JOIN {$this->table_rpd_sasaran} AS s 
+				ON t.id_unik = s.kode_tujuan AND s.id_jadwal = %d AND s.active = 1
+			LEFT JOIN {$this->table_rpd_program} AS p 
+				ON s.id_unik = p.kode_sasaran AND p.id_jadwal = %d AND p.active = 1 -- Perbaikan JOIN Condition
+			WHERE t.id_jadwal = %d 
+			AND t.active = 1
+			ORDER BY t.no_urut, md.id, s.sasaran_no_urut, p.id
+		", $id, $id, $id, $id, $id, $id);
+
+		$results = $wpdb->get_results($sql, ARRAY_A);
+
+		if (empty($results)) {
+			return null;
+		}
+
+		$structured_datas = [];
+		foreach ($results as $row) {
+			$tujuan_id = $row['t_id'];
+			$sasaran_id = $row['s_id'];
+			$program_id = $row['p_id'];
+			$misi_detail_id = $row['md_id'];
+
+			// Tujuan
+			if ($tujuan_id && !isset($structured_datas[$tujuan_id])) {
+				$tujuan_data = [];
+				foreach ($row as $key => $value) {
+					if (strpos($key, 't_') === 0) {
+						$tujuan_data[substr($key, 2)] = $value;
+					}
+				}
+				$tujuan_data['keterkaitan_rpjmd'] = [];
+				$tujuan_data['sasaran'] = [];
+				$structured_datas[$tujuan_id] = $tujuan_data;
+			}
+
+			// Misi RPJMD
+			if ($misi_detail_id && isset($structured_datas[$tujuan_id]) && !isset($structured_datas[$tujuan_id]['keterkaitan_rpjmd'][$misi_detail_id])) {
+				$keterkaitan = [];
+				// Visi RPJMD
+				if ($row['v_id']) {
+					$visi_data = [];
+					foreach ($row as $key => $value) {
+						if (strpos($key, 'v_') === 0) {
+							$visi_data[substr($key, 2)] = $value;
+						}
+					}
+					$keterkaitan['visi'] = $visi_data;
+				}
+
+				// Misi RPJMD
+				if ($row['m_id']) {
+					$misi_data = [];
+					foreach ($row as $key => $value) {
+						if (strpos($key, 'm_') === 0) {
+							$misi_data[substr($key, 2)] = $value;
+						}
+					}
+					$keterkaitan['misi'] = $misi_data;
+				}
+				$misi_detail_data = [];
+				foreach ($row as $key => $value) {
+					if (strpos($key, 'md_') === 0) {
+						$misi_detail_data[substr($key, 2)] = $value;
+					}
+				}
+				$keterkaitan['misi_detail'] = $misi_detail_data;
+
+				$structured_datas[$tujuan_id]['keterkaitan_rpjmd'][$misi_detail_id] = $keterkaitan;
+			}
+
+			// Sasaran
+			if ($sasaran_id && isset($structured_datas[$tujuan_id]) && !isset($structured_datas[$tujuan_id]['sasaran'][$sasaran_id])) {
+				$sasaran_data = [];
+				foreach ($row as $key => $value) {
+					if (strpos($key, 's_') === 0) {
+						$sasaran_data[substr($key, 2)] = $value;
+					}
+				}
+				$sasaran_data['program'] = [];
+				$structured_datas[$tujuan_id]['sasaran'][$sasaran_id] = $sasaran_data;
+			}
+
+			// Program
+			if ($program_id && isset($structured_datas[$tujuan_id]['sasaran'][$sasaran_id]) && !isset($structured_datas[$tujuan_id]['sasaran'][$sasaran_id]['program'][$program_id])) {
+				$program_data = [];
+				foreach ($row as $key => $value) {
+					if (strpos($key, 'p_') === 0) {
+						$program_data[substr($key, 2)] = $value;
+					}
+				}
+				$structured_datas[$tujuan_id]['sasaran'][$sasaran_id]['program'][$program_id] = $program_data;
+			}
+		}
+
+		// Mengubah array asosiatif menjadi array numerik biasa
+		$final_response = array_values($structured_datas);
+		foreach ($final_response as &$tujuan) {
+			if (isset($tujuan['keterkaitan_rpjmd'])) {
+				$tujuan['keterkaitan_rpjmd'] = array_values($tujuan['keterkaitan_rpjmd']);
+			}
+			if (isset($tujuan['sasaran'])) {
+				$tujuan['sasaran'] = array_values($tujuan['sasaran']);
+				foreach ($tujuan['sasaran'] as &$sasaran) {
+					if (isset($sasaran['program'])) {
+						$sasaran['program'] = array_values($sasaran['program']);
+					}
+				}
+			}
+		}
+
+		return $final_response;
+	}
+
+	/**
+	 * API get all data rpd.
+	 */
+	public function get_all_rpd_by_id_jadwal_ajax()
+	{
+		try {
+			$this->functions->validate($_POST, [
+				'api_key'   => 'required|string',
+				'id_jadwal' => 'required|string'
+			]);
+
+			if ($_POST['api_key'] !== get_option(ESAKIP_APIKEY)) {
+				throw new Exception("API key tidak valid atau tidak ditemukan!", 401);
+			}
+
+			$valid_jadwal = $this->get_data_jadwal_by_id($_POST['id_jadwal']);
+			if (!$valid_jadwal || $valid_jadwal['jenis_jadwal_khusus'] !== 'rpd') {
+				throw new Exception("Jadwal tidak temukan didalam sistem!", 404);
+			}
+
+			$data_rpd = $this->get_all_rpd_by_id_jadwal($valid_jadwal['id']);
+
+			if ($data_rpd) {
+				echo json_encode([
+					'status'  => true,
+					'message' => 'Data berhasil ditemukan.',
+					'data'    => $data_rpd
+				]);
+			} else {
+				throw new Exception("Data RPD dengan id Jadwal = {$valid_jadwal['id']} tidak ditemukan.", 404);
+			}
+		} catch (Exception $e) {
+			$code = is_int($e->getCode()) && $e->getCode() !== 0 ? $e->getCode() : 500;
+			http_response_code($code);
+			echo json_encode([
+				'status'  => false,
+				'message' => $e->getMessage()
+			]);
+		}
+		wp_die();
+	}
+
+	public function get_all_rpjmd_by_id_jadwal_ajax()
+	{
+		try {
+			$this->functions->validate($_POST, [
+				'api_key'   => 'required|string',
+				'id_jadwal' => 'required|string'
+			]);
+
+			if ($_POST['api_key'] !== get_option(ESAKIP_APIKEY)) {
+				throw new Exception("API key tidak valid atau tidak ditemukan!", 401);
+			}
+
+			$valid_jadwal = $this->get_data_jadwal_by_id($_POST['id_jadwal']);
+			if (!$valid_jadwal || $valid_jadwal['jenis_jadwal_khusus'] !== 'rpjmd') {
+				throw new Exception("Jadwal tidak temukan didalam sistem!", 404);
+			}
+
+			$data_rpd = $this->get_all_rpjmd_by_id_jadwal($valid_jadwal['id']);
+
+			if ($data_rpd) {
+				echo json_encode([
+					'status'  => true,
+					'message' => 'Data berhasil ditemukan.',
+					'data'    => $data_rpd
+				]);
+			} else {
+				throw new Exception("Data RPJMD dengan id Jadwal = {$valid_jadwal['id']} tidak ditemukan.", 404);
+			}
+		} catch (Exception $e) {
+			$code = is_int($e->getCode()) && $e->getCode() !== 0 ? $e->getCode() : 500;
+			http_response_code($code);
+			echo json_encode([
+				'status'  => false,
+				'message' => $e->getMessage()
+			]);
+		}
+		wp_die();
 	}
 }

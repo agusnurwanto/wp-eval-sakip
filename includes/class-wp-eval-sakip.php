@@ -239,6 +239,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_delete_jadwal_verifikasi_upload_dokumen_renstra',  $plugin_public, 'delete_jadwal_verifikasi_upload_dokumen_renstra');
 		$this->loader->add_action('wp_ajax_lock_jadwal_verifikasi_upload_dokumen_renstra',  $plugin_public, 'lock_jadwal_verifikasi_upload_dokumen_renstra');
 		$this->loader->add_action('wp_ajax_get_data_jadwal_by_id_verifikasi_upload_dokumen_renstra',  $plugin_public, 'get_data_jadwal_by_id_verifikasi_upload_dokumen_renstra');
+		
+		$this->loader->add_action('wp_ajax_nopriv_get_data_jadwal_by_type_ajax',  $plugin_public, 'get_data_jadwal_by_type_ajax');
 
 		$this->loader->add_action('wp_ajax_get_detail_dpa_by_id', $plugin_public, 'get_detail_dpa_by_id');
 		$this->loader->add_action('wp_ajax_tambah_dokumen_dpa', $plugin_public, 'tambah_dokumen_dpa');
@@ -571,6 +573,10 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_esakip_hapus_rpd',  $plugin_public, 'esakip_hapus_rpd');
 		$this->loader->add_action('wp_ajax_esakip_simpan_rpd',  $plugin_public, 'esakip_simpan_rpd');
 		$this->loader->add_action('wp_ajax_esakip_get_rpd',  $plugin_public, 'esakip_get_rpd');
+		
+		$this->loader->add_action('wp_ajax_nopriv_get_all_rpd_by_id_jadwal_ajax',  $plugin_public, 'get_all_rpd_by_id_jadwal_ajax');
+		$this->loader->add_action('wp_ajax_nopriv_get_all_rpjmd_by_id_jadwal_ajax',  $plugin_public, 'get_all_rpjmd_by_id_jadwal_ajax');
+
 		$this->loader->add_action('wp_ajax_esakip_get_bidang_urusan',  $plugin_public, 'esakip_get_bidang_urusan');
 		$this->loader->add_action('wp_ajax_get_indikator_sasaran',  $plugin_public, 'get_indikator_sasaran');
 		$this->loader->add_action('wp_ajax_get_sasaran_sebelum',  $plugin_public, 'get_sasaran_sebelum');

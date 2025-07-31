@@ -33395,13 +33395,86 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
-    /**
-	 * 
-	 * METHOD HANDLER PEGAWAI SIMPEG
-	 * 
-     */
+   	// =========================================================================
+	// METHOD HANDLER JADWAL
+    // =========================================================================
 
     /**
+     * The name of the database table for jadwal.
+     * @var string
+     */
+    private $table_data_jadwal = 'esakip_data_jadwal';
+
+    public function get_data_jadwal_by_type($type)
+    {
+        global $wpdb;
+
+		$allowed_type_jadwal = [
+			'RPJPD',
+			'RPJMD',
+			'LKE',
+			'verifikasi_upload_dokumen'
+		];
+
+		if (!in_array($type, $allowed_type_jadwal)) {
+			return;
+		}
+
+		$sql = $wpdb->prepare("
+			SELECT *
+			FROM {$this->table_data_jadwal}
+			WHERE status != 0
+			  AND tipe = %s
+		", $type);
+
+        // The second parameter, OBJECT, ensures the result is an object.
+        $data = $wpdb->get_results($sql, OBJECT);
+
+        return $data;
+    }
+
+	 /**
+     * API get data jadwal by type.
+     */
+    public function get_data_jadwal_by_type_ajax()
+    {
+        try {
+            $this->functions->validate($_POST, [
+                'api_key'   => 'required|string',
+                'type' 		=> 'required|string'
+            ]);
+
+            if ($_POST['api_key'] !== get_option(ESAKIP_APIKEY)) {
+                 throw new Exception("API key tidak valid atau tidak ditemukan!", 401);
+            }
+
+            $data_jadwal = $this->get_data_jadwal_by_type($_POST['type']);
+
+            if ($data_jadwal) {
+                echo json_encode([
+                    'status'  => true,
+                    'message' => 'Data berhasil ditemukan.',
+                    'data'    => $data_jadwal
+                ]);
+            } else {
+                 throw new Exception("Data jadwal dengan tipe = {$_POST['type']} tidak ditemukan.", 404);
+            }
+        } catch (Exception $e) {
+            $code = is_int($e->getCode()) && $e->getCode() !== 0 ? $e->getCode() : 500;
+            http_response_code($code);
+            echo json_encode([
+				'status'  => false,
+				'message' => $e->getMessage()
+			]);
+        }
+        wp_die();
+    }
+
+	// =========================================================================
+	// METHOD HANDLER PEGAWAI SIMPEG
+	// =========================================================================
+     
+	/**
      * The name of the database table for pegawai simpeg.
      * @var string
      */
@@ -33440,19 +33513,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
         'update_at'            => '%s',
     ];
 
-    /**
-     * Dynamically updates a record in the esakip_data_pegawai_simpeg table.
-     *
-     * This method is designed to handle partial updates securely and efficiently.
-     * It automatically generates the correct data formats for the columns being updated
-     * and sets the 'update_at' field to the current time.
-     *
-     * @param int   $id   The primary key (id) of the record to update.
-     * @param array $data An associative array where keys are column names and values
-     * are the new data for those columns.
-     *
-     * @return int|false The number of rows updated, or false on error.
-     */
     public function update_data_pegawai_simpeg_by_id($id, $data)
     {
         global $wpdb;
@@ -33488,12 +33548,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
         return $updated;
     }
 
-	 /**
-     * Retrieves a single record from the esakip_data_pegawai_simpeg table by its primary key.
-     *
-     * @param int $id The primary key (id) of the record to retrieve.
-     * @return object|null The record as an object, or null if not found or on error.
-     */
     public function get_data_pegawai_simpeg_by_id($id)
     {
         global $wpdb;
@@ -33517,13 +33571,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
         return $pegawai;
     }
 
-	 /**
-     * Retrieves a single record from the esakip_data_pegawai_simpeg table by its primary key.
-	 * where pegawai is inactive
-     *
-     * @param int $id The primary key (id) of the record to retrieve.
-     * @return object|null The record as an object, or null if not found or on error.
-     */
     public function get_data_pegawai_simpeg_inactive_by_id($id)
     {
         global $wpdb;
@@ -33547,13 +33594,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
         return $pegawai;
     }
 
-	/**
-	 * Retrieves all records from the esakip_data_pegawai_simpeg table where satker_id matches the given pattern.
-	 *
-	 * @param string $satker_id The satker_id pattern to match.
-	 * @param bool $all If true, matches all records starting with the satker_id; if false, matches exactly.
-	 * @return array An array of objects representing the matching records.
-	 */
     public function get_data_pegawai_simpeg_by_satker_id($satker_id)
     {
         global $wpdb; 
@@ -33568,13 +33608,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
         return $pegawai;
     }
 
-	/**
-	 * Retrieves a single record from the esakip_data_pegawai_simpeg table where satker_id matches the given satker_id
-	 * and tipe_pegawai_id is 11 (indicating a specific type of employee (KEPALA)).
-	 *
-	 * @param string $satker_id The satker_id to match.
-	 * @return object|null The record as an object, or null if not found or on error.
-	 */
     public function get_data_pegawai_simpeg_atasan_by_satker_id($satker_id)
     {
         global $wpdb; 
