@@ -62,25 +62,136 @@ $chart_labels = [];
 $chart_values = [];
 
 $html = '
-<div class="container-md" style="font-family:\'Times New Roman\', serif;">
+<div class="container-md" style="font-family:\'Times New Roman\', serif; padding: 0 20px;">
     <form id="form-kuesioner">
         <div>
-            <h3 class="text-center mb-3">
-                LEMBAR HASIL EVALUASI KELEMBAGAAN<br>
-                PERANGKAT DAERAH ' . strtoupper($nama_pemda) . ' TAHUN ' . $input['tahun'] . '<br>' . $skpd['nama_skpd'] . '
-            </h3>
-            <div style="width:100%;max-width:1200px;margin:20px auto;">
-                <canvas id="marksChart"></canvas>
-            </div>
-        </div>';
+            <p style="text-align: center !important; text-transform: uppercase">
+                <b>LEMBAR HASIL EVALUASI KELEMBAGAAN<br>PERANGKAT DAERAH ' . strtoupper($nama_pemda) . ' TAHUN ' . $input['tahun'] . '<br>' . $skpd['nama_skpd'] . '
+                </b>
+            </p>
+            <div class="d-flex justify-content-center" style="width: 100%; margin: 20px 0;">
+                <div style="max-width: 1880px; width: 100%;">
+                    <canvas id="marksChart"></canvas>
+                </div>
+            </div>';
 
+$total_chart_value = 0;
+$jumlah_kuesioner = 0;
+
+//untuk menampilkan data peringkat
+foreach ($data_kuesioner as $kuesioner_temp) {
+    if ($kuesioner_temp['tipe_soal'] != 1) continue;
+
+    $detail_all_temp = $wpdb->get_results($wpdb->prepare("
+        SELECT 
+            * 
+        FROM esakip_kuesioner_menpan_detail
+        WHERE id_kuesioner = %d 
+            AND active = 1
+        ORDER BY nomor_urut ASC, tipe_jawaban ASC
+    ", $kuesioner_temp['id']), ARRAY_A);
+
+    $pertanyaan_group_temp = [];
+    foreach ($detail_all_temp as $detail) {
+        $pertanyaan_group_temp[$detail['id_unik']][] = $detail;
+    }
+
+    $total_nilai_awal = 0;
+    foreach ($pertanyaan_group_temp as $group) {
+        foreach ($group as $detail) {
+            $data_penilaian = $wpdb->get_row(
+                $wpdb->prepare("
+                    SELECT 
+                        nilai
+                    FROM esakip_penilaian_kuesioner_menpan
+                    WHERE tahun_anggaran = %d
+                      AND id_skpd = %d
+                      AND id_detail = %d
+                      AND id_unik = %d
+                      AND active = 1
+                    LIMIT 1
+                ", $input['tahun'], $id_skpd, $detail['id'], $detail['id_unik']),
+                ARRAY_A
+            );
+            if ($data_penilaian) {
+                $total_nilai_awal += floatval($data_penilaian['nilai']);
+                break;
+            }
+        }
+    }
+
+    $get_total_bobot_kuesioner_detail = $wpdb->get_var(
+        $wpdb->prepare("
+            SELECT 
+                SUM(bobot)
+            FROM esakip_kuesioner_menpan_detail
+            WHERE id_kuesioner = %d
+              AND active = 1
+              AND tipe_jawaban = 1
+        ", $kuesioner_temp['id'])
+    );
+
+    $persentase = ($get_total_bobot_kuesioner_detail != 0)
+        ? round(($total_nilai_awal / $get_total_bobot_kuesioner_detail) * 100, 2)
+        : 0;
+
+    $chart_labels[] = $kuesioner_temp['nama_kuesioner'] . ' ' . $persentase;
+    $chart_values[] = round($persentase);
+}
+
+$total_chart_value = array_sum($chart_values);
+$jumlah_kuesioner = count($chart_values);
+$nilai_komposit = ($jumlah_kuesioner > 0) ? round($total_chart_value / $jumlah_kuesioner, 2) : 0;
+
+$peringkat = ($nilai_komposit >= 80) ? 'P-5' : 'P-4';
+$peringkat_provinsi = '';
+
+$narasi = ($nilai_komposit >= 80)
+    ? 'Mencerminkan bahwa dari sisi struktur dan proses, organisasi dinilai tergolong sangat efektif. Struktur dan proses organisasi yang ada dinilai mempunyai kemampuan sangat tinggi untuk mengakomodir kebutuhan internal organisasi dan sangat mampu beradaptasi terhadap dinamika perubahan lingkungan eksternal organisasi.'
+    : 'Mencerminkan bahwa dari sisi struktur dan proses, organisasi dinilai tergolong sangat efektif. Struktur dan proses organisasi yang ada dinilai mempunyai kemampuan sangat tinggi untuk mengakomodir kebutuhan internal organisasi dan sangat mampu beradaptasi terhadap dinamika perubahan lingkungan eksternal organisasi.';
+
+$kondisi_struktur_proses = ($nilai_komposit >= 80) ? 'Sangat Efektif' : 'Efektif';
+$kemampuan_akomodasi = ($nilai_komposit >= 80) ? 'Sangat Tinggi' : 'Tinggi';
+$kekurangan = ($nilai_komposit >= 80) ? '-' : 'Lemah';
+
+$html .= '
+<div class="mt-4 mb-4">
+    <table class="table table-bordered" style="width:100%; padding-left:20px; padding-right:20px;">
+        <tr>
+            <td colspan="2" class="text-center" style="border:1px solid black;"><strong>Peringkat Komposit : ' . $nilai_komposit . ' / ' . $peringkat . '</strong></td>
+        </tr>
+        <tr>
+            <td style="border:1px solid black;" colspan="2" class="text-center"><strong>Peringkat Provinsi : ' . $peringkat_provinsi . '</strong></td>
+        </tr>
+        <tr>
+            <td style="border:1px solid black;" colspan="2" style="text-align:justify;" class="text-center">' . $narasi . '</td>
+        </tr>
+        <tr>
+            <td style="border:1px solid black;" style="width:60%;">Kondisi Dimensi Struktur dan Proses</td>
+            <td style="border:1px solid black;">' . $kondisi_struktur_proses . '</td>
+        </tr>
+        <tr>
+            <td style="border:1px solid black;">Kemampuan akomodasi kebutuhan internal dan adaptasi lingkungan eksternal</td>
+            <td style="border:1px solid black;">' . $kemampuan_akomodasi . '</td>
+        </tr>
+        <tr>
+            <td style="border:1px solid black;">Kekurangan</td>
+            <td style="border:1px solid black;">' . $kekurangan . '</td>
+        </tr>
+    </table>
+</div>
+</div>';
+
+// untuk menampilkan data kuesioner
 foreach ($data_kuesioner as $kuesioner) {
     $html .= '<h3><strong>' . $kuesioner['nama_kuesioner'] . '</strong></h3>';
 
     $detail_all = $wpdb->get_results($wpdb->prepare("
-        SELECT * 
+        SELECT 
+            * 
         FROM esakip_kuesioner_menpan_detail
-        WHERE id_kuesioner = %d AND active = 1
+        WHERE id_kuesioner = %d 
+            AND active = 1
         ORDER BY nomor_urut ASC, tipe_jawaban ASC
     ", $kuesioner['id']), ARRAY_A);
 
@@ -89,25 +200,27 @@ foreach ($data_kuesioner as $kuesioner) {
         $pertanyaan_group[$detail['id_unik']][] = $detail;
     }
 
-    $html .= '<table class="table table-bordered" style="width:100%; margin-bottom:30px;">
+    $html .= '<table class="table table-bordered" style="width:100%; margin-bottom:30px; padding-left:20px; padding-right:20px;">
         <thead>
             <tr>
-                <th style="width:30px;">No</th>
-                <th class="text-center">Pertanyaan</th>';
+                <th style="border:1px solid black;" width:30px;">No</th>
+                <th style="border:1px solid black;" class="text-center">Pertanyaan</th>';
 
     if ($kuesioner['tipe_soal'] == 1) {
         $html .= '
-                <th colspan="2" class="text-center">Hasil Awal</th>
-                <th colspan="2" class="text-center">Hasil Akhir</th>
+                <th style="border:1px solid black;" colspan="2" class="text-center">Hasil Awal</th>
+                <th style="border:1px solid black;" colspan="2" class="text-center">Hasil Akhir</th>
             </tr>
             <tr>
-                <th></th><th></th>
-                <th style="width:80px;">Jawaban</th>
-                <th style="width:60px;">Skor</th>
-                <th style="width:100px;">Jawaban</th>
-                <th style="width:60px;">Skor</th>';
+                <th style="border:1px solid black;"></th><th style="border:1px solid black;"></th>
+                <th style="border:1px solid black;" width:80px;" class="text-center">Jawaban</th>
+                <th style="border:1px solid black;" width:60px;" class="text-center">Skor</th>
+                <th style="border:1px solid black;" width:100px;" class="text-center">Jawaban</th>
+                <th style="border:1px solid black;" width:60px;" class="text-center">Skor</th>';
     } else {
-        $html .= '<th class="text-center">Hasil Awal</th><th class="text-center">Hasil Akhir</th>';
+        $html .= '
+                <th style="border:1px solid black;" class="text-center">Hasil Awal</th>
+                <th style="border:1px solid black;" class="text-center">Hasil Akhir</th>';
     }
 
     $html .= '</tr></thead><tbody>';
@@ -123,7 +236,10 @@ foreach ($data_kuesioner as $kuesioner) {
         foreach ($group as $detail) {
             $data_penilaian = $wpdb->get_row(
                 $wpdb->prepare("
-                    SELECT id_detail, jawaban, nilai
+                    SELECT 
+                        id_detail, 
+                        jawaban, 
+                        nilai
                     FROM esakip_penilaian_kuesioner_menpan
                     WHERE tahun_anggaran = %d
                       AND id_skpd = %d
@@ -156,71 +272,33 @@ foreach ($data_kuesioner as $kuesioner) {
         }
 
         $html .= '<tr>
-            <td class="text-center">' . $no++ . '</td>
-            <td>' . $pertanyaan . '</td>';
+            <td style="border:1px solid black;" class="text-center">' . $no++ . '</td>
+            <td style="border:1px solid black;">' . $pertanyaan . '</td>';
 
         if ($kuesioner['tipe_soal'] == 1) {
             $html .= '
-            <td class="text-center">' . $jawaban_dipilih . '</td>
-            <td class="text-center">' . number_format($nilai_dipilih, 2) . '</td>
-            <td class="text-center">BELUM DINILAI</td>
-            <td class="text-center">0</td>';
+            <td style="border:1px solid black;" class="text-center"><b>' . $jawaban_dipilih . '</td>
+            <td style="border:1px solid black;" class="text-center">' . number_format($nilai_dipilih, 2) . '</td>
+            <td style="border:1px solid black;" class="text-center"><b>BELUM DINILAI</td>
+            <td style="border:1px solid black;" class="text-center">0</td>';
         } else {
-            $html .= '<td>' . $jawaban_dipilih . '</td><td></td>';
+            $html .= '
+            <td style="border:1px solid black;">' . $jawaban_dipilih . '</td>
+            <td style="border:1px solid black;"></td>';
         }
 
         $html .= '</tr>';
     }
-
-    if ($kuesioner['tipe_soal'] == 1) {
-        $nilai_format = number_format($total_nilai_awal, 3);
-        $explode = explode('.', $nilai_format);
-        $desimal = isset($explode[1]) ? $explode[1] : '000';
-
-        $nilai_bulat = $nilai_format;
-        if (isset($desimal[2]) && $desimal[2] == '0') {
-            $nilai_bulat = number_format(round($total_nilai_awal), 3);
-        }
-
-        // Dapatkan total bobot
-        $get_total_bobot_kuesioner_detail = $wpdb->get_var(
-            $wpdb->prepare("
-                SELECT 
-                    SUM(bobot)
-                FROM esakip_kuesioner_menpan_detail
-                WHERE id_kuesioner = %d
-                  AND active = 1
-                  AND tipe_jawaban = 1
-            ", $kuesioner['id'])
-        );
-
-        if ($get_total_bobot_kuesioner_detail !== null) {
-            if ($get_total_bobot_kuesioner_detail >= 500 && $get_total_bobot_kuesioner_detail < 600) {
-                $total_bobot_kuesioner_detail = 500;
-            } elseif ($get_total_bobot_kuesioner_detail < 100) {
-                $total_bobot_kuesioner_detail = round($get_total_bobot_kuesioner_detail * 2) / 2;
-            } else {
-                $total_bobot_kuesioner_detail = round($get_total_bobot_kuesioner_detail);
-            }
-        } else {
-            $total_bobot_kuesioner_detail = 1; // fallback untuk hindari div 0
-        }
-
-        // Hitung nilai untuk chart
-        $persentase = ($total_bobot_kuesioner_detail != 0) 
-            ? round(($nilai_bulat / $total_bobot_kuesioner_detail) * 100, 2)
-            : 0;
-
-        $html .= '<tr>
-            <td class="text-center" colspan="6"><strong>
-                Nilai ' . $kuesioner['nama_kuesioner'] . ' ' . $nilai_bulat . '<br>
-                Nilai Akhir ' . $kuesioner['nama_kuesioner'] . ' 0.000</strong>
-            </td>
-        </tr>';
-
-        $chart_labels[] = $kuesioner['nama_kuesioner'] . ' ' . $persentase;
-        $chart_values[] = $persentase;
-    }
+    $html .= '<tr>
+        <td class="text-center" colspan="6"  style="border:1px solid black;"><strong>
+            Nilai ' . $kuesioner['nama_kuesioner'] . ' ' . number_format($total_nilai_awal, 3) . '</strong>
+        </td>
+    </tr>';
+    $html .= '<tr>
+        <td class="text-center" colspan="6"  style="border:1px solid black;"><strong>
+            Nilai Akhir ' . $kuesioner['nama_kuesioner'] . ' 0.000</strong>
+        </td>
+    </tr>';
 
     $html .= '</tbody></table>';
 }
@@ -385,7 +463,7 @@ if(!empty($_GET['laporan'])){
                 <div>
                     <div class="info-section">
                         <span class="label">Total Nilai:</span> 
-                        <span class="value" id="total-nilai-kuesioner">0.00</span>
+                        <span class="value"><?php echo $nilai_komposit; ?></span>
                     </div>
                 </div>
                 <div class="wrap-table">
@@ -437,7 +515,7 @@ if(!empty($_GET['laporan'])){
                     jQuery('#wrap-loading').hide();
                     if (response.status === 'success') {
                         jQuery('#tbody-kuesioner-menpan').html(response.data.html);
-                        jQuery('#total-nilai-kuesioner').text(response.data.total_nilai_formatted);
+                        // jQuery('#total-nilai-kuesioner').text(response.data.total_nilai_formatted);
                     } else {
                         alert(response.message);
                     }
