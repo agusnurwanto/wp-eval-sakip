@@ -20669,6 +20669,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$periode_input_iku_pemda = '';
 		$periode_iku_pemda = '';
 		$halaman_iku_pemda = '';
+		$pengisian_kuesioner_menpan_detail_pemda = '';
+		$pengisian_kuesioner_mendagri_detail_pemda = '';
 
 		// SAKIP Perangkat Daerah
 		$periode_renstra = '';
@@ -20701,6 +20703,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$periode_input_iku_opd = '';
 		$periode_iku_opd = '';
 		$halaman_iku_opd = '';
+		$pengisian_kuesioner_menpan_detail_skpd = '';
+		$pengisian_kuesioner_mendagri_detail_skpd = '';
 
 		foreach ($jadwal_periode as $jadwal_periode_item) {
 			if (!empty($jadwal_periode_item['tahun_selesai_anggaran']) && $jadwal_periode_item['tahun_selesai_anggaran'] > 1) {
@@ -21239,6 +21243,26 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$title_dokumen_lainnya = 'Lainnya';
 			$cek_data_pelaporan['perangkat_daerah']['Dokumen Lainnya']['link'] = '<li><a target="_blank" href="' . $dokumen_lainnya['url'] . '" class="btn btn-primary">' .  $title_dokumen_lainnya . '</a></li>';
 		}
+					
+		$pengisian_kuesioner_menpan_skpd = $this->functions->generatePage(array(
+			'nama_page' => 'Kuesioner Menpan SKPD' . $_GET['tahun'],
+			'content' => '[list_kuesioner_menpan id_jadwal tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+
+		$title_pengisian_kuesioner_menpan = 'Kuesioner Menpan';
+		$pengisian_kuesioner_menpan_detail_skpd .= '<li><a href="' . $pengisian_kuesioner_menpan_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $title_pengisian_kuesioner_menpan . '</a></li>';
+		
+		$pengisian_kuesioner_mendagri_skpd = $this->functions->generatePage(array(
+			'nama_page' => 'Kuesioner Mendagri SKPD' . $_GET['tahun'],
+			'content' => '[list_kuesioner_mendagri id_jadwal tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+
+		$title_pengisian_kuesioner_mendagri = 'Kuesioner Mendagri';
+		$pengisian_kuesioner_mendagri_detail_skpd .= '<li><a href="' . $pengisian_kuesioner_mendagri_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $title_pengisian_kuesioner_mendagri . '</a></li>';
 
 		//DOKUMEN Perangkat Daerah JIKA DIPAKAI
 		if (!empty($cek_data_perencanaan['perangkat_daerah']['SKP']) && $cek_data_perencanaan['perangkat_daerah']['SKP']['active'] == 1) {
@@ -22082,6 +22106,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					</div>
 				</div>';
 
+			$evaluasi_kelembagaan_pemda = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="dokumen-evaluasi-pemda' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
+					<div class="esakip-body-tahun" data-id="dokumen-evaluasi-pemda' . $_GET['tahun'] . '">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							$evaluasi_kelembagaan_pemda .= 
+
+			$evaluasi_kelembagaan_pemda .= '
+						</ul>
+					</div>
+				</div>';
+
 			$halaman_evaluasi_pemda = '
 				<div class="accordion">
 					<h5 class="esakip-header-tahun" data-id="halaman-evaluasi-pemda" style="margin: 0;">Pemerintah Daerah</h5>
@@ -22093,6 +22129,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								$halaman_evaluasi_pemda .= do_shortcode(htmlspecialchars_decode($set_html_pemda_evaluasi));
 							}
 			$halaman_evaluasi_pemda .= '
+						</ul>
+					</div>
+				</div>';
+
+			$halaman_sakip_kelembagaan_skpd = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="halaman-sakip-kelembagaan-pemda" style="margin: 0;">Evaluasi Kelembagaan</h5>
+					<div class="esakip-body-tahun" data-id="halaman-sakip-kelembagaan-pemda">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							$halaman_sakip_kelembagaan_skpd .= $pengisian_kuesioner_menpan_detail_skpd;
+							$halaman_sakip_kelembagaan_skpd .= $pengisian_kuesioner_mendagri_detail_skpd;
+			$halaman_sakip_kelembagaan_skpd .= '
 						</ul>
 					</div>
 				</div>';
@@ -22109,6 +22157,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							// ) {
 								$halaman_sakip_evaluasi_pemda .= $halaman_evaluasi_pemda;
 								$halaman_sakip_evaluasi_pemda .= $halaman_evaluasi_opd;
+								$halaman_sakip_evaluasi_pemda .= $halaman_sakip_kelembagaan_skpd;
 							// }
 							$halaman_sakip_evaluasi_pemda .= $halaman_lke;
 			$halaman_sakip_evaluasi_pemda .= '
@@ -22234,7 +22283,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$lhe_akip_internal_skpd_detail = '';
 					$tl_lhe_akip_internal_skpd_detail = '';
 					$laporan_monev_renaksi_skpd_detail = '';
-					$pengisian_kuesioner_menpan_detail = '';
+					$pengisian_kuesioner_menpan_detail_opd = '';
+					$pengisian_kuesioner_mendagri_detail_opd = '';
 					$periode_iku_skpd = '';
 	
 					$cek_menu_aktif = $wpdb->get_results($wpdb->prepare("
@@ -22772,7 +22822,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$cek_data_pelaporan['perangkat_daerah']['Laporan Monev Renaksi']['link'] = $laporan_monev_renaksi_skpd_detail;
 					}
 					
-					$pengisian_kuesioner_menpan = $this->functions->generatePage(array(
+					$pengisian_kuesioner_menpan_opd = $this->functions->generatePage(array(
 						'nama_page' => 'Halaman Kuesioner Menpan OPD' . $_GET['tahun'],
 						'content' => '[kuesioner_menpan id_jadwal tahun=' . $_GET['tahun'] . ']',
 						'show_header' => 1,
@@ -22780,8 +22830,31 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					));
 
 					$title_pengisian_kuesioner_menpan = 'Kuesioner Menpan';
-					$pengisian_kuesioner_menpan['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
-					$pengisian_kuesioner_menpan_detail .= '<li><a href="' . $pengisian_kuesioner_menpan['url'] . '" target="_blank" class="btn btn-primary">' .  $title_pengisian_kuesioner_menpan . '</a></li>';
+					$pengisian_kuesioner_menpan_opd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+					$pengisian_kuesioner_menpan_detail_opd .= '<li><a href="' . $pengisian_kuesioner_menpan_opd['url'] . '" target="_blank" class="btn btn-primary">' .  $title_pengisian_kuesioner_menpan . '</a></li>';
+					
+					$pengisian_kuesioner_mendagri_opd = $this->functions->generatePage(array(
+						'nama_page' => 'Halaman Kuesioner Mendagri OPD' . $_GET['tahun'],
+						'content' => '[kuesioner_mendagri id_jadwal tahun=' . $_GET['tahun'] . ']',
+						'show_header' => 1,
+						'post_status' => 'private'
+					));
+
+					$title_pengisian_kuesioner_mendagri = 'Kuesioner Mendagri';
+					$pengisian_kuesioner_mendagri_opd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+					$pengisian_kuesioner_mendagri_detail_opd .= '<li><a href="' . $pengisian_kuesioner_mendagri_opd['url'] . '" target="_blank" class="btn btn-primary">' .  $title_pengisian_kuesioner_mendagri . '</a></li>';
+
+
+					$halaman_sakip_kelembagaan_opd = '
+							<div class="accordion">
+								<h5 class="esakip-header-tahun" data-id="halaman-kelembagaan-' . $skpd_db['id_skpd'] . '" style="margin: 0;">Evaluasi Kelembagaan</h5>
+								<div class="esakip-body-tahun" data-id="halaman-kelembagaan-' . $skpd_db['id_skpd'] . '">
+									<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+									' . $pengisian_kuesioner_menpan_detail_opd . '
+									' . $pengisian_kuesioner_mendagri_detail_opd . '
+									</ul>
+								</div>
+							</div>';
 
 					if (!empty($cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']) && $cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']['active'] == 1) {
 						$halaman_sakip_pokin_opd = '
@@ -22926,7 +22999,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								in_array("PA", $user_meta->roles) ||
 								in_array("pa", $user_meta->roles)
 							) {
-								$halaman_evaluasi_skpd .= $pengisian_kuesioner_menpan_detail;
+								$halaman_evaluasi_skpd .= $halaman_sakip_kelembagaan_opd;
 							}
 							$halaman_evaluasi_skpd .= $dokumen_evaluasi;
 							$set_html_opd_evaluasi = get_option('sakip_menu_khusus_set_html_opd_EVALUASI_' . $_GET['tahun']);
