@@ -2422,7 +2422,7 @@ CREATE TABLE esakip_data_dukung_kuesioner_mendagri (
 
 CREATE TABLE esakip_pengisian_kuesioner_mendagri (
   `id` int(11) NOT NULL auto_increment,
-  `id_kuesioner_mendagri_detail` int(11) DEFAULT NULL,  
+  `id_kuesioner_mendagri_detail` int(11) DEFAULT NULL, 
   `id_level` int(11) DEFAULT NULL,
   `ket_opd` text DEFAULT NULL,
   `ket_verifikator` text DEFAULT NULL, 
