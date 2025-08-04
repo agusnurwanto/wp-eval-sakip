@@ -540,7 +540,7 @@ if (!empty($data_tahapan)) {
                         $editor_id = 'formulasi';
                         $settings = array(
                             'textarea_name' => 'formulasi',
-                            'media_buttons' => false,
+                            'media_buttons' => true,
                             'teeny' => false,
                             'quicktags' => true
                         );

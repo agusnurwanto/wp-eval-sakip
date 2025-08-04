@@ -394,3 +394,7 @@ thead {
 .nav-link-icon:hover img {
     transform: scale(1.2);
 }
+
+.media-router .media-menu-item {
+    color: inherit;
+}

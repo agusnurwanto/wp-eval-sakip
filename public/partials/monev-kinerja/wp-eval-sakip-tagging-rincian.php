@@ -58,6 +58,7 @@ $indikator_rhk = $wpdb->get_row(
 	", $id_indikator),
 	ARRAY_A
 );
+
 if (empty($indikator_rhk)) {
 	die('<h1 class="text-center">Indikator Rencana Hasil Kerja tidak ditemukan!</h1>');
 }
@@ -759,26 +760,51 @@ if (!empty($selected_rhk) && !empty($selected_rhk['satker_id'])) {
 // ----- get data e-kin perbulan ----- //
 $get_bulanan_message = "Parameter Data Get Data Target Bulanan Ada Yang Kosong!";
 $show_alert_bulanan = 0;
-if (!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($selected_rhk['nip']) && !empty($indikator_rhk['id'])) {
-	$opsi_param = array(
-		'tahun' => $tahun,
-		'satker_id' => $satker_id_pegawai_indikator,
-		'nip' => $selected_rhk['nip'],
-		'id_indikator' => $indikator_rhk['id'],
-		'id_rhk' => $selected_rhk['id'],
-		'id_skpd' => $id_skpd,
-		'tipe' => 'indikator'
-	);
-
-	$data_ekin = $this->get_data_perbulan_ekinerja($opsi_param);
-	$data_ekin_terbaru = json_decode($data_ekin, true);
-	$get_bulanan_message = $data_ekin_terbaru['message'];
-	if (!empty($data_ekin_terbaru['is_error']) && $data_ekin_terbaru['is_error']) {
-		$show_alert_bulanan = 1;
-		$get_bulanan_message = "Ada Error Saat Mengakses Api E-Kinerja | Pesan: " . $data_ekin_terbaru['message'];
-	}
+if (!empty($_GET) && !empty($_GET['id_indikator'])) {
+    $multi_id_indikator = explode('|', $_GET['id_indikator']);
+    $multi_id_indikator = array_map('intval', $multi_id_indikator);
 }
 
+if (!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($selected_rhk['nip']) && !empty($indikator_rhk['id'])) {
+	$implode_id = implode(',', $multi_id_indikator);
+
+    $get_rhk_ind = $wpdb->get_results("
+        SELECT 
+        	id_renaksi
+        FROM esakip_data_rencana_aksi_indikator_opd
+        WHERE id IN ($implode_id)
+    ", ARRAY_A);
+
+    $multi_id_rhk_ind = array_map('intval', array_column($get_rhk_ind, 'id_renaksi'));
+    $implode_id_ind = implode(',', $multi_id_rhk_ind);
+
+    $get_rhk = $wpdb->get_results("
+        SELECT 
+        	id
+        FROM esakip_data_rencana_aksi_opd
+        WHERE id IN ($implode_id_ind)
+    ", ARRAY_A);
+
+    $multi_id_rhk = array_column($get_rhk, 'id');
+    $opsi_param = array(
+        'tahun' => $tahun,
+        'satker_id' => $satker_id_pegawai_indikator,
+        'nip' => $selected_rhk['nip'],
+        'id_indikator' => $multi_id_indikator, 
+        'id_rhk' => $multi_id_rhk,
+        'id_skpd' => $id_skpd,
+        'tipe' => 'indikator'
+    );
+    // print_r($opsi_param); die();
+    $data_ekin = $this->get_data_perbulan_ekinerja($opsi_param);
+    $data_ekin_terbaru = json_decode($data_ekin, true);
+    $get_bulanan_message = $data_ekin_terbaru['message'];
+
+    if (!empty($data_ekin_terbaru['is_error']) && $data_ekin_terbaru['is_error']) {
+        $show_alert_bulanan = 1;
+        $get_bulanan_message = "Ada Error Saat Mengakses Api E-Kinerja | Pesan: " . $data_ekin_terbaru['message'];
+    }
+}
 $data_target_realisasi_bulanan = array();
 $data_capaian_target_realisasi_bulanan = array();
 $data_jadi_volume = $data_jadi_rencana_aksi = $data_jadi_satuan_bulan = $data_jadi_realisasi = $data_jadi_keterangan = array();

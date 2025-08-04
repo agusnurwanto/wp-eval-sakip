@@ -40,12 +40,16 @@ if(!empty($data_jadwal)){
 
     $colspan = $data_jadwal['lama_pelaksanaan'];
     $header_tahun = '<tr>';
-    for($i=$tahun_mulai_anggaran; $i<=$tahun_periode; $i++){
-        $header_tahun .= '
-            <th class="text-center atas kiri kanan bawah">'.$i.'</th>
-        ';
+    for ($i = $tahun_mulai_anggaran; $i <= $tahun_periode; $i++) {
+        $header_tahun .= '<th class="text-center atas kanan bawah kiri" colspan="2">'.$i.'</th>';
+    }
+    $header_tahun .= '</tr><tr>';
+    for ($i = $tahun_mulai_anggaran; $i <= $tahun_periode; $i++) {
+        $header_tahun .= '<th class="text-center atas kanan bawah kiri">Target</th>';
+        $header_tahun .= '<th class="text-center atas kanan bawah kiri">Realisasi</th>';
     }
     $header_tahun .= '</tr>';
+
 }
 
 $nama_jadwal = strtoupper($data_jadwal['jenis_jadwal_khusus']) . ' ' . $data_jadwal['nama_jadwal'] . ' ' . '(' . $tahun_awal . ' - ' . $tahun_akhir . ')';
@@ -120,7 +124,12 @@ if (!empty($iku)) {
             'target_2' => $v_iku['target_2'] ?? '-', 
             'target_3' => $v_iku['target_3'] ?? '-', 
             'target_4' => $v_iku['target_4'] ?? '-', 
-            'target_5' => $v_iku['target_5'] ?? '-', 
+            'target_5' => $v_iku['target_5'] ?? '-',  
+            'realisasi_1' => $v_iku['realisasi_1'] ?? '-', 
+            'realisasi_2' => $v_iku['realisasi_2'] ?? '-', 
+            'realisasi_3' => $v_iku['realisasi_3'] ?? '-', 
+            'realisasi_4' => $v_iku['realisasi_4'] ?? '-', 
+            'realisasi_5' => $v_iku['realisasi_5'] ?? '-', 
             'id_jadwal' => $v_iku['id_jadwal'] ?? '-', 
         ];
         $html_iku .= '<tr>';
@@ -139,7 +148,7 @@ if (!empty($iku)) {
                 ", $id_sasaran));
 
                 $rowspan = $group[$id_sasaran];
-                $html_iku .= '<td class="text-left atas kanan bawah kiri" rowspan="' . $rowspan . '" style="vertical-align: middle;">' . ($sasaran_teks ?: '-') . '</td>';
+                $html_iku .= '<td class="text-left atas kanan bawah kiri" rowspan="' . $rowspan . '">' . ($sasaran_teks ?: '-') . '</td>';
                 $id_sasaran_murni[] = $id_sasaran;
             } elseif ($id_sasaran == 0) {
                 $html_iku .= '<td class="text-left atas kanan bawah kiri">-</td>';
@@ -156,7 +165,9 @@ if (!empty($iku)) {
         $tahun_index = 1;
         for ($tahun = $tahun_mulai_anggaran; $tahun <= $tahun_periode; $tahun++) {
             $target_field = 'target_' . $tahun_index;
+            $realisasi_field = 'realisasi_' . $tahun_index;
             $html_iku .= '<td class="text-left atas kanan bawah kiri">' . ($v_iku[$target_field] ?? '') . '</td>';
+            $html_iku .= '<td class="text-left atas kanan bawah kiri">' . ($v_iku[$realisasi_field] ?? '') . '</td>';
             $tahun_index++;
         }
 
@@ -520,10 +531,23 @@ $generate_page = $this->functions->generatePage(array(
                             <th rowspan="2" class="text-center atas kanan bawah kiri">Sumber Data</th>
                             <th rowspan="2" class="text-center atas kanan bawah kiri">Penanggung Jawab</th>
                             <th rowspan="2" class="text-center atas kanan bawah kiri">Satuan</th>
-                            <th colspan="<?php echo $colspan; ?>" class="text-center atas kanan bawah kiri">Target</th>
+                            <?php
+                            // Baris tahun
+                            for ($i = $tahun_mulai_anggaran; $i <= $tahun_periode; $i++) {
+                                echo '<th class="text-center atas kanan bawah kiri" colspan="2">'.$i.'</th>';
+                            }
+                            ?>
                             <th rowspan="2" class="text-center atas kanan bawah kiri hide-excel" style="width: 150px;">Aksi</th>
                         </tr>
-                        <?php echo $header_tahun; ?>
+                        <tr>
+                            <?php
+                            // Baris Target & Realisasi
+                            for ($i = $tahun_mulai_anggaran; $i <= $tahun_periode; $i++) {
+                                echo '<th class="text-center atas kanan bawah kiri">Target</th>';
+                                echo '<th class="text-center atas kanan bawah kiri">Realisasi</th>';
+                            }
+                            ?>
+                        </tr>
                     </thead>
                     <tbody>
                     </tbody>
@@ -531,7 +555,7 @@ $generate_page = $this->functions->generatePage(array(
             </div>
             <div id="cetak" class="wrap-table">
                 <table cellpadding="2" cellspacing="0" class="table_edit_dokumen_iku table table-bordered" style="display: none;">
-                    <thead style="background: #ffc491;">
+                   <thead style="background: #ffc491;">
                         <tr>
                             <th rowspan="2" class="text-center atas kanan bawah kiri">No</th>
                             <?php if (!empty($id_jadwal_murni)): ?>
@@ -543,9 +567,22 @@ $generate_page = $this->functions->generatePage(array(
                             <th rowspan="2" class="text-center atas kanan bawah kiri">Sumber Data</th>
                             <th rowspan="2" class="text-center atas kanan bawah kiri">Penanggung Jawab</th>
                             <th rowspan="2" class="text-center atas kanan bawah kiri">Satuan</th>
-                            <th colspan="<?php echo $colspan; ?>" class="text-center atas kanan bawah kiri">Target</th>
+                            <?php
+                            // Baris tahun
+                            for ($i = $tahun_mulai_anggaran; $i <= $tahun_periode; $i++) {
+                                echo '<th class="text-center atas kanan bawah kiri" colspan="2">'.$i.'</th>';
+                            }
+                            ?>
                         </tr>
-                        <?php echo $header_tahun; ?>
+                        <tr>
+                            <?php
+                            // Baris Target & Realisasi
+                            for ($i = $tahun_mulai_anggaran; $i <= $tahun_periode; $i++) {
+                                echo '<th class="text-center atas kanan bawah kiri">Target</th>';
+                                echo '<th class="text-center atas kanan bawah kiri">Realisasi</th>';
+                            }
+                            ?>
+                        </tr>
                     </thead>
                     <tbody>
                     </tbody>
@@ -617,9 +654,11 @@ $generate_page = $this->functions->generatePage(array(
                     </div>
                     
                     <?php 
-                    $lama = $data_jadwal['lama_pelaksanaan'];
-                    for ($i = 0; $i < $lama; $i += 2) : 
+                    $lama = $data_jadwal['lama_pelaksanaan'] ?? 0;
                     ?>
+
+                    <!-- Target -->
+                    <?php for ($i = 0; $i < $lama; $i += 2): ?>
                         <div class="form-group row">
                             <div class="col-md-2">
                                 <label for="target_<?php echo $i + 1; ?>">Target <?php echo $i + 1; ?></label>
@@ -627,6 +666,7 @@ $generate_page = $this->functions->generatePage(array(
                             <div class="col-md-4">
                                 <input type="number" class="form-control" id="target_<?php echo $i + 1; ?>" name="target_<?php echo $i + 1; ?>"/>
                             </div>
+
                             <?php if ($i + 2 <= $lama): ?>
                                 <div class="col-md-2">
                                     <label for="target_<?php echo $i + 2; ?>">Target <?php echo $i + 2; ?></label>
@@ -638,6 +678,26 @@ $generate_page = $this->functions->generatePage(array(
                         </div>
                     <?php endfor; ?>
 
+                    <!-- Realisasi -->
+                    <?php for ($i = 0; $i < $lama; $i += 2): ?>
+                        <div class="form-group row">
+                            <div class="col-md-2">
+                                <label for="realisasi_<?php echo $i + 1; ?>">Realisasi <?php echo $i + 1; ?></label>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="number" class="form-control" id="realisasi_<?php echo $i + 1; ?>" name="realisasi_<?php echo $i + 1; ?>"/>
+                            </div>
+
+                            <?php if ($i + 2 <= $lama): ?>
+                                <div class="col-md-2">
+                                    <label for="realisasi_<?php echo $i + 2; ?>">Realisasi <?php echo $i + 2; ?></label>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="number" class="form-control" id="realisasi_<?php echo $i + 2; ?>" name="realisasi_<?php echo $i + 2; ?>"/>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endfor; ?>
                 </form>
             </div>
             <div class="modal-footer">
@@ -680,9 +740,21 @@ $generate_page = $this->functions->generatePage(array(
                                         <th rowspan="2" class="text-center atas kanan bawah kiri">Sumber Data</th>
                                         <th rowspan="2" class="text-center atas kanan bawah kiri">Penanggung Jawab</th>
                                         <th rowspan="2" class="text-center atas kanan bawah kiri">Satuan</th>
-                                        <th colspan="<?php echo $colspan; ?>" class="text-center atas kanan bawah kiri">Target</th>
+                                        <?php
+                                        // Baris tahun
+                                        for ($i = $tahun_mulai_anggaran; $i <= $tahun_periode; $i++) {
+                                            echo '<th class="text-center atas kanan bawah kiri" colspan="2">'.$i.'</th>';
+                                        }
+                                        ?>
                                     </tr>
-                                    <?php echo $header_tahun; ?>
+                                    <tr>
+                                        <?php
+                                        // Baris Target & Realisasi
+                                        for ($i = $tahun_mulai_anggaran; $i <= $tahun_periode; $i++) {
+                                            echo '<th class="text-center atas kanan bawah kiri">Target</th>';
+                                            echo '<th class="text-center atas kanan bawah kiri">Realisasi</th>';
+                                        }
+                                        ?>
                                 </thead>
                                 <tbody>
                                     <?php echo $html_iku; ?>
@@ -879,6 +951,12 @@ function simpanDataIkuPemda(){
     let target_4 = jQuery("#target_4").val();    
     let target_5 = jQuery("#target_5").val();
 
+    let realisasi_1 = jQuery("#realisasi_1").val();
+    let realisasi_2 = jQuery("#realisasi_2").val();    
+    let realisasi_3 = jQuery("#realisasi_3").val();    
+    let realisasi_4 = jQuery("#realisasi_4").val();    
+    let realisasi_5 = jQuery("#realisasi_5").val();
+
 
     if(id_unik == '' || id_indikator == '' || formulasi == '' || sumber_data == '' || penanggung_jawab == '' || satuan == ''){
         return alert('Ada Input Data Yang Kosong!');
@@ -907,6 +985,11 @@ function simpanDataIkuPemda(){
             "target_3": target_3,
             "target_4": target_4,
             "target_5": target_5,
+            "realisasi_1": realisasi_1,
+            "realisasi_2": realisasi_2,
+            "realisasi_3": realisasi_3,
+            "realisasi_4": realisasi_4,
+            "realisasi_5": realisasi_5,
             "id_sasaran_murni": id_sasaran_murni
         },
         dataType: "json",
@@ -978,6 +1061,11 @@ function edit_iku(id) {
                     jQuery("#target_3").val(data.target_3);
                     jQuery("#target_4").val(data.target_4);
                     jQuery("#target_5").val(data.target_5);
+                    jQuery("#realisasi_1").val(data.realisasi_1);
+                    jQuery("#realisasi_2").val(data.realisasi_2);
+                    jQuery("#realisasi_3").val(data.realisasi_3);
+                    jQuery("#realisasi_4").val(data.realisasi_4);
+                    jQuery("#realisasi_5").val(data.realisasi_5);
                     jQuery("#modal-iku").find('.modal-title').html('Edit IKU');
                     jQuery('#modal-iku').modal('show');
 

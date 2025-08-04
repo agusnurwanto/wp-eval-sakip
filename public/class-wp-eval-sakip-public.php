@@ -266,7 +266,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-rkpd.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-rkpd-pemda.php';
 	}
 
 	public function lkjip_lppd($atts)
@@ -6593,15 +6593,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									SELECT a.*
 									FROM esakip_data_mapping_jenis_dokumen_esr a 
 									JOIN esakip_menu_dokumen b 
-									  ON b.id=a.esakip_menu_dokumen_id 
-									 AND a.tahun_anggaran = b.tahun_anggaran 
-									 AND b.active=1
+									  	ON b.id=a.esakip_menu_dokumen_id 
+									 	AND a.tahun_anggaran = b.tahun_anggaran 
+									 	AND b.active=1
 									JOIN esakip_data_jenis_dokumen_esr c 
-									  ON c.jenis_dokumen_esr_id = a.jenis_dokumen_esr_id 
-									 AND c.tahun_anggaran=a.tahun_anggaran 
-									 AND c.active=1
+									  	ON c.jenis_dokumen_esr_id = a.jenis_dokumen_esr_id 
+									 	AND c.tahun_anggaran=a.tahun_anggaran 
+									 	AND c.active=1
 									WHERE a.tahun_anggaran = %d 
-									  AND b.nama_tabel = %s;
+									  	AND b.nama_tabel = %s;
 								", $pengaturan_periode_dokumen['tahun_anggaran'], $nama_tabel),
 								ARRAY_A
 							);
@@ -7424,12 +7424,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 											a.*
 										FROM 
 											esakip_data_mapping_jenis_dokumen_esr a 
-												JOIN esakip_menu_dokumen b 
-													ON b.id=a.esakip_menu_dokumen_id AND 
-														a.tahun_anggaran=b.tahun_anggaran AND b.active=1
-				                                JOIN esakip_data_jenis_dokumen_esr c 
-				                                  	ON c.jenis_dokumen_esr_id=a.jenis_dokumen_esr_id  AND 
-				                                   		c.tahun_anggaran=a.tahun_anggaran AND c.active=1
+										JOIN esakip_menu_dokumen b 
+											ON b.id=a.esakip_menu_dokumen_id AND 
+												a.tahun_anggaran=b.tahun_anggaran AND b.active=1
+		                                JOIN esakip_data_jenis_dokumen_esr c 
+		                                  	ON c.jenis_dokumen_esr_id=a.jenis_dokumen_esr_id  AND 
+		                                   		c.tahun_anggaran=a.tahun_anggaran AND c.active=1
 				                        WHERE 
 				                            a.tahun_anggaran=%d AND
 				                            b.nama_tabel=%s;
@@ -7686,15 +7686,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									SELECT a.*
 									FROM esakip_data_mapping_jenis_dokumen_esr a 
 									JOIN esakip_menu_dokumen b 
-									  ON b.id = a.esakip_menu_dokumen_id 
-									 AND a.tahun_anggaran = b.tahun_anggaran 
-									 AND b.active = 1
+									  	ON b.id = a.esakip_menu_dokumen_id 
+									 	AND a.tahun_anggaran = b.tahun_anggaran 
+									 	AND b.active = 1
 									JOIN esakip_data_jenis_dokumen_esr c 
-									  ON c.jenis_dokumen_esr_id = a.jenis_dokumen_esr_id 
-									 AND c.tahun_anggaran = a.tahun_anggaran 
-									 AND c.active = 1
+									  	ON c.jenis_dokumen_esr_id = a.jenis_dokumen_esr_id 
+									 	AND c.tahun_anggaran = a.tahun_anggaran 
+									 	AND c.active = 1
 									WHERE a.tahun_anggaran = %d 
-									  AND b.nama_tabel = %s;
+									  	AND b.nama_tabel = %s;
 								", $pengaturan_periode_dokumen['tahun_anggaran'], $table_name),
 								ARRAY_A
 							);
@@ -7909,7 +7909,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$rkpds = $wpdb->get_results(
 					$wpdb->prepare("
 						SELECT * 
-						FROM esakip_rkpd
+						FROM esakip_rkpd_pemda
 						WHERE tahun_anggaran = %d 
 						  AND active = 1
 					", $tahun_anggaran),
@@ -8822,7 +8822,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				}
 
 				$tipe_dokumen = $_POST['tipe_dokumen'];
-
+				$tahun_anggaran = $_POST['tahun_anggaran'];
 				if ($ret['status'] == 'success') {
 					// untuk mengatur tabel sesuai tipe dokumen
 					$nama_tabel_admin = array(
@@ -8867,7 +8867,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							ARRAY_A
 						);
 					}
-
 					if (!empty($datas)) {
 						$counter = 1;
 						$tbody = '';
@@ -8875,10 +8874,24 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$mapping_jenis_dokumen_esr = [];
 						$status_api_esr = get_option('_crb_api_esr_status');
 						if ($status_api_esr) {
+							if (!empty($_POST['id_jadwal'])) {
+								$pengaturan_periode_dokumen = $wpdb->get_row(
+									$wpdb->prepare("
+										SELECT * 
+										FROM esakip_pengaturan_upload_dokumen 
+										WHERE id_jadwal_rpjmd = %d
+										  AND active = %d
+									", $_POST['id_jadwal'], 1),
+									ARRAY_A
+								);
 
+								if (!empty($pengaturan_periode_dokumen)) {
+									$tahun_anggaran = $pengaturan_periode_dokumen['tahun_anggaran'];
+								}
+							}
 							$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 								SELECT 
-										a.*
+									a.*
 								FROM 
 									esakip_data_mapping_jenis_dokumen_esr a 
 								JOIN esakip_menu_dokumen b 
@@ -16934,15 +16947,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									SELECT a.*
 									FROM esakip_data_mapping_jenis_dokumen_esr a 
 									JOIN esakip_menu_dokumen b 
-									  ON b.id=a.esakip_menu_dokumen_id 
-									 AND a.tahun_anggaran = b.tahun_anggaran 
-									 AND b.active = 1
+									  	ON b.id=a.esakip_menu_dokumen_id 
+									 	AND a.tahun_anggaran = b.tahun_anggaran 
+									 	AND b.active = 1
 									JOIN esakip_data_jenis_dokumen_esr c 
-									  ON c.jenis_dokumen_esr_id = a.jenis_dokumen_esr_id 
-									 AND c.tahun_anggaran = a.tahun_anggaran 
-									 AND c.active=1
+									  	ON c.jenis_dokumen_esr_id = a.jenis_dokumen_esr_id 
+									 	AND c.tahun_anggaran = a.tahun_anggaran 
+									 	AND c.active=1
 									WHERE a.tahun_anggaran = %d 
-									  AND b.nama_tabel = %s;
+									  	AND b.nama_tabel = %s;
 								", $pengaturan_periode_dokumen['tahun_anggaran'], 'esakip_iku'),
 								ARRAY_A
 							);
@@ -20228,12 +20241,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						}
 					}
 				} else {
-					$tbody = "<tr><td colspan='8' class='text-center'>Tidak ada data tersedia</td></tr>";
+					$tbody = "<tr><td colspan='11' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
 
 				if ($total_bobot_komponen != 100) {
 					$tbody .= "<tr>";
-					$tbody .= "<td colspan='9' class='text-center'>";
+					$tbody .= "<td colspan='11' class='text-center'>";
 					$tbody .= "<button class='btn btn-primary btn-lg btn-block' onclick='tambah_komponen_utama(\"" . $id_jadwal . "\")'><span class='dashicons dashicons-plus'></span> Tambah Komponen Utama</button>";
 					$tbody .= "</td>";
 					$tbody .= "</tr>";
@@ -20656,6 +20669,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$periode_input_iku_pemda = '';
 		$periode_iku_pemda = '';
 		$halaman_iku_pemda = '';
+		$pengisian_kuesioner_menpan_detail_pemda = '';
+		$pengisian_kuesioner_mendagri_detail_pemda = '';
 
 		// SAKIP Perangkat Daerah
 		$periode_renstra = '';
@@ -20688,6 +20703,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$periode_input_iku_opd = '';
 		$periode_iku_opd = '';
 		$halaman_iku_opd = '';
+		$pengisian_kuesioner_menpan_detail_skpd = '';
+		$pengisian_kuesioner_mendagri_detail_skpd = '';
 
 		foreach ($jadwal_periode as $jadwal_periode_item) {
 			if (!empty($jadwal_periode_item['tahun_selesai_anggaran']) && $jadwal_periode_item['tahun_selesai_anggaran'] > 1) {
@@ -21226,6 +21243,26 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$title_dokumen_lainnya = 'Lainnya';
 			$cek_data_pelaporan['perangkat_daerah']['Dokumen Lainnya']['link'] = '<li><a target="_blank" href="' . $dokumen_lainnya['url'] . '" class="btn btn-primary">' .  $title_dokumen_lainnya . '</a></li>';
 		}
+					
+		$pengisian_kuesioner_menpan_skpd = $this->functions->generatePage(array(
+			'nama_page' => 'Kuesioner Menpan SKPD' . $_GET['tahun'],
+			'content' => '[list_kuesioner_menpan id_jadwal tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+
+		$title_pengisian_kuesioner_menpan = 'Kuesioner Menpan';
+		$pengisian_kuesioner_menpan_detail_skpd .= '<li><a href="' . $pengisian_kuesioner_menpan_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $title_pengisian_kuesioner_menpan . '</a></li>';
+		
+		$pengisian_kuesioner_mendagri_skpd = $this->functions->generatePage(array(
+			'nama_page' => 'Kuesioner Mendagri SKPD' . $_GET['tahun'],
+			'content' => '[list_kuesioner_mendagri id_jadwal tahun=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
+
+		$title_pengisian_kuesioner_mendagri = 'Kuesioner Mendagri';
+		$pengisian_kuesioner_mendagri_detail_skpd .= '<li><a href="' . $pengisian_kuesioner_mendagri_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $title_pengisian_kuesioner_mendagri . '</a></li>';
 
 		//DOKUMEN Perangkat Daerah JIKA DIPAKAI
 		if (!empty($cek_data_perencanaan['perangkat_daerah']['SKP']) && $cek_data_perencanaan['perangkat_daerah']['SKP']['active'] == 1) {
@@ -22069,6 +22106,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					</div>
 				</div>';
 
+			$evaluasi_kelembagaan_pemda = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="dokumen-evaluasi-pemda' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
+					<div class="esakip-body-tahun" data-id="dokumen-evaluasi-pemda' . $_GET['tahun'] . '">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							$evaluasi_kelembagaan_pemda .= 
+
+			$evaluasi_kelembagaan_pemda .= '
+						</ul>
+					</div>
+				</div>';
+
 			$halaman_evaluasi_pemda = '
 				<div class="accordion">
 					<h5 class="esakip-header-tahun" data-id="halaman-evaluasi-pemda" style="margin: 0;">Pemerintah Daerah</h5>
@@ -22080,6 +22129,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								$halaman_evaluasi_pemda .= do_shortcode(htmlspecialchars_decode($set_html_pemda_evaluasi));
 							}
 			$halaman_evaluasi_pemda .= '
+						</ul>
+					</div>
+				</div>';
+
+			$halaman_sakip_kelembagaan_skpd = '
+				<div class="accordion">
+					<h5 class="esakip-header-tahun" data-id="halaman-sakip-kelembagaan-pemda" style="margin: 0;">Evaluasi Kelembagaan</h5>
+					<div class="esakip-body-tahun" data-id="halaman-sakip-kelembagaan-pemda">
+						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							$halaman_sakip_kelembagaan_skpd .= $pengisian_kuesioner_menpan_detail_skpd;
+							$halaman_sakip_kelembagaan_skpd .= $pengisian_kuesioner_mendagri_detail_skpd;
+			$halaman_sakip_kelembagaan_skpd .= '
 						</ul>
 					</div>
 				</div>';
@@ -22096,6 +22157,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							// ) {
 								$halaman_sakip_evaluasi_pemda .= $halaman_evaluasi_pemda;
 								$halaman_sakip_evaluasi_pemda .= $halaman_evaluasi_opd;
+								$halaman_sakip_evaluasi_pemda .= $halaman_sakip_kelembagaan_skpd;
 							// }
 							$halaman_sakip_evaluasi_pemda .= $halaman_lke;
 			$halaman_sakip_evaluasi_pemda .= '
@@ -22221,6 +22283,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$lhe_akip_internal_skpd_detail = '';
 					$tl_lhe_akip_internal_skpd_detail = '';
 					$laporan_monev_renaksi_skpd_detail = '';
+					$pengisian_kuesioner_menpan_detail_opd = '';
+					$pengisian_kuesioner_mendagri_detail_opd = '';
 					$periode_iku_skpd = '';
 	
 					$cek_menu_aktif = $wpdb->get_results($wpdb->prepare("
@@ -22757,7 +22821,41 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$laporan_monev_renaksi_skpd_detail .= '<li><a href="' . $laporan_monev_renaksi_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $title_laporan_monev_renaksi_skpd . '</a></li>';
 						$cek_data_pelaporan['perangkat_daerah']['Laporan Monev Renaksi']['link'] = $laporan_monev_renaksi_skpd_detail;
 					}
-	
+					
+					$pengisian_kuesioner_menpan_opd = $this->functions->generatePage(array(
+						'nama_page' => 'Halaman Kuesioner Menpan OPD' . $_GET['tahun'],
+						'content' => '[kuesioner_menpan id_jadwal tahun=' . $_GET['tahun'] . ']',
+						'show_header' => 1,
+						'post_status' => 'private'
+					));
+
+					$title_pengisian_kuesioner_menpan = 'Kuesioner Menpan';
+					$pengisian_kuesioner_menpan_opd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+					$pengisian_kuesioner_menpan_detail_opd .= '<li><a href="' . $pengisian_kuesioner_menpan_opd['url'] . '" target="_blank" class="btn btn-primary">' .  $title_pengisian_kuesioner_menpan . '</a></li>';
+					
+					$pengisian_kuesioner_mendagri_opd = $this->functions->generatePage(array(
+						'nama_page' => 'Halaman Kuesioner Mendagri OPD' . $_GET['tahun'],
+						'content' => '[kuesioner_mendagri id_jadwal tahun=' . $_GET['tahun'] . ']',
+						'show_header' => 1,
+						'post_status' => 'private'
+					));
+
+					$title_pengisian_kuesioner_mendagri = 'Kuesioner Mendagri';
+					$pengisian_kuesioner_mendagri_opd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+					$pengisian_kuesioner_mendagri_detail_opd .= '<li><a href="' . $pengisian_kuesioner_mendagri_opd['url'] . '" target="_blank" class="btn btn-primary">' .  $title_pengisian_kuesioner_mendagri . '</a></li>';
+
+
+					$halaman_sakip_kelembagaan_opd = '
+							<div class="accordion">
+								<h5 class="esakip-header-tahun" data-id="halaman-kelembagaan-' . $skpd_db['id_skpd'] . '" style="margin: 0;">Evaluasi Kelembagaan</h5>
+								<div class="esakip-body-tahun" data-id="halaman-kelembagaan-' . $skpd_db['id_skpd'] . '">
+									<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">
+									' . $pengisian_kuesioner_menpan_detail_opd . '
+									' . $pengisian_kuesioner_mendagri_detail_opd . '
+									</ul>
+								</div>
+							</div>';
+
 					if (!empty($cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']) && $cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']['active'] == 1) {
 						$halaman_sakip_pokin_opd = '
 								<div class="accordion">
@@ -22897,6 +22995,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						<div class="esakip-body-tahun" data-id="halaman-sakip-evaluasi-skpd-' . $skpd_db['id_skpd'] . '">
 							<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
 							$halaman_evaluasi_skpd .= $halaman_lke_per_skpd;
+							if (
+								in_array("PA", $user_meta->roles) ||
+								in_array("pa", $user_meta->roles)
+							) {
+								$halaman_evaluasi_skpd .= $halaman_sakip_kelembagaan_opd;
+							}
 							$halaman_evaluasi_skpd .= $dokumen_evaluasi;
 							$set_html_opd_evaluasi = get_option('sakip_menu_khusus_set_html_opd_EVALUASI_' . $_GET['tahun']);
 							if (!empty($set_html_opd_evaluasi)) {
@@ -23578,10 +23682,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									'penjelasan' => $penjelasan,
 									'langkah_kerja' => $langkah_kerja,
 									'jenis_bukti_dukung' => $bukti_dukung,
+									'id_kke' => $_POST['id_kke'],
 									'bobot' => $bobot_penilaian,
 								),
 								array('id' => $id_komponen_penilaian),
-								array('%d', '%s', '%s', '%f', '%s', '%s', '%s', '%s', '%f'),
+								array('%d', '%s', '%s', '%f', '%s', '%s', '%s', '%s', '%d', '%f'),
 								array('%d')
 							);
 						} else {
@@ -23596,9 +23701,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									'penjelasan' => $penjelasan,
 									'langkah_kerja' => $langkah_kerja,
 									'jenis_bukti_dukung' => $bukti_dukung,
+									'id_kke' => $_POST['id_kke'],
 									'bobot' => $bobot_penilaian,
 								),
-								array('%d', '%s', '%s', '%f', '%s', '%s', '%s', '%s', '%f'),
+								array('%d', '%s', '%s', '%f', '%s', '%s', '%s', '%s', '%d', '%f'),
 							);
 						}
 					}
@@ -24967,14 +25073,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
 										SELECT 
 											a.*
-										FROM 
-											esakip_data_mapping_jenis_dokumen_esr a 
-												JOIN esakip_menu_dokumen b 
-													ON b.id=a.esakip_menu_dokumen_id AND 
-														a.tahun_anggaran=b.tahun_anggaran AND b.active=1
-				                                JOIN esakip_data_jenis_dokumen_esr c 
-				                                  	ON c.jenis_dokumen_esr_id=a.jenis_dokumen_esr_id  AND 
-				                                   		c.tahun_anggaran=a.tahun_anggaran AND c.active=1
+										FROM esakip_data_mapping_jenis_dokumen_esr a 
+										JOIN esakip_menu_dokumen b 
+											ON b.id=a.esakip_menu_dokumen_id AND 
+												a.tahun_anggaran=b.tahun_anggaran AND b.active=1
+		                                JOIN esakip_data_jenis_dokumen_esr c 
+		                                  	ON c.jenis_dokumen_esr_id=a.jenis_dokumen_esr_id  AND 
+		                                   		c.tahun_anggaran=a.tahun_anggaran AND c.active=1
 				                        WHERE 
 				                            a.tahun_anggaran=%d AND
 				                            b.nama_tabel=%s;
@@ -30046,13 +30151,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 										a.*
 									FROM 
 										esakip_data_mapping_jenis_dokumen_esr a 
-											JOIN esakip_menu_dokumen b 
-												ON b.id=a.esakip_menu_dokumen_id AND 
-													a.tahun_anggaran=b.tahun_anggaran AND b.active=1
-		                                    JOIN esakip_data_jenis_dokumen_esr c 
-		                                    	ON c.jenis_dokumen_esr_id=a.jenis_dokumen_esr_id  AND 
-		                                    		c.tahun_anggaran=a.tahun_anggaran AND c.active=1
-		                                    where 
+									JOIN esakip_menu_dokumen b 
+										ON b.id=a.esakip_menu_dokumen_id AND 
+											a.tahun_anggaran=b.tahun_anggaran AND b.active=1
+                                    JOIN esakip_data_jenis_dokumen_esr c 
+                                    	ON c.jenis_dokumen_esr_id=a.jenis_dokumen_esr_id  AND 
+                                    		c.tahun_anggaran=a.tahun_anggaran AND c.active=1
+                                    where 
 		                            	a.tahun_anggaran=%d and
 		                                b.nama_tabel=%s;
 								", $tahun_anggaran, $nama_tabel), ARRAY_A);
@@ -32622,7 +32727,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		
 			if (!empty($pohon_kinerja_level_1)) {
 				$Pohon_kinerja_opd_page = $this->functions->generatePage(array(
-					'nama_page'    => 'Pohon Kinerja ' . $vv['nama_skpd'],
+					'nama_page'    => 'Pohon Kinerja' . $vv['nama_skpd'],
 					'content'      => '[view_pohon_kinerja_opd periode=' . $_POST['id_jadwal'] . ']',
 					'show_header'  => 1,
 					'post_status'  => 'publish'
@@ -32719,7 +32824,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$no_opd = 1;
 			foreach ($all_skpd as $skpd) {
 				$cascading_publish_page = $this->functions->generatePage([
-					'nama_page'   => 'Cascading ' . $skpd['nama_skpd'],
+					'nama_page'   => 'Cascading',
 					'content'     => '[view_cascading_publish]',
 					'show_header' => 1,
 					'post_status' => 'publish'
@@ -32744,6 +32849,125 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				
 		die(json_encode($ret));
 	}
+
+	function get_datatable_iku_publish() 
+	{
+		global $wpdb;
+		
+		$ret = [
+			'status'      => 'success',
+			'message'     => 'Berhasil mendapatkan data IKU publish!',
+			'data'        => '',
+			'data_pemda'  => ''
+		];
+	
+		// Ambil data tujuan tanpa id_unik_indikator
+		$get_iku = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT * 
+				FROM esakip_data_iku_pemda 
+				WHERE id_jadwal = %d
+				  AND active = 1
+			", $_POST['id_jadwal']), ARRAY_A
+		);
+		$ret['sql'] = $wpdb->last_query;
+	
+		if (!empty($get_iku)) {
+			$tbody_pemda = '';
+			$counter = 1;
+			
+			foreach ($get_iku as $iku) {
+				$target = '';
+				for($i=1; $i<=$_POST['lama_pelaksanaan']; $i++){
+					$target .= "
+						<td class='text-center'>{$iku['target_'.$i]}</td>
+						<td class='text-center'></td>
+					";
+				}
+				$tbody_pemda .= "
+				<tr>
+					<td class='text-center'>{$counter}</td>
+					<td>{$iku['label_sasaran']}</td>
+					<td>{$iku['label_indikator']}</td>
+					<td>{$iku['satuan']}</td>
+					{$target}
+				</tr>";
+				$counter++;
+			}
+			
+			$ret['data_pemda'] = $tbody_pemda;
+		}
+	
+		$tahun_anggaran = isset($_POST['tahun_anggaran']) ? intval($_POST['tahun_anggaran']) : 0;
+		//jadwal rpjmd
+		$id_jadwal = isset($_POST['id_jadwal']) ? intval($_POST['id_jadwal']) : 0;
+	
+		$all_skpd = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT 
+					id_skpd, 
+					nama_skpd, 
+					kode_skpd 
+				FROM esakip_data_unit 
+				WHERE active = 1 
+				  AND is_skpd = 1 
+				  AND tahun_anggaran = %d 
+				ORDER BY kode_skpd ASC
+			", $tahun_anggaran),
+			ARRAY_A
+		);
+				
+		if (!empty($_POST['id_jadwal_wp_sipd'])) {
+			$tbody = '';
+			$no_opd = 1;
+			foreach ($all_skpd as $skpd) {
+				$cascading_publish_page = $this->functions->generatePage([
+					'nama_page'   => 'Capaian Kinerja Perangkat Daerah',
+					'content'     => '[capaian_iku_opd]',
+					'show_header' => 1,
+					'post_status' => 'publish'
+				]);
+			
+				$url = $cascading_publish_page['url'] . '&id_skpd=' . $skpd['id_skpd'] . '&id_jadwal=' . $_POST['id_jadwal_wp_sipd'];
+			
+				$btn = "<button type='button' class='btn btn-info' title='Lihat IKU " . htmlspecialchars($skpd['nama_skpd']) . "' onclick='window.open(\"{$url}\", \"_blank\");'>
+					<span class='dashicons dashicons-visibility'></span>
+				</button>";
+			
+				$tbody .= "<tr>
+					<td class='text-center'>{$no_opd}</td>
+					<td class='text-left'>{$skpd['kode_skpd']} {$skpd['nama_skpd']}</td>
+					<td class='text-center'>{$btn}</td>
+				</tr>";
+			
+				$no_opd++;
+			}
+			$ret['data'] = $tbody;
+		}
+				
+		die(json_encode($ret));
+	}
+
+	function get_datatable_iku_publish_opd() 
+	{
+		// data to send in API request
+		$api_params_get_skpd = array(
+			'action' 		 => 'monitor_monev_iku',
+			'api_key'		 => get_option('_crb_apikey_wpsipd'),
+			'id_skpd'		 => $_POST['id_skpd'],
+			'id_jadwal' => $_POST['id_jadwal']
+		);
+
+		$res = wp_remote_post(
+			get_option('_crb_url_server_sakip'),
+			array(
+				'timeout' 	=> 1000,
+				'sslverify' => false,
+				'body' 		=> $api_params_get_skpd
+			)
+		);
+		die($res['body']);
+	}
 	
 	function get_rpjmd_setting_by_tahun_anggaran($tahun_anggaran) 
 	{
@@ -32762,10 +32986,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					u.id_jadwal_wp_sipd
 				FROM esakip_pengaturan_upload_dokumen u
 				INNER JOIN esakip_data_jadwal j
-						ON u.id_jadwal_rpjmd = j.id
+					ON u.id_jadwal_rpjmd = j.id
 				WHERE u.tahun_anggaran = %d
-				  AND u.active = 1
-				  AND j.status != 0
+				  	AND u.active = 1
+				  	AND j.status != 0
 				LIMIT 1
 			", $tahun_anggaran),
 			ARRAY_A
@@ -33244,13 +33468,86 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
-	// --------------------------------------------------------
-	// --------------------------------------------------------
-    // --- METHOD HANDLER PEGAWAI SIMPEG ---
-    // --------------------------------------------------------
-    // --------------------------------------------------------
+   	// =========================================================================
+	// METHOD HANDLER JADWAL
+    // =========================================================================
 
     /**
+     * The name of the database table for jadwal.
+     * @var string
+     */
+    private $table_data_jadwal = 'esakip_data_jadwal';
+
+    public function get_data_jadwal_by_type($type)
+    {
+        global $wpdb;
+
+		$allowed_type_jadwal = [
+			'RPJPD',
+			'RPJMD',
+			'LKE',
+			'verifikasi_upload_dokumen'
+		];
+
+		if (!in_array($type, $allowed_type_jadwal)) {
+			return;
+		}
+
+		$sql = $wpdb->prepare("
+			SELECT *
+			FROM {$this->table_data_jadwal}
+			WHERE status != 0
+			  AND tipe = %s
+		", $type);
+
+        // The second parameter, OBJECT, ensures the result is an object.
+        $data = $wpdb->get_results($sql, OBJECT);
+
+        return $data;
+    }
+
+	 /**
+     * API get data jadwal by type.
+     */
+    public function get_data_jadwal_by_type_ajax()
+    {
+        try {
+            $this->functions->validate($_POST, [
+                'api_key'   => 'required|string',
+                'type' 		=> 'required|string'
+            ]);
+
+            if ($_POST['api_key'] !== get_option(ESAKIP_APIKEY)) {
+                 throw new Exception("API key tidak valid atau tidak ditemukan!", 401);
+            }
+
+            $data_jadwal = $this->get_data_jadwal_by_type($_POST['type']);
+
+            if ($data_jadwal) {
+                echo json_encode([
+                    'status'  => true,
+                    'message' => 'Data berhasil ditemukan.',
+                    'data'    => $data_jadwal
+                ]);
+            } else {
+                 throw new Exception("Data jadwal dengan tipe = {$_POST['type']} tidak ditemukan.", 404);
+            }
+        } catch (Exception $e) {
+            $code = is_int($e->getCode()) && $e->getCode() !== 0 ? $e->getCode() : 500;
+            http_response_code($code);
+            echo json_encode([
+				'status'  => false,
+				'message' => $e->getMessage()
+			]);
+        }
+        wp_die();
+    }
+
+	// =========================================================================
+	// METHOD HANDLER PEGAWAI SIMPEG
+	// =========================================================================
+     
+	/**
      * The name of the database table for pegawai simpeg.
      * @var string
      */
@@ -33289,19 +33586,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
         'update_at'            => '%s',
     ];
 
-    /**
-     * Dynamically updates a record in the esakip_data_pegawai_simpeg table.
-     *
-     * This method is designed to handle partial updates securely and efficiently.
-     * It automatically generates the correct data formats for the columns being updated
-     * and sets the 'update_at' field to the current time.
-     *
-     * @param int   $id   The primary key (id) of the record to update.
-     * @param array $data An associative array where keys are column names and values
-     * are the new data for those columns.
-     *
-     * @return int|false The number of rows updated, or false on error.
-     */
     public function update_data_pegawai_simpeg_by_id($id, $data)
     {
         global $wpdb;
@@ -33337,12 +33621,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
         return $updated;
     }
 
-	 /**
-     * Retrieves a single record from the esakip_data_pegawai_simpeg table by its primary key.
-     *
-     * @param int $id The primary key (id) of the record to retrieve.
-     * @return object|null The record as an object, or null if not found or on error.
-     */
     public function get_data_pegawai_simpeg_by_id($id)
     {
         global $wpdb;
@@ -33366,13 +33644,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
         return $pegawai;
     }
 
-	 /**
-     * Retrieves a single record from the esakip_data_pegawai_simpeg table by its primary key.
-	 * where pegawai is inactive
-     *
-     * @param int $id The primary key (id) of the record to retrieve.
-     * @return object|null The record as an object, or null if not found or on error.
-     */
     public function get_data_pegawai_simpeg_inactive_by_id($id)
     {
         global $wpdb;
@@ -33396,13 +33667,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
         return $pegawai;
     }
 
-	/**
-	 * Retrieves all records from the esakip_data_pegawai_simpeg table where satker_id matches the given pattern.
-	 *
-	 * @param string $satker_id The satker_id pattern to match.
-	 * @param bool $all If true, matches all records starting with the satker_id; if false, matches exactly.
-	 * @return array An array of objects representing the matching records.
-	 */
     public function get_data_pegawai_simpeg_by_satker_id($satker_id)
     {
         global $wpdb; 
@@ -33417,13 +33681,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
         return $pegawai;
     }
 
-	/**
-	 * Retrieves a single record from the esakip_data_pegawai_simpeg table where satker_id matches the given satker_id
-	 * and tipe_pegawai_id is 11 (indicating a specific type of employee (KEPALA)).
-	 *
-	 * @param string $satker_id The satker_id to match.
-	 * @return object|null The record as an object, or null if not found or on error.
-	 */
     public function get_data_pegawai_simpeg_atasan_by_satker_id($satker_id)
     {
         global $wpdb; 
@@ -33719,5 +33976,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			]);
 		}
 		wp_die();
+	}
+
+	function batasi_upload_gambar($mimes){
+		$current_user = wp_get_current_user();
+		if (
+			in_array('administrator', $current_user->roles)
+			|| in_array('admin_bappeda', $current_user->roles)
+			|| in_array('admin_ortala', $current_user->roles)
+			|| in_array('admin_inspektor', $current_user->roles)
+		) {
+		    return $mimes;
+		} else {
+		    return [
+		        'jpg|jpe|jpeg' => 'image/jpeg',
+		        'png'      => 'image/png',
+		    ];
+		}
 	}
 }
