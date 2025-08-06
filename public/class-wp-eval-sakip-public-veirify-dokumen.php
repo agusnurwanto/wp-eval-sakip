@@ -2372,31 +2372,60 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
 
                 $data_pegawai_all = array();
                 $satker_id = $mapping_satker_id;
-                $data_pegawai = $wpdb->get_results(
-                    $wpdb->prepare("
-                        SELECT 
-                            p.id,
-                            p.nip_baru,
-                            p.nama_pegawai,
-                            p.satker_id,
-                            p.jabatan,
-                            p.id_jabatan,
-                            p.tipe_pegawai,
-                            p.tipe_pegawai_id,
-                            p.active,
-                            p.custom_jabatan,
-                            s.nama AS nama_bidang
-                        FROM esakip_data_pegawai_simpeg p
-                        LEFT JOIN esakip_data_satker_simpeg s
-                               ON s.satker_id = p.satker_id
-                        WHERE p.satker_id LIKE %s 
-                          AND p.active = 1
-                          AND p.active_rhk = 1
-                          AND s.tahun_anggaran = %d
-                        ORDER BY p.satker_id, p.tipe_pegawai_id, p.berakhir DESC, p.nama_pegawai
-                    ", $satker_id . '%', $_POST['tahun_anggaran']),
-                    ARRAY_A
-                );
+                if(!empty($_POST['nip'])){                    
+                    $data_pegawai = $wpdb->get_results(
+                        $wpdb->prepare("
+                            SELECT 
+                                p.id,
+                                p.nip_baru,
+                                p.nama_pegawai,
+                                p.satker_id,
+                                p.jabatan,
+                                p.id_jabatan,
+                                p.tipe_pegawai,
+                                p.tipe_pegawai_id,
+                                p.active,
+                                p.custom_jabatan,
+                                s.nama AS nama_bidang
+                            FROM esakip_data_pegawai_simpeg p
+                            LEFT JOIN esakip_data_satker_simpeg s
+                                   ON s.satker_id = p.satker_id
+                            WHERE p.satker_id LIKE %s 
+                              AND p.nip_baru = %d
+                              AND p.active = 1
+                              AND p.active_rhk = 1
+                              AND s.tahun_anggaran = %d
+                            ORDER BY p.satker_id, p.tipe_pegawai_id, p.berakhir DESC, p.nama_pegawai
+                        ", $satker_id . '%', $_POST['nip'], $_POST['tahun_anggaran']),
+                        ARRAY_A
+                    );
+                } else {
+                    $data_pegawai = $wpdb->get_results(
+                        $wpdb->prepare("
+                            SELECT 
+                                p.id,
+                                p.nip_baru,
+                                p.nama_pegawai,
+                                p.satker_id,
+                                p.jabatan,
+                                p.id_jabatan,
+                                p.tipe_pegawai,
+                                p.tipe_pegawai_id,
+                                p.active,
+                                p.custom_jabatan,
+                                s.nama AS nama_bidang
+                            FROM esakip_data_pegawai_simpeg p
+                            LEFT JOIN esakip_data_satker_simpeg s
+                                   ON s.satker_id = p.satker_id
+                            WHERE p.satker_id LIKE %s 
+                              AND p.active = 1
+                              AND p.active_rhk = 1
+                              AND s.tahun_anggaran = %d
+                            ORDER BY p.satker_id, p.tipe_pegawai_id, p.berakhir DESC, p.nama_pegawai
+                        ", $satker_id . '%', $_POST['tahun_anggaran']),
+                        ARRAY_A
+                    );
+                }
                 if (!empty($data_pegawai)) {
                     foreach ($data_pegawai as $v_1) {
                         if (
