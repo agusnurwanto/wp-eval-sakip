@@ -70,7 +70,7 @@ foreach ($idtahun as $val) {
                     <tr>
                         <th class="text-center" colspan="3" style="vertical-align: middle;">Kuesioner/Indikator</th>
                         <th class="text-center" style="vertical-align: middle;">Deskripsi</th>
-                        <th class="text-center" style="vertical-align: middle;">Level</th>
+                        <th class="text-center" style="vertical-align: middle;">Tingkat Kematangan</th>
                         <th class="text-center" style="vertical-align: middle;">Penjelasan</th>
                         <th class="text-center" style="vertical-align: middle;">Aksi</th>
                     </tr>
