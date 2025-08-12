@@ -9,11 +9,8 @@ $input = shortcode_atts(array(
     'tahun' => '2025',
 ), $atts);
 
-if (!empty($_GET) && !empty($_GET['id_skpd'])) {
-    $id_skpd = $_GET['id_skpd'];
-} else {
-    die('<h1 class="text-center">id_skpd tidak boleh kosong!</h1>');
-}
+$id_skpd = !empty($_GET['id_skpd']) ? intval($_GET['id_skpd']) : 0;
+
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
 $skpd = $wpdb->get_row(
@@ -38,11 +35,196 @@ $tahun = "<option value='-1'>Pilih Tahun</option>";
 
 foreach ($idtahun as $val) {
     $selected = '';
-    if (!empty($input['tahun_anggaran']) && $val['tahun_anggaran'] == $input['tahun']) {
+    if (!empty($input['tahun']) && $val['tahun_anggaran'] == $input['tahun']) {
         $selected = 'selected';
     }
     $tahun .= "<option value='$val[tahun_anggaran]' $selected>$val[tahun_anggaran]</option>";
 }
+$current_user = wp_get_current_user();
+$ret['debug_roles'] = $current_user->roles;
+$user_roles = $current_user->roles;
+$is_admin = in_array('administrator', $user_roles) || in_array('admin_panrb', $user_roles) || in_array("admin_bappeda", $current_user->roles) || in_array("administrator", $current_user->roles);
+
+$nama_pemda = get_option(ESAKIP_NAMA_PEMDA);
+
+$html = '
+<div class="container-md" style="font-family:\'Times New Roman\', serif; padding: 0 20px;">
+    <form id="form-kuesioner">
+        <div>
+            <p style="text-align: center !important; text-transform: uppercase">
+                <b>HASIL PENILAIAN TINGKAT KEMATANGAN INDIVIDU<br>PERANGKAT DAERAH ' . strtoupper($nama_pemda) . ' TAHUN ' . $input['tahun'] . '<br>' . $skpd['nama_skpd'] . '
+                </b>
+            </p>';
+$html .= '
+<div style="padding: 0 5px;">
+    <table class="table table-bordered" style="width:100%; margin-bottom:10px;">
+';
+$html .= '
+<thead>
+    <tr>
+        <th rowspan="2" style="text-align: center; vertical-align: middle; width: 30px;">No</th>
+        <th rowspan="2" style="text-align: center; vertical-align: middle;">Variabel</th>
+        <th colspan="2" style="text-align: center;">Hasil Awal</th>
+        <th colspan="2" style="text-align: center;">Hasil Akhir</th>
+    </tr>
+    <tr>
+        <th style="text-align: center; width: 60px;">Tingkat</th>
+        <th style="text-align: center; width: 60px;">Skor</th>
+        <th style="text-align: center; width: 60px;">Tingkat</th>
+        <th style="text-align: center; width: 60px;">Skor</th>
+    </tr>
+</thead>';
+
+$data_kuesioner = $wpdb->get_results($wpdb->prepare("
+    SELECT 
+        * 
+    FROM esakip_kuesioner_mendagri 
+    WHERE tahun_anggaran = %d 
+        AND active = 1 
+    ORDER BY nomor_urut ASC
+    ", $input['tahun']), 
+    ARRAY_A
+);
+
+$no = 1;
+$tbody = '';
+$romawi = array(
+    '1' => 'I',
+    '2' => 'II',
+    '3' => 'III',
+    '4' => 'IV',
+    '5' => 'V'
+);
+$total_skor_awal = 0;   // total skor dari kolom hasil awal (angka)
+$total_skor_akhir = 0;  // total skor dari kolom hasil akhir (angka)
+
+foreach ($data_kuesioner as $row) {
+    $id_kuesioner = intval($row['id']);
+
+    $pengisian = $wpdb->get_row($wpdb->prepare("
+        SELECT 
+            id_kuesioner_mendagri_detail,
+            id_level,
+            nilai_akhir,
+            ket_verifikator
+        FROM esakip_pengisian_kuesioner_mendagri
+        WHERE id_kuesioner = %d
+            AND id_skpd = %d
+            AND tahun_anggaran = %d
+            AND active = 1
+    ", $id_kuesioner, $id_skpd, $input['tahun']),
+    ARRAY_A
+);
+    $id_kuesioner_mendagri_detail = !empty($pengisian['id_kuesioner_mendagri_detail']) ? intval($pengisian['id_kuesioner_mendagri_detail']) : 0;
+    $id_level = !empty($pengisian['id_level']) ? $pengisian['id_level'] : 0;
+    $nilai_akhir = !empty($pengisian['nilai_akhir']) ? $pengisian['nilai_akhir'] : 0;
+    $ket_verifikator = !empty($pengisian['ket_verifikator']) ? esc_html($pengisian['ket_verifikator']) : '-';
+    $label_tingkat = $id_level != '0' ? $romawi[$id_level] : 'Belum Diisi';
+    $label_nilai = $nilai_akhir != '0' ? $romawi[$nilai_akhir] : 'Belum Dinilai';
+
+    $total_skor_awal += $id_level;
+    $total_skor_akhir += $nilai_akhir;
+
+    $kategori_range = [
+    "SANGAT TINGGI" => [46, 55],
+    "TINGGI"        => [38, 45],
+    "SEDANG"        => [29, 37],
+    "RENDAH"        => [20, 28],
+    "SANGAT RENDAH" => [1, 19]
+    ];
+
+    $kategori_awal = "-";
+    foreach ($kategori_range as $label => $range) {
+        if ($total_skor_awal >= $range[0] && $total_skor_awal <= $range[1]) {
+            $kategori_awal = $label;
+            break;
+        }
+    }
+
+    $kategori_final = "-";
+    foreach ($kategori_range as $label => $range) {
+        if ($total_skor_akhir >= $range[0] && $total_skor_akhir <= $range[1]) {
+            $kategori_final = $label;
+            break;
+        }
+    }
+
+    // Ambil jenis_bukti_dukung dari data_dukung
+    $jenis_bukti_dukung = '-';
+    if ($id_kuesioner_mendagri_detail > 0) {
+        $bukti_list = $wpdb->get_results($wpdb->prepare("
+            SELECT jenis_bukti_dukung 
+            FROM esakip_data_dukung_kuesioner_mendagri 
+            WHERE id_kuesioner_mendagri_detail = %d
+        ", $id_kuesioner_mendagri_detail));
+
+        if (!empty($bukti_list)) {
+            $list = array();
+            foreach ($bukti_list as $bukti) {
+                if (!empty($bukti->jenis_bukti_dukung)) {
+                    $list[] = esc_html($bukti->jenis_bukti_dukung);
+                }
+            }
+            if (!empty($list)) {
+                $jenis_bukti_dukung = implode('<br>', $list); 
+            }
+        }
+    }
+
+    $ket_html = '';
+    if (!empty($ket_verifikator) && $ket_verifikator !== '-') {
+        $ket_html = "
+            <br>
+            <br>
+            <span>
+                Keterangan Verifikator :
+                <br>
+                <b>$ket_verifikator</b>
+            </span>
+        ";
+    }
+
+    $tbody .= '<tr>'; 
+    $tbody .= '<td style="text-align: center; vertical-align: middle;">' . $no++ . '</td>'; 
+    $tbody .= "
+        <td class='text-left' style='vertical-align: middle;'>
+            <span>" . $row['deskripsi'] . "</span>
+            <br>
+            <br>
+            <span>$jenis_bukti_dukung</span>
+            $ket_html
+        </td>";
+
+    $tbody .= "<td style='text-align: center; vertical-align: middle;'>" . $label_tingkat . "</td>";      
+    $tbody .= "<td style='text-align: center; vertical-align: middle;'>" . $id_level . "</td>";      
+	$tbody .= "<td style='text-align: center; vertical-align: middle;'>" . $label_nilai . "</td>";
+	$tbody .= "<td style='text-align: center; vertical-align: middle;'>" . $nilai_akhir . "</td>";
+    $tbody .= '</tr>'; 
+}
+
+    $tbody .= '
+        <tr>
+            <td colspan="6" style="text-align: center; font-weight: bold; font-size: 15px;">
+                SKOR KEMATANGAN : ' . $total_skor_awal . ' , KATEGORI : ' . $kategori_awal . '
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6" style="text-align: center; font-weight: bold; font-size: 15px;">
+                SKOR KEMATANGAN FINAL : ' . $total_skor_akhir . ' , KATEGORI : ' . $kategori_final . '
+            </td>
+        </tr>';
+
+
+$html .= '<tbody>' . $tbody . '</tbody></table></div>';
+
+$laporan_kuesioner = $this->functions->modifyGetParameter(false, 'laporan', 'kuesioner');
+
+$laporan = false;
+if(!empty($_GET['laporan'])){
+    $laporan = $_GET['laporan'];
+}
+$html .= '</div></form></div>';
+
 ?>
 <style>
     .wrap-table {
@@ -69,20 +251,36 @@ foreach ($idtahun as $val) {
         vertical-align: middle !important;
     }
 </style>
+<?php if(empty($laporan)): ?>
 <div class="container-md">
     <div style="padding: 10px;margin:0 0 3rem 0;">
         <h1 class="text-center" style="margin:3rem;">Kuesioner Mendagri<br>
             <?php echo strtoupper($skpd['nama_skpd']); ?><br>
             Tahun Anggaran <?php echo $input['tahun']; ?>
         </h1>
+        <div class="action-section" style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
+            <div id="action-sakip" class="hide-print">
+                <div id="action-sakip" class="hide-print">
+                    <a href="<?php echo $laporan_kuesioner; ?>" target="_blank" class="btn btn-success">Laporan Kuesioner</a>
+                </div>
+            </div>
+        </div>
         <div class="wrap-table">
             <table id="table_kuesioner_pengisian_mendagri" cellpadding="2" cellspacing="0" style="collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                 <thead>
                     <tr>
-                        <th class="text-center" colspan="3" style="vertical-align: middle;">Kuesioner/Indikator</th>
-                        <th class="text-center" style="vertical-align: middle;">Keterangan Perangkat Daerah</th>
-                        <th class="text-center" style="vertical-align: middle;">Keterangan Verifikator</th>
-                        <th class="text-center" style="vertical-align: middle;">Aksi</th>
+                        <th class="text-center" colspan="3" rowspan="2" style="vertical-align: middle;">Kuesioner/Indikator</th>
+                        <th class="text-center" rowspan="2" style="vertical-align: middle;">Keterangan Perangkat Daerah</th>
+                        <th class="text-center" rowspan="2" style="vertical-align: middle;">Keterangan Verifikator</th>
+                        <th class="text-center" colspan="2" style="vertical-align: middle;">Nilai Awal</th>
+                        <th class="text-center" colspan="2" style="vertical-align: middle;">Nilai Akhir</th>
+                        <th class="text-center" rowspan="2" style="vertical-align: middle;">Aksi</th>
+                    </tr>
+                    <tr>
+                        <th class="text-center">Tingkat</th>
+                        <th class="text-center">Skor</th>
+                        <th class="text-center">Tingkat</th>
+                        <th class="text-center">Skor</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -150,7 +348,7 @@ foreach ($idtahun as $val) {
 
                 <div class="form-group col-md-12">
                     <label for="level">Tingkat Kematangan</label>
-                    <select class="form-control" id="level" name="level" required>
+                    <select class="form-control" id="level" name="level"  <?php echo $is_admin ? 'disabled' : ''; ?>>
                     </select>
                 </div>
 
@@ -167,6 +365,29 @@ foreach ($idtahun as $val) {
                         <label>Jenis Bukti Dukung</label>
                         <textarea class="form-control" id="jenis_bukti_dukung" rows="3" readonly></textarea>
                     </div>
+                </div>                                   
+                
+                <div class="form-group col-md-12">
+                    <label for="KeteranganOpd">Keterangan Perangkat Daerah</label>
+                    <textarea class="form-control" id="KeteranganOpd" rows="3" <?php echo $is_admin ? 'readonly' : ''; ?>></textarea>
+                </div>
+
+                <div class="form-group col-md-12">
+                    <label for="NilaiAkhir">Nilai Akhir</label>
+                    <select class="form-control" id="NilaiAkhir" name="NilaiAkhir"  <?php echo !$is_admin ? 'disabled' : ''; ?>>
+                        <option value=""> Pilih Nilai Akhir </option>
+                            <option value="1">Tingkat I</option>
+                            <option value="2">Tingkat II</option>
+                            <option value="3">Tingkat III</option>
+                            <option value="4">Tingkat IV</option>
+                            <option value="5">Tingkat V</option>
+                    </select>
+                </div>
+                
+                <div class="form-group col-md-12">
+                    <label for="KeteranganVerif">Keterangan Verifikator</label>
+                    <textarea class="form-control" id="KeteranganVerif" rows="3" <?php echo $is_admin ? '' : 'readonly'; ?>></textarea>
+                </div>
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" onclick="submit_tingkat(); return false">Simpan</button>
@@ -178,15 +399,23 @@ foreach ($idtahun as $val) {
         </div>
     </div>
 </div>
+<?php endif; ?>
+<?php if($laporan == 'kuesioner'): ?>   
+    <?php echo $html; ?>
+<?php endif; ?>
 <script>
     jQuery(document).ready(function() {
-        get_table_variabel_pengisian_mendagri();
+        
+        <?php if(empty($laporan)): ?>
+            get_table_variabel_pengisian_mendagri();
 
-        jQuery(document).on('change', '#level', function() {
-            getIndikatorDanBuktiDukung();
-        });
+            jQuery(document).on('change', '#level', function() {
+                getIndikatorDanBuktiDukung();
+            });
+        <?php endif; ?>
     });
 
+    <?php if(empty($laporan)): ?>
     function get_table_variabel_pengisian_mendagri() {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
@@ -220,6 +449,7 @@ foreach ($idtahun as $val) {
         const id_kuesioner = jQuery('#idKuesionerPertanyaan').val();
         const selectedOption = jQuery('#level option:selected');
         const id_detail_level = selectedOption.val();
+        const id_skpd = jQuery('#id_skpd').val();
         const level = jQuery('#level').val();
         //console.log("Kirim get_indikator_bukti_by_level => id_detail_level:", id_detail_level);
         if (level) {
@@ -230,7 +460,9 @@ foreach ($idtahun as $val) {
                 data: {
                     action: 'get_indikator_bukti_by_level',
                     api_key: esakip.api_key,
-                    id_kuesioner_mendagri_detail: id_detail_level
+                    id_kuesioner_mendagri_detail: id_detail_level,
+                    tahun_anggaran: <?php echo $input['tahun']; ?>,
+                    id_skpd: id_skpd
                 },
                 dataType: 'json',
                 success: function(response) {
@@ -239,7 +471,10 @@ foreach ($idtahun as $val) {
                         jQuery('#indikator').val(response.data.indikator);
                         jQuery('#jenis_bukti_dukung').val(response.data.jenis_bukti_dukung);
                         jQuery('#penjelasan').val(response.data.penjelasan);
+                        jQuery('#KeteranganOpd').val(response.data.ket_opd);
+                        jQuery('#KeteranganVerif').val(response.data.ket_verifikator);
                         jQuery('#id_detail_level').val(response.data.id_detail_level);
+                        jQuery('#NilaiAkhir').val(response.data.nilai_akhir);
                     } else {
                         alert(response.message);
                         jQuery('#wrap-loading').hide();
@@ -313,7 +548,10 @@ foreach ($idtahun as $val) {
             jQuery('#indikator').val('');
             jQuery('#jenis_bukti_dukung').val('');
             jQuery('#penjelasan').val('');
+            jQuery('#KeteranganOpd').val('');
+            jQuery('#KeteranganVerif').val('');
             jQuery('#id_detail_level').val('');
+            jQuery('#NilaiAkhir').val('');
 
             // Jika sudah ada level, ambil indikator & bukti
             if (id_level !== '') {
@@ -339,6 +577,9 @@ foreach ($idtahun as $val) {
         const level = selectedOption.data('level'); 
         const indikator = jQuery('#indikator').val();
         const penjelasan = jQuery('#penjelasan').val();
+        const ket_opd= jQuery('#KeteranganOpd').val();
+        const ket_verifikator= jQuery('#KeteranganVerif').val();
+        const nilai_akhir= jQuery('#NilaiAkhir').val();
         const id_skpd = jQuery('#id_skpd').val();
         if (!id_detail_level || !level) {
             return alert('Tingkat kematangan harus dipilih!');
@@ -359,6 +600,9 @@ foreach ($idtahun as $val) {
                     level: level,
                     indikator: indikator,
                     penjelasan: penjelasan,
+                    ket_opd: ket_opd,
+                    ket_verifikator: ket_verifikator,
+                    nilai_akhir: nilai_akhir
                 },
                 dataType: "json",
                 success: function(response) {
@@ -499,4 +743,6 @@ foreach ($idtahun as $val) {
             }
         });
     }
+
+    <?php endif; ?>
 </script>
