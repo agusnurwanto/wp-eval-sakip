@@ -5,7 +5,8 @@ if (!defined('WPINC')) {
 global $wpdb;
     
 $input = shortcode_atts(array(
-    'tahun_anggaran' => '2000'
+    'tahun_anggaran' => '2000',
+    'nip' => '0'
 ), $atts);
 
 $id_skpd = '';
@@ -160,15 +161,21 @@ if (!isset($response['status']) || $response['status'] === false) {
 
     function getTablePegawai(destroy) {
         jQuery('#wrap-loading').show();
+        var data = {
+            action: 'get_table_pegawai_simpeg_pk',
+            api_key: esakip.api_key,
+            tahun_anggaran: <?php echo $input['tahun_anggaran']; ?>,
+            id_skpd: <?php echo $id_skpd; ?>
+        };
+
+        var nip = '<?php echo $input['nip']; ?>';
+        if (nip !== '0') {
+            data.nip = nip;
+        }
         jQuery.ajax({
             url: esakip.url,
             type: 'POST',
-            data: {
-                action: 'get_table_pegawai_simpeg_pk',
-                api_key: esakip.api_key,
-                tahun_anggaran: <?php echo $input['tahun_anggaran']; ?>,
-                id_skpd: <?php echo $id_skpd; ?>
-            },
+            data: data,
             dataType: 'json',
             success: function(response) {
                 jQuery('#wrap-loading').hide();

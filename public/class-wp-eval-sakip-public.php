@@ -23155,7 +23155,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						if (!empty($_GET['tahun'])) {
 							$laporan_pk_page = $this->functions->generatePage(array(
 								'nama_page' 	=> 'Halaman List Pegawai Laporan PK ' . $_GET['tahun'],
-								'content' 		=> '[list_pegawai_laporan_pk]',
+								'content' 		=> '[list_perjanjian_kinerja tahun_anggaran=' . $_GET['tahun'] . ' nip=' . $data_pegawai['nip_baru'] . ']',
 								'show_header' 	=> 1,
 								'post_status' 	=> 'private'
 							));
