@@ -2219,6 +2219,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$ret['data_all'] = $data_all;
 					// die(json_encode($ret));
 
+					$data_all_wpsipd = array();
 					$rincian_tagging = $this->functions->generatePage(array(
 						'nama_page' => 'Halaman Tagging Rincian Belanja',
 						'content' => '[tagging_rincian_sakip]',
@@ -2369,13 +2370,61 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							}
 						}
 
-						if (empty($v['detail']['kode_cascading_sasaran'])) {
-							$keterangan .= '<li>Cascading Sasaran Belum dipilih</li>';
+						// rhk level 1 cascading sasaran
+						if($v['detail']['input_rencana_pagu_level'] == 1){
+							if (empty($v['detail']['kode_cascading_sub_kegiatan'])) {
+								$keterangan .= '<li>Cascading Sub Kegiatan Belum dipilih</li>';
+							}else{
+								if(empty($data_all_wpsipd[$v['detail']['kode_cascading_kegiatan']])){
+									$_POST['jenis'] = 'sub_kegiatan';
+									$_POST['parent_cascading'] = $v['detail']['kode_cascading_kegiatan'];
+									$data_all_wpsipd[$v['detail']['kode_cascading_kegiatan']] = $this->get_tujuan_sasaran_cascading(true);
+								}
+								foreach($data_all_wpsipd[$v['detail']['kode_cascading_kegiatan']]['data'] as $val){
+									if(
+										$v['detail']['kode_cascading_sub_kegiatan'] == $val->kode_sub_giat
+										&& $v['detail']['pagu_cascading'] != $val->pagu
+									){
+										$wpdb->update('esakip_data_rencana_aksi_opd', array(
+											'pagu_cascading' => $val->pagu
+										), array(
+											'id' => $v['detail']['id']
+										));
+									}
+								}
+							}
+						}else{
+							if (empty($v['detail']['kode_cascading_sasaran'])) {
+								$keterangan .= '<li>Cascading Sasaran Belum dipilih</li>';
+							}else{
+								if(empty($data_all_wpsipd[$v['detail']['kode_cascading_sasaran']])){
+									$_POST['jenis'] = 'program';
+									$_POST['parent_cascading'] = $v['detail']['kode_cascading_sasaran'];
+									$data_all_wpsipd[$v['detail']['kode_cascading_sasaran']] = $this->get_tujuan_sasaran_cascading(true);
+								}
+							}
 						}
 
 						$label_cascading = '';
-						if ($v['detail']['label_cascading_sasaran']) {
-							$label_cascading = $v['detail']['kode_cascading_sasaran'] . ' ' . $v['detail']['label_cascading_sasaran'];
+						if($v['detail']['input_rencana_pagu_level'] == 1){
+							if ($v['detail']['label_cascading_sasaran']) {
+								$label_cascading .= $v['detail']['kode_cascading_sasaran'] . ' ' . $v['detail']['label_cascading_sasaran'];
+							}
+							if ($v['detail']['label_cascading_program']) {
+								$label_cascading .= '<br>'.$v['detail']['kode_cascading_program'] . ' ' . $v['detail']['label_cascading_program'];
+							}
+							if ($v['detail']['label_cascading_kegiatan']) {
+								$label_cascading .= '<br>'.$v['detail']['kode_cascading_kegiatan'] . ' ' . $v['detail']['label_cascading_kegiatan'];
+							}
+							if ($v['detail']['label_cascading_sub_kegiatan']) {
+								$label_cascading .= '<br>'.$v['detail']['label_cascading_sub_kegiatan'];
+							}else{
+								$v['detail']['pagu_cascading'] = 0;
+							}
+						}else{
+							if ($v['detail']['label_cascading_sasaran']) {
+								$label_cascading = $v['detail']['kode_cascading_sasaran'] . ' ' . $v['detail']['label_cascading_sasaran'];
+							}
 						}
 						$html .= '
 						<tr class="keg-utama">
@@ -2552,8 +2601,83 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									}
 								}
 							}
-							if (empty($renaksi['detail']['kode_cascading_program'])) {
-								$keterangan .= '<li>Cascading Program Belum dipilih</li>';
+
+							// rhk level 2 cascading program
+							if($v['detail']['input_rencana_pagu_level'] == 1){
+								// jika parent sudah input sub keg, maka hapus cascading di rhk child nya
+								if(
+									!empty($renaksi['detail']['kode_cascading_sasaran'])
+									|| !empty($renaksi['detail']['kode_cascading_program'])
+									|| !empty($renaksi['detail']['kode_cascading_kegiatan'])
+									|| !empty($renaksi['detail']['kode_cascading_sub_kegiatan'])
+									|| !empty($renaksi['detail']['pagu_cascading'])
+								){
+									$wpdb->update('esakip_data_rencana_aksi_opd', array(
+										'kode_cascading_sasaran' => '',
+										'kode_cascading_program' => '',
+										'kode_cascading_kegiatan' => '',
+										'kode_cascading_sub_kegiatan' => '',
+										'label_cascading_sasaran' => '',
+										'label_cascading_program' => '',
+										'label_cascading_kegiatan' => '',
+										'label_cascading_sub_kegiatan' => '',
+										'pagu_cascading' => '0'
+									), array(
+										'id' => $renaksi['detail']['id']
+									));
+									$renaksi['detail']['label_cascading_program'] = '';
+								}
+							}else{
+								if($renaksi['detail']['input_rencana_pagu_level'] == 1){
+									if (empty($renaksi['detail']['kode_cascading_sub_kegiatan'])) {
+										$keterangan .= '<li>Cascading Sub Kegiatan Belum dipilih</li>';
+									}else{
+										if(empty($data_all_wpsipd[$renaksi['detail']['kode_cascading_kegiatan']])){
+											$_POST['jenis'] = 'sub_kegiatan';
+											$_POST['parent_cascading'] = $renaksi['detail']['kode_cascading_kegiatan'];
+											$data_all_wpsipd[$renaksi['detail']['kode_cascading_kegiatan']] = $this->get_tujuan_sasaran_cascading(true);
+										}
+										// update pagu sub kegiatan jika tidak sama dengan wp-sipd
+										foreach($data_all_wpsipd[$renaksi['detail']['kode_cascading_kegiatan']]['data'] as $val){
+											if(
+												$renaksi['detail']['kode_cascading_sub_kegiatan'] == $val->kode_sub_giat
+												&& $renaksi['detail']['pagu_cascading'] != $val->pagu
+											){
+												$wpdb->update('esakip_data_rencana_aksi_opd', array(
+													'pagu_cascading' => $val->pagu
+												), array(
+													'id' => $renaksi['detail']['id']
+												));
+											}
+										}
+									}
+								}else{
+									if (empty($renaksi['detail']['kode_cascading_program'])) {
+										$keterangan .= '<li>Cascading Program Belum dipilih</li>';
+									}else{
+										// update pagu program jika tidak sama dengan wp-sipd
+										if(!empty($data_all_wpsipd[$v['detail']['kode_cascading_sasaran']])){
+											foreach($data_all_wpsipd[$v['detail']['kode_cascading_sasaran']]['data'] as $val){
+												if(
+													$renaksi['detail']['kode_cascading_program'] == $val->kode_program
+													&& $renaksi['detail']['pagu_cascading'] != $val->pagu
+												){
+													$wpdb->update('esakip_data_rencana_aksi_opd', array(
+														'pagu_cascading' => $val->pagu
+													), array(
+														'id' => $renaksi['detail']['id']
+													));
+												}
+											}
+										}
+
+										if(empty($data_all_wpsipd[$renaksi['detail']['kode_cascading_program']])){
+											$_POST['jenis'] = 'kegiatan';
+											$_POST['parent_cascading'] = $renaksi['detail']['kode_cascading_program'];
+											$data_all_wpsipd[$renaksi['detail']['kode_cascading_program']] = $this->get_tujuan_sasaran_cascading(true);
+										}
+									}
+								}
 							}
 
 							$get_renaksi_pemda = $wpdb->get_results(
@@ -2647,8 +2771,22 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							}
 
 							$label_cascading = '';
-							if ($renaksi['detail']['label_cascading_program']) {
-								$label_cascading = $renaksi['detail']['kode_cascading_program'] . ' ' . $renaksi['detail']['label_cascading_program'];
+							if($renaksi['detail']['input_rencana_pagu_level'] == 1){
+								if ($renaksi['detail']['label_cascading_program']) {
+									$label_cascading .= $renaksi['detail']['kode_cascading_program'] . ' ' . $renaksi['detail']['label_cascading_program'];
+								}
+								if ($renaksi['detail']['label_cascading_kegiatan']) {
+									$label_cascading .= '<br>'.$renaksi['detail']['kode_cascading_kegiatan'] . ' ' . $renaksi['detail']['label_cascading_kegiatan'];
+								}
+								if ($renaksi['detail']['label_cascading_sub_kegiatan']) {
+									$label_cascading .= '<br>'.$renaksi['detail']['label_cascading_sub_kegiatan'];
+								}else{
+									$renaksi['detail']['pagu_cascading'] = 0;
+								}
+							}else{
+								if ($renaksi['detail']['label_cascading_program']) {
+									$label_cascading = $renaksi['detail']['kode_cascading_program'] . ' ' . $renaksi['detail']['label_cascading_program'];
+								}
 							}
 
 							$html .= '
@@ -2831,12 +2969,102 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										}
 									}
 								}
-								if (empty($uraian_renaksi['detail']['kode_cascading_kegiatan'])) {
-									$keterangan .= '<li>Cascading Kegiatan Belum dipilih</li>';
+
+								// rhk level 3 cascading kegiatan
+								if(
+									$v['detail']['input_rencana_pagu_level'] == 1
+									|| $renaksi['detail']['input_rencana_pagu_level'] == 1
+								){
+									// jika parent sudah input sub keg, maka hapus cascading di rhk child nya
+									if(
+										!empty($uraian_renaksi['detail']['kode_cascading_sasaran'])
+										|| !empty($uraian_renaksi['detail']['kode_cascading_program'])
+										|| !empty($uraian_renaksi['detail']['kode_cascading_kegiatan'])
+										|| !empty($uraian_renaksi['detail']['kode_cascading_sub_kegiatan'])
+										|| !empty($uraian_renaksi['detail']['pagu_cascading'])
+									){
+										$wpdb->update('esakip_data_rencana_aksi_opd', array(
+											'kode_cascading_sasaran' => '',
+											'kode_cascading_program' => '',
+											'kode_cascading_kegiatan' => '',
+											'kode_cascading_sub_kegiatan' => '',
+											'label_cascading_sasaran' => '',
+											'label_cascading_program' => '',
+											'label_cascading_kegiatan' => '',
+											'label_cascading_sub_kegiatan' => '',
+											'pagu_cascading' => '0'
+										), array(
+											'id' => $uraian_renaksi['detail']['id']
+										));
+										$uraian_renaksi['detail']['label_cascading_kegiatan'] = '';
+									}
+								}else{
+									if($uraian_renaksi['detail']['input_rencana_pagu_level'] == 1){
+										if (empty($uraian_renaksi['detail']['kode_cascading_sub_kegiatan'])) {
+											$keterangan .= '<li>Cascading Sub Kegiatan Belum dipilih</li>';
+										}else{
+											if(empty($data_all_wpsipd[$uraian_renaksi['detail']['kode_cascading_kegiatan']])){
+												$_POST['jenis'] = 'sub_kegiatan';
+												$_POST['parent_cascading'] = $uraian_renaksi['detail']['kode_cascading_kegiatan'];
+												$data_all_wpsipd[$uraian_renaksi['detail']['kode_cascading_kegiatan']] = $this->get_tujuan_sasaran_cascading(true);
+											}
+											// update pagu sub kegiatan jika tidak sama dengan wp-sipd
+											foreach($data_all_wpsipd[$uraian_renaksi['detail']['kode_cascading_kegiatan']]['data'] as $val){
+												if(
+													$uraian_renaksi['detail']['kode_cascading_sub_kegiatan'] == $val->kode_sub_giat
+													&& $uraian_renaksi['detail']['pagu_cascading'] != $val->pagu
+												){
+													$wpdb->update('esakip_data_rencana_aksi_opd', array(
+														'pagu_cascading' => $val->pagu
+													), array(
+														'id' => $uraian_renaksi['detail']['id']
+													));
+												}
+											}
+										}
+									}else{
+										if (empty($uraian_renaksi['detail']['kode_cascading_kegiatan'])) {
+											$keterangan .= '<li>Cascading Kegiatan Belum dipilih</li>';
+										}else{
+											// update pagu kegiatan jika tidak sama dengan wp-sipd
+											if(!empty($data_all_wpsipd[$renaksi['detail']['kode_cascading_program']])){
+												foreach($data_all_wpsipd[$renaksi['detail']['kode_cascading_program']]['data'] as $val){
+													if(
+														$uraian_renaksi['detail']['kode_cascading_kegiatan'] == $val->kode_giat
+														&& $uraian_renaksi['detail']['pagu_cascading'] != $val->pagu
+													){
+														$wpdb->update('esakip_data_rencana_aksi_opd', array(
+															'pagu_cascading' => $val->pagu
+														), array(
+															'id' => $uraian_renaksi['detail']['id']
+														));
+													}
+												}
+											}
+
+											if(empty($data_all_wpsipd[$uraian_renaksi['detail']['kode_cascading_kegiatan']])){
+												$_POST['jenis'] = 'sub_kegiatan';
+												$_POST['parent_cascading'] = $uraian_renaksi['detail']['kode_cascading_kegiatan'];
+												$all_keg_sipd = $this->get_tujuan_sasaran_cascading(true);
+											}
+										}
+									}
 								}
+
 								$label_cascading = '';
-								if ($uraian_renaksi['detail']['label_cascading_kegiatan']) {
-									$label_cascading = $uraian_renaksi['detail']['kode_cascading_kegiatan'] . ' ' . $uraian_renaksi['detail']['label_cascading_kegiatan'];
+								if($uraian_renaksi['detail']['input_rencana_pagu_level'] == 1){
+									if ($uraian_renaksi['detail']['label_cascading_kegiatan']) {
+										$label_cascading .= $uraian_renaksi['detail']['kode_cascading_kegiatan'] . ' ' . $uraian_renaksi['detail']['label_cascading_kegiatan'];
+									}
+									if ($uraian_renaksi['detail']['label_cascading_sub_kegiatan']) {
+										$label_cascading .= '<br>'.$uraian_renaksi['detail']['label_cascading_sub_kegiatan'];
+									}else{
+										$uraian_renaksi['detail']['pagu_cascading'] = 0;
+									}
+								}else{
+									if ($uraian_renaksi['detail']['label_cascading_kegiatan']) {
+										$label_cascading = $uraian_renaksi['detail']['kode_cascading_kegiatan'] . ' ' . $uraian_renaksi['detail']['label_cascading_kegiatan'];
+									}
 								}
 								$html .= '
 								<tr class="ur-kegiatan">
@@ -3011,13 +3239,61 @@ class Wp_Eval_Sakip_Monev_Kinerja
 											}
 										}
 									}
-									if (empty($uraian_teknis_kegiatan['detail']['kode_cascading_sub_kegiatan'])) {
-										$keterangan .= '<li>Cascading Sub Kegiatan Belum dipilih</li>';
+
+									// rhk level 4 cascading sub kegiatan
+									if(
+										$v['detail']['input_rencana_pagu_level'] == 1
+										|| $renaksi['detail']['input_rencana_pagu_level'] == 1
+										|| $uraian_renaksi['detail']['input_rencana_pagu_level'] == 1
+									){
+										// jika parent sudah input sub keg, maka hapus cascading di rhk child nya
+										if(
+											!empty($uraian_teknis_kegiatan['detail']['kode_cascading_sasaran'])
+											|| !empty($uraian_teknis_kegiatan['detail']['kode_cascading_program'])
+											|| !empty($uraian_teknis_kegiatan['detail']['kode_cascading_kegiatan'])
+											|| !empty($uraian_teknis_kegiatan['detail']['kode_cascading_sub_kegiatan'])
+											|| !empty($uraian_teknis_kegiatan['detail']['pagu_cascading'])
+										){
+											$wpdb->update('esakip_data_rencana_aksi_opd', array(
+												'kode_cascading_sasaran' => '',
+												'kode_cascading_program' => '',
+												'kode_cascading_kegiatan' => '',
+												'kode_cascading_sub_kegiatan' => '',
+												'label_cascading_sasaran' => '',
+												'label_cascading_program' => '',
+												'label_cascading_kegiatan' => '',
+												'label_cascading_sub_kegiatan' => '',
+												'pagu_cascading' => '0'
+											), array(
+												'id' => $uraian_teknis_kegiatan['detail']['id']
+											));
+											$uraian_teknis_kegiatan['detail']['label_cascading_sub_kegiatan'] = '';
+										}
+									}else{
+										if (empty($uraian_teknis_kegiatan['detail']['kode_cascading_sub_kegiatan'])) {
+											$keterangan .= '<li>Cascading Sub Kegiatan Belum dipilih</li>';
+										}else{
+											// update pagu sub kegiatan jika tidak sama dengan wp-sipd
+											if(!empty($data_all_wpsipd[$uraian_renaksi['detail']['kode_cascading_kegiatan']])){
+												foreach($data_all_wpsipd[$uraian_renaksi['detail']['kode_cascading_kegiatan']]['data'] as $val){
+													if(
+														$uraian_teknis_kegiatan['detail']['kode_cascading_sub_kegiatan'] == $val->kode_sub_giat
+														&& $uraian_teknis_kegiatan['detail']['pagu_cascading'] != $val->pagu
+													){
+														$wpdb->update('esakip_data_rencana_aksi_opd', array(
+															'pagu_cascading' => $val->pagu
+														), array(
+															'id' => $uraian_teknis_kegiatan['detail']['id']
+														));
+													}
+												}
+											}
+										}
 									}
+
 									$label_cascading = '';
 									if ($uraian_teknis_kegiatan['detail']['label_cascading_sub_kegiatan']) {
-										$nama_subkeg = implode(" ", array_slice(explode(" ", $uraian_teknis_kegiatan['detail']['label_cascading_sub_kegiatan']), 1));
-										$label_cascading = $uraian_teknis_kegiatan['detail']['kode_cascading_sub_kegiatan'] . ' ' . $nama_subkeg;
+										$label_cascading = $uraian_teknis_kegiatan['detail']['label_cascading_sub_kegiatan'];
 									}
 									$html .= '
 									<tr>

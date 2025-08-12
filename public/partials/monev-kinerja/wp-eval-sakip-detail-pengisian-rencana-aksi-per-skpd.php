@@ -710,10 +710,19 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
     });
 
     function open_input_rencana_pagu(cek){
+        var level = jQuery('.modal-footer .btn-success').attr('onclick').split('(')[1].split(')')[0];
         if(cek == true){
             jQuery(".in_setting_input_rencana_pagu").show();
+            if(level == 1){
+                jQuery('#sub-skpd-cascading').closest('.form-group').show();
+                jQuery('#pagu-cascading').closest('.form-group').show();
+            }
         }else{
             jQuery(".in_setting_input_rencana_pagu").hide();
+            if(level == 1){
+                jQuery('#sub-skpd-cascading').closest('.form-group').hide();
+                jQuery('#pagu-cascading').closest('.form-group').hide();
+            }
         }
 
         // trigger pilihan nomenklatur renja
@@ -2472,7 +2481,11 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
 
                             if (value['label_cascading_program']) {
                                 let nama_prog = value['label_cascading_program'];
-                                label_cascading = value['kode_cascading_program'] + ' ' + nama_prog + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
+                                var pagu = ' | Rp. ' + formatRupiah(value['pagu_cascading']);
+                                if(set_input_rencana_pagu == 1){
+                                    pagu = '';
+                                }
+                                label_cascading = value['kode_cascading_program'] + ' ' + nama_prog + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + pagu + '</span>';
                             }
 
                             tombol_detail = `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm mb-1 btn-warning" onclick="lihat_rencana_aksi(${value.id}, ${ (tipe + 1) }, ${ JSON.stringify(id_pokin) }, '${ id_parent_cascading }', ${ id_parent_sub_skpd_cascading })" title="Lihat Uraian Kegiatan Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
@@ -2482,7 +2495,11 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
 
                             if (value['label_cascading_kegiatan']) {
                                 let nama_keg = value['label_cascading_kegiatan'];
-                                label_cascading = value['kode_cascading_kegiatan'] + ' ' + nama_keg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
+                                var pagu = ' | Rp. ' + formatRupiah(value['pagu_cascading']);
+                                if(set_input_rencana_pagu == 1){
+                                    pagu = '';
+                                }
+                                label_cascading = value['kode_cascading_kegiatan'] + ' ' + nama_keg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + pagu + '</span>';
                             }
 
                             tombol_detail = `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm mb-1 btn-warning" onclick="lihat_rencana_aksi(${value.id}, ${ (tipe + 1) }, ${ JSON.stringify(id_pokin) }, '${ id_parent_cascading }', ${id_parent_sub_skpd_cascading})" title="Lihat Uraian Teknis Kegiatan"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
@@ -2501,13 +2518,13 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                             if(tipe <= 1) {
                                 if (value['label_cascading_program']) {
                                     let nama_prog = value['label_cascading_program'];
-                                    label_cascading += '</br>'+value['kode_cascading_program'] + ' ' + nama_prog + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
+                                    label_cascading += '</br>'+value['kode_cascading_program'] + ' ' + nama_prog + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + '</span>';
                                 }
                             }
                             if(tipe <= 2) {
                                 if (value['label_cascading_kegiatan']) {
                                     let nama_keg = value['label_cascading_kegiatan'];
-                                    label_cascading += '</br>'+value['kode_cascading_kegiatan'] + ' ' + nama_keg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
+                                    label_cascading += '</br>'+value['kode_cascading_kegiatan'] + ' ' + nama_keg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + '</span>';
                                 }
                             }
                             if(tipe <= 3) {
@@ -3039,9 +3056,10 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                 let html_cascading_turunan = '';
                 let html_cascading_turunan_id = '';
                 var hide_pagu_level1 = '';
+                var hide_cek_parent_global = '';
 
                 if(tipe == 1) {
-                    hide_pagu_level1 = 'display: none';
+                    hide_pagu_level1 = 'display: none;';
                     title = 'Kegiatan Utama | RHK Level 1';
                     data_cascading = data_sasaran_cascading[key];
                     level_pokin = 1;
@@ -3066,7 +3084,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     html_pokin_input_rencana_pagu += tampil_pokin(4, false);
                     html_pokin_input_rencana_pagu += tampil_pokin(5, false);
 
-                    trigger_pokin_input_rencana_pagu = `onchange="get_data_pokin_2(this.value, ${ level_pokin }, 'pokin-level-4', true)"`;
+                    trigger_pokin_input_rencana_pagu = `onchange="get_data_pokin_2(this.value, 4, 'pokin-level-4', true)"`;
 
                     html_input_sub_keg_cascading += tampil_cascading('kegiatan', false);
                     html_input_sub_keg_cascading += tampil_cascading('sub-kegiatan', false);
@@ -3082,7 +3100,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     
                     html_pokin_input_rencana_pagu += tampil_pokin(5, false);
         
-                    trigger_pokin_input_rencana_pagu = `onchange="get_data_pokin_2(this.value, ${ level_pokin }, 'pokin-level-5', true)"`;
+                    trigger_pokin_input_rencana_pagu = `onchange="get_data_pokin_2(this.value, 5, 'pokin-level-5', true)"`;
 
                     html_input_sub_keg_cascading += tampil_cascading('sub-kegiatan', false);
 
@@ -3129,16 +3147,16 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     checklist_renaksi_pemda += '</tbody></table>';
                 }
 
+                // ketika tipe 1, masih undefined
+                if(typeof cek_parent_global == 'undefined'){
+                    window.cek_parent_global = {
+                        input_pagu: 0
+                    };
+                }
+
                 let html_setting_input_rencana_pagu = '';
                 if(tipe != 4){
                     var hide = 'style="display:none"';
-
-                    // ketika tipe 1, masih undefined
-                    if(typeof cek_parent_global == 'undefined'){
-                        window.cek_parent_global = {
-                            input_pagu: 0
-                        };
-                    }
 
                     // jika parent rhk tidak ada yang input pagu maka checklist input pagu ditampilkan
                     if(cek_parent_global.input_pagu == 0){
@@ -3154,6 +3172,11 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                 Pengaturan Input Rencana Pagu Menjadikan Level Ini Menjadi Level RHK Terakhir.
                             </small>
                         </div>`;
+                }
+
+                // sembunyikan pilihan cascading jika parent sudah diset input pagu
+                if(cek_parent_global.input_pagu == 1){
+                    hide_cek_parent_global = 'display: none;'
                 }
 
                 var option = {
@@ -3206,12 +3229,12 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                 <div class="form-group">
                                     <textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan ${title}..."></textarea>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" style="${hide_cek_parent_global}">
                                     <label for="${html_cascading_turunan_id}">Pilih ${jenis_cascading} Cascading</label>
                                     <select class="form-control" name="${html_cascading_turunan_id}" id="${html_cascading_turunan_id}" ${html_cascading_turunan}></select>
                                 </div>
                                 ${ html_input_sub_keg_cascading }
-                                <div class="form-group" style="${hide_pagu_level1}">
+                                <div class="form-group" style="${hide_pagu_level1} ${hide_cek_parent_global}">
                                     <div class="row">
                                         <div class="col-md-3">
                                             <label for="sub-skpd-cascading">OPD Cascading</label>
@@ -3221,7 +3244,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group" style="${hide_pagu_level1}">
+                                <div class="form-group" style="${hide_pagu_level1} ${hide_cek_parent_global}">
                                     <div class="row">
                                         <div class="col-md-3">
                                             <label for="pagu-cascading">Pagu Cascading</label>
