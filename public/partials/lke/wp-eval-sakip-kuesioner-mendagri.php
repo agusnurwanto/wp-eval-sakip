@@ -48,13 +48,11 @@ $is_admin = in_array('administrator', $user_roles) || in_array('admin_panrb', $u
 $nama_pemda = get_option(ESAKIP_NAMA_PEMDA);
 
 $html = '
-<div class="container-md" style="font-family:\'Times New Roman\', serif; padding: 0 20px;">
-    <form id="form-kuesioner">
-        <div>
-            <p style="text-align: center !important; text-transform: uppercase">
-                <b>HASIL PENILAIAN TINGKAT KEMATANGAN INDIVIDU<br>PERANGKAT DAERAH ' . strtoupper($nama_pemda) . ' TAHUN ' . $input['tahun'] . '<br>' . $skpd['nama_skpd'] . '
-                </b>
-            </p>';
+<div class="action-section" class="hide-print"></div>
+<div id="cetak" class="container-md">
+    <h1 style="text-align: center !important; text-transform: uppercase">
+        HASIL PENILAIAN TINGKAT KEMATANGAN INDIVIDU<br>PERANGKAT DAERAH ' . strtoupper($nama_pemda) . ' TAHUN ' . $input['tahun'] . '<br>' . $skpd['nama_skpd'] . '
+    </h1>';
 $html .= '
 <div style="padding: 0 5px;">
     <table class="table table-bordered" style="width:100%; margin-bottom:10px;">
@@ -117,13 +115,16 @@ foreach ($data_kuesioner as $row) {
 );
     $id_kuesioner_mendagri_detail = !empty($pengisian['id_kuesioner_mendagri_detail']) ? intval($pengisian['id_kuesioner_mendagri_detail']) : 0;
     $id_level = !empty($pengisian['id_level']) ? $pengisian['id_level'] : 0;
-    $nilai_akhir = !empty($pengisian['nilai_akhir']) ? $pengisian['nilai_akhir'] : 0;
+    $nilai_akhir = isset($pengisian['nilai_akhir']) ? $pengisian['nilai_akhir'] : null;
     $ket_verifikator = !empty($pengisian['ket_verifikator']) ? esc_html($pengisian['ket_verifikator']) : '-';
     $label_tingkat = $id_level != '0' ? $romawi[$id_level] : 'Belum Diisi';
-    $label_nilai = $nilai_akhir != '0' ? $romawi[$nilai_akhir] : 'Belum Dinilai';
+    $label_nilai = ($nilai_akhir === null) 
+        ? 'Belum Dinilai' 
+        : $romawi[$nilai_akhir];
+    $nilai_akhir_print = ($nilai_akhir === null) ? 0 : $nilai_akhir;
 
     $total_skor_awal += $id_level;
-    $total_skor_akhir += $nilai_akhir;
+    $total_skor_akhir += $nilai_akhir_print;
 
     $kategori_range = [
     "SANGAT TINGGI" => [46, 55],
@@ -198,7 +199,7 @@ foreach ($data_kuesioner as $row) {
     $tbody .= "<td style='text-align: center; vertical-align: middle;'>" . $label_tingkat . "</td>";      
     $tbody .= "<td style='text-align: center; vertical-align: middle;'>" . $id_level . "</td>";      
 	$tbody .= "<td style='text-align: center; vertical-align: middle;'>" . $label_nilai . "</td>";
-	$tbody .= "<td style='text-align: center; vertical-align: middle;'>" . $nilai_akhir . "</td>";
+	$tbody .= "<td style='text-align: center; vertical-align: middle;'>" . $nilai_akhir_print . "</td>";
     $tbody .= '</tr>'; 
 }
 
@@ -223,7 +224,7 @@ $laporan = false;
 if(!empty($_GET['laporan'])){
     $laporan = $_GET['laporan'];
 }
-$html .= '</div></form></div>';
+$html .= '</div>';
 
 ?>
 <style>
@@ -258,12 +259,10 @@ $html .= '</div></form></div>';
             <?php echo strtoupper($skpd['nama_skpd']); ?><br>
             Tahun Anggaran <?php echo $input['tahun']; ?>
         </h1>
-        <div class="action-section" style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
-            <div id="action-sakip" class="hide-print">
+        <div id="action-sakip" class="hide-print">
                 <div id="action-sakip" class="hide-print">
                     <a href="<?php echo $laporan_kuesioner; ?>" target="_blank" class="btn btn-success">Laporan Kuesioner</a>
                 </div>
-            </div>
         </div>
         <div class="wrap-table">
             <table id="table_kuesioner_pengisian_mendagri" cellpadding="2" cellspacing="0" style="collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
@@ -405,7 +404,7 @@ $html .= '</div></form></div>';
 <?php endif; ?>
 <script>
     jQuery(document).ready(function() {
-        
+        run_download_excel_sakip();
         <?php if(empty($laporan)): ?>
             get_table_variabel_pengisian_mendagri();
 
@@ -663,10 +662,11 @@ $html .= '</div></form></div>';
                                 checked = 'checked';
                             }
 
+                            var disabled = response.is_admin ? 'disabled' : '';
 
                             html += '' +
                                 '<tr>' +
-                                '<td class="text-center"><input type="checkbox" ' + checked + ' class="list-dokumen" value="' + data.dokumen + '"/></td>' +
+                                '<td class="text-center"><input type="checkbox" ' + checked + ' ' + disabled + ' class="list-dokumen" value="' + data.dokumen + '"/></td>' +
                                 '<td>' + i + '</td>' +
                                 '<td><a href="' + url + data.dokumen + '" target="_blank">' + data.dokumen + '</a></td>' +
                                 '<td>' + data.keterangan + '</td>' +
@@ -680,6 +680,12 @@ $html .= '</div></form></div>';
                     jQuery('#id_detail_pengisian_hidden').val(id_detail_pengisian);
                     jQuery('#tambahBuktiDukung').modal('show');
 
+                    if (response.is_admin) {
+                        jQuery('#tambahBuktiDukung .btn-primary').prop('disabled', true); // tombol Simpan disable
+                    } else {
+                        jQuery('#tambahBuktiDukung .btn-primary').prop('disabled', false); // enable untuk user yang bisa edit
+                    }
+                    
                 } else {
                     alert(response.message);
                 }
