@@ -2425,6 +2425,7 @@ CREATE TABLE esakip_pengisian_kuesioner_mendagri (
   `id_kuesioner_mendagri_detail` int(11) DEFAULT NULL, 
   `id_kuesioner` int(11) DEFAULT NULL,
   `id_level` int(11) DEFAULT NULL,
+  `nilai_akhir` int(11) DEFAULT NULL,
   `ket_opd` text DEFAULT NULL,
   `ket_verifikator` text DEFAULT NULL, 
   `id_skpd` int(11) DEFAULT NULL,

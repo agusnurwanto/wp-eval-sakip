@@ -4890,6 +4890,10 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							</td>";           																// nama Variabel //						
 						$tbody .= "<td class='text-center'>" . $variabel['ket_opd'] . "</td>";      		// ket opd // 
 						$tbody .= "<td class='text-center'>" . $variabel['ket_verifikator'] . "</td>";      // ket verif // 
+						$tbody .= "<td class='text-center'>" . $romawi[$variabel['id_level']] ."</td>";		// nilai awal // 
+						$tbody .= "<td class='text-center'>" . $variabel['id_level'] . "</td>";			    // nilai awal // 
+						$tbody .= "<td class='text-center'>" . $romawi[$variabel['nilai_akhir']] ."</td>";	// nilai akhir // 
+						$tbody .= "<td class='text-center'>" . $variabel['nilai_akhir'] . "</td>";			// nilai akhir // 
 						$tbody .= "<td class='text-center'>" . $btn . "</td>";      						// aksi // 
 						$tbody .= "</tr>";
 
@@ -4962,7 +4966,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 							// indikator
 							$tbody .= "<tr>
-								<td class='text-center' colspan='6'>
+								<td class='text-center' colspan='10'>
 									<table class='table table-bordered'>
 										<tbody>
 											<tr>
@@ -5030,8 +5034,11 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 			}
 
 			$id_detail_level = $data_level['id'];
+			$id_skpd = isset($_POST['id_skpd']) ? intval($_POST['id_skpd']) : 0;
+			$tahun = isset($_POST['tahun_anggaran']) ? intval($_POST['tahun_anggaran']) : intval(get_option(ESAKIP_TAHUN_ANGGARAN));
 
-			// Ambil jenis data dukung //
+
+			// Ambil jenis data dukung 
 			$data_bukti = $wpdb->get_results(
 				$wpdb->prepare("
 					SELECT jenis_bukti_dukung	
@@ -5048,6 +5055,21 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				$jenis_bukti_list = array_column($data_bukti, 'jenis_bukti_dukung');
 				$data_level['jenis_bukti_dukung'] = implode("\n", $jenis_bukti_list);
 			}
+
+			// Ambil ket_opd, ket_verifikator dan nilai_akhir dari pengisian jika ada
+			$id_kuesioner = intval($data_level['id_kuesioner']);
+			$pengisian = $wpdb->get_row($wpdb->prepare("
+				SELECT ket_opd, ket_verifikator, nilai_akhir
+				FROM esakip_pengisian_kuesioner_mendagri
+				WHERE id_kuesioner = %d
+					AND id_skpd = %d
+					AND tahun_anggaran = %d
+					AND active = 1
+			", $id_kuesioner, $id_skpd, $tahun), ARRAY_A);
+
+			$data_level['ket_opd'] = $pengisian['ket_opd'] ?? '';
+			$data_level['ket_verifikator'] = $pengisian['ket_verifikator'] ?? '';
+			$data_level['nilai_akhir'] = $pengisian['nilai_akhir'] ?? '';
 
 			echo json_encode([
 				'status'  => true,
@@ -5115,6 +5137,10 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] === get_option(ESAKIP_APIKEY)) {
+				$current_user = wp_get_current_user();
+				$user_roles = $current_user->roles;
+				$is_admin = in_array('administrator', $user_roles) || in_array('admin_panrb', $user_roles) || in_array("admin_bappeda", $user_roles);
+
 				if (empty($_POST['id_variabel'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'ID Variabel kosong!';
@@ -5150,11 +5176,17 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				$level = intval($_POST['level']);
 				$id_skpd = intval($_POST['id_skpd']);
 				$tahun_anggaran = sanitize_text_field($_POST['tahun_anggaran']);
-				$ket_opd = '';
-				if (!empty($_POST['ket_opd'])) {
-					$ket_opd = $_POST['ket_opd'];
+				$ket_verifikator = isset($_POST['ket_verifikator']) ? sanitize_text_field($_POST['ket_verifikator']) : '';
+				$ket_opd = isset($_POST['ket_opd']) ? sanitize_text_field($_POST['ket_opd']) : '';
+				if ($is_admin) {
+					$nilai_akhir = (isset($_POST['nilai_akhir']) && $_POST['nilai_akhir'] !== '') 
+						? intval($_POST['nilai_akhir']) 
+						: null;
+				} else {
+					// Non-admin tidak mengubah nilai akhir
+					$nilai_akhir = null;
 				}
-				$ket_verifikator = '';
+
 
 				$data = array(
 					'id_kuesioner' => $id_kuesioner,
@@ -5164,6 +5196,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					'tahun_anggaran' => $tahun_anggaran,
 					'ket_opd' => $ket_opd,
 					'ket_verifikator' => $ket_verifikator,
+					'nilai_akhir' => $nilai_akhir,
 					'active' => 1
 				);
 				//cek data
@@ -5408,6 +5441,13 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							'show_header' => 1,
 							'post_status' => 'private'
 						));
+					} else if ($v == 'esakip_dokumen_kuesioner') {
+						$dokumen = $this->functions->generatePage(array(
+							'nama_page' => 'Dokumen Kuesioner ' . $_POST['tahun_anggaran'],
+							'content' => '[dokumen_detail_dokumen_kuesioner tahun=' . $_POST['tahun_anggaran'] . ']',
+							'show_header' => 1,
+							'post_status' => 'private'
+						));
 					} else if ($v == 'esakip_perjanjian_kinerja') {
 						$dokumen = $this->functions->generatePage(array(
 							'nama_page' => 'Perjanjian Kinerja ' . $_POST['tahun_anggaran'],
@@ -5447,6 +5487,8 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				$ret['data_existing'] = $bukti_dukung_existing;
 				$ret['sql'] = $wpdb->last_query;
 				$ret['raw_data_existing'] = $data_existing;
+				$current_user = wp_get_current_user();
+				$ret['is_admin'] = in_array('administrator', $current_user->roles) ? true : false;
 			} else {
 				$ret = array(
 					'status' => 'error',
@@ -5494,6 +5536,10 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					}
 
 					$nama_dokumen = json_encode($dokumen_upload);
+
+					// Ambil id_kuesioner_mendagri_detail dari tabel data dukung
+					// Catatan: variabel $id_kuesioner di sini isinya id_kuesioner_mendagri_detail 
+					// dari tabel esakip_data_dukung_kuesioner_mendagri
 
 					$id_kuesioner = $wpdb->get_var($wpdb->prepare("
 						SELECT id_kuesioner_mendagri_detail

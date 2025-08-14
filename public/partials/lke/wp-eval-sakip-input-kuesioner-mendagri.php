@@ -279,6 +279,12 @@ foreach ($idtahun as $val) {
                                         Pengukuran Kinerja
                                     </label>
                                 </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="checkbox_bukti" value="esakip_dokumen_kuesioner" id="dokumen-kuesioner">
+                                    <label class="form-check-label" for="dokumen-kuesioner">
+                                        Dokumen Kuesioner
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
