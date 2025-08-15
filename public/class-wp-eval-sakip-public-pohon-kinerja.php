@@ -522,7 +522,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								a.parent=%d AND 
 								a.active=%d AND
 								a.label_indikator_kinerja is NULL
-							ORDER BY a.nomor_urut ASC, b.nomor_urut ASC",
+							ORDER BY a.level ASC, a.nomor_urut ASC, b.nomor_urut ASC",
 							$_POST['id_jadwal'],
 							1
 						), ARRAY_A);
@@ -541,7 +541,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								a.active=%d AND 
 								a.id_skpd=%d AND
 								a.label_indikator_kinerja is NULL
-							ORDER BY a.nomor_urut ASC, b.nomor_urut ASC",
+							ORDER BY a.level ASC, a.nomor_urut ASC, b.nomor_urut ASC",
 							$_POST['id_jadwal'],
 							1,
 							$id_skpd
