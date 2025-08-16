@@ -488,6 +488,117 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		}
 	}
 
+	public function get_data_pokin_all()
+	{
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+					$_prefix_opd = $_where_opd = $id_skpd = '';
+					if (!empty($_POST['tipe_pokin'])) {
+						if (!empty($_POST['id_skpd'])) {
+							$id_skpd = $_POST['id_skpd'];
+
+							$_prefix_opd = $_POST['tipe_pokin'] == "opd" ? "_opd" : "";
+							$_where_opd = $_POST['tipe_pokin'] == "opd" ? ' AND id_skpd=' . $id_skpd : '';
+						} else {
+							throw new Exception("Id SKPD tidak ditemukan!", 1);
+						}
+					}
+
+					if ($_prefix_opd == '') {
+						$dataPokin = $wpdb->get_results($wpdb->prepare(
+							"
+							SELECT 
+								a.*,
+								b.id AS id_indikator,
+								b.label_indikator_kinerja,
+								b.nomor_urut as nomor_urut_indikator
+							FROM esakip_pohon_kinerja a
+							LEFT JOIN esakip_pohon_kinerja b ON a.id=b.parent AND a.level=b.level 
+							WHERE 
+								a.id_jadwal=%d AND 
+								a.parent=%d AND 
+								a.active=%d AND
+								a.label_indikator_kinerja is NULL
+							ORDER BY a.level ASC, a.nomor_urut ASC, b.nomor_urut ASC",
+							$_POST['id_jadwal'],
+							1
+						), ARRAY_A);
+					} else if ($_prefix_opd == '_opd') {
+						$dataPokin = $wpdb->get_results($wpdb->prepare(
+							"
+							SELECT 
+								a.*,
+								b.id AS id_indikator,
+								b.label_indikator_kinerja,
+								b.nomor_urut as nomor_urut_indikator
+							FROM esakip_pohon_kinerja_opd a
+							LEFT JOIN esakip_pohon_kinerja_opd b ON a.id=b.parent AND a.level=b.level 
+							WHERE 
+								a.id_jadwal=%d AND
+								a.active=%d AND 
+								a.id_skpd=%d AND
+								a.label_indikator_kinerja is NULL
+							ORDER BY a.level ASC, a.nomor_urut ASC, b.nomor_urut ASC",
+							$_POST['id_jadwal'],
+							1,
+							$id_skpd
+						), ARRAY_A);
+					}
+
+					$data = [
+						'data' => [],
+						'parent' => []
+					];
+					foreach ($dataPokin as $key => $pokin) {
+						if (empty($data['data'][$pokin['id']])) {
+							$data['data'][$pokin['id']] = [
+								'id' => $pokin['id'],
+								'level' => $pokin['level'],
+								'label' => $pokin['label'],
+								'parent' => $pokin['parent'],
+								'nomor_urut' => $pokin['nomor_urut'],
+								'pelaksana' => $pokin['pelaksana'] ? $pokin['pelaksana'] : '',
+								'bentuk_kegiatan' => $pokin['bentuk_kegiatan'] ? $pokin['bentuk_kegiatan'] : '',
+								'outcome' => $pokin['outcome'] ? $pokin['outcome'] : '',
+								'indikator' => []
+							];
+						}
+
+						if (!empty($pokin['id_indikator'])) {
+							if (empty($data['data'][$pokin['id']]['indikator'][$pokin['id_indikator'] . ' ' . $pokin['nomor_urut_indikator']])) {
+								$data['data'][$pokin['id']]['indikator'][$pokin['id_indikator'] . ' ' . $pokin['nomor_urut_indikator']] = [
+									'id' => $pokin['id_indikator'],
+									'label' => $pokin['label_indikator_kinerja'],
+									'nomor_urut' => $pokin['nomor_urut_indikator']
+								];
+							}
+						}
+					}
+
+					echo json_encode([
+						'status' => true,
+						'data' => array_values($data['data']),
+						'sql' => $wpdb->last_query
+					]);
+					exit();
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
+	}
+
 	public function create_pokin()
 	{
 		global $wpdb;

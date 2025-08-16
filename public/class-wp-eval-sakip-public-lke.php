@@ -5178,7 +5178,15 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				$tahun_anggaran = sanitize_text_field($_POST['tahun_anggaran']);
 				$ket_verifikator = isset($_POST['ket_verifikator']) ? sanitize_text_field($_POST['ket_verifikator']) : '';
 				$ket_opd = isset($_POST['ket_opd']) ? sanitize_text_field($_POST['ket_opd']) : '';
-				$nilai_akhir = intval($_POST['nilai_akhir']);
+				if ($is_admin) {
+					$nilai_akhir = (isset($_POST['nilai_akhir']) && $_POST['nilai_akhir'] !== '') 
+						? intval($_POST['nilai_akhir']) 
+						: null;
+				} else {
+					// Non-admin tidak mengubah nilai akhir
+					$nilai_akhir = null;
+				}
+
 
 				$data = array(
 					'id_kuesioner' => $id_kuesioner,
@@ -5433,6 +5441,13 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							'show_header' => 1,
 							'post_status' => 'private'
 						));
+					} else if ($v == 'esakip_dokumen_kuesioner') {
+						$dokumen = $this->functions->generatePage(array(
+							'nama_page' => 'Dokumen Kuesioner ' . $_POST['tahun_anggaran'],
+							'content' => '[dokumen_detail_dokumen_kuesioner tahun=' . $_POST['tahun_anggaran'] . ']',
+							'show_header' => 1,
+							'post_status' => 'private'
+						));
 					} else if ($v == 'esakip_perjanjian_kinerja') {
 						$dokumen = $this->functions->generatePage(array(
 							'nama_page' => 'Perjanjian Kinerja ' . $_POST['tahun_anggaran'],
@@ -5472,6 +5487,8 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				$ret['data_existing'] = $bukti_dukung_existing;
 				$ret['sql'] = $wpdb->last_query;
 				$ret['raw_data_existing'] = $data_existing;
+				$current_user = wp_get_current_user();
+				$ret['is_admin'] = in_array('administrator', $current_user->roles) ? true : false;
 			} else {
 				$ret = array(
 					'status' => 'error',
