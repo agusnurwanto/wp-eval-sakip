@@ -147,6 +147,14 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
         max-width: 300px;
     }
 
+    #tabel-cascading div span.nama_pokin {
+        font-size: 14px;
+        margin-top: 10px; 
+        display: block; 
+        width: 100%;
+        max-width: 300px;
+    }
+
     #tabel-cascading-kegiatan,
     #tabel-cascading-kegiatan td,
     #tabel-cascading-kegiatan table {
@@ -203,6 +211,19 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
     }
 
     .nama_satker {
+        font-size: 14px;
+    }
+
+    #tabel-cascading-kegiatan div span.nama_pokin {
+        font-size: 14px;
+        margin-top: 10px; 
+        display: block; 
+        width: 100%;
+        max-width: 300px;
+    }
+
+
+    .nama_pokin {
         font-size: 14px;
     }
 

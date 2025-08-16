@@ -1980,8 +1980,8 @@ CREATE TABLE `esakip_data_pegawai_cascading` (
   `nip` text DEFAULT NULL ,
   `nama` text DEFAULT NULL,
   `jenis_data` tinyint(4) NOT NULL COMMENT '1 = TUJUAN RENSTRA, 2 = SASARAN RENSTRA, 3 = PROGRAM RENSTRA, 4 = KEGIATAN RENSTRA, 5 = SUB KEGIATAN RENSTRA, 6 = RHK',
-  `id_data` int(11) NOT NULL,
-  `tahun_anggaran` year(4) DEFAULT NULL,
+  `id_data` varchar(255) NOT NULL,
+  `id_jadwal` int(11) DEFAULT NULL,
   `id_skpd` int(11) NOT NULL,
   `active` tinyint(4) NOT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
@@ -1990,7 +1990,25 @@ CREATE TABLE `esakip_data_pegawai_cascading` (
   KEY `jenis_data` (`jenis_data`),
   KEY `id_data` (`id_data`),
   KEY `active` (`active`),
-  KEY `tahun_anggaran` (`tahun_anggaran`)
+  KEY `id_jadwal` (`id_jadwal`)
+);
+
+CREATE TABLE `esakip_data_pokin_cascading` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_pokin` int(11) DEFAULT NULL,
+  `nama_pokin` text DEFAULT NULL,
+  `jenis_data` tinyint(4) NOT NULL COMMENT '1 = TUJUAN RENSTRA, 2 = SASARAN RENSTRA, 3 = PROGRAM RENSTRA, 4 = KEGIATAN RENSTRA, 5 = SUB KEGIATAN RENSTRA, 6 = RHK',
+  `id_data` varchar(255) NOT NULL,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `id_skpd` int(11) NOT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `jenis_data` (`jenis_data`),
+  KEY `id_data` (`id_data`),
+  KEY `active` (`active`),
+  KEY `id_jadwal` (`id_jadwal`)
 );
 
 CREATE TABLE `esakip_tagging_rincian_belanja` (
