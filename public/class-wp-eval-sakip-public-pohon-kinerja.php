@@ -5622,7 +5622,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						$api_params['id_jadwal'] = $id_jadwal_wpsipd;
 					}
 
-					$response = wp_remote_post(
+					$response_asli = wp_remote_post(
 						get_option('_crb_url_server_sakip'),
 						array(
 							'timeout' 	=> 1000,
@@ -5631,14 +5631,16 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						)
 					);
 
-					$response = wp_remote_retrieve_body($response);
+					$response = wp_remote_retrieve_body($response_asli);
 					$response = json_decode($response);
 					$data = $response->data;
 
 					$return = array(
 						'status' => 'success',
 						'jenis' => $_POST['jenis'],
-						'data' => $data
+						'data' => $data,
+						'param' => $api_params,
+						'response' => $response_asli
 					);
 					if (!empty($return_text)) {
 						return $return;
@@ -5925,7 +5927,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							        FROM esakip_data_pegawai_cascading 
 							        WHERE active = 1 
 							          AND jenis_data = 1
-							          AND id_data = %d
+							          AND id_data = %s
 							          AND id_skpd = %d
 							          AND id_jadwal = %d
 							    ", $t['id_unik'], $id_skpd, $id_jadwal),
@@ -5934,13 +5936,14 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						$pokin_tujuan = $wpdb->get_results(
 							$wpdb->prepare("
 							        SELECT 
-							            TRIM(SUBSTRING_INDEX(nama_pokin, '|', -1)) AS nama_pokin
+							            TRIM(SUBSTRING_INDEX(nama_pokin, '|', -1)) AS nama_pokin,
+							            TRIM(SUBSTRING_INDEX(indikator, '|', -1)) AS indikator
 							        FROM esakip_data_pokin_cascading 
 							        WHERE active = 1 
 							          AND jenis_data = 1
-							          AND id_data = %d
+							          AND id_data = %s
 							          AND id_skpd = %d
-							    ", $t['id'], $id_skpd),
+							    ", $t['id_unik'], $id_skpd),
 							ARRAY_A
 						);
 
@@ -5954,7 +5957,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							$_satker_tujuan[] = '<li>' . $satker['nama_satker'] . '</li>';
 						}
 						foreach ($pokin_tujuan as $pokin) {
-							$_pokin_tujuan[] = '<li>' . $pokin['nama_pokin'] . '</li>';
+							$_pokin_tujuan[] = '<li>' . $pokin['nama_pokin'] . ' ( ' . $pokin['indikator'] . ' )</li>';
 						}
 						if (!isset($body_all[$t['tujuan']])) {
 							$body_all[$t['tujuan']] = array(
@@ -6006,7 +6009,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								        FROM esakip_data_pegawai_cascading 
 								        WHERE active = 1 
 								          AND jenis_data = 2
-								          AND id_data = %d
+								          AND id_data = %s
 								          AND id_skpd = %d
 								    ", $s['id'], $id_skpd),
 								ARRAY_A
@@ -6015,13 +6018,14 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							$pokin_sasaran = $wpdb->get_results(
 								$wpdb->prepare("
 								        SELECT 
-								            TRIM(SUBSTRING_INDEX(nama_pokin, '|', -1)) AS nama_pokin
+								            TRIM(SUBSTRING_INDEX(nama_pokin, '|', -1)) AS nama_pokin,
+								            TRIM(SUBSTRING_INDEX(indikator, '|', -1)) AS indikator
 								        FROM esakip_data_pokin_cascading 
 								        WHERE active = 1 
 								          AND jenis_data = 1
-								          AND id_data = %d
+								          AND id_data = %s
 								          AND id_skpd = %d
-								    ", $t['id'], $id_skpd),
+								    ", $s['id'], $id_skpd),
 								ARRAY_A
 							);
 
@@ -6035,7 +6039,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								$_satker_sasaran[] = '<li>' . $satker['nama_satker'] . '</li>';
 							}
 							foreach ($pokin_sasaran as $pokin) {
-								$_pokin_sasaran[] = '<li>' . $pokin['nama_pokin'] . '</li>';
+								$_pokin_sasaran[] = '<li>' . $pokin['nama_pokin'] . '('. $pokin['indikator'] .')</li>';
 							}
 							if (!isset($body_all[$t['tujuan']]['data'][$s['sasaran']])) {
 								$body_all[$t['tujuan']]['data'][$s['sasaran']] = array(
@@ -6085,7 +6089,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									        FROM esakip_data_pegawai_cascading 
 									        WHERE active = 1 
 									          AND jenis_data = 3
-									          AND id_data = %d
+									          AND id_data = %s
 									          AND id_skpd = %d
 									    ", $p['id'], $id_skpd),
 									ARRAY_A
@@ -6093,11 +6097,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								$pokin_program = $wpdb->get_results(
 									$wpdb->prepare("
 									        SELECT 
-									            TRIM(SUBSTRING_INDEX(nama_pokin, '|', -1)) AS nama_pokin
+									            TRIM(SUBSTRING_INDEX(nama_pokin, '|', -1)) AS nama_pokin,
+									            TRIM(SUBSTRING_INDEX(indikator, '|', -1)) AS indikator
 									        FROM esakip_data_pokin_cascading 
 									        WHERE active = 1 
 									          AND jenis_data = 1
-									          AND id_data = %d
+									          AND id_data = %s
 									          AND id_skpd = %d
 									    ", $t['id'], $id_skpd),
 									ARRAY_A
@@ -6113,7 +6118,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									$satker_prog[] = '<li>' . $satker['nama_satker'] . '</li>';
 								}
 								foreach ($pokin_program as $pokin) {
-									$_pokin_program[] = '<li>' . $pokin['nama_pokin'] . '</li>';
+									$_pokin_program[] = '<li>' . $pokin['nama_pokin'] . '('. $pokin['indikator'] .')</li>';
 								}
 								$body_all[$t['tujuan']]['data'][$s['sasaran']]['data'][$p['program']] = array(
 									'program' => $p['program'],
@@ -6158,10 +6163,10 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								        <div class="btn btn-lg btn-success get_button" style="text-transform:uppercase;">
 								            ' . $s['sasaran'] . '
 								            <hr/>
-								            <span class="nama_pokin">Pohon Kinerja : <ol style="text-align: left;">' . $nama_pokin . '</ol></span>
-								            <br />
 								            <span class="indikator">IND: <ol style="text-align: left;">' . $indikator . '</ol></span>
 								            <hr/>
+								            <span class="nama_pokin">Pohon Kinerja : <ol style="text-align: left;">' . $nama_pokin . '</ol></span>
+								            <br />
 								            <span class="nama_satker">Satuan Kerja : <ol style="text-align: left;">' . $nama_satker . '</ol></span>
 								            <br />
 								        </div>
@@ -6176,10 +6181,10 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									        <div class="btn btn-lg btn-danger get_button" id="program-ke-' . $p["id"] . '" data-nama-program="' . $p['program'] . '" style="text-transform:uppercase; position: relative;">
 	                                            ' . $p['program'] . '
 									            <hr/>
-									            <span class="nama_pokin">Pohon Kinerja : <ol style="text-align: left;">' . $nama_pokin . '</ol></span>
-									            <br />
 									            <span class="indikator">IND: <ol style="text-align: left;">' . $indikator . '</ol></span>
 									            <hr/>
+									            <span class="nama_pokin">Pohon Kinerja : <ol style="text-align: left;">' . $nama_pokin . '</ol></span>
+									            <br />
 									            <span class="nama_satker">Satuan Kerja : <ol style="text-align: left;">' . $nama_satker . '</ol></span>
 									            <br />
 								                <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: center;">
@@ -6302,7 +6307,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							        FROM esakip_data_pegawai_cascading 
 							        WHERE active = 1 
 							          AND jenis_data = 4
-							          AND id_data = %d
+							          AND id_data = %s
 							          AND id_skpd = %d
 							    ", $k['id'], $id_skpd),
 							ARRAY_A
@@ -6311,11 +6316,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						$pokin_kegiatan = $wpdb->get_results(
 							$wpdb->prepare("
 							        SELECT 
-							            TRIM(SUBSTRING_INDEX(nama_pokin, '|', -1)) AS nama_pokin
+							            TRIM(SUBSTRING_INDEX(nama_pokin, '|', -1)) AS nama_pokin,
+							            TRIM(SUBSTRING_INDEX(indikator, '|', -1)) AS indikator
 							        FROM esakip_data_pokin_cascading 
 							        WHERE active = 1 
 							          AND jenis_data = 1
-							          AND id_data = %d
+							          AND id_data = %s
 							          AND id_skpd = %d
 							    ", $t['id'], $id_skpd),
 							ARRAY_A
@@ -6331,7 +6337,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							$satker_keg[] = '<li>' . $satker['nama_satker'] . '</li>';
 						}
 						foreach ($pokin_kegiatan as $pokin) {
-							$_pokin_kegiatan[] = '<li>' . $pokin['nama_pokin'] . '</li>';
+							$_pokin_kegiatan[] = '<li>' . $pokin['nama_pokin'] . '('. $pokin['indikator'] .')</li>';
 						}
 						if (!isset($body_all[$k['kegiatan']])) {
 							$body_all[$k['kegiatan']] = array(
@@ -6377,7 +6383,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								        FROM esakip_data_pegawai_cascading 
 								        WHERE active = 1 
 								          AND jenis_data = 5
-								          AND id_data = %d
+								          AND id_data = %s
 								          AND id_skpd = %d
 								    ", $g['id'], $id_skpd),
 								ARRAY_A
@@ -6386,11 +6392,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							$pokin_sub = $wpdb->get_results(
 								$wpdb->prepare("
 								        SELECT 
-								            TRIM(SUBSTRING_INDEX(nama_pokin, '|', -1)) AS nama_pokin
+								            TRIM(SUBSTRING_INDEX(nama_pokin, '|', -1)) AS nama_pokin,
+								            TRIM(SUBSTRING_INDEX(indikator, '|', -1)) AS indikator
 								        FROM esakip_data_pokin_cascading 
 								        WHERE active = 1 
 								          AND jenis_data = 1
-								          AND id_data = %d
+								          AND id_data = %s
 								          AND id_skpd = %d
 								    ", $t['id'], $id_skpd),
 								ARRAY_A
@@ -6406,7 +6413,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								$satker_sub[] = '<li>' . $satker['nama_satker'] . '</li>';
 							}
 							foreach ($pokin_sub as $pokin) {
-								$_pokin_sub[] = '<li>' . $pokin['nama_pokin'] . '</li>';
+								$_pokin_sub[] = '<li>' . $pokin['nama_pokin'] . '('. $pokin['indikator'] .')</li>';
 							}
 							$body_all[$k['kegiatan']]['data'][$g['sub_giat']] = array(
 								'sub_giat' => $g['sub_giat'],
@@ -7183,7 +7190,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						    foreach ($t->pokin_renstra as $pokin) {
 						        $wpdb->insert('esakip_data_pokin_cascading', array(
 						            'id_pokin'   => $pokin->id_pokin ?? '',
-						            'nama_pokin' => $pokin->nama_pokin ?? '',
+						            'nama_pokin' => $pokin->label ?? '',
+						            'indikator'	 => $pokin->indikator ?? '',
 						            'jenis_data' => 1,
 						            'id_data'    => $t->id_unik,
 						            'id_jadwal'  => $id_jadwal,
@@ -7296,7 +7304,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 	                        foreach ($s->pokin_renstra as $pokin) {
 	                            $wpdb->insert('esakip_data_pokin_cascading', array(
 						            'id_pokin'   => $pokin->id_pokin ?? '',
-						            'nama_pokin' => $pokin->nama_pokin ?? '',
+						            'nama_pokin' => $pokin->label ?? '',
 	                                'jenis_data' => 2,
 	                                'id_data' => $s->id,
 	                                'id_jadwal' => $id_jadwal,
@@ -7409,7 +7417,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 	                        foreach ($p->pokin_renstra as $pokin) {
 	                            $wpdb->insert('esakip_data_pokin_cascading', array(
 						            'id_pokin'   => $pokin->id_pokin ?? '',
-						            'nama_pokin' => $pokin->nama_pokin ?? '',
+						            'nama_pokin' => $pokin->label ?? '',
 	                                'jenis_data' => 3,
 	                                'id_data' => $p->id,
 	                                'id_jadwal' => $id_jadwal,
@@ -7523,7 +7531,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 	                        foreach ($k->pokin_renstra as $pokin) {
 	                            $wpdb->insert('esakip_data_pokin_cascading', array(
 						            'id_pokin'   => $pokin->id_pokin ?? '',
-						            'nama_pokin' => $pokin->nama_pokin ?? '',
+						            'nama_pokin' => $pokin->label ?? '',
 	                                'jenis_data' => 4,
 	                                'id_data' => $k->id,
 	                                'id_jadwal' => $id_jadwal,
@@ -7637,7 +7645,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 	                        foreach ($g->pokin_renstra as $pokin) {
 	                            $wpdb->insert('esakip_data_pokin_cascading', array(
 						            'id_pokin'   => $pokin->id_pokin ?? '',
-						            'nama_pokin' => $pokin->nama_pokin ?? '',
+						            'nama_pokin' => $pokin->label ?? '',
 	                                'jenis_data' => 5,
 	                                'id_data' => $g->id,
 	                                'id_jadwal' => $id_jadwal,

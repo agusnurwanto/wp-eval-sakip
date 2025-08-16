@@ -1997,6 +1997,7 @@ CREATE TABLE `esakip_data_pokin_cascading` (
   `id` int(11) NOT NULL auto_increment,
   `id_pokin` int(11) DEFAULT NULL,
   `nama_pokin` text DEFAULT NULL,
+  `indikator` text DEFAULT NULL,
   `jenis_data` tinyint(4) NOT NULL COMMENT '1 = TUJUAN RENSTRA, 2 = SASARAN RENSTRA, 3 = PROGRAM RENSTRA, 4 = KEGIATAN RENSTRA, 5 = SUB KEGIATAN RENSTRA, 6 = RHK',
   `id_data` varchar(255) NOT NULL,
   `id_jadwal` int(11) DEFAULT NULL,
