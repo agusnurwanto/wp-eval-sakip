@@ -307,6 +307,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_kegiatan_cascading', $plugin_public, 'get_kegiatan_cascading');
 		$this->loader->add_action('wp_ajax_get_sub_giat_cascading', $plugin_public, 'get_sub_giat_cascading');
 		$this->loader->add_action('wp_ajax_get_jabatan_cascading', $plugin_public, 'get_jabatan_cascading');
+		$this->loader->add_action('wp_ajax_nopriv_get_jabatan_cascading', $plugin_public, 'get_jabatan_cascading');
 		$this->loader->add_action('wp_ajax_submit_pegawai_cascading', $plugin_public, 'submit_pegawai_cascading');
 
 		$this->loader->add_action('wp_ajax_get_detail_dokumen_by_id', $plugin_public, 'get_detail_dokumen_by_id');
@@ -520,6 +521,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_tambah_pokin_renaksi', $plugin_public, 'tambah_pokin_renaksi');
 		
 		$this->loader->add_action('wp_ajax_get_data_pokin',  $plugin_public, 'get_data_pokin');
+		$this->loader->add_action('wp_ajax_get_data_pokin_all',  $plugin_public, 'get_data_pokin_all');
+		$this->loader->add_action('wp_ajax_nopriv_get_data_pokin_all',  $plugin_public, 'get_data_pokin_all');
 		$this->loader->add_action('wp_ajax_create_pokin',  $plugin_public, 'create_pokin');
 		$this->loader->add_action('wp_ajax_edit_pokin',  $plugin_public, 'edit_pokin');
 		$this->loader->add_action('wp_ajax_update_pokin',  $plugin_public, 'update_pokin');
