@@ -4936,6 +4936,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 										WHERE id_kuesioner = %d
 										  AND id_jenis_bukti_dukung = %d
 										  AND tahun_anggaran = %d
+										  AND active = 1
 									", $id_kuesioner, $val['id'], $tahun));
 
 									if (!empty($data_pengisian)) {
@@ -5139,7 +5140,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 			if (!empty($_POST['api_key']) && $_POST['api_key'] === get_option(ESAKIP_APIKEY)) {
 				$current_user = wp_get_current_user();
 				$user_roles = $current_user->roles;
-				$is_admin = in_array('administrator', $user_roles) || in_array('admin_panrb', $user_roles) || in_array("admin_bappeda", $user_roles);
+				$is_admin = in_array('administrator', $user_roles) || in_array('admin_panrb', $user_roles)|| in_array('admin_ortala', $user_roles) || in_array("admin_bappeda", $user_roles);
 
 				if (empty($_POST['id_variabel'])) {
 					$ret['status'] = 'error';
@@ -5272,6 +5273,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						dokumen_upload
 					FROM esakip_data_dukung_kuesioner_mendagri
 					WHERE id= %d
+						AND active = 1
 				", $_POST['id_jenis_data_dukung']));
 				$all_dokumen = array();
 				$jenis_bukti_dukung = json_decode(stripslashes($jenis_bukti_dukung_db), true);
@@ -5560,6 +5562,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						WHERE id_kuesioner = %d
 						  AND id_jenis_bukti_dukung = %d
 						  AND tahun_anggaran = %d
+						  AND active = 1
 					", $id_kuesioner, $id_jenis_bukti_dukung, $tahun_anggaran), ARRAY_A);
 
 					if ($existing_data) {

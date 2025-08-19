@@ -43,7 +43,7 @@ foreach ($idtahun as $val) {
 $current_user = wp_get_current_user();
 $ret['debug_roles'] = $current_user->roles;
 $user_roles = $current_user->roles;
-$is_admin = in_array('administrator', $user_roles) || in_array('admin_panrb', $user_roles) || in_array("admin_bappeda", $current_user->roles) || in_array("administrator", $current_user->roles);
+$is_admin = in_array('administrator', $user_roles) || in_array('admin_panrb', $user_roles)|| in_array('admin_ortala', $user_roles) || in_array("admin_bappeda", $current_user->roles) || in_array("administrator", $current_user->roles);
 
 $nama_pemda = get_option(ESAKIP_NAMA_PEMDA);
 
