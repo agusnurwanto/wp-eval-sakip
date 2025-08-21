@@ -4331,12 +4331,18 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					$ret['status'] = 'error';
 					$ret['message'] = 'Jenis bukti dukung tidak boleh kosong!';
 				}
+				
+				if (!empty($_POST['tahun_anggaran'])) {
+					$tahun_anggaran = intval($_POST['tahun_anggaran']);
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun anggaran kosong!';
+				}
+
 
 				$dokumen_upload = !empty($_POST['dokumen_upload']) ? json_encode($_POST['dokumen_upload']) : '';
 
-				if ($ret['status'] === 'success') {
-					$tahun_anggaran = date('Y');
-
+				if ($ret['status'] === 'success') {					
 					if (!empty($id_bukti)) {
 						$wpdb->update(
 							'esakip_data_dukung_kuesioner_mendagri',

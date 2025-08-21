@@ -842,6 +842,7 @@ foreach ($idtahun as $val) {
                 id_bukti: id_bukti,
                 id_detail: id_detail,
                 jenis_bukti_dukung: jenis_bukti_dukung,
+                tahun_anggaran: <?php echo $input['tahun']; ?>,
                 dokumen_upload: (selectedBuktiDukung)
             },
             success: function(response) {
