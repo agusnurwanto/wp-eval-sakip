@@ -28815,19 +28815,19 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$ret['message'] = 'Berhasil update data!';
 						} else {
 							$data['id_unik'] = $this->generateRandomString(5);
-							$cek_id = $wpdb->get_var($wpdb->prepare("
-                                    select 
-                                        id 
-                                    from $table
-                                    where nama_program=%s
-                                    	and id_jadwal=%d
-                                ", $_POST['nama_program'], $_POST['id_jadwal']));
-							if (!empty($cek_id)) {
-								$ret['status'] = 'error';
-								$ret['message'] = 'Program teks sudah ada!';
-							} else {
-								$wpdb->insert($table, $data);
-							}
+							$wpdb->insert($table, $data);
+							// $cek_id = $wpdb->get_var($wpdb->prepare("
+                            //         select 
+                            //             id 
+                            //         from $table
+                            //         where nama_program=%s
+                            //         	and id_jadwal=%d
+                            //     ", $_POST['nama_program'], $_POST['id_jadwal']));
+							// if (!empty($cek_id)) {
+							// 	$ret['status'] = 'error';
+							// 	$ret['message'] = 'Program teks sudah ada!';
+							// } else {
+							// }
 						}
 					}
 				}
