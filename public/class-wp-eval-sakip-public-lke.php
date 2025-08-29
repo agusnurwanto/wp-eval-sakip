@@ -2722,7 +2722,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							SELECT 
 								*
 							FROM esakip_kuesioner_menpan_detail
-							WHERE id = %d
+							WHERE id_kuesioner = %d
 						", $_POST['id']),
 						ARRAY_A
 					);
@@ -4250,7 +4250,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							'level' => $soal['level'],
 							'penjelasan' => $soal['penjelasan'],
 							'jenis_bukti_dukung' => str_replace("\\n", "\n", $soal['bukti_dukung']),
-							'dokumen_upload' => json_encode([]),
 							'tahun_anggaran' => $tahun_anggaran,
 							'active' => 1
 						);
@@ -5452,7 +5451,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					} else if ($v == 'esakip_dokumen_kuesioner') {
 						$dokumen = $this->functions->generatePage(array(
 							'nama_page' => 'Dokumen Kuesioner ' . $_POST['tahun_anggaran'],
-							'content' => '[dokumen_detail_dokumen_kuesioner tahun=' . $_POST['tahun_anggaran'] . ']',
+							'content' => '[dokumen_detail_kuesioner tahun=' . $_POST['tahun_anggaran'] . ']',
 							'show_header' => 1,
 							'post_status' => 'private'
 						));
