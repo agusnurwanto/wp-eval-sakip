@@ -2475,3 +2475,50 @@ CREATE TABLE esakip_pengisian_kuesioner_mendagri_detail (
   KEY `tahun_anggaran` (`tahun_anggaran`),
   KEY `active` (`active`)
 );
+
+CREATE TABLE esakip_kke_format (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `nama` TEXT DEFAULT NULL,
+  `keterangan` TEXT DEFAULT NULL,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `active` TINYINT(4) DEFAULT 1,
+  PRIMARY KEY(id)
+);
+
+CREATE TABLE `esakip_rpjmd_visi` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `visi` text DEFAULT null,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY key (id),
+  KEY `id_jadwal` (`id_jadwal`)
+);
+
+CREATE TABLE `esakip_rpjmd_misi` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `misi` text DEFAULT null,
+  `id_visi` int(11) DEFAULT NULL,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY key (id),
+  KEY `id_visi` (`id_visi`),
+  KEY `id_jadwal` (`id_jadwal`)
+);
+
+CREATE TABLE `esakip_rpjmd_misi_detail` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_misi` int(11) DEFAULT null,
+  `id_tujuan` text DEFAULT NULL,
+  `id_jadwal` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY key (id),
+  KEY `id_misi` (`id_misi`),
+  KEY `id_jadwal` (`id_jadwal`)
+);
