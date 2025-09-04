@@ -5868,676 +5868,698 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		die(json_encode($ret));
 	}
 
-	public function get_table_cascading_pd()
-	{
-		global $wpdb;
-		$ret = array(
-			'status' => 'success',
-			'message' => 'Berhasil get data!',
-			'data' => array()
-		);
+	public function get_table_cascading_pd() {
+        global $wpdb;
+        $ret = array(
+            'status' => 'success',
+            'message' => 'Berhasil get data!',
+            'data' => array()
+        );
 
-		if (!empty($_POST)) {
-			if (empty($_POST['id_jadwal'])) {
-				$ret['status'] = 'error';
-				$ret['message'] = 'id_jadwal tidak boleh kosong!';
-			} else if (empty($_POST['id_skpd'])) {
-				$ret['status'] = 'error';
-				$ret['message'] = 'id_skpd tidak boleh kosong!';
-			}
+        if (!empty($_POST)) {
+            if (empty($_POST['id_jadwal'])) {
+                $ret['status'] = 'error';
+                $ret['message'] = 'id_jadwal tidak boleh kosong!';
+            } else if (empty($_POST['id_skpd'])) {
+                $ret['status'] = 'error';
+                $ret['message'] = 'id_skpd tidak boleh kosong!';
+            }
 
-			if ($ret['status'] == 'success') {
-				$id_jadwal = $_POST['id_jadwal'];
-				$id_skpd = $_POST['id_skpd'];
-				$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+            if ($ret['status'] == 'success') {
+                $id_jadwal = $_POST['id_jadwal'];
+                $id_skpd = $_POST['id_skpd'];
+                $show_pokin = isset($_POST['show_pokin']) ? $_POST['show_pokin'] : false;
+                $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
-				$tujuan_data = $wpdb->get_results(
-					$wpdb->prepare("
-	                    SELECT 
-	                        *
-	                    FROM esakip_cascading_opd_tujuan 
-	                    WHERE active=1 
-	                      AND id_jadwal=%d
-	                      AND id_skpd=%d
-	                      AND id_tujuan IS NULL
-	                    ORDER BY no_urut ASC
-	                    ", $id_jadwal, $id_skpd),
-					ARRAY_A
-				);
+                $tujuan_data = $wpdb->get_results(
+                    $wpdb->prepare("
+                        SELECT 
+                            *
+                        FROM esakip_cascading_opd_tujuan 
+                        WHERE active=1 
+                          AND id_jadwal=%d
+                          AND id_skpd=%d
+                          AND id_tujuan IS NULL
+                        ORDER BY no_urut ASC
+                        ", $id_jadwal, $id_skpd),
+                    ARRAY_A
+                );
 
-				if (!empty($tujuan_data)) {
-					$body_all = array();
-					
-					foreach ($tujuan_data as $t) {
-						$indikator_tujuan = $wpdb->get_results(
-							$wpdb->prepare("
-	                            SELECT 
-	                                indikator
-	                            FROM esakip_cascading_opd_tujuan 
-	                            WHERE active=1 
-	                              AND indikator IS NOT NULL
-	                              AND id_tujuan=%d
-	                            ORDER BY no_urut ASC
-	                            ", $t['id']),
-							ARRAY_A
-						);
+                if (!empty($tujuan_data)) {
+                    $body_all = array();
+                    
+                    foreach ($tujuan_data as $t) {
+                        $indikator_tujuan = $wpdb->get_results(
+                            $wpdb->prepare("
+                                SELECT 
+                                    indikator
+                                FROM esakip_cascading_opd_tujuan 
+                                WHERE active=1 
+                                  AND indikator IS NOT NULL
+                                  AND id_tujuan=%d
+                                ORDER BY no_urut ASC
+                                ", $t['id']),
+                            ARRAY_A
+                        );
 
-						$satker_tujuan = $wpdb->get_results(
-							$wpdb->prepare("
-							        SELECT 
-							            TRIM(SUBSTRING_INDEX(nama_satker, '|', -1)) AS nama_satker
-							        FROM esakip_data_pegawai_cascading 
-							        WHERE active = 1 
-							          AND jenis_data = 1
-							          AND id_data = %s
-							          AND id_skpd = %d
-							          AND id_jadwal = %d
-							    ", $t['id_unik'], $id_skpd, $id_jadwal),
-							ARRAY_A
-						);
-						$pokin_tujuan = $wpdb->get_results(
-							$wpdb->prepare("
-							        SELECT 
-							            TRIM(SUBSTRING_INDEX(nama_pokin, '|', -1)) AS nama_pokin,
-							            TRIM(SUBSTRING_INDEX(indikator, '|', -1)) AS indikator
-							        FROM esakip_data_pokin_cascading 
-							        WHERE active = 1 
-							          AND jenis_data = 1
-							          AND id_data = %s
-							          AND id_skpd = %d
-							    ", $t['id_unik'], $id_skpd),
-							ARRAY_A
-						);
+                        $satker_tujuan = $wpdb->get_results(
+                            $wpdb->prepare("
+                                    SELECT 
+                                        TRIM(SUBSTRING_INDEX(nama_satker, '|', -1)) AS nama_satker
+                                    FROM esakip_data_pegawai_cascading 
+                                    WHERE active = 1 
+                                      AND jenis_data = 1
+                                      AND id_data = %s
+                                      AND id_skpd = %d
+                                      AND id_jadwal = %d
+                                ", $t['id_unik'], $id_skpd, $id_jadwal),
+                            ARRAY_A
+                        );
+                        
+                        $pokin_tujuan = array();
+                        if ($show_pokin) {
+                            $pokin_tujuan = $wpdb->get_results(
+                                $wpdb->prepare("
+                                        SELECT 
+                                            TRIM(SUBSTRING_INDEX(nama_pokin, '|', -1)) AS nama_pokin,
+                                            TRIM(SUBSTRING_INDEX(indikator, '|', -1)) AS indikator
+                                        FROM esakip_data_pokin_cascading 
+                                        WHERE active = 1 
+                                          AND jenis_data = 1
+                                          AND id_data = %s
+                                          AND id_skpd = %d
+                                    ", $t['id_unik'], $id_skpd),
+                                ARRAY_A
+                            );
+                        }
 
-						$ind_tujuan = array();
-						$_satker_tujuan = array();
-						$_pokin_tujuan = array();
-						
-						foreach ($indikator_tujuan as $ind) {
-							$indikator_text = trim($ind['indikator']);
-							if (!empty($indikator_text)) {
-								$ind_tujuan[] = $indikator_text;
-							}
-						}
-						
-						foreach ($satker_tujuan as $satker) {
-							$_satker_tujuan[] = '<li>' . $satker['nama_satker'] . '</li>';
-						}
-						foreach ($pokin_tujuan as $pokin) {
-							$_pokin_tujuan[] = '<li>' . $pokin['nama_pokin'] . ' ( ' . $pokin['indikator'] . ' )</li>';
-						}
-						
-						if (!isset($body_all[$t['tujuan']])) {
-							$body_all[$t['tujuan']] = array(
-								'colspan_sasaran' => 0,
-								'colspan_program' => 0,
-								'tujuan' => $t['tujuan'],
-								'id' => $t['id'],
-								'indikator' => array(),
-								'nama_satker' => $_satker_tujuan,
-								'nama_pokin' => $_pokin_tujuan,
-								'data' => array()
-							);
-						}
+                        $ind_tujuan = array();
+                        $_satker_tujuan = array();
+                        $_pokin_tujuan = array();
+                        
+                        foreach ($indikator_tujuan as $ind) {
+                            $indikator_text = trim($ind['indikator']);
+                            if (!empty($indikator_text)) {
+                                $ind_tujuan[] = $indikator_text;
+                            }
+                        }
+                        
+                        foreach ($satker_tujuan as $satker) {
+                            $_satker_tujuan[] = '<li>' . $satker['nama_satker'] . '</li>';
+                        }
+                        
+                        foreach ($pokin_tujuan as $pokin) {
+                            $_pokin_tujuan[] = '<li>' . $pokin['nama_pokin'] . ' ( ' . $pokin['indikator'] . ' )</li>';
+                        }
+                        
+                        if (!isset($body_all[$t['tujuan']])) {
+                            $body_all[$t['tujuan']] = array(
+                                'colspan_sasaran' => 0,
+                                'colspan_program' => 0,
+                                'tujuan' => $t['tujuan'],
+                                'id' => $t['id'],
+                                'indikator' => array(),
+                                'nama_satker' => $_satker_tujuan,
+                                'nama_pokin' => $_pokin_tujuan,
+                                'data' => array()
+                            );
+                        }
 
-						// indikator ditambahkan terus disetiap looping, karena tujuannya dijadikan satu jika textnya sama
-						$body_all[$t['tujuan']]['indikator'] = array_merge($body_all[$t['tujuan']]['indikator'], $ind_tujuan);
-						
-						// Menghilangkan duplikasi indikator berdasarkan teks 
-						$body_all[$t['tujuan']]['indikator'] = array_unique($body_all[$t['tujuan']]['indikator'], SORT_STRING);
+                        $body_all[$t['tujuan']]['indikator'] = array_merge($body_all[$t['tujuan']]['indikator'], $ind_tujuan);
+                        
+                        $body_all[$t['tujuan']]['indikator'] = array_unique($body_all[$t['tujuan']]['indikator'], SORT_STRING);
 
-						$sasaran = $wpdb->get_results(
-							$wpdb->prepare("
-	                            SELECT 
-	                                *
-	                            FROM esakip_cascading_opd_sasaran 
-	                            WHERE active=1 
-	                              AND id_tujuan=%d
-	                              AND id_sasaran IS NULL
-	                            ORDER BY no_urut ASC
-	                            ", $t['id']),
-							ARRAY_A
-						);
+                        $sasaran = $wpdb->get_results(
+                            $wpdb->prepare("
+                                SELECT 
+                                    *
+                                FROM esakip_cascading_opd_sasaran 
+                                WHERE active=1 
+                                  AND id_tujuan=%d
+                                  AND id_sasaran IS NULL
+                                ORDER BY no_urut ASC
+                                ", $t['id']),
+                            ARRAY_A
+                        );
 
-						foreach ($sasaran as $s) {
-							$indikator_sasaran = $wpdb->get_results(
-								$wpdb->prepare("
-	                                SELECT 
-	                                    indikator
-	                                FROM esakip_cascading_opd_sasaran 
-	                                WHERE active=1 
-		                              AND indikator IS NOT NULL
-	                                  AND id_sasaran=%d
-	                                ORDER BY no_urut ASC
-	                                ", $s['id']),
-								ARRAY_A
-							);
+                        foreach ($sasaran as $s) {
+                            $indikator_sasaran = $wpdb->get_results(
+                                $wpdb->prepare("
+                                    SELECT 
+                                        indikator
+                                    FROM esakip_cascading_opd_sasaran 
+                                    WHERE active=1 
+                                      AND indikator IS NOT NULL
+                                      AND id_sasaran=%d
+                                    ORDER BY no_urut ASC
+                                    ", $s['id']),
+                                ARRAY_A
+                            );
 
-							$satker_sasaran = $wpdb->get_results(
-								$wpdb->prepare("
-								        SELECT 
-								            TRIM(SUBSTRING_INDEX(nama_satker, '|', -1)) AS nama_satker
-								        FROM esakip_data_pegawai_cascading 
-								        WHERE active = 1 
-								          AND jenis_data = 2
-								          AND id_data = %s
-								          AND id_skpd = %d
-								    ", $s['id_unik'], $id_skpd),
-								ARRAY_A
-							);
-							$pokin_sasaran = $wpdb->get_results(
-								$wpdb->prepare("
-								        SELECT 
-								            TRIM(SUBSTRING_INDEX(nama_pokin, '|', -1)) AS nama_pokin,
-								            TRIM(SUBSTRING_INDEX(indikator, '|', -1)) AS indikator
-								        FROM esakip_data_pokin_cascading 
-								        WHERE active = 1 
-								          AND jenis_data = 2
-								          AND id_data = %s
-								          AND id_skpd = %d
-								    ", $s['id_unik'], $id_skpd),
-								ARRAY_A
-							);
+                            $satker_sasaran = $wpdb->get_results(
+                                $wpdb->prepare("
+                                        SELECT 
+                                            TRIM(SUBSTRING_INDEX(nama_satker, '|', -1)) AS nama_satker
+                                        FROM esakip_data_pegawai_cascading 
+                                        WHERE active = 1 
+                                          AND jenis_data = 2
+                                          AND id_data = %s
+                                          AND id_skpd = %d
+                                    ", $s['id_unik'], $id_skpd),
+                                ARRAY_A
+                            );
+                            
+                            $pokin_sasaran = array();
+                            if ($show_pokin) {
+                                $pokin_sasaran = $wpdb->get_results(
+                                    $wpdb->prepare("
+                                            SELECT 
+                                                TRIM(SUBSTRING_INDEX(nama_pokin, '|', -1)) AS nama_pokin,
+                                                TRIM(SUBSTRING_INDEX(indikator, '|', -1)) AS indikator
+                                            FROM esakip_data_pokin_cascading 
+                                            WHERE active = 1 
+                                              AND jenis_data = 2
+                                              AND id_data = %s
+                                              AND id_skpd = %d
+                                        ", $s['id_unik'], $id_skpd),
+                                    ARRAY_A
+                                );
+                            }
 
-							$ind_sasaran = array();
-							$_satker_sasaran = array();
-							$_pokin_sasaran = array();
-							foreach ($indikator_sasaran as $ind) {
-								$ind_sasaran[] = '<li>' . $ind['indikator'] . '</li>';
-							}
-							foreach ($satker_sasaran as $satker) {
-								$_satker_sasaran[] = '<li>' . $satker['nama_satker'] . '</li>';
-							}
-							foreach ($pokin_sasaran as $pokin) {
-								$_pokin_sasaran[] = '<li>' . $pokin['nama_pokin'] . '('. $pokin['indikator'] .')</li>';
-							}
-							
-							if (!isset($body_all[$t['tujuan']]['data'][$s['sasaran']])) {
-								$body_all[$t['tujuan']]['data'][$s['sasaran']] = array(
-									'colspan_program' => 0,
-									'sasaran' => $s['sasaran'],
-									'id' => $s['id'],
-									'indikator' => $ind_sasaran,
-									'nama_satker' => $_satker_sasaran,
-									'nama_pokin' => $_pokin_sasaran,
-									'data' => array()
-								);
-							}
+                            $ind_sasaran = array();
+                            $_satker_sasaran = array();
+                            $_pokin_sasaran = array();
+                            foreach ($indikator_sasaran as $ind) {
+                                $ind_sasaran[] = '<li>' . $ind['indikator'] . '</li>';
+                            }
+                            foreach ($satker_sasaran as $satker) {
+                                $_satker_sasaran[] = '<li>' . $satker['nama_satker'] . '</li>';
+                            }
+                            foreach ($pokin_sasaran as $pokin) {
+                                $_pokin_sasaran[] = '<li>' . $pokin['nama_pokin'] . '('. $pokin['indikator'] .')</li>';
+                            }
+                            
+                            if (!isset($body_all[$t['tujuan']]['data'][$s['sasaran']])) {
+                                $body_all[$t['tujuan']]['data'][$s['sasaran']] = array(
+                                    'colspan_program' => 0,
+                                    'sasaran' => $s['sasaran'],
+                                    'id' => $s['id'],
+                                    'indikator' => $ind_sasaran,
+                                    'nama_satker' => $_satker_sasaran,
+                                    'nama_pokin' => $_pokin_sasaran,
+                                    'data' => array()
+                                );
+                            }
 
-							$program = $wpdb->get_results(
-								$wpdb->prepare("
-	                                SELECT 
-	                                    *
-	                                FROM esakip_cascading_opd_program 
-	                                WHERE active=1 
-	                                  AND id_sasaran=%d
-	                                  AND id_program IS NULL
-	                                ORDER BY no_urut ASC
-	                                ", $s['id']),
-								ARRAY_A
-							);
+                            $program = $wpdb->get_results(
+                                $wpdb->prepare("
+                                    SELECT 
+                                        *
+                                    FROM esakip_cascading_opd_program 
+                                    WHERE active=1 
+                                      AND id_sasaran=%d
+                                      AND id_program IS NULL
+                                    ORDER BY no_urut ASC
+                                    ", $s['id']),
+                                ARRAY_A
+                            );
 
-							foreach ($program as $p) {
-								$indikator_program = $wpdb->get_results(
-									$wpdb->prepare("
-	                                    SELECT 
-	                                        indikator
-	                                    FROM esakip_cascading_opd_program 
-	                                    WHERE active=1 
-			                              AND indikator IS NOT NULL
-	                                      AND id_program=%d
-	                                    ORDER BY no_urut ASC
-	                                    ", $p['id']),
-									ARRAY_A
-								);
+                            foreach ($program as $p) {
+                                $indikator_program = $wpdb->get_results(
+                                    $wpdb->prepare("
+                                        SELECT 
+                                            indikator
+                                        FROM esakip_cascading_opd_program 
+                                        WHERE active=1 
+                                          AND indikator IS NOT NULL
+                                          AND id_program=%d
+                                        ORDER BY no_urut ASC
+                                        ", $p['id']),
+                                    ARRAY_A
+                                );
 
-								$satker_program = $wpdb->get_results(
-									$wpdb->prepare("
-									        SELECT 
-									            TRIM(SUBSTRING_INDEX(nama_satker, '|', -1)) AS nama_satker
-									        FROM esakip_data_pegawai_cascading 
-									        WHERE active = 1 
-									          AND jenis_data = 3
-									          AND id_data = %s
-									          AND id_skpd = %d
-									    ", $p['id_unik'], $id_skpd),
-									ARRAY_A
-								);
-								$pokin_program = $wpdb->get_results(
-									$wpdb->prepare("
-									        SELECT 
-									            TRIM(SUBSTRING_INDEX(nama_pokin, '|', -1)) AS nama_pokin,
-									            TRIM(SUBSTRING_INDEX(indikator, '|', -1)) AS indikator
-									        FROM esakip_data_pokin_cascading 
-									        WHERE active = 1 
-									          AND jenis_data = 3
-									          AND id_data = %s
-									          AND id_skpd = %d
-									    ", $p['id_unik'], $id_skpd),
-									ARRAY_A
-								);
+                                $satker_program = $wpdb->get_results(
+                                    $wpdb->prepare("
+                                            SELECT 
+                                                TRIM(SUBSTRING_INDEX(nama_satker, '|', -1)) AS nama_satker
+                                            FROM esakip_data_pegawai_cascading 
+                                            WHERE active = 1 
+                                              AND jenis_data = 3
+                                              AND id_data = %s
+                                              AND id_skpd = %d
+                                        ", $p['id_unik'], $id_skpd),
+                                    ARRAY_A
+                                );
+                                
+                                $pokin_program = array();
+                                if ($show_pokin) {
+                                    $pokin_program = $wpdb->get_results(
+                                        $wpdb->prepare("
+                                                SELECT 
+                                                    TRIM(SUBSTRING_INDEX(nama_pokin, '|', -1)) AS nama_pokin,
+                                                    TRIM(SUBSTRING_INDEX(indikator, '|', -1)) AS indikator
+                                                FROM esakip_data_pokin_cascading 
+                                                WHERE active = 1 
+                                                  AND jenis_data = 3
+                                                  AND id_data = %s
+                                                  AND id_skpd = %d
+                                            ", $p['id_unik'], $id_skpd),
+                                        ARRAY_A
+                                    );
+                                }
 
-								$ind_prog = array();
-								$satker_prog = array();
-								$_pokin_program = array();
-								foreach ($indikator_program as $ind) {
-									$ind_prog[] = '<li>' . $ind['indikator'] . '</li>';
-								}
-								foreach ($satker_program as $satker) {
-									$satker_prog[] = '<li>' . $satker['nama_satker'] . '</li>';
-								}
-								foreach ($pokin_program as $pokin) {
-									$_pokin_program[] = '<li>' . $pokin['nama_pokin'] . '('. $pokin['indikator'] .')</li>';
-								}
-								$body_all[$t['tujuan']]['data'][$s['sasaran']]['data'][$p['program']] = array(
-									'program' => $p['program'],
-									'id' => $p['id'],
-									'indikator' => $ind_prog,
-									'nama_satker' => $satker_prog,
-									'nama_pokin' => $_pokin_program
-								);
-								
-								$body_all[$t['tujuan']]['data'][$s['sasaran']]['colspan_program']++;
-							}
-						}
-					}
+                                $ind_prog = array();
+                                $satker_prog = array();
+                                $_pokin_program = array();
+                                foreach ($indikator_program as $ind) {
+                                    $ind_prog[] = '<li>' . $ind['indikator'] . '</li>';
+                                }
+                                foreach ($satker_program as $satker) {
+                                    $satker_prog[] = '<li>' . $satker['nama_satker'] . '</li>';
+                                }
+                                foreach ($pokin_program as $pokin) {
+                                    $_pokin_program[] = '<li>' . $pokin['nama_pokin'] . '('. $pokin['indikator'] .')</li>';
+                                }
+                                $body_all[$t['tujuan']]['data'][$s['sasaran']]['data'][$p['program']] = array(
+                                    'program' => $p['program'],
+                                    'id' => $p['id'],
+                                    'indikator' => $ind_prog,
+                                    'nama_satker' => $satker_prog,
+                                    'nama_pokin' => $_pokin_program
+                                );
+                                
+                                $body_all[$t['tujuan']]['data'][$s['sasaran']]['colspan_program']++;
+                            }
+                        }
+                    }
 
-					foreach ($body_all as $tujuan_key => &$tujuan_data) {
-						$total_program_count = 0;
-						$total_sasaran_count = 0;
-						
-						foreach ($tujuan_data['data'] as $sasaran_key => &$sasaran_data) {
-							$program_count = count($sasaran_data['data']);
-							$sasaran_data['colspan_program'] = max(1, $program_count);
-							$total_program_count += $sasaran_data['colspan_program'];
-							$total_sasaran_count++;
-						}
-						
-						$tujuan_data['colspan_program'] = max(1, $total_program_count);
-						$tujuan_data['colspan_sasaran'] = max(1, $total_sasaran_count);
-					}
+                    foreach ($body_all as $tujuan_key => &$tujuan_data) {
+                        $total_program_count = 0;
+                        $total_sasaran_count = 0;
+                        
+                        foreach ($tujuan_data['data'] as $sasaran_key => &$sasaran_data) {
+                            $program_count = count($sasaran_data['data']);
+                            $sasaran_data['colspan_program'] = max(1, $program_count);
+                            $total_program_count += $sasaran_data['colspan_program'];
+                            $total_sasaran_count++;
+                        }
+                        
+                        $tujuan_data['colspan_program'] = max(1, $total_program_count);
+                        $tujuan_data['colspan_sasaran'] = max(1, $total_sasaran_count);
+                    }
 
-					$tujuan_html = '';
-					$sasaran_html = '';
-					$program_html = '';
-					
-					foreach ($body_all as $t) {
-						$indikator_html = array_map(function($indicator) {
-							return '<li>' . $indicator . '</li>';
-						}, $t['indikator']);
-						$indikator = implode('', $indikator_html);
-						
-						$nama_satker = empty($t['nama_satker']) ? '<li>-</li>' : implode('', $t['nama_satker']);
-						$nama_pokin = empty($t['nama_pokin']) ? '<li>-</li>' : implode('', $t['nama_pokin']);
-						$tujuan_html .= '<td class="text-center" colspan="' . $t['colspan_program'] . '">
-							    <div class="button-container">
-							        <div class="btn btn-lg btn-warning get_button" style="text-transform:uppercase;">
-							            ' . $t['tujuan'] . '
-							            <hr/>
-							            <span class="indikator">IND: <ol style="text-align: left;">' . $indikator . '</ol></span>
-							            <hr/>
-							            <span class="nama_pokin">Pohon Kinerja : <ol style="text-align: left;">' . $nama_pokin . '</ol></span>
-							            <br />
-							            <span class="nama_satker">Satuan Kerja : <ol style="text-align: left;">' . $nama_satker . '</ol></span>
-							            <br />
-							            
-							        </div>
-							    </div>
-							</td>';
+                    $tujuan_html = '';
+                    $sasaran_html = '';
+                    $program_html = '';
+                    
+                    $pokin_style = $show_pokin ? '' : ' style="display: none;"';
+                    
+                    foreach ($body_all as $t) {
+                        $indikator_html = array_map(function($indicator) {
+                            return '<li>' . $indicator . '</li>';
+                        }, $t['indikator']);
+                        $indikator = implode('', $indikator_html);
+                        
+                        $nama_satker = empty($t['nama_satker']) ? '<li>-</li>' : implode('', $t['nama_satker']);
+                        $nama_pokin = empty($t['nama_pokin']) ? '<li>-</li>' : implode('', $t['nama_pokin']);
+                        
+                        $tujuan_html .= '<td class="text-center" colspan="' . $t['colspan_program'] . '">
+                                <div class="button-container">
+                                    <div class="btn btn-lg btn-warning get_button" style="text-transform:uppercase;">
+                                        ' . $t['tujuan'] . '
+                                        <hr/>
+                                        <span class="indikator">IND: <ol style="text-align: left;">' . $indikator . '</ol></span>
+                                        <hr/>
+                                        <span class="nama_pokin"' . $pokin_style . '>Pohon Kinerja : <ol style="text-align: left;">' . $nama_pokin . '</ol></span>
+                                        <br />
+                                        <span class="nama_satker">Satuan Kerja : <ol style="text-align: left;">' . $nama_satker . '</ol></span>
+                                        <br />
+                                        
+                                    </div>
+                                </div>
+                            </td>';
 
-						foreach ($t['data'] as $s) {
-							$indikator = implode('', $s['indikator']);
-							$nama_satker = empty($s['nama_satker']) ? '<li>-</li>' : implode('', $s['nama_satker']);
-							$nama_pokin = empty($s['nama_pokin']) ? '<li>-</li>' : implode('', $s['nama_pokin']);
-							$sasaran_html .= '<td class="text-center" colspan="' . $s['colspan_program'] . '">
-								    <div class="button-container">
-								        <div class="btn btn-lg btn-success get_button" style="text-transform:uppercase;">
-								            ' . $s['sasaran'] . '
-								            <hr/>
-								            <span class="indikator">IND: <ol style="text-align: left;">' . $indikator . '</ol></span>
-								            <hr/>
-								            <span class="nama_pokin">Pohon Kinerja : <ol style="text-align: left;">' . $nama_pokin . '</ol></span>
-								            <br />
-								            <span class="nama_satker">Satuan Kerja : <ol style="text-align: left;">' . $nama_satker . '</ol></span>
-								            <br />
-								        </div>
-								    </div>
-								</td>';
-							foreach ($s['data'] as $p) {
-								$indikator = implode('', $p['indikator']);
-								$nama_satker = empty($p['nama_satker']) ? '<li>-</li>' : implode('', $p['nama_satker']);
-								$nama_pokin = empty($p['nama_pokin']) ? '<li>-</li>' : implode('', $p['nama_pokin']);
-								$program_html .= '<td class="text-center">
-									    <div class="button-container">
-									        <div class="btn btn-lg btn-danger get_button" id="program-ke-' . $p["id"] . '" data-nama-program="' . $p['program'] . '" style="text-transform:uppercase; position: relative;">
-	                                            ' . $p['program'] . '
-									            <hr/>
-									            <span class="indikator">IND: <ol style="text-align: left;">' . $indikator . '</ol></span>
-									            <hr/>
-									            <span class="nama_pokin">Pohon Kinerja : <ol style="text-align: left;">' . $nama_pokin . '</ol></span>
-									            <br />
-									            <span class="nama_satker">Satuan Kerja : <ol style="text-align: left;">' . $nama_satker . '</ol></span>
-									            <br />
-								                <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: center;">
-									            <button class="btn btn-danger view-kegiatan-button" onclick="view_kegiatan(this, \'' . $p['id'] . '\', \'' . $p['program'] . '\',  \'' . $s['sasaran'] . '\', \'' . $t['tujuan'] . '\');"><i style="font-size: 2rem;" class="dashicons dashicons-visibility visibility-icon"></i>
-								                </button>
-								        	</div>
-								        </div>
-								    </div>
-								</td>';
-							}
-						}
-					}
-					
-					$tbody = '
-	                        <tr>
-	                            <td class="text-center" style="width: 150px;">
-	                                <div class="button-container">
-	                                    <div class="btn btn-lg btn-info">TUJUAN</div>
-	                                </div>
-	                            </td>
-	                            ' . $tujuan_html . '
-	                        </tr>
-	                        <tr>
-	                            <td class="text-center">
-	                                <div class="button-container">
-	                                    <div class="btn btn-lg btn-info">SASARAN</div>
-	                                </div>
-	                            </td>
-	                            ' . $sasaran_html . '
-	                        </tr>
-	                        <tr>
-	                            <td class="text-center">
-	                                <div class="button-container">
-	                                    <div class="btn btn-lg btn-info">PROGRAM</div>
-	                                </div>
-	                            </td>
-	                            ' . $program_html . '
-	                        </tr>';
+                        foreach ($t['data'] as $s) {
+                            $indikator = implode('', $s['indikator']);
+                            $nama_satker = empty($s['nama_satker']) ? '<li>-</li>' : implode('', $s['nama_satker']);
+                            $nama_pokin = empty($s['nama_pokin']) ? '<li>-</li>' : implode('', $s['nama_pokin']);
+                            $sasaran_html .= '<td class="text-center" colspan="' . $s['colspan_program'] . '">
+                                    <div class="button-container">
+                                        <div class="btn btn-lg btn-success get_button" style="text-transform:uppercase;">
+                                            ' . $s['sasaran'] . '
+                                            <hr/>
+                                            <span class="indikator">IND: <ol style="text-align: left;">' . $indikator . '</ol></span>
+                                            <hr/>
+                                            <span class="nama_pokin"' . $pokin_style . '>Pohon Kinerja : <ol style="text-align: left;">' . $nama_pokin . '</ol></span>
+                                            <br />
+                                            <span class="nama_satker">Satuan Kerja : <ol style="text-align: left;">' . $nama_satker . '</ol></span>
+                                            <br />
+                                        </div>
+                                    </div>
+                                </td>';
+                            foreach ($s['data'] as $p) {
+                                $indikator = implode('', $p['indikator']);
+                                $nama_satker = empty($p['nama_satker']) ? '<li>-</li>' : implode('', $p['nama_satker']);
+                                $nama_pokin = empty($p['nama_pokin']) ? '<li>-</li>' : implode('', $p['nama_pokin']);
+                                $program_html .= '<td class="text-center">
+                                        <div class="button-container">
+                                            <div class="btn btn-lg btn-danger get_button" id="program-ke-' . $p["id"] . '" data-nama-program="' . $p['program'] . '" style="text-transform:uppercase; position: relative;">
+                                                ' . $p['program'] . '
+                                                <hr/>
+                                                <span class="indikator">IND: <ol style="text-align: left;">' . $indikator . '</ol></span>
+                                                <hr/>
+                                                <span class="nama_pokin"' . $pokin_style . '>Pohon Kinerja : <ol style="text-align: left;">' . $nama_pokin . '</ol></span>
+                                                <br />
+                                                <span class="nama_satker">Satuan Kerja : <ol style="text-align: left;">' . $nama_satker . '</ol></span>
+                                                <br />
+                                                <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: center;">
+                                                <button class="btn btn-danger view-kegiatan-button" onclick="view_kegiatan(this, \'' . $p['id'] . '\', \'' . $p['program'] . '\',  \'' . $s['sasaran'] . '\', \'' . $t['tujuan'] . '\');"><i style="font-size: 2rem;" class="dashicons dashicons-visibility visibility-icon"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>';
+                            }
+                        }
+                    }
+                    
+                    $tbody = '
+                            <tr>
+                                <td class="text-center" style="width: 150px;">
+                                    <div class="button-container">
+                                        <div class="btn btn-lg btn-info">TUJUAN</div>
+                                    </div>
+                                </td>
+                                ' . $tujuan_html . '
+                            </tr>
+                            <tr>
+                                <td class="text-center">
+                                    <div class="button-container">
+                                        <div class="btn btn-lg btn-info">SASARAN</div>
+                                    </div>
+                                </td>
+                                ' . $sasaran_html . '
+                            </tr>
+                            <tr>
+                                <td class="text-center">
+                                    <div class="button-container">
+                                        <div class="btn btn-lg btn-info">PROGRAM</div>
+                                    </div>
+                                </td>
+                                ' . $program_html . '
+                            </tr>';
 
-					$ret['body_all'] = $body_all;
-					$ret['data'] = $tbody;
-				} else {
-					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
-				}
-			}
-		} else {
-			$ret = array(
-				'status' => 'error',
-				'message' => 'Format tidak sesuai!'
-			);
-		}
-		die(json_encode($ret));
-	}
+                    $ret['body_all'] = $body_all;
+                    $ret['data'] = $tbody;
+                } else {
+                    $ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+                }
+            }
+        } else {
+            $ret = array(
+                'status' => 'error',
+                'message' => 'Format tidak sesuai!'
+            );
+        }
+        die(json_encode($ret));
+    }
+    
+    public function get_kegiatan_by_program() {
+        global $wpdb;
+        $ret = array(
+            'status' => 'success',
+            'message' => 'Berhasil mendapatkan data kegiatan!',
+            'data' => ''
+        );
 
-	public function get_kegiatan_by_program()
-	{
-		global $wpdb;
-		$ret = array(
-			'status' => 'success',
-			'message' => 'Berhasil mendapatkan data kegiatan!',
-			'data' => ''
-		);
+        if (!empty($_POST)) {
+            if (empty($_POST['id'])) {
+                $ret['status'] = 'error';
+                $ret['message'] = 'ID tidak boleh kosong!';
+            } else if (empty($_POST['tujuan'])) {
+                $ret['status'] = 'error';
+                $ret['message'] = 'Tujuan kosong!';
+            } else if (empty($_POST['sasaran'])) {
+                $ret['status'] = 'error';
+                $ret['message'] = 'Sasaran kosong!';
+            } else if (empty($_POST['program'])) {
+                $ret['status'] = 'error';
+                $ret['message'] = 'Program kosong!';
+            } else if (empty($_POST['id_skpd'])) {
+                $ret['status'] = 'error';
+                $ret['message'] = 'id_skpd tidak boleh kosong!';
+            }
 
-		if (!empty($_POST)) {
-			if (empty($_POST['id'])) {
-				$ret['status'] = 'error';
-				$ret['message'] = 'ID tidak boleh kosong!';
-			} else if (empty($_POST['tujuan'])) {
-				$ret['status'] = 'error';
-				$ret['message'] = 'Tujuan kosong!';
-			} else if (empty($_POST['sasaran'])) {
-				$ret['status'] = 'error';
-				$ret['message'] = 'Sasaran kosong!';
-			} else if (empty($_POST['program'])) {
-				$ret['status'] = 'error';
-				$ret['message'] = 'Program kosong!';
-			} else if (empty($_POST['id_skpd'])) {
-				$ret['status'] = 'error';
-				$ret['message'] = 'id_skpd tidak boleh kosong!';
-			}
+            if ($ret['status'] === 'success') {
+                $id = intval($_POST['id']);
+                $tujuan = trim($_POST['tujuan']);
+                $sasaran = trim($_POST['sasaran']);
+                $program = trim($_POST['program']);
+                $id_skpd = trim($_POST['id_skpd']);
+                $show_pokin = isset($_POST['show_pokin']) ? $_POST['show_pokin'] : false;
 
-			if ($ret['status'] === 'success') {
-				$id = intval($_POST['id']);
-				$tujuan = trim($_POST['tujuan']);
-				$sasaran = trim($_POST['sasaran']);
-				$program = trim($_POST['program']);
-				$id_skpd = trim($_POST['id_skpd']);
+                $kegiatan_data = $wpdb->get_results(
+                    $wpdb->prepare("
+                        SELECT 
+                            * 
+                        FROM esakip_cascading_opd_kegiatan 
+                        WHERE active = 1 
+                            AND id_program = %d 
+                        ORDER BY no_urut ASC
+                    ", $id),
+                    ARRAY_A
+                );
 
+                if (!empty($kegiatan_data)) {
+                    $body_all = array();
+                    foreach ($kegiatan_data as $k) {
+                        $indikator_kegiatan = $wpdb->get_results(
+                            $wpdb->prepare("
+                                SELECT 
+                                    indikator 
+                                FROM esakip_cascading_opd_kegiatan 
+                                WHERE active = 1 
+                                    AND indikator IS NOT NULL
+                                    AND id_giat = %d 
+                                ORDER BY no_urut ASC
+                            ", $k['id']),
+                            ARRAY_A
+                        );
 
-				$kegiatan_data = $wpdb->get_results(
-					$wpdb->prepare("
-	                    	SELECT 
-	                    		* 
-	                    	FROM esakip_cascading_opd_kegiatan 
-	                    	WHERE active = 1 
-	                    		AND id_program = %d 
-	                    	ORDER BY no_urut ASC
-	                    ", $id),
-					ARRAY_A
-				);
+                        $satker_kegiatan = $wpdb->get_results(
+                            $wpdb->prepare("
+                                SELECT 
+                                    TRIM(SUBSTRING_INDEX(nama_satker, '|', -1)) AS nama_satker
+                                FROM esakip_data_pegawai_cascading 
+                                WHERE active = 1 
+                                  AND jenis_data = 4
+                                  AND id_data = %s
+                                  AND id_skpd = %d
+                            ", $k['id_unik'], $id_skpd),
+                            ARRAY_A
+                        );
 
-				if (!empty($kegiatan_data)) {
-					$body_all = array();
-					foreach ($kegiatan_data as $k) {
-						$indikator_kegiatan = $wpdb->get_results(
-							$wpdb->prepare("
-	                            	SELECT 
-	                            		indikator 
-	                            	FROM esakip_cascading_opd_kegiatan 
-	                            	WHERE active = 1 
-			                            AND indikator IS NOT NULL
-	                            		AND id_giat = %d 
-	                            	ORDER BY no_urut ASC
-	                            ", $k['id']),
-							ARRAY_A
-						);
+                        $pokin_kegiatan = array();
+                        if ($show_pokin) {
+                            $pokin_kegiatan = $wpdb->get_results(
+                                $wpdb->prepare("
+                                    SELECT 
+                                        TRIM(SUBSTRING_INDEX(nama_pokin, '|', -1)) AS nama_pokin,
+                                        TRIM(SUBSTRING_INDEX(indikator, '|', -1)) AS indikator
+                                    FROM esakip_data_pokin_cascading 
+                                    WHERE active = 1 
+                                      AND jenis_data = 4
+                                      AND id_data = %s
+                                      AND id_skpd = %d
+                                ", $k['id_unik'], $id_skpd),
+                                ARRAY_A
+                            );
+                        }
 
-						$satker_kegiatan = $wpdb->get_results(
-							$wpdb->prepare("
-							        SELECT 
-							            TRIM(SUBSTRING_INDEX(nama_satker, '|', -1)) AS nama_satker
-							        FROM esakip_data_pegawai_cascading 
-							        WHERE active = 1 
-							          AND jenis_data = 4
-							          AND id_data = %s
-							          AND id_skpd = %d
-							    ", $k['id_unik'], $id_skpd),
-							ARRAY_A
-						);
+                        $ind_keg = array();
+                        $satker_keg = array();
+                        $_pokin_kegiatan = array();
+                        foreach ($indikator_kegiatan as $ind) {
+                            $ind_keg[] = '<li>' . $ind['indikator'] . '</li>';
+                        }
+                        foreach ($satker_kegiatan as $satker) {
+                            $satker_keg[] = '<li>' . $satker['nama_satker'] . '</li>';
+                        }
+                        foreach ($pokin_kegiatan as $pokin) {
+                            $_pokin_kegiatan[] = '<li>' . $pokin['nama_pokin'] . '('. $pokin['indikator'] .')</li>';
+                        }
+                        if (!isset($body_all[$k['kegiatan']])) {
+                            $body_all[$k['kegiatan']] = array(
+                                'colspan_sub_giat' => 0,
+                                'kegiatan' => $k['kegiatan'],
+                                'id' => $k['id'],
+                                'indikator' => $ind_keg,
+                                'nama_satker' => $satker_keg,
+                                'nama_pokin' => $_pokin_kegiatan,
+                                'data' => array()
+                            );
+                        }
 
-						$pokin_kegiatan = $wpdb->get_results(
-							$wpdb->prepare("
-							        SELECT 
-							            TRIM(SUBSTRING_INDEX(nama_pokin, '|', -1)) AS nama_pokin,
-							            TRIM(SUBSTRING_INDEX(indikator, '|', -1)) AS indikator
-							        FROM esakip_data_pokin_cascading 
-							        WHERE active = 1 
-							          AND jenis_data = 4
-							          AND id_data = %s
-							          AND id_skpd = %d
-							    ", $k['id_unik'], $id_skpd),
-							ARRAY_A
-						);
+                        $sub_giat = $wpdb->get_results(
+                            $wpdb->prepare("
+                                SELECT 
+                                    * 
+                                FROM esakip_cascading_opd_sub_giat 
+                                WHERE active = 1 
+                                    AND id_giat = %d 
+                                    AND id_sub_giat IS NULL 
+                                ORDER BY no_urut ASC
+                            ", $k['id']),
+                            ARRAY_A
+                        );
 
-						$ind_keg = array();
-						$satker_keg = array();
-						$_pokin_kegiatan = array();
-						foreach ($indikator_kegiatan as $ind) {
-							$ind_keg[] = '<li>' . $ind['indikator'] . '</li>';
-						}
-						foreach ($satker_kegiatan as $satker) {
-							$satker_keg[] = '<li>' . $satker['nama_satker'] . '</li>';
-						}
-						foreach ($pokin_kegiatan as $pokin) {
-							$_pokin_kegiatan[] = '<li>' . $pokin['nama_pokin'] . '('. $pokin['indikator'] .')</li>';
-						}
-						if (!isset($body_all[$k['kegiatan']])) {
-							$body_all[$k['kegiatan']] = array(
-								'colspan_sub_giat' => 0,
-								'kegiatan' => $k['kegiatan'],
-								'id' => $k['id'],
-								'indikator' => $ind_keg,
-								'nama_satker' => $satker_keg,
-								'nama_pokin' => $_pokin_kegiatan,
-								'data' => array()
-							);
-						}
+                        foreach ($sub_giat as $g) {
+                            $body_all[$k['kegiatan']]['colspan_sub_giat']++;
+                            $indikator_sub_giat = $wpdb->get_results(
+                                $wpdb->prepare("
+                                    SELECT indikator 
+                                    FROM esakip_cascading_opd_sub_giat 
+                                    WHERE active = 1 
+                                        AND indikator IS NOT NULL
+                                        AND id_sub_giat = %d 
+                                    ORDER BY no_urut ASC
+                                ", $g['id']),
+                                ARRAY_A
+                            );
+                            $satker_sub_giat = $wpdb->get_results(
+                                $wpdb->prepare("
+                                    SELECT 
+                                        TRIM(SUBSTRING_INDEX(nama_satker, '|', -1)) AS nama_satker
+                                    FROM esakip_data_pegawai_cascading 
+                                    WHERE active = 1 
+                                      AND jenis_data = 5
+                                      AND id_data = %s
+                                      AND id_skpd = %d
+                                ", $g['id_unik'], $id_skpd),
+                                ARRAY_A
+                            );
 
-						$sub_giat = $wpdb->get_results(
-							$wpdb->prepare("
-                            		SELECT 
-                            			* 
-                            		FROM esakip_cascading_opd_sub_giat 
-                            		WHERE active = 1 
-                            			AND id_giat = %d 
-                            			AND id_sub_giat IS NULL 
-                            		ORDER BY no_urut ASC
-	                            ", $k['id']),
-							ARRAY_A
-						);
+                            $pokin_sub = array();
+                            if ($show_pokin) {
+                                $pokin_sub = $wpdb->get_results(
+                                    $wpdb->prepare("
+                                        SELECT 
+                                            TRIM(SUBSTRING_INDEX(nama_pokin, '|', -1)) AS nama_pokin,
+                                            TRIM(SUBSTRING_INDEX(indikator, '|', -1)) AS indikator
+                                        FROM esakip_data_pokin_cascading 
+                                        WHERE active = 1 
+                                          AND jenis_data = 5
+                                          AND id_data = %s
+                                          AND id_skpd = %d
+                                    ", $g['id_unik'], $id_skpd),
+                                    ARRAY_A
+                                );
+                            }
 
-						foreach ($sub_giat as $g) {
-							$body_all[$k['kegiatan']]['colspan_sub_giat']++;
-							$indikator_sub_giat = $wpdb->get_results(
-								$wpdb->prepare("
-	                                	SELECT indikator 
-	                                	FROM esakip_cascading_opd_sub_giat 
-	                                	WHERE active = 1 
-			                            	AND indikator IS NOT NULL
-	                                		AND id_sub_giat = %d 
-	                                	ORDER BY no_urut ASC
-	                                ", $g['id']),
-								ARRAY_A
-							);
-							$satker_sub_giat = $wpdb->get_results(
-								$wpdb->prepare("
-								        SELECT 
-								            TRIM(SUBSTRING_INDEX(nama_satker, '|', -1)) AS nama_satker
-								        FROM esakip_data_pegawai_cascading 
-								        WHERE active = 1 
-								          AND jenis_data = 5
-								          AND id_data = %s
-								          AND id_skpd = %d
-								    ", $g['id_unik'], $id_skpd),
-								ARRAY_A
-							);
+                            $ind_sub = array();
+                            $satker_sub = array();
+                            $_pokin_sub = array();
+                            foreach ($indikator_sub_giat as $ind) {
+                                $ind_sub[] = '<li>' . $ind['indikator'] . '</li>';
+                            }
+                            foreach ($satker_sub_giat as $satker) {
+                                $satker_sub[] = '<li>' . $satker['nama_satker'] . '</li>';
+                            }
+                            foreach ($pokin_sub as $pokin) {
+                                $_pokin_sub[] = '<li>' . $pokin['nama_pokin'] . '('. $pokin['indikator'] .')</li>';
+                            }
+                            $body_all[$k['kegiatan']]['data'][$g['sub_giat']] = array(
+                                'sub_giat' => $g['sub_giat'],
+                                'id' => $g['id'],
+                                'indikator' => $ind_sub,
+                                'nama_pokin' => $_pokin_sub,
+                                'nama_satker' => $satker_sub
+                            );
+                        }
+                    }
 
-							$pokin_sub = $wpdb->get_results(
-								$wpdb->prepare("
-								        SELECT 
-								            TRIM(SUBSTRING_INDEX(nama_pokin, '|', -1)) AS nama_pokin,
-								            TRIM(SUBSTRING_INDEX(indikator, '|', -1)) AS indikator
-								        FROM esakip_data_pokin_cascading 
-								        WHERE active = 1 
-								          AND jenis_data = 5
-								          AND id_data = %s
-								          AND id_skpd = %d
-								    ", $g['id_unik'], $id_skpd),
-								ARRAY_A
-							);
+                    $get_program = $wpdb->get_results(
+                        $wpdb->prepare("
+                            SELECT 
+                                no_urut
+                            FROM esakip_cascading_opd_program 
+                            WHERE id = %d
+                        ", $id),
+                        ARRAY_A
+                    );
+                    
+                    $pokin_style = $show_pokin ? '' : ' style="display: none;"';
+                    
+                    $kegiatan_html = '';
+                    $sub_giat_html = '';
+                    $no_urut = isset($get_program[0]['no_urut']) ? $get_program[0]['no_urut'] : '';
+                    foreach ($body_all as $k) {
+                        $indikator = implode('', $k['indikator']);
+                        $nama_satker = empty($k['nama_satker']) ? '<li>-</li>' : implode('', $k['nama_satker']);
+                        $nama_pokin = empty($k['nama_pokin']) ? '<li>-</li>' : implode('', $k['nama_pokin']);
+                        $kegiatan_html .= '<td class="text-center" colspan="' . $k['colspan_sub_giat'] . '">
+                            <div class="button-container">
+                                <div class="btn btn-lg btn-primary get_button" style="text-transform:uppercase;">
+                                    ' . $k['kegiatan'] . '
+                                    <hr/>
+                                    <span class="indikator">IND: <ol class="text-left">' . $indikator . '</ol></span>
+                                    <hr/>
+                                    <span class="nama_pokin"' . $pokin_style . '>Pohon Kinerja : <ol style="text-align: left;">' . $nama_pokin . '</ol></span>
+                                    <br />
+                                    <span class="nama_satker">Satuan Kerja : <ol class="text-left">' . $nama_satker . '</ol></span>
+                                    <br />							     
+                                </div>
+                            </div>
+                        </td>';
+                        foreach ($k['data'] as $g) {
+                            $indikator = implode('', $g['indikator']);
+                            $nama_satker = empty($g['nama_satker']) ? '<li>-</li>' : implode('', $g['nama_satker']);
+                            $nama_pokin = empty($g['nama_pokin']) ? '<li>-</li>' : implode('', $g['nama_pokin']);
+                            $sub_giat_html .= '<td class="text-center">
+                                <div class="button-container">
+                                    <div class="btn btn-lg btn-secondary get_button" style="text-transform:uppercase;">
+                                        ' . $g['sub_giat'] . '
+                                        <hr/>
+                                        <span class="indikator">IND: <ol class="text-left">' . $indikator . '</ol></span>
+                                        <hr/>
+                                        <span class="nama_pokin"' . $pokin_style . '>Pohon Kinerja : <ol style="text-align: left;">' . $nama_pokin . '</ol></span>
+                                        <br />
+                                        <span class="nama_satker">Satuan Kerja : <ol class="text-left">' . $nama_satker . '</ol></span>
+                                        <br />							     
+                                    </div>
+                                </div>
+                            </td>';
+                        }
+                    }
 
-							$ind_sub = array();
-							$satker_sub = array();
-							$_pokin_sub = array();
-							foreach ($indikator_sub_giat as $ind) {
-								$ind_sub[] = '<li>' . $ind['indikator'] . '</li>';
-							}
-							foreach ($satker_sub_giat as $satker) {
-								$satker_sub[] = '<li>' . $satker['nama_satker'] . '</li>';
-							}
-							foreach ($pokin_sub as $pokin) {
-								$_pokin_sub[] = '<li>' . $pokin['nama_pokin'] . '('. $pokin['indikator'] .')</li>';
-							}
-							$body_all[$k['kegiatan']]['data'][$g['sub_giat']] = array(
-								'sub_giat' => $g['sub_giat'],
-								'id' => $g['id'],
-								'indikator' => $ind_sub,
-								'nama_pokin' => $_pokin_sub,
-								'nama_satker' => $satker_sub
-							);
-						}
-					}
+                    $ret['data'] =
+                        '<tr>
+                            <td class="text-center" style="width: 150px;">' .
+                        '<div class="button-container">
+                                <div class="btn btn-lg btn-info">KEGIATAN</div>
+                            </div>
+                        </td>
+                        ' . $kegiatan_html . '
+                    </tr>' .
+                        '<tr>
+                            <td class="text-center">' .
+                        '<div class="button-container">
+                                <div class="btn btn-lg btn-info">SUB KEGIATAN</div>
+                            </div>
+                           </td>
+                           ' . $sub_giat_html . '
+                    </tr>';
+                } else {
+                    $ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
+                }
+            }
+        } else {
+            $ret['status'] = 'error';
+            $ret['message'] = 'Format tidak sesuai!';
+        }
 
-					$get_program = $wpdb->get_results(
-						$wpdb->prepare("
-						        SELECT 
-						            no_urut
-						        FROM esakip_cascading_opd_program 
-						        WHERE id = %d
-						    ", $id),
-						ARRAY_A
-					);
-					$kegiatan_html = '';
-					$sub_giat_html = '';
-					$no_urut = isset($get_program[0]['no_urut']) ? $get_program[0]['no_urut'] : '';
-					foreach ($body_all as $k) {
-						$indikator = implode('', $k['indikator']);
-						$nama_satker = empty($k['nama_satker']) ? '<li>-</li>' : implode('', $k['nama_satker']);
-						$nama_pokin = empty($k['nama_pokin']) ? '<li>-</li>' : implode('', $k['nama_pokin']);
-						$kegiatan_html .= '<td class="text-center" colspan="' . $k['colspan_sub_giat'] . '">
-							    <div class="button-container">
-							        <div class="btn btn-lg btn-primary get_button" style="text-transform:uppercase;">
-							            ' . $k['kegiatan'] . '
-							            <hr/>
-							            <span class="indikator">IND: <ol class="text-left">' . $indikator . '</ol></span>
-							            <hr/>
-							            <span class="nama_pokin">Pohon Kinerja : <ol style="text-align: left;">' . $nama_pokin . '</ol></span>
-							            <br />
-							            <span class="nama_satker">Satuan Kerja : <ol class="text-left">' . $nama_satker . '</ol></span>
-							            <br />							     
-							        </div>
-							    </div>
-							</td>';
-						foreach ($k['data'] as $g) {
-							$indikator = implode('', $g['indikator']);
-							$nama_satker = empty($g['nama_satker']) ? '<li>-</li>' : implode('', $g['nama_satker']);
-							$nama_pokin = empty($g['nama_pokin']) ? '<li>-</li>' : implode('', $g['nama_pokin']);
-							$sub_giat_html .= '<td class="text-center">
-							    <div class="button-container">
-							        <div class="btn btn-lg btn-secondary get_button" style="text-transform:uppercase;">
-							            ' . $g['sub_giat'] . '
-							            <hr/>
-							            <span class="indikator">IND: <ol class="text-left">' . $indikator . '</ol></span>
-							            <hr/>
-							            <span class="nama_pokin">Pohon Kinerja : <ol style="text-align: left;">' . $nama_pokin . '</ol></span>
-							            <br />
-							            <span class="nama_satker">Satuan Kerja : <ol class="text-left">' . $nama_satker . '</ol></span>
-							            <br />							     
-							        </div>
-							    </div>
-							</td>';
-						}
-					}
-
-					$ret['data'] =
-						'<tr>
-		                    	<td class="text-center" style="width: 150px;">' .
-						'<div class="button-container">
-			                        	<div class="btn btn-lg btn-info">KEGIATAN</div>
-			                        </div>
-		                        </td>
-		                        ' . $kegiatan_html . '
-		                    </tr>' .
-						'<tr>
-	                        	<td class="text-center">' .
-						'<div class="button-container">
-		                        		<div class="btn btn-lg btn-info">SUB KEGIATAN</div>
-		                        	</div>
-		                       	</td>
-		                       	' . $sub_giat_html . '
-		                    </tr>';
-				} else {
-					$ret['data'] = "<tr><td colspan='5' class='text-center'>Tidak ada data tersedia</td></tr>";
-				}
-			}
-		} else {
-			$ret['status'] = 'error';
-			$ret['message'] = 'Format tidak sesuai!';
-		}
-
-		die(json_encode($ret));
-	}
+        die(json_encode($ret));
+    }
 
 	public function get_tujuan_cascading()
 	{
