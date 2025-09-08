@@ -28786,7 +28786,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
                                     where indikator=%s
                                         and id_unik=%s
                                         and id_jadwal=%d
-                                ", $_POST['data'], $_POST['id_program'], $_POST['id_jadwal']));
+                                        and id_unit=%d
+                                ", $_POST['data'], $_POST['id_program'], $_POST['id_jadwal'], $_POST['id_skpd']));
 							if (!empty($cek_id)) {
 								$ret['status'] = 'error';
 								$ret['message'] = 'Indikator program sudah ada!';
