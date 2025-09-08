@@ -922,74 +922,77 @@ if (!empty($data_sasaran_existing)) {
     }
 </style>
 <h4 style="text-align: center; margin: 0; font-weight: bold; text-transform:uppercase;">Jadwal <?php echo $jadwal['jenis_jadwal_khusus']; ?> <?php echo $jadwal['nama_jadwal']; ?><br><?php echo $nama_pemda; ?><br><?php echo $tahun_awal . ' - ' . $jadwal['tahun_selesai_anggaran']; ?></h4>
+<div id="action" class="action-section hide-excel"></div>
 <div id="action-sakip"></div>
 <div id="cetak" title="Laporan MONEV RENJA" style="padding: 5px; overflow: auto; height: 80vh;">
-    <table cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; font-size: 70%; border: 0; table-layout: fixed;" contenteditable="false">
-        <thead>
-            <tr>
-                <th style="width: 85px;" class="esakip-atas esakip-kiri esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">No</th>
-                <?php if ($jadwal_rpjmd): ?>
-                    <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Misi RPJMD</th>
-                <?php else: ?>
-                    <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Isu RPJPD</th>
-                <?php endif; ?>
-                <?php if (!empty($id_jadwal_murni)): ?>
-                    <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Tujuan Sebelum</th>
-                <?php endif; ?>
-                <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Tujuan</th>
-                <?php if (!empty($id_jadwal_murni)): ?>
-                    <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Sasaran Sebelum</th>
-                <?php endif; ?>
-                <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Sasaran</th>
-                <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Program</th>
-                <th style="width: 400px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Indikator</th>
-                <th style="width: 100px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Target Awal</th>
-                <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
-                    <th style="width: 300px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok" colspan="2">Tahun <?php echo $i; ?></th>
-                <?php } ?>
-                <th style="width: 100px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Target Akhir</th>
-                <th style="width: 100px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Satuan</th>
-                <th style="width: 150px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Keterangan</th>
-                <th style="width: 100px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">No. Urut</th>
-                <th style="width: 100px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Catatan</th>
-                <th style="width: 100px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Indikator Catatan</th>
-            </tr>
-            <tr>
-                <th rowspan="2" class='esakip-atas esakip-kiri esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'>1</th>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'>2</th>
-                <?php $no = 3; ?>
-                <?php if (!empty($id_jadwal_murni)): ?>
+    <div class="wrap-table">
+        <table cellpadding="2" cellspacing="0" contenteditable="false">
+            <thead>
+                <tr>
+                    <th style="width: 85px;" class="esakip-atas esakip-kiri esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">No</th>
+                    <?php if ($jadwal_rpjmd): ?>
+                        <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Misi RPJMD</th>
+                    <?php else: ?>
+                        <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Isu RPJPD</th>
+                    <?php endif; ?>
+                    <?php if (!empty($id_jadwal_murni)): ?>
+                        <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Tujuan Sebelum</th>
+                    <?php endif; ?>
+                    <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Tujuan</th>
+                    <?php if (!empty($id_jadwal_murni)): ?>
+                        <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Sasaran Sebelum</th>
+                    <?php endif; ?>
+                    <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Sasaran</th>
+                    <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Program</th>
+                    <th style="width: 400px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Indikator</th>
+                    <th style="width: 100px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Target Awal</th>
+                    <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
+                        <th style="width: 300px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok" colspan="2">Tahun <?php echo $i; ?></th>
+                    <?php } ?>
+                    <th style="width: 100px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Target Akhir</th>
+                    <th style="width: 100px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Satuan</th>
+                    <th style="width: 150px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Keterangan</th>
+                    <th style="width: 100px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">No. Urut</th>
+                    <th style="width: 100px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Catatan</th>
+                    <th style="width: 100px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Indikator Catatan</th>
+                </tr>
+                <tr>
+                    <th rowspan="2" class='esakip-atas esakip-kiri esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'>1</th>
+                    <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'>2</th>
+                    <?php $no = 3; ?>
+                    <?php if (!empty($id_jadwal_murni)): ?>
+                        <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                    <?php endif; ?>
                     <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
-                <?php endif; ?>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
-                <?php if (!empty($id_jadwal_murni)): ?>
+                    <?php if (!empty($id_jadwal_murni)): ?>
+                        <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                    <?php endif; ?>
                     <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
-                <?php endif; ?>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
-                <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
-                    <th class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok" colspan="2"><?php echo $no++; ?></th>
-                <?php } ?>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
-                <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
-            </tr>
-            <tr>
-                <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
-                    <th class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Target</th>
-                    <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Pagu</th>
-                <?php } ?>
-            </tr>
-        </thead>
-        <tbody>
-            <?php echo $body; ?>
-        </tbody>
-    </table>
+                    <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                    <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                    <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                    <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
+                        <th class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok" colspan="2"><?php echo $no++; ?></th>
+                    <?php } ?>
+                    <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                    <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                    <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                    <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                    <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                    <th rowspan="2" class='esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok'><?php echo $no++; ?></th>
+                </tr>
+                <tr>
+                    <?php for ($i = 1; $i <= $lama_pelaksanaan; $i++) { ?>
+                        <th class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Target</th>
+                        <th style="width: 200px;" class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">Pagu</th>
+                    <?php } ?>
+                </tr>
+            </thead>
+            <tbody>
+                <?php echo $body; ?>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <div class="modal hide fade" id="modal-monev" role="dialog" data-backdrop="static" aria-hidden="true">'
@@ -1485,6 +1488,7 @@ if (!empty($data_sasaran_existing)) {
 
 <script type="text/javascript">
     jQuery(document).ready(function() {
+        run_download_excel_sakip();
         let data_all = <?php echo json_encode($data_all); ?>;
         window.edit_val = false;
 
