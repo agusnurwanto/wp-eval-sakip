@@ -94,6 +94,15 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-list_dokumen_kuesioner.php';
 	}
 
+	public function jadwal_kuesioner($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/wp-eval-sakip-jadwal-kuesioner.php';
+	}
+
 	public function format_kke_1($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
@@ -5346,7 +5355,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								));
 								$dokumen['url'] .= '&id_skpd=' . $_POST['id_skpd'];
 								$title_renstra = 'Dokumen RENSTRA | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
-								$ret['upload_bukti_dukung'] .= '<a style="margin-left: 5px;" class="btn btn-warning" target="_blank" href="' . $dokumen['url'] . '">' . $title_renstra . '</a>';
+								$ret['upload_bukti_dukung'] .= '<a style="margin: 0px 5px 5px 0px;" class="btn btn-warning" target="_blank" href="' . $dokumen['url'] . '">' . $title_renstra . '</a>';
 							}
 						}
 						continue;
@@ -5379,7 +5388,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 								$dokumen['url'] .= '&id_skpd=' . $_POST['id_skpd'];
 								$title_pokin = 'Dokumen Pohon Kinerja dan Cascading | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
-								$ret['upload_bukti_dukung'] .= '<a style="margin-left: 5px;" class="btn btn-warning" target="_blank" href="' . $dokumen['url'] . '">' . $title_pokin . '</a>';
+								$ret['upload_bukti_dukung'] .= '<a style="margin: 0px 5px 5px 0px;" class="btn btn-warning" target="_blank" href="' . $dokumen['url'] . '">' . $title_pokin . '</a>';
 							}
 						}
 						continue;
@@ -5486,7 +5495,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					}
 					if (!empty($dokumen)) {
 						$dokumen['url'] .= '&id_skpd=' . $_POST['id_skpd'];
-						$ret['upload_bukti_dukung'] .= '<a style="margin-left: 5px;" class="btn btn-warning" target="_blank" href="' . $dokumen['url'] . '">' . $dokumen['title'] . '</a>';
+						$ret['upload_bukti_dukung'] .= '<a style="margin: 0px 5px 5px 0px;" class="btn btn-warning" target="_blank" href="' . $dokumen['url'] . '">' . $dokumen['title'] . '</a>';
 					}
 				}
 
@@ -5613,6 +5622,252 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 		} else {
 			$ret['status'] = 'error';
 			$ret['message'] = 'Api Key tidak sesuai!';
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_table_jadwal_kuesioner()
+	{
+		global $wpdb;
+		$ret = array (
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array(),
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (empty($_POST['tahun_anggaran'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun Anggaran kosong!';
+					die(json_encode($ret));
+				} else {
+				$tahun_anggaran = $_POST['tahun_anggaran'];
+								
+				$started_date = current_time('mysql');
+				$time = strtotime($started_date);
+				$ended_date = date("Y-m-d H:i:s", strtotime("+1 month", $time));
+
+				$cek_jadwal_menpan = $wpdb->get_results(
+					$wpdb->prepare("
+						SELECT
+						  *
+						FROM esakip_data_jadwal
+						WHERE tipe = 'kuesioner_menpan'
+							AND status != 0
+							AND tahun_anggaran=%d
+					", $tahun_anggaran), ARRAY_A);
+				
+				if (empty($cek_jadwal_menpan)) {
+					$default_menpan = array(
+						'nama_jadwal'   => 'Kuesioner Menpan',
+						'started_at'    => $started_date,
+						'end_at'        => $ended_date,
+						'status'        => 1,
+						'jenis_jadwal'  => 'usulan',
+						'tipe'          => 'kuesioner_menpan',
+						'lama_pelaksanaan' => 1,
+						'tahun_anggaran'    => $tahun_anggaran,
+					);
+					$wpdb->insert('esakip_data_jadwal', $default_menpan);
+				}
+
+				$cek_jadwal_mendagri = $wpdb->get_results(
+					$wpdb->prepare("
+						SELECT
+						  *
+						FROM esakip_data_jadwal
+						WHERE tipe = 'kuesioner_mendagri'
+							AND status != 0
+							AND tahun_anggaran=%d
+					", $tahun_anggaran), ARRAY_A);
+				
+				if (empty($cek_jadwal_mendagri)) {
+					$default_mendagri = array (
+						'nama_jadwal'   => 'Kuesioner Mendagri',
+						'started_at'    => $started_date,
+						'end_at'        => $ended_date,
+						'status'        => 1,
+						'jenis_jadwal'  => 'usulan',
+						'tipe'          => 'kuesioner_mendagri',
+						'lama_pelaksanaan' => 1,
+						'tahun_anggaran'    => $tahun_anggaran,
+					);
+
+					$wpdb->insert('esakip_data_jadwal', $default_mendagri);
+				}
+
+				$data_jadwal_kuesioner = $wpdb->get_results(
+					$wpdb->prepare("
+						SELECT
+						 *
+						FROM esakip_data_jadwal
+						WHERE (tipe = 'kuesioner_menpan' OR tipe = 'kuesioner_mendagri')
+							AND status != 0
+							AND tahun_anggaran= %d
+					", $tahun_anggaran), ARRAY_A);
+
+				$tbody = '';
+				if (!empty($data_jadwal_kuesioner)){
+					foreach ($data_jadwal_kuesioner as $row) {
+						$btn = "<button class='btn btn-warning' onclick='handleEditJadwal(" . $row['id'] . ");' title='Detail Data Jadwal'><span class='dashicons dashicons-edit'></span></button>";
+
+						$tbody .= '<tr>';
+						$tbody .= '<td class="text-center">' . $row['nama_jadwal'] . '</td>'; // nama jadwal
+						$tbody .= '<td class="text-center">' . date('d-m-Y H:i', strtotime($row['started_at'])) .'</td>'; // jadwal mulai
+						$tbody .= '<td class="text-center">' . date('d-m-Y H:i', strtotime($row['end_at'])) . '</td>'; // jadwal selesai
+						$tbody .= '<td class="text-center">' . $row['jenis_jadwal'] . '</td>'; // jenis jadwal 
+						$tbody .= '<td class="text-center">' . $row['tipe'] . '</td>'; // tipe/jenis kuesioner 
+						$tbody .= '<td class="text-center">' . $btn . '</td>'; // aksi
+						$tbody .= '</tr>';
+					}
+				} else {
+					$tbody .= '<tr><td colspan="6" class="text-center">Tidak ada data tersedia!</td></tr>';
+				}
+
+				$ret['data'] = $tbody;
+				}
+			} else {
+				$ret = array(
+				'status'  => 'error',
+				'message' => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+			'status'  => 'error',
+			'message' => 'Format tidak sesuai!'
+			);
+		}
+
+		die(json_encode($ret));
+	}
+
+	public function get_data_jadwal_kuesioner_by_id()
+    {
+        global $wpdb;
+        $ret = array(
+            'status' => 'success',
+            'message' => 'Berhasil get data!',
+            'data' => array()
+        );
+        if (!empty($_POST)) {
+            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+                $ret['data'] = $wpdb->get_row($wpdb->prepare('
+                    SELECT 
+                        *
+                    FROM esakip_data_jadwal
+                    WHERE id=%d
+                ', $_POST['id']), ARRAY_A);
+            } else {
+                $ret['status']  = 'error';
+                $ret['message'] = 'Api key tidak ditemukan!';
+            }
+        } else {
+            $ret['status']  = 'error';
+            $ret['message'] = 'Format Salah!';
+        }
+
+        die(json_encode($ret));
+    }
+
+	public function submit_jadwal_kuesioner()
+	{
+		global $wpdb;
+		$ret = array (
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array(),
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (empty($_POST['id'])) {					
+                $ret['status']  = 'error';
+                $ret['message'] = 'ID jadwal kosong!';
+                die(json_encode($ret));
+				}
+				if (empty($_POST['tahun_anggaran'])) {					
+                $ret['status']  = 'error';
+                $ret['message'] = 'Tahun Anggaran kosong!';
+                die(json_encode($ret));
+				}
+				if (empty($_POST['nama_jadwal'])) {					
+                $ret['status']  = 'error';
+                $ret['message'] = 'Nama Jadwal tidak boleh kosong!';
+                die(json_encode($ret));
+				}
+				if (empty($_POST['jadwal_tanggal'])) {					
+                $ret['status']  = 'error';
+                $ret['message'] = 'Tanggal jadwal kosong!';
+                die(json_encode($ret));
+				}
+				if (empty($_POST['jenis_jadwal'])) {					
+                $ret['status']  = 'error';
+                $ret['message'] = 'Jenis Jadwal kosong!';
+                die(json_encode($ret));
+				}
+
+				$nama_jadwal    = sanitize_text_field($_POST['nama_jadwal']);
+				$jenis_jadwal   = sanitize_text_field($_POST['jenis_jadwal']);
+				$tahun_anggaran = intval($_POST['tahun_anggaran']);
+
+				// Format tanggal
+				$jadwal_tanggal = explode(' - ', $_POST['jadwal_tanggal']);
+				$started_at     = !empty($jadwal_tanggal[0]) ? date('Y-m-d H:i:s', strtotime($jadwal_tanggal[0])) : null;
+				$end_at         = !empty($jadwal_tanggal[1]) ? date('Y-m-d H:i:s', strtotime($jadwal_tanggal[1])) : null;
+				$id = !empty($_POST['id']) ? intval($_POST['id']) : 0;
+
+				if($id > 0) {
+					// Update
+					$updated = $wpdb->update(
+						'esakip_data_jadwal',
+						array(
+							'nama_jadwal'   => $nama_jadwal,
+							'jenis_jadwal'  => $jenis_jadwal,
+							'tahun_anggaran'=> $tahun_anggaran,
+							'started_at'    => $started_at,
+							'end_at'        => $end_at
+						),
+						array('id' => $id),
+						array('%s', '%s', '%d', '%s', '%s'),
+						array('%d')
+					);
+					if ($updated !== false) {
+						$ret['message'] = 'Data jadwal berhasil diperbarui.';
+						$ret['data'] = array('id' => $id);
+					} else {
+						$ret['status'] = 'error';
+						$ret['message'] = 'Gagal memperbarui data jadwal.';
+					}
+				} else {
+					// Insert baru
+					$inserted = $wpdb->insert(
+						'esakip_data_jadwal',
+						array(
+							'nama_jadwal'    => $nama_jadwal,
+							'jenis_jadwal'   => $jenis_jadwal,
+							'tahun_anggaran' => $tahun_anggaran,
+							'started_at'     => $started_at,
+							'end_at'         => $end_at,
+						),
+						array('%s', '%s', '%d', '%s', '%s')
+					);
+					if ($inserted) {
+						$ret['message'] = 'Data jadwal berhasil disimpan.';
+						$ret['data'] = array('id' => $wpdb->insert_id);
+					} else {
+						$ret['status'] = 'error';
+						$ret['message'] = 'Gagal menyimpan data jadwal.';
+					}
+				}
+			} else {
+				$ret['status'] = 'error';
+				$ret['message'] = 'API key tidak valid!';
+			}
+		} else {
+			$ret['status'] = 'error';
+			$ret['message'] = 'Data POST kosong!';
 		}
 		die(json_encode($ret));
 	}

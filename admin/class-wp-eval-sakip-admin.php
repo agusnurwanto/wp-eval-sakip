@@ -396,6 +396,10 @@ class Wp_Eval_Sakip_Admin
 		Container::make('theme_options', __('Dokumen Kuesioner'))
 			->set_page_parent($kuesioner)
 			->add_fields($this->generate_fields_dokumen_kuesioner());
+
+		Container::make('theme_options', __('Jadwal Kuesioner'))
+			->set_page_parent($kuesioner)
+			->add_fields($this->generate_fields_jadwal_kuesioner());
 	}
 
 	function get_jadwal_renstra_wp_sipd()
@@ -3855,6 +3859,54 @@ class Wp_Eval_Sakip_Admin
 					</style>
 				'),
 			Field::make('html', 'crb_dokumen_kuesioner_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_jadwal_kuesioner()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_jadwal_kuesioner.php') {
+			return array();
+		}
+
+		$get_tahun = $this->get_tahun();
+
+		$html = '';
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $v) {
+				$jadwal_kuesioner_page = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Jadwal Kuesioner tahun ' . $v['tahun_anggaran'],
+					'content' => '[jadwal_kuesioner tahun=' . $v['tahun_anggaran'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $jadwal_kuesioner_page['url'] . '">' . $jadwal_kuesioner_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+
+		return [
+			Field::make('html', 'crb_kuesioner_mendagri_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_kuesioner_mendagri_menu')
 				->set_html($html)
 		];
 	}
