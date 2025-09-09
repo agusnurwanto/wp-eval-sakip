@@ -70,26 +70,26 @@ $program_ids = array();
 $skpd_filter = array();
 
 $sql = "
-	select 
-		t.*,
-		i.isu_teks 
-	from esakip_rpd_tujuan t
-	left join esakip_rpjpd_isu i on t.id_isu = i.id
-	where t.active=1
+    select 
+        t.*,
+        i.isu_teks 
+    from esakip_rpd_tujuan t
+    left join esakip_rpjpd_isu i on t.id_isu = i.id
+    where t.active=1
         AND t.id_jadwal=%d
-	order by t.no_urut asc
+    order by t.no_urut asc
 ";
 if (!empty($id_jadwal_rpjpd)) {
     $sql = "
-		select 
-			t.*,
-			i.isu_teks 
-		from esakip_rpd_tujuan t
-		left join esakip_rpjpd_isu_history i on t.id_isu = i.id_asli
-		where t.active=1
+        select 
+            t.*,
+            i.isu_teks 
+        from esakip_rpd_tujuan t
+        left join esakip_rpjpd_isu_history i on t.id_isu = i.id_asli
+        where t.active=1
             AND t.id_jadwal=%d
-		order by t.no_urut asc
-	";
+        order by t.no_urut asc
+    ";
 }
 $tujuan_all = $wpdb->get_results($wpdb->prepare($sql, $input['periode']), ARRAY_A);
 foreach ($tujuan_all as $tujuan) {
@@ -106,14 +106,14 @@ foreach ($tujuan_all as $tujuan) {
         );
         $tujuan_ids[$tujuan['id_unik']] = "'" . $tujuan['id_unik'] . "'";
         $sql = $wpdb->prepare("
-			select 
-				* 
-			from esakip_rpd_sasaran
-			where kode_tujuan=%s
-				and active=1
+            select 
+                * 
+            from esakip_rpd_sasaran
+            where kode_tujuan=%s
+                and active=1
                 and id_jadwal=%d
-				order by sasaran_no_urut asc
-		", $tujuan['id_unik'], $input['periode']);
+                order by sasaran_no_urut asc
+        ", $tujuan['id_unik'], $input['periode']);
         $sasaran_all = $wpdb->get_results($sql, ARRAY_A);
         foreach ($sasaran_all as $sasaran) {
             if (empty($data_all['data'][$tujuan['id_unik']]['data'][$sasaran['id_unik']])) {
@@ -129,14 +129,14 @@ foreach ($tujuan_all as $tujuan) {
                 );
                 $sasaran_ids[$sasaran['id_unik']] = "'" . $sasaran['id_unik'] . "'";
                 $sql = $wpdb->prepare("
-					select 
-						* 
-					from esakip_rpd_program
-					where kode_sasaran=%s
-						and active=1
+                    select 
+                        * 
+                    from esakip_rpd_program
+                    where kode_sasaran=%s
+                        and active=1
                         and id_jadwal=%d
-						order by nama_program ASC
-				", $sasaran['id_unik'], $input['periode']);
+                        order by nama_program ASC
+                ", $sasaran['id_unik'], $input['periode']);
                 $program_all = $wpdb->get_results($sql, ARRAY_A);
                 foreach ($program_all as $program) {
                     $program_ids[$program['id_unik']] = "'" . $program['id_unik'] . "'";
@@ -244,51 +244,51 @@ if (empty($data_all['data']['tujuan_kosong']['data']['sasaran_kosong'])) {
 // select tujuan yang belum terselect
 if (!empty($tujuan_ids)) {
     $sql = "
-		select 
-			t.*,
-			i.isu_teks 
-		from esakip_rpd_tujuan t
-		left join esakip_rpjpd_isu i on t.id_isu = i.id
-		where t.id_unik not in (" . implode(',', $tujuan_ids) . ")
-			and t.active=1
+        select 
+            t.*,
+            i.isu_teks 
+        from esakip_rpd_tujuan t
+        left join esakip_rpjpd_isu i on t.id_isu = i.id
+        where t.id_unik not in (" . implode(',', $tujuan_ids) . ")
+            and t.active=1
             and t.id_jadwal=%d
-		order by t.no_urut
-	";
+        order by t.no_urut
+    ";
     if (!empty($id_jadwal_rpjpd)) {
         $sql = "
-			select 
-				t.*,
-				i.isu_teks 
-			from esakip_rpd_tujuan t
-			left join esakip_rpjpd_isu_history i on t.id_isu = i.id_asli
-			where t.id_unik not in (" . implode(',', $tujuan_ids) . ")
-				and t.active=1
+            select 
+                t.*,
+                i.isu_teks 
+            from esakip_rpd_tujuan t
+            left join esakip_rpjpd_isu_history i on t.id_isu = i.id_asli
+            where t.id_unik not in (" . implode(',', $tujuan_ids) . ")
+                and t.active=1
                 and t.id_jadwal=%d
-			order by t.no_urut
-		";
+            order by t.no_urut
+        ";
     }
 } else {
     $sql = "
-		select 
-			t.*,
-			i.isu_teks 
-		from esakip_rpd_tujuan t
-		left join esakip_rpjpd_isu i on t.id_isu = i.id
-		where t.active=1
+        select 
+            t.*,
+            i.isu_teks 
+        from esakip_rpd_tujuan t
+        left join esakip_rpjpd_isu i on t.id_isu = i.id
+        where t.active=1
             and t.id_jadwal=%d
-		order by t.no_urut
-	";
+        order by t.no_urut
+    ";
     if (!empty($id_jadwal_rpjpd)) {
         $sql = "
-			select 
-				t.*,
-				i.isu_teks 
-			from esakip_rpd_tujuan t
-			left join esakip_rpjpd_isu_history i on t.id_isu = i.id_asli
-			where t.active=1
+            select 
+                t.*,
+                i.isu_teks 
+            from esakip_rpd_tujuan t
+            left join esakip_rpjpd_isu_history i on t.id_isu = i.id_asli
+            where t.active=1
                 and t.id_jadwal=%d
-			order by t.no_urut
-		";
+            order by t.no_urut
+        ";
     }
 }
 $tujuan_all_kosong = $wpdb->get_results($wpdb->prepare($sql, $input['periode']), ARRAY_A);
@@ -307,14 +307,14 @@ foreach ($tujuan_all_kosong as $tujuan) {
     }
     $data_all['data'][$tujuan['id_unik']]['detail'][] = $tujuan;
     $sql = $wpdb->prepare("
-		select 
-			* 
-		from esakip_rpd_sasaran
-		where kode_tujuan=%s
-			and active=1
+        select 
+            * 
+        from esakip_rpd_sasaran
+        where kode_tujuan=%s
+            and active=1
             and id_jadwal=%d
-		order by sasaran_no_urut
-	", $tujuan['id_unik'], $input['periode']);
+        order by sasaran_no_urut
+    ", $tujuan['id_unik'], $input['periode']);
     $sasaran_all = $wpdb->get_results($sql, ARRAY_A);
     foreach ($sasaran_all as $sasaran) {
         $sasaran_ids[$sasaran['id_unik']] = "'" . $sasaran['id_unik'] . "'";
@@ -332,13 +332,13 @@ foreach ($tujuan_all_kosong as $tujuan) {
         }
         $data_all['data'][$tujuan['id_unik']]['data'][$sasaran['id_unik']]['detail'][] = $sasaran;
         $sql = $wpdb->prepare("
-			select 
-				* 
-			from esakip_rpd_program
-			where kode_sasaran=%s
-				and active=1
+            select 
+                * 
+            from esakip_rpd_program
+            where kode_sasaran=%s
+                and active=1
                 and id_jadwal=%d
-		", $sasaran['id_unik'], $input['periode']);
+        ", $sasaran['id_unik'], $input['periode']);
         $program_all = $wpdb->get_results($sql, ARRAY_A);
         foreach ($program_all as $program) {
             $program_ids[$program['id_unik']] = "'" . $program['id_unik'] . "'";
@@ -388,23 +388,23 @@ foreach ($tujuan_all_kosong as $tujuan) {
 // select sasaran yang belum terselect
 if (!empty($sasaran_ids)) {
     $sql = "
-		select 
-			* 
-		from esakip_rpd_sasaran
-		where id_unik not in (" . implode(',', $sasaran_ids) . ")
-			and active=1
+        select 
+            * 
+        from esakip_rpd_sasaran
+        where id_unik not in (" . implode(',', $sasaran_ids) . ")
+            and active=1
             and id_jadwal=%d
-		order by sasaran_no_urut
-	";
+        order by sasaran_no_urut
+    ";
 } else {
     $sql = "
-		select 
-			* 
-		from esakip_rpd_sasaran
-		where active=1
+        select 
+            * 
+        from esakip_rpd_sasaran
+        where active=1
             and id_jadwal=%d
-		order by sasaran_no_urut
-	";
+        order by sasaran_no_urut
+    ";
 }
 $sasaran_all_kosong = $wpdb->get_results($wpdb->prepare($sql, $input['periode']), ARRAY_A);
 foreach ($sasaran_all_kosong as $sasaran) {
@@ -422,13 +422,13 @@ foreach ($sasaran_all_kosong as $sasaran) {
     }
     $data_all['data']['tujuan_kosong']['data'][$sasaran['id_unik']]['detail'][] = $sasaran;
     $sql = $wpdb->prepare("
-		select 
-			* 
-		from esakip_rpd_program
-		where kode_sasaran=%s
-			and active=1
+        select 
+            * 
+        from esakip_rpd_program
+        where kode_sasaran=%s
+            and active=1
             and id_jadwal=%d
-	", $sasaran['id_unik'], $input['periode']);
+    ", $sasaran['id_unik'], $input['periode']);
     $program_all = $wpdb->get_results($sql, ARRAY_A);
     foreach ($program_all as $program) {
         $program_ids[$program['id_unik']] = "'" . $program['id_unik'] . "'";
@@ -477,21 +477,21 @@ foreach ($sasaran_all_kosong as $sasaran) {
 // select program yang belum terselect
 if (!empty($program_ids)) {
     $sql = "
-		select 
-			* 
-		from esakip_rpd_program
-		where id_unik not in (" . implode(',', $program_ids) . ")
-			and active=1
+        select 
+            * 
+        from esakip_rpd_program
+        where id_unik not in (" . implode(',', $program_ids) . ")
+            and active=1
             and id_jadwal=%d
-	";
+    ";
 } else {
     $sql = "
-		select 
-			* 
-		from esakip_rpd_program
-		where active=1
+        select 
+            * 
+        from esakip_rpd_program
+        where active=1
             and id_jadwal=%d
-	";
+    ";
 }
 $program_all = $wpdb->get_results($wpdb->prepare($sql, $input['periode']), ARRAY_A);
 foreach ($program_all as $program) {
@@ -722,35 +722,35 @@ foreach ($data_all['data'] as $tujuan) {
             $sasaran_catatan = $sasaran['detail'][0]['sasaran_catatan'];
         }
         $body .= '
-			<tr class="tr-sasaran" ' . $warning . '>
-				<td class="esakip-kiri esakip-atas esakip-kanan esakip-bawah">' . $no_tujuan . '.' . $no_sasaran . '</td>
-				<td class="esakip-atas esakip-kanan esakip-bawah"><span class="debug-tujuan">' . $tujuan['detail'][0]['isu_teks'] . '</span></td>';
+            <tr class="tr-sasaran" ' . $warning . '>
+                <td class="esakip-kiri esakip-atas esakip-kanan esakip-bawah">' . $no_tujuan . '.' . $no_sasaran . '</td>
+                <td class="esakip-atas esakip-kanan esakip-bawah"><span class="debug-tujuan">' . $tujuan['detail'][0]['isu_teks'] . '</span></td>';
         if (!empty($id_jadwal_murni)) {
             $body .= '
                 <td class="esakip-atas esakip-kanan esakip-bawah"></td>';
         }
         $body .= '
-				<td class="esakip-atas esakip-kanan esakip-bawah"><span class="debug-tujuan">' . $tujuan['nama'] . '</span></td>';
+                <td class="esakip-atas esakip-kanan esakip-bawah"><span class="debug-tujuan">' . $tujuan['nama'] . '</span></td>';
         $body .= '
-				<td class="esakip-atas esakip-kanan esakip-bawah">' . parsing_nama_kode($sasaran['nama']) . button_edit_monev($tujuan['detail'][0]['id_unik'] . '||' . $sasaran['detail'][0]['id_unik']) . '</td>';
+                <td class="esakip-atas esakip-kanan esakip-bawah">' . parsing_nama_kode($sasaran['nama']) . button_edit_monev($tujuan['detail'][0]['id_unik'] . '||' . $sasaran['detail'][0]['id_unik']) . '</td>';
 
         if (!empty($id_jadwal_murni)) {
             $body .= '
                 <td class="esakip-atas esakip-kanan esakip-bawah">' . (!empty($id_jadwal_murni) ? $nama_sasaran_existing : '') . '</td>';
         }
         $body .= '
-				<td class="esakip-atas esakip-kanan esakip-bawah"></td>
-				<td class="esakip-atas esakip-kanan esakip-bawah">' . $indikator_sasaran . '</td>
-				<td class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah">' . $target_awal . '</td>
-				' . $target_html . '
-				<td class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah">' . $target_akhir . '</td>
-				<td class="esakip-atas esakip-kanan esakip-bawah">' . $satuan . '</td>
-				<td class="esakip-atas esakip-kanan esakip-bawah"></td>
-				<td class="esakip-atas esakip-kanan esakip-bawah">' . $sasaran_no_urut . '</td>
-				<td class="esakip-atas esakip-kanan esakip-bawah">' . $sasaran_catatan . '</td>
-				<td class="esakip-atas esakip-kanan esakip-bawah">' . $indikator_catatan_sasaran . '</td>
-			</tr>
-		';
+                <td class="esakip-atas esakip-kanan esakip-bawah"></td>
+                <td class="esakip-atas esakip-kanan esakip-bawah">' . $indikator_sasaran . '</td>
+                <td class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah">' . $target_awal . '</td>
+                ' . $target_html . '
+                <td class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah">' . $target_akhir . '</td>
+                <td class="esakip-atas esakip-kanan esakip-bawah">' . $satuan . '</td>
+                <td class="esakip-atas esakip-kanan esakip-bawah"></td>
+                <td class="esakip-atas esakip-kanan esakip-bawah">' . $sasaran_no_urut . '</td>
+                <td class="esakip-atas esakip-kanan esakip-bawah">' . $sasaran_catatan . '</td>
+                <td class="esakip-atas esakip-kanan esakip-bawah">' . $indikator_catatan_sasaran . '</td>
+            </tr>
+        ';
         $no_program = 0;
         foreach ($sasaran['data'] as $program) {
             $no_program++;
@@ -820,9 +820,9 @@ foreach ($data_all['data'] as $tujuan) {
             // }
 
             $body .= '
-				<tr class="tr-program" data-kode-skpd="' . $program['kode_skpd'] . '" ' . $warning . '>
-					<td class="esakip-kiri esakip-atas esakip-kanan esakip-bawah">' . $no_tujuan . '.' . $no_sasaran . '.' . $no_program . '</td>
-					<td class="esakip-atas esakip-kanan esakip-bawah"><span class="debug-tujuan">' . $tujuan['detail'][0]['isu_teks'] . '</span></td>
+                <tr class="tr-program" data-kode-skpd="' . $program['kode_skpd'] . '" ' . $warning . '>
+                    <td class="esakip-kiri esakip-atas esakip-kanan esakip-bawah">' . $no_tujuan . '.' . $no_sasaran . '.' . $no_program . '</td>
+                    <td class="esakip-atas esakip-kanan esakip-bawah"><span class="debug-tujuan">' . $tujuan['detail'][0]['isu_teks'] . '</span></td>
                     ';
         if (!empty($id_jadwal_murni)) {
             $body .= '
@@ -839,17 +839,17 @@ foreach ($data_all['data'] as $tujuan) {
         }
         $body .= '
                     <td class="esakip-atas esakip-kanan esakip-bawah">' . parsing_nama_kode($program['nama']) . button_edit_monev($tujuan['detail'][0]['id_unik'] . '||' . $sasaran['detail'][0]['id_unik'] . '||' . $program['detail'][0]['id_unik']) . " " . $isMutakhir . '</td>
-					<td class="esakip-atas esakip-kanan esakip-bawah">' . $text_indikator . '</td>
-					<td class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah">' . $target_awal . '</td>
-					' . $target_html . '
-					<td class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah">' . $target_akhir . '</td>
-					<td class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah">' . $satuan . '</td>
-					<td class="esakip-atas esakip-kanan esakip-bawah">' . $nama_skpd . '</td>
-					<td class="esakip-atas esakip-kanan esakip-bawah"></td>
-					<td class="esakip-atas esakip-kanan esakip-bawah">' . $catatan_program . '</td>
-					<td class="esakip-atas esakip-kanan esakip-bawah">' . $catatan_indikator_program . '</td>
-				</tr>
-			';
+                    <td class="esakip-atas esakip-kanan esakip-bawah">' . $text_indikator . '</td>
+                    <td class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah">' . $target_awal . '</td>
+                    ' . $target_html . '
+                    <td class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah">' . $target_akhir . '</td>
+                    <td class="esakip-atas esakip-kanan esakip-bawah esakip-text_tengah">' . $satuan . '</td>
+                    <td class="esakip-atas esakip-kanan esakip-bawah">' . $nama_skpd . '</td>
+                    <td class="esakip-atas esakip-kanan esakip-bawah"></td>
+                    <td class="esakip-atas esakip-kanan esakip-bawah">' . $catatan_program . '</td>
+                    <td class="esakip-atas esakip-kanan esakip-bawah">' . $catatan_indikator_program . '</td>
+                </tr>
+            ';
         }
     }
 }
@@ -922,6 +922,7 @@ if (!empty($data_sasaran_existing)) {
     }
 </style>
 <h4 style="text-align: center; margin: 0; font-weight: bold; text-transform:uppercase;">Jadwal <?php echo $jadwal['jenis_jadwal_khusus']; ?> <?php echo $jadwal['nama_jadwal']; ?><br><?php echo $nama_pemda; ?><br><?php echo $tahun_awal . ' - ' . $jadwal['tahun_selesai_anggaran']; ?></h4>
+<div id="action" class="action-section hide-excel"></div>
 <div id="action-sakip"></div>
 <div id="cetak" title="Laporan MONEV RENJA" style="padding: 5px; overflow: auto; height: 80vh;">
     <table cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; font-size: 70%; border: 0; table-layout: fixed;" contenteditable="false">
@@ -1485,6 +1486,7 @@ if (!empty($data_sasaran_existing)) {
 
 <script type="text/javascript">
     jQuery(document).ready(function() {
+        run_download_excel_sakip();
         let data_all = <?php echo json_encode($data_all); ?>;
         window.edit_val = false;
 

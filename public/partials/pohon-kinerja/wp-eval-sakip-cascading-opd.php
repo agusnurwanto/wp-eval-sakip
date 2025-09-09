@@ -301,6 +301,14 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
     <div class="cetak">
         <div style="padding: 10px; margin: 0 0 3rem 0;">
             <h1 class="text-center">CASCADING <br><?php echo $skpd['nama_skpd']; ?><br><?php echo $nama_jadwal; ?></h1>
+            <div class="text-center">
+                <div style="display: block;">
+                    <div class="custom-control custom-checkbox custom-control-inline mt-4">
+                        <input type="checkbox" class="custom-control-input" id="show_pokin">
+                        <label class="custom-control-label" for="show_pokin">Tampilkan Pohon Kinerja</label>
+                    </div>
+                </div>
+            </div>
             <div id="action-sakip" class="action-section text-center">
                 <a style="margin-right: 10px;" id="singkron-cascading-renstra" href="#" class="btn btn-primary"><i class="dashicons dashicons-download"></i> Ambil dari Data RENSTRA</a>
                 <a style="margin-right: 10px;" onclick="window.print();" href="#" class="btn btn-success"><i class="dashicons dashicons-printer"></i> CETAK / PRINT</a>
@@ -499,18 +507,52 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
             'width': '100%',
             dropdownParent: jQuery('#modalUpload') 
         });
+        jQuery('#show_pokin').on('change', function() {
+            var isChecked = jQuery(this).is(':checked');
 
+            togglePokinVisibility(isChecked);
+            if (jQuery('#tabel-cascading-kegiatan tbody').is(':visible')) {
+                togglePokinVisibility(isChecked, '#tabel-cascading-kegiatan');
+            }
+
+            // cek apakah kegiatan dan sub kegiatan sedang ditampilkan
+            var kegiatanBody = jQuery('#tabel-cascading-kegiatan tbody');
+            var isKegiatanVisible = kegiatanBody.is(':visible');
+
+            // simpan id program saat terbuka
+            var openbutton = jQuery('.view-kegiatan-button').filter(function() {
+                return jQuery(this).data('loaded') === true;
+            }).first();
+            var openProgramId = openbutton.length ? openbutton.closest('[id^="program-ke-"]').attr('id') : null;
+
+            getTableCascading();
+
+            // hanya buka kembali kalau sebelumnya memang visible / ditampilkan
+            if (isKegiatanVisible && openProgramId) {
+                jQuery(document).ajaxStop(function() {
+                    var reopenbutton = jQuery('#' + openProgramId).find('.view-kegiatan-button');
+                    if (reopenbutton.length) {
+                        reopenbutton.click(); 
+                    }
+                    jQuery(document).off('ajaxStop'); // agar hanya sekali jalan
+                });
+            }
+        });
     });
 
     function getTableCascading() {
         jQuery('#wrap-loading').show();
+        
+        var showPokin = jQuery('#show_pokin').is(':checked') ? 1 : 0;
+        
         jQuery.ajax({
             url: esakip.url,
             type: 'POST',
             data: {
                 action: 'get_table_cascading_pd',
                 id_jadwal: <?php echo $input['periode']; ?>,
-                id_skpd: <?php echo $id_skpd; ?>
+                id_skpd: <?php echo $id_skpd; ?>,
+                show_pokin: showPokin
             },
             dataType: 'json',
             success: function(response) {
@@ -518,6 +560,8 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                 console.log(response);
                 if (response.status === 'success') {
                     jQuery('#tabel-cascading tbody').html(response.data);
+                    
+                    togglePokinVisibility(showPokin);
                 } else {
                     alert(response.message);
                 }
@@ -528,6 +572,16 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                 alert('Terjadi kesalahan saat memuat data!');
             }
         });
+    }
+
+    function togglePokinVisibility(show, tableSelector) {
+        var selector = tableSelector ? tableSelector + ' .nama_pokin' : '.nama_pokin';
+        
+        if (show) {
+            jQuery(selector).show();
+        } else {
+            jQuery(selector).hide();
+        }
     }
 
     function view_kegiatan(button, id, program, sasaran, tujuan) {
@@ -547,6 +601,8 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
 
         if (icon.hasClass('dashicons-visibility')) {
             let value_program = jQuery(`#program-ke-${id}`).attr('data-nama-program') || 'Program belum dipilih';
+            
+            var showPokin = jQuery('#show_pokin').is(':checked') ? 1 : 0;
 
             jQuery.ajax({
                 url: esakip.url,
@@ -557,7 +613,8 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                     id_skpd: <?php echo $id_skpd; ?>,
                     tujuan: tujuan,
                     sasaran: sasaran,
-                    program: program
+                    program: program,
+                    show_pokin: showPokin
                 },
                 dataType: 'json',
                 success: function(response) {
@@ -567,6 +624,8 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                         body.html(response.data).show();
                         jQuery(button).data('loaded', true);
                         icon.removeClass('dashicons-visibility').addClass('dashicons-hidden');
+                        
+                        togglePokinVisibility(showPokin, '#tabel-cascading-kegiatan');
                     } else {
                         alert(response.message);
                     }
@@ -584,6 +643,9 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
             } else {
                 body.show();
                 icon.removeClass('dashicons-visibility').addClass('dashicons-hidden');
+                
+                var showPokin = jQuery('#show_pokin').is(':checked') ? 1 : 0;
+                togglePokinVisibility(showPokin, '#tabel-cascading-kegiatan');
             }
 
             jQuery(".get-nama-program").html(function() {
