@@ -1723,6 +1723,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 	}
 
 	function handleDetailPokin(idPokin) {
+		jQuery("#wrap-loading").show();
 		jQuery.ajax({
 			method: 'POST',
 			url: esakip.url,
@@ -1733,6 +1734,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 			},
 			dataType: 'json',
 			success: function(response) {
+				jQuery("#wrap-loading").hide();
 				if (!response.status) {
 					alert(response.message);
 					return;

@@ -2758,7 +2758,7 @@ $hak_akses_user = ($this_jenis_role || $cek_settingan_menu == 3 || $is_administr
 
 		<div class="info-section text-left">
 			<h6><i class="dashicons dashicons-admin-users"></i> Pelaksana</h6>
-			<p id="pelaksana"></p>
+			<p id="pelaksana"><?php echo $skpd['nama_skpd'] ?></p>
 		</div>
 
 		<div class="info-section text-left">
@@ -2777,10 +2777,10 @@ $hak_akses_user = ($this_jenis_role || $cek_settingan_menu == 3 || $is_administr
                 <table id="croscutting" cellpadding="2" cellspacing="0" class="table table-bordered">
                     <thead>
 						<tr>
-							<th class="text-center kiri" style="border: 1px solid black;">Perangkat Pengusul</th>
-							<th class="text-center kiri" style="border: 1px solid black;">Keterangan Pengusul</th>
-							<th class="text-center kiri" style="border: 1px solid black;">Keterangan Tujuan</th>
-							<th class="text-center kiri" style="border: 1px solid black;">Perangkat Daerah Tujuan</th>
+							<th class="text-center" style="border: 1px solid black;">Perangkat Pengusul</th>
+							<th class="text-center" style="border: 1px solid black;">Keterangan Pengusul</th>
+							<th class="text-center" style="border: 1px solid black;">Keterangan Tujuan</th>
+							<th class="text-center" style="border: 1px solid black;">Perangkat Daerah Tujuan</th>
 						</tr>	
                     </thead>
                     <tbody>
@@ -2875,7 +2875,7 @@ jQuery(document).ready(function(){
                         +`</div>`
                         +`<div class="form-group">`
                             +'<label for="pelaku">Pelaksana</label>'
-                            +`<input type="text" class="form-control" name="pelaku" id="pelaku" value="${response.data.pelaksana ?? ''}">`
+                            +`<input type="text" class="form-control" name="pelaku" id="pelaku" value="<?php echo $skpd['nama_skpd'] ?>" disabled>`
                         +`</div>`
                         +`<div class="form-group">`
                             +'<label for="bentuk_kegiatan">Bentuk Kegiatan</label>'
@@ -3150,7 +3150,7 @@ jQuery(document).ready(function(){
                         +`</div>`
                         +`<div class="form-group">`
                             +'<label for="pelaku">Pelaksana</label>'
-                            +`<input type="text" class="form-control" name="pelaku" id="pelaku" value="${response.data.pelaksana ?? ''}">`
+                            +`<input type="text" class="form-control" name="pelaku" id="pelaku" value="<?php echo $skpd['nama_skpd'] ?>" disabled>`
                         +`</div>`
                         +`<div class="form-group">`
                             +'<label for="bentuk_kegiatan">Bentuk Kegiatan</label>'
@@ -3433,7 +3433,7 @@ jQuery(document).ready(function(){
                         +`</div>`
                         +`<div class="form-group">`
                             +'<label for="pelaku">Pelaksana</label>'
-                            +`<input type="text" class="form-control" name="pelaku" id="pelaku" value="${response.data.pelaksana ?? ''}">`
+                            +`<input type="text" class="form-control" name="pelaku" id="pelaku" value="<?php echo $skpd['nama_skpd'] ?>" disabled>`
                         +`</div>`
                         +`<div class="form-group">`
                             +'<label for="bentuk_kegiatan">Bentuk Kegiatan</label>'
@@ -3717,7 +3717,7 @@ jQuery(document).ready(function(){
                         +`</div>`
                         +`<div class="form-group">`
                             +'<label for="pelaku">Pelaksana</label>'
-                            +`<input type="text" class="form-control" name="pelaku" id="pelaku" value="${response.data.pelaksana ?? ''}">`
+                            +`<input type="text" class="form-control" name="pelaku" id="pelaku" value="<?php echo $skpd['nama_skpd'] ?>" disabled>`
                         +`</div>`
                         +`<div class="form-group">`
                             +'<label for="bentuk_kegiatan">Bentuk Kegiatan</label>'
@@ -4008,7 +4008,7 @@ jQuery(document).ready(function(){
                         +`</div>`
                         +`<div class="form-group">`
                             +'<label for="pelaku">Pelaksana</label>'
-                            +`<input type="text" class="form-control" name="pelaku" id="pelaku" value="${response.data.pelaksana ?? ''}">`
+                            +`<input type="text" class="form-control" name="pelaku" id="pelaku" value="<?php echo $skpd['nama_skpd'] ?>" disabled>`
                         +`</div>`
                         +`<div class="form-group">`
                             +'<label for="bentuk_kegiatan">Bentuk Kegiatan</label>'
@@ -5294,6 +5294,7 @@ function refresh_page() {
 
 
 function handleDetailPokin(idPokin) {
+	jQuery("#wrap-loading").show();
 	jQuery.ajax({
 		method: 'POST',
 		url: esakip.url,
@@ -5307,6 +5308,7 @@ function handleDetailPokin(idPokin) {
 		},
 		dataType: 'json',
 		success: function(response) {
+			jQuery("#wrap-loading").hide();
 			if (!response.status) {
 				alert(response.message);
 				return;
@@ -5320,12 +5322,11 @@ function handleDetailPokin(idPokin) {
 				jQuery("#indikator").text('-');
 			}
 
-			jQuery("#pelaksana").text(response.data.pelaksana || '-');
 			jQuery("#bentuk_kegiatan").text(response.data.bentuk_kegiatan || '-');
 			jQuery("#outcome").text(response.data.outcome || '-');
 		
 			if (!response.data_koneksi_croscutting_opd || response.data_koneksi_croscutting_opd.length === 0) {
-				jQuery("#croscutting tbody").text('-');
+				jQuery("#croscutting tbody").html(`<tr><td colspan="4" class="text-center" style="border: 1px solid black;">Tidak ada data koneksi croscutting</td></tr>`);
 			} else {
 				jQuery("#croscutting tbody").html(response.data_koneksi_croscutting_opd);
 			}

@@ -89,13 +89,13 @@ $html_iku = '';
 $no_iku = 1;
 $data_simpan = array();
 
+$jadwal = $wpdb->get_row($wpdb->prepare("
+    SELECT 
+        * 
+    FROM esakip_data_jadwal
+    WHERE id = %d
+", $input['id_periode']), ARRAY_A);
 if (!empty($iku)) {
-    $jadwal = $wpdb->get_row($wpdb->prepare("
-        SELECT 
-            * 
-        FROM esakip_data_jadwal
-        WHERE id = %d
-    ", $input['id_periode']), ARRAY_A);
 
     $id_jadwal_murni = $jadwal['id_jadwal_murni'] ?? null;
 
@@ -174,8 +174,8 @@ if (!empty($iku)) {
         $html_iku .= '</tr>';
     }
 } else {
-    $colspan = 8 + ($tahun_periode - $tahun_mulai_anggaran + 1);
-    $html_iku = '<tr><td class="text-center" colspan="' . $colspan . '">Data belum tersedia.</td></tr>';
+    $colspan = 7 + ($jadwal['lama_pelaksanaan'] * 2);
+    $html_iku = '<tr><td class="text-center" colspan="' . $colspan . '">Data tidak tersedia.</td></tr>';
 }
 
 
@@ -593,7 +593,7 @@ $generate_page = $this->functions->generatePage(array(
 </div>
 <!-- Modal crud -->
 <div class="modal fade" id="modal-iku" data-backdrop="static"  role="dialog" aria-labelledby="modal-crud-label" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Tambah Data</h5>
@@ -603,106 +603,106 @@ $generate_page = $this->functions->generatePage(array(
             </div>
             <div class="modal-body">
                 <form name="input_iku">
-                    <input type="hidden" id="id_iku" value="">
-                    <input type="hidden" id="id_sasaran_murni" value="">
-                    <?php if (!empty($id_jadwal_murni)): ?>
-                        <div class="form-group">
-                            <label>Sasaran Sebelum</label>
-                            <input class="form-control" id="sasaran_sebelum" disabled/>
+                    <div class="card bg-light shadow-md mb-3">
+                        <div class="card-body">
+                            <input type="hidden" id="id_iku" value="">
+                            <input type="hidden" id="id_sasaran_murni" value="">
+                            <?php if (!empty($id_jadwal_murni)): ?>
+                                <div class="form-group">
+                                    <label>Sasaran Sebelum</label>
+                                    <input class="form-control" id="sasaran_sebelum" disabled/>
+                                </div>
+                            <?php endif; ?>
+                            <div class="form-group">
+                                <label for="sumber-data-iku">Pilih Sumber Data</label>
+                                <select name="sumber-data-iku" id="sumber-data-iku" onchange="setDataIku();">
+                                    <option value="1">Tujuan</option>
+                                    <option value="2" selected>Sasaran</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="tujuan-sasaran" id="label-tujuan-sasaran">Tujuan/Sasaran</label>
+                                <select name="tujuan-sasaran" id="tujuan-sasaran"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="indikator">Indikator</label>
+                                <select name="indikator" id="indikator"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="formulasi">Definisi Operasional/Formulasi</label>
+                                <?php 
+                                    $content = ''; 
+                                    $editor_id = 'formulasi';
+                                    $settings = array(
+                                        'textarea_name' => 'formulasi',
+                                        'media_buttons' => true, 
+                                        'teeny' => false, 
+                                        'quicktags' => true
+                                    );
+                                    wp_editor($content, $editor_id, $settings);
+                                ?>
+                            </div>
+                            <div class="form-group">
+                                <label for="sumber-data">Sumber Data</label>
+                                <textarea name="sumber-data" id="sumber-data"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="penanggung-jawab">Penanggung Jawab</label>
+                                <textarea name="penanggung-jawab" id="penanggung-jawab"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="satuan">Satuan</label>
+                                <input type="text" class="form-control" id="satuan" name="satuan"/>
+                            </div>
                         </div>
-                     <?php endif; ?>
-                    <div class="form-group">
-                        <label for="sumber-data-iku">Pilih Sumber Data</label>
-                        <select name="sumber-data-iku" id="sumber-data-iku" onchange="setDataIku();">
-                            <option value="1">Tujuan</option>
-                            <option value="2" selected>Sasaran</option>
-                        </select>
                     </div>
-                    <div class="form-group">
-                        <label for="tujuan-sasaran" id="label-tujuan-sasaran">Tujuan/Sasaran</label>
-                        <select name="tujuan-sasaran" id="tujuan-sasaran"></select>
-                    </div>
-                    <div class="form-group">
-                        <label for="indikator">Indikator</label>
-                        <select name="indikator" id="indikator"></select>
-                    </div>
-                     <div class="form-group">
-                        <label for="formulasi">Definisi Operasional/Formulasi</label>
-                        <?php 
-                            $content = ''; 
-                            $editor_id = 'formulasi';
-                            $settings = array(
-                                'textarea_name' => 'formulasi',
-                                'media_buttons' => true, 
-                                'teeny' => false, 
-                                'quicktags' => true
-                            );
-                            wp_editor($content, $editor_id, $settings);
-                        ?>
-                    </div>
-                    <div class="form-group">
-                        <label for="sumber-data">Sumber Data</label>
-                        <textarea name="sumber-data" id="sumber-data"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="penanggung-jawab">Penanggung Jawab</label>
-                        <textarea name="penanggung-jawab" id="penanggung-jawab"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="satuan">Satuan</label>
-                        <input type="text" class="form-control" id="satuan" name="satuan"/>
-                    </div>
-                    
-                    <?php 
-                    $lama = $data_jadwal['lama_pelaksanaan'] ?? 0;
-                    ?>
 
                     <!-- Target -->
-                    <?php for ($i = 0; $i < $lama; $i += 2): ?>
-                        <div class="form-group row">
-                            <div class="col-md-2">
-                                <label for="target_<?php echo $i + 1; ?>">Target <?php echo $i + 1; ?></label>
-                            </div>
-                            <div class="col-md-4">
-                                <input type="number" class="form-control" id="target_<?php echo $i + 1; ?>" name="target_<?php echo $i + 1; ?>"/>
-                            </div>
+                    <div class="card bg-light shadow-md mb-3">
+                        <div class="card-body">
+                            <?php for ($i = 0; $i < $data_jadwal['lama_pelaksanaan']; $i += 2): ?>
+                                <div class="form-group row">
+                                    <div class="col-md-6">
+                                        <label for="target_<?php echo $i + 1; ?>">Target <?php echo $data_jadwal['tahun_anggaran'] + $i; ?></label>
+                                        <input type="number" min="0" class="form-control" id="target_<?php echo $i + 1; ?>" name="target_<?php echo $i + 1; ?>"/>
+                                    </div>
 
-                            <?php if ($i + 2 <= $lama): ?>
-                                <div class="col-md-2">
-                                    <label for="target_<?php echo $i + 2; ?>">Target <?php echo $i + 2; ?></label>
+                                    <?php if ($i + 2 <= $data_jadwal['lama_pelaksanaan']): ?>
+                                        <div class="col-md-6">
+                                            <label for="target_<?php echo $i + 2; ?>">Target <?php echo $data_jadwal['tahun_anggaran'] + $i + 1; ?></label>
+                                            <input type="number" min="0" class="form-control" id="target_<?php echo $i + 2; ?>" name="target_<?php echo $i + 2; ?>"/>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
-                                <div class="col-md-4">
-                                    <input type="number" class="form-control" id="target_<?php echo $i + 2; ?>" name="target_<?php echo $i + 2; ?>"/>
-                                </div>
-                            <?php endif; ?>
+                            <?php endfor; ?>
                         </div>
-                    <?php endfor; ?>
+                    </div>
 
                     <!-- Realisasi -->
-                    <?php for ($i = 0; $i < $lama; $i += 2): ?>
-                        <div class="form-group row">
-                            <div class="col-md-2">
-                                <label for="realisasi_<?php echo $i + 1; ?>">Realisasi <?php echo $i + 1; ?></label>
-                            </div>
-                            <div class="col-md-4">
-                                <input type="number" class="form-control" id="realisasi_<?php echo $i + 1; ?>" name="realisasi_<?php echo $i + 1; ?>"/>
-                            </div>
+                    <div class="card bg-light shadow-md mb-3">
+                        <div class="card-body">
+                        <?php for ($i = 0; $i < $data_jadwal['lama_pelaksanaan']; $i += 2): ?>
+                            <div class="form-group row">
+                                <div class="col-md-6">
+                                    <label for="realisasi_<?php echo $i + 1; ?>">Realisasi <?php echo $data_jadwal['tahun_anggaran'] + $i; ?></label>
+                                    <input type="number" min="0" class="form-control" id="realisasi_<?php echo $i + 1; ?>" name="realisasi_<?php echo $i + 1; ?>"/>
+                                </div>
 
-                            <?php if ($i + 2 <= $lama): ?>
-                                <div class="col-md-2">
-                                    <label for="realisasi_<?php echo $i + 2; ?>">Realisasi <?php echo $i + 2; ?></label>
-                                </div>
-                                <div class="col-md-4">
-                                    <input type="number" class="form-control" id="realisasi_<?php echo $i + 2; ?>" name="realisasi_<?php echo $i + 2; ?>"/>
-                                </div>
-                            <?php endif; ?>
+                                <?php if ($i + 2 <= $data_jadwal['lama_pelaksanaan']): ?>
+                                    <div class="col-md-6">
+                                        <label for="realisasi_<?php echo $i + 2; ?>">Realisasi <?php echo $data_jadwal['tahun_anggaran'] + $i + 1; ?></label>
+                                        <input type="number" min="0" class="form-control" id="realisasi_<?php echo $i + 2; ?>" name="realisasi_<?php echo $i + 2; ?>"/>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        <?php endfor; ?>
                         </div>
-                    <?php endfor; ?>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
-                <button type="button" class="btn btn-success" onclick="simpan_data_iku()">Simpan</button>
+                <button type="button" class="btn btn-success">Simpan</button>
             </div>
         </div>
     </div>

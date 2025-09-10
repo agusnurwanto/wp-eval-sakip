@@ -32870,7 +32870,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				for($i=1; $i<=$_POST['lama_pelaksanaan']; $i++){
 					$target .= "
 						<td class='text-center'>{$iku['target_'.$i]}</td>
-						<td class='text-center'></td>
+						<td class='text-center'>{$iku['realisasi_'.$i]}</td>
 					";
 				}
 				$tbody_pemda .= "

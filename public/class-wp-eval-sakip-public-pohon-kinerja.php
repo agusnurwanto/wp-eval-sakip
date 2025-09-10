@@ -1178,6 +1178,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						", trim($input['label']), $input['id']));
 					} else {
 						// untuk pokin opd  //////////////////////////////////////////////////////////////////////////////
+						$data['pelaksana'] = null; // pelaksana di opd di set null karena pasti opd itu sendiri.
 						$wpdb->update('esakip_pohon_kinerja' . $_prefix_opd, $data, [
 							'id' => $input['id'],
 							'id_skpd' => $id_skpd
