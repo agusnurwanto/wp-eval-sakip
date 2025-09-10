@@ -924,8 +924,8 @@ if (!empty($data_sasaran_existing)) {
 <h4 style="text-align: center; margin: 0; font-weight: bold; text-transform:uppercase;">Jadwal <?php echo $jadwal['jenis_jadwal_khusus']; ?> <?php echo $jadwal['nama_jadwal']; ?><br><?php echo $nama_pemda; ?><br><?php echo $tahun_awal . ' - ' . $jadwal['tahun_selesai_anggaran']; ?></h4>
 <div id="action" class="action-section hide-excel"></div>
 <div id="action-sakip"></div>
-<div id="cetak" title="Laporan MONEV RENJA" style="padding: 5px; overflow: auto; height: 80vh;">
-    <table cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; font-size: 70%; border: 0; table-layout: fixed;" contenteditable="false">
+<div id="cetak" title="Laporan <?php echo $jadwal['jenis_jadwal_khusus'] . ' ' . $tahun_awal; ?> " style="padding: 5px; overflow: auto; height: 80vh;">
+    <table cellpadding="2" cellspacing="0" contenteditable="false">
         <thead>
             <tr>
                 <th style="width: 85px;" class="esakip-atas esakip-kiri esakip-kanan esakip-bawah esakip-text_tengah esakip-text_blok">No</th>
