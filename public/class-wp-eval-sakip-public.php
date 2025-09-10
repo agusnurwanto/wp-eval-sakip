@@ -32813,7 +32813,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$no_opd = 1;
 			foreach ($all_skpd as $skpd) {
 				$cascading_publish_page = $this->functions->generatePage([
-					'nama_page'   => 'Cascading',
+					'nama_page'   => 'Cascading Publish',
 					'content'     => '[view_cascading_publish]',
 					'show_header' => 1,
 					'post_status' => 'publish'
