@@ -1753,9 +1753,9 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 				jQuery("#outcome").text(response.data.outcome || '-');
 				
 				if (!response.data_koneksi_croscutting_pemda || response.data_koneksi_croscutting_pemda.length === 0) {
-					jQuery("#crosscutting").text('-');
+					jQuery("#croscutting tbody").html(`<tr><td colspan="4" class="text-center" style="border: 1px solid black;">Tidak ada data koneksi croscutting</td></tr>`);
 				} else {
-					jQuery("#crosscutting").html(response.data_koneksi_croscutting_pemda);
+					jQuery("#croscutting tbody").html(response.data_koneksi_croscutting_pemda);
 				}
 
 				toggleSidebar();

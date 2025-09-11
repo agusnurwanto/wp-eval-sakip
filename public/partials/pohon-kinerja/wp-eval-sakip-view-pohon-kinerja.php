@@ -1061,7 +1061,7 @@ if (!empty($data_all['data'])) {
 					<?php if ($tipe == 'opd'): ?>
 
 						if (!response.data_koneksi_croscutting_opd || response.data_koneksi_croscutting_opd.length === 0) {
-							jQuery("#croscutting tbody").text('-');
+							jQuery("#croscutting tbody").html(`<tr><td colspan="4" class="text-center" style="border: 1px solid black;">Tidak ada data koneksi croscutting</td></tr>`);
 						} else {
 							jQuery("#croscutting tbody").html(response.data_koneksi_croscutting_opd);
 						}
@@ -1069,7 +1069,7 @@ if (!empty($data_all['data'])) {
                     <?php else: ?>
 
 						if (!response.data_koneksi_croscutting_pemda || response.data_koneksi_croscutting_pemda.length === 0) {
-							jQuery("#croscutting").text('-');
+							jQuery("#croscutting").html(`<tr><td colspan="4" class="text-center" style="border: 1px solid black;">Tidak ada data koneksi croscutting</td></tr>`);
 						} else {
 							jQuery("#croscutting").html(response.data_koneksi_croscutting_pemda);
 						}
