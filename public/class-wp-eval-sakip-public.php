@@ -5439,13 +5439,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 					foreach ($renjas as $kk => $vv) {
 						$data_verifikasi = $wpdb->get_row($wpdb->prepare('
-											SELECT 
-												*
-											FROM esakip_keterangan_verifikator
-											WHERE id_dokumen=%d
-												AND active=1
-												AND nama_tabel_dokumen=%s
-										', $vv['id'], 'esakip_renja_rkt'), ARRAY_A);
+							SELECT 
+								*
+							FROM esakip_keterangan_verifikator
+							WHERE id_dokumen=%d
+								AND active=1
+								AND nama_tabel_dokumen=%s
+						', $vv['id'], $nama_tabel), ARRAY_A);
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
@@ -5565,7 +5565,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						        $wpdb->update(
 						        	'esakip_keterangan_verifikator', 
 						            ['keterangan_verifikasi' => $update_keterangan], 
-						            ['id_dokumen' => $vv['id'], 'active' => 1, 'nama_tabel_dokumen' => 'esakip_dpa']
+						            ['id_dokumen' => $vv['id'], 'active' => 1, 'nama_tabel_dokumen' => $nama_tabel]
 						        );
 
 						        $keterangan_verifikasi = $keterangan['tanggal'] . '  ' . $keterangan['pesan'];
@@ -5982,13 +5982,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 					foreach ($perjanjian_kinerjas as $kk => $vv) {
 						$data_verifikasi = $wpdb->get_row($wpdb->prepare('
-											SELECT 
-												*
-											FROM esakip_keterangan_verifikator
-											WHERE id_dokumen=%d
-												AND active=1
-												AND nama_tabel_dokumen=%s
-										', $vv['id'], 'esakip_perjanjian_kinerja'), ARRAY_A);
+							SELECT 
+								*
+							FROM esakip_keterangan_verifikator
+							WHERE id_dokumen=%d
+								AND active=1
+								AND nama_tabel_dokumen=%s
+						', $vv['id'], $nama_tabel), ARRAY_A);
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
@@ -6108,7 +6108,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						        $wpdb->update(
 						        	'esakip_keterangan_verifikator', 
 						            ['keterangan_verifikasi' => $update_keterangan], 
-						            ['id_dokumen' => $vv['id'], 'active' => 1, 'nama_tabel_dokumen' => 'esakip_dpa']
+						            ['id_dokumen' => $vv['id'], 'active' => 1, 'nama_tabel_dokumen' => $nama_tabel]
 						        );
 
 						        $keterangan_verifikasi = $keterangan['tanggal'] . '  ' . $keterangan['pesan'];
@@ -6311,13 +6311,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 					foreach ($laporan_kinerjas as $kk => $vv) {
 						$data_verifikasi = $wpdb->get_row($wpdb->prepare('
-											SELECT 
-												*
-											FROM esakip_keterangan_verifikator
-											WHERE id_dokumen=%d
-												AND active=1
-												AND nama_tabel_dokumen=%s
-										', $vv['id'], 'esakip_laporan_kinerja'), ARRAY_A);
+							SELECT 
+								*
+							FROM esakip_keterangan_verifikator
+							WHERE id_dokumen=%d
+								AND active=1
+								AND nama_tabel_dokumen=%s
+						', $vv['id'], $nama_tabel), ARRAY_A);
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
@@ -6372,7 +6372,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							        $wpdb->update(
 							        	'esakip_keterangan_verifikator', 
 							            ['keterangan_verifikasi' => $update_keterangan], 
-							            ['id_dokumen' => $vv['id'], 'active' => 1, 'nama_tabel_dokumen' => 'esakip_dpa']
+							            ['id_dokumen' => $vv['id'], 'active' => 1, 'nama_tabel_dokumen' => $nama_tabel]
 							        );
 
 							        $keterangan_verifikasi = $keterangan['tanggal'] . '  ' . $keterangan['pesan'];
@@ -8084,13 +8084,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 					foreach ($renstras as $kk => $vv) {
 						$data_verifikasi = $wpdb->get_row($wpdb->prepare('
-											SELECT 
-												*
-											FROM esakip_keterangan_verifikator
-											WHERE id_dokumen=%d
-												AND active=1
-												AND nama_tabel_dokumen=%s
-										', $vv['id'], 'esakip_renstra'), ARRAY_A);
+							SELECT 
+								*
+							FROM esakip_keterangan_verifikator
+							WHERE id_dokumen=%d
+								AND active=1
+								AND nama_tabel_dokumen=%s
+						', $vv['id'], $nama_tabel), ARRAY_A);
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
@@ -8254,7 +8254,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						        $wpdb->update(
 						        	'esakip_keterangan_verifikator', 
 						            ['keterangan_verifikasi' => $update_keterangan], 
-						            ['id_dokumen' => $vv['id'], 'active' => 1, 'nama_tabel_dokumen' => 'esakip_dpa']
+						            ['id_dokumen' => $vv['id'], 'active' => 1, 'nama_tabel_dokumen' => $nama_tabel]
 						        );
 
 						        $keterangan_verifikasi = $keterangan['tanggal'] . '  ' . $keterangan['pesan'];
@@ -26010,8 +26010,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						}
 
 						$keterangan_verifikasi = array(
-							"keterangan_baru" => array("tanggal" => current_time('mysql'),
-								"pesan" => $keterangan),
+							"keterangan_baru" => array(
+								"tanggal" => current_time('mysql'),
+								"pesan" => $keterangan
+							),
 							"keterangan_lama" => $keterangan_lama
 						);
 
@@ -26261,7 +26263,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							WHERE id_dokumen=%d
 								AND active=1
 								AND nama_tabel_dokumen=%s
-						', $vv['id'], 'esakip_dpa'), ARRAY_A);
+						', $vv['id'], $nama_tabel), ARRAY_A);
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
@@ -26381,7 +26383,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						        $wpdb->update(
 						        	'esakip_keterangan_verifikator', 
 						            ['keterangan_verifikasi' => $update_keterangan], 
-						            ['id_dokumen' => $vv['id'], 'active' => 1, 'nama_tabel_dokumen' => 'esakip_dpa']
+						            ['id_dokumen' => $vv['id'], 'active' => 1, 'nama_tabel_dokumen' => $nama_tabel]
 						        );
 
 						        $keterangan_verifikasi = $keterangan['tanggal'] . '  ' . $keterangan['pesan'];
@@ -31038,27 +31040,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						);
 					}
 					if (!empty($data_terverifikasi)) {
-						if ($_POST['tipe_dokumen'] == 'renstra') {
-							$update_status = $wpdb->update(
-								'esakip_keterangan_verifikator',
-								array(
-									"status_verifikasi" => 0
-								),
-								array('id_dokumen' => $id_dokumen, 'nama_tabel_dokumen' => $nama_tabel_database, 'id_skpd' => $id_skpd, 'id_jadwal' => $id_jadwal, 'active' => 1),
-								array('%d'),
-								array('%d', '%s', '%d', '%d', '%d')
-							);
-						} else {
-							$update_status = $wpdb->update(
-								'esakip_keterangan_verifikator',
-								array(
-									"status_verifikasi" => 0
-								),
-								array('id_dokumen' => $id_dokumen, 'nama_tabel_dokumen' => $nama_tabel_database, 'id_skpd' => $id_skpd, 'active' => 1),
-								array('%d'),
-								array('%d', '%s', '%d', '%d')
-							);
-						}
+						$update_status = $wpdb->update(
+							'esakip_keterangan_verifikator',
+							array(
+								"status_verifikasi" => 0
+							),
+							array('id' => $data_terverifikasi['id'])
+						);
 
 						if ($update_status === false) {
 							$ret = array(
@@ -31960,7 +31948,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							WHERE id_dokumen=%d
 								AND active=1
 								AND nama_tabel_dokumen=%s
-						', $vv['id'], 'esakip_tl_lhe_akip_internal'), ARRAY_A);
+						', $vv['id'], $nama_tabel), ARRAY_A);
 
 						$color_badge_verify = 'secondary';
 						$text_badge = 'Menunggu';
@@ -32081,7 +32069,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						        $wpdb->update(
 						        	'esakip_keterangan_verifikator', 
 						            ['keterangan_verifikasi' => $update_keterangan], 
-						            ['id_dokumen' => $vv['id'], 'active' => 1, 'nama_tabel_dokumen' => 'esakip_dpa']
+						            ['id_dokumen' => $vv['id'], 'active' => 1, 'nama_tabel_dokumen' => $nama_tabel]
 						        );
 
 						        $keterangan_verifikasi = $keterangan['tanggal'] . '  ' . $keterangan['pesan'];
@@ -32825,7 +32813,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$no_opd = 1;
 			foreach ($all_skpd as $skpd) {
 				$cascading_publish_page = $this->functions->generatePage([
-					'nama_page'   => 'Cascading',
+					'nama_page'   => 'Cascading Publish',
 					'content'     => '[view_cascading_publish]',
 					'show_header' => 1,
 					'post_status' => 'publish'
@@ -32882,7 +32870,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				for($i=1; $i<=$_POST['lama_pelaksanaan']; $i++){
 					$target .= "
 						<td class='text-center'>{$iku['target_'.$i]}</td>
-						<td class='text-center'></td>
+						<td class='text-center'>{$iku['realisasi_'.$i]}</td>
 					";
 				}
 				$tbody_pemda .= "

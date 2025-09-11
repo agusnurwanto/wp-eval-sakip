@@ -4329,8 +4329,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				}
 
 				if (empty($html)) {
-					$colspan_jadwal_murni = !empty($id_jadwal_murni) ? 8 : 7;
-					$colspan = $colspan_jadwal_murni + $lama_pelaksanaan + 1;
+					$colspan = 9 + ($lama_pelaksanaan * 2);
 					$html = '<tr><td class="text-center" colspan="' . $colspan . '">Data masih kosong!</td></tr>';
 				}
 
@@ -4416,7 +4415,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					if (!empty($_POST['id_iku'])) {
 						$cek_id = $_POST['id_iku'];
 						$data_cek_iku = $wpdb->get_var($wpdb->prepare("
-	                        SELECT id FROM esakip_data_iku_pemda WHERE id = %d
+	                        SELECT id FROM esakip_data_iku_pemda WHERE id = %d AND active = 1
 	                    ", $cek_id));
 
 						$cek_id = !empty($data_cek_iku) ? $cek_id : null;
